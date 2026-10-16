@@ -1,0 +1,16 @@
+{
+  "kultivator.hud.hint_root": "Press %s to test your spiritual root",
+  "kultivator.hud.realm_layer": "%s %s",
+  "kultivator.hud.qi": "Qi %s/%s",
+  "kultivator.hud.stored": "+%s Stored Qi",
+  "kultivator.hud.stored_immortal": "+%s Immortal Qi",
+  "kultivator.hud.breaking_through": "Breaking through...",
+  "kultivator.hud.ready": "Bottleneck: ready to break through",
+  "kultivator.hud.deviation": "Qi Deviation %s",
+  "kultivator.hud.toxicity": "Pill toxicity %s%%!",
+  "kultivator.hud.meditating": "Meditating %s",
+  "kultivator.hud.density": "Qi density %s%%",
+  "kultivator.hud.formation.1": "Small Formation",
+  "kultivator.hud.formation.2": "Great Formation",
+  "kultivator.hud.formation.3": "Heavenly Formation"
+}

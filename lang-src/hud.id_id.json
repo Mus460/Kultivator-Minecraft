@@ -1,0 +1,16 @@
+{
+  "kultivator.hud.hint_root": "Tekan %s untuk menguji akar spiritualmu",
+  "kultivator.hud.realm_layer": "%s %s",
+  "kultivator.hud.qi": "Qi %s/%s",
+  "kultivator.hud.stored": "+%s Qi Tertimbun",
+  "kultivator.hud.stored_immortal": "+%s Qi Abadi",
+  "kultivator.hud.breaking_through": "Menerobos...",
+  "kultivator.hud.ready": "Leher botol: siap menerobos",
+  "kultivator.hud.deviation": "Penyimpangan Qi %s",
+  "kultivator.hud.toxicity": "Racun pil %s%%!",
+  "kultivator.hud.meditating": "Meditasi %s",
+  "kultivator.hud.density": "Kepadatan Qi %s%%",
+  "kultivator.hud.formation.1": "Formasi Kecil",
+  "kultivator.hud.formation.2": "Formasi Agung",
+  "kultivator.hud.formation.3": "Formasi Bintang Surgawi"
+}

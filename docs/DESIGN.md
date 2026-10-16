@@ -68,9 +68,11 @@ its linear index (0 = Mortal … 64 = True Immortal Peak).
 **XP sources** (all multiplied by `Progression.xpMultiplier(player)` = root grade × spiritual site (meditation only) ×
 breakthrough-quality bonus × server config `xpMultiplier`; deviation halves XP):
 * Combat (killing): hostile (`Enemy`) mob → `maxHealth × 0.5`; boss (Wither, Ender Dragon, Warden, Elder Guardian)
-  → `maxHealth × 2`; other mobs → 0. Heart Demon gives its own reward.
+  → `maxHealth × 2`; other mobs → 0. Heart Demon gives its own reward. Dao Protector monsters (§3) give half (they
+  are drawn by the heavens, not hunted).
 * Mining (player breaks, no Silk Touch on the tool): coal 1, copper 1, nether quartz 1, nether gold 1, iron 2,
-  redstone 2, lapis 3, gold 3, diamond 10, emerald 12, ancient debris 25, amethyst cluster 2. Deepslate variants +50%.
+  redstone 2, lapis 3, gold 3, diamond 10, emerald 12, amethyst cluster 2. Deepslate variants +50%. Ancient debris
+  gives nothing (it drops itself, so it could be placed and mined again forever).
 * Meditation: per second `0.6 + 0.25 × realm` × multipliers × spirit vein density (see §4).
 * Pills (vanilla in phase 1, own pills in phases 2/4), reduced by pill toxicity (§9).
 * Enlightenment moments, Heart Demon victory, tribulation success bonuses.
@@ -95,7 +97,8 @@ Qi regen per second = `max × 0.004` (×6 while meditating, ×1.5 in a spiritual
 Triggered with `/cultivate breakthrough`, the info-screen button, or the meditate key while meditating at a full Peak
 bar (a hint is shown). Requirements: full bar at Peak (or Mortal), not already in a breakthrough, not in deviation,
 spiritual root tested (for Mortal → Qi Refining). Moving more than 6 blocks from the start point cancels (counts as fail
-only after the first strike).
+only after the first strike). Logging out during a trial or after the first strike is a failure too, applied when the
+player is back; damage interrupts the Qi Refining gathering but never the awakening.
 
 * **Mortal → Qi Refining** "Awakening": needs a tested root. Always succeeds; 6 s cinematic of qi gathering.
 * **Qi Refining → Foundation**: chance roll, no tribulation. `chance = 0.75 + root bonus + pill bonus + site bonus +
@@ -119,7 +122,9 @@ only after the first strike).
 4. **Dao Protector event** ("Pelindung Dao", config `daoProtectorEvent`, default on): during strikes, waves of hostile
    mobs attracted by the phenomenon spawn on valid ground 10–16 blocks away (no block changes, never inside blocks):
    Overworld skeleton/spider/zombie(no door breaking)/stray/witch (vindicator from Deity Transformation),
-   Nether wither skeleton/magma cube/piglin brute, End endermite/phantom. Waves every 3 strikes, size
+   Nether wither skeleton/magma cube/hoglin (no piglin brutes: they open doors), End endermite/phantom. Skeletons get
+   swords instead of bows, nobody picks up loot, zombies call no reinforcements, raiders never join raids, and
+   protectors only hurt players. Waves every 3 strikes, size
    `1 + targetRealm/2`. They carry tag `kultivator.dao_protector`; leftovers vanish with a poof when it ends. Allies,
    pets and sect members nearby help ("Dao protectors").
 5. **Result**: success → rank advances to the new realm's Early stage, `BreakthroughQuality` rolled, Stored Qi flows in,
@@ -271,7 +276,7 @@ is cleared on join; abilities are only restored when we set them. Creative/spect
 
 Phase 1 — **vanilla items as pills** (eaten normally, or sneak + use for non-food items; a mixin on
 `LivingEntity.completeUsingItem` reports finished eating):
-golden carrot 8 XP · glow berries 2 XP + 5 qi · honey bottle: −20% deviation time · golden apple 30 XP + 30 qi ·
+golden carrot 8 XP · glow berries 2 XP + 5 qi · honey bottle: −20% deviation time (once per deviation) · golden apple 30 XP + 30 qi ·
 enchanted golden apple 250 XP + full qi + tribulation pct ×0.85 for the next tribulation · (sneak-use, consumed)
 glistering melon slice 20 qi · amethyst shard 15 qi · echo shard 60 XP + Indra hint · dragon's breath 400 XP ·
 nether star 1500 XP + breakthrough chance +10% next time · experience bottle (sneak-use) 15 XP.
@@ -408,7 +413,10 @@ Indonesian text should sound natural and use the xianxia terms from this documen
 * GUI: `GuiGraphicsExtractor g` with `g.fill`, `g.text(font, text, x, y, color, shadow)`, `g.item`, `g.pose()` (2D
   matrix: `pushMatrix/translate/scale/popMatrix`); HUD via `HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT,
   id, element)` implementing `extractRenderState(GuiGraphicsExtractor, DeltaTracker)`. Screens: see Butter Bot
-  `client/screen/*` (`minecraft.gui.setScreen`, `minecraft.gui.screen()`).
+  `client/screen/*` (`minecraft.gui.setScreen`, `minecraft.gui.screen()`). The F1 "hide GUI" flag is
+  `minecraft.gui.hud.isHidden()` (`options.hideGui` does not exist in 26.3).
+* Entities we spawn that must never come back from disk (Dao Protectors, Heart Demon) are refused with
+  `ServerEntityEvents.ALLOW_LOAD` (reason `LOAD`) instead of being discarded in `ENTITY_LOAD`.
 * Keys: `KeyMappingHelper.registerKeyMapping(new KeyMapping("key.kultivator.x", InputConstants.Type.KEYBOARD, key,
   CATEGORY))`, `KeyMapping.Category.register(Kultivator.id("main"))`.
 * Commands: op check `.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))`.
@@ -435,25 +443,68 @@ root advancement, `lang-src/core.*`.
 
 Phase 1:
 * **P1-progression**: `cultivation/Progression.java`, `cultivation/Qi.java`, `cultivation/Stats.java`,
-  `cultivation/XpSources.java` (combat + mining hooks), `lang-src/progression.*`, advancements `realm_*`.
+  `cultivation/XpSources.java` (combat + mining hooks), `lang-src/progression.*`, advancements `realm_*`, `stage_up`.
 * **P1-breakthrough**: `cultivation/Breakthrough.java`, `cultivation/Tribulation.java`,
   `cultivation/DaoProtectors.java`, `cultivation/Deviation.java`, damage type JSONs + tags,
   `client/fx/TribulationFx.java`, `client/fx/BreakthroughFx.java`, `lang-src/breakthrough.*`, advancements
-  `first_tribulation`, `perfect_breakthrough`, `heavenly_breakthrough`, `survive_*`.
+  `awakening`, `first_breakthrough`, `first_tribulation`, `perfect_breakthrough`, `heavenly_breakthrough`,
+  `qi_deviation`, `nether_tribulation`, `end_tribulation`, `true_immortal_tribulation`.
 * **P1-meditation**: `cultivation/Meditation.java`, `cultivation/SpiritSites.java`, `cultivation/SpiritVeins.java`,
   `cultivation/QiFormations.java`, `cultivation/Enlightenment.java`, client `client/fx/MeditationFx.java`,
   `client/render/MeditationPose.java` + mixins `client/mixin/AvatarRendererMixin.java`,
   `client/mixin/PlayerModelMixin.java` (registered in `kultivator.client.mixins.json`, which the spine creates empty),
-  `lang-src/meditation.*`, advancements `first_meditation`, `enlightenment`, `qi_formation*`, `spiritual_site`.
+  `lang-src/meditation.*`, advancements `first_meditation`, `enlightenment`, `qi_formation*`, `spiritual_site`,
+  `depleted_vein`.
 * **P1-pills**: `cultivation/VanillaPills.java`, `cultivation/PillToxicity.java`, mixin
   `mixin/LivingEntityMixin.java` (registered in `kultivator.mixins.json`, which the spine creates empty),
-  `lang-src/pills.*`, advancement `first_pill`.
+  `lang-src/pills.*`, advancements `first_pill`, `pill_poisoned`, `forbidden_pill`.
 * **P1-hud-screen**: `client/QiHud.java`, `client/screen/CultivationScreen.java` (+ helpers in `client/screen/`),
   `client/fx/AuraFx.java` (basic per-realm aura), `lang-src/hud.*`, `lang-src/screen.*`.
 
 Phase 2: P2-roots (`cultivation/SpiritRoots.java`, ceremony FX, Marrow pill item + recipe), P2-dao
 (`dao/DaoPaths.java`, `dao/Comprehension.java`, `dao/TechniqueBooks.java`), P2-techniques-a (universal techniques +
 flying sword), P2-techniques-b (Dao techniques), each with their own client FX classes and lang fragments.
+Phase 2 contracts (see §15).
 Phase 3: P3-heart-demon (entity + renderer), P3-beasts, P3-formations, P3-sects.
 Phase 4: P4-visuals (render layers, robe/eyes/back sword/Dao circle textures, flying sword render), P4-alchemy (items,
 pots, recipes, textures), P4-final (True Immortal event, remaining achievements, README).
+
+## 15. Phase 2 contracts
+
+Spine additions made before phase 2 starts:
+* `registry/ModItems.register(name, factory, properties)` registers an item and puts it in the "Kultivator" creative
+  tab (`ModItems.TAB`). Item model files: `assets/kultivator/items/<name>.json` + `models/item/<name>.json` +
+  `textures/item/<name>.png` (generate textures with `tools/png.py`, 16×16, readable pixel art).
+* `technique/UniversalTechniques`, `technique/DaoTechniques`, `dao/Comprehension`, `dao/TechniqueBooks`,
+  `client/fx/DaoTechniqueFx` stubs with the signatures below.
+
+**Casting flow (P2-techniques-a owns `Techniques`, `UniversalTechniques`, `FlyingSword`, `TechniqueFx`):**
+`Techniques.handleAction` → SELECT_TECHNIQUE / SELECT_NEXT / SELECT_PREVIOUS cycle through learned techniques that
+can be cast (Cloud Step is passive: never selected); CAST → `Techniques.tryCast(player, technique)`:
+known, realm ≥ minRealm, Dao technique only with that Dao chosen, not deviating, not breaking through, cooldown over,
+enough qi (Qi.trySpend after a successful cast), casting stops meditation. It calls
+`UniversalTechniques.cast(player, data, technique)` or `DaoTechniques.cast(player, data, technique)`; each returns
+true when the technique really happened (false = nothing to hit / no safe spot → no qi or cooldown spent, the
+implementation tells the player why). After success: spend qi, set the cooldown, `Comprehension.onTechniqueUsed`.
+Shared helpers in `Techniques` (public static, used by both technique modules):
+`double power(CultivationData data)` = D of section 8 (`4 + 2.5 × realm + 0.5 × stage` × `(1 + comprehension/100)`),
+`boolean hurt(ServerPlayer caster, LivingEntity target, float amount)` (damage type `kultivator:technique`, attacker =
+caster so kills count for XP and loot; returns true when it hit; counts `data.addTechniqueKill()` on kills),
+`void fx(ServerPlayer caster, Technique technique, int sub, Vec3 pos, Vec3 target, float scale)` (sends FxType.TECHNIQUE
+with a = technique ordinal).
+The Dao Domain (universal, P2-techniques-a) calls `DaoTechniques.domainPulse(player, data, dao, insideHostiles)` once per
+second when a Dao is chosen; without a Dao it applies the qi pressure itself.
+Client: `TechniqueFx.play` handles universal technique ordinals and forwards Dao technique ordinals to
+`DaoTechniqueFx.play(fx)` (P2-techniques-b); continuous effects (domain dome, flying sword trail, dharma glow) in
+`TechniqueFx.tick` from the synced VisualState flags.
+
+**Dao (P2-dao owns `DaoPaths`, `Comprehension`, `TechniqueBooks`, `DaoFx`):** `DaoPaths.choose` (Golden Core+, none chosen,
+grants the DAO techniques through `Techniques.refreshUnlocks`, FX DAO_CHOSEN, advancement); after a player reaches
+Golden Core without a Dao it sends `OpenScreen(CHOOSE_DAO)` once per session plus a chat hint.
+`Comprehension.add(player, dao, amount)` applies the ×1.5 root affinity; `Comprehension.onTechniqueUsed(player,
+technique)`; the Dao action hooks of section 7 live in `Comprehension.init()`.
+`TechniqueBooks.init()` handles sneak + use of a vanilla enchanted book (stored enchantments component).
+
+**Roots (P2-roots owns `SpiritRoots`, `RootFx`, the Marrow Cleansing Pill):** keeps `SpiritRoots.roll/describe` and
+replaces the instant test with the ceremony; the pill is an item `kultivator:marrow_cleansing_pill` with a shapeless
+recipe (glistering melon slice + ghast tear + golden apple + amethyst shard + bone meal).

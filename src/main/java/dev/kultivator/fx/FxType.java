@@ -17,15 +17,15 @@ public enum FxType {
 	PILLAR,
 
 	// ---- progression / breakthrough (client/fx/BreakthroughFx)
-	/** Minor breakthrough (stage up). a = realm ordinal, b = new stage. */
+	/** Minor breakthrough (stage up). a = realm ordinal, b = new stage, f = stages climbed in this gain. */
 	STAGE_UP,
-	/** Mortal -> Qi Refining awakening, played over its 6 s. a = root main colour. */
+	/** Mortal -> Qi Refining awakening, played over its 6 s. a = root main colour, b = duration ticks (0 = stop). */
 	AWAKENING,
-	/** A breakthrough begins (qi gathering). a = realm ordinal of the target, b = duration ticks. */
+	/** A breakthrough begins (qi gathering). a = realm ordinal of the target, b = duration ticks (0 = stop). */
 	BREAKTHROUGH_START,
-	/** Success. a = new realm ordinal, b = BreakthroughQuality ordinal. */
+	/** Success. a = new realm ordinal, b = BreakthroughQuality ordinal, f = new rank step. */
 	BREAKTHROUGH_SUCCESS,
-	/** Failure / Qi Deviation burst. */
+	/** Failure / Qi Deviation burst. a = 1 for a Hardcore realm drop, f = severity (1 = normal). */
 	DEVIATION,
 
 	// ---- tribulation (client/fx/TribulationFx); a = variant (0 overworld, 1 nether, 2 end)
@@ -35,7 +35,7 @@ public enum FxType {
 	TRIBULATION_STRIKE,
 	/** The clouds part. b = 1 success, 0 failure. */
 	TRIBULATION_END,
-	/** A Dao Protector monster arrives at pos. */
+	/** A Dao Protector monster arrives at pos (b = 0) or vanishes with a poof when the tribulation ends (b = 1). */
 	DAO_PROTECTOR,
 
 	// ---- meditation (client/fx/MeditationFx)
