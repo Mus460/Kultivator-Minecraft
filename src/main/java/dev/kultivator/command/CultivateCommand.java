@@ -29,7 +29,10 @@ import dev.kultivator.data.RootGrade;
 import dev.kultivator.data.Technique;
 import dev.kultivator.data.XpSource;
 import dev.kultivator.network.Net;
+import dev.kultivator.beast.SpiritBeasts;
+import dev.kultivator.formation.ProtectiveFormations;
 import dev.kultivator.technique.Techniques;
+import dev.kultivator.trial.HeartDemons;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
@@ -103,6 +106,9 @@ public final class CultivateCommand {
 		SpiritRoots.addCommands(root, debug);
 		DaoPaths.addCommands(root, debug);
 		Techniques.addCommands(root, debug);
+		HeartDemons.addCommands(root, debug);
+		SpiritBeasts.addCommands(root, debug);
+		ProtectiveFormations.addCommands(root, debug);
 
 		root.then(debug);
 		return root;
