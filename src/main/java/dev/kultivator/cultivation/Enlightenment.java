@@ -1,5 +1,6 @@
 package dev.kultivator.cultivation;
 
+import dev.kultivator.dao.Comprehension;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Dao;
@@ -58,7 +59,7 @@ public final class Enlightenment {
 		Progression.addXp(player, burst, XpSource.ENLIGHTENMENT);
 		Dao dao = data.dao();
 		if (dao != null) {
-			data.addComprehension(dao, COMPREHENSION_GAIN);
+			Comprehension.add(player, dao, COMPREHENSION_GAIN);
 		}
 		Cultivators.syncNow(player);
 

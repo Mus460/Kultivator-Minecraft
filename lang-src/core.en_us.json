@@ -46,7 +46,7 @@
   "kultivator.quality.perfect": "Perfect",
   "kultivator.quality.heavenly": "Heavenly",
   "kultivator.technique.cloud_step": "Cloud Step",
-  "kultivator.technique.cloud_step.desc": "Jump again in mid-air on clouds of qi; no fall damage right after.",
+  "kultivator.technique.cloud_step.desc": "Jump again in mid-air on clouds of qi; no fall damage when you land.",
   "kultivator.technique.qi_palm": "Qi Palm",
   "kultivator.technique.qi_palm.desc": "A blast of qi rushes forward and strikes monsters.",
   "kultivator.technique.flying_sword": "Flying Sword",

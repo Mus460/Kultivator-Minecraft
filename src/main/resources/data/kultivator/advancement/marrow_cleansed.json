@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root_tested",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.marrow_cleansed.description"
+    },
+    "icon": {
+      "id": "kultivator:marrow_cleansing_pill"
+    },
+    "title": {
+      "translate": "advancement.kultivator.marrow_cleansed.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

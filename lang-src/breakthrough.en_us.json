@@ -6,6 +6,7 @@
   "kultivator.breakthrough.refuse.not_peak": "You are not at a bottleneck yet. Reach %s first.",
   "kultivator.breakthrough.refuse.not_full": "Your cultivation is not full yet (%s / %s). Keep cultivating.",
   "kultivator.breakthrough.refuse.riding": "Get off your mount first: a breakthrough needs both feet on the ground.",
+  "kultivator.breakthrough.refuse.airborne": "Land first: a breakthrough needs both feet on the ground.",
   "kultivator.breakthrough.refuse.root": "Your spiritual root has not been tested yet. Use %s first.",
   "kultivator.breakthrough.awakening.start": "The qi of heaven and earth rushes towards you... Stay still and let it in!",
   "kultivator.breakthrough.gathering.start": "You gather your qi against the bottleneck... Stay still! (Chance of success: %s)",

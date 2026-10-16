@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:glistering_melon_slice",
+    "minecraft:ghast_tear",
+    "minecraft:golden_apple",
+    "minecraft:amethyst_shard",
+    "minecraft:bone_meal"
+  ],
+  "result": {
+    "id": "kultivator:marrow_cleansing_pill"
+  }
+}

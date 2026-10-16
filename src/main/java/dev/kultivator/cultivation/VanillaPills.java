@@ -1,6 +1,7 @@
 package dev.kultivator.cultivation;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.dao.Comprehension;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Dao;
@@ -280,7 +281,7 @@ public final class VanillaPills {
 			}
 			case ECHO_SHARD -> {
 				if (data.dao() == Dao.SPACE) {
-					data.addComprehension(Dao.SPACE, ECHO_SPACE_COMPREHENSION);
+					Comprehension.add(player, Dao.SPACE, ECHO_SPACE_COMPREHENSION);
 					parts.add(Component.translatable("kultivator.pills.part.comprehension", Msg.number(ECHO_SPACE_COMPREHENSION),
 							Dao.SPACE.displayName()));
 				}

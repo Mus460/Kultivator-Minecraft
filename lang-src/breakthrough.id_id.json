@@ -6,6 +6,7 @@
   "kultivator.breakthrough.refuse.not_peak": "Kamu belum sampai di leher botol. Capai %s dulu.",
   "kultivator.breakthrough.refuse.not_full": "Kultivasimu belum penuh (%s / %s). Teruslah berkultivasi.",
   "kultivator.breakthrough.refuse.riding": "Turun dulu dari tunggangan: terobosan butuh kedua kaki berpijak di tanah.",
+  "kultivator.breakthrough.refuse.airborne": "Mendaratlah dulu: terobosan butuh kedua kaki berpijak di tanah.",
   "kultivator.breakthrough.refuse.root": "Akar spiritualmu belum diuji. Gunakan %s dulu.",
   "kultivator.breakthrough.awakening.start": "Qi langit dan bumi mengalir deras ke arahmu... Diamlah dan biarkan ia masuk!",
   "kultivator.breakthrough.gathering.start": "Kamu menghimpun qi untuk menembus leher botol... Jangan bergerak! (Peluang berhasil: %s)",
