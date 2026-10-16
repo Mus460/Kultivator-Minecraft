@@ -24,7 +24,11 @@ import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.ModAttachments;
 import dev.kultivator.network.Net;
+import dev.kultivator.beast.SpiritBeasts;
+import dev.kultivator.formation.ProtectiveFormations;
 import dev.kultivator.registry.ModItems;
+import dev.kultivator.sect.Sects;
+import dev.kultivator.trial.HeartDemons;
 import dev.kultivator.technique.DaoTechniques;
 import dev.kultivator.technique.Techniques;
 import net.fabricmc.api.ModInitializer;
@@ -81,6 +85,11 @@ public class Kultivator implements ModInitializer {
 		TechniqueBooks.init();
 		Techniques.init();
 		DaoTechniques.init();
+		// Phase 3
+		HeartDemons.init();
+		SpiritBeasts.init();
+		ProtectiveFormations.init();
+		Sects.init();
 		// After every module registered its items.
 		ModItems.init();
 
@@ -115,6 +124,8 @@ public class Kultivator implements ModInitializer {
 			SpiritRoots.tick(player, data);
 			Techniques.tick(player, data);
 			DaoTechniques.tick(player, data);
+			HeartDemons.tick(player, data);
+			SpiritBeasts.tick(player, data);
 			if (player.tickCount % 40 == 0) {
 				// Picks up a new sword in the inventory, cosmetic changes and so on.
 				Cultivators.refreshVisual(player);

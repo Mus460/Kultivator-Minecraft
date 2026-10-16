@@ -1,7 +1,9 @@
 package dev.kultivator.client;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.beast.BeastClient;
 import dev.kultivator.client.fx.FxDispatcher;
+import dev.kultivator.client.trial.TrialClient;
 import dev.kultivator.client.fx.TechniqueFx;
 import dev.kultivator.client.screen.CultivationScreen;
 import dev.kultivator.network.Payloads;
@@ -22,6 +24,8 @@ public class KultivatorClient implements ClientModInitializer {
 		EffectQuality.load();
 		Keys.init();
 		PillTooltips.init();
+		TrialClient.init();
+		BeastClient.init();
 		BookTooltips.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
