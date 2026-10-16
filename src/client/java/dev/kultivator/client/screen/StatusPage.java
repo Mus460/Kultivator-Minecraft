@@ -7,6 +7,7 @@ import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.cultivation.Qi;
+import dev.kultivator.cultivation.SpiritRoots;
 import dev.kultivator.cultivation.Stats;
 import dev.kultivator.data.BreakthroughQuality;
 import dev.kultivator.data.CultivationData;
@@ -105,7 +106,11 @@ final class StatusPage extends Page {
 			TalismanButton root = new TalismanButton(0, 0, 0, BUTTON_H, () -> Component.translatable("kultivator.screen.btn.root_test"));
 			root.enabledWhen(() -> mortalUntested(data()));
 			root.urgentWhen(() -> mortalUntested(data()));
-			root.onPress(() -> send(Actions.ROOT_TEST));
+			root.onPress(() -> {
+				// The testing ceremony plays around the player in the world: close the scroll so it can be watched.
+				send(Actions.ROOT_TEST);
+				screen.onClose();
+			});
 			root.tooltip(() -> List.of(Component.translatable("kultivator.screen.btn.root_test"),
 					Component.translatable("kultivator.screen.btn.root_test.tip")));
 			row.add(root);
@@ -135,8 +140,22 @@ final class StatusPage extends Page {
 		rebuildSlips();
 	}
 
+	/** A Mortal whose root was never tested (the test button is offered). */
 	static boolean mortalUntested(CultivationData data) {
 		return data.realm().isMortal() && !data.rootTested();
+	}
+
+	/**
+	 * The root is tested and revealed. The root is saved when the 8 s testing ceremony starts; until the reveal the
+	 * screens keep the result hidden.
+	 */
+	static boolean rootKnown(CultivationData data) {
+		return data.rootTested() && !SpiritRoots.revealPending(data);
+	}
+
+	/** A Mortal whose root is not known yet (untested, or its ceremony still running): no breakthrough yet. */
+	static boolean mortalRootUnknown(CultivationData data) {
+		return data.realm().isMortal() && !rootKnown(data);
 	}
 
 	/**
@@ -145,12 +164,12 @@ final class StatusPage extends Page {
 	 */
 	static boolean canBreakthrough(CultivationData data) {
 		Rank rank = data.rank();
-		return data.barFull() && rank.nextIsBreakthrough() && !data.breakingThrough() && !data.deviating() && !mortalUntested(data);
+		return data.barFull() && rank.nextIsBreakthrough() && !data.breakingThrough() && !data.deviating() && !mortalRootUnknown(data);
 	}
 
 	/** Full bar at a bottleneck that the player could break through (an untested Mortal must test the root first). */
 	private static boolean ready(CultivationData data, Rank rank) {
-		return data.barFull() && rank.nextIsBreakthrough() && !mortalUntested(data);
+		return data.barFull() && rank.nextIsBreakthrough() && !mortalRootUnknown(data);
 	}
 
 	private static List<Component> breakthroughTip() {
@@ -176,6 +195,8 @@ final class StatusPage extends Page {
 		}
 		if (rank.realm().isMortal() && !data.rootTested()) {
 			lines.add(Component.translatable("kultivator.screen.bt.root_first").withStyle(ChatFormatting.RED));
+		} else if (rank.realm().isMortal() && !rootKnown(data)) {
+			lines.add(Component.translatable("kultivator.roots.info.reading").withStyle(ChatFormatting.GOLD));
 		}
 		if (data.deviating()) {
 			lines.add(Component.translatable("kultivator.screen.bt.deviation").withStyle(ChatFormatting.RED));
@@ -327,14 +348,14 @@ final class StatusPage extends Page {
 		float core = Math.max(6.0F, sInner - 2.5F);
 		Brush.disc(g, cx, cy, core + 1.0F, Palette.GOLD_DARK);
 		Brush.band(g, cx, cy, core, -core, core, Palette.NIGHT_MIST, Palette.NIGHT);
-		int root = Palette.opaque(Element.mainColor(data.rootElements()));
+		int root = Palette.opaque(Element.mainColor(rootKnown(data) ? data.rootElements() : 0));
 		float spin = (now % 6000L) / 6000.0F;
 		int swirl = Palette.mix(Palette.NIGHT, root, 0.35F);
 		Brush.arc(g, cx, cy, core * 0.72F, core * 0.78F, spin, spin + 0.28F, swirl);
 		Brush.arc(g, cx, cy, core * 0.72F, core * 0.78F, spin + 0.5F, spin + 0.78F, swirl);
 
 		Component name = Brush.bold(rank.realm().displayName());
-		Component second = rank.realm().isMortal() ? Component.translatable(data.rootTested() ? "kultivator.screen.status.root_known"
+		Component second = rank.realm().isMortal() ? Component.translatable(rootKnown(data) ? "kultivator.screen.status.root_known"
 				: "kultivator.screen.status.root_unknown") : rank.realm().layers() > 1
 				? Component.translatable("kultivator.screen.status.layer_stage", rank.layer() + 1, rank.stageName())
 				: Component.translatable("kultivator.screen.status.stage", rank.stageName());

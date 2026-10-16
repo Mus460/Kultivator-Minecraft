@@ -15,8 +15,8 @@ terluka (Penyimpangan Qi).
 | Fase | Isi | Status |
 |------|-----|--------|
 | 0 | Proyek, data pemain (tahan respawn/keluar-masuk/pindah dimensi), perintah uji | ✅ |
-| 1 | Ranah & tahap, leher botol + Qi Tertimbun, terobosan + tribulasi, meditasi, pil vanilla, bar Qi, layar info | ⏳ |
-| 2 | Akar spiritual, Jalan Dao, teknik, kitab teknik | ⏳ |
+| 1 | Ranah & tahap, leher botol + Qi Tertimbun, terobosan + tribulasi, meditasi, pil vanilla, bar Qi, layar info | ✅ |
+| 2 | Akar spiritual, Jalan Dao, teknik, kitab teknik | ✅ |
 | 3 | Iblis Hati, binatang roh, formasi pelindung, sekte | ⏳ |
 | 4 | Visual mewah, alkimia, event akhir Dewa Abadi | ⏳ |
 

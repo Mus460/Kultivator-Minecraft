@@ -15,6 +15,7 @@ import dev.kultivator.cultivation.Progression;
 import dev.kultivator.cultivation.Qi;
 import dev.kultivator.cultivation.SpiritRoots;
 import dev.kultivator.cultivation.Stats;
+import dev.kultivator.dao.Comprehension;
 import dev.kultivator.dao.DaoPaths;
 import dev.kultivator.data.BreakthroughQuality;
 import dev.kultivator.data.CultivationData;
@@ -221,7 +222,8 @@ public final class CultivateCommand {
 							if (dao == null) {
 								return fail(ctx, "kultivator.core.debug.no_dao", "");
 							}
-							data.setComprehension(dao, DoubleArgumentType.getDouble(ctx, "value"));
+							// Through Comprehension.set so crossed levels are announced and their advancements granted.
+							Comprehension.set(player, dao, DoubleArgumentType.getDouble(ctx, "value"));
 							return done(ctx, player);
 						})));
 		set.then(Commands.literal("quality")
@@ -347,6 +349,10 @@ public final class CultivateCommand {
 					data.forget(technique);
 				}
 			}
+			if (learn) {
+				// Selects a technique when none is selected and grants the collector advancement.
+				Techniques.refreshUnlocks(player);
+			}
 			return done(ctx, player);
 		}
 		Technique technique = Technique.byId(id);
@@ -355,6 +361,7 @@ public final class CultivateCommand {
 		}
 		if (learn) {
 			data.learn(technique);
+			Techniques.refreshUnlocks(player);
 		} else {
 			data.forget(technique);
 		}

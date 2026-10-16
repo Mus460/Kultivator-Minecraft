@@ -7,10 +7,12 @@ import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SealCard;
 import dev.kultivator.client.screen.ui.Widget;
+import dev.kultivator.dao.Comprehension;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Technique;
 import dev.kultivator.network.Actions;
+import dev.kultivator.technique.FlyingSword;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -168,8 +170,10 @@ final class TechniquesPage extends Page {
 		List<Component> lines = new ArrayList<>();
 		lines.add(technique.displayName().copy().withColor(dao == null ? 0xFFE6B3 : dao.color()));
 		lines.add(technique.description().copy().withStyle(ChatFormatting.GRAY));
-		String costKey = technique == Technique.FLYING_SWORD ? "kultivator.screen.tech.cost_per_second" : "kultivator.screen.tech.cost";
-		lines.add(Component.translatable(costKey, technique.qiCost(), SealCard.seconds(technique.cooldownTicks())).withColor(0x8FD0FF));
+		boolean flying = technique == Technique.FLYING_SWORD;
+		String costKey = flying ? "kultivator.screen.tech.cost_per_second" : "kultivator.screen.tech.cost";
+		Object cost = flying ? Comprehension.format(FlyingSword.drainPerSecond(data)) : technique.qiCost();
+		lines.add(Component.translatable(costKey, cost, SealCard.seconds(technique.cooldownTicks())).withColor(0x8FD0FF));
 		lines.add(dao == null ? Component.translatable("kultivator.screen.tech.universal").withStyle(ChatFormatting.DARK_AQUA)
 				: Component.translatable("kultivator.screen.tech.dao", dao.displayName()).withColor(dao.color()));
 		if (data.knows(technique)) {

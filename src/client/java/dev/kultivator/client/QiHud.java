@@ -5,6 +5,7 @@ import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.cultivation.Qi;
+import dev.kultivator.cultivation.SpiritRoots;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Element;
 import dev.kultivator.data.Rank;
@@ -124,14 +125,21 @@ public final class QiHud implements HudElement {
 		}
 	}
 
+	/** Root tested and revealed (not still inside its testing ceremony). */
+	private static boolean rootKnown(CultivationData data) {
+		return data.rootTested() && !SpiritRoots.revealPending(data);
+	}
+
 	// ================================================================== orb
 
 	private static void drawOrb(GuiGraphicsExtractor g, CultivationData data, Rank rank, float cx, float cy, float qiFraction, float barFraction,
 								float storedFraction, long now) {
 		float r = ORB;
-		int root = Palette.opaque(Element.mainColor(data.rootElements()));
-		// An untested Mortal is not ready: the root test comes first.
-		boolean ready = data.barFull() && rank.nextIsBreakthrough() && !(rank.realm().isMortal() && !data.rootTested());
+		// The root is saved when its testing ceremony starts: keep the orb pale until the reveal.
+		boolean known = rootKnown(data);
+		int root = Palette.opaque(Element.mainColor(known ? data.rootElements() : 0));
+		// A Mortal whose root is not known yet is not ready: the root test (and its reveal) comes first.
+		boolean ready = data.barFull() && rank.nextIsBreakthrough() && !(rank.realm().isMortal() && !known);
 		float pulse = 0.5F + 0.5F * (float) Math.sin(now / 240.0D);
 
 		Brush.disc(g, cx, cy, r + 4.2F, 0x70101824);
@@ -221,6 +229,7 @@ public final class QiHud implements HudElement {
 		Line meditatingLine = null;
 		addRankLines(lines, font, rank, room);
 		boolean untested = rank.realm().isMortal() && !data.rootTested();
+		boolean unknown = rank.realm().isMortal() && !rootKnown(data);
 		boolean narrow = room < 100;
 		float pulse = 0.5F + 0.5F * (float) Math.sin(now / 200.0D);
 		if (untested) {
@@ -244,7 +253,7 @@ public final class QiHud implements HudElement {
 		}
 		if (data.breakingThrough()) {
 			lines.add(Line.of(Component.translatable("kultivator.hud.breaking_through"), Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse), 0.75F));
-		} else if (data.barFull() && rank.nextIsBreakthrough() && !untested) {
+		} else if (data.barFull() && rank.nextIsBreakthrough() && !unknown) {
 			lines.add(Line.of(Component.translatable("kultivator.hud.ready"), Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse), 0.75F));
 		}
 		int deviation = deviationTicksNow();

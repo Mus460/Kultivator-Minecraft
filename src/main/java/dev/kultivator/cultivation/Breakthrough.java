@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.kultivator.KultivatorConfig;
+import dev.kultivator.dao.Comprehension;
 import dev.kultivator.data.BreakthroughQuality;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
@@ -183,9 +184,16 @@ public final class Breakthrough {
 		if (player.isPassenger()) {
 			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.riding"));
 		}
+		if (data.flyingSword() || player.isFallFlying() || !player.onGround() && !player.isInWater() && !player.isCreative()) {
+			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.airborne"));
+		}
 		if (rank.realm().isMortal() && !data.rootTested()) {
 			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.root",
 					Component.literal("/cultivate root test").withStyle(ChatFormatting.YELLOW)));
+		}
+		if (rank.realm().isMortal() && SpiritRoots.ceremonyPending(player)) {
+			// The root is saved when the testing ceremony starts; the awakening waits until it has been revealed.
+			return refuse(player, Component.translatable("kultivator.roots.ceremony.running"));
 		}
 		begin(player, data, rank.next(), false);
 		return true;
@@ -462,9 +470,12 @@ public final class Breakthrough {
 		}
 		Dao dao = data.dao();
 		if (dao != null && quality.comprehensionBonus() > 0.0D) {
-			data.addComprehension(dao, quality.comprehensionBonus());
-			Msg.chat(player, Component.translatable("kultivator.breakthrough.dao_bonus", dao.displayName().copy().withColor(dao.color()),
-					Msg.number(quality.comprehensionBonus())).withStyle(ChatFormatting.GRAY));
+			// The real gain (root affinity x1.5, capped at 100) is what the player is told.
+			double gained = Comprehension.grant(player, dao, quality.comprehensionBonus());
+			if (gained > 0.0D) {
+				Msg.chat(player, Component.translatable("kultivator.breakthrough.dao_bonus", dao.displayName().copy().withColor(dao.color()),
+						Comprehension.format(gained)).withStyle(ChatFormatting.GRAY));
+			}
 		}
 		if (kind == Kind.TRIBULATION) {
 			data.addTribulationSurvived();

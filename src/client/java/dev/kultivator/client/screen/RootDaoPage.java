@@ -6,6 +6,7 @@ import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
+import dev.kultivator.cultivation.SpiritRoots;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Element;
@@ -101,7 +102,11 @@ final class RootDaoPage extends Page {
 					() -> Component.translatable("kultivator.screen.btn.root_test"));
 			test.enabledWhen(() -> StatusPage.mortalUntested(data()));
 			test.urgentWhen(() -> StatusPage.mortalUntested(data()));
-			test.onPress(() -> send(Actions.ROOT_TEST));
+			test.onPress(() -> {
+				// The testing ceremony plays around the player in the world: close the scroll so it can be watched.
+				send(Actions.ROOT_TEST);
+				screen.onClose();
+			});
 			test.tooltip(() -> List.of(Component.translatable("kultivator.screen.btn.root_test"),
 					Component.translatable("kultivator.screen.btn.root_test.tip")));
 			add(test);
@@ -153,7 +158,10 @@ final class RootDaoPage extends Page {
 	}
 
 	private void drawPentagram(GuiGraphicsExtractor g, CultivationData data, int mouseX, int mouseY, long now) {
-		int mask = data.rootTested() ? data.rootElements() : 0;
+		// Until the testing ceremony reveals it, the saved root stays hidden.
+		boolean known = StatusPage.rootKnown(data);
+		boolean reading = data.rootTested() && SpiritRoots.revealPending(data);
+		int mask = known ? data.rootElements() : 0;
 		float pulse = 0.5F + 0.5F * (float) Math.sin(now / 400.0D);
 		float[] px = new float[5];
 		float[] py = new float[5];
@@ -171,7 +179,7 @@ final class RootDaoPage extends Page {
 		}
 		// The grade seal in the middle.
 		float seal = Math.max(5.0F, nodeR * 1.15F);
-		if (data.rootTested()) {
+		if (known) {
 			RootGrade grade = data.rootGrade();
 			Brush.disc(g, starX, starY, seal + 1.0F, Palette.GOLD_DARK);
 			Brush.band(g, starX, starY, seal, -seal, seal, Palette.lighten(Palette.opaque(grade.color()), 0.2F), Palette.darken(Palette.opaque(grade.color()), 0.25F));
@@ -208,10 +216,11 @@ final class RootDaoPage extends Page {
 			}
 		}
 		if (!builtRootButton) {
-			Component grade = data.rootTested()
+			Component grade = known
 					? Component.translatable("kultivator.screen.root.grade", data.rootGrade().displayName(), trim(data.rootGrade().multiplier()))
+					: reading ? Component.translatable("kultivator.roots.info.reading")
 					: Component.translatable("kultivator.screen.root.untested");
-			int color = data.rootTested() ? Palette.onPaper(data.rootGrade().color()) : Palette.INK_FAINT;
+			int color = known ? Palette.onPaper(data.rootGrade().color()) : Palette.INK_FAINT;
 			Brush.fitCentered(g, font, grade, starX, gradeY, half - 8.0F, color, 0.85F, 0.5F, false);
 		}
 		if (hovered != null) {
@@ -253,9 +262,11 @@ final class RootDaoPage extends Page {
 		if (element.mutant()) {
 			lines.add(Component.translatable("kultivator.screen.root.mutant").withStyle(ChatFormatting.LIGHT_PURPLE));
 		}
-		boolean has = data.rootTested() && (data.rootElements() & element.bit()) != 0;
-		lines.add(Component.translatable(!data.rootTested() ? "kultivator.screen.root.unknown"
-				: has ? "kultivator.screen.root.has" : "kultivator.screen.root.lacks").withStyle(has ? ChatFormatting.GREEN : ChatFormatting.GRAY));
+		boolean known = StatusPage.rootKnown(data);
+		boolean has = known && (data.rootElements() & element.bit()) != 0;
+		String state = known ? has ? "kultivator.screen.root.has" : "kultivator.screen.root.lacks"
+				: data.rootTested() ? "kultivator.roots.info.reading" : "kultivator.screen.root.unknown";
+		lines.add(Component.translatable(state).withStyle(has ? ChatFormatting.GREEN : ChatFormatting.GRAY));
 		MutableComponent daos = Component.empty();
 		boolean first = true;
 		for (Dao dao : Dao.values()) {
@@ -374,7 +385,7 @@ final class RootDaoPage extends Page {
 		lines.add(Component.translatable("kultivator.screen.trigram." + dao.id()).withStyle(ChatFormatting.GRAY));
 		double value = data.comprehension(dao);
 		lines.add(Component.translatable("kultivator.screen.dao.comprehension", Math.round(value), Dao.comprehensionName(value)));
-		if (data.rootTested() && dao.hasAffinity(data.rootElements())) {
+		if (StatusPage.rootKnown(data) && dao.hasAffinity(data.rootElements())) {
 			lines.add(Component.translatable("kultivator.screen.dao.affinity").withStyle(ChatFormatting.GREEN));
 		}
 		MutableComponent arts = Component.empty();

@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.kultivator.dao.Comprehension;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Dao;
@@ -246,7 +247,7 @@ public final class Meditation {
 		if (dao != null) {
 			for (SpiritSites.Site each : session.site.sites()) {
 				if (each.dao() == dao) {
-					data.addComprehension(dao, SITE_COMPREHENSION);
+					Comprehension.add(player, dao, SITE_COMPREHENSION);
 				}
 			}
 		}

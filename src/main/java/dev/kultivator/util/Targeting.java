@@ -3,6 +3,7 @@ package dev.kultivator.util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -11,6 +12,9 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -133,23 +137,38 @@ public final class Targeting {
 
 	/**
 	 * A spot where {@code entity} can stand at or near {@code target}: free of blocks for its box, standing on something
-	 * solid. Searches a few blocks up and down. Null when there is none. Read-only.
+	 * solid, with nothing harmful in it (fire, powder snow, cobweb, berry bush, wither rose, cactus) or underfoot (magma,
+	 * a lit campfire, cactus, pointed dripstone). Searches a few blocks up and down. Null when there is none. Read-only.
 	 */
 	public static @Nullable Vec3 safeSpot(ServerLevel level, Entity entity, Vec3 target) {
 		BlockPos base = BlockPos.containing(target);
 		for (int dy : new int[]{0, 1, -1, 2, -2, 3, -3}) {
 			BlockPos feet = base.above(dy);
 			BlockPos below = feet.below();
-			if (level.getBlockState(below).getCollisionShape(level, below).isEmpty()) {
+			BlockState belowState = level.getBlockState(below);
+			if (belowState.getCollisionShape(level, below).isEmpty() || hazardUnderfoot(belowState)) {
 				continue;
 			}
 			Vec3 spot = new Vec3(feet.getX() + 0.5D, feet.getY(), feet.getZ() + 0.5D);
 			AABB box = entity.getDimensions(entity.getPose()).makeBoundingBox(spot);
-			if (level.noCollision(entity, box) && !level.containsAnyLiquid(box)) {
+			if (level.noCollision(entity, box) && !level.containsAnyLiquid(box)
+					&& level.getBlockStates(box.inflate(0.01D, 0.0D, 0.01D)).noneMatch(Targeting::hazard)) {
 				return spot;
 			}
 		}
 		return null;
+	}
+
+	/** Blocks that hurt or trap whoever stands inside them (a lit campfire burns even when stepped into). */
+	private static boolean hazard(BlockState state) {
+		return state.is(BlockTags.FIRE) || state.is(Blocks.POWDER_SNOW) || state.is(Blocks.SWEET_BERRY_BUSH) || state.is(Blocks.COBWEB)
+				|| state.is(Blocks.WITHER_ROSE) || state.is(Blocks.CACTUS) || CampfireBlock.isLitCampfire(state);
+	}
+
+	/** Blocks that hurt whoever stands on them. */
+	private static boolean hazardUnderfoot(BlockState state) {
+		return state.is(Blocks.MAGMA_BLOCK) || state.is(Blocks.CACTUS) || state.is(Blocks.POINTED_DRIPSTONE)
+				|| CampfireBlock.isLitCampfire(state);
 	}
 
 	private Targeting() {

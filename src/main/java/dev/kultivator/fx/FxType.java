@@ -49,11 +49,17 @@ public enum FxType {
 	PILL,
 
 	// ---- phase 2 (client/fx/RootFx, DaoFx, TechniqueFx)
-	/** Root testing ceremony step. a = element ordinal lit (-1 final reveal), b = elements mask, f = grade ordinal. */
+	/**
+	 * Root testing ceremony step. a = -2 the stones rise, an element ordinal for the stone being read, -1 the final reveal;
+	 * b = elements mask, f = grade ordinal, pos = where the ceremony started.
+	 */
 	ROOT_CEREMONY,
-	/** Marrow cleansing. b = ticks. */
+	/** Marrow cleansing. b > 0 starts b ticks of impurities around pos; b = 0 is the purified flash (a = new grade ordinal). */
 	MARROW_CLEANSE,
-	/** Dao chosen. a = Dao ordinal. */
+	/**
+	 * Dao effects. a = Dao ordinal (-1 universal); b = 0 Dao chosen, 1..4 comprehension level reached, 5 technique learned
+	 * from a book, 6 book insight.
+	 */
 	DAO_CHOSEN,
 	/** Any technique. a = Technique ordinal, b = technique specific sub effect, f = scale; target = aim point. */
 	TECHNIQUE,
