@@ -38,6 +38,9 @@ public final class FxDispatcher {
 		}
 		AuraFx.tick(minecraft);
 		MeditationFx.tick(minecraft);
+		// Both ignore a second call in the same game tick (TribulationFx and PillFx's own hook also call them).
+		BreakthroughFx.tick(minecraft);
+		PillFx.tick(minecraft);
 		TribulationFx.tick(minecraft);
 		TechniqueFx.tick(minecraft);
 		FormationFx.tick(minecraft);

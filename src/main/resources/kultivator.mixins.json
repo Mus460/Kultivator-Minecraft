@@ -3,6 +3,9 @@
   "package": "dev.kultivator.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "LivingEntityMixin",
+    "FarmlandBlockMixin",
+    "TurtleEggBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -3,6 +3,8 @@
   "package": "dev.kultivator.client.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
+    "AvatarRendererMixin",
+    "PlayerModelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

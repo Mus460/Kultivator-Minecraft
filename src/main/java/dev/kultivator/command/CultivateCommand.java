@@ -10,6 +10,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import dev.kultivator.cultivation.Breakthrough;
 import dev.kultivator.cultivation.Meditation;
+import dev.kultivator.cultivation.PillToxicity;
 import dev.kultivator.cultivation.Progression;
 import dev.kultivator.cultivation.Qi;
 import dev.kultivator.cultivation.SpiritRoots;
@@ -97,6 +98,7 @@ public final class CultivateCommand {
 
 		Meditation.addCommands(root, debug);
 		Breakthrough.addCommands(root, debug);
+		PillToxicity.addCommands(root, debug);
 		SpiritRoots.addCommands(root, debug);
 		DaoPaths.addCommands(root, debug);
 		Techniques.addCommands(root, debug);
