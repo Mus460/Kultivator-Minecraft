@@ -17,11 +17,15 @@ import dev.kultivator.cultivation.Stats;
 import dev.kultivator.cultivation.Tribulation;
 import dev.kultivator.cultivation.VanillaPills;
 import dev.kultivator.cultivation.XpSources;
+import dev.kultivator.dao.Comprehension;
 import dev.kultivator.dao.DaoPaths;
+import dev.kultivator.dao.TechniqueBooks;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.ModAttachments;
 import dev.kultivator.network.Net;
+import dev.kultivator.registry.ModItems;
+import dev.kultivator.technique.DaoTechniques;
 import dev.kultivator.technique.Techniques;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -73,7 +77,12 @@ public class Kultivator implements ModInitializer {
 		// Phase 2
 		SpiritRoots.init();
 		DaoPaths.init();
+		Comprehension.init();
+		TechniqueBooks.init();
 		Techniques.init();
+		DaoTechniques.init();
+		// After every module registered its items.
+		ModItems.init();
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) ->
 				CultivateCommand.register(dispatcher, buildContext));
@@ -105,6 +114,7 @@ public class Kultivator implements ModInitializer {
 			Tribulation.tick(player, data);
 			SpiritRoots.tick(player, data);
 			Techniques.tick(player, data);
+			DaoTechniques.tick(player, data);
 			if (player.tickCount % 40 == 0) {
 				// Picks up a new sword in the inventory, cosmetic changes and so on.
 				Cultivators.refreshVisual(player);

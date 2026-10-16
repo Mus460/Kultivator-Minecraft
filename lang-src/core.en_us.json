@@ -131,5 +131,6 @@
   "kultivator.quality_setting.maximal": "Maximal",
   "kultivator.screen.title": "Cultivation",
   "advancement.kultivator.root.title": "Path of Cultivation",
-  "advancement.kultivator.root.description": "Every immortal was once a mortal."
+  "advancement.kultivator.root.description": "Every immortal was once a mortal.",
+  "itemGroup.kultivator.main": "Kultivator"
 }
