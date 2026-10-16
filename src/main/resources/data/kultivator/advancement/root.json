@@ -1,0 +1,26 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "kultivator:gui/advancements/backgrounds/jade",
+    "description": {
+      "translate": "advancement.kultivator.root.description"
+    },
+    "icon": {
+      "id": "minecraft:amethyst_shard"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancement.kultivator.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

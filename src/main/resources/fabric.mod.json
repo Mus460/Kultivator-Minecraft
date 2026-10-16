@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "kultivator",
+  "version": "${version}",
+  "name": "Kultivator",
+  "description": "Cultivate like in a xianxia novel: refine qi, break through realms from Mortal to True Immortal, survive heavenly tribulations, walk a Dao, master techniques, fly on your sword, refine pills, face your heart demon and found a sect. Effects never burn or break blocks.",
+  "authors": ["Musyaffa"],
+  "contact": {
+    "sources": "https://github.com/Mus460/Kultivator-Minecraft"
+  },
+  "license": "MIT",
+  "icon": "assets/kultivator/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["dev.kultivator.Kultivator"],
+    "client": ["dev.kultivator.client.KultivatorClient"]
+  },
+  "mixins": [
+    "kultivator.mixins.json",
+    {
+      "config": "kultivator.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}
