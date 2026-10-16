@@ -43,6 +43,7 @@ public final class FxDispatcher {
 		PillFx.tick(minecraft);
 		TribulationFx.tick(minecraft);
 		TechniqueFx.tick(minecraft);
+		DaoTechniqueFx.tick(minecraft);
 		FormationFx.tick(minecraft);
 		BeastFx.tick(minecraft);
 		AlchemyFx.tick(minecraft);

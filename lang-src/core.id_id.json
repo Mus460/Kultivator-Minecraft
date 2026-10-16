@@ -131,5 +131,6 @@
   "kultivator.quality_setting.maximal": "Maksimal",
   "kultivator.screen.title": "Kultivasi",
   "advancement.kultivator.root.title": "Jalan Kultivasi",
-  "advancement.kultivator.root.description": "Setiap abadi pernah menjadi manusia fana."
+  "advancement.kultivator.root.description": "Setiap abadi pernah menjadi manusia fana.",
+  "itemGroup.kultivator.main": "Kultivator"
 }
