@@ -1,0 +1,100 @@
+package dev.kultivator.client;
+
+import com.mojang.blaze3d.platform.InputConstants;
+import dev.kultivator.Kultivator;
+import dev.kultivator.client.screen.CultivationScreen;
+import dev.kultivator.data.CultivationData;
+import dev.kultivator.data.Technique;
+import dev.kultivator.network.Actions;
+import dev.kultivator.network.Payloads;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+
+/**
+ * The mod's keys, in their own "Kultivator" section of the controls. Defaults avoid vanilla keys, Butter Bot's keys
+ * and Iris (K, O, R): G cast, ; meditate, ' info screen, , and . choose the technique, \ flying sword. Jumping in
+ * mid-air asks for a Cloud Step.
+ */
+public final class Keys {
+
+	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Kultivator.id("main"));
+
+	public static final KeyMapping CAST = key("cast", InputConstants.KEY_G);
+	public static final KeyMapping MEDITATE = key("meditate", InputConstants.KEY_SEMICOLON);
+	public static final KeyMapping INFO = key("info", InputConstants.KEY_APOSTROPHE);
+	public static final KeyMapping PREVIOUS = key("previous", InputConstants.KEY_COMMA);
+	public static final KeyMapping NEXT = key("next", InputConstants.KEY_PERIOD);
+	public static final KeyMapping FLYING_SWORD = key("flying_sword", InputConstants.KEY_BACKSLASH);
+
+	private static boolean jumpWasDown;
+	private static int airTicks;
+
+	private static KeyMapping key(String name, int defaultKey) {
+		return KeyMappingHelper.registerKeyMapping(new KeyMapping("key.kultivator." + name, InputConstants.Type.KEYBOARD, defaultKey, CATEGORY));
+	}
+
+	public static void init() {
+		ClientTickEvents.END_CLIENT_TICK.register(Keys::tick);
+	}
+
+	/** True when the server has the mod and we are in a world. */
+	public static boolean connected() {
+		Minecraft minecraft = Minecraft.getInstance();
+		return minecraft.player != null && minecraft.getConnection() != null && ClientPlayNetworking.canSend(Payloads.Action.TYPE);
+	}
+
+	public static void send(Payloads.Action action) {
+		if (connected()) {
+			ClientPlayNetworking.send(action);
+		}
+	}
+
+	private static void tick(Minecraft minecraft) {
+		LocalPlayer player = minecraft.player;
+		boolean connected = connected();
+		boolean free = connected && minecraft.gui.screen() == null;
+		while (INFO.consumeClick()) {
+			if (free) {
+				minecraft.gui.setScreen(new CultivationScreen(0));
+			}
+		}
+		press(MEDITATE, free, Actions.MEDITATE_TOGGLE);
+		press(CAST, free, Actions.CAST);
+		press(PREVIOUS, free, Actions.SELECT_PREVIOUS);
+		press(NEXT, free, Actions.SELECT_NEXT);
+		press(FLYING_SWORD, free, Actions.FLYING_SWORD_TOGGLE);
+		tickCloudStep(minecraft, player, free);
+	}
+
+	private static void press(KeyMapping key, boolean free, int action) {
+		while (key.consumeClick()) {
+			if (free) {
+				send(Payloads.Action.of(action));
+			}
+		}
+	}
+
+	/** A fresh jump press while airborne (not flying, not in water) is a Cloud Step request. */
+	private static void tickCloudStep(Minecraft minecraft, LocalPlayer player, boolean free) {
+		if (player == null) {
+			jumpWasDown = false;
+			return;
+		}
+		boolean jumpDown = minecraft.options.keyJump.isDown();
+		airTicks = player.onGround() ? 0 : airTicks + 1;
+		CultivationData data = ClientCultivation.data();
+		boolean canStep = free && data.knows(Technique.CLOUD_STEP) && !player.getAbilities().flying && !player.isInWater()
+				&& !player.isPassenger() && !player.onClimbable() && !player.isFallFlying();
+		if (jumpDown && !jumpWasDown && canStep && airTicks > 2) {
+			send(Payloads.Action.of(Actions.CLOUD_STEP));
+		}
+		jumpWasDown = jumpDown;
+	}
+
+	private Keys() {
+	}
+}
