@@ -23,6 +23,7 @@ public final class Net {
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.Fx.TYPE, Payloads.Fx.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.OrePings.TYPE, Payloads.OrePings.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.OpenScreen.TYPE, Payloads.OpenScreen.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.DiscipleInfo.TYPE, Payloads.DiscipleInfo.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Payloads.Action.TYPE, Payloads.Action.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Action.TYPE, (payload, context) -> handle(context.player(), payload));
@@ -60,6 +61,9 @@ public final class Net {
 			}
 			case Actions.SET_HARDCORE -> setHardcore(player, action.arg() == 1);
 			case Actions.REQUEST_SYNC -> Cultivators.syncNow(player);
+			case Actions.DISCIPLE_OPEN, Actions.DISCIPLE_MODE, Actions.DISCIPLE_TEACH, Actions.DISCIPLE_FEED,
+				 Actions.DISCIPLE_BREAKTHROUGH, Actions.DISCIPLE_CHOOSE_DAO, Actions.DISCIPLE_RELEASE ->
+					dev.kultivator.disciple.Disciples.handleAction(player, action);
 			default -> {
 			}
 		}

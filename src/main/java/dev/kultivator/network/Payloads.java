@@ -105,6 +105,8 @@ public final class Payloads {
 		public static final int INFO = 0;
 		/** The Dao choice screen. */
 		public static final int CHOOSE_DAO = 1;
+		/** A disciple's screen; {@code arg} = its entity id (details follow in a DiscipleInfo). */
+		public static final int DISCIPLE = 2;
 
 		public static final Type<OpenScreen> TYPE = typeOf("open_screen");
 		public static final StreamCodec<RegistryFriendlyByteBuf, OpenScreen> CODEC = StreamCodec.of(
@@ -116,6 +118,22 @@ public final class Payloads {
 
 		@Override
 		public Type<OpenScreen> type() {
+			return TYPE;
+		}
+	}
+
+	/** Details of one disciple for its screen: {@code data} is the disciple's saved data plus live values. */
+	public record DiscipleInfo(int entityId, CompoundTag data) implements CustomPacketPayload {
+		public static final Type<DiscipleInfo> TYPE = typeOf("disciple_info");
+		public static final StreamCodec<RegistryFriendlyByteBuf, DiscipleInfo> CODEC = StreamCodec.of(
+				(buf, p) -> {
+					buf.writeVarInt(p.entityId);
+					ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, p.data);
+				},
+				buf -> new DiscipleInfo(buf.readVarInt(), ByteBufCodecs.TRUSTED_COMPOUND_TAG.decode(buf)));
+
+		@Override
+		public Type<DiscipleInfo> type() {
 			return TYPE;
 		}
 	}

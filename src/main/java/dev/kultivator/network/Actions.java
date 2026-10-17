@@ -27,6 +27,22 @@ public final class Actions {
 	/** Send me my data again. */
 	public static final int REQUEST_SYNC = 13;
 
+	// Disciples (phase 5): arg = the disciple's entity id, text = the parameter.
+	/** Ask the server for the disciple's details and open its screen. */
+	public static final int DISCIPLE_OPEN = 14;
+	/** Set the disciple's order: text = follow | stay | meditate | assist. */
+	public static final int DISCIPLE_MODE = 15;
+	/** Teach the technique with id {@code text}. */
+	public static final int DISCIPLE_TEACH = 16;
+	/** Give the disciple the pill the master holds in the main hand. */
+	public static final int DISCIPLE_FEED = 17;
+	/** Start the disciple's breakthrough. */
+	public static final int DISCIPLE_BREAKTHROUGH = 18;
+	/** Choose the disciple's Dao: text = Dao id. */
+	public static final int DISCIPLE_CHOOSE_DAO = 19;
+	/** Rename is done with a name tag; this releases the disciple (text must be "confirm"). */
+	public static final int DISCIPLE_RELEASE = 20;
+
 	private Actions() {
 	}
 }
