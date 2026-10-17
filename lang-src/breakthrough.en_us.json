@@ -1,6 +1,8 @@
 {
   "kultivator.breakthrough.refuse.dead": "You cannot attempt a breakthrough right now.",
   "kultivator.breakthrough.refuse.busy": "You are already in the middle of a breakthrough.",
+  "kultivator.breakthrough.refuse.sparring": "Finish your sparring match first: a breakthrough needs a calm heart.",
+  "kultivator.breakthrough.refuse.heart_demon": "Your Heart Demon still stands before you. Defeat it first: a breakthrough needs a calm heart.",
   "kultivator.breakthrough.refuse.deviation": "Your qi is still in chaos from a Qi Deviation (%s s left). Recover first.",
   "kultivator.breakthrough.refuse.max": "You stand at the very summit of the path. There is nothing left to break through.",
   "kultivator.breakthrough.refuse.not_peak": "You are not at a bottleneck yet. Reach %s first.",

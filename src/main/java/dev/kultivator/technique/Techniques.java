@@ -19,6 +19,7 @@ import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
+import dev.kultivator.trial.HeartDemons;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Targeting;
@@ -213,7 +214,9 @@ public final class Techniques {
 			return refuse(player, Component.translatable("kultivator.techniques.refuse.deviation",
 					Component.literal(String.valueOf(Math.max(1, data.deviationTicks() / 20)))));
 		}
-		if (data.breakingThrough() || Breakthrough.isBusy(player)) {
+		// The heart demon before a breakthrough is fought with every technique (the flying sword stays grounded).
+		boolean demonTrial = HeartDemons.inBreakthroughTrial(player) && technique != Technique.FLYING_SWORD;
+		if ((data.breakingThrough() || Breakthrough.isBusy(player)) && !demonTrial) {
 			return refuse(player, Component.translatable("kultivator.techniques.refuse.breakthrough"));
 		}
 		long now = player.level().getGameTime();

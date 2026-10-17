@@ -326,7 +326,10 @@ public final class Tribulation {
 		boolean wouldKill = false;
 		if (!protectedPlayer) {
 			float maxHealth = player.getMaxHealth();
-			double raw = maxHealth * t.pct * (last ? 2.0D : 1.0D) * KultivatorConfig.get().tribulationDamageScale * data.nextTribulationFactor();
+			// A powered protective formation around the cultivator softens the strikes (DESIGN 3: pills and formations).
+			double formation = dev.kultivator.formation.ProtectiveFormations.insideActiveFormation(level, player.position()) ? 0.85D : 1.0D;
+			double raw = maxHealth * t.pct * (last ? 2.0D : 1.0D) * KultivatorConfig.get().tribulationDamageScale * data.nextTribulationFactor()
+					* formation;
 			float amount = (float) Math.max(0.0D, raw);
 			float health = player.getHealth();
 			float pool = health + player.getAbsorptionAmount();

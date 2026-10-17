@@ -65,13 +65,21 @@ public enum FxType {
 	TECHNIQUE,
 
 	// ---- phase 3 (client/fx/TrialFx, BeastFx, FormationFx, SectFx)
+	/** Heart demon moments. a = step, b = demon entity id (player id for a warning), f = ticks; see trial.TrialFxIds. */
 	HEART_DEMON_APPEAR,
+	/** A heart demon trial ends. a = outcome, b = owner entity id, pos = demon, target = owner chest; see trial.TrialFxIds. */
 	HEART_DEMON_DEFEAT,
-	/** a = tier, b = entity id. */
+	/**
+	 * a >= 0: evolution cinematic to tier a (0 = awakening), b = entity id, f = kind. a = -1 Moon Thunder bolt (pos victim,
+	 * target sky), -2 Foxfire (pos victim), -3 tier 3 blessing thread (pos beast, target owner).
+	 */
 	BEAST_EVOLVE,
-	/** Protective formation dome. pos = centre, f = radius, a = 1 active / 0 switched off. */
+	/**
+	 * Protective formation. pos = lodestone centre, f = radius. a = 1 dome refresh (b = 1 just switched on, 2 charged),
+	 * 0 switched off, 2 / 3 missing / present pillar marker (pos = pillar), 4 monster pushed back (target = centre).
+	 */
 	PROTECTIVE_FORMATION,
-	/** b = 1 start, 0 end. */
+	/** b = 1 start (pos = A, target = B, a = A colour, f = B colour), 0 end (a = winner colour at pos, -1 no winner). */
 	SPARRING,
 
 	// ---- phase 4 (client/fx/AlchemyFx, AscensionFx)

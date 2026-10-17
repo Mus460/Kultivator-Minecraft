@@ -5,7 +5,11 @@
   "mixins": [
     "LivingEntityMixin",
     "FarmlandBlockMixin",
-    "TurtleEggBlockMixin"
+    "TurtleEggBlockMixin",
+    "SilverfishMixin",
+    "CreakingMixin",
+    "SculkSensorBlockMixin",
+    "BigDripleafBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

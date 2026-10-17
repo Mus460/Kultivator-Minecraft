@@ -6,6 +6,7 @@ import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Realm;
 import dev.kultivator.data.Technique;
+import dev.kultivator.trial.HeartDemons;
 import dev.kultivator.util.Advancements;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -76,7 +77,7 @@ final class CloudStep {
 		if (!data.knows(technique) || !player.isAlive() || player.isDeadOrDying() || player.isSpectator()) {
 			return;
 		}
-		if (data.deviating() || data.breakingThrough() || Breakthrough.isBusy(player)) {
+		if (data.deviating() || (data.breakingThrough() || Breakthrough.isBusy(player)) && !HeartDemons.inBreakthroughTrial(player)) {
 			return;
 		}
 		if (player.onGround() || player.isInWater() || player.isSwimming() || player.isPassenger() || player.isFallFlying()

@@ -1,6 +1,8 @@
 {
   "kultivator.breakthrough.refuse.dead": "Kamu tidak bisa mencoba terobosan sekarang.",
   "kultivator.breakthrough.refuse.busy": "Kamu sedang menjalani terobosan.",
+  "kultivator.breakthrough.refuse.sparring": "Selesaikan dulu Latih Tanding-mu: terobosan butuh hati yang tenang.",
+  "kultivator.breakthrough.refuse.heart_demon": "Iblis Hatimu masih berdiri di hadapanmu. Kalahkan dulu: terobosan butuh hati yang tenang.",
   "kultivator.breakthrough.refuse.deviation": "Qi-mu masih kacau akibat Penyimpangan Qi (sisa %s dtk). Pulihkan dirimu dulu.",
   "kultivator.breakthrough.refuse.max": "Kamu sudah berdiri di puncak tertinggi jalan ini. Tidak ada lagi yang bisa ditembus.",
   "kultivator.breakthrough.refuse.not_peak": "Kamu belum sampai di leher botol. Capai %s dulu.",

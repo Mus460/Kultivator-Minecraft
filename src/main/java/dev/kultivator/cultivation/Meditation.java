@@ -235,7 +235,7 @@ public final class Meditation {
 		int tier = session.tier;
 		double density = SpiritVeins.density(level, pos);
 		double xp = (0.6D + 0.25D * realm.ordinal()) * site * QiFormations.multiplier(tier) * Math.max(0.15D, density);
-		Progression.addXp(player, xp, XpSource.MEDITATION);
+		Progression.addXp(player, xp * dev.kultivator.sect.Sects.meditationBonus(player), XpSource.MEDITATION);
 		SpiritVeins.drain(level, pos, 0.0015D * (1.0D + realm.ordinal() * 0.25D));
 		density = SpiritVeins.density(level, pos);
 
