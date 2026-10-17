@@ -29,6 +29,8 @@ import dev.kultivator.data.RootGrade;
 import dev.kultivator.data.Technique;
 import dev.kultivator.data.XpSource;
 import dev.kultivator.network.Net;
+import dev.kultivator.alchemy.Alchemy;
+import dev.kultivator.ascension.Ascension;
 import dev.kultivator.beast.SpiritBeasts;
 import dev.kultivator.formation.ProtectiveFormations;
 import dev.kultivator.technique.Techniques;
@@ -109,6 +111,8 @@ public final class CultivateCommand {
 		HeartDemons.addCommands(root, debug);
 		SpiritBeasts.addCommands(root, debug);
 		ProtectiveFormations.addCommands(root, debug);
+		Alchemy.addCommands(root, debug);
+		Ascension.addCommands(root, debug);
 
 		root.then(debug);
 		return root;
