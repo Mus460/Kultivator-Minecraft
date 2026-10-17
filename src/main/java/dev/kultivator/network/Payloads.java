@@ -107,6 +107,10 @@ public final class Payloads {
 		public static final int CHOOSE_DAO = 1;
 		/** A disciple's screen; {@code arg} = its entity id (details follow in a DiscipleInfo). */
 		public static final int DISCIPLE = 2;
+		/** The Sect Hall screen ({@code arg} 0); its details come first in a {@link HallInfo}. */
+		public static final int HALL = 3;
+		/** The Mode Kehancuran warning: {@code arg} 0 = the player's own oath, otherwise the disciple's entity id. */
+		public static final int KEHANCURAN_CONFIRM = 4;
 
 		public static final Type<OpenScreen> TYPE = typeOf("open_screen");
 		public static final StreamCodec<RegistryFriendlyByteBuf, OpenScreen> CODEC = StreamCodec.of(
@@ -134,6 +138,22 @@ public final class Payloads {
 
 		@Override
 		public Type<DiscipleInfo> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * Everything the Sect Hall screen shows (DESIGN 20.2.2): composed by {@code sect.hall.Halls} plus the sections of the
+	 * other modules ({@code Halls.addInfoProvider}); {@code cfg.kehancuran} decides whether the Segel Merah tablet is shown.
+	 */
+	public record HallInfo(CompoundTag data) implements CustomPacketPayload {
+		public static final Type<HallInfo> TYPE = typeOf("hall_info");
+		public static final StreamCodec<RegistryFriendlyByteBuf, HallInfo> CODEC = StreamCodec.of(
+				(buf, p) -> ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, p.data),
+				buf -> new HallInfo(ByteBufCodecs.TRUSTED_COMPOUND_TAG.decode(buf)));
+
+		@Override
+		public Type<HallInfo> type() {
 			return TYPE;
 		}
 	}

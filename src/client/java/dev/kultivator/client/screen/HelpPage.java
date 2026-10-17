@@ -6,13 +6,20 @@ import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Palette;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 
 /** Help: short paragraphs on the path, written on the scroll, with the mod's keys at the end. Scrolls with the wheel. */
 final class HelpPage extends Page {
 
+	/**
+	 * Topics in reading order. The phase-6 topics (Sect Hall onwards, DESIGN 20.4.1) are written by their own modules;
+	 * a topic whose text is not in the language files yet is skipped.
+	 */
 	private static final String[] TOPICS = {"meditation", "xp", "bottleneck", "breakthrough", "tribulation", "protectors", "pills",
-			"techniques", "roots", "dao", "alchemy", "heart_demon", "beasts", "formations", "sects", "ascension", "visuals"};
+			"techniques", "roots", "dao", "alchemy", "heart_demon", "beasts", "formations", "sects", "ascension", "visuals",
+			"aula", "calon", "jenjang", "kontribusi", "tugas", "misi", "turnamen", "alam_hampa", "bakat", "pusaka", "bintang", "ikatan",
+			"kehancuran"};
 	private static final KeyMapping[] KEYS = {Keys.MEDITATE, Keys.CAST, Keys.PREVIOUS, Keys.NEXT, Keys.FLYING_SWORD, Keys.INFO};
 
 	private final Eased scrollShown = new Eased(14.0F);
@@ -47,6 +54,9 @@ final class HelpPage extends Page {
 		g.enableScissor(x, y, x + w, y + h);
 		float cursor = y + 1.0F - offset;
 		for (String topic : TOPICS) {
+			if (!Language.getInstance().has("kultivator.screen.help." + topic)) {
+				continue;
+			}
 			heading(g, Component.translatable("kultivator.screen.help." + topic + ".title"), x + 2.0F, cursor, textW, 0.85F);
 			cursor += 12.0F;
 			Component body = Component.translatable("kultivator.screen.help." + topic);

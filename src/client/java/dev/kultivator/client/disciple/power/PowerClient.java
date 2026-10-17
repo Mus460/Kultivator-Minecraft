@@ -1,0 +1,18 @@
+package dev.kultivator.client.disciple.power;
+
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+
+/**
+ * Client side of module C (DESIGN 20.4.3): the Bakat and Pusaka tabs ({@link TalentTab}, {@link TreasureTab}), the power
+ * effects ({@link PowerFx}, ticked by {@code FxDispatcher}) and the looks the disciple renderer reads
+ * ({@link PhysiqueVisuals}, {@link NatalTreasureLayer}, {@link DutyPoses}). Called once from {@code KultivatorClient}.
+ */
+public final class PowerClient {
+
+	public static void init() {
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> PowerFx.clear());
+	}
+
+	private PowerClient() {
+	}
+}

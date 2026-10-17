@@ -1,6 +1,7 @@
 package dev.kultivator.client.disciple;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.network.Actions;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Orders: four stacked talismans (Follow, Stay &amp; guard, Meditate, Assist) with the active order stamped, and on the
+ * Orders: stacked talismans (Follow, Stay &amp; guard, Meditate, Assist, Guard the Hall) with the active order stamped, and on the
  * right the meaning of the order under the mouse (or the active one) with a small ink picture of it.
  */
 final class OrderTab extends DiscipleTab {
@@ -27,12 +28,12 @@ final class OrderTab extends DiscipleTab {
 	}
 
 	@Override
-	Component title() {
+	public Component title() {
 		return Component.translatable("kultivator.discipleui.tab.orders");
 	}
 
 	@Override
-	Component shortName() {
+	public Component shortName() {
 		return Component.translatable("kultivator.discipleui.tab.orders.short");
 	}
 
@@ -103,7 +104,10 @@ final class OrderTab extends DiscipleTab {
 		g.disableScissor();
 	}
 
-	/** Small ink pictures: footprints (follow), a banner on a post (stay), a seated figure (meditate), crossed blades (assist). */
+	/**
+	 * Small ink pictures: footprints (follow), a banner on a post (stay), a seated figure (meditate), crossed blades
+	 * (assist), the hall's roof (guard the hall).
+	 */
 	private static void drawPicture(GuiGraphicsExtractor g, int mode, float cx, float cy, float size) {
 		float s = size / 2.0F;
 		int ink = Palette.INK_SOFT;
@@ -130,12 +134,14 @@ final class OrderTab extends DiscipleTab {
 				Brush.line(g, cx, cy - s * 0.1F, cx + s * 0.4F, cy + s * 0.3F, 1.0F, ink);
 				Brush.ring(g, cx, cy - s * 0.42F, s * 0.28F, s * 0.33F, Palette.argb(0xA0, Palette.QI));
 			}
-			default -> {
+			case 3 -> {
 				Brush.line(g, cx - s * 0.55F, cy + s * 0.55F, cx + s * 0.55F, cy - s * 0.55F, 1.4F, ink);
 				Brush.line(g, cx + s * 0.55F, cy + s * 0.55F, cx - s * 0.55F, cy - s * 0.55F, 1.4F, ink);
 				Brush.line(g, cx - s * 0.5F, cy + s * 0.25F, cx - s * 0.25F, cy + s * 0.5F, 1.2F, Palette.GOLD_DARK);
 				Brush.line(g, cx + s * 0.5F, cy + s * 0.25F, cx + s * 0.25F, cy + s * 0.5F, 1.2F, Palette.GOLD_DARK);
 			}
+			// Guard the hall (DESIGN 20.2.5): the hall's roof.
+			default -> Glyphs.tab(g, Glyphs.HALL, cx, cy, s * 1.3F, ink);
 		}
 	}
 }

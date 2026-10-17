@@ -123,6 +123,13 @@ public final class DiscipleTechniques {
 	 * they ran ({@link #tick}), when the disciple leaves the world ({@link #forget}) and when the server stops.
 	 */
 	private static final Map<DiscipleEntity, List<Pending>> PENDING = new HashMap<>();
+	/** Area radii are multiplied by this during a {@link #castInnate} with a range factor (server thread only). */
+	private static double rangeScale = 1.0D;
+
+	/** {@code base} times the current range factor (1 outside {@link #castInnate}). */
+	private static double ranged(double base) {
+		return base * rangeScale;
+	}
 
 	// ================================================================== rules
 
@@ -153,7 +160,7 @@ public final class DiscipleTechniques {
 			return false;
 		}
 		Dao dao = technique.dao();
-		if (dao != null && dao != data.dao()) {
+		if (dao != null && dao != data.dao() && !DiscipleHooks.daoBypass(data)) {
 			return false;
 		}
 		return !data.deviating() && !data.breakingThrough() && data.cooldownLeft(technique) <= 0
@@ -166,8 +173,15 @@ public final class DiscipleTechniques {
 	 * of one cultivator's heart), anything that cannot be seen as an enemy or a mob listed in {@link #provokesBlockChanges}.
 	 */
 	public static boolean mayHit(DiscipleEntity entity, @Nullable ServerPlayer master, @Nullable Entity target) {
-		if (master == null || !(target instanceof LivingEntity living) || living == entity || living == master || !living.isAlive()
-				|| living.isRemoved() || living.level() != entity.level()) {
+		if (!(target instanceof LivingEntity living) || living == entity || !living.isAlive() || living.isRemoved()
+				|| living.level() != entity.level()) {
+			return false;
+		}
+		// A registered duel comes first (DESIGN 20.2.8): the partner may be hit whoever it is.
+		if (DuelRules.dueling(entity, living)) {
+			return true;
+		}
+		if (master == null || living == master) {
 			return false;
 		}
 		if (living instanceof Player || living instanceof DiscipleEntity || living instanceof HeartDemonEntity || !living.canBeSeenAsEnemy()
@@ -215,7 +229,61 @@ public final class DiscipleTechniques {
 		DiscipleData data = entity.data();
 		double d = power(data);
 		LivingEntity aim = target != null && mayHit(entity, master, target) ? target : null;
-		boolean done = switch (technique) {
+		boolean done = perform(entity, master, level, technique, aim, d);
+		if (!done) {
+			return false;
+		}
+		data.setQi(data.qi() - qiCost(technique));
+		data.setCooldown(technique, technique.cooldownTicks());
+		data.addTechniqueCast();
+		Dao dao = technique.dao();
+		if (dao != null && dao == data.dao()) {
+			data.addComprehension(DiscipleCultivation.comprehensionGain(data, dao, DiscipleCultivation.TECHNIQUE_COMPREHENSION));
+		}
+		if (aim != null && technique != Technique.SPRING_OF_LIFE) {
+			face(entity, middleOf(aim));
+		}
+		return true;
+	}
+
+	/**
+	 * An innate or amplified cast for the phase-6 powers (DESIGN 20.4.3: Supreme Bone techniques, the Ice and Shadow
+	 * ultimates): {@code technique} at {@code powerFactor} times D, without knowing it, a slot, its realm or its Dao.
+	 * Spends no qi and starts no cooldown (the caller keeps its own); the targeting rules are exactly those of
+	 * {@link #cast}. False when there was nothing to hit.
+	 */
+	public static boolean castInnate(DiscipleEntity entity, Technique technique, @Nullable LivingEntity target, double powerFactor) {
+		return castInnate(entity, technique, target, powerFactor, 1.0D);
+	}
+
+	/** As {@link #castInnate(DiscipleEntity, Technique, LivingEntity, double)} with the area radii times {@code rangeFactor}. */
+	public static boolean castInnate(DiscipleEntity entity, Technique technique, @Nullable LivingEntity target, double powerFactor,
+			double rangeFactor) {
+		ServerPlayer master = entity.owner();
+		if (master == null || !(entity.level() instanceof ServerLevel level) || !entity.isAlive() || entity.isDeadOrDying()
+				|| !teachable(technique) || entity.data().deviating() || entity.data().breakingThrough()
+				|| !(powerFactor > 0.0D) || !Double.isFinite(powerFactor)) {
+			return false;
+		}
+		LivingEntity aim = target != null && mayHit(entity, master, target) ? target : null;
+		double previous = rangeScale;
+		rangeScale = Double.isFinite(rangeFactor) ? Math.max(0.25D, Math.min(4.0D, rangeFactor)) : 1.0D;
+		boolean done;
+		try {
+			done = perform(entity, master, level, technique, aim, power(entity.data()) * powerFactor);
+		} finally {
+			rangeScale = previous;
+		}
+		if (done && aim != null && technique != Technique.SPRING_OF_LIFE) {
+			face(entity, middleOf(aim));
+		}
+		return done;
+	}
+
+	/** The technique's effect itself (no rules, no costs). */
+	private static boolean perform(DiscipleEntity entity, ServerPlayer master, ServerLevel level, Technique technique,
+			@Nullable LivingEntity aim, double d) {
+		return switch (technique) {
 			case QI_PALM -> aim != null && qiPalm(entity, master, level, aim, d);
 			case BUDDHA_PALM -> aim != null && buddhaPalm(entity, master, level, aim, d);
 			case SWORD_QI -> aim != null && swordQi(entity, master, level, aim, d);
@@ -236,20 +304,6 @@ public final class DiscipleTechniques {
 			case SPACE_PRISON -> spacePrison(entity, master, level, d);
 			default -> false;
 		};
-		if (!done) {
-			return false;
-		}
-		data.setQi(data.qi() - qiCost(technique));
-		data.setCooldown(technique, technique.cooldownTicks());
-		data.addTechniqueCast();
-		Dao dao = technique.dao();
-		if (dao != null && dao == data.dao()) {
-			data.addComprehension(DiscipleCultivation.comprehensionGain(data, dao, DiscipleCultivation.TECHNIQUE_COMPREHENSION));
-		}
-		if (aim != null && technique != Technique.SPRING_OF_LIFE) {
-			face(entity, middleOf(aim));
-		}
-		return true;
 	}
 
 	/** Every server tick of the disciple: runs the delayed parts of its techniques. */
@@ -349,7 +403,8 @@ public final class DiscipleTechniques {
 		schedule(entity, level, BUDDHA_DELAY, owner -> {
 			for (LivingEntity target : hostilesAround(entity, owner, point, BUDDHA_RADIUS)) {
 				if (hurt(entity, owner, level, target, damage) && target.isAlive()) {
-					if (!(target instanceof EnderDragon)) {
+					// Never on a player (the master in a duel): a saved tag would keep him from portals and plates.
+					if (!(target instanceof EnderDragon) && !(target instanceof Player)) {
 						double resist = Math.max(0.0D, Math.min(1.0D, target.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE)));
 						Vec3 motion = target.getDeltaMovement();
 						target.addTag(NoGrief.TAG);
@@ -513,11 +568,12 @@ public final class DiscipleTechniques {
 
 	/** A lotus of frost blooms around the disciple: D, Slowness IV and frozen for 6 s. No ice blocks, ever. */
 	private static boolean frostLotus(DiscipleEntity entity, ServerPlayer master, ServerLevel level, double d) {
-		List<LivingEntity> hits = hostilesAround(entity, master, entity.position(), FROST_RADIUS);
+		double radius = ranged(FROST_RADIUS);
+		List<LivingEntity> hits = hostilesAround(entity, master, entity.position(), radius);
 		if (hits.isEmpty()) {
 			return false;
 		}
-		fx(level, Technique.FROST_LOTUS, DaoTechniqueSub.CAST, entity.position(), entity.position(), (float) FROST_RADIUS);
+		fx(level, Technique.FROST_LOTUS, DaoTechniqueSub.CAST, entity.position(), entity.position(), (float) radius);
 		sound(level, entity.position(), SoundEvents.POWDER_SNOW_BREAK, 1.1F, 0.6F);
 		sound(level, entity.position(), SoundEvents.AMETHYST_CLUSTER_BREAK, 0.9F, 1.5F);
 		for (LivingEntity target : hits) {
@@ -538,13 +594,14 @@ public final class DiscipleTechniques {
 		}
 		List<LivingEntity> victims = new ArrayList<>();
 		victims.add(aim);
-		for (LivingEntity other : hostilesAround(entity, master, aim.position(), GLACIER_RADIUS)) {
+		double radius = ranged(GLACIER_RADIUS);
+		for (LivingEntity other : hostilesAround(entity, master, aim.position(), radius)) {
 			if (other != aim) {
 				victims.add(other);
 			}
 		}
 		Vec3 dir = middleOf(aim).subtract(entity.getEyePosition()).normalize();
-		fx(level, Technique.GLACIER_PRISON, DaoTechniqueSub.CAST, middleOf(aim), hand(entity, dir), (float) GLACIER_RADIUS);
+		fx(level, Technique.GLACIER_PRISON, DaoTechniqueSub.CAST, middleOf(aim), hand(entity, dir), (float) radius);
 		sound(level, aim.position(), SoundEvents.POWDER_SNOW_BREAK, 1.1F, 0.5F);
 		sound(level, aim.position(), SoundEvents.AMETHYST_CLUSTER_BREAK, 0.9F, 0.6F);
 		for (LivingEntity victim : victims) {
@@ -658,12 +715,13 @@ public final class DiscipleTechniques {
 
 	/** A shockwave of radius 7: 2 D, monsters thrown up (never ravagers or the dragon, nothing near a portal) and slowed. */
 	private static boolean mountainStomp(DiscipleEntity entity, ServerPlayer master, ServerLevel level, double d) {
-		List<LivingEntity> hits = hostilesAround(entity, master, entity.position(), STOMP_RADIUS);
+		double radius = ranged(STOMP_RADIUS);
+		List<LivingEntity> hits = hostilesAround(entity, master, entity.position(), radius);
 		if (hits.isEmpty()) {
 			return false;
 		}
-		boolean throwing = !portalNear(entity, STOMP_RADIUS + 6.0D);
-		fx(level, Technique.MOUNTAIN_STOMP, DaoTechniqueSub.CAST, entity.position(), entity.position(), (float) STOMP_RADIUS);
+		boolean throwing = !portalNear(entity, radius + 6.0D);
+		fx(level, Technique.MOUNTAIN_STOMP, DaoTechniqueSub.CAST, entity.position(), entity.position(), (float) radius);
 		sound(level, entity.position(), SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.1F, 0.7F);
 		sound(level, entity.position(), SoundEvents.ANVIL_LAND, 0.5F, 0.5F);
 		for (LivingEntity target : hits) {
@@ -691,8 +749,9 @@ public final class DiscipleTechniques {
 	private static boolean springOfLife(DiscipleEntity entity, ServerPlayer master, ServerLevel level) {
 		AABB box = entity.getBoundingBox().inflate(SPRING_RADIUS);
 		List<LivingEntity> allies = level.getEntitiesOfClass(LivingEntity.class, box, other -> other.isAlive() && !other.isSpectator()
-				&& (other == entity || other instanceof Player || other instanceof DiscipleEntity || SpiritBeasts.isSpiritBeast(other)
+				&& (other == entity || other instanceof Player || other instanceof DiscipleEntity ally && healable(ally) || SpiritBeasts.isSpiritBeast(other)
 						|| other instanceof OwnableEntity ownable && ownable.getOwnerReference() != null)
+				&& !DuelRules.dueling(entity, other) && !DuelRules.dueling(master, other)
 				&& !Targeting.isHostileTo(other, master)
 				&& !(other instanceof Mob mob && (mob.getTarget() == master || mob.getTarget() == entity)));
 		boolean needed = false;
@@ -720,7 +779,8 @@ public final class DiscipleTechniques {
 
 	/** Every monster within 8 takes D; the disciple heals half of what was really dealt. */
 	private static boolean lifeDrain(DiscipleEntity entity, ServerPlayer master, ServerLevel level, double d) {
-		List<LivingEntity> hits = hostilesAround(entity, master, entity.position(), DRAIN_RADIUS);
+		double radius = ranged(DRAIN_RADIUS);
+		List<LivingEntity> hits = hostilesAround(entity, master, entity.position(), radius);
 		if (hits.isEmpty()) {
 			return false;
 		}
@@ -736,7 +796,7 @@ public final class DiscipleTechniques {
 		if (heal > 0.0F) {
 			entity.heal(heal);
 		}
-		fx(level, Technique.LIFE_DRAIN, DaoTechniqueSub.CAST, entity.position(), entity.position(), (float) DRAIN_RADIUS);
+		fx(level, Technique.LIFE_DRAIN, DaoTechniqueSub.CAST, entity.position(), entity.position(), (float) radius);
 		fx(level, Technique.LIFE_DRAIN, DaoTechniqueSub.HEAL, entity.position(), entity.position(), entity.getBbHeight());
 		sound(level, entity.position(), SoundEvents.EVOKER_CAST_SPELL, 0.9F, 0.8F);
 		sound(level, entity.position(), SoundEvents.WARDEN_HEARTBEAT, 0.9F, 1.3F);
@@ -784,10 +844,11 @@ public final class DiscipleTechniques {
 	 * near a portal) and the disciple turns swift for 6 s.
 	 */
 	private static boolean gale(DiscipleEntity entity, ServerPlayer master, ServerLevel level) {
-		if (portalNear(entity, GALE_RADIUS + 16.0D)) {
+		double radius = ranged(GALE_RADIUS);
+		if (portalNear(entity, radius + 16.0D)) {
 			return false;
 		}
-		List<LivingEntity> blown = hostilesAround(entity, master, entity.position(), GALE_RADIUS);
+		List<LivingEntity> blown = hostilesAround(entity, master, entity.position(), radius);
 		if (blown.isEmpty()) {
 			return false;
 		}
@@ -795,12 +856,12 @@ public final class DiscipleTechniques {
 			Vec3 away = target.position().subtract(entity.position()).horizontal();
 			double distance = away.length();
 			Vec3 dir = distance < 1.0E-3D ? new Vec3(1.0D, 0.0D, 0.0D) : away.scale(1.0D / distance);
-			double closeness = 1.0D - Math.min(1.0D, distance / GALE_RADIUS);
+			double closeness = 1.0D - Math.min(1.0D, distance / radius);
 			double strength = 0.9D + 1.7D * closeness;
 			launch(target, new Vec3(dir.x * strength, 0.35D + 0.3D * closeness, dir.z * strength));
 		}
 		entity.addEffect(new MobEffectInstance(MobEffects.SPEED, GALE_TICKS, 1, false, false, true), entity);
-		fx(level, Technique.GALE, DaoTechniqueSub.CAST, entity.position(), entity.position(), (float) GALE_RADIUS);
+		fx(level, Technique.GALE, DaoTechniqueSub.CAST, entity.position(), entity.position(), (float) radius);
 		sound(level, entity.position(), SoundEvents.PHANTOM_SWOOP, 0.9F, 0.8F);
 		sound(level, entity.position(), SoundEvents.BREEZE_SHOOT, 0.8F, 0.6F);
 		return true;
@@ -836,7 +897,7 @@ public final class DiscipleTechniques {
 
 	/** Every monster within 12 is caught in a fold of space for a short while: 1.5 D and a strong slow. */
 	private static boolean spacePrison(DiscipleEntity entity, ServerPlayer master, ServerLevel level, double d) {
-		List<LivingEntity> hits = hostilesAround(entity, master, entity.position(), SPACE_PRISON_RADIUS);
+		List<LivingEntity> hits = hostilesAround(entity, master, entity.position(), ranged(SPACE_PRISON_RADIUS));
 		if (hits.isEmpty()) {
 			return false;
 		}
@@ -869,12 +930,18 @@ public final class DiscipleTechniques {
 
 	// ================================================================== helpers
 
+	/** Disciples and clones are healed by Spring of Life; candidates, rivals and phantoms are not. */
+	private static boolean healable(DiscipleEntity other) {
+		return other.role() == DiscipleEntity.Role.DISCIPLE || other.role() == DiscipleEntity.Role.CLONE;
+	}
+
 	/**
 	 * Technique damage from the disciple (a mob attack, so kills are the disciple's), only on targets {@link #mayHit}
 	 * accepts; not slowed by the target's short invulnerability after a melee hit. True when it landed.
 	 */
 	static boolean hurt(DiscipleEntity entity, ServerPlayer master, ServerLevel level, LivingEntity target, double amount) {
-		float damage = (float) amount;
+		// The phase-6 damageFactor hooks (stars, hexes, folds, flames, titles...), product of all (DESIGN 20.2.6).
+		float damage = (float) (amount * DiscipleHooks.damageFactor(entity, target, true));
 		if (!(damage > 0.0F) || !Float.isFinite(damage) || !mayHit(entity, master, target)) {
 			return false;
 		}
@@ -882,9 +949,11 @@ public final class DiscipleTechniques {
 			target.damageCooldownTime = 10;
 		}
 		// The hit's knockback could push a monster into a portal (travel could build an exit portal) or make it land on
-		// farmland or turtle eggs: the tag keeps every block safe from it.
-		target.addTag(NoGrief.TAG);
-		target.setPortalCooldown();
+		// farmland or turtle eggs: the tag keeps every block safe from it. Never on a player (the master in a duel).
+		if (!(target instanceof Player)) {
+			target.addTag(NoGrief.TAG);
+			target.setPortalCooldown();
+		}
 		DamageSource source = level.damageSources().mobAttack(entity);
 		boolean landed = target.hurtServer(level, source, damage);
 		if (landed) {

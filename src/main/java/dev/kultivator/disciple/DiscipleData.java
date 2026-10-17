@@ -71,6 +71,11 @@ public final class DiscipleData {
 	private double nextTribulationFactor = 1.0D;
 	/** Rank step whose bottleneck the master was last told about (-1: never). */
 	private int notifiedStep = -1;
+	/**
+	 * Phase-6 data of the other modules (DESIGN 20.4.6): each module writes only its own sub-compound ({@code sect},
+	 * {@code talent}, {@code activity}, {@code power}, {@code path}); everyone may read. Saved under {@code "extra"}.
+	 */
+	private CompoundTag extra = new CompoundTag();
 
 	/** The running breakthrough (session only, never saved; see {@link #save()} for a tribulation left after a strike). */
 	private @Nullable DiscipleBreakthrough.Trial trial;
@@ -446,6 +451,26 @@ public final class DiscipleData {
 		return (breakingThrough() ? 2 : 0) | (deviating() ? 8 : 0);
 	}
 
+	// ================================================================== phase-6 module data
+
+	/**
+	 * The live compound of the phase-6 modules (never null, empty by default). Changes are saved with the disciple; a
+	 * module edits only its own sub-compound (DESIGN 20.4.6).
+	 */
+	public CompoundTag extra() {
+		return extra;
+	}
+
+	/** The sub-compound {@code key} of {@link #extra()}, created (and kept) when missing. */
+	public CompoundTag extraSection(String key) {
+		CompoundTag section = extra.getCompound(key).orElse(null);
+		if (section == null) {
+			section = new CompoundTag();
+			extra.put(key, section);
+		}
+		return section;
+	}
+
 	// ================================================================== saving
 
 	public CompoundTag save() {
@@ -490,6 +515,7 @@ public final class DiscipleData {
 		tag.putDouble("next_breakthrough_bonus", nextBreakthroughBonus);
 		tag.putDouble("next_tribulation_factor", nextTribulationFactor);
 		tag.putInt("notified_step", notifiedStep);
+		tag.put("extra", extra.copy());
 		if (trial != null && trial.kind == DiscipleBreakthrough.Kind.TRIBULATION && trial.strikesDone > 0) {
 			// Saved or unloaded after the first strike: like a cultivator logging out then, the tribulation counts as failed.
 			tag.putBoolean("trial_fled", true);
@@ -548,6 +574,7 @@ public final class DiscipleData {
 		data.setNextBreakthroughBonus(tag.getDoubleOr("next_breakthrough_bonus", 0.0D));
 		data.setNextTribulationFactor(tag.getDoubleOr("next_tribulation_factor", 1.0D));
 		data.notifiedStep = tag.getIntOr("notified_step", -1);
+		data.extra = tag.getCompoundOrEmpty("extra").copy();
 		if (tag.getBooleanOr("trial_fled", false)) {
 			// The failure of DiscipleBreakthrough.fail, applied now (the clouds ended with the session).
 			data.setXp(data.xp * DiscipleBreakthrough.FAIL_BAR_KEEP);

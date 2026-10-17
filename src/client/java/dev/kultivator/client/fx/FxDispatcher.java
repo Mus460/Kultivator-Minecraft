@@ -28,6 +28,12 @@ public final class FxDispatcher {
 			case SPARRING -> SectFx.play(type, fx);
 			case ALCHEMY -> AlchemyFx.play(type, fx);
 			case ASCENSION -> AscensionFx.play(type, fx);
+			// Phase 6 (DESIGN 20.2.3).
+			case HALL -> dev.kultivator.client.hall.HallFx.play(type, fx);
+			case SECT_EVENT -> dev.kultivator.client.sectevent.SectEventFx.play(type, fx);
+			case DISCIPLE_POWER -> dev.kultivator.client.disciple.power.PowerFx.play(type, fx);
+			case STAR -> dev.kultivator.client.disciple.path.PathFx.play(type, fx);
+			case KEHANCURAN -> dev.kultivator.client.kehancuran.KehancuranFx.play(type, fx);
 		}
 	}
 
@@ -48,6 +54,9 @@ public final class FxDispatcher {
 		BeastFx.tick(minecraft);
 		AlchemyFx.tick(minecraft);
 		AscensionFx.tick(minecraft);
+		// Phase 6: continuous disciple power and star visuals.
+		dev.kultivator.client.disciple.power.PowerFx.tick(minecraft);
+		dev.kultivator.client.disciple.path.PathFx.tick(minecraft);
 	}
 
 	private FxDispatcher() {

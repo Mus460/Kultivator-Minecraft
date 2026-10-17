@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.sect_gate_open.description"
+    },
+    "icon": {
+      "id": "kultivator:sect_hall_stele"
+    },
+    "title": {
+      "translate": "advancement.kultivator.sect_gate_open.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

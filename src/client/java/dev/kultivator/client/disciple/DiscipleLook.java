@@ -4,7 +4,10 @@ import dev.kultivator.data.Dao;
 import dev.kultivator.data.Element;
 import dev.kultivator.data.Rank;
 import dev.kultivator.data.Realm;
+import dev.kultivator.client.disciple.power.PhysiqueVisuals;
 import dev.kultivator.disciple.DiscipleEntity;
+import dev.kultivator.disciple.path.StarTitles;
+import dev.kultivator.disciple.power.PowerIds;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.network.chat.Component;
@@ -15,8 +18,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * How a disciple looks on this client, read from its synced entity data: rank, Dao, root colour, activity flags, its
@@ -37,6 +43,8 @@ public final class DiscipleLook {
 	/** Ticks the seated pose takes to blend in or out. */
 	private static final float BLEND_TICKS = 8.0F;
 	private static final Map<Integer, Blend> BLENDS = new HashMap<>();
+	/** Extra marks other client modules put on a disciple's name tag (phase 6; e.g. module D's red seal). */
+	private static final List<BiFunction<DiscipleEntity, MutableComponent, MutableComponent>> NAME_DECORATORS = new ArrayList<>();
 
 	static {
 		for (int i = 0; i < CHARACTERS.length; i++) {
@@ -127,10 +135,49 @@ public final class DiscipleLook {
 		return Component.translatable("kultivator.discipleui.rank_short", realm.displayName(), rank.stageName());
 	}
 
-	/** "&lt;name&gt; · &lt;rank&gt;" in the realm colour. */
+	/**
+	 * The name tag (phase 6, module C): a disciple reads "[Dalam] Lin Feng · Inti Emas ★31" with the rank prefix in its
+	 * trim colour, the name in its soul colour and the stars' title (module D's {@link StarTitles}); a candidate reads
+	 * "Calon · ???", rivals, phantoms and Divine Clones have their own lines. Other modules may add marks
+	 * ({@link #addNameDecorator}).
+	 */
 	public static Component nameTag(DiscipleEntity disciple) {
 		Rank rank = rank(disciple);
-		return Component.translatable("kultivator.discipleui.nametag", name(disciple), rankShort(rank)).withColor(rank.realm().color());
+		int realmColor = rank.realm().color();
+		MutableComponent tag = switch (disciple.syncedRole()) {
+			case CANDIDATE -> Component.translatable("kultivator.dpower.tag.candidate").withColor(0xE8E0C8);
+			case RIVAL -> Component.translatable("kultivator.dpower.tag.rival", name(disciple), rankShort(rank)).withColor(0xFF9A7A);
+			case PHANTOM -> Component.translatable("kultivator.dpower.tag.phantom", name(disciple), rankShort(rank)).withColor(0xB08AD8);
+			case CLONE -> Component.translatable("kultivator.dpower.tag.clone", name(disciple)).withColor(0xBFE8FF);
+			case DISCIPLE -> {
+				int talent = disciple.syncedTalent();
+				int soul = PowerIds.COLOUR_RGB[Mth.clamp(DiscipleEntity.talentSoulColor(talent), 0, PowerIds.COLOUR_RGB.length - 1)];
+				int sectRank = Mth.clamp(disciple.syncedSectRank(), 0, PhysiqueVisuals.RANK_TRIM.length - 1);
+				int stars = disciple.syncedStars();
+				Component prefix = Component.translatable("kultivator.dpower.tag.rank." + sectRank).withColor(PhysiqueVisuals.RANK_TRIM[sectRank]);
+				Component starLine = stars > 0 ? Component.literal(" ").append(StarTitles.title(stars).copy().withColor(0xFFE27A)) : Component.empty();
+				// An explicit name colour (the gold of Nomor Satu Daftar Kuat, DESIGN 20.3.12) wins over the soul colour.
+				Component custom = disciple.getCustomName();
+				MutableComponent shown = name(disciple).copy();
+				if (custom == null || custom.getStyle().getColor() == null) {
+					shown = shown.withColor(soul);
+				}
+				yield Component.translatable("kultivator.dpower.tag.line", prefix, shown,
+						rankShort(rank).withColor(realmColor), starLine).withColor(realmColor);
+			}
+		};
+		for (BiFunction<DiscipleEntity, MutableComponent, MutableComponent> decorator : NAME_DECORATORS) {
+			MutableComponent decorated = decorator.apply(disciple, tag);
+			if (decorated != null) {
+				tag = decorated;
+			}
+		}
+		return tag;
+	}
+
+	/** Lets a client module add a mark to every disciple's name tag (called once from its client init). */
+	public static void addNameDecorator(BiFunction<DiscipleEntity, MutableComponent, MutableComponent> decorator) {
+		NAME_DECORATORS.add(decorator);
 	}
 
 	// ================================================================ seated pose

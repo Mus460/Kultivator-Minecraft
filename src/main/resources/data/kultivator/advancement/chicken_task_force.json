@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:first_disciple",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.chicken_task_force.description"
+    },
+    "icon": {
+      "id": "kultivator:spirit_tail_feather"
+    },
+    "title": {
+      "translate": "advancement.kultivator.chicken_task_force.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "B": "minecraft:bookshelf",
+    "A": "minecraft:amethyst_block",
+    "L": "minecraft:lodestone"
+  },
+  "pattern": [
+    "GBG",
+    "ALA",
+    "GBG"
+  ],
+  "result": {
+    "id": "kultivator:sect_hall_stele"
+  }
+}

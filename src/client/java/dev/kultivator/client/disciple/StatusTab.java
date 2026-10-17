@@ -1,5 +1,6 @@
 package dev.kultivator.client.disciple;
 
+import dev.kultivator.client.disciple.power.PhysiqueVisuals;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Palette;
@@ -8,10 +9,14 @@ import dev.kultivator.data.Element;
 import dev.kultivator.data.Rank;
 import dev.kultivator.data.Realm;
 import dev.kultivator.disciple.DiscipleEntity;
+import dev.kultivator.disciple.path.StarTitles;
+import dev.kultivator.disciple.power.DisciplePowers;
+import dev.kultivator.disciple.power.PowerIds;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Util;
@@ -49,12 +54,12 @@ final class StatusTab extends DiscipleTab {
 	}
 
 	@Override
-	Component title() {
+	public Component title() {
 		return Component.translatable("kultivator.discipleui.tab.status");
 	}
 
 	@Override
-	Component shortName() {
+	public Component shortName() {
 		return Component.translatable("kultivator.discipleui.tab.status.short");
 	}
 
@@ -66,7 +71,7 @@ final class StatusTab extends DiscipleTab {
 	}
 
 	@Override
-	void onView() {
+	public void onView() {
 		rebuildSlips();
 	}
 
@@ -99,6 +104,7 @@ final class StatusTab extends DiscipleTab {
 			slips.add(new Slip(label("comprehension"), Component.translatable("kultivator.discipleui.status.comprehension.value",
 					String.format(Locale.ROOT, "%.1f", view.comprehension), Dao.comprehensionName(view.comprehension)), Palette.onPaper(dao.color())));
 		}
+		addPhase6Slips();
 		double health = disciple != null ? disciple.getHealth() : view.health;
 		double maxHealth = disciple != null ? disciple.getMaxHealth() : view.maxHealth;
 		if (health >= 0.0D && maxHealth > 0.0D) {
@@ -118,6 +124,30 @@ final class StatusTab extends DiscipleTab {
 
 	private static Component label(String id) {
 		return Component.translatable("kultivator.discipleui.status." + id);
+	}
+
+	/** Phase 6 (module C): sect rank, soul colour, rare physique and stars, from the {@code dpower} details. */
+	private void addPhase6Slips() {
+		CompoundTag power = info().getCompoundOrEmpty(DisciplePowers.INFO_KEY);
+		if (power.isEmpty()) {
+			return;
+		}
+		int rank = Math.max(0, Math.min(PhysiqueVisuals.RANK_TRIM.length - 1, power.getIntOr("sect_rank", 1)));
+		slips.add(new Slip(Component.translatable("kultivator.dpower.status.sect_rank"), Component.translatable("kultivator.dpower.rank." + rank),
+				Palette.onPaper(PhysiqueVisuals.RANK_TRIM[rank])));
+		int colour = Math.max(0, Math.min(6, power.getIntOr("colour", 2)));
+		slips.add(new Slip(Component.translatable("kultivator.dpower.status.colour"),
+				Component.translatable("kultivator.dpower.status.colour.value", Component.translatable("kultivator.dpower.colour." + PowerIds.COLOUR_IDS[colour]),
+						String.format(Locale.ROOT, "%.2f", power.getDoubleOr("colour_factor", 1.0D))), Palette.onPaper(PowerIds.COLOUR_RGB[colour])));
+		int physique = power.getIntOr("physique", 0);
+		if (physique > 0 && physique < PowerIds.PHYSIQUE_IDS.length && !power.getBooleanOr("hidden", false)) {
+			slips.add(new Slip(Component.translatable("kultivator.dpower.status.physique"),
+					Component.translatable("kultivator.dpower.physique." + PowerIds.PHYSIQUE_IDS[physique]), Palette.onPaper(PowerIds.PHYSIQUE_RGB[physique])));
+		}
+		int stars = power.getIntOr("stars", 0);
+		if (stars > 0) {
+			slips.add(new Slip(Component.translatable("kultivator.dpower.status.stars"), StarTitles.title(stars), Palette.GOLD_DARK));
+		}
 	}
 
 	/** The root's elements, each in its own colour ("not revealed" when unknown). */
@@ -388,7 +418,7 @@ final class StatusTab extends DiscipleTab {
 	}
 
 	@Override
-	boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (mouseX >= slipX && mouseX < slipX + slipW && mouseY >= y && mouseY < y + h) {
 			scroll -= (float) amount * 12.0F;
 			return true;

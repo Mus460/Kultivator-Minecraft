@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_recruit_hall",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.determined_disciple.description"
+    },
+    "icon": {
+      "id": "minecraft:bamboo"
+    },
+    "title": {
+      "translate": "advancement.kultivator.determined_disciple.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

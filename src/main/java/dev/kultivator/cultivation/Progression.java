@@ -21,6 +21,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.ToDoubleFunction;
+
 /**
  * All cultivation XP goes through {@link #addXp}: multipliers, stage-ups (minor breakthroughs), the bottleneck at Peak
  * and Mortal, and Stored Qi (docs/DESIGN.md section 1). Rank changes from breakthroughs and commands also come here.
@@ -33,6 +37,8 @@ public final class Progression {
 	private static final String NOTIFIED_STEP = "notified_step";
 	/** Whether the root was tested when that notice was given (a Mortal is told again once it is tested). */
 	private static final String NOTIFIED_TESTED = "notified_tested";
+	/** Extra XP factors from other modules (DESIGN 20.2.10), multiplied into {@link #xpMultiplier(ServerPlayer, XpSource)}. */
+	private static final List<ToDoubleFunction<ServerPlayer>> MULTIPLIERS = new ArrayList<>();
 
 	public static void init() {
 		// Nothing to register: XP is pushed in by the sources (XpSources, meditation, pills, ...).
@@ -57,7 +63,7 @@ public final class Progression {
 			return 0.0D;
 		}
 		CultivationData data = Cultivators.get(player);
-		double gain = amount * xpMultiplier(data, source);
+		double gain = amount * xpMultiplier(player, source);
 		if (!(gain > 0.0D) || !Double.isFinite(gain)) {
 			return 0.0D;
 		}
@@ -73,11 +79,30 @@ public final class Progression {
 
 	/**
 	 * The multiplier {@link #addXp} uses for {@code source}: root grade (once tested) x breakthrough quality factor x
-	 * server config x 0.5 during a Qi Deviation. EXACT is always 1. Site, vein, formation and toxicity factors are NOT
-	 * part of it: the meditation and pill modules apply those themselves.
+	 * server config x 0.5 during a Qi Deviation x every registered multiplier provider (DESIGN 20.2.10). EXACT is always
+	 * 1. Site, vein, formation and toxicity factors are NOT part of it: the meditation and pill modules apply those
+	 * themselves.
 	 */
 	public static double xpMultiplier(ServerPlayer player, XpSource source) {
-		return xpMultiplier(Cultivators.get(player), source);
+		double base = xpMultiplier(Cultivators.get(player), source);
+		if (source == XpSource.EXACT || MULTIPLIERS.isEmpty()) {
+			return base;
+		}
+		for (ToDoubleFunction<ServerPlayer> provider : MULTIPLIERS) {
+			double factor = provider.applyAsDouble(player);
+			if (Double.isFinite(factor) && factor >= 0.0D) {
+				base *= factor;
+			}
+		}
+		return base;
+	}
+
+	/**
+	 * Adds a factor to every player's XP multiplier (not for EXACT), e.g. Kebanggaan Guru (DESIGN 20.3.20). Register it
+	 * once from a module's {@code init()}; a provider returns 1 when it has nothing to add.
+	 */
+	public static void addMultiplierProvider(ToDoubleFunction<ServerPlayer> provider) {
+		MULTIPLIERS.add(provider);
 	}
 
 	/** Pure version of {@link #xpMultiplier(ServerPlayer, XpSource)} (the config part is the local one on a client). */

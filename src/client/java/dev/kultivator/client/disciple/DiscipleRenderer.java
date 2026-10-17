@@ -1,6 +1,9 @@
 package dev.kultivator.client.disciple;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.kultivator.client.disciple.power.DutyPoses;
+import dev.kultivator.client.disciple.power.NatalTreasureLayer;
+import dev.kultivator.client.disciple.power.PhysiqueVisuals;
 import dev.kultivator.client.render.MeditationPose;
 import dev.kultivator.data.Rank;
 import dev.kultivator.disciple.DiscipleEntity;
@@ -12,6 +15,8 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -19,6 +24,9 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Draws a disciple as a player: the player model with wide or slim arms and one of the default player skins (both
@@ -37,10 +45,12 @@ public class DiscipleRenderer extends LivingEntityRenderer<DiscipleEntity, Disci
 	private final PlayerModel slimModel;
 
 	public DiscipleRenderer(EntityRendererProvider.Context context) {
-		super(context, new PlayerModel(context.bakeLayer(ModelLayers.PLAYER), false), 0.5F);
+		// Phase 6: the player model plus the duty poses of module C (DESIGN 20.3.9, 20.3.22).
+		super(context, new DutyPoses.Model(context.bakeLayer(ModelLayers.PLAYER), false), 0.5F);
 		this.wideModel = this.model;
-		this.slimModel = new PlayerModel(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
+		this.slimModel = new DutyPoses.Model(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
 		this.addLayer(new DiscipleRobeLayer(this, context));
+		this.addLayer(new NatalTreasureLayer(this));
 		this.addLayer(new DiscipleHeldItemLayer(this));
 	}
 
@@ -71,6 +81,19 @@ public class DiscipleRenderer extends LivingEntityRenderer<DiscipleEntity, Disci
 		state.flags = DiscipleLook.flags(entity);
 		state.robeColor = DiscipleLook.color(state.realm, state.dao);
 		state.name = DiscipleLook.name(entity);
+		// Phase 6 (module C): role, duty, sect rank, stars, talent and power looks; the natal treasure's item.
+		state.role = entity.syncedRole().ordinal();
+		state.activity = entity.syncedActivity();
+		state.sectRank = entity.syncedSectRank();
+		state.stars = entity.syncedStars();
+		state.talent = entity.syncedTalent();
+		state.power = entity.syncedPower();
+		ItemStack natal = PhysiqueVisuals.natalStack(state.power);
+		if (natal.isEmpty()) {
+			state.natalItem.clear();
+		} else {
+			this.itemModelResolver.updateForLiving(state.natalItem, natal, ItemDisplayContext.FIXED, entity);
+		}
 
 		float seated = DiscipleLook.seatStrength(entity, partialTicks);
 		state.seated = seated;
@@ -86,14 +109,27 @@ public class DiscipleRenderer extends LivingEntityRenderer<DiscipleEntity, Disci
 		return state.texture;
 	}
 
-	/** A greyish, slightly red-tinged body while a Qi Deviation rages through its meridians. */
+	/**
+	 * A greyish, slightly red-tinged body while a Qi Deviation rages through its meridians; otherwise module C's looks
+	 * (phantom, clone and spirit body see-through, rival and candidate tints, gate veins, dragon form, golden glint).
+	 */
 	@Override
 	protected int getModelTint(DiscipleRenderState state) {
+		int deviating = -1;
 		if ((state.flags & DiscipleLook.DEVIATING) != 0) {
 			float pulse = 0.5F + 0.5F * Mth.sin(state.ageInTicks * 0.15F);
-			return ARGB.color(255, 220, (int) Mth.lerp(pulse, 150.0F, 185.0F), (int) Mth.lerp(pulse, 150.0F, 185.0F));
+			deviating = ARGB.color(255, 220, (int) Mth.lerp(pulse, 150.0F, 185.0F), (int) Mth.lerp(pulse, 150.0F, 185.0F));
 		}
-		return -1;
+		return PhysiqueVisuals.modelTint(state, deviating);
+	}
+
+	/** See-through bodies (the Void Realm spirit body, Divine Clones, phantoms) use a translucent render type. */
+	@Override
+	protected @Nullable RenderType getRenderType(DiscipleRenderState state, boolean isBodyVisible, boolean forceTransparent, boolean appearGlowing) {
+		if (isBodyVisible && PhysiqueVisuals.translucent(state)) {
+			return RenderTypes.entityTranslucent(this.getTextureLocation(state));
+		}
+		return super.getRenderType(state, isBodyVisible, forceTransparent, appearGlowing);
 	}
 
 	@Override

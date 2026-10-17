@@ -50,12 +50,12 @@ final class TechniqueTab extends DiscipleTab {
 	}
 
 	@Override
-	Component title() {
+	public Component title() {
 		return Component.translatable("kultivator.discipleui.tab.techniques");
 	}
 
 	@Override
-	Component shortName() {
+	public Component shortName() {
 		return Component.translatable("kultivator.discipleui.tab.techniques.short");
 	}
 
@@ -113,7 +113,7 @@ final class TechniqueTab extends DiscipleTab {
 	}
 
 	@Override
-	boolean needsRebuild() {
+	public boolean needsRebuild() {
 		return !listed().equals(builtFor);
 	}
 
@@ -291,7 +291,7 @@ final class TechniqueTab extends DiscipleTab {
 	}
 
 	@Override
-	boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (mouseX >= gridX && mouseX < gridX + gridW && mouseY >= gridY && mouseY < gridY + gridH) {
 			scroll -= (float) amount * 14.0F;
 			return true;

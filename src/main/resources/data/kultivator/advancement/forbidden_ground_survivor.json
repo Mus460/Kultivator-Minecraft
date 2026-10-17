@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_expedition",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.forbidden_ground_survivor.description"
+    },
+    "icon": {
+      "id": "kultivator:foundation_herb"
+    },
+    "title": {
+      "translate": "advancement.kultivator.forbidden_ground_survivor.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

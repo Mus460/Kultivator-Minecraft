@@ -48,17 +48,25 @@ public final class FormationFx {
 	private static ClientLevel lastLevel;
 	private static long clock;
 
-	/** A switched-on formation: lodestone centre, radius and when the server last mentioned it. */
+	/**
+	 * A switched-on formation: lodestone centre, radius and when the server last mentioned it; for a Formasi Agung Sekte
+	 * (DESIGN 20.3.2) also its restriction layers (0 for a plain formation) and whether we own it.
+	 */
 	private static final class Dome {
 		final Vec3 centre;
 		float radius;
 		long lastSeen;
+		int layers;
+		boolean owner;
 
 		Dome(Vec3 centre, float radius) {
 			this.centre = centre;
 			this.radius = radius;
 		}
 	}
+
+	/** Restriction layer tints of a Formasi Agung: 2 azure, 3 violet, 4 crimson-gold. */
+	private static final int[] LAYER_TINT = {JADE, JADE, 0x6FB8FF, 0xB98CFF, 0xFF7A4A};
 
 	private enum Kind {
 		RISE, COLLAPSE, MISSING, PRESENT
@@ -91,9 +99,12 @@ public final class FormationFx {
 				Dome dome = DOMES.computeIfAbsent(BlockPos.containing(pos), key -> new Dome(pos, radius));
 				dome.radius = radius;
 				dome.lastSeen = clock;
-				if (fx.b() == 1) {
+				dome.layers = fx.b() >> 4 & 0xF;
+				dome.owner = (fx.b() & 1 << 8) != 0;
+				int flourish = fx.b() & 0xF;
+				if (flourish == 1) {
 					awakening(pos, radius);
-				} else if (fx.b() == 2) {
+				} else if (flourish == 2) {
 					charge(pos);
 				}
 			}
@@ -133,6 +144,9 @@ public final class FormationFx {
 			double view = dome.radius + VIEW_MARGIN;
 			if (dome.centre.distanceToSqr(camera) <= view * view) {
 				drawDome(dome, random, camera);
+				if (dome.layers >= 2) {
+					drawLayers(dome, level, random, camera);
+				}
 			}
 		}
 		Iterator<Animation> animations = ANIMATIONS.iterator();
@@ -226,6 +240,78 @@ public final class FormationFx {
 			if (camera.distanceToSqr(at) <= PARTICLE_RANGE_SQ) {
 				CommonFx.add(ParticleTypes.END_ROD, at, new Vec3(0.0D, -0.01D, 0.0D), false);
 			}
+		}
+	}
+
+	/**
+	 * The restriction layers of a Formasi Agung Sekte (DESIGN 20.3.2): a tinted second skin of motes (layer 2+), a bright
+	 * band at the edge (layer 3+), crimson-gold sparks and, for its owner only, outlines around the monsters inside
+	 * (layer 4; particles, never the Glowing effect).
+	 */
+	private static void drawLayers(Dome dome, ClientLevel level, RandomSource random, Vec3 camera) {
+		int layers = Math.min(4, dome.layers);
+		int tint = LAYER_TINT[layers];
+		Vec3 centre = dome.centre;
+		double radius = dome.radius;
+		double ground = centre.y - 0.5D;
+		int motes = EffectQuality.scale(layers);
+		for (int i = 0; i < motes; i++) {
+			double height = random.nextDouble() * radius * 0.96D;
+			double ring = Math.sqrt(Math.max(0.0D, radius * radius * 0.92D - height * height));
+			double angle = random.nextDouble() * Math.PI * 2.0D;
+			double x = centre.x + Math.cos(angle) * ring;
+			double y = ground + height;
+			double z = centre.z + Math.sin(angle) * ring;
+			if (camera.distanceToSqr(x, y, z) <= PARTICLE_RANGE_SQ) {
+				CommonFx.add(CommonFx.dust(tint, 0.55F), x, y, z, 0.0D, 0.003D, 0.0D);
+			}
+		}
+		if (layers >= 3 && clock % 3 == 0) {
+			int n = EffectQuality.scale(4);
+			DustParticleOptions band = CommonFx.dust(tint, 0.9F);
+			for (int i = 0; i < n; i++) {
+				double angle = -clock * 0.02D + Math.PI * 2.0D * i / n;
+				CommonFx.add(band, centre.x + Math.cos(angle) * radius, ground + 0.6D, centre.z + Math.sin(angle) * radius, 0.0D, 0.0D, 0.0D);
+			}
+		}
+		if (layers >= 4) {
+			if (EffectQuality.chance(random, 0.3F)) {
+				double angle = random.nextDouble() * Math.PI * 2.0D;
+				CommonFx.add(ParticleTypes.CRIMSON_SPORE, centre.x + Math.cos(angle) * radius * 0.9D, ground + random.nextDouble() * 2.0D,
+						centre.z + Math.sin(angle) * radius * 0.9D, 0.0D, 0.01D, 0.0D);
+			}
+			if (dome.owner && clock % 10 == 0) {
+				double radiusSq = radius * radius;
+				int shown = 0;
+				for (net.minecraft.world.entity.Mob mob : level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,
+						new net.minecraft.world.phys.AABB(centre, centre).inflate(radius),
+						mob -> mob instanceof net.minecraft.world.entity.monster.Enemy && mob.isAlive() && mob.distanceToSqr(centre) <= radiusSq)) {
+					if (shown++ >= 16) {
+						break;
+					}
+					markMonster(mob.position(), mob.getBbWidth(), mob.getBbHeight());
+				}
+			}
+		}
+	}
+
+	/** Gold corner posts and a crimson ring around a monster's box. */
+	private static void markMonster(Vec3 feet, float width, float height) {
+		double half = width / 2.0D + 0.15D;
+		DustParticleOptions gold = CommonFx.dust(GOLD, 0.6F);
+		DustParticleOptions red = CommonFx.dust(RED, 0.7F);
+		int steps = Math.max(2, EffectQuality.scale(3));
+		for (int corner = 0; corner < 4; corner++) {
+			double cx = feet.x + (corner < 2 ? -half : half);
+			double cz = feet.z + (corner % 2 == 0 ? -half : half);
+			for (int i = 0; i <= steps; i++) {
+				CommonFx.add(gold, cx, feet.y + height * i / steps, cz, 0.0D, 0.0D, 0.0D);
+			}
+		}
+		int ring = EffectQuality.scale(8);
+		for (int i = 0; i < ring; i++) {
+			double angle = Math.PI * 2.0D * i / ring;
+			CommonFx.add(red, feet.x + Math.cos(angle) * half * 1.3D, feet.y + 0.1D, feet.z + Math.sin(angle) * half * 1.3D, 0.0D, 0.0D, 0.0D);
 		}
 	}
 

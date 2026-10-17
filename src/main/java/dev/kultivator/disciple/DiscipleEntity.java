@@ -1,5 +1,7 @@
 package dev.kultivator.disciple;
 
+import dev.kultivator.Kultivator;
+import dev.kultivator.cultivation.Tribulation;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Rank;
 import dev.kultivator.fx.Fx;
@@ -9,6 +11,7 @@ import dev.kultivator.util.Targeting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -21,6 +24,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
@@ -54,7 +58,12 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -87,6 +96,46 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	/** The bow before a released disciple vanishes (ticks). */
 	private static final int RELEASE_TICKS = 40;
 
+	/**
+	 * What kind of body this is (DESIGN 20.2.5). Only {@link #DISCIPLE} is saved, listed by {@link Disciples}, counted
+	 * toward the limit or able to leave a Soul Tablet; the others are refused when they would load from disk.
+	 */
+	public enum Role {
+		/** A master's disciple (phase 5). */
+		DISCIPLE,
+		/** A youth at the Sect Hall's acceptance day: no master, untouchable, strolls near its anchor. */
+		CANDIDATE,
+		/** A visiting rival for a duel: fights only its {@link DuelRules} partner. */
+		RIVAL,
+		/** A Void Realm phantom: fights only its {@link DuelRules} partner. */
+		PHANTOM,
+		/** A Divine Clone: allied with its source's master, fights monsters, follows its source. */
+		CLONE;
+
+		public static Role byOrdinal(int ordinal) {
+			Role[] values = values();
+			return ordinal < 0 || ordinal >= values.length ? DISCIPLE : values[ordinal];
+		}
+	}
+
+	/** Activity ids of {@link #activity()} (DESIGN 20.2.5). 1-8 hold their spot like STAY and fight only when hit (5 guards). */
+	public static final int ACTIVITY_NONE = 0;
+	public static final int ACTIVITY_WATER = 1;
+	public static final int ACTIVITY_GARDEN = 2;
+	public static final int ACTIVITY_KITCHEN = 3;
+	public static final int ACTIVITY_FARM = 4;
+	public static final int ACTIVITY_FORMATION_GUARD = 5;
+	public static final int ACTIVITY_TOWER = 6;
+	public static final int ACTIVITY_VOID_BODY = 7;
+	public static final int ACTIVITY_SPECTATOR = 8;
+	public static final int ACTIVITY_DUELLIST = 9;
+
+	/** {@link Mode#GUARD_HALL} patrols within this many blocks of its hall stele. */
+	public static final double HALL_PATROL_RADIUS = 32.0D;
+	/** Bits of {@link #syncedPower()} that module C (0-15) and module D (16-31) own. */
+	public static final int POWER_MASK_C = 0x0000FFFF;
+	public static final int POWER_MASK_D = 0xFFFF0000;
+
 	/** The orders a master can give. The id is saved and used by commands and the screen. */
 	public enum Mode {
 		/** Walks after the master (teleports when far), defends the master. */
@@ -96,7 +145,9 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		/** Sits at the spot and cultivates faster; fights only when hurt. */
 		MEDITATE("meditate"),
 		/** Follows and attacks whatever the master attacks or whatever attacks the master. */
-		ASSIST("assist");
+		ASSIST("assist"),
+		/** Patrols within 32 blocks of its master's hall stele and fights hostiles inside the territory (DESIGN 20.2.5). */
+		GUARD_HALL("guard_hall");
 
 		private final String id;
 
@@ -144,6 +195,15 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	private static final EntityDataAccessor<Integer> DATA_FLAGS = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> DATA_SKIN = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Boolean> DATA_SLIM = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.BOOLEAN);
+	// Phase 6 (DESIGN 20.2.5).
+	private static final EntityDataAccessor<Byte> DATA_ROLE = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.BYTE);
+	private static final EntityDataAccessor<Byte> DATA_ACTIVITY = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.BYTE);
+	private static final EntityDataAccessor<Byte> DATA_SECT_RANK = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.BYTE);
+	private static final EntityDataAccessor<Integer> DATA_STARS = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_TALENT = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_POWER = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	/** Transient attack modifier that carries the {@code damageFactor} hooks into a melee blow. */
+	private static final Identifier MELEE_FACTOR_ID = Kultivator.id("disciple_melee_factor");
 
 	private DiscipleData data = new DiscipleData();
 	private Mode mode = Mode.FOLLOW;
@@ -163,6 +223,23 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	private int nearOwnerTick = -10000;
 	private int releaseTicks;
 	private @Nullable BlockPos lastSafePos;
+
+	// ---- phase 6 (DESIGN 20.2.5)
+	private Role role = Role.DISCIPLE;
+	/** Where a candidate strolls, a rival's ring, a clone's start (role specific). */
+	private @Nullable BlockPos roleAnchor;
+	private int activity;
+	private @Nullable BlockPos activitySpot;
+	/** A clone's source disciple (soul id), or null. */
+	private @Nullable UUID cloneSource;
+	/** Set by {@link Disciples#depart}: the body leaves without touching the master's list. */
+	private boolean departed;
+	private @Nullable CompoundTag departure;
+	/** Attribute modifiers the {@code stats} hooks applied last ("attribute id|modifier id"), saved with the body. */
+	private final Set<String> hookModifiers = new HashSet<>();
+	/** GUARD_HALL: the hall stele (refreshed every 2 s), and the tick until which it rests between patrol legs. */
+	private @Nullable BlockPos hallAnchor;
+	private int patrolRestUntil;
 
 	public DiscipleEntity(EntityType<? extends DiscipleEntity> type, Level level) {
 		super(type, level);
@@ -186,6 +263,12 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		builder.define(DATA_FLAGS, 0);
 		builder.define(DATA_SKIN, 0);
 		builder.define(DATA_SLIM, false);
+		builder.define(DATA_ROLE, (byte) 0);
+		builder.define(DATA_ACTIVITY, (byte) 0);
+		builder.define(DATA_SECT_RANK, (byte) 0);
+		builder.define(DATA_STARS, 0);
+		builder.define(DATA_TALENT, 0);
+		builder.define(DATA_POWER, 0);
 	}
 
 	@Override
@@ -196,6 +279,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.goalSelector.addGoal(3, new DiscipleAi.CombatGoal(this));
 		this.goalSelector.addGoal(4, new DiscipleAi.ReturnToPostGoal(this));
 		this.goalSelector.addGoal(5, new DiscipleAi.FollowMasterGoal(this));
+		this.goalSelector.addGoal(6, new DiscipleAi.PatrolHallGoal(this));
+		this.goalSelector.addGoal(6, new DiscipleAi.CandidateStrollGoal(this));
 		this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F));
 		this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 		this.targetSelector.addGoal(1, new DiscipleAi.ChooseTargetGoal(this));
@@ -253,12 +338,219 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	 */
 	public void setMode(Mode mode) {
 		this.mode = mode;
-		this.post = mode.guardsPost() ? this.blockPosition() : null;
+		// GUARD_HALL keeps the current spot as its fallback anchor while it has no active hall in this dimension.
+		this.post = mode.guardsPost() || mode == Mode.GUARD_HALL ? this.blockPosition() : null;
 		if (mode == Mode.MEDITATE) {
 			this.setTarget(null);
 		}
 		this.ownerStillTicks = 0;
+		this.patrolRestUntil = 0;
+		if (mode == Mode.GUARD_HALL) {
+			refreshHallAnchor();
+		}
 		this.getNavigation().stop();
+	}
+
+	// ================================================================== phase 6: roles, activities, synced values
+
+	public Role role() {
+		return role;
+	}
+
+	/**
+	 * Gives this body its role (DESIGN 20.2.5) and the role's anchor: where a candidate strolls, a rival's ring centre,
+	 * a clone's start. Roles other than DISCIPLE are never saved.
+	 */
+	public void setRole(Role role, @Nullable BlockPos anchor) {
+		this.role = role == null ? Role.DISCIPLE : role;
+		this.roleAnchor = anchor;
+		this.entityData.set(DATA_ROLE, (byte) this.role.ordinal());
+		if (this.role != Role.DISCIPLE) {
+			this.meditating = false;
+			this.setTarget(null);
+		}
+		this.getNavigation().stop();
+		syncFlags();
+	}
+
+	/** The role's anchor (see {@link #setRole}), or null. */
+	public @Nullable BlockPos roleAnchor() {
+		return roleAnchor;
+	}
+
+	/** The current activity id ({@code ACTIVITY_*}, 0 none). */
+	public int activity() {
+		return activity;
+	}
+
+	/** The spot of an activity 1-8 (its post), or null. */
+	public @Nullable BlockPos activitySpot() {
+		return activitySpot;
+	}
+
+	/**
+	 * Sets the activity (0 none, 1 water, 2 garden, 3 kitchen, 4 farm, 5 formation guard, 6 tower, 7 void body,
+	 * 8 spectator, 9 duellist). While the id is 1-8 the disciple holds {@code spot} like STAY and fights only when hit
+	 * (5 guards the spot). Activities are session state for the module that set them (not saved).
+	 */
+	public void setActivity(int id, @Nullable BlockPos spot) {
+		this.activity = Math.max(0, Math.min(127, id));
+		this.activitySpot = holdsActivitySpot() ? (spot != null ? spot : this.blockPosition()) : spot;
+		this.entityData.set(DATA_ACTIVITY, (byte) this.activity);
+		if (holdsActivitySpot() && this.activity != ACTIVITY_FORMATION_GUARD) {
+			this.setTarget(null);
+		}
+		this.ownerStillTicks = 0;
+		this.getNavigation().stop();
+	}
+
+	/** True while an activity 1-8 binds the disciple to its spot. */
+	public boolean holdsActivitySpot() {
+		return activity >= ACTIVITY_WATER && activity <= ACTIVITY_SPECTATOR;
+	}
+
+	/** A clone's source disciple (its soul id), or null. */
+	public @Nullable UUID cloneSource() {
+		return cloneSource;
+	}
+
+	public void setCloneSource(@Nullable UUID source) {
+		this.cloneSource = source;
+	}
+
+	/** True once {@link Disciples#depart} took this body out of the world. */
+	public boolean departed() {
+		return departed;
+	}
+
+	/** The tag {@link Disciples#depart} made for this body (null before it departed). */
+	@Nullable CompoundTag departure() {
+		return departure;
+	}
+
+	void markDeparted(CompoundTag tag) {
+		this.departed = true;
+		this.departure = tag;
+	}
+
+	/** Role as the client sees it. */
+	public Role syncedRole() {
+		return Role.byOrdinal(this.entityData.get(DATA_ROLE));
+	}
+
+	public int syncedActivity() {
+		return this.entityData.get(DATA_ACTIVITY);
+	}
+
+	public int syncedSectRank() {
+		return this.entityData.get(DATA_SECT_RANK);
+	}
+
+	public int syncedStars() {
+		return this.entityData.get(DATA_STARS);
+	}
+
+	/** Physique (bits 0-3), soul colour (bits 4-6) and special type (bits 7-8); see {@link #packTalent}. */
+	public int syncedTalent() {
+		return this.entityData.get(DATA_TALENT);
+	}
+
+	/** Visual power flags: bits 0-15 belong to module C, bits 16-31 to module D. */
+	public int syncedPower() {
+		return this.entityData.get(DATA_POWER);
+	}
+
+	public void setSyncedSectRank(int rank) {
+		byte value = (byte) Math.max(0, Math.min(127, rank));
+		if (this.entityData.get(DATA_SECT_RANK) != value) {
+			this.entityData.set(DATA_SECT_RANK, value);
+		}
+	}
+
+	public void setSyncedStars(int stars) {
+		int value = Math.max(0, stars);
+		if (this.entityData.get(DATA_STARS) != value) {
+			this.entityData.set(DATA_STARS, value);
+		}
+	}
+
+	public void setSyncedTalent(int talent) {
+		if (this.entityData.get(DATA_TALENT) != talent) {
+			this.entityData.set(DATA_TALENT, talent);
+		}
+	}
+
+	/** Sets the bits of {@code mask} ({@link #POWER_MASK_C} or {@link #POWER_MASK_D}) to {@code bits}, keeps the others. */
+	public void setSyncedPower(int mask, int bits) {
+		int old = this.entityData.get(DATA_POWER);
+		int value = old & ~mask | bits & mask;
+		if (old != value) {
+			this.entityData.set(DATA_POWER, value);
+		}
+	}
+
+	/** The synced talent int: physique 4 bits, soul colour 3 bits, special type 2 bits. */
+	public static int packTalent(int physique, int soulColor, int special) {
+		return physique & 0xF | (soulColor & 0x7) << 4 | (special & 0x3) << 7;
+	}
+
+	public static int talentPhysique(int talent) {
+		return talent & 0xF;
+	}
+
+	public static int talentSoulColor(int talent) {
+		return talent >> 4 & 0x7;
+	}
+
+	public static int talentSpecial(int talent) {
+		return talent >> 7 & 0x3;
+	}
+
+	/**
+	 * Where GUARD_HALL patrols: the master's active hall stele in this dimension, else the spot of the order. Null for
+	 * other orders.
+	 */
+	public @Nullable BlockPos guardAnchor() {
+		if (mode != Mode.GUARD_HALL) {
+			return null;
+		}
+		return hallAnchor != null ? hallAnchor : post;
+	}
+
+	/** Looks the master's hall up again (cheap map lookup by the hall module). */
+	void refreshHallAnchor() {
+		hallAnchor = null;
+		UUID owner = ownerId();
+		if (owner == null || mode != Mode.GUARD_HALL || this.level().isClientSide()) {
+			return;
+		}
+		dev.kultivator.sect.hall.Halls.HallView hall = dev.kultivator.sect.hall.Halls.hallOf(owner);
+		if (hall != null && hall.active() && hall.dim() != null && hall.dim().equals(this.level().dimension())) {
+			hallAnchor = hall.pos();
+		}
+	}
+
+	/** True when {@code pos} is inside the hall territory GUARD_HALL defends (or near its fallback anchor). */
+	boolean inGuardedTerritory(Vec3 pos) {
+		BlockPos anchor = guardAnchor();
+		if (anchor == null) {
+			return false;
+		}
+		UUID owner = ownerId();
+		if (hallAnchor != null && owner != null && dev.kultivator.sect.hall.Halls.inTerritory(owner, this.level(), pos)) {
+			return true;
+		}
+		double dx = pos.x - (anchor.getX() + 0.5D);
+		double dz = pos.z - (anchor.getZ() + 0.5D);
+		return dx * dx + dz * dz <= HALL_PATROL_RADIUS * HALL_PATROL_RADIUS && Math.abs(pos.y - anchor.getY()) <= 32.0D;
+	}
+
+	int patrolRestUntil() {
+		return patrolRestUntil;
+	}
+
+	void setPatrolRestUntil(int tick) {
+		this.patrolRestUntil = tick;
 	}
 
 	/**
@@ -351,8 +643,61 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	}
 
 	private void bindTo(ServerPlayer master) {
-		this.entityData.set(DATA_OWNER, Optional.of(EntityReference.<LivingEntity>of(master.getUUID())));
-		this.entityData.set(DATA_OWNER_NAME, master.getName().getString());
+		bindTo(master.getUUID(), master.getName().getString());
+	}
+
+	/** Sets the master (null: none, as for a candidate or a rival). */
+	void bindTo(@Nullable UUID master, String masterName) {
+		this.entityData.set(DATA_OWNER, master == null ? Optional.empty() : Optional.of(EntityReference.<LivingEntity>of(master)));
+		this.entityData.set(DATA_OWNER_NAME, masterName == null ? "" : masterName);
+	}
+
+	/** Gives a candidate, rival, phantom or clone its looks (no master is bound here). */
+	void setupBody(DiscipleData fresh, @Nullable Component name, int skin, boolean slim) {
+		this.entityData.set(DATA_SKIN, Math.floorMod(skin, SKIN_COUNT));
+		this.entityData.set(DATA_SLIM, slim);
+		this.soulId = this.getUUID();
+		this.life = 0;
+		this.mode = Mode.FOLLOW;
+		this.post = null;
+		if (name != null) {
+			this.setCustomName(name);
+		}
+		setData(fresh);
+		this.setHealth(this.getMaxHealth());
+	}
+
+	/**
+	 * A candidate accepted in place (DESIGN 20.2.7): it becomes {@code master}'s disciple with a new soul, following,
+	 * with the data it already has.
+	 */
+	void acceptAsDisciple(ServerPlayer master) {
+		setRole(Role.DISCIPLE, null);
+		bindTo(master);
+		this.soulId = this.getUUID();
+		this.life = 0;
+		this.mode = Mode.FOLLOW;
+		this.post = null;
+		setActivity(ACTIVITY_NONE, null);
+		refreshSynced();
+	}
+
+	/**
+	 * Brings back a disciple taken out with {@link Disciples#depart} ({@link #writeTablet()} plus "health"): the same
+	 * soul and life, its master, looks, cultivation and order (a spot order takes the arrival spot as its post).
+	 */
+	void restoreFromDeparture(CompoundTag tag, UUID master, String masterName) {
+		bindTo(master, masterName);
+		this.soulId = tag.read("soul", UUIDUtil.CODEC).orElse(this.getUUID());
+		this.life = Math.max(0, tag.getIntOr("life", 0));
+		this.entityData.set(DATA_SKIN, Math.floorMod(tag.getIntOr("skin", 0), SKIN_COUNT));
+		this.entityData.set(DATA_SLIM, tag.getBooleanOr("slim", false));
+		tag.read("name", ComponentSerialization.CODEC).ifPresent(this::setCustomName);
+		setData(DiscipleData.load(tag.getCompoundOrEmpty("disciple")));
+		Mode saved = Mode.byId(tag.getStringOr("mode", Mode.FOLLOW.id()));
+		setMode(saved == null ? Mode.FOLLOW : saved);
+		float health = tag.getFloatOr("health", this.getMaxHealth());
+		this.setHealth(Math.max(1.0F, Math.min(this.getMaxHealth(), health)));
 	}
 
 	/** Everything a Soul Tablet keeps: soul, life, master, name, skin and the whole cultivation. */
@@ -438,10 +783,20 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	 * demon, anything that cannot be seen as an enemy, nor the mobs whose fights change blocks ({@link #untouchable}).
 	 */
 	public boolean mayAttack(@Nullable LivingEntity target) {
+		if (target == null || target == this || !target.isAlive()) {
+			return false;
+		}
+		// A registered duel comes first (DESIGN 20.2.8): the two partners may fight whoever they are.
+		if (DuelRules.dueling(this, target)) {
+			return true;
+		}
+		// Candidates fight nobody; rivals and phantoms fight only their duel partner.
+		if (role == Role.CANDIDATE || role == Role.RIVAL || role == Role.PHANTOM) {
+			return false;
+		}
 		// Disciples never fight disciples (of anyone): that also keeps two disciples from asking each other forever. A heart
 		// demon is a matter of one cultivator's heart (and immune to anyone else), invulnerable things are no enemies.
-		if (target == null || target == this || target instanceof DiscipleEntity || !target.isAlive() || untouchable(target)
-				|| target instanceof HeartDemonEntity || !target.canBeSeenAsEnemy()) {
+		if (target instanceof DiscipleEntity || untouchable(target) || target instanceof HeartDemonEntity || !target.canBeSeenAsEnemy()) {
 			return false;
 		}
 		ServerPlayer owner = owner();
@@ -496,7 +851,20 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 			living.addTag(NoGrief.TAG);
 			living.setPortalCooldown();
 		}
-		boolean hit = super.doHurtTarget(level, target);
+		// The damageFactor hooks ride on a transient attack modifier for this one blow only.
+		double factor = DiscipleHooks.damageFactor(this, living, false);
+		AttributeInstance attack = factor != 1.0D ? this.getAttribute(Attributes.ATTACK_DAMAGE) : null;
+		if (attack != null) {
+			attack.addOrUpdateTransientModifier(new AttributeModifier(MELEE_FACTOR_ID, factor - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+		}
+		boolean hit;
+		try {
+			hit = super.doHurtTarget(level, target);
+		} finally {
+			if (attack != null) {
+				attack.removeModifier(MELEE_FACTOR_ID);
+			}
+		}
 		if (hit) {
 			lastAttackTick = this.tickCount;
 		}
@@ -529,6 +897,14 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 			return true;
 		}
 		Entity attacker = source.getEntity();
+		// A registered duel comes first (DESIGN 20.2.8): the partner may always hurt it (clamped at 10% by DuelRules).
+		if (attacker != null && DuelRules.dueling(attacker, this)) {
+			return super.isInvulnerableTo(level, source);
+		}
+		if (role == Role.CANDIDATE || role == Role.RIVAL || role == Role.PHANTOM) {
+			// Candidates are untouchable (only /kill and the void); rivals and phantoms are only for their duel partner.
+			return !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
+		}
 		if (attacker != null && attacker != this && isFriendly(attacker)) {
 			return true;
 		}
@@ -559,12 +935,23 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 
 	@Override
 	public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+		boolean kill = source.is(DamageTypes.GENERIC_KILL);
+		if (!kill && damage > 0.0F) {
+			damage = (float) (damage * DiscipleHooks.hurtFactor(this, source));
+			if (source.is(Tribulation.DAMAGE)) {
+				// Tribulation and calamity strikes are never lethal (phase 5), whatever the hooks multiplied them by.
+				damage = Math.min(damage, Math.max(0.0F, this.getHealth() + this.getAbsorptionAmount() - 1.0F));
+			}
+		}
 		boolean hurt = super.hurtServer(level, source, damage);
 		if (hurt) {
 			lastHurtTick = this.tickCount;
 			if (meditating) {
 				meditating = false;
 				syncFlags();
+			}
+			if (!kill) {
+				DiscipleHooks.onHurt(this, source, damage);
 			}
 		}
 		return hurt;
@@ -573,6 +960,14 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	@Override
 	public void die(DamageSource source) {
 		boolean first = !this.isRemoved() && !this.dead;
+		if (first && role == Role.DISCIPLE && releaseTicks <= 0 && !this.level().isClientSide() && !source.is(DamageTypes.GENERIC_KILL)
+				&& DiscipleHooks.onDeath(this, source)) {
+			// Handled by a module (the Undying Blood, the Nascent Soul's flight...): no death, no tablet.
+			if (!this.isRemoved() && this.getHealth() <= 0.0F) {
+				this.setHealth(1.0F);
+			}
+			return;
+		}
 		super.die(source);
 		if (first && this.dead && this.level() instanceof ServerLevel level) {
 			Disciples.onDeath(this, level);
@@ -691,6 +1086,10 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 			ownerStillTicks = 0;
 		}
 
+		if (mode == Mode.GUARD_HALL && (this.tickCount / STATE_INTERVAL) % 4 == 0) {
+			refreshHallAnchor();
+		}
+
 		LivingEntity target = this.getTarget();
 		if (target != null && (!mayAttack(target) || !DiscipleAi.withinDuty(this, target, owner))) {
 			this.setTarget(null);
@@ -708,7 +1107,10 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		if (regenTimer >= REGEN_INTERVAL) {
 			regenTimer = 0;
 			if (!inCombat() && this.getHealth() < this.getMaxHealth()) {
-				this.heal(1.0F);
+				float amount = (float) DiscipleHooks.regenFactor(this);
+				if (amount > 0.0F) {
+					this.heal(amount);
+				}
 			}
 		}
 
@@ -720,13 +1122,24 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 
 	private boolean computeMeditating(@Nullable ServerPlayer owner, boolean sameLevel) {
 		if (releaseTicks > 0 || data.breakingThrough() || this.getTarget() != null || !this.onGround() || this.isInWater()
-				|| this.isPassenger() || this.tickCount - lastHurtTick < 60 || this.tickCount - lastAttackTick < 40) {
+				|| this.isPassenger() || this.tickCount - lastHurtTick < 60 || this.tickCount - lastAttackTick < 40
+				|| DuelRules.inDuel(this)) {
+			return false;
+		}
+		if (holdsActivitySpot()) {
+			// Formation guard, tower, spirit body and spectators sit at their spot; duties loop their own pose instead.
+			return activity >= ACTIVITY_FORMATION_GUARD && activitySpot != null && this.getNavigation().isDone()
+					&& this.distanceToSqr(activitySpot.getX() + 0.5D, activitySpot.getY(), activitySpot.getZ() + 0.5D) <= 2.25D;
+		}
+		if (role != Role.DISCIPLE) {
 			return false;
 		}
 		return switch (mode) {
 			case MEDITATE -> post != null && this.distanceToSqr(post.getX() + 0.5D, post.getY(), post.getZ() + 0.5D) <= 2.25D;
 			case STAY -> post != null && this.distanceToSqr(post.getX() + 0.5D, post.getY(), post.getZ() + 0.5D) <= 4.0D
 					&& this.getNavigation().isDone();
+			// Between two patrol legs it sits down where it stopped.
+			case GUARD_HALL -> this.getNavigation().isDone() && this.tickCount < patrolRestUntil;
 			case FOLLOW, ASSIST -> {
 				if (!sameLevel) {
 					// The master is offline or in another dimension: it waits where it is, cultivating.
@@ -751,8 +1164,61 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		setModifier(Attributes.ATTACK_DAMAGE, DiscipleEntities.ATTACK_ID, DiscipleCultivation.attackBonus(data), AttributeModifier.Operation.ADD_VALUE);
 		setModifier(Attributes.MOVEMENT_SPEED, DiscipleEntities.SPEED_ID, Math.min(1.0D, DiscipleCultivation.speedBonus(data)),
 				AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+		applyHookStats();
 		if (this.getHealth() > this.getMaxHealth()) {
 			this.setHealth(this.getMaxHealth());
+		}
+	}
+
+	/**
+	 * The {@code stats} hooks (DESIGN 20.2.6): their modifiers are applied as permanent modifiers; one that no provider
+	 * gives any more is removed (the applied ids are saved with the body, so this also holds after a restart).
+	 */
+	private void applyHookStats() {
+		if (!DiscipleHooks.hasStats() && hookModifiers.isEmpty()) {
+			return;
+		}
+		Map<String, AttributeModifier> wanted = new HashMap<>();
+		Map<String, Holder<Attribute>> attributes = new HashMap<>();
+		DiscipleHooks.stats(this, (attribute, id, amount, operation) -> {
+			if (attribute == null || id == null || !Double.isFinite(amount) || amount == 0.0D) {
+				return;
+			}
+			String key = attribute.unwrapKey().map(k -> k.identifier().toString()).orElse("") + "|" + id;
+			wanted.put(key, new AttributeModifier(id, amount, operation));
+			attributes.put(key, attribute);
+		});
+		for (String key : hookModifiers) {
+			if (!wanted.containsKey(key)) {
+				removeHookModifier(key);
+			}
+		}
+		hookModifiers.clear();
+		for (Map.Entry<String, AttributeModifier> entry : wanted.entrySet()) {
+			AttributeInstance instance = this.getAttribute(attributes.get(entry.getKey()));
+			if (instance != null) {
+				instance.addOrReplacePermanentModifier(entry.getValue());
+				hookModifiers.add(entry.getKey());
+			}
+		}
+	}
+
+	private void removeHookModifier(String key) {
+		int split = key.indexOf('|');
+		if (split <= 0 || split >= key.length() - 1) {
+			return;
+		}
+		try {
+			Identifier attributeId = Identifier.parse(key.substring(0, split));
+			Identifier modifierId = Identifier.parse(key.substring(split + 1));
+			BuiltInRegistries.ATTRIBUTE.get(attributeId).ifPresent(holder -> {
+				AttributeInstance instance = this.getAttribute(holder);
+				if (instance != null) {
+					instance.removeModifier(modifierId);
+				}
+			});
+		} catch (RuntimeException ignored) {
+			// A broken entry from an old save: nothing to remove.
 		}
 	}
 
@@ -774,7 +1240,7 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	 * Puts the disciple on a safe free spot 1.5-3 blocks from the master (read-only spot search, never in a portal) with
 	 * a small burst of qi where it left and where it arrives. False when there is no such spot.
 	 */
-	public boolean teleportNear(ServerPlayer master) {
+	public boolean teleportNear(LivingEntity master) {
 		if (!(this.level() instanceof ServerLevel level) || master.level() != level) {
 			return false;
 		}
@@ -790,10 +1256,15 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 
 	/** Returns to its post when it was carried far away (read-only spot search). */
 	boolean teleportToPost() {
-		if (post == null || !(this.level() instanceof ServerLevel level) || !level.isLoaded(post)) {
+		return post != null && returnTo(post);
+	}
+
+	/** Steps back to {@code target} (a post, an activity spot, the hall) in a flash: safe spot, loaded chunk, read-only. */
+	boolean returnTo(BlockPos target) {
+		if (target == null || !(this.level() instanceof ServerLevel level) || !level.isLoaded(target)) {
 			return false;
 		}
-		Vec3 spot = Targeting.safeSpot(level, this, new Vec3(post.getX() + 0.5D, post.getY(), post.getZ() + 0.5D));
+		Vec3 spot = Targeting.safeSpot(level, this, new Vec3(target.getX() + 0.5D, target.getY(), target.getZ() + 0.5D));
 		if (spot == null) {
 			return false;
 		}
@@ -880,6 +1351,18 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		if (lastSafePos != null) {
 			output.store("SafePos", BlockPos.CODEC, lastSafePos);
 		}
+		if (role != Role.DISCIPLE) {
+			// Never written to a chunk (shouldBeSaved); kept so a copy made another way is still refused on load.
+			output.putInt("Role", role.ordinal());
+		}
+		// Lasting assignments (duties, formation guard) survive a restart; tower, spirit body, spectator and duel do not.
+		if (activity >= ACTIVITY_WATER && activity <= ACTIVITY_FORMATION_GUARD && activitySpot != null) {
+			output.putInt("Activity", activity);
+			output.store("ActivitySpot", BlockPos.CODEC, activitySpot);
+		}
+		if (!hookModifiers.isEmpty()) {
+			output.store("HookMods", com.mojang.serialization.Codec.STRING.listOf(), List.copyOf(hookModifiers));
+		}
 	}
 
 	@Override
@@ -901,9 +1384,26 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.life = Math.max(0, input.getIntOr("Life", 0));
 		this.releaseTicks = Math.max(0, input.getIntOr("Releasing", 0));
 		this.lastSafePos = input.read("SafePos", BlockPos.CODEC).orElse(null);
+		this.role = Role.byOrdinal(input.getIntOr("Role", 0));
+		this.entityData.set(DATA_ROLE, (byte) this.role.ordinal());
+		int savedActivity = input.getIntOr("Activity", 0);
+		BlockPos savedSpot = input.read("ActivitySpot", BlockPos.CODEC).orElse(null);
+		if (savedActivity >= ACTIVITY_WATER && savedActivity <= ACTIVITY_FORMATION_GUARD && savedSpot != null) {
+			this.activity = savedActivity;
+			this.activitySpot = savedSpot;
+			this.entityData.set(DATA_ACTIVITY, (byte) savedActivity);
+		}
+		this.hookModifiers.clear();
+		input.read("HookMods", com.mojang.serialization.Codec.STRING.listOf()).ifPresent(this.hookModifiers::addAll);
 		this.addTag(NoGrief.TAG);
 		this.setCanPickUpLoot(false);
 		refreshSynced();
+	}
+
+	/** Only disciples are written with their chunk (DESIGN 20.2.5); candidates, rivals, phantoms and clones never are. */
+	@Override
+	public boolean shouldBeSaved() {
+		return role == Role.DISCIPLE && super.shouldBeSaved();
 	}
 
 	// ================================================================== never despawns, never changes the world

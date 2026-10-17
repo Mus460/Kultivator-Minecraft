@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sect_gate_open",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.lost_art_restored.description"
+    },
+    "icon": {
+      "id": "kultivator:lost_scripture_page"
+    },
+    "title": {
+      "translate": "advancement.kultivator.lost_art_restored.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

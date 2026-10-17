@@ -55,12 +55,12 @@ final class PillTab extends DiscipleTab {
 	}
 
 	@Override
-	Component title() {
+	public Component title() {
 		return Component.translatable("kultivator.discipleui.tab.pills");
 	}
 
 	@Override
-	Component shortName() {
+	public Component shortName() {
 		return Component.translatable("kultivator.discipleui.tab.pills.short");
 	}
 

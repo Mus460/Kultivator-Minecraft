@@ -54,6 +54,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Learning, selecting and casting techniques (DESIGN sections 8 and 15), plus the helpers both technique modules share:
@@ -64,6 +65,16 @@ public final class Techniques {
 
 	/** Damage type {@code kultivator:technique} (data/kultivator/damage_type/technique.json). */
 	public static final ResourceKey<DamageType> DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, Kultivator.id("technique"));
+	/** Other modules' reasons why the player may not cast right now (null: no objection). */
+	private static final List<Function<ServerPlayer, Component>> CAST_BLOCKERS = new ArrayList<>();
+
+	/**
+	 * Adds a reason a player may not cast techniques now (module D: the master whose soul descends into the ring,
+	 * DESIGN 20.3.20). The first non-null reason refuses the cast; stepping off the flying sword stays allowed.
+	 */
+	public static void addCastBlocker(Function<ServerPlayer, @Nullable Component> blocker) {
+		CAST_BLOCKERS.add(blocker);
+	}
 	/** More actions than this per second from one client are ignored. */
 	private static final int MAX_ACTIONS_PER_SECOND = 10;
 	/** Known techniques for the {@code technique_collector} advancement. */
@@ -205,6 +216,12 @@ public final class Techniques {
 			// Stepping down is always allowed and costs nothing.
 			FlyingSword.dismount(player, data, FlyingSword.Reason.TOGGLE);
 			return true;
+		}
+		for (Function<ServerPlayer, Component> blocker : CAST_BLOCKERS) {
+			Component blocked = blocker.apply(player);
+			if (blocked != null) {
+				return refuse(player, blocked);
+			}
 		}
 		Component why = whyNotCastable(data, technique);
 		if (why != null) {

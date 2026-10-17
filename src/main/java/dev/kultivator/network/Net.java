@@ -24,6 +24,7 @@ public final class Net {
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.OrePings.TYPE, Payloads.OrePings.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.OpenScreen.TYPE, Payloads.OpenScreen.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.DiscipleInfo.TYPE, Payloads.DiscipleInfo.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.HallInfo.TYPE, Payloads.HallInfo.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Payloads.Action.TYPE, Payloads.Action.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Action.TYPE, (payload, context) -> handle(context.player(), payload));
@@ -64,6 +65,12 @@ public final class Net {
 			case Actions.DISCIPLE_OPEN, Actions.DISCIPLE_MODE, Actions.DISCIPLE_TEACH, Actions.DISCIPLE_FEED,
 				 Actions.DISCIPLE_BREAKTHROUGH, Actions.DISCIPLE_CHOOSE_DAO, Actions.DISCIPLE_RELEASE ->
 					dev.kultivator.disciple.Disciples.handleAction(player, action);
+			// Phase 6 (DESIGN 20.2.1).
+			case Actions.HALL -> dev.kultivator.sect.hall.Halls.handleAction(player, action);
+			case Actions.SECT_EVENT -> dev.kultivator.sect.event.SectEvents.handleAction(player, action);
+			case Actions.DISCIPLE_POWER -> dev.kultivator.disciple.power.DisciplePowers.handleAction(player, action);
+			case Actions.DISCIPLE_PATH -> dev.kultivator.disciple.path.DisciplePaths.handleAction(player, action);
+			case Actions.KEHANCURAN -> dev.kultivator.kehancuran.Kehancuran.handleAction(player, action);
 			default -> {
 			}
 		}

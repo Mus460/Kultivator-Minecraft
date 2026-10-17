@@ -97,6 +97,12 @@ public class Kultivator implements ModInitializer {
 		Ascension.init();
 		// Phase 5
 		dev.kultivator.disciple.Disciples.init();
+		// Phase 6: Sekte Abadi & Murid OP (DESIGN 20.2.12)
+		dev.kultivator.sect.hall.Halls.init();
+		dev.kultivator.sect.event.SectEvents.init();
+		dev.kultivator.disciple.power.DisciplePowers.init();
+		dev.kultivator.disciple.path.DisciplePaths.init();
+		dev.kultivator.kehancuran.Kehancuran.init();
 		// After every module registered its items.
 		ModItems.init();
 

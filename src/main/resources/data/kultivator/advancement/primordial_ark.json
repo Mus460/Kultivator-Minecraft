@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tournament_champion",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.primordial_ark.description"
+    },
+    "icon": {
+      "id": "kultivator:kunpeng_bone_fragment"
+    },
+    "title": {
+      "translate": "advancement.kultivator.primordial_ark.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

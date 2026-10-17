@@ -133,10 +133,19 @@ public final class Disciples {
 	public static void init() {
 		DiscipleEntities.init();
 		DiscipleItems.init();
+		DuelRules.init();
+		// Candidates, rivals, phantoms and clones never come back from disk (DESIGN 20.2.5).
+		ServerEntityEvents.ALLOW_LOAD.register((entity, level, reason, flag) -> reason != EntitySpawnReason.LOAD
+				|| !(entity instanceof DiscipleEntity disciple) || disciple.role() == DiscipleEntity.Role.DISCIPLE);
+		// Nobody's techniques touch them (a registered duel partner still can: DuelRules is asked first).
+		Targeting.addExclusion((caster, entity) -> entity instanceof DiscipleEntity disciple && disciple.role() != DiscipleEntity.Role.DISCIPLE);
 		UseEntityCallback.EVENT.register(Disciples::onUseEntity);
 		ServerEntityEvents.ENTITY_LOAD.register(Disciples::onLoad);
 		ServerEntityEvents.ENTITY_UNLOAD.register(Disciples::onUnload);
 		ServerPlayerEvents.JOIN.register(Disciples::onJoin);
+		// Players are never block-safety tagged (an older duel could have saved the tag on the master: portals, plates).
+		ServerPlayerEvents.JOIN.register(player -> player.removeTag(NoGrief.TAG));
+		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> newPlayer.removeTag(NoGrief.TAG));
 		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) -> onChangeLevel(player, origin));
 		ServerLivingEntityEvents.AFTER_DEATH.register(Disciples::afterDeath);
 		ServerTickEvents.END_SERVER_TICK.register(Disciples::endTick);
@@ -157,7 +166,8 @@ public final class Disciples {
 		String text = action.text() == null ? "" : action.text();
 		boolean refresh = action.action() == Actions.DISCIPLE_OPEN && "refresh".equals(text);
 		Entity entity = player.level().getEntity(action.arg());
-		if (!(entity instanceof DiscipleEntity disciple) || !disciple.isAlive() || disciple.isReleasing()) {
+		if (!(entity instanceof DiscipleEntity disciple) || !disciple.isAlive() || disciple.isReleasing()
+				|| disciple.role() != DiscipleEntity.Role.DISCIPLE) {
 			if (!refresh) {
 				Msg.actionBar(player, Component.translatable("kultivator.disciples.gone").withStyle(ChatFormatting.GRAY));
 			}
@@ -249,6 +259,12 @@ public final class Disciples {
 
 	/** Gives one disciple an order, with its answer in chat. */
 	private static void order(ServerPlayer player, DiscipleEntity disciple, DiscipleEntity.Mode mode) {
+		String why = DiscipleHooks.modeBlocker(disciple, mode);
+		if (why != null) {
+			// A phase-6 module refused the order (sect rank, protector post...): its key gets the name and the order.
+			Msg.chat(player, Component.translatable(why, disciple.getDisplayName(), mode.displayName()).withStyle(ChatFormatting.YELLOW));
+			return;
+		}
 		disciple.setMode(mode);
 		disciple.getLookControl().setLookAt(player, 30.0F, 30.0F);
 		Msg.chat(player, Component.translatable("kultivator.disciples.mode.set", disciple.getDisplayName(), mode.displayName())
@@ -280,13 +296,24 @@ public final class Disciples {
 
 	/**
 	 * Right-clicking your own disciple with an empty hand (or while sneaking) opens its screen, with a pill it swallows
-	 * the pill; a name tag renames it the vanilla way. Someone else's disciple only tells whose disciple it is (it cannot
+	 * the pill; an item a phase-6 feed handler claims is used on it, sneaking or not; a name tag renames it the vanilla way. Someone else's disciple only tells whose disciple it is (it cannot
 	 * be renamed or fed by anyone but its master).
 	 */
 	private static InteractionResult onUseEntity(Player player, Level level, InteractionHand hand, Entity entity,
 			@Nullable EntityHitResult hitResult) {
 		if (!(entity instanceof DiscipleEntity disciple) || hand != InteractionHand.MAIN_HAND || player.isSpectator()) {
 			return InteractionResult.PASS;
+		}
+		if (disciple.role() == DiscipleEntity.Role.CANDIDATE) {
+			// The Sect Hall's candidate (DESIGN 20.3.3): testing and acceptance belong to the hall module.
+			if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer && disciple.isAlive()) {
+				dev.kultivator.sect.hall.Candidates.onInteract(serverPlayer, disciple);
+			}
+			return InteractionResult.SUCCESS;
+		}
+		if (disciple.role() != DiscipleEntity.Role.DISCIPLE) {
+			// Rivals, phantoms and clones answer nobody (and cannot be renamed).
+			return InteractionResult.SUCCESS;
 		}
 		ItemStack stack = player.getItemInHand(hand);
 		boolean own = disciple.isOwnedBy(player);
@@ -296,8 +323,17 @@ public final class Disciples {
 		}
 		boolean pill = isPill(stack);
 		boolean open = own && (stack.isEmpty() || player.isShiftKeyDown() && !pill);
-		if (own && !open && !pill) {
-			return InteractionResult.PASS;
+		if (own && !stack.isEmpty() && !pill) {
+			// Phase 6: a module may take other items from the master's hand (DiscipleHooks.addFeedHandler). Feed-handler items
+			// (Soul Seal Jade, Master's Ring, flame seed, spirit meal) win over the sneak-opens-screen shortcut.
+			if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer && DiscipleHooks.hasFeedHandlers()
+					&& disciple.isAlive() && !disciple.isReleasing() && DiscipleHooks.feedHandler(disciple, serverPlayer, stack)) {
+				disciple.refreshSynced();
+				return InteractionResult.SUCCESS;
+			}
+			if (!open) {
+				return InteractionResult.PASS;
+			}
 		}
 		if (level.isClientSide() || !(player instanceof ServerPlayer serverPlayer)) {
 			// The server decides; the client only swings the arm and sends the click.
@@ -334,8 +370,9 @@ public final class Disciples {
 		ServerLevel level = player.level();
 		CultivationData cultivation = Cultivators.get(player);
 		int alive = aliveCount(cultivation);
-		if (alive >= MAX_DISCIPLES) {
-			Msg.chat(player, Component.translatable("kultivator.disciples.full", alive, MAX_DISCIPLES).withStyle(ChatFormatting.YELLOW));
+		int cap = cap(player);
+		if (alive >= cap) {
+			Msg.chat(player, Component.translatable("kultivator.disciples.full", alive, cap).withStyle(ChatFormatting.YELLOW));
 			return false;
 		}
 		DiscipleEntity disciple = DiscipleEntities.DISCIPLE.create(level, EntitySpawnReason.MOB_SUMMONED);
@@ -359,6 +396,13 @@ public final class Disciples {
 			return false;
 		}
 
+		welcome(player, level, disciple, spot, alive, cap);
+		return true;
+	}
+
+	/** The welcome of a new disciple (scroll or Sect Hall): FX and sounds at {@code spot}, chat lines, advancements. */
+	private static void welcome(ServerPlayer player, ServerLevel level, DiscipleEntity disciple, Vec3 spot, int aliveBefore, int cap) {
+		DiscipleData data = disciple.data();
 		int color = data.rootColor();
 		Fx.pillar(level, spot, color, 3.5F);
 		Fx.burst(level, spot.add(0.0D, 1.0D, 0.0D), color, 40, 1.2F);
@@ -372,12 +416,11 @@ public final class Disciples {
 		Msg.chat(player, Component.translatable("kultivator.disciples.welcome.root", name,
 				SpiritRoots.describe(data.rootElements(), data.rootGrade())).withStyle(ChatFormatting.GRAY));
 		Msg.chat(player, Component.translatable("kultivator.disciples.welcome.hint").withStyle(ChatFormatting.DARK_AQUA));
-		Msg.actionBar(player, Component.translatable("kultivator.disciples.count", alive + 1, MAX_DISCIPLES).withStyle(ChatFormatting.AQUA));
+		Msg.actionBar(player, Component.translatable("kultivator.disciples.count", aliveBefore + 1, cap).withStyle(ChatFormatting.AQUA));
 		Advancements.grant(player, "first_disciple");
-		if (alive + 1 >= MAX_DISCIPLES) {
+		if (aliveBefore + 1 >= MAX_DISCIPLES) {
 			Advancements.grant(player, "five_disciples");
 		}
-		return true;
 	}
 
 	/**
@@ -406,8 +449,9 @@ public final class Disciples {
 			return false;
 		}
 		int alive = aliveCount(cultivation) - (entry != null && !entry.getBooleanOr("dead", false) ? 1 : 0);
-		if (alive >= MAX_DISCIPLES) {
-			Msg.chat(player, Component.translatable("kultivator.disciples.full", alive, MAX_DISCIPLES).withStyle(ChatFormatting.YELLOW));
+		int cap = cap(player);
+		if (alive >= cap) {
+			Msg.chat(player, Component.translatable("kultivator.disciples.full", alive, cap).withStyle(ChatFormatting.YELLOW));
 			return false;
 		}
 		ServerLevel level = player.level();
@@ -441,7 +485,7 @@ public final class Disciples {
 		level.playSound(null, spot.x, spot.y, spot.z, SoundEvents.TOTEM_USE, SoundSource.PLAYERS, 0.7F, 1.1F);
 		level.playSound(null, spot.x, spot.y, spot.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 0.8F, 1.3F);
 		Msg.chat(player, Component.translatable("kultivator.disciples.revive", disciple.getDisplayName()).withStyle(ChatFormatting.GOLD));
-		Msg.actionBar(player, Component.translatable("kultivator.disciples.count", alive + 1, MAX_DISCIPLES).withStyle(ChatFormatting.AQUA));
+		Msg.actionBar(player, Component.translatable("kultivator.disciples.count", alive + 1, cap).withStyle(ChatFormatting.AQUA));
 		Advancements.grant(player, "disciple_revived");
 		if (alive + 1 >= MAX_DISCIPLES) {
 			Advancements.grant(player, "five_disciples");
@@ -456,7 +500,8 @@ public final class Disciples {
 	 * master's list (right away, or when the master joins).
 	 */
 	static void onDeath(DiscipleEntity disciple, ServerLevel level) {
-		if (disciple.isReleasing()) {
+		if (disciple.isReleasing() || disciple.role() != DiscipleEntity.Role.DISCIPLE) {
+			// Only a real disciple leaves a Soul Tablet (DESIGN 20.2.5).
 			return;
 		}
 		if (disciple.data().breakingThrough()) {
@@ -563,12 +608,233 @@ public final class Disciples {
 		disciple.setYBodyRot(yaw);
 	}
 
+	// ================================================================== phase 6: away, candidates, other bodies (DESIGN 20.2.7)
+
+	/** The master's disciple limit: {@link #MAX_DISCIPLES} unless a module's cap hook raises it (Sect Hall level). */
+	public static int cap(ServerPlayer player) {
+		return DiscipleHooks.cap(player);
+	}
+
+	/**
+	 * Takes a disciple out of the world for an errand (expedition, envoy, soul flight): a running breakthrough ends
+	 * without a result, the body is removed silently and the master's list entry is marked {@code away} (away disciples
+	 * still count toward the limit). Returns everything {@link #arrive} needs: the Soul Tablet data plus {@code health}
+	 * and {@code away_reason}. Only role DISCIPLE can depart (an empty tag otherwise, nothing removed).
+	 */
+	public static CompoundTag depart(DiscipleEntity disciple, String reason) {
+		if (disciple.departed() && disciple.departure() != null) {
+			// Already gone (the caller and Halls.storeAway may both call this): the same tag again.
+			return disciple.departure().copy();
+		}
+		if (disciple.role() != DiscipleEntity.Role.DISCIPLE || disciple.isRemoved() || !(disciple.level() instanceof ServerLevel level)) {
+			return new CompoundTag();
+		}
+		boolean fled = false;
+		if (disciple.data().breakingThrough()) {
+			// A tribulation abandoned after its first strike counts as failed (phase 5), also when the disciple is sent away.
+			DiscipleBreakthrough.Trial trial = disciple.data().trial();
+			fled = trial != null && trial.kind == DiscipleBreakthrough.Kind.TRIBULATION && trial.strikesDone > 0;
+			DiscipleBreakthrough.cancel(disciple, level, null);
+		}
+		CompoundTag tag = disciple.writeTablet();
+		if (fled) {
+			CompoundTag data = tag.getCompoundOrEmpty("disciple");
+			data.putBoolean("trial_fled", true);
+			tag.put("disciple", data);
+		}
+		tag.putFloat("health", disciple.getHealth());
+		tag.putString("away_reason", reason == null ? "" : reason);
+		UUID owner = disciple.ownerId();
+		ServerPlayer player = owner == null ? null : level.getServer().getPlayerList().getPlayer(owner);
+		if (player != null) {
+			ListTag list = entries(Cultivators.get(player));
+			CompoundTag entry = findEntry(list, disciple.soulId());
+			if (entry == null) {
+				entry = new CompoundTag();
+				list.add(entry);
+			}
+			writeEntry(entry, disciple);
+			entry.putBoolean("away", true);
+			entry.putString("away_reason", reason == null ? "" : reason);
+			Cultivators.dirty(player);
+		}
+		disciple.markDeparted(tag.copy());
+		if (owner != null) {
+			Set<DiscipleEntity> set = LOADED.get(owner);
+			if (set != null) {
+				set.remove(disciple);
+				if (set.isEmpty()) {
+					LOADED.remove(owner);
+				}
+			}
+		}
+		disciple.discard();
+		return tag;
+	}
+
+	/** Notes when a departed disciple is due back (game time), for the master's list ("· 0.4 days left"). */
+	public static void setAwayUntil(MinecraftServer server, UUID owner, UUID soul, long returnAt) {
+		ServerPlayer player = server == null || owner == null ? null : server.getPlayerList().getPlayer(owner);
+		if (player == null || soul == null) {
+			return;
+		}
+		CompoundTag entry = findEntry(entries(Cultivators.get(player)), soul);
+		if (entry != null && entry.getBooleanOr("away", false)) {
+			entry.putLong("away_until", returnAt);
+			Cultivators.dirty(player);
+		}
+	}
+
+	/**
+	 * A departed disciple comes back as a Soul Tablet instead of a body (a Hardcore loss in the forbidden ground): its
+	 * list entry stops being away and turns fallen, so it frees its slot and can be revived or forgotten. An offline
+	 * master learns of it when they join.
+	 */
+	public static void markFallen(MinecraftServer server, UUID owner, UUID soul) {
+		if (server == null || owner == null || soul == null) {
+			return;
+		}
+		ServerPlayer player = server.getPlayerList().getPlayer(owner);
+		if (player == null) {
+			DiscipleRecords.get(server).addPendingDeath(owner, soul);
+			return;
+		}
+		ListTag list = entries(Cultivators.get(player));
+		CompoundTag entry = findEntry(list, soul);
+		if (entry == null) {
+			return;
+		}
+		entry.remove("away");
+		entry.remove("away_reason");
+		entry.remove("away_until");
+		entry.putBoolean("dead", true);
+		pruneFallen(list);
+		Cultivators.dirty(player);
+	}
+
+	/**
+	 * Brings a departed disciple back ({@code tag} from {@link #depart}, maybe changed by a return handler) on a safe spot
+	 * at or near {@code pos}, and clears its away mark. Null when it cannot come now (chunk not loaded, no room, its body
+	 * is already in the world, or its master forgot it); the caller keeps the record and tries again later.
+	 */
+	public static @Nullable DiscipleEntity arrive(ServerLevel level, Vec3 pos, CompoundTag tag, UUID owner) {
+		UUID soul = tag.read("soul", UUIDUtil.CODEC).orElse(null);
+		if (soul == null || owner == null || tag.getCompoundOrEmpty("disciple").isEmpty()) {
+			return null;
+		}
+		if (DiscipleRecords.get(level.getServer()).isForgotten(soul) || findLoaded(owner, soul) != null
+				|| !level.isLoaded(BlockPos.containing(pos))) {
+			return null;
+		}
+		DiscipleEntity disciple = DiscipleEntities.DISCIPLE.create(level, EntitySpawnReason.MOB_SUMMONED);
+		if (disciple == null) {
+			return null;
+		}
+		Vec3 spot = Targeting.safeSpot(level, disciple, pos);
+		if (spot == null) {
+			spot = disciple.spotNear(level, pos);
+		}
+		if (spot == null) {
+			return null;
+		}
+		disciple.snapTo(spot.x, spot.y, spot.z, level.getRandom().nextFloat() * 360.0F, 0.0F);
+		ServerPlayer player = level.getServer().getPlayerList().getPlayer(owner);
+		String ownerName = player != null ? player.getName().getString() : tag.getStringOr("owner_name", "");
+		disciple.restoreFromDeparture(tag, owner, ownerName);
+		if (!level.addFreshEntity(disciple)) {
+			return null;
+		}
+		if (player != null) {
+			// Joining the world listed it already (onLoad); this also clears the away mark of an older entry.
+			ensureAlive(player, disciple);
+		}
+		return disciple;
+	}
+
+	/**
+	 * A Sect Hall candidate (role CANDIDATE, no master, untouchable, strolling within 10 blocks of {@code anchor}) at
+	 * {@code pos}, already added to the world; never saved. Null when it could not be added.
+	 */
+	public static @Nullable DiscipleEntity createCandidate(ServerLevel level, Vec3 pos, DiscipleData data, Component name, int skin,
+			boolean slim, BlockPos anchor) {
+		return spawnUnowned(level, pos, data, name, skin, slim, DiscipleEntity.Role.CANDIDATE, anchor);
+	}
+
+	/**
+	 * A body without a master for the phase-6 modules: a CANDIDATE, RIVAL or PHANTOM with this data and look, added to
+	 * the world (never saved, never listed, no tablet). Null for role DISCIPLE or CLONE, or when it could not be added.
+	 */
+	public static @Nullable DiscipleEntity spawnUnowned(ServerLevel level, Vec3 pos, DiscipleData data, @Nullable Component name, int skin,
+			boolean slim, DiscipleEntity.Role role, @Nullable BlockPos anchor) {
+		if (role == DiscipleEntity.Role.DISCIPLE || role == DiscipleEntity.Role.CLONE) {
+			return null;
+		}
+		DiscipleEntity body = DiscipleEntities.DISCIPLE.create(level, EntitySpawnReason.MOB_SUMMONED);
+		if (body == null) {
+			return null;
+		}
+		body.setRole(role, anchor);
+		body.bindTo(null, "");
+		float yaw = level.getRandom().nextFloat() * 360.0F;
+		body.snapTo(pos.x, pos.y, pos.z, yaw, 0.0F);
+		body.setYHeadRot(yaw);
+		body.setYBodyRot(yaw);
+		body.setupBody(data, name, skin, slim);
+		return level.addFreshEntity(body) ? body : null;
+	}
+
+	/**
+	 * A Divine Clone of {@code source} (role CLONE): its master, look and a copy of its data, following the source and
+	 * fighting monsters; never saved, never listed. The caller sets its strength (stats hooks) and removes it in time.
+	 * Null when it could not be added.
+	 */
+	public static @Nullable DiscipleEntity spawnClone(DiscipleEntity source, Vec3 pos) {
+		if (!(source.level() instanceof ServerLevel level) || source.role() != DiscipleEntity.Role.DISCIPLE) {
+			return null;
+		}
+		DiscipleEntity clone = DiscipleEntities.DISCIPLE.create(level, EntitySpawnReason.MOB_SUMMONED);
+		if (clone == null) {
+			return null;
+		}
+		clone.setRole(DiscipleEntity.Role.CLONE, BlockPos.containing(pos));
+		clone.bindTo(source.ownerId(), source.ownerName());
+		clone.setCloneSource(source.soulId());
+		clone.snapTo(pos.x, pos.y, pos.z, source.getYRot(), 0.0F);
+		clone.setupBody(source.data().copy(), source.getCustomName(), source.skinIndex(), source.slimSkin());
+		return level.addFreshEntity(clone) ? clone : null;
+	}
+
+	/**
+	 * Accepts a Sect Hall candidate in place (DESIGN 20.2.7): it becomes {@code player}'s disciple (role DISCIPLE, a new
+	 * soul, following), joins the list and is welcomed like a recruit. False with a chat reason when the limit is reached
+	 * or it is no candidate any more.
+	 */
+	public static boolean recruitCandidate(ServerPlayer player, DiscipleEntity candidate) {
+		if (candidate == null || candidate.role() != DiscipleEntity.Role.CANDIDATE || !candidate.isAlive() || candidate.isRemoved()
+				|| !(candidate.level() instanceof ServerLevel level)) {
+			return false;
+		}
+		CultivationData cultivation = Cultivators.get(player);
+		int alive = aliveCount(cultivation);
+		int cap = cap(player);
+		if (alive >= cap) {
+			Msg.chat(player, Component.translatable("kultivator.disciples.full", alive, cap).withStyle(ChatFormatting.YELLOW));
+			return false;
+		}
+		candidate.acceptAsDisciple(player);
+		LOADED.computeIfAbsent(player.getUUID(), id -> new HashSet<>()).add(candidate);
+		ensureAlive(player, candidate);
+		candidate.getLookControl().setLookAt(player, 30.0F, 30.0F);
+		welcome(player, level, candidate, candidate.position(), alive, cap);
+		return true;
+	}
+
 	// ================================================================== events
 
 	private static void onLoad(Entity entity, ServerLevel level) {
 		if (entity instanceof DiscipleEntity disciple) {
 			UUID owner = disciple.ownerId();
-			if (owner == null) {
+			if (owner == null || disciple.role() != DiscipleEntity.Role.DISCIPLE) {
 				return;
 			}
 			if (!disciple.isReleasing() && DiscipleRecords.get(level.getServer()).isForgotten(disciple.soulId())) {
@@ -605,6 +871,10 @@ public final class Disciples {
 				LOADED.remove(owner);
 			}
 		}
+		if (disciple.role() != DiscipleEntity.Role.DISCIPLE || disciple.departed()) {
+			// Not a listed disciple, or it just left with Disciples.depart (its entry is already marked away).
+			return;
+		}
 		if (disciple.isAlive() && !disciple.isReleasing()) {
 			// Unloaded with its chunk: remember its name, rank and order for the list.
 			ServerPlayer player = level.getServer().getPlayerList().getPlayer(owner);
@@ -624,6 +894,9 @@ public final class Disciples {
 		for (UUID soul : fallen) {
 			CompoundTag entry = findEntry(list, soul);
 			if (entry != null) {
+				entry.remove("away");
+				entry.remove("away_reason");
+				entry.remove("away_until");
 				entry.putBoolean("dead", true);
 			}
 		}
@@ -640,7 +913,7 @@ public final class Disciples {
 		Set<UUID> souls = new HashSet<>();
 		for (DiscipleEntity disciple : loaded(player.getUUID())) {
 			if (disciple.level() == origin && disciple.mode().follows() && disciple.wasNearOwner() && !disciple.isReleasing()
-					&& !disciple.data().breakingThrough()) {
+					&& !disciple.data().breakingThrough() && !disciple.holdsActivitySpot()) {
 				souls.add(disciple.soulId());
 			}
 		}
@@ -668,7 +941,7 @@ public final class Disciples {
 			}
 			for (DiscipleEntity disciple : List.copyOf(set)) {
 				if (!request.souls().contains(disciple.soulId()) || disciple.level() != request.origin() || !disciple.isAlive()
-						|| disciple.isRemoved() || disciple.isReleasing() || disciple.data().breakingThrough()) {
+						|| disciple.isRemoved() || disciple.isReleasing() || disciple.data().breakingThrough() || disciple.holdsActivitySpot()) {
 					continue;
 				}
 				DiscipleEntity moved = disciple.followAcross(player);
@@ -696,7 +969,7 @@ public final class Disciples {
 		Entity killer = source.getEntity();
 		AABB box = victim.getBoundingBox().inflate(KILL_SHARE_RANGE);
 		for (DiscipleEntity disciple : level.getEntitiesOfClass(DiscipleEntity.class, box, each -> each != killer && each.isAlive()
-				&& each.ownerId() != null && !each.isReleasing())) {
+				&& each.ownerId() != null && !each.isReleasing() && each.role() == DiscipleEntity.Role.DISCIPLE)) {
 			if (disciple.distanceToSqr(victim) > KILL_SHARE_RANGE * KILL_SHARE_RANGE || disciple.getLastHurtMob() != victim
 					|| disciple.tickCount - disciple.getLastHurtMobTimestamp() >= KILL_SHARE_MEMORY) {
 				continue;
@@ -749,6 +1022,9 @@ public final class Disciples {
 	}
 
 	private static void writeEntry(CompoundTag entry, DiscipleEntity disciple) {
+		entry.remove("away");
+		entry.remove("away_reason");
+		entry.remove("away_until");
 		entry.putString("id", disciple.soulId().toString());
 		entry.putInt("life", disciple.life());
 		entry.putBoolean("dead", false);
@@ -898,7 +1174,7 @@ public final class Disciples {
 			Msg.chat(player, Component.translatable("kultivator.disciples.list.empty").withStyle(ChatFormatting.GRAY));
 			return 0;
 		}
-		player.sendSystemMessage(Component.translatable("kultivator.disciples.list.header", aliveCount(cultivation), MAX_DISCIPLES)
+		player.sendSystemMessage(Component.translatable("kultivator.disciples.list.header", aliveCount(cultivation), cap(player))
 				.withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
 		boolean missing = false;
 		for (int index = 0; index < list.size(); index++) {
@@ -924,8 +1200,19 @@ public final class Disciples {
 				DiscipleEntity.Mode saved = DiscipleEntity.Mode.byId(entry.getStringOr("mode", ""));
 				mode = (saved == null ? DiscipleEntity.Mode.FOLLOW : saved).displayName();
 				boolean fallen = entry.getBooleanOr("dead", false);
-				where = Component.translatable(fallen ? "kultivator.disciples.list.fallen" : "kultivator.disciples.list.unloaded");
-				missing |= !fallen;
+				boolean away = !fallen && entry.getBooleanOr("away", false);
+				if (away && entry.contains("away_until")) {
+					// "Sedang Ekspedisi · sisa 0,4 hari" (DESIGN 20.3.10).
+					String reason = entry.getStringOr("away_reason", "other");
+					long left = Math.max(0L, entry.getLongOr("away_until", 0L) - player.level().getServer().overworld().getGameTime());
+					where = Component.translatable("kultivator.spine6.list.away_reason",
+							Component.translatableWithFallback("kultivator.hall.away." + reason, reason),
+							String.format(java.util.Locale.ROOT, "%.1f", left / 24000.0D));
+				} else {
+					where = away ? Component.translatable("kultivator.spine6.list.away")
+							: Component.translatable(fallen ? "kultivator.disciples.list.fallen" : "kultivator.disciples.list.unloaded");
+				}
+				missing |= !fallen && !away;
 			}
 			boolean dead = loaded == null && entry.getBooleanOr("dead", false);
 			MutableComponent line = Component.literal((index + 1) + ". ").append(Component.translatable("kultivator.disciples.list.entry", name,
@@ -961,6 +1248,11 @@ public final class Disciples {
 			Msg.chat(player, Component.translatable("kultivator.disciples.forget.loaded", name).withStyle(ChatFormatting.YELLOW));
 			return 0;
 		}
+		if (entry.getBooleanOr("away", false)) {
+			// Away on an errand (expedition, soul flight): its body is not lost, it comes back by itself.
+			Msg.chat(player, Component.translatable("kultivator.spine6.forget.away", name).withStyle(ChatFormatting.YELLOW));
+			return 0;
+		}
 		if (!confirmed) {
 			Msg.chat(player, Component.translatable("kultivator.disciples.forget.warn", name, number).withStyle(ChatFormatting.GOLD));
 			return 0;
@@ -981,7 +1273,7 @@ public final class Disciples {
 	private static int call(ServerPlayer player) {
 		int count = 0;
 		for (DiscipleEntity disciple : loaded(player.getUUID())) {
-			if (disciple.isReleasing() || disciple.data().breakingThrough()) {
+			if (disciple.isReleasing() || disciple.data().breakingThrough() || DuelRules.inDuel(disciple)) {
 				continue;
 			}
 			DiscipleEntity called = disciple;
@@ -995,8 +1287,12 @@ public final class Disciples {
 				disciple.setTarget(null);
 				disciple.teleportNear(player);
 			}
-			if (called.mode().guardsPost()) {
+			if (!called.mode().follows()) {
 				called.setMode(DiscipleEntity.Mode.FOLLOW);
+			}
+			if (called.holdsActivitySpot()) {
+				// Called away from a duty post, the tower or the stands.
+				called.setActivity(DiscipleEntity.ACTIVITY_NONE, null);
 			}
 			called.setTarget(null);
 			count++;
@@ -1015,12 +1311,14 @@ public final class Disciples {
 	 * (DESIGN 18). A guard posted far away is never pulled off its post; {@code murid panggil} calls everyone.
 	 */
 	private static int orderCommand(ServerPlayer player, DiscipleEntity.Mode mode) {
-		DiscipleEntity target = lookedAt(player, disciple -> disciple.isOwnedBy(player) && !disciple.isReleasing());
+		DiscipleEntity target = lookedAt(player, disciple -> disciple.isOwnedBy(player) && !disciple.isReleasing()
+				&& disciple.role() == DiscipleEntity.Role.DISCIPLE);
 		if (target == null) {
 			AABB box = player.getBoundingBox().inflate(ACTION_RANGE);
 			double bestSq = ACTION_RANGE * ACTION_RANGE;
 			for (DiscipleEntity disciple : player.level().getEntitiesOfClass(DiscipleEntity.class, box, each -> each.isAlive()
-					&& each.isOwnedBy(player) && !each.isReleasing() && !each.data().breakingThrough())) {
+					&& each.isOwnedBy(player) && !each.isReleasing() && !each.data().breakingThrough()
+					&& each.role() == DiscipleEntity.Role.DISCIPLE)) {
 				double distanceSq = disciple.distanceToSqr(player);
 				if (distanceSq <= bestSq) {
 					bestSq = distanceSq;
