@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.disciple_revived.description"
+    },
+    "icon": {
+      "id": "kultivator:disciple_tablet"
+    },
+    "title": {
+      "translate": "advancement.kultivator.disciple_revived.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

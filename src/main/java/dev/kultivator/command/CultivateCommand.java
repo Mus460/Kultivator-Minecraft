@@ -119,6 +119,7 @@ public final class CultivateCommand {
 		Ascension.addCommands(root, debug);
 		dev.kultivator.disciple.Disciples.addCommands(root, debug);
 
+		TestCommands.addCommands(root);
 		root.then(debug);
 		return root;
 	}

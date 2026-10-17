@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_disciple",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.disciple_awakened.description"
+    },
+    "icon": {
+      "id": "minecraft:amethyst_shard"
+    },
+    "title": {
+      "translate": "advancement.kultivator.disciple_awakened.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

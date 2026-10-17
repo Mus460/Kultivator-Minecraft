@@ -3,13 +3,13 @@
 Panduan lengkap mod **Kultivator** (Minecraft 26.3, Fabric). Di mod ini **kamu sendiri** yang berkultivasi seperti
 tokoh novel xianxia: memurnikan qi, menembus ranah demi ranah dari Manusia Fana sampai Dewa Abadi, bertahan dari
 Tribulasi Langit, menapaki Jalan Dao, menguasai teknik, terbang di atas pedang, meracik pil, menghadapi Iblis Hati,
-membangkitkan binatang roh, membangun formasi, dan mendirikan sekte.
+membangkitkan binatang roh, membangun formasi, mendirikan sekte, dan membimbing murid.
 
 Semua angka di panduan ini diambil langsung dari kode mod. Angka kultivasi (XP) selalu ditampilkan sebagai bilangan
 bulat di dalam game.
 
 > **Janji keamanan blok:** tidak ada satu pun efek, teknik, peristiwa, makhluk, atau formasi dari mod ini yang
-> membakar, merusak, memasang, atau mengubah blok. Lihat [bagian terakhir](#24-janji-keamanan-blok).
+> membakar, merusak, memasang, atau mengubah blok. Lihat [bagian terakhir](#25-janji-keamanan-blok).
 
 ---
 
@@ -33,12 +33,13 @@ bulat di dalam game.
 16. [Binatang Roh](#16-binatang-roh)
 17. [Formasi Pelindung](#17-formasi-pelindung)
 18. [Sekte dan Latih Tanding](#18-sekte-dan-latih-tanding)
-19. [Pengakuan Langit: menjadi Dewa Abadi](#19-pengakuan-langit-menjadi-dewa-abadi)
-20. [Tampilan, Kualitas Efek, dan kosmetik](#20-tampilan-kualitas-efek-dan-kosmetik)
-21. [Layar kultivasi (gulungan giok)](#21-layar-kultivasi-gulungan-giok)
-22. [Pencapaian](#22-pencapaian)
-23. [Berkas konfigurasi](#23-berkas-konfigurasi)
-24. [Janji keamanan blok](#24-janji-keamanan-blok)
+19. [Murid](#19-murid)
+20. [Pengakuan Langit: menjadi Dewa Abadi](#20-pengakuan-langit-menjadi-dewa-abadi)
+21. [Tampilan, Kualitas Efek, dan kosmetik](#21-tampilan-kualitas-efek-dan-kosmetik)
+22. [Layar kultivasi (gulungan giok)](#22-layar-kultivasi-gulungan-giok)
+23. [Pencapaian](#23-pencapaian)
+24. [Berkas konfigurasi](#24-berkas-konfigurasi)
+25. [Janji keamanan blok](#25-janji-keamanan-blok)
 
 ---
 
@@ -100,6 +101,10 @@ bentrok dengan tombol vanilla, Butter Bot, maupun Iris (K, O, R).
 | `/kultivasi alchemy` / `alchemy help` | Ringkasan cara meracik pil |
 | `/kultivasi alchemy recipes` | Semua resep alkimia |
 | `/kultivasi alchemy level` | Tingkat alkimia, XP alkimia, dan peluang berhasilmu |
+| `/kultivasi murid list` | Daftar bernomor muridmu (lihat [Murid](#19-murid)) |
+| `/kultivasi murid panggil` | Semua muridmu yang termuat datang ke sebelahmu, juga dari dimensi lain |
+| `/kultivasi murid ikut` / `tinggal` / `meditasi` / `bantu` | Perintah untuk murid yang kamu tatap atau yang terdekat dalam 16 blok |
+| `/kultivasi murid lupakan <nomor> [konfirmasi]` | Membebaskan tempat murid hidup yang raganya hilang untuk selamanya |
 
 ### 3.2 `/sekte` (alias `/sect`)
 
@@ -154,6 +159,9 @@ Butuh izin operator (level 2). `[pemain]` berarti target pemain boleh ditambahka
 | `ascension reset [pemain]` | Menghapus status "sudah naik" |
 | `ascension progress [pemain]` | Kemajuan pencapaian akhir (menit meditasi, tribulasi, korban teknik) |
 | `ascension add meditation\|tribulations\|technique_kills <jumlah> [pemain]` | Menambah penghitung itu untuk pengujian |
+| `murid summon` | Murid baru di sebelahmu tanpa gulungan |
+| `murid xp <jumlah>` | Menambah kultivasi persis untuk murid yang kamu tatap (atau yang terdekat dalam 16 blok) |
+| `murid set realm <ranah> [tahap 1-4] [tingkat 1-9]` (juga `murid realm ...`) | Mengatur ranah murid itu |
 
 Untuk sekte: `/sekte debug addmember <nama>`
 menambahkan anggota tiruan agar bisa diuji sendirian.
@@ -359,7 +367,7 @@ Hukuman terobosan yang gagal (juga kalah dari Iblis Hati):
 * Luka sebesar 25% nyawa maksimum, **tidak pernah mematikan**.
 * Botol Madu memendekkannya 20% (sekali per penyimpangan); Pil Penenang Hati dan Pil Penyembuh juga membantu.
 * Setiap kegagalan menambah 25 *tekanan Iblis Hati*.
-* Dewa Abadi yang telah menjalani [Pengakuan Langit](#19-pengakuan-langit-menjadi-dewa-abadi) **kebal** terhadap
+* Dewa Abadi yang telah menjalani [Pengakuan Langit](#20-pengakuan-langit-menjadi-dewa-abadi) **kebal** terhadap
   Penyimpangan Qi.
 
 ### 7.7 Mode Hardcore
@@ -913,7 +921,159 @@ Aturan PvP vanilla (game rule `pvp`, tim) tetap berlaku.
 
 ---
 
-## 19. Pengakuan Langit: menjadi Dewa Abadi
+## 19. Murid
+
+**Murid** adalah pengikut yang kamu terima dan bimbing sendiri. Mereka berkultivasi seperti kamu (ranah, tahap, leher
+botol, Qi Tertimbun), mempelajari teknik yang kamu ajarkan, menelan pil darimu, dan bertarung di sisimu. Seorang Guru
+membimbing paling banyak **5 murid hidup** sekaligus.
+
+### 19.1 Menerima murid
+
+* **Gulungan Penerimaan Murid** (resep tanpa pola): Kertas + Batangan Emas + Serpihan Batu Kecubung + Kantong Tinta.
+* Gunakan gulungan itu: seorang murid muncul di depanmu (atau di sampingmu bila di depan tidak ada tanah aman) sebagai
+  **Manusia Fana**, dan akar spiritualnya langsung diuji dengan peluang yang sama seperti milikmu (lihat
+  [Akar spiritual](#10-akar-spiritual)). Gulungan hanya terpakai bila murid benar-benar datang.
+* Setiap murid mendapat nama xianxia acak dan salah satu kulit pemain bawaan. Hanya Gurunya yang bisa mengganti nama
+  dengan Label Nama.
+* Murid tidak pernah menghilang sendiri, tersimpan bersama dunia, dan tidak bisa diikat tali atau ditunggangi.
+* Klik kanan muridmu dengan **tangan kosong** (atau sambil jongkok dengan barang lain) untuk membuka gulungannya. Murid
+  orang lain hanya menyebutkan siapa Gurunya.
+
+### 19.2 Gulungan murid
+
+| Tab | Isi |
+|---|---|
+| **Status** | Ranah, bar kultivasi, qi, Qi Tertimbun, akar dan mutunya, Dao dan Pemahaman Dao, nyawa, kegiatan, perintah, monster yang dikalahkan |
+| **Teknik** | Teknik yang kamu kuasai sebagai kartu segel: ajarkan, atau baca alasan kenapa belum bisa |
+| **Perintah** | Empat perintah (lihat 19.3) |
+| **Pil & Terobosan** | Pil di tanganmu, jeda pil, tombol Terobosan, pilihan Dao, dan tombol Lepaskan murid (klik dua kali) |
+
+Gulungan memperbarui isinya sendiri setiap 5 detik selama terbuka dan tertutup bila murid lebih dari 16 blok darimu.
+
+### 19.3 Perintah
+
+| Perintah | Perilaku |
+|---|---|
+| **Ikut** (bawaan) | Berjalan bersamamu, menyusul dengan teleportasi bila tertinggal lebih dari 24 blok. Melawan apa pun yang menyerangmu atau menyerangnya |
+| **Tinggal & Jaga** | Menjaga tempat perintah diberikan: melawan monster dalam 12 blok, lalu kembali ke posnya. Monster netral yang tenang (enderman, piglin, piglin zombi, Warden) dibiarkan selama mereka tidak menyerang |
+| **Meditasi** | Duduk bersila di tempat itu dan berkultivasi **×1,5**. Hanya membalas bila diserang |
+| **Bantu** | Ikut bersamamu dan menyerang apa yang kamu serang serta apa yang menyerangmu |
+
+* Murid tidak pernah memulai perkelahian sendiri dengan perintah Ikut atau Bantu.
+* Di bawah **25% nyawa** murid mundur ke sisimu; bila kamu tidak terjangkau (misalnya di atas pilar) ia bertarung
+  di tempatnya.
+* Di luar pertarungan murid pulih 1 nyawa tiap 3 detik; selama bermeditasi 1% nyawa maks. per detik.
+* Murid dengan perintah Ikut atau Bantu yang berada dalam 24 blok darimu **ikut pindah dimensi** bersamamu: ia muncul
+  langsung di sebelahmu, tidak pernah lewat portal. Bila kamu bangkit di dimensi lain setelah mati, mereka tertinggal;
+  `/kultivasi murid panggil` menjemput mereka.
+* Murid hanya menyerang sasaran yang boleh diserang teknikmu: monster, makhluk yang menyerangmu, dan lawan Latih
+  Tanding. Tidak pernah kamu, pemain lain di luar Latih Tanding, hewan peliharaan (kecuali yang menyerangmu), penduduk
+  desa, hewan jinak, murid lain, binatang roh, atau Iblis Hati (urusan hati seorang kultivator). Creeper, ghast, blaze,
+  breeze, ravager, silverfish, Wither, dan creaking yang terikat jantungnya juga tidak pernah diserang, karena
+  pertarungannya akan mengubah blok.
+* Kamu, murid-muridmu yang lain, dan hewan peliharaanmu tidak bisa melukai muridmu; pemain lain hanya dalam Latih
+  Tanding denganmu.
+
+### 19.4 Kultivasi murid
+
+Murid naik ranah dengan aturan yang sama denganmu (bar, tahap, leher botol, Qi Tertimbun), tetapi dengan pengali
+**0,6 × mutu akarnya** (Sampah ×0,6 … Surgawi ×1,7) dan pengali server.
+
+| Sumber | Kultivasi |
+|---|---|
+| Meditasi (duduk bersila: di posnya, di sebelahmu saat kamu diam 5 detik atau bermeditasi, atau saat kamu luring / di dimensi lain) | `0,4 + 0,2 × ranah` per detik, ×1,5 dengan perintah Meditasi |
+| Bermeditasi dalam 8 blok darimu saat kamu juga bermeditasi | tambahan **10%** dari kultivasi meditasimu sendiri (tempat spiritual, formasi, urat roh, dan pengalimu ikut terhitung) |
+| Monster yang ia kalahkan | nyawa maks. monster × 0,4 |
+| Monster yang ia lukai dalam 5 detik terakhir tetapi dikalahkan orang lain (dalam 16 blok) | separuhnya |
+| Pil darimu | lihat 19.6 |
+
+Selama **Penyimpangan Qi** kultivasinya setengah dan qinya tidak pulih. Bonus kekuatan murid: nyawa +`(ranah × 6 +
+tahap × 1,5 + tingkat × 3)` × kualitas terobosannya, serangan +`ranah + tahap × 0,25 + tingkat × 0,5`, kecepatan +2% per
+ranah (maks. 20%). Qi maks. `60 + ranah × 80 + tahap × 20 + tingkat × 40`, pulih 0,6% per detik (×4 saat bermeditasi).
+
+### 19.5 Mengajarkan teknik
+
+* Tab **Teknik** menampilkan semua teknik yang kamu kuasai. Mengajar memakan **20% Qi maksimummu**.
+* Murid harus sudah mencapai ranah minimal teknik itu, dan untuk teknik Dao harus menempuh Dao yang sama.
+* **Pedang Terbang, Wujud Dharma, Wilayah Dao, Indra Ilahi, dan Langkah Awan tidak bisa diajarkan** (butuh raga dan
+  indra seorang kultivator sendiri).
+* Murid merapal teknik dengan qinya sendiri (60% biaya qi teknik itu) dan jeda yang sama dengan milikmu, sekali tiap
+  detik saat bertarung: Mata Air Kehidupan lebih dulu bila kamu di bawah separuh nyawa atau ia di bawah 40%, Tubuh Besi
+  saat musuh dekat, lalu teknik serangan terkuat yang siap. Kerusakan teknik murid `D = (3 + 2 × ranah + 0,5 × tahap) ×
+  (1 + Pemahaman Dao / 100)` dikali pengali tiap teknik.
+* Setiap teknik Dao miliknya yang ia rapal, setiap detik meditasi, dan setiap monster yang ia kalahkan menambah
+  Pemahaman Dao-nya (×1,5 bila akarnya selaras).
+
+### 19.6 Pil untuk murid
+
+Pegang pil lalu klik kanan muridmu (atau pakai tab Pil & Terobosan). Berlaku untuk pil vanilla (lihat
+[bagian 13](#13-pil-vanilla-dan-racun-pil)), semua pil alkimia, dan Pil Pembersih Sumsum:
+
+* Efeknya **70%** dari angka untuk pemain (kultivasi, qi, penyembuhan, Penyimpangan Qi, bonus terobosan, keringanan
+  tribulasi). Bintang Nether menambah peluang Fondasi berikutnya; Apel Emas Terpesona, Pil Inti Emas, dan Pil Penangkal
+  Petir melemahkan sambaran tribulasi berikutnya.
+* **Tanpa racun pil**, tetapi hanya **satu pil sejenis per menit** untuk tiap murid.
+* Pil Pemelihara Jiwa baru bisa ditelan murid ranah Jiwa Baru Lahir. Pil Binatang Roh ditolak.
+* Pil Pembersih Sumsum menaikkan mutu akar satu langkah (paling tinggi Surgawi); akar dengan 3 elemen atau lebih punya
+  25% peluang kehilangan satu elemen.
+
+### 19.7 Terobosan murid
+
+Saat bar penuh di tahap Puncak (leher botol), kamu diberi tahu di obrolan. Mulai terobosannya dengan tombol
+**Terobosan** di tab Pil & Terobosan. Syarat: kamu dalam **16 blok**, murid tidak sedang Penyimpangan Qi, dan untuk
+tribulasi nyawanya minimal 50%. Selama terobosan murid diam di tempat.
+
+| Terobosan | Jalannya |
+|---|---|
+| Manusia Fana → Pemurnian Qi (**Kebangkitan**) | 6 detik menghimpun qi, selalu berhasil |
+| Pemurnian Qi → Pembangunan Fondasi | 5 detik menghimpun qi lalu peluang `70% + (mutu akar − Menengah) × 5%` + bonus pil (5–98%). Batal tanpa akibat bila murid terluka atau dipindahkan lebih dari 6 blok |
+| Inti Emas ke atas (**tribulasi kecil**) | 6 detik awan pertanda, lalu `2 + ranah tujuan ÷ 2` sambaran (3 untuk Inti Emas) berselang 3 detik, masing-masing 18% nyawa maks. murid (pil meringankannya). Sambaran **tidak pernah membunuh** |
+
+* **Gagal** (peluang meleset, sambaran yang seharusnya mematikan, atau terbawa pergi setelah sambaran pertama):
+  **Penyimpangan Qi 3 menit** (lemah, qi tidak pulih, kultivasi setengah) dan bar berkurang 30%.
+* Tribulasi yang ditinggalkan setelah sambaran pertama (tempatnya tidak termuat lagi, atau dunia disimpan dan ditutup)
+  juga dihitung **gagal** saat murid termuat kembali, dan kamu diberi tahu begitu daring.
+* Berhasil: kualitas terobosan (Retak, Biasa, Sempurna, Surgawi) seperti milikmu, nyawa dan qi penuh, dan Qi Tertimbun
+  mengalir ke bar.
+* Di **Inti Emas** kamu memilihkan **Dao** untuk murid di tab Pil & Terobosan (sekali seumur hidupnya). Ia mendapat
+  pemahaman awal dan bisa mempelajari teknik Dao itu.
+* Semua efek terobosan hanyalah partikel dan suara: tidak ada entity petir, cuaca tidak berubah, blok tidak tersentuh.
+
+### 19.8 Gugur dan Papan Jiwa
+
+* Murid yang gugur meninggalkan **Papan Jiwa Murid** di tempatnya: bercahaya menembus dinding, tidak pernah menghilang,
+  kebal api, lava, ledakan, dan kaktus. Kamu diberi tahu koordinat dan dimensinya.
+* Bila ia gugur di atas kehampaan (jatuh dari dunia, di tepi pulau End), papannya terbang ke tasmu. Bila kamu sedang
+  luring, papan muncul di tempat terakhir ia berdiri dengan aman (atau di posnya, atau di titik muncul dunia), jadi
+  papannya tidak pernah hilang.
+* Gunakan papan itu untuk memanggil jiwanya kembali di sebelahmu, dengan nyawa penuh dan seluruh kultivasi serta
+  teknik yang sudah dipelajari. Hanya Gurunya yang bisa, dan batas 5 murid hidup tetap berlaku.
+* Papan dari kehidupan sebelumnya hanyalah gema: jiwa yang sama tidak bisa dibangkitkan dua kali.
+* Murid yang gugur saat kamu luring tercatat sebagai gugur begitu kamu masuk lagi, juga setelah server dimulai ulang.
+* **Melepaskan** murid (tab Pil & Terobosan, klik dua kali) membuatnya membungkuk, berpamitan, dan pergi untuk
+  selamanya tanpa papan; tempatnya langsung kosong.
+
+### 19.9 Perintah obrolan
+
+| Perintah | Fungsi |
+|---|---|
+| `/kultivasi murid list` | Daftar bernomor semua muridmu: nama, ranah, perintah, dan di mana mereka (jarak, di dimensi lain, jauh dan tidak termuat, atau gugur) |
+| `/kultivasi murid panggil` | Semua muridmu yang termuat datang ke sebelahmu dan kembali mengikutimu, juga dari dimensi lain |
+| `/kultivasi murid ikut` / `tinggal` / `meditasi` / `bantu` | Memberi perintah kepada murid yang kamu tatap, atau murid terdekat dalam 16 blok |
+| `/kultivasi murid lupakan <nomor>` | Jalan keluar bila raga seorang murid hidup hilang untuk selamanya: tanpa `konfirmasi` hanya memperingatkan; dengan `konfirmasi` tempatnya dibebaskan. Raga yang ternyata masih ada akan pergi saat termuat lagi |
+
+Perintah uji operator: `/kultivasi debug murid summon` (murid baru tanpa gulungan), `murid xp <jumlah>` (kultivasi
+persis), `murid set realm <ranah> [tahap 1-4] [tingkat 1-9]` (atau `murid realm ...`) untuk murid yang kamu tatap atau
+yang terdekat dalam 16 blok.
+
+**Keamanan blok:** murid tidak membuka pintu, tidak memungut barang, tidak menekan pelat tekan atau tali jebakan, tidak
+menginjak ladang atau telur penyu, tidak melewati portal, dan tidak pernah mengubah blok. Monster yang dipukul atau
+dilempar murid juga tidak bisa merusak ladang atau melewati portal, dan monster yang dikalahkan murid tanpa bantuan
+pemain tidak membuat katalis sculk menyebar.
+
+---
+
+## 20. Pengakuan Langit: menjadi Dewa Abadi
 
 Saat kamu mencapai **Dewa Abadi** dan belum pernah diakui, langit menjalankan peristiwa **Pengakuan Langit** sekali saja.
 Peristiwa ini dimulai beberapa detik setelah tribulasimu berakhir, ketika kamu hidup, tidak menunggang, tidak sedang
@@ -946,7 +1106,7 @@ jadi tidak ada anugerah qi tambahan.
 
 ---
 
-## 20. Tampilan, Kualitas Efek, dan kosmetik
+## 21. Tampilan, Kualitas Efek, dan kosmetik
 
 Semua efek digambar di sisi klien dengan partikel dan lapisan render standar (aman untuk Sodium, Iris, ImmediatelyFast,
 EMF/ETF), disesuaikan dengan **Kualitas Efek**:
@@ -977,7 +1137,7 @@ sendiri, jadi layar tetap bersih.
 
 ---
 
-## 21. Layar kultivasi (gulungan giok)
+## 22. Layar kultivasi (gulungan giok)
 
 Tekan `'`. Gulungan memiliki loh giok vertikal di sisi kiri:
 
@@ -991,7 +1151,7 @@ Tekan `'`. Gulungan memiliki loh giok vertikal di sisi kiri:
 
 ---
 
-## 22. Pencapaian
+## 23. Pencapaian
 
 Semua pencapaian ada di tab **Kultivasi** pada layar Pencapaian (Advancements). Bingkai: tugas, *tujuan*, **tantangan**.
 
@@ -1008,10 +1168,11 @@ Semua pencapaian ada di tab **Kultivasi** pada layar Pencapaian (Advancements). 
 | Binatang Roh | Binatang Roh, Kebangkitan Garis Darah, **Binatang Langit** (tingkat 3), *Serigala dan Rubah* |
 | Formasi | Perisai Giok, *Melimpah Qi* (daya penuh 2 jam), *Tak Tertembus* (20 monster terusir) |
 | Sekte | Leluhur Pendiri, Sesama Penganut Dao, *Sekte yang Berjaya* (5 anggota), Pelajaran Bersahabat (menang Latih Tanding) |
+| Murid | Lahirnya Seorang Guru (murid pertama), *Lima Murid, Satu Jalan*, Mewariskan Dao (mengajarkan teknik), Murid yang Terbangun (Kebangkitan murid), *Inti Emas Sang Murid*, *Kembali dari Mata Air Kuning* (membangkitkan murid dengan Papan Jiwa) |
 
 ---
 
-## 23. Berkas konfigurasi
+## 24. Berkas konfigurasi
 
 ### `config/kultivator.json` (server / dunia pemain tunggal)
 
@@ -1038,7 +1199,7 @@ Keduanya diatur dari tab Pengaturan gulungan.
 
 ---
 
-## 24. Janji keamanan blok
+## 25. Janji keamanan blok
 
 Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama:
 
@@ -1064,5 +1225,8 @@ Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama:
   pernah menggeser Naga Ender (ia menghancurkan blok yang ditabraknya); Naga Ender tetap bisa dilukai.
 * Tribulasi dan Iblis Hati **tidak pernah membunuhmu**: kegagalan berarti luka (Penyimpangan Qi), bukan kematian.
   Bila Iblis Hati melemparmu ke kehampaan, kamu dikembalikan ke tempat aman dan ujiannya berakhir sebagai kekalahan.
+* Murid tidak membuka pintu, tidak memungut barang, tidak menekan pelat tekan atau tali jebakan, tidak melewati
+  portal, dan teknik mereka mengikuti aturan yang sama dengan teknikmu. Papan Jiwa yang tergeletak juga tidak menekan
+  pelat dan tidak melewati portal.
 * Teknik hanya mengenai monster. Dalam Latih Tanding, teknik tidak pernah melempar atau menarik lawan, dan pemain
   yang jatuh ke kehampaan dikembalikan ke lawannya (duel berakhir kalah).
