@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.creaking.Creaking;
 import net.minecraft.world.entity.player.Player;
@@ -46,7 +47,8 @@ public final class Targeting {
 
 	/**
 	 * True when a technique of {@code caster} may hurt {@code target}. Never a creaking bound to a creaking heart: hurt by
-	 * a player (or their tamed wolf), its heart grows resin blocks.
+	 * a player (or their tamed wolf), its heart grows resin blocks. Never the Wither: every hit makes it break the blocks
+	 * around it a second later.
 	 */
 	public static boolean isHostileTo(Entity entity, ServerPlayer caster) {
 		if (!(entity instanceof LivingEntity target) || target == caster || !target.isAlive() || target.isSpectator()
@@ -54,6 +56,9 @@ public final class Targeting {
 			return false;
 		}
 		if (target instanceof Creaking creaking && creaking.isHeartBound()) {
+			return false;
+		}
+		if (target instanceof WitherBoss) {
 			return false;
 		}
 		for (BiPredicate<ServerPlayer, Entity> exclusion : EXCLUSIONS) {

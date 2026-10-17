@@ -16,6 +16,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.Ravager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
@@ -121,8 +122,11 @@ public final class UniversalTechniques {
 					// Slammed down: its landing must not trample farmland or crush turtle eggs.
 					target.addTag(NoGrief.TAG);
 				}
-				target.setDeltaMovement(motion.x * 0.3D, -1.0D * (1.0D - resist * 0.5D), motion.z * 0.3D);
-				target.syncVelocity = true;
+				if (!(target instanceof EnderDragon)) {
+					// The dragon is never moved: it breaks the blocks it is pushed into.
+					target.setDeltaMovement(motion.x * 0.3D, -1.0D * (1.0D - resist * 0.5D), motion.z * 0.3D);
+					target.syncVelocity = true;
+				}
 				target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 1, false, true), player);
 			}
 		}
@@ -135,16 +139,17 @@ public final class UniversalTechniques {
 
 	/**
 	 * Pushes {@code target} along the horizontal direction (x, z), less for knockback-resistant targets. Never a ravager
-	 * (pushed into trees it breaks leaves); a pushed monster gets {@link NoGrief#TAG} (no trampling, no egg crushing).
+	 * (pushed into trees it breaks leaves), the Ender Dragon (it breaks the blocks it is pushed into) or a player (a
+	 * sparring partner could be knocked into the void); a pushed monster gets {@link NoGrief#TAG} (no trampling, no egg
+	 * crushing, no portal travel) and a portal cooldown.
 	 */
 	static void knock(LivingEntity target, double x, double z, double strength, double lift) {
 		double length = Math.sqrt(x * x + z * z);
-		if (length < 1.0E-6D || target instanceof Ravager) {
+		if (length < 1.0E-6D || target instanceof Ravager || target instanceof EnderDragon || target instanceof Player) {
 			return;
 		}
-		if (!(target instanceof Player)) {
-			target.addTag(NoGrief.TAG);
-		}
+		target.addTag(NoGrief.TAG);
+		target.setPortalCooldown();
 		double resist = Math.max(0.0D, Math.min(1.0D, target.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE)));
 		double scale = strength * (1.0D - resist) / length;
 		if (scale <= 0.0D) {

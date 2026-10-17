@@ -38,6 +38,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -184,7 +185,8 @@ public final class DaoProtectors {
 				pool.add(EntityTypes.SPIDER);
 				pool.add(EntityTypes.ZOMBIE);
 				pool.add(EntityTypes.STRAY);
-				pool.add(EntityTypes.WITCH);
+				// Husks instead of witches: splash potions are vanilla projectiles and poison bystanders.
+				pool.add(EntityTypes.HUSK);
 				if (target.realm().atLeast(Realm.DEITY_TRANSFORMATION)) {
 					pool.add(EntityTypes.VINDICATOR);
 				}
@@ -205,7 +207,10 @@ public final class DaoProtectors {
 		}
 		if (mob instanceof Phantom) {
 			Vec3 high = spot.add(0.0D, 4.0D, 0.0D);
-			if (level.noCollision(mob, mob.getDimensions(mob.getPose()).makeBoundingBox(high))) {
+			AABB box = mob.getDimensions(mob.getPose()).makeBoundingBox(high);
+			// Portals have no collision, so check for them too: a phantom must never start inside one.
+			if (level.noCollision(mob, box) && level.getBlockStates(box.inflate(0.01D))
+					.noneMatch(state -> state.is(Blocks.NETHER_PORTAL) || state.is(Blocks.END_PORTAL) || state.is(Blocks.END_GATEWAY))) {
 				spot = high;
 			}
 		}

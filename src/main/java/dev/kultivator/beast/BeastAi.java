@@ -21,6 +21,7 @@ import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.fox.Fox;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Silverfish;
 import net.minecraft.world.entity.monster.creaking.Creaking;
@@ -100,11 +101,12 @@ final class BeastAi {
 
 	/**
 	 * Mobs a beast never hurts because the hit would change blocks: a silverfish calls its friends out of infested
-	 * blocks when something hurts it, and a creaking bound to a heart makes the heart grow resin when a player's tamed
-	 * wolf (or the player) hurts it.
+	 * blocks when something hurts it, a creaking bound to a heart makes the heart grow resin when a player's tamed
+	 * wolf (or the player) hurts it, and the Wither breaks the blocks around it a second after every hit.
 	 */
 	static boolean untouchable(@Nullable Entity entity) {
-		return entity instanceof Silverfish || entity instanceof Creaking creaking && creaking.isHeartBound();
+		return entity instanceof Silverfish || entity instanceof Creaking creaking && creaking.isHeartBound()
+				|| entity instanceof WitherBoss;
 	}
 
 	private static boolean isPet(LivingEntity entity) {

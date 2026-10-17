@@ -342,9 +342,11 @@ public final class Tribulation {
 				player.setHealth(1.0F);
 			}
 			if (t.variant == VARIANT_NETHER && !wouldKill && player.getHealth() > 6.0F) {
-				// Entity fire only: igniting an entity never sets blocks alight.
-				player.igniteForSeconds(2.0F);
-				FIRE_GUARD.put(player.getUUID(), level.getGameTime() + 100L);
+				// Entity fire only: igniting an entity never sets blocks alight. The guarded ignite skips the fire next to
+				// powder snow or a water / powder snow cauldron and puts it out near one (a burning player would melt or lower them).
+				if (dev.kultivator.technique.DaoTechniques.ignite(player, 2.0F)) {
+					FIRE_GUARD.put(player.getUUID(), level.getGameTime() + 100L);
+				}
 			}
 		}
 		trackHealth(player, t);

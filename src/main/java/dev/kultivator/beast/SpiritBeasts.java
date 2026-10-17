@@ -11,6 +11,7 @@ import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Realm;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
+import dev.kultivator.technique.DaoTechniques;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
@@ -511,9 +512,9 @@ public final class SpiritBeasts {
 					if (beast.getRandom().nextFloat() < MOON_THUNDER_CHANCE) {
 						PENDING_STRIKES.add(new Strike(beast, victim, damageTaken * MOON_THUNDER_BONUS));
 					}
-				} else {
-					// Fire on the entity only: a burning mob never sets blocks alight.
-					victim.igniteForSeconds(FOXFIRE_SECONDS);
+				} else if (DaoTechniques.ignite(victim, FOXFIRE_SECONDS)) {
+					// Fire on the entity only, never next to powder snow or a water cauldron (a burning mob would melt or
+					// lower them); the technique fire watcher puts it out if the victim gets close to one.
 					Fx.send(level, victim.position().add(0.0D, victim.getBbHeight() * 0.5D, 0.0D), FxType.BEAST_EVOLVE, FX_FOXFIRE,
 							beast.getId(), data.kind());
 					level.playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.NEUTRAL, 0.4F, 1.6F);

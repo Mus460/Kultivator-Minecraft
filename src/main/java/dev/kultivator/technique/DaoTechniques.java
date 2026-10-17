@@ -36,6 +36,7 @@ import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Ravager;
 import net.minecraft.world.entity.player.Player;
@@ -65,8 +66,10 @@ import java.util.UUID;
  * fire is only put on entities (never next to powder snow or a water cauldron, and put out when a burning monster gets
  * close to one), lightning is particles only, teleports only land on spots checked by {@link Targeting#safeSpot} and
  * reached through open space. Creepers and ravagers are never pulled or thrown (a creeper dragged close would explode,
- * a ravager thrown into trees breaks leaves), prisons stop a creeper's fuse, nothing is thrown or pulled near a portal,
- * and every thrown monster gets {@link NoGrief#TAG} so it cannot trample farmland or crush turtle eggs. Every particle is drawn on the client ({@code DaoTechniqueFx}) from TECHNIQUE packets
+ * a ravager thrown into trees breaks leaves), nor the Ender Dragon (it breaks the blocks it is moved into) or a player
+ * (a sparring partner could land in the void); prisons stop a creeper's fuse, nothing is thrown or pulled near a portal,
+ * and every thrown monster gets {@link NoGrief#TAG} (no trampling, no egg crushing, no portal travel) and a portal
+ * cooldown. Every particle is drawn on the client ({@code DaoTechniqueFx}) from TECHNIQUE packets
  * whose sub effects are listed in {@link DaoTechniqueSub}.
  */
 public final class DaoTechniques {
@@ -266,7 +269,8 @@ public final class DaoTechniques {
 				boolean pulling = !portalNear(player, DOMAIN_RADIUS + 4.0D);
 				for (LivingEntity target : targets) {
 					target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, DOMAIN_EFFECT_TICKS, 4), player);
-					if (!pulling || target instanceof Creeper || target instanceof Ravager) {
+					// Players (sparring partners) are never dragged: a pull could carry them over a deadly edge.
+					if (!pulling || target instanceof Creeper || target instanceof Ravager || target instanceof Player) {
 						continue;
 					}
 					Vec3 to = player.position().subtract(target.position()).horizontal();
@@ -617,7 +621,7 @@ public final class DaoTechniques {
 		}
 	}
 
-	/** A shockwave of radius 7: 2 D, monsters thrown into the air (not ravagers, nothing near a portal) and slowed. */
+	/** A shockwave of radius 7: 2 D, monsters thrown into the air (not ravagers or players, nothing near a portal) and slowed. */
 	private static boolean mountainStomp(ServerPlayer player, double power) {
 		List<LivingEntity> hits = Targeting.hostilesAround(player, player.position(), STOMP_RADIUS);
 		if (hits.isEmpty()) {
@@ -632,7 +636,7 @@ public final class DaoTechniques {
 			boolean landed = strike(player, target, power * 2.0D);
 			if (target.isAlive()) {
 				// Only a blow that landed throws: a refused one (a duel's decisive blow) must not launch into a deadly fall.
-				if (landed && throwing && !(target instanceof Ravager)) {
+				if (landed && throwing && !(target instanceof Ravager) && !(target instanceof Player)) {
 					Vec3 away = target.position().subtract(player.position()).horizontal();
 					Vec3 push = away.lengthSqr() < 1.0E-4D ? Vec3.ZERO : away.normalize().scale(0.35D);
 					launch(target, new Vec3(push.x, 0.9D, push.z));
@@ -758,14 +762,15 @@ public final class DaoTechniques {
 	}
 
 	/**
-	 * A storm wind hurls every monster within 10 away (harder when close; never ravagers, nothing near a portal); the
+	 * A storm wind hurls every monster within 10 away (harder when close; never ravagers or players, nothing near a portal); the
 	 * caster turns invisible and swift for 6 s.
 	 */
 	private static boolean gale(ServerPlayer player) {
 		List<LivingEntity> blown = portalNear(player, GALE_RADIUS + 16.0D) ? List.of()
 				: Targeting.hostilesAround(player, player.position(), GALE_RADIUS);
 		for (LivingEntity target : blown) {
-			if (target instanceof Ravager) {
+			// Never a ravager (it tears through leaves) or a player (a sparring partner could be blown into the void).
+			if (target instanceof Ravager || target instanceof Player) {
 				continue;
 			}
 			Vec3 away = target.position().subtract(player.position()).horizontal();
@@ -903,7 +908,8 @@ public final class DaoTechniques {
 				// Runs after the entity ticks: the next Creeper.tick reads -1, so the fuse never grows while held.
 				creeper.setSwellDir(-1);
 			}
-			boolean held = entity instanceof Creeper || entity instanceof Ravager;
+			// Only held, never dragged: creepers, ravagers, the Ender Dragon (it breaks the blocks it is moved into) and players.
+			boolean held = entity instanceof Creeper || entity instanceof Ravager || entity instanceof EnderDragon || entity instanceof Player;
 			if (lock.technique == Technique.SPACE_PRISON && !held) {
 				Vec3 to = lock.anchor.subtract(entity.position()).horizontal();
 				double distance = to.length();
@@ -1093,11 +1099,17 @@ public final class DaoTechniques {
 
 	/**
 	 * Sets an entity's velocity and makes sure every client (and a player's own client) receives it. A thrown monster is
-	 * tagged {@link NoGrief#TAG}, so its landing never tramples farmland or crushes turtle eggs.
+	 * tagged {@link NoGrief#TAG}, so its landing never tramples farmland or crushes turtle eggs, and gets a portal
+	 * cooldown (portal travel could build an exit portal). The Ender Dragon is never moved: it breaks the blocks it is
+	 * pushed into.
 	 */
 	private static void launch(Entity entity, Vec3 velocity) {
+		if (entity instanceof EnderDragon) {
+			return;
+		}
 		if (!(entity instanceof Player)) {
 			entity.addTag(NoGrief.TAG);
+			entity.setPortalCooldown();
 		}
 		entity.setDeltaMovement(velocity);
 		entity.needsSync = true;
@@ -1106,14 +1118,16 @@ public final class DaoTechniques {
 
 	/**
 	 * Sets an entity (never a block) on fire for {@code seconds}, unless powder snow or a water cauldron is right next to
-	 * it, and watches it until the fire is out (see init).
+	 * it, and watches it until the fire is out (see init): a burning entity would melt powder snow or lower a cauldron.
+	 * Used by every module that sets entities on fire. False when the fire was skipped.
 	 */
-	private static void ignite(LivingEntity target, float seconds) {
+	public static boolean ignite(LivingEntity target, float seconds) {
 		if (nearExtinguisher(target)) {
-			return;
+			return false;
 		}
 		target.igniteForSeconds(seconds);
 		BURNING.merge(target, target.level().getGameTime() + (long) (seconds * 20.0F) + 20L, Math::max);
+		return true;
 	}
 
 	/** Read-only: powder snow or a water / powder snow cauldron within a block of where the entity is heading. */

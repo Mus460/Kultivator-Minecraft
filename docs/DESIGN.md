@@ -121,7 +121,8 @@ player is back; damage interrupts the Qi Refining gathering but never the awaken
    void pulse). Other dimensions use Overworld style.
 4. **Dao Protector event** ("Pelindung Dao", config `daoProtectorEvent`, default on): during strikes, waves of hostile
    mobs attracted by the phenomenon spawn on valid ground 10–16 blocks away (no block changes, never inside blocks):
-   Overworld skeleton/spider/zombie(no door breaking)/stray/witch (vindicator from Deity Transformation),
+   Overworld skeleton/spider/zombie(no door breaking)/stray/husk (vindicator from Deity Transformation; no witches:
+   splash potions are vanilla projectiles),
    Nether wither skeleton/magma cube/hoglin (no piglin brutes: they open doors), End endermite/phantom. Skeletons get
    swords instead of bows, nobody picks up loot, zombies call no reinforcements, raiders never join raids, and
    protectors only hurt players. Waves every 3 strikes, size
@@ -288,7 +289,10 @@ detection). Right-click it with an ingredient to add one item to its pot (stored
 max 8 items, shown in the action bar); sneak + empty-hand right-click starts refining (10 s FX); a recipe table maps
 an unordered multiset of items to a pill; success chance `0.6 + alchemyLevel × 0.04 + soul fire 0.1 + Fire Dao 0.1`,
 quality grade (Low/Mid/High/Perfect) from a roll + level; failure gives smoke and nothing. The pot is dropped as items
-if the furnace disappears. Own pill items (data component `kultivator:pill_quality`, 0–3, multiplies effect
+if the furnace disappears; results and spilled ingredients pop out beside the cauldron, never into it (a lava cauldron
+would burn them). Bar-scaled XP pills are capped (Qi Gathering 15% of the bar, at most 450 XP; Soul Nurturing 30%, at
+most 3600 XP; both before quality), and outside Qi Refining Foundation pills raise the next breakthrough bonus to at
+most +0.15. Own pill items (data component `kultivator:pill_quality`, 0–3, multiplies effect
 0.8/1.0/1.25/1.6): Qi Gathering Pill, Qi Recovery Pill, Foundation Establishment Pill, Golden Core Pill, Marrow
 Cleansing Pill (phase 2 adds it with a crafting recipe), Heart Calming Pill, Healing Pill, Tribulation Warding Pill,
 Soul Nurturing Pill, Spirit Beast Pill (phase 3 adds it with a crafting recipe), Immortal Pill.
@@ -558,3 +562,47 @@ calls `client.render.CultivatorRender.init()`.
   yet, the ascension event runs (heavens open, golden pillar, celestial sounds, server-wide announcement, rainbow aura via
   `data.setAscended(true)` and the ASCENDED visual flag, an immortal gift: immunity to Qi Deviation and slow constant
   regeneration).
+
+## 18. Phase 5 — Disciples (Murid), requested by the user after phase 4 started
+
+"Bots that can be taught or become cultivators too", built entirely inside Kultivator (no dependency on or code from the
+Butter Bot mod; Butter Bot stays a separate mod).
+
+* **Entity `kultivator:disciple`** (PathfinderMob, humanoid 0.6×1.8, player model): owner UUID, name (random
+  xianxia-style name from a translated list, renameable with a name tag), skin = one of the default player skins (wide or
+  slim) chosen at recruitment, synced visual data (realm, stage, dao, root colour, flags: meditating, breaking through,
+  fighting). Persistent with the world (ValueOutput/ValueInput), never despawns, `NoGrief.TAG`, never breaks/places blocks,
+  opens no doors, picks up nothing, cannot be leashed/ridden. Max 5 disciples per player (count stored on the player in
+  `CultivationData.extra()`).
+* **Recruitment:** item *Gulungan Penerimaan Murid* (recruitment_scroll; shapeless: paper + gold ingot + amethyst shard +
+  ink sac). Use it → a disciple appears next to the player (FX, sounds) as a Mortal with a rolled root
+  (`SpiritRoots.roll`), saved once.
+* **Disciple cultivation** (`disciple/DiscipleCultivation`): its own realm/layer/stage/xp/storedQi/qi/root/dao/
+  comprehension/learned techniques/qualities in the entity's saved data, using the same `Rank` math and bottleneck rules
+  (with a disciple XP multiplier 0.6 so it is slower than the master). XP from monster kills it takes part in, from
+  meditating (idle, sits cross-legged near the master or at its post), pills the master gives (right-click with a vanilla
+  pill item or a kultivator pill: same effect table, scaled for the disciple), and 10% of the master's meditation XP when
+  meditating within 8 blocks of the master. At a full bottleneck the master starts its breakthrough from the disciple
+  screen: awakening needs nothing, Qi Refining → Foundation is a chance roll, Golden Core+ is a mini tribulation
+  (particles + sounds, strikes = % of its max health, never lethal; failure = 3 minutes of weakness and −30% bar).
+  Dao chosen by the master in the disciple screen when it reaches Golden Core.
+* **Teaching:** the master teaches any technique the master knows and the disciple qualifies for (realm, Dao) — costs the
+  master 20% of max qi; the disciple can then use it. Disciples use a simplified cast of each technique
+  (`disciple/DiscipleTechniques`): same visuals (FxType.TECHNIQUE), damage `(3 + 2 × realm + 0.5 × stage)`, only on
+  targets `Targeting.isHostileTo(target, master)` accepts, never the master's allies; flying sword/dharma/domain/divine
+  sense are not usable by disciples (they show as "cannot be taught").
+* **Orders (modes):** follow (default; teleports near when > 24 blocks), stay & guard a spot (fights monsters within 12),
+  meditate at a spot (cultivates faster: ×1.5, does not fight unless hit), assist (aggressively attacks what the master
+  attacks or what attacks the master). Via the disciple screen (right-click the disciple) or `/kultivasi murid ...`.
+* **Combat:** melee with its own attack damage (scaled by realm), casts taught techniques with its own qi pool and
+  cooldowns, retreats to the master below 25% health. Regenerates slowly.
+* **Death:** drops *Papan Jiwa Murid* (disciple_tablet) holding all its data in the item's custom data; the owner uses
+  it to bring the disciple back at full health (others cannot). The tablet is immune to fire/lava/explosions/cactus.
+* **Screen (client):** jade-scroll style like the cultivation screen (DESIGN 5b): tabs Status (rank, bars, root, dao,
+  stats), Teknik (teach from the master's known techniques; locked ones explain why), Perintah (modes), Pil (give the pill
+  in hand), Terobosan button. Sends `Payloads.Action` with new action ids (DISCIPLE_*) carrying the disciple entity id.
+* **Commands:** `/kultivasi murid list|panggil|ikut|tinggal|meditasi|bantu` (nearest/looked-at disciple), debug
+  `murid set realm ...`, `murid xp <n>`, `murid summon`.
+* **Visuals:** renderer with the player model, its skin, aura per realm (reuse AuraFx style), cross-legged pose while
+  meditating, robe tint by Dao, name tag "<name> · <realm>".
+* **Lang:** `lang-src/disciples.*` (id_id + en_us), names lists in both languages.

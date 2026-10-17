@@ -69,6 +69,11 @@ public final class Deviation {
 	 * duration and the injury scale with it. An existing deviation is extended (up to {@link #MAX_TICKS}).
 	 */
 	public static void apply(ServerPlayer player, double severity) {
+		if (Cultivators.get(player).ascended()) {
+			// The immortal gift of an ascended True Immortal (DESIGN 17): no Qi Deviation can take hold.
+			Msg.chat(player, Component.translatable("kultivator.ascension.deviation_immune").withStyle(ChatFormatting.GOLD));
+			return;
+		}
 		CultivationData data = Cultivators.get(player);
 		double scale = Math.max(0.1D, severity);
 		boolean already = data.deviating();

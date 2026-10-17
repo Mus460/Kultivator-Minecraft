@@ -1,9 +1,11 @@
 package dev.kultivator.command;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -56,6 +58,8 @@ import java.util.Locale;
  */
 public final class CultivateCommand {
 
+	/** Name of the optional target argument of the debug commands. */
+	private static final String PLAYER = "player";
 	private static final String[] COSMETICS = {"aura", "robe", "back_sword", "eyes", "dao_circle"};
 	private static final int[] COSMETIC_FLAGS = {CultivationData.COSMETIC_AURA, CultivationData.COSMETIC_ROBE,
 			CultivationData.COSMETIC_BACK_SWORD, CultivationData.COSMETIC_EYES, CultivationData.COSMETIC_DAO_CIRCLE};
@@ -122,6 +126,21 @@ public final class CultivateCommand {
 		return ctx.getSource().getPlayerOrException();
 	}
 
+	/** The debug target: the {@code player} argument when the command has one, else the executing player. */
+	private static ServerPlayer target(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		try {
+			return EntityArgument.getPlayer(ctx, PLAYER);
+		} catch (IllegalArgumentException absent) {
+			// Brigadier throws this when the argument is not part of the parsed command.
+			return self(ctx);
+		}
+	}
+
+	/** {@code node} runs {@code command} as it is and also with a trailing {@code [player]} target. */
+	private static <T extends ArgumentBuilder<CommandSourceStack, T>> T targeted(T node, Command<CommandSourceStack> command) {
+		return node.executes(command).then(Commands.argument(PLAYER, EntityArgument.player()).executes(command));
+	}
+
 	// ================================================================ player commands
 
 	/** A short status card in chat. */
@@ -172,122 +191,129 @@ public final class CultivateCommand {
 
 	// ================================================================ debug commands
 
+	/**
+	 * The debug commands of the spine. Each one acts on the executing player, or on the optional trailing
+	 * {@code [player]} (see {@link #target}), so an operator, the console or a command block can set up anyone.
+	 */
 	private static void addDebug(LiteralArgumentBuilder<CommandSourceStack> debug) {
 		LiteralArgumentBuilder<CommandSourceStack> set = Commands.literal("set");
+		Command<CommandSourceStack> realmOnly = ctx -> setRealm(ctx, 0, 0);
+		Command<CommandSourceStack> realmStage = ctx -> setRealm(ctx, IntegerArgumentType.getInteger(ctx, "stage") - 1, 0);
+		Command<CommandSourceStack> realmLayer = ctx -> setRealm(ctx, IntegerArgumentType.getInteger(ctx, "stage") - 1,
+				IntegerArgumentType.getInteger(ctx, "layer") - 1);
+		// The [player] child goes AFTER the number child on each node: brigadier keeps the first of two equal parses, and
+		// a number would also parse as a player name, so "2" stays the stage / layer.
 		set.then(Commands.literal("realm")
 				.then(Commands.argument("realm", StringArgumentType.word()).suggests(REALMS)
-						.executes(ctx -> setRealm(ctx, 0, 0))
+						.executes(realmOnly)
 						.then(Commands.argument("stage", IntegerArgumentType.integer(1, 4))
-								.executes(ctx -> setRealm(ctx, IntegerArgumentType.getInteger(ctx, "stage") - 1, 0))
-								.then(Commands.argument("layer", IntegerArgumentType.integer(1, 9))
-										.executes(ctx -> setRealm(ctx, IntegerArgumentType.getInteger(ctx, "stage") - 1,
-												IntegerArgumentType.getInteger(ctx, "layer") - 1))))));
+								.executes(realmStage)
+								.then(targeted(Commands.argument("layer", IntegerArgumentType.integer(1, 9)), realmLayer))
+								.then(Commands.argument(PLAYER, EntityArgument.player()).executes(realmStage)))
+						.then(Commands.argument(PLAYER, EntityArgument.player()).executes(realmOnly))));
 		set.then(Commands.literal("qi")
-				.then(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D))
-						.executes(ctx -> {
-							ServerPlayer player = self(ctx);
-							CultivationData data = Cultivators.get(player);
-							data.setQi(Math.min(Qi.max(data), DoubleArgumentType.getDouble(ctx, "amount")));
-							return done(ctx, player);
-						})));
+				.then(targeted(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D)), ctx -> {
+					ServerPlayer player = target(ctx);
+					CultivationData data = Cultivators.get(player);
+					data.setQi(Math.min(Qi.max(data), DoubleArgumentType.getDouble(ctx, "amount")));
+					return done(ctx, player);
+				})));
 		set.then(Commands.literal("xp")
-				.then(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D))
-						.executes(ctx -> {
-							ServerPlayer player = self(ctx);
-							CultivationData data = Cultivators.get(player);
-							data.setXp(Math.min(data.rank().xpRequired(), DoubleArgumentType.getDouble(ctx, "amount")));
-							return done(ctx, player);
-						})));
+				.then(targeted(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D)), ctx -> {
+					ServerPlayer player = target(ctx);
+					CultivationData data = Cultivators.get(player);
+					data.setXp(Math.min(data.rank().xpRequired(), DoubleArgumentType.getDouble(ctx, "amount")));
+					return done(ctx, player);
+				})));
 		set.then(Commands.literal("storedqi")
-				.then(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D))
-						.executes(ctx -> {
-							ServerPlayer player = self(ctx);
-							Cultivators.get(player).setStoredQi(DoubleArgumentType.getDouble(ctx, "amount"));
-							return done(ctx, player);
-						})));
+				.then(targeted(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D)), ctx -> {
+					ServerPlayer player = target(ctx);
+					Cultivators.get(player).setStoredQi(DoubleArgumentType.getDouble(ctx, "amount"));
+					return done(ctx, player);
+				})));
 		set.then(Commands.literal("root")
 				.then(Commands.argument("grade", StringArgumentType.word()).suggests(GRADES)
 						.then(Commands.argument("elements", StringArgumentType.greedyString())
 								.executes(CultivateCommand::setRoot))));
+		// A player name would also parse as a grade word (and the elements are greedy), so another player's root has its
+		// own path: set root_of <player> <grade> <elements>.
+		set.then(Commands.literal("root_of")
+				.then(Commands.argument(PLAYER, EntityArgument.player())
+						.then(Commands.argument("grade", StringArgumentType.word()).suggests(GRADES)
+								.then(Commands.argument("elements", StringArgumentType.greedyString())
+										.executes(CultivateCommand::setRoot)))));
 		set.then(Commands.literal("dao")
-				.then(Commands.argument("dao", StringArgumentType.word()).suggests(DAOS)
-						.executes(ctx -> {
-							ServerPlayer player = self(ctx);
-							String id = StringArgumentType.getString(ctx, "dao");
-							Dao dao = Dao.byId(id);
-							if (dao == null && !id.equals("none")) {
-								return fail(ctx, "kultivator.core.debug.unknown", id);
-							}
-							Cultivators.get(player).setDao(dao);
-							Techniques.refreshUnlocks(player);
-							Stats.apply(player);
-							return done(ctx, player);
-						})));
+				.then(targeted(Commands.argument("dao", StringArgumentType.word()).suggests(DAOS), ctx -> {
+					ServerPlayer player = target(ctx);
+					String id = StringArgumentType.getString(ctx, "dao");
+					Dao dao = Dao.byId(id);
+					if (dao == null && !id.equals("none")) {
+						return fail(ctx, "kultivator.core.debug.unknown", id);
+					}
+					Cultivators.get(player).setDao(dao);
+					Techniques.refreshUnlocks(player);
+					Stats.apply(player);
+					return done(ctx, player);
+				})));
 		set.then(Commands.literal("comprehension")
-				.then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0D, 100.0D))
-						.executes(ctx -> {
-							ServerPlayer player = self(ctx);
-							CultivationData data = Cultivators.get(player);
-							Dao dao = data.dao();
-							if (dao == null) {
-								return fail(ctx, "kultivator.core.debug.no_dao", "");
-							}
-							// Through Comprehension.set so crossed levels are announced and their advancements granted.
-							Comprehension.set(player, dao, DoubleArgumentType.getDouble(ctx, "value"));
-							return done(ctx, player);
-						})));
+				.then(targeted(Commands.argument("value", DoubleArgumentType.doubleArg(0.0D, 100.0D)), ctx -> {
+					ServerPlayer player = target(ctx);
+					CultivationData data = Cultivators.get(player);
+					Dao dao = data.dao();
+					if (dao == null) {
+						return fail(ctx, "kultivator.core.debug.no_dao", "");
+					}
+					// Through Comprehension.set so crossed levels are announced and their advancements granted.
+					Comprehension.set(player, dao, DoubleArgumentType.getDouble(ctx, "value"));
+					return done(ctx, player);
+				})));
 		set.then(Commands.literal("quality")
-				.then(Commands.argument("quality", StringArgumentType.word())
+				.then(targeted(Commands.argument("quality", StringArgumentType.word())
 						.suggests((ctx, builder) -> SharedSuggestionProvider.suggest(Arrays.stream(BreakthroughQuality.values())
-								.map(BreakthroughQuality::id), builder))
-						.executes(ctx -> {
-							ServerPlayer player = self(ctx);
-							String id = StringArgumentType.getString(ctx, "quality");
-							BreakthroughQuality quality = Arrays.stream(BreakthroughQuality.values()).filter(q -> q.id().equals(id))
-									.findFirst().orElse(null);
-							if (quality == null) {
-								return fail(ctx, "kultivator.core.debug.unknown", id);
-							}
-							CultivationData data = Cultivators.get(player);
-							data.setQuality(data.realm(), quality);
-							Stats.apply(player);
-							return done(ctx, player);
-						})));
+								.map(BreakthroughQuality::id), builder)), ctx -> {
+					ServerPlayer player = target(ctx);
+					String id = StringArgumentType.getString(ctx, "quality");
+					BreakthroughQuality quality = Arrays.stream(BreakthroughQuality.values()).filter(q -> q.id().equals(id))
+							.findFirst().orElse(null);
+					if (quality == null) {
+						return fail(ctx, "kultivator.core.debug.unknown", id);
+					}
+					CultivationData data = Cultivators.get(player);
+					data.setQuality(data.realm(), quality);
+					Stats.apply(player);
+					return done(ctx, player);
+				})));
 		debug.then(set);
 
 		debug.then(Commands.literal("addxp")
-				.then(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D))
-						.executes(ctx -> {
-							ServerPlayer player = self(ctx);
-							Progression.addXp(player, DoubleArgumentType.getDouble(ctx, "amount"), XpSource.EXACT);
-							return done(ctx, player);
-						})));
-		debug.then(Commands.literal("fill")
-				.executes(ctx -> {
-					ServerPlayer player = self(ctx);
-					CultivationData data = Cultivators.get(player);
-					data.setXp(data.rank().xpRequired());
-					data.setQi(Qi.max(data));
+				.then(targeted(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D)), ctx -> {
+					ServerPlayer player = target(ctx);
+					Progression.addXp(player, DoubleArgumentType.getDouble(ctx, "amount"), XpSource.EXACT);
 					return done(ctx, player);
-				}));
+				})));
+		debug.then(targeted(Commands.literal("fill"), ctx -> {
+			ServerPlayer player = target(ctx);
+			CultivationData data = Cultivators.get(player);
+			data.setXp(data.rank().xpRequired());
+			data.setQi(Qi.max(data));
+			return done(ctx, player);
+		}));
 		debug.then(Commands.literal("learn")
-				.then(Commands.argument("technique", StringArgumentType.word()).suggests(TECHNIQUES)
-						.executes(ctx -> learn(ctx, true))));
+				.then(targeted(Commands.argument("technique", StringArgumentType.word()).suggests(TECHNIQUES), ctx -> learn(ctx, true))));
 		debug.then(Commands.literal("forget")
-				.then(Commands.argument("technique", StringArgumentType.word()).suggests(TECHNIQUES)
-						.executes(ctx -> learn(ctx, false))));
-		debug.then(Commands.literal("deviation").then(Commands.literal("clear").executes(ctx -> {
-			ServerPlayer player = self(ctx);
+				.then(targeted(Commands.argument("technique", StringArgumentType.word()).suggests(TECHNIQUES), ctx -> learn(ctx, false))));
+		debug.then(Commands.literal("deviation").then(targeted(Commands.literal("clear"), ctx -> {
+			ServerPlayer player = target(ctx);
 			dev.kultivator.cultivation.Deviation.clear(player);
 			return done(ctx, player);
 		})));
-		debug.then(Commands.literal("toxicity").then(Commands.literal("clear").executes(ctx -> {
-			ServerPlayer player = self(ctx);
+		debug.then(Commands.literal("toxicity").then(targeted(Commands.literal("clear"), ctx -> {
+			ServerPlayer player = target(ctx);
 			Cultivators.get(player).setToxicity(0.0D);
 			return done(ctx, player);
 		})));
-		debug.then(Commands.literal("reset").executes(ctx -> {
-			ServerPlayer player = self(ctx);
+		debug.then(targeted(Commands.literal("reset"), ctx -> {
+			ServerPlayer player = target(ctx);
 			player.setAttached(ModAttachments.CULTIVATION, new CultivationData());
 			Stats.apply(player);
 			Techniques.refreshUnlocks(player);
@@ -299,7 +325,7 @@ public final class CultivateCommand {
 	}
 
 	private static int setRealm(CommandContext<CommandSourceStack> ctx, int stage, int layer) throws CommandSyntaxException {
-		ServerPlayer player = self(ctx);
+		ServerPlayer player = target(ctx);
 		String id = StringArgumentType.getString(ctx, "realm");
 		Realm realm = Realm.byId(id);
 		if (realm == null) {
@@ -322,7 +348,7 @@ public final class CultivateCommand {
 	}
 
 	private static int setRoot(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-		ServerPlayer player = self(ctx);
+		ServerPlayer player = target(ctx);
 		String gradeId = StringArgumentType.getString(ctx, "grade");
 		RootGrade grade = RootGrade.byId(gradeId);
 		if (grade == null) {
@@ -348,7 +374,7 @@ public final class CultivateCommand {
 	}
 
 	private static int learn(CommandContext<CommandSourceStack> ctx, boolean learn) throws CommandSyntaxException {
-		ServerPlayer player = self(ctx);
+		ServerPlayer player = target(ctx);
 		String id = StringArgumentType.getString(ctx, "technique");
 		CultivationData data = Cultivators.get(player);
 		if (id.equals("all")) {

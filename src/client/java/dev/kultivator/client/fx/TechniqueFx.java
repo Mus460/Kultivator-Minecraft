@@ -259,10 +259,13 @@ public final class TechniqueFx {
 		}
 	}
 
-	/** The qi of the sword under a flying cultivator's feet: a blade of motes and a drifting trail. */
+	/**
+	 * The qi of the sword under a flying cultivator's feet: side sparks and a drifting trail. The sword itself is drawn
+	 * by FlyingSwordLayer along the body yaw, so everything here follows the body yaw too.
+	 */
 	private static void swordTrail(AbstractClientPlayer player, VisualState visual, RandomSource random, long time) {
 		int color = SwordColors.color(visual.swordItem());
-		double yaw = Math.toRadians(player.getYRot());
+		double yaw = Math.toRadians(player.yBodyRot);
 		double fx = -Math.sin(yaw);
 		double fz = Math.cos(yaw);
 		double rx = -fz;
@@ -270,11 +273,6 @@ public final class TechniqueFx {
 		double x = player.getX();
 		double y = player.getY() - 0.12D;
 		double z = player.getZ();
-		int blade = EffectQuality.minimal() ? (random.nextInt(3) == 0 ? 1 : 0) : EffectQuality.scale(2);
-		for (int i = 0; i < blade; i++) {
-			double t = -0.6D + random.nextDouble() * 1.6D;
-			CommonFx.add(CommonFx.dust(color, 0.6F), new Vec3(x + fx * t, y, z + fz * t), Vec3.ZERO, false);
-		}
 		if (time % (EffectQuality.maximal() ? 1L : EffectQuality.minimal() ? 6L : 3L) == 0L) {
 			for (int side = -1; side <= 1; side += 2) {
 				CommonFx.add(CommonFx.dust(TechniqueShapes.lighten(color, 0.2F), 0.55F),

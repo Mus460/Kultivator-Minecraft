@@ -6,6 +6,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -107,7 +108,7 @@ public final class Cultivators {
 			flags |= VisualState.TRIBULATION;
 		}
 		Dao dao = data.dao();
-		ItemStack sword = bestSword(player);
+		ItemStack sword = data.flyingSword() ? flightSword(player) : bestSword(player);
 		String swordId = sword.isEmpty() ? "" : BuiltInRegistries.ITEM.getKey(sword.getItem()).toString();
 		VisualState state = new VisualState(rank.realm().ordinal(), rank.layer(), rank.stage(), dao == null ? -1 : dao.ordinal(),
 				Element.mainColor(data.rootElements()), flags, swordId);
@@ -141,6 +142,30 @@ public final class Cultivators {
 			}
 		}
 		return best;
+	}
+
+	/** While flying: the best sword not held in either hand (so it is not drawn twice), else the held one. */
+	public static ItemStack flightSword(Player player) {
+		var inventory = player.getInventory();
+		int selected = inventory.getSelectedSlot();
+		ItemStack best = ItemStack.EMPTY;
+		int bestRank = Integer.MAX_VALUE;
+		for (int i = 0; i < inventory.getContainerSize(); i++) {
+			if (i == selected || i == Inventory.SLOT_OFFHAND) {
+				continue;
+			}
+			ItemStack stack = inventory.getItem(i);
+			if (stack.isEmpty() || !stack.is(ItemTags.SWORDS)) {
+				continue;
+			}
+			int index = SWORD_ORDER.indexOf(stack.getItem());
+			int rankOf = index < 0 ? SWORD_ORDER.size() : index;
+			if (rankOf < bestRank) {
+				bestRank = rankOf;
+				best = stack;
+			}
+		}
+		return best.isEmpty() ? bestSword(player) : best;
 	}
 
 	private Cultivators() {

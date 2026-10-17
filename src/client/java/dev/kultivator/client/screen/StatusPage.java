@@ -1,5 +1,6 @@
 package dev.kultivator.client.screen;
 
+import dev.kultivator.alchemy.Alchemy;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.QiHud;
 import dev.kultivator.client.screen.ui.Brush;
@@ -242,6 +243,13 @@ final class StatusPage extends Page {
 				Component.literal(String.valueOf(data.enlightenments())), Palette.onPaper(0xFFC060)));
 		slips.add(new Slip(Component.translatable("kultivator.screen.status.tribulations"),
 				Component.literal(String.valueOf(data.tribulationsSurvived())), Palette.onPaper(0x9A7CFF)));
+		if (data.ascended()) {
+			slips.add(new Slip(Component.translatable("kultivator.screen.status.ascended"),
+					Component.translatable("kultivator.screen.status.ascended.value"), Palette.GOLD_DARK));
+		}
+		slips.add(new Slip(Component.translatable("kultivator.screen.status.alchemy"),
+				Component.translatable("kultivator.screen.status.alchemy.value", Alchemy.level(data), data.pillsRefined()),
+				Palette.onPaper(0xFFB060)));
 		slips.add(new Slip(Component.translatable("kultivator.screen.status.failed"),
 				Component.literal(String.valueOf(data.failedBreakthroughs())), data.failedBreakthroughs() > 0 ? Palette.WARN : Palette.INK_SOFT));
 		slips.add(new Slip(Component.translatable("kultivator.screen.status.hardcore"),
