@@ -1676,3 +1676,1293 @@ teknik | bintang <n>` (op only). `<name>` suggests the names of the player's own
 `semua` applies to all of them. `maks` = True Immortal Peak + heavenly root + every teachable technique + full qi and
 health; `tur` cycles the same realm list as the player tour on that disciple and restores its saved data afterwards;
 `bintang <n>` (after phase 6) sets the Bintang Abadi star tier. Implemented by the orchestrator right after phase 5.
+
+### 20.1 Principles for this phase
+
+* **Source rule (user, 2026-10-17): every idea comes from a real cultivation story.** Each feature has a **Sumber / Source** line that names the work(s) and the exact concept it adapts. Only concepts from the researchers' verified list are used, and the source lines use the verifiers' corrections. Numbers, recipes, UI and safety rules are game design and are never presented as canon. Anything without a verifiable source was dropped or redesigned (see 20.6).
+* **Block safety.** DESIGN 0 applies everywhere except Mode Kehancuran (20.3.21).
+  - Only `kehancuran/WorldBreaker` may call `setBlock`/`removeBlock`.
+  - The Sect Hall stele is placed and broken only by players, through vanilla placement and mining.
+  - Duties change no crops or blocks. Duels, phantoms, rivals, clones, auras and ultimates act on entities only. Fire is entity fire only. Lightning is particle bolts only.
+* **Targeting.** Disciple techniques, auras and ultimates hit only what `DiscipleTechniques.mayHit` accepts. The only exception is the two partners of a duel registered in `DuelRules` (tournament, Hundred Dynasties War, Void Realm, Tanding dengan Guru).
+  - Disciples still never fight `DiscipleEntity.untouchable` mobs: creeper, ghast, blaze, breeze, ravager, silverfish, Wither and heart-bound creaking.
+  - Every reward below that names one of these mobs credits the **master's** kill, never a disciple's.
+* **Performance (a laptop that also runs Valorant).**
+  - Per hall at most: 6 candidate entities, 2 duellists plus at most 1 rival or phantom, 2 clones per disciple.
+  - Disciples on expeditions or soul flight are pure data, with zero ticking.
+  - Hall logic runs every 20 ticks. The building scan is spread over 9 ticks every 30 s.
+  - Duties, expeditions and away timers are computed lazily from game time.
+  - Kehancuran stays inside the block budget of 20.3.21.
+  - Continuous visuals are client-side within 32 blocks and scaled by Effect Quality.
+* **Phase 7 items do not exist yet** (spirit stones, beast cores, elites, the player's Immortal Stars). Phase 6 uses vanilla items and the existing Kultivator pills. The player's star count is read from `extra.kultivasi.stars` (0 until phase 7 exists).
+* **Singleplayer first.** A hall belongs to one player. On LAN, members of the same `/sect` can open it read-only and donate to its pool.
+* **Constants and text.** Every number below is a `public static final` in its class, so screens show the real values. All player-facing text is in `id_id` and `en_us`. All GUI follows DESIGN 5b (jade scroll), apart from the deliberate blood-red variant of the Kehancuran warning (20.3.21).
+* **Time.** "Day index" `d = floor(overworld dayTime / 24000)`. Sunrise is `dayTime % 24000` crossing 0 and noon is crossing 6000. The hall tick checks this once per second.
+
+### 20.2 Spine additions (orchestrator, after phase 5 is committed, before the four modules start)
+
+1. **`network/Actions`.** Add these ids (21–24 stay reserved for phase 7):
+   - `HALL = 30` → `sect.hall.Halls.handleAction`
+   - `SECT_EVENT = 31` → `sect.event.SectEvents.handleAction`
+   - `DISCIPLE_POWER = 32` → `disciple.power.DisciplePowers.handleAction`
+   - `DISCIPLE_PATH = 33` → `disciple.path.DisciplePaths.handleAction`
+   - `KEHANCURAN = 34` → `kehancuran.Kehancuran.handleAction`
+
+   For disciple actions `arg` is the entity id. For hall actions `arg` is the sub-op. `text` carries `"op[:param]"`. Route all five in `Net`.
+2. **`network/Payloads`.**
+   - New `HallInfo(CompoundTag)` S2C.
+   - `OpenScreen.HALL = 3` (arg 0).
+   - `OpenScreen.KEHANCURAN_CONFIRM = 4` (arg 0 = the player's oath, otherwise the disciple entity id).
+   - Client routes go to `client.hall.HallClient.onInfo/openScreen` and `client.kehancuran.KehancuranClient.openConfirm`.
+3. **`fx/FxType`.** Append these and add their routes in `FxDispatcher`:
+
+   | FxType | Routed to |
+   |---|---|
+   | `HALL` | `client/hall/HallFx` |
+   | `SECT_EVENT` | `client/sectevent/SectEventFx` |
+   | `DISCIPLE_POWER` | `client/disciple/power/PowerFx` |
+   | `STAR` | `client/disciple/path/PathFx` |
+   | `KEHANCURAN` | `client/kehancuran/KehancuranFx` |
+
+   `FxDispatcher.tick` also calls `PowerFx.tick` and `PathFx.tick`.
+4. **`DiscipleData`.** Add `CompoundTag extra()`, saved under `"extra"`, copied in `copy()`, empty by default. Each module writes only its own sub-compound (20.4.6). Make `DiscipleCultivation.distribute(DiscipleData, double)` public so XP can be added to data whose entity is not loaded.
+5. **`DiscipleEntity`.**
+   - **Roles.** `enum Role { DISCIPLE, CANDIDATE, RIVAL, PHANTOM, CLONE }` with `role()` and `setRole(Role, @Nullable BlockPos anchor)`.
+     - Only DISCIPLE is saved, listed in `Disciples`, counted toward the cap, or able to drop a tablet. The other roles are refused in `ServerEntityEvents.ALLOW_LOAD`.
+     - CANDIDATE: no owner, invulnerable (except `/kill`), excluded from Targeting (`Targeting.addExclusion`) and from `mayAttack` in both directions. AI is a stroll within 10 blocks of the anchor plus looking at players. Right-click calls `Candidates.onInteract` (A).
+     - RIVAL and PHANTOM: `NoGrief.TAG`. They fight only their `DuelRules` partner.
+     - CLONE: allied with its source's master. Fights monsters, follows its source, not saved.
+   - **Activity.** `activity()` and `setActivity(int id, @Nullable BlockPos spot)`.
+     - Ids: 0 none, 1 water, 2 garden, 3 kitchen, 4 farm, 5 formation guard, 6 tower, 7 void body, 8 spectator, 9 duellist.
+     - While the id is 1–8 the disciple holds the spot like STAY and fights only when hit (5 guards the spot).
+   - **New order.** `Mode.GUARD_HALL`: patrols within 32 blocks of its hall stele and fights hostiles inside the territory.
+   - **New synced fields** for the client: role (byte), activity (byte), sect rank (byte), stars (int), talent (int: physique 4 bits, soul colour 3 bits, special 2 bits), power flags (int: bits 0–15 module C, 16–31 module D). Setter: `setSyncedPower(...)`.
+6. **`disciple/DiscipleHooks`** (new, spine-owned; providers registered in each module's `init()`). The spine wires each call into phase-5 code; the call site is in brackets:
+
+   | Hook | Call site | Combine rule |
+   |---|---|---|
+   | `potentialFactor(DiscipleData)` | `xpMultiplier` | replaces the root-grade factor (default: root multiplier) |
+   | `rankFactor(DiscipleData)` | `xpMultiplier` | replaces `XP_FACTOR` (default 0.6) |
+   | `xpFactor(@Nullable DiscipleEntity, DiscipleData, XpSource)` | `xpMultiplier` | product |
+   | `masterShareFactor(DiscipleData)`, `masterShareAnyRange(DiscipleData)` | master-meditation share | product; any true |
+   | `stats(DiscipleEntity, StatSink)` | `refreshSynced` | applied as permanent modifiers, removed when absent |
+   | `damageFactor(DiscipleEntity, LivingEntity target, boolean technique)` | `DiscipleTechniques` hurt, `doHurtTarget` | product |
+   | `hurtFactor(DiscipleEntity, DamageSource)` | start of `hurtServer` | product |
+   | `onHurt(DiscipleEntity, DamageSource, float)` | after damage | – |
+   | `onDeath(DiscipleEntity, DamageSource) → boolean` | before `die`/tablet | first true = handled (cancelled or soul flight) |
+   | `combatCast(DiscipleEntity, LivingEntity) → boolean` | start of `tryCastInCombat` | first true wins |
+   | `tick20(DiscipleEntity)` | every 20 ticks | – |
+   | `onKill(DiscipleEntity, LivingEntity)` | `onKill` | – |
+   | `strikeFactor(e, Rank target, int index)` | `DiscipleBreakthrough` strikes | product, floored at 0.5 |
+   | `qualityBonus(e, Rank target)` | quality roll | sum, −0.10…+0.40 |
+   | `qualityFloor(e, Rank target) → @Nullable BreakthroughQuality` | after the roll | highest wins |
+   | `foundationChance(e)` | `chance` | sum |
+   | `breakthroughBlocker(e) → @Nullable String` | `breakthroughBlocker` | first non-null |
+   | `breakthroughListener (onStart, onStrike, onEnd(success, kind))` | `DiscipleBreakthrough` | – |
+   | `teachBlocker(e, master, technique)` | `teachBlocker` | first non-null |
+   | `teachCostFactor(e, master, technique)` | `teachCost` | product |
+   | `daoBypass(DiscipleData) → boolean` | `ready`, `teachBlocker` Dao check | any true |
+   | `onTaught(e, master, technique)` | after `teach` | – |
+   | `feedHandler(e, master, stack) → boolean` | start of `feed` | first true consumes |
+   | `onFed(e, master, stack)` | after a successful `feed` | – |
+   | `modeBlocker(e, Mode) → @Nullable String` | mode setter | first non-null |
+   | `retreatFraction(e)` | `RetreatGoal` (default 0.25) | max |
+   | `regenFactor(e)` | regeneration | product |
+   | `info(e, master, CompoundTag)` | end of `infoFor` | – |
+   | `cap(ServerPlayer) → int` | every disciple-count check | replaces `MAX_DISCIPLES` (default 5) |
+7. **`Disciples` (phase-5 core).**
+   - `CompoundTag depart(DiscipleEntity, String reason)`: removes the entity silently and marks the list entry `away`. Away disciples still count toward the cap.
+   - `@Nullable DiscipleEntity arrive(ServerLevel, Vec3, CompoundTag, UUID owner)`: restores the disciple and clears the away mark.
+   - `DiscipleEntity createCandidate(ServerLevel, Vec3, DiscipleData, Component name, int skin, boolean slim, BlockPos anchor)`.
+   - `boolean recruitCandidate(ServerPlayer, DiscipleEntity candidate)`: switches the candidate to role DISCIPLE in place, sets the owner, adds the list entry, and reuses the welcome messages and FX of `recruit`.
+   - Delete `data/kultivator/recipe/recruitment_scroll.json`. The scroll stays in the creative tab and its tooltip says "Hanya kreatif / Creative only".
+8. **`disciple/DuelRules`** (new, spine-owned).
+   - API: `begin(LivingEntity a, LivingEntity b, int maxTicks, Listener)`, `dueling(Entity, Entity)`, `end(...)`.
+   - Consulted first in `DiscipleEntity.mayAttack`, `isInvulnerableTo` and `DiscipleTechniques.mayHit`, and at the top of `Targeting.isHostileTo` so a master's techniques reach his duel partner.
+   - Damage between partners is clamped to keep at least 10% max health. A clamped hit ends the duel. Players use the `ServerLivingEntityEvents.ALLOW_DAMAGE` pattern from `Sparring`.
+   - `Listener.onEnd(winner, loser, Reason { DEFEAT, TIMEOUT, LEFT_RING, CANCELLED })`. On TIMEOUT the higher health fraction wins.
+9. **`cultivation/DaoProtectors`.** Additive `int spawnWaveFor(ServerLevel, LivingEntity target, @Nullable ServerPlayer owner, Rank target, int size, double healthFactor)`. It uses the same hardening, tags and cleanup, with `target` as the first target.
+10. **`cultivation/Progression`.** `addMultiplierProvider(ToDoubleFunction<ServerPlayer>)`, multiplied into `xpMultiplier` (used by D's Kebanggaan Guru).
+11. **`KultivatorConfig`.** New fields (clamped on load):
+    - `sectHall = true`, `recruitmentIntervalDays = 3` (1–15), `sectEvents = true`, `tournamentIntervalDays = 7` (3–30), `forbiddenGroundIntervalDays = 15` (5–60)
+    - `modeKehancuran = false`, `kehancuranMaxRadius = 12` (4–24), `kehancuranBlocksPerTick = 48` (8–256), `kehancuranMaxBlocksPerCast = 4096` (256–16384), `kehancuranDropsPct = 0` (0–10), `kehancuranHallSafeRadius = 64` (48–256), `kehancuranPlayerSafeRadius = 24` (16–128), `kehancuranMsptPause = 45` (30–50), `kehancuranWarningSeconds = 30` (10–60), `kehancuranUndoMinutes = 10` (0–30)
+
+    `KultivatorConfig.save()` must exist so `/kultivasi kehancuran izin` can write the file.
+12. **Entry points.**
+    - `Kultivator.onInitialize` (before `ModItems.init()`) calls `sect.hall.Halls.init()`, `sect.event.SectEvents.init()`, `disciple.power.DisciplePowers.init()`, `disciple.path.DisciplePaths.init()` and `kehancuran.Kehancuran.init()`.
+    - `CultivateCommand` calls each module's `addCommands`.
+    - `KultivatorClient` calls `client.hall.HallClient.init()`, `client.sectevent.SectEventClient.init()`, `client.disciple.power.PowerClient.init()`, `client.disciple.path.PathClient.init()` and `client.kehancuran.KehancuranClient.init()`.
+13. **Client stubs.**
+    - `client/hall/HallScreen` with tablet slots and stub pages:
+      - `AulaPage`, `CalonPage`, `JenjangPage`, `TreasuryPage`, `LogPage` (A)
+      - `DutyPage`, `MissionPage`, `ArenaPage` (B)
+      - `RedSealPage` (D, shown only when `HallInfo.cfg.kehancuran` is true)
+    - `DiscipleScreen` gets `TAB_TALENT = 4` (stub `TalentTab`, C), `TAB_TREASURE = 5` (stub `TreasureTab`, C) and `TAB_PATH = 6` (stub `PathTab`, D). Tablets shrink to fit 7 inside 240 px.
+14. **Stub classes** with the exact public signatures of 20.4.5, so every module compiles against the others in any order.
+
+### 20.3 The features
+
+#### 20.3.1 Prasasti Aula Sekte: the hall, its level and its territory (module A)
+
+**Sumber / Source.**
+- *Battle Through the Heavens*: the Xiao clan's Dou Qi testing stone monument reads each youth's talent in public. The stele is that testing stone.
+- *A Record of a Mortal's Journey to Immortality*, ch. 153: Yue Lu Hall is an abode on Great Shaman's Mountain, covered by a spell formation, that stores magic tools, pill recipes and technique manuals and supplies materials. This gives the hall and its pavilion.
+- *I Shall Seal the Heavens*, ch. 36–38: Meng Hao studies a whole season in the Magic Pavilion. This is the pavilion requirement.
+- *Return of the Mount Hua Sect*: a ruined, unknown sect regains its fame through victories, and applicants then return. This is renown.
+- *Perfect World*, ch. 551/558: Shi Hao vows to rebuild the ruined Heaven Mending Pavilion. This is "rebuild to level up".
+
+**Block.** `sect_hall_stele`, *Prasasti Aula Sekte / Sect Hall Stele*.
+- Shaped recipe: `G B G / A L A / G B G` (G gold ingot, B bookshelf, A amethyst block, L lodestone).
+- Hardness 3.5, any pickaxe, blast resistance 1200, push reaction BLOCK, light 7, drops itself.
+- Model: a jade tablet with a gold cap on a stone foot.
+
+**Registration** (`setPlacedBy`, server side).
+- If the placer has no hall, a hall is founded:
+  - `HallData` stores owner, dimension, position, `founded_day`, name "Sekte <player>" (renamable on the Aula page, validated with `Sect.validName`).
+  - Effects: pillar plus bell chime, chat line "Aula Sekte berdiri", advancement `sect_gate_open` ("Gerbang Sekte Terbuka").
+- If the placer already has a hall, the new stele is inert. Sneak-using it with an empty hand offers "Pindahkan Aula ke sini?" (move the hall; cooldown 1 in-game day). Renown, pool, storehouse, candidates and away teams move with it.
+- A stele within 128 blocks of another player's hall is inert, with a message.
+- If the owner is in a `/sect`, the screen shows the sect name and sect mates get read-only view plus donations.
+
+**Removal.**
+- Whenever the block is gone (mined, or noticed missing by the 30 s check), the hall becomes **dormant**. Nothing is deleted: candidates leave, duties pause, and away teams return beside the master instead of at the hall.
+- Placing a stele again (anywhere) reactivates the hall with all its data. Renown can only be earned, so re-placing gains nothing.
+
+**Tingkat Aula / Hall level 1–9** = `min(renownLevel, buildingCap)`.
+
+| Level | Renown needed | Candidates per Penerimaan | Disciple cap | Territory radius | Exchange price | Duty posts | Missions per day |
+|---|---|---|---|---|---|---|---|
+| 1 | 0 | 2 | 5 | 24 | ×1.00 | 1 | 3 |
+| 2 | 100 | 2 | 6 | 28 | ×1.00 | 1 | 3 |
+| 3 | 300 | 3 | 6 | 32 | ×0.95 | 2 | 3 |
+| 4 | 700 | 3 | 7 | 36 | ×0.95 | 2 | 4 |
+| 5 | 1,500 | 3 | 7 | 40 | ×0.90 | 2 | 4 |
+| 6 | 3,000 | 4 | 8 | 44 | ×0.90 | 3 | 4 |
+| 7 | 6,000 | 4 | 8 | 48 | ×0.85 | 3 | 4 |
+| 8 | 12,000 | 4 | 9 | 52 | ×0.85 | 3 | 5 |
+| 9 | 25,000 | 5 | 9 | 56 | ×0.80 | 4 | 5 |
+
+Formulas: candidates `2 + floor(L/3)`, cap `5 + floor(L/2)`, radius `20 + 4L`, price `1 − 0.05 × floor((L−1)/2)`, posts `1 + floor(L/3)`. Without a hall the cap stays 5.
+
+**Building caps.** Read-only. Scanned in a box of ±16 blocks horizontally and y −2…+6 around the stele (the tower box is ±32), spread one y-slab per tick over 9 ticks, every 30 s while the hall chunk is loaded and whenever the screen opens.
+
+| Building (source) | Requirement | Allows up to |
+|---|---|---|
+| (stele only) | – | Level 2 |
+| **Paviliun Kitab** (Yue Lu Hall, Magic Pavilion) | ≥ 10 bookshelves or chiseled bookshelves + 1 lectern within 16 | Level 4 |
+| **Formasi Agung** (Yue Lu Hall's covering formation) | an active, registered Protective Formation with its lodestone within 24 | Level 6 |
+| **Aula Latihan** (Mount Hua's drill ground) | ≥ 4 target blocks within 16 | Level 8 |
+| **Menara Langit Membara** (20.3.15) | ≥ 3 tower rooms within 32 | Level 9 |
+
+**Ketenaran Sekte / renown** (never decreases; awards come only from the owner's own disciples):
+
+| Event | Renown |
+|---|---|
+| Disciple breakthrough | 10 × target realm ordinal |
+| Disciple calamity passed | 100 |
+| Every 9th disciple star | 50 |
+| Tournament 1st / 2nd / 3rd | 200 / 100 / 50 (Turnamen Elit ×2.5) |
+| Expedition success | 10 × tier |
+| Forbidden ground survivor | 30 each |
+| Boss killed with a disciple dealing ≥ 20% of the damage | 100 (once per boss type per day) |
+| Lost art restored | 500 |
+
+At level 5 the server announces "Sekte <nama> telah kembali!". The Mount Hua line is credited in its tooltip.
+
+**Territory.** Horizontal distance ≤ radius, |dy| ≤ 32, same dimension. Used by candidates, duties, events, elder auras and GUARD_HALL.
+
+**Hall screen** (owner right-clicks the stele: `HallInfo` + `OpenScreen.HALL`). Vertical tablets:
+
+| Tablet | Content |
+|---|---|
+| Aula | name, level and renown bar, building checklist with hints, cap, schedule of the next events, away teams |
+| Calon | candidates (20.3.3) |
+| Jenjang | ranks (20.3.6) |
+| Perbendaharaan | contribution points (20.3.7) |
+| Tugas | duties (B) |
+| Misi | expeditions (B) |
+| Arena | events (B) |
+| Catatan | last 50 log lines stamped with day index |
+| Segel Merah | Mode Kehancuran (D), only when the server allows it |
+
+It fits 320×240; the tablets scroll when fewer than 9 fit.
+
+**Performance.** One hall map lookup per second, one spread scan every 30 s, no per-block ticking.
+
+#### 20.3.2 Formasi Agung Sekte: the grand protective formation (module A, edits `formation/*`)
+
+**Sumber / Source.**
+- *A Record of a Mortal's Journey to Immortality*, ch. 153: Yue Lu Hall is entirely covered by a spell formation.
+- *Renegade Immortal*, ch. 216: Wang Lin lays hidden restrictions so no one can enter while he cultivates. This gives stacked restriction layers.
+- *Soul Land*: the Seven Treasure Glazed Tile Sect is guarded by two Titled Douluo protectors, Sword Douluo and Bone Douluo. This is the Pelindung post (20.3.6).
+
+A Protective Formation (DESIGN 10) of the hall owner, with its lodestone within 24 blocks of an active stele, becomes **Formasi Agung Sekte**.
+- **Radius:** `min(32, 16 + 2 × level)`.
+- **Penjaga Formasi:** a Foundation+ disciple in STAY or MEDITATE within 3 blocks of the lodestone (A sets activity 5) keeps it powered with no amethyst drain while it is there. A shows "Dijaga: <nama>".
+- **Lapisan Larangan / restriction layers:** `1 + (Tetua and Tetua Agung inside the territory) + (Dalam+ Penjaga Formasi)`, at most 4.
+
+| Layer | Effect on monsters inside |
+|---|---|
+| 1 | Push out + 1 damage/s (unchanged) |
+| 2 | + Slowness II |
+| 3 | + Slowness V for 3 s when crossing the edge |
+| 4 | Damage 2/s; monsters inside are outlined for the owner (client FX through `FormationFx`, no Glowing effect) |
+
+- Each Pelindung Sekte inside the territory multiplies formation damage by 1.5 (max 2).
+
+**Performance.** Unchanged: one scan per second per formation.
+
+#### 20.3.3 Hari Penerimaan Murid: candidates arrive, are tested and accepted (module A)
+
+**Sumber / Source.**
+- *A Record of a Mortal's Journey to Immortality*, ch. 1–5: the Seven Mysteries Sect holds its test once every 5 years. The climb has three stages: bamboo forest, crumbling slope and the rope up Bone Refining Cliff. Han Li misses the noon deadline, but his determination earns him Unofficial Disciple status, retested after half a year.
+- *Renegade Immortal*, ch. 3–29: Wang Lin fails the spirit test and enters only as an honorary (grey-robed) disciple. "Murid Tercatat" is the mod's name for that rank.
+- *Battle Through the Heavens*: Jia Nan Academy sends tutors to test and recruit youths, and the testing stone reads Dou Zhi Li in 1–9 Duan.
+- *Tales of Demons and Gods*, ch. 13–14: the seven soul-realm colours, red lowest, azure and indigo near-legendary.
+- *Soul Land*: Spirit Hall awakens village children every year on schedule, and Shrek accepts "only monsters".
+- *I Shall Seal the Heavens*, ch. 19: youths with latent talent are taken in as servants.
+- *Return of the Mount Hua Sect*: talented youths avoid a fallen sect.
+
+**Schedule.** The arrival day is every `recruitmentIntervalDays` (3) days: `d ≡ founded_day (mod interval)`, plus the first sunrise after founding.
+- At sunrise, if the hall is active, its chunk is loaded and the owner is online within 128 blocks, candidates arrive. Otherwise the arrival waits until those hold, but only within the same day; missed days never stack.
+- Every 4th arrival day at hall level 3+ is the **Perang Seratus Dinasti** instead (20.3.13).
+- **Count:** N = candidates of the level, +1 at renown ≥ 3,000 ("the sect's fame returns"), max 6.
+- They step out of a travellers' mist puff on safe ground 8–14 blocks from the stele (`Targeting.safeSpot`, never in blocks or fluids; fewer if no spot is found). A distant bell sounds, the owner gets a chat line and a toast.
+- Candidates stay until the next sunrise. They sit and doze at night, then bow and vanish.
+
+**Data first.** Each candidate is a record in `HallData`:
+- `DiscipleData.fresh`, name, skin, slim
+- age 12–16 (cosmetic, plus Calon Jenius)
+- **Tekad** (determination) 0–100, rolled uniform 20–100 and always visible
+- talents, physique and special type (rolled now, hidden until tested)
+- tested flag, expiry tick
+
+The entity (role CANDIDATE, nametag "Calon · ???") is only a view of the record. It is re-created when the hall chunk loads with the owner within 64 blocks, and never saved.
+
+**Rolling** (module A writes, module C applies effects):
+- Root: `SpiritRoots.roll`.
+- Renown gate: a HIGH root while renown < 300, or a HEAVENLY root while renown < 1,000, is re-rolled down one grade. The card notes "Calon berbakat menghindari sekte yang belum dikenal".
+- 'Hanya Monster' toggle (jade coin on the Calon tablet): only candidates with root ≥ HIGH or a physique are generated, and N − 1 of them (min 1).
+
+**Ujian Masuk / the entrance test.** Talisman "Uji (1 Pecahan Kecubung)" on the card, or right-click the candidate holding an amethyst shard. It costs one shard and plays a 6 s cinematic:
+1. **0–3 s:** three tiers of particles climb beside the candidate (bamboo green, stone grey, cliff gold; Fanren's three stages). Tiers climbed:
+   - +1 if root grade ≥ LOW
+   - +1 if Tekad ≥ 40
+   - +1 if `grade × 20 + Tekad ≥ 110`
+2. **3–6 s:** the stele raises a light pillar of **Duan** segments 1–9 (BTTH), one chime per segment, coloured with the candidate's **soul colour** (TDG, 20.3.5).
+   - Duan = `clamp(1 + 2 × grade + floor((5 − elementCount)/2) + (physique ? 1 : 0), 1, 9)`.
+
+The card then reveals root, colour, talents, physique and special type.
+
+**Verdict.**
+
+| Verdict | Condition | Can join as |
+|---|---|---|
+| **Lulus sebelum tengah hari** | all 3 tiers | Murid Luar, free |
+| **Murid Tercatat** | otherwise, Tekad ≥ 70 (the Han Li / Wang Lin path) | Tercatat, free; a TRASH/LOW root also gets the talent Hati Gigih |
+| **Ditolak** | anything else (one of 4 polite lines) | Tercatat as servant ("Jalur Pelayan", ISSTH), 100 PK from the pool |
+
+Untested candidates can be accepted blind; everything is revealed on joining.
+
+**Acceptance.** Talisman "Terima": cap check, then `Disciples.recruitCandidate` at the candidate's spot.
+- Effects: the existing recruit FX plus a jade ring and a bow.
+- Starts as a Mortal (the phase-5 awakening flow) at the rank of its verdict.
+- Advancements `first_recruit_hall`, and `determined_disciple` for a Tercatat.
+- "Undang pergi" dismisses a candidate.
+
+**Calon Jenius** (TDG Genius class): age ≤ 14 and colour ≥ Sian. Shown as a flag; adds +5% to its physique roll.
+
+**UI (Calon tablet).** One scroll card per candidate: face, name, age, Tekad bar, verdict seal, talisman buttons, a countdown "Pergi saat fajar 0:14:20", and "Penerimaan berikutnya: hari 12".
+
+**Performance.** At most 6 candidate entities, each with a stroll goal ticked every 10 ticks and look-at AI.
+
+#### 20.3.4 Token Kenaikan Abadi and the Calon Istimewa (A rolls, C applies)
+
+**Token Kenaikan Abadi / Immortal Ascension Token** (`immortal_ascension_token`, not craftable).
+
+**Sumber / Source.** *A Record of a Mortal's Journey to Immortality*: the Immortal Ascension Token lets whoever holds it enter a sect regardless of spiritual root, and entitles the bearer to one Foundation Establishment Pill.
+
+- **Loot:** `LootTableEvents.MODIFY`, built-in tables only, 6% in `chests/stronghold_library` and `chests/ancient_city`, 4% in `chests/trial_chambers/reward_ominous`.
+- **Use:** right-click the active stele. One candidate arrives at once: root ≥ MID, Tekad ≥ 60, already tested.
+- **Recruiting it:** joins as Murid Luar whatever the verdict, and the master receives one Normal-quality Foundation Establishment Pill.
+- Advancement `immortal_token`.
+
+**Calon Istimewa** (at most one per arrival; flags in `extra.talent.special`):
+
+| Type | Chance | Sumber / Source | Effect (module C) |
+|---|---|---|---|
+| **Pengemis di Gerbang** (Beggar at the Gate) | 2% per arrival, once per hall | *Return of the Mount Hua Sect*: the Plum Blossom Sword Saint is reborn as a ragged beggar boy, joins as a lowly third-generation disciple and is secretly the greatest swordsman. | Card shows TRASH / Merah. On reaching Foundation, a reveal cinematic: root HEAVENLY, colour Nila, +30 comprehension when the Sword Dao is chosen (+10 for any other Dao), and the innate Plum Blossom passive of 20.3.8. |
+| **Murid Regresor** (Regressor) | 3% | *Volcanic Age*: a mediocre Mount Hua elder is sent back to his youth on his deathbed with his memories. *Absolute Sword Sense*: Soh Woonhwi regresses ten years. | Remembers a previous-life realm R (Golden Core–Dao Union, shown "???" until tested). Until R: XP ×1.6, every breakthrough at least Perfect (`qualityFloor`), strikes ×0.8. |
+| **Dantian Tersumbat** (Blocked Dantian) | 4% | *Stellar Transformations*: Qin Yu's dantian cannot store energy, so he trains the body and becomes mighty. | Cannot learn qi techniques (teach blocker with the reason). Melee ×1.6, max-health bonus ×1.5, its breakthrough failures cause no Qi Deviation, kill XP ×1.4, star-qi meditation ×1.5, Undying Codex free. |
+
+#### 20.3.5 Warna Alam Jiwa, Bakat and Fisik Langka: soul colour, talents, physiques (A rolls, C applies)
+
+**Warna Alam Jiwa / soul colour.**
+
+**Sumber / Source.** *Tales of Demons and Gods*, ch. 13–14:
+- Seven colours: red, orange, yellow, green, cyan, azure, indigo.
+- Teacher Shen Xiu claims a red realm caps soul force at 600 unless fortuitous circumstances occur.
+- Nie Li insists no soul realm is crippled.
+
+Derived from the root grade (existing disciples: from their grade, Yellow for MID). It replaces the root XP multiplier through `potentialFactor`:
+
+| Colour | Root grade | XP factor |
+|---|---|---|
+| Merah / Red | TRASH | 0.6 |
+| Jingga / Orange | LOW | 0.85 |
+| Kuning / Yellow | MID (60%) | 1.0 |
+| Hijau / Green | MID (40%) | 1.1 |
+| Sian / Cyan | HIGH (65%) | 1.3 |
+| Biru Langit / Azure | HIGH (35%) | 1.5 |
+| Nila / Indigo | HEAVENLY | 1.7 |
+
+- **Red cap:** a Merah disciple cannot break through out of Golden Core Peak (`breakthroughBlocker`: "Alam jiwa merah menahan…"). XP beyond the full bar goes to Stored Qi at 50%.
+- **Good fortune** lifts the colour one step:
+  - a Marrow Cleansing Pill fed through the existing feed rules (a new grade takes that grade's base colour), or
+  - "Keberuntungan": 1% per minute while meditating within 8 blocks of the meditating master.
+
+  The colour tints the aura and the name line.
+
+**Bakat / talents.** Rolled at creation: 60% none, 32% one, 8% two. Shown as seal tiles on the Bakat tab.
+
+| Talent (weight) | Sumber / Source | Effect |
+|---|---|---|
+| **Hati Gigih** / Persevering Heart (26, TRASH/LOW roots only) | *A Record of a Mortal's Journey*: Han Li rises through persistence on a poor pseudo root. | Meditation and duty XP ×1.3, Foundation chance +0.08, strikes ×0.9 |
+| **Darah Dewa Kuno** / Ancient God Blood (2) | *Renegade Immortal*: Wang Lin inherits the Ancient God Tu Si; Ancient Gods grow by stars, and Tu Si met his first trial at eight stars. | Max-health bonus ×1.5, melee ×1.3, star health ×1.5, first calamity at star 8 |
+| **Bakat Pil** / Pill Gift (22) | *I Shall Seal the Heavens*: Meng Hao's gift for alchemy makes him the Pill Demon's disciple. | Fed pills ×1.3, pill cooldown −30%; when Herba Fondasi is refined (20.3.11), 25% chance of +1 quality step |
+| **Jari Penempa Roh** / Spirit Enhancer (22) | *A Will Eternal*: Bai Xiaochun's gift for spirit enhancement. | Natal enhancement +15% success, +1 max fold |
+| **Takut Mati** / Fear of Death (16) | *A Will Eternal*: Bai Xiaochun's overwhelming fear of death. | Retreats at 40% HP (`retreatFraction`), regeneration ×2 while retreating, Undying Codex points ×2 |
+| **Indra Pedang** / Sword Sense (12) | *Absolute Sword Sense*: Soh Woonhwi hears weapons and reads their wielders' styles. | Against monsters holding a sword: 30% dodge of their melee, ×1.5 comprehension from killing them; after 20 such kills, +10% sword damage (melee and Sword techniques) |
+
+**Fisik Langka / rare physique** (one at most).
+- Chance: 6% base, +1% per hall level above 1, +5% for Calon Jenius, 30% with a HEAVENLY root, 50% for the Hundred Dynasties champion.
+- Weights in brackets. Effects (module C), all monsters-only.
+
+| Physique (weight) | Sumber / Source | Effect |
+|---|---|---|
+| **Tubuh Racun Malapetaka** / Woeful Poison Body (14) | *Battle Through the Heavens*: the Little Fairy Doctor's Woeful Poison Body and Seven-Colored Poison Manual; it grows out of control until Xiao Yan's Poison Pill gives her a normal life. | Immune to Poison and Wither; melee adds Poison II 4 s. From Foundation: aura 0.3 U/s within 4 (one query per second). Toxic meter +1 per minute of fighting; at 100, "Racun Mengamuk" for 60 s (aura ×2, ignores Follow, still monsters only). A Healing Pill (the Poison Pill stand-in) resets the meter. From Deity Transformation: "Kabut Racun Tujuh Warna", a 6-block cloud for 8 s (Poison III + Wither II), cooldown 45 s. |
+| **Darah Naga Purba Taixu** / Taixu Ancient Dragon (12) | *Battle Through the Heavens*: Zi Yan, a young Taixu Ancient Dragon in human form, devours pills and takes dragon form. | Pill effects ×1.5, pill cooldown ×0.5. From Nascent Soul: "Wujud Naga" for 20 s (scale ×1.4 if there is head room, +50% damage, knockback immune, flame-breath cone of 6 blocks at 1.2 U/s with entity fire 3 s), cooldown 120 s. |
+| **Garis Darah Dou Di** / Dou Di Bloodline (10) | *Battle Through the Heavens*: the Xiao clan's ancient Dou Di bloodline, awakened later by Xiao Yan. | +0.12 quality score on every breakthrough. At Dao Union, a one-time awakening cinematic: +15% to all stats and +1 stage. |
+| **Tubuh Emas Tulang Angkuh** / Proud Golden Body (14) | *Martial Peak*: Yang Kai's Proud Golden Body grows stronger through the beatings he endures. | Every 10 damage taken = 1 Darah Emas stack (max 40, −1 per 30 s); each stack +1.5% damage and +0.5% damage reduction. Every 500 damage survived: +0.5 max HP for good (max +30). |
+| **Pembawa Simbol Melahap** / Devouring Ancestral Symbol (8) | *Martial Universe*: Lin Dong carries the Devouring Ancestral Symbol. | Kills give +25% XP and heal 5% of the victim's max health. Unlocks Pusaran Melahap (20.3.21). |
+| **Tulang Mahatinggi** / Supreme Bone (10) | *Perfect World*: Shi Hao's innate Supreme Bone with bone-text techniques; ch. 1996, after losing bones he forms an even stronger bone text. | From Foundation, one innate "Teknik Pusaka" for its main root element: METAL sword_qi, WOOD life_drain, WATER/ICE frost_lotus, FIRE flame_palm, LIGHTNING thunder_palm, EARTH mountain_stomp, WIND gale, SPACE space_prison. Power ×1.5, no slot, any Dao, cannot be taught. Kill XP ×1.25. At star 9 the bone "sheds": power ×2.25. |
+| **Pupil Ganda** / Double Pupils (10) | *Perfect World*: Shi Yi's Double Pupils fire swords and beams of light. | 25% dodge against monster melee, technique damage ×1.2. Every 10 s, monsters within 16 get an eye-glyph marker for the master only (client FX). |
+| **Nadi Dewa Sesat** / Heretic God Veins (8) | *Against the Gods*, ch. 45–47: Yun Che's veins look absolutely ordinary until all 54 entrances open; ch. 46: seven gates in the core of the veins, each opened gate raising the Heretic God Arts one realm, classed Berserk, and opening one too early can kill. | Shows as TRASH / Merah (red cap exempt). At the Golden Core breakthrough, a reveal cinematic: colour Nila with a special factor of 2.0. **Seven gates** open at Golden Core, Nascent Soul, Deity Transformation, Dao Union, Immortal Ascension layer 5, True Immortal and star 9. Names: Jiwa Sesat, Hati Membara, Api Penyucian, Langit Bergemuruh, Raja Neraka, Gerbang Keenam, Gerbang Ketujuh. Each gate +15% damage. "Ledakan Gerbang" (automatic below 50% HP in a boss fight, or ordered): 20 s at damage ×(1 + 0.25 × gates), then +30% damage taken and Weakness for 30 s, cooldown 5 min. Gate 7 unlocks Murka Raja Neraka (20.3.21). |
+| **Alam Jiwa Tanpa Atribut** / Attributeless Soul Realm (14) | *Tales of Demons and Gods*, ch. 14: Nie Li's attributeless red realm suits the Heavenly God technique, slow at first, highest potential, able to wield techniques of every attribute. | XP ×0.8 before Golden Core, ×1.4 from Dao Union. Learns and casts techniques of every Dao (`daoBypass`). |
+
+#### 20.3.6 Jenjang Sekte: ranks and promotions (module A)
+
+**Sumber / Source.**
+- *Renegade Immortal*: honorary disciples are a lower rank in grey.
+- *A Record of a Mortal's Journey*: an unofficial disciple is retested after half a year. Ch. 871: the grand elder title "rightfully belongs to the strongest cultivator", offered to Han Li at mid Nascent Soul.
+- *I Shall Seal the Heavens*, ch. 27–31: Outer and Inner Sects, with a special promotion training that admits one Outer disciple.
+- *Battle Through the Heavens*: Outer and Inner Academy, and Grand Elder Su Qian presiding over the Inner Academy.
+- *Martial Peak*: Yang Kai is a lowly Trial Disciple and floor sweeper.
+- *Return of the Mount Hua Sect*: generations of disciples, instructors and elders, with the reborn junior Chung Myung drilling his seniors.
+- *Soul Land*: two Titled Douluo protectors guard the Seven Treasure Glazed Tile Sect.
+
+Rank is stored in `extra.sect.rank`.
+- Shown as a nametag prefix "[Dalam] Lin Feng · Inti Emas", a robe trim colour (C) and a rank tile on the Status and Bakat tabs.
+- Technique slots limit only *new* teaching; techniques already known are kept.
+
+| # | Rank | Requirements to be promoted into it | Slots | XP factor (`rankFactor`) | Trim | Perks |
+|---|---|---|---|---|---|---|
+| 0 | **Murid Tercatat** (Registered) | joins via determination or the servant path | 2 | 0.55 | grey | orders only FOLLOW / MEDITATE plus duties (`modeBlocker`); ×1.2 duty output |
+| 1 | **Murid Luar** (Outer) | Qi Refining, 30 PK, and ≥ half a recruitment cycle (36,000 ticks by default) since joining ("Uji Ulang", Fanren's retest) | 3 | 0.60 | white | all orders, mission tiers 1–2 |
+| 2 | **Murid Dalam** (Inner) | Foundation, 150 PK, and a passed **Latihan Khusus** (20.3.15) | 5 | 0.70 | blue | missions up to tier 5, Void Realm, tower |
+| 3 | **Murid Inti** (Core) | Golden Core, 600 PK, and a top-3 tournament finish or Void Realm floor 10 | all | 0.80 | jade | missions of every tier, can lead (+0.05 success) |
+| 4 | **Tetua** (Elder; max 1, or 2 at hall level 5+) | Nascent Soul, 1,500 PK | all | 0.90 | violet | aura: disciples meditating within 16 get ×1.15 XP; teaches juniors techniques it knows, paid from 30% of its own qi (Mount Hua) |
+| 5 | **Tetua Agung** (Grand Elder; max 1) | Nascent Soul Middle, the highest `DisciplePaths.power` among the master's disciples, and appointed by the master | all | 1.00 | white-gold | aura ×1.2 across the territory, +1 Formasi Agung layer |
+
+**Designations** (independent of rank):
+- **Pewaris** (heir, 20.3.20).
+- **Pelindung Sekte** (Protector):
+  - Max 1, or 2 at hall level 7+. Needs Dao Union or star ≥ 1.
+  - Order GUARD_HALL. Regeneration II while in the territory. Formasi Agung damage ×1.5.
+
+**Jenjang tablet.**
+- A six-storey pagoda drawing with disciple seals on each floor. Clicking a seal opens a slip with the requirement checklist and the "Naikkan" / "Turunkan" talismans.
+- Promotion costs the disciple's own PK. It plays a 3 s robe flash in the new trim colour, a bell, and a sect chat line.
+- Demotion is free and refunds nothing; the floor is Tercatat.
+- Advancements `first_promotion`, `grand_elder`.
+
+**Migration** (phase-5 disciples with no `extra.sect`): Luar below Foundation, Dalam at Foundation–Golden Core, Inti from Nascent Soul. PK 0.
+
+#### 20.3.7 Poin Kontribusi, Kantor Misi and Paviliun Yue Lu (module A)
+
+**Sumber / Source.**
+- *A Will Eternal*, ch. 9 and 27: Outer disciples bring spirit plants to the Missions Office, an elder grades them, and merit points are paid by quality. Merit buys scripture sermons, the Magical Arts Pavilion and the 10,000 Medicines Pavilion.
+- *Martial Peak*: the Contribution Hall trades contribution points for herbs, pills and recipes.
+- *A Record of a Mortal's Journey*, ch. 153: Yue Lu Hall stores manuals and pill recipes and supplies materials.
+- *Battle Through the Heavens*: Fire Energy pays for tower training time (used in 20.3.15).
+
+**PK** (integers) exist in two places: the hall pool `pool` (the master's) and each disciple's `extra.sect.pk`.
+
+**Earning.**
+- **Pool, Kantor Misi:** the master offers stacks from the inventory, and an elder line grades them ("Tetua menilai: kualitas tinggi"). Capped at 300 PK per in-game day from offerings.
+
+  | Item | PK each |
+  |---|---|
+  | Glow berries | 0.5 |
+  | Amethyst shard, golden carrot, gold ingot | 1 |
+  | Glistering melon slice | 2 |
+  | Emerald | 6 |
+  | Diamond | 8 |
+  | Echo shard | 15 |
+  | Kultivator pill, quality 0 / 1 / 2 / 3 | 5 / 10 / 20 / 40 |
+- **Pool, other:** expedition and event shares (B).
+- **Disciple, kills:** `floor(victim max health × 0.05)`, minimum 1 for an `Enemy`, capped at 120 per disciple per in-game day.
+- **Disciple, other:** missions, events and duties (B).
+- **Anugerah Ketua:** moves pool PK to a disciple 1:1 (Martial Peak: disciples receive contribution points from the sect).
+
+**Paviliun Yue Lu** (spends pool PK; prices × the level factor; "needs" = minimum hall level):
+
+| Item | Price | Needs |
+|---|---|---|
+| Pil Penyembuh (Healing Pill) | 40 | – |
+| Pil Pengumpul Qi (Qi Gathering Pill) | 60 | – |
+| 8 amethyst shards | 40 | – |
+| Undangan Khusus (one extra candidate now, max 1 per day) | 150 | – |
+| Ceramah Kitab (+5 comprehension for one disciple; AWE scripture sermons) | 150 | – |
+| Pil Pembangunan Fondasi (Normal) | 250 | – |
+| Reset the envoy cooldown | 300 | – |
+| Gulungan Teknik (an enchanted book mapped to a chosen book technique, DESIGN 7) | 400 | Level 3 |
+| Pil Penangkal Tribulasi (Tribulation Warding) | 600 | Level 3 |
+| Pil Inti Emas (Golden Core Pill) | 800 | Level 4 |
+| Pil Pembersih Sumsum (Marrow Cleansing) | 900 | Level 6 |
+| Manual Tubuh Abadi (Undying Codex for one disciple, 20.3.17) | 1,200 | Level 3 |
+
+Pills are created as the existing alchemy items with `kultivator:pill_quality` 1 (read-only use of the alchemy registry).
+
+**UI (Perbendaharaan tablet).** Left: Kantor Misi. The master's accepted stacks appear as seal cards showing their PK value; one click offers the stack (C2S with the slot index; no container menu). A daily cap bar shows 0/300. Right: Paviliun seal cards with price and lock reason.
+
+#### 20.3.8 Seni Sekte yang Hilang: the lost sect arts (A items and restoration, C effects)
+
+**Sumber / Source.**
+- *Return of the Mount Hua Sect*: Chung Myung recovers Mount Hua's lost Twenty-Four Plum Blossom Sword (sword qi blooms as plum blossoms) and the Purple Mist Divine Art.
+- *Legend of the Northern Blade*: Jin Mu-won learns the disbanded Northern Heavenly Sect's arts from fragmentary writings his father left.
+- *Volcanic Age*: the regressed elder uses techniques from the sect's hidden records.
+
+**Item.** `lost_scripture_page`, *Lembar Kitab yang Hilang*, with component `kultivator:scripture_page {set 1–3, piece 1–5}`.
+
+**Loot** (built-in tables only): `stronghold_library` 25%, `woodland_mansion` 20%, `ancient_city` 15%, `trial_chambers/reward_ominous` 10%, `desert_pyramid` and `jungle_temple` 8%.
+
+**Restoration.** Five different pieces of one set, with a Paviliun Kitab built: Perbendaharaan → "Pulihkan Seni". Pages consumed, +500 renown, advancement `lost_art_restored`. The art is hall-wide for disciples of rank Dalam and above:
+- **Pedang Dua Puluh Empat Bunga Plum:** every 4th melee or Sword-technique hit sets off a petal storm (r 4, 1.2 U, `cherry_leaves` particles). At rank Inti, every 24th hit is "Mekar Penuh" (24 petals, r 6, 2 U).
+- **Seni Ilahi Kabut Ungu:** qi regeneration ×1.3, max qi +20%, purple mist while meditating.
+- **Warisan Sekte Langit Utara:** +20% damage at night and in snowy biomes.
+
+#### 20.3.9 Tugas Sekte and Lumbung Sekte: duties and the storehouse (module B)
+
+**Sumber / Source.**
+- *Renegade Immortal*: Wang Lin's chore of at least ten vats of water a day.
+- *A Record of a Mortal's Journey*, ch. 150–151: Han Li takes the unclaimed Hundred Medicine Garden task, run by the Foundation cultivator Ma, and secretly ripens herbs there.
+- *A Will Eternal*, ch. 2 and 20–26: Bai Xiaochun starts at the Ovens kitchen, cooking spirit rice in woks engraved with earthflame formations. He steals Spirit Tail Chickens; their burnt tails make the three-coloured flame used for spirit enhancement; he proposes the "chicken thief task force" himself. (Flame colours belong to enhancement, so the kitchen has none.)
+
+**Posts.** `posts(level)` posts sit at fixed spots 5 blocks N/E/S/W of the stele (the first free one). On the Tugas tablet the master assigns a disciple to a duty. It walks to the post (STAY + activity 1–4) and loops a cosmetic pose (C renders: carrying a bucket, kneeling, stirring, scattering feed). No block or crop is touched.
+
+**Output.** Computed from elapsed game time every 60 s while the hall chunk is loaded, and when the hall opens. At most 24,000 ticks are banked per post. Goods go to the 27-slot virtual **Lumbung Sekte** (take-out only, by clicking on the Tugas tablet; overflow is lost with a warning line).
+
+| Duty | Output |
+|---|---|
+| **Pikul Air** (water) | +0.8 XP per minute (`XpSource.SECT`); "Tubuh Terlatih" +1 permanent max HP per 60 min (max +10); +10 disciple PK per 50 min ("ten vats"); +1 Poin Tempa per minute (C, Undying Codex) |
+| **Kebun Seratus Obat** (garden) | 1 ingredient per 4 min (glow berries, golden carrot, glistering melon slice or sweet berries, equal weights); ×1.5 with a Wood root or the Life Dao; ×1.25 at hall level 5+ |
+| **Dapur Api** (the Ovens) | 1 `spirit_meal` (*Hidangan Roh*) per 6 min; ×1.5 with a Fire root or Fire Dao |
+| **Peternakan Ayam Ekor Roh** (chicken farm) | needs ≥ 4 chickens within 16 of the stele (read-only count at computation time); 1 `spirit_tail_feather` (*Bulu Ekor Roh*) per 10 min |
+
+**Hidangan Roh** (spirit meal).
+- Food: nutrition 8, saturation 1.0.
+- The player gets +8 XP (`XpSource.PILL`) and +10 qi.
+- Fed to a disciple (`feedHandler`): XP ×1.2 for 2 min (`extra.activity.meal_until`).
+
+**Easter egg.** A Takut Mati disciple on any duty has a 5% daily chance to eat up to 3 feathers from the storehouse. Chat "Siapa pencuri ayam roh?!" and hidden advancement `chicken_task_force` ("Satgas Pencuri Ayam").
+
+#### 20.3.10 Ekspedisi: missions, envoys, the Primordial Ark and the Kunpeng bone (module B)
+
+**Sumber / Source.**
+- *Battle Through the Heavens*: Xiao Yan trains in the Magical Beast Mountain Range and hunts magic cores.
+- *Soul Land*: spirit masters travel into the Star Dou Great Forest and the Hunting Spirit Forest for beasts of a chosen age, usually escorted.
+- *Coiling Dragon*, Book 19: in the Planar Battlefield, badges from kills count as merits exchanged at a stele (the mission reward model).
+- *I Shall Seal the Heavens*, ch. 19: each April, Outer disciples above the fifth level go out and each brings back two or three talented youths (the envoy).
+- *Perfect World*, ch. 258–347: the Kunpeng's primordial bone is split into six parts that give only about a third of the legacy; the true technique lies in the Devil Refinement Cave and needs a higher realm to use fully.
+- *Against the Gods*, ch. 454: the Primordial Profound Ark opens for a single day right after the Seven Nation tournament. Its boarding rule here is game design.
+
+**Board** (Misi tablet). `missions(level)` offers rolled at sunrise. T* = `clamp(1 + strongest disciple's realm ordinal, 1, 9)`; offers use tiers T*−1, T*, T*+1, clipped to each type's range.
+
+| Mission | Tiers | Duration | Requirement |
+|---|---|---|---|
+| Patroli Wilayah | 1–3 | 12,000 ticks | Luar+ |
+| Mencari Herba Roh | 1–5 | 12,000 ticks | Luar+ |
+| Mengawal Karavan | 2–6 | 24,000 ticks | Luar+; tier ≥ 3 needs Dalam+ |
+| Perburuan Binatang Iblis | 3–8 | 24,000 ticks | Dalam+ |
+| Alam Rahasia | 6–9 | 48,000 ticks | an Inti+ leader at Nascent Soul+ |
+
+**Departure.**
+- 1–3 disciples leave with a cloud-step FX and a pillar.
+- `Disciples.depart` stores them, then `Halls.storeAway(..., "expedition", info)`.
+- They tick zero while away, the timer runs on game time (offline too), and the disciple list shows "Sedang Ekspedisi · sisa 0,4 hari".
+
+**Resolution** happens when a record is due: on the hall tick, when the hall opens, or when the master joins.
+- Member power `m = realm ordinal + stage/4 + layer/9 + stars/9`.
+- Party `P = max m + 0.5 × Σ others`.
+- Difficulty `d = tier + (tier == 9 ? stars of the strongest member / 9 : 0)`.
+- **Success** = `clamp(0.45 + 0.12 × (P − (d − 1)) + 0.05 (if an Inti+ member is present), 0.10, 0.95)`.
+
+| Result | Each member | Hall |
+|---|---|---|
+| **Success** | `DisciplePaths.grantBarShare`: 15% (tier 1–3), 25% (4–6), 35% (7–9), +10% for Alam Rahasia; 10 × tier PK | pool +5 × tier; renown +10 × tier; loot to the storehouse (below) |
+| **Failure** | returns at 30% HP with a 3-minute Qi Deviation and half the XP share; no PK or loot; **never dies** | – |
+
+**Loot by the highest tier:**
+- Tier 1–2: 2–6 bones, string or iron ingots.
+- Tier 3–4: 2–5 gold, emeralds or lapis.
+- Tier 5–6: 1–3 diamonds, 2–4 ender pearls, 1 golden apple.
+- Tier 7–8: 1–2 echo shards, 10% netherite scrap, 15% an enchanted book mapped to a book technique.
+- Tier 9: as tier 7–8 plus 1% nether star.
+- From tier 4: 20% one Qi Gathering Pill.
+- Mencari Herba Roh doubles the garden ingredients.
+
+"Panggil Pulang" recalls a team at once with nothing gained.
+
+**Utus Perekrut / envoy.**
+- One Luar+ disciple at Qi Refining Middle or higher, away 24,000 ticks.
+- Once per 5 in-game days per hall (reset for 300 PK).
+- Brings 1 (30%), 2 (55%) or 3 (15%) candidates via `Halls.addCandidates`. Each has 30% for +1 root grade, 50% to share the envoy's main element, and a talent chance of 50% instead of 40%.
+- The envoy earns 40 PK and a 10% bar share.
+
+**Tulang Kunpeng.**
+- Each Alam Rahasia success has an 8% chance of `kunpeng_bone_fragment` (component `kultivator:kunpeng_piece` 1–6, random piece).
+- Six *different* pieces → Misi tablet "Satukan" → pick an Inti+ disciple → `DisciplePowers.teachKunpeng` (20.3.16).
+
+**Bahtera Purba** (ghostly ark).
+- For one in-game day after each tournament, a ghostly ark floats over the hall (client FX, no blocks).
+- Only that tournament's top 3 may board, once, for 24,000 ticks.
+- Guaranteed: 1 mapped enchanted book, 1 Kunpeng piece the hall lacks (random if none is missing), and a 60% bar share.
+- Advancement `primordial_ark`.
+
+#### 20.3.11 Tanah Terlarang Berwarna Darah: the Blood-Colored Forbidden Ground (module B)
+
+**Sumber / Source.** *A Record of a Mortal's Journey to Immortality*, ch. 155–160:
+- An ancient wind restriction weakens for five days once every five years.
+- A second restriction admits only Qi Condensation disciples.
+- The ground supplies the main herbs for Foundation pills, fewer than a third return, and Han Li goes in to refine his own pills.
+
+**Schedule.** Every `forbiddenGroundIntervalDays` (15) at hall level 2+. Title "Segel angin melemah!" and crimson wind around the stele for a 1-day window.
+
+**Entry.** Up to 3 disciples at **Qi Refining only**. Others are refused with the tooltip "Pembatasan kedua menolak Fondasi ke atas". They are away 6,000 ticks (the five days).
+
+**Success chance per disciple** = `0.30 + 0.08 × stage + 0.05 × root grade + 0.05 × min(3, attack techniques known) + 0.10 (if not alone)`, at most 0.85.
+
+| Result | Effect |
+|---|---|
+| **Success** | 2–5 `foundation_herb` (*Herba Fondasi*) to the storehouse, 25% bar share, 40 PK, renown +30 |
+| **Failure** | "Terluka Parah": 10-minute Qi Deviation and −30% bar, **never death**. Only when the master has Hardcore on: it returns as its Soul Tablet in the storehouse (revivable as usual). |
+
+**Murnikan Herba** (Tugas tablet): 3 herbs → 1 Foundation Establishment Pill. Quality: Low 30 / Mid 45 / High 20 / Perfect 5. Leftovers kept.
+
+A jade report scroll lists every result. Advancement `forbidden_ground_survivor`.
+
+#### 20.3.12 Duels, Kompetisi Daftar Kuat and Turnamen Elit (module B on `DuelRules`)
+
+**Sumber / Source.**
+- *A Will Eternal*: the Outer Sect Chosen battles; the north bank takes most of the top ten, and winners are in line for the Legacy Echelon.
+- *Battle Through the Heavens*, ch. 566–573: the Strong Ranking competition runs elimination rounds down to a top ten.
+- *I Shall Seal the Heavens*, ch. 27–31: the promotion training ends in a final bout announced by the Grand Elder.
+- *Against the Gods*, ch. 434–436 and 1359: the Blue Wind and Seven Nation ranking tournaments against rival nations' geniuses.
+- *Soul Land*: the Shrek Seven Monsters win the Continental Elite competition and bring Shrek fame.
+- *Return of the Mount Hua Sect*: victories over Zhongnan spread Mount Hua's name.
+
+**Kompetisi Daftar Kuat** (internal).
+- **Schedule:** every `tournamentIntervalDays` (7) at noon, or from the Arena tablet (cooldown 3 days).
+- **Needs:** ≥ 3 Luar+ disciples in the territory and the master within 32 blocks. Otherwise it waits for the next noon; "Lewati minggu ini" skips it.
+- **Bracket:** up to 8 of the master's disciples (strongest first; the master can untick some). Empty slots up to the next power of two are filled with **Murid Tepi Utara** rivals (AWE north bank).
+- **Rivals:** role RIVAL, never saved. Name from a 24-name list. Realm rolled at the entrants' median ±1 stage. Melee plus two `RivalSkills`: a 12-block qi line of 1 U every 6 s, and an element burst of r 3 and 1 U every 10 s. A rival is spawned only for its own duel.
+
+**Turnamen Elit** (every 3rd Kompetisi).
+- Adds 3 visiting champions of rival sects, ranked at your best entrant −1 stage, ±0 and +1 stage.
+- Renown ×2.5. Opens Bahtera Purba.
+
+**Duel rules.**
+- One duel at a time inside a particle ring of r 9 at the stele.
+- Ends at 10% HP (clamp, never lethal) or after 60 s, when the higher HP fraction wins. Being outside r 11 for 3 s is a loss.
+- Taught techniques are allowed; `mayHit` accepts the partner only.
+- Underdog: +15% damage per realm below the opponent (max +45%; `damageFactor`).
+- Spectators sit (activity 8).
+- A vanilla `ServerBossEvent` shows the pairing and both HP bars. One FX per hit.
+
+**Rewards.**
+
+| Place | Reward |
+|---|---|
+| 1st | 300 PK; title "Nomor Satu Daftar Kuat" for 7 days (gold name, +10% technique damage); 40% bar share. In a Turnamen Elit also the title "Juara Peringkat" and boarding the Ark. |
+| 2nd | 150 PK, 25% bar share |
+| 3rd | 75 PK, 15% bar share |
+| Every entrant | 20 PK, 5% bar share, +2 comprehension, +3 bond per won bout |
+
+**Daftar Kuat:** an all-time top-10 list on bamboo slips in the Arena tablet. Advancement `tournament_champion`.
+
+**Performance.** At most 2 fighting entities; the bracket advances every 3 s.
+
+#### 20.3.13 Perang Seratus Dinasti: the Hundred Dynasties War (module B)
+
+**Sumber / Source.**
+- *Martial Universe*: the Hundred Dynasties War brings youths of a hundred dynasties to fight; champion Lin Dong is taken into the Dao Sect.
+- *Battle Through the Heavens*: Jia Nan Academy accepts only a region's best youths.
+
+**Arrival.** Replaces every 4th arrival day at hall level 3+. 8 candidates arrive.
+
+**The war.** The master presses "Mulai Perang" on the Calon tablet any time that day. It is a 4 + 2 + 1 single-elimination bracket among candidates (temporary `DuelRules` pairs between CANDIDATEs, 30 s bouts, the 10% HP end, base stats, particle flourishes).
+
+**Champion.** Root +1 grade (max HEAVENLY), a 50% physique roll, Tekad 100. Recruitable free as Murid Luar starting at Qi Refining Early with bond 20. Finalists stay recruitable normally until sunrise. A bamboo-slip bracket is shown. Advancement `hundred_dynasties_champion`.
+
+#### 20.3.14 Alam Dewa Hampa: the Void God Realm, an endless trial tower (module B)
+
+**Sumber / Source.**
+- *Perfect World*, ch. 339–345: cultivators fight in spirit in the Void God Realm; injuries carry over to the real body as an aftereffect; the lowest level is the Starting Ground, with a long stone stairway upward. Also the Devil Refinement Cave (ch. 261).
+- *Tales of Demons and Gods*, ch. 48: the Heavenly Sacred Border, passed by only three in centuries, marks Glory City's brightest talent.
+
+**Entering.** Arena tablet → pick a disciple of rank Dalam or higher → "Masuk Alam Hampa".
+- It sits at the stele; its body gets the translucent "tubuh roh" tint (activity 7, rendered by C).
+- A **phantom** (role PHANTOM, dark tint, red eyes) appears 4 blocks away inside an 8-block ring. `DuelRules` pairs them.
+
+**Phantom on floor f.**
+- HP `20 × 1.12^f`, damage `3 × 1.10^f`, armor `min(20, f/3)`.
+- From floor 10 it casts one `RivalSkill` every 8 s.
+
+**Floor names.**
+
+| Floors | Name |
+|---|---|
+| 1–9 | Tanah Permulaan |
+| 10–19 | Tangga Batu |
+| 20–29 | Gerbang Awan |
+| 30–39 | Istana Hampa |
+| 40–49 | Puncak Hampa |
+| 50 | Batas Suci |
+| 51–59 | Di Atas Batas |
+| 60 | Gua Pemurnian Iblis |
+| 61+ | Hampa Tanpa Dasar N |
+
+**Climbs.** One per disciple per in-game day, up to 5 floors in a row, with a 3 s pause and a 25% heal between floors. One phantom per hall at a time; climbs queue.
+
+**Rewards.**
+- First clear of floor f: bar share `4% × (1 + f/20)`.
+- Every 10th first clear: +2 comprehension.
+- Floor 50: permanent title "Jenius Batas Suci" (XP ×1.1). Advancement `batas_suci`.
+- Floor 60 first clear: Sayap Kunpeng reaches full power (20.3.16).
+- A repeat clear gives 25% of the first-clear share.
+
+**Loss.** The phantom fades and the real body gets "Luka Jiwa" for 5 min: −20% damage and no kill XP. Nobody dies, and the climb ends.
+
+**UI.** A best-floor leaderboard of all disciples on the Arena tablet. Advancement `void_floor_10`.
+
+#### 20.3.15 Latihan Khusus and Menara Langit Membara (module B)
+
+**Latihan Khusus / promotion trial** (Luar → Dalam).
+
+**Sumber / Source.**
+- *I Shall Seal the Heavens*, ch. 27–31: a special promotion training admits a single Outer disciple into the Inner Sect.
+- *Battle Through the Heavens*: the Inner Academy selection.
+
+- **Start:** A calls `SectEvents.startPromotionTrial(disciple, master)` once the other requirements are met. The disciple must be at the stele.
+- **Waves:** three waves at 0, 20 and 40 s from `DaoProtectors.spawnWaveFor(level, disciple, master, Rank(Foundation), size 2/3/4, healthFactor 1.6)`. Overworld types only, the usual hardening.
+- **Pass:** the disciple survives 60 s without dropping below 25% HP, and the master deals no damage to the trial mobs ("Guru membantu — ujian batal" fails it).
+- **Fail:** the mobs vanish with a poof; retry after 1 in-game day.
+- **Result:** `SectRanks.onPromotionTrialResult(entity, passed)`. PK are spent only on a pass.
+
+**Menara Langit Membara / Blazing Sky Qi Refining Tower.**
+
+**Sumber / Source.** *Battle Through the Heavens*, ch. 491, 549, 622:
+- Training rooms over the sealed Fallen Heart Flame; Heart Flame grows stronger deeper down, nearer the flame.
+- Students pay Fire Energy for time, and newcomers get "grilled".
+- A monthly collective training day is free.
+
+**Rooms.** Built by the player and detected read-only: a lit Soul Campfire standing on Crying Obsidian, within 32 blocks of the stele, at most 7 rooms.
+- Sorted by **descending** Y: the highest room is floor 1 and the deepest is floor n.
+- Cached; re-checked every 5 s only while someone trains.
+
+**Training.** Arena tablet → "Latihan di Menara (lantai n)".
+- Requires realm ordinal ≥ n − 1. The disciple walks there and meditates (activity 6).
+- Meditation XP ×(1.2 + 0.2n) through an `xpFactor` on MEDITATION.
+- Comprehension +0.02n per second.
+- Cost: n of the disciple's PK per 1,200 ticks; training stops when PK run out.
+- "Hari Latihan Bersama": free on day index `d % 7 == 3`.
+
+**Heart-fire surge.** Every 60 s, chance 4% × n:
+- comprehension ≥ 10n: the disciple resists, +2 comprehension and +0.01 to its next breakthrough quality (max +0.1),
+- otherwise: 8% of max HP as damage (never below 50%) and thrown out for 30 s.
+
+**FX.** Soul-flame motes around a training disciple (`SectEventFx`, scaled by quality).
+
+#### 20.3.16 Jurus Pamungkas: signature ultimates, Heavenly Flames and Kunpeng Wings (module C)
+
+**General rules.**
+- Unlocked at **Nascent Soul** for the matching Dao.
+- Cast automatically in combat (`combatCast`) when a boss or ≥ 3 monsters are within 12 blocks, or ordered with the "Jurus Pamungkas" talisman on the Bakat tab.
+- Cooldown 120 s unless stated.
+- One FxPayload per cast; server damage pulses every 10 ticks, each with a single AABB query.
+- Monsters only. Never centred within 4 blocks of the master or a villager. Block raycasts are read-only `clip`.
+- **U** = `DiscipleTechniques.power(data)` × every `damageFactor` provider (stars, hexes, folds, flames, titles).
+
+| Dao | Ultimate | Sumber / Source | Effect |
+|---|---|---|---|
+| Pedang | **Formasi Pedang Geng Agung** | *A Record of a Mortal's Journey*: Han Li's 72 Azure Bamboo Cloudswarm Swords; Great Geng Sword Formation (Da Geng Jian Zhen) | 12 / 24 / 36 / 72 flying-sword particles (Nascent Soul / Deity Transformation / Dao Union / Immortal Ascension+; density by quality) form a 10-block dome net over the target for 6 s, 0.4 U per pulse to monsters inside |
+| Petir | **Petir Pengusir Kejahatan** | Same work: Evil-Dispelling Divine Lightning carried by the Golden Thunder Bamboo | Golden particle bolts on up to 6 monsters, 2.5 U each (×1.5 against undead); each chains once to a monster within 6 for 1.25 U |
+| Ruang | **Kurungan Larangan** | *Renegade Immortal*, ch. 216: Wang Lin's restrictions | Glyph cube of r 7 on the target; monsters inside get a transient −100% movement modifier and Weakness V for 4 s and take 1 U/s |
+| Tubuh | **Tinju Kaisar Abadi** | *A Will Eternal*: the Undying Emperor's Fist, secret art of Undying Bones | One punch of 6 × its attack damage plus a 4-block shockwave of 2 U |
+| Api | **Teratai Api Amarah Buddha** | *Battle Through the Heavens*: Xiao Yan's self-made lotus from fusing Heavenly Flames, more explosive with each flame added | 4 s charge, thrown ≤ 24 blocks; particle burst only (no `Explosion`), r 4 (r 6 with ≥ 2 flames), `3 U × max(1, flames)`, entity ignite 6 s; cooldown 45 s |
+| Kehidupan | **Kitab Kehancuran Agung** (block-safe form) | *Martial Universe*: the Great Desolation Scripture gathers life force into one body | Drains monsters within 10 for 1.5 U each; heals the disciple 100%, the master and allied disciples within 10 by 30%; +30% damage for 30 s |
+| Es, Bayangan | the Dao's book technique, amplified | *No new concept* (existing Glacier Prison / Gale) | +60% damage and ×2 radius |
+
+**Fusi Api Guru-Murid.**
+
+**Sumber / Source.** *Battle Through the Heavens*: the first lotus fused Xiao Yan's flame with his master Yao Lao's Bone Chilling Flame.
+
+During the lotus charge, a Fire-Dao master within 6 blocks may press "Fusi" on the disciple screen: `5 U × max(1, flames)`, r 6, costing the master 30% of max qi.
+
+**Benih Api Surgawi / Heavenly Flame seeds.** Item `heavenly_flame_seed`, component `kultivator:flame_kind`.
+
+**Sumber / Source.** *Battle Through the Heavens*: the ranked Heavenly Flames (Green Lotus Core Flame, Bone Chilling Flame, Sea Heart Flame, Fallen Heart Flame, Pure Lotus Demon Flame), and the Flame Mantra that grows by devouring them.
+
+Drops (an `ItemEntity` at the victim on `AFTER_DEATH`):
+
+| Seed | Source | Chance |
+|---|---|---|
+| Api Inti Bumi Teratai Hijau | blaze killed by a player | 0.5% |
+| Api Dingin Tulang | stray, killed by a player or a disciple | 0.3% |
+| Api Hati Lautan | Elder Guardian | 100% on the first kill per player, then 25% |
+| Api Jantung Jatuh | Wither killed by a player | 100% on the first kill, then 25% |
+| Api Teratai Iblis Murni | Ender Dragon | 100% |
+
+**Absorbing.**
+- Who: a Fire-root or Fire-Dao disciple, or any disciple from Nascent Soul.
+- The master feeds the seed (`feedHandler`), starting a 20 s ritual.
+- Without Hu Fa (20.3.18) it fails 40% of the time: 3-minute Qi Deviation, seed returned.
+- Each flame (max 3, +1 per 9 stars): fire technique damage +20%, melee ignites entities for 4 s, immune to fire and lava damage. Shown as coloured flame orbs in its aura.
+- Advancements `heavenly_flame`, `buddha_lotus_fusion`.
+
+**Sayap Kunpeng / Kunpeng Wings** (taught by the six fragments, 20.3.10; any Dao).
+- Dash 12 blocks plus a wind crescent of 2 U on monsters along the path, cooldown 20 s.
+- One third of full power (the six pieces give a third of the legacy) until Void Realm floor 60. Then: dash 24, 6 U.
+- Advancement `kunpeng_wings`.
+
+**Formasi Tujuh Peri.**
+
+**Sumber / Source.** *Against the Gods*, ch. 739: the Frozen Cloud Seven Fairies, the sect's elite seven.
+
+When 7 or more Inti+ disciples of one master fight within 16 blocks of each other, each deals +10% damage.
+
+#### 20.3.17 Pusaka Natal, Kitab Abadi Tak Mati and Pelarian Jiwa (module C)
+
+**Pusaka Natal / Natal Treasure and spirit enhancement.**
+
+**Sumber / Source.**
+- *A Will Eternal*, ch. 5, 29–38, 637: Bai Xiaochun's spirit enhancement gives silver sheen at one fold and later two- and threefold; elders stop at one or two folds because failure rises; his Eternal Parasol changes at its fourteenth enhancement; the three-coloured Spirit Tail flame is the fuel.
+- *A Record of a Mortal's Journey*: the 72 swords are Han Li's life-bound natal treasure.
+
+**Refining.** From Foundation, one virtual treasure per disciple (`extra.power.natal`, not an item).
+- Form chosen once: Pedang, Payung, Wajan or Lonceng.
+- Costs 1 diamond + 8 Bulu Ekor Roh, with the master inside the territory (Pusaka tab).
+- Rendered on its back like the player's back sword (C edits the renderer).
+
+**Enhancement, fold n** (max 18; 19 with Jari Penempa Roh).
+- Cost: n feathers + `n × 40` pool PK.
+- Success = `0.95 − 0.07 × (n − 1)`, +0.15 with Jari Penempa Roh, +0.05 Fire Dao, +0.05 hall level 5+, minimum 0.10.
+- A failure at n ≥ 3 loses one fold (smoke and pop FX, no block).
+- Each fold: +5% melee and technique damage.
+
+| Fold | Effect |
+|---|---|
+| 3 | silver tint |
+| 9 | gold tint, and the form ability unlocks |
+| 14 | "Payung Abadi": the ability doubles and the treasure orbits the disciple |
+
+Form abilities at fold 9:
+- **Pedang:** +10% technique damage.
+- **Payung:** every 60 s, the master and disciples within 4 get Absorption II for 10 s.
+- **Wajan** (Bai Xiaochun's turtle-shell wok): −20% damage taken.
+- **Lonceng:** Slowness II for 3 s on monsters within 6 on each of its casts.
+
+Advancements `natal_fold_9`, `payung_abadi`.
+
+**Kitab Abadi Tak Mati / Undying Codex.**
+
+**Sumber / Source.** *A Will Eternal*: the Undying Live-Forever Codex's levels Undying Skin (Iron, Bronze, Silver, Gold Skin), Undying Tendons, Undying Bones (whose secret art is the Undying Emperor's Fist) and Undying Blood. The Heavenly King strength level is skipped as a simplification.
+
+- **Access:** Manual Tubuh Abadi (20.3.7), or free for Body-Dao and Dantian Tersumbat disciples.
+- **Poin Tempa:** 1 per 1% of max HP taken in combat (cap 200 per day; ×2 with Takut Mati), plus 1 per minute of Pikul Air.
+
+| Stage | Points | Effect |
+|---|---|---|
+| Kulit Perak | 150 | armor +6 |
+| Kulit Emas | 500 | armor +12, toughness +4, immune to entity fire, gold glint |
+| Urat Abadi | 1,200 | speed +15%; dash to its target (8 blocks, cooldown 6 s) |
+| Tulang Abadi | 2,500 | Tinju Kaisar Abadi for any Dao (cooldown 30 s outside the Body ultimate) |
+| Darah Abadi 0–100% | 80 per 1% | regeneration +0.05 HP/s per 10%. At 100%, once per in-game day a lethal hit leaves it at 1 HP with Resistance V for 5 s and no tablet (`onDeath`). It then starts "Kitab Hidup Abadi": +1% max HP per star. |
+
+Advancement `undying_blood`.
+
+**Pelarian Jiwa Baru Lahir / Nascent Soul escape.**
+
+**Sumber / Source.** *A Record of a Mortal's Journey*: a Nascent Soul flees as a streak of light when its body is destroyed.
+
+A disciple at Nascent Soul+ that dies while its master's hall is active does not drop a tablet (`onDeath` returns handled):
+- A glowing soul streak flies toward the stele (FX).
+- `Halls.storeAway(..., "soul_flight")` holds it for 12,000 ticks.
+- It re-forms at the stele with −10% bar and full health.
+
+Below Nascent Soul, or with no active hall, the Soul Tablet rule of phase 5 applies.
+
+#### 20.3.18 Ikatan, Segel Jiwa, Hu Fa and Fondasi Dao (module D)
+
+**Ikatan / bond** (`extra.path.bond`, 0–100).
+
+**Sumber / Source.** *Tales of Demons and Gods*: a new disciple forms a Soul Seal with the master for loyalty, and ch. 343 is titled "Taking in a disciple". Ch. 13: Nie Li matches each friend's technique to the attribute of their soul.
+
+Gains:
+
+| Action | Bond |
+|---|---|
+| Teaching a technique | +5 |
+| Feeding a pill | +2 (max 10 per day) |
+| Guarding its breakthrough or calamity | +10 |
+| Meditating within 8 blocks of the master | +1 per minute (max 20 per day) |
+| Each won tournament bout | +3 |
+| Each Balas Budi rescue | +5 |
+
+Bond resets on release.
+
+- **Segel Jiwa / Soul Seal** (bond ≥ 50). Item `soul_seal_jade`, *Giok Segel Jiwa* (shapeless: amethyst shard + echo shard + gold ingot + paper). Sneak-use it on the disciple for a 5 s seal-glyph ritual.
+  - Max sealed = `3 + floor(hall level / 3)` (3 without a hall).
+  - A sealed disciple:
+    1. can be recalled to the master from anywhere in the same dimension (Jalan tab, cooldown 60 s, safe spot only),
+    2. gets +10% max health, damage and max qi,
+    3. when the master drops below 30% HP: every sealed disciple within 48 gets Speed II + Strength I for 10 s and switches to ASSIST until the fight ends.
+- **Element-matched teaching:** a technique whose Dao element is in the disciple's root costs 10% of the master's max qi instead of 20% (`teachCostFactor`). Its first 10 casts give double comprehension.
+
+**Hu Fa / guarding the breakthrough.**
+
+**Sumber / Source.**
+- *Battle Through the Heavens*: Yao Lao protects and guides Xiao Yan through refining the Green Lotus Core Flame and the Fallen Heart Flame (护法).
+- *A Will Eternal*: Foundation is Mortal-Dao (with a pill), Earth-Dao or Heaven-Dao (only by chance; Bai Xiaochun reaches it).
+- *I Shall Seal the Heavens*, ch. 76 and 100: Foundation pillars graded by crack count (Flawless, Cracked, Fractured), and the crackless Perfect Foundation, extraordinarily rare; Meng Hao's has ten pillars.
+
+**When it applies.** During any disciple breakthrough, calamity, soul-lamp trial or flame absorption, the master qualifies when within 8 blocks and meditating, or standing still while sneaking. Shown as a seal "Hu Fa aktif".
+
+| Effect | Value |
+|---|---|
+| Strikes | ×0.8 |
+| Quality | +0.1 |
+| Foundation chance | +10% |
+| Flame absorption | never fails |
+| **Tahan Petir** (talisman on the Jalan tab or `/kultivasi murid tahan`) | Redirects the next strike: the master takes `0.5 × that strike's share × his max health` (tribulation damage source, clamped to keep 1 HP), and the disciple's strike is skipped. Max 3 per trial, 15% of max qi each. |
+
+**Dao protectors for disciples** (Golden Core+ targets and calamities).
+- Every 2 strikes: `spawnWaveFor(disciple)`, size `1 + target realm / 3`.
+- Each protector the **master** kills makes the next strike ×0.92 (min ×0.6) and adds +0.05 quality (max +0.2).
+- Other disciples nearby fight the protectors but never reduce strikes (DESIGN 19.5).
+
+**Fondasi Dao / Foundation type.** Rolled on a successful Qi Refining → Foundation (`breakthroughListener.onEnd`, kind GATHERING). Shown as pillar art on the Jalan tab.
+
+| Type | Base chance | Pillars | Effect |
+|---|---|---|---|
+| Fana (Mortal-Dao) | 60% | 9, fractured | – |
+| Bumi (Earth-Dao) | 32% | 9, cracked | XP ×1.1, max HP +10% |
+| Langit (Heaven-Dao) | 8% | 9, flawless | XP ×1.25, later strikes ×0.85, golden pillar in the aura |
+| Sempurna (Perfect) | 0.01% (game value) | **10**, no cracks | XP ×1.4, first calamity at star 8 |
+
+Odds shifts (taken from Fana):
+- Master meditating within 8 during the gathering: +10% Bumi, +5% Langit.
+- Master's own Foundation quality Perfect or Heavenly: +3% Langit.
+- A Perfect-quality Foundation pill fed beforehand (`onFed` marker): +5% Langit.
+- All three together: Sempurna becomes 2%.
+
+Advancements `heaven_dao_foundation`, `perfect_foundation`, `disciple_guardian` ("Pelindung Dao Murid").
+
+#### 20.3.19 Bintang Abadi: endless stars beyond True Immortal (module D)
+
+**Sumber / Source.**
+- *Renegade Immortal*, ch. ~1157–1159: Ancient Gods grow by stars and face Three Trials with Seven Calamities (2 + 2 + 3). Most meet the first at six stars, some at seven, very few at eight (Tu Si). Failing means death (here: injury). Wang Lin ends at Heaven Trampling.
+- *Stellar Transformations*: stages Nebula, Meteor (1, 3, 9 golden granules), Star Core, Planet, Tribulation, Stellar, and beyond them Dark Star and Black Hole.
+- *I Shall Seal the Heavens*, ch. ~1276–1362: Soul Lamps, about one per five Immortal meridians; Meng Hao has 33. Extinguishing a lamp absorbs its clone and greatly raises power. The bonus numbers here are game design.
+- *Coiling Dragon*: Linley refines divine sparks into Divine Clones that fight beside him.
+- *Battle Through the Heavens*: Dou grades in 1–9 stars.
+
+**Condensing.**
+- At True Immortal Peak with a full bar, every further XP goes to Stored Qi (shown as "Qi Bintang").
+- Star n costs `cost(n) = min(5.0E9, 500,000 × 1.07^(n−1))`. Star count is an int with no cap.
+- With "Otomatis" on (default) a star condenses whenever Stored Qi ≥ cost and no calamity gate blocks it; otherwise use the button.
+- FX: silver motes collapse into a star that joins the orbit, plus a chime.
+
+**Calamities.**
+- Calamity k (1–7) gates star `s_k = f + 9(k − 1)`, with f = 6 (average quality Normal or lower), 7 (Perfect) or 8 (Heavenly, Sempurna Foundation or Darah Dewa Kuno). For f = 6 that is stars 6, 15, 24, 33, 42, 51, 60.
+- Started by the master (Jalan tab); the star's cost is deducted at the start.
+- Omen 6 s, then `6 + k` strikes of `(0.12 + 0.01 × trial) × max health`, one every 60 ticks, the last ×2. A would-kill strike means failure.
+- Protector waves every 3 strikes: size `2 + k`, health ×(1 + 0.5k). Hu Fa applies.
+
+| Result | Effect |
+|---|---|
+| **Pass** | The star condenses. Finishing a Trial (k = 2, 4, 7) multiplies all star bonuses by 1.1 (trial factor T, up to ×1.331). |
+| **Fail** | "Luka Bencana" (Qi Deviation 12,000 ticks), no star, 50% of the cost refunded to Stored Qi |
+
+After k = 7: title **Penginjak Langit** (Heaven Trampling), white-gold aura, server announcement.
+
+**Per-star bonuses** (via the `stats`, `damageFactor` and `xpFactor` providers):
+
+| Bonus | Formula |
+|---|---|
+| Max health | +4 × n × T (×1.5 with Darah Dewa Kuno) |
+| Attack | +0.6 × n × T |
+| Technique damage | ×(1 + 0.04 × n × T) |
+| Completed 9-star stages | ×1.15 each to technique and melee damage |
+| Max qi | ×(1 + 0.02n) |
+| Meditation XP | ×(1 + 0.04n); ×2 under the open night sky (`canSeeSky` + night; Qin Yu absorbs star power) |
+
+Health above the 1,024 attribute cap converts to damage reduction: +0.25% per 4 HP over, max 80%.
+
+**Power curve** (technique damage factor; health for a disciple with a base of about 77 at True Immortal):
+
+| Stars | 9 | 18 | 27 | 36 | 54 | 72 | 100 |
+|---|---|---|---|---|---|---|---|
+| Technique ×(1 + 0.04nT) × 1.15^stages | 1.56 | 2.37 | 3.33 | 4.80 | 8.36 | 14.8 | 29.4 |
+| Max health ≈ | 113 | 156 | 196 | 251 | 338 | 460 | 609 |
+| Next star cost | 0.86 M | 1.58 M | 2.90 M | 5.34 M | 18.0 M | 61 M | 406 M |
+
+**Star income.** Every event reward is a share of `barSize`: `xpRequired` below True Immortal Peak, `cost(stars + 1)` after it. The climb therefore stays steady and never stalls, and the daily and weekly limits stop farming:
+
+| Source | Share |
+|---|---|
+| Expedition success | 15–45% |
+| Void Realm first clear of floor f | `4% × (1 + f/20)` |
+| Tournament 1st / 2nd / 3rd | 40% / 25% / 15% |
+| Primordial Ark | 60% |
+| Meditation | as above |
+
+Expect roughly 0.3–1 star per in-game day per active disciple.
+
+**Titles** every 9 stars (Stellar Transformations; nametag "Lin Feng · Planet ★31"):
+
+| Stars | Title | Visual |
+|---|---|---|
+| ★1–9 | Nebula | silver fragments orbit |
+| ★10–18 | Meteor | 1, 3, then 9 gold granules at ★10, 13 and 18 |
+| ★19–27 | Inti Bintang | gold core glow in the chest |
+| ★28–36 | Planet | **Klon Ilahi** unlocks |
+| ★37–45 | Tribulasi | |
+| ★46–54 | Gemintang | sun-like aura; 2 clones |
+| ★55–63 | Bintang Gelap | |
+| ★64–72 | Lubang Hitam | |
+| ★73+ | Tak Terbatas I, II, … (one numeral per 9 stars) | new aura hue per tier |
+
+**Klon Ilahi / Divine Clone.**
+- A role CLONE copy with 50% max health and attack, techniques at 50% U, lasting 60 s, cooldown 5 min.
+- Automatic when a boss is within 24 or the disciple is below 50% HP in combat.
+- Not saved, not listed, translucent.
+
+**Lampu Jiwa / Soul Lamps** (after Penginjak Langit).
+- One lamp lights per 10 stars, max 33.
+- "Padamkan Lampu" is a calamity-engine trial with k = 8 + lamps already out.
+- Reward per lamp out: +10% range on ultimates and Jurus Pemusnah, +5% damage.
+- The Jalan tab shows a row of lamps.
+
+**Server announcements** at ★36, Penginjak Langit and each 9th lamp.
+
+Advancements `first_disciple_star`, `disciple_calamity`, `heaven_trampling`, `soul_lamp`.
+
+**Performance.** Pure math; one calamity per master at a time. Orbit dots are client particles (9 per ring, 1 ring at Minimal, 3 at Maximal).
+
+#### 20.3.20 Pewaris and the Nine Hexes, Cincin Jiwa Guru, Murid Melampaui Guru (module D)
+
+**Pewaris and Sembilan Segel / the heir and the Nine Hexes.**
+
+**Sumber / Source.**
+- *I Shall Seal the Heavens*, ch. 102, 1379, 1534–1556: the League of Demon Sealers passes down one Demon Sealer per generation, and each generation must create a new hex (the Eighth Hex, Meng Hao's Ninth). A Mountain and Sea Lord must master all Nine Hexes.
+- *Renegade Immortal*: Wang Lin inherits Tu Si's legacy and memories.
+- *Martial Universe*: Lin Dong becomes a senior direct disciple of the Desolate Hall.
+
+**Naming the heir.**
+- Requirements: rank Inti+, Nascent Soul+, bond ≥ 80, sealed.
+- 60 s ritual: master and disciple meditate within 4 blocks, costing the master 30% of max qi. Jade light links their dantians.
+
+**The heir gets:**
+- Every teachable technique the master knows, free.
+- Comprehension `max(own, master's × 0.5)` in its own Dao.
+- XP factor +0.05.
+- Master-meditation share ×2 (20% instead of 10%; the direct disciple).
+
+**Segel Generasi.** The master marks one of his techniques as the Generation Hex: the heir's version deals +50% and shows a seal ring.
+
+**New hexes.** Each new realm the heir reaches, and every 9 stars, it creates a hex: the player picks one of its taught techniques without a hex, which gets +25% damage and the seal FX. Max 9.
+
+**All nine:** title "Penguasa Sembilan Segel", the passive "Tersegel" (every 20 s its next hit pins monsters within 6 with Slowness V + Weakness V for 3 s), and Segel Gunung-Laut (20.3.21).
+
+**Changing heir.** The old heir keeps its techniques but loses every hex (warning dialog). A lineage counter "Generasi ke-N" is shown in the tooltip.
+
+Advancements `heir_named`, `nine_hexes`.
+
+**Cincin Jiwa Guru / the Master's Soul Ring.** Item `master_soul_ring` (shapeless: gold ingot + echo shard + amethyst shard + ender pearl). It is given only to the heir, one per heir, and stays in its tablet if it falls.
+
+**Sumber / Source.**
+- *Battle Through the Heavens*: Yao Lao's soul lives in the ring, secretly absorbs Xiao Yan's Dou Qi for three years, then becomes his master, lending soul power or taking over in deadly fights.
+- *Coiling Dragon*: Doehring Cowart's soul in the Coiling Dragon Ring teaches Linley and guards him in danger.
+
+**Awakening.** For 72,000 ticks (3 in-game days) the ring takes 50% of the heir's meditation XP. Then it bonds (chat line, FX, advancement `master_in_ring`). After bonding:
+
+| Ability | Effect |
+|---|---|
+| **Bimbingan Jiwa** | The master-meditation share works at any distance and in any dimension (`masterShareAnyRange`). |
+| **Perlindungan Jiwa** | Once per in-game day a lethal blow leaves the heir at 1 HP with Resistance IV for 3 s and an old-sage ghost FX. |
+| **Jiwa Guru Turun** | Automatic below 30% HP in combat, or ordered; master must be online in the same dimension; cooldown 10 min. For 20 s the heir uses the master's D (`Techniques.power`) for its techniques and may cast Buddha Palm and a 6-block Dao Domain pulse of the master's Dao on monsters, wrapped in an aura of the master's realm colour. Cost to the master: 40% of max qi up front plus 2 qi/s; Slowness I and no casting meanwhile. |
+
+**Murid Melampaui Guru / the disciple surpasses the master.**
+
+**Sumber / Source.**
+- *Battle Through the Heavens*: Xiao Yan outgrows Yao Lao and later rescues him from the Hall of Souls.
+- *Martial Peak*: Meng Wu Ya, keeper of the Contribution Hall, knew and healed the trial disciple Yang Kai, who later surpassed him.
+
+**Trigger** (once per disciple):
+- `DisciplePaths.power(disciple) = rank step + stars` exceeds the master's `rank step + extra.kultivasi.stars`, or
+- the disciple wins **Tanding dengan Guru**: a `DuelRules` duel with the master, both ≥ 80% HP within 16 blocks, 120 s, ending at 10% HP; once per in-game day; both get +1 comprehension and +3 bond.
+
+The trigger plays a golden pillar, a server chat line and advancement `disciple_surpasses_master`.
+
+**Effects.**
+- The disciple's XP factor +0.1.
+- **Kebanggaan Guru:** the master gets +5% XP per surpassing disciple, max +15% (`Progression.addMultiplierProvider`).
+- **Balas Budi:** once per in-game day, when the master is below 25% HP within 48 blocks in the same dimension, the disciple teleports to a safe spot beside him. It gives him Absorption equal to 25% of its own max health (amplifier `min(19, floor(0.25 × maxHP / 4) − 1)`) and Resistance II for 5 s, and taunts monsters within 12 for 8 s.
+- **Tetua Kehormatan** (master's toggle): while meditating within 8 blocks of this disciple, the master gets 5% of its meditation XP through `Progression.addXp(…, XpSource.SECT)`.
+
+#### 20.3.21 Jurus Pemusnah and MODE KEHANCURAN (module D; the only block-changing code of the mod)
+
+**Sumber / Source.**
+- *A Record of a Mortal's Journey*, ch. 2191/2238: the Xuantian Slaying Spirit Sword, a Xuantian treasure (the highest tier), overwhelmingly powerful and draining Han Li's mana. No "law of destruction" is claimed.
+- *Battle Through the Heavens*: the Buddha's Fury Flame Lotus grows far more destructive with each flame fused into it.
+- *Martial Universe*: the Great Desolation Scripture desolates a thousand miles around the user and gathers life force into one body; the Great Desolate Imprisoning Heavenly Hand (ch. 701); the Devouring Ancestral Symbol devours energy.
+- *Soul Land*: the Clear Sky Sect's Disorderly Cloak Hammer Technique builds force over chained blows, and the Great Sumeru Hammer is its devastating ultimate.
+- *Coiling Dragon*: Linley's earth mystery of the Pulse, vibration that shatters rock from within.
+- *Against the Gods*, ch. 46: the seventh Heretic God gate; the fifth realm, Hell Monarch, is the last the blood memory names.
+- *I Shall Seal the Heavens*, ch. 1556: the Lord of the Mountain and Sea Realm must master all Nine Hexes.
+- *Renegade Immortal*: Heaven Trampling, beyond the three steps.
+
+**Jurus Pemusnah / world-destroying ultimates.**
+- Available to disciples that passed **calamity 4** (the Second Trial, star ≈ 33).
+- One shared cooldown of 10 min per disciple.
+- **Normal mode (default):** block-safe. Big FX plus monster damage only. May be cast automatically against a boss within 32, or ordered.
+- **With all three locks open (below):** the *ordered* cast also changes blocks. Automatic casts always use the block-safe form.
+- R = `kehancuranMaxRadius` (12). s = stars.
+
+| Ultimate | Who | Mode Kehancuran shape | Normal mode (blocks untouched) |
+|---|---|---|---|
+| **Tebasan Xuantian** | Dao Pedang | trench along the aim line from 3 blocks ahead: 3 wide, 4 deep below the surface, length `min(48, 16 + s/2)` | sword light along the line: 8 U to monsters within 2 of it |
+| **Teratai Api Amarah Buddha Agung** | Dao Api with ≥ 2 Heavenly Flames | sphere at impact, r `min(R, 4 + s/9)` | 8 U in r + 2, entity ignite 8 s |
+| **Getaran Bumi** | Dao Tubuh | disc 3 deep below the surface, r `min(R + 4, 6 + s/6)`; natural blocks only (`base_stone_overworld`, `base_stone_nether`, `#dirt`, sand, red sand, gravel, end stone) | 6 U, launch 0.8, Slowness IV 4 s |
+| **Kitab Kehancuran Agung** | Dao Kehidupan | surface withering in r `min(R + 8, 8 + s/6)`: grass block, podzol, mycelium and rooted dirt → coarse dirt; leaves, grass, ferns, flowers and vines removed; crops and farmland skipped; no holes | the block-safe form of 20.3.16 at 2 U |
+| **Tangan Penjara Langit** | Dao Ruang | pit 9×9, depth `min(12, 3 + s/18)` | 8 U and held 5 s inside a 9×9 column |
+| **Palu Agung Sumeru** | Dao Es, Petir, Bayangan, or no Dao | 9 build-up blows (a hammer glyph grows), then a sphere of r `min(R, 4 + s/9)` | 15 U in r + 4 |
+| **Murka Raja Neraka** | Nadi Dewa Sesat with gate 7 | sphere r `min(R, 4 + s/5)` | 24-block nova of 6 U, crimson-sky FX |
+| **Pusaran Melahap** | Pembawa Simbol Melahap | column r 3 from the target surface down 16 | vortex r 8: pull 4 s, 1 U/s |
+| **Segel Gunung-Laut** | heir with all 9 hexes | nine spheres of r `min(4, R)` in a 3×3 grid 8 blocks apart | nine seal pulses of 3 U, r 4 |
+
+Entity damage always goes to monsters only (`mayHit`). Players, pets, villagers and disciples are never hurt.
+
+**Who can switch it on: three locks, all required.**
+1. **Server / global.** `modeKehancuran` in `config/kultivator.json` (default **false**). Only an op changes it: `/kultivasi kehancuran izin on|off` (`LEVEL_GAMEMASTERS`) writes the file, or the file is edited. In singleplayer this needs cheats or the file.
+2. **Per player: "Sumpah Kehancuran".** Opened from the Segel Merah tablet or `/kultivasi kehancuran sumpah`. On LAN each player swears only for their own disciples.
+3. **Per disciple: "Lepaskan Segel".** On the Jalan tab, only for eligible disciples.
+
+Locks 2 and 3 each open `OpenScreen.KEHANCURAN_CONFIRM`. Closing any lock is one click and takes effect at once. The player himself never gets destructive techniques.
+
+**Warning UI** (`KehancuranConfirmScreen`, the deliberate blood-red variant of the scroll).
+- Crimson parchment, black ink, red seal stamps, a slow heartbeat sound. Title "SEGEL MERAH — MODE KEHANCURAN".
+- Lists exactly: shape and maximum radius, maximum blocks per cast, the protected zones, "Tidak ada drop" (or the drop %), the restore window.
+- A checkbox talisman "Saya paham blok akan hancur", then a seal that must be **held** for 5 s (oath) or 3 s (disciple). Esc cancels.
+- A released disciple shows a red seal on its nametag and red sparks in its aura.
+
+**Ordering a destructive cast.**
+1. Jalan tab → "Jurus Pemusnah": the master aims within 10 s (ray ≤ 64 blocks, read-only).
+2. Server validation (below), then a preview outline of the shape (client FX).
+3. Clickable chat confirm "[Ya, hancurkan]" within 15 s.
+4. A dimension-wide warning title and red-sky countdown `kehancuranWarningSeconds` (30): "<murid> akan melepaskan <jurus> di X Y Z". "[Batalkan]" works until zero.
+5. The cast. Logged in the Catatan tablet and in the server log as `[Kultivator] Kehancuran: master/disciple shape dim x y z → N blocks`.
+
+**Protected (a cast whose shape touches a zone is refused; positions inside a zone are always skipped):**
+- within `kehancuranHallSafeRadius` (64) horizontal blocks of **any** Sect Hall stele, active or not;
+- within `kehancuranPlayerSafeRadius` (24) of the master or any player (checked at the start and re-checked for each tick's batch);
+- world spawn protection (the server's radius, at least 16);
+- within 32 blocks of any villager or iron golem, or of any registered protective formation lodestone;
+- in the End, within 160 blocks of (0, 0);
+- unloaded chunks (dropped, never force-loaded).
+
+**Never touched:**
+- bedrock and anything with hardness < 0;
+- **every block with a block entity** (chests, barrels, furnaces, beds, signs, spawners, beacons, lecterns, banners and so on);
+- portal blocks and frames, obsidian, crying obsidian, reinforced deepslate, lodestone, respawn anchor, the stele;
+- fluids and waterlogged blocks;
+- the datapack tag `#kultivator:indestructible`.
+
+**Execution (`WorldBreaker`).**
+- One running job per server, at most 2 queued.
+- Positions are ordered centre-out in shells for spheres and columns, top-down for trenches, pits and discs, and cut at `kehancuranMaxBlocksPerCast` (4,096), so a capped cast still looks like a crater.
+- Each server tick (END_SERVER_TICK) removes at most `kehancuranBlocksPerTick` (48) positions across all jobs with `setBlock(air, Block.UPDATE_CLIENTS)`: flag 2, no neighbour updates, no cascades. Gravity blocks may float until touched.
+- The job pauses while `server.getAverageTickTimeNanos()` > `kehancuranMsptPause` (45 ms).
+- No fire, no `Explosion`, no item entities.
+- **Drops:** none by default. With `kehancuranDropsPct` 1–10, each removed block has that chance to drop its resources, at most 64 stacks per cast.
+
+**Pulihkan (restore).** A safety rule, not a story feature.
+- Each cast keeps its removed states in memory, up to the cast cap.
+- For `kehancuranUndoMinutes` (10) the master can press "Pulihkan" (Segel Merah tablet or chat).
+- It restores at the same budget, only where the position is still air, and only for casts with 0% drops.
+- The buffer is lost on server restart.
+
+Advancements `destruction_oath`, `world_breaker`.
+
+**Performance.** About 48 block changes per tick at most, light updates included. Zero cost while idle.
+
+#### 20.3.22 Visual summary (client, all scaled by Effect Quality)
+
+| Module | Visuals |
+|---|---|
+| A | candidate mist arrival; test tiers and Duan pillar in the soul colour; recruit ring; promotion robe flash; hall level-up pillar; lost-art restoration glyphs; Formasi Agung layer tints in `FormationFx` |
+| B | departure and return cloud-step; duel ring and per-hit sparks; Void portal swirl and phantom dissolve; crimson wind for the forbidden ground; ghostly ark over the hall; heart-fire motes in the tower; duty puffs |
+| C | robe trim by rank; nametag prefix; soul-colour aura tint; candidate, rival and phantom tints; translucent spirit body and clones; duty poses; natal treasure on the back (silver, gold, orbit); flame orbs; Poison Body haze; dragon form; golden-body glint; Double Pupils eye glyphs; gate veins; every ultimate's particles |
+| D | star orbit and Stellar stage effects; calamity omen and strikes (reusing the TribulationFx look); soul lamps; seal glyphs; heir dantian link; ring ghost; surpass pillar; Tahan Petir arc; the Kehancuran red sky, shape preview, impact dust and restore shimmer |
+
+### 20.4 Modules, file ownership and contracts
+
+Four agents work in parallel after 20.2. **Never edit a file owned by another module.** Anything missing goes into the final report as a TODO.
+
+#### 20.4.1 P6-aula (module A): 20.3.1–20.3.8 (generation and the hall side)
+
+**Owns (new):**
+- `sect/hall/*`: `Halls` (init, tick, actions, commands, info composition), `HallData` (SavedData `kultivator:sect_halls` on the overworld), `HallBlock`, `HallItems` (stele block and item, `immortal_ascension_token`, `lost_scripture_page` + component `kultivator:scripture_page`), `HallLevel`, `Candidates`, `Talents`, `SectRanks`, `Contribution`, `GrandFormation`, `LostArts`, `AwayStore`.
+- `client/hall/*`: `HallClient`, `HallScreen`, `AulaPage`, `CalonPage`, `JenjangPage`, `TreasuryPage`, `LogPage`, `CandidateCard`, `HallFx`.
+- Assets: block model, blockstate and textures; item textures; `tools/gen_hall_textures.py`; recipe `sect_hall_stele.json`; the block loot table.
+- `lang-src/hall.*`.
+- Advancements `sect_gate_open`, `first_recruit_hall`, `determined_disciple`, `first_promotion`, `grand_elder`, `hall_level_5`, `hall_level_9`, `lost_art_restored`, `immortal_token`.
+
+**May edit:** `formation/ProtectiveFormations.java`, `formation/Formation.java`, `client/fx/FormationFx.java`, `client/screen/HelpPage.java`. It adds help topics `aula`, `calon`, `jenjang`, `kontribusi`, `tugas`, `misi`, `turnamen`, `alam_hampa`, `bakat`, `pusaka`, `bintang`, `ikatan`, `kehancuran`; each module writes its own topic texts.
+
+**Commands:** `/kultivasi aula info|nama <nama>`; debug `aula renown <n>`, `aula pk <n>`, `aula calon datang [n]`, `aula level`.
+
+**May slip to 6b:** lost arts, token.
+
+#### 20.4.2 P6-kegiatan (module B): 20.3.9–20.3.15
+
+**Owns (new):**
+- `sect/event/*`: `SectEvents`, `Duties`, `Storehouse`, `Expeditions`, `Envoys`, `PrimordialArk`, `ForbiddenGround`, `DuelArena`, `Tournament`, `HundredDynasties`, `Rivals`, `RivalSkills`, `VoidRealm`, `PromotionTrial`, `BlazingTower`, `SectEventItems` (`spirit_tail_feather`, `foundation_herb`, `spirit_meal`, `kunpeng_bone_fragment` + component `kultivator:kunpeng_piece`).
+- `client/sectevent/*`: `SectEventClient`, `DutyPage`, `MissionPage`, `ArenaPage`, `BracketView`, `SectEventFx`.
+- Assets and `tools/gen_sectevent_textures.py`.
+- `lang-src/sectevent.*` (rival and rival-sect name lists in both languages).
+- Advancements `first_expedition`, `secret_realm`, `primordial_ark`, `forbidden_ground_survivor`, `tournament_champion`, `hundred_dynasties_champion`, `void_floor_10`, `batas_suci`, `chicken_task_force` (hidden).
+
+**May edit:** nothing outside its own files (it uses the spine's `DuelRules` and `spawnWaveFor`).
+
+**Commands:** debug `event turnamen mulai`, `event perang mulai`, `event hampa <floor>`, `event terlarang buka`, `event misi selesai`.
+
+**May slip to 6b:** Menara Langit Membara, Perang Seratus Dinasti.
+
+#### 20.4.3 P6-kekuatan (module C): effects of 20.3.4, 20.3.5 and 20.3.8; 20.3.16, 20.3.17; the disciple visuals
+
+**Owns (new):**
+- `disciple/power/*`: `DisciplePowers` (init, provider registration, actions, commands), `TalentEffects`, `Physiques`, `HereticGates`, `SpecialCandidates`, `Ultimates`, `HeavenlyFlames` (+ `heavenly_flame_seed`, component `kultivator:flame_kind`), `NatalTreasure`, `UndyingCodex`, `SoulFlight`, `KunpengWings`, `SectArts`, `SevenFairies`, `SwordSense`.
+- `client/disciple/power/*`: `PowerClient`, `TalentTab`, `TreasureTab`, `PowerFx`, `PhysiqueVisuals`.
+- Assets and `lang-src/dpower.*`.
+- Advancements `rare_physique`, `heretic_gates`, `signature_ultimate`, `heavenly_flame`, `buddha_lotus_fusion`, `natal_fold_9`, `payung_abadi`, `undying_blood`, `kunpeng_wings`, `beggar_revealed`.
+
+**May edit:** `client/disciple/DiscipleRenderer.java`, `DiscipleRenderState.java`, `DiscipleRobeLayer.java`, `DiscipleHeldItemLayer.java`, `DiscipleLook.java`, `StatusTab.java`, `client/fx/DiscipleFx.java`, and `disciple/DiscipleTechniques.java` (only to add `castInnate(entity, technique, target, powerFactor)` and a range factor; targeting rules unchanged).
+
+**Commands:** debug `murid fisik <id>`, `murid bakat <id>`, `murid lipat <n>`, `murid api <kind>`.
+
+**May slip to 6b:** Formasi Tujuh Peri, Indra Pedang.
+
+#### 20.4.4 P6-jalan-abadi (module D): 20.3.18–20.3.21
+
+**Owns (new):**
+- `disciple/path/*`: `DisciplePaths`, `Stars`, `StarTitles` (pure functions, readable by C), `Calamity`, `SoulLamps`, `DivineClones`, `FoundationTypes`, `HuFa`, `Bond`, `SoulSeal` (+ `soul_seal_jade` + recipe), `Heir`, `MasterRing` (+ `master_soul_ring` + recipe), `Surpass`, `DestroyerArts`.
+- `kehancuran/*`: `Kehancuran`, `WorldBreaker`, `Shapes`, `ProtectedZones`, `KehancuranLog`.
+- `client/disciple/path/*`: `PathClient`, `PathTab`, `PathFx`.
+- `client/kehancuran/*`: `KehancuranClient`, `RedSealPage`, `KehancuranConfirmScreen`, `KehancuranFx`.
+- `data/kultivator/tags/block/indestructible.json`.
+- `lang-src/dpath.*`, `lang-src/kehancuran.*`.
+- Advancements `first_disciple_star`, `disciple_calamity`, `heaven_trampling`, `soul_lamp`, `heaven_dao_foundation`, `perfect_foundation`, `disciple_guardian`, `soul_seal`, `heir_named`, `nine_hexes`, `master_in_ring`, `disciple_surpasses_master`, `destruction_oath`, `world_breaker`.
+
+**May edit:** nothing outside its own files.
+
+**Commands:** `/kultivasi murid tahan`; `/kultivasi kehancuran sumpah|status|pulihkan`; op `kehancuran izin on|off`; debug `murid bintang set <n>`, `murid bencana mulai`, `murid ikatan <n>`.
+
+**May slip to 6b:** soul lamps, Klon Ilahi.
+
+#### 20.4.5 Public API contracts (stubbed by the spine, filled by the owner)
+
+| Owner | Signature |
+|---|---|
+| A | `Halls.hallOf(UUID) → @Nullable HallView` (record: pos, dim, level, renown, radius, active, name) |
+| A | `int Halls.level(UUID)`, `int Halls.cap(UUID)`, `boolean Halls.inTerritory(UUID, Level, Vec3)` |
+| A | `Halls.addRenown(UUID, int, String reasonKey)`, `Halls.addPool(UUID, int)`, `boolean Halls.spendPool(UUID, int)`, `Halls.log(UUID, Component)` |
+| A | `CompoundTag Halls.section(UUID, String key)`, `Halls.setDirty()`, `Halls.addInfoProvider(BiConsumer<ServerPlayer, CompoundTag>)` |
+| A | `Halls.storeAway(UUID owner, DiscipleEntity, long returnAt, String reason, CompoundTag info)`, `Halls.addReturnHandler(String reason, ReturnHandler)` (handler may change the stored disciple data before arrival and returns the arrival position), `List<AwayView> Halls.away(UUID)` |
+| A | `Halls.addCandidates(UUID, List<CandidateSpec>)`, `int Halls.arts(UUID)` (bits 1 Plum, 2 Purple Mist, 4 Northern Heaven) |
+| A | `Talents.soulColor(DiscipleData)`, `setSoulColor(DiscipleData, int)`, `talents(DiscipleData)` (bits), `physique(DiscipleData)` (0 = none), `special(DiscipleData)`, `tekad(DiscipleData)` |
+| A | `SectRanks.rank(DiscipleData)`, `pk(DiscipleData)`, `addPk(DiscipleData, int, String)`, `onPromotionTrialResult(DiscipleEntity, boolean)`, `isProtector(DiscipleData)` |
+| B | `SectEvents.startPromotionTrial(DiscipleEntity, ServerPlayer) → boolean`, `@Nullable String Duties.dutyOf(DiscipleData)`, `int VoidRealm.bestFloor(DiscipleData)`, `boolean VoidRealm.clearedDevilCave(DiscipleData)`, `Tournament.hasTitle(DiscipleData, String)`, `Storehouse.insert(UUID, ItemStack) → ItemStack rest` |
+| C | `DisciplePowers.addTempering(DiscipleData, int)`, `int flames(DiscipleData)`, `int gates(DiscipleData)`, `teachKunpeng(DiscipleEntity) → boolean`, `boolean hasUltimate(DiscipleData)` |
+| D | `int DisciplePaths.stars(DiscipleData)`, `int power(DiscipleData)`, `double barSize(DiscipleData)`, `double grantBarShare(DiscipleData, double fraction)` (EXACT, works without the entity; the caller calls `refreshSynced` when loaded), `int bond(DiscipleData)`, `addBond(DiscipleData, int, String)`, `boolean isHeir(DiscipleData)`, `int calamitiesPassed(DiscipleData)` |
+| D | `StarTitles.title(int stars) → Component` |
+| D | `Kehancuran.serverAllows()`, `playerSworn(ServerPlayer)`, `released(DiscipleData)`, `boolean ProtectedZones.blocked(ServerLevel, BlockPos)` |
+| spine | `DiscipleHooks.*` (20.2.6), `DuelRules.*`, `Disciples.depart/arrive/createCandidate/recruitCandidate`, `DaoProtectors.spawnWaveFor`, `Progression.addMultiplierProvider` |
+| existing, read-only | `DiscipleTechniques.power/mayHit/hostilesAround/cast`, `DiscipleCultivation.distribute/addXp/infoFor`, `Targeting.*`, `Techniques.power`, `Qi.*`, `SpiritRoots.roll`, `Sect`/`Sects` (name, membership), `ProtectiveFormations.insideActiveFormation`, alchemy items and `AlchemyComponents` |
+
+#### 20.4.6 Data keys
+
+**`DiscipleData.extra()`.** Each module writes only its own sub-compound; others may read.
+
+| Sub-compound | Owner | Keys |
+|---|---|---|
+| `extra.sect` | A | `rank`, `pk`, `pk_day`, `pk_today`, `joined`, `protector` |
+| `extra.talent` | A | `tekad`, `tested`, `colour`, `talents`, `physique`, `special {type, realm_r, revealed}`, `duan`, `age` |
+| `extra.activity` | B | `duty`, `meal_until`, `void {best, day, devil}`, `titles {id: until}`, `tower`, `injury_until` |
+| `extra.power` | C | `natal {form, folds}`, `codex {pts, stage, blood, day_pts, unbroken_day}`, `flames [kind]`, `gates`, `toxic`, `gold_stacks`, `gold_dmg`, `gold_hp`, `kunpeng {has}`, `bone_shed`, `dou_di`, `sword_kills`, `trained_hp` |
+| `extra.path` | D | `stars`, `auto`, `calamity`, `trials`, `lamps_out`, `foundation`, `bond`, `bond_day {…}`, `sealed`, `heir {gen, hexes [id], gen_hex}`, `ring {stage, since}`, `surpassed`, `released`, `cd {…}` |
+
+**Player `CultivationData.extra()`:** `hall {moved_day}` (A), `path {heir, generation, surpassers, sworn, ring_given}` (D).
+
+**`HallData` per owner:**
+- `core` (A): pos, dim, name, founded_day, renown, pool, pool_day, offered_today, candidates [records], last_arrival, envoy_day, arts, log [50], away [records], dormant.
+- `activity` (B): storehouse [27], posts {id: soul}, board [missions], board_day, events {next_tournament, count, forbidden_open_until, hundred_counter}, ranking [10], void_board, ark {until, top3}.
+- `kehancuran` (D): log entries. Undo buffers live in memory only.
+
+### 20.5 Order of work and deliverables
+
+1. Phase 5 is committed.
+2. **P6-spine** (20.2).
+3. Modules A, B, C and D in parallel. No Gradle. Each module returns a player-facing summary and a test checklist.
+4. One compile step: `compileJava`, `compileClientJava`, `jar --no-daemon`. Never tests, `runClient` or `build`. Then a fix pass.
+5. **P6-docs:** PANDUAN sections (including a clear Mode Kehancuran warning page), `docs/uji/FASE-6.md` from the module checklists, README.
+
+### 20.6 Rejected and deferred ideas
+
+| Idea | Decision | Reason |
+|---|---|---|
+| Soul Land martial souls, twin souls, aged spirit rings, spirit bones, fusion skills | Deferred to 6b (spirit ring visuals are the first candidate) | A whole second progression track with its own UI. The Wither-based spirit bone drop is impossible, because disciples never fight the Wither. |
+| TDG Demon Spirit Fusion (seven slots) | Deferred to 6b | L effort, new tab, overlaps physiques. The attributeless physique keeps its "all Daos" part. |
+| Martial Peak Small Universe, Apotheosis Hundred Refinements | Deferred to 6b | Item-sink power tracks that duplicate the star curve and the Undying Codex. |
+| Coiling Dragon Dragonblood Warrior | Deferred | Duplicates the Taixu dragon form. |
+| Martial Universe Four Halls | Deferred | An assignment layer on top of ranks; low singleplayer value. |
+| TDG six apprentice classes | Rejected | Only three of the six classes are canon, and they overlap duties and ranks. |
+| Soul Land Sea God Nine Trials and Hell Road | Deferred | The RI calamities already gate the stars. |
+| SSS Tianyan assassin raids | Deferred to 6b | Needs assassin AI; the user plays alone. |
+| Willow Deity, Fanren puppet guards | Deferred | New render or entity work; overlaps Formasi Agung and Pelindung. |
+| Absolute Sword Sense sword memory on vanilla swords | Deferred | Hooks into player combat files owned by others; the Indra Pedang talent is kept. |
+| AtG Overlord Pill and Stabilising Jade | Deferred | The alchemy recipes are owned by phase 4/7. |
+| AWE "a bank win brings resources" bonus | Rejected | Not in the text. |
+| Using AWE flame colours in the kitchen | Rejected | Those colours belong to spirit enhancement. |
+| SSS champion admitted directly as Inner; Darah Es; Reincarnation Stone | Rejected | Weak or unconfirmed sources (one viewer review). |
+| Pan's Gate pooling 20% of Fire Energy | Rejected | Unconfirmed; there is no automatic sect tax. |
+| Martial Peak paying bout winners in contribution points | Rejected | Unconfirmed. |
+| Separate currencies Energi Api and Lencana Jasa | Merged | One currency, Poin Kontribusi. |
+| "Law of Destruction" (Xuantian), ISSTH "1 in 10,000", "+10% divine sense per lamp" | Not claimed | The values stay as plain game design. |
+| Regressor's warning before the master's failing strike, Heart Demon token drop, master's tower-room bonus, Bakat Pil furnace bonus | Dropped | Need edits in player tribulation, trial, meditation or alchemy files owned by other modules. |
+| Wilayah Bintang at ★9, ★27 "Kaisar" title ladder, "Suci Agung" | Dropped | Unsourced or invented. The Stellar Transformations ladder is used instead. |
+| Gold or emerald recruitment fees | Rejected | Unsourced. Shrek's fee is paid by applicants, and Fanren's acceptance is free. Only the test shard and the 100 PK servant path cost anything. |
+| Registered disciples counting as half, trial disciples outside the cap | Rejected | Simpler with one cap rule. |
+| Red-colour cap at Foundation | Moved to Golden Core Peak | So the Heretic God Veins reveal can happen. |
