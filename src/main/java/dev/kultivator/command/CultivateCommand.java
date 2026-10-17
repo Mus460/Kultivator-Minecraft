@@ -117,6 +117,7 @@ public final class CultivateCommand {
 		ProtectiveFormations.addCommands(root, debug);
 		Alchemy.addCommands(root, debug);
 		Ascension.addCommands(root, debug);
+		dev.kultivator.disciple.Disciples.addCommands(root, debug);
 
 		root.then(debug);
 		return root;

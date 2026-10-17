@@ -28,10 +28,13 @@ public class KultivatorClient implements ClientModInitializer {
 		TrialClient.init();
 		BeastClient.init();
 		CultivatorRender.init();
+		dev.kultivator.client.disciple.DiscipleClient.init();
 		BookTooltips.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));
+		ClientPlayNetworking.registerGlobalReceiver(Payloads.DiscipleInfo.TYPE, (payload, context) ->
+				dev.kultivator.client.disciple.DiscipleClient.onInfo(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.OrePings.TYPE, (payload, context) -> TechniqueFx.onOrePings(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.OpenScreen.TYPE, (payload, context) -> {
 			if (payload.screen() == Payloads.OpenScreen.INFO) {
@@ -43,6 +46,8 @@ public class KultivatorClient implements ClientModInitializer {
 				} else {
 					pendingDaoChoice = true;
 				}
+			} else if (payload.screen() == Payloads.OpenScreen.DISCIPLE) {
+				dev.kultivator.client.disciple.DiscipleClient.openScreen(payload.arg());
 			}
 		});
 

@@ -95,6 +95,8 @@ public class Kultivator implements ModInitializer {
 		// Phase 4
 		Alchemy.init();
 		Ascension.init();
+		// Phase 5
+		dev.kultivator.disciple.Disciples.init();
 		// After every module registered its items.
 		ModItems.init();
 
