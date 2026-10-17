@@ -1,0 +1,114 @@
+package dev.kultivator.alchemy;
+
+import net.minecraft.world.item.Rarity;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * The pills refined in an alchemy furnace (DESIGN section 9, phase 4). Each one is an item {@code kultivator:<id>}
+ * ({@link PillItem}); the numbers here are for Mid quality and are multiplied by {@link PillQuality#multiplier()}.
+ */
+public enum PillKind {
+	/** Pil Pengumpul Qi: cultivation XP worth 15% of the bar, at most {@link #QI_GATHERING_MAX_XP}. */
+	QI_GATHERING("qi_gathering_pill", 0x7FE0FF, 6, 1, Rarity.COMMON),
+	/** Pil Pemulih Qi: restores 50% of the qi pool. */
+	QI_RECOVERY("qi_recovery_pill", 0x4A8CFF, 5, 1, Rarity.COMMON),
+	/** Pil Pembangunan Fondasi: next breakthrough +15% (full strength at Qi Refining, half otherwise). */
+	FOUNDATION("foundation_pill", 0xE0B060, 12, 2, Rarity.UNCOMMON),
+	/** Pil Inti Emas: next tribulation strikes x0.85. */
+	GOLDEN_CORE("golden_core_pill", 0xFFC23C, 15, 2, Rarity.RARE),
+	/** Pil Penenang Hati: heart demon pressure -50, Qi Deviation 40% shorter. */
+	HEART_CALMING("heart_calming_pill", 0xF7A8C8, 8, 2, Rarity.UNCOMMON),
+	/** Pil Penyembuh: heals 60% of max health, halves a Qi Deviation (Perfect cures it). */
+	HEALING("healing_pill", 0x6CFF8A, 7, 1, Rarity.COMMON),
+	/** Pil Penangkal Petir: next tribulation strikes x0.75. */
+	TRIBULATION_WARDING("tribulation_warding_pill", 0x9A7CFF, 15, 2, Rarity.RARE),
+	/** Pil Pemelihara Jiwa: cultivation XP worth 30% of the bar (at most {@link #SOUL_NURTURING_MAX_XP}), Nascent Soul and above only. */
+	SOUL_NURTURING("soul_nurturing_pill", 0xD9B8FF, 22, 3, Rarity.RARE),
+	/** Pil Dewa: cultivation XP worth a whole bar, full qi, purges all pill toxicity. */
+	IMMORTAL("immortal_pill", 0xFFF0B0, 0, 3, Rarity.EPIC);
+
+	public static final double QI_GATHERING_XP = 0.15D;
+	/** Cap of the Qi Gathering XP before quality (about 15% of a Golden Core Peak bar), so late realms cannot be pill-farmed. */
+	public static final double QI_GATHERING_MAX_XP = 450.0D;
+	public static final double QI_RECOVERY_QI = 0.5D;
+	public static final double FOUNDATION_BONUS = 0.15D;
+	/** Outside Qi Refining the foundation pill works at this share. */
+	public static final double FOUNDATION_OFF_REALM = 0.5D;
+	/** Outside Qi Refining, Foundation pills never raise the next breakthrough bonus above this. */
+	public static final double FOUNDATION_OFF_REALM_MAX = 0.15D;
+	public static final double GOLDEN_CORE_REDUCTION = 0.15D;
+	public static final double HEART_PRESSURE = 50.0D;
+	public static final double HEART_DEVIATION = 0.4D;
+	public static final double HEALING_HEALTH = 0.6D;
+	public static final double HEALING_DEVIATION = 0.5D;
+	public static final double WARDING_REDUCTION = 0.25D;
+	public static final double SOUL_NURTURING_XP = 0.30D;
+	/** Cap of the Soul Nurturing XP before quality (30% of a Deity Transformation Early bar). */
+	public static final double SOUL_NURTURING_MAX_XP = 3600.0D;
+	public static final double IMMORTAL_XP = 1.0D;
+
+	private static final PillKind[] ALL = values();
+
+	private final String id;
+	private final int color;
+	private final int toxin;
+	private final int strength;
+	private final Rarity rarity;
+
+	PillKind(String id, int color, int toxin, int strength, Rarity rarity) {
+		this.id = id;
+		this.color = color;
+		this.toxin = toxin;
+		this.strength = strength;
+		this.rarity = rarity;
+	}
+
+	/** Item id path, e.g. {@code qi_gathering_pill}. */
+	public String id() {
+		return id;
+	}
+
+	/** Id without the {@code _pill} suffix, used by commands. */
+	public String shortId() {
+		return id.endsWith("_pill") ? id.substring(0, id.length() - "_pill".length()) : id;
+	}
+
+	/** RGB of the pill (effects, action bar). */
+	public int color() {
+		return color;
+	}
+
+	/** Base toxin (Mid quality); see {@link #toxin(PillQuality)}. */
+	public int toxin() {
+		return toxin;
+	}
+
+	/** Toxin of a pill of this quality. */
+	public double toxin(PillQuality quality) {
+		return toxin * quality.toxinFactor();
+	}
+
+	/** 1..3, how grand the swallowing effect looks. */
+	public int strength() {
+		return strength;
+	}
+
+	public Rarity rarity() {
+		return rarity;
+	}
+
+	/** The pill gives cultivation XP (so pill toxicity weakens it). */
+	public boolean givesXp() {
+		return this == QI_GATHERING || this == SOUL_NURTURING || this == IMMORTAL;
+	}
+
+	/** Null when unknown; accepts the item id or the short id. */
+	public static @Nullable PillKind byId(String id) {
+		for (PillKind kind : ALL) {
+			if (kind.id.equals(id) || kind.shortId().equals(id)) {
+				return kind;
+			}
+		}
+		return null;
+	}
+}

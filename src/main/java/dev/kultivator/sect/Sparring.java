@@ -37,6 +37,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -59,7 +60,8 @@ import java.util.UUID;
  * and is judged by the health it really left. Harm without an attacker (burning left by a Flame Palm, a fall after a
  * Mountain Stomp, a wall or lava after a push) counts as the partner's for a few seconds after their blow, and any such
  * harm that would leave a duelist below 10% ends the duel instead, also during the short truce after a decisive blow;
- * leftovers are put out when the duel ends. Damage from anyone else is untouched, and vanilla PvP rules (game rule
+ * leftovers are put out when the duel ends. Techniques never throw or drag a player, and a duelist who still falls below
+ * the world is put back next to the partner and loses (also during the truce). Damage from anyone else is untouched, and vanilla PvP rules (game rule
  * {@code pvp}, teams) still apply. The duel also ends without a winner on leave, death, dimension change, distance over
  * 48 blocks, a switch to creative/spectator, or timeout. The winner is rewarded only for a real fight: at least 15 s
  * long, the loser starting with at least 80% health and losing at least 40% of it to the winner, and at most once per
@@ -336,6 +338,14 @@ public final class Sparring {
 		}
 		if (!TRUCES.isEmpty()) {
 			TRUCES.values().removeIf(truce -> truce.until() <= now);
+			// A launch from before the decisive blow may still carry someone over the edge during the truce.
+			for (Map.Entry<UUID, Truce> entry : TRUCES.entrySet()) {
+				ServerPlayer victim = online(server, entry.getKey());
+				ServerPlayer other = online(server, entry.getValue().other());
+				if (victim != null && other != null && victim.level() == other.level() && belowWorld(victim)) {
+					rescue(victim, other);
+				}
+			}
 		}
 		if (DUELS.isEmpty()) {
 			return;
@@ -390,6 +400,18 @@ public final class Sparring {
 		if (a.isSpectator() || a.isCreative() || b.isSpectator() || b.isCreative()) {
 			end(server, duel, null, End.MODE, "");
 			return;
+		}
+		if (duel.fighting()) {
+			// Never lethal: someone knocked off an island or into a deep hole is caught long before the void hurts
+			// (void damage starts 64 blocks below the world), put back next to the partner, and loses the duel.
+			for (ServerPlayer victim : new ServerPlayer[]{a, b}) {
+				if (belowWorld(victim)) {
+					ServerPlayer partner = victim == a ? b : a;
+					rescue(victim, partner);
+					end(server, duel, partner, End.DEFEAT, victim.getPlainTextName());
+					return;
+				}
+			}
 		}
 		if (!duel.fighting()) {
 			long elapsed = now - duel.accepted;
@@ -789,6 +811,19 @@ public final class Sparring {
 	private static int refuse(ServerPlayer player, Component message) {
 		Msg.chat(player, message.copy().withStyle(ChatFormatting.RED));
 		return 0;
+	}
+
+	/** True when the living player has fallen below the bottom of the world (on the way to the void). */
+	private static boolean belowWorld(ServerPlayer player) {
+		return player.isAlive() && player.getY() < player.level().getMinY();
+	}
+
+	/** Puts {@code victim} back next to {@code partner}, motion and fall stopped. Only moves the entity. */
+	private static void rescue(ServerPlayer victim, ServerPlayer partner) {
+		victim.resetFallDistance();
+		victim.setDeltaMovement(Vec3.ZERO);
+		victim.teleportTo(partner.level(), partner.getX(), partner.getY(), partner.getZ(), Relative.ROTATION, 0.0F, 0.0F, false);
+		victim.resetFallDistance();
 	}
 
 	private static @Nullable ServerPlayer online(MinecraftServer server, UUID id) {

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_pill",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.failed_refining.description"
+    },
+    "icon": {
+      "id": "minecraft:coal"
+    },
+    "title": {
+      "translate": "advancement.kultivator.failed_refining.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 final class HelpPage extends Page {
 
 	private static final String[] TOPICS = {"meditation", "xp", "bottleneck", "breakthrough", "tribulation", "protectors", "pills",
-			"techniques"};
+			"techniques", "roots", "dao", "alchemy", "heart_demon", "beasts", "formations", "sects", "ascension", "visuals"};
 	private static final KeyMapping[] KEYS = {Keys.MEDITATE, Keys.CAST, Keys.PREVIOUS, Keys.NEXT, Keys.FLYING_SWORD, Keys.INFO};
 
 	private final Eased scrollShown = new Eased(14.0F);

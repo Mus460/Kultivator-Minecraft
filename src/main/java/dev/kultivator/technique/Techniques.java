@@ -461,6 +461,10 @@ public final class Techniques {
 		} else {
 			source = damageSource(level, caster);
 		}
+		if (!(target instanceof ServerPlayer)) {
+			// The hit's knockback could push a monster into a portal; travel could build an exit portal (blocks).
+			target.setPortalCooldown();
+		}
 		boolean hit = target.hurtServer(level, source, amount);
 		if (hit && target.isDeadOrDying()) {
 			Cultivators.get(caster).addTechniqueKill();

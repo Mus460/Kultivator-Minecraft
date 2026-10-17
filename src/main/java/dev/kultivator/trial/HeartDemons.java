@@ -46,6 +46,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -116,14 +117,17 @@ public final class HeartDemons {
 		int respawns;
 		/** Decided inside the damage event; applied on the next tick (never inside another entity's hurt call). */
 		@Nullable Outcome pending;
+		/** Where the owner last stood on the ground (put back there if the demon throws them into the void). */
+		Vec3 lastGround;
 
-		Trial(UUID owner, Kind kind, @Nullable Rank target, ResourceKey<Level> dimension, int duration, ServerBossEvent bar) {
+		Trial(UUID owner, Kind kind, @Nullable Rank target, ResourceKey<Level> dimension, int duration, ServerBossEvent bar, Vec3 start) {
 			this.owner = owner;
 			this.kind = kind;
 			this.target = target;
 			this.dimension = dimension;
 			this.duration = duration;
 			this.bar = bar;
+			this.lastGround = start;
 		}
 	}
 
@@ -368,7 +372,7 @@ public final class HeartDemons {
 		bar.setDarkenScreen(true);
 		bar.setProgress(1.0F);
 		bar.addPlayer(player);
-		Trial trial = new Trial(player.getUUID(), kind, target, player.level().dimension(), duration, bar);
+		Trial trial = new Trial(player.getUUID(), kind, target, player.level().dimension(), duration, bar, player.position());
 		trial.demon = demon;
 		TRIALS.put(player.getUUID(), trial);
 
@@ -458,6 +462,22 @@ public final class HeartDemons {
 		if (!player.level().dimension().equals(trial.dimension)) {
 			finish(player, data, trial, Outcome.FLED);
 			return;
+		}
+		if (player.getY() < player.level().getMinY()) {
+			// Thrown off an edge by the demon's dash or blow: caught long before the void hurts (it starts 64 blocks below
+			// the world), put back where they last stood, and the heart gives way (never lethal).
+			ServerLevel level = player.level();
+			Vec3 spot = Targeting.safeSpot(level, player, trial.lastGround);
+			Vec3 to = spot != null ? spot : trial.lastGround;
+			player.setDeltaMovement(Vec3.ZERO);
+			player.resetFallDistance();
+			player.teleportTo(level, to.x, to.y, to.z, Relative.ROTATION, 0.0F, 0.0F, false);
+			player.resetFallDistance();
+			finish(player, data, trial, Outcome.OVERWHELMED);
+			return;
+		}
+		if (player.onGround()) {
+			trial.lastGround = player.position();
 		}
 		if (player.getHealth() + player.getAbsorptionAmount() < player.getMaxHealth() * LOSE_FRACTION) {
 			// Below 20% from anything (other mobs, fire, hunger...): the heart gives way.
@@ -659,7 +679,8 @@ public final class HeartDemons {
 	 * leave its owner below 20% of their max health is cancelled, and the trial is lost at that moment (resolved on the
 	 * next tick). The damage is estimated after armour, Resistance and Protection ({@link DamageEstimate}, an upper
 	 * bound); a demon's blow on a raised shield goes through unless it could kill, and {@link #afterDamage} judges the
-	 * health it really left.
+	 * health it really left. The void's own damage is not held back here; instead tickTrial catches an owner who falls
+	 * below the world, puts them back on the ground and ends the trial as lost.
 	 */
 	private static boolean allowDamage(LivingEntity victim, DamageSource source, float amount) {
 		if (!(victim instanceof ServerPlayer player) || TRIALS.isEmpty()) {

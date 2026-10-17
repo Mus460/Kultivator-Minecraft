@@ -9,7 +9,9 @@
     "SilverfishMixin",
     "CreakingMixin",
     "SculkSensorBlockMixin",
-    "BigDripleafBlockMixin"
+    "BigDripleafBlockMixin",
+    "EntityMixin",
+    "RedStoneOreBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

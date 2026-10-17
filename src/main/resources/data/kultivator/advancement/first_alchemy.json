@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_pill",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.first_alchemy.description"
+    },
+    "icon": {
+      "id": "minecraft:cauldron"
+    },
+    "title": {
+      "translate": "advancement.kultivator.first_alchemy.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

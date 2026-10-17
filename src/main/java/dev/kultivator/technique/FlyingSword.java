@@ -125,12 +125,14 @@ public final class FlyingSword {
 		Cultivators.dirty(player);
 
 		Vec3 feet = player.position();
-		int colorIndex = SwordColors.index(BuiltInRegistries.ITEM.getKey(sword.getItem()).toString());
+		// The sword actually ridden (one not held, when there is one), the same one the look shows.
+		ItemStack ridden = Cultivators.flightSword(player);
+		int colorIndex = SwordColors.index(BuiltInRegistries.ITEM.getKey(ridden.getItem()).toString());
 		Techniques.fx(player, Technique.FLYING_SWORD, colorIndex << 4, feet, feet, 1.0F);
 		level.playSound(null, feet.x, feet.y, feet.z, SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 0.9F, 1.4F);
 		level.playSound(null, feet.x, feet.y, feet.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0F, 1.6F);
 		Msg.actionBar(player, Component.translatable("kultivator.techniques.flying_sword.mount",
-				sword.getHoverName().copy().withColor(SwordColors.color(colorIndex)),
+				ridden.getHoverName().copy().withColor(SwordColors.color(colorIndex)),
 				Techniques.name(Technique.FLYING_SWORD)).withColor(Techniques.JADE));
 		Advancements.grant(player, "flying_sword");
 		return true;

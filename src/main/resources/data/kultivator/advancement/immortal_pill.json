@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_alchemy",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.immortal_pill.description"
+    },
+    "icon": {
+      "id": "kultivator:immortal_pill"
+    },
+    "title": {
+      "translate": "advancement.kultivator.immortal_pill.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}
