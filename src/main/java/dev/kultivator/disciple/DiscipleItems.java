@@ -103,6 +103,8 @@ public final class DiscipleItems {
 			builder.accept(Component.translatable("kultivator.disciples.scroll.tooltip").withStyle(ChatFormatting.GRAY));
 			builder.accept(Component.translatable("kultivator.disciples.scroll.tooltip_limit", Disciples.MAX_DISCIPLES)
 					.withStyle(ChatFormatting.DARK_GRAY));
+			// Phase 6 (DESIGN 20.2.7): disciples come from the Sect Hall; the scroll is no longer craftable.
+			builder.accept(Component.translatable("kultivator.spine6.scroll.creative_only").withStyle(ChatFormatting.GOLD));
 		}
 	}
 
@@ -131,6 +133,12 @@ public final class DiscipleItems {
 									TooltipFlag flag) {
 			builder.accept(Component.translatable("kultivator.disciples.tablet.tooltip").withStyle(ChatFormatting.GRAY));
 			builder.accept(Component.translatable("kultivator.disciples.tablet.tooltip_safe").withStyle(ChatFormatting.DARK_GRAY));
+			// The lineage counter of an heir (DESIGN 20.3.20: "Generasi ke-N" in the tooltip).
+			int gen = soulOf(stack).getCompoundOrEmpty("disciple").getCompoundOrEmpty("extra").getCompoundOrEmpty("path")
+					.getCompoundOrEmpty("heir").getIntOr("gen", 0);
+			if (gen > 0) {
+				builder.accept(Component.translatable("kultivator.spine6.tablet.generation", gen).withStyle(ChatFormatting.GOLD));
+			}
 		}
 	}
 

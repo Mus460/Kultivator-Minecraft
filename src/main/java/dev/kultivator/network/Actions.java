@@ -30,7 +30,7 @@ public final class Actions {
 	// Disciples (phase 5): arg = the disciple's entity id, text = the parameter.
 	/** Ask the server for the disciple's details and open its screen. */
 	public static final int DISCIPLE_OPEN = 14;
-	/** Set the disciple's order: text = follow | stay | meditate | assist. */
+	/** Set the disciple's order: text = follow | stay | meditate | assist | guard_hall. */
 	public static final int DISCIPLE_MODE = 15;
 	/** Teach the technique with id {@code text}. */
 	public static final int DISCIPLE_TEACH = 16;
@@ -42,6 +42,21 @@ public final class Actions {
 	public static final int DISCIPLE_CHOOSE_DAO = 19;
 	/** Rename is done with a name tag; this releases the disciple (text must be "confirm"). */
 	public static final int DISCIPLE_RELEASE = 20;
+
+	// 21-24 stay reserved for phase 7 ("Dunia yang Hidup", DESIGN 19).
+
+	// Phase 6 (DESIGN 20.2.1). Hall actions: arg = the sub-op. Disciple actions: arg = the disciple's entity id.
+	// text carries "op[:param]" in both cases.
+	/** The Sect Hall screen ({@code sect.hall.Halls.handleAction}). */
+	public static final int HALL = 30;
+	/** Sect events: duties, missions, arena ({@code sect.event.SectEvents.handleAction}). */
+	public static final int SECT_EVENT = 31;
+	/** A disciple's talents, treasures and ultimates ({@code disciple.power.DisciplePowers.handleAction}). */
+	public static final int DISCIPLE_POWER = 32;
+	/** A disciple's path: stars, bond, heir, seal ({@code disciple.path.DisciplePaths.handleAction}). */
+	public static final int DISCIPLE_PATH = 33;
+	/** Mode Kehancuran locks and casts ({@code kehancuran.Kehancuran.handleAction}). */
+	public static final int KEHANCURAN = 34;
 
 	private Actions() {
 	}

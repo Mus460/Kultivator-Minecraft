@@ -13,7 +13,17 @@ This document is the contract every contributor (human or agent) follows. Read i
 > **User decision (phase 6, 2026-10-17):** the ONLY exception to rule 1 below is the opt-in **Mode Kehancuran**
 > (destruction mode) for very powerful disciples (DESIGN 20). It is OFF by default, switched on explicitly by the
 > player/server, never touches blocks near a Sect Hall or the master, and is capped in radius and blocks per tick.
+> **User decision (phase 6b, 2026-10-17):** the second exception is **Pembangunan Sekte** (DESIGN 21): the sect complex
+> the player chose builds itself from deposited resources, placing blocks and levelling terrain ONLY inside the
+> footprint the player previewed and confirmed; displaced natural blocks are credited to the sect storehouse.
 > Everything else in the mod stays fully block-safe.
+> **User decision (phase 6c, 2026-10-17):** "the world blocks must really get destroyed too, not only big effects" ->
+> chosen option "Saklar gampang": Mode Kehancuran also applies to the PLAYER's own techniques (DESIGN 22). It stays OFF
+> by default so a base is never wrecked by accident, but switching it on is ONE click in the Kitab Teknik (or
+> `/kultivasi kehancuran nyala|mati`): no oath screen for the player's own switch, just a one-line red chat warning with
+> the undo command. While it is on, every damaging technique really carves craters, trenches and split terrain that grow
+> with the realm (kehancuran/WorldBreaker stays the only block-changing code: caps, MSPT pause, undo log, safe zones around
+> Sect Halls, players and spawn). On a dedicated server the switch needs the server permission of 20.3.21.
 
 1. **No block is ever burned, broken, placed, replaced or changed by any effect, power, technique, event, entity or
    formation of this mod.** Formations, alchemy furnaces and spiritual sites only *read* blocks. Concretely:
@@ -1688,7 +1698,7 @@ health; `tur` cycles the same realm list as the player tour on that disciple and
   - Disciples still never fight `DiscipleEntity.untouchable` mobs: creeper, ghast, blaze, breeze, ravager, silverfish, Wither and heart-bound creaking.
   - Every reward below that names one of these mobs credits the **master's** kill, never a disciple's.
 * **Performance (a laptop that also runs Valorant).**
-  - Per hall at most: 6 candidate entities, 2 duellists plus at most 1 rival or phantom, 2 clones per disciple.
+  - Per hall at most: 6 candidate entities (8 on a Hundred Dynasties War day, the one documented exception), 2 duellists plus at most 1 rival or phantom, 2 clones per disciple.
   - Disciples on expeditions or soul flight are pure data, with zero ticking.
   - Hall logic runs every 20 ticks. The building scan is spread over 9 ticks every 30 s.
   - Duties, expeditions and away timers are computed lazily from game time.
@@ -1974,7 +1984,7 @@ Untested candidates can be accepted blind; everything is revealed on joining.
 
 **UI (Calon tablet).** One scroll card per candidate: face, name, age, Tekad bar, verdict seal, talisman buttons, a countdown "Pergi saat fajar 0:14:20", and "Penerimaan berikutnya: hari 12".
 
-**Performance.** At most 6 candidate entities, each with a stroll goal ticked every 10 ticks and look-at AI.
+**Performance.** At most 6 candidate entities (8 on a war day), each with a stroll goal ticked every 10 ticks and look-at AI. Tokens, envoys and invitations never spawn past the cap: an extra record waits and gets its body when a slot frees.
 
 #### 20.3.4 Token Kenaikan Abadi and the Calon Istimewa (A rolls, C applies)
 
@@ -2803,7 +2813,9 @@ Locks 2 and 3 each open `OpenScreen.KEHANCURAN_CONFIRM`. Closing any lock is one
 **Execution (`WorldBreaker`).**
 - One running job per server, at most 2 queued.
 - Positions are ordered centre-out in shells for spheres and columns, top-down for trenches, pits and discs, and cut at `kehancuranMaxBlocksPerCast` (4,096), so a capped cast still looks like a crater.
-- Each server tick (END_SERVER_TICK) removes at most `kehancuranBlocksPerTick` (48) positions across all jobs with `setBlock(air, Block.UPDATE_CLIENTS)`: flag 2, no neighbour updates, no cascades. Gravity blocks may float until touched.
+- Each server tick (END_SERVER_TICK) removes at most `kehancuranBlocksPerTick` (48) positions across all jobs with `setBlock(air, UPDATE_CLIENTS | UPDATE_KNOWN_SHAPE | UPDATE_SUPPRESS_DROPS | UPDATE_SKIP_ON_PLACE)` (2|16|32|512). In 26.3 flag 2 alone still runs the neighbour shape updates, which pop torches and signs, start fluids and drop sand; flag 16 skips them, so there are no cascades. Gravity blocks may float until touched.
+- A position next to a fluid or a block entity, or next to an unloaded chunk, is never removed (a later neighbour update could let water or lava in or pop a sign).
+- Disciples (the caster too), tamed pets and spirit beasts are a protected zone of 6 blocks, like villagers, so none of them falls into a pit.
 - The job pauses while `server.getAverageTickTimeNanos()` > `kehancuranMsptPause` (45 ms).
 - No fire, no `Explosion`, no item entities.
 - **Drops:** none by default. With `kehancuranDropsPct` 1–10, each removed block has that chance to drop its resources, at most 64 stacks per cast.
@@ -2811,7 +2823,8 @@ Locks 2 and 3 each open `OpenScreen.KEHANCURAN_CONFIRM`. Closing any lock is one
 **Pulihkan (restore).** A safety rule, not a story feature.
 - Each cast keeps its removed states in memory, up to the cast cap.
 - For `kehancuranUndoMinutes` (10) the master can press "Pulihkan" (Segel Merah tablet or chat).
-- It restores at the same budget, only where the position is still air, and only for casts with 0% drops.
+- It restores at the same budget and the same flags, only where the position is still air, and only for casts with 0% drops.
+- A restore ignores the protected zones (it only puts back what the cast took). It waits for unloaded chunks and for anyone standing in a block, and hands those blocks back to the buffer with the original expiry, so "Pulihkan" can be pressed again. Closing a lock or switching the mode off never stops a running restore.
 - The buffer is lost on server restart.
 
 Advancements `destruction_oath`, `world_breaker`.
@@ -2842,7 +2855,7 @@ Four agents work in parallel after 20.2. **Never edit a file owned by another mo
 
 **May edit:** `formation/ProtectiveFormations.java`, `formation/Formation.java`, `client/fx/FormationFx.java`, `client/screen/HelpPage.java`. It adds help topics `aula`, `calon`, `jenjang`, `kontribusi`, `tugas`, `misi`, `turnamen`, `alam_hampa`, `bakat`, `pusaka`, `bintang`, `ikatan`, `kehancuran`; each module writes its own topic texts.
 
-**Commands:** `/kultivasi aula info|nama <nama>`; debug `aula renown <n>`, `aula pk <n>`, `aula calon datang [n]`, `aula level`.
+**Commands:** `/kultivasi aula info|nama <nama>`; debug `aula renown <n>`, `aula pk <n>`, `aula calon datang [n]`, `aula calon perang` (the 8 war youths now), `aula level`.
 
 **May slip to 6b:** lost arts, token.
 
@@ -2966,3 +2979,2059 @@ Four agents work in parallel after 20.2. **Never edit a file owned by another mo
 | Gold or emerald recruitment fees | Rejected | Unsourced. Shrek's fee is paid by applicants, and Fanren's acceptance is free. Only the test shard and the 100 PK servant path cost anything. |
 | Registered disciples counting as half, trial disciples outside the cap | Rejected | Simpler with one cap rule. |
 | Red-colour cap at Foundation | Moved to Golden Core Peak | So the Heretic God Veins reveal can happen. |
+
+## 21. Phase 6b — Pembangunan Sekte (sect construction)
+
+**User decisions (2026-10-17), in order:**
+1. "I get missions to gather resources to build the sect. I just deposit them and the sect builds itself slowly. At the start I choose a sect complex template (small, medium, large, very large). The sect has 9 tiers of size."
+2. "The size grades are divided into 6 levels."
+3. **Latest, overrides the earlier ones:** "Nine template sizes, then — and design the sect beautifully (*yang bagus*)."
+
+**Result:**
+- There are **nine templates**. The player chooses one when founding the sect, on the stele.
+- Each template has **nine growth tiers**: T1 is the founding compound and T9 is the complete, magnificent sect of that size.
+- The sect builds itself, gradually, from materials the player deposits.
+
+---------------------------------------------------------------------------------------------------------------------
+
+**User decision 4 (2026-10-17), binding for the whole flow:** "I want to build just by depositing the materials that are
+needed; then the building builds itself automatically once the materials are enough."
+- Depositing is the ONLY thing the player has to do. As soon as the next building's (component's) bill is fully covered by
+  deposits, it is reserved and starts building **automatically**, with no button per building or tier, no confirmation, no
+  timer and no renown gate. The only confirmation is the one-time founding confirm of the footprint (21.12).
+- Builders (disciples), Misi Pembangunan and gathering expeditions are OPTIONAL helpers: they only make gathering easier or
+  placement faster. With zero disciples and zero missions the sect still builds completely.
+- The stele page and the HUD always show clearly what the next building still needs ("Masih kurang: 32 Batu, 12 Kayu...")
+  and the deposit button/right-click takes the needed items from the inventory in one go.
+- Once funded, a building rises at the pace of 21.15 (a few minutes per building, watchable); `sectBuildSpeed` (config,
+  up to 4x) and the test commands (`uji sekte tingkat <n> instan`) make it faster.
+
+### 21.0 Principles
+
+1. **Blocks are placed only inside the confirmed footprint.** This is the second exception to DESIGN 0, and the user asked for it explicitly.
+   - Pembangunan Sekte places blocks and levels terrain **only inside the footprint column the player previewed as a hologram and confirmed**. The column is the template-local rectangle of 21.1 times that template's height envelope.
+   - `sect/build/engine/BuildPlacer` is the only new code that calls `setBlock`. The other caller in the mod stays `kehancuran/WorldBreaker`.
+   - Natural blocks it moves are credited to the **Gudang Bahan Sekte** (21.13). They are never lost.
+   - Player-made blocks, block entities and protected blocks are never removed silently.
+   - Outside the footprint nothing changes, apart from the vanilla side effects named in the consent text (21.10).
+   - Everything else in the mod stays fully block-safe.
+2. **Beauty is a primary requirement.** The sect must look like a real classical Chinese sect from donghua and manhua art:
+   - red lacquered pillars and teal painted beams;
+   - curved dark-tile roofs with upturned eaves, double eaves on important halls;
+   - white plaster walls on stone plinths, with gold and jade used sparingly;
+   - a paifang gate, then long stone stairs and terraces rising along a symmetric axis toward the main hall;
+   - asymmetric water gardens beside the axis: arched bridges, lotus ponds, waterfalls, a pagoda, lanterns, plum and azalea trees, bamboo, rock gardens and incense burners.
+   - Larger templates add grandeur: several peaks, hanging islands chained to the ground, cloud-sea terraces and a sky-piercing pagoda.
+   - The art rules in 21.5–21.8 are binding and are checked by `uji sekte audit`.
+   - **Every tier must already look intentional and pretty, never like a construction site** (21.2).
+3. **Just deposit.** Materials are the only gate. There is no renown gate and no timer. The sect builds itself at a slow pace the player can watch.
+4. **One component at a time, fully paid.** A component starts only when its whole bill is reserved. Only one component per site is open at a time. The sect therefore never stands half-built waiting for materials.
+5. **Laptop first.** The game must stay playable on a weak laptop that also runs Valorant.
+   - Placement is strictly budgeted and done in bursts.
+   - Chunks are never force-loaded, and there is an MSPT guard.
+   - Ops are generated off the main thread.
+   - The largest template (161×161) stays buildable over a long time (21.15).
+6. **Source rule (20.1).** Every story idea cites a verified work and concept.
+   - Real Chinese architecture (Yingzao Fashi, the Forbidden City, Jiangnan gardens and so on) is art direction and is **never presented as novel canon**.
+   - Numbers, costs, UI and safety rules are game design.
+7. **Singleplayer first.** A site belongs to one player. On LAN, sect mates get a read-only view and may deposit materials.
+8. **Constants and text.** Every number is a `public static final` in its class. All text exists in `id_id` and `en_us`. All GUI is the jade scroll of DESIGN 5b.
+
+**Sumber / Source (the phase as a whole):**
+- *Return of the Mount Hua Sect*: the fallen, ruined Mount Hua is restored and its fame returns.
+- *Perfect World*, ch. 551/558: Shi Hao vows to rebuild the ruined Heaven Mending Pavilion.
+- *Martial Peak*: Yang Kai starts as a trial disciple and floor sweeper of High Heaven Pavilion. He founds High Heaven Palace in the Star Boundary's Northern Territory, and it later becomes High Heaven Cave Heaven, ranked first of the 36.
+- *Battle Through the Heavens*: Xiao Yan co-founds Pan Men in the Inner Academy, then Xiao Gate in Maple City in the Black-Corner Region, then the Yan Alliance.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.1 The nine templates
+
+**How the axes work:**
+- Template-local axes: +z points to the gate (front), −z to the main hall, and +x is east.
+- The stele is at (0,0,0). The plaza floor is at stele y − 1.
+- Footprints are rectangles that lie deeper behind the stele than in front of it. Every width is odd, so the axis runs through the stele cell.
+- The player can rotate the template in 90° steps. There is no mirror option, because a mirror would flip the Bagua trigrams and the plaque text.
+
+**Table A: names and geometry**
+
+| # | id | Nama (id_id) / en_us | Footprint W×D | Local bounds | Envelope above / below plaza | Max relief (P95−P5) | Earthwork cap (cut + fill) | Realm hint (plaque only) |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `unranked` | **Sekte Tak Berperingkat** / Unranked Sect | 25×29 | x ±12, z −16..12 | +14 / −14 | 10 | 3,625 | Manusia Fana |
+| 2 | `third_rate` | **Sekte Kelas Tiga** / Third-Rate Sect | 33×39 | x ±16, z −24..14 | +24 / −14 | 14 | 6,435 | Pemurnian Qi |
+| 3 | `second_rate` | **Sekte Kelas Dua** / Second-Rate Sect | 45×51 | x ±22, z −32..18 | +36 / −18 | 18 | 11,475 | Pembangunan Fondasi |
+| 4 | `first_rate` | **Sekte Kelas Satu** / First-Rate Sect | 57×63 | x ±28, z −38..24 | +40 / −18 | 22 | 17,955 | Inti Emas |
+| 5 | `great` | **Sekte Agung** / Great Sect | 73×81 | x ±36, z −50..30 | +48 / −22 | 28 | 29,565 | Jiwa Baru Lahir |
+| 6 | `holy_land` | **Tanah Suci** / Holy Land | 89×97 | x ±44, z −60..36 | +56 / −26 | 36 | 43,165 | Transformasi Dewa |
+| 7 | `cave_heaven` | **Gua Surga Tanah Berkah** / Cave Heaven, Blessed Land | 109×117 | x ±54, z −72..44 | +62 / −26 | 44 | 63,765 | Penyatuan Dao |
+| 8 | `ancient_lineage` | **Warisan Kuno Abadi** / Ancient Immortal Lineage | 133×141 | x ±66, z −88..52 | +70 / −30 | 52 | 93,765 | Kenaikan Abadi |
+| 9 | `heavenly_court` | **Istana Langit** / Heavenly Court | 161×161 | x ±80, z −100..60 | +100 / −30 | 64 | 129,605 | Dewa Abadi |
+
+**Table B: composition and perks**
+
+| # | Archetype (unique per template) | Main hall | Dominant vertical (one only) | Boundary | Tower rooms | Qi seat tier | Gate altars (optional) | Disc: lodestone z / ring r | Territory R_t |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | courtyard hermitage (siheyuan) | Aula Pendiri, 3-bay xieshan, rank C | hero plum | bamboo fence → white wall | 3 (cellar) | 1 (the disc) | 0 | 2 / 4 | 24 |
+| 2 | two courts climbing a slope | 3-bay xieshan on a +3 terrace | 3-floor square pagoda | white wall + wooden gate | 3 | 1 | 0 | 6 / 4 | 32 |
+| 3 | Jiangnan water garden: horse-head gables, moon gates | 5-bay xieshan | 5-floor pagoda behind the pond | stepped white walls | 4 | 1 | 0 | 6 / 5 | 40 |
+| 4 | martial mountain gate: long central stair | 5-bay double-eave xieshan on +8 | main hall at the stair head | red palace walls, 4 watchtowers | 4 | 2 | 0 | 6 / 5 | 46 |
+| 5 | orthodox great sect: white marble terrace | 5-bay double-eave xieshan | Pagoda Kaca Tujuh Harta (7F) | red walls, 2 front towers | 5 | 2 | 0 | 6 / 5 | 58 |
+| 6 | twin peaks: gallery bridge over a gorge | 7-bay double-eave wudian | main hall ↔ Inner hall (diagonal pair) | gate + boundary stones | 6 | 2 | 2 | 6 / 7 | 68 |
+| 7 | lake valley: island pavilion, stone boat, grotto hill | 7-bay double-eave wudian on a peak | grotto hill + floating rocks | valley rim, no wall | 6 (in the grotto) | 3 | 4 | 6 / 8 | 80 |
+| 8 | ancient clan citadel: moat, spirit way, three halls | 9-bay double-eave wudian | gate tower + Pagoda Kaca Sembilan Harta | dark citadel walls | 7 | 3 | 4 | 6 / 8 | 96 |
+| 9 | five peaks above the clouds | 9-bay double-eave wudian on the main peak | summit Pagoda Kaca Sembilan Harta | gate + boundary stones | 7 | 3 | 4 | 6 / 9 | 108 |
+
+**Size rules:**
+- `R_t = max(|z_min|, x_half) + 8`. The hall's territory radius becomes `max(20 + 4L, R_t)` (21.17).
+- The disc ring never passes through the stele, because the lodestone distance d never equals the ring radius r.
+
+**Size perks** (game design; they use only existing mechanics):
+- Tower rooms, Qi seat tier and gate altars as in Table B.
+- Disciple cap +1 once T9 is complete, for templates 5–9. This stays inside the 20.1 entity budget.
+- +1 candidate per arrival for templates 6–9 at tier ≥ 7. The maximum of 6 from 20.3.3 still holds.
+- When T9 is complete for template 5 or higher, a server line: "Sekte ‹nama› (‹templat›) berdiri megah!".
+- **Gate formation altars** are optional extra Protective Formations, each registered by the player. If no lodestone is deposited, the altar shows an empty socket and the tier still completes.
+
+**Name decisions (lore pass).**
+- Template 9 is renamed from the brief's "Sekte Abadi" to **Istana Langit**. No work has a sect grade called "Immortal Sect", and "Sekte Abadi" stays the phase-6 title.
+- Template 8 keeps **Warisan Kuno Abadi** and is mapped to the "ancient Dao lineages" (古老道统) of *Perfect World*.
+- Templates 2–4 use the genre convention 三流/二流/一流门派. It is not tied to one work.
+
+**Sumber / Source per template:**
+- **1:** *Renegade Immortal*, Er Gen's author's note: the Xuan Dao Sect is "小门小派，本不入流" (a small, unranked sect), and the Heng Yue Sect has "沦入末流" (fallen to the bottom grade). For the founding feel: *BTTH*, Pan Men is founded in the Inner Academy to protect new students.
+- **2–4:** wuxia/xianxia genre convention of third-, second- and first-rate sects, for example in the Wuxiaworld translations of *Yuan's Ascension* and *Everlasting* (ch. 73). This is a genre label, not a single work's ladder.
+- **5:** *Return of the Mount Hua Sect*: the Nine Great Sects and One Gang, and the Five Great Families. Mount Hua was once a member and was replaced by Hainan. Also *A Record of a Mortal's Journey*: Yue State's Seven Great Sects (越国七大派).
+- **6:** *Shrouding the Heavens*: Holy Lands such as the Yaoguang Holy Land. *Against the Gods*, ch. 696: the Four Great Sacred Grounds, guardians of the Profound Sky Continent.
+- **7:** *Martial Peak*, ch. 3831: the 36 Cave Heavens and 72 Paradises, the forces that dominate the 3,000 Worlds. Classical scheme of Cave Heavens and Blessed Lands: Sima Chengzhen's *Tiandi gongfu tu* (Tang) and Du Guangting's *Dongtian fudi yuedu mingshan ji* (901).
+- **8:** *Perfect World*: the Longevity Clans and ancient Dao lineages among the top forces of the Nine Heavens Ten Earths. *BTTH*: the Eight Ancient Clans. *Shrouding the Heavens*: the ancient Jiang family.
+- **9:** *Shrouding the Heavens*: Ye Fan establishes the Heavenly Court. The layout follows the rank-by-height rings of *A Record of a Mortal's Journey*'s Heavenly Star City, where Sage Mountain has 81 layers and higher rank lives higher.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.2 The nine growth tiers (shared by every template)
+
+Each tier unlocks the same hall feature in every template. The construction tier then feeds the hall level (21.17).
+
+| Tier | Name (id_id / en_us) | Always adds | Hall feature it backs | `bflags` set | How it looks when complete |
+|---|---|---|---|---|---|
+| T1 | **Peletakan Prasasti** / Founding Stele | Stele surround: an octagonal inlay ring at r 2 and 4 low stone lanterns, but no roof over the stele. Also: axis path and paved forecourt; **Aula Pendiri** on the axis; first dorm (from T2 in template 1); wooden inner gate or bamboo gateway; lantern posts; well with water vats (Pikul Air); **hero tree** | – | – | a small, lit compound in nature |
+| T2 | **Api Dapur dan Kebun Obat** / Hearth and Herb Garden | Dapur Api kitchen (smoker, open hearth); Hundred Medicine Garden; Spirit-Tail coop; trees | duty stations for real (anchors) | – | a working household: hearth smoke, herb beds, plum trees |
+| T3 | **Paviliun Kitab** / Scripture Pavilion | Library with ≥ 10 bookshelves and a lectern within 16 of the stele; covered galleries in templates 3–9; plaza paving completed | same as the scan's Paviliun Kitab | `B_PAVILION` | an enclosed scholarly court |
+| T4 | **Tembok dan Air** / Walls and Waters | Alchemy hall (cauldron on a lit soul campfire); pond, lake or basins; boundary: wall + shanmen, or gate + boundary stones (6, 7, 9); the wall band at its final level | – | – | a walled sect with water, the classic first impression |
+| T5 | **Formasi Agung** / Grand Formation | Bagua disc: lodestone, crying obsidian at ±4, amethyst at ±3, King Wen trigrams. It is placed **inactive**. Also corner or watch towers, and optional gate altars | Formasi Agung once the owner registers the lodestone with an amethyst shard (DESIGN 10, unchanged) | (`B_FORMATION` stays the real active-formation check) | the court floor becomes a ritual disc |
+| T6 | **Aula Utama** / Main Hall | Main hall on its terrace (template 1: the **gilding tier** on its Aula Pendiri: plaque, chiwen, gold pearl, roof beasts, eave lanterns); paifang; bronze dings (one with signal smoke). The Aula Pendiri becomes **Kantor Misi** (plaque swap) | – | – | the full axis: paifang → gate → plaza → terrace → hall |
+| T7 | **Lapangan Latihan** / Drill Ground | Drill ground and archery with ≥ 4 target blocks; bell and drum towers (templates 3–9); arena stage (templates 6–9); banners; galleries; Inner dorms | same as the scan's Aula Latihan | `B_DRILL` | disciples' life: drums, bell, targets |
+| T8 | **Pagoda dan Leluhur** / Pagoda and Ancestors | Pagoda; ancestral hall with soul lanterns; meditation pavilion with its Qi seat; beast garden; bamboo; extra peaks (templates 6–9) | Qi seat tier 2 or 3 for the master | – | vertical grandeur |
+| T9 | **Menara Langit Membara** / Blazing Sky Tower | Tower entrance with 3–7 rooms straight below. The finale: waterfalls, gold pearls, glowing plaques, eave lanterns. Templates 7–9 add the sky elements | same as the scan's Menara (≥ 3 rooms) | `B_TOWER` | the complete, magnificent sect of that size |
+
+**Every tier must look finished.** These are binding rules for the blueprint designer:
+
+1. **A component is one unit: plot terrain + structure + plot landscaping.** That means curb, planting, lights and the paving it reaches. There are no tier-wide earthworks ahead of the buildings; only the axis path may lead.
+2. **A terrace belongs to the component of its first building.** For example, template 5's west +3 court comes with the pagoda at T8. An empty "stage" never waits for a later tier.
+3. **Paving grows with use.** T1 paves the axis and a forecourt of about 11×9 around the stele and the hall front. The rest is lawn with stepping stones, paved by the tier that reaches it.
+4. **The axis never dead-ends in a building lot.** Before T6 the path ends at a **screen-wall rock** (影壁). T6 keeps it as the foot of the terrace stair.
+5. **The wall band reaches its final level at T4**: the wall line plus 3 cells inside. Unbuilt land inside stays wild woodland, which reads as the sect's "back mountain".
+6. **Frontier rule.** Each component finishes the edges of the land it shaped with a curb, a moss slope with rocks, or a hedge.
+   - Plots reserved for later tiers keep their natural terrain. At most, cheap stone paths connect the components.
+   - Natural trees in garden and lawn plots are kept and planned around. Those in building plots are credited (21.10).
+7. **Each tier ends with a "Hiasan Tingkat" ornament component** that adds lanterns, flowers and banners across existing parts. The whole sect looks upgraded, not just one plot.
+8. **Build order inside every building** follows how Chinese timber frames are actually erected:
+   1. platform and floor;
+   2. all pillars rise together, layer by layer;
+   3. beams and brackets;
+   4. **the roof, eave ring first and ridge last**;
+   5. walls, lattice, interior and lights.
+
+   So a half-built hall reads as an open pavilion, never as scaffolding.
+9. **Light swaps only, never hall swaps.** Allowed swaps: bamboo fence → wall (template 1), wooden gateway → stone paifang, lawn → paving, and ornaments added. A built hall is never torn down.
+
+**Sumber / Source.** Hall features: DESIGN 20.3.1.
+- *A Record of a Mortal's Journey*, ch. 153: Yue Lu Hall and its covering formation.
+- *I Shall Seal the Heavens*, ch. 36–38: the Magic Pavilion.
+- *Return of the Mount Hua Sect*: the drill ground.
+- *BTTH*, ch. 491/549/622: the Blazing Sky tower.
+
+Duty stations (20.3.9):
+- *Renegade Immortal*: the water vats.
+- *A Record of a Mortal's Journey*, ch. 150–151: the Hundred Medicine Garden.
+- *A Will Eternal*, ch. 2 and 20–26: the Ovens and the Spirit Tail chickens.
+
+Kantor Misi: *A Will Eternal*, ch. 9 and 27, the Missions Office. "The founding hall becomes Kantor Misi" is game design.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.3 Building lists per template and tier
+
+Rank letters refer to 21.5. Every list implies the 21.2 rules: hero tree at T1, polish at each tier's end, frontier finishing.
+
+**Template 1 — Sekte Tak Berperingkat (25×29)**
+
+| Tier | Components |
+|---|---|
+| T1 | axis + forecourt paving; Aula Pendiri (13×7, rank C, glazed); bamboo fence + wooden gateway; 2 gate lantern posts; 2 water vats; hero plum |
+| T2 | west dorm wing; SE Dapur Api; coop under the plum; herb beds; pine |
+| T3 | east Scripture wing (14 shelves + lectern) |
+| T4 | SW alchemy room; white plaster wall with tile cap replaces the fence; 2 lotus basins |
+| T5 | formation disc (r 4) with trigrams |
+| T6 | gilding tier: plaque, chiwen, gold pearl, roof beasts, eave lanterns; 1-bay stone paifang replaces the gateway; bronze ding |
+| T7 | 4 framed target boards on the court faces of the alchemy room and kitchen; stone lanterns; pagoda-lanterns at the steps; scholar rocks |
+| T8 | ancestral altar with soul lanterns in the hall's east bay; bamboo screens; bonsai; red carpet |
+| T9 | 3-room Blazing cellar under the hall (spiral stair in the west bay); glowing plaque; palace lanterns; petals |
+
+**Template 2 — Sekte Kelas Tiga (33×39)**
+
+| Tier | Components |
+|---|---|
+| T1 | front court; Aula Pendiri (rank B); wooden gate + fence; lanterns; well + 2 vats; hero pine |
+| T2 | east dorm; kitchen; herb garden; coop; trees |
+| T3 | west Scripture Pavilion (16 shelves) |
+| T4 | rear terrace +3 with the alchemy hall; small stream and lotus pond with a flat bridge; white wall + wooden gate house |
+| T5 | disc (r 4) |
+| T6 | main hall on the rear terrace (3-bay xieshan, rank D); red-wood paifang (1 bay, 3 roofs); ding |
+| T7 | drill ground (4 targets); bell pavilion; side gallery; banners |
+| T8 | 3-floor square pagoda (NW, with the pond in front); small ancestral shrine; bamboo |
+| T9 | tower entrance + 3 rooms; gold ornaments; eave lanterns; trees |
+
+**Template 3 — Sekte Kelas Dua (45×51)**
+
+| Tier | Components |
+|---|---|
+| T1 | plaza; Aula Pendiri; Outer dorm; wooden chuihuamen; well + 4 vats; hero plum |
+| T2 | kitchen court (kitchen, coop); herb garden; 6 trees |
+| T3 | 2-storey Scripture Pavilion (24 shelves); covered galleries round the plaza |
+| T4 | north terrace +3 with the alchemy hall; lotus garden with an arched bridge and waterside pavilion (水榭); stepped white walls with moon gates and leak windows; shanmen |
+| T5 | disc (r 5); 2 front corner towers |
+| T6 | 5-bay main hall (rank D); stone paifang; dings |
+| T7 | drill ground (6 targets); bell and drum towers; linking galleries; rock garden; lantern rows; banners |
+| T8 | 5-floor square pagoda behind the pond; ancestral hall; meditation pavilion (Qi seat tier 1); horse-head gables on the dorm and kitchen (light swap) |
+| T9 | tower entrance + 4 rooms; finishing |
+
+**Template 4 — Sekte Kelas Satu (57×63)**
+
+| Tier | Components |
+|---|---|
+| T1 | plaza; Aula Pendiri; Outer dorm; inner gate; well; hero pine |
+| T2 | kitchen court; stepped herb garden; 8 trees |
+| T3 | 2-storey Scripture Pavilion (32 shelves); galleries |
+| T4 | red palace walls, 3-bay shanmen and lions; side terrace +2 with the alchemy hall; lotus garden with a small waterfall off the retaining wall |
+| T5 | disc (r 5); 4 xieshan watchtowers |
+| T6 | **long central stair** (7 wide, 3 landings) to the main terrace (design +8, range +5..+10); 5-bay double-eave xieshan; paifang; dings |
+| T7 | drill ground with weapon racks and banners (8 targets); bell and drum; climbing galleries; Inner dorm |
+| T8 | 5-floor pagoda; ancestral hall; octagonal meditation pavilion (Qi seat tier 2); beast garden; bamboo grove |
+| T9 | tower entrance + 4 rooms; finishing |
+
+**Template 5 — Sekte Agung (73×81)** (plan and coordinates in 21.4)
+
+| Tier | Components |
+|---|---|
+| T1 | plaza forecourt and axis; Aula Pendiri (15×7, rank B); Outer dorm (east); wooden chuihuamen; well pavilion + 4 vats; lantern posts; hero plum |
+| T2 | walled kitchen court (Dapur Api, well, Spirit-Tail coop); stepped Hundred Medicine Garden; 8 trees and paths |
+| T3 | 2-storey Scripture Pavilion (west, 40 shelves); covered galleries framing the plaza; plaza paving completed |
+| T4 | red palace walls; 3-bay shanmen and lions; approach path; east +2 terrace with the alchemy hall; lotus pond with moon bridge |
+| T5 | Bagua disc (r 5); 2 two-storey front corner towers |
+| T6 | three-tier white marble terrace (+2 / +4 / +5) with dragon ramp; 5-bay double-eave xieshan (core 23×11, colonnade); 3-bay stone paifang; 2 bronze dings |
+| T7 | archery (4 targets) and drill ground (4 dummies); bell and drum towers; climbing galleries to the east halls; rock garden; lantern rows; banners |
+| T8 | Pagoda Kaca Tujuh Harta on the NW +3 court; ancestral hall on the NE +3 court; island meditation pavilion (Qi seat tier 2); zigzag stepping bridge; beast garden; bamboo grove |
+| T9 | tower entrance with 5 rooms; waterfall into the pond; gold pearls, glowing plaques, eave lanterns; approach groves |
+
+**Template 6 — Tanah Suci (89×97)** (no perimeter wall)
+
+| Tier | Components |
+|---|---|
+| T1 | plaza; Aula Pendiri; Outer dorm; inner gate; well; hero pine |
+| T2 | kitchen court; stepped herb garden; 12 trees |
+| T3 | 2-storey Scripture Pavilion; galleries |
+| T4 | gorge stream and lotus lake with bridge; alchemy hall on its terrace; 5-bay shanmen with short wall stubs ending in rock; boundary stones |
+| T5 | disc (r 7) + 2 gate altars; 2 watch pavilions |
+| T6 | main peak terraces (marble +3 / +6 / +9); 7-bay double-eave wudian; 5-roof stone paifang; dings |
+| T7 | drill ground and arena stage (10 targets); bell and drum; galleries; Inner dorm |
+| T8 | Inner peak (design +12) behind its own barrier with the Inner Disciples' Hall and dorm; covered gallery bridge over the gorge; Pagoda Kaca Tujuh Harta; ancestral hall; meditation pavilion (tier 2); beast garden; bamboo |
+| T9 | tower with 6 rooms; cloud-sea terrace with a cliff pavilion (Hanging Temple style) over the mist valley; waterfall off the Inner peak; lanterns; gold |
+
+**Template 7 — Gua Surga Tanah Berkah (109×117)** (no perimeter wall)
+
+| Tier | Components |
+|---|---|
+| T1 | plaza; Aula Pendiri; Outer dorm; inner gate; well; hero pine |
+| T2 | kitchen court; stepped herb fields; 16 trees |
+| T3 | 3-storey Scripture Pavilion; galleries |
+| T4 | Blessed Land lake (30–35% of the footprint) with rock banks; alchemy hall; nine-turn bridge to a waterside pavilion; **stone boat**; willows; 5-bay shanmen with wall stubs; boundary stones |
+| T5 | disc (r 8) + 4 gate altars; 4 watch pavilions on the valley rim |
+| T6 | straight marble bridge across the lake with a mid-lake pavilion; main peak +4 / +8 / +12; 7-bay double-eave wudian; 7-roof paifang |
+| T7 | drill ground and arena (12 targets); bell and drum; galleries; 2 Inner dorms |
+| T8 | Inner and Elders' peaks (+10); Inner hall; elders' residence; Pagoda Kaca Tujuh Harta; ancestral hall; meditation pavilion (tier 3); beast garden; bamboo; test path |
+| T9 | **Cave-Heaven grotto hill** (about 15 high) with a carved cave gate; the 6 tower rooms inside and below it, within 12 horizontally; 3 chained hanging rocks over the lake with a carved turtle head under the largest; stepped cascade; mist |
+
+**Template 8 — Warisan Kuno Abadi (133×141)**
+
+| Tier | Components |
+|---|---|
+| T1 | plaza; Aula Pendiri; 2 Outer dorms; inner gate; well; hero pine |
+| T2 | large kitchen court; herb garden; 20 trees |
+| T3 | 3-storey Scripture Pavilion; galleries |
+| T4 | dark citadel walls (deepslate bricks, 20% cracked) with a **3-storey gate tower** (城楼) and 2 side gates; moat with 3 bridges; imperial way; Menara Pil (3-floor alchemy tower); imperial-garden lake with bridges |
+| T5 | disc (r 8) + 4 gate altars; 4 three-storey corner towers |
+| T6 | **spirit way** of stone statues and ancient pines; three-tier marble terrace +3 / +6 / +9; 9-bay double-eave wudian; square pyramidal Central Hall; 7-roof paifang with a glazed screen wall |
+| T7 | clan arena; drill ground (12 targets); 2-storey bell and drum towers; galleries; 2 Inner dorms |
+| T8 | Grand Ancestral Hall (7-bay, soul lanterns) behind the three halls; Pagoda Kaca Sembilan Harta (9F, Porcelain-Tower style); imperial rockery hill with a summit pavilion; meditation pavilion (tier 3); beast garden; 2 elders' courtyards |
+| T9 | tower with 7 rooms; 3 chained relic islands over the rear court; finishing |
+
+**Template 9 — Istana Langit (161×161)** (no perimeter wall)
+
+| Tier | Components |
+|---|---|
+| T1 | plaza axis and forecourt; Aula Pendiri; 2 Outer dorms; inner gate; well pavilion; hero pine |
+| T2 | large kitchen court; stepped herb fields; 24 trees |
+| T3 | 3-storey Scripture Pavilion; galleries |
+| T4 | valley lake, stream and rock banks; island pavilion, zigzag bridge, stone boat; **Puncak Awan Harum** (pill peak, +8) with the Menara Pil; 5-bay shanmen with wall stubs; boundary stones; 3 arched bridges |
+| T5 | disc (r 9) + 4 gate altars; 4 watch pavilions on spurs |
+| T6 | sculpted main peak (keeps natural rock) with terraces +3 / +6 / +9 and marble +11 / +13; 9-bay double-eave wudian; grand 7-roof paifang; screen wall; nine-flight stair |
+| T7 | arena, drill ground and archery (16 targets); 2-storey bell and drum; galleries; 2 Inner dorms |
+| T8 | **Puncak Dalam** and **Puncak Tetua** (+14) with halls and dorms behind barriers; **Puncak Binatang** (+8, beast garden); Grand Ancestral Hall (+13); meditation pavilion (tier 3); 2 covered gallery bridges; bamboo grove and test path |
+| T9 | tower with 7 rooms; summit Pagoda Kaca Sembilan Harta (base +18, top about +96); hanging-mountain archipelago on jade chains; arched sky bridge to the pagoda's 4th-floor balcony; round triple-eave **Aula Dao Langit** (Langit blue); peak waterfalls into the lake; valley mist |
+
+**Sumber / Source.**
+- **Rank by height**, so terraces and stairs climb toward the main hall:
+  - *I Shall Seal the Heavens*, ch. 2–3: the Reliance Sect has four peaks. The Outer Sect lies at the foot between them, servants live halfway up, and the Inner Sect and elders live above, behind defensive spells. This is the source for "Inner Sect on upper terraces behind a barrier".
+  - *A Record of a Mortal's Journey*: Heavenly Star City's Sage Mountain, 81 layers, higher rank lives higher.
+- **Multi-peak sects:**
+  - *I Shall Seal the Heavens*: the four peaks above.
+  - *A Will Eternal*: the Spirit Stream Sect's peaks. Fragrant Cloud Peak makes the pills, which gives Puncak Awan Harum. Green Crest Peak is for sword cultivators.
+- **Menara Pil:** *BTTH*, the Pill Tower, holy land of alchemists in Zhongzhou. Its shape is taken from the name.
+- **Beast garden:** *A Record of a Mortal's Journey*, Spirit Beast Mountain, a Yue sect of beast tamers. Name only.
+- **Test path:** *A Record of a Mortal's Journey*, ch. 1–5, the Seven Mysteries climb (20.3.3).
+- **Hero plum:** *Return of the Mount Hua Sect*, the plum blossoms.
+- **Pagoda names:** *Soul Land*, Ning Rongrong's Seven Treasure Glazed Tile pagoda evolving into the Nine Treasure one. It is a martial soul, not a building; the storey counts are design.
+- **Floating islands:** *Liezi*, "Tang Wen", the classical Daoist myth behind Penglai in xianxia. Five drifting mountains, Penglai and Yingzhou among them, are held on the heads of fifteen giant turtles; the carved turtle head nods to this. The chains are the user's request and art direction, **not canon**.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.4 Site plans
+
+**Legend:**
+
+| Symbol | Meaning | Symbol | Meaning |
+|---|---|---|---|
+| `#` | wall | `W` | corner tower |
+| `G` | gate hall (shanmen) | `g` | inner gate (chuihuamen) |
+| `P` | paifang | `M` | main hall (lower-eave outline) |
+| `E` | Aula Pendiri / Kantor Misi | `K` | Scripture Pavilion |
+| `A` | alchemy hall | `D` | dorm |
+| `k` | kitchen | `c` | coop |
+| `w` | well pavilion or vats | `h` | Hundred Medicine Garden |
+| `O` | pagoda | `T` | Blazing Sky Tower entrance |
+| `Q` | pavilion | `Z` | ancestral hall |
+| `Y` | beast garden | `B` | bell or drum tower |
+| `X` | arena stage | `x` | target |
+| `S` | stele | `L` | lodestone |
+| `C` | crying obsidian | `a` | amethyst block |
+| `o` | disc ring | `+` | duty post (kept open) |
+| `~` | water | `b` | bridge |
+| `v` | waterfall | `t` | trees |
+| `@` | hero tree | `i` | bamboo |
+| `R` | rockery or screen-wall rock | `I` | hanging island (high above) |
+| `H` | hall on a peak | `u` | covered gallery |
+| `=` | paving | `:` | raised terrace |
+| `"` | terrace edge (retaining wall + balustrade) | `^` | stairs |
+| `l` | lantern | `n` | stone lion |
+| `d` | bronze ding | `f` | woodland or cliff at the rim |
+| `j` | boundary stone pillar | `.` | lawn or garden ground |
+
+**Template 1 — Sekte Tak Berperingkat, at T9 (1 char = 1 block)**
+
+```
+         |         |         |     (x = -12 .. 12; rows are z)
+  -16  #########################   boundary: T1 bamboo fence -> T4 white plaster wall with tile cap
+  -15  #ii.EEEEEEEEEEEEEEEEE.ii#   E Aula Pendiri (T1), eave outline x -8..8 z -16..-6; core 13x7 (pillars x +-3, +-6; z -14..-8)
+  -14  #ii.EEEEEEEEEEEEEEEEE.ii#     3-bay [3,6,3] xieshan, rank C (the main hall of this sect, glazed); platform x -7..7 z -15..-7
+  -13  #ii.EEEEEEEEEEEEEEEEE.ii#     T9: spiral stair in the west bay -> 3 rooms at y -5/-9/-13 under the hall
+  -12  #ii.EEEEEEEEEEEEEEEEE.ii#   i bamboo screens in the north corners (T8)
+  -11  #...EEEEEEEEEEEEEEEEE...#
+  -10  #...EEEEEEEEEEEEEEEEE...#
+   -9  #.R.EEEEEEEEEEEEEEEEE.R.#   R scholar rocks (T7)
+   -8  #...EEEEEEEEEEEEEEEEE...#
+   -7  #...EEEEEEEEEEEEEEEEE...#
+   -6  #...EEEEEE^^^^^EEEEEE...#   ^ steps before the centre bay only; doors recessed 1 behind the front pillars (porch)
+   -5  #..t..======+======..R..#   + north duty post stays open paving; w water vats (T1); t pine (T2)
+   -4  #.....===w=====w===.....#
+   -3  #DDDDD~~=========~~KKKKK#   D dorm wing (T2)      K Scripture wing, 14 shelves + lectern (T3)
+   -2  #DDDDD~~==ooCoo==~~KKKKK#   ~ two lotus basins (T4)
+   -1  #DDDDD===oo=a=oo===KKKKK#
+    0  #DDDDD=+oo==S==oo+=KKKKK#   S stele (0,0,0); + E/W duty posts at x +-5
+    1  #DDDDD==o=======o==KKKKK#
+    2  #DDDDD==Ca==L==aC==KKKKK#   disc (T5): L (0,2), C at +-4, a at +-3, ring o r 4 (the stele sits inside the ring)
+    3  #DDDDD==o=======o==KKKKK#
+    4  #DDDDD==oo=====oo==KKKKK#
+    5  #DDDDD===oo=a=oo===KKKKK#   a at (0,5) is also the floor of the south duty post
+    6  #DDDDDl===ooCoo===lKKKKK#   l stone lanterns (T7)
+    7  #hhhhh=============hhh@t#   h herb beds (T2)  @ hero plum (T1)
+    8  #AxAAxAA..=====..kkxkkxk#   A alchemy room (T4)   k Dapur Api kitchen (T2)   x framed target boards on their court faces (T7)
+    9  #AAAAAAA.l=====l.kkkkkkk#   l gate lantern posts (T1)
+   10  #AAAAAAA..=====..kkkkkkk#
+   11  #AAAAAAAt.=====.ckkkkkkk#   c coop under the plum (T2)
+   12  #########P=====P#########   P gateway in the wall line: T1 wooden gate -> T6 1-bay stone paifang
+```
+
+**Template 5 — Sekte Agung, at T9 (1 char = 1 block)**
+
+The levels are fitted to the terrain within these ranges:
+
+| Area | Design level (range) |
+|---|---|
+| Approach and outer court | −1 (−3..0) |
+| Plaza | 0, fixed |
+| East and side terraces | +2 (+1..+4) |
+| Main terrace | +2 / +4, hall platform +5 |
+| Pagoda and ancestral courts | +3 |
+
+```
+             |         |         |         |         |         |         |         (x = -36 .. 36; rows are z)
+  -50  #########################################################################   north wall (T4); no north corner towers: the pagoda (NW) and the ancestral court (NE) hold the corners
+  -49  #""""OOOOOOO"""".......ttt.........ttt.........ttt......""""ZZZZZZZZZZZZ#
+  -48  #"::OOOOOOOOO::".......ttt.........ttt.........ttt......":::ZZZZZZZZZZZZ#
+  -47  #":OOOOOOOOOOO:".......ttt.........ttt.........ttt......":::ZZZZZZZZZZZZ#
+  -46  #"OOOOOOOOOOOOO"."""""""""""""""""""""""""""""""""""""""":::ZZZZZZZZZZZZ#   main terrace (T6): +2 x -19..19 z -46..-19; +4 x -17..17 z -44..-22; hall platform +5 x -15..15 z -42..-24
+  -45  #OOOOOOOOOOOOOOO."iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"":::ZZZZZZZZZZZZ#   i bamboo grove behind the main hall (T8)
+  -44  #OOOOOOOOOOOOOOO.":""""""""""""""""""""""""""""""""""":"":::ZZZZZZZZZZZZ#
+  -43  #OOOOOOOOOOOOOOO.":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":"":::ZZZZZZZZZZZZ#   M main hall: core 23x11 (5 bays [4,4,6,4,4], pillars x +-3,+-7,+-11; z -38..-28),
+  -42  #OOOOOOOOOOOOOOO.":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":"":::ZZZZZZZZZZZZ#     colonnade 3 out, double-eave xieshan; lower eave x -16..16 z -43..-23 (drawn), upper eave 1 inside
+  -41  #OOOOOOOOOOOOOOO.":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":"":::ZZZZZZZZZZZZ#   O Pagoda Kaca Tujuh Harta (T8), octagonal, centre (-28,-42), floor-1 eaves 15 wide, on a +3 court
+  -40  #OOOOOOOOOOOOOOO.":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"uu":::ZZZZZZZZZZZZ#   Z ancestral hall (T8) on the NE +3 court, faces west to the axis: core 8x13, eaves x 24..36 z -50..-34
+  -39  #OOOOOOOOOOOOOOO.":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"uu":::ZZZZZZZZZZZZ#   u climbing galleries joining the east halls to the main terrace (T7)
+  -38  #"OOOOOOOOOOOOO".":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"uu":::ZZZZZZZZZZZZ#
+  -37  #":OOOOOOOOOOO:".":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":"":::ZZZZZZZZZZZZ#
+  -36  #"""OOOOOOOOO""".":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":"":::ZZZZZZZZZZZZ#
+  -35  #....OOOOOOO.....":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":"":::ZZZZZZZZZZZZ#
+  -34  #ttt..~~b~~......":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":"":::ZZZZZZZZZZZZ#   b zigzag stepping bridge island -> pagoda court (T8)
+  -33  #ttt~~~~b~~~~....":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":""::::::::::::::"#
+  -32  #ttt~~~~b~~~~~...":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":""::::::::::::::"#
+  -31  #.~~~~QQQQQ~~~~..":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":""::::::::::::::"#
+  -30  #.~~~QQQQQQQ~~~.v":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":""::::::::::::::"#   v waterfall from a notch in the +2 retaining wall into the pond (T9)
+  -29  #~~~QQQQQQQQQ~~~v":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":""AAAAAAAAAAAAAAA#   Q island meditation pavilion, octagonal 9, Qi seat tier 2 (T8)   A alchemy hall (T4) on the east +2 terrace
+  -28  #~~~QQQQQQQQQ~~~.":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":""AAAAAAAAAAAAAAA#
+  -27  #~~~QQQQQQQQQ~~~.":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":""AAAAAAAAAAAAAAA#
+  -26  #~~~QQQQQQQQQ~~~.":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":""AAAAAAAAAAAAAAA#   ~ lotus pond (T4), water surface -1; the pond lies between viewer and pagoda (foreground water)
+  -25  #~~~QQQQQQQQQ~~~.":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"uu"AAAAAAAAAAAAAAA#
+  -24  #~~~~QQQQQQQ~~~~.":"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"uu"AAAAAAAAAAAAAAA#
+  -23  #~~~~~QQQQQ~~~~~.":"MMMMMMMMMMMMMM^^^^^MMMMMMMMMMMMMM"uu"AAAAAAAAAAAAAAA#
+  -22  #.~~~~~~b~~~~~~..":""""""""""""""""""""""""""""""""""":""AAAAAAAAAAAAAAA#   b moon bridge to the island (T4)
+  -21  #.~~~~~~b~~~~~~.."::::::::::::::::^^^^^::::::::::::::::""AAAAAAAAAAAAAAA#
+  -20  #R.~~~~~b~~~~~..."::::::::::::d:::^^^^^:::d::::::::::::""AAAAAAAAAAAAAAA#   ^ dragon-ramp stair +2 -> +4 -> +5;  d bronze incense dings (T6, one signal smoke)
+  -19  #...~~~~b~~~~.R..""""""""""""""""""""""""""""""""""""""""AAAAAAAAAAAAAAA#
+  -18  #.....~~b~~.............^^^.......RRRRR.......^^^.......""""""""""""""""#   ^ side ascents 0 -> +2 at x +-10..12;  R screen-wall rock: the axis end before T6, stair foot after
+  -17  #.......b...............^^^.......RRRRR.......^^^.......................#
+  -16  #..........................EEEEEEEEEEEEEEEEEEE.......YYYYYYYYYYYY.......#   E Aula Pendiri (T1) -> Kantor Misi at T6: core 15x7 (3 bays [4,6,4]), eaves x -9..9 z -16..-6
+  -15  #..........................EEEEEEEEEEEEEEEEEEE.......YYYYYYYYYYYY.......#
+  -14  #..........................EEEEEEEEEEEEEEEEEEE.......YYYYtttYYYYY.......#
+  -13  #..........................EEEEEEEEEEEEEEEEEEE.......YYYYtttYYYYY.......#   Y beast garden (T8)
+  -12  #hhhh......................EEEEEEEEEEEEEEEEEEE.......YYYYtttYYYYY.#######   h stepped Hundred Medicine Garden (T2)   kitchen court (T2): k Dapur Api, w well, c Spirit-Tail coop
+  -11  #hhhh......................EEEEEEEEEEEEEEEEEEE.......YYYYYYYYYYYY.#kkkk##
+  -10  #hhhh......................EEEEEEEEEEEEEEEEEEE.......YYYYYYYYYYYY.#kkkk##
+   -9  #hhhh......................EEEEEEEEEEEEEEEEEEE....................#kkkk##
+   -8  #hhhh..KKKKKKKKKKKKK.......EEEEEEEEEEEEEEEEEEE.......DDDDDDDDDDD..#kkkk##
+   -7  #hhhh..KKKKKKKKKKKKK.......EEEEEEEEEEEEEEEEEEE.......DDDDDDDDDDD..#kkkk##
+   -6  #hhhh..KKKKKKKKKKKKK..uuu==EEEEEEE^^^^^EEEEEEE==uuu..DDDDDDDDDDD..#kkkk##   K 2-storey Scripture Pavilion, 40 shelves (T3)   D Outer dorm (T1)   u covered galleries (T3)
+   -5  #hhhh..KKKKKKKKKKKKK..uuu===========+===========uuu..DDDDDDDDDDD..#....##
+   -4  #hhhh..KKKKKKKKKKKKK..uuu=======================uuu..DDDDDDDDDDD..#....##
+   -3  #hhhh..KKKKKKKKKKKKK..uuuTTTTT=============wwwwwuuu..DDDDDDDDDDD..#.w..##   T Blazing Sky Tower entrance (T9), 5 rooms straight below   w well pavilion + 4 vats (T1)
+   -2  #hhhh..KKKKKKKKKKKKK..uuuTTTTT=============wwwwwuuu..DDDDDDDDDDD..#....##
+   -1  #hhhh..KKKKKKKKKKKKK..uuuTTTTT=============wwwwwuuu..DDDDDDDDDDD..#....##
+    0  #hhhh..KKKKKKKKKKKKK..uuuTTTTT=+====S====+=wwwwwuuu..DDDDDDDDDDD..#....##   S stele (0,0,0); + duty posts at 5 N/E/S/W (kept open)
+    1  #hhhh..KKKKKKKKKKKKK..uuuTTTTT====ooooo====wwwwwuuu..DDDDDDDDDDD..#cccc##
+    2  #hhhh..KKKKKKKKKKKKK..uuu========o==C==o========uuu..DDDDDDDDDDD..#cccc##
+    3  #hhhh.................==========o===a===o==========...............#cccc##
+    4  #hhhh...ttt......ttt..uuu=l====o=========o====l=uuu.........ttt...#cccc##
+    5  #hhhh...ttt.R....ttt..uuu======o====+====o======uuu....ttt..ttt...#cccc##
+    6  #hhhh...ttt.....Rttt..uuu======oCa==L==aCo======uuu....ttt..ttt...#######   disc (T5): L (0,6), C at +-4, a at +-3, ring o r 5 (never through the stele)
+    7  #hhhh................@uuu======o=========o======uuu....ttt..............#   @ hero plum (T1)
+    8  #hhhh.................uuu======o=========o======uuu.....................#
+    9  #......============...uuu=======o===a===o=======uuu...============......#   archery (T7, 4 targets x at the west end)        drill ground (T7, 4 dummies x)
+   10  #......============...uuu========o==C==o========uuu...============......#
+   11  #......x===========...uuu=l=======ooooo=======l=uuu...============......#
+   12  #......============...uuu=======================uuu...===x===x====......#
+   13  #......x===========..............ggggggg..............============......#   g wooden chuihuamen (T1)
+   14  WWWWWWW============.BBBBB........ggggggg........BBBBB.============WWWWWWW   B bell tower (T7)                                 B drum tower (T7)
+   15  WWWWWWWx===========.BBBBB.........=====.........BBBBB.============WWWWWWW
+   16  WWWWWWW============.BBBBB...GGGGGG=====GGGGGG...BBBBB.===x===x====WWWWWWW   G 3-bay shanmen on the red wall line z 20 (T4); W 2-storey corner towers (T5)
+   17  WWWWWWWx===========.BBBBB...GGGGGG=====GGGGGG...BBBBB.============WWWWWWW
+   18  WWWWWWW============.BBBBB...GGGGGG=====GGGGGG...BBBBB.============WWWWWWW
+   19  WWWWWWW============.........GGGGGG=====GGGGGG.........============WWWWWWW
+   20  WWWWWWW#####################GGGGGG=====GGGGGG#####################WWWWWWW
+   21  ............................GGGGGG=====GGGGGG............................
+   22  ................................n.=====.n................................   n stone lions (T4)
+   23  ..................................=====..................................
+   24  .........ttt.........ttt..........=====..........ttt.........ttt.........
+   25  ........ttttt.......ttttt.......l.=====.l.......ttttt.......ttttt........   l lantern posts (T1, more at T7)   t pine and plum groves (T2/T9)
+   26  .........ttt.........ttt..........=====..........ttt.........ttt.........
+   27  ..................................=====..................................
+   28  ................................l.=====.l................................
+   29  ............................PPPPPP=====PPPPPP............................   P 3-bay stone paifang (T6), 8 blocks clear of the gate hall
+   30  ............................PPPPPP=====PPPPPP............................
+```
+
+**Template 5 key coordinates** (template-local; these are the contract for the blueprint):
+
+| Element | Bounds / position |
+|---|---|
+| Plaza | x −11..11, z −6..12. T1 paves the axis (x −2..2) and the forecourt x −5..5, z −6..2. |
+| Disc | L (0,6); C (0,2), (0,10), (±4,6); a (0,3), (0,9), (±3,6); ring r 5 |
+| Duty posts | (0,±5), (±5,0): air over walkable floor at stele height |
+| Tower | entrance x −11..−7, z −3..1; 5 rooms with campfires at y −6, −10, −14, −18, −22 (deepest is 24 from the stele) |
+| Well pavilion | x 7..11, z −3..1 |
+| Aula Pendiri | core x −7..7, z −14..−8; platform x −8..8, z −15..−7; eaves x −9..9, z −16..−6 |
+| Side ascents | x ±10..12, z −18..−17; screen-wall rock x −2..2, z −18..−17 |
+| Main terrace | +2 x −19..19, z −46..−19; +4 x −17..17, z −44..−22; platform +5 x −15..15, z −42..−24 |
+| Main hall | core x −11..11, z −38..−28; colonnade x ±14, z −41..−25; lower eave x ±16, z −43..−23; upper eave x ±15, z −42..−24 |
+| Dings | (±6, −20) |
+| Pond | ellipse centre (−28,−26), rx 7, rz 8, surface −1. Island pavilion: octagon at (−28,−27), 9 wide. Moon bridge x −28, z −22..−17. Stepping bridge x −28, z −34..−32. |
+| Waterfall | (−20, −30..−29) |
+| Pagoda | court x −35..−21, z −49..−36; centre (−28,−42) |
+| East terrace | x 20..35, z −49..−18; alchemy x 21..35, z −29..−19; ancestral eaves x 24..36, z −50..−34 |
+| Galleries | plaza x ±12..±14, z −6..12 (open at z 3); climbing x 18..19, z −40..−38 and −25..−23 |
+| Flanks | Scripture x −29..−17, z −8..2. Herb garden x −35..−32, z −12..8. Dorm x 17..27, z −8..2. Kitchen court x 30..35, z −12..6. Beast garden x 17..28, z −16..−10. |
+| Outer court | archery x −29..−18, z 9..19; drill ground x 18..29, z 9..19; bell x −16..−12 and drum x 12..16 at z 14..18; inner gate x −3..3, z 13..14 |
+| Gate and approach | gate hall x −8..8, z 16..21 on the wall line z 20; towers x ±(30..36), z 14..20; lions (±4,22); paifang x −8..8, z 29..30 |
+
+**Template 9 — Istana Langit, at T9 (1 char = 3×3 blocks)**
+
+```
+              |         |         |         |         |       (1 char = 3x3 blocks; x = -80 .. 80, z = -100 .. 60)
+ -100  ffffffjfffffjfffIfjfffffjfffffjfffffjfffffjfffffjfffff   f woodland and cliffs at the rim; j boundary stone pillars every ~16 blocks (no perimeter wall)
+  -97  ffff"""""""""".IIII..:::::::::::".IIIII...........ffff   I hanging-mountain islands (+28..+52) on vertical jade chains to bollards on the peaks below
+  -94  ff:::::::::::".IIII..::ttt::::::"IIIIIII....III...ffff
+  -91  ff:::::::::::".IIII..:::tt::::::"IIIIIIII...IIII..ffff
+  -88  f"::HHHHHHH::"..I....:::OOOOOO::"IIHHHHII...IIII.....f   NW Puncak Dalam (Inner Sect, +14) behind its own formation; O summit Pagoda Kaca Sembilan Harta (+18)
+  -85  j"::HHHHHHH::".......:::OOOOOO::IIIHHHHII...IIII.....j   NE big island: round triple-eave Aula Dao Langit (Langit blue) - H inside I; arched sky bridge to pagoda floor 4
+  -82  f"::HHHHHHH::bb......:::OOOOOO::"IIHHHHII............f   b covered gallery bridges between the peaks
+  -79  f":::::::::::bb......:::OOOOOO::"IIIIIIII............f
+  -76  f"::DDDDD::::".......:::OOOOOO::".IIIIII.............f
+  -73  f"::DDDDD::::".......:::OOOOOO::"...I................f   D Inner dorms
+  -70  j"::DDDDD::::".......:::::::::::".......::::::::::::.j
+  -67  f":::::::::::".......:::::^^::::".......::::::::::::.f
+  -64  f....................ZZZZZ^ZZZZZ........:::HHHHHH:::.f   Z Grand Ancestral Hall (+13);  NE Puncak Tetua (Elders, +14) with H residence and Q meditation pavilion (Qi tier 3)
+  -61  f.....III..~~.:::::::ZZZZZZZZZZZ:::::::":::HHHHHH:::.f
+  -58  f.....III..~~.:::::::ZZZZZZZZZZZ:::::::bb::HHHHHH:::.f
+  -55  j....IIIII.~~.:::::::::::::::::::::::::bb:::::::::::.j
+  -52  f.....III..~~.:::::::::::::::::::::::::":::::::QQQQ:.f
+  -49  f..........~~.::::::MMMMMMMMMMMMM::::::":::::::QQQQ:.f   M 9-bay double-eave wudian main hall on the marble terrace +11/+13
+  -46  f"::::::::"~~.::::::MMMMMMMMMMMMM::::::":::::::QQQQ:.f
+  -43  f"::::::::"~~vv:::::MMMMMMMMMMMMM::::::"::::::::::::.f
+  -40  j"::AAAA::"~~vv:::::MMMMMMMMMMMMM::::::""""""""""""".j   W Puncak Awan Harum (+8, the pill peak): A Menara Pil;  ~ stream with waterfalls v into the lake
+  -37  f"::AAAA::"~~.::::::MMMMMMMMMMMMM::::::"...""""""""".f
+  -34  f"::AAAA::"~~t::::::MMMMMMMMMMMMM::::::tt..:YYYYYYY:.f   E Puncak Binatang (+8): Y beast garden
+  -31  f"::AAAA::"~~tt::::::::::::::::::::::::ttt.:YYYYYYY:.f
+  -28  f"::AAAA::"~~t:::::::::::^^^:::::::::::tt..:YYYYYYY:.f
+  -25  j"::::::::"~~.:::::::::::^^^:::::::::::"...:YYYYYYY:.j
+  -22  f"::::::::"~~.:::::::::::^^^:::::::::::"...:YYYYYYY:.f
+  -19  f....vv....~~.:::::::::::^^^:::::::::::"...:YYYYYYY:.f
+  -16  f....vv....~~."""""tt""EEEEEEEE""t""""""...:::::::::.f   E Aula Pendiri -> Kantor Misi; nine-flight stair ^ up the main peak
+  -13  f....~~~~~.........ttt.EEEEEEEE.ttt.............I....f
+  -10  j.~~~~~~~~~~~..KKKKKK..EEEEEEEE.kkkkkkDDDDDhhhIIIIhhhj   K Scripture Pavilion, k kitchen court, D Outer dorms, h herb terraces
+   -7  f~~~~~~~~~~~~~.KKKKKK=TEEEEEEEEwkkkkkkDDDDDhhhIIIIhhhf
+   -4  ff~~~~QQQ~~~~~.KKKKKK=TTT=oo=wwwkkkkkkDDDDDhhhIIIIhhhf   T Blazing Sky Tower entrance (<= 12 from the stele), 7 rooms below; S stele; disc r 9 around L (0,6)
+   -1  ff~~~~QQQ~~~~~.KKKKKK=TTToSoowwwkkkkkkDDDDDhhhhhIhhhhf
+    2  ff~~~~QQQb~~~~.KKKKKK===o=C==o==kkkkkkDDDDDhhhhhhhhhhf   west Blessed lake: Q island pavilion, b zigzag bridge, stone boat
+    5  jf~~~~~~~bbb~~.KKKKKK===oCL=Co==kkkkkkDDDDDhhhhhhhhhhj
+    8  f.~~~~~~~~~bb........===o=C==o==kkkkkkDDDDDhhhhhhhhhhf
+   11  f....~~~~~...........===oo=oo===...........hhhhhhhhhhf
+   14  fiiiiiiiiii..........====ggg====...........DDDDDDDDDDf   i bamboo grove and the candidates' test path (bamboo -> rough slope -> chain ladder)
+   17  fiiiiiiiiii..............===...............DDDDDDDDDDf
+   20  jiiiiiiiiiiXXXXXXXXX.....===......=========DDDDDDDDDDj   X arena stage (leitai); x targets; B bell and drum towers
+   23  fiiiiiiiiiiXXXXXXXXX.....===......=xx=xxx==DDDDDDDDDDf
+   26  fiiiiiiiiiiXXXXXXXXXBBBB.===..BBB.=========DDDDDDDDDDf
+   29  fiiiiiiiiiiXXXXXXXXXBBBB.===..BBB.=========DDDDDDDDDDf
+   32  ff========.XXXXXXXXXBBBB.===..BBB.=========DDDDDDDDDDf
+   35  ff========.XXXXXXXXX.....===......=xx=xxx==DDDDDDDDDDf
+   38  ff========.XXXXXXXXX..GGGG==GGG...=========DDDDDDDDDDf
+   41  ffff======............GGGG==GGG............DDDDDDDffff
+   44  ffffffjfffffjfffffj###GGGGGGGGG###ffjfffffjfffffjfffff   G 5-bay shanmen with short red wall stubs # that end in rock; no side gates
+   47  .........tt.....tt....GGGGGGGGG.....tt....ttt.........
+   50  .........ttt...ttt.......===.......ttt....ttt.........
+   53  .....................PPPPP=PPPPP......................   P grand paifang, 5 bays, 7 roofs
+   56  .........................===..........................
+   59  .........................===..........................
+```
+
+The `T` marker on this plan is schematic; the tower entrance centre must stay within 12 blocks of the stele.
+
+**Template 9 levels:**
+
+| Area | Level |
+|---|---|
+| Approach | −6 → −3 |
+| Outer court | −3 |
+| Plaza | 0 |
+| Main peak | +3 / +6 / +9, marble +11 / +13 |
+| Ancestral terrace | +13 |
+| Summit | +18 |
+| Inner and Elders' peaks | +14 |
+| Pill and Beast peaks | +8 |
+| Lake surface | −1 |
+| Islands | +28..+52 |
+
+The peaks are sculpted `Peak` components that keep natural terrain wherever it is higher than the design (21.8). The valley "cloud sea" is client mist (21.16).
+
+**Compositions of the other templates.** These follow 21.3 and the rules of 21.5–21.8.
+- **Template 2:** a front court, then the Aula Pendiri, then a +3 rear court with the main hall, with a pagoda NW behind a small pond.
+- **Template 3:** the plaza ringed by galleries; a lotus garden NW with the 5-floor pagoda behind the water; horse-head gables.
+- **Template 4:** a 7-wide central stair with 3 landings from the gate to the main hall on its +8 terrace, 4 watchtowers on the red wall, archery W and drill ground E.
+- **Template 6:** the template-5 scheme with the Inner peak NW across a gorge stream (covered gallery bridge) and a cloud-sea terrace E.
+- **Template 7:** gate → plaza → straight marble bridge across the lake → main peak, with a nine-turn bridge W and the grotto hill beside the plaza.
+- **Template 8:** moat → gate tower → spirit way → outer court → plaza → three halls on one three-tier marble terrace, with an imperial garden NW and the 9F pagoda NE.
+
+**Sumber / Source.** The same as 21.3. The layouts are art direction from real architecture (21.8).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.5 Block palette (vanilla 26.3; every name verified in `Blocks.java`)
+
+**26.3 API notes:**
+- Dyed blocks are `ColorCollection`s, for example `Blocks.DYED_TERRACOTTA.pick(DyeColor.RED)`, `CONCRETE`, `CONCRETE_STAIRS`, `CONCRETE_SLAB`, `GLAZED_TERRACOTTA`, `CARPET`, `DYED_CANDLE`, `BANNER`.
+- Copper blocks are `WeatheringCopperCollection`s, for example `Blocks.CUT_COPPER_STAIRS.waxed().pick(WeatheringCopper.WeatherState.OXIDIZED)`. **Always use the waxed form.** Lightning only rewrites unwaxed copper.
+- The iron chain is `IRON_CHAIN`.
+
+**Roof rank hierarchy** (real practice, for example grey tile with a green-glazed border, 灰瓦绿剪边):
+
+| Rank | Buildings | Field | Trim (eave row and hips) | Ridge |
+|---|---|---|---|---|
+| A | dorm, kitchen, coop, gallery | `DEEPSLATE_TILE_STAIRS` / `_SLAB` / `DEEPSLATE_TILES` | `POLISHED_DEEPSLATE_STAIRS` / `_SLAB` / `_WALL` | `DEEPSLATE_BRICKS`, or a rolled ridge |
+| B | gate, Aula Pendiri (templates 2–9), scripture, alchemy, towers | deepslate tiles | **jade**: waxed oxidized `CUT_COPPER_STAIRS` / `_SLAB` | `DEEPSLATE_BRICKS` + jade cap |
+| C / D | main hall, template 1's Aula Pendiri, ancestral hall, pagodas, Aula Dao Langit | the player's **glaze** | glaze trim | glaze ridge + gold |
+
+**Glazes.**
+- The player chooses a glaze at founding. It can be changed until the first rank C/D roof starts.
+- Glazed pagodas always use Giok field and trim with white walls, whatever the choice.
+
+| Role | **Tinta** (ink, default) | **Giok** (jade) | **Langit** (sky, after the Temple of Heaven) |
+|---|---|---|---|
+| Field | deepslate tiles | waxed oxidized `CUT_COPPER_STAIRS` / `_SLAB` / `CUT_COPPER` | `CONCRETE_STAIRS` / `CONCRETE_SLAB` / `CONCRETE` `.pick(BLUE)` |
+| Trim | `POLISHED_DEEPSLATE_STAIRS` / `_SLAB` | `CONCRETE_STAIRS` / `_SLAB` `.pick(YELLOW)` | yellow concrete |
+| Ridge | `DEEPSLATE_BRICKS` + `POLISHED_DEEPSLATE_WALL` | waxed oxidized `CUT_COPPER` + yellow `CONCRETE_SLAB` cap | `LAPIS_BLOCK` |
+
+**Materials by role:**
+
+| Role | Blocks |
+|---|---|
+| Lacquer pillars | `POLISHED_CINNABAR` (halls and gates); `POLISHED_CINNABAR_WALL` (pavilions, galleries, small gates: it reads as round, so let FIXUP connect them). Base: `CHISELED_TUFF` on `POLISHED_ANDESITE`. |
+| Wood trim and doors | `MANGROVE_PLANKS` / `_STAIRS` / `_SLAB`, `STRIPPED_MANGROVE_WOOD` (sills, lintels), `MANGROVE_DOOR`, `MANGROVE_FENCE` |
+| Painted beams | beam band `WARPED_PLANKS` (teal caihua); beam ends `GLAZED_TERRACOTTA.pick(CYAN)` |
+| Brackets (dougong) | `WARPED_STAIRS` `HALF=TOP` with the tall side against the wall, plus `DARK_OAK_TRAPDOOR`; caps `CHISELED_SULFUR` (aged gilt in shade, T6+). Warped wood does not burn. |
+| Soffit (rank C/D) | `POLISHED_DEEPSLATE_SLAB` top half (dark rafter rhythm, non-flammable) |
+| Plaster | `SMOOTH_QUARTZ` for **all** plaster; `CALCITE` only in rocks; plinth `POLISHED_ANDESITE` |
+| Palace walls | `POLISHED_CINNABAR` body on a `STONE_BRICKS` footing; `CINNABAR_BRICKS` where texture is wanted; cap = rank B trim. Template 8 citadel: `DEEPSLATE_BRICKS` with 20% `CRACKED_DEEPSLATE_BRICKS`. |
+| Lattice | rank D: waxed oxidized `COPPER_TRAPDOOR` (quatrefoil fret); rank B/C: `MANGROVE_TRAPDOOR` (moon hole); garden buildings: `POPLAR_TRAPDOOR` (diamond); leak windows: waxed oxidized `COPPER_BARS` |
+| Interior | `POLISHED_DEEPSLATE` floor (the palace "golden bricks"); `CARPET.pick(RED)` runner on the axis |
+| Stone terraces | `STONE_BRICKS` (≤ 10% `MOSSY_STONE_BRICKS`, retaining walls only); `CHISELED_TUFF_BRICKS` fret course; `SMOOTH_STONE_SLAB` / `POLISHED_ANDESITE` coping; `STONE_BRICK_STAIRS`; a `CHISELED_STONE_BRICKS` pilaster every 6–8 |
+| Marble terraces | deck `SMOOTH_QUARTZ`; face `POLISHED_DIORITE`; balustrade `PALE_OAK_FENCE` rails between `QUARTZ_PILLAR` posts (every 3rd cell) with a `SMOOTH_QUARTZ_SLAB` cap; fret `CHISELED_QUARTZ_BLOCK`; stairs `SMOOTH_QUARTZ_STAIRS`; dragon ramp `CHISELED_QUARTZ_BLOCK` |
+| Paving | plaza `POLISHED_ANDESITE` with a `STONE_BRICKS` grid every 4; imperial way `SMOOTH_STONE` with `CHISELED_STONE_BRICKS` every 4th; garden `TUFF_BRICK_SLAB` stepping stones on `MOSS_BLOCK` |
+| Gold (≤ 5% of a view) | `GOLD_BLOCK` (pearls and finials, at most 1 per roof); `RAW_GOLD_BLOCK` (hanging fish, rank-D plaque frame); `GLAZED_TERRACOTTA.pick(YELLOW)` (cloud panels); `GILDED_BLACKSTONE` (plaque field); `BELL` |
+| Jade | waxed oxidized `CHISELED_COPPER`, `COPPER_GRATE`, `COPPER_CHAIN`, `COPPER_LANTERN`; `PRISMARINE_BRICKS` (disc inlay) |
+| Bronze | waxed exposed `CUT_COPPER` + `COPPER_GRATE` (dings, vats' stands) |
+| Lights | hanging lantern: `IRON_CHAIN` ×1–3 → `SHROOMLIGHT` → `POLISHED_CINNABAR_SLAB` top-half rim below (palace lantern: 2 shroomlights stacked; **no 2×2×2 cubes**). Post lantern: `MANGROVE_FENCE` ×2 → shroomlight → `POLISHED_CINNABAR_SLAB` bottom cap. Stone lantern: `ANDESITE_WALL` ×2 + `LANTERN` + `DEEPSLATE_TILE_SLAB` hood. Also `SOUL_LANTERN` (ancestral hall, tower), waxed oxidized `COPPER_LANTERN` (gardens), hidden `OCHRE_FROGLIGHT` under `MOSS_CARPET`, `PEARLESCENT_FROGLIGHT` inside ridges and island tops, `SEA_PICKLE` (waterlogged) on pond floors, `END_ROD` (spires), `FIREFLY_BUSH`, red `DYED_CANDLE` (altars) |
+| Banners | `BANNER.pick(RED)` with a yellow border on `MANGROVE_FENCE` poles 4–6 high; wall banners on the gate pillars |
+| Flora (leaves always `PERSISTENT=true`) | see the tree table in 21.8; lotus = `BIG_DRIPLEAF` + stem (waterlogged) + `LILY_PAD` + `SEAGRASS`; beds of `PEONY`, `LILAC`, `LILY_OF_THE_VALLEY`, `TORCHFLOWER`, `PITCHER_PLANT`, `FERN`; formal beds `MOSS_BLOCK`; hedges `FLOWERING_AZALEA_LEAVES`; bonsai `POTTED_AZALEA`, `POTTED_FLOWERING_AZALEA`, `POTTED_CHERRY_SAPLING`, `POTTED_SPRUCE_SAPLING` |
+| Rocks | `CALCITE`, `DIORITE`, `TUFF`, `ANDESITE`, `MOSSY_COBBLESTONE` |
+| Water | sealed basins: `STONE_BRICKS` / `MUD_BRICKS` rims, `CLAY` floor |
+| Formation disc | `LODESTONE`, `CRYING_OBSIDIAN`, `AMETHYST_BLOCK`. Ring `SMOOTH_QUARTZ` with trigram lines in `POLISHED_BLACKSTONE` (yang = 3 blocks, yin = 1 + gap + 1). Compass points `GILDED_BLACKSTONE`, jade inlay `PRISMARINE_BRICKS`, rim `CHISELED_TUFF_BRICKS`. King Wen (Later Heaven) arrangement in **true compass orientation** whatever the rotation: ☲ S, ☵ N, ☳ E, ☱ W, ☴ SE, ☷ SW, ☶ NE, ☰ NW (matches the GUI Bagua). |
+| Blazing tower | `POLISHED_BLACKSTONE_BRICKS`, `CINNABAR_BRICKS` bands, `CHISELED_CINNABAR` panels, `SOUL_LANTERN`. Each room: `CRYING_OBSIDIAN` + lit `SOUL_CAMPFIRE`. |
+| Hanging islands | irregular drips of `TUFF` / `ANDESITE` / `STONE` / `CALCITE`; top `GRASS_BLOCK` / `MOSS_BLOCK`; `HANGING_ROOTS`; at most 2 `SPORE_BLOSSOM` per sect; vertical `IRON_CHAIN` or waxed oxidized `COPPER_CHAIN` to `POLISHED_BLACKSTONE` bollards |
+| Clouds | **client mist only** (21.16). Carved cloud motifs only as yellow glazed-terracotta panels on gates. |
+
+**Colour budget per view** (checked by the audit; plants excluded):
+
+| Share | Colours |
+|---|---|
+| about 60% | neutral: stone, roof grey, white |
+| about 25% | red |
+| about 10% | teal and jade |
+| at most 5% | gold |
+
+**Banned in builds:**
+- gravity blocks (sand, gravel, concrete powder); fill always uses dirt or stone, even when the credit came from sand;
+- vines and glow lichen; sugar cane and kelp;
+- fire, lightning rods, redstone;
+- carved pumpkins and jack-o'-lanterns (golem patterns);
+- spawners; chests (use barrels); entities (no armor stands or item frames).
+
+**Sumber / Source.** Art direction from real architecture (21.8), not novel canon.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.6 Roofs: curved tiered eaves from stairs and slabs
+
+**21.6.1 Profile: the juzhe rule, at most 45°.**
+
+This replaces a gamma curve, which reads as Japanese above 45°. The rule follows the *Yingzao Fashi* (1103) juzhe method and the Qing *Gongbu Gongcheng Zuofa* (1734), whose rise steps from 0.5 to 0.9 per run.
+
+Heights are in half-blocks per column, counted from the eave tip (d = 0) inward:
+
+- **Flare:** `f` columns of +1 (slabs, about 27°). `f` is odd, so stairs start on an even `s`:
+  - `f = 1` when R ≤ 4;
+  - `f = 3` when R is 5–9;
+  - `f = 5` when R ≥ 10.
+- **Then +2 per column** (stairs, 45°) up to the ridge.
+  - Never +3 on halls.
+  - Pavilion and pagoda tops may use +3 on their last 1–2 columns.
+- **Skirts and pagoda eaves:** all +1, except +2 on the last column.
+
+**Examples:**
+
+| R | s by column, eave → ridge | Total rise |
+|---|---|---|
+| 4 | 1, 2, 4, 6, 8 | 4 blocks |
+| 6 | 1, 2, 3, 4, 6, 8, 10 | 5 blocks |
+| 9 | 1, 2, 3, 4, 6, 8, 10, 12, 14, 16 | 8 blocks |
+
+**Shape formulas:**
+- `d = min(dx, dz)` for hip and pyramid roofs. `d = dz` where `dx ≥ gableInset` (the xieshan gable part, or always for a gable roof).
+- `i = |dx − dz|`.
+- **Corner upturn (qiqiao):** `up(i) = n − i` for `i < n`, with `n = clamp(R/2, 2, 5)`. Surface `= s(min(d, R)) + max(0, up(i) − d)`.
+- **Hip line raised:** the `i == 0` columns sit +1 half-block above the field, in trim, and run into the flying tip.
+
+**Roof : body ratio.** The body is measured from the floor to the eave tip; the roof from the eave tip to the ridge cap.
+
+| Building | Roof : body |
+|---|---|
+| halls | 1.0–1.2 |
+| minor buildings | ≥ 0.65 |
+| pavilions and pagoda tops | ≥ 1.2 |
+
+**Quadrant height map** for R = 6, n = 3. Rows run from the ridge (top) to the eave (bottom); columns run from the corner (left) to the centre (right). The hip-line +1 is not drawn.
+
+```
+hip                                          xieshan (gable from dx >= 3 = overhang + 1)
+dz=6:  1  2  3  4  6  8 10 10 10 10          dz=6:  1  2  3 10 10 10 10 10 10 10   <- ridge line
+dz=5:  1  2  3  4  6  8  8  8  8  8          dz=5:  1  2  3  8  8  8  8  8  8  8
+dz=4:  1  2  3  4  6  6  6  6  6  6          dz=4:  1  2  3  6  6  6  6  6  6  6
+dz=3:  1  2  3  4  4  4  4  4  4  4          dz=3:  1  2  3  4  4  4  4  4  4  4
+dz=2:  2  3  4  3  3  3  3  3  3  3          dz=2:  2  3  4  3  3  3  3  3  3  3
+dz=1:  3  4  3  2  2  2  2  2  2  2          dz=1:  3  4  3  2  2  2  2  2  2  2
+dz=0:  4  3  2  1  1  1  1  1  1  1          dz=0:  4  3  2  1  1  1  1  1  1  1   <- the eave edge lifts 1.5 blocks over 3 columns
+       ^ corner tip                                 vertical gable triangle stands 1 inside the end pillar line
+```
+
+**21.6.2 Turning heights into blocks.** `sOut` is the height of the lowest outward neighbour.
+
+| Condition | Piece |
+|---|---|
+| `s` odd | bottom slab at `baseY + (s−1)/2` |
+| `s` even and `s − sOut ≥ 2` | stair at `baseY + s/2 − 1`: `HALF=BOTTOM`, `FACING` toward the ridge; `SHAPE` set explicitly (outer shapes on hip lines) |
+| `s` even otherwise | top slab at `baseY + s/2 − 1` |
+| upturn zone (`up(i) − d > 0`) | **slabs only, never stairs** |
+
+**Other rules:**
+- **No slab-on-fill stacks.** Each stair sits directly on the stair below it. Under the shell, roof blocks fill down to `floor(sOut/2)`, so no hole shows. The first `overhang` columns stay a one-layer shell (an open soffit).
+- **Robustness.** `StairBlock.updateShape` recomputes `SHAPE` whenever a horizontal neighbour changes (snow, a torch). So facings must be chosen so that vanilla's `getStairsShape` produces the designed shape. The audit runs the vanilla shape on every stair and fails on any difference.
+
+**21.6.3 Where the wall line may sit (this fixes the eave slit).**
+- The pillar/wall line must fall on a column whose piece fills the bottom half of its cell (a bottom slab or a stair).
+- With `f = 3`, overhang 2 gives a bottom slab and overhang 4 gives a stair. Overhang 1 or 3 gives a top slab and a see-through slit.
+- **Frieze rule:** every cell from pillar top + 1 up to the roof underside at the wall line is filled. The bottom row is the beam band; the rows above are bracket rows. The audit rejects any air in that band.
+
+**21.6.4 Facings, ridges and ornaments:**
+
+| Element | Correct state |
+|---|---|
+| Roof stairs | `HALF=BOTTOM`, `FACING` toward the ridge |
+| Bracket row (dougong) | `WARPED_STAIRS` `HALF=TOP`, `FACING` **toward the wall**, so the tall side is a corbel against the wall. At each pillar head a 2-high cluster (stair + trapdoor), with a `CHISELED_SULFUR` cap from T6. |
+| Chiwen (ridge end) | on top of the last ridge block, a trim stair `HALF=BOTTOM` facing **outward**; one cell further out at the same Y, a top slab. This makes a hook that rises and curls out. |
+| Terrace spouts and corbels | `HALF=TOP`, tall side against the wall |
+| Main ridge by outer width W | W ≥ 11: ridge block + wall cap. W 7–10: ridge block only. W ≤ 6, galleries and garden buildings: **rolled ridge** (卷棚), where the last 2 columns on each side become slabs meeting in a rounded top. |
+| Ridge pearl | gold block at the ridge centre, flanked by two stairs facing it (main hall from T6; every major hall at T9) |
+| Hip roof (wudian) | needs W/D ≥ 1.6; otherwise use xieshan |
+| Xieshan gable | gable face 1 inside the end pillar line. Field `SMOOTH_QUARTZ` (Jiangnan) or `POLISHED_CINNABAR` (northern official style); bargeboard of trim stairs; **hanging fish** (悬鱼) under the ridge, 1×2 `RAW_GOLD_BLOCK`, on rank C/D |
+| Roof beasts (走兽) | rank C/D: an unlit black `DYED_CANDLE` (blue in Langit) on each of the last 3–5 hip blocks before each tip |
+| Flying tip | a top slab diagonally outside each corner at `s(0,0) + 1`, over a diagonal corner bracket of upside-down outer stairs. From T4: an `IRON_CHAIN` with a `LANTERN` (the wind bell). |
+
+**21.6.5 Variants:**
+- **Double eave.**
+  - The lower skirt covers a real **outer colonnade** (副阶周匝), 3 cells outside the core. Its eaves are all +1 except the last; a flashing row of trim slabs runs against the core wall.
+  - The visible clerestory is 2–3 rows plus the bracket row, and carries the gilded name plaque.
+  - The upper eave tip lands 1–2 blocks inside the lower eave tip horizontally, and at least 3 blocks above the skirt surface.
+- **Pyramidal** (pavilion, pagoda top): a square hip converging to an apex finial: `DEEPSLATE_TILE_WALL` ×2, `GOLD_BLOCK`, `IRON_CHAIN` ×2, `END_ROD`.
+- **Octagonal:** chamfered distance `d = min(dx, dz, (dx + dz + k)/2)`, with the upturn measured to the nearest of the 8 corner lines.
+- **Round** (Aula Dao Langit, template 9): `d = R − √(dx² + dz²)`, triple eave.
+- **Fan-shaped** pavilions (扇面亭) use the round rule on a sector.
+- **Pagoda floor:** core walls with lattice on 4 sides → skirt eave with corner tips and lanterns → balcony railing on the skirt (`MANGROVE_FENCE`, or jade `COPPER_BARS` on glazed pagodas).
+
+**21.6.6 Front elevation of the Sekte Agung main hall** (stylised; 1 char ≈ 1 block)
+
+```
+                   )               (             chiwen curls at both ridge ends (outward hooks)
+                   [=======o=======]             main ridge + wall cap; gold pearl o (T6+)
+                   /###############\             upper roof: +2 per column (45 deg max), no steeper
+                  /#################\            (xieshan: from here up the ends are vertical gable triangles)
+                _/###################\_
+         ,-'"--'=======================`--"'-,   upper eave: 3 flare slabs; corners lift over n columns + flying tip
+               vvvvvvvvvvvvvvvvvvvvvvvvv         bracket band (warped, tall side against the wall; gilded caps at pillar heads)
+               ::::::::[ PLAKAT ]:::::::         clerestory 2-3 rows: plaster, black-gold plaque with the sect name sign
+       ,-'"--'/////////////////\\\\\\\\\\\\\`--"'-,   lower skirt over the outer colonnade (+1 per column, 27 deg)
+             ===============================     lower eave edge (trim slabs)
+             vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv     brackets on the colonnade
+              |~~~|~~~|~~~~~|~~~|~~~|        beam band: teal warped planks between cinnabar pillars (centre bay wider)
+              |+++|+++|DDDDD|+++|+++|        doors/lattice recessed 3 behind the colonnade (deep porch shadow)
+              |+++|+++|DDDDD|+++|+++|
+            i |___|___|DDDDD|___|___| i      quartz-pillar balustrade posts on the platform
+         ===================^^^^^===================   hall platform (+5) with steps the width of the centre bay
+       #####################^^^^^#####################   marble terrace +4 (polished diorite face, dragon ramp)
+     #######################^^^^^#######################  marble terrace +2
+```
+
+**21.6.7 Single-eave section** (3-bay Aula Pendiri: pillar height 5, R = 6, f = 3, overhang 2)
+
+```
+      z: -7 -6 -5 -4 -3 -2 -1  0      half section: front eave left, ridge at z=0
+  F+12                         n      n  ridge cap wall (only when outer width >= 11)
+  F+11                         R      R  ridge block (DEEPSLATE_BRICKS / glaze ridge)
+  F+10                         #      #  shared ridge-column block
+  F+9                       S         S  roof stair, HALF=BOTTOM, FACING toward the ridge
+  F+8                    S
+  F+7           b  t                  b/t  bottom / top slab: eave flare, +1/2 block per column
+  F+6     b  t  v                     v  bracket row: WARPED_STAIRS HALF=TOP, tall side against the wall
+  F+5     s  s  =                     s  soffit POLISHED_DEEPSLATE_SLAB top (rank C+);  =  WARPED_PLANKS beam band
+  F+1..4        P                     P  POLISHED_CINNABAR pillar
+  F+0           P                        on a CHISELED_TUFF base block
+  F-1  ~  _  _  _  _  _  _  _         _  platform, 2 high for halls (STONE_BRICKS + POLISHED_ANDESITE coping)
+```
+
+The wall line z −4 sits on a bottom slab (s = 3), so the frieze closes. Body = 6 and roof = 7, a ratio of about 1.15.
+
+**21.6.8 Double-eave section** (template 5+ main hall)
+
+```
+  z:   -10 -9 -8 -7 -6 -5 -4 ...  0
+ F+19                          R/n  upper ridge, gold pearl at x=0, chiwen at both ends
+ F+13..18                S  S ...   upper roof, R about 9, f = 3, overhang 4
+ F+12                 S            core line sits on a stair (s = 6)
+ F+10/11   b  t  b  t              upper eave flare
+ F+11                 v            upper bracket row (warped, against the core wall)
+ F+10                 =            upper beam band
+ F+9                  Q            clerestory SMOOTH_QUARTZ; name plaque in the centre bay
+ F+8            b  b  |            skirt meets the core: flashing row of trim slabs
+ F+7      b  t  b  t  |            lower skirt (all +1, 27 deg), eave tip 2 beyond the colonnade
+ F+6   b  t  v        |            lower bracket row on the colonnade
+ F+5         =        |            lower beam band
+ F+0..4      P  . .   W            P outer colonnade;  porch;  W doors/lattice on the core line
+```
+
+**Sumber / Source.** Art direction from *Yingzao Fashi* and the Qing *Gongbu Gongcheng Zuofa*, the Forbidden City's roof beasts and dragon-head spouts, and Hui-style horse-head walls. These are not novel canon.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.7 Building bodies, gates, pagodas and stamps
+
+**Proportion rules** (audit constants):
+
+| Rule | Value |
+|---|---|
+| Bays | Centre bay 6 (5 cells), other bays 4 (3 cells), end bays of 7- and 9-bay halls 3. Small ≤ 3-bay halls of rank A/B may use side bays of 3, which gives 13 wide. Widths stay symmetric about x = 0. 5-bay = pillars at ±3, ±7, ±11. |
+| Hall depth | pillar-to-pillar depth ≥ 7; width : depth 1.6–2.2 |
+| Pillar height | about 0.9 × centre bay: dorms 4, halls 5–6, main-hall lower storey 6 |
+| Overhang | 2 when pillar height ≤ 5, else 4 (parity rule, 21.6.3) |
+| Platform | 1 for minor buildings, 2 for halls, 3+ on terraces; steps only as wide as the centre bay |
+| Porch | every rank C/D hall has its door and lattice line 1–3 behind the front pillar row, for the deepest shadow |
+| Interior | halls of 5+ bays get interior pillar rows (金柱), so an open door never shows an empty box |
+| Ornament budget | A: tiles, pillars, plain lattice. B: + brackets, jade trim. C: + painted beams, plaque, soffit. D: + double eave, gold, chiwen, roof beasts, colonnade. |
+| Density | Roof outer rectangles ≥ 2 apart, or ≥ 4 when both buildings are taller than 7, unless joined by a gallery. Every gap ≥ 4 gets planting. |
+
+**Façade bay module** (槅扇):
+
+```
+         x:  P  .  .  .  .  .  P  .  .  .  P
+   F+5       =  =  =  =  =  =  =  =  =  =  =    beam band WARPED_PLANKS (pillar-head cells CHISELED_SULFUR from T6)
+   F+4       P  L  L  L  L  L  P  L  L  L  P    L = lattice: an OPEN trapdoor lying on the cell's outer face
+   F+3       P  L  L  L  L  L  P  L  L  L  P
+   F+2       P  L  L  L  L  L  P  L  L  L  P
+   F+1       P  k  D  D  D  k  P  k  k  k  P    D = MANGROVE_DOOR, 3 single leaves side by side (a row of geshan doors)
+   F+0       P  m  D  D  D  m  P  m  m  m  P    k = MANGROVE_PLANKS panel;  m = POLISHED_ANDESITE sill
+              centre bay (6)    side bay (4)    steps in front of the centre bay only
+```
+
+- Doors on disciple routes (duties, library, tower) are placed `OPEN=true` or left out, because disciples cannot open doors.
+- Repair treats "planned open, found closed" as fixable at no cost.
+
+**Plaque (匾额):** a `GILDED_BLACKSTONE` frame (with a `RAW_GOLD_BLOCK` border on rank D) around a centred `DARK_OAK_WALL_SIGN`. The text is yellow and glowing, the sign is waxed, and it shows the sect name (updated on rename).
+
+**Pagodas.**
+- Floor heights fall as the pagoda rises, and the silhouette tapers convexly. Never use a straight stack.
+- Templates 2–4 use square pagodas. The glazed 7- and 9-floor pagodas are octagonal (models: the Porcelain Tower of Nanjing and the Kaifeng Iron Pagoda).
+- Every floor has a lantern under every corner tip.
+- The dominant pagoda's top is 1.6–2.0 × the main hall's ridge height above the plaza.
+
+**Example: Tujuh Harta, 7 floors, about 42 high:**
+
+| Floor | Core (chamfer) | Overhang | Eave width | Height |
+|---|---|---|---|---|
+| 1 | 9 (2) | 3 | 15 | 7 (with plinth and porch) |
+| 2 | 9 (2) | 2 | 13 | 5 |
+| 3 | 7 (1) | 3 | 13 | 5 |
+| 4 | 7 (1) | 2 | 11 | 4 |
+| 5 | 5 (1) | 3 | 11 | 4 |
+| 6 | 5 (1) | 2 | 9 | 4 |
+| 7 | 5 (1) | 2, pyramid roof | 9 | 4, + roof 4, + spire 5 |
+
+Pagoda skirts are all +1 slabs, so the odd overhangs leave no slit.
+
+**Paifang** (3 bays, 4 posts, 3 roofs; the 5- and 7-roof variants add small roofs over the posts):
+
+```
+ x:  -8 . . . -4 . . . 0 . . . 4 . . . 8
+y13   ........o........     o  GOLD_BLOCK pearl on a trim wall stub
+y12   ....CrrrrrrrC....     centre ridge (trim stairs back to back), C = chiwen (21.6.4)
+y11   ...^SSSSSSSSS^...     S  roof slope, ^ lifted tip slab
+y10   ....vvvvvvvvv....     v  brackets
+y9    .....#=====#.....     #  centre posts x = +-3,  = upper lintel
+y8    .....#gKKKg#.....     K  plaque 3x2, g YELLOW_GLAZED_TERRACOTTA cloud panel
+y7    Crrrr#gKKKg#rrrrC     side roofs butt against the centre posts
+y6    ^SSSS#=====#SSSS^
+y5    .vvvv#.....#vvvv.
+y4    .#===#.....#===#.     side posts x = +-7, side lintel
+y1-3  .#...#.....#...#.     centre opening 5 wide x 6 high, sides 3 x 4
+y0    .B...B.....B...B.     B  post foot clamped by "drum stones" (STONE_BRICK_STAIRS against the post at z = +-1)
+```
+
+- Red-wood variant: posts `POLISHED_CINNABAR`, lintels `WARPED_PLANKS`.
+- White-stone variant: posts `QUARTZ_PILLAR`, lintels `CHISELED_QUARTZ_BLOCK`, roofs in the glaze.
+- A paifang stands **at least 8 blocks** in front of a gate hall. A paifang without roofs is forbidden, because it would read as a torii.
+
+**Stamps** (a small char-grid DSL in Java):
+- stone lions, dings, water vats (cauldrons on stone stands), weapon racks, bell frames, drums (barrels), pagoda-lanterns, flag poles, bonsai stands, boundary stones;
+- the screen-wall rock; the stone boat (template 7);
+- **horse-head gables** (马头墙): the gable rises in 2–3 steps of 2 high × 2 wide, each step capped by back-to-back trim stairs ending in an outward top slab. Used on dorms, kitchens and garden walls in templates 3, 7 and 9.
+
+**Incense ding.** There is **one** signal-smoke ding per sect: a hidden `HAY_BLOCK` under its lit campfire, in front of the main hall. Every other campfire has `SIGNAL_FIRE=false`.
+
+**Stele framing.** No roof over the stele, because it would hide the candidates' Duan light pillar. Instead, a `CHISELED_TUFF_BRICKS` octagon inlay at r 2 and low stone lanterns at (±2, ±2). The stele stays reachable from all 4 sides.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.8 Landscape, composition, sky elements and art QA
+
+**Terrace edges:**
+
+```
+        outside             deck (y0)
+  y+1          P  f  f  P   P QUARTZ_PILLAR post every 3rd cell + SMOOTH_QUARTZ_SLAB cap;  f PALE_OAK_FENCE
+  y0        c  #  =  =  =   c coping: SMOOTH_QUARTZ_SLAB TOP, one cell OUT from the face -> shadow line
+  y-1       s  #            s spout under every post: SMOOTH_QUARTZ_STAIRS HALF=TOP, tall side against the wall
+  y-2          #            # face: POLISHED_DIORITE (marble) / STONE_BRICKS (stone)
+  y-3          k            k fret course: CHISELED_QUARTZ_BLOCK / CHISELED_TUFF_BRICKS
+  y-4    a  a  #            a planting strip: AZALEA, FERN, rocks (hides the foot)
+```
+
+**Terraces and slopes:**
+- At most 4 blocks of exposed retaining wall; above that, step back 2 with a planting strip. Template 8's citadel walls are the deliberate exception.
+- Exposed step edges use `MOSS_BLOCK` (green on all faces), with a rock cluster every 4–6 blocks. Never leave a bare dirt face.
+- Use 1:2 slopes where space allows; rustic sections use rubble walls of mossy cobblestone, tuff and andesite.
+
+**Water:**
+- Vanilla water has **no reflections**, so compose for foreground water: the pond lies between the viewpoint and the pagoda.
+- Edges are taihu rocks with holes. Formal basins only get `SMOOTH_STONE_SLAB` curbs.
+- The surface sits ½–1 block below the path.
+- Plant with seagrass, lily pads, dripleaf lotus and sea pickle glow, with flowering azalea on the banks.
+- **No water flows off islands.**
+
+**Trees: 6 seeded archetypes**, never a free L-system:
+
+| Tree | Trunk | Canopy | Ground / use |
+|---|---|---|---|
+| Huangshan pine | `SPRUCE_LOG` 6–10, leaning 1 per 3 | 2–4 horizontal log arms, each ending in a flat `SPRUCE_LEAVES` pad (5×3 or 7×4, 1 thick) + a crown | the most common tree; on ledges |
+| Plum (Mount Hua) | `CHERRY_LOG` 2–3, splitting into 3 crooked branches | sparse `CHERRY_LEAVES` clusters with 30% holes; **dark branches stay visible** (big pink blobs read as sakura) | `PINK_PETALS` r 3 |
+| Willow | dark trunk 4–5 | `AZALEA_LEAVES` dome r 3 + strands 2–4 long hanging from every other rim cell | water edges only |
+| Ginkgo | straight `POPLAR_LOG` 7–9 | conical `YELLOW_POPLAR_LEAVES` | `LEAF_LITTER` ring |
+| Maple | `POPLAR_LOG` 4–5 | `ORANGE_POPLAR_LEAVES` near red buildings; `RED_POPLAR_LEAVES` only against white walls or rocks | upper slopes |
+| Bamboo clump | 5–12 stalks in a 3×3–5×5 cluster, heights 6–12 | `STAGE=1`, large leaves on the top 2 | podzol or moss |
+
+**Planting rules:**
+- At least 60% green foliage, about 25% plum and ginkgo, at most 15% maple.
+- Use spruce and azalea, never biome-tinted dark oak or oak leaves.
+- **Every template gets one hero tree at T1.**
+
+**Rocks and paths:**
+- Scholar's rocks: vertical stacks of 2–4 with lateral offsets and random voids (thin, perforated, open, wrinkled).
+- Formal axis: smooth stone with chiseled stone bricks.
+- Garden paths: tuff-brick stepping stones on moss.
+- Over water: stepping stones (汀步).
+
+**Composition rules** (checked by the audit at dev time):
+1. **Sightline** (rising roofs, after Guo Xi's three distances).
+   - Eye point: the paifang centre, 1.6 above the ground.
+   - For consecutive buildings on the axis, the angle up to the farther ridge must beat the nearer one by ≥ 1.5 blocks at that distance.
+   - If not, raise the farther building's platform or terrace within its range.
+2. **One dominant vertical per template**, 1.6–2× the main ridge, placed off-axis between ⅓ and ¾ of the half-width. Template 9's summit pagoda is the exception. Never two equal towers.
+3. **Framed views** (Ji Cheng, *Yuanye*: borrowed scenery). Every moon gate and leak window frames the pagoda or a hero tree, checked by a line-of-sight test from the gate centre.
+4. **No perimeter wall on templates 6, 7 and 9.** Mountains are the walls in sect art. Use the shanmen with short wall stubs ending in rock, boundary stones (界碑) every ~16 blocks, and forest.
+5. **Big-template peaks are sculpted mountains, not stacked fill.**
+   - The `Peak` component uses a radial falloff plus seeded noise.
+   - Cliff faces are striped in stone, andesite, tuff and calcite, with overhangs and pines on the ledges.
+   - Retaining walls go only under building pads and stair flights; climbing galleries (爬山廊) join the levels.
+   - Natural terrain higher than the design is kept, and only pads and stairs are carved.
+6. **Never repeat an identical building within one view**, except mirrored axis pairs. Mix roof types: gable, xieshan, hip, pyramid, round, rolled ridge. Mix pavilions: square, hexagonal, octagonal, round, fan. Mix bridges: moon arch, nine-turn, covered, stepping stones, straight marble. Mix galleries: straight, climbing, waterside.
+7. **Avoid Japanese-isms:** paifang without roofs, pale shoji lattice (`BAMBOO_TRAPDOOR`), all-pink canopies, steep tall roofs, all-red buildings without the teal beams, gravel gardens. Chinese reads as red + teal + gold + white + dark grey.
+
+**Sky elements:**
+- **Clouds are client FX** (21.16), not snow or concrete blobs.
+- **Floating islands are hanging mountains**:
+  - irregular drips 1.5–2.5 × r deep;
+  - pines leaning out from the rim, with a ting on top;
+  - only vertical chains (iron, or jade copper) to stone bollards, with a carved turtle head under the largest island (Liezi);
+  - mist instead of water.
+- **Cliff pavilion (template 6):** a deck on cantilevered dark-oak fence-and-log struts from a cliff face, after the Hanging Temple of Mount Heng.
+- **Aula Dao Langit (template 9):** round, triple-eave, Langit blue, after the Hall of Prayer for Good Harvests.
+
+**Art QA.** `uji sekte kamera <1-3>` jumps to 3 fixed views per template:
+1. the approach eye at the paifang;
+2. the garden view across the water toward the dominant vertical;
+3. a 45° aerial from the SE.
+
+Review snapshots at T1, T3, T5, T7 and T9, in Tinta and in Giok, by day and at night. At night, windows glow (hidden lights behind the lattice) and lantern rows mark the axis and the eaves.
+
+**Sumber / Source.** Real architecture and art theory, art direction only:
+- Guo Xi, *Linquan Gaozhi*; Ji Cheng, *Yuanye*;
+- the Porcelain Tower of Nanjing and the Kaifeng Iron Pagoda;
+- the Hall of Prayer for Good Harvests; the Summer Palace (marble boat, climbing gallery);
+- the Hanging Temple of Mount Heng; the Ming tombs' spirit way; the Forbidden City's three-tier marble terrace and water vats;
+- the Huangshan welcoming pine; Hui horse-head walls.
+
+Story tie-ins: *Return of the Mount Hua Sect*'s plum blossoms and the *Liezi* turtles (21.3).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.9 The procedural blueprint engine
+
+**Why procedural Java and not `.nbt`:**
+- 81 template-tier combinations come from one component library.
+- The terrain fit, rotation and glaze swaps are inputs.
+- The intentional build order is generated together with the blocks.
+- The bill is computed from the same code.
+- `uji sekte audit` can dry-run everything.
+- Block references are checked at compile time. Renames such as `chain` → `iron_chain` and the 26.x `ColorCollection` / `WeatheringCopperCollection` moves would silently break NBT data.
+- `.nbt` would need 81 hand-built files, cannot fit terrain, and still needs code for order and palette.
+- Diagrams, the hologram and the bills all come from the same data.
+
+**Components** (package `sect/build/blueprint`). Every component exposes `bounds()` (for the hologram), `tier`, `id` (stable forever), `cost(ctx)` (from a dry-run count) and `emit(ctx, sink)`.
+
+| Component | Key parameters / notes |
+|---|---|
+| `TerrainZone` | Polygon or rectangle, design level + allowed range, edge style (RETAINING / SLOPE / WATER), keepNature. Owned by the component whose plot it is. Layered earthwork (21.10). |
+| `Peak` | radial falloff + seeded noise, striped cliffs, ledges, keeps higher natural terrain, pads for buildings |
+| `Terrace` | rectangle, height, style (STONE / MARBLE), balustrade, stair openings; a lantern every 8; terrace interiors filled solid, never hollow |
+| `StairFlight` | start, direction, width, rise, style, centre ramp, landing every 4 |
+| `Paving` | area, pattern (PLAZA / AXIS / PATH / STEPPING); paths use bottom slabs |
+| `Hall` | bays (bay rule), pillarH, platformH, overhang, roof {GABLE, XIESHAN, HIP, PYRAMID, ROUND} × eaves {1, 2, 3}, colonnade, clerestoryH, façade, sides, rank, interior preset, plaque key |
+| `RoofBuilder` | outer rectangle, wall rectangle, baseY, R, profile (21.6), type, gableInset, upturn n, glaze, rank; shared by every roofed component |
+| `Pavilion` | size, sides {4, 6, 8, ROUND, FAN}, eaves 1–3, optional `QiSeat` |
+| `Pagoda` | base, floors, floor heights, taper, sides, glazed, spire |
+| `GateHall`, `GateTower` | bays, depth, straddles a wall; the gate tower (城楼) is template 8's 3-storey version |
+| `Paifang` | bays {1, 3, 5}, roofs {1, 3, 5, 7}, material {RED_WOOD, WHITE_STONE}, plaque |
+| `InnerGate` | width; the T1 gate with hanging-lantern posts |
+| `Wall` | polyline, height, style {RED_PALACE, WHITE_GARDEN, CITADEL}, openings (moon gate Ø5, leak windows), horse-head option |
+| `CornerTower` | width, storeys 2–3 |
+| `Corridor` | path, width 3, slope (climbing gallery), open side |
+| `Pond`, `Stream`, `Waterfall`, `Moat` | shape, depth 2, plants; sealed basins; containment proven at emission |
+| `Bridge` | MOON_ARCH / ZIGZAG / COVERED / SKY / STRAIGHT_MARBLE / STEPPING |
+| `Tree` | the 6 archetypes of 21.8, seeded; skipped where a natural tree stands within 2 |
+| `BambooGrove`, `HerbBeds`, `Coop`, `BeastGarden`, `DrillGround`, `ArcheryRange`, `Arena` | area-based; targets are `TARGET` on stone posts, fence dummies or framed boards |
+| `Rock`, `RockHill`, `GrottoHill` | taihu holes; hills carry a ting; the grotto hill has a cave gate and hosts the tower |
+| `SpiritWay`, `StoneBoat`, `BoundaryStone`, `ScreenWall` | template-specific set pieces |
+| `LanternPost` | STONE / RED_POST / HANGING / PALACE / JADE; spacing per the light rule (21.10) |
+| `FormationDisc` | lodestone distance d, ring r (Table B); trigrams in compass orientation |
+| `TowerShaft` | rooms 3–7, 5×5 interior, spacing 4, entrance (CELLAR / TING / TOWER / GROTTO), doorless spiral stair, shell first |
+| `QiSeat` | tier 1 / 2 / 3 exactly as DESIGN 4 / `QiFormations` |
+| `HangingIsland` | centre, r, seed, top preset, vertical tethers |
+| `Stamp` | char-grid layers + legend (21.7) |
+| `Ornament` | "Hiasan Tingkat n": lanterns, flowers, banners spread over existing parts |
+
+**Interior presets:**
+
+| Preset | Contents |
+|---|---|
+| main hall | throne dais, gilt screen, incense table with red candles, palace lanterns |
+| library | bookshelf walls ≥ the requirement, lecterns, reading tables |
+| dorm | kang beds of dark-oak slabs with red carpet (no bed block entities) |
+| kitchen | smoker, open campfire hearth, barrel, vats. Never a cauldron on a fire, which would read as an alchemy furnace. |
+| alchemy | cauldron on a lit soul campfire under a jade copper-grate hood, brewing stands. It is a working `AlchemyFurnace`, so deconstruction treats an active pot as an obstacle. |
+| ancestral | stepped tablet altar, soul lanterns, candles |
+| meditation | `QiSeat` |
+
+**Pipeline:**
+- `TemplateSpec(id)` holds: footprint, envelope, zones (design level, range, parent, minimum step), the components per tier with their template-local coordinates, anchors, and `planVersion`.
+- `SitePlan.compile(spec, rotation, glaze, seed, snapshot)` fits the zone levels, then freezes them at confirmation.
+- `emit(component)` streams `BuildOp(localPos, state, phase)`.
+
+**Placement order:**
+- **Tiers** ascending. Tier t+1 starts only when every tier-t component is DONE or SKIPPED.
+- **Components within a tier:**
+  1. the axis path;
+  2. components by axis priority (south → north), then side axes from the inside out;
+  3. boundary works clockwise from the gate;
+  4. gardens and water;
+  5. the tier's `Ornament`.
+
+  The player may **Prioritaskan** one component to the front of its tier.
+- **Phases within a component:**
+  `CLEAR` (plants and snow, no drops) → `SEAL` (fluid-first, 21.10) → `CUT` (layers top-down) → `SHELL` (underground room shells) → `FILL` (layers bottom-up) → `PLINTH` → `FRAME` (pillars all together layer by layer, then beams and brackets) → `ROOF` (ascending s: eave ring first, ridge last) → `WALL` → `INTERIOR` → `ORNAMENT` → `GARDEN` → `WATER` (last) → `TIDY`.
+- **Within a layer:** mirror pairs interleaved (`(x,z)` then `(−x,z)`), outward from the axis. Earthwork spirals outward within each layer. A building is therefore symmetric at every moment of its growth.
+
+**Slices and determinism:**
+- Ops are a pure function of (template, component, seed, rotation, origin, frozen snapshot, frozen zone levels, glaze, planVersion).
+- The engine emits a component **off the server thread** (`Util.backgroundExecutor()`, no world reads) and consumes it in slices of ≤ 4,096 ops along the ordered stream. A slice is a range of (phase, layer), never a spatial tile, so symmetric growth is kept.
+- Only the cursor `(tier, componentId, phase, layer)` is saved.
+- **Resume is idempotent**: re-emit and skip cells already in their target state.
+
+**Versioning:**
+- Component ids are stable. `hash` changes only when a component's blocks change.
+- After a mod update with a new `planVersion`, finished components are never rebuilt and unfinished ones use the new blueprint.
+- New components in tiers that are already finished are queued as "Tambahan" without lowering the tier. Components that disappeared from the plan stay as ordinary sect cells.
+
+**Transform.** Local → world uses rotate and translate. States go through `state.rotate(Rotation)`. The trigrams and plaque text are emitted in world orientation.
+
+**TIDY:**
+- A whitelist only: fences, walls, panes, iron and copper bars, fence gates, grass `SNOWY`.
+- Uses `Block.updateFromNeighbourShapes(state, level, pos)` with flags 2|16, over the component box **plus a 1-block halo**, so earlier components' fences reconnect.
+- Never stairs (designed shapes stay), and never lanterns or plants (a failed `canSurvive` returns AIR).
+
+**Anchors and design constraints the systems rely on:**
+
+| Anchor or constraint | Why |
+|---|---|
+| Stele (0,0,0); its cell and the block under it are never edited | 20.1: only players place or break the stele |
+| The 4 cells 5 blocks N/E/S/W of the stele stay air over walkable floor, at stele height | 20.3.9 duty posts (rotation-invariant) |
+| Standing cells inside a ring 8–14 from the stele within ±3 of stele y | 20.3.3 candidate arrival fallback |
+| `post_water`, `post_kitchen`, `post_garden`, `post_farm`, `arrival`, `arena`, `library` (≤ 16), `formation` (≤ 24), `tower` (entrance ≤ 12 horizontally, deepest campfire ≤ 28 below, so within the 32 sphere of `BlazingTower`), `treasury`, `main_hall`, `work_*` | A, B and D integration; builder AI |
+| Tower rooms: 2-high clear cells next to each campfire; doorless routes | `Targeting.safeSpot`; disciples cannot open doors |
+| Lit soul campfires on crying obsidian only in tower rooms | `BlazingTower` counts any of them as a floor |
+| Leaves `PERSISTENT=true`; trees are blocks, never saplings | no decay; trees look grown on day one |
+| Block entities only: lectern, bell, banners, campfires, brewing stands, decorative empty barrels, the gate sign | no spawners, no loot, no chests |
+
+**Sumber / Source.** Game design; no canon claimed.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.10 Footprint, terrain and safety (the exact scope of the exception)
+
+**Snapshot and preview scan** (reads only):
+- The union square of all 4 rotations is scanned once and cached; rotating only re-projects the plan.
+- Terrain heights come from chunk heightmaps (`MOTION_BLOCKING_NO_LEAVES`) plus a short downward probe, at about 520k reads for template 9 (≈ 3 s, spread over ticks).
+- Fluids, block entities and protected blocks are found by skipping sections with `LevelChunkSection.maybeHas(...)`, as `HallLevel.scanTower` does.
+- Every read goes through `getChunkNow`; a sync chunk load is never called. An unknown neighbour counts as "fluid present".
+- **Confirmation requires 100% of the chosen rotation's columns snapshotted.** Columns are captured as their chunks load. The HUD shows "Tapak terpindai 78%" with an arrow toward the missing part.
+- Template 9 needs about render distance 8 from the stele, template 8 needs 7 and template 7 needs 6.
+
+**Validation:**
+
+| Check | Rule | Severity | Message (id_id) |
+|---|---|---|---|
+| Dimension | Overworld only (v1) | red | "Hanya di Dunia Atas" |
+| World height | `plazaY − below ≥ minY + 2`; `plazaY + above ≤ maxY − 2` | red | "Turunkan/naikkan Prasasti" |
+| Other sites | footprint + 16 must not touch another hall's footprint or a showcase; A's 128-block stele rule | red | "Bertumpuk dengan Sekte ‹nama›" |
+| Spawn protection | dedicated servers: no overlap | red | |
+| Villages | a villager or iron golem within footprint + 16, or a village piece intersecting touched cells | red | "Ada desa di dalam tapak" |
+| Structures | player-relevant structures (village, outpost, temples, igloo, mansion, monument, stronghold, ancient city, trial chambers, ruined portal with a chest) intersecting **touched** cells; looked up per chunk with `StructureManager`; mineshafts ignored | red, names it | |
+| Lava | lava **outside** the footprint next to a cut cell; lava inside is converted to fill (amber note) | red | |
+| Relief | P95 − P5 of surface height ≤ max relief (Table A) | amber > 75%, red > 100% | "Medan terlalu curam: pilih tempat lebih datar atau templat lebih kecil" |
+| Earthwork | cut + fill ≤ cap (always shown: "Galian 12.400 · Timbunan 3.100") | red above | |
+| Water | surface water ≤ 30% of columns and ≤ 10% deeper than 6 (it is filled and billed) | amber, red above | |
+| Cliffs and voids | columns needing fill > 16: fill is capped 4–6 below the surface, with a 3-block stone cap over caves and ravines | amber > 5%, red > 15% | |
+| Protected blocks (below) | inside a component box | red marker | "Pindahkan/hancurkan sendiri bila mau" |
+| Containers with items | inside a component box | red; amber if "Kosongkan ke Peti Galian" is authorized | |
+| Player-made blocks | inside a component box or earthwork | amber: "N blok buatan pemain dilindungi; bangunan yang menabraknya akan menunggu" | |
+| Leafless log clusters, natural bee nests | in a building plot | amber; the player chooses credit or keep | |
+| Snapshot | < 100% | confirm disabled | "Tapak belum terpindai penuh" |
+
+**Classification** (reads only; a datapack can extend the tags):
+- **Natural** = tag `#kultivator:sect_natural`:
+  - `#base_stone_overworld`, `#dirt`, `#sand`, gravel, clay, calcite, tuff, dripstone, cinnabar and sulfur, `#ores` (and deepslate variants), badlands terracotta;
+  - snow, ice, packed ice, moss, short and tall grass, fern, dead bush, `#flowers`, sugar cane, cactus, bamboo, kelp, seagrass, mushrooms, pumpkin, melon, sweet-berry bush, mangrove roots, mud;
+  - leaves only with `persistent=false`;
+  - logs as whole clusters: a log-and-leaf cluster classified at scan time keeps its verdict while its state is unchanged, so clearing the leaves first never turns the trunk into "player-made".
+- The builder's **own** cells (21.20 cell index) always count as its own and are never "player-made".
+- **Player-made** = everything else: planks, glass, wool, torches, rails, redstone, farmland and crops, dirt paths, persistent leaves, carpets. Hanging entities, armor stands, boats and minecarts count as blocking.
+- **Protected, never touched** (tag `#kultivator:sect_protected` + D's `#kultivator:indestructible`):
+  - bedrock and anything with hardness < 0;
+  - portals, frames and end gateways; spawners, trial spawners, vaults; reinforced deepslate; budding amethyst;
+  - beacons, conduits, respawn anchors;
+  - the stele and the block under it; the lodestone of any registered formation;
+  - every block entity the builder did not place, except containers explicitly emptied.
+
+**Per-position decision**, re-checked at placement and not only at scan:
+
+| Current block | Action |
+|---|---|
+| Already the target state | skip (0.1 op); its reserved share is refunded |
+| Air, short or tall grass, fern, snow layer, dead bush | place; cleared plants drop nothing |
+| Flowers | credited as Flora items, then place |
+| Natural | **displace**: drops as if mined by the unenchanted netherite tool matching its mineable tag (`Block.getDrops(state, level, pos, null, null, tool)`); routed per "Credit" below; then place or leave air |
+| Fluid or waterlogged | sealed first by the fluid-first rule |
+| Player-made | **blocked**, unless "Bongkar & simpan" is authorized for this site (singleplayer without LAN, or op): then a silk-touch drop goes to Peti Galian |
+| Container with items | blocked, unless "Kosongkan" is authorized (same permission): contents and block go to Peti Galian |
+| Protected | blocked; can never be authorized |
+| A living entity's box overlaps a solid target, or the block holds up a living entity's feet | defer and retry after 40 ticks. After 10 tries, players within 16 see "Menyingkir dari area kerja"; mobs are simply retried |
+| Chunk not loaded | the component is suspended (reservation kept); the next loaded one opens |
+
+**Earthwork.**
+- Done in **horizontal layers per zone**: cut top-down, fill bottom-up, spiralling within each layer. Never a column sweep, which could drop a player or disciple 10 blocks. A plateau settles visibly.
+- **Perimeter first:** edge columns are finished before interior digging below the outside level. Within 2 blocks of the edge, cuts never go below the outside ground; that cell becomes retaining wall.
+- **Keep columns:** columns holding player-made blocks, plus a 2-block margin, get no cut below and no fill above. They are wrapped by a retaining ring, and the components that need them show as blocked.
+- **Landscape margin:** a 3–6 block ring inside the edge blends from the zone level to the outside height at ≤ 1:1, using moss, rocks and kept natural trees. Retaining walls go wherever it would be steeper.
+
+**Fluids.** Fluids are sealed first.
+- Before any cell inside the footprint becomes air, every fluid cell in or touching the cut volume (waterlogged blocks included) becomes the zone's fill block, set with 2|16|512.
+- A fluid outside the footprint, or in an unloaded chunk, means that cell never becomes air; it becomes retaining wall.
+- Underground rooms place their 1-block shell (replacing cave air and fluid) before hollowing.
+- Water is placed in the WATER phase only, as static sources with flag 512, and only where a containment check proves every non-source cell ends in the plan's own sealed basin.
+- Only waterfalls get `scheduleTick`. They start in a notch walled on 3 sides and land in a source pool.
+- Waterloggable blocks placed in planned water get `WATERLOGGED=true`.
+
+**Flags.**
+- Placement uses `UPDATE_CLIENTS | UPDATE_KNOWN_SHAPE | UPDATE_SKIP_ON_PLACE` (2|16|512): no neighbour cascades, no `onPlace`, so gravity blocks, observers and redstone never wake up.
+- Removal uses 2|16.
+- TIDY and waterfalls are the only exceptions.
+- Flag 256 is never used on a container that holds items.
+
+**Block-state correctness** (emit every property explicitly):
+- Stairs: `FACING`, `HALF`, `SHAPE`.
+- Doors and double plants: both halves, same `FACING` / `HINGE`. A refund removes both halves.
+- Lanterns: `HANGING` matches the support, and the support goes first.
+- Chains: `AXIS=Y`.
+- Bamboo: `STAGE=1`, plus `AGE` and `LEAVES`.
+- Big dripleaf: `TILT=NONE` + stem, waterlogged, on clay or moss.
+- Pink petals: amount and facing, on a sturdy block. Lily pads: only on a source.
+- Campfire: `LIT`, `SIGNAL_FIRE` false (except the one ding).
+- Bell: `ATTACHMENT` matching its mount.
+- Vats: `WATER_CAULDRON` with `LEVEL=3` (water is free).
+
+**Light and mobs.**
+- **Light rule:** every top surface, roofs included, keeps block light above 0.
+  - Each ridge has a glowing pearl or a froglight inside it; island tops have froglights.
+  - Walkable lights at most 12 apart; interiors get a light for every ~7×7 of floor.
+  - Terrace interiors are solid.
+- **Spawn-proof mixin** (`sectBuildSpawnProof = true`): `NaturalSpawner.isValidSpawnPostitionForType` (the vanilla spelling) returns false for `MobCategory.MONSTER` when the block below is a sect cell.
+- Emitters of light ≥ 12 stay at least 4 blocks inside the edge, so outside snow and ice do not melt.
+
+**Fire.**
+- Roofs, brackets and soffits are non-flammable (stone, copper, concrete, warped). Lantern rims are cinnabar slabs.
+- Flammable trim (mangrove, carpets, leaves) stays at least 2 blocks below roof surfaces.
+- Trees stay at least 3 blocks from wooden walls.
+
+**Ambient budget per sect:**
+- about 120 block entities;
+- at most 12 lit campfires: up to 7 tower, 1–2 alchemy, 1 kitchen, 2 dings;
+- at most 3 bells; at most 2 spore blossoms; no chests.
+
+**Credit routing** for displaced blocks. Nothing is lost.
+1. With "Pakai hasil galian" on (default), bulk drops (cobblestone, dirt, logs, flowers…) go to the ledger at their deposit value (21.11).
+2. Everything else, including ores, gems, raw metals and leftovers, goes to **Peti Galian** as items. Ores are never auto-converted.
+3. B's 27-slot `Storehouse` is **never** used, because its overflow is deleted.
+
+**Safety checklist.** This is the whole scope of the DESIGN 0 exception.
+1. Only `BuildPlacer` places or removes blocks.
+2. It acts only inside the confirmed footprint column, only in loaded chunks (it never force-loads), and only while the hall is active and the stele stands on its anchor cell.
+3. It never touches protected blocks, obstacles or block entities it did not place, except as explicitly authorized.
+4. No item entities, no fire, no explosions, no lightning, no spreading plants, no gravity blocks, no entities.
+5. No living entity is trapped or dropped.
+6. Fluids stay contained.
+7. Every confirmation is logged to Catatan and the server log: `[Kultivator] Bangun: <owner> <template> T<n> -> N blocks`.
+8. The consent text names the only accepted outside effect: natural leaves outside the footprint may decay when a trunk inside it is credited.
+
+**Sumber / Source.** The spawn-proofing image is *A Record of a Mortal's Journey*, ch. 153: Yue Lu Hall is covered by a formation. The rules themselves are game design.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.11 Materials, costs and bills
+
+**Sembilan Bahan (nine materials).**
+- Each item belongs to exactly one category.
+- The ledger stores centi-units (`long` × 100), up to 1,000,000 units per category.
+- **1 unit ≈ one full block of that material** when deposited.
+
+| id | Nama / English | Accepts (units each) | Pays for |
+|---|---|---|---|
+| `batu` | Batu / Stone | cobblestone, stone, andesite, granite, tuff family, stone bricks (all), smooth stone, basalt, sandstone, end stone: 1; slab ½; stair ¾; wall 1 | plinths, terraces, paving, stairs, retaining walls |
+| `tanah` | Tanah / Earth | dirt family, grass block, podzol, mycelium, mud, packed mud, sand, red sand, gravel, soul sand and soil: 1; netherrack ½ | fill and soil (mostly paid by digging credit) |
+| `kayu` | Kayu / Timber | log, wood, stem or hyphae: 4; planks 1; bamboo block 2; wooden slab ½; stair ¾; stick or bamboo ¼ | beams, frames, doors, lattice |
+| `genteng` | Genteng / Tile | deepslate and blackstone families: 1; clay 1, clay ball ¼; bricks 1, brick ¼; terracotta 1; mud bricks 1 | roof tiles, ridges, interior floors |
+| `kapur` | Kapur / Lime & Plaster | calcite, diorite (any), quartz block, white concrete or powder, bone block, snow block: 1; quartz ¼; bone ⅓; bone meal ⅑; snowball ¼ | plaster, marble |
+| `pernis` | Pernis & Pewarna / Lacquer & Dye | cinnabar family 1 (slab ½, stair ¾); any dye 1; beetroot 1; red, yellow or blue concrete or powder 1; red terracotta, glazed or wool 1 | lacquer pillars, palace walls, glaze concrete |
+| `flora` | Flora / Plants | sapling 1; leaves ¼; flower 1; tall flower 2; lily pad 1; moss block 1; moss carpet ½; azalea 1; dripleaf 1; petals ¼; fern or grass ¼; seagrass ¼; spore blossom 2; firefly bush 1; leaf litter ¼; hanging roots ¼ | trees, beds, hedges, lotus |
+| `logam` | Logam & Pelita / Metal & Lamps | iron ingot or raw iron 1; nugget ⅑; iron block 9; chain 1; lantern, soul lantern or copper lantern 1; torch ¼; glowstone 1, dust ¼; shroomlight 1; froglight 1; sea lantern 1; sea pickle ½; candle ½; iron bars ⅜ | chains, lights, fittings |
+| `permata` | Emas & Giok / Gold & Jade | gold ingot or raw gold 1; nugget ⅑; gold or raw-gold block 9; copper ingot or raw copper ½; copper block 4½; cut or waxed copper (any) 2; prismarine shard or crystals ¼; prismarine 1; prismarine bricks 2; dark prismarine 2; emerald 2, emerald block 18; lapis ½, lapis block 4½; diamond 4; sulfur family ½ | gilt, jade trims and lattice, Giok and Langit glazes |
+
+**Placed cost, by material and never by role:**
+
+| Placed block | Cost |
+|---|---|
+| Masonry, stone, deepslate, blackstone, brick, quartz, calcite, cinnabar, concrete; full block or wall | ½ unit of its category (stair ⅜, slab ¼). The sect's artisans stretch bulk materials 2 : 1. |
+| Hidden fill (terrace cores, foundations) | Tanah ¼ or Batu ¼ |
+| Planks and wood | Kayu ½ (stair ⅜, slab ¼, fence ¼, trapdoor ⅜, door 1 per door, sign ½); tree trunks ½ |
+| Leaves | Flora ¼ |
+| Flowers, azalea, lily pads | Flora 1 each |
+| Lanterns, shroomlight, froglight | Logam 1 (chain and bars ½, candle ½) |
+| Waxed copper full block, grate, trapdoor | Permata 2 (stair 1½, slab 1, bars and chain 1) |
+| Prismarine bricks | Permata 2 |
+| Gold block or raw-gold block | Permata 9 |
+| Chiseled sulfur | Permata ½ |
+| Lapis block | Permata 4½ |
+| Water, air | free |
+| Unknown block | refused at startup by the audit |
+
+**Cost invariant** (startup self-check): for Logam & Pelita, Emas & Giok and every exact item, the deposit value of a placed block's drop is ≤ its placed cost. Bulk renewable categories are exempt, because vanilla already makes them infinite.
+
+**Exact items** (deposited 1:1, never converted from units, so vanilla progression holds):
+
+| Tier | Item | Count by template 1 → 9 |
+|---|---|---|
+| T1 | cauldron (water vats) | 2, 2, 4, 4, 4, 6, 6, 8, 8 |
+| T2 | smoker, campfire | 1 each |
+| T3 | bookshelf | 14, 16, 24, 32, 40, 48, 56, 64, 72 |
+| T3 | lectern | 1 (templates 1–4), 2 (5–9) |
+| T4 | cauldron + soul campfire (alchemy furnace) | 1 each (templates 1–5), 2 each (6–9) |
+| T4 | brewing stand | 1, 1, 1, 2, 2, 2, 3, 3, 3 |
+| T5 | lodestone 1, crying obsidian 4, amethyst block 4 | all templates |
+| T5 | optional gate altars: +1 lodestone and +4 crying obsidian each | 2 (template 6), 4 (7–9) |
+| T6 | campfire (dings) + 1 hay block (the signal ding) | campfires 1 (templates 1–4), 2 (5–9) |
+| T7 | target block | 4, 4, 6, 8, 8, 10, 12, 12, 16 |
+| T7 | bell | templates 2–9 |
+| T7 | barrel (drum) | templates 3–9 |
+| T8 | Qi seat tier 1: 4 amethyst blocks | template 3 |
+| T8 | Qi seat tier 2: 8 amethyst blocks | templates 4–6 |
+| T8 | Qi seat tier 3: 8 amethyst blocks + 4 end rods + 1 lodestone | templates 7–9 |
+| T8 / T9 | end rod per pagoda spire | 1 per pagoda |
+| T9 | crying obsidian + soul campfire per tower room | 3, 3, 4, 4, 5, 6, 6, 7, 7 |
+
+**Bills.**
+- Tinta palette, units, before digging credit.
+- The real numbers come from the dry run: `uji sekte info <n>` prints them, and blueprints are tuned to within ±15% of these targets.
+- Giok and Langit move most roof Genteng into Permata or Pernis.
+
+**Whole template (all 9 tiers):**
+
+| Template | Batu | Tanah | Kayu | Genteng | Kapur | Pernis | Flora | Logam | Permata | Total |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 1,120 | 20 | 440 | 510 | 320 | 140 | 110 | 310 | 270 | 3,240 |
+| 2 | 2,110 | 320 | 910 | 1,100 | 680 | 240 | 110 | 460 | 420 | 6,350 |
+| 3 | 3,600 | 460 | 1,450 | 1,780 | 1,080 | 400 | 220 | 500 | 680 | 10,170 |
+| 4 | 5,720 | 980 | 2,180 | 2,640 | 1,200 | 980 | 360 | 730 | 1,060 | 15,850 |
+| 5 | 7,250 | 1,590 | 2,820 | 3,590 | 1,280 | 1,490 | 500 | 1,120 | 1,450 | 21,090 |
+| 6 | 9,680 | 2,710 | 4,000 | 5,040 | 1,820 | 1,760 | 670 | 1,670 | 2,080 | 29,430 |
+| 7 | 12,470 | 4,000 | 4,470 | 5,850 | 1,720 | 2,090 | 1,090 | 2,130 | 2,620 | 36,440 |
+| 8 | 19,060 | 4,050 | 6,290 | 8,520 | 2,230 | 3,700 | 1,390 | 2,960 | 3,620 | 51,820 |
+| 9 | 22,620 | 10,320 | 6,470 | 9,000 | 2,710 | 3,330 | 2,450 | 3,850 | 4,480 | 65,230 |
+
+**Per tier, total units, every template.** T1–T3 are kept a similar-cost core, so hall level 3 comes at a comparable pace in every template.
+
+| Template | T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 | Total |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 650 | 400 | 560 | 530 | 390 | 160 | 90 | 160 | 300 | 3,240 |
+| 2 | 800 | 500 | 670 | 1,080 | 810 | 880 | 480 | 720 | 410 | 6,350 |
+| 3 | 1,000 | 600 | 900 | 2,970 | 620 | 1,320 | 700 | 1,320 | 740 | 10,170 |
+| 4 | 1,150 | 700 | 1,100 | 4,460 | 1,480 | 2,090 | 1,780 | 2,090 | 1,000 | 15,850 |
+| 5 | 1,300 | 800 | 1,300 | 4,470 | 3,540 | 3,760 | 2,000 | 2,930 | 990 | 21,090 |
+| 6 | 1,400 | 900 | 1,400 | 5,300 | 4,410 | 5,240 | 2,290 | 6,570 | 1,920 | 29,430 |
+| 7 | 1,500 | 1,000 | 1,500 | 4,480 | 6,050 | 8,210 | 3,250 | 8,490 | 1,960 | 36,440 |
+| 8 | 1,700 | 1,100 | 1,600 | 9,680 | 8,250 | 12,490 | 4,910 | 8,440 | 3,650 | 51,820 |
+| 9 | 1,800 | 1,200 | 1,700 | 8,560 | 7,170 | 15,200 | 5,030 | 13,760 | 10,810 | 65,230 |
+
+**Per tier and category, templates 1, 5 and 9.** Templates 2–4 use template 1's or 5's split for each tier, and templates 6–8 use template 5's or 9's, whichever is nearer in size, scaled to their own tier totals.
+
+| Template 1 | Batu | Tanah | Kayu | Genteng | Kapur | Pernis | Flora | Logam | Permata | Total |
+|---|---|---|---|---|---|---|---|---|---|---|
+| T1 | 210 | – | 130 | 100 | 50 | 20 | – | 100 | 40 | 650 |
+| T2 | 100 | 10 | 70 | 70 | 40 | 20 | 40 | 20 | 30 | 400 |
+| T3 | 150 | – | 120 | 130 | 70 | 30 | – | 20 | 40 | 560 |
+| T4 | 160 | – | 90 | 110 | 50 | 40 | – | 30 | 50 | 530 |
+| T5 | 170 | – | – | 90 | 110 | – | – | 20 | – | 390 |
+| T6 | 70 | – | 20 | 20 | 10 | 10 | – | 10 | 20 | 160 |
+| T7 | 20 | 10 | – | – | – | – | 20 | 20 | 20 | 90 |
+| T8 | 30 | – | 10 | – | – | – | 30 | 40 | 50 | 160 |
+| T9 | 220 | – | – | – | – | 10 | – | 50 | 20 | 300 |
+
+| Template 5 | Batu | Tanah | Kayu | Genteng | Kapur | Pernis | Flora | Logam | Permata | Total |
+|---|---|---|---|---|---|---|---|---|---|---|
+| T1 | 480 | – | 230 | 250 | 130 | 70 | – | 50 | 90 | 1,300 |
+| T2 | 130 | 20 | 160 | 80 | 50 | 30 | 270 | 30 | 30 | 800 |
+| T3 | 330 | – | 310 | 320 | 110 | 80 | – | 50 | 100 | 1,300 |
+| T4 | 1,820 | 690 | 180 | 640 | 220 | 560 | 50 | 210 | 100 | 4,470 |
+| T5 | 1,570 | – | 440 | 740 | 10 | 400 | – | 170 | 210 | 3,540 |
+| T6 | 1,370 | 790 | 390 | 420 | 350 | 120 | – | 120 | 200 | 3,760 |
+| T7 | 490 | – | 430 | 440 | 120 | 110 | – | 160 | 250 | 2,000 |
+| T8 | 660 | 200 | 560 | 670 | 250 | 150 | 120 | 100 | 220 | 2,930 |
+| T9 | 490 | 10 | – | – | – | 20 | 20 | 230 | 220 | 990 |
+
+| Template 9 | Batu | Tanah | Kayu | Genteng | Kapur | Pernis | Flora | Logam | Permata | Total |
+|---|---|---|---|---|---|---|---|---|---|---|
+| T1 | 610 | – | 360 | 370 | 160 | 80 | – | 80 | 140 | 1,800 |
+| T2 | 190 | 30 | 230 | 110 | 50 | 30 | 480 | 40 | 40 | 1,200 |
+| T3 | 380 | – | 430 | 520 | 80 | 90 | – | 60 | 140 | 1,700 |
+| T4 | 2,930 | 760 | 420 | 1,920 | 190 | 1,370 | 280 | 510 | 180 | 8,560 |
+| T5 | 3,050 | – | 940 | 1,570 | 30 | 720 | – | 380 | 480 | 7,170 |
+| T6 | 5,310 | 5,360 | 1,050 | 1,160 | 930 | 310 | – | 430 | 650 | 15,200 |
+| T7 | 1,500 | – | 820 | 1,000 | 140 | 310 | – | 530 | 730 | 5,030 |
+| T8 | 5,370 | 3,950 | 710 | 650 | 820 | 140 | 1,160 | 520 | 440 | 13,760 |
+| T9 | 3,560 | 850 | 1,140 | 1,480 | 310 | 320 | 300 | 1,280 | 1,570 | 10,810 |
+
+**Reservation.**
+- `bill = Σ cost(target)` over the positions that still need placing.
+- For earthwork, `reserve[cat] = max(0, fill[cat] − predictedCutCredit[cat])`. The scan predicts natural blocks 1:1 (stone → Batu, dirt → Tanah, logs → Kayu), and CUT runs before FILL.
+- Positions found already correct at placement refund their share.
+- The bill line shows the expected digging credit: "Batu 1.570 (galian ±900)". On hillsides, digging usually covers Batu and Tanah.
+
+**Sumber / Source.** *A Record of a Mortal's Journey*, ch. 153: Yue Lu Hall stores and supplies materials. This is the Gudang. Categories, numbers and costs are game design.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.12 Founding flow: choose, preview, confirm
+
+1. **Place the stele** (20.3.1). If the hall has no template:
+   - chat shows a clickable "[Pilih Templat Sekte]";
+   - the Aula and Bangun tablets show a "Pilih Templat" talisman and a small "Bangun Sendiri" coin. That coin keeps the 20.3.1 scan path, with no template.
+2. **Template screen** (`OpenScreen.SECT_TEMPLATE`, jade scroll).
+   - **Left:** a 3×3 grid of jade plaques. Each has a numeral seal, the name and an ink top-down sketch drawn at runtime from the component boxes.
+   - **Right, for the selected template:**
+     - a large diagram with a scrubber of nine jade beads (later tiers fade in) and a skyline strip along the axis;
+     - stats: footprint, envelope, component count, the whole bill and exact items, estimated time at the current builder count, perks, and the realm hint;
+     - the **glaze** choice: Tinta, Giok or Langit.
+   - Diagrams come from the blueprint classes in `src/main`, so there are no image assets to drift.
+3. **"Lihat Tapak" (preview)** sends C2S `SECT_BUILD "preview:<t>:<rot>:<glaze>"`. The server compiles the plan on the snapshot (21.10) and replies with S2C `BuildPreview`. The client draws the hologram (21.16) for 120 s. The screen can be closed to walk around, and a HUD panel stays: "Pratinjau Tapak · Sekte Kelas Dua · Gerbang: Selatan · 2 peringatan", with chat buttons [Putar] [Konfirmasi] [Batal].
+4. **Rotation.** The gate faces N, E, S or W. The default is the side of the stele where the owner stands.
+5. **Validation** (21.10). Confirmation is possible only when nothing is red and the snapshot is 100%.
+6. **Consent.** A checkbox talisman sits next to the conflict summary: "Aku paham: di dalam tapak, tanah dan tanaman alami akan diratakan dan dikreditkan ke Gudang Sekte; bangunanku dilindungi; daun alami di luar tapak bisa rontok." Then the player **holds** the jade Konfirmasi seal for 3 s.
+7. **On confirm:**
+   - the site is written (template, rotation, glaze, seed, plazaY, snapshot, frozen zone levels, frozen scan cap);
+   - the **Batu Pertama** ceremony plays: the outline flashes once, the stele chimes, and disciples in the territory gather and bow;
+   - T1 is queued, the tier missions appear, and advancement `first_stone` is granted;
+   - a log line is written.
+8. **Free change.** Until the first block is placed, "Ganti Templat" (any template, rotation or glaze) is free. After that, the options are an upgrade, deconstruction, relocation or abandoning (21.18).
+
+**Sumber / Source.** Founding one's own sect:
+- *Martial Peak*: Yang Kai founds High Heaven Palace.
+- *BTTH*: Xiao Yan founds Pan Men, then Xiao Gate.
+
+The preview, consent and hold are safety game design, a jade version of the Kehancuran hold.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.13 Deposits and the Gudang Bahan Sekte
+
+**Two stores**, both shown on the Bangun tablet:
+- **Gudang Bahan**, the ledger of the 9 categories plus exact items.
+- **Peti Galian**, a salvage counter map `item_id → long`. It has no limit and loses nothing, and items can be taken out one stack per click.
+
+Both are separate from B's 27-slot Lumbung Sekte (duty output).
+
+**Depositing:**
+- **Bangun tablet → Bahan panel:**
+  - Accepted inventory items are listed by category with their unit value. Click deposits a stack (C2S `"deposit:<slot>"`, no container menu); shift-click deposits all of that item.
+  - **"Setor yang dibutuhkan"** deposits only what the current and next tier still need.
+  - Exact items are deposited the same way.
+  - Optional **"Ambil dari Lumbung"** moves accepted items from B's storehouse; it needs a B API (21.24).
+- **At the stele:** **sneak + right-click with an accepted item**, through `UseBlockCallback`, deposits the held stack. A plain right-click keeps opening the hall, and sneak with an empty hand keeps A's "move hall", so a held diamond is never swallowed by accident. Actionbar: "+64 Batu · Batu 412 / 1.570 (tingkat ini)".
+- Partial deposits are always fine.
+- **Deposits give no PK by themselves.** Kantor Misi stays the place for PK offerings; missions pay PK (21.14).
+
+**Break refund** (`sectBuildBreakRefund = true`):
+- Trigger: `PlayerBlockBreakEvents.BEFORE` on a cell in the sect cell index (21.20).
+- The vanilla break is cancelled. `BuildPlacer` removes the block and the sect blocks that depend on it (lanterns, doors, plants) with 2|16.
+- Their placed cost is refunded to the ledger, the "removed by player" bit is set, and a jade puff and actionbar show "+0,5 Batu kembali ke Gudang Sekte".
+- This applies in creative too, with no XP.
+- Placed blocks can therefore never become items, which keeps the 2 : 1 bulk costs safe.
+
+**Explosions** (`sectBuildExplosionCredit = true`). A mixin on `ServerExplosion.interactWithBlocks` handles sect cells: they are removed with no item drops and their placed cost is credited. Perbaiki can rebuild them.
+
+**Accepted minor leak.** A piston-moved sect block mined elsewhere drops normally. It is effortful, the cost invariant bounds valuable categories, and it is documented.
+
+**Surplus.** Batu, Tanah and Kayu units **beyond the whole template's remaining bill** can be taken out 1:1 as cobblestone, dirt or oak planks, one stack per click. There are no other withdrawals.
+
+**Donors (LAN).**
+- Members of the same `/sect` may deposit through the stele or the read-only tablet.
+- `donors {uuid: units}` feeds the **Prasasti Penyumbang** list and a thank-you line in sect chat, at most one per player per minute.
+
+**Sumber / Source.**
+- *A Record of a Mortal's Journey*, ch. 153: Yue Lu Hall stores and supplies materials.
+- *Return of the Mount Hua Sect*: a Xi'an merchant guild starts backing Mount Hua after Chung Myung's group heals Elder Hwang Mun-yak, and Hwang Mun-yak declares himself Mount Hua's sponsor. This gives sect-mate deposits and the donor list.
+- Refunds and surplus are game design.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.14 Construction missions, gathering expeditions and builders
+
+**1. Misi Tingkat (tier missions)** are the user's "missions to gather resources".
+- Every bill line of the current tier is a standing mission, for example "Kumpulkan 1.570 Batu — Formasi Agung" or "Serahkan 1 Lodestone".
+- It completes automatically when the ledger covers the line.
+- Reward, once per (template, tier, line): pool PK `min(30, ceil(units × rate))`.
+  - Rates: Batu and Tanah 0.02; Kayu 0.03; Genteng, Kapur, Pernis and Flora 0.05; Logam 0.1; Permata 0.25.
+  - Exact items pay 5 each (lodestone 20).
+- When the current tier is covered, the next tier's lines show as "Persiapan".
+
+**2. Daily offers** (Misi panel, rolled at sunrise).
+- Count: `3 + floor((S − 1)/3)` offers, so 3, 4 or 5. They are picked weighted by the current shortfall (or the next tier's shortfall once the current one is covered).
+- **Setoran (delivery), 60%:** "Bawa 96 Kayu".
+  - Amount: `clamp(round_to_stack(shortfall × U(0.20, 0.35)), 16, 1024)`.
+  - Progress counts deposits in that category after accepting, by the owner or sect mates.
+  - Reward: pool PK `ceil(amount × 2 × rate)`, at most 60 per offer, plus **Berkah Pengrajin**, +20% of the amount as bonus units.
+- **Ekspedisi Berkah, 40%:** a gathering trip in that category with ×1.5 yield today.
+- **Daily cap:** 150 pool PK from build missions, separate from the 300 of Kantor Misi.
+- When the template is complete: no offers; the panel reads "Sekte telah lengkap".
+- **No renown is awarded by 6b.** Renown keeps coming only from disciples (20.3.1).
+
+**3. Ekspedisi Pengumpulan (gathering expeditions).** Always available, pure data.
+- **Departure:** choose a category and 1–3 disciples, then `Halls.storeAway(owner, e, returnAt, "build_gather", info)`. The return handler is registered with `Halls.addReturnHandler("build_gather", …)`. B's cloud-step look is reused.
+
+| Category | Who may go | Difficulty | Base yield (short trip) |
+|---|---|---|---|
+| Batu, Tanah | any rank, including Tercatat | 0 | 48 |
+| Kayu | any rank | 0 | 32 |
+| Flora | any rank | 0 | 16 |
+| Genteng | Luar+ | 1 | 24 |
+| Kapur | Luar+ | 1 | 16 |
+| Pernis | Luar+ | 1 | 12 |
+| Logam | Luar+ at Qi Refining+ | 2 | 8 |
+| Permata | Dalam+ | 4 | 3 |
+
+- **Duration:** short 6,000 ticks or long 24,000 ticks. A long trip yields ×4.5.
+- **Yield:** `base × (1 + 0.4 × P)`, with P from 20.3.10 (`max m + 0.5 × Σ others`).
+- **Success:** `clamp(0.75 + 0.05 × (P − difficulty), 0.30, 0.98)`. On failure the party brings 30% of the yield and returns at 50% HP. Never death, never Qi Deviation.
+- **Disciple rewards:** PK 3 (short) or 10 (long) × `(1 + difficulty/4)` via `SectRanks.addPk`; a bar share of 3% or 8% via `DisciplePaths.grantBarShare`.
+- **Parties at once:** `1 + floor((S − 1)/3)`. A disciple on a gathering trip holds no duty, builder post or expedition.
+
+**4. Pekerja Bangunan (builders).**
+- **Assignment:** up to 4 disciples of any rank, set on the Pekerja panel. They get **activity 10 BUILD** (a spine addition: held like activities 1–8 but with a movable spot; they fight only when hit).
+- **Work spot:** from `EngineApi.workSpot(owner)`, a perimeter cell of the open component. It changes every 20 s and with each new component. A disciple whose path fails for 10 s cloud-steps to it.
+- **Effect:** +25% rate for each builder within 24 blocks of the open component.
+- **Pose:** server-side `swing(MAIN_HAND)` every 15–25 ticks, plus material dust FX.
+- **Rewards:** +1 PK per 2,400 active ticks (cap 30 per day) and 0.5 XP per minute (`XpSource.SECT`).
+- **Idle builders** (site paused or waiting) meditate at the plaza.
+
+**Sumber / Source.**
+- Delivery missions paid in merit: *A Will Eternal*, ch. 9 and 27 (the Missions Office pays merit points for delivered spirit plants); *Martial Peak*, the Contribution Hall.
+- Gathering trips: *BTTH*, trips into the Magical Beast Mountain Range; *Soul Land*, escorted trips into the Star Dou Great Forest and the Hunting Spirit Forest.
+- Builders: an adaptation of the chore model of *Renegade Immortal* (Wang Lin's water vats) and *A Will Eternal* (the Ovens). No canon about construction work is claimed.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.15 Pacing and performance
+
+```
+rate (blocks/s) = (6 + 3 × (S − 1)) × sectBuildSpeed × (1 + 0.25 × activeBuilders) × (bank > 0 ? 2 : 1) × msptFactor
+msptFactor: average MSPT < 30 ms → 1 · 30–40 ms → 0.5 · ≥ sectBuildMsptPause (40) → 0 (pause)
+acc += rate / 20 per tick; every 4 ticks place min(floor(acc), 4 × sectBuildMaxPerTick) ops, kept inside one 16³ section where possible
+skips cost 0.1 op; at most 256 checks per tick; one global budget across all sites (round-robin)
+```
+
+**When construction runs:**
+- the hall is active and the stele stands on its anchor cell;
+- the owner, or on LAN a sect mate, is online in the same dimension within `sectBuildRange` = 160 horizontal blocks of the stele (template 9's farthest corner is 128);
+- the target chunk is already loaded.
+
+**Pauses and multipliers:**
+- Construction never force-loads chunks.
+- It pauses while a Kehancuran job runs.
+- An optional client hint (`sectBuildFpsHint`) halves the rate while that player's FPS stays below 30 for 5 s.
+- **Banked time:** while a funded component waits only because the owner is away, `bank += elapsed ticks`, up to `sectBuildBankTicks` (24,000, as for duties). Banked ticks double the rate until used up. Nothing is banked while the site waits for materials.
+- In singleplayer, alt-tabbing to Valorant pauses the game, so nothing builds and nothing is banked. The help text says so.
+
+**Base rates and time while present:**
+
+| Template | Base rate (blocks/s) | Ops (flat .. hillside) | Minutes at base rate | With 4 builders | + bank |
+|---|---|---|---|---|---|
+| 1 | 6 | 8k .. 10k | 22 .. 28 | 11 .. 14 | 6 .. 7 |
+| 2 | 9 | 16k .. 20k | 30 .. 37 | 15 .. 19 | 8 .. 9 |
+| 3 | 12 | 27k .. 34k | 38 .. 47 | 19 .. 24 | 10 .. 12 |
+| 4 | 15 | 42k .. 53k | 47 .. 59 | 24 .. 30 | 12 .. 15 |
+| 5 | 18 | 60k .. 77k | 56 .. 71 | 28 .. 36 | 14 .. 18 |
+| 6 | 21 | 90k .. 115k | 71 .. 91 | 36 .. 46 | 18 .. 23 |
+| 7 | 24 | 120k .. 155k | 83 .. 108 | 42 .. 54 | 21 .. 27 |
+| 8 | 27 | 160k .. 215k | 99 .. 133 | 50 .. 67 | 25 .. 33 |
+| 9 | 30 | 220k .. 290k | 122 .. 161 | 61 .. 81 | 31 .. 40 |
+
+Gathering materials is the real limit. Placement is just slow enough to watch the sect grow.
+
+**Costs:**
+- **Idle:** one site check per second.
+- **Active:** usually 1–6 `setBlock` per tick on average, a hard average cap of 8, in bursts every 4 ticks. Bursts cut client section rebuilds and light packets 4–5×.
+- **Emission:** off-thread.
+- **Memory:** one open slice list (< 0.2 MB) plus the cell index (about 0.5 MB worst case for template 9).
+- **Break event:** a bitset lookup.
+- **Client:** the hologram only during preview (≤ 800 gizmos per tick); one wireframe and label within 64 blocks; sparks ≤ 8/s × Effect Quality; mist within 64 blocks, off at Minimal.
+
+**Sumber / Source.** Game design.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.16 Visuals and sound
+
+All client-side, scaled by Effect Quality, via `FxType.SECT_BUILD`.
+
+**Hologram.**
+- Drawn with vanilla `net.minecraft.gizmos.Gizmos` (`line`, `cuboid`, `rect`, text) from `ClientTickEvents.END_CLIENT_TICK`. This must be verified inside the per-tick gizmo collection; the fallback is dust particles every 10 ticks. Fabric `LevelRenderEvents.BeforeGizmos` is the alternative hook.
+- What it shows:
+  - jade light curtains along the footprint edge, from the ground to +3;
+  - gold corner pillars up to the envelope height;
+  - the gold axis line;
+  - terrace outlines at their fitted heights;
+  - component boxes coloured by tier, up to the scrubber value;
+  - orange or blue cut and fill ticks per 4×4 cell;
+  - a red X on each obstacle (≤ 256), a blue X on water to fill;
+  - labels for the main components.
+
+**While building:**
+- 3–6 block-particle crumbs and one jade spark per placement, batched ≤ 8 per payload per tick per site.
+- The block's own sound at 0.35 volume on every 4th placement, at most 5 per second.
+- The open component shows:
+  - a faint gold wireframe and a label such as "Paviliun Kitab · 63%";
+  - a thin **work mist** ring at the current layer, which also softens the half-built look;
+  - gold qi threads from each builder to that layer.
+
+**Ceremonies:**
+- **Component done:** cherry-petal burst along its roofline, amethyst chime, actionbar "Paviliun Kitab selesai".
+- **Tier done (10 s):**
+  - disciples in the territory turn and bow (the recruit bow is reused);
+  - 3 bells; a gold light pillar from `main_hall`; lantern orbs rising from finished components; a gold ribbon along the axis;
+  - title "Sekte ‹nama› · Tingkat 5 — Formasi Agung";
+  - a sect chat line, a toast, a log line, advancements.
+- **Template complete:** the grand version of the tier ceremony, plus the server line for template ≥ 5.
+- **Blocked ping:** a red X shimmer every 5 s for up to 30 s.
+
+**Mist:**
+- **Cloud sea (templates 6–9):** soft white billboard particles at valley level inside the footprint, within 64 blocks.
+- **Island mist** replaces water off islands.
+
+**Sumber / Source.** Game design. The petals echo the plum motif of *Return of the Mount Hua Sect*.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.17 Hall level and phase-6 integration (replaces the 20.3.1 building caps)
+
+```
+buildingCap(owner) = no template ? scanCap (20.3.1 scan, unchanged)
+                                 : max(frozenScanCap, tier)      // frozenScanCap = core.bcap at confirmation
+hallLevel = HallLevel.level(renown, buildingCap) = max(1, min(renownLevel, max(CAP_STELE = 2, buildingCap)))
+```
+
+**Why not the pure `min(renown, tier)`:** a hall that had already scanned, for example to cap 6, would drop to 2 on confirming a template. With a frozen cap, hall level never drops because of a construction choice.
+
+**Rules:**
+- While a template exists, the 30-second building scan is skipped, which also saves CPU.
+- The tier counts only while the stele stands on the anchor cell.
+- **`bflags` come from the tier:** `B_PAVILION` at T ≥ 3, `B_DRILL` at T ≥ 7, `B_TOWER` at T ≥ 9. `B_FORMATION` stays the real active-formation check. `bflags` feed the "pavilion" info flag and the lost-art restoration (20.3.8).
+
+| Integration | Rule |
+|---|---|
+| Aula tablet | the building checklist is replaced by `SectBuild.statusLine(owner)` |
+| Territory | radius = `max(20 + 4L, R_t)` (Table B); \|dy\| ≤ 32 is unchanged |
+| Disciple cap | `+ capBonus` (1 for templates 5–9 at T9) |
+| Candidates | +1 per arrival (templates 6–9, tier ≥ 7); arrival spots from `anchor("arrival")` and the kept ring cells |
+| Duty posts | B uses `anchor("post_*")` when present, otherwise the 4 cells at 5 blocks (always open) |
+| Formation | the disc is placed inactive; the owner registers it with an amethyst shard (DESIGN 10, 20.3.2 unchanged) |
+| Tower | `BlazingTower` is unchanged: rooms lie within its 32-block sphere, the highest is floor 1 |
+| Kehancuran | `ProtectedZones` also refuses `insideAnySite(level, pos, 16)`; template 9's corners lie beyond the 64-block stele radius |
+| Stele moved | With a template, re-placing the stele anywhere other than the anchor cell opens the 6b move dialog (21.18); construction pauses meanwhile. Mining the stele makes the hall dormant and pauses construction; re-placing it on the anchor resumes. |
+
+**Sumber / Source.** As 20.3.1 (Yue Lu Hall, the Magic Pavilion, Mount Hua's drill ground, the Blazing Sky tower).
+- *Return of the Mount Hua Sect*: the sect grows in stone while its fame (renown) comes from victories.
+- *Perfect World*, ch. 551/558: rebuild to rise.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.18 Template upgrade, repair, deconstruction, relocation, abandoning
+
+**Naik Templat (template upgrade)** to any larger template, on the same stele and rotation.
+- The new footprint contains the old one. Validation covers the new ring and any player-made blocks; old sect cells count as the sect's own.
+- The archetypes differ, so the new plan builds from its own T1. To keep the sect looking alive:
+  - **Old components keep standing and working** until a new component needs their cells.
+  - Before such a component opens, the old sect cells in its volume are dismantled in reverse order (ORNAMENT → … → PLINTH), with a 100% refund for every cell still equal to its plan state.
+  - Old components that never collide stay as heritage until the player picks "Bongkar sisa lama".
+  - Old function buildings (disc, tower rooms, library, targets) are dismantled last. Formation and tower functions may pause during the switch, with a warning; the new lodestone must be registered again.
+- **`guaranteeTier`** = the old tier, held until the new tier reaches it, so hall level never drops.
+- **Cost** = the new plan's bill. The screen shows "Dipertahankan 12 · Dibongkar (bahan kembali) 31 · Biaya ±18.400".
+- Advancement `sect_upgraded`.
+
+**Periksa & Perbaiki (inspect and repair).**
+- An audit reads the DONE components.
+- Cells that are air where the plan has a block, and are not marked "removed by player", go on the repair list, paid at the normal cost and rate.
+- Cells changed to another block are counted as "diubah pemain" and left alone.
+- Auto-repair is **off**, so a doorway the player cut is never refilled.
+
+**Bongkar (deconstruct).**
+- Reverse order at the normal rate, with a 100% refund for every cell still equal to its plan state.
+- **"Bongkar bangunan"** keeps the landform (fill, retaining walls, paving): a ruined terrace site that can be rebuilt.
+- **"Bongkar total"** also removes paving and walls.
+- The original terrain is not restored on real sites; credits replaced it.
+- The tier falls as tiers are removed. At the end the template is cleared and the hall returns to the scan.
+
+**Relocation** extends A's "Pindahkan Aula", with its 1-day cooldown.
+- **Pindah & bongkar:** the old site deconstructs with a refund whenever the owner is near it. The new site goes through founding.
+- **Pindah & tinggalkan:** the old buildings stay as ordinary blocks. The break refund stops there and the site is released.
+- Both give `guaranteeTier` = the old tier for 10 in-game days, or until reached.
+
+**Lepaskan Templat (abandon):** like "Pindah & tinggalkan" without moving. Hall level returns to the scan.
+
+**Sumber / Source.**
+- Growing through the grades:
+  - *Martial Peak*: High Heaven Pavilion → High Heaven Palace → High Heaven Cave Heaven.
+  - *BTTH*: Pan Men → Xiao Gate → Yan Alliance.
+- The ruined terrace that can be rebuilt: *Perfect World*, ch. 551/558, the ruined Heaven Mending Pavilion.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.19 Multiplayer (LAN)
+
+- A site belongs to one player.
+- **Same-`/sect` members** get the read-only Bangun tablet and can deposit. Their presence counts for building, and they appear on the donor list.
+- **Overlap:** footprint + 16, plus A's 128-block stele rule.
+- **Removing player-made blocks or emptying containers** is allowed only in singleplayer without LAN, or by an op. Otherwise the footprint could be used to grief a neighbour's house.
+- **Breaking a sect block**, by anyone, refunds the site owner's ledger. A rate-limited line "Blok sekte dibongkar oleh ‹pemain›" goes to Catatan.
+- The mod is not a claims mod and adds no protection.
+
+**Sumber / Source.** *Return of the Mount Hua Sect*: the merchant guild backs Mount Hua (21.13).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.20 Data storage
+
+The two modules write separate `HallData` sections through `Halls.section(owner, key)`, so the data moves with the hall:
+
+```
+build_site (P6b-cetak) {
+  v, plan_v, template (0 none, 1..9), rot (0..3), glaze, seed, plaza_y, snap (packed heights + water surface), levels [int],
+  state (0 none, 1 active, 2 paused, 3 deconstructing, 4 relocating, 5 upgrading), tier, perfect_tiers (bits),
+  done [id], skipped [id], prio, open {id, phase, layer, reserve {cat: long}, exact {item: n}, defer, since},
+  suspended [id], wait {id: {reason, count, sample [pos ≤ 32]}}, keep_cols (packed), orphans [id], stats {placed, removed, credited}
+}
+build_flow (P6b-alur) {
+  v, ledger {cat: long centi}, exact {item: n}, salvage {item: long}, frozen_scan_cap, guarantee {tier, until_day},
+  bank, last_tick, flags {use_excavation:1, empty_containers:0, remove_player_blocks:0},
+  missions {day, offers [...], lines_paid [..], pk_today}, builders [uuid], donors {uuid: long}, awards [..],
+  history [{template, from_day, to_day}]
+}
+```
+
+**Other stores:**
+- **Cell index:** SavedData `kultivator:sect_cells` (P6b-cetak). Per dimension and touched chunk section, it holds two 512-byte bitsets (placed-by-builder, removed-by-player) plus the owner. About 0.4–0.6 MB worst case. It answers refunds, spawn-proofing, explosion credit, Kehancuran zones, repair and "own block" checks without regenerating plans.
+- **Site index** (in memory, rebuilt on load): `dim → list(owner, footprint box)`.
+- **Showcases and test undo:** SavedData `kultivator:sect_showcases`, plus one `kultivator_build_undo_<id>` per showcase or test site (packed positions, state palette, indices; about 1 MB gzip for template 9).
+- **Add to 20.4.6:** `HallData.build_site` (6b engine) and `HallData.build_flow` (6b flow).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.21 UI pages (jade scroll, fits 320×240)
+
+**Bangun tablet** (a new hall tablet, placed second after Aula):
+- **Left:** a 120×120 site diagram.
+  - Components are coloured by state: done in full colour, open with a pulsing gold edge and %, queued as a faint ink outline, blocked with a red seal, future tiers dotted.
+  - Hovering shows name, tier, bill and state.
+- **Right:**
+  - title "Tingkat 4/9 · Tembok dan Air";
+  - the **tier ladder drawn as a mountain path of 9 terraces** (deliberately not the Jenjang pagoda);
+  - the open component bar;
+  - a rate line: "≈ 22 blok/detik · 3 pekerja · ×2 tabungan";
+  - a status line: "Berjalan", "Menunggu bahan: Kayu 120", "Jeda: pemilik jauh", "Terhalang: 14 blok", "Menunggu: belum dimuat", "Jeda: server sibuk", …
+- **Panels**, chosen from a vertical seal column on the right edge (no top tab row):
+
+| Panel | Contents |
+|---|---|
+| Ikhtisar | overview |
+| Bahan | bamboo-slip bill bars per category for this tier and the next, exact items, the deposit grid, "Setor yang dibutuhkan" |
+| Misi | tier missions, daily offers, gathering parties |
+| Pekerja | builders |
+| Galian | Peti Galian, surplus, the "Pakai hasil galian" coin |
+| Templat | upgrade, repair, deconstruct, abandon, glaze, stats, history, the obstacle list with "Periksa ulang", "Lewati bagian ini", "Selesaikan tanpa blok terhalang", "Prioritaskan" |
+| Penyumbang | donors (LAN only) |
+
+- Talismans: *Setor dari tas*, *Pratinjau*, *Konfirmasi* (hold). Jade-coin toggles: *Jeda*, *Pakai hasil galian*.
+
+**Template screen** (21.12): a 3×3 plaque grid (44×36 each) and the detail panel. Talismans "Lihat Tapak", "Putar", "Konfirmasi" (hold 3 s). Warnings show as bamboo slips.
+
+**HUD during preview:** a small jade panel with template, gate direction, warnings and snapshot %, plus an arrow to unscanned parts.
+
+**Sumber / Source.** DESIGN 5b.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.22 Commands
+
+**Player** (merged into A's `aula` node):
+
+| Command | Effect |
+|---|---|
+| `/kultivasi aula bangun` | status: template, tier, open component %, shortfall, state |
+| `… templat` | opens the template screen |
+| `… pratinjau <1-9> [utara\|timur\|selatan\|barat] [tinta\|giok\|langit]` | preview from chat |
+| `… putar` / `konfirmasi` / `batal` | rotate; confirm (clickable "[Ya, mulai bangun]" after the consent line); cancel |
+| `… setor [semua]` | deposit the held stack, or every accepted item |
+| `… jeda` / `lanjut` | pause or resume |
+| `… prioritas <komponen>` | move a component to the front of its tier |
+| `… naik <2-9>` | template-upgrade preview |
+| `… perbaiki` | audit and repair |
+| `… bongkar <bangunan\|total>` | deconstruct (with a confirm) |
+| `… lepaskan` | abandon the template (with a confirm) |
+
+**Debug** (op, `/kultivasi debug aula bangun …`):
+- `tingkat-set <0-9>`: sets the counter only, to test the hall-level coupling.
+- `komponen selesai`: finishes the open component now.
+- `bank <ticks>`.
+- `rencana ulang`: recompiles the plan to the current `planVersion`.
+
+**Test** (op, `/kultivasi uji sekte …`; every placement goes to an undo log and still passes preview → confirm):
+
+| Command | Effect |
+|---|---|
+| `uji sekte templat <1-9> [arah] [glasir] [paksa]` | Sets the template on the player's hall at no cost. With no hall, it gives a stele item and the hint "pasang Prasasti, atau pakai `pamer`". `paksa` skips only the relief, earthwork and water checks, **never** protected blocks, containers, villages or other sites. |
+| `uji sekte tingkat <0-9> [instan\|cepat]` | Builds every component of tiers ≤ n at no cost. `instan` = 512 ops per tick, pausing above 50 ms MSPT, with one ceremony at the end. `cepat` = ×20 rate with every ceremony. A lower n instantly removes higher tiers. |
+| `uji sekte sumber [penuh\|<jumlah>]` | `penuh` = the remaining bill + 10% and all exact items; a number = that many units in every category |
+| `uji sekte pamer <1-9> [tingkat <1-9>] [arah]` | Showcase at the looked-at block (ray ≤ 64) or the player's spot: hologram first, then `uji sekte pamer konfirmasi` builds it instantly. Not a hall; at most 2 at once. |
+| `uji sekte pamer hapus [semua]` / `pamer daftar` | restores the world exactly from the undo log / lists showcases |
+| `uji sekte hologram <1-9> [tingkat]` | layout hologram only |
+| `uji sekte bandingkan` | all 9 footprints nested around the player as a hologram |
+| `uji sekte info [<1-9>]` | the real plan stats: components per tier, blocks, bill per category, exact items, ops, minutes |
+| `uji sekte periksa <1-9> [arah]` | runs the validator here without founding |
+| `uji sekte audit [<1-9>]` | **dry run of all 81 (template, tier) emissions** (see below) |
+| `uji sekte kamera <1-3>` | the art QA views (21.8) |
+| `uji sekte upacara [tingkat]` | plays a tier ceremony |
+| `uji sekte kecepatan <1-50>` | session rate multiplier |
+| `uji sekte naik <2-9>` / `uji sekte bongkar` | instant upgrade / instant deconstruction |
+| `uji sekte reset` | removes every plan block of the site instantly, restores the undo-logged originals, clears the template |
+| `uji sekte misi [selesai]` | rerolls today's offers / returns all gathering parties now |
+| `uji sekte pekerja` | makes every loaded own disciple a builder |
+
+`uji sekte audit` reports:
+- ops outside the footprint or envelope;
+- gravity blocks, and dependants with no support;
+- water that is not contained;
+- dark spawnable cells;
+- stair-shape mismatches with vanilla, air in friezes;
+- the colour budget, sightline, density and framed-view rules;
+- the anchors (posts open, library ≤ 16, formation ≤ 24, tower geometry);
+- cost/deposit invariant violations.
+
+This is the robustness net, since no Gradle tests are run.
+
+**Sumber / Source.** The user asked for test commands (the 20.0 style).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.23 Advancements, text, help
+
+| Advancement | Name (id_id) | When |
+|---|---|---|
+| `first_stone` | Batu Pertama | confirm a template |
+| `sect_tier_5` | Formasi Agung Berdiri | T5 complete |
+| `sect_complete` | Sekte Lengkap | any template at T9 |
+| `glazed_pagoda` | Pagoda Kaca | a glazed pagoda complete |
+| `grand_sect_complete` | Sekte Agung Berdiri | template ≥ 5 at T9 |
+| `heavenly_court` | Istana Langit | template 9 at T9 |
+| `sect_upgraded` | Melampaui Tapak Lama | a template upgrade completes its guarantee tier |
+| `four_builders` | Seribu Tangan | 4 builders at once |
+| `first_gathering` | Ekspedisi Bahan Pertama | first gathering trip returns |
+| `sect_donor` | Penyumbang Sekte | LAN: deposit to another player's sect |
+
+- **Text:**
+  - `lang-src/blueprint.*` holds template, tier, component-kind, glaze, validation and blocked messages.
+  - `lang-src/sectbuild.*` holds the flow text: category names, statuses, consent, mission lines, UI and help.
+  - Both exist in id_id and en_us.
+- **Help topic `bangun`:** mentions the alt-tab pause, the footprint exception and the refunds.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.24 Modules, spine additions, file ownership and contracts
+
+Two agents work in parallel after the 6b spine. **They never edit each other's files.** Anything missing goes into the final report as a TODO.
+
+**6b spine** (orchestrator, after phase 6 is committed and before both modules):
+1. `sect/build/api/*`, created with stubs and owned by the spine:
+   - `Bahan` (enum of the 9 categories);
+   - `Bill` (record: `long[] centi`, `Map<Item,Integer> exact`);
+   - `MaterialLedger`, `BuildListener`, `EngineApi` (static facade; the engine registers its implementation);
+   - `SiteView`, `ComponentView`, `PlanStats`, `AuditReport`;
+   - `BuildFxIds` (PLACE, COMPONENT_OPEN, COMPONENT_DONE, TIER_DONE, FIRST_STONE, BLOCKED, DECONSTRUCT).
+2. `Actions.SECT_BUILD = 35` routes to `sect.build.SectBuild.handleAction`. Also `OpenScreen.SECT_TEMPLATE = 5`, S2C `Payloads.BuildPreview(CompoundTag)`, and `FxType.SECT_BUILD` routed to `client/sectbuild/BuildFx`.
+3. `DiscipleEntity.ACTIVITY_BUILD = 10`: held like 1–8, with `setActivity(10, spot)` callable again; `holdsActivitySpot` covers 10.
+4. `HallScreen`: a "Bangun" tablet slot placed second, filled by `client.sectbuild.BuildPage`.
+5. Provider hooks in A's `Halls` / `HallLevel`:
+   - `addBuildingCapProvider` (≥ 0 skips the scan);
+   - `addBuildingFlagsProvider`, `addRadiusProvider`, `addCapBonusProvider`, `addCandidateBonusProvider`;
+   - `addArrivalSpotProvider`, `addStatusLineProvider`, `addSteleMoveListener`.
+
+   Also B's `Duties.addPostSpotProvider` and D's `ProtectedZones.addZoneProvider`.
+6. `KultivatorConfig` fields (clamped on load):
+
+   | Field | Default (range) |
+   |---|---|
+   | `sectConstruction` | true |
+   | `sectBuildSpeed` | 1.0 (0.25–4) |
+   | `sectBuildMaxPerTick` | 8 (1–32) |
+   | `sectBuildMsptPause` | 40 (30–50) |
+   | `sectBuildRange` | 160 (96–512) |
+   | `sectBuildWhileAway` | false |
+   | `sectBuildBankTicks` | 24000 (0–72000) |
+   | `sectBuildMaxTemplate` | 9 (1–9) |
+   | `sectTemplateRealmGate` | false |
+   | `sectBuildBreakRefund` | true |
+   | `sectBuildExplosionCredit` | true |
+   | `sectBuildSpawnProof` | true |
+   | `sectBuildFpsHint` | true |
+
+7. `kultivator.mixins.json` lists `SectSpawnMixin` and `SectExplosionMixin`.
+8. Entry points:
+   - `Kultivator.onInitialize` calls `sect.build.engine.BuildEngine.init()` and `sect.build.SectBuild.init()`;
+   - `CultivateCommand` calls `SectBuild.addCommands(root, debug)`;
+   - `TestCommands` calls `SectBuild.addTestCommands(uji)`;
+   - `KultivatorClient` calls `client.sectbuild.BuildClient.init()`.
+
+**P6b-cetak (blueprint + placement engine).**
+- **Owns (new):**
+  - `sect/build/blueprint/*`: the components of 21.9, `RoofBuilder`, `Palette`, `Glaze`, `Rank`, `Interiors`, `Stamp`, `Costs` (placed costs), `templates/T1Unranked … T9HeavenlyCourt`, `Templates`.
+  - `sect/build/engine/*`: `BuildEngine` (init, tick, `EngineApi` implementation), `SitePlan`, `Snapshot`, `TerraceFitter`, `Validator`, `Scheduler`, `BuildPlacer` (**the only `setBlock` caller of 6b**), `CellIndex`, `Classifier`, `FluidGuard`, `EntityGuard`, `BreakRefund`, `Showcase`, `Undo`, `PlanAudit`, `PreviewData`.
+  - `mixin/SectSpawnMixin`, `mixin/SectExplosionMixin`.
+  - `data/kultivator/tags/block/sect_natural.json`, `sect_protected.json`.
+  - `lang-src/blueprint.*`.
+- **May edit:** nothing outside its own files.
+
+**P6b-alur (founding, deposits, missions, UI, integration).**
+- **Owns (new):**
+  - `sect/build/SectBuild`: init, the public API below, actions, the info provider, all commands of 21.22 (calling `EngineApi`).
+  - `sect/build/flow/*`: `Founding`, `Ledger` (implements `MaterialLedger`), `Deposits` (deposit table), `SteleDeposit` (`UseBlockCallback`), `BuildMissions`, `GatherExpeditions`, `Builders`, `Ceremonies` (implements `BuildListener`), `HallBridge` (registers every provider), `Upgrade`, `Relocation`, `FlowData`.
+  - `client/sectbuild/*`: `BuildClient`, `BuildPage`, `TemplateScreen`, `SiteDiagram`, `SiteHologram`, `BuildHud`, `BuildFx`, `MistFx`.
+  - `lang-src/sectbuild.*`, the advancements of 21.23, help topic text `bangun`.
+- **May edit:** nothing outside its own files.
+
+**Contracts** (the spine stubs them; each owner fills them):
+
+```java
+// flow implements, engine calls
+interface MaterialLedger {
+  boolean reserve(UUID owner, Bill bill);                       // all-or-nothing
+  void release(UUID owner, Bill unused);                        // refund of an unused reservation
+  void credit(UUID owner, Bahan cat, long centi, String reason); // digging, break refund, explosion, dismantling
+  void salvage(UUID owner, ItemStack stack);                    // Peti Galian, never lost
+  long depositValueCenti(Item item); @Nullable Bahan categoryOf(Item item); // for the audit invariant
+}
+// flow implements, engine fires
+interface BuildListener {
+  void onConfirmed(UUID owner, int template); void onComponentStarted(UUID owner, ComponentView c);
+  void onComponentDone(UUID owner, ComponentView c); void onTierDone(UUID owner, int template, int tier);
+  void onBlocked(UUID owner, ComponentView c, int count, List<BlockPos> sample); void onWaitingFunds(UUID owner, Bill shortfall);
+}
+// engine implements (static facade in api)
+EngineApi.preview(ServerPlayer, int template, int rot, Glaze) → long ticket        // async; PreviewData via previewData(ticket)
+EngineApi.previewData(long ticket) → @Nullable PreviewData                          // .toTag() is the BuildPreview payload
+EngineApi.confirm(ServerPlayer, long ticket) → @Nullable Component error
+EngineApi.template(UUID) / tier(UUID) / site(UUID) / components(UUID) / remainingBill(UUID, int tierOr0)
+EngineApi.tierBill(int template, int tier, Glaze) → Bill; stats(int template) → PlanStats; audit(@Nullable Integer) → AuditReport
+EngineApi.isSectCell(ServerLevel, BlockPos); insideAnySite(Level, BlockPos, int margin); anchor(UUID, String) → @Nullable BlockPos
+EngineApi.workSpot(UUID) → @Nullable BlockPos; setRateMultiplier(UUID, double); setBank(UUID, long)
+EngineApi.pause(UUID, boolean); prioritize(UUID, String); skip(UUID, String); finishWithoutBlocked(UUID, String); recheck(UUID)
+EngineApi.authorize(UUID, boolean removePlayerBlocks, boolean emptyContainers); repair(UUID); deconstruct(UUID, boolean total)
+EngineApi.beginUpgrade(UUID, int newTemplate, long ticket); release(UUID, boolean keepBlocks); relocate(UUID, BlockPos newStele, boolean deconstructOld)
+EngineApi.testBuild(ServerPlayer, int tier, int speedMode); showcase(...); showcaseRemove(...); reset(UUID)
+```
+
+`BuildPreview` tag keys:
+- `t`, `rot`, `glaze`, `fp` (world box), `axis`;
+- `comps [{id, kind, tier, box[6], y}]`, `zones [{box, y}]`;
+- `cut` (packed signed deltas per 4×4 cell), `obst` (long[] ≤ 256), `warn [{sev, key, args}]`;
+- `snap` (%), `bill {cat: centi}`, `exact {item: n}`, `ops`.
+
+**Public API for phase-6 modules** (P6b-alur):
+
+```java
+int  SectBuild.buildingCap(UUID owner)        // -1 = no template → A keeps the scan; else max(frozenScanCap, tier)
+int  SectBuild.buildingFlags(UUID owner)      // bflags from the tier
+int  SectBuild.tier(UUID owner); int SectBuild.templateSize(UUID owner)
+int  SectBuild.capBonus(UUID owner); int SectBuild.extraCandidates(UUID owner); int SectBuild.territoryRadius(UUID owner)
+@Nullable BlockPos SectBuild.anchor(UUID owner, String id); boolean SectBuild.insideAnySite(Level, BlockPos, int margin)
+@Nullable Component SectBuild.statusLine(UUID owner)
+```
+
+**Integration TODOs** (small edits by the owners after their pass, unless the spine does them as in step 5):
+- **A:**
+  - `HallLevel` uses the cap and flags providers and skips the scan when the cap is ≥ 0;
+  - radius, cap bonus and candidate bonus;
+  - the arrival-spot provider in `Candidates`;
+  - the stele-move listener in `HallBlock`;
+  - the Aula checklist replaced by the status line.
+- **B:**
+  - `Duties.postSpot` asks the post provider first;
+  - optional `Storehouse.take(UUID, Predicate<ItemStack>, int max)` for "Ambil dari Lumbung".
+- **C (optional):** a hammer look for activity 10 in `DiscipleHeldItemLayer`.
+- **D:** `ProtectedZones.blocked` consults the zone provider.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.25 Test checklist (for `docs/uji/FASE-6b.md`)
+
+1. **Instant build and undo.**
+   - Place a stele, then `uji sekte templat 3`, then `uji sekte tingkat 9 instan`.
+   - Expected: built in seconds, the ceremony plays, and hall level = min(renown level, 9).
+   - `uji sekte reset` restores the land exactly.
+2. **Real flow.**
+   - Template screen → pick 2 → Lihat Tapak → walk the hologram → rotate → confirm by holding the seal.
+   - `uji sekte sumber 200`, then watch T1 build at 9 blocks/s, mirror pairs growing symmetrically.
+   - Sneak + right-click the stele with cobblestone: the ledger grows. A plain right-click opens the hall.
+3. **Player-made blocks are protected.**
+   - Put planks inside a component box.
+   - Expected: red X, "Terhalang", and the queue moves on. Remove them and it resumes. Test "Lewati bagian ini" too.
+4. **Fluids.** Found next to a pond: the cut edge becomes retaining wall and no water floods. Basins fill statically.
+5. **Refunds.**
+   - Break a placed lantern: no item, +1 Logam.
+   - TNT a wall: no drops, ledger credited.
+   - `perbaiki` refills the air cells and skips a doorway that was cut by hand.
+6. **Pause and bank.** Walk 200 blocks away: paused, and the bank grows. Come back: ×2 rate. Alt-tab in singleplayer: nothing builds.
+7. **Missions and gathering.**
+   - Tier mission lines match the bill.
+   - `uji sekte misi`: offers match the shortfall.
+   - Send 3 disciples on a Batu trip, then `uji sekte misi selesai`: units, PK and bar share arrive.
+8. **Builders.** 2 builders walk to the component, swing, and the rate shows +50%.
+9. **Hall integration.**
+   - A hall with a scanned cap of 6 confirms a template: level unchanged.
+   - `bflags` follow the tier.
+   - The disc registers with an amethyst shard.
+   - The tower rooms count as floors.
+10. **Upgrade.** `uji sekte naik 5` on a finished template 3: the old parts keep working until replaced, and hall level does not drop.
+11. **Showcase.** `uji sekte pamer 9` on flat land → confirm → `pamer hapus` restores it.
+12. **Audit.** `uji sekte audit` reports zero violations for all 81 emissions; `bandingkan` and `info 9` print.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 21.26 Rejected and deferred ideas
+
+| Idea | Decision | Reason |
+|---|---|---|
+| `.nbt` structure files | rejected | no terrain fitting, no point queries, 81 binary files, renames break silently (21.9) |
+| Pure `hallLevel = min(renown, tier)` | changed to `max(frozenScanCap, tier)` as the cap | it would drop an already-scanned hall on confirming a template |
+| Renown gate per tier | rejected | breaks the user's "just deposit and it builds" loop; renown already caps the level |
+| Tier-ceremony and mission renown | rejected | 20.3.1: renown comes only from disciples |
+| Mirror option | rejected | flips the Bagua trigrams and the plaque text |
+| Nether and End sites | deferred | water oddities, ghast damage; Overworld only in v1 |
+| Snow and concrete cloud blocks | rejected | they read as snow drifts; client mist instead |
+| Steep gamma-curve roofs | rejected | above 45° they read as Japanese; the juzhe rule instead |
+| Red terracotta palace walls, sulfur "gold" trim, diorite balustrades, dark-prismarine third glaze, dark-oak pine leaves | replaced | colour clashes or duplicates (21.5) |
+| 2×2×2 palace lanterns | rejected | an orange cube; 1×2 lanterns instead |
+| Per-column earthwork sweep | rejected | can drop entities; layered earthwork instead |
+| Op-index resume cursor | rejected | breaks after any blueprint change; idempotent (phase, layer) cursor instead |
+| Regenerating plans in the break event | rejected | server hitch; cell index instead |
+| Inserting excavated valuables into B's Storehouse | rejected | its overflow is deleted; Peti Galian instead |
+| Esensi Roh category | dropped | gate items are exact items; spirit stones and beast cores join in phase 7 |
+| Refusing any lava or any structure piece in the volume | narrowed | would make templates 7–9 almost impossible to place (mineshafts, caves) |
+| A 3×3 player-placed stele pedestal | dropped | does not exist in 20.3.1; the stele surround is a T1 component |
+| Disciple cap perk up to +3 | reduced to +1 | the 20.1 per-hall entity budget |
+| Full ghost-block preview of the whole sect | deferred | too heavy for the laptop; outline, boxes and diagram instead |
+| Hopper or chest deposit block | deferred | a new block entity and automation loops; stele sneak-deposit covers it |
+| Auto-repair by default | rejected | would undo the player's own changes |
+| Restoring original terrain on real sites | rejected | needs a huge undo store; credits replace it (tests and showcases keep exact undo) |
+| Realm-locked template choice | optional config, off | the user wants a free choice at founding |
+| Time-locked tiers | rejected | gathering already paces the build |
+| Territory protection against players | rejected | not a claims mod |
+| Surplus → PK | rejected | would turn digging into a PK farm |
+| Building all 9 showcases at once | rejected | about 700k ops; `pamer` (max 2) and `bandingkan` instead |
+| *Tales of Demons and Gods* "Heavenly Fate Sect" founding | source dropped | No such sect: "Heavenly Fate" is a realm. Nie Li is promoted to Sect Master of the Divine Feathers Sect (around ch. 442) and co-founds the Demon Alliance; neither is founding a sect. |
+| *Perfect World* as the source for Holy Lands or Cave Heaven | source dropped | Holy Lands are not systematic there; 洞天境 is a cultivation realm, not a force |
+| *Reverend Insanity* as a source for sects | source dropped | blessed lands and grotto-heavens are personal immortal apertures (term only) |
+| *A Record of a Mortal's Journey* "First-Rate Sect" label, yellow maple groves as text | source dropped | they are the "Seven Great Sects"; Yellow Maple Valley gives only the name |
+| *Martial Peak* as the source for rate grades | source dropped | its sects rank by territory |
+| *BTTH* Misty Cloud "long stairs and summit plaza", "Holy Pill City", testing stone "in a public plaza" | source dropped | unverified; the testing stone stands in the Xiao clan's testing ground |
+| *Soul Land* storey counts as canon | not claimed | the pagoda is a martial soul; the 7 and 9 floors are a design reading |
+| Floating islands chained to the ground as canon | not claimed | *Liezi* has turtles, not chains; the chains are the user's request and art direction |
+| *I Shall Seal the Heavens* Outer and Inner Sects on separate mountains | corrected | the Inner Sect is on the upper terraces behind a barrier |
+| *A Will Eternal* Violet Cauldron Peak as the pill peak | corrected | the pill peak is Fragrant Cloud Peak (Puncak Awan Harum) |
+| *Return of the Mount Hua Sect* Eunha chapter number | dropped | the concept is kept; no chapter could be verified |

@@ -25,5 +25,5 @@
   "kultivator.test.disciple.tour": "Tur ranah untuk %s: %s ranah, masing-masing %s detik. Kultivasi aslinya kembali di akhir tur.",
   "kultivator.test.disciple.tour_step": "%s: %s (%s / %s)",
   "kultivator.test.disciple.tour_end": "Tur ranah %s selesai; kultivasi aslinya sudah kembali.",
-  "kultivator.test.help.murid": "/kultivasi uji murid <nama|semua> maks | ranah <ranah> [tahap] [tingkat] | tur [detik] | teknik — uji yang sama untuk muridmu, berdasarkan nama."
+  "kultivator.test.help.murid": "/kultivasi uji murid <nama|semua> maks | ranah <ranah> [tahap] [tingkat] | tur [detik] | teknik | bintang <n> — uji yang sama untuk muridmu, berdasarkan nama."
 }

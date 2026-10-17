@@ -56,19 +56,22 @@ public class JadeTablet extends Widget {
 		g.fill(bx + 1, y + 4, bx + 2, b - 4, 0x50FFFFFF);
 
 		int ink = s > 0.5F ? Palette.GOLD_LIGHT : Palette.mix(Palette.JADE_PALE, 0xFFFFFFFF, glow * 0.5F);
-		// Short tablets (the smallest windows) get a smaller icon and tighter margins so the name stays readable.
+		// Short tablets (the smallest windows, or seven tablets on one scroll) get a smaller icon and tighter margins so
+		// the name stays readable.
+		boolean tiny = h < 32;
 		boolean small = h < 44;
-		float iconSize = Math.min(w - 9, small ? 7 : 10);
-		float pad = small ? 12.0F : 14.0F;
-		Glyphs.tab(g, icon, bx + w / 2.0F, y + 6.0F + iconSize / 2.0F, iconSize, ink);
+		float iconSize = Math.min(w - 9, tiny ? 6 : small ? 7 : 10);
+		float pad = tiny ? 8.0F : small ? 12.0F : 14.0F;
+		float iconTop = tiny ? 4.0F : 6.0F;
+		Glyphs.tab(g, icon, bx + w / 2.0F, y + iconTop + iconSize / 2.0F, iconSize, ink);
 
 		// The name, written down the tablet (rotated a quarter turn).
 		Component text = name.get();
 		float length = h - iconSize - pad;
-		if (length > 8.0F) {
+		if (length > (tiny ? 6.0F : 8.0F)) {
 			float scale = Brush.fitScale(font, text, length, 0.75F, 0.45F);
 			float drawn = Math.min(length, font.width(text) * scale);
-			float startY = y + iconSize + (small ? 8.0F : 9.0F) + (length - drawn) / 2.0F;
+			float startY = y + iconSize + (tiny ? 5.0F : small ? 8.0F : 9.0F) + (length - drawn) / 2.0F;
 			g.pose().pushMatrix();
 			g.pose().translate(bx + w / 2.0F + 4.0F * scale, startY);
 			g.pose().rotate((float) (Math.PI / 2.0D));

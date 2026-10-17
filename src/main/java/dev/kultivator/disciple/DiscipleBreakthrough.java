@@ -114,7 +114,15 @@ public final class DiscipleBreakthrough {
 
 	/** Qi Refining -> Foundation: {@code 0.7 + (grade - 2) x 0.05} plus pill bonuses, 5%..98%. */
 	public static double chance(DiscipleData data) {
+		return chance(null, data);
+	}
+
+	/** As {@link #chance(DiscipleData)} plus the foundationChance hooks of the loaded disciple (DESIGN 20.2.6). */
+	public static double chance(@Nullable DiscipleEntity entity, DiscipleData data) {
 		double chance = 0.7D + (data.rootGrade().ordinal() - 2) * 0.05D + data.nextBreakthroughBonus();
+		if (entity != null) {
+			chance += DiscipleHooks.foundationChance(entity);
+		}
 		return Math.max(0.05D, Math.min(0.98D, chance));
 	}
 
@@ -132,7 +140,7 @@ public final class DiscipleBreakthrough {
 		Kind kind = kindFor(current);
 		int variant = Tribulation.variant(level);
 		Trial trial = new Trial(kind, target, entity.position(), level.dimension(), variant,
-				kind == Kind.TRIBULATION ? strikeCount(target) : 0, kind == Kind.GATHERING ? chance(data) : 1.0D);
+				kind == Kind.TRIBULATION ? strikeCount(target) : 0, kind == Kind.GATHERING ? chance(entity, data) : 1.0D);
 		trial.lastHealth = entity.getHealth();
 		data.setTrial(trial);
 		holdStill(entity);
@@ -159,6 +167,7 @@ public final class DiscipleBreakthrough {
 			}
 		}
 		entity.refreshSynced();
+		DiscipleHooks.breakthroughStarted(entity, kind, target);
 	}
 
 	/** Every server tick of the disciple (cheap when no breakthrough runs). */
@@ -267,9 +276,11 @@ public final class DiscipleBreakthrough {
 			Msg.actionBar(master, Component.translatable("kultivator.disciplecult.bt.strike", number, t.strikeCount, name(entity))
 					.withStyle(last ? ChatFormatting.GOLD : variantColor(t.variant)));
 		}
-		float amount = (float) Math.max(0.0D, entity.getMaxHealth() * strikeShare(data));
+		// Phase-6 hooks: a strike may be taken over (Tahan Petir) or softened (Hu Fa, foundations...; floored at 0.5).
+		boolean skipped = DiscipleHooks.strikeSkipped(entity, t.target, number);
+		float amount = skipped ? 0.0F : (float) Math.max(0.0D, entity.getMaxHealth() * strikeShare(data) * DiscipleHooks.strikeFactor(entity, t.target, number));
 		float pool = entity.getHealth() + entity.getAbsorptionAmount();
-		boolean wouldKill = amount >= pool;
+		boolean wouldKill = !skipped && amount >= pool;
 		// Never lethal: the hit is clamped so at least 1 health is left.
 		float dealt = Math.min(amount, pool - 1.0F);
 		if (dealt > 0.0F) {
@@ -279,6 +290,7 @@ public final class DiscipleBreakthrough {
 			entity.setHealth(1.0F);
 		}
 		trackHealth(entity, t);
+		DiscipleHooks.breakthroughStrike(entity, number, t.strikeCount);
 		if (wouldKill) {
 			fail(entity, level, data, t, "kultivator.disciplecult.bt.fail_strike");
 			return false;
@@ -307,6 +319,7 @@ public final class DiscipleBreakthrough {
 			Msg.chat(master, Component.translatable(messageKey, name(entity)).withStyle(ChatFormatting.GRAY));
 		}
 		entity.refreshSynced();
+		DiscipleHooks.breakthroughCancelled(entity, t.kind);
 		return true;
 	}
 
@@ -322,7 +335,12 @@ public final class DiscipleBreakthrough {
 		double score = t.kind == Kind.TRIBULATION
 				? random.nextDouble() * 0.5D + t.lowestHealth * 0.3D + data.rootGrade().ordinal() * 0.05D
 				: random.nextDouble() * 0.7D + data.rootGrade().ordinal() * 0.05D;
+		score += DiscipleHooks.qualityBonus(entity, t.target);
 		BreakthroughQuality quality = BreakthroughQuality.fromScore(score);
+		BreakthroughQuality floor = DiscipleHooks.qualityFloor(entity, t.target);
+		if (floor != null && floor.ordinal() > quality.ordinal()) {
+			quality = floor;
+		}
 		BreakthroughQuality old = data.quality(t.target.realm());
 		if (newRealm || old == null || quality.ordinal() > old.ordinal()) {
 			data.setQuality(t.target.realm(), quality);
@@ -351,6 +369,7 @@ public final class DiscipleBreakthrough {
 		sound(level, pos, SoundEvents.PLAYER_LEVELUP, 1.0F, 0.8F);
 		sound(level, pos, SoundEvents.BEACON_ACTIVATE, 1.0F, 1.1F);
 		sound(level, pos, SoundEvents.BELL_RESONATE, 0.8F, 1.2F);
+		DiscipleHooks.breakthroughEnded(entity, true, t.kind);
 
 		ServerPlayer master = entity.owner();
 		if (master == null) {
@@ -393,6 +412,7 @@ public final class DiscipleBreakthrough {
 		sound(level, pos, SoundEvents.WITHER_AMBIENT, 0.5F, 1.4F);
 		sound(level, pos, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.8F, 0.4F);
 		entity.refreshSynced();
+		DiscipleHooks.breakthroughEnded(entity, false, t.kind);
 		ServerPlayer master = entity.owner();
 		if (master != null) {
 			Component name = name(entity);

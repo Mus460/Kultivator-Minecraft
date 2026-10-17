@@ -1,5 +1,6 @@
 package dev.kultivator.cultivation;
 
+import dev.kultivator.Kultivator;
 import dev.kultivator.data.Rank;
 import dev.kultivator.data.Realm;
 import dev.kultivator.fx.Fx;
@@ -12,6 +13,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -25,6 +27,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.RemoveBlockGoal;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -62,6 +65,9 @@ public final class DaoProtectors {
 	/** Every Dao Protector carries this entity tag. */
 	public static final String TAG = "kultivator.dao_protector";
 	private static final String OWNER_TAG_PREFIX = "kultivator.dao_protector.";
+	/** A wave raised for a non-player target (spawnWaveFor) carries this plus the target's UUID: it may hurt that target. */
+	private static final String VERSUS_TAG_PREFIX = "kultivator.dao_protector_vs.";
+	private static final Identifier HEALTH_ID = Kultivator.id("dao_protector_health");
 	private static final int TRIES_PER_MOB = 20;
 
 	/** Owner UUID -> the protectors spawned for them. */
@@ -96,7 +102,8 @@ public final class DaoProtectors {
 		// keeps a killed villager from turning into a zombie villager that would stay behind).
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((victim, source, amount) -> {
 			Entity attacker = source.getEntity();
-			return attacker == null || !isProtector(attacker) || victim instanceof Player;
+			return attacker == null || !isProtector(attacker) || victim instanceof Player
+					|| attacker.entityTags().contains(VERSUS_TAG_PREFIX + victim.getUUID());
 		});
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			BY_OWNER.clear();
@@ -117,7 +124,7 @@ public final class DaoProtectors {
 		int spawned = 0;
 		for (int i = 0; i < count; i++) {
 			EntityType<? extends Mob> type = pick(variant, target, random);
-			if (spawnOne(level, player, type, variant, random)) {
+			if (spawnOne(level, player, type, variant, random, 1.0D)) {
 				spawned++;
 			}
 		}
@@ -127,14 +134,54 @@ public final class DaoProtectors {
 		return spawned;
 	}
 
+	/**
+	 * A wave of {@code size} protectors for any living {@code target} (DESIGN 20.2.9: a disciple's tribulation or
+	 * calamity, the promotion trial): the same monster pool (by the level's dimension and {@code rank}), hardening, tags
+	 * and cleanup as {@link #spawnWave}, health times {@code healthFactor}, aimed at {@code target} first. Unlike player
+	 * waves these protectors may also hurt {@code target}. Tracked under the target: {@link #clearFor} removes them.
+	 * {@code owner} is the target's master (may be null); no chat line is sent, the caller words its own. Returns how many
+	 * arrived.
+	 */
+	public static int spawnWaveFor(ServerLevel level, LivingEntity target, @Nullable ServerPlayer owner, Rank rank, int size, double healthFactor) {
+		if (target == null || !target.isAlive() || target.level() != level || size <= 0) {
+			return 0;
+		}
+		RandomSource random = level.getRandom();
+		int variant = Tribulation.variant(level);
+		double health = Double.isFinite(healthFactor) ? Math.max(0.1D, healthFactor) : 1.0D;
+		int spawned = 0;
+		for (int i = 0; i < Math.min(size, 16); i++) {
+			EntityType<? extends Mob> type = pick(variant, rank, random);
+			if (spawnOne(level, target, type, variant, random, health)) {
+				spawned++;
+			}
+		}
+		return spawned;
+	}
+
+	/** True when {@code protector} belongs to a wave raised for {@code target} (spawnWave or spawnWaveFor). */
+	public static boolean isWaveOf(Entity protector, Entity target) {
+		return protector != null && target != null && isProtector(protector) && protector.entityTags().contains(OWNER_TAG_PREFIX + target.getUUID());
+	}
+
+	/** Removes every protector raised for {@code target} with a poof (no drops). */
+	public static void clearFor(LivingEntity target) {
+		if (target != null && target.level() instanceof ServerLevel level) {
+			clear(level, target.getUUID());
+		}
+	}
+
 	/** Removes every protector of the player with a poof (no drops). */
 	public static void clear(ServerPlayer player) {
-		ServerLevel level = player.level();
-		Set<UUID> ids = BY_OWNER.remove(player.getUUID());
+		clear(player.level(), player.getUUID());
+	}
+
+	private static void clear(ServerLevel level, UUID key) {
+		Set<UUID> ids = BY_OWNER.remove(key);
 		if (ids != null) {
 			for (UUID id : ids) {
 				ALIVE.remove(id);
-				Entity entity = findEntity(player, id);
+				Entity entity = findEntity(level, id);
 				if (entity != null && entity.isAlive()) {
 					vanish(entity);
 				}
@@ -142,7 +189,7 @@ public final class DaoProtectors {
 		}
 		// Anything else carrying the owner tag (converted or split mobs, wherever they wandered): collect first, then
 		// discard, so the entity lists are not changed while they are walked.
-		String ownerTag = ownerTag(player);
+		String ownerTag = OWNER_TAG_PREFIX + key;
 		List<Entity> leftovers = new ArrayList<>();
 		for (ServerLevel each : level.getServer().getAllLevels()) {
 			for (Entity entity : each.getAllEntities()) {
@@ -195,7 +242,8 @@ public final class DaoProtectors {
 		return pool.get(random.nextInt(pool.size()));
 	}
 
-	private static boolean spawnOne(ServerLevel level, ServerPlayer player, EntityType<? extends Mob> type, int variant, RandomSource random) {
+	private static boolean spawnOne(ServerLevel level, LivingEntity player, EntityType<? extends Mob> type, int variant, RandomSource random,
+			double healthFactor) {
 		Mob mob = type.create(level, EntitySpawnReason.EVENT);
 		if (mob == null) {
 			// Peaceful difficulty or a disabled feature.
@@ -229,8 +277,12 @@ public final class DaoProtectors {
 		for (Entity member : group) {
 			member.addTag(TAG);
 			member.addTag(ownerTag);
+			if (!(player instanceof Player)) {
+				member.addTag(VERSUS_TAG_PREFIX + player.getUUID());
+			}
 			if (member instanceof Mob each) {
 				harden(each);
+				strengthen(each, healthFactor);
 			}
 			owned.add(member.getUUID());
 			ALIVE.add(member.getUUID());
@@ -255,8 +307,8 @@ public final class DaoProtectors {
 		return true;
 	}
 
-	/** A free standing spot 10-16 blocks from the player, near their height, inside loaded chunks. Read-only. */
-	private static @Nullable Vec3 findSpot(ServerLevel level, ServerPlayer player, Mob mob, RandomSource random) {
+	/** A free standing spot 10-16 blocks from the target, near its height, inside loaded chunks. Read-only. */
+	private static @Nullable Vec3 findSpot(ServerLevel level, LivingEntity player, Mob mob, RandomSource random) {
 		Vec3 center = player.position();
 		for (int attempt = 0; attempt < TRIES_PER_MOB; attempt++) {
 			double angle = random.nextDouble() * Math.PI * 2.0D;
@@ -317,10 +369,22 @@ public final class DaoProtectors {
 		}
 	}
 
-	private static void aim(Mob mob, ServerPlayer player) {
+	private static void aim(Mob mob, LivingEntity player) {
 		mob.setTarget(player);
 		if (mob.getBrain().checkMemory(MemoryModuleType.ATTACK_TARGET, MemoryStatus.REGISTERED)) {
-			mob.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, (LivingEntity) player);
+			mob.getBrain().setMemory(MemoryModuleType.ATTACK_TARGET, player);
+		}
+	}
+
+	/** More health for a stronger wave ({@code factor} 1 changes nothing); the mob starts at full health. */
+	private static void strengthen(Mob mob, double factor) {
+		if (factor == 1.0D) {
+			return;
+		}
+		AttributeInstance health = mob.getAttribute(Attributes.MAX_HEALTH);
+		if (health != null) {
+			health.addOrReplacePermanentModifier(new AttributeModifier(HEALTH_ID, factor - 1.0D, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+			mob.setHealth(mob.getMaxHealth());
 		}
 	}
 
@@ -333,12 +397,12 @@ public final class DaoProtectors {
 		entity.discard();
 	}
 
-	private static @Nullable Entity findEntity(ServerPlayer player, UUID id) {
-		Entity entity = player.level().getEntity(id);
+	private static @Nullable Entity findEntity(ServerLevel level, UUID id) {
+		Entity entity = level.getEntity(id);
 		if (entity != null) {
 			return entity;
 		}
-		for (ServerLevel other : player.level().getServer().getAllLevels()) {
+		for (ServerLevel other : level.getServer().getAllLevels()) {
 			Entity found = other.getEntity(id);
 			if (found != null) {
 				return found;
@@ -347,8 +411,8 @@ public final class DaoProtectors {
 		return null;
 	}
 
-	private static String ownerTag(ServerPlayer player) {
-		return OWNER_TAG_PREFIX + player.getUUID();
+	private static String ownerTag(Entity target) {
+		return OWNER_TAG_PREFIX + target.getUUID();
 	}
 
 	private DaoProtectors() {

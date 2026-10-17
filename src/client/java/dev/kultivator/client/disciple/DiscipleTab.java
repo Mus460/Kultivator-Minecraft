@@ -7,6 +7,7 @@ import dev.kultivator.client.screen.ui.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,9 +16,10 @@ import java.util.List;
 
 /**
  * One tab of the disciple scroll: laid out into the scroll's content box, it owns its controls (which read the latest
- * {@link DiscipleView} live through the screen), draws its pictures and handles the mouse inside the box.
+ * {@link DiscipleView} live through the screen), draws its pictures and handles the mouse inside the box. Public so the
+ * phase-6 tabs of other packages (Bakat, Pusaka, Jalan) extend it; they read {@link #info()}.
  */
-abstract class DiscipleTab {
+public abstract class DiscipleTab {
 
 	protected final DiscipleScreen screen;
 	protected final Font font;
@@ -28,16 +30,16 @@ abstract class DiscipleTab {
 	protected final List<Widget> widgets = new ArrayList<>();
 	private @Nullable Widget pressed;
 
-	DiscipleTab(DiscipleScreen screen) {
+	protected DiscipleTab(DiscipleScreen screen) {
 		this.screen = screen;
 		this.font = Minecraft.getInstance().font;
 	}
 
 	/** The tab's full name (header and tooltip). */
-	abstract Component title();
+	public abstract Component title();
 
 	/** The short name written on its jade tablet. */
-	abstract Component shortName();
+	public abstract Component shortName();
 
 	final void layout(int x, int y, int w, int h) {
 		this.x = x;
@@ -54,11 +56,11 @@ abstract class DiscipleTab {
 	protected abstract void build();
 
 	/** New details of the disciple arrived. */
-	void onView() {
+	public void onView() {
 	}
 
 	/** True when the new details changed what controls exist, so {@link #build()} must run again. */
-	boolean needsRebuild() {
+	public boolean needsRebuild() {
 		return false;
 	}
 
@@ -100,7 +102,7 @@ abstract class DiscipleTab {
 		return null;
 	}
 
-	boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button != InputConstants.MOUSE_BUTTON_LEFT) {
 			return false;
 		}
@@ -115,7 +117,7 @@ abstract class DiscipleTab {
 		return false;
 	}
 
-	boolean mouseReleased(double mouseX, double mouseY, int button) {
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		if (pressed == null) {
 			return false;
 		}
@@ -125,7 +127,7 @@ abstract class DiscipleTab {
 		return true;
 	}
 
-	boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+	public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		return false;
 	}
 
@@ -144,6 +146,16 @@ abstract class DiscipleTab {
 
 	protected DiscipleView view() {
 		return screen.view();
+	}
+
+	/** The raw details of the last {@code DiscipleInfo} (phase-6 tabs read their own keys from it). */
+	protected CompoundTag info() {
+		return screen.info();
+	}
+
+	/** Sends {@code action} for this disciple (arg = its entity id) with {@code text}. */
+	protected void send(int action, String text) {
+		screen.send(action, text);
 	}
 
 	/** A heading in seal red with a little stamp before it and a gold rule under it. */

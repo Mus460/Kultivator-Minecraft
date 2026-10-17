@@ -86,7 +86,19 @@ public enum FxType {
 	/** a = 0 add ingredient, 1 refining (b = ticks), 2 success (b = pill quality), 3 failure. */
 	ALCHEMY,
 	/** True Immortal ascension. a = step of the event. */
-	ASCENSION;
+	ASCENSION,
+
+	// ---- phase 6 (DESIGN 20.2.3); arguments are defined by the owning module
+	/** Sect Hall effects (client/hall/HallFx, module A). */
+	HALL,
+	/** Duties, expeditions, duels, the Void Realm (client/sectevent/SectEventFx, module B). */
+	SECT_EVENT,
+	/** Talents, physiques, treasures, ultimates (client/disciple/power/PowerFx, module C). */
+	DISCIPLE_POWER,
+	/** Bintang Abadi stars, calamities, seals, the heir (client/disciple/path/PathFx, module D). */
+	STAR,
+	/** Mode Kehancuran: red sky, shape preview, impact dust, restore shimmer (client/kehancuran/KehancuranFx, module D). */
+	KEHANCURAN;
 
 	public static FxType byOrdinal(int ordinal) {
 		FxType[] values = values();

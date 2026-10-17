@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "kultivator:block/sect_hall_stele",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "kultivator:block/sect_hall_stele"
+    },
+    "facing=south": {
+      "model": "kultivator:block/sect_hall_stele",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "kultivator:block/sect_hall_stele",
+      "y": 270
+    }
+  }
+}

@@ -1,6 +1,7 @@
 package dev.kultivator.client.disciple;
 
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -22,4 +23,14 @@ public class DiscipleRenderState extends AvatarRenderState {
 	/** 0..1 how far into the seated meditation pose it is. */
 	public float seated;
 	public Component name = Component.empty();
+	// Phase 6 (DESIGN 20.3.22, module C): synced role, activity, sect rank, stars, talent and power bits.
+	/** {@code DiscipleEntity.Role} ordinal. */
+	public int role;
+	public int activity;
+	public int sectRank;
+	public int stars;
+	public int talent;
+	public int power;
+	/** The natal treasure's item (empty when it has none). */
+	public final ItemStackRenderState natalItem = new ItemStackRenderState();
 }

@@ -29,17 +29,21 @@ import java.util.List;
 
 /**
  * A disciple's scroll in the "Gulungan Giok" style (DESIGN 5b, 18): the same unrolling jade scroll as the cultivation
- * screen, with four jade tablets on its left edge: Status, Techniques (teach the master's arts), Orders (follow, stay,
- * meditate, assist) and Pills &amp; Breakthrough (feed the pill in hand, start the breakthrough, choose the Dao,
- * release). Every button sends a {@code DISCIPLE_*} action with the disciple's entity id; the server answers with fresh
+ * screen, with seven jade tablets on its left edge: Status, Techniques (teach the master's arts), Orders (follow, stay,
+ * meditate, assist), Pills &amp; Breakthrough (feed the pill in hand, start the breakthrough, choose the Dao,
+ * release), and the phase-6 tabs Talents and Treasures (module C) and Path (module D). Every button sends a {@code DISCIPLE_*} action with the disciple's entity id; the server answers with fresh
  * details, which refresh the scroll. It closes when the disciple is gone or more than 16 blocks away. Not a pause screen.
  */
 public class DiscipleScreen extends Screen {
 
-	static final int TAB_STATUS = 0;
-	static final int TAB_TECHNIQUES = 1;
-	static final int TAB_ORDERS = 2;
-	static final int TAB_PILLS = 3;
+	public static final int TAB_STATUS = 0;
+	public static final int TAB_TECHNIQUES = 1;
+	public static final int TAB_ORDERS = 2;
+	public static final int TAB_PILLS = 3;
+	/** Phase 6 (DESIGN 20.2.13): Bakat (module C), Pusaka (module C) and Jalan (module D). */
+	public static final int TAB_TALENT = 4;
+	public static final int TAB_TREASURE = 5;
+	public static final int TAB_PATH = 6;
 
 	private static final long UNROLL_MILLIS = 250L;
 	private static final int TABLET_W = 20;
@@ -49,10 +53,13 @@ public class DiscipleScreen extends Screen {
 	private static final double MAX_DISTANCE_SQ = Disciples.ACTION_RANGE * Disciples.ACTION_RANGE;
 	/** Live values (qi, xp, health) are asked for again this often while the scroll is open, in ticks. */
 	private static final int REFRESH_TICKS = 100;
-	private static final int[] ICONS = {Glyphs.STATUS, Glyphs.TECHNIQUES, Glyphs.HELP, Glyphs.ROOT_DAO};
+	private static final int[] ICONS = {Glyphs.STATUS, Glyphs.TECHNIQUES, Glyphs.HELP, Glyphs.ROOT_DAO, Glyphs.TALENT, Glyphs.TREASURE, Glyphs.PATH};
+	/** Seven tablets fit beside the scroll down to a 240 px high window (DESIGN 20.2.13). */
+	private static final int MIN_TABLET_H = 18;
 
 	private final int entityId;
 	private DiscipleView view;
+	private CompoundTag info;
 	private long seenVersion;
 	private int tab;
 	private final DiscipleTab[] tabs;
@@ -78,8 +85,11 @@ public class DiscipleScreen extends Screen {
 		super(Component.translatable("kultivator.discipleui.title"));
 		this.entityId = entityId;
 		this.view = new DiscipleView(info);
+		this.info = info;
 		this.seenVersion = version;
-		this.tabs = new DiscipleTab[]{new StatusTab(this), new TechniqueTab(this), new OrderTab(this), new PillTab(this)};
+		this.tabs = new DiscipleTab[]{new StatusTab(this), new TechniqueTab(this), new OrderTab(this), new PillTab(this),
+				new dev.kultivator.client.disciple.power.TalentTab(this), new dev.kultivator.client.disciple.power.TreasureTab(this),
+				new dev.kultivator.client.disciple.path.PathTab(this)};
 	}
 
 	public int entityId() {
@@ -90,8 +100,13 @@ public class DiscipleScreen extends Screen {
 		return view;
 	}
 
+	/** The raw details of the last {@code DiscipleInfo} for this disciple (never null). */
+	public CompoundTag info() {
+		return info;
+	}
+
 	/** The disciple on this client, or null when it is not loaded. */
-	@Nullable DiscipleEntity entity() {
+	public @Nullable DiscipleEntity entity() {
 		if (minecraft.level == null) {
 			return null;
 		}
@@ -108,13 +123,13 @@ public class DiscipleScreen extends Screen {
 		return disciple != null ? DiscipleLook.name(disciple) : Component.translatable("kultivator.discipleui.title");
 	}
 
-	/** Sends a disciple action for this disciple. */
-	void send(int action, String text) {
+	/** Sends a disciple action for this disciple (arg = its entity id). */
+	public void send(int action, String text) {
 		Keys.send(new Payloads.Action(action, entityId, text));
 	}
 
 	/** Shows {@code lines} as this frame's tooltip (drawn last, over everything). */
-	void showTooltip(List<Component> lines) {
+	public void showTooltip(List<Component> lines) {
 		if (tooltip == null && !lines.isEmpty()) {
 			tooltip = lines;
 		}
@@ -143,7 +158,7 @@ public class DiscipleScreen extends Screen {
 		int count = tabs.length;
 		int top = paperTop + 10;
 		int gap = height < 250 ? 2 : 3;
-		int tabletH = Math.max(24, Math.min(58, (paperBottom - paperTop - 20 - gap * (count - 1)) / count));
+		int tabletH = Math.max(MIN_TABLET_H, Math.min(58, (paperBottom - paperTop - 20 - gap * (count - 1)) / count));
 		for (int i = 0; i < count; i++) {
 			int index = i;
 			JadeTablet tablet = new JadeTablet(paperX0 - TABLET_W + 1, top + i * (tabletH + gap), TABLET_W, tabletH, ICONS[i],
@@ -192,6 +207,7 @@ public class DiscipleScreen extends Screen {
 			return;
 		}
 		view = new DiscipleView(info);
+		this.info = info;
 		DiscipleTab current = tabs[tab];
 		if (current.needsRebuild()) {
 			current.layout(contentX, contentY, contentW, contentH);

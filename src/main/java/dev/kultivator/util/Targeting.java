@@ -1,6 +1,7 @@
 package dev.kultivator.util;
 
 import dev.kultivator.beast.SpiritBeasts;
+import dev.kultivator.disciple.DuelRules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -54,6 +55,10 @@ public final class Targeting {
 		if (!(entity instanceof LivingEntity target) || target == caster || !target.isAlive() || target.isSpectator()
 				|| target.isInvulnerable()) {
 			return false;
+		}
+		// A registered duel comes first (DESIGN 20.2.8): a master's techniques reach his duel partner (Tanding dengan Guru).
+		if (DuelRules.dueling(caster, target)) {
+			return true;
 		}
 		if (target instanceof Creaking creaking && creaking.isHeartBound()) {
 			return false;

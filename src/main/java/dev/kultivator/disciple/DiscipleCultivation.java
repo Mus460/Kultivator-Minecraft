@@ -110,12 +110,21 @@ public final class DiscipleCultivation {
 			return;
 		}
 		DiscipleData data = entity.data();
-		DiscipleBreakthrough.tick(entity, level, data);
+		// Only a real disciple cultivates (DESIGN 20.2.5): clones, rivals, phantoms and candidates only cool down and refill qi.
+		boolean disciple = entity.role() == DiscipleEntity.Role.DISCIPLE;
+		if (disciple) {
+			DiscipleBreakthrough.tick(entity, level, data);
+		}
 		DiscipleTechniques.tick(entity, level);
 		if (entity.tickCount % 20 != 0) {
 			return;
 		}
 		data.tickCooldowns(20);
+		if (!disciple) {
+			double maxQi = maxQi(data);
+			data.setQi(Math.min(maxQi, data.qi() + regenPerSecond(data, false)));
+			return;
+		}
 		boolean changed = false;
 
 		if (data.deviating()) {
@@ -151,10 +160,13 @@ public final class DiscipleCultivation {
 				entity.heal(entity.getMaxHealth() * 0.01F);
 			}
 			ServerPlayer master = entity.owner();
-			if (master != null && master.level() == level && master.distanceToSqr(entity) <= MASTER_MEDITATION_RANGE * MASTER_MEDITATION_RANGE) {
+			boolean anyRange = master != null && DiscipleHooks.masterShareAnyRange(data);
+			if (master != null && (anyRange || master.level() == level
+					&& master.distanceToSqr(entity) <= MASTER_MEDITATION_RANGE * MASTER_MEDITATION_RANGE)) {
 				CultivationData masterData = Cultivators.get(master);
 				if (masterData.meditating()) {
-					addXp(entity, masterMeditationGain(master, masterData) * MASTER_SHARE * (data.deviating() ? 0.5D : 1.0D), XpSource.EXACT);
+					addXp(entity, masterMeditationGain(master, masterData) * MASTER_SHARE * DiscipleHooks.masterShareFactor(data)
+							* (data.deviating() ? 0.5D : 1.0D), XpSource.EXACT);
 				}
 			}
 		}
@@ -172,14 +184,15 @@ public final class DiscipleCultivation {
 		if (changed) {
 			entity.refreshSynced();
 		}
+		DiscipleHooks.tick20(entity);
 	}
 
 	// ================================================================== qi
 
-	/** Max qi: {@code 60 + realm x 80 + stage x 20 + layer x 40}. */
+	/** Max qi: {@code 60 + realm x 80 + stage x 20 + layer x 40}, times {@link DiscipleHooks#maxQiFactor} (stars, seal, arts). */
 	public static double maxQi(DiscipleData data) {
 		Rank rank = data.rank();
-		return 60.0D + rank.realm().ordinal() * 80.0D + rank.stage() * 20.0D + rank.layer() * 40.0D;
+		return (60.0D + rank.realm().ordinal() * 80.0D + rank.stage() * 20.0D + rank.layer() * 40.0D) * DiscipleHooks.maxQiFactor(data);
 	}
 
 	/** Qi per second: 0.6% of max, x4 while meditating, nothing during a Qi Deviation. */
@@ -194,11 +207,21 @@ public final class DiscipleCultivation {
 
 	/** Root grade x 0.6 x server config, halved during a Qi Deviation; EXACT is always 1. */
 	public static double xpMultiplier(DiscipleData data, XpSource source) {
+		return xpMultiplier(null, data, source);
+	}
+
+	/**
+	 * The disciple XP multiplier: potential (root grade, or the soul colour hook) x rank factor (0.6, or the sect rank
+	 * hook) x the {@code xpFactor} hooks x server config, halved during a Qi Deviation; EXACT is always 1
+	 * (DESIGN 20.2.6). {@code entity} is null for data whose body is not loaded.
+	 */
+	public static double xpMultiplier(@Nullable DiscipleEntity entity, DiscipleData data, XpSource source) {
 		if (source == XpSource.EXACT) {
 			return 1.0D;
 		}
 		double config = Math.max(0.0D, KultivatorConfig.get().xpMultiplier);
-		return data.rootGrade().multiplier() * XP_FACTOR * config * (data.deviating() ? 0.5D : 1.0D);
+		return DiscipleHooks.potentialFactor(data) * DiscipleHooks.rankFactor(data) * DiscipleHooks.xpFactor(entity, data, source)
+				* config * (data.deviating() ? 0.5D : 1.0D);
 	}
 
 	/**
@@ -210,7 +233,7 @@ public final class DiscipleCultivation {
 		double site = masterData.siteMultiplier() > 0.0D ? masterData.siteMultiplier() : 1.0D;
 		double base = (0.6D + 0.25D * masterData.realm().ordinal()) * site * QiFormations.multiplier(masterData.formationTier())
 				* Math.max(0.15D, masterData.veinDensity());
-		return base * Sects.meditationBonus(master) * Progression.xpMultiplier(masterData, XpSource.MEDITATION);
+		return base * Sects.meditationBonus(master) * Progression.xpMultiplier(master, XpSource.MEDITATION);
 	}
 
 	/** Meditation XP per second before multipliers: {@code 0.4 + 0.2 x realm}, x1.5 when ordered to meditate. */
@@ -225,11 +248,11 @@ public final class DiscipleCultivation {
 	 * actually added.
 	 */
 	public static double addXp(DiscipleEntity entity, double amount, XpSource source) {
-		if (!(amount > 0.0D) || !Double.isFinite(amount)) {
+		if (!(amount > 0.0D) || !Double.isFinite(amount) || entity.role() != DiscipleEntity.Role.DISCIPLE) {
 			return 0.0D;
 		}
 		DiscipleData data = entity.data();
-		double gain = amount * xpMultiplier(data, source);
+		double gain = amount * xpMultiplier(entity, data, source);
 		if (!(gain > 0.0D) || !Double.isFinite(gain)) {
 			return 0.0D;
 		}
@@ -247,9 +270,10 @@ public final class DiscipleCultivation {
 
 	/**
 	 * Puts {@code amount} into the bar with the rules of DESIGN 1 (no multipliers): stage-ups below Peak with carry-over,
-	 * a full bar and Stored Qi at a bottleneck, only Stored Qi at the very end. Returns the number of stage-ups.
+	 * a full bar and Stored Qi at a bottleneck, only Stored Qi at the very end. Returns the number of stage-ups. Works on
+	 * data whose body is not loaded (expeditions, away disciples); call {@code refreshSynced} when the body is loaded.
 	 */
-	static int distribute(DiscipleData data, double amount) {
+	public static int distribute(DiscipleData data, double amount) {
 		double left = amount;
 		int stageUps = 0;
 		for (int guard = 0; left > 0.0D && guard <= Rank.MAX_STEP + 2; guard++) {
@@ -343,7 +367,11 @@ public final class DiscipleCultivation {
 
 	/** A monster the disciple killed: {@code maxHealth x 0.4} XP, a kill counted, a little comprehension of its Dao. */
 	public static void onKill(DiscipleEntity entity, LivingEntity victim) {
-		if (!(victim instanceof Enemy) || victim == entity) {
+		if (victim == entity || entity.role() != DiscipleEntity.Role.DISCIPLE) {
+			return;
+		}
+		DiscipleHooks.onKill(entity, victim);
+		if (!(victim instanceof Enemy)) {
 			return;
 		}
 		DiscipleData data = entity.data();
@@ -362,6 +390,9 @@ public final class DiscipleCultivation {
 	 */
 	public static boolean tryCastInCombat(DiscipleEntity entity, @Nullable LivingEntity target) {
 		DiscipleData data = entity.data();
+		if (target != null && entity.isAlive() && !data.breakingThrough() && DiscipleHooks.combatCast(entity, target)) {
+			return true;
+		}
 		ServerPlayer master = entity.owner();
 		if (master == null || data.learnedIds().isEmpty() || data.deviating() || data.breakingThrough() || !entity.isAlive()) {
 			return false;
@@ -460,6 +491,10 @@ public final class DiscipleCultivation {
 	 * True when the pill was taken.
 	 */
 	public static boolean feed(DiscipleEntity entity, ServerPlayer master, ItemStack stack) {
+		if (!stack.isEmpty() && DiscipleHooks.feedHandler(entity, master, stack)) {
+			entity.refreshSynced();
+			return true;
+		}
 		String why = feedBlocker(entity, stack);
 		PillChoice choice = pillOf(stack);
 		if (why != null || choice == null || !(entity.level() instanceof ServerLevel level)) {
@@ -467,11 +502,15 @@ public final class DiscipleCultivation {
 			return false;
 		}
 		Component pillName = stack.getHoverName().copy();
+		// What was given, kept before the stack shrinks (for the onFed hooks).
+		ItemStack fed = stack.copyWithCount(1);
 		DiscipleData data = entity.data();
 		List<Component> parts = new ArrayList<>();
+		// The pill-effect hooks scale everything but XP (XP has its own xpFactor path).
+		double pf = DiscipleHooks.pillEffectFactor(entity, fed);
 		switch (choice.sort()) {
-			case VANILLA -> applyVanilla(entity, data, choice.vanilla(), parts);
-			case ALCHEMY -> applyAlchemy(entity, data, choice.kind(), choice.quality(), parts);
+			case VANILLA -> applyVanilla(entity, data, choice.vanilla(), parts, pf);
+			case ALCHEMY -> applyAlchemy(entity, data, choice.kind(), choice.quality(), parts, pf);
 			case MARROW -> applyMarrow(entity, level, data, parts);
 		}
 		if (parts.isEmpty()) {
@@ -498,6 +537,7 @@ public final class DiscipleCultivation {
 		}
 		Msg.chat(master, Component.translatable(PREFIX + "pill.taken", name(entity), pillName, join(parts)).withColor(choice.color()));
 		entity.refreshSynced();
+		DiscipleHooks.onFed(entity, master, fed);
 		return true;
 	}
 
@@ -538,7 +578,7 @@ public final class DiscipleCultivation {
 		}
 	}
 
-	private static void applyVanilla(DiscipleEntity entity, DiscipleData data, @Nullable VanillaPills.Pill pill, List<Component> parts) {
+	private static void applyVanilla(DiscipleEntity entity, DiscipleData data, @Nullable VanillaPills.Pill pill, List<Component> parts, double pf) {
 		if (pill == null) {
 			return;
 		}
@@ -548,23 +588,23 @@ public final class DiscipleCultivation {
 		if (pill.qi() == VanillaPills.FULL_QI) {
 			qiPart(data, maxQi(data), parts);
 		} else if (pill.qi() > 0) {
-			qiPart(data, pill.qi() * PILL_SHARE, parts);
+			qiPart(data, pill.qi() * PILL_SHARE * pf, parts);
 		}
 		switch (pill) {
 			case HONEY_BOTTLE -> {
-				if (!shortenDeviation(entity, data, 0.2D * PILL_SHARE, false, parts)) {
+				if (!shortenDeviation(entity, data, 0.2D * PILL_SHARE * pf, false, parts)) {
 					parts.add(Component.translatable(PREFIX + "pill.part.calm"));
 				}
 			}
-			case ENCHANTED_GOLDEN_APPLE -> tribulationPart(data, 1.0D - 0.15D * PILL_SHARE, parts);
+			case ENCHANTED_GOLDEN_APPLE -> tribulationPart(data, Math.max(0.0D, 1.0D - 0.15D * PILL_SHARE * pf), parts);
 			case NETHER_STAR -> {
 				double before = data.nextBreakthroughBonus();
-				data.setNextBreakthroughBonus(before + 0.1D * PILL_SHARE);
+				data.setNextBreakthroughBonus(before + 0.1D * PILL_SHARE * pf);
 				breakthroughPart(data, before, parts);
 			}
 			case ECHO_SHARD -> {
 				if (data.dao() == Dao.SPACE) {
-					double gain = comprehensionGain(data, Dao.SPACE, 1.0D * PILL_SHARE);
+					double gain = comprehensionGain(data, Dao.SPACE, 1.0D * PILL_SHARE * pf);
 					data.addComprehension(gain);
 					parts.add(Component.translatable(PREFIX + "pill.part.comprehension", decimal(gain), Dao.SPACE.displayName()));
 				}
@@ -575,39 +615,41 @@ public final class DiscipleCultivation {
 	}
 
 	private static void applyAlchemy(DiscipleEntity entity, DiscipleData data, @Nullable PillKind kind, PillQuality quality,
-									 List<Component> parts) {
+									 List<Component> parts, double pf) {
 		if (kind == null) {
 			return;
 		}
 		double m = quality.multiplier() * PILL_SHARE;
+		// Effects other than XP also take the pill-effect hooks (Taixu blood x1.5).
+		double e = m * pf;
 		double bar = data.xpRequired();
 		switch (kind) {
 			case QI_GATHERING -> xpPart(entity, Math.min(bar * PillKind.QI_GATHERING_XP, PillKind.QI_GATHERING_MAX_XP) * m, parts);
-			case QI_RECOVERY -> qiPart(data, maxQi(data) * PillKind.QI_RECOVERY_QI * m, parts);
+			case QI_RECOVERY -> qiPart(data, maxQi(data) * PillKind.QI_RECOVERY_QI * e, parts);
 			case FOUNDATION -> {
 				boolean best = data.realm() == Realm.QI_REFINING;
-				double bonus = PillKind.FOUNDATION_BONUS * m * (best ? 1.0D : PillKind.FOUNDATION_OFF_REALM);
+				double bonus = PillKind.FOUNDATION_BONUS * e * (best ? 1.0D : PillKind.FOUNDATION_OFF_REALM);
 				double before = data.nextBreakthroughBonus();
 				data.setNextBreakthroughBonus(best ? before + bonus
 						: Math.max(before, Math.min(before + bonus, PillKind.FOUNDATION_OFF_REALM_MAX)));
 				breakthroughPart(data, before, parts);
 			}
-			case GOLDEN_CORE -> tribulationPart(data, 1.0D - PillKind.GOLDEN_CORE_REDUCTION * m, parts);
-			case TRIBULATION_WARDING -> tribulationPart(data, 1.0D - PillKind.WARDING_REDUCTION * m, parts);
+			case GOLDEN_CORE -> tribulationPart(data, Math.max(0.0D, 1.0D - PillKind.GOLDEN_CORE_REDUCTION * e), parts);
+			case TRIBULATION_WARDING -> tribulationPart(data, Math.max(0.0D, 1.0D - PillKind.WARDING_REDUCTION * e), parts);
 			case HEART_CALMING -> {
-				if (!shortenDeviation(entity, data, PillKind.HEART_DEVIATION * m, false, parts)) {
+				if (!shortenDeviation(entity, data, PillKind.HEART_DEVIATION * e, false, parts)) {
 					parts.add(Component.translatable(PREFIX + "pill.part.calm"));
 				}
 			}
 			case HEALING -> {
 				float max = entity.getMaxHealth();
 				float before = entity.getHealth();
-				entity.heal((float) Math.min(max, max * PillKind.HEALING_HEALTH * m));
+				entity.heal((float) Math.min(max, max * PillKind.HEALING_HEALTH * e));
 				float healed = entity.getHealth() - before;
 				parts.add(healed >= 0.5F
 						? Component.translatable(PREFIX + "pill.part.heal", Msg.number(healed + 1.0E-4D))
 						: Component.translatable(PREFIX + "pill.part.health_full"));
-				shortenDeviation(entity, data, PillKind.HEALING_DEVIATION * m, quality == PillQuality.PERFECT, parts);
+				shortenDeviation(entity, data, PillKind.HEALING_DEVIATION * e, quality == PillQuality.PERFECT, parts);
 			}
 			case SOUL_NURTURING -> xpPart(entity, Math.min(bar * PillKind.SOUL_NURTURING_XP, PillKind.SOUL_NURTURING_MAX_XP) * m, parts);
 			case IMMORTAL -> {
@@ -689,9 +731,14 @@ public final class DiscipleCultivation {
 
 	// ================================================================== teaching
 
-	/** Qi the master pays to teach: 20% of their max qi. */
+	/** Qi the master pays to teach before the hooks: 20% of their max qi. */
 	public static double teachCost(ServerPlayer master) {
 		return Qi.max(Cultivators.get(master)) * TEACH_COST;
+	}
+
+	/** Qi the master pays to teach {@code technique} to this disciple: 20% of max qi x the teachCostFactor hooks. */
+	public static double teachCost(DiscipleEntity entity, ServerPlayer master, Technique technique) {
+		return teachCost(master) * DiscipleHooks.teachCostFactor(entity, master, technique);
 	}
 
 	/** Why {@code technique} cannot be taught now (a {@code why.*} key), or null when it can. */
@@ -710,16 +757,21 @@ public final class DiscipleCultivation {
 			return PREFIX + "why.realm";
 		}
 		Dao dao = technique.dao();
-		if (dao != null && data.dao() == null) {
+		boolean anyDao = dao != null && DiscipleHooks.daoBypass(data);
+		if (dao != null && data.dao() == null && !anyDao) {
 			return PREFIX + "why.no_dao";
 		}
-		if (dao != null && dao != data.dao()) {
+		if (dao != null && dao != data.dao() && !anyDao) {
 			return PREFIX + "why.other_dao";
 		}
 		if (data.breakingThrough()) {
 			return PREFIX + "why.busy";
 		}
-		if (Cultivators.get(master).qi() + 1.0E-6D < teachCost(master)) {
+		String hook = DiscipleHooks.teachBlocker(entity, master, technique);
+		if (hook != null) {
+			return hook;
+		}
+		if (Cultivators.get(master).qi() + 1.0E-6D < teachCost(entity, master, technique)) {
 			return PREFIX + "why.qi";
 		}
 		return null;
@@ -731,12 +783,17 @@ public final class DiscipleCultivation {
 	 */
 	public static boolean teach(DiscipleEntity entity, ServerPlayer master, Technique technique) {
 		String why = teachBlocker(entity, master, technique);
-		double cost = teachCost(master);
+		double cost = teachCost(entity, master, technique);
 		if (why == null && !Qi.trySpend(master, cost)) {
 			why = PREFIX + "why.qi";
 		}
 		Component name = name(entity);
 		MutableComponent techniqueName = technique.displayName().copy().withColor(GOLD);
+		if (why != null && !why.startsWith(PREFIX + "why.")) {
+			// A phase-6 module refused (DiscipleHooks.addTeachBlocker): its key gets the name and the technique.
+			Msg.chat(master, Component.translatable(why, name, techniqueName).withColor(REFUSE));
+			return false;
+		}
 		if (why != null) {
 			DiscipleData data = entity.data();
 			Dao dao = technique.dao();
@@ -774,6 +831,7 @@ public final class DiscipleCultivation {
 		Msg.chat(master, Component.translatable(PREFIX + "teach.success", techniqueName, name, Msg.number(Math.ceil(cost)),
 				technique.description().copy().withColor(MUTED)).withColor(JADE));
 		Advancements.grant(master, "disciple_taught");
+		DiscipleHooks.onTaught(entity, master, technique);
 		return true;
 	}
 
@@ -798,6 +856,10 @@ public final class DiscipleCultivation {
 		if (data.deviating()) {
 			return PREFIX + "why.bt_deviation";
 		}
+		String hook = DiscipleHooks.breakthroughBlocker(entity);
+		if (hook != null) {
+			return hook;
+		}
 		if (master == null) {
 			return PREFIX + "why.bt_offline";
 		}
@@ -817,6 +879,11 @@ public final class DiscipleCultivation {
 	 */
 	public static boolean startBreakthrough(DiscipleEntity entity, ServerPlayer master) {
 		String why = breakthroughBlocker(entity, master);
+		if (why != null && !why.startsWith(PREFIX + "why.")) {
+			// A phase-6 module refused (DiscipleHooks.addBreakthroughBlocker).
+			Msg.chat(master, Component.translatable(why, name(entity)).withColor(REFUSE));
+			return false;
+		}
 		if (why != null || !(entity.level() instanceof ServerLevel level)) {
 			DiscipleData data = entity.data();
 			Rank rank = data.rank();
@@ -925,8 +992,8 @@ public final class DiscipleCultivation {
 		tag.putBoolean("breaking_through", data.breakingThrough());
 		tag.putBoolean("deviating", data.deviating());
 		tag.putInt("deviation_seconds", (data.deviationTicks() + 19) / 20);
-		tag.putDouble("xp_multiplier", xpMultiplier(data, XpSource.MEDITATION));
-		tag.putDouble("meditation_rate", meditationBase(entity, data) * xpMultiplier(data, XpSource.MEDITATION));
+		tag.putDouble("xp_multiplier", xpMultiplier(entity, data, XpSource.MEDITATION));
+		tag.putDouble("meditation_rate", meditationBase(entity, data) * xpMultiplier(entity, data, XpSource.MEDITATION));
 		tag.putDouble("power", DiscipleTechniques.power(data));
 		tag.putFloat("health", entity.getHealth());
 		tag.putFloat("max_health", entity.getMaxHealth());
@@ -955,7 +1022,7 @@ public final class DiscipleCultivation {
 			Rank next = peak.next();
 			tag.putString("breakthrough_kind", kindId);
 			tag.putString("breakthrough_kind_key", PREFIX + "kind." + kindId);
-			tag.putDouble("breakthrough_chance", kind == DiscipleBreakthrough.Kind.GATHERING ? DiscipleBreakthrough.chance(data) : 1.0D);
+			tag.putDouble("breakthrough_chance", kind == DiscipleBreakthrough.Kind.GATHERING ? DiscipleBreakthrough.chance(entity, data) : 1.0D);
 			tag.putInt("breakthrough_strikes", kind == DiscipleBreakthrough.Kind.TRIBULATION ? DiscipleBreakthrough.strikeCount(next) : 0);
 			tag.putDouble("breakthrough_strike_share", DiscipleBreakthrough.strikeShare(data));
 			tag.putInt("next_realm", next.realm().ordinal());
@@ -991,6 +1058,7 @@ public final class DiscipleCultivation {
 			entry.putInt("dao", technique.dao() == null ? -1 : technique.dao().ordinal());
 			entry.putDouble("qi_cost", DiscipleTechniques.qiCost(technique));
 			entry.putInt("cooldown", technique.cooldownTicks());
+			entry.putDouble("teach_cost", teachCost(entity, master, technique));
 			teachable.add(entry);
 		}
 		tag.put("teachable", teachable);
@@ -1013,6 +1081,7 @@ public final class DiscipleCultivation {
 		tag.putString("pill_item", hand.isEmpty() ? "" : BuiltInRegistries.ITEM.getKey(hand.getItem()).toString());
 		tag.putInt("pill_cooldown", choice == null ? 0 : data.pillCooldownLeft(choice.key()));
 		tag.putInt("pill_cooldown_max", PILL_COOLDOWN);
+		DiscipleHooks.info(entity, master, tag);
 		return tag;
 	}
 

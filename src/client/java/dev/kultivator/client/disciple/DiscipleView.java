@@ -35,7 +35,8 @@ import java.util.Set;
  */
 final class DiscipleView {
 
-	static final String[] MODES = {"follow", "stay", "meditate", "assist"};
+	/** The order ids of {@code DiscipleEntity.Mode}; guard_hall is the Sect Hall protector's patrol (DESIGN 20.2.5). */
+	static final String[] MODES = {"follow", "stay", "meditate", "assist", "guard_hall"};
 
 	/**
 	 * One of the master's techniques: whether it can be taught now, whether the disciple knows it, why not, and the

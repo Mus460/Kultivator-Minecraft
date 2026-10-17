@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sect_gate_open",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.immortal_token.description"
+    },
+    "icon": {
+      "id": "kultivator:immortal_ascension_token"
+    },
+    "title": {
+      "translate": "advancement.kultivator.immortal_token.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

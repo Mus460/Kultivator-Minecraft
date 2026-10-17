@@ -25,5 +25,5 @@
   "kultivator.test.disciple.tour": "Realm tour for %s: %s realms, %s seconds each. Their real cultivation comes back at the end.",
   "kultivator.test.disciple.tour_step": "%s: %s (%s / %s)",
   "kultivator.test.disciple.tour_end": "The realm tour of %s is over; their own cultivation is back.",
-  "kultivator.test.help.murid": "/kultivasi uji murid <name|semua> maks | ranah <realm> [stage] [layer] | tur [seconds] | teknik — the same tests for your disciples, by name."
+  "kultivator.test.help.murid": "/kultivasi uji murid <name|semua> maks | ranah <realm> [stage] [layer] | tur [seconds] | teknik | bintang <n> — the same tests for your disciples, by name."
 }

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:heir_named",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.master_in_ring.description"
+    },
+    "icon": {
+      "id": "kultivator:master_soul_ring"
+    },
+    "title": {
+      "translate": "advancement.kultivator.master_in_ring.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

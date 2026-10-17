@@ -205,7 +205,23 @@ public final class TestCommands {
 								.then(Commands.literal("tur")
 										.executes(ctx -> discipleTour(ctx, 6))
 										.then(Commands.argument("seconds", IntegerArgumentType.integer(2, 60))
-												.executes(ctx -> discipleTour(ctx, IntegerArgumentType.getInteger(ctx, "seconds"))))))));
+												.executes(ctx -> discipleTour(ctx, IntegerArgumentType.getInteger(ctx, "seconds")))))
+								// DESIGN 20.0 (phase 6, module D): the Bintang Abadi star tier.
+								.then(Commands.literal("bintang")
+										.then(Commands.argument("n", IntegerArgumentType.integer(0, 100000))
+												.executes(ctx -> discipleStars(ctx, IntegerArgumentType.getInteger(ctx, "n"))))))));
+	}
+
+	/** Sets the Bintang Abadi star tier through module D's API (True Immortal Peak first, calamities below it passed). */
+	private static int discipleStars(CommandContext<CommandSourceStack> ctx, int stars) throws CommandSyntaxException {
+		ServerPlayer player = self(ctx);
+		List<DiscipleEntity> found = targets(ctx);
+		for (DiscipleEntity disciple : found) {
+			dev.kultivator.disciple.path.DisciplePaths.setStars(disciple, stars);
+			Msg.chat(player, Component.translatable("kultivator.dpath.test.stars", disciple.getName(), stars,
+					dev.kultivator.disciple.path.StarTitles.title(stars)).withStyle(ChatFormatting.GOLD));
+		}
+		return found.size();
 	}
 
 	private static ServerPlayer self(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -587,7 +603,13 @@ public final class TestCommands {
 	private static void give(ServerPlayer player, List<ItemStack> stacks) {
 		for (ItemStack stack : stacks) {
 			if (!player.getInventory().add(stack) && !stack.isEmpty()) {
-				player.spawnAtLocation(player.level(), stack);
+				// Block-safe like every item the mod drops: no portal travel, no plates.
+				net.minecraft.world.entity.item.ItemEntity item = new net.minecraft.world.entity.item.ItemEntity(player.level(), player.getX(),
+						player.getY() + 0.5D, player.getZ(), stack);
+				item.setDefaultPickUpDelay();
+				item.addTag(dev.kultivator.util.NoGrief.TAG);
+				item.setPortalCooldown();
+				player.level().addFreshEntity(item);
 			}
 		}
 	}

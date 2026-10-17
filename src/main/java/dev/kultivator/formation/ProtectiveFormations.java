@@ -9,6 +9,7 @@ import dev.kultivator.KultivatorConfig;
 import dev.kultivator.beast.SpiritBeasts;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
+import dev.kultivator.sect.hall.GrandFormation;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
@@ -33,6 +34,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -112,14 +115,18 @@ public final class ProtectiveFormations {
 				.then(Commands.literal("clear").executes(ProtectiveFormations::clearCommand)));
 	}
 
-	/** True when {@code pos} lies inside a switched-on, powered formation of {@code level} (for other modules). */
+	/**
+	 * True when {@code pos} lies inside a switched-on, powered (or guarded) formation of {@code level} (for other modules).
+	 * A Formasi Agung Sekte counts with its larger radius (DESIGN 20.3.2).
+	 */
 	public static boolean insideActiveFormation(ServerLevel level, Vec3 pos) {
 		FormationData data = FormationData.get(level);
 		if (data.isEmpty()) {
 			return false;
 		}
 		for (Formation formation : data.all()) {
-			if (formation.active() && formation.power() > 0 && Vec3.atCenterOf(formation.pos()).distanceToSqr(pos) <= RADIUS * RADIUS) {
+			double radius = GrandFormation.radius(formation);
+			if (formation.active() && Vec3.atCenterOf(formation.pos()).distanceToSqr(pos) <= radius * radius) {
 				return true;
 			}
 		}
@@ -343,27 +350,36 @@ public final class ProtectiveFormations {
 			switchOff(level, data, formation, "kultivator.formations.server_disabled");
 			return;
 		}
-		if (formation.power() <= 0) {
+		// Formasi Agung Sekte (DESIGN 20.3.2): a larger radius, restriction layers, and no drain while a guard sits by it.
+		GrandFormation.State grand = GrandFormation.state(level, formation, tick);
+		if (formation.power() <= 0 && !grand.guarded()) {
 			switchOff(level, data, formation, "kultivator.formations.power_out");
 			return;
 		}
-		repel(level, data, formation, tick % 20 == 0);
-		formation.setPower(formation.power() - PULSE);
-		data.setDirty();
-		if (formation.power() <= 0) {
-			switchOff(level, data, formation, "kultivator.formations.power_out");
-			return;
+		repel(level, data, formation, tick % 20 == 0, grand);
+		if (!grand.guarded()) {
+			formation.setPower(formation.power() - PULSE);
+			data.setDirty();
+			if (formation.power() <= 0) {
+				switchOff(level, data, formation, "kultivator.formations.power_out");
+				return;
+			}
 		}
 		if (tick % FX_INTERVAL == 0) {
 			sendDome(level, formation, 1, 0);
 		}
 	}
 
-	/** Pushes every intruder outwards (stronger near the centre); every second also 1 magic damage. */
-	private static void repel(ServerLevel level, FormationData data, Formation formation, boolean hurt) {
+	/**
+	 * Pushes every intruder outwards (stronger near the centre); every second also 1 magic damage. A Formasi Agung Sekte
+	 * adds its restriction layers: Slowness II inside (layer 2), Slowness V for 3 s on crossing the edge (layer 3), 2
+	 * damage per second (layer 4), times its Pelindung factor (DESIGN 20.3.2). Effects only, never a block.
+	 */
+	private static void repel(ServerLevel level, FormationData data, Formation formation, boolean hurt, GrandFormation.State grand) {
 		Vec3 centre = Vec3.atCenterOf(formation.pos());
-		double radiusSq = RADIUS * RADIUS;
-		List<Mob> intruders = level.getEntitiesOfClass(Mob.class, new AABB(centre, centre).inflate(RADIUS),
+		double radius = grand.radius();
+		double radiusSq = radius * radius;
+		List<Mob> intruders = level.getEntitiesOfClass(Mob.class, new AABB(centre, centre).inflate(radius),
 				mob -> isIntruder(mob, centre, radiusSq));
 		if (intruders.isEmpty()) {
 			return;
@@ -371,22 +387,31 @@ public final class ProtectiveFormations {
 		long now = level.getGameTime();
 		int counted = 0;
 		int ripples = 0;
+		int layers = grand.grand() ? grand.layers() : 1;
+		float damage = (float) ((layers >= GrandFormation.HARD_LAYER ? 2.0D : 1.0D) * grand.damageFactor());
 		for (Mob mob : intruders) {
-			push(mob, centre);
-			if (formation.notePush(mob.getId(), now, REPEL_MEMORY)) {
+			push(mob, centre, radius);
+			boolean fresh = formation.notePush(mob.getId(), now, REPEL_MEMORY);
+			if (fresh) {
 				counted++;
 				sound(level, mob.position(), SoundEvents.AMETHYST_BLOCK_RESONATE, 0.6F, 1.6F);
+				if (layers >= GrandFormation.EDGE_LAYER) {
+					mob.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 4, false, true, true));
+				}
+			}
+			if (layers >= GrandFormation.SLOW_LAYER) {
+				mob.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 30, 1, false, true, true));
 			}
 			if (ripples < MAX_RIPPLES_PER_PULSE) {
 				ripples++;
 				Vec3 at = mob.getBoundingBox().getCenter();
 				for (ServerPlayer viewer : PlayerLookup.around(level, centre, FX_RANGE)) {
-					Fx.sendTo(viewer, at, centre, FxType.PROTECTIVE_FORMATION, 4, 0, (float) RADIUS);
+					Fx.sendTo(viewer, at, centre, FxType.PROTECTIVE_FORMATION, 4, 0, (float) radius);
 				}
 			}
 			// Never a silverfish: magic damage makes it call its friends out of infested blocks (broken or replaced).
 			if (hurt && mob.isAlive() && !(mob instanceof Silverfish)) {
-				mob.hurtServer(level, level.damageSources().magic(), 1.0F);
+				mob.hurtServer(level, level.damageSources().magic(), damage);
 			}
 		}
 		if (counted > 0) {
@@ -429,7 +454,7 @@ public final class ProtectiveFormations {
 	 * the leaves it runs into). The mob gets a portal cooldown, so a push into a portal near the lodestone never sends it
 	 * through (that could build an exit portal or the End platform).
 	 */
-	private static void push(Mob mob, Vec3 centre) {
+	private static void push(Mob mob, Vec3 centre, double radius) {
 		if (mob.isPassenger() || mob instanceof Ravager) {
 			return;
 		}
@@ -443,7 +468,7 @@ public final class ProtectiveFormations {
 			dz = Math.sin(angle);
 			horizontal = 1.0D;
 		}
-		double closeness = 1.0D - Math.min(1.0D, Math.sqrt(mob.distanceToSqr(centre)) / RADIUS);
+		double closeness = 1.0D - Math.min(1.0D, Math.sqrt(mob.distanceToSqr(centre)) / radius);
 		double resistance = Mth.clamp(mob.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 0.0D, 1.0D);
 		double power = (0.45D + 0.85D * closeness) * (1.0D - 0.6D * resistance);
 		Vec3 motion = mob.getDeltaMovement();
@@ -479,11 +504,18 @@ public final class ProtectiveFormations {
 		}
 	}
 
-	/** The dome effect for players within {@link #FX_RANGE}: state 1 on / 0 off, flourish 1 switched on / 2 charged. */
+	/**
+	 * The dome effect for players within {@link #FX_RANGE}: state 1 on / 0 off, flourish 1 switched on / 2 charged. For a
+	 * Formasi Agung Sekte {@code b} also carries its layers (bits 4-7) and, for its owner, bit 8 (the owner sees the
+	 * monsters inside outlined at layer 4); {@code f} is its radius.
+	 */
 	private static void sendDome(ServerLevel level, Formation formation, int state, int flourish) {
 		Vec3 centre = Vec3.atCenterOf(formation.pos());
+		GrandFormation.State grand = GrandFormation.state(level, formation, level.getServer().getTickCount());
+		int layers = grand.grand() ? grand.layers() << 4 : 0;
 		for (ServerPlayer viewer : PlayerLookup.around(level, centre, FX_RANGE)) {
-			Fx.sendTo(viewer, centre, centre, FxType.PROTECTIVE_FORMATION, state, flourish, (float) RADIUS);
+			int b = flourish | layers | (grand.grand() && formation.isOwner(viewer) ? 1 << 8 : 0);
+			Fx.sendTo(viewer, centre, centre, FxType.PROTECTIVE_FORMATION, state, b, (float) grand.radius());
 		}
 	}
 

@@ -1,12 +1,12 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    "minecraft:paper",
     "minecraft:gold_ingot",
+    "minecraft:echo_shard",
     "minecraft:amethyst_shard",
-    "minecraft:ink_sac"
+    "minecraft:ender_pearl"
   ],
   "result": {
-    "id": "kultivator:recruitment_scroll"
+    "id": "kultivator:master_soul_ring"
   }
 }

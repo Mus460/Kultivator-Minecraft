@@ -2,9 +2,12 @@ package dev.kultivator.client.disciple;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.disciple.power.DutyPoses;
+import dev.kultivator.client.disciple.power.PhysiqueVisuals;
 import dev.kultivator.client.render.CultivatorModels;
 import dev.kultivator.client.render.MeditationPose;
 import dev.kultivator.data.Realm;
+import dev.kultivator.disciple.DiscipleEntity;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -21,16 +24,21 @@ import net.minecraft.util.Mth;
 
 /**
  * A disciple's robe from Qi Refining: the cultivator robe model layers ({@link CultivatorModels#ROBE}) wearing the
- * greyscale robe texture tinted with its Dao colour (realm colour before a Dao), gold trims from Golden Core and the
- * embroidered emblem from Nascent Soul. The robe is a PlayerModel, so the meditation pose folds it with the body.
+ * greyscale robe texture tinted with its Dao colour (realm colour before a Dao), trims in its sect rank's colour (phase 6;
+ * rivals, phantoms and clones keep the gold trims from Golden Core) and the embroidered emblem from Nascent Soul. The robe
+ * is a PlayerModel, so the meditation pose and the duty poses fold it with the body; see-through bodies wear a
+ * see-through robe.
  */
 public class DiscipleRobeLayer extends RenderLayer<DiscipleRenderState, PlayerModel> {
 
 	private static final Identifier BASE = Kultivator.id("textures/entity/robe_base.png");
 	private static final Identifier TRIM = Kultivator.id("textures/entity/robe_trim.png");
 	private static final Identifier EMBLEM = Kultivator.id("textures/entity/robe_emblem.png");
+	/** The trims in greyscale, tinted with the sect rank's colour (module C, DESIGN 20.3.6). */
+	private static final Identifier RANK_TRIM = Kultivator.id("textures/entity/robe_rank_trim.png");
 	private static final RenderType BASE_TYPE = RenderTypes.entityTranslucent(BASE);
 	private static final RenderType TRIM_TYPE = RenderTypes.entityTranslucent(TRIM);
+	private static final RenderType RANK_TRIM_TYPE = RenderTypes.entityTranslucent(RANK_TRIM);
 	private static final RenderType EMBLEM_TYPE = RenderTypes.entityTranslucent(EMBLEM);
 	private static final int CLOTH_ALPHA = 242;
 	/** Name of the skirt part inside the robe model layers. */
@@ -53,13 +61,19 @@ public class DiscipleRobeLayer extends RenderLayer<DiscipleRenderState, PlayerMo
 		}
 		RobeModel model = state.slim ? slim : wide;
 		int overlay = LivingEntityRenderer.getOverlayCoords(state, 0.0F);
-		int cloth = ARGB.color(CLOTH_ALPHA, state.robeColor & 0xFFFFFF);
+		int alpha = PhysiqueVisuals.clothAlpha(state, CLOTH_ALPHA);
+		int cloth = ARGB.color(alpha, state.robeColor & 0xFFFFFF);
+		int plain = PhysiqueVisuals.translucent(state) ? ARGB.color(alpha, 0xFFFFFF) : -1;
 		submitNodeCollector.submitModel(model, state, poseStack, BASE_TYPE, lightCoords, overlay, cloth, null, state.outlineColor);
-		if (state.realm >= Realm.GOLDEN_CORE.ordinal()) {
-			submitNodeCollector.order(1).submitModel(model, state, poseStack, TRIM_TYPE, lightCoords, overlay, -1, null, state.outlineColor);
+		if (state.role == DiscipleEntity.Role.DISCIPLE.ordinal()) {
+			// The trims in the colour of its sect rank (grey Tercatat ... white-gold Tetua Agung).
+			int trim = ARGB.color(PhysiqueVisuals.translucent(state) ? alpha : 255, PhysiqueVisuals.trimColor(state));
+			submitNodeCollector.order(1).submitModel(model, state, poseStack, RANK_TRIM_TYPE, lightCoords, overlay, trim, null, state.outlineColor);
+		} else if (state.realm >= Realm.GOLDEN_CORE.ordinal()) {
+			submitNodeCollector.order(1).submitModel(model, state, poseStack, TRIM_TYPE, lightCoords, overlay, plain, null, state.outlineColor);
 		}
 		if (state.realm >= Realm.NASCENT_SOUL.ordinal()) {
-			submitNodeCollector.order(2).submitModel(model, state, poseStack, EMBLEM_TYPE, lightCoords, overlay, -1, null, state.outlineColor);
+			submitNodeCollector.order(2).submitModel(model, state, poseStack, EMBLEM_TYPE, lightCoords, overlay, plain, null, state.outlineColor);
 		}
 	}
 
@@ -79,6 +93,8 @@ public class DiscipleRobeLayer extends RenderLayer<DiscipleRenderState, PlayerMo
 		@Override
 		public void setupAnim(AvatarRenderState state) {
 			super.setupAnim(state);
+			// Phase 6: the robe follows the duty poses of the body (module C).
+			DutyPoses.apply(this, state);
 			this.hat.visible = false;
 			this.jacket.visible = true;
 			this.leftSleeve.visible = true;

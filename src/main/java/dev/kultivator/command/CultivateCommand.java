@@ -118,6 +118,12 @@ public final class CultivateCommand {
 		Alchemy.addCommands(root, debug);
 		Ascension.addCommands(root, debug);
 		dev.kultivator.disciple.Disciples.addCommands(root, debug);
+		// Phase 6 (DESIGN 20.2.12).
+		dev.kultivator.sect.hall.Halls.addCommands(root, debug);
+		dev.kultivator.sect.event.SectEvents.addCommands(root, debug);
+		dev.kultivator.disciple.power.DisciplePowers.addCommands(root, debug);
+		dev.kultivator.disciple.path.DisciplePaths.addCommands(root, debug);
+		dev.kultivator.kehancuran.Kehancuran.addCommands(root, debug);
 
 		TestCommands.addCommands(root);
 		root.then(debug);

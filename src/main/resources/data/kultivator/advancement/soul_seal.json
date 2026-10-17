@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_disciple",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.soul_seal.description"
+    },
+    "icon": {
+      "id": "kultivator:soul_seal_jade"
+    },
+    "title": {
+      "translate": "advancement.kultivator.soul_seal.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}
