@@ -46,8 +46,9 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi).
 | 2 | Akar spiritual, Jalan Dao, teknik, kitab teknik | ✅ |
 | 3 | Iblis Hati, binatang roh, formasi pelindung, sekte | ✅ |
 | 4 | Visual mewah, alkimia, Pengakuan Langit (event Dewa Abadi), pencapaian akhir, panduan pemain | ✅ |
-| 5 | Murid: bot pengikut yang diajari teknik dan ikut berkultivasi | ⏳ |
-| 6 | Pengayaan & penyempurnaan fitur | ⏳ |
+| 5 | Murid: bot pengikut yang diajari teknik dan ikut berkultivasi, perintah uji | ✅ |
+| 6 | Sekte Abadi & murid OP (Aula Sekte, Bintang Abadi, Mode Kehancuran) | ⏳ |
+| 7 | Dunia yang Hidup (monster elite, batu roh, jimat, herba) | ⏳ |
 
 ## Perintah singkat
 

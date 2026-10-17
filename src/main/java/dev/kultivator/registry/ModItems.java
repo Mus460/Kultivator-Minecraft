@@ -39,6 +39,11 @@ public final class ModItems {
 		return item;
 	}
 
+	/** Every item of the mod, in registration order (test kits). */
+	public static List<Item> all() {
+		return List.copyOf(TAB_ITEMS);
+	}
+
 	/** Called once by the spine after every module registered its items. */
 	public static void init() {
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TAB_KEY, FabricCreativeModeTab.builder()

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:paper",
+    "minecraft:gold_ingot",
+    "minecraft:amethyst_shard",
+    "minecraft:ink_sac"
+  ],
+  "result": {
+    "id": "kultivator:recruitment_scroll"
+  }
+}
