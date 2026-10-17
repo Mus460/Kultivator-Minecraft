@@ -629,9 +629,10 @@ public final class DaoTechniques {
 		sound(player, player.position(), SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.2F, 0.7F);
 		sound(player, player.position(), SoundEvents.ANVIL_LAND, 0.6F, 0.5F);
 		for (LivingEntity target : hits) {
-			strike(player, target, power * 2.0D);
+			boolean landed = strike(player, target, power * 2.0D);
 			if (target.isAlive()) {
-				if (throwing && !(target instanceof Ravager)) {
+				// Only a blow that landed throws: a refused one (a duel's decisive blow) must not launch into a deadly fall.
+				if (landed && throwing && !(target instanceof Ravager)) {
 					Vec3 away = target.position().subtract(player.position()).horizontal();
 					Vec3 push = away.lengthSqr() < 1.0E-4D ? Vec3.ZERO : away.normalize().scale(0.35D);
 					launch(target, new Vec3(push.x, 0.9D, push.z));
@@ -1077,11 +1078,12 @@ public final class DaoTechniques {
 		return player.level().getGameTime();
 	}
 
-	/** Technique damage (Techniques.hurt checks the target again and is not swallowed by the short hurt cooldown). */
-	private static void strike(ServerPlayer player, LivingEntity target, double amount) {
-		if (amount > 0.0D && target.isAlive()) {
-			Techniques.hurt(player, target, (float) amount);
-		}
+	/**
+	 * Technique damage (Techniques.hurt checks the target again and is not swallowed by the short hurt cooldown). True
+	 * when the hit landed (false when it was refused, e.g. the decisive blow of a sparring duel).
+	 */
+	private static boolean strike(ServerPlayer player, LivingEntity target, double amount) {
+		return amount > 0.0D && target.isAlive() && Techniques.hurt(player, target, (float) amount);
 	}
 
 	private static boolean valid(ServerPlayer player, @Nullable LivingEntity target) {

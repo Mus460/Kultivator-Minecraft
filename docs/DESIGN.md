@@ -357,7 +357,8 @@ src/main/java/dev/kultivator/
   data/Realm.java Rank.java Element.java RootGrade.java Dao.java Technique.java BreakthroughQuality.java
   data/CultivationData.java       ALL per-player persistent fields (+ NBT read/write with defaults)
   data/VisualState.java           synced record for other clients' rendering
-  data/ModAttachments.java        CULTIVATION (player), VISUAL (player, synced), SPIRIT_BEAST (animal, phase 3)
+  data/ModAttachments.java        CULTIVATION (player), VISUAL (player, synced); the animal attachment
+                                  kultivator:spirit_beast is registered by beast/BeastData.TYPE (phase 3), not here
   data/Cultivators.java           get(player) / dirty(player) / refreshVisual(player) / sync helpers
   network/Payloads.java           SyncSelf (S2C), Action (C2S), Fx (S2C), OrePings (S2C), Notify (S2C)
   network/Net.java                registration, sending, Action dispatch → module handlers
@@ -531,3 +532,29 @@ per-player tick calls `HeartDemons.tick`, `SpiritBeasts.tick`; `KultivatorClient
 * **P3-sects** owns `sect/*`, `client/fx/SectFx.java`, `lang-src/sects.*`; global SavedData on the overworld; commands
   `/sect` and `/sekte`; sets `Targeting.sparring`; may change the single XP line in `Meditation` to multiply by
   `Sects.meditationBonus(player)` (1.15 near a sect mate, else 1.0).
+
+## 17. Phase 4 contracts
+
+Spine additions made before phase 4 starts: `Kultivator.onInitialize` calls `alchemy.Alchemy.init()` and
+`ascension.Ascension.init()` (before `ModItems.init()`), the per-player tick calls `Ascension.tick`; `KultivatorClient`
+calls `client.render.CultivatorRender.init()`.
+
+* **P4-visuals** owns `client/render/*` except `MeditationPose.java` (new: `CultivatorRender.init()` registering player
+  render layers through `LivingEntityRenderLayerRegistrationCallback` for the player renderer), `client/fx/AuraFx.java`
+  (takes it over from phase 1), generated textures under `assets/kultivator/textures/entity/` and `textures/misc/`,
+  `lang-src/visuals.*`. Layers, all driven by the synced `VisualState` (and its SHOW_* cosmetic flags) and scaled by
+  `EffectQuality`: robe (Jubah: an inflated player-model overlay with a generated robe texture tinted by the Dao colour,
+  realm trims), sword on the back (`swordItem`, rendered as an item diagonally across the back, hidden while flying or
+  holding that sword), glowing eyes (emissive eyes layer, Nascent Soul+, colour by Dao/realm), Dao circle (a rotating
+  rune ring quad under the feet while meditating, casting a domain or breaking through; translucent emissive, quality
+  decides segment count), the flying sword drawn as the real sword item lying flat under the feet while FLYING_SWORD,
+  Dharma form golden outline glow, and a richer per-realm aura (AuraFx). First-person view stays clean.
+* **P4-alchemy** owns `alchemy/*`, `client/fx/AlchemyFx.java`, the pill items it adds (items/models/textures), the data
+  component `kultivator:pill_quality` (registered in `alchemy/AlchemyComponents`), `lang-src/alchemy.*`. Furnace = any
+  cauldron on a lit campfire / soul campfire (read-only check); pots in SavedData; recipe table in code; quality grades;
+  alchemy XP in `CultivationData.alchemyXp`; pill effects per DESIGN 9.
+* **P4-final** owns `ascension/*`, `client/fx/AscensionFx.java`, `lang-src/ascension.*`, the final advancements, the
+  user guide `docs/PANDUAN.md` (Indonesian) and README updates. When a player reaches True Immortal and has not ascended
+  yet, the ascension event runs (heavens open, golden pillar, celestial sounds, server-wide announcement, rainbow aura via
+  `data.setAscended(true)` and the ASCENDED visual flag, an immortal gift: immunity to Qi Deviation and slow constant
+  regeneration).

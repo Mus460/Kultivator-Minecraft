@@ -1,5 +1,6 @@
 package dev.kultivator.util;
 
+import dev.kultivator.beast.SpiritBeasts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,6 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.monster.creaking.Creaking;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
@@ -42,10 +44,16 @@ public final class Targeting {
 		EXCLUSIONS.add(exclusion);
 	}
 
-	/** True when a technique of {@code caster} may hurt {@code target}. */
+	/**
+	 * True when a technique of {@code caster} may hurt {@code target}. Never a creaking bound to a creaking heart: hurt by
+	 * a player (or their tamed wolf), its heart grows resin blocks.
+	 */
 	public static boolean isHostileTo(Entity entity, ServerPlayer caster) {
 		if (!(entity instanceof LivingEntity target) || target == caster || !target.isAlive() || target.isSpectator()
 				|| target.isInvulnerable()) {
+			return false;
+		}
+		if (target instanceof Creaking creaking && creaking.isHeartBound()) {
 			return false;
 		}
 		for (BiPredicate<ServerPlayer, Entity> exclusion : EXCLUSIONS) {
@@ -76,11 +84,12 @@ public final class Targeting {
 		return list;
 	}
 
-	/** Friendly living things near the caster that healing may touch: the caster, other players, and tamed pets. */
+	/** Friendly living things near the caster that healing may touch: the caster, other players, tamed pets, spirit beasts. */
 	public static List<LivingEntity> alliesAround(ServerPlayer caster, double radius) {
 		AABB box = caster.getBoundingBox().inflate(radius);
 		return caster.level().getEntitiesOfClass(LivingEntity.class, box, entity -> entity.isAlive()
-				&& (entity instanceof Player || entity instanceof OwnableEntity ownable && ownable.getOwnerReference() != null)
+				&& (entity instanceof Player || entity instanceof OwnableEntity ownable && ownable.getOwnerReference() != null
+						|| SpiritBeasts.isSpiritBeast(entity))
 				&& !isHostileTo(entity, caster));
 	}
 
@@ -137,8 +146,8 @@ public final class Targeting {
 
 	/**
 	 * A spot where {@code entity} can stand at or near {@code target}: free of blocks for its box, standing on something
-	 * solid, with nothing harmful in it (fire, powder snow, cobweb, berry bush, wither rose, cactus) or underfoot (magma,
-	 * a lit campfire, cactus, pointed dripstone). Searches a few blocks up and down. Null when there is none. Read-only.
+	 * solid, with nothing harmful in it (fire, powder snow, cobweb, berry bush, wither rose, cactus, and portals: travel
+	 * could build an exit portal or the End platform) or underfoot (magma, a lit campfire, cactus, pointed dripstone). Searches a few blocks up and down. Null when there is none. Read-only.
 	 */
 	public static @Nullable Vec3 safeSpot(ServerLevel level, Entity entity, Vec3 target) {
 		BlockPos base = BlockPos.containing(target);
@@ -159,10 +168,14 @@ public final class Targeting {
 		return null;
 	}
 
-	/** Blocks that hurt or trap whoever stands inside them (a lit campfire burns even when stepped into). */
+	/**
+	 * Blocks that hurt or trap whoever stands inside them (a lit campfire burns even when stepped into), and portals
+	 * (an entity put inside one could travel and build blocks on the other side).
+	 */
 	private static boolean hazard(BlockState state) {
 		return state.is(BlockTags.FIRE) || state.is(Blocks.POWDER_SNOW) || state.is(Blocks.SWEET_BERRY_BUSH) || state.is(Blocks.COBWEB)
-				|| state.is(Blocks.WITHER_ROSE) || state.is(Blocks.CACTUS) || CampfireBlock.isLitCampfire(state);
+				|| state.is(Blocks.WITHER_ROSE) || state.is(Blocks.CACTUS) || CampfireBlock.isLitCampfire(state)
+				|| state.is(Blocks.NETHER_PORTAL) || state.is(Blocks.END_PORTAL) || state.is(Blocks.END_GATEWAY);
 	}
 
 	/** Blocks that hurt whoever stands on them. */

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.spirit_beast.description"
+    },
+    "icon": {
+      "id": "kultivator:spirit_beast_pill"
+    },
+    "title": {
+      "translate": "advancement.kultivator.spirit_beast.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

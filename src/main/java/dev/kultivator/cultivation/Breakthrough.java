@@ -14,6 +14,8 @@ import dev.kultivator.data.Rank;
 import dev.kultivator.data.Realm;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
+import dev.kultivator.sect.Sparring;
+import dev.kultivator.trial.HeartDemons;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -165,6 +167,13 @@ public final class Breakthrough {
 		}
 		if (isBusy(player) || data.breakingThrough()) {
 			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.busy"));
+		}
+		if (Sparring.inDuel(player)) {
+			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.sparring"));
+		}
+		if (HeartDemons.inTrial(player)) {
+			// A pressure Heart Demon is still fighting: it must be faced first.
+			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.heart_demon"));
 		}
 		if (data.deviating()) {
 			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.deviation",

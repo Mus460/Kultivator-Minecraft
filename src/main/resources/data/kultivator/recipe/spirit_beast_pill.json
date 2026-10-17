@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:bone",
+    "minecraft:glow_berries",
+    "minecraft:amethyst_shard",
+    "minecraft:golden_carrot"
+  ],
+  "result": {
+    "id": "kultivator:spirit_beast_pill"
+  }
+}
