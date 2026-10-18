@@ -58,6 +58,10 @@ public final class Actions {
 	/** Mode Kehancuran locks and casts ({@code kehancuran.Kehancuran.handleAction}). */
 	public static final int KEHANCURAN = 34;
 
+	// Phase 6b (DESIGN 21.24): arg = the sub-op, text = "op[:param]" ("preview:<t>:<rot>:<glaze>", "deposit:<slot>", ...).
+	/** Pembangunan Sekte: templates, preview, confirm, deposits, missions, builders ({@code sect.build.SectBuild.handleAction}). */
+	public static final int SECT_BUILD = 35;
+
 	private Actions() {
 	}
 }

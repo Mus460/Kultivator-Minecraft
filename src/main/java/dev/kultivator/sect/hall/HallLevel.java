@@ -17,11 +17,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.ToIntFunction;
 
 /**
  * Tingkat Aula (DESIGN 20.3.1): the hall level {@code min(renownLevel, buildingCap)} with every number the level decides,
  * and the read-only building scan that sets the building cap (Paviliun Kitab, Formasi Agung, Aula Latihan, Menara Langit
- * Membara). The scan is spread one y-slab per tick over 9 ticks; blocks are only read, never changed.
+ * Membara). The scan is spread one y-slab per tick over 9 ticks; blocks are only read, never changed. While a phase-6b
+ * template exists its providers give the cap ({@code max(frozenScanCap, tier)}), the bits, a minimum radius and the
+ * bonuses instead, and the scan is skipped (DESIGN 21.17); with no provider every rule here is unchanged.
  * <p>
  * Sources: <i>A Record of a Mortal's Journey</i> ch. 153 (Yue Lu Hall, its formation and pavilion), <i>I Shall Seal the
  * Heavens</i> ch. 36-38 (the Magic Pavilion), <i>Return of the Mount Hua Sect</i> (renown, the drill ground),
@@ -62,6 +65,12 @@ public final class HallLevel {
 
 	/** Running scans (at most one per hall). */
 	private static final List<Scan> SCANS = new ArrayList<>();
+	// Phase 6b providers (DESIGN 21.17, 21.24 item 5), registered through Halls.add*Provider.
+	private static final List<ToIntFunction<UUID>> CAP_PROVIDERS = new ArrayList<>();
+	private static final List<ToIntFunction<UUID>> FLAGS_PROVIDERS = new ArrayList<>();
+	private static final List<ToIntFunction<UUID>> RADIUS_PROVIDERS = new ArrayList<>();
+	private static final List<ToIntFunction<UUID>> CAP_BONUS_PROVIDERS = new ArrayList<>();
+	private static final List<ToIntFunction<UUID>> CANDIDATE_BONUS_PROVIDERS = new ArrayList<>();
 
 	/** One spread scan: counters filled slab by slab. */
 	private static final class Scan {
@@ -170,6 +179,96 @@ public final class HallLevel {
 			}
 		}
 		return cap;
+	}
+
+	// ================================================================== phase 6b providers (DESIGN 21.17)
+
+	static void addCapProvider(ToIntFunction<UUID> provider) {
+		if (provider != null) {
+			CAP_PROVIDERS.add(provider);
+		}
+	}
+
+	static void addFlagsProvider(ToIntFunction<UUID> provider) {
+		if (provider != null) {
+			FLAGS_PROVIDERS.add(provider);
+		}
+	}
+
+	static void addRadiusProvider(ToIntFunction<UUID> provider) {
+		if (provider != null) {
+			RADIUS_PROVIDERS.add(provider);
+		}
+	}
+
+	static void addCapBonusProvider(ToIntFunction<UUID> provider) {
+		if (provider != null) {
+			CAP_BONUS_PROVIDERS.add(provider);
+		}
+	}
+
+	static void addCandidateBonusProvider(ToIntFunction<UUID> provider) {
+		if (provider != null) {
+			CANDIDATE_BONUS_PROVIDERS.add(provider);
+		}
+	}
+
+	/** The provided building cap (the highest value of 0 or more), or -1 when the building scan decides (no provider). */
+	static int providedCap(UUID owner) {
+		int cap = -1;
+		for (ToIntFunction<UUID> provider : CAP_PROVIDERS) {
+			cap = Math.max(cap, ask(provider, owner, -1));
+		}
+		return cap;
+	}
+
+	/** The provided building bits (combined; negative values ignored). */
+	static int providedFlags(UUID owner) {
+		int flags = 0;
+		for (ToIntFunction<UUID> provider : FLAGS_PROVIDERS) {
+			int value = ask(provider, owner, -1);
+			if (value > 0) {
+				flags |= value;
+			}
+		}
+		return flags;
+	}
+
+	/** The largest provided minimum territory radius, 0 without one. */
+	static int providedRadius(UUID owner) {
+		int radius = 0;
+		for (ToIntFunction<UUID> provider : RADIUS_PROVIDERS) {
+			radius = Math.max(radius, ask(provider, owner, 0));
+		}
+		return radius;
+	}
+
+	/** The provided extra disciple cap (summed, at least 0). */
+	static int capBonus(UUID owner) {
+		int bonus = 0;
+		for (ToIntFunction<UUID> provider : CAP_BONUS_PROVIDERS) {
+			bonus += Math.max(0, ask(provider, owner, 0));
+		}
+		return bonus;
+	}
+
+	/** The provided extra candidates per arrival (summed, at least 0). */
+	static int candidateBonus(UUID owner) {
+		int bonus = 0;
+		for (ToIntFunction<UUID> provider : CANDIDATE_BONUS_PROVIDERS) {
+			bonus += Math.max(0, ask(provider, owner, 0));
+		}
+		return bonus;
+	}
+
+	/** One provider's value; a failing provider counts as {@code fallback}. */
+	private static int ask(ToIntFunction<UUID> provider, UUID owner, int fallback) {
+		try {
+			return owner == null ? fallback : provider.applyAsInt(owner);
+		} catch (RuntimeException exception) {
+			dev.kultivator.Kultivator.LOGGER.error("A Sect Hall level provider failed", exception);
+			return fallback;
+		}
 	}
 
 	// ================================================================== the building scan

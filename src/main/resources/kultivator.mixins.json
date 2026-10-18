@@ -11,7 +11,9 @@
     "SculkSensorBlockMixin",
     "BigDripleafBlockMixin",
     "EntityMixin",
-    "RedStoneOreBlockMixin"
+    "RedStoneOreBlockMixin",
+    "SectSpawnMixin",
+    "SectExplosionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

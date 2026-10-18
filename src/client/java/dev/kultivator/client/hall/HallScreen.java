@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * The Sect Hall scroll (DESIGN 20.3.1, 5b): the jade scroll at most 320 x 240 with vertical jade tablets on its left
- * edge for the pages Aula, Calon, Jenjang, Perbendaharaan (module A), Tugas, Misi, Arena (module B), Catatan (A) and
+ * edge for the pages Aula, Bangun (phase 6b), Calon, Jenjang, Perbendaharaan (module A), Tugas, Misi, Arena (module B), Catatan (A) and
  * Segel Merah (module D, only while {@code HallInfo.cfg.kehancuran} is true). When fewer than all tablets fit, the
  * column scrolls with the mouse wheel. Reads the last {@code HallInfo} from {@link HallClient} and asks for fresh details
  * every few seconds while open. Not a pause screen.
@@ -74,13 +74,15 @@ public class HallScreen extends Screen {
 		this(0);
 	}
 
-	/** Opens on page {@code initialPage} (0 Aula, 1 Calon, 2 Jenjang, 3 Perbendaharaan, ...). */
+	/** Opens on page {@code initialPage} ({@code Halls.PAGE_*}: 0 Aula, 1 Bangun, 2 Calon, 3 Jenjang, 4 Perbendaharaan, ...). */
 	public HallScreen(int initialPage) {
 		super(Component.translatable("kultivator.spine6.hall.title"));
 		this.info = HallClient.info();
 		this.seenVersion = HallClient.version();
 		this.requestedPage = Math.max(0, initialPage);
 		allPages.add(new AulaPage(this));
+		// Phase 6b (DESIGN 21.21, 21.24): the Bangun tablet, second after Aula.
+		allPages.add(new dev.kultivator.client.sectbuild.BuildPage(this));
 		allPages.add(new CalonPage(this));
 		allPages.add(new JenjangPage(this));
 		allPages.add(new TreasuryPage(this));

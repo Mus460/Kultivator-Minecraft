@@ -26,6 +26,9 @@ public final class Glyphs {
 	public static final int HALL = 8;
 	/** A seal stamp: the red seal of Mode Kehancuran. */
 	public static final int SEAL = 9;
+	// Phase 6b (DESIGN 21.24).
+	/** Terraces climbing to a small roof: Pembangunan Sekte (the Bangun tablet). */
+	public static final int BUILD = 10;
 
 	/** The Daos around the Bagua, clockwise from the top (Earlier Heaven order: opposites face each other). */
 	public static final Dao[] BAGUA = {Dao.SWORD, Dao.SHADOW, Dao.ICE, Dao.BODY, Dao.SPACE, Dao.LIGHTNING, Dao.FIRE, Dao.LIFE};
@@ -126,6 +129,18 @@ public final class Glyphs {
 				Brush.rect(g, cx - s * 0.8F, cy - s * 0.8F, cx + s * 0.8F, cy + s * 0.8F, color);
 				Brush.rect(g, cx - s * 0.5F, cy - 0.5F, cx + s * 0.5F, cy + 0.5F, Palette.darken(color, 0.6F));
 				Brush.rect(g, cx - 0.5F, cy - s * 0.5F, cx + 0.5F, cy + s * 0.5F, Palette.darken(color, 0.6F));
+			}
+			case BUILD -> {
+				// Three terraces stepping up to the right, a little upturned roof on the top one.
+				Brush.rect(g, cx - s, cy + s * 0.7F, cx + s, cy + s, color);
+				Brush.rect(g, cx - s * 0.35F, cy + s * 0.3F, cx + s, cy + s * 0.6F, color);
+				Brush.rect(g, cx + s * 0.25F, cy - s * 0.1F, cx + s, cy + s * 0.2F, color);
+				Brush.rect(g, cx + s * 0.05F, cy - s * 0.5F, cx + s * 1.0F, cy - s * 0.5F + 1.0F, color);
+				Brush.rect(g, cx + s * 0.05F, cy - s * 0.65F, cx + s * 0.2F, cy - s * 0.5F, color);
+				Brush.rect(g, cx + s * 0.85F, cy - s * 0.65F, cx + s * 1.0F, cy - s * 0.5F, color);
+				Brush.rect(g, cx + s * 0.35F, cy - s * 0.85F, cx + s * 0.7F, cy - s * 0.85F + 1.0F, color);
+				Brush.rect(g, cx + s * 0.3F, cy - s * 0.45F, cx + s * 0.4F, cy - s * 0.1F, color);
+				Brush.rect(g, cx + s * 0.65F, cy - s * 0.45F, cx + s * 0.75F, cy - s * 0.1F, color);
 			}
 			default -> {
 				// A little scroll: paper between two rods.

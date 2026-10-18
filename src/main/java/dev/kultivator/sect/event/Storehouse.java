@@ -63,6 +63,35 @@ public final class Storehouse {
 		return taken;
 	}
 
+	/**
+	 * Takes up to {@code max} items matching {@code filter} out of the storehouse and returns them as stacks (empty when
+	 * none): phase 6b's "Ambil dari Lumbung" moves accepted building materials into the Gudang Bahan (DESIGN 21.13).
+	 */
+	public static List<ItemStack> take(UUID owner, Predicate<ItemStack> filter, int max) {
+		ItemStack[] slots = load(owner);
+		List<ItemStack> taken = new ArrayList<>();
+		if (slots == null || filter == null || max <= 0) {
+			return taken;
+		}
+		int left = max;
+		for (int i = 0; i < SLOTS && left > 0; i++) {
+			ItemStack slot = slots[i];
+			if (!slot.isEmpty() && filter.test(slot)) {
+				int move = Math.min(left, slot.getCount());
+				taken.add(slot.copyWithCount(move));
+				slot.shrink(move);
+				left -= move;
+				if (slot.isEmpty()) {
+					slots[i] = ItemStack.EMPTY;
+				}
+			}
+		}
+		if (!taken.isEmpty()) {
+			save(owner, slots);
+		}
+		return taken;
+	}
+
 	/** How many items match {@code filter}. */
 	static int count(UUID owner, Predicate<ItemStack> filter) {
 		ItemStack[] slots = load(owner);

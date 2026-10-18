@@ -118,7 +118,10 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		}
 	}
 
-	/** Activity ids of {@link #activity()} (DESIGN 20.2.5). 1-8 hold their spot like STAY and fight only when hit (5 guards). */
+	/**
+	 * Activity ids of {@link #activity()} (DESIGN 20.2.5, 21.24). 1-8 and 10 hold their spot like STAY and fight only when hit
+	 * (5 guards).
+	 */
 	public static final int ACTIVITY_NONE = 0;
 	public static final int ACTIVITY_WATER = 1;
 	public static final int ACTIVITY_GARDEN = 2;
@@ -129,6 +132,12 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	public static final int ACTIVITY_VOID_BODY = 7;
 	public static final int ACTIVITY_SPECTATOR = 8;
 	public static final int ACTIVITY_DUELLIST = 9;
+	/**
+	 * Pekerja Bangunan, a sect builder (DESIGN 21.14, phase 6b): holds its work spot like 1-8 and fights only when hit, but
+	 * the spot moves with the open component ({@code setActivity(ACTIVITY_BUILD, spot)} may be called again) and it never
+	 * sits down to meditate there (it works). Session state like the other activities (the flow re-applies it).
+	 */
+	public static final int ACTIVITY_BUILD = 10;
 
 	/** {@link Mode#GUARD_HALL} patrols within this many blocks of its hall stele. */
 	public static final double HALL_PATROL_RADIUS = 32.0D;
@@ -383,18 +392,30 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		return activity;
 	}
 
-	/** The spot of an activity 1-8 (its post), or null. */
+	/** The spot of an activity 1-8 or 10 (its post), or null. */
 	public @Nullable BlockPos activitySpot() {
 		return activitySpot;
 	}
 
 	/**
 	 * Sets the activity (0 none, 1 water, 2 garden, 3 kitchen, 4 farm, 5 formation guard, 6 tower, 7 void body,
-	 * 8 spectator, 9 duellist). While the id is 1-8 the disciple holds {@code spot} like STAY and fights only when hit
-	 * (5 guards the spot). Activities are session state for the module that set them (not saved).
+	 * 8 spectator, 9 duellist, 10 builder). While the id is 1-8 or 10 the disciple holds {@code spot} like STAY and fights
+	 * only when hit (5 guards the spot). Calling it again with 10 while already building only moves the work spot (a fight
+	 * it is in goes on). Activities are session state for the module that set them (not saved).
 	 */
 	public void setActivity(int id, @Nullable BlockPos spot) {
-		this.activity = Math.max(0, Math.min(127, id));
+		int next = Math.max(0, Math.min(127, id));
+		if (next == ACTIVITY_BUILD && this.activity == ACTIVITY_BUILD) {
+			BlockPos moved = spot != null ? spot.immutable() : this.activitySpot;
+			if (moved != null && !moved.equals(this.activitySpot)) {
+				this.activitySpot = moved;
+				if (this.getTarget() == null) {
+					this.getNavigation().stop();
+				}
+			}
+			return;
+		}
+		this.activity = next;
 		this.activitySpot = holdsActivitySpot() ? (spot != null ? spot : this.blockPosition()) : spot;
 		this.entityData.set(DATA_ACTIVITY, (byte) this.activity);
 		if (holdsActivitySpot() && this.activity != ACTIVITY_FORMATION_GUARD) {
@@ -404,9 +425,9 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.getNavigation().stop();
 	}
 
-	/** True while an activity 1-8 binds the disciple to its spot. */
+	/** True while an activity 1-8 or 10 (builder) binds the disciple to its spot. */
 	public boolean holdsActivitySpot() {
-		return activity >= ACTIVITY_WATER && activity <= ACTIVITY_SPECTATOR;
+		return activity >= ACTIVITY_WATER && activity <= ACTIVITY_SPECTATOR || activity == ACTIVITY_BUILD;
 	}
 
 	/** A clone's source disciple (its soul id), or null. */
@@ -1127,8 +1148,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 			return false;
 		}
 		if (holdsActivitySpot()) {
-			// Formation guard, tower, spirit body and spectators sit at their spot; duties loop their own pose instead.
-			return activity >= ACTIVITY_FORMATION_GUARD && activitySpot != null && this.getNavigation().isDone()
+			// Formation guard, tower, spirit body and spectators sit at their spot; duties and builders loop their own pose instead.
+			return activity >= ACTIVITY_FORMATION_GUARD && activity != ACTIVITY_BUILD && activitySpot != null && this.getNavigation().isDone()
 					&& this.distanceToSqr(activitySpot.getX() + 0.5D, activitySpot.getY(), activitySpot.getZ() + 0.5D) <= 2.25D;
 		}
 		if (role != Role.DISCIPLE) {

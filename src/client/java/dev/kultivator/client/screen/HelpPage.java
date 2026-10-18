@@ -18,7 +18,7 @@ final class HelpPage extends Page {
 	 */
 	private static final String[] TOPICS = {"meditation", "xp", "bottleneck", "breakthrough", "tribulation", "protectors", "pills",
 			"techniques", "roots", "dao", "alchemy", "heart_demon", "beasts", "formations", "sects", "ascension", "visuals",
-			"aula", "calon", "jenjang", "kontribusi", "tugas", "misi", "turnamen", "alam_hampa", "bakat", "pusaka", "bintang", "ikatan",
+			"aula", "bangun", "calon", "jenjang", "kontribusi", "tugas", "misi", "turnamen", "alam_hampa", "bakat", "pusaka", "bintang", "ikatan",
 			"kehancuran"};
 	private static final KeyMapping[] KEYS = {Keys.MEDITATE, Keys.CAST, Keys.PREVIOUS, Keys.NEXT, Keys.FLYING_SWORD, Keys.INFO};
 

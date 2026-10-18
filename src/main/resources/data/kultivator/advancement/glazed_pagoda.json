@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.glazed_pagoda.description"
+    },
+    "icon": {
+      "id": "minecraft:cyan_glazed_terracotta"
+    },
+    "title": {
+      "translate": "advancement.kultivator.glazed_pagoda.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

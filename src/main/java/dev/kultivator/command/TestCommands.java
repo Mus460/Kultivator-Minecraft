@@ -171,8 +171,8 @@ public final class TestCommands {
 
 	/** Adds {@code uji ...} to /cultivate (op only). */
 	public static void addCommands(LiteralArgumentBuilder<CommandSourceStack> root) {
-		root.then(Commands.literal("uji")
-				.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+		LiteralArgumentBuilder<CommandSourceStack> uji = Commands.literal("uji");
+		uji.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 				.executes(ctx -> help(ctx.getSource()))
 				.then(Commands.literal("maks").executes(ctx -> max(ctx)))
 				.then(Commands.literal("ranah")
@@ -209,7 +209,10 @@ public final class TestCommands {
 								// DESIGN 20.0 (phase 6, module D): the Bintang Abadi star tier.
 								.then(Commands.literal("bintang")
 										.then(Commands.argument("n", IntegerArgumentType.integer(0, 100000))
-												.executes(ctx -> discipleStars(ctx, IntegerArgumentType.getInteger(ctx, "n"))))))));
+												.executes(ctx -> discipleStars(ctx, IntegerArgumentType.getInteger(ctx, "n")))))));
+		// Phase 6b (DESIGN 21.22, 21.24): uji sekte ...
+		dev.kultivator.sect.build.SectBuild.addTestCommands(uji);
+		root.then(uji);
 	}
 
 	/** Sets the Bintang Abadi star tier through module D's API (True Immortal Peak first, calamities below it passed). */

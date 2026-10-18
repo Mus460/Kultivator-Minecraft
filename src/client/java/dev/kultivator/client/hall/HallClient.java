@@ -45,7 +45,7 @@ public final class HallClient {
 		}
 	}
 
-	/** The server asks to open the hall screen on page {@code arg} (0 Aula, 1 Calon, 2 Jenjang, 3 Perbendaharaan). */
+	/** The server asks to open the hall screen on page {@code arg} ({@code Halls.PAGE_*}: 0 Aula, 1 Bangun, 2 Calon, ...). */
 	public static void openScreen(int arg) {
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.gui.screen() instanceof HallScreen screen) {

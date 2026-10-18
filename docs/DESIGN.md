@@ -3605,8 +3605,10 @@ The peaks are sculpted `Peak` components that keep natural terrain wherever it i
 | Role | **Tinta** (ink, default) | **Giok** (jade) | **Langit** (sky, after the Temple of Heaven) |
 |---|---|---|---|
 | Field | deepslate tiles | waxed oxidized `CUT_COPPER_STAIRS` / `_SLAB` / `CUT_COPPER` | `CONCRETE_STAIRS` / `CONCRETE_SLAB` / `CONCRETE` `.pick(BLUE)` |
-| Trim | `POLISHED_DEEPSLATE_STAIRS` / `_SLAB` | `CONCRETE_STAIRS` / `_SLAB` `.pick(YELLOW)` | yellow concrete |
-| Ridge | `DEEPSLATE_BRICKS` + `POLISHED_DEEPSLATE_WALL` | waxed oxidized `CUT_COPPER` + yellow `CONCRETE_SLAB` cap | `LAPIS_BLOCK` |
+| Trim | `CONCRETE_STAIRS` / `_SLAB` `.pick(YELLOW)` (yellow-glazed border, 灰瓦黄剪边) | `CONCRETE_STAIRS` / `_SLAB` `.pick(YELLOW)` | yellow concrete |
+| Ridge | `DEEPSLATE_BRICKS` + yellow `CONCRETE_SLAB` cap | waxed oxidized `CUT_COPPER` + yellow `CONCRETE_SLAB` cap | `LAPIS_BLOCK` |
+
+*Note (6b review):* Tinta's rank C/D roofs use the yellow-glazed border, not the plain polished deepslate trim of rank A, so the main hall, the ancestral hall and the pagodas outrank the rank B jade border in the default glaze as well.
 
 **Materials by role:**
 

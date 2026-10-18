@@ -36,6 +36,8 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.disciple.power.PowerClient.init();
 		dev.kultivator.client.disciple.path.PathClient.init();
 		dev.kultivator.client.kehancuran.KehancuranClient.init();
+		// Phase 6b (DESIGN 21.24).
+		dev.kultivator.client.sectbuild.BuildClient.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));
@@ -44,6 +46,8 @@ public class KultivatorClient implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.OrePings.TYPE, (payload, context) -> TechniqueFx.onOrePings(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.HallInfo.TYPE, (payload, context) ->
 				dev.kultivator.client.hall.HallClient.onInfo(payload));
+		ClientPlayNetworking.registerGlobalReceiver(Payloads.BuildPreview.TYPE, (payload, context) ->
+				dev.kultivator.client.sectbuild.BuildClient.onPreview(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.OpenScreen.TYPE, (payload, context) -> {
 			if (payload.screen() == Payloads.OpenScreen.INFO) {
 				context.client().gui.setScreen(new CultivationScreen(payload.arg()));
@@ -60,6 +64,8 @@ public class KultivatorClient implements ClientModInitializer {
 				dev.kultivator.client.hall.HallClient.openScreen(payload.arg());
 			} else if (payload.screen() == Payloads.OpenScreen.KEHANCURAN_CONFIRM) {
 				dev.kultivator.client.kehancuran.KehancuranClient.openConfirm(payload.arg());
+			} else if (payload.screen() == Payloads.OpenScreen.SECT_TEMPLATE) {
+				dev.kultivator.client.sectbuild.BuildClient.openScreen(payload.arg());
 			}
 		});
 

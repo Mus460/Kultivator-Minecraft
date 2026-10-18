@@ -1,0 +1,30 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:portals",
+    "minecraft:bedrock",
+    "minecraft:barrier",
+    "minecraft:light",
+    "minecraft:command_block",
+    "minecraft:chain_command_block",
+    "minecraft:repeating_command_block",
+    "minecraft:structure_block",
+    "minecraft:jigsaw",
+    "minecraft:end_portal_frame",
+    "minecraft:end_portal",
+    "minecraft:end_gateway",
+    "minecraft:nether_portal",
+    "minecraft:spawner",
+    "minecraft:trial_spawner",
+    "minecraft:vault",
+    "minecraft:reinforced_deepslate",
+    "minecraft:budding_amethyst",
+    "minecraft:beacon",
+    "minecraft:conduit",
+    "minecraft:respawn_anchor",
+    {
+      "id": "kultivator:sect_hall_stele",
+      "required": false
+    }
+  ]
+}

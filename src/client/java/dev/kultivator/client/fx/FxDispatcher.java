@@ -34,6 +34,8 @@ public final class FxDispatcher {
 			case DISCIPLE_POWER -> dev.kultivator.client.disciple.power.PowerFx.play(type, fx);
 			case STAR -> dev.kultivator.client.disciple.path.PathFx.play(type, fx);
 			case KEHANCURAN -> dev.kultivator.client.kehancuran.KehancuranFx.play(type, fx);
+			// Phase 6b (DESIGN 21.24).
+			case SECT_BUILD -> dev.kultivator.client.sectbuild.BuildFx.play(type, fx);
 		}
 	}
 
@@ -57,6 +59,8 @@ public final class FxDispatcher {
 		// Phase 6: continuous disciple power and star visuals.
 		dev.kultivator.client.disciple.power.PowerFx.tick(minecraft);
 		dev.kultivator.client.disciple.path.PathFx.tick(minecraft);
+		// Phase 6b: construction sparks, work mist and the cloud sea.
+		dev.kultivator.client.sectbuild.BuildFx.tick(minecraft);
 	}
 
 	private FxDispatcher() {

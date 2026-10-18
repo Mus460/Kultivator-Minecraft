@@ -11,7 +11,7 @@ import java.nio.file.Path;
 
 /**
  * Server settings in {@code config/kultivator.json}. Missing values get their defaults, out-of-range values are clamped
- * (DESIGN 20.2.11) and the file is rewritten.
+ * (DESIGN 20.2.11, 21.24) and the file is rewritten.
  */
 public final class KultivatorConfig {
 
@@ -69,6 +69,34 @@ public final class KultivatorConfig {
 	/** Removed blocks can be restored for this many minutes (0-30). */
 	public int kehancuranUndoMinutes = 10;
 
+	// ---- phase 6b: Pembangunan Sekte (DESIGN 21), the second exception: blocks only inside a confirmed footprint
+	/** Sect templates can be chosen and built at all. */
+	public boolean sectConstruction = true;
+	/** Multiplies the placement rate (0.25-4). */
+	public double sectBuildSpeed = 1.0D;
+	/** Hard average cap of placements per tick over all sites (1-32); bursts every 4 ticks place up to 4x this. */
+	public int sectBuildMaxPerTick = 8;
+	/** Construction pauses while the average tick time is at or above this many milliseconds (30-50). */
+	public int sectBuildMsptPause = 40;
+	/** The owner (or a sect mate) must be within this many horizontal blocks of the stele for building to run (96-512). */
+	public int sectBuildRange = 160;
+	/** Build even with nobody near (still never force-loads chunks). Default false: away time is banked instead. */
+	public boolean sectBuildWhileAway = false;
+	/** At most this many away ticks are banked (0-72000); banked ticks double the rate until used up. */
+	public int sectBuildBankTicks = 24000;
+	/** The largest template that may be chosen (1-9). */
+	public int sectBuildMaxTemplate = 9;
+	/** Only show the realm hint on the plaque (false) or require that realm to choose a template (true). */
+	public boolean sectTemplateRealmGate = false;
+	/** Breaking a sect block refunds its placed cost to the Gudang instead of dropping it. */
+	public boolean sectBuildBreakRefund = true;
+	/** Exploded sect blocks drop nothing and are credited to the Gudang. */
+	public boolean sectBuildExplosionCredit = true;
+	/** Monsters never spawn naturally on sect cells. */
+	public boolean sectBuildSpawnProof = true;
+	/** Clients report a long low frame rate so their sect builds at half speed. */
+	public boolean sectBuildFpsHint = true;
+
 	public static KultivatorConfig get() {
 		return instance;
 	}
@@ -105,7 +133,7 @@ public final class KultivatorConfig {
 		}
 	}
 
-	/** Keeps every phase-6 number inside its allowed range (DESIGN 20.2.11). */
+	/** Keeps every phase-6 and 6b number inside its allowed range (DESIGN 20.2.11, 21.24). */
 	private void clamp() {
 		recruitmentIntervalDays = clamp(recruitmentIntervalDays, 1, 15);
 		tournamentIntervalDays = clamp(tournamentIntervalDays, 3, 30);
@@ -119,10 +147,22 @@ public final class KultivatorConfig {
 		kehancuranMsptPause = clamp(kehancuranMsptPause, 30, 50);
 		kehancuranWarningSeconds = clamp(kehancuranWarningSeconds, 10, 60);
 		kehancuranUndoMinutes = clamp(kehancuranUndoMinutes, 0, 30);
+		// Phase 6b (DESIGN 21.24).
+		sectBuildSpeed = clamp(sectBuildSpeed, 0.25D, 4.0D, 1.0D);
+		sectBuildMaxPerTick = clamp(sectBuildMaxPerTick, 1, 32);
+		sectBuildMsptPause = clamp(sectBuildMsptPause, 30, 50);
+		sectBuildRange = clamp(sectBuildRange, 96, 512);
+		sectBuildBankTicks = clamp(sectBuildBankTicks, 0, 72000);
+		sectBuildMaxTemplate = clamp(sectBuildMaxTemplate, 1, 9);
 	}
 
 	private static int clamp(int value, int min, int max) {
 		return Math.max(min, Math.min(max, value));
+	}
+
+	/** {@code fallback} when the file held no number (NaN). */
+	private static double clamp(double value, double min, double max, double fallback) {
+		return Double.isNaN(value) ? fallback : Math.max(min, Math.min(max, value));
 	}
 
 	private KultivatorConfig() {

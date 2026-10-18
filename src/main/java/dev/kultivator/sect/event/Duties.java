@@ -197,7 +197,7 @@ public final class Duties {
 		CompoundTag post = EventUtil.sub(posts, key);
 		BlockPos spot = EventUtil.pos(post, "spot");
 		if (spot == null) {
-			spot = postSpot(level, disciple, hall.pos(), Integer.parseInt(key));
+			spot = postSpot(level, disciple, owner, duty, hall.pos(), Integer.parseInt(key));
 			if (spot == null) {
 				posts.remove(key);
 				EventUtil.chat(player, Component.translatable("kultivator.sectevent.duty.blocked").withStyle(ChatFormatting.YELLOW));
@@ -262,8 +262,45 @@ public final class Duties {
 		return null;
 	}
 
-	/** A safe standing spot near post {@code index} (0 N, 1 E, 2 S, 3 W of the stele), read-only; null when none. */
-	private static @Nullable BlockPos postSpot(ServerLevel level, DiscipleEntity disciple, BlockPos stele, int index) {
+	/**
+	 * Where the post of a duty stands when a sect template is built (phase 6b: the plan's {@code post_water},
+	 * {@code post_kitchen}, {@code post_garden} or {@code post_farm} anchor, DESIGN 21.17), or null for the cell 5 blocks
+	 * from the stele.
+	 */
+	@FunctionalInterface
+	public interface PostSpotProvider {
+		@Nullable BlockPos spot(UUID owner, String duty, int index);
+	}
+
+	private static final List<PostSpotProvider> POST_SPOT_PROVIDERS = new ArrayList<>();
+
+	/** Adds a post-spot provider (phase 6b, DESIGN 21.24); with none every post stays 5 blocks N/E/S/W of the stele. */
+	public static void addPostSpotProvider(PostSpotProvider provider) {
+		if (provider != null) {
+			POST_SPOT_PROVIDERS.add(provider);
+		}
+	}
+
+	/**
+	 * A safe standing spot for post {@code index} of {@code duty}: a provided anchor first, else near the cell 5 blocks
+	 * from the stele (0 N, 1 E, 2 S, 3 W); read-only; null when none.
+	 */
+	private static @Nullable BlockPos postSpot(ServerLevel level, DiscipleEntity disciple, UUID owner, String duty, BlockPos stele, int index) {
+		for (PostSpotProvider provider : POST_SPOT_PROVIDERS) {
+			BlockPos anchor;
+			try {
+				anchor = provider.spot(owner, duty, index);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A duty post provider failed", exception);
+				anchor = null;
+			}
+			if (anchor != null && level.isLoaded(anchor)) {
+				Vec3 spot = Targeting.safeSpot(level, disciple, Vec3.atBottomCenterOf(anchor));
+				if (spot != null) {
+					return BlockPos.containing(spot);
+				}
+			}
+		}
 		int dx = index == 1 ? POST_DISTANCE : index == 3 ? -POST_DISTANCE : 0;
 		int dz = index == 0 ? -POST_DISTANCE : index == 2 ? POST_DISTANCE : 0;
 		Vec3 target = new Vec3(stele.getX() + dx + 0.5D, stele.getY(), stele.getZ() + dz + 0.5D);

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.first_gathering.description"
+    },
+    "icon": {
+      "id": "minecraft:oak_log"
+    },
+    "title": {
+      "translate": "advancement.kultivator.first_gathering.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

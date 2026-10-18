@@ -56,6 +56,40 @@ public final class ProtectedZones {
 	public static final TagKey<Block> INDESTRUCTIBLE = TagKey.create(Registries.BLOCK, Kultivator.id("indestructible"));
 	private static final Identifier STELE = Kultivator.id("sect_hall_stele");
 
+	/**
+	 * An extra protected area (phase 6b: within 16 blocks of any confirmed sect footprint or showcase,
+	 * {@code SectBuild.insideAnySite(level, pos, 16)}, DESIGN 21.17). Counted as the hall zone. Called for many positions
+	 * per tick, so it must be cheap.
+	 */
+	@FunctionalInterface
+	public interface ZoneProvider {
+		boolean protects(ServerLevel level, BlockPos pos);
+	}
+
+	private static final List<ZoneProvider> ZONE_PROVIDERS = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+	/** Adds a protected area provider (DESIGN 21.24); with none the zones are exactly those listed above. */
+	public static void addZoneProvider(ZoneProvider provider) {
+		if (provider != null) {
+			ZONE_PROVIDERS.add(provider);
+		}
+	}
+
+	/** True when a provider protects {@code pos} (a failing provider protects, to stay safe). */
+	private static boolean provided(ServerLevel level, BlockPos pos) {
+		for (ZoneProvider provider : ZONE_PROVIDERS) {
+			try {
+				if (provider.protects(level, pos)) {
+					return true;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A Mode Kehancuran zone provider failed", exception);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/** Why a position is protected (a translation key suffix), for the refusal message. */
 	public enum Zone {
 		HALL("hall"),
@@ -146,6 +180,9 @@ public final class ProtectedZones {
 					return Zone.HALL;
 				}
 			}
+			if (provided(level, pos)) {
+				return Zone.HALL;
+			}
 			for (Vec3 player : players) {
 				if (player.distanceToSqr(x, y, z) <= playerSafe * playerSafe) {
 					return Zone.PLAYER;
@@ -186,7 +223,10 @@ public final class ProtectedZones {
 				|| SpiritBeasts.isSpiritBeast(entity));
 	}
 
-	/** True when no destructive shape may touch {@code pos} (one-off check; casts use a {@link Context}). */
+	/**
+	 * True when no destructive shape may touch {@code pos} (one-off check; casts use a {@link Context}); the zone providers
+	 * (sect sites) are consulted too.
+	 */
 	public static boolean blocked(ServerLevel level, BlockPos pos) {
 		return new Context(level, new AABB(pos)).zoneOf(pos) != null;
 	}
