@@ -141,6 +141,7 @@ public final class Comprehension {
 		double after = data.comprehension(dao);
 		Cultivators.dirty(player);
 		announceLevels(player, dao, before, after);
+		refreshTechniques(player, dao, before, after);
 		return after - before;
 	}
 
@@ -152,6 +153,86 @@ public final class Comprehension {
 		double after = data.comprehension(dao);
 		Cultivators.dirty(player);
 		announceLevels(player, dao, before, after);
+		refreshTechniques(player, dao, before, after);
+	}
+
+	// ================================================================== phase 6c techniques (DESIGN 22.2.6, 22.8)
+
+	/** Technique comprehension a player may gain per Dao per in-game day (22.2.6). */
+	public static final double TECHNIQUE_DAILY_CAP = 3.0D;
+	/** {@code extra.teknik.cday}: {@code {day, <dao id>: gained}} (22.18.4). */
+	private static final String DAILY = "cday";
+
+	/**
+	 * Comprehension from techniques, at most {@link #TECHNIQUE_DAILY_CAP} per Dao per in-game day (stored in
+	 * {@code extra.teknik.cday}). Returns what was really gained.
+	 */
+	public static double grantCapped(ServerPlayer player, Dao dao, double amount) {
+		if (dao == null || !(amount > 0.0D) || !Double.isFinite(amount)) {
+			return 0.0D;
+		}
+		CultivationData data = Cultivators.get(player);
+		net.minecraft.nbt.CompoundTag teknik = data.extra().getCompound("teknik").orElse(null);
+		if (teknik == null) {
+			teknik = new net.minecraft.nbt.CompoundTag();
+			data.extra().put("teknik", teknik);
+		}
+		net.minecraft.nbt.CompoundTag daily = teknik.getCompoundOrEmpty(DAILY);
+		long day = dev.kultivator.technique.spec.run.Mastery.day(player.level());
+		if (daily.getLongOr("day", -1L) != day) {
+			daily = new net.minecraft.nbt.CompoundTag();
+			daily.putLong("day", day);
+		}
+		double used = daily.getDoubleOr(dao.id(), 0.0D);
+		double allowed = Math.min(amount, TECHNIQUE_DAILY_CAP - used);
+		if (!(allowed > 0.0D)) {
+			return 0.0D;
+		}
+		daily.putDouble(dao.id(), used + allowed);
+		teknik.put(DAILY, daily);
+		return grant(player, dao, allowed);
+	}
+
+	/**
+	 * A spec cast hit a hostile for the first time (22.2.6): +0.15 x the grade factor (1 / 1.2 / 1.5 / 2 / 2.5 / 3) to the
+	 * chosen Dao when the spec is of that Dao (universal arts never count), within the daily cap.
+	 */
+	public static void onTechniqueHit(ServerPlayer player, dev.kultivator.data.TechniqueSpec spec) {
+		Dao chosen = Cultivators.get(player).dao();
+		if (chosen == null || spec.dao() != chosen) {
+			return;
+		}
+		grantCapped(player, chosen, TECHNIQUE_GAIN * spec.grade().comprehensionFactor());
+	}
+
+	/** A COMP route threshold of a {@code dao} spec was crossed: the automatic unlocks run at once (22.8). */
+	private static void refreshTechniques(ServerPlayer player, Dao dao, double before, double after) {
+		if (!(after > before)) {
+			return;
+		}
+		boolean gate3 = before < dev.kultivator.technique.spec.TechniquePower.MASTERY_GATE_3 && after >= dev.kultivator.technique.spec.TechniquePower.MASTERY_GATE_3;
+		boolean gate4 = before < dev.kultivator.technique.spec.TechniquePower.MASTERY_GATE_4 && after >= dev.kultivator.technique.spec.TechniquePower.MASTERY_GATE_4;
+		if (gate3 || gate4) {
+			// mastery levels 3 / 4 open here with points already banked: the toast, then the unlocks they gate (22.6)
+			dev.kultivator.technique.spec.run.Mastery.gateCrossed(player, dao, before, after);
+			dev.kultivator.technique.spec.run.Unlocks.refresh(player);
+			return;
+		}
+		for (dev.kultivator.data.TechniqueSpec spec : dev.kultivator.data.TechniqueRegistry.all()) {
+			if (spec.dao() != null && spec.dao() != dao) {
+				continue;
+			}
+			for (dev.kultivator.technique.spec.dsl.Route route : spec.routes()) {
+				if (route.kind() == dev.kultivator.technique.spec.dsl.Route.Kind.COMP && before < route.n() && after + 1.0E-6D >= route.n()) {
+					dev.kultivator.technique.spec.run.Unlocks.refresh(player);
+					return;
+				}
+			}
+			if (spec.minComprehension() > 0.0D && before < spec.minComprehension() && after + 1.0E-6D >= spec.minComprehension()) {
+				dev.kultivator.technique.spec.run.Unlocks.refresh(player);
+				return;
+			}
+		}
 	}
 
 	/** {@code amount} after the root affinity factor. */

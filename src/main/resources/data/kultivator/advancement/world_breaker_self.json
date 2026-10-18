@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_technique",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.world_breaker_self.description"
+    },
+    "icon": {
+      "id": "minecraft:mace"
+    },
+    "title": {
+      "translate": "advancement.kultivator.world_breaker_self.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

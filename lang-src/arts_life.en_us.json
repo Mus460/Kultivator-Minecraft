@@ -1,0 +1,71 @@
+{
+  "kultivator.technique.eternal_spring_art": "Eternal Spring Art",
+  "kultivator.technique.eternal_spring_art.desc": "A 12 s spring aura (radius 6→10): you and nearby allies heal 25% health over 12 s; your qi regeneration ×1.5.",
+  "kultivator.technique.eternal_spring_art.source": "Source: A Record of a Mortal's Journey · 长春功 Eternal Spring Art, the wood-attribute foundation art Han Li practises first",
+  "kultivator.technique.eternal_spring_art.lore": "Around you, the grass grows a little greener.",
+
+  "kultivator.technique.blue_silver_entangle": "Blue Silver Entangle",
+  "kultivator.technique.blue_silver_entangle.desc": "Blue silver grass entangles foes at the aim (radius 4→10): rooted 4→6 s (bosses 1.5 s), 0.6× power and Poison I for 4 s.",
+  "kultivator.technique.blue_silver_entangle.source": "Source: Soul Land · 蓝银缠绕 Entangle, the first spirit ability of Tang San's Blue Silver Grass (a ten-year ring)",
+  "kultivator.technique.blue_silver_entangle.lore": "The plainest grass in the world, and not one monster can break free of it.",
+
+  "kultivator.technique.earth_vitality": "Vitality of the Earth",
+  "kultivator.technique.earth_vitality.desc": "The earth's vitality rises within radius 10→24: you and allies heal 25→35% health, gain a 15% Qi Shield for 20 s and Resistance I for 10 s; those standing on natural ground get the heal and the shield twice.",
+  "kultivator.technique.earth_vitality.source": "Source: Coiling Dragon (Book 15) · Vitality, one of the six profound mysteries of the Laws of the Earth",
+  "kultivator.technique.earth_vitality.lore": "The ground you stand on gives back what battle takes.",
+
+  "kultivator.technique.blue_silver_parasite": "Blue Silver Parasite",
+  "kultivator.technique.blue_silver_parasite.desc": "Blue silver grass feeds on the 6→16 nearest foes (radius 16): poison 0.2× power/s for 8 s, 60% of it heals you and allies within 8; foes that die snare those around them (radius 3, rooted 2 s).",
+  "kultivator.technique.blue_silver_parasite.source": "Source: Soul Land · 寄生 Parasitic, the second spirit ability of Blue Silver Grass (a hundred-year ring)",
+  "kultivator.technique.blue_silver_parasite.lore": "The life they stole from the world, you take back one blade at a time.",
+
+  "kultivator.technique.clear_heart_melody": "Clear-Heart Melody",
+  "kultivator.technique.clear_heart_melody.desc": "Five rings of melody spread (radius 16→32): monsters are slowed (IV) and weakened (III) for 6 s; undead also take 0.8× power (×2). The melody lingers 20 s (radius 6→10): every 2 s it cleanses harmful effects and grants Resistance I to you and allies.",
+  "kultivator.technique.clear_heart_melody.source": "Source: Mo Dao Zu Shi · 清心音 Clear-Heart Melody of the Gusu Lan Sect, the calming melody that Jin Guangyao learned and twisted into 乱魄抄",
+  "kultivator.technique.clear_heart_melody.lore": "A clear heart cannot be troubled, not even by the dead.",
+
+  "kultivator.technique.seven_treasure_pagoda": "Seven Treasure Glazed Tile Pagoda",
+  "kultivator.technique.seven_treasure_pagoda.desc": "A seven-tier pagoda turns above you for 30 s (radius 6→10), one tier per second for you and allies: 1 techniques +25%, 2 Speed II, 3 qi regeneration ×2, 4 Resistance I, 5 Jump Boost II, 6 Regeneration I; tier 7 \"Seven Treasures\" (at 6 s) raises them all ×1.5.",
+  "kultivator.technique.seven_treasure_pagoda.source": "Source: Soul Land · Ning Rongrong's Seven Treasure Glazed Tile Pagoda, a support martial soul whose fixed abilities boost allies (the seven values are game design)",
+  "kultivator.technique.seven_treasure_pagoda.lore": "Seven tiers, seven blessings, and your allies have never felt this strong.",
+
+  "kultivator.technique.gold_devouring_beetles": "Gold-Devouring Beetle Swarm",
+  "kultivator.technique.gold_devouring_beetles.desc": "A swarm of gold and silver beetles falls on 12→32 foes (radius 24): bleeding 0.35× power/s for 8 s through armor, armor −30% for 8 s; each kill strengthens the swarm +10% (up to 10); 10% of the damage heals you.",
+  "kultivator.technique.gold_devouring_beetles.source": "Source: A Record of a Mortal's Journey · 噬金虫 Gold-Devouring Beetles, the swarm Han Li breeds, which later brings forth an insect king",
+  "kultivator.technique.gold_devouring_beetles.lore": "They eat gold. Flesh is no harder.",
+
+  "kultivator.technique.willow_god_branches": "Willow God's Branches and Golden Leaves",
+  "kultivator.technique.willow_god_branches.desc": "A phantom willow rises: its branches lash 10→24 foes (radius 20→32), 1.2× power and rooted 3 s (bosses 0.75 s); 24 golden leaves hunt up to 12 foes (≤2 each), 0.9× power (bosses ×0.6). Below 50% health you heal 30%.",
+  "kultivator.technique.willow_god_branches.source": "Source: Perfect World · the Willow God (柳神) of Stone Village, Shi Hao's guardian, whose charred trunk sprouts anew",
+  "kultivator.technique.willow_god_branches.lore": "Struck by lightning, charred, and still growing. That is what the willow teaches you.",
+
+  "kultivator.technique.blood_transforming_formation": "Blood-Transforming Formation",
+  "kultivator.technique.blood_transforming_formation.desc": "A black-sand vortex at the aim for 15 s (radius 14→28): every second 0.5× power + 1% of max health (bosses 0.5%) and Wither II for 3 s; 25% of the damage heals you.",
+  "kultivator.technique.blood_transforming_formation.source": "Source: Investiture of the Gods ch. 44/46 · 化血陣 of Sun Tianjun (孫良), one of the Ten Absolute Formations: its black sand turns victims to blood water",
+  "kultivator.technique.blood_transforming_formation.lore": "The black sand whispers, and whatever it touches melts.",
+
+  "kultivator.technique.blood_clones": "Blood Clones",
+  "kultivator.technique.blood_clones.desc": "2→4 blood clones cling to foes for 15 s (attacking every second, range 16, 0.8× power); at the end they converge on the densest crowd (radius 6→10), 3× power per clone, and you heal 20→40% health.",
+  "kultivator.technique.blood_clones.source": "Source: I Shall Seal the Heavens (Book 4) · Meng Hao's Blood Clones, cored on the meat jelly's skin and indestructible while he lives",
+  "kultivator.technique.blood_clones.lore": "As long as you live, they cannot die.",
+
+  "kultivator.technique.nezha_lotus_body": "Nezha's Lotus Incarnation",
+  "kultivator.technique.nezha_lotus_body.desc": "For 40 s: damage taken −30% and harmful effects cleansed. The first lethal hit does not kill you: full health, Resistance III for 3 s and a lotus burst (radius 10→20, 4× power). Shares the 10-minute lockout of other life-saving arts; never against tribulations or /kill.",
+  "kultivator.technique.nezha_lotus_body.source": "Source: Investiture of the Gods ch. 14 · after Nezha's death, Taiyi Zhenren rebuilds his body from lotus roots and leaves (莲花化身)",
+  "kultivator.technique.nezha_lotus_body.lore": "A body of lotus does not fear wilting.",
+
+  "kultivator.technique.guanyin_sweet_dew": "Guanyin's Willow Sprig and Sweet Dew",
+  "kultivator.technique.guanyin_sweet_dew.desc": "A white vase tilts in the sky and sprinkles dew for 10 s (radius 24→32): you and every ally, villagers and golems included, heal 50% health and are cleansed; undead take 0.8× power each second; you restore 30% qi; afterwards Regeneration III for 10 s. Particles only; the weather never changes.",
+  "kultivator.technique.guanyin_sweet_dew.source": "Source: Journey to the West ch. 26 · Guanyin revives Zhenyuan's felled Ginseng Fruit Tree with the sweet dew of her vase, sprinkled with her willow sprig",
+  "kultivator.technique.guanyin_sweet_dew.lore": "A drop of dew, and even a felled tree bears fruit again.",
+
+  "kultivator.technique.life_death_domain": "Life and Death Domain",
+  "kultivator.technique.life_death_domain.desc": "A domain that follows you for 20 s (radius 20→32): every second monsters take 0.6× power + 2% of max health (bosses 1%) and those under 10% health die at once (bosses 5%); 20% of the damage heals you; you and allies heal 60% health over 20 s. At the end: radius 32, 12× power. Qi 55% (min 700).",
+  "kultivator.technique.life_death_domain.source": "Source: Renegade Immortal · Wang Lin's Life and Death domain",
+  "kultivator.technique.life_death_domain.lore": "Half the world withers to ash, half bursts into bloom. You stand on the line.",
+
+  "kultivator.technique.bodhisattva_tree": "Bodhisattva Ancient Tree: Hundred Lives",
+  "kultivator.technique.bodhisattva_tree.desc": "A 30-block tree grows around you for 30 s (radius 24→40): you and allies heal 90% health, qi regeneration ×3; your comprehension +0.05/s (up to 3); once, you cannot fall below 1 health. Every 5 s monsters within 40 take 4× power and Slowness III; at the end 14× power. Qi 80%.",
+  "kultivator.technique.bodhisattva_tree.source": "Source: Battle Through the Heavens · the Bodhisattva Ancient Tree: Xiao Yan seeks its Bodhisattva Heart (ch. 828) and later sits inside it in \"Hundred Lives Reincarnation\" (ch. 1426)",
+  "kultivator.technique.bodhisattva_tree.lore": "A hundred lives pass beneath its branches in a single breath."
+}

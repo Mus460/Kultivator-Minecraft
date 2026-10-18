@@ -162,6 +162,70 @@ public final class DisciplePowers {
 
 	// ================================================================== API (DESIGN 20.4.5)
 
+	/**
+	 * The bonded disciple that can cast {@code netherworld_white_tiger} with {@code master} (DESIGN 22.13.5): bonded
+	 * (20.3.18: bond at least {@link #PAIR_MIN_BOND}), within {@code range} in the same level, not deviating or breaking
+	 * through, with at least 30% qi. The highest bond wins, then the nearest. Null when none qualifies.
+	 */
+	public static @Nullable DiscipleEntity pairPartner(ServerPlayer master, double range) {
+		DiscipleEntity best = null;
+		int bestBond = -1;
+		double bestDistance = Double.MAX_VALUE;
+		for (DiscipleEntity entity : Disciples.loaded(master.getUUID())) {
+			if (entity.role() != DiscipleEntity.Role.DISCIPLE || !entity.isAlive() || entity.isRemoved() || entity.level() != master.level()) {
+				continue;
+			}
+			double distance = entity.distanceToSqr(master);
+			DiscipleData data = entity.data();
+			int bond = DisciplePaths.bond(data);
+			if (distance > range * range || bond < PAIR_MIN_BOND || data.deviating() || data.breakingThrough()
+					|| data.qi() < dev.kultivator.disciple.DiscipleCultivation.maxQi(data) * PAIR_MIN_QI) {
+				continue;
+			}
+			if (bond > bestBond || bond == bestBond && distance < bestDistance) {
+				best = entity;
+				bestBond = bond;
+				bestDistance = distance;
+			}
+		}
+		return best;
+	}
+
+	/** The bond a pair partner needs (20.3.18, bonded) and the share of its max qi it must hold (22.13.5). */
+	public static final int PAIR_MIN_BOND = 50;
+	public static final double PAIR_MIN_QI = 0.3D;
+
+	/**
+	 * Takes {@code share} of the pair cast's qi cost from the disciple's own pool (22.13.5: the disciple pays 50%). The cost
+	 * is the master's qi cost of the {@code fusion_pair} spec at the master's mastery; {@code share} is clamped to 0-1.
+	 * False (nothing taken) when the disciple cannot pay.
+	 */
+	public static boolean spendPairQi(DiscipleEntity entity, double share) {
+		DiscipleData data = entity.data();
+		double part = Math.max(0.0D, Math.min(1.0D, share));
+		double cost;
+		ServerPlayer master = entity.owner();
+		dev.kultivator.data.TechniqueSpec pair = null;
+		for (dev.kultivator.data.TechniqueSpec spec : dev.kultivator.data.TechniqueRegistry.all()) {
+			if ("fusion_pair".equals(spec.special())) {
+				pair = spec;
+				break;
+			}
+		}
+		if (master != null && pair != null) {
+			dev.kultivator.data.CultivationData masterData = dev.kultivator.data.Cultivators.get(master);
+			cost = dev.kultivator.technique.spec.TechniquePower.qi(pair, masterData,
+					dev.kultivator.technique.spec.run.Mastery.level(masterData, pair.id())) * part;
+		} else {
+			cost = dev.kultivator.disciple.DiscipleCultivation.maxQi(data) * 0.25D * part;
+		}
+		if (data.qi() + 1.0E-6D < cost) {
+			return false;
+		}
+		data.setQi(Math.max(0.0D, data.qi() - cost));
+		return true;
+	}
+
 	/** Adds Poin Tempa of the Undying Codex (Pikul Air duty, DESIGN 20.3.9): also trains the body (+1 max health per hour). */
 	public static void addTempering(DiscipleData data, int points) {
 		UndyingCodex.addPoints(data, points, true);

@@ -5,15 +5,19 @@ import dev.kultivator.alchemy.AlchemyItems;
 import dev.kultivator.alchemy.PillItem;
 import dev.kultivator.alchemy.PillQuality;
 import dev.kultivator.data.Technique;
+import dev.kultivator.data.TechniqueRegistry;
+import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.disciple.DiscipleData;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.power.DisciplePowers;
 import dev.kultivator.item.RootItems;
+import dev.kultivator.technique.source.JadeSlips;
+import dev.kultivator.technique.source.LearnRules;
+import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -28,12 +32,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.enchantment.Enchantments;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -60,7 +64,8 @@ final class Contribution {
 		SERMON("sermon", 150, 1, true),
 		FOUNDATION("foundation", 250, 1, false),
 		ENVOY("envoy", 300, 1, false),
-		TECHNIQUE("technique", 400, 3, false),
+		/** Slip Giok Teknik (DESIGN 22.8.4): the price and hall level follow the chosen art's grade; 200 / 1 is the cheapest. */
+		TECHNIQUE("technique", 200, 1, false),
 		WARDING("warding", 600, 3, false),
 		GOLDEN_CORE("golden_core", 800, 4, false),
 		MARROW("marrow", 900, 6, false),
@@ -94,7 +99,13 @@ final class Contribution {
 	/** The envoys' rest (module B's {@code Envoys.COOLDOWN_DAYS}, package-private there). */
 	public static final int ENVOY_COOLDOWN_DAYS = 5;
 
-	/** Gulungan Teknik: the book techniques and the vanilla enchantment each maps to (DESIGN 7). */
+	/** Slip Giok Teknik: at most this many slips per in-game day (DESIGN 22.8.4). */
+	public static final int SLIPS_PER_DAY = 2;
+
+	/**
+	 * The legacy book techniques (DESIGN 7), kept for the hall screen's art picker; the pavilion now sells any of them, and
+	 * every other {@link #sellable} spec, as a jade slip.
+	 */
 	static final Map<Technique, ResourceKey<Enchantment>> BOOKS = new LinkedHashMap<>();
 
 	static {
@@ -222,7 +233,52 @@ final class Contribution {
 		return (int) Math.round(ware.price * HallLevel.price(level));
 	}
 
-	/** The Paviliun list for the screen: {id, price, need, ok, target}. */
+	// ---- Slip Giok Teknik (DESIGN 22.8.4)
+
+	/**
+	 * Specs the pavilion sells as jade slips: those a slip may hold that are flagged or routed for the pavilion
+	 * ({@code TechniqueSpec.pavilion()}), plus the legacy book techniques.
+	 */
+	static boolean sellable(TechniqueSpec spec) {
+		if (!spec.slipAllowed() || spec.grade().pavilionPrice() <= 0) {
+			return false;
+		}
+		if (spec.pavilion()) {
+			return true;
+		}
+		if (spec.isLegacy()) {
+			for (Route route : spec.routes()) {
+				if (route.kind() == Route.Kind.BOOK) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/** Every sellable spec in grade order. */
+	static List<TechniqueSpec> slips() {
+		List<TechniqueSpec> list = new ArrayList<>();
+		for (TechniqueSpec spec : TechniqueRegistry.all()) {
+			if (sellable(spec)) {
+				list.add(spec);
+			}
+		}
+		list.sort(LearnRules.GRADE_ORDER);
+		return list;
+	}
+
+	/** Grade price (Kuning 200 · Misterius 400 · Bumi 900 · Langit 2,000 · Abadi 4,000) × the hall's price factor. */
+	static int slipPrice(TechniqueSpec spec, int level) {
+		return (int) Math.round(spec.grade().pavilionPrice() * HallLevel.price(level));
+	}
+
+	/** Slips bought today (resets each in-game day). */
+	static int slipsToday(CompoundTag core) {
+		return core.getLongOr("slip_day", -1L) == Halls.dayIndex() ? core.getIntOr("slips_today", 0) : 0;
+	}
+
+	/** The Paviliun list for the screen: {id, price, need, ok, target}; the slip row also lists {slips: [{id, price, need, ok}]}. */
 	static ListTag shop(UUID owner, CompoundTag core) {
 		ListTag list = new ListTag();
 		int level = Halls.level(owner);
@@ -233,17 +289,31 @@ final class Contribution {
 			entry.putInt("price", price(ware, level));
 			entry.putInt("need", ware.level);
 			boolean unlocked = level >= ware.level;
-			boolean today = ware != Ware.INVITE || core.getLongOr("invite_day", -1L) != Halls.dayIndex();
+			boolean today = ware == Ware.INVITE ? core.getLongOr("invite_day", -1L) != Halls.dayIndex()
+					: ware != Ware.TECHNIQUE || slipsToday(core) < SLIPS_PER_DAY;
 			entry.putBoolean("ok", unlocked && today && pool >= price(ware, level));
 			entry.putBoolean("locked", !unlocked);
 			entry.putBoolean("used_today", !today);
 			entry.putBoolean("target", ware.disciple);
+			if (ware == Ware.TECHNIQUE) {
+				ListTag slips = new ListTag();
+				for (TechniqueSpec spec : slips()) {
+					CompoundTag slip = new CompoundTag();
+					slip.putString("id", spec.id());
+					slip.putInt("price", slipPrice(spec, level));
+					slip.putInt("need", spec.grade().pavilionHallLevel());
+					slip.putBoolean("ok", today && level >= spec.grade().pavilionHallLevel() && pool >= slipPrice(spec, level));
+					slips.add(slip);
+				}
+				entry.put("slips", slips);
+				entry.putInt("slips_left", Math.max(0, SLIPS_PER_DAY - slipsToday(core)));
+			}
 			list.add(entry);
 		}
 		return list;
 	}
 
-	/** Buys {@code id}; {@code param} is the target disciple's soul (Sermon, Codex) or the technique id (Gulungan Teknik). */
+	/** Buys {@code id}; {@code param} is the target disciple's soul (Sermon, Codex) or the spec id (Slip Giok Teknik). */
 	static void buy(ServerPlayer player, UUID owner, CompoundTag core, String id, String param) {
 		Ware ware = Ware.byId(id);
 		if (ware == null) {
@@ -267,11 +337,30 @@ final class Contribution {
 				return;
 			}
 		}
-		Technique technique = null;
+		TechniqueSpec slip = null;
 		if (ware == Ware.TECHNIQUE) {
-			technique = Technique.byId(param);
-			if (technique == null || !BOOKS.containsKey(technique)) {
+			// Slip Giok Teknik: param is the spec id (legacy ids too); its grade sets the price and the hall level.
+			slip = TechniqueRegistry.byId(param);
+			if (slip == null) {
 				Msg.chat(player, Component.translatable("kultivator.hall.shop.pick_technique").withStyle(ChatFormatting.YELLOW));
+				return;
+			}
+			if (!sellable(slip)) {
+				Msg.chat(player, Component.translatable("kultivator.sumber.pavilion.not_sold", LearnRules.name(slip)).withStyle(ChatFormatting.YELLOW));
+				return;
+			}
+			if (level < slip.grade().pavilionHallLevel()) {
+				Msg.chat(player, Component.translatable("kultivator.sumber.pavilion.level", LearnRules.name(slip), slip.grade().displayName(),
+						slip.grade().pavilionHallLevel()).withStyle(ChatFormatting.YELLOW));
+				return;
+			}
+			if (slipsToday(core) >= SLIPS_PER_DAY) {
+				Msg.chat(player, Component.translatable("kultivator.sumber.pavilion.daily", SLIPS_PER_DAY).withStyle(ChatFormatting.YELLOW));
+				return;
+			}
+			cost = slipPrice(slip, level);
+			if (core.getIntOr("pool", 0) < cost) {
+				Msg.chat(player, Component.translatable("kultivator.hall.pk.pool_short", cost).withStyle(ChatFormatting.YELLOW));
 				return;
 			}
 		}
@@ -312,12 +401,20 @@ final class Contribution {
 				Msg.chat(player, Component.translatable("kultivator.hall.shop.envoy_done").withStyle(ChatFormatting.AQUA));
 			}
 			case TECHNIQUE -> {
-				ItemStack book = book(player, technique);
-				if (book.isEmpty()) {
+				ItemStack stack = JadeSlips.stack(slip.id());
+				if (stack.isEmpty()) {
 					Halls.addPool(owner, cost);
 					return;
 				}
-				give(player, book);
+				long day = Halls.dayIndex();
+				if (core.getLongOr("slip_day", -1L) != day) {
+					core.putLong("slip_day", day);
+					core.putInt("slips_today", 0);
+				}
+				core.putInt("slips_today", core.getIntOr("slips_today", 0) + 1);
+				give(player, stack);
+				Msg.chat(player, Component.translatable("kultivator.sumber.pavilion.bought", LearnRules.name(slip), cost,
+						Math.max(0, SLIPS_PER_DAY - slipsToday(core))).withStyle(ChatFormatting.AQUA));
 			}
 			case WARDING -> give(player, pill(AlchemyItems.TRIBULATION_WARDING_PILL));
 			case GOLDEN_CORE -> give(player, pill(AlchemyItems.GOLDEN_CORE_PILL));
@@ -337,16 +434,6 @@ final class Contribution {
 
 	private static ItemStack pill(Item item) {
 		return AlchemyComponents.withQuality(new ItemStack(item), PillQuality.MID);
-	}
-
-	/** An enchanted book whose enchantment maps to {@code technique} (empty when the enchantment is missing). */
-	private static ItemStack book(ServerPlayer player, Technique technique) {
-		ResourceKey<Enchantment> key = BOOKS.get(technique);
-		if (key == null) {
-			return ItemStack.EMPTY;
-		}
-		var enchantments = player.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
-		return enchantments.get(key).map(holder -> EnchantmentHelper.createBook(new EnchantmentInstance(holder, 1))).orElse(ItemStack.EMPTY);
 	}
 
 	/** Into the player's inventory, the rest at their feet. */

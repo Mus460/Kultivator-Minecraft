@@ -1,0 +1,56 @@
+{
+  "kultivator.technique.shadow_devil_fusion": "Shadow Devil Demon Spirit Fusion",
+  "kultivator.technique.shadow_devil_fusion.desc": "Your shadow detaches and scouts. You turn invisible for 400→600 ticks; every monster within 32 blocks (up to 32) loses track of you, takes ×2 from your next hit and is highlighted for you alone for 400 ticks.",
+  "kultivator.technique.shadow_devil_fusion.source": "Source: Tales of Demons and Gods ch. 40–56 · Nie Li's Shadow Devil demon spirit, a trace-concealing scout; fusing with it needs Silver rank",
+  "kultivator.technique.shadow_devil_fusion.lore": "The shadow at your feet opens one violet eye, then is gone.",
+
+  "kultivator.technique.samadhi_wind": "Samadhi Divine Wind",
+  "kultivator.technique.samadhi_wind.desc": "Channel 3 seconds of yellow sand-wind: a 14→24-block cone deals 0.3×P every half second, blinds for 120 ticks, slows (Slowness II, 60 ticks) and pushes monsters back.",
+  "kultivator.technique.samadhi_wind.source": "Source: Journey to the West ch. 21 · 三昧神风 Samadhi Divine Wind of the Yellow Wind Great King, which blinds Sun Wukong until Lingji Bodhisattva subdues him",
+  "kultivator.technique.samadhi_wind.lore": "Even fiery golden eyes water in this wind.",
+
+  "kultivator.technique.star_god_broken_shadow": "Star God's Broken Shadow",
+  "kultivator.technique.star_god_broken_shadow.desc": "Stage 1: blink from monster to monster 5→10 times within 20 blocks, striking each for 1.8×P; every afterimage bursts for 0.6×P. Stage 2 (within 2 s): blink back to where you started.",
+  "kultivator.technique.star_god_broken_shadow.source": "Source: Against the Gods · 星神碎影 Star God's Broken Shadow, the Star God Realm's movement divine art used by Jasmine, which splits the user into afterimages",
+  "kultivator.technique.star_god_broken_shadow.lore": "Starlight shatters, and every shard is you.",
+
+  "kultivator.technique.wraith_butterflies": "Silver Wraith Butterflies",
+  "kultivator.technique.wraith_butterflies.desc": "A swarm of silver butterflies covers up to 8→20 monsters within 24 blocks with soul damage of 0.35×P per second for 10 s; twelve of them circle you for 10 s and swallow up to 12 incoming projectiles.",
+  "kultivator.technique.wraith_butterflies.source": "Source: Heaven Official's Blessing · Hua Cheng's silver wraith butterflies (死灵蝶), heralds of his presence that swarm his enemies",
+  "kultivator.technique.wraith_butterflies.lore": "Where the silver wings gather, a certain ghost king is never far.",
+
+  "kultivator.technique.banana_leaf_fan": "Banana Leaf Fan",
+  "kultivator.technique.banana_leaf_fan.desc": "Stage 1: one swing sends a wall of wind 32→64 blocks long and 8→24 wide: 2.2×P and a huge knockback. Stage 2 (within 3 s): the back-swing pulls monsters in a 24-block cone toward you for 1×P.",
+  "kultivator.technique.banana_leaf_fan.source": "Source: Journey to the West ch. 59–61 · Princess Iron Fan's banana-leaf fan blows Sun Wukong tens of thousands of li away; Lingji's Wind-Settling Pill lets him withstand it",
+  "kultivator.technique.banana_leaf_fan.lore": "One fan of the leaf, and the enemy is somewhere past the horizon.",
+
+  "kultivator.technique.wind_roaring_formation": "Wind-Roaring Formation",
+  "kultivator.technique.wind_roaring_formation.desc": "Raises a cyclone formation of radius 14→28 at the aimed spot for 15 s: 0.3×P and fire every half second; every 2 s monsters are spun, lifted and blinded. When it ends, ten thousand blades strike everything inside for 3×P.",
+  "kultivator.technique.wind_roaring_formation.source": "Source: Investiture of the Gods ch. 44/46 · 風吼陣 of Dong Tianjun, one of the Ten Absolute Formations: wind and fire with ten thousand blades; Cihang breaks it with the Wind-Fixing Pearl",
+  "kultivator.technique.wind_roaring_formation.lore": "The four banners wave once, and the wind starts carrying knives.",
+
+  "kultivator.technique.soul_falling_formation": "Soul-Falling Formation",
+  "kultivator.technique.soul_falling_formation.desc": "A white-banner formation of radius 16→28 for 12 s: every 2 s, soul damage of 0.5×P per second for 4 s and a 25% chance to stun for 30 ticks. When it ends, every monster inside below 15% health (bosses 5%) is executed.",
+  "kultivator.technique.soul_falling_formation.source": "Source: Investiture of the Gods ch. 44/48 · 落魂陣 of Yao Bin (姚斌): a white paper banner with talisman seals, \"白旛展动，魄消魂散\", plus a straw-figure soul ritual",
+  "kultivator.technique.soul_falling_formation.lore": "The paper banner stirs, and souls forget the way back to their bodies.",
+
+  "kultivator.technique.billion_soul_flag": "One-Billion-Soul Flag",
+  "kultivator.technique.billion_soul_flag.desc": "Plants a soul flag with a field of radius 20→32 for 20 s: 0.5×P armour-piercing damage every second; each kill feeds it (+3%, up to 50 stacks). When it ends, the souls burst for 4×P plus 0.15×P per stack.",
+  "kultivator.technique.billion_soul_flag.source": "Source: Renegade Immortal · the Soul Refining Sect's billion-soul flag, with the souls of 12 Soul Transformation ancestors sealed inside",
+  "kultivator.technique.billion_soul_flag.lore": "Every scream on the wind is one more soul for the flag.",
+
+  "kultivator.technique.stygian_tiger_seal": "Stygian Tiger Seal",
+  "kultivator.technique.stygian_tiger_seal.desc": "Forbidden: costs 10% of your current health (never below 1). Raises 8 fierce corpses for 25 s that attack every second for 1.5×P; every 5 s a wave of terror weakens and slows monsters within 24 blocks.",
+  "kultivator.technique.stygian_tiger_seal.source": "Source: Mo Dao Zu Shi · 阴虎符 Stygian Tiger Seal, which Wei Wuxian forges from the iron sword in the Tortoise of Carnage's cave and uses to command fierce corpses with his flute Chenqing",
+  "kultivator.technique.stygian_tiger_seal.lore": "A flute note in the dark, and the dead answer it.",
+
+  "kultivator.technique.kunpeng_art": "Kunpeng Precious Art",
+  "kultivator.technique.kunpeng_art.desc": "After a 1 s charge, a Kun wind crescent travels 128 blocks through everything (12→24 wide): 16×P and knockback, while you dash 32 blocks behind it. Where it ends, a ring wave of 8→24 deals 6×P.",
+  "kultivator.technique.kunpeng_art.source": "Source: Perfect World ch. 347 on · Shi Hao's Kun Peng precious technique (鲲鹏宝术); the 128-block wind crescent is game design",
+  "kultivator.technique.kunpeng_art.lore": "In the northern darkness there is a fish; when it rises, the sky is cut in two.",
+
+  "kultivator.technique.karma_domain": "Karma Domain",
+  "kultivator.technique.karma_domain.desc": "Disciples only (star 46). A domain of radius 16→32 for 20 s links every monster inside: damage to one passes 40% to the others (bosses 25%). The master, disciples and pets inside reflect monster hits back.",
+  "kultivator.technique.karma_domain.source": "Source: Renegade Immortal · Wang Lin's Karma domain",
+  "kultivator.technique.karma_domain.lore": "Every blow returns along the red thread it came from."
+}

@@ -104,6 +104,12 @@ public final class CultivationData {
 	private double veinDensity = 1.0D;
 	private int formationTier;
 	private int sparringWith = -1;
+	/**
+	 * Session-only values modules show on the HUD and screens (DESIGN 19.1, 22.12.10 {@code sessionExtra.teknik}): sent
+	 * to the owner's client with the snapshot, never saved, cleared on join and respawn. Each module writes its own
+	 * sub-compound, then calls {@code Cultivators.dirty}.
+	 */
+	private CompoundTag sessionExtra = new CompoundTag();
 
 	public CultivationData() {
 		Arrays.fill(qualities, -1);
@@ -236,18 +242,37 @@ public final class CultivationData {
 
 	// ================================================================== techniques
 
+	// Technique ids are strings (DESIGN 22.2.4): every id of the form [a-z0-9_]{1,48} is kept (up to 512), also ids whose
+	// spec does not exist (any more); the enum overloads delegate to the string ones.
+
 	public boolean knows(Technique technique) {
-		return learned.contains(technique.id());
+		return knows(technique.id());
+	}
+
+	public boolean knows(String id) {
+		return learned.contains(id);
 	}
 
 	/** True if it was not known before. */
 	public boolean learn(Technique technique) {
-		return learned.add(technique.id());
+		return learn(technique.id());
+	}
+
+	/** True if it was not known before; malformed ids and ids beyond the 512 limit are refused. */
+	public boolean learn(String id) {
+		if (!TechniqueRegistry.savedIdOk(id) || learned.size() >= TechniqueRegistry.MAX_SAVED_IDS && !learned.contains(id)) {
+			return false;
+		}
+		return learned.add(id);
 	}
 
 	public void forget(Technique technique) {
-		learned.remove(technique.id());
-		if (selected.equals(technique.id())) {
+		forget(technique.id());
+	}
+
+	public void forget(String id) {
+		learned.remove(id);
+		if (selected.equals(id)) {
 			selected = "";
 		}
 	}
@@ -256,11 +281,23 @@ public final class CultivationData {
 		return java.util.Collections.unmodifiableSet(learned);
 	}
 
+	/** The known legacy techniques, in enum order. */
 	public java.util.List<Technique> learnedTechniques() {
 		java.util.List<Technique> list = new java.util.ArrayList<>();
 		for (Technique technique : Technique.values()) {
 			if (learned.contains(technique.id())) {
 				list.add(technique);
+			}
+		}
+		return list;
+	}
+
+	/** The known specs in catalogue order; ids without a spec are skipped (they stay saved). */
+	public java.util.List<TechniqueSpec> learnedSpecs() {
+		java.util.List<TechniqueSpec> list = new java.util.ArrayList<>();
+		for (TechniqueSpec spec : TechniqueRegistry.all()) {
+			if (learned.contains(spec.id())) {
+				list.add(spec);
 			}
 		}
 		return list;
@@ -272,22 +309,56 @@ public final class CultivationData {
 		selected = "";
 	}
 
+	/** The selected legacy technique, or null (also when a non-legacy spec is selected: see {@link #selectedId()}). */
 	public @Nullable Technique selected() {
 		return Technique.byId(selected);
+	}
+
+	/** The selected spec id ("" for none). */
+	public String selectedId() {
+		return selected;
 	}
 
 	public void setSelected(@Nullable Technique technique) {
 		this.selected = technique == null ? "" : technique.id();
 	}
 
+	/** Selects a spec id ("" or null clears; malformed ids are ignored). */
+	public void setSelectedId(@Nullable String id) {
+		if (id == null || id.isEmpty()) {
+			this.selected = "";
+		} else if (TechniqueRegistry.savedIdOk(id)) {
+			this.selected = id;
+		}
+	}
+
 	/** Ticks until the technique is ready, 0 when ready. */
 	public long cooldownLeft(Technique technique, long gameTime) {
-		Long readyAt = cooldowns.get(technique.id());
+		return cooldownLeft(technique.id(), gameTime);
+	}
+
+	/** Ticks until the spec {@code id} is ready, 0 when ready. */
+	public long cooldownLeft(String id, long gameTime) {
+		Long readyAt = cooldowns.get(id);
 		return readyAt == null ? 0L : Math.max(0L, readyAt - gameTime);
 	}
 
 	public void setCooldown(Technique technique, long gameTime, int ticks) {
-		cooldowns.put(technique.id(), gameTime + Math.max(0, ticks));
+		setCooldown(technique.id(), gameTime, ticks);
+	}
+
+	public void setCooldown(String id, long gameTime, int ticks) {
+		if (!TechniqueRegistry.savedIdOk(id)) {
+			return;
+		}
+		if (cooldowns.size() >= TechniqueRegistry.MAX_SAVED_IDS && !cooldowns.containsKey(id)) {
+			// Make room by dropping finished cooldowns first; a full map of running ones refuses the new key.
+			cooldowns.values().removeIf(readyAt -> readyAt <= gameTime);
+			if (cooldowns.size() >= TechniqueRegistry.MAX_SAVED_IDS) {
+				return;
+			}
+		}
+		cooldowns.put(id, gameTime + Math.max(0, ticks));
 	}
 
 	// ================================================================== breakthroughs
@@ -565,8 +636,14 @@ public final class CultivationData {
 		this.sparringWith = entityId;
 	}
 
+	/** Session-only module data for the owner's client (never saved). */
+	public CompoundTag sessionExtra() {
+		return sessionExtra;
+	}
+
 	/** Clears everything that only lasts for one session (join, respawn). */
 	public void resetSession() {
+		sessionExtra = new CompoundTag();
 		meditating = false;
 		flyingSword = false;
 		breakingThrough = false;
@@ -663,19 +740,22 @@ public final class CultivationData {
 			data.setComprehension(each, comp.getDoubleOr(each.id(), 0.0D));
 		}
 
+		// DESIGN 22.2.4: every well-formed id is kept (up to 512), whether or not its spec exists in this version.
 		ListTag known = tag.getListOrEmpty("learned");
 		for (Tag entry : known) {
 			entry.asString().ifPresent(id -> {
-				if (Technique.byId(id) != null) {
+				if (TechniqueRegistry.savedIdOk(id) && data.learned.size() < TechniqueRegistry.MAX_SAVED_IDS) {
 					data.learned.add(id);
 				}
 			});
 		}
 		String selectedId = tag.getStringOr("selected", "");
-		data.selected = Technique.byId(selectedId) != null ? selectedId : "";
+		data.selected = TechniqueRegistry.savedIdOk(selectedId) ? selectedId : "";
 		CompoundTag cds = tag.getCompoundOrEmpty("cooldowns");
 		for (String key : cds.keySet()) {
-			data.cooldowns.put(key, cds.getLongOr(key, 0L));
+			if (TechniqueRegistry.savedIdOk(key) && data.cooldowns.size() < TechniqueRegistry.MAX_SAVED_IDS) {
+				data.cooldowns.put(key, cds.getLongOr(key, 0L));
+			}
 		}
 
 		CompoundTag qual = tag.getCompoundOrEmpty("qualities");
@@ -722,6 +802,9 @@ public final class CultivationData {
 		session.putInt("formation", formationTier);
 		session.putInt("sparring", sparringWith);
 		tag.put("session", session);
+		if (!sessionExtra.isEmpty()) {
+			tag.put("session_extra", sessionExtra.copy());
+		}
 		return tag;
 	}
 
@@ -738,6 +821,7 @@ public final class CultivationData {
 		data.veinDensity = session.getDoubleOr("density", 1.0D);
 		data.formationTier = session.getIntOr("formation", 0);
 		data.sparringWith = session.getIntOr("sparring", -1);
+		data.sessionExtra = tag.getCompoundOrEmpty("session_extra").copy();
 		return data;
 	}
 

@@ -63,6 +63,8 @@ public class Kultivator implements ModInitializer {
 		KultivatorConfig.load();
 		ModAttachments.init();
 		Net.init();
+		// Phase 6c spine (DESIGN 22.14.6): DeathGuard is the only player ALLOW_DEATH listener; modules register their guards.
+		dev.kultivator.util.DeathGuard.init();
 
 		// Phase 1
 		Progression.init();
@@ -108,6 +110,10 @@ public class Kultivator implements ModInitializer {
 		dev.kultivator.sect.build.SectBuild.init();
 		// After every module registered its items.
 		ModItems.init();
+		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its
+		// items (FX layers may name them). It runs on both physical sides, so the client knows every spec without a sync;
+		// the client initializer never builds it again. Module inits must read the registry lazily.
+		dev.kultivator.data.TechniqueRegistry.init();
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) ->
 				CultivateCommand.register(dispatcher, buildContext));

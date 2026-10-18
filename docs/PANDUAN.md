@@ -7,6 +7,8 @@ membangkitkan binatang roh, dan membangun formasi. Sejak Fase 6 kamu juga mendir
 dari Hari Penerimaan Murid, dan membimbing mereka naik tanpa batas sampai **Bintang Abadi**, bahkan sampai melampauimu.
 Sejak Fase 6b sektemu **membangun dirinya sendiri** dari bahan yang kamu setor: pilih satu dari sembilan templat, dari
 Sekte Tak Berperingkat sampai Istana Langit, lalu saksikan kompleks sekte klasik tumbuh melewati sembilan tingkat.
+Sejak Fase 6c ada **169 teknik** (Teknik Dewa) dari cerita kultivasi sungguhan, yang makin dahsyat di setiap ranah, dengan
+**Kitab Teknik**, Roda Segel, Penguasaan Jurus, dan saklar satu klik bila kamu ingin jurusmu benar-benar membelah bumi.
 
 Semua angka di panduan ini diambil langsung dari kode mod. Angka kultivasi (XP) selalu ditampilkan sebagai bilangan
 bulat di dalam game.
@@ -14,8 +16,10 @@ bulat di dalam game.
 > **Janji keamanan blok:** tidak ada satu pun efek, teknik, peristiwa, makhluk, atau formasi dari mod ini yang
 > membakar, merusak, memasang, atau mengubah blok. Hanya ada dua pengecualian: **Pembangunan Sekte**, yang memasang blok
 > hanya di dalam tapak yang kamu lihat sebagai hologram lalu kamu konfirmasi sendiri (lihat
-> [20b](#20b-pembangunan-sekte)), dan **Mode Kehancuran**, yang harus dinyalakan sendiri dan **mati secara bawaan**
-> (lihat [peringatannya](#31-mode-kehancuran-peringatan)). Lihat juga [bagian terakhir](#37-janji-keamanan-blok).
+> [20b](#20b-pembangunan-sekte)), dan **Mode Kehancuran**, yang **mati secara bawaan** dan harus dinyalakan sendiri: untuk
+> jurusmu sendiri dengan satu klik ([12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang)), untuk Jurus
+> Pemusnah murid dengan tiga kunci ([31](#31-mode-kehancuran-peringatan)). Lihat juga
+> [bagian terakhir](#37-janji-keamanan-blok).
 
 ---
 
@@ -32,7 +36,12 @@ bulat di dalam game.
 9. [Qi dan HUD](#9-qi-dan-hud)
 10. [Akar spiritual](#10-akar-spiritual)
 11. [Jalan Dao dan Pemahaman Dao](#11-jalan-dao-dan-pemahaman-dao)
-12. [Teknik (23 teknik)](#12-teknik)
+12. [Teknik Dewa (169 teknik)](#12-teknik-dewa-169-teknik)
+    * 12.1 [Kitab Teknik](#121-kitab-teknik) · 12.4 [Kekuatan](#124-kekuatan-tumbuh-bersama-ranah) ·
+      12.5 [Penguasaan Jurus](#125-penguasaan-jurus) · 12.6 [Cara memperoleh](#126-cara-memperoleh-teknik) ·
+      12.7 [Katalog](#127-katalog-teknik-baru) · 12.8 [23 teknik lama](#128-dua-puluh-tiga-teknik-lama-yang-diperkuat) ·
+      12.10 [Murid](#1210-teknik-dan-murid) · 12.12 [Perintah](#1212-perintah-teknik)
+    * 12.11 [**MODE KEHANCURAN untuk jurusmu sendiri**](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang)
 13. [Pil vanilla dan racun pil](#13-pil-vanilla-dan-racun-pil)
 14. [Alkimia](#14-alkimia)
 15. [Iblis Hati](#15-iblis-hati)
@@ -74,7 +83,9 @@ bulat di dalam game.
 4. **Naik tahap.** Di setiap ranah ada 4 tahap (Awal, Menengah, Akhir, Puncak). Kamu naik tahap otomatis saat bar
    penuh. Di Tahap Puncak kamu harus menerobos ke ranah berikutnya.
 5. **Pelajari teknik.** Di Pemurnian Qi kamu langsung menguasai *Langkah Awan* (lompat lagi di udara) dan *Telapak Qi*
-   (tekan `G`). Semakin tinggi ranahmu, semakin banyak teknik yang terbuka.
+   (tekan `G`). Semakin tinggi ranahmu, semakin banyak dan semakin dahsyat teknik yang terbuka. Tekan `-` untuk membuka
+   **Kitab Teknik**: semua 169 teknik, sumber ceritanya, angkanya, dan cara memperolehnya (lihat
+   [Teknik Dewa](#12-teknik-dewa-169-teknik)).
 6. **Pilih Dao** saat mencapai *Inti Emas*: jalan seumur hidup yang menentukan teknik dan kekuatanmu.
 7. **Dirikan sekte.** Buat dan pasang **Prasasti Aula Sekte** (lihat [Aula Sekte](#20-aula-sekte)). Setiap beberapa
    hari para calon murid datang ke prasastimu saat fajar: uji mereka, terima yang kamu pilih, lalu bimbing mereka.
@@ -90,10 +101,12 @@ Kalau bingung, buka tab **Bantuan** di gulungan (`'`) atau ketik `/kultivasi` un
 
 | Tombol bawaan | Fungsi |
 |---|---|
-| `G` | Rapal teknik yang sedang dipilih |
+| `G` | Ketuk: rapal teknik yang sedang dipilih. Tahan ≥ 250 ms: buka **Roda Segel** ([12.1](#121-kitab-teknik)) |
 | `;` | Mulai / berhenti meditasi. Saat bermeditasi dengan bar penuh di leher botol: memulai terobosan |
 | `'` | Buka gulungan kultivasi (layar info) |
-| `,` dan `.` | Pilih teknik sebelumnya / berikutnya |
+| `-` | Buka **Kitab Teknik** |
+| `,` dan `.` | Pilih teknik sebelumnya / berikutnya di dalam Cincin Segel (semua teknik bila cincin kosong) |
+| Roda Segel (tahan), Segel Cepat 1–4 | Belum diatur. Begitu Roda Segel diatur, `G` merapal saat ditekan; Segel Cepat merapal soket 1–4 Cincin Segel |
 | `\` | Naik / turun dari Pedang Terbang |
 | Lompat di udara (`Spasi`) | *Langkah Awan*: lompatan tambahan di udara (setelah teknik ini dikuasai) |
 
@@ -116,9 +129,14 @@ bentrok dengan tombol vanilla, Butter Bot, maupun Iris (K, O, R).
 | `/kultivasi root info` | Menampilkan akar spiritualmu |
 | `/kultivasi dao` / `dao info` | Keterangan Dao dan Pemahaman Dao |
 | `/kultivasi dao choose <dao>` | Memilih Dao (Inti Emas ke atas, sekali seumur hidup). `<dao>`: `sword`, `fire`, `ice`, `lightning`, `body`, `life`, `shadow`, `space` |
-| `/kultivasi technique list` | Daftar teknik yang kamu kuasai, biaya, dan jeda |
-| `/kultivasi technique select <id>` | Memilih teknik |
-| `/kultivasi technique cast <id>` | Merapal teknik tertentu langsung |
+| `/kultivasi teknik` / `teknik kitab [id]` | Membuka [Kitab Teknik](#121-kitab-teknik) (dengan id: kartu itu terfokus) |
+| `/kultivasi teknik info <id>` | Nama, Sumber, angka langsung, penguasaan, dan cara memperoleh teknik itu di chat |
+| `/kultivasi teknik pilih <id>` / `teknik rapal <id>` | Memilih / merapal teknik yang kamu kuasai |
+| `/kultivasi teknik daftar [dao <dao>\|tingkat <tingkat>\|jenis <jenis>]` | Teknik yang kamu kuasai dengan penguasaan dan sisa jeda ([12.12](#1212-perintah-teknik)) |
+| `/kultivasi teknik slot <1-12> <id\|kosong>` / `slot isi` / `slot hapus` | Mengatur Cincin Segel |
+| `/kultivasi teknik pahamkan <murid> <id>` | Memilih teknik Dewa yang dipahami murid di gelar bintang barunya (biasanya lewat klik di chat) |
+| `/kultivasi technique list` / `select <id>` / `cast <id>` | Perintah lama; tetap bekerja dengan semua id teknik |
+| `/kultivasi warisan pilih <1-3>` | Memilih hadiah [Ujian Warisan](#126-cara-memperoleh-teknik) |
 | `/kultivasi visual <bagian> on` / `off` | Menyalakan / mematikan kosmetik: `aura`, `robe`, `back_sword`, `eyes`, `dao_circle` |
 | `/kultivasi beast list` | Daftar Binatang Rohmu yang termuat |
 | `/kultivasi formation list` | Daftar Formasi Pelindungmu |
@@ -133,9 +151,10 @@ bentrok dengan tombol vanilla, Butter Bot, maupun Iris (K, O, R).
 | `/kultivasi aula info` | Keterangan [Aula Sekte](#20-aula-sekte)-mu: tingkat, ketenaran, batas murid, radius wilayah, kas, letak prasasti, jadwal |
 | `/kultivasi aula nama <nama>` | Mengganti nama aula (3–24 huruf, angka, spasi, `-` atau `_`) |
 | `/kultivasi aula bangun ...` | [Pembangunan Sekte](#20b-pembangunan-sekte): status, `templat`, `pratinjau <1-9> [arah] [glasir]`, `putar`, `konfirmasi`, `batal`, `setor [semua\|butuh]`, `jeda`, `lanjut`, `naik <2-9>`, `perbaiki`, `bongkar`, `lepaskan`, dan lainnya ([daftar lengkap](#20b16-perintah)) |
-| `/kultivasi kehancuran` / `kehancuran status` | Status [Mode Kehancuran](#31-mode-kehancuran-peringatan): tiga kunci, batas, jurus yang berjalan, sisa jendela pulih |
+| `/kultivasi kehancuran nyala` / `kehancuran mati` | **Saklar satu klik** Mode Kehancuran untuk jurusmu sendiri ([12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang)); tanpa sumpah |
+| `/kultivasi kehancuran` / `kehancuran status` | Status [Mode Kehancuran](#31-mode-kehancuran-peringatan): saklar jurus sendiri (K, blok per rapalan, zona aman), tiga kunci murid, batas, jurus yang berjalan, pahatanmu, sisa jendela pulih |
 | `/kultivasi kehancuran sumpah` | Membuka layar merah Sumpah Kehancuran (hanya bila server mengizinkan Mode Kehancuran) |
-| `/kultivasi kehancuran pulihkan` | Memulihkan blok dari jurus penghancur milikmu yang masih dalam jendela pulih |
+| `/kultivasi kehancuran pulihkan` | Memulihkan blok dari jurusmu sendiri dan Jurus Pemusnah muridmu yang masih dalam jendela pulih |
 | `/kultivasi kehancuran ya` / `batal` | Sama dengan tombol chat **[Ya, hancurkan]** / **[Batal]** sebuah perintah penghancuran |
 | `/kultivasi kehancuran izin on` / `off` | **Khusus operator** (level 2): mengizinkan atau mematikan Mode Kehancuran di server dan menulis `config/kultivator.json` |
 
@@ -171,7 +190,7 @@ Butuh izin operator (level 2). `[pemain]` berarti target pemain boleh ditambahka
 | `set quality <cracked\|normal\|perfect\|heavenly> [pemain]` | Kualitas terobosan ranah saat ini |
 | `addxp <jumlah> [pemain]` | Menambah kultivasi persis (tanpa pengali) |
 | `fill [pemain]` | Bar dan qi penuh |
-| `learn <teknik>\|all [pemain]` / `forget <teknik>\|all [pemain]` | Mempelajari / melupakan teknik |
+| `learn <teknik>\|all [pemain]` / `forget <teknik>\|all [pemain]` | Mempelajari / melupakan teknik (semua 169 id teknik disarankan dengan Tab) |
 | `deviation clear [pemain]` | Menghapus Penyimpangan Qi |
 | `toxicity clear [pemain]` / `toxicity set <0-100>` | Mengatur racun pil |
 | `reset [pemain]` | Menghapus seluruh data kultivasi |
@@ -238,6 +257,18 @@ atau yang terdekat dalam 16 blok.
 | `aula bangun bank <tick>` | Mengatur tabungan waktu pembangunan (0–72.000) |
 | `aula bangun rencana ulang` | Menyusun ulang rencana tapak ke versi rencana terbaru |
 
+**Perintah uji Fase 6c** (juga di bawah `/kultivasi debug`), untuk [Teknik Dewa](#12-teknik-dewa-169-teknik):
+
+| Perintah | Fungsi |
+|---|---|
+| `teknik mastery <id\|semua> <0-4>` / `teknik mastery tambah <id> <poin>` | Mengatur tingkat penguasaan / menambah poin penguasaan |
+| `teknik cooldowns reset` | Semua jeda, jeda global, kunci pamungkas, dan muatan selesai |
+| `teknik lupakan <id\|semua>` | Melupakan teknik |
+| `teknik kekuatan` | R, C, Q, S, P, A/D/N, tingkat, batas bos per tingkat, K, dan batas blok Mode Kehancuran |
+| `teknik beban` | Beban teknik di server: rapalan aktif, makhluk maya, proyektil, medan, boneka, DOT/IKAT/TAUT, peristiwa FX per detik, tugas kehancuran |
+| `teknik feat <jenis> <n>` | Mengatur penghitung prestasi (`kills_with`, `casts_with`, `first_kill`, `meditate_at`, `alchemy_count`, `trib`, `heart_demon_win`, `deviation_recovered`) |
+| `murid teknik mastery <nama> <id\|semua> <0-4>` | Penguasaan teknik murid |
+
 ### 3.4 Perintah uji cepat (`/kultivasi uji ...`)
 
 Khusus operator. `/kultivasi uji` tanpa tambahan menampilkan daftar ini di chat.
@@ -248,7 +279,9 @@ Khusus operator. `/kultivasi uji` tanpa tambahan menampilkan daftar ini di chat.
 | `/kultivasi uji ranah <ranah> [tahap] [tingkat]` | Lompat ke ranah mana saja, lengkap dengan tekniknya dan qi penuh |
 | `/kultivasi uji tur [detik]` / `uji tur stop` | Tur semua ranah beberapa detik per ranah untuk melihat efeknya; data aslimu dikembalikan di akhir |
 | `/kultivasi uji kit` | Kotak shulker berisi semua item mod, pil tiap mutu, kitab teknik, item langka, bahan formasi dan alkimia |
-| `/kultivasi uji teknik` | Pelajari semua teknik, hapus jeda, isi penuh qi |
+| `/kultivasi uji teknik` | Pelajari semua 168 teknik pemain, hapus jeda, isi penuh qi |
+| `/kultivasi uji teknik semua\|<id>\|pamer ...\|bebas ...\|penguasaan ...\|gerbang\|kehancuran ...\|audit\|murid <nama>` | Uji [Teknik Dewa](#12-teknik-dewa-169-teknik): hitungan per set, rapalan uji dengan angka lengkap, pameran semua teknik, rapal bebas, penguasaan, Gerbang Dewa, kawah saat uji, audit registri, mengajari murid ([daftar lengkap dengan contoh](#1212-perintah-teknik)) |
+| `/kultivasi uji boneka [1-6] [bos]` / `uji boneka hapus` | Boneka latihan yang tidak bisa mati dengan papan nama kerusakan (5 menit) |
 | `/kultivasi uji murid <nama\|semua> maks` | Murid itu (atau semua muridmu) langsung Dewa Abadi Tahap Puncak, akar Surgawi, semua teknik yang bisa diajarkan, qi dan nyawa penuh |
 | `/kultivasi uji murid <nama\|semua> ranah <ranah> [tahap] [tingkat]` | Lompat ke ranah mana saja |
 | `/kultivasi uji murid <nama\|semua> tur [detik]` | Tur ranah untuk murid itu; datanya dikembalikan di akhir |
@@ -567,7 +600,8 @@ Formasi juga memberi bonus Kualitas Terobosan (+0,03 per tingkat) bila kamu mene
 ## 9. Qi dan HUD
 
 * **Qi maksimum**: lihat [tabel kekuatan](#kekuatan-dari-kultivasi).
-* **Pemulihan qi** per detik: 0,4% dari maksimum; ×6 saat meditasi; ×1,5 di tempat spiritual; 0 saat Penyimpangan Qi.
+* **Pemulihan qi** per detik: 0,4% dari maksimum × (1 + 0,1 × tingkat ranah: PQ/PF 0, IE/JBL 1, TD/PD 2, Kenaikan Abadi 3,
+  Dewa Abadi 4, jadi Dewa Abadi ×1,4); ×6 saat meditasi; ×1,5 di tempat spiritual; 0 saat Penyimpangan Qi.
 * Qi dipakai oleh teknik dan Pedang Terbang, dan dipulihkan oleh pil.
 
 **HUD (kiri bawah):**
@@ -575,7 +609,9 @@ Formasi juga memberi bonus Kualitas Terobosan (+0,03 per tingkat) bila kamu mene
 * **Cincin emas** di sekelilingnya terisi searah jarum jam sesuai isi bar kultivasi.
 * Nama ranah dan tahap dalam warna ranah, angka qi, `+N Qi Tertimbun` (atau `Qi Abadi`), petunjuk "Leher botol:
   siap menerobos", sisa waktu Penyimpangan Qi (merah), peringatan racun pil.
-* Teknik terpilih sebagai **ubin jimat** dengan biaya qi dan sapuan jeda melingkar.
+* Teknik terpilih sebagai **ubin segel** (glif, pita tingkat, empat manik penguasaan, biaya qi, sapuan jeda), ubin segel
+  cepat, busur Perisai Qi, busur waktu wujud/wilayah/medan, bilah isi dan pip tahap, tag merah KEHANCURAN, dan toast teknik
+  (lihat [12.1](#121-kitab-teknik)).
 * Saat meditasi: pengali tempat, kepadatan qi, dan nama formasi.
 
 HUD tersembunyi saat F1 atau F3, dan bisa dimatikan di tab Pengaturan (disimpan di `config/kultivator-client.json`).
@@ -642,6 +678,9 @@ Setelah terobosan ke Inti Emas, gulungan terbuka di tab *Akar & Dao* dan obrolan
 
 Dao Tubuh juga memberi zirah dari kultivasi ×1,5.
 
+Tabel di atas adalah dua teknik lama tiap Dao. Sejak Fase 6c setiap Dao punya 11–15 teknik baru lagi, dari Inti Emas
+sampai Gerbang Dewa: lihat [katalog](#127-katalog-teknik-baru).
+
 ### 11.2 Pemahaman Dao
 
 Nilai 0–100% untuk tiap Dao. Kerusakan teknik dikalikan `1 + pemahaman ÷ 100` (hingga ×2).
@@ -658,7 +697,7 @@ Nilai 0–100% untuk tiap Dao. Kerusakan teknik dikalikan `1 + pemahaman ÷ 100`
 
 | Sumber | Jumlah |
 |---|---|
-| Merapal teknik milik Dao-mu (teknik universal tidak dihitung) | +0,15 per rapalan |
+| Merapal teknik milik Dao-mu yang **mengenai monster** (teknik universal tidak dihitung) | +0,15 × faktor tingkat (Kuning 1 … Dewa 3) per rapalan, paling banyak +3,0 per Dao per hari game ([12.5](#125-penguasaan-jurus)) |
 | **Pedang**: membunuh monster sambil memegang pedang | +0,05 |
 | **Api**: membunuh monster yang sedang terbakar | +0,05 |
 | **Es**: membunuh monster di bioma dingin/bersalju | +0,05 |
@@ -680,88 +719,975 @@ pilih. Melewati setiap tingkat diumumkan dengan efek, suara, dan pencapaian.
 
 ### 11.3 Kitab teknik (Buku Pesona)
 
-Teknik tingkat lanjut tersimpan di **Buku Pesona** vanilla. **Jongkok + gunakan** buku itu untuk membacanya:
-* bila tekniknya bisa dipelajari sekarang → teknik dikuasai dan buku habis;
-* bila teknik sudah dikuasai, atau itu kitab Dao-mu yang belum bisa dipelajari → +5 Pemahaman Dao (buku habis);
-* selain itu kamu diberi tahu apa yang kurang, dan buku tetap utuh;
-* buku tanpa pesona yang dipetakan → +30 kultivasi.
+Teknik tingkat lanjut tersimpan di **Buku Pesona** vanilla. Sejak Fase 6c setiap pesona punya **kolam** teknik (31 pesona,
+dari Ketajaman sampai Kutukan Sirna). **Jongkok + gunakan** buku itu untuk membacanya:
+* buku mengajarkan teknik pertama di kolamnya yang bisa kamu pelajari sekarang (urut tingkat), lalu buku habis;
+* bila semua teknik kolamnya sudah kamu kuasai atau belum bisa kamu pelajari → wawasan: +5 Pemahaman Dao dan +15 penguasaan
+  untuk teknik kolam yang sudah kamu kenal (buku habis);
+* bila tidak ada yang bisa → kamu diberi tahu apa yang kurang, dan buku tetap utuh;
+* buku yang pesonanya tidak punya kolam (misalnya Kedayagunaan) → +30 kultivasi.
 
-Tooltip buku menunjukkan teknik apa yang diajarkannya dan apakah kamu sudah bisa memahaminya.
-
-| Pesona | Teknik | Syarat |
-|---|---|---|
-| Ketajaman (Sharpness), Tepi Menyapu (Sweeping Edge) | Seribu Pedang | Dao Pedang, Jiwa Baru Lahir, Pemahaman 30% |
-| Rupa Api (Fire Aspect), Nyala Api (Flame) | Api Phoenix | Dao Api, Jiwa Baru Lahir, Pemahaman 30% |
-| Pengarung Kebekuan (Frost Walker) | Penjara Gletser | Dao Es, Jiwa Baru Lahir, Pemahaman 30% |
-| Pemusatan (Channeling) | Petir Surgawi | Dao Petir, Jiwa Baru Lahir, Pemahaman 30% |
-| Perlindungan (Protection), Duri (Thorns) | Hentakan Gunung | Dao Tubuh, Jiwa Baru Lahir, Pemahaman 30% |
-| Pemulihan (Mending) | Serap Kehidupan | Dao Kehidupan, Jiwa Baru Lahir, Pemahaman 30% |
-| Selinap Cepat (Swift Sneak), Peredaan Jatuh (Feather Falling) | Badai Angin | Dao Bayangan, Jiwa Baru Lahir, Pemahaman 30% |
-| Ketakberhinggaan (Infinity), Kesetiaan (Loyalty) | Penjara Ruang | Dao Ruang, Jiwa Baru Lahir, Pemahaman 30% |
-| Penumpas Bangkai (Smite) | Telapak Buddha | teknik universal, Inti Emas (tanpa syarat Dao) |
+Tooltip buku mencantumkan isi kolam menurut tingkat, teknik yang akan diajarkannya ("▶ Mengajarkan …"), dan alasan setiap
+teknik yang terkunci. Daftar lengkap kolam ada di [12.6](#126-cara-memperoleh-teknik). Delapan kitab lama tetap ada di
+kolamnya (misalnya Ketajaman masih mengajarkan Seribu Pedang, Penumpas Bangkai masih mengajarkan Telapak Buddha), tetapi
+kolam yang sama kini juga berisi teknik baru dari tingkat yang lebih tinggi.
 
 ---
 
-## 12. Teknik
+## 12. Teknik Dewa (169 teknik)
 
-Pilih teknik dengan `,` / `.` atau di tab *Teknik*, lalu rapal dengan `G`. Teknik memakai qi, punya jeda, dan **hanya
-mengenai monster** (tidak pernah pemain, hewan peliharaan, penduduk desa, atau hewan damai; kecuali lawan Latih
-Tanding yang sudah setuju). Teknik tidak pernah menyentuh blok. Kalau tidak ada sasaran atau tempat aman, teknik
-batal tanpa memakan qi maupun jeda.
+Sejak Fase 6c Kultivator punya **169 teknik**: 146 teknik baru ditambah 23 teknik lama yang diperkuat. Kamu bisa
+mempelajari **168** di antaranya; satu, *Wilayah Karma*, khusus murid. Semakin tinggi ranahmu, semakin dahsyat setiap
+jurus: di Dewa Abadi, Telapak Qi yang sama memukul sekitar **165 kali** lebih keras daripada di Pemurnian Qi, dengan
+jangkauan, durasi, jumlah, dan ukuran visual yang jauh lebih besar. Jurus terkuat baru terbuka di Kenaikan Abadi, Dewa
+Abadi, dan Gerbang Dewa.
 
-**Kekuatan teknik (D)** = `(4 + 2,5 × ranah + 0,5 × tahap) × (1 + Pemahaman Dao ÷ 100)`.
+**Sumber.** Setiap teknik diambil dari cerita kultivasi sungguhan (novel, donghua, manhua). Tooltip dan bilah bambu
+Kitab Teknik menulis baris **"Sumber: <karya> · <nama jurus>"** (judul karya tetap dalam bahasa Inggris). Nama yang tidak
+bisa diverifikasi ditulis **"Terinspirasi dari …"**. Angka, rumus, tampilan, dan aturan keselamatan adalah desain
+permainan, bukan kanon.
 
-Teknik tidak bisa dipakai saat Penyimpangan Qi atau saat menerobos; pengecualiannya ujian Iblis Hati sebelum
-terobosan, di mana semua teknik kecuali Pedang Terbang boleh dipakai. Merapal teknik menghentikan meditasi.
+**Aturan yang tidak berubah.** Teknik **hanya mengenai monster**: tidak pernah pemain (kecuali lawan Latih Tanding atau
+duel yang sudah setuju), hewan peliharaan, penduduk desa, atau hewan damai. Secara bawaan teknik **tidak menyentuh blok
+sama sekali**: tanpa api di blok, tanpa ledakan, tanpa entity petir, tanpa proyektil sungguhan, cuaca dan waktu tidak
+diubah. Kekuatan dahsyat tampil sebagai efek di layarmu dan kerusakan pada monster. Blok baru benar-benar hancur bila kamu
+sendiri menyalakan **Mode Kehancuran** untuk jurusmu ([12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang)).
 
-### 12.1 Teknik universal
+| Set | Kuning | Misterius | Bumi | Langit | Abadi | Dewa | Baru | + lama |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Pedang | – | 4 | 4 | 4 | 1 | 1 | 14 | 2 |
+| Api | – | 4 | 5 | 4 | 1 | 1 | 15 | 2 |
+| Es | – | 4 | 4 | 4 | 1 | 1 | 14 | 2 |
+| Petir | – | 5 | 4 | 3 | 1 | 1 | 14 | 2 |
+| Tubuh | – | 3 | 5 | 3 | 1 | 1 | 13 | 2 |
+| Kehidupan | – | 4 | 4 | 3 | 2 | 1 | 14 | 2 |
+| Bayangan & Angin | – | 2 | 3 | 3 | 1 | 2 (1 khusus murid) | 11 | 2 |
+| Ruang | – | 3 | 4 | 3 | 1 | 2 | 13 | 2 |
+| Universal | 4 | 7 | 10 | 13 | 3 | 1 | 38 | 7 |
+| **Jumlah** | **4** | **36** | **43** | **40** | **12** | **11** | **146** | **23** |
 
-| Teknik | Ranah | Qi | Jeda | Cara membuka | Efek |
-|---|---|---:|---:|---|---|
-| **Langkah Awan** (`cloud_step`) | Pemurnian Qi | 6 | 0,5 dtk | otomatis (pasif) | Tekan lompat di udara untuk lompatan tambahan: 1× (Pemurnian Qi), 2× (Pembangunan Fondasi), 3× (Inti Emas ke atas); tidak ada luka jatuh sesudahnya |
-| **Telapak Qi** (`qi_palm`) | Pemurnian Qi | 10 | 1,5 dtk | otomatis | Hentakan qi lurus 12 blok ke depan, 1 D |
-| **Pedang Terbang** (`flying_sword`) | Pembangunan Fondasi | 2, lalu per detik | 2 dtk | otomatis | Berdiri di atas pedang dan benar-benar terbang (tombol `\` atau `G`). Butuh pedang apa pun di inventaris (dipakai yang terbaik). Kecepatan `0,05 + 0,01 × ranah`; qi per detik `max(0,5; 2 − 0,2 × ranah)`. Qi habis, pukulan keras, terobosan, atau tombol lagi → turun dengan Jatuh Lambat 6 detik. Tidak berpengaruh di mode Kreatif/Penonton |
-| **Telapak Buddha** (`buddha_palm`) | Inti Emas | 45 | 12 dtk | Kitab: Penumpas Bangkai | Telapak emas raksasa jatuh di titik yang kamu tatap (≤ 24 blok), area 5 blok, 2,5 D, menjatuhkan monster |
-| **Indra Ilahi** (`divine_sense`) | Jiwa Baru Lahir | 30 | 20 dtk | otomatis | Monster dalam 48 blok bercahaya 12 detik + bijih dalam radius 12 ditandai 10 detik |
-| **Wujud Dharma** (`dharma_form`) | Transformasi Dewa | 80 | 60 dtk | otomatis | 30 detik: tubuh ×2 (butuh ruang di atas kepala), Kekuatan II, Ketahanan I, jangkauan +2, garis emas bercahaya |
-| **Wilayah Dao** (`dao_domain`) | Penyatuan Dao | 120 | 90 dtk | otomatis | 20 detik, radius 10 mengikutimu, efek Dao tiap detik pada monster di dalamnya (lihat bawah) |
+**Cara membaca angka di bab ini.** **P** adalah Kekuatan teknikmu ([12.4](#124-kekuatan-tumbuh-bersama-ranah)); "2,5×"
+berarti kerusakan 2,5 × P. "8→20" berarti nilai dasar 8 yang tumbuh bersama ranah dan penguasaan sampai batas 20. "dtk" =
+detik, "r" = jari-jari dalam blok.
 
-### 12.2 Teknik Dao
+### 12.1 Kitab Teknik
 
-Teknik Inti Emas terbuka otomatis saat memilih Dao. Teknik Jiwa Baru Lahir dipelajari dari kitab (Pemahaman 30%).
+**Membuka.** Tekan **`-`** (minus), klik kartu **Buka Kitab Teknik** di tablet Teknik gulungan kultivasi (`'`), atau
+ketik `/kultivasi teknik kitab [id]` (dengan id, kartu itu langsung terfokus). Gulungan giok terbuka dalam seperempat
+detik. Tablet di kiri: **Kodeks**, **Cincin Segel**, **Mode Kehancuran** (tablet merah), dan **Bantuan**. Semua halaman
+muat di GUI 320×240.
 
-| Teknik | Dao | Ranah | Qi | Jeda | Cara membuka | Efek |
-|---|---|---|---:|---:|---|---|
-| **Tebasan Qi Pedang** (`sword_qi`) | Pedang | Inti Emas | 20 | 3 dtk | pilih Dao | Bulan sabit qi 16 blok, menembus semua monster di garisnya, 1,5 D |
-| **Seribu Pedang** (`thousand_swords`) | Pedang | Jiwa Baru Lahir | 90 | 40 dtk | kitab | Hujan pedang cahaya pada setiap monster dalam 16 blok selama 4 detik |
-| **Telapak Api** (`flame_palm`) | Api | Inti Emas | 20 | 3 dtk | pilih Dao | Kerucut api 7 blok, 1 D, membakar monster 6 detik |
-| **Api Phoenix** (`phoenix_flame`) | Api | Jiwa Baru Lahir | 80 | 35 dtk | kitab | Phoenix api terbang 24 blok ke depan, membakar semua monster yang dilewati, 2 D |
-| **Lotus Es** (`frost_lotus`) | Es | Inti Emas | 20 | 4 dtk | pilih Dao | Ledakan es radius 6, 1 D, Kelambatan IV + membeku 6 detik |
-| **Penjara Gletser** (`glacier_prison`) | Es | Jiwa Baru Lahir | 70 | 30 dtk | kitab | Target dan monster dalam 5 blok darinya membeku di tempat 8 detik, 1,5 D |
-| **Telapak Petir** (`thunder_palm`) | Petir | Inti Emas | 25 | 4 dtk | pilih Dao | Petir partikel ke target, melompat ke 4 monster lain, 1 D |
-| **Petir Surgawi** (`heavenly_thunder`) | Petir | Jiwa Baru Lahir | 90 | 40 dtk | kitab | 8 sambaran petir partikel pada monster dalam 16 blok, 2 D tiap sambaran |
-| **Tubuh Besi** (`iron_body`) | Tubuh | Inti Emas | 25 | 30 dtk | pilih Dao | 15 detik: Ketahanan II, kebal dorongan, memantulkan 30% serangan jarak dekat |
-| **Hentakan Gunung** (`mountain_stomp`) | Tubuh | Jiwa Baru Lahir | 60 | 20 dtk | kitab | Gelombang kejut radius 7, 2 D, melempar monster ke udara |
-| **Mata Air Kehidupan** (`spring_of_life`) | Kehidupan | Inti Emas | 30 | 20 dtk | pilih Dao | Memulihkan dirimu, teman, dan hewan peliharaan dalam 8 blok sebesar 40% nyawa maks., menyembuhkan racun dan wither |
-| **Serap Kehidupan** (`life_drain`) | Kehidupan | Jiwa Baru Lahir | 60 | 25 dtk | kitab | Menyerap monster dalam 8 blok (1 D tiap monster), memulihkan 50% kerusakan yang dihasilkan |
-| **Langkah Bayangan** (`shadow_step`) | Bayangan | Inti Emas | 20 | 6 dtk | pilih Dao | Pindah ke belakang monster yang kamu tatap (≤ 20 blok) dengan aman; serangan berikutnya dalam 5 detik ×2 |
-| **Badai Angin** (`gale`) | Bayangan | Jiwa Baru Lahir | 50 | 20 dtk | kitab | Melempar monster dalam 10 blok jauh-jauh + Tak Terlihat dan Kecepatan II 6 detik |
-| **Kedipan Ruang** (`space_blink`) | Ruang | Inti Emas | 25 | 5 dtk | pilih Dao | Pindah ke titik yang kamu tatap (≤ 24 blok) bila aman |
-| **Penjara Ruang** (`space_prison`) | Ruang | Jiwa Baru Lahir | 80 | 35 dtk | kitab | Monster dalam 12 blok terkunci di tempat 6 detik dan ditarik berkumpul, 1,5 D |
+**Kodeks: saringan.**
 
-**Efek Wilayah Dao per detik** (monster di dalam radius 10):
-
-| Dao | Efek |
+| Baris | Isi |
 |---|---|
-| Tanpa Dao | Tekanan qi 0,4 D |
-| Pedang | Sayatan 0,5 D |
-| Api | Membakar + 0,3 D |
-| Es | Kelambatan III + membeku |
-| Petir | Satu sambaran partikel 0,8 D pada monster acak |
-| Tubuh | Kamu mendapat Ketahanan II |
-| Kehidupan | Kamu dan teman mendapat Regenerasi II, monster mendapat Wither I |
-| Bayangan | Monster dibutakan, kamu Tak Terlihat |
-| Ruang | Monster Kelambatan V dan ditarik ke tengah |
+| A | kolom cari bertinta, penghitung "Dikuasai x/168", jimat **Urutkan** (Tingkat / Ranah / Nama / Dao / Penguasaan) |
+| B | koin **Dao** (Semua, Universal, delapan trigram) dan enam koin **tingkat** dalam warna pita (Kuning, Misterius, Bumi, Langit, Abadi, Dewa) |
+| C | jimat **Ranah** (Semua / Bisa kurapal / tiap ranah dari Inti Emas sampai Dewa Abadi / Gerbang Dewa), jimat **Jenis** (klik kiri berikutnya, klik kanan sebelumnya), chip keadaan **Semua / Dikuasai / Bisa Dipelajari / Terkunci**, koin **Hanya pamungkas** |
+
+Semua saringan digabung (harus cocok semuanya) dan diingat di `config/kultivator-client.json`. Bila diurutkan menurut
+tingkat, grid diberi kepala kelompok seperti "Tingkat Bumi · 18".
+
+**Kartu segel** menampilkan glif (trigram Dao dan tanda jenis), pita tingkat di sudut (Dewa berkilau pelangi), empat manik
+penguasaan, gembok bila terkunci, sapuan jeda, nomor soket Cincin Segel, **tanda retak merah kecil** bila jurus itu bisa
+memahat dunia, dan lencana **BARU** sampai kartunya kamu buka. Tooltip-nya: nama Indonesia, nama Inggris, tingkat-sub ·
+jenis, baris Sumber, qi dan jeda yang sudah diskalakan, dan alasan terkunci.
+
+**Pencarian.** Cukup mulai mengetik (tanpa klik kolom). Yang dicari: nama Indonesia, nama Inggris, judul karya dan nama
+jurus di baris Sumber, nama Dao, jenis, dan id. Huruf besar/kecil dan aksen diabaikan; beberapa kata harus cocok semuanya
+(awal kata). Contoh: "pedang langit" menemukan Seni Pedang Hukuman Langit, "against" menemukan semua jurus dari *Against
+the Gods*, "zhuxian" menemukan Formasi Pedang Zhuxian. Esc pertama berhenti mengetik, Esc kedua menutup kitab.
+
+**Bilah bambu (detail).** Klik kartu. Bilah menempel di kanan bila layar minimal 420 GUI px, selain itu melapisi grid.
+Isinya:
+1. glif besar, nama Indonesia dan nama Inggris;
+2. chip Dao, tingkat-sub, jenis, gerbang ranah (sembilan tingkat Kenaikan Abadi ditulis "Tahap 1–9"), Gerbang Dewa I/II;
+3. baris **Sumber** ("Terinspirasi" dalam tinta abu-abu miring);
+4. deskripsi dan baris lore;
+5. **angka langsung**, dihitung dengan rumus yang sama dengan server: "Kerusakan 2,4× → 20.160", area dasar → hasil,
+   durasi, jumlah, qi · jeda setelah penguasaan dan selisih ranah, batas bos untuk tingkat ini, "Kawah: kawah r 6 · ≤ 512
+   blok" selama Mode Kehancuran nyala, dan "Di arena: kekuatan lama";
+6. bilah **penguasaan**: nama tingkat, poin / ambang berikutnya, bonus tingkat 3 dan 4, syarat pemahaman, sisa poin kena
+   dan meleset hari ini;
+7. daftar **Cara memperoleh** dengan ✓ / ✗ per baris (ranah dan Dao, pemahaman, buku pesona, slip giok, harga Paviliun,
+   ujian warisan, kemajuan prestasi seperti "Bunuh 12/30 … di malam bulan purnama", prasyarat, Gerbang Dewa);
+8. jimat **Pilih** (tombol rapal memakai teknik ini), **Pasang ke Cincin** (pilih soket 1–12), dan **Uji** (hanya operator
+   dalam mode Kreatif: dirapal sebagai uji tanpa biaya dan tanpa penguasaan).
+
+**Cincin Segel.** Dua belas soket mengelilingi dantian; soket 1–4 bernomor emas dan sekaligus menjadi **segel cepat**.
+* Klik soket lalu klik kartu, atau seret kartu dari daftar kanan ke soket. Klik kartu biasa mengisi soket kosong pertama.
+  Klik kanan soket mengosongkannya.
+* **Isi otomatis** memasang teknik terkuat yang bisa dirapal per peran: 2 satu sasaran, 3 area, 2 kendali, 1 gerak,
+  1 lindung, 1 pulih, 2 pamungkas (terkuat = tingkat tertinggi, lalu penguasaan, lalu koefisien).
+* **Kosongkan** butuh klik kedua.
+* Cincin disimpan di server, jadi tetap ada setelah keluar-masuk dunia. Perintahnya: `/kultivasi teknik slot ...`
+  ([12.12](#1212-perintah-teknik)).
+
+**Tombol dan Roda Segel.**
+
+| Tombol | Bawaan | Fungsi |
+|---|---|---|
+| Rapal | `G` | ketuk: rapal teknik terpilih. Tahan ≥ 250 ms: buka **Roda Segel** (selama "Tahan G untuk roda" nyala; ketukan merapal saat dilepas) |
+| Sebelumnya / berikutnya | `,` / `.` | memutar teknik terpilih **di dalam Cincin Segel** (semua teknik yang bisa dirapal bila cincin kosong), dengan carousel 1,2 detik di atas hotbar |
+| Kitab Teknik | `-` | membuka Kitab Teknik |
+| Roda Segel (tahan) | belum diatur | tahan untuk membuka roda. Begitu tombol ini diatur, `G` kembali merapal saat ditekan tanpa jeda |
+| Segel Cepat 1–4 | belum diatur | merapal soket 1–4 Cincin Segel |
+
+Roda Segel menampilkan 12 segel cincin (bila cincin kosong: 12 teknik pertama yang bisa dirapal, urut tingkat) dalam
+lingkaran berjari-jari 56 GUI px (46 bila tinggi layar di bawah 260). Tiap segel memperlihatkan glif, pita tingkat, biaya
+qi, sapuan jeda, dan menjadi abu-abu bila qi tidak cukup. Di tengah: nama, qi, jeda, tingkat penguasaan, dan satu baris
+deskripsi. Gerakkan tetikus atau gulir untuk memilih; WASD tetap berjalan. **Lepas = pilih** (dengan pengaturan "Lepas =
+rapal": langsung merapal). Esc atau klik kanan menutup tanpa memilih. Menekan **1–4** sambil menyorot sebuah segel
+menjadikannya segel cepat ("… menjadi segel cepat 2"), tersimpan di server.
+
+**HUD teknik** (kiri bawah dan tengah layar):
+* ubin segel teknik terpilih: glif, pita tingkat, sapuan jeda, empat manik penguasaan, biaya qi; empat ubin segel cepat
+  10 px di atasnya bila ada tombol segel atau soket 1–4 terisi;
+* busur putih giok **Perisai Qi** di sekitar bola qi, dan busur hitung mundur wujud, wilayah, aura, sikap, dan medan dalam
+  warna Dao;
+* bilah isi di bawah crosshair ("Tekan lagi = lepas" mulai 50%), cincin salur yang mengosong dan berkedip saat hampir
+  putus, pip tahap dengan jendela waktu, pip muatan;
+* "Pamungkas N dtk" selama kunci pamungkas, tag merah **KEHANCURAN** selama saklarmu nyala;
+* toast giok: "Jurus baru", "Pencerahan Jurus" (terbuka sendiri), penguasaan naik (dengan dentingan), "Gerbang Dewa
+  terbuka".
+
+F1 menyembunyikan semuanya. Pengaturan efek teknik ada di [12.13](#1213-performa-efek-dan-pengaturan).
+
+### 12.2 Merapal
+
+**Penolakan.** Rapalan ditolak dengan alasan di bilah aksi, **tanpa memakan qi atau jeda**, bila: teknik belum kamu
+kuasai; ranah, Dao, Gerbang Dewa, atau prasyaratnya belum terpenuhi; kamu sedang Penyimpangan Qi atau menerobos (melawan
+Iblis Hati sendiri tetap boleh); **jeda global** 10 tick setelah rapalan apa pun belum lewat; **kunci pamungkas** 20 detik
+setelah sebuah jurus pamungkas ("Meridianmu masih pulih dari jurus pamungkas"); jeda atau muatan teknik itu belum siap;
+qi kurang; atau sudah ada **6 jurus aktif** milikmu ("Terlalu banyak jurus aktif"). Jurus serang juga batal tanpa biaya
+bila tidak ada musuh yang mungkin terkena, dan jurus bersasaran terkunci butuh kamu menatap seekor musuh. Merapal
+menghentikan meditasi.
+
+**Arus jurus.**
+
+| Arus | Cara kerja |
+|---|---|
+| **Isi** | jeda tetap sebelum lepas, gerakmu −90%. Rapal lagi = lepas lebih awal dengan kekuatan sebanding (minimal 50%). Terkena ≥ 20% darah maks. = terputus: separuh qi kembali, 25% jeda tetap berlaku. Tidak ada "tahan untuk mengisi": menahan tombol membuka roda |
+| **Salur** | langkah berulang. Bergerak lebih dari 1,5 blok, merapal jurus lain, rapal lagi, atau pukulan besar memutusnya. Qi per detik dipakai selama itu |
+| **Sikap** | bertahan dengan qi per detik tanpa batas gerak; rapal lagi untuk berhenti |
+| **Bertahap** | rapal ulang dalam jendela waktu = tahap berikutnya (tanpa jeda global). Jeda dimulai setelah tahap terakhir atau saat jendela habis |
+| **Muatan** | dirapal beberapa kali beruntun; tiap muatan pulih sendiri |
+
+**Shift saat mulai merapal = tanpa kehancuran.** Karena itu tidak ada jurus yang memakai Shift sebagai mode lain; mode lain
+selalu lewat tahap.
+
+**Slot satu-satu per perapal:** satu wilayah yang mengikutimu (yang baru menggantikan yang lama), satu aura, satu wujud,
+satu sikap, paling banyak dua medan yang ditempatkan (yang tertua berakhir).
+
+**Jurus terlarang** (Dunia Kematian Darah, Pelarian Bayangan Darah, Bulan Ditarik Bintang Kembali, Hati Membara, Segel
+Harimau Alam Baka) dibayar dengan darahmu sendiri. Rapalan pertama meminta konfirmasi ("Rapal lagi dalam 10 detik untuk
+memastikan"). Harga darah tidak pernah mematikan, dan jurusnya ditolak bila darahmu di bawah 2.
+
+Mati, keluar dunia, atau pindah dimensi mengakhiri semua rapalanmu yang masih berjalan.
+
+### 12.3 Tingkat dan jenis
+
+**Sumber:** *Battle Through the Heavens* bab 2, teknik Dou diberi tingkat Huang, Xuan, Di, dan Tian, masing-masing
+rendah, menengah, tinggi. "Abadi" dan "Dewa" di atas Tian adalah label desain permainan.
+
+| Tingkat | Pita | Ranah khas | Satu sasaran | Area per sasaran | Pamungkas | Pemulihan | Kendali |
+|---|---|---|---|---|---|---|---|
+| **Kuning** | oker | Pemurnian Qi – Pembangunan Fondasi | 1,0–1,5× | 0,6–0,9× | 2,5× | 15–25% | 1–2 dtk |
+| **Misterius** | ungu | Inti Emas – Jiwa Baru Lahir | 1,5–2,5× | 0,9–1,5× | 4× | 20–35% | 2–4 dtk |
+| **Bumi** | perunggu | Transformasi Dewa – Penyatuan Dao | 2,5–4× | 1,5–2,4× | 7× | 30–40% | 3–5 dtk |
+| **Langit** | biru langit | Kenaikan Abadi (Rendah tk. 1–3, Menengah 4–6, Tinggi 7–9) | 4–6× | 2,4–3,6× | 12× | 35–50% | 4–6 dtk |
+| **Abadi** | putih-emas | Dewa Abadi | 6–9× | 3,6–5,4× | 18× | 40–60% | 5–7 dtk |
+| **Dewa** | kilau pelangi | Gerbang Dewa | 9–14× | 5,4–8,4× | 28× | 50–100% | 6–8 dtk |
+
+Setiap tingkat dibagi **Rendah, Menengah, Tinggi**. Angka di atas adalah pita koefisien pada penguasaan 0.
+
+| Jenis | Arti | Bisa diajarkan (bawaan) |
+|---|---|---|
+| Serang | satu sasaran | ya |
+| Area | serangan area (medan yang ditempatkan juga Area) | ya |
+| Kendali | memaku, membekukan, mengikat | ya |
+| Gerak | lesatan dan kedipan | ya |
+| Lindung | pertahanan diri | ya |
+| Pulih | penyembuhan dan penguat | ya |
+| Panggil | makhluk maya | ya, setengah jumlah |
+| Wilayah | wilayah yang mengikutimu | tidak |
+| Ubah | perubahan wujud | tidak |
+| Pamungkas | jurus pamungkas | ya |
+| Indra | indra dan alat bantu | tidak |
+| Pasif | dicadangkan (hanya Langkah Awan) | tidak |
+
+Kolom **Murid** di katalog adalah kata akhir soal mengajar ([12.10](#1210-teknik-dan-murid)).
+
+### 12.4 Kekuatan tumbuh bersama ranah
+
+```
+P = 6 × R × C × Q × S × techniqueDamageMultiplier
+R: sampai Penyatuan Dao  A × (1 + 0,12 × tahap)   A = Fana 0,6 · PQ 1,0 · PF 1,7 · IE 2,9 · JBL 5,0 · TD 8,5 · PD 14,5
+   Kenaikan Abadi        25 × 1,3^(tingkat − 1) × (1 + 0,06 × tahap)
+   Dewa Abadi            400 × (1 + 0,25 × tahap)          (tahap 0–3 = Awal … Puncak)
+C = 1 + pemahaman ÷ 100 (Dao teknik itu; teknik universal memakai Dao utamamu)
+Q = akar dari rata-rata faktor Kualitas Terobosan (0,95–1,14)
+S = bintang (untuk pemain baru di Fase 7; sekarang 1)
+```
+
+R naik di **setiap** dari 65 posisi; satu terobosan mengalikannya 1,25–1,27, dan langkah dari Kenaikan Abadi tingkat 9 ke
+Dewa Abadi mengalikannya 1,66. Contoh di tahap Puncak, pemahaman 50 (C = 1,5), Q = 1, penguasaan 0:
+
+| Ranah (Puncak) | P | Jurus dasar 1,5P | Pamungkas terbaik | × kerusakan lama | Batas bos dasar | Rapalan vs Warden | K kehancuran | Blok per rapalan |
+|---|---:|---:|---|---:|---:|---:|---:|---:|
+| Pemurnian Qi | 12 | 18 | – | 1,0 | 6% | – | – | 0 |
+| Pembangunan Fondasi | 21 | 31 | – | 1,3 | 6% | – | – | 0 |
+| Inti Emas | 35 | 53 | 142 (4P) | 1,8 | 12% | 12 | 0,25 | 128 |
+| Jiwa Baru Lahir | 61 | 92 | 245 | 2,6 | 15% | 10 | 0,35 | 256 |
+| Transformasi Dewa | 104 | 156 | 728 (7P) | 3,9 | 18% | 7 | 0,50 | 512 |
+| Penyatuan Dao | 177 | 266 | 1.240 | 5,8 | 22% | 6 | 0,60 | 1.024 |
+| Kenaikan Abadi tk. 1 | 266 | 399 | 3.190 (12P) | 7,7 | 26% | 4 | 0,65 | 1.536 |
+| Kenaikan Abadi tk. 5 | 758 | 1.140 | 9.100 | 22 | 38% | 3 | 0,81 | 2.304 |
+| Kenaikan Abadi tk. 9 | 2.165 | 3.250 | 26.000 | 63 | 50% | 2 | 0,97 | 3.072 |
+| **Dewa Abadi** | **6.300** | 9.450 | 113.400 (18P); Dewa 176.400 (28P) | **165** | 100% | 1 | 1,5 | 4.096 |
+
+Penguasaan Puncak menggandakan kerusakan. Monster biasa (20–40 darah) tumbang oleh jurus apa pun mulai Inti Emas. XP
+tempur tetap `darah maks. × 0,5`, jadi kerusakan lebih besar tidak memberi XP lebih banyak.
+
+**Area, durasi, jumlah.** Selisih = ranahmu − ranah minimal teknik itu.
+* Area × `1 + 0,10 × selisih` (+0,02 per tingkat Kenaikan Abadi; di Dewa Abadi +0,10 + 0,05 × tahap);
+* durasi × `1 + 0,06 × selisih`; jumlah × `1 + 0,15 × selisih`;
+* lalu dikali faktor penguasaan dan dipotong batas teknik itu dan batas keras (jari-jari kueri 32, Dewa 40).
+
+**Qi dan jeda.** Tingkat perapal: PQ/PF 0, IE/JBL 1, TD/PD 2, Kenaikan Abadi 3, Dewa Abadi 4. Selisih tingkat = tingkat
+perapal − tingkat teknik.
+* qi = `qi × penguasaan × max(0,35; 1 − 0,13 × selisih tingkat)` (teknik berbiaya persen qi tidak ikut);
+* jeda = `jeda × penguasaan × max(0,40; 1 − 0,12 × selisih tingkat)`, tidak pernah di bawah 10 tick;
+* pemulihan qi dasar 0,4% per detik dikali `1 + 0,1 × tingkat perapal` (Dewa Abadi ×1,4).
+
+**Tampilan ikut tumbuh.** Tingkat visual: PQ/PF 0, IE/JBL 1, TD/PD 2, Kenaikan Abadi 3, Dewa Abadi 4, bintang 9 ke atas
+5. Ukuran efek × (1 + 0,15 × tingkat), jumlah partikel × (1 + 0,10 × tingkat). Lingkar rune mulai tingkat 2, tampilan
+raksasa (pedang, telapak, aksara, sinar) mulai 3, efek langit mulai 4, kilau Dewa mulai 5. Penguasaan 3 menambah tepi
+emas, penguasaan 4 bayangan sisa.
+
+**Batas kerusakan** (satu fungsi untuk semua jurus):
+* Pengali gabungan (tanda, penguat, pecah, basah, syarat, tumpukan) paling besar **×3** terhadap monster, ×1,5 di arena.
+* **Bos** (Warden, Wither, Ender Dragon, Elder Guardian, tag datapack `#kultivator:technique_bosses`, makhluk bertanda
+  `kultivator.boss`): satu rapalan paling banyak mengambil `batas dasar × faktor tingkat` dari darah maksimal bos itu
+  (tabel di atas; faktor Kuning 0,5, Misterius 0,7, Bumi 0,85, Langit 1,0, Abadi 1,2, Dewa 1,5; tidak lebih dari 100%).
+  Gema, tautan, pantulan, simpanan, DOT, makhluk maya, denyut wilayah, dan putaran ulang ikut dihitung dalam batas rapalan
+  asalnya; tiap DOT dan denyut paling banyak 2% darah bos. Eksekusi pada bos hanya di bawah 5% darah. Kendali pada bos
+  ×0,25, pingsan menjadi terakar. Warden, Wither, dan naga tidak pernah diangkat; naga tidak pernah diikat atau digeser,
+  kristal End tidak pernah dipukul. Server bisa mematikan batas ini dengan `techniqueBossCaps`.
+* **Wither:** pukulan teknik tidak lagi memicu Wither menghancurkan blok (juga tengkorak birunya), jadi teknikmu boleh
+  melawannya. Murid tetap tidak.
+* **Ender Dragon:** jurus tepat (sinar, satu sasaran) mengenai kepala; jurus area mengenai tubuh (dikurangi vanilla).
+* **Iblis Hati sendiri:** paling banyak 6% darahnya per pukulan (pamungkas 10%) dan 12% per rapalan; tanpa penguasaan dan
+  pemahaman.
+* **Pelindung Dao, penjaga ujian, bencana bintang, ujian jenjang:** memakai kekuatan lama × 1,5, jadi tetap pertarungan
+  sungguhan.
+* **Arena** (Latih Tanding, duel, Kompetisi Daftar Kuat, Turnamen Elit, Perang Seratus Dinasti, Alam Dewa Hampa, Tanding
+  dengan Guru): kerusakan persis seperti sebelum 6c (kekuatan lama, tanpa bonus area, penguasaan 3/4 mati, Telapak Buddha
+  kembali 2,5). Ke pemain paling banyak 15% darah per pukulan **dan** per rapalan, tanpa eksekusi, tanpa dorongan, kendali
+  ×0,3, tanpa kawah.
+
+**Batas bertumpuk pada dirimu:** pengurangan kerusakan dari teknik (pengurangan, menghindar, Ketahanan dari teknik, istana
+sekutu) digabung paling besar 80% (Dewa Abadi 85%), terhadap Iblis Hati paling besar 50%; menghindar paling besar 50%;
+Perisai Qi paling besar 2× darah maks.; pengurangan jeda gabungan paling rendah ×0,4 (tidak pernah untuk pamungkas);
+kendali pada satu sasaran melemah (kedua dalam 10 detik ×0,5, ketiga ×0,25, lalu kebal 6 detik). Tribulasi, Penyimpangan
+Qi, jatuh ke kehampaan, dan `/kill` **tidak pernah** dikurangi, diserap, atau dicegah.
+
+**Penyelamat nyawa (DeathGuard).** Urutan pemeriksaannya: aturan duel → aturan tribulasi → **Totem Kehidupan Abadi** di
+tangan (selalu lebih dulu) → teknik penyelamat (Tiga Helai Rambut Penyelamat, Tubuh Teratai Nezha, lantai 1 darah Pohon
+Kuno Bodhisattva). Semua teknik penyelamat berbagi satu **kunci 10 menit**.
+
+### 12.5 Penguasaan Jurus
+
+**Sumber:** *Ancient Strengthening Technique* (seni maju lewat sukses kecil, sukses besar, dan kesempurnaan agung, bab 378
+dan 818); *The Sovereign's Ascension* (penguasaan rendah hanya melepas sebagian daya seni, bab 4). Tingkat 4 "Puncak" dan
+semua angkanya adalah desain permainan.
+
+| Tingkat | Nama | Kerusakan | Area | Durasi | Qi | Jeda | Syarat |
+|---|---|---:|---:|---:|---:|---:|---|
+| 0 | Pemula | ×1,00 | ×1,00 | ×1,00 | ×1,00 | ×1,00 | – |
+| 1 | Sukses Kecil | ×1,15 | ×1,08 | ×1,10 | ×0,95 | ×0,95 | – |
+| 2 | Sukses Besar | ×1,35 | ×1,16 | ×1,20 | ×0,90 | ×0,90 | – |
+| 3 | Kesempurnaan Agung | ×1,60 | ×1,25 | ×1,30 | ×0,85 | ×0,80 | pemahaman Dao ≥ 60 (universal: Jiwa Baru Lahir) |
+| 4 | Puncak Jurus | ×2,00 | ×1,40 | ×1,50 | ×0,75 | ×0,70 | pemahaman Dao ≥ 90 (universal: Penyatuan Dao) |
+
+* **Bonus.** Tingkat 3 membuka bonus kesempurnaan (jumlah tambahan, gelombang tambahan, area, durasi, efek tambahan,
+  lompatan rantai, jeda, atau rapalan tambahan; tertulis di bilah bambu). Tingkat 4 membuka **Gema** 40% (jurus diulang
+  sesaat dengan kekuatan 40%, tanpa kehancuran dan tanpa penguasaan) untuk jurus Serang, Area, Kendali, dan Pamungkas yang
+  seketika; jurus lain mendapat durasi +25% atau bonus khususnya sendiri.
+* **Poin** per rapalan, dikali `jeda dasar ÷ 10 dtk` (0,25–3): +1 merapal, +1 bila mengenai monster, +2 bila membunuh, +3
+  bila mengenai bos. Poin kena dan bunuh paling banyak **200 per teknik per hari game**; rapalan yang tidak mengenai apa pun
+  paling banyak **20**. Momen Pencerahan +10 untuk teknik terpilih; buku teknik yang sudah dikuasai +15; slip giok yang
+  sudah dikuasai +25. Rapalan `/kultivasi uji ...` dan pukulan ke boneka latihan tidak memberi apa-apa.
+* **Ambang** (poin kumulatif untuk tingkat 1 / 2 / 3 / 4): Kuning 25 / 80 / 200 / 450 · Misterius 40 / 120 / 300 / 700 ·
+  Bumi 60 / 180 / 450 / 1.000 · Langit 90 / 270 / 650 / 1.500 · Abadi 120 / 360 / 900 / 2.000 · Dewa 160 / 480 / 1.200 /
+  2.700.
+* **Tanda naik tingkat:** toast segel giok ("Telapak Buddha mencapai Sukses Besar!"), dentingan, cincin emas, dan baris
+  chat. Naik tingkat langsung membuka jurus yang berprasyarat penguasaan. Kesempurnaan Agung dan Puncak Jurus pertama
+  memberi pencapaian.
+* **Pemahaman Dao dari teknik:** setiap rapalan jurus Dao-mu yang **mengenai monster** memberi +0,15 × faktor tingkat
+  (Kuning 1, Misterius 1,2, Bumi 1,5, Langit 2, Abadi 2,5, Dewa 3), paling banyak **+3,0 per Dao per hari game**.
+
+### 12.6 Cara memperoleh teknik
+
+Setiap teknik punya satu atau lebih jalur; bilah bambu menampilkannya sebagai daftar centang.
+
+1. **Otomatis.** Teknik universal terbuka di ranahnya; teknik pertama tiap Dao terbuka saat Dao dipilih; teknik
+   berjalur pemahaman terbuka begitu pemahaman Dao-nya cukup dan ranahnya tercapai. Kamu mendapat baris chat, toast
+   "Pencerahan Jurus", dan efek.
+2. **Buku Pesona.** Jongkok + gunakan. Setiap pesona punya **kolam** teknik; buku mengajarkan teknik pertama di kolamnya
+   yang bisa kamu pelajari (urut tingkat). Bila semua sudah dikuasai atau belum bisa: wawasan +5 pemahaman dan +15
+   penguasaan untuk teknik kolam yang sudah kamu kenal. Bila tidak ada yang bisa: alasan ditulis dan buku tetap utuh. Buku
+   yang pesonanya tidak punya kolam tetap memberi +30 kultivasi. Tooltip buku mencantumkan isi kolam, teknik yang akan
+   diajarkan, dan alasan terkunci. Kolam yang ada (nama pesona seperti di game berbahasa Indonesia):
+
+   | Pesona | Kolam |
+   |---|---|
+   | Ketajaman (sharpness) | Cahaya Pedang Raksasa, Tebasan Serigala Langit, Amarah Sang Penguasa, Seni Pedang Kesengsaraan Abadi, Sikap Tetes Darah, Seribu Pedang |
+   | Tepi Menyapu (sweeping_edge) | Bayangan Pedang Membelah Cahaya, Seribu Pedang |
+   | Penerobosan (breach) | Jari Kematian |
+   | Rupa Api (fire_aspect) | Tsunami Api Pembelah, Pukulan Phoenix Mengaum Langit, Api Phoenix |
+   | Nyala Api (flame) | Panah Phoenix, Api Phoenix |
+   | Pengarung Kebekuan (frost_walker) | Seni Awan Beku, Api Es Qianlan, Formasi Es Dingin, Dingin Tak Tertandingi, Penjara Gletser |
+   | Pemusatan (channeling) | Cambuk Zidian, Tiga Gaya Guntur, Seni Pusaka Kaisar Petir, Seni Awan Ungu: Awan Petir Pemusnah, Petir Surgawi |
+   | Perlindungan (protection) | Seni Raja Cerah, Hentakan Gunung |
+   | Duri (thorns) | Segel Kedelapan: Segel Tubuh, Hentakan Gunung |
+   | Perlindungan Ledakan (blast_protection) | Denyut Nadi Dunia |
+   | Tak Hancur (unbreaking) | Tinju Enam Jalan Reinkarnasi, Tangan Giok Misterius |
+   | Kepadatan (density) | Palu Jubah Angin Kacau |
+   | Pemulihan (mending) | Melodi Hati Jernih, Serap Kehidupan |
+   | Keberuntungan Laut (luck_of_the_sea) | Pagoda Kaca Tujuh Harta |
+   | Umpan (lure) | Belitan Rumput Perak Biru, Serangga Tidur |
+   | Selinap Cepat (swift_sneak) | Penyatuan Roh Iblis Bayangan, Badai Angin |
+   | Peredaan Jatuh (feather_falling) | Bayang Pecah Dewa Bintang, Badai Angin |
+   | Dorongan Jiwa (soul_speed) | Kupu-kupu Arwah Perak, Langkah Bayangan Hantu |
+   | Embusan Angin (wind_burst) | Kipas Daun Pisang |
+   | Tolakan Panah (punch) | Formasi Angin Menderu |
+   | Ketakberhinggaan (infinity) | Gelang Qiankun, Penjara Ruang |
+   | Kesetiaan (loyalty) | Tali Pengikat Abadi, Penjara Ruang |
+   | Sentuhan Sutra (silk_touch) | Ruang Gravitasi |
+   | Menusuk (piercing) | Labu Merah Ungu-Emas, Mata Iblis Ungu |
+   | Penumpas Bangkai (smite) | Telapak Buddha |
+   | Keberuntungan (fortune) | Mata Api Pupil Emas |
+   | Tolakan (knockback) | Seni Segel Kaisar |
+   | Perlindungan Tembakan (projectile_protection) | Istana Suci Qilin |
+   | Tembakan Berganda (multishot) | Jarum Hujan Bunga Pir |
+   | Kutukan Ikat (binding_curse) | Mantra Pembeku Tubuh |
+   | Kutukan Sirna (vanishing_curse) | Pelarian Bayangan Darah |
+
+3. **Slip Giok** (barang `kultivator:jade_slip`, berisi satu teknik). **Sumber:** *A Record of a Mortal's Journey*, slip
+   giok menyimpan seni, dibaca dengan indra ilahi, diperdagangkan dan dihadiahkan (bab 1269); Han Li menolak seni yang
+   bertentangan dengan kultivasinya (bab 1782). Klik kanan: dipelajari bila semua syarat terpenuhi, kalau tidak "Isi slip
+   ini terlalu dalam untukmu" plus syarat yang kurang (slip tetap). Slip yang sudah dikuasai memberi +25 penguasaan. Klik
+   kanan murid sendiri (tanpa jongkok) mengajarkannya tanpa qi guru. Semua teknik bisa ada di slip, termasuk teknik lama,
+   **kecuali** teknik Dewa, Wilayah Karma, dan Harimau Putih Alam Baka. Slip diberi kelangkaan sesuai tingkat dan bernama
+   "Slip Giok: <teknik>".
+4. **Paviliun Yue Lu** ([23.3](#233-paviliun-yue-lu)). Baris **Slip Giok Teknik** menjual slip dari setiap teknik bertanda
+   Paviliun (bawaan: teknik bukan Dewa dan bukan khusus yang punya jalur buku, Paviliun, atau pemahaman) dan teknik lama
+   berjalur buku. Pilih tekniknya dengan jimat "Slip: <teknik>". Harga dasar per tingkat: Kuning 200 PK (aula tingkat 1), Misterius 400 (3), Bumi 900 (5), Langit
+   2.000 (7), Abadi 4.000 (9), dikali faktor harga aula. Paling banyak **2 slip per hari game**.
+5. **Ujian Warisan** (barang **Giok Warisan**, bertema satu Dao atau universal). **Sumber:** *Renegade Immortal* (warisan
+   Tu Si), *Perfect World* (seni tulang berukir), *A Record of a Mortal's Journey* (slip giok); ujiannya desain permainan.
+   * Didapat dari peti: kota kuno 6%, harta kota End 8%, harta bastion 6%, perpustakaan benteng 5%, hadiah ominous Trial
+     Chambers 5% (tema acak). Bos pertama: Warden (Bayangan), Ender Dragon (Ruang), Elder Guardian (Es) pasti menjatuhkan
+     giok bertema; berikutnya 15%.
+   * Klik kanan: butuh Transformasi Dewa ke atas, tema sama dengan Dao-mu (tema universal untuk siapa saja), tidak sedang
+     Penyimpangan Qi, menerobos, atau duel, dan tidak sedang beristirahat dari ujian yang gagal. Pertanda 10 detik (awan partikel, cuaca tidak berubah), lalu **3 gelombang penjaga dalam 90 detik**; gelombang
+     terakhir membawa Penjaga Warisan berdarah 4× yang terkena batas bos.
+   * **Menang:** pencapaian *Pewaris Warisan*, chat menawarkan 3 teknik bertema itu (Transformasi Dewa–Penyatuan Dao:
+     Bumi; Kenaikan Abadi: Langit, dari tingkat 7 juga 30% Abadi; Dewa Abadi: 60% Abadi / 40% Langit). Klik salah satu
+     atau ketik `/kultivasi warisan pilih <1-3>`.
+   * **Kalah** (darah di bawah 20%, lebih dari 24 blok dari tempat ujian, pindah dimensi, keluar, atau waktu habis): giok
+     kembali dengan istirahat 1 hari game. Ujian tidak pernah mematikan (`/kill` tetap).
+6. **Benih Api Surgawi:** jongkok + gunakan benih yang cocok mengajarkan teknik berjalur benda itu (benih Api Dingin
+   Tulang → *Api Dingin Tulang Roh*); benih habis. Memberi benih ke murid tetap memulai ritual murid.
+7. **Kitab Penyegel Iblis** (set ke-4 Lembar Kitab yang Hilang, lima lembar, di peti yang sama dengan lembar lain).
+   Menggunakan satu lembar set 4 membaca lembar berbeda yang kamu bawa dan mengajarkan setiap teknik berjalur lembar yang
+   syaratnya terpenuhi (Segel Hidup-Mati 2 lembar, Segel Karma 3, Segel Kedelapan 3, Segel Kesembilan 5). Lembar tidak
+   habis; set ini tidak dipulihkan di tablet Perbendaharaan.
+8. **Momen Pencerahan:** 25% peluang memahami teknik berjalur pemahaman berikutnya lebih awal (bila kurang dari 10 poin
+   lagi), dan di Kenaikan Abadi tingkat 5 ke atas peluang membuka *Rahasia Xing*.
+9. **Prasyarat penguasaan:** misalnya Jari Takdir Surgawi butuh Indra Ilahi di Kesempurnaan Agung, Gunung Lima Unsur butuh
+   Telapak Buddha di Kesempurnaan Agung.
+10. **Prestasi** (dicatat diam-diam, terlihat sebagai kemajuan di bilah bambu): bunuh dengan teknik dalam suatu keadaan,
+    rapal dalam suatu keadaan, bos pertama yang dikalahkan dengan Dao tertentu, menit meditasi di suatu tempat, jumlah
+    pemurnian alkimia, hasil tribulasi (kualitas atau jumlah sambaran yang pernah ditahan), menang melawan Iblis Hati, dan
+    pulih dari Penyimpangan Qi. Keadaan: malam, bulan purnama, badai petir, hujan, bioma, dimensi, memegang pedang,
+    ketinggian.
+11. **Syarat tambahan** yang selalu wajib di samping jalur lain (juga untuk buku dan slip): "Menguasai 30 teknik" (Roda Enam
+    Jalan Reinkarnasi), "Pemahaman Dao kedua ≥ 30" (Fusi Misteri Mendalam), "Ikatan ≥ 50 dengan seorang murid" (Harimau
+    Putih Alam Baka).
+12. **Gerbang Dewa.** **Gerbang I:** Dewa Abadi Puncak yang sudah diakui langit ([32](#32-pengakuan-langit-menjadi-dewa-abadi)),
+    pemahaman ≥ 90 di Dao teknik itu (universal: Dao utama), dan prasyarat yang disebut di Kesempurnaan Agung. **Gerbang
+    II:** seperti Gerbang I, ditambah dua prasyarat di Puncak Jurus. Di Fase 7 bintang 9 / 18 menjadi jalur pengganti.
+    **Sumber:** *Battle Through the Heavens* (Xiao Yan melampaui Yao Lao) dan *Renegade Immortal* (bintang Dewa Kuno).
+
+Dengan semua jalur ini setiap teknik pemain bisa diraih, jadi penghitung "Teknik x/168" bisa penuh.
+
+### 12.7 Katalog teknik baru
+
+Kolom: **Ranah** — PF Pembangunan Fondasi, IE Inti Emas, JBL Jiwa Baru Lahir, TD Transformasi Dewa, PD Penyatuan Dao, KA n
+Kenaikan Abadi tingkat n (di kitab "Tahap n"), DA Dewa Abadi, GD I/II Gerbang Dewa. **Tingkat · Jenis** — R/M/T = Rendah,
+Menengah, Tinggi. **★** = teknik khusus dengan kode sendiri. **Kawah** — bentuk yang dipahat selama Mode Kehancuran nyala
+([12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang)); "–" = tidak pernah memahat. **Murid** — Y bisa
+diajarkan, N tidak, ★n mulai bintang murid n, (½) jumlah setengah. **Sumber** disingkat menjadi karya · nama jurus; baris
+lengkap ada di tooltip. Angka efek pada penguasaan 0, sebelum batas bos dan arena.
+
+#### Dao Pedang (14)
+
+| Teknik | Ranah | Tingkat · Jenis | Efek singkat (× P) | Kawah | Murid | Sumber |
+|---|---|---|---|---|---|---|
+| **Seni Pedang Esensi Biru** (`azure_essence_sword`) | IE | Misterius R · Serang | Sikap 1 qi/dtk: setiap tebasan pedang melepas sabit 0,6× (6→12 blok); mulai KA, tiga sabit menyebar | – | Y | A Record of a Mortal's Journey · 青元剑诀 Seni Pedang Esensi Biru |
+| **Bayangan Pedang Membelah Cahaya** (`sword_shadow_split`) | IE | Misterius R · Area | 3→10 bayangan pedang memburu musuh dalam 20→48 blok, 0,7× tiap bayangan (maks. 3 per musuh) | – | Y | A Record of a Mortal's Journey · 剑影分光术, kemampuan ilahi Seni Pedang Esensi Biru |
+| **Cahaya Pedang Raksasa** (`giant_sword_light`) | JBL | Misterius M · Serang | Isi 0,75 dtk, lalu cahaya pedang raksasa membelah ke depan (10→36 blok): 3,0× + terpaku 1 dtk | retakan | Y | Terinspirasi dari cahaya pedang raksasa Seni Pedang Esensi Biru (A Record of a Mortal's Journey) |
+| **Tebasan Serigala Langit** (`heavenly_wolf_slash`) | JBL | Misterius M · Gerak | Melesat 8→20 blok menebas lintasan 2,2×, lalu Taring Liar: kerucut 1,2× + Lemah I | parit | Y | Against the Gods · Tebasan Serigala Langit (bab 148) dan Taring Liar (bab 1297) |
+| **Pedang Pembunuh Abadi Bulan Darah** (`bloodmoon_immortal_slaying_sword`) | TD | Bumi R · Area | Hujan 12→36 pedang bulan darah (0,9× tiap pedang), lalu tebasan 3,0×; musuh +20% rentan jurus Pedang | kawah tebar + kawah | Y | Against the Gods bab 1266 · Pedang Pembunuh Abadi Bulan Darah (formasi Xisu) |
+| **Amarah Sang Penguasa** (`overlord_fury`) | TD | Bumi M · Area | Lompat ke titik bidik lalu hantam: gelombang kejut 3,5× (tepi 1,5×), melontarkan, zirah musuh −50% 8 dtk | kawah + cincin | Y | Against the Gods bab 333 · 霸王怒 Amarah Sang Penguasa |
+| **Seni Pedang Kesengsaraan Abadi** (`immortal_tribulation_sword`) | PD | Bumi T · Serang | Sinar kesengsaraan 48→64 blok menembus semua: 4,0× + kerusakan qi 0,25×/dtk selama 8 dtk | terowongan | Y | Perfect World bab 1786/1973 · Seni Pedang Kesengsaraan Abadi |
+| **Seni Pedang Aksara Rumput** (`grass_symbol_sword`) | PD | Bumi T · Serang | Goresan aksara 草 menebas 5→8 musuh terkuat dalam 32 blok: 2,5× + Lambat III | – | Y | Perfect World bab 1786 · 草字剑诀 Seni Pedang Aksara Rumput |
+| **Sikap Pemecah Langit** (`heavenbreaker_stance`) | KA 1 | Langit R · Pamungkas | Isi 2 dtk: bilah raksasa 40→64 blok, 8,0× × isian, memaku 2 dtk lalu membanting | retakan | Y | Desolate Era · sikap Heavenbreaker milik Ji Ning |
+| **Labu Pemenggal Lu Ya** (`lu_ya_gourd`) | KA 3 | Langit R · Kendali | Benang labu memaku sasaran terkunci 3 dtk, lalu 8,0× dan eksekusi di bawah 35% darah (bos 5%) | – | Y | Investiture of the Gods bab 48 · labu Lu Ya |
+| **Sikap Tetes Darah** (`blood_drop_stance`) | KA 5 | Langit M · Serang | Kedip berantai 6→12 kali di antara musuh: 3,0× tiap kedipan (×2 di bawah separuh darah), eksekusi di bawah 15% | – | Y | Desolate Era · sikap Tetes Darah dari seni pedang Brightmoon |
+| **Niat Pedang Inti: Sikap Bintang** (`astral_sword_intent`) | KA 7 | Langit T · Wilayah | Wilayah pedang bintang r 16→32 selama 15 dtk: 1,2×/dtk; tiap seranganmu memanggil 2 pedang bintang 0,8× | – | N | Desolate Era · Niat Pedang Inti, sikap ketiga Astral |
+| **Formasi Pedang Zhuxian** (`zhuxian_sword_formation`) | DA | Abadi M · Pamungkas | Formasi persegi berdinding 12 dtk: 2,0×/dtk, melucuti penguatan, pilar sudut 4,0×; akhir 10,0× + eksekusi di bawah 15% | kolom + parit | ★18 | Investiture of the Gods bab 77–78 · 誅仙陣, formasi empat pedang Tongtian Jiaozhu |
+| **Seni Pedang Hukuman Langit** (`heaven_punishing_sword`) | GD I | Dewa R · Pamungkas | Empat fase: 3,0× ke 9 terkuat, terpaku + Kegelapan, 5,0×, lalu sinar 128 blok menembus blok 12,0× | parit | ★36 | Against the Gods bab 2189 · Seni Pedang Hukuman Langit (empat fasenya desain permainan) |
+
+#### Dao Api (15)
+
+| Teknik | Ranah | Tingkat · Jenis | Efek singkat (× P) | Kawah | Murid | Sumber |
+|---|---|---|---|---|---|---|
+| **Garis Api Phoenix** (`phoenix_fire_line`) | IE | Misterius R · Serang | Garis api emas dari mulut (14→35 blok): 1,2× + terbakar 0,25×/dtk selama 6 dtk | terowongan | Y | Soul Land · 凤凰火线, keterampilan jiwa ke-1 Ma Hongjun |
+| **Phoenix Mandi Api** (`phoenix_bathing_fire`) | IE | Misterius M · Lindung | Jubah api 20 dtk: aura 0,3×/dtk, Tahan Api, jurus Api +30%, pukulanmu membakar | – | Y | Soul Land · 浴火凤凰, keterampilan jiwa ke-2 Ma Hongjun |
+| **Tsunami Api Pembelah** (`flame_splitting_tsunami`) | JBL | Misterius M · Area | Isi 1 dtk, lalu gelombang merah tua 20→48 blok: 2,5×, terdorong, terbakar | kerukan kipas | Y | Battle Through the Heavens · 焰分噬浪尺 lewat Penggaris Xuan Berat Xiao Yan |
+| **Panah Phoenix** (`phoenix_arrow`) | JBL | Misterius T · Serang | 1→5 panah phoenix memburu musuh dalam 48 blok: 2,0× + ledakan 1,0× + terbakar | kawah tebar | Y | Against the Gods · 凤凰箭 Panah Phoenix (Kidung Dunia Phoenix) |
+| **Guci Sepuluh Ribu Gagak** (`ten_thousand_crow_vase`) | TD | Bumi R · Area | 12→40 gagak api memburu musuh selama 3 dtk: 0,8× tiap gagak + terbakar (maks. 5 per musuh) | kawah tebar | Y | Investiture of the Gods bab 64 · 萬鴉壺 milik Luo Xuan |
+| **Tiga Transformasi Misterius Api Langit** (`heaven_fire_transformation`) | TD | Bumi M · Ubah | Tiga tahap: jurus Api +40% → +90% → +150% dengan penguat; sesudahnya 20 dtk Lemah II tanpa pemulihan qi | – | N | Battle Through the Heavens · 天火三玄变 ciptaan Xiao Xuan |
+| **Pukulan Phoenix Mengaum Langit** (`phoenix_sky_roaring_strike`) | TD | Bumi T · Kendali | Musuh dalam 5→14 blok terpaku 2 dtk; lava meletus di bawah 8→16 musuh: 2,5×, terlontar, terbakar | kawah tebar | Y | Soul Land · 凤凰啸天击, keterampilan jiwa ke-4 Ma Hongjun |
+| **Tudung Api Ilahi Sembilan Naga** (`nine_dragon_fire_cover`) | PD | Bumi R · Area | Tudung api berdinding (r 6→16) selama 4,5 dtk: 1,2× tiap setengah detik; saat menutup 4,0× | kawah | Y | Investiture of the Gods bab 13/46 · 九龍神火罩 milik Taiyi Zhenren |
+| **Api Sejati Samadhi** (`samadhi_true_fire`) | PD | Bumi M · Area | Salurkan 3 dtk: kerucut api sejati 0,8× + terbakar 0,5×/dtk (penuh terhadap kebal api) + Buta; lima kereta api berjaga 10 dtk | kerukan kipas | Y | Journey to the West bab 40–42 · 三昧真火 milik Anak Merah |
+| **Tungku Delapan Trigram** (`eight_trigrams_furnace`) | KA 1 | Langit R · Kendali | Tungku r 16→28 selama 10 dtk: 1,0×/dtk (×2 terhadap mayat hidup), tarik + akar; akhir 4,0× | lubang | Y | Journey to the West bab 7 · Tungku Delapan Trigram milik Laozi |
+| **Api Phoenix Membakar Langit** (`phoenix_flame_sears_heavens`) | KA 4 | Langit M · Pamungkas | Menukik sebagai phoenix api 48 blok (3,0×), lalu kobaran r 10→18: 6,0× + terbakar 1,0×/dtk | kawah | Y | Against the Gods bab 440/563 · 凤炎焚天 Api Phoenix Membakar Langit |
+| **Api Kaisar Emas Pembakar Langit** (`golden_emperor_flame`) | KA 7 | Langit T · Area | Lautan api emas r 20→32 selama 10 dtk: 1,5×/dtk dan melucuti Ketahanan, Kekuatan, Regenerasi, dll. dari monster | – | Y | Battle Through the Heavens · 金帝焚天炎, peringkat ke-4 Daftar Api Surgawi |
+| **Pilar Api Ilahi Penembus Langit** (`tongtian_divine_fire_pillars`) | KA 9 | Langit T · Area | Delapan pilar api di segi delapan berdinding 6 dtk: tiap pilar 1,2×/dtk; akhir 6,0× | kolom | Y | Investiture of the Gods bab 52 · 通天神火柱 milik Yunzhongzi |
+| **Murka Langit Sembilan Matahari** (`nine_suns_heavens_fury`) | DA | Abadi R · Pamungkas | Isi 3 dtk: sembilan matahari jatuh di kerumunan terpadat (6,0× + terbakar 2,0×/dtk); matahari terakhir 12,0× r 24 | kawah | ★27 | Against the Gods bab 1007/1197 · Murka Langit Sembilan Matahari |
+| **Api Kaisar** (`emperor_flame`) | GD I | Dewa R · Pamungkas | Teratai api kaisar r 32→40 selama 20 dtk: 2,0×/dtk, jurus Api tanpa qi di dalamnya, tumpukan per pembunuhan; akhir 15,0× + 0,5×/tumpukan | kawah | ★36 | Terinspirasi dari 帝炎 Api Kaisar, api pertama dari 23 Api Surgawi (Battle Through the Heavens) |
+
+#### Dao Es (14)
+
+| Teknik | Ranah | Tingkat · Jenis | Efek singkat (× P) | Kawah | Murid | Sumber |
+|---|---|---|---|---|---|---|
+| **Capit Permaisuri Es** (`ice_empress_pincer`) | IE | Misterius R · Serang | Cakaran 1,0× + Lambat III; tiga pukulan berikutnya ikut melambatkan, yang ke-3 membekukan; Ketahanan I | – | Y | The Unrivaled Tang Sect bab 133 · Capit Permaisuri Es (Huo Yuhao) |
+| **Pembekuan Es Adas Bintang** (`star_anise_ice_coagulation`) | IE | Misterius M · Area | 6→18 tombak es menyebar (20→32 blok): 0,8× + Lambat II | – | Y | The Unrivaled Tang Sect bab 467 · Pembekuan Es Adas Bintang |
+| **Seni Awan Beku** (`frozen_cloud_art`) | JBL | Misterius M · Area | Kerucut awan beku 12→24 blok: 1,5×, Lambat IV, beku 2 dtk; gumpalan awan bertahan 5 dtk | kerukan kipas | Y | Against the Gods bab 361/383 · 冰云诀 Seni Awan Beku |
+| **Sungai Tongtian Membeku** (`tongtian_river_freeze`) | JBL | Misterius T · Kendali | Cincin pembeku 8→22 blok: beku 4 dtk, lalu es pecah 2,5× (×1,5 terhadap makhluk air) | – | Y | Journey to the West bab 47–49 · Sungai Tongtian dibekukan |
+| **Api Es Qianlan** (`qianlan_ice_flame`) | TD | Bumi R · Serang | Sinar api dingin 24→48 blok: 2,5×, beku 3 dtk, dingin 0,4×/dtk; pembunuhan meledak 1,0× | terowongan | Y | A Record of a Mortal's Journey · 乾蓝冰焰 Api Es Qianlan |
+| **Kebanggaan Dua Kaisar Es dan Salju** (`ice_snow_emperors_pride`) | TD | Bumi T · Panggil | Dua kaisar 10 dtk: Kaisar Es 0,7× tiap setengah detik, wilayah Kaisar Salju 0,4×/dtk; akhir 3,0× + beku 3 dtk | – | Y (½) | The Unrivaled Tang Sect · 冰雪二帝之骄傲, keterampilan jiwa ke-5 Huo Yuhao |
+| **Formasi Es Dingin** (`cold_ice_formation`) | PD | Bumi R · Area | Paku es di area bidik (r 8→18): 2,0× + terlontar + terakar; sedetik kemudian gunung es 5,0× + beku 4 dtk | kawah | Y | Investiture of the Gods bab 44/46 · 寒冰陣 milik Yuan Tianjun |
+| **Bulan Patah Menyapu Bayangan** (`broken_moon_shadow`) | PD | Bumi T · Gerak | Sampai tiga lesatan 12→20 blok; bayangan sisa meledak 1,5× + beku 2 dtk; setelah yang ke-3 tak terlihat | – | Y | Against the Gods · 断月拂影 Bulan Patah Menyapu Bayangan |
+| **Api Dingin Tulang Roh** (`bone_chilling_flame`) | KA 1 | Langit R · Area | Cincin api dingin 20→36 blok: 3,0× + beku 4 dtk; jurus Es hemat 30% qi selama 10 dtk | cincin | Y | Battle Through the Heavens · 骨灵冷火, Api Surgawi milik Yao Lao |
+| **Dingin Tak Tertandingi** (`unparalleled_chill`) | KA 3 | Langit R · Serang | Bilah kristal memburu satu musuh: 5,0×, lalu pecah r 6→10: 3,0× + beku 4 dtk | – | Y | The Unrivaled Tang Sect bab 538 · Dingin Tak Tertandingi |
+| **Seni Ilahi Akhir Beku** (`frozen_end_divine_art`) | KA 5 | Langit M · Wilayah | Wilayah beku r 24→32 selama 12 dtk: 1,5×/dtk, gerak −95%; akhir eksekusi di bawah 25% (bos 10,0×) | – | N | Against the Gods bab 383–385 · Seni Ilahi Akhir Beku (Xia Qingyue) |
+| **Segel Embun Beku Phoenix Es** (`ice_phoenix_frost_seal`) | KA 9 | Langit T · Pamungkas | Segel kepingan salju r 20→24: 4,0× + beku 6 dtk; 2 dtk kemudian semua yang kena pecah 6,0× | cakram | Y | Terinspirasi dari Kitab Penobatan Dewa Phoenix Es (Against the Gods) |
+| **Turunnya Phoenix Es** (`ice_phoenix_descent`) | DA | Abadi R · Pamungkas | Phoenix es 12 dtk menukik tiap 3 dtk (6,0× + beku); akhir 10,0×; kamu kebal lambat, jurus Es +50% | kawah | ★27 | Terinspirasi dari jiwa Phoenix Es dan Kitab Penobatan Dewa Phoenix Es (Against the Gods) |
+| **Membekukan Gunung Qi** (`freeze_mount_qi`) | GD I | Dewa R · Pamungkas | Angin dan salju r 40 selama 20 dtk: 2,0× + Lambat III; detik ke-10: 64 musuh beku 8 dtk dan 8,0×; akhir pecah 12,0× | – | ★36 | Investiture of the Gods bab 39 · Jiang Ziya membekukan Gunung Qi |
+
+#### Dao Petir (14)
+
+| Teknik | Ranah | Tingkat · Jenis | Efek singkat (× P) | Kawah | Murid | Sumber |
+|---|---|---|---|---|---|---|
+| **Cambuk Zidian** (`zidian_whip`) | IE | Misterius R · Serang | Cambuk petir ungu ke sasaran terkunci lalu 1→4 musuh lain: 1,2× + setrum 1,5 dtk; yang pertama tertarik 4 blok | – | Y | Mo Dao Zu Shi · 紫电 Zidian, cincin Yu Ziyuan |
+| **Kilat: Tiga Ribu Gerak Petir** (`lightning_flash_step`) | IE | Misterius M · Gerak | 2 muatan: melesat 8→16 blok, lintasan 0,8× + setrum; mulai TD bayangan sisa meledak | parit | Y | Battle Through the Heavens bab 394/509 · Three Thousand Lightning Movement, tahap Lightning Flash |
+| **Tanda, Zirah dan Sayap Petir** (`lightning_mark_armor`) | IE | Misterius T · Lindung | 30 dtk: jurus +15%, Kecepatan I, petir berantai dari pukulan jarak dekat, sengat balik; mulai TD sayap petir | – | Y | Martial God Asura bab 1210/1667/3254 · Tanda, Zirah dan Sayap Petir milik Chu Feng |
+| **Tiga Gaya Guntur** (`three_thunder_styles`) | JBL | Misterius M · Area | Tiga tahap dalam 4 dtk: lesat 1,2×, kerucut 1,5× + setrum, guntur di titik bidik 2,5× + lontar | kawah | Y | Martial God Asura bab 5 · Tiga Gaya Guntur |
+| **Metode Lima Guntur** (`five_thunder_method`) | JBL | Misterius T · Kendali | Empat ketukan token: angin, awan (buta), guntur 5→12 sambaran 1,5×, hujan (basah); cuaca tidak berubah | kawah tebar | Y | Journey to the West bab 45 · 五雷法, token Dewa Kekuatan Harimau |
+| **Seni Pusaka Kaisar Petir** (`lightning_emperor_art`) | TD | Bumi R · Serang | Sinar 40→64 blok menembus: 3,0× + tanda (+30% kerusakan Petir); mulai KA tiap musuh memanggil 5 sambaran kecil | terowongan | Y | Perfect World bab 1405 · Seni Pusaka Kaisar Petir |
+| **Formasi Cahaya Emas** (`golden_light_formation`) | TD | Bumi T · Area | Cincin cermin r 10→18 selama 8 dtk: cahaya emas 0,9×/dtk ke 8→16 musuh (×1,5 terhadap mayat hidup) + buta | – | Y | Investiture of the Gods bab 44/46 · 金光陣 milik Jin Guang Shengmu |
+| **Seni Awan Ungu: Awan Petir Pemusnah** (`extinction_thundercloud`) | PD | Bumi R · Area | Awan petir r 16→32 selama 10 dtk: 40 sambaran 1,5× + setrum; akhir 4,0× | kawah tebar | Y | Against the Gods · 紫云功 Seni Awan Ungu, ranah ke-8 寂灭雷云 |
+| **Seni Sejati Pedang Ilahi Mengendalikan Guntur** (`divine_sword_imperial_thunder`) | PD | Bumi T · Serang | Isi 1,5 dtk: petir lewat pedangmu 32→64 blok, 5,0× (×0,7 tanpa pedang), lalu berantai ke 6 musuh 2,0× | parit | Y | Jade Dynasty (Zhu Xian) · 神剑御雷真诀, mantra Sekte Qingyun |
+| **Sayap Lei Zhenzi** ★ (`lei_zhenzi_wings`) | KA 1 | Langit R · Ubah | Wujud 20 dtk: benar-benar terbang (3 qi/dtk), tongkat emas serangan +50%; rapal lagi menukik 16 blok 2,0× | – | N | Investiture of the Gods bab 21 · sayap angin-guntur Lei Zhenzi |
+| **Pedang Petir Kesengsaraan Surgawi** (`tribulation_thunder_sword`) | KA 4 | Langit M · Pamungkas | Isi 2 dtk: pedang petir menyapu 48→64 blok, 6,0× (+1% per sambaran kesengsaraan yang pernah ditahan, maks. +100%) | retakan | Y | Against the Gods · 天劫雷剑 Pedang Petir Kesengsaraan Surgawi |
+| **Simbol Leluhur Halilintar** (`thunderbolt_ancestral_symbol`) | KA 7 | Langit T · Wilayah | Wilayah r 24→32 selama 15 dtk: sambaran 1,5× tiap 0,5 dtk, ledakan 2,0× tiap 3 dtk; jeda jurus Petir ×2 lebih cepat | – | N | Martial Universe bab 969/982/1033 · Simbol Leluhur Halilintar |
+| **Formasi Kaisar Petir Kesengsaraan** (`tribulation_thunder_emperor_array`) | DA | Abadi M · Pamungkas | Formasi r 24→32 selama 10 dtk: sembilan sambaran ke ≤ 32 musuh, 2,0× + 8% darah maks. (bos 3%); yang ke-9 ganda | kawah tebar | ★27 | Against the Gods · 天劫雷帝阵 Formasi Kaisar Petir Kesengsaraan |
+| **Tianzun Guntur Sembilan Langit** (`nine_heavens_thunder_venerable`) | GD I | Dewa R · Pamungkas | Wujud 20 dtk dengan dewa guntur di awan (2,0×), ledakan r 40 4,0× + setrum tiap 4 dtk; akhir 8,0× ke 64 musuh | kawah tebar | ★36 | Investiture of the Gods bab 99 · Wen Zhong dinobatkan sebagai Tianzun Guntur |
+
+#### Dao Tubuh (13)
+
+| Teknik | Ranah | Tingkat · Jenis | Efek singkat (× P) | Kawah | Murid | Sumber |
+|---|---|---|---|---|---|---|
+| **Ledakan Delapan Kutub** (`octane_blast`) | IE | Misterius R · Serang | Tujuh hentakan 0,15× + pukulan ke-8 0,9×; bila kedelapannya kena satu musuh, tenaga meledak di dalamnya 0,5× | bola | Y | Battle Through the Heavens · 八极崩 Ledakan Delapan Kutub (Yao Lao) |
+| **Langkah Penjelajah Bumi** ★ (`worldwalking`) | JBL | Misterius M · Gerak | Menyelam ke bumi 16→48 blok tanpa terlihat, muncul dengan pilar batu 1,5× + lontar; ditolak tanpa tempat keluar aman | parit (alami) | N | Coiling Dragon · Worldwalking; Investiture of the Gods · 地行术 Tu Xingsun |
+| **Denyut Nadi Dunia** (`throbbing_pulse`) | JBL | Misterius T · Area | Tiga cincin denyut bumi 0,6× tembus zirah + lontar; cincin ke-3 menghancurkan dari dalam; Perisai Qi 15% | cakram (alami) | Y | Coiling Dragon (Buku 15–16) · Denyut Nadi Dunia |
+| **Palu Jubah Angin Kacau** (`disorderly_cloak_hammer`) | TD | Bumi R · Area | Salurkan 2,7 dtk: palu menghantam 8 kali (0,2×, +15% tiap pukulan), pukulan ke-9 2,4× r 6→14 | bola | Y | Soul Land · 乱披风锤法 Sekte Langit Cerah |
+| **Seni Raja Cerah** (`bright_king_art`) | TD | Bumi M · Lindung | 20 dtk kulit emas: kerusakan diterima −35→60%, serangan +40%; seperempat kerusakan disimpan lalu meledak ×2 di akhir | cakram (alami) | Y | A Record of a Mortal's Journey · 明王诀 Seni Raja Cerah |
+| **Jalan Agung Buddha** (`great_way_of_buddha`) | TD | Bumi T · Pulih | Pulih 30→50% darah dalam 30 dtk, +10% tiap pukulan berat; lalu dibersihkan + Peningkatan Darah (menumpuk sampai III) | – | Y | Against the Gods bab 147/287/786 · 大道浮屠诀 Jalan Agung Buddha |
+| **Wujud Prajurit Darah Naga** (`dragonblood_warrior`) | PD | Bumi R · Ubah | Wujud naga 30 dtk: zirah +10, serangan +6, sapuan ekor 2,0×, cakaran kerucut 0,8× tiap pukulan | cincin | N | Coiling Dragon · Prajurit Darah Naga (Linley Baruch) |
+| **Tinju Enam Jalan Reinkarnasi** (`six_paths_fist`) | PD | Bumi T · Serang | Enam tinju berwarna menembus 24→48 blok, 0,6× masing-masing; musuh yang tewas meledak berantai (≤ 8) | parit | Y | Shrouded the Heavens · 六道轮回拳 Tinju Enam Jalan Reinkarnasi |
+| **Segel Kedelapan: Segel Tubuh** (`eighth_hex_body`) | KA 1 | Langit R · Kendali | Segel 封 r 16→32: 1,2× tembus zirah; 10 dtk musuh −60% serangan, tanpa zirah, −50% gerak, +40% kerusakan diterima | – | N | I Shall Seal the Heavens bab 954 · Segel Kedelapan, Segel Tubuh |
+| **Tinju Kaisar Abadi** (`undying_emperor_fist`) | KA 4 | Langit M · Pamungkas | Satu tinju 7,0× + tiga gempa susulan, lalu gelombang kejut 20→48 blok 3,0× | parit | N | A Will Eternal bab 671/696/892 · Tinju Kaisar Abadi |
+| **Kera Raksasa Emas: Raungan Vajra** (`golden_ape_roar`) | KA 7 | Langit T · Ubah | Wujud kera emas 25 dtk + Raungan Vajra 3,0× (Lemah III, Lambat IV); rapal lagi: hantaman gunung 5,0× | kawah | N | A Record of a Mortal's Journey · kera raksasa emas Han Li dan 金刚吼 Raungan Vajra |
+| **Wujud Kosmik Langit-Bumi** (`cosmic_giant_form`) | DA | Abadi R · Pamungkas | Sosok raksasa emas 20 dtk menginjak tiap 2,5 dtk (4,0×), kerusakan diterima −50%; akhir 10,0× | cakram (alami) | N | Journey to the West bab 6 · tubuh sepuluh ribu zhang Erlang Shen |
+| **Injakan Dewa Kuno** (`ancient_god_trample`) | GD I | Dewa R · Pamungkas | Tubuh Dewa Kuno 15 dtk: delapan jejak kaki 3,0×, jejak ke-9 r 32→40 16,0× + setrum 6 dtk | sembilan bola + kawah | ★28 | Terinspirasi dari tubuh Dewa Kuno (Renegade Immortal bab 921) |
+
+#### Dao Kehidupan (14)
+
+| Teknik | Ranah | Tingkat · Jenis | Efek singkat (× P) | Kawah | Murid | Sumber |
+|---|---|---|---|---|---|---|
+| **Seni Musim Semi Abadi** (`eternal_spring_art`) | IE | Misterius R · Pulih | Aura 12 dtk: kamu dan sekutu pulih 25% darah; regenerasi qi ×1,5 | – | Y | A Record of a Mortal's Journey · 长春功 Seni Musim Semi Abadi |
+| **Belitan Rumput Perak Biru** (`blue_silver_entangle`) | IE | Misterius M · Kendali | Rumput perak biru mengikat musuh di titik bidik 4→6 dtk (bos 1,5 dtk): 0,6× + Racun I | – | Y | Soul Land · 蓝银缠绕 Belitan Rumput Perak Biru (Tang San) |
+| **Vitalitas Bumi** (`earth_vitality`) | JBL | Misterius M · Pulih | Sekutu dalam 10→24 blok pulih 25→35% + Perisai Qi 15% + Ketahanan I; ×2 di tanah alami | – | Y | Coiling Dragon (Buku 15) · Vitalitas, misteri Hukum Bumi |
+| **Parasit Perak Biru** (`blue_silver_parasite`) | JBL | Misterius T · Area | Parasit pada 6→16 musuh: racun 0,2×/dtk selama 8 dtk, 60%-nya memulihkanmu dan sekutu | layu | Y | Soul Land · 寄生 Parasit Rumput Perak Biru |
+| **Melodi Hati Jernih** (`clear_heart_melody`) | TD | Bumi R · Pulih | Lima cincin nada: monster Lambat IV + Lemah III (mayat hidup 0,8× ×2); melodi 20 dtk membersihkan + Ketahanan I | – | Y | Mo Dao Zu Shi · 清心音 Melodi Hati Jernih Sekte Gusu Lan |
+| **Pagoda Kaca Tujuh Harta** (`seven_treasure_pagoda`) | TD | Bumi M · Pulih | Pagoda tujuh tingkat 30 dtk: satu penguat baru tiap detik untuk kamu dan sekutu; tingkat 7 menguatkan semua ×1,5 | – | Y | Soul Land · Pagoda Kaca Tujuh Harta Ning Rongrong |
+| **Kawanan Kumbang Pemakan Emas** (`gold_devouring_beetles`) | PD | Bumi R · Area | Kumbang menyerbu 12→32 musuh: 0,35×/dtk tembus zirah, zirah −30%; makin kuat tiap pembunuhan | layu | Y | A Record of a Mortal's Journey · 噬金虫 Kumbang Pemakan Emas |
+| **Cabang dan Daun Emas Dewa Dedalu** (`willow_god_branches`) | PD | Bumi M · Kendali | Cabang dedalu mencambuk 10→24 musuh 1,2× + ikat 3 dtk; 24 daun emas 0,9×; pulih 30% bila darahmu < 50% | layu | Y | Perfect World · Dewa Dedalu (柳神) Desa Batu |
+| **Formasi Pelebur Darah** (`blood_transforming_formation`) | KA 1 | Langit R · Area | Pusaran pasir hitam 15 dtk (r 14→28): 0,5× + 1% darah maks. tiap detik + Layu II; 25%-nya memulihkanmu | layu | Y | Investiture of the Gods bab 44/46 · 化血陣 milik Sun Tianjun |
+| **Klon Darah** (`blood_clones`) | KA 4 | Langit M · Pamungkas | 2→4 klon darah menempel pada musuh 15 dtk (0,8×/dtk); akhir menyatu 3,0× per klon, kamu pulih 20→40% | kawah | N | I Shall Seal the Heavens (Buku 4) · Klon Darah Meng Hao |
+| **Tubuh Teratai Nezha** (`nezha_lotus_body`) | KA 7 | Langit T · Lindung | 40 dtk: kerusakan diterima −30%; pukulan mematikan pertama → darah penuh + ledakan teratai 4,0× (kunci 10 menit) | – | N | Investiture of the Gods bab 14 · tubuh teratai Nezha (莲花化身) |
+| **Embun Manis Guanyin** (`guanyin_sweet_dew`) | DA | Abadi R · Pulih | Embun 10 dtk r 24→32: semua sekutu (juga penduduk desa, golem) pulih 50%, mayat hidup 0,8×/dtk, qi +30% | – | N | Journey to the West bab 26 · embun manis vas Guanyin |
+| **Wilayah Hidup dan Mati** (`life_death_domain`) | DA | Abadi M · Pamungkas | Wilayah 20 dtk: 0,6× + 2% darah maks./dtk, eksekusi di bawah 10%; sekutu pulih 60%; akhir 12,0× | layu | ★27 | Renegade Immortal · wilayah Hidup dan Mati Wang Lin |
+| **Pohon Kuno Bodhisattva: Seratus Kehidupan** (`bodhisattva_tree`) | GD II | Dewa M · Pamungkas | Pohon 30 blok selama 30 dtk: sekutu pulih 90%, qi ×3, pemahaman +0,05/dtk, sekali tak jatuh di bawah 1 darah; akhir 14,0× | – | ★37 | Battle Through the Heavens bab 828/1426 · Pohon Kuno Bodhisattva |
+
+#### Dao Bayangan & Angin (11)
+
+| Teknik | Ranah | Tingkat · Jenis | Efek singkat (× P) | Kawah | Murid | Sumber |
+|---|---|---|---|---|---|---|
+| **Penyatuan Roh Iblis Bayangan** (`shadow_devil_fusion`) | IE | Misterius R · Indra | Tak terlihat 20→30 dtk; monster dalam 32 blok kehilangan jejakmu dan menerima ×2 dari pukulan berikutnya | – | N | Tales of Demons and Gods bab 40–56 · roh iblis Shadow Devil Nie Li |
+| **Angin Ilahi Samadhi** (`samadhi_wind`) | JBL | Misterius M · Kendali | Salurkan 3 dtk: kerucut angin pasir 0,3× tiap setengah detik, buta, Lambat II, terdorong | sapu daun | Y | Journey to the West bab 21 · 三昧神风 Raja Agung Angin Kuning |
+| **Bayang Pecah Dewa Bintang** (`star_god_broken_shadow`) | TD | Bumi R · Gerak | Kedip 5→10 kali dari monster ke monster, 1,8× tiap tebasan, bayangan meledak 0,6×; tahap 2 kembali ke titik awal | – | N | Against the Gods · 星神碎影 Bayang Pecah Dewa Bintang |
+| **Kupu-kupu Arwah Perak** (`wraith_butterflies`) | TD | Bumi M · Area | Kupu-kupu perak pada 8→20 monster: jiwa 0,35×/dtk selama 10 dtk; 12 kupu-kupu menelan proyektil | – | Y | Heaven Official's Blessing · 死灵蝶 kupu-kupu arwah perak Hua Cheng |
+| **Kipas Daun Pisang** (`banana_leaf_fan`) | PD | Bumi R · Area | Dinding angin 32→64 blok: 2,2× + dorongan sangat kuat; tahap 2 kibasan balik menarik 1,0× | sapu daun | Y | Journey to the West bab 59–61 · kipas daun pisang Putri Kipas Besi |
+| **Formasi Angin Menderu** (`wind_roaring_formation`) | KA 1 | Langit R · Area | Formasi topan r 14→28 selama 15 dtk: 0,3× + api tiap setengah detik, memutar dan mengangkat; akhir 3,0× | sapu daun | Y | Investiture of the Gods bab 44/46 · 風吼陣 milik Dong Tianjun |
+| **Formasi Jiwa Jatuh** (`soul_falling_formation`) | KA 4 | Langit M · Kendali | Formasi panji putih 12 dtk: jiwa 0,5×/dtk, peluang lumpuh; akhir eksekusi di bawah 15% (bos 5%) | – | Y | Investiture of the Gods bab 44/48 · 落魂陣 milik Yao Bin |
+| **Panji Semiliar Jiwa** (`billion_soul_flag`) | KA 7 | Langit T · Pamungkas | Panji jiwa r 20→32 selama 20 dtk: 0,5×/dtk tembus zirah, tumpukan per pembunuhan; akhir 4,0× + 0,15× per tumpukan | bola | N | Renegade Immortal · panji semiliar jiwa Sekte Pemurni Jiwa |
+| **Segel Harimau Alam Baka** (`stygian_tiger_seal`) | DA | Abadi R · Panggil | Terlarang (10% darah saat ini): 8 mayat ganas maya selama 25 dtk, 1,5×/dtk; gelombang teror tiap 5 dtk | layu | N | Mo Dao Zu Shi · 阴虎符 Segel Harimau Alam Baka Wei Wuxian |
+| **Teknik Pusaka Kunpeng** (`kunpeng_art`) | GD I | Dewa R · Pamungkas | Isi 1 dtk: sabit angin Kun 128 blok menembus segalanya 16,0×, kamu melesat 32 blok; gelombang cincin 6,0× | parit | N | Perfect World bab 347 dst. · 鲲鹏宝术 teknik pusaka Kun Peng Shi Hao |
+| **Wilayah Karma** (`karma_domain`) | murid ★46 | Dewa M · Wilayah | Khusus murid ★46: wilayah 20 dtk, kerusakan pada satu monster menjalar 40% ke yang lain; sekutu memantulkan serangan | – | khusus murid | Renegade Immortal · wilayah Karma Wang Lin |
+
+#### Dao Ruang (13)
+
+| Teknik | Ranah | Tingkat · Jenis | Efek singkat (× P) | Kawah | Murid | Sumber |
+|---|---|---|---|---|---|---|
+| **Bilah Ruang** (`space_blade`) | IE | Misterius R · Serang | Retakan ruang 20→48 blok memotong semua di garisnya: 1,5× tembus zirah | parit | Y | Martial Peak bab 1139 · Space Blade Yang Kai |
+| **Tali Pengikat Abadi** (`immortal_binding_rope`) | IE | Misterius M · Kendali | Tali ke sasaran lalu 2→6 lainnya: 0,5× + terpaku 4 dtk; tahap 2 menyentak mereka 6 blok | – | Y | Investiture of the Gods bab 53–54 · 捆仙绳 milik Ju Liusun |
+| **Gelang Qiankun** (`qiankun_ring`) | JBL | Misterius T · Serang | Gelang emas memantul 4→12 kali di antara monster: 1,8× (×0,85 tiap pantulan) + dorongan, lalu kembali | – | Y | Investiture of the Gods bab 12 · 乾坤圈 Nezha |
+| **Ruang Gravitasi** (`gravitational_space`) | TD | Bumi R · Kendali | Wilayah gravitasi r 10→24 selama 12→18 dtk: 0,3×/dtk, Lambat IV, tak bisa lompat/terbang, kerusakan jatuh ×2 | cakram (alami) | Y | Coiling Dragon (Buku 15–16) · Gravitational Space |
+| **Bilah Rembulan** (`moon_blade`) | TD | Bumi M · Area | Tiga sabit ruang 32→64 blok menembus dinding: 2,0× tembus zirah | parit | Y | Martial Peak · Moon Blade Yang Kai |
+| **Labu Merah Ungu-Emas** (`purple_gold_gourd`) | PD | Bumi R · Serang | Labu memanggil nama sasaran (24 blok): menelannya bila darah maks. < 10×P; yang tangguh 4,0× (bos 3,0×) | – | N | Journey to the West bab 32–35 · 紫金红葫芦 Raja Tanduk Emas dan Perak |
+| **Segel Pembalik Langit** (`heaven_turning_seal`) | PD | Bumi T · Area | Segel raksasa jatuh dari 30 blok: 3,5× + terpaku (r 7→16), lalu gelombang kejut 1,0× | lubang | Y | Investiture of the Gods bab 46 · 番天印 milik Guang Chengzi |
+| **Simbol Leluhur Ruang** ★ (`spatial_ancestral_symbol`) | KA 1 | Langit R · Kendali | Lipat medan r 16→28 selama 10 dtk: ≤ 32 monster ditarik ke pusat, 0,5×/dtk; rapal lagi sampai 7× untuk berkedip di dalam medan | bola | N | Martial Universe bab 1209 · Simbol Leluhur Ruang (Zhou Tong) |
+| **Kantong Benih Alis Kuning** (`yellow_brow_bag`) | KA 4 | Langit M · Kendali | Kantong menyedot ≤ 32 monster selama 3 dtk, menahan mereka melayang (qi 0,5×/dtk), memuntahkan 3,0× di detik ke-8 | – | N | Journey to the West bab 65–66 · kantong dan simbal emas Raja Alis Kuning |
+| **Larangan Langit Berlapis** (`heavenly_restriction`) | KA 7 | Langit T · Pamungkas | Kubus berdinding 8 dtk: 0,6×/dtk (+15% tiap lapis), terpaku, Lemah III; runtuh 6,0× | lubang | N | Terinspirasi dari larangan (禁制) Wang Lin (Renegade Immortal bab 207, 233, 291) |
+| **Cermin Hampa** (`void_mirror`) | DA | Abadi R · Pamungkas | Cermin 10 dtk: kerusakan dari depan ×0,5, proyektil ditelan dan dibalas; lalu sinar hampa 64 blok 10,0× + simpanan | parit | N | Shrouded the Heavens · 虚空镜 Cermin Hampa |
+| **Wilayah Roh Waktu** ★ (`time_spirit_domain`) | GD I | Dewa R · Pamungkas | Waktu berhenti r 24→32 selama 8 dtk: monster beku, pukulanmu disimpan; lalu dilepas ×1,5 + 10,0× | kawah tebar | N | A Record of a Mortal's Journey · 时间灵域 Wilayah Roh Waktu |
+| **Lubang Hitam** (`stellar_black_hole`) | GD II | Dewa M · Pamungkas | Lubang hitam 6 dtk menyeret semua dalam 32→40 blok (0,5× tiap setengah detik); runtuh 18,0× di inti, 4,0× di medan | bola | ★64 | Stellar Transformations · Black Hole, tahap setelah Bintang Gelap |
+
+#### Universal dan pamungkas tanpa Dao (38)
+
+| Teknik | Ranah | Tingkat · Jenis | Efek singkat (× P) | Kawah | Murid | Sumber |
+|---|---|---|---|---|---|---|
+| **Langkah Bayangan Hantu** (`ghost_shadow_track`) | PF | Kuning R · Gerak | 2→4 muatan: meluncur 4→8 blok ke arah gerak, sejenak tak tersentuh, monster kehilangan jejak; Kecepatan II | – | Y | Soul Land · 鬼影迷踪 Sekte Tang |
+| **Tangan Giok Misterius** (`mysterious_jade_hand`) | PF | Kuning M · Lindung | 1,5→2,5 dtk: tangkap 2→5 proyektil dari depan dan balas 1,0×; kerusakan dari depan −50%; membersihkan | – | Y | Soul Land · 玄玉手 Sekte Tang |
+| **Mata Iblis Ungu** (`purple_demon_eye`) | PF | Kuning M · Serang | Tatapan menembus 3 monster: 1,2× tembus zirah, Lambat II, Lemah I; ×1,5 saat fajar | – | Y | Soul Land · 紫极魔瞳 Sekte Tang |
+| **Jarum Hujan Bunga Pir** (`pear_blossom_needles`) | PF | Kuning T · Area | 9→27 jarum dalam kipas 25°: 0,3× tembus zirah, maks. 4 per monster (8 mulai Inti Emas) | – | Y | Soul Land · 暴雨梨花针 Sekte Tang |
+| **Serangga Tidur** (`sleep_insects`) | IE | Misterius R · Kendali | Kerucut serangga: monster tidur 3→5 dtk, Buta, pukulan berikutnya ×2 | – | Y | Journey to the West bab 5, 25, 71 · 瞌睡蟲 serangga pembawa kantuk |
+| **Mantra Pembeku Tubuh** (`immobilization_spell`) | IE | Misterius M · Kendali | Sasaran terkunci 1,5× lalu pingsan 3→5 dtk; tiap tingkat di atasnya satu monster lagi ikut (maks. 4) | – | Y | Journey to the West bab 5, 97 · 定身法 ilmu pembeku tubuh |
+| **Seni Segel Kaisar** (`emperor_seal_jue`) | IE | Misterius M · Area | Sampai 4 segel bertahap: Segel Pembuka Gunung 1,5× + pingsan, gelombang 1,2×, pilar lempar-banting 1,5×, segel kaisar 2,5× | lubang + cakram + kawah | Y (tahap 1–3) | Battle Through the Heavens · 帝印决 dan 开山印 (tahap 2–4 desain permainan) |
+| **Mata Api Pupil Emas** (`fiery_golden_eyes`) | JBL | Misterius M · Indra | Pindai 24→32 blok: ≤ 32 monster kehilangan Tak Terlihat, tertanda tembus dinding, +20→40% kerusakan darimu | – | N | Journey to the West bab 7 · 火眼金睛 |
+| **Jari Kematian** (`finger_of_death`) | JBL | Misterius T · Serang | Jari qi ke sasaran terkunci: 2,2× tembus zirah, eksekusi di bawah 30% (bos 5%); pembunuhan +8% qi | – | Y | Renegade Immortal bab 543, 734 · Finger of Death |
+| **Tubuh di Luar Tubuh** (`body_beyond_body`) | JBL | Misterius T · Panggil | 3→8 klon rambut menempel pada monster 10→15 dtk, 0,25×/dtk | – | N | Journey to the West bab 2 · 身外身法 |
+| **Harimau Putih Alam Baka** ★ (`netherworld_white_tiger`) | JBL | Misterius T · Area | Bersama murid terikat ber-Dao lain: harimau putih menerjang 24→48 blok, (2 + 2 × rasio kekuatan)× + denyut Dao murid | parit | pasangan | Soul Land · 幽冥白虎, fusi Dai Mubai dan Zhu Zhuqing |
+| **Awan Jungkir Balik** ★ (`somersault_cloud`) | TD | Bumi R · Gerak | Menunggang awan emas 64→128 blok dalam 2 dtk, tak tersentuh, mendarat di tempat aman | – | N | Journey to the West bab 2 · 觔斗雲 awan jungkir balik |
+| **Istana Suci Qilin** (`qilin_sacred_palace`) | TD | Bumi R · Lindung | Istana emas r 4→8 selama 6→10 dtk: monster tertahan di luar (0,5×), kerusakan pada kamu dan sekutu −60%, proyektil lenyap | – | Y | Against the Gods bab 2008 · Qilin Sacred Palace |
+| **Tujuh Puluh Dua Perubahan** ★ (`seventy_two_transformations`) | TD | Bumi M · Ubah | Lima wujud bergantian (Harimau, Elang, Ikan, Serangga, Kuil) selama 60→90 dtk, 3 qi/dtk | cakram | N | Journey to the West bab 2, 6 · 地煞七十二变 |
+| **Tiga Kepala Enam Lengan** (`three_heads_six_arms`) | TD | Bumi M · Ubah | Wujud perang 20→30 dtk: tiap pukulan ditambah dua pukulan lengan bayangan 0,6×, kecepatan serang +50% | – | N | Journey to the West bab 4 · 三头六臂; Desolate Era · Ji Ning |
+| **Dunia Kematian Darah** (`blood_death_world`) | TD | Bumi T · Wilayah | Terlarang (20% darah maks.): wilayah darah 8→12 dtk, 0,35×/dtk, serap 30%, Jari Darah 1,2× eksekusi di bawah 10% | layu | N | I Shall Seal the Heavens bab 203, 447 · Blood Finger dan Blood Death World |
+| **Pelarian Bayangan Darah** (`bloodshadow_evasion`) | PD | Bumi R · Gerak | Terlarang (30% darah maks., boleh tanpa qi): kabur 32→64 blok ke tempat paling aman, kerusakan −80% 3 dtk | – | N | A Record of a Mortal's Journey · 血影遁 Bloodshadow Evasion |
+| **Bulan Ditarik Bintang Kembali** (`moon_star_restoration`) | PD | Bumi M · Lindung | Terlarang (15% darah saat ini): 2→3 dtk kerusakan dibatalkan dan disimpan, lalu meledak 2,0× + 2× simpanan | cakram | N | Against the Gods · 月挽星回, ranah ke-4 Heretic God Art |
+| **Alam Ji** (`ji_realm`) | PD | Bumi T · Area | Kerucut pencabik jiwa: 2,4× tembus zirah, eksekusi di bawah 30% dan non-bos yang lemah; tanpa regenerasi qi 15 dtk | – | N | Renegade Immortal bab 243, 268 · Alam Ji Wang Lin |
+| **Fusi Misteri Mendalam** ★ (`profound_mystery_fusion`) | PD | Bumi T · Area | Bola dua Dao meledak r 6→12: 2,2× + denyut wilayah kedua Dao ×2 + efek pasangan | bola | N | Coiling Dragon Buku 15 bab 42, Buku 21 bab 10 · Linley memadukan misteri |
+| **Teratai Tang Murka Buddha** (`buddha_wrath_tang_lotus`) | PD | Bumi T · Area | Lempar teratai: 108 bilah tiga kali (0,7× + Racun II), inti 2,5× | bola | Y | Soul Land · 佛怒唐莲, senjata rahasia Tang San |
+| **Sayap Angin-Petir Han Li** (`wind_thunder_wings`) | KA 1 | Langit R · Gerak | 2 muatan: melesat 24→40 blok tak tersentuh, lintasan 3,0× + pingsan, petir berantai 1,5× | parit | Y | A Record of a Mortal's Journey · 风雷翅, sayap Roc Petir Han Li |
+| **Tubuh Emas Pantang Tunduk** (`proud_golden_body`) | KA 1 | Langit R · Lindung | Kulit emas 25 dtk: kerusakan diterima −20→60% dan kerusakan jurus +0→100%, makin besar saat darah menipis | – | Y | Martial Peak · 傲骨金身 (penguatan saat darah menipis: terinspirasi) |
+| **Rupa Langit Wujud Bumi** (`fa_tian_xiang_di`) | KA 1 | Langit R · Ubah | Membesar ×3 (×4 di Dewa Abadi) selama 30→45 dtk, 5 qi/dtk, Kekuatan III; rapal ulang menghentak 3,0× (jeda ≥ 3 dtk) | cakram (alami) | N | Journey to the West bab 3, 6 · 法天象地 |
+| **Hati Membara** (`burning_heart`) | KA 1 | Langit R · Ubah | Terlarang (35% darah saat ini, 20% qi): 15 dtk kerusakan jurus +100%, qi ×0,5; sesudahnya lemah 60 dtk | – | N | Against the Gods · Burning Heart, ranah ke-2 Heretic God Art |
+| **Segel Hidup-Mati** (`life_death_hex`) | KA 2 | Langit R · Area | Medan segel 10 dtk: jiwa 0,4×/dtk + Lambat II, kematian merambat; akhir eksekusi di bawah 25% (bos 4,0×) | layu | Y | I Shall Seal the Heavens bab 882 · Segel Keenam, Life-Death Hexing |
+| **Pukulan Tongkat Ruyi** (`ruyi_staff`) | KA 2 | Langit R · Pamungkas | Isi 1 dtk: tongkat raksasa tumbang 40→64 blok, 9,0× + terlempar; mulai KA 7 dua tongkat tambahan 4,5× | parit | Y | Journey to the West bab 3 · 如意金箍棒 |
+| **Tiga Helai Rambut Penyelamat** (`three_life_saving_hairs`) | KA 3 | Langit R · Lindung | 20 menit: 1→3 helai menyelamatkan dari pukulan mematikan (darah 30%, mundur 8 blok); totem dipakai lebih dulu | – | N | Journey to the West bab 15, 75 · tiga helai rambut penyelamat |
+| **Wilayah Jiwa Naga** (`dragon_soul_domain`) | KA 3 | Langit R · Wilayah | Wilayah jiwa naga 10→15 dtk: kehilangan jejak, 0,4×/dtk, Lambat III, terdorong, pingsan tiap 3 dtk | – | N | Against the Gods bab 316, 1064, 1099 · Dragon Soul Domain |
+| **Kuali Induk Qi Segala Benda** (`myriad_cauldron`) | KA 4 | Langit M · Kendali | Kuali jatuh dari 24 blok: 5,0× + tarik, lalu 4 dtk terpaku dan terbakar 0,5×/dtk; pembunuhan +3% qi | lubang | Y | Shrouded the Heavens · 万物母气鼎 milik Ye Fan |
+| **Rahasia Xing** (`xing_secret`) | KA 5 | Langit M · Gerak | 10→15 dtk: Kecepatan IV, kecepatan serang +100%, jeda ×2 lebih cepat; monster sekitar lambat dan pingsan | – | N | Shrouded the Heavens · 行字秘 Rahasia Xing (efeknya terinspirasi) |
+| **Segel Karma** (`karmic_hex`) | KA 6 | Langit M · Kendali | Sasaran 4,0× tembus zirah, benang karma mengikat 12→24 monster 12 dtk: berbagi 50% kerusakan (bos 25%) | – | Y | I Shall Seal the Heavens bab 751, 858 · Segel Ketujuh, Karmic Hexing |
+| **Roda Enam Jalan Reinkarnasi** ★ (`six_dao_reincarnation`) | KA 7 | Langit T · Pamungkas | Roda memutar ulang 6 jurus terakhirmu di titik bidik (×0,6→0,8, gratis), lalu nova 4,0× | – | N | Perfect World bab 1091, 1120 · Six Dao Reincarnations Heavenly Art |
+| **Jari Takdir Surgawi** (`heavenly_fate_finger`) | KA 9 | Langit T · Pamungkas | Isi 1 dtk: jari cahaya raksasa ke sasaran terkunci (≤ 64 blok): 12,0× tembus zirah + terpaku 3 dtk; sekitarnya 3,0× | kolom | N | Renegade Immortal bab 1254 · mantra All-Seer |
+| **Segel Kesembilan** (`ninth_hex`) | DA | Abadi R · Pamungkas | Salurkan ≤ 8 dtk: segel r 24→32 membuat monster pingsan tiap detik dan menelan proyektil; akhir 9,0× ke 32 terkuat | cakram | N | I Shall Seal the Heavens bab 1379, 1465, 1534, 1540 · Segel Kesembilan Meng Hao |
+| **Gunung Lima Unsur** (`five_elements_mountain`) | DA | Abadi M · Pamungkas | Telapak emas jatuh dari 64 blok r 12→24: 14,0× (×1,5 terhadap mayat hidup); lima gunung memaku 6 dtk dan membakar | cakram + kolom | ★27 | Journey to the West bab 7 · 五行山 Gunung Lima Unsur |
+| **Diagram Taiji** (`tai_chi_diagram`) | DA | Abadi T · Pamungkas | Isi 1,5 dtk: diagram menekan sepanjang bidikan (48→64 × 9 blok): 12,0×, eksekusi di bawah 40% (bos 5%) | parit | ★27 | Investiture of the Gods bab 61 · 太极图, Yin Hong menjadi abu |
+| **Langkah Penginjak Langit** (`heaven_trampling`) | GD I | Dewa R · Pamungkas | Naik 24 blok lewat sembilan anak tangga cahaya, lalu injak r 24→32: 14,0× + tiga gelombang 4,0× | bola + cakram (alami) | ★60 | Renegade Immortal · Heaven Trampling Wang Lin (anak tangga: desain permainan) |
+
+### 12.8 Dua puluh tiga teknik lama yang diperkuat
+
+Id, nama, teknik yang sudah dipelajari, teknik terpilih, jeda, dan Pedang Terbang di simpanan lama **tidak berubah**;
+penguasaannya mulai dari 0. Koefisien × P menggantikan × D, jadi di Pemurnian Qi angkanya hampir sama dengan dulu,
+sedangkan di Dewa Abadi jauh lebih besar. Qi dan jeda di bawah adalah nilai dasar; selisih ranah dan penguasaan
+menurunkannya. Efek lama tetap tampil, ditambah lapisan baru sesuai tingkat visual. Karena teknik ini dibuat sebelum aturan
+sumber, baris Sumbernya "Terinspirasi dari …", kecuali Indra Ilahi.
+
+| Teknik | Ranah | Tingkat · Jenis | Efek sekarang (× P) | Penguasaan 3 / 4 | Kawah | Murid | Sumber |
+|---|---|---|---|---|---|---|---|
+| **Langkah Awan** (`cloud_step`) | PQ | Kuning R · Pasif | Lompatan udara: PQ 1, PF 2, IE 3, TD 4, KA 5, DA 6; 6 qi per lompatan (makin murah, DA 3); tanpa luka jatuh sampai mendarat | +1 lompatan / mendarat dari ≥ 4 blok menghentak r 3 (0,3× + dorong) | – | N | Terinspirasi dari perjalanan awan, *Journey to the West* bab 2 |
+| **Telapak Qi** (`qi_palm`) | PQ | Kuning R · Serang | Sinar telapak 12→24 blok: 1,0× + dorong; qi 10 · jeda 1,5 dtk | tiga telapak menyebar ±12° (samping ×0,6) / Gema 40% | kawah (ujung) | Y | Terinspirasi dari telapak qi para kultivator Dou Qi, *Battle Through the Heavens* |
+| **Pedang Terbang** (`flying_sword`) | PF | Kuning T · Gerak | Terbang sungguhan; laju 0,05 + 0,01 × ranah, +0,015 per tingkat di atas PD (maks. 0,18); qi/dtk `max(0,5; 2 − 0,2 × ranah)` × 0,75 (KA 1–3) / 0,5 (KA 4–6) / 0,25 (KA 7–9) / 0 (DA) | laju +25% / tabrakan sambil sprint-terbang 0,5× (tanpa mendorong) | – | N | Terinspirasi dari menunggang pedang (御剑) murid Qingyun, *Jade Dynasty* |
+| **Indra Ilahi** (`divine_sense`) | JBL | Misterius M · Indra | Monster dalam 48→96 blok (maks. 64) bercahaya 12 dtk tembus dinding; bijih r 12 (maks. 16) ditandai 10 dtk; qi 30 · jeda 20 dtk | cahaya +6 dtk / monster bercahaya +10% rentan | – | N | *A Record of a Mortal's Journey* · indra ilahi (神识) Han Li, bab 1269 |
+| **Telapak Buddha** (`buddha_palm`) | IE | Misterius M · Area | Telapak emas jatuh di titik bidik (≤ 24→48, r 5→16): 3,0× (dulu 2,5 D) + banting + Lambat II; qi 45 · jeda 12 dtk | area +25% / tiga telapak (dua tambahan ×0,6) | cakram | Y | Terinspirasi dari telapak Buddha, *Journey to the West* bab 7 (seni lengkapnya Gunung Lima Unsur) |
+| **Wujud Dharma** (`dharma_form`) | TD | Bumi R · Ubah | 30 dtk→: skala TD 2, PD 2,5, KA 3, KA 5+ 3,5, DA 4 (yang terbesar yang muat); Kekuatan II (KA III, DA IV), Ketahanan I (DA II), jangkauan +2 × (skala − 1), jurus +15%; qi 80 · jeda 60 dtk | +5 dtk / pukulan dekat melepas busur emas 0,8× | – | N | Terinspirasi dari kultivasi ganda tubuh dan dharma (法体双修), *A Record of a Mortal's Journey* |
+| **Wilayah Dao** (`dao_domain`) | PD | Bumi T · Wilayah | Wilayah r 10 + 2 per tingkat (maks. 24), 20 dtk + 2 dtk per ranah di atas PD (maks. 40), denyut Dao tiap detik (tabel bawah); qi 120 · jeda 90 dtk | jari-jari +20% / denyut tiap 0,5 dtk | – | N | Terinspirasi dari wilayah (领域) *Renegade Immortal* |
+| **Tebasan Qi Pedang** (`sword_qi`) | IE | Misterius R · Serang | Sabit 16→48 blok: 1,5×; jumlah sabit IE 1, TD 2, KA 3, DA 5; qi 20 · jeda 3 dtk | +1 sabit / Gema 40% | parit per sabit | Y | Terinspirasi dari cahaya pedang Azure Essence Sword Art, *A Record of a Mortal's Journey* |
+| **Seribu Pedang** (`thousand_swords`) | JBL | Misterius T · Area | 16 gelombang pedang dalam 4→8 dtk ke monster acak r 16→32 (6 + 2 per tingkat, maks. 24 per gelombang): 0,6× tiap pedang; qi 90 · jeda 40 dtk | +2 pedang per gelombang / pedang raksasa akhir 3,0× ke yang terkuat | kawah tebar | Y | Terinspirasi dari Formasi Pedang Geng Agung, *A Record of a Mortal's Journey* |
+| **Telapak Api** (`flame_palm`) | IE | Misterius R · Area | Kerucut 7→20 blok: 1,0× + terbakar 0,2×/dtk 5 dtk + api 6 dtk; qi 20 · jeda 3 dtk | api +1 dtk / Gema 40% | kerukan kipas | Y | Terinspirasi dari teknik Dou api, *Battle Through the Heavens* |
+| **Api Phoenix** (`phoenix_flame`) | JBL | Misterius T · Serang | Phoenix merah terbang 24→64 blok: 2,0× + api 8 dtk; phoenix JBL 1, KA 2, DA 3; qi 80 · jeda 35 dtk | +1 phoenix / Gema 40% | parit per phoenix | Y | Terinspirasi dari api phoenix World Ode of the Phoenix, *Against the Gods* |
+| **Lotus Es** (`frost_lotus`) | IE | Misterius R · Kendali | Ledakan r 6→18: 1,0× + Lambat IV 6 dtk + beku 12 dtk; qi 20 · jeda 4 dtk | beku +2 dtk / gelombang paku es 0,5× (pecah) | cincin | Y | Terinspirasi dari Frozen Cloud Arts, *Against the Gods* |
+| **Penjara Gletser** (`glacier_prison`) | JBL | Misterius T · Kendali | Sasaran (≤ 24→48) dan monster 5→8 blok di sekitarnya: 1,5× + terakar 8 dtk (bos 2 dtk); qi 70 · jeda 30 dtk | +2 dtk / saat lepas 1,0× (pecah ×1,5) | – | Y | Terinspirasi dari segel es Ice Phoenix God Investiture Canon, *Against the Gods* |
+| **Telapak Petir** (`thunder_palm`) | IE | Misterius R · Serang | Rantai petir 24→48 blok, 4 + 1 lompatan per tingkat (maks. 10): 1,0× tanpa melemah (×1,25 terhadap basah/beku); qi 25 · jeda 4 dtk | +2 lompatan / Gema 40% | kawah tebar | Y | Terinspirasi dari seni petir Chu Feng, *Martial God Asura* |
+| **Petir Surgawi** (`heavenly_thunder`) | JBL | Misterius T · Area | Hujan petir r 16→32 selama 2 dtk, 8 + 2 sambaran per tingkat (maks. 24): 2,0×; qi 90 · jeda 40 dtk | +4 sambaran / petir pemusat 4,0× ke yang terkuat | kawah tebar | Y | Terinspirasi dari petir kesengsaraan langit (天劫), *Against the Gods* |
+| **Tubuh Besi** (`iron_body`) | IE | Misterius R · Lindung | 15 dtk→: Ketahanan II (KA III), kebal dorongan, pantulkan 30% pukulan dekat (DA 50%); qi 25 · jeda 30 dtk | +5 dtk / saat berakhir hentakan 1,0× + dorong | – | Y | Terinspirasi dari penempaan tubuh Undying Live-Forever Codex, *A Will Eternal* |
+| **Hentakan Gunung** (`mountain_stomp`) | JBL | Misterius T · Area | Hentakan r 7→20: 2,0× + lontar + Lambat II; 0→2 gempa susulan 0,8×; qi 60 · jeda 20 dtk | +1 gempa susulan / Gema 40% | cakram (alami) | Y | Terinspirasi dari Throbbing Pulse of the World, *Coiling Dragon* |
+| **Mata Air Kehidupan** (`spring_of_life`) | IE | Misterius R · Pulih | Kamu dan sekutu r 8→16: pulih 40% (DA 60%) + bersihkan racun dan layu + Regenerasi I 5 dtk; qi 30 · jeda 20 dtk | bersih penuh / Regenerasi II 10 dtk | – | Y | Terinspirasi dari Eternal Spring Art, *A Record of a Mortal's Journey* |
+| **Serap Kehidupan** (`life_drain`) | JBL | Misterius T · Area | Nova r 8→16: 1,0× + serap 50% (kelebihan menjadi Penyerapan ≤ 20% darah maks.); qi 60 · jeda 25 dtk | serap 60% / Gema 40% + serap qi 10% | layu | Y | Terinspirasi dari Great Desolation Scripture, *Martial Universe* |
+| **Langkah Bayangan** (`shadow_step`) | IE | Misterius R · Gerak | Pindah ke belakang monster (≤ 20→32, creeper ditolak); pukulan dekat berikutnya ×2 (KA ×3) dalam 5 dtk; mulai TD tahap 2 dalam 3 dtk ke monster lain; qi 20 · jeda 6 dtk | jendela +1 dtk / bayangan sisa meledak 0,5× | – | Y | Terinspirasi dari Ghost Shadow Perplexing Track, *Soul Land* |
+| **Badai Angin** (`gale`) | JBL | Misterius T · Kendali | Nova r 10→20: 0,8× (baru) + dorongan 0,9→2,6 menurut kedekatan; Tak Terlihat + Kecepatan II 6 dtk→; qi 50 · jeda 20 dtk | +2 dtk / Gema 40% | sapu daun | Y | Terinspirasi dari Angin Ilahi Samadhi, *Journey to the West* bab 21 |
+| **Kedipan Ruang** (`space_blink`) | IE | Misterius R · Gerak | Pindah ke titik bidik 24→64 blok bila aman (jalur termuat, tidak ke portal); qi 25 · jeda 5 dtk | jeda −20% / retakan di titik asal 0,5× | – | Y | Terinspirasi dari prinsip ruang Yang Kai, *Martial Peak* |
+| **Penjara Ruang** (`space_prison`) | JBL | Misterius T · Kendali | Nova r 12→24: 1,5× + terakar 6 dtk + ditarik ke pusat (tidak di dekat portal); qi 80 · jeda 35 dtk | +1 dtk / saat lepas ledakan ke dalam 1,5× | lubang (saat lepas) | Y | Terinspirasi dari larangan (禁制) Wang Lin, *Renegade Immortal* |
+
+**Denyut Wilayah Dao** (sekali per denyut, × P; Fusi Misteri Mendalam memakai denyut yang sama untuk dua Dao ×2):
+
+| Dao | Denyut |
+|---|---|
+| Tanpa Dao | 0,4× + Lambat I |
+| Pedang | 0,5×, cincin pedang mengorbit |
+| Api | api 3 dtk + 0,3× + terbakar 0,4×/dtk 3 dtk |
+| Es | Lambat III + beku; mulai Penyatuan Dao tiap denyut ke-4 beku 4 dtk |
+| Petir | 1 + (tingkat ÷ 2) sambaran (maks. 4), masing-masing 0,8× ke monster acak yang berbeda |
+| Tubuh | kamu Ketahanan II, gempa 0,4× |
+| Kehidupan | kamu dan sekutu Regenerasi II; monster Layu I + 0,3×, diserap penuh ke kamu |
+| Bayangan | monster buta, kamu Tak Terlihat, sayatan 0,4× |
+| Ruang | Lambat V + ditarik ke tengah + 0,3× |
+
+### 12.9 Teknik khusus (★)
+
+Sembilan teknik punya kode sendiri, tetapi tetap mengikuti semua aturan keselamatan:
+
+| Teknik | Yang khusus |
+|---|---|
+| Langkah Penjelajah Bumi | perjalanan tersembunyi di dalam tanah; tempat keluar yang aman dicari **sebelum** qi dipakai |
+| Sayap Lei Zhenzi | terbang sungguhan lewat satu "sewa terbang" bersama Pedang Terbang: selama yang satu membawamu, yang lain ditolak ("Teknik terbang lain sedang membawamu"), jadi keduanya tidak saling mencabut kemampuan terbangmu |
+| Awan Jungkir Balik | perjalanan bertahap yang aman, paling jauh 128 blok, hanya di chunk termuat, berhenti di dinding, cairan, api, dan portal |
+| Tujuh Puluh Dua Perubahan | wujud bergilir lewat rapal ulang; wujud Serangga diperiksa ruang kepalanya dan dipindah aman saat kembali; jeda 10 dtk setelah wujud berakhir |
+| Harimau Putih Alam Baka | dirapal bersama murid terikat ([12.10](#1210-teknik-dan-murid)) |
+| Fusi Misteri Mendalam | denyut wilayah dua Dao ×2 dan efek pasangan: Pedang+Petir rantai, Api+Es ×1,5 dan lambat, Tubuh+Ruang tarikan dan bakar qi, Kehidupan+Bayangan serap, Es+Ruang terpaku, Pedang+Ruang gelombang bilah, Api+Petir api dan pingsan, Tubuh+Kehidupan menyembuhkan sekutu 20%; pasangan lain jari-jari ×1,5 |
+| Roda Enam Jalan Reinkarnasi | memutar ulang jurus terakhirmu; tanpa pamungkas, jurus khusus, sikap, atau dirinya sendiri; satu batas bos, tanpa penguasaan, tanpa kehancuran |
+| Simbol Leluhur Ruang | memindahkan paling banyak 32 monster bukan bos ke titik aman dekat pusat medan (tidak pernah dekat portal), sekali per rapalan |
+| Wilayah Roh Waktu | menyimpan kerusakanmu pada monster yang terhenti, lalu melepasnya ×1,5 lewat batas rapalan yang sama |
+
+### 12.10 Teknik dan murid
+
+**Sumber:** mengajar murid dan pemahaman sendiri di gelar bintang memakai konsep [27](#27-ikatan-segel-jiwa-hu-fa-dan-fondasi-dao)
+dan [28](#28-bintang-abadi) (*Battle Through the Heavens*: Xiao Yan melampaui Yao Lao; *Renegade Immortal*: bintang Dewa
+Kuno). Aturannya desain permainan.
+
+**Siapa bisa belajar apa** (kolom Murid di katalog):
+
+| Tanda | Arti |
+|---|---|
+| Y | bisa diajarkan bila murid memenuhi ranah, Dao (atau pengecualian Dao bakat/fisiknya), dan pemahaman. Teknik Abadi butuh murid di Dewa Abadi |
+| N | tidak pernah bisa diajarkan |
+| ★n | bisa diajarkan mulai bintang murid n, di samping syarat ranah. Teknik Dewa bawaan ★36 |
+| Y (½) | bisa diajarkan; makhluk panggilan dan jumlahnya setengah |
+| khusus murid | Wilayah Karma (Bayangan, ★46): tidak pernah ada di kitab pemain atau penghitung 168 |
+| pasangan | Harimau Putih Alam Baka: dirapal guru bersama murid terikat, tidak pernah ada di daftar murid sendiri |
+
+Tidak pernah bisa diajarkan, apa pun tandanya: jurus terlarang, jurus dengan muatan penyelamat nyawa (lantai 1 darah biasa
+boleh), perubahan wujud lebih dari ×1,5, jurus khusus yang tidak mendukung murid (Langkah Penjelajah Bumi, Sayap Lei
+Zhenzi, Awan Jungkir Balik, Tujuh Puluh Dua Perubahan, Roda Enam Jalan Reinkarnasi), dan klon (Tubuh di Luar Tubuh, Klon
+Darah). Lima teknik lama tetap tidak bisa diajarkan: Langkah Awan, Pedang Terbang, Indra Ilahi, Wujud Dharma, Wilayah Dao.
+
+**Cara murid belajar:**
+
+| Cara | Aturan |
+|---|---|
+| Diajar guru (tab **Teknik** murid, tombol **Ajarkan**) | guru menguasainya dan murid memenuhi syarat. Biaya qi guru menurut tingkat: Kuning 10%, Misterius 15%, Bumi 20%, Langit 30%, Abadi 40%, Dewa 50% dari qi maksimummu. Penguasaan murid mulai dari tingkat penguasaanmu − 1 |
+| Slip Giok | klik kanan muridmu sendiri dengan slip: syarat sama, tanpa qi guru; slip yang sudah dikuasai +25 penguasaan |
+| Pewaris ([29.1](#291-pewaris-dan-sembilan-segel)) | mendapat setiap teknik yang bisa diajar milik guru, gratis, di tingkat penguasaan guru |
+| Gelar bintang (setiap 9 bintang) | chat menawarkan satu tombol per teknik Dewa yang layak (Dao murid atau universal, bintang cukup); klik menjalankan `/kultivasi teknik pahamkan <murid> <id>`. Daftar yang sama ada di tab Teknik murid dengan tombol **"Pahami (gelar bintang)"**. Gratis |
+| Khusus murid | murid Bayangan memahami Wilayah Karma sendiri di bintang 46 |
+
+Murid mendapat poin penguasaan setengah laju, dengan batas harian yang sama.
+
+**Murid bertarung dengan teknik:**
+* **Slot tempur** = `3 + ranah ÷ 2 + bintang ÷ 9` (dibulatkan ke bawah, paling banyak 10; Inti Emas 4 slot, Dewa Abadi 7).
+  Pilih di tab Teknik murid lewat soket **Siapkan** (klik = isi dengan jurus terpilih yang sudah dikuasai, klik kanan =
+  kosongkan); tanpa pilihan, murid memilih sendiri per peran.
+* Tiap detik murid menilai jurus di slotnya: jurus pembunuh bos saat bos ada dalam 24 blok; area saat ≥ 3 musuh di sekitar
+  sasaran; kendali saat ≥ 2 musuh menyerangmu; pemulihan atau perisai saat kamu, murid sekutu, atau dirinya di bawah 50%;
+  gerak saat sasaran lebih dari 10 blok (hanya melesat ke sasaran atau berkedip ke belakangnya); panggilan saat ≥ 2 musuh;
+  selain itu jurus serang termurah yang siap. Pamungkas hanya melawan bos atau ≥ 4 musuh.
+* Qi: 60% biaya dari qi murid sendiri (teknik berbiaya persen memakai persen qi maksimal murid). Jeda disimpan per teknik.
+* Kekuatan rapalan teknik murid: `P_murid = 4,5 × R × C` × pengali kekuatan murid (bintang, segel, lipatan, api, gelar).
+  Paling banyak 3 rapalan aktif per murid; sikap yang sama tidak dirapal dua kali, dan sikap murid berakhir setelah 10
+  detik atau saat tidak ada musuh dalam 24 blok.
+* Murid tidak pernah melawan Wither, creeper, ghast, blaze, breeze, ravager, silverfish, dan creaking terikat jantung, dan
+  **tidak pernah memahat dunia** dengan teknik. Satu-satunya kehancuran murid tetap Jurus Pemusnah berkunci tiga
+  ([30](#30-jurus-pemusnah), [31](#31-mode-kehancuran-peringatan)).
+
+**Harimau Putih Alam Baka** butuh murid terikat (ikatan ≥ 50) ber-Dao lain dalam 16 blok, tidak sedang Penyimpangan Qi atau
+menerobos, dengan qi ≥ 30%. Murid membayar separuh biaya dari qinya, dan kalian berbagi satu jeda. Kerusakan memakai P-mu;
+bersama pewarismu ×1,5.
+
+### 12.11 MODE KEHANCURAN untuk jurusmu sendiri (Saklar gampang)
+
+> **PERINGATAN — SAKLAR MERAH.** Selama saklar ini **NYALA**, jurus serangmu **benar-benar menghancurkan blok dunia**:
+> kawah, parit, retakan, dan tanah terbelah yang makin besar seiring ranahmu. Saklarnya **MATI secara bawaan**, juga di dunia
+> baru dan untuk pemain baru. Nyalakan hanya di dunia uji atau dunia yang memang rela kamu rusak, dan **buat cadangan dunia
+> lebih dulu**. Pemulihan hanya berlaku 10 menit dan hilang saat server dimulai ulang.
+
+**Sumber:** pengecualian blok ini adalah keputusan pengguna (DESIGN 0, Fase 6c "Saklar gampang"); ukuran, zona, dan angkanya
+desain permainan.
+
+**Menyalakan dan mematikan: satu klik.**
+* Kitab Teknik (`-`) → tablet merah **Mode Kehancuran** → klik **segel merah besar** sekali. Atau ketik
+  `/kultivasi kehancuran nyala` / `/kultivasi kehancuran mati`.
+* **Tanpa layar sumpah**, tanpa tahan, tanpa centang. Saat menyala muncul tepat satu baris merah dan satu detak jantung:
+  > **MODE KEHANCURAN NYALA** — jurusmu kini benar-benar menghancurkan blok dunia. Batalkan dengan
+  > **/kultivasi kehancuran pulihkan** (10 menit). **[Matikan] [Pulihkan]**
+
+  Kedua tombol di baris itu bisa diklik. Tag merah **KEHANCURAN** muncul di sebelah ubin segel HUD.
+* **Mati juga satu klik dan langsung berlaku:** pahatanmu yang masih mengantre dibuang, yang sedang berjalan berhenti setelah
+  kelompok blok saat itu (bloknya tetap bisa dipulihkan), dan pemulihan yang sedang berjalan tetap lanjut. Chat: "Mode
+  Kehancuran mati — dunia aman lagi."
+* **Siapa boleh:** opsi server `kehancuranPlayerTechniques` harus `true` (bawaan), dan kamu pemilik dunia pemain tunggal
+  atau tuan rumah LAN, **atau** operator sudah menyalakan izin server `/kultivasi kehancuran izin on`. Di server khusus dan
+  untuk tamu LAN, izin itu wajib; tanpa izin klik ditolak dengan alasan di bilah aksi dan chat. `izin off` membatalkan
+  semua tugas kehancuran dan membuat saklar setiap tamu terbaca mati (saklar tuan rumah tidak terpengaruh).
+* Saklar bisa dinyalakan di ranah mana saja, tetapi jurus baru **memahat mulai Inti Emas**; halaman Kehancuran menulis
+  "Aktif, tetapi baru mengukir dari Inti Emas".
+
+**Rapalan mana yang memahat.** Ditentukan sekali saat rapalan dimulai. Hanya bila semuanya benar:
+1. saklarmu nyala dan masih diizinkan;
+2. perapalnya kamu (rapalan teknik murid tidak pernah memahat);
+3. ranahmu Inti Emas ke atas;
+4. teknik itu punya bentuk kehancuran (kolom Kawah di katalog, tanda retak merah di kartunya);
+5. **kamu tidak sedang jongkok saat mulai merapal.** Jongkok = rapalan aman blok dengan kerusakan dan efek yang sama;
+6. bukan salinan atau hasil sampingan: gema, putaran ulang Roda Enam Jalan, tautan, pantulan, pelepasan simpanan, serangan
+   makhluk maya, tabrakan, cincin pendaratan, atau kait. Proyektil yang meleset tidak menambah titik kawah;
+7. bukan rapalan uji, kecuali `/kultivasi uji teknik kehancuran nyala` (aturan 1–5 tetap berlaku);
+8. kamu tidak sedang duel atau Latih Tanding, menerobos, atau ujian Iblis Hati.
+
+Tidak ada peringatan 30 detik, bidikan, atau konfirmasi seperti Jurus Pemusnah murid: kawah terbentuk sesaat setelah
+hantaman. Pahatan yang tertunda dibatalkan bila kamu mati atau pindah dimensi lebih dulu.
+
+**Ukuran: K dan batas blok.** Setiap ukuran bentuk = ukuran dasar × K × faktor area penguasaan (1,00–1,40).
+
+| Ranah | K | Blok per rapalan |
+|---|---:|---:|
+| di bawah Inti Emas | 0 (tidak pernah memahat) | 0 |
+| Inti Emas | 0,25 | 128 |
+| Jiwa Baru Lahir | 0,35 | 256 |
+| Transformasi Dewa | 0,50 | 512 |
+| Penyatuan Dao | 0,60 | 1.024 |
+| Kenaikan Abadi tingkat L | 0,65 + 0,04 × (L − 1) (tk. 9: 0,97) | 1.536 + 192 × (L − 1) (tk. 9: 3.072) |
+| Dewa Abadi, tahap s | 1,2 + 0,1 × s (Puncak 1,5) | 4.096 |
+
+* Blok per rapalan tidak pernah melebihi `kehancuranMaxBlocksPerCast` (bawaan 4.096).
+* Jari-jari paling besar `kehancuranMaxRadius` (bawaan 12); panjang paling besar 4× itu (48; pamungkas Dewa 6×, 72);
+  kedalaman paling besar 24; kawah tebar paling banyak 12 titik; satu rapalan paling banyak 5 bentuk yang berbagi satu
+  batas blok.
+* Contoh **Amarah Sang Penguasa** (kawah 6): di Transformasi Dewa jari-jari 3, sekitar 40 blok; di Dewa Abadi Puncak dengan
+  Puncak Jurus 6 × 1,5 × 1,4 = 12,6 → dipotong 12, sekitar 2.400 blok.
+* Bilah bambu menulis ukuran sungguhan untuk ranahmu ("Kawah: kawah r 6 · ≤ 512 blok").
+
+**Bentuk yang dipahat:**
+
+| Nama | Bentuk | Urutan |
+|---|---|---|
+| kawah | setengah bola pipih di bawah titik hantam (dalam 0,6 × jari-jari), ditambah semua yang di atasnya dalam setengah jari-jari (pohon dan dinding di ledakan) | dari tengah ke luar |
+| cincin | cincin tanah di sekitarmu atau titik lain, dengan lubang dalam yang selalu lebih lebar dari lingkar amanmu | dari tepi dalam ke luar |
+| terowongan | silinder sepanjang sinar, mulai dari blok pertama yang kena | dekat ke jauh |
+| retakan | belahan tegak sepanjang bidikan, paling dalam di tengah ("bumi terbelah") | dekat ke jauh, lalu atas ke bawah |
+| kawah tebar | kawah kecil di setiap titik hantam (hujan, rantai, proyektil, titik terpadat), paling banyak 12 | per titik, tengah ke luar |
+| parit sabit | parit melengkung di depanmu | tengah busur ke luar |
+| kerukan kipas | kerukan berbentuk kipas dari depanmu searah kerucut jurus | dekat ke jauh |
+| sapu daun | **hanya dedaunan**: daun, bunga, rumput, pakis, semak mati, sulur, lumut karpet. Tidak pernah kayu, tanah, bibit, tanaman ladang, atau lahan | atas ke bawah |
+| parit | parit lurus sepanjang bidikan, lintasan lesatan, sinar, atau tepi medan | atas ke bawah |
+| bola | bola di titik hantam (ledakan di udara) | lapis demi lapis dari tengah |
+| cakram | lapisan sedalam d di bawah permukaan; "(alami)" = hanya tanah alami | atas ke bawah |
+| lubang | lubang persegi | atas ke bawah |
+| kolom | kolom dari permukaan sasaran ke bawah | atas ke bawah |
+| sembilan bola | sembilan bola dalam kisi 3 × 3 (Injakan Dewa Kuno) | per bola |
+| layu | permukaan layu: rumput, podzol, miselium, dan tanah berakar menjadi tanah kasar, dedaunan hilang; tidak pernah lubang, tanaman ladang dan lahan dibiarkan | atas ke bawah |
+
+**Zona terlindung.** Posisi di dalam zona dilewati (sisa bentuk tetap dipahat). Bila semua posisi terlindung, bilah aksi
+menulis "Zona terlindung — tanpa kehancuran".
+
+| Zona | Jarak |
+|---|---|
+| **Lingkar amanmu**: silinder setinggi dunia di sekitar tempatmu merapal **dan** tempatmu berdiri di setiap kelompok blok, jadi tanah di bawah dan di sampingmu tidak pernah hilang, juga saat kamu bergerak | `kehancuranCasterSafeRadius` (bawaan 4) blok |
+| Setiap **titik bangkit** (kasur, jangkar bangkit) semua pemain yang pernah dikenal server, juga tamu yang sedang luring | `kehancuranHomeSafeRadius` (bawaan 24) blok |
+| Setiap **pemain lain** (diperiksa ulang setiap kelompok) | `kehancuranPlayerSafeRadius` (bawaan 24) blok |
+| Setiap Prasasti Aula Sekte, aktif atau tidak | `kehancuranHallSafeRadius` (bawaan 64) blok mendatar |
+| Tapak Pembangunan Sekte | seluruh tapak + 16 blok |
+| Titik bangkit dunia | perlindungan spawn server, minimal 16 |
+| Penduduk desa, golem besi, Batu Magnet formasi pelindung | 32 blok |
+| Murid, hewan peliharaan jinak, binatang roh | 6 blok |
+| Pulau utama End | 160 blok dari (0, 0) |
+| Chunk yang tidak dimuat | dilewati, tidak pernah dimuat |
+
+**Tidak pernah disentuh:** batuan dasar dan blok berkekerasan < 0; setiap blok berisi (peti, tong, tungku, kasur, papan
+tanda, spawner, suar, dan sebagainya); portal dan bingkainya, obsidian, obsidian menangis, deepslate berpenguat, Batu
+Magnet, jangkar bangkit, prasasti aula; cairan dan blok berisi air; blok di tag `#kultivator:indestructible`; dan setiap
+posisi yang bersebelahan dengan cairan, blok berisi, atau chunk yang tidak dimuat.
+
+**Antrean dan laju.** Paling banyak 2 rapalan diolah menjadi bentuk per tick (sisanya menunggu sebentar) dan 8 tugas di seluruh server; per pemain satu tugas berjalan
+atau mengantre ditambah satu lagi. Rapalan yang tidak muat dilewati dengan bilah aksi "Bumi masih runtuh — kehancuran
+dilewati" (paling sering sekali per 5 detik); kerusakannya tetap terjadi. Semua bentuk satu rapalan pada tick yang sama
+menjadi **satu tugas dan satu entri pulihkan**; tahap berikutnya dari rapalan yang sama bergabung ke tugasnya yang masih
+mengantre. Setiap tick paling banyak 48 blok dihapus (`kehancuranBlocksPerTick`) tanpa pembaruan tetangga, dan semua tugas
+berhenti sejenak saat server lambat (rata-rata tick di atas 45 ms). Kawah 4.096 blok selesai sekitar 4,3 detik. Tanpa api,
+tanpa ledakan, tanpa item (kecuali `kehancuranDropsPct` > 0).
+
+**Pulihkan.** `/kultivasi kehancuran pulihkan`, tombol **[Pulihkan]** di baris merah, atau tombol **Pulihkan** di halaman
+Kehancuran mengembalikan semua pahatanmu yang masih bisa dipulihkan (jurus sendiri dan Jurus Pemusnah muridmu), dari yang
+terbaru. Berlaku `kehancuranUndoMinutes` (bawaan 10 menit), hanya di tempat yang masih berupa udara, dan hanya untuk pahatan
+tanpa drop. Server menyimpan paling banyak 32 entri; yang tertua dilepas lebih dulu dengan catatan chat ke pemiliknya.
+Simpanan pemulihan **hilang saat server dimulai ulang**.
+
+**Halaman Kehancuran** (kertas merah darah): segel saklar ("MODE KEHANCURAN: MATI / NYALA"), tersedia atau alasannya, K,
+jari-jari, dan blok per rapalan ranahmu, zona aman ("Lingkar aman 4 blok di sekitarmu", "Rumah: 24 blok dari setiap titik
+bangkit", "Pemain lain 24, Aula Sekte 64, penduduk desa 32, murid dan hewan peliharaan 6 blok"), **"Shift saat merapal =
+tanpa kehancuran"**, keadaan antrean, tombol Pulihkan dengan sisa blok dan waktu (mm:ss), enam ukiran terakhir, dan catatan
+bahwa pemulihan hilang saat server dimulai ulang.
+
+**Catatan.** Setiap pahatan ditulis di tablet Catatan aula dan log server:
+`[Kultivator] Kehancuran: <pemain> self:<id> <dimensi> x y z → N blocks`. `/kultivasi kehancuran status` menampilkan baris
+"Jurus sendiri: NYALA · K … · … blok per rapalan · aman … blok di sekitarmu, … di sekitar titik kebangkitan" dan daftar
+pahatanmu. Kawah pertama memberi pencapaian **Tanganku Membelah Bumi**.
+
+Jurus Pemusnah murid tetap memakai tiga kunci dan layar sumpah dari [bagian 31](#31-mode-kehancuran-peringatan); saklar
+gampang ini hanya untuk jurusmu sendiri.
+
+### 12.12 Perintah teknik
+
+**Pemain** (`/kultivasi` atau `/cultivate`):
+
+| Perintah | Fungsi |
+|---|---|
+| `teknik` / `teknik kitab [id]` | membuka Kitab Teknik (dengan id: kartu itu terfokus) |
+| `teknik info <id>` | di chat: nama, Sumber, angka langsung, penguasaan, cara memperoleh |
+| `teknik pilih <id>` / `teknik rapal <id>` | memilih / merapal teknik yang kamu kuasai |
+| `teknik daftar [dao <dao>\|tingkat <tingkat>\|jenis <jenis>]` | teknik yang kamu kuasai dengan penguasaan dan "[siap]" / sisa jeda. `<dao>`: `sword`, `fire`, `ice`, `lightning`, `body`, `life`, `shadow`, `space`, `universal`. `<tingkat>`: `huang`, `xuan`, `di`, `tian`, `abadi`, `dewa`. `<jenis>`: `serang`, `area`, `kendali`, `gerak`, `lindung`, `pulih`, `panggil`, `wilayah`, `ubah`, `pamungkas`, `indra` |
+| `teknik slot` / `teknik slot <1-12> <id\|kosong>` / `teknik slot isi` / `teknik slot hapus` | lihat, isi, isi otomatis, atau kosongkan Cincin Segel |
+| `teknik pahamkan <murid> <id>` | pilihan teknik Dewa di gelar bintang murid (biasanya lewat klik di chat) |
+| `technique list\|select\|cast <id>` | perintah lama, tetap bekerja dengan semua id |
+| `kehancuran nyala` / `kehancuran mati` | saklar Mode Kehancuran jurusmu sendiri |
+| `kehancuran pulihkan` / `kehancuran status` | memulihkan / status, juga pahatan jurus sendiri |
+| `warisan pilih <1-3>` | memilih hadiah Ujian Warisan |
+
+Contoh: `/kultivasi teknik info buddha_palm`, `/kultivasi teknik daftar tingkat xuan`, `/kultivasi teknik slot 1 qi_palm`,
+`/kultivasi teknik rapal sword_qi`.
+
+**Uji cepat** (operator, `/kultivasi uji ...`):
+
+| Perintah | Fungsi |
+|---|---|
+| `uji teknik` | mempelajari **semua 168** teknik pemain, menghapus jeda, mengisi qi |
+| `uji teknik semua` | sama, ditambah hitungan per set dan tingkat ("Total 168 untuk pemain (169 terdaftar)") |
+| `uji teknik <id>` | mempelajarinya dan **langsung merapalnya** ke arah pandang tanpa cek ranah, Dao, gerbang, qi, atau jeda, tanpa penguasaan. Chat menulis P, koefisien, A/D/N, batas radius, jumlah sasaran, bagian bos, K dan blok, lalu per sasaran "mentah → diterima" dengan tanda "(batas bos)" |
+| `uji teknik pamer [detik] [dao <dao>\|tingkat <tingkat>\|dari <id>]` | **pameran**: semua teknik dirapal bergiliran (yang lama dulu), bawaan 4 detik (2–60). Judul = nama Indonesia, subjudul = baris Sumber, bilah aksi "n/total". Tanpa biaya, penguasaan, atau kawah (kecuali `uji teknik kehancuran nyala`) |
+| `uji teknik pamer stop` | menghentikan pameran (juga berhenti saat mati, keluar, atau pindah dimensi) |
+| `uji teknik bebas nyala\|mati` | rapalan normal tanpa gerbang, qi, dan jeda selama sesi ini (untuk mencoba roda dan cincin) |
+| `uji teknik penguasaan <id\|semua> <0-4>` | mengatur penguasaan ke ambang tingkat itu |
+| `uji teknik gerbang` | Dewa Abadi Puncak, sudah diakui, pemahaman 90, prasyarat Gerbang Dewa di Puncak Jurus |
+| `uji teknik kehancuran nyala\|mati` | rapalan uji dan pameran boleh memahat (saklar Kehancuran-mu tetap harus nyala) |
+| `uji teknik audit` | memeriksa registri: id dan net id unik, empat kunci bahasa di kedua bahasa, baris Sumber, FX, guncangan pamungkas, prasyarat, gema, batas. Hasil baik: "169 spec OK · 168 untuk pemain" |
+| `uji teknik murid <nama\|semua>` | mengajari murid semua teknik yang memenuhi syarat (juga lewat `uji murid <nama> teknik`) |
+| `uji boneka [1-6] [bos]` / `uji boneka bos` / `uji boneka hapus` | boneka latihan: husk diam, 1.024 darah, tidak bisa mati, papan nama "Kerusakan terakhir: X → Y"; `bos` memberi batas bos. Tanpa penguasaan, prestasi, atau pemahaman; hilang setelah 5 menit, saat kamu keluar, atau dengan `hapus` |
+| `uji ranah <ranah> [tahap 1-4] [tingkat 1-9]` | lompat ke ranah (tanpa tahap = Puncak) |
+
+Contoh:
+* `/kultivasi uji teknik qi_palm` sambil menatap boneka, lalu `/kultivasi uji teknik azure_essence_sword`;
+* `/kultivasi uji teknik pamer 3`, `/kultivasi uji teknik pamer dao sword`, `/kultivasi uji teknik pamer tingkat dewa`,
+  `/kultivasi uji teknik pamer 5 dari qi_palm`, `/kultivasi uji teknik pamer stop`;
+* `/kultivasi uji boneka 3`, `/kultivasi uji boneka 1 bos`, `/kultivasi uji boneka hapus`;
+* `/kultivasi uji teknik penguasaan semua 4`, `/kultivasi uji teknik penguasaan qi_palm 2`;
+* `/kultivasi uji ranah immortal_ascension 1 7` (Kenaikan Abadi tingkat 7, tahap Awal), `/kultivasi uji ranah true_immortal`;
+* `/kultivasi kehancuran nyala`, lalu `/kultivasi uji teknik kehancuran nyala` dan `/kultivasi uji teknik overlord_fury`;
+* `/kultivasi uji teknik murid semua`.
+
+**Debug** (operator, `/kultivasi debug ...`):
+
+| Perintah | Fungsi |
+|---|---|
+| `debug teknik mastery <id\|semua> <0-4>` | mengatur tingkat penguasaan |
+| `debug teknik mastery tambah <id> <poin>` | menambah (atau mengurangi) poin penguasaan |
+| `debug teknik cooldowns reset` | semua jeda, jeda global, kunci pamungkas, dan muatan selesai (`debug technique cooldowns reset` tetap ada) |
+| `debug teknik lupakan <id\|semua>` | melupakan teknik |
+| `debug teknik kekuatan` | R, C, Q, S, P, A/D/N, tingkat, selisih tingkat, batas bos per tingkat, K, dan batas blok |
+| `debug teknik beban` | rapalan aktif, makhluk maya, proyektil, medan, boneka, DOT/IKAT/TAUT, kait, peristiwa FX per detik, tugas kehancuran |
+| `debug teknik feat <jenis> <n>` | mengatur penghitung prestasi: `kills_with`, `casts_with`, `first_kill`, `meditate_at`, `alchemy_count`, `trib`, `heart_demon_win`, `deviation_recovered` |
+| `debug murid teknik mastery <nama> <id\|semua> <0-4>` | penguasaan teknik murid |
+| `debug learn <id>\|all` / `debug forget <id>\|all` | menerima setiap id teknik (lama dan baru) |
+
+### 12.13 Performa, efek, dan pengaturan
+
+Mod ini dirancang untuk laptop lemah. Server: satu kueri makhluk per evaluasi bentuk, proyektil disimulasikan (bukan entity),
+paling banyak 6 rapalan aktif per pemain dan 64 di seluruh server (`techniqueMaxActiveCasts`), makhluk maya paling banyak 8
+per rapalan, 12 per perapal, 48 per server, nol biaya saat diam. Saat server lambat, denyut hujan, wilayah, medan, dan
+proyektil dijarangkan ×0,5 dengan kerusakan ×2 (kerusakan per detik tetap) dan efeknya digambar ringan.
+
+**Efek hanya di layarmu.** Partikel, tampilan raksasa (pedang 20 blok, telapak, gunung, aksara 佛 封 定 帝 雷 剑, sinar),
+avatar raksasa tembus pandang, klon, kawanan, siluet langit, guncangan kamera, dan kilatan semuanya digambar oleh klien.
+Server tidak pernah memunculkan entity tampilan; tidak ada yang tersimpan di dunia, dan semuanya hilang saat ganti dimensi.
+
+| Anggaran klien | Minimal | Normal | Maksimal |
+|---|---:|---:|---:|
+| token partikel per tick (semua rapalan) | 80 | 300 | 800 |
+| partikel per peristiwa | 40 | 300 | 800 |
+| tampilan raksasa per rapalan | 2 (hanya Langit ke atas) | 8 | 24 |
+| tampilan raksasa hidup | 8 | 32 | 96 |
+| klon model | 0 (bayangan partikel) | 4 | 12 |
+| butir kawanan | 40 | 120 | 240 |
+
+**Pengaturan** (tab Pengaturan gulungan `'`, tersimpan di `config/kultivator-client.json`):
+
+| Pengaturan | Pilihan (bawaan tebal) | Arti |
+|---|---|---|
+| Kualitas efek | Minimal / **Normal** / Maksimal / Otomatis | Otomatis turun ke Minimal di bawah 40 FPS dan kembali ke Normal setelah 10 detik di atas 70 FPS (tidak pernah Maksimal) |
+| Guncangan layar | Penuh / **Ringan** / Mati | guncangan kamera jurus besar (paling besar 2,5°), juga dikali Damage Tilt vanilla |
+| Kilatan layar | **nyala** / mati | kilatan singkat jurus pamungkas, dikali skala efek layar vanilla |
+| Tampilan raksasa | **nyala** / mati | mati: diganti partikel |
+| Efek pemain lain | **Penuh** / Ringan / Mati | Ringan ×0,25 tanpa tampilan raksasa; Mati menyembunyikan jurus pemain lain |
+| Tahan G untuk roda | **nyala** / mati | mati: G merapal saat ditekan |
+| Lepas = rapal | nyala / **mati** | melepas Roda Segel langsung merapal |
+| Kurangi gerak | nyala / **mati** | menghentikan kilau pelangi Dewa dan kilatan layar |
+
+Server bisa melarang tampilan raksasa untuk semua klien dengan `techniqueDisplays = false`.
+
+### 12.14 Yang belum ada atau berbeda
+
+* **Pencarian teks di tab Teknik murid** (mode mengajar) belum ada; tab itu baru punya jimat saringan Dao, keadaan, dan
+  urutan.
+* `debug teknik beban` belum menampilkan **token partikel klien** (data itu hanya ada di klien); yang tampil adalah peristiwa
+  FX per detik.
+* `uji teknik <id>` menulis batas utama (radius, jumlah sasaran, bos, blok), tetapi belum menyebut setiap batas kecil yang
+  memotong di dalam bentuk.
+* Avatar raksasa dan klon berupa **salinan model hanya untuk pemain**; murid dan makhluk lain tampil sebagai garis partikel.
+* Retakan dan remah otomatis Mode Kehancuran digambar di titik hantam, bukan di setiap blok yang benar-benar dihapus (debu
+  kehancuran per kelompok blok tetap tampil).
+* Teknik lama milik murid dan kekuatan murid lainnya (Jurus Pamungkas, Jurus Pemusnah, Sayap Kunpeng) masih memakai rumus
+  kekuatan murid lama, karena jalur kerusakannya belum lewat batas bos dan arena. Rapalan murid untuk teknik baru sudah
+  memakai kurva baru.
+* Tianzun Guntur Sembilan Langit menulis 12 dewa guntur, tetapi server membatasi makhluk maya 8 per rapalan; langit tetap
+  menggambar siluetnya.
+* Segel Kesembilan: ikatan per denyut bisa terkena pelemahan kendali berulang, jadi monster kadang lepas lebih cepat.
+* Semua fitur Fase 6c dibuat dan dikompilasi, tetapi **belum diuji di dalam game**, dan angka keseimbangannya belum disetel
+  dari permainan nyata. Daftar uji: [docs/uji/FASE-6c.md](uji/FASE-6c.md).
 
 ---
 
@@ -1047,7 +1973,7 @@ dan bisa [melampaui Gurunya](#293-murid-melampaui-guru).
 | Tab | Isi |
 |---|---|
 | **Status** | Ranah, bar kultivasi, qi, Qi Tertimbun, akar dan mutunya, Dao dan Pemahaman Dao, nyawa, kegiatan, perintah, monster yang dikalahkan |
-| **Teknik** | Teknik yang kamu kuasai sebagai kartu segel: ajarkan, atau baca alasan kenapa belum bisa |
+| **Teknik** | Teknik yang kamu kuasai sebagai kartu Kitab Teknik: saringan, detail dengan Sumber, **Ajarkan** atau alasan kenapa belum bisa, soket **Siapkan** untuk slot tempur, dan tawaran teknik Dewa di gelar bintang ([12.10](#1210-teknik-dan-murid)) |
 | **Perintah** | Lima perintah (lihat 19.3) |
 | **Pil & Terobosan** | Pil di tanganmu, jeda pil, tombol Terobosan, pilihan Dao, dan tombol Lepaskan murid (klik dua kali) |
 | **Bakat** | Alam jiwa, jenjang sekte, bakat, fisik langka, seni sekte, Jurus Pamungkas; tombol *Jurus Pamungkas*, *Fusi*, *Ledakan Gerbang* (lihat [bagian 22](#22-alam-jiwa-bakat-dan-fisik-langka) dan [26](#26-kekuatan-murid-jurus-pamungkas-api-surgawi-pusaka-natal)) |
@@ -1107,14 +2033,19 @@ ranah (maks. 20%). Qi maks. `60 + ranah × 80 + tahap × 20 + tingkat × 40`, pu
 
 ### 19.5 Mengajarkan teknik
 
-* Tab **Teknik** menampilkan semua teknik yang kamu kuasai. Mengajar memakan **20% Qi maksimummu**.
-* Murid harus sudah mencapai ranah minimal teknik itu, dan untuk teknik Dao harus menempuh Dao yang sama.
-* **Pedang Terbang, Wujud Dharma, Wilayah Dao, Indra Ilahi, dan Langkah Awan tidak bisa diajarkan** (butuh raga dan
-  indra seorang kultivator sendiri).
-* Murid merapal teknik dengan qinya sendiri (60% biaya qi teknik itu) dan jeda yang sama dengan milikmu, sekali tiap
-  detik saat bertarung: Mata Air Kehidupan lebih dulu bila kamu di bawah separuh nyawa atau ia di bawah 40%, Tubuh Besi
-  saat musuh dekat, lalu teknik serangan terkuat yang siap. Kerusakan teknik murid `D = (3 + 2 × ranah + 0,5 × tahap) ×
-  (1 + Pemahaman Dao / 100)` dikali pengali tiap teknik.
+Sejak Fase 6c aturan lengkapnya ada di [12.10](#1210-teknik-dan-murid). Ringkasnya:
+* Tab **Teknik** memakai kartu Kitab Teknik dalam mode mengajar: teknik yang kamu kuasai (terstempel bila murid sudah
+  menguasainya, bergembok bila tidak bisa diajar), saringan Dao/keadaan/urutan, detail dengan Sumber dan alasan, tombol
+  **Ajarkan**, dan soket **Siapkan** untuk slot tempur.
+* Biaya mengajar menurut tingkat teknik: Kuning 10%, Misterius 15%, Bumi 20%, Langit 30%, Abadi 40%, Dewa 50% dari Qi
+  maksimummu. Penguasaan murid mulai dari tingkat penguasaanmu − 1. Slip Giok bisa mengajar tanpa qi guru.
+* Murid harus mencapai ranah minimal teknik itu, menempuh Dao yang sama (kecuali pengecualian bakat atau fisiknya),
+  memenuhi pemahamannya, dan untuk teknik bertanda ★n memiliki n bintang.
+* **Pedang Terbang, Wujud Dharma, Wilayah Dao, Indra Ilahi, dan Langkah Awan tetap tidak bisa diajarkan**, begitu pula
+  teknik bertanda N di katalog.
+* Murid merapal teknik di slot tempurnya dengan qinya sendiri (60% biaya) sekali tiap detik saat bertarung, memilih
+  menurut peran (pembunuh bos, area, kendali, pemulihan, gerak, panggilan). Kekuatan rapalan teknik murid
+  `P_murid = 4,5 × R × C` dikali pengali kekuatan murid ([12.10](#1210-teknik-dan-murid)).
 * Setiap teknik Dao miliknya yang ia rapal, setiap detik meditasi, dan setiap monster yang ia kalahkan menambah
   Pemahaman Dao-nya (×1,5 bila akarnya selaras).
 
@@ -2648,14 +3579,14 @@ menampilkan "Tk N" dan alasannya. Pil dibuat sebagai pil alkimia mutu Menengah.
 | Ceramah Kitab (+5 pemahaman untuk satu murid; ceramah kitab *A Will Eternal*) | 150 | – |
 | Pil Pembangunan Fondasi | 250 | – |
 | Utusan Siap Lagi (jeda utusan dihapus; ditolak tanpa biaya bila tidak ada utusan yang sedang beristirahat) | 300 | – |
-| Gulungan Teknik (Buku Pesona yang dipetakan ke teknik kitab pilihanmu; lihat [11.3](#113-kitab-teknik-buku-pesona)) | 400 | 3 |
+| Slip Giok Teknik (slip berisi teknik pilihanmu; harga dan tingkat aula menurut tingkat teknik, paling banyak 2 sehari; lihat [12.6](#126-cara-memperoleh-teknik)) | Kuning 200 · Misterius 400 · Bumi 900 · Langit 2.000 · Abadi 4.000 | 1 · 3 · 5 · 7 · 9 |
 | Pil Penangkal Petir | 600 | 3 |
 | Pil Inti Emas | 800 | 4 |
 | Pil Pembersih Sumsum | 900 | 6 |
 | Manual Tubuh Abadi (membuka Kitab Abadi Tak Mati untuk satu murid; [26.4](#264-kitab-abadi-tak-mati)) | 1.200 | 3 |
 
-Talisman **"Untuk: <murid>"** memilih murid di dekatmu untuk Ceramah Kitab dan Manual Tubuh Abadi; **"Gulungan:
-<teknik>"** memilih teknik untuk Gulungan Teknik. Teman satu `/sekte` hanya bisa menyumbang, tidak membeli.
+Talisman **"Untuk: <murid>"** memilih murid di dekatmu untuk Ceramah Kitab dan Manual Tubuh Abadi; **"Slip:
+<teknik>"** memilih teknik untuk Slip Giok Teknik. Teman satu `/sekte` hanya bisa menyumbang, tidak membeli.
 
 ### 23.4 Seni Sekte yang Hilang
 
@@ -2679,6 +3610,11 @@ pencapaian *Dari Lembar yang Tercecer*. Seni berlaku di seluruh aula untuk murid
 | **Pedang Dua Puluh Empat Bunga Plum** | Setiap pukulan jarak dekat atau teknik Pedang ke-4 melepaskan badai kelopak (radius 4, 1,2 U). Murid Inti: setiap pukulan ke-24 adalah **Mekar Penuh** (24 kelopak, radius 6, 2 U) |
 | **Seni Ilahi Kabut Ungu** | Pemulihan qi ×1,3, qi maksimal +20%, kabut ungu saat bermeditasi |
 | **Warisan Sekte Langit Utara** | Kerusakan +20% di malam hari dan di bioma bersalju |
+
+**Set ke-4: Kitab Penyegel Iblis** (Fase 6c). Lima lembar ini ikut tercecer di peti yang sama, tetapi tidak dipulihkan di
+tablet Perbendaharaan. Gunakan satu lembar set 4: kamu membaca semua lembar berbeda yang kamu bawa dan mempelajari setiap
+teknik segel yang syaratnya terpenuhi (Segel Hidup-Mati 2 lembar, Segel Karma dan Segel Kedelapan 3, Segel Kesembilan 5).
+Lembarnya tidak habis. Lihat [12.6](#126-cara-memperoleh-teknik).
 
 ---
 
@@ -3117,8 +4053,9 @@ Ikatan hilang bila murid dilepaskan. Pada **50** kamu bisa membentuk Segel Jiwa;
 
 ### 27.3 Mengajar sesuai unsur
 
-Teknik yang unsur Dao-nya ada di akar murid hanya memakan **10%** qi maksimalmu (bukan 20%), dan 10 kali pertama ia
-memakainya memberi pemahaman dua kali lipat.
+Teknik lama yang unsur Dao-nya ada di akar murid hanya memakan **separuh** biaya mengajarnya (sejak Fase 6c biaya dasar
+mengikuti tingkat teknik, [12.10](#1210-teknik-dan-murid)), dan 10 kali pertama ia memakainya memberi pemahaman dua kali
+lipat. Teknik baru Fase 6c memakai biaya tingkatnya tanpa potongan ini.
 
 ### 27.4 Hu Fa: menjaga terobosan
 
@@ -3402,12 +4339,18 @@ Kerusakan selalu hanya pada monster: pemain, hewan peliharaan, penduduk desa, da
 > sungguhan**. Mode ini **MATI secara bawaan** dan tidak bisa menyala sendiri. Nyalakan hanya di dunia uji atau dunia
 > yang memang rela kamu rusak, dan **buat cadangan dunia lebih dulu**. Tanpa ketiga kunci di bawah, setiap Jurus Pemusnah
 > tetap aman blok.
+>
+> Mode Kehancuran punya dua bentuk. Bagian ini membahas **Jurus Pemusnah murid** dengan tiga kunci. **Jurusmu sendiri**
+> memakai saklar satu klik tanpa sumpah sejak Fase 6c: lihat
+> [12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang). Antrean, laju, zona terlindung, dan Pulihkan
+> dipakai bersama.
 
 ### 31.1 Apa yang dilakukannya
 
 Bila ketiga kunci terbuka, **Jurus Pemusnah yang kamu perintahkan** untuk seorang murid yang segelnya dilepas benar-benar
 menghapus blok dengan bentuk dari [bagian 30](#30-jurus-pemusnah) (parit, bola, cakram, permukaan layu, lubang, kolom,
-sembilan bola). Jurus otomatis melawan bos tetap aman blok. Kamu sendiri tidak pernah mendapat teknik penghancur.
+sembilan bola). Jurus otomatis melawan bos tetap aman blok. Teknik biasa murid tidak pernah memahat. Teknikmu sendiri
+memahat hanya lewat saklar di [12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang).
 
 ### 31.2 Tiga kunci (semuanya wajib)
 
@@ -3471,7 +4414,8 @@ berjalan):
 
 ### 31.7 Cara kerjanya
 
-* Satu jurus berjalan di seluruh server, paling banyak 2 mengantre.
+* Satu tugas berjalan di seluruh server dan paling banyak 8 tugas mengantre (sejak Fase 6c, bersama pahatan jurus pemain
+  sendiri); per pemilik paling banyak satu tugas berjalan atau mengantre ditambah satu lagi.
 * Posisi diurutkan dari tengah ke luar (bola dan kolom) atau dari atas ke bawah (parit, lubang, cakram) dan dipotong di
   `kehancuranMaxBlocksPerCast` (bawaan 4.096), jadi jurus yang terpotong tetap terlihat seperti kawah.
 * Setiap tick server menghapus paling banyak `kehancuranBlocksPerTick` (bawaan 48) blok tanpa pembaruan tetangga: tidak
@@ -3492,6 +4436,8 @@ Aturan keselamatan, bukan fitur cerita.
 * Posisi di chunk yang belum dimuat atau tempat seseorang berdiri ditunda dan kembali ke penyimpanan dengan batas waktu
   aslinya ("Tekan Pulihkan lagi nanti").
 * Menutup kunci atau mematikan mode tidak menghentikan pemulihan yang sedang berjalan.
+* Server menyimpan paling banyak 32 entri pulihkan (juga pahatan jurus sendiri); yang tertua dilepas lebih dulu dengan
+  catatan chat ke pemiliknya.
 * Penyimpanan ini **hilang bila server dimulai ulang**.
 
 ### 31.9 Pengaturan
@@ -3508,8 +4454,18 @@ Aturan keselamatan, bukan fitur cerita.
 | `kehancuranMsptPause` | 45 | 30–50 | Berhenti sejenak bila tick server lebih lambat dari ini (ms) |
 | `kehancuranWarningSeconds` | 30 | 10–60 | Hitung mundur peringatan |
 | `kehancuranUndoMinutes` | 10 | 0–30 | Jendela Pulihkan |
+| `kehancuranPlayerTechniques` | `true` | – | Fase 6c: jurus pemain sendiri boleh memakai saklar Mode Kehancuran. `false` mematikan saklar itu untuk semua orang |
+| `kehancuranCasterSafeRadius` | 4 | 3–8 | Fase 6c: lingkar aman setinggi dunia di sekitar pemain yang merapal |
+| `kehancuranHomeSafeRadius` | 24 | 0–64 | Fase 6c: zona aman di sekitar setiap titik bangkit (kasur, jangkar bangkit) |
 
-`/kultivasi kehancuran status` menampilkan ketiga kunci, batas-batas ini, jurus yang berjalan, dan sisa jendela pulih.
+Untuk jurusmu sendiri, `modeKehancuran` hanya dibutuhkan di server khusus dan untuk tamu LAN; pemilik dunia pemain tunggal
+dan tuan rumah LAN cukup menekan saklar ([12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang)).
+`kehancuranMaxRadius`, `kehancuranBlocksPerTick`, `kehancuranMaxBlocksPerCast`, `kehancuranDropsPct`, zona aman,
+`kehancuranMsptPause`, dan `kehancuranUndoMinutes` berlaku untuk keduanya; `kehancuranWarningSeconds` hanya untuk Jurus
+Pemusnah murid.
+
+`/kultivasi kehancuran status` menampilkan saklar jurusmu sendiri, ketiga kunci, batas-batas ini, jurus yang berjalan,
+pahatanmu, dan sisa jendela pulih.
 
 ---
 
@@ -3556,8 +4512,11 @@ EMF/ETF), disesuaikan dengan **Kualitas Efek**:
 | Minimal | ×0,25 | untuk komputer lemah |
 | Normal | ×1 | bawaan |
 | Maksimal | ×2 | ditambah hiasan ekstra (spiral, cincin tambahan, kembang api, dst.) |
+| Otomatis (Fase 6c) | Minimal atau Normal | turun ke Minimal di bawah 40 FPS, kembali ke Normal setelah 10 detik di atas 70 FPS; tidak pernah Maksimal |
 
-Atur di tab **Pengaturan** gulungan; tersimpan di `config/kultivator-client.json` (hanya di komputermu).
+Atur di tab **Pengaturan** gulungan; tersimpan di `config/kultivator-client.json` (hanya di komputermu). Pengaturan efek
+teknik (guncangan layar, kilatan, tampilan raksasa, efek pemain lain, roda, kurangi gerak) ada di tab yang sama, lihat
+[12.13](#1213-performa-efek-dan-pengaturan).
 
 **Kosmetik** (terlihat oleh semua orang, bisa dimatikan sendiri dengan `/kultivasi visual <bagian> on|off` atau koin
 giok di tab Pengaturan):
@@ -3596,6 +4555,26 @@ partikel, Maksimal menambah hiasan). Efek yang terus menyala hanya digambar dala
 | Mode Kehancuran | langit merah dan abu selama hitung mundur, garis pratinjau bentuk 15 detik, debu hantaman, kilau biru saat pemulihan |
 | Pembangunan Sekte | hologram tapak saat pratinjau, remah blok dan percik giok saat memasang, kabut kerja dan benang qi pekerja, kelopak ceri saat bagian selesai, pilar emas, pita, bola lentera, dan hujan emas saat tingkat selesai, lautan awan di lembah Templat 6–9 ([20b.14](#20b14-tampilan-dan-suara)); kabut kerja dan lautan awan mati di Minimal |
 
+### 33.2 Tampilan Fase 6c: Teknik Dewa
+
+Setiap teknik punya lapisan efek per tahap (rapal, isi, lintasan, hantaman, kena, denyut, akhir) yang digambar di
+komputermu dari satu pesan server dan satu benih acak, jadi semua pemain melihat bentuk yang sama:
+* partikel bertemplat: busur dan sabit pedang, sinar berinti, kerucut, cincin kejut dengan remah tanah, kubah, pilar langit,
+  petir bercabang dan badai petir dari cakram awan, pusaran, lingkar rune, kelopak teratai, telapak dan tinju raksasa dari
+  titik cahaya, hujan pedang, sayap, binatang dari titik cahaya (naga, burung, Kun, harimau, serigala, kura-kura, kera,
+  kalajengking), kabut, serpihan, rantai, cahaya penyembuh, perisai, bayangan sisa, robekan langit, meteor, dan medan
+  bintang;
+* **tampilan raksasa** khusus klien: pedang sampai 24 kali ukuran (juga pedangmu sendiri), balok gunung dan es, laser kaca,
+  kelopak teratai yang membuka, aksara raksasa (佛 封 定 帝 雷 剑 生死 因果 时), dan cincin pedang yang mengorbit;
+* avatar tembus pandang dirimu yang membesar (wujud raksasa), klon, kawanan kupu-kupu dan kumbang, siluet binatang seukuran
+  langit, dan tanda sasaran yang hanya terlihat olehmu;
+* guncangan kamera (paling besar 2,5°), kilatan layar, dan bayang tepi layar untuk pamungkas besar; tidak pernah mengubah
+  cuaca.
+
+Makin tinggi ranah perapal, makin besar dan makin lengkap lapisannya ([12.4](#124-kekuatan-tumbuh-bersama-ranah)).
+Penguasaan 3 menambah tepi emas, penguasaan 4 bayangan sisa. Selama Mode Kehancuran nyala, hantaman menambah retakan dan
+remah blok. Anggaran dan pengaturannya di [12.13](#1213-performa-efek-dan-pengaturan).
+
 ---
 
 ## 34. Layar kultivasi (gulungan giok)
@@ -3606,8 +4585,8 @@ Tekan `'`. Gulungan memiliki loh giok vertikal di sisi kiri:
 |---|---|
 | **Status** | Lingkaran dantian besar (cincin kultivasi, qi, Qi Tertimbun), ranah, statistik, Penyimpangan Qi, racun pil, tingkat Alkimia; jimat Meditasi, Terobosan, Uji Akar |
 | **Akar & Dao** | Pentagram lima elemen yang menyala sesuai akarmu, segi delapan Bagua delapan Dao (klik untuk membaca/memilih) |
-| **Teknik** | Kartu segel semua teknik: terkunci/terbuka, biaya, jeda; klik untuk memilih |
-| **Pengaturan** | Kualitas Efek, kosmetik, HUD, terobosan Hardcore (klik dua kali dalam 3 detik) |
+| **Teknik** | Kartu peluncur **Buka Kitab Teknik** dengan "Teknik x/168", Kekuatan P, penguasaan tertinggi, dan teknik terpilih; jimat ke Kodeks, Cincin Segel, dan Mode Kehancuran ([12.1](#121-kitab-teknik)) |
+| **Pengaturan** | Kualitas Efek (juga Otomatis), kosmetik, HUD, efek teknik ([12.13](#1213-performa-efek-dan-pengaturan)), terobosan Hardcore (klik dua kali dalam 3 detik) |
 | **Bantuan** | Ringkasan aturan dan tombol (lihat di bawah) |
 
 **Topik Bantuan Fase 6** (setelah topik lama): Aula Sekte, Pembangunan Sekte, Hari Penerimaan Murid, Jenjang Sekte, Poin Kontribusi, Tugas
@@ -3615,6 +4594,10 @@ Sekte dan Lumbung Sekte, Misi/Utusan/Tanah Terlarang, Turnamen dan Perang Seratu
 Membara/Latihan Khusus, Bakat/alam jiwa/fisik langka, Pusaka Natal/Kitab Abadi Tak Mati/Api Surgawi, Bintang Abadi,
 Ikatan/Segel Jiwa/Hu Fa/pewaris, dan Mode Kehancuran (MATI secara bawaan). Sumber cerita tiap fitur dibaca di tooltip
 gulungan aula dan tab murid, dan selengkapnya di bagian 20–31 panduan ini.
+
+**Topik Bantuan Fase 6c** (juga di tablet Bantuan Kitab Teknik): Teknik, Penguasaan, Kitab Teknik, dan Mode Kehancuran
+untuk jurusmu sendiri (peringatan merah: mati secara bawaan, satu klik, Shift = tanpa kawah, zona aman, pulihkan dalam
+10 menit).
 
 Gulungan lain di Fase 6: **gulungan murid** (klik kanan muridmu, [19.2](#192-gulungan-murid)) dan **gulungan aula**
 (klik kanan prasastimu, [20.6](#206-gulungan-aula)).
@@ -3644,7 +4627,8 @@ Semua pencapaian ada di tab **Kultivasi** pada layar Pencapaian (Advancements). 
 | Kegiatan sekte | Melangkah Keluar Gerbang (ekspedisi pertama), *Alam Rahasia Ditaklukkan*, *Keluar dari Angin Merah Darah* (Tanah Terlarang), *Nomor Satu Daftar Kuat* (juara turnamen), **Penumpang Bahtera Purba**, *Juara Seratus Dinasti*, Tangga Batu (lantai 10 Alam Dewa Hampa), **Jenius Batas Suci** (lantai 50), Satgas Pencuri Ayam (tersembunyi) |
 | Bakat & kekuatan murid | Terlahir Berbeda (fisik langka), *Pengemis di Gerbang*, *Nadi Dewa Sesat*, *Jurus Pamungkas*, **Api Guru dan Murid** (Fusi), *Pelahap Api* (Api Surgawi), *Pusaka Sembilan Lipatan*, **Payung Abadi** (lipatan 14), **Darah Abadi**, **Sayap Sang Kunpeng** |
 | Jalan Abadi | Segel Jiwa, Pelindung Dao Murid (Hu Fa sampai berhasil), *Fondasi Dao Langit*, **Fondasi Sempurna**, Bintang Pertama Terpadatkan, *Bencana Terlewati*, **Penginjak Langit** (ketujuh bencana), *Lampu Jiwa Padam*, *Pewaris Ditetapkan*, **Penguasa Sembilan Segel**, *Guru di Dalam Cincin*, **Murid Melampaui Guru** |
-| Mode Kehancuran | Sumpah Kehancuran (butuh izin server), **Pemecah Dunia** (Jurus Pemusnah yang mengubah blok sungguhan) |
+| Teknik Dewa (Fase 6c) | Lima Puluh Jurus (kuasai 50 teknik), *Seratus Jurus*, **Kitab Lengkap** (semua 168), *Kesempurnaan Agung* (penguasaan tingkat 3 pertama), **Puncak Jurus** (tingkat 4 pertama), Jurus Tingkat Langit, *Jurus Abadi*, **Gerbang Dewa** (teknik Dewa pertama), Membaca Slip Giok, *Pewaris Warisan* (menang Ujian Warisan) |
+| Mode Kehancuran | Sumpah Kehancuran (butuh izin server), **Pemecah Dunia** (Jurus Pemusnah yang mengubah blok sungguhan), **Tanganku Membelah Bumi** (kawah pertama dari jurusmu sendiri) |
 
 Resep yang terbuka di buku resep: Prasasti Aula Sekte (saat kamu mendapat Batu Magnet), serta Giok Segel Jiwa dan Cincin
 Jiwa Guru (saat kamu mendapat Serpihan Gaung).
@@ -3670,7 +4654,12 @@ Resep Gulungan Penerimaan Murid sudah dihapus sejak Fase 6.
 | `sectEvents` | `true` | Acara sekte terjadwal: Kompetisi Daftar Kuat, Tanah Terlarang, Perang Seratus Dinasti |
 | `tournamentIntervalDays` | `7` (3–30) | Kompetisi Daftar Kuat setiap sekian hari game |
 | `forbiddenGroundIntervalDays` | `15` (5–60) | Tanah Terlarang Berwarna Darah terbuka setiap sekian hari game |
-| `modeKehancuran` dan `kehancuran...` | `false` dan lainnya | Mode Kehancuran: lihat [31.9](#319-pengaturan) |
+| `modeKehancuran` dan `kehancuran...` | `false` dan lainnya | Mode Kehancuran: lihat [31.9](#319-pengaturan) (termasuk `kehancuranPlayerTechniques`, `kehancuranCasterSafeRadius`, `kehancuranHomeSafeRadius` untuk saklar jurus sendiri) |
+| `techniqueDamageMultiplier` | `1.0` (0,1–10) | Faktor dalam Kekuatan teknik pemain P ([12.4](#124-kekuatan-tumbuh-bersama-ranah)) |
+| `techniqueAreaCap` | `32` (8–48) | Batas keras jari-jari bentuk teknik; teknik Dewa ×1,25 |
+| `techniqueBossCaps` | `true` | Batas kerusakan per rapalan pada bos |
+| `techniqueMaxActiveCasts` | `64` (16–128) | Rapalan teknik yang bertahan di seluruh server; lebih dari itu yang tertua berakhir lebih awal |
+| `techniqueDisplays` | `true` | Klien boleh menggambar tampilan raksasa teknik (khusus klien) |
 | `sectConstruction` | `true` | [Pembangunan Sekte](#20b-pembangunan-sekte) bisa dipakai. Bila `false`, templat tidak bisa dipilih |
 | `sectBuildSpeed` | `1.0` (0,25–4) | Mengalikan laju pemasangan |
 | `sectBuildMaxPerTick` | `8` (1–32) | Batas rata-rata pemasangan per tick untuk semua tapak (gelombang tiap 4 tick memasang sampai 4× angka ini) |
@@ -3693,9 +4682,18 @@ Nilai yang hilang diisi bawaan, nilai di luar rentang dipotong ke batasnya, dan 
 | Opsi | Nilai | Arti |
 |---|---|---|
 | `effect_quality` | `minimal`, `normal`, `maximal` | Kualitas Efek |
+| `quality_auto` | `true` / `false` | Kualitas Efek "Otomatis" |
 | `hud` | `true` / `false` | HUD qi di kiri bawah |
+| `shake` | `full`, `light`, `off` | Guncangan layar (bawaan `light`) |
+| `flash` | `true` / `false` | Kilatan layar |
+| `phantoms` | `true` / `false` | Tampilan raksasa teknik |
+| `others_fx` | `full`, `light`, `off` | Efek pemain lain |
+| `wheel_hold` | `true` / `false` | Tahan G untuk Roda Segel |
+| `release_cast` | `true` / `false` | Lepas = rapal |
+| `reduce_motion` | `true` / `false` | Kurangi gerak |
+| `codex_filters`, `codex_sort`, `teach_filters`, `teach_sort`, `codex_seen` | – | Saringan dan urutan terakhir Kitab Teknik dan tab Teknik murid, serta kartu yang sudah dilihat (lencana BARU) |
 
-Keduanya diatur dari tab Pengaturan gulungan.
+Semuanya diatur dari tab Pengaturan gulungan atau langsung di Kitab Teknik.
 
 ---
 
@@ -3703,11 +4701,17 @@ Keduanya diatur dari tab Pengaturan gulungan.
 
 Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama.
 
-> **Pengecualian pertama: Mode Kehancuran.** Mode ini **MATI secara bawaan** dan baru mengubah blok bila ketiga
-> kuncinya dibuka dengan sengaja (izin server, Sumpah Kehancuran, Lepaskan Segel), lalu sebuah jurus diperintahkan,
-> dipratinjau, dikonfirmasi, dan diumumkan dengan hitung mundur. Zona terlindung (termasuk setiap tapak sekte + 16 blok),
-> batas blok, jeda saat server lambat, dan tombol Pulihkan tetap berlaku. Lihat
-> [bagian 31](#31-mode-kehancuran-peringatan).
+> **Pengecualian pertama: Mode Kehancuran.** Mode ini **MATI secara bawaan**. Ada dua bentuk:
+> * **Jurusmu sendiri** (Fase 6c, "Saklar gampang"): baru memahat setelah kamu sendiri menekan saklar satu klik di Kitab
+>   Teknik atau `/kultivasi kehancuran nyala` (di server khusus dan untuk tamu LAN juga butuh izin server), mulai Inti
+>   Emas, tidak saat kamu jongkok, dengan baris peringatan merah dan perintah pulihkan. Lihat
+>   [12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang).
+> * **Jurus Pemusnah murid**: baru mengubah blok bila ketiga kuncinya dibuka dengan sengaja (izin server, Sumpah
+>   Kehancuran, Lepaskan Segel), lalu sebuah jurus diperintahkan, dipratinjau, dikonfirmasi, dan diumumkan dengan hitung
+>   mundur. Lihat [bagian 31](#31-mode-kehancuran-peringatan).
+>
+> Untuk keduanya zona terlindung (lingkar 4 blok di sekitarmu, 24 blok dari titik bangkit dan pemain lain, 64 dari aula,
+> setiap tapak sekte + 16 blok), batas blok, jeda saat server lambat, dan tombol Pulihkan tetap berlaku.
 >
 > **Pengecualian kedua: Pembangunan Sekte.** Sekte hanya memasang blok dan meratakan tanah **di dalam tapak yang kamu
 > lihat sebagai hologram lalu kamu konfirmasi sendiri**, hanya di chunk yang sudah termuat, dan hanya selama aulamu aktif.
@@ -3735,7 +4739,8 @@ Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama.
 * Makhluk yang dimunculkan atau dilempar mod (Pelindung Dao, monster yang terlempar teknik, Binatang Roh) tidak
   menginjak pelat tekan atau tali jebakan, tidak menyalakan bijih redstone, dan tidak pernah melewati portal (yang
   bisa membangun portal keluar atau panggung obsidian End).
-* Teknik dan Binatang Roh tidak menyerang Wither (setiap pukulan membuatnya menghancurkan blok di sekitarnya) dan tidak
+* Binatang Roh dan murid tidak menyerang Wither (setiap pukulan biasa membuatnya menghancurkan blok di sekitarnya). Sejak
+  Fase 6c teknikmu boleh melawannya, karena pukulan teknik tidak lagi memicu penghancuran blok Wither. Tidak ada yang
   pernah menggeser Naga Ender (ia menghancurkan blok yang ditabraknya); Naga Ender tetap bisa dilukai.
 * Tribulasi dan Iblis Hati **tidak pernah membunuhmu**: kegagalan berarti luka (Penyimpangan Qi), bukan kematian.
   Bila Iblis Hati melemparmu ke kehampaan, kamu dikembalikan ke tempat aman dan ujiannya berakhir sebagai kekalahan.
@@ -3764,7 +4769,8 @@ Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama.
   Hardcore-mu menyala: murid yang gagal kembali sebagai Papan Jiwa yang bisa dibangkitkan.
 * Bahtera Purba, angin merah, portal Alam Hampa, dan cincin duel adalah partikel; tidak ada blok yang dipasang.
 * Kode yang mengubah blok hanya ada di dua tempat: pemasang Pembangunan Sekte (hanya di dalam tapak yang dikonfirmasi)
-  dan mesin Mode Kehancuran (tidak berjalan selama ketiga kunci belum terbuka).
+  dan mesin Mode Kehancuran (tidak berjalan selama ketiga kunci belum terbuka; sejak Fase 6c juga dipakai saklar jurus
+  sendiri, yang mati secara bawaan).
 
 **Tambahan Fase 6b (Pembangunan Sekte):**
 * Pratinjau, hologram, pemeriksaan tapak, Periksa & Perbaiki, dan audit hanya **membaca** blok dan tidak pernah memuat
@@ -3773,3 +4779,21 @@ Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama.
 * Pencegahan monster di atas sel sekte hanyalah aturan pemunculan; tidak ada blok di luar tapak yang diubah untuk itu.
 * Tapak uji dan pameran mencatat setiap blok asli di log undo, dan `uji sekte reset` serta `pamer hapus` memulihkannya
   persis.
+
+**Tambahan Fase 6c (Teknik Dewa):**
+* Ke-169 teknik tidak pernah memasang, merusak, atau membakar blok sendiri. Petir hanya partikel, api hanya pada tubuh
+  monster, tidak ada ledakan, tidak ada proyektil sungguhan (semua proyektil disimulasikan), cuaca dan waktu tidak berubah,
+  termasuk Metode Lima Guntur, Embun Manis Guanyin, dan Murka Langit Sembilan Matahari.
+* Tampilan raksasa (pedang, gunung, aksara, laser) hanya ada di komputermu; server tidak pernah memunculkan entity tampilan,
+  dan tidak ada yang tersimpan di dunia.
+* Makhluk panggilan teknik (mayat ganas, dewa guntur, klon, kumbang) adalah makhluk maya tanpa entity: tidak bisa dilukai,
+  tidak menginjak pelat, tidak pernah menyasar pemain.
+* Monster yang didorong, ditarik, atau dipindah teknik tidak pernah creeper, ravager, naga, Wither, Warden, atau Elder
+  Guardian, tidak pernah dalam 8 blok dari portal, dan diberi tanda agar tidak menekan pelat atau melewati portal. Semua
+  jalur, kedipan, dan perjalanan hanya melewati chunk termuat dan tidak pernah memuat chunk.
+* Pukulan teknik tidak memicu Wither menghancurkan blok, dan kristal End tidak pernah dipukul.
+* Penangkis proyektil menghapus proyektil musuh alih-alih memantulkannya (bola api atau tengkorak yang dipantulkan bisa
+  mengenai blok), dan proyektil tanpa pemilik (dispenser, kembang api) tidak pernah dihapus.
+* Kawah, parit, dan retakan hanya ada lewat saklar Mode Kehancuran jurus sendiri
+  ([12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang)), yang mati secara bawaan, tidak berlaku saat
+  jongkok, duel, terobosan, atau rapalan murid, dan bisa dipulihkan dalam 10 menit (selama server tidak dimulai ulang).

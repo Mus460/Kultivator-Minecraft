@@ -28,7 +28,6 @@ import dev.kultivator.data.ModAttachments;
 import dev.kultivator.data.Rank;
 import dev.kultivator.data.Realm;
 import dev.kultivator.data.RootGrade;
-import dev.kultivator.data.Technique;
 import dev.kultivator.data.XpSource;
 import dev.kultivator.network.Net;
 import dev.kultivator.alchemy.Alchemy;
@@ -71,8 +70,10 @@ public final class CultivateCommand {
 					java.util.stream.Stream.of("none")), builder);
 	private static final SuggestionProvider<CommandSourceStack> GRADES = (ctx, builder) ->
 			SharedSuggestionProvider.suggest(Arrays.stream(RootGrade.values()).map(RootGrade::id), builder);
+	/** Every spec id (DESIGN 22.16.3: debug learn|forget suggest all 169) plus "all". */
 	private static final SuggestionProvider<CommandSourceStack> TECHNIQUES = (ctx, builder) ->
-			SharedSuggestionProvider.suggest(java.util.stream.Stream.concat(Arrays.stream(Technique.values()).map(Technique::id),
+			SharedSuggestionProvider.suggest(java.util.stream.Stream.concat(
+					dev.kultivator.data.TechniqueRegistry.all().stream().map(dev.kultivator.data.TechniqueSpec::id),
 					java.util.stream.Stream.of("all")), builder);
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
@@ -112,6 +113,8 @@ public final class CultivateCommand {
 		SpiritRoots.addCommands(root, debug);
 		DaoPaths.addCommands(root, debug);
 		Techniques.addCommands(root, debug);
+		// Phase 6c (DESIGN 22.16.1, 22.16.3): teknik ... and debug teknik ...
+		dev.kultivator.technique.spec.run.TechniqueCommands.add(root, debug);
 		HeartDemons.addCommands(root, debug);
 		SpiritBeasts.addCommands(root, debug);
 		ProtectiveFormations.addCommands(root, debug);
@@ -388,11 +391,14 @@ public final class CultivateCommand {
 		String id = StringArgumentType.getString(ctx, "technique");
 		CultivationData data = Cultivators.get(player);
 		if (id.equals("all")) {
-			for (Technique technique : Technique.values()) {
+			for (dev.kultivator.data.TechniqueSpec spec : dev.kultivator.data.TechniqueRegistry.all()) {
+				if (!spec.playerVisible()) {
+					continue;
+				}
 				if (learn) {
-					data.learn(technique);
+					data.learn(spec.id());
 				} else {
-					data.forget(technique);
+					data.forget(spec.id());
 				}
 			}
 			if (learn) {
@@ -401,15 +407,15 @@ public final class CultivateCommand {
 			}
 			return done(ctx, player);
 		}
-		Technique technique = Technique.byId(id);
-		if (technique == null) {
+		dev.kultivator.data.TechniqueSpec spec = dev.kultivator.data.TechniqueRegistry.byId(id);
+		if (spec == null) {
 			return fail(ctx, "kultivator.core.debug.unknown", id);
 		}
 		if (learn) {
-			data.learn(technique);
+			data.learn(spec.id());
 			Techniques.refreshUnlocks(player);
 		} else {
-			data.forget(technique);
+			data.forget(spec.id());
 		}
 		return done(ctx, player);
 	}

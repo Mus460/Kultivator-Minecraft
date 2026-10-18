@@ -100,6 +100,11 @@ public enum Technique {
 		return Component.translatable("kultivator.technique." + id + ".desc");
 	}
 
+	/** The registry spec of this legacy technique (net id = ordinal, DESIGN 22.2.4); always available. */
+	public TechniqueSpec spec() {
+		return TechniqueRegistry.legacy(this);
+	}
+
 	/** Null when unknown. */
 	public static @Nullable Technique byId(String id) {
 		for (Technique technique : values()) {

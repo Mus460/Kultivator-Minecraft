@@ -62,14 +62,14 @@ public final class Qi {
 	}
 
 	/**
-	 * Qi regenerated per second right now: 0.4% of max, x6 while meditating, x1.5 at a spiritual site, nothing during a
-	 * Qi Deviation. Pure: also used on the client.
+	 * Qi regenerated per second right now: 0.4% of max × (1 + 0.1 × caster grade tier) (Dewa Abadi ×1.4, DESIGN 22.5.4),
+	 * x6 while meditating, x1.5 at a spiritual site, nothing during a Qi Deviation. Pure: also used on the client.
 	 */
 	public static double regenPerSecond(CultivationData data) {
 		if (data.deviating()) {
 			return 0.0D;
 		}
-		double regen = max(data) * 0.004D;
+		double regen = max(data) * 0.004D * dev.kultivator.technique.spec.TechniquePower.qiRegenFactor(data);
 		if (data.meditating()) {
 			regen *= 6.0D;
 		}

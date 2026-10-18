@@ -163,8 +163,14 @@ final class PowerCore {
 		if (!(entity.level() instanceof ServerLevel level) || !DiscipleTechniques.mayHit(entity, master, target)) {
 			return false;
 		}
-		float damage = (float) (amount * DiscipleHooks.damageFactor(entity, target, kind != HIT_MELEE));
-		if (!(damage > 0.0F) || !Float.isFinite(damage)) {
+		float factored = (float) (amount * DiscipleHooks.damageFactor(entity, target, kind != HIT_MELEE));
+		if (!(factored > 0.0F) || !Float.isFinite(factored)) {
+			return false;
+		}
+		// The one damage function of DESIGN 22.5.5 (third choke point); a finished pre-6c amount passes it unchanged.
+		float damage = dev.kultivator.technique.spec.TechniquePower.finalDamage(
+				dev.kultivator.technique.spec.DamageContext.legacy(entity, target, factored));
+		if (!(damage > 0.0F)) {
 			return false;
 		}
 		if (target.damageCooldownTime > 10) {

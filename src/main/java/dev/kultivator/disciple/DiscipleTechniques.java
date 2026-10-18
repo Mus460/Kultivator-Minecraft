@@ -4,6 +4,14 @@ import dev.kultivator.beast.SpiritBeasts;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Rank;
 import dev.kultivator.data.Technique;
+import dev.kultivator.data.TechniqueSpec;
+import dev.kultivator.data.TechniqueType;
+import dev.kultivator.disciple.path.DisciplePaths;
+import dev.kultivator.technique.spec.run.CastContext;
+import dev.kultivator.technique.spec.run.Caster;
+import dev.kultivator.technique.spec.run.EndReason;
+import dev.kultivator.technique.spec.run.Mastery;
+import dev.kultivator.technique.spec.run.TechniqueRunner;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.technique.DaoTechniqueSub;
@@ -126,9 +134,23 @@ public final class DiscipleTechniques {
 	/** Area radii are multiplied by this during a {@link #castInnate} with a range factor (server thread only). */
 	private static double rangeScale = 1.0D;
 
-	/** {@code base} times the current range factor (1 outside {@link #castInnate}). */
+	/** The disciple's spec cast running the legacy code ({@link #castLegacy}; server thread only), or null. */
+	private static @Nullable CastContext legacyCtx;
+
+/** {@code base} times the current range factor (1 outside {@link #castInnate}). */
 	private static double ranged(double base) {
-		return base * rangeScale;
+		double scaled = legacyCtx == null ? base : legacyCtx.area(base, base * 2.0D);
+		return (Double.isNaN(scaled) ? base : scaled) * rangeScale;
+	}
+
+	/** A legacy duration through the cast's scaled reads (22.10.2): A/D/N of the disciple's rank and stars, its mastery. */
+	private static int ticksOf(int base) {
+		return legacyCtx == null ? base : Math.max(1, legacyCtx.duration(base, base * 2.0D));
+	}
+
+	/** A legacy count through the cast's scaled reads (counts grow with N; the L3 extra count applies). */
+	private static int countOf(int base) {
+		return legacyCtx == null ? base : Math.max(1, legacyCtx.count(base, base * 2.0D));
 	}
 
 	// ================================================================== rules
@@ -146,7 +168,12 @@ public final class DiscipleTechniques {
 		return technique.qiCost() * QI_FACTOR;
 	}
 
-	/** D for the disciple: {@code (3 + 2 x realm + 0.5 x stage) x (1 + comprehension / 100)}. */
+	/**
+	 * U_legacy for the disciple: {@code (3 + 2 x realm + 0.5 x stage) x (1 + comprehension / 100)}. Deliberately not
+	 * P_disciple yet (DESIGN 22.5.1, 6c note): {@code PowerCore.hurt} and the legacy hurt path pass LEGACY amounts through
+	 * {@code finalDamage} unchanged, so this switches only together with those choke points building HIT contexts. Spec
+	 * casts read P_disciple from {@code DiscipleCaster}.
+	 */
 	public static double power(DiscipleData data) {
 		Rank rank = data.rank();
 		double base = 3.0D + 2.0D * rank.realm().ordinal() + 0.5D * rank.stage();
@@ -173,6 +200,14 @@ public final class DiscipleTechniques {
 	 * of one cultivator's heart), anything that cannot be seen as an enemy or a mob listed in {@link #provokesBlockChanges}.
 	 */
 	public static boolean mayHit(DiscipleEntity entity, @Nullable ServerPlayer master, @Nullable Entity target) {
+		return mayHit(entity, master, target, true);
+	}
+
+	/**
+	 * As {@link #mayHit(DiscipleEntity, ServerPlayer, Entity)}; calm neutral mobs only when {@code precise} (22.3.5 rule 2:
+	 * STRIKE, BEAM, TARGET, the first CHAIN hop, EXEC and PRECISE specs), so a disciple's area spec never angers a fortress.
+	 */
+	public static boolean mayHit(DiscipleEntity entity, @Nullable ServerPlayer master, @Nullable Entity target, boolean precise) {
 		if (!(target instanceof LivingEntity living) || living == entity || !living.isAlive() || living.isRemoved()
 				|| living.level() != entity.level()) {
 			return false;
@@ -188,7 +223,7 @@ public final class DiscipleTechniques {
 				|| SpiritBeasts.isSpiritBeast(living) || provokesBlockChanges(living)) {
 			return false;
 		}
-		return Targeting.isHostileTo(living, master);
+		return Targeting.isHostileTo(living, master, precise);
 	}
 
 	/**
@@ -205,10 +240,15 @@ public final class DiscipleTechniques {
 
 	/** Living things the disciple may hit within {@code radius} of {@code center}, nearest first. */
 	public static List<LivingEntity> hostilesAround(DiscipleEntity entity, ServerPlayer master, Vec3 center, double radius) {
+		return hostilesAround(entity, master, center, radius, true);
+	}
+
+	/** As {@link #hostilesAround(DiscipleEntity, ServerPlayer, Vec3, double)} with the calm-neutral rule of {@code precise}. */
+	public static List<LivingEntity> hostilesAround(DiscipleEntity entity, ServerPlayer master, Vec3 center, double radius, boolean precise) {
 		AABB box = new AABB(center, center).inflate(radius);
 		double radiusSq = radius * radius;
 		List<LivingEntity> list = entity.level().getEntitiesOfClass(LivingEntity.class, box,
-				other -> other.distanceToSqr(center) <= radiusSq && mayHit(entity, master, other));
+				other -> other.distanceToSqr(center) <= radiusSq && mayHit(entity, master, other, precise));
 		list.sort(Comparator.comparingDouble(other -> other.distanceToSqr(center)));
 		return list;
 	}
@@ -340,12 +380,30 @@ public final class DiscipleTechniques {
 	}
 
 	private static void schedule(DiscipleEntity entity, ServerLevel level, int delayTicks, Consumer<ServerPlayer> action) {
-		PENDING.computeIfAbsent(entity, key -> new ArrayList<>()).add(new Pending(level.getGameTime() + Math.max(1, delayTicks), action));
+		CastContext ctx = legacyCtx;
+		Consumer<ServerPlayer> run = action;
+		if (ctx != null) {
+			// The delayed part keeps its cast (scaled reads, the choke point) and keeps the cast alive until it ran.
+			if (ctx instanceof Caster cast) {
+				cast.keepAlive(Math.max(1, delayTicks) + 1);
+			}
+			run = master -> {
+				CastContext previous = legacyCtx;
+				legacyCtx = ctx;
+				try {
+					action.accept(master);
+				} finally {
+					legacyCtx = previous;
+				}
+			};
+		}
+		PENDING.computeIfAbsent(entity, key -> new ArrayList<>()).add(new Pending(level.getGameTime() + Math.max(1, delayTicks), run));
 	}
 
 	/** Drops the pending effects of a disciple that left the world (died, unloaded, changed dimension, discarded). */
 	static void forget(DiscipleEntity entity) {
 		PENDING.remove(entity);
+		TechniqueRunner.abort(entity, EndReason.CANCELLED);
 	}
 
 	/** The server stopped: nothing pending survives it. */
@@ -460,7 +518,7 @@ public final class DiscipleTechniques {
 		sound(level, entity.position(), SoundEvents.BEACON_ACTIVATE, 0.9F, 1.6F);
 		sound(level, entity.position(), SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 0.8F);
 		float damage = (float) (d * 0.8D);
-		for (int wave = 0; wave < SWORDS_WAVES; wave++) {
+		for (int wave = 0; wave < countOf(SWORDS_WAVES); wave++) {
 			schedule(entity, level, 1 + wave * SWORDS_WAVE_INTERVAL, owner -> {
 				List<LivingEntity> around = new ArrayList<>(hostilesAround(entity, owner, entity.position(), SWORDS_RANGE));
 				RandomSource random = entity.getRandom();
@@ -470,7 +528,7 @@ public final class DiscipleTechniques {
 					around.set(i, around.get(j));
 					around.set(j, swap);
 				}
-				int count = Math.min(SWORDS_PER_WAVE, around.size());
+				int count = Math.min(countOf(SWORDS_PER_WAVE), around.size());
 				for (int i = 0; i < count; i++) {
 					LivingEntity target = around.get(i);
 					fx(level, Technique.THOUSAND_SWORDS, DaoTechniqueSub.SWORD_FALL, target.position(), target.position(), SWORD_FALL_TICKS);
@@ -607,9 +665,9 @@ public final class DiscipleTechniques {
 		for (LivingEntity victim : victims) {
 			hurt(entity, master, level, victim, d * 1.5D);
 			if (victim.isAlive()) {
-				victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, PRISON_TICKS, PRISON_AMPLIFIER), entity);
-				freeze(victim, PRISON_TICKS);
-				fx(level, Technique.GLACIER_PRISON, DaoTechniqueSub.MARK, victim.position(), new Vec3(victim.getId(), PRISON_TICKS, 0.0D),
+				victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, ticksOf(PRISON_TICKS), PRISON_AMPLIFIER), entity);
+				freeze(victim, ticksOf(PRISON_TICKS));
+				fx(level, Technique.GLACIER_PRISON, DaoTechniqueSub.MARK, victim.position(), new Vec3(victim.getId(), ticksOf(PRISON_TICKS), 0.0D),
 						victim.getBbHeight());
 			}
 		}
@@ -633,7 +691,7 @@ public final class DiscipleTechniques {
 		Set<Integer> chained = new HashSet<>();
 		chained.add(aim.getId());
 		LivingEntity previous = aim;
-		for (int jump = 1; jump <= CHAIN_JUMPS; jump++) {
+		for (int jump = 1; jump <= countOf(CHAIN_JUMPS); jump++) {
 			LivingEntity next = null;
 			for (LivingEntity candidate : hostilesAround(entity, master, previous.position(), CHAIN_RADIUS)) {
 				if (!chained.contains(candidate.getId())) {
@@ -672,7 +730,7 @@ public final class DiscipleTechniques {
 		sound(level, entity.position(), SoundEvents.LIGHTNING_BOLT_THUNDER, 0.6F, 1.1F);
 		float damage = (float) (d * 2.0D);
 		Set<Integer> struck = new HashSet<>();
-		for (int i = 0; i < HEAVENLY_BOLTS; i++) {
+		for (int i = 0; i < countOf(HEAVENLY_BOLTS); i++) {
 			schedule(entity, level, 1 + i * HEAVENLY_INTERVAL, owner -> {
 				List<LivingEntity> around = hostilesAround(entity, owner, entity.position(), HEAVENLY_RANGE);
 				if (around.isEmpty()) {
@@ -704,9 +762,9 @@ public final class DiscipleTechniques {
 		if (entity.hasEffect(MobEffects.RESISTANCE)) {
 			return false;
 		}
-		entity.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, IRON_BODY_TICKS, 1), entity);
+		entity.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, ticksOf(IRON_BODY_TICKS), 1), entity);
 		fx(level, Technique.IRON_BODY, DaoTechniqueSub.CAST, entity.position(), entity.position(), entity.getBbHeight());
-		fx(level, Technique.IRON_BODY, DaoTechniqueSub.MARK, entity.position(), new Vec3(entity.getId(), IRON_BODY_TICKS, 0.0D),
+		fx(level, Technique.IRON_BODY, DaoTechniqueSub.MARK, entity.position(), new Vec3(entity.getId(), ticksOf(IRON_BODY_TICKS), 0.0D),
 				entity.getBbHeight());
 		sound(level, entity.position(), SoundEvents.ANVIL_LAND, 0.4F, 1.4F);
 		sound(level, entity.position(), SoundEvents.IRON_GOLEM_REPAIR, 0.9F, 0.9F);
@@ -860,7 +918,7 @@ public final class DiscipleTechniques {
 			double strength = 0.9D + 1.7D * closeness;
 			launch(target, new Vec3(dir.x * strength, 0.35D + 0.3D * closeness, dir.z * strength));
 		}
-		entity.addEffect(new MobEffectInstance(MobEffects.SPEED, GALE_TICKS, 1, false, false, true), entity);
+		entity.addEffect(new MobEffectInstance(MobEffects.SPEED, ticksOf(GALE_TICKS), 1, false, false, true), entity);
 		fx(level, Technique.GALE, DaoTechniqueSub.CAST, entity.position(), entity.position(), (float) radius);
 		sound(level, entity.position(), SoundEvents.PHANTOM_SWOOP, 0.9F, 0.8F);
 		sound(level, entity.position(), SoundEvents.BREEZE_SHOOT, 0.8F, 0.6F);
@@ -920,8 +978,8 @@ public final class DiscipleTechniques {
 		for (LivingEntity target : hits) {
 			hurt(entity, master, level, target, d * 1.5D);
 			if (target.isAlive()) {
-				target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, PRISON_TICKS, PRISON_AMPLIFIER), entity);
-				fx(level, Technique.SPACE_PRISON, DaoTechniqueSub.MARK, target.position(), new Vec3(target.getId(), PRISON_TICKS, 0.0D),
+				target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, ticksOf(PRISON_TICKS), PRISON_AMPLIFIER), entity);
+				fx(level, Technique.SPACE_PRISON, DaoTechniqueSub.MARK, target.position(), new Vec3(target.getId(), ticksOf(PRISON_TICKS), 0.0D),
 						target.getBbHeight());
 			}
 		}
@@ -940,9 +998,21 @@ public final class DiscipleTechniques {
 	 * accepts; not slowed by the target's short invulnerability after a melee hit. True when it landed.
 	 */
 	static boolean hurt(DiscipleEntity entity, ServerPlayer master, ServerLevel level, LivingEntity target, double amount) {
+		// A spec cast running this legacy code (22.10.2): the hit goes through the cast, so P_disciple, mastery, the boss cap
+		// and the hit records apply ({@code amount} is a multiple of P_disciple there).
+		CastContext ctx = legacyCtx;
+		if (ctx != null && ctx.power() > 0.0D) {
+			return ctx.hurt(target, amount / ctx.power(), false);
+		}
 		// The phase-6 damageFactor hooks (stars, hexes, folds, flames, titles...), product of all (DESIGN 20.2.6).
-		float damage = (float) (amount * DiscipleHooks.damageFactor(entity, target, true));
-		if (!(damage > 0.0F) || !Float.isFinite(damage) || !mayHit(entity, master, target)) {
+		float factored = (float) (amount * DiscipleHooks.damageFactor(entity, target, true));
+		if (!(factored > 0.0F) || !Float.isFinite(factored) || !mayHit(entity, master, target)) {
+			return false;
+		}
+		// The one damage function of DESIGN 22.5.5; a finished pre-6c amount passes it unchanged.
+		float damage = dev.kultivator.technique.spec.TechniquePower.finalDamage(
+				dev.kultivator.technique.spec.DamageContext.legacy(entity, target, factored));
+		if (!(damage > 0.0F)) {
 			return false;
 		}
 		if (target.damageCooldownTime > 10) {
@@ -961,6 +1031,147 @@ public final class DiscipleTechniques {
 			entity.setLastHurtMob(target);
 		}
 		return landed;
+	}
+
+	/**
+	 * A disciple's spec damage choke point (DESIGN 22.3.5 rule 7): only {@link #mayHit} targets, the amount from
+	 * {@code TechniquePower.finalDamage} (which applies the {@code damageFactor} hooks, the arena and trial-mob rules and
+	 * the boss cap), {@link NoGrief#TAG} and a portal cooldown, a mob attack of the disciple. True when it landed.
+	 */
+	public static boolean hurt(DiscipleEntity entity, @Nullable ServerPlayer master, dev.kultivator.technique.spec.DamageContext context) {
+		LivingEntity target = context.target();
+		if (!(entity.level() instanceof ServerLevel level) || target == null || !mayHit(entity, master, target)) {
+			return false;
+		}
+		float damage = dev.kultivator.technique.spec.TechniquePower.finalDamage(context);
+		if (!(damage > 0.0F) || !Float.isFinite(damage)) {
+			return false;
+		}
+		if (target.damageCooldownTime > 10) {
+			target.damageCooldownTime = 10;
+		}
+		if (!(target instanceof Player)) {
+			target.addTag(NoGrief.TAG);
+			target.setPortalCooldown();
+		}
+		boolean landed = target.hurtServer(level, level.damageSources().mobAttack(entity), damage);
+		if (landed) {
+			entity.setLastHurtMob(target);
+		}
+		return landed;
+	}
+
+	/**
+	 * Why the disciple cannot use {@code spec} now (a short reason id), or null when it can (DESIGN 22.13.3): known,
+	 * teachable, realm, Dao (or {@code daoBypass}), the star gates, not deviating or breaking through, cooled down and
+	 * affordable. The qi and cooldown come from {@link #specQi} and the id-keyed cooldowns of {@link DiscipleData}.
+	 */
+	public static @Nullable String specBlocker(DiscipleEntity entity, TechniqueSpec spec) {
+		DiscipleData data = entity.data();
+		if (!data.knows(spec.id())) {
+			return "unknown";
+		}
+		if (!usable(spec)) {
+			return "never";
+		}
+		if (!rankReached(data.rank(), spec.minRank())) {
+			return "realm";
+		}
+		Dao dao = spec.dao();
+		if (dao != null && dao != data.dao() && !DiscipleHooks.daoBypass(data)) {
+			return "dao";
+		}
+		int stars = DisciplePaths.stars(data);
+		if (stars < spec.teachStars() || spec.dewa() && stars < spec.dewaStars()) {
+			return "stars";
+		}
+		if (data.deviating() || data.breakingThrough()) {
+			return "busy";
+		}
+		if (data.cooldownLeft(spec.id()) > 0) {
+			return "cooldown";
+		}
+		if (data.qi() + 1.0E-6D < specQi(data, spec)) {
+			return "qi";
+		}
+		return null;
+	}
+
+	/** A disciple may use {@code spec}: teachable (22.13.1), or one of its own disciple-only specs; never the pair special. */
+	public static boolean usable(TechniqueSpec spec) {
+		return !"fusion_pair".equals(spec.special()) && (spec.teachable() || spec.has(TechniqueSpec.Flag.DISCIPLE_ONLY)
+				&& !spec.has(TechniqueSpec.Flag.FORBIDDEN) && !spec.has(TechniqueSpec.Flag.NO_TEACH));
+	}
+
+	/** True when {@code rank} is at or above {@code need} (realm, then layer, then stage). */
+	public static boolean rankReached(Rank rank, Rank need) {
+		if (rank.realm() != need.realm()) {
+			return rank.realm().atLeast(need.realm());
+		}
+		return rank.layer() > need.layer() || rank.layer() == need.layer() && rank.stage() >= need.stage();
+	}
+
+	/** Qi of one disciple spec cast: 60% of the cost, or {@code qiPct} of the disciple's own max qi (22.13.3). */
+	public static double specQi(DiscipleData data, TechniqueSpec spec) {
+		return dev.kultivator.technique.spec.TechniquePower.qiDisciple(spec, data, Mastery.level(data, spec.id()));
+	}
+
+	/**
+	 * Casts a spec for the disciple (DESIGN 22.13.3): the gates of {@link #specBlocker}, then the runner's disciple cast
+	 * ({@code DiscipleCaster}: P_disciple, the disciple's mastery, at most 3 active casts, its own global cooldown; legacy
+	 * specs run this class's legacy code through {@link #castLegacy}). Spends the qi and starts the id-keyed cooldown only
+	 * when the cast happened. Never Mode Kehancuran.
+	 */
+	public static boolean trySpec(DiscipleEntity entity, TechniqueSpec spec, @Nullable LivingEntity target) {
+		ServerPlayer master = entity.owner();
+		if (master == null || !(entity.level() instanceof ServerLevel) || !entity.isAlive() || entity.isDeadOrDying()
+				|| specBlocker(entity, spec) != null) {
+			return false;
+		}
+		LivingEntity aim = target != null && mayHit(entity, master, target) ? target : null;
+		DiscipleData data = entity.data();
+		double qi = specQi(data, spec);
+		if (!TechniqueRunner.castDisciple(entity, spec, aim)) {
+			return false;
+		}
+		data.setQi(Math.max(0.0D, data.qi() - qi));
+		data.setCooldown(spec.id(), dev.kultivator.technique.spec.TechniquePower.cooldownTicks(spec, data, Mastery.level(data, spec.id())));
+		data.addTechniqueCast();
+		if (aim != null && spec.type() != TechniqueType.PULIH) {
+			face(entity, middleOf(aim));
+		}
+		return true;
+	}
+
+	/**
+	 * The disciple's copy of a legacy technique for a spec cast (DESIGN 22.10.2): this class's own legacy code and constants,
+	 * reading P_disciple, with its scaled reads (radii, durations, counts) and every hit going through {@code ctx}. True when
+	 * it really happened (false spends nothing).
+	 */
+	public static boolean castLegacy(CastContext ctx, Technique technique) {
+		DiscipleEntity entity = ctx.disciple();
+		ServerPlayer master = ctx.master();
+		if (entity == null || master == null || !teachable(technique) || !entity.isAlive()) {
+			return false;
+		}
+		LivingEntity target = ctx.target();
+		LivingEntity aim = target != null && mayHit(entity, master, target) ? target : null;
+		CastContext previous = legacyCtx;
+		legacyCtx = ctx;
+		boolean done;
+		try {
+			done = perform(entity, master, ctx.level(), technique, aim, ctx.power());
+		} finally {
+			legacyCtx = previous;
+		}
+		if (done) {
+			Dao dao = technique.dao();
+			DiscipleData data = entity.data();
+			if (dao != null && dao == data.dao()) {
+				data.addComprehension(DiscipleCultivation.comprehensionGain(data, dao, DiscipleCultivation.TECHNIQUE_COMPREHENSION));
+			}
+		}
+		return done;
 	}
 
 	/** Sets a monster's velocity for every client, with {@link NoGrief#TAG} and a portal cooldown; never moves the dragon or a ravager. */

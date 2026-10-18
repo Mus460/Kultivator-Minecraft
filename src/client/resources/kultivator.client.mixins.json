@@ -4,7 +4,9 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "AvatarRendererMixin",
-    "PlayerModelMixin"
+    "PlayerModelMixin",
+    "GameRendererShakeMixin",
+    "MouseHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

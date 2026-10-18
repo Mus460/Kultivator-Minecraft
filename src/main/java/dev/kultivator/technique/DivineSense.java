@@ -1,12 +1,15 @@
 package dev.kultivator.technique;
 
-import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Technique;
 import dev.kultivator.network.Net;
 import dev.kultivator.network.Payloads;
+import dev.kultivator.technique.spec.dsl.Bonus;
+import dev.kultivator.technique.spec.dsl.Mark;
+import dev.kultivator.technique.spec.dsl.Payload;
+import dev.kultivator.technique.spec.run.Boons;
+import dev.kultivator.technique.spec.run.Caster;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
-import dev.kultivator.util.Targeting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
@@ -30,16 +33,15 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Indra Ilahi / Divine Sense (Nascent Soul+): the soul's sense spreads out. Monsters within 48 blocks glow for 12 s and
- * the ores within 12 blocks are read (read-only) and sent to the caster's client as pings shown for 10 s, with a chat
- * summary.
+ * Indra Ilahi / Divine Sense (DESIGN 22.10): monsters within 48→96 (at most 64, no line of sight needed) glow for 240
+ * ticks → (D) (+120 at Kesempurnaan Agung; at Puncak Jurus they are also marked vulnerable +10% for 200 ticks), and the
+ * ores within 12→16 blocks are read (read-only, spread over 4 ticks) and sent to the caster's client as pings for 200
+ * ticks, with a chat summary.
  */
 final class DivineSense {
 
-	private static final double MONSTER_RANGE = 48.0D;
-	private static final int ORE_RADIUS = 12;
-	private static final int GLOW_TICKS = 240;
 	private static final int PING_TICKS = 200;
+	private static final int SCAN_TICKS = 4;
 
 	/** Ore kinds, rarest first (the chat summary keeps this order). */
 	enum Ore {
@@ -76,16 +78,47 @@ final class DivineSense {
 	private record Found(BlockPos pos, Ore ore, double distSq) {
 	}
 
-	static boolean cast(ServerPlayer player, CultivationData data) {
+	static boolean cast(Caster ctx, ServerPlayer player) {
 		ServerLevel level = player.level();
 		Vec3 eye = player.getEyePosition();
-
-		List<LivingEntity> monsters = Targeting.hostilesAround(player, eye, MONSTER_RANGE);
+		double range = ctx.area(48.0D, 96.0D);
+		int glow = ctx.duration(240.0D, 480.0D);
+		boolean mark = ctx.peak(Bonus.Kind.PAYLOAD);
+		List<LivingEntity> monsters = ctx.hostiles(eye, range, false);
+		int glowing = 0;
 		for (LivingEntity monster : monsters) {
-			monster.addEffect(new MobEffectInstance(MobEffects.GLOWING, GLOW_TICKS, 0, false, false), player);
+			if (glowing++ >= dev.kultivator.technique.spec.TechniquePower.GLOWING_PER_CAST) {
+				break;
+			}
+			monster.addEffect(new MobEffectInstance(MobEffects.GLOWING, glow, 0, false, false), player);
+			if (mark) {
+				ctx.apply(monster, new Payload.Marked(Mark.vulnerable(0.10D), 200));
+			}
 		}
+		Boons.markDivineSense(player, glow);
+		int radius = (int) Math.round(ctx.area(12.0D, 16.0D));
+		BlockPos center = player.blockPosition();
+		List<Found> found = new ArrayList<>();
+		for (int slice = 0; slice < SCAN_TICKS; slice++) {
+			int index = slice;
+			ctx.schedule(slice, () -> scan(level, center, eye, radius, index, found));
+		}
+		ctx.schedule(SCAN_TICKS, () -> report(player, found, monsters.size(), (int) range));
+		ctx.keepAlive(SCAN_TICKS + 1);
+		Techniques.fx(player, Technique.DIVINE_SENSE, 0, player.position(), eye, (float) range);
+		ctx.castFx(player.position(), eye, (float) range, 0.0F, monsters.size(), glow);
+		level.playSound(null, eye.x, eye.y, eye.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.8F, 1.5F);
+		level.playSound(null, eye.x, eye.y, eye.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 0.5F);
+		if (!ctx.copy()) {
+			Advancements.grant(player, "divine_sense");
+		}
+		return true;
+	}
 
-		List<Found> found = scan(level, player.blockPosition(), eye);
+	private static void report(ServerPlayer player, List<Found> found, int monsters, int range) {
+		if (player.isRemoved()) {
+			return;
+		}
 		int[] counts = new int[Ore.values().length];
 		for (Found each : found) {
 			counts[each.ore().ordinal()]++;
@@ -99,12 +132,10 @@ final class DivineSense {
 			colors.add(found.get(i).ore().color);
 		}
 		Net.send(player, new Payloads.OrePings(positions, colors, PING_TICKS));
-
 		List<Component> parts = new ArrayList<>();
 		for (Ore ore : Ore.values()) {
 			if (counts[ore.ordinal()] > 0) {
-				parts.add(Component.translatable("kultivator.techniques.ore." + ore.id, String.valueOf(counts[ore.ordinal()]))
-						.withColor(ore.color));
+				parts.add(Component.translatable("kultivator.techniques.ore." + ore.id, String.valueOf(counts[ore.ordinal()])).withColor(ore.color));
 			}
 		}
 		Component ores = parts.isEmpty()
@@ -112,34 +143,33 @@ final class DivineSense {
 				: ComponentUtils.formatList(parts, Component.literal(", ").withColor(Techniques.MUTED));
 		Msg.chat(player, Component.translatable("kultivator.techniques.divine_sense.summary", Techniques.name(Technique.DIVINE_SENSE),
 				ores).withColor(0xC9B8FF));
-		Msg.chat(player, Component.translatable("kultivator.techniques.divine_sense.monsters", String.valueOf(monsters.size()),
-				String.valueOf((int) MONSTER_RANGE)).withColor(Techniques.MUTED));
-
-		Techniques.fx(player, Technique.DIVINE_SENSE, 0, player.position(), eye, (float) MONSTER_RANGE);
-		level.playSound(null, eye.x, eye.y, eye.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.8F, 1.5F);
-		level.playSound(null, eye.x, eye.y, eye.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.0F, 0.5F);
-		Advancements.grant(player, "divine_sense");
-		return true;
+		Msg.chat(player, Component.translatable("kultivator.techniques.divine_sense.monsters", String.valueOf(monsters),
+				String.valueOf(range)).withColor(Techniques.MUTED));
 	}
 
-	/** Every ore block within {@link #ORE_RADIUS} of {@code center} (a sphere). Only reads blocks. */
-	private static List<Found> scan(ServerLevel level, BlockPos center, Vec3 eye) {
-		List<Found> found = new ArrayList<>();
+	/** One quarter of the sphere's height (read-only, loaded chunks only). */
+	private static void scan(ServerLevel level, BlockPos center, Vec3 eye, int radius, int slice, List<Found> found) {
 		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
-		int radiusSq = ORE_RADIUS * ORE_RADIUS;
+		int radiusSq = radius * radius;
 		int minY = level.getMinY();
 		int maxY = level.getMaxY();
-		for (int dy = -ORE_RADIUS; dy <= ORE_RADIUS; dy++) {
+		int span = 2 * radius + 1;
+		int from = -radius + slice * span / SCAN_TICKS;
+		int to = -radius + (slice + 1) * span / SCAN_TICKS;
+		for (int dy = from; dy < to; dy++) {
 			int y = center.getY() + dy;
 			if (y < minY || y > maxY) {
 				continue;
 			}
-			for (int dx = -ORE_RADIUS; dx <= ORE_RADIUS; dx++) {
-				for (int dz = -ORE_RADIUS; dz <= ORE_RADIUS; dz++) {
+			for (int dx = -radius; dx <= radius; dx++) {
+				for (int dz = -radius; dz <= radius; dz++) {
 					if (dx * dx + dy * dy + dz * dz > radiusSq) {
 						continue;
 					}
 					cursor.set(center.getX() + dx, y, center.getZ() + dz);
+					if (!level.isLoaded(cursor)) {
+						continue;
+					}
 					Ore ore = classify(level.getBlockState(cursor));
 					if (ore != null) {
 						double distSq = eye.distanceToSqr(cursor.getX() + 0.5D, cursor.getY() + 0.5D, cursor.getZ() + 0.5D);
@@ -148,7 +178,6 @@ final class DivineSense {
 				}
 			}
 		}
-		return found;
 	}
 
 	private static @Nullable Ore classify(BlockState state) {

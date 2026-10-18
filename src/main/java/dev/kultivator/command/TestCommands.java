@@ -189,11 +189,13 @@ public final class TestCommands {
 						.then(Commands.argument("seconds", IntegerArgumentType.integer(2, 60))
 								.executes(ctx -> tour(ctx, IntegerArgumentType.getInteger(ctx, "seconds")))))
 				.then(Commands.literal("kit").executes(ctx -> kit(ctx)))
-				.then(Commands.literal("teknik").executes(ctx -> techniques(ctx)))
+				// "uji teknik" itself belongs to TechniqueTests (DESIGN 22.16.2: learns all 168), registered below
 				.then(Commands.literal("murid")
 						.then(Commands.argument("name", StringArgumentType.word()).suggests(DISCIPLE_NAMES)
 								.then(Commands.literal("maks").executes(ctx -> discipleMax(ctx)))
-								.then(Commands.literal("teknik").executes(ctx -> discipleTechniques(ctx)))
+								// DESIGN 22.16.2: every spec the disciple qualifies for, through the 6c teacher
+								.then(Commands.literal("teknik").executes(ctx -> dev.kultivator.technique.spec.run.TechniqueTests.teachDisciples(
+										self(ctx), StringArgumentType.getString(ctx, "name"))))
 								.then(Commands.literal("ranah")
 										.then(Commands.argument("realm", StringArgumentType.word()).suggests(REALMS)
 												.executes(ctx -> discipleRealm(ctx, 4, 1))
@@ -212,6 +214,8 @@ public final class TestCommands {
 												.executes(ctx -> discipleStars(ctx, IntegerArgumentType.getInteger(ctx, "n")))))));
 		// Phase 6b (DESIGN 21.22, 21.24): uji sekte ...
 		dev.kultivator.sect.build.SectBuild.addTestCommands(uji);
+		// Phase 6c (DESIGN 22.16.2): uji teknik ... and uji boneka ... (merges with the teknik literal above).
+		dev.kultivator.technique.spec.run.TechniqueTests.addTestCommands(uji);
 		root.then(uji);
 	}
 
@@ -266,8 +270,11 @@ public final class TestCommands {
 		Deviation.clear(player);
 		Progression.setRank(player, rank);
 		if (everything) {
-			for (Technique technique : Technique.values()) {
-				data.learn(technique);
+			// every player spec of DESIGN 22 (the 23 legacy ones included)
+			for (dev.kultivator.data.TechniqueSpec spec : dev.kultivator.data.TechniqueRegistry.all()) {
+				if (spec.playerVisible()) {
+					data.learn(spec.id());
+				}
 			}
 		}
 		Techniques.refreshUnlocks(player);
@@ -296,20 +303,6 @@ public final class TestCommands {
 		Rank rank = new Rank(realm, layer - 1, stage - 1);
 		prepare(player, rank, BreakthroughQuality.PERFECT, false);
 		Msg.chat(player, Component.translatable("kultivator.test.realm", rank.displayName().withColor(realm.color())));
-		return 1;
-	}
-
-	private static int techniques(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-		ServerPlayer player = self(ctx);
-		CultivationData data = Cultivators.get(player);
-		for (Technique technique : Technique.values()) {
-			data.learn(technique);
-			data.setCooldown(technique, player.level().getGameTime(), 0);
-		}
-		Techniques.refreshUnlocks(player);
-		Qi.fill(player);
-		Cultivators.syncNow(player);
-		Msg.chat(player, Component.translatable("kultivator.test.techniques"));
 		return 1;
 	}
 
@@ -433,24 +426,6 @@ public final class TestCommands {
 		for (DiscipleEntity disciple : found) {
 			prepareDisciple(disciple, Rank.ofStep(Rank.MAX_STEP), BreakthroughQuality.HEAVENLY, true);
 			Msg.chat(player, Component.translatable("kultivator.test.disciple.max", disciple.getName()).withStyle(ChatFormatting.GOLD));
-		}
-		return found.size();
-	}
-
-	private static int discipleTechniques(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-		ServerPlayer player = self(ctx);
-		List<DiscipleEntity> found = targets(ctx);
-		for (DiscipleEntity disciple : found) {
-			DiscipleData data = disciple.data();
-			for (Technique technique : Technique.values()) {
-				if (DiscipleTechniques.teachable(technique)) {
-					data.learn(technique);
-					data.setCooldown(technique, 0);
-				}
-			}
-			data.setQi(DiscipleCultivation.maxQi(data));
-			disciple.refreshSynced();
-			Msg.chat(player, Component.translatable("kultivator.test.disciple.techniques", disciple.getName()));
 		}
 		return found.size();
 	}

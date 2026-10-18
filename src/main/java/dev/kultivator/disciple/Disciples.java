@@ -205,6 +205,12 @@ public final class Disciples {
 				Technique technique = Technique.byId(text);
 				if (technique != null) {
 					DiscipleCultivation.teach(disciple, player, technique);
+				} else {
+					// every 6c spec id from the Teknik tab (DESIGN 22.13.2)
+					dev.kultivator.data.TechniqueSpec spec = dev.kultivator.data.TechniqueRegistry.byId(text);
+					if (spec != null) {
+						DiscipleCultivation.teach(disciple, player, spec);
+					}
 				}
 			}
 			case Actions.DISCIPLE_FEED -> DiscipleCultivation.feed(disciple, player, player.getMainHandItem());

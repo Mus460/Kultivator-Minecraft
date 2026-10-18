@@ -35,7 +35,8 @@ import java.util.UUID;
 
 /**
  * The ONLY code of the whole mod that changes blocks (DESIGN 0 and 20.3.21), and only for Mode Kehancuran's ordered casts
- * with all three locks open. One running job per server and at most 2 queued. Each server tick changes at most
+ * with all three locks open, and (phase 6c, DESIGN 22.11) for the player's own techniques with the one-click switch on. One
+ * running job per server and at most 7 queued, at most 2 destructive jobs per owner. Each server tick changes at most
  * {@code kehancuranBlocksPerTick} positions across all jobs with {@link #FLAGS} ({@code UPDATE_CLIENTS | UPDATE_KNOWN_SHAPE
  * | UPDATE_SUPPRESS_DROPS | UPDATE_SKIP_ON_PLACE}): no neighbour or shape updates, so no cascades, no popped torches or
  * signs, no flowing fluids and no falling blocks (gravity blocks may float until touched). A position next to a fluid or a
@@ -49,8 +50,17 @@ import java.util.UUID;
  */
 public final class WorldBreaker {
 
-	/** One running job plus two queued. */
-	public static final int MAX_JOBS = 3;
+	/** One running job plus seven queued (DESIGN 22.11.7). */
+	public static final int MAX_JOBS = 8;
+	/** Destructive jobs (self and disciple together) one owner may have running or queued. */
+	public static final int MAX_PER_OWNER = 2;
+	/** Restore buffers the server keeps at most; the oldest is released first. */
+	public static final int MAX_UNDO = 32;
+	/** Per-position modes of a self job (one job may merge several shapes). */
+	static final byte MODE_REMOVE = 0;
+	static final byte MODE_NATURAL = 1;
+	static final byte MODE_STRIP = 2;
+	static final byte MODE_WITHER = 3;
 	public static final int MAX_DROP_STACKS = 64;
 	/** Positions looked at per tick at most, as a multiple of the block budget (skipped positions are cheap but bounded). */
 	private static final int READ_FACTOR = 8;
@@ -85,6 +95,13 @@ public final class WorldBreaker {
 		final List<Long> undoPositions = new ArrayList<>();
 		final List<BlockState> undoOld = new ArrayList<>();
 		final List<BlockState> undoPlaced = new ArrayList<>();
+		/** A player's own technique (DESIGN 22.11): label {@code self:<specId>}, the caster's moving safe column. */
+		boolean self;
+		@Nullable String specId;
+		/** Where the caster stood at the cast (its safe column holds there too). */
+		@Nullable Vec3 castPos;
+		/** Per-position modes for a merged self job (null = the job flags). */
+		byte @Nullable [] modes;
 
 		Job(UUID owner, String ownerName, String disciple, String shape, ResourceKey<Level> dimension, BlockPos centre, long[] positions,
 				BlockState[] targets, BlockState[] placed, boolean restore, boolean naturalOnly, boolean wither, int dropsPct) {
@@ -103,6 +120,25 @@ public final class WorldBreaker {
 			this.dropsPct = dropsPct;
 			this.undoable = !restore && dropsPct <= 0 && KultivatorConfig.get().kehancuranUndoMinutes > 0;
 		}
+
+		/** A self job of the player's own technique (22.11.5): one merged plan with a mode per position. */
+		static Job self(ServerPlayer caster, String specId, String shape, BlockPos centre, long[] positions, byte[] modes) {
+			Job job = new Job(caster.getUUID(), caster.getName().getString(), "", shape, caster.level().dimension(), centre, positions,
+					new BlockState[positions.length], null, false, false, false, KultivatorConfig.get().kehancuranDropsPct);
+			job.self = true;
+			job.specId = specId;
+			job.castPos = caster.position();
+			job.modes = modes;
+			return job;
+		}
+
+		/** The mode of position {@code i}. */
+		byte mode(int i) {
+			if (modes != null && i < modes.length) {
+				return modes[i];
+			}
+			return wither ? MODE_WITHER : naturalOnly ? MODE_NATURAL : MODE_REMOVE;
+		}
 	}
 
 	/** What a finished cast removed, kept in memory for the restore window. */
@@ -118,6 +154,8 @@ public final class WorldBreaker {
 		final BlockState[] old;
 		final BlockState[] placed;
 		final long expiresAt;
+		final boolean self;
+		final @Nullable String specId;
 
 		Undo(int id, Job job, long expiresAt) {
 			this(id, job, job.undoPositions.stream().mapToLong(Long::longValue).toArray(), job.undoOld.toArray(new BlockState[0]),
@@ -136,6 +174,8 @@ public final class WorldBreaker {
 			this.old = old;
 			this.placed = placed;
 			this.expiresAt = expiresAt;
+			this.self = job.self;
+			this.specId = job.specId;
 		}
 	}
 
@@ -158,13 +198,122 @@ public final class WorldBreaker {
 		return JOBS.size() < MAX_JOBS;
 	}
 
-	/** Queues a cast. False when the queue is full. */
+	/** True when another destructive job of {@code owner} fits: the queue has room and the owner has fewer than 2. */
+	static boolean hasRoom(UUID owner) {
+		return hasRoom() && ownerJobs(owner) < MAX_PER_OWNER;
+	}
+
+	/** Destructive (not restore) jobs of {@code owner} running or queued. */
+	static int ownerJobs(UUID owner) {
+		int count = 0;
+		for (Job job : JOBS) {
+			if (!job.restore && job.owner.equals(owner)) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	/** Queues a cast. False when the queue is full (or, for a destructive job, its owner already has 2). */
 	static boolean submit(Job job) {
-		if (!hasRoom()) {
+		if (job.self && !job.restore && ownerJobs(job.owner) >= MAX_PER_OWNER && merge(job)) {
+			return true;
+		}
+		if (!hasRoom() || !job.restore && ownerJobs(job.owner) >= MAX_PER_OWNER) {
 			return false;
 		}
 		JOBS.addLast(job);
 		return true;
+	}
+
+	/**
+	 * A self job of the same owner, spec and dimension still waiting in the queue (not the running one) takes the new
+	 * positions, so a cast's later stages or a recast while it carves stay one job and one undo entry (22.11.5). False
+	 * when there is none or the merged plan would pass twice the per-cast block cap.
+	 */
+	private static boolean merge(Job job) {
+		Job running = JOBS.peekFirst();
+		List<Job> list = new ArrayList<>(JOBS);
+		int limit = 2 * Math.max(1, KultivatorConfig.get().kehancuranMaxBlocksPerCast);
+		for (int i = 0; i < list.size(); i++) {
+			Job queued = list.get(i);
+			if (queued == running || !queued.self || queued.restore || !queued.owner.equals(job.owner)
+					|| !java.util.Objects.equals(queued.specId, job.specId) || !queued.dimension.equals(job.dimension)) {
+				continue;
+			}
+			int total = queued.positions.length + job.positions.length;
+			if (total > limit) {
+				return false;
+			}
+			long[] positions = new long[total];
+			byte[] modes = new byte[total];
+			for (int n = 0; n < queued.positions.length; n++) {
+				positions[n] = queued.positions[n];
+				modes[n] = queued.mode(n);
+			}
+			for (int n = 0; n < job.positions.length; n++) {
+				positions[queued.positions.length + n] = job.positions[n];
+				modes[queued.positions.length + n] = job.mode(n);
+			}
+			Job merged = new Job(queued.owner, queued.ownerName, queued.disciple, queued.shape, queued.dimension, queued.centre, positions,
+					new BlockState[total], null, false, false, false, queued.dropsPct);
+			merged.self = true;
+			merged.specId = queued.specId;
+			merged.castPos = queued.castPos;
+			merged.modes = modes;
+			list.set(i, merged);
+			JOBS.clear();
+			JOBS.addAll(list);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * The player switched the self mode off (22.11.1): queued self jobs are dropped and a running one stops now (after the
+	 * batch this tick already did); what was removed stays restorable. Restores keep running. Returns how many stopped.
+	 */
+	static int cancelSelf(MinecraftServer server, UUID owner) {
+		int cancelled = 0;
+		for (Iterator<Job> it = JOBS.iterator(); it.hasNext(); ) {
+			Job job = it.next();
+			if (!job.self || job.restore || !job.owner.equals(owner)) {
+				continue;
+			}
+			it.remove();
+			cancelled++;
+			finish(server, job, true);
+		}
+		return cancelled;
+	}
+
+	/** {running, queued, self jobs} across the server (for {@code debug teknik beban}). */
+	static int[] counts() {
+		int self = 0;
+		for (Job job : JOBS) {
+			if (job.self) {
+				self++;
+			}
+		}
+		return new int[]{JOBS.isEmpty() ? 0 : 1, queued(), self};
+	}
+
+	/** {queued self jobs, 1 when a self job of this owner runs} for the Kehancuran page. */
+	static int[] selfState(UUID owner) {
+		int queued = 0;
+		boolean running = false;
+		boolean first = true;
+		for (Job job : JOBS) {
+			if (job.self && !job.restore && job.owner.equals(owner)) {
+				if (first) {
+					running = true;
+				} else {
+					queued++;
+				}
+			}
+			first = false;
+		}
+		return new int[]{queued, running ? 1 : 0};
 	}
 
 	/** Jobs waiting behind the running one. */
@@ -240,7 +389,7 @@ public final class WorldBreaker {
 		}
 		int budget = config.kehancuranBlocksPerTick;
 		int reads = budget * READ_FACTOR;
-		ProtectedZones.Context zones = job.restore ? null : new ProtectedZones.Context(level, batchBox(job, reads));
+		ProtectedZones.Context zones = job.restore ? null : zonesFor(server, level, job, batchBox(job, reads));
 		double sx = 0.0D;
 		double sy = 0.0D;
 		double sz = 0.0D;
@@ -272,10 +421,12 @@ public final class WorldBreaker {
 					continue;
 				}
 			} else {
-				if (ProtectedZones.neverTouch(level, pos, state) || job.naturalOnly && !Shapes.natural(state) || touchesUnsafe(level, pos)) {
+				byte mode = job.mode(i);
+				if (ProtectedZones.neverTouch(level, pos, state) || mode == MODE_NATURAL && !Shapes.natural(state)
+						|| mode == MODE_STRIP && !state.is(Shapes.STRIPPABLE) || touchesUnsafe(level, pos)) {
 					continue;
 				}
-				to = job.wither ? Shapes.witherInto(state) : Blocks.AIR.defaultBlockState();
+				to = mode == MODE_WITHER ? Shapes.witherInto(state) : Blocks.AIR.defaultBlockState();
 				if (to == null) {
 					continue;
 				}
@@ -315,6 +466,25 @@ public final class WorldBreaker {
 			JOBS.pollFirst();
 			finish(server, job, false);
 		}
+	}
+
+	/**
+	 * The zones of one batch: a self job exempts its caster from the player zone and protects the caster's safe column at
+	 * the cast position and where the caster stands now (re-read every batch, 22.11.6).
+	 */
+	private static ProtectedZones.Context zonesFor(MinecraftServer server, ServerLevel level, Job job, AABB box) {
+		if (!job.self) {
+			return new ProtectedZones.Context(level, box);
+		}
+		List<Vec3> columns = new ArrayList<>(2);
+		if (job.castPos != null) {
+			columns.add(job.castPos);
+		}
+		ServerPlayer caster = server.getPlayerList().getPlayer(job.owner);
+		if (caster != null && caster.level() == level) {
+			columns.add(caster.position());
+		}
+		return new ProtectedZones.Context(level, box, job.owner, columns);
 	}
 
 	/**
@@ -366,15 +536,29 @@ public final class WorldBreaker {
 	/** A job ends (done or cancelled): the record, the restore buffer and the owner's message. */
 	private static void finish(MinecraftServer server, Job job, boolean cancelled) {
 		if (job.changed > 0) {
-			KehancuranLog.record(server, job.owner, job.ownerName, job.disciple, job.shape, job.dimension, job.centre, job.changed, job.restore);
+			if (job.self) {
+				KehancuranLog.recordSelf(server, job.owner, job.ownerName, job.specId == null ? "?" : job.specId, job.shape, job.dimension, job.centre,
+						job.changed);
+			} else {
+				KehancuranLog.record(server, job.owner, job.ownerName, job.disciple, job.shape, job.dimension, job.centre, job.changed, job.restore);
+			}
 		}
 		ServerPlayer owner = server.getPlayerList().getPlayer(job.owner);
 		int minutes = KultivatorConfig.get().kehancuranUndoMinutes;
 		if (job.undoable && !job.undoPositions.isEmpty()) {
-			UNDO.add(new Undo(nextUndo++, job, server.overworld().getGameTime() + minutes * 1200L));
+			addUndo(server, new Undo(nextUndo++, job, server.overworld().getGameTime() + minutes * 1200L));
 		}
 		int left = job.restore ? rebuffer(server, job) : 0;
 		if (owner == null) {
+			return;
+		}
+		if (job.self && !job.restore) {
+			if (cancelled) {
+				Msg.chat(owner, Component.translatable("kultivator.kehancuran_diri.stopped", job.changed).withStyle(ChatFormatting.GOLD));
+			} else if (job.changed > 0) {
+				Msg.actionBar(owner, Component.translatable(job.undoable ? "kultivator.kehancuran_diri.done_undo" : "kultivator.kehancuran_diri.done",
+						job.changed, minutes).withColor(0xFF6A5A));
+			}
 			return;
 		}
 		if (job.restore) {
@@ -414,8 +598,20 @@ public final class WorldBreaker {
 			old[n] = job.targets[i];
 			placed[n] = job.placed == null ? Blocks.AIR.defaultBlockState() : job.placed[i];
 		}
-		UNDO.add(new Undo(nextUndo++, job, positions, old, placed, job.expiresAt));
+		addUndo(server, new Undo(nextUndo++, job, positions, old, placed, job.expiresAt));
 		return rest.size();
+	}
+
+	/** Keeps a restore buffer; beyond {@link #MAX_UNDO} the oldest is released with a note to its owner (22.11.7). */
+	private static void addUndo(MinecraftServer server, Undo undo) {
+		UNDO.add(undo);
+		while (UNDO.size() > MAX_UNDO) {
+			Undo oldest = UNDO.remove(0);
+			ServerPlayer owner = server.getPlayerList().getPlayer(oldest.owner);
+			if (owner != null) {
+				Msg.chat(owner, Component.translatable("kultivator.kehancuran_diri.undo_released", oldest.positions.length).withStyle(ChatFormatting.GRAY));
+			}
+		}
 	}
 
 	/** Queues the restore of every cast of {@code owner} still in its window, newest first. Returns how many. */

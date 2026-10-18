@@ -4,7 +4,7 @@
   "kultivator.test.help.ranah": "/kultivasi uji ranah <ranah> [tahap] [tingkat] — lompat ke ranah mana saja lengkap dengan tekniknya dan Qi penuh.",
   "kultivator.test.help.tur": "/kultivasi uji tur [detik] — tur semua ranah beberapa detik per ranah untuk melihat efeknya, lalu data aslimu dikembalikan (/kultivasi uji tur stop).",
   "kultivator.test.help.kit": "/kultivasi uji kit — kotak berisi semua item mod, pil tiap mutu, kitab teknik, item langka, bahan formasi dan alkimia.",
-  "kultivator.test.help.teknik": "/kultivasi uji teknik — pelajari semua teknik, hapus jeda, dan isi penuh Qi.",
+  "kultivator.test.help.teknik": "/kultivasi uji teknik [semua | <id> | pamer [detik] | bebas nyala|mati | penguasaan <id|semua> <0-4> | gerbang | kehancuran nyala|mati | audit | murid <nama|semua>] — pelajari 168 teknik, rapal satu langsung, pamerkan semuanya atau periksa registri. /kultivasi uji boneka [n] [bos] | hapus — boneka latihan.",
   "kultivator.test.help.more": "Lainnya: /kultivasi debug tribulation test · heartdemon summon · enlighten · ascension start · alchemy give · murid summon · reset",
   "kultivator.test.max": "Kamu berdiri di puncak: Dewa Abadi Tahap Puncak. Diamlah sejenak, langit akan terbuka.",
   "kultivator.test.realm": "Uji: kini kamu berada di %s.",

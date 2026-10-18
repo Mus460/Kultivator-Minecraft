@@ -18,6 +18,10 @@ import dev.kultivator.data.Rank;
 import dev.kultivator.data.Realm;
 import dev.kultivator.data.RootGrade;
 import dev.kultivator.data.Technique;
+import dev.kultivator.data.TechniqueRegistry;
+import dev.kultivator.data.TechniqueSpec;
+import dev.kultivator.data.TechniqueType;
+import dev.kultivator.technique.spec.run.Mastery;
 import dev.kultivator.data.XpSource;
 import dev.kultivator.dao.TechniqueBooks;
 import dev.kultivator.fx.Fx;
@@ -126,6 +130,10 @@ public final class DiscipleCultivation {
 			return;
 		}
 		boolean changed = false;
+		if (entity.tickCount % 1200 == 0) {
+			changed |= selfComprehendDiscipleOnly(entity, data);
+			changed |= dewaTitleOffer(entity, data);
+		}
 
 		if (data.deviating()) {
 			data.setDeviationTicks(data.deviationTicks() - 20);
@@ -397,6 +405,10 @@ public final class DiscipleCultivation {
 		if (master == null || data.learnedIds().isEmpty() || data.deviating() || data.breakingThrough() || !entity.isAlive()) {
 			return false;
 		}
+		// Phase 6c (DESIGN 22.13.3): the slotted specs by role first; the pre-6c order below stays the fallback.
+		if (trySlots(entity, master, target)) {
+			return true;
+		}
 		boolean masterHurt = master.level() == entity.level() && master.distanceToSqr(entity) <= 64.0D
 				&& master.getHealth() < master.getMaxHealth() * 0.5F;
 		boolean selfHurt = entity.getHealth() < entity.getMaxHealth() * 0.4F;
@@ -426,7 +438,8 @@ public final class DiscipleCultivation {
 	}
 
 	private static boolean tryOne(DiscipleEntity entity, Technique technique, @Nullable LivingEntity target) {
-		return entity.data().knows(technique) && DiscipleTechniques.ready(entity, technique) && DiscipleTechniques.cast(entity, technique, target);
+		// Legacy arts run through their spec (P_disciple, the disciple's mastery and scaled reads, 22.10.2).
+		return entity.data().knows(technique) && DiscipleTechniques.trySpec(entity, TechniqueRegistry.legacy(technique), target);
 	}
 
 	// ================================================================== pills
@@ -729,34 +742,53 @@ public final class DiscipleCultivation {
 		return true;
 	}
 
-	// ================================================================== teaching
+	// ================================================================== teaching (DESIGN 18, 22.13.2)
 
-	/** Qi the master pays to teach before the hooks: 20% of their max qi. */
+	/** Qi the master pays to teach before the hooks: 20% of their max qi (the pre-6c rate, shown for legacy screens). */
 	public static double teachCost(ServerPlayer master) {
 		return Qi.max(Cultivators.get(master)) * TEACH_COST;
 	}
 
-	/** Qi the master pays to teach {@code technique} to this disciple: 20% of max qi x the teachCostFactor hooks. */
+	/** Qi the master pays to teach {@code technique}: its spec's grade share of max qi x the teachCostFactor hooks. */
 	public static double teachCost(DiscipleEntity entity, ServerPlayer master, Technique technique) {
-		return teachCost(master) * DiscipleHooks.teachCostFactor(entity, master, technique);
+		return teachCost(entity, master, TechniqueRegistry.legacy(technique));
+	}
+
+	/**
+	 * Qi the master pays to teach {@code spec} (22.13.2): Kuning 10%, Misterius 15%, Bumi 20%, Langit 30%, Abadi 40%, Dewa
+	 * 50% of the master's max qi; the legacy arts keep the {@code teachCostFactor} hooks.
+	 */
+	public static double teachCost(DiscipleEntity entity, ServerPlayer master, TechniqueSpec spec) {
+		double cost = Qi.max(Cultivators.get(master)) * spec.grade().teachQiShare();
+		Technique legacy = spec.legacy();
+		return legacy == null ? cost : cost * DiscipleHooks.teachCostFactor(entity, master, legacy);
 	}
 
 	/** Why {@code technique} cannot be taught now (a {@code why.*} key), or null when it can. */
 	public static @Nullable String teachBlocker(DiscipleEntity entity, ServerPlayer master, Technique technique) {
+		return teachBlocker(entity, master, TechniqueRegistry.legacy(technique));
+	}
+
+	/**
+	 * Why {@code spec} cannot be taught now (a translation key), or null when it can (22.13.1, 22.13.2): teachable, known by
+	 * the master, new, the realm, the Dao (or {@code daoBypass}), the star gates (Y★n, Dewa {@code dewaStars}), not
+	 * breaking through, the phase-6 teach hooks (legacy arts) and the master's qi.
+	 */
+	public static @Nullable String teachBlocker(DiscipleEntity entity, ServerPlayer master, TechniqueSpec spec) {
 		DiscipleData data = entity.data();
-		if (!DiscipleTechniques.teachable(technique)) {
+		if (!spec.teachable() || "fusion_pair".equals(spec.special())) {
 			return PREFIX + "why.not_teachable";
 		}
-		if (!Cultivators.get(master).knows(technique)) {
+		if (!Cultivators.get(master).knows(spec.id())) {
 			return PREFIX + "why.master_unknown";
 		}
-		if (data.knows(technique)) {
+		if (data.knows(spec.id())) {
 			return PREFIX + "why.known";
 		}
-		if (!data.realm().atLeast(technique.minRealm())) {
+		if (!DiscipleTechniques.rankReached(data.rank(), spec.minRank())) {
 			return PREFIX + "why.realm";
 		}
-		Dao dao = technique.dao();
+		Dao dao = spec.dao();
 		boolean anyDao = dao != null && DiscipleHooks.daoBypass(data);
 		if (dao != null && data.dao() == null && !anyDao) {
 			return PREFIX + "why.no_dao";
@@ -764,45 +796,77 @@ public final class DiscipleCultivation {
 		if (dao != null && dao != data.dao() && !anyDao) {
 			return PREFIX + "why.other_dao";
 		}
+		if (!starsReached(data, spec)) {
+			return "kultivator.teknik.teach.why_stars";
+		}
 		if (data.breakingThrough()) {
 			return PREFIX + "why.busy";
 		}
-		String hook = DiscipleHooks.teachBlocker(entity, master, technique);
-		if (hook != null) {
-			return hook;
+		Technique legacy = spec.legacy();
+		if (legacy != null) {
+			String hook = DiscipleHooks.teachBlocker(entity, master, legacy);
+			if (hook != null) {
+				return hook;
+			}
 		}
-		if (Cultivators.get(master).qi() + 1.0E-6D < teachCost(entity, master, technique)) {
+		if (Cultivators.get(master).qi() + 1.0E-6D < teachCost(entity, master, spec)) {
 			return PREFIX + "why.qi";
 		}
 		return null;
 	}
 
+	/** The disciple's star tier opens {@code spec}: its own star gate and, for Dewa specs, {@code dewaStars}. */
+	public static boolean starsReached(DiscipleData data, TechniqueSpec spec) {
+		int stars = dev.kultivator.disciple.path.DisciplePaths.stars(data);
+		return stars >= spec.teachStars() && (!spec.dewa() || stars >= spec.dewaStars());
+	}
+
 	/**
-	 * The master passes {@code technique} on: they must know it, it must be teachable, the disciple's realm (and Dao for
-	 * a Dao technique) must allow it and it must be new. Costs the master 20% of their max qi. True when it was learned.
+	 * The disciple could learn {@code spec} (for {@code uji teknik murid}): teachable, the realm, the Dao (or
+	 * {@code daoBypass}) and the star gates; no master, qi or knowledge checks.
 	 */
+	public static boolean specQualifies(DiscipleData data, TechniqueSpec spec) {
+		if (!DiscipleTechniques.usable(spec) || !DiscipleTechniques.rankReached(data.rank(), spec.minRank())) {
+			return false;
+		}
+		Dao dao = spec.dao();
+		if (dao != null && dao != data.dao() && !DiscipleHooks.daoBypass(data)) {
+			return false;
+		}
+		return starsReached(data, spec);
+	}
+
+	/** The pre-6c entry ({@code Actions.DISCIPLE_TEACH} with a legacy id): teaches the technique's spec. */
 	public static boolean teach(DiscipleEntity entity, ServerPlayer master, Technique technique) {
-		String why = teachBlocker(entity, master, technique);
-		double cost = teachCost(entity, master, technique);
+		return teach(entity, master, TechniqueRegistry.legacy(technique));
+	}
+
+	/**
+	 * The master passes {@code spec} on (22.13.2): the gates of {@link #teachBlocker}, the master's qi by grade; the
+	 * disciple's mastery starts at the master's level - 1. True when it was learned.
+	 */
+	public static boolean teach(DiscipleEntity entity, ServerPlayer master, TechniqueSpec spec) {
+		String why = teachBlocker(entity, master, spec);
+		double cost = teachCost(entity, master, spec);
 		if (why == null && !Qi.trySpend(master, cost)) {
 			why = PREFIX + "why.qi";
 		}
 		Component name = name(entity);
-		MutableComponent techniqueName = technique.displayName().copy().withColor(GOLD);
+		MutableComponent techniqueName = spec.displayName().copy().withColor(GOLD);
 		if (why != null && !why.startsWith(PREFIX + "why.")) {
-			// A phase-6 module refused (DiscipleHooks.addTeachBlocker): its key gets the name and the technique.
+			// A phase-6 module refused (DiscipleHooks.addTeachBlocker) or a star gate: the key gets the name and the art.
 			Msg.chat(master, Component.translatable(why, name, techniqueName).withColor(REFUSE));
 			return false;
 		}
 		if (why != null) {
 			DiscipleData data = entity.data();
-			Dao dao = technique.dao();
+			Dao dao = spec.dao();
 			MutableComponent message = switch (why.substring(PREFIX.length())) {
 				case "why.not_teachable" -> Component.translatable(PREFIX + "teach.refuse.not_teachable", techniqueName);
 				case "why.master_unknown" -> Component.translatable(PREFIX + "teach.refuse.master_unknown", techniqueName);
 				case "why.known" -> Component.translatable(PREFIX + "teach.refuse.known", name, techniqueName);
 				case "why.realm" -> Component.translatable(PREFIX + "teach.refuse.realm", techniqueName,
-						technique.minRealm().displayName().copy().withColor(technique.minRealm().color()), name);
+						spec.minRank().displayName().withColor(spec.minRealm().color()), name);
 				case "why.no_dao" -> Component.translatable(PREFIX + "teach.refuse.no_dao", techniqueName, daoName(dao), name);
 				case "why.other_dao" -> Component.translatable(PREFIX + "teach.refuse.other_dao", techniqueName, daoName(dao), name,
 						daoName(data.dao()));
@@ -814,25 +878,349 @@ public final class DiscipleCultivation {
 			return false;
 		}
 		DiscipleData data = entity.data();
-		data.learn(technique);
+		data.learn(spec.id());
+		int masterLevel = Mastery.level(Cultivators.get(master), spec.id());
+		if (masterLevel > 1) {
+			Mastery.setDiscipleLevel(data, spec.id(), masterLevel - 1);
+		}
 		Cultivators.dirty(master);
 		if (entity.level() instanceof ServerLevel level) {
-			int color = technique.dao() == null ? TechniqueBooks.UNIVERSAL_COLOR : technique.dao().color();
+			int color = spec.dao() == null ? TechniqueBooks.UNIVERSAL_COLOR : spec.dao().color();
 			Vec3 from = master.position().add(0.0D, 1.2D, 0.0D);
 			Vec3 to = entity.position().add(0.0D, 1.2D, 0.0D);
 			if (master.level() == level) {
 				Fx.beam(level, from, to, color, 0.12F);
 			}
-			Fx.send(level, entity.position(), FxType.DAO_CHOSEN, technique.dao() == null ? -1 : technique.dao().ordinal(),
+			Fx.send(level, entity.position(), FxType.DAO_CHOSEN, spec.dao() == null ? -1 : spec.dao().ordinal(),
 					TechniqueBooks.FX_LEARNED, 0.0F);
 			sound(level, entity.position(), SoundEvents.ENCHANTMENT_TABLE_USE, 1.0F, 1.1F);
 			sound(level, entity.position(), SoundEvents.AMETHYST_BLOCK_RESONATE, 0.9F, 1.4F);
 		}
 		Msg.chat(master, Component.translatable(PREFIX + "teach.success", techniqueName, name, Msg.number(Math.ceil(cost)),
-				technique.description().copy().withColor(MUTED)).withColor(JADE));
+				spec.description().copy().withColor(MUTED)).withColor(JADE));
 		Advancements.grant(master, "disciple_taught");
-		DiscipleHooks.onTaught(entity, master, technique);
+		Technique legacy = spec.legacy();
+		if (legacy != null) {
+			DiscipleHooks.onTaught(entity, master, legacy);
+		}
+		autoSlot(entity, spec);
+		entity.refreshSynced();
 		return true;
+	}
+
+	/**
+	 * Disciple-only specs (22.13.2): a disciple self-comprehends a {@code DISCIPLE_ONLY} spec of its Dao once it meets the
+	 * spec's gates (karma_domain: Shadow, ★46). Checked once a minute. True when one was learned.
+	 */
+	private static boolean selfComprehendDiscipleOnly(DiscipleEntity entity, DiscipleData data) {
+		for (TechniqueSpec spec : TechniqueRegistry.all()) {
+			if (!spec.has(TechniqueSpec.Flag.DISCIPLE_ONLY) || data.knows(spec.id()) || spec.dao() == null || spec.dao() != data.dao()
+					|| !specQualifies(data, spec)) {
+				continue;
+			}
+			if (data.learn(spec.id())) {
+				autoSlot(entity, spec);
+				ServerPlayer master = entity.owner();
+				if (master != null) {
+					Msg.chat(master, Component.translatable("kultivator.teknik.disciple_only", name(entity), spec.displayName().copy().withColor(GOLD))
+							.withColor(JADE));
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// ================================================================== Dewa self-comprehension (22.8.8, 22.13.2)
+
+	/** {@code extra.teknik.dewaTier}: floor(stars / 9) last offered; {@code dewaPending}: the ids the master may pick from. */
+	private static final String DEWA_TIER = "dewaTier";
+	private static final String DEWA_PENDING = "dewaPending";
+
+	/**
+	 * At each new 9-star title the master picks one eligible Dewa art of the disciple's Dao (or universal) with
+	 * {@code dewaStars} ≤ stars: the list is kept and offered in chat (one click per art) and on the Teknik tab. Checked
+	 * once a minute. True when the saved state changed.
+	 */
+	private static boolean dewaTitleOffer(DiscipleEntity entity, DiscipleData data) {
+		int tier = Math.max(0, dev.kultivator.disciple.path.DisciplePaths.stars(data)) / 9;
+		int offered = data.extra().getCompoundOrEmpty(TEKNIK).getIntOr(DEWA_TIER, 0);
+		if (tier <= offered) {
+			return false;
+		}
+		CompoundTag section = data.extraSection(TEKNIK);
+		section.putInt(DEWA_TIER, tier);
+		List<TechniqueSpec> eligible = dewaEligible(data);
+		if (eligible.isEmpty()) {
+			section.remove(DEWA_PENDING);
+			return true;
+		}
+		ListTag list = new ListTag();
+		for (TechniqueSpec spec : eligible) {
+			list.add(net.minecraft.nbt.StringTag.valueOf(spec.id()));
+		}
+		section.put(DEWA_PENDING, list);
+		ServerPlayer master = entity.owner();
+		if (master != null) {
+			offerDewa(master, entity, eligible);
+		}
+		entity.refreshSynced();
+		return true;
+	}
+
+	/** Dewa arts the disciple could comprehend now: its Dao's or universal, its stars, every gate, not known yet. */
+	public static List<TechniqueSpec> dewaEligible(DiscipleData data) {
+		List<TechniqueSpec> list = new ArrayList<>();
+		for (TechniqueSpec spec : TechniqueRegistry.all()) {
+			if (spec.grade() != dev.kultivator.data.TechniqueGrade.DEWA || data.knows(spec.id()) || spec.has(TechniqueSpec.Flag.DISCIPLE_ONLY)
+					|| spec.dao() != null && spec.dao() != data.dao() || !specQualifies(data, spec)) {
+				continue;
+			}
+			list.add(spec);
+		}
+		return list;
+	}
+
+	/** The pending offer that still holds (known or no longer eligible ids drop out). */
+	public static List<String> dewaPending(DiscipleData data) {
+		List<String> ids = new ArrayList<>();
+		for (net.minecraft.nbt.Tag tag : data.extra().getCompoundOrEmpty(TEKNIK).getListOrEmpty(DEWA_PENDING)) {
+			String id = tag.asString().orElse("");
+			TechniqueSpec spec = TechniqueRegistry.byId(id);
+			if (spec != null && !data.knows(id) && specQualifies(data, spec) && (spec.dao() == null || spec.dao() == data.dao())) {
+				ids.add(id);
+			}
+		}
+		return ids;
+	}
+
+	/** The chat line with one click per art ({@code /kultivasi teknik pahamkan <disciple> <id>}). */
+	private static void offerDewa(ServerPlayer master, DiscipleEntity entity, List<TechniqueSpec> specs) {
+		MutableComponent line = Component.translatable("kultivator.teknik.dewa_offer", name(entity)).withColor(JADE);
+		for (TechniqueSpec spec : specs) {
+			String command = "/kultivasi teknik pahamkan " + entity.getUUID() + " " + spec.id();
+			MutableComponent button = Component.literal("[").append(spec.displayName()).append("]").withStyle(style -> style.withColor(GOLD)
+					.withClickEvent(new net.minecraft.network.chat.ClickEvent.RunCommand(command))
+					.withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(Component.translatable("kultivator.teknik.dewa_offer.hover",
+							spec.displayName(), spec.description()))));
+			line.append(Component.literal(" ")).append(button);
+		}
+		Msg.chat(master, line);
+		master.level().playSound(null, master.getX(), master.getY(), master.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8F, 1.3F);
+	}
+
+	/**
+	 * The master picks one offered Dewa art (chat click or the Teknik tab): every gate is checked again, then the disciple
+	 * learns it, it takes a free combat slot and the master hears it. True when learned.
+	 */
+	public static boolean chooseDewa(DiscipleEntity entity, ServerPlayer master, String id) {
+		DiscipleData data = entity.data();
+		TechniqueSpec spec = TechniqueRegistry.byId(id);
+		if (!entity.isOwnedBy(master) || spec == null || !dewaPending(data).contains(id)) {
+			Msg.actionBar(master, Component.translatable("kultivator.teknik.dewa_offer.refused", spec == null ? Component.literal(id) : spec.displayName())
+					.withColor(0xFF8A7A));
+			return false;
+		}
+		if (!data.learn(id)) {
+			return false;
+		}
+		data.extraSection(TEKNIK).remove(DEWA_PENDING);
+		autoSlot(entity, spec);
+		entity.refreshSynced();
+		Msg.chat(master, Component.translatable("kultivator.teknik.dewa_offer.learned", name(entity), spec.displayName().copy().withColor(GOLD),
+				spec.description().copy().withColor(MUTED)).withColor(JADE));
+		if (entity.level() instanceof ServerLevel level) {
+			int color = spec.dao() == null ? TechniqueBooks.UNIVERSAL_COLOR : spec.dao().color();
+			Fx.send(level, entity.position(), FxType.DAO_CHOSEN, spec.dao() == null ? -1 : spec.dao().ordinal(), TechniqueBooks.FX_LEARNED, 0.0F);
+			Fx.burst(level, entity.position().add(0.0D, 1.2D, 0.0D), color, 24, 1.2F);
+			sound(level, entity.position(), SoundEvents.ENCHANTMENT_TABLE_USE, 1.0F, 0.9F);
+			sound(level, entity.position(), SoundEvents.AMETHYST_BLOCK_RESONATE, 0.9F, 1.2F);
+		}
+		return true;
+	}
+
+	// ================================================================== combat slots (22.13.3)
+
+	/** {@code DiscipleData.extra.teknik}: {@code m} (mastery, see Mastery) and {@code slots} (combat sockets). */
+	public static final String TEKNIK = "teknik";
+
+	/** Combat sockets: 3 + floor(realm / 2) + floor(stars / 9), at most 10. */
+	public static int combatSlotCount(DiscipleData data) {
+		int stars = dev.kultivator.disciple.path.DisciplePaths.stars(data);
+		return Math.max(1, Math.min(10, 3 + data.realm().ordinal() / 2 + Math.max(0, stars) / 9));
+	}
+
+	/** The ids in the combat sockets ("" = empty), as many as {@link #combatSlotCount}. */
+	public static String[] combatSlots(DiscipleData data) {
+		String[] slots = new String[combatSlotCount(data)];
+		java.util.Arrays.fill(slots, "");
+		ListTag list = data.extra().getCompoundOrEmpty(TEKNIK).getListOrEmpty("slots");
+		for (int i = 0; i < Math.min(slots.length, list.size()); i++) {
+			slots[i] = list.get(i).asString().orElse("");
+		}
+		return slots;
+	}
+
+	private static void writeSlots(DiscipleData data, String[] slots) {
+		ListTag list = new ListTag();
+		for (String id : slots) {
+			list.add(net.minecraft.nbt.StringTag.valueOf(id == null ? "" : id));
+		}
+		data.extraSection(TEKNIK).put("slots", list);
+	}
+
+	/** Puts {@code id} ("-" empties) into socket {@code socket}; only known, teachable specs. True when changed. */
+	public static boolean setCombatSlot(DiscipleEntity entity, int socket, String id) {
+		DiscipleData data = entity.data();
+		String[] slots = combatSlots(data);
+		if (socket < 0 || socket >= slots.length) {
+			return false;
+		}
+		String value = id == null || "-".equals(id) ? "" : id.trim();
+		if (!value.isEmpty()) {
+			TechniqueSpec spec = TechniqueRegistry.byId(value);
+			if (spec == null || !data.knows(value) || !DiscipleTechniques.usable(spec)) {
+				return false;
+			}
+			for (int i = 0; i < slots.length; i++) {
+				if (i != socket && slots[i].equals(value)) {
+					slots[i] = "";
+				}
+			}
+		}
+		slots[socket] = value;
+		writeSlots(data, slots);
+		entity.refreshSynced();
+		return true;
+	}
+
+	/** A newly learned spec takes the first empty socket. */
+	private static void autoSlot(DiscipleEntity entity, TechniqueSpec spec) {
+		DiscipleData data = entity.data();
+		String[] slots = combatSlots(data);
+		for (String id : slots) {
+			if (id.equals(spec.id())) {
+				return;
+			}
+		}
+		for (int i = 0; i < slots.length; i++) {
+			if (slots[i].isEmpty()) {
+				slots[i] = spec.id();
+				writeSlots(data, slots);
+				return;
+			}
+		}
+	}
+
+	/** The specs a disciple fights with: its sockets, or (none set) an auto-pick of its known specs by role. */
+	public static List<TechniqueSpec> combatSpecs(DiscipleData data) {
+		List<TechniqueSpec> list = new ArrayList<>();
+		for (String id : combatSlots(data)) {
+			TechniqueSpec spec = TechniqueRegistry.byId(id);
+			if (spec != null && data.knows(id) && spec.type() != TechniqueType.PASIF) {
+				list.add(spec);
+			}
+		}
+		if (!list.isEmpty()) {
+			return list;
+		}
+		for (TechniqueSpec spec : data.learnedSpecs()) {
+			if (spec.type() != TechniqueType.PASIF && DiscipleTechniques.usable(spec) && list.size() < combatSlotCount(data)) {
+				list.add(spec);
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * One combat decision over the slotted specs (22.13.3): boss-kill, area, control, heal or shield, mobility, summon and
+	 * domain by their conditions, otherwise the cheapest ready attack; PAMUNGKAS only against a boss or 4+ hostiles.
+	 */
+	private static boolean trySlots(DiscipleEntity entity, ServerPlayer master, @Nullable LivingEntity target) {
+		DiscipleData data = entity.data();
+		List<TechniqueSpec> specs = combatSpecs(data);
+		if (specs.isEmpty()) {
+			return false;
+		}
+		Vec3 centre = target != null ? target.position() : entity.position();
+		List<LivingEntity> near = DiscipleTechniques.hostilesAround(entity, master, entity.position(), 24.0D, false);
+		boolean boss = false;
+		for (LivingEntity hostile : near) {
+			if (dev.kultivator.technique.spec.TechniquePower.isBoss(hostile)) {
+				boss = true;
+				break;
+			}
+		}
+		int aroundTarget = 0;
+		int attackingMaster = 0;
+		for (LivingEntity hostile : near) {
+			if (hostile.distanceToSqr(centre) <= 36.0D) {
+				aroundTarget++;
+			}
+			if (hostile instanceof net.minecraft.world.entity.Mob mob && mob.getTarget() == master) {
+				attackingMaster++;
+			}
+		}
+		boolean hurt = entity.getHealth() < entity.getMaxHealth() * 0.5F
+				|| master.level() == entity.level() && master.distanceToSqr(entity) <= 256.0D && master.getHealth() < master.getMaxHealth() * 0.5F;
+		if (!hurt) {
+			for (DiscipleEntity other : Disciples.loaded(master.getUUID())) {
+				if (other != entity && other.level() == entity.level() && other.distanceToSqr(entity) <= 256.0D
+						&& other.getHealth() < other.getMaxHealth() * 0.5F) {
+					hurt = true;
+					break;
+				}
+			}
+		}
+		double distance = target == null ? 0.0D : Math.sqrt(entity.distanceToSqr(target));
+		TechniqueSpec best = null;
+		double bestScore = 0.0D;
+		for (TechniqueSpec spec : specs) {
+			if (DiscipleTechniques.specBlocker(entity, spec) != null) {
+				continue;
+			}
+			if (spec.pamungkas() && !boss && near.size() < 4) {
+				continue;
+			}
+			double coefficient = dev.kultivator.technique.spec.run.Loadout.coefficient(spec);
+			double score = switch (spec.type()) {
+				case SERANG, PAMUNGKAS -> target == null ? 0.0D : boss ? 100.0D + coefficient * (1 + spec.grade().tier()) : 10.0D + coefficient;
+				case AREA -> target != null && aroundTarget >= 3 ? 80.0D + aroundTarget + coefficient : target == null ? 0.0D : 9.0D + coefficient;
+				case KENDALI -> attackingMaster >= 2 ? 70.0D + attackingMaster : 0.0D;
+				case PULIH, LINDUNG -> hurt ? 90.0D : 0.0D;
+				case GERAK -> target != null && distance > 10.0D && mobilityTowardTarget(spec) ? 50.0D : 0.0D;
+				case PANGGIL -> near.size() >= 2 ? 60.0D + near.size() : 0.0D;
+				case WILAYAH -> aroundTarget >= 3 ? 75.0D + aroundTarget : 0.0D;
+				default -> 0.0D;
+			};
+			if (score > 0.0D && score < 20.0D) {
+				// The cheapest ready attack wins among the plain attacks.
+				score -= Math.min(5.0D, DiscipleTechniques.specQi(data, spec) / 200.0D);
+			}
+			if (score > bestScore) {
+				bestScore = score;
+				best = spec;
+			}
+		}
+		return best != null && DiscipleTechniques.trySpec(entity, best, target);
+	}
+
+	/** GERAK specs a disciple may use: a DASH toward the target or a BLINK behind / to the target, never an AIM blink. */
+	private static boolean mobilityTowardTarget(TechniqueSpec spec) {
+		for (dev.kultivator.technique.spec.dsl.Step step : spec.timeline()) {
+			for (dev.kultivator.technique.spec.dsl.Payload.Boon boon : step.self()) {
+				if (boon instanceof dev.kultivator.technique.spec.dsl.Payload.Dash dash
+						&& dash.dir() == dev.kultivator.technique.spec.dsl.Payload.DashDir.TARGET) {
+					return true;
+				}
+				if (boon instanceof dev.kultivator.technique.spec.dsl.Payload.Blink blink
+						&& (blink.mode() == dev.kultivator.technique.spec.dsl.Payload.BlinkMode.BEHIND_TARGET
+						|| blink.mode() == dev.kultivator.technique.spec.dsl.Payload.BlinkMode.TO_TARGET)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	// ================================================================== breakthrough
@@ -972,7 +1360,8 @@ public final class DiscipleCultivation {
 	 * breakthrough_kind_key, breakthrough_chance, breakthrough_strikes, breakthrough_strike_share, next_realm,
 	 * next_layer, next_stage, can_choose_dao, dao_reason, affinity_mask (bit per Dao ordinal), owner_name, teach_cost, master_qi,
 	 * master_max_qi, teachable (list of {id, ok, reason_key, known, min_realm, dao, qi_cost, cooldown} for every
-	 * technique the master knows), techniques (list of {id, ready, cooldown_left, qi_cost} for the disciple's own),
+	 * technique the master knows), techniques (list of {id, ready, cooldown_left, qi_cost} for the disciple's own), dewa_pending
+ * (the ids of a 9-star title's Dewa offer),
 	 * pills_ready, pill_reason, pill_item, pill_cooldown, pill_cooldown_max}. Reason keys are translation keys.
 	 */
 	public static CompoundTag infoFor(DiscipleEntity entity, ServerPlayer master) {
@@ -995,6 +1384,11 @@ public final class DiscipleCultivation {
 		tag.putDouble("xp_multiplier", xpMultiplier(entity, data, XpSource.MEDITATION));
 		tag.putDouble("meditation_rate", meditationBase(entity, data) * xpMultiplier(entity, data, XpSource.MEDITATION));
 		tag.putDouble("power", DiscipleTechniques.power(data));
+		ListTag dewaOffer = new ListTag();
+		for (String id : dewaPending(data)) {
+			dewaOffer.add(net.minecraft.nbt.StringTag.valueOf(id));
+		}
+		tag.put("dewa_pending", dewaOffer);
 		tag.putFloat("health", entity.getHealth());
 		tag.putFloat("max_health", entity.getMaxHealth());
 		tag.putDouble("max_health_bonus", maxHealthBonus(data));
@@ -1046,29 +1440,59 @@ public final class DiscipleCultivation {
 		tag.putDouble("teach_cost", teachCost(master));
 		tag.putDouble("master_qi", masterData.qi());
 		tag.putDouble("master_max_qi", Qi.max(masterData));
+		// Phase 6c (DESIGN 22.13.6): the master's known specs only, compact ({id, ok, known, reason_key, qi_cost,
+		// cooldown, mastery}; defaults left out), so 168 specs stay near 8 KB.
 		ListTag teachable = new ListTag();
-		for (Technique technique : masterData.learnedTechniques()) {
+		for (TechniqueSpec spec : masterData.learnedSpecs()) {
+			if (!spec.playerVisible() || "fusion_pair".equals(spec.special())) {
+				continue;
+			}
 			CompoundTag entry = new CompoundTag();
-			String teachWhy = teachBlocker(entity, master, technique);
-			entry.putString("id", technique.id());
-			entry.putBoolean("ok", teachWhy == null);
-			entry.putString("reason_key", teachWhy == null ? "" : teachWhy);
-			entry.putBoolean("known", data.knows(technique));
-			entry.putInt("min_realm", technique.minRealm().ordinal());
-			entry.putInt("dao", technique.dao() == null ? -1 : technique.dao().ordinal());
-			entry.putDouble("qi_cost", DiscipleTechniques.qiCost(technique));
-			entry.putInt("cooldown", technique.cooldownTicks());
-			entry.putDouble("teach_cost", teachCost(entity, master, technique));
+			String teachWhy = data.knows(spec.id()) ? null : teachBlocker(entity, master, spec);
+			entry.putString("id", spec.id());
+			if (teachWhy == null && !data.knows(spec.id())) {
+				entry.putBoolean("ok", true);
+			}
+			if (teachWhy != null) {
+				entry.putString("reason_key", teachWhy);
+			}
+			if (data.knows(spec.id())) {
+				entry.putBoolean("known", true);
+				int level = Mastery.level(data, spec.id());
+				if (level > 0) {
+					entry.putInt("mastery", level);
+				}
+			}
+			if (!data.knows(spec.id())) {
+				// the master's qi for teaching this spec (grade share, 22.13.2)
+				entry.putInt("teach_cost", (int) Math.ceil(teachCost(entity, master, spec)));
+			}
+			entry.putInt("qi_cost", (int) Math.ceil(DiscipleTechniques.specQi(data, spec)));
+			entry.putInt("cooldown", dev.kultivator.technique.spec.TechniquePower.cooldownTicks(spec, data, Mastery.level(data, spec.id())));
 			teachable.add(entry);
 		}
 		tag.put("teachable", teachable);
+		ListTag learned = new ListTag();
+		for (String id : data.learnedIds()) {
+			learned.add(net.minecraft.nbt.StringTag.valueOf(id));
+		}
+		tag.put("learned", learned);
+		ListTag sockets = new ListTag();
+		for (String id : combatSlots(data)) {
+			sockets.add(net.minecraft.nbt.StringTag.valueOf(id));
+		}
+		tag.put("teknik_slots", sockets);
 		ListTag own = new ListTag();
-		for (Technique technique : data.learnedTechniques()) {
+		for (TechniqueSpec spec : data.learnedSpecs()) {
 			CompoundTag entry = new CompoundTag();
-			entry.putString("id", technique.id());
-			entry.putBoolean("ready", DiscipleTechniques.ready(entity, technique));
-			entry.putInt("cooldown_left", data.cooldownLeft(technique));
-			entry.putDouble("qi_cost", DiscipleTechniques.qiCost(technique));
+			entry.putString("id", spec.id());
+			if (DiscipleTechniques.specBlocker(entity, spec) == null) {
+				entry.putBoolean("ready", true);
+			}
+			int left = data.cooldownLeft(spec.id());
+			if (left > 0) {
+				entry.putInt("cooldown_left", left);
+			}
 			own.add(entry);
 		}
 		tag.put("techniques", own);

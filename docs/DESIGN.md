@@ -5569,6 +5569,7 @@ legacy (arena, trial mobs):  D_legacy = (4 + 2.5 realm + 0.5 stage) × C ;  U_le
 
 - R rises at every one of the 65 ranks. A breakthrough multiplies it by 1.25–1.27; the step from Kenaikan Abadi Tahap 9 to Dewa Abadi multiplies it by 1.66.
 - `Techniques.power` returns `P_player`. `DiscipleTechniques.power` returns `P_disciple`, which puts disciple ultimates, Jurus Pemusnah, Kunpeng and rival skills on the curve too, with the arena and trial-mob rules.
+  - **6c implementation note (deliberate deviation).** Disciple *spec* casts read `P_disciple` (`TechniquePower.power(DiscipleData)` in `DiscipleCaster`). `DiscipleTechniques.power` itself still returns `U_legacy`, because `PowerCore.hurt` and the legacy `DiscipleTechniques.hurt` path pass `DamageContext.legacy` amounts unchanged (no boss cap, trial-mob rule or arena ratio). It switches to `P_disciple` only together with those two choke points building HIT contexts (coef = amount / P_disciple, one ledger per cast), so disciple powers never deal curve damage without the caps.
 
 #### 22.5.2 Example numbers per rank
 

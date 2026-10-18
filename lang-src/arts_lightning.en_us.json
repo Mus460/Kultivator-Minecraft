@@ -1,0 +1,76 @@
+{
+  "kultivator.technique.zidian_whip": "Zidian Purple Lightning Whip",
+  "kultivator.technique.zidian_whip.desc": "A purple lightning whip lashes the locked foe and leaps to 1→4 more (reach 10→24, each leap weaker): 1.2× power and a 1.5 s stun; the first lash pulls the target 4 blocks.",
+  "kultivator.technique.zidian_whip.source": "Source: Mo Dao Zu Shi · 紫电 Zidian, Yu Ziyuan's ring that becomes a purple-lightning whip, inherited by Jiang Cheng",
+  "kultivator.technique.zidian_whip.lore": "The ring on your finger hisses; one flick, and purple lightning answers.",
+
+  "kultivator.technique.lightning_flash_step": "Three Thousand Lightning Movement: Lightning Flash",
+  "kultivator.technique.lightning_flash_step.desc": "2 charges (4 s each): flash 8→16 blocks; foes on the path take 0.8× power and a 0.5 s stun. From Deity Transformation the afterimage left behind bursts (radius 3, 1× power).",
+  "kultivator.technique.lightning_flash_step.source": "Source: Battle Through the Heavens ch. 394/509 · the Di-class agility technique Three Thousand Lightning Movement, 1st stage \"Lightning Flash\"",
+  "kultivator.technique.lightning_flash_step.lore": "Your step makes no sound; all that remains is a scorched smell and a violet afterimage.",
+
+  "kultivator.technique.lightning_mark_armor": "Lightning Mark, Armor and Wings",
+  "kultivator.technique.lightning_mark_armor.desc": "For 30 s: techniques +15% damage and Speed I. Melee hits arc chain lightning to 1→4 foes (0.5× power); melee attackers are shocked for 0.4× power. From Deity Transformation lightning wings grow (slow falling).",
+  "kultivator.technique.lightning_mark_armor.source": "Source: Martial God Asura ch. 1210/1667/3254 · Chu Feng's Lightning Mark, Lightning Armor and Lightning Wings",
+  "kultivator.technique.lightning_mark_armor.lore": "Lightning is no longer something you call; it wears you.",
+
+  "kultivator.technique.three_thunder_styles": "Three Thunder Styles",
+  "kultivator.technique.three_thunder_styles.desc": "Three stages, recast within 4 s: (1) dash 6 blocks, 1.2× power on the path; (2) an 8→14-block cone, 1.5× power + 1 s stun; (3) a thunderclap at the aim (radius 4→8), 2.5× power and a launch. Qi 25/30/45.",
+  "kultivator.technique.three_thunder_styles.source": "Source: Martial God Asura ch. 5 · Three Thunder Styles of the Azure Dragon School's founder: \"fast as lightning, strong as thunder\"",
+  "kultivator.technique.three_thunder_styles.lore": "The first style closes in, the second pins, the third ends it.",
+
+  "kultivator.technique.five_thunder_method": "Five Thunder Method",
+  "kultivator.technique.five_thunder_method.desc": "Strike the 令 token up to four times (6 s window): (1) wind pushes (radius 6→12); (2) clouds blind for 3 s; (3) thunder, 5→12 bolts (radius 12→20), 1.5× power + 1 s stun; (4) rain soaks foes for 15 s and puts out your fire. Particles only; the weather never changes.",
+  "kultivator.technique.five_thunder_method.source": "Source: Journey to the West ch. 45 · the Tiger Strength Immortal strikes his token once for wind, twice for clouds, three times for thunder and lightning, four times for rain; Lord Deng calls it a true 五雷法",
+  "kultivator.technique.five_thunder_method.lore": "One token, four knocks, and the sky keeps to the order.",
+
+  "kultivator.technique.lightning_emperor_art": "Lightning Emperor Precious Technique",
+  "kultivator.technique.lightning_emperor_art.desc": "A hand of lightning points from the sky: a piercing 40→64-block beam, 3× power, marking foes (+30% Lightning damage for 10 s). From Immortal Ascension each foe hit calls 5 small bolts (1× power).",
+  "kultivator.technique.lightning_emperor_art.source": "Source: Perfect World ch. 1405 · Lightning Emperor Precious Technique (the finger image and the split are game design)",
+  "kultivator.technique.lightning_emperor_art.lore": "The emperor need not raise a hand; pointing is enough.",
+
+  "kultivator.technique.golden_light_formation": "Golden Light Formation",
+  "kultivator.technique.golden_light_formation.desc": "A ring of mirrors at the aim (radius 10→18, 8 s, 7→21 emitters): every second golden light strikes up to 8→16 foes inside, 0.9× power (undead ×1.5) and 2 s of blindness.",
+  "kultivator.technique.golden_light_formation.source": "Source: Investiture of the Gods ch. 44/46 · 金光陣 of Jin Guang Shengmu: 21 poles with mirrors; thunder shakes them and golden light fires",
+  "kultivator.technique.golden_light_formation.lore": "Whoever looks into those mirrors sees light, and then nothing at all.",
+
+  "kultivator.technique.extinction_thundercloud": "Purple Cloud Art: Extinction Thundercloud",
+  "kultivator.technique.extinction_thundercloud.desc": "A purple thundercloud covers the aim (radius 16→32, 10 s): 40 bolts, each 1.5× power + 0.5 s stun; at the end every foe beneath takes 4× power.",
+  "kultivator.technique.extinction_thundercloud.source": "Source: Against the Gods · 紫云功 Purple Cloud Art, 8th realm 寂灭雷云 Extinction Thundercloud",
+  "kultivator.technique.extinction_thundercloud.lore": "That cloud brings no rain. It brings an ending.",
+
+  "kultivator.technique.divine_sword_imperial_thunder": "Divine Sword Imperial Thunder Art",
+  "kultivator.technique.divine_sword_imperial_thunder.desc": "Charge 1.5 s (cast again = release early): sky lightning falls into your sword and fires 32→64 blocks, 5× power (×0.7 without a sword in hand); from its end lightning chains to 6 foes, 2× power.",
+  "kultivator.technique.divine_sword_imperial_thunder.source": "Source: Jade Dynasty (Zhu Xian) · 神剑御雷真诀 Divine Sword Imperial Thunder Art, the Qingyun Sect's signature spell",
+  "kultivator.technique.divine_sword_imperial_thunder.lore": "Raise your sword to the sky, and the sky answers through the blade.",
+
+  "kultivator.technique.lei_zhenzi_wings": "Lei Zhenzi's Wind-Thunder Wings",
+  "kultivator.technique.lei_zhenzi_wings.desc": "A 20 s form: wind-thunder wings give real flight (3 qi/s), the golden staff gives +50% attack and +2 reach; melee hits burst with lightning (radius 3, 1.5× power). Cast again: dive 16 blocks, 2× power along the path.",
+  "kultivator.technique.lei_zhenzi_wings.source": "Source: Investiture of the Gods ch. 21 · Lei Zhenzi eats two red apricots, grows wings marked \"wind\" and \"thunder\", and receives a golden staff from Yunzhongzi",
+  "kultivator.technique.lei_zhenzi_wings.lore": "Two apricots, two wings, and the sky is no longer a limit.",
+  "kultivator.technique.lei_zhenzi_wings.player_only": "Only a player can grow Lei Zhenzi's wings.",
+  "kultivator.technique.lei_zhenzi_wings.riding": "Dismount before growing the wings.",
+  "kultivator.technique.lei_zhenzi_wings.busy": "Another flight art is already carrying you.",
+  "kultivator.technique.lei_zhenzi_wings.unavailable": "The wings cannot fly here right now.",
+  "kultivator.technique.lei_zhenzi_wings.no_qi": "Out of qi: Lei Zhenzi's wings fade.",
+
+  "kultivator.technique.tribulation_thunder_sword": "Heavenly Tribulation Thunder Sword",
+  "kultivator.technique.tribulation_thunder_sword.desc": "Charge 2 s: a 60-block thunder sword falls from the sky and sweeps along the aim (48→64 blocks), 6× power, +1% per tribulation strike you ever survived (up to +100%); 5 lightning pillars strike foes near the aim, 2× power.",
+  "kultivator.technique.tribulation_thunder_sword.source": "Source: Against the Gods · 天劫雷剑 Heavenly Tribulation Thunder Sword, part of Yun Che's Heavenly Dao Divine Power (天道神力)",
+  "kultivator.technique.tribulation_thunder_sword.lore": "Every strike that once nearly killed you is now your blade.",
+
+  "kultivator.technique.thunderbolt_ancestral_symbol": "Thunderbolt Ancestral Symbol",
+  "kultivator.technique.thunderbolt_ancestral_symbol.desc": "A domain that follows you (radius 24→32, 15 s): every 0.5 s a random foe is struck (1.5× power), every 3 s a lightning burst (radius 12, 2× power); Lightning cooldowns recover twice as fast.",
+  "kultivator.technique.thunderbolt_ancestral_symbol.source": "Source: Martial Universe ch. 969/982/1033 · Thunderbolt Ancestral Symbol, one of the eight Ancestral Symbols (the sun image is visual flavour only)",
+  "kultivator.technique.thunderbolt_ancestral_symbol.lore": "The violet orb above your head is never still, and never misses.",
+
+  "kultivator.technique.tribulation_thunder_emperor_array": "Heavenly Tribulation Thunder Emperor Array",
+  "kultivator.technique.tribulation_thunder_emperor_array.desc": "A vast array at the aim (radius 24→32, 10 s): nine tribulation strikes hit up to 32 foes, each 2× power + 8% of max health (bosses 3%); the 9th strike is doubled. Qi 55% (min 700).",
+  "kultivator.technique.tribulation_thunder_emperor_array.source": "Source: Against the Gods · 天劫雷帝阵 Heavenly Tribulation Thunder Emperor Array, part of the Heavenly Dao Divine Power (the strikes as a share of max health are game design)",
+  "kultivator.technique.tribulation_thunder_emperor_array.lore": "You once endured the heavens' tribulation. Now you are the one who sends it.",
+
+  "kultivator.technique.nine_heavens_thunder_venerable": "Nine Heavens Thunder Venerable",
+  "kultivator.technique.nine_heavens_thunder_venerable.desc": "A 20 s form (×1.5 when there is room) with 12 thunder deities in the clouds (attacking every 0.5 s, range 24→40, 2× power); every 4 s a radius-40 burst, 4× power + 2 s stun; at the end up to 64 foes within 40 take 8× power. Qi 75%.",
+  "kultivator.technique.nine_heavens_thunder_venerable.source": "Source: Investiture of the Gods ch. 99 · Wen Zhong is invested as 九天應元雷聲普化天尊, leading the 24 deities of the Thunder Department",
+  "kultivator.technique.nine_heavens_thunder_venerable.lore": "The third eye opens, and twenty-four thunder deities await your word."
+}

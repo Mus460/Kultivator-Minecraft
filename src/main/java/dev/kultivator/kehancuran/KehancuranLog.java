@@ -191,6 +191,49 @@ public final class KehancuranLog extends SavedData {
 		data.setDirty();
 	}
 
+	/**
+	 * Writes one finished self cast (DESIGN 22.11.7): the server log line
+	 * {@code [Kultivator] Kehancuran: <player> self:<spec> <dim> x y z -> N blocks}, the Catatan tablet and the global log
+	 * (with {@code self} and {@code spec}, so the Kitab Teknik's Kehancuran page can list it).
+	 */
+	static void recordSelf(MinecraftServer server, UUID owner, String ownerName, String specId, String shape, ResourceKey<Level> dim, BlockPos pos,
+			int blocks) {
+		String dimension = dim.identifier().toString();
+		Kultivator.LOGGER.info("[Kultivator] Kehancuran: {} self:{} {} {} {} {} -> {} blocks", ownerName, specId, dimension, pos.getX(), pos.getY(),
+				pos.getZ(), blocks);
+		long day = server.overworld().getOverworldClockTime() / 24000L;
+		CompoundTag line = new CompoundTag();
+		line.putString("owner", owner.toString());
+		line.putString("disciple", ownerName);
+		line.putString("shape", shape);
+		line.putBoolean("self", true);
+		line.putString("spec", specId);
+		line.putString("dim", dimension);
+		line.putInt("x", pos.getX());
+		line.putInt("y", pos.getY());
+		line.putInt("z", pos.getZ());
+		line.putInt("blocks", blocks);
+		line.putBoolean("restore", false);
+		line.putLong("day", day);
+		dev.kultivator.data.TechniqueSpec spec = dev.kultivator.data.TechniqueRegistry.byId(specId);
+		Halls.log(owner, Component.translatable("kultivator.kehancuran_diri.log.cast", spec == null ? Component.literal(specId) : spec.displayName(),
+				pos.getX(), pos.getY(), pos.getZ(), blocks));
+		CompoundTag section = Halls.section(owner, "kehancuran");
+		ListTag hallLog = section.getListOrEmpty("log").copy();
+		hallLog.add(line.copy());
+		while (hallLog.size() > MAX_HALL_LOG) {
+			hallLog.remove(0);
+		}
+		section.put("log", hallLog);
+		Halls.setDirty();
+		KehancuranLog data = get(server);
+		data.log.add(line);
+		while (data.log.size() > MAX_GLOBAL_LOG) {
+			data.log.remove(0);
+		}
+		data.setDirty();
+	}
+
 	/** The owner's last {@code max} records, newest first. */
 	static List<CompoundTag> recent(MinecraftServer server, UUID owner, int max) {
 		List<CompoundTag> list = new ArrayList<>();

@@ -62,6 +62,10 @@ public final class Actions {
 	/** Pembangunan Sekte: templates, preview, confirm, deposits, missions, builders ({@code sect.build.SectBuild.handleAction}). */
 	public static final int SECT_BUILD = 35;
 
+	// Phase 6c (DESIGN 22.12.10): text = "slot:<0-11>:<id|->", "autofill", "clear", "test:<id>" (op + creative).
+	/** The Kitab Teknik and the Cincin Segel ({@code technique.spec.run.Codex.handleAction}). */
+	public static final int TECHNIQUE = 36;
+
 	private Actions() {
 	}
 }

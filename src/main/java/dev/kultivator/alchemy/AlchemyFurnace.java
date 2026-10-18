@@ -358,6 +358,8 @@ public final class AlchemyFurnace {
 			data.addPillRefined();
 		}
 		Cultivators.dirty(owner);
+		// ALCHEMY_COUNT feats (DESIGN 22.8.9): one successful refinement.
+		dev.kultivator.technique.spec.run.FeatTracker.onAlchemy(owner);
 		MutableComponent shownQuality = pill ? quality.displayName() : Component.translatable("kultivator.alchemy.quality.na");
 		Msg.chat(owner, Component.translatable("kultivator.alchemy.refine.success", count, name, shownQuality, Msg.number(xp))
 				.withColor(recipe.color()));

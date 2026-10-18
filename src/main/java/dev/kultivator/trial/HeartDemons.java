@@ -600,6 +600,8 @@ public final class HeartDemons {
 		fxLevel.playSound(null, heart.x, heart.y, heart.z, SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 1.0F, 0.9F);
 
 		data.addHeartDemonDefeated();
+		// HEART_DEMON_WIN feats (DESIGN 22.8.9), read at the rank the demon was beaten at.
+		dev.kultivator.technique.spec.run.FeatTracker.onHeartDemonWin(player);
 		data.setHeartDemonPressure(0.0D);
 		// "Hati Dao Teguh": +0.1 on the next breakthrough's quality score (the setter keeps it within its cap).
 		data.setNextBreakthroughBonus(data.nextBreakthroughBonus() + 0.1D);

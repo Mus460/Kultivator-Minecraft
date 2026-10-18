@@ -1,0 +1,56 @@
+{
+  "kultivator.technique.shadow_devil_fusion": "Penyatuan Roh Iblis Bayangan",
+  "kultivator.technique.shadow_devil_fusion.desc": "Bayanganmu terlepas dan mengintai. Kamu tak terlihat selama 400→600 tick; setiap monster dalam 32 blok (maks. 32) kehilangan jejakmu, menerima ×2 dari pukulanmu berikutnya, dan disorot hanya untukmu selama 400 tick.",
+  "kultivator.technique.shadow_devil_fusion.source": "Sumber: Tales of Demons and Gods bab 40–56 · roh iblis Shadow Devil (Iblis Bayangan) milik Nie Li, pengintai yang menyembunyikan jejak; menyatu dengannya butuh peringkat Perak",
+  "kultivator.technique.shadow_devil_fusion.lore": "Bayangan di kakimu membuka satu mata ungu, lalu lenyap.",
+
+  "kultivator.technique.samadhi_wind": "Angin Ilahi Samadhi",
+  "kultivator.technique.samadhi_wind.desc": "Salurkan angin pasir kuning selama 3 detik: kerucut 14→24 blok memberi 0,3×P tiap setengah detik, membutakan 120 tick, memperlambat (Lambat II, 60 tick) dan mendorong monster mundur.",
+  "kultivator.technique.samadhi_wind.source": "Sumber: Journey to the West bab 21 · 三昧神风 Angin Ilahi Samadhi milik Raja Agung Angin Kuning, yang membutakan Sun Wukong sampai Bodhisattva Lingji menaklukkannya",
+  "kultivator.technique.samadhi_wind.lore": "Bahkan mata emas berapi pun berair di angin ini.",
+
+  "kultivator.technique.star_god_broken_shadow": "Bayang Pecah Dewa Bintang",
+  "kultivator.technique.star_god_broken_shadow.desc": "Tahap 1: berkedip dari monster ke monster 5→10 kali dalam 20 blok, menebas masing-masing 1,8×P; setiap bayangan sisa meledak 0,6×P. Tahap 2 (dalam 2 detik): berkedip kembali ke titik awal.",
+  "kultivator.technique.star_god_broken_shadow.source": "Sumber: Against the Gods · 星神碎影 Bayang Pecah Dewa Bintang, seni gerak ilahi Alam Dewa Bintang yang dipakai Jasmine, yang memecah penggunanya menjadi bayangan sisa",
+  "kultivator.technique.star_god_broken_shadow.lore": "Cahaya bintang pecah, dan setiap kepingnya adalah dirimu.",
+
+  "kultivator.technique.wraith_butterflies": "Kupu-kupu Arwah Perak",
+  "kultivator.technique.wraith_butterflies.desc": "Kawanan kupu-kupu perak menyelimuti 8→20 monster dalam 24 blok dengan kerusakan jiwa 0,35×P per detik selama 10 detik; dua belas di antaranya mengitarimu 10 detik dan menelan hingga 12 proyektil yang datang.",
+  "kultivator.technique.wraith_butterflies.source": "Sumber: Heaven Official's Blessing · kupu-kupu arwah perak (死灵蝶) milik Hua Cheng, pertanda kehadirannya yang mengerumuni musuh-musuhnya",
+  "kultivator.technique.wraith_butterflies.lore": "Di mana sayap perak berkumpul, seorang raja hantu tak pernah jauh.",
+
+  "kultivator.technique.banana_leaf_fan": "Kipas Daun Pisang",
+  "kultivator.technique.banana_leaf_fan.desc": "Tahap 1: satu kibasan mengirim dinding angin sepanjang 32→64 blok dan selebar 8→24: 2,2×P dan dorongan sangat kuat. Tahap 2 (dalam 3 detik): kibasan balik menarik monster dalam kerucut 24 blok ke arahmu, 1×P.",
+  "kultivator.technique.banana_leaf_fan.source": "Sumber: Journey to the West bab 59–61 · kipas daun pisang Putri Kipas Besi meniup Sun Wukong puluhan ribu li jauhnya; Pil Penenang Angin dari Lingji membuatnya sanggup bertahan",
+  "kultivator.technique.banana_leaf_fan.lore": "Sekali daun dikibaskan, musuh entah sudah di balik cakrawala mana.",
+
+  "kultivator.technique.wind_roaring_formation": "Formasi Angin Menderu",
+  "kultivator.technique.wind_roaring_formation.desc": "Mendirikan formasi topan berjari-jari 14→28 di titik bidikan selama 15 detik: 0,3×P dan api tiap setengah detik; tiap 2 detik monster diputar, diangkat dan dibutakan. Saat berakhir, sepuluh ribu bilah menebas semua di dalamnya 3×P.",
+  "kultivator.technique.wind_roaring_formation.source": "Sumber: Investiture of the Gods bab 44/46 · 風吼陣 milik Dong Tianjun, salah satu dari Sepuluh Formasi Mutlak: angin dan api dengan sepuluh ribu bilah; Cihang mematahkannya dengan Mutiara Penahan Angin",
+  "kultivator.technique.wind_roaring_formation.lore": "Empat panji berkibar sekali, dan angin mulai membawa pisau.",
+
+  "kultivator.technique.soul_falling_formation": "Formasi Jiwa Jatuh",
+  "kultivator.technique.soul_falling_formation.desc": "Formasi panji putih berjari-jari 16→28 selama 12 detik: tiap 2 detik kerusakan jiwa 0,5×P per detik selama 4 detik dan peluang 25% melumpuhkan 30 tick. Saat berakhir, setiap monster di dalam dengan darah di bawah 15% (bos 5%) dieksekusi.",
+  "kultivator.technique.soul_falling_formation.source": "Sumber: Investiture of the Gods bab 44/48 · 落魂陣 milik Yao Bin (姚斌): panji kertas putih bersegel jimat, \"白旛展动，魄消魂散\", ditambah ritual jiwa dengan boneka jerami",
+  "kultivator.technique.soul_falling_formation.lore": "Panji kertas bergoyang, dan jiwa lupa jalan pulang ke raganya.",
+
+  "kultivator.technique.billion_soul_flag": "Panji Semiliar Jiwa",
+  "kultivator.technique.billion_soul_flag.desc": "Menancapkan panji jiwa dengan medan berjari-jari 20→32 selama 20 detik: 0,5×P tembus zirah tiap detik; setiap pembunuhan memberinya makan (+3%, maks. 50 tumpukan). Saat berakhir, jiwa-jiwa meledak 4×P ditambah 0,15×P per tumpukan.",
+  "kultivator.technique.billion_soul_flag.source": "Sumber: Renegade Immortal · panji semiliar jiwa milik Sekte Pemurni Jiwa, dengan jiwa 12 leluhur tahap Transformasi Jiwa tersegel di dalamnya",
+  "kultivator.technique.billion_soul_flag.lore": "Setiap jeritan di angin adalah satu jiwa lagi untuk panji itu.",
+
+  "kultivator.technique.stygian_tiger_seal": "Segel Harimau Alam Baka",
+  "kultivator.technique.stygian_tiger_seal.desc": "Terlarang: membayar 10% darahmu saat ini (tak pernah di bawah 1). Membangkitkan 8 mayat ganas selama 25 detik yang menyerang tiap detik 1,5×P; tiap 5 detik gelombang teror melemahkan dan memperlambat monster dalam 24 blok.",
+  "kultivator.technique.stygian_tiger_seal.source": "Sumber: Mo Dao Zu Shi · 阴虎符 Segel Harimau Alam Baka, yang ditempa Wei Wuxian dari pedang besi di gua Kura-kura Pembantaian dan dipakai untuk memerintah mayat ganas dengan serulingnya, Chenqing",
+  "kultivator.technique.stygian_tiger_seal.lore": "Satu nada seruling dalam gelap, dan yang mati menjawabnya.",
+
+  "kultivator.technique.kunpeng_art": "Teknik Pusaka Kunpeng",
+  "kultivator.technique.kunpeng_art.desc": "Setelah mengisi 1 detik, bulan sabit angin Kun melesat 128 blok menembus segalanya (lebar 12→24): 16×P dan dorongan, sementara kamu melesat 32 blok di belakangnya. Di ujungnya, gelombang cincin 8→24 memberi 6×P.",
+  "kultivator.technique.kunpeng_art.source": "Sumber: Perfect World bab 347 dst. · teknik pusaka Kun Peng milik Shi Hao (鲲鹏宝术); bulan sabit angin sepanjang 128 blok adalah desain permainan",
+  "kultivator.technique.kunpeng_art.lore": "Di kegelapan utara ada seekor ikan; saat ia naik, langit terbelah dua.",
+
+  "kultivator.technique.karma_domain": "Wilayah Karma",
+  "kultivator.technique.karma_domain.desc": "Khusus murid (bintang 46). Wilayah berjari-jari 16→32 selama 20 detik mengikat setiap monster di dalamnya: kerusakan pada satu monster menjalar 40% ke yang lain (bos 25%). Guru, murid dan hewan peliharaan di dalam memantulkan serangan monster.",
+  "kultivator.technique.karma_domain.source": "Sumber: Renegade Immortal · wilayah Karma milik Wang Lin",
+  "kultivator.technique.karma_domain.lore": "Setiap pukulan kembali menyusuri benang merah tempat ia datang."
+}

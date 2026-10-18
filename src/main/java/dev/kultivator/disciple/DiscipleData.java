@@ -8,6 +8,8 @@ import dev.kultivator.data.Rank;
 import dev.kultivator.data.Realm;
 import dev.kultivator.data.RootGrade;
 import dev.kultivator.data.Technique;
+import dev.kultivator.data.TechniqueRegistry;
+import dev.kultivator.data.TechniqueSpec;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -228,18 +230,48 @@ public final class DiscipleData {
 
 	// ================================================================== techniques
 
+	// Technique ids are strings (DESIGN 22.2.4): every id of the form [a-z0-9_]{1,48} is kept (up to 512), also ids whose
+	// spec does not exist (any more); the enum overloads delegate to the string ones.
+
 	public boolean knows(Technique technique) {
-		return learned.contains(technique.id());
+		return knows(technique.id());
+	}
+
+	public boolean knows(String id) {
+		return learned.contains(id);
 	}
 
 	/** True when it was new. */
 	public boolean learn(Technique technique) {
-		return learned.add(technique.id());
+		return learn(technique.id());
+	}
+
+	/** True when it was new; malformed ids and ids beyond the 512 limit are refused. */
+	public boolean learn(String id) {
+		if (!TechniqueRegistry.savedIdOk(id) || learned.size() >= TechniqueRegistry.MAX_SAVED_IDS && !learned.contains(id)) {
+			return false;
+		}
+		return learned.add(id);
 	}
 
 	public void forget(Technique technique) {
-		learned.remove(technique.id());
-		cooldowns.remove(technique.id());
+		forget(technique.id());
+	}
+
+	public void forget(String id) {
+		learned.remove(id);
+		cooldowns.remove(id);
+	}
+
+	/** The known specs in catalogue order; ids without a spec are skipped (they stay saved). */
+	public List<TechniqueSpec> learnedSpecs() {
+		List<TechniqueSpec> list = new ArrayList<>();
+		for (TechniqueSpec spec : TechniqueRegistry.all()) {
+			if (learned.contains(spec.id())) {
+				list.add(spec);
+			}
+		}
+		return list;
 	}
 
 	public void clearTechniques() {
@@ -265,14 +297,23 @@ public final class DiscipleData {
 
 	/** Ticks until the technique is ready, 0 when ready. */
 	public int cooldownLeft(Technique technique) {
-		return Math.max(0, cooldowns.getOrDefault(technique.id(), 0));
+		return cooldownLeft(technique.id());
+	}
+
+	/** Ticks until the spec {@code id} is ready, 0 when ready. */
+	public int cooldownLeft(String id) {
+		return Math.max(0, cooldowns.getOrDefault(id, 0));
 	}
 
 	public void setCooldown(Technique technique, int ticks) {
+		setCooldown(technique.id(), ticks);
+	}
+
+	public void setCooldown(String id, int ticks) {
 		if (ticks <= 0) {
-			cooldowns.remove(technique.id());
-		} else {
-			cooldowns.put(technique.id(), ticks);
+			cooldowns.remove(id);
+		} else if (TechniqueRegistry.savedIdOk(id) && (cooldowns.containsKey(id) || cooldowns.size() < TechniqueRegistry.MAX_SAVED_IDS)) {
+			cooldowns.put(id, ticks);
 		}
 	}
 
@@ -538,9 +579,10 @@ public final class DiscipleData {
 		data.setDao(Dao.byOrdinal(tag.getIntOr("dao", -1)));
 		data.setComprehension(tag.getDoubleOr("comprehension", 0.0D));
 
+		// DESIGN 22.2.4: every well-formed id is kept (up to 512), whether or not its spec exists in this version.
 		for (Tag entry : tag.getListOrEmpty("learned")) {
 			entry.asString().ifPresent(id -> {
-				if (Technique.byId(id) != null) {
+				if (TechniqueRegistry.savedIdOk(id) && data.learned.size() < TechniqueRegistry.MAX_SAVED_IDS) {
 					data.learned.add(id);
 				}
 			});
@@ -548,7 +590,7 @@ public final class DiscipleData {
 		CompoundTag cds = tag.getCompoundOrEmpty("cooldowns");
 		for (String key : cds.keySet()) {
 			int left = cds.getIntOr(key, 0);
-			if (left > 0 && Technique.byId(key) != null) {
+			if (left > 0 && TechniqueRegistry.savedIdOk(key) && data.cooldowns.size() < TechniqueRegistry.MAX_SAVED_IDS) {
 				data.cooldowns.put(key, left);
 			}
 		}

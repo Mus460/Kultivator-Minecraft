@@ -97,6 +97,24 @@ public final class KultivatorConfig {
 	/** Clients report a long low frame rate so their sect builds at half speed. */
 	public boolean sectBuildFpsHint = true;
 
+	// ---- phase 6c: Teknik Dewa (DESIGN 22.14.7, 22.18.1)
+	/** A factor in the player's technique power P (0.1-10). */
+	public double techniqueDamageMultiplier = 1.0D;
+	/** The radius hard cap of technique shapes (8-48); Dewa specs × 1.25. */
+	public int techniqueAreaCap = 32;
+	/** The per-cast boss damage caps of DESIGN 22.14.2. */
+	public boolean techniqueBossCaps = true;
+	/** Lasting technique casts on the whole server (16-128); beyond that the oldest ends early. */
+	public int techniqueMaxActiveCasts = 64;
+	/** Clients may draw client-only phantom displays for techniques. */
+	public boolean techniqueDisplays = true;
+	/** The player's own techniques may use Mode Kehancuran at all (the one-click switch, DESIGN 22.11.1). */
+	public boolean kehancuranPlayerTechniques = true;
+	/** Nothing is carved within this many blocks of the casting player, at full height (3-8). */
+	public int kehancuranCasterSafeRadius = 4;
+	/** Nothing is carved within this many blocks of any player's respawn point (0-64). */
+	public int kehancuranHomeSafeRadius = 24;
+
 	public static KultivatorConfig get() {
 		return instance;
 	}
@@ -133,7 +151,7 @@ public final class KultivatorConfig {
 		}
 	}
 
-	/** Keeps every phase-6 and 6b number inside its allowed range (DESIGN 20.2.11, 21.24). */
+	/** Keeps every phase-6, 6b and 6c number inside its allowed range (DESIGN 20.2.11, 21.24, 22.18.1). */
 	private void clamp() {
 		recruitmentIntervalDays = clamp(recruitmentIntervalDays, 1, 15);
 		tournamentIntervalDays = clamp(tournamentIntervalDays, 3, 30);
@@ -154,6 +172,12 @@ public final class KultivatorConfig {
 		sectBuildRange = clamp(sectBuildRange, 96, 512);
 		sectBuildBankTicks = clamp(sectBuildBankTicks, 0, 72000);
 		sectBuildMaxTemplate = clamp(sectBuildMaxTemplate, 1, 9);
+		// Phase 6c (DESIGN 22.18.1 item 12).
+		techniqueDamageMultiplier = clamp(techniqueDamageMultiplier, 0.1D, 10.0D, 1.0D);
+		techniqueAreaCap = clamp(techniqueAreaCap, 8, 48);
+		techniqueMaxActiveCasts = clamp(techniqueMaxActiveCasts, 16, 128);
+		kehancuranCasterSafeRadius = clamp(kehancuranCasterSafeRadius, 3, 8);
+		kehancuranHomeSafeRadius = clamp(kehancuranHomeSafeRadius, 0, 64);
 	}
 
 	private static int clamp(int value, int min, int max) {

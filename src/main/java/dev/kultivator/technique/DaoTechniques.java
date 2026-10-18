@@ -1,9 +1,14 @@
 package dev.kultivator.technique;
 
-import dev.kultivator.Kultivator;
-import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Dao;
+import dev.kultivator.data.Realm;
 import dev.kultivator.data.Technique;
+import dev.kultivator.technique.spec.dsl.Bonus;
+import dev.kultivator.technique.spec.dsl.Payload;
+import dev.kultivator.technique.spec.dsl.Shape;
+import dev.kultivator.technique.spec.dsl.Step;
+import dev.kultivator.technique.spec.run.CastContext;
+import dev.kultivator.technique.spec.run.Caster;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
@@ -13,8 +18,6 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.ChatFormatting;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -31,16 +34,9 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.Relative;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Ravager;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -60,72 +56,30 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * The 16 Dao techniques (DESIGN 8) and the Dao flavour of the Dao Domain. Qi, cooldowns and comprehension are handled by
- * {@link Techniques}; {@link #cast} only performs the effect. Targets always come from {@link Targeting} and damage
- * always goes through {@link Techniques#hurt}. Nothing here ever changes a block: block raycasts are read-only clips,
- * fire is only put on entities (never next to powder snow or a water cauldron, and put out when a burning monster gets
- * close to one), lightning is particles only, teleports only land on spots checked by {@link Targeting#safeSpot} and
- * reached through open space. Creepers and ravagers are never pulled or thrown (a creeper dragged close would explode,
- * a ravager thrown into trees breaks leaves), nor the Ender Dragon (it breaks the blocks it is moved into) or a player
- * (a sparring partner could land in the void); prisons stop a creeper's fuse, nothing is thrown or pulled near a portal,
- * and every thrown monster gets {@link NoGrief#TAG} (no trampling, no egg crushing, no portal travel) and a portal
- * cooldown. Every particle is drawn on the client ({@code DaoTechniqueFx}) from TECHNIQUE packets
- * whose sub effects are listed in {@link DaoTechniqueSub}.
+ * The 16 legacy Dao techniques made stronger (DESIGN 22.10) and the Dao flavour of the Dao Domain (22.10.1). The cast
+ * pipeline ({@code TechniqueRunner}) handles refusals, qi and cooldowns; {@link #cast} performs the effect with the
+ * cast's {@link Caster}: damage is a coefficient × P through the choke point (boss, arena, trial-mob and heart-demon caps
+ * on the cast's ledger), sizes are scaled reads (A/D/N × mastery), the level 3/4 bonuses of 22.10 apply, and movement
+ * follows the shared rules (never-moved list, PortalIndex, NoGrief). In an arena the pre-6c coefficients apply and the new
+ * payloads are skipped. Nothing here changes a block: rays are read-only clips, fire is entity fire only, lightning is
+ * particles. The old {@code FxType.TECHNIQUE} sub effects keep playing ({@link DaoTechniqueSub}); the tier layers come as
+ * {@code TechFx} events of the spec.
  */
 public final class DaoTechniques {
 
-	/** Transient knockback resistance of Iron Body (never saved, removed when it ends). */
-	public static final Identifier IRON_BODY_ID = Kultivator.id("iron_body");
+	/** Transient knockback resistance id of the old Iron Body (removed on join from saves of older versions). */
+	public static final Identifier IRON_BODY_ID = dev.kultivator.Kultivator.id("iron_body");
 
-	private static final double SWORD_QI_RANGE = 16.0D;
-	private static final double SWORD_QI_HALF_WIDTH = 1.0D;
-	private static final int THOUSAND_SWORDS_TICKS = 80;
-	private static final int THOUSAND_SWORDS_INTERVAL = 5;
-	private static final int THOUSAND_SWORDS_MAX = 6;
-	private static final double THOUSAND_SWORDS_RANGE = 16.0D;
-	/** Ticks a sword of light takes to fall (the client animates the same time). */
 	private static final int SWORD_FALL_TICKS = 4;
-	private static final double FLAME_RANGE = 7.0D;
-	/** Cosine of the half angle of the 60 degree flame cone. */
-	private static final double FLAME_COS = Math.cos(Math.toRadians(30.0D));
-	private static final double PHOENIX_RANGE = 24.0D;
-	private static final double PHOENIX_REACH = 1.8D;
-	private static final double FROST_RADIUS = 6.0D;
-	private static final double GLACIER_RANGE = 24.0D;
-	private static final double GLACIER_RADIUS = 5.0D;
-	private static final int GLACIER_TICKS = 160;
-	private static final double THUNDER_RANGE = 24.0D;
-	private static final double CHAIN_RADIUS = 6.0D;
-	private static final int CHAIN_JUMPS = 4;
-	private static final int CHAIN_DELAY = 3;
-	private static final double HEAVENLY_RANGE = 16.0D;
-	private static final int HEAVENLY_BOLTS = 8;
-	private static final int HEAVENLY_INTERVAL = 5;
+	private static final int THOUSAND_SWORDS_INTERVAL = 5;
 	private static final double SKY_HEIGHT = 14.0D;
-	private static final int IRON_BODY_TICKS = 300;
-	private static final float REFLECT_SHARE = 0.3F;
-	private static final double STOMP_RADIUS = 7.0D;
-	private static final double SPRING_RADIUS = 8.0D;
-	private static final double DRAIN_RADIUS = 8.0D;
-	private static final double SHADOW_RANGE = 20.0D;
-	private static final int SHADOW_TICKS = 100;
-	private static final double GALE_RADIUS = 10.0D;
-	private static final int GALE_TICKS = 120;
-	private static final double BLINK_RANGE = 24.0D;
-	private static final double SPACE_PRISON_RADIUS = 12.0D;
-	private static final int SPACE_PRISON_TICKS = 120;
-	/** Blocks per tick a Space Prison pulls its prisoners (and per pulse for the Space domain). */
-	private static final double PULL_SPEED = 0.3D;
-	private static final double DOMAIN_RADIUS = 10.0D;
-	/** Effects of a domain pulse last 2 s (pulses come every second, so they never run out inside the domain). */
 	private static final int DOMAIN_EFFECT_TICKS = 40;
-	/** Slowness amplifier that brings a mob's own movement to zero (prisons). */
-	private static final int HOLD_AMPLIFIER = 9;
+	private static final double PULL_SPEED = 0.3D;
 
 	private static final Map<UUID, DaoTechniqueState> STATES = new HashMap<>();
 	/** Monsters set on fire by a technique -> game time their fire ends (watched so it never melts powder snow). */
 	private static final Map<LivingEntity, Long> BURNING = new HashMap<>();
-	/** True while we deal retaliation / empowered damage, so it never triggers itself again. */
+	/** True while we deal the empowered Shadow Step damage, so it never triggers itself again. */
 	private static boolean retaliating;
 
 	public static void init() {
@@ -142,7 +96,7 @@ public final class DaoTechniques {
 				forgetEverywhere(entity);
 			}
 		});
-		ServerPlayerEvents.LEAVE.register(DaoTechniques::onLeave);
+		ServerPlayerEvents.LEAVE.register(player -> STATES.remove(player.getUUID()));
 		ServerTickEvents.END_SERVER_TICK.register(server -> BURNING.entrySet().removeIf(entry -> {
 			LivingEntity entity = entry.getKey();
 			if (entity.isRemoved() || !entity.isAlive() || !entity.isOnFire() || entity.level().getGameTime() > entry.getValue()) {
@@ -161,32 +115,33 @@ public final class DaoTechniques {
 		});
 	}
 
-	/** Performs {@code technique} (qi and cooldown are handled by Techniques). True when it really happened. */
-	public static boolean cast(ServerPlayer player, CultivationData data, Technique technique) {
-		if (technique.dao() == null || player.isRemoved() || player.isDeadOrDying()) {
+	/** Performs a legacy Dao technique with its cast context. True when it really happened (false spends nothing). */
+	public static boolean cast(Caster ctx) {
+		Technique technique = ctx.spec().legacy();
+		ServerPlayer player = ctx.player();
+		if (technique == null || technique.dao() == null || player == null || player.isRemoved() || player.isDeadOrDying()) {
 			return false;
 		}
-		double power = Techniques.power(data);
 		boolean done = switch (technique) {
-			case SWORD_QI -> swordQi(player, power);
-			case THOUSAND_SWORDS -> thousandSwords(player, power);
-			case FLAME_PALM -> flamePalm(player, power);
-			case PHOENIX_FLAME -> phoenixFlame(player, power);
-			case FROST_LOTUS -> frostLotus(player, power);
-			case GLACIER_PRISON -> glacierPrison(player, power);
-			case THUNDER_PALM -> thunderPalm(player, power);
-			case HEAVENLY_THUNDER -> heavenlyThunder(player, power);
-			case IRON_BODY -> ironBody(player);
-			case MOUNTAIN_STOMP -> mountainStomp(player, power);
-			case SPRING_OF_LIFE -> springOfLife(player);
-			case LIFE_DRAIN -> lifeDrain(player, power);
-			case SHADOW_STEP -> shadowStep(player);
-			case GALE -> gale(player);
-			case SPACE_BLINK -> spaceBlink(player);
-			case SPACE_PRISON -> spacePrison(player, power);
+			case SWORD_QI -> swordQi(ctx, player);
+			case THOUSAND_SWORDS -> thousandSwords(ctx, player);
+			case FLAME_PALM -> flamePalm(ctx, player);
+			case PHOENIX_FLAME -> phoenixFlame(ctx, player);
+			case FROST_LOTUS -> frostLotus(ctx, player);
+			case GLACIER_PRISON -> glacierPrison(ctx, player);
+			case THUNDER_PALM -> thunderPalm(ctx, player);
+			case HEAVENLY_THUNDER -> heavenlyThunder(ctx, player);
+			case IRON_BODY -> ironBody(ctx, player);
+			case MOUNTAIN_STOMP -> mountainStomp(ctx, player);
+			case SPRING_OF_LIFE -> springOfLife(ctx, player);
+			case LIFE_DRAIN -> lifeDrain(ctx, player);
+			case SHADOW_STEP -> shadowStep(ctx, player, false);
+			case GALE -> gale(ctx, player);
+			case SPACE_BLINK -> spaceBlink(ctx, player);
+			case SPACE_PRISON -> spacePrison(ctx, player);
 			default -> false;
 		};
-		if (done) {
+		if (done && !ctx.copy()) {
 			Advancements.grant(player, "dao_technique");
 			if (technique.unlock() == Technique.Unlock.BOOK) {
 				Advancements.grant(player, "dao_ultimate");
@@ -202,195 +157,264 @@ public final class DaoTechniques {
 		return done;
 	}
 
-	/** Once per second while the Dao Domain is up: the Dao's effect on the monsters inside (and on the caster). */
-	public static void domainPulse(ServerPlayer player, CultivationData data, Dao dao, List<LivingEntity> insideHostiles) {
-		if (dao == null || player.isRemoved() || player.isDeadOrDying()) {
+	// ================================================================== Dao Domain pulses (22.10.1)
+
+	/**
+	 * One pulse of the Dao Domain's law (22.10.1), coefficients × P through the cast's choke point (DOT and pulse ticks
+	 * ≤ 2% of a boss each); {@code factor} ×2 for {@code profound_mystery_fusion}. {@code pulseIndex} counts the pulses
+	 * (Ice: every 4th from Dao Union freezes).
+	 */
+	public static void domainPulse(CastContext ctx, @Nullable Dao dao, List<LivingEntity> inside, double areaRadius, double factor, int pulseIndex) {
+		LivingEntity caster = ctx.caster();
+		if (caster.isRemoved() || caster.isDeadOrDying()) {
 			return;
 		}
-		double power = Techniques.power(data);
-		fx(player, flavour(dao), DaoTechniqueSub.DOMAIN, player.position(), player.position(), (float) DOMAIN_RADIUS);
 		List<LivingEntity> targets = new ArrayList<>();
-		for (LivingEntity entity : insideHostiles) {
-			if (entity.isAlive() && !entity.isRemoved() && entity.level() == player.level() && Targeting.isHostileTo(entity, player)) {
+		for (LivingEntity entity : inside) {
+			if (entity.isAlive() && !entity.isRemoved() && entity.level() == caster.level() && ctx.mayHit(entity, false)) {
 				targets.add(entity);
 			}
+		}
+		ServerLevel level = ctx.level();
+		Vec3 pos = caster.position();
+		float radius = (float) Math.max(1.0D, areaRadius);
+		if (dao != null) {
+			fx(level, flavour(dao), DaoTechniqueSub.DOMAIN, pos, pos, radius);
+		}
+		boolean arena = ctx.arena();
+		if (dao == null) {
+			for (LivingEntity target : targets) {
+				if (pulse(ctx, target, 0.4D * factor) && target.isAlive()) {
+					target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, DOMAIN_EFFECT_TICKS, 0, false, true), caster);
+				}
+			}
+			return;
 		}
 		switch (dao) {
 			case SWORD -> {
 				for (LivingEntity target : targets) {
-					strike(player, target, power * 0.5D);
-					fx(player, Technique.SWORD_QI, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
+					pulse(ctx, target, 0.5D * factor);
+					fx(level, Technique.SWORD_QI, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
 				}
 				if (!targets.isEmpty()) {
-					sound(player, player.position(), SoundEvents.PLAYER_ATTACK_SWEEP, 0.4F, 1.4F);
+					sound(level, pos, SoundEvents.PLAYER_ATTACK_SWEEP, 0.4F, 1.4F);
 				}
 			}
 			case FIRE -> {
+				Payload.Dot dot = new Payload.Dot(0.4D, 3, Payload.DotKind.FIRE, false, Map.of());
 				for (LivingEntity target : targets) {
 					ignite(target, 3.0F);
-					strike(player, target, power * 0.3D);
+					pulse(ctx, target, 0.3D * factor);
+					if (!arena && target.isAlive()) {
+						ctx.apply(target, dot);
+					}
 				}
 			}
 			case ICE -> {
+				boolean deep = !arena && caster instanceof ServerPlayer player
+						&& dev.kultivator.data.Cultivators.get(player).realm().atLeast(Realm.DAO_UNION) && pulseIndex % 4 == 3;
 				for (LivingEntity target : targets) {
-					target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, DOMAIN_EFFECT_TICKS, 2), player);
-					freeze(target, DOMAIN_EFFECT_TICKS);
+					target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, DOMAIN_EFFECT_TICKS, 2), caster);
+					freezeLook(target, DOMAIN_EFFECT_TICKS);
+					if (deep) {
+						ctx.apply(target, new Payload.Freeze(80));
+					}
 				}
 			}
 			case LIGHTNING -> {
-				if (!targets.isEmpty()) {
-					LivingEntity target = targets.get(player.getRandom().nextInt(targets.size()));
+				int bolts = arena ? 1 : Math.min(4, 1 + ctx.tier() / 2);
+				List<LivingEntity> pool = new ArrayList<>(targets);
+				RandomSource random = caster.getRandom();
+				for (int i = 0; i < bolts && !pool.isEmpty(); i++) {
+					LivingEntity target = pool.remove(random.nextInt(pool.size()));
 					Vec3 ground = target.position();
-					fx(player, Technique.THUNDER_PALM, DaoTechniqueSub.BOLT, skyAbove(player, ground), ground, 1.0F);
-					strike(player, target, power * 0.8D);
-					sound(player, ground, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.6F, 1.3F);
+					fx(level, Technique.THUNDER_PALM, DaoTechniqueSub.BOLT, skyAbove(level, caster, ground), ground, 1.0F);
+					pulse(ctx, target, 0.8D * factor);
+					sound(level, ground, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.6F, 1.3F);
 				}
 			}
-			case BODY -> player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, DOMAIN_EFFECT_TICKS, 1, false, false, true), player);
-			case LIFE -> {
-				List<LivingEntity> allies = new ArrayList<>(Targeting.alliesAround(player, DOMAIN_RADIUS));
-				if (!allies.contains(player)) {
-					allies.add(player);
+			case BODY -> {
+				caster.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, DOMAIN_EFFECT_TICKS, 1, false, false, true), caster);
+				// technique Resistance counts inside the DR cap (22.14.3)
+				dev.kultivator.technique.spec.run.Boons.trackResistance(caster, 1, DOMAIN_EFFECT_TICKS);
+				if (!arena) {
+					for (LivingEntity target : targets) {
+						pulse(ctx, target, 0.4D * factor);
+					}
 				}
-				for (LivingEntity ally : allies) {
-					ally.addEffect(new MobEffectInstance(MobEffects.REGENERATION, DOMAIN_EFFECT_TICKS, 1, false, false, true), player);
+			}
+			case LIFE -> {
+				for (LivingEntity ally : ctx.allies(pos, radius)) {
+					ally.addEffect(new MobEffectInstance(MobEffects.REGENERATION, DOMAIN_EFFECT_TICKS, 1, false, false, true), caster);
 				}
 				for (LivingEntity target : targets) {
-					target.addEffect(new MobEffectInstance(MobEffects.WITHER, DOMAIN_EFFECT_TICKS, 0), player);
+					target.addEffect(new MobEffectInstance(MobEffects.WITHER, DOMAIN_EFFECT_TICKS, 0), caster);
+					if (!arena && pulse(ctx, target, 0.3D * factor)) {
+						ctx.apply(target, new Payload.Drain(1.0D, 0.0D, 0.0D, 0.0D, 0.0D));
+					}
 				}
 			}
 			case SHADOW -> {
 				for (LivingEntity target : targets) {
-					target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, DOMAIN_EFFECT_TICKS, 0), player);
+					target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, DOMAIN_EFFECT_TICKS, 0), caster);
+					if (!arena) {
+						pulse(ctx, target, 0.4D * factor);
+					}
 				}
-				player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, DOMAIN_EFFECT_TICKS, 0, false, false, true), player);
+				caster.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, DOMAIN_EFFECT_TICKS, 0, false, false, true), caster);
 			}
 			case SPACE -> {
-				boolean pulling = !portalNear(player, DOMAIN_RADIUS + 4.0D);
 				for (LivingEntity target : targets) {
-					target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, DOMAIN_EFFECT_TICKS, 4), player);
-					// Players (sparring partners) are never dragged: a pull could carry them over a deadly edge.
-					if (!pulling || target instanceof Creeper || target instanceof Ravager || target instanceof Player) {
-						continue;
+					target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, DOMAIN_EFFECT_TICKS, 4), caster);
+					if (!arena) {
+						pulse(ctx, target, 0.3D * factor);
 					}
-					Vec3 to = player.position().subtract(target.position()).horizontal();
-					if (to.lengthSqr() > 1.0D) {
-						Vec3 pull = to.normalize().scale(PULL_SPEED);
-						launch(target, target.getDeltaMovement().add(pull.x, 0.0D, pull.z));
+					if (target.isAlive() && ctx.moveAllowed(target)) {
+						Vec3 to = pos.subtract(target.position()).horizontal();
+						if (to.lengthSqr() > 1.0D) {
+							Vec3 pull = to.normalize().scale(PULL_SPEED);
+							launch(target, target.getDeltaMovement().add(pull.x, 0.0D, pull.z));
+						}
 					}
 				}
 			}
 		}
 	}
 
-	/** Every server tick for every player: lasting effects of Dao techniques (iron body, prisons...). */
-	public static void tick(ServerPlayer player, CultivationData data) {
-		DaoTechniqueState state = STATES.get(player.getUUID());
-		if (state == null || player.isRemoved() || player.isDeadOrDying()) {
-			return;
-		}
-		long now = now(player);
-		if (state.ironBodyUntil != 0L && now >= state.ironBodyUntil) {
-			endIronBody(player, state);
-		}
-		if (state.shadowUntil != 0L && now >= state.shadowUntil) {
-			state.shadowUntil = 0L;
-			fx(player, Technique.SHADOW_STEP, DaoTechniqueSub.END, middleOf(player), new Vec3(player.getId(), 0.0D, 0.0D), 0.0F);
-		}
-		tickSwords(player, state);
-		tickScheduled(player, state);
-		tickPhoenixes(player, state);
-		tickLocks(player, state);
-		if (state.idle()) {
-			STATES.remove(player.getUUID());
-		}
+	private static boolean pulse(CastContext ctx, LivingEntity target, double coef) {
+		return target.isAlive() && ctx.hurt(ctx.damage(target, coef).kind(dev.kultivator.technique.spec.DamageContext.Kind.PULSE));
 	}
 
 	// ================================================================== Sword
 
-	/** A crescent of sword qi flies 16 blocks forward (stopped by solid blocks), cutting every monster in its way once. */
-	private static boolean swordQi(ServerPlayer player, double power) {
+	/**
+	 * Sword Qi Slash: crescents (GC 1, DT 2, IA 3, TI 5; +1 at Kesempurnaan Agung) fanned 20°, each a front of 16→48 blocks
+	 * at 2 blocks per tick (stopped by blocks), 1.5 × P to everything in its way once.
+	 */
+	private static boolean swordQi(Caster ctx, ServerPlayer player) {
 		Vec3 look = player.getViewVector(1.0F);
 		Vec3 start = player.getEyePosition().add(0.0D, -0.3D, 0.0D).add(look.scale(0.6D));
-		Vec3 end = clipEnd(player, start, look, SWORD_QI_RANGE);
-		List<LivingEntity> hits = new ArrayList<>();
-		for (LivingEntity target : Targeting.hostilesAround(player, start.add(end).scale(0.5D), start.distanceTo(end) * 0.5D + 3.0D)) {
-			if (nearSegment(target, start, end, SWORD_QI_HALF_WIDTH)) {
-				hits.add(target);
+		Realm realm = dev.kultivator.data.Cultivators.get(player).realm();
+		int base = ctx.arena() ? 1 : realm.atLeast(Realm.TRUE_IMMORTAL) ? 5 : realm.atLeast(Realm.IMMORTAL_ASCENSION) ? 3
+				: realm.atLeast(Realm.DEITY_TRANSFORMATION) ? 2 : 1;
+		int count = base + ctx.bonusCount();
+		double length = ctx.area(16.0D, 48.0D);
+		double reach = Math.max(1.0D, ctx.area(1.0D, 3.0D) * 0.5D + 0.5D);
+		List<Vec3> ends = new ArrayList<>();
+		Map<LivingEntity, Double> hits = new HashMap<>();
+		Map<LivingEntity, Double> along = new HashMap<>();
+		for (int i = 0; i < count; i++) {
+			double offset = count <= 1 ? 0.0D : (i - (count - 1) / 2.0D) * 20.0D;
+			Vec3 dir = Caster.rotateYaw(look, offset);
+			Vec3 end = clipEnd(player, start, dir, length);
+			ends.add(end);
+			for (LivingEntity target : ctx.hostiles(start.add(end).scale(0.5D), start.distanceTo(end) * 0.5D + 3.0D, true)) {
+				if (nearSegment(target, start, end, reach) && !hits.containsKey(target)) {
+					hits.put(target, 1.0D);
+					along.put(target, middleOf(target).distanceTo(start));
+				}
 			}
 		}
 		if (hits.isEmpty()) {
 			refuse(player, "no_target_path");
 			return false;
 		}
-		fx(player, Technique.SWORD_QI, DaoTechniqueSub.CAST, start, end, (float) (SWORD_QI_HALF_WIDTH * 2.0D));
-		sound(player, player.position(), SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 0.7F);
-		sound(player, player.position(), SoundEvents.AMETHYST_BLOCK_CHIME, 0.9F, 1.7F);
-		for (LivingEntity target : hits) {
-			strike(player, target, power * 1.5D);
-			fx(player, Technique.SWORD_QI, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
+		ServerLevel level = player.level();
+		for (Vec3 end : ends) {
+			fx(level, Technique.SWORD_QI, DaoTechniqueSub.CAST, start, end, (float) (reach * 2.0D));
 		}
+		ctx.castFx(start, ends.get(0), (float) reach, (float) length, count, (int) Math.ceil(length / 2.0D));
+		sound(level, player.position(), SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 0.7F);
+		sound(level, player.position(), SoundEvents.AMETHYST_BLOCK_CHIME, 0.9F, 1.7F);
+		for (Map.Entry<LivingEntity, Double> entry : hits.entrySet()) {
+			LivingEntity target = entry.getKey();
+			int delay = Math.max(0, (int) Math.round(along.getOrDefault(target, 0.0D) / 2.0D));
+			ctx.schedule(delay, () -> {
+				if (strike(ctx, target, 1.5D, true)) {
+					fx(level, Technique.SWORD_QI, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
+				}
+			});
+		}
+		for (Vec3 end : ends) {
+			ctx.hop(end.subtract(look.horizontal().normalize().scale(Math.min(8.0D, start.distanceTo(end)))), look);
+		}
+		echoPeak(ctx);
 		return true;
 	}
 
-	/** For 4 s, every 5 ticks swords of light fall on up to 6 random monsters within 16 blocks. */
-	private static boolean thousandSwords(ServerPlayer player, double power) {
-		if (Targeting.hostilesAround(player, player.position(), THOUSAND_SWORDS_RANGE).isEmpty()) {
+	/**
+	 * Thousand Swords: a wave every 5 ticks over 80→160 ticks; each wave swords of light fall on up to lin(6, 2, 24) random
+	 * monsters within 16→32 (+2 at Kesempurnaan Agung), 0.6 × P each; at Puncak Jurus a giant sword on the strongest (3 × P).
+	 */
+	private static boolean thousandSwords(Caster ctx, ServerPlayer player) {
+		double range = ctx.area(16.0D, 32.0D);
+		if (ctx.hostiles(player.position(), range, false).isEmpty()) {
 			refuse(player, "no_target");
 			return false;
 		}
-		DaoTechniqueState state = state(player);
-		state.swordsLeft = THOUSAND_SWORDS_TICKS;
-		state.swordsDamage = power * 0.6D;
-		fx(player, Technique.THOUSAND_SWORDS, DaoTechniqueSub.CAST, player.position(), player.position(), (float) THOUSAND_SWORDS_RANGE);
-		sound(player, player.position(), SoundEvents.BEACON_ACTIVATE, 1.0F, 1.6F);
-		sound(player, player.position(), SoundEvents.AMETHYST_BLOCK_RESONATE, 1.2F, 0.8F);
+		int duration = ctx.arena() ? 80 : ctx.duration(80.0D, 160.0D);
+		int perWave = (ctx.arena() ? 6 : (int) ctx.lin(6.0D, 2.0D, 24.0D)) + ctx.bonusCount();
+		ServerLevel level = player.level();
+		fx(level, Technique.THOUSAND_SWORDS, DaoTechniqueSub.CAST, player.position(), player.position(), (float) range);
+		ctx.castFx(player.position(), player.position(), (float) range, 0.0F, perWave, duration);
+		sound(level, player.position(), SoundEvents.BEACON_ACTIVATE, 1.0F, 1.6F);
+		sound(level, player.position(), SoundEvents.AMETHYST_BLOCK_RESONATE, 1.2F, 0.8F);
 		Msg.actionBar(player, Component.translatable("kultivator.daotech.swords").withColor(Dao.SWORD.color()));
+		int waves = Math.max(1, duration / THOUSAND_SWORDS_INTERVAL);
+		for (int wave = 0; wave < waves; wave++) {
+			int index = wave;
+			ctx.schedule(1 + wave * THOUSAND_SWORDS_INTERVAL, () -> {
+				List<LivingEntity> around = new ArrayList<>(ctx.hostiles(player.position(), range, false));
+				RandomSource random = player.getRandom();
+				for (int i = around.size() - 1; i > 0; i--) {
+					int j = random.nextInt(i + 1);
+					LivingEntity swap = around.get(i);
+					around.set(i, around.get(j));
+					around.set(j, swap);
+				}
+				int count = Math.min(perWave, around.size());
+				for (int i = 0; i < count; i++) {
+					LivingEntity target = around.get(i);
+					int stagger = 1 + random.nextInt(THOUSAND_SWORDS_INTERVAL);
+					ctx.schedule(stagger, () -> {
+						if (valid(ctx, target)) {
+							fx(level, Technique.THOUSAND_SWORDS, DaoTechniqueSub.SWORD_FALL, target.position(), target.position(), SWORD_FALL_TICKS);
+							ctx.schedule(SWORD_FALL_TICKS, () -> {
+								if (valid(ctx, target) && strike(ctx, target, 0.6D, false)) {
+									sound(level, target.position(), SoundEvents.TRIDENT_HIT, 0.5F, 1.3F + random.nextFloat() * 0.4F);
+									ctx.hop(target.position(), ctx.look());
+								}
+							});
+						}
+					});
+				}
+				if (count > 0 && index % 4 == 0) {
+					sound(level, player.position(), SoundEvents.PLAYER_ATTACK_SWEEP, 0.6F, 1.5F);
+				}
+			});
+		}
+		ctx.keepAlive(duration + SWORD_FALL_TICKS + THOUSAND_SWORDS_INTERVAL + 2);
+		ctx.runBonusSteps();
 		return true;
-	}
-
-	private static void tickSwords(ServerPlayer player, DaoTechniqueState state) {
-		if (state.swordsLeft <= 0) {
-			return;
-		}
-		int elapsed = THOUSAND_SWORDS_TICKS - state.swordsLeft;
-		state.swordsLeft--;
-		if (elapsed % THOUSAND_SWORDS_INTERVAL != 0) {
-			return;
-		}
-		List<LivingEntity> around = new ArrayList<>(Targeting.hostilesAround(player, player.position(), THOUSAND_SWORDS_RANGE));
-		RandomSource random = player.getRandom();
-		for (int i = around.size() - 1; i > 0; i--) {
-			int j = random.nextInt(i + 1);
-			LivingEntity swap = around.get(i);
-			around.set(i, around.get(j));
-			around.set(j, swap);
-		}
-		int count = Math.min(THOUSAND_SWORDS_MAX, around.size());
-		for (int i = 0; i < count; i++) {
-			// Staggered: each sword starts falling 1..5 ticks after the wave.
-			state.scheduled.add(new DaoTechniqueState.Scheduled(DaoTechniqueState.Kind.SWORD, 1 + random.nextInt(THOUSAND_SWORDS_INTERVAL),
-					around.get(i), state.swordsDamage, null));
-		}
-		if (count > 0 && elapsed % 20 == 0) {
-			sound(player, player.position(), SoundEvents.PLAYER_ATTACK_SWEEP, 0.6F, 1.5F);
-		}
 	}
 
 	// ================================================================== Fire
 
-	/** A 60 degree cone of spirit fire 7 blocks long: D and 6 s of burning (on entities only). */
-	private static boolean flamePalm(ServerPlayer player, double power) {
+	/** Flame Palm: a cone 7→20 blocks, 30°→45°: 1 × P, a fire DOT of 0.2 × P per second for 5 s and 6 s of burning. */
+	private static boolean flamePalm(Caster ctx, ServerPlayer player) {
 		Vec3 eye = player.getEyePosition();
 		Vec3 look = player.getViewVector(1.0F);
+		double range = ctx.area(7.0D, 20.0D);
+		double half = ctx.area(30.0D, 45.0D);
+		double cos = Math.cos(Math.toRadians(half));
 		List<LivingEntity> hits = new ArrayList<>();
-		for (LivingEntity target : Targeting.hostilesAround(player, eye, FLAME_RANGE + 1.0D)) {
+		for (LivingEntity target : ctx.hostiles(eye, range + 1.0D, false)) {
 			Vec3 to = middleOf(target).subtract(eye);
 			double distance = to.length();
-			if (distance > FLAME_RANGE + target.getBbWidth() * 0.5D) {
+			if (distance > range + target.getBbWidth() * 0.5D) {
 				continue;
 			}
-			boolean inCone = distance < 1.5D ? to.dot(look) > 0.0D : to.scale(1.0D / distance).dot(look) >= FLAME_COS;
+			boolean inCone = distance < 1.5D ? to.dot(look) > 0.0D : to.scale(1.0D / distance).dot(look) >= cos;
 			if (inCone && Targeting.hasLineOfSight(player, target)) {
 				hits.add(target);
 			}
@@ -399,157 +423,237 @@ public final class DaoTechniques {
 			refuse(player, "no_target_path");
 			return false;
 		}
-		fx(player, Technique.FLAME_PALM, DaoTechniqueSub.CAST, hand(player), eye.add(look.scale(FLAME_RANGE)), (float) FLAME_RANGE);
-		sound(player, player.position(), SoundEvents.FIRECHARGE_USE, 1.0F, 0.8F);
-		sound(player, player.position(), SoundEvents.BLAZE_SHOOT, 0.8F, 1.2F);
+		ServerLevel level = player.level();
+		fx(level, Technique.FLAME_PALM, DaoTechniqueSub.CAST, hand(player), eye.add(look.scale(range)), (float) range);
+		ctx.castFx(hand(player), eye.add(look.scale(range)), (float) half, (float) range, hits.size(), 0);
+		sound(level, player.position(), SoundEvents.FIRECHARGE_USE, 1.0F, 0.8F);
+		sound(level, player.position(), SoundEvents.BLAZE_SHOOT, 0.8F, 1.2F);
+		boolean deep = ctx.special("ignite_dot");
+		Payload.Dot dot = new Payload.Dot(0.2D, deep ? 6 : 5, Payload.DotKind.FIRE, false, Map.of());
 		for (LivingEntity target : hits) {
-			strike(player, target, power);
+			strike(ctx, target, 1.0D, false);
 			if (target.isAlive()) {
-				ignite(target, 6.0F);
+				ignite(target, deep ? 7.0F : 6.0F);
+				if (!ctx.arena()) {
+					ctx.apply(target, dot);
+				}
 			}
-			fx(player, Technique.FLAME_PALM, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
+			fx(level, Technique.FLAME_PALM, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
 		}
+		ctx.impact(player.position(), look);
+		echoPeak(ctx);
 		return true;
 	}
 
-	/** A virtual phoenix flies one block per tick for 24 blocks (or to the first solid block) and burns what it passes. */
-	private static boolean phoenixFlame(ServerPlayer player, double power) {
+	/**
+	 * Phoenix Flame: phoenixes (NS 1, IA 2, TI 3; +1 at Kesempurnaan Agung) fanned 20°, each flying one block per tick for
+	 * 24→64 blocks (stopped by blocks): 2 × P and 8 s of burning to everything within 1.8→3 blocks of its path.
+	 */
+	private static boolean phoenixFlame(Caster ctx, ServerPlayer player) {
 		Vec3 look = player.getViewVector(1.0F);
 		Vec3 start = player.getEyePosition().add(0.0D, -0.2D, 0.0D).add(look.scale(0.8D));
-		Vec3 end = clipEnd(player, start, look, PHOENIX_RANGE);
-		double length = start.distanceTo(end);
-		int ticks = Math.max(1, (int) Math.ceil(length));
+		Realm realm = dev.kultivator.data.Cultivators.get(player).realm();
+		int base = ctx.arena() ? 1 : realm.atLeast(Realm.TRUE_IMMORTAL) ? 3 : realm.atLeast(Realm.IMMORTAL_ASCENSION) ? 2 : 1;
+		int count = base + ctx.bonusCount();
+		double range = ctx.area(24.0D, 64.0D);
+		double reach = ctx.area(1.8D, 3.0D);
+		List<Vec3[]> paths = new ArrayList<>();
 		boolean any = false;
-		for (LivingEntity target : Targeting.hostilesAround(player, start.add(end).scale(0.5D), length * 0.5D + 3.0D)) {
-			if (nearSegment(target, start, end, PHOENIX_REACH + 0.7D)) {
-				any = true;
-				break;
+		for (int i = 0; i < count; i++) {
+			double offset = count <= 1 ? 0.0D : (i - (count - 1) / 2.0D) * 20.0D;
+			Vec3 dir = Caster.rotateYaw(look, offset);
+			Vec3 end = clipEnd(player, start, dir, range);
+			paths.add(new Vec3[]{start, end});
+			if (!any) {
+				for (LivingEntity target : ctx.hostiles(start.add(end).scale(0.5D), start.distanceTo(end) * 0.5D + 3.0D, false)) {
+					if (nearSegment(target, start, end, reach + 0.7D)) {
+						any = true;
+						break;
+					}
+				}
 			}
 		}
 		if (!any) {
 			refuse(player, "no_target_path");
 			return false;
 		}
-		Vec3 step = length < 1.0E-4D ? look : end.subtract(start).scale(1.0D / ticks);
-		state(player).phoenixes.add(new DaoTechniqueState.Phoenix(start, step, ticks, power * 2.0D));
-		fx(player, Technique.PHOENIX_FLAME, DaoTechniqueSub.CAST, start, end, ticks);
-		sound(player, player.position(), SoundEvents.BLAZE_SHOOT, 1.0F, 0.6F);
-		sound(player, player.position(), SoundEvents.ENDER_DRAGON_FLAP, 1.0F, 1.4F);
-		sound(player, player.position(), SoundEvents.FIRECHARGE_USE, 0.8F, 0.7F);
+		DaoTechniqueState state = state(player);
+		ServerLevel level = player.level();
+		int longest = 1;
+		for (Vec3[] path : paths) {
+			double length = path[0].distanceTo(path[1]);
+			int ticks = Math.max(1, (int) Math.ceil(length));
+			longest = Math.max(longest, ticks);
+			Vec3 step = length < 1.0E-4D ? look : path[1].subtract(path[0]).scale(1.0D / ticks);
+			state.phoenixes.add(new DaoTechniqueState.Phoenix(ctx, path[0], step, ticks, 2.0D, reach));
+			fx(level, Technique.PHOENIX_FLAME, DaoTechniqueSub.CAST, path[0], path[1], ticks);
+		}
+		ctx.castFx(start, paths.get(0)[1], (float) reach, (float) range, count, longest);
+		sound(level, player.position(), SoundEvents.BLAZE_SHOOT, 1.0F, 0.6F);
+		sound(level, player.position(), SoundEvents.ENDER_DRAGON_FLAP, 1.0F, 1.4F);
+		sound(level, player.position(), SoundEvents.FIRECHARGE_USE, 0.8F, 0.7F);
+		ctx.keepAlive(longest + 2);
+		echoPeak(ctx);
 		return true;
 	}
 
 	private static void tickPhoenixes(ServerPlayer player, DaoTechniqueState state) {
 		Iterator<DaoTechniqueState.Phoenix> iterator = state.phoenixes.iterator();
+		ServerLevel level = player.level();
 		while (iterator.hasNext()) {
 			DaoTechniqueState.Phoenix phoenix = iterator.next();
 			Vec3 next = phoenix.pos.add(phoenix.step);
-			BlockHitResult wall = player.level().clip(new ClipContext(phoenix.pos, next, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+			BlockHitResult wall = dev.kultivator.util.LoadedPath.ray(level, phoenix.pos, next, player);
 			boolean blocked = wall.getType() != HitResult.Type.MISS;
 			if (blocked) {
 				next = wall.getLocation();
 			}
-			for (LivingEntity target : Targeting.hostilesAround(player, next, PHOENIX_REACH + 2.5D)) {
-				if (target.getBoundingBox().distanceToSqr(next) <= PHOENIX_REACH * PHOENIX_REACH && phoenix.hit.add(target.getId())) {
-					strike(player, target, phoenix.damage);
-					if (target.isAlive()) {
-						ignite(target, 8.0F);
+			if (phoenix.age % 4 == 0 || blocked) {
+				// One query covers the next 4 blocks of flight.
+				Vec3 ahead = next.add(phoenix.step.scale(3.0D));
+				for (LivingEntity target : phoenix.ctx.hostiles(next.add(ahead).scale(0.5D), phoenix.reach + 4.5D, false)) {
+					if (!phoenix.hit.contains(target.getId()) && nearSegment(target, phoenix.pos, ahead, phoenix.reach)) {
+						phoenix.hit.add(target.getId());
+						int delay = Math.max(0, (int) Math.round(middleOf(target).distanceTo(phoenix.pos) / Math.max(0.2D, phoenix.step.length())));
+						phoenix.ctx.schedule(delay, () -> {
+							if (strike(phoenix.ctx, target, phoenix.coef, false) && target.isAlive()) {
+								ignite(target, 8.0F);
+							}
+							if (target.isAlive()) {
+								fx(level, Technique.PHOENIX_FLAME, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
+							}
+						});
 					}
-					fx(player, Technique.PHOENIX_FLAME, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
 				}
 			}
 			phoenix.pos = next;
 			phoenix.ticksLeft--;
+			phoenix.age++;
 			if (phoenix.ticksLeft % 6 == 0) {
-				sound(player, next, SoundEvents.PHANTOM_FLAP, 0.8F, 0.7F);
+				sound(level, next, SoundEvents.PHANTOM_FLAP, 0.8F, 0.7F);
 			}
-			if (blocked || phoenix.ticksLeft <= 0) {
+			if (blocked || phoenix.ticksLeft <= 0 || phoenix.ctx.ended()) {
 				iterator.remove();
-				sound(player, next, SoundEvents.BLAZE_SHOOT, 0.7F, 0.5F);
-				sound(player, next, SoundEvents.FIRE_EXTINGUISH, 0.5F, 1.2F);
+				if (phoenix.ctx instanceof Caster cast) {
+					cast.hop(next, phoenix.step);
+				}
+				sound(level, next, SoundEvents.BLAZE_SHOOT, 0.7F, 0.5F);
+				sound(level, next, SoundEvents.FIRE_EXTINGUISH, 0.5F, 1.2F);
 			}
 		}
 	}
 
 	// ================================================================== Ice
 
-	/** A lotus of frost blooms around the caster: D, Slowness IV and frozen for 6 s. No ice blocks, ever. */
-	private static boolean frostLotus(ServerPlayer player, double power) {
-		List<LivingEntity> hits = Targeting.hostilesAround(player, player.position(), FROST_RADIUS);
+	/**
+	 * Frost Lotus: a nova of 6→18 blocks: 1 × P, Slowness IV for 6 s and frozen 240 ticks (+40 at Kesempurnaan Agung); at
+	 * Puncak Jurus ice spikes ride a wave out to the same radius 20 ticks later (0.5 × P, shatter).
+	 */
+	private static boolean frostLotus(Caster ctx, ServerPlayer player) {
+		double radius = ctx.area(6.0D, 18.0D);
+		List<LivingEntity> hits = ctx.hostiles(player.position(), radius, false);
 		if (hits.isEmpty()) {
 			refuse(player, "no_target");
 			return false;
 		}
-		fx(player, Technique.FROST_LOTUS, DaoTechniqueSub.CAST, player.position(), player.position(), (float) FROST_RADIUS);
-		sound(player, player.position(), SoundEvents.POWDER_SNOW_BREAK, 1.2F, 0.6F);
-		sound(player, player.position(), SoundEvents.AMETHYST_CLUSTER_BREAK, 1.0F, 1.5F);
-		sound(player, player.position(), SoundEvents.PLAYER_HURT_FREEZE, 0.7F, 0.8F);
+		ctx.setLastAreaRadius(radius);
+		ServerLevel level = player.level();
+		fx(level, Technique.FROST_LOTUS, DaoTechniqueSub.CAST, player.position(), player.position(), (float) radius);
+		ctx.castFx(player.position(), player.position(), (float) radius, 0.0F, hits.size(), 0);
+		sound(level, player.position(), SoundEvents.POWDER_SNOW_BREAK, 1.2F, 0.6F);
+		sound(level, player.position(), SoundEvents.AMETHYST_CLUSTER_BREAK, 1.0F, 1.5F);
+		sound(level, player.position(), SoundEvents.PLAYER_HURT_FREEZE, 0.7F, 0.8F);
+		int freeze = 240 + (ctx.perfection(Bonus.Kind.PAYLOAD) ? 40 : 0);
 		for (LivingEntity target : hits) {
-			strike(player, target, power);
+			strike(ctx, target, 1.0D, false);
 			if (target.isAlive()) {
 				target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 120, 3), player);
-				// Frozen ticks thaw by 2 per tick: fully frozen (shaking) for 6 s.
-				freeze(target, 240);
+				ctx.apply(target, new Payload.Freeze(freeze));
 			}
-			fx(player, Technique.FROST_LOTUS, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
+			fx(level, Technique.FROST_LOTUS, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
 		}
+		ctx.impact(player.position(), ctx.look());
+		ctx.runBonusSteps();
 		return true;
 	}
 
-	/** The looked-at monster and every monster within 5 of it are sealed in ice: frozen in place for 8 s, 1.5 D. */
-	private static boolean glacierPrison(ServerPlayer player, double power) {
-		LivingEntity main = Targeting.lookedAtHostile(player, GLACIER_RANGE);
+	/**
+	 * Glacier Prison: the looked-at monster (24→48) and every monster within 5→8 of it: 1.5 × P and rooted 160 ticks
+	 * (bosses 40; +40 at Kesempurnaan Agung). At Puncak Jurus the prisoners shatter at release (1 × P, ×1.5 on the frozen).
+	 */
+	private static boolean glacierPrison(Caster ctx, ServerPlayer player) {
+		double range = ctx.area(24.0D, 48.0D);
+		LivingEntity main = ctx.target() != null && ctx.target().distanceTo(player) <= range + 2.0D ? ctx.target()
+				: Targeting.lookedAtHostile(player, range);
 		if (main == null) {
 			refuse(player, "no_target_look");
 			return false;
 		}
+		double splash = ctx.area(5.0D, 8.0D);
 		List<LivingEntity> victims = new ArrayList<>();
 		victims.add(main);
-		for (LivingEntity other : Targeting.hostilesAround(player, main.position(), GLACIER_RADIUS)) {
+		for (LivingEntity other : ctx.hostiles(main.position(), splash, false)) {
 			if (other != main) {
 				victims.add(other);
 			}
 		}
-		fx(player, Technique.GLACIER_PRISON, DaoTechniqueSub.CAST, middleOf(main), hand(player), (float) GLACIER_RADIUS);
-		sound(player, main.position(), SoundEvents.POWDER_SNOW_BREAK, 1.2F, 0.5F);
-		sound(player, main.position(), SoundEvents.AMETHYST_CLUSTER_BREAK, 1.0F, 0.6F);
-		sound(player, main.position(), SoundEvents.GLASS_PLACE, 1.0F, 0.7F);
+		ServerLevel level = player.level();
+		fx(level, Technique.GLACIER_PRISON, DaoTechniqueSub.CAST, middleOf(main), hand(player), (float) splash);
+		ctx.castFx(middleOf(main), hand(player), (float) splash, 0.0F, victims.size(), 0);
+		sound(level, main.position(), SoundEvents.POWDER_SNOW_BREAK, 1.2F, 0.5F);
+		sound(level, main.position(), SoundEvents.AMETHYST_CLUSTER_BREAK, 1.0F, 0.6F);
+		sound(level, main.position(), SoundEvents.GLASS_PLACE, 1.0F, 0.7F);
+		int ticks = ctx.duration(160.0D, 160.0D);
 		int sealed = 0;
 		for (LivingEntity victim : victims) {
-			strike(player, victim, power * 1.5D);
+			strike(ctx, victim, 1.5D, victim == main);
 			if (victim.isAlive()) {
-				victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, GLACIER_TICKS, HOLD_AMPLIFIER), player);
-				freeze(victim, 20);
-				lock(player, victim, Technique.GLACIER_PRISON, victim.position(), GLACIER_TICKS);
+				ctx.apply(victim, new Payload.Bind(Payload.BindKind.ROOT, dev.kultivator.technique.spec.dsl.Val.of(ticks), 40));
+				freezeLook(victim, 20);
+				fx(level, Technique.GLACIER_PRISON, DaoTechniqueSub.MARK, victim.position(), new Vec3(victim.getId(), ticks, 0.0D), victim.getBbHeight());
 				sealed++;
 			}
 		}
+		ctx.schedule(ticks, () -> {
+			for (LivingEntity victim : victims) {
+				if (victim.isAlive() && !victim.isRemoved()) {
+					fx(level, Technique.GLACIER_PRISON, DaoTechniqueSub.END, middleOf(victim), new Vec3(victim.getId(), 0.0D, 0.0D), victim.getBbHeight());
+					sound(level, victim.position(), SoundEvents.GLASS_BREAK, 0.8F, 1.0F);
+				}
+			}
+		});
+		ctx.keepAlive(ticks + 1);
+		ctx.runBonusSteps();
 		Msg.actionBar(player, Component.translatable("kultivator.daotech.glacier", String.valueOf(sealed)).withColor(Dao.ICE.color()));
 		return true;
 	}
 
 	// ================================================================== Lightning
 
-	/** A particle bolt from the palm to the looked-at monster (D), then up to 4 jumps to monsters within 6 (D each). */
-	private static boolean thunderPalm(ServerPlayer player, double power) {
-		LivingEntity main = Targeting.lookedAtHostile(player, THUNDER_RANGE);
+	/** Thunder Palm: a bolt to the looked-at monster (24→48), then lin(4, 1, 10) hops (+2) to monsters within 6→12, 1 × P each. */
+	private static boolean thunderPalm(Caster ctx, ServerPlayer player) {
+		double range = ctx.area(24.0D, 48.0D);
+		LivingEntity main = ctx.target() != null && ctx.target().distanceTo(player) <= range + 2.0D ? ctx.target()
+				: Targeting.lookedAtHostile(player, range);
 		if (main == null) {
 			refuse(player, "no_target_look");
 			return false;
 		}
+		ServerLevel level = player.level();
 		Vec3 hand = hand(player);
-		fx(player, Technique.THUNDER_PALM, DaoTechniqueSub.CAST, hand, middleOf(main), 1.0F);
-		fx(player, Technique.THUNDER_PALM, DaoTechniqueSub.BOLT, hand, middleOf(main), 1.0F);
-		sound(player, main.position(), SoundEvents.LIGHTNING_BOLT_IMPACT, 1.0F, 1.2F);
-		sound(player, player.position(), SoundEvents.FIRECHARGE_USE, 0.5F, 1.8F);
-		DaoTechniqueState state = state(player);
+		fx(level, Technique.THUNDER_PALM, DaoTechniqueSub.CAST, hand, middleOf(main), 1.0F);
+		fx(level, Technique.THUNDER_PALM, DaoTechniqueSub.BOLT, hand, middleOf(main), 1.0F);
+		int jumps = (ctx.arena() ? 4 : (int) ctx.lin(4.0D, 1.0D, 10.0D)) + ctx.bonusChain();
+		double jumpRange = ctx.area(6.0D, 12.0D);
+		ctx.castFx(hand, middleOf(main), (float) jumpRange, (float) hand.distanceTo(middleOf(main)), jumps + 1, jumps * 3);
+		sound(level, main.position(), SoundEvents.LIGHTNING_BOLT_IMPACT, 1.0F, 1.2F);
+		sound(level, player.position(), SoundEvents.FIRECHARGE_USE, 0.5F, 1.8F);
 		Set<Integer> chained = new HashSet<>();
 		chained.add(main.getId());
-		// The chain is chosen now (from where the monsters stand), the jumps follow a few ticks apart.
 		LivingEntity previous = main;
-		for (int jump = 1; jump <= CHAIN_JUMPS; jump++) {
+		for (int jump = 1; jump <= jumps; jump++) {
 			LivingEntity next = null;
-			for (LivingEntity candidate : Targeting.hostilesAround(player, previous.position(), CHAIN_RADIUS)) {
+			for (LivingEntity candidate : ctx.hostiles(previous.position(), jumpRange, false)) {
 				if (!chained.contains(candidate.getId())) {
 					next = candidate;
 					break;
@@ -559,100 +663,158 @@ public final class DaoTechniques {
 				break;
 			}
 			chained.add(next.getId());
-			DaoTechniqueState.Scheduled hop = new DaoTechniqueState.Scheduled(DaoTechniqueState.Kind.CHAIN, CHAIN_DELAY * jump, next, power, null);
-			hop.from = previous;
-			hop.fromPos = middleOf(previous);
-			state.scheduled.add(hop);
+			LivingEntity from = previous;
+			Vec3 fromPos = middleOf(previous);
+			LivingEntity hop = next;
+			ctx.schedule(3 * jump, () -> {
+				if (valid(ctx, hop)) {
+					Vec3 origin = from.isRemoved() ? fromPos : middleOf(from);
+					fx(level, Technique.THUNDER_PALM, DaoTechniqueSub.BOLT, origin, middleOf(hop), 0.8F);
+					strike(ctx, hop, 1.0D, false);
+					ctx.hop(hop.position(), ctx.look());
+					sound(level, hop.position(), SoundEvents.LIGHTNING_BOLT_IMPACT, 0.6F, 1.5F + player.getRandom().nextFloat() * 0.3F);
+				}
+			});
 			previous = next;
 		}
-		strike(player, main, power);
+		strike(ctx, main, 1.0D, true);
+		ctx.hop(main.position(), ctx.look());
+		ctx.keepAlive(3 * jumps + 1);
+		echoPeak(ctx);
 		return true;
 	}
 
-	/** 8 particle bolts from the sky over 2 s on monsters within 16 (2 D each; the same one may be hit again if few). */
-	private static boolean heavenlyThunder(ServerPlayer player, double power) {
-		if (Targeting.hostilesAround(player, player.position(), HEAVENLY_RANGE).isEmpty()) {
+	/**
+	 * Heavenly Thunder: lin(8, 2, 24) particle bolts (+4) over 40 ticks on monsters within 16→32 (2 × P each, preferring
+	 * ones not struck yet); at Puncak Jurus a converging bolt on the strongest at tick 50 (4 × P).
+	 */
+	private static boolean heavenlyThunder(Caster ctx, ServerPlayer player) {
+		double range = ctx.area(16.0D, 32.0D);
+		if (ctx.hostiles(player.position(), range, false).isEmpty()) {
 			refuse(player, "no_target");
 			return false;
 		}
-		DaoTechniqueState state = state(player);
+		int bolts = (ctx.arena() ? 8 : (int) ctx.lin(8.0D, 2.0D, 24.0D)) + ctx.bonusCount();
+		ServerLevel level = player.level();
+		fx(level, Technique.HEAVENLY_THUNDER, DaoTechniqueSub.CAST, player.position(), player.position(), (float) range);
+		ctx.castFx(player.position(), player.position(), (float) range, 0.0F, bolts, 40);
+		sound(level, player.position(), SoundEvents.LIGHTNING_BOLT_THUNDER, 0.7F, 1.1F);
 		Set<Integer> struck = new HashSet<>();
-		for (int i = 0; i < HEAVENLY_BOLTS; i++) {
-			state.scheduled.add(new DaoTechniqueState.Scheduled(DaoTechniqueState.Kind.SKY_BOLT, 1 + i * HEAVENLY_INTERVAL, null,
-					power * 2.0D, struck));
+		for (int i = 0; i < bolts; i++) {
+			int delay = 1 + (int) Math.round(40.0D * i / Math.max(1, bolts));
+			ctx.schedule(delay, () -> skyBolt(ctx, player, range, struck));
 		}
-		fx(player, Technique.HEAVENLY_THUNDER, DaoTechniqueSub.CAST, player.position(), player.position(), (float) HEAVENLY_RANGE);
-		sound(player, player.position(), SoundEvents.LIGHTNING_BOLT_THUNDER, 0.7F, 1.1F);
+		ctx.keepAlive(43);
+		ctx.runBonusSteps();
 		return true;
+	}
+
+	private static void skyBolt(Caster ctx, ServerPlayer player, double range, Set<Integer> struck) {
+		List<LivingEntity> around = ctx.hostiles(player.position(), range, false);
+		if (around.isEmpty()) {
+			return;
+		}
+		List<LivingEntity> fresh = new ArrayList<>();
+		for (LivingEntity candidate : around) {
+			if (!struck.contains(candidate.getId())) {
+				fresh.add(candidate);
+			}
+		}
+		List<LivingEntity> pool = fresh.isEmpty() ? around : fresh;
+		RandomSource random = player.getRandom();
+		LivingEntity target = pool.get(random.nextInt(pool.size()));
+		struck.add(target.getId());
+		Vec3 ground = target.position();
+		ServerLevel level = player.level();
+		fx(level, Technique.HEAVENLY_THUNDER, DaoTechniqueSub.BOLT, skyAbove(level, player, ground), ground, 2.0F);
+		strike(ctx, target, 2.0D, false);
+		ctx.hop(ground, ctx.look());
+		sound(level, ground, SoundEvents.LIGHTNING_BOLT_IMPACT, 1.0F, 0.9F + random.nextFloat() * 0.3F);
+		if (random.nextInt(3) == 0) {
+			sound(level, ground, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.4F, 1.3F);
+		}
 	}
 
 	// ================================================================== Body
 
-	/** 15 s of Resistance II, knockback immunity and 30% of every melee blow thrown back at the monster. */
-	private static boolean ironBody(ServerPlayer player) {
-		player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, IRON_BODY_TICKS, 1), player);
-		AttributeInstance knockback = player.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
-		if (knockback != null) {
-			knockback.addOrUpdateTransientModifier(new AttributeModifier(IRON_BODY_ID, 1.0D, AttributeModifier.Operation.ADD_VALUE));
-		}
-		state(player).ironBodyUntil = now(player) + IRON_BODY_TICKS;
-		fx(player, Technique.IRON_BODY, DaoTechniqueSub.CAST, player.position(), player.position(), player.getBbHeight());
-		fx(player, Technique.IRON_BODY, DaoTechniqueSub.MARK, player.position(), new Vec3(player.getId(), IRON_BODY_TICKS, 0.0D),
-				player.getBbHeight());
-		sound(player, player.position(), SoundEvents.ANVIL_LAND, 0.5F, 1.4F);
-		sound(player, player.position(), SoundEvents.ARMOR_EQUIP_IRON, 1.0F, 0.8F);
-		sound(player, player.position(), SoundEvents.IRON_GOLEM_REPAIR, 1.0F, 0.9F);
+	/**
+	 * Iron Body: 300 ticks → (D): Resistance II (Kenaikan Abadi III), knockback resistance +1 and 30% of every melee blow
+	 * thrown back (Dewa Abadi 50%) through the choke point and this cast's cap. +100 ticks at Kesempurnaan Agung; at Puncak
+	 * Jurus a nova of 4 blocks when it ends (1 × P, knockback 0.8).
+	 */
+	private static boolean ironBody(Caster ctx, ServerPlayer player) {
+		Realm realm = dev.kultivator.data.Cultivators.get(player).realm();
+		int ticks = ctx.duration(300.0D, 600.0D);
+		int resistance = realm.atLeast(Realm.IMMORTAL_ASCENSION) && !ctx.arena() ? 3 : 2;
+		ctx.applySelf(new Payload.Buff(Payload.BuffKind.RESISTANCE, resistance, 0.0D, dev.kultivator.technique.spec.dsl.Val.of(ticks), null, false, false, 1));
+		ctx.applySelf(new Payload.Buff(Payload.BuffKind.KNOCKBACK_RESISTANCE, 1.0D, 0.0D, dev.kultivator.technique.spec.dsl.Val.of(ticks), null, false, false, 1));
+		double reflect = realm.atLeast(Realm.TRUE_IMMORTAL) && !ctx.arena() ? 0.5D : 0.3D;
+		ctx.applySelf(new Payload.Buff(Payload.BuffKind.REFLECT, reflect, 0.0D, dev.kultivator.technique.spec.dsl.Val.of(ticks), null, false, false, 1));
+		ServerLevel level = player.level();
+		fx(level, Technique.IRON_BODY, DaoTechniqueSub.CAST, player.position(), player.position(), player.getBbHeight());
+		fx(level, Technique.IRON_BODY, DaoTechniqueSub.MARK, player.position(), new Vec3(player.getId(), ticks, 0.0D), player.getBbHeight());
+		ctx.castFx(player.position(), player.position(), player.getBbHeight(), 0.0F, 1, ticks);
+		sound(level, player.position(), SoundEvents.ANVIL_LAND, 0.5F, 1.4F);
+		sound(level, player.position(), SoundEvents.ARMOR_EQUIP_IRON, 1.0F, 0.8F);
+		sound(level, player.position(), SoundEvents.IRON_GOLEM_REPAIR, 1.0F, 0.9F);
 		Msg.actionBar(player, Component.translatable("kultivator.daotech.iron_body_on").withColor(Dao.BODY.color()));
+		ctx.schedule(ticks, () -> {
+			fx(level, Technique.IRON_BODY, DaoTechniqueSub.END, middleOf(player), new Vec3(player.getId(), 0.0D, 0.0D), player.getBbHeight());
+			sound(level, player.position(), SoundEvents.ARMOR_EQUIP_IRON, 0.6F, 0.6F);
+			Msg.actionBar(player, Component.translatable("kultivator.daotech.iron_body_off").withColor(0xA8B5B0));
+		});
+		ctx.keepAlive(ticks + 1);
+		ctx.runBonusSteps();
 		return true;
 	}
 
-	private static void endIronBody(ServerPlayer player, DaoTechniqueState state) {
-		state.ironBodyUntil = 0L;
-		removeIronBody(player);
-		fx(player, Technique.IRON_BODY, DaoTechniqueSub.END, middleOf(player), new Vec3(player.getId(), 0.0D, 0.0D), player.getBbHeight());
-		sound(player, player.position(), SoundEvents.ARMOR_EQUIP_IRON, 0.6F, 0.6F);
-		Msg.actionBar(player, Component.translatable("kultivator.daotech.iron_body_off").withStyle(ChatFormatting.GRAY));
-	}
-
-	private static void removeIronBody(ServerPlayer player) {
-		AttributeInstance knockback = player.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
-		if (knockback != null) {
-			knockback.removeModifier(IRON_BODY_ID);
-		}
-	}
-
-	/** A shockwave of radius 7: 2 D, monsters thrown into the air (not ravagers or players, nothing near a portal) and slowed. */
-	private static boolean mountainStomp(ServerPlayer player, double power) {
-		List<LivingEntity> hits = Targeting.hostilesAround(player, player.position(), STOMP_RADIUS);
+	/**
+	 * Mountain Stomp: a shockwave of 7→20 blocks: 2 × P, thrown up (launch 0.9; the never-moved list and the portal rule
+	 * apply per monster) and Slowness II for 4 s; aftershock waves lin(0, 1 per 3 tiers, 2) (+1) of 0.8 × P each.
+	 */
+	private static boolean mountainStomp(Caster ctx, ServerPlayer player) {
+		double radius = ctx.area(7.0D, 20.0D);
+		List<LivingEntity> hits = ctx.hostiles(player.position(), radius, false);
 		if (hits.isEmpty()) {
 			refuse(player, "no_target");
 			return false;
 		}
-		boolean throwing = !portalNear(player, STOMP_RADIUS + 6.0D);
-		fx(player, Technique.MOUNTAIN_STOMP, DaoTechniqueSub.CAST, player.position(), player.position(), (float) STOMP_RADIUS);
-		sound(player, player.position(), SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.2F, 0.7F);
-		sound(player, player.position(), SoundEvents.ANVIL_LAND, 0.6F, 0.5F);
+		ServerLevel level = player.level();
+		fx(level, Technique.MOUNTAIN_STOMP, DaoTechniqueSub.CAST, player.position(), player.position(), (float) radius);
+		ctx.castFx(player.position(), player.position(), (float) radius, 0.0F, hits.size(), 0);
+		sound(level, player.position(), SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.2F, 0.7F);
+		sound(level, player.position(), SoundEvents.ANVIL_LAND, 0.6F, 0.5F);
+		Payload.Move up = new Payload.Move(Payload.MoveKind.LAUNCH, dev.kultivator.technique.spec.dsl.Val.of(0.9D), Payload.Center.CASTER, false, 0,
+				false, false, false);
 		for (LivingEntity target : hits) {
-			boolean landed = strike(player, target, power * 2.0D);
+			boolean landed = strike(ctx, target, 2.0D, false);
 			if (target.isAlive()) {
-				// Only a blow that landed throws: a refused one (a duel's decisive blow) must not launch into a deadly fall.
-				if (landed && throwing && !(target instanceof Ravager) && !(target instanceof Player)) {
-					Vec3 away = target.position().subtract(player.position()).horizontal();
-					Vec3 push = away.lengthSqr() < 1.0E-4D ? Vec3.ZERO : away.normalize().scale(0.35D);
-					launch(target, new Vec3(push.x, 0.9D, push.z));
+				if (landed && !(target instanceof Player)) {
+					ctx.applyHit(target, up, false, player.position(), radius);
 				}
 				target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 80, 1), player);
 			}
-			fx(player, Technique.MOUNTAIN_STOMP, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
+			fx(level, Technique.MOUNTAIN_STOMP, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
 		}
+		ctx.impact(player.position(), ctx.look());
+		int aftershocks = ctx.arena() ? 0 : Math.min(2, ctx.factors().above() / 3) + ctx.bonusWaves();
+		ctx.setLastAreaRadius(radius);
+		for (int i = 1; i <= aftershocks; i++) {
+			ctx.run(Step.at(10 * i).shape(Shape.Wave.DEFAULT.r1(radius).speed(1.5D)).hit(dmg(0.8D)));
+		}
+		echoPeak(ctx);
 		return true;
 	}
 
 	// ================================================================== Life
 
-	/** Heals the caster and the allies / pets within 8 by 40% of their max health, cures Poison and Wither. */
-	private static boolean springOfLife(ServerPlayer player) {
-		List<LivingEntity> allies = new ArrayList<>(Targeting.alliesAround(player, SPRING_RADIUS));
+	/**
+	 * Spring of Life: the caster and the allies within 8→16: 40% of max health (Dewa Abadi 60%), Poison and Wither cured
+	 * (every listed effect at Kesempurnaan Agung) and Regeneration I for 5 s (II for 10 s at Puncak Jurus).
+	 */
+	private static boolean springOfLife(Caster ctx, ServerPlayer player) {
+		double radius = ctx.area(8.0D, 16.0D);
+		List<LivingEntity> allies = new ArrayList<>(ctx.allies(player.position(), radius));
 		if (!allies.contains(player)) {
 			allies.add(0, player);
 		}
@@ -668,64 +830,98 @@ public final class DaoTechniques {
 			refuse(player, "nothing_to_heal");
 			return false;
 		}
-		fx(player, Technique.SPRING_OF_LIFE, DaoTechniqueSub.CAST, player.position(), player.position(), (float) SPRING_RADIUS);
-		sound(player, player.position(), SoundEvents.BEACON_POWER_SELECT, 0.8F, 1.6F);
-		sound(player, player.position(), SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.2F);
+		ServerLevel level = player.level();
+		fx(level, Technique.SPRING_OF_LIFE, DaoTechniqueSub.CAST, player.position(), player.position(), (float) radius);
+		ctx.castFx(player.position(), player.position(), (float) radius, 0.0F, allies.size(), 0);
+		sound(level, player.position(), SoundEvents.BEACON_POWER_SELECT, 0.8F, 1.6F);
+		sound(level, player.position(), SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.2F);
+		boolean deep = !ctx.arena() && dev.kultivator.data.Cultivators.get(player).realm().atLeast(Realm.TRUE_IMMORTAL);
+		boolean fullCleanse = ctx.perfection(Bonus.Kind.PAYLOAD);
+		boolean strongRegen = ctx.peak(Bonus.Kind.PAYLOAD);
 		for (LivingEntity ally : allies) {
-			ally.heal(ally.getMaxHealth() * 0.4F);
-			ally.removeEffect(MobEffects.POISON);
-			ally.removeEffect(MobEffects.WITHER);
-			ally.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0), player);
-			fx(player, Technique.SPRING_OF_LIFE, DaoTechniqueSub.HEAL, ally.position(), ally.position(), ally.getBbHeight());
+			ally.heal(ally.getMaxHealth() * (deep ? 0.6F : 0.4F));
+			if (fullCleanse) {
+				for (var effect : Payload.Cleanse.DEFAULT) {
+					ally.removeEffect(effect);
+				}
+			} else {
+				ally.removeEffect(MobEffects.POISON);
+				ally.removeEffect(MobEffects.WITHER);
+			}
+			ally.addEffect(strongRegen ? new MobEffectInstance(MobEffects.REGENERATION, 200, 1) : new MobEffectInstance(MobEffects.REGENERATION, 100, 0), player);
+			fx(level, Technique.SPRING_OF_LIFE, DaoTechniqueSub.HEAL, ally.position(), ally.position(), ally.getBbHeight());
 		}
 		return true;
 	}
 
-	/** Every monster within 8 takes D; the caster heals half of what was really dealt. */
-	private static boolean lifeDrain(ServerPlayer player, double power) {
-		List<LivingEntity> hits = Targeting.hostilesAround(player, player.position(), DRAIN_RADIUS);
+	/**
+	 * Life Drain: every monster within 8→16 takes 1 × P; the caster heals half of what was really dealt (0.6 at
+	 * Kesempurnaan Agung), overheal becoming absorption up to 20% of max health; at Puncak Jurus also 10% of it as qi.
+	 */
+	private static boolean lifeDrain(Caster ctx, ServerPlayer player) {
+		double radius = ctx.area(8.0D, 16.0D);
+		List<LivingEntity> hits = ctx.hostiles(player.position(), radius, false);
 		if (hits.isEmpty()) {
 			refuse(player, "no_target");
 			return false;
 		}
+		ServerLevel level = player.level();
 		Vec3 heart = middleOf(player);
+		double share = ctx.perfection(Bonus.Kind.PAYLOAD) ? 0.6D : 0.5D;
+		double qi = ctx.peak(Bonus.Kind.ECHO) && !ctx.copy() ? 0.1D : 0.0D;
+		Payload.Drain drain = new Payload.Drain(share, 0.0D, 0.0D, qi, ctx.arena() ? 0.0D : 0.2D);
 		double dealt = 0.0D;
 		for (LivingEntity target : hits) {
-			float before = target.getHealth();
-			strike(player, target, power);
-			dealt += Math.max(0.0F, before - Math.max(0.0F, target.getHealth()));
-			fx(player, Technique.LIFE_DRAIN, DaoTechniqueSub.DRAIN, middleOf(target), heart, target.getBbHeight());
+			if (strike(ctx, target, 1.0D, false)) {
+				dealt += ctx.lastDealt();
+				ctx.apply(target, drain);
+			}
+			fx(level, Technique.LIFE_DRAIN, DaoTechniqueSub.DRAIN, middleOf(target), heart, target.getBbHeight());
 		}
-		float heal = (float) (dealt * 0.5D);
-		if (heal > 0.0F) {
-			player.heal(heal);
-		}
-		fx(player, Technique.LIFE_DRAIN, DaoTechniqueSub.CAST, player.position(), player.position(), (float) DRAIN_RADIUS);
-		fx(player, Technique.LIFE_DRAIN, DaoTechniqueSub.HEAL, player.position(), player.position(), player.getBbHeight());
-		sound(player, player.position(), SoundEvents.EVOKER_CAST_SPELL, 1.0F, 0.7F);
-		sound(player, player.position(), SoundEvents.WARDEN_HEARTBEAT, 1.0F, 1.3F);
-		Msg.actionBar(player, Component.translatable("kultivator.daotech.drained", String.format(Locale.ROOT, "%.1f", heal))
+		fx(level, Technique.LIFE_DRAIN, DaoTechniqueSub.CAST, player.position(), player.position(), (float) radius);
+		fx(level, Technique.LIFE_DRAIN, DaoTechniqueSub.HEAL, player.position(), player.position(), player.getBbHeight());
+		ctx.castFx(player.position(), player.position(), (float) radius, 0.0F, hits.size(), 0);
+		sound(level, player.position(), SoundEvents.EVOKER_CAST_SPELL, 1.0F, 0.7F);
+		sound(level, player.position(), SoundEvents.WARDEN_HEARTBEAT, 1.0F, 1.3F);
+		Msg.actionBar(player, Component.translatable("kultivator.daotech.drained", String.format(Locale.ROOT, "%.1f", dealt * share))
 				.withColor(Dao.LIFE.color()));
+		ctx.impact(player.position(), ctx.look());
+		echoPeak(ctx);
 		return true;
 	}
 
 	// ================================================================== Shadow & Wind
 
-	/** Steps through the shadows to a safe spot right behind the looked-at monster; the next melee hit within 5 s is doubled. */
-	private static boolean shadowStep(ServerPlayer player) {
-		LivingEntity target = Targeting.lookedAtHostile(player, SHADOW_RANGE);
+	/**
+	 * Shadow Step: a safe step behind the looked-at monster (20→32; never behind a creeper); the next melee hit within 5 s
+	 * lands ×2 (Kenaikan Abadi ×3). From Deity Transformation a second step behind another monster within 20 may follow
+	 * within 60 ticks (+20 at Kesempurnaan Agung). At Puncak Jurus an afterimage bursts 10 ticks later (0.5 × P).
+	 */
+	private static boolean shadowStep(Caster ctx, ServerPlayer player, boolean second) {
+		double range = second ? 20.0D : ctx.area(20.0D, 32.0D);
+		DaoTechniqueState state = state(player);
+		LivingEntity target;
+		if (second) {
+			target = null;
+			for (LivingEntity candidate : ctx.hostiles(player.position(), range, true)) {
+				if (!state.shadowVisited.contains(candidate.getId()) && !(candidate instanceof Creeper)) {
+					target = candidate;
+					break;
+				}
+			}
+		} else {
+			target = ctx.target() != null && ctx.target().distanceTo(player) <= range + 2.0D ? ctx.target() : Targeting.lookedAtHostile(player, range);
+		}
 		if (target == null) {
 			refuse(player, "no_target_look");
 			return false;
 		}
 		if (target instanceof Creeper) {
-			// Right behind a creeper is inside its fuse range.
 			refuse(player, "creeper");
 			return false;
 		}
 		ServerLevel level = player.level();
 		Vec3 from = player.position();
-		// "Behind" = on the far side of the monster, seen from where the caster comes from.
 		Vec3 approach = target.position().subtract(from).horizontal();
 		if (approach.lengthSqr() < 1.0E-4D) {
 			approach = player.getViewVector(1.0F).horizontal();
@@ -734,7 +930,7 @@ public final class DaoTechniques {
 		double base = target.getBbWidth() * 0.5D + player.getBbWidth() * 0.5D;
 		Vec3 spot = null;
 		for (double gap : new double[]{0.9D, 0.5D, 1.5D}) {
-			Vec3 candidate = Targeting.safeSpot(level, player, target.position().add(approach.scale(base + gap)));
+			Vec3 candidate = ctx.safeSpot(target.position().add(approach.scale(base + gap)));
 			if (candidate != null && Math.abs(candidate.y - target.getY()) <= 2.5D
 					&& clearBetween(player, middleOf(target), candidate.add(0.0D, player.getBbHeight() * 0.5D, 0.0D))) {
 				spot = candidate;
@@ -748,89 +944,131 @@ public final class DaoTechniques {
 		Vec3 look = middleOf(target).subtract(spot.add(0.0D, player.getEyeHeight(), 0.0D));
 		float yaw = (float) (Mth.atan2(look.z, look.x) * Mth.RAD_TO_DEG) - 90.0F;
 		float pitch = (float) (-(Mth.atan2(look.y, look.horizontalDistance()) * Mth.RAD_TO_DEG));
-		fx(player, Technique.SHADOW_STEP, DaoTechniqueSub.CAST, from, spot, player.getBbHeight());
-		sound(player, from, SoundEvents.ENDERMAN_TELEPORT, 0.7F, 1.4F);
-		sound(player, from, SoundEvents.ILLUSIONER_MIRROR_MOVE, 0.8F, 1.0F);
+		fx(level, Technique.SHADOW_STEP, DaoTechniqueSub.CAST, from, spot, player.getBbHeight());
+		sound(level, from, SoundEvents.ENDERMAN_TELEPORT, 0.7F, 1.4F);
+		sound(level, from, SoundEvents.ILLUSIONER_MIRROR_MOVE, 0.8F, 1.0F);
 		player.teleportTo(level, spot.x, spot.y, spot.z, EnumSet.noneOf(Relative.class), yaw, pitch, false);
 		player.resetFallDistance();
-		sound(player, spot, SoundEvents.ENDERMAN_TELEPORT, 0.7F, 1.6F);
-		sound(player, spot, SoundEvents.SQUID_SQUIRT, 0.6F, 0.6F);
-		state(player).shadowUntil = now(player) + SHADOW_TICKS;
-		fx(player, Technique.SHADOW_STEP, DaoTechniqueSub.MARK, spot, new Vec3(player.getId(), SHADOW_TICKS, 0.0D), player.getBbHeight());
+		ctx.markPath(from, spot);
+		ctx.addAfterimage(from);
+		ctx.castFx(from, spot, player.getBbWidth(), (float) from.distanceTo(spot), 1, 1);
+		sound(level, spot, SoundEvents.ENDERMAN_TELEPORT, 0.7F, 1.6F);
+		sound(level, spot, SoundEvents.SQUID_SQUIRT, 0.6F, 0.6F);
+		long now = level.getGameTime();
+		Realm realm = dev.kultivator.data.Cultivators.get(player).realm();
+		state.shadowUntil = now + 100L;
+		state.shadowFactor = realm.atLeast(Realm.IMMORTAL_ASCENSION) && !ctx.arena() ? 3.0D : 2.0D;
+		state.shadowCast = ctx;
+		state.shadowVisited.add(target.getId());
+		if (!second && !ctx.arena() && realm.atLeast(Realm.DEITY_TRANSFORMATION)) {
+			state.shadowWindowUntil = now + 60L + (ctx.perfection(Bonus.Kind.DURATION_TICKS) ? 20L : 0L);
+		} else if (second) {
+			state.shadowWindowUntil = 0L;
+		}
+		fx(level, Technique.SHADOW_STEP, DaoTechniqueSub.MARK, spot, new Vec3(player.getId(), 100, 0.0D), player.getBbHeight());
 		Msg.actionBar(player, Component.translatable("kultivator.daotech.shadow_ready").withColor(Dao.SHADOW.color()));
+		ctx.keepAlive(100);
+		if (!second) {
+			ctx.runBonusSteps();
+		}
 		return true;
 	}
 
-	/**
-	 * A storm wind hurls every monster within 10 away (harder when close; never ravagers or players, nothing near a portal); the
-	 * caster turns invisible and swift for 6 s.
-	 */
-	private static boolean gale(ServerPlayer player) {
-		List<LivingEntity> blown = portalNear(player, GALE_RADIUS + 16.0D) ? List.of()
-				: Targeting.hostilesAround(player, player.position(), GALE_RADIUS);
-		for (LivingEntity target : blown) {
-			// Never a ravager (it tears through leaves) or a player (a sparring partner could be blown into the void).
-			if (target instanceof Ravager || target instanceof Player) {
-				continue;
-			}
-			Vec3 away = target.position().subtract(player.position()).horizontal();
-			double distance = away.length();
-			Vec3 dir = distance < 1.0E-3D ? player.getViewVector(1.0F).horizontal() : away.scale(1.0D / distance);
-			dir = dir.lengthSqr() < 1.0E-6D ? new Vec3(1.0D, 0.0D, 0.0D) : dir.normalize();
-			double closeness = 1.0D - Math.min(1.0D, distance / GALE_RADIUS);
-			double strength = 0.9D + 1.7D * closeness;
-			launch(target, new Vec3(dir.x * strength, 0.35D + 0.3D * closeness, dir.z * strength));
+	/** The Shadow Step stage-2 recast inside its window (skips the cooldown). True when consumed. */
+	public static boolean shadowRecast(Caster ctx, ServerPlayer player) {
+		DaoTechniqueState state = STATES.get(player.getUUID());
+		if (state == null || player.level().getGameTime() >= state.shadowWindowUntil) {
+			return false;
 		}
-		player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, GALE_TICKS, 0, false, false, true), player);
-		player.addEffect(new MobEffectInstance(MobEffects.SPEED, GALE_TICKS, 1, false, false, true), player);
-		fx(player, Technique.GALE, DaoTechniqueSub.CAST, player.position(), player.position(), (float) GALE_RADIUS);
-		sound(player, player.position(), SoundEvents.BREEZE_WIND_CHARGE_BURST, 1.0F, 0.8F);
-		sound(player, player.position(), SoundEvents.PHANTOM_SWOOP, 0.7F, 1.5F);
+		return shadowStep(ctx, player, true);
+	}
+
+	/** True while the Shadow Step stage-2 window is open. */
+	public static boolean shadowWindow(ServerPlayer player) {
+		DaoTechniqueState state = STATES.get(player.getUUID());
+		return state != null && player.level().getGameTime() < state.shadowWindowUntil;
+	}
+
+	/**
+	 * Gale: a storm wind of 10→20 blocks: 0.8 × P (not in an arena) and every monster hurled away, 0.9→2.6 by closeness × A
+	 * (the never-moved list and the portal rule apply per monster); the caster turns invisible and swift for 120 ticks → (D)
+	 * (+40 at Kesempurnaan Agung).
+	 */
+	private static boolean gale(Caster ctx, ServerPlayer player) {
+		double radius = ctx.area(10.0D, 20.0D);
+		List<LivingEntity> blown = ctx.hostiles(player.position(), radius, false);
+		Payload.Move knock = new Payload.Move(Payload.MoveKind.KNOCK, dev.kultivator.technique.spec.dsl.Val.of(0.9D, 2.6D), Payload.Center.CASTER, false,
+				0, false, true, false);
+		for (LivingEntity target : blown) {
+			if (!ctx.arena()) {
+				strike(ctx, target, 0.8D, false);
+			}
+			if (target.isAlive() && !(target instanceof Player)) {
+				ctx.applyHit(target, knock, false, player.position(), radius);
+			}
+		}
+		int ticks = ctx.duration(120.0D, 240.0D);
+		player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, ticks, 0, false, false, true), player);
+		player.addEffect(new MobEffectInstance(MobEffects.SPEED, ticks, 1, false, false, true), player);
+		ServerLevel level = player.level();
+		fx(level, Technique.GALE, DaoTechniqueSub.CAST, player.position(), player.position(), (float) radius);
+		ctx.castFx(player.position(), player.position(), (float) radius, 0.0F, blown.size(), ticks);
+		sound(level, player.position(), SoundEvents.BREEZE_WIND_CHARGE_BURST, 1.0F, 0.8F);
+		sound(level, player.position(), SoundEvents.PHANTOM_SWOOP, 0.7F, 1.5F);
+		if (!blown.isEmpty()) {
+			ctx.impact(player.position(), ctx.look());
+		}
+		echoPeak(ctx);
 		return true;
 	}
 
 	// ================================================================== Space
 
-	/** Folds space to the looked-at spot (24 blocks), only onto a spot checked to be safe; refuses otherwise. */
-	private static boolean spaceBlink(ServerPlayer player) {
+	/** Space Blink: folds space to the looked-at spot (24→64), only onto a safe spot reached through open, loaded space. */
+	private static boolean spaceBlink(Caster ctx, ServerPlayer player) {
 		ServerLevel level = player.level();
-		BlockHitResult hit = Targeting.blockHit(player, BLINK_RANGE);
-		Vec3 aim = Targeting.aimPoint(player, BLINK_RANGE);
+		double range = ctx.area(24.0D, 64.0D);
+		Vec3 eye = player.getEyePosition();
+		BlockHitResult hit = dev.kultivator.util.LoadedPath.ray(level, eye, eye.add(player.getViewVector(1.0F).scale(range)), player);
+		Vec3 aim = hit.getLocation();
 		if (hit.getType() != HitResult.Type.MISS) {
-			// Step out of the face we look at: on top of a floor, in front of a wall, under a ceiling.
-			Direction face = hit.getDirection();
-			double dy = face == Direction.DOWN ? -player.getBbHeight() - 0.1D : face.getStepY() * 0.1D;
+			net.minecraft.core.Direction face = hit.getDirection();
+			double dy = face == net.minecraft.core.Direction.DOWN ? -player.getBbHeight() - 0.1D : face.getStepY() * 0.1D;
 			aim = aim.add(face.getStepX() * 0.6D, dy, face.getStepZ() * 0.6D);
 		}
-		Vec3 spot = Targeting.safeSpot(level, player, aim);
+		Vec3 spot = ctx.safeSpot(aim);
 		if (spot == null) {
 			refuse(player, "no_safe_spot");
 			return false;
 		}
-		// Only through open space: never onto a roof through a ceiling, or into a room under a floor.
 		Vec3 middle = spot.add(0.0D, player.getBbHeight() * 0.5D, 0.0D);
-		Vec3 eye = player.getEyePosition();
 		if (!clearBetween(player, aim, middle)
 				|| !clearBetween(player, eye, spot.add(0.0D, player.getEyeHeight(), 0.0D)) && !clearBetween(player, eye, middle)) {
 			refuse(player, "no_safe_spot");
 			return false;
 		}
 		Vec3 from = player.position();
-		fx(player, Technique.SPACE_BLINK, DaoTechniqueSub.CAST, from, spot, player.getBbHeight());
-		sound(player, from, SoundEvents.ENDERMAN_TELEPORT, 0.8F, 0.7F);
+		fx(level, Technique.SPACE_BLINK, DaoTechniqueSub.CAST, from, spot, player.getBbHeight());
+		ctx.castFx(from, spot, player.getBbWidth(), (float) from.distanceTo(spot), 1, 1);
+		sound(level, from, SoundEvents.ENDERMAN_TELEPORT, 0.8F, 0.7F);
 		player.teleportTo(level, spot.x, spot.y, spot.z, Relative.ROTATION, 0.0F, 0.0F, false);
 		player.resetFallDistance();
-		sound(player, spot, SoundEvents.ENDERMAN_TELEPORT, 0.8F, 1.2F);
-		sound(player, spot, SoundEvents.AMETHYST_BLOCK_RESONATE, 0.6F, 1.8F);
+		ctx.markPath(from, spot);
+		ctx.addAfterimage(from);
+		sound(level, spot, SoundEvents.ENDERMAN_TELEPORT, 0.8F, 1.2F);
+		sound(level, spot, SoundEvents.AMETHYST_BLOCK_RESONATE, 0.6F, 1.8F);
+		ctx.runBonusSteps();
 		return true;
 	}
 
 	/**
-	 * Every monster within 12 is locked in place for 6 s and pulled together (0.3 block per tick; creepers and ravagers are
-	 * only held, and nothing is pulled near a portal); 1.5 D at the start.
+	 * Space Prison: every monster within 12→24 takes 1.5 × P, is rooted 120 ticks (+20 at Kesempurnaan Agung) and pulled
+	 * together 0.3 blocks per tick (never-moved list; near a portal it is only held). At Puncak Jurus the prison implodes
+	 * at release (1.5 × P).
 	 */
-	private static boolean spacePrison(ServerPlayer player, double power) {
-		List<LivingEntity> hits = Targeting.hostilesAround(player, player.position(), SPACE_PRISON_RADIUS);
+	private static boolean spacePrison(Caster ctx, ServerPlayer player) {
+		double radius = ctx.area(12.0D, 24.0D);
+		List<LivingEntity> hits = ctx.hostiles(player.position(), radius, false);
 		if (hits.isEmpty()) {
 			refuse(player, "no_target");
 			return false;
@@ -848,228 +1086,98 @@ public final class DaoTechniques {
 		for (LivingEntity target : hits) {
 			spread = Math.max(spread, target.position().distanceTo(centre) + 1.0D);
 		}
-		fx(player, Technique.SPACE_PRISON, DaoTechniqueSub.CAST, centre, player.position(), (float) spread);
-		sound(player, centre, SoundEvents.RESPAWN_ANCHOR_CHARGE, 1.0F, 0.6F);
-		sound(player, centre, SoundEvents.ILLUSIONER_CAST_SPELL, 1.0F, 0.8F);
+		ServerLevel level = player.level();
+		fx(level, Technique.SPACE_PRISON, DaoTechniqueSub.CAST, centre, player.position(), (float) spread);
+		ctx.castFx(centre, player.position(), (float) spread, 0.0F, hits.size(), 120);
+		sound(level, centre, SoundEvents.RESPAWN_ANCHOR_CHARGE, 1.0F, 0.6F);
+		sound(level, centre, SoundEvents.ILLUSIONER_CAST_SPELL, 1.0F, 0.8F);
+		int ticks = ctx.duration(120.0D, 120.0D);
+		Payload.Move pull = new Payload.Move(Payload.MoveKind.PULL, dev.kultivator.technique.spec.dsl.Val.of(PULL_SPEED), Payload.Center.ANCHOR, true,
+				ticks, false, false, false);
 		int locked = 0;
-		boolean pull = !portalNear(player, SPACE_PRISON_RADIUS + 4.0D);
 		for (LivingEntity target : hits) {
-			strike(player, target, power * 1.5D);
+			strike(ctx, target, 1.5D, false);
 			if (target.isAlive()) {
-				target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, SPACE_PRISON_TICKS, HOLD_AMPLIFIER), player);
-				// Near a portal every prisoner is anchored where it stands (held, never pulled).
-				lock(player, target, Technique.SPACE_PRISON, pull ? centre : target.position(), SPACE_PRISON_TICKS);
+				ctx.apply(target, new Payload.Bind(Payload.BindKind.ROOT, dev.kultivator.technique.spec.dsl.Val.of(ticks), -1));
+				ctx.applyHit(target, pull, false, centre, spread);
+				fx(level, Technique.SPACE_PRISON, DaoTechniqueSub.MARK, centre, new Vec3(target.getId(), ticks, 0.0D), target.getBbHeight());
 				locked++;
 			}
 		}
+		ctx.markEnd(centre);
+		ctx.schedule(ticks, () -> {
+			for (LivingEntity target : hits) {
+				if (target.isAlive() && !target.isRemoved()) {
+					fx(level, Technique.SPACE_PRISON, DaoTechniqueSub.END, middleOf(target), new Vec3(target.getId(), 0.0D, 0.0D), target.getBbHeight());
+					sound(level, target.position(), SoundEvents.ENDERMAN_TELEPORT, 0.4F, 1.8F);
+				}
+			}
+		});
+		ctx.keepAlive(ticks + 1);
+		ctx.runBonusSteps();
 		Msg.actionBar(player, Component.translatable("kultivator.daotech.space_prison", String.valueOf(locked)).withColor(Dao.SPACE.color()));
 		return true;
 	}
 
 	// ================================================================== lasting effects
 
-	/** Holds {@code entity} for {@code ticks} (replacing any other prison on it) and tells clients to draw it. */
-	private static void lock(ServerPlayer player, LivingEntity entity, Technique technique, Vec3 anchor, int ticks) {
-		for (DaoTechniqueState other : STATES.values()) {
-			if (other.holds(entity)) {
-				other.locks.removeIf(lock -> lock.entity == entity);
-			}
-		}
-		state(player).locks.add(new DaoTechniqueState.Lock(entity, technique, anchor, ticks));
-		Vec3 velocity = entity.getDeltaMovement();
-		launch(entity, new Vec3(0.0D, Math.min(0.0D, velocity.y), 0.0D));
-		if (entity instanceof Creeper creeper) {
-			// A prisoner's fuse never burns.
-			creeper.setSwellDir(-1);
-		}
-		if (entity instanceof Mob mob) {
-			mob.getNavigation().stop();
-		}
-		fx(player, technique, DaoTechniqueSub.MARK, anchor, new Vec3(entity.getId(), ticks, 0.0D), entity.getBbHeight());
-	}
-
-	private static void tickLocks(ServerPlayer player, DaoTechniqueState state) {
-		Iterator<DaoTechniqueState.Lock> iterator = state.locks.iterator();
-		while (iterator.hasNext()) {
-			DaoTechniqueState.Lock lock = iterator.next();
-			LivingEntity entity = lock.entity;
-			lock.ticksLeft--;
-			lock.age++;
-			boolean gone = !entity.isAlive() || entity.isRemoved() || entity.level() != player.level();
-			if (gone || lock.ticksLeft <= 0) {
-				iterator.remove();
-				if (!gone) {
-					release(player, lock);
-				}
-				continue;
-			}
-			Vec3 velocity = entity.getDeltaMovement();
-			if (entity instanceof Creeper creeper) {
-				// Runs after the entity ticks: the next Creeper.tick reads -1, so the fuse never grows while held.
-				creeper.setSwellDir(-1);
-			}
-			// Only held, never dragged: creepers, ravagers, the Ender Dragon (it breaks the blocks it is moved into) and players.
-			boolean held = entity instanceof Creeper || entity instanceof Ravager || entity instanceof EnderDragon || entity instanceof Player;
-			if (lock.technique == Technique.SPACE_PRISON && !held) {
-				Vec3 to = lock.anchor.subtract(entity.position()).horizontal();
-				double distance = to.length();
-				Vec3 pull = distance > 1.0D ? to.scale(Math.min(PULL_SPEED, distance - 0.9D) / distance) : Vec3.ZERO;
-				entity.setDeltaMovement(pull.x, Math.min(0.0D, velocity.y), pull.z);
-			} else {
-				entity.setDeltaMovement(0.0D, Math.min(0.0D, velocity.y), 0.0D);
-				if (lock.technique == Technique.GLACIER_PRISON) {
-					freeze(entity, 20);
-				}
-			}
-			if (entity instanceof Mob mob) {
-				mob.getNavigation().stop();
-			}
-			if (lock.age % 3 == 1) {
-				// Mobs only send their motion now and then; make sure clients see them stop / slide.
-				entity.needsSync = true;
-				entity.syncVelocity = true;
-			}
-		}
-	}
-
-	private static void release(ServerPlayer player, DaoTechniqueState.Lock lock) {
-		LivingEntity entity = lock.entity;
-		fx(player, lock.technique, DaoTechniqueSub.END, middleOf(entity), new Vec3(entity.getId(), 0.0D, 0.0D), entity.getBbHeight());
-		if (lock.technique == Technique.GLACIER_PRISON) {
-			sound(player, entity.position(), SoundEvents.GLASS_BREAK, 0.8F, 1.0F);
-		} else {
-			sound(player, entity.position(), SoundEvents.ENDERMAN_TELEPORT, 0.4F, 1.8F);
-		}
-	}
-
-	private static void tickScheduled(ServerPlayer player, DaoTechniqueState state) {
-		if (state.scheduled.isEmpty()) {
+	/** Every server tick for every player: the flying phoenixes and the end of the empowered strike. */
+	public static void tick(ServerPlayer player, dev.kultivator.data.CultivationData data) {
+		DaoTechniqueState state = STATES.get(player.getUUID());
+		if (state == null || player.isRemoved() || player.isDeadOrDying()) {
 			return;
 		}
-		List<DaoTechniqueState.Scheduled> due = new ArrayList<>();
-		Iterator<DaoTechniqueState.Scheduled> iterator = state.scheduled.iterator();
-		while (iterator.hasNext()) {
-			DaoTechniqueState.Scheduled each = iterator.next();
-			if (--each.delay <= 0) {
-				iterator.remove();
-				due.add(each);
-			}
+		long now = player.level().getGameTime();
+		if (state.shadowUntil != 0L && now >= state.shadowUntil) {
+			state.shadowUntil = 0L;
+			fx(player.level(), Technique.SHADOW_STEP, DaoTechniqueSub.END, middleOf(player), new Vec3(player.getId(), 0.0D, 0.0D), 0.0F);
 		}
-		for (DaoTechniqueState.Scheduled each : due) {
-			switch (each.kind) {
-				case SWORD -> {
-					LivingEntity target = each.target;
-					if (valid(player, target)) {
-						fx(player, Technique.THOUSAND_SWORDS, DaoTechniqueSub.SWORD_FALL, target.position(), target.position(), SWORD_FALL_TICKS);
-						state.scheduled.add(new DaoTechniqueState.Scheduled(DaoTechniqueState.Kind.SWORD_HIT, SWORD_FALL_TICKS, target,
-								each.amount, null));
-					}
-				}
-				case SWORD_HIT -> {
-					LivingEntity target = each.target;
-					if (valid(player, target)) {
-						strike(player, target, each.amount);
-						sound(player, target.position(), SoundEvents.TRIDENT_HIT, 0.5F, 1.3F + player.getRandom().nextFloat() * 0.4F);
-					}
-				}
-				case CHAIN -> {
-					LivingEntity target = each.target;
-					if (valid(player, target)) {
-						Vec3 from = each.from != null && !each.from.isRemoved() ? middleOf(each.from) : each.fromPos;
-						fx(player, Technique.THUNDER_PALM, DaoTechniqueSub.BOLT, from, middleOf(target), 0.8F);
-						strike(player, target, each.amount);
-						sound(player, target.position(), SoundEvents.LIGHTNING_BOLT_IMPACT, 0.6F, 1.5F + player.getRandom().nextFloat() * 0.3F);
-					}
-				}
-				case SKY_BOLT -> skyBolt(player, each);
-			}
+		if (!state.phoenixes.isEmpty()) {
+			tickPhoenixes(player, state);
 		}
-	}
-
-	/** One Heavenly Thunder bolt: prefers a monster not struck yet by this cast. */
-	private static void skyBolt(ServerPlayer player, DaoTechniqueState.Scheduled bolt) {
-		List<LivingEntity> around = Targeting.hostilesAround(player, player.position(), HEAVENLY_RANGE);
-		if (around.isEmpty()) {
-			return;
+		if (now >= state.shadowWindowUntil) {
+			state.shadowVisited.clear();
 		}
-		List<LivingEntity> fresh = new ArrayList<>();
-		for (LivingEntity candidate : around) {
-			if (bolt.hitSet == null || !bolt.hitSet.contains(candidate.getId())) {
-				fresh.add(candidate);
-			}
-		}
-		List<LivingEntity> pool = fresh.isEmpty() ? around : fresh;
-		RandomSource random = player.getRandom();
-		LivingEntity target = pool.get(random.nextInt(pool.size()));
-		if (bolt.hitSet != null) {
-			bolt.hitSet.add(target.getId());
-		}
-		Vec3 ground = target.position();
-		fx(player, Technique.HEAVENLY_THUNDER, DaoTechniqueSub.BOLT, skyAbove(player, ground), ground, 2.0F);
-		strike(player, target, bolt.amount);
-		sound(player, ground, SoundEvents.LIGHTNING_BOLT_IMPACT, 1.0F, 0.9F + random.nextFloat() * 0.3F);
-		if (random.nextInt(3) == 0) {
-			sound(player, ground, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.4F, 1.3F);
+		if (state.idle(now)) {
+			STATES.remove(player.getUUID());
 		}
 	}
 
 	// ================================================================== events
 
 	private static void afterDamage(LivingEntity entity, DamageSource source, float baseDamage, float damageTaken, boolean blocked) {
-		if (retaliating || blocked || baseDamage <= 0.0F) {
+		if (retaliating || blocked || damageTaken <= 0.0F) {
 			return;
 		}
-		// Iron Body: a melee blow taken is partly thrown back at the monster.
-		if (entity instanceof ServerPlayer victim && isMelee(source) && source.getEntity() instanceof LivingEntity attacker) {
-			DaoTechniqueState state = STATES.get(victim.getUUID());
-			if (state != null && state.ironBodyUntil > now(victim) && attacker.isAlive() && Targeting.isHostileTo(attacker, victim)) {
-				retaliating = true;
-				try {
-					strike(victim, attacker, baseDamage * REFLECT_SHARE);
-				} finally {
-					retaliating = false;
-				}
-				fx(victim, Technique.IRON_BODY, DaoTechniqueSub.HIT, middleOf(attacker), middleOf(attacker), attacker.getBbWidth());
-				sound(victim, attacker.position(), SoundEvents.SHIELD_BLOCK, 0.7F, 0.7F);
-			}
-		}
-		// Shadow Step: the next melee hit after the step lands twice.
-		if (damageTaken > 0.0F && source.is(DamageTypes.PLAYER_ATTACK) && source.getEntity() instanceof ServerPlayer attacker
-				&& source.getDirectEntity() == attacker) {
+		// Shadow Step: the next melee hit after the step lands ×2 (×3 from Kenaikan Abadi), through the choke point.
+		if (source.is(DamageTypes.PLAYER_ATTACK) && source.getEntity() instanceof ServerPlayer attacker && source.getDirectEntity() == attacker) {
 			DaoTechniqueState state = STATES.get(attacker.getUUID());
-			if (state != null && state.shadowUntil > now(attacker) && entity.isAlive() && Targeting.isHostileTo(entity, attacker)) {
+			if (state != null && state.shadowUntil > attacker.level().getGameTime() && entity.isAlive() && state.shadowCast != null
+					&& state.shadowCast.mayHit(entity, true)) {
 				state.shadowUntil = 0L;
 				retaliating = true;
 				try {
-					strike(attacker, entity, damageTaken);
+					double extra = damageTaken * Math.max(0.0D, state.shadowFactor - 1.0D);
+					if (state.shadowCast instanceof Caster cast) {
+						cast.hurt(cast.raw(entity, extra, dev.kultivator.technique.spec.DamageContext.Kind.HIT));
+					}
 				} finally {
 					retaliating = false;
 				}
-				fx(attacker, Technique.SHADOW_STEP, DaoTechniqueSub.HIT, middleOf(entity), middleOf(entity), entity.getBbWidth());
-				fx(attacker, Technique.SHADOW_STEP, DaoTechniqueSub.END, middleOf(attacker), new Vec3(attacker.getId(), 0.0D, 0.0D), 0.0F);
-				sound(attacker, entity.position(), SoundEvents.PLAYER_ATTACK_CRIT, 1.0F, 0.6F);
+				ServerLevel level = attacker.level();
+				fx(level, Technique.SHADOW_STEP, DaoTechniqueSub.HIT, middleOf(entity), middleOf(entity), entity.getBbWidth());
+				fx(level, Technique.SHADOW_STEP, DaoTechniqueSub.END, middleOf(attacker), new Vec3(attacker.getId(), 0.0D, 0.0D), 0.0F);
+				sound(level, entity.position(), SoundEvents.PLAYER_ATTACK_CRIT, 1.0F, 0.6F);
 				Msg.actionBar(attacker, Component.translatable("kultivator.daotech.shadow_strike").withColor(Dao.SHADOW.color()));
 			}
 		}
 	}
 
-	private static boolean isMelee(DamageSource source) {
-		return (source.is(DamageTypes.MOB_ATTACK) || source.is(DamageTypes.MOB_ATTACK_NO_AGGRO) || source.is(DamageTypes.PLAYER_ATTACK))
-				&& source.getEntity() != null && source.getDirectEntity() == source.getEntity();
-	}
-
-	private static void onLeave(ServerPlayer player) {
-		DaoTechniqueState state = STATES.remove(player.getUUID());
-		if (state != null && state.ironBodyUntil != 0L) {
-			removeIronBody(player);
-		}
-	}
-
 	private static void forgetEverywhere(Entity entity) {
-		for (DaoTechniqueState state : STATES.values()) {
-			state.forget(entity);
-		}
 		if (entity instanceof LivingEntity living) {
+			for (DaoTechniqueState state : STATES.values()) {
+				state.forget(living);
+			}
 			BURNING.remove(living);
 		}
 	}
@@ -1080,33 +1188,31 @@ public final class DaoTechniques {
 		return STATES.computeIfAbsent(player.getUUID(), id -> new DaoTechniqueState());
 	}
 
-	private static long now(ServerPlayer player) {
-		return player.level().getGameTime();
+	/** ECHO .4 at Puncak Jurus (22.10): the cast again 10 ticks later at 40%, no Kehancuran, no mastery. */
+	static void echoPeak(Caster ctx) {
+		if (!ctx.copy() && ctx.peak(Bonus.Kind.ECHO)) {
+			ctx.copyAfter(10, 0.4D, true);
+		}
+	}
+
+	/** Technique damage of {@code coef} × P through the cast's choke point. True when it landed. */
+	static boolean strike(CastContext ctx, LivingEntity target, double coef, boolean precise) {
+		return coef > 0.0D && target.isAlive() && ctx.hurt(ctx.damage(target, coef).precise(precise));
+	}
+
+	static Payload.Dmg dmg(double coef) {
+		return new Payload.Dmg(coef, false, Map.of(), Double.NaN, 0.0D, Payload.Per.NONE, false, false);
+	}
+
+	private static boolean valid(CastContext ctx, @Nullable LivingEntity target) {
+		return target != null && target.isAlive() && !target.isRemoved() && target.level() == ctx.level() && ctx.mayHit(target, false);
 	}
 
 	/**
-	 * Technique damage (Techniques.hurt checks the target again and is not swallowed by the short hurt cooldown). True
-	 * when the hit landed (false when it was refused, e.g. the decisive blow of a sparring duel).
-	 */
-	private static boolean strike(ServerPlayer player, LivingEntity target, double amount) {
-		return amount > 0.0D && target.isAlive() && Techniques.hurt(player, target, (float) amount);
-	}
-
-	private static boolean valid(ServerPlayer player, @Nullable LivingEntity target) {
-		return target != null && target.isAlive() && !target.isRemoved() && target.level() == player.level()
-				&& Targeting.isHostileTo(target, player);
-	}
-
-	/**
-	 * Sets an entity's velocity and makes sure every client (and a player's own client) receives it. A thrown monster is
-	 * tagged {@link NoGrief#TAG}, so its landing never tramples farmland or crushes turtle eggs, and gets a portal
-	 * cooldown (portal travel could build an exit portal). The Ender Dragon is never moved: it breaks the blocks it is
-	 * pushed into.
+	 * Sets an entity's velocity for every client. A moved monster gets {@link NoGrief#TAG} and a portal cooldown. Callers
+	 * check {@code moveAllowed} (never-moved list and portals) first.
 	 */
 	private static void launch(Entity entity, Vec3 velocity) {
-		if (entity instanceof EnderDragon) {
-			return;
-		}
 		if (!(entity instanceof Player)) {
 			entity.addTag(NoGrief.TAG);
 			entity.setPortalCooldown();
@@ -1136,14 +1242,8 @@ public final class DaoTechniques {
 				.anyMatch(state -> state.is(Blocks.POWDER_SNOW) || state.is(Blocks.WATER_CAULDRON) || state.is(Blocks.POWDER_SNOW_CAULDRON));
 	}
 
-	/** Read-only: a Nether portal, End portal or End gateway block within {@code radius} (nothing is thrown or pulled then). */
-	private static boolean portalNear(ServerPlayer player, double radius) {
-		return player.level().getBlockStatesIfLoaded(player.getBoundingBox().inflate(radius))
-				.anyMatch(state -> state.is(Blocks.NETHER_PORTAL) || state.is(Blocks.END_PORTAL) || state.is(Blocks.END_GATEWAY));
-	}
-
-	/** Frozen look (shaking, frost) for about {@code extraTicks / 2} ticks beyond full freeze. Entities only. */
-	private static void freeze(LivingEntity target, int extraTicks) {
+	/** Frozen look (shaking, frost) for about {@code extraTicks / 2} ticks beyond full freeze. Entities only, no control. */
+	private static void freezeLook(LivingEntity target, int extraTicks) {
 		if (target.isAlive() && target.canFreeze()) {
 			target.setTicksFrozen(Math.max(target.getTicksFrozen(), target.getTicksRequiredToFreeze() + extraTicks));
 		}
@@ -1158,25 +1258,24 @@ public final class DaoTechniques {
 		return player.getEyePosition().add(player.getViewVector(1.0F).scale(0.6D)).add(0.0D, -0.35D, 0.0D);
 	}
 
-	/** Read-only: where a line from {@code from} along {@code dir} meets the first solid block, or its end. */
+	/** Read-only: where a line from {@code from} along {@code dir} meets the first solid block (or an unloaded chunk), or its end. */
 	private static Vec3 clipEnd(ServerPlayer player, Vec3 from, Vec3 dir, double range) {
-		Vec3 to = from.add(dir.scale(range));
-		BlockHitResult hit = player.level().clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
-		return hit.getType() == HitResult.Type.MISS ? to : hit.getLocation();
+		BlockHitResult hit = dev.kultivator.util.LoadedPath.ray(player.level(), from, from.add(dir.scale(range)), player);
+		return hit.getLocation();
 	}
 
-	/** Read-only: nothing solid between two points. */
+	/** Read-only: nothing solid between two points (and loaded). */
 	private static boolean clearBetween(ServerPlayer player, Vec3 a, Vec3 b) {
-		return player.level().clip(new ClipContext(a, b, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)).getType()
-				== HitResult.Type.MISS;
+		return dev.kultivator.util.LoadedPath.loaded(player.level(), a, b)
+				&& dev.kultivator.util.LoadedPath.ray(player.level(), a, b, player).getType() == HitResult.Type.MISS;
 	}
 
 	/** Where a particle bolt starts: up to 14 blocks above, below the first ceiling (read-only). */
-	private static Vec3 skyAbove(ServerPlayer player, Vec3 ground) {
-		RandomSource random = player.getRandom();
+	private static Vec3 skyAbove(ServerLevel level, LivingEntity caster, Vec3 ground) {
+		RandomSource random = caster.getRandom();
 		Vec3 from = ground.add(0.0D, 1.5D, 0.0D);
 		Vec3 sky = ground.add((random.nextDouble() - 0.5D) * 4.0D, SKY_HEIGHT, (random.nextDouble() - 0.5D) * 4.0D);
-		BlockHitResult hit = player.level().clip(new ClipContext(from, sky, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+		BlockHitResult hit = dev.kultivator.util.LoadedPath.ray(level, from, sky, caster);
 		return hit.getType() == HitResult.Type.MISS ? sky : hit.getLocation().add(0.0D, -0.2D, 0.0D);
 	}
 
@@ -1187,7 +1286,7 @@ public final class DaoTechniques {
 	}
 
 	/** The Dao technique whose ordinal carries the Dao Domain pulse of {@code dao} to the client. */
-	private static Technique flavour(Dao dao) {
+	static Technique flavour(Dao dao) {
 		return switch (dao) {
 			case SWORD -> Technique.SWORD_QI;
 			case FIRE -> Technique.FLAME_PALM;
@@ -1200,19 +1299,19 @@ public final class DaoTechniques {
 		};
 	}
 
-	private static void fx(ServerPlayer player, Technique technique, int sub, Vec3 pos, Vec3 target, float f) {
-		Techniques.fx(player, technique, sub, pos, target, f);
+	private static void fx(ServerLevel level, Technique technique, int sub, Vec3 pos, Vec3 target, float f) {
+		dev.kultivator.fx.Fx.send(level, pos, target, dev.kultivator.fx.FxType.TECHNIQUE, technique.ordinal(), sub, f);
 	}
 
-	private static void sound(ServerPlayer player, Vec3 at, SoundEvent sound, float volume, float pitch) {
-		player.level().playSound(null, at.x, at.y, at.z, sound, SoundSource.PLAYERS, volume, pitch);
+	private static void sound(ServerLevel level, Vec3 at, SoundEvent sound, float volume, float pitch) {
+		level.playSound(null, at.x, at.y, at.z, sound, SoundSource.PLAYERS, volume, pitch);
 	}
 
-	private static void sound(ServerPlayer player, Vec3 at, Holder<SoundEvent> sound, float volume, float pitch) {
-		player.level().playSound(null, at.x, at.y, at.z, sound, SoundSource.PLAYERS, volume, pitch);
+	private static void sound(ServerLevel level, Vec3 at, Holder<SoundEvent> sound, float volume, float pitch) {
+		level.playSound(null, at.x, at.y, at.z, sound, SoundSource.PLAYERS, volume, pitch);
 	}
 
-	/** Why the technique did not happen, in the same action-bar style as Techniques' own refusals. */
+	/** Why the technique did not happen, in the same action-bar style as the pipeline's refusals. */
 	private static void refuse(ServerPlayer player, String key) {
 		Techniques.refuse(player, Component.translatable("kultivator.daotech." + key));
 	}

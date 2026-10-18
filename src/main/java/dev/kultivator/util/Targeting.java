@@ -9,10 +9,11 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.OwnableEntity;
-import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.creaking.Creaking;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
@@ -47,11 +48,22 @@ public final class Targeting {
 	}
 
 	/**
-	 * True when a technique of {@code caster} may hurt {@code target}. Never a creaking bound to a creaking heart: hurt by
-	 * a player (or their tamed wolf), its heart grows resin blocks. Never the Wither: every hit makes it break the blocks
-	 * around it a second later.
+	 * True when a technique of {@code caster} may hurt {@code target}, calm neutral mobs included (the PRECISE rule of
+	 * {@link #isHostileTo(Entity, ServerPlayer, boolean)}; the pre-6c behaviour every legacy caller keeps).
 	 */
 	public static boolean isHostileTo(Entity entity, ServerPlayer caster) {
+		return isHostileTo(entity, caster, true);
+	}
+
+	/**
+	 * True when a technique of {@code caster} may hurt {@code target}. Never a creaking bound to a creaking heart: hurt by
+	 * a player (or their tamed wolf), its heart grows resin blocks. The Wither may be hit by the player's techniques: the
+	 * spine's {@code WitherBossMixin} keeps technique damage from arming its block breaking (DESIGN 22.14.2); disciples and
+	 * spirit beasts still keep away from it. Calm neutral mobs ({@code NeutralMob} not angry at the caster, piglins not
+	 * targeting the caster) are hit only when {@code precise} (STRIKE, BEAM, TARGET, the first CHAIN hop, EXEC, PRECISE
+	 * specs; 22.3.5 rule 2), so an area attack in the Nether never angers a whole fortress.
+	 */
+	public static boolean isHostileTo(Entity entity, ServerPlayer caster, boolean precise) {
 		if (!(entity instanceof LivingEntity target) || target == caster || !target.isAlive() || target.isSpectator()
 				|| target.isInvulnerable()) {
 			return false;
@@ -61,9 +73,6 @@ public final class Targeting {
 			return true;
 		}
 		if (target instanceof Creaking creaking && creaking.isHeartBound()) {
-			return false;
-		}
-		if (target instanceof WitherBoss) {
 			return false;
 		}
 		for (BiPredicate<ServerPlayer, Entity> exclusion : EXCLUSIONS) {
@@ -78,18 +87,34 @@ public final class Targeting {
 			// Pets (anyone's) are only fair game while they are attacking the caster.
 			return target instanceof Mob mob && mob.getTarget() == caster;
 		}
+		if (!precise && calmNeutral(target, caster)) {
+			return false;
+		}
 		if (target instanceof Enemy) {
 			return true;
 		}
 		return target instanceof Mob mob && mob.getTarget() == caster;
 	}
 
-	/** Living entities a technique may hit within {@code radius} of {@code center}, nearest first. */
+	/** A neutral mob not angry at the caster, or a piglin that is not after the caster (22.3.5 rule 2). */
+	public static boolean calmNeutral(LivingEntity target, ServerPlayer caster) {
+		if (target instanceof NeutralMob neutral && !neutral.isAngryAt(caster, caster.level())) {
+			return true;
+		}
+		return target instanceof AbstractPiglin piglin && piglin.getTarget() != caster;
+	}
+
+	/** Living entities a technique may hit within {@code radius} of {@code center}, nearest first (calm neutrals included). */
 	public static List<LivingEntity> hostilesAround(ServerPlayer caster, Vec3 center, double radius) {
+		return hostilesAround(caster, center, radius, true);
+	}
+
+	/** Living entities a technique may hit within {@code radius} of {@code center}, nearest first; calm neutrals only when {@code precise}. */
+	public static List<LivingEntity> hostilesAround(ServerPlayer caster, Vec3 center, double radius, boolean precise) {
 		AABB box = new AABB(center, center).inflate(radius);
 		double radiusSq = radius * radius;
 		List<LivingEntity> list = caster.level().getEntitiesOfClass(LivingEntity.class, box,
-				entity -> entity.distanceToSqr(center) <= radiusSq && isHostileTo(entity, caster));
+				entity -> entity.distanceToSqr(center) <= radiusSq && isHostileTo(entity, caster, precise));
 		list.sort(Comparator.comparingDouble(entity -> entity.distanceToSqr(center)));
 		return list;
 	}

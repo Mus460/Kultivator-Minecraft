@@ -3,12 +3,13 @@
 **Bahasa Indonesia** · [English below](#english)
 
 Mod Fabric berdiri sendiri di mana **pemain** berkultivasi seperti di novel xianxia: memurnikan qi, menembus ranah dari
-Manusia Fana sampai Dewa Abadi, bertahan dari Tribulasi Langit, memilih Jalan Dao, menguasai teknik, terbang di atas
-pedang, meracik pil, menghadapi Iblis Hati, membangkitkan binatang roh, dan mendirikan sekte. Kamu mendirikan
-**Aula Sekte**, menerima murid dari Hari Penerimaan Murid, dan membimbing mereka naik tanpa batas sampai **Bintang
-Abadi**, bahkan sampai melampauimu. Lalu sektemu **membangun dirinya sendiri**: pilih satu dari sembilan templat
-kompleks sekte klasik, setor bahan, dan saksikan sekte tumbuh melewati sembilan tingkat. Setiap fitur sekte dan murid
-diadaptasi dari cerita kultivasi sungguhan, dan sumbernya (karya + konsep) tertulis di game dan di panduan.
+Manusia Fana sampai Dewa Abadi, bertahan dari Tribulasi Langit, memilih Jalan Dao, menguasai **169 Teknik Dewa** yang
+makin dahsyat di setiap ranah, terbang di atas pedang, meracik pil, menghadapi Iblis Hati, membangkitkan binatang roh,
+dan mendirikan sekte. Kamu mendirikan **Aula Sekte**, menerima murid dari Hari Penerimaan Murid, dan membimbing mereka
+naik tanpa batas sampai **Bintang Abadi**, bahkan sampai melampauimu. Lalu sektemu **membangun dirinya sendiri**: pilih
+satu dari sembilan templat kompleks sekte klasik, setor bahan, dan saksikan sekte tumbuh melewati sembilan tingkat.
+Setiap teknik serta setiap fitur sekte dan murid diadaptasi dari cerita kultivasi sungguhan, dan sumbernya (karya +
+konsep) tertulis di game dan di panduan.
 
 📖 **Panduan pemain lengkap: [docs/PANDUAN.md](docs/PANDUAN.md)** · Daftar uji per fase: [docs/uji/](docs/uji/) ·
 Rancangan dan aturan kode: [docs/DESIGN.md](docs/DESIGN.md)
@@ -20,9 +21,17 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
   sendiri**, hanya di chunk yang sudah termuat. Tanah dan tanaman alami yang dipindahkan dikreditkan ke Gudang Bahan
   Sekte, bangunan buatan pemain dan blok terlindung tidak pernah dibongkar diam-diam, dan di luar tapak tidak ada yang
   berubah ([aturannya di panduan](docs/PANDUAN.md#20b17-keamanan-blok-pembangunan-sekte)).
-* **Mode Kehancuran** untuk jurus murid tingkat tertinggi: **mati secara bawaan**, terkunci di balik izin server, sumpah
-  pemain, dan segel per murid, dengan zona terlindung di sekitar aula, tapak sekte, pemain, dan desa, serta tombol
-  Pulihkan ([peringatan di panduan](docs/PANDUAN.md#31-mode-kehancuran-peringatan)).
+* **Mode Kehancuran**, **mati secara bawaan**, dalam dua bentuk:
+  * **jurusmu sendiri** ("saklar gampang", Fase 6c): satu klik di Kitab Teknik atau `/kultivasi kehancuran nyala|mati`,
+    tanpa layar sumpah, dengan satu baris peringatan merah berisi perintah pulihkan. Selama nyala, jurus serang mulai Inti
+    Emas memahat kawah, parit, dan retakan yang makin besar seiring ranah. Jongkok saat merapal = tanpa kawah. Di server
+    khusus dan untuk tamu LAN butuh izin server
+    ([peringatan di panduan](docs/PANDUAN.md#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang));
+  * **Jurus Pemusnah murid** tingkat tertinggi: terkunci di balik izin server, sumpah pemain, dan segel per murid
+    ([peringatan di panduan](docs/PANDUAN.md#31-mode-kehancuran-peringatan)).
+
+  Keduanya memakai batas blok, jeda saat server lambat, zona terlindung (4 blok di sekitarmu, 24 blok dari kasur dan
+  pemain lain, 64 dari aula, tapak sekte, desa), dan tombol Pulihkan 10 menit.
 
 ## Fitur
 
@@ -35,8 +44,16 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
 * **Meditasi** — pose bersila, tempat spiritual (puncak gunung, Hutan Ceri, suar, kecubung, End, bulan purnama), urat roh
   dengan kepadatan qi, Momen Pencerahan, dan tiga **formasi pengumpul qi** dari blok vanilla.
 * **Akar spiritual** — upacara pengujian dengan 9 elemen dan 5 mutu, Pil Pembersih Sumsum.
-* **8 Jalan Dao** dengan Pemahaman Dao dan **23 teknik** (Langkah Awan, Pedang Terbang, Telapak Buddha, Wujud Dharma,
-  Wilayah Dao, Seribu Pedang, Api Phoenix, Petir Surgawi, Penjara Ruang, …); kitab teknik dari Buku Pesona vanilla.
+* **8 Jalan Dao** dengan Pemahaman Dao.
+* **Teknik Dewa: 169 teknik** (146 baru + 23 lama yang diperkuat; 168 bisa dipelajari pemain), masing-masing diambil dari
+  cerita kultivasi sungguhan dengan baris **Sumber** di game (Formasi Pedang Zhuxian, Murka Langit Sembilan Matahari,
+  Membekukan Gunung Qi, Tianzun Guntur Sembilan Langit, Injakan Dewa Kuno, Pohon Kuno Bodhisattva, Lubang Hitam, Gunung Lima
+  Unsur, Langkah Penginjak Langit, …). Enam tingkat **Kuning → Misterius → Bumi → Langit → Abadi → Dewa**; kekuatan melonjak
+  di setiap ranah sampai sekitar ×165 di Dewa Abadi, dengan area, durasi, dan efek yang ikut membesar (pedang raksasa,
+  aksara, sinar, avatar, robekan langit, guncangan kamera; semuanya khusus klien). **Penguasaan Jurus** lima tingkat,
+  **Kitab Teknik** (saringan, pencarian, bilah bambu dengan angka langsung), **Cincin Segel** 12 soket, **Roda Segel**,
+  segel cepat, Gerbang Dewa, Slip Giok, Ujian Warisan, kolam buku pesona, prestasi, dan murid yang belajar serta bertarung
+  dengan teknik baru. Batas bos, aturan arena lama, dan anggaran performa untuk laptop lemah.
 * **Pil** — barang vanilla sebagai pil dengan racun pil, dan **Alkimia** di tungku Kuali di atas Api Unggun dengan pil
   bermutu Rendah sampai Sempurna.
 * **Iblis Hati**, **Binatang Roh** (serigala dan rubah hingga Serigala Langit / Rubah Ekor Sembilan), **Formasi
@@ -44,7 +61,7 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
 * **Pengakuan Langit** — peristiwa sinematik saat menjadi Dewa Abadi: pilar cahaya emas, langit terbuka, suara langit,
   aura pelangi, kebal Penyimpangan Qi, dan regenerasi abadi.
 * **Visual mewah** — aura per ranah, jubah sesuai Dao, pedang di punggung, mata bercahaya, Lingkaran Dao, pedang terbang
-  di bawah kaki; HUD bola dantian dan layar "Gulungan Giok"; **Kualitas Efek** Minimal / Normal / Maksimal.
+  di bawah kaki; HUD bola dantian dan layar "Gulungan Giok"; **Kualitas Efek** Minimal / Normal / Maksimal / Otomatis.
 * **Murid** — pengikut yang ikut berkultivasi, diajari tekniknya, diberi pil, menerobos dengan tribulasinya sendiri,
   bertarung di sisimu, dan bisa dibangkitkan dengan Papan Jiwa.
 * **Aula Sekte** — Prasasti Aula Sekte yang kamu buat dan pasang sendiri; Tingkat Aula 1–9 dari ketenaran dan bangunan
@@ -90,26 +107,30 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
 | 5 | Murid: bot pengikut yang diajari teknik dan ikut berkultivasi, perintah uji | ✅ |
 | 6 | Sekte Abadi & murid OP: Aula Sekte, Hari Penerimaan Murid, bakat dan fisik, jenjang dan Poin Kontribusi, tugas, misi, turnamen, Alam Dewa Hampa, kekuatan murid, Bintang Abadi, pewaris, Mode Kehancuran opsional ([daftar uji](docs/uji/FASE-6.md)) | ✅ |
 | 6b | Pembangunan Sekte (9 templat x 9 tingkat): pilih templat, pratinjau hologram, konfirmasi sekali, lalu cukup setor bahan dan sekte membangun dirinya sendiri; Gudang Bahan Sekte, Misi Pembangunan, Ekspedisi Pengumpulan, Pekerja Bangunan, Naik Templat/Perbaiki/Bongkar/Pindah, penyumbang LAN, perintah uji `uji sekte` ([daftar uji](docs/uji/FASE-6b.md), [panduan](docs/PANDUAN.md#20b-pembangunan-sekte)). Belum diuji di game; tagihan belum diseimbangkan | ✅ |
-| 6c | Teknik Dewa: 100+ teknik baru bersumber cerita kultivasi, makin OP sesuai ranah, Kitab Teknik, kehancuran blok lewat saklar gampang | ⏳ |
+| 6c | Teknik Dewa: 169 teknik (146 baru + 23 lama diperkuat) bersumber cerita kultivasi, makin OP sesuai ranah, Penguasaan Jurus, Kitab Teknik, Cincin dan Roda Segel, Slip Giok, Ujian Warisan, Gerbang Dewa, teknik untuk murid, Mode Kehancuran jurus sendiri lewat saklar gampang, perintah uji `uji teknik` dan `uji boneka` ([daftar uji](docs/uji/FASE-6c.md), [panduan](docs/PANDUAN.md#12-teknik-dewa-169-teknik)). Belum diuji di game; beberapa hal kecil belum ada (pencarian teks di tab Teknik murid, token partikel di `debug teknik beban`) | ✅ |
 | 7 | Dunia yang Hidup (monster elite, batu roh, jimat, herba) | ⏳ |
 
 ## Perintah singkat
 
 `/kultivasi` atau `/cultivate` — `info`, `meditate`, `breakthrough`, `hardcore on|off`, `root test|info`,
-`dao [info|choose <dao>]`, `technique list|select|cast`, `visual <bagian> on|off`, `beast list`, `formation list`,
-`murid list|panggil|ikut|tinggal|meditasi|bantu|tahan`, `aula info|nama <nama>`, `kehancuran status|sumpah|pulihkan`,
+`dao [info|choose <dao>]`, `teknik [kitab|info|pilih|rapal|daftar|slot ...]`, `technique list|select|cast`,
+`visual <bagian> on|off`, `beast list`, `formation list`, `murid list|panggil|ikut|tinggal|meditasi|bantu|tahan`,
+`aula info|nama <nama>`, `kehancuran nyala|mati|status|sumpah|pulihkan`, `warisan pilih <n>`,
 `aula bangun [templat|pratinjau <1-9> [arah] [glasir]|konfirmasi|setor [semua|butuh]|naik <2-9>|perbaiki|bongkar|lepaskan]`.
-Perintah uji cepat untuk operator: `/kultivasi uji ...`, `/kultivasi uji murid <nama|semua> maks|ranah|bintang <n>`, dan
+Perintah uji cepat untuk operator: `/kultivasi uji ...`, `/kultivasi uji murid <nama|semua> maks|ranah|bintang <n>`,
 `/kultivasi uji sekte templat <1-9>|tingkat <0-9> [instan|cepat]|sumber|pamer|audit|info|reset|...`
-([daftar lengkap](docs/PANDUAN.md#20b16-perintah)).
+([daftar lengkap](docs/PANDUAN.md#20b16-perintah)), dan
+`/kultivasi uji teknik [semua|<id>|pamer [detik]|bebas|penguasaan|gerbang|kehancuran|audit|murid]` serta
+`/kultivasi uji boneka [n] [bos]|hapus` ([daftar lengkap dengan contoh](docs/PANDUAN.md#1212-perintah-teknik)).
 `/sekte` atau `/sect` — `create`, `invite`, `join`, `leave`, `kick`, `disband`, `info`, `list`, `chat`,
 `spar <pemain>|accept|decline`. Perintah uji operator ada di bawah `/kultivasi debug` — daftar lengkapnya di
 [panduan](docs/PANDUAN.md#33-perintah-uji-untuk-operator-kultivasi-debug-).
 
 ## Tombol bawaan
 
-`G` teknik terpilih · `;` meditasi · `'` layar kultivasi · `,` `.` ganti teknik · `\` pedang terbang · lompat di udara =
-Langkah Awan. Semua bisa diganti di Options → Controls → Key Binds → Kultivator.
+`G` teknik terpilih (tahan = Roda Segel) · `-` Kitab Teknik · `;` meditasi · `'` layar kultivasi · `,` `.` ganti teknik di
+Cincin Segel · `\` pedang terbang · lompat di udara = Langkah Awan · Roda Segel dan Segel Cepat 1–4 belum diatur. Semua
+bisa diganti di Options → Controls → Key Binds → Kultivator.
 
 ## Konfigurasi
 
@@ -117,8 +138,11 @@ Langkah Awan. Semua bisa diganti di Options → Controls → Key Binds → Kulti
 `heartDemonTrials`, `protectiveFormations`, `announceBreakthroughs`, `sectHall`, `recruitmentIntervalDays`,
 `sectEvents`, `tournamentIntervalDays`, `forbiddenGroundIntervalDays`, `sectConstruction` dan `sectBuild...` (laju,
 batas per tick, jeda MSPT, jangkauan, tabungan, templat terbesar, pengembalian bahan, tanpa monster di sekte), serta
-`modeKehancuran` (bawaan `false`) dan batas-batas `kehancuran...`. `config/kultivator-client.json` (klien): `effect_quality`, `hud`. Penjelasan di
-[panduan](docs/PANDUAN.md#36-berkas-konfigurasi).
+`modeKehancuran` (bawaan `false`) dan batas-batas `kehancuran...` (termasuk `kehancuranPlayerTechniques`,
+`kehancuranCasterSafeRadius`, `kehancuranHomeSafeRadius`), serta `techniqueDamageMultiplier`, `techniqueAreaCap`,
+`techniqueBossCaps`, `techniqueMaxActiveCasts`, `techniqueDisplays`. `config/kultivator-client.json` (klien):
+`effect_quality`, `quality_auto`, `hud`, `shake`, `flash`, `phantoms`, `others_fx`, `wheel_hold`, `release_cast`,
+`reduce_motion`, dan saringan Kitab Teknik. Penjelasan di [panduan](docs/PANDUAN.md#36-berkas-konfigurasi).
 
 ## Build
 
@@ -132,7 +156,7 @@ gagal kalau ada kunci yang hanya ada di satu bahasa. Rancangan lengkap: [docs/DE
 
 A standalone Fabric mod for Minecraft 26.3 in which **you** cultivate like in a xianxia novel: refine qi, break through
 nine realms (65 ranks) from Mortal to True Immortal, survive heavenly tribulations (with Nether and End variants and
-waves of Dao Protector monsters), walk one of eight Daos, master 23 techniques, fly on your sword, refine pills in an
+waves of Dao Protector monsters), walk one of eight Daos, master 169 techniques, fly on your sword, refine pills in an
 alchemy furnace, face your heart demon, awaken spirit beasts, build protective formations, found a sect and spar with
 friends. Reaching True Immortal triggers a cinematic ascension event (a golden pillar of light, the heavens opening, a
 celestial voice) that grants a rainbow aura, immunity to Qi Deviation and slow regeneration. Visuals (auras, robes, back
@@ -148,13 +172,24 @@ preview the footprint as a hologram, confirm once, and just deposit materials. E
 as soon as its materials are in, through nine tiers that each already look finished. Every sect and disciple feature
 adapts a named concept from real cultivation stories, and the game and the guide name each source.
 
+**God-level techniques (phase 6c).** 169 techniques (146 new, the 23 old ones made stronger; 168 for the player), each
+taken from a real cultivation novel, donghua or manhua with a Source line in game. Six grades from Yellow to Divine;
+power climbs at every rank to about 165× at True Immortal, with areas, durations and client-only visuals (giant swords,
+glyphs, beams, avatars, sky tears, camera shake) growing along. Five mastery levels, a Technique Codex with filters,
+search and live numbers, a 12-socket Seal Ring with a seal wheel and quick seals, jade slips, inheritance trials, book
+pools, feats, the Divine Gate, and disciples who learn and fight with the new arts. Boss caps, the old linear power in
+arenas, and strict performance budgets for weak laptops.
+
 Nothing in this mod ever burns, breaks, places or changes a block; tribulation lightning is particles and sound only,
 the weather and time are never changed, and a failed tribulation injures you (Qi Deviation) instead of killing you.
 There are two exceptions. **Sect Construction** places blocks only inside the footprint you previewed as a hologram and
 confirmed yourself, only in loaded chunks; natural ground it moves is credited to the sect's material store, and
-player-made and protected blocks are never removed silently. The opt-in **Destruction Mode** for top-tier disciple arts
-is OFF by default and needs server permission, a player oath and a per-disciple seal release. Halls, sect sites, players
-and villages stay protected, and an undo window restores the blocks.
+player-made and protected blocks are never removed silently. The opt-in **Destruction Mode** is OFF by default. For your
+own techniques it is one click in the Technique Codex (or `/kultivasi kehancuran nyala|mati`), with a red warning line
+and the undo command; damaging arts from Golden Core on then carve craters, trenches and fissures, never while you sneak,
+and a dedicated server or a LAN guest also needs the server permission. For top-tier disciple arts it needs server
+permission, a player oath and a per-disciple seal release. A safe column around you, beds, other players, halls, sect
+sites and villages stay protected, and a 10-minute undo window restores the blocks.
 The full player guide is in Indonesian: [docs/PANDUAN.md](docs/PANDUAN.md); every rule and number is in
 [docs/DESIGN.md](docs/DESIGN.md); per-phase test lists in [docs/uji/](docs/uji/).
 

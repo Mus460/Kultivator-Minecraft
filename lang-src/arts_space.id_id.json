@@ -1,0 +1,69 @@
+{
+  "kultivator.technique.space_blade": "Bilah Ruang",
+  "kultivator.technique.space_blade.desc": "Mendorong retakan tipis ruang sejauh 20→48 blok, memotong setiap monster di garisnya dengan 1,5×P kerusakan tembus zirah.",
+  "kultivator.technique.space_blade.source": "Sumber: Martial Peak bab 1139 · Space Blade (Bilah Ruang), seni ruang ciptaan Yang Kai sendiri: retakan ruang kecil didorong maju seperti bilah angin",
+  "kultivator.technique.space_blade.lore": "Udara tidak tersibak. Ia robek.",
+
+  "kultivator.technique.immortal_binding_rope": "Tali Pengikat Abadi",
+  "kultivator.technique.immortal_binding_rope.desc": "Tahap 1: tali melompat ke sasaranmu dalam 20→40 blok lalu ke 2→6 lainnya dalam 4 blok: 0,5×P dan terpaku 80 tick (bos 30). Tahap 2 (dalam 3 detik): sentak monster yang terikat 6 blok ke arahmu.",
+  "kultivator.technique.immortal_binding_rope.source": "Sumber: Investiture of the Gods bab 53–54 · 捆仙绳 Tali Pengikat Abadi milik Ju Liusun, yang dicuri Tu Xingsun",
+  "kultivator.technique.immortal_binding_rope.lore": "Benang emas yang hafal bentuk setiap abadi yang pernah diikatnya.",
+
+  "kultivator.technique.qiankun_ring": "Gelang Qiankun",
+  "kultivator.technique.qiankun_ring.desc": "Melempar gelang emas ke sasaranmu dalam 24 blok; gelang memantul 4→12 kali di antara monster yang berjarak hingga 8 blok, masing-masing 1,8×P (×0,85 tiap pantulan) dengan dorongan, lalu kembali kepadamu.",
+  "kultivator.technique.qiankun_ring.source": "Sumber: Investiture of the Gods bab 12 · gelang emas 乾坤圈 Qiankun milik Nezha, yang membunuh yaksa dan putra ketiga Raja Naga",
+  "kultivator.technique.qiankun_ring.lore": "Dilempar seorang bocah, gelang ini pernah membungkam seekor naga.",
+
+  "kultivator.technique.gravitational_space": "Ruang Gravitasi",
+  "kultivator.technique.gravitational_space.desc": "Wilayah gravitasi penghancur berjari-jari 10→24 mengikutimu selama 240→360 tick: tiap detik 0,3×P, Lambat IV, tak bisa melompat atau terbang, kerusakan jatuh dua kali lipat dan hentakan ke tanah.",
+  "kultivator.technique.gravitational_space.source": "Sumber: Coiling Dragon (Buku 15–16) · Gravitational Space (Ruang Gravitasi), misteri mendalam tingkat tinggi dari Hukum Bumi yang susah payah coba dipadukan Linley",
+  "kultivator.technique.gravitational_space.lore": "Di sini bahkan sehelai bulu jatuh seperti gunung.",
+
+  "kultivator.technique.moon_blade": "Bilah Rembulan",
+  "kultivator.technique.moon_blade.desc": "Tiga bulan sabit tipis dari ruang yang robek mengembang (−15°, 0°, +15°) dan terbang 32→64 blok menembus dinding: 2×P tembus zirah, paling banyak dua bulan sabit per monster.",
+  "kultivator.technique.moon_blade.source": "Sumber: Martial Peak · Moon Blade (Bilah Rembulan), Bilah Ruang Yang Kai yang telah disempurnakan",
+  "kultivator.technique.moon_blade.lore": "Tiga bulan muda, masing-masing satu sayatan di dunia.",
+
+  "kultivator.technique.purple_gold_gourd": "Labu Merah Ungu-Emas",
+  "kultivator.technique.purple_gold_gourd.desc": "Labu memanggil nama sasaranmu (24 blok, tanpa perlu garis pandang). Sedetik kemudian ia menelannya bulat-bulat bila darah maksimumnya di bawah 10×P; monster yang lebih tangguh menerima 4×P, bos 3×P dan Lambat IV selama 80 tick.",
+  "kultivator.technique.purple_gold_gourd.source": "Sumber: Journey to the West bab 32–35 · 紫金红葫芦, labu merah milik Raja Tanduk Emas dan Tanduk Perak, menyedot siapa pun yang menjawab saat namanya dipanggil; kemudian Wukong menjebak Tanduk Perak di dalamnya",
+  "kultivator.technique.purple_gold_gourd.lore": "Jangan menjawab bila sebuah labu memanggil namamu.",
+
+  "kultivator.technique.heaven_turning_seal": "Segel Pembalik Langit",
+  "kultivator.technique.heaven_turning_seal.desc": "Segel raksasa jatuh dari ketinggian 30 blok ke titik bidikan (dalam 40) setelah 1 detik: 3,5×P dan terpaku 40 tick (bos 10) dalam jari-jari 7→16, lalu gelombang kejut 4 blok lebih lebar memberi 1×P dan mendorong monster.",
+  "kultivator.technique.heaven_turning_seal.source": "Sumber: Investiture of the Gods bab 46 · 番天印 Segel Pembalik Langit milik Guang Chengzi menghancurkan 19 cermin, lalu menghantam mahkota Jin Guang Shengmu dan membunuhnya",
+  "kultivator.technique.heaven_turning_seal.lore": "Ia membalik langit, dan apa pun yang berdiri di bawahnya lenyap begitu saja.",
+
+  "kultivator.technique.spatial_ancestral_symbol": "Simbol Leluhur Ruang",
+  "kultivator.technique.spatial_ancestral_symbol.desc": "Melipat medan berjari-jari 16→28 di titik bidikan selama 10 detik: hingga 32 monster bukan bos di dalamnya ditarik menembus ruang ke pusatnya, dan semua di dalam menerima 0,5×P tembus zirah tiap detik. Rapal lagi hingga 7 kali (berjarak 1 detik) untuk berkedip bebas ke titik mana pun di dalam medan.",
+  "kultivator.technique.spatial_ancestral_symbol.source": "Sumber: Martial Universe bab 1209 · Simbol Leluhur Ruang, salah satu dari delapan Simbol Leluhur, dipegang oleh Zhou Tong",
+  "kultivator.technique.spatial_ancestral_symbol.lore": "Ruang terlipat seperti kertas, dan setiap sudutnya hanya selangkah jauhnya.",
+  "kultivator.technique.spatial_ancestral_symbol.closed": "Lipatan ruang sudah tertutup: tak ada ruang lagi untuk dilangkahi.",
+  "kultivator.technique.spatial_ancestral_symbol.wait": "Ruang masih mengendap (%s dtk).",
+  "kultivator.technique.spatial_ancestral_symbol.no_spot": "Tak ada pijakan aman di dalam lipatan di sana.",
+
+  "kultivator.technique.yellow_brow_bag": "Kantong Benih Alis Kuning",
+  "kultivator.technique.yellow_brow_bag.desc": "Kantong kain terbuka di titik bidikan: selama 3 detik ia menyedot hingga 32 monster bukan bos dalam 20→32 blok; lalu menahan mereka melayang 100 tick dengan kerusakan qi 0,5×P per detik selama 5 detik (bos terkurung di bawah simbal emas). Setelah 8 detik ia memuntahkan mereka, 3×P dan dorongan.",
+  "kultivator.technique.yellow_brow_bag.source": "Sumber: Journey to the West bab 65–66 · Raja Alis Kuning, pelayan muda Maitreya, menjebak Wukong di bawah simbal emas curian dan menelan para penolong langit ke dalam kantong kainnya sampai Maitreya menaklukkannya",
+  "kultivator.technique.yellow_brow_bag.lore": "Kantong itu dibuat untuk benih. Untuk pasukan pun sama muatnya.",
+
+  "kultivator.technique.heavenly_restriction": "Larangan Langit Berlapis",
+  "kultivator.technique.heavenly_restriction.desc": "Menyegel kubus berdinding (setengah sisi 10→24) di titik bidikan selama 8 detik: tiap detik 0,6×P, terpaku di tempat dan Lemah III; kerusakan bertambah 15% tiap lapis (maks. 8). Saat berakhir, kubus runtuh dan memberi 6×P kepada semua di dalamnya.",
+  "kultivator.technique.heavenly_restriction.source": "Sumber: Terinspirasi dari larangan (禁制) Wang Lin dan Panji Larangannya (Renegade Immortal bab 207, 233, 291); kubus berlapis dan namanya adalah desain permainan",
+  "kultivator.technique.heavenly_restriction.lore": "Satu larangan menutup, lalu satu lagi, sampai tak tersisa tempat untuk berpijak.",
+
+  "kultivator.technique.void_mirror": "Cermin Hampa",
+  "kultivator.technique.void_mirror.desc": "Tahap 1: cermin hampa berdiri di depanmu selama 10 detik: kerusakan dari depan tinggal separuh, proyektil dari depan ditelan dan dibalas serangan ke penembaknya, dan pukulan dari depan disimpan. Tahap 2, atau saat 10 detik habis: cermin menembakkan sinar hampa 64 blok menembus segalanya, 10×P ditambah pukulan yang tersimpan.",
+  "kultivator.technique.void_mirror.source": "Sumber: Shrouded the Heavens · 虚空镜 Cermin Hampa, senjata kekaisaran Kaisar Agung Hampa, disimpan oleh keluarga Ji",
+  "kultivator.technique.void_mirror.lore": "Apa pun yang dipantulkannya, kembali sebagai ketiadaan.",
+
+  "kultivator.technique.time_spirit_domain": "Wilayah Roh Waktu",
+  "kultivator.technique.time_spirit_domain.desc": "Waktu berhenti dalam wilayah berjari-jari 24→32 di sekitarmu selama 8 detik: monster di dalam membeku (bos terpaku 40 tick dan diperlambat), dan setiap pukulanmu pada monster yang terhenti disimpan. Cooldown-mu berjalan dua kali lebih cepat. Saat waktu berjalan lagi, semua simpanan dilepas ×1,5 dan semua di dalam menerima 10×P.",
+  "kultivator.technique.time_spirit_domain.source": "Sumber: A Record of a Mortal's Journey · 时间灵域 Wilayah Roh Waktu, diperoleh pada tahap Abadi Emas; kelak Han Li menjadi Leluhur Dao Waktu",
+  "kultivator.technique.time_spirit_domain.lore": "Tik. Dunia menahan napas. Tak. Semuanya tiba sekaligus.",
+
+  "kultivator.technique.stellar_black_hole": "Lubang Hitam",
+  "kultivator.technique.stellar_black_hole.desc": "Membuka lubang hitam di titik bidikan (dalam 48) selama 6 detik: semua dalam 32→40 blok terseret ke inti dan menerima 0,5×P tiap setengah detik (×5 dalam 3 blok dari inti). Saat runtuh, inti memberi 18×P dalam 16 blok dan 4×P kepada semua di medan.",
+  "kultivator.technique.stellar_black_hole.source": "Sumber: Stellar Transformations · Black Hole (Lubang Hitam), tahap setelah Bintang Gelap; tahap-tahap pasca-Bintang ini berevolusi sendiri dan tidak tercatat dalam seni aslinya",
+  "kultivator.technique.stellar_black_hole.lore": "Melewati bintang tergelap, bahkan cahaya lupa cara pergi."
+}

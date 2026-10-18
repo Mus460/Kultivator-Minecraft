@@ -24,6 +24,17 @@ public final class Fx {
 		}
 	}
 
+	/**
+	 * Sends one technique visual event to the players within {@code range} (96, or 160 for PAMUNGKAS and grades from
+	 * Langit; DESIGN 22.4.1).
+	 */
+	public static void sendTech(ServerLevel level, Payloads.TechFx payload, double range) {
+		Vec3 pos = new Vec3(payload.x(), payload.y(), payload.z());
+		for (ServerPlayer player : PlayerLookup.around(level, pos, range)) {
+			Net.send(player, payload);
+		}
+	}
+
 	/** Only for one player (personal effects like a private omen). */
 	public static void sendTo(ServerPlayer player, Vec3 pos, Vec3 target, FxType type, int a, int b, float f) {
 		Net.send(player, new Payloads.Fx(type.ordinal(), pos.x, pos.y, pos.z, target.x, target.y, target.z, a, b, f));

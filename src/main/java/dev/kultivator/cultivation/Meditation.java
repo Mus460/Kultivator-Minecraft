@@ -243,6 +243,8 @@ public final class Meditation {
 		data.setFormationTier(tier);
 		data.setVeinDensity(density);
 		data.addMeditationTicks(20);
+		// MEDITATE_AT feats (DESIGN 22.8.9).
+		dev.kultivator.technique.spec.run.FeatTracker.onMeditate(player, 20);
 		Dao dao = data.dao();
 		if (dao != null) {
 			for (SpiritSites.Site each : session.site.sites()) {

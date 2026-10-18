@@ -4,7 +4,7 @@
   "kultivator.test.help.ranah": "/kultivasi uji ranah <realm> [stage] [layer] — jump to any realm with its techniques and full qi.",
   "kultivator.test.help.tur": "/kultivasi uji tur [seconds] — tour every realm for a few seconds each to see its effects, then get your real data back (/kultivasi uji tur stop).",
   "kultivator.test.help.kit": "/kultivasi uji kit — boxes with every mod item, pills of each quality, technique books, rare items, formation and alchemy materials.",
-  "kultivator.test.help.teknik": "/kultivasi uji teknik — learn every technique, reset cooldowns and fill qi.",
+  "kultivator.test.help.teknik": "/kultivasi uji teknik [semua | <id> | pamer [seconds] | bebas nyala|mati | penguasaan <id|semua> <0-4> | gerbang | kehancuran nyala|mati | audit | murid <name|semua>] — learn all 168 techniques, cast one at once, showcase them all or check the registry. /kultivasi uji boneka [n] [bos] | hapus — training dummies.",
   "kultivator.test.help.more": "More: /kultivasi debug tribulation test · heartdemon summon · enlighten · ascension start · alchemy give · murid summon · reset",
   "kultivator.test.max": "You stand at the summit: True Immortal Peak. Stay still a moment and the heavens will open.",
   "kultivator.test.realm": "Test: you are now at %s.",

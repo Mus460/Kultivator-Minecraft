@@ -1,0 +1,69 @@
+{
+  "kultivator.technique.octane_blast": "Ledakan Delapan Kutub",
+  "kultivator.technique.octane_blast.desc": "Delapan lapis tenaga dalam satu pukulan: tujuh hentakan cepat (0,15× kekuatan, hingga 3 musuh di depan), lalu yang ke-8: 0,9× kekuatan dan pukulan mundur. Bila kedelapannya mengenai satu musuh, tenaga meledak di dalamnya (radius 3→8, 0,5× kekuatan).",
+  "kultivator.technique.octane_blast.source": "Sumber: Battle Through the Heavens · 八极崩 Ledakan Delapan Kutub, teknik Dou tingkat Xuan tinggi dari Yao Lao; bila dikuasai, ia menyimpan delapan lapis tenaga",
+  "kultivator.technique.octane_blast.lore": "Lawan merasakan satu pukulan. Tubuhnya merasakan delapan.",
+
+  "kultivator.technique.worldwalking": "Langkah Penjelajah Bumi",
+  "kultivator.technique.worldwalking.desc": "Tenggelam ke dalam bumi dan melaju 16→48 blok ke arah bidikan dalam 0,4 dtk, tak terlihat dan tanpa kerusakan jatuh; di tempat keluar, pilar batu menyembur (radius 3→6): 1,5× kekuatan, melontarkan dan Lambat II 2 dtk. Ditolak bila tidak ada tempat keluar yang aman.",
+  "kultivator.technique.worldwalking.source": "Sumber: Coiling Dragon · Worldwalking, misteri bumi yang dipakai untuk menyelinap dan kabur; Investiture of the Gods · seni menembus bumi (地行术) milik Tu Xingsun",
+  "kultivator.technique.worldwalking.lore": "Bumi tidak menahanmu. Ia mengantarmu.",
+  "kultivator.technique.worldwalking.player_only": "Hanya pemain yang bisa menjelajah bumi.",
+  "kultivator.technique.worldwalking.not_grounded": "Kakimu harus menapak tanah untuk masuk ke dalam bumi.",
+  "kultivator.technique.worldwalking.no_exit": "Tidak ada tempat keluar yang aman ke arah itu.",
+
+  "kultivator.technique.throbbing_pulse": "Denyut Nadi Dunia",
+  "kultivator.technique.throbbing_pulse.desc": "Tiga cincin denyut bumi menyebar (radius 6/10/14→36): masing-masing 0,6× kekuatan menembus zirah, melontarkan dan Lambat III 3 dtk; cincin ketiga menghancurkan dari dalam musuh yang terkena kedua cincin sebelumnya (+0,6× kekuatan). Perisai Qi 15% selama 5 dtk.",
+  "kultivator.technique.throbbing_pulse.source": "Sumber: Coiling Dragon (Buku 15–16) · Denyut Nadi Dunia, salah satu dari enam misteri mendalam Hukum Bumi; ia menangkis dan melancarkan serangan spiritual",
+  "kultivator.technique.throbbing_pulse.lore": "Dengarkan denyut di bawah kakimu; kini ia berdenyut bersamamu.",
+
+  "kultivator.technique.disorderly_cloak_hammer": "Palu Jubah Angin Kacau",
+  "kultivator.technique.disorderly_cloak_hammer.desc": "Kanalisasi 2,7 dtk: palu bayangan menghantam titik bidik delapan kali (radius 3), mulai 0,2× kekuatan dan +15% tiap pukulan; pukulan ke-9 menghantam radius 6→14, 2,4× kekuatan dan melontarkan. Bergerak, merapal jurus lain, atau kehilangan 15% darah memutusnya.",
+  "kultivator.technique.disorderly_cloak_hammer.source": "Sumber: Soul Land · 乱披风锤法 Teknik Palu Jubah Angin Kacau Sekte Langit Cerah, yang tenaganya menumpuk lewat pukulan berantai",
+  "kultivator.technique.disorderly_cloak_hammer.lore": "Pukulan pertama hanya salam. Yang kesembilan adalah perpisahan.",
+
+  "kultivator.technique.bright_king_art": "Seni Raja Cerah",
+  "kultivator.technique.bright_king_art.desc": "Selama 20 dtk: kulit emas, kerusakan diterima −35→60%, serangan +40%, kebal pukulan mundur; seperempat kerusakan yang kau terima (hingga 4 pukulan) disimpan. Saat waktunya habis simpanan itu meledak keluar (radius 6→14): dua kali kerusakan yang tersimpan dan pukulan mundur.",
+  "kultivator.technique.bright_king_art.source": "Sumber: A Record of a Mortal's Journey · 明王诀 Seni Raja Cerah, seni tubuh Buddha dari gua rahasia keluarga Feng, berasal dari dasar pemurnian tubuh Seni Tiga Suci Brahma; kelak salah satu dari tiga seni yang dilebur menjadi Seni Iblis Sejati Suci Brahma",
+  "kultivator.technique.bright_king_art.lore": "Pukul aku. Setiap pukulanmu akan kembali padamu sebagai cahaya.",
+
+  "kultivator.technique.great_way_of_buddha": "Jalan Agung Buddha",
+  "kultivator.technique.great_way_of_buddha.desc": "Pulihkan 30→50% darah selama 30 dtk; tiap terkena pukulan berat (≥10% darah) pulih lagi 10% (sekali per 2 dtk). Setelahnya: efek buruk dibersihkan dan Peningkatan Darah I selama 5 menit (rapalan ulang menumpuk hingga III).",
+  "kultivator.technique.great_way_of_buddha.source": "Sumber: Against the Gods bab 147/287/786 · 大道浮屠诀 Jalan Agung Buddha, seni tubuh Yun Che dengan regenerasi luar biasa; tempaan keras membuat tubuhnya terlahir kembali",
+  "kultivator.technique.great_way_of_buddha.lore": "Hancurkan tubuh ini, dan ia bangkit lebih kokoh dari sebelumnya.",
+
+  "kultivator.technique.dragonblood_warrior": "Wujud Prajurit Darah Naga",
+  "kultivator.technique.dragonblood_warrior.desc": "Wujud naga 30 dtk (×1,3 bila ada ruang): zirah +10, serangan +6, Kecepatan I. Saat berubah, ekor menyapu (radius 5→12), 2× kekuatan dan pukulan mundur; tiap serangan jarak dekat menambah cakaran kerucut (0,8× kekuatan).",
+  "kultivator.technique.dragonblood_warrior.source": "Sumber: Coiling Dragon · Linley Baruch membangkitkan transformasi garis darah Prajurit Darah Naga milik klannya",
+  "kultivator.technique.dragonblood_warrior.lore": "Darah naga yang lama tertidur akhirnya teringat siapa dirinya.",
+
+  "kultivator.technique.six_paths_fist": "Tinju Enam Jalan Reinkarnasi",
+  "kultivator.technique.six_paths_fist.desc": "Enam tinju bayangan berwarna melaju bergantian (24→48 blok, menembus), masing-masing 0,6× kekuatan. Musuh yang tewas meledak \"Reinkarnasi\" (radius 4, 0,8× kekuatan) yang bisa berantai hingga 8 kali.",
+  "kultivator.technique.six_paths_fist.source": "Sumber: Shrouded the Heavens · 六道轮回拳 Tinju Enam Jalan Reinkarnasi dari garis Tubuh Suci, diciptakan pendirinya dan diwariskan lewat \"Si Gila Tua\" (老疯子)",
+  "kultivator.technique.six_paths_fist.lore": "Enam jalan, enam tinju, dan tak satu pun jalan keluar.",
+
+  "kultivator.technique.eighth_hex_body": "Segel Kedelapan: Segel Tubuh",
+  "kultivator.technique.eighth_hex_body.desc": "Segel 封 merah menimpa radius 16→32: 1,2× kekuatan menembus zirah; selama 10 dtk musuh kehilangan 60% serangan, seluruh zirah dan 50% kecepatan, serta menerima +40% kerusakan (bos setengahnya). Seranganmu +30% selama 10 dtk.",
+  "kultivator.technique.eighth_hex_body.source": "Sumber: I Shall Seal the Heavens bab 954 · Segel Kedelapan, Segel Tubuh, segel yang ditanamkan pada tubuh itu sendiri",
+  "kultivator.technique.eighth_hex_body.lore": "Bukan jurusmu yang mereka takuti, melainkan tubuh mereka sendiri yang berkhianat.",
+
+  "kultivator.technique.undying_emperor_fist": "Tinju Kaisar Abadi",
+  "kultivator.technique.undying_emperor_fist.desc": "Satu tinju (jangkauan 6, busur 60°): 7× kekuatan dan pukulan mundur sangat kuat, lalu tiga gempa susulan pada yang terpukul (0,6× kekuatan); gelombang kejut melaju 20→48 blok (lebar 6), 3× kekuatan dan pukulan mundur.",
+  "kultivator.technique.undying_emperor_fist.source": "Sumber: A Will Eternal bab 671/696/892 · Tinju Kaisar Abadi, seni rahasia tingkat Tulang Abadi dari Kitab Hidup Abadi Tak Mati",
+  "kultivator.technique.undying_emperor_fist.lore": "Di belakang tinjumu berdiri bayangan seorang kaisar yang menolak mati.",
+
+  "kultivator.technique.golden_ape_roar": "Kera Raksasa Emas: Raungan Vajra",
+  "kultivator.technique.golden_ape_roar.desc": "Tahap 1: wujud kera emas 25 dtk (×2,5 bila ada ruang) dan Raungan Vajra (kerucut 16→24): 3× kekuatan, Lemah III dan Lambat IV 5 dtk, pukulan mundur; serangan jarak dekat meledak (radius 4, 2× kekuatan). Rapal lagi, \"Hantaman Gunung\": lompat ke bidikan (≤24) dan hantam radius 10→20, 5× kekuatan, lalu wujud berakhir.",
+  "kultivator.technique.golden_ape_roar.source": "Sumber: A Record of a Mortal's Journey · wujud kera raksasa emas Han Li dan 金刚吼 Raungan Vajra-nya, dari transformasi 惊蛰十二变 dengan darah sejati Kera Raksasa Gunung (hantaman gunung adalah desain permainan)",
+  "kultivator.technique.golden_ape_roar.lore": "Satu raungan, dan monster lupa cara berdiri.",
+
+  "kultivator.technique.cosmic_giant_form": "Wujud Kosmik Langit-Bumi",
+  "kultivator.technique.cosmic_giant_form.desc": "Sosok raksasa emas dirimu bangkit selama 20 dtk (kau tetap seukuranmu): tiap 2,5 dtk ia menginjak kerumunan terpadat (radius 8→14), 4× kekuatan dan melontarkan; tinjunya mengikuti serangan jarak dekatmu (3× kekuatan); kerusakan diterima −50%. Di akhir: radius 24→32, 10× kekuatan. Qi 55% (min 700).",
+  "kultivator.technique.cosmic_giant_form.source": "Sumber: Journey to the West bab 6 · Erlang Shen tumbuh menjadi tubuh setinggi sepuluh ribu zhang melawan Kera Sakti, yang menandinginya",
+  "kultivator.technique.cosmic_giant_form.lore": "Kepalanya menyentuh awan; langkahnya menjadi gempa.",
+
+  "kultivator.technique.ancient_god_trample": "Injakan Dewa Kuno",
+  "kultivator.technique.ancient_god_trample.desc": "Tubuh Dewa Kuno 15 dtk (×1,5 bila ada ruang, kerusakan diterima −30%): delapan jejak kaki, satu tiap detik dan 8 blok lebih jauh (radius 8→12), 3× kekuatan dan membanting; jejak ke-9: radius 32→40, 16× kekuatan, melontarkan dan setrum 6 dtk. Qi 75%.",
+  "kultivator.technique.ancient_god_trample.source": "Sumber: Terinspirasi dari tubuh Dewa Kuno dalam Renegade Immortal, yang kekuatannya ditandai bintang di antara alis (bab 921); injakannya adalah desain permainan",
+  "kultivator.technique.ancient_god_trample.lore": "Sembilan bintang menyala di antara alismu, satu untuk tiap langkah."
+}
