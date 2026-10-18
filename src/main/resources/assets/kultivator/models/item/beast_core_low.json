@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "kultivator:item/beast_core_low",
+    "layer1": "kultivator:item/beast_core_low_overlay"
+  }
+}

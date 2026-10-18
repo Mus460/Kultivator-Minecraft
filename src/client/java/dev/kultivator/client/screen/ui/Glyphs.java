@@ -36,6 +36,11 @@ public final class Glyphs {
 	public static final int CODEX = 11;
 	/** A ring of seals around a core: the Cincin Segel. */
 	public static final int RING = 12;
+	// Phase 7 (DESIGN 19.2.13).
+	/** Stepping stones winding up to a summit: the Jalan tablet. */
+	public static final int JALAN = 13;
+	/** A three-legged cauldron with rising qi: the Kitab Alkimia. */
+	public static final int ALKIMIA = 14;
 
 	/** The Daos around the Bagua, clockwise from the top (Earlier Heaven order: opposites face each other). */
 	public static final Dao[] BAGUA = {Dao.SWORD, Dao.SHADOW, Dao.ICE, Dao.BODY, Dao.SPACE, Dao.LIGHTNING, Dao.FIRE, Dao.LIFE};
@@ -165,6 +170,25 @@ public final class Glyphs {
 					double a = Math.PI * 2.0D * i / 8.0D;
 					Brush.dot(g, cx + (float) Math.cos(a) * s * 0.8F, cy + (float) Math.sin(a) * s * 0.8F, Math.max(0.7F, s * 0.17F), color);
 				}
+			}
+			case JALAN -> {
+				// Stepping stones winding from the lower left up to a small summit on the right.
+				Brush.disc(g, cx - s * 0.7F, cy + s * 0.75F, s * 0.22F, color);
+				Brush.disc(g, cx - s * 0.15F, cy + s * 0.45F, s * 0.2F, color);
+				Brush.disc(g, cx - s * 0.5F, cy + s * 0.05F, s * 0.18F, color);
+				Brush.disc(g, cx + s * 0.05F, cy - s * 0.3F, s * 0.17F, color);
+				Brush.line(g, cx + s * 0.25F, cy - s * 0.45F, cx + s * 0.65F, cy - s, Math.max(1.0F, s * 0.18F), color);
+				Brush.line(g, cx + s * 0.65F, cy - s, cx + s, cy - s * 0.45F, Math.max(1.0F, s * 0.18F), color);
+			}
+			case ALKIMIA -> {
+				// A round cauldron on three legs with two wisps of qi above it.
+				Brush.band(g, cx, cy + s * 0.1F, s * 0.7F, -s * 0.25F, s * 0.7F, color, color);
+				Brush.rect(g, cx - s * 0.85F, cy - s * 0.15F, cx + s * 0.85F, cy - s * 0.15F + 1.0F, color);
+				Brush.rect(g, cx - s * 0.55F, cy + s * 0.6F, cx - s * 0.4F, cy + s, color);
+				Brush.rect(g, cx - 0.5F, cy + s * 0.6F, cx + 0.5F, cy + s, color);
+				Brush.rect(g, cx + s * 0.4F, cy + s * 0.6F, cx + s * 0.55F, cy + s, color);
+				Brush.dot(g, cx - s * 0.3F, cy - s * 0.5F, Math.max(0.7F, s * 0.14F), color);
+				Brush.dot(g, cx + s * 0.25F, cy - s * 0.8F, Math.max(0.7F, s * 0.14F), color);
 			}
 			default -> {
 				// A little scroll: paper between two rods.

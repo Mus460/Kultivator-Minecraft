@@ -108,5 +108,8 @@
   "advancement.kultivator.disciple_golden_core.title": "The Student's Golden Core",
   "advancement.kultivator.disciple_golden_core.description": "Watch a disciple survive its tribulation and form a Golden Core",
   "advancement.kultivator.disciple_taught.title": "Passing On the Dao",
-  "advancement.kultivator.disciple_taught.description": "Teach one of your techniques to a disciple"
+  "advancement.kultivator.disciple_taught.description": "Teach one of your techniques to a disciple",
+  "kultivator.disciplecult.guidance.status": "Bimbingan Guru: while you meditate within %2$s blocks, this disciple gets %1$s%% of your meditation and meditates ×%3$s faster.",
+  "kultivator.screen.help.bimbingan.title": "Bimbingan Guru (Master Guidance)",
+  "kultivator.screen.help.bimbingan": "The higher your realm, the faster your disciples cultivate while you meditate near them. A meditating disciple within 8 + 2 × your realm blocks (at most 24; realm counts from Mortal 0 to True Immortal 8) receives 10%% + 3%% × your realm + 5%% × the realms you stand above it of your own meditation gain (at most 60%%), and its own meditation runs ×(1 + 0.05 × your realm) meanwhile. A True Immortal master guiding a Qi Refining disciple gives 60%% within 24 blocks and ×1.4. The disciple's Status tab shows the numbers for that disciple. Sources: inspired by Battle Through the Heavens (Yao Lao, the teacher in Xiao Yan's ring, guiding his cultivation); the numbers are game design."
 }

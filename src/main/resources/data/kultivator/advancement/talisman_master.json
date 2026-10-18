@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_talisman",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.talisman_master.description"
+    },
+    "icon": {
+      "id": "kultivator:return_talisman"
+    },
+    "title": {
+      "translate": "advancement.kultivator.talisman_master.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

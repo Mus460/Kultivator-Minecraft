@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "kultivator:item/thousand_mile_talisman"
+  }
+}

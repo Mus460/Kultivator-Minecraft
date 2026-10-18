@@ -235,7 +235,7 @@ final class StatusTab extends DiscipleTab {
 				bx0, barsTop, bx1, mouseX, mouseY, List.of(label("cultivation"),
 						Component.literal(Msg.number(view.xp) + " / " + Msg.number(view.xpRequired)).withColor(Palette.GOLD_LIGHT),
 						Component.translatable(view.barFull() && !rank.isMax() ? "kultivator.discipleui.status.ready"
-								: "kultivator.discipleui.status.cultivation.tip")));
+								: "kultivator.discipleui.status.cultivation.tip"), guidanceLine(rank)));
 		drawBar(g, label("qi"), Msg.number(view.qi) + " / " + Msg.number(view.maxQi), qiT, Palette.QI, Palette.QI_LIGHT, bx0, barsTop + 15.0F, bx1,
 				mouseX, mouseY, List.of(label("qi"), Component.literal(Msg.number(view.qi) + " / " + Msg.number(view.maxQi)).withColor(Palette.QI_LIGHT),
 						Component.translatable("kultivator.discipleui.status.qi.tip")));
@@ -244,6 +244,15 @@ final class StatusTab extends DiscipleTab {
 						Component.translatable("kultivator.discipleui.status.stored.tip")));
 		g.nextStratum();
 		drawSlips(g, seconds);
+	}
+
+	/** Bimbingan Guru: what the master's meditation nearby gives this disciple now (the server's own pure formulas). */
+	private static Component guidanceLine(Rank rank) {
+		dev.kultivator.data.Realm master = dev.kultivator.client.ClientCultivation.data().realm();
+		return Component.translatable("kultivator.disciplecult.guidance.status",
+				Math.round(dev.kultivator.disciple.DiscipleCultivation.guidanceShare(master, rank.realm()) * 100.0D),
+				Msg.number(dev.kultivator.disciple.DiscipleCultivation.guidanceRange(master)),
+				Msg.number(dev.kultivator.disciple.DiscipleCultivation.guidanceSelfFactor(master))).withColor(0x7CFFB2);
 	}
 
 	/**

@@ -38,7 +38,7 @@ import java.util.UUID;
  * Sumber: I Shall Seal the Heavens ch. 27-31 (a special promotion training admits a single Outer disciple into the Inner
  * Sect); Battle Through the Heavens (the Inner Academy selection).
  */
-final class PromotionTrial {
+public final class PromotionTrial {
 
 	public static final int DURATION = 1200;
 	public static final int[] WAVE_TICKS = {0, 400, 800};
@@ -69,7 +69,7 @@ final class PromotionTrial {
 	/** Owner -> the running trial (one per hall). */
 	private static final Map<UUID, Trial> TRIALS = new HashMap<>();
 
-	static boolean running(UUID owner) {
+	public static boolean running(UUID owner) {
 		return TRIALS.containsKey(owner);
 	}
 

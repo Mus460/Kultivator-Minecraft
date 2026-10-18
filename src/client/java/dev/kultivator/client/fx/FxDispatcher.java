@@ -36,6 +36,10 @@ public final class FxDispatcher {
 			case KEHANCURAN -> dev.kultivator.client.kehancuran.KehancuranFx.play(type, fx);
 			// Phase 6b (DESIGN 21.24).
 			case SECT_BUILD -> dev.kultivator.client.sectbuild.BuildFx.play(type, fx);
+			// Phase 7 (DESIGN 19.2.11).
+			case ELITE -> EliteFx.play(type, fx);
+			case TREASURE -> HartaFx.play(type, fx);
+			case TALISMAN -> TalismanFx.play(type, fx);
 		}
 	}
 
@@ -61,6 +65,9 @@ public final class FxDispatcher {
 		dev.kultivator.client.disciple.path.PathFx.tick(minecraft);
 		// Phase 6b: construction sparks, work mist and the cloud sea.
 		dev.kultivator.client.sectbuild.BuildFx.tick(minecraft);
+		// Phase 7: elite auras and telegraphs, talisman glyphs.
+		EliteFx.tick(minecraft);
+		TalismanFx.tick(minecraft);
 	}
 
 	private FxDispatcher() {

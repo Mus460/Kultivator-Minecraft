@@ -26,6 +26,33 @@ public final class Stats {
 	public static final Identifier ARMOR_ID = Kultivator.id("realm_armor");
 	public static final Identifier SAFE_FALL_ID = Kultivator.id("realm_safe_fall");
 	public static final Identifier MINING_ID = Kultivator.id("realm_mining");
+	/** Player stars (DESIGN 19.3.11): +{@link #HEALTH_PER_STAR} max health each. */
+	public static final Identifier STAR_HEALTH_ID = Kultivator.id("star_health");
+	public static final double HEALTH_PER_STAR = 2.0D;
+	/** Anugerah Kenaikan attribute boons (DESIGN 19.3.11), ids {@code kultivator:perk_*}. */
+	public static final Identifier PERK_OXYGEN_ID = Kultivator.id("perk_oxygen");
+	public static final Identifier PERK_BURNING_ID = Kultivator.id("perk_burning");
+	public static final Identifier PERK_STEP_ID = Kultivator.id("perk_step_height");
+	public static final Identifier PERK_WATER_ID = Kultivator.id("perk_water_movement");
+	public static final Identifier PERK_TOUGHNESS_ID = Kultivator.id("perk_toughness");
+	public static final Identifier PERK_KNOCKBACK_ID = Kultivator.id("perk_knockback");
+	public static final Identifier PERK_ENTITY_REACH_ID = Kultivator.id("perk_entity_reach");
+	public static final Identifier PERK_BLOCK_REACH_ID = Kultivator.id("perk_block_reach");
+	/** L1 Napas Abadi: +3 oxygen bonus, burning time −50%. */
+	public static final double PERK_OXYGEN = 3.0D;
+	public static final double PERK_BURNING = -0.5D;
+	/** L2 Langkah Ringan: +0.5 step height, +0.5 water movement efficiency. */
+	public static final double PERK_STEP = 0.5D;
+	public static final double PERK_WATER = 0.5D;
+	/** L3 Kulit Giok: +4 armor toughness, +0.25 knockback resistance. */
+	public static final double PERK_TOUGHNESS = 4.0D;
+	public static final double PERK_KNOCKBACK = 0.25D;
+	/** L5 Tangan Langit: +1.5 entity and +1.0 block interaction range. */
+	public static final double PERK_ENTITY_REACH = 1.5D;
+	public static final double PERK_BLOCK_REACH = 1.0D;
+	/** Health curve (DESIGN 19.3.11): per Immortal Ascension layer, and the flat True Immortal bonus. */
+	public static final double HEALTH_PER_LAYER = 4.0D;
+	public static final double TRUE_IMMORTAL_HEALTH = 40.0D;
 
 	public static void init() {
 		// Applied on join, respawn and every rank / quality / Dao change by the callers.
@@ -47,6 +74,8 @@ public final class Stats {
 		set(player, Attributes.ARMOR, ARMOR_ID, armorBonus(data), AttributeModifier.Operation.ADD_VALUE);
 		set(player, Attributes.SAFE_FALL_DISTANCE, SAFE_FALL_ID, safeFallBonus(data), AttributeModifier.Operation.ADD_VALUE);
 		set(player, Attributes.BLOCK_BREAK_SPEED, MINING_ID, miningBonus(data), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+		set(player, Attributes.MAX_HEALTH, STAR_HEALTH_ID, starHealthBonus(data), AttributeModifier.Operation.ADD_VALUE);
+		applyBoons(player, data);
 
 		if (!alive) {
 			return;
@@ -58,14 +87,40 @@ public final class Stats {
 		}
 	}
 
-	/** Max health: {@code realm x 4 + stage + layer x 2} (+60 more for True Immortal) x quality factor. */
+	/**
+	 * Max health: {@code realm x 4 + stage + layer x 4} (+40 more for True Immortal) x quality factor (DESIGN 19.3.11:
+	 * IA L9 Peak +63, True Immortal +72 to +75 before quality).
+	 */
 	public static double healthBonus(CultivationData data) {
 		Rank rank = data.rank();
-		double bonus = rank.realm().ordinal() * 4.0D + rank.stage() + rank.layer() * 2.0D;
+		double bonus = rank.realm().ordinal() * 4.0D + rank.stage() + rank.layer() * HEALTH_PER_LAYER;
 		if (rank.realm() == Realm.TRUE_IMMORTAL) {
-			bonus += 60.0D;
+			bonus += TRUE_IMMORTAL_HEALTH;
 		}
 		return bonus * data.qualityFactor();
+	}
+
+	/** Max health from the player's stars: {@link #HEALTH_PER_STAR} per star. */
+	public static double starHealthBonus(CultivationData data) {
+		return ImmortalPerks.stars(data) * HEALTH_PER_STAR;
+	}
+
+	/** The attribute boons of Anugerah Kenaikan (L1, L2, L3, L5); L4, L6 to L9 act in their own places. */
+	private static void applyBoons(ServerPlayer player, CultivationData data) {
+		boolean breath = ImmortalPerks.boonActive(data, 1);
+		boolean step = ImmortalPerks.boonActive(data, 2);
+		boolean jade = ImmortalPerks.boonActive(data, 3);
+		boolean reach = ImmortalPerks.boonActive(data, 5);
+		set(player, Attributes.OXYGEN_BONUS, PERK_OXYGEN_ID, breath ? PERK_OXYGEN : 0.0D, AttributeModifier.Operation.ADD_VALUE);
+		set(player, Attributes.BURNING_TIME, PERK_BURNING_ID, breath ? PERK_BURNING : 0.0D, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+		set(player, Attributes.STEP_HEIGHT, PERK_STEP_ID, step ? PERK_STEP : 0.0D, AttributeModifier.Operation.ADD_VALUE);
+		set(player, Attributes.WATER_MOVEMENT_EFFICIENCY, PERK_WATER_ID, step ? PERK_WATER : 0.0D, AttributeModifier.Operation.ADD_VALUE);
+		set(player, Attributes.ARMOR_TOUGHNESS, PERK_TOUGHNESS_ID, jade ? PERK_TOUGHNESS : 0.0D, AttributeModifier.Operation.ADD_VALUE);
+		set(player, Attributes.KNOCKBACK_RESISTANCE, PERK_KNOCKBACK_ID, jade ? PERK_KNOCKBACK : 0.0D, AttributeModifier.Operation.ADD_VALUE);
+		set(player, Attributes.ENTITY_INTERACTION_RANGE, PERK_ENTITY_REACH_ID, reach ? PERK_ENTITY_REACH : 0.0D,
+				AttributeModifier.Operation.ADD_VALUE);
+		set(player, Attributes.BLOCK_INTERACTION_RANGE, PERK_BLOCK_REACH_ID, reach ? PERK_BLOCK_REACH : 0.0D,
+				AttributeModifier.Operation.ADD_VALUE);
 	}
 
 	/** Attack damage: {@code realm x 0.6 + stage x 0.15 + layer x 0.3}. */

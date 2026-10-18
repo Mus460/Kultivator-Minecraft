@@ -10,6 +10,7 @@ import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.data.XpSource;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
+import dev.kultivator.harta.Harta;
 import dev.kultivator.technique.source.BookPools;
 import dev.kultivator.technique.source.InheritanceTrials;
 import dev.kultivator.technique.source.JadeSlips;
@@ -54,6 +55,10 @@ import java.util.Set;
  * order and is consumed. Otherwise it gives insight: +5 comprehension (the Dao of a known art of the pool, or the book
  * family's Dao when it is the reader's) and +15 mastery to the first known art of the pool. Otherwise the player is told
  * exactly what is missing and keeps the book. A book without any pool or family gives 30 cultivation XP.
+ * <p>
+ * Phase 7 (DESIGN 19.3.14, game design): only the uncapped insight comprehension is limited, to
+ * {@code Harta.BOOK_INSIGHT_DAILY} books per in-game day ({@code extra.harta.book_day}, {@code book_insight}). Over the
+ * limit a book that would only give comprehension is kept; learning and book mastery are never limited.
  * <p>
  * {@link #init()} also starts the phase-6c acquisition modules of {@code technique.source} (jade slips, inheritance
  * jades, loot), so their items exist before the creative tab is built.
@@ -251,7 +256,16 @@ public final class TechniqueBooks {
 			return InteractionResult.SUCCESS;
 		}
 		if (reading.useful()) {
-			insight(player, data, stack, reading);
+			// Insight books per day (DESIGN 19.3.14): over the limit the comprehension is withheld; a book with nothing
+			// else to give (no mastery for a known art) is kept.
+			boolean capped = reading.insight() != null && Harta.bookInsightsToday(player) >= Harta.BOOK_INSIGHT_DAILY;
+			if (capped && reading.known() == null) {
+				Msg.chat(player, Component.translatable("kultivator.harta.book.capped", Harta.BOOK_INSIGHT_DAILY).withStyle(ChatFormatting.GRAY));
+				player.level().playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), SoundEvents.BOOK_PUT, SoundSource.PLAYERS,
+						0.8F, 0.7F);
+				return InteractionResult.PASS;
+			}
+			insight(player, data, stack, reading, capped);
 			return InteractionResult.SUCCESS;
 		}
 
@@ -280,8 +294,11 @@ public final class TechniqueBooks {
 		return InteractionResult.PASS;
 	}
 
-	/** Nothing new in the book: +5 comprehension and +15 mastery to a known art of the pool instead. */
-	private static void insight(ServerPlayer player, CultivationData data, ItemStack stack, Reading reading) {
+	/**
+	 * Nothing new in the book: +5 comprehension and +15 mastery to a known art of the pool instead. {@code capped}: the
+	 * daily insight limit is reached, so only the mastery is given.
+	 */
+	private static void insight(ServerPlayer player, CultivationData data, ItemStack stack, Reading reading, boolean capped) {
 		consume(player, stack);
 		Dao dao = reading.insight();
 		TechniqueSpec known = reading.known();
@@ -293,9 +310,12 @@ public final class TechniqueBooks {
 		} else if (dao != null) {
 			Msg.chat(player, Component.translatable("kultivator.sumber.book.insight_future", DaoPaths.colored(dao)).withStyle(ChatFormatting.YELLOW));
 		}
-		if (dao != null) {
+		if (dao != null && capped) {
+			Msg.chat(player, Component.translatable("kultivator.harta.book.capped", Harta.BOOK_INSIGHT_DAILY).withStyle(ChatFormatting.GRAY));
+		} else if (dao != null) {
 			double gained = Comprehension.grant(player, dao, INSIGHT);
 			if (gained > 0.0D) {
+				Harta.countBookInsight(player);
 				Msg.chat(player, Component.translatable("kultivator.dao.book.insight_gain", Comprehension.format(gained), DaoPaths.colored(dao),
 						Comprehension.format(data.comprehension(dao))).withStyle(ChatFormatting.GRAY));
 			} else {

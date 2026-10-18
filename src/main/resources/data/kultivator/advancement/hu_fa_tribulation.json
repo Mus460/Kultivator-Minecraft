@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_breakthrough",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.hu_fa_tribulation.description"
+    },
+    "icon": {
+      "id": "minecraft:shield"
+    },
+    "title": {
+      "translate": "advancement.kultivator.hu_fa_tribulation.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -20,6 +20,11 @@ public final class AlchemyItems {
 	public static final Item TRIBULATION_WARDING_PILL = register(PillKind.TRIBULATION_WARDING);
 	public static final Item SOUL_NURTURING_PILL = register(PillKind.SOUL_NURTURING);
 	public static final Item IMMORTAL_PILL = register(PillKind.IMMORTAL);
+	// Phase 7 (DESIGN 19.3.7).
+	public static final Item DAO_INSIGHT_PILL = register(PillKind.DAO_INSIGHT);
+	public static final Item TOXIN_PURGING_PILL = register(PillKind.TOXIN_PURGING);
+	public static final Item ENLIGHTENMENT_PILL = register(PillKind.ENLIGHTENMENT);
+	public static final Item BONE_TEMPERING_PILL = register(PillKind.BONE_TEMPERING);
 
 	private static Item register(PillKind kind) {
 		Item item = ModItems.register(kind.id(), properties -> new PillItem(properties, kind), new Item.Properties()

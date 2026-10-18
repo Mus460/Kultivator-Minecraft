@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_alchemy",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.first_herb.description"
+    },
+    "icon": {
+      "id": "kultivator:spirit_grass"
+    },
+    "title": {
+      "translate": "advancement.kultivator.first_herb.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -38,7 +38,7 @@ import java.util.UUID;
  * until the next landing. At Puncak Jurus a landing from 4 blocks or more sends a ring (0.3 × P, knockback 0.4, every
  * 20 ticks at most). Blocked during a Qi Deviation and a breakthrough, like every technique.
  */
-final class CloudStep {
+public final class CloudStep {
 
 	/** Fall damage stays cancelled this long after the landing (safety margin; the landing itself is already covered). */
 	private static final int LANDING_TAIL_TICKS = 10;
@@ -56,8 +56,8 @@ final class CloudStep {
 
 	private static final Map<UUID, State> STATES = new HashMap<>();
 
-	/** Air jumps per flight by realm (22.10). */
-	static int maxJumps(Realm realm) {
+	/** Air jumps per flight by realm (22.10); public for the HUD pips (DESIGN 19.2.9). */
+	public static int maxJumps(Realm realm) {
 		return switch (realm) {
 			case MORTAL -> 0;
 			case QI_REFINING -> 1;

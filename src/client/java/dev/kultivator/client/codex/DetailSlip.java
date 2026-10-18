@@ -238,6 +238,11 @@ public final class DetailSlip {
 				damage.append(Component.translatable(P + "repeats", numbers.repeats()));
 			}
 			lines.add(damage.withColor(0xB3281D));
+			// Lima Unsur (DESIGN 19.3.12, the element line of P7-jalan): the monster elements this art overcomes.
+			Component elements = elementLine(data, s);
+			if (elements != null) {
+				lines.add(elements);
+			}
 		}
 		if (!Double.isNaN(numbers.area())) {
 			lines.add(Component.translatable(P + "area", Component.translatable(numbers.areaKey()), SpecInfo.decimal(numbers.areaBase(), 1),
@@ -279,6 +284,31 @@ public final class DetailSlip {
 			cursor += Brush.wrap(g, font, text, tx, cursor, room, line.met() ? Palette.INK_SOFT : Palette.INK, 0.58F, false) + 0.5F;
 		}
 		return cursor;
+	}
+
+	/**
+	 * "Unsur Logam · unggul melawan monster Kayu" (DESIGN 19.3.12): the art's element (its Dao's, else the caster's own
+	 * from {@code ElementRelations.techniqueElement}) and {@code ElementRelations.strongAgainst}; Space is ×1.05 against
+	 * everything. Null without an element.
+	 */
+	private static @Nullable Component elementLine(CultivationData data, TechniqueSpec s) {
+		dev.kultivator.data.Element element = s.dao() != null ? s.dao().affinity() : dev.kultivator.elite.ElementRelations.techniqueElement(data);
+		if (element == null) {
+			return null;
+		}
+		List<dev.kultivator.data.Element> strong = dev.kultivator.elite.ElementRelations.strongAgainst(element);
+		if (strong.isEmpty()) {
+			return element == dev.kultivator.data.Element.SPACE
+					? Component.translatable("kultivator.goals.codex.space", element.displayName()).withColor(0x2E6B4F) : null;
+		}
+		MutableComponent names = Component.empty();
+		for (int i = 0; i < strong.size(); i++) {
+			if (i > 0) {
+				names.append(Component.literal(", "));
+			}
+			names.append(strong.get(i).displayName());
+		}
+		return Component.translatable("kultivator.goals.codex.strong", element.displayName(), names).withColor(0x2E6B4F);
 	}
 
 	/** "Kawah: BOWL r 6 · ≤ 512 blok" for the first carving shape at this rank (22.11.3). */

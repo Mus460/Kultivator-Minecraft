@@ -105,6 +105,11 @@ public final class Kehancuran {
 
 	private static final Map<UUID, Order> ORDERS = new HashMap<>();
 
+	/** Read-only: the master has a destructive order in its aim, confirm or countdown stage (DESIGN 19.3.6). */
+	public static boolean ordering(UUID master) {
+		return ORDERS.containsKey(master);
+	}
+
 	public static void init() {
 		WorldBreaker.init();
 		ServerTickEvents.END_SERVER_TICK.register(Kehancuran::tick);
@@ -320,9 +325,10 @@ public final class Kehancuran {
 		int maxX = Integer.MIN_VALUE;
 		int maxY = Integer.MIN_VALUE;
 		int maxZ = Integer.MIN_VALUE;
-		// 22.15: at most 4 × cap block reads per build. The shape geometry (surface scans of RING, STRIP, WITHER and the
-		// impact search) may use up to 3 × cap of them; the merge below gets what is left, at least one cap.
-		int geometryBudget = 3 * blockCap;
+		// 22.15: at most 4 × cap block reads per build. The shape geometry (surface reads, the scans of RING, STRIP, WITHER
+		// and the impact search) may use up to 2 × cap of them; the merge below gets what is left plus one cap, and the
+		// open-top column check at most one read per planned column (≤ cap).
+		int geometryBudget = 2 * blockCap;
 		for (Shapes.Placed placed : shapes) {
 			List<Shapes.Change> raw = Shapes.build(level, placed.spec(), placed.anchor(), placed.direction(), geometryBudget);
 			geometryBudget = Math.max(0, geometryBudget - Shapes.lastReads());
@@ -345,7 +351,10 @@ public final class Kehancuran {
 		ProtectedZones.Context zones = new ProtectedZones.Context(level, box, caster.getUUID(), List.of(caster.position()));
 		List<Long> positions = new ArrayList<>();
 		List<Byte> modes = new ArrayList<>();
+		List<Boolean> checks = new ArrayList<>();
 		java.util.Set<Long> seen = new java.util.HashSet<>();
+		// Per column: the highest solid block that has to stay; nothing under it is planned (no sealed hollows).
+		java.util.Map<Long, Integer> kept = new java.util.HashMap<>();
 		int protectedCount = 0;
 		int candidates = 0;
 		int readsLeft = blockCap + geometryBudget;
@@ -374,17 +383,27 @@ public final class Kehancuran {
 					continue;
 				}
 				candidates++;
+				boolean carves = mode == WorldBreaker.MODE_REMOVE || mode == WorldBreaker.MODE_NATURAL;
+				long column = Shapes.columnKey(pos);
 				if (zone != null) {
 					protectedCount++;
+					if (carves && Shapes.roofs(state)) {
+						kept.merge(column, pos.getY(), Math::max);
+					}
 					continue;
 				}
 				if (ProtectedZones.neverTouch(level, pos, state) || mode == WorldBreaker.MODE_NATURAL && !Shapes.natural(state)
 						|| mode == WorldBreaker.MODE_STRIP && !state.is(Shapes.STRIPPABLE)
-						|| mode == WorldBreaker.MODE_WITHER && Shapes.witherInto(state) == null) {
+						|| mode == WorldBreaker.MODE_WITHER && Shapes.witherInto(state) == null
+						|| carves && kept.getOrDefault(column, Integer.MIN_VALUE) > pos.getY()) {
+					if (carves && Shapes.roofs(state)) {
+						kept.merge(column, pos.getY(), Math::max);
+					}
 					continue;
 				}
 				positions.add(pos.asLong());
 				modes.add(mode);
+				checks.add(carves && !Shapes.pointBlast(spec.kind()));
 				taken++;
 			}
 		}
@@ -395,11 +414,22 @@ public final class Kehancuran {
 			}
 			return SelfResult.NOTHING;
 		}
-		long[] packed = new long[positions.size()];
-		byte[] modeArray = new byte[positions.size()];
+		// A column whose top planned block sits under a solid, unplanned block would become a sealed hollow: drop it.
+		List<BlockPos> planned = new ArrayList<>(positions.size());
+		boolean[] check = new boolean[positions.size()];
+		for (int i = 0; i < positions.size(); i++) {
+			planned.add(BlockPos.of(positions.get(i)));
+			check[i] = checks.get(i);
+		}
+		List<Integer> open = Shapes.openColumns(level, planned, check);
+		if (open.isEmpty()) {
+			return SelfResult.NOTHING;
+		}
+		long[] packed = new long[open.size()];
+		byte[] modeArray = new byte[open.size()];
 		for (int i = 0; i < packed.length; i++) {
-			packed[i] = positions.get(i);
-			modeArray[i] = modes.get(i);
+			packed[i] = positions.get(open.get(i));
+			modeArray[i] = modes.get(open.get(i));
 		}
 		Shapes.Placed first = shapes.get(0);
 		BlockPos centre = first.anchor();
@@ -749,6 +779,8 @@ public final class Kehancuran {
 		AABB box = bounds(raw);
 		ProtectedZones.Context zones = new ProtectedZones.Context(level, box);
 		List<Shapes.Change> plan = new ArrayList<>();
+		java.util.Map<Long, Integer> kept = new java.util.HashMap<>();
+		boolean carves = spec.kind() != Shapes.Kind.WITHER && spec.kind() != Shapes.Kind.STRIP;
 		for (Shapes.Change change : raw) {
 			ProtectedZones.Zone zone = zones.zoneOf(change.pos());
 			if (zone == ProtectedZones.Zone.UNLOADED) {
@@ -760,13 +792,34 @@ public final class Kehancuran {
 				return;
 			}
 			BlockState state = level.getBlockState(change.pos());
-			if (ProtectedZones.neverTouch(level, change.pos(), state) || spec.naturalOnly() && !Shapes.natural(state)) {
+			long column = Shapes.columnKey(change.pos());
+			if (ProtectedZones.neverTouch(level, change.pos(), state) || spec.naturalOnly() && !Shapes.natural(state)
+					|| carves && kept.getOrDefault(column, Integer.MIN_VALUE) > change.pos().getY()) {
+				if (carves && Shapes.roofs(state)) {
+					kept.merge(column, change.pos().getY(), Math::max);
+				}
+				continue;
+			}
+			if (state.isAir()) {
 				continue;
 			}
 			plan.add(change);
 			if (plan.size() >= config.kehancuranMaxBlocksPerCast) {
 				break;
 			}
+		}
+		if (carves && !Shapes.pointBlast(spec.kind()) && !plan.isEmpty()) {
+			List<BlockPos> planned = new ArrayList<>(plan.size());
+			boolean[] check = new boolean[plan.size()];
+			for (int i = 0; i < plan.size(); i++) {
+				planned.add(plan.get(i).pos());
+				check[i] = plan.get(i).to() == null;
+			}
+			List<Shapes.Change> open = new ArrayList<>(plan.size());
+			for (int i : Shapes.openColumns(level, planned, check)) {
+				open.add(plan.get(i));
+			}
+			plan = open;
 		}
 		if (plan.isEmpty()) {
 			Msg.chat(master, Component.translatable(PREFIX + "why.empty").withColor(RED));

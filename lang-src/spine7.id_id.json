@@ -1,0 +1,16 @@
+{
+  "kultivator.spine7.tab.jalan": "Jalan Kultivasi",
+  "kultivator.spine7.tab.jalan.short": "Jalan",
+  "kultivator.spine7.tab.alkimia": "Kitab Alkimia",
+  "kultivator.spine7.tab.alkimia.short": "Alkimia",
+  "kultivator.spine7.placeholder": "Tablet ini masih sedang dipahat.",
+  "kultivator.spine7.kit": "Fase 7: batu roh, herba, inti dan jimat",
+  "kultivator.spine7.config.eliteMonsters": "eliteMonsters: monster yang muncul alami di dekat pemain Pemurnian Qi ke atas bisa menjadi binatang iblis elit.",
+  "kultivator.spine7.config.eliteChanceScale": "eliteChanceScale (0-5): pengali peluang elit; batas 7% tetap berlaku.",
+  "kultivator.spine7.config.structureLoot": "structureLoot: batu roh, herba roh, inti binatang dan slip giok di peti struktur bawaan.",
+  "kultivator.spine7.config.spiritStoneMining": "spiritStoneMining: bijih yang dipatahkan pemain Pemurnian Qi ke atas kadang menjatuhkan batu roh.",
+  "kultivator.spine7.config.herbHarvest": "herbHarvest: tanaman yang dipatahkan pemain Pemurnian Qi ke atas bisa menyimpan herba roh berumur.",
+  "kultivator.spine7.config.guideRewards": "guideRewards: bab-bab Langkah Pertama di tablet Jalan memberikan hadiahnya.",
+  "kultivator.spine7.config.dailyTasks": "dailyTasks: Kewajiban Harian, tiga tugas kecil setiap hari game.",
+  "kultivator.spine7.config.tribulationTelegraph": "tribulationTelegraph: cincin petir memperingatkan sambaran tribulasi mulai Transformasi Dewa; jika mati, setiap petir kena penuh."
+}

@@ -41,6 +41,11 @@ public class KultivatorClient implements ClientModInitializer {
 		// Phase 6c (DESIGN 22.18.1 item 13). The technique registry itself is built by the main entrypoint only.
 		dev.kultivator.client.fx.spec.SpecFx.init();
 		dev.kultivator.client.codex.CodexClient.init();
+		// Phase 7 (DESIGN 19.2.14); GoalsClient registers its own HUD elements.
+		dev.kultivator.client.harta.HartaClient.init();
+		dev.kultivator.client.elite.EliteClient.init();
+		dev.kultivator.client.talisman.TalismanClient.init();
+		dev.kultivator.client.goals.GoalsClient.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));

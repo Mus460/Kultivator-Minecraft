@@ -32,7 +32,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
@@ -180,12 +179,9 @@ public final class TechniqueLoot {
 		Msg.chat(player, Component.translatable(PREFIX + "trial.dropped", InheritanceTrials.themeName(theme)).withStyle(ChatFormatting.GOLD));
 	}
 
+	/** The player who killed the boss themselves (DESIGN 19.2.5: the spine's {@code KillCredit.directPlayer}, unchanged rule). */
 	private static @Nullable ServerPlayer killer(LivingEntity victim, DamageSource source) {
-		Entity attacker = source.getEntity();
-		if (attacker instanceof ServerPlayer player) {
-			return player;
-		}
-		return victim.getKillCredit() instanceof ServerPlayer player ? player : null;
+		return dev.kultivator.util.KillCredit.directPlayer(victim, source);
 	}
 
 	// ================================================================== flame seeds and scripture pages

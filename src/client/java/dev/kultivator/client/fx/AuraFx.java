@@ -35,6 +35,9 @@ import net.minecraft.world.phys.Vec3;
  * and not for yourself in first person. Everything is scaled by Effect Quality (Minimal: almost nothing; Maximal adds
  * end-rod sparkles from Nascent Soul). Motes that must keep their shape (the infant, beads, comets, flames) are made
  * with exact speed and lifetime instead of the random drift of plain dust.
+ * <p>
+ * Other players' auras also follow the "Efek pemain lain" setting ({@link EffectQuality#othersScale()}, DESIGN 19.3.15):
+ * Penuh as before, Ringan a quarter of the motes and the shaped motifs every fourth tick, Mati none.
  */
 public final class AuraFx {
 
@@ -47,6 +50,8 @@ public final class AuraFx {
 	private static final int PILLAR_LIGHT = 0xFFF4D0;
 	/** How much of the standing height is left while seated in meditation (the pose lowers the model). */
 	private static final float SEATED_HEIGHT = 0.69F;
+	/** The share of the aura drawn for the player being handled: 1 for yourself, the others' setting for anyone else. */
+	private static float share = 1.0F;
 
 	/** Where and when one player's aura is drawn this tick. */
 	private record Frame(double x, double y, double z, double width, double height, long t, float yaw) {
@@ -76,8 +81,13 @@ public final class AuraFx {
 			if (!visual.has(VisualState.SHOW_AURA) || visual.realm() < Realm.QI_REFINING.ordinal()) {
 				continue;
 			}
+			share = player == minecraft.player ? 1.0F : EffectQuality.othersScale();
+			if (share <= 0.0F) {
+				continue;
+			}
 			aura(minecraft, player, visual, random, time);
 		}
+		share = 1.0F;
 	}
 
 	private static void aura(Minecraft minecraft, AbstractClientPlayer player, VisualState visual, RandomSource random, long time) {
@@ -126,7 +136,7 @@ public final class AuraFx {
 		}
 		// Nascent Soul and above at Maximal: end-rod sparkles drifting up.
 		if (tier >= Realm.NASCENT_SOUL.ordinal() && EffectQuality.maximal()
-				&& random.nextFloat() < 0.08F + 0.02F * (tier - Realm.NASCENT_SOUL.ordinal())) {
+				&& random.nextFloat() < (0.08F + 0.02F * (tier - Realm.NASCENT_SOUL.ordinal())) * share) {
 			double angle = random.nextDouble() * Math.PI * 2.0D;
 			CommonFx.add(ParticleTypes.END_ROD, new Vec3(f.x + Math.cos(angle) * f.width * 0.9D, f.y + random.nextDouble() * f.height,
 					f.z + Math.sin(angle) * f.width * 0.9D), new Vec3(0.0D, 0.015D + random.nextDouble() * 0.02D, 0.0D), false);
@@ -193,7 +203,7 @@ public final class AuraFx {
 	/** Nascent Soul: a small spectral infant seated in lotus above the head, bobbing gently, with a tiny halo. */
 	private static void soulInfant(Minecraft minecraft, Frame f, int realmColor, RandomSource random) {
 		boolean minimal = EffectQuality.minimal();
-		if (minimal && f.t % 3L != 0L) {
+		if (minimal && f.t % 3L != 0L || share < 1.0F && f.t % 4L != 0L) {
 			return;
 		}
 		double bob = Math.sin(f.t * 0.08D) * 0.05D;
@@ -277,7 +287,7 @@ public final class AuraFx {
 						px + (random.nextDouble() - 0.5D) * 0.08D, py, pz + (random.nextDouble() - 0.5D) * 0.08D,
 						0.0D, 0.05D + random.nextDouble() * 0.02D, 0.0D, 14);
 			}
-			if (EffectQuality.chance(random, 0.08F)) {
+			if (EffectQuality.chance(random, 0.08F * share)) {
 				CommonFx.add(ParticleTypes.END_ROD, new Vec3(px, f.y + 0.1D, pz), new Vec3(0.0D, 0.07D, 0.0D), false);
 			}
 		}
@@ -285,7 +295,7 @@ public final class AuraFx {
 
 	/** Ascended True Immortal: petals drifting down around the immortal, some cherry pink, some in shifting rainbow tints. */
 	private static void petals(Frame f, RandomSource random) {
-		if (!EffectQuality.chance(random, 0.16F)) {
+		if (!EffectQuality.chance(random, 0.16F * share)) {
 			return;
 		}
 		double angle = random.nextDouble() * Math.PI * 2.0D;
@@ -326,14 +336,14 @@ public final class AuraFx {
 
 	/** How many particles to make this tick for a rate given at Normal quality (fractions become chances). */
 	private static int amount(RandomSource random, float normalRate) {
-		float rate = normalRate * EffectQuality.level().factor();
+		float rate = normalRate * EffectQuality.level().factor() * share;
 		int whole = (int) rate;
 		return whole + (random.nextFloat() < rate - whole ? 1 : 0);
 	}
 
 	/** True every {@code normalTicks} ticks at Normal and Maximal quality, three times rarer at Minimal. */
 	private static boolean every(long t, int normalTicks) {
-		int n = EffectQuality.minimal() ? normalTicks * 3 : normalTicks;
+		int n = (EffectQuality.minimal() ? normalTicks * 3 : normalTicks) * (share < 1.0F ? 4 : 1);
 		return t % n == 0L;
 	}
 

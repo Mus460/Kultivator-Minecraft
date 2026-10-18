@@ -116,15 +116,30 @@ public final class DaoProtectors {
 		return entity.entityTags().contains(TAG);
 	}
 
-	/** Spawns one wave of {@code 1 + targetRealm / 2} monsters around the player. Returns how many arrived. */
+	/** Phase 7 (DESIGN 19.3.1): protector health ×(1 + 0.3 × max(0, target realm − Golden Core)) in the player's own waves. */
+	public static final double HEALTH_PER_REALM = 0.3D;
+
+	/**
+	 * Spawns one wave of {@code 1 + targetRealm / 2} monsters around the player, +1 per Hu Fa guardian (at most 3). From
+	 * target Nascent Soul the first one is an elite demonic beast (tier 1 NS/DT, 2 DU/IA, 3 TI; realm = target − 2); every
+	 * protector picks its first target among the cultivator, the guardians and the cultivator's disciples within 16
+	 * (DESIGN 19.3.1, 19.3.8). Only the player's own tribulation calls this; {@link #spawnWaveFor} stays unchanged.
+	 * Returns how many arrived.
+	 */
 	public static int spawnWave(ServerPlayer player, Rank target, int variant) {
 		ServerLevel level = player.level();
 		RandomSource random = player.getRandom();
-		int count = 1 + target.realm().ordinal() / 2;
+		int targetRealm = target.realm().ordinal();
+		int count = 1 + targetRealm / 2 + dev.kultivator.elite.HuFaTribulation.extraProtectors(player);
+		double health = 1.0D + HEALTH_PER_REALM * Math.max(0, targetRealm - Realm.GOLDEN_CORE.ordinal());
+		int eliteTier = eliteTier(target.realm());
+		List<LivingEntity> targets = dev.kultivator.elite.HuFaTribulation.protectorTargets(player);
 		int spawned = 0;
 		for (int i = 0; i < count; i++) {
-			EntityType<? extends Mob> type = pick(variant, target, random);
-			if (spawnOne(level, player, type, variant, random, 1.0D)) {
+			boolean elite = i == 0 && eliteTier > 0;
+			EntityType<? extends Mob> type = elite ? pickElite(variant, random) : pick(variant, target, random);
+			LivingEntity first = targets.isEmpty() ? player : targets.get(random.nextInt(targets.size()));
+			if (spawnOne(level, player, type, variant, random, health, elite ? eliteTier : 0, Math.max(0, targetRealm - 2), first)) {
 				spawned++;
 			}
 		}
@@ -152,7 +167,7 @@ public final class DaoProtectors {
 		int spawned = 0;
 		for (int i = 0; i < Math.min(size, 16); i++) {
 			EntityType<? extends Mob> type = pick(variant, rank, random);
-			if (spawnOne(level, target, type, variant, random, health)) {
+			if (spawnOne(level, target, type, variant, random, health, 0, 0, null)) {
 				spawned++;
 			}
 		}
@@ -242,8 +257,29 @@ public final class DaoProtectors {
 		return pool.get(random.nextInt(pool.size()));
 	}
 
+	/** The elite protector's tier for a target realm: 1 for NS and DT, 2 for DU and IA, 3 for TI, 0 below NS. */
+	private static int eliteTier(Realm target) {
+		if (target == Realm.TRUE_IMMORTAL) {
+			return 3;
+		}
+		if (target.atLeast(Realm.DAO_UNION)) {
+			return 2;
+		}
+		return target.atLeast(Realm.NASCENT_SOUL) ? 1 : 0;
+	}
+
+	/** A monster type that may carry the elite of a wave (no magma cube: it would split). */
+	private static EntityType<? extends Mob> pickElite(int variant, RandomSource random) {
+		List<EntityType<? extends Mob>> pool = switch (variant) {
+			case Tribulation.VARIANT_NETHER -> List.of(EntityTypes.WITHER_SKELETON, EntityTypes.HOGLIN);
+			case Tribulation.VARIANT_END -> List.of(EntityTypes.ENDERMITE);
+			default -> List.of(EntityTypes.ZOMBIE, EntityTypes.SKELETON, EntityTypes.SPIDER, EntityTypes.STRAY, EntityTypes.HUSK);
+		};
+		return pool.get(random.nextInt(pool.size()));
+	}
+
 	private static boolean spawnOne(ServerLevel level, LivingEntity player, EntityType<? extends Mob> type, int variant, RandomSource random,
-			double healthFactor) {
+			double healthFactor, int eliteTier, int eliteRealm, @Nullable LivingEntity firstTarget) {
 		Mob mob = type.create(level, EntitySpawnReason.EVENT);
 		if (mob == null) {
 			// Peaceful difficulty or a disabled feature.
@@ -274,11 +310,16 @@ public final class DaoProtectors {
 		// The mob itself plus a jockey rider that finalizeSpawn may have created (spider jockeys).
 		List<Entity> group = new ArrayList<>();
 		mob.getSelfAndPassengers().forEach(group::add);
+		LivingEntity aimAt = firstTarget != null && firstTarget.isAlive() && firstTarget.level() == level ? firstTarget : player;
 		for (Entity member : group) {
 			member.addTag(TAG);
 			member.addTag(ownerTag);
 			if (!(player instanceof Player)) {
 				member.addTag(VERSUS_TAG_PREFIX + player.getUUID());
+			}
+			if (aimAt != player && !(aimAt instanceof Player)) {
+				// A disciple picked as the first target (DESIGN 19.3.8) may be fought for real.
+				member.addTag(VERSUS_TAG_PREFIX + aimAt.getUUID());
 			}
 			if (member instanceof Mob each) {
 				harden(each);
@@ -286,6 +327,10 @@ public final class DaoProtectors {
 			}
 			owned.add(member.getUUID());
 			ALIVE.add(member.getUUID());
+		}
+		if (eliteTier > 0) {
+			// Phase 7 (DESIGN 19.3.1): one elite per wave; it keeps the protector rules but drops its core.
+			dev.kultivator.elite.EliteMonsters.makeElite(mob, eliteTier, null, eliteRealm);
 		}
 		if (!mob.isAlive()) {
 			return false;
@@ -299,7 +344,7 @@ public final class DaoProtectors {
 		}
 		for (Entity member : group) {
 			if (member instanceof Mob each) {
-				aim(each, player);
+				aim(each, aimAt);
 			}
 		}
 		Fx.send(level, spot, FxType.DAO_PROTECTOR, variant, 0, 0.0F);
@@ -346,9 +391,10 @@ public final class DaoProtectors {
 	/**
 	 * Takes away every way a protector could change blocks or keep items: no loot pickup (a discarded mob would destroy
 	 * what it picked up), swords instead of bows (arrows break pots and light TNT), zombies never break doors, call no
-	 * reinforcements and leave turtle eggs alone, raiders never join a raid (raid goals break and open doors).
+	 * reinforcements and leave turtle eggs alone, raiders never join a raid (raid goals break and open doors). Public for
+	 * the elite demonic beasts (DESIGN 19.3.1), which are hardened the same way.
 	 */
-	private static void harden(Mob mob) {
+	public static void harden(Mob mob) {
 		mob.setCanPickUpLoot(false);
 		if (mob instanceof AbstractSkeleton skeleton) {
 			skeleton.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.STONE_SWORD));

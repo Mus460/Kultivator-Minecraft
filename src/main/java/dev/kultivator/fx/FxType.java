@@ -102,7 +102,15 @@ public enum FxType {
 
 	// ---- phase 6b (DESIGN 21.24)
 	/** Pembangunan Sekte: placement crumbs, component and tier ceremonies, blocked pings (client/sectbuild/BuildFx); a = {@code sect.build.api.BuildFxIds}. */
-	SECT_BUILD;
+	SECT_BUILD,
+
+	// ---- phase 7 (DESIGN 19.2.11); one per module, sub-ids in each module's FxIds class
+	/** Elite telegraphs, element sparks, tribulation lightning rings, twin rings, Hu Fa threads (client/fx/EliteFx); a = {@code elite.CombatFxIds}. */
+	ELITE,
+	/** Spirit stones, beast cores, herbs, treasure finds (client/fx/HartaFx); a = {@code harta.HartaFxIds}. */
+	TREASURE,
+	/** Talismans inscribed, burning into glyphs, the Unbroken Soul shatter (client/fx/TalismanFx); a = {@code talisman.TalismanFxIds}. */
+	TALISMAN;
 
 	public static FxType byOrdinal(int ordinal) {
 		FxType[] values = values();

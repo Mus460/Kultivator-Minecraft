@@ -9,6 +9,8 @@ import dev.kultivator.KultivatorConfig;
 import dev.kultivator.beast.SpiritBeasts;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
+import dev.kultivator.harta.HartaFxIds;
+import dev.kultivator.harta.SpiritStones;
 import dev.kultivator.sect.hall.GrandFormation;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
@@ -74,6 +76,11 @@ import java.util.List;
  * pushed ravager tears through leaves), and every pushed mob gets a portal cooldown (portal travel could build an exit
  * portal). Data in {@link FormationData} per dimension.
  * <p>
+ * Spirit stones (DESIGN 19.3.2, use 3) fuel a formation too: sneak-use the lodestone with a stone. Low +20 min, Mid +3 h,
+ * High +24 h, Supreme fills it to the stone cap {@link #MAX_POWER_STONES} (48 h); amethyst stays capped at
+ * {@link #MAX_POWER_SHARDS} (2 h). Source: stones power formations and a better stone makes the formation stronger
+ * (RMJ ch. 131); the durations are game design.
+ * <p>
  * Effects ({@code FxType.PROTECTIVE_FORMATION}, drawn by the client's FormationFx): pos = lodestone centre, f = radius;
  * a = 1 dome refresh every 2 s (b = 1 just switched on, b = 2 charged with a shard), a = 0 switched off, a = 2 missing
  * pillar marker / a = 3 present pillar marker (pos = the pillar block), a = 4 a monster driven back (pos = the monster,
@@ -85,8 +92,12 @@ public final class ProtectiveFormations {
 	public static final double RADIUS = 16.0D;
 	/** Power one Amethyst Shard adds: 10 minutes. */
 	public static final int TICKS_PER_SHARD = 20 * 60 * 10;
-	/** Most power a formation can hold: 2 hours. */
-	public static final int MAX_POWER = 20 * 60 * 120;
+	/** Most power amethyst shards can give a formation: 2 hours. */
+	public static final int MAX_POWER_SHARDS = 20 * 60 * 120;
+	/** Most power spirit stones can give a formation: 48 hours (DESIGN 19.3.2). */
+	public static final int MAX_POWER_STONES = 20 * 60 * 60 * 48;
+	/** Most power a formation can hold at all (the clamp of {@link Formation}): the stone cap. */
+	public static final int MAX_POWER = MAX_POWER_STONES;
 
 	private static final int PULSE = 10;
 	private static final int CHECK_INTERVAL = 100;
@@ -150,16 +161,21 @@ public final class ProtectiveFormations {
 			return InteractionResult.PASS;
 		}
 		boolean shard = player.getItemInHand(hand).is(Items.AMETHYST_SHARD);
+		int stoneGrade = SpiritStones.grade(player.getItemInHand(hand));
+		boolean stone = stoneGrade >= 0;
 		// An empty hand only counts next to at least one pillar, so a plain lodestone keeps its plain behaviour.
 		boolean emptyHands = hand == InteractionHand.MAIN_HAND && player.getMainHandItem().isEmpty()
 				&& FormationPattern.missing(level, pos).size() < FormationPattern.pillars(pos).size();
-		if (!shard && !emptyHands) {
+		if (!shard && !stone && !emptyHands) {
 			return InteractionResult.PASS;
 		}
 		if (level.isClientSide() || !(player instanceof ServerPlayer serverPlayer) || !(level instanceof ServerLevel serverLevel)) {
 			return InteractionResult.SUCCESS;
 		}
 		try {
+			if (stone) {
+				return useStone(serverPlayer, serverLevel, pos.immutable(), hand, stoneGrade);
+			}
 			return shard ? useShard(serverPlayer, serverLevel, pos.immutable(), hand) : useEmptyHand(serverPlayer, serverLevel, pos.immutable());
 		} catch (RuntimeException exception) {
 			Kultivator.LOGGER.error("Protective formation interaction failed at {}", pos, exception);
@@ -190,14 +206,14 @@ public final class ProtectiveFormations {
 		}
 		formation.setOwnerName(player.getPlainTextName());
 		boolean wasActive = formation.active();
-		// A shard is only used when at least half of it fits below the 2 hour cap.
-		boolean charged = MAX_POWER - formation.power() >= TICKS_PER_SHARD / 2;
+		// A shard is only used when at least half of it fits below the 2 hour cap (stone power above it is kept).
+		boolean charged = MAX_POWER_SHARDS - formation.power() >= TICKS_PER_SHARD / 2;
 		if (charged) {
 			ItemStack stack = player.getItemInHand(hand);
 			if (!player.hasInfiniteMaterials()) {
 				stack.shrink(1);
 			}
-			formation.setPower(formation.power() + TICKS_PER_SHARD);
+			formation.setPower(Math.max(formation.power(), Math.min(MAX_POWER_SHARDS, formation.power() + TICKS_PER_SHARD)));
 		}
 		formation.setActive(true);
 		data.setDirty();
@@ -219,7 +235,75 @@ public final class ProtectiveFormations {
 		if (created) {
 			Advancements.grant(player, "formation_built");
 		}
-		if (formation.power() >= MAX_POWER) {
+		if (formation.power() >= MAX_POWER_SHARDS) {
+			Advancements.grant(player, "formation_powered");
+		}
+		return InteractionResult.SUCCESS;
+	}
+
+	/**
+	 * A spirit stone dissolves into the formation (DESIGN 19.3.2, use 3): Low +20 min, Mid +3 h, High +24 h, Supreme up to
+	 * the stone cap. A stone is only used when at least half of it fits (Supreme: when the formation is not nearly full).
+	 */
+	private static InteractionResult useStone(ServerPlayer player, ServerLevel level, BlockPos pos, InteractionHand hand, int grade) {
+		if (!KultivatorConfig.get().protectiveFormations) {
+			Msg.chat(player, Component.translatable("kultivator.formations.disabled").withStyle(ChatFormatting.RED));
+			return InteractionResult.SUCCESS;
+		}
+		FormationData data = FormationData.get(level);
+		Formation formation = data.get(pos);
+		if (formation != null && !formation.isOwner(player)) {
+			Msg.chat(player, Component.translatable("kultivator.formations.owned_by", ownerName(formation)).withStyle(ChatFormatting.YELLOW));
+			return InteractionResult.SUCCESS;
+		}
+		List<BlockPos> missing = FormationPattern.missing(level, pos);
+		if (!missing.isEmpty()) {
+			showIncomplete(player, pos, missing);
+			return InteractionResult.SUCCESS;
+		}
+		boolean created = formation == null;
+		if (created) {
+			formation = new Formation(pos, player.getUUID(), player.getPlainTextName(), false, 0, 0);
+			data.put(formation);
+		}
+		formation.setOwnerName(player.getPlainTextName());
+		boolean wasActive = formation.active();
+		int ticks = SpiritStones.FORMATION_TICKS[Math.max(0, Math.min(SpiritStones.FORMATION_TICKS.length - 1, grade))];
+		int before = formation.power();
+		boolean charged = ticks < 0 ? before < MAX_POWER_STONES - TICKS_PER_SHARD : MAX_POWER_STONES - before >= ticks / 2;
+		ItemStack stack = player.getItemInHand(hand);
+		Component stoneName = stack.getHoverName().copy();
+		if (charged) {
+			if (!player.hasInfiniteMaterials()) {
+				stack.shrink(1);
+			}
+			formation.setPower(ticks < 0 ? MAX_POWER_STONES : Math.min(MAX_POWER_STONES, before + ticks));
+		}
+		formation.setActive(true);
+		data.setDirty();
+
+		Vec3 centre = Vec3.atCenterOf(pos);
+		if (charged) {
+			Fx.send(level, centre, FxType.TREASURE, HartaFxIds.FORMATION_FUEL, grade, 0.0F);
+			sound(level, centre, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 0.8F + 0.15F * grade);
+			sound(level, centre, SoundEvents.RESPAWN_ANCHOR_CHARGE, 0.6F, 1.2F);
+			sendDome(level, formation, 1, wasActive ? 2 : 1);
+			if (!wasActive) {
+				sound(level, centre, SoundEvents.BEACON_ACTIVATE, 1.0F, 1.2F);
+			}
+			Msg.chat(player, Component.translatable("kultivator.harta.stone.formation_fuel", stoneName,
+					duration(formation.power() - before), duration(formation.power())).withStyle(ChatFormatting.GREEN));
+		} else {
+			if (!wasActive) {
+				sendDome(level, formation, 1, 1);
+			}
+			Msg.chat(player, Component.translatable("kultivator.harta.stone.formation_full", duration(formation.power()),
+					duration(MAX_POWER_STONES)).withStyle(ChatFormatting.YELLOW));
+		}
+		if (created) {
+			Advancements.grant(player, "formation_built");
+		}
+		if (formation.power() >= MAX_POWER_SHARDS) {
 			Advancements.grant(player, "formation_powered");
 		}
 		return InteractionResult.SUCCESS;

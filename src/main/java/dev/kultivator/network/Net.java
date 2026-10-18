@@ -77,6 +77,9 @@ public final class Net {
 			case Actions.SECT_BUILD -> dev.kultivator.sect.build.SectBuild.handleAction(player, action);
 			// Phase 6c (DESIGN 22.12.10).
 			case Actions.TECHNIQUE -> dev.kultivator.technique.spec.run.Codex.handleAction(player, action);
+			// Phase 7 (DESIGN 19.2.1).
+			case Actions.KULTIVASI -> dev.kultivator.cultivation.ImmortalPerks.handleAction(player, action.text());
+			case Actions.JALAN -> dev.kultivator.goals.Goals.handleAction(player, action.text());
 			default -> {
 			}
 		}

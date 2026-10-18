@@ -2,24 +2,32 @@ package dev.kultivator.alchemy;
 
 import dev.kultivator.Kultivator;
 import dev.kultivator.cultivation.Deviation;
+import dev.kultivator.cultivation.Enlightenment;
 import dev.kultivator.cultivation.PillToxicity;
 import dev.kultivator.cultivation.Progression;
 import dev.kultivator.cultivation.Qi;
+import dev.kultivator.dao.Comprehension;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
+import dev.kultivator.data.Dao;
 import dev.kultivator.data.Realm;
 import dev.kultivator.data.XpSource;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
+import dev.kultivator.harta.Harta;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,15 +60,69 @@ public final class PillEffects {
 			return false;
 		}
 		PillQuality quality = AlchemyComponents.quality(stack);
+		Component refusal = refusal(player, data, kind, quality);
+		if (refusal != null) {
+			// Phase 7 pills that cannot work now are kept (DESIGN 19.3.7).
+			Msg.chat(player, refusal.copy().withColor(REFUSE_COLOR));
+			return false;
+		}
 		// The cooldown group comes from the stack, so set it before the stack may become empty.
 		player.getCooldowns().addCooldown(stack, COOLDOWN);
 		stack.consume(1, player);
 		try {
+			// Pil Membalik (DESIGN 19.3.14): above 90 toxicity a pill may turn against its taker; the purging pills never do.
+			if (kind != PillKind.IMMORTAL && kind != PillKind.TOXIN_PURGING && PillToxicity.backfire(player, name)) {
+				return true;
+			}
 			apply(player, kind, quality, name);
 		} catch (RuntimeException exception) {
 			Kultivator.LOGGER.error("Could not apply the effect of {}", kind.id(), exception);
 		}
 		return true;
+	}
+
+	/** Why a phase-7 pill cannot be taken now (the pill is kept), or null. */
+	private static @Nullable Component refusal(ServerPlayer player, CultivationData data, PillKind kind, PillQuality quality) {
+		switch (kind) {
+			case DAO_INSIGHT -> {
+				Dao dao = data.dao();
+				if (dao == null) {
+					return Component.translatable("kultivator.harta.pill.insight_no_dao");
+				}
+				if (Harta.insightPills(data, data.realm()) >= PillKind.DAO_INSIGHT_PER_REALM) {
+					return Component.translatable("kultivator.harta.pill.insight_realm", PillKind.DAO_INSIGHT_PER_REALM, data.realm().displayName());
+				}
+				if (data.comprehension(dao) >= PillKind.DAO_INSIGHT_MAX - 1.0E-6D) {
+					return Component.translatable("kultivator.harta.pill.insight_max", Msg.number(PillKind.DAO_INSIGHT_MAX), dao.displayName());
+				}
+			}
+			case BONE_TEMPERING -> {
+				if (Harta.boneHealth(data) >= PillKind.BONE_HEALTH_CAP) {
+					return Component.translatable("kultivator.harta.pill.bone_max", PillKind.BONE_HEALTH_CAP);
+				}
+			}
+			case TOXIN_PURGING -> {
+				if (data.toxicity() < 0.5D && !hasHarmfulEffect(player)) {
+					return Component.translatable("kultivator.harta.pill.purge_nothing");
+				}
+			}
+			default -> {
+			}
+		}
+		return null;
+	}
+
+	/** The effects the Toxin Purging Pill clears (the dropped purifying talisman's cleanse). */
+	private static final List<Holder<MobEffect>> CLEANSED = List.of(MobEffects.POISON, MobEffects.WITHER, MobEffects.NAUSEA, MobEffects.BLINDNESS,
+			MobEffects.DARKNESS, MobEffects.SLOWNESS, MobEffects.WEAKNESS);
+
+	private static boolean hasHarmfulEffect(ServerPlayer player) {
+		for (Holder<MobEffect> effect : CLEANSED) {
+			if (player.hasEffect(effect)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/** The effect, feedback, achievements and finally the toxin. */
@@ -81,12 +143,24 @@ public final class PillEffects {
 			case HEALING -> healing(player, data, quality, m, parts);
 			case SOUL_NURTURING -> xp(player, Math.min(bar * PillKind.SOUL_NURTURING_XP, PillKind.SOUL_NURTURING_MAX_XP) * m * efficacy, parts);
 			case IMMORTAL -> {
-				xp(player, bar * PillKind.IMMORTAL_XP * m * efficacy, parts);
+				// DESIGN 19.3.14 (balance): one bar x pill quality only, no root, breakthrough-quality or toxicity factors.
+				double gained = Progression.grantXp(player, bar * PillKind.IMMORTAL_XP * m, XpSource.EXACT);
+				if (gained > 0.0D) {
+					parts.add(Component.translatable("kultivator.alchemy.part.xp", Msg.number(Math.max(1.0D, gained))));
+				}
 				Qi.fill(player);
 				parts.add(Component.translatable("kultivator.alchemy.part.qi_all"));
 			}
+			case DAO_INSIGHT -> daoInsight(player, data, m, parts);
+			case TOXIN_PURGING -> purge(player, data, m, parts);
+			case ENLIGHTENMENT -> {
+				Enlightenment.boostChance(player, PillKind.ENLIGHTENMENT_FACTOR, PillKind.ENLIGHTENMENT_TICKS);
+				parts.add(Component.translatable("kultivator.harta.pill.part.enlightenment", multiplierText(PillKind.ENLIGHTENMENT_FACTOR),
+						PillKind.ENLIGHTENMENT_TICKS / 1200));
+			}
+			case BONE_TEMPERING -> boneTempering(player, data, quality, parts);
 		}
-		if (kind.givesXp() && efficacy < 0.995D) {
+		if (kind.givesXp() && kind != PillKind.IMMORTAL && efficacy < 0.995D) {
 			parts.add(Component.translatable("kultivator.alchemy.part.efficacy", Msg.number(efficacy * 100.0D + 1.0E-6D)));
 		}
 		Cultivators.dirty(player);
@@ -183,6 +257,50 @@ public final class PillEffects {
 		}
 	}
 
+	/** Dao Insight Pill: +3 x quality comprehension to the chosen Dao (after the root affinity), never above 60. */
+	private static void daoInsight(ServerPlayer player, CultivationData data, double m, List<Component> parts) {
+		Dao dao = data.dao();
+		if (dao == null) {
+			return;
+		}
+		double room = PillKind.DAO_INSIGHT_MAX - data.comprehension(dao);
+		double factor = Math.max(1.0D, Comprehension.gainFor(data, dao, 1.0D));
+		double raw = Math.min(PillKind.DAO_INSIGHT_COMPREHENSION * m, Math.max(0.0D, room / factor));
+		double gained = Comprehension.grant(player, dao, raw);
+		Harta.addInsightPill(data, data.realm());
+		parts.add(Component.translatable("kultivator.harta.pill.part.insight", Comprehension.format(gained), dao.displayName(),
+				Harta.insightPills(data, data.realm()), PillKind.DAO_INSIGHT_PER_REALM));
+	}
+
+	/** Toxin Purging Pill: toxicity −35 x quality and the harmful effects cleared. */
+	private static void purge(ServerPlayer player, CultivationData data, double m, List<Component> parts) {
+		double before = data.toxicity();
+		data.setToxicity(before - PillKind.TOXIN_PURGE * m);
+		double removed = before - data.toxicity();
+		if (removed > 0.05D) {
+			parts.add(Component.translatable("kultivator.harta.pill.part.purged", Msg.number(removed + 1.0E-6D), Msg.number(data.toxicity())));
+		}
+		int cleared = 0;
+		for (Holder<MobEffect> effect : CLEANSED) {
+			if (player.removeEffect(effect)) {
+				cleared++;
+			}
+		}
+		if (cleared > 0) {
+			parts.add(Component.translatable("kultivator.harta.pill.part.cleansed", cleared));
+		}
+	}
+
+	/** Bone Tempering Pill: +1 max health for good (Perfect +2), at most {@link PillKind#BONE_HEALTH_CAP} in total. */
+	private static void boneTempering(ServerPlayer player, CultivationData data, PillQuality quality, List<Component> parts) {
+		int before = Harta.boneHealth(data);
+		int add = quality == PillQuality.PERFECT ? PillKind.BONE_HEALTH_PERFECT : PillKind.BONE_HEALTH;
+		int after = Math.min(PillKind.BONE_HEALTH_CAP, before + add);
+		Harta.setBoneHealth(player, after);
+		player.heal(after - before);
+		parts.add(Component.translatable("kultivator.harta.pill.part.bone", after - before, after, PillKind.BONE_HEALTH_CAP));
+	}
+
 	/** Cuts {@code share} of the remaining Qi Deviation; true when there was one. */
 	private static boolean shortenDeviation(ServerPlayer player, CultivationData data, double share, List<Component> parts) {
 		if (!data.deviating()) {
@@ -256,6 +374,19 @@ public final class PillEffects {
 				lines.add(Component.translatable("kultivator.alchemy.tooltip.effect.qi_all"));
 				lines.add(Component.translatable("kultivator.alchemy.tooltip.effect.purge"));
 			}
+			case DAO_INSIGHT -> {
+				lines.add(Component.translatable("kultivator.harta.pill.tooltip.insight", decimal(PillKind.DAO_INSIGHT_COMPREHENSION * m),
+						Msg.number(PillKind.DAO_INSIGHT_MAX)));
+				lines.add(Component.translatable("kultivator.harta.pill.tooltip.insight_limit", PillKind.DAO_INSIGHT_PER_REALM));
+			}
+			case TOXIN_PURGING -> {
+				lines.add(Component.translatable("kultivator.harta.pill.tooltip.purge", decimal(PillKind.TOXIN_PURGE * m)));
+				lines.add(Component.translatable("kultivator.harta.pill.tooltip.cleanse"));
+			}
+			case ENLIGHTENMENT -> lines.add(Component.translatable("kultivator.harta.pill.tooltip.enlightenment",
+					multiplierText(PillKind.ENLIGHTENMENT_FACTOR), PillKind.ENLIGHTENMENT_TICKS / 1200));
+			case BONE_TEMPERING -> lines.add(Component.translatable("kultivator.harta.pill.tooltip.bone",
+					quality == PillQuality.PERFECT ? PillKind.BONE_HEALTH_PERFECT : PillKind.BONE_HEALTH, PillKind.BONE_HEALTH_CAP));
 		}
 		return lines;
 	}

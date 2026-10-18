@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_spirit_stone",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.supreme_spirit_stone.description"
+    },
+    "icon": {
+      "id": "kultivator:spirit_stone_supreme"
+    },
+    "title": {
+      "translate": "advancement.kultivator.supreme_spirit_stone.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "kultivator:item/beast_core_mid",
+    "layer1": "kultivator:item/beast_core_mid_overlay"
+  }
+}

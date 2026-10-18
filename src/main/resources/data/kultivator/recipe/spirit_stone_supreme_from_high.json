@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "kultivator:spirit_stone_high",
+    "kultivator:spirit_stone_high",
+    "kultivator:spirit_stone_high",
+    "kultivator:spirit_stone_high",
+    "kultivator:spirit_stone_high",
+    "kultivator:spirit_stone_high",
+    "kultivator:spirit_stone_high",
+    "kultivator:spirit_stone_high",
+    "kultivator:spirit_stone_high"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:spirit_stone_supreme"
+  }
+}

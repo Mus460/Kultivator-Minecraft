@@ -22,8 +22,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Enlightenment moments (Momen Pencerahan, DESIGN section 4): a sudden insight while meditating. For 10 s the player
- * glows golden (synced ENLIGHTENED flag), gains a burst of 25% of the bar and, with a Dao chosen, +3 comprehension.
+ * Enlightenment moments (Momen Pencerahan, DESIGN section 4, 19.3.5): a sudden insight while meditating. For 10 s the
+ * player glows golden (synced ENLIGHTENED flag), gains a burst of {@link #BURST_SHARE} of the bar and, with a Dao chosen,
+ * +3 comprehension. The chance per minute is built by {@code Meditation} from {@link #chance}, closed-door seclusion,
+ * {@link #boostFactor} (the Enlightenment Pill), the Clear Mind boon and the cave abode, capped at {@link #MAX_CHANCE}.
  */
 public final class Enlightenment {
 
@@ -35,9 +37,17 @@ public final class Enlightenment {
 	public static final double BASE_CHANCE = 0.04D;
 	public static final double DAO_BONUS = 0.02D;
 	public static final double COMPREHENSION_GAIN = 3.0D;
+	/** Share of the bar an enlightenment gives (DESIGN 19.3.5: 25% became 20%). */
+	public static final double BURST_SHARE = 0.20D;
+	/** The chance per minute never goes above this. */
+	public static final double MAX_CHANCE = 0.5D;
 
 	/** Game time at which each enlightened player's golden state ends. */
 	private static final Map<UUID, Long> ENDS = new HashMap<>();
+	/** A running chance boost: its factor and the game time it ends. */
+	private record Boost(double factor, long end) {
+	}
+	private static final Map<UUID, Boost> BOOSTS = new HashMap<>();
 
 	public static void init() {
 	}
@@ -45,6 +55,42 @@ public final class Enlightenment {
 	/** Chance of an enlightenment for one full minute of meditation at a site with this multiplier. */
 	public static double chance(CultivationData data, double siteMultiplier) {
 		return BASE_CHANCE * siteMultiplier + (data.dao() != null ? DAO_BONUS : 0.0D);
+	}
+
+	/**
+	 * Multiplies the player's enlightenment chance by {@code factor} for {@code ticks} (the Enlightenment Pill, DESIGN
+	 * 19.3.7). A running boost keeps the larger factor and the later end. Session only (lost on logout).
+	 */
+	public static void boostChance(ServerPlayer player, double factor, int ticks) {
+		if (!(factor > 0.0D) || !Double.isFinite(factor) || ticks <= 0) {
+			return;
+		}
+		long now = player.level().getGameTime();
+		Boost old = BOOSTS.get(player.getUUID());
+		if (old != null && old.end() > now) {
+			BOOSTS.put(player.getUUID(), new Boost(Math.max(old.factor(), factor), Math.max(old.end(), now + ticks)));
+		} else {
+			BOOSTS.put(player.getUUID(), new Boost(factor, now + ticks));
+		}
+	}
+
+	/** The running chance factor of {@link #boostChance} (1 when none). */
+	public static double boostFactor(ServerPlayer player) {
+		Boost boost = BOOSTS.get(player.getUUID());
+		if (boost == null) {
+			return 1.0D;
+		}
+		if (player.level().getGameTime() >= boost.end()) {
+			BOOSTS.remove(player.getUUID());
+			return 1.0D;
+		}
+		return boost.factor();
+	}
+
+	/** Ticks left of the running chance boost (0 when none). */
+	public static long boostTicksLeft(ServerPlayer player) {
+		Boost boost = BOOSTS.get(player.getUUID());
+		return boost == null ? 0L : Math.max(0L, boost.end() - player.level().getGameTime());
 	}
 
 	/** Starts an enlightenment moment for the player now. */
@@ -55,7 +101,7 @@ public final class Enlightenment {
 		data.setEnlightened(true);
 		data.addEnlightenment();
 
-		double burst = data.rank().xpRequired() * 0.25D;
+		double burst = data.rank().xpRequired() * BURST_SHARE;
 		Progression.addXp(player, burst, XpSource.ENLIGHTENMENT);
 		Dao dao = data.dao();
 		if (dao != null) {
@@ -108,6 +154,12 @@ public final class Enlightenment {
 	/** Forgets the player (left, died or respawned); the flag itself is a session value. */
 	public static void forget(ServerPlayer player) {
 		ENDS.remove(player.getUUID());
+	}
+
+	/** Drops the chance boost too (the player left the server). */
+	public static void forgetAll(ServerPlayer player) {
+		ENDS.remove(player.getUUID());
+		BOOSTS.remove(player.getUUID());
 	}
 
 	private Enlightenment() {

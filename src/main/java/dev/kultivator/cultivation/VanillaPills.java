@@ -240,6 +240,10 @@ public final class VanillaPills {
 
 	/** The pill's effect, feedback, achievements and finally its toxin. */
 	private static void apply(ServerPlayer player, Pill pill, ItemStack stack) {
+		// Pil Membalik (DESIGN 19.3.14): above 90 toxicity the pill may turn against its taker instead of working.
+		if (PillToxicity.backfire(player, stack.getItemName())) {
+			return;
+		}
 		CultivationData data = Cultivators.get(player);
 		double efficacy = Math.max(0.0D, Math.min(1.0D, PillToxicity.effectiveness(data)));
 		List<Component> parts = new ArrayList<>();

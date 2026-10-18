@@ -9,7 +9,10 @@ dan mendirikan sekte. Kamu mendirikan **Aula Sekte**, menerima murid dari Hari P
 naik tanpa batas sampai **Bintang Abadi**, bahkan sampai melampauimu. Lalu sektemu **membangun dirinya sendiri**: pilih
 satu dari sembilan templat kompleks sekte klasik, setor bahan, dan saksikan sekte tumbuh melewati sembilan tingkat.
 Setiap teknik serta setiap fitur sekte dan murid diadaptasi dari cerita kultivasi sungguhan, dan sumbernya (karya +
-konsep) tertulis di game dan di panduan.
+konsep) tertulis di game dan di panduan. Sejak Fase 7 **dunianya hidup**: monster elit Binatang Iblis di setiap ranah,
+Batu Roh, Inti Binatang, herba roh berumur, urat roh dan Kultivasi Tertutup di Gua Kediaman, jimat, alkimia lanjutan,
+tribulasi dengan lingkar petir dan Hu Fa bersama teman, tablet **Jalan** yang menuntun pemain baru, dan Bintang Abadi untuk
+dirimu sendiri.
 
 📖 **Panduan pemain lengkap: [docs/PANDUAN.md](docs/PANDUAN.md)** · Daftar uji per fase: [docs/uji/](docs/uji/) ·
 Rancangan dan aturan kode: [docs/DESIGN.md](docs/DESIGN.md)
@@ -37,7 +40,8 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
 
 * **9 ranah, 65 posisi** — Manusia Fana, Pemurnian Qi, Pembangunan Fondasi, Inti Emas, Jiwa Baru Lahir, Transformasi
   Dewa, Penyatuan Dao, Kenaikan Abadi (9 tingkat), Dewa Abadi; masing-masing dengan tahap Awal, Menengah, Akhir, Puncak.
-  Kultivasi dari monster, bijih, meditasi, pil, dan pencerahan; leher botol di Tahap Puncak menyimpan **Qi Tertimbun**.
+  Kultivasi dari monster, bijih, meditasi, pil, dan pencerahan; leher botol di Tahap Puncak menyimpan **Qi Tertimbun**
+  (dipakai untuk Perkokoh Fondasi, isi ulang setelah gagal, dan Bintang Abadi pemain).
 * **Terobosan** — kebangkitan, lemparan peluang, lalu **Tribulasi Langit** dengan varian Permukaan, Api Neraka (Nether),
   dan Kehampaan (End), gelombang **Pelindung Dao**, **Kualitas Terobosan** (Retak/Biasa/Sempurna/Surgawi),
   **Penyimpangan Qi**, dan mode Hardcore opsional.
@@ -92,6 +96,21 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
 * **Jalan Abadi** — ikatan, Segel Jiwa, Hu Fa dan Tahan Petir, Fondasi Dao; **Bintang Abadi** tanpa batas dengan Tujuh
   Bencana dalam Tiga Ujian, gelar tahap Stellar, Klon Ilahi, Lampu Jiwa; pewaris dan Sembilan Segel, Cincin Jiwa Guru,
   **Murid Melampaui Guru**; Jurus Pemusnah yang aman blok, dan **Mode Kehancuran** opsional (mati secara bawaan).
+* **Dunia yang Hidup (Fase 7)** — **Binatang Iblis**: monster alami di dekat pemain Pemurnian Qi+ kadang bangkit sebagai
+  Siluman, Binatang Iblis, atau Raja Siluman (bilah bos), dengan unsur, skill bertanda yang bisa dihindari, dan afiks
+  (Perisai Unsur, Penyerap Qi, Pulih Cepat). **Batu Roh** empat tingkat dari tambang, peti, pedagang keliling, elit, dan
+  ekspedisi: bahan bakar meditasi, qi seketika, daya formasi pelindung sampai 48 jam, dan bonus mutu terobosan.
+  **Inti Binatang** untuk dimurnikan, makanan binatang roh, dan katalis. **Tanaman Roh**: delapan herba berumur (sampai
+  "Seribu Tahun") yang tersembunyi di rumput, ladang, bunga, bambu saat badai, korus, dan jamur. **Urat Roh** Agung/Kaya/
+  Tipis dengan kepadatan sampai 200%, rumus meditasi baru, **Kultivasi Tertutup**, **Gua Kediaman** yang terlindung, dan
+  Kompas Urat Roh. **Delapan jimat** yang kamu tulis sendiri (Petir, Awan Api, Perisai, Pengikat, Pulang, Penangkal Petir,
+  Seribu Li, Kejernihan). **Alkimia Lanjutan**: panci 10 bahan, katalis batu dan inti, herba pembantu, empat pil baru,
+  resep alternatif, tablet **Kitab Alkimia**. **Tribulasi Hidup**: lingkar petir mulai Transformasi Dewa (keluar = hanya
+  terserempet), Menantang Langit, dan **Hu Fa Tribulasi** bersama saudara sekte. Tablet **Jalan**: 20 Langkah Pertama
+  dengan pelacak dan hadiah, Ujian Fondasi, Kewajiban Harian. Panel **Persiapan** dan HUD tribulasi langsung. **Anugerah
+  Kenaikan** di setiap tingkat Kenaikan Abadi, **Perkokoh Fondasi**, dan **Bintang Abadi** tanpa batas untuk pemain.
+  **Lima Unsur** dalam pertarungan, **Relik di Peti Kuno** dengan Indra Ilahi yang mencium harta, Kejenuhan Bertarung,
+  dan kenyamanan HUD (pengukur pedang terbang, peringatan bahaya saat meditasi, cetak biru formasi).
 * Semua teks dalam **Bahasa Indonesia** dan **English**. Kompatibel dengan Sodium, Iris, ImmediatelyFast, EMF/ETF,
   Lithium, FerriteCore.
 
@@ -108,7 +127,7 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
 | 6 | Sekte Abadi & murid OP: Aula Sekte, Hari Penerimaan Murid, bakat dan fisik, jenjang dan Poin Kontribusi, tugas, misi, turnamen, Alam Dewa Hampa, kekuatan murid, Bintang Abadi, pewaris, Mode Kehancuran opsional ([daftar uji](docs/uji/FASE-6.md)) | ✅ |
 | 6b | Pembangunan Sekte (9 templat x 9 tingkat): pilih templat, pratinjau hologram, konfirmasi sekali, lalu cukup setor bahan dan sekte membangun dirinya sendiri; Gudang Bahan Sekte, Misi Pembangunan, Ekspedisi Pengumpulan, Pekerja Bangunan, Naik Templat/Perbaiki/Bongkar/Pindah, penyumbang LAN, perintah uji `uji sekte` ([daftar uji](docs/uji/FASE-6b.md), [panduan](docs/PANDUAN.md#20b-pembangunan-sekte)). Belum diuji di game; tagihan belum diseimbangkan | ✅ |
 | 6c | Teknik Dewa: 169 teknik (146 baru + 23 lama diperkuat) bersumber cerita kultivasi, makin OP sesuai ranah, Penguasaan Jurus, Kitab Teknik, Cincin dan Roda Segel, Slip Giok, Ujian Warisan, Gerbang Dewa, teknik untuk murid, Mode Kehancuran jurus sendiri lewat saklar gampang, perintah uji `uji teknik` dan `uji boneka` ([daftar uji](docs/uji/FASE-6c.md), [panduan](docs/PANDUAN.md#12-teknik-dewa-169-teknik)). Belum diuji di game; beberapa hal kecil belum ada (pencarian teks di tab Teknik murid, token partikel di `debug teknik beban`) | ✅ |
-| 7 | Dunia yang Hidup (monster elite, batu roh, jimat, herba) | ⏳ |
+| 7 | Dunia yang Hidup: Binatang Iblis (elit), Batu Roh, Inti Binatang, herba roh berumur, Urat Roh dan Kultivasi Tertutup, Gua Kediaman, jimat, Alkimia Lanjutan dan Kitab Alkimia, lingkar petir, Menantang Langit, Hu Fa Tribulasi, tablet Jalan (Langkah Pertama, Ujian Fondasi, Kewajiban Harian), Persiapan dan HUD tribulasi, Anugerah Kenaikan, Perkokoh Fondasi, Bintang Abadi pemain, Lima Unsur, Relik di Peti Kuno, keseimbangan, kenyamanan HUD, perintah uji `uji elit|batu|herba|inti|pil|relik|tribulasi|jimat|jalan|hud|...` ([daftar uji](docs/uji/FASE-7.md), [panduan](docs/PANDUAN.md#33-dunia-yang-hidup-fase-7)). Belum diuji di game; ditunda ke 7b: efek pil baru untuk murid, lingkar petir tujuh warna, bencana bintang pemain, tooltip Sumber anugerah di tab Status | ✅ |
 
 ## Perintah singkat
 
@@ -116,12 +135,17 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
 `dao [info|choose <dao>]`, `teknik [kitab|info|pilih|rapal|daftar|slot ...]`, `technique list|select|cast`,
 `visual <bagian> on|off`, `beast list`, `formation list`, `murid list|panggil|ikut|tinggal|meditasi|bantu|tahan`,
 `aula info|nama <nama>`, `kehancuran nyala|mati|status|sumpah|pulihkan`, `warisan pilih <n>`,
-`aula bangun [templat|pratinjau <1-9> [arah] [glasir]|konfirmasi|setor [semua|butuh]|naik <2-9>|perbaiki|bongkar|lepaskan]`.
+`aula bangun [templat|pratinjau <1-9> [arah] [glasir]|konfirmasi|setor [semua|butuh]|naik <2-9>|perbaiki|bongkar|lepaskan]`,
+`jalan`, `resep`, `harian`, `kawal <pemain>`, `gua tetapkan|lihat|hapus`, `fondasi perkokoh`, `bintang padatkan [semua]`.
 Perintah uji cepat untuk operator: `/kultivasi uji ...`, `/kultivasi uji murid <nama|semua> maks|ranah|bintang <n>`,
 `/kultivasi uji sekte templat <1-9>|tingkat <0-9> [instan|cepat]|sumber|pamer|audit|info|reset|...`
 ([daftar lengkap](docs/PANDUAN.md#20b16-perintah)), dan
 `/kultivasi uji teknik [semua|<id>|pamer [detik]|bebas|penguasaan|gerbang|kehancuran|audit|murid]` serta
 `/kultivasi uji boneka [n] [bos]|hapus` ([daftar lengkap dengan contoh](docs/PANDUAN.md#1212-perintah-teknik)).
+Fase 7: `uji elit <1-3> [unsur] [jenis] [afiks]|hapus`, `uji tribulasi <ranah> [lapis] [biasa|cincin|kembar]`,
+`uji kawal <0-3>`, `uji batu|herba|inti|pil|relik ...`, `uji urat|tertutup|gua|jimat|anugerah|jiwa|fondasi|bintang ...`,
+`uji jalan|harian ...`, `uji unsur`, `uji kejenuhan <n>`, `uji hud`
+([daftar lengkap dengan contoh](docs/PANDUAN.md#34-perintah-uji-cepat-kultivasi-uji-)).
 `/sekte` atau `/sect` — `create`, `invite`, `join`, `leave`, `kick`, `disband`, `info`, `list`, `chat`,
 `spar <pemain>|accept|decline`. Perintah uji operator ada di bawah `/kultivasi debug` — daftar lengkapnya di
 [panduan](docs/PANDUAN.md#33-perintah-uji-untuk-operator-kultivasi-debug-).
@@ -140,9 +164,12 @@ bisa diganti di Options → Controls → Key Binds → Kultivator.
 batas per tick, jeda MSPT, jangkauan, tabungan, templat terbesar, pengembalian bahan, tanpa monster di sekte), serta
 `modeKehancuran` (bawaan `false`) dan batas-batas `kehancuran...` (termasuk `kehancuranPlayerTechniques`,
 `kehancuranCasterSafeRadius`, `kehancuranHomeSafeRadius`), serta `techniqueDamageMultiplier`, `techniqueAreaCap`,
-`techniqueBossCaps`, `techniqueMaxActiveCasts`, `techniqueDisplays`. `config/kultivator-client.json` (klien):
+`techniqueBossCaps`, `techniqueMaxActiveCasts`, `techniqueDisplays`, serta saklar Fase 7 `eliteMonsters`,
+`eliteChanceScale`, `structureLoot`, `spiritStoneMining`, `herbHarvest`, `guideRewards`, `dailyTasks`,
+`tribulationTelegraph`. `config/kultivator-client.json` (klien):
 `effect_quality`, `quality_auto`, `hud`, `shake`, `flash`, `phantoms`, `others_fx`, `wheel_hold`, `release_cast`,
-`reduce_motion`, dan saringan Kitab Teknik. Penjelasan di [panduan](docs/PANDUAN.md#36-berkas-konfigurasi).
+`reduce_motion`, `cooldown_ping`, `danger_alert`, dan saringan Kitab Teknik. Penjelasan di
+[panduan](docs/PANDUAN.md#52-berkas-konfigurasi).
 
 ## Build
 
@@ -179,6 +206,16 @@ glyphs, beams, avatars, sky tears, camera shake) growing along. Five mastery lev
 search and live numbers, a 12-socket Seal Ring with a seal wheel and quick seals, jade slips, inheritance trials, book
 pools, feats, the Divine Gate, and disciples who learn and fight with the new arts. Boss caps, the old linear power in
 arenas, and strict performance budgets for weak laptops.
+
+**A living world (phase 7).** Elite demonic beasts (three tiers with elements, telegraphed skills you can dodge and
+affixes) near any player from Qi Refining on; four grades of spirit stones (meditation fuel, instant qi, formation power,
+breakthrough quality), beast cores and eight aged spirit herbs hidden in ordinary plants; living spirit veins up to 200%
+density, closed-door cultivation and a protected cave abode; eight talismans you inscribe yourself; deeper alchemy with
+catalysts, auxiliary herbs, four new pills and a recipe tablet; a living tribulation with lightning rings, Defy the
+Heavens and co-op Tribulation Guardians; a Path tablet with 20 first steps, Foundation Trials and daily chores; a
+breakthrough forecast and a live tribulation HUD; Immortal Ascension boons, Strengthen Foundation and endless Immortal
+Stars for the player; the five elements in combat; relics in structure chests. Every feature keeps its verified source,
+nothing places or breaks a block, and the phase is compiled but not yet tested in game.
 
 Nothing in this mod ever burns, breaks, places or changes a block; tribulation lightning is particles and sound only,
 the weather and time are never changed, and a failed tribulation injures you (Qi Deviation) instead of killing you.

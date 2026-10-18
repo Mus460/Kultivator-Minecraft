@@ -31,8 +31,10 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * All technique math (DESIGN 22.5, 22.6, 22.11.3, 22.14): power P, the A/D/N growth, qi and cooldown after mastery and
@@ -117,6 +119,45 @@ public final class TechniquePower {
 	public static final String TAG_DUMMY_BOSS = "kultivator.dummy_boss";
 	public static final String TAG_DAO_PROTECTOR = "kultivator.dao_protector";
 	public static final String TAG_TRIAL_GUARD = "kultivator.trial_guard";
+	/** Elite demonic beasts (DESIGN 19.2.8, 19.3.1): trial-mob rule, never {@link #TAG_BOSS}. */
+	public static final String TAG_ELITE = "kultivator.elite";
+	/** The product of all {@link TargetFactor}s is clamped to this range (DESIGN 19.2.8). */
+	public static final double TARGET_FACTOR_MIN = 0.5D;
+	public static final double TARGET_FACTOR_MAX = 2.0D;
+
+	/**
+	 * A phase-7 factor on technique damage against a target (DESIGN 19.2.8: the five elements, the elite affix Perisai
+	 * Unsur). Only used for the coefficient branch of {@link #finalDamage}, never in an arena, never against players, never
+	 * on LEGACY, PERCENT or EXEC amounts. Server only (the codex on the client sees no factors).
+	 */
+	public interface TargetFactor {
+		double factor(LivingEntity attacker, LivingEntity target, @Nullable TechniqueSpec spec);
+	}
+
+	private static final List<TargetFactor> TARGET_FACTORS = new CopyOnWriteArrayList<>();
+
+	/** Adds a target factor (DESIGN 19.2.8); register from a module's {@code init()}. */
+	public static void addTargetFactor(TargetFactor factor) {
+		TARGET_FACTORS.add(factor);
+	}
+
+	/**
+	 * The product of every {@link TargetFactor} for this hit, clamped to {@link #TARGET_FACTOR_MIN}..{@link #TARGET_FACTOR_MAX}
+	 * (1 without factors). {@link #finalDamage} applies it only where DESIGN 19.2.8 allows; {@code uji unsur} may show it.
+	 */
+	public static double targetFactor(LivingEntity attacker, LivingEntity target, @Nullable TechniqueSpec spec) {
+		if (TARGET_FACTORS.isEmpty()) {
+			return 1.0D;
+		}
+		double product = 1.0D;
+		for (TargetFactor factor : TARGET_FACTORS) {
+			double value = factor.factor(attacker, target, spec);
+			if (Double.isFinite(value) && value >= 0.0D) {
+				product *= value;
+			}
+		}
+		return Math.max(TARGET_FACTOR_MIN, Math.min(TARGET_FACTOR_MAX, product));
+	}
 	/** {@code #kultivator:technique_bosses} (warden, wither, ender_dragon, elder_guardian). */
 	public static final TagKey<EntityType<?>> TECHNIQUE_BOSSES = TagKey.create(Registries.ENTITY_TYPE, Kultivator.id("technique_bosses"));
 	/** Damage reduction from technique sources is capped at 80% (Dewa Abadi 85%), heart-demon damage at 50% (22.14.3). */
@@ -527,9 +568,10 @@ public final class TechniquePower {
 		return entity.is(TECHNIQUE_BOSSES) || entity.entityTags().contains(TAG_BOSS) || entity.entityTags().contains(TAG_DUMMY_BOSS);
 	}
 
-	/** Dao Protectors and trial guards: legacy power × 1.5 instead of P (22.14.4). */
+	/** Dao Protectors, trial guards and elites (19.2.8): legacy power × 1.5 instead of P (22.14.4). */
 	public static boolean isTrialMob(LivingEntity entity) {
-		return entity.entityTags().contains(TAG_DAO_PROTECTOR) || entity.entityTags().contains(TAG_TRIAL_GUARD);
+		Set<String> tags = entity.entityTags();
+		return tags.contains(TAG_DAO_PROTECTOR) || tags.contains(TAG_TRIAL_GUARD) || tags.contains(TAG_ELITE);
 	}
 
 	/** The attacker's own heart demon. */
@@ -692,6 +734,10 @@ public final class TechniquePower {
 					power = legacyPower(attacker, spec) * TRIAL_MOB_FACTOR;
 				}
 				raw = ctx.coef() * power * mastery * clampF(ctx.f(), arena);
+				// Phase 7 target factors (DESIGN 19.2.8): elements and Perisai Unsur, never in arenas or against players.
+				if (!arena && !(target instanceof Player)) {
+					raw *= targetFactor(attacker, target, spec);
+				}
 			}
 		}
 		// A share of max health (DMG%) and an execution are not scaled by the disciple's damage factors.

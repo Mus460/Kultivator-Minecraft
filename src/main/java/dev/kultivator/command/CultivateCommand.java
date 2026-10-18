@@ -129,6 +129,11 @@ public final class CultivateCommand {
 		dev.kultivator.kehancuran.Kehancuran.addCommands(root, debug);
 		// Phase 6b (DESIGN 21.24): aula bangun ... (merged into module A's aula node).
 		dev.kultivator.sect.build.SectBuild.addCommands(root, debug);
+		// Phase 7 (DESIGN 19.2.14): jalan, resep, harian, kawal, gua, fondasi, bintang and their debug nodes.
+		dev.kultivator.harta.Harta.addCommands(root, debug);
+		dev.kultivator.elite.EliteMonsters.addCommands(root, debug);
+		dev.kultivator.cultivation.ImmortalPerks.addCommands(root, debug);
+		dev.kultivator.goals.Goals.addCommands(root, debug);
 
 		TestCommands.addCommands(root);
 		root.then(debug);

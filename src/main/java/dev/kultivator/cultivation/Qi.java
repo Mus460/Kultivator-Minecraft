@@ -16,6 +16,13 @@ import java.util.UUID;
  */
 public final class Qi {
 
+	/** Anugerah Kenaikan L4 Lautan Qi: max qi ×1.15 (DESIGN 19.3.11). */
+	public static final double QI_SEA_FACTOR = 1.15D;
+	/** Anugerah Kenaikan L6 Urat Abadi: qi regeneration ×1.25. */
+	public static final double MERIDIAN_REGEN_FACTOR = 1.25D;
+	/** Each player star: +1% max qi. */
+	public static final double MAX_QI_PER_STAR = 0.01D;
+
 	/** Qi value of the last snapshot we asked for, per player, so slow regeneration does not sync every second. */
 	private static final Map<UUID, Double> LAST_SENT = new HashMap<>();
 
@@ -52,24 +59,31 @@ public final class Qi {
 
 	/**
 	 * Max qi: {@code (100 + realm x 120 + stage x 30 + layer x 60) x quality factor x root factor}, where the root factor
-	 * is {@code 0.85 + 0.15 x grade multiplier} once the root is tested (1 before). Pure: also used on the client.
+	 * is {@code 0.85 + 0.15 x grade multiplier} once the root is tested (1 before); x1.15 with the Qi Sea boon and +1% per
+	 * player star (DESIGN 19.3.11). Pure: also used on the client.
 	 */
 	public static double max(CultivationData data) {
 		Rank rank = data.rank();
 		double base = 100.0D + rank.realm().ordinal() * 120.0D + rank.stage() * 30.0D + rank.layer() * 60.0D;
 		double root = data.rootTested() ? 0.85D + 0.15D * data.rootGrade().multiplier() : 1.0D;
-		return base * data.qualityFactor() * root;
+		double sea = ImmortalPerks.boonActive(data, 4) ? QI_SEA_FACTOR : 1.0D;
+		double stars = 1.0D + MAX_QI_PER_STAR * ImmortalPerks.stars(data);
+		return base * data.qualityFactor() * root * sea * stars;
 	}
 
 	/**
 	 * Qi regenerated per second right now: 0.4% of max × (1 + 0.1 × caster grade tier) (Dewa Abadi ×1.4, DESIGN 22.5.4),
-	 * x6 while meditating, x1.5 at a spiritual site, nothing during a Qi Deviation. Pure: also used on the client.
+	 * ×1.25 with the Immortal Meridians boon (DESIGN 19.3.11), x6 while meditating, x1.5 at a spiritual site, nothing
+	 * during a Qi Deviation. Pure: also used on the client.
 	 */
 	public static double regenPerSecond(CultivationData data) {
 		if (data.deviating()) {
 			return 0.0D;
 		}
 		double regen = max(data) * 0.004D * dev.kultivator.technique.spec.TechniquePower.qiRegenFactor(data);
+		if (ImmortalPerks.boonActive(data, 6)) {
+			regen *= MERIDIAN_REGEN_FACTOR;
+		}
 		if (data.meditating()) {
 			regen *= 6.0D;
 		}

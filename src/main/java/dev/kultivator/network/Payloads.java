@@ -116,6 +116,11 @@ public final class Payloads {
 		/** The Kitab Teknik (DESIGN 22.12.1); {@code arg} = the net id to focus, or −1. */
 		public static final int CODEX = 6;
 
+		/** Tab {@code arg} of {@link #INFO}: the Jalan tablet (DESIGN 19.2.2, {@code /kultivasi jalan}). Same as {@code CultivationScreen.TAB_JALAN}. */
+		public static final int TAB_JALAN = 5;
+		/** Tab {@code arg} of {@link #INFO}: the Kitab Alkimia (DESIGN 19.2.2, {@code /kultivasi resep}). Same as {@code CultivationScreen.TAB_ALKIMIA}. */
+		public static final int TAB_ALKIMIA = 6;
+
 		public static final Type<OpenScreen> TYPE = typeOf("open_screen");
 		public static final StreamCodec<RegistryFriendlyByteBuf, OpenScreen> CODEC = StreamCodec.of(
 				(buf, p) -> {

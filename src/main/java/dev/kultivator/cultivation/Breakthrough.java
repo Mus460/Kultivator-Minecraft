@@ -3,6 +3,7 @@ package dev.kultivator.cultivation;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.kultivator.Kultivator;
 import dev.kultivator.KultivatorConfig;
 import dev.kultivator.dao.Comprehension;
 import dev.kultivator.data.BreakthroughQuality;
@@ -36,8 +37,10 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Breakthroughs (DESIGN section 3): the Mortal awakening, the Qi Refining chance roll, and from Foundation up an optional
@@ -55,6 +58,24 @@ public final class Breakthrough {
 		void startTrial(ServerPlayer player, Rank target);
 	}
 
+	/**
+	 * A phase-7 breakthrough-quality bonus (DESIGN 19.2.6: Batu Roh di Hambatan, Menantang Langit, Hu Fa Tribulasi,
+	 * Ujian Fondasi). {@link #bonus} must be pure (the Persiapan panel asks it every few seconds); {@link #commit} runs
+	 * once right after a real roll of that breakthrough, e.g. to spend the stones the bonus counted.
+	 */
+	public interface QualityBonus {
+		/** Added to the quality score of the breakthrough into {@code target} (summed with the others, then clamped). */
+		double bonus(ServerPlayer p, CultivationData d, Rank target);
+
+		/** The breakthrough into {@code target} succeeded and its quality was rolled with this bonus. */
+		default void commit(ServerPlayer p, CultivationData d, Rank target) {
+		}
+	}
+
+	/** The sum of all {@link QualityBonus} providers is clamped to this range (the {@code DiscipleHooks} range). */
+	public static final double QUALITY_BONUS_MIN = -0.10D;
+	public static final double QUALITY_BONUS_MAX = 0.40D;
+
 	/** Length of the awakening cinematic. */
 	public static final int AWAKENING_TICKS = 120;
 	/** Length of the qi gathering before the Qi Refining -> Foundation chance roll. */
@@ -64,7 +85,9 @@ public final class Breakthrough {
 	/** Awakening and gathering are interrupted when the player moves further than 6 blocks (horizontally) from the start. */
 	private static final double STILL_DISTANCE_SQ = 36.0D;
 	/** Breakthrough quality bonus per qi gathering formation tier (read when the breakthrough begins). */
-	private static final double FORMATION_BONUS = 0.03D;
+	public static final double FORMATION_BONUS = 0.03D;
+	/** Breakthrough bonus of a spiritual site (multiplier above 1, read when the breakthrough begins). */
+	public static final double SITE_BONUS = 0.05D;
 
 	private enum Phase { AWAKENING, GATHERING, TRIAL, TRIBULATION }
 
@@ -103,6 +126,7 @@ public final class Breakthrough {
 
 	private static final Map<UUID, Session> SESSIONS = new HashMap<>();
 	private static @Nullable TrialProvider trialProvider;
+	private static final List<QualityBonus> QUALITY_BONUS = new CopyOnWriteArrayList<>();
 
 	public static void init() {
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
@@ -124,6 +148,56 @@ public final class Breakthrough {
 	/** Registers the trial provider (phase 3 heart demon). Null removes it. */
 	public static void setTrialProvider(@Nullable TrialProvider provider) {
 		trialProvider = provider;
+	}
+
+	/** Adds a breakthrough-quality bonus (DESIGN 19.2.6); register from a module's {@code init()}. */
+	public static void addQualityBonusProvider(QualityBonus provider) {
+		QUALITY_BONUS.add(provider);
+	}
+
+	/**
+	 * The phase-7 quality bonus of the breakthrough into {@code target}: the sum of every provider, clamped to
+	 * {@link #QUALITY_BONUS_MIN}..{@link #QUALITY_BONUS_MAX}. Pure (0 without providers); the awakening never uses it.
+	 */
+	public static double qualityBonus(ServerPlayer p, CultivationData d, Rank target) {
+		if (QUALITY_BONUS.isEmpty()) {
+			return 0.0D;
+		}
+		double sum = 0.0D;
+		for (QualityBonus provider : QUALITY_BONUS) {
+			double value = provider.bonus(p, d, target);
+			if (Double.isFinite(value)) {
+				sum += value;
+			}
+		}
+		return Math.max(QUALITY_BONUS_MIN, Math.min(QUALITY_BONUS_MAX, sum));
+	}
+
+	/** Every provider's {@code commit} once, after the quality of a real breakthrough into {@code target} was rolled. */
+	private static void commitQualityBonus(ServerPlayer p, CultivationData d, Rank target) {
+		for (QualityBonus provider : QUALITY_BONUS) {
+			try {
+				provider.commit(p, d, target);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Breakthrough quality bonus commit failed", exception);
+			}
+		}
+	}
+
+	/**
+	 * Starts a test tribulation into {@code target} (no rank change, never lethal, the failure is only a deviation), as
+	 * {@code debug tribulation test} does for the next realm. False with a message to the player when busy or dead.
+	 */
+	public static boolean beginTest(ServerPlayer player, Rank target) {
+		CultivationData data = Cultivators.get(player);
+		if (isBusy(player) || data.breakingThrough()) {
+			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.busy"));
+		}
+		if (!player.isAlive() || player.isDeadOrDying() || player.isSpectator()) {
+			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.dead"));
+		}
+		begin(player, data, target, true);
+		return true;
 	}
 
 	public static void tick(ServerPlayer player, CultivationData data) {
@@ -319,7 +393,7 @@ public final class Breakthrough {
 		ServerLevel level = player.level();
 		double site = data.meditating() ? data.siteMultiplier() : SpiritSites.multiplier(player);
 		int formation = data.meditating() ? data.formationTier() : QiFormations.tier(level, player.blockPosition().below());
-		double siteBonus = (site > 1.01D ? 0.05D : 0.0D) + FORMATION_BONUS * formation;
+		double siteBonus = (site > 1.01D ? SITE_BONUS : 0.0D) + FORMATION_BONUS * formation;
 		// Flag first, so stopping the meditation stays quiet (the breakthrough tells its own story).
 		data.setBreakingThrough(true);
 		Meditation.stop(player);
@@ -444,11 +518,16 @@ public final class Breakthrough {
 
 	/** Qi Refining -> Foundation success chance (DESIGN section 3), capped at 0.98. */
 	public static double chance(CultivationData data, double siteBonus) {
-		Rank rank = data.rank();
-		double required = Math.max(1.0D, rank.xpRequired());
-		double value = 0.75D + (data.rootGrade().ordinal() - 2) * 0.05D + data.nextBreakthroughBonus() + siteBonus
-				+ Math.min(0.1D, data.storedQi() / required * 0.1D);
+		double[] parts = chanceParts(data);
+		double value = parts[0] + parts[1] + parts[2] + parts[3] + siteBonus;
 		return Math.max(0.05D, Math.min(0.98D, value));
+	}
+
+	/** The parts of {@link #chance} before the place bonus: {base, root, pill, Stored Qi} (pure; the forecast shows them). */
+	public static double[] chanceParts(CultivationData data) {
+		double required = Math.max(1.0D, data.rank().xpRequired());
+		return new double[]{0.75D, (data.rootGrade().ordinal() - 2) * 0.05D, data.nextBreakthroughBonus(),
+				Math.min(0.1D, data.storedQi() / required * 0.1D)};
 	}
 
 	// ================================================================== results
@@ -457,12 +536,16 @@ public final class Breakthrough {
 								@Nullable BreakthroughQuality forced) {
 		ServerLevel level = player.level();
 		Realm before = data.realm();
+		// Phase 7 (DESIGN 19.2.6): the providers' bonus is read before the rank changes (as the Persiapan panel reads it);
+		// the awakening and a forced quality have no roll, so they neither use nor commit it.
+		boolean rolled = kind != Kind.AWAKENING && forced == null;
+		double providerBonus = rolled ? qualityBonus(player, data, session.target) : 0.0D;
 		Progression.completeBreakthrough(player);
 		Rank now = data.rank();
 		Realm realm = now.realm();
 
 		// The awakening keeps a Nether Star's bonus for the first real roll (it is not spent here, so it is not used either).
-		double bonus = (kind == Kind.AWAKENING ? 0.0D : data.nextBreakthroughBonus()) + session.siteBonus;
+		double bonus = (kind == Kind.AWAKENING ? 0.0D : data.nextBreakthroughBonus()) + session.siteBonus + providerBonus;
 		double roll = player.getRandom().nextDouble();
 		BreakthroughQuality quality;
 		if (forced != null) {
@@ -471,6 +554,9 @@ public final class Breakthrough {
 			quality = BreakthroughQuality.fromScore(roll * 0.5D + lowestHealth * 0.3D + data.rootGrade().ordinal() * 0.05D + bonus);
 		} else {
 			quality = BreakthroughQuality.fromScore(roll * 0.7D + bonus);
+		}
+		if (rolled) {
+			commitQualityBonus(player, data, session.target);
 		}
 		BreakthroughQuality previous = data.quality(realm);
 		if (realm != before || previous == null || quality.ordinal() > previous.ordinal()) {

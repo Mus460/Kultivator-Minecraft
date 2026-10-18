@@ -15,7 +15,8 @@
     "SectSpawnMixin",
     "SectExplosionMixin",
     "WitherBossMixin",
-    "LivingEntityDamageMixin"
+    "LivingEntityDamageMixin",
+    "MobFinalizeSpawnMixin"
   ],
   "injectors": {
     "defaultRequire": 1

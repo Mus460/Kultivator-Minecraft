@@ -1,6 +1,11 @@
 package dev.kultivator.technique;
 
+import dev.kultivator.KultivatorConfig;
+import dev.kultivator.data.Cultivators;
+import dev.kultivator.data.Realm;
 import dev.kultivator.data.Technique;
+import dev.kultivator.harta.HartaLoot;
+import dev.kultivator.harta.SpiritHerbs;
 import dev.kultivator.network.Net;
 import dev.kultivator.network.Payloads;
 import dev.kultivator.technique.spec.dsl.Bonus;
@@ -37,6 +42,12 @@ import java.util.List;
  * ticks → (D) (+120 at Kesempurnaan Agung; at Puncak Jurus they are also marked vulnerable +10% for 200 ticks), and the
  * ores within 12→16 blocks are read (read-only, spread over 4 ticks) and sent to the caster's client as pings for 200
  * ticks, with a chat summary.
+ * <p>
+ * Phase 7 (DESIGN 19.3.4, 19.3.13): the same scan pings spirit-infused plants green ({@link SpiritHerbs#infused}, the
+ * very herb the caster would find when breaking it today), and once per cast the unlooted containers (block entities
+ * with a pending loot table) within {@link HartaLoot#SENSE_RADIUS} blocks of loaded chunks are pinged gold. Treasure
+ * pings come first within {@code OrePings.MAX}. Sources: a spiritual sense sweeping the land (RMJ ch. 1269) and Han Li
+ * sweeping his sense over his abode (RMJ: Immortal Realm ch. 367). Everything here only reads blocks.
  */
 final class DivineSense {
 
@@ -75,7 +86,11 @@ final class DivineSense {
 	private static final TagKey<Block> DIAMOND_ORES = BlockItemTags.DIAMOND_ORES.block();
 	private static final TagKey<Block> EMERALD_ORES = BlockItemTags.EMERALD_ORES.block();
 
-	private record Found(BlockPos pos, Ore ore, double distSq) {
+	/** One ping: an ore ({@code ore} set), an infused plant or an unlooted container ({@code ore} null, {@code herb} tells which). */
+	private record Found(BlockPos pos, @Nullable Ore ore, boolean herb, double distSq) {
+		int color() {
+			return ore != null ? ore.color : herb ? SpiritHerbs.SENSE_COLOR : HartaLoot.SENSE_COLOR;
+		}
 	}
 
 	static boolean cast(Caster ctx, ServerPlayer player) {
@@ -99,9 +114,10 @@ final class DivineSense {
 		int radius = (int) Math.round(ctx.area(12.0D, 16.0D));
 		BlockPos center = player.blockPosition();
 		List<Found> found = new ArrayList<>();
+		boolean herbs = !ctx.copy() && KultivatorConfig.get().herbHarvest && Cultivators.get(player).realm().atLeast(Realm.QI_REFINING);
 		for (int slice = 0; slice < SCAN_TICKS; slice++) {
 			int index = slice;
-			ctx.schedule(slice, () -> scan(level, center, eye, radius, index, found));
+			ctx.schedule(slice, () -> scan(level, player, herbs, center, eye, radius, index, found));
 		}
 		ctx.schedule(SCAN_TICKS, () -> report(player, found, monsters.size(), (int) range));
 		ctx.keepAlive(SCAN_TICKS + 1);
@@ -119,17 +135,31 @@ final class DivineSense {
 		if (player.isRemoved()) {
 			return;
 		}
-		int[] counts = new int[Ore.values().length];
-		for (Found each : found) {
-			counts[each.ore().ordinal()]++;
+		// Treasure sense (DESIGN 19.3.13): unlooted containers of loaded chunks, once per cast.
+		Vec3 eye = player.getEyePosition();
+		for (BlockPos chest : HartaLoot.unlootedContainers(player.level(), player.blockPosition(), HartaLoot.SENSE_RADIUS)) {
+			found.add(new Found(chest, null, false, eye.distanceToSqr(Vec3.atCenterOf(chest))));
 		}
-		found.sort(Comparator.comparingDouble(Found::distSq));
+		int[] counts = new int[Ore.values().length];
+		int herbCount = 0;
+		int chestCount = 0;
+		for (Found each : found) {
+			if (each.ore() != null) {
+				counts[each.ore().ordinal()]++;
+			} else if (each.herb()) {
+				herbCount++;
+			} else {
+				chestCount++;
+			}
+		}
+		// Treasure first, then ores, each nearest first.
+		found.sort(Comparator.comparingInt((Found each) -> each.ore() == null ? 0 : 1).thenComparingDouble(Found::distSq));
 		int limit = Math.min(Payloads.OrePings.MAX, found.size());
 		List<BlockPos> positions = new ArrayList<>(limit);
 		List<Integer> colors = new ArrayList<>(limit);
 		for (int i = 0; i < limit; i++) {
 			positions.add(found.get(i).pos());
-			colors.add(found.get(i).ore().color);
+			colors.add(found.get(i).color());
 		}
 		Net.send(player, new Payloads.OrePings(positions, colors, PING_TICKS));
 		List<Component> parts = new ArrayList<>();
@@ -145,10 +175,25 @@ final class DivineSense {
 				ores).withColor(0xC9B8FF));
 		Msg.chat(player, Component.translatable("kultivator.techniques.divine_sense.monsters", String.valueOf(monsters),
 				String.valueOf(range)).withColor(Techniques.MUTED));
+		if (herbCount > 0 || chestCount > 0) {
+			List<Component> treasure = new ArrayList<>(2);
+			if (herbCount > 0) {
+				treasure.add(Component.translatable("kultivator.harta.sense.herbs", String.valueOf(herbCount)).withColor(SpiritHerbs.SENSE_COLOR));
+			}
+			if (chestCount > 0) {
+				treasure.add(Component.translatable("kultivator.harta.sense.chests", String.valueOf(chestCount)).withColor(HartaLoot.SENSE_COLOR));
+			}
+			Msg.chat(player, Component.translatable("kultivator.harta.sense.summary",
+					ComponentUtils.formatList(treasure, Component.literal(", ").withColor(Techniques.MUTED))).withColor(0xC9B8FF));
+		}
 	}
 
-	/** One quarter of the sphere's height (read-only, loaded chunks only). */
-	private static void scan(ServerLevel level, BlockPos center, Vec3 eye, int radius, int slice, List<Found> found) {
+	/** One quarter of the sphere's height (read-only, loaded chunks only); with {@code herbs} also the infused plants. */
+	private static void scan(ServerLevel level, ServerPlayer player, boolean herbs, BlockPos center, Vec3 eye, int radius, int slice,
+							 List<Found> found) {
+		if (player.isRemoved()) {
+			return;
+		}
 		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		int radiusSq = radius * radius;
 		int minY = level.getMinY();
@@ -170,10 +215,14 @@ final class DivineSense {
 					if (!level.isLoaded(cursor)) {
 						continue;
 					}
-					Ore ore = classify(level.getBlockState(cursor));
+					BlockState state = level.getBlockState(cursor);
+					Ore ore = classify(state);
 					if (ore != null) {
 						double distSq = eye.distanceToSqr(cursor.getX() + 0.5D, cursor.getY() + 0.5D, cursor.getZ() + 0.5D);
-						found.add(new Found(cursor.immutable(), ore, distSq));
+						found.add(new Found(cursor.immutable(), ore, false, distSq));
+					} else if (herbs && SpiritHerbs.isPlant(state) && SpiritHerbs.infused(level, cursor, state, player) != null) {
+						double distSq = eye.distanceToSqr(cursor.getX() + 0.5D, cursor.getY() + 0.5D, cursor.getZ() + 0.5D);
+						found.add(new Found(cursor.immutable(), null, true, distSq));
 					}
 				}
 			}

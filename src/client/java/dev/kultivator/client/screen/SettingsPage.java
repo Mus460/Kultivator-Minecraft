@@ -34,6 +34,7 @@ final class SettingsPage extends Page {
 	private static final String[] PARTS = {"aura", "robe", "back_sword", "eyes", "dao_circle"};
 	private static final long CONFIRM_MILLIS = 3000L;
 	private static final String C = "kultivator.codex.settings.";
+	private static final String G = "kultivator.goals.settings.";
 
 	private long hardcoreAskUntil;
 	private int leftW;
@@ -165,7 +166,29 @@ final class SettingsPage extends Page {
 		cy = coin(cy, row, coin, "wheel_hold", EffectQuality::wheelHold, EffectQuality::setWheelHold);
 		cy = coin(cy, row, coin, "release_cast", EffectQuality::releaseCast, EffectQuality::setReleaseCast);
 		cy = coin(cy, row, coin, "reduce_motion", EffectQuality::reduceMotion, EffectQuality::setReduceMotion);
+
+		// Phase 7 HUD comfort (DESIGN 19.3.15): the cooldown ping, the meditation danger alert and the guide tracker.
+		cy += 2;
+		heading(cy, G + "heading");
+		cy += 15;
+		cy = goalCoin(cy, row, coin, "cooldown_ping", EffectQuality::cooldownPing, EffectQuality::setCooldownPing);
+		cy = goalCoin(cy, row, coin, "danger_alert", EffectQuality::dangerAlert, EffectQuality::setDangerAlert);
+		JadeCoin guide = new JadeCoin(rightX + 2, cy, rightW - 6, coin, () -> Component.translatable(G + "guide"),
+				() -> !dev.kultivator.goals.Guide.hidden(data()));
+		guide.enabledWhen(Keys::connected);
+		guide.onPress(() -> send(Actions.JALAN, 0, dev.kultivator.goals.Guide.hidden(data()) ? "show" : "hide"));
+		guide.tooltip(() -> List.of(Component.translatable(G + "guide"), Component.translatable(G + "guide.tip").withStyle(ChatFormatting.GRAY)));
+		put(guide, cy);
+		cy += row;
 		columnHeight = cy - y + 4;
+	}
+
+	private int goalCoin(int cy, int row, int coin, String key, BooleanSupplier value, Consumer<Boolean> set) {
+		JadeCoin toggle = new JadeCoin(rightX + 2, cy, rightW - 6, coin, () -> Component.translatable(G + key), value);
+		toggle.onPress(() -> set.accept(!value.getAsBoolean()));
+		toggle.tooltip(() -> List.of(Component.translatable(G + key), Component.translatable(G + key + ".tip").withStyle(ChatFormatting.GRAY)));
+		put(toggle, cy);
+		return cy + row;
 	}
 
 	private int coin(int cy, int row, int coin, String key, BooleanSupplier value, Consumer<Boolean> set) {

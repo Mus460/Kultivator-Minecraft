@@ -6,6 +6,8 @@ import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Dao;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
+import dev.kultivator.harta.Harta;
+import dev.kultivator.harta.HartaFxIds;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
@@ -75,6 +77,7 @@ public final class AlchemyFurnace {
 	/** Extra alchemy XP per quality grade above Low (x recipe XP). */
 	private static final double QUALITY_XP = 0.2D;
 
+	private static final int CATALYST_COLOR = 0x9FE0C0;
 	private static final int POT_COLOR = 0xE8D9A8;
 	private static final int BUSY_COLOR = 0xFFB060;
 	private static final int FAIL_COLOR = 0xB0A8A0;
@@ -111,6 +114,13 @@ public final class AlchemyFurnace {
 		return Math.min(MAX_CHANCE, chance);
 	}
 
+	/** Success chance with the catalysts of {@code mix} (DESIGN 19.3.7), still capped at {@link #MAX_CHANCE}. */
+	public static double successChance(int alchemyLevel, boolean soul, boolean fireDao, AlchemyRecipes.Mix mix) {
+		double chance = BASE_CHANCE + alchemyLevel * CHANCE_PER_LEVEL + (soul ? SOUL_FIRE_CHANCE : 0.0D) + (fireDao ? FIRE_DAO_CHANCE : 0.0D)
+				+ mix.chanceBonus();
+		return Math.min(MAX_CHANCE, chance);
+	}
+
 	/** The top centre of the cauldron, where the effects play. */
 	public static Vec3 top(BlockPos pos) {
 		return new Vec3(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D);
@@ -134,7 +144,7 @@ public final class AlchemyFurnace {
 		ItemStack held = player.getMainHandItem();
 		Use use;
 		if (!held.isEmpty()) {
-			if (!AlchemyRecipes.isIngredient(held.getItem()) || hasCauldronInteraction(held)) {
+			if (!AlchemyRecipes.accepts(held) || hasCauldronInteraction(held)) {
 				return InteractionResult.PASS;
 			}
 			use = Use.ADD;
@@ -177,7 +187,8 @@ public final class AlchemyFurnace {
 		AlchemyPots.Pot pot = existing != null ? existing : pots.getOrCreate(pos);
 		Item item = held.getItem();
 		Component name = held.getHoverName().copy();
-		pot.add(item);
+		// Phase 7: herbs keep their age and cores their element inside the pot (DESIGN 19.3.7).
+		pot.add(held);
 		pots.setDirty();
 		held.consume(1, player);
 
@@ -240,16 +251,25 @@ public final class AlchemyFurnace {
 				AlchemyRecipes.ingredientList(pot.contents()));
 	}
 
-	/** "→ Qi Gathering Pill" or "→ unknown mixture". */
+	/** "→ Qi Gathering Pill", plus the catalysts ("· katalis: peluang +15%, kualitas +0.13"), or "→ unknown mixture". */
 	private static MutableComponent match(AlchemyPots.Pot pot) {
-		AlchemyRecipes.Recipe recipe = AlchemyRecipes.match(pot.contents());
-		return recipe == null
-				? Component.translatable("kultivator.alchemy.pot.unknown").withStyle(ChatFormatting.GRAY)
-				: Component.translatable("kultivator.alchemy.pot.match", recipe.displayName()).withColor(recipe.color());
+		AlchemyRecipes.Mix mix = AlchemyRecipes.analyze(pot);
+		AlchemyRecipes.Recipe recipe = mix.recipe();
+		if (recipe == null) {
+			return Component.translatable("kultivator.alchemy.pot.unknown").withStyle(ChatFormatting.GRAY);
+		}
+		MutableComponent line = Component.translatable("kultivator.alchemy.pot.match", recipe.displayName()).withColor(recipe.color());
+		if (mix.hasCatalysts()) {
+			PillQuality floor = mix.floor();
+			line.append(Component.translatable(floor == null ? "kultivator.harta.alchemy.catalysts" : "kultivator.harta.alchemy.catalysts_floor",
+					PillEffects.percent(mix.chanceBonus()), PillEffects.multiplierText(mix.qualityBonus()),
+					floor == null ? Component.empty() : floor.displayName()).withColor(CATALYST_COLOR));
+		}
+		return line;
 	}
 
 	private static int steamColor(AlchemyPots.Pot pot) {
-		AlchemyRecipes.Recipe recipe = AlchemyRecipes.match(pot.contents());
+		AlchemyRecipes.Recipe recipe = AlchemyRecipes.analyze(pot).recipe();
 		return recipe == null ? AlchemyRecipes.MURKY_COLOR : recipe.color();
 	}
 
@@ -312,7 +332,8 @@ public final class AlchemyFurnace {
 		BlockPos pos = pot.pos();
 		Vec3 top = top(pos);
 		boolean soul = soulFire(level, pos);
-		AlchemyRecipes.Recipe recipe = AlchemyRecipes.match(pot.contents());
+		AlchemyRecipes.Mix mix = AlchemyRecipes.analyze(pot);
+		AlchemyRecipes.Recipe recipe = mix.recipe();
 		ServerPlayer owner = pot.owner() == null ? null : level.getServer().getPlayerList().getPlayer(pot.owner());
 		int alchemyLevel = owner != null ? Alchemy.level(Cultivators.get(owner)) : pot.ownerLevel();
 		boolean fireDao = owner != null ? Cultivators.get(owner).dao() == Dao.FIRE : pot.ownerFire();
@@ -323,15 +344,24 @@ public final class AlchemyFurnace {
 			failure(level, top, owner, "kultivator.alchemy.refine.unknown", UNKNOWN_XP);
 			return;
 		}
-		if (random.nextDouble() >= successChance(alchemyLevel, soul, fireDao)) {
+		// Phase 7 (DESIGN 19.3.7): stones and a core add to the chance (still capped at MAX_CHANCE), stones and the
+		// auxiliary herb shift the quality roll, a core sets a quality floor.
+		if (random.nextDouble() >= successChance(alchemyLevel, soul, fireDao, mix)) {
 			failure(level, top, owner, "kultivator.alchemy.refine.failed", recipe.xp() * FAILED_XP_SHARE);
 			return;
 		}
-		PillQuality quality = rollQuality(random, alchemyLevel, soul);
-		boolean pill = recipe.isPill();
-		int count = recipe.count() + (!pill && quality == PillQuality.PERFECT ? 1 : 0);
+		PillQuality quality = rollQuality(random, alchemyLevel, soul, mix.qualityBonus());
+		PillQuality floor = mix.floor();
+		if (floor != null && quality.ordinal() < floor.ordinal()) {
+			quality = floor;
+		}
+		if (mix.hasCatalysts()) {
+			Fx.send(level, top, FxType.TREASURE, HartaFxIds.CATALYST, mix.lowStones() + mix.highStones(), floor == null ? 0.0F : floor.ordinal() + 1.0F);
+		}
+		boolean quality7 = recipe.carriesQuality();
+		int count = recipe.count() + (!quality7 && quality == PillQuality.PERFECT ? 1 : 0);
 		ItemStack result = new ItemStack(recipe.outputItem(), count);
-		if (pill) {
+		if (quality7) {
 			AlchemyComponents.withQuality(result, quality);
 		}
 		Component name = result.getHoverName().copy();
@@ -360,7 +390,9 @@ public final class AlchemyFurnace {
 		Cultivators.dirty(owner);
 		// ALCHEMY_COUNT feats (DESIGN 22.8.9): one successful refinement.
 		dev.kultivator.technique.spec.run.FeatTracker.onAlchemy(owner);
-		MutableComponent shownQuality = pill ? quality.displayName() : Component.translatable("kultivator.alchemy.quality.na");
+		// extra.harta.refined (DESIGN 19.3.7): one per successful refining, read by the trials and the daily chores.
+		Harta.countRefined(owner);
+		MutableComponent shownQuality = quality7 ? quality.displayName() : Component.translatable("kultivator.alchemy.quality.na");
 		Msg.chat(owner, Component.translatable("kultivator.alchemy.refine.success", count, name, shownQuality, Msg.number(xp))
 				.withColor(recipe.color()));
 		Alchemy.addXp(owner, xp);
@@ -404,9 +436,9 @@ public final class AlchemyFurnace {
 		}
 	}
 
-	/** Quality from a roll shifted by the alchemy level; soul fire may raise it one grade. */
-	private static PillQuality rollQuality(RandomSource random, int alchemyLevel, boolean soul) {
-		double roll = random.nextDouble() + alchemyLevel * QUALITY_PER_LEVEL;
+	/** Quality from a roll shifted by the alchemy level and the catalysts' bonus; soul fire may raise it one grade. */
+	private static PillQuality rollQuality(RandomSource random, int alchemyLevel, boolean soul, double bonus) {
+		double roll = random.nextDouble() + alchemyLevel * QUALITY_PER_LEVEL + Math.max(0.0D, bonus);
 		PillQuality quality;
 		if (roll < 0.35D) {
 			quality = PillQuality.LOW;

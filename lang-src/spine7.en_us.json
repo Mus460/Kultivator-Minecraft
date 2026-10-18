@@ -1,0 +1,16 @@
+{
+  "kultivator.spine7.tab.jalan": "Path of Cultivation",
+  "kultivator.spine7.tab.jalan.short": "Path",
+  "kultivator.spine7.tab.alkimia": "Book of Alchemy",
+  "kultivator.spine7.tab.alkimia.short": "Alchemy",
+  "kultivator.spine7.placeholder": "This tablet is still being carved.",
+  "kultivator.spine7.kit": "Phase 7: stones, herbs, cores and talismans",
+  "kultivator.spine7.config.eliteMonsters": "eliteMonsters: naturally spawned monsters near a Qi Refining or higher player may become elite demonic beasts.",
+  "kultivator.spine7.config.eliteChanceScale": "eliteChanceScale (0-5): multiplies the elite chance; the 7% cap still applies.",
+  "kultivator.spine7.config.structureLoot": "structureLoot: spirit stones, spirit herbs, beast cores and jade slips in built-in structure chests.",
+  "kultivator.spine7.config.spiritStoneMining": "spiritStoneMining: ores broken by a Qi Refining or higher player sometimes drop spirit stones.",
+  "kultivator.spine7.config.herbHarvest": "herbHarvest: plants broken by a Qi Refining or higher player may hold aged spirit herbs.",
+  "kultivator.spine7.config.guideRewards": "guideRewards: the chapters of First Steps on the Path tablet give their rewards.",
+  "kultivator.spine7.config.dailyTasks": "dailyTasks: Daily Chores, three small tasks every in-game day.",
+  "kultivator.spine7.config.tribulationTelegraph": "tribulationTelegraph: lightning rings warn of tribulation strikes from Deity Transformation up; off means every strike is a full hit."
+}

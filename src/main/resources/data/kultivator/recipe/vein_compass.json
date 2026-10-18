@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "minecraft:compass",
+    "minecraft:amethyst_shard",
+    "minecraft:gold_ingot",
+    "minecraft:glow_berries"
+  ],
+  "result": {
+    "id": "kultivator:vein_compass"
+  }
+}

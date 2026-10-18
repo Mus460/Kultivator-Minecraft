@@ -38,6 +38,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -108,6 +109,13 @@ public class Kultivator implements ModInitializer {
 		// Phase 6b: Pembangunan Sekte (DESIGN 21.24); the engine registers first, then the flow and its hall providers.
 		dev.kultivator.sect.build.engine.BuildEngine.init();
 		dev.kultivator.sect.build.SectBuild.init();
+		// Phase 7: Dunia yang Hidup (DESIGN 19.2.3). None of them reads TechniqueRegistry eagerly; ImmortalPerks also
+		// initialises Reforge and CaveAbode.
+		dev.kultivator.harta.Harta.init();
+		dev.kultivator.elite.EliteMonsters.init();
+		dev.kultivator.talisman.Talismans.init();
+		dev.kultivator.cultivation.ImmortalPerks.init();
+		dev.kultivator.goals.Goals.init();
 		// After every module registered its items.
 		ModItems.init();
 		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its
@@ -149,6 +157,10 @@ public class Kultivator implements ModInitializer {
 			HeartDemons.tick(player, data);
 			SpiritBeasts.tick(player, data);
 			Ascension.tick(player, data);
+			// Phase 7 (DESIGN 19.2.3): each one throttles itself.
+			dev.kultivator.cultivation.ImmortalPerks.tick(player, data);
+			dev.kultivator.talisman.Talismans.tick(player, data);
+			dev.kultivator.goals.Goals.tick(player, data);
 			if (player.tickCount % 40 == 0) {
 				// Picks up a new sword in the inventory, cosmetic changes and so on.
 				Cultivators.refreshVisual(player);
@@ -161,6 +173,7 @@ public class Kultivator implements ModInitializer {
 		CultivationData data = Cultivators.get(player);
 		Techniques.onJoin(player, data);
 		data.resetSession();
+		writeSessionConfig(data);
 		Stats.apply(player);
 		Cultivators.syncNow(player);
 	}
@@ -175,11 +188,28 @@ public class Kultivator implements ModInitializer {
 	private static void onRespawn(ServerPlayer player, boolean alive) {
 		CultivationData data = Cultivators.get(player);
 		data.resetSession();
+		writeSessionConfig(data);
 		Stats.apply(player);
 		if (!alive) {
 			player.setHealth(player.getMaxHealth());
 			Breakthrough.onRespawn(player, data);
 		}
 		Cultivators.syncNow(player);
+	}
+
+	/**
+	 * {@code sessionExtra.cfg} (DESIGN 19.2.3, 19.9): the server switches the client screens and HUD must know, written
+	 * after every session reset (join and respawn): hd heart demon trials, dp Dao Protector event, guide guide rewards,
+	 * daily daily chores, tele tribulation telegraph. Call it again after any other {@code resetSession()}.
+	 */
+	public static void writeSessionConfig(CultivationData data) {
+		KultivatorConfig config = KultivatorConfig.get();
+		CompoundTag cfg = new CompoundTag();
+		cfg.putBoolean("hd", config.heartDemonTrials);
+		cfg.putBoolean("dp", config.daoProtectorEvent);
+		cfg.putBoolean("guide", config.guideRewards);
+		cfg.putBoolean("daily", config.dailyTasks);
+		cfg.putBoolean("tele", config.tribulationTelegraph);
+		data.sessionExtra().put("cfg", cfg);
 	}
 }

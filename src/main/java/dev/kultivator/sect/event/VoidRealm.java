@@ -226,7 +226,7 @@ public final class VoidRealm {
 		}
 	}
 
-	static boolean climbing(UUID owner) {
+	public static boolean climbing(UUID owner) {
 		return CLIMBS.containsKey(owner);
 	}
 

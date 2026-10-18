@@ -13,13 +13,16 @@ import net.minecraft.network.chat.Component;
 final class HelpPage extends Page {
 
 	/**
-	 * Topics in reading order. The phase-6 topics (Sect Hall onwards, DESIGN 20.4.1) are written by their own modules;
-	 * a topic whose text is not in the language files yet is skipped.
+	 * Topics in reading order. The phase-6 topics (Sect Hall onwards, DESIGN 20.4.1) and the phase-7 topics (DESIGN 19.6:
+	 * the Jalan tablet first, for new players) are written by their own modules; a topic whose text is not in the
+	 * language files yet is skipped.
 	 */
-	private static final String[] TOPICS = {"meditation", "xp", "bottleneck", "breakthrough", "tribulation", "protectors", "pills",
-			"techniques", "roots", "dao", "alchemy", "heart_demon", "beasts", "formations", "sects", "ascension", "visuals",
-			"aula", "bangun", "calon", "jenjang", "kontribusi", "tugas", "misi", "turnamen", "alam_hampa", "bakat", "pusaka", "bintang", "ikatan",
-			"kehancuran", "teknik", "penguasaan", "kitab_teknik", "kehancuran_diri"};
+	private static final String[] TOPICS = {"jalan", "meditation", "xp", "bottleneck", "breakthrough", "persiapan", "tribulation", "protectors",
+			"pills", "techniques", "roots", "dao", "alchemy", "heart_demon", "beasts", "formations", "sects", "ascension", "visuals",
+			"aula", "bangun", "calon", "jenjang", "kontribusi", "tugas", "misi", "turnamen", "alam_hampa", "bakat", "pusaka", "bintang", "ikatan", "bimbingan",
+			"kehancuran", "teknik", "penguasaan", "kitab_teknik", "kehancuran_diri",
+			"harian", "batu_roh", "tanaman_roh", "inti_binatang", "alkimia_lanjut", "relik", "urat_roh", "jimat", "anugerah", "elit", "unsur",
+			"kejenuhan", "hu_fa_tribulasi"};
 	private static final KeyMapping[] KEYS = {Keys.MEDITATE, Keys.CAST, Keys.PREVIOUS, Keys.NEXT, Keys.FLYING_SWORD, Keys.INFO, Keys.CODEX, Keys.WHEEL,
 			Keys.SEAL_1, Keys.SEAL_2, Keys.SEAL_3, Keys.SEAL_4};
 

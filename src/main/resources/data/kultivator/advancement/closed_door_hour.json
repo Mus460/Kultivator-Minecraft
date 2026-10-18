@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_meditation",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.closed_door_hour.description"
+    },
+    "icon": {
+      "id": "minecraft:candle"
+    },
+    "title": {
+      "translate": "advancement.kultivator.closed_door_hour.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

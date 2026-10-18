@@ -2,19 +2,28 @@ package dev.kultivator.client;
 
 import dev.kultivator.client.codex.SpecInfo;
 import dev.kultivator.client.codex.TeknikSession;
+import dev.kultivator.client.goals.GoalsClient;
+import dev.kultivator.client.goals.HudDemo;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.cultivation.Enlightenment;
+import dev.kultivator.cultivation.ImmortalPerks;
 import dev.kultivator.cultivation.Qi;
 import dev.kultivator.cultivation.SpiritRoots;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Element;
 import dev.kultivator.data.Rank;
+import dev.kultivator.data.Technique;
 import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueSpec;
+import dev.kultivator.goals.DailyChores;
+import dev.kultivator.technique.CloudStep;
+import dev.kultivator.technique.FlyingSword;
 import dev.kultivator.util.Msg;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.DeltaTracker;
@@ -22,16 +31,21 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.HumanoidArm;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * The cultivation HUD in the bottom-left corner, in the strip under the chat and left of the offhand slot (DESIGN 5):
@@ -41,15 +55,42 @@ import java.util.Locale;
  * tag, DESIGN 22.12.8); countdown arcs of lasting forms, domains and fields above the orb; and the realm, qi and
  * warnings beside it. Every value glides to its new number. Hidden with F1, F3, the HUD setting, an open chat, or
  * before the server sent any data. The quick seals, wheel, charge bar and toasts are {@code codex.CodexHud}.
+ * <p>
+ * Phase 7 (DESIGN 19.3.15): the flying-sword gauge (amber below 15 s, red below 10 s with chimes at 10/5/3 s, "Turun!"
+ * below 2 s), the enlightenment timer, Cloud Step pips while airborne, the optional cooldown ping, the toxicity meter
+ * from 40, the vein line (density, grade, "Tertutup +15%", the stone and its fuel timer), the star count and the three
+ * daily-chore dots. The new lines are the first to go on narrow screens.
  */
 public final class QiHud implements HudElement {
 
 	private static final float ORB = 11.0F;
 	private static final int STORED_BEADS = 12;
+	/** Toxicity is shown from here (DESIGN 19.3.15), and as a warning above 80. */
+	private static final double TOXICITY_SHOWN = 40.0D;
+	private static final double TOXICITY_WARN = 80.0D;
+	/** Flying-sword gauge thresholds in seconds. */
+	private static final double FLY_AMBER = 15.0D;
+	private static final double FLY_RED = 10.0D;
+	private static final double FLY_LAND = 2.0D;
+	private static final int[] FLY_CHIMES = {10, 5, 3};
+	/** A cooldown at least this long pings when it ends (setting "Pengingat cooldown"). */
+	private static final int PING_COOLDOWN_TICKS = 200;
+	private static final long PING_FLASH_MILLIS = 700L;
+	/** Fuel stone colours by grade (Low, Mid, High, Supreme). */
+	private static final int[] STONE_COLORS = {0xFF9FD8C8, 0xFF6FB8FF, 0xFFB98CFF, 0xFFFFD54A};
 
 	private static long seenVersion = -1L;
 	private static int deviationAtSync;
 	private static long syncClientTime;
+
+	// Phase 7 client counters (ticked by goals.GoalsClient).
+	private static int jumpsUsed;
+	private static boolean jumpWasDown;
+	private static int airTicks;
+	private static long enlightenedAt = -1L;
+	private static double lastFlySeconds = Double.MAX_VALUE;
+	private static final Map<String, Long> COOLDOWNS = new HashMap<>();
+	private static long pingFlashUntil;
 
 	private final Eased qi = new Eased(5.0F);
 	private final Eased bar = new Eased(5.0F);
@@ -80,6 +121,102 @@ public final class QiHud implements HudElement {
 			syncClientTime = now;
 		}
 		return (int) Math.max(0L, deviationAtSync - Math.max(0L, now - syncClientTime));
+	}
+
+	// ================================================================== phase 7 counters (DESIGN 19.3.15)
+
+	/**
+	 * Every client tick (from {@code goals.GoalsClient}): counts Cloud Step jumps (the same press the key handler sends),
+	 * notes when an enlightenment began, rings the flying-sword chimes and the optional cooldown ping.
+	 */
+	public static void clientTick(Minecraft minecraft) {
+		LocalPlayer player = minecraft.player;
+		if (player == null || !ClientCultivation.received()) {
+			return;
+		}
+		CultivationData data = ClientCultivation.data();
+		boolean grounded = player.onGround() || player.isInWater() || player.onClimbable() || player.isPassenger() || player.getAbilities().flying;
+		airTicks = grounded ? 0 : airTicks + 1;
+		if (grounded) {
+			jumpsUsed = 0;
+		}
+		boolean jumpDown = minecraft.options.keyJump.isDown();
+		if (jumpDown && !jumpWasDown && !grounded && airTicks > 2 && minecraft.gui.screen() == null && data.knows(Technique.CLOUD_STEP)
+				&& !player.isFallFlying()) {
+			jumpsUsed = Math.min(CloudStep.maxJumps(data.realm()), jumpsUsed + 1);
+		}
+		jumpWasDown = jumpDown;
+
+		if (data.enlightened()) {
+			if (enlightenedAt < 0L) {
+				enlightenedAt = ClientCultivation.serverGameTime();
+			}
+		} else {
+			enlightenedAt = -1L;
+		}
+
+		double flySeconds = flySeconds(data);
+		if (!Double.isNaN(flySeconds)) {
+			for (int mark : FLY_CHIMES) {
+				if (lastFlySeconds > mark && flySeconds <= mark) {
+					minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_CHIME.value(), mark <= 3 ? 1.8F : 1.4F, 0.5F));
+				}
+			}
+			lastFlySeconds = flySeconds;
+		} else {
+			lastFlySeconds = Double.MAX_VALUE;
+		}
+
+		if (EffectQuality.cooldownPing()) {
+			pingCooldowns(minecraft, data);
+		} else {
+			COOLDOWNS.clear();
+		}
+	}
+
+	/** Seconds of flight the qi still pays for, or NaN when not flying or when regeneration covers the drain. */
+	private static double flySeconds(CultivationData data) {
+		if (!data.flyingSword()) {
+			return Double.NaN;
+		}
+		double net = FlyingSword.drainPerSecond(data) - Qi.regenPerSecond(data);
+		if (net <= 0.01D) {
+			return Double.NaN;
+		}
+		return data.qi() / Math.max(0.01D, net);
+	}
+
+	/** A chime (and a flash on the HUD seal) when a cooldown of 10 s or more of the selected seal or a quick seal ends. */
+	private static void pingCooldowns(Minecraft minecraft, CultivationData data) {
+		List<String> ids = new ArrayList<>();
+		if (!data.selectedId().isEmpty()) {
+			ids.add(data.selectedId());
+		}
+		String[] slots = TeknikSession.slots();
+		for (int i = 0; i < Math.min(4, slots.length); i++) {
+			if (!slots[i].isEmpty() && !ids.contains(slots[i])) {
+				ids.add(slots[i]);
+			}
+		}
+		boolean ping = false;
+		for (String id : ids) {
+			TechniqueSpec spec = TechniqueRegistry.byId(id);
+			if (spec == null) {
+				continue;
+			}
+			long left = SpecInfo.cooldownLeft(spec);
+			Long before = COOLDOWNS.put(id, left);
+			if (before != null && before > 0L && left <= 0L && SpecInfo.cooldown(data, spec) >= PING_COOLDOWN_TICKS) {
+				ping = true;
+				if (id.equals(data.selectedId())) {
+					pingFlashUntil = Util.getMillis() + PING_FLASH_MILLIS;
+				}
+			}
+		}
+		COOLDOWNS.keySet().retainAll(ids);
+		if (ping) {
+			minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.AMETHYST_BLOCK_CHIME, 1.6F, 0.6F));
+		}
 	}
 
 	@Override
@@ -129,6 +266,7 @@ public final class QiHud implements HudElement {
 			textX = 62;
 		}
 		drawLasting(g, nowMillis, height);
+		drawCloudPips(g, minecraft.player, data, height);
 		int room = limit - textX;
 		if (room >= 24) {
 			drawText(g, font, data, rank, textX, room, cy, height, qiShown, maxQi, barShown, storedNumber, nowMillis);
@@ -251,6 +389,12 @@ public final class QiHud implements HudElement {
 			Component secs = Component.literal(String.valueOf((left + 19L) / 20L));
 			Brush.centered(g, font, secs, x + size / 2.0F, y + size / 2.0F - 2.5F, 0xFFFFFFFF, 0.6F, true);
 		}
+		long flash = pingFlashUntil - Util.getMillis();
+		if (flash > 0L) {
+			// The cooldown ping (DESIGN 19.3.15): a short gold flash over the seal.
+			int alpha = Math.round(160 * flash / (float) PING_FLASH_MILLIS);
+			g.fill(x - 1, y - 1, x + size + 1, y + size + 1, Palette.argb(alpha, 0xFFE07A));
+		}
 		Component cost = Component.literal(SpecInfo.compact(qi));
 		Brush.centered(g, font, cost, x + size / 2.0F, y + size + 2.0F, affordable ? Palette.QI_LIGHT : 0xFFFF7A6A, 0.6F, true);
 		CompoundTag charges = TeknikSession.charges(spec.id());
@@ -302,6 +446,24 @@ public final class QiHud implements HudElement {
 		}
 	}
 
+	/** Cloud Step pips above the orb while airborne: one small cloud per air jump left of {@code CloudStep.maxJumps}. */
+	private static void drawCloudPips(GuiGraphicsExtractor g, @Nullable LocalPlayer player, CultivationData data, int height) {
+		boolean demo = HudDemo.active();
+		if (player == null || !demo && (airTicks <= 2 || !data.knows(Technique.CLOUD_STEP))) {
+			return;
+		}
+		int max = demo ? 6 : CloudStep.maxJumps(data.realm());
+		int left = demo ? 6 - Math.round(HudDemo.progress() * 3.0F) : Math.max(0, max - jumpsUsed);
+		for (int i = 0; i < max; i++) {
+			float cx = 7.0F + i * 6.5F;
+			float cy = height - 49.0F;
+			int color = i < left ? 0xF0F4FAFF : 0x50A0B0C0;
+			Brush.disc(g, cx - 1.3F, cy + 0.4F, 1.5F, color);
+			Brush.disc(g, cx + 1.3F, cy + 0.4F, 1.5F, color);
+			Brush.disc(g, cx, cy - 0.7F, 1.8F, color);
+		}
+	}
+
 	// ================================================================== text
 
 	private static void drawText(GuiGraphicsExtractor g, Font font, CultivationData data, Rank rank, int x, int room, float cy, int height,
@@ -310,7 +472,12 @@ public final class QiHud implements HudElement {
 		Line storedLine = null;
 		Line toxicityLine = null;
 		Line meditatingLine = null;
+		Line veinLine = null;
+		Line enlightenLine = null;
+		boolean demo = HudDemo.active();
+		CompoundTag session = data.sessionExtra();
 		addRankLines(lines, font, rank, room);
+		int rankLines = lines.size();
 		boolean untested = rank.realm().isMortal() && !data.rootTested();
 		boolean unknown = rank.realm().isMortal() && !rootKnown(data);
 		boolean narrow = room < 100;
@@ -327,6 +494,10 @@ public final class QiHud implements HudElement {
 			if (!narrow) {
 				qiLine.append(Component.literal("  " + Math.round(barShown * 100.0F) + "%").withColor(Palette.GOLD));
 			}
+			int stars = demo ? 9 : ImmortalPerks.stars(data);
+			if (stars > 0) {
+				qiLine.append(Component.literal("  ★" + stars).withColor(Palette.GOLD_LIGHT));
+			}
 			lines.add(Line.of(qiLine, Palette.QI_LIGHT, 0.75F));
 			if (data.storedQi() > 0.5D) {
 				storedLine = Line.of(Component.translatable(rank.isMax() ? "kultivator.hud.stored_immortal" : "kultivator.hud.stored",
@@ -339,31 +510,95 @@ public final class QiHud implements HudElement {
 		} else if (data.barFull() && rank.nextIsBreakthrough() && !unknown) {
 			lines.add(Line.of(Component.translatable("kultivator.hud.ready"), Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse), 0.75F));
 		}
+		// The flying-sword gauge: seconds of flight the qi still pays for.
+		double fly = demo ? 42.0D - 41.0D * HudDemo.progress() : flySeconds(data);
+		if (!Double.isNaN(fly)) {
+			int color = fly < FLY_RED ? Palette.mix(0xFFFF4A3A, 0xFFFF9A8A, pulse) : fly < FLY_AMBER ? 0xFFFFB347 : Palette.JADE_PALE;
+			Component text = fly < FLY_LAND ? Component.translatable("kultivator.goals.hud.fly_land")
+					: Component.translatable("kultivator.goals.hud.fly", Math.round(fly));
+			lines.add(Line.of(text, color, 0.75F));
+		}
 		int deviation = deviationTicksNow();
 		if (deviation > 0) {
 			int seconds = deviation / 20;
 			String clock = String.format(Locale.ROOT, "%d:%02d", seconds / 60, seconds % 60);
 			lines.add(Line.of(Component.translatable("kultivator.hud.deviation", clock), Palette.mix(0xFFFF4A3A, 0xFFFF9A8A, pulse), 0.75F));
 		}
-		if (data.toxicity() > 80.0D) {
-			toxicityLine = Line.of(Component.translatable("kultivator.hud.toxicity", Msg.number(data.toxicity())), Palette.WARN, 0.75F);
+		// The enlightenment timer.
+		if (demo || data.enlightened() && enlightenedAt >= 0L) {
+			long left = demo ? 140L : Math.max(0L, Enlightenment.DURATION_TICKS - (ClientCultivation.serverGameTime() - enlightenedAt));
+			enlightenLine = Line.of(Component.translatable("kultivator.goals.hud.enlightenment", clock(left)),
+					Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse), 0.75F);
+			lines.add(enlightenLine);
+		}
+		// Toxicity from 40 (amber), a warning above 80.
+		double toxicity = demo ? 55.0D : data.toxicity();
+		if (toxicity >= TOXICITY_SHOWN) {
+			boolean warn = toxicity > TOXICITY_WARN;
+			toxicityLine = Line.of(Component.translatable(warn ? "kultivator.hud.toxicity" : "kultivator.goals.hud.toxicity", Msg.number(toxicity)),
+					warn ? Palette.WARN : 0xFFE0C070, 0.75F);
 			lines.add(toxicityLine);
 		}
-		if (data.meditating()) {
-			MutableComponent line = Component.translatable("kultivator.hud.meditating", multiplier(data.siteMultiplier()))
+		if (data.meditating() || demo) {
+			MutableComponent line = Component.translatable("kultivator.hud.meditating", multiplier(demo ? 1.5D : data.siteMultiplier()))
 					.append(Component.literal(" · "))
-					.append(Component.translatable("kultivator.hud.density", Math.round(data.veinDensity() * 100.0D)));
+					.append(Component.translatable("kultivator.hud.density", Math.round((demo ? 1.8D : data.veinDensity()) * 100.0D)));
+			int grade = demo ? 2 : session.getIntOr("vein_grade", 0);
+			if (grade != 0) {
+				line.append(Component.literal(" · ")).append(Component.translatable("kultivator.goals.hud.vein." + (grade >= 2 ? "great" : grade == 1
+						? "rich" : "thin")));
+			}
 			if (data.formationTier() > 0) {
 				line.append(Component.literal(" · ")).append(Component.translatable("kultivator.hud.formation." + Math.min(3, data.formationTier())));
 			}
 			meditatingLine = Line.of(line, Palette.JADE_PALE, 0.75F);
 			lines.add(meditatingLine);
+			// Closed-door seclusion and the spirit stone burning as fuel.
+			MutableComponent extra = Component.empty();
+			boolean any = false;
+			int seclusion = demo ? 3 : session.getIntOr("seclusion", 0);
+			if (seclusion > 0) {
+				extra.append(Component.translatable("kultivator.goals.hud.seclusion", seclusion * 5));
+				any = true;
+			}
+			int fuel = demo ? 2 : session.getIntOr("fuel", -1);
+			long fuelLeft = demo ? 480L : session.getLongOr("fuel_end", 0L) - ClientCultivation.serverGameTime();
+			if (fuel >= 0 && fuelLeft > 0L) {
+				if (any) {
+					extra.append(Component.literal(" · "));
+				}
+				extra.append(Component.literal("◆ ").withColor(STONE_COLORS[Math.min(STONE_COLORS.length - 1, fuel)]))
+						.append(Component.literal(clock(fuelLeft)));
+				any = true;
+			}
+			// The Cave Abode (1 bonuses act, −1 near the seat but unprotected) and a running Perkokoh Fondasi ritual.
+			int abode = demo ? 1 : session.getIntOr("abode", 0);
+			if (abode != 0) {
+				if (any) {
+					extra.append(Component.literal(" · "));
+				}
+				extra.append(Component.translatable(abode > 0 ? "kultivator.goals.hud.abode" : "kultivator.goals.hud.abode_unprotected")
+						.withColor(abode > 0 ? Palette.JADE_LIGHT : 0xFFFFB347));
+				any = true;
+			}
+			long reforgeLeft = session.getLongOr("reforge_end", 0L) - ClientCultivation.serverGameTime();
+			if (reforgeLeft > 0L) {
+				if (any) {
+					extra.append(Component.literal(" · "));
+				}
+				extra.append(Component.translatable("kultivator.goals.hud.reforge", clock(reforgeLeft)).withColor(Palette.GOLD_LIGHT));
+				any = true;
+			}
+			if (any) {
+				veinLine = Line.of(extra, Palette.JADE_PALE, 0.7F);
+				lines.add(veinLine);
+			}
 		}
 
 		// The vanilla chat starts 40 px above the bottom: keep the block below it by dropping the least important lines
-		// (meditation details first, then Stored Qi, then the toxicity warning).
+		// (the phase-7 vein line first, then the enlightenment timer, the meditation details, Stored Qi, toxicity).
 		float total = linesHeight(lines);
-		for (Line droppable : new Line[]{meditatingLine, storedLine, toxicityLine}) {
+		for (Line droppable : new Line[]{veinLine, enlightenLine, meditatingLine, storedLine, toxicityLine}) {
 			if (total <= MAX_TEXT_HEIGHT) {
 				break;
 			}
@@ -372,7 +607,9 @@ public final class QiHud implements HudElement {
 			}
 		}
 		float y = total <= 34.0F ? cy - total / 2.0F : height - 3.0F - total;
-		for (Line line : lines) {
+		int[] dots = dailyDots(data, demo);
+		for (int i = 0; i < lines.size(); i++) {
+			Line line = lines.get(i);
 			float drawn;
 			if (line.text() != null) {
 				drawn = Brush.fit(g, font, line.text(), x, y, room, line.color(), line.scale(), line.scale() * 0.65F, true);
@@ -382,11 +619,39 @@ public final class QiHud implements HudElement {
 			} else {
 				drawn = 0.0F;
 			}
+			float end = drawn;
 			if (line.pips() >= 0 && drawn + PIP_ROOM <= room) {
 				pips(g, x + drawn + 3.0F, y + 3.5F * line.scale(), line.pips(), line.color());
+				end += PIP_ROOM;
+			}
+			// The three daily-chore dots beside the realm name (DESIGN 19.3.9 c).
+			if (dots != null && i == rankLines - 1 && end + 14.0F <= room) {
+				for (int d = 0; d < dots[0]; d++) {
+					boolean done = (dots[1] & (1 << d)) != 0;
+					Brush.dot(g, x + end + 5.0F + d * 3.6F, y + 3.5F * line.scale(), done ? 1.2F : 0.9F, done ? Palette.GOLD_LIGHT : 0x90A0B0A8);
+				}
 			}
 			y += 9.0F * line.scale();
 		}
+	}
+
+	/** {count, done bits} of today's chores, or null when there are none or the server switched them off. */
+	private static @Nullable int[] dailyDots(CultivationData data, boolean demo) {
+		if (demo) {
+			return new int[]{3, 3};
+		}
+		if (!GoalsClient.cfg("daily", true)) {
+			return null;
+		}
+		CompoundTag daily = DailyChores.view(data);
+		ListTag chores = daily.getListOrEmpty("chores");
+		return chores.isEmpty() ? null : new int[]{Math.min(3, chores.size()), daily.getIntOr("done", 0)};
+	}
+
+	/** Ticks as m:ss. */
+	private static String clock(long ticks) {
+		long seconds = Math.max(0L, ticks) / 20L;
+		return String.format(Locale.ROOT, "%d:%02d", seconds / 60L, seconds % 60L);
 	}
 
 	/**
