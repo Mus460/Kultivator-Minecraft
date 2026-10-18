@@ -771,7 +771,7 @@ English in both) shown in its tooltip or detail card; "Terinspirasi" is written 
   is a `DeathGuard` PERK guard.
 - **Disciples (5, 6).** Disciples may kill elites (`DiscipleHooks.addOnKill`); drops land at the elite. Disciples near
   a tribulation count for protector targeting only, never for strike reduction (the `HuFa` rule). New pills fed to a
-  disciple are refused and kept (Phase 7b adds disciple effects). `DiscipleCultivation.masterMeditationGain` calls the
+  disciple are refused and kept (a later phase adds disciple effects). `DiscipleCultivation.masterMeditationGain` calls the
   new `Meditation.gainPerSecond` instead of its own copy of the formula.
 - **Sect (6, 6b).** `SectSpawnMixin` already blocks natural monsters on sect cells, so no elite rolls there. Layer 4
   of `GrandFormation` damages monsters, elites included. A qi seat built by `sect/build/blueprint/QiSeat` is a normal
@@ -1366,7 +1366,7 @@ Kehancuran aim or countdown, or within 10 s of being hurt. It never uses or crea
 
 Disciples: `Disciples.isPill` accepts every `PillItem` and `DiscipleCultivation.applyAlchemy` has no case for the new
 kinds, so P7-harta registers a `DiscipleHooks.addFeedHandler` that refuses the four new pills for disciples and keeps
-them ("Pil ini belum bisa dicerna murid"). Disciple effects are Phase 7b.
+them ("Pil ini belum bisa dicerna murid"). Disciple effects are a later phase.
 
 **Alternative recipes** (same outputs, so every herb has a use):
 - Ninecurl Spirit Ginseng + Golden Carrot + Glistering Melon → 3 Healing.
@@ -1397,7 +1397,7 @@ telegraph with no canon claim.
   ignored, the would-kill check uses the final damage), so DESIGN 0 rule 3 holds. With the config off every strike is
   a full hit, as today.
 - **Twin strikes (targets IA and TI):** every 4th strike has twin rings, the second 3 blocks away in a random
-  direction; standing in either takes the full hit. Optional (Phase 7b): IA/TI rings in seven colours (ISSTH ch. 969,
+  direction; standing in either takes the full hit. Optional (a later phase): IA/TI rings in seven colours (ISSTH ch. 969,
   the seven-coloured Immortal Tribulation Lightning).
 - `MAX_DISTANCE` (6 blocks) is unchanged; a 2-block sidestep is enough.
 
@@ -1623,7 +1623,7 @@ consuming 2 Stored Qi per XP. "Qi Tertimbun mengalir kembali…".
 **Bintang Abadi for the player.**
 
 **Sumber / Source.** BTTH: Dou grades in 1–9 stars (DESIGN 20.3.19); *Terinspirasi dari* the Ancient God stars of RI
-ch. ~1157–1159. The player's stars have no Three Trials yet (player star calamities are Phase 7b; disciples keep
+ch. ~1157–1159. The player's stars have no Three Trials yet (player star calamities are a later phase; disciples keep
 theirs).
 
 - At True Immortal Peak with a full bar every XP goes to Qi Abadi (Stored Qi). Star n costs `Stars.cost(n)` =
@@ -2013,7 +2013,7 @@ uses}`. **Entities:** attachment `kultivator:elite {tier, element, realm, affix}
    pass.
 4. **P7-docs:** PANDUAN sections for every item, `docs/uji/FASE-7.md` from 19.11, README.
 
-If a module runs long, these parts may slip to **Phase 7b** without breaking contracts:
+If a module runs long, these parts may slip to **a later phase** without breaking contracts:
 
 | Module | May slip |
 |---|---|
@@ -2200,7 +2200,7 @@ If a module runs long, these parts may slip to **Phase 7b** without breaking con
 | fabric world-render blueprints with a particle fallback | vanilla `Gizmos` | replace | as `SiteHologram` |
 | `CloudStep.maxJumps(CultivationData)`, 1–3 pips | public `maxJumps(Realm)`, up to 6 pips | fix | 6c changed the jumps |
 | Elite protectors in every wave helper | `spawnWave` only | fix | `spawnWaveFor` serves disciples and trials |
-| Module names P6-*, "slip to Phase 6b" | P7-*, Phase 7b | rename | the real phase 6b exists |
+| Module names P6-*, "slip to Phase 6b" | P7-*, a later phase | rename | the real phase 6b exists |
 
 ### 19.13 Deferred and rejected (replaces the old 19.5)
 
@@ -2208,7 +2208,7 @@ If a module runs long, these parts may slip to **Phase 7b** without breaking con
   disciple expeditions (`sect/event/Expeditions`); Alam Rahasia as an expedition type and `VoidRealm`; Heaven Ranking in
   part (`Tournament`, `HundredDynasties`, `Rivals`); Fabao for disciples (`NatalTreasure`); the Nine Heavens tribulation
   for disciples (`Calamity`); jade-slip technique teaching (6c `JadeSlips`); a codex for techniques (Kitab Teknik).
-* **Phase 7b:** player star calamities (the RI Three Trials, reusing the 20.3.19 rules); disciple effects of the new
+* **a later phase:** player star calamities (the RI Three Trials, reusing the 20.3.19 rules); disciple effects of the new
   pills and cores; the slip list of 19.10.
 * **Deferred to Phase 8 or later, each needing its own source check:** Metode Kultivasi (gongfa manuals, effort L);
   Fabao for the player; Kultivator Sesat ambushes (the NPC parts now exist in `Rivals` and phantoms); heavenly treasure
@@ -7834,3 +7834,4654 @@ These rows apply the lore verification and the balance critique. The id on the r
 | deflecting projectiles (`void_mirror`, `mysterious_jade_hand`, `qilin_sacred_palace`, `ninth_hex`, `wraith_butterflies`) | PROJECTILE_GUARD discard (+ a simulated return strike) |
 | "client ice sheet" (`tongtian_river_freeze`) | BlockDisplays or particles, never `ClientLevel.setBlock` |
 | every server-spawned Display | client-only phantoms |
+
+## 23. Phase 7b — Momen Epik (sinematik & VFX)
+
+> **User request (2026-10-18), translated:** "For the tense parts like the tribulation or other epic parts, make the scenes
+> much more spectacular: very big visual effects and cinematic video too, or anything that makes it cooler; VFX too."
+>
+> **The source rule of 19 still binds.** Every story beat below has a **Sumber / Source** line. Tags:
+> **[D]** = verified (in DESIGN, or by the 7b lore pass with the chapter given); ***Terinspirasi dari*** = only the general
+> concept is claimed; **Presentasi** = a presentation choice (camera, colour, music, shape, seal glyph, kill-cam) that
+> claims no canon. Cards, tooltips and help never present a Presentasi choice as canon.
+>
+> **7b changes no gameplay number.** Damage, timings, rings, chances, rewards and every server rule stay as 3, 19, 20,
+> 21 and 22 define them. 7b only adds presentation on top of events that already happen.
+
+Phase 7b is built **together with phase 7** (19): one spine pass, then the four P7 modules and the two 7b modules in
+parallel. The old "Phase 7b" list of 19.13 (player star calamities, disciple effects of the new pills, the 19.10 slip
+list) is renamed **Phase 7c** (23.21).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.0 What 7b is
+
+**"Cinematic video" means real-time in-game cinematics.** There are no video files, no decoder and no download size.
+Each epic moment is a short, data-driven scene keyed to server events that already exist. A scene can have:
+- short camera shots, only on the client of the player the moment belongs to (the **protagonist**);
+- letterbox bars and a calligraphy title card in the jade-scroll style of 5b;
+- a slow-motion **feel** (only 7b's own renderers, particles and the shot clock slow down; nothing else);
+- a sky grade (darkened, tinted sky, fog, clouds, stars and a dimmed world);
+- giant client-only geometry: a tribulation cloud vortex whose rim reads kilometres wide, lightning drawn as geometry
+  like the vanilla bolt renderer (never a `LightningBolt`), light pillars to the build limit, gates, rings and figures;
+- HUD screen effects (flash, vignette, ink edge, chromatic fringe, grey wash, sky dim);
+- layered vanilla sounds and a non-diegetic music cue.
+
+**Mode Rekam / Record mode** (setting, 23.2) is the literal "video" answer: during the safe beats of your own moments it
+hides the vanilla HUD (bars and cards stay), so a clip recorded with OBS looks like a cutscene.
+
+**The user's real install decides the main path.** Checked in `%APPDATA%\.minecraft\versions\SODIUM\`: Iris 1.11.7 with
+the Complementary Reimagined pack **on**, Sodium 0.9.3, ImmediatelyFast, dynamic-fps, BadOptimizations 2.4.1, EMF/ETF,
+Lithium, FerriteCore. `kultivator-client.json` has `effect_quality: maximal` and `quality_auto: false`, render distance
+12, cloud range 64. So the **shader-pack profile is the main path, not a fallback**, and "Otomatis" does not protect
+this user: the 7b frame guard (23.14) is on by default and independent of Otomatis.
+
+### 23.1 Principles (binding)
+
+#### 23.1.1 Hard rules
+
+1. **Blocks.** No scene places, breaks, burns or changes a block. Debris, shards and glyphs are client-only Display
+   entities or particles. Real destruction stays `kehancuran/WorldBreaker` behind Mode Kehancuran (0, 20.3.21, 22.11).
+2. **No `LightningBolt`, no `Explosion`, no weather or time change** (server or client: no client rain or thunder
+   override either, it reads as weather). `ClientLevel.setSkyFlashTime` is a client-only sky flash and is allowed.
+3. **The tick rate is never touched**: not `/tick`, not the client `TickRateManager`, not `DeltaTracker`. Slow motion is
+   7b presentation only (23.11).
+4. **No entity is added to the level for a scene**: no fake camera entity, no `RemotePlayer`, no `setCameraEntity`.
+   The player's real position, rotation and inputs are never changed.
+5. **No custom post shader and no server `/posteffect`.** A post chain that fails to compile triggers
+   `Minecraft.triggerResourcePackRecovery`, which clears the user's resource packs or disconnects (23.21). Every screen
+   effect of 7b is a HUD effect.
+
+#### 23.1.2 Camera safety
+
+- The camera is directed **only on the protagonist's client**. Every key keeps working: movement keys move the player
+  **and** end the shot. Only mouse look is paused while a shot owns the view, and a big mouse motion ends the shot.
+- Shots are short, eased, skippable, and never start or continue in real danger (23.7.4). **Singkat** (default) uses
+  only safe beats. **Penuh** (opt-in) adds danger micro-shots of ≤ 1.5 s, still under the hard gates. **Mati** has none.
+- "Kurangi gerak" forces camera Mati and removes roll, slow-motion ramps, the chromatic fringe and rainbow drift.
+
+#### 23.1.3 Multiplayer
+
+- Other players see the world VFX (vortex, bolts, pillars, gates, figures, sky colour with distance falloff) at their
+  "Efek pemain lain" scale. They never get camera shots, letterbox, music cues or cards for someone else's scene; the
+  one exception is the Kehancuran safety BANNER of D5 (b).
+- Every beat comes from one server cue carrying a seed, so every viewer builds the same bolts, gates and debris.
+- Bystanders more than 48 blocks away get only sky, fog, cloud and star **colour**: never `SKY_LIGHT_FACTOR`, never a
+  cloud-height change.
+
+#### 23.1.4 Performance (the laptop also runs Valorant)
+
+- **Big is geometry, but overdraw is the real cost.** A sky-sized translucent layer costs a full screen of fill, and
+  under Complementary every translucent fragment runs the pack's lighting. So 7b budgets **large layers** as well as
+  quads (23.14), and the frame guard measures real frame time, not CPU emit time.
+- Seeded meshes are built once per beat and turned with the `PoseStack`; no per-frame allocation; one
+  `submitCustomGeometry` per render type per frame; at most one `level.clip` per frame for the camera.
+- Idle cost is zero: every 7b mixin early-returns on one boolean while no scene is alive; server hooks are event calls.
+- Server: one cue per beat, no per-tick traffic, ≤ 4 world sound cues per beat (22.15.1).
+
+#### 23.1.5 Compatibility
+
+- Only vanilla render types and the vanilla beacon beam; no custom `RenderPipeline`, no core or post shader.
+- Iris: the profile is chosen by reflection on `net.irisshaders.iris.api.v0.IrisApi` (23.14.3). Sodium needs nothing.
+- Sound categories the player cares about in combat (HOSTILE, PLAYERS) are never ducked.
+
+#### 23.1.6 Comfort and photosensitivity
+
+- At most **one full-screen luminance event per 500 ms** (ScreenFlash, `setSkyFlashTime`, HUD flashes; the re-flickers
+  of one giant bolt count as one event). No invert frame.
+- All flashes obey vanilla "Hide Lightning Flashes" (`hideLightningFlash`), "Kilatan layar" and `screenEffectScale`.
+- Camera speed caps (23.7.3), FOV changes ≤ ±12% × `fovEffectScale`, roll ≤ 8° × `damageTiltStrength`.
+
+#### 23.1.7 Sounds (amends 0 rule 4)
+
+World sounds stay server-side (`level.playSound(null, …)`, ≤ 4 cues per beat). **Client-only presentation sounds** are
+allowed for 7b, like the 19.3.10 HUD heartbeat: music cues and UI stings for the protagonist, camera whooshes and
+slow-motion layers, and per-element notes (pillar notes, bell rows) that every client in range derives from the same
+cue at the same position.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.2 Settings, keys and server config
+
+**Client settings** (`config/kultivator-client.json` through the existing `EffectQuality.get/put`; `EffectQuality.java`
+itself is not edited). Rows live in a "Momen Epik" group of the Settings page: a generic block in `SettingsPage` that
+loops over `EpicSettings.rows()` (spine 7b, 23.17.2), with the client command `/sinematik` as a fallback (23.15.3).
+
+| Key | Label (id_id) | Values (default in bold) | Effect |
+|---|---|---|---|
+| `epic_camera` | Kamera sinematik | Penuh / **Singkat** / Mati | 23.7.4 |
+| `epic_letterbox` | Bilah layar lebar | **Nyala** / Mati | bars only while a shot runs or a FULL card shows in a safe beat |
+| `epic_cards` | Kartu judul | **Nyala** / Mati | Mati: no cards; vanilla titles and chat lines show as today |
+| `epic_music` | Musik sinematik | **Nyala** / Mati | music cues of 23.12.2 |
+| `epic_slowmo` | Gerak lambat | **Nyala** / Mati | 23.11.2 |
+| `epic_geometry` | Geometri raksasa | **Nyala** / Mati | Mati: every geometry layer uses its particle fallback |
+| `epic_sky` | Langit berubah | **Nyala** / Mati | sky grades and the HUD sky dim |
+| `epic_vfx` | Skala VFX momen | 0.5 / **1.0** / 1.5 | multiplies sizes and counts, always inside the budget |
+| `epic_record` | Mode rekam | Nyala / **Mati** | hides the vanilla HUD during the safe beats of your own moments |
+| `epic_pack_geometry` | (no row; `/sinematik paket`) | **Nyala** / Mati | Mati: soft geometry layers use particle fallbacks while a shader pack is on (23.14.3) |
+
+**Existing settings keep their meaning:** "Guncangan layar", "Kilatan layar", "Efek pemain lain", "Tampilan raksasa",
+"Kurangi gerak" (see 23.1.2), and the vanilla `screenEffectScale`, `damageTiltStrength`, `fovEffectScale`,
+`hideLightningFlash` and the music and master sliders.
+
+**Key `key.kultivator.skip_scene` "Lewati sinematik"**, default **Backspace** (free in vanilla, Iris and Butter Bot),
+registered with `KeyMappingHelper` in P7b-sinema's own class (`Keys.java` stays untouched), in the mod's key category.
+- Press: ends the current shot (10-tick ease back), clears the card queue, releases the music cue.
+- Double press within 1 s: also turns the letterbox off for the rest of that scene.
+- The bottom bar shows the hint "[Backspace] Lewati" (the bound key's real name).
+
+**Server config** (`KultivatorConfig`, spine, clamped on load):
+
+| Field | Default (range) | Effect |
+|---|---|---|
+| `epicMoments` | true | false: no cues are sent; today's FX stay |
+| `epicCameraShots` | true | false: the CAMERA_OK flag is never set, so no client directs its camera |
+| `epicRange` | 192 (96–512) | send range for sky-scale scenes (23.4.4) |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.3 Architecture
+
+```
+SERVER (P7b-langit)                                         CLIENT (P7b-sinema)
+Tribulation.Listener ──────┐                                Payloads.EpicMoment ──► EpicClient.onPayload ─► EpicDirector
+Breakthrough.Listener (7b) ┤                                SpecFx.play (TechFx) ──► EpicDirector.onTechFx   (ultimates, own Kehancuran)
+DiscipleHooks listener ────┤ EpicHooks ─► EpicMoments ──►   VisualState edges ────► EpicDirector             (Dharma, Domain, Enlightenment, Deviation)
+BuildListener ─────────────┤ (timers,     .send()           EpicDirector ─► Scene (storyboard of SceneCatalog, keyed by moment + subject)
+DeathGuard saved (7b) ─────┤  flags,                          ├─ camera/CinematicDirector + Shots   [protagonist only]
+AFTER_DEATH (own) ─────────┤  seeds,                          ├─ screen/EpicScreen + TitleCard + HudHider
+one-liners: Ascension,     │  rate,                           ├─ sky/SkyDirector (probe overrides, HUD sky dim)    [everyone, by distance]
+HeartDemons, Calamity,     │  firsts)                         ├─ render/EpicRenderer (vortex, bolts, pillars, rays, rings, gate, aurora, trails, figures)
+Surpass, Candidates, Halls,┘                                  ├─ fx/EpicParticles, fx/EpicDisplays (particle cues, debris, shards, glyphs)
+SectEvents, Kehancuran, …                                     ├─ EpicClock (slow-motion feel, hit-stop; 7b only)
+server sounds (≤ 4 cues per beat)                             └─ sound/EpicSound + sound/MusicCue (local layers, ducking, music)
+```
+
+- **Server packages:** `dev.kultivator.epic` (`EpicIds` and `EpicColors` common, `EpicMoments`, `EpicHooks`,
+  `EpicCommands`, `EpicScale`, `EpicTests`).
+- **Client packages:** `dev.kultivator.client.epic` and its sub-packages `camera`, `screen`, `sky`, `render`, `fx`, `sound`.
+- The **existing FX packets stay** (`TRIBULATION_*`, `ASCENSION`, `TechFx`, the trial and disciple FX). A cue only adds
+  the 7b layers. A client with an older build, a server with `epicMoments = false`, or a viewer out of range simply
+  shows today's FX.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.4 Network
+
+#### 23.4.1 `Payloads.EpicMoment` (spine)
+
+```java
+// network/Payloads.java, registered in Net.init with PayloadTypeRegistry.clientboundPlay()
+public record EpicMoment(int moment, int beat, int subject, int viewer, double x, double y, double z,
+                         long at, int seed, int a, int b, float f, int s, int flags) implements CustomPacketPayload
+// codec: varint moment, byte beat, varint subject+1, varint viewer+1, 3×double, varlong at, int seed,
+//        varint a, varint b, float f, byte s, varint flags   (about 47 bytes)
+```
+
+- `subject`: the entity the scene centres on (player, disciple, demon, boss; −1 for a place). **The client always
+  positions from `x/y/z`**, because the subject may not be tracked on a far client.
+- `viewer`: the only player who may get camera shots, letterbox, FULL cards and the music cue (the cultivator; for
+  disciple scenes the master). Everyone else gets VFX only.
+- `at`: the server game time at which the beat **lands**. PRE and HUSH beats are sent ahead. The client schedules by
+  `at − level.getGameTime()`, clamped to −20…+80 ticks.
+- `seed`: `mix(subject UUID, at)`; every client builds the same shapes.
+- `s`: scene scale 0–10 (23.10.1).
+
+#### 23.4.2 Flags (`epic/EpicIds`, common)
+
+| Bit | Name | Meaning |
+|---|---|---|
+| 1 | CAMERA_OK | `epicCameraShots` is on and the cue is the viewer's own |
+| 2 | TEST | sent by `uji momen` or a test tribulation: plays fully, announces nothing |
+| 4 | LOW_LOAD | average tick above `kehancuranMsptPause`: clients halve geometry; no PRE beats are sent |
+| 8 | IN_COMBAT | the viewer was hurt by a mob within the last 100 ticks (`getLastHurtByMobTimestamp`) |
+| 16 | PROTECTORS | `DaoProtectors.count(player) > 0` |
+| 32 | LETHAL_NEXT | `sessionExtra.trib.pct × maxHealth ≥ health + absorption` (19.3.8, read-only) |
+| 64 | FINAL | the last strike or the last beat of a scene |
+| 128 | HARDCORE | the failure drops a realm |
+| 256 | SAFE | no `Mob` targets the viewer within 16 blocks; no damage from a non-scene source in 40 ticks; fall distance ≤ 2; not burning; not in fluid; air ≥ 60%; not riding, gliding, sleeping or spectating; no other player within 12 blocks unless a sect mate (`Sects.sectOf`) or a registered Hu Fa guardian who has not hurt the viewer in 200 ticks |
+| 512 | RESULT_SAFE | no `Enemy` within 24 blocks, not burning, not falling, not in fluid (lets a failure result shot run at low health) |
+| 1024 | FIRST | the first time this player (or this master's disciples) reaches this milestone (`extra.momen.firsts`) |
+| 2048 | SKY_SCALE | the scene has sky-scale layers (sent with `epicRange`) |
+| 4096 | SUPPRESS_TITLE | the server also shows a vanilla title for this beat; a client that draws the card hides it (23.8.3) |
+
+#### 23.4.3 Moment and beat ids (`epic/EpicIds`)
+
+| id | Moment | Sent by | Beats | a / b / f |
+|---|---|---|---|---|
+| 1 | TRIBULATION | `EpicHooks` (Tribulation listener + timer) | 0 OMEN, 1 PRE, 2 STRIKE, 3 HUSH, 4 END_OK, 5 END_FAIL, 6 ABORT | OMEN: a = variant \| realm<<4 \| layer<<8, b = total. PRE/STRIKE/HUSH: a = index, b = total. END: a = strikes done |
+| 2 | BREAKTHROUGH | `Breakthrough.Listener` (spine 7b) | 0 BEGIN, 1 SUCCESS, 2 FAIL | a = realm \| quality<<4 \| kind<<8 \| layer<<12; FAIL f = 1 when Hardcore dropped a realm |
+| 3 | ASCENSION | one-liners in `Ascension` | 0 DARKEN, 1 PILLAR, 2 HEAVENS, 3 VOICE, 4 FINALE, 5 STOP | a = event tick, f = real 1/0 |
+| 4 | HEART_DEMON | one-liners in `HeartDemons` | 0 WARNING, 1 APPEAR, 2 WON, 3 LOST | subject = demon from APPEAR on; a = trial kind |
+| 5 | DISCIPLE_BT | `DiscipleHooks.addBreakthroughListener` + one-liner in `HuFa` | 0 START, 1 STRIKE, 2 END_OK, 3 END_FAIL, 4 CANCEL, 5 TAKE_LIGHTNING, 6 REVEAL | a = realm \| quality<<4 \| kind<<8; b = Foundation type or reveal kind |
+| 6 | CALAMITY | one-liners in `Calamity` | 0 OMEN, 1 PRE, 2 STRIKE, 3 PASS, 4 FAIL, 5 ABORT, 6 TRAMPLING, 7 LAMP | a = k, b = index \| total<<8 |
+| 7 | SURPASS | one-liner in `Surpass.trigger` | 0 TRIGGER | a = by duel 1/0 |
+| 8 | RECRUIT | one-liners in `Candidates` | 0 ARRIVAL, 1 TEST, 2 ACCEPT | ARRIVAL a = count, b = war day; TEST a = Duan \| colour<<4 \| special<<8 |
+| 9 | TOURNAMENT | one-liners in `SectEvents` / `Tournament` / `HundredDynasties` | 0 INTRO, 1 WINNER | a = kind (0 internal, 1 elite, 2 Hundred Dynasties); b = the other finalist |
+| 10 | SECT | `BuildListener` + one-liner in `Halls.checkLevel` | 0 TIER, 1 TEMPLATE, 2 HALL_LEVEL | a = tier or hall level, b = template |
+| 11 | KEHANCURAN | one-liners in `kehancuran/*` | 0 WARNING, 1 IMPACT, 2 ABORT, 3 RESTORE, 4 CRATER | a = art ordinal, b = seconds or blocks, f = radius |
+| 12 | BOSS | `EpicHooks` own `AFTER_DEATH` listener | 0 KILL | a = boss kind, b = flame seed kind |
+| 13 | CHEAT_DEATH | `DeathGuard` saved listener (spine 7b) + disciple one-liners | 0 SAVED | a = stage or disciple save kind |
+| 14 | EXTRA | one-liners (23.5.3) | 0 ROOT_TEST, 1 BEAST_TIER3, 2 HEIR, 3 RING_BOND, 4 MASTER_DESCENDS, 5 FLAME_ABSORBED, 6 VOID_BORDER | per beat |
+| 20 | TECH_ULTIMATE | client, from `SpecFx.play` | CAST, TRAVEL/IMPACT, END (the TechFx phases) | – |
+| 21 | DHARMA | client, `VisualState.DHARMA` rising edge | 0 RISE | – |
+| 22 | DOMAIN | client, `VisualState.DOMAIN` rising edge | 0 UNFOLD | – |
+| 23 | ENLIGHTEN | client, `VisualState.ENLIGHTENED` rising edge (self) | 0 START | – |
+| 24 | DEVIATION | client, `VisualState.DEVIATION` rising edge | 0 BURST | – |
+| 25 | KEHANCURAN_SELF | client, `TechFx` with `FLAG_KEHANCURAN` | 0 IMPACT | – |
+
+Ids 20–25 need no packet in play; `uji momen` sends them as cues with TEST so they can be previewed.
+
+#### 23.4.4 Range and rate
+
+- The viewer always gets the cue. Disciple scenes go to the master within 32 blocks (calamities 64).
+- Other players in the same dimension get it within 96 blocks, or `epicRange` (192) for SKY_SCALE scenes: tribulations
+  with S ≥ 4, Pengakuan Langit, Istana Langit, calamities, Kehancuran warnings. Sent through `Net.send` to
+  `PlayerLookup.around(...)`, so vanilla clients are skipped.
+- At most 3 cues per subject per 20 ticks; PRE beats are dropped first. Under LOW_LOAD no PRE beats are sent.
+- A 9-strike tribulation is about 22 cues in 45 s. No keepalives (the longest gap, Pengakuan Langit, is 12 s; the client
+  watchdog is 120 s).
+- Late viewers who enter range mid-scene see today's FX only.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.5 Server: spine additions and hooks
+
+#### 23.5.1 Spine 7b (orchestrator, merged with the 19.2 spine)
+
+`Tribulation` is **not** edited for 7b (P7-tempur owns it after the spine). The 19.2 `Tribulation.Listener`
+(`onOmen`, `onStrike`, `onEnd`, `onFinish`) is enough; PRE and HUSH beats are scheduled by `EpicHooks` (23.5.2).
+
+1. `network/Payloads.EpicMoment` and its registration in `Net.init`; `epic/EpicIds` (moments, beats, flags,
+   `PRE_LEAD = 30` matching the 19.3.8 telegraph, `HUSH_LEAD = 60`); `epic/EpicColors` (common constants, written in
+   full by the spine: the seven Kenaikan Abadi strike colours, the nine finale colours, variant bolt colours,
+   `immortalStrike(int index)`), so P7-tempur may use them without waiting for a 7b module.
+2. **`cultivation/Breakthrough`** (spine-only file, 19.7):
+   ```java
+   public static final int KIND_AWAKENING = 0, KIND_CHANCE = 1, KIND_TRIBULATION = 2, KIND_FORCED = 3; // enum Kind stays private
+   public interface Listener {
+     default void onBegin(ServerPlayer p, Rank from, Rank target, int kind, boolean test) {}
+     default void onSuccess(ServerPlayer p, Rank before, Rank now, BreakthroughQuality q, int kind, boolean test) {}
+     default void onFail(ServerPlayer p, boolean hardcoreDrop, boolean test) {}
+   }
+   public static void addListener(Listener listener);
+   ```
+   Calls in `begin(...)` (all three branches), in `succeed(...)` right after `Fx.send(BREAKTHROUGH_SUCCESS)`, and in
+   `fail(...)`; each in try/catch with a warning, like the Tribulation listeners.
+3. **`util/DeathGuard`** (no P7 module owns it): `interface SavedListener { void onSaved(ServerPlayer p, Stage stage); }`,
+   `addSavedListener(SavedListener)`, fired right after any guard returned true.
+4. `KultivatorConfig`: `epicMoments`, `epicCameraShots`, `epicRange` (23.2).
+5. Entry calls: `Kultivator.onInitialize` → `epic.EpicHooks.init()`; `CultivateCommand` →
+   `epic.EpicCommands.addCommands(root, debug)`; `TestCommands` → `epic.EpicCommands.addTestCommands(uji)`;
+   `KultivatorClient` → `client.epic.EpicClient.init()` and the receiver `Payloads.EpicMoment.TYPE → EpicClient.onPayload`.
+6. `kultivator.client.mixins.json`: `CameraCinematicMixin`, `GameRendererCinematicMixin`, `MouseCinematicMixin`,
+   `EnvironmentProbeMixin`, `HudTitleMixin` (stub classes whose bodies only call the stubs of item 7).
+7. Stubs with the final signatures of 23.17.3, so both 7b modules compile alone.
+8. `lang-src/spine7b.*`: the three config comments.
+9. Two client lines in P7-jalan's files, written by the spine **before P7-jalan starts or after it returned, never while
+   it runs** (both must survive every later edit, 23.17.5): `SettingsPage.build()` gets a "Momen Epik" block that loops
+   over `client.epic.EpicSettings.rows()` with the widgets the page already uses (`JadeCoin` for on/off rows, the
+   three-state cycle of "Guncangan layar" for Penuh / Singkat / Mati and for the VFX scale); `HelpPage.TOPICS` gains
+   `"momen"` after `"hu_fa_tribulasi"`.
+
+No `network/Actions` id is needed: the server needs nothing from the client (title suppression is client-side, 23.8.3).
+
+#### 23.5.2 Zero-edit listeners (`EpicHooks.init()`)
+
+| Listener | Beats it sends |
+|---|---|
+| `Tribulation.addListener` | `onOmen` → OMEN now, and PRE for strike 1 at `start + OMEN_TICKS − PRE_LEAD` (the first strike lands at `OMEN_TICKS`). `onStrike(index, total)` → STRIKE now; if `index < total` → PRE at `now + STRIKE_INTERVAL − PRE_LEAD`; if `index == total − 1` → HUSH at `now + STRIKE_INTERVAL − HUSH_LEAD`. `onFinish(result == null)` → ABORT and clear timers. `onEnd(success)` → END_OK or END_FAIL (HARDCORE from the `Breakthrough.onFail` of the same tick). Variant = dimension (Overworld 0, Nether 1, End 2); layer from the target `Rank` |
+| `Breakthrough.addListener` | BEGIN, SUCCESS (realm, quality, kind, layer), FAIL |
+| `DiscipleHooks.addBreakthroughListener` | START, STRIKE, END_OK / END_FAIL, CANCEL; at END_OK it reads the disciple's data read-only (Foundation type, special candidate kind, physique, Heretic Gates) and adds REVEAL when a special reveal is due (E4 d) |
+| `BuildListener.add` (`onTierDone(owner, template, tier)`) | TIER; TEMPLATE when `tier == SectTemplates.TIERS` (template 9 = Istana Langit). Positions from `EngineApi.get().site(owner)` and `anchor(owner, "main_hall")`, exactly as `Ceremonies.playTier` does |
+| `ServerLivingEntityEvents.AFTER_DEATH` (own) | BOSS KILL for Warden, Wither, Ender Dragon, Elder Guardian, the inheritance final guardian (22.8.5) and Raja Siluman (`EliteMonsters.tier(entity) == 3`, read-only); the killer from `KillCredit.resolve` (19.2) |
+| `DeathGuard.addSavedListener` | CHEAT_DEATH for stages TECHNIQUE and PERK; TOTEM (vanilla), DUEL and TRIBULATION are ignored (the tribulation clamp is the failure scene, A5) |
+
+The timer map (player → pending beats) is checked from one `END_SERVER_TICK` listener that returns at once while the
+map is empty. If P7-tempur ever changes the strike rhythm, PRE timing is the only thing that drifts (contract 23.17.4).
+
+#### 23.5.3 One-line hooks (files no P7 module owns)
+
+Each line only calls `EpicHooks` with entities and primitives; it never changes behaviour. A site that cannot be found
+ships without its 7b layer and goes into the module report as a TODO.
+
+| File | Where (current names, verified unless marked) | Call |
+|---|---|---|
+| `ascension/Ascension` | `start(ServerPlayer, boolean)` when it returns true → DARKEN; `tickEvent(...)` at `PILLAR_AT` (100), `HEAVENS_AT` (240), `VOICE_AT` (360); `finish(...)` → FINALE; `cancel(ServerPlayer, String)` → STOP | `EpicHooks.ascension(player, beat, tick, real)` |
+| `trial/HeartDemons` | `tickWarning(...)` after the WARNING Fx; both APPEAR Fx sites (first spawn and respawn); `won(...)`; `lost(...)` | `EpicHooks.heartDemon(player, demon, beat, kind)` |
+| `disciple/path/Calamity` | `start(DiscipleEntity, ServerPlayer, boolean, boolean)` → OMEN; `tickRun(Run, ServerLevel)` at `OMEN_TICKS − 30` and `nextStrikeAt − 30` → PRE; `strike(Run, ServerLevel)`; `pass(Run, ServerLevel)` (+ TRAMPLING after the seventh, LAMP when `run.lamp`); `fail(...)`; `cancel(...)` → ABORT | `EpicHooks.calamity(entity, master, beat, k, index, total)` |
+| `disciple/path/Surpass` | `trigger(DiscipleEntity, ServerPlayer, boolean byDuel)` | `EpicHooks.surpass(entity, master, byDuel)` |
+| `disciple/path/HuFa` | the Tahan Petir site where the master takes the disciple's strike (verify) | `EpicHooks.takeLightning(entity, master)` |
+| `disciple/path/Heir` | `complete(ServerPlayer, DiscipleEntity)` | `EpicHooks.extra(HEIR, …)` |
+| `disciple/path/MasterRing`, `disciple/path/Bond`, `disciple/power/UndyingCodex`, `disciple/power/SoulFlight` | the existing FX sites of ring bond, Jiwa Guru Turun, Perlindungan Jiwa, Balas Budi, Darah Abadi, Pelarian Jiwa (verify each) | `EpicHooks.extra(…)` / `EpicHooks.discipleSave(entity, master, kind)` |
+| `sect/hall/Halls` | `checkLevel(UUID, CompoundTag)` after the `HallFxIds.LEVEL_UP` Fx | `EpicHooks.hallLevel(owner, level)` |
+| `sect/hall/Candidates` | sunrise arrival (after the existing bell), entrance-test result, acceptance (verify names) | `EpicHooks.recruit(owner, beat, …)` |
+| `sect/event/SectEvents`, `Tournament`, `HundredDynasties` | the bracket pause before the final; the final result (verify names) | `EpicHooks.tournament(…)` |
+| `sect/event/VoidRealm` | first clear of floor 50 or 60 (verify) | `EpicHooks.extra(VOID_BORDER, …)` |
+| `kehancuran/Kehancuran` | `confirm(ServerPlayer)` after the countdown starts → WARNING; `cast(MinecraftServer, ServerPlayer, Order)` after the IMPACT Fx → IMPACT; `cancel(MinecraftServer, Order, String)` → ABORT; the restore completion → RESTORE; the completion of a player's own carving job → CRATER with the removed-block count (verify where the 22.11 job finishes; primitives only, `Order` is private) | `EpicHooks.kehancuran(owner, entity, centre, art, radius, beat, blocks)` |
+| `cultivation/SpiritRoots` | where the root-test result Fx is sent (verify) | `EpicHooks.extra(ROOT_TEST, …)` |
+| `beast/SpiritBeasts` | the tier-3 evolution (verify) | `EpicHooks.extra(BEAST_TIER3, …)` |
+| `disciple/power/HeavenlyFlames` | success of the 20 s absorption ritual (verify) | `EpicHooks.extra(FLAME_ABSORBED, …)` |
+
+#### 23.5.4 Server state, flags and sounds
+
+- **Saved:** `extra.momen {firsts: long (bit per milestone), kills: int (bit per boss kind)}` (P7b-langit). It sets the
+  FIRST flag; nothing else reads it. Never the `path` key (19.9).
+- **Flags** are computed in `EpicMoments.flags(viewer)` when a cue is sent: one `Mob` AABB query of 16 blocks for SAFE
+  and one `Enemy` query of 24 blocks for RESULT_SAFE, only on cue. LOW_LOAD from `server.getAverageTickTimeNanos()`
+  against `kehancuranMsptPause` (the 6c `TechniqueRunner.lowLoad()` is package-private).
+- **World sounds** for each beat are listed in the storyboards (23.13), at most 4 cues per beat including the sounds the
+  existing code already plays.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.6 Client: `EpicDirector` and scenes
+
+- **Scenes.** Each (moment, beat) starts or extends a scene built from `SceneCatalog` (storyboard data in code: cues of
+  `cue(startTick, duration, Track, params)`). Tracks: CAMERA, LETTERBOX, CARD, HUD, SKY, VORTEX, BOLT, PILLAR, RAYS,
+  RING, GATE, AURORA, TRAIL, SEAM, FIGURE, PARTICLES, DISPLAYS, FLASH, SHAKE, EDGE, SLOWMO, SOUND, MUSIC. Running scenes
+  are keyed by (moment, subject or position), so a STRIKE attaches to the live vortex of its tribulation.
+- **Merging.** A BREAKTHROUGH SUCCESS within 4 ticks of a TRIBULATION END_OK (either order) joins it: A4 plus the realm
+  layer. A DEVIATION edge within 40 ticks after END_FAIL or a heart-demon LOST is chained (no second card).
+- **Watchdog.** A scene fades out after 120 s without a beat, on ABORT or STOP, a level change, disconnect, or the
+  protagonist's death. Everything (sky, sound gains, music, camera) is restored at once.
+- **Priority** for the camera, the sky grade and the music (the higher wins; the lower is dropped, never queued):
+  cheat-death (never a camera) > tribulation and heart demon > breakthrough results > Pengakuan Langit > calamity >
+  Kehancuran > Dewa ultimates > sect and disciple scenes > Abadi ultimates > boss kill-cams > Dharma, Domain,
+  Enlightenment > extras. Lower scenes keep their VFX inside the budget.
+- **Camera cooldowns.** ≥ 20 s of normal play between two camera scenes; the same kind ≥ 30 s apart (tribulation beats
+  exempt); ultimate cameras at most once per 60 s; Dharma once per 5 min. TEST cues ignore cooldowns.
+- **Others' scenes.** "Efek pemain lain": Penuh ×1; Ringan ×0.25 (one bolt, no displays, no figures, sky ×0.5); Mati
+  nothing. Only the **nearest** other player's giant scene draws geometry, at ≤ 25% of the budget; the rest use
+  particle fallbacks.
+- **Client-derived moments.**
+  - `SpecFx.play` gets one line, `EpicDirector.onTechFx(payload)`. It starts TECH_ULTIMATE when
+    `spec.pamungkas() && spec.grade().ordinal() >= TechniqueGrade.ABADI.ordinal()` or `spec.dewa()`; CAST is the
+    pre-roll, TRAVEL/IMPACT the climax, END the release. `FLAG_KEHANCURAN` starts KEHANCURAN_SELF. A cheat-death spec
+    within 2 ticks of a CHEAT_DEATH cue picks the F2 look. The scene uses the technique's own `.source` line and adds no
+    canon claim.
+  - A client tick reads the visual state (`ClientCultivation`) of players within 64 blocks every 5 ticks and starts
+    DHARMA, DOMAIN, DEVIATION on rising edges, and ENLIGHTEN for the local player.
+  - First casts: a client list `epic_seen` (spec ids) in `kultivator-client.json` decides the FULL card.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.7 Camera direction
+
+#### 23.7.1 Mixins (targets verified in the 26.3 mcsrc)
+
+```java
+@Mixin(Camera.class)
+abstract class CameraCinematicMixin {
+  @Shadow private boolean detached;
+  @Shadow protected abstract void setPosition(Vec3 position);
+  @Shadow protected abstract void setRotation(float yRot, float xRot);
+
+  @Inject(method = "update(Lnet/minecraft/client/DeltaTracker;)V",
+          at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;alignWithEntity(F)V", shift = At.Shift.AFTER))
+  private void kultivator$direct(DeltaTracker dt, CallbackInfo ci) {
+    CinematicDirector.Pose p = CinematicDirector.pose((Camera) (Object) this, dt);   // null = no shot (one boolean check)
+    if (p != null) { setRotation(p.yaw(), p.pitch()); setPosition(p.pos()); detached = true; }
+  }
+
+  @Inject(method = "calculateFov(F)F", at = @At("RETURN"), cancellable = true)
+  private void kultivator$fov(float partialTicks, CallbackInfoReturnable<Float> cir) {
+    float s = CinematicDirector.fovScale(); if (s != 1.0F) cir.setReturnValue(cir.getReturnValueF() * s);
+  }
+}
+
+@Mixin(GameRenderer.class)
+abstract class GameRendererCinematicMixin {
+  // Dutch roll, next to (not inside) the 6c GameRendererShakeMixin
+  @Inject(method = "bobHurt(Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V", at = @At("HEAD"))
+  private void kultivator$roll(CameraRenderState state, PoseStack pose, CallbackInfo ci) { /* rotate Z by CinematicDirector.roll() */ }
+  // hide the vanilla hand while a shot runs
+  @Inject(method = "renderItemInHand(Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lnet/minecraft/client/renderer/state/level/PlayerRenderState;Lcom/mojang/renderpearl/api/textures/GpuTextureView;)V",
+          at = @At("HEAD"), cancellable = true)
+  private void kultivator$hand(CameraRenderState c, PlayerRenderState p, GpuTextureView d, CallbackInfo ci) { if (CinematicDirector.hideHand()) ci.cancel(); }
+}
+
+@Mixin(MouseHandler.class)
+abstract class MouseCinematicMixin {
+  @Shadow private double accumulatedDX; @Shadow private double accumulatedDY;
+  @Inject(method = "turnPlayer(D)V", at = @At("HEAD"), cancellable = true)   // pause mouse look; big motion = skip
+  private void kultivator$look(double mousea, CallbackInfo ci) { if (CinematicDirector.consumeMouse(accumulatedDX, accumulatedDY)) ci.cancel(); }
+}
+
+@Mixin(EnvironmentAttributeProbe.class)   // 23.9
+abstract class EnvironmentProbeMixin {
+  @Inject(method = "getValue(Lnet/minecraft/world/attribute/EnvironmentAttribute;F)Ljava/lang/Object;", at = @At("RETURN"), cancellable = true)
+  private void kultivator$sky(EnvironmentAttribute<?> attribute, float partialTicks, CallbackInfoReturnable<Object> cir) { SkyDirector.override(attribute, cir); }
+}
+
+@Mixin(Hud.class)                          // net.minecraft.client.gui.Hud; 23.8.3
+abstract class HudTitleMixin {
+  @Inject(method = { "setTitle(Lnet/minecraft/network/chat/Component;)V", "setSubtitle(Lnet/minecraft/network/chat/Component;)V" },
+          at = @At("HEAD"), cancellable = true)
+  private void kultivator$title(Component text, CallbackInfo ci) { if (TitleCard.suppressVanillaTitle()) ci.cancel(); }
+}
+```
+
+**Facts behind them (26.3):**
+- `Camera.update` calls `alignWithEntity`, then `calculateFov`, then `prepareCullFrustum(..., this.position)`, so the
+  frustum (and Sodium's culling) is built from the directed camera. `detached` is reset every frame inside
+  `alignWithEntity` (`detached = !cameraType.isFirstPerson()`), so nothing lingers after a shot.
+- `LevelExtractor` draws the camera entity only when `camera.isDetached()`, so the player's own body shows in a shot.
+- The crosshair, the vanilla hand and the fire and water overlays read the **options'** first-person state, not
+  `detached`. So: the crosshair is hidden by `HudHider` (23.8.2), the vanilla hand by the `renderItemInHand` cancel, the
+  Iris hand by `detached` itself (Iris `HandRenderer.canRender` checks `isDetached`), and the targeted block outline by
+  returning false from Fabric `LevelRenderEvents.BEFORE_BLOCK_OUTLINE` during shots. Fire and fluid overlays never show
+  because no shot runs in fire or fluid (23.7.4).
+- Mouse skip motion is measured in degrees with vanilla's formula (`s = sensitivity × 0.6 + 0.2`,
+  degrees = counts × s³ × 8 × 0.15); a shot ends above 8°. The 6c `MouseHandlerMixin` stays untouched.
+- Installed mods: Iris `MixinCamera` only wraps `new Frustum`; Sodium `CameraMixin` only touches
+  `createProjectionMatrixForCulling`; BadOptimizations wraps `tickFov`. None touches `update`, `alignWithEntity` or
+  `calculateFov`.
+
+#### 23.7.2 Shot library (`camera/Shots`)
+
+Positions are relative to the **subject's interpolated feet**; yaw 0 is the subject's body yaw when the shot starts;
+pitch uses Minecraft's `xRot` (**negative = looking up**). "Look" means the camera points at the subject's eye unless
+the shot says otherwise.
+
+| Code | Path | Defaults | Max |
+|---|---|---|---|
+| `CRANE_UP` | rises from (back r0, up h0) to (back r1, up h1); pitch p0 → p1 | 2.5/1.9 → 9/16, +5° → −55°, 4 s | 5 s; ≤ 24 b up |
+| `CRANE_DOWN` | the reverse | – | 4 s |
+| `ORBIT` | circle of radius r at height h, sweeping Δ | r 6, h 1.6, 60° in 3 s | 6 s |
+| `PUSH` | straight push r0 → r1 toward the face | 6 → 3.5, h 1.4, 2.5 s | 4 s |
+| `PULLBACK` | reveal r0 → r1, h0 → h1 | 3.5 → 18, 0.4 → 10, 3 s | 5 s |
+| `SKYPAN` | camera 0.4 b behind the head, pitch p0 → p1 (either way), optional yaw sweep ≤ 30° | 0° → −60°, 2.5 s | 3.5 s |
+| `LOWHERO` | in front at r ≥ max(4, glow r + 1.5), height 0.3–0.5, looking up 20–30°, optional push ≤ 1.5 b | r 4 | 3 s |
+| `OTS` | over the subject's shoulder (1.6 b back, 0.6 b right, +0.3) toward a target point | – | 2.5 s |
+| `TWO_SHOT` | on the perpendicular to A–B at d from the midpoint, slight low angle, slow push | d 6 → 4.5, h 1.2, 3 s | 4 s |
+| `STATIC` | a locked framing with an optional push ≤ 1 b | – | 5 s |
+| `FLYOVER` | Catmull-Rom spline over ≤ 6 points, path ≤ 60 b inside loaded chunks | – | 8 s, ceremonies only |
+| `KILLCAM` | ORBIT around a world point (the dead boss), only within 24 b of the player | r 8, 60° in 3 s | 4 s |
+| modifier `DUTCH(roll)` | roll ≤ 8° × `damageTiltStrength`, ≤ 5°/s, never together with an ORBIT | – | – |
+| `SNAP(±%, t)` | **not a shot**: an FOV punch on the normal first-person camera (`calculateFov` RETURN), ±12% × `fovEffectScale`, ≤ 12 ticks; every camera mode, never with Kurangi gerak | – | – |
+
+#### 23.7.3 Rules shared by every shot
+
+- **Easing:** sine in-out (peak speed 1.57 × average). Enter with an 8-tick blend from the eye, exit with a 10-tick
+  blend; a danger abort snaps back instantly. Yaw and pitch use shortest-arc lerp. No hard cuts (Sodium visibility
+  rebuilds flash on jumps); never more than 8 b per tick.
+- **Speed caps (motion sickness):** average translation ≤ 7.6 b/s and rotation ≤ 25°/s, so peaks stay ≤ 12 b/s and
+  ≤ 40°/s. `Shots.validate` stretches the duration, and if that breaks the shot's maximum it shortens the path. Every
+  shot in 23.13 already satisfies `distance ≤ 7.6 × T` and `angle ≤ 25 × T`.
+- **Framing limits:** pitch clamped to ±85°; FOV ±12% × `fovEffectScale`; `CameraShake` × 0.3 while a shot runs.
+- **Distance:** ≤ 32 b from the protagonist (ceremonies 48 b); cranes ≤ 24 b up (Sodium pop-in); ≥ glow radius + 1.5 b
+  from every pillar axis; ≥ 24 b below the (possibly lowered) cloud layer.
+- **Collision:** one `level.clip(new ClipContext(eye, target, ClipContext.Block.VISUAL, ClipContext.Fluid.ANY, player))`
+  per frame from the subject's eye. The camera stops 0.3 b before a hit; if that is closer than 1.2 b to the eye it
+  tries the mirrored side; otherwise the shot is skipped. Never inside a block or a fluid, never below the world.
+- **Chaining:** beats of the same scene may chain (final strike → result) without returning to the eye.
+- **Sound:** the listener follows the camera, which reads as cinematic.
+
+#### 23.7.4 Camera modes, hard gates and skipping
+
+| | Penuh (opt-in) | Singkat (default) | Mati |
+|---|---|---|---|
+| Shots | safe beats and danger micro-shots | safe beats only (SAFE flag) | none |
+| Per shot | ≤ 6 s (FLYOVER 8 s) | ≤ 5 s (FLYOVER 8 s) | – |
+| Per scene | ≤ 20 s; strike impact cuts are not counted but limited to 1 per 3 strikes | ≤ 12 s | – |
+| Danger micro-shots (≤ 1.5 s) | strike impact cut (starts 2 ticks after the damage), ultimate charge OTS, Dharma LOWHERO, Tahan Petir OTS | never | – |
+| Hostiles | allowed unless an `Enemy` or a `Mob` targeting the protagonist is within 4 b | SAFE (server, 16 b) and a client re-check every 10 ticks (16 b) | – |
+| Health floor | 30% | 45% | – |
+| Letterbox and cards | yes | yes | cards only |
+| SNAP, sky, slow motion, music | yes | yes | yes |
+
+**Hard gates (every mode).** A shot does not start, or aborts at once with an instant snap, when:
+- LETHAL_NEXT is set, or health is under the floor (except the result exemption below);
+- the protagonist takes damage the scene did not cause (a hurt within ±2 ticks of the shown strike is the scene's);
+- the 30-tick telegraph window of a strike is open (from the PRE beat to the STRIKE), so the ring can always be dodged;
+- fall distance > 2, in fluid, lava or fire, air < 60%, riding, gliding, on a flying sword, sleeping, spectating;
+- a screen opens, the player dies, the dimension changes or the connection drops;
+- "Kurangi gerak" is on, CAMERA_OK is missing, or (for a safe beat) SAFE is missing.
+
+**Result exemption.** After a tribulation, trial or heart-demon failure, with RESULT_SAFE, one STATIC shot of ≤ 2 s may
+run under the health floor (no roll).
+
+**Skips (10-tick ease back):** the skip key; any movement, jump, sneak, attack, use, drop, swap-hand, inventory, chat,
+F5 or Esc key; a hotbar scroll; mouse motion above 8°.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.8 Letterbox, HUD and title cards
+
+#### 23.8.1 HUD elements (registered from `ClientLifecycleEvents.CLIENT_STARTED`)
+
+- **`kultivator:epic_screen`**, attached right after `VanillaHudElements.MISC_OVERLAYS`. It draws, in order: the sky dim
+  and tint (23.9.4), the grey wash, the ink edge and vignette, the chromatic fringe, and the letterbox bars. Because it
+  comes early, the boss bars, health, armour, the Qi HUD, the tribulation HUD of 19.3.10 and its would-fail warning all
+  draw **above** the bars. 7b's own overlays are this one element (DESIGN 22.15.2 asks for few full-screen layers).
+- **`kultivator:epic_card`**, attached before `VanillaHudElements.CHAT`: title cards, so chat stays readable above them.
+- **Bars:** 11% of the screen height each, eased in and out over 8 ticks, ink-black with a 1-px gold inner line. The
+  bottom bar carries the skip hint. F1 hides both elements.
+
+#### 23.8.2 `HudHider` (no alpha fades: `GuiGraphicsExtractor` has no global alpha)
+
+`HudElementRegistry.replaceElement` wraps `HOTBAR`, `EXPERIENCE_LEVEL`, `INFO_BAR`, `HELD_ITEM_TOOLTIP` and `CROSSHAIR`;
+the wrapper skips drawing while the bars are more than 50% in. Health, armour, food, air, boss bars, effects and the
+mod's HUDs always stay. **Mode Rekam** additionally hides health, armour, food, air, effects, scoreboard and chat, but
+only during the **safe** beats of the player's own scenes, never during danger beats. (All `VanillaHudElements`
+names used here were checked in fabric-rendering-v1 27.0.14; the mod's own HUDs attach before `CHAT`, so they draw
+above the bars.)
+
+#### 23.8.3 Title cards (`screen/TitleCard`, jade-scroll style of 5b)
+
+| Kind | Where | Time | Use |
+|---|---|---|---|
+| **FULL** | lower third (62% of the height), between the bars | 3–4 s | realm results, ceremonies, first-time moments |
+| **STAMP** | top-right seal tile with a name | 1.5 s | technique moments, cheat-death, minor results |
+| **BANNER** | thin line under the boss bar | 1.5 s | "Petir Terakhir", omen notes |
+
+- **Main line:** vanilla font up to ×3 through `Brush.fitScale` and `Brush.text` (read-only use of `screen/ui`),
+  clamped to 90% of the width, +1 px letter spacing, 2-px ink shadow. Brush-sweep reveal left to right over 10 ticks
+  (`enableScissor` on an ink-band texture) with ink bleed on the last 3 characters; a tapered underline sweeps in over
+  8 ticks; the subtitle (×1.25, gold-grey) follows 6 ticks later. Exit: an ink dissolve bottom-up over 10 ticks.
+  Kurangi gerak: a plain fade.
+- **Seal:** a red square with one CJK glyph (unifont) in paper colour; **Presentasi** (decoration, not a claim).
+- **Queue:** one FULL card at a time, ≥ 1 s gaps, at most 3 waiting; STAMPs drop when the queue is full. Cards come only
+  for the protagonist's own scenes.
+- **Sound:** the seal stamp plays `BELL_BLOCK` p 0.5 + `AMETHYST_BLOCK_RESONATE` p 0.7 (client).
+- **Text:** keys `kultivator.momen.<card>.title` / `.sub` in `lang-src/momen.id_id.json` and `.en_us.json`. Below, each
+  card is written "Indonesian / English".
+- **No double titles.** For beats with SUPPRESS_TITLE (the server also sends a vanilla title, for example the tribulation
+  omen, the Pengakuan Langit voice, the sect tier title, the `ImmortalPerks` boon title that comes up to 20 ticks later),
+  a client that draws the card calls `Hud.clearTitles()` when the card starts and `HudTitleMixin` cancels `setTitle` and
+  `setSubtitle` for 60 ticks. With "Kartu judul" off nothing is suppressed.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.9 Sky grades (`sky/SkyDirector`)
+
+#### 23.9.1 One probe mixin with a whitelist
+
+26.3 has no `DimensionSpecialEffects`; the camera's `EnvironmentAttributeProbe` (its only instance) feeds the sky, fog,
+clouds, lightmap and music. `EnvironmentProbeMixin` (23.7.1) returns early while no grade is active; values are
+recomputed once per frame into cached vectors (no allocation per call).
+
+| Attribute | Override (blend weight w) | Who |
+|---|---|---|
+| `SKY_COLOR`, `FOG_COLOR` | lerp to the grade colour × (1 − 0.5 D) | everyone in range, × falloff |
+| `CLOUD_COLOR` | lerp RGB to the grade cloud colour; alpha kept | everyone in range |
+| `CLOUD_HEIGHT` | ease to `max(subject.y + 38, camera.y + 24)` during an omen, restored upward when the clouds part; only when clouds are visible (cloud alpha > 0, Overworld) | protagonist and viewers within 48 b |
+| `SUNRISE_SUNSET_COLOR` | alpha × (1 − D × w) | everyone in range |
+| `STAR_BRIGHTNESS` | max(vanilla, grade stars × w) | everyone in range |
+| `SKY_LIGHT_FACTOR` | × max(0.5, grade factor): never below half of vanilla, so mobs stay visible | protagonist and viewers within 48 b |
+| `SKY_LIGHT_COLOR`, `AMBIENT_LIGHT_COLOR` | 30% / 20% toward the tint, **always together with `SKY_LIGHT_FACTOR`** (BadOptimizations skips lightmap updates unless the sky light colour or factor changes) | same |
+| `MUSIC_VOLUME` | duck and release ramps (23.12.2) | protagonist |
+| `BACKGROUND_MUSIC` | `new BackgroundMusic(new Music(cue, 0, 0, true))` while a cue plays | protagonist |
+
+**Never overridden:** `FOG_START_DISTANCE`, `FOG_END_DISTANCE`, `SKY_FOG_END_DISTANCE` (shorter fog would hide the 7b
+geometry itself and the mobs), `SKY_LIGHT_LEVEL` (feeds `Level.skyDarken`), day time, rain and thunder levels, and every
+gameplay attribute. No server code reads this probe.
+
+#### 23.9.2 Grades
+
+| Grade | Sky / fog / cloud | Stars | Light factor | Used by |
+|---|---|---|---|---|
+| `SK_TRIB` | #1B1A24 / #2A2833 / #2B2933 | 0.15 | max(0.5, 1 − 0.6 D w) | Overworld tribulations |
+| `SK_NETHER` | fog #3A0E05 (no sky) | – | – | Nether tribulation |
+| `SK_VOID` | fog #1A0B26 (the End sky texture ignores `SKY_COLOR`; the vortex carries the colour) | – | – | End tribulation |
+| `SK_GOLD` | #F6D27A / #FFE3A0 / #FFF2C0 | 0 | vanilla (never above) | successes, Pengakuan Langit, Istana Langit, victories |
+| `SK_WHITE` | #FFFFFF with ±10° hue drift (static under Kurangi gerak) / #FFF8E8 | 0 | vanilla | Kualitas Surgawi |
+| `SK_RED` | #6A0D0D / #3A0505 / #4A0A0A | 0.2 | 0.6 | Kehancuran, Murka Raja Neraka |
+| `SK_ASH` | #4A4A4A / #2A2A2A (red variant #4A2A2A) | 0 | 0.7 | deviation, heart demon |
+| `SK_STARS` | #0E1430 / #141A33 | 1.0 | 0.55 | calamities, Pengakuan Langit opening, black hole, void mirror |
+| `SK_JADE` | tint #8FE3C8 at w ≤ .3 / cloud #E8FFF6 | – | vanilla | sect ceremonies, Foundation |
+| `SK_DAWN` | sunrise colour × 1.4, warm fog | – | vanilla | recruitment day |
+| `SK_DAO(c)` | tint toward the Dao colour at w ≤ .35 | – | vanilla | Dao Domain, Dao Union |
+| `SK_ICE` | tint #BFE8FF at w ≤ .4 | – | vanilla | ice ultimates |
+
+#### 23.9.3 Rules
+
+- One grade at a time; the higher scene priority wins; blends take 1 s (≥ 2 s under Kurangi gerak).
+- `w = intensity × falloff`, falloff 1 within 48 b of the scene centre and 0 at `epicRange`; × `othersScale()` for
+  another player's scene.
+- "Langit berubah" gates it all. Cleared on disconnect and level change; with no grade active the mixin returns the
+  vanilla value at once, so nothing lingers.
+- Strike flashes call vanilla `ClientLevel.setSkyFlashTime(2)` (3 for the final strike). Vanilla `getSkyFlashTime`
+  already honours "Hide Lightning Flashes"; the call counts as a luminance event (23.1.6).
+
+#### 23.9.4 Shader-pack profile (the user's main path)
+
+Iris has its own sky and cloud mixins and Complementary most likely draws its own sky and clouds, so the attribute
+overrides may be partly or wholly ignored [verify in game]. They stay on (some packs read fog colour), but the **HUD sky
+layer is the primary channel**: a vertical gradient in the grade's sky colour from `0.55 × D × w` alpha at the top to 0
+at 60% height, plus a full-screen tint of α ≤ 0.18 for tinted grades (SK_TRIB, SK_RED, SK_GOLD, SK_STARS, SK_ASH),
+drawn under the letterbox. At Minimal the HUD layer is also used without a pack (cheap). In the vanilla profile at
+Normal+ only the top gradient (≤ 0.35) is added, for SK_TRIB, SK_STARS and SK_RED at D ≥ 0.5.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.10 Giant renderers (`render/EpicRenderer`, in `LevelRenderEvents.COLLECT_SUBMITS`)
+
+#### 23.10.1 Scene scale S
+
+| S | Rank (target or current of the scene's subject) | Vortex radius R_v (b) | Cloud base H above the subject (b) | Eye r (b) | Bolt core w (b) | Pillar glow r_p (b) | Sky darkness D | Final-strike shake | Seal (Presentasi) |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | Manusia Fana, Pemurnian Qi | – | – | – | – | 0.6 | 0 | – | 气 |
+| 1 | Pembangunan Fondasi | – | – | – | – | 0.8 | 0.10 | – | 基 |
+| 2 | Inti Emas | 64 | 40 | 6 | 0.25 | 1.0 | 0.35 | 0.6 | 丹 |
+| 3 | Jiwa Baru Lahir | 112 | 48 | 8 | 0.30 | 1.2 | 0.45 | 0.7 | 婴 |
+| 4 | Transformasi Dewa | 176 | 56 | 10 | 0.35 | 1.5 | 0.55 | 0.8 | 神 |
+| 5 | Penyatuan Dao | 256 | 64 | 12 | 0.40 | 1.8 | 0.60 | 0.9 | 道 |
+| 6 | Kenaikan Abadi L1–3 | 384 | 72 | 14 | 0.50 | 2.0 | 0.65 | 1.0 | 仙 |
+| 7 | Kenaikan Abadi L4–6 | 512 | 84 | 16 | 0.60 | 2.4 | 0.70 | 1.0 | 仙 |
+| 8 | Kenaikan Abadi L7–9 | 704 | 96 | 18 | 0.70 | 2.8 | 0.75 | 1.0 | 仙 |
+| 9 | Dewa Abadi | 1,024 (2 km rim) | 112 | 24 | 0.90 | 3.5 | 0.80 | 1.0 | 天 |
+| 10 | ★9+ (disciples now, the player later) | 1,024 | 112 | 24 | 1.00 | 4.0 | 0.80 | 1.0 | 星 |
+
+- `EpicScale.of(Rank)` (server) puts S into the cue. Disciple scenes use the S of the disciple's target at 0.35 × radius
+  and 0.6 × height. The final-strike shake is multiplied by the shake setting.
+- The **true-position** part of the vortex is limited by fog, not by `depthFar` (23.10.3); the rim beyond it is
+  sky-projected. Outer rings fade to alpha 0, so the disc never shows a hard edge.
+
+#### 23.10.2 Render types and order (`render/EpicRenderTypes`)
+
+| Look | Vanilla profile | Shader-pack profile |
+|---|---|---|
+| thin glow: bolts, arcs, lead threads, seams ≤ 0.3 b | `RenderTypes.lightning()` (POSITION_COLOR, additive, **writes depth**, so only thin strips) | `lightning()` too (Iris maps the LIGHTNING pipeline to a pack program; the bolt colour is [verify]); switch `BOLT_EMISSIVE_UNDER_PACK` → `entityTranslucentEmissive(glow_strip)` |
+| soft layers: vortex, rays, rings, gate, aurora, trails, wide seams, domes | `RenderTypes.entityTranslucentEmissive(tex)` (alpha blend, no depth write, no culling; proven in `DaoCircleLayer`) | same (mapped by Iris) |
+| giant figures | `RenderTypes.entityTranslucentCull(skin)` at full-bright light (no inner faces) | same |
+| pillars | `BeaconRenderer.submitBeaconBeam(...)` with `textures/entity/beacon/beacon_beam.png` | same (Iris BEACON_BEAM program) |
+
+- **Dark clouds need alpha blending.** Additive `lightning()` can only brighten, so no dark layer ever uses it.
+- `entityTranslucentEmissive` tests `ALPHA_CUTOUT 0.1` on the **texture** alpha before the vertex colour: textures
+  keep alpha ≥ 0.1 and soft fades go into vertex alpha. It has `PER_FACE_LIGHTING`: horizontal discs get up normals,
+  sky-projected quads face the camera.
+- **Order:** soft layers first, then pillars, then bolts last, with `submitNodeCollector.order(n)` (as in
+  `DharmaGlowLayer`). One `submitCustomGeometry` per render type per frame.
+- All positions are camera-relative (`world − levelState().cameraRenderState.pos`, `levelState().worldPartialTicks`).
+  The event does not fire in Iris's shadow pass; `IrisApi.isRenderingShadowPass()` is still checked (cheap).
+
+#### 23.10.3 Fog and sky projection
+
+- The lightning and entity shaders fade colour **and alpha** by cylindrical fog distance (`max(|xz|, |y|)`) against
+  `FogRenderDistanceStart/End`, which follow the render distance in blocks. So anything past about 192 b vanishes at this
+  user's render distance of 12.
+- **True-position geometry** goes out to 0.85 × fog start (about 160 b here).
+- **Sky-projected parts** (the vortex outer rim, the Dewa Abadi gate and its plaque, sky glyph halos): each vertex P is
+  drawn at `cam + d × (R_draw / |d|)` with `d = P − cam` and `R_draw = clamp(0.7 × fog start, 24, 96)`. The angular shape
+  is exact and nearer terrain still occludes it (depth test). Projected parts show only above 20° elevation and fade to
+  alpha 0 between 20° and 15°, so they never paint over distant hills.
+- "Kilometres wide" is carried by the projected rim, the sky grade, the HUD gradient and, in the vanilla profile, the
+  lowered and darkened vanilla cloud layer.
+
+#### 23.10.4 Renderer catalogue
+
+| Code | What | Size and detail | Cost / fallback |
+|---|---|---|---|
+| `G_VORTEX` (`VortexRenderer`) | tribulation cloud whirlpool: concentric ring mesh with a logarithmic-spiral offset (`cloud_swirl.png`), 2 shells (inner true-position, outer rim sky-projected), vertex colours per variant, darker eye rim, inner eye glow disc, thin horizontal micro-arcs (lightning type) | R_v, H and eye r from S; ω 2°/s at the omen → 8°/s before the final strike (×3 in the hush); rings × segments per shell: Normal 10×40, Maximal 16×48 | ≤ 1,536 quads; each shell is a large layer. Minimal: none (the existing `TribulationFx` disc, the sky grade and the HUD gradient) |
+| `G_BOLT` (`BoltRenderer`) | port of the `LightningBoltRenderer` quad math, seeded: trunk of 8–12 segments, 4 nested widths w…4w at alpha .3, side branches | core w(S); length ≤ 128 b from the cloud base or eye to the feet (sky end projected beyond fog); life 8–10 ticks with 2 re-seeds (one luminance event); branches Max 2 + S/2, Normal 1, Min 0 | big bolts ≤ 6 / 3 / 1; thin convergence bolts (core ½ w, 2 layers, no branches) count ½. Fallback `CommonFx.bolt` particles |
+| `G_PILLAR` (`PillarRenderer`) | light pillar to the sky (beacon beam, any colour); can descend | glow r_p(S) up to `2048 − y`; **solid radius ≤ 0.05** (23.10.5) | big pillars (glow > 0.5 b or height > 40 b) ≤ 3 / 2 / 1; small pillars count about 16 quads each |
+| `G_RAYS` (`RaysRenderer`) | god rays from a cloud hole or a point: tapered translucent quads at 15–30°, slowly turning, alpha .12–.25 (`ray_fan.png`) | 6 (Normal) / 12 (Maximal) rays | one large layer. Fallback END_ROD rain (≤ 15% of a layer's tokens) |
+| `G_RING` (`RingRenderer`) | flat annulus r0 → r1 with alpha fade (`ring_soft.png`, or the existing `dao_circle.png` / `dao_circle_inner.png` for rune circles); optional dust crown of BLOCK particles of the ground block | ≤ 64 b (Istana Langit 96) | r > 16 b is a large layer. Fallback `CommonFx.ring` |
+| `G_GATE` (`GateRenderer`) | paifang outline (two pillars, three beams, curved roof) of glowing gold line quads 0.4–1.5 b thick, two door planes swinging 0 → 80° with light behind | Door of Immortality 24×36 b; Heavenly Gate 48×72 (omen hint, α .2) and 64×96 (Dewa Abadi); plaque "天門" only on the Dewa Abadi gate (`submitText` [verify]; fallback a TextDisplay glyph) | ≤ 600 quads near, about 60 beyond 32 b (LOD); one large layer. Fallback gold DUST outline |
+| `G_AURORA` (`AuroraRenderer`) | 3 rainbow ribbons spiralling up a pillar | r 2 + r_p, 40 b × (1 + 0.1 S) | one large layer; Normal+. Fallback rainbow DUST helix |
+| `G_TRAIL` (`TrailRenderer`) | ribbon along a Bézier arc: soul flight, rescue streak, Hu Fa thread, meridian lines, sect axis | 0.05–0.8 b wide | quads only |
+| `G_SEAM` (`TrailRenderer`) | jagged bright strip: sky tear, mirror crack, cracks | 2–176 b | thin = lightning type, wide = emissive. Fallback the existing SKY_TEAR template |
+| `F_FIGURE` (`GiantFigureRenderer`) | baked `ModelLayers.PLAYER` parts (`Minecraft.getEntityModels().bakeLayer`), posed, `submitModelPart` with `entityTranslucentCull` at full-bright | scale 1–30, α .25–.4; skins: the caster's or disciple's own skin tinted, generated `thunder_avatar.png` (white-violet, glowing eyes) and `immortal_avatar.png` (gold-jade) | 0 / 1 / 2 alive; one large layer each. Drawn from `COLLECT_SUBMITS`, so never culled by a small hitbox and never in Iris's shadow pass. Minimal: particle outline |
+| `F_AVATAR` | the existing AVATAR (`AvatarFx`, clamp 1–4 unchanged) | ≤ 4× | outline particles at Minimal |
+| `F_SILHOUETTE` | the existing SKY_SILHOUETTE point clouds (thunder deities, cranes = BIRD, APE) | – | 0 / 6 / 12 (Minimal: one outline) |
+| `F_GLYPH` | the existing TextDisplay GLYPH | ≤ 40 b | display caps |
+| `F_SOUL`, `F_ORB` | new point clouds: a seated infant 0.6 b tall; a sphere r 0.35 b with 3 tilted orbit rings | – | particle tokens (DETAIL) |
+| `F_DEBRIS`, `F_SHARD` | ≤ 6 client BLOCK_DISPLAYs of the ground's own block state (0.6–1.2 b, arcs of 8–20 b, fading on landing); ≤ 8 tinted-glass displays | – | debris Maximal only; displays inside the 22.15.2 alive caps, `setViewRange` and width/height set (22.4.3) so culling mods keep them |
+
+#### 23.10.5 Pillars (`BeaconRenderer.submitBeaconBeam`, public static)
+
+- Its solid core is drawn with `beaconBeam(tex, false)`: opaque and depth-writing. So `solidBeamRadius ≤ 0.05` and the
+  visible size goes into `beamGlowRadius`; otherwise the pillar would hide the player standing in it.
+- Subtract the built-in `translate(0.5, 0, 0.5)`. `beamStart` and `height` are ints: a smooth descent translates the
+  `PoseStack` by the fractional y. Height up to `MAX_RENDER_Y` (2048) − y.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.11 Screen effects and slow motion
+
+#### 23.11.1 Screen effects (all HUD; no post chain)
+
+| Effect | Implementation | Limits |
+|---|---|---|
+| `FLASH` | existing `ScreenFlash.add(rgb, alpha, ticks)` | α ≤ .35; one luminance event per 500 ms; × `screenEffectScale`; "Kilatan layar"; "Hide Lightning Flashes" |
+| `VIGNETTE` | own radial `vignette.png` blitted by `epic_screen`, colour per moment (fallback `ScreenFlash.vignette`) | α ≤ .35 |
+| `INK_EDGE` | mottled ink-splatter edge (`ink_edge.png`): red (deviation), black (heart demon), gold (cheat-death), pale blue (ice), white-blue (freeze) | ≤ 4 s |
+| `CHROMA` | chromatic fringe: two translucent offset edge bands (red left, cyan right), 4–8 ticks | Normal+, ≥ 3 s apart, never under Kurangi gerak |
+| `GREY` | grey wash α ≤ .2 (stands in for desaturation) | ≤ 2 s |
+| `SKY_DIM` | 23.9.4 | – |
+| `SHAKE` | existing `CameraShake.add(intensity, ticks, at, radius)` (strongest wins) | × 0.3 while a shot runs |
+| `SNAP` | FOV punch (23.7.2) | ±12% × `fovEffectScale` |
+| `HAZE` | rising WHITE_ASH and faint embers (no FOV wobble) | Normal+, ≤ 6 s |
+| sky flash | `ClientLevel.setSkyFlashTime(2–3)` | a luminance event |
+
+#### 23.11.2 Slow motion: `EpicClock` (presentation only)
+
+- `σ` is eased by requests `(σ, in, hold, out, priority)`; `t += σ` per client tick, interpolated with `partial × σ`.
+- **Only 7b reads it:** bolt flicker, vortex spin, pillar descent, ring growth, figure fades, shot progress, and 7b's own
+  particle cues (spawned with velocity × σ and their normal lifetime, so `FxBudget` cost is unchanged). Title cards run
+  in real time.
+- **Never touched:** vanilla particles (`ParticleEngine`), entities, `DeltaTracker`, the client `TickRateManager`, the
+  server tick rate, damage.
+- **Gerak lambat windows:** σ ≈ 0.35, ≤ 1.5 s real time, ≥ 6 s apart, never on a beat the player must react to.
+- **Hit-stop:** σ = 0 for 3 ticks (final strike, Dewa ultimate impacts, the demon's shatter), the bolt held at peak
+  brightness, then a 20-tick ramp back.
+- **Sound side:** while σ < 1, the world categories AMBIENT, WEATHER, NEUTRAL and BLOCKS are ducked to 0.35 × the
+  player's own slider through `SoundManager.updateCategoryVolume` (in-memory), with a looping `BEACON_AMBIENT` p 0.5
+  "time stretch" layer. HOSTILE, PLAYERS, MUSIC (owned by `MusicManager`), MASTER, VOICE, RECORDS and UI are never
+  ducked. Gains go back to the player's slider value exactly at the strike tick (`at − 1`), and also on a 2 s timeout,
+  skip, screen open, death, dimension change and disconnect.
+- **Kurangi gerak** or "Gerak lambat" off: σ stays 1, no hit-stop.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.12 Sound and music
+
+#### 23.12.1 Layers
+
+- **Server world sounds** (≤ 4 per beat, everyone near hears them), chosen from four layers. Sub: `WARDEN_SONIC_BOOM`,
+  `GENERIC_EXPLODE` (sound only), `MACE_SMASH_GROUND_HEAVY`. Low: `WARDEN_HEARTBEAT`, `BEACON_DEACTIVATE` p 0.5,
+  `TRIAL_SPAWNER_OMINOUS_ACTIVATE`. Mid: `TRIDENT_THUNDER`, `BELL_BLOCK`, `GOAT_HORN_SOUND_VARIANTS`,
+  `RESPAWN_ANCHOR_CHARGE`, `WARDEN_SONIC_CHARGE`, `ENDER_DRAGON_GROWL`. High: `BELL_RESONATE`,
+  `AMETHYST_BLOCK_RESONATE` / `_CHIME`, `BEACON_POWER_SELECT`, `CONDUIT_ACTIVATE`, `GLASS_BREAK`. All names verified in
+  the 26.3 `SoundEvents`.
+- **Client-local layers** (`sound/EpicSound`, `EpicRampSound extends AbstractTickableSoundInstance` with per-tick volume
+  and pitch curves): camera whoosh `ELYTRA_FLYING` (0 → .35 → 0, pitch .6 → 1.2 over a move), time stretch, card seal,
+  hit-stop sub-bass `WARDEN_SONIC_BOOM` .35 p .5 (protagonist), success sting `UI_TOAST_CHALLENGE_COMPLETE` through
+  `SimpleSoundInstance.forUI` (protagonist), per-pillar `NOTE_BLOCK_BASS` notes and bell rows (positioned, every client
+  in range).
+
+#### 23.12.2 Music cues (`sound/MusicCue`, protagonist only, setting "Musik sinematik")
+
+- **Start:** `SkyDirector` returns `new BackgroundMusic(new Music(cue, 0, 0, true))` for `BACKGROUND_MUSIC`;
+  `MusicManager.tick` replaces the current track only for `replaceCurrentMusic` music, so the cue starts at once. Right
+  after it starts, `toastManager().hideNowPlayingToast()`.
+- **Duck:** `MUSIC_VOLUME` 0.25 during omens before the cue. `fadePlaying` raises gain by at most 0.005 per tick, so a
+  recovery takes ≥ 7.5 s; duck releases start early.
+- **Release:** `MUSIC_VOLUME` ramps 1 → 0.05 over 40 ticks, then `getMusicManager().stopPlaying(cue)`. Needed because
+  game music has `replaceCurrentMusic = false` and would otherwise let a cue run for minutes. Vanilla music resumes by
+  itself; the music slider applies automatically.
+- The moods are Presentasi; each cue is a row of a constant table, auditioned and swappable.
+
+| Cue | Vanilla event | Length | Used for |
+|---|---|---|---|
+| `M_OMEN` | `MUSIC_DISC_13` | 12 s | tribulation omens below Kenaikan Abadi |
+| `M_STORM` | `MUSIC_DRAGON` | 12 s | omens of Kenaikan Abadi and Dewa Abadi tribulations; calamity k ≥ 5 |
+| `M_NETHER` | `MUSIC_BIOME_SOUL_SAND_VALLEY` | 12 s | Nether tribulation omen |
+| `M_END` | `MUSIC_END` | 12 s | End tribulation omen |
+| `M_HEART` | `MUSIC_DISC_11` | 10 s | heart demon appears |
+| `M_DREAD` | `MUSIC_DISC_5` | ≤ 30 s | Kehancuran countdown, calamity omen k < 5 |
+| `M_TRIUMPH` | `MUSIC_DISC_RELIC` | 14 s | successes Golden Core to Dao Union, disciple milestones, surpassing, first boss kills |
+| `M_GLORY` | `MUSIC_DISC_CREATOR` | 16–20 s | Surgawi, Kenaikan Abadi L9, sect template complete, Istana Langit, elite champion, Penginjak Langit |
+| `M_GENTLE` | `MUSIC_DISC_CREATOR_MUSIC_BOX` | 12 s | awakening, recruitment day, sect tiers, enlightenment |
+| `M_ASCEND` | `MUSIC_CREDITS` | 35 s | Pengakuan Langit |
+| `M_BOUT` | `MUSIC_DISC_PRECIPICE` | ≤ 60 s | tournament final |
+| `M_SORROW` | `MUSIC_DISC_TEARS` | 10 s | tribulation failure, calamity failure |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.13 Storyboards
+
+Times are seconds from the beat's server event (ticks in brackets where they matter). **Camera column:** "S:" is what
+Singkat does, "P:" what Penuh adds, "—" no camera. Sizes are in blocks (b). Every shot below satisfies the caps of
+23.7.3; every camera cell is subject to the gates of 23.7.4. "srv" = server world sound, "cli" = client-local sound or
+music. Each moment has its `uji momen` id in brackets (23.15).
+
+#### A. Tribulasi Langit (3, 19.2.7, 19.3.8; `Tribulation`: omen 240 t, a strike every 70 t, telegraph −30 t from Deity Transformation, settle 30 t)
+
+##### A1. Pertanda Langit / Heavenly Omen, 12 s [`tribulasi`]
+
+| t | Beat | Camera | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| 0.0 (0) | Angin berhenti / stillness | — | WHITE_ASH motes drift inward from r 24 to the subject (6 per tick at Normal); with protector waves on (`cfg.dp`): red sparks circling at r 12 (a hint, Presentasi) | SK_TRIB w 0 → .4 over 4 s; vanilla clouds start to descend and darken (vanilla profile) | srv `BEACON_DEACTIVATE` .8 p .5 + `TRIAL_SPAWNER_OMINOUS_ACTIVATE` .8 p .55 (the existing omen rumble continues); cli music duck .25 |
+| 0.5–5.5 (10–110) | Langit menoleh / the heavens turn | S: `CRANE_UP` 2.5/1.9 → 9/16, pitch +5° → −55° in 4 s, then 1 s hold on the eye; letterbox in | `G_VORTEX` born at H; radius .15 R_v → .5 R_v by 12 s; ω 2°/s; eye glow disc of eye r; a micro-arc every 2 s (Maximal every 0.4 s) | w → .6 | cli `M_OMEN` (`M_STORM` from Kenaikan Abadi, `M_NETHER`, `M_END`) fades in over 2 s from 1.0 s |
+| 2.5–6.0 | FULL card | – | – | – | card seal |
+| 6.0–9.0 (120–180) | Pengumpulan / gathering | P: `ORBIT` r 6, h 1.4, 60° in 3 s | spiral arms tighten. S ≥ 5: 4 dark down-shafts (inverted `G_RAYS`, alpha .15, lowest layer priority). S ≥ 6: one thunder-deity `F_FIGURE` (24 b, α .3, `thunder_avatar`) takes shape in the rim at 8 s. S ≥ 8: + 4 (Maximal 12) thunder-deity `F_SILHOUETTE`s of 12 b | w → 1.0 by 11 s; light × max(.5, 1 − .6 D) | S ≥ 6: srv `TRIDENT_THUNDER` .4 p .5 at 8 s (EpicHooks timer) |
+| ≤ 9.5 (190) | every shot has blended out | ≥ 20 ticks before strike 1's PRE (210) | – | – | – |
+| 11.0 (220) | Mata langit / the eye flares | — | eye radius pulses ×1.5 (geometry only, not a screen flash) | – | music −6 dB |
+
+- **Card:** "TRIBULASI LANGIT / HEAVENLY TRIBULATION", sub "Menuju {ranah} · {n} petir / Toward {realm} · {n} strikes",
+  seal 劫. Nether: "TRIBULASI API NERAKA / HELLFIRE TRIBULATION", seal 火. End: "TRIBULASI KEHAMPAAN / VOID TRIBULATION",
+  seal 虚. Kenaikan Abadi: sub "Kenaikan Abadi Tahap {L} · {n} petir / Immortal Ascension Layer {L} · {n} strikes".
+  Dewa Abadi: "TRIBULASI DEWA ABADI / TRUE IMMORTAL TRIBULATION", sub "{n} petir · Gerbang Langit menanti / {n} strikes ·
+  the Heavenly Gate awaits". SUPPRESS_TITLE (the server's omen title).
+- **Scaling:** radius, height, darkness from S. Kenaikan Abadi (S 6–8): the eye rim shimmers in the seven strike colours.
+  Dewa Abadi (S 9): a faint Heavenly Gate `G_GATE` 48×72 b (α .2) inside the eye at H + 20 (sky-projected).
+- **Nether** (ceiling): no sky geometry. A flame `G_RING` r 8 → 16 at `min(subject + 14, ceiling − 2)` and 4 fire-tornado
+  particle spirals (FLAME + SOUL_FIRE_FLAME, h 12, r 1) at r 10; SK_NETHER fog only.
+- **End:** a violet `G_VORTEX` with STARFIELD points and REVERSE_PORTAL rain; SK_VOID.
+- **Sumber:** [D] *Against the Gods* ch. 1241–1256 (a lightning tribulation of nine stages comes down while black clouds
+  cover the sky; ch. 1243 "Nine Tribulations of Heavenly Wrath") and ch. 1703 (the heavenly law strikes Yun Che with
+  tribulation lightning). Thunder deities: *Terinspirasi dari* *Investiture of the Gods* ch. 99 (Wen Zhong is made head
+  of the Thunder Department; the novel never sends its deities against cultivators). Gate hint: *Terinspirasi dari*
+  *Journey to the West* ch. 4 (the South Heaven Gate). Seven-colour rim: [D] *I Shall Seal the Heavens* ch. 969–970. The
+  vortex shape, the darkening and the music are Presentasi.
+
+##### A2. Petir / Strike (every regular strike) [`petir`]
+
+| t | Beat | Camera | VFX | Sky | Sound |
+|---|---|---|---|---|---|
+| −1.5 (−30) PRE | Telegraph | — (telegraph window: no shot in any mode) | P7-tempur's ring r 1.5 (Deity Transformation+, unchanged) and a 0.05-b "lead thread" (thin `G_BOLT` line) from the eye to the ring centre; vortex spins ×1.5; the eye pulses at −20 and −8 ticks (geometry only). LETHAL_NEXT: red `INK_EDGE` (the 19.3.10 HUD keeps its own heartbeat) | w +.05 | srv `RESPAWN_ANCHOR_CHARGE` .6 p .6; cli world-sound duck from −15, restored at −1 |
+| −0.5 (−10) | Muatan / charge | `SNAP` −4% over 10 ticks | the eye contracts to .7×; 3–6 micro-arcs converge in the cloud | – | – |
+| 0 STRIKE | Hantaman / impact | `SNAP` release +6% over 4 ticks | main `G_BOLT` (core w(S), length H, 2 re-seeds, branches by quality); `G_RING` r 1 → 4 + S/2 in 10 ticks; the existing burst; `FLASH` in the variant colour α .15 for 3 ticks (viewers within 24 b: .08), in the same frame as the sky flash (one luminance event) | sky flash 2 | srv the existing thunder and impact; S ≥ 6: + `TRIDENT_THUNDER` .8 p .7 |
+| +0.1–1.3 (2–26) | P only, every 3rd strike | P: `LOWHERO` r max(4, r_p + 1.5), push 0.8 b, looking up 25° at the eye, 1.2 s; only without LETHAL_NEXT, at HP ≥ 30%, with no protector or hostile targeting the player within 8 b; it ends ≥ 0.5 s before the next PRE | – | – | cli whoosh |
+| +0.3 | Bekas petir / afterglow | — | a DUST scorch ring under the feet for 1.5 s (no block change); smoke | – | – |
+
+- **Shake:** protagonist .25 + .03 S (≤ .55) for 10 ticks; viewers within 16 b get half.
+- **Scaling:** sympathetic visual bolts (never damage, never blocks, thin, inside the bolt budget): S ≥ 4: 2 at r 10–24;
+  S ≥ 6: 4 at r 12–40; S ≥ 8: 6, "thrown" by the silhouettes (an arm flare); S 9: 9.
+- **Kenaikan Abadi strikes** cycle seven colours (#FF3B3B, #FF8A1A, #FFD54A, #3BDB7A, #3BE0E0, #4A7BFF, #A65BFF; the hues
+  are Presentasi). `EpicColors.immortalStrike(index)` is offered to P7-tempur for the optional seven-colour rings of
+  19.3.8. Nether bolts #FF7A2A with an ember core; End bolts #C08BFF.
+- **Hu Fa Tribulasi:** P7-tempur's gold threads stay as they are; guardians get world VFX, never a camera.
+- **Sumber:** [D] *Against the Gods* ch. 1241–1256; seven colours [D] *I Shall Seal the Heavens* ch. 969–970 (the
+  seven-coloured Immortal Tribulation Lightning, already cited in 19.3.8). The rest is Presentasi.
+
+##### A3. Petir Terakhir / Final Strike [`petir_terakhir`]
+
+| t | Beat | Camera | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| −3.0 (−60) HUSH | Hening / silence | — | micro-arcs stop; vortex ω ×3; the cloud base sinks to .8 H over 2 s; BANNER "Petir Terakhir · ×2 / The Final Strike · ×2" | w 1.0; light at its floor (.5) | cli music release (40 ticks) and world-sound duck: the inhale before the strike |
+| −1.5 (−30) PRE | Telegraph | — (telegraph window) | ring (Deity Transformation+, unchanged); the eye opens 2× | – | srv `WARDEN_SONIC_CHARGE` .6 p .5 + `BEACON_POWER_SELECT` .8 p .5 |
+| −0.5 | Muatan | `SNAP` −8% | every micro-arc converges; Normal+: 8 short dim ground arcs (2–3 b) at r 8–14 | near black (floor .5) | – |
+| 0 STRIKE (FINAL) | Hantaman | — | giant `G_BOLT` (core 2.5 w). Convergence of thin bolts from the eye rim: S 2–5 three in the variant colour; **Kenaikan Abadi seven** in the seven colours; **Dewa Abadi nine** (+ #FFFFFF, #2A0F45); count by quality: Maximal all, Normal 4, Minimal 0. White `G_PILLAR` glow 1.5 w for 10 ticks; `G_RING` r 6 → 10 + S with a dust crown (BLOCK particles of the ground block, 40 at Normal); `FLASH` α .3 for 5 ticks with the sky flash (one event); hit-stop 3 ticks; shake = S table × setting for 14 ticks; `CHROMA` 6 ticks (Normal+); S ≥ 6: the thunder figure swings its arm down | sky flash 3 | srv the existing thunder and impact + `WARDEN_SONIC_BOOM` .8 (S ≥ 5) or `GENERIC_EXPLODE` (sound only) .6 p .5 (S < 5) + `ENDER_DRAGON_GROWL` .6 p .5 (S ≥ 6); cli sub-bass |
+| +0.15–1.65 | Waktu peluru / bullet time | S+P (SAFE; the damage is already resolved): `ORBIT` r 7, h 1.6, 36° over 1.5 s | Gerak lambat 1.5 s (σ .35): dust hangs, the bolt afterimage lingers | – | cli time-stretch layer |
+| +1.65 | → A4 or A5 | the camera chains on | – | – | – |
+
+- **Sumber:** [D] *Against the Gods* ch. 1241–1256 (each stage stronger; ch. 1242 an eighth stage); seven colours [D]
+  *I Shall Seal the Heavens* ch. 969–970. **Nine colours are Presentasi** (no verified work; *Martial God Asura* ch. 2960
+  is not cited because the text does not show a breakthrough tribulation); no card or help text names them.
+
+##### A4. Langit Terbelah / Success [`tribulasi_berhasil`] (with the realm layer B2–B7 and the B8 overlay)
+
+| t | Beat | Camera | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| 0.0 | Awan terbelah / the clouds part | (chained orbit) | the vortex dissolves outward (radius ×1.4, alpha → 0 over 3 s); a hole opens (r → .3 R_v); vanilla clouds rise back over 4 s (vanilla profile); a gold `G_PILLAR` (glow r_p) descends from the eye in 1.5 s and stays 6 s; `G_RAYS` 6/12 fade over 3 s | SK_TRIB → SK_GOLD in 2 s, hold 4 s, release 4 s | srv the existing success sounds + `BELL_RESONATE` 1.5 p .8 + `BEACON_POWER_SELECT` |
+| 0.5–3.0 | Pahlawan / hero | S+P: `LOWHERO` from max(5, r_p + 3) to max(4, r_p + 1.5), h .4, looking up 25° at the face against the pillar, 2.5 s | falling light (END_ROD ≤ 15% + gold DUST) r 8, 40 per tick at Normal; **the realm layer plays here** | – | cli `M_TRIUMPH` (`M_GLORY` for Surgawi and Kenaikan Abadi L9) + success sting |
+| 1.0–4.5 | FULL card | – | – | – | – |
+| 3.0–6.0 | Pengungkapan / reveal | S+P: `PULLBACK` max(4, r_p + 1.5) → 18, h .4 → 10, 3 s | pillar, dissolving vortex, the existing protector poofs | – | – |
+| 6.0 | Kembali / return | 10-tick ease | the pillar fades over 1 s | – | – |
+
+- Singkat camera for a whole tribulation: A1 5 s + A3 1.5 s + A4 5.5 s = 12 s (the cap).
+- **Card:** the new realm in capitals, sub "Tribulasi dilalui · Kualitas {q} / Tribulation passed · Quality {q}", seal
+  per S. Example: "INTI EMAS / GOLDEN CORE".
+- **Others in range:** the pillar, rays, hole and SK_GOLD by falloff; the chat announcement already exists.
+- **Sumber:** [D] *Against the Gods* ch. 1241–1256 (the tribulation itself). The parting clouds, the pillar and the rays
+  are Presentasi; at Kenaikan Abadi L9 the clouds dissipate per *I Shall Seal the Heavens* ch. 969 (B6).
+
+##### A5. Langit Murka / Failure [`tribulasi_gagal`] (→ C1)
+
+| t | Beat | Camera | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| 0.0 | the would-kill strike, clamped to 1 HP (rule 3) | (chained bullet time if it was the final strike) | the existing black-red burst; the bolt freezes 4 ticks, then shatters into red motes; `GREY` .2 for 2 s | SK_TRIB → SK_ASH (red) in 1 s | srv existing + `ANVIL_LAND` .5 p .5 + `WARDEN_HEARTBEAT` .8 |
+| 0.3–2.3 | Jatuh / the fall | S+P (RESULT_SAFE, result exemption): `STATIC` 4 b to the side, h 1.2, push 0.5 b, 2 s, no roll | the vortex collapses inward (R → 0 in 2 s, ω ×4); thunder rolls away (cli); red `INK_EDGE` 4 s | – | cli `M_SORROW` |
+| 1.0–4.0 | FULL card | – | – | – | – |
+
+- **Card:** "PENYIMPANGAN QI / QI DEVIATION", sub "Tribulasi gagal · {m} menit penyimpangan / Tribulation failed · {m}
+  min of deviation", seal 魔. **Hardcore drop:** "RANAH RUNTUH / REALM SHATTERED", sub "Jatuh ke Puncak {ranah} / Fell
+  to {realm} Peak"; the letters crack and fall as shards; srv `GLASS_BREAK` .8 p .5 instead of the anvil.
+- **Sumber:** game design (0 rule 3, 3). The collapse is Presentasi. (Qi deviation exists in wuxia, verified: *The
+  Legend of the Condor Heroes*, Ouyang Feng and the falsified Nine Yin Manual; *Demi-Gods and Semi-Devils*, Jiumozhi.
+  Like the L2 boon of 19.12, wuxia is not printed unless the user accepts it, and no card claims a novel links a failed
+  tribulation to deviation.)
+
+##### A6. Notes for every tribulation
+
+- Singkat never directs the camera between strikes; the ring decision of 19.3.8 (Menantang Langit) stays fully playable.
+- Health, armour and the 19.3.10 tribulation HUD stay visible; only the hotbar, XP and crosshair hide during a shot.
+- Test tribulations (`uji tribulasi`, `debug tribulation test`) carry TEST: the scene plays, nothing is announced.
+- Guardians and other players see the world layers by distance; only the cultivator gets camera, cards and music.
+
+#### B. Breakthroughs per realm
+
+##### B0. Kebangkitan / Awakening (Mortal → Qi Refining, the existing 6 s) [`kebangkitan`]
+
+- **Camera:** S `ORBIT` r 4, h 1.4, 120° over 5 s. Damage does not interrupt the awakening (3), but the gates stop the
+  camera.
+- **VFX:** the existing root-colour spiral + a `G_PILLAR` (glow .6, h 12) in the root colour at 5.5 s.
+- **Music:** `M_GENTLE`. **Card:** "PEMURNIAN QI / QI REFINING", sub "Jalan kultivasi terbuka / The path of cultivation
+  opens", seal 气.
+- **Sumber:** *Terinspirasi dari* *Soul Land* (Spirit Hall awakens the village children every year; 20.3.3).
+
+##### B1. Pembangunan Fondasi / Foundation (5 s gathering, chance roll, no tribulation) [`fondasi <retak|normal|sempurna|surgawi>`]
+
+| t | Beat | Camera | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| 0–5 | Pengumpulan / gathering | S: `PUSH` 6 → 3.5 b during 2–5 s | the existing qi spiral + a ground rune `G_RING` r 4 (`dao_circle.png`) | SK_JADE w .2 | existing |
+| 5.0 | Pilar bangkit / the pillars rise (success) | S+P: `CRANE_UP` 3.5/1.6 → 10/12, pitch → +40° (looking down at the circle), 3 s | nine small pillars (`G_PILLAR` glow .35, h 8 → 20) at r 5 rise one every 0.2 s. **Retak:** heavy dark bands (two cracks each), three flicker. **Biasa:** one hairline dark band each. **Sempurna:** crackless gold, and at 5.6 s three thin harmless visual bolts touch the pillar tops (no damage, no screen flash). **Surgawi:** ten; the tenth rises from beneath the subject, white-gold, glow .6, h 40 (+ B8) | Surgawi: B8 | cli `NOTE_BLOCK_BASS` per pillar, pitch rising; srv `BELL_RESONATE`; cli `M_TRIUMPH` / `M_GLORY` |
+| 7.0 | Pilar tenggelam / the pillars sink | – | the pillars converge into the dantian (1 s); gold `G_RING` r 6 | – | srv `AMETHYST_BLOCK_RESONATE` |
+| 6.0–9.5 | FULL card | – | – | – | – |
+| fail | Fondasi runtuh / the foundation collapses | P: `STATIC` 1.5 s | the pillars rise to half height, crack and dissolve; smoke | – | – |
+
+- **Card:** "PEMBANGUNAN FONDASI / FOUNDATION ESTABLISHMENT", seal 基; sub by quality: Retak "Sembilan pilar retak /
+  Nine cracked pillars"; Biasa "Sembilan pilar · Biasa / Nine pillars · Normal"; Sempurna "Sembilan pilar tanpa retak ·
+  Sempurna / Nine crackless pillars · Perfect"; Surgawi "Pilar kesepuluh · Surgawi / The tenth pillar · Heavenly". On
+  failure a STAMP "Fondasi runtuh / Foundation collapsed".
+- **Sumber:** [D] *I Shall Seal the Heavens* ch. 76 (nine Dao pillars graded by their cracks; a Perfect Foundation has
+  no crack at all and calls down tribulation lightning) and ch. 273, 276 (the tenth pillar, beyond any record); [D] *A
+  Will Eternal* (Mortal-, Earth- and Heaven-Dao Foundation). Mapping the mod's four qualities to crack counts is game
+  design. (In ISSTH "Flawless" is a foundation **with** one crack per pillar, so English text says "crackless".)
+
+##### B2. Inti Emas / Golden Core (inside A4, 0.5–3.0 s) [`inti_emas`]
+
+- **VFX:** the pillar narrows to a 0.3-b thread into the dantian. A gold `F_ORB` core condenses there, spins faster and
+  pulses three times (each pulse a gold `G_RING` r 4 → 12 over 8 ticks), then seals in a gold flash (α .2). Surgawi: 9
+  orbit rings instead of 3.
+- **Camera:** A4's hero shot ends in a `PUSH` to 2 b at chest height (1 s; the thread's glow is 0.3, so ≥ 1.8 b holds).
+- **Sumber:** [D] *I Shall Seal the Heavens* ch. 337–339 (Meng Hao's Perfect Gold Core and its far more violent pill
+  tribulation); [D] *A Will Eternal* ch. 338 ("Heaven-Dao Gold Core"). The orbiting rings are Presentasi.
+
+##### B3. Jiwa Baru Lahir / Nascent Soul (after C2, inside A4) [`jiwa_baru`]
+
+- **VFX:** an `F_SOUL` (a seated infant, 0.6 b, aura colour, translucent) rises from the dantian to 0.8 b above the head,
+  opens its eyes (two bright motes), circles above the head once and streaks back in.
+- **Camera:** A4's hero shot becomes an `OTS` from above and behind the head, looking at the soul (2 s), then the reveal.
+- **Sumber:** [D] *A Record of a Mortal's Journey to Immortality* ch. 488, 1077 (the Nascent Soul is an infant about two
+  inches tall with its owner's face; in ch. 1077 it circles above Han Li's head) and 20.3.17 (it flees as a streak of
+  light). The 0.6-b size is a Presentasi upscale.
+
+##### B4. Transformasi Dewa / Deity Transformation (inside A4) [`transformasi_dewa`]
+
+- **VFX:** a 4× gold translucent `F_AVATAR` (α .35) rises behind the subject for 3 s. "Heaven and earth answer": every 7b
+  particle within 32 b drifts toward the subject for 1.5 s; then a spherical SHELL of particles r 32 and a ground
+  `G_RING` r 48.
+- **Camera:** `PULLBACK` 4 → 22, h 2 → 9, 3 s. **Card sub** adds "Wujud Dharma terbuka / Dharma Form unlocked".
+- **Sumber:** *Terinspirasi dari* *A Record of a Mortal's Journey to Immortality* (Deity Transformation is the peak of
+  the human world before the Spirit Realm; the lore pass agrees from knowledge but read no chapter, so no chapter is
+  printed). The figure and the wave are Presentasi.
+
+##### B5. Penyatuan Dao / Dao Union (inside A4) [`penyatuan_dao [dao]`]
+
+- **VFX:** the Dao glyph (剑 炎 冰 雷 体 生 影 空; 道 without a Dao) appears 32 b tall in the cloud hole (`F_GLYPH`, Dao
+  colour); the pillar recolours to the Dao colour; a translucent dome r 24 pulses once (one large layer).
+- **Sky:** SK_DAO .3 for 6 s. **Camera:** `SKYPAN` pitch 0 → −70° over 3 s toward the glyph, hold 0.5 s.
+- **Card sub:** "Wilayah Dao terbuka / Dao Domain unlocked".
+- **Sumber:** *Terinspirasi dari* *Renegade Immortal*, Wang Lin's domains (ch. 826, 851; 22.10 #6).
+
+##### B6. Kenaikan Abadi Tahap 1–9 / Immortal Ascension layers [`kenaikan_abadi <1-9>`] (each layer is a tribulation: A1–A4 + this)
+
+- **Pintu Keabadian / Door of Immortality:** one `G_GATE` 24×36 b (gold-jade line quads) stands in the cloud hole at
+  H + 8. Its two doors open a further L/9 of 80° at each layer (L1 a crack of light, L8 nearly open), and light pours
+  from the gap (`G_RAYS`, width ∝ L) down along the success pillar. **L9:** the doors swing fully open, Immortal light
+  pours out and the remaining tribulation clouds dissipate at once (vortex alpha → 0 in 1 s instead of 3).
+- **Urat Abadi / Immortal meridians:** for 2 s thin jade-gold lines (`G_TRAIL` 0.05 b) trace outward over the body from
+  the dantian; more lines at higher layers (8 + 12 L).
+- L ≥ 7: the thunder silhouettes bow (Presentasi).
+- **Camera:** replaces A4's reveal with `CRANE_UP` to 18 b, pitch −60° (looking up), framing the door, 3 s.
+- **Card:** "KENAIKAN ABADI · TAHAP {L} / IMMORTAL ASCENSION · LAYER {L}", sub "Urat Abadi terbuka: {anugerah} /
+  Immortal meridians open: {boon}" (boon names from the 19.3.11 keys, read-only); L9 sub "Gerbang Keabadian terbuka /
+  The Door of Immortality opens". SUPPRESS_TITLE (the `ImmortalPerks` boon title). Seal 仙.
+- **Sumber:** [D] *I Shall Seal the Heavens* Book 6 ch. 963–983 (at Immortal Ascension the Door of Immortality opens and
+  Immortal meridians open with it; ch. 974: Immortal qi pouring in makes 95 meridians appear), ch. 969 (when the Door of
+  Immortality opens, Immortal light pours out and the Tribulation Clouds dissipate; the L9 boon's own source), ch.
+  969–970 (the seven-coloured lightning). The paifang shape, the opening by layer and the line count are Presentasi.
+
+##### B7. Dewa Abadi and Pengakuan Langit [`dewa_abadi`, `pengakuan_langit`] (True Immortal tribulation + `Ascension`, 600 t)
+
+**The tribulation** is A1–A4 at S 9 with the nine-colour finale (A3, Presentasi). **Success:** the **Gerbang Langit /
+Heavenly Gate** (64×96 b at H + 16, sky-projected, plaque "天門") opens in the eye, with a `G_PILLAR` glow 3.5 and 12
+`G_RAYS`. **Card:** "DEWA ABADI / TRUE IMMORTAL", sub "Gerbang Langit terbuka / The Heavenly Gate opens", seal 天.
+
+**Pengakuan Langit**, anchored to the existing `Ascension` FX steps:
+
+| tick | Server step | Beat | Camera | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|---|
+| 0 | FX_DARKEN | Langit menahan napas / the heavens hold their breath | shot 1 (0–4 s), S+P: `STATIC` wide at 12 b, h .5, slow push to 9 b | stars at noon; a gold-dark `G_VORTEX` (R 1,024) forms slowly; Gerak lambat 1 s at the start | SK_STARS w 1 (stars 1, light floor .5) | the existing beacon sounds; cli music duck to silence for 4 s |
+| 100–160 | FX_PILLAR | Pilar turun / the pillar descends | shot 2 (5–9 s), S+P: `STATIC` at r 6, h .5, tilting pitch −70° → −10° with the beam's tip, 3 s | a gold `G_PILLAR` (glow 3.5) descends from y + 400 over 60 ticks; at 160: `G_RING` r 48 + dust crown + gold `FLASH` .3 + shake .6 (× 0.3 in the shot) | – | the existing bells ×3; conduit at 160 |
+| 160–240 | – | Dalam cahaya / inside the light | none (player control) | gold motes rise inside the pillar; the aura whitens | → SK_GOLD | – |
+| 240 | FX_HEAVENS | Langit terbuka / the heavens open | shot 3 (12–16 s), S+P: `SKYPAN` 0 → −60° up the pillar (2.5 s), then `ORBIT` r 10, h 6, looking up 60°, 36° in 1.5 s | the hole opens to .4 R; the Gerbang Langit (64×96 b) with open doors; 12 `G_RAYS`; petals (CHERRY_LEAVES + gold DUST) r 48; 6 crane `F_SILHOUETTE`s at 60 b (Presentasi) | SK_GOLD w 1 | the existing chimes; cli `M_ASCEND` fades in over 3 s |
+| 360 | FX_VOICE | Suara Langit / the voice | — | the gate brightens; a 40-b 天 `F_GLYPH` above the gate fades in and out over 3 s | – | the existing voice cues; the voice title becomes the FULL card (SUPPRESS_TITLE) |
+| 380–460 | FX_PULSE | – | shot 4, P: `PULLBACK` 4 → 24, h 2 → 16, 4 s | – | – | the existing chords |
+| 600 | FX_FINALE | Penobatan / the crowning | — | a rainbow `G_RING` r 64 + `G_AURORA` for 4 s; the pillar lifts away upward; the existing rainbow aura begins | SK_GOLD → normal over 6 s | the existing toast and bells; `M_ASCEND` released after 5 s |
+
+- Singkat: 3 shots, 12 s; Penuh: 4 shots, 16 s.
+- **Cards:** voice "LANGIT MENGAKUI / THE HEAVENS ACKNOWLEDGE" (sub = the existing subtitle key); finale "DEWA ABADI
+  {nama} / TRUE IMMORTAL {name}", sub "Kebal Penyimpangan Qi · Regenerasi abadi / Immune to Qi Deviation · Eternal
+  regeneration", seal 天.
+- **Others within `epicRange`:** the vortex, pillar, gate, glyph and petals at `othersScale`, and SK_GOLD colour with
+  falloff (no light change beyond 48 b).
+- **Sumber:** *Terinspirasi dari* *Journey to the West* ch. 4 (the South Heaven Gate, the single entrance to the Jade
+  Emperor's court; in the novel it is not a gate of ascension, so the plaque says only 天門). The pillar, the cranes, the
+  天 glyph, the voice and the petals are Presentasi (17 predates the source rule).
+
+##### B8. Kualitas Surgawi overlay (any HEAVENLY result, Foundation and disciples included) [`surgawi`]
+
+- **At the reveal:** Gerak lambat 1 s; SK_WHITE for 3 s, then the realm's grade; `G_AURORA` (3 ribbons) up the success
+  pillar (Normal+); the card sub "Kualitas Surgawi / Heavenly Quality" in drifting rainbow letters (static under Kurangi
+  gerak) with a second seal 天; `M_GLORY` instead of `M_TRIUMPH`; srv `BELL_RESONATE` p 1.2 + `AMETHYST_BLOCK_RESONATE`
+  (the server-wide announcement already exists).
+- **Sempurna (Perfect):** only a gold rim on the card and 4 gold motes orbiting the seal.
+- **Sumber:** Foundation: [D] *A Will Eternal* (Heaven-Dao Foundation), [D] *I Shall Seal the Heavens* ch. 76 (Perfect)
+  and ch. 273 (tenth pillar). Other realms: Presentasi (quality is game design, 3).
+
+#### C. Crises
+
+##### C1. Penyimpangan Qi / Qi Deviation (any cause) [`penyimpangan`]
+
+Client-derived from the `VisualState.DEVIATION` rising edge; chained (no second card) after A5 or a heart-demon loss.
+Other causes: the pressure demon, a failed flame absorption.
+
+| t | Beat | Camera | VFX | Sky | Sound |
+|---|---|---|---|---|---|
+| 0–0.5 | Ledakan / burst | — | the existing black-red burst; red `INK_EDGE` | SK_ASH (red) w .6 (others: colour only) | cli `WARDEN_HEARTBEAT` .6 |
+| 0.5–2.5 | Retak / cracks | S+P: `STATIC` 4 b to the side, h 1.2, push 0.5 b, 2 s, no roll; only with RESULT_SAFE when chained, or when standalone the client sees no `Enemy` within 24 b and the player is not burning, falling or in fluid | 8 small dark-red `G_SEAM` cracks (2 b) flicker around the body for 3 s | – | – |
+| during | Pengingat / reminder | — | a 0.5-s red edge pulse at most every 30 s while deviating | – | – |
+
+- **Card** (standalone only): "PENYIMPANGAN QI / QI DEVIATION", sub "{m} menit penyimpangan / {m} min of deviation",
+  seal 魔.
+- **Sumber:** game design (3). The visuals are Presentasi.
+
+##### C2. Ujian Iblis Hati / Heart Demon trial [`iblis_hati`] (before the Nascent Soul, Dao Union and True Immortal omens, or pressure > 100; `TrialFxIds`)
+
+| Step | Beat | Camera | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| WARNING | Bisikan / whisper | — | black motes rise from the feet; black `INK_EDGE` 2 s | SK_ASH w .3 | srv `WARDEN_HEARTBEAT` .5 |
+| APPEAR | Cermin retak / the mirror cracks | **none in any mode** (`HeartDemons` sets the demon's target right after the APPEAR Fx); P: a 3° roll for 2 s, no shot | a 2×3-b black-glass mirror (`G_SEAM` outline + a translucent plane) 3 b ahead cracks in 0.5 s and shatters into ≤ 8 `F_SHARD`s; the demon steps out (the existing smoke pillar); red eye glints | SK_ASH w .7, black fog tint | srv `GLASS_BREAK` .6 p .5 + `SCULK_SHRIEKER_SHRIEK` .4; cli `M_HEART` |
+| 0.5–4.0 | FULL card (no bars: no shot) | – | – | – | – |
+| fight | – | — | the existing boss bar and taunts | – | – |
+| WON | Hati Dao Teguh / steadfast heart | S+P (SAFE): Gerak lambat 1 s + `ORBIT` r 5, h 1.5, 45° over 2 s | hit-stop 3 ticks; the demon shatters into ≤ 8 tinted-glass `F_SHARD`s and black motes; a thin gold `G_PILLAR` (glow .3) rises from the heart for 3 s | SK_ASH → normal (→ SK_TRIB when the omen follows) | srv `GLASS_BREAK` ×2 p .6 + `BELL_RESONATE` |
+| LOST | Iblis kembali / the demon returns | — | the demon walks into the subject and merges (a black `G_TRAIL` streak) → C1 | – | – |
+
+- **Cards:** appear "IBLIS HATI / HEART DEMON", sub "Kalahkan bayanganmu sendiri / Defeat your own shadow"; win "HATI
+  DAO TEGUH / STEADFAST DAO HEART". Seal 心.
+- **Sumber:** *Terinspirasi dari* *A Record of a Mortal's Journey to Immortality* (inner demons are a recognised danger of
+  cultivation; ch. 1739 mentions an inner-demon backlash; no chapter shows a heart devil at Nascent Soul formation, so
+  none is printed). The mirror is Presentasi.
+
+#### D. Power
+
+##### D1. Wujud Dharma / Dharma Form (Deity Transformation+) [`wujud_dharma`]
+
+Client-derived from the `VisualState.DHARMA` rising edge (every viewer's client derives it for players within 64 b).
+
+| t | Beat | Camera | VFX | Sky | Sound |
+|---|---|---|---|---|---|
+| 0–0.6 | Bangkit / rise | S: `SNAP` +10% over 8 ticks (size feel). P: `LOWHERO` r 4 + 2 × scale, push 1.5 b, 1.5 s, only with no hostile targeting the player within 8 b and HP ≥ 30% (once per 5 min) | gold `G_RING` r 2 × scale; gold `G_PILLAR` glow .8 × scale, h 12 × scale for 0.6 s; the existing Dharma colossus; Maximal: two faint extra heads and four extra arms in gold motes on the colossus for 3 s | Dewa Abadi: SK_GOLD .2 for 3 s | cli `BEACON_ACTIVATE` .8 p .6 + `MACE_SMASH_GROUND_HEAVY` .6 (positioned) |
+
+- **STAMP:** "WUJUD DHARMA / DHARMA FORM", seal 法. **Scaling:** scale 2 (Deity Transformation) → 4 (Dewa Abadi),
+  as today; Dewa Abadi adds a dust `G_RING` r 12.
+- **Sumber:** [D] *Journey to the West* ch. 3, 6 (Fa Tian Xiang Di, the giant body); *Terinspirasi dari* the Brahmic
+  Saint True Devil Art of *A Record of a Mortal's Journey to Immortality* (official English name "Provenance True Devil
+  Arts"; 22.10 #5); the extra heads and arms: [D] same work ch. 1857 (a golden three-headed, six-armed projection that
+  fires six pillars of light) and ch. 2209.
+
+##### D2. Wilayah Dao / Dao Domain (Dao Union+) [`wilayah_dao <dao>`]
+
+Client-derived from the `VisualState.DOMAIN` rising edge; pulses from the domain's `TechFx` events.
+
+| t | Beat | Camera | VFX | Sky | Sound |
+|---|---|---|---|---|---|
+| 0–1.0 | Terbentang / unfold | S: —. P: `PULLBACK` 3 → 10, h 2 → 6, 1.5 s, when safe | the dome expands r 0 → R_dom (the radius `DaoDomain` uses, read-only) in 1 s with a bright rim ripple (one large layer); ground rune `G_RING` r R_dom; the existing Dao sky glyph | SK_DAO: w .35 for viewers inside, .1 outside (colour only) | cli `BEACON_ACTIVATE` .7 + one Dao cue: Sword `BELL_BLOCK`, Fire `BLAZE_SHOOT`, Ice `GLASS_BREAK` .3, Lightning `TRIDENT_THUNDER` .4, Body `MACE_SMASH_GROUND`, Life `AMETHYST_BLOCK_CHIME`, Shadow `WARDEN_SNIFF` .4, Space `PORTAL_TRIGGER` .3 |
+| active | – | — | Sword: `SWORD_RING` 24. Fire: ember rain + `HAZE` inside. Ice: snowfall + pale-blue `INK_EDGE` (inside only). Lightning: thin `G_BOLT`s on each pulse. Body: crack dust on each pulse. Life: blossoms. Shadow: a crow `SWARM`. Space: STARFIELD + slow rings | – | – |
+
+- **STAMP:** "WILAYAH DAO · {Dao} / DAO DOMAIN · {Dao}", seal = the Dao glyph.
+- **Sumber:** [D] *Renegade Immortal*, Wang Lin's domains (ch. 826, 851).
+
+##### D3. Jurus Abadi / Immortal-grade ultimates (12 specs) [`jurus_abadi <spec>`]
+
+**Common to all 12** (client-derived through `SpecFx`):
+- CHARGE/CAST: a STAMP with the name and seal, and the row's sky grade at w .5. IMPACT: Gerak lambat 0.6 s; the spec's
+  own flash and shake (22.9, unchanged, inside the luminance rule).
+- Camera: S none (combat). P: an `OTS` from behind the caster toward the aim point during the charge (≤ 1.5 s, cut
+  before impact, at most once per 60 s).
+- First cast ever (`epic_seen`): a FULL card and, in Penuh, a 1-s letterbox flick (bars only) instead of the STAMP.
+
+| Spec | 7b additions | Sky | Seal | Sumber |
+|---|---|---|---|---|
+| `zhuxian_sword_formation` | `G_SEAM` lines join the four 24-b swords into a square cage | SK_RED .4 | 誅 | [D] *Investiture of the Gods* ch. 77–78 |
+| `nine_suns_heavens_fury` | `HAZE` for 6 s; Gerak lambat on the ninth sun | SK_GOLD (white-gold) | 陽 | [D] *Against the Gods* ch. 1007, 1197 (tenth stage of the Golden Crow's Record of the Burning World) |
+| `ice_phoenix_descent` | pale-blue `INK_EDGE` frost; the 40-b phoenix leaves a SNOWFLAKE wake | SK_ICE .4 | 凤 | *Terinspirasi dari* *Against the Gods* |
+| `tribulation_thunder_emperor_array` | a mini tribulation: `G_VORTEX` at .25 R_v(S) and a `G_BOLT` per strike | SK_TRIB .7 | 雷 | *Terinspirasi dari* *Against the Gods* tribulation lightning (ch. 1241–1256); the array's name has no verified chapter (23.20) |
+| `cosmic_giant_form` | a 40-b `F_FIGURE` behind the spec's own visuals; S+P: a post-cast `PULLBACK` 4 → 24, h 2 → 14, 4 s, only when no hostile is within 16 b | – | 巨 | [D] *Journey to the West* ch. 6 |
+| `guanyin_sweet_dew` | 4 soft `G_RAYS` from the vase | SK_JADE .3 | 露 | [D] *Journey to the West* ch. 26 |
+| `life_death_domain` | the existing split dome; a SOUL river glows | SK_ASH .3 | 生 | [D] *Renegade Immortal* (ch. 826, 851) |
+| `stygian_tiger_seal` | a flute `G_TRAIL` weaving between the corpses | SK_RED .4 | 虎 | [D] *Mo Dao Zu Shi* (the Stygian Tiger Seal) |
+| `void_mirror` | stars at noon while the 128-b black beam fires | SK_STARS .4 | 镜 | [D] *Shrouding the Heavens* (the Void Great Emperor's mirror, kept by the Ji family) |
+| `ninth_hex` | Gerak lambat 1 s exactly while the hex freezes; 7b particles inside the dome stop | SK_ASH .5 | 封 | [D] *I Shall Seal the Heavens* ch. 1379, 1465, 1534, 1540 |
+| `five_elements_mountain` | the palm descends through a parting `G_VORTEX` (.2 R_v) | SK_GOLD .4 | 佛 | [D] *Journey to the West* ch. 7 |
+| `tai_chi_diagram` | the 176-b yin-yang bridge leaves WHITE_ASH; black and white `G_SEAM` edges | SK_ASH .2 | 太 | [D] *Investiture of the Gods* ch. 61 |
+
+##### D4. Jurus Dewa / Divine-grade ultimates (11 specs) [`jurus_dewa <spec>`]
+
+**Common to all 11:**
+- First cast per session: a FULL card; otherwise a STAMP. The row's sky grade at w .8.
+- On the decisive beat: Gerak lambat 1 s with a 3-tick hit-stop; cli `WARDEN_SONIC_BOOM` .6 when the spec has no sub
+  layer of its own.
+- Camera, P: a 1-s letterbox flick at the charge (bars only, no move) and a `PULLBACK` 4 → 14, h 2 → 8, 2 s, starting
+  2 s after the decisive beat when no hostile is within 16 b. S: a "kill reveal" `CRANE_UP` (3/2 → 8/10, pitch +30°,
+  2.5 s) only when no hostile is left within 16 b after the cast ends.
+
+| Spec | Decisive beat | 7b additions | Sky | Seal | Sumber |
+|---|---|---|---|---|---|
+| `heaven_punishing_sword` | @60 the travelling beam | the horizon-to-horizon tear as a 176-b `G_SEAM` (sky-projected beyond fog) | SK_GOLD (white) | 罰 | [D] *Against the Gods* ch. 2189 (one of Mo E's sword arts) |
+| `emperor_flame` | @400 the nova | the 80-b lotus rim glows violet; `HAZE` | SK_DAO (violet-white) .6 | 帝 | *Terinspirasi dari* *Battle Through the Heavens* (帝炎) |
+| `freeze_mount_qi` | @200 the mass freeze | snowfall r 40 + a white-blue `INK_EDGE` | SK_WHITE (blue) | 冰 | [D] *Investiture of the Gods* ch. 39 |
+| `nine_heavens_thunder_venerable` | @400 ALL | thunder silhouettes (≤ the silhouette cap) in a `G_VORTEX` (.3 R_v); a `G_BOLT` for each attack (bolt cap) | SK_TRIB .9 | 雷 | *Terinspirasi dari* *Investiture of the Gods* ch. 99 |
+| `ancient_god_trample` | the ninth step | nine star footprints glow one by one; a dark-gold `G_SEAM` | SK_STARS (gold) | 古 | *Terinspirasi dari* *Renegade Immortal* ch. 921 |
+| `bodhisattva_tree` | @600 the final nova | the 30-b tree under 6 `G_RAYS` | SK_JADE .6 | 菩 | [D] *Battle Through the Heavens* ch. 828, 1426 |
+| `kunpeng_art` | the dash | `SNAP` +12% during the dash; a 128-b cloud-wake `G_TRAIL` | SK_ICE .5 | 鲲 | [D] *Perfect World* ch. 347 |
+| `karma_domain` (disciple) | the domain's end | red-gold `CHAINS` threads; master's view only | red-gold tint .4 | 因 | [D] *Renegade Immortal* (ch. 851) |
+| `time_spirit_domain` | @160 the resume | 7b layers inside freeze for the whole stop; at the resume Gerak lambat 1 s, flash and boom | SK_ASH (blue) .6 | 时 | [D] *A Record of a Mortal's Journey to Immortality: Immortal Realm* (凡人修仙之仙界篇), Han Li's time spirit domain (23.20) |
+| `stellar_black_hole` | @120 the collapse | an inverted dark `G_VORTEX` (.2 R_v) around the core; stars at noon | SK_STARS .9 | 星 | [D] *Stellar Transformations* (the Dark Star and Black Hole stages) |
+| `heaven_trampling` | @30 the zone | nine stacked `G_RING`s 6 b apart; a `G_SEAM` tear; P: `LOWHERO` from the ground watching the climb, 1.5 s | SK_GOLD (white) | 踏 | [D] *Renegade Immortal* ch. ~1157–1159 |
+
+##### D5. Mode Kehancuran (22.11 own casts; 20.3.21 disciple Jurus Pemusnah) [`kehancuran`, `pemusnah <art>`]
+
+**(a) The player's own carving cast** (KEHANCURAN_SELF from `TechFx` `FLAG_KEHANCURAN`, CRATER from the server):
+
+| t | Beat | Camera | VFX | Sky | Sound |
+|---|---|---|---|---|---|
+| impact | Bumi berduka / the earth grieves | — (combat) | the existing CRACKS and BLOCK_CRUMBLE; a dust crown of BLOCK particles of the ground state (24 at Normal) rising 6–16 b; Maximal: ≤ 6 `F_DEBRIS` chunks arcing 8–20 b; a dust `G_RING` r = shape radius × 1.5 | only a Dewa PAMUNGKAS with Kehancuran: SK_RED .5 for 4 s | cli `MACE_SMASH_GROUND_HEAVY` .8 p .6 (positioned) |
+| CRATER | Kawah / the crater | S (SAFE, ≥ 512 blocks removed): `CRANE_UP` from the caster to 20 b over the crater centre, pitch +70° (looking down), 3 s (4 s when the centre is 10–16 b away; skipped beyond 16 b). P: from 128 blocks | the existing `KehancuranFx` dust | – | – |
+
+- **STAMP:** "KEHANCURAN · {n} blok / DESTRUCTION · {n} blocks", hint "Pulihkan: 10 mnt / Restore: 10 min", red seal 毁.
+
+**(b) A disciple's Jurus Pemusnah** (three locks, 30 s countdown):
+
+| t | Beat | Camera (master) | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| −30 WARNING | Segel Merah dilepas / the Red Seal breaks | S (SAFE): `PULLBACK` 3 → 14, h 2 → 9, turning to frame the zone centre, 3 s (the master is ≥ 24 b from the zone by the protected-zone rule) | the existing preview outline + a 12-b red 毁 `F_GLYPH` above the zone; countdown digits as a 6-b `F_GLYPH` for the last 10 s | SK_RED 0 → .7 over 30 s for everyone within 256 b of the zone (colour only beyond 48 b) | srv `BELL_BLOCK` p .5 every 5 s; `WARDEN_HEARTBEAT` every second in the last 5 s (EpicHooks timer); cli `M_DREAD` (master) |
+| 0 IMPACT | Pemusnahan / annihilation | S+P (SAFE): `STATIC` wide from a point on the master's side ≤ 32 b from the master and ≥ 20 b from the zone centre, h 16, 4 s (no such point: 8 b above and behind the master, looking at the zone) | per art: **Tebasan Xuantian** a 24-b sword descends with a 48-b light line; **Getaran Bumi** 3 expanding `G_RING`s; **Kitab Kehancuran Agung** a green-to-grey wave; **Tangan Penjara Langit** a 9×9 glyph cube falls from 40 b; **Palu Agung Sumeru** a hammer glyph grows over 9 blows (each blow a ring and a shake); **Murka Raja Neraka** a crimson `G_VORTEX` (.15 R) with SK_RED 1.0 (light floor .5); **Pusaran Melahap** an inverted vortex into the ground; **Teratai Api Amarah Buddha Agung** a three-colour 16-b lotus; **Segel Gunung-Laut** 9 seal glyphs (8 b) stamping down in a 3×3 grid | SK_RED → normal over 8 s | the spec cues + srv `GENERIC_EXPLODE` (sound only) .8 p .5 |
+| RESTORE | Pulihkan / restored | — | reverse dust drifting down + the existing cyan shimmer | – | STAMP "PULIHKAN / RESTORED" |
+
+- **Card at −30:** the master gets a FULL card "SEGEL MERAH DILEPAS / THE RED SEAL IS BROKEN", sub "{murid} · {jurus} ·
+  30 detik / {disciple} · {art} · 30 s". Other players within 256 b of the zone get the same text as a BANNER: a safety
+  warning, the only card 7b ever shows for someone else's scene (23.1.3). Everyone else keeps the existing dimension
+  warning.
+- `client/kehancuran/RedSkyHud` skips itself while `SkyDirector.coversRedSky()`; it stays the fallback with "Langit
+  berubah" off.
+- **Sumber:** [D] 20.3.21: *A Record of a Mortal's Journey to Immortality* ch. 2191, 2238 (Xuantian Slaying Spirit
+  Sword); *Battle Through the Heavens* (Buddha's Fury Flame Lotus); *Martial Universe* (Great Desolation Scripture ch.
+  702–703, Devouring Ancestral Symbol, Great Desolate Imprisoning Heavenly Hand, upgraded in ch. 708); *Soul Land* (Great
+  Sumeru Hammer); *Coiling Dragon* (the Pulse, Linley's earth mystery); *Against the Gods* ch. 46 (Hell Monarch, the
+  **fifth realm** of the Heretic God art); *I Shall Seal the Heavens* ch. 1556 (the Nine Hexes). The shapes and the
+  countdown are game design (22.11).
+
+#### E. Disciples and the sect
+
+##### E1. Terobosan Murid / Disciple breakthroughs [`murid_terobosan`] (`DiscipleBreakthrough`, Foundation types, the disciple `HuFa`)
+
+- **Camera** (the master is the protagonist, the disciple the subject; master within 32 b): S only the result shot
+  (≤ 4 s) for milestones: the first time any of his disciples reaches Golden Core, Nascent Soul, Deity Transformation,
+  Dao Union, IA L1, IA L9 or True Immortal (FIRST), and every Langit or Sempurna Foundation. P: every Golden Core+ result.
+- **Omen:** `G_VORTEX` at the disciple rule (.35 R_v, .6 H). BANNER "Murid {nama} menghadapi tribulasi / Disciple {name}
+  faces tribulation".
+- **Strikes:** `G_BOLT` at 0.8 width. With the master guarding (护法): the existing seal and a gold `G_TRAIL` (0.12 b)
+  between master and disciple.
+- **Tahan Petir:** the strike visibly **bends**: one bolt polyline runs from the sky to a kink above the midpoint and on
+  to the master, who gets the impact FX. P: an `OTS` behind the master, 1.2 s (the master takes damage: Penuh only, hard
+  gates apply). STAMP "TAHAN PETIR / TAKE THE LIGHTNING", seal 护.
+- **Success:** A4 at 0.6 scale; milestones a FULL card "MURID {NAMA} · {RANAH} / DISCIPLE {NAME} · {REALM}", sub
+  "Kualitas {q} / Quality {q}"; otherwise a STAMP. Result shot: `ORBIT` around the disciple r 6, h 1.6, 60° in 3 s.
+- **Foundation types** (B1 pillars on the disciple): Fana nine fractured (heavy dark bands; three topple and dissolve);
+  Bumi nine cracked; Langit nine crackless gold, and the existing gold pillar stays in its aura; Sempurna ten crackless
+  white-gold + B8 + `M_GLORY`.
+- **Failure:** grey smoke and a STAMP "Terobosan gagal / Breakthrough failed".
+- **Sumber:** [D] 20.3.18: *Battle Through the Heavens* (护法: Yao Lao guarding Xiao Yan's breakthroughs), *A Will
+  Eternal* (Mortal-, Earth- and Heaven-Dao Foundation), *I Shall Seal the Heavens* ch. 76, 273, 276 (pillars).
+
+##### E2. Bencana Dewa Kuno / Calamities k 1–7, Penginjak Langit, Lampu Jiwa [`bencana <k>`, `penginjak_langit`, `lampu_jiwa`] (`Calamity`, `SoulLamps`)
+
+| Step | Beat | Camera (master) | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| omen 0–6 s | Langit bintang / starry sky | S (SAFE, master within 64 b): `CRANE_UP` from behind the master framing the disciple under the vortex, 4 s | a silver-blue `G_VORTEX` (disciple rule) with STARFIELD points; the disciple's existing star orbit; a falling-star streak in the eye | SK_STARS w .8 | srv `BEACON_DEACTIVATE` p .5; cli `M_DREAD` (k ≥ 5: `M_STORM`) |
+| strikes (6 + k, every 3 s) | Petir bencana / calamity lightning | P: every third strike a 1-s `LOWHERO` on the disciple (the master's gates apply) | silver-white `G_BOLT` with a gold core; the existing protectors | sky flash | as A2 |
+| PASS | Bintang lahir / a star is born | S+P: `ORBIT` around the disciple r 6, h 2, 60° in 3 s | a silver METEOR streak drops from the eye into the disciple's chest; the new star joins the orbit. At k = 2, 4, 7 (a Trial complete): a star `G_RING` r 32 + FULL card | SK_STARS → normal over 4 s | cli `M_TRIUMPH` |
+| FAIL | Luka Bencana / calamity wound | — | the star shatters into dust above the disciple; red edge | – | cli `M_SORROW` 8 s |
+
+- **Cards:** omen BANNER "Bencana ke-{k} · {nama} ★{s} / Calamity {k} · {name} ★{s}"; Trial "UJIAN {PERTAMA / KEDUA /
+  KETIGA} DILALUI / {FIRST / SECOND / THIRD} TRIAL PASSED", sub "Semua bonus bintang ×1,1 / All star bonuses ×1.1".
+- **Penginjak Langit** (TRAMPLING, after k = 7, +6 s): a translucent `F_FIGURE` clone of the disciple (its own skin)
+  climbs nine light steps (`G_RING` r 3, 6 b apart, up to 54 b), one every 0.5 s, and stamps on the ninth; a 96-b
+  white-gold `G_SEAM` tears the sky, `FLASH` .3, shake .8 (× 0.3 in the shot). The white-gold aura and the server line
+  already exist. Camera S+P: `CRANE_UP` from h 2 to 24 following the clone, pitch 0 → −45°, 5 s. `M_GLORY`. FULL
+  "PENGINJAK LANGIT / HEAVEN TRAMPLING", sub "{nama} melampaui tiga langkah / {name} steps beyond the three steps", seal 踏.
+- **Lampu Jiwa** (LAMP, Padamkan Lampu passed): the lamp's soul flame (SOUL_FIRE_FLAME spiral) drifts into the disciple;
+  STAMP "Lampu ke-{n} padam / Lamp {n} extinguished"; every ninth lamp a FULL card (the server line already exists).
+- **Sumber:** [D] *Renegade Immortal* ch. ~1157–1159 (Three Trials with Seven Calamities; Heaven Trampling); [D]
+  *Stellar Transformations* (the star stages); [D] *I Shall Seal the Heavens* ch. ~1276–1362 (Soul Lamps). The nine
+  light steps are Presentasi.
+
+##### E3. Murid Melampaui Guru / The disciple surpasses the master [`melampaui_guru`] (`Surpass`, the existing SURPASS FX)
+
+| t | Beat | Camera (master) | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| 0–3 | Dua pilar / two pillars | S+P: `TWO_SHOT` 6 → 4.5 b, h 1.2, 3 s | two `G_PILLAR`s: the master's (his realm colour, glow 1, h 24) and the disciple's (gold, glow 1), which rises **past** it to 48 b | SK_GOLD .3 | srv `BELL_RESONATE` + `BEACON_POWER_SELECT`; cli `M_TRIUMPH` |
+| 3–5 | Penghormatan / the bow | then `CRANE_UP` 2 s showing both pillars | the existing bow pose if `Surpass` plays one; petals | – | – |
+| 1–4.5 | FULL card | – | – | – | – |
+
+- **Card:** "MURID MELAMPAUI GURU / THE DISCIPLE SURPASSES THE MASTER", sub "{nama} · {ranah / bintang}", seal 徒.
+- **Tanding dengan Guru** (by duel): the decisive hit gets Gerak lambat 1 s before this scene.
+- **Sumber:** [D] *Battle Through the Heavens* (Xiao Yan outgrows Yao Lao); [D] *Martial Peak* (Yang Kai surpasses Meng
+  Wu Ya, the Treasurer of High Heaven Pavilion).
+
+##### E4. Hari Penerimaan Murid / Recruitment day [`penerimaan`, `ujian_masuk <duan>`, `pengemis`, `nadi_dewa_sesat`, `darah_dou_di`] (`Candidates`, 20.3.3–20.3.5)
+
+**(a) Arrival at sunrise:**
+
+| t | Beat | Camera (owner within 32 b of the stele, SAFE) | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| 0 | Lonceng jauh / a distant bell | — | – | SK_DAWN w .5 for 20 s within 128 b of the stele | the existing bell + srv `BELL_BLOCK` ×2 (0.6 s apart) + goat horn "Seek" .5 |
+| 0.5–4.5 | Kabut perjalanan / travellers' mist | S+P: `CRANE_UP` turning into a forward drift, from 10 b above and behind the stele toward the candidates' arrival centroid, 4 s | a 14-b mist band rolls over the 8–14 b arrival ring; the candidates step out (existing); 6 small crane `F_SILHOUETTE`s (3 b) circle | – | cli `M_GENTLE` |
+| 1–4.5 | FULL card | – | – | – | – |
+
+- **Card:** "HARI PENERIMAAN MURID / DISCIPLE RECRUITMENT DAY", sub "{N} calon tiba di Sekte {nama} / {N} candidates
+  arrive at {name}". War day: "PERANG SERATUS DINASTI / HUNDRED DYNASTIES WAR", sub "Delapan calon terbaik / The eight
+  finest candidates".
+
+**(b) Entrance test** (the existing 6 s): the Duan pillar becomes small `G_PILLAR` segments, 2.5 b per Duan (up to
+22.5 b), in the soul colour (red, orange, yellow, green, cyan, azure, indigo; **no purple**), with the existing chime per
+segment; the stele glows. Duan ≥ 7: S `PUSH` tilting up with the pillar top, 3 s. Duan 9, a physique or a special type:
+soul-colour sky tint .3 for 3 s + STAMP "BAKAT LANGKA · Duan {d} · {warna} / RARE TALENT · Duan {d} · {colour}".
+
+**(c) Acceptance:** the existing jade ring and bow; STAMP "Murid baru: {nama} / New disciple: {name}".
+
+**(d) Special reveals** (REVEAL beats from the disciple listener):
+- **Pengemis di Gerbang**, at its Foundation: a plum-blossom storm (CHERRY_LEAVES + pink DUST, r 12, 4 s), a 20-b
+  plum-blossom sword arc, and the root shown on the card flipping TRASH → HEAVENLY. S `ORBIT` r 5, 100° in 4 s;
+  `M_GLORY`. FULL "PENGEMIS DI GERBANG / THE BEGGAR AT THE GATE", sub "Akar Surgawi · Nila / Heavenly root · Indigo".
+  [D] *Return of the Mount Hua Sect* (the Plum Blossom Sword Saint reborn as a beggar boy).
+- **Nadi Dewa Sesat**, at Golden Core: seven gate rings glow up the body (particle rings at 7 heights), each with a cli
+  `NOTE_BLOCK_BASEDRUM`. FULL "NADI DEWA SESAT / HERETIC GOD VEINS"; each later gate a STAMP "Gerbang ke-{n}: {nama} /
+  Gate {n}: {name}". [D] *Against the Gods* ch. 45–47 (ch. 46: each opened gate raises the Heretic God art one realm).
+- **Garis Darah Dou Di**, at Dao Union: a purple-gold flame burst. FULL "DARAH DOU DI BANGKIT / THE DOU DI BLOODLINE
+  AWAKENS". [D] *Battle Through the Heavens*.
+
+**Sumber (arrival and test):** [D] *A Record of a Mortal's Journey to Immortality* ch. 1–5 (the Seven Mysteries Sect
+test); *Battle Through the Heavens* (testing stone, Duan); *Tales of Demons and Gods* ch. 13–14 (the seven soul colours);
+*Martial Universe* (Hundred Dynasties War). The cranes and mist are Presentasi.
+
+##### E5. Final Turnamen / Tournament final [`turnamen`] (Kompetisi Daftar Kuat, Turnamen Elit, Hundred Dynasties final; `SectEvents`, `DuelRules`)
+
+| t | Beat | Camera (master as spectator) | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| −3 (bracket pause) | Pengumuman / the announcement | S+P (SAFE): `TWO_SHOT` on the finalists, 3 s | the r 9 duel ring lights as a gold `G_RING` | – | srv goat horn "Call" .8; cli `NOTE_BLOCK_BASEDRUM` ×4 (0.5 s apart); cli `M_BOUT` until the bout ends |
+| −2.5–1 | FULL card | – | – | – | – |
+| bout (≤ 60 s) | – | — | the existing sparks and boss bar | – | – |
+| final hit | Pukulan penentu / the decisive blow | S+P (the duel has ended): Gerak lambat 1 s + `ORBIT` around the winner r 5, h 1.5, 60° in 2.5 s | gold sparks; FIREWORK particles (never rockets) burst r 6 at 8 b ×3 | SK_GOLD .3 for 4 s | srv `BELL_RESONATE`; cli success sting |
+| +1–4.5 | FULL card | – | – | – | `M_GLORY` (Elite, Hundred Dynasties) or `M_TRIUMPH` (internal) |
+
+- **Cards:** intro "BABAK FINAL / THE FINAL BOUT", sub "{A} melawan {B} / {A} versus {B}"; winner "JUARA DAFTAR KUAT /
+  STRONG RANKING CHAMPION", sub "{nama} · Nomor Satu / {name} · Number One"; Elite "JUARA PERINGKAT / RANKING CHAMPION",
+  sub "Bahtera Purba menanti / The Primordial Ark awaits"; Hundred Dynasties "JUARA PERANG SERATUS DINASTI / HUNDRED
+  DYNASTIES CHAMPION". Visiting champions arrive with the existing cloud-step puff and a STAMP with their sect's name.
+- **Tanding dengan Guru:** the master is fighting, so no camera before the end.
+- **Sumber:** [D] 20.3.12–13: *I Shall Seal the Heavens* ch. 27–31 (ch. 31: Grand Elder Ouyang announces the final match;
+  the victor is promoted to the Inner Sect), *Battle Through the Heavens* ch. 566–573, *A Will Eternal*, *Against the
+  Gods* ch. 434–436, *Soul Land* (the Shrek Seven Monsters at the Continental Elite competition), *Martial Universe*.
+
+##### E6. Sekte: tier, template, Istana Langit, hall level [`sekte_tingkat`, `sekte_templat`, `istana_langit`, `aula`] (21.16)
+
+**(a) Tier done** (the existing 10 s ceremony keeps its beats):
+
+| t | Beat | Camera (owner in the territory, SAFE) | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| 0 | Lonceng / bells | S+P: `FLYOVER` along the axis from above the gate (h 14) to 10 b before the main hall (h 8); path ≤ 48 b (start clamped), 6.5 s | the existing 3 bells; the main-hall pillar becomes a jade-gold `G_PILLAR` (glow 1.2); lantern orbs rise; the gold axis ribbon becomes a `G_TRAIL` (0.4 b) at h 0.5 | SK_JADE .3 | cli `M_GENTLE` |
+| 1–5 | FULL card (the existing title becomes the card; SUPPRESS_TITLE) | – | – | – | – |
+| 6–10 | Hormat / the bow | — | the existing disciple bows; new components flash a gold outline for 2 s when `EngineApi` exposes their bounds (read-only) | – | – |
+
+- **Card:** "SEKTE {NAMA} · TINGKAT {n} / {NAME} SECT · TIER {n}", sub = the tier name ("Formasi Agung / Grand Formation").
+
+**(b) Template complete** (tier 9 of templates 1–8): 9 small `G_PILLAR`s (glow .5, one per major component) + 9
+FIREWORK-particle bursts over the main hall; `M_GLORY` 20 s; FULL "SEKTE {NAMA} BERDIRI MEGAH / {NAME} SECT STANDS IN
+GLORY", sub "{templat} · sembilan tingkat selesai / {template} · nine tiers complete". The existing server line stays.
+
+**(c) Istana Langit T9** (template 9, 161×161, five peaks above the clouds), 20 s:
+
+| t | Beat | Camera | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| 0 | Fajar Surgawi / heavenly dawn | — | the existing cloud sea surges ×2 and glows gold | SK_GOLD .6 within 256 b for 20 s | cli `BELL_BLOCK` ×9 at the hall, 0.5 s apart, pitch rising F#3 → F#4; srv goat horn "Call" ×2 |
+| 0.5–8.5 | Melintasi lautan awan / across the cloud sea | S+P: `FLYOVER` from the gate at cloud-sea level (2 b above the mist), rising up the main axis to 12 b before the summit Pagoda Kaca Sembilan Harta; path ≤ 60 b, 8 s | five small gold `G_PILLAR`s (glow .5, one per peak) and the summit's white-gold big pillar (glow 3); 12 `G_RAYS` | – | cli `M_GLORY` 20 s |
+| 8.5–13 | Prasasti Langit / the sky plaque | P: `PULLBACK` from the pagoda 12 → 40 b out, h 6 → 24, 4.5 s (inside the 48-b ceremony cap, else shortened) | a 40-b gold 天庭 `F_GLYPH` over the summit (Presentasi); 9 light bursts; 9 crane silhouettes (6 b) circling the peaks | – | – |
+| 9–12.5 | FULL card | – | – | – | – |
+| 12.5–20 | Hormat seluruh sekte / the whole sect bows | — | the existing disciple bows toward the owner; eave lanterns flare at the blueprint's lantern stamps when the client has them (cap 64) | SK_GOLD → normal over 6 s | the existing server line |
+
+- **Card:** "ISTANA LANGIT BERDIRI / THE HEAVENLY COURT STANDS", sub "Sekte {nama} · lima puncak di atas awan / {name} ·
+  five peaks above the clouds", seal 庭.
+- **(d) Hall level** (HALL_LEVEL): a small jade pillar at the stele; at level 5 a STAMP "SEKTE TELAH KEMBALI / THE SECT
+  HAS RETURNED" ([D] *Return of the Mount Hua Sect*, the ruined sect's fame returns).
+- **Sumber:** [D] 21.1 template 9: *Shrouding the Heavens* (Ye Fan founds the Heavenly Court) and *A Record of a Mortal's
+  Journey to Immortality* (Heavenly Star City: higher layers have denser qi and higher status); [D] *Return of the Mount
+  Hua Sect*; [D] *Perfect World* ch. 551, 558 (rebuilding). The ceremony is game design (21.16); the 天庭 plaque is
+  Presentasi.
+
+#### F. Combat
+
+##### F1. Boss kills [`bos <warden|wither|naga|penjaga|warisan|raja_siluman>`]
+
+Bosses: Warden, Wither, Ender Dragon, Elder Guardian (1); the inheritance final guardian (22.8.5); Raja Siluman (19.3.1).
+
+| t | Beat | Camera (the killer) | VFX | Sky | Sound / music |
+|---|---|---|---|---|---|
+| kill | Pukulan terakhir / the last blow | `SNAP` −6% over 6 ticks; Gerak lambat 1.2 s for the killer and viewers within 32 b | white `FLASH` α .15; a pale soul wisp `G_TRAIL` rises 12 b and dissolves (Presentasi) | – | vanilla death + srv `BELL_RESONATE` .8 p .6 |
+| +0.3–3.3 | Kill-cam | S: `KILLCAM` r 8 (Warden r 6), 60° in 3 s, **first kill of that boss type per player only** (`extra.momen.kills`), only with SAFE and the boss within 24 b. P: every boss kill. **Dragon:** `PULLBACK` from the player 4 → 24 b back, h 2 → 16, framing the vanilla death beams, 4 s | – | – | cli `M_TRIUMPH` on a first kill |
+| +0.5–4 | FULL card (first kill) / STAMP (later) | – | – | – | – |
+| first Elder Guardian, Wither or Dragon kill | Benih Api Surgawi / Heavenly Flame seed | — | a flame column at the death point: Api Hati Lautan deep blue (SOUL_FIRE_FLAME + blue DUST, h 6); Api Jantung Jatuh pale violet; Api Teratai Iblis Murni a white-black 4-b `PETAL_RING` lotus | – | STAMP "Benih Api Surgawi: {api} / Heavenly Flame seed: {flame}" |
+
+- **Cards:** "{BOSS} DITAKLUKKAN / {BOSS} VANQUISHED"; Raja Siluman "RAJA SILUMAN TUMBANG / DEMON BEAST KING SLAIN".
+- **Sumber:** the kill-cam is Presentasi. Flame seeds: [D] *Battle Through the Heavens*, the ranked Heavenly Flames
+  (20.3.16). Raja Siluman: its own 19.3.1 Sumber line.
+
+##### F2. Lolos dari Maut / Cheat-death [`lolos_maut <sumber>`] (`DeathGuard` order)
+
+**Never a camera** (real danger). Only Gerak lambat, `SNAP`, one `FLASH` (luminance rule), `INK_EDGE` and a STAMP.
+
+| Source | Beat | VFX | STAMP (id / en) | Sumber |
+|---|---|---|---|---|
+| Jiwa Tak Hancur (IA L7 boon, stage PERK) | Retak emas / golden cracks: Gerak lambat 1.5 s; 7b particles freeze 0.4 s, then burst | the body outline cracks in gold light (24 gold DUST lines) and reforms; gold `G_RING` r 6; gold `INK_EDGE` 2 s (on top of P7-kultivasi's golden shatter) | JIWA TAK HANCUR / UNBROKEN SOUL | the boon's own 19.3.11 line; the look is Presentasi |
+| `three_life_saving_hairs` | Rambut terakhir / the last hair | the existing gold monkey puff + a 3-b gold APE point cloud leaping away | RAMBUT PENYELAMAT · {n} tersisa / LIFE-SAVING HAIR · {n} left | [D] *Journey to the West* ch. 15 (given), 75 (used) |
+| `nezha_lotus_body` | Lahir dari teratai / born from the lotus: Gerak lambat 1 s | a lotus `PETAL_RING` (8 petals, 6 b) closes over the player and blooms open in 1 s; a pink-white flash | TUBUH TERATAI / LOTUS INCARNATION | [D] *Investiture of the Gods* ch. 14 |
+| `bodhisattva_tree` HP floor | – | leaf-crown pieces wrap and release | SERATUS KEHIDUPAN / HUNDRED LIVES | [D] *Battle Through the Heavens* ch. 1426 |
+| Darah Abadi (disciple) | – | a blood-gold heartbeat aura; STAMP to the master | DARAH ABADI · {nama} / UNDYING BLOOD · {name} | [D] *A Will Eternal* |
+| Perlindungan Jiwa (heir) | the old sage | the existing RING_GHOST as a 3-b translucent sage behind the heir, hands on its shoulders, 2 s | JIWA GURU MELINDUNGI / THE MASTER'S SOUL SHIELDS | [D] *Battle Through the Heavens* (Yao Lao), *Coiling Dragon* (Doehring Cowart) |
+| Balas Budi (master below 25% HP) | the rescue | a `G_TRAIL` streak arcs from the disciple's old spot to the master in 0.4 s; a shield SHELL; a taunt ring r 12 | BALAS BUDI · {nama} / REPAYING THE MASTER · {name} | [D] *Battle Through the Heavens* (Xiao Yan rescues Yao Lao) |
+| Pelarian Jiwa (disciple, Nascent Soul+) | soul flight | a 0.3-b gold `G_TRAIL` arcing high (peak 24 b) to the stele | JIWA MELARIKAN DIRI · {nama} / THE SOUL FLEES · {name} | [D] *A Record of a Mortal's Journey to Immortality* (20.3.17) |
+| Totem of Undying | untouched (vanilla) | – | – | – |
+
+The tribulation's never-lethal clamp is **not** a cheat-death scene: it is the failure, A5.
+
+#### G. Extras (short)
+
+| Moment [id] | Camera (S) | VFX / sky / music | Card | Sumber |
+|---|---|---|---|---|
+| Upacara Akar, root test 8 s [`akar`] | `ORBIT` r 5, h 1.6, 120° in 5 s | one small `G_PILLAR` (glow .4) per element in turn; HEAVENLY: SK_WHITE + `M_GLORY` | AKAR ROH: {grade} / SPIRITUAL ROOT: {grade} | *Terinspirasi dari* the *Battle Through the Heavens* testing stone (20.3.1) |
+| Momen Pencerahan, 10 s while meditating [`pencerahan`] | `ORBIT` r 4, h 1.2, 90° in 5 s (client safe check) | a golden lotus `PETAL_RING` under the player; soft gold sky; `M_GENTLE` | STAMP PENCERAHAN / ENLIGHTENMENT | Presentasi |
+| Spirit beast tier 3 (Nine-Tailed Fox, Heavenly Wolf) [`binatang`] | `ORBIT` around the beast, 80° in 4 s | a fan of nine light tails (point cloud) or a moon disc | RUBAH EKOR SEMBILAN / NINE-TAILED FOX (etc.) | Presentasi (phase 3 predates the rule) |
+| Heir named, end of the 60 s ritual [`pewaris`] | `TWO_SHOT` 3 s | the existing dantian link as a jade `G_TRAIL` | PEWARIS GENERASI KE-{n} / HEIR OF GENERATION {n} | [D] *I Shall Seal the Heavens* ch. 102, 1534–1556 |
+| Master's ring bond [`cincin_guru`] | — | the existing RING_GHOST bows | STAMP JIWA GURU BANGKIT / THE MASTER'S SOUL AWAKENS | [D] *Battle Through the Heavens*, *Coiling Dragon* |
+| Jiwa Guru Turun [`guru_turun`] | — (combat) | the master's realm-colour silhouette wraps the heir for 20 s | STAMP JIWA GURU TURUN / THE MASTER DESCENDS | [D] *Battle Through the Heavens* |
+| Heavenly Flame absorbed, 20 s ritual [`api_surgawi`] | `ORBIT` 60° in 3 s at success | an 8-b flame column in the flame's colour; the orb joins the aura | API SURGAWI DISERAP · {api} / HEAVENLY FLAME ABSORBED · {flame} | [D] *Battle Through the Heavens* |
+| Void Realm floor 50 / 60 first clear [`batas_suci`] | — | the existing phantom dissolve + a gold `G_RING` | BATAS SUCI / HEAVENLY SACRED BORDER | [D] *Tales of Demons and Gods* ch. 48 (only those under fifteen may enter; three passed it in several hundred years); *Perfect World* ch. 261 |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.14 Budgets, quality and compatibility
+
+#### 23.14.1 Client budgets (replaces both drafts; amends 22.15.2)
+
+| Budget | Minimal | Normal | Maximal | Shader pack on |
+|---|---|---|---|---|
+| geometry quads per frame, all 7b renderers together | 400 | 1,500 | 3,000 | × 0.6 |
+| large translucent layers at once | 1 | 2 | 3 | − 1 (at least 1) |
+| big bolts / big pillars alive | 1 / 1 | 3 / 2 | 6 / 3 | same |
+| `G_VORTEX` | none: the existing `TribulationFx` disc, the sky grade and the HUD gradient | inner shell 10×40 + rim | both shells 16×48 | inner shell only, unless a large layer is free |
+| bolt branches | 0 | 1 | 2 + S/2 | same |
+| giant figures (`F_FIGURE`) | 0 (particle outline) | 1 | 2 | same |
+| silhouettes (`F_SILHOUETTE`) | 1 outline | 6 | 12 | same |
+| displays per scene (debris, shards, glyphs) | 2 | 8 | 24 | same, always inside the 22.15.2 alive caps |
+| `F_DEBRIS` / `G_AURORA` / `CHROMA` | off / off / off | off / on / on | on / on / on | same |
+| 7b particles | `FxBudget` tokens (80 / 300 / 800 per tick, shared with every other effect); 7b layers are DETAIL or EXTRA, never CORE; END_ROD ≤ 15% of a layer | | | |
+| post chains | 0 in every tier (23.1.1 rule 5) | | | |
+| other players' giant scenes | 0 | 1, at ≤ 25% of the budget | 1, at ≤ 25% | same |
+| camera, letterbox, cards, sound, music | the same in every tier (they cost nothing) | | | |
+
+This user (Maximal, Complementary on) therefore gets 1,800 quads, 2 large layers, 6 big bolts and 3 big pillars.
+
+- **Large layer** = any translucent surface that can cover more than about a tenth of the screen: a vortex shell, a ray
+  fan, a ring wider than 16 b, a gate, an aurora, a dome, a giant figure, a wide seam. Pillars, bolts, trails, thin seams
+  and rings ≤ 16 b are not large layers (they still count quads).
+- **Who yields.** When the cap is reached, the scene with the lower priority (23.6) yields first; inside one scene the
+  lowest layer drops to its particle fallback: vortex inner shell 1, gate 2, giant figure 3, rays 4, vortex rim 5,
+  rings 6, dome 7, aurora 8, down-shafts 9.
+- **6c displays.** While a TECH_ULTIMATE scene runs, the spec's own 6c displays (dome, laser, sky tear) already use
+  large layers, so 7b adds at most 1 large layer to it.
+- **Amendment to 22.15.2.** "At most 2 large translucent layers at once" becomes **1 / 2 / 3 by tier, − 1 under a
+  shader pack**, for 6c displays and 7b geometry alike.
+- **Multipliers.** `epic_vfx` (0.5 / 1 / 1.5) scales sizes and counts but never a cap. LOW_LOAD: × 0.5 geometry and no
+  displays. Others' scenes: × `othersScale()`. Otomatis still applies (below 40 fps → Minimal).
+- **CPU.** Seeded meshes are built once per beat and rigid shapes (spirals, rings, gates) are turned with the
+  `PoseStack`, so there is no per-frame trigonometry. Bolts are re-seeded at most every 2 ticks. One
+  `submitCustomGeometry` per render type per frame; no per-frame allocation; at most one `level.clip` per frame (camera);
+  the client `Enemy` scan runs every 10 ticks in a 16-b box, only while a shot runs or a safe beat is pending; the
+  visual-state edge scan runs every 5 ticks over players within 64 b.
+
+#### 23.14.2 Frame guard (`EpicBudget`, on by default, independent of Otomatis)
+
+The user has `quality_auto: false`, so Otomatis never protects them; the frame guard does.
+- **Baseline.** A 2-s ring of frame times (one `System.nanoTime()` per frame in `epic_screen`: the only idle work of
+  7b). When a scene's first beat arrives, the baseline is the median of the ring.
+- **Trigger.** For 20 frames in a row: frame time above 1.35 × baseline, or below 30 fps. A second trigger is the CPU
+  cost of 7b itself (`EpicRenderer` submits + `epic_screen`) above 2.0 ms averaged over 30 frames.
+- **Action.** The scene drops one tier (Maximal → Normal → Minimal → no geometry) for the rest of that scene and never
+  climbs back mid-scene. After drops in 3 scenes in a row, later scenes start one tier lower for the session.
+- Frames while the window is not focused (`Minecraft.isWindowActive()`, dynamic-fps throttles them) are ignored.
+- `/sinematik info` shows the baseline, the drops and the tier now; `/sinematik reset` clears the session memory.
+
+#### 23.14.3 Shader-pack profile (Iris)
+
+`ShaderCompat` detects Iris by reflection only (no compile dependency):
+`Class.forName("net.irisshaders.iris.api.v0.IrisApi")`, then `getInstance().isShaderPackInUse()`, refreshed every
+100 ticks and after a resource reload. A missing class means the vanilla profile; any reflection error means the
+vanilla profile and one log line. `isRenderingShadowPass()` is also checked in the render event (cheap).
+
+| Part | Vanilla profile | Shader-pack profile (this user) |
+|---|---|---|
+| budgets | the tier | × 0.6 quads, − 1 large layer |
+| sky | attribute overrides; HUD top gradient ≤ 0.35 for dark grades | overrides stay; the HUD sky layer is the primary channel (23.9.4) |
+| clouds | vanilla clouds lowered and darkened | not relied on (the pack draws its own) |
+| bolts and thin glow | `RenderTypes.lightning()` | `lightning()` (Iris maps the pipeline); the constant `BOLT_EMISSIVE_UNDER_PACK` switches to the emissive glow strip if colours look wrong [verify] |
+| soft layers | `entityTranslucentEmissive` | the same; `epic_pack_geometry` off → particle fallbacks |
+| pillars | beacon beam | beacon beam (Iris `BEACON_BEAM` program) |
+| giant figures | `entityTranslucentCull`, full-bright | the same; never in the shadow pass (`COLLECT_SUBMITS` does not fire there) |
+| hand during shots | the `renderItemInHand` cancel | `detached` (Iris `HandRenderer.canRender`) plus the cancel |
+| screen effects | HUD only | HUD only |
+
+#### 23.14.4 Sodium and the other installed mods
+
+- **Sodium 0.9.3.** Fabric fires `COLLECT_SUBMITS` from vanilla `submitFeatures`, which Sodium leaves alone. The camera
+  is directed inside `Camera.update`, so Sodium culls from the directed position. Shots never move more than 8 b per
+  tick and cranes stay ≤ 24 b up, so visibility rebuilds stay smooth (pop-in [verify]).
+- **BadOptimizations 2.4.1.** Its lightmap mixin updates only when `SKY_LIGHT_COLOR` or `SKY_LIGHT_FACTOR` changes, so
+  7b always moves them together with `AMBIENT_LIGHT_COLOR`. Its `tickFov` and particle-extract mixins do not touch ours.
+- **ImmediatelyFast.** 7b's HUD uses plain `GuiGraphicsExtractor` calls, which it batches.
+- **dynamic-fps.** Scenes run on server game time (`at`), so a throttled client catches up. No shot starts while the
+  window is not focused.
+- **EMF / ETF.** `F_FIGURE` bakes the vanilla `ModelLayers.PLAYER` itself and never goes through an entity renderer, so
+  the model mods do not replace it [verify].
+- **Lithium, FerriteCore, Butter Bot.** No interaction; Backspace is free in all of them.
+- **Displays** keep `setViewRange` and width/height (22.4.3), so culling mods keep them.
+
+#### 23.14.5 Server and network cost
+
+- Added server average ≤ 0.05 ms per tick: event calls, plus one `END_SERVER_TICK` listener that returns at once while
+  the PRE/HUSH timer map is empty.
+- Flags are computed only when a cue is sent: one `Mob` box (16 b), one `Enemy` box (24 b), one player-list pass (12 b).
+- At most 3 cues per subject per 20 ticks, about 47 bytes each; a 9-strike tribulation is about 22 cues in 45 s; no
+  per-tick traffic and no keepalive. World sounds ≤ 4 per beat, counting the sounds the existing code already plays.
+- LOW_LOAD (average tick above `kehancuranMsptPause`): no PRE beats, clients halve geometry.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.15 Commands
+
+`/kultivasi` and `/cultivate` are the same root.
+
+#### 23.15.1 Test (op): `uji momen` (`EpicCommands.addTestCommands(uji)`, P7b-langit)
+
+| Command | Effect |
+|---|---|
+| `uji momen <id> [arg] [skala <0-10>] [beat <n>]` | plays that moment on yourself with TEST: every beat at its real spacing. `skala` overrides S; `beat` plays one beat only. Ids and args below; tab completion lists them |
+| `uji momen tribulasi_penuh <ranah> [lapis] [gagal]` | a whole tribulation scene: A1, every A2, A3, then A4 with the realm layer (or A5 with `gagal`) at the real 240 / 70-tick rhythm. Realm ids as in `uji ranah`. Dewa Abadi lasts about 2.6 minutes |
+| `uji momen semua [kelompok] [jeda <detik>]` | showcase: every moment in catalogue order, or one group (`tribulasi` A, `terobosan` B, `krisis` C, `kekuatan` D, `murid` E1–E3, `sekte` E4–E6, `tempur` F, `lain` G). Gap 3 s by default (1–10). Chat line "n/N · id · Nama". About 9 minutes for all |
+| `uji momen berhenti` | stops your running test scenes and the showcase; clients restore sky, sound gains, music and camera at once |
+| `uji momen daftar` | every id with its group, args and length |
+
+**Ids and args** (each storyboard heading in 23.13 shows its id): `tribulasi`, `petir`, `petir_terakhir`,
+`tribulasi_berhasil`, `tribulasi_gagal`, `kebangkitan`, `fondasi <retak|normal|sempurna|surgawi>`, `inti_emas`,
+`jiwa_baru`, `transformasi_dewa`, `penyatuan_dao [dao]`, `kenaikan_abadi <1-9>`, `dewa_abadi`, `pengakuan_langit`,
+`surgawi`, `penyimpangan`, `iblis_hati`, `wujud_dharma`, `wilayah_dao <dao>`, `jurus_abadi <spec>` (the 12 of D3),
+`jurus_dewa <spec>` (the 11 of D4), `kehancuran`, `pemusnah <art>` (the 9 arts of 20.3.21), `murid_terobosan`,
+`bencana <1-7>`, `penginjak_langit`, `lampu_jiwa`, `melampaui_guru`, `penerimaan [perang]`, `ujian_masuk <1-9>`,
+`pengemis`, `nadi_dewa_sesat`, `darah_dou_di`, `turnamen [internal|elit|seratus]`, `sekte_tingkat`, `sekte_templat`,
+`istana_langit`, `aula`, `bos <warden|wither|naga|penjaga|warisan|raja_siluman>`,
+`lolos_maut <jiwa_tak_hancur|rambut|teratai|pohon|darah_abadi|perlindungan_jiwa|balas_budi|pelarian_jiwa>`, `akar`,
+`pencerahan`, `binatang`, `pewaris`, `cincin_guru`, `guru_turun`, `api_surgawi`, `batas_suci`. Dao ids are the ones the
+existing commands use.
+
+**Rules of test cues:**
+- **TEST changes nothing.** It announces nothing, writes nothing (`extra.momen` untouched, FIRST never set), deals no
+  damage, changes no rank and never carves: `kehancuran` and `pemusnah` show only the VFX and the client outline;
+  `WorldBreaker` is never called. Cooldowns are ignored. World sounds play, as in the 6c showcase.
+- **The camera still obeys** the player's mode and every hard gate; SAFE is computed for real. Stand somewhere calm to
+  see the shots; `/sinematik penuh` shows the danger micro-shots.
+- **Subjects.** You. Disciple scenes use your nearest disciple within 32 b, otherwise a point 6 b ahead (clones and
+  figures then use your skin). Boss kill-cams orbit a point 8 b ahead. Tournaments frame you and a point 6 b to your
+  right. Sect scenes use your sect site and main hall when you own one, otherwise an axis of 40 b along your look. The
+  Kehancuran zone is 30 b ahead.
+- **Client-derived moments** (`jurus_abadi`, `jurus_dewa`, `wujud_dharma`, `wilayah_dao`, `pencerahan`, `penyimpangan`,
+  `kehancuran`) are sent as cues with TEST and add only the 7b layers. To see them with the technique's own FX, cast it
+  with 6c `uji teknik <id>`: a real cast starts the 7b layers by itself.
+
+#### 23.15.2 Debug (op, P7b-langit)
+
+- `debug momen info`: the last 16 cues sent (game time, moment, beat, S, flags by name, receivers).
+- `debug momen bendera [player]`: SAFE, RESULT_SAFE, IN_COMBAT, LETHAL_NEXT and PROTECTORS right now, with the reason for
+  every false SAFE ("Mob menargetkan dalam 16 blok", "jatuh", …).
+
+#### 23.15.3 Client command `/sinematik` (no op; `ClientCommandRegistrationCallback`, P7b-sinema)
+
+| Command | Effect |
+|---|---|
+| `/sinematik penuh\|singkat\|mati` | camera mode |
+| `/sinematik vfx <0.5\|1\|1.5>` | VFX scale |
+| `/sinematik rekam [nyala\|mati]` | Mode Rekam |
+| `/sinematik paket [nyala\|mati]` | soft geometry while a shader pack is on |
+| `/sinematik info` | profile (vanilla or shader pack, Iris found or not), tier now, frame-guard baseline and drops this session, budget use of the last scene |
+| `/sinematik reset` | every 7b setting back to its default, and clears the frame-guard memory |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.16 Integration, text, help and advancements
+
+#### 23.16.1 Where 7b plugs into the existing code
+
+| Existing system | 7b use | How (owner) |
+|---|---|---|
+| `Tribulation.Listener` (19.2, in the code with `onFinish`) | tribulation beats; PRE and HUSH from its own timers | listener in `EpicHooks.init()`, zero edits (P7b-langit) |
+| `Breakthrough` | BEGIN / SUCCESS / FAIL | `Breakthrough.Listener` (spine 7b) |
+| `DiscipleHooks.addBreakthroughListener` | disciple beats and special reveals | listener (P7b-langit) |
+| `BuildListener.add` | sect tier and template | listener (P7b-langit) |
+| `DeathGuard` | cheat-death | `SavedListener` (spine 7b) + listener |
+| `ServerLivingEntityEvents.AFTER_DEATH`, `KillCredit.resolve`, `EliteMonsters.tier` | boss kills | own listener, read-only calls (P7b-langit) |
+| `Ascension`, `HeartDemons`, `Calamity`, `Surpass`, `HuFa`, `Heir`, `Halls`, `Candidates`, `SectEvents`, `Kehancuran`, … | their beats | the one-line calls of 23.5.3 (P7b-langit) |
+| `SpecFx.play` | ultimates, own Kehancuran casts | one call (P7b-sinema) |
+| `ClientCultivation` visual state | Dharma, Domain, Enlightenment, Deviation | read-only tick (P7b-sinema) |
+| `client/kehancuran/RedSkyHud` | the red sky becomes a sky grade | one early return (P7b-sinema) |
+| `TribulationFx`, `BreakthroughFx`, `AscensionFx`, `TrialFx`, the disciple FX | unchanged; 7b draws on top | read-only (P7-tempur owns `TribulationFx`) |
+| `CameraShake.add`, `ScreenFlash.add` / `vignette`, `FxBudget.take`, `CommonFx`, `AvatarFx`, the 6c templates GLYPH and SKY_SILHOUETTE | reused, never re-implemented | read-only calls |
+| `EffectQuality` (`level`, `othersScale`, `reduceMotion`, `flash`, `shake`, `get`, `put`) | tiers and 7b settings | read-only; own `epic_*` keys through `get` / `put` |
+| `Brush`, `Palette` (`screen/ui`) | title cards | read-only |
+| `DaoCircleLayer`, `DharmaGlowLayer` | the custom-geometry and `order(n)` patterns | copied, not edited |
+| server titles (`Msg.title` in the tribulation omen, the ascension voice, `Ceremonies`, `ImmortalPerks`) | no double titles | client `HudTitleMixin`; no server edit |
+| `GameRendererShakeMixin`, `MouseHandlerMixin` | untouched | 7b adds its own mixins beside them |
+
+#### 23.16.2 Text
+
+| File | Contents | Owner |
+|---|---|---|
+| `lang-src/spine7b.*` | the three config comments | spine |
+| `lang-src/momen.*` | every card title and subtitle (`kultivator.momen.<card>.title` / `.sub`), banners and stamps, setting labels and tips (`kultivator.momen.setting.*`), the key `key.kultivator.skip_scene`, the skip hint, `/sinematik` feedback, the help topic `kultivator.screen.help.momen` and `.title` | P7b-sinema |
+| `lang-src/momen_server.*` | `uji momen` and `debug momen` feedback, moment names for `daftar` and the showcase | P7b-langit |
+
+Card placeholders ({ranah}, {nama}, {q}, {n}, …) are filled on the client from the cue's `a` / `b` and the synced names,
+with the existing realm, quality and boon keys read-only. Work titles are in English in both languages.
+
+#### 23.16.3 Help topic `momen` ("Momen Epik / Epic Moments")
+
+Written by P7b-sinema in `lang-src/momen.*`:
+1. What they are: short in-game cinematics, not video files, at tribulations, breakthroughs, Pengakuan Langit, heart
+   demons, disciple calamities, sect ceremonies, ultimates and boss kills.
+2. Kamera sinematik: Singkat (default) only in calm moments; Penuh adds short shots during danger; Mati none. Every key
+   still works and moving ends a shot. Backspace "Lewati sinematik"; pressed twice it also removes the bars for that
+   scene.
+3. Safety: no shot near monsters, at low health, in water or lava, while falling or riding, or during a strike's
+   warning ring.
+4. The settings, Mode Rekam (with a tip for recording clips with OBS) and `/sinematik`.
+5. Shader packs: the sky darkens as a screen layer; `/sinematik paket mati` if soft shapes look wrong.
+6. Nothing changes the world: no block, no weather, no time change, no real lightning.
+7. Ends with: "Sumber: tiap momen punya baris Sumber sendiri (*Against the Gods*, *I Shall Seal the Heavens*, *A Record
+   of a Mortal's Journey to Immortality*, *Journey to the West*, *Renegade Immortal*, *Battle Through the Heavens* dan
+   lainnya). Kamera, musik, warna langit, pilar cahaya dan cap aksara adalah presentasi, bukan kanon."
+
+#### 23.16.4 Advancements
+
+**None.** 7b adds no gameplay, every moment it decorates already has its own advancement where one makes sense (realms,
+`root_tested`, the sect, boss and phase-7 advancements of 19.5), watching a cinematic is not an achievement, and a toast
+would cover the cards. The first-kill rule of F1 uses `extra.momen.kills`, not an advancement.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.17 Modules, file ownership and contracts
+
+#### 23.17.1 Modules
+
+Two implementation agents work in parallel after spine 7b. **They never edit each other's files, the spine's files or
+a P7 module's files.** A missing need goes into the final report as a TODO. Paths as in 19.7.
+
+| Module | Owns (new) | May edit (one-line hooks only) | Never touches |
+|---|---|---|---|
+| **P7b-langit** (server: cues, hooks, tests): 23.4, 23.5.2–23.5.4, 23.15.1–2, the server sounds of 23.13 | `epic/EpicMoments`, `epic/EpicHooks`, `epic/EpicCommands`, `epic/EpicScale`, `epic/EpicTests` (the scripted test sequences), `lang-src/momen_server.*`, the saved key `extra.momen` | the call sites of 23.5.3: `ascension/Ascension`, `trial/HeartDemons`, `disciple/path/Calamity`, `Surpass`, `HuFa`, `Heir`, `MasterRing`, `Bond`, `disciple/power/UndyingCodex`, `SoulFlight`, `HeavenlyFlames`, `sect/hall/Halls`, `Candidates`, `sect/event/SectEvents`, `Tournament`, `HundredDynasties`, `VoidRealm`, `kehancuran/Kehancuran` (the CRATER call goes where the 22.11 job reports completion; in `WorldBreaker` only that one call, never logic), `cultivation/SpiritRoots`, `beast/SpiritBeasts` | `cultivation/Tribulation`, `DaoProtectors`, `XpSources` (P7-tempur); `Breakthrough`, `DeathGuard` and every spine-only file; every other P7 file; every client file |
+| **P7b-sinema** (client: director, camera, sky, renderers, screen, sound): 23.6–23.12, 23.14, 23.15.3, the client side of 23.13 | `client/epic/**`: `EpicClient`, `EpicSettings`, `EpicDirector`, `SceneCatalog`, `Scene`, `EpicClock`, `EpicBudget`, `ShaderCompat`, `EpicClientCommands`; `camera/` (`CinematicDirector`, `Shots`, `ShotGuard`, `SkipKey`); `screen/` (`EpicScreen`, `Letterbox`, `TitleCard`, `HudHider`); `sky/SkyDirector`; `render/` (`EpicRenderer`, `EpicRenderTypes`, `SkyProjection`, `VortexRenderer`, `BoltRenderer`, `PillarRenderer`, `RaysRenderer`, `RingRenderer`, `GateRenderer`, `AuroraRenderer`, `TrailRenderer`, `GiantFigureRenderer`); `fx/` (`EpicParticles`, `EpicDisplays`, `PointClouds`); `sound/` (`EpicSound`, `EpicRampSound`, `MusicCue`). The bodies of `client/mixin/CameraCinematicMixin`, `GameRendererCinematicMixin`, `MouseCinematicMixin`, `EnvironmentProbeMixin`, `HudTitleMixin`. Assets `textures/misc/epic/*` (`cloud_swirl`, `glow_strip`, `ray_fan`, `ring_soft`, `thunder_avatar`, `immortal_avatar`) and `textures/gui/epic/*` (`ink_band`, `seal`, `vignette`, `ink_edge`, `bar_trim`), made by `tools/gen_epic_textures.py` (procedural PNGs, the `tools/png.py` pattern). `lang-src/momen.*`. The client config keys `epic_*` | `client/fx/spec/SpecFx` (one call in `play`), `client/kehancuran/RedSkyHud` (one early return) | `client/fx/TribulationFx` (P7-tempur); `QiHud`, `EffectQuality`, `CultivationScreen`, `StatusPage`, `SettingsPage`, `HelpPage`, `screen/ui/*`, `AuraFx` (P7-jalan; read-only use of `Brush`, `Palette`, `EffectQuality` is fine); `MeditationFx` (P7-kultivasi); `Keys`, `MouseHandlerMixin`, `GameRendererShakeMixin`, `AvatarFx`, `CameraShake`, `ScreenFlash`, `FxBudget` (read-only use); every server file |
+
+**Spine-only files (7b):** `network/Payloads`, `Net`, `epic/EpicIds`, `epic/EpicColors`, `cultivation/Breakthrough`
+(listener), `util/DeathGuard` (saved listener), `KultivatorConfig`, `Kultivator`, `KultivatorClient`,
+`command/CultivateCommand`, `command/TestCommands`, `kultivator.client.mixins.json` and the five mixin stub classes
+(P7b-sinema fills the bodies afterwards, the 19.2 `MobFinalizeSpawnMixin` pattern), the stubs of 23.17.3, the two lines
+in `SettingsPage` and `HelpPage` (23.5.1 item 9), `lang-src/spine7b.*`.
+
+#### 23.17.2 Order of work
+
+1. **Spine 7b** (23.5.1). Merged into the P7 spine when phase 7 has not started; otherwise its own pass after the four
+   P7 modules returned (the `SettingsPage` and `HelpPage` lines need P7-jalan to be done).
+2. **P7b-langit and P7b-sinema in parallel**, together with any P7 module still running. No Gradle in the modules; each
+   returns a player-facing summary, its checklist lines and its TODOs (for example a 23.5.3 site it could not find).
+3. **One compile:** `compileJava`, `compileClientJava`, `jar --no-daemon` (never tests, `runClient` or `build`), then a
+   fix pass.
+4. **P7b-docs:** a PANDUAN section "Momen Epik", `docs/uji/FASE-7b.md` from 23.18, a README line.
+
+If a module runs long, these parts may slip to **Phase 7c** without breaking contracts:
+
+| Module | May slip |
+|---|---|
+| langit | the E4 special reveals, the G extras, the showcase groups (the plain `uji momen semua` stays) |
+| sinema | `G_AURORA`, `F_DEBRIS`, Mode Rekam, the ink-bleed reveal (a plain fade stays), the cloud-height override |
+
+#### 23.17.3 Public contracts (spine stubs with final signatures; the owner fills them)
+
+```java
+// common, spine (written in full, not stubs)
+EpicIds: moments 1–14 and 20–25, beat ids per moment, FLAG_CAMERA_OK … FLAG_SUPPRESS_TITLE (23.4.2), PRE_LEAD = 30, HUSH_LEAD = 60
+EpicColors.IMMORTAL_STRIKE (int[7]) ; NINE (int[9]) ; immortalStrike(int index) → int ; variantBolt(int variant) → int
+Payloads.EpicMoment(int moment, int beat, int subject, int viewer, double x, double y, double z, long at, int seed, int a, int b, float f, int s, int flags)
+Breakthrough.KIND_AWAKENING = 0 … KIND_FORCED = 3 ; Breakthrough.Listener (23.5.1) ; Breakthrough.addListener(Listener)
+DeathGuard.SavedListener { void onSaved(ServerPlayer p, DeathGuard.Stage stage); } ; DeathGuard.addSavedListener(SavedListener)
+
+// P7b-langit
+EpicMoments.send(ServerLevel level, int moment, int beat, @Nullable Entity subject, @Nullable ServerPlayer viewer, Vec3 pos, long at, int a, int b, float f, int s, int extraFlags)
+EpicMoments.flags(ServerPlayer viewer) → int
+EpicScale.of(Rank) → int (0–10) ; EpicScale.ofDisciple(DiscipleEntity) → int
+EpicHooks.init()
+EpicHooks.ascension(ServerPlayer, int beat, int tick, boolean real)
+EpicHooks.heartDemon(ServerPlayer, @Nullable LivingEntity demon, int beat, int kind)
+EpicHooks.calamity(DiscipleEntity, @Nullable ServerPlayer master, int beat, int k, int index, int total)
+EpicHooks.surpass(DiscipleEntity, ServerPlayer master, boolean byDuel)
+EpicHooks.takeLightning(DiscipleEntity, ServerPlayer master)
+EpicHooks.discipleSave(DiscipleEntity, @Nullable ServerPlayer master, int kind)
+EpicHooks.hallLevel(MinecraftServer, UUID owner, int level)
+EpicHooks.recruit(ServerLevel, UUID owner, int beat, Vec3 pos, int a, int b)
+EpicHooks.tournament(ServerLevel, int beat, int kind, @Nullable LivingEntity first, @Nullable LivingEntity second, Vec3 pos)
+EpicHooks.kehancuran(ServerLevel, @Nullable ServerPlayer owner, @Nullable Entity caster, Vec3 centre, int art, float radius, int beat, int blocks)
+EpicHooks.extra(ServerLevel, int beat, @Nullable ServerPlayer viewer, @Nullable Entity subject, Vec3 pos, int a, int b)
+EpicCommands.addCommands(LiteralArgumentBuilder<CommandSourceStack> root, LiteralArgumentBuilder<CommandSourceStack> debug)
+EpicCommands.addTestCommands(LiteralArgumentBuilder<CommandSourceStack> uji)
+
+// P7b-sinema
+EpicClient.init() ; EpicClient.onPayload(Payloads.EpicMoment payload, ClientPlayNetworking.Context context)
+EpicDirector.onTechFx(Payloads.TechFx payload) ; cinematicActive() → boolean ; recordHide() → boolean
+CinematicDirector.pose(Camera, DeltaTracker) → @Nullable CinematicDirector.Pose(Vec3 pos, float yaw, float pitch)
+CinematicDirector.fovScale() → float ; roll() → float ; hideHand() → boolean ; consumeMouse(double dx, double dy) → boolean
+SkyDirector.override(EnvironmentAttribute<?> attribute, CallbackInfoReturnable<Object> cir) ; coversRedSky() → boolean
+TitleCard.suppressVanillaTitle() → boolean
+EpicSettings.rows() → List<EpicSettings.Row>
+EpicSettings.Row(String key, boolean cycle, Supplier<Component> value, Runnable next, Supplier<List<Component>> tooltip)
+EpicSettings.camera() → EpicSettings.Camera (PENUH, SINGKAT, MATI) ; vfx() → float
+EpicSettings.letterbox() ; cards() ; music() ; slowmo() ; geometry() ; sky() ; record() ; packGeometry()   // → boolean
+```
+
+Existing, read-only for 7b: `Tribulation.isTest` / `strikesDone` / `strikeTotal` / `OMEN_TICKS` / `STRIKE_INTERVAL`,
+`DaoProtectors.count`, `CultivationData.sessionExtra`, `KillCredit.resolve`, `EliteMonsters.tier`, `Sects.sectOf`,
+`EngineApi.get().site` / `anchor`, `SectTemplates.TIERS`, `DiscipleHooks.addBreakthroughListener`, `BuildListener.add`,
+`ClientCultivation.visual`, `VisualState`, `EffectQuality.*`, `FxBudget.take`, `CameraShake.add`, `ScreenFlash.*`,
+`CommonFx.*`, `Brush`, `Palette`.
+
+#### 23.17.4 Cross-module contracts with phase 7
+
+- **P7-tempur** keeps the `Tribulation.Listener` calls where they are (`onOmen` after `start`, `onStrike` after the
+  hit, `onFinish` / `onEnd` once at the end) and keeps `OMEN_TICKS` (240) and `STRIKE_INTERVAL` (70) public. If it ever
+  changes the rhythm, only the PRE and HUSH timing of 7b drifts (the client clamps it). It keeps writing
+  `sessionExtra.trib.pct` (LETHAL_NEXT reads it). It may use `EpicColors.immortalStrike` for the optional seven-colour
+  rings of 19.3.8. `TribulationFx` stays its own: 7b never draws the rings.
+- **P7-jalan** keeps the spine's `SettingsPage` block and `"momen"` topic through its edits. It may read
+  `EpicDirector.recordHide()` in `QiHud` to hide the Qi bar during Mode Rekam's safe beats (optional; without it the bar
+  simply stays). `TribulationHud` and its would-fail warning stay attached before `CHAT`, so they draw above the bars,
+  and 7b never hides them.
+- **P7-kultivasi** keeps `VisualState.ENLIGHTENED` and `DEVIATION` meaning what they mean (7b starts scenes on their
+  rising edges), keeps Jiwa Tak Hancur a `DeathGuard.Stage.PERK` guard (CHEAT_DEATH reads the stage), and keeps the boon
+  title (7b hides it on the client while a card shows).
+- **P7-harta:** no contract.
+- **6c `SpecFx`:** the one call sits after the payload's spec is resolved and before the templates spawn; it can never
+  throw (`EpicDirector.onTechFx` catches everything).
+- **Between the two 7b modules:** the payload fields, ids and flags of 23.4 are the whole contract. P7b-langit never
+  assumes a client; P7b-sinema treats every cue as optional and keeps today's FX when cues are missing or unknown
+  (unknown moment or beat ids are ignored, so a newer server never breaks an older client).
+
+#### 23.17.5 Hooks that must survive every edit
+
+- The "Momen Epik" block in `SettingsPage.build()` and `"momen"` in `HelpPage.TOPICS`.
+- `EpicDirector.onTechFx(payload)` in `SpecFx.play`; the `SkyDirector.coversRedSky()` early return in `RedSkyHud`.
+- The `Breakthrough.Listener` calls and the `DeathGuard` saved-listener call (spine 7b).
+- Every one-line `EpicHooks.*` call of 23.5.3.
+- The 19.7 list (`FeatTracker.onMeditate`, `FeatTracker.onTribStrike`, `countSurvivedStrike`, `FeatTracker.onAlchemy`,
+  `Sects.meditationBonus`, the enlightenment mastery points) still holds.
+
+#### 23.17.6 Data keys
+
+| Where | Key | Owner |
+|---|---|---|
+| saved, `extra()` | `momen {firsts: long, kills: int}` (never `path`) | P7b-langit |
+| session | none | – |
+| client config | `epic_camera`, `epic_letterbox`, `epic_cards`, `epic_music`, `epic_slowmo`, `epic_geometry`, `epic_sky`, `epic_vfx`, `epic_record`, `epic_pack_geometry`, `epic_seen` (spec ids already cast once) | P7b-sinema |
+| server config | `epicMoments`, `epicCameraShots`, `epicRange` | spine |
+
+The frame-guard memory (23.14.2) lives only in memory for the session.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.18 Test checklist (for `docs/uji/FASE-7b.md`)
+
+> Bahasa Indonesia. Persiapan: dunia uji dengan cheat aktif. Semua momen bisa diputar tanpa grinding dengan
+> `/kultivasi uji momen <id>` (daftar lengkap: `/kultivasi uji momen daftar`). Mode kamera cepat diganti dengan
+> `/sinematik penuh|singkat|mati`. Uji dulu dengan setelan biasamu (Iris + Complementary, Maksimal), lalu ulangi bagian
+> I tanpa shader. Kamera hanya bergerak di tempat yang aman: uji di tempat tenang tanpa monster.
+
+**A. Dasar dan pengaturan**
+1. Muat simpanan fase 7: tidak ada crash, tidak ada peringatan kunci bahasa. Tab Pengaturan punya grup "Momen Epik"; Bantuan punya topik "Momen Epik" yang diakhiri baris Sumber.
+2. Kontrol: "Lewati sinematik" default Backspace dan tidak bentrok dengan tombol lain (termasuk Butter Bot).
+3. `/sinematik info` menampilkan profil (shader aktif atau vanilla), tingkat kualitas sekarang dan penjaga frame. `/sinematik reset` mengembalikan semua setelan Momen Epik.
+
+**B. Tribulasi Langit**
+4. `/kultivasi uji momen tribulasi_penuh inti_emas` dengan Kamera **Singkat**: langit menggelap, pusaran awan terbentuk, kamera naik melihat mata langit lalu kembali sebelum petir pertama. Ada bilah layar lebar, kartu "TRIBULASI LANGIT" dan musik pertanda.
+5. Di antara petir kamera tidak bergerak sama sekali (Singkat); cincin peringatan tetap bisa dihindari.
+6. Petir terakhir: banner "Petir Terakhir", hening sebentar, petir raksasa dan beberapa petir tipis berkumpul, getaran, lalu gerak lambat 1,5 detik dengan kamera mengitari.
+7. Berhasil: awan terbelah, pilar emas turun, kartu ranah baru ("INTI EMAS"), musik kemenangan, kamera kembali mulus ke mata.
+8. `tribulasi_penuh kenaikan_abadi 9`: petir tujuh warna, Pintu Keabadian terbuka penuh, awan hilang seketika.
+9. `tribulasi_penuh dewa_abadi`: 18 petir, finale sembilan warna, Gerbang Langit terbuka. Tidak ada kartu atau teks yang menyebut "petir sembilan warna".
+10. `tribulasi_penuh inti_emas gagal`: kartu "PENYIMPANGAN QI", tepi tinta merah, kamera diam paling lama 2 detik tanpa miring.
+11. Tribulasi di Nether: tidak ada geometri langit, hanya cincin api dan kabut. Di End: pusaran ungu.
+12. Tribulasi uji tidak mengumumkan apa pun di chat dan tidak mengubah ranah.
+
+**C. Terobosan**
+13. `kebangkitan`, lalu `fondasi retak`, `fondasi normal`, `fondasi sempurna`, `fondasi surgawi`: pilar sesuai kualitas (retak berat, satu garis retak, tanpa retak, pilar kesepuluh).
+14. `inti_emas`, `jiwa_baru`, `transformasi_dewa`, `penyatuan_dao` dan `kenaikan_abadi 3`: lapisan ranah masing-masing tampil (inti emas berputar, bayi jiwa, sosok emas, aksara Dao, pintu yang terbuka sebagian).
+15. `surgawi`: langit putih, pita pelangi naik di pilar, huruf kartu pelangi (diam saat Kurangi gerak menyala).
+16. `pengakuan_langit`: bintang di siang hari, pilar emas turun, gerbang terbuka, musik penutup. Singkat 3 shot, Penuh 4 shot.
+17. Tidak pernah ada kartu dan judul vanilla yang tampil bersamaan.
+
+**D. Krisis**
+18. `iblis_hati`: cermin retak dan pecah; **tidak ada** gerakan kamera saat iblis muncul. Menang: iblis pecah jadi serpihan kaca, gerak lambat, kamera mengitari.
+19. `penyimpangan`: ledakan hitam-merah dan retakan merah kecil di sekitar tubuh.
+
+**E. Kekuatan dan jurus**
+20. `wujud_dharma` dan `wilayah_dao es`: stempel kecil di kanan atas; FOV sedikit melebar saat Wujud Dharma.
+21. `jurus_abadi nine_suns_heavens_fury` dan `jurus_dewa heaven_punishing_sword`: kartu atau stempel nama jurus, warna langit, gerak lambat pada pukulan penentu. Dengan Singkat kamera tidak bergerak selama pertarungan.
+22. `kehancuran` dan `pemusnah` (satu jurus): langit merah menghitung mundur, efek pemusnahan, kartu "SEGEL MERAH DILEPAS". **Tidak ada blok yang berubah** (uji tidak pernah menggali).
+
+**F. Murid dan sekte**
+23. `murid_terobosan`, `bencana 3`, `penginjak_langit`, `lampu_jiwa`, `melampaui_guru` (pakai murid dalam 32 blok, atau titik di depanmu).
+24. `penerimaan`, `ujian_masuk 9` (warna jiwa: merah sampai nila, **tidak ada ungu**), `pengemis`, `nadi_dewa_sesat`, `darah_dou_di`.
+25. `turnamen`, `sekte_tingkat`, `sekte_templat`, `istana_langit`, `aula`: kamera terbang di sepanjang sumbu sekte paling lama 8 detik, tidak menembus bangunan.
+
+**G. Tempur**
+26. `bos warden` dan `bos naga`: kill-cam berjalan (Singkat hanya pembunuhan pertama tiap jenis bos, Penuh setiap kali).
+27. Semua `lolos_maut …`: tidak pernah ada gerakan kamera; hanya stempel, satu kilatan, tepi tinta dan gerak lambat.
+28. `uji momen semua`: semua momen berputar berurutan dengan jeda dan nomor urut di chat; `uji momen berhenti` menghentikannya dan langit, suara, musik kembali normal.
+
+**H. Keamanan kamera**
+29. Saat shot berjalan, tekan W, spasi, Backspace, Esc, atau gerakkan mouse: kendali langsung kembali dan kamera kembali halus. Tekan Backspace dua kali: bilah hilang untuk sisa adegan itu.
+30. Panggil zombi dalam 16 blok (Singkat): tidak ada shot. Darah di bawah 45% (Singkat) atau 30% (Penuh): tidak ada shot, kecuali shot hasil setelah gagal (diam, paling lama 2 detik).
+31. Di air, di lava, saat jatuh, menunggang kuda, memakai elytra atau pedang terbang: tidak ada shot.
+32. Kurangi gerak menyala: kamera mati, tanpa miring, tanpa gerak lambat, tanpa pinggiran warna.
+33. Kamera tidak pernah masuk ke blok atau air (uji di dalam gua sempit dan di tepi danau).
+34. Mode Rekam: HUD vanilla hilang hanya saat momen aman milikmu sendiri; bilah dan kartu tetap. F1 menyembunyikan bilah dan kartu. Darah, armor dan HUD tribulasi tetap terlihat di luar Mode Rekam.
+35. "Hide Lightning Flashes" (vanilla) menyala: tidak ada kilatan layar maupun kilatan langit dari momen apa pun.
+
+**I. Kinerja dan kompatibilitas**
+36. Iris + Complementary menyala: petir dan pilar terlihat, langit menggelap lewat lapisan layar, tangan tersembunyi saat shot, badan pemain terlihat.
+37. Shader mati (Sodium saja): pusaran, sinar dan gerbang tampil sebagai geometri; tidak ada lubang dunia saat kamera naik atau terbang.
+38. Maksimal + shader, finale `tribulasi_penuh dewa_abadi`: FPS turun paling banyak sekitar 10% dibanding tribulasi tanpa 7b; kalau berat, `/sinematik info` menunjukkan penjaga frame menurunkan tingkat.
+39. Minimal: tidak ada pusaran geometri, FPS stabil. Pindah dimensi atau keluar dunia di tengah adegan: langit, volume suara dan musik kembali normal.
+
+**J. Multipemain (LAN)**
+40. Pemain kedua dalam 192 blok dari tribulasi Dewa Abadi melihat pusaran, petir dan gerbang, tetapi tidak mendapat gerakan kamera, bilah, musik atau kartu.
+41. Pemain kedua lebih dari 48 blok: hanya warna langit yang berubah; dunianya tidak ikut gelap.
+
+**K. Aturan keras**
+42. Tidak ada blok berubah di momen mana pun, kecuali Mode Kehancuran yang asli. `/execute if entity @e[type=lightning_bolt]` selalu gagal. Cuaca dan waktu tidak berubah. MSPT server tidak naik.
+
+**S. Sumber**
+43. Setiap kartu dengan klaim cerita punya baris Sumber di DESIGN 23.13; pilar cahaya, warna petir sembilan, kamera dan musik tidak pernah disebut sebagai kanon.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.19 Verify in game (the fix pass checks these)
+
+1. Complementary: whether `SKY_COLOR`, `FOG_COLOR`, `CLOUD_COLOR`, `SKY_LIGHT_FACTOR` and `CLOUD_HEIGHT` overrides show at
+   all, and whether vanilla clouds draw. The HUD sky layer must look right either way.
+2. Bolt colour under the pack with `lightning()` against the emissive strip (`BOLT_EMISSIVE_UNDER_PACK`).
+3. Beacon glow with a 0.05 solid core, with and without the pack; a hero shot inside a pillar keeps the player visible
+   and does not wash the screen out.
+4. `detached = true` while the options say first person: the body renders, no first-person-only model quirk, the hand is
+   hidden in both profiles, the block outline is gone.
+5. `Camera.update` is the only camera setup path in play (sleeping and riding are gated anyway).
+6. `submitText` for the 天門 plaque (fallback: a TextDisplay glyph).
+7. Sodium pop-in during cranes and flyovers.
+8. Cloud mesh rebuild cost when `CLOUD_HEIGHT` moves (kept ≥ camera + 24 b) at cloud range 64.
+9. EMF leaves the baked `ModelLayers.PLAYER` parts of `F_FIGURE` alone.
+10. `HudTitleMixin` catches server titles that arrive up to 20 ticks after the card (the `ImmortalPerks` boon title).
+11. Music: the cue starts at once, the now-playing toast hides, the duck recovers in time (`fadePlaying` 0.005 per tick).
+12. BadOptimizations updates the lightmap when the grade moves sky light colour and factor together.
+13. Frame-guard thresholds (1.35×, 30 fps, 2.0 ms) on the user's laptop during the Dewa Abadi finale.
+14. Fog fade of `lightning()` and `entityTranslucentEmissive` at render distance 12 (about 192 b), and the projected rim
+    above 20° elevation.
+15. Every "(verify)" site of 23.5.3 exists (the `HuFa` Tahan Petir site, `Candidates`, `SectEvents`, `VoidRealm`,
+    `SpiritRoots`, `SpiritBeasts`, `HeavenlyFlames`, the Kehancuran job end); a missing one ships without its layer and
+    is reported.
+16. dynamic-fps: no shot starts while the window is unfocused, and a scene that ran unfocused cleans up.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.20 Source status (the 7b lore pass, applied above)
+
+**OK** = printed as cited; ***Terinspirasi*** = only the general concept; **fix** = the citation or wording changed.
+"Also in" names existing DESIGN rows that get the same correction when this section is merged.
+
+| Work and concept | Verdict | Used in | Also in |
+|---|---|---|---|
+| *Against the Gods*, tribulation lightning (ch. 1241–1256, ch. 1243 "Nine Tribulations of Heavenly Wrath", ch. 1703) | OK, new chapters | A1–A5 | – |
+| *Against the Gods*, "Heavenly Tribulation Thunder Emperor Array" | no chapter found → *Terinspirasi* | D3 `tribulation_thunder_emperor_array` | 22.9 #512 (its "Heavenly Dao Divine Power" label looks misnamed; ch. 1581 shows a "Heavenly Handle Divine Power"), 22.10 #14 and "Heavenly Tribulation Thunder Sword": mark *Terinspirasi* until a chapter is found |
+| *Against the Gods*, Heretic God Veins (ch. 45–47) | OK | E4 (d) | – |
+| *Against the Gods*, Hell Monarch (ch. 46) | fix: the **fifth realm** of the Heretic God art (ch. 1668: five of seven gates is the human limit), not "a gate" | D5 (b) | 20.3.21 wording |
+| *Against the Gods*, Nine Suns (ch. 1007, 1197); Heaven Punishing Sword (ch. 2189) | OK | D3, D4 | – |
+| *Against the Gods*, Ice Phoenix | *Terinspirasi* (as tagged) | D3 | – |
+| *Investiture of the Gods*, Thunder Department under Wen Zhong (ch. 99) | *Terinspirasi* (never sent against cultivators) | A1, A3, D4 | – |
+| *Investiture of the Gods*, Zhuxian (ch. 77–78), Freezing Mount Qi (ch. 39), Tai Chi Diagram (ch. 61), Nezha's lotus body (ch. 14) | OK | D3, D4, F2 | – |
+| *Journey to the West*, South Heaven Gate (ch. 4) | OK for the gate, *Terinspirasi* for its use: in the novel it is the entrance to the Jade Emperor's court, not a gate of ascension | A1 hint, B7 | – |
+| *Journey to the West*, Fa Tian Xiang Di (ch. 3, 6), the palm (ch. 7), life-saving hairs (ch. 15, 75), sweet dew (ch. 26) | OK | D1, D3, F2 | – |
+| *I Shall Seal the Heavens*, Foundation pillars | fix: ch. 76 (nine pillars graded by cracks; Perfect = no crack and calls lightning) and ch. 273, 276 (the tenth pillar); ch. 100 dropped. English "crackless", never "flawless" (in ISSTH "Flawless" has one crack per pillar) | B1, B8, E1 | 20.3.18 citation and wording |
+| *I Shall Seal the Heavens*, Perfect Gold Core (ch. 337–339) | OK (was unverified) | B2 | – |
+| *I Shall Seal the Heavens*, seven-coloured Immortal Tribulation Lightning (ch. 969–970) | OK, new source | A1, A2, A3, B6 | already in 19.3.8 |
+| *I Shall Seal the Heavens*, final bout announced by the Grand Elder (ch. 27–31), Soul Lamps, Ninth Hex | OK | E5, E2, D3 | – |
+| *A Will Eternal*, Heaven-Dao Gold Core (ch. 338); Foundation types; Undying Blood | OK (the core was unverified) | B2, B1, E1, F2 | – |
+| *A Record of a Mortal's Journey to Immortality*, Nascent Soul as an infant with its owner's face (ch. 488, 1077) | OK (was unverified) | B3 | – |
+| same work, heart devil at Nascent Soul formation | *Terinspirasi*, no chapter (ch. 1739 only mentions an inner-demon backlash) | C2 | – |
+| same work, Deity Transformation as the human world's peak | *Terinspirasi*, no chapter (knowledge only) | B4 | – |
+| same work, three-headed six-armed golden projection (ch. 1857, 2209) | OK (was unverified) | D1 extra heads and arms | – |
+| same work, Brahmic Saint True Devil Art | *Terinspirasi*; official English name "Provenance True Devil Arts" | D1 | 22.10 #5 note |
+| Time Spirit Domain | fix the work: *A Record of a Mortal's Journey to Immortality: Immortal Realm* (凡人修仙之仙界篇), not the first series | D4 | the 22.9 row of `time_spirit_domain` |
+| Heavenly Star City | fix wording: higher layers have denser qi and higher status (81 layers; top 30 for elders; summit for the Sages), not strict rank | E6 | 21.1 template 9 |
+| *Renegade Immortal*, Three Trials with Seven Calamities, Heaven Trampling (ch. ~1157–1159), domains (ch. 826, 851), stars between the brows (ch. 921) | OK | B5, D2, D3, D4, E2 | – |
+| *Battle Through the Heavens*, 护法 | fix wording: "Hu Fa" is the act or role of guarding, not a name ("护法: Yao Lao guarding Xiao Yan's breakthroughs") | E1 | 20.3.18 wording |
+| *Battle Through the Heavens*, testing stone, Duan, Heavenly Flames, Buddha's Fury Flame Lotus, Bodhisattva tree (ch. 828, 1426), Dou Di bloodline, Strong Ranking (ch. 566–573) | OK; Emperor Flame stays *Terinspirasi* | D4, D5, E4, E5, F1, F2, G | – |
+| *Martial Peak*, Yang Kai surpasses Meng Wu Ya | fix: Meng Wu Ya is the **Treasurer** of High Heaven Pavilion; drop "healed" and "keeper of the Contribution Hall" | E3 | the 20.3 row that describes him |
+| *Tales of Demons and Gods*, soul colours (ch. 13–14) | fix: red, orange, yellow, green, cyan, azure, indigo; **no purple** | E4 (b) | 20.3.4 palette and text |
+| *Tales of Demons and Gods*, Heavenly Sacred Border (ch. 48) | OK | G | – |
+| *Perfect World* (ch. 347, 339–345, 551, 558); *Shrouding the Heavens* (Heavenly Court, Void Mirror); *Return of the Mount Hua Sect*; *Martial Universe* (ch. 702–703, 708); *Soul Land*; *Coiling Dragon*; *Mo Dao Zu Shi*; *Stellar Transformations* | OK (*Perfect World* ch. 261 not re-checked; it keeps its existing DESIGN status) | D3, D4, D5, E4–E6, G | – |
+| *The Legend of the Condor Heroes* (Ouyang Feng), *Demi-Gods and Semi-Devils* (Jiumozhi), qi deviation | facts OK, but wuxia: **not printed**; A5 and C1 are game design | A5, C1 | – |
+
+**Presentasi (no canon claimed anywhere):** nine-coloured lightning (*Martial God Asura* ch. 2960 is not cited: the
+text does not show a breakthrough tribulation); light pillars, including Pengakuan Langit's (17 predates the source
+rule); the vortex shape and the darkening; cranes, the 天 glyph, the 天門 and 天庭 plaques; the nine light steps; the
+heart-demon mirror; kill-cams; all camera work, music cues, sky grades and title-card seals.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 23.21 Dropped, reworded and renamed
+
+| Draft or old plan | Now | Change | Why |
+|---|---|---|---|
+| pre-rendered video files | real-time in-game cinematics; Mode Rekam for OBS clips | replace | no decoder, no size, reacts to the real scene |
+| post chains `epic_chroma`, `epic_zoom`, `epic_trail`, `epic_haze`, `epic_mono`; the vanilla `minecraft:invert` impact frame; a mixin on `GameRenderer.requestedPostEffects` | HUD effects (23.11.1); no invert frame | drop | a post shader that fails to compile triggers `Minecraft.triggerResourcePackRecovery` (clears resource packs or disconnects) and stalls the climax frame; the invert frame breaks the flash rule |
+| server `/posteffect` list | – | reject | saved in player NBT; a crash would leave it on |
+| slow motion by skipping `ParticleEngine.tick()` | `EpicClock`: only 7b reads it | replace | froze every vanilla particle and tripled live particles at the climax |
+| `/tick`, client `TickRateManager`, `DeltaTracker` scaling | – | reject | changes or desyncs game timing |
+| sky layers in `ClientLevel.addEnvironmentAttributeLayers` | one probe mixin with a whitelist (23.9.1) | replace | the probe feeds only rendering and music, and also covers `MUSIC_VOLUME` and `BACKGROUND_MUSIC` |
+| fog distance × 0.6 during scenes | fog distances never overridden | drop | hid 7b's own geometry and the mobs |
+| client rain or thunder override for a storm look | – | reject | reads as a weather change |
+| every layer in `RenderTypes.lightning()` | thin glow only; soft layers `entityTranslucentEmissive`; figures `entityTranslucentCull` | fix | additive blending cannot draw dark clouds, and a depth-writing sky surface punches holes in translucents |
+| vortex visible radius from `depthFar` (about 460 b) | true position to 0.85 × fog start, rim sky-projected above 20° | fix | the shaders fade by render-distance fog (about 192 b here) |
+| `F_COLOSSUS`: `AvatarFx` clamp raised to 16× | `F_FIGURE` (`GiantFigureRenderer`); `AvatarFx` untouched | replace | culled with the caster's hitbox, gone past entity distance, drawn in Iris's shadow pass |
+| Display entities for sky-scale shapes; a fake camera entity | geometry; the camera directed inside `Camera.update` | reject | entity counts and culling; a camera entity leaks into the level and breaks input and sound |
+| music as a direct `SimpleSoundInstance` after `stopPlaying()` | `BACKGROUND_MUSIC` through the probe, ducking through `MUSIC_VOLUME` | replace | fought `MusicManager`'s gain and restart |
+| ducking HOSTILE, PLAYERS or MUSIC through `updateCategoryVolume` | never; only AMBIENT, WEATHER, NEUTRAL, BLOCKS | fix | combat sounds must stay audible; `MusicManager` owns MUSIC |
+| fading vanilla HUD elements | `HudHider` hides them; health, armour and mod HUDs stay | fix | `GuiGraphicsExtractor` has no global alpha |
+| letterbox before `CHAT` | right after `MISC_OVERLAYS` | move | boss bars, the Qi HUD and the tribulation HUD must draw above the bars |
+| C2S `Actions.CINEMA_PREFS`, `sessionExtra.cine` | client-side title suppression (`HudTitleMixin`, SUPPRESS_TITLE) | drop | the server needs nothing from the client |
+| `Payloads.SceneCue` (scenes draft) and `Payloads.EpicMoment` (technical draft) | `EpicMoment` with `s` and the merged flags | merge | one payload |
+| 1 Hz keepalives | none; a 120-s client watchdog | drop | the longest gap is 12 s |
+| `sceneSkyRange` 512 | `epicRange` 192 (96–512) | merge | 192 covers the visible sky at normal render distances |
+| `uji adegan`, `uji epik` | `uji momen` | rename | the computed task's name; ids in Indonesian |
+| `key.kultivator.skip_cinematic` | `key.kultivator.skip_scene` "Lewati sinematik", Backspace | merge | one key |
+| A3 Penuh `ORBIT` at −1.0 s | none | drop | inside the telegraph and dodge window |
+| A5 top-down `CRANE_UP` with a Dutch tilt | `STATIC` ≤ 2 s, no roll, RESULT_SAFE only | replace | the player is at 1 HP |
+| heart-demon APPEAR `OTS` | no shot; P a 3° roll only | drop | the demon targets the player at once |
+| Kurangi gerak → static framings | Kurangi gerak → camera Mati | replace | comfort |
+| 25° of invisible mouse drift; a 30-px mouse skip | mouse look paused; skip above 8° by vanilla's formula | fix | the view snapped on return; pixels ignore sensitivity |
+| PUSH_IN FOV × 0.82 | ±12% × `fovEffectScale` | fix | motion sickness |
+| heat haze as an FOV sine | particles only | drop | FOV wobble causes nausea |
+| Dutch roll 10° | ≤ 8° × `damageTiltStrength`, ≤ 5°/s, never with an orbit | reduce | comfort |
+| cubic easing and the fast reveals (A4, B4, B7, D2 pullbacks; A3 and B0 orbits) | sine easing, averages ≤ 7.6 b/s and ≤ 25°/s, shots re-timed | fix | peaks went up to 36 b/s and 100°/s |
+| pillar radius as the beacon's solid radius | solid ≤ 0.05, size in the glow radius | fix | an opaque tower hid the player and swallowed the hero shot |
+| darkness D 0.8 (20% light) | light factor ≥ 0.5 × vanilla | fix | mobs must stay visible |
+| bystanders' light factor and cloud height | colour only beyond 48 b | fix | someone else's scene must not darken your world |
+| flashes stacking on one strike | one luminance event per 500 ms; "Hide Lightning Flashes" obeyed | fix | photosensitivity |
+| 6,000 quads at Maximal | 3,000 (× 0.6 with a pack) plus a large-layer cap | reduce | overdraw under Complementary |
+| frame guard on CPU emit time only | real frame time against a baseline, plus the CPU check | fix | the GPU cost comes later |
+| ring of L gates per Immortal Ascension layer (*Journey to the West*) | one **Pintu Keabadian / Door of Immortality** opening further at each layer | replace | ISSTH ch. 963–983 and 969 (the L9 boon's own source) fit the layers; the JTTW gate is not an ascension gate |
+| central L9 gate "Gerbang Surgawi" | "Gerbang Keabadian / Door of Immortality" | rename | 19.12 renamed the boon (ISSTH ch. 969) |
+| plaque "南天門" | "天門", only on the Dewa Abadi gate | reword | *Terinspirasi*; no claim that the novel's gate is an ascension gate |
+| "nine-coloured lightning" as canon | Presentasi, never named; Kenaikan Abadi uses seven colours | reword | no verified work for nine; ISSTH ch. 969–970 for seven |
+| "Heaven Trampling Bridge" with bridge geometry | nine light steps (`G_RING`), Presentasi | reword | the verified concept is Heaven Trampling, not a bridge |
+| `M_BOSS` (`MUSIC_DRAGON`) for the first dragon kill | `M_TRIUMPH` on first boss kills; `MUSIC_DRAGON` becomes `M_STORM` | replace | the dragon track fits Immortal storms better |
+| ultimates and Dharma sent as server cues | client-derived from `SpecFx` and visual-state edges | replace | P7 and 6c combat files stay untouched |
+| `EpicDirector.hudFade()` for P7-jalan | `EpicDirector.recordHide()`, optional | reword | no fades (no global alpha) |
+| an advancement per moment | none | drop | presentation, not gameplay |
+| "Phase 7b" in 19.1.5, 19.3.7, 19.3.8, 19.3.11, 19.10, 19.12 and 19.13 (player star calamities, disciple pill effects, the slip list) | **Phase 7c** | rename | Phase 7b is now Momen Epik |
+
+## 24. Phase 7c — Formasi Sekte (sect formations)
+
+User request (id, 2026-10-18): "Formasi untuk sekte besar, saya mau sangat lengkap." ("Formations for a big sect, I want
+them very complete.") The orchestrator scheduled this as **Phase 7c "Formasi Sekte"**. It is built after phases 7 and
+7b are committed and assumes their contracts (19.8) are final.
+
+This section merges the Formation Master catalogue, the systems design, the lore verification and the critic's review.
+Where the drafts disagreed, the decision and its reason are recorded in 24.16.
+
+**Short version.**
+- 24 new sect formations in 13 families and 5 grades (Kuning, Misterius, Bumi, Langit, Abadi), gated at hall levels
+  1, 3, 5, 7 and 9.
+- Every one is anchored on a new crafted block, the **Mata Formasi** (Formation Eye). Each pattern is built by the
+  player around the eye and has its own themed **heart block** next to the eye.
+- Fuel is amethyst and phase-7 spirit stones, counted as **Daya** in each core and in a sect treasury, the **Kas Daya
+  Formasi**.
+- Disciples keep the formations as **Penjaga Formasi** (formation keepers).
+- A jade-scroll **Formasi** tablet and a read-only **hologram blueprint** follow the build layer by layer.
+- Every formation can be tried with a virtual test core, without building anything.
+- The 3 personal Qi formations, the Formasi Pelindung and the Formasi Agung Sekte stay **unchanged**. They are the base
+  rows of the ladder.
+- Every card has a verified Sumber (24.17).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.1 Principles (binding)
+
+1. **Formations only read blocks (DESIGN 0 rule 1).**
+   - Players build every pattern. 7c code calls only `getBlockState` and `getFluidState`, through `getChunkNow`, and
+     never loads a chunk.
+   - No 7c code calls `setBlock`, `destroyBlock` or `removeBlock`, or changes any block state. That includes the eye:
+     it has no LIT or ACTIVE property, and its glow is client FX.
+   - The only block placement connected to 7c is the optional 6b pattern component (24.6.2). It runs through the
+     existing 6b exception (21.0, 21.10): `BuildPlacer`, inside the confirmed footprint, placed inactive.
+   - **Never:** a `LightningBolt`, an `Explosion`, block fire, a vanilla projectile, a portal, or a weather or time
+     change. "Thunder" means particle bolts plus a quiet thunder sound. "Dark clouds" means client particles. "Fire"
+     means entity fire (`igniteForSeconds`) only.
+2. **Hostile mobs only (DESIGN 0 rule 2).**
+   - Every damage, root, slow, push, lost target and steer goes through `FormationTargets.mayAffect` (24.2.10).
+   - Players are never hurt or moved, except by a trip they asked for. Pets, spirit beasts, villagers, disciples of
+     any role, heart demons and Dao Protectors are never touched by killing, control or illusion effects.
+3. **No farms.** Formation damage uses a new damage type, `kultivator:formation`, with no attacker.
+   `KillCredit.resolve` returns null for it, so a formation kill gives no cultivation XP, beast cores, spirit stones,
+   renown, feats or mastery, even if a player tapped the mob first. Vanilla XP and drops follow vanilla rules, as with a
+   fall-damage farm.
+4. **Source rule (19 header, 20.1).**
+   - Every card's **Sumber / Source** line names the work, the concept and the chapter that was checked.
+   - *Terinspirasi dari* / *Inspired by* marks a concept-only borrowing.
+   - All numbers, patterns, block choices, UI, safety rules and framework mechanics are game design and claim no canon.
+5. **Laptop first.** The user plays Valorant on the same laptop.
+   - Active formations are capped by hall level.
+   - Pulses are staggered, block reads are round-robin, and hostile scans are shared.
+   - An auto-throttle keeps the added server time at or below 0.15 ms per tick (24.9).
+   - Client FX go through `FxBudget` and Effect Quality.
+6. **Singleplayer first, LAN as a bonus.**
+   - The hall owner registers, toggles and assigns keepers.
+   - `/sect` mates may deposit fuel, benefit from effects, receive alarms and use transport nodes.
+   - Strangers trigger alarms and cannot see concealed members' nametags.
+   - This is not a claims mod (21.19).
+7. **Constants and text.**
+   - Every number is a `public static final` in its class, and caps live together in `formasi/stack/Stacking`.
+   - All text is in id_id and en_us. Every spec has `.name`, `.desc`, `.hint` and `.source` keys. Work titles stay in
+     English in both languages.
+   - The GUI follows the jade scroll of DESIGN 5b.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.2 The framework
+
+Package `dev.kultivator.formasi` (new). The old `formation/*` (Formasi Pelindung), `sect/hall/GrandFormation` and
+`cultivation/QiFormations` are not edited, apart from the one spine hook in 24.13 item 8.
+
+#### 24.2.1 Mata Formasi / Formation Eye and heart blocks
+
+**Block:** `kultivator:formation_eye`, class `formasi/FormationEyeBlock`, registered in `formasi/FormasiItems`.
+
+- **Shaped recipe:** `A S A / G L G / A S A`, where A is an amethyst shard, S a Batu Roh Rendah, G a gold ingot and L a
+  lodestone. Game design.
+- **Properties:** hardness 3.5, any pickaxe, blast resistance 1200, push reaction **BLOCK** (pistons cannot move it),
+  light 5, drops itself. It has no block entity, no random tick and no block-state property.
+- **Tags (spine):** `#kultivator:indestructible` (Kehancuran never carves it) and `#kultivator:sect_protected` (6b never
+  removes it).
+- **Tooltip Sumber:** *The Mirror Legacy* ch. 34 "Misty Maze Formation". The sixth flag reveals a palm-sized formation
+  eye, and the brothers drop blood on it so that the formation recognises them. This is where **Pengenalan Darah**
+  (blood recognition = registration) comes from.
+
+**Heart blocks.** Each card names a themed **heart** block. It sits directly **under** the eye (dy −1, buried in the
+floor) unless the card says **on** the eye (dy +1).
+- The heart is part of the pattern, so the themed blocks keep their meaning.
+- Because only the eye starts detection, clicking a gold, iron or magma block with shards never triggers a formation
+  check. Personal seats, the protective lodestone and the 6b Bagua disc never collide with 7c.
+
+#### 24.2.2 FormationSpec, registry and pattern DSL
+
+**Files** (common code, so the client knows every blueprint without any sync):
+
+| File | Purpose |
+|---|---|
+| `formasi/spec/FormationSpec` | immutable spec record |
+| `formasi/spec/Builder`, `Specs` | DSL entry `Specs.spec(id, netId, family)` |
+| `formasi/spec/Family`, `Grade`, `Scope`, `Flag` | enums |
+| `formasi/spec/Pattern`, `Slot`, `PatternBlock`, `Rule`, `Rules` | geometry, rotation, rules, emission |
+| `formasi/spec/Params` | immutable `String → double` map for effect numbers |
+| `formasi/FormationRegistry` | `byId`, `byNet`, `all`, `ofFamily`, `effectOf`, `frozen`; registration through `SpecSink` and `EffectSink` |
+
+**Spec fields:**
+
+| Field | Meaning |
+|---|---|
+| `id`, `netId` | `[a-z0-9_]{1,32}`, saved and never renamed. netId blocks: 0–19 legacy mirrors, 100–399 module A, 400–799 module B; ids are never reused |
+| `family`, `grade` | 24.2.4 |
+| `scope` | `CORE` (radius around the eye, ≤ `RADIUS_CAP = 48`) or `TERRITORY` (the owner's hall territory, `Halls.inTerritory`) |
+| `radius`, `radiusPerLevel`, `radiusMax` | effect radius = `min(radiusMax, RADIUS_CAP, radius + radiusPerLevel × (hallLevel − gate))` + amplifier bonuses (24.2.9) |
+| `minHallLevel` | the grade gate; may be raised, never lowered |
+| `pulseTicks` | ≥ 20 |
+| `upkeep` | Daya per hour (the grade default unless the card says otherwise) |
+| `pattern`, `effect`, `params` | 24.2.2 below, the handler id, and the numbers it reads |
+| `requires` | spec ids or `family:<name>` that must be running, with the same owner and territory (A1, L1) |
+| `flags` | `FIXED_ORIENTATION`, `STONE_ONLY` (automatic for Bumi and up), `PAUSE_IN_TRIBULATION`, `NO_6B`, `PERSONAL_OK`, `LEGACY_MIRROR` |
+| `color`, `fx` | family frame colour and the FX style sub-id |
+
+**Pattern format.**
+
+```java
+r.add(Specs.spec("small_spirit_gathering", 110, Family.PENGUMPUL).grade(Grade.KUNING)
+    .pattern(p -> p
+        .layer(0,  "A . . . Q . . . A", /* ... */ "A . . . Q . . . A")   // '@' = Mata Formasi, exactly once, on layer 0
+        .layer(1,  "c . . . . . . . c", /* ... */ "c . . . . . . . c")
+        .key('A', Rules.block(Blocks.AMETHYST_BLOCK))
+        .key('Q', Rules.block(Blocks.QUARTZ_PILLAR))
+        .key('c', Rules.anyOf(Blocks.AMETHYST_CLUSTER, Blocks.LARGE_AMETHYST_BUD, Blocks.END_ROD).or(Rules.tag(BlockTags.CANDLES)))
+        .heart(-1, Rules.block(Blocks.AMETHYST_BLOCK)))
+    .effect("gather").param("gather", 0.10)
+    .build());
+```
+
+- **Grid.** North (−z) is the top row. Rows map to dz and columns to dx, both centred on `@`. Spaces between characters
+  are optional. `.` means "don't care".
+- **Bounds.** `|dx|, |dz| ≤ 16`; dy from −3 to +5; at most **160** cared slots; exactly one `@`.
+- **Rules:**
+
+  | Rule | Meaning |
+  |---|---|
+  | `block(B)` | that block |
+  | `anyOf(B...)` | any of these |
+  | `tag(T)` | any block in the tag |
+  | `state(B, P, v)` | a block with that property value; directional properties rotate with the pattern |
+  | `copper(B)` | any oxidation, waxed or not, of a `WeatheringCopperCollection`, matched with `asList().contains(...)`; waxed oxidized ("jade") is recommended |
+  | `banner()` | any standing or wall banner of any colour (`Blocks.BANNER.asList()` plus the wall banners) |
+  | `banner(RED)` | red only (`BANNER.pick(DyeColor.RED)` and its wall form) |
+  | `waterSource()` | water source fluid, including waterlogged blocks; a read-only check |
+  | `light()` | any froglight, `SEA_LANTERN`, `GLOWSTONE` or `SHROOMLIGHT` |
+
+  Every rule has a translated `label()` (for example "Balok Kecubung", "Tongkat End") and a `canonical(rot)` state for
+  holograms and 6b emission.
+- **Orientation.**
+  - By default a pattern is matched in 4 rotations, clockwise quarter turns: (dx, dz) → (−dz, dx). There is no mirror
+    (21.1). At `freeze()`, `distinctRotations()` (1, 2 or 4) is computed, so a symmetric spec is checked only once.
+  - Specs flagged `FIXED_ORIENTATION` are matched only in true compass orientation: M1, B2, L1 and A1 (Five Elements,
+    Heaven/Earth/Man and trigram order). This is the `FormationDisc` rule.
+- **Slot order.** Slots are stored nearest-first, so a mismatch fails early.
+- **Emission.** `Pattern.emit(rot) → List<PatternBlock(dx, dy, dz, BlockState, @Nullable Item exactItem, boolean core)>`
+  is a pure function. It feeds the Kitab bill of materials, the hologram and 6b.
+
+**Registry rules (as 22.2.3).**
+- Built once in `Formasi.init()` on both physical sides, in this order:
+  1. `LegacyMirrors` (read-only descriptors of `qi_small`, `qi_great`, `qi_heavenly`, `protective` and
+     `formasi_agung`, for the Kitab and the hologram);
+  2. `CatalogA`;
+  3. `FormasiB.init(specSink, effectSink)`;
+  4. `freeze()`.
+- A duplicate id or netId, a late registration, an unknown effect id, a missing `@`, too many slots or out-of-bounds
+  coordinates logs an error and refuses that spec. Startup never crashes.
+- If two specs have identical slot sets in some rotation, the audit warns and detection prefers the one with more slots.
+
+#### 24.2.3 Matcher
+
+**Reading (`match/ChunkReader`).**
+- Reads go through `level.getChunkSource().getChunkNow(cx, cz)` with a one-chunk cache.
+- Each slot reads as `OK`, `MISSING` (air or `canBeReplaced()`), `WRONG` or `UNKNOWN` (chunk not loaded).
+- `UNKNOWN` never breaks a registered core; it only counts as not re-verified yet.
+
+**Detection (`match/Detect`)** runs when a player wakes an eye.
+1. If the eye has a **target spec**, only that spec is tried, in its distinct rotations. The target is set by
+   `formasi tuju <id>`, the Kitab button *Tuju pola ini*, or the last hologram anchored on this eye.
+2. Otherwise every spec the player may register here is tried, ordered by grade and then slot count, both descending.
+   Each rotation stops at its first wrong slot.
+3. **Budget:** at most `DETECT_READS = 2048` reads per click, with a 20-tick cooldown per player. Over budget, the
+   player is told: "Terlalu banyak kemungkinan pola — pilih dengan /kultivasi formasi tuju <id>" / "Too many possible
+   patterns — choose one with /kultivasi formasi tuju <id>".
+4. **Result.** The first full match wins (ties: more slots, then the lower rotation index). This is how tiered eyes
+   work: the K4 eye becomes M2, the K3 eye becomes B7, and the M3 eye becomes L5. If the best complete pattern needs a
+   higher hall, the hint is "Pola Bumi lengkap — butuh Aula Tingkat 5".
+5. With no full match, the best partial match is reported. Nothing is registered and nothing is consumed.
+
+**Verification of registered cores (`core/Verifier`).**
+- **Round-robin.** One global budget of `formationReadsPerTick` (config, default **16**, range 8–64) reads per tick is
+  shared by all loaded cores. Each core keeps a slot cursor and a `BitSet ok`. Every core is fully verified at least
+  every 10 s.
+- **Event re-reads.** After `PlayerBlockBreakEvents.AFTER`, or one tick after a successful player block placement, the
+  matcher looks up `FormationIndex.slotsAt(level, pos)` and re-reads only that slot. These re-reads use a separate burst
+  allowance of 64 reads per tick. A removed pillar is noticed at once. Explosions, pistons and endermen are caught by the
+  round-robin within about 10 s.
+- **Missing blocks.** `missing > 0` → `BROKEN`, with at most one owner notice per core per 60 s: "Formasi X rusak: 2
+  blok hilang (posisi ditandai)" / "Formation X is broken: 2 blocks missing (spots marked)". When the pattern is
+  complete again, the core resumes by itself.
+- **Eye gone.** The record is removed and its Daya goes to the owner's Kas, with a notice. The eye drops itself
+  (vanilla loot table).
+
+**Index (`core/FormationIndex`)**, per dimension, in memory, rebuilt when the SavedData loads:
+- `chunkKey → coreIds`, using the bounding box plus 8, for zone and field lookups;
+- `packedPos → slot refs`, for event re-reads.
+
+The size is at most 160 slots × 64 cores.
+
+**Validation messages.**
+- **Chat summary,** grouped by rule label, at most 3 groups plus "+N lagi" / "+N more":
+  - id_id: "Pola *Formasi …* belum lengkap: kurang 5 — Balok Kecubung ×3, Tongkat End ×2. Blok yang kurang ditandai
+    merah selama 30 detik. [Lihat hologram]"
+  - en_us: "Pattern *… Formation* incomplete: 5 missing — Amethyst Block ×3, End Rod ×2. Missing spots are marked red
+    for 30 s. [Show hologram]"
+- **Markers:** `FxType.FORMASI` sub `SLOT_MARK`, at most 24 per check, sent only to that player. They use the visual
+  words of `FormationBlueprint` (19.3.15): a red cross for a wrong block, a pulsing gold cube for an empty slot, a green
+  outline for a correct one.
+
+#### 24.2.4 Grades, hall gates, slots and limits
+
+The grade names and ribbon colours follow the 6c ladder (22.7; *Battle Through the Heavens* ch. 2).
+
+| Grade | Hall level ≥ | Keeper realm ≥ | Max keepers | Fuel | Upkeep (Daya per hour) | Core cap (48 h) |
+|---|---|---|---|---|---|---|
+| **Kuning** (ochre) | 1 | Pemurnian Qi | 1 | amethyst or any stone | 3 | 144 |
+| **Misterius** (violet) | 3 | Pembangunan Fondasi | 1 | amethyst or any stone | 6 | 288 |
+| **Bumi** (bronze) | 5 | Inti Emas | 1 | stones only | 12 | 576 |
+| **Langit** (azure) | 7 | Jiwa Baru Lahir | 2 (2nd Murid Dalam+) | stones only | 18 | 864 |
+| **Abadi** (white-gold) | 9 | Transformasi Dewa | 2 (Murid Inti+) | stones only | 24 | 1,152 |
+
+**Active slots.** Registered cores beyond this number stay switched off.
+
+| Hall level | 1–2 | 3–4 | 5–6 | 7–8 | 9 |
+|---|---|---|---|---|---|
+| Active slots | 2 | 3 | 4 | 5 | 6 |
+
+- **Free (no slot):** the Formasi Pelindung, the Formasi Agung Sekte and personal Qi seats.
+- **One slot each:** every switched-on 7c core; a whole transport network of one grade (all M3 nodes together, all L5
+  nodes together); each Abadi array.
+- When slots are full, a switched-on core is `SUSPENDED` with the reason "Slot aktif penuh 5/5 — matikan formasi lain".
+
+**Registered limits** (`formasi/own/Limits`; config may lower them):
+
+| Limit | Value |
+|---|---|
+| Registered sect cores per owner (transport nodes excluded) | `2 + hallLevel` (3–11) |
+| Killing (PEMBUNUH) cores | `1 + floor(L / 3)` (1–4) |
+| Each other family | 2 per owner |
+| Abadi arrays | 1 each (A1, A2) |
+| M3 nodes | `2 + floor(L / 2)` (2–6) |
+| L5 nodes | 4, of which at most 2 outposts (24.4, L5) |
+| All owners in one dimension | `formationMaxCores` (default 64) |
+
+A core over a limit becomes `SUSPENDED` with its reason. It is never deleted.
+
+**Territory.**
+- A sect core's eye must lie inside its owner's hall territory: horizontal distance ≤ `max(20 + 4L, R_t)`, |dy| ≤ 32,
+  same dimension (21.17). L5 outposts are the only exception.
+- If the hall goes dormant (stele mined or off its 6b anchor, 20.3.1), every sect core is `SUSPENDED` and keeps its
+  Daya.
+- If the hall moves (21.18), cores left outside the new territory are `SUSPENDED` ("di luar wilayah baru" / "outside
+  the new territory").
+
+#### 24.2.5 Core states and eye interactions
+
+**States (`formasi/core/CoreState`),** derived each pulse in this priority order:
+
+| State | id_id / en_us | Condition | Runs | Upkeep |
+|---|---|---|---|---|
+| `DORMANT` | Tertidur / Dormant | switched off, or never woken | no | none |
+| `BROKEN` | Rusak / Broken | on, but `missing > 0` | no (L6 "Retak" exception, 24.4) | none |
+| `SUSPENDED` | Tertahan / Suspended | on and complete, but blocked: hall dormant or too low, slots full, limit exceeded, outside the territory, config off, `requires` not met | no; shows the reason | none |
+| `ACTIVE` | Aktif · tanpa daya / Active · unpowered | on, complete and allowed, with Daya = 0 and no zero-cost keeper | no; pulls from the Kas every 60 s | none |
+| `POWERED` | Berdaya / Powered | Daya > 0 | yes | full, or ×0.25 when in standby |
+| `KEPT` | Dijaga / Kept | `POWERED` (or zero-cost) with at least one keeper at its post | yes, with keeper modifiers | × keeper factor |
+
+- **Siaga / standby** is a flag on running cores (24.2.7). It shows in grey on the card.
+- **Retak / cracked** is a flag on `BROKEN` cores covered by an L6 (24.4).
+- Every non-running state names its reason everywhere: chat, the card and `formasi info`.
+
+**Sneak-use on the eye** (server `UseBlockCallback`, the same pattern as `ProtectiveFormations.onUseBlock`; a plain use
+passes through to vanilla):
+
+| Who | With a fuel item (amethyst or stone) | With an empty main hand |
+|---|---|---|
+| Unregistered eye, hall owner | **Pengenalan Darah:** detect (24.2.3). On a full match with ownership and limits OK, the core registers (owner, spec, rotation), takes the item, switches on if a slot is free, plays the blood-into-the-eye FX with chime and `BEACON_ACTIVATE`, and grants advancement `formation_eye`. Otherwise the missing-block report. | detection report only |
+| Unregistered eye, sect mate | "Hanya Ketua Sekte yang bisa mendaftarkan" / "Only the Sect Master can register" | detection report only |
+| Owner | deposit (24.2.7) | toggle on or off; Daya is kept |
+| Sect mate (LAN) | deposit, logged as a donation | status line |
+| Transport node, owner or mate | deposit | opens the **node map** (24.7) |
+| Stranger | "Milik Sekte ‹nama›" / "Belongs to ‹name›'s sect" | status line, or "Mata formasi yang sunyi" / "A silent formation eye" when a concealment field covers the eye |
+
+#### 24.2.6 Ownership and membership (`formasi/own/Ownership`)
+
+**Kind, set at registration:**
+- An eye inside the registering player's own active hall territory is `SECT`, with that player as owner.
+- An eye inside another player's territory is refused: "Wilayah Sekte ‹nama›" / "Inside ‹name›'s sect territory".
+- An eye outside every territory is `PERSONAL`. Only `PERSONAL_OK` specs are allowed (K1, K2, K4 and M4), at most 2 per
+  player, at the Kuning and Misterius grades, and the hall gate counts as level 3. *Slip candidate.*
+
+**Members of a core:** the owner, the owner's `/sect` mates (`Sects.areSectMates`) and the owner's disciples. Everyone
+else is a **stranger**.
+
+| Role | Benefits | View | Deposit | Toggle, keepers, rename | Transport | Alarms |
+|---|---|---|---|---|---|---|
+| Owner | yes | full | yes | yes | yes | yes |
+| Sect mate (LAN) | yes | read-only | yes | no | yes | yes |
+| Own disciples | yes, through hooks | – | – | – | follow the owner | – |
+| Stranger | no | status line | no | no | no | the subject of alarms |
+
+**Offline owner.** A sect core runs only while its chunk is entity-ticking (for example, a LAN mate is nearby). Alarms
+are then queued in the Catatan log, and targeting uses the generic calm rule (24.2.10).
+
+#### 24.2.7 Fuel: Daya, the Kas, upkeep and standby
+
+**Fuel table (`formasi/fuel/FuelTable`).** Values are derived from `SpiritStones.FORMATION_TICKS / TICKS_PER_SHARD`, so
+a stone is worth the same in 7c as in the Formasi Pelindung.
+
+| Item | Daya | Pool |
+|---|---|---|
+| Amethyst Shard | 1 | amethyst |
+| Amethyst Block | 4 | amethyst |
+| Batu Roh Rendah (Low) | 2 | stone, grade 0 |
+| Batu Roh Menengah (Mid) | 18 | stone, grade 1 |
+| Batu Roh Tinggi (High) | 144 | stone, grade 2 |
+| Batu Roh Agung (Supreme) | 1,296 | stone, grade 3 |
+
+- Stones are recognised with `SpiritStones.isStone` and `grade`. Beast cores are not fuel.
+- Ledgers are kept in centi-Daya (`long`).
+- `ProtectiveFormations` keeps its own phase-7 tick tank. The two systems never exchange power.
+
+**Per-core Daya.**
+- Cap: 48 h of the grade's upkeep (table in 24.2.4).
+- Amethyst is accepted only by Kuning and Misterius cores. Bumi and up are `STONE_ONLY`.
+- An item is used when at least half of its value fits. The overflow goes to the Kas and is never lost.
+- The amethyst part burns first, then the stones.
+- `bestGrade` is the highest stone grade that has filled the core since it was last empty. It resets at 0 and feeds
+  the stone-quality bonus Q (24.2.9).
+
+**Kas Daya Formasi (`formasi/fuel/Kas`),** one per owner.
+- **Two pools:** amethyst (cap 2,000) and stone (cap 50,000). The stone pool remembers its own `best` grade since it was
+  last empty, and passes it to the cores it fills.
+- **Deposits:**
+  - the talisman **Setor dari tas** on the tablet (every accepted item, stones first, up to the caps);
+  - `/kultivasi formasi setor [semua]`;
+  - sneak-using an eye whose core is full;
+  - deposits by sect mates, logged as "Setoran oleh ‹nama›: 144 Daya".
+- **Auto-draw.** Every 60 s, a core with "Tarik dari Kas" switched on (the default for sect cores) and less than 2 h of
+  upkeep left draws up to 12 h. `STONE_ONLY` cores draw only from the stone pool.
+- **Manual fill:** the talismans **Isi 12 jam** (one core) and **Isi Semua** (every registered core, cheapest accepted
+  pool first), and `formasi isi [jam]`.
+- **Never withdrawable as items.** Daya is spent qi, so there is no duplication path. The tablet says so.
+
+**Upkeep.**
+
+```
+upkeepCenti/tick = upkeep(grade) × 100 / 72000 × vein × keeper × standby × flag
+  vein    (SpiritVeins.grade at the eye): Great 0.70 · Rich 0.85 · Normal 1.00 · Thin 1.25      (Terinspirasi dari RMJ ch. 391)
+  keeper  (24.2.8): 1.0 without a keeper
+  standby: 0.25 while the family has nothing to do (table below), else 1.0
+  flag    : 1.10 for the target of an L6
+```
+
+- A per-core `double carry` holds the fraction, so there is no drift.
+- Only running cores in entity-ticking chunks pay. Unloaded cores sleep for free. The MSPT throttle slows pulses but
+  never changes upkeep.
+- Handlers may spend extra Daya through `CoreContext.spend`, for example a transport trip. A spend that cannot be paid
+  fails cleanly.
+
+**Siaga / standby, ×0.25** (game design):
+
+| Family | Standby when |
+|---|---|
+| Killing, illusion, control, protection (L1) | no intruder inside for 60 s |
+| Gathering (K2, M5, B5) | nobody of the sect is cultivating inside |
+| Healing (M4) | no hurt or deviating ally and no spirit beast inside |
+| Refining (K3, B7) | no furnace refining and nobody inscribing in range |
+| Tribulation warding (B6) | always, except during a member's omen or strikes inside |
+| Transport (M3, L5) | always; each trip pays its own cost |
+| Support (L6), grand (A1, A2) | while their target or count is not met |
+| Alarm, concealment (K1, K4, M2) | never: they always drain fully |
+
+#### 24.2.8 Penjaga Formasi / formation keepers
+
+**Activity.** Keepers use a new disciple activity, **`ACTIVITY_FORMATION_KEEPER = 11`**.
+- Activity 5 (the Formasi Agung guard) cannot be reused, because `GrandFormation.checkGuard` frees any activity-5
+  disciple that is not beside an active grand lodestone.
+- The spine widens the five activity range checks in `DiscipleEntity` (lines about 421, 430, 1152, 1380 and 1412) so
+  that activity 11 holds its spot and survives a save.
+
+**Eligibility.** A keeper must be:
+- the owner's own loaded disciple, role DISCIPLE;
+- at or above the grade's keeper realm, and the rank where 24.2.4 asks for one;
+- not breaking through, not on a Latihan Khusus, trial or expedition, and not holding another activity.
+
+**Assignment.**
+- From the Inti panel (**Tugaskan** lists eligible disciples within 48 blocks of the eye).
+- By `/kultivasi formasi penjaga <nama> [order]` while looking at the eye.
+- Automatically, when the owner orders a disciple to STAY within 3 blocks of a running eye that has a free keeper slot
+  (the 20.3.2 pattern).
+
+**Post.** The keeper's post is a cell within 2 blocks of the eye chosen by `Targeting.safeSpot`, so never magma or a lit
+campfire. The assignment is saved in `DiscipleData.extra().formasi {core, dim, order}` and mirrored in the core record.
+The post is freed when the disciple is released, given a new mode, or dies, or when the core is removed.
+
+**Orders (`KeeperOrder`):**
+
+| Order | id_id / en_us | Effect | Disciple behaviour |
+|---|---|---|---|
+| `JAGA` | Jaga / Keep | Kuning and Misterius: **upkeep 0** (the 20.3.2 precedent). Bumi and up: upkeep ×0.5; a second Jaga keeper ×0.75 more; floor ×0.25 | stands at its post and fights only when hit |
+| `PERKUAT` | Perkuat / Empower | K = +0.05 per realm above the grade's keeper realm, at most +0.25 for all keepers together | meditates at its post; its own meditation XP ×0.5 while keeping |
+| `WASPADA` | Waspada / Watch | upkeep ×0.9; alarm approach ring +8; keeper fights intruders **inside the core radius only** (a GUARD_HALL clone bounded to the radius), then returns to its post | patrols its post |
+
+**Also, with any order:**
+- **Affinity:** +0.10 to P when the keeper's Dao or a root element matches the family (table below).
+- **Rank perks:** Murid Dalam+ or Murid Inti+ perks as written on each card.
+- **Daya Tembus:** a Murid Dalam+ keeper raises the formation's effective grade by 1 (24.2.10).
+
+| Family | Affinity: Dao / root element |
+|---|---|
+| Peringatan, Penyembunyi | Bayangan & Angin / Angin |
+| Pengumpul, Pemulihan | Kehidupan / Kayu |
+| Penempaan | Api / Api |
+| Ilusi | Ruang / Tanah |
+| Kendali | Tubuh / Tanah |
+| Pembunuh: sword / thunder / fire / water | Pedang / Logam · Petir / Petir · Api / Api · Es / Air or Es |
+| Perpindahan | Ruang / Ruang |
+| Penangkal | Petir / Petir or Logam |
+| Pelindung | Tubuh / Tanah |
+| Penguat, Gabungan | any; a Tetua Agung counts as matching |
+
+**Limits.** Keepers never cast Mode Kehancuran techniques while keeping. They give no reduction to the master's own
+tribulation strikes (the HuFa rule of 19.1.5 stands).
+
+**Balance.** There are at most 9 disciples (10 for templates 5–9 at T9) and 6 active slots, so choosing keepers is a
+real decision.
+
+**Sumber (keepers):**
+- ISSTH Book 5 ch. 735 "War!": each layer of the Blood Demon Sect's five-layered restrictive shield is maintained by
+  Spirit Severing experts. In the sect's first formation, the Demonic Incarnation, Meng Hao is the nucleus.
+- RMJ ch. 557: Exquisite Sound Sect disciples guard a transportation formation.
+- The Penjaga rule of 20.3.2.
+
+#### 24.2.9 Power P, scaling and amplifiers
+
+```
+P      = min(P_CAP 1.5, 1 + Q + K + F + A)
+  Q    stone quality (bestGrade): amethyst or Low 0 · Mid 0.05 · High 0.10 · Supreme 0.15   (RMJ ch. 131: a better stone raises a formation's power)
+  K    Perkuat keepers, ≤ 0.25
+  F    affinity, +0.10
+  A    amplifiers, ≤ A_CAP 0.40: L6 +0.25 (its target) · A1 +0.15 (every other core of the hall) · A2 +0.03 × N (Absolute arrays)
+Support families (Pengumpul, Pemulihan, Penempaan): P ≤ P_SUPPORT_CAP 1.3 and A is ignored (A1 raises the stack cap instead).
+
+bonus  = 1 + base × P                  gathering, healing and refining factors on the cards are written as "base"
+damage = base × P × config sectFormationDamageScale, then the per-mob caps of 24.5
+radius = card radius, + 2 for L6 and + 2 for A1 (at most + 4), capped at RADIUS_CAP 48
+```
+
+#### 24.2.10 Targeting and damage (`formasi/effect/FormationTargets`)
+
+**Intruder (`mayAffect`).** A mob counts when it is alive, has AI and is not invulnerable, and it is either an `Enemy`,
+or a mob whose target is a member, a disciple of the owner, or their tamed pet or spirit beast, inside the field.
+
+**Calm neutrals are skipped:**
+- owner online: `Targeting.isHostileTo(mob, owner, false)` must be true. The non-precise form keeps the calm-neutral
+  exclusion and every `Targeting.addExclusion` rule, so calm endermen and zombified piglins at a sect portal are safe;
+- owner offline: a `NeutralMob` that is not angry, and an `AbstractPiglin` that is not targeting a member, are skipped.
+
+**Never affected:**
+- players (duels and sparring included), `OwnableEntity` with an owner, spirit beasts and `Npc`;
+- `DiscipleEntity` of any role (candidates, rivals, phantoms, clones) and heart demons;
+- mobs tagged `kultivator.trial_guard`, `kultivator.inheritance`, `kultivator.dummy` or `kultivator.dummy_boss`;
+- the Wither, the Ender Dragon and heart-bound creakings;
+- player-created iron golems and snow golems, and a `ZombieVillager` that is converting;
+- mobs with a custom name, leashed mobs and mobs riding a vehicle (players' kept and caged mobs);
+- **Dao Protectors** (`DaoProtectors.TAG`) for killing, control, illusion and L1 projectile discard. The alarm only labels
+  them "Pelindung Dao". The legacy Pelindung is unchanged.
+
+**Modifiers:**
+
+| Target | Rule |
+|---|---|
+| Silverfish | never hurt |
+| Ravager | never moved or steered (it breaks leaves) |
+| Elites (`EliteMonsters.tier` 1–3) | damage ×0.6 |
+| Bosses (Warden, Elder Guardian, `TechniquePower.TAG_BOSS`) | damage ×0.25; never steered or rooted for more than 1 s; immune to illusion and concealment |
+| **Daya Tembus** | an elite whose tier is at least the formation's effective grade number (Kuning 1 … Abadi 5) ignores that formation's illusion and concealment |
+
+The Daya Tembus rule comes from *The Mirror Legacy* ch. 34: the simple formation fools only Embryonic Breathing
+cultivators, and Qi Cultivation cultivators could break it.
+
+**Damage.**
+- Formation damage uses the new data damage type **`kultivator:formation`** (it bypasses nothing), with no attacker.
+- `KillCredit.resolve` returns null for it, and so do `XpSources`, the beast-core drops and the stone drops. This is a
+  spine edit (24.13).
+
+**Roots, holds and steering.**
+- Roots and creeper-fuse holds go through the 6c bind path. The spine adds a public facade,
+  `technique/spec/run/ExternalControl.root(LivingEntity, int ticks, int bossTicks)` and `release(LivingEntity)`, over
+  the package-private `StatusTracker.bind`. That path holds a creeper's fuse every tick. A pulse-based reset would not,
+  because `SwellGoal` re-arms the fuse every tick.
+- Steering uses `mob.getNavigation().moveTo(...)` once per waypoint, never `setNoAi`. Waypoints stay on the field's
+  ring, never inside buildings.
+- While a zombie is steered, `setCanBreakDoors(false)` is applied and then restored.
+- Every steered or pushed mob gets `setPortalCooldown()` and `NoGrief.TAG`, as the pushed mobs already do.
+
+**Target gate (`util/TargetGates`, spine).** A mixin on `Mob.setTarget` asks the registered gates whether a new target
+is allowed. This is event-driven and costs nothing per tick.
+- **Concealment gate:** refuses a new target that is a member inside a concealment field when the mob is outside it,
+  unless the member hurt that mob in the last 60 ticks.
+- **Maze gate:** inside a maze field, refuses targets inside `r − 4`, unless that target hurt the mob in the last 60
+  ticks.
+- Brain-driven mobs (piglins, hoglins, the Warden) do not use `setTarget` this way and are not covered. This is
+  accepted.
+
+#### 24.2.11 Shared palettes
+
+**Lima Unsur / Five Elements pillars** (M1, L1). True compass, whatever the build rotation.
+
+| Element | Place | Body | Cap at Misterius (M1) | Cap at Langit (L1) |
+|---|---|---|---|---|
+| Kayu / Wood | east | `BAMBOO_BLOCK` | `light()` | `VERDANT_FROGLIGHT` |
+| Api / Fire | south | `anyOf(POLISHED_CINNABAR, CINNABAR_BRICKS, RED_NETHER_BRICKS)` | `light()` | `SHROOMLIGHT` |
+| Tanah / Earth | centre (M1 heart) or the SSW peak (L1) | `SMOOTH_SANDSTONE` | – | `OCHRE_FROGLIGHT` |
+| Logam / Metal | west | `IRON_BLOCK` | `light()` | `PEARLESCENT_FROGLIGHT` |
+| Air / Water | north | `POLISHED_BLACKSTONE` | `light()` | `SEA_LANTERN` |
+
+**Trigram pillars** (A1). Lines are read bottom to top, as in the `FormationDisc` line arrays: yang =
+`POLISHED_BLACKSTONE`, yin = `SMOOTH_QUARTZ`. The order is King Wen (Later Heaven) in true compass orientation, as in
+the GUI Bagua: ☲ S, ☵ N, ☳ E, ☱ W, ☴ SE, ☷ SW, ☶ NE, ☰ NW.
+
+**Early-gate substitutes.** Blocks that need the End, an ocean monument or frog variants are never *required* below
+the Bumi grade:
+- `END_ROD` at Kuning and Misterius → `anyOf(END_ROD, SOUL_LANTERN, LANTERN)` or `CANDLES`;
+- `PURPUR_PILLAR` → `anyOf(PURPUR_PILLAR, QUARTZ_PILLAR)`;
+- `END_STONE_BRICKS` → `anyOf(END_STONE_BRICKS, SMOOTH_QUARTZ, CALCITE)`;
+- `DARK_PRISMARINE` → `anyOf(DARK_PRISMARINE, DEEPSLATE_TILES, POLISHED_DEEPSLATE)`;
+- froglights → `light()`.
+
+**Hazards.**
+- Magma (K3, B7, B3) and lit soul campfires (B7, L3) hurt whoever stands on them. That is vanilla. Keeper posts avoid
+  them through `safeSpot`.
+- Bamboo burns, but nothing in 7c makes block fire. The hints warn players to keep lava away.
+
+#### 24.2.12 Runtime (`formasi/core/CoreTicker`, `formasi/effect/*`)
+
+**Handler interface** (A owns it; B implements its own handlers):
+
+```java
+public interface FormationEffect {
+    default void pulse(CoreContext ctx) {}                                  // every spec.pulseTicks while running
+    default void field(CoreContext ctx, FieldSink sink) {}                  // contributes to stacking fields (24.5)
+    default void onState(CoreContext ctx, CoreState from, CoreState to) {}  // drop marks, notify
+    default boolean idle(CoreContext ctx) { return false; }                 // true → standby ×0.25
+    default @Nullable Component blocker(CoreContext ctx) { return null; }   // an extra SUSPENDED reason
+    default void sync(CoreContext ctx, CompoundTag out) {}                  // ≤ 64 bytes of extra client fields
+}
+```
+
+**`CoreContext`** offers:
+- `level`, `core` (a `CoreView`), `spec`, `owner`, `ownerOnline`, `hallLevel`, `radius`, `centre`, `power` (P), `now`,
+  `random`;
+- `isMember(Entity)`;
+- `hostiles(int max)` (≤ 24) and `allies(int max)` (≤ 16);
+- `hurt(Mob, float)`, which applies the ledger, the caps and the damage type;
+- `push`, `root`, `steer`, `loseTarget`;
+- `fx(sub, at, b, f)`, `alert(AlarmKind, Component, @Nullable Vec3)`, `spend(daya)` and `ownerCores()`.
+
+**Shared intruder snapshot.** Every 20 ticks, per owner, one AABB query is run over the union box of each cluster of
+overlapping hostile-affecting cores (radius ≤ 48, at most 3 queries per owner). `hostiles()` filters that cached list by
+distance. No formation runs its own overlapping scan.
+
+**Scheduling (`ServerTickEvents.END_SERVER_TICK`):**
+1. `Verifier.step`.
+2. Up to `MAX_PULSES_PER_TICK = 4` cores that are due, from a priority queue. Phases are staggered by
+   `id × 7 % pulseTicks`.
+3. For each core:
+   - if the eye's chunk is not entity-ticking, skip it and add 100 ticks (no upkeep);
+   - derive the state and, when running, call `pulse`;
+   - pay upkeep for the elapsed ticks.
+4. Every 20 ticks: invalidate field caches and run the sync dirty check for at most 8 players per tick.
+5. Every 1200 ticks: the Kas auto-draw pass.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.3 Catalogue overview
+
+**Existing formations, unchanged (base rows; legacy mirrors in the Kitab, no 7c toggle):**
+
+| Row | Meaning on the ladder | Effect | Where |
+|---|---|---|---|
+| Personal Qi formations: Kecil ×1.25, Agung ×1.6, Bintang Surgawi ×2.2 | personal meditation seat | gathering for the seated player | PANDUAN 8.4, `QiFormations` |
+| **Formasi Pelindung** | Kuning protection | lodestone + 4 crying obsidian at distance 4; radius 16; push + 1 damage/s; tribulation ×0.85 | DESIGN 10 |
+| **Formasi Agung Sekte** | Misterius–Bumi protection | radius `min(32, 16 + 2L)`, 4 layers, keeper, Pelindung factor ×1.5 (≤ 2) | 20.3.2 |
+
+**New formations (24), by grade.** Radius is horizontal; |dy| ≤ radius/2 unless the card says otherwise. "Mod" is the
+owning module (24.14).
+
+| # | id | Nama (id_id) | en_us | Family | Grade | Heart | Size | Radius | One-line effect | Mod |
+|---|---|---|---|---|---|---|---|---|---|---|
+| K1 | `alarm_restriction` | Larangan Peringatan | Alarm Restriction | Peringatan | Kuning | `BELL` on | 7×7×2 | 24–32 / territory | warns of hostiles and strangers | B |
+| K2 | `small_spirit_gathering` | Formasi Pengumpul Roh Kecil | Small Spirit-Gathering Array | Pengumpul | Kuning | `AMETHYST_BLOCK` | 9×9×2 | 10–14 | gathering +10% | A |
+| K3 | `earthfire` | Formasi Api Bumi | Earthfire Array | Penempaan | Kuning | `MAGMA_BLOCK` | 7×7×2 | 6–8 | alchemy +5%, faster refining | A |
+| K4 | `concealment_restriction` | Larangan Penyembunyi | Concealment Restriction | Penyembunyi | Kuning | `TINTED_GLASS` | 7×7×2 | 12–20 | outside monsters lose sight of those inside | B |
+| M1 | `five_elements_reversal` | Formasi Lima Unsur Terbalik | Five Elements Reversal Formation | Ilusi | Misterius | `RAW_GOLD_BLOCK` | 11×11×3 | 16–22 | monsters lose their way | B |
+| M2 | `concealment_detection` | Formasi Penyembunyi dan Pengintai | Concealment and Detection Array | Penyembunyi (+ alarm) | Misterius | `TINTED_GLASS` | 11×11×3 | territory | territory-wide concealment and alarm | B |
+| M3 | `sect_transfer` | Formasi Perpindahan Sekte | Sect Transfer Array | Perpindahan | Misterius | `CRYING_OBSIDIAN` | 5×5×3 per node | territory | teleport between nodes | B |
+| M4 | `spirit_nurturing` | Formasi Pemelihara Roh | Spirit-Nurturing Array | Pemulihan | Misterius | froglight | 9×9×3 | 12–18 | regeneration, qi regen, shorter deviation | A |
+| M5 | `uniting_circle` | Formasi Lingkar Penyatu | Uniting Circle Array | Pengumpul | Misterius | `CHISELED_QUARTZ_BLOCK` | 11×11×3 | 8 cushions | group meditation bonus | A |
+| B1 | `great_geng_sword` | Formasi Pedang Geng Agung Sekte | Sect Great Geng Sword Formation | Pembunuh (sword) | Bumi | `IRON_BLOCK` | 15×15×4 | 16–20 | sword strikes + 72-sword sweep | B |
+| B2 | `heaven_absolute` | Formasi Mutlak Langit | Heaven Absolute Formation | Pembunuh (thunder) | Bumi | `CHISELED_COPPER` | 13×10×5 | 18–22 | particle thunder bolts | B |
+| B3 | `earth_fierce` | Formasi Bumi Membara | Earth Fierce Formation | Pembunuh (fire + thunder) | Bumi | `RED_NETHER_BRICKS` | 13×13×4 | 14–18 | fire below, thunder above | B |
+| B4 | `red_sand` | Formasi Pasir Merah | Red Sand Formation | Kendali | Bumi | `CHISELED_RED_SANDSTONE` | 13×13×3 | 14–18 | roots intruders, blade sand | B |
+| B5 | `great_spirit_gathering` | Formasi Pengumpul Roh Agung Sekte | Great Sect Spirit-Gathering Array | Pengumpul | Bumi | `GOLD_BLOCK` | 15×15×4 | territory | gathering +20% everywhere in the territory | A |
+| B6 | `golden_lightning_net` | Formasi Jaring Petir Emas | Golden Lightning-Net Array | Penangkal | Bumi | `GILDED_BLACKSTONE` / `GOLD_BLOCK` | 13×13×5 | 12–16 | tribulation strikes ×0.90 | A |
+| B7 | `earth_lung_fire` | Formasi Api Paru Bumi | Earth Lung Fire Array | Penempaan | Bumi | `MAGMA_BLOCK` (K3 upgrade) | 11×11×3 | 8 | alchemy +10%, quality, inscription | A |
+| L1 | `five_layer_shield` | Perisai Larangan Lima Lapis | Five-Layered Restrictive Shield | Pelindung | Langit | `DIAMOND_BLOCK` | 21×19×5 | ≤ 48 | layers 5–6 over the Agung, projectile absorption | A |
+| L2 | `nine_bend_yellow_river` | Formasi Sungai Kuning Sembilan Lekuk | Nine-Bend Yellow River Formation | Ilusi | Langit | `CAULDRON` on + `GOLD_BLOCK` | 19×19×3 | 20–22 | endless bends; strips buffs and elite skills | B |
+| L3 | `blazing_flame` | Formasi Api Berkobar | Blazing Flame Formation | Pembunuh (fire) | Langit | `POLISHED_CINNABAR` | 15×14×5 | 20–22 | three fires | B |
+| L4 | `red_water` | Formasi Air Merah | Red Water Formation | Pembunuh (water) | Langit | `SEA_LANTERN` | 15×15×4 | 18–22 | dissolving red water | B |
+| L5 | `ancient_transfer` | Formasi Perpindahan Kuno | Ancient Transportation Array | Perpindahan | Langit | `CRYING_OBSIDIAN` (M3 upgrade) | 9×9×4 per node | ≤ 4,096 | long range, outposts | B |
+| L6 | `restriction_flag` | Formasi Panji Larangan | Restriction Flag Array | Penguat | Langit | `CHISELED_POLISHED_BLACKSTONE` | 7×7×2 | target ≤ 8 | amplifies one formation, fills "cracks" | A |
+| A1 | `ten_thousand_immortals` | Formasi Sepuluh Ribu Abadi | Ten Thousand Immortals Formation | Gabungan | Abadi | `BEACON` on | 21×21×5 | territory | joins three parts: all formations stronger | B |
+| A2 | `ten_absolute` | Sepuluh Formasi Mutlak | Ten Absolute Formations | Gabungan (killing) | Abadi | `NETHERITE_BLOCK` | 7×11×3 | territory | strengthens the Absolute arrays | B |
+
+**Family coverage** (each line also lists the legacy rows):
+
+| Family | Formations |
+|---|---|
+| Pelindung / Protection | Pelindung, Agung, L1 (A1 joins them) |
+| Pengumpul / Gathering | K2, M5, B5 (personal seats) |
+| Pemulihan / Healing | M4 |
+| Penempaan / Refining | K3, B7 |
+| Penangkal Petir / Tribulation warding | B6 (and the existing 0.85) |
+| Penguat / Support | L6 |
+| Peringatan / Alarm | K1, M2 |
+| Penyembunyi / Concealment | K4, M2 |
+| Ilusi & Labirin / Illusion and maze | M1, L2 |
+| Kendali / Control | B4 |
+| Pembunuh / Killing | B1, B2, B3, L3, L4 |
+| Perpindahan / Transport | M3, L5 |
+| Formasi Gabungan Agung / Grand combined | A1, A2 |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.4 The formation cards (by family, then grade)
+
+**Notation.**
+- North is up; one character is one block; `.` means don't care.
+- `@` is the **Mata Formasi** at y0. The heart is at dy −1 under it unless the card says "on", meaning dy +1.
+- Pillars stand on y0 unless written otherwise. Side views are cuts through the eye.
+- "Rot." says whether the pattern may be built in any of 4 rotations, or is `FIXED` (true compass).
+- Effect numbers are at P = 1; "× P" values scale (24.2.9). Damage is always capped per mob (24.5).
+- Every card's **Uji** line uses the commands of 24.10. Any formation can also be tried with
+  `uji formasi pasang <id>` (a virtual core: no blocks, not saved).
+
+#### 24.4.1 Pelindung / Protection (module A)
+
+##### L1 · Perisai Larangan Lima Lapis / Five-Layered Restrictive Shield
+`five_layer_shield` · netId 100 · Langit · hall 7 · keeper ≥ Jiwa Baru Lahir (2nd: Murid Dalam+) · FIXED · 21×19, five peaks 5 high
+
+```
+. . . . . . . . . . a . . . . . . . . . .      every peak (elevation):
+. . . . . . . . . . . . . . . . . . . . .      y+4  cap (lamp of its element)
+. . . . . . . . . . . . . . . . . . . . .      y0–3 body ×4
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .      a (0,−10) Water    k (10,−3) Wood
+. . . . . . . . . . . . . . . . . . . . .      p (6,8)  Fire      t (−6,8)  Earth
+. . . . . . . . . . . . . . . . . . . . .      l (−10,−3) Metal   @ = eye, heart DIAMOND_BLOCK
+l . . . . . . . . . . . . . . . . . . . k      clockwise from north: the generating cycle
+. . . . . . . . . . . . . . . . . . . . .      Water → Wood → Fire → Earth → Metal
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . @ . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . t . . . . . . . . . . . p . . . .
+```
+
+**Blocks.** Heart `DIAMOND_BLOCK`. The five peaks use the Langit column of the Five Elements palette (24.2.11).
+Bill: 1 diamond block; 4 each of polished blackstone, bamboo block, cinnabar (any listed), smooth sandstone and iron
+block; 5 element lamps.
+
+**Requires.** The hall's Formasi Agung Sekte must be active (`requires`), and the L1 eye must lie within 32 blocks of the
+stele.
+
+**Radius.** `min(48, territory radius)` around the eye.
+
+**Effect.** L1 never edits the Agung's radius or layers. It runs its own layers on top of them:
+- **Lapis 5, Lapis Perisai (always on).** Projectiles whose owner is a hostile mob (`Enemy`, not a Dao Protector) are
+  tracked from `ENTITY_LOAD` when they spawn within radius + 32. The tracked set is checked **every tick**, and a tracked
+  projectile that crosses the shell inward is `discard()`ed with a ripple FX. This covers arrows, tridents, small and
+  large fireballs, shulker bullets, llama spit, breeze wind charges and wither skulls. They never explode and never hit
+  a block. A projectile whose current owner is a member is never touched.
+- **Lapis 6, Lapis Inti (needs a keeper at Jiwa Baru Lahir or higher, or A1 complete).** Intruders inside get Weakness I
+  for 3 s every 40 ticks. Creepers inside are held through `ExternalControl.root` (fuse held every tick), so they never
+  explode inside the shield.
+- **No amethyst drain on the Agung's lodestone** while L1 runs, through the spine hook
+  `ProtectiveFormations.addDrainExemption` (24.13). The lodestone keeps its power.
+- **Displayed layers** = the Agung's layers (≤ 4) + the running L1 layers, at most `BARRIER_LAYER_CAP = 6`.
+
+**Keeper.** Body or Earth affinity +0.10.
+
+**Standby.** No intruder and no tracked projectile for 60 s.
+
+**Visual.** Five nested translucent shell rings in the element colours (black-blue, green, red, yellow, white). They are
+drawn as sparse rendered shells near the camera, never as particle spheres, and only the edge ring at Minimal. Rune
+bands rotate slowly in opposite directions. A ripple marks each discarded projectile, and a thin jade beam rises from
+the eye.
+
+**Sumber.**
+- ISSTH Book 5 ch. 735 "War!": the Blood Demon Sect's five summits shine into five differently coloured layers, forming
+  a five-layered restrictive spell shield. Each layer is maintained by Spirit Severing experts and draws on a whole peak.
+- RMJ ch. 346: the sect could not endure long against the Devil Dao even with its great protective formations.
+- *A Will Eternal* ch. 877: after the war the Profound Stream Division repairs the spell formations that protected the
+  sect (the 6b repair rule, 24.6.2).
+
+**Uji.** `uji formasi pasang five_layer_shield` beside a registered Agung; `uji formasi musuh 6` (skeletons shoot from
+outside); `uji formasi penjaga semu jiwa_baru_lahir`.
+
+#### 24.4.2 Pengumpul / Gathering (module A)
+
+##### K2 · Formasi Pengumpul Roh Kecil / Small Spirit-Gathering Array
+`small_spirit_gathering` · netId 110 · Kuning · hall 1 · keeper ≥ Pemurnian Qi · rotatable · 9×9×2 (about the "30 feet" of the source) · `PERSONAL_OK`
+
+```
+A . . . Q . . . A        row z−4:  y+1  c . . . . . . . c
+. . . . . . . . .                  y0   A . . . Q . . . A
+. . . . . . . . .        row z0:   y+1  . . . . k . . . .
+. . . . . . . . .                  y0   Q . . . @ . . . Q
+Q . . . @ . . . Q                  y−1  . . . . h . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+A . . . Q . . . A
+```
+
+**Blocks.**
+- h: heart `AMETHYST_BLOCK`.
+- k: an `AMETHYST_CLUSTER` on the eye.
+- A: `AMETHYST_BLOCK` with c on top, where c is `anyOf(AMETHYST_CLUSTER, LARGE_AMETHYST_BUD, END_ROD)` or any candle.
+- Q: `QUARTZ_PILLAR`.
+- Bill: 5 amethyst blocks, 1 cluster, 4 tips, 4 quartz pillars.
+
+**Radius.** 10, +1 per hall level above 1, at most 14; a Murid Dalam+ keeper adds +4. |dy| ≤ 4.
+
+**Effect** (through the field, 24.5):
+- Members meditating inside: sect gather factor `1 + 0.10 × P`.
+- The owner's disciples meditating inside: their own meditation XP × the same factor.
+- Meditation vein drain inside ×0.9.
+
+**Standby.** Nobody cultivating inside.
+
+**Visual.** Violet motes arc from the four tips into the cluster; each meditator inside gets a faint violet thread to the
+eye.
+
+**Sumber.** RMJ: Immortal Realm ch. 216: a small spirit gathering array, roughly 30 feet in size, fills a stone chamber
+with abundant spiritual qi.
+
+**Uji.** `uji formasi pasang small_spirit_gathering`, then `/kultivasi meditate` and read the HUD factor.
+
+##### M5 · Formasi Lingkar Penyatu / Uniting Circle Array
+`uniting_circle` · netId 111 · Misterius · hall 3 · keeper ≥ Pembangunan Fondasi · rotatable · 11×11×3, eight cushions
+
+```
+A . . . . . . . . . A        row z0:   y+1  . . . . . k . . . . .
+. . . . . . . . . . .                  y0   . . s . . @ . . s . .
+. . . . . s . . . . .                  y−1  . . . . . h . . . . .
+. . . s . . . s . . .        row z−5:  y+2  r . . . . . . . . . r
+. . . . . . . . . . .                  y0–1 A . . . . . . . . . A
+. . s . . @ . . s . .
+. . . . . . . . . . .
+. . . s . . . s . . .
+. . . . . s . . . . .
+. . . . . . . . . . .
+A . . . . . . . . . A
+```
+
+**Blocks.**
+- h: heart `CHISELED_QUARTZ_BLOCK`.
+- k: an `AMETHYST_CLUSTER` or any candle on the eye.
+- s: any wool carpet (`BlockTags.WOOL_CARPETS`) at (±3,0), (0,±3) and (±2,±2): the cushions.
+- A: `AMETHYST_BLOCK` ×2 at the corners, with r on top, where r is `anyOf(END_ROD, SOUL_LANTERN, LANTERN)` or any candle.
+
+**Effect.**
+- n = occupied cushions. A cushion is occupied by a meditating player or a MEDITATE disciple within 1 block of it, one
+  per cushion. A keeper standing within 1 block of the eye counts as the "nucleus" for +1, so n ≤ 9.
+- Every seated cultivator gets the factor `1 + 0.03 × n × P` (×1.27 at n = 9). It multiplies into the sect gather
+  factor, inside the cap.
+- Seated players: enlightenment chance +0.004 × n.
+- It stacks with the existing `Sects.meditationBonus` (1.15 near a mate). The Medan panel shows both lines.
+
+**Standby.** n = 0.
+
+**Visual.** Threads of soul light link each seated cultivator to the eye and to each other in a star polygon, brighter
+as n grows.
+
+**Sumber.** *Terinspirasi dari* ISSTH Book 5 ch. 735: the Blood Demon Sect's Demonic Incarnation formation merges the
+cultivation bases of all its disciples, with Meng Hao as its nucleus.
+
+**Uji.** `uji formasi pasang uniting_circle`; put disciples on MEDITATE on the cushions; `uji formasi tumpuk`.
+
+##### B5 · Formasi Pengumpul Roh Agung Sekte / Great Sect Spirit-Gathering Array
+`great_spirit_gathering` · netId 112 · Bumi · hall 5 · keeper ≥ Inti Emas · rotatable · 15×15×4
+
+```
+. . . . . . . S . . . . . . .      side (west–east, through the eye)
+. . . . . . . . . . . . . . .      y+3  r . . . . . . . . . . . . . r
+. . S . . . . . . . . . S . .      y+1–2 a . . . . . . . . . . . . . a
+. . . . . . . . . . . . . . .      y+1  . . . . . . . k . . . . . . .
+. . . . j . . . . . j . . . .      y0   a . . . . . . @ . . . . . . a
+. . . . . . . . . . . . . . .      y−1  . . . . . . . h . . . . . . .
+. . . . . . . . . . . . . . .
+S . . . . . . @ . . . . . . S
+. . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . .
+. . . . j . . . . . j . . . .
+. . . . . . . . . . . . . . .
+. . S . . . . . . . . . S . .
+. . . . . . . . . . . . . . .
+. . . . . . . S . . . . . . .
+```
+
+**Blocks.**
+- h: heart `GOLD_BLOCK`.
+- k: an `AMETHYST_CLUSTER` on the eye.
+- S: spirit spires, `AMETHYST_BLOCK` ×3 (a) + `END_ROD` (r).
+- j: `anyOf(PRISMARINE_BRICKS, PRISMARINE, EMERALD_BLOCK)` (jade marks).
+- Bill: 1 gold block, 1 cluster, 24 amethyst blocks, 8 end rods, 4 jade marks.
+
+**Scope.** The whole territory.
+
+**Effect.**
+- Members meditating anywhere in the territory: sect gather factor `1 + 0.20 × P`, or `1 + 0.25 × P` when the eye is at
+  Y ≥ 120.
+- The owner's disciples: their own meditation XP × the same factor.
+- Meditation vein drain in the territory ×0.8 (a Murid Dalam+ keeper: ×0.7).
+- B5 never raises a vein, its regeneration or its density. That would loop with meditation (24.16).
+
+**Interactions.**
+- K2 and B5 never stack; the stronger counts. M5 multiplies.
+- The 6b meditation pavilion's Qi seat is a normal personal seat and benefits from B5.
+
+**Standby.** Nobody cultivating in the territory.
+
+**Visual.** A slow violet-gold spiral rises around the eye into a soft column, seen from 64 blocks. Meditators within 32
+blocks show a faint thread pointing toward it.
+
+**Sumber.**
+- RMJ ch. 391 "A New Home": a natural spirit vein flows through Sage Mountain; the higher the building, the greater the
+  spiritual qi.
+- RMJ ch. 131: spirit stones power formations.
+- RMJ: Immortal Realm ch. 216: the spirit gathering array.
+
+**Uji.** `uji formasi pasang great_spirit_gathering`; meditate anywhere in the territory; `uji urat 50`.
+
+#### 24.4.3 Pemulihan / Healing (module A)
+
+##### M4 · Formasi Pemelihara Roh / Spirit-Nurturing Array
+`spirit_nurturing` · netId 120 · Misterius · hall 3 · keeper ≥ Pembangunan Fondasi · rotatable · 9×9×3 · `PAUSE_IN_TRIBULATION`, `PERSONAL_OK`
+
+```
+G . . . . . . . G        row z−4:  y+2  v . . . . . . . v
+. . . . . . . . .                  y+1  f . . . . . . . f
+. . . . w . . . .                  y0   m . . . . . . . m
+. . . . . . . . .        row z0:   y0   . . w . @ . w . .
+. . w . @ . w . .                  y−1  . . . . h . . . .
+. . . . . . . . .
+. . . . w . . . .
+. . . . . . . . .
+G . . . . . . . G
+```
+
+**Blocks.**
+- h: heart `anyOf(PEARLESCENT_FROGLIGHT, OCHRE_FROGLIGHT, VERDANT_FROGLIGHT, SEA_LANTERN)` (the "white egg").
+- w: `waterSource()` at ±2. The player seals the pools.
+- G: `MOSS_BLOCK` (m), `anyOf(FLOWERING_AZALEA_LEAVES, AZALEA_LEAVES)` (f), `light()` (v).
+
+**Radius.** 12 + (L − 3), at most 18.
+
+**Effect.** Every 100 ticks, on members, the owner's disciples, and their tamed pets and spirit beasts inside:
+- **Regeneration I** for 6 s, or II from hall level 7 or with a Life/Wood keeper. Players are capped at amplifier 1.
+  Disciples get `DiscipleHooks.addRegenFactor` ×1.5 (×2 at Regeneration II).
+- **Qi regen** of members inside ×(1 + 0.3 × P) (new `Qi.addRegenFactor`, spine).
+- **Qi Deviation timer** of members inside runs ×1.33, so deviation is 25% shorter (new `Deviation.addTimerFactor`,
+  spine).
+- **Spirit beasts** gain +1 beast XP per minute, at most 60 per beast per in-game day (through the existing beast XP
+  call; slip if no public one exists).
+
+Hostiles are never touched. The effect pauses during the target's own tribulation.
+
+**Standby.** No hurt or deviating ally and no beast inside.
+
+**Visual.** Soft green-white motes rise from the four pools and drift toward wounded allies; the eye pulses a pearl glow
+every 5 s.
+
+**Sumber.** *Terinspirasi dari* RMJ: Immortal Realm ch. 216: a spirit gathering array fills a chamber with qi around a
+huge white egg at its centre. The healing numbers are game design; no canon healing array was found.
+
+**Uji.** `uji formasi pasang spirit_nurturing`; take damage; `uji formasi tumpuk`.
+
+#### 24.4.4 Penempaan / Refining support (module A)
+
+##### K3 · Formasi Api Bumi / Earthfire Array
+`earthfire` · netId 130 · Kuning · hall 1 · keeper ≥ Pemurnian Qi · rotatable · 7×7×2
+
+```
+P . . . . . P        row z−3:  y+1  s . . . . . s
+. . . . . . .                  y0   P . . . . . P
+. . . b . . .        row z0:   y0   . . b @ b . .
+. . b @ b . .                  y−1  . . . h . . .
+. . . b . . .
+. . . . . . .
+P . . . . . P
+```
+
+**Blocks.**
+- h: heart `MAGMA_BLOCK` (the "earth vent").
+- b: `POLISHED_BLACKSTONE_BRICKS`.
+- P: `CHISELED_POLISHED_BLACKSTONE` with a `SOUL_LANTERN` (s) on top.
+- Bill: 1 magma, 4 polished blackstone bricks, 4 chiseled polished blackstone, 4 soul lanterns.
+
+**Radius.** 6, +1 at hall level 5 and again at 9; a Murid Dalam+ keeper adds +2. |dy| ≤ 3.
+
+**Effect.**
+- Alchemy furnaces (DESIGN 9: a cauldron on a lit campfire or soul campfire) in range: success `+0.05 × P`, and
+  refining time 10 s → 8 s.
+- Talisman inscriptions by members standing in range: success `+0.03 × P`.
+
+**Interactions.** B7 is the upgrade on the same eye and replaces K3; the two never stack. The refining caps are in 24.5.
+
+**Standby.** Nothing refining or inscribing in range.
+
+**Visual.** Heat shimmer and orange embers rise from the eye; thin fire veins run along the ground to each furnace in
+range.
+
+**Sumber.**
+- *A Will Eternal* ch. 2 "The Ovens": Big Fatty Zhang's wok is engraved with an earthflame spell formation (also cited
+  in 20.3.9).
+- RMJ ch. 156 "Earth Lung Fire": a furnace able to bear the heat of earth fire.
+- RMJ ch. 928: on the second floor of the Tool Refinement Hall, earthfire can be used directly to refine materials.
+
+**Uji.** `uji formasi pasang earthfire` next to a furnace; `/kultivasi resep` shows the new success value.
+
+##### B7 · Formasi Api Paru Bumi / Earth Lung Fire Array
+`earth_lung_fire` · netId 131 · Bumi · hall 5 · keeper ≥ Inti Emas · rotatable · 11×11×3 (the K3 upgrade on the same eye)
+
+```
+. . . . . H . . . . .        row z0:   y+2  f . . . . . . . . . f
+. . . . . . . . . . .                  y+1  c . . . . . . . . . c
+. . P . . . . . P . .                  y0   c . . . b @ b . . . c
+. . . m . . . m . . .                  y−1  . . . . . h . . . . .
+. . . . . b . . . . .
+H . . . b @ b . . . H
+. . . . . b . . . . .
+. . . m . . . m . . .
+. . P . . . . . P . .
+. . . . . . . . . . .
+. . . . . H . . . . .
+```
+
+**Blocks.**
+- The K3 pattern: heart `MAGMA_BLOCK`; b `POLISHED_BLACKSTONE_BRICKS`; P `CHISELED_POLISHED_BLACKSTONE` + `SOUL_LANTERN`.
+- m: `MAGMA_BLOCK` at (±2,±2).
+- H: chimneys of `POLISHED_BLACKSTONE_BRICKS` ×2 (c) with a lit `SOUL_CAMPFIRE` on top
+  (`state(SOUL_CAMPFIRE, LIT, true)`).
+
+**Radius.** 8, |dy| ≤ 4.
+
+**Effect.**
+- Furnaces in range: success `+0.10 × P`, **+1 quality step**, and refining time ×0.7.
+- Inscriptions by members in range: success `+0.05 × P`.
+- Replaces K3.
+
+**Standby.** As for K3.
+
+**Visual.** The blue chimneys "breathe" in rhythm; heat waves rise over furnaces in range, with ember threads to each.
+
+**Sumber.**
+- RMJ ch. 156: the Earth Lung Fire and its furnace.
+- RMJ ch. 866 "The Yin Yang Pagoda": a mountain that is a top-grade reservoir of Earth Lung Fire, far more efficient for
+  tool refinement.
+- RMJ ch. 928: refining directly with earthfire.
+
+**Uji.** `uji formasi pasang earth_lung_fire`; refine a pill; inscribe a talisman.
+
+#### 24.4.5 Penangkal Petir / Tribulation warding (module A)
+
+##### B6 · Formasi Jaring Petir Emas / Golden Lightning-Net Array
+`golden_lightning_net` · netId 140 · Bumi · hall 5 · keeper ≥ Inti Emas · rotatable · 13×13×5
+
+```
+M . . . . . o . . . . . M        row z−6:  y+4  r . . . . . . . . . . . r
+. . . . . . . . . . . . .                  y0–3 u . . . . . o . . . . . u
+. . . . . . . . . . . . .        row z0:   y0   o . . . . . @ . . . . . o
+. . . . . . . . . . . . .                  y−1  . . . . . . h . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+o . . . . . @ . . . . . o
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+M . . . . . o . . . . . M
+```
+
+**Blocks.**
+- h: heart `anyOf(GILDED_BLACKSTONE, GOLD_BLOCK)`. Gilded blackstone comes only from bastions; the hint says so.
+- M: net masts, `copper(CUT_COPPER)` ×4 (u) + `END_ROD` (r).
+- o: `GOLD_BLOCK` anchors.
+- No lightning rods; 6b bans them (21.5).
+
+**Radius.** 12 + (L − 5), at most 16.
+
+**Effect.**
+- A `Tribulation.StrikeFactor` provider. During their own strikes, any player of the owner's sect standing inside gets
+  ×0.90, or ×0.85 with an Inti Emas+ keeper or Lightning affinity.
+- All formations together never go below `TRIB_FORMATION_FLOOR = 0.70`, including the existing Pelindung 0.85
+  (24.5). B6 × Pelindung = 0.765, or 0.7225 with the keeper. The spine's overall floor of 0.5 still holds.
+- Disciples' calamity strikes inside get the same factor through `DiscipleHooks.addStrikeFactor`.
+
+**Standby.** Except during a member's omen or strikes inside.
+
+**Visual.** During an omen, a golden lattice net (particles) opens 20 blocks over the eye. Each strike visibly splits, and
+part of the bolt sinks into the net.
+
+**Sumber.**
+- *Terinspirasi dari* RMJ ch. 1468 "Capturing Lightning": a golden net devours the azure tribulation lightning, grows to
+  more than 200 feet, and the bolts vanish into its golden light.
+- RMJ ch. 1315: there are few means that can block a heavenly tribulation.
+
+**Uji.** `uji formasi pasang golden_lightning_net`, then `uji formasi tribulasi` and `uji tribulasi golden_core`.
+
+#### 24.4.6 Penguat / Support (module A)
+
+##### L6 · Formasi Panji Larangan / Restriction Flag Array
+`restriction_flag` · netId 150 · Langit · hall 7 · keeper optional (any realm) · rotatable · 7×7×2
+
+```
+. . . b . . .        side (west–east)
+. b . . . b .        y+1  . . . F . . .
+. . . . . . .        y0   b . . @ . . b
+b . . @ . . b        y−1  . . . h . . .
+. . . . . . .
+. b . . . b .
+. . . b . . .
+```
+
+**Blocks.**
+- h: heart `CHISELED_POLISHED_BLACKSTONE`.
+- F: `banner()` on the eye (black recommended).
+- b: eight `POLISHED_BLACKSTONE_BRICKS` at (±3,0), (0,±3) and (±2,±2).
+
+**Target.** The nearest registered 7c core of the same owner whose eye lies within 8 blocks of the L6 eye. It may not be
+an Abadi array or another L6. One flag per target. The L6 uses a slot.
+
+**Effect on the target.**
+- P +0.25 (the amplifier term A), radius +2, and killing arrays +1 target.
+- Target upkeep ×1.10.
+- **Mengisi Retakan / fills the cracks.** If the target has exactly one missing pattern block, it does not become
+  `BROKEN`. It shows "Retak" and keeps working at P × 0.5 for up to 10 min, or 20 min with any keeper at the flag. After
+  that it goes to `BROKEN`. The block itself is never restored.
+
+**Standby.** No valid target.
+
+**Visual.** Black restriction mist rolls off the banner and threads into the target's eye; the target's runes turn dark
+gold.
+
+**Sumber.**
+- *Renegade Immortal* ch. 291: Wang Lin places 18 more sets of restrictions onto his restriction flag.
+- *Renegade Immortal* ch. 527 "Life Force Seals": strands of restriction gas flow along a formation's cracks, and its
+  power increases several fold.
+- *Renegade Immortal* ch. 233 "Stop": 99 restrictions form 99 dragons circling an ancient restriction.
+
+**Uji.** `uji formasi pasang restriction_flag` near any registered core; `uji formasi info` shows the +0.25; break one
+block of the target.
+
+#### 24.4.7 Peringatan & Penyembunyi / Alarm and concealment (module B)
+
+##### K1 · Larangan Peringatan / Alarm Restriction
+`alarm_restriction` · netId 400 · Kuning · hall 1 · keeper ≥ Pemurnian Qi · rotatable · 7×7×2, eye + 9 blocks · `PERSONAL_OK`
+
+```
+. . . L . . .        side (west–east, through the eye)
+. . . . . . .        y+1  c . . k . . c
+. . . . . . .        y0   S . . @ . . S
+L . . @ . . L
+. . . . . . .
+. . . . . . .
+. . . L . . .
+```
+
+**Blocks.**
+- k: heart `BELL` on the eye (floor attachment).
+- L: pillar of `CHISELED_STONE_BRICKS` (S) with a `copper(COPPER_LANTERN)` (c) on top.
+- Bill: 1 bell, 4 chiseled stone bricks, 4 copper lanterns.
+
+**Zone.** `CORE` radius 24 + 2 × (L − 1), at most 32. With a Murid Dalam+ keeper, or while the owner runs an M2, the
+alarm covers the whole territory through the territory sweep (24.9).
+
+**Effect.** Two stages:
+- **APPROACH:** intruders (24.2.10) and **strangers** (LAN players who are neither the owner nor in the owner's
+  `/sect`, and not spectators) in the ring from the radius to radius + 8. Members get an action-bar line and a soft
+  bell.
+- **BREACH:** inside the radius. Members get the action-bar line "⚠ Larangan Peringatan: 3 monster dari barat laut
+  (Zombie ×2, Skeleton Elit) · 18 blok dari mata formasi". They also get a personal chime (`playNotifySound`), the HUD
+  arrow `AlarmPing` for 8 s, a bell sound at the eye (`level.playSound(null, …, BELL_BLOCK)`), and a chat line with the
+  direction and distance.
+- The bell block is never "rung", so vanilla raid glowing is never triggered.
+- Elites and bosses also show a title, at most once per 60 s per core.
+
+Rate limits are in 24.5. Each mob is reported once per 60 s. Strangers are found from the level's player list every 20
+ticks.
+
+**Keeper.**
+- Pembangunan Fondasi+: names mob types.
+- Inti Emas+: intruders are outlined for the owner for 10 s (client FX, not Glowing).
+- Shadow or Wind affinity: radius +8.
+
+**Interactions.** Concealment never hides intruders from the alarm. Dao Protectors are reported once as "Pelindung Dao",
+without alarm spam. With the owner offline, alarms are queued in the Catatan log.
+
+**Visual.** At idle, copper motes spiral slowly around the lanterns. On an alarm, a ring of red runes flares at the
+crossing point on the zone edge, and a golden sound-wave ring spreads from the bell.
+
+**Sumber.**
+- *Desolate Era* Book 8 ch. 30 "Hunted": an alarm formation set within a mountain gives off no elemental ripples and
+  warns its makers when anyone enters.
+- RMJ ch. 399 "Exquisite Sound Sect": sound transmission talismans knock against the barriers (restrictions) of Han Li's
+  cave residence.
+- The bell and the stranger rule are game design.
+
+**Uji.** `uji formasi pasang alarm_restriction`; `uji formasi alarm [orang|monster|elit]`; `uji formasi musuh 3`.
+
+##### K4 · Larangan Penyembunyi / Concealment Restriction
+`concealment_restriction` · netId 410 · Kuning · hall 1 · keeper ≥ Pemurnian Qi · rotatable · 7×7×2 · `PERSONAL_OK`
+
+```
+D . . m . . D        row z0:  y+1  f . . . . . f
+. . . . . . .                 y0   m . . @ . . m
+. . . . . . .                 y−1  . . . h . . .
+m . . @ . . m
+. . . . . . .
+. . . . . . .
+D . . m . . D
+```
+
+**Blocks.**
+- h: heart `TINTED_GLASS`.
+- m: `MOSS_BLOCK` with `anyOf(FLOWERING_AZALEA_LEAVES, AZALEA_LEAVES)` (f) on top; player-placed leaves are persistent.
+- D: `anyOf(DARK_PRISMARINE, DEEPSLATE_TILES, POLISHED_DEEPSLATE)`.
+
+**Radius.** 12 + (L − 1), at most 20; Shadow affinity adds +4.
+
+**Effect.**
+- **Concealment gate (24.2.10):** a hostile **outside** the radius cannot take a new target that is a member, disciple,
+  pet or spirit beast **inside**, unless that target hurt it in the last 60 ticks.
+- Every 40 ticks, outside mobs within radius + 16 that already target someone inside lose that target, under the same
+  rule.
+- Mobs already inside are not affected.
+- **Daya Tembus:** elites see through a Kuning formation; a Murid Dalam+ keeper lifts it to Misterius, which hides
+  members from tier-1 elites. Bosses always see.
+- **LAN:** sect players standing inside are added to the concealed-names list, so strangers' clients hide their
+  nametags (24.7).
+- Drain is always full.
+
+**Visual.** A faint grey-green mist shell at the edge. It is fully visible from inside; outsiders see only a heat haze.
+The leaves flutter.
+
+**Sumber.**
+- RMJ ch. 520: Han Li places another concealment restriction in the refining room of his new cave residence before a
+  closed-door refinement.
+- RMJ ch. 803: the restriction outside his cave residence was not top grade, so many cultivators discovered the
+  residence.
+
+**Uji.** `uji formasi pasang concealment_restriction`; stand inside; `uji formasi musuh 4` outside the edge;
+`uji formasi sembunyi` (LAN).
+
+##### M2 · Formasi Penyembunyi dan Pengintai / Concealment and Detection Array
+`concealment_detection` · netId 401 · Penyembunyi (+ alarm) · Misterius · hall 3 · keeper ≥ Pembangunan Fondasi · rotatable · 11×11×3
+
+```
+. . . . . P . . . . .        side (west–east, through the eye)
+. m . . . . . . . m .        y+2  c . . . . . . . . . c
+. . . . . . . . . . .        y+1  g . . . . o . . . . g
+. . . . . . . . . . .        y0   d . . . . @ . . . . d
+. . . . . . . . . . .        y−1  . . . . . h . . . . .
+P . . . . @ . . . . P
+. . . . . . . . . . .
+. . . . . . . . . . .
+. . . . . . . . . . .
+. m . . . . . . . m .
+. . . . . P . . . . .
+```
+
+**Blocks.**
+- h: heart `TINTED_GLASS`.
+- o: a `SOUL_LANTERN` on the eye.
+- P: pillars of the K4 D-block (d), `TINTED_GLASS` (g) and `copper(COPPER_LANTERN)` (c).
+- m: `MOSS_BLOCK` + azalea leaves at (±4,±4).
+- It shares its heart with K4. The higher complete pattern wins (24.2.3).
+
+**Scope.** The whole territory.
+
+**Effect.**
+- **Concealment:** the K4 rules for the whole territory. "Outside" means outside the territory. It counts as Misterius
+  for Daya Tembus, so tier-1 elites are fooled too; bosses always see.
+- Mobs that already target members are cleared from the member-centred part of the territory sweep (24.9). There is no
+  separate scan.
+- **Detection:** the K1 alarm over the whole territory, through the territory sweep. Its APPROACH ring is the 16 blocks
+  outside the territory edge: "Penyusup di tepi timur laut" / "Intruder at the north-east edge". Strangers on LAN are
+  named.
+- Drain is always full.
+
+**Keeper.** Shadow affinity: the approach ring becomes 24 blocks.
+
+**Visual.** A pale mist **ground ring** at the territory edge near the camera (never a particle dome), visible only to
+members. Detection pings show as violet ripples on the ring.
+
+**Sumber.**
+- RMJ ch. 995: Han Li tosses formation flags and plates into the air, multicoloured light fills the cavern, and a simple
+  spell formation gives concealment and detection, warning him early if anybody trespasses.
+- RMJ ch. 803: the grade of a restriction matters.
+
+**Uji.** `uji formasi pasang concealment_detection`; `uji formasi alarm`; on LAN, a second account checks the name hiding.
+
+#### 24.4.8 Ilusi & Kendali / Illusion, maze and control (module B)
+
+**Shared maze rules (M1, L2):**
+- The maze target gate of 24.2.10 applies inside the field.
+- Waypoints come from `steer` once per 40 ticks, always on the ring.
+- After a mob has spent the card's time inside, it is pushed out once and is immune to steering for 10 s, so mobs never
+  pile up.
+- Bosses ignore the steering. The Warden and the Elder Guardian are never steered.
+
+##### M1 · Formasi Lima Unsur Terbalik / Five Elements Reversal Formation
+`five_elements_reversal` · netId 420 · Misterius · hall 3 · keeper ≥ Pembangunan Fondasi · **FIXED** · 11×11×3
+
+```
+. . . . . a . . . . .        side (west–east, through the eye)
+. . . . . . . . . . .        y+2  P . . . . . . . . . V
+. . t . . . . . t . .        y0–1 I . . . . @ . . . . B
+. . . . . . . . . . .        y−1  . . . . . h . . . . .
+. . . . . . . . . . .
+l . . . . @ . . . . k        north–south: a = Water pillar (north),
+. . . . . . . . . . .        p = Fire pillar (south), same heights
+. . . . . . . . . . .
+. . t . . . . . t . .
+. . . . . . . . . . .
+. . . . . p . . . . .
+```
+
+**Blocks.**
+- h: heart `RAW_GOLD_BLOCK` (Earth, at the centre).
+- Element pillars from the Misterius column of 24.2.11, body ×2 + `light()` cap:
+  - k: Wood, east (B = bamboo block, V = cap);
+  - p: Fire, south;
+  - l: Metal, west (I = iron block, P = cap);
+  - a: Water, north.
+- t: `CHISELED_TUFF_BRICKS` (the four "reversal" corners).
+
+**Radius.** 16 + (L − 3), at most 22.
+
+**Effect** (every 20 ticks, on intruders inside):
+- maze gate inside r − 4;
+- every 40 ticks, a waypoint 90° further around the ring at r − 2;
+- Slowness I for 2 s;
+- every 60 s the pattern **shifts** and the circulation reverses, with a soft gong;
+- after 20 s inside, the mob is expelled once;
+- elites: no slowness, steered every 80 ticks.
+
+**Keeper.** Murid Dalam+: a mob inside for 10 s is rooted for 2 s, once ("trapped"). Affinity: Space or Earth.
+
+**Visual.** Five coloured mist banks drift around the ring and reverse at each shift; element rune sparks rise from each
+pillar.
+
+**Sumber.**
+- RMJ ch. 231 "Disaster Knocking on the Door": flags are inserted and plates buried, small spirit-stone formations
+  outside the centre supply it, and the master formation flag ceaselessly shifts and controls the patterns to trap
+  enemies.
+- RMJ ch. 363 "Transfer": only after he enters his Five Elements Reversal Formation does Han Li truly breathe a sigh of
+  relief.
+
+**Uji.** `uji formasi pasang five_elements_reversal`; `uji formasi musuh 6`.
+
+##### L2 · Formasi Sungai Kuning Sembilan Lekuk / Nine-Bend Yellow River Formation (九曲黃河陣)
+`nine_bend_yellow_river` · netId 421 · Langit · hall 7 · keeper ≥ Jiwa Baru Lahir · rotatable · 19×19×3
+
+```
+. . . . . . . . . B . . . . . . . . .      row z0:
+. . . . . . . . . . . . . . . . . . .      y+2  F . . . . . . . . . . . . . . . . . F
+. . . . . . . . . . . . . . . . . . .      y+1  w . . . . . . . . U . . . . . . . . w
+. . . B . . . . . . . . . . . B . . .      y0   w . . . . . . . . @ . . . . . . . . w
+. . . . . . . . . . . . . . . . . . .      y−1  . . . . . . . . . g . . . . . . . . .
+. . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . .
+B . . . . . . . . @ . . . . . . . . B
+. . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . .
+. . . B . . . . . . . . . . . B . . .
+. . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . .
+. . . . . . . . . B . . . . . . . . .
+```
+
+**Blocks.**
+- U: a `CAULDRON` (any fill) on the eye, the "Hunyuan Golden Dipper".
+- g: heart `GOLD_BLOCK` under the eye.
+- B: eight posts of `CALCITE` ×2 (w, "white earth") topped with a `banner()` (F). The five colours (black N, green E,
+  red S, white W, yellow) are recommended.
+- The eight posts plus the eye make the nine bends.
+- The blueprint suggests a serpentine `SMOOTH_SANDSTONE` "river" path. It is decor only and never read.
+
+**Radius.** 20 + (L − 7), at most 22.
+
+**Effect** (every 20 ticks, on intruders inside):
+- maze gate inside r − 4;
+- every 40 ticks, a waypoint 90° further around, alternating between r − 3 and r − 8 ("no straight path in its nine
+  bends");
+- Slowness II;
+- **"immortals become mortals":** every pulse removes Strength, Speed, Resistance, Fire Resistance, Invisibility,
+  Regeneration and Absorption, and `EliteMonsters.suppressSkills(mob, 60)` silences elite affix skills while inside and
+  for 3 s after leaving (spine contract; if it is missing, only the effects are stripped);
+- after 30 s inside, the mob is expelled once;
+- bosses: stripped only, never steered.
+
+**Keeper.** Space affinity. Murid Dalam+: Weakness I inside.
+
+**Visual.** A ghostly yellow river of mist meanders in nine bends across the zone (sky-level elements, 24.8); the banners
+flutter and the cauldron glows gold. Stripped mobs shed white petals ("the three flowers").
+
+**Sumber.** *Investiture of the Gods* ch. 50 「三姑計擺黃河陣」: the plan is drawn in white earth (「用白土畫成圖式」)
+with five-coloured banners (「旗旛五色」) and only about 600 men. 「九曲曲中無直」: there is no straight path in its nine
+bends. 「神仙入此而成凡」: immortals who enter become mortals, and with their three flowers removed they are ordinary men.
+The Hunyuan Golden Dipper (混元金斗) captures.
+
+**Uji.** `uji formasi pasang nine_bend_yellow_river`; `uji elit 2`; `uji formasi musuh 6 elit`.
+
+##### B4 · Formasi Pasir Merah / Red Sand Formation (紅砂陣)
+`red_sand` · netId 430 · Kendali · Bumi · hall 5 · keeper ≥ Inti Emas · rotatable · 13×13×3
+
+```
+P . . . . . . . . . . . P        row z−6:  y+2  k . . . . . . . . . . . k
+. . . . . . . . . . . . .                  y0–1 s . . . . . . . . . . . s
+. . . . . . c . . . . . .        row z0:   y0   . . c . c . @ . c . c . .
+. . . . . . . . . . . . .                  y−1  . . . . . . h . . . . . .
+. . . . . . c . . . . . .
+. . . . . . . . . . . . .
+. . c . c . @ . c . c . .
+. . . . . . . . . . . . .
+. . . . . . c . . . . . .
+. . . . . . . . . . . . .
+. . . . . . c . . . . . .
+. . . . . . . . . . . . .
+P . . . . . . . . . . . P
+```
+
+**Blocks.**
+- h: heart `CHISELED_RED_SANDSTONE`.
+- c: `CUT_RED_SANDSTONE` at ±2 and ±4 on both axes (the "three qi").
+- P: corner pillars of `RED_SANDSTONE` ×2 (s) + `CHISELED_RED_SANDSTONE` (k).
+- No gravity blocks (no red sand).
+
+**Radius.** 14 + (L − 5), at most 18.
+
+**Effect.**
+- An intruder crossing the edge inward "falls into the pit": `ExternalControl.root` for 4 s (elites 2 s, bosses 1 s),
+  once per mob per 15 s.
+- Inside, every 20 ticks: blade sand for `1.5 × P`.
+- Every 40 ticks: Blindness I for 2 s (never on bosses).
+
+**Keeper.** Body or Earth affinity, and the root lasts +1 s. Murid Dalam+: Slowness I inside.
+
+**Visual.** Red sand whirls on the three rings, with wind and thunder flickers. Rooted mobs show sand shackles and sink
+visually into a red dust plume.
+
+**Sumber.**
+- *Investiture of the Gods* ch. 44: Zhang Tianjun's Red Sand Formation 「中分三氣，內藏紅砂三斗」; when wind and thunder
+  move, the flying sand wounds people.
+- *Investiture of the Gods* ch. 49: King Wu and his horse are knocked into the pit (「連人帶馬撞下坑去」), and the sand
+  cuts like blades every day. Ran Deng predicts he must wait a hundred days, and talismans front and back protect his
+  body (「前後符印護持其體」).
+
+**Uji.** `uji formasi pasang red_sand`; `uji formasi musuh 5`.
+
+#### 24.4.9 Pembunuh / Killing (module B)
+
+**Shared killing rules:**
+- Damage goes only through `ctx.hurt`, with the ledger and caps of 24.5.
+- Targets come from the shared intruder snapshot, at most the card's count.
+- Thunder sounds play only when a target was hit, and only for players within 32 blocks.
+- Killing arrays skip Dao Protectors.
+
+##### B1 · Formasi Pedang Geng Agung Sekte / Sect Great Geng Sword Formation (大庚剑阵)
+`great_geng_sword` · netId 440 · Bumi · hall 5 · keeper ≥ Inti Emas · rotatable · 15×15×4
+
+```
+. . . . . . . P . . . . . . .      side (west–east, through the eye)
+. . . . . . . . . . . . . . .      y+3  r . . . . . . . . . . . . . r
+. . P . . . . . . . . . P . .      y+1–2 b . . . . . . . . . . . . . b
+. . . . . . . . . . . . . . .      y+1  . . . . . . . r . . . . . . .
+. . . . . . . . . . . . . . .      y0   b . . . . . . @ . . . . . . b
+. . . . . . . . . . . . . . .      y−1  . . . . . . . h . . . . . . .
+. . . . . . . . . . . . . . .
+P . . . . . . @ . . . . . . P
+. . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . .
+. . P . . . . . . . . . P . .
+. . . . . . . . . . . . . . .
+. . . . . . . P . . . . . . .
+```
+
+**Blocks.**
+- h: heart `IRON_BLOCK` ("Geng metal").
+- r: an `END_ROD` on the eye, the master sword.
+- P: `BAMBOO_BLOCK` ×3 (b) + `END_ROD` (r) at (±7,0), (0,±7) and (±5,±5).
+- Bill: 1 iron block, 9 end rods, 24 bamboo blocks.
+
+**Radius.** 16 + (L − 5), at most 20.
+
+**Effect.**
+- Every 20 ticks: up to 6 intruders inside take one phantom sword strike each, for `4 × P`.
+- Every 100 ticks, "Tujuh Puluh Dua Pedang": a ring of swords sweeps the densest cluster (the intruder with the most
+  neighbours within 4) for `8 × P` to each of up to 8 mobs within 4 of it.
+
+**Keeper.** Sword or Metal affinity. Murid Dalam+: +2 targets.
+
+**Interactions.** It shares its source with the disciple Sword ultimate of 20.3.16. The word "Sekte" keeps the two
+names apart in tooltips.
+
+**Visual.** Azure-green flying swords orbit 6 blocks up through the 6c `SWORD_RING` phantom displays (22.4.3): none at
+Minimal, 12 at Normal and Maximal. Strikes are cold-light streaks, and the sweep is a full ring.
+
+**Sumber.**
+- RMJ ch. 788 "Sword Formation Revealed", ch. 789, ch. 1237 and ch. 1386: Han Li's Great Geng Sword Formation (大庚剑阵),
+  translated by WuxiaWorld as the "Aureate Sword Formation".
+  - ch. 788: 36 Bamboo Cloudswarm Swords are to form it.
+  - ch. 789: threads of sword qi; the formation re-forms while the true swords are unharmed.
+  - ch. 1237: all 72 swords are infused with Auric Essence (庚精).
+  - ch. 1386: countless glittering golden threads spread over 1,000 feet.
+- RMJ ch. 1535 "New Flying Swords": 72 sword projections fly into the bamboo, the bamboo crumbles to greyish-white dust,
+  and 72 azure flying swords remain.
+- RMJ ch. 412: Han Li grows Gold Lightning Bamboo.
+- **Correction to 20.3.16:** its Great Geng citation is replaced by these chapters.
+
+**Uji.** `uji formasi pasang great_geng_sword`; `uji formasi musuh 8`; `uji formasi pembunuh`.
+
+##### B2 · Formasi Mutlak Langit / Heaven Absolute Formation (天絕陣)
+`heaven_absolute` · netId 441 · Bumi · hall 5 · keeper ≥ Inti Emas · **FIXED** · 13×10, banners 5 high
+
+```
+. . . . . . H . . . . . .        side (north–south through x = 0), z −6 … +3
+. . . . . . . . . . . . .        y+4   F . . . . . . . . .
+. . . . . . . . . . . . .        y0–3  u . . . . . @ . . c
+. . . . . . . . . . . . .        y−1   . . . . . . h . . .
+. . . c . . . . . c . . .
+. . . . . . . . . . . . .
+. . . . . . @ . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. E . . . . c . . . . M .
+```
+
+**Blocks.**
+- h: heart `copper(CHISELED_COPPER)`.
+- Three banner pillars, each `copper(CUT_COPPER)` ×4 (u) + `banner()` (F):
+  - H, Heaven (Langit), at (0,−6);
+  - E, Earth (Bumi), at (−5,3);
+  - M, Man (Manusia), at (5,3).
+- c: `copper(CHISELED_COPPER)` "thunder stones" opposite each banner, at (0,3) and (±3,−2), making a six-pointed star.
+- Bill: 4 chiseled copper, 12 cut copper, 3 banners.
+
+**Radius.** 18 + (L − 5), at most 22.
+
+**Effect.**
+- Every 30 ticks, 3 particle bolts from the sky hit 3 different intruders for `6 × P`, plus Slowness II for 1 s.
+- A mob killed by a bolt bursts into ash ("turned to dust"; visual only).
+
+**Keeper.** Lightning affinity. Murid Dalam+: +1 bolt.
+
+**Visual.** A dark cloud disc (client particles, sky-level, 24.8) gathers 24 blocks above the triangle. The three
+banners flare in turn, then white-gold bolts strike, with a puff of ash. It is not weather.
+
+**Sumber.** *Investiture of the Gods* ch. 44: Qin Tianjun's Heaven Absolute Formation 「中有三首旛，按天、地、人三才，
+共合為一氣。若人入此陣內，有雷鳴之處，化作灰塵。」 Its three banners follow Heaven, Earth and Man, merged into one qi;
+whoever enters is turned to dust where the thunder sounds.
+
+**Uji.** `uji formasi pasang heaven_absolute`; `uji formasi musuh 6`.
+
+##### B3 · Formasi Bumi Membara / Earth Fierce Formation (地烈陣)
+`earth_fierce` · netId 442 · Bumi · hall 5 · keeper ≥ Inti Emas · rotatable · 13×13×4
+
+```
+T . . . . . v . . . . . T        row z−6:  y+3  r . . . . . . . . . . . r
+. . . . . . . . . . . . .                  y0–2 u . . . . . v . . . . . u
+. . v . . . . . . . v . .        row z0:   y+1  . . . . . . F . . . . . .
+. . . . . . . . . . . . .                  y0   v . . . . . @ . . . . . v
+. . . . . . . . . . . . .                  y−1  . . . . . . h . . . . . .
+. . . . . . . . . . . . .
+v . . . . . @ . . . . . v
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . v . . . . . . . v . .
+. . . . . . . . . . . . .
+T . . . . . v . . . . . T
+```
+
+**Blocks.**
+- h: heart `RED_NETHER_BRICKS`.
+- F: a **red** `banner(RED)` on the eye, "the one red banner hidden inside".
+- v: `MAGMA_BLOCK` vents at (±6,0), (0,±6) and (±4,±4).
+- T: thunder posts at the corners, `copper(CUT_COPPER)` ×3 (u) + `END_ROD` (r).
+
+**Radius.** 14 + (L − 5), at most 18.
+
+**Effect.**
+- Every 20 ticks, up to 10 intruders inside get entity fire for 3 s plus `2 × P`. Fire-immune mobs take the damage only.
+- Every 60 ticks, "thunder above": `5 × P` to up to 10 intruders inside.
+
+**Keeper.** Fire or Lightning affinity. Murid Dalam+: +2 targets.
+
+**Visual.** Cracks of light run from the vents to the eye; sparks rise; thunder rolls between the four copper posts.
+
+**Sumber.** *Investiture of the Gods* ch. 44: Zhao Tianjun's Earth Fierce Formation 「內隱一首紅旛，招動處，上有雷鳴，
+下有火起。」 One red banner is hidden inside; when it is waved, thunder roars above and fire rises below. (It is broken
+in ch. 45.)
+
+**Uji.** `uji formasi pasang earth_fierce`; `uji formasi musuh 6`.
+
+##### L3 · Formasi Api Berkobar / Blazing Flame Formation (烈焰陣)
+`blazing_flame` · netId 443 · Langit · hall 7 · keeper ≥ Jiwa Baru Lahir · rotatable · 15×14, banners 5 high
+
+```
+. . . . . . . R . . . . . . .      banner pillar R:  y0–3 Fire body (24.2.11), y4 banner(RED)
+. . . . . . . . . . . . . . .      s (samadhi fire): y0 POLISHED_BLACKSTONE, y1 lit SOUL_CAMPFIRE
+. . . . . . . . . . . . . . .      u (fire in the air): y0–1 POLISHED_CINNABAR_WALL or CINNABAR_BRICK_WALL,
+. . . . . . . . . . . . . . .                           y2 SHROOMLIGHT
+. . . . . . . . . . . . . . .      m (fire in stone): y0 MAGMA_BLOCK
+. . . s . . . . . . . u . . .      @ = eye, heart = Fire body block
+. . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . .
+. . . . . . . @ . . . . . . .
+. . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . .
+R . . . . . . . . . . . . . R
+. . . . . . . m . . . . . . .
+```
+
+**Blocks.** Three red banner pillars at (0,−8) and (±7,4); three fire stations at (−4,−3), (4,−3) and (0,5).
+
+**Radius.** 20 + (L − 7), at most 22.
+
+**Effect** (every 20 ticks, at most 14 intruders):
+- **samadhi fire:** entity fire for 6 s; fire-immune mobs take `2 × P` instead;
+- **fire in the air:** `2.5 × P` each;
+- **fire in stone:** `+4 × P` to mobs within 2 blocks of the magma station or standing on any magma inside.
+
+**Keeper.** Fire affinity. Murid Dalam+: +2 targets.
+
+**Visual.** Blue soul fire, orange air fire and red stone fire braid into a fire-tornado ring at the edge (particles
+only); the red banners whip.
+
+**Sumber.**
+- *Investiture of the Gods* ch. 44: Bai Tianjun's Blazing Flame Formation 「內藏三火，有三昧火、空中火、石中火」, with
+  three red banners.
+- *Investiture of the Gods* ch. 48: Lu Ya enters and faces fire in the air, fire below and samadhi fire.
+
+**Uji.** `uji formasi pasang blazing_flame`; `uji formasi musuh 8`.
+
+##### L4 · Formasi Air Merah / Red Water Formation (紅水陣)
+`red_water` · netId 444 · Langit · hall 7 · keeper ≥ Jiwa Baru Lahir · rotatable · 15×15×4
+
+```
+P . . . . . . . . . . . . . P      y+1 on the platform (u = WATER_CAULDRON):
+. . . . . . . . . . . . . . .            . u .
+. . . . . . . . . . . . . . .            . . .
+. . . . . . . w . . . . . . .            u . u
+. . . . w . . . . . w . . . .
+. . . . . . . . . . . . . . .      corner pillar P:  y0–1 PRISMARINE_BRICKS or DEEPSLATE_TILES,
+. . . . . . q q q . . . . . .                        y2 Fire body, y3 SEA_LANTERN
+. . . w . . q @ q . . w . . .
+. . . . . . q q q . . . . . .      heart under the eye: SEA_LANTERN
+. . . . . . . . . . . . . . .
+. . . . w . . . . . w . . . .
+. . . . . . . w . . . . . . .
+. . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . .
+P . . . . . . . . . . . . . P
+```
+
+**Blocks.**
+- The eye sits in a 3×3 "eight-trigram platform" of `SMOOTH_QUARTZ` (q).
+- Three `WATER_CAULDRON` "gourds" (any fill) stand on the platform's N, SE and SW cells.
+- w: `waterSource()` at (±4,0), (0,±4) and (±3,±3).
+- P: corner pillars as in the side note.
+
+**Radius.** 18 + (L − 7), at most 22.
+
+**Effect.**
+- Every 20 ticks, "red water" hits up to 12 intruders: `3 × P` plus 1% of max health (elites 0.5%, bosses 0.25%), and
+  Slowness II for 2 s.
+- Water mobs (Drowned, Guardian) take ×1.5, "the Ren-Gui water essence stolen".
+- The water blocks never change; the red is a particle sheet.
+
+**Keeper.** Ice or Water affinity. Murid Dalam+: +2 targets.
+
+**Visual.** The cauldrons tip (visual only), and a red-tinted sheet spreads over the ground in waves. Intruders inside
+drip red.
+
+**Sumber.**
+- *Investiture of the Gods* ch. 44: Wang Tianjun's Red Water Formation 「內奪壬癸之精」, with an eight-trigram platform
+  and three gourds at its centre; thrown down, they pour out red water that turns flesh to blood water.
+- *Investiture of the Gods* ch. 48: Cao Bao 「四肢皮肉化為津」. (It is broken in ch. 49.)
+
+**Uji.** `uji formasi pasang red_water`; `uji formasi musuh 6`.
+
+#### 24.4.10 Perpindahan / Transport (module B)
+
+**Shared transport rules (M3, L5):**
+- **Who may travel:** players and the traveller's own disciples only. Up to 4 disciples in FOLLOW within 4 blocks come
+  along for free. Never pets, mobs, items or other entities.
+- **Channel:** the traveller stands within 1.5 blocks of the source eye. The channel is cancelled by damage or by moving
+  more than 1 block.
+- **Arrival:** on top of the destination eye through `Targeting.safeSpot` plus `setPortalCooldown`. A trip never uses a
+  portal and never changes dimension.
+- **Refused** in the Return Talisman situations (19.3.6), with the reason shown: breakthrough, tribulation, heart-demon
+  trial, `InheritanceTrials`, duels and sparring, tournament, Void Realm, `FlightLease`, Kehancuran aim or countdown,
+  riding or leashing, hurt within 10 s.
+- **Refused** when the destination node was last seen `BROKEN`, or was not verified within the last 10 min; the
+  destination is re-checked on arrival.
+- **Node names:** "Simpul 1" by default, renamable from the scroll or with `formasi simpul nama <nama>`.
+- **Config:** `formationTransport` switches transport off.
+
+##### M3 · Formasi Perpindahan Sekte / Sect Transfer Array
+`sect_transfer` · netId 450 · Misterius · hall 3 · keeper ≥ Pembangunan Fondasi · rotatable · 5×5×3 per node
+
+```
+R . . . R        row z−2:  y+2  r . . . r      row z0:  y0   . e @ e .
+. e e e .                  y0–1 p . . . p               y−1  . . h . .
+. e @ e .
+. e e e .
+R . . . R
+```
+
+**Blocks.**
+- h: heart `CRYING_OBSIDIAN`. Travellers stand on the eye.
+- e: `anyOf(END_STONE_BRICKS, SMOOTH_QUARTZ, CALCITE)`.
+- R: `anyOf(PURPUR_PILLAR, QUARTZ_PILLAR)` ×2 (p) + `anyOf(END_ROD, SOUL_LANTERN, LANTERN)` (r).
+
+**Network.**
+- At most `2 + floor(L/2)` nodes, all inside the territory and at least 16 blocks apart.
+- One active slot covers the whole network.
+- The destination chunk must be loaded: "Simpul tujuan belum termuat" / "The destination node is not loaded".
+
+**Trip.**
+- Sneak-use the eye with an empty hand to open the node map, then click a destination.
+- Channel 60 ticks; cooldown 200 ticks per player.
+- Cost: the source core pays 1 Daya and the traveller pays 10 qi.
+- A keeper at the source: no Daya cost and a 30-tick channel. Space affinity: no qi cost.
+
+**Visual.** A purple-white rune ring spins up between the four posts and the tip beams converge; the traveller dissolves
+into star motes, and a ring bursts on arrival.
+
+**Sumber.**
+- RMJ ch. 272 "One Year": an ancient transportation formation can also be considered a formation spell, so Han Li hopes
+  a formation-master friend can help him restore it.
+- RMJ ch. 359: he goes to the Heavenly Star Sect's market city and buys the items needed.
+- RMJ ch. 363: he spends the following days restoring the ancient transportation formation.
+
+**Uji.** `uji formasi pasang sect_transfer` at two spots; `uji formasi teleport <simpul>`; `uji formasi simpul`.
+
+##### L5 · Formasi Perpindahan Kuno / Ancient Transportation Array
+`ancient_transfer` · netId 451 · Langit · hall 7 · keeper ≥ Jiwa Baru Lahir · rotatable · 9×9×4 per node (the M3 upgrade on the same eye)
+
+```
+. . . . O . . . .        obelisk O: y0 CHISELED_QUARTZ_BLOCK, y1–2 QUARTZ_PILLAR, y3 END_ROD
+. . . . . . . . .
+. . R . . . R . .        inner 5×5 = the M3 node (heart CRYING_OBSIDIAN, e ring, R posts)
+. . . e e e . . .
+O . . e @ e . . O
+. . . e e e . . .
+. . R . . . R . .
+. . . . . . . . .
+. . . . O . . . .
+```
+
+**Network.**
+- At most 4 Langit nodes. L5 nodes link to each other and to every M3 node inside the territory.
+- One active slot covers the network.
+- **Outposts** (*slip candidate*): at most 2 L5 nodes may stand **outside** the territory, in the same dimension and
+  within 4,096 blocks of the stele. They are the only sect cores allowed outside the territory. An outpost needs no
+  hall territory, but it does need the hall to be active.
+
+**Trip.**
+- Channel 100 ticks; cooldown 30 s.
+- Cost: the source pays 2 Daya (one Low-stone equivalent) per started 512 blocks, at least 2.
+- **Chunks:** during the channel, a short-lived vanilla chunk ticket of the kind an ender pearl uses is added at the
+  destination (the exact `TicketType` name is checked in mcsrc at build time). `safeSpot` runs only after the chunk has
+  loaded, and the ticket is removed on arrival or cancel. No chunk is ever kept loaded or force-loaded.
+
+**Keeper.** Space affinity: cost ×0.5.
+
+**Visual.** A white-violet light column rises from the eye and star-map runes spin. The traveller becomes a falling-star
+streak toward the destination, and arrival makes a shock ring (particles only, no crater).
+
+**Sumber.**
+- RMJ ch. 272, 359 and 363, as for M3.
+- RMJ ch. 1130: an ancient teleportation formation on Stalwart Star Island, which Han Li wants to return to find.
+- The range and the outposts are game design.
+
+**Uji.** `uji formasi pasang ancient_transfer` at two far points; `uji formasi teleport <simpul>`.
+
+#### 24.4.11 Formasi Gabungan Agung / Grand combined arrays (module B)
+
+##### A1 · Formasi Sepuluh Ribu Abadi / Ten Thousand Immortals Formation (萬仙陣)
+`ten_thousand_immortals` · netId 460 · Abadi · hall 9 · keeper ≥ Transformasi Dewa (Murid Inti+) · **FIXED** · 21×21, pillars 5 high
+
+```
+. . . . . . . . . . C . . . . . . . . . .      trigram pillar (elevation):
+. . . . . . . . . . . . . . . . . . . . .      y+4  END_ROD
+. . . . . . . . . . . . . . . . . . . . .      y+3  top line
+. . . Q . . . . . . . . . . . . . G . . .      y+2  middle line
+. . . . . . . . . . . . . . . . . . . . .      y+1  bottom line
+. . . . . . . . . . . . . . . . . . . . .      y0   CHISELED_QUARTZ_BLOCK
+. . . . . . . . . . . . . . . . . . . . .      yang = POLISHED_BLACKSTONE, yin = SMOOTH_QUARTZ
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .      bottom→top:  Q ☰ Qian NW  ▬▬▬
+. . . . . . . . . q q q . . . . . . . . .                   C ☵ Kan N    ‒▬‒
+D . . . . . . . . q @ q . . . . . . . . Z                   G ☶ Gen NE   ‒‒▬
+. . . . . . . . . q q q . . . . . . . . .                   Z ☳ Zhen E   ▬‒‒
+. . . . . . . . . . . . . . . . . . . . .                   X ☴ Xun SE   ‒▬▬
+. . . . . . . . . . . . . . . . . . . . .                   L ☲ Li S     ▬‒▬
+. . . . . . . . . . . . . . . . . . . . .                   K ☷ Kun SW   ‒‒‒
+. . . . . . . . . . . . . . . . . . . . .                   D ☱ Dui W    ▬▬‒
+. . . . . . . . . . . . . . . . . . . . .      (▬ yang, ‒ yin; FormationDisc line arrays,
+. . . K . . . . . . . . . . . . . X . . .       bottom line first)
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . L . . . . . . . . . .
+```
+
+**Blocks.**
+- A `BEACON` sits **on** the eye. No pyramid is needed; its jade light column is mod FX.
+- q: 8 `SMOOTH_QUARTZ` around the eye, the eight-trigram platform.
+- Trigram pillars stand at distance 10 on the cardinals and at (±7,±7). Any paving around them is don't-care, which
+  keeps the pattern under 160 slots.
+- Bill: 1 beacon, 20 smooth quartz, 12 polished blackstone, 8 chiseled quartz blocks, 8 end rods.
+
+**Complete when, all in the same hall:**
+1. the pattern stands;
+2. the **Formasi Agung** is active ("gates and households");
+3. its three **parts** are running:
+   - **Taiji** (the One, protection): L1, or M2, or the Agung with 3 or more layers;
+   - **Liangyi** (the Two, opposition): a Bumi+ killing, maze or control array (B1–B4, L2–L4);
+   - **Sixiang** (the Four, nurture): a Bumi+ gathering, refining, tribulation or transport array (B5, B6, B7, L5), or
+     M4.
+
+**Effects while complete:**
+- every other running 7c core of the hall: A +0.15 and radius +2;
+- `FORMATION_STACK_CAP` 2.6 → **2.8** for members inside the territory;
+- L1's Lapis Inti runs without a keeper;
+- a `Breakthrough.QualityBonus` provider adds +0.04 for breakthroughs inside the territory (within
+  `QUALITY_FORMATION_CAP`);
+- A1 is never amplified by L6.
+
+**Visual** (Normal and up, within 48 blocks; sky-level, 24.8).
+- A vast yin-yang disc of light turns slowly in the sky over the platform, with two rings circling it in opposite
+  directions.
+- Direction lights glow at the cardinal pillars (azure E, white W, vermilion S, black N; art direction only).
+- Gold threads link the three part cores to the eye.
+
+**Sumber.** *Investiture of the Gods* ch. 82 「三教大會萬仙陣」: 「一個陣結三個營疊」 (one formation knotting three camps
+together), which Laozi names one array of Taiji, Liangyi and Sixiang (「太極兩儀四象之陣」). Its gates and households are
+layered (「門戶重疊」), and Tongtian Jiaozhu sits on the eight-trigram platform at its centre (「上了八卦臺坐下」).
+
+**Uji.** `uji formasi aula 9`; `uji formasi semua`; `uji formasi resonansi`.
+
+##### A2 · Sepuluh Formasi Mutlak / Ten Absolute Formations (十絕陣)
+`ten_absolute` · netId 461 · Abadi · hall 9 · keeper ≥ Transformasi Dewa (Murid Inti+) · rotatable · 7×11 altar, poles 3 high
+
+```
+. . . @ . . .        pole f:  y0–1 MANGROVE_FENCE, y2 banner() (ten colours recommended)
+. . . . . . .        @ = eye at the altar's head; heart NETHERITE_BLOCK under it;
+f . . . . . f            the altar opens away from the eye, like a hall
+. . . . . . .
+f . . . . . f        side (row z = 2):
+. . . . . . .        y+2  F . . . . . F
+f . . . . . f        y0–1 n . . . . . n
+. . . . . . .
+f . . . . . f
+. . . . . . .
+f . . . . . f
+```
+
+**Blocks.** Bill: 1 netherite block (the heaviest cost in the catalogue: the war altar of the ten Heavenly Lords), 20
+mangrove fences, 10 banners.
+
+**Count N (0–10):**
+- +1 for each **built** and running Absolute array in the territory: B2 Heaven Absolute, B3 Earth Fierce, B4 Red Sand,
+  L3 Blazing Flame and L4 Red Water;
+- +1 for each of the five 6c technique Absolutes known by the master or by the altar's keeper (22.9):
+  `wind_roaring_formation`, `cold_ice_formation`, `golden_light_formation`, `blood_transforming_formation` and
+  `soul_falling_formation`.
+
+A2 is active when N ≥ 3 and at least 2 are built.
+
+**Effect.**
+- Every built Absolute array gets A +0.03 × N (+0.30 at ten, within `A_CAP`) and +2 targets.
+- At N = 10, "Sepuluh Mutlak":
+  - intruders inside any Absolute array lose Regeneration and Absorption every pulse;
+  - the Absolute arrays' pulse intervals ×0.75;
+  - advancement `ten_absolute`.
+- The per-mob caps of 24.5 still apply, so A2 mostly widens how many mobs are hit.
+
+**Visual.** The ten banners glow in ten colours. At N ≥ 3, a red-gold rune circle with the glyph 十絕 (the 6c GLYPH
+template) hovers over the altar, and red threads run to each built Absolute eye.
+
+**Sumber.** *Investiture of the Gods* ch. 44: the ten Heavenly Lords of Golden Turtle Island set up the Ten Absolute
+Formations together for Grand Tutor Wen Zhong: Heaven Absolute, Earth Fierce, Wind Roaring, Cold Ice, Golden Light,
+Blood Transforming, Blazing Flame, Soul Falling, Red Water and Red Sand. The five 6c techniques keep their own
+citations (22.9).
+
+**Uji.** `uji formasi pasang ten_absolute`; `uji formasi mutlak <n>`; `uji formasi resonansi`.
+
+#### 24.4.12 Optional item: Panji Induk Formasi / Master Formation Flag (*slip candidate*, module A)
+
+- **Recipe:** shapeless, any banner + amethyst shard + gold ingot.
+- **Uses:**
+  - Holding it shows the hologram of any 7c eye you look at within 8 blocks.
+  - Sneak-using a registered eye binds the flag to it. Sneak-using air then toggles the bound core if it is within 64
+    blocks (owner only).
+  - Using it on an M1 or L2 eye forces an immediate pattern shift.
+- **Sumber:** RMJ ch. 231. The master formation flag ceaselessly shifts and controls the formation patterns.
+- The scroll can do everything the flag does, so it may slip.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.5 Stacking rules and caps (`formasi/stack/Stacking`, all `public static final`)
+
+**Field lookup.** `Stacking.fieldAt(level, pos, who)` returns a `FormationField`, cached per player and per disciple for
+20 ticks.
+- Only running cores whose members include `who` count.
+- **Cores of different owners never stack.**
+- Legacy formations keep their own rules. The only links are the ones written here.
+
+| Effect | Combine rule | Cap | Notes |
+|---|---|---|---|
+| Gathering, players | sect term `G = min(GATHER_SECT_CAP 1.5, max(K2, B5) × M5)` | formation term `min(FORMATION_STACK_CAP 2.6, or 2.8 with A1, QiFormations.multiplier(tier) × G)` | still inside the existing `min(5.0, site × formation × fuel)`. Without a seat: ≤ ×1.5. Heavenly Star seat ×2.2: +18% (+27% with A1) |
+| Gathering, disciples | the disciple's **own** meditation XP × G, through `DiscipleHooks.addXpFactor` for `XpSource.MEDITATION` | 1.5 | the master share is never multiplied again (`masterMeditationGain` already uses `gainPerSecond`); multiplies with the Tetua aura |
+| Meditation vein drain | strongest: K2 0.9, B5 0.8, B5 with a Dalam+ keeper 0.7 | ≥ 0.7 | other drain factors (Great 0.6, Heavenly 0.35, fuel 0.5, abode 0.5) are unchanged |
+| Healing | strongest | players Regeneration amplifier ≤ 1; disciple `regenFactor` ≤ ×2; qi regen ≤ ×1.39; deviation timer ≤ ×1.33 | paused during the target's own tribulation |
+| Refining | strongest per furnace (the cauldron position) | chance `REFINE_CHANCE_CAP +0.10`; ≤ 1 quality step; time factor ≥ 0.7; inscription ≤ +0.065 | `AlchemyFurnace.MAX_CHANCE 0.95` and the talisman cap 0.95 stay |
+| Tribulation warding | product of the 7c factors | all formations together ≥ `TRIB_FORMATION_FLOOR 0.70`, the existing 0.85 included: the provider returns `max(0.70 / (insidePelindung ? 0.85 : 1), Π)` | the spine's overall `max(0.5, …)` still applies; disciples' strikes use the same factor |
+| Breakthrough quality | sum of 7c contributions | `QUALITY_FORMATION_CAP +0.06` | separate from the personal seat's +0.03 per tier; inside the −0.10…+0.40 clamp |
+| Protection layers | Agung layers + L1 layers | `BARRIER_LAYER_CAP 6` (display) | the Agung's own 4 layers are unchanged |
+| Killing | **sum** of all 7c killing damage on one mob, through a per-mob per-second ledger (`KillLedger`). Only the **two** strongest arrays count | `KILL_DPS_CAP = (2.0 + 0.5 × L) × agung` damage per second, and at most 25% of max health per second (elites 15%, bosses 5%). `agung = min(1.5, GrandFormation.State.damageFactor)` inside an active Agung, else 1.0 | target modifiers (elite ×0.6, boss ×0.25) apply first; the legacy Pelindung and Agung damage is separate and unchanged |
+| Roots (B4, M1, L1) | one root per mob per 15 s across all formations | elites ≤ 2 s, bosses ≤ 1 s | through `ExternalControl` |
+| Illusion and maze | strongest (highest effective grade) steers | – | Daya Tembus and boss immunity, 24.2.10 |
+| Concealment | strongest (highest effective grade) | – | Daya Tembus; bosses always see |
+| Alarm | union | per core and kind: one alert per 15 s; per player: one chat line per 5 s (more go to the action bar); each mob once per 60 s; elite or boss title once per 60 s per core | config `formationAlarmChat` moves everything to the action bar |
+| Transport | – | per-player cooldown: M3 200 ticks, L5 30 s | – |
+| Power and amplifiers | additive (24.2.9) | `P_CAP 1.5`, support families `P_SUPPORT_CAP 1.3`, `A_CAP 0.40`, radius +4, `RADIUS_CAP 48` | – |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.6 Integration
+
+#### 24.6.1 Existing systems (binding)
+
+| System | Rule |
+|---|---|
+| Personal Qi formations (`QiFormations`, PANDUAN 8.4) | unchanged; the sect term multiplies them within the stack cap (24.5) |
+| Formasi Pelindung (DESIGN 10) | unchanged. A 7c core never pushes a mob that is inside an active Pelindung (`ProtectiveFormations.insideActiveFormation`), so a mob is never double-pushed. Its tribulation 0.85 counts toward the 0.70 floor |
+| Formasi Agung Sekte (20.3.2) | unchanged, including its radius, `MAX_LAYERS = 4` and its keeper (activity 5). It is read through `GrandFormation.state(...)`, which is cached for 20 ticks. L1 adds layers 5–6 as its own core, plus the drain exemption hook |
+| Tribulation (19.2 step 7) | B6 registers a `StrikeFactor` provider in `Formasi.init` |
+| Breakthrough (19.2 step 6) | A1 registers a `QualityBonus` provider (+0.04) |
+| Meditation and veins (19.3.5) | the gathering, stack-cap and drain providers (24.13); upkeep reads `SpiritVeins.grade`. No formation ever raises a vein |
+| Spirit stones (19.3.2) | fuel values (24.2.7) and stone quality Q (RMJ ch. 131) |
+| Alchemy and talismans (DESIGN 9, 19.3.6) | K3 and B7 through the furnace and inscription providers; the 0.95 caps stay |
+| Disciples (18, 20) | keepers use activity 11; gathering through `addXpFactor`; healing through `addRegenFactor`; tribulation through `addStrikeFactor`; disciples travel with M3 and L5 |
+| Elites (19.3.1) | killing arrays hit elites (×0.6, 15% per second); L2 uses `EliteMonsters.suppressSkills`; Daya Tembus uses `EliteMonsters.tier` |
+| Heart demons, Dao Protectors | never affected. Protectors ignore concealment and mazes and are skipped by killing; the alarm labels them |
+| Sect spawn-proofing (`SectSpawnMixin`) | unchanged; 7c handles only mobs that walk in |
+| Explosions (`SectExplosionMixin`) | 6b formation pattern components are sect cells: credited and rebuildable by Periksa & Perbaiki. Player-built patterns are never rebuilt by anything. L1's Lapis Inti holds creepers inside |
+| Duels, arenas, sparring | formations ignore all players, always |
+| Cave Abode (19.3.5) | an abode inside K4 or M2 is concealed with it; M4 heals there; nothing else changes |
+| Kantor Misi | none: Daya cannot be withdrawn, so there is no trading loop |
+
+#### 24.6.2 Phase 6b (sect construction, DESIGN 21)
+
+**A. Titik Formasi anchors (required in 7c).**
+- P6b-cetak adds anchors `formasi_<n>` to the templates. Each is a flat, paved, building-free square plot inside an
+  existing component, with a carved centre tile where the eye goes.
+- The 21.5–21.8 art rules apply.
+
+| Template | Tier | Anchor (radius) | Suggested spec |
+|---|---|---|---|
+| 3–9 | T5 | gate tower plot (6) | K1 or K4 |
+| 5–9 | T5 | beside the Bagua disc court (6) | M1, M2 or M5 |
+| 4–9 | T7 | beside the alchemy hall (8) | K3 → B7 |
+| 4–9 | T8 | meditation pavilion court (8) | K2, M5, or B5 for templates 6–9 |
+| 5–9 | T9 | gate, main-hall terrace and tower entrance (3 each) | M3 nodes |
+| 7–9 | T9 | "Altar Formasi Gabungan" (**11**) | A1, L1 or L2 |
+
+- A spec fits an anchor when `pattern.radius() ≤ anchor.radius` and its dy span is within −1…+5.
+  `formasi/SectFormationSlots` (module A) holds the fit table and is audited.
+- **Plan updates.** A `planVersion` bump adds anchors only to unfinished tiers. Finished sites get them through a
+  "Hiasan" retrofit component (paving only, normal rate, refunded), so finished components are never rebuilt (21.9).
+- `EngineApi.formasiAnchors(UUID) → List<FormasiAnchor(id, centre, radius, tier)>` is a spine stub that P6b-cetak
+  fills.
+- The tablet lists the anchors and offers **Pola di Titik Formasi**, which shows the hologram at the anchor.
+
+**B. Pattern components (optional; may slip to a 7c follow-up).**
+- `EngineApi.requestPattern(UUID owner, String anchorId, String specId, int rot) → @Nullable Component error`.
+- The 6b engine compiles `Pattern.emit(rot)` into a component of kind `FORMASI_PATTERN` at that anchor and bills it
+  through the 6b ledger, with exact items for the special blocks.
+- It is placed by `BuildPlacer` **inside the confirmed footprint only**, with the 21.10 flags, refunds and audit. It is
+  **placed inactive**: the owner wakes the eye with fuel, as for the T5 Bagua disc (21.17).
+- The eye, and any costly heart (beacon, diamond block, netherite block), is an **exact-item socket**. Without it the
+  socket stays empty and the tier still completes (as for the 21.1 gate altars).
+- `NO_6B` specs are refused.
+- **Repair.** Formation components are sect cells. Periksa & Perbaiki restores them, and explosions credit them. Sumber:
+  AWE ch. 877, the Profound Stream Division repairs the sect's protective spell formations.
+- **Audit.** `uji sekte audit` counts `FORMASI_PATTERN` ops like any other and checks that the pattern is complete and
+  inside the footprint.
+- Players must not hand-edit 6b cells for formations, because Perbaiki would revert them. That is why L1 and A1 have
+  their own eyes and never use the Bagua disc.
+
+#### 24.6.3 Phase 7
+
+| Feature | Use |
+|---|---|
+| Spirit stones (`SpiritStones.isStone`, `grade`, `FORMATION_TICKS`) | fuel, Q, kit items |
+| Veins (`SpiritVeins.grade`, `drain`) | the upkeep factor; the B5 and K2 drain factors |
+| Beast cores | not fuel; no 7c use (deferred, 24.16) |
+| Talismans | inscription bonus (K3, B7); the Return Talisman refusal list is reused by transport |
+| Elites | 24.6.1 |
+| Cave Abode | 24.6.1 |
+
+#### 24.6.4 Mode Kehancuran (20.3.21, 22.11)
+
+- `ProtectedZones.addZoneProvider` protects any position within `pattern.radius() + 8` horizontally and |dy| ≤ 8 of
+  **any** registered 7c eye, of any owner. The lookup is O(1) through the chunk index plus at most 4 box tests.
+- The eye is in `#kultivator:indestructible`, so it is never carved anywhere.
+- Transport is refused during a Kehancuran aim or countdown.
+- Keepers never cast Kehancuran techniques.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.7 UI (jade scroll, DESIGN 5b, fits 320×240)
+
+#### 24.7.1 Formasi tablet in the hall scroll (`client/formasi/FormasiPage`, module B)
+
+The tablet has the glyph 陣 and is drawn third, after Bangun. Data arrives as the `formasi` part of `HallInfo` (24.12),
+only while the scroll is open.
+
+**Header strip:**
+- "Kas Daya: 1.240 (Kecubung 300 · Batu 940)" / "Formation Treasury: 1,240 (Amethyst 300 · Stone 940)";
+- "Aktif 4/5 · Terdaftar 7/9 · Aula Tingkat 7";
+- the talismans **Setor dari tas** and **Isi Semua**.
+
+**Panels** (a seal column on the right edge, no top tab row):
+
+| Panel | Contents |
+|---|---|
+| **Inti** / Cores | A scrolling list (18 px rows) with a row of **family filter seals** above it: family glyph, name, grade ribbon, state seal (grey Tertidur, red Rusak, ink Tertahan, pulsing amber Aktif · tanpa daya, gold Berdaya, violet Dijaga; "Siaga" and "Retak" as small tags), and a thin Daya bar. Legacy rows (Pelindung, Agung) are read-only and point to the lodestone. |
+| **Kitab** / Codex | A seal-card grid of every spec, grouped by grade. Locked cards show "Aula Tingkat 5" / "Hall level 5" or "Butuh: ‹spec›". A click opens the **slip** (below, Kitab mode). It doubles as the formation codex. |
+| **Medan** / Field | The player's current `FormationField`, each line with its cap: "Kultivasi ×1,26 · Sekte · batas ×2,6", "Petir ×0,77 · lantai formasi 0,70", "Lapisan 6/6", "Teman sekte ×1,15". |
+| **Simpul** / Nodes | Transport nodes with name, grade, Daya, distance and loaded flag; *Ganti Nama* for the owner. |
+| **Catatan** / Log | The last 20 log lines: alarms (including those queued while the owner was offline), deposits, keeper changes, broken patterns. |
+
+**The bamboo slip** (detail view of one core, or of one Kitab entry):
+- name, grade stars, family, and the Sumber line (italic for *Terinspirasi*);
+- a **mini pattern diagram**, drawn as ink-grid slices per layer by `BlueprintDiagram` from the pattern data (3–4 px
+  per cell, no image assets), with legend swatches, item icons and counts — the bill of materials;
+- core mode:
+  - the state line with its reason, and the missing-block labels when BROKEN;
+  - the Daya bar with "12 j 30 m tersisa · 6 Daya/jam × urat 0,85 × penjaga 0,5" / "12 h 30 m left · 6 Daya/h ×
+    vein 0.85 × keeper 0.5";
+  - the P breakdown: "P 1,30 = 1 + batu 0,10 + penjaga 0,10 + afinitas 0,10";
+  - live numbers after stacking and caps (radius, factor, damage, targets);
+  - keeper slots with face, name, realm, and an order coin that cycles Jaga → Perkuat → Waspada. *Tugaskan* lists
+    eligible disciples with the hint "perintahkan Tinggal dalam 3 blok dari mata formasi". There is also *Lepas*;
+- Kitab mode: the numbers at the current hall level, the bill, and the lock reason.
+
+**Controls on the slip:**
+
+| Control | Kind | Mode |
+|---|---|---|
+| Nyala/Mati | jade coin | core, owner |
+| Tarik dari Kas | jade coin | core, owner |
+| *Isi 12 jam* | talisman | core, owner |
+| *Lihat Pola* | talisman (hologram on this eye) | core |
+| *Lihat yang kurang* | talisman (only when BROKEN) | core |
+| *Tandai* | talisman (a 10 s light pillar on the eye) | core |
+| *Hologram di depanku*, *Di Titik Formasi…* | talismans | Kitab |
+| *Tuju pola ini* | talisman, only while looking at an eye | Kitab |
+
+Sect mates see everything read-only, except *Setor*.
+
+**Actions.** `Actions.FORMASI` carries these text ops:
+- `toggle:<id>`, `draw:<id>:<0|1>`, `fill:<id>`, `fillall`, `deposit:all`, `mark:<id>`;
+- `keeper:<id>:<entityId>:<order>`, `order:<id>:<uuid>:<jaga|perkuat|waspada>`, `release:<id>:<uuid>`;
+- `target:<x>:<y>:<z>:<specId>`;
+- `node:<id>:<name>` and `travel:<fromId>:<toId>` (module B).
+
+The server checks the owner (or a mate, for `deposit` and `travel`) and the core id, then answers with a fresh
+`HallInfo`.
+
+#### 24.7.2 Node map (module B)
+
+It opens when a player sneak-uses a transport eye with an empty hand.
+- A round jade map: territory nodes are dots placed by relative position, and outposts sit on the rim with their
+  distance.
+- Each node shows its cost, its Daya, and a red seal when it is broken or not verified.
+- Click a node to travel; the channel ring shows on screen.
+
+#### 24.7.3 Hologram blueprint viewer (`client/formasi/PatternHologram`, module B)
+
+The viewer is client-only and read-only. It uses `ClientLevel.getBlockState` and vanilla `Gizmos` (`cuboid`, `line`,
+`billboardText`) from `ClientTickEvents.END_CLIENT_TICK`, like `SiteHologram` and `FormationBlueprint` (19.3.15).
+
+**Start:**
+- from the slip;
+- from `/kultivasi formasi pola <id> [utara|timur|selatan|barat] [menit]`. The server sends
+  `Fx(FORMASI, PATTERN_SHOW, pos = anchor, b = netId | rot << 12, f = minutes)`;
+- automatically, while looking within 8 blocks at an eye with a target spec while sneaking, holding a block the pattern
+  uses, or holding the Panji Induk.
+
+**Anchors:**
+- an existing eye, with the rotation that has the most OK slots;
+- a Titik Formasi;
+- "di depanku" (in front of me): the top of the looked-at block within 8 blocks, or else 4 blocks ahead on the ground.
+
+`FIXED` specs always face true north.
+
+**Following the build:**
+- The **current layer** is the lowest layer with missing slots, drawn strong. Upper layers are faint ghost outlines, and
+  finished layers show green outlines only.
+- Slots:
+  - OK: a thin green outline;
+  - MISSING: a pulsing gold ghost cube tinted with the canonical state's map colour;
+  - WRONG: a red cross plus outline;
+  - UNKNOWN: grey.
+- The 6 missing slots nearest the player, within 6 blocks, show their rule label.
+- A two-line label floats over the anchor:
+  - "Formasi Pedang Geng Agung Sekte · Bumi · butuh Aula 5"
+  - "Lapis 2/4 · 22/34 · Kurang: Tongkat End ×4, Balok Bambu ×8"
+
+**Ends:** after the chosen minutes (default 10), beyond 64 blocks, on a dimension change, from *Sembunyikan*, or with
+`formasi pola mati`.
+
+While `PatternHologram.active()`, `FormationBlueprint` returns early. That is one guard line, the only edit module B
+makes in a phase-7 file.
+
+**Budgets:** ≤ 160 slots, ≤ 32 reads per tick (round-robin), ≤ 400 gizmos per tick, drawn within 48 blocks. At Effect
+Quality Minimal: outlines only, no fill, at most 3 labels.
+
+#### 24.7.4 HUD and LAN names
+
+- **Alarm arrow.** `AlarmPing` shows a direction arrow at the screen edge for 8 s.
+- **Meditation line.** While meditating, the factor line reads "Formasi ×2,20 · Sekte ×1,26 (batas 2,6)".
+- **Concealed names.** `FormasiSync.conceal` lists the entity ids of members a stranger's client must not nametag.
+  - The client mixin `AvatarNameMixin` on `AvatarRenderer.shouldShowName(AvatarlikeEntity, double)` (verified in the
+    26.3 source) returns false for listed ids, unless the viewer is in the same sect.
+  - This is cosmetic, and the help text says so: the tab list and the 26.x locator bar still show players.
+  - Config `formationConcealNames` switches it off.
+  - Scoreboard teams are not used.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.8 Visuals and sounds (client)
+
+**Transport of visuals:**
+- Continuous visuals (domes, rings, swords, mist, river, clouds) are driven from `FormasiSync`. It covers cores within
+  96 blocks, is sent at most once per second per player, and only on change (the DESIGN 13 effects rule).
+- One-off events (awaken, alarm, trip, strike, ripple, slot marks) use `FxType.FORMASI` with sub-ids from
+  `formasi/FormasiFxIds`.
+
+**Budget.** Everything goes through `FxBudget.take` and Effect Quality.
+
+| Quality | Shells and rings drawn (nearest first) | Motes per core per second | Sky elements |
+|---|---|---|---|
+| Minimal | edge rings only, no shells | 2 | none (event flashes only) |
+| Normal | 3 | 6 | one at a time, within 48 blocks |
+| Maximal | 6 | 12 | one at a time, within 48 blocks |
+
+- **Sky elements** are the A1 Taiji disc, the B2 cloud disc and the L2 river.
+- Shells are sparse rendered shells or ground rings near the camera, never particle spheres. The M2 territory ring is a
+  ground ring.
+- At most 8 cores are drawn, within 48 blocks. Everything is hidden in F1.
+- B1's swords use the 6c `PhantomDisplays` `SWORD_RING`: none at Minimal, 12 at Normal and Maximal.
+
+**Colours.**
+- Family frames: protection jade, gathering violet, healing pearl-green, refining ember, tribulation gold, support
+  black-gold, alarm copper, concealment grey-green, illusion five-colour, control red-ochre, killing red, transport
+  purple-white, grand white-gold.
+- Grade ribbons follow 22.7.
+
+**Sounds** (always `level.playSound(null, …)`):
+- awaken: `BEACON_ACTIVATE` + `AMETHYST_BLOCK_RESONATE`, as in DESIGN 10;
+- alarm: `BELL_BLOCK`, soft for approach and loud for breach;
+- trips: `CHORUS_FRUIT_TELEPORT`, pitch 0.8;
+- maze shifts: a note-block gong;
+- thunder arrays: a quiet `LIGHTNING_BOLT_THUNDER` at volume 0.3, only on a hit, within 32 blocks.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.9 Performance budgets (server; the laptop also runs Valorant)
+
+| Item | Limit |
+|---|---|
+| Added server time | **≤ 0.15 ms per tick** on average with 1 player, 6 active cores and 20 mobs (config `formationBudgetMs`), measured in `CoreTicker` and shown by `debug formasi stats` |
+| Auto-throttle | above budget: pulse periods ×2 and FX refresh ×2. Above 2× budget, or MSPT above `formationMsptSlow` (45 ms, the 6b `BuildEngine` reading): killing pulses every 40 ticks. Upkeep never changes |
+| Active cores | ≤ 6 per hall (24.2.4) plus the Agung; ≤ 64 per dimension; cores in chunks that are not entity-ticking sleep |
+| Pulses | `pulseTicks` ≥ 20; ≤ 4 pulses per tick, staggered |
+| Hostile scans | one shared intruder snapshot per owner per 20 ticks (≤ 3 cluster queries, radius ≤ 48); ≤ 24 mobs processed per pulse |
+| Territory sweep (K1 at territory scope, M2) | the territory box in 4 sectors, one sector per 40 ticks (a full sweep every 8 s), plus a 32-block box around each online member every 40 ticks; ≤ 32 entities per query |
+| Concealment and maze gates | event-driven `Mob.setTarget` gate: no per-tick cost |
+| Gathering, healing, refining | no entity scans: read from the meditation, alchemy, inscription and qi hooks through the cached field. Healing does one ally query per 100 ticks |
+| Pattern verification | 16 reads per tick (config 8–64) for all cores together, plus a 64-read burst for event re-reads; each core fully verified at least every 10 s; never a chunk load |
+| Detection | ≤ 2,048 reads per click, 20-tick cooldown per player |
+| L1 projectiles | only tracked projectiles (registered at `ENTITY_LOAD` near a running L1, from hostile owners), checked every tick |
+| Keepers | computed once per second and cached (the `GrandFormation` pattern) |
+| Field cache | one per player and per disciple per 20 ticks |
+| Kehancuran zone | O(1) chunk map plus ≤ 4 box tests per call |
+| Sync | `FormasiSync` ≤ 1 per second per player, only on change; `HallInfo` only while the scroll is open; `AlarmPing` once per event |
+| Memory | core record < 256 B plus the slot bitset; index ≤ about 10k entries |
+| Alt-tab | in singleplayer the game pauses, so nothing ticks or drains (help text) |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.10 Commands
+
+`/kultivasi` = `/cultivate`.
+
+**Player commands.** Module A creates the `formasi` node; module B adds `simpul` and `pindah`.
+
+| Command | Effect | Mod |
+|---|---|---|
+| `formasi` | Kas, cores (state, Daya, hours left), slots and limits | A |
+| `formasi info` | the looked-at eye: spec, rotation, match (OK/total, missing grouped), state and reason, P breakdown, upkeep breakdown | A |
+| `formasi katalog` | opens the Kitab panel | A |
+| `formasi pola <id> [utara\|timur\|selatan\|barat] [menit]` · `formasi pola mati` | the client hologram at the looked-at block or in front of you (any player; read-only) | A + B |
+| `formasi tuju <id>` | sets the looked-at eye's target spec | A |
+| `formasi nyala` · `formasi mati` | toggles your looked-at eye | A |
+| `formasi setor [semua]` | held stack, or every accepted item, into the Kas | A |
+| `formasi isi [jam]` · `formasi isi semua` | Kas → the looked-at core (default 12 h), or every core | A |
+| `formasi penjaga <nama> [jaga\|perkuat\|waspada]` · `formasi penjaga lepas` | assigns or frees a keeper on the looked-at core | A |
+| `formasi simpul` · `formasi simpul nama <nama>` | lists transport nodes, or names the looked-at node | B |
+| `formasi pindah <nama>` | travels from the node you stand on (24.4.10 rules) | B |
+
+`formation list` (DESIGN 10) stays.
+
+**Test commands** (op, `uji formasi …`). Module A builds the node and calls `FormasiB.addTestCommands(node)`. **No test
+command places or breaks a block.**
+
+| Command | Effect | Mod |
+|---|---|---|
+| `uji formasi pasang <id> [menit] [paksa]` | a **virtual core** at your feet: no pattern check, no blocks, owner = caller, full Daya, marked UJI. It is never saved, never counts toward limits, and is removed after the minutes (default 5) or on restart. `paksa` also skips the hall gate | A |
+| `uji formasi pola <id> [arah]` | the hologram of that spec in front of you | A + B |
+| `uji formasi semua` | one virtual core of each family in a ring around you, for a visual check | A |
+| `uji formasi daftar` | every spec: id, netId, family, grade, gate, slots, distinct rotations, scope, radius at the current level, flags; red marks for missing lang or Sumber keys | A |
+| `uji formasi audit` | registry audit, `emit` round-trip, 6b fit table against the anchors, budget estimates | A |
+| `uji formasi status` | the looked-at core's full match result with every slot state, and its last verify time | A |
+| `uji formasi tumpuk` | the `FormationField` at you, with each contributing core and every cap | A |
+| `uji formasi daya <jam\|penuh> [id\|semua]` | sets Daya | A |
+| `uji formasi kas <n> [batu\|kecubung]` | sets the Kas | A |
+| `uji formasi aula <1-9>` | pretends a hall level for gates and slots (this session only) | A |
+| `uji formasi penjaga murid [order]` | your nearest loaded disciple becomes keeper of the looked-at core, ignoring realm and rank | A |
+| `uji formasi penjaga semu <ranah> [jenjang] [dao]` | a pretend keeper on the nearest core (no entity) | A |
+| `uji formasi tribulasi` | prints the strike factor here; combine with `uji tribulasi <ranah>` | A |
+| `uji formasi hapus [semua]` | removes the nearest (or every) virtual core; with `semua` it can also forget your real 7c records (blocks untouched, Daya to the Kas) | A |
+| `uji formasi kinerja` | ms per tick, reads per tick, queries per second, throttle state | A |
+| `uji formasi musuh <n> [elit]` | n test mobs (zombies, husks, skeletons, spiders only), 24 blocks away and walking toward you. They have `NoGrief.TAG`, `setCanBreakDoors(false)`, the tag `kultivator.uji_formasi`, no drops, and vanish after 120 s. `elit` makes one an elite. Never creepers, ghasts, blazes, endermen, silverfish, ravagers or breezes (DESIGN 0) | B |
+| `uji formasi bersih` | removes every `kultivator.uji_formasi` mob | B |
+| `uji formasi alarm [orang\|monster\|elit]` | fires a sample alert from the looked-at direction through the real path | B |
+| `uji formasi teleport <simpul>` | an instant trip: skips the channel, not the refusals | B |
+| `uji formasi simpul` | nodes with distance, loaded flag and trip cost | B |
+| `uji formasi sembunyi` | who is concealed from whom (LAN) | B |
+| `uji formasi pembunuh` | the kill ledger and the DPS cap per tracked mob | B |
+| `uji formasi mutlak <n>` | pretends the A2 count | B |
+| `uji formasi resonansi` | A1 and A2 status, the three parts, and the multipliers | B |
+
+`uji kit` gains `Formasi.kitItems()` in a shulker named "Fase 7c": 8 eyes, every heart block of the catalogue (one
+each, including the beacon, diamond and netherite blocks), 64 amethyst blocks, 32 shards, 16 end rods and 16 crying
+obsidian. These are items only. Stones are already in the phase-7 kit. The existing `uji elit`, `uji tribulasi`,
+`uji urat`, `uji batu` and `uji sekte …` cover the rest.
+
+**Debug commands** (op):
+- `debug formasi stats`: reads and pulses per tick, average µs per tick over 200 ticks, cores loaded and sleeping, field
+  cache hits;
+- `debug formasi verify`: a full synchronous re-verify of the looked-at core;
+- `debug formasi clear`: forgets every 7c record of this dimension (blocks untouched, Daya to the Kas).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.11 Advancements, text and help
+
+**Advancements** (`docs/ADVANCEMENT_TEMPLATE.json`; parent in brackets):
+
+| Id | id_id | When | Mod |
+|---|---|---|---|
+| `formation_eye` (`formation_built`) | Mata Formasi Terbuka | first 7c core registered (Pengenalan Darah) | A |
+| `formation_keeper` (`formation_eye`) | Penjaga Formasi | first keeper assigned | A |
+| `stone_formation` (`formation_eye`) | Formasi Batu Roh | first Bumi+ core powered | A |
+| `five_families` (`formation_eye`) | Lima Aliran Formasi | 5 families running at once | A |
+| `formation_grandmaster` (`formation_eye`) | Guru Besar Formasi | one formation of each of the 5 grades registered | A |
+| `five_layer_shield` (`formation_powered`) | Lima Lapis Larangan | L1 running with Lapis Inti | A |
+| `first_transfer` (`formation_eye`) | Seribu Li dalam Sekejap | first M3 or L5 trip | B |
+| `alarm_breach` (`formation_eye`) | Mata Formasi Bersinar | first breach alarm | B |
+| `nine_bends` (`formation_eye`) | Sembilan Lekuk | 20 mobs led astray by L2 | B |
+| `ten_absolute` (`formation_eye`) | Sepuluh Mutlak | A2 with N = 10 | B |
+| `ten_thousand_immortals` (`formation_eye`) | Sepuluh Ribu Abadi | A1 complete | B |
+
+**Text** (id_id + en_us, merged by `mergeLang`; work titles in English in both):
+
+| File | Contents | Owner |
+|---|---|---|
+| `lang-src/spine7c.*` | config comments, the tablet name "Formasi", the damage type name | spine |
+| `lang-src/formasi.*` | eye block, states and reasons, fuel and Kas, keepers and orders, ownership refusals, validation messages, rule labels, grade and family names, commands, catalogue A names/desc/hint/source, legacy mirror names, help topic `formasi` | A |
+| `lang-src/formasib.*` | catalogue B names/desc/hint/source, alarms, transport, concealment | B |
+| `lang-src/formasiui.*` | tablet, panels, slip, node map, hologram labels, help topic `formasi_pola` | B |
+
+- **Help topics** `formasi` and `formasi_pola` are added to `HelpPage.TOPICS` by the spine. Each ends with its sources.
+  The `formasi` topic also says that concealment of nametags is cosmetic, and that formations protect but do not farm.
+- **PANDUAN.** A new section "20c. Formasi Sekte" mirrors this catalogue, with the building diagrams and a test guide.
+  Module A writes the framework part and module B the catalogue-B part, under two separate headings, so neither edits
+  the other's text.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.12 Data storage
+
+| Store | Contents | Owner |
+|---|---|---|
+| SavedData `kultivator:formasi_cores` (per dimension) | `{v, next_id, cores: [{id, spec, x, y, z, rot, owner, owner_name, kind (0 personal, 1 sect), on, daya (centi), carry, best, draw, keepers [{u, order}], target_spec, ext {…module-B fields, e.g. node name}, created_day, stats {repels, kills, alerts, trips, strayed}}]}`. Ids are never reused. An unknown spec id is kept and shown as "Pola tidak dikenal" (`SUSPENDED`). Virtual cores are never written | A |
+| SavedData `kultivator:formasi_owners` (overworld) | `{v, owners: {uuid: {kas_a, kas_s, kas_best, log [≤ 20 {d, k, args}], settings {draw_default}}}}` | A |
+| `DiscipleData.extra().formasi` | `{core, dim, order}` | A |
+| `CultivationData.extra().formasi` | `{fam_seen (bits), grades_seen (bits), trips, strayed}`, for advancements | A writes `fam_seen` and `grades_seen`; B writes `trips` and `strayed` |
+| Session | `sessionExtra.formasi_alarm {dx, dz, n, elite, until}` (HUD arrow) | B |
+| Client only | hologram state, `ConcealClient` set; never saved | B |
+| Item components | none (the eye is a plain block item) | – |
+
+**`HallInfo` part** (module A writes it through `Halls.addInfoProvider`, key `formasi`, ≤ 8 KB; module B adds `ext`
+through `Formasi.addInfoPart`):
+
+```
+formasi {
+  kas {a, s, best}, slots {active, max}, lim {cores, used, fam {PEMBUNUH: [used, max], ...}}, can {edit, deposit},
+  cores [{id, spec, x, y, z, rot, st, why, idle, crack, daya, cap, upk, hrs, best, pow, pk {q, k, f, a}, miss,
+          keep [{e, u, n, realm, rank, order}], ext {...}}],
+  legacy [{kind, x, y, z, on, power, r, layers}],
+  anchors [{id, x, y, z, r, tier}],
+  field {g, cap, drain, h, t, rc, rs, q, l, c, i, mate},
+  log [{d, k, args}]
+}
+```
+
+**`FormasiSync`** (S2C, per player, only on change, at most once per second):
+
+```
+{ cores: [{id, net, x, y, z, rot, r, st, mem, ext}],   // cores within 96 blocks, same dimension
+  conceal: [entityId...] }                               // members this client must not nametag
+```
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.13 Spine (orchestrator, after 7 and 7b are committed, before both modules start)
+
+1. **`network/Actions`.** `FORMASI = 37` (36 is `TECHNIQUE`, 23–24 are reserved by phase 7; if 7b took 37, use the next
+   free id). It routes to `formasi.Formasi.handleAction(player, text)` in `Net.handle`.
+2. **`network/Payloads`.** S2C `FormasiSync(CompoundTag)` → `client.formasi.FormasiClient.onSync`. No new `OpenScreen`
+   id: add `Halls.PAGE_FORMASI` for `openScreen`.
+3. **`fx/FxType`.** Append `FORMASI` after the phase-7 and 7b entries, routed to `client/formasi/FormasiFx.play`.
+   `FxDispatcher.tick` calls `FormasiFx.tick`. Sub-ids live in `formasi/FormasiFxIds` (A): `SLOT_MARK`, `PATTERN_SHOW`,
+   `AWAKEN`, `STATE`, `PULSE`, `HIT`, `RIPPLE`, `MARK_PILLAR`. Module B may add sub-ids only from `B_FIRST = 32` (`BOLT`,
+   `SWORD`, `SWEEP`, `FOG`, `ALARM`, `JUMP_OUT`, `JUMP_IN`, `ROOT`, …).
+4. **`Kultivator`.**
+   - `formasi.Formasi.init()` before `ModItems.init()`. It calls `FormasiB.init(...)` and `FormationRegistry.freeze()`
+     itself.
+   - `CultivateCommand` → `Formasi.addCommands(root, debug)`.
+   - `TestCommands` → `Formasi.addTestCommands(uji)`; `kit()` adds `Formasi.kitItems()` in the "Fase 7c" shulker.
+5. **`KultivatorClient`** → `client.formasi.FormasiClient.init()`.
+6. **`client/hall/HallScreen`.** A "Formasi" tablet filled by `FormasiPage`, appended to `allPages` but drawn third,
+   after Bangun. Every existing `Halls.PAGE_*` index stays unchanged.
+7. **`disciple/DiscipleEntity`.** `ACTIVITY_FORMATION_KEEPER = 11`:
+   - add `|| activity == ACTIVITY_FORMATION_KEEPER` to the five range checks (about lines 421, 430, 1152, 1380 and
+     1412), so it holds its spot and survives a save;
+   - `holdsActivitySpot` covers it, and the meditation pose is allowed while it is held;
+   - the nameplate and duty UI read "Penjaga Formasi".
+8. **Hooks in other modules' files** (small, contracted; each is a provider list with a no-op default):
+   - `cultivation/Meditation`: `addGatheringProvider(ToDoubleFunction<ServerPlayer>)`,
+     `addStackCapProvider(ToDoubleFunction<ServerPlayer>)` and `addDrainFactorProvider(ToDoubleFunction<ServerPlayer>)`.
+     The formation term becomes `min(stackCap, QiFormations.multiplier(tier) × Π gathering)`, inside the 5.0 cap. The HUD
+     line shows "· Sekte ×…".
+   - The disciple XP path: the spine checks that a `DiscipleHooks.addXpFactor` provider for `XpSource.MEDITATION` touches
+     only the disciple's own meditation XP, never the master share. If the master share passes through `xpFactor`, a flag
+     argument is added so that 7c can return 1.0 there.
+   - `alchemy/AlchemyFurnace`: `addChanceProvider` (sum, clamped to 0…+0.10, before `MAX_CHANCE`),
+     `addQualityStepProvider` (max, ≤ 1) and `addDurationFactorProvider` (min, ≥ 0.7).
+   - `talisman/Inscribe` (P7): `addChanceProvider(ToDoubleFunction<ServerPlayer>)`.
+   - `cultivation/Qi`: `addRegenFactor(ToDoubleFunction<ServerPlayer>)`. `cultivation/Deviation`:
+     `addTimerFactor(ToDoubleFunction<ServerPlayer>)`.
+   - `elite/EliteMonsters.suppressSkills(Mob, int ticks)`: affix skills do not fire while suppressed.
+   - New `util/TargetGates` (`addGate(TargetGate)`, `allow(Mob, LivingEntity)`) and `mixin/MobSetTargetMixin`, which
+     cancels a new non-null target when a gate refuses it.
+   - Damage type data `data/kultivator/damage_type/formation.json` (it bypasses nothing), plus
+     `util/FormationDamage.source(ServerLevel)`. `util/KillCredit.resolve` returns null for this type; `XpSources` and the
+     beast-core and stone drop paths go through `resolve`, or check the type the same way.
+   - `formation/ProtectiveFormations.addDrainExemption(Predicate<Formation>)`. The tick skips the amethyst drain when any
+     predicate is true. This is the only edit to the old formation code.
+   - `technique/spec/run/ExternalControl` (public facade): `root(LivingEntity, int ticks, int bossTicks)` and
+     `release(LivingEntity)`. It calls `StatusTracker.bind` and `release` with a sourceless formation `Caster`, so the
+     creeper fuse hold and the transient root modifier work as for 6c binds.
+   - `sect/build/api/EngineApi`: `formasiAnchors(UUID)` and `requestPattern(UUID, String, String, int)`, as stubs that
+     P6b-cetak fills later (slip allowed).
+9. **Tags.** Add `kultivator:formation_eye` to `data/kultivator/tags/block/indestructible.json` and `sect_protected.json`.
+10. **`kultivator.client.mixins.json`** lists `AvatarNameMixin` (module B owns the class). `kultivator.mixins.json` lists
+    `MobSetTargetMixin` (spine).
+11. **`KultivatorConfig`** (clamped on load):
+
+    | Field | Default (range) |
+    |---|---|
+    | `sectFormations` | true |
+    | `formationDamage` | true (off: killing arrays only show FX) |
+    | `sectFormationDamageScale` | 1.0 (0–3) |
+    | `formationTransport` | true |
+    | `formationConcealNames` | true |
+    | `formationAlarmChat` | true |
+    | `formationMaxCores` | 64 (8–256) |
+    | `formationReadsPerTick` | 16 (8–64) |
+    | `formationBudgetMs` | 0.15 (0.05–1.0) |
+    | `formationMsptSlow` | 45 (30–50) |
+
+12. **`HelpPage.TOPICS`** gains `formasi` and `formasi_pola`. **`lang-src/spine7c.*`** is created.
+13. **Stubs** with the exact signatures of 24.14.3, so each module compiles on its own.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.14 Modules, file ownership and contracts
+
+There are two modules, and they never edit each other's files. Paths are relative to `src/main/java/dev/kultivator/`
+and `src/client/java/dev/kultivator/client/`.
+
+#### 24.14.1 P7c-inti (framework + catalogue A: protection, gathering, healing, refining, tribulation warding, support)
+
+**Owns (new files):**
+- `formasi/Formasi`, `FormasiItems`, `FormationEyeBlock`, `FormasiFxIds`, `FormasiTests`, `SectFormationSlots`,
+  `MasterFlagItem` (slip);
+- `formasi/spec/*`, `formasi/FormationRegistry`;
+- `formasi/match/*`: `ChunkReader`, `PatternMatcher`, `MatchResult`, `Detect`;
+- `formasi/core/*`: `CoreRecord`, `CoreState`, `CoreView`, `Cores`, `CoreStore`, `OwnerStore`, `CoreTicker`, `Verifier`,
+  `FormationIndex`, `IntruderSnapshot`, `SyncSender`, `VirtualCores`;
+- `formasi/fuel/*`: `FuelTable`, `Kas`, `Upkeep`;
+- `formasi/keeper/*`: `Keepers`, `KeeperOrder`, `Affinity`;
+- `formasi/own/*`: `Ownership`, `Limits`, `Slots`;
+- `formasi/stack/*`: `Stacking`, `FormationField`, `FieldSink`, `KillLedger`, `Power`;
+- `formasi/effect/*`: `FormationEffect`, `CoreContext`, `CoreContextImpl`, `FormationTargets`, `AlarmKind`;
+- `formasi/effect/a/*`: `ShieldEffect` (L1), `GatherEffect` (K2, B5), `UnitingCircleEffect` (M5), `HealEffect` (M4),
+  `RefineEffect` (K3, B7), `WardEffect` (B6), `FlagEffect` (L6);
+- `formasi/integrate/*`: `MeditationBridge`, `DiscipleBridge`, `TribulationBridge`, `BreakthroughBridge`, `AlchemyBridge`,
+  `QiBridge`, `ZoneBridge`, `ProjectileTracker` (L1), `HallBridge` (info provider), `SectBuildBridge`;
+- `formasi/catalog/CatalogA`, `formasi/catalog/LegacyMirrors`;
+- the eye's blockstate, model, item model, texture, loot table and recipe, the master flag assets, and
+  `tools/gen_formasi_textures.py`;
+- module A's advancements, `lang-src/formasi.*`, the help topic `formasi`, and the PANDUAN 20c framework part.
+
+**May edit:** nothing outside its own files. The spine does every hook in 24.13.
+
+#### 24.14.2 P7c-katalog-ui (catalogue B + all client UI)
+
+**Owns (new files):**
+- `formasi/FormasiB`, `formasi/catalog/CatalogB`;
+- `formasi/effect/b/*`: `AlarmEffect` (K1, M2 detection), `ConcealEffect` (K4, M2), `TerritorySweep`, `MazeEffect` (M1,
+  L2), `RedSandEffect` (B4), `KillingEffect` (B1, B2, B3, L3, L4), `TransportNetwork`, `TransportChannel` (M3, L5),
+  `GrandArrayEffect` (A1, A2), `TargetGateImpl`;
+- `client/formasi/*`: `FormasiClient`, `FormasiPage`, `CorePanel`, `CodexPanel`, `FieldPanel`, `NodePanel`, `LogPanel`,
+  `FormationSlip`, `BlueprintDiagram`, `NodeMap`, `PatternHologram`, `FormasiFx`, `AlarmHud`, `ConcealClient`;
+- `client/mixin/AvatarNameMixin`;
+- module B's advancements, `lang-src/formasib.*`, `lang-src/formasiui.*`, the help topic `formasi_pola`, and the PANDUAN
+  20c catalogue-B part.
+
+**May edit:** `client/goals/FormationBlueprint`, one early-return guard line only.
+
+#### 24.14.3 Contracts (spine stubs; the owner fills them)
+
+```java
+// ===== common, owned by A =====
+enum Family { PELINDUNG, PENGUMPUL, PEMULIHAN, PENEMPAAN, PENANGKAL, PENGUAT,              // module A
+              PERINGATAN, PENYEMBUNYI, ILUSI, KENDALI, PEMBUNUH, PERPINDAHAN, GABUNGAN;     // module B
+              boolean moduleA(); boolean support(); Component label(); }
+enum Grade { KUNING(1, 3), MISTERIUS(3, 6), BUMI(5, 12), LANGIT(7, 18), ABADI(9, 24);       // (hall gate, Daya/h)
+             int gate(); double upkeep(); Rank keeperRealm(); int maxKeepers(); boolean stoneOnly(); int number(); }
+enum Scope { CORE, TERRITORY }
+enum Flag { FIXED_ORIENTATION, STONE_ONLY, PAUSE_IN_TRIBULATION, NO_6B, PERSONAL_OK, LEGACY_MIRROR }
+record FormationSpec(String id, int netId, Family family, Grade grade, Scope scope, int radius, int radiusPerLevel,
+                     int radiusMax, int minHallLevel, int pulseTicks, double upkeep, Pattern pattern, String effect,
+                     Params params, List<String> requires, EnumSet<Flag> flags, int color, int fx) {
+    double radiusAt(int hallLevel); Component name(); Component desc(); Component hint(); Component source(); }
+final class Pattern { List<Slot> slots(int rot); int distinctRotations(); int radius(); int minDy(); int maxDy();
+                      Map<Character, Rule> legend(); List<PatternBlock> emit(int rot); Map<Rule, Integer> bill(); }
+record Slot(int dx, int dy, int dz, char key, Rule rule) {}
+interface Rule { boolean test(BlockState state, FluidState fluid, int rot); BlockState canonical(int rot);
+                 Component label(); @Nullable Item exactItem(); }
+record PatternBlock(int dx, int dy, int dz, BlockState state, @Nullable Item exactItem, boolean core) {}
+final class Specs { static Builder spec(String id, int netId, Family family); }
+final class Rules { static Rule block(Block b); static Rule anyOf(Block... b); static Rule tag(TagKey<Block> t);
+                    static Rule state(Block b, Property<?> p, Comparable<?> v); static Rule copper(WeatheringCopperCollection<?> c);
+                    static Rule banner(); static Rule banner(DyeColor c); static Rule waterSource(); static Rule light(); }
+interface SpecSink { void add(FormationSpec spec); }
+interface EffectSink { void effect(String id, FormationEffect effect); }
+final class FormationRegistry { static @Nullable FormationSpec byId(String id); static @Nullable FormationSpec byNet(int netId);
+    static List<FormationSpec> all(); static List<FormationSpec> ofFamily(Family f);
+    static @Nullable FormationEffect effectOf(FormationSpec s); static boolean frozen(); }
+final class FormasiItems { static Block FORMATION_EYE; static Item FORMATION_EYE_ITEM; }
+
+// ===== server runtime, owned by A =====
+interface FormationEffect { /* 24.2.12 */ }
+interface CoreContext { /* 24.2.12 */ }
+interface FieldSink { void gather(double g); void unite(double m); void drain(double f); void heal(int amp, double qiRegen, double deviation);
+                      void tribulation(double f); void refine(double chance, int steps, double time, double inscribe);
+                      void quality(double q); void stackCap(double cap); void layers(int n); void concealed(int grade); void illusion(int grade); }
+enum CoreState { DORMANT, BROKEN, SUSPENDED, ACTIVE, POWERED, KEPT; boolean running(); }
+record CoreView(int id, String spec, ResourceKey<Level> dim, BlockPos eye, int rot, UUID owner, int kind, CoreState state,
+                @Nullable Component reason, boolean idle, boolean cracked, long dayaCenti, int keepers, double power,
+                boolean virtual, CompoundTag ext) {}
+final class Cores { static List<CoreView> of(UUID owner); static @Nullable CoreView at(ServerLevel l, BlockPos eye);
+                    static @Nullable CoreView byId(ResourceKey<Level> dim, int id);
+                    static List<CoreView> covering(ServerLevel l, Vec3 pos, @Nullable Family f);
+                    static void setExt(ResourceKey<Level> dim, int id, CompoundTag ext); }
+record FormationField(double gather, double unite, double stackCap, double drain, int healAmp, double qiRegen, double deviation,
+                      double tribFactor, double refineChance, int refineSteps, double refineTime, double inscribe,
+                      double quality, int layers, int concealGrade, int illusionGrade) { static final FormationField NONE; }
+final class Stacking { static FormationField fieldAt(ServerLevel l, Vec3 pos, @Nullable Entity who);
+                       static double killBudget(Mob target, UUID owner, int hallLevel); /* + every cap of 24.5 as public static final */ }
+final class FormationTargets { static boolean mayAffect(Mob m, CoreContext ctx); static double damageFactor(Mob m);
+                               static boolean resists(Mob m, CoreView core); /* Daya Tembus */ static boolean immuneToMind(Mob m);
+                               static boolean steerable(Mob m); }
+interface PowerBonus { double bonus(CoreView target); }        // B registers A1 (+0.15) and A2 (+0.03 N)
+final class Kas { static long amethyst(UUID owner); static long stone(UUID owner); static int depositInventory(ServerPlayer p, UUID owner, boolean all); }
+final class FuelTable { static int daya(ItemStack s); static int grade(ItemStack s); /* -1 amethyst, 0-3 stones, -2 none */ }
+final class Keepers { static @Nullable Component assign(ServerPlayer master, int coreId, DiscipleEntity d, KeeperOrder o);
+                      static void release(DiscipleEntity d); static List<UUID> of(ResourceKey<Level> dim, int coreId); }
+enum KeeperOrder { JAGA, PERKUAT, WASPADA }
+enum AlarmKind { APPROACH, BREACH, STRANGER, ELITE, BOSS }
+interface SyncPart { void write(ServerPlayer viewer, CompoundTag out); }
+interface InfoPart { void write(ServerPlayer viewer, UUID owner, CompoundTag formasi); }
+interface UseHandler { InteractionResult use(ServerPlayer p, CoreView core); }
+final class Formasi { static void init(); static void addCommands(LiteralArgumentBuilder<CommandSourceStack> root, LiteralArgumentBuilder<CommandSourceStack> debug);
+    static void addTestCommands(LiteralArgumentBuilder<CommandSourceStack> uji); static void handleAction(ServerPlayer p, String text);
+    static List<ItemStack> kitItems(); static void addSyncPart(SyncPart part); static void addInfoPart(InfoPart part);
+    static void addActionHandler(String opPrefix, BiConsumer<ServerPlayer, String> handler);   // B: "travel", "node"
+    static void addUseHandler(Family f, UseHandler h);                                          // B: node map on transport eyes
+    static void addPowerBonus(PowerBonus bonus); }
+
+// ===== owned by B (A calls these) =====
+final class FormasiB { static void init(SpecSink specs, EffectSink effects);   // registers CatalogB, B handlers, gates, sync/info/action/use parts
+                       static void addCommands(LiteralArgumentBuilder<CommandSourceStack> formasiNode);     // simpul, pindah
+                       static void addTestCommands(LiteralArgumentBuilder<CommandSourceStack> ujiFormasiNode);
+                       static boolean grandComplete(UUID owner); }             // A1 complete (L1 Lapis Inti, stack cap 2.8)
+final class CatalogB { static void register(SpecSink r); }
+final class TransportNetwork { static List<CoreView> nodes(UUID owner); static @Nullable Component travel(ServerPlayer p, int fromId, int toId); }
+
+// ===== client, owned by B =====
+final class FormasiClient { static void init(); static void onSync(CompoundTag data); }
+final class PatternHologram { static void show(FormationSpec spec, BlockPos anchor, int rot, int minutes); static void hide(); static boolean active(); }
+final class FormasiFx { static void play(Payloads.Fx fx); static void tick(); }
+final class ConcealClient { static boolean hidden(int entityId); }
+
+// ===== spine-owned (24.13) =====
+final class TargetGates { interface TargetGate { boolean allow(Mob mob, LivingEntity target); }
+                          static void addGate(TargetGate g); static boolean allow(Mob mob, LivingEntity target); }
+final class ExternalControl { static boolean root(LivingEntity target, int ticks, int bossTicks); static void release(LivingEntity target); }
+final class FormationDamage { static DamageSource source(ServerLevel level); static boolean is(DamageSource s); }
+// EliteMonsters.suppressSkills(Mob, int); ProtectiveFormations.addDrainExemption(Predicate<Formation>);
+// Meditation.addGatheringProvider / addStackCapProvider / addDrainFactorProvider; AlchemyFurnace.addChanceProvider /
+// addQualityStepProvider / addDurationFactorProvider; Inscribe.addChanceProvider; Qi.addRegenFactor; Deviation.addTimerFactor;
+// EngineApi.formasiAnchors / requestPattern.
+```
+
+**Existing APIs used read-only:**
+- `Halls.hallOf`, `inTerritory`, `level`, `addInfoProvider`, `log`; `Sects.areSectMates`, `sectOf`, `onlineMembers`;
+- `Disciples.loaded`, `DiscipleEntity` (mode, role, activity, setActivity), `SectRanks.rank`;
+- `DiscipleHooks.addXpFactor`, `addRegenFactor`, `addStrikeFactor`; `DuelRules.dueling`;
+- `Targeting.isHostileTo(…, false)`, `calmNeutral`, `safeSpot`; `TechniquePower.TAG_*`; `EliteMonsters.isElite`, `tier`;
+  `DaoProtectors.TAG`;
+- `SpiritStones.*`, `SpiritVeins.grade`, `drain`;
+- `Tribulation.addStrikeFactorProvider`, `FORMATION_FACTOR`; `Breakthrough.addQualityBonusProvider`;
+- `ProtectiveFormations.insideActiveFormation`, `FormationData.get`, `GrandFormation.state`, `radius`;
+  `QiFormations.multiplier`;
+- `ProtectedZones.addZoneProvider`, `Fx.sendTo`, `Msg`, `Advancements.grant`, `FxBudget`, `EffectQuality`,
+  `PhantomDisplays`, `client/screen/ui/*`.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.15 Daftar uji (untuk `docs/uji/FASE-7c.md`, Bahasa Indonesia)
+
+**Dasar dan kerangka**
+1. Simpanan dari fase 7/7b termuat; tidak ada yang berubah sampai sebuah Mata Formasi dipasang. Tablet Formasi muncul
+   ketiga (setelah Bangun) dan muat di 320×240.
+2. Buat Mata Formasi dari resepnya. `formasi pola small_spirit_gathering` → hologram menandai lapis terendah yang kurang:
+   kubus emas berdenyut untuk slot kosong, silang merah untuk blok salah, garis hijau untuk yang benar. **Tidak ada blok
+   yang berubah.**
+3. Jongkok + pakai mata dengan Pecahan Kecubung pada pola yang belum lengkap → daftar kekurangan berkelompok, penanda
+   merah 30 detik, tidak ada yang terpakai. Lengkapi → Pengenalan Darah, status Berdaya, pencapaian `formation_eye`.
+4. Bangun K2 diputar 90/180/270° → tetap terdeteksi; versi cermin tidak. M1 yang diputar ditolak (FIXED, hanya arah
+   kompas sebenarnya).
+5. Cabut satu tiang → Rusak dalam satu tick, pemilik diberi tahu; pasang kembali → menyala lagi. Ledakkan satu tiang
+   dengan TNT → Rusak dalam ±10 detik.
+6. Klik balok emas, besi atau magma biasa dengan kecubung → tidak terjadi apa-apa (hanya mata yang memulai deteksi).
+
+**Daya, Kas, slot, penjaga**
+7. Batu Roh Rendah = 2 Daya, Menengah 18, Tinggi 144, Agung 1.296. Inti Bumi menolak kecubung. Batu yang berlebih masuk
+   ke Kas. Dengan "Tarik dari Kas", inti yang tersisa < 2 jam terisi otomatis. Faktor urat (Agung/Kaya/Tipis) terlihat di
+   baris upkeep.
+8. Siaga: tanpa monster selama 60 detik → pengurasan ×0,25 terlihat di slip.
+9. Aula Tingkat 1 → slot aktif 2; formasi ketiga yang dinyalakan Tertahan "Slot aktif penuh 2/2". `uji formasi aula 9`
+   → 6 slot.
+10. Penjaga: murid Pemurnian Qi pada Jaga di inti Kuning → upkeep 0, "Dijaga". Perkuat → P naik dan murid bermeditasi.
+    Waspada → murid hanya bertarung di dalam radius. Inti Langit menolak murid Inti Emas, dengan alasannya. Formasi Agung
+    Sekte tetap menjaga penjaga lamanya (aktivitas 5 tidak terganggu).
+11. Kepemilikan: mata di wilayah pemain lain menolak pendaftaran; teman sekte bisa menyetor tetapi tidak bisa
+    mendaftarkan; prasasti Aula ditambang → semua inti sekte Tertahan; dipasang kembali → menyala lagi.
+
+**Katalog A**
+12. K2: meditasi di dalam radius 10 → HUD "Sekte ×1,10". Dengan kursi Bintang Surgawi (×2,2), faktor formasi tertahan di
+    2,6. K2 dan B5 bersamaan → hanya yang lebih kuat yang dihitung.
+13. M5: tiga murid MEDITATE di bantal + kamu + penjaga di tengah → faktor 1 + 0,03 × 5. Bonus teman sekte ×1,15 tampil
+    terpisah di Medan.
+14. B5: meditasi di mana pun di wilayah → ×1,20; mata di Y ≥ 120 → ×1,25; pengurasan urat ×0,8. Urat tidak pernah naik.
+15. M4: Regenerasi I tiap 5 detik; Penyimpangan Qi selesai 25% lebih cepat; berhenti saat tribulasimu sendiri; monster
+    tidak ikut sembuh.
+16. K3: peluang di `/kultivasi resep` naik +5%, meracik 8 detik. Bangun B7 di mata yang sama → +10% dan +1 tingkat mutu;
+    K3 tidak ikut bertumpuk. Peluang tidak pernah melewati 0,95.
+17. B6 lalu `uji tribulasi golden_core` → faktor ×0,90 (×0,85 dengan penjaga Inti Emas). Di dalam Formasi Pelindung juga,
+    total formasi tidak pernah di bawah 0,70; tidak pernah mati karena formasi.
+18. L1 tanpa Formasi Agung → Tertahan. Dengan Agung → panah, bola api dan wind charge dari luar lenyap di tepi;
+    panah anggota sendiri tidak; creeper di dalam tidak pernah meledak (Lapis Inti dengan penjaga Jiwa Baru Lahir);
+    lodestone tidak menguras kecubung; tampilan lapisan "6/6". Radius dan lapisan Formasi Agung sendiri tidak berubah.
+19. L6: target P +0,25 di slip; cabut satu blok target → "Retak", tetap bekerja 50% selama 10 menit lalu Rusak.
+
+**Katalog B**
+20. K1: `uji formasi musuh 3` → baris "⚠ Larangan Peringatan…", panah HUD, suara lonceng; tahap mendekat lalu menembus;
+    satu baris chat per 5 detik. Di LAN, orang asing memicu alarm. Pelindung Dao hanya diberi label.
+21. K4: zombie di luar radius tidak bisa mengincarmu saat kamu di dalam; elit tetap melihat. Di LAN, nama anggota di
+    dalam tidak tampak bagi orang luar (tab list masih menampilkannya; ini kosmetik).
+22. M2: seluruh wilayah tersembunyi dan terpantau; elit tingkat 1 pun tertipu; peringatan tepi "Penyusup di tepi …".
+23. M1: monster berputar di cincin dengan Lambat I; tiap 60 detik arah berbalik; setelah 20 detik terdorong keluar; zombi
+    yang dibelokkan tidak mendobrak pintu.
+24. L2: buff monster hilang, keahlian elit diam; tidak ada jalan lurus; keluar setelah 30 detik; bos hanya dilucuti.
+25. B4: monster yang melintas masuk terkunci 4 detik (elit 2, bos 1), sekali per 15 detik.
+26. B1 di Aula Tingkat 4 → ditolak "butuh Aula Tingkat 5". `uji formasi aula 5` → terdaftar; pedang menyerang ≤ 6
+    monster; sapuan 72 pedang tiap 5 detik.
+27. B2/B3/L3/L4: hanya petir dan api partikel; tidak ada `LightningBolt`, tidak ada api pada blok, tembaga dan air tidak
+    berubah. Dua formasi pembunuh pada satu zombie tidak pernah melewati `(2 + 0,5 × L)` per detik; bos ×0,25; Wither
+    dan Ender Dragon tidak tersentuh; golem buatan pemain, hewan bernama dan yang diikat tali tidak tersentuh.
+28. Tidak ada XP kultivasi, inti binatang, batu roh atau ketenaran dari kematian karena formasi, meskipun kamu memukul
+    monster itu lebih dulu.
+29. M3: dua simpul; jongkok + tangan kosong → peta simpul; perjalanan 3 detik; murid FOLLOW ikut (≤ 4); hewan peliharaan
+    tidak ikut; ditolak saat tribulasi, saat menunggang, atau baru terluka; simpul tujuan yang rusak ditolak.
+30. L5: perjalanan 1.000 blok memakan 4 Daya (2 Batu Roh Rendah) dari tangki; chunk tujuan dimuat sebentar lalu
+    dilepas; tidak pernah ganti dimensi. Pos luar (jika tidak di-slip) ≤ 2.
+31. A1: tanpa salah satu bagian (Taiji, Liangyi, Sixiang) → tidak lengkap. Lengkap → semua formasi lain P +0,15 dan
+    radius +2, batas tumpuk 2,8, mutu terobosan +0,04, Lapis Inti L1 tanpa penjaga.
+32. A2: `uji formasi mutlak 10` → setiap formasi Mutlak P +0,30, interval pulsa ×0,75, pencapaian `ten_absolute`.
+
+**Integrasi dan kinerja**
+33. Kehancuran: tidak ada kawah dalam radius + 8 dari mata formasi mana pun; mata tidak pernah terukir.
+34. 6b: Titik Formasi ada di T5/T7/T8/T9 (altar T9 radius 11); "Pola di Titik Formasi" menampilkan hologram; komponen
+    pola opsional hanya dibangun di dalam tapak, tidak aktif, dengan soket mata kosong; Perbaiki memulihkannya;
+    `uji sekte audit` lulus.
+35. `uji formasi pasang <id>` menjalankan setiap formasi tanpa blok; formasi semu hilang setelah restart dan tidak
+    dihitung dalam batas. `uji formasi audit` melaporkan nol galat; setiap kartu dan tooltip punya baris Sumber.
+36. `uji formasi musuh` hanya memunculkan zombi, husk, tengkorak dan laba-laba; `uji formasi bersih` menghapus semuanya.
+37. Kinerja: 6 formasi aktif, 20 monster, 3 elit dan satu tribulasi → 20 TPS; `debug formasi stats` ≤ 0,15 ms per tick;
+    throttle aktif bila dilampaui. Effect Quality Minimal → hologram hanya garis, tanpa kubah, hanya cincin tepi.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.16 Dropped, replaced and reworded
+
+**Synthesis decisions** (where the drafts disagreed, or the code forced a change):
+
+| Idea (draft) | Decision | Why |
+|---|---|---|
+| A themed core block per formation (catalogue) | **replaced** by one Mata Formasi, with the themed block as the heart | clicking any gold or iron block would trigger detection; this avoids clashes with seats, the lodestone and the 6b disc |
+| True-compass detection only (catalogue) vs 4 rotations (systems) | **both:** rotations by default, `FIXED_ORIENTATION` for M1, B2, L1 and A1 | Five Elements, Heaven/Earth/Man and trigram order must stay true; other patterns are easier to build rotated |
+| Multiplicative P ≤ 2.5, damage multiplier ≤ 3 (catalogue) | **replaced** by additive P ≤ 1.5 (support ≤ 1.3); Agung factor only in the per-mob cap | balance; it keeps the gathering numbers honest |
+| Per-core tick tanks (catalogue), ×9 ladder with High 162 and Supreme 1,458 (systems) | **Daya + Kas** with values from `FORMATION_TICKS`: Low 2, Mid 18, High 144, Supreme 1,296 | a stone must be worth the same in 7c and in the Pelindung; the Kas suits 6–11 cores |
+| Langit Mid+ and Abadi High+ fuel minimums | **replaced** by stone-only from Bumi plus the stone-quality bonus Q | a pooled Kas cannot keep grades fairly |
+| Amethyst ceiling of 6 h (systems) | **dropped** | auto-draw made it meaningless; "stones matter" is enforced by stone-only Bumi+ |
+| Tier names Dasar / Menengah / Tinggi / Agung / Surgawi (systems) | **replaced** by Kuning / Misterius / Bumi / Langit / Abadi | "Agung" already names the Formasi Agung, Batu Roh Agung and B5 |
+| Upkeep 3/6/12/24/48 (systems) | **3/6/12/18/24** (catalogue) | matches the catalogue's fuel tables; Abadi stays affordable on High stones |
+| Tribulation stacking down to 0.5 (catalogue) | **floor 0.70** for all formations | B6 × Pelindung = 0.72 still fits; tribulations stay dangerous |
+| B5 vein regen ×1.5 and a density floor | **dropped**; drain ×0.8 only | it would loop with meditation |
+| `FORMATION_TERM_CAP 3.0` (systems) | **2.6** (2.8 with A1), with the sect term ≤ 1.5 | otherwise B5 × M5 rivals a Heavenly Star seat everywhere |
+| Keepers on activity 5 (catalogue) | **activity 11** + five range edits | `GrandFormation.checkGuard` frees activity-5 disciples away from the lodestone |
+| L1 sets the Agung radius to `min(64, territory)` and `MAX_LAYERS` to 6 | **replaced** by L1's own layers 5–6 (radius ≤ 48) and a drain-exemption hook | `MAX_LAYERS` is final, the radius lives inside `GrandFormation.compute`, and 64 breaks `RADIUS_CAP` |
+| A1 and L6 add +1 Agung layer | **dropped**; A1 instead lets Lapis Inti run without a keeper; L6 targets 7c cores only | the Agung code is not edited |
+| Creeper fuse reset per pulse | **replaced** by `ExternalControl` (the 6c bind path) | `SwellGoal` re-arms the fuse every tick |
+| `Targeting.isHostileTo(…, true)` (systems) | **non-precise** form, plus a generic offline rule | the precise form turns off the calm-neutral exclusion (gold-farm piglins, endermen) |
+| `isPersistenceRequired()` as an exemption (critic) | **dropped**; custom name, leash or vehicle instead | zombies that pick up items become persistent and would be immune |
+| Pulse-based `loseTarget` for mazes and concealment | **replaced** by the `Mob.setTarget` gate | `NearestAttackableTargetGoal` re-acquires within about 10 ticks |
+| Territory-wide AABB scans every 40 ticks | **replaced** by a 4-sector sweep plus member boxes | territory radii reach 58–108 |
+| L1 projectile check every 2 ticks | **every tick** | an arrow moves about 3 blocks per tick |
+| Transport cost `1 + ceil(d/32)` Daya | M3 flat 1 Daya; L5 2 Daya per started 512 blocks | far too expensive at long range |
+| L5 "never load chunks" | a short-lived ender-pearl-style ticket during the channel | `safeSpot` needs the destination loaded; nothing stays loaded |
+| L5 outposts | kept as a **slip candidate** | the only sect cores outside the territory |
+| Test spelling `uji formasi <id> semu` vs `pasang` | **`uji formasi pasang <id>`** | one spelling; virtual cores are never saved |
+| `formationReadsPerTick` 64 | **16** plus a 64-read event burst | the real worst case is about 3 reads per tick |
+| `SpawnGuards` (spawn-block chance for illusion and protection) | **deferred** | `SectSpawnMixin` already spawn-proofs sect cells; less hook surface |
+| `END_ROD`, purpur, end stone, dark prismarine and froglights at Kuning–Misterius | **substitutes** (24.2.11) | End, monument and frog-variant blocks are not available that early |
+| `GILDED_BLACKSTONE` required (B6) | `anyOf(GILDED_BLACKSTONE, GOLD_BLOCK)` | bastion-only, not craftable |
+| Standing banners only | standing **or** wall banners | `BlockTags.BANNERS` mixes them anyway; it is friendlier to builders |
+| Decorated pots as L4 "gourds" | water cauldrons | vanilla projectiles break pots and would make the formation flicker |
+| B1 swords 24 at Maximal | 12 | client cost |
+| A shared `FormationPlot` file "owned jointly" with 6b | **replaced** by `EngineApi` stubs filled by P6b-cetak | modules never share files |
+| `sectformation.*` lang file (catalogue) | four files: `spine7c`, `formasi`, `formasib`, `formasiui` | one owner per file |
+| Personal cores outside a territory | kept, limited to K1, K2, K4 and M4; *slip candidate* | small singleplayer bonus |
+| Master Formation Flag item | kept; *slip candidate* | the scroll covers every use |
+
+**Rejected outright:**
+
+| Idea | Why |
+|---|---|
+| Nine-palace (九宮八卦) array | not found in Investiture, JTTW, RMJ or Zhu Xian; folk and wuxia only. The Bagua lives in A1 and the 6b disc |
+| A sect Zhuxian Sword Formation | 6c technique 212 owns the name and source; B1 and A2 cover sword and grand killing |
+| Martial Peak formation-master sources | no verifiable chapter found |
+| *Tales of Demons and Gods* soul array for M5 | only a fan-wiki summary without a chapter; M5 cites ISSTH ch. 735 instead |
+| A canon healing array | none found; M4 is *Terinspirasi* |
+| Vein-nurturing (vein-raising) arrays | no source; it loops with meditation (19.13) |
+| Transport across dimensions, through portals, or carrying pets, mobs or items | DESIGN 0 and the Return Talisman rule |
+| Weather, day-night or "summon storm" arrays | DESIGN 0 rule 1 |
+| Formations that place or repair blocks | only 6b `BuildPlacer` inside the footprint (Perbaiki) |
+| PvP walls or anti-player arrays | DESIGN 0 rule 2; not a claims mod |
+| Portable discs or flags that deploy patterns | they would place blocks; deferred to Phase 8 as control items only (RMJ ch. 231, 995 ready) |
+| Lightning rods as pillars | banned in 6b builds (21.5) |
+| An eye block state for "lit" or "active" | DESIGN 0 rule 1; client FX instead |
+| A test command that builds patterns | DESIGN 0; virtual cores instead |
+| Formation kills granting XP, cores or loot | AFK and assisted farms |
+| Withdrawing Kas Daya as items | duplication and trading loops |
+| Nametag hiding through scoreboard teams | persistent world data, datapack clashes |
+| Disciple nametag concealment | deferred: needs P5's `DiscipleRenderer` |
+| Datapack JSON specs | deferred: needs server→client sync; the code DSL is shared on both sides |
+| Beast-core attunement of formations | deferred: no card needs it yet |
+| Mirror rotation | Bagua and trigram order (21.1) |
+
+**Lore rewordings applied** (from the verification pass):
+
+| Where | Correction |
+|---|---|
+| Keepers, M5, L1 (ISSTH B5 ch. 735) | Meng Hao is the nucleus of the **Demonic Incarnation** formation, not of the five-layered shield; each shield layer is maintained by Spirit Severing experts |
+| B1 (RMJ ch. 1535) | the 72 sword projections fly into the bamboo, the bamboo crumbles to dust, and 72 azure flying swords remain. Nothing hides among the bamboo and re-forms. The Great Geng (Aureate) Sword Formation now cites ch. 788–789, 1237 and 1386; **20.3.16 is corrected the same way** |
+| B4 (FSYY ch. 49) | the hundred days is Ran Deng's prediction, not something the pit does |
+| L5 (RMJ ch. 1130) | only says an ancient teleportation formation is on Stalwart Star Island; the range is game design |
+| L6 (RI ch. 233) | 99 restrictions form 99 dragons; the flag is not shown releasing them |
+| M2 (RMJ ch. 995) | the chapter title "Purple Mist" is removed (not confirmed) |
+| K1 (RMJ ch. 399) | the translation says "barriers" (restrictions) |
+| K3 (AWE ch. 2) | one wok (Big Fatty Zhang's) is engraved with an earthflame spell formation |
+| K4 (RMJ ch. 520) | the concealment restriction is in the refining room |
+| M3 (RMJ ch. 272, 359) | Han Li *hopes* a formation-master friend can help; he buys the listed items |
+| A1 (FSYY ch. 82) | one array of Taiji, Liangyi and Sixiang parts, not three separately named formations |
+| 20.3.2 (RI ch. 216) | Wang Lin sets up hidden restrictions; "layered" is *Terinspirasi dari* |
+| 2.3 Mutu Batu (RMJ ch. 131) | cited as "a better stone raises the formation's power" (the sentence is cut off in the teaser) |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 24.17 Sources (verification log)
+
+Investiture of the Gods was checked in the Chinese Wikisource text. The novels were checked in the WuxiaWorld chapter
+openings (most pages are teasers, so a claim is cited only when it is in the visible text).
+
+**Investiture of the Gods (封神演義), zh.wikisource:**
+- [卷044](https://zh.wikisource.org/zh/%E5%B0%81%E7%A5%9E%E6%BC%94%E7%BE%A9/%E5%8D%B7044): the Ten Absolute Formations
+  and their masters (B2, B3, B4, L3, L4, A2).
+- [卷048](https://zh.wikisource.org/zh/%E5%B0%81%E7%A5%9E%E6%BC%94%E7%BE%A9/%E5%8D%B7048): Cao Bao dissolved by the red
+  water; Lu Ya in the Blazing Flame Formation.
+- [卷049](https://zh.wikisource.org/zh/%E5%B0%81%E7%A5%9E%E6%BC%94%E7%BE%A9/%E5%8D%B7049): King Wu in the Red Sand pit.
+- [卷050](https://zh.wikisource.org/zh/%E5%B0%81%E7%A5%9E%E6%BC%94%E7%BE%A9/%E5%8D%B7050): the Nine-Bend Yellow River
+  Formation.
+- [卷082](https://zh.wikisource.org/zh/%E5%B0%81%E7%A5%9E%E6%BC%94%E7%BE%A9/%E5%8D%B7082): the Ten Thousand Immortals
+  Formation.
+
+**A Record of a Mortal's Journey (RMJ), WuxiaWorld:**
+- [131](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-131) stone quality;
+  [156](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-156), [866](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-866),
+  [928](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-928) earth fire;
+- [231](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-231) Five Elements Reversal and the master flag;
+  [363](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-363) relief inside it;
+- [272](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-272), [359](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-359),
+  [1130](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-1130) the ancient transportation formation;
+  [557](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-557) disciples guarding one;
+- [346](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-346) great protective formations;
+  [391](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-391) the Sage Mountain vein;
+- [399](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-399) talismans at the barriers;
+  [520](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-520), [803](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-803),
+  [995](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-995) concealment and detection;
+- [788](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-788), [789](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-789),
+  [1237](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-1237), [1386](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-1386)
+  the Great Geng (Aureate) Sword Formation; [1535](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-1535) the 72 azure
+  swords; ch. 412 (Gold Lightning Bamboo, already in DESIGN);
+- [1315](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-1315), [1468](https://www.wuxiaworld.com/novel/rmji/rmji-chapter-1468)
+  blocking a tribulation; the golden net;
+- [RMJ: Immortal Realm ch. 216](https://www.wuxiaworld.com/novel/rmjiir/rmjiir-chapter-216) the spirit gathering array
+  and the white egg.
+
+**Other works:**
+- *I Shall Seal the Heavens* [Book 5 ch. 735](https://www.wuxiaworld.com/novel/i-shall-seal-the-heavens/issth-book-5-chapter-735):
+  the five-layered restrictive shield, its layer keepers, and the Demonic Incarnation nucleus.
+- *Renegade Immortal* [ch. 233](https://www.wuxiaworld.com/novel/renegade-immortal/rge-chapter-233),
+  [291](https://www.wuxiaworld.com/novel/renegade-immortal/rge-chapter-291) and
+  [527](https://www.wuxiaworld.com/novel/renegade-immortal/rge-chapter-527): the restriction flag.
+- *A Will Eternal* [ch. 2](https://www.wuxiaworld.com/novel/a-will-eternal/awe-chapter-2) (the earthflame wok) and
+  [ch. 877](https://www.wuxiaworld.com/novel/a-will-eternal/awe-chapter-877) (repairing the protective formations).
+- *Desolate Era* [Book 8 ch. 30](https://www.wuxiaworld.com/novel/desolate-era/de-book-8-chapter-30): the hidden alarm
+  formation.
+- *The Mirror Legacy* [ch. 34](https://www.wuxiaworld.com/novel/the-mirror-legacy/tml-chapter-34): the formation eye,
+  blood recognition, and Daya Tembus.
+- *Battle Through the Heavens* ch. 2: the grade names (already in 22.7).
+
+**Already verified in DESIGN and reused:** RMJ ch. 131 and 391 (19.3.2, 19.3.5); AWE ch. 2 (20.3.9); RMJ ch. 153 and
+RI ch. 216 (20.3.2, now worded *Terinspirasi* for layering); BTTH ch. 2 (22.7); the five 6c Absolute techniques (22.9).
+
+**Searched but not usable:** Martial Peak arrays; a TDG chapter for the soul array; a canon healing array; a canon
+tribulation-blocking formation (so B6 is *Terinspirasi*); a canon source for 九宮八卦陣.
