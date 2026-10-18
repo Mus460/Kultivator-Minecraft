@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.grand_sect_complete.description"
+    },
+    "icon": {
+      "id": "minecraft:gold_block"
+    },
+    "title": {
+      "translate": "advancement.kultivator.grand_sect_complete.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

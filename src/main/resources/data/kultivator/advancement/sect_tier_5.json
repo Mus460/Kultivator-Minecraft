@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.sect_tier_5.description"
+    },
+    "icon": {
+      "id": "minecraft:lodestone"
+    },
+    "title": {
+      "translate": "advancement.kultivator.sect_tier_5.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

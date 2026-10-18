@@ -111,6 +111,8 @@ public final class Payloads {
 		public static final int HALL = 3;
 		/** The Mode Kehancuran warning: {@code arg} 0 = the player's own oath, otherwise the disciple's entity id. */
 		public static final int KEHANCURAN_CONFIRM = 4;
+		/** The sect template screen (DESIGN 21.12); {@code arg} = the template to select first (0 = none). */
+		public static final int SECT_TEMPLATE = 5;
 
 		public static final Type<OpenScreen> TYPE = typeOf("open_screen");
 		public static final StreamCodec<RegistryFriendlyByteBuf, OpenScreen> CODEC = StreamCodec.of(
@@ -154,6 +156,23 @@ public final class Payloads {
 
 		@Override
 		public Type<HallInfo> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * A compiled sect footprint preview for the hologram and the template screen (DESIGN 21.12, 21.24): the
+	 * {@code PreviewData.toTag()} of the engine with the keys {@code t, rot, glaze, fp, axis, comps, zones, cut, obst, warn,
+	 * snap, bill, exact, ops}. An empty tag clears the hologram. Read by {@code client.sectbuild.BuildClient}.
+	 */
+	public record BuildPreview(CompoundTag data) implements CustomPacketPayload {
+		public static final Type<BuildPreview> TYPE = typeOf("build_preview");
+		public static final StreamCodec<RegistryFriendlyByteBuf, BuildPreview> CODEC = StreamCodec.of(
+				(buf, p) -> ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, p.data),
+				buf -> new BuildPreview(ByteBufCodecs.TRUSTED_COMPOUND_TAG.decode(buf)));
+
+		@Override
+		public Type<BuildPreview> type() {
 			return TYPE;
 		}
 	}

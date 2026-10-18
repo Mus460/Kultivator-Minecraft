@@ -98,7 +98,11 @@ public enum FxType {
 	/** Bintang Abadi stars, calamities, seals, the heir (client/disciple/path/PathFx, module D). */
 	STAR,
 	/** Mode Kehancuran: red sky, shape preview, impact dust, restore shimmer (client/kehancuran/KehancuranFx, module D). */
-	KEHANCURAN;
+	KEHANCURAN,
+
+	// ---- phase 6b (DESIGN 21.24)
+	/** Pembangunan Sekte: placement crumbs, component and tier ceremonies, blocked pings (client/sectbuild/BuildFx); a = {@code sect.build.api.BuildFxIds}. */
+	SECT_BUILD;
 
 	public static FxType byOrdinal(int ordinal) {
 		FxType[] values = values();

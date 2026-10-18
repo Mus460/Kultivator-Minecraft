@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -203,18 +204,24 @@ public class AulaPage extends HallPage {
 		float cursor = y + 4.0F - offset;
 		heading(g, Component.translatable("kultivator.hall.ui.buildings"), tx, cursor, width, 0.75F);
 		cursor += 12.0F;
-		int flags = info.getIntOr("bflags", 0);
-		CompoundTag counts = info.getCompoundOrEmpty("bcount");
-		boolean pavilion = (flags & 1) != 0;
-		boolean formation = (flags & 2) != 0;
-		boolean drill = (flags & 4) != 0;
-		boolean tower = (flags & 8) != 0;
-		cursor = building(g, tx, cursor, width, true, "stele", 2, Component.translatable("kultivator.hall.ui.b.stele"));
-		cursor = building(g, tx, cursor, width, pavilion, "pavilion", 4, Component.translatable("kultivator.hall.ui.b.pavilion",
-				counts.getIntOr("books", 0), 10, counts.getIntOr("lecterns", 0)));
-		cursor = building(g, tx, cursor, width, formation, "formation", 6, Component.translatable("kultivator.hall.ui.b.formation"));
-		cursor = building(g, tx, cursor, width, drill, "drill", 8, Component.translatable("kultivator.hall.ui.b.drill", counts.getIntOr("targets", 0), 4));
-		cursor = building(g, tx, cursor, width, tower, "tower", 9, Component.translatable("kultivator.hall.ui.b.tower", counts.getIntOr("rooms", 0), 3));
+		Component buildStatus = info.read("build_status", ComponentSerialization.CODEC).orElse(null);
+		if (buildStatus != null) {
+			// Phase 6b: a sect template builds the hall, so its status line replaces the checklist (DESIGN 21.17).
+			cursor += Brush.wrap(g, font, buildStatus, tx, cursor, width, Palette.INK, 0.6F, false) + 2.0F;
+		} else {
+			int flags = info.getIntOr("bflags", 0);
+			CompoundTag counts = info.getCompoundOrEmpty("bcount");
+			boolean pavilion = (flags & 1) != 0;
+			boolean formation = (flags & 2) != 0;
+			boolean drill = (flags & 4) != 0;
+			boolean tower = (flags & 8) != 0;
+			cursor = building(g, tx, cursor, width, true, "stele", 2, Component.translatable("kultivator.hall.ui.b.stele"));
+			cursor = building(g, tx, cursor, width, pavilion, "pavilion", 4, Component.translatable("kultivator.hall.ui.b.pavilion",
+					counts.getIntOr("books", 0), 10, counts.getIntOr("lecterns", 0)));
+			cursor = building(g, tx, cursor, width, formation, "formation", 6, Component.translatable("kultivator.hall.ui.b.formation"));
+			cursor = building(g, tx, cursor, width, drill, "drill", 8, Component.translatable("kultivator.hall.ui.b.drill", counts.getIntOr("targets", 0), 4));
+			cursor = building(g, tx, cursor, width, tower, "tower", 9, Component.translatable("kultivator.hall.ui.b.tower", counts.getIntOr("rooms", 0), 3));
+		}
 		cursor += 3.0F;
 		CompoundTag grand = info.getCompoundOrEmpty("formation");
 		if (!grand.isEmpty()) {

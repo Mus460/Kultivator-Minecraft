@@ -176,6 +176,11 @@ public final class WorldBreaker {
 		return JOBS.peekFirst();
 	}
 
+	/** True while any Kehancuran job (cast or restore) is queued or running: sect construction pauses (DESIGN 21.15). */
+	public static boolean busy() {
+		return !JOBS.isEmpty();
+	}
+
 	/**
 	 * Stops every destructive job of {@code owner} at once (a lock was closed); what was already removed stays restorable.
 	 * Restores keep running: they only put the world back.

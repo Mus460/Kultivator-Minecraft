@@ -5,14 +5,17 @@ tokoh novel xianxia: memurnikan qi, menembus ranah demi ranah dari Manusia Fana 
 Tribulasi Langit, menapaki Jalan Dao, menguasai teknik, terbang di atas pedang, meracik pil, menghadapi Iblis Hati,
 membangkitkan binatang roh, dan membangun formasi. Sejak Fase 6 kamu juga mendirikan **Aula Sekte**, menerima murid
 dari Hari Penerimaan Murid, dan membimbing mereka naik tanpa batas sampai **Bintang Abadi**, bahkan sampai melampauimu.
+Sejak Fase 6b sektemu **membangun dirinya sendiri** dari bahan yang kamu setor: pilih satu dari sembilan templat, dari
+Sekte Tak Berperingkat sampai Istana Langit, lalu saksikan kompleks sekte klasik tumbuh melewati sembilan tingkat.
 
 Semua angka di panduan ini diambil langsung dari kode mod. Angka kultivasi (XP) selalu ditampilkan sebagai bilangan
 bulat di dalam game.
 
 > **Janji keamanan blok:** tidak ada satu pun efek, teknik, peristiwa, makhluk, atau formasi dari mod ini yang
-> membakar, merusak, memasang, atau mengubah blok. Satu-satunya pengecualian adalah **Mode Kehancuran** yang harus
-> dinyalakan sendiri dan **mati secara bawaan** (lihat [peringatannya](#31-mode-kehancuran-peringatan)). Lihat juga
-> [bagian terakhir](#37-janji-keamanan-blok).
+> membakar, merusak, memasang, atau mengubah blok. Hanya ada dua pengecualian: **Pembangunan Sekte**, yang memasang blok
+> hanya di dalam tapak yang kamu lihat sebagai hologram lalu kamu konfirmasi sendiri (lihat
+> [20b](#20b-pembangunan-sekte)), dan **Mode Kehancuran**, yang harus dinyalakan sendiri dan **mati secara bawaan**
+> (lihat [peringatannya](#31-mode-kehancuran-peringatan)). Lihat juga [bagian terakhir](#37-janji-keamanan-blok).
 
 ---
 
@@ -38,6 +41,7 @@ bulat di dalam game.
 18. [Sekte dan Latih Tanding](#18-sekte-dan-latih-tanding)
 19. [Murid](#19-murid)
 20. [Aula Sekte](#20-aula-sekte)
+    * 20b. [Pembangunan Sekte (9 templat × 9 tingkat)](#20b-pembangunan-sekte)
 21. [Hari Penerimaan Murid](#21-hari-penerimaan-murid)
 22. [Alam jiwa, Bakat, dan Fisik Langka](#22-alam-jiwa-bakat-dan-fisik-langka)
 23. [Jenjang Sekte dan Poin Kontribusi](#23-jenjang-sekte-dan-poin-kontribusi)
@@ -74,6 +78,9 @@ bulat di dalam game.
 6. **Pilih Dao** saat mencapai *Inti Emas*: jalan seumur hidup yang menentukan teknik dan kekuatanmu.
 7. **Dirikan sekte.** Buat dan pasang **Prasasti Aula Sekte** (lihat [Aula Sekte](#20-aula-sekte)). Setiap beberapa
    hari para calon murid datang ke prasastimu saat fajar: uji mereka, terima yang kamu pilih, lalu bimbing mereka.
+8. **Bangun sektemu.** Di tablet **Bangun** pada gulungan aula, pilih templat sekte, lihat tapaknya sebagai hologram,
+   konfirmasi, lalu cukup setor bahan (jongkok + klik kanan Prasasti). Sekte membangun dirinya sendiri (lihat
+   [Pembangunan Sekte](#20b-pembangunan-sekte)).
 
 Kalau bingung, buka tab **Bantuan** di gulungan (`'`) atau ketik `/kultivasi` untuk melihat kartu statusmu.
 
@@ -125,6 +132,7 @@ bentrok dengan tombol vanilla, Butter Bot, maupun Iris (K, O, R).
 | `/kultivasi murid tahan` | **Tahan Petir**: kamu menerima sambaran berikutnya dari terobosan atau bencana muridmu dalam 16 blok (lihat [Hu Fa](#274-hu-fa-menjaga-terobosan)) |
 | `/kultivasi aula info` | Keterangan [Aula Sekte](#20-aula-sekte)-mu: tingkat, ketenaran, batas murid, radius wilayah, kas, letak prasasti, jadwal |
 | `/kultivasi aula nama <nama>` | Mengganti nama aula (3–24 huruf, angka, spasi, `-` atau `_`) |
+| `/kultivasi aula bangun ...` | [Pembangunan Sekte](#20b-pembangunan-sekte): status, `templat`, `pratinjau <1-9> [arah] [glasir]`, `putar`, `konfirmasi`, `batal`, `setor [semua\|butuh]`, `jeda`, `lanjut`, `naik <2-9>`, `perbaiki`, `bongkar`, `lepaskan`, dan lainnya ([daftar lengkap](#20b16-perintah)) |
 | `/kultivasi kehancuran` / `kehancuran status` | Status [Mode Kehancuran](#31-mode-kehancuran-peringatan): tiga kunci, batas, jurus yang berjalan, sisa jendela pulih |
 | `/kultivasi kehancuran sumpah` | Membuka layar merah Sumpah Kehancuran (hanya bila server mengizinkan Mode Kehancuran) |
 | `/kultivasi kehancuran pulihkan` | Memulihkan blok dari jurus penghancur milikmu yang masih dalam jendela pulih |
@@ -221,6 +229,15 @@ atau yang terdekat dalam 16 blok.
 | `murid bencana mulai` | Memulai bencana berikutnya tanpa membayar Qi Bintang |
 | `murid ikatan <n>` | Mengatur ikatan (0–100) |
 
+**Perintah uji Fase 6b** (juga di bawah `/kultivasi debug`), untuk [Pembangunan Sekte](#20b-pembangunan-sekte):
+
+| Perintah | Fungsi |
+|---|---|
+| `aula bangun tingkat-set <0-9>` | Mengatur penghitung tingkat pembangunan saja, untuk menguji kaitannya dengan Tingkat Aula |
+| `aula bangun komponen selesai` | Menyelesaikan bagian yang sedang dibangun sekarang |
+| `aula bangun bank <tick>` | Mengatur tabungan waktu pembangunan (0–72.000) |
+| `aula bangun rencana ulang` | Menyusun ulang rencana tapak ke versi rencana terbaru |
+
 ### 3.4 Perintah uji cepat (`/kultivasi uji ...`)
 
 Khusus operator. `/kultivasi uji` tanpa tambahan menampilkan daftar ini di chat.
@@ -237,6 +254,7 @@ Khusus operator. `/kultivasi uji` tanpa tambahan menampilkan daftar ini di chat.
 | `/kultivasi uji murid <nama\|semua> tur [detik]` | Tur ranah untuk murid itu; datanya dikembalikan di akhir |
 | `/kultivasi uji murid <nama\|semua> teknik` | Semua teknik yang bisa diajarkan, jeda dihapus, qi penuh |
 | `/kultivasi uji murid <nama\|semua> bintang <n>` | Mengatur Bintang Abadi: murid dinaikkan ke Puncak Dewa Abadi dulu, dan bencana yang gerbangnya ≤ n dicatat lewat |
+| `/kultivasi uji sekte ...` | Uji [Pembangunan Sekte](#20b-pembangunan-sekte): `templat`, `tingkat <n> [instan\|cepat]`, `sumber`, `pamer`, `hologram`, `bandingkan`, `info`, `periksa`, `audit`, `kamera`, `upacara`, `kecepatan`, `naik`, `bongkar`, `reset`, `misi`, `pekerja` ([daftar lengkap dengan contoh](#20b16-perintah)) |
 
 Nama murid dengan spasi ditulis memakai garis bawah (misalnya `Lin_Yuchen`); tekan Tab untuk saran nama.
 
@@ -1227,7 +1245,8 @@ G B G
 * **Membuka gulungan aula:** klik kanan prasasti aktifmu.
 * **Prasasti kedua** (saat aulamu sudah berdiri) tetap **diam**. Jongkok lalu gunakan dengan tangan kosong: "Pindahkan
   Aula ke sini?"; ulangi dalam 10 detik untuk memastikan. Paling sering sekali per hari game. Ketenaran, kas, lumbung,
-  calon, dan regu yang sedang pergi ikut pindah.
+  calon, dan regu yang sedang pergi ikut pindah. Bila aulamu punya templat sekte, yang muncul adalah dialog
+  **[Pindah & bongkar] [Pindah & tinggalkan] [Batal]** ([20b.11](#20b11-naik-templat-bongkar-pindah-lepaskan)).
 * Prasasti dalam **128 blok** dari aula pemain lain juga tetap diam.
 * **Tertidur:** bila prasasti hilang (ditambang, atau ketahuan hilang oleh pemeriksaan tiap 30 detik), aula tertidur.
   **Tidak ada yang dihapus**: calon pergi, tugas berhenti, dan regu yang pulang muncul di sebelahmu, bukan di aula.
@@ -1270,6 +1289,10 @@ Pemindaian: kotak ±16 blok mendatar (seluruh 33 × 33) dan dari 2 blok di bawah
 ±32 blok), dibaca satu lapisan per tick selama 9 tick, setiap 30 detik selama chunk aula termuat dan setiap kali
 gulungan dibuka. Hasilnya tampil sebagai daftar centang **Bangunan** di tablet Aula.
 
+**Dengan templat sekte** ([Pembangunan Sekte](#20b-pembangunan-sekte)) pemindaian ini dilewati: batas bangunan menjadi
+yang tertinggi dari hasil pindai tepat sebelum konfirmasi, tingkat pembangunan, dan tingkat yang dijamin, dan daftar
+centang diganti baris status sekte ([20b.12](#20b12-tingkat-aula-dan-fitur-aula)).
+
 ### 20.4 Ketenaran
 
 Ketenaran **tidak pernah turun** dan hanya datang dari murid-muridmu sendiri. Setiap tambahan tercatat di tablet
@@ -1301,7 +1324,8 @@ Klik kanan prasasti aktifmu. Loh giok di sisi kiri adalah tablet-tabletnya; teka
 
 | Tablet | Isi |
 |---|---|
-| **Aula** | Nama (*Ganti Nama*), segel tingkat, bar ketenaran, angka (batas murid, radius, harga, pos, misi, kas), daftar centang Bangunan dengan petunjuk dan sumbernya, baris Formasi Agung ("Dijaga: <nama>"), jadwal (Hari Penerimaan, Perang Seratus Dinasti, Kompetisi, Tanah Terlarang, Bahtera Purba), dan murid yang sedang pergi |
+| **Aula** | Nama (*Ganti Nama*), segel tingkat, bar ketenaran, angka (batas murid, radius, harga, pos, misi, kas), daftar centang Bangunan dengan petunjuk dan sumbernya (dengan templat sekte: baris status sekte), baris Formasi Agung ("Dijaga: <nama>"), jadwal (Hari Penerimaan, Perang Seratus Dinasti, Kompetisi, Tanah Terlarang, Bahtera Purba), dan murid yang sedang pergi |
+| **Bangun** | [Pembangunan Sekte](#20b-pembangunan-sekte): diagram tapak, tangga sembilan tingkat, dan panel Ikhtisar, Bahan, Misi, Pekerja, Galian, Templat, Penyumbang ([20b.13](#20b13-tablet-bangun-layar-templat-dan-hud)) |
 | **Calon** | Kartu calon murid, koin *Hanya Monster*, tombol *Mulai Perang* pada hari perang ([bagian 21](#21-hari-penerimaan-murid)) |
 | **Jenjang** | Pagoda enam lantai ([23.1](#231-jenjang-sekte)) |
 | **Perbendaharaan** | Kantor Misi, Paviliun Yue Lu, Seni Sekte yang Hilang ([23.2–23.4](#232-poin-kontribusi)) |
@@ -1342,6 +1366,1014 @@ sebelumnya, separuh kanan untuk berikutnya.
 
 * Setiap **Pelindung Sekte** di dalam wilayah mengalikan kerusakan formasi ×1,5 (paling banyak 2 kali).
 * Warna lapis dan garis monster hanyalah partikel di komputermu (bukan efek Glowing). Tidak ada blok yang berubah.
+
+---
+
+## 20b. Pembangunan Sekte
+
+Sejak Fase 6b aulamu bisa **membangun dirinya sendiri** menjadi kompleks sekte klasik seperti di donghua dan manhua:
+tiang merah berpernis, balok berlukis hijau-toska, atap genteng gelap yang melengkung dengan ujung sudut terangkat (atap
+ganda pada aula penting), dinding plester putih di atas alas batu, emas dan giok secukupnya, gapura paifang, lalu tangga
+batu panjang dan teras yang naik di sepanjang sumbu simetris menuju aula utama, dengan taman air di sampingnya: jembatan
+lengkung, kolam teratai, air terjun, pagoda, lentera, pohon prem dan azalea, bambu, taman batu, dan ding dupa. Templat
+yang lebih besar menambah beberapa puncak, pulau melayang yang dirantai ke tanah, teras lautan awan, dan pagoda yang
+menembus langit.
+
+Kamu memilih satu dari **sembilan templat** di Prasasti, melihat tapaknya sebagai hologram, mengonfirmasi **sekali**, lalu
+**cukup menyetor bahan**. Begitu tagihan bangunan berikutnya tertutup oleh setoranmu, bangunan itu dipesan dan mulai
+dibangun **sendiri**: tanpa tombol per bangunan atau per tingkat, tanpa konfirmasi lagi, tanpa pengatur waktu, dan tanpa
+syarat ketenaran. Sekte tumbuh melewati **sembilan tingkat**, dan setiap tingkat sudah tampak selesai, tidak pernah seperti
+lokasi proyek. Murid sebagai Pekerja Bangunan, Misi Pembangunan, dan Ekspedisi Pengumpulan hanyalah **pembantu**: tanpa
+satu murid pun dan tanpa satu misi pun, sekte tetap terbangun lengkap.
+
+> **Pengecualian kedua dari janji keamanan blok.** Pembangunan Sekte memasang blok dan meratakan tanah **hanya di dalam
+> tapak yang kamu lihat sebagai hologram lalu kamu konfirmasi**. Tanah dan tanaman alami yang dipindahkan dikreditkan ke
+> Gudang Bahan Sekte (tidak ada yang hilang), bangunan buatanmu dan blok terlindung tidak pernah dibongkar diam-diam, dan
+> di luar tapak tidak ada yang berubah. Rinciannya di [20b.17](#20b17-keamanan-blok-pembangunan-sekte).
+
+**Sumber (fase ini secara keseluruhan):**
+* *Return of the Mount Hua Sect*: Gunung Hua yang jatuh dan runtuh dipulihkan, dan ketenarannya kembali.
+* *Perfect World*, bab 551/558: Shi Hao bersumpah membangun kembali Paviliun Penambal Langit yang runtuh.
+* *Martial Peak*: Yang Kai mulai sebagai murid percobaan dan penyapu lantai High Heaven Pavilion. Ia mendirikan High
+  Heaven Palace di Wilayah Utara Star Boundary, yang kelak menjadi High Heaven Cave Heaven, peringkat pertama dari 36.
+* *Battle Through the Heavens*: Xiao Yan ikut mendirikan Pan Men di Akademi Dalam, lalu Xiao Gate di Kota Maple di
+  Wilayah Sudut Hitam, lalu Aliansi Yan.
+
+Arsitektur Tiongkok sungguhan (*Yingzao Fashi*, Kota Terlarang, taman Jiangnan, dan lainnya) dipakai sebagai **arah seni,
+bukan kanon novel**. Angka, biaya, tampilan, dan aturan keamanan adalah desain game.
+
+### 20b.1 Cara singkat
+
+1. Dirikan [Aula Sekte](#202-mendirikan-memindahkan-dan-membangunkan-aula). Chat menawarkan sekali **[Pilih Templat
+   Sekte]** dan **[Bangun Sendiri]**.
+2. Klik kanan Prasasti → tablet kedua **Bangun** → jimat *Pilih Templat* (atau tombol di chat, atau
+   `/kultivasi aula bangun templat`).
+3. Pilih templat dan glasirnya, lalu klik *Lihat Tapak*. Tapak muncul sebagai hologram selama 2 menit; tutup layar dan
+   berjalanlah mengelilinginya.
+4. *Putar* sampai gerbang menghadap arah yang kamu mau. Tunggu sampai tapak terpindai 100% dan tidak ada peringatan merah.
+5. Centang persetujuan, lalu **tahan segel giok Konfirmasi selama 3 detik** (atau klik [Konfirmasi] di chat, lalu
+   [Ya, mulai bangun]). Upacara **Batu Pertama** dimainkan.
+6. Setor bahan: **jongkok + klik kanan Prasasti** sambil memegang batu, kayu, genteng, dan lainnya, atau pakai panel
+   *Bahan* di tablet Bangun (*Setor yang dibutuhkan*). Bangunan berikutnya mulai sendiri begitu tagihannya tertutup.
+7. Tetaplah dalam 160 blok dari Prasasti agar pembangunan berjalan. Tablet dan HUD selalu menulis apa yang masih kurang,
+   misalnya "Masih kurang: 32 Batu, 12 Kayu".
+8. Opsional: jadikan sampai empat murid Pekerja Bangunan, kirim regu Ekspedisi Pengumpulan, dan ambil Misi Pembangunan
+   untuk Poin Kontribusi.
+
+Kalau kamu lebih suka menyusun aula dengan tangan, pilih **Bangun Sendiri**: aula tetap memindai bangunan buatanmu
+seperti di [20.3](#203-tingkat-aula-dan-bangunan), dan layar Templat tetap bisa dibuka kapan saja.
+
+### 20b.2 Sembilan templat
+
+Arah templat: gerbang di depan, aula utama di belakang, dan **Prasasti berada di sumbu**. Tapak lebih dalam di belakang
+Prasasti daripada di depannya, dan lebarnya selalu ganjil supaya sumbu melewati sel Prasasti. Templat bisa diputar per
+90°, tetapi tidak bisa dicerminkan (cermin akan membalik trigram Bagua dan tulisan papan nama).
+
+**Ukuran dan medan**
+
+| # | Templat | Tapak (lebar × dalam) | Tinggi di atas / di bawah pelataran | Selisih tinggi tanah maks. | Pekerjaan tanah maks. (gali + timbun) | Ranah di papan |
+|---|---|---|---|---:|---:|---|
+| 1 | **Sekte Tak Berperingkat** | 25 × 29 | +14 / −14 | 10 | 3.625 | Manusia Fana |
+| 2 | **Sekte Kelas Tiga** | 33 × 39 | +24 / −14 | 14 | 6.435 | Pemurnian Qi |
+| 3 | **Sekte Kelas Dua** | 45 × 51 | +36 / −18 | 18 | 11.475 | Pembangunan Fondasi |
+| 4 | **Sekte Kelas Satu** | 57 × 63 | +40 / −18 | 22 | 17.955 | Inti Emas |
+| 5 | **Sekte Agung** | 73 × 81 | +48 / −22 | 28 | 29.565 | Jiwa Baru Lahir |
+| 6 | **Tanah Suci** | 89 × 97 | +56 / −26 | 36 | 43.165 | Transformasi Dewa |
+| 7 | **Gua Surgawi, Tanah Berkah** | 109 × 117 | +62 / −26 | 44 | 63.765 | Penyatuan Dao |
+| 8 | **Garis Abadi Kuno** | 133 × 141 | +70 / −30 | 52 | 93.765 | Kenaikan Abadi |
+| 9 | **Istana Langit** | 161 × 161 | +100 / −30 | 64 | 129.605 | Dewa Abadi |
+
+"Selisih tinggi" adalah beda antara tanah tertinggi dan terendah di tapak (tanpa 5% ujung atas dan bawah). Ranah di papan
+hanya petunjuk; kamu bebas memilih templat mana pun, kecuali server menyalakan `sectTemplateRealmGate` (lihat
+[36](#36-berkas-konfigurasi)). Agar tapak bisa terpindai penuh, Templat 9 butuh jarak pandang sekitar 8 chunk dari
+Prasasti, Templat 8 butuh 7, dan Templat 7 butuh 6.
+
+**Susunan dan bonus**
+
+| # | Gaya | Aula utama | Satu titik menjulang | Batas sekte | Ruang menara | Kursi Qi | Altar gerbang | Radius wilayah |
+|---|---|---|---|---|---:|---:|---:|---:|
+| 1 | pertapaan berhalaman (siheyuan) | Aula Pendiri, 3 ruang, xieshan | pohon prem pusaka | pagar bambu → tembok putih | 3 (ruang bawah) | 1 (cakram) | 0 | 24 |
+| 2 | dua halaman menaiki lereng | 3 ruang, xieshan, di teras +3 | pagoda persegi 3 lantai | tembok putih + gerbang kayu | 3 | 1 | 0 | 32 |
+| 3 | taman air Jiangnan: dinding kepala kuda, gerbang bulan | 5 ruang, xieshan | pagoda 5 lantai di balik kolam | tembok putih berundak | 4 | 1 | 0 | 40 |
+| 4 | gerbang gunung bela diri: tangga tengah panjang | 5 ruang, atap ganda xieshan, di +8 | aula utama di ujung tangga | tembok istana merah, 4 menara jaga | 4 | 2 | 0 | 46 |
+| 5 | sekte agung ortodoks: teras marmer putih | 5 ruang, atap ganda xieshan | Pagoda Kaca Tujuh Harta (7 lantai) | tembok merah, 2 menara depan | 5 | 2 | 0 | 58 |
+| 6 | puncak kembar: jembatan galeri di atas jurang | 7 ruang, atap ganda wudian | aula utama ↔ aula Puncak Dalam | gerbang + batu batas | 6 | 2 | 2 | 68 |
+| 7 | lembah danau: paviliun pulau, perahu batu, bukit gua | 7 ruang, atap ganda wudian, di puncak | bukit gua + batu melayang | bibir lembah, tanpa tembok | 6 (di dalam gua) | 3 | 4 | 80 |
+| 8 | benteng klan kuno: parit, jalan arwah, tiga aula | 9 ruang, atap ganda wudian | menara gerbang + Pagoda Kaca Sembilan Harta | tembok benteng gelap | 7 | 3 | 4 | 96 |
+| 9 | lima puncak di atas awan | 9 ruang, atap ganda wudian, di puncak utama | Pagoda Kaca Sembilan Harta di puncak | gerbang + batu batas | 7 | 3 | 4 | 108 |
+
+*Kursi Qi* adalah [Formasi Pengumpul Qi](#84-formasi-pengumpul-qi) yang sudah jadi untukmu di paviliun meditasi:
+tingkat 1 = Kecil, 2 = Agung, 3 = Bintang Surgawi (Templat 1 dan 2: cakram formasi itu sendiri). Bonus ukuran lain (hanya memakai aturan yang sudah ada):
+* Batas murid **+1** setelah Tingkat 9 selesai, untuk Templat 5–9.
+* **+1 calon** per kedatangan untuk Templat 6–9 sejak Tingkat 7 (batas 6 calon tetap berlaku).
+* Saat Tingkat 9 Templat 5 ke atas selesai, seluruh server membaca "Sekte ‹nama› (‹templat›) berdiri megah!".
+* **Altar formasi gerbang** adalah Formasi Pelindung tambahan yang opsional; tiap altar kamu daftarkan sendiri. Tanpa
+  lodestone, altar menampilkan soket kosong dan tingkatnya tetap selesai.
+
+**Wajah tiap templat**
+1. **Sekte Tak Berperingkat:** halaman pertapaan kecil. Aula Pendiri berglasir di belakang pelataran, asrama di barat dan
+   sayap Paviliun Kitab di timur, ruang alkimia dan dapur di depan, pohon prem pusaka di sudut. Pagar bambu menjadi tembok
+   plester putih (T4), gapura kayu menjadi paifang batu (T6), dan T6 adalah tingkat sepuhan emas Aula Pendiri.
+2. **Sekte Kelas Tiga:** halaman depan, Aula Pendiri, lalu halaman belakang di teras +3 dengan aula alkimia dan aula utama;
+   pagoda persegi 3 lantai di barat laut di balik kolam kecil.
+3. **Sekte Kelas Dua:** pelataran berserambi, taman teratai dengan jembatan lengkung dan paviliun tepi air, tembok putih
+   berundak dengan gerbang bulan dan jendela tembus, pagoda 5 lantai di balik air, dinding kepala kuda pada asrama dan
+   dapur.
+4. **Sekte Kelas Satu:** tembok istana merah dengan 4 menara jaga, tangga tengah selebar 7 blok dengan 3 bordes ke aula
+   utama beratap ganda di teras +8, panahan di barat dan lapangan latihan di timur, air terjun kecil dari dinding penahan
+   ke taman teratai.
+5. **Sekte Agung:** teras marmer putih tiga undak (+2 / +4 / +5) dengan tangga naga, aula utama beratap ganda, Pagoda Kaca
+   Tujuh Harta oktagonal di pelataran barat laut sebagai satu-satunya titik menjulang, kolam teratai dengan paviliun pulau
+   dan air terjun.
+6. **Tanah Suci:** teras marmer +3 / +6 / +9 untuk aula utama 7 ruang; Puncak Dalam (+12) di barat laut di seberang sungai
+   jurang, disambung jembatan galeri beratap; teras lautan awan dengan paviliun tebing di T9. Tanpa tembok keliling.
+7. **Gua Surgawi, Tanah Berkah:** danau besar bertepi batu, jembatan sembilan belokan, perahu batu, jembatan marmer lurus
+   ke puncak utama, Puncak Dalam dan Puncak Tetua; di T9 bukit Gua Surgawi dengan gerbang gua berukir dan tiga batu
+   melayang berantai di atas danau. Tanpa tembok keliling.
+8. **Garis Abadi Kuno:** parit, tembok benteng gelap dengan menara gerbang 3 lantai dan 4 menara sudut, jalan arwah dengan
+   patung batu dan pinus tua, tiga aula di satu teras marmer tiga undak, taman kekaisaran di barat laut, dan Pagoda Kaca
+   Sembilan Harta di timur laut.
+9. **Istana Langit:** tangga sembilan tahap ke aula utama di puncak utama, Aula Leluhur Agung di +13, puncak +18 dengan
+   Pagoda Kaca Sembilan Harta (ujungnya sekitar +96), puncak pil, Puncak Dalam, Puncak Tetua, dan Puncak Binatang; di T9
+   kepulauan gunung melayang berantai giok dan Aula Dao Langit yang bundar dan biru. Tanpa tembok keliling.
+
+Di rancangan (DESIGN 21.1) Templat 7 dan 8 bernama "Gua Surga Tanah Berkah" dan "Warisan Kuno Abadi"; di game tertulis
+seperti di tabel.
+
+**Sumber per templat:**
+* **1:** *Renegade Immortal*, catatan pengarang Er Gen: Sekte Xuan Dao adalah "小门小派，本不入流" (sekte kecil yang tak
+  berperingkat), dan Sekte Heng Yue telah "沦入末流" (jatuh ke tingkat terbawah). Rasa mendirikan: *Battle Through the
+  Heavens*, Pan Men didirikan di Akademi Dalam untuk melindungi murid baru.
+* **2–4:** konvensi genre wuxia/xianxia tentang sekte kelas tiga, dua, dan satu, misalnya di terjemahan Wuxiaworld *Yuan's
+  Ascension* dan *Everlasting* (bab 73). Ini label genre, bukan tangga milik satu karya.
+* **5:** *Return of the Mount Hua Sect*: Sembilan Sekte Besar dan Satu Perkumpulan, serta Lima Keluarga Besar. Gunung Hua
+  dulu anggotanya dan digantikan Hainan. Juga *A Record of a Mortal's Journey to Immortality*: Tujuh Sekte Besar Negeri Yue
+  (越国七大派).
+* **6:** *Shrouding the Heavens*: Tanah Suci seperti Tanah Suci Yaoguang. *Against the Gods*, bab 696: Empat Tanah Suci
+  Agung, penjaga Benua Langit Mendalam (Profound Sky Continent).
+* **7:** *Martial Peak*, bab 3831: 36 Gua Surgawi dan 72 Tanah Berkah, kekuatan yang menguasai 3.000 Dunia. Skema klasik Gua
+  Surgawi dan Tanah Berkah: *Tiandi gongfu tu* karya Sima Chengzhen (Tang) dan *Dongtian fudi yuedu mingshan ji* karya Du
+  Guangting (901).
+* **8:** *Perfect World*: Klan Panjang Umur dan garis Dao kuno (古老道统) di antara kekuatan teratas Sembilan Langit Sepuluh
+  Bumi. *Battle Through the Heavens*: Delapan Klan Kuno. *Shrouding the Heavens*: keluarga Jiang kuno.
+* **9:** *Shrouding the Heavens*: Ye Fan mendirikan Istana Langit (Heavenly Court). Tata letaknya mengikuti cincin
+  "pangkat menurut ketinggian" Kota Bintang Langit di *A Record of a Mortal's Journey to Immortality*: Gunung Suci punya 81
+  lapis, dan yang berpangkat lebih tinggi tinggal lebih tinggi.
+
+**Keputusan nama.** Templat 9 sengaja tidak bernama "Sekte Abadi": tidak ada karya yang punya tingkat sekte bernama "Sekte
+Abadi", dan nama itu tetap menjadi judul Fase 6. Templat 8 dipetakan ke "garis Dao kuno" (古老道统) *Perfect World*.
+Templat 2–4 memakai konvensi genre 三流/二流/一流门派 dan tidak terikat pada satu karya.
+
+### 20b.3 Sembilan tingkat
+
+Setiap tingkat membuka fitur aula yang sama di semua templat, dan tingkat pembangunan ikut menentukan Tingkat Aula
+([20b.12](#20b12-tingkat-aula-dan-fitur-aula)).
+
+| Tingkat | Nama | Selalu menambah | Fitur aula yang didukung | Tampak saat selesai |
+|---|---|---|---|---|
+| 1 | **Peletakan Prasasti** | lingkaran Prasasti (cincin tatahan oktagonal r 2 dan r 4, 4 lentera batu rendah, tanpa atap di atas Prasasti); jalan poros dan pelataran depan berlantai batu; **Aula Pendiri** di poros; asrama pertama (Templat 1: sejak T2); gerbang dalam kayu atau gapura bambu; tiang lentera; sumur dengan gentong air (Pikul Air); **pohon pusaka** | – | kompleks kecil yang terang di tengah alam |
+| 2 | **Api Dapur dan Kebun Obat** | Dapur Api (smoker, tungku terbuka); Kebun Seratus Obat; kandang Ayam Ekor Roh; pepohonan | pos tugas menjadi tempat nyata | rumah tangga yang hidup: asap dapur, bedeng obat, pohon prem |
+| 3 | **Paviliun Kitab** | perpustakaan dengan ≥ 10 rak buku dan podium dalam 16 blok dari Prasasti; serambi beratap (Templat 3–9); lantai pelataran lengkap | Paviliun Kitab | halaman cendekia yang tertutup |
+| 4 | **Tembok dan Air** | aula alkimia (kuali di atas api unggun jiwa yang menyala); kolam, danau, atau bak air; batas sekte: tembok + gerbang gunung, atau gerbang + batu batas (Templat 6, 7, 9); pita tembok mencapai bentuk akhirnya | – | sekte bertembok dengan air, kesan pertama yang klasik |
+| 5 | **Formasi Agung** | cakram Bagua: lodestone, crying obsidian di ±4, blok kecubung di ±3, trigram King Wen; dipasang **belum aktif**. Juga menara sudut atau menara jaga, dan altar gerbang opsional | Formasi Agung, setelah kamu mendaftarkan lodestone-nya dengan serpihan kecubung ([17](#17-formasi-pelindung)) | lantai halaman menjadi cakram ritual |
+| 6 | **Aula Utama** | aula utama di terasnya (Templat 1: tingkat sepuhan emas Aula Pendiri: papan nama, chiwen, mutiara emas, hewan atap, lentera atap); paifang; ding perunggu (satu berasap isyarat). Aula Pendiri menjadi **Kantor Misi** (papan nama diganti) | – | poros lengkap: paifang → gerbang → pelataran → teras → aula |
+| 7 | **Lapangan Latihan** | lapangan latihan dan panahan dengan ≥ 4 blok sasaran; menara lonceng dan genderang (Templat 3–9); panggung laga (Templat 6–9); panji; serambi; asrama Murid Dalam | Aula Latihan | kehidupan murid: genderang, lonceng, sasaran |
+| 8 | **Pagoda dan Leluhur** | pagoda; aula leluhur dengan lentera jiwa; paviliun meditasi dengan kursi Qi; taman binatang roh; bambu; puncak tambahan (Templat 6–9) | kursi Qi tingkat 2 atau 3 untuk sang guru | kemegahan yang menjulang |
+| 9 | **Menara Langit Membara** | pintu menara dengan 3–7 ruang tepat di bawahnya; puncak kemegahan: air terjun, mutiara emas, papan nama bercahaya, lentera atap; Templat 7–9 menambah unsur langit | [Menara Langit Membara](#257-menara-langit-membara) (≥ 3 ruang) | sekte yang lengkap dan megah sesuai ukurannya |
+
+**Setiap tingkat tampak selesai.** Aturan ini mengikat semua templat:
+1. **Satu bagian adalah satu kesatuan:** tanah petaknya, bangunannya, dan taman petaknya (pinggiran, tanaman, lampu, dan
+   lantai yang dijangkaunya). Tidak ada galian besar yang mendahului bangunan; hanya jalan poros yang boleh duluan.
+2. **Teras datang bersama bangunan pertamanya.** Contoh: pelataran barat +3 Templat 5 datang bersama pagoda di T8. Tidak
+   pernah ada "panggung" kosong yang menunggu tingkat lain.
+3. **Lantai batu tumbuh sesuai pemakaian.** T1 hanya melapisi poros dan pelataran sekitar 11 × 9 di sekitar Prasasti dan
+   depan aula; sisanya rumput dengan batu pijakan sampai tingkat yang memakainya.
+4. **Poros tidak pernah buntu di petak kosong.** Sebelum T6 poros berakhir di **batu penghalang** (影壁), yang di T6 menjadi
+   kaki tangga teras.
+5. **Pita tembok selesai di T4** (garis tembok + 3 sel ke dalam). Tanah kosong di dalamnya tetap hutan alami, seperti
+   "gunung belakang" sekte.
+6. **Tepi selalu dirapikan.** Setiap bagian menyelesaikan tepi lahan yang dibentuknya dengan pinggiran batu, lereng lumut
+   berbatu, atau pagar tanaman. Petak untuk tingkat berikutnya tetap alami; paling banyak jalan batu sederhana yang
+   menghubungkan. Pohon alami di petak taman dan rumput dipertahankan; di petak bangunan dikreditkan ke Gudang.
+7. **Setiap tingkat diakhiri bagian "Hiasan Tingkat"** yang menambah lentera, bunga, dan panji di seluruh sekte, jadi
+   seluruh sekte tampak naik kelas, bukan satu petak saja.
+8. **Urutan di dalam setiap bangunan** mengikuti cara rangka kayu Tiongkok didirikan: alas dan lantai → semua tiang naik
+   bersama, lapis demi lapis → balok dan konsol → **atap, cincin tepi atap dulu dan bubungan terakhir** → dinding, kisi,
+   isi, dan lampu. Bangunan setengah jadi tampak seperti paviliun terbuka, bukan perancah.
+9. **Hanya pergantian ringan, tidak pernah aula dirobohkan:** pagar bambu → tembok (Templat 1), gapura kayu → paifang batu,
+   rumput → lantai batu, dan hiasan yang bertambah.
+
+**Sumber (tingkat):** fitur aula mengikuti [20.3](#203-tingkat-aula-dan-bangunan): Aula Yue Lu dan formasi yang
+menyelubunginya (*A Record of a Mortal's Journey to Immortality*, bab 153); Paviliun Sihir (*I Shall Seal the Heavens*,
+bab 36–38); lapangan latihan (*Return of the Mount Hua Sect*); menara Langit Membara (*Battle Through the Heavens*, bab
+491/549/622). Pos tugas: gentong air (*Renegade Immortal*); Kebun Seratus Obat (*A Record of a Mortal's Journey to
+Immortality*, bab 150–151); Dapur dan Ayam Ekor Roh (*A Will Eternal*, bab 2 dan 20–26). Kantor Misi: *A Will Eternal*,
+bab 9 dan 27 (Kantor Misi); "Aula Pendiri menjadi Kantor Misi" adalah desain game.
+
+<details>
+<summary><b>Daftar bangunan per templat dan tingkat</b> (klik untuk membuka)</summary>
+
+**Templat 1 — Sekte Tak Berperingkat (25 × 29)**
+* T1: jalan poros dan pelataran depan; Aula Pendiri (13 × 7, pangkat C, berglasir); pagar bambu dan gapura kayu; 2 tiang
+  lentera gerbang; 2 gentong air; prem pusaka
+* T2: sayap asrama barat; Dapur Api di tenggara; kandang di bawah pohon prem; bedeng obat; pinus
+* T3: sayap Paviliun Kitab timur (14 rak buku + podium); lantai pelataran
+* T4: ruang alkimia barat daya; tembok plester putih bertudung genteng menggantikan pagar; 2 bak teratai
+* T5: cakram formasi (r 4) dengan trigram
+* T6: sepuhan emas Aula Pendiri; paifang batu 1 ruang menggantikan gapura; ding perunggu kecil
+* T7: 4 papan sasaran berbingkai pada muka halaman ruang alkimia dan dapur; lentera batu; lentera pagoda di tangga; batu
+  cendekia
+* T8: altar leluhur dengan lentera jiwa di ruang timur aula; tirai bambu; bonsai; karpet merah
+* T9: ruang bawah Langit Membara 3 ruang di bawah aula (tangga spiral di ruang barat); papan nama bercahaya; lentera
+  istana; kelopak bunga
+
+**Templat 2 — Sekte Kelas Tiga (33 × 39)**
+* T1: halaman depan; Aula Pendiri (pangkat B); gerbang kayu dan pagar; lentera; sumur dan 2 gentong; pinus pusaka
+* T2: asrama timur; dapur; kebun obat; kandang; pepohonan
+* T3: Paviliun Kitab barat (16 rak)
+* T4: teras belakang +3 dengan aula alkimia; sungai kecil dan kolam teratai dengan jembatan datar; tembok putih dan rumah
+  gerbang kayu
+* T5: cakram (r 4)
+* T6: aula utama di teras belakang (xieshan 3 ruang, pangkat D); paifang kayu merah (1 ruang, 3 atap); ding
+* T7: lapangan latihan (4 sasaran); paviliun lonceng di halaman timur; panji
+* T8: pagoda persegi 3 lantai (barat laut, kolam di depannya); kuil leluhur kecil; bambu
+* T9: pintu menara + 3 ruang; hiasan emas; lentera atap; pepohonan
+
+**Templat 3 — Sekte Kelas Dua (45 × 51)**
+* T1: pelataran; Aula Pendiri; asrama Murid Luar; Gerbang Bunga Gantung kayu (chuihuamen); sumur dan 4 gentong; prem
+  pusaka
+* T2: halaman dapur (dapur, kandang); kebun obat; 6 pohon
+* T3: Paviliun Kitab 2 lantai (24 rak); serambi beratap di kiri-kanan pelataran
+* T4: teras utara +3 dengan aula alkimia; taman teratai dengan jembatan lengkung dan paviliun tepi air (水榭); tembok putih
+  berundak dengan gerbang bulan dan jendela tembus; gerbang gunung
+* T5: cakram (r 5); 2 menara sudut depan
+* T6: aula utama 5 ruang (pangkat D); paifang batu; ding-ding
+* T7: lapangan latihan (6 sasaran); rangka lonceng dan genderang; taman batu; deretan lentera; panji
+* T8: pagoda persegi 5 lantai di balik kolam; aula leluhur; paviliun meditasi (kursi Qi tingkat 1); dinding kepala kuda
+  pada asrama dan dapur
+* T9: pintu menara + 4 ruang; sentuhan akhir
+
+**Templat 4 — Sekte Kelas Satu (57 × 63)**
+* T1: pelataran; Aula Pendiri; asrama Luar; gerbang dalam; sumur; pinus pusaka
+* T2: halaman dapur; kebun obat berundak; pepohonan
+* T3: Paviliun Kitab 2 lantai (32 rak); serambi
+* T4: tembok istana merah, gerbang gunung 3 ruang dan singa batu; teras samping +2 dengan aula alkimia; taman teratai
+  dengan air terjun kecil dari dinding penahan
+* T5: cakram (r 5); 4 menara jaga xieshan
+* T6: **tangga tengah panjang** (lebar 7, 3 bordes) ke teras utama (+8, menyesuaikan medan +5..+10); aula utama 5 ruang
+  beratap ganda xieshan; paifang; ding
+* T7: lapangan latihan dengan rak senjata dan panji (8 sasaran); lonceng dan genderang; serambi mendaki; asrama Murid Dalam
+* T8: pagoda 5 lantai; aula leluhur; paviliun meditasi oktagonal (kursi Qi tingkat 2); taman binatang roh; rumpun bambu
+* T9: pintu menara + 4 ruang; sentuhan akhir
+
+**Templat 5 — Sekte Agung (73 × 81)**
+* T1: pelataran depan dan poros; Aula Pendiri (15 × 7, pangkat B); asrama Luar (timur); Gerbang Bunga Gantung kayu;
+  paviliun sumur + 4 gentong; tiang lentera; prem pusaka
+* T2: halaman dapur bertembok (Dapur Api, sumur, kandang Ayam Ekor Roh); Kebun Seratus Obat berundak; pohon dan jalan
+* T3: Paviliun Kitab 2 lantai (barat, 40 rak, 2 podium); serambi beratap yang membingkai pelataran; lantai pelataran
+  lengkap
+* T4: tembok istana merah; gerbang gunung 3 ruang dan singa batu; jalan masuk; teras timur +2 dengan aula alkimia; kolam
+  teratai dengan jembatan bulan
+* T5: cakram Bagua (r 5); 2 menara sudut depan 2 lantai
+* T6: teras marmer putih tiga undak (+2 / +4 / +5) dengan tangga naga; aula utama 5 ruang beratap ganda xieshan; paifang
+  batu 3 ruang; 2 ding perunggu
+* T7: panahan dan lapangan latihan; menara lonceng dan genderang; serambi mendaki ke aula timur; taman batu; deretan
+  lentera; panji
+* T8: Pagoda Kaca Tujuh Harta di pelataran barat laut +3; aula leluhur di pelataran timur laut +3; paviliun meditasi pulau
+  (kursi Qi tingkat 2); jembatan batu pijakan; taman binatang roh; rumpun bambu
+* T9: pintu menara dengan 5 ruang; air terjun ke kolam; mutiara emas, papan nama bercahaya, lentera atap; hutan kecil di
+  jalan masuk
+
+**Templat 6 — Tanah Suci (89 × 97)**, tanpa tembok keliling
+* T1: pelataran; Aula Pendiri; asrama Luar; gerbang dalam; sumur; pinus pusaka
+* T2: halaman dapur; kebun obat berundak; pepohonan
+* T3: Paviliun Kitab 2 lantai (48 rak, 2 podium); serambi
+* T4: sungai jurang dan danau teratai dengan jembatan; aula alkimia di terasnya; gerbang gunung 5 ruang dengan potongan
+  tembok yang berakhir di batu; batu batas
+* T5: cakram (r 7) + 2 altar gerbang; 2 paviliun jaga
+* T6: teras puncak utama (marmer +3 / +6 / +9); aula utama 7 ruang beratap ganda wudian; paifang batu 5 atap; ding
+* T7: lapangan latihan dan panggung laga (10 sasaran); lonceng dan genderang; serambi; asrama Murid Dalam
+* T8: Puncak Dalam (+12) di balik penghalangnya dengan Aula Murid Dalam 2 lantai dan asramanya; jembatan galeri beratap di
+  atas jurang; Pagoda Kaca Tujuh Harta; aula leluhur; paviliun meditasi (tingkat 2); taman binatang roh; bambu
+* T9: menara 6 ruang; teras lautan awan dengan paviliun tebing (gaya Kuil Gantung) di atas lembah kabut; air terjun dari
+  Puncak Dalam; lentera; emas
+
+**Templat 7 — Gua Surgawi, Tanah Berkah (109 × 117)**, tanpa tembok keliling
+* T1: pelataran; Aula Pendiri; asrama Luar; gerbang dalam; gentong air; pinus pusaka
+* T2: halaman dapur; ladang obat berundak; 16 pohon
+* T3: Paviliun Kitab 3 lantai (56 rak); serambi
+* T4: danau Tanah Berkah (30–35% tapak) bertepi batu; aula alkimia; jembatan sembilan belokan ke paviliun tepi air;
+  **perahu batu**; dedalu; gerbang gunung 5 ruang dengan potongan tembok; batu batas
+* T5: cakram (r 8) + 4 altar gerbang; 4 paviliun jaga di bibir lembah
+* T6: jembatan marmer lurus melintasi danau dengan paviliun tengah danau; puncak utama +4 / +8 / +12; aula utama 7 ruang
+  beratap ganda wudian; paifang 7 atap
+* T7: lapangan latihan dan panggung laga (12 sasaran); lonceng dan genderang; serambi; 2 asrama Murid Dalam
+* T8: Puncak Dalam dan Puncak Tetua (+10); aula Murid Dalam; kediaman tetua; Pagoda Kaca Tujuh Harta; aula leluhur;
+  paviliun meditasi (tingkat 3); taman binatang roh; bambu; jalan ujian
+* T9: **bukit Gua Surgawi** (sekitar 15 blok) dengan gerbang gua berukir, 6 ruang menara di dalam dan di bawahnya; 3 batu
+  gantung berantai di atas danau dengan kepala kura-kura berukir di bawah yang terbesar; air terjun berundak; kabut
+
+**Templat 8 — Garis Abadi Kuno (133 × 141)**
+* T1: pelataran; Aula Pendiri; 2 asrama Luar; gerbang dalam; 8 gentong; pinus pusaka
+* T2: halaman dapur besar dengan lumbung; kebun obat; 20 pohon
+* T3: Paviliun Kitab 3 lantai (64 rak, 2 podium); serambi
+* T4: tembok benteng gelap (bata deepslate, 20% retak, bergerigi, tanjakan kuda) dengan **menara gerbang 3 lantai** (城楼)
+  dan 2 gerbang samping; parit dengan 3 jembatan; jalan kekaisaran; Menara Pil (menara alkimia 3 lantai); danau taman
+  kekaisaran dengan jembatan
+* T5: cakram (r 8) + 4 altar gerbang; 4 menara sudut 3 lantai di atas benteng
+* T6: **jalan arwah** dengan patung batu dan pinus tua; teras marmer tiga undak +3 / +6 / +9; aula utama 9 ruang beratap
+  ganda wudian; Aula Tengah persegi beratap piramida; paifang 7 atap di antara dua dinding penghalang berglasir
+* T7: panggung laga klan; lapangan latihan (12 sasaran); menara lonceng dan genderang 2 lantai; serambi; 2 asrama Murid
+  Dalam
+* T8: Aula Leluhur Agung (7 ruang, lentera jiwa) di belakang teras sebagai aula ketiga; Pagoda Kaca Sembilan Harta (9
+  lantai, gaya Menara Porselen); bukit batu kekaisaran dengan paviliun puncak; paviliun meditasi pulau (tingkat 3); taman
+  binatang roh; 2 halaman tetua
+* T9: menara 7 ruang; 3 pulau relik berantai di atas halaman belakang; air terjun bukit batu ke danau; sentuhan akhir
+
+**Templat 9 — Istana Langit (161 × 161)**, tanpa tembok keliling
+* T1: poros pelataran dan pelataran depan; Aula Pendiri; 2 asrama Luar; gerbang dalam; paviliun sumur; pinus pusaka
+* T2: halaman dapur besar; ladang obat berundak; 24 pohon
+* T3: Paviliun Kitab 3 lantai (72 rak, 2 podium); serambi
+* T4: danau lembah, sungai, dan tepi batu; paviliun pulau, jembatan zig-zag, perahu batu; **Puncak Awan Harum** (puncak pil,
+  +8) dengan Menara Pil; gerbang gunung 5 ruang dengan potongan tembok; batu batas; 3 jembatan lengkung
+* T5: cakram (r 9) + 4 altar gerbang; 4 paviliun jaga di taji punggung bukit
+* T6: puncak utama berpahat (batu alam yang lebih tinggi dipertahankan) dengan teras +3 / +6 / +9 dan marmer +11 / +13;
+  aula utama 9 ruang beratap ganda wudian; paifang agung 7 atap; dua dinding penghalang berglasir di kiri-kanan gerbang
+  gunung; tangga sembilan tahap
+* T7: panggung laga, lapangan latihan, dan panahan (16 sasaran); menara lonceng dan genderang 2 lantai; serambi; 2 asrama
+  Murid Dalam
+* T8: **Puncak Dalam** dan **Puncak Tetua** (+14) dengan aula dan asrama di balik penghalang; **Puncak Binatang** (+8, taman
+  binatang roh); Aula Leluhur Agung (+13); paviliun meditasi (tingkat 3); 2 jembatan galeri beratap; rumpun bambu dan
+  jalan ujian
+* T9: menara 7 ruang; Pagoda Kaca Sembilan Harta di puncak (dasar +18, ujung sekitar +96); kepulauan gunung melayang
+  berantai giok; jembatan langit ke balkon lantai 4 pagoda; **Aula Dao Langit** bundar beratap tiga (biru Langit); air
+  terjun dari puncak ke danau; kabut lembah
+
+</details>
+
+**Sumber (daftar bangunan):**
+* **Pangkat menurut ketinggian** (teras dan tangga naik ke aula utama): *I Shall Seal the Heavens*, bab 2–3: Sekte Reliance
+  punya empat puncak; Sekte Luar ada di kaki di antaranya, para pelayan tinggal di tengah lereng, dan Sekte Dalam serta para
+  tetua tinggal di atas, di balik mantra pelindung. Inilah sumber "Sekte Dalam di teras atas di balik penghalang". Juga *A
+  Record of a Mortal's Journey to Immortality*: Gunung Suci di Kota Bintang Langit, 81 lapis, pangkat lebih tinggi tinggal
+  lebih tinggi.
+* **Sekte berpuncak banyak:** empat puncak *I Shall Seal the Heavens* di atas. *A Will Eternal*: puncak-puncak Sekte Spirit
+  Stream. Puncak Awan Harum (Fragrant Cloud Peak) membuat pil, maka lahirlah Puncak Awan Harum di sini; Green Crest Peak
+  untuk kultivator pedang.
+* **Menara Pil:** *Battle Through the Heavens*, Menara Pil, tanah suci para alkemis di Zhongzhou. Bentuknya diambil dari
+  namanya.
+* **Taman binatang roh:** *A Record of a Mortal's Journey to Immortality*, Gunung Binatang Roh, sekte penjinak binatang di
+  Negeri Yue. Hanya namanya.
+* **Jalan ujian:** *A Record of a Mortal's Journey to Immortality*, bab 1–5, pendakian Tujuh Misteri (seperti di Hari
+  Penerimaan Murid).
+* **Prem pusaka:** *Return of the Mount Hua Sect*, bunga-bunga prem.
+* **Nama pagoda:** *Soul Land*, pagoda Ubin Kaca Tujuh Harta milik Ning Rongrong yang berkembang menjadi Sembilan Harta.
+  Di sana itu jiwa bela diri, bukan bangunan; jumlah lantainya adalah desain.
+* **Pulau melayang:** *Liezi*, "Tang Wen", mitos Daois klasik di balik Penglai dalam xianxia: lima gunung yang hanyut,
+  termasuk Penglai dan Yingzhou, ditopang kepala lima belas kura-kura raksasa; kepala kura-kura berukir mengingatkan pada
+  kisah ini. **Rantainya** adalah permintaan pengguna dan arah seni, **bukan kanon**.
+* Tata letak tapak adalah arah seni dari arsitektur sungguhan ([20b.4](#20b4-gaya-bangunan-arah-seni)).
+
+### 20b.4 Gaya bangunan (arah seni)
+
+* **Atap melengkung bertingkat** dari tangga dan slab mengikuti aturan *juzhe* (paling curam 45°, supaya tidak tampak
+  seperti atap Jepang), dengan sudut yang terangkat dan bubungan berisi froglight. Jenis atap: pelana, xieshan, wudian,
+  piramida, oktagonal, bundar, dan rok atap pagoda. Aula penting beratap ganda.
+* **Pangkat atap:** A (asrama, dapur, kandang, serambi) genteng deepslate polos; B (gerbang, Aula Pendiri Templat 2–9,
+  Paviliun Kitab, aula alkimia, menara) genteng gelap bertepi **giok**; C/D (aula utama, Aula Pendiri Templat 1, aula
+  leluhur, pagoda, Aula Dao Langit) memakai **glasir** pilihanmu dengan tepi kuning dan emas.
+* **Glasir** dipilih saat mendirikan: **Tinta** (bawaan: genteng gelap bertepi kuning), **Giok** (tembaga teroksidasi
+  berlilin yang hijau), atau **Langit** (beton biru seperti Kuil Langit, bubungan lapis). Giok dan Langit memindahkan
+  sebagian besar tagihan Genteng atap ke Emas & Giok serta Pernis & Pewarna. Pagoda biasa mengikuti glasirmu; **Pagoda
+  Kaca** (Tujuh dan Sembilan Harta) selalu Giok berdinding putih, dan **Aula Dao Langit** selalu biru Langit.
+* **Bahan menurut peran:** tiang sinabar berpernis di atas alas tuf berukir, kayu bakau untuk ambang dan pintu, balok
+  berlukis dari papan warped, konsol (dougong) dari tangga warped, plester kuarsa halus, teras batu bata atau marmer putih
+  dengan pagar langkan, lantai dalam deepslate halus dengan karpet merah di poros, lentera gantung (rantai → shroomlight →
+  bibir slab sinabar), lentera tiang, lentera batu, panji merah bertepi kuning, dan pohon berdaun permanen.
+* **Anggaran warna per pandangan** (tanpa tanaman): sekitar 60% netral (batu, abu-abu atap, putih), 25% merah, 10% hijau
+  giok, paling banyak 5% emas.
+* **Tidak pernah dipakai:** blok yang jatuh (pasir, kerikil, bubuk beton), sulur dan lumut bercahaya, tebu dan kelp, api,
+  penangkal petir, redstone, labu berukir, spawner, peti (tong dipakai sebagai gantinya), dan makhluk (tanpa armor stand
+  atau bingkai).
+* **Malam hari:** jendela bercahaya (lampu tersembunyi di balik kisi), dan deretan lentera menandai poros serta tepi atap.
+
+**Sumber (arah seni, bukan kanon novel):** *Yingzao Fashi* dan *Gongbu Gongcheng Zuofa* (Qing); hewan atap dan cerat kepala
+naga Kota Terlarang; dinding kepala kuda gaya Hui; Guo Xi, *Linquan Gaozhi*; Ji Cheng, *Yuanye*; Menara Porselen Nanjing
+dan Pagoda Besi Kaifeng; Aula Doa Panen Baik (Kuil Langit); Istana Musim Panas (perahu marmer, serambi mendaki); Kuil
+Gantung Gunung Heng; jalan arwah makam Dinasti Ming; teras marmer tiga undak dan gentong air Kota Terlarang; pinus
+penyambut Huangshan. Kaitan cerita: bunga prem *Return of the Mount Hua Sect* dan kura-kura *Liezi* (di atas).
+
+### 20b.5 Mendirikan: pilih, pratinjau, konfirmasi
+
+**Layar Templat** (gulungan giok):
+* Kiri: 3 × 3 plakat giok, masing-masing dengan segel angka, nama, dan sketsa tinta dari atas. Tombol **1–9** memilih
+  templat.
+* Kanan, untuk templat terpilih: diagram besar dengan **sembilan manik giok** di bawahnya (klik manik atau gulir di diagram
+  untuk melihat tingkat demi tingkat), garis cakrawala di sepanjang poros, angka tapak, tinggi, jumlah bagian, seluruh
+  tagihan, barang khusus, perkiraan waktu dengan jumlah pekerjamu sekarang, bonus ukuran, dan ranah di papan.
+* Koin glasir **Tinta / Giok / Langit**, dan jimat **Lihat Tapak**, **Putar**, **Batal**.
+
+**Hologram tapak** (selama 120 detik; layar boleh ditutup):
+* tirai cahaya giok di tepi tapak setinggi 3 blok, dan tiang emas di sudut setinggi batas atas templat;
+* garis poros emas dengan label "Gerbang", dan garis teras pada ketinggian yang sudah disesuaikan dengan medan;
+* kotak tiap bagian dengan warna per tingkat (sampai tingkat yang dipilih manik), dan label nama bangunan utama;
+* tanda gali (jingga) dan timbun (biru) per petak 4 × 4, serta **X merah** di setiap penghalang;
+* panel HUD di kiri atas: "Pratinjau Tapak · Sekte Kelas Dua", "Gerbang: Selatan · 2 peringatan", "Tapak terpindai 78%"
+  dengan panah ke bagian yang belum terpindai, lalu "Siap dikonfirmasi" atau jumlah peringatan merah, serta sisa waktu.
+* Chat: "Pratinjau Tapak · … [Putar] [Konfirmasi] [Batal]".
+
+**Arah gerbang** utara, timur, selatan, atau barat. Bawaannya adalah sisi Prasasti tempat kamu berdiri.
+
+**Pemeriksaan tapak.** Konfirmasi hanya mungkin bila tidak ada yang merah dan tapak terpindai 100% (chunk dipindai saat
+termuat; berjalanlah berkeliling). Pemindaian hanya **membaca** dunia dan tidak pernah memuat chunk.
+
+| Pemeriksaan | Aturan | Tingkat |
+|---|---|---|
+| Dimensi | hanya Dunia Atas (Overworld) | merah |
+| Batas tinggi dunia | tapak tidak boleh menembus dasar atau atap dunia | merah: pasang Prasasti lebih tinggi/rendah |
+| Tapak lain | tapak + 16 blok tidak boleh menyentuh tapak sekte lain atau pameran; aturan 128 blok antar-Prasasti tetap | merah |
+| Perlindungan titik muncul | server khusus: tidak boleh bertumpuk | merah |
+| Desa | penduduk desa atau golem besi dalam tapak + 16, atau bagian desa di sel yang tersentuh | merah |
+| Bangunan dunia | desa, pos penjarah, kuil, igloo, rumah besar, monumen laut, benteng, kota kuno, ruang ujian, portal rusak berpeti di sel yang tersentuh (tambang terbengkalai diabaikan) | merah, disebut namanya |
+| Lava | lava di luar tapak di samping sel galian | merah; lava di dalam tapak menjadi timbunan |
+| Kecuraman | selisih tinggi ≤ batas templat | kuning > 75%, merah > 100% |
+| Pekerjaan tanah | gali + timbun ≤ batas templat (selalu ditulis: "Gali 12.400 · Timbun 3.100") | merah bila lebih |
+| Air | air permukaan ≤ 30% kolom dan ≤ 10% lebih dalam dari 6 (ditimbun dan ditagih) | kuning, merah bila lebih |
+| Tebing dan rongga | timbunan dibatasi 4–6 di bawah permukaan, dengan tutup batu 3 blok di atas gua dan jurang | kuning > 5%, merah > 15% |
+| Blok terlindung | di dalam kotak bangunan | merah: pindahkan atau hancurkan sendiri bila mau |
+| Wadah berisi barang | di dalam kotak bangunan | merah; kuning bila "Kosongkan" diizinkan |
+| Blok buatan pemain | di dalam kotak bangunan atau pekerjaan tanah | kuning: dilindungi, bangunan yang mengenainya menunggu |
+| Pohon alami | di petak bangunan | kuning: dikreditkan ke Gudang |
+| Pemindaian | belum 100% | konfirmasi mati |
+
+**Persetujuan.** Di samping ringkasan ada jimat centang: *"Aku paham: di dalam tapak, tanah dan tanaman alami akan
+diratakan dan dikreditkan ke Gudang Sekte; bangunanku dilindungi; daun alami di luar tapak bisa rontok."* Lalu **tahan**
+segel giok Konfirmasi 3 detik. Lewat chat: `/kultivasi aula bangun konfirmasi` menampilkan baris persetujuan dengan
+**[Ya, mulai bangun]**.
+
+**Saat dikonfirmasi:** tapak tersimpan (templat, arah, glasir, ketinggian pelataran, pindaian, ketinggian teras yang
+dibekukan, dan batas bangunan aula saat itu); upacara **Batu Pertama** berjalan (garis tapak berkilat, lonceng, kecubung,
+dan suar berbunyi, murid di wilayah berbalik dan membungkuk); Tingkat 1 masuk antrean, Misi Tingkat muncul, pencapaian
+*Batu Pertama* didapat, dan baris Catatan serta log server ditulis: `[Kultivator] Bangun: <pemilik> <templat> T1 -> N blocks`.
+
+**Ganti Templat gratis.** Sampai blok pertama terpasang, *Ganti Templat* (`/kultivasi aula bangun ganti`) membuka layar
+Templat lagi tanpa biaya: templat, arah, atau glasir apa pun. Setelah itu pilihanmu adalah Naik Templat, Bongkar, Pindah,
+atau Lepaskan ([20b.11](#20b11-naik-templat-bongkar-pindah-lepaskan)).
+
+**Apa yang terjadi pada blok yang sudah ada di tapak** (diperiksa lagi tepat saat dipasang, bukan hanya saat pindai):
+
+| Yang ada di sel itu | Yang terjadi |
+|---|---|
+| Sudah sama dengan rencana | dilewati; bagian bahannya dikembalikan |
+| Udara, rumput pendek atau tinggi, pakis, lapisan salju, semak mati | langsung dipasang; tanaman itu tidak menjatuhkan apa-apa |
+| Bunga | dikreditkan sebagai Flora, lalu dipasang |
+| Blok alami (batu, tanah, pasir, kerikil, bijih, pohon alami, salju, es, lumut, …) | **dipindahkan**: hasilnya dihitung seperti ditambang alat netherite tanpa pesona. Bahan curah masuk Gudang (bila *Pakai hasil galian* menyala); bijih, permata, logam mentah, dan sisanya masuk **Peti Galian** sebagai barang |
+| Cairan atau blok terendam | disegel lebih dulu (lihat di bawah) |
+| Blok buatan pemain | **terhalang**: bagian itu menunggu. Hanya bila *Bongkar & simpan* diizinkan, blok diambil dengan silk touch ke Peti Galian |
+| Wadah berisi barang | terhalang, kecuali *Kosongkan* diizinkan: isi dan wadahnya masuk Peti Galian |
+| Blok terlindung | terhalang; tidak pernah bisa diizinkan |
+| Makhluk hidup di tempat itu | ditunda dan dicoba lagi tiap 2 detik. Setelah 10 kali, pemain dalam 16 blok membaca "Keluarlah dari area kerja"; perahu, kereta tambang, armor stand, dan bingkai dihitung terhalang; setelah 30 kali semuanya dihitung terhalang |
+| Chunk belum termuat | bagian itu ditangguhkan (bahannya tetap dipesan) dan bagian termuat berikutnya dibuka |
+
+* **Alami** = tag `#kultivator:sect_natural`: batu dunia atas, tanah, pasir, kerikil, tanah liat, kalsit, tuf, dripstone,
+  sinabar dan belerang, bijih, terakota badlands, salju, es, lumut, rumput, pakis, bunga, tebu, kaktus, bambu, kelp,
+  lamun, jamur, labu, semangka, semak beri, akar bakau, lumpur, daun yang tidak permanen, dan batang pohon alami (seluruh
+  gugus batang dan daun dinilai saat pindai, jadi membersihkan daunnya dulu tidak mengubah batang menjadi "buatan pemain").
+* **Buatan pemain** = semua yang lain: papan, kaca, wol, obor, rel, redstone, ladang dan tanaman pangan, jalan tanah, daun
+  permanen, karpet. Blok yang dipasang oleh pembangun sekte sendiri selalu dihitung miliknya.
+* **Terlindung** (tag `#kultivator:sect_protected` dan `#kultivator:indestructible`): batuan dasar dan semua blok tak
+  tertambang, portal dan bingkainya, gerbang End, spawner, spawner ujian, vault, reinforced deepslate, budding amethyst,
+  suar, conduit, respawn anchor, Prasasti dan blok di bawahnya, lodestone formasi terdaftar, dan setiap block entity yang
+  tidak dipasang pembangun (kecuali wadah yang sengaja dikosongkan). Data pack bisa menambah kedua tag itu.
+
+**Pekerjaan tanah** dikerjakan per **lapisan mendatar**: gali dari atas ke bawah, timbun dari bawah ke atas, berputar di
+setiap lapisan (tidak pernah menyapu satu kolom sekaligus yang bisa menjatuhkan pemain atau murid). Tepi tapak dikerjakan
+dulu; dalam 2 blok dari tepi galian tidak pernah lebih rendah dari tanah di luar, dan sel itu menjadi dinding penahan.
+Kolom yang berisi blok buatan pemain (plus 2 blok di sekitarnya) tidak digali di bawahnya atau ditimbun di atasnya, dan
+dikelilingi dinding penahan. Cincin 3–6 blok di dalam tepi melandai ke tinggi tanah luar paling curam 1 : 1 dengan lumut,
+batu, dan pohon alami; di tempat yang lebih curam dibuat dinding penahan.
+
+**Cairan disegel lebih dulu.** Sebelum sel apa pun di tapak menjadi udara, setiap sel cairan di atau di samping galian
+(termasuk blok terendam) diganti blok timbunan zona itu. Cairan di luar tapak atau di chunk yang belum termuat membuat sel
+itu tidak pernah menjadi udara; ia menjadi dinding penahan. Air sekte dipasang sebagai sumber diam di kolam yang sudah
+tersegel; hanya air terjun yang mengalir, dan semuanya jatuh ke kolam sumbernya sendiri. Bila ada yang berenang di sel yang
+akan disegel, sel itu menunggu.
+
+**Sumber:** mendirikan sekte sendiri: *Martial Peak* (Yang Kai mendirikan High Heaven Palace); *Battle Through the Heavens*
+(Xiao Yan mendirikan Pan Men, lalu Xiao Gate). Pratinjau, persetujuan, dan segel yang ditahan adalah desain keamanan game,
+versi giok dari segel Mode Kehancuran.
+
+### 20b.6 Bahan, Gudang Bahan Sekte, dan Peti Galian
+
+Ada dua gudang, keduanya tampil di tablet Bangun dan terpisah dari Lumbung Sekte 27 petak ([24.2](#242-lumbung-sekte-hidangan-roh-dan-murnikan-herba)):
+* **Gudang Bahan Sekte:** catatan **sembilan bahan** plus barang khusus. Satu unit kira-kira satu blok penuh bahan itu saat
+  disetor; tiap kategori menampung sampai 1.000.000 unit. Kelebihannya menjadi barang di Peti Galian, jadi tidak ada yang
+  hilang.
+* **Peti Galian:** tempat barang hasil galian dan sisa yang tidak bisa menjadi unit (bijih, permata, logam mentah, isi
+  wadah yang dikosongkan, …). Tanpa batas dan tidak pernah menghapus apa pun; ambil satu tumpuk per klik di panel *Galian*.
+
+**Sembilan Bahan**
+
+| Bahan | Diterima (unit per buah) | Membayar |
+|---|---|---|
+| **Batu** | cobblestone, batu, andesit, granit, keluarga tuf, semua bata batu, batu halus, basal, batu pasir, batu End: 1; slab ½; tangga ¾; tembok 1 | alas, teras, lantai batu, tangga, dinding penahan |
+| **Tanah** | keluarga tanah, blok rumput, podzol, miselium, lumpur, lumpur padat, pasir, pasir merah, kerikil, pasir dan tanah jiwa: 1; netherrack ½ | timbunan dan tanah tanam (kebanyakan dibayar hasil galian) |
+| **Kayu** | batang kayu, kayu, batang jamur raksasa: 4; papan 1; balok bambu 2; slab kayu ½; tangga kayu ¾; tongkat atau bambu ¼ | balok, rangka, pintu, kisi |
+| **Genteng** | keluarga deepslate dan blackstone: 1; tanah liat 1, bola tanah liat ¼; balok bata 1, bata ¼; terakota 1; bata lumpur 1 | genteng atap, bubungan, lantai dalam |
+| **Kapur** | kalsit, diorit (apa pun), blok kuarsa, beton putih atau bubuknya, balok tulang, balok salju: 1; kuarsa ¼; tulang ⅓; bubuk tulang ⅑; bola salju ¼ | plester, marmer |
+| **Pernis & Pewarna** | keluarga sinabar 1 (slab ½, tangga ¾); pewarna apa pun 1; bit 1; beton merah, kuning, atau biru (atau bubuknya) 1; terakota merah, terakota berglasir merah, wol merah 1 | tiang berpernis, tembok istana, beton glasir |
+| **Flora** | bibit 1; daun ¼; bunga 1; bunga tinggi 2; daun teratai 1; blok lumut 1; karpet lumut ½; azalea 1; dripleaf 1; kelopak ¼; pakis atau rumput ¼; lamun ¼; spore blossom 2; semak kunang-kunang 1; serasah daun ¼; akar gantung ¼ | pohon, bedeng, pagar tanaman, teratai |
+| **Logam & Pelita** | batangan besi atau besi mentah 1; nugget ⅑; blok besi 9; rantai 1; lentera (biasa, jiwa, tembaga) 1; obor ¼; glowstone 1, debunya ¼; shroomlight 1; froglight 1; lentera laut 1; acar laut ½; lilin ½; jeruji besi ⅜ | rantai, lampu, perlengkapan |
+| **Emas & Giok** | batangan emas atau emas mentah 1; nugget ⅑; blok emas atau emas mentah 9; batangan tembaga atau tembaga mentah ½; blok tembaga 4½; tembaga potong atau berlilin (apa pun) 2; pecahan atau kristal prismarin ¼; prismarin 1; bata prismarin 2; prismarin gelap 2; zamrud 2, blok zamrud 18; lapis ½, blok lapis 4½; berlian 4; keluarga belerang ½ | sepuhan emas, hiasan dan kisi giok, glasir Giok dan Langit |
+
+Tongkat sihir, pedang, alat, dan barang lain di luar tabel **tidak pernah** diambil.
+
+**Biaya pasang** (menurut bahan, bukan peran): batu, bata, kuarsa, kalsit, sinabar, atau beton penuh dan tembok ½ unit
+kategorinya (tangga ⅜, slab ¼), karena tukang sekte meregangkan bahan curah 2 : 1; timbunan tersembunyi (inti teras,
+fondasi) ¼ Tanah atau Batu; papan dan kayu ½ Kayu (tangga ⅜, slab ¼, pagar ¼, pintu jebak ⅜, pintu 1, papan tulisan ½);
+daun ¼ Flora; bunga, azalea, dan daun teratai 1 Flora; lentera, shroomlight, froglight 1 Logam (rantai dan jeruji ½, lilin
+½); tembaga berlilin penuh, kisi, atau pintu jebak 2 Emas & Giok (tangga 1½, slab 1, jeruji dan rantai 1); bata prismarin
+2; blok emas atau emas mentah 9; belerang berpahat ½; blok lapis 4½; air dan udara gratis. Nilai setor barang yang jatuh
+dari blok sekte tidak pernah melebihi biaya pasangnya (diperiksa saat server mulai), jadi bahan berharga tidak bisa
+digandakan.
+
+**Barang khusus** (disetor 1 : 1 sebagai dirinya sendiri, tidak pernah dari unit, supaya kemajuan vanilla tetap berlaku):
+
+| Tingkat | Barang | Jumlah untuk Templat 1 → 9 |
+|---|---|---|
+| T1 | kuali (gentong air) | 2, 2, 4, 4, 4, 6, 6, 8, 8 |
+| T2 | smoker, api unggun | masing-masing 1 |
+| T3 | rak buku | 14, 16, 24, 32, 40, 48, 56, 64, 72 |
+| T3 | podium | 1 (Templat 1–4), 2 (Templat 5–9) |
+| T4 | kuali + api unggun jiwa (tungku alkimia) | masing-masing 1 (Templat 1–5), 2 (Templat 6–9) |
+| T4 | tempat meramu | 1, 1, 1, 2, 2, 2, 3, 3, 3 |
+| T5 | lodestone 1, crying obsidian 4, blok kecubung 4 | semua templat |
+| T5 | altar gerbang opsional: +1 lodestone dan +4 crying obsidian per altar | 2 (Templat 6), 4 (Templat 7–9) |
+| T6 | api unggun (ding) + 1 jerami (ding isyarat) | api unggun 1 (Templat 1–4), 2 (Templat 5–9) |
+| T7 | blok sasaran | 4, 4, 6, 8, 8, 10, 12, 12, 16 |
+| T7 | lonceng | Templat 2–9 |
+| T7 | tong (genderang) | Templat 3–9 |
+| T8 | kursi Qi tingkat 1: 4 blok kecubung | Templat 3 |
+| T8 | kursi Qi tingkat 2: 8 blok kecubung | Templat 4–6 |
+| T8 | kursi Qi tingkat 3: 8 blok kecubung + 4 batang End + 1 lodestone | Templat 7–9 |
+| T8 / T9 | batang End untuk puncak tiap pagoda | 1 per pagoda |
+| T9 | crying obsidian + api unggun jiwa per ruang menara | 3, 3, 4, 4, 5, 6, 6, 7, 7 |
+
+Barang khusus hanya diterima sebanyak yang masih dibutuhkan templat.
+
+**Menyetor:**
+* **Di Prasasti:** **jongkok + klik kanan sambil memegang bahan yang diterima** menyetor tumpukan yang dipegang. Klik kanan
+  biasa tetap membuka aula, dan jongkok dengan tangan kosong tetap "Pindahkan Aula", jadi berlian di tanganmu tidak pernah
+  tertelan tanpa sengaja. Actionbar: "+64 Batu · 412 / 1.570 (tingkat ini)", dan butir bahan mengalir ke Prasasti.
+* **Tablet Bangun → panel Bahan:** isi tasmu yang diterima tersusun per kategori dengan nilai unitnya. Klik = setor satu
+  tumpuk; shift-klik = semua barang itu. **Setor yang dibutuhkan** hanya mengambil apa yang masih dibutuhkan tingkat ini dan
+  berikutnya; **Setor dari tas** mengambil semua yang diterima; **Ambil dari Lumbung** memindahkan bahan yang diterima dari
+  Lumbung Sekte (yang tidak muat kembali ke Lumbung atau Peti Galian).
+* **Lewat chat:** `/kultivasi aula bangun setor` (tumpukan di tangan), `setor semua`, `setor butuh`.
+* Setoran sebagian selalu boleh. **Setoran tidak memberi PK** dengan sendirinya; PK datang dari misi
+  ([20b.8](#20b8-misi-pembangunan-dan-ekspedisi-pengumpulan)) dan Kantor Misi.
+
+**Pakai hasil galian** (koin di panel *Galian*, bawaan menyala): batu, tanah, kayu, dan bunga hasil galian langsung
+membayar tagihan dengan nilai setornya. Bila dimatikan, semuanya disimpan sebagai barang di Peti Galian. Di lereng bukit,
+hasil galian biasanya menutup sebagian besar Batu dan Tanah; baris tagihan menulis perkiraannya, misalnya "Batu 1.570
+(galian ±900)".
+
+**Sisa bahan.** Batu, Tanah, dan Kayu yang **melebihi seluruh sisa tagihan templat** bisa diambil kembali 1 : 1 sebagai
+cobblestone, tanah, atau papan ek, satu tumpuk per klik. Tidak ada penarikan lain.
+
+**Tagihan.** Angka nyata selalu dihitung dari rencananya sendiri: layar Templat, panel Bahan, dan `uji sekte info <n>`
+menampilkannya. Sasaran rancangan seluruh templat (glasir Tinta, sebelum kredit galian) kira-kira 3.240 unit (Templat 1),
+6.350, 10.170, 15.850, 21.090, 29.430, 36.440, 51.820, sampai 65.230 unit (Templat 9). Tingkat 1–3 sengaja berbiaya mirip
+di semua templat, jadi Tingkat Aula 3 datang dengan kecepatan serupa. Rencana yang sekarang masih lebih murah daripada
+sasaran itu (lihat [20b.18](#20b18-yang-belum-ada-atau-berbeda)).
+
+**Sumber:** *A Record of a Mortal's Journey to Immortality*, bab 153: Aula Yue Lu menyimpan dan memasok bahan; inilah
+Gudang. Kategori, angka, dan biaya adalah desain game.
+
+### 20b.7 Pembangunan otomatis dan laju
+
+**Satu bagian sekaligus, dibayar penuh.** Sebuah bagian (komponen) baru mulai saat **seluruh** tagihannya bisa dipesan dari
+Gudang, dan hanya satu bagian per tapak yang terbuka. Jadi sekte tidak pernah berdiri setengah jadi menunggu bahan. Begitu
+tagihan bagian berikutnya tertutup, ia mulai sendiri; bagian lain di tingkat yang sama mengikuti urutannya
+(`prioritas <bagian>` memajukan satu bagian). Bahan yang dipesan tetapi tidak terpakai (sel yang ternyata sudah benar,
+bagian yang dilewati atau dibatalkan) kembali tepat sebesar sisanya.
+
+**Status** di tablet dan HUD: *Berjalan*, *Menunggu bahan: Kayu 120*, *Jeda: pemilik jauh*, *Terhalang: 14 blok*,
+*Menunggu: belum dimuat*, *Jeda: server sibuk*, *Jeda*, *Jeda: Prasasti tidak di tempatnya*, *Jeda: Mode Kehancuran sedang
+berjalan*, *Sekte telah lengkap*.
+
+**Menunggu bahan.** Tablet menulis "‹bagian› masih kurang:" dengan batang per bahan, HUD di dekat Prasasti "Masih kurang:
+32 Batu, …" dengan petunjuk "Jongkok + klik kanan Prasasti untuk menyetor", dan chat (paling sering tiap 10 menit) "Menunggu
+bahan: … [Setor yang dibutuhkan]".
+
+**Terhalang.** Bila blok buatanmu, wadah berisi, atau blok terlindung menghalangi, chat menulis "Terhalang: N blok
+menghalangi ‹bagian›" dengan tiga tombol, dan X merah berkilau di blok itu tiap 5 detik selama 30 detik. Pembangunan
+melanjutkan bagian lain; blok terhalang diperiksa ulang tiap 30 detik.
+* **[Periksa ulang]** — periksa sekarang (misalnya setelah kamu memindahkan peti).
+* **[Lewati bagian ini]** — bagian itu dilewati; bahannya yang belum terpakai kembali ke Gudang.
+* **[Selesaikan tanpa blok terhalang]** — bagian itu dianggap selesai tanpa sel yang terhalang.
+
+**Kapan pembangunan berjalan:**
+* aula aktif dan Prasasti berdiri di sel jangkarnya, di chunk yang termuat (bila chunk Prasasti tidak termuat, status
+  menjadi "Jeda: Prasasti tidak di tempatnya");
+* kamu (atau di LAN saudara sekte) daring di dimensi yang sama dalam **160 blok** mendatar dari Prasasti
+  (`sectBuildRange`; sudut terjauh Templat 9 berjarak 128);
+* chunk tujuannya sudah termuat. Pembangunan **tidak pernah memuat paksa chunk**, dan berhenti selama Mode Kehancuran
+  bekerja.
+
+**Laju:**
+
+```
+laju (blok/detik) = (6 + 3 × (S − 1)) × sectBuildSpeed × (1 + 0,25 × pekerja aktif) × (2 bila ada tabungan) × faktor server
+faktor server: rata-rata MSPT < 30 ms → 1 · 30–40 ms → 0,5 · ≥ 40 ms (sectBuildMsptPause) → berhenti
+```
+
+S adalah nomor templat (Templat 1 = 6 blok/detik, Templat 9 = 30 blok/detik). Blok dipasang bergelombang tiap 4 tick, dan
+satu anggaran bersama dipakai untuk semua tapak. Sel yang sudah benar hanya menghabiskan 0,1 langkah. Bila komputermu
+terus di bawah 30 FPS selama 5 detik, laju tapakmu turun setengah (`sectBuildFpsHint`).
+
+**Tabungan waktu.** Saat bagian yang sudah dibayar dan terbuka hanya menunggu karena kamu jauh, waktunya ditabung sampai
+24.000 tick (`sectBuildBankTicks`). Waktu tabungan menggandakan laju sampai habis. Tidak ada yang ditabung saat tapak
+menunggu bahan. **Di pemain tunggal, alt-tab (misalnya ke Valorant) menjeda permainan**, jadi tidak ada yang dibangun dan
+tidak ada yang ditabung.
+
+**Perkiraan lama pembangunan** (saat kamu hadir; rancangan, tanah datar .. lereng):
+
+| Templat | Laju dasar (blok/detik) | Langkah | Menit dengan laju dasar | Dengan 4 pekerja | + tabungan |
+|---|---:|---|---|---|---|
+| 1 | 6 | 8 rb .. 10 rb | 22 .. 28 | 11 .. 14 | 6 .. 7 |
+| 2 | 9 | 16 rb .. 20 rb | 30 .. 37 | 15 .. 19 | 8 .. 9 |
+| 3 | 12 | 27 rb .. 34 rb | 38 .. 47 | 19 .. 24 | 10 .. 12 |
+| 4 | 15 | 42 rb .. 53 rb | 47 .. 59 | 24 .. 30 | 12 .. 15 |
+| 5 | 18 | 60 rb .. 77 rb | 56 .. 71 | 28 .. 36 | 14 .. 18 |
+| 6 | 21 | 90 rb .. 115 rb | 71 .. 91 | 36 .. 46 | 18 .. 23 |
+| 7 | 24 | 120 rb .. 155 rb | 83 .. 108 | 42 .. 54 | 21 .. 27 |
+| 8 | 27 | 160 rb .. 215 rb | 99 .. 133 | 50 .. 67 | 25 .. 33 |
+| 9 | 30 | 220 rb .. 290 rb | 122 .. 161 | 61 .. 81 | 31 .. 40 |
+
+Rencana sekarang di tanah datar sedikit lebih kecil (misalnya Istana Langit sekitar 177 ribu langkah, kira-kira 100 menit
+dengan laju dasar). Angka persisnya tampil di layar Templat dan `uji sekte info <n>`. Yang sebenarnya membatasi adalah
+mengumpulkan bahan; pemasangan hanya cukup lambat untuk ditonton. `sectBuildSpeed` (sampai ×4) dan perintah uji
+mempercepatnya.
+
+**Sumber:** desain game.
+
+### 20b.8 Misi Pembangunan dan Ekspedisi Pengumpulan
+
+**1. Misi Tingkat.** Setiap baris tagihan tingkat yang sedang dibangun adalah misi tetap, misalnya "Kumpulkan 1.570 Batu"
+atau "Serahkan 1 Lodestone". Misi selesai sendiri saat Gudang menutup baris itu, dan membayar **sekali** per (templat,
+tingkat, baris) ke kas PK sekte sebanyak `min(30, ⌈unit × laju⌉)`:
+
+| Bahan | Laju PK per unit |
+|---|---:|
+| Batu, Tanah | 0,02 |
+| Kayu | 0,03 |
+| Genteng, Kapur, Pernis & Pewarna, Flora | 0,05 |
+| Logam & Pelita | 0,1 |
+| Emas & Giok | 0,25 |
+| Barang khusus | 5 per buah (lodestone 20) |
+
+Saat tingkat ini sudah tertutup, baris tingkat berikutnya tampil sebagai "Persiapan".
+
+**2. Tawaran harian** (panel *Misi*, diacak saat matahari terbit): `3 + ⌊(S − 1)/3⌋` tawaran (3, 4, atau 5), dipilih
+menurut kekurangan tingkat sekarang (atau tingkat berikutnya bila yang sekarang sudah tertutup).
+* **Setoran** (60%): "Bawa 96 Kayu". Jumlahnya 20–35% dari kekurangan, dibulatkan ke tumpukan, antara 16 dan 1.024. Klik
+  *Terima*; setoran kategori itu olehmu atau saudara sekte sejak saat itu dihitung. Hadiah: PK kas `⌈jumlah × 2 × laju⌉`
+  (paling banyak 60 per tawaran) plus **Berkah Pengrajin**: bonus 20% dari jumlahnya sebagai unit. Surplus yang kamu ambil
+  dari Gudang harus disetor kembali dulu sebelum setoran dihitung untuk tawaran.
+* **Ekspedisi Berkah** (40%): hasil Ekspedisi Pengumpulan kategori itu ×1,5 hari ini.
+* **Batas harian:** 150 PK kas dari misi pembangunan (terpisah dari 300 milik Kantor Misi); baris yang melewati batas
+  menunggu hari berikutnya.
+* Saat templat lengkap: tidak ada tawaran lagi; panel menulis "Sekte telah lengkap".
+* Pembangunan Sekte **tidak memberi ketenaran**; ketenaran tetap hanya dari murid-muridmu ([20.4](#204-ketenaran)).
+
+**3. Ekspedisi Pengumpulan** (selalu tersedia, hanya data; tidak ada yang menggali di dunia). Di panel *Misi* pilih
+*Ekspedisi Pengumpulan*, sebuah kategori, 1–3 murid bebas, dan lama perjalanan, lalu *Kirim regu*. Murid pergi dengan awan
+langkah dan pulang di samping Prasasti.
+
+| Bahan | Siapa boleh pergi | Kesulitan | Hasil dasar (perjalanan pendek) |
+|---|---|---:|---:|
+| Batu, Tanah | semua jenjang, termasuk Tercatat | 0 | 48 |
+| Kayu | semua jenjang | 0 | 32 |
+| Flora | semua jenjang | 0 | 16 |
+| Genteng | Murid Luar ke atas | 1 | 24 |
+| Kapur | Murid Luar ke atas | 1 | 16 |
+| Pernis & Pewarna | Murid Luar ke atas | 1 | 12 |
+| Logam & Pelita | Murid Luar ke atas, minimal Pemurnian Qi | 2 | 8 |
+| Emas & Giok | Murid Dalam ke atas | 4 | 3 |
+
+* **Lama:** pendek 6.000 tick (5 menit) atau panjang 24.000 tick (20 menit, hasil ×4,5).
+* **Hasil:** `dasar × (1 + 0,4 × P)`, dengan P = kekuatan regu (kekuatan terbesar + 0,5 × jumlah kekuatan anggota lain;
+  kekuatan seorang murid ≈ nomor ranahnya ditambah tahap, tingkat, dan bintang).
+* **Peluang berhasil:** `0,75 + 0,05 × (P − kesulitan)`, dibatasi 30%–98%. Gagal = regu hanya membawa 30% hasil dan pulang
+  dengan separuh nyawa. Tidak pernah mati, tidak pernah Penyimpangan Qi.
+* **Hadiah murid:** PK 3 (pendek) atau 10 (panjang) × `(1 + kesulitan/4)` (separuhnya bila gagal), plus 3% atau 8% bar
+  kultivasi.
+* **Regu sekaligus:** `1 + ⌊(S − 1)/3⌋`. Murid yang sedang mengumpulkan tidak memegang tugas, pos pekerja, atau ekspedisi
+  lain. Selama pergi, Jenjang menulis mereka "mengumpulkan bahan".
+* Regu pertama yang pulang memberi pencapaian *Ekspedisi Bahan Pertama*.
+
+**Sumber:**
+* Misi setoran yang dibayar jasa: *A Will Eternal*, bab 9 dan 27 (Kantor Misi membayar poin jasa untuk tanaman roh yang
+  diserahkan); *Martial Peak*, Aula Kontribusi.
+* Perjalanan mengumpulkan bahan: *Battle Through the Heavens*, perjalanan ke Pegunungan Binatang Ajaib; *Soul Land*,
+  perjalanan berpengawal ke Hutan Besar Bintang Dou dan Hutan Pemburu Roh.
+
+### 20b.9 Murid sebagai Pekerja Bangunan
+
+* Sampai **4 murid** jenjang apa pun bisa diangkat di panel *Pekerja* (klik murid bebas; klik pekerja untuk melepasnya),
+  atau semua sekaligus dengan `uji sekte pekerja`. Murid yang bertugas, pergi, atau punya kegiatan lain harus dilepas dulu.
+* Pekerja berjalan ke **titik kerja** di tepi bagian yang sedang dibangun (titik itu berpindah tiap 20 detik dan pada tiap
+  bagian baru). Bila jalannya macet 10 detik, ia melompat ke sana dengan awan langkah. Pekerja hanya bertarung bila dipukul.
+* **Efek:** laju +25% untuk setiap pekerja dalam 24 blok dari bagian yang terbuka (4 pekerja = ×2).
+* **Tampilan:** mengayunkan tangan tiap 15–25 tick dengan debu bahan dan benang qi emas ke lapisan kerja.
+* **Hadiah:** +1 PK per 2.400 tick bekerja (paling banyak 30 sehari) dan 0,5 kultivasi per menit.
+* Saat tapak dijeda atau menunggu bahan, pekerja bermeditasi di pelataran (cincin sekitar 3 blok dari Prasasti).
+* Empat pekerja sekaligus memberi pencapaian *Seribu Tangan*.
+
+**Sumber:** adaptasi model tugas harian *Renegade Immortal* (gentong air Wang Lin) dan *A Will Eternal* (Dapur). Tidak ada
+kanon tentang pekerjaan membangun yang diklaim.
+
+### 20b.10 Pengembalian bahan, ledakan, dan Periksa & Perbaiki
+
+* **Membongkar blok sekte** (`sectBuildBreakRefund`, bawaan menyala): pecahan vanilla dibatalkan, blok itu dan blok sekte
+  yang bergantung padanya (lentera, pintu, tanaman, apa pun yang menempel di keenam sisinya) diangkat, dan biaya pasangnya
+  kembali ke Gudang pemilik tapak: kepulan giok dan actionbar "+0,5 Batu kembali ke Gudang Bahan Sekte". Berlaku juga di
+  Kreatif, tanpa XP. Blok sekte tidak pernah menjadi barang, jadi biaya curah 2 : 1 tetap aman. Catatan aula menulis
+  (dibatasi) "Sebuah blok sekte dibongkar oleh ‹pemain›". Blok itu ditandai "dibongkar pemain" dan tidak dipasang lagi
+  sendiri.
+* **Ledakan** (`sectBuildExplosionCredit`): blok sekte yang benar-benar dihancurkan ledakan tidak menjatuhkan barang dan
+  biaya pasangnya dikreditkan. Wind charge dan Wind Burst tidak mengambil blok sekte. Bila tapaknya sudah tidak ada,
+  ledakan berjalan seperti vanilla.
+* **Kebocoran kecil yang diterima:** blok sekte yang didorong piston lalu ditambang di luar tapak jatuh seperti biasa.
+* **Periksa & Perbaiki** (`/kultivasi aula bangun perbaiki` atau panel *Templat*): bagian yang sudah selesai diperiksa di
+  latar belakang ("Memeriksa N bagian…", server tidak membeku), dan hasilnya datang di chat. Sel yang menjadi udara padahal
+  rencana punya blok, dan tidak ditandai "dibongkar pemain", diperbaiki dengan biaya dan laju biasa. Sel yang kamu ganti
+  dengan blok lain dihitung "diubah pemain" dan dibiarkan. Perbaikan otomatis **mati**, jadi pintu yang kamu buka sendiri
+  tidak pernah ditutup lagi.
+* **Tanpa monster di sekte** (`sectBuildSpawnProof`): monster tidak muncul secara alami di atas sel sekte; di luar tapak
+  tetap muncul. Setiap permukaan, termasuk atap, juga diberi cahaya.
+
+**Sumber:** gambaran sekte yang diselubungi formasi: *A Record of a Mortal's Journey to Immortality*, bab 153, Aula Yue Lu
+diselubungi formasi. Aturan pengembalian dan sisa bahan adalah desain game.
+
+### 20b.11 Naik Templat, Bongkar, Pindah, Lepaskan
+
+**Naik Templat** ke templat mana pun yang lebih besar, di Prasasti dan arah yang sama (`/kultivasi aula bangun naik <2-9>`
+atau panel *Templat*). Pratinjau memakai arah dan glasir lama (tanpa Putar).
+* Tapak baru memuat tapak lama. Pemeriksaan mencakup cincin baru dan blok buatan pemain; sel sekte lama dihitung milik
+  sekte.
+* Gaya templat berbeda, jadi rencana baru dibangun dari T1-nya sendiri. **Bangunan lama tetap berdiri dan berfungsi** sampai
+  sebuah bangunan baru membutuhkan tempatnya; sebelum itu sel lama di kolom bangunan baru diturunkan dari atas ke bawah
+  dengan pengembalian penuh untuk setiap sel yang masih sesuai rencana.
+* **Tingkat dijamin** = tingkat lama, sampai rencana baru mencapainya, jadi Tingkat Aula tidak turun. Fungsi formasi dan
+  menara bisa jeda sebentar selama pergantian; lodestone baru harus didaftarkan lagi.
+* Biayanya adalah tagihan rencana baru. Saat rencana baru mencapai tingkat lama: chat "Naik Templat selesai" dan pencapaian
+  *Melampaui Tapak Lama*.
+
+**Bongkar** (panel *Templat* dengan klik dua kali, atau `/kultivasi aula bangun bongkar bangunan|total` lalu **[Ya,
+bongkar]**): urutan terbalik dengan laju biasa, pengembalian 100% untuk setiap sel yang masih sesuai rencana.
+* **Bongkar bangunan** mempertahankan bentuk lahan (timbunan, dinding penahan, lantai batu): lahan teras yang bisa dibangun
+  lagi.
+* **Bongkar total** juga membongkar lantai batu dan tembok.
+* Tanah asli **tidak** dipulihkan di tapak sungguhan; kreditnya sudah menggantikannya. Tingkat turun selangkah demi
+  selangkah; di akhir templat dikosongkan dan aula kembali memindai bangunan buatanmu.
+
+**Pindah.** Dengan templat, memasang Prasasti di tempat lain lalu jongkok + klik kanan dengan tangan kosong membuka dialog
+**[Pindah & bongkar] [Pindah & tinggalkan] [Batal]** (bukan pindah langsung; jeda sekali per hari dari [20.2](#202-mendirikan-memindahkan-dan-membangunkan-aula) tetap berlaku). Selama dialog, pembangunan berhenti.
+* **Pindah & bongkar:** tapak lama dibongkar dengan pengembalian penuh selama kamu di dekatnya (juga setelah restart). Tapak
+  baru melalui pendirian biasa; layar Templat terbuka.
+* **Pindah & tinggalkan:** bangunan lama tetap berdiri sebagai blok biasa; pengembalian saat dibongkar berhenti di sana dan
+  tapaknya dilepas.
+* Keduanya menjamin tingkat lama selama **10 hari game** atau sampai tercapai.
+* Menambang Prasasti membuat aula tertidur dan pembangunan berhenti; memasangnya lagi **di sel jangkarnya** melanjutkan.
+
+**Lepaskan Templat** (`/kultivasi aula bangun lepaskan` lalu `ya` dalam 30 detik, atau koin di panel *Templat* yang diklik
+dua kali): seperti "Pindah & tinggalkan" tanpa pindah. Bangunannya tetap berdiri sebagai blok biasa, dan Tingkat Aula
+kembali ke pemindaian bangunan.
+
+**Sumber:** tumbuh melewati tingkatan: *Martial Peak* (High Heaven Pavilion → High Heaven Palace → High Heaven Cave
+Heaven); *Battle Through the Heavens* (Pan Men → Xiao Gate → Aliansi Yan). Lahan teras runtuh yang bisa dibangun lagi:
+*Perfect World*, bab 551/558, Paviliun Penambal Langit yang runtuh.
+
+### 20b.12 Tingkat Aula dan fitur aula
+
+Dengan templat, pemindaian bangunan 30 detik dari [20.3](#203-tingkat-aula-dan-bangunan) dilewati (lebih hemat CPU), dan
+batas bangunan aula menjadi:
+
+```
+batas bangunan = max(batas pindai beku, tingkat pembangunan, tingkat dijamin)
+Tingkat Aula   = min(tingkat dari ketenaran, max(2, batas bangunan))
+```
+
+*Batas pindai beku* adalah hasil pindai aulamu tepat sebelum konfirmasi, jadi aula yang sudah terpindai sampai batas 6
+tidak turun karena memilih templat. Tingkat pembangunan hanya dihitung selama Prasasti berdiri di sel jangkarnya.
+
+| Fitur | Aturan |
+|---|---|
+| Paviliun Kitab / Aula Latihan / Menara Langit Membara | dihitung terpenuhi sejak T3 / T7 / T9 |
+| Formasi Agung | cakram T5 dipasang belum aktif; daftarkan lodestone-nya dengan serpihan kecubung ([17](#17-formasi-pelindung)) |
+| Menara Langit Membara | ruang-ruang T9 berada dalam bola 32 blok menara dan dihitung sebagai lantai ([25.7](#257-menara-langit-membara)) |
+| Wilayah sekte | radius = `max(20 + 4 × Tingkat Aula, radius templat)` (tabel di [20b.2](#20b2-sembilan-templat)); beda tinggi ≤ 32 tetap |
+| Batas murid | +1 untuk Templat 5–9 setelah Tingkat 9 |
+| Calon | +1 per kedatangan (Templat 6–9, sejak Tingkat 7); calon datang di poros sekte, 8–15 blok di depan Prasasti |
+| Pos tugas | memakai titik tugas di samping sumur, dapur, kebun, dan kandang sekte bila sudah ada; tanpa itu tetap 4 sel berjarak 5 blok dari Prasasti |
+| Mode Kehancuran | zona terlindung juga mencakup seluruh tapak + 16 blok |
+| Tablet Aula dan `/kultivasi aula info` | daftar centang Bangunan diganti baris status, misalnya "Sekte Kelas Dua · Tingkat 4/9 · Berjalan" |
+
+**Sumber:** seperti [20.3](#203-tingkat-aula-dan-bangunan) (Aula Yue Lu, Paviliun Sihir, lapangan latihan Gunung Hua,
+menara Langit Membara). *Return of the Mount Hua Sect*: sekte tumbuh dalam batu, sementara ketenarannya datang dari
+kemenangan. *Perfect World*, bab 551/558: membangun kembali untuk naik.
+
+### 20b.13 Tablet Bangun, layar Templat, dan HUD
+
+**Tablet Bangun** (tablet kedua gulungan aula, setelah Aula; muat di jendela 320 × 240):
+* **Kiri:** diagram tapak sampai 120 piksel. Bagian selesai berwarna penuh, yang sedang dibangun bertepi emas berdenyut
+  dengan persen, yang menunggu bergaris tinta tipis, yang terhalang bersegel merah, dan tingkat mendatang samar. Arahkan
+  kursor untuk nama, tingkat, keadaan, dan tagihan.
+* **Kanan:** judul "Tingkat 4/9 · Tembok dan Air", **tangga tingkat** yang digambar sebagai jalan gunung sembilan teras,
+  batang bagian yang sedang dibangun, baris laju ("≈ 22 blok/detik · 3 pekerja · ×2 tabungan"), baris status, dan batang
+  "masih kurang".
+* **Kolom segel di tepi kanan** memilih panel:
+
+| Panel | Isi |
+|---|---|
+| Ikhtisar | tingkat, bangunan yang sedang dikerjakan, laju, apa yang masih kurang |
+| Bahan | batang tagihan bambu per kategori (tingkat ini, dan garis tipis tingkat berikutnya), barang khusus, kisi setor tas, *Setor yang dibutuhkan*, *Setor dari tas*, *Ambil dari Lumbung* |
+| Misi | Misi Tingkat, tawaran harian, Ekspedisi Pengumpulan dan regu yang pergi |
+| Pekerja | sampai 4 pekerja dan keadaannya |
+| Galian | Peti Galian, sisa bahan, koin *Pakai hasil galian*, *Bongkar & simpan*, *Kosongkan* |
+| Templat | Naik Templat, Periksa & Perbaiki, Bongkar, Bongkar total, Lepaskan, Ganti Templat, daftar penghalang (*Periksa ulang*, *Lewati*, *Selesaikan saja*), antrean dengan *Prioritaskan*, batas bangunan beku dan tingkat dijamin, riwayat |
+| Penyumbang | saudara sekte yang menyumbang (hanya di LAN) |
+
+* Tanpa templat, tablet menampilkan jimat *Pilih Templat* yang berdenyut dan koin kecil *Bangun Sendiri*.
+* Koin *Jeda* menjeda dan melanjutkan. Tombol berbahaya (Bongkar, Lepaskan) butuh dua klik (bingkai koin berdenyut merah).
+
+**HUD:** saat pratinjau, panel giok kecil berisi templat, arah gerbang, peringatan, persen pindaian, dan panah ke bagian
+yang belum terpindai. Di dekat tapak: templat dan tingkat, bangunan yang sedang dibangun, dan "Masih kurang: …" dengan
+petunjuk setor. F1 menyembunyikannya.
+
+**Bantuan:** tab Bantuan gulungan kultivasi punya topik **Pembangunan Sekte** (termasuk jeda alt-tab, pengecualian tapak,
+dan pengembalian bahan).
+
+**Sumber:** gaya gulungan giok DESIGN 5b.
+
+### 20b.14 Tampilan dan suara
+
+Semua efek hanya partikel dan garis di komputermu, ikut Kualitas Efek; di **Minimal** kabut kerja dan lautan awan mati dan
+partikel berkurang. Suara dimainkan server.
+* **Saat membangun:** remah blok dari blok yang dipasang dan satu percik giok per pemasangan, suara blok itu sendiri dengan
+  pelan (paling banyak 5 per detik), bingkai kawat emas samar dan label "Paviliun Kitab · 63%" pada bagian yang terbuka
+  dalam 64 blok, cincin **kabut kerja** tipis di lapisan yang sedang dikerjakan (juga melembutkan tampilan setengah jadi),
+  dan benang qi emas dari setiap pekerja.
+* **Bagian selesai:** semburan kelopak ceri di sepanjang garis atapnya, letupan emas, denting kecubung, actionbar
+  "Paviliun Kitab selesai".
+* **Tingkat selesai (10 detik):** murid di wilayah berbalik dan membungkuk; 3 lonceng (9 saat sekte lengkap); pilar cahaya
+  emas dari aula utama; bola lentera naik dari bangunan yang selesai; pita emas di sepanjang poros; hujan emas; judul
+  "Sekte ‹nama› · Tingkat 5 — Formasi Agung"; baris chat sekte, toast, Catatan, dan pencapaian.
+* **Sekte lengkap:** versi agung upacara tingkat, plus baris server untuk Templat 5 ke atas.
+* **Batu Pertama:** garis tapak berkilat sekali, lonceng, kecubung, dan suar.
+* **Lainnya:** debu saat membongkar, X merah berkilau di blok terhalang, butir bahan yang mengalir ke Prasasti saat
+  menyetor, kepulan giok saat pengembalian, dan **lautan awan** putih lembut di lembah Templat 6–9 sejak Tingkat 8.
+* Pameran dan tapak uji tidak pernah memberi pencapaian atau baris server.
+
+**Sumber:** desain game. Kelopak bunga menggemakan motif prem *Return of the Mount Hua Sect*.
+
+### 20b.15 Multipemain (LAN) dan penyumbang
+
+* Satu tapak milik satu pemain. Tapak lain harus berjarak 16 blok dari tapakmu, dan aturan 128 blok antar-Prasasti tetap
+  berlaku.
+* **Saudara satu `/sekte`** membuka tablet Bangun milikmu dalam mode baca saja (tombol pemilik mati) dan **boleh menyetor**,
+  di Prasasti (jongkok + klik kanan) maupun lewat tablet. Kehadiran mereka dalam jangkauan juga menjalankan pembangunan,
+  dan mereka melihat HUD tapak di dekatnya.
+* Setiap sumbangan dicatat di panel **Penyumbang**, dan chat sekte menulis ucapan terima kasih (paling sering sekali per
+  menit per penyumbang). Penyumbang mendapat pencapaian *Penyumbang Sekte*.
+* **Bongkar & simpan** dan **Kosongkan** hanya berlaku di pemain tunggal tanpa LAN, atau bila operator menyalakannya. Begitu
+  dunia dibuka ke LAN, izin yang dinyalakan tanpa operator tidak berlaku lagi, supaya tapak tidak bisa dipakai membongkar
+  rumah tetangga.
+* Siapa pun yang membongkar blok sekte mengembalikan bahannya ke Gudang pemilik tapak. Mod ini bukan mod klaim lahan dan
+  tidak menambah perlindungan wilayah.
+
+**Sumber:** *A Record of a Mortal's Journey to Immortality*, bab 153 (Aula Yue Lu menyimpan dan memasok bahan); *Return of
+the Mount Hua Sect*: sebuah serikat pedagang Xi'an mulai mendukung Gunung Hua setelah rombongan Chung Myung menyembuhkan
+Tetua Hwang Mun-yak, dan Hwang Mun-yak menyatakan dirinya penyokong Gunung Hua. Dari sinilah setoran saudara sekte dan
+daftar penyumbang.
+
+### 20b.16 Perintah
+
+**Pemain** (`/kultivasi aula bangun …`):
+
+| Perintah | Fungsi |
+|---|---|
+| `/kultivasi aula bangun` | Status: templat, tingkat, bagian yang sedang dibangun dan persennya, laju, kekurangan, dan tombol [Setor yang dibutuhkan] |
+| `… templat` | Membuka layar Templat |
+| `… pratinjau <1-9> [utara\|timur\|selatan\|barat] [tinta\|giok\|langit]` | Pratinjau dari chat. Contoh: `/kultivasi aula bangun pratinjau 3 timur giok` |
+| `… putar` | Memutar gerbang ke sisi berikutnya |
+| `… konfirmasi` lalu `… konfirmasi ya` | Menampilkan baris persetujuan dengan [Ya, mulai bangun]; `ya` mengonfirmasi |
+| `… batal` | Membatalkan pratinjau |
+| `… ganti` | Ganti Templat (gratis sebelum blok pertama terpasang) |
+| `… sendiri` | Bangun Sendiri: aula tetap memindai bangunan buatanmu |
+| `… setor` / `setor semua` / `setor butuh` | Menyetor tumpukan di tangan / semua bahan yang diterima di tas / hanya yang masih dibutuhkan tingkat ini dan berikutnya |
+| `… jeda` / `… lanjut` | Menjeda / melanjutkan pembangunan |
+| `… prioritas <bagian>` | Memajukan bagian itu ke depan tingkatnya (Tab menyarankan nama bagian). Contoh: `/kultivasi aula bangun prioritas t3_scripture` |
+| `… lewati <bagian>` | Lewati bagian ini; bahannya yang belum terpakai kembali |
+| `… tanpa-terhalang <bagian>` | Selesaikan bagian itu tanpa blok yang terhalang |
+| `… periksa-ulang` | Memeriksa ulang blok terhalang sekarang |
+| `… naik <2-9>` | Pratinjau Naik Templat. Contoh: `/kultivasi aula bangun naik 5` |
+| `… perbaiki` | Periksa & Perbaiki |
+| `… bongkar bangunan` / `bongkar total` (lalu `… ya`) | Bongkar, dengan konfirmasi |
+| `… lepaskan` (lalu `lepaskan ya`) | Lepaskan Templat, dengan konfirmasi |
+| `… pindah bongkar` / `pindah tinggalkan` / `pindah batal` | Pilihan dialog pemindahan aula |
+
+**Debug** (operator, `/kultivasi debug aula bangun …`):
+
+| Perintah | Fungsi |
+|---|---|
+| `tingkat-set <0-9>` | Mengatur penghitung tingkat saja, untuk menguji kaitan dengan Tingkat Aula. Contoh: `/kultivasi debug aula bangun tingkat-set 7` |
+| `komponen selesai` | Menyelesaikan bagian yang terbuka sekarang (dengan laju instan, tetap menghormati semua jeda) |
+| `bank <tick>` | Mengatur tabungan waktu (0–72.000). Contoh: `/kultivasi debug aula bangun bank 24000` |
+| `rencana ulang` | Menyusun ulang rencana tapak ke versi rencana terbaru |
+
+**Uji cepat** (operator, `/kultivasi uji sekte …`). Setiap pemasangan uji tetap melalui pratinjau dan konfirmasi dan masuk
+ke **log undo**, jadi `reset` dan `pamer hapus` memulihkan tanah persis seperti semula.
+
+| Perintah | Fungsi |
+|---|---|
+| `templat <1-9> [arah] [glasir] [paksa]` | Pratinjau templat uji untuk aulamu, tanpa biaya; konfirmasi seperti biasa ([Konfirmasi] lalu [Ya, mulai bangun]). Tanpa aula kamu diberi sebuah Prasasti Aula Sekte. `paksa` hanya melewati pemeriksaan kecuraman, pekerjaan tanah, dan air, **tidak pernah** blok terlindung, wadah, desa, atau tapak lain. Templat uji lama dipulihkan dulu; konfirmasi lagi sesudahnya. Contoh: `/kultivasi uji sekte templat 3 utara giok paksa` |
+| `tingkat <0-9> [instan\|cepat]` | Membangun semua bagian sampai tingkat n tanpa biaya. Tanpa tambahan: laju biasa. `instan`: 512 langkah per tick (berhenti sejenak bila MSPT di atas 50), satu upacara di akhir. `cepat`: ×20 dengan setiap upacara. Angka yang lebih rendah membongkar tingkat di atasnya. Contoh: `/kultivasi uji sekte tingkat 9 instan` |
+| `sumber [penuh\|<jumlah>]` | `penuh` (bawaan): sisa tagihan + 10% dan semua barang khusus; angka: sebanyak itu di setiap kategori. Contoh: `/kultivasi uji sekte sumber 200` |
+| `pamer <1-9> [tingkat <1-9>] [arah]` | Pameran di blok yang kamu tatap (≤ 64 blok) atau di tempatmu: hologram dulu, lalu `pamer konfirmasi` membangunnya seketika. Bukan aula; paling banyak 2 sekaligus. Contoh: `/kultivasi uji sekte pamer 5 tingkat 9 timur` |
+| `pamer konfirmasi` / `pamer daftar` / `pamer hapus [semua]` | Mendirikan pameran yang dipratinjau / daftar pameran / menghapus pameran terdekat (atau semua) dan memulihkan tanahnya persis, sedikit demi sedikit tiap tick |
+| `hologram <1-9> [tingkat]` | Hologram tata letak saja; tidak bisa dikonfirmasi. Contoh: `/kultivasi uji sekte hologram 3 6` |
+| `bandingkan` | Kesembilan tapak bersarang di sekelilingmu sebagai hologram emas |
+| `info` | Tapakmu: status, keadaan, Gudang, batas bangunan, batas pindai beku, dan tingkat dijamin |
+| `info <1-9>` | Angka rencana nyata: ukuran, bagian dan blok per tingkat, langkah, menit, tagihan per tingkat dan seluruhnya. Contoh: `/kultivasi uji sekte info 9` |
+| `periksa <1-9> [arah]` | Menjalankan pemeriksaan tapak di sini tanpa mendirikan. Contoh: `/kultivasi uji sekte periksa 4 utara` |
+| `audit [<1-9>]` | Uji kering semua 81 emisi (templat × tingkat), atau satu templat; laporannya menyusul tiap 2 detik |
+| `kamera <1-3>` | Pindah ke tiga sudut pandang tapakmu (atau pameran terdekat): 1 mata pejalan di gerbang, 2 pandangan taman, 3 pandangan udara dari tenggara |
+| `upacara [tingkat]` | Memutar upacara tingkat. Contoh: `/kultivasi uji sekte upacara 5` |
+| `kecepatan <1-50>` | Pengali laju untuk sesi ini. Contoh: `/kultivasi uji sekte kecepatan 10` |
+| `naik <2-9>` | Naik Templat uji seketika |
+| `bongkar` | Membongkar tapak uji seketika |
+| `reset` | Menghapus blok rencana tapak uji dan memulihkan tanah asli dari log undo (512 sel per tick), lalu mengosongkan templat |
+| `misi` / `misi selesai` | Mengacak ulang tawaran hari ini / semua regu pengumpul langsung pulang |
+| `pekerja` | Semua murid milikmu yang termuat dan bebas menjadi pekerja (paling banyak 4) |
+
+**Contoh sesi uji cepat:** pasang Prasasti di tanah datar → `/kultivasi uji sekte templat 3` → klik [Konfirmasi] dan
+[Ya, mulai bangun] → `/kultivasi uji sekte tingkat 9 instan` → jalan-jalan dan `/kultivasi uji sekte kamera 1` →
+`/kultivasi uji sekte reset`.
+
+**Sumber:** pengguna meminta perintah uji (gaya perintah uji Fase 6).
+
+### 20b.17 Keamanan blok Pembangunan Sekte
+
+Inilah seluruh cakupan pengecualian kedua:
+1. Hanya satu bagian kode, pemasang pembangunan sekte, yang memasang atau mengangkat blok.
+2. Ia bekerja hanya **di dalam kolom tapak yang dikonfirmasi** (persegi tapak × batas tinggi templat), hanya di chunk yang
+   sudah termuat (tidak pernah memuat paksa), dan hanya selama aula aktif dan Prasasti berdiri di sel jangkarnya.
+3. Ia tidak pernah menyentuh blok terlindung, penghalang, atau block entity yang tidak dipasangnya, kecuali yang kamu
+   izinkan dengan jelas (*Bongkar & simpan*, *Kosongkan*).
+4. Tanpa barang yang dijatuhkan, tanpa api, tanpa ledakan, tanpa petir, tanpa tanaman yang menjalar, tanpa blok yang jatuh,
+   dan tanpa makhluk. Blok dipasang tanpa memicu tetangganya (redstone, observer, dan pasir tidak bangun).
+5. Tidak ada makhluk hidup yang terkurung atau dijatuhkan.
+6. Cairan tetap tertampung.
+7. Setiap konfirmasi dicatat di Catatan dan log server.
+8. Satu-satunya efek di luar tapak yang diterima, dan disebut di teks persetujuan: daun alami di luar tapak bisa rontok bila
+   batang pohonnya di dalam tapak dikreditkan.
+
+Atap, konsol, dan langit-langit tidak mudah terbakar; hiasan kayu yang mudah terbakar paling dekat 2 blok di bawah atap, dan
+pohon paling dekat 3 blok dari dinding kayu. Pemancar cahaya terang berada 4 blok di dalam tepi, jadi salju dan es di luar
+tidak mencair. Pameran dan tapak uji tidak pernah mengosongkan wadah dan memulihkan tanah persis dari log undo.
+
+### 20b.18 Yang belum ada atau berbeda
+
+* **Tagihan belum diseimbangkan:** rencana sekarang membutuhkan kira-kira 60–75% dari sasaran rancangan, dan beberapa
+  tingkat jauh lebih ringan atau lebih berat daripada sasarannya. Angka nyata selalu tampil di game.
+* **"Bongkar sisa lama" belum ada:** setelah Naik Templat, bangunan lama yang tidak pernah bertabrakan dengan rencana baru
+  tetap berdiri sebagai warisan dan belum bisa dibongkar dengan satu tombol.
+* **Baris naik templat** "Dipertahankan N · Dibongkar M · Biaya ±X" belum tampil; layar Templat menampilkan angka rencana
+  baru.
+* **Glasir** hanya bisa diganti lewat Ganti Templat sebelum blok pertama terpasang (rancangan: sampai atap pangkat C/D
+  pertama dimulai).
+* **Hologram:** X biru untuk air yang akan ditimbun belum tampil. Sketsa templat sebelum pratinjau hanyalah perkiraan
+  bentuk tiap gaya; kotak bagian yang sebenarnya muncul begitu pratinjau tiba.
+* **Kabut pulau** (kabut sebagai pengganti air di sekitar pulau melayang) belum ada.
+* **Regu Ekspedisi Pengumpulan** tampil di panel Misi tablet Bangun dan di Jenjang, tetapi belum di daftar "murid yang
+  sedang pergi" tablet Aula.
+* **Jimat "Pilih Templat" di tablet Aula** belum ada (ada di tablet Bangun dan di chat). Tampilan palu untuk pekerja juga
+  belum ada.
+* **Kamera uji** memakai tiga sudut pandang tetap yang dihitung dari ukuran tapak, belum sudut pandang khusus tiap templat.
+* **Audit** belum memeriksa garis pandang, kepadatan, bingkai pemandangan, dan sel gelap tempat monster bisa muncul;
+  anggaran warna hanya dilaporkan.
+* **Pemeriksaan tapak:** desa dikenali lewat bangunan dunia di chunk itu; block entity dan rongga hanya dicari di dekat
+  permukaan.
+* **Berbeda dari daftar rancangan:** serambi samping Templat 2 dan serambi penghubung Templat 3 tidak ada (tidak cukup
+  ruang); Templat 3 memakai rangka lonceng dan genderang, bukan menara; jembatan batu pijakan Templat 5 lurus, bukan
+  zig-zag, dan beberapa letaknya bergeser; Templat 8 menaruh aula utama dan Aula Tengah di teras (T6) dan Aula Leluhur
+  Agung sebagai aula ketiga (T8); Templat 9 memakai dua dinding penghalang di kiri-kanan gerbang gunung, ketiga jembatan
+  sungainya berbentuk lengkung bulan, dan ketinggian puncaknya tetap (hanya halaman luar dan jalan masuk yang menyesuaikan
+  medan).
+* Belum diuji di dalam game (hanya dikompilasi dan diuji kering di luar game).
 
 ---
 
@@ -2420,6 +3452,7 @@ berjalan):
 | Zona | Jarak |
 |---|---|
 | Prasasti Aula Sekte mana pun, aktif, tertidur, atau diam, milik siapa pun (juga yang pemiliknya luring) | `kehancuranHallSafeRadius` (bawaan 64) blok mendatar |
+| Tapak [Pembangunan Sekte](#20b-pembangunan-sekte) mana pun (sudut Templat 9 lebih jauh dari 64 blok) | seluruh tapak + 16 blok |
 | Kamu dan setiap pemain (diperiksa di awal dan ulang setiap tick) | `kehancuranPlayerSafeRadius` (bawaan 24) blok |
 | Area spawn dunia | radius perlindungan spawn server, minimal 16 |
 | Penduduk desa, golem besi, Batu Magnet formasi pelindung yang terdaftar | 32 blok |
@@ -2561,6 +3594,7 @@ partikel, Maksimal menambah hiasan). Efek yang terus menyala hanya digambar dala
 | Acara | awan langkah saat tim pergi dan pulang, cincin duel dan percikan per pukulan, pusaran portal Alam Hampa, angin merah Tanah Terlarang, bahtera hantu di atas aula, butir api jiwa di menara |
 | Jalan Abadi | pertanda dan sambaran bencana (seperti tribulasi), aksara segel, cahaya giok antar dantian pewaris, bayangan guru tua di cincin, pilar emas Murid Melampaui Guru, busur kuning Tahan Petir, segel Hu Fa, pilar Fondasi Dao |
 | Mode Kehancuran | langit merah dan abu selama hitung mundur, garis pratinjau bentuk 15 detik, debu hantaman, kilau biru saat pemulihan |
+| Pembangunan Sekte | hologram tapak saat pratinjau, remah blok dan percik giok saat memasang, kabut kerja dan benang qi pekerja, kelopak ceri saat bagian selesai, pilar emas, pita, bola lentera, dan hujan emas saat tingkat selesai, lautan awan di lembah Templat 6–9 ([20b.14](#20b14-tampilan-dan-suara)); kabut kerja dan lautan awan mati di Minimal |
 
 ---
 
@@ -2576,7 +3610,7 @@ Tekan `'`. Gulungan memiliki loh giok vertikal di sisi kiri:
 | **Pengaturan** | Kualitas Efek, kosmetik, HUD, terobosan Hardcore (klik dua kali dalam 3 detik) |
 | **Bantuan** | Ringkasan aturan dan tombol (lihat di bawah) |
 
-**Topik Bantuan Fase 6** (setelah topik lama): Aula Sekte, Hari Penerimaan Murid, Jenjang Sekte, Poin Kontribusi, Tugas
+**Topik Bantuan Fase 6** (setelah topik lama): Aula Sekte, Pembangunan Sekte, Hari Penerimaan Murid, Jenjang Sekte, Poin Kontribusi, Tugas
 Sekte dan Lumbung Sekte, Misi/Utusan/Tanah Terlarang, Turnamen dan Perang Seratus Dinasti, Alam Dewa Hampa/Menara Langit
 Membara/Latihan Khusus, Bakat/alam jiwa/fisik langka, Pusaka Natal/Kitab Abadi Tak Mati/Api Surgawi, Bintang Abadi,
 Ikatan/Segel Jiwa/Hu Fa/pewaris, dan Mode Kehancuran (MATI secara bawaan). Sumber cerita tiap fitur dibaca di tooltip
@@ -2606,6 +3640,7 @@ Semua pencapaian ada di tab **Kultivasi** pada layar Pencapaian (Advancements). 
 | Sekte | Leluhur Pendiri, Sesama Penganut Dao, *Sekte yang Berjaya* (5 anggota), Pelajaran Bersahabat (menang Latih Tanding) |
 | Murid | Lahirnya Seorang Guru (murid pertama), *Lima Murid, Satu Jalan*, Mewariskan Dao (mengajarkan teknik), Murid yang Terbangun (Kebangkitan murid), *Inti Emas Sang Murid*, *Kembali dari Mata Air Kuning* (membangkitkan murid dengan Papan Jiwa) |
 | Aula Sekte | *Gerbang Sekte Terbuka* (mendirikan aula), Hari Penerimaan Murid (calon pertama diterima), Tekad Mengalahkan Bakat (Murid Tercatat), Apa Pun Akarnya (Token Kenaikan Abadi), Naik Pagoda (kenaikan jenjang pertama), **Yang Terkuat Duduk Tertinggi** (Tetua Agung), *Sekte Telah Kembali* (Tingkat 5), **Sekte di Bawah Langit** (Tingkat 9), *Dari Lembar yang Tercecer* (seni yang hilang dipulihkan) |
+| Pembangunan Sekte | *Batu Pertama* (konfirmasi templat), Formasi Agung Berdiri (Tingkat 5), *Sekte Lengkap* (Tingkat 9 templat mana pun), Pagoda Kaca (pagoda berglasir selesai), **Sekte Agung Berdiri** (Templat 5 ke atas di Tingkat 9), **Istana Langit** (Templat 9 di Tingkat 9), *Melampaui Tapak Lama* (Naik Templat mencapai tingkat lama), Seribu Tangan (4 pekerja sekaligus), Ekspedisi Bahan Pertama (regu pengumpul pertama pulang), Penyumbang Sekte (LAN: menyetor ke sekte pemain lain) |
 | Kegiatan sekte | Melangkah Keluar Gerbang (ekspedisi pertama), *Alam Rahasia Ditaklukkan*, *Keluar dari Angin Merah Darah* (Tanah Terlarang), *Nomor Satu Daftar Kuat* (juara turnamen), **Penumpang Bahtera Purba**, *Juara Seratus Dinasti*, Tangga Batu (lantai 10 Alam Dewa Hampa), **Jenius Batas Suci** (lantai 50), Satgas Pencuri Ayam (tersembunyi) |
 | Bakat & kekuatan murid | Terlahir Berbeda (fisik langka), *Pengemis di Gerbang*, *Nadi Dewa Sesat*, *Jurus Pamungkas*, **Api Guru dan Murid** (Fusi), *Pelahap Api* (Api Surgawi), *Pusaka Sembilan Lipatan*, **Payung Abadi** (lipatan 14), **Darah Abadi**, **Sayap Sang Kunpeng** |
 | Jalan Abadi | Segel Jiwa, Pelindung Dao Murid (Hu Fa sampai berhasil), *Fondasi Dao Langit*, **Fondasi Sempurna**, Bintang Pertama Terpadatkan, *Bencana Terlewati*, **Penginjak Langit** (ketujuh bencana), *Lampu Jiwa Padam*, *Pewaris Ditetapkan*, **Penguasa Sembilan Segel**, *Guru di Dalam Cincin*, **Murid Melampaui Guru** |
@@ -2636,6 +3671,19 @@ Resep Gulungan Penerimaan Murid sudah dihapus sejak Fase 6.
 | `tournamentIntervalDays` | `7` (3–30) | Kompetisi Daftar Kuat setiap sekian hari game |
 | `forbiddenGroundIntervalDays` | `15` (5–60) | Tanah Terlarang Berwarna Darah terbuka setiap sekian hari game |
 | `modeKehancuran` dan `kehancuran...` | `false` dan lainnya | Mode Kehancuran: lihat [31.9](#319-pengaturan) |
+| `sectConstruction` | `true` | [Pembangunan Sekte](#20b-pembangunan-sekte) bisa dipakai. Bila `false`, templat tidak bisa dipilih |
+| `sectBuildSpeed` | `1.0` (0,25–4) | Mengalikan laju pemasangan |
+| `sectBuildMaxPerTick` | `8` (1–32) | Batas rata-rata pemasangan per tick untuk semua tapak (gelombang tiap 4 tick memasang sampai 4× angka ini) |
+| `sectBuildMsptPause` | `40` (30–50) | Pembangunan berhenti selama rata-rata waktu tick setinggi ini (milidetik) atau lebih |
+| `sectBuildRange` | `160` (96–512) | Pemilik atau saudara sekte harus berada sejauh ini (mendatar) dari Prasasti agar pembangunan berjalan |
+| `sectBuildWhileAway` | `false` | Tetap membangun saat tidak ada yang dekat (tetap tidak pernah memuat paksa chunk). Bawaannya waktu itu ditabung |
+| `sectBuildBankTicks` | `24000` (0–72.000) | Batas tabungan waktu; waktu tabungan menggandakan laju |
+| `sectBuildMaxTemplate` | `9` (1–9) | Templat terbesar yang boleh dipilih |
+| `sectTemplateRealmGate` | `false` | Bila `true`, templat butuh ranah yang tertulis di papannya |
+| `sectBuildBreakRefund` | `true` | Membongkar blok sekte mengembalikan bahannya ke Gudang alih-alih menjatuhkan barang |
+| `sectBuildExplosionCredit` | `true` | Blok sekte yang diledakkan tidak menjatuhkan barang dan dikreditkan ke Gudang |
+| `sectBuildSpawnProof` | `true` | Monster tidak muncul secara alami di atas sel sekte |
+| `sectBuildFpsHint` | `true` | Komputer yang lama di bawah 30 FPS membuat sektenya dibangun setengah laju |
 
 Nilai yang hilang diisi bawaan, nilai di luar rentang dipotong ke batasnya, dan berkas ditulis ulang saat server mulai.
 `/kultivasi kehancuran izin on|off` (operator) juga menulis berkas ini.
@@ -2655,11 +3703,19 @@ Keduanya diatur dari tab Pengaturan gulungan.
 
 Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama.
 
-> **Satu-satunya pengecualian: Mode Kehancuran.** Mode ini **MATI secara bawaan** dan baru mengubah blok bila ketiga
+> **Pengecualian pertama: Mode Kehancuran.** Mode ini **MATI secara bawaan** dan baru mengubah blok bila ketiga
 > kuncinya dibuka dengan sengaja (izin server, Sumpah Kehancuran, Lepaskan Segel), lalu sebuah jurus diperintahkan,
-> dipratinjau, dikonfirmasi, dan diumumkan dengan hitung mundur. Zona terlindung, batas blok, jeda saat server lambat,
-> dan tombol Pulihkan tetap berlaku. Lihat [bagian 31](#31-mode-kehancuran-peringatan). Semua aturan di bawah berlaku
-> penuh selama mode itu mati, dan untuk setiap hal lain di mod ini juga saat mode itu menyala.
+> dipratinjau, dikonfirmasi, dan diumumkan dengan hitung mundur. Zona terlindung (termasuk setiap tapak sekte + 16 blok),
+> batas blok, jeda saat server lambat, dan tombol Pulihkan tetap berlaku. Lihat
+> [bagian 31](#31-mode-kehancuran-peringatan).
+>
+> **Pengecualian kedua: Pembangunan Sekte.** Sekte hanya memasang blok dan meratakan tanah **di dalam tapak yang kamu
+> lihat sebagai hologram lalu kamu konfirmasi sendiri**, hanya di chunk yang sudah termuat, dan hanya selama aulamu aktif.
+> Tanah dan tanaman alami yang dipindahkan dikreditkan ke Gudang Bahan Sekte, blok buatan pemain, wadah berisi, dan blok
+> terlindung tidak pernah diangkat tanpa izinmu, dan di luar tapak tidak ada yang berubah (kecuali daun alami yang bisa
+> rontok bila batangnya di dalam tapak dikreditkan). Lihat [20b.17](#20b17-keamanan-blok-pembangunan-sekte).
+>
+> Semua aturan di bawah berlaku penuh untuk setiap hal lain di mod ini.
 
 * **Tidak ada blok yang dipasang, dirusak, dibakar, diganti, atau diubah** oleh efek, teknik, peristiwa, makhluk,
   atau formasi mod ini. Formasi, tungku alkimia, dan tempat spiritual hanya **membaca** blok. Tungku alkimia tidak
@@ -2707,5 +3763,13 @@ Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama.
   membunuh murid**: kegagalan berarti luka atau Penyimpangan Qi. Satu-satunya pengecualian ada di Tanah Terlarang saat
   Hardcore-mu menyala: murid yang gagal kembali sebagai Papan Jiwa yang bisa dibangkitkan.
 * Bahtera Purba, angin merah, portal Alam Hampa, dan cincin duel adalah partikel; tidak ada blok yang dipasang.
-* Kode yang mengubah blok hanya ada di satu tempat, mesin Mode Kehancuran, dan mesin itu tidak berjalan selama ketiga
-  kunci belum terbuka.
+* Kode yang mengubah blok hanya ada di dua tempat: pemasang Pembangunan Sekte (hanya di dalam tapak yang dikonfirmasi)
+  dan mesin Mode Kehancuran (tidak berjalan selama ketiga kunci belum terbuka).
+
+**Tambahan Fase 6b (Pembangunan Sekte):**
+* Pratinjau, hologram, pemeriksaan tapak, Periksa & Perbaiki, dan audit hanya **membaca** blok dan tidak pernah memuat
+  chunk.
+* Pekerja Bangunan dan regu Ekspedisi Pengumpulan tidak memasang atau menggali apa pun; regu yang pergi hanyalah data.
+* Pencegahan monster di atas sel sekte hanyalah aturan pemunculan; tidak ada blok di luar tapak yang diubah untuk itu.
+* Tapak uji dan pameran mencatat setiap blok asli di log undo, dan `uji sekte reset` serta `pamer hapus` memulihkannya
+  persis.

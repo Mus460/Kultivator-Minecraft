@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.first_stone.description"
+    },
+    "icon": {
+      "id": "kultivator:sect_hall_stele"
+    },
+    "title": {
+      "translate": "advancement.kultivator.first_stone.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

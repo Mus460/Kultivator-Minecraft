@@ -47,6 +47,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
@@ -62,11 +63,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.ToIntFunction;
 
 /**
  * The Sect Hall (Aula Sekte, DESIGN 20.3.1-20.3.8; module A, P6-aula): founding, moving and the dormant hall, the hall
  * tick (once a second: arrivals, candidate views, away returns, the spread building scan every 30 s), renown and the
- * hall level, the screen's actions and its {@code HallInfo}, the commands, and the public API of DESIGN 20.4.5.
+ * hall level, the screen's actions and its {@code HallInfo}, the commands, and the public API of DESIGN 20.4.5. Phase 6b
+ * (Pembangunan Sekte) plugs in through the provider hooks of DESIGN 21.24 item 5; with none registered nothing changes.
  * <p>
  * Sources: <i>Battle Through the Heavens</i> (the Xiao clan's testing stone monument), <i>A Record of a Mortal's
  * Journey</i> ch. 153 (Yue Lu Hall), <i>I Shall Seal the Heavens</i> ch. 36-38 (the Magic Pavilion), <i>Return of the
@@ -99,11 +102,51 @@ public final class Halls {
 		@Nullable Vec3 onReturn(ServerLevel level, UUID owner, CompoundTag stored, CompoundTag info);
 	}
 
-	// ---- screen pages (OpenScreen.HALL arg) and hall action sub-ops (Actions.HALL arg)
+	/**
+	 * Where a candidate of the owner's hall should arrive (phase 6b: the plan's {@code arrival} anchor and the kept ring
+	 * cells, DESIGN 21.17), or null for the 20.3.3 ring 8-14 blocks from the stele. The spot is checked with
+	 * {@code Targeting.safeSpot} before use.
+	 */
+	@FunctionalInterface
+	public interface ArrivalSpotProvider {
+		@Nullable BlockPos spot(UUID owner, ServerLevel level, BlockPos stele, RandomSource random);
+	}
+
+	/** A line replacing the Aula tablet's building checklist (phase 6b: {@code SectBuild.statusLine}), or null for none. */
+	@FunctionalInterface
+	public interface StatusLineProvider {
+		@Nullable Component statusLine(UUID owner);
+	}
+
+	/**
+	 * Hears the stele move (phase 6b, DESIGN 21.17 / 21.18). {@link #beforeMove} may take over a wake-up or a move (for
+	 * example to open the construction move dialog while a template exists): the hall then stays where it is and the
+	 * listener later calls {@link Halls#relocateHall}.
+	 */
+	public interface SteleMoveListener {
+		/**
+		 * The hall is about to wake at ({@code wake}: a stele placed while dormant) or move to ({@code to}, a second stele
+		 * sneak-used) from {@code from} (null when unknown). True = handled here, module A does nothing more.
+		 */
+		default boolean beforeMove(ServerPlayer player, UUID owner, ServerLevel level, @Nullable BlockPos from, BlockPos to, boolean wake) {
+			return false;
+		}
+
+		/** The hall woke at or moved to {@code to}. */
+		default void afterMove(UUID owner, ServerLevel level, @Nullable BlockPos from, BlockPos to, boolean wake) {
+		}
+
+		/** The stele at {@code pos} is gone: the hall is dormant now. */
+		default void onRemoved(UUID owner, @Nullable ServerLevel level, @Nullable BlockPos pos) {
+		}
+	}
+
+	// ---- screen pages (OpenScreen.HALL arg; the Bangun tablet of phase 6b is second, DESIGN 21.24) and hall action sub-ops
 	public static final int PAGE_AULA = 0;
-	public static final int PAGE_CALON = 1;
-	public static final int PAGE_JENJANG = 2;
-	public static final int PAGE_TREASURY = 3;
+	public static final int PAGE_BANGUN = 1;
+	public static final int PAGE_CALON = 2;
+	public static final int PAGE_JENJANG = 3;
+	public static final int PAGE_TREASURY = 4;
 	public static final int OP_REFRESH = 0;
 	public static final int OP_RENAME = 1;
 	public static final int OP_TEST = 2;
@@ -136,6 +179,10 @@ public final class Halls {
 	private static final int HALL_COLOR = 0x8FE3C8;
 
 	private static final List<InfoProvider> INFO_PROVIDERS = new ArrayList<>();
+	// Phase 6b providers (DESIGN 21.24 item 5). With none registered every phase-6 rule is unchanged.
+	private static final List<ArrivalSpotProvider> ARRIVAL_SPOT_PROVIDERS = new ArrayList<>();
+	private static final List<StatusLineProvider> STATUS_LINE_PROVIDERS = new ArrayList<>();
+	private static final List<SteleMoveListener> STELE_MOVE_LISTENERS = new ArrayList<>();
 	private static final Map<UUID, HallView> VIEW_CACHE = new HashMap<>();
 	/** Players with the hall scroll open -> whose hall. */
 	private static final Map<UUID, UUID> VIEWERS = new HashMap<>();
@@ -417,6 +464,9 @@ public final class Halls {
 			return;
 		}
 		if (dormant(core)) {
+			if (beforeMove(player, owner, level, posOf(core), pos, true)) {
+				return;
+			}
 			relocate(player, owner, core, level, pos, true);
 			return;
 		}
@@ -459,11 +509,12 @@ public final class Halls {
 		Msg.chat(player, Component.translatable("kultivator.hall.founded_hint", KultivatorConfig.get().recruitmentIntervalDays)
 				.withStyle(ChatFormatting.GRAY));
 		Advancements.grant(player, "sect_gate_open");
-		HallLevel.startScan(owner, level, pos);
+		scan(owner, level, pos);
 	}
 
 	/** The hall moves to (or wakes at) a new stele: renown, pool, storehouse, candidates and away teams come along. */
 	private static void relocate(ServerPlayer player, UUID owner, CompoundTag core, ServerLevel level, BlockPos pos, boolean wake) {
+		BlockPos from = posOf(core);
 		if (wake) {
 			Candidates.clearHall(owner, core);
 		} else {
@@ -487,7 +538,28 @@ public final class Halls {
 		log(owner, Component.translatable(wake ? "kultivator.hall.log.woke" : "kultivator.hall.log.moved"));
 		Msg.chat(player, Component.translatable(wake ? "kultivator.hall.woke" : "kultivator.hall.moved", hallName(core))
 				.withStyle(ChatFormatting.GOLD));
-		HallLevel.startScan(owner, level, pos);
+		scan(owner, level, pos);
+		for (SteleMoveListener listener : List.copyOf(STELE_MOVE_LISTENERS)) {
+			try {
+				listener.afterMove(owner, level, from, pos, wake);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A Sect Hall stele-move listener failed", exception);
+			}
+		}
+	}
+
+	/** Asks the stele-move listeners whether one takes over this wake-up or move (phase 6b); false = module A goes on. */
+	private static boolean beforeMove(ServerPlayer player, UUID owner, ServerLevel level, @Nullable BlockPos from, BlockPos to, boolean wake) {
+		for (SteleMoveListener listener : List.copyOf(STELE_MOVE_LISTENERS)) {
+			try {
+				if (listener.beforeMove(player, owner, level, from, to, wake)) {
+					return true;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A Sect Hall stele-move listener failed", exception);
+			}
+		}
+		return false;
 	}
 
 	/** Someone used a stele (empty hand, or an item that is not a token). */
@@ -544,6 +616,10 @@ public final class Halls {
 					(int) OTHER_HALL_RANGE).withStyle(ChatFormatting.YELLOW));
 			return;
 		}
+		if (beforeMove(player, player.getUUID(), level, posOf(core), pos, false)) {
+			MOVES.remove(player.getUUID());
+			return;
+		}
 		int now = level.getServer().getTickCount();
 		PendingMove pending = MOVES.get(player.getUUID());
 		if (pending != null && pending.pos().equals(pos) && pending.dim().equals(level.dimension()) && now <= pending.deadline()) {
@@ -579,6 +655,13 @@ public final class Halls {
 		ServerPlayer master = server == null ? null : server.getPlayerList().getPlayer(owner);
 		if (master != null) {
 			Msg.chat(master, Component.translatable("kultivator.hall.dormant", hallName(core)).withStyle(ChatFormatting.YELLOW));
+		}
+		for (SteleMoveListener listener : List.copyOf(STELE_MOVE_LISTENERS)) {
+			try {
+				listener.onRemoved(owner, level, pos);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A Sect Hall stele-move listener failed", exception);
+			}
 		}
 	}
 
@@ -631,12 +714,45 @@ public final class Halls {
 				makeDormant(owner, core, level, pos);
 				return;
 			}
-			HallLevel.startScan(owner, level, pos);
+			scan(owner, level, pos);
 		}
 		if (Candidates.tick(current, owner, core, level, pos, day, timeOfDay)) {
 			changed();
 		}
 		if (AwayStore.tick(current, owner, core, level, pos)) {
+			changed();
+		}
+		checkLevel(owner, core);
+	}
+
+	/**
+	 * Re-reads the hall's buildings: with a phase-6b building cap (a provider value of 0 or more, DESIGN 21.17) the cap and
+	 * bits are applied at once and the building scan is skipped; otherwise the spread scan of DESIGN 20.3.1 starts.
+	 */
+	private static void scan(UUID owner, ServerLevel level, BlockPos pos) {
+		int provided = HallLevel.providedCap(owner);
+		if (provided < 0) {
+			HallLevel.startScan(owner, level, pos);
+			return;
+		}
+		applyProvided(owner, level, pos, provided);
+	}
+
+	/**
+	 * A provided building cap: {@code bcap} = that cap, {@code bflags} = the provided bits with {@code B_FORMATION} still
+	 * from the real active-formation check (DESIGN 21.17); the scan counters are left as they were.
+	 */
+	private static void applyProvided(UUID owner, ServerLevel level, BlockPos pos, int provided) {
+		CompoundTag core = coreOf(owner);
+		if (core == null) {
+			return;
+		}
+		int flags = (HallLevel.providedFlags(owner) & ~HallLevel.B_FORMATION)
+				| (HallLevel.hasOwnFormation(level, pos, owner) ? HallLevel.B_FORMATION : 0);
+		int cap = Math.max(HallLevel.CAP_STELE, Math.min(HallLevel.MAX_LEVEL, provided));
+		if (core.getIntOr("bflags", -1) != flags || core.getIntOr("bcap", -1) != cap) {
+			core.putInt("bflags", flags);
+			core.putInt("bcap", cap);
 			changed();
 		}
 		checkLevel(owner, core);
@@ -648,10 +764,18 @@ public final class Halls {
 		if (core == null || !centre.equals(posOf(core)) || !level.dimension().equals(dimOf(core))) {
 			return;
 		}
+		int provided = HallLevel.providedCap(owner);
+		if (provided >= 0) {
+			// A template was confirmed while this scan ran: the provided cap wins (DESIGN 21.17).
+			applyProvided(owner, level, centre, provided);
+			return;
+		}
 		int cap = HallLevel.capFromFlags(flags);
-		if (core.getIntOr("bflags", -1) != flags || core.getIntOr("bcap", -1) != cap || !core.getCompoundOrEmpty("bcount").equals(counts)) {
+		if (core.getIntOr("bflags", -1) != flags || core.getIntOr("bcap", -1) != cap || core.getIntOr("scan_bcap", -1) != cap
+				|| !core.getCompoundOrEmpty("bcount").equals(counts)) {
 			core.putInt("bflags", flags);
 			core.putInt("bcap", cap);
+			core.putInt("scan_bcap", cap);
 			core.put("bcount", counts);
 			changed();
 		}
@@ -735,15 +859,15 @@ public final class Halls {
 
 	// ================================================================== the scroll (actions and HallInfo)
 
-	/** Sends the hall's details and opens the scroll on {@code page}. */
-	static void openScreen(ServerPlayer viewer, UUID owner, int page) {
+	/** Sends the hall's details and opens the scroll on {@code page} ({@code PAGE_*}; public for phase 6b, DESIGN 21.24). */
+	public static void openScreen(ServerPlayer viewer, UUID owner, int page) {
 		VIEWERS.put(viewer.getUUID(), owner);
 		// The building checklist is re-read whenever the scroll opens (the result reaches the scroll on its next refresh).
 		CompoundTag core = coreOf(owner);
 		ServerLevel level = core == null ? null : levelOf(core);
 		BlockPos pos = core == null ? null : posOf(core);
 		if (level != null && pos != null && !dormant(core) && level.isLoaded(pos)) {
-			HallLevel.startScan(owner, level, pos);
+			scan(owner, level, pos);
 		}
 		sendInfo(viewer, owner);
 		Net.send(viewer, new Payloads.OpenScreen(Payloads.OpenScreen.HALL, page));
@@ -898,13 +1022,14 @@ public final class Halls {
 		info.putInt("bcap", core.getIntOr("bcap", HallLevel.CAP_STELE));
 		info.putInt("bflags", core.getIntOr("bflags", 0));
 		info.put("bcount", core.getCompoundOrEmpty("bcount").copy());
-		info.putInt("radius", HallLevel.radius(level));
-		info.putInt("cap", HallLevel.cap(level));
+		info.putInt("radius", radiusOf(owner, level));
+		info.putInt("cap", discipleCap(owner, level));
 		info.putInt("alive", own ? Disciples.aliveCount(Cultivators.get(viewer)) : -1);
 		info.putDouble("price", HallLevel.price(level));
 		info.putInt("posts", HallLevel.posts(level));
 		info.putInt("missions", HallLevel.missions(level));
-		info.putInt("per_arrival", Math.min(HallLevel.MAX_CANDIDATES, HallLevel.candidates(level) + (renown >= HallLevel.FAME_RENOWN ? 1 : 0)));
+		info.putInt("per_arrival", Math.min(HallLevel.MAX_CANDIDATES, HallLevel.candidates(level) + (renown >= HallLevel.FAME_RENOWN ? 1 : 0)
+				+ HallLevel.candidateBonus(owner)));
 		ServerLevel hallLevel = levelOf(core);
 		if (hallLevel != null && pos != null && !dormant) {
 			GrandFormation.State state = GrandFormation.forHall(hallLevel, pos, owner);
@@ -974,6 +1099,11 @@ public final class Halls {
 		}
 		info.putIntArray("pages", pages);
 		info.putBoolean("pavilion", (core.getIntOr("bflags", 0) & HallLevel.B_PAVILION) != 0);
+		// Phase 6b: with a template the Aula tablet shows this line instead of the building checklist (DESIGN 21.17).
+		Component buildStatus = statusLine(owner);
+		if (buildStatus != null) {
+			info.store("build_status", ComponentSerialization.CODEC, buildStatus);
+		}
 		info.put("log", core.getListOrEmpty("log").copy());
 		for (InfoProvider provider : INFO_PROVIDERS) {
 			try {
@@ -1181,13 +1311,18 @@ public final class Halls {
 		long next = HallLevel.nextRenown(renown);
 		player.sendSystemMessage(Component.translatable("kultivator.hall.info.renown", renown, next < 0 ? "-" : String.valueOf(next),
 				core.getIntOr("bcap", HallLevel.CAP_STELE)).withStyle(ChatFormatting.GRAY));
-		player.sendSystemMessage(Component.translatable("kultivator.hall.info.numbers", HallLevel.cap(level), HallLevel.radius(level),
+		UUID owner = player.getUUID();
+		player.sendSystemMessage(Component.translatable("kultivator.hall.info.numbers", discipleCap(owner, level), radiusOf(owner, level),
 				core.getIntOr("pool", 0)).withStyle(ChatFormatting.GRAY));
 		player.sendSystemMessage(Component.translatable(dormant(core) ? "kultivator.hall.info.dormant" : "kultivator.hall.info.where",
 				pos == null ? "?" : pos.getX() + " " + pos.getY() + " " + pos.getZ(), core.getStringOr("dim", "")).withStyle(ChatFormatting.GRAY));
 		long day = dayIndex();
 		player.sendSystemMessage(Component.translatable("kultivator.hall.info.schedule", day, Candidates.nextArrivalDay(core, day),
 				Candidates.list(core).size()).withStyle(ChatFormatting.GRAY));
+		Component buildStatus = statusLine(owner);
+		if (buildStatus != null) {
+			player.sendSystemMessage(buildStatus.copy().withStyle(style -> style.getColor() == null ? style.withColor(ChatFormatting.GRAY) : style));
+		}
 		return 1;
 	}
 
@@ -1207,7 +1342,7 @@ public final class Halls {
 			changed();
 			return war;
 		}
-		int n = count > 0 ? count : Math.min(HallLevel.MAX_CANDIDATES, HallLevel.candidates(levelOf(core, true)));
+		int n = count > 0 ? count : Math.min(HallLevel.MAX_CANDIDATES, HallLevel.candidates(levelOf(core, true)) + HallLevel.candidateBonus(owner));
 		Candidates.arrive(ctx.getSource().getServer(), owner, core, level, pos, player, n);
 		changed();
 		return n;
@@ -1228,7 +1363,7 @@ public final class Halls {
 		ServerLevel level = levelOf(core);
 		BlockPos pos = posOf(core);
 		if (level != null && pos != null && !dormant(core)) {
-			HallLevel.startScan(player.getUUID(), level, pos);
+			scan(player.getUUID(), level, pos);
 		}
 		return 1;
 	}
@@ -1251,7 +1386,7 @@ public final class Halls {
 			return null;
 		}
 		int level = levelOf(core, true);
-		HallView view = new HallView(pos, dim, level, core.getLongOr("renown", 0L), HallLevel.radius(level), !dormant(core),
+		HallView view = new HallView(pos, dim, level, core.getLongOr("renown", 0L), radiusOf(owner, level), !dormant(core),
 				core.getStringOr("name", ""));
 		VIEW_CACHE.put(owner, view);
 		return view;
@@ -1273,7 +1408,7 @@ public final class Halls {
 	/** The disciple limit the hall allows ({@link Disciples#MAX_DISCIPLES} without a hall). */
 	public static int cap(UUID owner) {
 		HallView hall = hallOf(owner);
-		return hall == null ? Disciples.MAX_DISCIPLES : HallLevel.cap(hall.level());
+		return hall == null ? Disciples.MAX_DISCIPLES : discipleCap(owner, hall.level());
 	}
 
 	/** True when {@code pos} in {@code level} is inside the owner's active hall territory. */
@@ -1413,6 +1548,178 @@ public final class Halls {
 	public static int arts(UUID owner) {
 		CompoundTag core = coreOf(owner);
 		return core == null ? 0 : core.getIntOr("arts", 0);
+	}
+
+	// ================================================================== phase 6b hooks (DESIGN 21.17, 21.24 item 5)
+
+	/**
+	 * A building cap from outside the scan (Pembangunan Sekte: {@code max(frozenScanCap, tier)}): the highest value of 0 or
+	 * more replaces the scanned cap and the building scan is skipped; -1 from every provider keeps the scan.
+	 */
+	public static void addBuildingCapProvider(ToIntFunction<UUID> provider) {
+		HallLevel.addCapProvider(provider);
+	}
+
+	/**
+	 * The building bits while a provided cap applies (the tier's {@code B_PAVILION}, {@code B_DRILL}, {@code B_TOWER});
+	 * the bits of every provider are combined, negative values ignored. {@code B_FORMATION} stays the real check.
+	 */
+	public static void addBuildingFlagsProvider(ToIntFunction<UUID> provider) {
+		HallLevel.addFlagsProvider(provider);
+	}
+
+	/** A minimum territory radius (the template's R_t); the radius is {@code max(20 + 4L, every provider)}. */
+	public static void addRadiusProvider(ToIntFunction<UUID> provider) {
+		HallLevel.addRadiusProvider(provider);
+	}
+
+	/** Extra disciple cap added to {@code 5 + floor(L/2)} (summed, negative values ignored). */
+	public static void addCapBonusProvider(ToIntFunction<UUID> provider) {
+		HallLevel.addCapBonusProvider(provider);
+	}
+
+	/** Extra candidates per arrival (summed, negative values ignored); the total stays at most {@code MAX_CANDIDATES}. */
+	public static void addCandidateBonusProvider(ToIntFunction<UUID> provider) {
+		HallLevel.addCandidateBonusProvider(provider);
+	}
+
+	/** Where candidates arrive (the first provider with a usable spot wins; none keeps the 8-14 ring). */
+	public static void addArrivalSpotProvider(ArrivalSpotProvider provider) {
+		if (provider != null) {
+			ARRIVAL_SPOT_PROVIDERS.add(provider);
+		}
+	}
+
+	/** The Aula tablet's construction line replacing the building checklist (the first non-null line wins). */
+	public static void addStatusLineProvider(StatusLineProvider provider) {
+		if (provider != null) {
+			STATUS_LINE_PROVIDERS.add(provider);
+		}
+	}
+
+	/** Hears the stele being moved, woken or removed (see {@link SteleMoveListener}). */
+	public static void addSteleMoveListener(SteleMoveListener listener) {
+		if (listener != null) {
+			STELE_MOVE_LISTENERS.add(listener);
+		}
+	}
+
+	/**
+	 * The hall's current building cap ({@code core.bcap}): the last building scan, or the provided cap while one applies;
+	 * phase 6b freezes it at confirmation ({@code frozenScanCap}, DESIGN 21.17). 0 without a hall.
+	 */
+	public static int buildingCap(UUID owner) {
+		CompoundTag core = coreOf(owner);
+		return core == null ? 0 : core.getIntOr("bcap", HallLevel.CAP_STELE);
+	}
+
+	/**
+	 * The cap of the last real building scan ({@code core.scan_bcap}), never a provided cap such as phase 6b's move
+	 * guarantee; a hall scanned before this value existed falls back to {@code bcap} only while no cap is provided.
+	 */
+	public static int scanCap(UUID owner) {
+		CompoundTag core = coreOf(owner);
+		if (core == null) {
+			return 0;
+		}
+		int scanned = core.getIntOr("scan_bcap", -1);
+		if (scanned >= 0) {
+			return scanned;
+		}
+		return HallLevel.providedCap(owner) < 0 ? core.getIntOr("bcap", HallLevel.CAP_STELE) : HallLevel.CAP_STELE;
+	}
+
+	/**
+	 * Re-applies the building cap and every provided value now (phase 6b calls it when a tier completes or the template
+	 * changes; otherwise they are read again within 30 s): clears the cached hall view and rescans or applies the cap.
+	 */
+	public static void refreshBuildings(UUID owner) {
+		CompoundTag core = coreOf(owner);
+		if (core == null) {
+			return;
+		}
+		changed();
+		ServerLevel level = levelOf(core);
+		BlockPos pos = posOf(core);
+		if (level != null && pos != null && !dormant(core) && level.isLoaded(pos)) {
+			scan(owner, level, pos);
+		} else {
+			checkLevel(owner, core);
+		}
+	}
+
+	/**
+	 * Moves the player's hall to the stele at {@code pos} (or wakes it there when dormant) with module A's rules (a stele
+	 * stands there, no other hall within 128 blocks, the one-day move cooldown) without asking the stele-move listeners:
+	 * phase 6b calls it from its move dialog. False, with a chat line, when refused.
+	 */
+	public static boolean relocateHall(ServerPlayer player, ServerLevel level, BlockPos pos) {
+		UUID owner = player.getUUID();
+		CompoundTag core = coreOf(owner);
+		if (core == null || !level.getBlockState(pos).is(HallItems.SECT_HALL_STELE)) {
+			return false;
+		}
+		boolean wake = dormant(core);
+		if (!wake && pos.equals(posOf(core)) && level.dimension().equals(dimOf(core))) {
+			return true;
+		}
+		UUID other = otherHallNear(owner, level, pos);
+		if (other != null) {
+			CompoundTag otherCore = coreOf(other);
+			Msg.chat(player, Component.translatable("kultivator.hall.too_close", otherCore == null ? "?" : hallName(otherCore),
+					(int) OTHER_HALL_RANGE).withStyle(ChatFormatting.YELLOW));
+			return false;
+		}
+		if (!wake) {
+			long moved = Cultivators.get(player).extra().getCompoundOrEmpty("hall").getLongOr("moved_day", Long.MIN_VALUE / 2L);
+			if (dayIndex() - moved < 1L) {
+				Msg.chat(player, Component.translatable("kultivator.hall.move_cooldown").withStyle(ChatFormatting.YELLOW));
+				return false;
+			}
+		}
+		MOVES.remove(owner);
+		relocate(player, owner, core, level, pos.immutable(), wake);
+		return true;
+	}
+
+	/** Territory radius of a hall of {@code level}: {@code max(20 + 4L, provided R_t)} (DESIGN 21.17). */
+	static int radiusOf(UUID owner, int level) {
+		return Math.max(HallLevel.radius(level), HallLevel.providedRadius(owner));
+	}
+
+	/** Disciple cap of a hall of {@code level}: {@code 5 + floor(L/2)} plus the provided bonus. */
+	static int discipleCap(UUID owner, int level) {
+		return HallLevel.cap(level) + HallLevel.capBonus(owner);
+	}
+
+	/** The provided construction status line, or null. */
+	static @Nullable Component statusLine(UUID owner) {
+		for (StatusLineProvider provider : STATUS_LINE_PROVIDERS) {
+			try {
+				Component line = provider.statusLine(owner);
+				if (line != null) {
+					return line;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A Sect Hall status-line provider failed", exception);
+			}
+		}
+		return null;
+	}
+
+	/** A provided arrival spot for a candidate, or null. */
+	static @Nullable BlockPos arrivalSpot(UUID owner, ServerLevel level, BlockPos stele, RandomSource random) {
+		for (ArrivalSpotProvider provider : ARRIVAL_SPOT_PROVIDERS) {
+			try {
+				BlockPos spot = provider.spot(owner, level, stele, random);
+				if (spot != null) {
+					return spot;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A Sect Hall arrival-spot provider failed", exception);
+			}
+		}
+		return null;
 	}
 
 	private Halls() {

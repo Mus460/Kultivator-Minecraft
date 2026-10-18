@@ -419,6 +419,8 @@ public final class Candidates {
 		} else {
 			core.putInt("arrivals", core.getIntOr("arrivals", 0) + 1);
 			n = HallLevel.candidates(hallLevel) + (renown >= HallLevel.FAME_RENOWN ? 1 : 0);
+			// Phase 6b: +1 for large templates at tier 7 or more (DESIGN 21.1); the maximum of 6 still holds.
+			n += HallLevel.candidateBonus(owner);
 			n = Math.min(HallLevel.MAX_CANDIDATES, n);
 			if (monsters) {
 				n = Math.max(1, n - 1);
@@ -657,6 +659,13 @@ public final class Candidates {
 			}
 		}
 		RandomSource random = level.getRandom();
+		if (spot == null) {
+			// Phase 6b: the built plan's arrival anchor and kept ring cells first (DESIGN 21.17); none keeps the ring below.
+			BlockPos provided = Halls.arrivalSpot(owner, level, stele, random);
+			if (provided != null && level.isLoaded(provided)) {
+				spot = Targeting.safeSpot(level, probe, Vec3.atBottomCenterOf(provided));
+			}
+		}
 		for (int attempt = 0; spot == null && attempt < 16; attempt++) {
 			double angle = random.nextDouble() * Math.PI * 2.0D;
 			double radius = SPAWN_MIN + random.nextDouble() * (SPAWN_MAX - SPAWN_MIN);

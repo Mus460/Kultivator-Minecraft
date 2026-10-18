@@ -124,6 +124,8 @@ public final class CultivateCommand {
 		dev.kultivator.disciple.power.DisciplePowers.addCommands(root, debug);
 		dev.kultivator.disciple.path.DisciplePaths.addCommands(root, debug);
 		dev.kultivator.kehancuran.Kehancuran.addCommands(root, debug);
+		// Phase 6b (DESIGN 21.24): aula bangun ... (merged into module A's aula node).
+		dev.kultivator.sect.build.SectBuild.addCommands(root, debug);
 
 		TestCommands.addCommands(root);
 		root.then(debug);

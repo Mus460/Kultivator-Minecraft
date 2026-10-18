@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.sect_complete.description"
+    },
+    "icon": {
+      "id": "minecraft:bell"
+    },
+    "title": {
+      "translate": "advancement.kultivator.sect_complete.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

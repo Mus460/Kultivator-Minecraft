@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.four_builders.description"
+    },
+    "icon": {
+      "id": "minecraft:iron_axe"
+    },
+    "title": {
+      "translate": "advancement.kultivator.four_builders.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

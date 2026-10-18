@@ -25,6 +25,7 @@ public final class Net {
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.OpenScreen.TYPE, Payloads.OpenScreen.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.DiscipleInfo.TYPE, Payloads.DiscipleInfo.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.HallInfo.TYPE, Payloads.HallInfo.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.BuildPreview.TYPE, Payloads.BuildPreview.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Payloads.Action.TYPE, Payloads.Action.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Action.TYPE, (payload, context) -> handle(context.player(), payload));
@@ -71,6 +72,8 @@ public final class Net {
 			case Actions.DISCIPLE_POWER -> dev.kultivator.disciple.power.DisciplePowers.handleAction(player, action);
 			case Actions.DISCIPLE_PATH -> dev.kultivator.disciple.path.DisciplePaths.handleAction(player, action);
 			case Actions.KEHANCURAN -> dev.kultivator.kehancuran.Kehancuran.handleAction(player, action);
+			// Phase 6b (DESIGN 21.24).
+			case Actions.SECT_BUILD -> dev.kultivator.sect.build.SectBuild.handleAction(player, action);
 			default -> {
 			}
 		}

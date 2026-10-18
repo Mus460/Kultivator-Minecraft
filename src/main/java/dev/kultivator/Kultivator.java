@@ -103,6 +103,9 @@ public class Kultivator implements ModInitializer {
 		dev.kultivator.disciple.power.DisciplePowers.init();
 		dev.kultivator.disciple.path.DisciplePaths.init();
 		dev.kultivator.kehancuran.Kehancuran.init();
+		// Phase 6b: Pembangunan Sekte (DESIGN 21.24); the engine registers first, then the flow and its hall providers.
+		dev.kultivator.sect.build.engine.BuildEngine.init();
+		dev.kultivator.sect.build.SectBuild.init();
 		// After every module registered its items.
 		ModItems.init();
 

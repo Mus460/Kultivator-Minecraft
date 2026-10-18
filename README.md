@@ -6,18 +6,23 @@ Mod Fabric berdiri sendiri di mana **pemain** berkultivasi seperti di novel xian
 Manusia Fana sampai Dewa Abadi, bertahan dari Tribulasi Langit, memilih Jalan Dao, menguasai teknik, terbang di atas
 pedang, meracik pil, menghadapi Iblis Hati, membangkitkan binatang roh, dan mendirikan sekte. Kamu mendirikan
 **Aula Sekte**, menerima murid dari Hari Penerimaan Murid, dan membimbing mereka naik tanpa batas sampai **Bintang
-Abadi**, bahkan sampai melampauimu. Setiap fitur sekte dan murid diadaptasi dari cerita kultivasi sungguhan, dan
-sumbernya (karya + konsep) tertulis di game dan di panduan.
+Abadi**, bahkan sampai melampauimu. Lalu sektemu **membangun dirinya sendiri**: pilih satu dari sembilan templat
+kompleks sekte klasik, setor bahan, dan saksikan sekte tumbuh melewati sembilan tingkat. Setiap fitur sekte dan murid
+diadaptasi dari cerita kultivasi sungguhan, dan sumbernya (karya + konsep) tertulis di game dan di panduan.
 
 📖 **Panduan pemain lengkap: [docs/PANDUAN.md](docs/PANDUAN.md)** · Daftar uji per fase: [docs/uji/](docs/uji/) ·
 Rancangan dan aturan kode: [docs/DESIGN.md](docs/DESIGN.md)
 
 **Aturan keras:** efek dan kekuatan mod ini tidak pernah membakar, merusak, memasang, atau mengubah blok apa pun.
 Petir tribulasi hanya partikel dan suara (tanpa entity petir), cuaca dan waktu tidak diubah, dan tribulasi tidak pernah
-membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Satu-satunya pengecualian adalah **Mode Kehancuran** untuk
-jurus murid tingkat tertinggi: **mati secara bawaan**, terkunci di balik izin server, sumpah pemain, dan segel per murid,
-dengan zona terlindung di sekitar aula, pemain, dan desa, serta tombol Pulihkan
-([peringatan di panduan](docs/PANDUAN.md#31-mode-kehancuran-peringatan)).
+membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengecualian:
+* **Pembangunan Sekte** memasang blok **hanya di dalam tapak yang kamu lihat sebagai hologram lalu kamu konfirmasi
+  sendiri**, hanya di chunk yang sudah termuat. Tanah dan tanaman alami yang dipindahkan dikreditkan ke Gudang Bahan
+  Sekte, bangunan buatan pemain dan blok terlindung tidak pernah dibongkar diam-diam, dan di luar tapak tidak ada yang
+  berubah ([aturannya di panduan](docs/PANDUAN.md#20b17-keamanan-blok-pembangunan-sekte)).
+* **Mode Kehancuran** untuk jurus murid tingkat tertinggi: **mati secara bawaan**, terkunci di balik izin server, sumpah
+  pemain, dan segel per murid, dengan zona terlindung di sekitar aula, tapak sekte, pemain, dan desa, serta tombol
+  Pulihkan ([peringatan di panduan](docs/PANDUAN.md#31-mode-kehancuran-peringatan)).
 
 ## Fitur
 
@@ -57,6 +62,16 @@ dengan zona terlindung di sekitar aula, pemain, dan desa, serta tombol Pulihkan
   Dinasti, Alam Dewa Hampa tanpa batas lantai, Latihan Khusus, Menara Langit Membara.
 * **Kekuatan murid** — Jurus Pamungkas per Dao, Benih Api Surgawi dan Fusi Api Guru-Murid, Pusaka Natal dengan lipatan
   penempaan, Kitab Abadi Tak Mati, Pelarian Jiwa Baru Lahir, Sayap Kunpeng, Formasi Tujuh Peri.
+* **Pembangunan Sekte** — sembilan templat kompleks sekte klasik bergaya donghua dan manhua, dari **Sekte Tak
+  Berperingkat** (25×29) sampai **Istana Langit** (161×161, lima puncak di atas awan), masing-masing dengan sembilan
+  tingkat yang setiap tingkatnya sudah tampak selesai: Aula Pendiri, dapur dan Kebun Seratus Obat, Paviliun Kitab, tembok
+  dan air, cakram Formasi Agung, aula utama di atas teras marmer, lapangan latihan, pagoda dan aula leluhur, lalu Menara
+  Langit Membara. Pilih templat di Prasasti, lihat tapaknya sebagai hologram, putar, konfirmasi sekali, lalu **cukup setor
+  bahan**: setiap bangunan mulai dan membangun dirinya sendiri begitu bahannya lengkap. Atap melengkung dengan ujung
+  terangkat dalam glasir Tinta, Giok, atau Langit; sembilan kategori bahan di Gudang Bahan Sekte dan Peti Galian; Misi
+  Pembangunan dan Ekspedisi Pengumpulan untuk PK; sampai empat murid sebagai Pekerja Bangunan; Naik Templat, Periksa &
+  Perbaiki, Bongkar, dan Pindah dengan pengembalian bahan; penyumbang di LAN; laju hemat untuk laptop lemah (tanpa memuat
+  paksa chunk, berhenti saat server sibuk).
 * **Jalan Abadi** — ikatan, Segel Jiwa, Hu Fa dan Tahan Petir, Fondasi Dao; **Bintang Abadi** tanpa batas dengan Tujuh
   Bencana dalam Tiga Ujian, gelar tahap Stellar, Klon Ilahi, Lampu Jiwa; pewaris dan Sembilan Segel, Cincin Jiwa Guru,
   **Murid Melampaui Guru**; Jurus Pemusnah yang aman blok, dan **Mode Kehancuran** opsional (mati secara bawaan).
@@ -74,7 +89,7 @@ dengan zona terlindung di sekitar aula, pemain, dan desa, serta tombol Pulihkan
 | 4 | Visual mewah, alkimia, Pengakuan Langit (event Dewa Abadi), pencapaian akhir, panduan pemain | ✅ |
 | 5 | Murid: bot pengikut yang diajari teknik dan ikut berkultivasi, perintah uji | ✅ |
 | 6 | Sekte Abadi & murid OP: Aula Sekte, Hari Penerimaan Murid, bakat dan fisik, jenjang dan Poin Kontribusi, tugas, misi, turnamen, Alam Dewa Hampa, kekuatan murid, Bintang Abadi, pewaris, Mode Kehancuran opsional ([daftar uji](docs/uji/FASE-6.md)) | ✅ |
-| 6b | Pembangunan Sekte: 9 templat x 9 tingkat, cukup setor bahan lalu sekte membangun dirinya sendiri | ⏳ |
+| 6b | Pembangunan Sekte (9 templat x 9 tingkat): pilih templat, pratinjau hologram, konfirmasi sekali, lalu cukup setor bahan dan sekte membangun dirinya sendiri; Gudang Bahan Sekte, Misi Pembangunan, Ekspedisi Pengumpulan, Pekerja Bangunan, Naik Templat/Perbaiki/Bongkar/Pindah, penyumbang LAN, perintah uji `uji sekte` ([daftar uji](docs/uji/FASE-6b.md), [panduan](docs/PANDUAN.md#20b-pembangunan-sekte)). Belum diuji di game; tagihan belum diseimbangkan | ✅ |
 | 6c | Teknik Dewa: 100+ teknik baru bersumber cerita kultivasi, makin OP sesuai ranah, Kitab Teknik, kehancuran blok lewat saklar gampang | ⏳ |
 | 7 | Dunia yang Hidup (monster elite, batu roh, jimat, herba) | ⏳ |
 
@@ -82,8 +97,11 @@ dengan zona terlindung di sekitar aula, pemain, dan desa, serta tombol Pulihkan
 
 `/kultivasi` atau `/cultivate` — `info`, `meditate`, `breakthrough`, `hardcore on|off`, `root test|info`,
 `dao [info|choose <dao>]`, `technique list|select|cast`, `visual <bagian> on|off`, `beast list`, `formation list`,
-`murid list|panggil|ikut|tinggal|meditasi|bantu|tahan`, `aula info|nama <nama>`, `kehancuran status|sumpah|pulihkan`.
-Perintah uji cepat untuk operator: `/kultivasi uji ...` dan `/kultivasi uji murid <nama|semua> maks|ranah|bintang <n>`.
+`murid list|panggil|ikut|tinggal|meditasi|bantu|tahan`, `aula info|nama <nama>`, `kehancuran status|sumpah|pulihkan`,
+`aula bangun [templat|pratinjau <1-9> [arah] [glasir]|konfirmasi|setor [semua|butuh]|naik <2-9>|perbaiki|bongkar|lepaskan]`.
+Perintah uji cepat untuk operator: `/kultivasi uji ...`, `/kultivasi uji murid <nama|semua> maks|ranah|bintang <n>`, dan
+`/kultivasi uji sekte templat <1-9>|tingkat <0-9> [instan|cepat]|sumber|pamer|audit|info|reset|...`
+([daftar lengkap](docs/PANDUAN.md#20b16-perintah)).
 `/sekte` atau `/sect` — `create`, `invite`, `join`, `leave`, `kick`, `disband`, `info`, `list`, `chat`,
 `spar <pemain>|accept|decline`. Perintah uji operator ada di bawah `/kultivasi debug` — daftar lengkapnya di
 [panduan](docs/PANDUAN.md#33-perintah-uji-untuk-operator-kultivasi-debug-).
@@ -97,8 +115,9 @@ Langkah Awan. Semua bisa diganti di Options → Controls → Key Binds → Kulti
 
 `config/kultivator.json` (server): `xpMultiplier`, `hardcoreForced`, `daoProtectorEvent`, `tribulationDamageScale`,
 `heartDemonTrials`, `protectiveFormations`, `announceBreakthroughs`, `sectHall`, `recruitmentIntervalDays`,
-`sectEvents`, `tournamentIntervalDays`, `forbiddenGroundIntervalDays`, serta `modeKehancuran` (bawaan `false`) dan
-batas-batas `kehancuran...`. `config/kultivator-client.json` (klien): `effect_quality`, `hud`. Penjelasan di
+`sectEvents`, `tournamentIntervalDays`, `forbiddenGroundIntervalDays`, `sectConstruction` dan `sectBuild...` (laju,
+batas per tick, jeda MSPT, jangkauan, tabungan, templat terbesar, pengembalian bahan, tanpa monster di sekte), serta
+`modeKehancuran` (bawaan `false`) dan batas-batas `kehancuran...`. `config/kultivator-client.json` (klien): `effect_quality`, `hud`. Penjelasan di
 [panduan](docs/PANDUAN.md#36-berkas-konfigurasi).
 
 ## Build
@@ -123,14 +142,19 @@ You also take on disciples. Found a **Sect Hall** with a stele you craft and pla
 take an entrance test, and join at a sect rank. Disciples carry soul colours, talents and rare physiques, earn
 contribution points, run duties and expeditions, fight in tournaments and the endless Void God Realm, unlock Dao
 ultimates, Heavenly Flames and a Natal Treasure, and keep growing past True Immortal through endless **Immortal Stars**
-and seven calamities, until they may surpass their master. Every sect and disciple feature adapts a named concept from
-real cultivation stories, and the game and the guide name each source.
+and seven calamities, until they may surpass their master. Then the sect **builds itself**: choose one of nine
+classical sect templates (from the 25×29 Unranked Sect to the 161×161 Heavenly Court of five peaks above the clouds),
+preview the footprint as a hologram, confirm once, and just deposit materials. Each building starts and rises by itself
+as soon as its materials are in, through nine tiers that each already look finished. Every sect and disciple feature
+adapts a named concept from real cultivation stories, and the game and the guide name each source.
 
 Nothing in this mod ever burns, breaks, places or changes a block; tribulation lightning is particles and sound only,
 the weather and time are never changed, and a failed tribulation injures you (Qi Deviation) instead of killing you.
-The one exception is the opt-in **Destruction Mode** for top-tier disciple arts. It is OFF by default and needs server
-permission, a player oath and a per-disciple seal release. Halls, players and villages stay protected, and an undo
-window restores the blocks.
+There are two exceptions. **Sect Construction** places blocks only inside the footprint you previewed as a hologram and
+confirmed yourself, only in loaded chunks; natural ground it moves is credited to the sect's material store, and
+player-made and protected blocks are never removed silently. The opt-in **Destruction Mode** for top-tier disciple arts
+is OFF by default and needs server permission, a player oath and a per-disciple seal release. Halls, sect sites, players
+and villages stay protected, and an undo window restores the blocks.
 The full player guide is in Indonesian: [docs/PANDUAN.md](docs/PANDUAN.md); every rule and number is in
 [docs/DESIGN.md](docs/DESIGN.md); per-phase test lists in [docs/uji/](docs/uji/).
 
