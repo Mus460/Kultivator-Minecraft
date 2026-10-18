@@ -48,6 +48,7 @@ public final class Deviation {
 			Msg.chat(player, Component.translatable("kultivator.breakthrough.deviation.recovered").withStyle(ChatFormatting.GREEN));
 			player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE,
 					SoundSource.PLAYERS, 0.8F, 1.2F);
+			refill(player, data);
 			Cultivators.refreshVisual(player);
 			Cultivators.syncNow(player);
 			// DEVIATION_RECOVERED feats (DESIGN 22.8.9).
@@ -98,6 +99,31 @@ public final class Deviation {
 		Advancements.grant(player, "qi_deviation");
 		Cultivators.refreshVisual(player);
 		Cultivators.syncNow(player);
+	}
+
+	/** Stored Qi spent per XP of the refill after a deviation (DESIGN 19.3.11). */
+	public static final double REFILL_COST = 2.0D;
+
+	/**
+	 * The refill after a failure (DESIGN 19.3.11, game design): when a deviation ends at a bottleneck with the bar not
+	 * full, Stored Qi flows back into the bar, {@code min(missing, storedQi / 2)}, costing {@link #REFILL_COST} per XP.
+	 */
+	public static void refill(ServerPlayer player, CultivationData data) {
+		dev.kultivator.data.Rank rank = data.rank();
+		double stored = data.storedQi();
+		if (!rank.isBottleneck() || rank.isMax() || data.barFull() || !(stored > 0.0D)) {
+			return;
+		}
+		double missing = Math.max(0.0D, rank.xpRequired() - data.xp());
+		double amount = Math.min(missing, stored / REFILL_COST);
+		if (!(amount > 0.0D)) {
+			return;
+		}
+		data.setXp(data.xp() + amount);
+		data.setStoredQi(Math.max(0.0D, stored - amount * REFILL_COST));
+		Msg.chat(player, Component.translatable("kultivator.kultivasi.refill", Msg.number(amount), Msg.number(amount * REFILL_COST))
+				.withColor(0xC69CFF));
+		Cultivators.dirty(player);
 	}
 
 	/** Ends a deviation at once (healing pills, commands). */

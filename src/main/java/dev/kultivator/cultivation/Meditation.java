@@ -13,11 +13,14 @@ import dev.kultivator.data.Realm;
 import dev.kultivator.data.XpSource;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
+import dev.kultivator.harta.SpiritStones;
+import dev.kultivator.talisman.TalismanFxIds;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -25,6 +28,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.MutableComponent;
@@ -35,10 +39,12 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -46,10 +52,17 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Meditation (DESIGN section 4): the player sits cross-legged and gathers qi. Every second it gives XP scaled by the
- * spiritual site, the qi gathering formation and the spirit vein density, drains the vein a little, and every minute
- * may bring an enlightenment. Qi regeneration itself is boosted by {@code Qi.tick} (it reads {@code meditating()}).
- * Moving, getting hurt, attacking, using an item or block, changing dimension, dying or starting a breakthrough ends it.
+ * Meditation (DESIGN 4, reworked in 19.3.5): the player sits cross-legged and gathers qi. Every second it gives
+ * {@link #gainPerSecond} XP (realm base rate × site × formation × spirit-stone fuel, capped at ×5, × vein density × sect
+ * bonus × closed-door seclusion), drains the spirit vein, and every minute may bring an enlightenment. Qi regeneration
+ * itself is boosted by {@code Qi.tick} (it reads {@code meditating()}). Moving, getting hurt, attacking, using an item or
+ * block, changing dimension, dying or starting a breakthrough ends it; a session of a minute or more ends with a
+ * summary line.
+ * <p>
+ * Kultivasi Tertutup (closed-door seclusion): unbroken meditation earns a stack every 5 minutes (+5% each, up to 5) and
+ * after 30 minutes raises the enlightenment chance ×1.5. Within 6 blocks of a protected cave abode a break of 10 s or
+ * less keeps the stacks. Sumber: RMJ ch. 520 and <i>RMJ: Immortal Realm</i> ch. 1142 (years of seclusion); the numbers
+ * are game design.
  */
 public final class Meditation {
 
@@ -61,27 +74,99 @@ public final class Meditation {
 	/** Comprehension per second for each site that matches the chosen Dao. */
 	private static final double SITE_COMPREHENSION = 0.004D;
 
+	/** The base rate: {@code max(0.6 + 0.25 × realm, Rank(realm, layer, 0).xpRequired() / BASE_DIVISOR)} XP per second. */
+	public static final double BASE_FLAT = 0.6D;
+	public static final double BASE_PER_REALM = 0.25D;
+	public static final double BASE_DIVISOR = 3000.0D;
+	/** Site × formation × fuel never multiplies the base by more than this. */
+	public static final double MULTIPLIER_CAP = 5.0D;
+	/** Density never lowers the gain below this share. */
+	public static final double DENSITY_FLOOR = 0.15D;
+	/** Vein drain per second: {@code DRAIN_BASE × (1 + DRAIN_PER_REALM × realm)} × the factors below. */
+	public static final double DRAIN_BASE = 0.0015D;
+	public static final double DRAIN_PER_REALM = 0.10D;
+	public static final double DRAIN_FUEL = 0.5D;
+	public static final double DRAIN_GREAT_FORMATION = 0.6D;
+	public static final double DRAIN_HEAVENLY_FORMATION = 0.35D;
+	public static final double DRAIN_ABODE = 0.5D;
+	/** A Great (Heavenly) qi formation keeps the density at or above this while it is active at the seat. */
+	public static final double FLOOR_GREAT_FORMATION = 0.30D;
+	public static final double FLOOR_HEAVENLY_FORMATION = 0.45D;
+	/** Spirit-stone fuel by grade (Low, Mid, High, Supreme): seconds one stone lasts and its XP factor. */
+	public static final int[] FUEL_SECONDS = {30, 150, 300, 600};
+	public static final double[] FUEL_FACTOR = {1.5D, 2.0D, 2.5D, 3.0D};
+	/** Closed-door seclusion: one stack per period of unbroken meditation, up to the maximum, +5% XP each. */
+	public static final int SECLUSION_PERIOD = 300;
+	public static final int SECLUSION_MAX = 5;
+	public static final double SECLUSION_BONUS = 0.05D;
+	/** After this many unbroken seconds the enlightenment chance is multiplied. */
+	public static final int SECLUSION_DEEP = 1800;
+	public static final double SECLUSION_DEEP_FACTOR = 1.5D;
+	/** Unbroken seconds of the advancement {@code closed_door_hour}. */
+	public static final int CLOSED_DOOR_HOUR = 3600;
+	/** Seconds in a Great vein for the advancement {@code great_vein}. */
+	public static final int GREAT_VEIN_SECONDS = 600;
+	/** A meditation this long ends with a summary line. */
+	public static final int SUMMARY_SECONDS = 60;
+	/** A break this short near a protected abode keeps the seclusion. */
+	public static final int ABODE_BREAK_TICKS = 200;
+	/** Clear Mind boon (L8): extra enlightenment chance per minute and healing per second while meditating. */
+	public static final double CLEAR_MIND_CHANCE = 0.02D;
+	public static final float CLEAR_MIND_HEAL = 0.5F;
+	/** A protected cave abode adds this to the enlightenment chance per minute. */
+	public static final double ABODE_CHANCE = 0.01D;
+
 	private static final int JADE = 0x8FE3C8;
 	private static final int GOLD = 0xFFD54A;
 	private static final int MUTED = 0xA8B5B0;
+	private static final int VIOLET = 0xC69CFF;
 
 	/** Server-side state of one meditation, from sitting down to standing up. */
 	private static final class Session {
 		final Vec3 start;
 		final ResourceKey<Level> dimension;
+		final long startTime;
+		final int startEnlightenments;
+		final double startDensity;
 		int ticks;
 		int seconds;
+		/** Unbroken seconds of closed-door seclusion (restored after a short break at the abode). */
+		int unbroken;
+		int stacks;
+		int greatSeconds;
 		SpiritSites.Result site = SpiritSites.Result.NONE;
 		int tier;
+		int grade;
+		/** 1 abode bonuses active, −1 at the abode but unprotected, 0 not at an abode. */
+		int abode;
 		boolean warnedThin;
+		boolean warnedAbode;
+		boolean fuelTold;
+		boolean reserveTold;
+		boolean deepTold;
+		double xpGained;
+		double storedGained;
 
-		Session(Vec3 start, ResourceKey<Level> dimension) {
+		Session(Vec3 start, ResourceKey<Level> dimension, long startTime, int startEnlightenments, double startDensity) {
 			this.start = start;
 			this.dimension = dimension;
+			this.startTime = startTime;
+			this.startEnlightenments = startEnlightenments;
+			this.startDensity = startDensity;
 		}
 	}
 
+	/** A consumed spirit stone: its grade and the game time its period ends. */
+	private record Fuel(int grade, long end) {
+	}
+
+	/** Where a seclusion was broken off at the abode: when, and how many unbroken seconds it had. */
+	private record Break(long time, int unbroken) {
+	}
+
 	private static final Map<UUID, Session> SESSIONS = new HashMap<>();
+	private static final Map<UUID, Fuel> FUEL = new HashMap<>();
+	private static final Map<UUID, Break> BREAKS = new HashMap<>();
 	/** True while the meditate key is asking for a breakthrough: the stop it causes needs no message of its own. */
 	private static boolean quietStop;
 
@@ -111,6 +196,7 @@ public final class Meditation {
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
 			if (entity instanceof ServerPlayer player) {
 				Enlightenment.forget(player);
+				BREAKS.remove(player.getUUID());
 				if (isMeditating(player) || SESSIONS.containsKey(player.getUUID())) {
 					end(player, null);
 				}
@@ -120,6 +206,11 @@ public final class Meditation {
 			SESSIONS.remove(newPlayer.getUUID());
 			Enlightenment.forget(newPlayer);
 			SpiritSites.forget(newPlayer);
+		});
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+			SESSIONS.clear();
+			FUEL.clear();
+			BREAKS.clear();
 		});
 	}
 
@@ -138,12 +229,13 @@ public final class Meditation {
 		if (!data.meditating()) {
 			if (session != null) {
 				SESSIONS.remove(id);
+				clearHud(player, data);
 			}
 			return;
 		}
 		if (session == null) {
 			// Someone else switched the flag on (or a reload): start a session where the player is.
-			session = new Session(player.position(), player.level().dimension());
+			session = newSession(player, data);
 			SESSIONS.put(id, session);
 			evaluate(player, data, session, true);
 		}
@@ -180,7 +272,24 @@ public final class Meditation {
 		}
 	}
 
-	/** Re-checks spiritual sites and the formation (on start and every 5 s), grants their advancements and shows the lines. */
+	private static Session newSession(ServerPlayer player, CultivationData data) {
+		ServerLevel level = player.level();
+		Session session = new Session(player.position(), level.dimension(), level.getGameTime(), data.enlightenments(),
+				SpiritVeins.density(level, player.blockPosition()));
+		Break pause = BREAKS.remove(player.getUUID());
+		if (pause != null && level.getGameTime() - pause.time() <= ABODE_BREAK_TICKS && CaveAbode.bonusActive(player)) {
+			// A short break at the protected abode: the seclusion goes on (DESIGN 19.3.5).
+			session.unbroken = pause.unbroken();
+			session.stacks = Math.min(SECLUSION_MAX, session.unbroken / SECLUSION_PERIOD);
+			session.deepTold = session.unbroken >= SECLUSION_DEEP;
+			if (session.stacks > 0) {
+				Msg.chat(player, Component.translatable("kultivator.kultivasi.seclusion.kept", percentBonus(session.stacks)).withColor(VIOLET));
+			}
+		}
+		return session;
+	}
+
+	/** Re-checks spiritual sites, the formation, the vein grade and the abode (on start and every 5 s). */
 	private static void evaluate(ServerPlayer player, CultivationData data, Session session, boolean starting) {
 		ServerLevel level = player.level();
 		BlockPos seat = player.blockPosition().below();
@@ -198,6 +307,21 @@ public final class Meditation {
 		session.tier = tier;
 		data.setSiteMultiplier(site.multiplier());
 		data.setFormationTier(tier);
+		int grade = SpiritVeins.grade(level, player.blockPosition());
+		if (starting && grade != SpiritVeins.NORMAL) {
+			Msg.chat(player, Component.translatable("kultivator.kultivasi.vein.here", SpiritVeins.gradeName(grade),
+					percentText(SpiritVeins.cap(level, player.blockPosition()))).withColor(SpiritVeins.gradeColor(grade)));
+		}
+		session.grade = grade;
+		putInt(player, data, "vein_grade", grade);
+		int abode = CaveAbode.state(player);
+		session.abode = abode;
+		putInt(player, data, "abode", abode);
+		if (abode < 0 && !session.warnedAbode) {
+			session.warnedAbode = true;
+			Msg.chat(player, Component.translatable("kultivator.kultivasi.abode.unprotected").withColor(0xFF9A7A));
+		}
+		putInt(player, data, "seclusion", session.stacks);
 		Cultivators.dirty(player);
 		if (site.any()) {
 			Advancements.grant(player, "spiritual_site");
@@ -226,21 +350,132 @@ public final class Meditation {
 				0.9F, 0.8F + tier * 0.2F);
 	}
 
-	/** One second of meditation: XP, vein drain, Dao insight from the site, the thin-vein warning, enlightenment rolls. */
+	// ================================================================ the formula
+
+	/** The realm base rate of {@link #gainPerSecond}: unchanged up to Nascent Soul, then a share of the realm's bar. */
+	public static double baseRate(Rank rank) {
+		Realm realm = rank.realm();
+		double flat = BASE_FLAT + BASE_PER_REALM * realm.ordinal();
+		return Math.max(flat, new Rank(realm, rank.layer(), 0).xpRequired() / BASE_DIVISOR);
+	}
+
+	/**
+	 * Meditation XP per second before {@code Progression}'s multipliers (DESIGN 19.3.5), shared with
+	 * {@code DiscipleCultivation.masterMeditationGain}: {@code base × min(5, site × formation × fuel) × max(0.15, density)
+	 * × Sects.meditationBonus × (1 + 0.05 × seclusion stacks)}. Site and formation are the synced values of the session.
+	 */
+	public static double gainPerSecond(ServerPlayer player, CultivationData data) {
+		double site = data.siteMultiplier() > 0.0D ? data.siteMultiplier() : 1.0D;
+		double formation = QiFormations.multiplier(data.formationTier());
+		double density = SpiritVeins.density(player.level(), player.blockPosition());
+		return baseRate(data.rank()) * Math.min(MULTIPLIER_CAP, site * formation * fuelFactor(player)) * Math.max(DENSITY_FLOOR, density)
+				* dev.kultivator.sect.Sects.meditationBonus(player) * (1.0D + SECLUSION_BONUS * seclusionStacks(player));
+	}
+
+	/** Vein drain per second of the player's meditation now (fuel, formation tier and abode factors). */
+	public static double drainPerSecond(ServerPlayer player, CultivationData data, int tier, boolean abode) {
+		double drain = DRAIN_BASE * (1.0D + DRAIN_PER_REALM * data.realm().ordinal());
+		if (fuelActive(player)) {
+			drain *= DRAIN_FUEL;
+		}
+		if (tier >= 3) {
+			drain *= DRAIN_HEAVENLY_FORMATION;
+		} else if (tier == 2) {
+			drain *= DRAIN_GREAT_FORMATION;
+		}
+		if (abode) {
+			drain *= DRAIN_ABODE;
+		}
+		return drain;
+	}
+
+	/**
+	 * The enlightenment chance for one minute: {@code (0.04 × site + 0.02 with a Dao) × 1.5 after 30 min of seclusion ×
+	 * the pill boost + 0.02 (Clear Mind) + 0.01 (abode)}, at most {@link Enlightenment#MAX_CHANCE}.
+	 */
+	public static double enlightenmentChance(ServerPlayer player, CultivationData data, double site, int unbroken, boolean abode) {
+		double chance = Enlightenment.chance(data, site);
+		if (unbroken >= SECLUSION_DEEP) {
+			chance *= SECLUSION_DEEP_FACTOR;
+		}
+		chance *= Enlightenment.boostFactor(player);
+		if (ImmortalPerks.boonActive(data, 8)) {
+			chance += CLEAR_MIND_CHANCE;
+		}
+		if (abode) {
+			chance += ABODE_CHANCE;
+		}
+		return Math.min(Enlightenment.MAX_CHANCE, chance);
+	}
+
+	/** Seclusion stacks of the running meditation (0 when not meditating). */
+	public static int seclusionStacks(ServerPlayer player) {
+		Session session = SESSIONS.get(player.getUUID());
+		return session == null ? 0 : Math.min(SECLUSION_MAX, session.unbroken / SECLUSION_PERIOD);
+	}
+
+	/** Unbroken seconds of the running meditation (0 when not meditating). */
+	public static int unbrokenSeconds(ServerPlayer player) {
+		Session session = SESSIONS.get(player.getUUID());
+		return session == null ? 0 : session.unbroken;
+	}
+
+	/** The spirit-stone XP factor while a consumed stone's period runs (1 otherwise). */
+	public static double fuelFactor(ServerPlayer player) {
+		Fuel fuel = FUEL.get(player.getUUID());
+		if (fuel == null || fuel.end() <= player.level().getGameTime()) {
+			return 1.0D;
+		}
+		return FUEL_FACTOR[Math.max(0, Math.min(FUEL_FACTOR.length - 1, fuel.grade()))];
+	}
+
+	/** True while a consumed spirit stone's period runs. */
+	public static boolean fuelActive(ServerPlayer player) {
+		Fuel fuel = FUEL.get(player.getUUID());
+		return fuel != null && fuel.end() > player.level().getGameTime();
+	}
+
+	/**
+	 * Sets the unbroken seconds of the running meditation ({@code uji tertutup}); false when the player is not meditating.
+	 */
+	public static boolean setUnbroken(ServerPlayer player, int seconds) {
+		Session session = SESSIONS.get(player.getUUID());
+		if (session == null) {
+			return false;
+		}
+		session.unbroken = Math.max(0, seconds);
+		session.stacks = Math.min(SECLUSION_MAX, session.unbroken / SECLUSION_PERIOD);
+		putInt(player, Cultivators.get(player), "seclusion", session.stacks);
+		return true;
+	}
+
+	// ================================================================ one second
+
+	/** One second of meditation: fuel, XP, vein drain, Dao insight, seclusion, the warnings, enlightenment rolls. */
 	private static void second(ServerPlayer player, CultivationData data, Session session) {
 		ServerLevel level = player.level();
 		BlockPos pos = player.blockPosition();
-		Realm realm = data.realm();
 		double site = session.site.multiplier();
 		int tier = session.tier;
-		double density = SpiritVeins.density(level, pos);
-		double xp = (0.6D + 0.25D * realm.ordinal()) * site * QiFormations.multiplier(tier) * Math.max(0.15D, density);
-		Progression.addXp(player, xp * dev.kultivator.sect.Sects.meditationBonus(player), XpSource.MEDITATION);
-		SpiritVeins.drain(level, pos, 0.0015D * (1.0D + realm.ordinal() * 0.25D));
-		density = SpiritVeins.density(level, pos);
-
 		data.setSiteMultiplier(site);
 		data.setFormationTier(tier);
+		session.unbroken++;
+		refuel(player, data, session);
+
+		double gain = gainPerSecond(player, data);
+		double storedBefore = data.storedQi();
+		double added = Progression.grantXp(player, gain, XpSource.MEDITATION);
+		double stored = Math.max(0.0D, data.storedQi() - storedBefore);
+		session.xpGained += Math.max(0.0D, added - stored);
+		session.storedGained += stored;
+
+		boolean abode = session.abode > 0;
+		double density = SpiritVeins.density(level, pos);
+		double floor = tier >= 3 ? FLOOR_HEAVENLY_FORMATION : tier == 2 ? FLOOR_GREAT_FORMATION : 0.0D;
+		if (density > floor) {
+			SpiritVeins.drain(level, pos, Math.min(drainPerSecond(player, data, tier, abode), density - floor));
+		}
+		density = SpiritVeins.density(level, pos);
 		data.setVeinDensity(density);
 		data.addMeditationTicks(20);
 		// MEDITATE_AT feats (DESIGN 22.8.9).
@@ -253,23 +488,108 @@ public final class Meditation {
 				}
 			}
 		}
+		if (ImmortalPerks.boonActive(data, 8) && player.getHealth() < player.getMaxHealth()) {
+			// Pikiran Jernih (L8): the calm mind mends the body.
+			player.heal(CLEAR_MIND_HEAL);
+		}
 		Cultivators.dirty(player);
 		session.seconds++;
 
+		seclusion(player, data, session);
+		if (session.grade == SpiritVeins.GREAT) {
+			session.greatSeconds++;
+			if (session.greatSeconds >= GREAT_VEIN_SECONDS) {
+				Advancements.grant(player, "great_vein");
+			}
+		}
 		if (density < THIN_VEIN && !session.warnedThin) {
 			session.warnedThin = true;
 			Msg.chat(player, Component.translatable("kultivator.meditation.vein_thin", percent(density)).withColor(0xFF9A7A));
 			Advancements.grant(player, "depleted_vein");
 		}
 		if (session.seconds % 60 == 0) {
-			double chance = Enlightenment.chance(data, site);
+			double chance = enlightenmentChance(player, data, site, session.unbroken, abode);
 			if (!Enlightenment.isActive(player) && player.getRandom().nextDouble() < chance) {
 				Enlightenment.trigger(player);
 			}
 		}
 	}
 
-	/** The line above the hotbar: site, qi density and formation, or the bottleneck hint when the bar is full. */
+	/** The seclusion stacks grow every 5 minutes; the deep mark at 30 minutes; the hour advancement. */
+	private static void seclusion(ServerPlayer player, CultivationData data, Session session) {
+		int stacks = Math.min(SECLUSION_MAX, session.unbroken / SECLUSION_PERIOD);
+		if (stacks > session.stacks) {
+			session.stacks = stacks;
+			putInt(player, data, "seclusion", stacks);
+			Msg.chat(player, Component.translatable("kultivator.kultivasi.seclusion.stack", percentBonus(stacks), stacks, SECLUSION_MAX)
+					.withColor(VIOLET));
+			player.level().playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME,
+					SoundSource.PLAYERS, 0.7F, 0.6F + 0.15F * stacks);
+		}
+		if (session.unbroken >= SECLUSION_DEEP && !session.deepTold) {
+			session.deepTold = true;
+			Msg.chat(player, Component.translatable("kultivator.kultivasi.seclusion.deep",
+					Msg.number(SECLUSION_DEEP_FACTOR)).withColor(GOLD));
+		}
+		if (session.unbroken >= CLOSED_DOOR_HOUR) {
+			Advancements.grant(player, "closed_door_hour");
+		}
+	}
+
+	/** Consumes one spirit stone from the offhand when no consumed stone's period runs (DESIGN 19.3.2, 19.3.5). */
+	private static void refuel(ServerPlayer player, CultivationData data, Session session) {
+		UUID id = player.getUUID();
+		long now = player.level().getGameTime();
+		Fuel fuel = FUEL.get(id);
+		if (fuel != null && fuel.end() > now) {
+			putInt(player, data, "fuel", fuel.grade());
+			putLong(player, data, "fuel_end", fuel.end());
+			return;
+		}
+		ItemStack offhand = player.getOffhandItem();
+		int grade = SpiritStones.isStone(offhand) ? SpiritStones.grade(offhand) : -1;
+		if (grade < 0 || grade >= FUEL_SECONDS.length) {
+			if (fuel != null) {
+				FUEL.remove(id);
+				removeKey(player, data, "fuel");
+				removeKey(player, data, "fuel_end");
+				Msg.actionBar(player, Component.translatable("kultivator.kultivasi.fuel.out").withColor(MUTED));
+			}
+			return;
+		}
+		if (grade >= SpiritStones.HIGH && data.barFull() && data.rank().nextIsBreakthrough() && !data.deviating()) {
+			// High and Supreme stones at a bottleneck are kept for Batu Roh di Hambatan (StoneBottleneck), never burned as fuel.
+			if (fuel != null) {
+				FUEL.remove(id);
+				removeKey(player, data, "fuel");
+				removeKey(player, data, "fuel_end");
+			}
+			if (!session.reserveTold) {
+				session.reserveTold = true;
+				Msg.chat(player, Component.translatable("kultivator.kultivasi.fuel.reserved", offhand.getHoverName().copy()).withColor(JADE));
+			}
+			return;
+		}
+		Component stoneName = offhand.getHoverName().copy();
+		if (!player.hasInfiniteMaterials()) {
+			offhand.shrink(1);
+		}
+		long end = now + FUEL_SECONDS[grade] * 20L;
+		FUEL.put(id, new Fuel(grade, end));
+		putInt(player, data, "fuel", grade);
+		putLong(player, data, "fuel_end", end);
+		ServerLevel level = player.level();
+		level.playSound(null, player.getX(), player.getY() + 0.5D, player.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS,
+				0.6F, 1.2F + 0.1F * grade);
+		Fx.send(level, player.position().add(0.0D, 0.6D, 0.0D), FxType.TALISMAN, TalismanFxIds.FUEL, grade, 0.0F);
+		if (!session.fuelTold) {
+			session.fuelTold = true;
+			Msg.chat(player, Component.translatable("kultivator.kultivasi.fuel.start", stoneName, Msg.number(FUEL_FACTOR[grade]),
+					FUEL_SECONDS[grade]).withColor(JADE));
+		}
+	}
+
+	/** The line above the hotbar: site, qi density, vein grade, formation and seclusion, or the bottleneck hint. */
 	private static void actionBar(ServerPlayer player, CultivationData data, Session session) {
 		Rank rank = data.rank();
 		if (data.barFull() && rank.nextIsBreakthrough()) {
@@ -277,13 +597,13 @@ public final class Meditation {
 				Msg.actionBar(player, Component.translatable("kultivator.progression.bottleneck_mortal_bar").withStyle(ChatFormatting.LIGHT_PURPLE));
 				return;
 			}
-			if (!data.deviating()) {
+			if (!data.deviating() && !fuelActive(player)) {
 				Msg.actionBar(player, Component.translatable("kultivator.meditation.bar.bottleneck",
 						Component.keybind("key.kultivator.meditate").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD),
 						Component.keybind("key.kultivator.info").withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD)).withColor(GOLD));
 				return;
 			}
-			// During a deviation no breakthrough is possible: show the normal line instead.
+			// During a deviation no breakthrough is possible, and fuel now flows into Stored Qi: show the normal line.
 		}
 		double site = session.site.multiplier();
 		double density = data.veinDensity();
@@ -291,11 +611,19 @@ public final class Meditation {
 		MutableComponent line = Component.literal("☯ ").withColor(JADE)
 				.append(Component.translatable("kultivator.meditation.bar.site", multiplier(site)).withColor(site > 1.0001D ? GOLD : MUTED))
 				.append(Component.literal("  ·  ").withColor(MUTED))
-				.append(Component.translatable("kultivator.meditation.bar.density", percent(density)).withColor(densityColor))
-				.append(Component.literal("  ·  ").withColor(MUTED))
+				.append(Component.translatable("kultivator.meditation.bar.density", percent(density)).withColor(densityColor));
+		if (session.grade != SpiritVeins.NORMAL) {
+			line.append(Component.literal(" · ").withColor(MUTED))
+					.append(SpiritVeins.gradeName(session.grade).copy().withColor(SpiritVeins.gradeColor(session.grade)));
+		}
+		line.append(Component.literal("  ·  ").withColor(MUTED))
 				.append(session.tier > 0
 						? QiFormations.name(session.tier).copy().withColor(QiFormations.color(session.tier))
 						: Component.translatable("kultivator.meditation.bar.no_formation").withColor(MUTED));
+		if (session.stacks > 0) {
+			line.append(Component.literal("  ·  ").withColor(MUTED))
+					.append(Component.translatable("kultivator.kultivasi.seclusion.bar", percentBonus(session.stacks)).withColor(VIOLET));
+		}
 		Msg.actionBar(player, line);
 	}
 
@@ -340,7 +668,7 @@ public final class Meditation {
 			Msg.chat(player, Component.translatable(reason).withColor(0xFF9A7A));
 			return false;
 		}
-		Session session = new Session(player.position(), player.level().dimension());
+		Session session = newSession(player, data);
 		SESSIONS.put(player.getUUID(), session);
 		data.setMeditating(true);
 		evaluate(player, data, session, true);
@@ -377,7 +705,9 @@ public final class Meditation {
 
 	public static void onLeave(ServerPlayer player) {
 		SESSIONS.remove(player.getUUID());
-		Enlightenment.forget(player);
+		FUEL.remove(player.getUUID());
+		BREAKS.remove(player.getUUID());
+		Enlightenment.forgetAll(player);
 		SpiritSites.forget(player);
 		CultivationData data = Cultivators.get(player);
 		data.setMeditating(false);
@@ -386,21 +716,59 @@ public final class Meditation {
 
 	/** Ends the meditation; {@code reasonKey} is the chat line telling why, null for none. */
 	private static void end(ServerPlayer player, @Nullable String reasonKey) {
-		SESSIONS.remove(player.getUUID());
+		Session session = SESSIONS.remove(player.getUUID());
 		CultivationData data = Cultivators.get(player);
 		boolean was = data.meditating();
 		data.setMeditating(false);
 		resetSessionValues(data);
+		clearHud(player, data);
 		Cultivators.syncNow(player);
 		if (was && reasonKey != null) {
 			Msg.chat(player, Component.translatable(reasonKey).withColor(MUTED));
 		}
+		if (session != null && player.isAlive()) {
+			if (session.abode > 0 && session.unbroken > 0) {
+				BREAKS.put(player.getUUID(), new Break(player.level().getGameTime(), session.unbroken));
+			}
+			if (session.seconds >= SUMMARY_SECONDS) {
+				summary(player, data, session);
+			}
+		}
+	}
+
+	/** "Meditasi 32 menit: +4.210 kultivasi · 2 pencerahan · kepadatan 180% → 95%". */
+	private static void summary(ServerPlayer player, CultivationData data, Session session) {
+		List<Component> parts = new ArrayList<>();
+		if (session.xpGained >= 0.5D) {
+			parts.add(Component.translatable("kultivator.kultivasi.summary.xp", Msg.number(session.xpGained)).withColor(JADE));
+		}
+		if (session.storedGained >= 0.5D) {
+			parts.add(Component.translatable("kultivator.kultivasi.summary.stored", Msg.number(session.storedGained)).withColor(VIOLET));
+		}
+		int enlightenments = Math.max(0, data.enlightenments() - session.startEnlightenments);
+		if (enlightenments > 0) {
+			parts.add(Component.translatable("kultivator.kultivasi.summary.enlightenments", enlightenments).withColor(GOLD));
+		}
+		double end = SpiritVeins.density(player.level(), player.blockPosition());
+		parts.add(Component.translatable("kultivator.kultivasi.summary.density", percent(session.startDensity), percent(end)).withColor(0x7FD8FF));
+		Component duration = session.seconds >= 3600
+				? Component.translatable("kultivator.kultivasi.summary.hours", session.seconds / 3600, (session.seconds % 3600) / 60)
+				: Component.translatable("kultivator.kultivasi.summary.minutes", Math.max(1, session.seconds / 60));
+		Msg.chat(player, Component.translatable("kultivator.kultivasi.summary", duration,
+				ComponentUtils.formatList(parts, Component.literal(" · ").withColor(MUTED))).withColor(MUTED));
 	}
 
 	private static void resetSessionValues(CultivationData data) {
 		data.setSiteMultiplier(1.0D);
 		data.setFormationTier(0);
 		data.setVeinDensity(1.0D);
+	}
+
+	/** Removes the meditation HUD keys of {@code sessionExtra} (DESIGN 19.9). */
+	private static void clearHud(ServerPlayer player, CultivationData data) {
+		for (String key : new String[]{"vein_grade", "seclusion", "fuel", "fuel_end", "abode"}) {
+			removeKey(player, data, key);
+		}
 	}
 
 	/** The translation key of why the player cannot sit down now, or null when they can. */
@@ -435,9 +803,37 @@ public final class Meditation {
 				|| player.isInWater() || player.isSleeping() || player.isSpectator();
 	}
 
+	// ================================================================ session keys (HUD, DESIGN 19.9)
+
+	private static void putInt(ServerPlayer player, CultivationData data, String key, int value) {
+		CompoundTag tag = data.sessionExtra();
+		if (!tag.contains(key) || tag.getIntOr(key, Integer.MIN_VALUE) != value) {
+			tag.putInt(key, value);
+			Cultivators.dirty(player);
+		}
+	}
+
+	private static void putLong(ServerPlayer player, CultivationData data, String key, long value) {
+		CompoundTag tag = data.sessionExtra();
+		if (!tag.contains(key) || tag.getLongOr(key, Long.MIN_VALUE) != value) {
+			tag.putLong(key, value);
+			Cultivators.dirty(player);
+		}
+	}
+
+	private static void removeKey(ServerPlayer player, CultivationData data, String key) {
+		if (data.sessionExtra().contains(key)) {
+			data.sessionExtra().remove(key);
+			Cultivators.dirty(player);
+		}
+	}
+
 	// ================================================================ commands
 
-	/** Adds {@code meditate} to /cultivate, and {@code enlighten}, {@code site}, {@code vein [percent]} to debug. */
+	/**
+	 * Adds {@code meditate} to /cultivate, and {@code enlighten}, {@code site}, {@code vein [percent 0-200]} and
+	 * {@code vein grade} to debug.
+	 */
 	public static void addCommands(LiteralArgumentBuilder<CommandSourceStack> root, LiteralArgumentBuilder<CommandSourceStack> debug) {
 		root.then(Commands.literal("meditate").executes(ctx -> {
 			toggle(ctx.getSource().getPlayerOrException());
@@ -450,19 +846,36 @@ public final class Meditation {
 		debug.then(Commands.literal("site").executes(Meditation::showSite));
 		debug.then(Commands.literal("vein")
 				.executes(Meditation::showSite)
-				.then(Commands.argument("percent", DoubleArgumentType.doubleArg(0.0D, 100.0D))
-						.executes(ctx -> {
-							ServerPlayer player = ctx.getSource().getPlayerOrException();
-							double value = DoubleArgumentType.getDouble(ctx, "percent") / 100.0D;
-							SpiritVeins.set(player.level(), player.blockPosition(), value);
-							if (isMeditating(player)) {
-								Cultivators.get(player).setVeinDensity(SpiritVeins.density(player.level(), player.blockPosition()));
-								Cultivators.dirty(player);
-							}
-							ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.meditation.debug.vein",
-									percent(value))), false);
-							return 1;
-						})));
+				.then(Commands.literal("grade").executes(Meditation::showGrade))
+				.then(Commands.argument("percent", DoubleArgumentType.doubleArg(0.0D, 200.0D))
+						.executes(ctx -> setDensity(ctx.getSource(), ctx.getSource().getPlayerOrException(),
+								DoubleArgumentType.getDouble(ctx, "percent")))));
+	}
+
+	/** Sets the density of the region the player stands in (debug vein, uji urat); clamped to the region's cap. */
+	public static int setDensity(CommandSourceStack source, ServerPlayer player, double percent) {
+		ServerLevel level = player.level();
+		BlockPos pos = player.blockPosition();
+		SpiritVeins.set(level, pos, percent / 100.0D);
+		double now = SpiritVeins.density(level, pos);
+		if (isMeditating(player)) {
+			Cultivators.get(player).setVeinDensity(now);
+			Cultivators.dirty(player);
+		}
+		source.sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.kultivasi.debug.vein_set", percent(now),
+				SpiritVeins.gradeName(SpiritVeins.grade(level, pos)), percentText(SpiritVeins.cap(level, pos)))), false);
+		return 1;
+	}
+
+	private static int showGrade(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		ServerLevel level = player.level();
+		BlockPos pos = player.blockPosition();
+		int grade = SpiritVeins.grade(level, pos);
+		ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.kultivasi.debug.vein_grade",
+				SpiritVeins.gradeName(grade).copy().withColor(SpiritVeins.gradeColor(grade)), percentText(SpiritVeins.cap(level, pos)),
+				percent(SpiritVeins.density(level, pos)), SpiritVeins.regionX(pos), SpiritVeins.regionZ(pos))), false);
+		return 1;
 	}
 
 	private static int showSite(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -494,9 +907,19 @@ public final class Meditation {
 		return text;
 	}
 
-	/** Density 0..1 as a whole percentage. */
+	/** Density 0..2 as a whole percentage (values above 100% are shown, DESIGN 19.3.5). */
 	public static String percent(double fraction) {
-		return String.valueOf(Math.round(Math.max(0.0D, Math.min(1.0D, fraction)) * 100.0D));
+		return String.valueOf(Math.round(Math.max(0.0D, Math.min(SpiritVeins.MAX_CAP, fraction)) * 100.0D));
+	}
+
+	/** "180%". */
+	private static String percentText(double fraction) {
+		return percent(fraction) + "%";
+	}
+
+	/** "+15%" for 3 seclusion stacks. */
+	private static String percentBonus(int stacks) {
+		return "+" + Math.round(stacks * SECLUSION_BONUS * 100.0D) + "%";
 	}
 
 	private Meditation() {

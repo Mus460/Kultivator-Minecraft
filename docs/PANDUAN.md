@@ -9,6 +9,10 @@ Sejak Fase 6b sektemu **membangun dirinya sendiri** dari bahan yang kamu setor: 
 Sekte Tak Berperingkat sampai Istana Langit, lalu saksikan kompleks sekte klasik tumbuh melewati sembilan tingkat.
 Sejak Fase 6c ada **169 teknik** (Teknik Dewa) dari cerita kultivasi sungguhan, yang makin dahsyat di setiap ranah, dengan
 **Kitab Teknik**, Roda Segel, Penguasaan Jurus, dan saklar satu klik bila kamu ingin jurusmu benar-benar membelah bumi.
+Sejak Fase 7 **dunianya hidup** ([33](#33-dunia-yang-hidup-fase-7)): monster elit Binatang Iblis di setiap ranah, Batu Roh,
+Inti Binatang, herba roh berumur, urat roh dan Kultivasi Tertutup di Gua Kediaman, jimat, alkimia lanjutan, tribulasi
+dengan lingkar petir dan Hu Fa bersama teman, tablet **Jalan** yang menuntun pemain baru, anugerah Kenaikan Abadi, dan
+Bintang Abadi untuk dirimu sendiri.
 
 Semua angka di panduan ini diambil langsung dari kode mod. Angka kultivasi (XP) selalu ditampilkan sebagai bilangan
 bulat di dalam game.
@@ -18,8 +22,9 @@ bulat di dalam game.
 > hanya di dalam tapak yang kamu lihat sebagai hologram lalu kamu konfirmasi sendiri (lihat
 > [20b](#20b-pembangunan-sekte)), dan **Mode Kehancuran**, yang **mati secara bawaan** dan harus dinyalakan sendiri: untuk
 > jurusmu sendiri dengan satu klik ([12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang)), untuk Jurus
-> Pemusnah murid dengan tiga kunci ([31](#31-mode-kehancuran-peringatan)). Lihat juga
-> [bagian terakhir](#37-janji-keamanan-blok).
+> Pemusnah murid dengan tiga kunci ([31](#31-mode-kehancuran-peringatan)). Fase 7 tidak menambah pengecualian: batu dan
+> herba hanya jatuh dari blok yang kamu patahkan sendiri, dan elit, jimat, serta lingkar petir hanya mengenai makhluk.
+> Lihat juga [bagian terakhir](#53-janji-keamanan-blok).
 
 ---
 
@@ -63,15 +68,36 @@ bulat di dalam game.
 30. [Jurus Pemusnah](#30-jurus-pemusnah)
 31. [MODE KEHANCURAN (peringatan)](#31-mode-kehancuran-peringatan)
 32. [Pengakuan Langit: menjadi Dewa Abadi](#32-pengakuan-langit-menjadi-dewa-abadi)
-33. [Tampilan, Kualitas Efek, dan kosmetik](#33-tampilan-kualitas-efek-dan-kosmetik)
-34. [Layar kultivasi (gulungan giok)](#34-layar-kultivasi-gulungan-giok)
-35. [Pencapaian](#35-pencapaian)
-36. [Berkas konfigurasi](#36-berkas-konfigurasi)
-37. [Janji keamanan blok](#37-janji-keamanan-blok)
+33. [**Dunia yang Hidup (Fase 7)**](#33-dunia-yang-hidup-fase-7): [mulai cepat](#331-mulai-cepat) ·
+    [yang belum ada](#332-yang-belum-ada-fase-7b)
+34. [Binatang Iblis (monster elit)](#34-binatang-iblis-monster-elit)
+35. [Batu Roh](#35-batu-roh)
+36. [Inti Binatang](#36-inti-binatang)
+37. [Tanaman Roh (herba berumur)](#37-tanaman-roh-herba-berumur)
+38. [Urat Roh, Kultivasi Tertutup, dan Gua Kediaman](#38-urat-roh-kultivasi-tertutup-dan-gua-kediaman)
+39. [Jimat](#39-jimat)
+40. [Alkimia Lanjutan dan Kitab Alkimia](#40-alkimia-lanjutan-dan-kitab-alkimia)
+41. [Tribulasi Hidup: Lingkar Petir, Menantang Langit, Hu Fa Tribulasi](#41-tribulasi-hidup-lingkar-petir-menantang-langit-hu-fa-tribulasi)
+42. [Tablet Jalan: Langkah Pertama, Ujian Fondasi, Kewajiban Harian](#42-tablet-jalan-langkah-pertama-ujian-fondasi-kewajiban-harian)
+43. [Persiapan dan HUD Tribulasi](#43-persiapan-dan-hud-tribulasi)
+44. [Anugerah Kenaikan, Perkokoh Fondasi, Bintang Pemain](#44-anugerah-kenaikan-perkokoh-fondasi-bintang-pemain)
+45. [Lima Unsur dalam pertarungan](#45-lima-unsur-dalam-pertarungan)
+46. [Relik di Peti Kuno](#46-relik-di-peti-kuno)
+47. [Keseimbangan Fase 7](#47-keseimbangan-fase-7)
+48. [HUD dan kenyamanan Fase 7](#48-hud-dan-kenyamanan-fase-7)
+49. [Tampilan, Kualitas Efek, dan kosmetik](#49-tampilan-kualitas-efek-dan-kosmetik)
+50. [Layar kultivasi (gulungan giok)](#50-layar-kultivasi-gulungan-giok)
+51. [Pencapaian](#51-pencapaian)
+52. [Berkas konfigurasi](#52-berkas-konfigurasi)
+53. [Janji keamanan blok](#53-janji-keamanan-blok)
 
 ---
 
 ## 1. Langkah pertama
+
+Sejak Fase 7 kamu tidak perlu menghafal daftar ini: **pelacak Langkah Pertama** di tepi kanan layar selalu menunjukkan
+langkah berikutnya beserta tombolnya, dan tablet **Jalan** di gulungan (`/kultivasi jalan`) memberi hadiah untuk setiap
+bab ([42](#42-tablet-jalan-langkah-pertama-ujian-fondasi-kewajiban-harian)).
 
 1. **Uji akar spiritualmu.** Semua orang mulai sebagai *Manusia Fana*. Tekan `'` untuk membuka gulungan kultivasi
    lalu klik jimat *Uji Akar*, atau ketik `/kultivasi root test`. Upacara 8 detik membaca akarmu: elemen apa yang kamu
@@ -92,6 +118,10 @@ bulat di dalam game.
 8. **Bangun sektemu.** Di tablet **Bangun** pada gulungan aula, pilih templat sekte, lihat tapaknya sebagai hologram,
    konfirmasi, lalu cukup setor bahan (jongkok + klik kanan Prasasti). Sekte membangun dirinya sendiri (lihat
    [Pembangunan Sekte](#20b-pembangunan-sekte)).
+9. **Jelajahi dunia yang hidup.** Mulai Pemurnian Qi, tambang bijih sendiri untuk **Batu Roh**, patahkan tanaman untuk
+   **herba roh**, buru **Binatang Iblis** yang bercahaya warna unsur untuk **Inti Binatang**, pegang batu di tangan kiri
+   saat bermeditasi, tulis **jimat**, dan buka koin **Persiapan** di tab Status sebelum setiap terobosan (lihat
+   [Dunia yang Hidup](#33-dunia-yang-hidup-fase-7)).
 
 Kalau bingung, buka tab **Bantuan** di gulungan (`'`) atau ketik `/kultivasi` untuk melihat kartu statusmu.
 
@@ -103,7 +133,7 @@ Kalau bingung, buka tab **Bantuan** di gulungan (`'`) atau ketik `/kultivasi` un
 |---|---|
 | `G` | Ketuk: rapal teknik yang sedang dipilih. Tahan ≥ 250 ms: buka **Roda Segel** ([12.1](#121-kitab-teknik)) |
 | `;` | Mulai / berhenti meditasi. Saat bermeditasi dengan bar penuh di leher botol: memulai terobosan |
-| `'` | Buka gulungan kultivasi (layar info) |
+| `'` | Buka gulungan kultivasi (layar info). Saat ditahan di dalam game, pelacak Langkah Pertama yang mengecil terbuka lagi |
 | `-` | Buka **Kitab Teknik** |
 | `,` dan `.` | Pilih teknik sebelumnya / berikutnya di dalam Cincin Segel (semua teknik bila cincin kosong) |
 | Roda Segel (tahan), Segel Cepat 1–4 | Belum diatur. Begitu Roda Segel diatur, `G` merapal saat ditekan; Segel Cepat merapal soket 1–4 Cincin Segel |
@@ -143,6 +173,13 @@ bentrok dengan tombol vanilla, Butter Bot, maupun Iris (K, O, R).
 | `/kultivasi alchemy` / `alchemy help` | Ringkasan cara meracik pil |
 | `/kultivasi alchemy recipes` | Semua resep alkimia |
 | `/kultivasi alchemy level` | Tingkat alkimia, XP alkimia, dan peluang berhasilmu |
+| `/kultivasi resep` | Membuka tablet **Kitab Alkimia** ([40.4](#404-kitab-alkimia)) |
+| `/kultivasi jalan` | Membuka tablet **Jalan**: Langkah Pertama, Ujian Fondasi, Kewajiban Harian ([42](#42-tablet-jalan-langkah-pertama-ujian-fondasi-kewajiban-harian)) |
+| `/kultivasi harian` | Kewajiban Harian hari ini dan hari beruntun di chat ([42.3](#423-kewajiban-harian)) |
+| `/kultivasi kawal <pemain>` | Menjadi Hu Fa Tribulasi pemain itu (paling jauh 64 blok, dimensi sama; [41.3](#413-hu-fa-tribulasi-bersama-teman)). Contoh: `/kultivasi kawal Steve` |
+| `/kultivasi gua tetapkan` / `gua lihat` / `gua hapus` | Menetapkan, melihat, atau meninggalkan [Gua Kediaman](#385-gua-kediaman) |
+| `/kultivasi fondasi perkokoh` | Memulai ritual [Perkokoh Fondasi](#442-perkokoh-fondasi) (saat bermeditasi di formasi qi tingkat 2+) |
+| `/kultivasi bintang padatkan [semua]` | Memadatkan satu Bintang Abadi (atau semua yang terjangkau) dari Qi Abadi di Puncak Dewa Abadi ([44.4](#444-bintang-abadi-untuk-pemain)) |
 | `/kultivasi murid list` | Daftar bernomor muridmu (lihat [Murid](#19-murid)); murid yang sedang pergi tertulis "alasan · sisa N hari" |
 | `/kultivasi murid panggil` | Semua muridmu yang termuat datang ke sebelahmu, juga dari dimensi lain |
 | `/kultivasi murid ikut` / `tinggal` / `meditasi` / `bantu` | Perintah untuk murid yang kamu tatap atau yang terdekat dalam 16 blok |
@@ -196,7 +233,7 @@ Butuh izin operator (level 2). `[pemain]` berarti target pemain boleh ditambahka
 | `reset [pemain]` | Menghapus seluruh data kultivasi |
 | `show <pemain>` | Kartu status pemain lain |
 | `enlighten` | Memicu Momen Pencerahan |
-| `site` / `vein [persen]` | Melihat tempat spiritual / mengatur kepadatan qi di sini |
+| `site` / `vein [persen]` / `vein grade` | Melihat tempat spiritual / mengatur kepadatan qi di sini (0–200) / tingkat urat ([38.1](#381-tingkat-urat-roh)) |
 | `breakthrough force [pemain]` / `breakthrough cancel [pemain]` | Memaksa terobosan berhasil / membatalkan terobosan |
 | `tribulation test [pemain]` | Tribulasi uji (tanpa naik ranah) |
 | `root reroll` / `root replay` | Mengacak ulang akar / memutar ulang upacara |
@@ -269,6 +306,16 @@ atau yang terdekat dalam 16 blok.
 | `teknik feat <jenis> <n>` | Mengatur penghitung prestasi (`kills_with`, `casts_with`, `first_kill`, `meditate_at`, `alchemy_count`, `trib`, `heart_demon_win`, `deviation_recovered`) |
 | `murid teknik mastery <nama> <id\|semua> <0-4>` | Penguasaan teknik murid |
 
+**Perintah uji Fase 7** (juga di bawah `/kultivasi debug`), untuk [Dunia yang Hidup](#33-dunia-yang-hidup-fase-7):
+
+| Perintah | Fungsi |
+|---|---|
+| `vein [persen]` | Kepadatan qi di wilayah ini, kini 0–200 (dibatasi oleh batas urat wilayah itu) |
+| `vein grade` | Tingkat urat di sini, batasnya, kepadatan sekarang, dan koordinat wilayah |
+| `elit info` | Elit yang kamu tatap: tingkat, unsur, ranah, afiks, nyawa |
+| `kejenuhan show` / `kejenuhan reset` | Nilai Kejenuhan Bertarung dan faktornya / kembali ke 0 |
+| `perks show` | Bintang dan biaya berikutnya, Qi Tertimbun, sisa jeda Jiwa Tak Hancur, fondasi yang diperkokoh, keahlian jimat, dan anugerah aktif (dengan baris Sumber) |
+
 ### 3.4 Perintah uji cepat (`/kultivasi uji ...`)
 
 Khusus operator. `/kultivasi uji` tanpa tambahan menampilkan daftar ini di chat.
@@ -278,7 +325,7 @@ Khusus operator. `/kultivasi uji` tanpa tambahan menampilkan daftar ini di chat.
 | `/kultivasi uji maks` | Kamu langsung Dewa Abadi Tahap Puncak: akar Surgawi, Kualitas Terobosan Surgawi, semua teknik, qi penuh (lalu Pengakuan Langit) |
 | `/kultivasi uji ranah <ranah> [tahap] [tingkat]` | Lompat ke ranah mana saja, lengkap dengan tekniknya dan qi penuh |
 | `/kultivasi uji tur [detik]` / `uji tur stop` | Tur semua ranah beberapa detik per ranah untuk melihat efeknya; data aslimu dikembalikan di akhir |
-| `/kultivasi uji kit` | Kotak shulker berisi semua item mod, pil tiap mutu, kitab teknik, item langka, bahan formasi dan alkimia |
+| `/kultivasi uji kit` | Kotak shulker berisi semua item mod, pil tiap mutu, kitab teknik, item langka, bahan formasi dan alkimia, ditambah kotak **"Fase 7"** (16 batu roh tiap tingkat, setiap herba umur 100 ×4, Buah Ginseng 1.200 tahun, satu inti tiap tingkat berunsur acak, 4 butir tiap pil baru Sempurna, 8 jimat kekuatan 5, 16 kertas jimat, Kompas Urat Roh) |
 | `/kultivasi uji teknik` | Pelajari semua 168 teknik pemain, hapus jeda, isi penuh qi |
 | `/kultivasi uji teknik semua\|<id>\|pamer ...\|bebas ...\|penguasaan ...\|gerbang\|kehancuran ...\|audit\|murid <nama>` | Uji [Teknik Dewa](#12-teknik-dewa-169-teknik): hitungan per set, rapalan uji dengan angka lengkap, pameran semua teknik, rapal bebas, penguasaan, Gerbang Dewa, kawah saat uji, audit registri, mengajari murid ([daftar lengkap dengan contoh](#1212-perintah-teknik)) |
 | `/kultivasi uji boneka [1-6] [bos]` / `uji boneka hapus` | Boneka latihan yang tidak bisa mati dengan papan nama kerusakan (5 menit) |
@@ -290,6 +337,57 @@ Khusus operator. `/kultivasi uji` tanpa tambahan menampilkan daftar ini di chat.
 | `/kultivasi uji sekte ...` | Uji [Pembangunan Sekte](#20b-pembangunan-sekte): `templat`, `tingkat <n> [instan\|cepat]`, `sumber`, `pamer`, `hologram`, `bandingkan`, `info`, `periksa`, `audit`, `kamera`, `upacara`, `kecepatan`, `naik`, `bongkar`, `reset`, `misi`, `pekerja` ([daftar lengkap dengan contoh](#20b16-perintah)) |
 
 Nama murid dengan spasi ditulis memakai garis bawah (misalnya `Lin_Yuchen`); tekan Tab untuk saran nama.
+
+**Perintah uji cepat Fase 7** (khusus operator; setiap fitur [Dunia yang Hidup](#33-dunia-yang-hidup-fase-7) bisa dicoba
+tanpa menggiling). Unsur ditulis `logam`, `kayu`, `air`, `api`, `tanah`, `petir`, `es`, `angin`, `ruang` (id Inggris juga
+diterima); mutu pil `rendah`, `menengah`, `tinggi`, `sempurna`.
+
+| Perintah | Fungsi |
+|---|---|
+| `uji batu <rendah\|menengah\|tinggi\|agung> [n]` | Batu roh (bawaan 16) |
+| `uji herba <id\|semua> [umur]` | Herba roh dengan umur itu (bawaan 100). Id: `spirit_grass`, `ninecurl_ginseng`, `eight_angled_ice_grass`, `purple_flame_flower`, `illusory_spirit_herb`, `gold_lightning_bamboo`, `ginseng_fruit`, `yellow_essence_mushroom` |
+| `uji herba tampak` | Tanaman berikutnya yang kamu patahkan dalam 60 detik pasti menyimpan herba roh |
+| `uji inti <rendah\|menengah\|tinggi\|raja> [unsur] [n]` | Inti binatang (tanpa unsur: acak) |
+| `uji pil <dao_insight\|toxin_purging\|enlightenment\|bone_tempering> [mutu]` | Pil baru |
+| `uji relik <tabel>` | Menggulirkan tabel peti bawaan yang sudah ditambah sekali ke inventorimu dan menulis peluang kolam Fase 7. Tabel: `simple_dungeon`, `abandoned_mineshaft`, `desert_pyramid`, `jungle_temple`, `stronghold_corridor`, `stronghold_crossing`, `stronghold_library`, `woodland_mansion`, `igloo_chest`, `underwater_ruin_big`, `nether_bridge`, `buried_treasure`, `ancient_city`, `bastion_treasure`, `end_city_treasure`, `reward_ominous` |
+| `uji elit <1\|2\|3> [unsur\|alami] [jenis] [afiks]` | Elit 4 blok di depanmu (ranahnya = ranahmu). Jenis: `zombie`, `husk`, `skeleton`, `stray`, `bogged`, `spider`, `wither_skeleton`, `hoglin`. Afiks: `tanpa`, `perisai_unsur`, `penyerap_qi`, `pulih_cepat` |
+| `uji elit hapus` | Menghapus semua elit dalam 32 blok |
+| `uji tribulasi <ranah> [lapis 1-9] [biasa\|cincin\|kembar]` | Tribulasi uji menuju ranah itu (sungguhan tetapi tidak pernah mematikan dan tanpa naik ranah). `cincin` memaksa lingkar petir di bawah Transformasi Dewa, `biasa` memakai aturan biasa, `kembar` membuat setiap lingkar kembar |
+| `uji kawal <0-3>` | Tribulasi ujimu berikutnya berpura-pura dikawal sekian Hu Fa (faktor, mutu, HUD, pelindung) |
+| `uji kejenuhan <nilai>` | Mengatur Kejenuhan Bertarung |
+| `uji unsur` | Untuk monster yang kamu tatap: unsur jurusmu, unsurnya, hubungan, resonansi akar, total |
+| `uji urat <0-200>` / `uji urat cari` | Mengatur kepadatan di sini (dibatasi batas urat) / mencetak Urat Roh Agung dan Kaya terdekat |
+| `uji tertutup <0-5>` / `uji tertutup 30m` | Saat bermeditasi: tumpukan Tertutup / lompat ke 30 menit tanpa putus |
+| `uji gua` | Menetapkan Gua Kediaman di sini tanpa pemeriksaan formasi |
+| `uji jimat <jenis\|semua> [kekuatan 1-9]` / `uji jimat tingkat <0-10>` | Jimat (bawaan kekuatan 5; jenis `petir`, `awan_api`, `perisai`, `pengikat`, `pulang`, `penangkal`, `seribu_li`, `kejernihan`; jimat `pulang` uji juga mereset jeda 10 menit) / keahlian jimat |
+| `uji anugerah` / `uji jiwa` | Daftar anugerah aktif dan putar ulang judul yang terbaru / reset jeda Jiwa Tak Hancur |
+| `uji fondasi <ranah> <retak\|normal\|sempurna\|surgawi>` | Mengatur kualitas tercatat sebuah ranah (untuk mencoba Perkokoh Fondasi) |
+| `uji bintang <n>` | Mengatur Bintang Abadi milikmu (`uji murid <nama> bintang` tetap untuk murid) |
+| `uji jalan reset` / `uji jalan bab <1-5>` | Mengulang panduan, Ujian Fondasi, dan Kewajiban Harian (penghitung seumur hidup tetap) / menyelesaikan bab 1 sampai n |
+| `uji jalan ujian [selesai]` | Menulis set Ujian Fondasi yang terbuka / menyelesaikannya |
+| `uji harian ulang` / `uji harian selesai` / `uji harian beruntun <n>` | Mengundi ulang / menyelesaikan kewajiban hari ini / mengatur hari beruntun |
+| `uji hud` | Semua elemen HUD Fase 7 dengan contoh nilai selama 10 detik |
+
+Contoh singkat (`uji ...` = `/kultivasi uji ...`):
+
+```
+uji ranah golden_core              # Inti Emas Puncak
+uji elit 3 petir zombie            # Raja Siluman Petir, bilah bos "Raja Siluman · Petir"
+uji elit 2 air zombie perisai_unsur
+uji tribulasi deity_transformation # lingkar petir mulai Transformasi Dewa
+uji tribulasi immortal_ascension 1 # lingkar kembar setiap petir ke-4
+uji kawal 2                        # lalu: uji tribulasi dao_union
+uji herba semua 1200               # semua herba "Seribu Tahun"
+uji inti menengah tanah            # bahan Pil Penempa Tulang
+uji pil dao_insight sempurna
+uji relik ancient_city
+uji fondasi golden_core retak      # lalu /kultivasi debug set storedqi 10000 dan /kultivasi fondasi perkokoh
+uji ranah true_immortal            # lalu /kultivasi debug set storedqi 600000 dan /kultivasi bintang padatkan
+uji ranah immortal_ascension 1 7   # Kenaikan Abadi tingkat 7 tahap Awal: anugerah 1-7
+```
+
+Perintah lama yang tetap berguna: `uji ranah <ranah> [tahap] [tingkat]`, `debug set storedqi`, `debug enlighten`,
+`debug fill`, `debug toxicity set <0-100>`, `debug tribulation test`.
 
 ---
 
@@ -334,7 +432,7 @@ Setiap kenaikan langsung memperkuat tubuhmu (ranah = nomor ranah 0–8 di tabel 
 
 | Atribut | Bonus |
 |---|---|
-| Nyawa maksimum | `ranah × 4 + tahap + tingkat × 2` (Dewa Abadi +60 lagi) × faktor kualitas |
+| Nyawa maksimum | `ranah × 4 + tahap + tingkat × 4` (Dewa Abadi +40 lagi) × faktor kualitas; sejak Fase 7 ditambah Pil Penempa Tulang (paling banyak +10), Bintang Abadi (+2 per bintang), dan anugerah ([44](#44-anugerah-kenaikan-perkokoh-fondasi-bintang-pemain)) |
 | Kerusakan serangan | `ranah × 0,6 + tahap × 0,15 + tingkat × 0,3` |
 | Kecepatan gerak | +2,5% per ranah (maks. +25%) |
 | Zirah | +1 per ranah (Dao Tubuh ×1,5) |
@@ -351,14 +449,18 @@ Surgawi 1,3). *Faktor akar* qi = `0,85 + 0,15 × pengali mutu akar`.
 
 | Sumber | Kultivasi dasar |
 |---|---|
-| Membunuh monster (`Enemy`) | nyawa maksimum monster × 0,5 |
-| Membunuh bos (Wither, Naga Ender, Warden, Elder Guardian) | nyawa maksimum × 2 |
+| Membunuh monster (`Enemy`) | nyawa maksimum monster × 0,5 × faktor [Kejenuhan Bertarung](#471-kejenuhan-bertarung); monster dari spawner ×0,25 |
+| Membunuh elit (Binatang Iblis) | jauh lebih banyak, sampai 5% bilah ([34.5](#345-hadiah)) |
+| Membunuh bos (Wither, Naga Ender, Warden, Elder Guardian) | nyawa maksimum × 2; penuh sekali per jenis bos per hari game, 25% sesudahnya |
 | Monster Pelindung Dao (dari tribulasi) | setengah dari biasanya |
 | Hewan, penduduk desa, Iblis Hati | 0 (Iblis Hati punya hadiahnya sendiri) |
 | Menambang (tanpa Sentuhan Sutra) | batu bara 1, tembaga 1, kuarsa Nether 1, emas Nether 1, besi 2, redstone 2, gugus kecubung 2, lapis 3, emas 3, berlian 10, zamrud 12; varian deepslate +50%. Puing kuno: 0 |
-| Meditasi (per detik) | `0,6 + 0,25 × ranah` × tempat spiritual × formasi × kepadatan qi (lihat [Meditasi](#8-meditasi)) |
+| Meditasi (per detik) | laju dasar ranah × tempat × formasi × bahan bakar batu roh × kepadatan qi × tumpukan Tertutup (lihat [38.2](#382-rumus-meditasi-baru)) |
 | Pil | lihat [Pil](#13-pil-vanilla-dan-racun-pil) dan [Alkimia](#14-alkimia) |
-| Momen Pencerahan | 25% dari bar ranah saat ini |
+| Inti Binatang | 3–15% bilah ([36.2](#362-kegunaan)) |
+| Kewajiban Harian | 4% bilah per kewajiban ([42.3](#423-kewajiban-harian)) |
+| Mengawal tribulasi (Hu Fa) | 10% bilahmu bila berhasil ([41.3](#413-hu-fa-tribulasi-bersama-teman)) |
+| Momen Pencerahan | 20% dari bar ranah saat ini (sejak Fase 7; dulu 25%) |
 | Mengalahkan Iblis Hati | 10% bar (ujian terobosan) atau 25% bar (Iblis Hati tekanan) |
 | Menang Latih Tanding | 10% bar |
 | Buku Pesona tanpa teknik | 30 |
@@ -383,7 +485,10 @@ Sebelum akarmu diuji, pengali akar dianggap ×1,0.
 * Setelah terobosan berhasil, Qi Tertimbun mengalir ke bar ranah baru (dengan aturan naik tahap biasa) sampai habis
   atau sampai leher botol berikutnya.
 * Qi Tertimbun juga menambah peluang terobosan Pemurnian Qi → Pembangunan Fondasi (maks. +10%).
-* Di Dewa Abadi tahap Puncak jalan telah berakhir; kultivasi selanjutnya hanya menjadi **Qi Abadi** (tampil di HUD).
+* Di Dewa Abadi tahap Puncak jalan telah berakhir; kultivasi selanjutnya hanya menjadi **Qi Abadi** (tampil di HUD),
+  yang sejak Fase 7 dipadatkan menjadi [Bintang Abadi](#444-bintang-abadi-untuk-pemain).
+* Sejak Fase 7 Qi Tertimbun juga dipakai untuk [Perkokoh Fondasi](#442-perkokoh-fondasi) dan mengisi ulang bilah saat
+  Penyimpangan Qi berakhir ([44.3](#443-qi-tertimbun-mengalir-kembali)); bahan bakar batu roh di leher botol mengisinya.
 
 ---
 
@@ -436,11 +541,18 @@ Penyimpangan Qi, tidak sedang Latih Tanding atau menghadapi Iblis Hati. Manusia 
   tribulasi **gagal** saat itu juga, kamu tersisa minimal 1 nyawa dan terkena Penyimpangan Qi.
 * Pengurang kerusakan: Apel Emas Terpesona (×0,85), Pil Inti Emas (×0,85), Pil Penangkal Petir (×0,75), dengan
   mutu pil memperkuat efeknya; gabungan pil dan apel paling kecil ×0,5. Formasi Pelindung yang menyala di sekitarmu
-  memberi ×0,85 lagi, di luar batas itu (paling kecil sekitar ×0,43).
+  memberi ×0,85 lagi. Sejak Fase 7 semua pengali petir (pil, apel, formasi, jimat, Hu Fa, Fondasi Kokoh, anugerah)
+  bersama-sama paling kecil ×0,5.
   Server bisa mengubah skala dengan `tribulationDamageScale`.
 * Tetaplah dalam **6 blok** dari tempatmu memulai. Pergi saat pertanda = batal tanpa hukuman; pergi setelah
   sambaran pertama = gagal. Keluar dunia atau mati setelah sambaran pertama juga dihitung gagal (diterapkan saat kamu
   kembali).
+* **Sejak Fase 7** ([41](#41-tribulasi-hidup-lingkar-petir-menantang-langit-hu-fa-tribulasi)): mulai target Transformasi
+  Dewa **lingkar petir** muncul 1,5 detik sebelum setiap sambaran (keluar = hanya terserempet 40%, tetap di dalam =
+  Menantang Langit +0,12 mutu); teman sekte bisa menjadi **Hu Fa Tribulasi** (setiap Hu Fa ×0,95); **Jimat Penangkal Petir**
+  membuat satu sambaran ×0,5 (2 per tribulasi); **Fondasi Kokoh** ×0,9 dan anugerah **Gerbang Keabadian** ×0,85 (tribulasi
+  Dewa Abadi). Semua pengali ini bersama pil, apel, dan formasi paling kecil ×0,5. Panel **Persiapan** dan **HUD tribulasi**
+  menunjukkan angkanya ([43](#43-persiapan-dan-hud-tribulasi)).
 
 **Varian per dimensi:**
 * **Permukaan** (dan dimensi lain): *Tribulasi Langit*, petir putih-ungu dari awan gelap.
@@ -461,6 +573,9 @@ Mereka tidak memungut barang, tidak memanggil bala bantuan, tidak ikut raid, dan
 peliharaan, dan saudara sekte di dekatmu bisa membantu: merekalah *Pelindung Dao*-mu. Sisa monster lenyap saat
 tribulasi berakhir. Server bisa mematikan peristiwa ini (`daoProtectorEvent`).
 
+Sejak Fase 7, mulai target Jiwa Baru Lahir setiap gelombang membawa satu **Binatang Iblis**, nyawa pelindung naik bersama
+ranah target, dan setiap Hu Fa Tribulasi menarik satu pelindung lagi ([34.6](#346-elit-di-gelombang-pelindung-dao)).
+
 ### 7.5 Kualitas Terobosan
 
 Setiap terobosan dinilai:
@@ -476,6 +591,11 @@ Setiap terobosan dinilai:
 * Tanpa tribulasi: `acak × 0,7 + bonus`.
 * Bonus: tempat spiritual/formasi saat memulai, Bintang Nether, pil, kemenangan atas Iblis Hati (+0,1). Di luar
   Pemurnian Qi, Pil Pembangunan Fondasi hanya bisa menaikkan bonus ini sampai +0,15.
+* Bonus Fase 7 (bersama dibatasi −0,10…+0,40, tidak untuk Kebangkitan): [Ujian Fondasi](#422-ujian-fondasi) +0,07 per
+  ujian dan +0,05 untuk ketiganya, [Batu di Hambatan](#352-kegunaan) +0,03/+0,08 per batu Tinggi/Agung (paling banyak +0,16),
+  [Menantang Langit](#412-menantang-langit) +0,12 atau −0,02 per serempetan, dan [Hu Fa](#413-hu-fa-tribulasi-bersama-teman)
+  +0,04 per pengawal (paling banyak +0,08).
+* Kualitas yang sudah tercatat bisa dinaikkan nanti dengan [Perkokoh Fondasi](#442-perkokoh-fondasi).
 * Faktor kekuatan dirata-rata dari semua ranah dan memengaruhi nyawa maksimum, qi maksimum, **dan pengali
   kultivasimu**. Jadi menjaga nyawa tetap tinggi selama tribulasi itu penting.
 
@@ -492,6 +612,8 @@ Hukuman terobosan yang gagal (juga kalah dari Iblis Hati):
 * Luka sebesar 25% nyawa maksimum, **tidak pernah mematikan**.
 * Botol Madu memendekkannya 20% (sekali per penyimpangan); Pil Penenang Hati dan Pil Penyembuh juga membantu.
 * Setiap kegagalan menambah 25 *tekanan Iblis Hati*.
+* Sejak Fase 7: saat penyimpangan berakhir di leher botol dengan bilah tidak penuh, Qi Tertimbun mengalir kembali ke
+  bilah (2 Qi Tertimbun per kultivasi, [44.3](#443-qi-tertimbun-mengalir-kembali)).
 * Dewa Abadi yang telah menjalani [Pengakuan Langit](#32-pengakuan-langit-menjadi-dewa-abadi) **kebal** terhadap
   Penyimpangan Qi.
 
@@ -515,8 +637,10 @@ dimensi, atau mati.
 
 Setiap detik bermeditasi:
 * qi pulih **×6** (×1,5 lagi di tempat spiritual),
-* kultivasi `(0,6 + 0,25 × ranah) × tempat × formasi × max(0,15; kepadatan qi)` × pengali umum (×1,15 di dekat
-  saudara sekte),
+* kultivasi `laju dasar × min(5; tempat × formasi × bahan bakar) × max(0,15; kepadatan qi) × (1 + 0,05 × tumpukan
+  Tertutup)` × pengali umum (×1,15 di dekat saudara sekte). Laju dasar sama dengan dulu (`0,6 + 0,25 × ranah`) sampai Jiwa
+  Baru Lahir dan jauh lebih tinggi sesudahnya (Transformasi Dewa 4,0 … Dewa Abadi 83,3); rumus lengkap di
+  [38.2](#382-rumus-meditasi-baru),
 * sedikit Pemahaman Dao (+0,004/detik) bila tempat itu cocok dengan Dao-mu.
 
 ### 8.1 Tempat spiritual
@@ -534,15 +658,20 @@ Diperiksa saat mulai dan setiap 5 detik; pengalinya dikalikan satu sama lain, **
 
 ### 8.2 Urat roh dan kepadatan qi
 
-Dunia dibagi menjadi wilayah 4×4 chunk, masing-masing dengan **kepadatan qi** 0–100% (awal 100%). Meditasi
-menguras `0,15%/detik × (1 + ranah × 0,25)`; kepadatan pulih perlahan 0,02%/detik. Kultivasi meditasi dikalikan
-kepadatan (paling kecil ×0,15). Di bawah 20% kamu diperingatkan: saatnya pindah tempat. Kepadatan tampil di HUD dan
-di bar aksi selama meditasi.
+Dunia dibagi menjadi wilayah 4×4 chunk, masing-masing dengan **kepadatan qi**. Sejak Fase 7 setiap wilayah punya
+**tingkat urat**: Agung (sampai 200%), Kaya (140%), biasa (100%), atau Tipis (60%), dan wilayah yang belum disentuh berada
+di batasnya. Meditasi menguras `0,15%/detik × (1 + 0,10 × ranah)` (separuh dengan bahan bakar batu roh atau di Gua
+Kediaman, lebih kecil di formasi Agung dan Bintang Surgawi); kepadatan pulih `0,04% × batas` per detik. Kultivasi meditasi
+dikalikan kepadatan (paling kecil ×0,15). Di bawah 20% kamu diperingatkan: saatnya pindah tempat. Kepadatan tampil di HUD
+dan di bar aksi selama meditasi, misalnya "Kepadatan Qi 180% · Urat Roh Agung". Selengkapnya di
+[38](#38-urat-roh-kultivasi-tertutup-dan-gua-kediaman), termasuk Kultivasi Tertutup, Gua Kediaman, dan Kompas Urat Roh.
 
 ### 8.3 Momen Pencerahan
 
 Setiap 60 detik meditasi ada peluang `4% × pengali tempat` (+2% bila sudah memilih Dao). Saat terjadi: 10 detik cahaya
-keemasan, ledakan kultivasi **25% bar** (masuk ke Qi Tertimbun bila di leher botol), dan **+3 Pemahaman Dao**.
+keemasan, ledakan kultivasi **20% bar** (sejak Fase 7; masuk ke Qi Tertimbun bila di leher botol), dan **+3 Pemahaman
+Dao**. Sejak Fase 7 peluangnya ×1,5 setelah 30 menit Kultivasi Tertutup, ×2 dengan Pil Pencerahan, +2% dengan anugerah
+Pikiran Jernih, dan +1% di Gua Kediaman, paling tinggi 50% ([38.3](#383-momen-pencerahan-diubah)).
 
 ### 8.4 Formasi Pengumpul Qi
 
@@ -595,6 +724,11 @@ A . . A . . A
 
 Formasi juga memberi bonus Kualitas Terobosan (+0,03 per tingkat) bila kamu menerobos sambil duduk di dalamnya.
 
+Sejak Fase 7: formasi Agung dan Bintang Surgawi mengurangi kuras urat dan menjaga kepadatan di atas 30% / 45%; kursi formasi
+qi di dalam formasi pelindung bisa menjadi [Gua Kediaman](#385-gua-kediaman); formasi tingkat 2+ dibutuhkan untuk
+[Perkokoh Fondasi](#442-perkokoh-fondasi); dan **Cetak Biru Formasi** menunjukkan slot yang benar, kosong, dan salah saat
+kamu menatap Balok Emas sambil memegang bahan formasi ([48](#48-hud-dan-kenyamanan-fase-7)).
+
 ---
 
 ## 9. Qi dan HUD
@@ -613,6 +747,10 @@ Formasi juga memberi bonus Kualitas Terobosan (+0,03 per tingkat) bila kamu mene
   cepat, busur Perisai Qi, busur waktu wujud/wilayah/medan, bilah isi dan pip tahap, tag merah KEHANCURAN, dan toast teknik
   (lihat [12.1](#121-kitab-teknik)).
 * Saat meditasi: pengali tempat, kepadatan qi, dan nama formasi.
+* **Sejak Fase 7:** pengukur pedang terbang, timer pencerahan, pip Langkah Awan, pengingat cooldown (opsional), racun pil
+  mulai 40%, baris urat (tingkat urat, "Tertutup +15%", ikon batu dan sisa bahan bakar, Gua, hitung mundur Perkokoh
+  Fondasi), "★n" bintang, tiga titik Kewajiban Harian, pelacak Langkah Pertama di tepi kanan, HUD tribulasi di tepi kiri,
+  dan peringatan bahaya saat meditasi ([48](#48-hud-dan-kenyamanan-fase-7), [43.2](#432-hud-tribulasi)).
 
 HUD tersembunyi saat F1 atau F3, dan bisa dimatikan di tab Pengaturan (disimpan di `config/kultivator-client.json`).
 
@@ -651,9 +789,14 @@ Resep tanpa pola di meja kerajinan: **Irisan Semangka Emas + Air Mata Ghast + Ap
 Tepung Tulang**.
 
 Klik kanan untuk menelan (akar harus sudah diuji). 8 detik siksaan (mual, Lapar II, kotoran hitam merembes keluar),
-lalu **mutu akar naik satu tingkat** (maks. Surgawi). Akar dengan 3 elemen atau lebih punya 25% peluang kehilangan satu
-elemen klasik yang tidak murni. Menambah 15 racun pil. Tidak bisa dipakai lagi selagi pembersihan berlangsung, dan
-tidak berguna bila akarmu sudah Surgawi dengan kurang dari 3 elemen.
+lalu mutu akar mencoba naik satu tingkat (maks. Surgawi). Akar dengan 3 elemen atau lebih punya 25% peluang kehilangan
+satu elemen klasik yang tidak murni. Menambah 15 racun pil (20 menuju Tinggi dan Surgawi). Tidak bisa dipakai lagi selagi
+pembersihan berlangsung, dan tidak berguna bila akarmu sudah Surgawi dengan kurang dari 3 elemen.
+
+**Sejak Fase 7** kenaikannya tidak lagi pasti: Sampah → Rendah 100%, Rendah → Menengah 85%, Menengah → Tinggi 55% (butuh
+Pembangunan Fondasi), Tinggi → Surgawi 30% (butuh Inti Emas dan pil bermutu Tinggi atau Sempurna), dikali mutu pil (paling
+tinggi 95%). Syarat diperiksa sebelum pil habis. Gagal = "Sumsum menolak!", asap kelabu, akar tetap. Pil hasil tungku
+alkimia membawa mutu; pil dari meja kerajinan dihitung Menengah. Lihat [47.5](#475-pil-pembersih-sumsum).
 
 ---
 
@@ -723,7 +866,9 @@ Teknik tingkat lanjut tersimpan di **Buku Pesona** vanilla. Sejak Fase 6c setiap
 dari Ketajaman sampai Kutukan Sirna). **Jongkok + gunakan** buku itu untuk membacanya:
 * buku mengajarkan teknik pertama di kolamnya yang bisa kamu pelajari sekarang (urut tingkat), lalu buku habis;
 * bila semua teknik kolamnya sudah kamu kuasai atau belum bisa kamu pelajari → wawasan: +5 Pemahaman Dao dan +15 penguasaan
-  untuk teknik kolam yang sudah kamu kenal (buku habis);
+  untuk teknik kolam yang sudah kamu kenal (buku habis). Sejak Fase 7 pemahaman dari wawasan buku paling banyak **4 buku per
+  hari game**; buku berikutnya yang tidak punya hal lain untuk diberikan tetap utuh dengan pesan "Kata-katanya kabur;
+  pikiranmu sudah penuh hari ini", dan tooltip menulis "Buku wawasan hari ini: n/4" ([47.2](#472-buku-wawasan));
 * bila tidak ada yang bisa → kamu diberi tahu apa yang kurang, dan buku tetap utuh;
 * buku yang pesonanya tidak punya kolam (misalnya Kedayagunaan) → +30 kultivasi.
 
@@ -927,7 +1072,7 @@ R: sampai Penyatuan Dao  A × (1 + 0,12 × tahap)   A = Fana 0,6 · PQ 1,0 · PF
    Dewa Abadi            400 × (1 + 0,25 × tahap)          (tahap 0–3 = Awal … Puncak)
 C = 1 + pemahaman ÷ 100 (Dao teknik itu; teknik universal memakai Dao utamamu)
 Q = akar dari rata-rata faktor Kualitas Terobosan (0,95–1,14)
-S = bintang (untuk pemain baru di Fase 7; sekarang 1)
+S = faktor bintang (1 + 0,04 × bintang) × 1,15^bawah(bintang ÷ 9); sejak Fase 7 pemain punya Bintang Abadi sendiri (44.4), tanpa bintang 1
 ```
 
 R naik di **setiap** dari 65 posisi; satu terobosan mengalikannya 1,25–1,27, dan langkah dari Kenaikan Abadi tingkat 9 ke
@@ -1118,7 +1263,7 @@ Setiap teknik punya satu atau lebih jalur; bilah bambu menampilkannya sebagai da
     Putih Alam Baka).
 12. **Gerbang Dewa.** **Gerbang I:** Dewa Abadi Puncak yang sudah diakui langit ([32](#32-pengakuan-langit-menjadi-dewa-abadi)),
     pemahaman ≥ 90 di Dao teknik itu (universal: Dao utama), dan prasyarat yang disebut di Kesempurnaan Agung. **Gerbang
-    II:** seperti Gerbang I, ditambah dua prasyarat di Puncak Jurus. Di Fase 7 bintang 9 / 18 menjadi jalur pengganti.
+    II:** seperti Gerbang I, ditambah dua prasyarat di Puncak Jurus. Sejak Fase 7 **★9 / ★18** milikmu sendiri juga membuka Gerbang I / II ([44.4](#444-bintang-abadi-untuk-pemain)).
     **Sumber:** *Battle Through the Heavens* (Xiao Yan melampaui Yao Lao) dan *Renegade Immortal* (bintang Dewa Kuno).
 
 Dengan semua jalur ini setiap teknik pemain bisa diraih, jadi penghitung "Teknik x/168" bisa penuh.
@@ -1536,6 +1681,7 @@ menulis "Zona terlindung — tanpa kehancuran".
 | Titik bangkit dunia | perlindungan spawn server, minimal 16 |
 | Penduduk desa, golem besi, Batu Magnet formasi pelindung | 32 blok |
 | Murid, hewan peliharaan jinak, binatang roh | 6 blok |
+| Kursi Gua Kediaman (Fase 7), juga saat pemiliknya luring | 16 blok |
 | Pulau utama End | 160 blok dari (0, 0) |
 | Chunk yang tidak dimuat | dilewati, tidak pernah dimuat |
 
@@ -1543,6 +1689,19 @@ menulis "Zona terlindung — tanpa kehancuran".
 tanda, spawner, suar, dan sebagainya); portal dan bingkainya, obsidian, obsidian menangis, deepslate berpenguat, Batu
 Magnet, jangkar bangkit, prasasti aula; cairan dan blok berisi air; blok di tag `#kultivator:indestructible`; dan setiap
 posisi yang bersebelahan dengan cairan, blok berisi, atau chunk yang tidak dimuat.
+
+**Perbaikan bentuk (pass Fase 7).**
+* Bentuk tidak pernah dimulai di permukaan air, dan mangkuk tidak pernah tenggelam sampai dasar danau (di atas air tidak
+  terjadi apa-apa).
+* Bentuk kolom membaca tinggi tanah per kolom; mangkuk terbuka sampai tanah setiap kolom, paling tinggi sejauh jari-jarinya
+  di atas pusat. Blok bola dan mangkuk dipahat kolom demi kolom dari atas ke bawah.
+* **Tanpa rongga tertutup:** bila sebuah blok padat atau air harus tetap ada (air di sebelahnya, zona terlindung, blok yang
+  tidak pernah disentuh, atau saringan), tidak ada yang dihapus di bawahnya dalam kolom itu. Kolom yang blok teratasnya
+  berada di bawah tanah padat dilewati, kecuali untuk terowongan, bola, dan sembilan bola yang boleh terbuka ke samping.
+* Blok udara dilewati; hitungan blok dan log pulihkan hanya mencatat blok yang benar-benar berubah.
+* Bentuk kini boleh memakai paling banyak 2 × batas blok untuk membaca geometrinya (dulu 3 ×), karena pencarian permukaan
+  ikut dihitung.
+* **Gua Kediaman** adalah zona terlindung baru: 16 blok di sekitar kursinya ([38.5](#385-gua-kediaman)).
 
 **Antrean dan laju.** Paling banyak 2 rapalan diolah menjadi bentuk per tick (sisanya menunggu sebentar) dan 8 tugas di seluruh server; per pemain satu tugas berjalan
 atau mengantre ditambah satu lagi. Rapalan yang tidak muat dilewati dengan bilah aksi "Bumi masih runtuh — kehancuran
@@ -1710,11 +1869,16 @@ Beberapa barang vanilla bekerja sebagai pil. Makanan dimakan seperti biasa; yang
 | Bintang Nether | jongkok + gunakan | +1.500 kultivasi, peluang/kualitas terobosan berikutnya +10% (pil terlarang) | 40 |
 | Botol Pesona | jongkok + gunakan | +15 kultivasi (tidak dilempar) | 2 |
 
-**Racun pil** (0–100):
-* Setiap pil menambah racunnya; racun berkurang 1 setiap 30 detik.
-* Kultivasi dari pil dikalikan `1 − racun ÷ 120` (racun 60 → khasiat 50%).
-* Mulai 50 kamu diperingatkan. **Di atas 80** setiap pil membuatmu mual dan keracunan 5 detik.
+**Racun pil** (0–100, diubah di Fase 7, [47.3](#473-racun-pil)):
+* Setiap pil (dan setiap Inti Binatang) menambah racunnya; racun berkurang 1 setiap 30 detik, atau setiap 10 detik saat
+  bermeditasi.
+* Kultivasi dari pil dikalikan khasiat `1 − (racun ÷ 100)^1,6` (25 → 89%, 50 → 67%, 80 → 30%, 100 → 0%).
+* HUD menampilkan racun mulai 40. Mulai 50 kamu diperingatkan. **Di atas 80** setiap pil membuatmu mual dan keracunan
+  5 detik.
+* **Di atas 90** setiap pil punya 25% peluang **"Pil Membalik!"**: asap kelabu dan Penyimpangan Qi ringan (tidak pernah
+  mematikan; Dewa Abadi yang sudah diakui kebal).
 * Racun di atas 80 juga menambah tekanan Iblis Hati (+2 per menit).
+* **Pil Penawar Racun** (Fase 7) menurunkan racun 35 × mutu ([40.2](#402-empat-pil-baru)).
 
 Bonus pil seperti ×0,85 tribulasi dan +10% terobosan berlaku untuk terobosan berikutnya saja.
 
@@ -1735,7 +1899,7 @@ Tampak samping
 
 ### 14.2 Cara meracik
 
-1. **Klik kanan Kuali sambil memegang bahan** → satu bahan masuk ke dalam Kuali (paling banyak 8 bahan). Isi Kuali
+1. **Klik kanan Kuali sambil memegang bahan** → satu bahan masuk ke dalam Kuali (paling banyak 10 bahan sejak Fase 7). Isi Kuali
    tampil di bar aksi. Hanya barang yang dipakai sebuah resep yang bisa dimasukkan; barang lain (ember, botol, ramuan,
    dst.) tetap berperilaku seperti biasa pada Kuali.
 2. **Klik kanan dengan tangan kosong** → melihat isi Kuali dan apakah cocok dengan sebuah resep. Ini hanya terjadi bila
@@ -1748,7 +1912,9 @@ Tampak samping
    menjadi asap hitam.
 5. Bila api dipadamkan atau Kuali dirusak, bahan di dalam Kuali jatuh kembali sebagai barang di samping Kuali.
 
-Urutan bahan tidak penting, tetapi isinya harus **persis** sama dengan resep (tidak lebih, tidak kurang).
+Urutan bahan tidak penting, tetapi isinya harus **persis** sama dengan resep (tidak lebih, tidak kurang). Sejak Fase 7
+ada pengecualian: sampai 2 batu roh dan 1 inti binatang sebagai **katalis**, dan satu herba roh lebihan sebagai **herba
+pembantu** boleh ikut di panci ([40.1](#401-aturan-panci-baru)).
 
 ### 14.3 Resep
 
@@ -1760,11 +1926,16 @@ Urutan bahan tidak penting, tetapi isinya harus **persis** sama dengan resep (ti
 | 2 **Pil Penenang Hati** | Sarang Madu + Lili Lembah + Biji Kakao + Buni Sinar | tekanan Iblis Hati −50, Penyimpangan Qi 40% lebih singkat | 8 |
 | 2 **Pil Binatang Roh** | Tulang + Buni Sinar + Serpihan Batu Kecubung + Wortel Emas | lihat [Binatang Roh](#16-binatang-roh) (tanpa mutu) | – |
 | 2 **Pil Pembangunan Fondasi** | Wortel Emas + Serbuk Batu Sinar + Serpihan Batu Kecubung + Tepung Tulang | peluang/kualitas terobosan berikutnya +15% (penuh di Pemurnian Qi; di ranah lain separuh, dan pil hanya bisa menaikkan bonusnya sampai +15%) | 12 |
-| 2 **Pil Pembersih Sumsum** | Irisan Semangka Emas + Air Mata Ghast + Apel Emas + Serpihan Batu Kecubung + Tepung Tulang | lihat [Akar spiritual](#102-pil-pembersih-sumsum) (tanpa mutu) | 15 |
+| 2 **Pil Pembersih Sumsum** | Irisan Semangka Emas + Air Mata Ghast + Apel Emas + Serpihan Batu Kecubung + Tepung Tulang | lihat [Akar spiritual](#102-pil-pembersih-sumsum) (sejak Fase 7 mutunya mengalikan peluang naik) | 15 |
 | 2 **Pil Inti Emas** | Emas Batangan + Bubuk Kemamang + Apel Emas + Serpihan Batu Kecubung | sambaran tribulasi berikutnya ×0,85 | 15 |
 | 2 **Pil Penangkal Petir** | Tembaga Batangan + Selaput Angan-Angan + Serpihan Batu Kecubung + Serbuk Batu Sinar + Besi Batangan | sambaran tribulasi berikutnya ×0,75 | 15 |
 | 2 **Pil Pemelihara Jiwa** | Air Mata Ghast + Serpihan Gaung + Buah Korus + Ketuat Nether | +30% bar kultivasi (maks. 3600; hanya Jiwa Baru Lahir ke atas) | 22 |
-| 1 **Pil Dewa** | Bintang Nether + Azimat Keabadian + Apel Emas Terpesona + Serpihan Gaung + Jantung Lautan | +100% bar kultivasi, qi penuh, **racun pil menjadi 0** | 0 |
+| 1 **Pil Dewa** | Bintang Nether + Azimat Keabadian + Apel Emas Terpesona + Serpihan Gaung + Jantung Lautan | tepat 1 bilah kultivasi × mutu pil (sejak Fase 7 tanpa pengali akar, racun, atau kualitas), qi penuh, **racun pil menjadi 0** | 0 |
+
+Sejak Fase 7 ada empat pil baru (Pil Wawasan Dao, Pil Penawar Racun, Pil Pencerahan, Pil Penempa Tulang) dan empat resep
+alternatif dari herba roh untuk Pil Penyembuh, Pil Inti Emas, Pil Penangkal Petir, dan Pil Pemelihara Jiwa: lihat
+[40.2](#402-empat-pil-baru) dan [40.3](#403-resep-alternatif). Semua resep juga tampil di tablet **Kitab Alkimia**
+(`/kultivasi resep`).
 
 * Pil Pembersih Sumsum dan Pil Binatang Roh juga tetap bisa dibuat di meja kerajinan; di tungku, pemurnian Sempurna
   memberi satu butir tambahan.
@@ -1852,6 +2023,8 @@ Binatang Roh**.
 * Klik kanan hewan itu sambil memegang pil. Rubah liar tidak memercayai siapa pun: kembangbiakkan dua rubah dengan Beri
   Manis, dan anaknya akan memercayaimu.
 * Pil berikutnya memberi **+40 XP roh** (sekali tiap 30 detik per binatang).
+* Sejak Fase 7 binatang roh juga makan **Inti Binatang**: +60 / +150 / +400 / +1.000 XP roh menurut tingkat inti, ×1,5 bila
+  unsurnya cocok (serigala Petir atau Logam, rubah Api atau Kayu), jeda 10 detik per binatang ([36.2](#362-kegunaan)).
 * Binatang roh juga mendapat XP roh dari monster yang ia bunuh (nyawa maks. korban) dan setengahnya dari monster yang
   kamu bunuh dalam 16 blok darinya.
 
@@ -1900,7 +2073,9 @@ O . . . L . . . O
 **Mengaktifkan:**
 1. Formasi yang baru dibangun **tertidur** (mati).
 2. **Jongkok + gunakan Batu Magnet sambil memegang Serpihan Batu Kecubung**: formasi bangkit dan menjadi milikmu.
-   Setiap serpihan = **10 menit daya**, paling banyak **2 jam**.
+   Setiap serpihan = **10 menit daya**, paling banyak **2 jam**. Sejak Fase 7 **Batu Roh** juga mengisi daya (Rendah +20
+   menit, Menengah +3 jam, Tinggi +24 jam, Agung sampai penuh), sampai **48 jam**; kecubung tetap berhenti di 2 jam
+   ([35.2](#352-kegunaan)).
 3. **Jongkok + gunakan dengan tangan kosong** untuk mematikan atau menyalakannya lagi; daya yang tersimpan tetap.
    Hanya pemilik yang bisa mengisi dan menyalakan/mematikannya.
 4. Bila ada pilar yang kurang, pilar itu ditandai merah dan kamu diberi tahu yang mana.
@@ -2376,7 +2551,7 @@ Prasasti daripada di depannya, dan lebarnya selalu ganjil supaya sumbu melewati 
 
 "Selisih tinggi" adalah beda antara tanah tertinggi dan terendah di tapak (tanpa 5% ujung atas dan bawah). Ranah di papan
 hanya petunjuk; kamu bebas memilih templat mana pun, kecuali server menyalakan `sectTemplateRealmGate` (lihat
-[36](#36-berkas-konfigurasi)). Agar tapak bisa terpindai penuh, Templat 9 butuh jarak pandang sekitar 8 chunk dari
+[52](#52-berkas-konfigurasi)). Agar tapak bisa terpindai penuh, Templat 9 butuh jarak pandang sekitar 8 chunk dari
 Prasasti, Templat 8 butuh 7, dan Templat 7 butuh 6.
 
 **Susunan dan bonus**
@@ -3701,6 +3876,13 @@ lapis lazuli; 5–6: 1–3 berlian, 2–4 mutiara ender, 1 apel emas; 7–8: 1�
 Buku Pesona yang dipetakan ke teknik kitab; 9: seperti 7–8 plus 1% bintang Nether. Mulai tingkat 4: 20% satu Pil
 Pengumpul Qi. Mencari Herba Roh menggandakan bahan kebun.
 
+**Rampasan Fase 7** (tambahan, bila berhasil): Mengawal Karavan +2–5 Batu Roh Rendah; Alam Rahasia +1 Batu Roh Menengah
+(dan 5% satu Batu Roh Tinggi mulai tingkat 7); Perburuan Binatang Iblis +1 Inti Binatang berunsur acak (tingkat 1–3
+Rendah, 4–6 Menengah, 7–8 Tinggi, 9 Tinggi atau 10% Raja); Mencari Herba Roh +1–2 herba roh berumur `50 × tingkat` sampai
+`150 × tingkat` tahun. Tugas Kebun murid kadang (10% per panen) menambah satu Rumput Roh berumur 50–200 ke lumbung.
+Kantor Misi menerima batu roh (0,5 / 4,5 / 40 / 300 PK), inti binatang (3 / 10 / 30 / 120 PK), dan herba roh
+(`1 + umur ÷ 100` PK), tetap dalam batas 300 PK per hari.
+
 **Panggil Pulang** (bagian Tim) memanggil tim saat itu juga tanpa hasil apa pun. Pencapaian *Melangkah Keluar Gerbang*
 dan *Alam Rahasia Ditaklukkan*.
 
@@ -4107,6 +4289,8 @@ diberikan sebelumnya (+5% Langit). Ketiganya sekaligus: Sempurna menjadi 2%. Pen
 ## 28. Bintang Abadi
 
 Murid tidak berhenti di Dewa Abadi. Mereka memadatkan bintang demi bintang, tanpa batas, makin lama makin kuat.
+Sejak Fase 7 kamu sendiri juga memadatkan Bintang Abadi (tanpa bencana untuk sekarang), lihat
+[44.4](#444-bintang-abadi-untuk-pemain).
 
 **Sumber:**
 * *Renegade Immortal*, bab ~1157–1159: Dewa Kuno tumbuh lewat bintang dan menghadapi Tiga Ujian dengan Tujuh Bencana
@@ -4274,7 +4458,7 @@ melampauinya.
 
 **Pemicu** (sekali per murid):
 * Kekuatan murid (langkah ranah di jalan 65 posisi + bintang) melebihi kekuatanmu (langkah ranahmu + bintangmu; bintang
-  pemain baru ada di Fase 7), terlihat di tab Jalan bagian Pewaris; **atau**
+  pemain ada sejak Fase 7), terlihat di tab Jalan bagian Pewaris; **atau**
 * murid menang **Tanding dengan Guru**: duel denganmu, keduanya ≥ 80% nyawa dalam 16 blok, 120 detik, berakhir di 10%
   nyawa; sekali per hari game; keduanya mendapat +1 pemahaman dan +3 ikatan.
 
@@ -4400,6 +4584,7 @@ berjalan):
 | Area spawn dunia | radius perlindungan spawn server, minimal 16 |
 | Penduduk desa, golem besi, Batu Magnet formasi pelindung yang terdaftar | 32 blok |
 | Murid (termasuk yang merapal), hewan peliharaan jinak, binatang roh | 6 blok |
+| Kursi [Gua Kediaman](#385-gua-kediaman) setiap pemain (Fase 7), juga saat pemiliknya luring | 16 blok |
 | Pulau utama End | 160 blok dari (0, 0) |
 | Chunk yang tidak dimuat | dilewati, tidak pernah dipaksa dimuat |
 
@@ -4502,7 +4687,987 @@ jadi tidak ada anugerah qi tambahan.
 
 ---
 
-## 33. Tampilan, Kualitas Efek, dan kosmetik
+## 33. Dunia yang Hidup (Fase 7)
+
+Fase 7 mengisi dunia dengan hal yang layak diburu di setiap ranah dan dengan ekonomi barang kultivasi:
+
+| Fitur | Ringkas | Bagian |
+|---|---|---|
+| **Binatang Iblis** | monster alami di dekatmu kadang bangkit sebagai elit (Siluman, Binatang Iblis, Raja Siluman) dengan unsur, skill bertanda, dan afiks | [34](#34-binatang-iblis-monster-elit) |
+| **Batu Roh** | empat tingkat; dari tambang, peti, pedagang, elit, ekspedisi; bahan bakar meditasi, qi seketika, daya formasi, bonus terobosan | [35](#35-batu-roh) |
+| **Inti Binatang** | dari elit dan bos; dimurnikan untuk kultivasi, makanan binatang roh, katalis alkimia dan jimat | [36](#36-inti-binatang) |
+| **Tanaman Roh** | delapan herba berumur yang tersembunyi di tanaman biasa | [37](#37-tanaman-roh-herba-berumur) |
+| **Urat Roh, Kultivasi Tertutup, Gua Kediaman** | kepadatan qi sampai 200%, rumus meditasi baru, tumpukan Tertutup, kompas urat, gua yang dilindungi | [38](#38-urat-roh-kultivasi-tertutup-dan-gua-kediaman) |
+| **Jimat** | delapan jimat yang kamu tulis sendiri dan bisa dipakai siapa pun | [39](#39-jimat) |
+| **Alkimia Lanjutan** | panci 10 bahan, katalis, herba pembantu, empat pil baru, tablet Kitab Alkimia | [40](#40-alkimia-lanjutan-dan-kitab-alkimia) |
+| **Tribulasi Hidup** | lingkar petir, Menantang Langit, Hu Fa Tribulasi bersama teman | [41](#41-tribulasi-hidup-lingkar-petir-menantang-langit-hu-fa-tribulasi) |
+| **Tablet Jalan** | Langkah Pertama (20 langkah), Ujian Fondasi, Kewajiban Harian | [42](#42-tablet-jalan-langkah-pertama-ujian-fondasi-kewajiban-harian) |
+| **Persiapan dan HUD Tribulasi** | perkiraan terobosan dan HUD tribulasi langsung | [43](#43-persiapan-dan-hud-tribulasi) |
+| **Anugerah Kenaikan, Perkokoh Fondasi, Bintang** | sembilan anugerah Kenaikan Abadi, menaikkan kualitas lama, Bintang Abadi untuk pemain | [44](#44-anugerah-kenaikan-perkokoh-fondasi-bintang-pemain) |
+| **Lima Unsur** | unsur jurus melawan unsur monster | [45](#45-lima-unsur-dalam-pertarungan) |
+| **Relik di Peti Kuno** | batu, herba, inti, dan slip giok di peti struktur; Indra Ilahi mencium harta | [46](#46-relik-di-peti-kuno) |
+| **Keseimbangan** | Kejenuhan Bertarung, monster spawner, bos harian, buku wawasan, racun pil, Pil Abadi, Pil Pembersih Sumsum | [47](#47-keseimbangan-fase-7) |
+| **HUD dan kenyamanan** | pengukur pedang terbang, pip Langkah Awan, peringatan bahaya saat meditasi, cetak biru formasi | [48](#48-hud-dan-kenyamanan-fase-7) |
+
+**Aturan sumber.** Setiap fitur diambil dari novel, donghua, atau manhua kultivasi sungguhan. Setiap barang, tingkat
+elit, afiks, jimat, herba, dan anugerah baru punya baris **Sumber** di tooltip atau kartunya (judul karya dalam bahasa
+Inggris). "*Terinspirasi dari* …" berarti hanya konsep umumnya yang diambil, bukan nama atau mekaniknya. Angka, rumus,
+resep, tampilan, dan aturan keamanan adalah desain permainan; aturan yang ditulis "desain permainan (UX)" atau
+"desain permainan (keseimbangan)" tidak mengaku kanon sama sekali.
+
+**Keamanan blok.** Fase 7 tidak menambah pengecualian apa pun pada [janji keamanan blok](#53-janji-keamanan-blok): batu
+dan herba hanya jatuh setelah **kamu sendiri** mematahkan bloknya, harta peti hanya lewat tabel jarahan bawaan, elit
+adalah monster vanilla yang muncul secara alami, dan skill elit, jimat, serta lingkar petir hanya mengenai makhluk.
+Kawah Mode Kehancuran dan Pembangunan Sekte tidak dihitung sebagai "kamu mematahkan blok", jadi tidak pernah memberi batu
+roh, herba, kultivasi tambang, atau menguras urat.
+
+**Saklar server** (`config/kultivator.json`, semuanya bawaan menyala): `eliteMonsters`, `eliteChanceScale`,
+`structureLoot`, `spiritStoneMining`, `herbHarvest`, `guideRewards`, `dailyTasks`, `tribulationTelegraph`
+([52](#52-berkas-konfigurasi)).
+
+### 33.1 Mulai cepat
+
+1. Ikuti **pelacak Langkah Pertama** di tepi kanan layar, atau buka tablet **Jalan** (`/kultivasi jalan`).
+2. Sejak Pemurnian Qi: tambang bijih sendiri tanpa Sentuhan Sutra untuk **Batu Roh**, patahkan rumput, wortel, bunga,
+   dan jamur untuk **herba roh**, dan waspadai monster yang bercahaya warna unsur: itu **Binatang Iblis**.
+3. Pegang Batu Roh di **tangan kiri** saat bermeditasi sebagai bahan bakar. Jongkok + pakai batu di luar meditasi untuk
+   qi seketika.
+4. Jongkok + pakai **Inti Binatang** untuk memurnikannya, atau berikan ke binatang rohmu.
+5. Buat **Kertas Jimat Kosong** (3 kertas + Rumput Roh + pewarna merah), lalu tulis jimat dengan katalis di tangan kiri.
+6. Sebelum menerobos, buka koin **Persiapan** di tab Status. Mulai Transformasi Dewa, **keluar dari lingkar petir** untuk
+   hanya terserempet, atau tetap di dalam untuk Menantang Langit.
+7. Operator bisa mencoba semuanya tanpa menggiling: `/kultivasi uji kit` memberi kotak shulker **"Fase 7"** (16 batu tiap
+   tingkat, setiap herba umur 100 ×4, Buah Ginseng 1.200 tahun, satu inti tiap tingkat dengan unsur acak, 4 butir tiap pil
+   baru bermutu Sempurna, 8 jimat kekuatan 5, 16 kertas jimat, dan Kompas Urat Roh). Semua perintah uji ada di
+   [3.4](#34-perintah-uji-cepat-kultivasi-uji-).
+
+### 33.2 Yang belum ada (Fase 7b)
+
+* **Efek pil baru untuk murid.** Murid menolak keempat pil baru ("… masih terlalu berat untuk dicerna …; pil tetap
+  disimpan"); pilnya tidak hilang. Inti binatang juga belum bisa diberikan ke murid.
+* **Lingkar petir tujuh warna** di tribulasi Kenaikan Abadi dan Dewa Abadi: lingkar memakai satu warna per varian dimensi.
+* **Bencana bintang pemain** (Tiga Ujian seperti milik murid): bintang pemain dipadatkan tanpa bencana.
+* **Baris Sumber anugerah di tab Status**: sumber anugerah tampil di chat (baris abu-abu miring dan teks melayang pada
+  nama anugerah), belum di tooltip tab Status.
+* Ingatan "tempat ini sudah memberi herba hari ini" disimpan di memori server, jadi hilang saat server dimulai ulang;
+  batas 12 herba per pemain per hari tetap tersimpan.
+* Semua fitur Fase 7 sudah dikompilasi tetapi **belum diuji di dalam game**. Daftar ujinya ada di
+  [docs/uji/FASE-7.md](uji/FASE-7.md).
+
+---
+
+## 34. Binatang Iblis (monster elit)
+
+Mulai Inti Emas, monster vanilla bukan lagi tantangan maupun kemajuan. Binatang Iblis memberi setiap ranah sesuatu
+untuk diburu dan mengisi ekonomi barang baru.
+
+**Sumber:** monster buas di alam liar yang diburu demi bahan: *Battle Through the Heavens* bab 11 (tentara bayaran
+memburu binatang sihir demi intinya) dan 144 (kompi tentara bayaran di Pegunungan Binatang Sihir); *A Record of a
+Mortal's Journey to Immortality* (RMJ) bab 396–397 (Han Li memburu binatang iblis di Lautan Bintang Luar demi inti
+iblis). Tingkat bernomor: BTTH bab 14 dan 131; RMJ bab 396, 548, 1125. Ketiga tingkat *Terinspirasi dari* tingkat itu;
+"Raja" dari RMJ bab 1152 (Raja Wyrm Emas) dan 1502 (raja iblis). Unsur binatang: RMJ bab 1497, 1561, 1125. Skill
+bertanda: RMJ bab 1502 (dua Binatang Petir Neraka berdiri di kaki belakang sebelum jurus kuat). Bulan purnama dan urat
+roh: *Terinspirasi dari* RMJ bab 1194 dan 1152. Hadiah: *Terinspirasi dari* *Perfect World* bab 2, 18, 557 dan RMJ
+bab 397. Desain permainan: elit hanya muncul di dekat pemain Pemurnian Qi ke atas dan tingkatnya mengikuti ranah pemain
+itu, serta semua angka di bawah.
+
+### 34.1 Kapan elit muncul
+
+Hanya monster yang **muncul secara alami** (bukan dari spawner, struktur, patroli, perintah, atau gelombang Pelindung
+Dao) dan hanya jenis berikut: **zombi, husk, tengkorak, stray, bogged, laba-laba, tengkorak wither, hoglin**. Tidak
+pernah creeper, enderman, drowned, slime, kubus magma, phantom, penyihir, blaze, ghast, piglin, perampok, atau silverfish.
+
+* Pemain terdekat (bukan penonton) dalam 48 blok harus **Pemurnian Qi atau lebih tinggi**. Manusia Fana tidak pernah
+  bertemu elit.
+* Peluang = `1% + 0,5% × ranah` pemain itu (Inti Emas 2,5%, Penyatuan Dao 4%, Dewa Abadi 5%), ×2 pada malam bulan
+  purnama di Permukaan, ×1,5 di Urat Roh Agung, × `eliteChanceScale`, **paling tinggi 7%**.
+* Setelah lemparan berhasil masih ada batas: paling banyak 3 elit dalam 64 blok dari pemain itu, tidak ada elit lain
+  dalam 24 blok, jeda 60 detik per pemain, dan tidak ada elit bila sudah ada 10 monster atau lebih dalam 16 blok (ruang
+  gelap ladang monster).
+* Tidak ada elit di sel sekte (monster alami tidak muncul di sana) dan tidak ada sama sekali bila `eliteMonsters` mati.
+  Bila saklar itu dimatikan saat elit sudah ada, elit itu kehilangan skillnya, bilah bos Raja dihapus, afiks Perisai Unsur
+  tidak bekerja, dan kematiannya dihitung seperti monster biasa (tanpa inti dan tanpa hadiah elit).
+
+### 34.2 Tingkat dan kekuatan
+
+| Tingkat | Nama | Bagian | Pemain terdekat minimal |
+|---|---|---:|---|
+| 1 | **Siluman** | 65% | Pemurnian Qi |
+| 2 | **Binatang Iblis** | 28% | Pembangunan Fondasi |
+| 3 | **Raja Siluman** | 7% | Inti Emas, paling banyak satu dalam 128 blok |
+
+Tingkat yang syaratnya tidak terpenuhi turun ke tingkat di bawahnya. R = nomor ranah pemain terdekat saat elit muncul
+(0–8). Pengubah atribut permanen (`kultivator:elite_*`):
+
+| Atribut | Rumus |
+|---|---|
+| Nyawa maksimum | × `pengali tingkat × (1 + 0,35R)`, pengali 1,5 / 2,5 / 4,0, lalu disembuhkan penuh |
+| Serangan | + `1,5 × tingkat + 0,8R` |
+| Zirah | + `R + 2 × tingkat` |
+| Tahan dorongan | 0,3 / 0,5 / 0,8 |
+| Ukuran | ×1,10 / 1,20 / 1,35 |
+| Kecepatan | +5% / 10% / 15% |
+
+Contoh: zombi Raja Siluman di Inti Emas punya 164 nyawa, di Dewa Abadi 304. Elit memakai **aturan monster ujian**
+(kekuatan teknik lama × 1,5), jadi pemain Inti Emas butuh sekitar 7 pukulan jurus dasar dan pemain Dewa Abadi sekitar 4
+pukulan dasar atau 1–2 jurus tingkat Langit. Elit tidak pernah mendapat tanda bos, dan mulai Transformasi Dewa pun tidak
+mati dalam satu pukulan biasa.
+
+### 34.3 Unsur dan skill
+
+**Unsur:** 75% unsur alami monster itu ([45](#45-lima-unsur-dalam-pertarungan)), 25% satu dari sembilan unsur secara acak.
+
+**Tingkat 1, pasif saat memukul** (hanya pada makhluk):
+
+| Unsur | Efek |
+|---|---|
+| Api | membakar tubuh sasaran 3 detik |
+| Es / Air | Kelambatan II 3 detik |
+| Kayu | Racun I 4 detik |
+| Logam | Kelemahan I 4 detik |
+| Tanah | dorongan tambahan 0,6 |
+| Petir | 20% peluang sambaran partikel 2 kerusakan |
+| Angin | kecepatan +30% permanen |
+| Ruang | 15% peluang mendarat di belakang sasaran (hanya di tempat aman) |
+
+**Tingkat 2: skill aktif bertanda** setiap 8–10 detik melawan sasarannya. Ada tanda di tanah lebih dulu: **keluarlah**.
+
+| Unsur | Skill | Efek |
+|---|---|---|
+| Api / Petir | **Tanda Langit** | lingkar berjari-jari 1,5 di bawah sasaran; setelah 1,5 detik `6 + 3 × tingkat + 0,5R` kerusakan bila sasaran masih di dalam |
+| Es / Air | **Napas Es** | kerucut 6 blok: Kelambatan IV 4 detik + 3 kerusakan |
+| Tanah / Logam | **Hentakan Bumi** | pemain dalam 4 blok terlempar 0,6 ke atas + `5 + 2 × tingkat` kerusakan |
+| Angin / Ruang | **Kedipan** | mendarat di belakang sasaran (hanya di tempat aman) |
+| Kayu | **Duri Racun** | Racun II 5 detik dalam 5 blok |
+
+**Tingkat 3:** skill aktif unsur alaminya ditambah satu skill acak lain secara bergantian, dan **bilah bos**
+"Raja Siluman · Petir" untuk pemain dalam 24 blok (diperbarui tiap 0,5 detik).
+
+### 34.4 Afiks
+
+Tingkat 2 ke atas membawa satu afiks:
+
+| Afiks | Efek | Sumber |
+|---|---|---|
+| **Perisai Unsur** | kerusakan jurus ×0,65, kecuali unsur jurusmu mengalahkan unsurnya (lalu ×1,0). Berlaku untuk jurusmu, jurus murid, dan kekuatan murid; jimat tidak terpengaruh | RMJ bab 1561 (pertahanan binatang laut bersumber dari kekuatan hakiki air) |
+| **Penyerap Qi** | setiap pukulan jarak dekat ke pemain menyedot hingga 8 qi | RMJ bab 1497 (binatang itu melahap petir sang kultivator) |
+| **Pulih Cepat** | memulihkan 1 nyawa per detik | RMJ bab 1561 (cahaya biru dari air laut menutup luka binatang itu) |
+
+### 34.5 Hadiah
+
+Hadiah elit dihitung dari siapa yang membunuhnya. Mati karena jatuh atau lava tanpa pembunuh tidak memberi apa-apa
+tambahan. Barang selalu jatuh di tempat elit mati.
+
+| Pembunuh | Hadiah |
+|---|---|
+| Kamu (langsung, jurus, proyektil) atau binatang rohmu / serigala jinakmu | kultivasi dan pemahaman di bawah, hitungan elit, pencapaian |
+| Muridmu | murid mendapat kultivasi tambahan `kultivasi bunuh × 2 / 4 / 7`; kamu mendapat hitungan elit dan pencapaian, tanpa kultivasi atau pemahaman |
+
+* **Kultivasi:** `maks(kultivasi bunuh biasa × 3 / 5 / 8, bilahmu × 1% / 2,5% / 5% × selisih ranah)`, selisih ranah =
+  `1 + 0,5 × (R − ranahmu)` dibatasi 0,25–2,0, lalu pengali biasa dan [Kejenuhan Bertarung](#47-keseimbangan-fase-7). Raja
+  Siluman di Kenaikan Abadi tingkat 1 kira-kira 5% bilah.
+* **Pemahaman:** +0,3 / +0,6 / +1,5 untuk Dao pilihanmu, paling banyak +3 per hari game dari elit.
+* **Barang:** selalu 1 [Inti Binatang](#36-inti-binatang) bertingkat sama dengan elit dan berunsur sama; tingkat 2+: 25%
+  satu herba roh (umur 50–400) yang cocok dengan unsurnya; tingkat 3: 1–3 Batu Roh Rendah.
+
+Kematian Raja Siluman diumumkan di chat: "… telah tumbang! Inti dan batu rohnya tergeletak di tempat ia mati."
+
+### 34.6 Elit di gelombang Pelindung Dao
+
+Hanya pada tribulasimu sendiri ([7.4](#74-pelindung-dao)):
+* mulai target Jiwa Baru Lahir setiap gelombang membawa 1 elit: tingkat 1 untuk Jiwa Baru Lahir dan Transformasi Dewa,
+  tingkat 2 untuk Penyatuan Dao dan Kenaikan Abadi, tingkat 3 untuk Dewa Abadi; ranahnya = target − 2;
+* nyawa pelindung × `1 + 0,3 × (ranah target − Inti Emas)`;
+* +1 monster per Hu Fa Tribulasi (paling banyak +3), dan setiap pelindung baru memilih sasaran pertamanya secara acak di
+  antara kamu, para Hu Fa, dan muridmu dalam 16 blok;
+* elit pelindung tetap mengikuti aturan pelindung (setengah kultivasi, lenyap saat tribulasi berakhir) tetapi
+  menjatuhkan intinya.
+
+### 34.7 Tampilan dan keamanan
+
+* Aura butir warna unsur pada elit dalam 32 blok (4 / 8 / 16 butir per detik menurut tingkat, dikali Kualitas Efek,
+  paling banyak 12 elit), tanda lingkar dan kerucut skill, serta percikan hantaman.
+* **Pelat elit**: arahkan pandangan ke elit dalam 24 blok. Di bawah tanda bidik tampil "Binatang Iblis · Api", jenis
+  monster, afiks, dan bilah nyawa. **Tahan jongkok** untuk membaca baris Sumber tingkat dan afiksnya.
+* Elit tidak memungut barang; zombi elit tidak bisa mendobrak pintu; tengkorak, stray, dan bogged elit memakai pedang
+  besi (panah memecahkan pot, korus, dan dripstone). Elit **tanpa nama khusus**, jadi tetap hilang (despawn) seperti
+  monster biasa. Monster yang berubah (zombi menjadi drowned) kehilangan status elitnya.
+* Skill elit hanya mengenai makhluk: efek, dorongan, sambaran partikel, api pada tubuh. Tidak pernah entity petir, tidak
+  pernah api di blok.
+
+---
+
+## 35. Batu Roh
+
+Batu yang menyimpan qi bumi, dalam empat tingkat: **Batu Roh Rendah**, **Menengah**, **Tinggi**, dan **Agung**. Resep
+tanpa pola mengubah 9 batu menjadi 1 batu tingkat berikutnya dan 1 batu kembali menjadi 9 (enam resep, terbuka di buku
+resep saat kamu mendapat batunya).
+
+**Sumber:** batu menyimpan qi yang diserap: RMJ bab 214 (batu menengah melepas qi jauh lebih cepat daripada batu rendah)
+dan 1156; tingkat: RMJ bab 214 dan 1155–1156, *Renegade Immortal* (RI) bab 19; tambang batu roh: donghua RMJ musim 2
+episode 1–2, *Invincible* bab 1392; qi seketika: RMJ bab 169; daya formasi: RMJ bab 131; membantu menembus hambatan: RMJ
+bab 1152; mata uang: RMJ bab 214, RI bab 329, *A Will Eternal* (AWE) bab 79. Desain permainan: resep 9 ↔ 1 (kanon menukar
+100 rendah untuk 1 menengah), semua peluang dan durasi.
+
+### 35.1 Cara mendapatkan
+
+* **Menambang.** Mulai Pemurnian Qi, mode Bertahan, tanpa Sentuhan Sutra (`spiritStoneMining`). Peluang =
+  `min(50%, 1,5% × kultivasi tambang bijih itu) × kepadatan qi` (kepadatan dibatasi 0,5–2,0). Pada kepadatan 100%: batu
+  bara 1,5%, besi 3%, emas 4,5%, berlian 15% (deepslate 22,5%), zamrud 18%. Satu Batu Roh Rendah (berlian dan zamrud 1–2)
+  melompat keluar dari blok dengan kilau hijau dan baris di bilah aksi. Fortune tidak berpengaruh, puing kuno tidak
+  memberi apa-apa. Pemain palsu (mesin) dan mode Kreatif tidak pernah mendapat batu.
+* **Peti struktur** ([46](#46-relik-di-peti-kuno)), **Raja Siluman** (1–3 Rendah), **ekspedisi sekte** (Mengawal
+  Karavan +2–5 Rendah; Alam Rahasia +1 Menengah dan 5% Tinggi mulai tim tingkat 7).
+* **Pedagang keliling**: kadang menawarkan 2 zamrud → 3 Batu Roh Rendah (4 kali pakai).
+* **Kewajiban Harian** (1 Rendah untuk ketiganya) dan hadiah bab Langkah Pertama.
+
+### 35.2 Kegunaan
+
+| Kegunaan | Cara | Efek per tingkat (Rendah / Menengah / Tinggi / Agung) |
+|---|---|---|
+| **Bahan bakar meditasi** | pegang batu di **tangan kiri** saat meditasi; satu batu habis di awal setiap periode | satu batu tiap 30 / 150 / 300 / 600 detik, kultivasi ×1,5 / ×2,0 / ×2,5 / ×3,0 |
+| **Qi seketika** | **jongkok + pakai** batu di tangan kanan saat tidak bermeditasi (jeda 1 detik, tanpa racun) | qi +30 / +200 / +900 / qi penuh + pemulihan qi ×3 selama 60 detik |
+| **Daya formasi pelindung** | **jongkok + pakai** batu pada Batu Magnet formasi pelindungmu | +20 menit / +3 jam / +24 jam / diisi sampai batas 48 jam |
+| **Batu di Hambatan** | pegang batu Tinggi atau Agung di tangan kiri saat terobosan **berhasil** | – / – / kualitas +0,03 / +0,08 per batu |
+| **Katalis alkimia** | masukkan ke panci ([40](#40-alkimia-lanjutan-dan-kitab-alkimia)) | peluang +5% / +10% dan kualitas +0,1 untuk Menengah ke atas |
+| **Kantor Misi** | tawarkan di Aula Sekte | 0,5 / 4,5 / 40 / 300 PK per batu (batas 300 PK per hari tetap) |
+
+* **Bahan bakar:** kuras urat ×0,5 selama ada bahan bakar. Bahan bakar ikut dalam batas gabungan tempat × formasi ×
+  bahan bakar ×5. Saat bilah penuh di leher botol, hasilnya masuk **Qi Tertimbun** (di Puncak Dewa Abadi menjadi Qi Abadi
+  untuk bintang). **Batu Tinggi dan Agung tidak dibakar di leher botol**: batu itu disimpan untuk Batu di Hambatan, dan
+  satu baris chat menjelaskannya. Batu Rendah dan Menengah tetap membakar menjadi Qi Tertimbun.
+* **Qi seketika** ditolak saat bermeditasi (pakai batunya di tangan kiri) dan saat qi sudah penuh.
+* **Daya formasi:** batu bisa mengisi formasi sampai 48 jam; Serpihan Batu Kecubung tetap berhenti di 2 jam dan tidak
+  terpakai bila daya sudah di atas 2 jam. Bila formasi sudah penuh, batu ditolak dengan pesan "Formasi sudah menyimpan …".
+* **Batu di Hambatan** (pengganti Padatkan Qi): paling banyak 4 batu dan +0,16. Batu hanya habis bila terobosan
+  berhasil; gagal atau batal = batu tetap ada. Tidak berlaku untuk Kebangkitan. Panel Persiapan menulis "batu roh
+  +0,16". Pesan: "Hambatan menyerap 2× Batu Roh Agung: kualitas terobosan +0,16".
+
+**Pencapaian:** *Batu Roh Pertama*, *Batu Roh Agung*, *Batu di Hambatan* (terobosan pertama yang menghabiskan batu).
+
+---
+
+## 36. Inti Binatang
+
+**Inti Binatang Rendah / Menengah / Tinggi / Raja**, masing-masing dengan satu unsur (nama "Inti Binatang Api ·
+Menengah", warna inti mengikuti unsurnya).
+
+**Sumber:** BTTH bab 11 (inti monster dipakai untuk alkimia, senjata, dan zirah, sangat mahal) dan 14 (inti tingkat satu
+laku sekitar 400–450 emas); RMJ bab 397 (inti iblis) dan 529 (Han Li memurnikan inti iblis menjadi pil). Menyerap inti:
+*Coiling Dragon* Buku 8 bab 57 (garis darah Linley menyerap inti peringkat sembilan, tetapi sisa energinya belum
+terkuasai) dan BTTH bab 11 (inti menyimpan energi alam yang sangat ganas): racun di bawah adalah sisa energi itu.
+Memberi makan binatang roh: *Coiling Dragon* Buku 8 bab 57. Bonus akar: *Terinspirasi dari* *Tales of Demons and Gods*
+bab 13. Desain permainan: nama tingkat, unsur pada inti, dan elit yang selalu menjatuhkan inti.
+
+### 36.1 Cara mendapatkan
+
+* **Elit:** selalu satu, tingkat = tingkat elit ([34.5](#345-hadiah)).
+* **Bos** (Wither, Warden, Naga Ender, Elder Guardian): satu Inti Raja berunsur acak, hanya untuk pembunuhan **pertama**
+  jenis bos itu per pemain per hari game.
+* **Monster biasa** yang kamu atau binatang rohmu bunuh, di Pemurnian Qi ke atas: 1,5% × faktor Kejenuhan Bertarung untuk
+  satu Inti Rendah berunsur monster itu. Tidak pernah dari Pelindung Dao (kecuali elit pelindung), monster spawner,
+  penjaga ujian, boneka latihan, Iblis Hati, bos, atau monster tanpa unsur.
+* **Ekspedisi Perburuan Binatang Iblis**: +1 inti berunsur acak; tingkat menurut tingkat tim (1–3 Rendah, 4–6 Menengah,
+  7–8 Tinggi, 9 Tinggi atau 10% Raja).
+
+### 36.2 Kegunaan
+
+**Memurnikan** (jongkok + pakai, jeda 1 detik, ditolak saat Penyimpangan Qi):
+
+| Tingkat | Kultivasi | Racun | Pemahaman (unsur cocok dengan Dao-mu) | Kantor Misi |
+|---|---|---:|---:|---:|
+| Rendah | 3% bilah, paling banyak 150 | 6 | +0,5 | 3 PK |
+| Menengah | 6%, paling banyak 900 | 10 | +1 | 10 PK |
+| Tinggi | 10%, paling banyak 5.000 | 16 | +2 | 30 PK |
+| Raja | 15%, paling banyak 25.000 | 28 | +4 | 120 PK |
+
+* Kultivasi dikalikan khasiat racun pil ([47](#47-keseimbangan-fase-7)) dan **+50%** bila unsurnya ada di akarmu.
+* Kecocokan unsur dan Dao: Logam → Pedang, Api → Api, Air / Es → Es, Petir → Petir, Tanah → Tubuh, Kayu → Kehidupan,
+  Angin → Bayangan & Angin, Ruang → Ruang.
+
+**Memberi makan binatang roh:** klik kanan binatang rohmu dengan inti: kultivasi binatang +60 / +150 / +400 / +1.000,
+×1,5 bila unsurnya cocok (serigala: Petir atau Logam; rubah: Api atau Kayu). Jeda 10 detik per binatang (terpisah dari
+jeda pil 30 detik). Binatang milik orang lain menolak, dan klik inti tidak membuat serigala duduk atau berdiri.
+
+**Katalis:** di panci alkimia (peluang dan mutu paling rendah, [40](#40-alkimia-lanjutan-dan-kitab-alkimia)), Pil
+Penempa Tulang **memerlukan** inti Tanah Menengah ke atas, dan inti berunsur sama menggantikan katalis jimat
+([39](#39-jimat)).
+
+**Pencapaian:** *Inti Binatang* (inti pertama), *Inti Raja*.
+
+---
+
+## 37. Tanaman Roh (herba berumur)
+
+Mulai Pemurnian Qi, tanaman yang **kamu sendiri** patahkan (mode Bertahan, bukan mesin, `herbHarvest`) kadang
+menyimpan herba roh. Herba melompat keluar di samping tanaman dengan umurnya, dalam tahun.
+
+**Sumber:** umur menentukan nilai: RMJ bab 26 ("makin tua herbanya, makin berharga"), 164 (Jamur Inti Kuning yang ditaksir
+herba seribu tahun), 276. Tanah yang lebih kaya memberi herba yang lebih tua: *Terinspirasi dari* Kebun Seratus Obat, RMJ
+bab 150–151. Sumber tiap herba ada di tabel. Desain permainan: herba yang tersembunyi di tanaman biasa, undian harian,
+rumus umur; herba tidak bisa ditanam (kanon menanamnya di kebun; di sini demi keamanan blok).
+
+| Herba | Tanaman dan syarat | p | Sumber |
+|---|---|---:|---|
+| **Rumput Roh** | rumput pendek/tinggi, pakis, pakis besar di Permukaan | 1,5% | RMJ bab 26 |
+| **Ginseng Roh Sembilan Lekuk** | wortel, kentang, atau bit yang matang; ×2 di hutan rimba, taiga, hutan tua, hutan sakura | 1% | RMJ bab 433, 863, 1252 |
+| **Rumput Es Bersudut Delapan** | bunga kecil atau semak beri manis matang di tempat yang cukup dingin untuk bersalju | 4% | *Soul Land* (herba dingin ekstrem dari Mata Es dan Api; konsep) |
+| **Bunga Api Ungu** | kutil Nether matang, jamur atau akar crimson/warped di Nether | 3% | RMJ bab 1174 (namanya) |
+| **Rumput Roh Ilusi** | bunga kecil di malam hari di bawah langit terbuka; bulan purnama ×3 | 2% | RMJ bab 1174 (namanya); aturan malam *Terinspirasi dari* RMJ bab 1194 |
+| **Bambu Petir Emas** | bambu yang kamu patahkan saat badai petir di bawah langit terbuka | 5% | RMJ bab 412, 1535 (pemicu badai: desain permainan) |
+| **Buah Ginseng** | bunga atau batang korus di End | 2% | *Journey to the West* bab 24 (pohon Zhenyuan berbuah 30 butir setiap 9.000 tahun) |
+| **Jamur Inti Kuning** | jamur merah/cokelat di padang jamur, Deep Dark, atau di bawah y 0 | 3% | RMJ bab 164 |
+| **Herba Fondasi** (sudah ada) | tidak dipanen di dunia | – | kini ikut keluarga herba: diterima sebagai herba pembantu (umurnya, atau 60 tahun) |
+
+**Undian.** Sebuah tanaman terinfus bila undian tetap per tempat, per jenis herba, per hari game lebih kecil dari
+`p × pengali`:
+* Akar Kayu atau Dao Kehidupan ×2; situs spiritual × pengalinya (paling banyak ×2); × kepadatan urat setempat (paling
+  banyak ×1).
+* Satu tempat **paling banyak satu herba per hari**, jadi menanam ulang atau tepung tulang tidak membantu, dan kamu
+  **paling banyak menemukan 12 herba per hari**.
+* Setiap temuan menguras 0,02 kepadatan urat, jadi wilayah yang sering dipanen makin jarang memberi herba.
+
+**Umur** = `(10 + acak × 90) × kepadatan (0,5–2,0) × situs (paling banyak ×2)`, dibulatkan; satu dari seratus temuan
+**sepuluh kali** lebih tua. Tooltip menulis "Umur: 340 tahun". Mulai **1.000 tahun** namanya emas ("Rumput Roh Seribu
+Tahun"), berkilau, dan satu baris diumumkan ke server (paling sering sekali per pemain per 10 menit).
+
+**Sumber lain:** tugas Kebun murid (10% per panen: satu Rumput Roh umur 50–200 ke Lumbung Sekte), ekspedisi Mencari Herba
+Roh (+1–2 herba umur `50 × tingkat`–`150 × tingkat`), elit tingkat 2+, dan peti struktur.
+
+**Kegunaan:** bahan pil baru dan resep alternatif, **herba pembantu** di panci (kualitas + `umur ÷ 3333`, paling banyak
++0,30), Kantor Misi `1 + umur ÷ 100` PK (100 tahun 2 PK, 1.000 tahun 11 PK). Herba **tidak bisa ditanam**.
+
+**Indra Ilahi** menandai tanaman yang terinfus hari ini dengan warna hijau ([46](#46-relik-di-peti-kuno)).
+
+**Pencapaian:** *Tanaman Roh* (herba pertama), *Herba Seribu Tahun*.
+
+---
+
+## 38. Urat Roh, Kultivasi Tertutup, dan Gua Kediaman
+
+**Sumber:** urat membuat tempat lebih kaya: RMJ bab 391 (urat roh alami di Gunung Bijak) dan 1347; tingkat urat
+*Terinspirasi dari* *Martial World* bab 879 ("Top Grade Spirit Vein"); kuras dan pulih *Terinspirasi dari* *I Shall Seal
+the Heavens* (ISSTH) bab 25; kultivasi tertutup: RMJ bab 520, *RMJ: Immortal Realm* bab 1142; gua kediaman: RMJ bab 391,
+520, 803, RI bab 216; kompas urat *Terinspirasi dari* para Source Master dalam *Shrouding the Heavens* (konsep). Desain
+permainan: rumus meditasi, tumpukan, waktu, dan semua angka.
+
+### 38.1 Tingkat urat roh
+
+Setiap wilayah 4×4 chunk berada di atas satu urat, tetap untuk benih dunia itu:
+
+| Tingkat | Peluang wilayah | Kepadatan paling tinggi |
+|---|---:|---:|
+| **Urat Roh Agung** | 2% | 200% |
+| **Urat Roh Kaya** | 8% | 140% |
+| Urat Roh (biasa) | 82% | 100% |
+| **Urat Roh Tipis** | 8% | 60% |
+
+* Wilayah yang belum disentuh berada di batasnya. Kepadatan pulih `0,04% × batas` per detik (dari kosong sampai penuh
+  sekitar 42 menit). Simpanan lama tetap berlaku.
+* Bilah aksi meditasi menulis "Kepadatan Qi 180% · Urat Roh Agung"; `debug vein grade` menulis tingkat, batas, dan
+  kepadatan sekarang.
+
+### 38.2 Rumus meditasi baru
+
+```
+dasar      = maks(0,6 + 0,25 × ranah, kebutuhan bar tahap Awal ranah/tingkat ini ÷ 3000)
+kultivasi/dtk = dasar × min(5, tempat × formasi × bahan bakar) × maks(0,15; kepadatan)
+             × bonus sekte × (1 + 0,05 × tumpukan Tertutup)
+kuras/dtk  = 0,15% × (1 + 0,10 × ranah) × bahan bakar 0,5 × formasi (Agung 0,6, Bintang Surgawi 0,35) × gua 0,5
+```
+
+* Laju dasar: sama seperti dulu sampai Jiwa Baru Lahir (1,6/detik); Transformasi Dewa 4,0, Penyatuan Dao 10, Kenaikan
+  Abadi tingkat 1 20, tingkat 9 68, Dewa Abadi 83,3. Satu tahap Awal tanpa bantuan sekitar 50 menit; dengan semuanya
+  sekitar 5–10 menit.
+* Selama Formasi Pengumpul Qi Agung (Bintang Surgawi) aktif di kursimu, kuras tidak pernah menurunkan kepadatan di bawah
+  30% (45%).
+* Bahan bakar batu roh: [35.2](#352-kegunaan). Rumus ini juga dipakai untuk bagian meditasi murid yang bermeditasi di
+  dekatmu.
+
+### 38.3 Momen Pencerahan (diubah)
+
+Ledakan kultivasi kini **20% bilah** (dulu 25%). Peluang per menit = `(4% × tempat + 2% dengan Dao) × 1,5 setelah 30
+menit tertutup × pengali Pil Pencerahan + 2% (anugerah Pikiran Jernih) + 1% (gua kediaman)`, paling tinggi 50%.
+
+### 38.4 Kultivasi Tertutup
+
+* Meditasi tanpa putus memberi **1 tumpukan Tertutup setiap 5 menit**, paling banyak 5 (+25% kultivasi). HUD: "Tertutup
+  +15%".
+* Setelah **30 menit** tanpa putus: peluang pencerahan ×1,5 ("Setengah jam hening tanpa putus …").
+* Saat meditasi berakhir setelah paling tidak 60 detik muncul ringkasan, misalnya "Meditasi 32 menit: +4.210 kultivasi ·
+  2 pencerahan · kepadatan 180% → 95%" (atau "+… Qi Tertimbun").
+* Pencapaian *Satu Jam Tertutup* (60 menit tanpa putus) dan *Urat Roh Agung* (10 menit bermeditasi di Urat Roh Agung).
+
+### 38.5 Gua Kediaman
+
+* **Menetapkan:** bermeditasilah di kursi **Formasi Pengumpul Qi** (paling tidak yang Kecil) yang berada **di dalam
+  formasi pelindung yang aktif dan berdaya**, lalu `/kultivasi gua tetapkan` atau koin **Gua Kediaman** di tab Status.
+  Kursi Qi yang dibangun Pembangunan Sekte juga dihitung. Satu gua per pemain.
+* `/kultivasi gua lihat` menulis letak, jarak, dan "terlindungi" atau "tidak terlindungi"; `/kultivasi gua hapus` (atau
+  klik koin dua kali dalam 3 detik) meninggalkannya.
+* **Dalam 6 blok dari kursi:** kuras urat ×0,5, pencerahan +1% per menit, istirahat sampai 10 detik tidak memutus tumpukan
+  Tertutup, dan gua menjadi tujuan pertama [Jimat Pulang](#39-jimat).
+* **Zona terlindung 16 blok** di sekitar kursi: Mode Kehancuran tidak pernah memahat di sana. Zona ini tersimpan bersama
+  dunia, jadi tetap berlaku saat pemiliknya luring.
+* Bila formasi qi kursi hilang atau formasi pelindungnya tanpa daya, bonus berhenti sementara: "Gua tidak terlindungi".
+* Pencapaian *Gua Kediaman*.
+
+### 38.6 Kompas Urat Roh
+
+* Resep tanpa pola: **kompas + Serpihan Batu Kecubung + batangan emas + Buni Sinar**.
+* Pakai: 5 qi, jeda 60 detik. Kompas mencari Urat Roh Agung terdekat (kalau tidak ada, yang Kaya) dalam sekitar 2.048
+  blok, hanya dengan menghitung (tidak memuat chunk), lalu jarumnya menunjuk pusat wilayah itu seperti kompas Batu Magnet.
+* Chat dan tooltip menulis tingkat, arah, dan jarak ("Menunjuk: Urat Roh Agung", "Jarak: … blok").
+
+---
+
+## 39. Jimat
+
+**Sumber:** jimat sebagai barang habis pakai dan kerajinan: RMJ bab 242 "Making Talismans" (Han Li mulai dari jimat
+rendah; kertas kosong dari herba roh yang cukup matang, sinabar dari darah binatang roh; jimat tinggi butuh kulit binatang
+iblis), bab 765 (tiga gagal sebelum satu berhasil), 1346 (peluang sangat rendah yang dinaikkan bahan lebih baik), 222;
+AWE bab 51; RI bab 12 dan 31. Siapa pun, bahkan Manusia Fana, bisa memakainya: RI bab 12. Sumber tiap jimat ada di tabel.
+Desain permainan: cara menulis, biaya qi, kekuatan dari ranah, dan angka keahlian.
+
+### 39.1 Kertas dan menulis jimat
+
+* **Kertas Jimat Kosong:** resep tanpa pola 3 kertas + 1 Rumput Roh + 1 pewarna merah → 3 (kertas herba dan sinabar RMJ
+  bab 242; pewarna merah menggantikan sinabar).
+* **Menulis:** mulai Pemurnian Qi, pegang kertas di **tangan kanan**, katalis di **tangan kiri**, lalu **jongkok + pakai**.
+  Setelah 2 detik (efek kuas) qi dan satu katalis terpakai.
+* **Kekuatan** = nomor ranahmu (Pemurnian Qi 1 … Dewa Abadi 8). **Inti binatang berunsur sama** boleh menggantikan
+  katalis: kekuatan +1 (+2 untuk inti Tinggi atau Raja), paling tinggi 9. Jimat Pulang dan Penangkal tidak punya unsur.
+* **Keahlian jimat:** +4 XP per keberhasilan, +1 per kegagalan; tingkat = `min(10, bawah(akar(XP ÷ 8)))`; peluang berhasil
+  = `60% + 3,5% × tingkat` (paling tinggi 95%). Gagal = kertas dan katalis terbakar menjadi abu (hanya barang).
+* Pencapaian *Jimat Pertama* dan *Ahli Jimat* (keahlian tingkat 10).
+
+### 39.2 Delapan jimat
+
+Memakai jimat: tahan pakai 0,5 detik (Jimat Pulang 5 detik), satu habis (atau satu pakai berkurang), jeda bersama 1
+detik, tumpuk 16. Kerusakan dasar `T(p) = 4 + 2,5 × kekuatan`, lewat aturan sasaran yang sama dengan teknik (hanya
+monster) dan tanpa faktor unsur.
+
+| Jimat | Katalis (inti) | Qi tulis | Efek | Sumber |
+|---|---|---:|---|---|
+| **Jimat Petir** | batangan tembaga (Petir) | 20 | sambaran partikel pada monster yang kamu lihat dalam 24 blok: `T(p)`; merantai ke 1 monster lain dalam 5 blok dengan 50% | *Terinspirasi dari* *Dragon War God* bab 498 dan RMJ bab 1367 |
+| **Jimat Awan Api** | bubuk blaze (Api) | 20 | kerucut 6 blok 60°: membakar tubuh monster 5 detik + `0,75 × T(p)` | RMJ bab 242 |
+| **Jimat Perisai** | batangan emas (Tanah) | 25 | Absorption tingkat `min(4, kekuatan ÷ 2)` selama 60 detik; **ditolak selama tribulasimu sendiri** | AWE bab 51 (juga 346, 560) |
+| **Jimat Pengikat** | rantai (Es) | 20 | monster yang kamu lihat dalam 16 blok: Kelambatan VII + Kelemahan I selama `3 + 0,5 × kekuatan` detik (bos ×0,25) | *Terinspirasi dari* *Ancient Strengthening Technique* bab 421 |
+| **Jimat Pulang** | mutiara ender (sebagai tinta, tidak dilempar) | 40 | lihat di bawah | *Terinspirasi dari* *RMJ: Immortal Realm* bab 289 dan RI bab 12, 27 |
+| **Jimat Penangkal Petir** | barang penangkal petir | 35 | hanya selama tribulasimu sendiri: petir berikutnya ×0,5; paling banyak 2 per tribulasi | *Terinspirasi dari* ISSTH bab 159 |
+| **Jimat Seribu Li** | gula (Angin) | 15 | **dua kali pakai**: Kecepatan II 60 detik setiap kali | RI bab 12 |
+| **Jimat Kejernihan** | mata laba-laba fermentasi (Ruang) | 30 | tak terlihat `10 + 2 × kekuatan` detik; saat dipakai dan tiap detik, monster dalam 12 blok yang mengincarmu kehilangan sasaran (kecuali yang kamu lukai dalam 3 detik terakhir); menyerang mengakhirinya; bos tidak terpengaruh | RMJ bab 1365 |
+
+Contoh pada kekuatan 5 (isi kit): Jimat Petir 16,5 kerusakan dan 8,25 pada rantai; Perisai Absorption III; Pengikat 5,5
+detik; Kejernihan 20 detik. Jimat Petir kekuatan Inti Emas (11,5) tetap di bawah Telapak Petir. Elit dan pelindung
+(nyawa disetel untuk kekuatan lama) menerima kerusakan jimat secara utuh; monster biasa terasa lebih kecil daripada jurus.
+
+**Jimat Pulang.** Tahan pakai 5 detik (api emas). Batal bila kamu terluka, bergerak lebih dari 1 blok, atau melepas
+tombol. Tujuan berurutan: **Gua Kediaman** di dimensi ini → **titik bangkitmu** di dimensi ini → **spawn dunia** (hanya di
+Permukaan) → ditolak. Mendarat di tempat aman, jeda 10 menit. Ditolak saat terobosan atau tribulasi, ujian Iblis Hati atau
+ujian warisan, duel atau tanding, Latihan Khusus, laga turnamen, pendakian Alam Dewa Hampa, saat perintah Kehancuran sedang
+dibidik atau dihitung mundur, saat menunggang pedang terbang atau dibawa terbang, dan dalam 10 detik setelah terluka.
+Tidak pernah memakai atau membuat portal dan **tidak pernah berpindah dimensi**.
+
+---
+
+## 40. Alkimia Lanjutan dan Kitab Alkimia
+
+**Sumber:** inti di tungku: BTTH bab 14 (Yao Lao memurnikan bahan dan melunakkan energi ganas inti); kata katalis: BTTH
+bab 6; herba tua memberi pil lebih baik: RMJ bab 26–27; katalis batu *Terinspirasi dari* RMJ bab 131 dan 214 ("formasi
+tungku menarik daya dari batu"); tingkat pil: glosarium *Talisman Emperor* dan *Nine Star Hegemon Body Art* (NSHBA) bab
+53; tablet resep: RMJ bab 153 (Aula Yue Lu menyimpan resep pil), BTTH bab 9. Desain permainan: slot, batas mutu, peluang,
+dan kartu tablet.
+
+### 40.1 Aturan panci baru
+
+* Panci kini menampung **10 bahan** dan menerima batu roh, inti binatang, dan herba roh.
+* Pencocokan: (1) sampai 2 batu roh dikeluarkan sebagai **katalis**; (2) 1 inti binatang dikeluarkan sebagai katalis,
+  kecuali resepnya memerlukan inti; (3) sisanya harus sama dengan bahan sebuah resep **ditambah paling banyak satu herba
+  roh lebihan** (herba pembantu: yang tertua yang tidak diperlukan resep). Resep yang cocok persis didahulukan.
+
+| Tambahan di panci | Efek |
+|---|---|
+| tiap Batu Roh Rendah | peluang +5% |
+| tiap Batu Roh Menengah ke atas | peluang +10%, lemparan mutu +0,1 |
+| herba pembantu | lemparan mutu + `min(0,30, umur ÷ 3333)` (100 tahun +0,03, 1.000 tahun +0,30) |
+| inti katalis Rendah / Menengah / Tinggi / Raja | peluang +5% / +8% / +12% / +18%; mutu paling rendah – / Menengah / Tinggi / Sempurna |
+
+* Peluang tetap paling tinggi 95%. Klik kanan panci dengan tangan kosong menulis resep dan katalisnya, misalnya
+  "→ Pil Pencerahan · katalis: peluang +38%, kualitas +0,5, paling rendah Sempurna". Katalis berhasil menampilkan lingkar
+  emas.
+* Panci mengingat umur herba dan unsur inti: bila apinya padam atau panci dirusak, barang keluar dengan umur/unsurnya.
+* Pil Pembersih Sumsum hasil panci membawa mutu ([47](#47-keseimbangan-fase-7)); yang dari meja kerajinan dihitung
+  Menengah. Pil bermutu Tinggi dan Sempurna menampilkan lingkar cahaya (NSHBA bab 53).
+
+### 40.2 Empat pil baru
+
+| Pil | Resep | Efek | Racun | Sumber |
+|---|---|---|---:|---|
+| **Pil Wawasan Dao** | Rumput Roh Ilusi + Jamur Inti Kuning + Serpihan Gaung → 1 | pemahaman Dao pilihanmu +3 × mutu, tidak pernah melewati 60; paling banyak 5 per ranah; ditolak (pil tetap) tanpa Dao | 18 | *Terinspirasi dari* NSHBA bab 6918 |
+| **Pil Penawar Racun** | Rumput Es Bersudut Delapan + Botol Madu + Rumput Roh → 2 | racun pil −35 × mutu; menghapus Racun, Layu, Mual, Buta, Kegelapan, Lambat, Lemah | 0 | AWE bab 41 |
+| **Pil Pencerahan** | Rumput Roh Ilusi + Buni Sinar + Serpihan Batu Kecubung → 2 | peluang pencerahan ×2 selama 10 menit | 10 | *Terinspirasi dari* Pohon Purba Bodhisattva, BTTH bab 828 dan 1426 |
+| **Pil Penempa Tulang** | Blok Tulang + Batangan Besi + Wortel Emas + **inti Tanah Menengah ke atas** (wajib) → 2 | nyawa maksimum +1 selamanya (Sempurna +2), paling banyak +10; tetap setelah mati dan masuk ulang | 12 | NSHBA bab 503 |
+
+Mutu pil mengalikan efeknya seperti biasa (×0,8 / 1,0 / 1,25 / 1,6). Murid menolak keempat pil ini dan pilnya tetap
+disimpan ([33.2](#332-yang-belum-ada-fase-7b)).
+
+### 40.3 Resep alternatif
+
+Hasilnya sama dengan resep lama, agar setiap herba punya kegunaan:
+
+| Hasil | Bahan |
+|---|---|
+| 3 Pil Penyembuh | Ginseng Roh Sembilan Lekuk + Wortel Emas + Irisan Semangka Emas |
+| 2 Pil Inti Emas | Bunga Api Ungu + Batangan Emas + Apel Emas |
+| 2 Pil Penangkal Petir | Bambu Petir Emas + Batangan Tembaga + Selaput Angan-Angan + Batangan Besi |
+| 3 Pil Pemelihara Jiwa | Buah Ginseng + Air Mata Ghast + Serpihan Gaung + Buah Korus |
+
+### 40.4 Kitab Alkimia
+
+Tablet **Alkimia** di gulungan (`'`, tablet ketujuh) atau `/kultivasi resep`:
+* **Kepala:** tingkat alkimia, XP menuju tingkat berikutnya, peluang dengan api unggun dan api unggun jiwa (Dao Api sudah
+  dihitung bila dipilih).
+* **Kartu per resep** (bisa digulir): ikon hasil × jumlah, ikon bahan × n dengan garis merah untuk bahan yang kurang,
+  ikon inti untuk Penempa Tulang, pita warna, XP alkimia, tanda centang dan "Bisa diracik 2×" bila isi tasmu cukup.
+* **Kaki:** penjelasan katalis dan herba pembantu. Satu atau dua kolom, muat di 320×240.
+
+**Tooltip bahan:** setiap bahan alkimia menulis "[Shift] Bahan alkimia"; tahan Shift untuk melihat pil yang dibuatnya
+("→ 2× Pil Pengumpul Qi" …). Setiap batu, inti, herba, dan pil baru punya baris Sumber (dan baris *Terinspirasi* miring).
+
+---
+
+## 41. Tribulasi Hidup: Lingkar Petir, Menantang Langit, Hu Fa Tribulasi
+
+### 41.1 Lingkar Petir
+
+Mulai target **Transformasi Dewa** (saklar `tribulationTelegraph`).
+
+**Sumber:** ISSTH Buku 6 bab 969 (kultivator lain melewati tribulasi dengan mati-matian menghindari atau menerobos petir,
+sementara Meng Hao menyambutnya langsung). Lingkar di tanah adalah tanda permainan tanpa klaim kanon.
+
+* **1,5 detik sebelum setiap petir** muncul cincin bercahaya berjari-jari 1,5 blok di kakimu (pusatnya tempatmu berdiri
+  saat itu).
+* Saat petir jatuh: berdiri **lebih dari 1,5 blok** dari pusat = petir hanya **menyerempet** sebesar 40%; di dalam = kena
+  penuh. Setiap petir tetap mengenai: serempetan tidak pernah nol, tetap menembus zirah dan efek, dan pemeriksaan "akan
+  menggagalkan" memakai angka akhirnya. Bilah aksi menulis "Di luar lingkar petir: petir hanya menyerempetmu (40%)".
+* **Lingkar kembar** (target Kenaikan Abadi dan Dewa Abadi): setiap petir ke-4 punya dua cincin, yang kedua 3 blok jauhnya;
+  berdiri di salah satunya tetap kena penuh.
+* Batas 6 blok dari tempat mulai tetap berlaku; satu langkah ke samping 2 blok sudah cukup.
+* Saklar mati = tidak ada cincin, semua petir kena penuh seperti dulu.
+
+### 41.2 Menantang Langit
+
+Bonus mutu terobosan: **+0,12** bila setiap petir bertanda kamu terima penuh; selain itu −0,02 per serempetan (paling
+rendah −0,10). Menyerempet menjaga nyawa terendah tetap tinggi, jadi pilihannya nyata. Chat merangkum hasilnya;
+pencapaian *Menantang Langit* (tribulasi bertanda yang semuanya diterima penuh).
+
+**Sumber:** *Terinspirasi dari* ISSTH bab 969 (Meng Hao menyambut petir tujuh warna) dan *Perfect World* bab 1000 dan
+1247 (petir menghancurkan lalu menyusun kembali tubuh Shi Hao; kulitnya tumbuh lagi seputih giok).
+
+### 41.3 Hu Fa Tribulasi (bersama teman)
+
+**Sumber:** BTTH: Yao Lao mengawal Xiao Yan saat memurnikan api (护法); RMJ bab 1803 (dengan Dao petir, Hai Yuetian bisa
+membantu orang lain melewati tribulasi petir); NSHBA bab 6594 (tribulasi bersama menjadi lebih kuat, jadi petir hanya
+jatuh pada sang kultivator). Faktornya desain permainan. Hu Fa Tribulasi berbeda dari monster Pelindung Dao dan dari Hu Fa
+murid ([27.4](#274-hu-fa-menjaga-terobosan)).
+
+* **Bergabung:** saat pertanda dimulai (target Inti Emas ke atas, bukan uji), saudara sekte (`/sekte`) yang daring di
+  dimensi yang sama mendapat baris "[Hu Fa] … menghadapi tribulasi menuju …, N blok ke arah …" dengan tombol **[Kawal]**
+  (menjalankan `/kultivasi kawal <pemain>`, dari paling jauh 64 blok). Siapa pun dalam 24 blok saat petir pertama jatuh
+  ikut terdaftar otomatis.
+* **Kehilangan peran:** lebih dari 40 blok selama 10 detik, mati, keluar dunia, atau memulai terobosanmu sendiri.
+* **Selama petir:** setiap Hu Fa dalam 16 blok mengalikan kerusakan petir ×0,95 (**×0,90** bila Dao pilihannya Petir);
+  semua Hu Fa bersama paling kecil ×0,85. Satu benang qi emas per petir.
+* **Mutu:** +0,04 per Hu Fa yang hadir di akhir (paling banyak +0,08). Gelombang pelindung +1 monster per Hu Fa
+  (paling banyak +3).
+* **Hadiah:** berhasil = setiap Hu Fa mendapat 10% bilahnya sendiri (Qi Tertimbun bila di leher botol); gagal = separuh;
+  batal = tidak ada. Sekali per pasangan per 20 menit. Tidak ada pemahaman.
+* HUD tribulasi menulis "Dikawal: 2". Petir tetap hanya jatuh pada sang kultivator. Murid di dekatmu hanya bisa menjadi
+  sasaran pelindung, tidak pernah mengurangi petir.
+* Pencapaian *Hu Fa Tribulasi* (kawal sampai berhasil) dan *Pelindung Agung* (5 kali).
+
+### 41.4 Pengali petir lain
+
+Semua pengali dikalikan, lalu hasilnya paling kecil ×0,5 (sejak Fase 7 formasi pelindung ×0,85 ikut di dalam batas
+itu): pil dan Apel Emas Terpesona ([7.3](#73-tribulasi-langit)), **Jimat Penangkal Petir** ×0,5 untuk satu petir (2 per tribulasi), Hu Fa,
+**Fondasi Kokoh** ×0,9 ([42.2](#422-ujian-fondasi)), dan anugerah **Gerbang Keabadian** ×0,85 pada tribulasi Dewa Abadi
+([44.1](#441-anugerah-kenaikan)). Jimat Perisai ditolak selama tribulasimu sendiri.
+
+---
+
+## 42. Tablet Jalan: Langkah Pertama, Ujian Fondasi, Kewajiban Harian
+
+Tablet **Jalan** (tablet keenam di gulungan, atau `/kultivasi jalan`) punya tiga bagian yang dipilih dengan koin giok:
+**Langkah · Ujian · Harian**. Semua muat di 320×240.
+
+### 42.1 Langkah Pertama
+
+**Sumber:** *Terinspirasi dari* bimbingan Yao Lao kepada Xiao Yan (BTTH); hadiah bab *Terinspirasi dari* BTTH bab 20 (Yao
+Lao meracik Pil Fondasi "khusus untukmu"). Langkahnya desain permainan.
+
+20 langkah dalam 5 bab. Setiap langkah selesai saat pencapaiannya didapat. **Pemain lama** tidak disuruh mengulang: saat
+masuk, langkah yang pencapaiannya sudah ada langsung tercentang (satu baris chat untuk semua bab yang selesai).
+
+| Bab | Langkah |
+|---|---|
+| 1 Manusia Fana | uji akar · bermeditasi · penuhi bilah Manusia Fana ("Bilah 34/60") · bangkitkan qi |
+| 2 Pemurnian Qi | rapal jurus · telan pil · duduk di situs roh atau bangun Formasi Pengumpul Qi Kecil · terobos ke Fondasi |
+| 3 Fondasi | terbang dengan pedang · racik pil · temukan batu roh · bertahan dari tribulasi Inti Emas |
+| 4 Inti Emas | pilih Dao · belajar dari buku, slip giok, atau warisan · kalahkan Binatang Iblis · bangunkan binatang roh atau bangun formasi pelindung |
+| 5 Sekte | buka Kitab Teknik dan isi 4 segel Cincin Segel · dirikan sekte atau terima calon di aula · ambil murid pertama · pulangkan ekspedisi pertama |
+
+Setiap langkah punya baris "cara" dengan nama tombol yang sedang kamu pakai.
+
+**Hadiah bab** (talisman **Ambil hadiah** di tablet; masuk ke inventori atau jatuh di kakimu; saklar `guideRewards`):
+
+| Bab | Hadiah |
+|---|---|
+| 1 | 2 Pil Pengumpul Qi (Menengah) |
+| 2 | 1 Pil Penyembuh + 1 Pil Pemulih Qi |
+| 3 | 1 Pil Penangkal Petir + 4 Batu Roh Rendah |
+| 4 | 1 Batu Roh Menengah + slip giok jurus tingkat Kuning dari Dao-mu yang belum kamu kuasai (kalau sudah semua: 2 Batu Roh Menengah) |
+| 5 | 2 Batu Roh Menengah + 1 Jimat Perisai (kekuatan 3) |
+
+**Pelacak** (slip giok di **tepi kanan layar, tengah**, sekitar 120 px, mengecil di layar kecil): segel bab, langkah, 1–2
+baris cara, 20 manik kemajuan, dan pengingat hadiah. Mengecil menjadi segel 12 px setelah 20 detik tanpa perubahan;
+terbuka 8 detik saat ada perubahan atau saat tombol gulungan (`'`) ditahan. Langkah selesai = bunyi lonceng kecubung dan
+kilau emas. Koin **Sembunyikan panduan** (tablet Jalan) atau **Panduan** (tab Pengaturan) menyembunyikan dan
+menampilkannya; setelah langkah ke-20 pelacak hilang sendiri dan pencapaian *Jalan Telah Terbuka* muncul.
+
+### 42.2 Ujian Fondasi
+
+**Sumber:** *Terinspirasi dari* fondasi yang dinilai dari retakannya dan Fondasi Sempurna (ISSTH bab 76, 100) serta
+fondasi Dao Bumi dan Dao Langit (AWE). Isi ujian dan "Fondasi Kokoh" desain permainan.
+
+Tiga ujian pilihan untuk setiap terobosan besar dari Inti Emas sampai Dewa Abadi. Satu set terbuka saat kamu memasuki ranah
+atau tingkat di bawah targetnya; kemajuan dihitung sejak saat itu, dan butir "pernah" memakai catatan seumur hidup.
+
+| Target | Ujian 1 | Ujian 2 | Ujian 3 |
+|---|---|---|---|
+| Inti Emas | 20 pembunuhan dengan jurus | 20 menit meditasi di situs ×1,5+ | injak Nether |
+| Jiwa Baru Lahir | 3 Binatang Iblis | racik 3 pil | pemahaman 10 |
+| Transformasi Dewa | pernah mengalahkan Wither atau Elder Guardian | 10 menit di formasi qi Agung+ | bangunkan binatang roh atau kalahkan 1 Iblis Hati |
+| Penyatuan Dao | pemahaman 45 | 3 Binatang Iblis tingkat 2+ | 10 menit meditasi di End |
+| Kenaikan Abadi 1 | pernah mengalahkan Naga Ender | 5 elit tingkat 2+ | 15 menit di situs ×2,0+ |
+| Kenaikan Abadi 2 | pemahaman 60 | 30 menit di Formasi Bintang Surgawi | 1 Raja Siluman |
+| Kenaikan Abadi 3 | pernah mengalahkan Warden | 3 pencerahan | racik 5 pil |
+| Kenaikan Abadi 4 | lewati tribulasi di Nether atau End | 10 elit tingkat 2+ | 20 menit di Urat Roh Agung |
+| Kenaikan Abadi 5 | 2 jenis bos pernah dikalahkan | pemahaman 75 | 2 Raja Siluman |
+| Kenaikan Abadi 6 | 5 pencerahan | 30 menit meditasi di End | 15 elit tingkat 2+ |
+| Kenaikan Abadi 7 | pemahaman 90 | 3 Raja Siluman | racik 8 pil |
+| Kenaikan Abadi 8 | keempat jenis bos | 45 menit di Formasi Bintang Surgawi | 20 elit tingkat 2+ |
+| Kenaikan Abadi 9 | 6 jenis situs roh | 8 pencerahan | 5 Raja Siluman |
+| Dewa Abadi | 6 jenis situs roh | keempat jenis bos | pemahaman 100 |
+
+**Hadiah** (untuk target itu saja): +0,07 mutu per ujian; ketiganya +0,05 lagi dan petir ×0,9 (**Fondasi Kokoh**). Jadi
+satu set lengkap = mutu +0,26. Tidak ada yang wajib dan tidak ada hukuman. Ujian yang selesai tetap penuh. Pencapaian
+*Fondasi Kokoh* untuk set lengkap pertama.
+
+### 42.3 Kewajiban Harian
+
+**Sumber:** RI bab 10 (sebagai murid pelayan, Wang Lin wajib mengisi tidak kurang dari sepuluh tong air setiap hari; gagal
+berarti tanpa makan). Bonus beruntun desain permainan. Ini kewajibanmu sendiri, terpisah dari Tugas Sekte murid dan papan
+Kantor Misi.
+
+* **Tiga kewajiban per hari game** (`/kultivasi harian` atau tab Jalan › Harian). Kewajiban baru juga butuh 15 menit
+  bermain sejak set terakhir, jadi tidur melewati malam tidak mendatangkannya.
+* **Kumpulan** (yang fiturnya tidak tersedia tidak pernah diundi): bunuh `8 + 2 × ranah` monster · kalahkan 1 Binatang
+  Iblis · bermeditasi 8 menit tanpa putus · bermeditasi 5 menit di situs ×2+ · bunuh 5 monster dengan jurus · racik 2 pil
+  (setelah pil racikan pertama) · tambang 6 bijih emas, berlian, atau zamrud tanpa Sentuhan Sutra · panen 2 herba roh ·
+  bunuh 1 monster saat badai petir · tulis 2 jimat (setelah jimat pertama).
+* **Hadiah:** setiap kewajiban 4% bilahmu; ketiganya 1 Batu Roh Rendah; setiap hari beruntun +10%, paling banyak +50%;
+  satu hari terlewat mengulang hitungan. Tiga titik kecil di samping nama ranah di HUD. Pencapaian *Lima Hari Tekun*.
+* Saklar server `dailyTasks`.
+
+---
+
+## 43. Persiapan dan HUD Tribulasi
+
+**Sumber:** desain permainan (UX); hanya membaca sistem yang sudah ada, tidak pernah menyalin rumusnya.
+
+### 43.1 Panel Persiapan
+
+Koin **Persiapan** di tab Status (juga ringkasannya di tooltip talisman Terobosan), diperbarui tiap 5 detik saat bilah
+penuh di leher botol:
+* **Pemurnian Qi → Fondasi:** peluang berhasil dengan rincian (dasar 75% · akar · pil · Qi Tertimbun · tempat) dan saran
+  situs roh atau formasi.
+* **Tribulasi:** jumlah petir × bagian nyawa (terakhir dua kali lipat) dan totalnya, misalnya menuju Penyatuan Dao "Petir: 9 ×
+  18% (terakhir 36%) = 180%" dan "sembuhkan sekitar satu bilah darah"; kerusakan per petir dalam hati dengan faktor petirmu; berapa penyembuhan yang perlu kamu
+  bawa (Inti Emas: 3 × 15%, terakhir 30% → 60%, tidak perlu menyembuhkan diri).
+* **Mutu:** bonus mutu dengan bagiannya (ujian, batu roh, Hu Fa, lainnya).
+* Apakah **Iblis Hati** datang lebih dulu (120 detik, 1,2× nyawamu), gelombang **Pelindung Dao** (berapa gelombang × berapa
+  monster, +1 Binatang Iblis mulai Jiwa Baru Lahir), **lingkar petir** mulai Transformasi Dewa, varian Nether (bawa Tahan
+  Api) atau End.
+* **Daftar periksa:** nyawa ≥ 90% · penyembuh dibawa (apel emas, apel emas terpesona, Pil Penyembuh) · Pil Penangkal Petir
+  sudah diminum atau Jimat Penangkal Petir dibawa · sekutu dalam 16 blok (pemain, murid, binatang roh) · racun pil < 80% ·
+  tidak Penyimpangan Qi · Hardcore ditulis merah.
+
+### 43.2 HUD tribulasi
+
+Di **tepi kiri layar, tengah** (tidak bertabrakan dengan bilah bos Iblis Hati, duel, dan Raja Siluman, langit merah
+Kehancuran, atau toast):
+* pip petir dan "Petir 4/9", cincin waktu yang mengosong menuju petir berikutnya ("Pertanda: petir dalam N dtk",
+  "Langit mulai tenang…");
+* "Berikutnya −5,4 ❤": putih biasa, kuning bila petir itu lebih dari separuh nyawamu, **merah berkedip** dengan detak
+  jantung dan "Petir berikutnya akan menggagalkan — pulihkan dirimu!" bila petir itu akan menggagalkan tribulasi;
+* "Keluar dari lingkar!" saat cincin ada di kakimu (juga cincin kembar), "Di luar lingkar: hanya terserempet 40%";
+* peta kecil dari atas dengan batas 6 blok (kuning di atas 4,5, merah di atas 5,5, panah kembali ke pusat);
+* "Dikawal: N".
+
+---
+
+## 44. Anugerah Kenaikan, Perkokoh Fondasi, Bintang Pemain
+
+### 44.1 Anugerah Kenaikan
+
+Setiap tingkat Kenaikan Abadi membuka Urat Abadi dan satu anugerah. Anugerah ke-n aktif di Kenaikan Abadi tingkat n ke
+atas; Dewa Abadi memiliki kesembilannya. Saat anugerah baru terbuka muncul judul "Urat Abadi terbuka" dan chat "Urat Abadi
+terbuka: Napas Abadi — …" dengan baris Sumbernya.
+
+**Sumber (sistemnya):** ISSTH Buku 6 bab 963–983 (di Kenaikan Abadi Gerbang Keabadian terbuka dan meridian Abadi terbuka
+bersamanya). Efek dan angkanya desain permainan.
+
+| Tingkat | Anugerah | Efek | Sumber |
+|---|---|---|---|
+| 1 | **Napas Abadi** | +3 napas di dalam air, waktu terbakar −50% | *Terinspirasi dari* *Journey to the West* bab 3 dan 7 |
+| 2 | **Langkah Ringan** | tinggi langkah +0,5, gerak di air +50% | *Terinspirasi dari* ilmu menunggang awan Subodhi, *Journey to the West* bab 2 |
+| 3 | **Kulit Giok** | ketangguhan zirah +4, tahan dorongan +25% | *Perfect World* bab 1247 |
+| 4 | **Lautan Qi** | qi maksimum ×1,15 | NSHBA, kisah sampingan Mo Nian bab 3 |
+| 5 | **Tangan Langit** | jangkauan ke makhluk +1,5, ke blok +1 | *Terinspirasi dari* Tangan Hampa, BTTH bab 14 |
+| 6 | **Urat Abadi** | pemulihan qi ×1,25 | ISSTH bab 974 |
+| 7 | **Jiwa Tak Hancur** | lihat di bawah | *Terinspirasi dari* RMJ bab 2434 |
+| 8 | **Pikiran Jernih** | peluang pencerahan +2% per menit; pulih 0,5 nyawa per detik saat meditasi | *Terinspirasi dari* Melodi Hati Jernih, *Mo Dao Zu Shi* |
+| 9 | **Gerbang Keabadian** | petir tribulasi Dewa Abadi ×0,85 | ISSTH bab 969 |
+
+**Jiwa Tak Hancur:** sekali per hari game, pukulan yang seharusnya mematikan menyisakan **1 nyawa**, memberi Absorption
+(sekitar separuh nyawa maksimum) selama 5 detik dan Ketahanan III selama 3 detik, lalu menguras seluruh qi; serpihan
+emas, judul, dan pencapaian *Jiwa Tak Hancur*. Totem dan teknik penolak maut bekerja lebih dulu. Tidak pernah mencegah
+`/kill`, kehampaan, kerusakan yang tidak bisa ditahan, petir tribulasi, duel, atau tanding.
+
+**Kurva nyawa (diubah):** koefisien tingkat Kenaikan Abadi 2 → **4**, bonus Dewa Abadi 60 → **40**. Kenaikan Abadi tingkat 9
+Puncak +63, Dewa Abadi +72–75 (sebelum faktor kualitas).
+
+### 44.2 Perkokoh Fondasi
+
+**Sumber:** ISSTH Buku 2 bab 134 (Meng Hao sudah punya Fondasi Sempurna tetapi masih bisa mendapat pilar Dao keempat);
+tingkat fondasi: ISSTH bab 76 dan 100. Menaikkan kualitas ranah lain, biaya, dan peluang adalah desain permainan.
+
+* `/kultivasi fondasi perkokoh` atau talisman **Perkokoh Fondasi** di tab Status. Syarat: bermeditasi di **Formasi
+  Pengumpul Qi tingkat 2+** (Agung atau Bintang Surgawi), tidak Penyimpangan Qi, tidak sedang menerobos.
+* Target: kualitas tercatat terendah di antara ranah yang sudah kamu capai (ranah paling awal bila sama).
+* Ritual 30 detik (hitung mundur di talisman dan HUD). Berhenti meditasi = batal tanpa biaya.
+* Biaya di akhir: `3 × kebutuhan bar Puncak ranahmu` dari **Qi Tertimbun** (Inti Emas 9.225; Penyatuan Dao 184.500;
+  Kenaikan Abadi 369.000).
+* Peluang: Retak → Biasa 100%, Biasa → Sempurna 60%, Sempurna → Surgawi 25%; gagal mengembalikan separuh biaya.
+* Berhasil: judul "Fondasi Diperkokoh", nyawa dan qi maksimum dihitung ulang, pencapaian *Fondasi Diperkokoh*.
+
+### 44.3 Qi Tertimbun mengalir kembali
+
+Saat Penyimpangan Qi berakhir di leher botol dengan bilah tidak penuh dan Qi Tertimbun > 0, bilah terisi lagi sebanyak
+`min(kekurangan, Qi Tertimbun ÷ 2)` dengan biaya 2 Qi Tertimbun per kultivasi: "Qi Tertimbun mengalir kembali ke
+meridianmu …". Desain permainan (keseimbangan).
+
+### 44.4 Bintang Abadi untuk pemain
+
+**Sumber:** BTTH: tingkat Dou bintang 1–9; *Terinspirasi dari* bintang Dewa Kuno dalam RI bab ~1157–1159. Bencana bintang
+pemain belum ada (Fase 7b); murid tetap punya Tiga Ujiannya ([28](#28-bintang-abadi)).
+
+* Di **Puncak Dewa Abadi** dengan bilah penuh, semua kultivasi menjadi Qi Abadi (Qi Tertimbun).
+* Bintang ke-n berharga `min(5 miliar, 500.000 × 1,07^(n−1))` Qi Abadi. Tanpa batas jumlah.
+* Padatkan dengan `/kultivasi bintang padatkan` (satu) atau `bintang padatkan semua` (sebanyak yang terjangkau, paling
+  banyak 1.000 per perintah), atau talisman **Padatkan Bintang** di tab Status (yang menggantikan talisman Terobosan di
+  Puncak Dewa Abadi; Shift + klik = semua).
+* Setiap bintang: **+2 nyawa maksimum** dan **+1% qi maksimum**. Kerusakan jurus naik lewat faktor bintang Fase 6c
+  ([12.4](#124-kekuatan-tumbuh-bersama-ranah)), begitu juga ukuran Mode Kehancuran dan kecepatan Pedang Terbang. **★9** dan
+  **★18** membuka Gerbang Dewa I dan II untuk pelajaranmu sendiri.
+* Bintang mengorbit dantian di tab Status dengan jumlahnya, dan "★n" tampil di HUD.
+* Pencapaian *Bintang Pertama*, *Sembilan Bintang*, *Delapan Belas Bintang*.
+
+**Kegunaan Qi Tertimbun sekarang:** Perkokoh Fondasi, isi ulang setelah gagal, dan bintang; bahan bakar batu roh di leher
+botol mengisinya.
+
+---
+
+## 45. Lima Unsur dalam pertarungan
+
+**Sumber:** siklus saling mengalahkan adalah Wuxing klasik (filsafat Tiongkok sungguhan, bukan kanon novel). Dukungan
+novel: *RMJ: Immortal Realm* bab 1049 (hukum interaksi antara lima unsur); unsur mutasi: RMJ bab 127 (petir = tanah + air,
+es = logam + air); resonansi akar: *Tales of Demons and Gods* bab 13. Peta Dao → unsur, unsur monster, +5% Ruang, dan semua
+faktor adalah desain permainan.
+
+**Unsur jurus:** unsur Dao jurus itu (Pedang = Logam, Api, Es, Petir, Tubuh = Tanah, Kehidupan = Kayu, Bayangan & Angin =
+Angin, Ruang); untuk jurus umum unsur Dao pilihanmu; tanpa Dao unsur utama akarmu; tanpa akar tidak ada.
+
+**Unsur monster** (elit memakai unsurnya sendiri):
+
+| Unsur | Monster |
+|---|---|
+| Tanah | zombi, husk, zombi penduduk, slime, silverfish, ravager |
+| Air | drowned, guardian |
+| Logam | tengkorak, pillager, vindicator, piglin brute |
+| Es | stray |
+| Kayu | bogged, laba-laba, laba-laba gua, penyihir, creaking |
+| Api | tengkorak wither, blaze, kubus magma, ghast, hoglin, zoglin |
+| Petir | creeper |
+| Ruang | enderman, endermite, shulker |
+| Angin | phantom, vex, evoker, breeze |
+
+Bos, pemain, dan monster lain netral.
+
+**Siklus:** Kayu > Tanah > Air > Api > Logam > Kayu. Petir terhitung {Tanah, Air}, Es terhitung {Air, Logam}; Angin dan Ruang
+netral.
+
+| Hubungan | Faktor |
+|---|---|
+| unsurmu mengalahkan unsurnya (dan tidak sebaliknya) | ×1,3, percikan warna unsur |
+| unsurnya mengalahkan unsurmu | ×0,8 |
+| keduanya saling mengalahkan | ×1,0 |
+| sama-sama berbagi unsur induk | ×0,9 |
+| lainnya atau netral | ×1,0 |
+| jurus Ruang | ×1,05 melawan apa pun |
+| **resonansi**: unsur jurus ada di akarmu | ×1,1 tambahan |
+| bila tidak: akarmu menghidupi unsur jurus (siklus menghidupi Kayu → Api → Tanah → Logam → Air → Kayu) | ×1,05 tambahan |
+
+Contoh: Dao Pedang melawan laba-laba ×1,3; Dao Kehidupan melawan zombi ×1,3; Dao Petir melawan drowned ×1,3; Dao Api melawan
+stray ×1,0; Dao Es melawan blaze ×1,0.
+
+* Hanya pada monster: tidak berlaku di Latih Tanding, duel turnamen, arena, tribulasi, atau pada pemain, dan tidak berlaku
+  untuk jimat dan kerusakan lama lainnya. Faktor gabungan dibatasi ×0,5–×2,0.
+* Detail Kitab Teknik menulis "Unsur Logam · unggul melawan monster Kayu" (jurus Ruang: "×1,05 melawan semua monster").
+* `/kultivasi uji unsur` sambil menatap monster menulis unsur jurusmu, unsurnya, hubungan, resonansi, dan total.
+
+---
+
+## 46. Relik di Peti Kuno
+
+**Sumber:** barangnya membawa sumbernya sendiri; slip giok dari RMJ bab 1269; indra harta dari RMJ bab 1269 (indra roh
+menyapu daratan) dan *RMJ: Immortal Realm* bab 367. Kolam peti adalah desain permainan.
+
+Hanya tabel jarahan peti **bawaan** yang ditambah (`structureLoot`), paling banyak dua kolam per tabel, di samping slip giok
+Fase 6c dan token aula:
+
+| Peti | Tambahan |
+|---|---|
+| penjara bawah tanah, tambang terbengkalai | 30%: 1–4 Batu Roh Rendah |
+| piramida gurun, kuil rimba, lorong dan persimpangan benteng | 2–6 Rendah + 15%: 1 Menengah |
+| perpustakaan benteng | 2–6 Rendah + 15%: 1 Menengah |
+| rumah besar hutan | 1–3 Rendah + 10%: 1 Menengah |
+| iglo | 30%: Rumput Es Bersudut Delapan (umur 50–300); 20%: slip giok jurus Es (Kuning atau Misterius) |
+| reruntuhan laut besar | 20%: 1–3 Rendah; 8%: slip giok jurus Es |
+| benteng Nether | 20%: Bunga Api Ungu (umur 50–300); 10%: slip giok jurus Api |
+| harta karun terkubur | 10%: Rumput Roh Ilusi (umur 500–1.500) |
+| kota kuno | 1–3 Menengah + 10% Tinggi; 15%: Inti Binatang Ruang Tinggi |
+| harta bastion | 1–3 Menengah + 10% Tinggi; 5%: Inti Binatang Api Raja |
+| harta kota End | 1–3 Menengah + 10% Tinggi; 10%: Buah Ginseng (umur 300–900) |
+| brankas ujian yang mengancam | 8%: 1 Batu Roh Tinggi |
+
+**Indra Ilahi mencium harta.** Saat kamu merapal Indra Ilahi:
+* tanaman yang terinfus hari ini dalam jangkauannya ditandai **hijau**;
+* wadah yang belum dibuka (masih menunggu tabel jarahannya) dalam 24 blok, hanya di chunk termuat, ditandai **emas** dengan
+  benang cahaya naik;
+* chat merangkum: "Inderamu menyentuh harta: 3 herba roh, 1 peti yang belum dibuka".
+
+Hanya tabel jarahan yang berubah; tidak ada bangunan atau blok yang disentuh.
+
+---
+
+## 47. Keseimbangan Fase 7
+
+### 47.1 Kejenuhan Bertarung
+
+**Sumber:** desain permainan (aturan keseimbangan); tidak mengaku kanon.
+
+* Setiap monster yang kamu bunuh menambah Kejenuhan +1 (slime dan kubus magma +0,3, elit +3); nilainya turun 1 setiap 5
+  detik.
+* Kultivasi dari membunuh dan peluang inti biasa × `1 ÷ (1 + maks(0, K − 25) ÷ 25)`. Pertarungan biasa (2–6 bunuhan per
+  menit) tidak pernah melewati 25; ladang 30 bunuhan per menit turun ke ×0,12 dalam 10 menit.
+* Bilah aksi memberi tahu paling sering sekali per menit selama faktornya di bawah 0,6: "Tubuhmu jenuh bertarung:
+  kultivasi dari membunuh ×0,4".
+* **Monster dari spawner** (dungeon, bukan spawner ujian) selalu ×0,25 kultivasi, tanpa inti dan herba, dan tidak pernah
+  menjadi elit.
+* **Bos:** kultivasi penuh sekali per jenis bos per pemain per hari game, 25% sesudahnya.
+
+### 47.2 Buku wawasan
+
+Buku Pesona yang hanya memberi wawasan (pemahaman +5) paling banyak **4 per hari game**. Buku kelima tetap disimpan dengan
+pesan "Kata-katanya kabur; pikiranmu sudah penuh hari ini". Tooltip buku menulis "Buku wawasan hari ini: 2/4". Belajar
+teknik dan penguasaan dari buku tidak pernah dibatasi ([11.3](#113-kitab-teknik-buku-pesona)).
+
+### 47.3 Racun pil
+
+**Sumber:** AWE bab 41 (kotoran menjadi racun obat yang memengaruhi kultivasi berikutnya). Angka dan deviasinya desain
+permainan.
+
+* Khasiat = `1 − (racun ÷ 100)^1,6` (25 → 89%, 50 → 67%, 80 → 30%, 100 → 0%), untuk pil vanilla, pil racikan, dan inti.
+* Berkurang 1 setiap 30 detik, atau setiap 10 detik saat bermeditasi.
+* Di atas 90: setiap pil punya 25% peluang **"Pil Membalik!"**: asap kelabu dan Penyimpangan Qi ringan (tidak pernah
+  mematikan; Dewa Abadi yang sudah diakui kebal). Tidak berlaku untuk Pil Penawar Racun dan Pil Dewa.
+* HUD menampilkan racun mulai 40 (kuning), di atas 80 peringatan lama tetap berlaku.
+
+### 47.4 Pil Dewa
+
+Desain permainan (keseimbangan): Pil Dewa kini memberi tepat **1 bilah × mutu pil** (Menengah 1 bilah, Sempurna 1,6
+bilah), tanpa pengali akar, racun, atau kualitas terobosan (dulu bisa sampai sekitar 3,5 bilah).
+
+### 47.5 Pil Pembersih Sumsum
+
+**Sumber:** *Keyboard Immortal* bab 1943 (Pil Pembersih Sumsum menaikkan bakat). Peluangnya desain permainan.
+
+| Langkah | Peluang | Syarat |
+|---|---:|---|
+| Sampah → Rendah | 100% | – |
+| Rendah → Menengah | 85% | – |
+| Menengah → Tinggi | 55% | Pembangunan Fondasi ke atas |
+| Tinggi → Surgawi | 30% | Inti Emas ke atas dan pil bermutu Tinggi atau Sempurna |
+
+* Peluang × 0,8 / 1,0 / 1,25 / 1,6 menurut mutu pil, paling tinggi 95%. Pil dari meja kerajinan dihitung Menengah.
+* Syarat diperiksa **sebelum** pil habis (pesan "pil tetap disimpan").
+* Gagal: pil terpakai, racun 15, mual, asap kelabu, "Sumsum menolak!", akar tetap. Racun 20 untuk langkah menuju Tinggi
+  dan Surgawi. Akar Surgawi tetap Surgawi.
+
+---
+
+## 48. HUD dan kenyamanan Fase 7
+
+**Sumber:** desain permainan (UX).
+
+**Tambahan HUD** (kiri bawah; baris baru dibuang lebih dulu di layar sempit):
+
+| Baris | Isi |
+|---|---|
+| Pengukur pedang terbang | "Pedang ≈42 dtk" sisa terbang dengan qi sekarang; kuning di bawah 15 detik, merah di bawah 10 dengan bunyi di 10/5/3 detik; "Turun!" di bawah 2 detik |
+| Pencerahan | "Pencerahan 0:07" selama Momen Pencerahan |
+| Langkah Awan | 1–6 pip awan saat melayang (jumlah lompatan sesuai ranah) |
+| Pengingat cooldown | bunyi lonceng dan kilau segel saat jeda 10 detik atau lebih selesai (pengaturan, bawaan mati) |
+| Racun pil | tampil mulai 40% |
+| Urat | kepadatan dalam %, nama tingkat urat, "Tertutup +15%", ikon batu + sisa bahan bakar, "Gua" / "Gua tidak terlindungi", hitung mundur Perkokoh Fondasi |
+| Bintang | "★n" bila ada |
+| Kewajiban | tiga titik di samping nama ranah |
+
+**Peringatan bahaya** (pengaturan "Peringatan bahaya", bawaan nyala): setiap 0,5 detik saat bermeditasi, monster yang
+terlihat dalam 12 blok (bukan Iblis Hati, bukan hewan peliharaanmu) memicu bunyi bel, tepi layar memerah ke arah monster,
+dan "Bahaya: Zombie 7 blok" di atas bilah aksi (elit: "Bahaya: Binatang Iblis (Zombie) 7 blok"). Berulang setiap 5 detik
+selama monster itu dalam 6 blok.
+
+**Efek pemain lain:** pengaturan "Efek pemain lain: Mati" kini juga menyembunyikan aura kultivasi pemain lain; "Ringan"
+menipiskannya. Auramu sendiri tetap.
+
+**Cetak Biru Formasi** (hanya membaca blok):
+* **Pemicu:** tatap Balok Emas (kursi formasi qi) atau Batu Magnet (formasi pelindung) dari paling jauh 8 blok sambil
+  memegang Balok Batu Kecubung, Tongkat End, Balok Emas, Suar, Batu Magnet, atau Obsidian Menangis, atau sambil jongkok.
+  Bertahan 30 detik setelah pemicu terakhir.
+* **Tanda:** garis hijau = blok benar; kubus emas berdenyut = slot kosong; silang merah = blok salah.
+* **Label:** "Formasi Pengumpul Qi Kecil 3/4 · ×1,25 → Formasi Pengumpul Qi Agung 5/9", atau "Formasi Pelindung n/4" dengan
+  saran "Jongkok + pakai Serpihan Batu Kecubung untuk membangkitkannya".
+
+**Pengaturan baru** di tab Pengaturan (bagian Jalan & HUD): Pengingat cooldown, Peringatan bahaya, Panduan.
+
+**`/kultivasi uji hud`** (operator) menampilkan semua elemen HUD Fase 7 dengan contoh nilai selama 10 detik.
+
+---
+
+## 49. Tampilan, Kualitas Efek, dan kosmetik
 
 Semua efek digambar di sisi klien dengan partikel dan lapisan render standar (aman untuk Sodium, Iris, ImmediatelyFast,
 EMF/ETF), disesuaikan dengan **Kualitas Efek**:
@@ -4534,7 +5699,7 @@ kilau dan garis emas Wujud Dharma, awan dan petir tribulasi, garis formasi pengu
 Formasi Pelindung, dan sinematik Pengakuan Langit. Lapisan tubuh tidak pernah digambar untuk pandangan orang pertamamu
 sendiri, jadi layar tetap bersih.
 
-### 33.1 Tampilan Fase 6: murid, aula, dan acara
+### 49.1 Tampilan Fase 6: murid, aula, dan acara
 
 Semua tampilan Fase 6 juga hanya partikel dan lapisan render di komputermu, ikut Kualitas Efek (Minimal mengurangi
 partikel, Maksimal menambah hiasan). Efek yang terus menyala hanya digambar dalam 32 blok (bahtera hantu 64 blok).
@@ -4555,7 +5720,7 @@ partikel, Maksimal menambah hiasan). Efek yang terus menyala hanya digambar dala
 | Mode Kehancuran | langit merah dan abu selama hitung mundur, garis pratinjau bentuk 15 detik, debu hantaman, kilau biru saat pemulihan |
 | Pembangunan Sekte | hologram tapak saat pratinjau, remah blok dan percik giok saat memasang, kabut kerja dan benang qi pekerja, kelopak ceri saat bagian selesai, pilar emas, pita, bola lentera, dan hujan emas saat tingkat selesai, lautan awan di lembah Templat 6–9 ([20b.14](#20b14-tampilan-dan-suara)); kabut kerja dan lautan awan mati di Minimal |
 
-### 33.2 Tampilan Fase 6c: Teknik Dewa
+### 49.2 Tampilan Fase 6c: Teknik Dewa
 
 Setiap teknik punya lapisan efek per tahap (rapal, isi, lintasan, hantaman, kena, denyut, akhir) yang digambar di
 komputermu dari satu pesan server dan satu benih acak, jadi semua pemain melihat bentuk yang sama:
@@ -4575,19 +5740,34 @@ Makin tinggi ranah perapal, makin besar dan makin lengkap lapisannya ([12.4](#12
 Penguasaan 3 menambah tepi emas, penguasaan 4 bayangan sisa. Selama Mode Kehancuran nyala, hantaman menambah retakan dan
 remah blok. Anggaran dan pengaturannya di [12.13](#1213-performa-efek-dan-pengaturan).
 
+### 49.3 Tampilan Fase 7: Dunia yang Hidup
+
+Semuanya partikel di komputermu, dalam 32 blok (harta 48 blok), ikut Kualitas Efek dan anggaran partikel:
+
+| Apa | Tampilan |
+|---|---|
+| Elit | aura butir warna unsur (4 / 8 / 16 per detik menurut tingkat, paling banyak 12 elit), lingkar Tanda Langit, kerucut Napas Es, cincin Hentakan Bumi, jejak Kedipan, percikan hantaman; pelat elit di bawah tanda bidik |
+| Tribulasi | lingkar sigil bercahaya 1,5 detik sebelum petir, lingkar kembar, benang qi emas Hu Fa, percikan warna unsur pada pukulan ×1,3 |
+| Harta | kilau hijau saat batu roh keluar dari bijih, kilau herba, nama emas dan kilau herba seribu tahun, lingkar emas katalis panci, lingkar cahaya pil Tinggi dan Sempurna, tanda hijau herba dan emas peti dari Indra Ilahi (dengan benang cahaya naik) |
+| Jimat | kertas terbakar menjadi aksara, sambaran Jimat Petir, kerucut Awan Api, cangkang Perisai, rantai Pengikat, api emas Jimat Pulang, slip biru Penangkal, angin Seribu Li, kilau Kejernihan, goresan kuas dan abu saat menulis, serpihan emas Jiwa Tak Hancur, sinar anugerah, ritual Perkokoh Fondasi, ping kompas, nyala bahan bakar batu, lingkar Gua Kediaman |
+
 ---
 
-## 34. Layar kultivasi (gulungan giok)
+## 50. Layar kultivasi (gulungan giok)
 
 Tekan `'`. Gulungan memiliki loh giok vertikal di sisi kiri:
 
 | Tab | Isi |
 |---|---|
-| **Status** | Lingkaran dantian besar (cincin kultivasi, qi, Qi Tertimbun), ranah, statistik, Penyimpangan Qi, racun pil, tingkat Alkimia; jimat Meditasi, Terobosan, Uji Akar |
+| **Status** | Lingkaran dantian besar (cincin kultivasi, qi, Qi Tertimbun), ranah, statistik, Penyimpangan Qi, racun pil, tingkat Alkimia; jimat Meditasi, Terobosan, Uji Akar. Sejak Fase 7: koin **Persiapan** ([43.1](#431-panel-persiapan)), koin **Gua Kediaman**, talisman **Perkokoh Fondasi**, dan di Puncak Dewa Abadi talisman **Padatkan Bintang** dengan Bintang Abadi yang mengorbit dantian ([44](#44-anugerah-kenaikan-perkokoh-fondasi-bintang-pemain)) |
 | **Akar & Dao** | Pentagram lima elemen yang menyala sesuai akarmu, segi delapan Bagua delapan Dao (klik untuk membaca/memilih) |
 | **Teknik** | Kartu peluncur **Buka Kitab Teknik** dengan "Teknik x/168", Kekuatan P, penguasaan tertinggi, dan teknik terpilih; jimat ke Kodeks, Cincin Segel, dan Mode Kehancuran ([12.1](#121-kitab-teknik)) |
-| **Pengaturan** | Kualitas Efek (juga Otomatis), kosmetik, HUD, efek teknik ([12.13](#1213-performa-efek-dan-pengaturan)), terobosan Hardcore (klik dua kali dalam 3 detik) |
+| **Pengaturan** | Kualitas Efek (juga Otomatis), kosmetik, HUD, efek teknik ([12.13](#1213-performa-efek-dan-pengaturan)), terobosan Hardcore (klik dua kali dalam 3 detik); sejak Fase 7 bagian **Jalan & HUD**: Pengingat cooldown, Peringatan bahaya, Panduan |
 | **Bantuan** | Ringkasan aturan dan tombol (lihat di bawah) |
+| **Jalan** (Fase 7) | Langkah Pertama, Ujian Fondasi, Kewajiban Harian ([42](#42-tablet-jalan-langkah-pertama-ujian-fondasi-kewajiban-harian)); juga `/kultivasi jalan` |
+| **Alkimia** (Fase 7) | Kitab Alkimia: semua resep dan apa yang bisa diracik dari isi tasmu ([40.4](#404-kitab-alkimia)); juga `/kultivasi resep` |
+
+Ketujuh tablet muat di jendela 320×240.
 
 **Topik Bantuan Fase 6** (setelah topik lama): Aula Sekte, Pembangunan Sekte, Hari Penerimaan Murid, Jenjang Sekte, Poin Kontribusi, Tugas
 Sekte dan Lumbung Sekte, Misi/Utusan/Tanah Terlarang, Turnamen dan Perang Seratus Dinasti, Alam Dewa Hampa/Menara Langit
@@ -4599,12 +5779,17 @@ gulungan aula dan tab murid, dan selengkapnya di bagian 20–31 panduan ini.
 untuk jurusmu sendiri (peringatan merah: mati secara bawaan, satu klik, Shift = tanpa kawah, zona aman, pulihkan dalam
 10 menit).
 
+**Topik Bantuan Fase 7** (15 topik, "Tablet Jalan" paling atas, masing-masing diakhiri baris Sumber): Tablet Jalan,
+Persiapan dan HUD tribulasi, Kewajiban Harian, Batu Roh, Tanaman Roh, Inti Binatang, Relik di Peti Kuno, Alkimia
+Lanjutan, Binatang iblis, Lima unsur dalam pertarungan, Kejenuhan Bertarung, Tribulasi hidup dan Hu Fa, Urat Roh dan
+Kultivasi Tertutup, Anugerah Kenaikan/Fondasi/Bintang, dan Jimat.
+
 Gulungan lain di Fase 6: **gulungan murid** (klik kanan muridmu, [19.2](#192-gulungan-murid)) dan **gulungan aula**
 (klik kanan prasastimu, [20.6](#206-gulungan-aula)).
 
 ---
 
-## 35. Pencapaian
+## 51. Pencapaian
 
 Semua pencapaian ada di tab **Kultivasi** pada layar Pencapaian (Advancements). Bingkai: tugas, *tujuan*, **tantangan**.
 
@@ -4629,14 +5814,18 @@ Semua pencapaian ada di tab **Kultivasi** pada layar Pencapaian (Advancements). 
 | Jalan Abadi | Segel Jiwa, Pelindung Dao Murid (Hu Fa sampai berhasil), *Fondasi Dao Langit*, **Fondasi Sempurna**, Bintang Pertama Terpadatkan, *Bencana Terlewati*, **Penginjak Langit** (ketujuh bencana), *Lampu Jiwa Padam*, *Pewaris Ditetapkan*, **Penguasa Sembilan Segel**, *Guru di Dalam Cincin*, **Murid Melampaui Guru** |
 | Teknik Dewa (Fase 6c) | Lima Puluh Jurus (kuasai 50 teknik), *Seratus Jurus*, **Kitab Lengkap** (semua 168), *Kesempurnaan Agung* (penguasaan tingkat 3 pertama), **Puncak Jurus** (tingkat 4 pertama), Jurus Tingkat Langit, *Jurus Abadi*, **Gerbang Dewa** (teknik Dewa pertama), Membaca Slip Giok, *Pewaris Warisan* (menang Ujian Warisan) |
 | Mode Kehancuran | Sumpah Kehancuran (butuh izin server), **Pemecah Dunia** (Jurus Pemusnah yang mengubah blok sungguhan), **Tanganku Membelah Bumi** (kawah pertama dari jurusmu sendiri) |
+| Harta (Fase 7) | Batu Roh Pertama, *Batu Roh Agung*, Batu di Hambatan (terobosan yang menghabiskan batu), Tanaman Roh (herba pertama), *Herba Seribu Tahun*, Inti Binatang, **Inti Raja**. Pencapaian "memegang" terbuka paling lama 5 detik setelah barangnya ada di inventori |
+| Pertarungan dan tribulasi (Fase 7) | Pemburu Siluman (elit pertama), *Penakluk Raja Siluman*, **Pemburu Binatang Iblis** (50 elit), **Menantang Langit** (semua petir bertanda diterima penuh; namanya sama dengan pencapaian tribulasi pertama), Hu Fa Tribulasi (kawal sampai berhasil), *Pelindung Agung* (5 kali) |
+| Kultivasi (Fase 7) | *Urat Roh Agung* (10 menit meditasi di Urat Roh Agung), *Gua Kediaman*, *Satu Jam Tertutup* (60 menit tanpa putus), *Fondasi Diperkokoh*, **Jiwa Tak Hancur**, *Bintang Pertama*, **Sembilan Bintang**, **Delapan Belas Bintang**, Jimat Pertama, *Ahli Jimat* (keahlian jimat 10) |
+| Jalan (Fase 7) | *Jalan Telah Terbuka* (20 Langkah Pertama), *Fondasi Kokoh* (satu set Ujian Fondasi lengkap), Lima Hari Tekun (Kewajiban Harian 5 hari beruntun) |
 
 Resep yang terbuka di buku resep: Prasasti Aula Sekte (saat kamu mendapat Batu Magnet), serta Giok Segel Jiwa dan Cincin
-Jiwa Guru (saat kamu mendapat Serpihan Gaung).
+Jiwa Guru (saat kamu mendapat Serpihan Gaung). Sejak Fase 7: resep 9 ↔ 1 Batu Roh (saat kamu mendapat batunya).
 Resep Gulungan Penerimaan Murid sudah dihapus sejak Fase 6.
 
 ---
 
-## 36. Berkas konfigurasi
+## 52. Berkas konfigurasi
 
 ### `config/kultivator.json` (server / dunia pemain tunggal)
 
@@ -4673,6 +5862,14 @@ Resep Gulungan Penerimaan Murid sudah dihapus sejak Fase 6.
 | `sectBuildExplosionCredit` | `true` | Blok sekte yang diledakkan tidak menjatuhkan barang dan dikreditkan ke Gudang |
 | `sectBuildSpawnProof` | `true` | Monster tidak muncul secara alami di atas sel sekte |
 | `sectBuildFpsHint` | `true` | Komputer yang lama di bawah 30 FPS membuat sektenya dibangun setengah laju |
+| `eliteMonsters` | `true` | Monster alami di dekat pemain Pemurnian Qi ke atas bisa menjadi [Binatang Iblis](#34-binatang-iblis-monster-elit). Bila `false`, elit yang ada kehilangan skill dan hadiahnya |
+| `eliteChanceScale` | `1.0` (0–5) | Pengali peluang elit; batas 7% tetap berlaku |
+| `structureLoot` | `true` | Batu roh, herba, inti, dan slip giok di peti struktur bawaan ([46](#46-relik-di-peti-kuno)); berlaku setelah `/reload` atau saat server mulai |
+| `spiritStoneMining` | `true` | Bijih yang dipatahkan pemain Pemurnian Qi ke atas kadang menjatuhkan [Batu Roh](#35-batu-roh) |
+| `herbHarvest` | `true` | Tanaman yang dipatahkan pemain Pemurnian Qi ke atas bisa menyimpan [herba roh](#37-tanaman-roh-herba-berumur) |
+| `guideRewards` | `true` | Bab Langkah Pertama memberi hadiahnya ([42.1](#421-langkah-pertama)) |
+| `dailyTasks` | `true` | [Kewajiban Harian](#423-kewajiban-harian) |
+| `tribulationTelegraph` | `true` | [Lingkar petir](#411-lingkar-petir) mulai Transformasi Dewa; bila `false` setiap petir kena penuh |
 
 Nilai yang hilang diisi bawaan, nilai di luar rentang dipotong ke batasnya, dan berkas ditulis ulang saat server mulai.
 `/kultivasi kehancuran izin on|off` (operator) juga menulis berkas ini.
@@ -4691,13 +5888,16 @@ Nilai yang hilang diisi bawaan, nilai di luar rentang dipotong ke batasnya, dan 
 | `wheel_hold` | `true` / `false` | Tahan G untuk Roda Segel |
 | `release_cast` | `true` / `false` | Lepas = rapal |
 | `reduce_motion` | `true` / `false` | Kurangi gerak |
+| `cooldown_ping` | `true` / `false` | Pengingat cooldown (Fase 7, bawaan `false`) |
+| `danger_alert` | `true` / `false` | Peringatan bahaya saat meditasi (Fase 7, bawaan `true`) |
 | `codex_filters`, `codex_sort`, `teach_filters`, `teach_sort`, `codex_seen` | – | Saringan dan urutan terakhir Kitab Teknik dan tab Teknik murid, serta kartu yang sudah dilihat (lencana BARU) |
 
-Semuanya diatur dari tab Pengaturan gulungan atau langsung di Kitab Teknik.
+Semuanya diatur dari tab Pengaturan gulungan atau langsung di Kitab Teknik. Pilihan **Panduan** (tampilkan atau
+sembunyikan pelacak Langkah Pertama) disimpan di data pemainmu di server, bukan di berkas ini.
 
 ---
 
-## 37. Janji keamanan blok
+## 53. Janji keamanan blok
 
 Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama.
 
@@ -4797,3 +5997,20 @@ Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama.
 * Kawah, parit, dan retakan hanya ada lewat saklar Mode Kehancuran jurus sendiri
   ([12.11](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang)), yang mati secara bawaan, tidak berlaku saat
   jongkok, duel, terobosan, atau rapalan murid, dan bisa dipulihkan dalam 10 menit (selama server tidak dimulai ulang).
+
+**Tambahan Fase 7 (Dunia yang Hidup):**
+* Fase 7 tidak menambah pengecualian. Batu roh dan herba hanya jatuh sebagai barang **setelah kamu sendiri mematahkan**
+  bijih atau tanamannya; kawah Mode Kehancuran dan Pembangunan Sekte tidak pernah memberi batu, herba, atau kultivasi
+  tambang. Herba tidak bisa ditanam (tidak ada blok tanaman baru).
+* Harta peti hanya ditambahkan ke tabel jarahan peti **bawaan**; tidak ada struktur atau blok yang dibuat atau diubah.
+* Elit adalah monster vanilla yang muncul secara alami lalu diperkuat. Satu-satunya monster yang dimunculkan mod tetap
+  gelombang Pelindung Dao (kini dengan satu elit) dan elit `uji elit`. Semua membawa tanda keamanan: tidak mendobrak pintu,
+  tidak memungut barang, tidak menekan pelat, tidak melewati portal; tengkorak elit memakai pedang, bukan busur.
+* Skill elit, jimat, dan lingkar petir hanya mengenai makhluk: efek, dorongan, sambaran partikel, api pada tubuh. Tidak
+  pernah entity petir, proyektil vanilla, ledakan, blok api, atau portal. Jimat Pulang tidak pernah memakai atau membuat
+  portal dan tidak berpindah dimensi.
+* Cetak Biru Formasi, Kompas Urat Roh, dan Indra Ilahi hanya **membaca** blok (kompas bahkan tidak membaca blok, hanya
+  menghitung), tidak pernah memuat chunk.
+* Gua Kediaman adalah zona terlindung 16 blok untuk Mode Kehancuran.
+* Cuaca dan waktu tetap tidak pernah diubah: Bambu Petir Emas hanya bisa ditemukan saat badai petir yang datang sendiri
+  atau dari perintah `/weather`.

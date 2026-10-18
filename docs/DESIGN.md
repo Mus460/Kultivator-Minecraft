@@ -596,8 +596,8 @@ Butter Bot mod; Butter Bot stays a separate mod).
   comprehension/learned techniques/qualities in the entity's saved data, using the same `Rank` math and bottleneck rules
   (with a disciple XP multiplier 0.6 so it is slower than the master). XP from monster kills it takes part in, from
   meditating (idle, sits cross-legged near the master or at its post), pills the master gives (right-click with a vanilla
-  pill item or a kultivator pill: same effect table, scaled for the disciple), and 10% of the master's meditation XP when
-  meditating within 8 blocks of the master. At a full bottleneck the master starts its breakthrough from the disciple
+  pill item or a kultivator pill: same effect table, scaled for the disciple), and a share of the master's meditation XP when
+  meditating near a meditating master (Bimbingan Guru below; originally a flat 10% within 8 blocks). At a full bottleneck the master starts its breakthrough from the disciple
   screen: awakening needs nothing, Qi Refining → Foundation is a chance roll, Golden Core+ is a mini tribulation
   (particles + sounds, strikes = % of its max health, never lethal; failure = 3 minutes of weakness and −30% bar).
   Dao chosen by the master in the disciple screen when it reaches Golden Core.
@@ -623,6 +623,15 @@ Butter Bot mod; Butter Bot stays a separate mod).
 * **Visuals:** renderer with the player model, its skin, aura per realm (reuse AuraFx style), cross-legged pose while
   meditating, robe tint by Dao, name tag "<name> · <realm>".
 * **Lang:** `lang-src/disciples.*` (id_id + en_us), names lists in both languages.
+* **Bimbingan Guru (user request, 2026-10-18):** "the higher my realm, the faster my disciples cultivate when I
+  cultivate near them". With realm = ordinal (Mortal 0 … True Immortal 8): share of the master's meditation gain =
+  10% + 3% × master realm + 5% × max(0, master realm − disciple realm), at most 60%; range = 8 + 2 × master realm blocks,
+  at most 24; while the master meditates within that range the disciple's own meditation gain is also ×(1 + 0.05 ×
+  master realm). Constants `DiscipleCultivation.GUIDANCE_*` (public static final) with the pure functions
+  `guidanceShare`, `guidanceRange`, `guidanceSelfFactor`; shown on the disciple Status tab (cultivation bar tooltip) and in
+  the guide topic `bimbingan` (`lang-src/disciplecult.*`). The any-range talent hook still lifts the range limit for
+  the share only. Sumber: terinspirasi dari Battle Through the Heavens (Yao Lao, the teacher living in Xiao Yan's ring,
+  guiding his cultivation); the numbers are game design.
 
 ### 18.1 Phase 5 code contract (three modules)
 

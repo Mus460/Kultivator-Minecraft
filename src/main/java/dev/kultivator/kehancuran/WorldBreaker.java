@@ -29,8 +29,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -102,6 +104,11 @@ public final class WorldBreaker {
 		@Nullable Vec3 castPos;
 		/** Per-position modes for a merged self job (null = the job flags). */
 		byte @Nullable [] modes;
+		/**
+		 * Per column ({@code BlockPos.asLong(x, 0, z)}): the highest solid or fluid block this job had to leave. Nothing below
+		 * it in that column is removed, so a skipped top layer (a lake bed, a protected block) never seals a hollow.
+		 */
+		final Map<Long, Integer> kept = new HashMap<>();
 
 		Job(UUID owner, String ownerName, String disciple, String shape, ResourceKey<Level> dimension, BlockPos centre, long[] positions,
 				BlockState[] targets, BlockState[] placed, boolean restore, boolean naturalOnly, boolean wither, int dropsPct) {
@@ -404,10 +411,16 @@ public final class WorldBreaker {
 					job.deferred.add(i);
 					continue;
 				}
-			} else if (zones.zoneOf(pos) != null) {
+			}
+			ProtectedZones.Zone zone = job.restore ? null : zones.zoneOf(pos);
+			if (zone == ProtectedZones.Zone.UNLOADED) {
 				continue;
 			}
 			BlockState state = level.getBlockState(pos);
+			if (zone != null) {
+				keep(job, i, pos, state);
+				continue;
+			}
 			BlockState to;
 			if (job.restore) {
 				BlockState left = job.placed == null ? Blocks.AIR.defaultBlockState() : job.placed[i];
@@ -422,8 +435,18 @@ public final class WorldBreaker {
 				}
 			} else {
 				byte mode = job.mode(i);
+				if (state.isAir()) {
+					continue;
+				}
+				boolean carves = mode == MODE_REMOVE || mode == MODE_NATURAL;
+				if (carves && job.kept.getOrDefault(BlockPos.asLong(pos.getX(), 0, pos.getZ()), Integer.MIN_VALUE) > pos.getY()) {
+					// A block above in this column had to stay: carving under it would leave a sealed hollow.
+					keep(job, i, pos, state);
+					continue;
+				}
 				if (ProtectedZones.neverTouch(level, pos, state) || mode == MODE_NATURAL && !Shapes.natural(state)
 						|| mode == MODE_STRIP && !state.is(Shapes.STRIPPABLE) || touchesUnsafe(level, pos)) {
+					keep(job, i, pos, state);
 					continue;
 				}
 				to = mode == MODE_WITHER ? Shapes.witherInto(state) : Blocks.AIR.defaultBlockState();
@@ -440,7 +463,10 @@ public final class WorldBreaker {
 					}
 				}
 			}
-			level.setBlock(pos, to, FLAGS);
+			if (!level.setBlock(pos, to, FLAGS)) {
+				// Nothing changed (the same state, or the level refused): no count and no undo entry.
+				continue;
+			}
 			if (job.undoable) {
 				job.undoPositions.add(pos.asLong());
 				job.undoOld.add(state);
@@ -485,6 +511,14 @@ public final class WorldBreaker {
 			columns.add(caster.position());
 		}
 		return new ProtectedZones.Context(level, box, job.owner, columns);
+	}
+
+	/** Records a solid or fluid block a carving position had to leave (see {@link Job#kept}). */
+	private static void keep(Job job, int i, BlockPos pos, BlockState state) {
+		byte mode = job.mode(i);
+		if ((mode == MODE_REMOVE || mode == MODE_NATURAL) && !state.isAir() && (state.canOcclude() || !state.getFluidState().isEmpty())) {
+			job.kept.merge(BlockPos.asLong(pos.getX(), 0, pos.getZ()), pos.getY(), Math::max);
+		}
 	}
 
 	/**

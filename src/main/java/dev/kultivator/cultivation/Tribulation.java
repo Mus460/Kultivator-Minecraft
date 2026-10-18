@@ -28,8 +28,10 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The Heavenly Tribulation (DESIGN section 3): a 12 s omen of gathering clouds, then a series of strikes whose damage is
@@ -57,6 +59,52 @@ public final class Tribulation {
 	public static final double SKY_HEIGHT = 22.0D;
 	/** Pause after the final strike before the result. */
 	private static final int SETTLE_TICKS = 30;
+
+	/** The product of {@link #strikeFactor} never goes below this (DESIGN 3: pills and formations, at least 0.5×). */
+	public static final double STRIKE_FACTOR_FLOOR = 0.5D;
+	/** A powered protective formation around the cultivator softens every strike by this factor. */
+	public static final double FORMATION_FACTOR = 0.85D;
+
+	/**
+	 * A phase-7 strike factor (DESIGN 19.2.7: Hu Fa Tribulasi, the Tribulation Ward talisman, Fondasi Kokoh, Gerbang
+	 * Keabadian). Must be pure: the Persiapan panel asks it for the first strike while no tribulation runs.
+	 * {@code strikeIndex} is the 1-based number of the strike (1 … total), {@code last} true for the final one.
+	 */
+	public interface StrikeFactor {
+		double factor(ServerPlayer p, Rank target, int strikeIndex, boolean last);
+	}
+
+	/**
+	 * Told about the stages of every tribulation, tests included (DESIGN 19.2.7). {@code t} is the strength the
+	 * tribulation runs at (targets below Golden Core are raised to Golden Core). {@link #onEnd} comes after the
+	 * breakthrough result was applied (so quality bonuses still see the module's state) and exactly once per
+	 * tribulation, also when it was cancelled or aborted ({@code success} false); {@link #onFinish} has the details.
+	 */
+	public interface Listener {
+		/** The omen begins (the instance is already active, so {@link Tribulation#isTest} works here). */
+		default void onOmen(ServerPlayer p, Rank t) {
+		}
+
+		/** Strike {@code index} (1-based) of {@code total} just hit (also a strike that makes the tribulation fail). */
+		default void onStrike(ServerPlayer p, Rank t, int index, int total) {
+		}
+
+		/** The tribulation is over; {@code success} only when every strike was survived. */
+		default void onEnd(ServerPlayer p, Rank t, boolean success, boolean test) {
+		}
+
+		/**
+		 * The detailed end: {@code result} null when it was aborted from outside (death, logout, a cancelled breakthrough;
+		 * a death or a logout after the first strike becomes a failure later), {@code strikesDone} the strikes that fell.
+		 * By default it calls {@link #onEnd}.
+		 */
+		default void onFinish(ServerPlayer p, Rank t, @Nullable Result result, int strikesDone, boolean test) {
+			onEnd(p, t, result == Result.SUCCESS, test);
+		}
+	}
+
+	private static final List<StrikeFactor> STRIKE_FACTORS = new CopyOnWriteArrayList<>();
+	private static final List<Listener> LISTENERS = new CopyOnWriteArrayList<>();
 
 	/** How a tribulation ended. */
 	public enum Result {
@@ -86,6 +134,8 @@ public final class Tribulation {
 		int nextStrikeAt = OMEN_TICKS;
 		int settleAt;
 		float lowestHealth = 1.0F;
+		/** The lightning rings of this tribulation (DESIGN 19.3.8; P7-tempur). */
+		@Nullable dev.kultivator.elite.LightningRings.State rings;
 
 		Instance(Rank target, boolean test, int variant, Vec3 start, ResourceKey<Level> dimension) {
 			this.target = target;
@@ -147,6 +197,57 @@ public final class Tribulation {
 		return ACTIVE.containsKey(player.getUUID());
 	}
 
+	/** True while the player's running tribulation is a test (commands; no rank change). */
+	public static boolean isTest(ServerPlayer player) {
+		Instance t = ACTIVE.get(player.getUUID());
+		return t != null && t.test;
+	}
+
+	/** The strength of the player's running tribulation, or null without one. */
+	public static @Nullable Rank target(ServerPlayer player) {
+		Instance t = ACTIVE.get(player.getUUID());
+		return t == null ? null : t.target;
+	}
+
+	/** Adds a strike factor (DESIGN 19.2.7); register from a module's {@code init()}. */
+	public static void addStrikeFactorProvider(StrikeFactor provider) {
+		STRIKE_FACTORS.add(provider);
+	}
+
+	/** Adds a tribulation listener (DESIGN 19.2.7); register from a module's {@code init()}. */
+	public static void addListener(Listener listener) {
+		LISTENERS.add(listener);
+	}
+
+	/**
+	 * The share of a strike that lands (DESIGN 19.2.7): every provider × the Tribulation Warding pill
+	 * ({@code data.nextTribulationFactor()}) × {@link #FORMATION_FACTOR} inside a powered protective formation, never
+	 * below {@link #STRIKE_FACTOR_FLOOR}. Pure; {@code strikeIndex} is 1-based.
+	 */
+	public static double strikeFactor(ServerPlayer p, Rank target, int strikeIndex, boolean last) {
+		double factor = Cultivators.get(p).nextTribulationFactor();
+		if (dev.kultivator.formation.ProtectiveFormations.insideActiveFormation(p.level(), p.position())) {
+			factor *= FORMATION_FACTOR;
+		}
+		for (StrikeFactor provider : STRIKE_FACTORS) {
+			double value = provider.factor(p, target, strikeIndex, last);
+			if (Double.isFinite(value) && value >= 0.0D) {
+				factor *= value;
+			}
+		}
+		return Math.max(STRIKE_FACTOR_FLOOR, factor);
+	}
+
+	private static void fireEnd(ServerPlayer player, Instance t, @Nullable Result result) {
+		for (Listener listener : LISTENERS) {
+			try {
+				listener.onFinish(player, t.target, result, t.strikesDone, t.test);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Tribulation listener failed at the end", exception);
+			}
+		}
+	}
+
 	/** Strikes of the tribulation into {@code target}: 3, 5, 7, 9 (Golden Core to Dao Union), 9 + layer, 18. */
 	public static int strikeCount(Rank target) {
 		Realm realm = target.realm();
@@ -187,6 +288,7 @@ public final class Tribulation {
 		int variant = variant(level);
 		Instance instance = new Instance(strength, test, variant, player.position(), level.dimension());
 		ACTIVE.put(player.getUUID(), instance);
+		instance.rings = dev.kultivator.elite.LightningRings.begin(player, strength, test);
 
 		Component strikes = Component.literal(String.valueOf(instance.strikeCount)).withStyle(ChatFormatting.YELLOW);
 		Msg.title(player, Component.translatable("kultivator.breakthrough.omen.title." + variant).withStyle(variantColor(variant), ChatFormatting.BOLD),
@@ -198,6 +300,14 @@ public final class Tribulation {
 		rumble(level, player, instance.variant, player.getRandom());
 		Cultivators.refreshVisual(player);
 		Cultivators.dirty(player);
+		for (Listener listener : LISTENERS) {
+			try {
+				listener.onOmen(player, instance.target);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Tribulation listener failed at the omen", exception);
+			}
+		}
+		syncHud(player, instance);
 	}
 
 	public static void tick(ServerPlayer player, CultivationData data) {
@@ -215,6 +325,10 @@ public final class Tribulation {
 			if (away) {
 				finish(player, Result.CANCELLED, "kultivator.breakthrough.cancel.left_area");
 				return;
+			}
+			if (t.ticks == OMEN_TICKS - dev.kultivator.elite.LightningRings.TELEGRAPH_TICKS) {
+				// The first strike's ring (DESIGN 19.3.8): it falls the moment the omen ends.
+				telegraph(player, level, t);
 			}
 			if (t.ticks % 40 == 0) {
 				sendOmen(level, t, Math.max(0, OMEN_TICKS - t.ticks));
@@ -249,6 +363,9 @@ public final class Tribulation {
 					t.phase = Phase.SETTLING;
 					t.settleAt = t.ticks + SETTLE_TICKS;
 				}
+				syncHud(player, t);
+			} else if ((t.nextStrikeAt - t.ticks) == dev.kultivator.elite.LightningRings.TELEGRAPH_TICKS) {
+				telegraph(player, level, t);
 			} else if ((t.nextStrikeAt - t.ticks) == 35) {
 				// Keep the clouds alive and rumbling between strikes.
 				sendOmen(level, t, 0);
@@ -286,9 +403,11 @@ public final class Tribulation {
 		if (t == null) {
 			return false;
 		}
+		clearHud(player);
 		DaoProtectors.clear(player);
 		Fx.send(player.level(), t.start, t.start.add(0.0D, SKY_HEIGHT, 0.0D), FxType.TRIBULATION_END, t.variant, 0, 0.0F);
 		Cultivators.refreshVisual(player);
+		fireEnd(player, t, null);
 		return true;
 	}
 
@@ -312,21 +431,26 @@ public final class Tribulation {
 		t.strikesDone++;
 		int number = t.strikesDone;
 		boolean last = number >= t.strikeCount;
-		Vec3 feet = player.position();
+		// Phase 7 (DESIGN 19.3.8): guardians within 24 join at the first strike, then the ring decides full hit or graze.
+		dev.kultivator.elite.HuFaTribulation.beforeStrike(player, number);
+		dev.kultivator.elite.LightningRings.Impact impact = dev.kultivator.elite.LightningRings.impact(player, t.rings, number);
+		Vec3 feet = impact.boltAt();
 		Vec3 sky = feet.add(0.0D, SKY_HEIGHT, 0.0D);
 		Fx.send(level, feet, sky, FxType.TRIBULATION_STRIKE, t.variant, number, last ? 2.0F : 1.0F);
 		strikeSounds(level, player, t.variant, last, player.getRandom());
 		Msg.actionBar(player, Component.translatable(last ? "kultivator.breakthrough.strike.final" : "kultivator.breakthrough.strike",
 				number, t.strikeCount).withStyle(last ? ChatFormatting.GOLD : variantColor(t.variant)));
+		dev.kultivator.elite.LightningRings.impactFx(player, impact, t.variant, number);
 
 		boolean protectedPlayer = player.isCreative() || player.isSpectator() || player.getAbilities().invulnerable;
 		boolean wouldKill = false;
 		if (!protectedPlayer) {
 			float maxHealth = player.getMaxHealth();
-			// A powered protective formation around the cultivator softens the strikes (DESIGN 3: pills and formations).
-			double formation = dev.kultivator.formation.ProtectiveFormations.insideActiveFormation(level, player.position()) ? 0.85D : 1.0D;
-			double raw = maxHealth * t.pct * (last ? 2.0D : 1.0D) * KultivatorConfig.get().tribulationDamageScale * data.nextTribulationFactor()
-					* formation;
+			// The pill, a powered protective formation around the cultivator (DESIGN 3) and the phase-7 providers, all in
+			// strikeFactor (DESIGN 19.2.7); a graze outside the lightning ring lands at 40% but never at zero (19.3.8).
+			// The would-kill check below uses this final amount.
+			double raw = maxHealth * t.pct * (last ? 2.0D : 1.0D) * strikeFactor(player, t.target, number, last)
+					* KultivatorConfig.get().tribulationDamageScale * impact.factor();
 			float amount = (float) Math.max(0.0D, raw);
 			float health = player.getHealth();
 			float pool = health + player.getAbsorptionAmount();
@@ -347,6 +471,13 @@ public final class Tribulation {
 			}
 		}
 		trackHealth(player, t);
+		for (Listener listener : LISTENERS) {
+			try {
+				listener.onStrike(player, t.target, number, t.strikeCount);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Tribulation listener failed at a strike", exception);
+			}
+		}
 		if (wouldKill) {
 			finish(player, Result.FAILED, "kultivator.breakthrough.fail.strike");
 			return false;
@@ -390,6 +521,7 @@ public final class Tribulation {
 		if (t == null) {
 			return;
 		}
+		clearHud(player);
 		ServerLevel level = player.level();
 		DaoProtectors.clear(player);
 		if (result == Result.FAILED) {
@@ -411,6 +543,70 @@ public final class Tribulation {
 		}
 		Cultivators.refreshVisual(player);
 		Breakthrough.onTribulationEnd(player, result, t.lowestHealth, t.variant, t.test);
+		// After the result (DESIGN 19.2.7): quality bonuses were read while the modules' state was intact.
+		fireEnd(player, t, result);
+	}
+
+	// ================================================================== phase 7: rings and the HUD (DESIGN 19.3.8)
+
+	/** Re-sends {@code sessionExtra.trib} of the player's running tribulation (Hu Fa guardians joined or left). */
+	public static void refreshHud(ServerPlayer player) {
+		Instance t = ACTIVE.get(player.getUUID());
+		if (t != null) {
+			syncHud(player, t);
+		}
+	}
+
+	/** 30 ticks before the next strike: the lightning ring (and twin) at the player's feet, then the HUD. */
+	private static void telegraph(ServerPlayer player, ServerLevel level, Instance t) {
+		int number = t.strikesDone + 1;
+		if (number > t.strikeCount) {
+			return;
+		}
+		long strikeAt = level.getGameTime() + Math.max(0, t.nextStrikeAt - t.ticks);
+		if (dev.kultivator.elite.LightningRings.telegraph(player, t.rings, number, t.start, t.variant, strikeAt)) {
+			syncHud(player, t);
+		}
+	}
+
+	/**
+	 * {@code sessionExtra.trib} for the tribulation HUD (DESIGN 19.3.8): phase (1 omen, 2 strikes, 3 settling), done, total,
+	 * next (game time of the next strike), pct (its effective share of max health with strikeFactor, the last ×2 and the
+	 * config scale), cx/cz (the ground's centre) and max (its radius), guards, test; while a ring waits rx/rz/rr/rend
+	 * (rend = the strike's game time), tx/tz for a twin, and tele (rings on). Dirty only at the omen, telegraphs and strikes.
+	 */
+	private static void syncHud(ServerPlayer player, Instance t) {
+		net.minecraft.nbt.CompoundTag trib = new net.minecraft.nbt.CompoundTag();
+		trib.putInt("phase", t.phase == Phase.OMEN ? 1 : t.phase == Phase.STRIKES ? 2 : 3);
+		trib.putInt("done", t.strikesDone);
+		trib.putInt("total", t.strikeCount);
+		long now = player.level().getGameTime();
+		int next = t.strikesDone + 1;
+		if (t.phase != Phase.SETTLING && next <= t.strikeCount) {
+			boolean last = next >= t.strikeCount;
+			trib.putLong("next", now + Math.max(0, t.nextStrikeAt - t.ticks));
+			trib.putDouble("pct", t.pct * (last ? 2.0D : 1.0D) * strikeFactor(player, t.target, next, last)
+					* KultivatorConfig.get().tribulationDamageScale);
+		} else {
+			trib.putLong("next", now + Math.max(0, t.settleAt - t.ticks));
+			trib.putDouble("pct", 0.0D);
+		}
+		trib.putDouble("cx", t.start.x);
+		trib.putDouble("cz", t.start.z);
+		trib.putDouble("max", MAX_DISTANCE);
+		trib.putInt("guards", dev.kultivator.elite.HuFaTribulation.guards(player));
+		trib.putBoolean("test", t.test);
+		dev.kultivator.elite.LightningRings.writeHud(t.rings, trib);
+		Cultivators.get(player).sessionExtra().put("trib", trib);
+		Cultivators.dirty(player);
+	}
+
+	private static void clearHud(ServerPlayer player) {
+		net.minecraft.nbt.CompoundTag extra = Cultivators.get(player).sessionExtra();
+		if (extra.contains("trib")) {
+			extra.remove("trib");
+			Cultivators.dirty(player);
+		}
 	}
 
 	private static void sendOmen(ServerLevel level, Instance t, int ticksLeft) {

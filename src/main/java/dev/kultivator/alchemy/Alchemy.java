@@ -142,7 +142,7 @@ public final class Alchemy {
 			Component name = recipe.displayName();
 			source.sendSuccess(() -> Component.literal(" • ").withStyle(ChatFormatting.DARK_GRAY)
 					.append(Component.translatable("kultivator.alchemy.cmd.recipes.entry", name, recipe.count(),
-							AlchemyRecipes.ingredientList(recipe.ingredients()).withStyle(ChatFormatting.GRAY))), false);
+							AlchemyRecipes.ingredientList(recipe).withStyle(ChatFormatting.GRAY))), false);
 		}
 		source.sendSuccess(() -> Component.translatable("kultivator.alchemy.cmd.recipes.footer").withStyle(ChatFormatting.DARK_GRAY,
 				ChatFormatting.ITALIC), false);

@@ -134,6 +134,11 @@ public final class OrePingFx {
 				continue;
 			}
 			int color = TechniqueShapes.dim(COLORS.get(i), fade);
+			if (treasure(COLORS.get(i))) {
+				// Phase 7 (DESIGN 19.3.4, 19.3.13): an infused plant or an unlooted chest also sends a thin thread of light up.
+				Vec3 base = center.add((random.nextDouble() - 0.5D) * 0.5D, 0.2D, (random.nextDouble() - 0.5D) * 0.5D);
+				CommonFx.add(new TrailParticleOption(base.add(0.0D, 0.9D, 0.0D), color, 14), base, Vec3.ZERO, false);
+			}
 			for (Direction direction : Direction.values()) {
 				if (current.getBlockState(pos.relative(direction)).isSolidRender() || !EffectQuality.chance(random, 0.6F)) {
 					continue;
@@ -153,6 +158,12 @@ public final class OrePingFx {
 				clear();
 			}
 		}
+	}
+
+	/** The ping colours of a spirit-infused plant and of an unlooted container (Divine Sense treasure sense). */
+	private static boolean treasure(int color) {
+		int rgb = color & 0xFFFFFF;
+		return rgb == dev.kultivator.harta.SpiritHerbs.SENSE_COLOR || rgb == dev.kultivator.harta.HartaLoot.SENSE_COLOR;
 	}
 
 	/** A random offset within a block face whose normal is {@code normal}. */

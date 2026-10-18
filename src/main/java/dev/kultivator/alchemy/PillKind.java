@@ -24,8 +24,16 @@ public enum PillKind {
 	TRIBULATION_WARDING("tribulation_warding_pill", 0x9A7CFF, 15, 2, Rarity.RARE),
 	/** Pil Pemelihara Jiwa: cultivation XP worth 30% of the bar (at most {@link #SOUL_NURTURING_MAX_XP}), Nascent Soul and above only. */
 	SOUL_NURTURING("soul_nurturing_pill", 0xD9B8FF, 22, 3, Rarity.RARE),
-	/** Pil Dewa: cultivation XP worth a whole bar, full qi, purges all pill toxicity. */
-	IMMORTAL("immortal_pill", 0xFFF0B0, 0, 3, Rarity.EPIC);
+	/** Pil Dewa: cultivation XP worth a whole bar (x quality only), full qi, purges all pill toxicity. */
+	IMMORTAL("immortal_pill", 0xFFF0B0, 0, 3, Rarity.EPIC),
+	/** Pil Wawasan Dao (phase 7): +3 x quality comprehension to the chosen Dao, never above 60, at most 5 per realm. */
+	DAO_INSIGHT("dao_insight_pill", 0x3FD0C8, 18, 2, Rarity.RARE),
+	/** Pil Penawar Racun (phase 7): toxicity −35 x quality and the harmful effects cleared. */
+	TOXIN_PURGING("toxin_purging_pill", 0xB8F5A0, 0, 1, Rarity.UNCOMMON),
+	/** Pil Pencerahan (phase 7): enlightenment chance x2 for 10 minutes. */
+	ENLIGHTENMENT("enlightenment_pill", 0xFFE070, 10, 2, Rarity.RARE),
+	/** Pil Penempa Tulang (phase 7): +1 max health for good (Perfect +2), at most +10 in total. */
+	BONE_TEMPERING("bone_tempering_pill", 0xE8DCC0, 12, 2, Rarity.RARE);
 
 	public static final double QI_GATHERING_XP = 0.15D;
 	/** Cap of the Qi Gathering XP before quality (about 15% of a Golden Core Peak bar), so late realms cannot be pill-farmed. */
@@ -46,6 +54,19 @@ public enum PillKind {
 	/** Cap of the Soul Nurturing XP before quality (30% of a Deity Transformation Early bar). */
 	public static final double SOUL_NURTURING_MAX_XP = 3600.0D;
 	public static final double IMMORTAL_XP = 1.0D;
+	/** Dao Insight Pill (DESIGN 19.3.7): comprehension x quality, the ceiling it never passes, pills per realm. */
+	public static final double DAO_INSIGHT_COMPREHENSION = 3.0D;
+	public static final double DAO_INSIGHT_MAX = 60.0D;
+	public static final int DAO_INSIGHT_PER_REALM = 5;
+	/** Toxin Purging Pill: toxicity removed x quality. */
+	public static final double TOXIN_PURGE = 35.0D;
+	/** Enlightenment Pill: the chance factor and how long it lasts. */
+	public static final double ENLIGHTENMENT_FACTOR = 2.0D;
+	public static final int ENLIGHTENMENT_TICKS = 12000;
+	/** Bone Tempering Pill: max health per pill (Perfect twice) and the total cap. */
+	public static final int BONE_HEALTH = 1;
+	public static final int BONE_HEALTH_PERFECT = 2;
+	public static final int BONE_HEALTH_CAP = 10;
 
 	private static final PillKind[] ALL = values();
 
@@ -100,6 +121,11 @@ public enum PillKind {
 	/** The pill gives cultivation XP (so pill toxicity weakens it). */
 	public boolean givesXp() {
 		return this == QI_GATHERING || this == SOUL_NURTURING || this == IMMORTAL;
+	}
+
+	/** One of the four phase-7 pills (DESIGN 19.3.7): disciples refuse them for now, their tooltips carry a source line. */
+	public boolean phase7() {
+		return this == DAO_INSIGHT || this == TOXIN_PURGING || this == ENLIGHTENMENT || this == BONE_TEMPERING;
 	}
 
 	/** Null when unknown; accepts the item id or the short id. */

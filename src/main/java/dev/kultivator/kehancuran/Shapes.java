@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -255,21 +257,33 @@ public final class Shapes {
 				}
 			}
 		}
-		list.sort(Comparator.comparingDouble(pos -> pos.distSqr(centre)));
+		// Centre-out by column, each column top-down (WorldBreaker never carves under a block it had to leave).
+		list.sort(Comparator.comparingDouble((BlockPos pos) -> horizontal(pos, centre)).thenComparingInt(pos -> -pos.getY()));
 		return air(list);
 	}
 
-	/** The top solid block of a loaded column (heightmap without leaves), or null when the chunk is not loaded. */
+	/**
+	 * The top solid block of a loaded column (heightmap without leaves), or null when the chunk is not loaded, the read
+	 * budget ran out or the column's top is a fluid (the heightmap counts water: a shape never starts on a lake and only
+	 * cuts the hidden part under its bed). One block-state read.
+	 */
 	static @Nullable Integer surface(ServerLevel level, int x, int z) {
 		BlockPos probe = new BlockPos(x, level.getMinY(), z);
 		if (!level.isLoaded(probe)) {
 			return null;
 		}
-		return level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z) - 1;
+		int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z) - 1;
+		if (!read() || !level.getBlockState(new BlockPos(x, top, z)).getFluidState().isEmpty()) {
+			return null;
+		}
+		return top;
 	}
 
-	/** The impact block: the first solid block at or below the anchor (≤ 8 blocks), else the column surface. */
-	static BlockPos impact(ServerLevel level, BlockPos anchor) {
+	/**
+	 * The impact block: the first solid block at or below the anchor (≤ 8 blocks), else the column surface; null when the
+	 * scan meets a fluid before a solid block (a bowl never sinks to a lake bed).
+	 */
+	static @Nullable BlockPos impact(ServerLevel level, BlockPos anchor) {
 		if (!level.isLoaded(anchor)) {
 			return anchor;
 		}
@@ -277,12 +291,15 @@ public final class Shapes {
 		for (int d = 0; d <= IMPACT_SCAN && read(); d++) {
 			cursor.setY(anchor.getY() - d);
 			BlockState state = level.getBlockState(cursor);
-			if (!state.isAir() && state.getFluidState().isEmpty()) {
+			if (!state.getFluidState().isEmpty()) {
+				return null;
+			}
+			if (!state.isAir()) {
 				return cursor.immutable();
 			}
 		}
 		Integer top = surface(level, anchor.getX(), anchor.getZ());
-		return top == null ? anchor : new BlockPos(anchor.getX(), top, anchor.getZ());
+		return top == null ? null : new BlockPos(anchor.getX(), top, anchor.getZ());
 	}
 
 	/** Along the aim from the impact point: {@code width} wide, {@code depth} below the surface; top-down. */
@@ -357,8 +374,6 @@ public final class Shapes {
 
 	/** A column of radius r from the target's surface down {@code depth}; centre-out by distance from the axis. */
 	static List<Change> column(ServerLevel level, BlockPos centre, int radius, int depth) {
-		Integer top = surface(level, centre.getX(), centre.getZ());
-		int from = top == null ? centre.getY() : top;
 		List<BlockPos> list = new ArrayList<>();
 		double limit = (radius + 0.5D) * (radius + 0.5D);
 		for (int dx = -radius; dx <= radius; dx++) {
@@ -366,8 +381,13 @@ public final class Shapes {
 				if (dx * dx + dz * dz > limit) {
 					continue;
 				}
+				// Each column from its own surface, so higher ground around the centre never keeps its top layer.
+				Integer top = surface(level, centre.getX() + dx, centre.getZ() + dz);
+				if (top == null) {
+					continue;
+				}
 				for (int d = 0; d < depth; d++) {
-					list.add(new BlockPos(centre.getX() + dx, from - d, centre.getZ() + dz));
+					list.add(new BlockPos(centre.getX() + dx, top - d, centre.getZ() + dz));
 				}
 			}
 		}
@@ -392,27 +412,37 @@ public final class Shapes {
 
 	/**
 	 * BOWL r: a half-ellipsoid under the impact block ((dx² + dz²)/r² + (dy/d)² ≤ 1 for dy in [−d, 0]) plus everything above
-	 * it within a sphere of r/2 (trees and walls in the blast); centre-out by distance.
+	 * it within a sphere of r/2 (trees and walls in the blast); every column also opens up to its own ground (at most r
+	 * above the centre), so higher ground never keeps a lid over the hollow. Centre-out by distance.
 	 */
 	static List<Change> bowl(ServerLevel level, BlockPos anchor, int radius, int depth) {
 		BlockPos centre = impact(level, anchor);
+		if (centre == null) {
+			return List.of();
+		}
 		List<BlockPos> list = new ArrayList<>();
 		double r2 = (radius + 0.5D) * (radius + 0.5D);
-		double d2 = (depth + 0.5D) * (depth + 0.5D);
 		double up = radius * 0.5D + 0.5D;
-		int upInt = (int) Math.ceil(radius * 0.5D);
 		for (int dx = -radius; dx <= radius; dx++) {
 			for (int dz = -radius; dz <= radius; dz++) {
 				double h = dx * dx + dz * dz;
-				for (int dy = -depth; dy <= upInt; dy++) {
-					boolean inside = dy <= 0 ? h / r2 + dy * dy / d2 <= 1.0D : h + dy * dy <= up * up;
-					if (inside) {
-						list.add(centre.offset(dx, dy, dz));
-					}
+				if (h > r2) {
+					continue;
+				}
+				int floor = -(int) Math.floor((depth + 0.5D) * Math.sqrt(Math.max(0.0D, 1.0D - h / r2)));
+				int cap = h <= up * up ? (int) Math.floor(Math.sqrt(up * up - h)) : 0;
+				Integer ground = surface(level, centre.getX() + dx, centre.getZ() + dz);
+				if (ground == null) {
+					continue;
+				}
+				int roof = Math.max(cap, Math.min(ground - centre.getY(), radius));
+				for (int dy = roof; dy >= floor; dy--) {
+					list.add(centre.offset(dx, dy, dz));
 				}
 			}
 		}
-		list.sort(Comparator.comparingDouble(pos -> pos.distSqr(centre)));
+		// Centre-out by column, each column top-down (WorldBreaker never carves under a block it had to leave).
+		list.sort(Comparator.comparingDouble((BlockPos pos) -> horizontal(pos, centre)).thenComparingInt(pos -> -pos.getY()));
 		return air(list);
 	}
 
@@ -703,6 +733,59 @@ public final class Shapes {
 	public static boolean natural(BlockState state) {
 		return state.is(BlockTags.BASE_STONE_OVERWORLD) || state.is(BlockTags.BASE_STONE_NETHER) || state.is(BlockTags.DIRT)
 				|| state.is(Blocks.SAND) || state.is(Blocks.RED_SAND) || state.is(Blocks.GRAVEL) || state.is(Blocks.END_STONE);
+	}
+
+	// ================================================================== no sealed hollows
+
+	/** Column key of a position ({@code BlockPos.asLong(x, 0, z)}). */
+	public static long columnKey(BlockPos pos) {
+		return BlockPos.asLong(pos.getX(), 0, pos.getZ());
+	}
+
+	/** True for a block that would roof a hollow: solid (occluding) or a fluid. */
+	public static boolean roofs(BlockState state) {
+		return !state.isAir() && (state.canOcclude() || !state.getFluidState().isEmpty());
+	}
+
+	/** True for the point-blast shapes that may open sideways (a wall hit) and so skip the open-top column check. */
+	public static boolean pointBlast(Kind kind) {
+		return kind == Kind.TUNNEL || kind == Kind.SPHERE || kind == Kind.NINE;
+	}
+
+	/**
+	 * Drops every planned column whose highest planned block has a solid or fluid, unplanned block right above it (one read
+	 * per column, loaded chunks only; an unloaded or unread top drops the column too). {@code check[i]} false leaves
+	 * position i out of the test (point blasts, wither, strip). Returns the kept indices in their order.
+	 */
+	public static List<Integer> openColumns(ServerLevel level, List<BlockPos> planned, boolean[] check) {
+		Map<Long, Integer> highest = new HashMap<>();
+		Set<Long> all = new HashSet<>(planned.size() * 2);
+		for (int i = 0; i < planned.size(); i++) {
+			BlockPos pos = planned.get(i);
+			all.add(pos.asLong());
+			if (check[i]) {
+				highest.merge(columnKey(pos), pos.getY(), Math::max);
+			}
+		}
+		Set<Long> sealed = new HashSet<>();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+		for (Map.Entry<Long, Integer> entry : highest.entrySet()) {
+			BlockPos column = BlockPos.of(entry.getKey());
+			cursor.set(column.getX(), entry.getValue() + 1, column.getZ());
+			if (all.contains(cursor.asLong())) {
+				continue;
+			}
+			if (!level.isLoaded(cursor) || roofs(level.getBlockState(cursor))) {
+				sealed.add(entry.getKey());
+			}
+		}
+		List<Integer> kept = new ArrayList<>(planned.size());
+		for (int i = 0; i < planned.size(); i++) {
+			if (!check[i] || !sealed.contains(columnKey(planned.get(i)))) {
+				kept.add(i);
+			}
+		}
+		return kept;
 	}
 
 	private static double horizontal(BlockPos pos, BlockPos centre) {

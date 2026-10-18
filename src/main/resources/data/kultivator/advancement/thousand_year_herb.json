@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_herb",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.thousand_year_herb.description"
+    },
+    "icon": {
+      "id": "kultivator:ginseng_fruit"
+    },
+    "title": {
+      "translate": "advancement.kultivator.thousand_year_herb.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

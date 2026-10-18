@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:awakening",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.first_talisman.description"
+    },
+    "icon": {
+      "id": "kultivator:thunder_talisman"
+    },
+    "title": {
+      "translate": "advancement.kultivator.first_talisman.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

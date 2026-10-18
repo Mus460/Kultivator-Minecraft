@@ -3,6 +3,11 @@ package dev.kultivator.alchemy;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.kultivator.Kultivator;
+import dev.kultivator.data.Element;
+import dev.kultivator.harta.BeastCoreItem;
+import dev.kultivator.harta.BeastCores;
+import dev.kultivator.harta.HartaComponents;
+import dev.kultivator.harta.SpiritHerbs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -31,8 +36,8 @@ import java.util.UUID;
  */
 public final class AlchemyPots extends SavedData {
 
-	/** A pot holds at most this many items. */
-	public static final int CAPACITY = 8;
+	/** A pot holds at most this many items (8 before phase 7; DESIGN 19.3.7 adds room for catalysts and a herb). */
+	public static final int CAPACITY = 10;
 
 	public static final Codec<AlchemyPots> CODEC = Pot.CODEC.listOf().optionalFieldOf("pots", List.of()).codec()
 			.xmap(AlchemyPots::fromList, AlchemyPots::toList);
@@ -71,7 +76,7 @@ public final class AlchemyPots extends SavedData {
 	public Pot getOrCreate(BlockPos pos) {
 		Pot pot = pots.get(pos);
 		if (pot == null) {
-			pot = new Pot(pos, new LinkedHashMap<>(), 0L, null, 0, false);
+			pot = new Pot(pos, new LinkedHashMap<>(), new ArrayList<>(), 0L, null, 0, false);
 			pots.put(pot.pos(), pot);
 			setDirty();
 		}
@@ -103,12 +108,29 @@ public final class AlchemyPots extends SavedData {
 		).apply(instance, Entry::new));
 	}
 
+	/**
+	 * Details of one spirit herb (its age) or beast core (its element id) in the pot (DESIGN 19.3.7), in the order they
+	 * went in; ordinary ingredients have none.
+	 */
+	public record Unit(Item item, int age, String element) {
+	}
+
+	/** One saved {@link Unit}. */
+	private record UnitEntry(Identifier id, int age, String element) {
+		private static final Codec<UnitEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				Identifier.CODEC.fieldOf("id").forGetter(UnitEntry::id),
+				Codec.INT.optionalFieldOf("age", 0).forGetter(UnitEntry::age),
+				Codec.STRING.optionalFieldOf("element", "").forGetter(UnitEntry::element)
+		).apply(instance, UnitEntry::new));
+	}
+
 	/** The pot of one furnace. Call {@link AlchemyPots#setDirty()} after changing it. */
 	public static final class Pot {
 
 		private static final Codec<Pot> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 				BlockPos.CODEC.fieldOf("pos").forGetter(Pot::pos),
 				Entry.CODEC.listOf().optionalFieldOf("items", List.of()).forGetter(Pot::entries),
+				UnitEntry.CODEC.listOf().optionalFieldOf("units", List.of()).forGetter(Pot::unitEntries),
 				Codec.LONG.optionalFieldOf("refine_end", 0L).forGetter(Pot::refineEnd),
 				UUIDUtil.CODEC.optionalFieldOf("owner").forGetter(Pot::ownerOptional),
 				Codec.INT.optionalFieldOf("owner_level", 0).forGetter(Pot::ownerLevel),
@@ -117,21 +139,25 @@ public final class AlchemyPots extends SavedData {
 
 		private final BlockPos pos;
 		private final LinkedHashMap<Item, Integer> items;
+		private final List<Unit> units;
 		private long refineEnd;
 		private @Nullable UUID owner;
 		private int ownerLevel;
 		private boolean ownerFire;
 
-		private Pot(BlockPos pos, LinkedHashMap<Item, Integer> items, long refineEnd, @Nullable UUID owner, int ownerLevel, boolean ownerFire) {
+		private Pot(BlockPos pos, LinkedHashMap<Item, Integer> items, List<Unit> units, long refineEnd, @Nullable UUID owner, int ownerLevel,
+					boolean ownerFire) {
 			this.pos = pos.immutable();
 			this.items = items;
+			this.units = units;
 			this.refineEnd = Math.max(0L, refineEnd);
 			this.owner = owner;
 			this.ownerLevel = ownerLevel;
 			this.ownerFire = ownerFire;
 		}
 
-		private static Pot decode(BlockPos pos, List<Entry> entries, long refineEnd, Optional<UUID> owner, int ownerLevel, boolean ownerFire) {
+		private static Pot decode(BlockPos pos, List<Entry> entries, List<UnitEntry> unitEntries, long refineEnd, Optional<UUID> owner,
+								  int ownerLevel, boolean ownerFire) {
 			LinkedHashMap<Item, Integer> items = new LinkedHashMap<>();
 			int total = 0;
 			for (Entry entry : entries) {
@@ -149,7 +175,37 @@ public final class AlchemyPots extends SavedData {
 				items.merge(item, count, Integer::sum);
 				total += count;
 			}
-			return new Pot(pos, items, refineEnd, owner.orElse(null), ownerLevel, ownerFire);
+			List<Unit> units = new ArrayList<>();
+			Map<Item, Integer> used = new LinkedHashMap<>();
+			for (UnitEntry entry : unitEntries) {
+				if (!BuiltInRegistries.ITEM.containsKey(entry.id())) {
+					continue;
+				}
+				Item item = BuiltInRegistries.ITEM.getValue(entry.id());
+				int have = items.getOrDefault(item, 0);
+				if (used.getOrDefault(item, 0) >= have) {
+					continue;
+				}
+				used.merge(item, 1, Integer::sum);
+				units.add(new Unit(item, Math.max(0, entry.age()), entry.element()));
+			}
+			return new Pot(pos, items, units, refineEnd, owner.orElse(null), ownerLevel, ownerFire);
+		}
+
+		private List<UnitEntry> unitEntries() {
+			List<UnitEntry> list = new ArrayList<>();
+			for (Unit unit : units) {
+				Identifier id = BuiltInRegistries.ITEM.getKey(unit.item());
+				if (id != null) {
+					list.add(new UnitEntry(id, unit.age(), unit.element()));
+				}
+			}
+			return list;
+		}
+
+		/** The herbs (with age) and cores (with element) in the pot, in the order they went in (read-only). */
+		public List<Unit> units() {
+			return Collections.unmodifiableList(units);
 		}
 
 		private Optional<UUID> ownerOptional() {
@@ -202,13 +258,49 @@ public final class AlchemyPots extends SavedData {
 			return true;
 		}
 
-		/** One stack per ingredient (for spilling the pot). */
+		/** Adds one item of {@code stack}, remembering a herb's age or a core's element; false when the pot is full. */
+		public boolean add(ItemStack stack) {
+			if (stack.isEmpty() || !add(stack.getItem())) {
+				return false;
+			}
+			if (SpiritHerbs.isHerb(stack)) {
+				units.add(new Unit(stack.getItem(), SpiritHerbs.age(stack), ""));
+			} else if (BeastCores.isCore(stack)) {
+				Element element = BeastCores.element(stack);
+				units.add(new Unit(stack.getItem(), 0, element == null ? "" : element.id()));
+			}
+			return true;
+		}
+
+		/** One stack per ingredient (for spilling the pot); herbs keep their age and cores their element. */
 		public List<ItemStack> stacks() {
 			List<ItemStack> list = new ArrayList<>();
 			for (Map.Entry<Item, Integer> entry : items.entrySet()) {
-				list.add(new ItemStack(entry.getKey(), entry.getValue()));
+				int plain = entry.getValue();
+				for (Unit unit : units) {
+					if (unit.item() == entry.getKey() && plain > 0) {
+						list.add(unitStack(unit));
+						plain--;
+					}
+				}
+				if (plain > 0) {
+					list.add(new ItemStack(entry.getKey(), plain));
+				}
 			}
 			return list;
+		}
+
+		/** The single stack a unit stands for. */
+		public static ItemStack unitStack(Unit unit) {
+			if (unit.item() instanceof BeastCoreItem core) {
+				Element element = Element.byId(unit.element());
+				return element == null ? new ItemStack(unit.item()) : BeastCores.create(element, core.grade());
+			}
+			ItemStack stack = new ItemStack(unit.item());
+			if (unit.age() > 0) {
+				stack.set(HartaComponents.HERB_AGE, Math.min(HartaComponents.MAX_HERB_AGE, unit.age()));
+			}
+			return stack;
 		}
 
 		public boolean refining() {

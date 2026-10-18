@@ -75,8 +75,19 @@ public class PillItem extends Item {
 			builder.accept(Component.translatable("kultivator.alchemy.tooltip.toxin",
 					PillEffects.decimal(kind.toxin(quality))).withColor(TOXIN_COLOR));
 		}
-		builder.accept(Component.translatable("kultivator.alchemy.lore." + kind.shortId()).withColor(LORE_COLOR)
-				.withStyle(ChatFormatting.ITALIC));
+		if (kind.phase7()) {
+			// Phase 7 pills (DESIGN 19.1.4): their lore lives in the harta fragment and they carry a source line.
+			builder.accept(Component.translatable("kultivator.harta.pill.lore." + kind.shortId()).withColor(LORE_COLOR)
+					.withStyle(ChatFormatting.ITALIC));
+			builder.accept(Component.translatable("kultivator.harta.pill.tooltip.disciples").withColor(NOTE_COLOR));
+			dev.kultivator.harta.HartaText.sources(getDescriptionId(), builder);
+		} else {
+			builder.accept(Component.translatable("kultivator.alchemy.lore." + kind.shortId()).withColor(LORE_COLOR)
+					.withStyle(ChatFormatting.ITALIC));
+		}
+		if (kind == PillKind.IMMORTAL) {
+			builder.accept(Component.translatable("kultivator.harta.pill.tooltip.immortal_balance").withColor(NOTE_COLOR));
+		}
 		builder.accept(Component.translatable("kultivator.alchemy.tooltip.use").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
 	}
 }

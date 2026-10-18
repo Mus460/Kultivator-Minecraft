@@ -292,6 +292,17 @@ final class KodeksPage extends CodexPage {
 		Component qi = spec.qiPerSecond() > 0.0D ? Component.translatable("kultivator.codex.detail.qi_per_second", SpecInfo.decimal(spec.qiPerSecond(), 1))
 				: Component.literal(SpecInfo.number(SpecInfo.qi(data, spec)));
 		lines.add(Component.translatable("kultivator.codex.detail.costs", qi, SpecInfo.seconds(SpecInfo.cooldown(data, spec))).withColor(0x8FD0FF));
+		// How the technique wants to be used: a charge, a channel or stages.
+		if (spec.charge() != null) {
+			lines.add(Component.translatable("kultivator.codex.detail.flow.charge", SpecInfo.seconds(spec.charge().ticks())).withColor(0xFFD58A));
+		}
+		if (spec.channel() != null) {
+			lines.add(Component.translatable("kultivator.codex.detail.flow.channel", SpecInfo.seconds(spec.channel().ticks())).withColor(0xFFD58A));
+		}
+		if (spec.stages() != null) {
+			lines.add(Component.translatable("kultivator.codex.detail.flow.stages", spec.stages().count(), SpecInfo.seconds(spec.stages().window()))
+					.withColor(0xFFD58A));
+		}
 		SpecInfo.State state = SpecInfo.state(data, spec);
 		Component reason = SpecInfo.lockReason(data, spec);
 		if (state == SpecInfo.State.LEARNED) {

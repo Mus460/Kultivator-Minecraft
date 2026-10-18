@@ -380,6 +380,10 @@ public final class Duties {
 					int count = progress(post, minutes / GARDEN_MINUTES * factor);
 					for (int i = 0; i < count; i++) {
 						store(owner, new ItemStack(GARDEN_GOODS[random.nextInt(GARDEN_GOODS.length)]), lost);
+						// Phase 7 (DESIGN 19.3.4, RMJ ch. 150-151): each yield has a 10% chance of a Spirit Grass aged 50-200 years.
+						if (random.nextDouble() < 0.10D) {
+							store(owner, dev.kultivator.harta.SpiritHerbs.create(dev.kultivator.harta.HerbKind.SPIRIT_GRASS, 50 + random.nextInt(151)), lost);
+						}
 					}
 				}
 				case KITCHEN -> {

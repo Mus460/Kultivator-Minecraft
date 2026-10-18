@@ -83,11 +83,23 @@ public final class XpSources {
 		if (!(killer instanceof ServerPlayer player) || player instanceof FakePlayer || player.isSpectator()) {
 			return;
 		}
-		double xp = combatXp(killed);
+		if (dev.kultivator.elite.EliteMonsters.isElite(killed)) {
+			// Binatang Iblis: EliteRewards pays its own XP (DESIGN 19.3.1), for player and spirit-beast kills alike.
+			return;
+		}
+		// Phase 7 (DESIGN 19.3.14): spawner mobs ×0.25, a boss type slain again today ×0.25, Kejenuhan Bertarung; the
+		// call also keeps the kill counters and may drop a beast core.
+		double factor = dev.kultivator.elite.EliteRewards.playerKill(player, killed);
+		double xp = combatXp(killed) * factor;
 		if (xp <= 0.0D) {
 			return;
 		}
 		showGain(player, Progression.grantXp(player, xp, XpSource.COMBAT));
+	}
+
+	/** Shows a kill's gain in the throttled "+N Cultivation" line (the elite rewards of DESIGN 19.3.1). */
+	public static void showKillGain(ServerPlayer player, double gained) {
+		showGain(player, gained);
 	}
 
 	/**

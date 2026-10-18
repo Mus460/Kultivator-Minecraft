@@ -88,6 +88,12 @@ public final class BookTooltips {
 			if (insight != null) {
 				lines.add(Component.translatable(PREFIX + "book.insight", Comprehension.format(Comprehension.gainFor(data, insight, TechniqueBooks.INSIGHT)),
 						DaoPaths.colored(insight)).withColor(OK_COLOR));
+				// Insight books per day (DESIGN 19.3.14).
+				int today = insightBooksToday(data);
+				lines.add(today >= dev.kultivator.harta.Harta.BOOK_INSIGHT_DAILY
+						? Component.translatable("kultivator.harta.book.tooltip_capped", dev.kultivator.harta.Harta.BOOK_INSIGHT_DAILY).withColor(LOCKED_COLOR)
+						: Component.translatable("kultivator.harta.book.tooltip_today", today, dev.kultivator.harta.Harta.BOOK_INSIGHT_DAILY)
+						.withStyle(ChatFormatting.DARK_GRAY));
 			}
 		} else {
 			lines.add(Component.translatable(PREFIX + "book.nothing").withColor(LOCKED_COLOR));
@@ -104,6 +110,17 @@ public final class BookTooltips {
 		if (pool.size() > shown) {
 			lines.add(Component.translatable(PREFIX + "book.more", pool.size() - shown).withStyle(ChatFormatting.DARK_GRAY));
 		}
+	}
+
+	/** Insight books read today ({@code extra.harta.book_day}, {@code book_insight}; 0 on another in-game day). */
+	private static int insightBooksToday(CultivationData data) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.level == null) {
+			return 0;
+		}
+		net.minecraft.nbt.CompoundTag own = data.extra().getCompoundOrEmpty(dev.kultivator.harta.Harta.EXTRA);
+		long day = Math.max(0L, minecraft.level.getOverworldClockTime() / 24000L);
+		return own.getLongOr(dev.kultivator.harta.Harta.BOOK_DAY, -1L) == day ? own.getIntOr(dev.kultivator.harta.Harta.BOOK_INSIGHT, 0) : 0;
 	}
 
 	/** "• Seni Pedang Aksara Rumput (Bumi Tinggi · Serang) — terkunci: capai Penyatuan Dao". */

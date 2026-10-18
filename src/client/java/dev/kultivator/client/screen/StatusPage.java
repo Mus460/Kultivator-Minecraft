@@ -1,13 +1,19 @@
 package dev.kultivator.client.screen;
 
 import dev.kultivator.alchemy.Alchemy;
+import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.QiHud;
+import dev.kultivator.client.goals.PrepView;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
+import dev.kultivator.client.screen.ui.JadeCoin;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
+import dev.kultivator.cultivation.ImmortalPerks;
 import dev.kultivator.cultivation.Qi;
+import dev.kultivator.cultivation.QiFormations;
+import dev.kultivator.cultivation.Reforge;
 import dev.kultivator.cultivation.SpiritRoots;
 import dev.kultivator.cultivation.Stats;
 import dev.kultivator.data.BreakthroughQuality;
@@ -18,9 +24,12 @@ import dev.kultivator.data.Realm;
 import dev.kultivator.network.Actions;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +38,21 @@ import java.util.Locale;
 /**
  * Status: the big dantian circle (gold ring cultivation, blue ring qi, violet ring stored qi, the realm written in
  * the ink core) with the numbers on a column of bamboo slips beside it, and the meditate / breakthrough / root test
- * talismans under them.
+ * talismans under them. The "Persiapan" coin above the slips folds out the breakthrough forecast (DESIGN 19.3.10), the
+ * "Gua Kediaman" coin beside it sets or (on a second click) removes the Cave Abode (Action KULTIVASI {@code abode:set} /
+ * {@code abode:clear}, DESIGN 19.3.5). A "Perkokoh Fondasi" talisman joins the row while a recorded quality can still rise
+ * ({@code reforge}), and at True Immortal Peak the breakthrough talisman becomes "Padatkan Bintang" ({@code star}, with
+ * Shift {@code star:all}); the player's Immortal Stars circle the dantian (DESIGN 19.3.11).
  */
 final class StatusPage extends Page {
 
 	private static final int BUTTON_H = 18;
+	private static final String S = "kultivator.goals.status.";
+	private static final long CONFIRM_MILLIS = 3000L;
+	/** The qi formation tier Perkokoh Fondasi needs (DESIGN 19.3.11; the server checks it again). */
+	private static final int REFORGE_FORMATION = 2;
+	/** At most this many Immortal Stars orbit the dantian (the count is written beside it). */
+	private static final int ORBIT_STARS = 18;
 
 	private final Eased bar = new Eased(5.0F);
 	private final Eased qi = new Eased(5.0F);
@@ -44,6 +63,15 @@ final class StatusPage extends Page {
 	private long slipsBuiltAt;
 	private boolean builtMortalUntested;
 	private int lastStep = -1;
+	/** The Persiapan fold-out (DESIGN 19.3.10) replaces the bamboo slips while open. */
+	private static boolean prepOpen;
+	private float prepScroll;
+	private float prepHeight;
+	private final Eased prepShown = new Eased(14.0F);
+	/** Phase-7 controls that exist only in some states (DESIGN 19.3.5, 19.3.11). */
+	private boolean builtSummit;
+	private boolean builtReforge;
+	private long abodeAskUntil;
 
 	private float cx;
 	private float cy;
@@ -82,9 +110,39 @@ final class StatusPage extends Page {
 		cx = x + circleW / 2.0F;
 		cy = y + availH / 2.0F;
 		slipX = x + circleW + 4;
-		slipY = y;
 		slipW = x + w - slipX;
-		slipH = availH;
+		// The Persiapan coin (DESIGN 19.3.10) and the Cave Abode coin (DESIGN 19.3.5) on top of the slip column.
+		int coinH = 11;
+		boolean twoCoins = slipW >= 96;
+		int half = (slipW - 4) / 2;
+		JadeCoin prep = new JadeCoin(slipX + 2, y, twoCoins ? half - 2 : slipW - 4, coinH, () -> Component.translatable("kultivator.goals.prep.coin"),
+				() -> prepOpen);
+		prep.onPress(() -> {
+			prepOpen = !prepOpen;
+			prepScroll = 0.0F;
+		});
+		prep.tooltip(() -> List.of(Component.translatable("kultivator.goals.prep.coin"), Component.translatable("kultivator.goals.prep.coin.tip")
+				.withStyle(ChatFormatting.GRAY)));
+		add(prep);
+		if (twoCoins) {
+			JadeCoin abodeCoin = new JadeCoin(slipX + 2 + half, y, half - 2, coinH, () -> Component.translatable(S + "abode"), () -> abode(data()) != null);
+			abodeCoin.askingWhen(() -> Util.getMillis() < abodeAskUntil);
+			abodeCoin.enabledWhen(Keys::connected);
+			abodeCoin.onPress(() -> {
+				if (abode(data()) == null) {
+					send(Actions.KULTIVASI, 0, "abode:set");
+				} else if (Util.getMillis() < abodeAskUntil) {
+					abodeAskUntil = 0L;
+					send(Actions.KULTIVASI, 0, "abode:clear");
+				} else {
+					abodeAskUntil = Util.getMillis() + CONFIRM_MILLIS;
+				}
+			});
+			abodeCoin.tooltip(this::abodeTip);
+			add(abodeCoin);
+		}
+		slipY = y + coinH + 2;
+		slipH = availH - coinH - 2;
 
 		List<TalismanButton> row = new ArrayList<>();
 		TalismanButton meditate = new TalismanButton(0, 0, 0, BUTTON_H, () -> Component.translatable(data().meditating()
@@ -96,12 +154,37 @@ final class StatusPage extends Page {
 				Component.translatable("kultivator.screen.key_hint", Keys.MEDITATE.getTranslatedKeyMessage())));
 		row.add(meditate);
 
-		TalismanButton breakthrough = new TalismanButton(0, 0, 0, BUTTON_H, () -> Component.translatable("kultivator.screen.btn.breakthrough"));
-		breakthrough.enabledWhen(() -> canBreakthrough(data()));
-		breakthrough.urgentWhen(() -> canBreakthrough(data()));
-		breakthrough.onPress(() -> send(Actions.BREAKTHROUGH));
-		breakthrough.tooltip(StatusPage::breakthroughTip);
-		row.add(breakthrough);
+		builtSummit = data.rank().isMax();
+		if (builtSummit) {
+			// At True Immortal Peak no breakthrough is left: the talisman condenses Immortal Stars instead (DESIGN 19.3.11).
+			TalismanButton star = new TalismanButton(0, 0, 0, BUTTON_H, () -> Component.translatable(S + "star", ImmortalPerks.stars(data()) + 1));
+			star.enabledWhen(() -> Keys.connected() && canCondense(data()));
+			star.urgentWhen(() -> canCondense(data()));
+			star.onPress(() -> send(Actions.KULTIVASI, 0, Minecraft.getInstance().hasShiftDown() ? "star:all" : "star"));
+			star.tooltip(StatusPage::starTip);
+			row.add(star);
+		} else {
+			TalismanButton breakthrough = new TalismanButton(0, 0, 0, BUTTON_H, () -> Component.translatable("kultivator.screen.btn.breakthrough"));
+			breakthrough.enabledWhen(() -> canBreakthrough(data()));
+			breakthrough.urgentWhen(() -> canBreakthrough(data()));
+			breakthrough.onPress(() -> send(Actions.BREAKTHROUGH));
+			breakthrough.tooltip(StatusPage::breakthroughTip);
+			row.add(breakthrough);
+		}
+
+		builtReforge = reforgeOffered(data);
+		if (builtReforge) {
+			// Perkokoh Fondasi (DESIGN 19.3.11): raises the lowest recorded foundation quality.
+			TalismanButton reforge = new TalismanButton(0, 0, 0, BUTTON_H, () -> reforging(data())
+					? Component.translatable(S + "reforge.running", clock((int) reforgeLeft(data())))
+					: Component.translatable(S + "reforge"));
+			reforge.stampedWhen(() -> reforging(data()));
+			reforge.enabledWhen(() -> Keys.connected() && canReforge(data()));
+			reforge.urgentWhen(() -> canReforge(data()));
+			reforge.onPress(() -> send(Actions.KULTIVASI, 0, "reforge"));
+			reforge.tooltip(StatusPage::reforgeTip);
+			row.add(reforge);
+		}
 
 		if (builtMortalUntested) {
 			TalismanButton root = new TalismanButton(0, 0, 0, BUTTON_H, () -> Component.translatable("kultivator.screen.btn.root_test"));
@@ -133,7 +216,132 @@ final class StatusPage extends Page {
 
 	@Override
 	boolean needsRebuild() {
-		return builtMortalUntested != mortalUntested(data());
+		CultivationData data = data();
+		return builtMortalUntested != mortalUntested(data) || builtSummit != data.rank().isMax() || builtReforge != reforgeOffered(data);
+	}
+
+	// ================================================================== phase 7: abode, Perkokoh Fondasi, stars
+
+	/** The Cave Abode saved in {@code extra.kultivasi.abode {dim, x, y, z}} (DESIGN 19.9), or null when none is set. */
+	private static @Nullable CompoundTag abode(CultivationData data) {
+		CompoundTag tag = data.extra().getCompoundOrEmpty("kultivasi").getCompoundOrEmpty("abode");
+		return tag.getStringOr("dim", "").isEmpty() ? null : tag;
+	}
+
+	private List<Component> abodeTip() {
+		CultivationData data = data();
+		List<Component> lines = new ArrayList<>();
+		lines.add(Component.translatable(S + "abode"));
+		CompoundTag abode = abode(data);
+		if (abode == null) {
+			lines.add(Component.translatable(S + "abode.none").withStyle(ChatFormatting.GRAY));
+			lines.add(Component.translatable(S + "abode.how").withStyle(ChatFormatting.GRAY));
+			return lines;
+		}
+		String dim = abode.getStringOr("dim", "");
+		Component where = switch (dim) {
+			case "minecraft:overworld" -> Component.translatable(S + "dim.overworld");
+			case "minecraft:the_nether" -> Component.translatable(S + "dim.nether");
+			case "minecraft:the_end" -> Component.translatable(S + "dim.end");
+			default -> Component.literal(dim);
+		};
+		lines.add(Component.translatable(S + "abode.at", abode.getIntOr("x", 0), abode.getIntOr("y", 0), abode.getIntOr("z", 0), where)
+				.withColor(Palette.JADE_LIGHT));
+		int state = data.sessionExtra().getIntOr("abode", 0);
+		if (state > 0) {
+			lines.add(Component.translatable(S + "abode.active").withStyle(ChatFormatting.GREEN));
+		} else if (state < 0) {
+			lines.add(Component.translatable(S + "abode.unprotected").withStyle(ChatFormatting.GOLD));
+		}
+		lines.add(Component.translatable(S + "abode.bonus").withStyle(ChatFormatting.GRAY));
+		lines.add(Component.translatable(Util.getMillis() < abodeAskUntil ? S + "abode.confirm" : S + "abode.clear")
+				.withStyle(Util.getMillis() < abodeAskUntil ? ChatFormatting.RED : ChatFormatting.DARK_GRAY));
+		return lines;
+	}
+
+	/** True at True Immortal Peak with enough Qi Abadi for the next star. */
+	static boolean canCondense(CultivationData data) {
+		double cost = ImmortalPerks.nextStarCost(data);
+		return data.rank().isMax() && cost > 0.0D && data.storedQi() + 1.0E-6D >= cost;
+	}
+
+	private static List<Component> starTip() {
+		CultivationData data = data();
+		int stars = ImmortalPerks.stars(data);
+		double cost = ImmortalPerks.nextStarCost(data);
+		List<Component> lines = new ArrayList<>();
+		lines.add(Component.translatable(S + "star", stars + 1));
+		lines.add(Component.translatable(S + "star.count", stars).withColor(Palette.GOLD_LIGHT));
+		lines.add(Component.translatable(S + "star.cost", Msg.number(cost), Msg.number(data.storedQi()))
+				.withStyle(canCondense(data) ? ChatFormatting.GREEN : ChatFormatting.RED));
+		lines.add(Component.translatable(S + "star.tip").withStyle(ChatFormatting.GRAY));
+		return lines;
+	}
+
+	/** Perkokoh Fondasi is offered from Qi Refining on while some recorded quality is below Heavenly. */
+	static boolean reforgeOffered(CultivationData data) {
+		return !data.realm().isMortal() && Reforge.target(data) != null;
+	}
+
+	/** Ticks left of the running Perkokoh Fondasi ritual ({@code sessionExtra.reforge_end}), 0 when none runs. */
+	static long reforgeLeft(CultivationData data) {
+		return Math.max(0L, data.sessionExtra().getLongOr("reforge_end", 0L) - ClientCultivation.serverGameTime());
+	}
+
+	static boolean reforging(CultivationData data) {
+		return reforgeLeft(data) > 0L;
+	}
+
+	/** Everything the server checks before the ritual, so the talisman lights up only when it would start. */
+	static boolean canReforge(CultivationData data) {
+		return Reforge.target(data) != null && !reforging(data) && data.meditating() && data.formationTier() >= REFORGE_FORMATION
+				&& !data.deviating() && !data.breakingThrough() && data.storedQi() + 1.0E-6D >= Reforge.cost(data);
+	}
+
+	private static List<Component> reforgeTip() {
+		CultivationData data = data();
+		List<Component> lines = new ArrayList<>();
+		lines.add(Component.translatable(S + "reforge"));
+		Realm target = Reforge.target(data);
+		if (target == null) {
+			lines.add(Component.translatable(S + "reforge.none").withStyle(ChatFormatting.GRAY));
+			return lines;
+		}
+		BreakthroughQuality quality = data.quality(target);
+		lines.add(Component.translatable(S + "reforge.target", target.displayName().copy().withColor(target.color()),
+				quality == null ? Component.empty() : quality.displayName().copy().withColor(quality.color())));
+		double cost = Reforge.cost(data);
+		lines.add(Component.translatable(S + "reforge.cost", Msg.number(cost), Msg.number(data.storedQi()))
+				.withStyle(data.storedQi() + 1.0E-6D >= cost ? ChatFormatting.GREEN : ChatFormatting.RED));
+		boolean seat = data.meditating() && data.formationTier() >= REFORGE_FORMATION;
+		lines.add(Component.translatable(S + "reforge.need", QiFormations.name(REFORGE_FORMATION))
+				.withStyle(seat ? ChatFormatting.GREEN : ChatFormatting.RED));
+		if (data.deviating()) {
+			lines.add(Component.translatable("kultivator.screen.bt.deviation").withStyle(ChatFormatting.RED));
+		}
+		if (reforging(data)) {
+			lines.add(Component.translatable(S + "reforge.running", clock((int) reforgeLeft(data))).withStyle(ChatFormatting.GOLD));
+		}
+		lines.add(Component.translatable(S + "reforge.tip").withStyle(ChatFormatting.GRAY));
+		return lines;
+	}
+
+	/** Immortal Stars circling the dantian (at most {@link #ORBIT_STARS}) and the count beside the circle. */
+	private void drawStars(GuiGraphicsExtractor g, int stars, float r, long now) {
+		int shown = Math.min(ORBIT_STARS, stars);
+		double spin = (now % 24000L) / 24000.0D * Math.PI * 2.0D;
+		float orbit = r + 2.5F;
+		for (int i = 0; i < shown; i++) {
+			double angle = spin + i * Math.PI * 2.0D / shown;
+			float sx = cx + (float) Math.cos(angle) * orbit;
+			float sy = cy + (float) Math.sin(angle) * orbit;
+			float twinkle = 0.6F + 0.4F * (float) Math.sin(now / 300.0D + i * 1.7D);
+			int color = Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, twinkle);
+			Brush.rect(g, sx - 1.6F, sy - 0.35F, sx + 1.6F, sy + 0.35F, color);
+			Brush.rect(g, sx - 0.35F, sy - 1.6F, sx + 0.35F, sy + 1.6F, color);
+			Brush.dot(g, sx, sy, 0.6F, 0xFFFFFFFF);
+		}
+		Brush.text(g, font, Component.literal("★" + stars), cx + r * 0.72F, cy - r - 1.0F, Palette.GOLD_DARK, 0.65F, false);
 	}
 
 	@Override
@@ -202,6 +410,8 @@ final class StatusPage extends Page {
 		if (data.deviating()) {
 			lines.add(Component.translatable("kultivator.screen.bt.deviation").withStyle(ChatFormatting.RED));
 		}
+		// The Persiapan summary (DESIGN 19.3.10): strikes, quality bonus, healing needed.
+		lines.addAll(PrepView.tooltip(data));
 		lines.add(Component.translatable("kultivator.screen.key_hint_bt", Keys.MEDITATE.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
 		return lines;
 	}
@@ -395,6 +605,10 @@ final class StatusPage extends Page {
 		Brush.fitCentered(g, font, second, cx, ty, room, Palette.JADE_PALE, s2, 0.45F, false);
 		ty += 9.0F * s2 + 1.5F;
 		Brush.fitCentered(g, font, third, cx, ty, room, ready ? Palette.GOLD_LIGHT : Palette.GOLD, s3, 0.5F, false);
+		int stars = ImmortalPerks.stars(data);
+		if (stars > 0) {
+			drawStars(g, stars, r, now);
+		}
 
 		// Which ring is under the mouse.
 		float dx = mouseX - cx;
@@ -415,13 +629,56 @@ final class StatusPage extends Page {
 						Component.literal(Msg.number(data.storedQi())).withColor(Palette.STORED_LIGHT),
 						Component.translatable("kultivator.screen.status.stored.tip")));
 			} else {
-				screen.showTooltip(List.of(rank.displayName().withColor(rank.realm().color()),
+				List<Component> tip = new ArrayList<>(List.of(rank.displayName().withColor(rank.realm().color()),
 						Component.translatable("kultivator.screen.status.total_xp", Msg.number(data.totalXp()))));
+				if (stars > 0) {
+					tip.add(Component.translatable(S + "star.count", stars).withColor(Palette.GOLD_LIGHT));
+				}
+				screen.showTooltip(tip);
 			}
 		}
 	}
 
+	/** The Persiapan fold-out: the forecast lines of {@code PrepView} on a pale slip, scrolling with the wheel. */
+	private void drawPrep(GuiGraphicsExtractor g, float seconds) {
+		if (slipW < 30) {
+			return;
+		}
+		g.fill(slipX + 1, slipY, slipX + slipW - 1, slipY + slipH, Palette.argb(0x70, 0xFFF4E6B8));
+		Brush.frame(g, slipX, slipY, slipX + slipW, slipY + slipH, Palette.argb(0xB0, Palette.GOLD_DARK));
+		float maxScroll = Math.max(0.0F, prepHeight - slipH + 6.0F);
+		prepScroll = Math.max(0.0F, Math.min(maxScroll, prepScroll));
+		float offset = prepShown.to(prepScroll, seconds);
+		float scale = slipW >= 130 ? 0.62F : 0.55F;
+		float room = slipW - 10.0F;
+		g.enableScissor(slipX + 1, slipY + 1, slipX + slipW - 1, slipY + slipH - 1);
+		float top = slipY + 3.0F - offset;
+		float cursor = top;
+		for (PrepView.Row row : PrepView.rows(data())) {
+			if (row.heading()) {
+				cursor += 1.0F;
+				Brush.rect(g, slipX + 4.0F, cursor + 1.5F, slipX + 7.0F, cursor + 4.5F, Palette.SEAL);
+				Brush.fit(g, font, Brush.bold(row.text()), slipX + 9.0F, cursor, room - 5.0F, row.color(), scale + 0.06F, 0.45F, false);
+				cursor += 9.0F * (scale + 0.06F);
+				Brush.rect(g, slipX + 4.0F, cursor, slipX + slipW - 4.0F, cursor + 0.6F, Palette.argb(0xA0, Palette.GOLD));
+				cursor += 2.0F;
+			} else {
+				cursor += Brush.wrap(g, font, row.text(), slipX + 5.0F, cursor, room, row.color(), scale, false) + 1.0F;
+			}
+		}
+		prepHeight = cursor - top;
+		g.disableScissor();
+		if (maxScroll > 0.0F) {
+			float bead = slipY + 3.0F + (slipH - 6.0F) * (offset / maxScroll);
+			Brush.disc(g, slipX + slipW - 2.5F, bead, 2.0F, Palette.JADE);
+		}
+	}
+
 	private void drawSlips(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
+		if (prepOpen) {
+			drawPrep(g, seconds);
+			return;
+		}
 		if (slipW < 30 || slips.isEmpty()) {
 			return;
 		}
@@ -478,7 +735,11 @@ final class StatusPage extends Page {
 	@Override
 	boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 		if (mouseX >= slipX && mouseX < slipX + slipW && mouseY >= slipY && mouseY < slipY + slipH) {
-			scroll -= (float) amount * 12.0F;
+			if (prepOpen) {
+				prepScroll -= (float) amount * 12.0F;
+			} else {
+				scroll -= (float) amount * 12.0F;
+			}
 			return true;
 		}
 		return false;

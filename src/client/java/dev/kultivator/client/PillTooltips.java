@@ -36,6 +36,7 @@ public final class PillTooltips {
 		if (stack.isEmpty() || !ClientCultivation.received()) {
 			return;
 		}
+		ingredientLines(stack, lines);
 		VanillaPills.Pill pill = VanillaPills.Pill.of(stack);
 		if (pill == null) {
 			return;
@@ -59,6 +60,35 @@ public final class PillTooltips {
 					: toxicity >= PillToxicity.WARNING_THRESHOLD ? TOXICITY_MID : TOXICITY_LOW;
 			lines.add(Component.translatable("kultivator.pills.tooltip.toxicity", Msg.number(toxicity),
 					Msg.number(efficacy * 100.0D + 1.0E-6D)).withColor(color));
+		}
+	}
+
+	/** At most this many recipes are listed under an ingredient. */
+	private static final int RECIPE_LINES = 6;
+	private static final int INGREDIENT_COLOR = 0xC9B88A;
+
+	/**
+	 * Alchemy ingredients (DESIGN 19.3.7): "[Shift] Bahan alkimia"; while Shift is held, the pills the item goes into
+	 * ("→ 2 Pil Penyembuh").
+	 */
+	private static void ingredientLines(ItemStack stack, List<Component> lines) {
+		List<dev.kultivator.alchemy.AlchemyRecipes.Recipe> uses = dev.kultivator.alchemy.AlchemyRecipes.usesOf(stack);
+		if (uses.isEmpty()) {
+			return;
+		}
+		if (!net.minecraft.client.Minecraft.getInstance().hasShiftDown()) {
+			lines.add(Component.translatable("kultivator.harta.tooltip.ingredient").withStyle(ChatFormatting.DARK_GRAY));
+			return;
+		}
+		lines.add(Component.translatable("kultivator.harta.tooltip.ingredient_of").withColor(INGREDIENT_COLOR));
+		int shown = 0;
+		for (dev.kultivator.alchemy.AlchemyRecipes.Recipe recipe : uses) {
+			if (shown >= RECIPE_LINES) {
+				lines.add(Component.translatable("kultivator.harta.tooltip.ingredient_more", uses.size() - shown).withStyle(ChatFormatting.DARK_GRAY));
+				break;
+			}
+			lines.add(Component.translatable("kultivator.harta.tooltip.ingredient_line", recipe.count(), recipe.displayName()));
+			shown++;
 		}
 	}
 

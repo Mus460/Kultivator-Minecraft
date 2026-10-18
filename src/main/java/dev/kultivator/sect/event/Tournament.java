@@ -133,7 +133,7 @@ public final class Tournament {
 		return until > EventUtil.gameTime();
 	}
 
-	static boolean running(UUID owner) {
+	public static boolean running(UUID owner) {
 		return RUNS.containsKey(owner);
 	}
 

@@ -43,7 +43,14 @@ public final class Actions {
 	/** Rename is done with a name tag; this releases the disciple (text must be "confirm"). */
 	public static final int DISCIPLE_RELEASE = 20;
 
-	// 21-24 stay reserved for phase 7 ("Dunia yang Hidup", DESIGN 19).
+	// Phase 7 "Dunia yang Hidup" (DESIGN 19.2.1): one id per module, text = "op[:param]". 23 and 24 stay reserved, 25-29 free.
+	/**
+	 * Boons, stars, Perkokoh Fondasi and the Cave Abode ({@code cultivation.ImmortalPerks.handleAction}); text = "star",
+	 * "star:all", "reforge", "abode:set" or "abode:clear".
+	 */
+	public static final int KULTIVASI = 21;
+	/** The Jalan tablet ({@code goals.Goals.handleAction}); text = "hide", "show", "claim:N" (N = chapter 1-5) or "seen:codex". */
+	public static final int JALAN = 22;
 
 	// Phase 6 (DESIGN 20.2.1). Hall actions: arg = the sub-op. Disciple actions: arg = the disciple's entity id.
 	// text carries "op[:param]" in both cases.

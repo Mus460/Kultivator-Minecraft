@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_spirit_stone",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.first_beast_core.description"
+    },
+    "icon": {
+      "id": "kultivator:beast_core_low"
+    },
+    "title": {
+      "translate": "advancement.kultivator.first_beast_core.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

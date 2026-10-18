@@ -1,0 +1,356 @@
+package dev.kultivator.goals;
+
+import dev.kultivator.KultivatorConfig;
+import dev.kultivator.alchemy.AlchemyComponents;
+import dev.kultivator.alchemy.AlchemyItems;
+import dev.kultivator.alchemy.PillQuality;
+import dev.kultivator.data.CultivationData;
+import dev.kultivator.data.Cultivators;
+import dev.kultivator.data.Dao;
+import dev.kultivator.data.Realm;
+import dev.kultivator.data.TechniqueGrade;
+import dev.kultivator.data.TechniqueRegistry;
+import dev.kultivator.data.TechniqueSpec;
+import dev.kultivator.harta.SpiritStones;
+import dev.kultivator.talisman.TalismanKind;
+import dev.kultivator.talisman.Talismans;
+import dev.kultivator.technique.source.JadeSlips;
+import dev.kultivator.technique.spec.run.Loadout;
+import dev.kultivator.util.Advancements;
+import dev.kultivator.util.Msg;
+import dev.kultivator.util.NoGrief;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Langkah Pertama / First Steps (DESIGN 19.3.9 a): 20 steps in 5 chapters, a bitmask in {@code extra.goals.guide}.
+ * A step completes when its advancement is granted ({@code Advancements.addListener}); on join every step is
+ * back-filled from the advancements already done (and from the rank), so veterans are never told to test their root.
+ * The two steps without an advancement (the Mortal bar, the Kitab Teknik with 4 seals) are checked every 100 ticks.
+ * Chapter rewards (config {@code guideRewards}) are claimed with Action JALAN {@code claim:<chapter>}.
+ * <p>
+ * Sumber: Terinspirasi dari Yao Lao's guidance of Xiao Yan (BTTH); chapter rewards Terinspirasi dari BTTH ch. 20
+ * (Foundation Elixirs "tailored for you"). The steps are game design.
+ */
+public final class Guide {
+
+	public static final String KEY = "guide";
+	public static final String CLAIMED = "claimed";
+	public static final String HIDDEN = "hidden";
+	public static final String SEEN = "seen";
+	public static final int CHAPTERS = 5;
+	public static final int PER_CHAPTER = 4;
+	public static final int STEP_COUNT = CHAPTERS * PER_CHAPTER;
+	public static final int ALL = (1 << STEP_COUNT) - 1;
+	/** Seals of the Cincin Segel the chapter-5 step asks for. */
+	public static final int SEALS_NEEDED = 4;
+	/** The power of the chapter-5 Shield Talisman. */
+	public static final int SHIELD_POWER = 3;
+
+	/** One step: its id (text keys) and the advancements that complete it (any one; none for the checked steps). */
+	public record Step(String id, String... advancements) {
+	}
+
+	/** The steps in order: chapter = index / 4. */
+	public static final Step[] STEPS = {
+			new Step("root", "root_tested"), new Step("meditate", "first_meditation"), new Step("bar"), new Step("awaken", "awakening"),
+			new Step("technique", "first_technique"), new Step("pill", "first_pill"), new Step("site", "spiritual_site", "qi_formation_small"),
+			new Step("foundation", "first_breakthrough"),
+			new Step("sword", "flying_sword"), new Step("alchemy", "first_alchemy"), new Step("stone", "first_spirit_stone"),
+			new Step("tribulation", "first_tribulation"),
+			new Step("dao", "dao_chosen"), new Step("book", "first_book", "jade_slip", "inheritance"), new Step("elite", "first_elite"),
+			new Step("beast", "spirit_beast", "formation_built"),
+			new Step("codex"), new Step("sect", "sect_founded", "first_recruit_hall"), new Step("disciple", "first_disciple"),
+			new Step("expedition", "first_expedition")
+	};
+	private static final int BAR = 2;
+	private static final int CODEX = 16;
+
+	// ================================================================== pure readers
+
+	public static int bits(CultivationData data) {
+		return GoalCounters.view(data).getIntOr(KEY, 0) & ALL;
+	}
+
+	public static int claimed(CultivationData data) {
+		return GoalCounters.view(data).getIntOr(CLAIMED, 0);
+	}
+
+	public static boolean hidden(CultivationData data) {
+		return GoalCounters.view(data).getBooleanOr(HIDDEN, false);
+	}
+
+	public static boolean seen(CultivationData data) {
+		return GoalCounters.view(data).getBooleanOr(SEEN, false);
+	}
+
+	/** Bits of the four steps of {@code chapter} (0-4). */
+	public static int chapterMask(int chapter) {
+		return 0xF << (chapter * PER_CHAPTER);
+	}
+
+	public static boolean chapterDone(int bits, int chapter) {
+		return (bits & chapterMask(chapter)) == chapterMask(chapter);
+	}
+
+	/** Steps done in {@code chapter}. */
+	public static int doneIn(int bits, int chapter) {
+		return Integer.bitCount(bits & chapterMask(chapter));
+	}
+
+	/** The first chapter (0-4) with a step left, or 5 when all are done. */
+	public static int currentChapter(int bits) {
+		for (int chapter = 0; chapter < CHAPTERS; chapter++) {
+			if (!chapterDone(bits, chapter)) {
+				return chapter;
+			}
+		}
+		return CHAPTERS;
+	}
+
+	/** The first step left (0-19), or -1 when all are done. */
+	public static int currentStep(int bits) {
+		for (int i = 0; i < STEP_COUNT; i++) {
+			if ((bits & (1 << i)) == 0) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/** Filled seals of the Cincin Segel. */
+	public static int seals(CultivationData data) {
+		int filled = 0;
+		for (String id : Loadout.slots(data)) {
+			if (!id.isEmpty()) {
+				filled++;
+			}
+		}
+		return filled;
+	}
+
+	// ================================================================== server
+
+	/** An advancement was completed: the steps it belongs to. */
+	static void onAdvancement(ServerPlayer player, String name) {
+		int add = 0;
+		for (int i = 0; i < STEPS.length; i++) {
+			for (String advancement : STEPS[i].advancements()) {
+				if (advancement.equals(name)) {
+					add |= 1 << i;
+				}
+			}
+		}
+		if (add != 0) {
+			mark(player, Cultivators.get(player), add);
+		}
+	}
+
+	/** On join: every step whose advancement is already done (or that the rank proves) is ticked. */
+	static void backfill(ServerPlayer player, CultivationData data) {
+		int add = 0;
+		for (int i = 0; i < STEPS.length; i++) {
+			for (String advancement : STEPS[i].advancements()) {
+				if (RealmTrials.done(player, advancement)) {
+					add |= 1 << i;
+				}
+			}
+		}
+		Realm realm = data.realm();
+		if (data.rootTested()) {
+			add |= 1;
+		}
+		if (realm.atLeast(Realm.QI_REFINING)) {
+			add |= 1 << 3;
+		}
+		if (realm.atLeast(Realm.FOUNDATION)) {
+			add |= 1 << 7;
+		}
+		if (realm.atLeast(Realm.GOLDEN_CORE)) {
+			add |= 1 << 11;
+		}
+		if (data.dao() != null) {
+			add |= 1 << 12;
+		}
+		mark(player, data, add | checked(data));
+	}
+
+	/** Every 100 ticks: the two steps without an advancement. */
+	static void check(ServerPlayer player, CultivationData data) {
+		int add = checked(data);
+		if ((add & ~bits(data)) != 0) {
+			mark(player, data, add);
+		}
+	}
+
+	private static int checked(CultivationData data) {
+		int add = 0;
+		if (!data.realm().isMortal() || data.barFull()) {
+			add |= 1 << BAR;
+		}
+		if (seen(data) && seals(data) >= SEALS_NEEDED) {
+			add |= 1 << CODEX;
+		}
+		return add;
+	}
+
+	/** Sets step bits; tells about finished chapters and grants {@code guide_complete} after the last step. */
+	static void mark(ServerPlayer player, CultivationData data, int add) {
+		CompoundTag goals = GoalCounters.goals(data);
+		int before = goals.getIntOr(KEY, 0) & ALL;
+		int after = (before | add) & ALL;
+		if (after == before) {
+			return;
+		}
+		goals.putInt(KEY, after);
+		Cultivators.dirty(player);
+		// Every chapter finished by this change in one line (a veteran's first join can finish several at once).
+		MutableComponent names = Component.empty();
+		int finished = 0;
+		boolean reward = false;
+		for (int chapter = 0; chapter < CHAPTERS; chapter++) {
+			if (chapterDone(after, chapter) && !chapterDone(before, chapter)) {
+				if (finished > 0) {
+					names.append(Component.literal(", "));
+				}
+				names.append(Component.translatable("kultivator.goals.chapter." + (chapter + 1)));
+				finished++;
+				reward |= KultivatorConfig.get().guideRewards && (claimed(data) & (1 << chapter)) == 0;
+			}
+		}
+		if (finished > 0) {
+			Msg.chat(player, Component.translatable(reward ? "kultivator.goals.guide.chapter_done_reward" : "kultivator.goals.guide.chapter_done",
+					names).withStyle(ChatFormatting.GOLD));
+		}
+		if (after == ALL && before != ALL) {
+			Advancements.grant(player, "guide_complete");
+		}
+	}
+
+	/** Action JALAN {@code claim:<chapter>} (1-5): the chapter's reward into the inventory or at the feet. */
+	static void claim(ServerPlayer player, int chapterNumber) {
+		int chapter = chapterNumber - 1;
+		CultivationData data = Cultivators.get(player);
+		if (chapter < 0 || chapter >= CHAPTERS) {
+			return;
+		}
+		if (!KultivatorConfig.get().guideRewards) {
+			Msg.chat(player, Component.translatable("kultivator.goals.guide.rewards_off").withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		if (!chapterDone(bits(data), chapter)) {
+			Msg.chat(player, Component.translatable("kultivator.goals.guide.not_done").withStyle(ChatFormatting.RED));
+			return;
+		}
+		CompoundTag goals = GoalCounters.goals(data);
+		int claimed = goals.getIntOr(CLAIMED, 0);
+		if ((claimed & (1 << chapter)) != 0) {
+			Msg.chat(player, Component.translatable("kultivator.goals.guide.already").withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		goals.putInt(CLAIMED, claimed | (1 << chapter));
+		Cultivators.dirty(player);
+		List<ItemStack> stacks = rewards(chapter, data, player.getRandom());
+		for (ItemStack stack : stacks) {
+			give(player, stack);
+		}
+		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.9F, 1.3F);
+		Msg.chat(player, Component.translatable("kultivator.goals.guide.claimed", Component.translatable("kultivator.goals.chapter." + chapterNumber))
+				.withStyle(ChatFormatting.GOLD));
+	}
+
+	/** The stacks of a chapter's reward (0-4); chapter 4 picks a Kuning slip of the chosen Dao the player lacks. */
+	static List<ItemStack> rewards(int chapter, CultivationData data, RandomSource random) {
+		List<ItemStack> list = new ArrayList<>();
+		switch (chapter) {
+			case 0 -> list.add(pill(AlchemyItems.QI_GATHERING_PILL, 2));
+			case 1 -> {
+				list.add(pill(AlchemyItems.HEALING_PILL, 1));
+				list.add(pill(AlchemyItems.QI_RECOVERY_PILL, 1));
+			}
+			case 2 -> {
+				list.add(pill(AlchemyItems.TRIBULATION_WARDING_PILL, 1));
+				list.add(SpiritStones.stack(SpiritStones.LOW, 4));
+			}
+			case 3 -> {
+				list.add(SpiritStones.stack(SpiritStones.MID, 1));
+				ItemStack slip = slipFor(data, random);
+				list.add(slip.isEmpty() ? SpiritStones.stack(SpiritStones.MID, 2) : slip);
+			}
+			default -> {
+				list.add(SpiritStones.stack(SpiritStones.MID, 2));
+				ItemStack shield = shieldTalisman();
+				list.add(shield.isEmpty() ? SpiritStones.stack(SpiritStones.MID, 1) : shield);
+			}
+		}
+		list.removeIf(ItemStack::isEmpty);
+		return list;
+	}
+
+	private static ItemStack pill(Item item, int count) {
+		return AlchemyComponents.withQuality(new ItemStack(item, count), PillQuality.MID);
+	}
+
+	/** A jade slip of a random Kuning (Huang) spec of the chosen Dao that the player does not know yet, or empty. */
+	private static ItemStack slipFor(CultivationData data, RandomSource random) {
+		Dao dao = data.dao();
+		if (dao == null) {
+			return ItemStack.EMPTY;
+		}
+		List<TechniqueSpec> candidates = new ArrayList<>();
+		for (TechniqueSpec spec : TechniqueRegistry.all()) {
+			if (spec.dao() == dao && spec.grade() == TechniqueGrade.HUANG && spec.slipAllowed() && spec.playerVisible() && !data.knows(spec.id())) {
+				candidates.add(spec);
+			}
+		}
+		while (!candidates.isEmpty()) {
+			ItemStack slip = JadeSlips.stack(candidates.remove(random.nextInt(candidates.size())).id());
+			if (!slip.isEmpty()) {
+				return slip;
+			}
+		}
+		return ItemStack.EMPTY;
+	}
+
+	/** One Shield Talisman of power {@link #SHIELD_POWER} (DESIGN 19.3.9), without an inscriber name. */
+	private static ItemStack shieldTalisman() {
+		return Talismans.create(TalismanKind.SHIELD, SHIELD_POWER, "");
+	}
+
+	private static void give(ServerPlayer player, ItemStack stack) {
+		if (stack.isEmpty()) {
+			return;
+		}
+		if (!player.getInventory().add(stack) && !stack.isEmpty()) {
+			ItemEntity item = new ItemEntity(player.level(), player.getX(), player.getY() + 0.5D, player.getZ(), stack);
+			item.setDefaultPickUpDelay();
+			item.addTag(NoGrief.TAG);
+			item.setPortalCooldown();
+			player.level().addFreshEntity(item);
+		}
+	}
+
+	/** {@code uji jalan bab <n>}: completes chapters 1..n. */
+	static void completeUpTo(ServerPlayer player, int chapters) {
+		int add = 0;
+		for (int chapter = 0; chapter < Math.min(CHAPTERS, chapters); chapter++) {
+			add |= chapterMask(chapter);
+		}
+		mark(player, Cultivators.get(player), add);
+	}
+
+	private Guide() {
+	}
+}

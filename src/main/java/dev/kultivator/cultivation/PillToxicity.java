@@ -20,8 +20,13 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 
 /**
- * Pill toxicity (DESIGN section 9): every pill adds its toxin (0..100 in total), 1 point fades every 30 s. Pills work
- * at {@code 1 - toxicity / 120}; above 80 each pill poisons the body (Nausea + Poison I for 5 s, never lethal).
+ * Pill toxicity (DESIGN section 9, reworked in 19.3.14): every pill adds its toxin (0..100 in total). 1 point fades
+ * every 30 s, or every 10 s while meditating. Pills work at {@code clamp(1 - (toxicity / 100)^1.6, 0, 1)} (25 -> 0.89,
+ * 50 -> 0.67, 80 -> 0.30, 100 -> 0); above 80 each pill poisons the body (Nausea + Poison I for 5 s, never lethal);
+ * above 90 each pill has a 25% chance of "Pil Membalik", a mild Qi Deviation (never lethal, ascended players immune).
+ * <p>
+ * Source: impurities in pills become medicinal toxins that affect future cultivation (A Will Eternal ch. 41). The
+ * deviation and every number are game design.
  */
 public final class PillToxicity {
 
@@ -31,9 +36,19 @@ public final class PillToxicity {
 	public static final double WARNING_THRESHOLD = 50.0D;
 	/** Ticks per point of toxicity that fades. */
 	public static final int DECAY_INTERVAL = 600;
+	/** Ticks per point of toxicity that fades while meditating. */
+	public static final int MEDITATING_DECAY_INTERVAL = 200;
+	/** Effectiveness = clamp(1 - (toxicity / 100)^EFFECT_EXPONENT, 0, 1). */
+	public static final double EFFECT_EXPONENT = 1.6D;
+	/** Pil Membalik: above this toxicity each pill may turn against its taker. */
+	public static final double BACKFIRE_THRESHOLD = 90.0D;
+	public static final double BACKFIRE_CHANCE = 0.25D;
+	/** Severity of the Qi Deviation a backfiring pill causes (1.0 = a failed breakthrough). */
+	public static final double BACKFIRE_SEVERITY = 0.3D;
 	/** Colour of the sickly motes (sent with strength 0 in the PILL effect). */
 	public static final int SICK_COLOR = 0x8DB33A;
 	private static final int POISON_TICKS = 100;
+	private static final int BACKFIRE_COLOR = 0xB08A9A;
 
 	public static void init() {
 	}
@@ -62,7 +77,8 @@ public final class PillToxicity {
 				data.extra().put(VanillaPills.EXTRA, own);
 			}
 		}
-		if (player.tickCount <= 0 || player.tickCount % DECAY_INTERVAL != 0 || data.toxicity() <= 0.0D) {
+		int interval = data.meditating() ? MEDITATING_DECAY_INTERVAL : DECAY_INTERVAL;
+		if (player.tickCount <= 0 || player.tickCount % interval != 0 || data.toxicity() <= 0.0D) {
 			return;
 		}
 		data.setToxicity(data.toxicity() - 1.0D);
@@ -71,7 +87,32 @@ public final class PillToxicity {
 
 	/** How well a pill works right now, 0..1 (before adding its toxin). */
 	public static double effectiveness(CultivationData data) {
-		return 1.0D - data.toxicity() / 120.0D;
+		return effectiveness(data.toxicity());
+	}
+
+	/** Effectiveness at {@code toxicity} (pure): {@code clamp(1 - (toxicity / 100)^1.6, 0, 1)}. */
+	public static double effectiveness(double toxicity) {
+		double share = Math.max(0.0D, toxicity) / 100.0D;
+		return Math.max(0.0D, Math.min(1.0D, 1.0D - Math.pow(share, EFFECT_EXPONENT)));
+	}
+
+	/**
+	 * Pil Membalik (DESIGN 19.3.14): above {@link #BACKFIRE_THRESHOLD} toxicity a pill has a {@link #BACKFIRE_CHANCE}
+	 * chance to turn against its taker: no effect, a mild Qi Deviation (never lethal) and grey smoke. Ascended players
+	 * are immune. Call after the pill was consumed; true when it backfired (the caller then skips the effect).
+	 */
+	public static boolean backfire(ServerPlayer player, Component pillName) {
+		CultivationData data = Cultivators.get(player);
+		if (data.toxicity() <= BACKFIRE_THRESHOLD || data.ascended() || player.getRandom().nextDouble() >= BACKFIRE_CHANCE) {
+			return false;
+		}
+		Msg.chat(player, Component.translatable("kultivator.harta.toxicity.backfire", pillName, Msg.number(data.toxicity()))
+				.withColor(BACKFIRE_COLOR));
+		Fx.send(player.level(), player.position(), FxType.TREASURE, dev.kultivator.harta.HartaFxIds.SMOKE, 0, 1.0F);
+		player.level().playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), SoundEvents.FIRE_EXTINGUISH,
+				SoundSource.PLAYERS, 0.8F, 0.7F);
+		Deviation.apply(player, BACKFIRE_SEVERITY);
+		return true;
 	}
 
 	/** Adds the pill's toxin and applies the poisoning side effects above 80. */

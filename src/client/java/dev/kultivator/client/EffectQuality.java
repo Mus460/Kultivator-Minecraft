@@ -111,6 +111,9 @@ public final class EffectQuality {
 	private static boolean wheelHold = true;
 	private static boolean releaseCast;
 	private static boolean reduceMotion;
+	/** Phase 7 (DESIGN 19.3.15): "Pengingat cooldown" (default off) and "Peringatan bahaya" (default on). */
+	private static boolean cooldownPing;
+	private static boolean dangerAlert = true;
 	/** Everything else of the file (codex filters and seen set, other modules' keys), kept as read. */
 	private static JsonObject extra = new JsonObject();
 
@@ -246,6 +249,26 @@ public final class EffectQuality {
 		save();
 	}
 
+	/** "Pengingat cooldown": a chime and a seal flash when a cooldown of 10 s or more ends (DESIGN 19.3.15). */
+	public static boolean cooldownPing() {
+		return cooldownPing;
+	}
+
+	public static void setCooldownPing(boolean on) {
+		cooldownPing = on;
+		save();
+	}
+
+	/** "Peringatan bahaya": the meditation danger alert (DESIGN 19.3.15). */
+	public static boolean dangerAlert() {
+		return dangerAlert;
+	}
+
+	public static void setDangerAlert(boolean on) {
+		dangerAlert = on;
+		save();
+	}
+
 	/** Particle factor for other players' casts (22.15.2). */
 	public static float othersScale() {
 		return others.factor();
@@ -347,6 +370,8 @@ public final class EffectQuality {
 			wheelHold = bool(json, "wheel_hold", true);
 			releaseCast = bool(json, "release_cast", false);
 			reduceMotion = bool(json, "reduce_motion", false);
+			cooldownPing = bool(json, "cooldown_ping", false);
+			dangerAlert = bool(json, "danger_alert", true);
 			extra = json.deepCopy();
 			for (String key : OWN_KEYS) {
 				extra.remove(key);
@@ -357,7 +382,7 @@ public final class EffectQuality {
 	}
 
 	private static final String[] OWN_KEYS = {"effect_quality", "hud", "quality_auto", "shake", "others_fx", "flash", "phantoms", "wheel_hold",
-			"release_cast", "reduce_motion"};
+			"release_cast", "reduce_motion", "cooldown_ping", "danger_alert"};
 
 	private static String string(JsonObject json, String key, String fallback) {
 		try {
@@ -388,6 +413,8 @@ public final class EffectQuality {
 			json.addProperty("wheel_hold", wheelHold);
 			json.addProperty("release_cast", releaseCast);
 			json.addProperty("reduce_motion", reduceMotion);
+			json.addProperty("cooldown_ping", cooldownPing);
+			json.addProperty("danger_alert", dangerAlert);
 			Files.createDirectories(FILE.getParent());
 			Files.writeString(FILE, json.toString(), StandardCharsets.UTF_8);
 		} catch (IOException exception) {

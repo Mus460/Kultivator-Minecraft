@@ -8,7 +8,6 @@ import dev.kultivator.alchemy.PillQuality;
 import dev.kultivator.beast.SpiritBeastPillItem;
 import dev.kultivator.cultivation.Progression;
 import dev.kultivator.cultivation.Qi;
-import dev.kultivator.cultivation.QiFormations;
 import dev.kultivator.cultivation.VanillaPills;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
@@ -27,7 +26,6 @@ import dev.kultivator.dao.TechniqueBooks;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.item.RootItems;
-import dev.kultivator.sect.Sects;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
@@ -76,9 +74,25 @@ public final class DiscipleCultivation {
 	public static final double TEACH_COST = 0.2D;
 	/** The master must be this close to start the breakthrough. */
 	public static final double BREAKTHROUGH_RANGE = 16.0D;
-	/** Meditating near a meditating master shares 10% of the master's meditation gain. */
-	public static final double MASTER_MEDITATION_RANGE = 8.0D;
-	public static final double MASTER_SHARE = 0.1D;
+	/**
+	 * Bimbingan Guru (DESIGN 20, master guidance): a disciple meditating near a meditating master gets a share of the
+	 * master's meditation gain, {@code 10% + 3% x master realm + 5% x max(0, master realm - disciple realm)} (at most 60%),
+	 * within {@code 8 + 2 x master realm} blocks (at most 24), and its own meditation runs {@code x(1 + 0.05 x master
+	 * realm)} meanwhile (realm = ordinal, Mortal 0 to True Immortal 8). Sumber: inspired by Battle Through the Heavens
+	 * (Yao Lao guiding Xiao Yan's cultivation as his teacher); the numbers are game design.
+	 */
+	public static final double GUIDANCE_BASE_SHARE = 0.10D;
+	public static final double GUIDANCE_SHARE_PER_REALM = 0.03D;
+	public static final double GUIDANCE_SHARE_PER_GAP = 0.05D;
+	public static final double GUIDANCE_SHARE_CAP = 0.60D;
+	public static final double GUIDANCE_BASE_RANGE = 8.0D;
+	public static final double GUIDANCE_RANGE_PER_REALM = 2.0D;
+	public static final double GUIDANCE_RANGE_CAP = 24.0D;
+	public static final double GUIDANCE_SELF_PER_REALM = 0.05D;
+	/** The guidance range of a Mortal master (kept for older callers). */
+	public static final double MASTER_MEDITATION_RANGE = GUIDANCE_BASE_RANGE;
+	/** The base share (kept for older callers). */
+	public static final double MASTER_SHARE = GUIDANCE_BASE_SHARE;
 	/** Comprehension per cast of a technique of the disciple's own Dao (before root affinity). */
 	public static final double TECHNIQUE_COMPREHENSION = 0.15D;
 	/** Comprehension per second of meditation once a Dao is chosen (before root affinity). */
@@ -157,9 +171,19 @@ public final class DiscipleCultivation {
 			data.setQi(Math.min(max, data.qi() + regenPerSecond(data, meditating)));
 		}
 
+		ServerPlayer guide = meditating ? entity.owner() : null;
+		CultivationData guideData = null;
+		boolean guided = false;
+		if (guide != null) {
+			guideData = Cultivators.get(guide);
+			double range = guidanceRange(guideData.realm());
+			guided = guideData.meditating() && guide.level() == level && guide.distanceToSqr(entity) <= range * range;
+		}
 		if (meditating) {
 			data.addMeditationTicks(20L);
-			addXp(entity, meditationBase(entity, data), XpSource.MEDITATION);
+			// Bimbingan Guru: the master meditating nearby lifts the disciple's own meditation too.
+			double own = guided ? guidanceSelfFactor(guideData.realm()) : 1.0D;
+			addXp(entity, meditationBase(entity, data) * own, XpSource.MEDITATION);
 			Dao dao = data.dao();
 			if (dao != null) {
 				data.addComprehension(comprehensionGain(data, dao, MEDITATION_COMPREHENSION));
@@ -167,15 +191,10 @@ public final class DiscipleCultivation {
 			if (entity.getHealth() < entity.getMaxHealth()) {
 				entity.heal(entity.getMaxHealth() * 0.01F);
 			}
-			ServerPlayer master = entity.owner();
-			boolean anyRange = master != null && DiscipleHooks.masterShareAnyRange(data);
-			if (master != null && (anyRange || master.level() == level
-					&& master.distanceToSqr(entity) <= MASTER_MEDITATION_RANGE * MASTER_MEDITATION_RANGE)) {
-				CultivationData masterData = Cultivators.get(master);
-				if (masterData.meditating()) {
-					addXp(entity, masterMeditationGain(master, masterData) * MASTER_SHARE * DiscipleHooks.masterShareFactor(data)
-							* (data.deviating() ? 0.5D : 1.0D), XpSource.EXACT);
-				}
+			boolean anyRange = guide != null && DiscipleHooks.masterShareAnyRange(data);
+			if (guide != null && guideData.meditating() && (guided || anyRange)) {
+				addXp(entity, masterMeditationGain(guide, guideData) * guidanceShare(guideData.realm(), data.realm())
+						* DiscipleHooks.masterShareFactor(data) * (data.deviating() ? 0.5D : 1.0D), XpSource.EXACT);
 			}
 		}
 		if (data.fledNoticePending()) {
@@ -193,6 +212,25 @@ public final class DiscipleCultivation {
 			entity.refreshSynced();
 		}
 		DiscipleHooks.tick20(entity);
+	}
+
+	// ================================================================== Bimbingan Guru
+
+	/** The share of the master's meditation gain a guided disciple receives (pure; the Status tab shows it). */
+	public static double guidanceShare(Realm master, Realm disciple) {
+		int m = master.ordinal();
+		int gap = Math.max(0, m - disciple.ordinal());
+		return Math.min(GUIDANCE_SHARE_CAP, GUIDANCE_BASE_SHARE + GUIDANCE_SHARE_PER_REALM * m + GUIDANCE_SHARE_PER_GAP * gap);
+	}
+
+	/** How close the master must meditate to guide (pure). */
+	public static double guidanceRange(Realm master) {
+		return Math.min(GUIDANCE_RANGE_CAP, GUIDANCE_BASE_RANGE + GUIDANCE_RANGE_PER_REALM * master.ordinal());
+	}
+
+	/** The factor on the disciple's own meditation while guided (pure). */
+	public static double guidanceSelfFactor(Realm master) {
+		return 1.0D + GUIDANCE_SELF_PER_REALM * master.ordinal();
 	}
 
 	// ================================================================== qi
@@ -238,10 +276,8 @@ public final class DiscipleCultivation {
 	 * own multipliers (root, breakthrough quality, server config, Qi Deviation).
 	 */
 	private static double masterMeditationGain(ServerPlayer master, CultivationData masterData) {
-		double site = masterData.siteMultiplier() > 0.0D ? masterData.siteMultiplier() : 1.0D;
-		double base = (0.6D + 0.25D * masterData.realm().ordinal()) * site * QiFormations.multiplier(masterData.formationTier())
-				* Math.max(0.15D, masterData.veinDensity());
-		return base * Sects.meditationBonus(master) * Progression.xpMultiplier(master, XpSource.MEDITATION);
+		// DESIGN 19.1.5: the one meditation formula of phase 7 (site, formation, fuel, density, sect bonus, seclusion).
+		return dev.kultivator.cultivation.Meditation.gainPerSecond(master, masterData) * Progression.xpMultiplier(master, XpSource.MEDITATION);
 	}
 
 	/** Meditation XP per second before multipliers: {@code 0.4 + 0.2 x realm}, x1.5 when ordered to meditate. */

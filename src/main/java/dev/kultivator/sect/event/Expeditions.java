@@ -347,7 +347,39 @@ final class Expeditions {
 				loot.add(new ItemStack(herbs[random.nextInt(herbs.length)]));
 			}
 		}
+		addPhase7Loot(loot, type, tier, random);
 		return loot;
+	}
+
+	/**
+	 * Phase 7 loot rows (DESIGN 19.3.2-19.3.4, P7-harta): Mengawal Karavan +2-5 Low stones, Alam Rahasia +1 Mid (+5% High
+	 * at tier 7+), Perburuan Binatang Iblis +1 core of a random element (grade by tier: 1-3 Low, 4-6 Mid, 7-8 High, 9 Raja
+	 * at 10% else High), Mencari Herba Roh +1-2 spirit herbs aged 50 x tier to 150 x tier years.
+	 */
+	private static void addPhase7Loot(List<ItemStack> loot, int type, int tier, RandomSource random) {
+		switch (type) {
+			case TYPE_CARAVAN -> loot.add(dev.kultivator.harta.SpiritStones.stack(dev.kultivator.harta.SpiritStones.LOW, 2 + random.nextInt(4)));
+			case TYPE_SECRET -> {
+				loot.add(dev.kultivator.harta.SpiritStones.stack(dev.kultivator.harta.SpiritStones.MID, 1));
+				if (tier >= 7 && random.nextDouble() < 0.05D) {
+					loot.add(dev.kultivator.harta.SpiritStones.stack(dev.kultivator.harta.SpiritStones.HIGH, 1));
+				}
+			}
+			case TYPE_HUNT -> {
+				int grade = tier <= 3 ? dev.kultivator.harta.BeastCores.LOW : tier <= 6 ? dev.kultivator.harta.BeastCores.MID
+						: tier <= 8 || random.nextDouble() >= 0.10D ? dev.kultivator.harta.BeastCores.HIGH : dev.kultivator.harta.BeastCores.KING;
+				dev.kultivator.data.Element[] elements = dev.kultivator.data.Element.values();
+				loot.add(dev.kultivator.harta.BeastCores.create(elements[random.nextInt(elements.length)], grade));
+			}
+			case TYPE_HERBS -> {
+				int herbs = 1 + random.nextInt(2);
+				for (int i = 0; i < herbs; i++) {
+					loot.add(dev.kultivator.harta.SpiritHerbs.randomFor(null, random, 50 * tier, 150 * tier));
+				}
+			}
+			default -> {
+			}
+		}
 	}
 
 	/** An enchanted book whose enchantment teaches a technique (DESIGN 7), empty when none exists. */

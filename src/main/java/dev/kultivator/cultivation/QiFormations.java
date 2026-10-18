@@ -42,6 +42,24 @@ public final class QiFormations {
 		return 3;
 	}
 
+	/** Copies of the four cardinal pillar offsets {dx, dz} (formation blueprints, DESIGN 19.8). */
+	public static int[][] cardinalOffsets() {
+		return copy(CARDINAL);
+	}
+
+	/** Copies of the four corner pillar offsets {dx, dz} (formation blueprints, DESIGN 19.8). */
+	public static int[][] cornerOffsets() {
+		return copy(CORNERS);
+	}
+
+	private static int[][] copy(int[][] offsets) {
+		int[][] copy = new int[offsets.length][];
+		for (int i = 0; i < offsets.length; i++) {
+			copy[i] = offsets[i].clone();
+		}
+		return copy;
+	}
+
 	/** XP multiplier of a tier. */
 	public static double multiplier(int tier) {
 		return switch (tier) {

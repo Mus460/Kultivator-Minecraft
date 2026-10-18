@@ -26,9 +26,9 @@ import java.util.List;
 
 /**
  * The cultivation info screen in the "Gulungan Giok" (jade scroll) style (DESIGN 5b, 12): a scroll that unrolls in a
- * quarter second over an ink-blue night with distant mountains, five jade tablets hanging on its left edge as the
+ * quarter second over an ink-blue night with distant mountains, seven jade tablets hanging on its left edge as the
  * tabs, and the tab's pictures and talismans on the parchment. Not a pause screen; the info key or Escape closes it.
- * {@code tab}: 0 Status, 1 Root and Dao, 2 Techniques, 3 Settings, 4 Help.
+ * {@code tab}: 0 Status, 1 Root and Dao, 2 Techniques, 3 Settings, 4 Help, 5 Jalan, 6 Alkimia (DESIGN 19.2.13).
  */
 public class CultivationScreen extends Screen {
 
@@ -37,6 +37,10 @@ public class CultivationScreen extends Screen {
 	public static final int TAB_TECHNIQUES = 2;
 	public static final int TAB_SETTINGS = 3;
 	public static final int TAB_HELP = 4;
+	/** The Jalan tablet (P7-jalan); the server opens it with {@code Payloads.OpenScreen.TAB_JALAN}. */
+	public static final int TAB_JALAN = 5;
+	/** The Kitab Alkimia (P7-harta); the server opens it with {@code Payloads.OpenScreen.TAB_ALKIMIA}. */
+	public static final int TAB_ALKIMIA = 6;
 
 	private static final long UNROLL_MILLIS = 250L;
 	private static final int TABLET_W = 20;
@@ -68,8 +72,18 @@ public class CultivationScreen extends Screen {
 
 	public CultivationScreen(int tab) {
 		super(Component.translatable("kultivator.screen.title"));
-		this.tab = Math.max(TAB_STATUS, Math.min(TAB_HELP, tab));
-		this.pages = new Page[]{new StatusPage(this), new RootDaoPage(this), new TechniquesPage(this), new SettingsPage(this), new HelpPage(this)};
+		this.pages = new Page[]{new StatusPage(this), new RootDaoPage(this), new TechniquesPage(this), new SettingsPage(this), new HelpPage(this),
+				new JalanPage(this), new AlchemyBookPage(this)};
+		this.tab = Math.max(TAB_STATUS, Math.min(pages.length - 1, tab));
+	}
+
+	/** The glyph of a tab's tablet and header seals (the two phase-7 tablets have their own). */
+	private static int glyph(int tab) {
+		return switch (tab) {
+			case TAB_JALAN -> Glyphs.JALAN;
+			case TAB_ALKIMIA -> Glyphs.ALKIMIA;
+			default -> tab;
+		};
 	}
 
 	@Override
@@ -99,7 +113,7 @@ public class CultivationScreen extends Screen {
 		int tabletH = Math.max(24, Math.min(54, (paperBottom - paperTop - 20 - gap * (count - 1)) / count));
 		for (int i = 0; i < count; i++) {
 			int index = i;
-			JadeTablet tablet = new JadeTablet(paperX0 - TABLET_W + 1, top + i * (tabletH + gap), TABLET_W, tabletH, i,
+			JadeTablet tablet = new JadeTablet(paperX0 - TABLET_W + 1, top + i * (tabletH + gap), TABLET_W, tabletH, glyph(i),
 					() -> pages[index].shortName(), () -> tab == index);
 			tablet.onPress(() -> switchTab(index));
 			tablet.tooltip(() -> List.of(pages[index].title(), Component.translatable("kultivator.screen.tab.key", index + 1)));
@@ -238,8 +252,8 @@ public class CultivationScreen extends Screen {
 		Brush.rect(g, right + 4.0F, lineY - 0.5F, contentX + contentW - 8.0F, lineY + 0.5F, Palette.GOLD);
 		Brush.rect(g, left - 3.0F, lineY - 2.0F, left + 1.0F, lineY + 2.0F, Palette.SEAL);
 		Brush.rect(g, right - 1.0F, lineY - 2.0F, right + 3.0F, lineY + 2.0F, Palette.SEAL);
-		Glyphs.tab(g, tab, contentX + 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
-		Glyphs.tab(g, tab, contentX + contentW - 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
+		Glyphs.tab(g, glyph(tab), contentX + 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
+		Glyphs.tab(g, glyph(tab), contentX + contentW - 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
 	}
 
 	// ================================================================== input
@@ -295,7 +309,7 @@ public class CultivationScreen extends Screen {
 			return true;
 		}
 		int number = event.key() - InputConstants.KEY_1;
-		if (number >= 0 && number < pages.length && event.key() <= InputConstants.KEY_5) {
+		if (number >= 0 && number < pages.length && event.key() <= InputConstants.KEY_9) {
 			if (number != tab) {
 				UiSound.tab();
 				switchTab(number);

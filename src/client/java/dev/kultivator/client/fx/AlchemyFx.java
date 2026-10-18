@@ -307,6 +307,10 @@ public final class AlchemyFx {
 	private static void pop(PillGlow glow, RandomSource random) {
 		Vec3 top = glow.origin.add(0.0D, 1.6D, 0.0D);
 		CommonFx.burst(top, glow.qualityRgb, 10 + 4 * glow.quality, 0.8F);
+		if (glow.quality >= PillQuality.HIGH.ordinal()) {
+			// Phase 7 (DESIGN 19.3.7): a High or Perfect pill shows its halo (Nine Star Hegemon Body Art ch. 53).
+			CommonFx.ring(top, glow.qualityRgb, 0.45F + 0.1F * glow.quality, 20);
+		}
 		for (int i = 0; i < EffectQuality.scale(4 + 2 * glow.quality); i++) {
 			CommonFx.add(ParticleTypes.END_ROD, top.x, top.y, top.z, random.nextGaussian() * 0.06D, random.nextGaussian() * 0.06D,
 					random.nextGaussian() * 0.06D);

@@ -115,6 +115,24 @@ public final class KultivatorConfig {
 	/** Nothing is carved within this many blocks of any player's respawn point (0-64). */
 	public int kehancuranHomeSafeRadius = 24;
 
+	// ---- phase 7: Dunia yang Hidup (DESIGN 19.2.10)
+	/** Naturally spawned monsters near a Qi Refining+ player may become elite demonic beasts (DESIGN 19.3.1). */
+	public boolean eliteMonsters = true;
+	/** Multiplies the elite chance (0-5); the 7% cap still applies. */
+	public double eliteChanceScale = 1.0D;
+	/** Spirit stones, herbs, cores and jade slips in built-in structure chests (DESIGN 19.3.13). */
+	public boolean structureLoot = true;
+	/** Ores broken by a Qi Refining+ player sometimes drop spirit stones (DESIGN 19.3.2). */
+	public boolean spiritStoneMining = true;
+	/** Plants broken by a Qi Refining+ player may hold aged spirit herbs (DESIGN 19.3.4). */
+	public boolean herbHarvest = true;
+	/** The First Steps chapters of the Jalan tablet give their rewards (DESIGN 19.3.9). */
+	public boolean guideRewards = true;
+	/** Kewajiban Harian, the player's three daily chores (DESIGN 19.3.9). */
+	public boolean dailyTasks = true;
+	/** Lightning rings telegraph tribulation strikes from Deity Transformation up; off = every strike is a full hit (DESIGN 19.3.8). */
+	public boolean tribulationTelegraph = true;
+
 	public static KultivatorConfig get() {
 		return instance;
 	}
@@ -151,7 +169,7 @@ public final class KultivatorConfig {
 		}
 	}
 
-	/** Keeps every phase-6, 6b and 6c number inside its allowed range (DESIGN 20.2.11, 21.24, 22.18.1). */
+	/** Keeps every phase-6, 6b, 6c and 7 number inside its allowed range (DESIGN 20.2.11, 21.24, 22.18.1, 19.2.10). */
 	private void clamp() {
 		recruitmentIntervalDays = clamp(recruitmentIntervalDays, 1, 15);
 		tournamentIntervalDays = clamp(tournamentIntervalDays, 3, 30);
@@ -178,6 +196,8 @@ public final class KultivatorConfig {
 		techniqueMaxActiveCasts = clamp(techniqueMaxActiveCasts, 16, 128);
 		kehancuranCasterSafeRadius = clamp(kehancuranCasterSafeRadius, 3, 8);
 		kehancuranHomeSafeRadius = clamp(kehancuranHomeSafeRadius, 0, 64);
+		// Phase 7 (DESIGN 19.2.10).
+		eliteChanceScale = clamp(eliteChanceScale, 0.0D, 5.0D, 1.0D);
 	}
 
 	private static int clamp(int value, int min, int max) {

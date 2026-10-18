@@ -216,6 +216,11 @@ public final class TestCommands {
 		dev.kultivator.sect.build.SectBuild.addTestCommands(uji);
 		// Phase 6c (DESIGN 22.16.2): uji teknik ... and uji boneka ... (merges with the teknik literal above).
 		dev.kultivator.technique.spec.run.TechniqueTests.addTestCommands(uji);
+		// Phase 7 (DESIGN 19.2.14, 19.4).
+		dev.kultivator.harta.Harta.addTestCommands(uji);
+		dev.kultivator.elite.EliteMonsters.addTestCommands(uji);
+		dev.kultivator.cultivation.ImmortalPerks.addTestCommands(uji);
+		dev.kultivator.goals.Goals.addTestCommands(uji);
 		root.then(uji);
 	}
 
@@ -359,6 +364,7 @@ public final class TestCommands {
 	private static void restore(ServerPlayer player, Tour tour) {
 		player.setAttached(ModAttachments.CULTIVATION, tour.original.copy());
 		Cultivators.get(player).resetSession();
+		dev.kultivator.Kultivator.writeSessionConfig(Cultivators.get(player));
 		Stats.apply(player);
 		Cultivators.syncNow(player);
 		Msg.chat(player, Component.translatable("kultivator.test.tour.end").withStyle(ChatFormatting.AQUA));
@@ -561,6 +567,14 @@ public final class TestCommands {
 		give(player, box("kultivator.test.kit.books", books));
 		give(player, box("kultivator.test.kit.rare", rare));
 		give(player, box("kultivator.test.kit.materials", materials));
+		// Phase 7 (DESIGN 19.2.14): stones, herbs, cores, talismans, the compass and the new pills, from the modules.
+		List<ItemStack> phase7 = new ArrayList<>();
+		phase7.addAll(dev.kultivator.harta.Harta.kitItems());
+		phase7.addAll(dev.kultivator.talisman.Talismans.kitItems());
+		phase7.removeIf(ItemStack::isEmpty);
+		if (!phase7.isEmpty()) {
+			give(player, box("kultivator.spine7.kit", phase7));
+		}
 		Msg.chat(player, Component.translatable("kultivator.test.kit").withStyle(ChatFormatting.GOLD));
 		return 1;
 	}

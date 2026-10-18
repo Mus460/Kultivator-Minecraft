@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_beast_core",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.king_core.description"
+    },
+    "icon": {
+      "id": "kultivator:beast_core_king"
+    },
+    "title": {
+      "translate": "advancement.kultivator.king_core.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

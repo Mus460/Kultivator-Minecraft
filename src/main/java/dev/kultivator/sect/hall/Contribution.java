@@ -145,6 +145,11 @@ final class Contribution {
 		if (stack.is(Items.ECHO_SHARD)) {
 			return 15.0D;
 		}
+		// Phase 7 (DESIGN 19.1.5): spirit stones, beast cores and aged spirit herbs, graded by P7-harta.
+		double treasure = dev.kultivator.harta.Harta.missionValue(stack);
+		if (treasure > 0.0D) {
+			return treasure;
+		}
 		if (stack.getItem() instanceof PillItem) {
 			return switch (AlchemyComponents.quality(stack)) {
 				case LOW -> 5.0D;
