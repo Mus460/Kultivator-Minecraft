@@ -40,6 +40,8 @@ public final class FxDispatcher {
 			case ELITE -> EliteFx.play(type, fx);
 			case TREASURE -> HartaFx.play(type, fx);
 			case TALISMAN -> TalismanFx.play(type, fx);
+			// Phase 7c (DESIGN 24.13 item 3).
+			case FORMASI -> dev.kultivator.client.formasi.FormasiFx.play(fx);
 		}
 	}
 
@@ -68,6 +70,8 @@ public final class FxDispatcher {
 		// Phase 7: elite auras and telegraphs, talisman glyphs.
 		EliteFx.tick(minecraft);
 		TalismanFx.tick(minecraft);
+		// Phase 7c: formation domes, rings, marks and holograms.
+		dev.kultivator.client.formasi.FormasiFx.tick();
 	}
 
 	private FxDispatcher() {

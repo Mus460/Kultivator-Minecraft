@@ -143,6 +143,7 @@ public final class Surpass {
 		Component name = DisciplePaths.name(entity);
 		if (entity.level() instanceof ServerLevel level) {
 			Fx.send(level, entity.position(), FxType.STAR, PathFxIds.SURPASS, 0, 12.0F);
+			dev.kultivator.epic.EpicHooks.surpass(entity, master, byDuel);
 			DisciplePaths.sound(level, entity.position(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
 			DisciplePaths.sound(level, entity.position(), SoundEvents.BEACON_ACTIVATE, 1.0F, 1.4F);
 			Msg.broadcast(level.getServer(), Component.translatable(DisciplePaths.PREFIX + (byDuel ? "surpass.announce_duel" : "surpass.announce"),
@@ -191,6 +192,7 @@ public final class Surpass {
 		}
 		Bond.add(entity.data(), Bond.RESCUE);
 		Fx.send(level, master.position().add(0.0D, 1.0D, 0.0D), entity.position().add(0.0D, 1.0D, 0.0D), FxType.STAR, PathFxIds.REPAY, taunted, 1.0F);
+		dev.kultivator.epic.EpicHooks.discipleSave(entity, master, dev.kultivator.epic.EpicIds.SAVE_REPAY);
 		DisciplePaths.sound(level, master.position(), SoundEvents.TOTEM_USE, 0.6F, 1.5F);
 		DisciplePaths.sound(level, entity.position(), SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 0.8F);
 		Msg.chat(master, Component.translatable(DisciplePaths.PREFIX + "surpass.repay", DisciplePaths.name(entity)).withStyle(ChatFormatting.GOLD));

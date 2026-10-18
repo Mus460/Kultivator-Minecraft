@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:formation_eye",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.formation_keeper.description"
+    },
+    "icon": {
+      "id": "kultivator:disciple_tablet"
+    },
+    "title": {
+      "translate": "advancement.kultivator.formation_keeper.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

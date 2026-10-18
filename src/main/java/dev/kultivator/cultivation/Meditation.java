@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Meditation (DESIGN 4, reworked in 19.3.5): the player sits cross-legged and gathers qi. Every second it gives
@@ -366,15 +367,86 @@ public final class Meditation {
 	 */
 	public static double gainPerSecond(ServerPlayer player, CultivationData data) {
 		double site = data.siteMultiplier() > 0.0D ? data.siteMultiplier() : 1.0D;
-		double formation = QiFormations.multiplier(data.formationTier());
+		double formation = formationTerm(player, QiFormations.multiplier(data.formationTier()));
 		double density = SpiritVeins.density(player.level(), player.blockPosition());
 		return baseRate(data.rank()) * Math.min(MULTIPLIER_CAP, site * formation * fuelFactor(player)) * Math.max(DENSITY_FLOOR, density)
 				* dev.kultivator.sect.Sects.meditationBonus(player) * (1.0D + SECLUSION_BONUS * seclusionStacks(player));
 	}
 
-	/** Vein drain per second of the player's meditation now (fuel, formation tier and abode factors). */
+	// ================================================================ phase 7c sect formation hooks (DESIGN 24.13 item 8)
+
+	private static final List<ToDoubleFunction<ServerPlayer>> GATHERING = new ArrayList<>();
+	private static final List<ToDoubleFunction<ServerPlayer>> STACK_CAP = new ArrayList<>();
+	private static final List<ToDoubleFunction<ServerPlayer>> DRAIN_FACTOR = new ArrayList<>();
+	/** A sect formation never lowers the vein drain below this share. */
+	public static final double SECT_DRAIN_FLOOR = 0.7D;
+
+	/** A sect gathering factor at the player's seat (product of all providers, 1 = none). */
+	public static void addGatheringProvider(ToDoubleFunction<ServerPlayer> provider) {
+		GATHERING.add(provider);
+	}
+
+	/** The formation stack cap at the player's seat (the lowest provider value wins; no provider = no cap). */
+	public static void addStackCapProvider(ToDoubleFunction<ServerPlayer> provider) {
+		STACK_CAP.add(provider);
+	}
+
+	/** A vein drain factor at the player's seat (the lowest provider value wins, never below {@link #SECT_DRAIN_FLOOR}). */
+	public static void addDrainFactorProvider(ToDoubleFunction<ServerPlayer> provider) {
+		DRAIN_FACTOR.add(provider);
+	}
+
+	/** The sect gathering term G at the player (1 without providers or outside every field). */
+	public static double sectGathering(ServerPlayer player) {
+		double product = 1.0D;
+		for (ToDoubleFunction<ServerPlayer> provider : GATHERING) {
+			double value = provider.applyAsDouble(player);
+			if (Double.isFinite(value) && value > 0.0D) {
+				product *= value;
+			}
+		}
+		return product;
+	}
+
+	/**
+	 * The formation term {@code min(stackCap, seat × G)} (DESIGN 24.5); never below the seat's own multiplier, so the
+	 * personal Qi formations stay exactly as they were without a sect field.
+	 */
+	public static double formationTerm(ServerPlayer player, double seat) {
+		if (GATHERING.isEmpty()) {
+			return seat;
+		}
+		double gathering = sectGathering(player);
+		if (!(gathering > 1.0D)) {
+			return seat;
+		}
+		double cap = Double.MAX_VALUE;
+		for (ToDoubleFunction<ServerPlayer> provider : STACK_CAP) {
+			double value = provider.applyAsDouble(player);
+			if (Double.isFinite(value) && value > 0.0D) {
+				cap = Math.min(cap, value);
+			}
+		}
+		return Math.max(seat, Math.min(cap, seat * gathering));
+	}
+
+	private static double sectDrainFactor(ServerPlayer player) {
+		double best = 1.0D;
+		for (ToDoubleFunction<ServerPlayer> provider : DRAIN_FACTOR) {
+			double value = provider.applyAsDouble(player);
+			if (Double.isFinite(value)) {
+				best = Math.min(best, value);
+			}
+		}
+		return Math.max(SECT_DRAIN_FLOOR, best);
+	}
+
+	/** Vein drain per second of the player's meditation now (fuel, formation tier, abode and sect formation factors). */
 	public static double drainPerSecond(ServerPlayer player, CultivationData data, int tier, boolean abode) {
 		double drain = DRAIN_BASE * (1.0D + DRAIN_PER_REALM * data.realm().ordinal());
+		if (!DRAIN_FACTOR.isEmpty()) {
+			drain *= sectDrainFactor(player);
+		}
 		if (fuelActive(player)) {
 			drain *= DRAIN_FUEL;
 		}
@@ -620,6 +692,14 @@ public final class Meditation {
 				.append(session.tier > 0
 						? QiFormations.name(session.tier).copy().withColor(QiFormations.color(session.tier))
 						: Component.translatable("kultivator.meditation.bar.no_formation").withColor(MUTED));
+		if (!GATHERING.isEmpty()) {
+			// Phase 7c (DESIGN 24.7.4): the sect formation term, when a field lifts it.
+			double sect = sectGathering(player);
+			if (sect > 1.0001D) {
+				line.append(Component.literal(" · ").withColor(MUTED))
+						.append(Component.translatable("kultivator.spine7c.meditation.sect", multiplier(sect)).withColor(VIOLET));
+			}
+		}
 		if (session.stacks > 0) {
 			line.append(Component.literal("  ·  ").withColor(MUTED))
 					.append(Component.translatable("kultivator.kultivasi.seclusion.bar", percentBonus(session.stacks)).withColor(VIOLET));

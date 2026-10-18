@@ -418,6 +418,9 @@ public final class Tournament {
 			return;
 		}
 		run.fighting = true;
+		if (!match.bronze && run.bracket.rounds.get(run.bracket.rounds.size() - 1).size() == 1) {
+			dev.kultivator.epic.EpicHooks.tournament(run.level, dev.kultivator.epic.EpicIds.TOUR_INTRO, run.elite ? dev.kultivator.epic.EpicIds.TOUR_ELITE : dev.kultivator.epic.EpicIds.TOUR_INTERNAL, a, b, run.center);
+		}
 		announce(run, Component.translatable(match.bronze ? "kultivator.sectevent.tourney.bronze_bout" : "kultivator.sectevent.tourney.bout",
 				match.a.name, match.b.name).withStyle(ChatFormatting.YELLOW));
 	}
@@ -576,6 +579,7 @@ public final class Tournament {
 		Bracket.Entrant champion = places[0];
 		if (champion != null) {
 			EventUtil.fx(run.level, run.center, SectEventFxIds.CHAMPION, run.elite ? 1 : 0, 0.0F);
+			dev.kultivator.epic.EpicHooks.tournament(run.level, dev.kultivator.epic.EpicIds.TOUR_WINNER, run.elite ? dev.kultivator.epic.EpicIds.TOUR_ELITE : dev.kultivator.epic.EpicIds.TOUR_INTERNAL, champion.disciple() && champion.soul != null ? EventUtil.bySoul(run.owner, champion.soul) : null, null, run.center);
 			run.level.playSound(null, run.center.x, run.center.y, run.center.z, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.NEUTRAL, 1.0F, 1.0F);
 			announce(run, Component.translatable("kultivator.sectevent.tourney.champion", champion.name,
 					places[1] == null ? Component.literal("-") : places[1].name, places[2] == null ? Component.literal("-") : places[2].name)

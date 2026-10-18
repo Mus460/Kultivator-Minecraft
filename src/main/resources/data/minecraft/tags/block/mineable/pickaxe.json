@@ -1,5 +1,9 @@
 {
   "values": [
-    "kultivator:sect_hall_stele"
+    "kultivator:sect_hall_stele",
+    {
+      "id": "kultivator:formation_eye",
+      "required": false
+    }
   ]
 }

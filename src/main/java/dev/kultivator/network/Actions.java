@@ -73,6 +73,10 @@ public final class Actions {
 	/** The Kitab Teknik and the Cincin Segel ({@code technique.spec.run.Codex.handleAction}). */
 	public static final int TECHNIQUE = 36;
 
+	// Phase 7c (DESIGN 24.7.1, 24.13 item 1): text = "toggle:<id>", "fill:<id>", "keeper:<id>:<entityId>:<order>", "travel:<a>:<b>", ...
+	/** Formasi Sekte: the Formasi tablet, keepers, deposits, holograms, transport ({@code formasi.Formasi.handleAction}). */
+	public static final int FORMASI = 37;
+
 	private Actions() {
 	}
 }

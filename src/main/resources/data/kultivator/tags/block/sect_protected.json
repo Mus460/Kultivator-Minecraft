@@ -25,6 +25,10 @@
     {
       "id": "kultivator:sect_hall_stele",
       "required": false
+    },
+    {
+      "id": "kultivator:formation_eye",
+      "required": false
     }
   ]
 }

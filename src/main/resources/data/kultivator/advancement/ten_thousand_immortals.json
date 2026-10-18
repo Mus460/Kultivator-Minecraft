@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:formation_eye",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.ten_thousand_immortals.description"
+    },
+    "icon": {
+      "id": "minecraft:beacon"
+    },
+    "title": {
+      "translate": "advancement.kultivator.ten_thousand_immortals.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

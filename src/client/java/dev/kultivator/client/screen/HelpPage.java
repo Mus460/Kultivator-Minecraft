@@ -22,7 +22,7 @@ final class HelpPage extends Page {
 			"aula", "bangun", "calon", "jenjang", "kontribusi", "tugas", "misi", "turnamen", "alam_hampa", "bakat", "pusaka", "bintang", "ikatan", "bimbingan",
 			"kehancuran", "teknik", "penguasaan", "kitab_teknik", "kehancuran_diri",
 			"harian", "batu_roh", "tanaman_roh", "inti_binatang", "alkimia_lanjut", "relik", "urat_roh", "jimat", "anugerah", "elit", "unsur",
-			"kejenuhan", "hu_fa_tribulasi"};
+			"kejenuhan", "hu_fa_tribulasi", "momen", "formasi", "formasi_pola"};
 	private static final KeyMapping[] KEYS = {Keys.MEDITATE, Keys.CAST, Keys.PREVIOUS, Keys.NEXT, Keys.FLYING_SWORD, Keys.INFO, Keys.CODEX, Keys.WHEEL,
 			Keys.SEAL_1, Keys.SEAL_2, Keys.SEAL_3, Keys.SEAL_4};
 

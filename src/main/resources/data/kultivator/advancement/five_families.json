@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:formation_eye",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.five_families.description"
+    },
+    "icon": {
+      "id": "minecraft:amethyst_cluster"
+    },
+    "title": {
+      "translate": "advancement.kultivator.five_families.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

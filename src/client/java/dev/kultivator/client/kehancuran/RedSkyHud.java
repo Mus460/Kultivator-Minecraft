@@ -25,6 +25,10 @@ final class RedSkyHud implements HudElement {
 		if (minecraft.player == null || !KehancuranClient.skyActive() || minecraft.gui.hud.isHidden()) {
 			return;
 		}
+		// Phase 7b (DESIGN 23.13 D5): a 7b sky grade replaces the red sky; this stays the fallback with "Langit berubah" off.
+		if (dev.kultivator.client.epic.sky.SkyDirector.coversRedSky()) {
+			return;
+		}
 		int width = g.guiWidth();
 		int height = g.guiHeight();
 		float progress = KehancuranClient.skyProgress();

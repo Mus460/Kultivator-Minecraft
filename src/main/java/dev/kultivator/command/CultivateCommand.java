@@ -134,6 +134,10 @@ public final class CultivateCommand {
 		dev.kultivator.elite.EliteMonsters.addCommands(root, debug);
 		dev.kultivator.cultivation.ImmortalPerks.addCommands(root, debug);
 		dev.kultivator.goals.Goals.addCommands(root, debug);
+		// Phase 7b (DESIGN 23.5.1 item 5): debug momen ...
+		dev.kultivator.epic.EpicCommands.addCommands(root, debug);
+		// Phase 7c (DESIGN 24.10): formasi ... and debug formasi ...
+		dev.kultivator.formasi.Formasi.addCommands(root, debug);
 
 		TestCommands.addCommands(root);
 		root.then(debug);

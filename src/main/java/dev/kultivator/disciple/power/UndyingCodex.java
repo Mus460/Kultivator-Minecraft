@@ -273,6 +273,7 @@ final class UndyingCodex {
 		entity.setHealth(1.0F);
 		entity.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, UNBROKEN_TICKS, 4), entity);
 		PowerCore.fx(level, entity.position(), PowerIds.FX_UNDYING, 0, 0.0F);
+		dev.kultivator.epic.EpicHooks.discipleSave(entity, entity.owner(), dev.kultivator.epic.EpicIds.SAVE_UNDYING_BLOOD);
 		PowerCore.sound(level, entity.position(), SoundEvents.TOTEM_USE, 0.7F, 0.7F);
 		PowerCore.sound(level, entity.position(), SoundEvents.WARDEN_HEARTBEAT, 1.2F, 0.8F);
 		PowerCore.tell(entity, PowerCore.key("codex.unbroken", PowerCore.name(entity)).withStyle(ChatFormatting.RED));

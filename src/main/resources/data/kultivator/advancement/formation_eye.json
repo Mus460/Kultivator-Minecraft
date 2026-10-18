@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:formation_built",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.formation_eye.description"
+    },
+    "icon": {
+      "id": "kultivator:formation_eye"
+    },
+    "title": {
+      "translate": "advancement.kultivator.formation_eye.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

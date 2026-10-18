@@ -224,6 +224,7 @@ public final class Ascension {
 		EVENTS.put(player.getUUID(), new Event(real, level.dimension()));
 		Vec3 pos = player.position();
 		Fx.send(level, pos, FxType.ASCENSION, FX_DARKEN, player.getId(), 0.0F);
+		dev.kultivator.epic.EpicHooks.ascension(player, dev.kultivator.epic.EpicIds.ASC_DARKEN, 0, real);
 		// The world dims around the one being judged (the vanilla Darkness screen effect, a few seconds, no icon).
 		player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 80, 0, false, false, false));
 		sound(level, pos, SoundEvents.BEACON_DEACTIVATE, 2.0F, 0.5F);
@@ -243,6 +244,7 @@ public final class Ascension {
 			return false;
 		}
 		Fx.send(player.level(), player.position(), FxType.ASCENSION, FX_STOP, player.getId(), (float) event.ticks);
+		dev.kultivator.epic.EpicHooks.ascension(player, dev.kultivator.epic.EpicIds.ASC_STOP, event.ticks, event.real);
 		WAIT.put(player.getUUID(), -RETRY_CHECKS);
 		if (messageKey != null) {
 			Msg.chat(player, Component.translatable(messageKey).withStyle(ChatFormatting.GRAY));
@@ -304,6 +306,7 @@ public final class Ascension {
 
 		if (t == PILLAR_AT) {
 			Fx.send(level, pos, FxType.ASCENSION, FX_PILLAR, id, t);
+			dev.kultivator.epic.EpicHooks.ascension(player, dev.kultivator.epic.EpicIds.ASC_PILLAR, t, event.real);
 			sound(level, pos, SoundEvents.BEACON_ACTIVATE, 2.0F, 0.6F);
 			sound(level, pos, SoundEvents.BELL_BLOCK, 2.0F, 0.5F);
 			Msg.chat(player, Component.translatable("kultivator.ascension.pillar").withColor(GOLD));
@@ -314,12 +317,14 @@ public final class Ascension {
 			sound(level, pos, SoundEvents.BEACON_POWER_SELECT, 1.6F, 0.8F);
 		} else if (t == HEAVENS_AT) {
 			Fx.send(level, pos, FxType.ASCENSION, FX_HEAVENS, id, t);
+			dev.kultivator.epic.EpicHooks.ascension(player, dev.kultivator.epic.EpicIds.ASC_HEAVENS, t, event.real);
 			sound(level, pos, SoundEvents.BELL_RESONATE, 2.0F, 1.0F);
 			sound(level, pos, SoundEvents.AMETHYST_BLOCK_CHIME, 1.5F, 1.2F);
 			Msg.chat(player, Component.translatable("kultivator.ascension.heavens").withColor(GOLD));
 			tellNearby(player, Component.translatable("kultivator.ascension.heavens_nearby", player.getDisplayName()).withColor(GOLD));
 		} else if (t == VOICE_AT) {
 			Fx.send(level, pos, FxType.ASCENSION, FX_VOICE, id, t);
+			dev.kultivator.epic.EpicHooks.ascension(player, dev.kultivator.epic.EpicIds.ASC_VOICE, t, event.real);
 			voice(player, level, pos);
 		}
 		if (t > HEAVENS_AT && t % 40 == 0) {
@@ -352,6 +357,7 @@ public final class Ascension {
 		ServerLevel level = player.level();
 		Vec3 pos = player.position();
 		Fx.send(level, pos, FxType.ASCENSION, FX_FINALE, player.getId(), event.real ? 1.0F : 0.0F);
+		dev.kultivator.epic.EpicHooks.ascension(player, dev.kultivator.epic.EpicIds.ASC_FINALE, event.ticks, event.real);
 		sound(level, pos, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1.5F, 1.0F);
 		sound(level, pos, SoundEvents.TOTEM_USE, 1.5F, 1.0F);
 		sound(level, pos, SoundEvents.BELL_RESONATE, 2.0F, 1.2F);

@@ -133,6 +133,36 @@ public final class KultivatorConfig {
 	/** Lightning rings telegraph tribulation strikes from Deity Transformation up; off = every strike is a full hit (DESIGN 19.3.8). */
 	public boolean tribulationTelegraph = true;
 
+	// ---- phase 7b: Momen Epik (DESIGN 23.2)
+	/** Epic-moment cues are sent at all; false keeps today's FX only. */
+	public boolean epicMoments = true;
+	/** Cues may carry the CAMERA_OK flag; false means no client ever directs its camera. */
+	public boolean epicCameraShots = true;
+	/** Send range in blocks of sky-scale scenes (96-512). */
+	public int epicRange = 192;
+
+	// ---- phase 7c: Formasi Sekte (DESIGN 24.13 item 11)
+	/** Sect formations (Mata Formasi cores) run at all; false suspends every 7c core. */
+	public boolean sectFormations = true;
+	/** Killing arrays deal damage; false: they only show their FX. */
+	public boolean formationDamage = true;
+	/** Multiplies all sect formation damage (0-3). */
+	public double sectFormationDamageScale = 1.0D;
+	/** Transport arrays (M3, L5) may be used. */
+	public boolean formationTransport = true;
+	/** Concealment fields hide members' nametags from strangers (cosmetic). */
+	public boolean formationConcealNames = true;
+	/** Formation alarms may use chat; false sends every alarm to the action bar. */
+	public boolean formationAlarmChat = true;
+	/** Registered 7c cores of all owners in one dimension (8-256). */
+	public int formationMaxCores = 64;
+	/** Pattern verification block reads per tick for all cores together (8-64). */
+	public int formationReadsPerTick = 16;
+	/** Average added server milliseconds per tick before the auto-throttle (0.05-1.0). */
+	public double formationBudgetMs = 0.15D;
+	/** MSPT above which killing arrays pulse only every 40 ticks (30-50). */
+	public int formationMsptSlow = 45;
+
 	public static KultivatorConfig get() {
 		return instance;
 	}
@@ -169,7 +199,7 @@ public final class KultivatorConfig {
 		}
 	}
 
-	/** Keeps every phase-6, 6b, 6c and 7 number inside its allowed range (DESIGN 20.2.11, 21.24, 22.18.1, 19.2.10). */
+	/** Keeps every phase-6, 6b, 6c, 7 and 7b number inside its allowed range (DESIGN 20.2.11, 21.24, 22.18.1, 19.2.10, 23.2). */
 	private void clamp() {
 		recruitmentIntervalDays = clamp(recruitmentIntervalDays, 1, 15);
 		tournamentIntervalDays = clamp(tournamentIntervalDays, 3, 30);
@@ -198,6 +228,14 @@ public final class KultivatorConfig {
 		kehancuranHomeSafeRadius = clamp(kehancuranHomeSafeRadius, 0, 64);
 		// Phase 7 (DESIGN 19.2.10).
 		eliteChanceScale = clamp(eliteChanceScale, 0.0D, 5.0D, 1.0D);
+		// Phase 7b (DESIGN 23.2).
+		epicRange = clamp(epicRange, 96, 512);
+		// Phase 7c (DESIGN 24.13 item 11).
+		sectFormationDamageScale = clamp(sectFormationDamageScale, 0.0D, 3.0D, 1.0D);
+		formationMaxCores = clamp(formationMaxCores, 8, 256);
+		formationReadsPerTick = clamp(formationReadsPerTick, 8, 64);
+		formationBudgetMs = clamp(formationBudgetMs, 0.05D, 1.0D, 0.15D);
+		formationMsptSlow = clamp(formationMsptSlow, 30, 50);
 	}
 
 	private static int clamp(int value, int min, int max) {

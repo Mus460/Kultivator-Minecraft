@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The only player {@code ALLOW_DEATH} listener of the mod (DESIGN 22.14.6): asks its guards in a fixed order and stops at
@@ -43,6 +44,14 @@ public final class DeathGuard {
 		boolean preventDeath(ServerPlayer player, DamageSource source, float amount);
 	}
 
+	/** Told after any guard kept a player alive (DESIGN 23.5.1, spine 7b); presentation only. */
+	@FunctionalInterface
+	public interface SavedListener {
+		void onSaved(ServerPlayer p, Stage stage);
+	}
+
+	private static final List<SavedListener> SAVED_LISTENERS = new CopyOnWriteArrayList<>();
+
 	/** The shared lockout of every technique cheat-death source: 10 minutes. */
 	public static final int TECHNIQUE_LOCKOUT_TICKS = 20 * 60 * 10;
 
@@ -57,6 +66,21 @@ public final class DeathGuard {
 
 	public static synchronized void register(Stage stage, Guard guard) {
 		GUARDS.computeIfAbsent(stage, key -> new ArrayList<>()).add(guard);
+	}
+
+	/** Adds a listener told after every prevented death (DESIGN 23.5.1); register from a module's {@code init()}. */
+	public static void addSavedListener(SavedListener listener) {
+		SAVED_LISTENERS.add(listener);
+	}
+
+	private static void fireSaved(ServerPlayer player, Stage stage) {
+		for (SavedListener listener : SAVED_LISTENERS) {
+			try {
+				listener.onSaved(player, stage);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Kultivator death guard saved listener failed", exception);
+			}
+		}
 	}
 
 	/** True while the shared technique cheat-death lockout runs for the player. */
@@ -106,6 +130,7 @@ public final class DeathGuard {
 					if (stage == Stage.TECHNIQUE) {
 						LOCKOUT.put(player.getUUID(), player.level().getGameTime() + TECHNIQUE_LOCKOUT_TICKS);
 					}
+					fireSaved(player, stage);
 					return false;
 				}
 			}

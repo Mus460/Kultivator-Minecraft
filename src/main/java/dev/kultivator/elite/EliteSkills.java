@@ -188,6 +188,13 @@ public final class EliteSkills {
 				iterator.remove();
 				continue;
 			}
+			if (EliteMonsters.suppressed(tracked, tick)) {
+				// Phase 7c: a formation holds its skills (the bar still follows its health).
+				if (data.tier() >= 3) {
+					updateBar(tracked, data, level);
+				}
+				continue;
+			}
 			if (data.affix() == EliteData.RECOVERY && mob.getHealth() < mob.getMaxHealth()) {
 				mob.heal(RECOVERY_PER_PASS);
 			}

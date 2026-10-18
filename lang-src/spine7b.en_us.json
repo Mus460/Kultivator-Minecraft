@@ -1,0 +1,6 @@
+{
+  "kultivator.spine7b.config.epicMoments": "epicMoments: tribulations, breakthroughs and other epic moments get in-game cinematics and huge effects; off keeps only the normal effects.",
+  "kultivator.spine7b.config.epicCameraShots": "epicCameraShots: cinematic camera shots are allowed on each player's own client; off means no client ever moves its camera.",
+  "kultivator.spine7b.config.epicRange": "epicRange (96-512): how far, in blocks, other players see sky-scale epic moments.",
+  "kultivator.spine7b.settings.heading": "Epic Moments"
+}

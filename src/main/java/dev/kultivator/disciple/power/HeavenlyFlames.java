@@ -308,6 +308,7 @@ final class HeavenlyFlames {
 		list.add(IntTag.valueOf(kind));
 		PowerCore.edit(data).put("flames", list);
 		entity.refreshSynced();
+		dev.kultivator.epic.EpicHooks.extra(level, dev.kultivator.epic.EpicIds.EXTRA_FLAME_ABSORBED, master, entity, entity.position(), kind, 0);
 		DisciplePowers.syncPower(entity);
 		PowerCore.fx(level, entity.position(), PowerIds.FX_FLAME_RESULT, kind, 1.0F);
 		PowerCore.sound(level, entity.position(), SoundEvents.BLAZE_SHOOT, 1.0F, 0.4F);

@@ -167,6 +167,8 @@ public final class EliteMonsters {
 		final Mob mob;
 		long nextSkillAt;
 		int skillTurn;
+		/** Server tick until which affix skills stay silent (phase 7c {@link #suppressSkills}). */
+		long suppressedUntil;
 		@Nullable net.minecraft.server.level.ServerBossEvent bar;
 
 		Tracked(Mob mob, long nextSkillAt) {
@@ -495,6 +497,23 @@ public final class EliteMonsters {
 		if (tracked != null && tracked.bar != null) {
 			tracked.bar.removeAllPlayers();
 		}
+	}
+
+	/**
+	 * Phase 7c (DESIGN 24.13 item 8, the L2 river): a loaded elite's affix skills (recovery and actives) do not fire for
+	 * {@code ticks}; a longer suppression already running is kept. Nothing happens for a mob that is not a tracked elite.
+	 */
+	public static void suppressSkills(Mob mob, int ticks) {
+		Tracked tracked = TRACKED.get(mob.getUUID());
+		if (tracked == null || ticks <= 0 || !(mob.level() instanceof ServerLevel level)) {
+			return;
+		}
+		tracked.suppressedUntil = Math.max(tracked.suppressedUntil, level.getServer().getTickCount() + (long) ticks);
+	}
+
+	/** True while {@link #suppressSkills} holds this elite's skills. */
+	static boolean suppressed(Tracked tracked, long tick) {
+		return tick < tracked.suppressedUntil;
 	}
 
 	/** The loaded elites (read-only view for the skill pass and commands). */

@@ -138,6 +138,12 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	 * sits down to meditate there (it works). Session state like the other activities (the flow re-applies it).
 	 */
 	public static final int ACTIVITY_BUILD = 10;
+	/**
+	 * Penjaga Formasi, a sect formation keeper (DESIGN 24.2.8, phase 7c): holds its post beside a Mata Formasi like 1-8,
+	 * may sit to meditate there, and survives a save like the duties and the formation guard (5 cannot be reused: the
+	 * Formasi Agung frees any activity-5 disciple away from its lodestone).
+	 */
+	public static final int ACTIVITY_FORMATION_KEEPER = 11;
 
 	/** {@link Mode#GUARD_HALL} patrols within this many blocks of its hall stele. */
 	public static final double HALL_PATROL_RADIUS = 32.0D;
@@ -425,9 +431,10 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.getNavigation().stop();
 	}
 
-	/** True while an activity 1-8 or 10 (builder) binds the disciple to its spot. */
+	/** True while an activity 1-8, 10 (builder) or 11 (formation keeper) binds the disciple to its spot. */
 	public boolean holdsActivitySpot() {
-		return activity >= ACTIVITY_WATER && activity <= ACTIVITY_SPECTATOR || activity == ACTIVITY_BUILD;
+		return activity >= ACTIVITY_WATER && activity <= ACTIVITY_SPECTATOR || activity == ACTIVITY_BUILD
+				|| activity == ACTIVITY_FORMATION_KEEPER;
 	}
 
 	/** A clone's source disciple (its soul id), or null. */
@@ -1376,8 +1383,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 			// Never written to a chunk (shouldBeSaved); kept so a copy made another way is still refused on load.
 			output.putInt("Role", role.ordinal());
 		}
-		// Lasting assignments (duties, formation guard) survive a restart; tower, spirit body, spectator and duel do not.
-		if (activity >= ACTIVITY_WATER && activity <= ACTIVITY_FORMATION_GUARD && activitySpot != null) {
+		// Lasting assignments (duties, formation guard, formation keeper) survive a restart; tower, spirit body, spectator and duel do not.
+		if ((activity >= ACTIVITY_WATER && activity <= ACTIVITY_FORMATION_GUARD || activity == ACTIVITY_FORMATION_KEEPER) && activitySpot != null) {
 			output.putInt("Activity", activity);
 			output.store("ActivitySpot", BlockPos.CODEC, activitySpot);
 		}
@@ -1409,7 +1416,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.entityData.set(DATA_ROLE, (byte) this.role.ordinal());
 		int savedActivity = input.getIntOr("Activity", 0);
 		BlockPos savedSpot = input.read("ActivitySpot", BlockPos.CODEC).orElse(null);
-		if (savedActivity >= ACTIVITY_WATER && savedActivity <= ACTIVITY_FORMATION_GUARD && savedSpot != null) {
+		if ((savedActivity >= ACTIVITY_WATER && savedActivity <= ACTIVITY_FORMATION_GUARD || savedActivity == ACTIVITY_FORMATION_KEEPER)
+				&& savedSpot != null) {
 			this.activity = savedActivity;
 			this.activitySpot = savedSpot;
 			this.entityData.set(DATA_ACTIVITY, (byte) savedActivity);

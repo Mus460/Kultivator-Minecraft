@@ -60,6 +60,7 @@ public final class FormationBlueprint {
 	private static int tier;
 
 	static void tick(Minecraft minecraft) {
+		if (dev.kultivator.client.formasi.PatternHologram.active()) return;
 		LocalPlayer player = minecraft.player;
 		ClientLevel level = minecraft.level;
 		if (player == null || level == null) {

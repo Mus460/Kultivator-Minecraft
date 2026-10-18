@@ -254,6 +254,22 @@ public interface EngineApi {
 		return false;
 	}
 
+	// ================================================================== phase 7c Titik Formasi (DESIGN 24.6.2, 24.13 item 8)
+
+	/** The owner's built Titik Formasi anchors ({@code formasi_<n>}), empty until P6b-cetak fills this (slip allowed). */
+	default List<FormasiAnchor> formasiAnchors(UUID owner) {
+		return List.of();
+	}
+
+	/**
+	 * Optional: asks the engine to build {@code specId}'s pattern ({@code Pattern.emit(rot)}) at anchor {@code anchorId} as
+	 * a {@code FORMASI_PATTERN} component, inside the confirmed footprint only and placed inactive. Null when queued, else
+	 * why not (the default: unavailable).
+	 */
+	default @Nullable Component requestPattern(UUID owner, String anchorId, String specId, int rot) {
+		return Component.translatable(UNAVAILABLE_KEY);
+	}
+
 	// ================================================================== registration
 
 	/** The registered engine, or the safe defaults. */

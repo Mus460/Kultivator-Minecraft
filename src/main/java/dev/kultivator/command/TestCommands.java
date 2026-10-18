@@ -221,6 +221,10 @@ public final class TestCommands {
 		dev.kultivator.elite.EliteMonsters.addTestCommands(uji);
 		dev.kultivator.cultivation.ImmortalPerks.addTestCommands(uji);
 		dev.kultivator.goals.Goals.addTestCommands(uji);
+		// Phase 7b (DESIGN 23.15.1): uji momen ...
+		dev.kultivator.epic.EpicCommands.addTestCommands(uji);
+		// Phase 7c (DESIGN 24.10): uji formasi ...
+		dev.kultivator.formasi.Formasi.addTestCommands(uji);
 		root.then(uji);
 	}
 
@@ -574,6 +578,12 @@ public final class TestCommands {
 		phase7.removeIf(ItemStack::isEmpty);
 		if (!phase7.isEmpty()) {
 			give(player, box("kultivator.spine7.kit", phase7));
+		}
+		// Phase 7c (DESIGN 24.10): eyes, heart blocks and fuel, items only.
+		List<ItemStack> phase7c = new ArrayList<>(dev.kultivator.formasi.Formasi.kitItems());
+		phase7c.removeIf(ItemStack::isEmpty);
+		if (!phase7c.isEmpty()) {
+			give(player, box("kultivator.spine7c.kit", phase7c));
 		}
 		Msg.chat(player, Component.translatable("kultivator.test.kit").withStyle(ChatFormatting.GOLD));
 		return 1;

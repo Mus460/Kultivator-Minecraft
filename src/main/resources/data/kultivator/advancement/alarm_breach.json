@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:formation_eye",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.alarm_breach.description"
+    },
+    "icon": {
+      "id": "minecraft:bell"
+    },
+    "title": {
+      "translate": "advancement.kultivator.alarm_breach.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

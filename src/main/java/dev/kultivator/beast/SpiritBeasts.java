@@ -390,6 +390,9 @@ public final class SpiritBeasts {
 		}
 		int color = tierColor(after.kind(), after.tier());
 		Fx.send(level, beast.position(), FxType.BEAST_EVOLVE, after.tier(), beast.getId(), after.kind());
+		if (after.tier() >= BeastData.MAX_TIER && before.tier() < BeastData.MAX_TIER) {
+			dev.kultivator.epic.EpicHooks.extra(level, dev.kultivator.epic.EpicIds.EXTRA_BEAST_TIER3, owner, beast, beast.position(), after.kind(), after.tier());
+		}
 		double x = beast.getX();
 		double y = beast.getY();
 		double z = beast.getZ();

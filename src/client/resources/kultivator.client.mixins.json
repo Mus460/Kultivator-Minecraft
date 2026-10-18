@@ -6,7 +6,13 @@
     "AvatarRendererMixin",
     "PlayerModelMixin",
     "GameRendererShakeMixin",
-    "MouseHandlerMixin"
+    "MouseHandlerMixin",
+    "CameraCinematicMixin",
+    "GameRendererCinematicMixin",
+    "MouseCinematicMixin",
+    "EnvironmentProbeMixin",
+    "HudTitleMixin",
+    "AvatarNameMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -247,6 +247,65 @@ public final class Payloads {
 		}
 	}
 
+	/**
+	 * One beat of an epic moment (DESIGN 23.4.1): {@code moment} and {@code beat} from {@code epic.EpicIds};
+	 * {@code subject} the entity id the scene centres on (−1 for a place) and {@code viewer} the entity id of the only
+	 * player who may get camera shots, bars, FULL cards and music (−1 for none). Clients always position from
+	 * {@code x,y,z}. {@code at} is the server game time the beat lands, {@code seed} builds the same shapes everywhere,
+	 * {@code a}, {@code b}, {@code f} are beat specific, {@code s} the scene scale 0-10, {@code flags} the
+	 * {@code EpicIds.FLAG_*} bits. Unknown moments or beats are ignored by the client.
+	 */
+	public record EpicMoment(int moment, int beat, int subject, int viewer, double x, double y, double z, long at, int seed,
+			int a, int b, float f, int s, int flags) implements CustomPacketPayload {
+		public static final Type<EpicMoment> TYPE = typeOf("epic_moment");
+		public static final StreamCodec<RegistryFriendlyByteBuf, EpicMoment> CODEC = StreamCodec.of(
+				(buf, p) -> {
+					buf.writeVarInt(p.moment);
+					buf.writeByte(p.beat);
+					buf.writeVarInt(p.subject + 1);
+					buf.writeVarInt(p.viewer + 1);
+					buf.writeDouble(p.x);
+					buf.writeDouble(p.y);
+					buf.writeDouble(p.z);
+					buf.writeVarLong(p.at);
+					buf.writeInt(p.seed);
+					buf.writeVarInt(p.a);
+					buf.writeVarInt(p.b);
+					buf.writeFloat(p.f);
+					buf.writeByte(p.s);
+					buf.writeVarInt(p.flags);
+				},
+				buf -> new EpicMoment(buf.readVarInt(), buf.readUnsignedByte(), buf.readVarInt() - 1, buf.readVarInt() - 1,
+						buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readVarLong(), buf.readInt(), buf.readVarInt(),
+						buf.readVarInt(), buf.readFloat(), buf.readUnsignedByte(), buf.readVarInt()));
+
+		public boolean has(int flag) {
+			return (flags & flag) != 0;
+		}
+
+		@Override
+		public Type<EpicMoment> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * The sect formations near one player (DESIGN 24.12): {@code cores [{id, net, x, y, z, rot, r, st, mem, ext}]} within 96
+	 * blocks of the same dimension and {@code conceal [entityId...]}. Sent only on change, at most once per second; read by
+	 * {@code client.formasi.FormasiClient.onSync}.
+	 */
+	public record FormasiSync(CompoundTag data) implements CustomPacketPayload {
+		public static final Type<FormasiSync> TYPE = typeOf("formasi_sync");
+		public static final StreamCodec<RegistryFriendlyByteBuf, FormasiSync> CODEC = StreamCodec.of(
+				(buf, p) -> ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, p.data),
+				buf -> new FormasiSync(ByteBufCodecs.TRUSTED_COMPOUND_TAG.decode(buf)));
+
+		@Override
+		public Type<FormasiSync> type() {
+			return TYPE;
+		}
+	}
+
 	// ================================================================ client -> server
 
 	/** A key press or screen button: {@code action} from {@link Actions}, plus an int and a short text argument. */

@@ -438,6 +438,7 @@ public final class Candidates {
 			spawnView(owner, rec, level, stele, true);
 		}
 		bells(level, stele);
+		dev.kultivator.epic.EpicHooks.recruit(level, owner, dev.kultivator.epic.EpicIds.RECRUIT_ARRIVAL, Vec3.atBottomCenterOf(stele), n, 0);
 		Component line = Component.translatable("kultivator.hall.cand.arrived", n);
 		Halls.log(owner, line);
 		if (master != null) {
@@ -473,6 +474,7 @@ public final class Candidates {
 			spawnView(owner, rec, level, stele, true, true);
 		}
 		bells(level, stele);
+		dev.kultivator.epic.EpicHooks.recruit(level, owner, dev.kultivator.epic.EpicIds.RECRUIT_ARRIVAL, Vec3.atBottomCenterOf(stele), WAR_CANDIDATES, 1);
 		Component line = Component.translatable("kultivator.hall.cand.war_arrived", WAR_CANDIDATES);
 		Halls.log(owner, line);
 		if (master != null) {
@@ -825,6 +827,7 @@ public final class Candidates {
 			ServerLevel level = test.level;
 			if (t == 0L) {
 				Fx.send(level, at, FxType.HALL, HallFxIds.TEST_TIERS, test.tiers, 3.0F);
+				dev.kultivator.epic.EpicHooks.recruit(level, test.owner, dev.kultivator.epic.EpicIds.RECRUIT_TEST, Vec3.atBottomCenterOf(test.stele), dev.kultivator.epic.EpicIds.packRecruitTest(test.duan, test.colour, 0), test.tiers);
 			}
 			if (t > 0L && t <= TIER_TICKS && t % 20L == 0L) {
 				int tier = (int) (t / 20L);
@@ -1038,6 +1041,7 @@ public final class Candidates {
 		if (entity.level() instanceof ServerLevel level) {
 			Vec3 at = entity.position();
 			Fx.send(level, at, FxType.HALL, HallFxIds.RECRUIT, data.rootColor(), 2.5F);
+			dev.kultivator.epic.EpicHooks.recruit(level, owner, dev.kultivator.epic.EpicIds.RECRUIT_ACCEPT, at, data.rootColor(), entity.getId());
 			level.playSound(null, at.x, at.y, at.z, SoundEvents.BELL_BLOCK, SoundSource.NEUTRAL, 0.8F, 1.3F);
 		}
 		Component name = entity.getDisplayName();

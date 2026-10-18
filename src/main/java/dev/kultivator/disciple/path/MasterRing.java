@@ -200,6 +200,7 @@ public final class MasterRing {
 			DisciplePaths.child(DisciplePaths.section(data), "ring").putInt("stage", 1);
 			DisciplePaths.child(DisciplePaths.section(data), "ring").putBoolean("told", false);
 			Fx.send(level, entity.position(), FxType.STAR, PathFxIds.RING_GHOST, 1, 1.0F);
+			dev.kultivator.epic.EpicHooks.extra(level, dev.kultivator.epic.EpicIds.EXTRA_RING_BOND, master, entity, entity.position(), 0, 0);
 			DisciplePaths.sound(level, entity.position(), SoundEvents.BELL_RESONATE, 1.0F, 0.6F);
 			DisciplePaths.syncPower(entity);
 		}
@@ -225,6 +226,7 @@ public final class MasterRing {
 		entity.setHealth(1.0F);
 		entity.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, PROTECT_TICKS, 3));
 		Fx.send(level, entity.position(), FxType.STAR, PathFxIds.RING_GHOST, 2, 1.0F);
+		dev.kultivator.epic.EpicHooks.discipleSave(entity, entity.owner(), dev.kultivator.epic.EpicIds.SAVE_SOUL_SHIELD);
 		DisciplePaths.sound(level, entity.position(), SoundEvents.TOTEM_USE, 0.8F, 1.3F);
 		ServerPlayer master = entity.owner();
 		if (master != null) {
@@ -280,6 +282,7 @@ public final class MasterRing {
 		DESCENTS.put(entity.soulId(), new Descent(entity, master.getUUID(), now + DESCEND_TICKS, new int[]{0}));
 		int color = Cultivators.get(master).realm().color();
 		Fx.send(level, entity.position(), FxType.STAR, PathFxIds.DESCEND, color, DESCEND_TICKS / 20.0F);
+		dev.kultivator.epic.EpicHooks.extra(level, dev.kultivator.epic.EpicIds.EXTRA_MASTER_DESCENDS, master, entity, entity.position(), color, 0);
 		DisciplePaths.sound(level, entity.position(), SoundEvents.BEACON_ACTIVATE, 1.0F, 0.7F);
 		DisciplePaths.sound(level, entity.position(), SoundEvents.BELL_RESONATE, 1.0F, 0.5F);
 		LivingEntity target = entity.getTarget();

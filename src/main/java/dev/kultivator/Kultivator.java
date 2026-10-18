@@ -116,6 +116,11 @@ public class Kultivator implements ModInitializer {
 		dev.kultivator.talisman.Talismans.init();
 		dev.kultivator.cultivation.ImmortalPerks.init();
 		dev.kultivator.goals.Goals.init();
+		// Phase 7b: Momen Epik (DESIGN 23.5.1 item 5); listeners only, no items.
+		dev.kultivator.epic.EpicHooks.init();
+		// Phase 7c: Formasi Sekte (DESIGN 24.13 item 4). Registers the eye block, builds and freezes the formation registry
+		// (it calls FormasiB.init itself) on both physical sides.
+		dev.kultivator.formasi.Formasi.init();
 		// After every module registered its items.
 		ModItems.init();
 		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its

@@ -46,6 +46,10 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.elite.EliteClient.init();
 		dev.kultivator.client.talisman.TalismanClient.init();
 		dev.kultivator.client.goals.GoalsClient.init();
+		// Phase 7b Momen Epik (DESIGN 23.5.1 item 5).
+		dev.kultivator.client.epic.EpicClient.init();
+		// Phase 7c Formasi Sekte (DESIGN 24.13 item 5).
+		dev.kultivator.client.formasi.FormasiClient.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));
@@ -58,6 +62,9 @@ public class KultivatorClient implements ClientModInitializer {
 				dev.kultivator.client.sectbuild.BuildClient.onPreview(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.TechFx.TYPE, (payload, context) ->
 				dev.kultivator.client.fx.spec.SpecFx.play(payload));
+		ClientPlayNetworking.registerGlobalReceiver(Payloads.EpicMoment.TYPE, dev.kultivator.client.epic.EpicClient::onPayload);
+		ClientPlayNetworking.registerGlobalReceiver(Payloads.FormasiSync.TYPE, (payload, context) ->
+				dev.kultivator.client.formasi.FormasiClient.onSync(payload.data()));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.OpenScreen.TYPE, (payload, context) -> {
 			if (payload.screen() == Payloads.OpenScreen.INFO) {
 				context.client().gui.setScreen(new CultivationScreen(payload.arg()));

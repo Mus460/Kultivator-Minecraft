@@ -56,6 +56,8 @@ bulat di dalam game.
 19. [Murid](#19-murid)
 20. [Aula Sekte](#20-aula-sekte)
     * 20b. [Pembangunan Sekte (9 templat × 9 tingkat)](#20b-pembangunan-sekte)
+    * 20c. [Formasi Sekte (24 formasi, Mata Formasi, Kas Daya)](#20c-formasi-sekte)
+      20c.0 [Mulai cepat](#20c0-mulai-cepat) · 20c.9 [Bahan tiap formasi](#20c9-bahan-tiap-formasi-nama-blok-inggris)
 21. [Hari Penerimaan Murid](#21-hari-penerimaan-murid)
 22. [Alam jiwa, Bakat, dan Fisik Langka](#22-alam-jiwa-bakat-dan-fisik-langka)
 23. [Jenjang Sekte dan Poin Kontribusi](#23-jenjang-sekte-dan-poin-kontribusi)
@@ -90,6 +92,7 @@ bulat di dalam game.
 51. [Pencapaian](#51-pencapaian)
 52. [Berkas konfigurasi](#52-berkas-konfigurasi)
 53. [Janji keamanan blok](#53-janji-keamanan-blok)
+54. [**Momen Epik (Fase 7b)**](#54-momen-epik-fase-7b): kamera sinematik, kartu judul, langit, `/sinematik`, `uji momen`
 
 ---
 
@@ -3483,6 +3486,554 @@ tidak mencair. Pameran dan tapak uji tidak pernah mengosongkan wadah dan memulih
 
 ---
 
+## 20c. Formasi Sekte
+
+Fase 7c menambahkan **24 formasi sekte** dalam 13 aliran dan 5 tingkat. Semuanya berpusat pada satu balok baru, **Mata
+Formasi**, dan pola yang kamu bangun sendiri di sekelilingnya. Tiga formasi pengumpul Qi pribadi, Formasi Pelindung, dan
+Formasi Agung Sekte **tidak berubah**; mereka menjadi anak tangga paling bawah dan tampil di Kitab Formasi sebagai
+rujukan.
+
+> **Belum diuji di game.** Fase 7c baru dikompilasi (build berhasil). Daftar uji: [docs/uji/FASE-7c.md](uji/FASE-7c.md).
+
+### 20c.0 Mulai cepat
+
+1. Buat **Mata Formasi** (*Formation Eye*): `A S A / G L G / A S A` dengan A = Serpihan Kecubung (*Amethyst Shard*),
+   S = Batu Roh Rendah, G = Batangan Emas (*Gold Ingot*), L = Batu Magnet (*Lodestone*).
+2. Pasang di dalam wilayah aulamu. Untuk formasi pertama pakai **K2 Pengumpul Roh Kecil**: taruh Balok Kecubung
+   (*Block of Amethyst*) tepat di bawah Mata Formasi, lalu `/kultivasi formasi pola small_spirit_gathering`.
+3. Ikuti hologram: kubus emas = blok yang kurang, silang merah = blok salah, hijau = benar. Bahan semua formasi ada di
+   [20c.9](#20c9-bahan-tiap-formasi-nama-blok-inggris).
+4. **Jongkok + klik kanan** Mata Formasi sambil memegang Serpihan Kecubung atau Batu Roh: Pengenalan Darah. Bila lengkap,
+   formasi terdaftar dan menyala.
+5. Isi Daya: `/kultivasi formasi setor semua`, lalu `/kultivasi formasi isi`. Lihat semuanya di tablet **Formasi**
+   (glif 陣) di gulungan aula, atau `/kultivasi formasi`.
+6. Tugaskan murid sebagai penjaga: suruh murid **Tinggal** dalam 3 blok dari Mata Formasi, atau
+   `/kultivasi formasi penjaga <nama> jaga`.
+
+Mau mencoba tanpa membangun? `/kultivasi uji formasi pasang <id>` membuat inti uji di kakimu (tanpa blok, tanpa
+menyimpan apa pun), dan `/kultivasi uji formasi semua` memasang satu inti uji tiap aliran.
+
+### 20c.1 Kerangka formasi (modul A)
+
+#### Mata Formasi
+
+* **Resep:** `A S A / G L G / A S A`. A = Serpihan Batu Kecubung, S = Batu Roh Rendah, G = batangan emas, L = Batu
+  Magnet.
+* Kekerasan 3,5 (beliung apa pun), tahan ledakan, tidak bisa didorong piston, bercahaya 5, menjatuhkan dirinya sendiri.
+  Kehancuran tidak mengukirnya dan Pembangunan Sekte tidak membongkarnya.
+* **Balok jantung:** setiap pola punya balok jantung bertema tepat **di bawah** Mata Formasi (atau **di atas**-nya bila
+  kartunya bilang begitu). Hanya Mata Formasi yang memulai pemeriksaan, jadi balok emas, besi, atau magma biasa tidak
+  pernah memicu formasi.
+* **Sumber:** *The Mirror Legacy* bab 34 "Misty Maze Formation": panji keenam memperlihatkan mata formasi seukuran
+  telapak tangan, dan para saudara meneteskan darah agar formasi mengenali mereka. Dari sinilah **Pengenalan Darah**
+  (pendaftaran).
+
+#### Membangun dan mendaftarkan
+
+1. Letakkan Mata Formasi di dalam wilayah aulamu (formasi pribadi di luar wilayah: lihat di bawah).
+2. Tampilkan pola dengan `/kultivasi formasi pola <id> [utara|timur|selatan|barat] [menit]`. Hologram baca-saja muncul
+   lapis demi lapis di mata formasi yang kamu lihat (atau di depanmu). `pola mati` menyembunyikannya. Pola hologram
+   terakhir di sebuah mata formasi juga menjadi **pola tujuannya**.
+3. Bangun polanya. Utara adalah baris atas; pola boleh diputar ke 4 arah kecuali yang bertanda **TETAP** (L1, dan di
+   katalog B: M1, B2, A1), yang harus menghadap utara sejati.
+4. **Jongkok + gunakan** Mata Formasi dengan Serpihan Batu Kecubung atau Batu Roh: **Pengenalan Darah**. Bila polanya
+   lengkap, formasi terdaftar atas namamu, barang itu menjadi Daya pertamanya, dan formasi menyala bila slotnya ada.
+5. Bila belum lengkap, obrolan merangkum yang kurang ("kurang 5 — Balok Kecubung ×3, Tongkat End ×2") dan posisinya
+   ditandai selama 30 detik: silang merah = balok salah, kubus emas berdenyut = slot kosong. Tidak ada yang dipakai.
+6. Dengan tangan kosong, jongkok + gunakan hanya memberi laporan pemeriksaan (formasi belum terdaftar) atau
+   menyalakan/mematikan formasimu (Daya tetap tersimpan).
+
+Pemeriksaan membaca paling banyak 2.048 blok per klik dengan jeda 1 detik. Bila terlalu banyak kemungkinan, pilih
+polanya dengan `/kultivasi formasi tuju <id>`. Pola yang lebih tinggi menang: mata formasi K3 yang diperbesar menjadi
+B7, dan seterusnya. Pola lengkap yang butuh aula lebih tinggi menulis "Pola Bumi lengkap — butuh Aula Tingkat 5".
+
+#### Tingkat, slot, dan batas
+
+| Tingkat | Aula ≥ | Ranah penjaga ≥ | Penjaga | Bahan bakar | Biaya Daya/jam | Isi penuh (48 jam) |
+|---|---|---|---|---|---|---|
+| **Kuning** | 1 | Pemurnian Qi | 1 | kecubung atau Batu Roh | 3 | 144 |
+| **Misterius** | 3 | Pembangunan Fondasi | 1 | kecubung atau Batu Roh | 6 | 288 |
+| **Bumi** | 5 | Inti Emas | 1 | hanya Batu Roh | 12 | 576 |
+| **Langit** | 7 | Jiwa Baru Lahir | 2 (kedua Murid Dalam+) | hanya Batu Roh | 18 | 864 |
+| **Abadi** | 9 | Transformasi Dewa | 2 (Murid Inti+) | hanya Batu Roh | 24 | 1.152 |
+
+* **Slot aktif:** Aula 1–2: 2, 3–4: 3, 5–6: 4, 7–8: 5, 9: 6. Formasi Pelindung, Formasi Agung, dan kursi Qi pribadi
+  gratis. Satu jaringan perpindahan setingkat memakai satu slot. Bila penuh: "Slot aktif penuh 5/5 — matikan formasi
+  lain".
+* **Batas terdaftar:** `2 + Tingkat Aula` inti sekte (simpul perpindahan tidak dihitung), formasi Pembunuh
+  `1 + Tingkat/3`, aliran lain 2, tiap formasi Abadi 1, dan `formationMaxCores` (bawaan 64) untuk semua pemilik dalam
+  satu dimensi. Formasi di atas batas **Tertahan**, tidak pernah dihapus.
+* **Wilayah:** mata formasi sekte harus berada di dalam wilayah aulamu. Bila aula tertidur atau pindah, formasi di luar
+  wilayah baru **Tertahan** dengan Dayanya tetap utuh.
+* **Formasi pribadi:** di luar semua wilayah hanya jenis bertanda pribadi (K1, K2, K4, M4), paling banyak 2, tingkat
+  Kuning dan Misterius, dan gerbang aulanya dihitung Tingkat 3.
+
+#### Keadaan inti
+
+| Keadaan | Artinya | Bekerja | Biaya |
+|---|---|---|---|
+| **Tertidur** | dimatikan atau belum pernah dibangunkan | tidak | tidak |
+| **Rusak** | menyala, tapi ada blok pola yang hilang | tidak (kecuali "Retak" di bawah Panji Larangan) | tidak |
+| **Tertahan** | lengkap tapi terhalang (aula tertidur atau terlalu rendah, slot penuh, batas, di luar wilayah, konfigurasi mati, syarat formasi lain) | tidak, alasannya ditampilkan | tidak |
+| **Aktif · tanpa daya** | lengkap dan diizinkan, tapi Daya 0 | tidak; menarik dari Kas tiap 60 detik | tidak |
+| **Berdaya** | Daya > 0 | ya | penuh, atau ×0,25 saat **siaga** |
+| **Dijaga** | Berdaya dengan penjaga di posnya | ya | × faktor penjaga |
+
+**Siaga** berarti formasi sedang tidak ada kerjaan (misalnya tidak ada yang bermeditasi di formasi pengumpul); biayanya
+turun menjadi ×0,25. Formasi peringatan dan penyembunyi selalu membayar penuh.
+
+#### Daya dan Kas Daya Formasi
+
+| Barang | Daya | Kolam |
+|---|---|---|
+| Serpihan Batu Kecubung | 1 | kecubung |
+| Balok Kecubung | 4 | kecubung |
+| Batu Roh Rendah | 2 | batu |
+| Batu Roh Menengah | 18 | batu |
+| Batu Roh Tinggi | 144 | batu |
+| Batu Roh Agung | 1.296 | batu |
+
+* Setiap inti menampung Daya untuk 48 jam. Sebuah barang dipakai bila setidaknya separuh nilainya muat; sisanya masuk
+  ke **Kas** dan tidak pernah hilang. Tingkat Bumi ke atas hanya menerima Batu Roh.
+* **Kas Daya Formasi:** dua kolam per pemilik, kecubung (maks. 2.000) dan batu (maks. 50.000). Setor dengan
+  `/kultivasi formasi setor [semua]`, jimat **Setor dari tas** di tablet, atau jongkok + gunakan inti yang sudah penuh.
+  Setoran rekan sekte dicatat sebagai sumbangan.
+* **Tarik otomatis:** tiap 60 detik, inti yang tinggal kurang dari 2 jam menarik hingga 12 jam dari Kas. Isi manual:
+  `/kultivasi formasi isi [jam]` atau `isi semua`.
+* Daya **tidak pernah** bisa diambil kembali sebagai barang.
+* **Biaya per jam** × urat roh di mata formasi (Agung 0,70 · Kaya 0,85 · Normal 1,00 · Tipis 1,25) × penjaga × siaga ×
+  panji (1,10 untuk sasaran Panji Larangan). Inti di chunk yang tidak termuat tidur gratis.
+
+#### Penjaga Formasi
+
+* Murid milikmu sendiri (peran murid, termuat), ranahnya memenuhi tabel tingkat, tidak sedang menerobos, bertugas, atau
+  memegang pos lain. Tugaskan dari panel Inti di tablet, dengan `/kultivasi formasi penjaga <nama> [jaga|perkuat|waspada]`
+  sambil melihat mata formasi, atau otomatis saat kamu menyuruh murid **Tinggal** dalam 3 blok dari formasi yang menyala.
+  `penjaga lepas` membebaskan semuanya.
+* **Jaga:** Kuning dan Misterius **tanpa biaya**; Bumi ke atas biaya ×0,5 (penjaga Jaga kedua ×0,75 lagi, paling rendah
+  ×0,25). Berdiri di posnya dan hanya melawan bila dipukul.
+* **Perkuat:** P +0,05 per ranah di atas ranah penjaga tingkat itu (semua penjaga bersama paling banyak +0,25); ia
+  bermeditasi dan XP meditasinya sendiri ×0,5 selama berjaga.
+* **Waspada:** biaya ×0,9, cincin peringatan +8, dan ia melawan penyusup **di dalam radius** formasi lalu kembali ke
+  posnya.
+* **Afinitas:** P +0,10 bila Dao atau unsur akar murid cocok dengan aliran (Pengumpul/Pemulihan: Kehidupan/Kayu,
+  Penempaan: Api, Penangkal: Petir atau Logam, Pelindung: Tubuh/Tanah, Penguat: siapa pun).
+* **Daya Tembus:** penjaga Murid Dalam ke atas menaikkan tingkat efektif formasi satu langkah melawan monster elit.
+* Penjaga tidak mengurangi sambaran kesengsaraanmu sendiri (aturan Hu Fa tetap).
+
+#### Kekuatan P dan aturan tumpuk
+
+* `P = min(1,5; 1 + Q + K + F + A)`: Q mutu batu (Menengah 0,05 · Tinggi 0,10 · Agung 0,15), K penjaga Perkuat (≤ 0,25),
+  F afinitas (0,10), A penguat (≤ 0,40: Panji Larangan +0,25, A1 +0,15, A2 +0,03 × N). Aliran pendukung (Pengumpul,
+  Pemulihan, Penempaan) paling tinggi 1,3 dan tidak memakai A.
+* **Meditasi:** faktor sekte paling tinggi ×1,5; seluruh suku formasi paling tinggi ×2,6 (×2,8 dengan A1 lengkap), tetap
+  di dalam batas ×5 meditasi. Pengurasan urat paling rendah ×0,7.
+* **Pemulihan:** Regenerasi pemain paling tinggi II; pemulihan qi ≤ ×1,39; waktu penyimpangan ≤ ×1,33.
+* **Penempaan:** keberhasilan alkimia ≤ +0,10, mutu ≤ +1 langkah, waktu ≥ ×0,7, jimat ≤ +0,065.
+* **Kesengsaraan:** semua formasi bersama tidak pernah di bawah ×0,70 (termasuk Formasi Pelindung ×0,85); lantai
+  keseluruhan ×0,5 tetap.
+* **Lapis perisai** yang tampil paling banyak 6.
+* K2 dan B5 tidak bertumpuk (yang lebih kuat dihitung); M5 mengalikan.
+
+#### Janji keamanan
+
+* Formasi **hanya membaca blok**. Tidak ada yang memasang, merusak, atau mengubah blok, termasuk Mata Formasi sendiri
+  (cahayanya hanyalah efek di komputermu). Tidak pernah petir sungguhan, ledakan, api balok, atau perubahan cuaca/waktu.
+* Kerusakan, kendali, dan ilusi hanya mengenai **monster yang bermusuhan**. Pemain, hewan peliharaan, binatang roh,
+  penduduk desa, murid, iblis hati, dan Pelindung Dao tidak pernah tersentuh.
+* Formasi **melindungi, bukan untuk bertani**: monster yang dibunuh formasi tidak memberi XP kultivasi, inti binatang,
+  Batu Roh, ketenaran, atau penguasaan, walaupun pemain sempat memukulnya.
+* Menyembunyikan papan nama anggota dari orang asing hanyalah tampilan.
+
+### 20c.2 Katalog A: Pelindung, Pengumpul, Pemulihan, Penempaan, Penangkal, Penguat
+
+Angka efek ditulis pada P = 1. Diagram dilihat dari atas, utara di atas, `@` = Mata Formasi, `.` = bebas.
+
+#### L1 · Perisai Larangan Lima Lapis (Langit, Aula 7, TETAP)
+
+Lima puncak unsur (masing-masing 4 balok badan + lampu di puncak) mengelilingi mata formasi; Balok Berlian di bawahnya.
+
+```
+. . . . . . . . . . a . . . . . . . . . .     a (0,−10) Air: Batu Hitam Poles + Lentera Laut
+                                               k (10,−3) Kayu: Balok Bambu + Verdant Froglight
+l . . . . . . . . . . . . . . . . . . . k     p (6,8)   Api: sinabar / Bata Nether Merah + Shroomlight
+                                               t (−6,8)  Tanah: Batu Pasir Halus + Ochre Froglight
+. . . . . . . . . . @ . . . . . . . . . .     l (−10,−3) Logam: Balok Besi + Pearlescent Froglight
+
+. . . . t . . . . . . . . . . . p . . . .
+```
+
+* Syarat: Formasi Agung Sekte aktif, mata formasi dalam 32 blok dari prasasti. Radius `min(48, wilayah)`.
+* **Lapis 5 (selalu):** proyektil yang ditembakkan monster lenyap dengan riak saat menembus cangkang ke dalam.
+* **Lapis 6 (penjaga Jiwa Baru Lahir atau A1 lengkap):** penyusup terkena Kelemahan I, creeper ditahan dan tidak pernah
+  meledak di dalam.
+* Batu Magnet Formasi Agung tidak memakai kecubung selama L1 menyala.
+* Sumber: *I Shall Seal the Heavens* Buku 5 bab 735 "War!"; *A Record of a Mortal's Journey to Immortality* bab 346;
+  *A Will Eternal* bab 877.
+
+#### K2 · Formasi Pengumpul Roh Kecil (Kuning, Aula 1, pribadi boleh)
+
+```
+A . . . Q . . . A      A = Balok Kecubung + ujung di atasnya (gugus, tunas besar, Tongkat End, lentera, lilin)
+. . . . . . . . .      Q = Pilar Kuarsa
+Q . . . @ . . . Q      di atas @: Gugus Kecubung · di bawah @: Balok Kecubung
+. . . . . . . . .
+A . . . Q . . . A      (diagram diringkas; jarak sebenarnya 4 blok, total 9×9)
+```
+
+* Pengumpul sekte ×(1 + 0,10 × P), XP meditasi murid × faktor yang sama, kuras urat ×0,9. Radius 10–14 (+4 dengan
+  penjaga Murid Dalam+), tinggi ±4.
+* Sumber: *A Record of a Mortal's Journey to Immortality: Immortal Realm* bab 216.
+
+#### M5 · Formasi Lingkar Penyatu (Misterius, Aula 3)
+
+* Delapan karpet wol di (±3,0), (0,±3), (±2,±2); di tiap sudut (±5,±5) 2 Balok Kecubung + Tongkat End/lentera/lilin;
+  Gugus Kecubung atau lilin di atas @; Balok Kuarsa Pahat di bawahnya.
+* n = bantal yang diduduki anggota atau murid yang bermeditasi, +1 penjaga di samping @ (≤ 9). Yang duduk mendapat
+  ×(1 + 0,03 × n × P).
+* Sumber: terinspirasi dari *I Shall Seal the Heavens* Buku 5 bab 735 (Demonic Incarnation, Meng Hao sebagai inti).
+
+#### B5 · Formasi Pengumpul Roh Agung Sekte (Bumi, Aula 5, seluruh wilayah)
+
+* Delapan menara roh (3 Balok Kecubung + Tongkat End) di (0,±7), (±7,0), (±5,±5); empat tanda giok (prismarin, Bata
+  Prismarin, Balok Zamrud) di (±3,±3); Gugus Kecubung di atas @; Balok Emas di bawahnya.
+* Di seluruh wilayah: pengumpul ×(1 + 0,20 × P), atau ×(1 + 0,25 × P) bila @ di Y ≥ 120; kuras urat ×0,8 (×0,7 dengan
+  penjaga Murid Dalam+). Tidak pernah menaikkan urat roh.
+* Sumber: *A Record of a Mortal's Journey to Immortality* bab 391, bab 131, dan *Immortal Realm* bab 216.
+
+#### M4 · Formasi Pemelihara Roh (Misterius, Aula 3, pribadi boleh)
+
+* Empat sumber air tertutup di (0,±2), (±2,0); di tiap sudut (±4,±4) Balok Lumut + daun azalea + balok cahaya; balok
+  cahaya (froglight, Lentera Laut, Batu Pendar, Shroomlight) di bawah @.
+* Tiap 5 detik Regenerasi I (II mulai Aula 7 atau penjaga Kehidupan/Kayu) untuk anggota, peliharaan, dan binatang roh;
+  pemulihan qi ×(1 + 0,3 × P); Penyimpangan Qi ×1,33 lebih cepat. Berhenti selama kesengsaraan si penerima.
+* Sumber: terinspirasi dari *A Record of a Mortal's Journey to Immortality: Immortal Realm* bab 216; angka penyembuhan
+  adalah rancangan permainan.
+
+#### K3 · Formasi Api Bumi (Kuning, Aula 1)
+
+```
+P . . . . . P      P = Batu Hitam Poles Pahat + lentera jiwa di atasnya
+. . . b . . .      b = Bata Batu Hitam Poles
+. . b @ b . .      di bawah @: Balok Magma
+. . . b . . .
+P . . . . . P
+```
+
+* Tungku alkimia dalam jangkauan: keberhasilan +0,05 × P, waktu 10 → 8 detik; menulis jimat +0,03 × P. Radius 6–8.
+* Sumber: *A Will Eternal* bab 2; *A Record of a Mortal's Journey to Immortality* bab 156 dan 928.
+
+#### B7 · Formasi Api Paru Bumi (Bumi, Aula 5, peningkatan K3)
+
+* Pola K3 + Balok Magma di (±2,±2) + empat cerobong di (0,±5), (±5,0): 2 Bata Batu Hitam Poles + api unggun jiwa menyala.
+* Tungku: keberhasilan +0,10 × P, **mutu +1 langkah**, waktu ×0,7; jimat +0,05 × P. Radius 8. Menggantikan K3.
+* Sumber: *A Record of a Mortal's Journey to Immortality* bab 156, 866, dan 928.
+
+#### B6 · Formasi Jaring Petir Emas (Bumi, Aula 5)
+
+* Empat tiang di sudut (±6,±6): 4 Tembaga Potong (oksidasi apa pun) + Tongkat End; Balok Emas di (0,±6), (±6,0); Batu
+  Hitam Berlapis Emas atau Balok Emas di bawah @. Tanpa penangkal petir.
+* Selama kesengsaraanmu sendiri di dalamnya: sambaran ×0,90 (×0,85 dengan penjaga atau afinitas Petir). Bersama Formasi
+  Pelindung: ×0,765. Semua formasi tidak pernah di bawah ×0,70.
+* Sumber: terinspirasi dari *A Record of a Mortal's Journey to Immortality* bab 1468 dan bab 1315.
+
+#### L6 · Formasi Panji Larangan (Langit, Aula 7)
+
+* Delapan Bata Batu Hitam Poles di (±3,0), (0,±3), (±2,±2); spanduk di atas @; Batu Hitam Poles Pahat di bawahnya.
+* Sasaran: formasi terdaftar milikmu terdekat dalam 8 blok (bukan Abadi atau panji lain). P +0,25, radius +2,
+  formasi pembunuh +1 sasaran, biaya sasaran ×1,10.
+* **Mengisi retakan:** sasaran yang kurang tepat satu blok tetap bekerja setengah kekuatan selama 10 menit (20 dengan
+  penjaga di panji), lalu Rusak. Bloknya tidak pernah dipulihkan.
+* Sumber: *Renegade Immortal* bab 291, 527, dan 233.
+
+### 20c.3 Perintah (modul A)
+
+| Perintah | Fungsi |
+|---|---|
+| `/kultivasi formasi` | Kas, inti (keadaan, Daya, sisa jam), slot, dan batas |
+| `formasi info` | kartu lengkap mata formasi yang dilihat: pola, rotasi, kecocokan, keadaan dan alasannya, rincian P dan biaya |
+| `formasi katalog` | membuka tablet Formasi |
+| `formasi pola <id> [arah] [menit]` · `pola mati` | hologram baca-saja |
+| `formasi tuju <id>` | pola tujuan mata formasi yang dilihat |
+| `formasi nyala` · `formasi mati` | menyalakan atau mematikan formasimu yang dilihat |
+| `formasi setor [semua]` | barang di tangan, atau semua barang yang diterima, ke Kas |
+| `formasi isi [jam]` · `isi semua` | Kas → inti yang dilihat (bawaan 12 jam), atau semua inti |
+| `formasi penjaga <nama> [jaga\|perkuat\|waspada]` · `penjaga lepas` | menugaskan atau membebaskan penjaga |
+
+### 20c.4 Panduan uji (modul A)
+
+Perintah uji tidak pernah memasang atau merusak blok. **Inti uji** hanyalah catatan: tanpa pemeriksaan pola, Daya
+penuh, bertanda [UJI], tidak disimpan, dan hilang setelah beberapa menit atau saat server dimulai ulang.
+
+| Perintah | Fungsi |
+|---|---|
+| `/kultivasi uji formasi pasang <id> [menit] [paksa]` | inti uji di kakimu (`paksa` melewati gerbang aula) |
+| `uji formasi pola <id> [arah]` | hologram pola di depanmu |
+| `uji formasi semua` | satu inti uji tiap aliran, melingkar di sekitarmu |
+| `uji formasi daftar` · `audit` | semua spesifikasi (teks atau sumber yang hilang ditandai merah); audit registri, emit, tabel muat 6b, anggaran |
+| `uji formasi status` · `tumpuk` | bacaan penuh inti yang dilihat; medan formasi di tempatmu dengan tiap penyumbang dan semua batas |
+| `uji formasi daya <jam\|penuh> [id\|semua]` · `kas <n> [batu\|kecubung]` | mengatur Daya inti atau Kas |
+| `uji formasi aula <1-9>` (0 = kembali) | menganggap tingkat aula (sesi ini saja) |
+| `uji formasi penjaga murid [order]` · `penjaga semu <ranah> [jenjang] [dao]` | murid terdekat menjadi penjaga tanpa syarat ranah; penjaga semu tanpa entitas |
+| `uji formasi tribulasi` | faktor sambaran di sini (gabungkan dengan `uji tribulasi <ranah>`) |
+| `uji formasi hapus [semua [nyata]]` | menghapus inti uji terdekat atau semuanya; `nyata` juga melupakan catatan formasimu yang sebenarnya (blok tidak disentuh, Daya ke Kas) |
+| `uji formasi kinerja` · `debug formasi stats\|verify\|clear` | ms per tick, baca per tick, pelambat; pemeriksaan ulang penuh; melupakan semua catatan dimensi ini |
+
+`/kultivasi uji kit` kini juga memberi kotak shulker "Fase 7c" berisi 8 Mata Formasi, semua balok jantung, 64 Balok
+Kecubung, 32 serpihan, 16 Tongkat End, dan 16 Obsidian Menangis.
+
+Contoh: `uji formasi pasang small_spirit_gathering`, lalu `/kultivasi meditate` dan baca faktor "Sekte ×" di HUD;
+`uji formasi pasang golden_lightning_net`, `uji formasi tribulasi`, lalu `uji tribulasi golden_core`.
+
+### 20c.5 Katalog B: Peringatan, Penyembunyi, Ilusi, Kendali, Pembunuh, Perpindahan, Gabungan (modul B)
+
+Angka efek ditulis pada P = 1. Diagram dilihat dari atas, utara di atas, `@` = Mata Formasi, `.` = bebas. Formasi
+pembunuh hanya melukai **monster yang bermusuhan** lewat jenis kerusakan formasi, dalam batas pembunuhan per monster
+(2 + 0,5 × tingkat aula per detik), tanpa XP kultivasi, inti, atau Batu Roh. Tidak ada yang memasang atau merusak blok,
+memanggil petir sungguhan, atau mengubah cuaca.
+
+#### K1 · Larangan Peringatan (Kuning, Aula 1, pribadi boleh)
+
+```
+. . . L . . .      L = Bata Batu Pahat + Lentera Tembaga (boleh berkarat/berlilin) di atasnya
+L . . @ . . L      di atas @: Lonceng
+. . . L . . .      (diagram diringkas; jaraknya 3 blok, total 7×7)
+```
+
+* Radius 24 + 2 × (tingkat aula − 1), paling jauh 32. **Mendekat:** cincin dari radius sampai radius + 8.
+  **Menerobos:** di dalam radius. Anggota mendapat baris di atas hotbar, panah HUD 8 detik, lonceng di mata formasi,
+  dan baris chat berisi arah dan jarak. Orang asing di LAN juga dilaporkan; elit dan bos memunculkan judul (paling sering
+  sekali per 60 detik). Saat pemilik tidak ada, peringatan masuk ke Catatan.
+* Penjaga Pembangunan Fondasi+: jenis monster disebut. Inti Emas+: penyusup diberi garis tepi 10 detik (bukan Glowing).
+* Sumber: *Desolate Era* Buku 8 bab 30 "Hunted"; RMJ bab 399.
+
+#### K4 · Larangan Penyembunyi (Kuning, Aula 1, pribadi boleh)
+
+```
+D . . m . . D      m = Balok Lumut + daun azalea di atasnya · D = batu gelap
+m . . @ . . m      di bawah @: Kaca Gelap
+D . . m . . D      (diagram diringkas; jaraknya 3 blok, total 7×7)
+```
+
+* Radius 12 + (L − 1), paling jauh 20. Monster di **luar** radius tidak bisa memilih sasaran baru di **dalam** (anggota,
+  murid, peliharaan, binatang roh), kecuali sasaran itu baru saja melukainya. Elit menembus tingkat Kuning; bos selalu
+  melihat. Di LAN, papan nama anggota di dalam disembunyikan dari orang asing (hanya tampilan).
+* Sumber: RMJ bab 520 dan bab 803.
+
+#### M2 · Formasi Penyembunyi dan Pengintai (Misterius, Aula 3, seluruh wilayah)
+
+* Tiang batu gelap + Kaca Gelap + Lentera Tembaga 5 blok di empat arah; lumut + azalea di diagonal 4; Lentera Jiwa di
+  atas @, Kaca Gelap di bawahnya (berbagi jantung dengan K4, pola yang lebih tinggi menang).
+* Penyembunyian K4 untuk seluruh wilayah (terhitung Misterius) ditambah peringatan seluruh wilayah: "Penyusup di tepi
+  timur laut" untuk cincin 16 blok di luar tepi wilayah.
+* Sumber: RMJ bab 995 dan bab 803.
+
+#### M1 · Formasi Lima Unsur Terbalik (Misterius, Aula 3, TETAP)
+
+```
+. . . . . a . . . . .      a Air (utara) · k Kayu: Balok Bambu ×2 + lampu (timur)
+. . t . . . . . t . .      p Api (selatan) · l Logam: Balok Besi ×2 + lampu (barat)
+l . . . . @ . . . . k      t = Bata Tuf Pahat · di bawah @: Balok Emas Mentah
+. . t . . . . . t . .
+. . . . . p . . . . .      (diagram diringkas; tiang unsur 5 blok dari @)
+```
+
+* Radius 16 + (L − 3), paling jauh 22. Labirin: penyusup dituntun berputar, diperlambat, pola bergeser tiap 60 detik,
+  didorong keluar setelah 20 detik. Bos tidak dibelokkan.
+* Sumber: RMJ bab 231 "Disaster Knocking on the Door"; bab 363.
+
+#### L2 · Formasi Sungai Kuning Sembilan Lekuk (Langit, Aula 7)
+
+* Delapan tonggak Kalsit ×2 + panji (9 blok di empat arah, 6 blok di diagonal), Kuali di atas @, Balok Emas di bawahnya.
+* Radius 20 + (L − 7), paling jauh 22. Labirin berkelok, Kelambatan II, efek baik dilucuti tiap denyut, jurus elit
+  dibungkam, didorong keluar setelah 30 detik. Pencapaian **Sembilan Lekuk** setelah 20 monster disesatkan.
+* Sumber: *Investiture of the Gods* bab 50.
+
+#### B4 · Formasi Pasir Merah (Bumi, Aula 5)
+
+* Batu Pasir Merah Potong di jarak 2 dan 4 pada kedua sumbu; tiang sudut (jarak 6) Batu Pasir Merah ×2 + Batu Pasir
+  Merah Pahat; Batu Pasir Merah Pahat di bawah @. Tanpa pasir merah (tidak ada blok jatuh).
+* Penyusup yang masuk "jatuh ke lubang": terpaku 4 detik (elit 2, bos 1), sekali per 15 detik; pasir pisau 1,5 × P
+  tiap detik; Kebutaan tiap 2 detik (bukan bos).
+* Sumber: *Investiture of the Gods* bab 44 dan bab 49.
+
+#### B1 · Formasi Pedang Geng Agung Sekte (Bumi, Aula 5)
+
+```
+. . . . . . . P . . . . . . .      P = Balok Bambu ×3 + Tongkat End
+. . P . . . . . . . . . P . .      di atas @: Tongkat End (pedang induk) · di bawah @: Balok Besi
+P . . . . . . @ . . . . . . P
+. . P . . . . . . . . . P . .      (diagram diringkas; 7 blok di empat arah, 5 di diagonal)
+. . . . . . . P . . . . . . .
+```
+
+* Radius 16 + (L − 5), paling jauh 20. Tiap detik 6 penyusup terkena tebasan pedang 4 × P; tiap 5 detik Tujuh Puluh Dua
+  Pedang menyapu kerumunan terpadat 8 × P (hingga 8 monster).
+* Sumber: RMJ bab 788, 789, 1237, 1386, 1535, dan 412.
+
+#### B2 · Formasi Mutlak Langit (Bumi, Aula 5, TETAP)
+
+* Tiga tiang panji Tembaga Potong ×4 + panji: Langit (0,−6), Bumi (−5,3), Manusia (5,3); Tembaga Pahat di (0,3) dan
+  (±3,−2) serta di bawah @.
+* Radius 18 + (L − 5), paling jauh 22. Tiap 1,5 detik tiga sambaran **partikel** dari cakram awan gelap: 6 × P dan
+  Kelambatan II; monster yang mati hancur menjadi abu (tampilan saja).
+* Sumber: *Investiture of the Gods* bab 44.
+
+#### B3 · Formasi Bumi Membara (Bumi, Aula 5)
+
+* Magma di (±6,0), (0,±6), (±4,±4); tonggak guntur di sudut (±6,±6) Tembaga Potong ×3 + Tongkat End; Panji Merah di atas
+  @, Bata Nether Merah di bawahnya.
+* Tiap detik 10 penyusup terbakar 3 detik + 2 × P; tiap 3 detik guntur 5 × P.
+* Sumber: *Investiture of the Gods* bab 44.
+
+#### L3 · Formasi Api Berkobar (Langit, Aula 7)
+
+* Tiang panji merah (tubuh api ×4 + Panji Merah) di (0,−8) dan (±7,4); stasiun api samadhi (Batu Hitam Poles + Api
+  Unggun Jiwa menyala) di (−4,−3), api di udara (Dinding Sinabar ×2 + Shroomlight) di (4,−3), api di batu (Magma) di
+  (0,5); blok tubuh api di bawah @.
+* Hingga 14 penyusup: api samadhi (terbakar 6 detik, kebal api 2 × P), api di udara 2,5 × P, api di batu +4 × P.
+* Sumber: *Investiture of the Gods* bab 44 dan bab 48.
+
+#### L4 · Formasi Air Merah (Langit, Aula 7)
+
+* Panggung Kuarsa Halus 3×3 di sekeliling @ dengan tiga Kuali Air (U, TG, BD); sumber air di (±4,0), (0,±4), (±3,±3);
+  tiang sudut (±7,±7): Bata Prismarin/Ubin Batu Dalam ×2, tubuh api, Lentera Laut; Lentera Laut di bawah @.
+* Tiap detik 12 penyusup: 3 × P + 1% nyawa maksimum (elit 0,5%, bos 0,25%), Kelambatan II. Air tidak pernah berubah.
+* Sumber: *Investiture of the Gods* bab 44 dan bab 48.
+
+#### M3 · Formasi Perpindahan Sekte (Misterius, Aula 3) dan L5 · Formasi Perpindahan Kuno (Langit, Aula 7)
+
+```
+R . . . R          e = Bata Batu End / Kuarsa Halus / Kalsit
+. e e e .          R = Pilar Purpur/Kuarsa ×2 + Tongkat End atau lentera
+. e @ e .          di bawah @: Obsidian Menangis
+. e e e .          L5 = M3 + empat tugu 4 blok di empat arah:
+R . . . R               Kuarsa Pahat, Pilar Kuarsa ×2, Tongkat End
+```
+
+* **Cara pakai:** berdiri di Mata Formasi simpul, klik kanan sambil jongkok dengan tangan kosong, lalu klik tujuan di
+  peta simpul. Jangan bergerak dan jangan terluka selama penyaluran (M3 3 detik, 1,5 detik dengan penjaga; L5 5 detik).
+* Biaya: 10 qi dari pelancong (gratis dengan penjaga Ruang); M3 1 Daya dari simpul asal (gratis dengan penjaga); L5 2 Daya
+  per 512 blok yang dimulai (separuh dengan penjaga Ruang). Jeda: M3 10 detik, L5 30 detik.
+* M3 hanya terhubung di dalam wilayah dan butuh simpul tujuan yang termuat; L5 terhubung ke semua simpul kuno dan ke
+  semua M3 di dalam wilayah. Tidak pernah lintas dimensi. Hingga 4 murid yang mengikuti dalam 4 blok ikut serta.
+* Ditolak saat terobosan, tribulasi, ujian, duel, turnamen, Alam Hampa, terbang, menunggang, Kehancuran, atau baru terluka.
+* Pencapaian **Seribu Li dalam Sekejap** pada perpindahan pertama.
+* Sumber: RMJ bab 272 "One Year", 359, 363, dan 1130.
+
+#### A1 · Formasi Sepuluh Ribu Abadi (Abadi, Aula 9, TETAP)
+
+* Suar di atas @ (tanpa piramida), 8 Kuarsa Halus mengelilingi @, delapan tiang trigram (10 blok di empat arah, (±7,±7)
+  di diagonal): Kuarsa Pahat, tiga garis (yang = Batu Hitam Poles, yin = Kuarsa Halus, garis bawah dulu), Tongkat End.
+  Qian ☰ BL, Kan ☵ U, Gen ☶ TL, Zhen ☳ T, Xun ☴ TG, Li ☲ S, Kun ☷ BD, Dui ☱ B.
+* Lengkap bila polanya berdiri, Formasi Agung Sekte aktif, dan tiga bagian menyala: **Taiji** (L1, M2, atau Agung 3+
+  lapis), **Liangyi** (formasi pembunuh, labirin, atau kendali tingkat Bumi+), **Sixiang** (pengumpul, penempaan,
+  penangkal, atau perpindahan tingkat Bumi+, atau M4). Lalu formasi lain di aula mendapat A +0,15 dan radius +2, batas
+  tumpukan 2,8, Lapis Inti L1 tanpa penjaga, dan kualitas terobosan +0,04. Pencapaian **Sepuluh Ribu Abadi**.
+* Sumber: *Investiture of the Gods* bab 82.
+
+#### A2 · Sepuluh Formasi Mutlak (Abadi, Aula 9)
+
+```
+. . . @ . . .      f = Pagar Bakau ×2 + panji (sepuluh warna dianjurkan)
+f . . . . . f      di bawah @: Balok Netherit
+f . . . . . f      (lima pasang tiang, tiap 2 blok, menjauh dari @)
+f . . . . . f
+```
+
+* N (0–10) = formasi Mutlak yang dibangun dan menyala (B2, B3, B4, L3, L4) + lima teknik Mutlak 6c yang dikuasai guru atau
+  penjaga altar. Aktif bila N ≥ 3 dan minimal 2 dibangun: tiap Mutlak yang dibangun mendapat A +0,03 × N dan +2 sasaran.
+  Pada N = 10 penyusup kehilangan Regenerasi dan Penyerapan, denyut Mutlak ×0,75, pencapaian **Sepuluh Mutlak**.
+* Sumber: *Investiture of the Gods* bab 44.
+
+### 20c.6 Tablet Formasi, peta simpul, dan hologram (modul B)
+
+* **Tablet Formasi** (glif 陣, ketiga setelah Bangun) di gulungan aula: Kas Daya, slot aktif dan terdaftar, talisman
+  *Setor dari tas* dan *Isi Semua*. Kolom segel di kanan: **Inti** (daftar dengan saringan aliran, keadaan, Daya),
+  **Kitab** (kartu semua pola per tingkat; yang terkunci menulis "Aula Tingkat 5" atau "Butuh: …"), **Medan** (nilai
+  formasi di tempatmu beserta batasnya), **Simpul** (simpul perpindahan, *Ganti Nama*, *Peta*), **Catatan** (20 kejadian
+  terakhir).
+* **Bilah bambu** (klik sebuah inti atau kartu Kitab): nama, bintang tingkat, aliran, Sumber, diagram pola per lapis
+  dengan daftar bahan, keadaan dan alasannya, Daya dan rincian biaya, rincian P, angka hidup, penjaga dengan koin perintah
+  Jaga → Perkuat → Waspada, *Tugaskan* dan *Lepas*, serta koin *Nyala/Mati*, *Tarik dari Kas*, dan talisman *Isi 12 jam*,
+  *Lihat Pola*, *Lihat yang kurang*, *Tandai*. Di mode Kitab: *Hologram di depanku*, *Di Titik Formasi…*, *Tuju pola ini*.
+  Teman sekte melihat semuanya tanpa bisa mengubah, kecuali *Setor*.
+* **Peta simpul:** piringan giok, utara di atas. Simpul wilayah ditempatkan menurut posisinya, pos luar di tepi beserta
+  jaraknya; tiap simpul menulis biaya dan Dayanya; segel merah berarti rusak, mati, atau belum termuat.
+* **Hologram:** lapis yang sedang dibangun tegas, lapis di atasnya samar, lapis selesai hijau; kubus emas = kurang, silang
+  merah = salah, abu-abu = chunk belum termuat; enam blok kurang terdekat menampilkan namanya; label dua baris di atas
+  mata formasi. Berakhir setelah menitnya, lebih jauh dari 64 blok, berganti dimensi, atau `formasi pola mati`. Jongkok
+  sambil melihat mata formasi (atau memegang blok yang dipakai polanya) menampilkannya sebentar. Kualitas Efek Minimal:
+  garis saja, paling banyak 3 label.
+* **Panah peringatan** di tepi layar 8 detik (tembaga = mendekat, merah = menerobos, ungu = orang asing, emas = elit/bos),
+  dan cincin penyaluran di bawah tengah layar saat berpindah. Disembunyikan dengan F1.
+
+### 20c.7 Perintah (modul B)
+
+| Perintah | Fungsi |
+|---|---|
+| `/kultivasi formasi simpul` | daftar simpul perpindahan beserta jarak dan Daya |
+| `formasi simpul nama <nama>` | mengganti nama simpul yang dilihat (pemilik) |
+| `formasi pindah <nama>` | berpindah dari simpul tempatmu berdiri ke simpul bernama itu |
+
+### 20c.8 Panduan uji (modul B)
+
+| Perintah | Fungsi |
+|---|---|
+| `/kultivasi uji formasi musuh <n> [elit]` | n monster uji (zombi, husk, tengkorak, laba-laba saja) 24 blok dari kamu, berjalan ke arahmu, tanpa jarahan, tidak merusak, lenyap setelah 120 detik |
+| `uji formasi bersih` | menghapus semua monster uji formasi |
+| `uji formasi alarm [orang\|monster\|elit]` | contoh peringatan dari formasi peringatan terdekat milikmu, dari arah acak, lewat jalur yang sebenarnya |
+| `uji formasi teleport <simpul>` | perpindahan instan (melewati penyaluran, bukan penolakan) |
+| `uji formasi simpul` | simpul beserta jarak, status termuat, dan biaya |
+| `uji formasi sembunyi` | siapa disembunyikan dari siapa (LAN) |
+| `uji formasi pembunuh` | catatan pembunuhan dan batas kerusakan per monster di dekatmu |
+| `uji formasi mutlak [n]` | menganggap hitungan A2 (tanpa angka = kembali normal) |
+| `uji formasi resonansi` | status A1 dan A2, ketiga bagian, dan pengalinya |
+
+Contoh: `uji formasi pasang great_geng_sword`, `uji formasi musuh 8`, lalu `uji formasi pembunuh`;
+`uji formasi pasang sect_transfer` di dua tempat yang berjauhan 16+ blok, lalu jongkok dan klik kanan mata formasi dengan
+tangan kosong; `uji formasi aula 9`, `uji formasi semua`, `uji formasi resonansi`.
+
+### 20c.9 Bahan tiap formasi (nama blok Inggris)
+
+Nama Indonesia di depan, nama Inggris (seperti di game berbahasa Inggris) di dalam kurung. **Jantung** adalah blok tepat
+di bawah Mata Formasi (atau di atasnya bila tertulis "di atas"). Bentuk persisnya selalu terlihat lewat hologram
+`/kultivasi formasi pola <id>`. "Lampu" = Tongkat End (*End Rod*), Lentera Jiwa (*Soul Lantern*), Lentera (*Lantern*)
+atau lilin apa pun (*Candle*). "Panji" = spanduk apa pun (*Banner*), kecuali bila disebut warnanya. Tembaga boleh dalam
+tingkat karat apa pun dan boleh dilapisi lilin.
+
+| Kode · id | Tingkat, Aula | Jantung | Bahan pola |
+|---|---|---|---|
+| K2 · `small_spirit_gathering` | Kuning, 1 | Balok Kecubung (*Block of Amethyst*) | Balok Kecubung, Pilar Kuarsa (*Quartz Pillar*), Gugus Kecubung (*Amethyst Cluster*) di atas mata; ujung tiang: Gugus Kecubung, Tunas Kecubung Besar (*Large Amethyst Bud*), atau lampu |
+| M5 · `uniting_circle` | Misterius, 3 | Balok Kuarsa Pahat (*Chiseled Quartz Block*) | 8 karpet wol apa pun (*Carpet*) sebagai bantal, 4 tiang Balok Kecubung setinggi 2, lampu di puncaknya, Gugus Kecubung atau lilin di atas mata |
+| B5 · `great_spirit_gathering` | Bumi, 5 | Balok Emas (*Block of Gold*) | 8 menara Balok Kecubung setinggi 3 dengan Tongkat End (*End Rod*) di puncak, 4 balok giok: Bata Prismarin (*Prismarine Bricks*), Prismarin (*Prismarine*) atau Balok Zamrud (*Block of Emerald*); Gugus Kecubung di atas mata |
+| M4 · `spirit_nurturing` | Misterius, 3 | lampu putih: Froglight apa pun (*Pearlescent/Ochre/Verdant Froglight*), Lentera Laut (*Sea Lantern*), Batu Pendar (*Glowstone*) atau *Shroomlight* | 4 Balok Lumut (*Moss Block*) di sudut, di atasnya Daun Azalea (berbunga) (*Azalea Leaves / Flowering Azalea Leaves*), lalu blok cahaya (Froglight, Lentera Laut, Batu Pendar atau *Shroomlight*); 4 sumber air (*Water*) |
+| K3 · `earthfire` | Kuning, 1 | Balok Magma (*Magma Block*) | 4 Batu Hitam Poles Pahat (*Chiseled Polished Blackstone*) dengan Lentera Jiwa (*Soul Lantern*) di atasnya, 4 Bata Batu Hitam Poles (*Polished Blackstone Bricks*) di sisi mata |
+| B7 · `earth_lung_fire` | Bumi, 5 | Balok Magma (*Magma Block*) | pola K3 ditambah 4 Balok Magma dan 4 cerobong Bata Batu Hitam Poles setinggi 2 dengan Api Unggun Jiwa menyala (*Soul Campfire*, lit) di puncaknya |
+| B6 · `golden_lightning_net` | Bumi, 5 | Batu Hitam Bersepuh (*Gilded Blackstone*) atau Balok Emas | 4 tiang Tembaga Potong (*Cut Copper*) setinggi 4 dengan Tongkat End di puncak, 4 Balok Emas (*Block of Gold*) di tengah sisi |
+| L6 · `restriction_flag` | Langit, 7 | Batu Hitam Poles Pahat (*Chiseled Polished Blackstone*) | 8 Bata Batu Hitam Poles (*Polished Blackstone Bricks*) melingkar, panji di atas mata |
+| L1 · `five_layer_shield` | Langit, 7, TETAP | Balok Berlian (*Block of Diamond*) | lima puncak unsur, masing-masing 4 blok badan + lampu: Air = Batu Hitam Poles (*Polished Blackstone*) + Lentera Laut (*Sea Lantern*); Kayu = Balok Bambu (*Block of Bamboo*) + *Verdant Froglight*; Api = Sinabar Poles (*Polished Cinnabar*), Bata Sinabar (*Cinnabar Bricks*) atau Bata Nether Merah (*Red Nether Bricks*) + *Shroomlight*; Tanah = Batu Pasir Halus (*Smooth Sandstone*) + *Ochre Froglight*; Logam = Balok Besi (*Block of Iron*) + *Pearlescent Froglight*. Butuh Formasi Agung Sekte aktif |
+| K1 · `alarm_restriction` | Kuning, 1 | Lonceng (*Bell*) **di atas** mata | 4 Bata Batu Pahat (*Chiseled Stone Bricks*) dengan Lentera Tembaga (*Copper Lantern*) di atasnya |
+| K4 · `concealment_restriction` | Kuning, 1 | Kaca Berwarna Gelap (*Tinted Glass*) | 4 Balok Lumut (*Moss Block*) dengan Daun Azalea di atasnya; 4 sudut batu gelap: Prismarin Gelap (*Dark Prismarine*), Ubin Batu Dalam (*Deepslate Tiles*) atau Batu Dalam Poles (*Polished Deepslate*) |
+| M2 · `concealment_detection` | Misterius, 3 | Kaca Berwarna Gelap (*Tinted Glass*) | 4 tiang batu gelap + Kaca Berwarna Gelap + Lentera Tembaga, 4 sudut Balok Lumut + Daun Azalea, Lentera Jiwa (*Soul Lantern*) di atas mata |
+| M1 · `five_elements_reversal` | Misterius, 3, TETAP | Balok Emas Mentah (*Block of Raw Gold*) | timur Balok Bambu ×2, selatan blok api (Sinabar Poles, Bata Sinabar atau Bata Nether Merah) ×2, barat Balok Besi ×2, utara Batu Hitam Poles ×2, tiap tiang ditutup blok cahaya (Froglight, Lentera Laut, Batu Pendar atau *Shroomlight*); 4 sudut Bata Tuf Pahat (*Chiseled Tuff Bricks*) |
+| L2 · `nine_bend_yellow_river` | Langit, 7 | Balok Emas (*Block of Gold*) | 8 tiang Kalsit (*Calcite*) setinggi 2 dengan panji di puncak, kuali apa pun (*Cauldron*) di atas mata |
+| B4 · `red_sand` | Bumi, 5 | Batu Pasir Merah Pahat (*Chiseled Red Sandstone*) | 8 Batu Pasir Merah Potong (*Cut Red Sandstone*) di dua cincin, 4 tiang sudut Batu Pasir Merah (*Red Sandstone*) ×2 + Batu Pasir Merah Pahat |
+| B1 · `great_geng_sword` | Bumi, 5 | Balok Besi (*Block of Iron*) | 8 tiang Balok Bambu (*Block of Bamboo*) setinggi 3 dengan Tongkat End di puncak, Tongkat End di atas mata |
+| B2 · `heaven_absolute` | Bumi, 5, TETAP | Tembaga Pahat (*Chiseled Copper*) | 3 tiang Tembaga Potong (*Cut Copper*) setinggi 4 dengan panji di puncak, 3 Tembaga Pahat di sekeliling |
+| B3 · `earth_fierce` | Bumi, 5 | Bata Nether Merah (*Red Nether Bricks*) | 8 Balok Magma (*Magma Block*), 4 tiang sudut Tembaga Potong ×3 + Tongkat End, panji **merah** di atas mata |
+| L3 · `blazing_flame` | Langit, 7 | blok api (Sinabar Poles, Bata Sinabar atau Bata Nether Merah) | 3 tiang blok api setinggi 4 dengan panji merah, Batu Hitam Poles + Api Unggun Jiwa menyala, dinding sinabar (*Polished Cinnabar Wall* / *Cinnabar Brick Wall*) ×2 + *Shroomlight*, Balok Magma |
+| L4 · `red_water` | Langit, 7 | Lentera Laut (*Sea Lantern*) | cincin Kuarsa Halus (*Smooth Quartz*), 3 Kuali berisi air (*Water Cauldron*), 8 sumber air, 4 tiang sudut batu dalam (*Prismarine Bricks* / *Deepslate Tiles*) ×2 + blok api + Lentera Laut |
+| M3 · `sect_transfer` | Misterius, 3 | Obsidian Menangis (*Crying Obsidian*) | cincin batu End: Bata Batu End (*End Stone Bricks*), Kuarsa Halus (*Smooth Quartz*) atau Kalsit (*Calcite*); 4 tiang Pilar Purpur (*Purpur Pillar*) atau Pilar Kuarsa ×2 + Tongkat End, Lentera Jiwa atau Lentera |
+| L5 · `ancient_transfer` | Langit, 7 | Obsidian Menangis (*Crying Obsidian*) | pola M3 ditambah 4 tiang Balok Kuarsa Pahat + Pilar Kuarsa ×2 + Tongkat End |
+| A1 · `ten_thousand_immortals` | Abadi, 9, TETAP | Suar (*Beacon*) **di atas** mata | cincin Kuarsa Halus, 8 tiang trigram: Balok Kuarsa Pahat, tiga garis (yang = Batu Hitam Poles, yin = Kuarsa Halus) sesuai urutan Raja Wen, Tongkat End di puncak |
+| A2 · `ten_absolute` | Abadi, 9 | Balok Netherit (*Block of Netherite*) | dua baris 5 tiang Pagar Bakau (*Mangrove Fence*) ×2 dengan panji di puncak |
+
+Formasi lama (Pengumpul Qi Kecil/Agung, Bintang Surgawi, Formasi Pelindung, Formasi Agung Sekte) dibangun seperti dulu
+([8](#8-meditasi), [17](#17-formasi-pelindung)) dan hanya tampil di Kitab sebagai rujukan.
+
+---
+
 ## 21. Hari Penerimaan Murid
 
 Kini murid bergabung lewat aula. Para calon datang ke prasastimu, kamu menguji mereka, lalu memilih siapa yang
@@ -6014,3 +6565,140 @@ Kultivator dirancang agar aman di dunia mana pun, termasuk dunia bersama.
 * Gua Kediaman adalah zona terlindung 16 blok untuk Mode Kehancuran.
 * Cuaca dan waktu tetap tidak pernah diubah: Bambu Petir Emas hanya bisa ditemukan saat badai petir yang datang sendiri
   atau dari perintah `/weather`.
+
+**Tambahan Fase 7b dan 7c:**
+* Momen Epik ([54](#54-momen-epik-fase-7b)) tidak menambah pengecualian: pusaran awan, petir, pilar, gerbang, serpihan,
+  dan aksara hanyalah gambar dan partikel di komputermu. Tidak pernah entity petir, ledakan, perubahan cuaca, waktu,
+  atau kecepatan tick; gerak lambat hanya memperlambat efek Momen Epik sendiri. Perintah `uji momen` tidak pernah
+  menggali, mengumumkan, menyimpan, atau melukai.
+* Formasi Sekte ([20c](#20c-formasi-sekte)) hanya **membaca** blok dan hanya melukai monster yang bermusuhan lewat jenis
+  kerusakan formasi. Petir dan api formasi pembunuh hanyalah partikel; tembaga dan air di pola tidak pernah berubah.
+
+---
+
+## 54. Momen Epik (Fase 7b)
+
+> **Belum diuji di game.** Fase 7b baru dikompilasi (build berhasil). Daftar uji: [docs/uji/FASE-7b.md](uji/FASE-7b.md).
+> Perilaku dengan paket shader (Iris + Complementary) belum dicoba langsung.
+
+Fase 7b membuat tribulasi dan semua momen besar lain terasa seperti adegan film, **langsung di dalam game** (bukan file
+video). Sebuah momen bisa berisi:
+
+* **Shot kamera** pendek yang halus, hanya di layar pemain pemilik momen;
+* **bilah layar lebar** hitam di atas dan bawah, dan **kartu judul kaligrafi** bergaya gulungan giok;
+* **langit berubah**: menggelap, berwarna, kabut, awan, dan bintang (cuaca dan waktu tidak pernah diubah);
+* **geometri raksasa**: pusaran awan tribulasi selebar langit, petir berbentuk seperti petir vanilla, pilar cahaya
+  sampai batas ketinggian, gerbang, cincin, dan sosok raksasa;
+* **efek layar**: kilatan, vinyet, tepi tinta, pinggiran warna, layar abu-abu;
+* **gerak lambat** sesaat (paling lama 1,5 detik, hanya efek Momen Epik yang melambat; dunia dan monster tidak);
+* **suara berlapis** dan **potongan musik** vanilla.
+
+### 54.1 Momen yang punya adegan
+
+| Kelompok | Momen |
+|---|---|
+| **A. Tribulasi Langit** | Pertanda Langit, setiap petir, Petir Terakhir, Langit Terbelah (berhasil), Langit Murka (gagal); di Nether cincin api dan kabut, di End pusaran ungu |
+| **B. Terobosan** | Kebangkitan, Pembangunan Fondasi (retak, normal, sempurna, surgawi), Inti Emas, Jiwa Baru Lahir, Transformasi Dewa, Penyatuan Dao, Kenaikan Abadi tahap 1–9, Dewa Abadi dan Pengakuan Langit, lapisan Kualitas Surgawi |
+| **C. Krisis** | Penyimpangan Qi, Ujian Iblis Hati |
+| **D. Kekuatan** | Wujud Dharma, Wilayah Dao, 12 Jurus Abadi, 11 Jurus Dewa, Mode Kehancuran dan Jurus Pemusnah |
+| **E. Murid dan sekte** | terobosan murid, Bencana Dewa Kuno 1–7, Penginjak Langit, Lampu Jiwa, Murid Melampaui Guru, Hari Penerimaan, Ujian Masuk, final turnamen, naik tingkat sekte, templat sekte, Istana Langit, naik tingkat aula |
+| **F. Tempur** | membunuh bos (Warden, Wither, Naga Ender, dan lainnya), Lolos dari Maut |
+| **G. Tambahan** | akar spiritual, Momen Pencerahan, binatang roh, pewaris, Cincin Jiwa Guru, Api Surgawi, dan lainnya |
+
+Semua terpicu sendiri saat momennya terjadi dalam permainan biasa. Pemain lain di dekatmu melihat pusaran, petir, pilar,
+dan warna langit, tetapi **tidak pernah** mendapat gerakan kamera, bilah, musik, atau kartu dari momen orang lain.
+
+### 54.2 Keamanan kamera
+
+* Kamera hanya bergerak saat **aman**: tidak ada monster yang mengincarmu dalam 16 blok, darah cukup (di atas 45% untuk
+  Singkat, 30% untuk Penuh), tidak jatuh, tidak di air atau lava, tidak menunggang, tidak memakai elytra atau pedang
+  terbang. Kalau tidak aman, momen tetap tampil tanpa shot.
+* **Semua tombol tetap bekerja.** Menekan W, spasi, Esc, atau menggerakkan mouse dengan kuat langsung mengakhiri shot
+  dan kamera kembali halus ke tempatnya. Posisi dan arah pandangmu yang sebenarnya tidak pernah diubah.
+* **Lewati sinematik** (bawaan **Backspace**, bisa diganti di Kontrol): mengakhiri shot, menghapus antrean kartu, dan
+  menghentikan musik. Tekan dua kali dalam 1 detik untuk menghilangkan bilah sampai adegan itu selesai.
+* Shot juga berhenti saat kamu mati, membuka layar, berganti dimensi, atau keluar dunia.
+* **Kurangi gerak** (pengaturan aksesibilitas mod) memaksa kamera Mati dan mematikan miring, gerak lambat, dan pinggiran
+  warna. Vanilla "Hide Lightning Flashes" mematikan semua kilatan Momen Epik.
+
+### 54.3 Pengaturan
+
+Grup **Momen Epik** di tab Pengaturan gulungan giok (tersimpan di `config/kultivator-client.json`):
+
+| Pengaturan | Pilihan (bawaan tebal) | Artinya |
+|---|---|---|
+| Kamera sinematik | Penuh / **Singkat** / Mati | Singkat: kamera hanya bergerak di momen yang tenang. Penuh: juga potongan pendek (≤ 1,5 detik) saat bahaya, tetap dengan semua syarat aman. Mati: kamera tidak pernah bergerak |
+| Bilah layar lebar | **Nyala** / Mati | bilah hitam selama shot atau kartu besar |
+| Kartu judul | **Nyala** / Mati | Mati: judul vanilla tampil seperti biasa |
+| Musik sinematik | **Nyala** / Mati | potongan musik untuk momenmu sendiri, mengikuti penggeser musik |
+| Gerak lambat | **Nyala** / Mati | hanya efek Momen Epik |
+| Geometri raksasa | **Nyala** / Mati | Mati: memakai partikel yang lebih ringan |
+| Langit berubah | **Nyala** / Mati | warna langit, kabut, awan, bintang, dan lapisan langit di layar |
+| Skala VFX momen | 0,5 / **1,0** / 1,5 | ukuran dan jumlah efek, selalu di dalam batas kinerja |
+| Mode rekam | Nyala / **Mati** | menyembunyikan HUD vanilla dan bar Qi saat bagian aman momenmu sendiri, supaya rekaman OBS terlihat seperti adegan film |
+
+Pengaturan lama tetap berlaku: Guncangan layar, Kilatan layar, Efek pemain lain, Tampilan raksasa, Kualitas Efek.
+
+**Penjaga frame** selalu menyala: bila FPS turun terlalu banyak saat adegan besar, tingkat efek diturunkan sendiri
+(cocok untuk laptop yang juga menjalankan Valorant). Dengan paket shader, lapisan transparan besar dihitung lebih berat.
+
+**Server** (`config/kultivator.json`): `epicMoments` (bawaan true; false = tidak ada adegan, efek lama tetap),
+`epicCameraShots` (bawaan true; false = tidak ada pemain yang kameranya diarahkan), `epicRange` (bawaan 192, 96–512 blok:
+jarak kirim adegan seukuran langit).
+
+### 54.4 Perintah `/sinematik` (tanpa cheat, di komputermu)
+
+| Perintah | Fungsi |
+|---|---|
+| `/sinematik penuh` · `singkat` · `mati` | mode kamera |
+| `/sinematik vfx 0.5` · `1` · `1.5` | skala VFX |
+| `/sinematik rekam [nyala\|mati]` | Mode Rekam (tanpa pilihan = dibalik) |
+| `/sinematik paket [nyala\|mati]` | geometri lembut saat paket shader menyala (Mati = partikel) |
+| `/sinematik info` | profil (vanilla atau paket shader), tingkat efek sekarang, penjaga frame, dan pemakaian anggaran adegan terakhir |
+| `/sinematik reset` | semua pengaturan Momen Epik kembali ke bawaan |
+
+### 54.5 Perintah uji (op)
+
+`uji ...` = `/kultivasi uji ...`. Uji **tidak mengubah apa pun**: tidak mengumumkan, tidak menyimpan, tidak melukai,
+tidak menggali (Kehancuran dan Pemusnah hanya efeknya), tidak mengubah ranah. Kamera tetap mengikuti mode dan semua
+syarat aman, jadi uji di tempat tenang tanpa monster.
+
+| Perintah | Fungsi |
+|---|---|
+| `uji momen daftar` | semua id beserta kelompok, argumen, dan lamanya |
+| `uji momen <id> [arg] [skala <0-10>] [beat <n>]` | memutar satu momen pada dirimu; `skala` mengganti besarnya, `beat` hanya satu ketukan |
+| `uji momen tribulasi_penuh <ranah> [lapis] [gagal]` | satu tribulasi utuh dengan irama aslinya (Dewa Abadi ±2,6 menit) |
+| `uji momen semua [kelompok] [jeda <detik>]` | pameran semua momen berurutan (±9 menit) atau satu kelompok: `tribulasi`, `terobosan`, `krisis`, `kekuatan`, `murid`, `sekte`, `tempur`, `lain` |
+| `uji momen berhenti` | menghentikan semua adegan uji; langit, suara, musik, dan kamera langsung kembali |
+| `debug momen info` | 16 isyarat terakhir yang dikirim server |
+| `debug momen bendera [pemain]` | apakah sekarang aman untuk shot, beserta alasannya bila tidak |
+
+Id ranah: `pemurnian_qi`, `fondasi`, `inti_emas`, `jiwa_baru`, `transformasi_dewa`, `penyatuan_dao`, `kenaikan_abadi`,
+`dewa_abadi` (id Inggris dari `uji ranah` juga boleh). Id momen lain: `tribulasi`, `petir`, `petir_terakhir`,
+`tribulasi_berhasil`, `tribulasi_gagal`, `kebangkitan`, `fondasi <retak|normal|sempurna|surgawi>`, `inti_emas`,
+`jiwa_baru`, `transformasi_dewa`, `penyatuan_dao [dao]`, `kenaikan_abadi <1-9>`, `dewa_abadi`, `pengakuan_langit`,
+`surgawi`, `penyimpangan`, `iblis_hati`, `wujud_dharma`, `wilayah_dao <dao>`, `jurus_abadi <teknik>`,
+`jurus_dewa <teknik>`, `kehancuran`, `pemusnah <jurus>`, `murid_terobosan`, `bencana <1-7>`, `penginjak_langit`,
+`lampu_jiwa`, `melampaui_guru`, `penerimaan [perang]`, `ujian_masuk <1-9>`, `pengemis`, `nadi_dewa_sesat`,
+`darah_dou_di`, `turnamen [internal|elit|seratus]`, `sekte_tingkat`, `sekte_templat`, `istana_langit`, `aula`,
+`bos <warden|wither|naga|penjaga|warisan|raja_siluman>`, `lolos_maut <sumber>`, `akar`, `pencerahan`, `binatang`,
+`pewaris`, `cincin_guru`, `guru_turun`, `api_surgawi`, `batas_suci`. Tekan Tab untuk melengkapi.
+
+Contoh:
+* `/kultivasi uji momen tribulasi_penuh inti_emas` — tribulasi Inti Emas lengkap dengan kamera Singkat.
+* `/kultivasi uji momen tribulasi_penuh dewa_abadi` — finale sembilan warna dan Gerbang Langit.
+* `/kultivasi uji momen tribulasi_penuh inti_emas gagal` — kegagalan dan Penyimpangan Qi.
+* `/kultivasi uji momen fondasi surgawi` — pilar kesepuluh dan pita pelangi.
+* `/kultivasi uji momen jurus_dewa heaven_punishing_sword` — lapisan 7b sebuah Jurus Dewa (untuk efek jurusnya sendiri,
+  rapal dengan `uji teknik <id>`).
+* `/kultivasi uji momen bos warden` — kill-cam bos.
+* `/kultivasi uji momen semua tribulasi jeda 2` — pameran kelompok tribulasi.
+
+### 54.6 Yang belum lengkap
+
+* Pengungkapan otomatis Pengemis di Gerbang, Nadi Dewa Sesat, dan darah Dou Di belum terpicu dari permainan nyata;
+  adegannya hanya bisa diputar lewat `uji momen`.
+* Penjaga Hu Fa Tribulasi belum dikecualikan dari pemeriksaan bahaya, jadi saat teman menjagamu kamera Singkat mungkin
+  lebih sering diam.
+* **Sumber:** setiap kartu dengan klaim cerita punya Sumber di DESIGN 23.13. Pilar cahaya, warna petir, gerakan kamera,
+  dan musik adalah tampilan mod, bukan kanon.

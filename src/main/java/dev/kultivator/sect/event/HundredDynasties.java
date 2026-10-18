@@ -206,6 +206,9 @@ final class HundredDynasties {
 			return;
 		}
 		war.fighting = true;
+		if (war.bracket.rounds.get(war.bracket.rounds.size() - 1).size() == 1 && !match.bronze) {
+			dev.kultivator.epic.EpicHooks.tournament(war.level, dev.kultivator.epic.EpicIds.TOUR_INTRO, dev.kultivator.epic.EpicIds.TOUR_HUNDRED_DYNASTIES, war.bodyA, war.bodyB, war.center);
+		}
 		EventUtil.chat(EventUtil.player(war.owner), Component.translatable("kultivator.sectevent.tourney.bout", match.a.name, match.b.name)
 				.withStyle(ChatFormatting.YELLOW));
 	}
@@ -287,6 +290,7 @@ final class HundredDynasties {
 			}
 			saved.store("champion", ComponentSerialization.CODEC, champion.name);
 			EventUtil.fx(war.level, war.center, SectEventFxIds.CHAMPION, 0, 0.0F);
+			dev.kultivator.epic.EpicHooks.tournament(war.level, dev.kultivator.epic.EpicIds.TOUR_WINNER, dev.kultivator.epic.EpicIds.TOUR_HUNDRED_DYNASTIES, body, null, war.center);
 			war.level.playSound(null, war.center.x, war.center.y, war.center.z, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.NEUTRAL, 1.0F, 1.2F);
 			EventUtil.chat(player, Component.translatable("kultivator.sectevent.war.champion", champion.name).withStyle(ChatFormatting.GOLD));
 			if (player != null) {

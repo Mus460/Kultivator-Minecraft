@@ -290,6 +290,7 @@ public final class Heir {
 		Component name = DisciplePaths.name(entity);
 		if (entity.level() instanceof ServerLevel level) {
 			Fx.send(level, entity.position(), FxType.STAR, PathFxIds.HEIR_NAMED, generation, 1.0F);
+			dev.kultivator.epic.EpicHooks.extra(level, dev.kultivator.epic.EpicIds.EXTRA_HEIR, master, entity, entity.position(), generation, 0);
 			DisciplePaths.sound(level, entity.position(), SoundEvents.BELL_RESONATE, 1.2F, 0.8F);
 			DisciplePaths.sound(level, entity.position(), SoundEvents.BEACON_ACTIVATE, 1.0F, 1.2F);
 		}

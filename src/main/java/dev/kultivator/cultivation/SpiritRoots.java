@@ -254,6 +254,7 @@ public final class SpiritRoots {
 		clearMarker(data);
 
 		Fx.send(level(player, ceremony), ceremony.center, FxType.ROOT_CEREMONY, FX_REVEAL, mask, grade.ordinal());
+		dev.kultivator.epic.EpicHooks.extra(level(player, ceremony), dev.kultivator.epic.EpicIds.EXTRA_ROOT_TEST, player, player, ceremony.center, grade.ordinal(), mask);
 		switch (grade) {
 			case TRASH -> {
 				sound(player, ceremony, SoundEvents.BEACON_DEACTIVATE, 1.0F, 0.6F);

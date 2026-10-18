@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * The Sect Hall scroll (DESIGN 20.3.1, 5b): the jade scroll at most 320 x 240 with vertical jade tablets on its left
- * edge for the pages Aula, Bangun (phase 6b), Calon, Jenjang, Perbendaharaan (module A), Tugas, Misi, Arena (module B), Catatan (A) and
+ * edge for the pages Aula, Bangun (phase 6b), Formasi (phase 7c), Calon, Jenjang, Perbendaharaan (module A), Tugas, Misi, Arena (module B), Catatan (A) and
  * Segel Merah (module D, only while {@code HallInfo.cfg.kehancuran} is true). When fewer than all tablets fit, the
  * column scrolls with the mouse wheel. Reads the last {@code HallInfo} from {@link HallClient} and asks for fresh details
  * every few seconds while open. Not a pause screen.
@@ -39,7 +39,10 @@ public class HallScreen extends Screen {
 	private static final int MIN_TABLET_H = 24;
 	private static final int MAX_TABLET_H = 40;
 
+	/** Every page by {@code Halls.PAGE_*} index (the server's page ids). */
 	private final List<HallPage> allPages = new ArrayList<>();
+	/** The same pages in tablet order (the Formasi tablet sits third, DESIGN 24.13 item 6). */
+	private final List<HallPage> drawOrder = new ArrayList<>();
 	private final List<HallPage> pages = new ArrayList<>();
 	private final List<JadeTablet> tablets = new ArrayList<>();
 	private final Eased backdrop = new Eased(6.0F);
@@ -91,6 +94,12 @@ public class HallScreen extends Screen {
 		allPages.add(new dev.kultivator.client.sectevent.ArenaPage(this));
 		allPages.add(new LogPage(this));
 		allPages.add(new dev.kultivator.client.kehancuran.RedSealPage(this));
+		// Phase 7c (DESIGN 24.13 item 6): the Formasi tablet is index Halls.PAGE_FORMASI (10) of allPages, drawn third.
+		HallPage formasi = new dev.kultivator.client.formasi.FormasiPage(this);
+		allPages.add(formasi);
+		drawOrder.addAll(allPages);
+		drawOrder.remove(formasi);
+		drawOrder.add(Math.min(2, drawOrder.size()), formasi);
 	}
 
 	/** The last hall details (never null). */
@@ -125,7 +134,7 @@ public class HallScreen extends Screen {
 		}
 		HallPage current = pages.isEmpty() ? null : pages.get(Math.min(page, pages.size() - 1));
 		pages.clear();
-		for (HallPage each : allPages) {
+		for (HallPage each : drawOrder) {
 			if (each.shown()) {
 				pages.add(each);
 			}

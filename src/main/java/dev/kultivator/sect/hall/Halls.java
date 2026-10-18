@@ -147,6 +147,11 @@ public final class Halls {
 	public static final int PAGE_CALON = 2;
 	public static final int PAGE_JENJANG = 3;
 	public static final int PAGE_TREASURY = 4;
+	/**
+	 * The Formasi tablet of phase 7c (DESIGN 24.13 item 6): appended after every existing page (index 10 of the screen's
+	 * page list) but drawn third, after Bangun. The indices above stay unchanged.
+	 */
+	public static final int PAGE_FORMASI = 10;
 	public static final int OP_REFRESH = 0;
 	public static final int OP_RENAME = 1;
 	public static final int OP_TEST = 2;
@@ -803,6 +808,7 @@ public final class Halls {
 		if (hallLevel != null && pos != null && !dormant(core)) {
 			Vec3 top = Vec3.atBottomCenterOf(pos).add(0.0D, 1.0D, 0.0D);
 			Fx.send(hallLevel, top, FxType.HALL, HallFxIds.LEVEL_UP, level, 10.0F);
+			dev.kultivator.epic.EpicHooks.hallLevel(server, owner, level);
 			hallLevel.playSound(null, top.x, top.y, top.z, SoundEvents.BELL_BLOCK, SoundSource.BLOCKS, 2.0F, 0.7F);
 			hallLevel.playSound(null, top.x, top.y, top.z, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.BLOCKS, 0.6F, 1.0F);
 		}

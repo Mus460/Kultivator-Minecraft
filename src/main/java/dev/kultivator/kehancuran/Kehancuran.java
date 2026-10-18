@@ -881,6 +881,7 @@ public final class Kehancuran {
 			Fx.sendTo(player, Vec3.atCenterOf(c), Vec3.atCenterOf(c), FxType.KEHANCURAN, KehancuranFxIds.RED_SKY, seconds, 0.0F);
 			player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 1.0F, 0.5F);
 		}
+		dev.kultivator.epic.EpicHooks.kehancuran(level, master, order.entity, Vec3.atCenterOf(c), order.art.ordinal(), (float) DestroyerArts.spec(order.art, DisciplePaths.stars(order.entity.data())).radius(), dev.kultivator.epic.EpicIds.KEH_WARNING, seconds);
 		MutableComponent stop = Component.translatable(PREFIX + "cancel_button").withStyle(style -> style.withColor(ChatFormatting.AQUA)
 				.withBold(true).withClickEvent(new ClickEvent.RunCommand("/kultivasi kehancuran batal")));
 		master.sendSystemMessage(stop);
@@ -937,6 +938,7 @@ public final class Kehancuran {
 			return;
 		}
 		Fx.send(level, Vec3.atCenterOf(centre), FxType.KEHANCURAN, KehancuranFxIds.IMPACT, order.art.ordinal(), spec.radius() + 2.0F);
+		dev.kultivator.epic.EpicHooks.kehancuran(level, master, entity, Vec3.atCenterOf(centre), order.art.ordinal(), (float) spec.radius(), dev.kultivator.epic.EpicIds.KEH_IMPACT, positions.length);
 		level.playSound(null, centre.getX(), centre.getY(), centre.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 2.0F, 0.5F);
 		Msg.chat(master, Component.translatable(PREFIX + "cast", entity.getDisplayName(), order.art.displayName(), positions.length)
 				.withStyle(ChatFormatting.DARK_RED));
@@ -955,6 +957,7 @@ public final class Kehancuran {
 			stopSky(server, order);
 			ServerLevel level = order.dimension == null ? null : server.getLevel(order.dimension);
 			if (level != null) {
+				dev.kultivator.epic.EpicHooks.kehancuran(level, master, order.entity, order.centre == null ? order.entity.position() : Vec3.atCenterOf(order.centre), order.art.ordinal(), 0.0F, dev.kultivator.epic.EpicIds.KEH_ABORT, 0);
 				Component line = Component.translatable(PREFIX + "warning_cancelled", order.entity.getDisplayName()).withColor(0x9FF3E6);
 				for (ServerPlayer player : level.players()) {
 					player.sendSystemMessage(Msg.prefixed(line));

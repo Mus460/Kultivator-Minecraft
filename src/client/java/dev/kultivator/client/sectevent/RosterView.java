@@ -162,6 +162,10 @@ final class RosterView {
 			lines.add(Component.translatable("kultivator.sectevent.ui.on_duty", Component.translatable("kultivator.sectevent.duty." + duty))
 					.withStyle(ChatFormatting.GOLD));
 		}
+		if (entry.getIntOr("act", 0) == dev.kultivator.disciple.DiscipleEntity.ACTIVITY_FORMATION_KEEPER) {
+			// Phase 7c (DESIGN 24.13 item 7).
+			lines.add(Component.translatable("kultivator.spine7c.keeper_duty").withStyle(ChatFormatting.GOLD));
+		}
 		if (entry.getBooleanOr("injured", false)) {
 			lines.add(Component.translatable("kultivator.sectevent.ui.injured").withStyle(ChatFormatting.RED));
 		}
