@@ -16,8 +16,10 @@ import net.minecraft.client.player.LocalPlayer;
 
 /**
  * The mod's keys, in their own "Kultivator" section of the controls. Defaults avoid vanilla keys, Butter Bot's keys
- * and Iris (K, O, R): G cast, ; meditate, ' info screen, , and . choose the technique, \ flying sword. Jumping in
- * mid-air asks for a Cloud Step.
+ * and Iris (K, O, R): G cast, ; meditate, ' info screen, , and . choose the technique, \ flying sword, - the Kitab
+ * Teknik; the seal wheel key and the four quick seal keys are unbound (DESIGN 22.12.7). Jumping in mid-air asks for a
+ * Cloud Step. The cast, wheel, quick seal, cycle and codex keys are read by {@code client.codex.CodexClient} (tap or
+ * hold, the loadout carousel); this class handles the rest.
  */
 public final class Keys {
 
@@ -29,6 +31,13 @@ public final class Keys {
 	public static final KeyMapping PREVIOUS = key("previous", InputConstants.KEY_COMMA);
 	public static final KeyMapping NEXT = key("next", InputConstants.KEY_PERIOD);
 	public static final KeyMapping FLYING_SWORD = key("flying_sword", InputConstants.KEY_BACKSLASH);
+	// Phase 6c (DESIGN 22.12.1, 22.12.7).
+	public static final KeyMapping CODEX = key("codex", InputConstants.KEY_MINUS);
+	public static final KeyMapping WHEEL = key("wheel", InputConstants.UNKNOWN.getValue());
+	public static final KeyMapping SEAL_1 = key("seal_1", InputConstants.UNKNOWN.getValue());
+	public static final KeyMapping SEAL_2 = key("seal_2", InputConstants.UNKNOWN.getValue());
+	public static final KeyMapping SEAL_3 = key("seal_3", InputConstants.UNKNOWN.getValue());
+	public static final KeyMapping SEAL_4 = key("seal_4", InputConstants.UNKNOWN.getValue());
 
 	private static boolean jumpWasDown;
 	private static int airTicks;
@@ -63,9 +72,6 @@ public final class Keys {
 			}
 		}
 		press(MEDITATE, free, Actions.MEDITATE_TOGGLE);
-		press(CAST, free, Actions.CAST);
-		press(PREVIOUS, free, Actions.SELECT_PREVIOUS);
-		press(NEXT, free, Actions.SELECT_NEXT);
 		press(FLYING_SWORD, free, Actions.FLYING_SWORD_TOGGLE);
 		tickCloudStep(minecraft, player, free);
 	}

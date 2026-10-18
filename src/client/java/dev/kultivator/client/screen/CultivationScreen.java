@@ -289,6 +289,11 @@ public class CultivationScreen extends Screen {
 			onClose();
 			return true;
 		}
+		// The codex key opens the Kitab Teknik from here too (DESIGN 22.12.1).
+		if (Keys.CODEX.matches(event)) {
+			dev.kultivator.client.codex.Codex.open(-1);
+			return true;
+		}
 		int number = event.key() - InputConstants.KEY_1;
 		if (number >= 0 && number < pages.length && event.key() <= InputConstants.KEY_5) {
 			if (number != tab) {

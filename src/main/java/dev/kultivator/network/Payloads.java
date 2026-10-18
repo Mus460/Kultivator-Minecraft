@@ -113,6 +113,8 @@ public final class Payloads {
 		public static final int KEHANCURAN_CONFIRM = 4;
 		/** The sect template screen (DESIGN 21.12); {@code arg} = the template to select first (0 = none). */
 		public static final int SECT_TEMPLATE = 5;
+		/** The Kitab Teknik (DESIGN 22.12.1); {@code arg} = the net id to focus, or −1. */
+		public static final int CODEX = 6;
 
 		public static final Type<OpenScreen> TYPE = typeOf("open_screen");
 		public static final StreamCodec<RegistryFriendlyByteBuf, OpenScreen> CODEC = StreamCodec.of(
@@ -173,6 +175,69 @@ public final class Payloads {
 
 		@Override
 		public Type<BuildPreview> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * One visual event of a technique spec (DESIGN 22.4.1): every client draws the spec's FX layers of {@code phase} from
+	 * the registry with its own quality and budget; one event per phase occurrence, never per particle.
+	 * {@code spec} = net id; {@code x,y,z} the event position, {@code tx,ty,tz} the second point; {@code tier} = caster
+	 * grade tier 0-5 | mastery level << 3; {@code flags} = the {@code FLAG_*} bits; {@code seed} draws the same shape on
+	 * every client; {@code caster} = entity id auras and forms attach to.
+	 */
+	public record TechFx(int spec, byte phase, double x, double y, double z, double tx, double ty, double tz, float radius,
+			float length, byte tier, byte flags, short count, int seed, int caster, short duration) implements CustomPacketPayload {
+		/** A Kehancuran cast (CRACKS layer, BLOCK_CRUMBLE at the impact). */
+		public static final int FLAG_KEHANCURAN = 1;
+		public static final int FLAG_ECHO = 2;
+		/** Server under load: draw ×0.5 and no displays. */
+		public static final int FLAG_LOW_LOAD = 4;
+		public static final int FLAG_BOSS_HIT = 8;
+		public static final int FLAG_DISCIPLE = 16;
+		public static final int FLAG_ALLY = 32;
+		public static final int FLAG_SHOWCASE = 64;
+
+		public static final Type<TechFx> TYPE = typeOf("tech_fx");
+		public static final StreamCodec<RegistryFriendlyByteBuf, TechFx> CODEC = StreamCodec.of(
+				(buf, p) -> {
+					buf.writeVarInt(p.spec);
+					buf.writeByte(p.phase);
+					buf.writeDouble(p.x);
+					buf.writeDouble(p.y);
+					buf.writeDouble(p.z);
+					buf.writeDouble(p.tx);
+					buf.writeDouble(p.ty);
+					buf.writeDouble(p.tz);
+					buf.writeFloat(p.radius);
+					buf.writeFloat(p.length);
+					buf.writeByte(p.tier);
+					buf.writeByte(p.flags);
+					buf.writeShort(p.count);
+					buf.writeInt(p.seed);
+					buf.writeVarInt(p.caster);
+					buf.writeShort(p.duration);
+				},
+				buf -> new TechFx(buf.readVarInt(), buf.readByte(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble(),
+						buf.readDouble(), buf.readDouble(), buf.readFloat(), buf.readFloat(), buf.readByte(), buf.readByte(), buf.readShort(),
+						buf.readInt(), buf.readVarInt(), buf.readShort()));
+
+		/** The caster grade tier 0-5. */
+		public int gradeTier() {
+			return tier & 7;
+		}
+
+		/** The caster's mastery level 0-4 of this spec. */
+		public int mastery() {
+			return (tier >> 3) & 7;
+		}
+
+		public boolean has(int flag) {
+			return (flags & flag) != 0;
+		}
+
+		@Override
+		public Type<TechFx> type() {
 			return TYPE;
 		}
 	}

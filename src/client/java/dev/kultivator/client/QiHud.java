@@ -1,5 +1,7 @@
 package dev.kultivator.client;
 
+import dev.kultivator.client.codex.SpecInfo;
+import dev.kultivator.client.codex.TeknikSession;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
@@ -9,8 +11,10 @@ import dev.kultivator.cultivation.SpiritRoots;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Element;
 import dev.kultivator.data.Rank;
-import dev.kultivator.data.Technique;
+import dev.kultivator.data.TechniqueRegistry;
+import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.util.Msg;
+import net.minecraft.nbt.CompoundTag;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.DeltaTracker;
@@ -32,9 +36,11 @@ import java.util.Locale;
 /**
  * The cultivation HUD in the bottom-left corner, in the strip under the chat and left of the offhand slot (DESIGN 5):
  * a dantian orb whose qi rises from the bottom in the root's colour, wrapped in a gold ring that fills clockwise with
- * the cultivation bar and circled by violet beads while Stored Qi waits; the selected technique as a small seal tile
- * with its qi cost and a cooldown sweep; and the realm, qi and warnings beside it. Every value glides to its new
- * number. Hidden with F1, F3, the HUD setting, an open chat, or before the server sent any data.
+ * the cultivation bar, a white-jade Perisai Qi arc, and violet beads while Stored Qi waits; the selected technique spec
+ * as a seal tile (glyph, grade ribbon, cooldown sweep, mastery beads, scaled qi cost, charge pips, the red KEHANCURAN
+ * tag, DESIGN 22.12.8); countdown arcs of lasting forms, domains and fields above the orb; and the realm, qi and
+ * warnings beside it. Every value glides to its new number. Hidden with F1, F3, the HUD setting, an open chat, or
+ * before the server sent any data. The quick seals, wheel, charge bar and toasts are {@code codex.CodexHud}.
  */
 public final class QiHud implements HudElement {
 
@@ -114,11 +120,15 @@ public final class QiHud implements HudElement {
 		int limit = right ? width / 2 - 91 - 29 - 4
 				: minecraft.options.attackIndicator().get() == AttackIndicatorStatus.HOTBAR ? width / 2 - 91 - 22 - 4 : width / 2 - 91 - 4;
 		int textX = 40;
-		Technique selected = data.selected();
+		TechniqueSpec selected = data.selectedId().isEmpty() ? null : TechniqueRegistry.byId(data.selectedId());
 		if (selected != null && 40 + 18 <= limit) {
 			drawSeal(g, font, data, selected, 40, Math.round(cy) - 13, deltaTracker.getGameTimeDeltaPartialTick(false));
 			textX = 62;
+		} else if (TeknikSession.breakerOn() && 40 + 18 <= limit) {
+			kehancuranTag(g, font, 49.0F, Math.round(cy) - 3.0F);
+			textX = 62;
 		}
+		drawLasting(g, nowMillis, height);
 		int room = limit - textX;
 		if (room >= 24) {
 			drawText(g, font, data, rank, textX, room, cy, height, qiShown, maxQi, barShown, storedNumber, nowMillis);
@@ -176,6 +186,18 @@ public final class QiHud implements HudElement {
 			Brush.dot(g, cx + (float) Math.cos(angle) * (r + 1.8F), cy + (float) Math.sin(angle) * (r + 1.8F), 1.3F, Palette.GOLD_LIGHT);
 		}
 
+		// Perisai Qi: a white-jade arc between the gold ring and the beads (pool / its maximum, DESIGN 22.12.8).
+		double shield = TeknikSession.shield();
+		if (shield > 0.01D) {
+			double max = TeknikSession.shieldMax();
+			if (max <= 0.0D) {
+				Minecraft minecraft = Minecraft.getInstance();
+				max = minecraft.player == null ? shield : Math.max(shield, minecraft.player.getMaxHealth() * 2.0D);
+			}
+			float share = (float) Math.max(0.0D, Math.min(1.0D, shield / Math.max(0.01D, max)));
+			Brush.arc(g, cx, cy, r + 3.0F, r + 4.1F, 0.0F, share, 0xFFE4F4EC);
+		}
+
 		// Violet beads while Stored Qi waits (lit share = stored / one full bar), turning slowly.
 		if (data.storedQi() > 0.5D) {
 			int lit = Math.max(1, (int) Math.ceil(STORED_BEADS * storedFraction));
@@ -193,15 +215,21 @@ public final class QiHud implements HudElement {
 
 	// ================================================================== technique seal
 
-	private static void drawSeal(GuiGraphicsExtractor g, Font font, CultivationData data, Technique technique, int x, int y, float partialTick) {
+	/**
+	 * The selected spec as a seal tile (DESIGN 22.12.8): glyph, grade ribbon, cooldown sweep, four mastery beads, the qi
+	 * cost after mastery and the realm gap, charge pips above it and the red KEHANCURAN tag under it while the switch is on.
+	 */
+	private static void drawSeal(GuiGraphicsExtractor g, Font font, CultivationData data, TechniqueSpec spec, int x, int y, float partialTick) {
 		int size = 18;
-		boolean affordable = data.qi() + 1.0E-6D >= technique.qiCost();
+		int qi = SpecInfo.qi(data, spec);
+		boolean affordable = data.qi() + 1.0E-6D >= qi;
 		g.fill(x - 1, y - 1, x + size + 1, y + size + 1, 0xA0101824);
 		int paper = affordable ? Palette.TALISMAN : Palette.grey(Palette.TALISMAN, 0.6F);
 		g.fill(x, y, x + size, y + size, paper);
-		long left = ClientCultivation.cooldownLeft(technique);
-		if (left > 0L && technique.cooldownTicks() > 0) {
-			float fraction = Math.min(1.0F, Math.max(0.0F, (left - partialTick) / technique.cooldownTicks()));
+		long left = SpecInfo.cooldownLeft(spec);
+		int total = SpecInfo.cooldown(data, spec);
+		if (left > 0L && total > 0) {
+			float fraction = Math.min(1.0F, Math.max(0.0F, (left - partialTick) / total));
 			g.enableScissor(x, y, x + size, y + size);
 			Brush.pie(g, x + size / 2.0F, y + size / 2.0F, size * 0.75F, 1.0F - fraction, 1.0F, Palette.mix(paper, 0xFF1A2230, 0.6F));
 			g.disableScissor();
@@ -209,14 +237,69 @@ public final class QiHud implements HudElement {
 		int seal = affordable ? Palette.SEAL : 0xFF6A6A6A;
 		Brush.frame(g, x, y, x + size, y + size, seal);
 		Brush.frame(g, x + 1, y + 1, x + size - 1, y + size - 1, Palette.argb(0x70, seal));
-		int ink = technique.dao() == null ? Palette.JADE_DARK : Palette.onPaper(technique.dao().color());
-		Glyphs.technique(g, technique, x + size / 2.0F, y + size / 2.0F, 9.0F, left > 0L ? Palette.fade(ink, 0.55F) : ink);
+		int ribbon = SpecInfo.ribbon(spec.grade());
+		for (int i = 0; i < 5; i++) {
+			g.fill(x + size - 5 + i, y + i, x + size, y + i + 1, ribbon);
+		}
+		int ink = SpecInfo.ink(spec);
+		Glyphs.spec(g, spec, x + size / 2.0F, y + size / 2.0F - 1.0F, 10.0F, left > 0L ? Palette.fade(ink, 0.55F) : ink);
+		int mastery = data.knows(spec.id()) ? SpecInfo.mastery(data, spec) : 0;
+		for (int i = 0; i < 4; i++) {
+			Brush.dot(g, x + size / 2.0F + (i - 1.5F) * 2.6F, y + size - 2.2F, 0.7F, i < mastery ? Palette.GOLD : Palette.argb(0x60, 0x3A2D12));
+		}
 		if (left > 0L) {
 			Component secs = Component.literal(String.valueOf((left + 19L) / 20L));
 			Brush.centered(g, font, secs, x + size / 2.0F, y + size / 2.0F - 2.5F, 0xFFFFFFFF, 0.6F, true);
 		}
-		Component cost = Component.literal(String.valueOf(technique.qiCost()));
+		Component cost = Component.literal(SpecInfo.compact(qi));
 		Brush.centered(g, font, cost, x + size / 2.0F, y + size + 2.0F, affordable ? Palette.QI_LIGHT : 0xFFFF7A6A, 0.6F, true);
+		CompoundTag charges = TeknikSession.charges(spec.id());
+		if (charges != null) {
+			int max = Math.max(1, Math.min(8, charges.getIntOr("max", 1)));
+			int have = Math.max(0, Math.min(max, charges.getIntOr("n", max)));
+			for (int i = 0; i < max; i++) {
+				Brush.dot(g, x + size / 2.0F + (i - (max - 1) / 2.0F) * 3.0F, y - 2.5F, 0.9F, i < have ? Palette.QI_LIGHT : Palette.argb(0x70, 0x3A4A5A));
+			}
+		}
+		if (TeknikSession.breakerOn()) {
+			kehancuranTag(g, font, x + size / 2.0F, y + size + 7.5F);
+		}
+	}
+
+	/** The red "KEHANCURAN" tag (Mode Kehancuran on and allowed). */
+	private static void kehancuranTag(GuiGraphicsExtractor g, Font font, float cx, float y) {
+		float pulse = 0.6F + 0.4F * (float) Math.sin(Util.getMillis() / 250.0D);
+		Component tag = Component.translatable("kultivator.codex.hud.kehancuran").withStyle(net.minecraft.ChatFormatting.BOLD);
+		Brush.centered(g, font, tag, cx, y, Palette.mix(0xFFB3281D, 0xFFFF5B3A, pulse), 0.42F, true);
+	}
+
+	/** Countdown arcs for forms, domains, auras, toggles and fields above the orb, in their Dao colour. */
+	private static void drawLasting(GuiGraphicsExtractor g, long now, int height) {
+		List<TeknikSession.Lasting> lasting = TeknikSession.lasting();
+		if (lasting.isEmpty()) {
+			return;
+		}
+		long time = ClientCultivation.serverGameTime();
+		int shown = 0;
+		for (TeknikSession.Lasting entry : lasting) {
+			if (shown >= 5) {
+				break;
+			}
+			TechniqueSpec spec = TechniqueRegistry.byId(entry.id());
+			int color = spec == null || spec.dao() == null ? Palette.GOLD : Palette.opaque(spec.dao().color());
+			float cx = 6.0F + shown * 8.0F;
+			float cy = height - 40.0F;
+			Brush.disc(g, cx, cy, 3.4F, 0xA0101824);
+			if (entry.end() <= 0L) {
+				float pulse = 0.5F + 0.5F * (float) Math.sin(now / 300.0D);
+				Brush.arc(g, cx, cy, 2.2F, 3.4F, 0.0F, 1.0F, Palette.mix(color, 0xFFFFFFFF, 0.3F * pulse));
+			} else {
+				float share = Math.max(0.0F, Math.min(1.0F, (entry.end() - time) / (float) Math.max(1L, entry.end() - entry.start())));
+				Brush.arc(g, cx, cy, 2.2F, 3.4F, 0.0F, share, color);
+			}
+			Brush.dot(g, cx, cy, 0.8F, color);
+			shown++;
+		}
 	}
 
 	// ================================================================== text

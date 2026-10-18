@@ -2,6 +2,8 @@ package dev.kultivator.client.screen.ui;
 
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Technique;
+import dev.kultivator.data.TechniqueSpec;
+import dev.kultivator.data.TechniqueType;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
@@ -29,6 +31,11 @@ public final class Glyphs {
 	// Phase 6b (DESIGN 21.24).
 	/** Terraces climbing to a small roof: Pembangunan Sekte (the Bangun tablet). */
 	public static final int BUILD = 10;
+	// Phase 6c (DESIGN 22.12).
+	/** An open book with a seal: the Kitab Teknik (Kodeks tablet). */
+	public static final int CODEX = 11;
+	/** A ring of seals around a core: the Cincin Segel. */
+	public static final int RING = 12;
 
 	/** The Daos around the Bagua, clockwise from the top (Earlier Heaven order: opposites face each other). */
 	public static final Dao[] BAGUA = {Dao.SWORD, Dao.SHADOW, Dao.ICE, Dao.BODY, Dao.SPACE, Dao.LIGHTNING, Dao.FIRE, Dao.LIFE};
@@ -142,6 +149,23 @@ public final class Glyphs {
 				Brush.rect(g, cx + s * 0.3F, cy - s * 0.45F, cx + s * 0.4F, cy - s * 0.1F, color);
 				Brush.rect(g, cx + s * 0.65F, cy - s * 0.45F, cx + s * 0.75F, cy - s * 0.1F, color);
 			}
+			case CODEX -> {
+				// An open book: two pages, a spine, and a seal on the right page.
+				Brush.rect(g, cx - s, cy - s * 0.7F, cx - 0.5F, cy + s * 0.8F, Palette.fade(color, 0.55F));
+				Brush.rect(g, cx + 0.5F, cy - s * 0.7F, cx + s, cy + s * 0.8F, Palette.fade(color, 0.55F));
+				Brush.rect(g, cx - 0.5F, cy - s * 0.85F, cx + 0.5F, cy + s * 0.9F, color);
+				Brush.rect(g, cx - s * 0.8F, cy - s * 0.35F, cx - s * 0.2F, cy - s * 0.35F + 0.8F, color);
+				Brush.rect(g, cx - s * 0.8F, cy + s * 0.05F, cx - s * 0.3F, cy + s * 0.05F + 0.8F, color);
+				Brush.rect(g, cx + s * 0.3F, cy - s * 0.3F, cx + s * 0.8F, cy + s * 0.2F, color);
+			}
+			case RING -> {
+				// Eight beads around a core.
+				Brush.disc(g, cx, cy, s * 0.28F, color);
+				for (int i = 0; i < 8; i++) {
+					double a = Math.PI * 2.0D * i / 8.0D;
+					Brush.dot(g, cx + (float) Math.cos(a) * s * 0.8F, cy + (float) Math.sin(a) * s * 0.8F, Math.max(0.7F, s * 0.17F), color);
+				}
+			}
 			default -> {
 				// A little scroll: paper between two rods.
 				Brush.rect(g, cx - s, cy - s, cx + s, cy - s + 1.5F, color);
@@ -174,6 +198,82 @@ public final class Glyphs {
 			return;
 		}
 		trigram(g, cx, cy, size, Math.max(1.0F, size * 0.15F), size * 0.3F, trigramOf(dao), color);
+	}
+
+	/** A spec's glyph (DESIGN 22.12.2): its Dao's trigram (a qi swirl for universal arts) with its type mark at the lower right. */
+	public static void spec(GuiGraphicsExtractor g, TechniqueSpec spec, float cx, float cy, float size, int color) {
+		Dao dao = spec.dao();
+		float main = size * 0.86F;
+		float mx = cx - size * 0.08F;
+		float my = cy - size * 0.06F;
+		if (dao == null) {
+			float s = main / 2.0F;
+			Brush.ring(g, mx, my, s * 0.55F, s * 0.85F, color);
+			Brush.disc(g, mx, my, s * 0.25F, color);
+			Brush.rect(g, mx + s * 0.55F, my - s * 0.95F, mx + s * 0.95F, my - s * 0.55F, color);
+		} else {
+			trigram(g, mx, my, main, Math.max(1.0F, main * 0.15F), main * 0.3F, trigramOf(dao), color);
+		}
+		typeMark(g, spec.type(), cx + size * 0.46F, cy + size * 0.42F, Math.max(2.5F, size * 0.32F), color);
+	}
+
+	/** A small mark per technique type (SERANG arrow, AREA ring, KENDALI cross, GERAK chevron, LINDUNG shield, PULIH plus...). */
+	public static void typeMark(GuiGraphicsExtractor g, TechniqueType type, float cx, float cy, float size, int color) {
+		float s = size / 2.0F;
+		float t = Math.max(0.6F, size * 0.14F);
+		switch (type) {
+			case SERANG -> {
+				Brush.line(g, cx - s, cy + s, cx + s, cy - s, t, color);
+				Brush.rect(g, cx + s * 0.2F, cy - s, cx + s, cy - s + t, color);
+				Brush.rect(g, cx + s - t, cy - s, cx + s, cy - s * 0.2F, color);
+			}
+			case AREA -> Brush.ring(g, cx, cy, s * 0.55F, s, color);
+			case KENDALI -> {
+				Brush.line(g, cx - s, cy - s, cx + s, cy + s, t, color);
+				Brush.line(g, cx - s, cy + s, cx + s, cy - s, t, color);
+			}
+			case GERAK -> {
+				Brush.line(g, cx - s * 0.6F, cy - s, cx + s * 0.4F, cy, t, color);
+				Brush.line(g, cx + s * 0.4F, cy, cx - s * 0.6F, cy + s, t, color);
+			}
+			case LINDUNG -> {
+				Brush.rect(g, cx - s * 0.8F, cy - s, cx + s * 0.8F, cy + s * 0.2F, color);
+				Brush.line(g, cx - s * 0.8F, cy + s * 0.2F, cx, cy + s, t * 1.4F, color);
+				Brush.line(g, cx + s * 0.8F, cy + s * 0.2F, cx, cy + s, t * 1.4F, color);
+			}
+			case PULIH -> {
+				Brush.rect(g, cx - s, cy - t / 2.0F, cx + s, cy + t / 2.0F, color);
+				Brush.rect(g, cx - t / 2.0F, cy - s, cx + t / 2.0F, cy + s, color);
+			}
+			case PANGGIL -> {
+				Brush.dot(g, cx - s * 0.5F, cy, Math.max(0.7F, s * 0.4F), color);
+				Brush.dot(g, cx + s * 0.5F, cy, Math.max(0.7F, s * 0.4F), color);
+			}
+			case WILAYAH -> {
+				Brush.rect(g, cx - s, cy - s, cx + s, cy - s + t, color);
+				Brush.rect(g, cx - s, cy + s - t, cx + s, cy + s, color);
+				Brush.rect(g, cx - s, cy - s, cx - s + t, cy + s, color);
+				Brush.rect(g, cx + s - t, cy - s, cx + s, cy + s, color);
+			}
+			case UBAH -> {
+				g.pose().pushMatrix();
+				g.pose().translate(cx, cy);
+				g.pose().rotate((float) (Math.PI / 4.0D));
+				Brush.rect(g, -s * 0.7F, -s * 0.7F, s * 0.7F, s * 0.7F, color);
+				g.pose().popMatrix();
+			}
+			case PASIF -> Brush.dot(g, cx, cy, Math.max(0.7F, s * 0.5F), color);
+			case PAMUNGKAS -> {
+				Brush.rect(g, cx - s, cy - t / 2.0F, cx + s, cy + t / 2.0F, color);
+				Brush.rect(g, cx - t / 2.0F, cy - s, cx + t / 2.0F, cy + s, color);
+				Brush.line(g, cx - s * 0.7F, cy - s * 0.7F, cx + s * 0.7F, cy + s * 0.7F, t, color);
+				Brush.line(g, cx - s * 0.7F, cy + s * 0.7F, cx + s * 0.7F, cy - s * 0.7F, t, color);
+			}
+			case INDRA -> {
+				Brush.ring(g, cx, cy, s * 0.6F, s, color);
+				Brush.dot(g, cx, cy, Math.max(0.6F, s * 0.3F), color);
+			}
+		}
 	}
 
 	private Glyphs() {

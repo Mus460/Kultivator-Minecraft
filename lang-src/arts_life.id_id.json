@@ -1,0 +1,71 @@
+{
+  "kultivator.technique.eternal_spring_art": "Seni Musim Semi Abadi",
+  "kultivator.technique.eternal_spring_art.desc": "Aura musim semi 12 dtk (radius 6→10): kau dan sekutu di dekatmu pulih 25% darah selama 12 dtk; regenerasi qi-mu ×1,5.",
+  "kultivator.technique.eternal_spring_art.source": "Sumber: A Record of a Mortal's Journey · 长春功 Seni Musim Semi Abadi, seni dasar beratribut kayu yang pertama kali dilatih Han Li",
+  "kultivator.technique.eternal_spring_art.lore": "Di sekitarmu, rumput tumbuh sedikit lebih hijau.",
+
+  "kultivator.technique.blue_silver_entangle": "Belitan Rumput Perak Biru",
+  "kultivator.technique.blue_silver_entangle.desc": "Rumput perak biru membelit musuh di titik bidik (radius 4→10): terikat 4→6 dtk (bos 1,5 dtk), 0,6× kekuatan dan Racun I 4 dtk.",
+  "kultivator.technique.blue_silver_entangle.source": "Sumber: Soul Land · 蓝银缠绕 Belitan, kemampuan roh pertama Rumput Perak Biru milik Tang San (cincin sepuluh tahun)",
+  "kultivator.technique.blue_silver_entangle.lore": "Rumput paling biasa di dunia, dan tak satu pun monster bisa lepas darinya.",
+
+  "kultivator.technique.earth_vitality": "Vitalitas Bumi",
+  "kultivator.technique.earth_vitality.desc": "Daya hidup bumi naik dalam radius 10→24: kau dan sekutu pulih 25→35% darah, mendapat Perisai Qi 15% selama 20 dtk dan Ketahanan I 10 dtk; yang berdiri di tanah alami menerima pemulihan dan perisai dua kali.",
+  "kultivator.technique.earth_vitality.source": "Sumber: Coiling Dragon (Buku 15) · Vitalitas, salah satu dari enam misteri mendalam Hukum Bumi",
+  "kultivator.technique.earth_vitality.lore": "Bumi yang kau pijak memberi kembali apa yang diambil pertempuran.",
+
+  "kultivator.technique.blue_silver_parasite": "Parasit Perak Biru",
+  "kultivator.technique.blue_silver_parasite.desc": "Rumput perak biru menumpang pada 6→16 musuh terdekat (radius 16): racun 0,2× kekuatan/dtk selama 8 dtk, 60% kerusakannya memulihkanmu dan sekutu dalam 8 blok; musuh yang tewas menjerat sekitarnya (radius 3, terikat 2 dtk).",
+  "kultivator.technique.blue_silver_parasite.source": "Sumber: Soul Land · 寄生 Parasit, kemampuan roh kedua Rumput Perak Biru (cincin seratus tahun)",
+  "kultivator.technique.blue_silver_parasite.lore": "Hidup yang mereka curi dari dunia, kau ambil kembali sehelai demi sehelai.",
+
+  "kultivator.technique.clear_heart_melody": "Melodi Hati Jernih",
+  "kultivator.technique.clear_heart_melody.desc": "Lima cincin nada menyebar (radius 16→32): monster melambat (IV) dan melemah (III) 6 dtk; mayat hidup juga terkena 0,8× kekuatan (×2). Melodi bertahan 20 dtk (radius 6→10): tiap 2 dtk membersihkan efek buruk dan memberi Ketahanan I padamu dan sekutu.",
+  "kultivator.technique.clear_heart_melody.source": "Sumber: Mo Dao Zu Shi · 清心音 Melodi Hati Jernih Sekte Gusu Lan, melodi penenang yang dipelajari Jin Guangyao lalu dipelintir menjadi 乱魄抄",
+  "kultivator.technique.clear_heart_melody.lore": "Hati yang jernih tak bisa diganggu, bahkan oleh yang sudah mati.",
+
+  "kultivator.technique.seven_treasure_pagoda": "Pagoda Kaca Tujuh Harta",
+  "kultivator.technique.seven_treasure_pagoda.desc": "Pagoda tujuh tingkat berputar di atasmu selama 30 dtk (radius 6→10), satu tingkat tiap detik untukmu dan sekutu: 1 jurus +25%, 2 Kecepatan II, 3 regenerasi qi ×2, 4 Ketahanan I, 5 Lompatan II, 6 Regenerasi I; tingkat 7 \"Tujuh Harta\" (detik ke-6) menaikkan semuanya ×1,5.",
+  "kultivator.technique.seven_treasure_pagoda.source": "Sumber: Soul Land · Pagoda Kaca Tujuh Harta milik Ning Rongrong, jiwa bela diri pendukung yang kemampuan tetapnya memperkuat sekutu (ketujuh nilainya adalah desain permainan)",
+  "kultivator.technique.seven_treasure_pagoda.lore": "Tujuh tingkat, tujuh berkah, dan sekutumu tak pernah merasa sekuat ini.",
+
+  "kultivator.technique.gold_devouring_beetles": "Kawanan Kumbang Pemakan Emas",
+  "kultivator.technique.gold_devouring_beetles.desc": "Kawanan kumbang emas dan perak menyerbu 12→32 musuh (radius 24): luka 0,35× kekuatan/dtk selama 8 dtk menembus zirah, zirah −30% 8 dtk; tiap musuh tewas memperkuat kawanan +10% (maks 10); 10% kerusakannya memulihkanmu.",
+  "kultivator.technique.gold_devouring_beetles.source": "Sumber: A Record of a Mortal's Journey · 噬金虫 Kumbang Pemakan Emas, kawanan yang dibiakkan Han Li dan kelak melahirkan raja serangga",
+  "kultivator.technique.gold_devouring_beetles.lore": "Mereka memakan emas. Daging tidak lebih keras.",
+
+  "kultivator.technique.willow_god_branches": "Cabang dan Daun Emas Dewa Dedalu",
+  "kultivator.technique.willow_god_branches.desc": "Dedalu bayangan bangkit: cabangnya mencambuk 10→24 musuh (radius 20→32), 1,2× kekuatan dan terikat 3 dtk (bos 0,75 dtk); 24 daun emas memburu hingga 12 musuh (≤2 tiap musuh), 0,9× kekuatan (bos ×0,6). Bila darahmu di bawah 50%, pulih 30%.",
+  "kultivator.technique.willow_god_branches.source": "Sumber: Perfect World · Dewa Dedalu (柳神) Desa Batu, pelindung Shi Hao, yang batangnya yang hangus bertunas kembali",
+  "kultivator.technique.willow_god_branches.lore": "Tersambar petir, hangus, dan tetap tumbuh. Begitulah dedalu itu mengajarimu.",
+
+  "kultivator.technique.blood_transforming_formation": "Formasi Pelebur Darah",
+  "kultivator.technique.blood_transforming_formation.desc": "Pusaran pasir hitam di titik bidik selama 15 dtk (radius 14→28): tiap detik 0,5× kekuatan + 1% darah maksimum (bos 0,5%) dan Layu II 3 dtk; 25% kerusakannya memulihkanmu.",
+  "kultivator.technique.blood_transforming_formation.source": "Sumber: Investiture of the Gods bab 44/46 · 化血陣 milik Sun Tianjun (孫良), salah satu dari Sepuluh Formasi Mutlak: pasir hitamnya mengubah korban menjadi air darah",
+  "kultivator.technique.blood_transforming_formation.lore": "Pasir hitam berbisik, dan apa pun yang disentuhnya mencair.",
+
+  "kultivator.technique.blood_clones": "Klon Darah",
+  "kultivator.technique.blood_clones.desc": "2→4 klon darah menempel pada musuh selama 15 dtk (menyerang tiap detik, jangkauan 16, 0,8× kekuatan); di akhir semuanya menyatu di kerumunan terpadat (radius 6→10), 3× kekuatan per klon, dan kau pulih 20→40% darah.",
+  "kultivator.technique.blood_clones.source": "Sumber: I Shall Seal the Heavens (Buku 4) · Klon Darah Meng Hao, berinti kulit si jeli daging dan tak bisa dihancurkan selama ia hidup",
+  "kultivator.technique.blood_clones.lore": "Selama kau hidup, mereka tak bisa mati.",
+
+  "kultivator.technique.nezha_lotus_body": "Tubuh Teratai Nezha",
+  "kultivator.technique.nezha_lotus_body.desc": "Selama 40 dtk: kerusakan diterima −30% dan efek buruk dibersihkan. Pukulan mematikan pertama tidak membunuhmu: darah pulih penuh, Ketahanan III 3 dtk dan teratai meledak (radius 10→20, 4× kekuatan). Berbagi kunci 10 menit dengan teknik penyelamat lain; tak berlaku terhadap kesengsaraan atau /kill.",
+  "kultivator.technique.nezha_lotus_body.source": "Sumber: Investiture of the Gods bab 14 · setelah Nezha wafat, Taiyi Zhenren membangun kembali tubuhnya dari akar dan daun teratai (莲花化身)",
+  "kultivator.technique.nezha_lotus_body.lore": "Tubuh dari teratai tidak takut layu.",
+
+  "kultivator.technique.guanyin_sweet_dew": "Embun Manis Guanyin",
+  "kultivator.technique.guanyin_sweet_dew.desc": "Vas putih miring di langit dan meneteskan embun selama 10 dtk (radius 24→32): kau dan semua sekutu, termasuk penduduk desa dan golem, pulih 50% darah dan dibersihkan; mayat hidup terkena 0,8× kekuatan tiap detik; qi-mu pulih 30%; setelahnya Regenerasi III 10 dtk. Hanya partikel, cuaca tidak berubah.",
+  "kultivator.technique.guanyin_sweet_dew.source": "Sumber: Journey to the West bab 26 · Guanyin menghidupkan kembali Pohon Buah Ginseng milik Zhenyuan yang tumbang dengan embun manis dari vasnya, dipercikkan dengan ranting dedalunya",
+  "kultivator.technique.guanyin_sweet_dew.lore": "Setetes embun, dan bahkan pohon yang tumbang kembali berbuah.",
+
+  "kultivator.technique.life_death_domain": "Wilayah Hidup dan Mati",
+  "kultivator.technique.life_death_domain.desc": "Wilayah yang mengikutimu selama 20 dtk (radius 20→32): tiap detik monster terkena 0,6× kekuatan + 2% darah maksimum (bos 1%) dan yang di bawah 10% darah langsung tewas (bos 5%); 20% kerusakannya memulihkanmu; kau dan sekutu pulih 60% darah selama 20 dtk. Di akhir: radius 32, 12× kekuatan. Qi 55% (min 700).",
+  "kultivator.technique.life_death_domain.source": "Sumber: Renegade Immortal · wilayah Hidup dan Mati milik Wang Lin",
+  "kultivator.technique.life_death_domain.lore": "Separuh dunia layu menjadi abu, separuh lagi bermekaran. Kau berdiri di garisnya.",
+
+  "kultivator.technique.bodhisattva_tree": "Pohon Kuno Bodhisattva: Seratus Kehidupan",
+  "kultivator.technique.bodhisattva_tree.desc": "Pohon setinggi 30 blok tumbuh di sekitarmu selama 30 dtk (radius 24→40): kau dan sekutu pulih 90% darah, regenerasi qi ×3; pemahamanmu +0,05/dtk (maks 3); sekali kau tak bisa jatuh di bawah 1 darah. Tiap 5 dtk monster dalam radius 40 terkena 4× kekuatan dan Lambat III; di akhir 14× kekuatan. Qi 80%.",
+  "kultivator.technique.bodhisattva_tree.source": "Sumber: Battle Through the Heavens · Pohon Kuno Bodhisattva: Xiao Yan mencari Jantung Bodhisattva-nya (bab 828) dan kelak duduk di dalamnya dalam \"Reinkarnasi Seratus Kehidupan\" (bab 1426)",
+  "kultivator.technique.bodhisattva_tree.lore": "Seratus kehidupan berlalu di bawah dahannya dalam sekejap."
+}

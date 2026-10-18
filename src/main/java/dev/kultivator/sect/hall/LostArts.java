@@ -30,21 +30,33 @@ import java.util.UUID;
  */
 final class LostArts {
 
-	public static final int SETS = 3;
+	/**
+	 * Page sets of {@code kultivator:scripture_page}: the three hall arts, plus set 4 "Kitab Penyegel Iblis" (DESIGN 22.8.10,
+	 * module P6c-seni-A), whose pages teach techniques with an SCR route ({@code technique.source.TechniqueLoot}) and are never
+	 * restored here.
+	 */
+	public static final int SETS = 4;
+	/** The sets the hall restores as lost arts (1-3). */
+	public static final int RESTORABLE = 3;
+	/** Set 4, Kitab Penyegel Iblis (Sealing Demon Codex): read for SCR techniques, never restored. */
+	public static final int SEALING = 4;
 	public static final int PIECES = 5;
 	public static final int PLUM = 1;
 	public static final int PURPLE_MIST = 2;
 	public static final int NORTHERN_HEAVEN = 4;
 	/** Renown for a restored art. */
 	public static final int RENOWN = 500;
-	private static final int[] COLOUR = {0xFF9EC8, 0xB88CFF, 0xBFE4FF};
+	private static final int[] COLOUR = {0xFF9EC8, 0xB88CFF, 0xBFE4FF, 0xC24B4B};
 
 	static int bit(int set) {
-		return 1 << (Math.max(1, Math.min(SETS, set)) - 1);
+		return 1 << (Math.max(1, Math.min(RESTORABLE, set)) - 1);
 	}
 
 	static MutableComponent setName(int set) {
-		return Component.translatable("kultivator.hall.art." + Math.max(1, Math.min(SETS, set)));
+		if (set == SEALING) {
+			return Component.translatable("kultivator.sumber.scripture.set");
+		}
+		return Component.translatable("kultivator.hall.art." + Math.max(1, Math.min(RESTORABLE, set)));
 	}
 
 	/** Which pieces (bits 0-4) of {@code set} the player carries. */
@@ -63,7 +75,8 @@ final class LostArts {
 
 	/** Pulihkan Seni: consumes one page of each piece, restores the art, +500 renown. */
 	static void restore(ServerPlayer player, UUID owner, CompoundTag core, int set) {
-		if (set < 1 || set > SETS) {
+		if (set < 1 || set > RESTORABLE) {
+			// Set 4 (Kitab Penyegel Iblis) is read for techniques, never restored as a hall art.
 			return;
 		}
 		int arts = core.getIntOr("arts", 0);

@@ -1,0 +1,30 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:leaves",
+    "#minecraft:small_flowers",
+    "minecraft:sunflower",
+    "minecraft:lilac",
+    "minecraft:peony",
+    "minecraft:rose_bush",
+    "minecraft:pink_petals",
+    "minecraft:wildflowers",
+    "minecraft:cactus_flower",
+    "minecraft:short_grass",
+    "minecraft:tall_grass",
+    "minecraft:fern",
+    "minecraft:large_fern",
+    "minecraft:dead_bush",
+    "minecraft:bush",
+    "minecraft:short_dry_grass",
+    "minecraft:tall_dry_grass",
+    "minecraft:firefly_bush",
+    "minecraft:leaf_litter",
+    "minecraft:vine",
+    "minecraft:glow_lichen",
+    "minecraft:moss_carpet",
+    "minecraft:pale_moss_carpet",
+    "minecraft:pale_hanging_moss",
+    "minecraft:hanging_roots"
+  ]
+}

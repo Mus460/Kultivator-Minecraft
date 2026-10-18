@@ -6,22 +6,32 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import dev.kultivator.Kultivator;
-import dev.kultivator.cultivation.Breakthrough;
-import dev.kultivator.cultivation.Meditation;
 import dev.kultivator.cultivation.Qi;
-import dev.kultivator.dao.Comprehension;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
-import dev.kultivator.data.Dao;
 import dev.kultivator.data.Rank;
 import dev.kultivator.data.Technique;
+import dev.kultivator.data.TechniqueRegistry;
+import dev.kultivator.data.TechniqueSpec;
+import dev.kultivator.data.TechniqueType;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
-import dev.kultivator.trial.HeartDemons;
+import dev.kultivator.technique.spec.DamageContext;
+import dev.kultivator.technique.spec.TechniquePower;
+import dev.kultivator.technique.spec.run.Boons;
+import dev.kultivator.technique.spec.run.CastOptions;
+import dev.kultivator.technique.spec.run.Forms;
+import dev.kultivator.technique.spec.run.Loadout;
+import dev.kultivator.technique.spec.run.Mastery;
+import dev.kultivator.technique.spec.run.TechniqueRunner;
+import dev.kultivator.technique.spec.run.TeknikSync;
+import dev.kultivator.technique.spec.run.Unlocks;
 import dev.kultivator.util.Advancements;
+import dev.kultivator.util.DamageHooks;
 import dev.kultivator.util.Msg;
+import dev.kultivator.util.NoGrief;
 import dev.kultivator.util.Targeting;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -48,23 +58,28 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Learning, selecting and casting techniques (DESIGN sections 8 and 15), plus the helpers both technique modules share:
- * {@link #power}, {@link #hurt}, {@link #fx} and {@link #schedule}. The universal techniques themselves live in
- * {@link UniversalTechniques} and its helper classes, the Dao techniques in {@code DaoTechniques}.
+ * Learning, selecting and casting techniques (DESIGN 8, 15, 22.2.6) and the helpers both technique modules share:
+ * {@link #power}, {@link #hurt}, {@link #fx} and {@link #schedule}. Since phase 6c every cast goes through the spec
+ * pipeline ({@code TechniqueRunner.cast}); the legacy 23 run their hand-written code through {@code LegacyArt}. The
+ * CAST and SELECT actions resolve spec ids through the registry, cycling stays inside the loadout (Cincin Segel).
  */
 public final class Techniques {
 
 	/** Damage type {@code kultivator:technique} (data/kultivator/damage_type/technique.json). */
 	public static final ResourceKey<DamageType> DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, Kultivator.id("technique"));
+	/** Armour-bypassing technique damage {@code kultivator:technique_pierce} (soul and space arts, DESIGN 22.3.2). */
+	public static final ResourceKey<DamageType> DAMAGE_PIERCE = ResourceKey.create(Registries.DAMAGE_TYPE, Kultivator.id("technique_pierce"));
 	/** Other modules' reasons why the player may not cast right now (null: no objection). */
 	private static final List<Function<ServerPlayer, Component>> CAST_BLOCKERS = new ArrayList<>();
 
@@ -75,44 +90,46 @@ public final class Techniques {
 	public static void addCastBlocker(Function<ServerPlayer, @Nullable Component> blocker) {
 		CAST_BLOCKERS.add(blocker);
 	}
+
 	/** More actions than this per second from one client are ignored. */
 	private static final int MAX_ACTIONS_PER_SECOND = 10;
-	/** Known techniques for the {@code technique_collector} advancement. */
-	private static final int COLLECTOR_COUNT = 10;
 
 	static final int REFUSE = 0xFF9A7A;
 	static final int JADE = 0x8FE3C8;
 	static final int GOLD = 0xFFD54A;
 	static final int MUTED = 0xA8B5B0;
 
-	/** Something a technique does later (the Buddha Palm landing...). Dropped on death, leaving or dimension change. */
+	/** Something a technique does later. Dropped on death, leaving or dimension change. */
 	private record Pending(long due, ResourceKey<Level> dimension, Consumer<ServerPlayer> action) {
 	}
 
 	private static final Map<UUID, List<Pending>> PENDING = new HashMap<>();
 	/** Per player: game time the current one-second window started, actions in it. */
 	private static final Map<UUID, long[]> RATE = new HashMap<>();
+	/** Players whose current Enlightenment Moment was already counted (22.6, 22.8.6). */
+	private static final Set<UUID> ENLIGHTENED = new HashSet<>();
 
 	private static final SuggestionProvider<CommandSourceStack> KNOWN = (ctx, builder) -> {
 		ServerPlayer player = ctx.getSource().getPlayer();
 		if (player == null) {
-			return SharedSuggestionProvider.suggest(java.util.Arrays.stream(Technique.values()).map(Technique::id), builder);
+			return SharedSuggestionProvider.suggest(TechniqueRegistry.all().stream().map(TechniqueSpec::id), builder);
 		}
-		return SharedSuggestionProvider.suggest(Cultivators.get(player).learnedTechniques().stream().map(Technique::id), builder);
+		return SharedSuggestionProvider.suggest(Cultivators.get(player).learnedSpecs().stream().map(TechniqueSpec::id), builder);
 	};
 
 	public static void init() {
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
 			if (entity instanceof ServerPlayer player) {
 				// Every fall-based damage (fall, stalagmite) but the ender pearl's own.
-				if (source.is(DamageTypeTags.IS_FALL) && !source.is(DamageTypes.ENDER_PEARL) && CloudStep.fallImmune(player)) {
+				if (source.is(DamageTypeTags.IS_FALL) && !source.is(DamageTypes.ENDER_PEARL) && (CloudStep.fallImmune(player) || Boons.noFall(player))) {
 					return false;
 				}
-				if (source.is(DamageTypes.IN_WALL) && Cultivators.get(player).dharmaActive()) {
+				if (source.is(DamageTypes.IN_WALL) && (Cultivators.get(player).dharmaActive() || Forms.grown(player))) {
 					return false;
 				}
 			}
-			return true;
+			// Dash i-frames never cover unblockable damage (tribulation, qi deviation, the void, /kill).
+			return !(Boons.iframes(entity) && !source.is(DamageHooks.UNBLOCKABLE));
 		});
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
 			if (entity instanceof ServerPlayer player) {
@@ -131,11 +148,15 @@ public final class Techniques {
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			PENDING.clear();
 			RATE.clear();
+			ENLIGHTENED.clear();
 			CloudStep.clearAll();
 			FlyingSword.clearAll();
 			DharmaForm.clearAll();
 			DaoDomain.clearAll();
 		});
+		FlyingSword.init();
+		// Phase 6c (DESIGN 22.2.6): the runner and its subsystems; the registry is built later and read lazily.
+		TechniqueRunner.init();
 	}
 
 	public static void tick(ServerPlayer player, CultivationData data) {
@@ -144,14 +165,36 @@ public final class Techniques {
 		FlyingSword.tick(player, data);
 		DharmaForm.tick(player, data);
 		DaoDomain.tick(player, data);
-		if (player.tickCount % 100 == 37 && data.learnedIds().size() >= COLLECTOR_COUNT) {
-			Advancements.grant(player, "technique_collector");
+		if (player.tickCount % 20 == 0) {
+			// QI_REGEN boons and SELF_PENALTY adjust the second Qi.tick just regenerated.
+			double factor = Boons.qiRegenFactor(player);
+			if (Math.abs(factor - 1.0D) > 1.0E-6D && !data.deviating()) {
+				double regen = Qi.regenPerSecond(data);
+				if (factor > 1.0D) {
+					Qi.restore(player, regen * (factor - 1.0D));
+				} else {
+					data.setQi(Math.max(0.0D, data.qi() - regen * (1.0D - factor)));
+				}
+			}
+		}
+		if (data.enlightened()) {
+			if (ENLIGHTENED.add(player.getUUID())) {
+				dev.kultivator.technique.spec.run.TechniqueCommands.enlightenment(player);
+			}
+		} else if (!ENLIGHTENED.isEmpty()) {
+			ENLIGHTENED.remove(player.getUUID());
+		}
+		if (player.tickCount % 100 == 37) {
+			dev.kultivator.technique.spec.run.TechniqueCommands.checkAdvancements(player);
+		}
+		if (player.tickCount % 10 == 3) {
+			TeknikSync.write(player, data);
 		}
 	}
 
 	// ================================================================ actions
 
-	/** CAST, SELECT_*, FLYING_SWORD_TOGGLE and CLOUD_STEP actions. */
+	/** CAST, SELECT_*, FLYING_SWORD_TOGGLE and CLOUD_STEP actions (spec ids through the registry). */
 	public static void handleAction(ServerPlayer player, Payloads.Action action) {
 		if (!allowAction(player)) {
 			return;
@@ -164,19 +207,14 @@ public final class Techniques {
 			case Actions.CAST -> {
 				String text = action.text() == null ? "" : action.text().trim();
 				if (text.isEmpty()) {
-					Technique selected = data.selected();
-					if (selected == null) {
+					String selected = data.selectedId();
+					if (selected.isEmpty() || TechniqueRegistry.byId(selected) == null) {
 						refuse(player, Component.translatable("kultivator.techniques.refuse.none_selected"));
 					} else {
 						tryCast(player, selected);
 					}
 				} else {
-					Technique technique = Technique.byId(text);
-					if (technique == null) {
-						refuse(player, Component.translatable("kultivator.techniques.refuse.unknown", text));
-					} else {
-						tryCast(player, technique);
-					}
+					tryCast(player, text);
 				}
 			}
 			case Actions.FLYING_SWORD_TOGGLE -> tryCast(player, Technique.FLYING_SWORD);
@@ -198,118 +236,125 @@ public final class Techniques {
 		return rate[1] <= MAX_ACTIONS_PER_SECOND;
 	}
 
-	/**
-	 * Casts {@code technique} if every rule allows it (DESIGN section 15): known, realm, Dao, no deviation, no
-	 * breakthrough, cooldown over, enough qi. Stops meditation first. On success spends the qi, starts the cooldown and
-	 * feeds Dao comprehension. Every refusal is explained in the action bar. True when the technique happened.
-	 */
+	/** Casts a legacy technique through the spec pipeline. True when it happened. */
 	public static boolean tryCast(ServerPlayer player, Technique technique) {
-		CultivationData data = Cultivators.get(player);
-		if (!player.isAlive() || player.isDeadOrDying() || player.isSpectator()) {
-			return refuse(player, Component.translatable("kultivator.techniques.refuse.now"));
+		return tryCast(player, technique.spec(), CastOptions.DEFAULT);
+	}
+
+	/** Casts a spec (DESIGN 22.2.6): every refusal of step 1 in order, the snapshot, precheck, spending and the start. */
+	public static boolean tryCast(ServerPlayer player, TechniqueSpec spec, CastOptions options) {
+		return TechniqueRunner.cast(player, spec, options);
+	}
+
+	/** Casts the spec with id {@code id} with the default options; unknown ids are refused. */
+	public static boolean tryCast(ServerPlayer player, String id) {
+		TechniqueSpec spec = TechniqueRegistry.byId(id == null ? "" : id.trim());
+		if (spec == null) {
+			return refuse(player, Component.translatable("kultivator.techniques.refuse.unknown", String.valueOf(id)));
 		}
-		if (technique == Technique.CLOUD_STEP) {
-			return refuse(player, Component.translatable("kultivator.techniques.refuse.passive",
-					Component.keybind("key.jump").withStyle(ChatFormatting.YELLOW)));
-		}
-		if (technique == Technique.FLYING_SWORD && data.flyingSword()) {
-			// Stepping down is always allowed and costs nothing.
-			FlyingSword.dismount(player, data, FlyingSword.Reason.TOGGLE);
-			return true;
-		}
+		return tryCast(player, spec, CastOptions.DEFAULT);
+	}
+
+	/** The first other module's reason the player may not cast now, or null. */
+	public static @Nullable Component castBlocker(ServerPlayer player) {
 		for (Function<ServerPlayer, Component> blocker : CAST_BLOCKERS) {
 			Component blocked = blocker.apply(player);
 			if (blocked != null) {
-				return refuse(player, blocked);
+				return blocked;
 			}
 		}
-		Component why = whyNotCastable(data, technique);
-		if (why != null) {
-			return refuse(player, why);
-		}
-		if (data.deviating()) {
-			return refuse(player, Component.translatable("kultivator.techniques.refuse.deviation",
-					Component.literal(String.valueOf(Math.max(1, data.deviationTicks() / 20)))));
-		}
-		// The heart demon before a breakthrough is fought with every technique (the flying sword stays grounded).
-		boolean demonTrial = HeartDemons.inBreakthroughTrial(player) && technique != Technique.FLYING_SWORD;
-		if ((data.breakingThrough() || Breakthrough.isBusy(player)) && !demonTrial) {
-			return refuse(player, Component.translatable("kultivator.techniques.refuse.breakthrough"));
-		}
-		long now = player.level().getGameTime();
-		long left = data.cooldownLeft(technique, now);
-		if (left > 0L) {
-			return refuse(player, Component.translatable("kultivator.techniques.refuse.cooldown", name(technique), seconds(left)));
-		}
-		int cost = technique.qiCost();
-		if (data.qi() + 1.0E-6D < cost) {
-			return refuse(player, Component.translatable("kultivator.techniques.refuse.qi", name(technique),
-					Msg.number(data.qi()), String.valueOf(cost)));
-		}
-		Meditation.stop(player);
-		boolean done = technique.dao() == null
-				? UniversalTechniques.cast(player, data, technique)
-				: DaoTechniques.cast(player, data, technique);
-		if (!done) {
-			return false;
-		}
-		Qi.trySpend(player, cost);
-		data.setCooldown(technique, now, technique.cooldownTicks());
-		Comprehension.onTechniqueUsed(player, technique);
-		Advancements.grant(player, "first_technique");
-		Cultivators.dirty(player);
-		return true;
+		return null;
 	}
 
-	/** Selects a known, castable technique (never the passive Cloud Step). True on success. */
+	/** Steps down from the Flying Sword (always allowed, costs nothing). */
+	public static void dismountSword(ServerPlayer player) {
+		FlyingSword.dismount(player, Cultivators.get(player), FlyingSword.Reason.TOGGLE);
+	}
+
+	/** Ends a Dharma Form (a technique form takes the one-form slot). */
+	public static void endDharma(ServerPlayer player) {
+		DharmaForm.end(player, "kultivator.techniques.dharma_form.end");
+	}
+
+	/** Ends a technique form (Dharma Form takes the one-form slot). */
+	static void endTechniqueForm(ServerPlayer player) {
+		dev.kultivator.technique.spec.run.TechniqueCommands.endForm(player);
+	}
+
+	/** True when {@code pos} lies inside the player's legacy Dao Domain (IN_AREA, COST_MOD inside the own field). */
+	public static boolean inLegacyDomain(ServerPlayer player, Vec3 pos) {
+		return DaoDomain.contains(player, pos);
+	}
+
+	/** The legacy Dao Domain's end tick and radius (HUD), or {0, 0}. */
+	public static double[] legacyDomain(ServerPlayer player) {
+		return new double[]{DaoDomain.endTick(player), DaoDomain.radius(player)};
+	}
+
+	/** Selects a known, castable spec (never the passive Cloud Step). True on success. */
 	public static boolean select(ServerPlayer player, String id) {
 		CultivationData data = Cultivators.get(player);
-		Technique technique = Technique.byId(id == null ? "" : id.trim());
-		if (technique == null) {
+		TechniqueSpec spec = TechniqueRegistry.byId(id == null ? "" : id.trim());
+		if (spec == null || !spec.playerVisible()) {
 			return refuse(player, Component.translatable("kultivator.techniques.refuse.unknown", String.valueOf(id)));
 		}
-		if (technique == Technique.CLOUD_STEP) {
+		if (spec.type() == TechniqueType.PASIF) {
 			return refuse(player, Component.translatable("kultivator.techniques.refuse.passive",
 					Component.keybind("key.jump").withStyle(ChatFormatting.YELLOW)));
 		}
-		Component why = whyNotCastable(data, technique);
+		Component why = TechniqueRunner.whyNotCastablePublic(data, spec);
 		if (why != null) {
 			return refuse(player, why);
 		}
-		data.setSelected(technique);
+		data.setSelectedId(spec.id());
 		Cultivators.syncNow(player);
-		showSelection(player, technique);
+		showSelection(player, spec);
 		return true;
 	}
 
-	/** Moves the selection {@code step} places through the castable techniques (enum order, wrapping around). */
+	/** Moves the selection {@code step} places through the loadout (every castable spec while it is empty), wrapping around. */
 	public static void cycle(ServerPlayer player, int step) {
 		CultivationData data = Cultivators.get(player);
-		List<Technique> list = castableTechniques(data);
+		List<TechniqueSpec> list = Loadout.cycle(data);
 		if (list.isEmpty()) {
 			refuse(player, Component.translatable("kultivator.techniques.refuse.none_learned"));
 			return;
 		}
-		int index = list.indexOf(data.selected());
+		int index = -1;
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).id().equals(data.selectedId())) {
+				index = i;
+				break;
+			}
+		}
 		int next = index < 0 ? (step >= 0 ? 0 : list.size() - 1) : Math.floorMod(index + step, list.size());
-		Technique technique = list.get(next);
-		data.setSelected(technique);
+		TechniqueSpec spec = list.get(next);
+		data.setSelectedId(spec.id());
 		Cultivators.syncNow(player);
-		showSelection(player, technique);
+		showSelection(player, spec);
 	}
 
-	private static void showSelection(ServerPlayer player, Technique technique) {
-		String key = technique == Technique.FLYING_SWORD ? "kultivator.techniques.selected.flying" : "kultivator.techniques.selected";
-		Msg.actionBar(player, Component.translatable(key, name(technique), String.valueOf(technique.qiCost()),
-				seconds(technique.cooldownTicks()), Comprehension.format(FlyingSword.drainPerSecond(Cultivators.get(player)))).withColor(JADE));
+	private static void showSelection(ServerPlayer player, TechniqueSpec spec) {
+		CultivationData data = Cultivators.get(player);
+		int mastery = Mastery.level(data, spec.id());
+		int qi = TechniquePower.qi(spec, data, mastery, Boons.qiFactor(player, spec));
+		int cooldown = TechniquePower.cooldownTicks(spec, data, mastery, Boons.cooldownFactor(player, spec));
+		String key = spec.legacy() == Technique.FLYING_SWORD ? "kultivator.techniques.selected.flying" : "kultivator.techniques.selected";
+		Msg.actionBar(player, Component.translatable(key, spec.displayName().copy().withColor(GOLD), String.valueOf(qi), seconds(cooldown),
+				dev.kultivator.dao.Comprehension.format(FlyingSword.drainPerSecond(data))).withColor(JADE));
 	}
 
-	/** Known, realm reached, Dao matches, not passive: may be selected and cast. Pure (client screens may use it). */
+	/** Known, rank reached, Dao matches, not passive: may be selected and cast. Pure (client screens may use it). */
 	public static boolean castable(CultivationData data, Technique technique) {
-		return technique != Technique.CLOUD_STEP && whyNotCastable(data, technique) == null;
+		return castable(data, technique.spec());
 	}
 
-	/** Every castable technique in enum order. */
+	/** The spec variant of {@link #castable(CultivationData, Technique)}. Pure. */
+	public static boolean castable(CultivationData data, TechniqueSpec spec) {
+		return Loadout.castable(data, spec);
+	}
+
+	/** Every castable legacy technique in enum order. */
 	public static List<Technique> castableTechniques(CultivationData data) {
 		List<Technique> list = new ArrayList<>();
 		for (Technique technique : Technique.values()) {
@@ -318,22 +363,6 @@ public final class Techniques {
 			}
 		}
 		return list;
-	}
-
-	/** Why the technique cannot be used at all (unknown, realm too low, other Dao), or null when it can. */
-	private static @Nullable Component whyNotCastable(CultivationData data, Technique technique) {
-		if (!data.knows(technique)) {
-			return Component.translatable("kultivator.techniques.refuse.not_known", name(technique));
-		}
-		if (!data.realm().atLeast(technique.minRealm())) {
-			return Component.translatable("kultivator.techniques.refuse.realm", name(technique),
-					technique.minRealm().displayName().copy().withColor(technique.minRealm().color()));
-		}
-		Dao dao = technique.dao();
-		if (dao != null && dao != data.dao()) {
-			return Component.translatable("kultivator.techniques.refuse.dao", name(technique), dao.displayName().copy().withColor(dao.color()));
-		}
-		return null;
 	}
 
 	/** Tells the player why something did not happen (action bar, soft red). Always false, for {@code return refuse(...)}. */
@@ -353,63 +382,9 @@ public final class Techniques {
 
 	// ================================================================ learning
 
-	/** Learns every REALM/DAO technique the player now qualifies for (called after rank or Dao changes). Never forgets. */
+	/** Learns every automatic spec the player now qualifies for (rank, Dao, comprehension, feats). Never forgets. */
 	public static void refreshUnlocks(ServerPlayer player) {
-		CultivationData data = Cultivators.get(player);
-		boolean knewNothing = data.learnedIds().isEmpty();
-		Dao dao = data.dao();
-		List<Technique> fresh = new ArrayList<>();
-		for (Technique technique : Technique.values()) {
-			boolean qualifies = switch (technique.unlock()) {
-				case REALM -> data.realm().atLeast(technique.minRealm());
-				case DAO -> dao != null && technique.dao() == dao && data.realm().atLeast(technique.minRealm());
-				case BOOK -> false;
-			};
-			if (qualifies && data.learn(technique)) {
-				fresh.add(technique);
-			}
-		}
-		for (Technique technique : fresh) {
-			Msg.chat(player, Component.translatable("kultivator.techniques.learned", name(technique),
-					technique.description().copy().withColor(MUTED)).withColor(JADE));
-			if (technique == Technique.FLYING_SWORD) {
-				Msg.chat(player, Component.translatable("kultivator.techniques.hint.flying_sword",
-						Component.keybind("key.kultivator.flying_sword").withStyle(ChatFormatting.YELLOW)).withColor(MUTED));
-			}
-		}
-		if (knewNothing && !fresh.isEmpty()) {
-			Msg.chat(player, Component.translatable("kultivator.techniques.hint.keys",
-					Component.keybind("key.kultivator.cast").withStyle(ChatFormatting.YELLOW),
-					Component.keybind("key.kultivator.previous").withStyle(ChatFormatting.YELLOW),
-					Component.keybind("key.kultivator.next").withStyle(ChatFormatting.YELLOW),
-					Component.keybind("key.kultivator.info").withStyle(ChatFormatting.YELLOW)).withColor(MUTED));
-		}
-		boolean selectionChanged = ensureSelection(data);
-		if (data.learnedIds().size() >= COLLECTOR_COUNT) {
-			Advancements.grant(player, "technique_collector");
-		}
-		if (!fresh.isEmpty() || selectionChanged) {
-			Cultivators.dirty(player);
-		}
-	}
-
-	/** Selects the first castable technique when nothing (or something no longer castable) is selected. True if changed. */
-	private static boolean ensureSelection(CultivationData data) {
-		Technique selected = data.selected();
-		if (selected != null && castable(data, selected)) {
-			return false;
-		}
-		List<Technique> list = castableTechniques(data);
-		Technique choice = list.isEmpty() ? null : list.get(0);
-		if (choice == selected) {
-			return false;
-		}
-		if (choice == null && selected != null && data.knows(selected)) {
-			// Keep a known but momentarily unusable selection rather than clearing it.
-			return false;
-		}
-		data.setSelected(choice);
-		return true;
+		Unlocks.refresh(player);
 	}
 
 	// ================================================================ join / leave / death
@@ -428,6 +403,7 @@ public final class Techniques {
 		CloudStep.forget(player);
 		PENDING.remove(player.getUUID());
 		RATE.remove(player.getUUID());
+		ENLIGHTENED.remove(player.getUUID());
 	}
 
 	private static void onDeath(ServerPlayer player) {
@@ -440,7 +416,7 @@ public final class Techniques {
 
 	// ================================================================ shared helpers
 
-	/** D of DESIGN section 8: {@code (4 + 2.5 x realm + 0.5 x stage) x (1 + comprehension / 100)}. */
+	/** D of DESIGN section 8 (the pre-6c power; arenas and other modules' legacy numbers). */
 	public static double power(CultivationData data) {
 		Rank rank = data.rank();
 		double base = 4.0D + 2.5D * rank.realm().ordinal() + 0.5D * rank.stage();
@@ -453,37 +429,62 @@ public final class Techniques {
 	}
 
 	/**
-	 * Hurts {@code target} with technique damage from {@code caster} (kill credit, XP and loot go to the caster). Refuses
-	 * every target {@link Targeting#isHostileTo} rejects. Technique qi is not slowed by the target's short invulnerability
-	 * after a melee hit. True when damage was dealt; a kill is counted in the caster's technique kills.
-	 * <p>
-	 * Silverfish take attacker-less damage (credited through {@code setLastHurtByPlayer}): a hit with an attacker makes them
-	 * call their friends out of infested blocks, which breaks or replaces those blocks.
+	 * Hurts {@code target} with a finished amount of technique damage from {@code caster} (other modules' pre-6c numbers;
+	 * the boss, arena, trial-mob and heart-demon caps apply through a single-hit ledger). Refuses every target
+	 * {@link Targeting#isHostileTo} rejects. True when damage was dealt.
 	 */
 	public static boolean hurt(ServerPlayer caster, LivingEntity target, float amount) {
 		if (caster == null || target == null || !(amount > 0.0F) || !Float.isFinite(amount)) {
 			return false;
 		}
-		if (target.level() != caster.level() || !Targeting.isHostileTo(target, caster)) {
+		if (TechniquePower.inArena(caster, target)) {
+			// A duel keeps the pre-6c amount exactly (the duel clamps apply as before).
+			return hurt(caster, DamageContext.legacy(caster, target, amount));
+		}
+		double power = Math.max(1.0E-6D, TechniquePower.power(Cultivators.get(caster)));
+		DamageContext context = new DamageContext(DamageContext.Kind.HIT, caster, target, null, amount / power, amount / power, 0.0D, power, 0,
+				1.0D, true, false, null);
+		return hurt(caster, context);
+	}
+
+	/**
+	 * The player's spec damage choke point (DESIGN 22.3.5 rule 7): only targets {@link Targeting#isHostileTo} accepts
+	 * (calm neutrals only for precise hits), the amount from {@code TechniquePower.finalDamage}, {@code technique_pierce}
+	 * for pierce hits, the silverfish rule, {@link NoGrief#TAG} and a portal cooldown on monsters, and precise hits on the
+	 * Ender Dragon go to its head. True when damage landed.
+	 */
+	public static boolean hurt(ServerPlayer caster, DamageContext context) {
+		LivingEntity target = context.target();
+		if (caster == null || target == null || target.level() != caster.level() || !Targeting.isHostileTo(target, caster, context.precise())) {
+			return false;
+		}
+		float damage = TechniquePower.finalDamage(context);
+		if (!(damage > 0.0F) || !Float.isFinite(damage)) {
 			return false;
 		}
 		ServerLevel level = caster.level();
 		if (target.damageCooldownTime > 10) {
 			target.damageCooldownTime = 10;
 		}
+		ResourceKey<DamageType> type = context.pierce() ? DAMAGE_PIERCE : DAMAGE;
 		DamageSource source;
 		if (target instanceof Silverfish) {
 			target.setLastHurtByPlayer(caster, 100);
-			source = new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(DAMAGE));
+			source = new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(type));
 		} else {
-			source = damageSource(level, caster);
+			source = new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(type), caster);
 		}
 		if (!(target instanceof ServerPlayer)) {
-			// The hit's knockback could push a monster into a portal; travel could build an exit portal (blocks).
+			target.addTag(NoGrief.TAG);
 			target.setPortalCooldown();
 		}
-		boolean hit = target.hurtServer(level, source, amount);
-		if (hit && target.isDeadOrDying()) {
+		boolean hit;
+		if (context.precise() && target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon) {
+			hit = dragon.hurt(level, dragon.head, source, damage);
+		} else {
+			hit = target.hurtServer(level, source, damage);
+		}
+		if (hit && target.isDeadOrDying() && !dev.kultivator.technique.spec.run.Dummies.isDummy(target)) {
 			Cultivators.get(caster).addTechniqueKill();
 			Cultivators.dirty(caster);
 		}
@@ -536,7 +537,7 @@ public final class Techniques {
 
 	// ================================================================ commands
 
-	/** {@code technique select|list|cast} for players and {@code debug technique cooldowns reset}. */
+	/** {@code technique select|list|cast} for players (every spec id) and {@code debug technique cooldowns reset}. */
 	public static void addCommands(LiteralArgumentBuilder<CommandSourceStack> root, LiteralArgumentBuilder<CommandSourceStack> debug) {
 		root.then(Commands.literal("technique")
 				.then(Commands.literal("select")
@@ -545,39 +546,39 @@ public final class Techniques {
 				.then(Commands.literal("list").executes(ctx -> list(ctx.getSource(), self(ctx))))
 				.then(Commands.literal("cast")
 						.then(Commands.argument("id", StringArgumentType.word()).suggests(KNOWN)
-								.executes(ctx -> {
-									ServerPlayer player = self(ctx);
-									String id = StringArgumentType.getString(ctx, "id");
-									Technique technique = Technique.byId(id);
-									if (technique == null) {
-										ctx.getSource().sendFailure(Component.translatable("kultivator.techniques.refuse.unknown", id));
-										return 0;
-									}
-									return tryCast(player, technique) ? 1 : 0;
-								}))));
+								.executes(ctx -> tryCast(self(ctx), StringArgumentType.getString(ctx, "id")) ? 1 : 0))));
 		debug.then(Commands.literal("technique")
 				.then(Commands.literal("cooldowns")
 						.then(Commands.literal("reset").executes(ctx -> {
 							ServerPlayer player = self(ctx);
-							CultivationData data = Cultivators.get(player);
-							long now = player.level().getGameTime();
-							for (Technique technique : Technique.values()) {
-								data.setCooldown(technique, now, 0);
-							}
-							Cultivators.syncNow(player);
+							resetCooldowns(player);
 							ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.techniques.debug.cooldowns_reset")), false);
 							return 1;
 						}))));
+	}
+
+	/** Every cooldown of the player, the global cooldown, the lockout and the charges. */
+	public static void resetCooldowns(ServerPlayer player) {
+		CultivationData data = Cultivators.get(player);
+		long now = player.level().getGameTime();
+		for (String id : data.learnedIds()) {
+			data.setCooldown(id, now, 0);
+		}
+		for (Technique technique : Technique.values()) {
+			data.setCooldown(technique, now, 0);
+		}
+		dev.kultivator.technique.spec.run.TechniqueCommands.resetSession(player);
+		Cultivators.syncNow(player);
 	}
 
 	private static ServerPlayer self(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
 		return ctx.getSource().getPlayerOrException();
 	}
 
-	/** Known techniques with their qi cost, cooldown and state. */
+	/** Known specs with their qi cost, cooldown and state. */
 	private static int list(CommandSourceStack source, ServerPlayer player) {
 		CultivationData data = Cultivators.get(player);
-		List<Technique> known = data.learnedTechniques();
+		List<TechniqueSpec> known = data.learnedSpecs();
 		if (known.isEmpty()) {
 			source.sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.techniques.list.empty").withColor(MUTED)), false);
 			return 0;
@@ -585,32 +586,38 @@ public final class Techniques {
 		source.sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.techniques.list.header",
 				String.valueOf(known.size())).withColor(GOLD)), false);
 		long now = player.level().getGameTime();
-		Technique selected = data.selected();
-		String drain = Comprehension.format(FlyingSword.drainPerSecond(data));
-		for (Technique technique : known) {
-			String key = technique == Technique.FLYING_SWORD ? "kultivator.techniques.list.entry_flying" : "kultivator.techniques.list.entry";
+		String selected = data.selectedId();
+		String drain = dev.kultivator.dao.Comprehension.format(FlyingSword.drainPerSecond(data));
+		for (TechniqueSpec spec : known) {
+			int mastery = Mastery.level(data, spec.id());
+			String key = spec.legacy() == Technique.FLYING_SWORD ? "kultivator.techniques.list.entry_flying" : "kultivator.techniques.list.entry";
 			MutableComponent line = Component.literal(" • ").withColor(MUTED)
-					.append(Component.translatable(key, name(technique), String.valueOf(technique.qiCost()),
-							seconds(technique.cooldownTicks()), drain).withColor(0xE8E8E8));
+					.append(Component.translatable(key, spec.displayName().copy().withColor(GOLD), String.valueOf(TechniquePower.qi(spec, data, mastery)),
+							seconds(TechniquePower.cooldownTicks(spec, data, mastery)), drain).withColor(0xE8E8E8));
 			Component state;
-			if (technique == Technique.CLOUD_STEP) {
+			if (spec.type() == TechniqueType.PASIF) {
 				state = Component.translatable("kultivator.techniques.list.passive").withColor(JADE);
-			} else if (!castable(data, technique)) {
-				Component why = whyNotCastable(data, technique);
+			} else if (!castable(data, spec)) {
+				Component why = TechniqueRunner.whyNotCastablePublic(data, spec);
 				state = (why == null ? Component.translatable("kultivator.techniques.list.locked") : why.copy()).withColor(REFUSE);
 			} else {
-				long left = data.cooldownLeft(technique, now);
+				long left = data.cooldownLeft(spec.id(), now);
 				state = left > 0L
 						? Component.translatable("kultivator.techniques.list.waiting", seconds(left)).withColor(0xFFC27A)
 						: Component.translatable("kultivator.techniques.list.ready").withColor(0x7CFFB2);
 			}
 			line.append(Component.literal("  [").withColor(MUTED)).append(state).append(Component.literal("]").withColor(MUTED));
-			if (technique == selected) {
+			if (spec.id().equals(selected)) {
 				line.append(Component.literal(" ").append(Component.translatable("kultivator.techniques.list.selected").withColor(GOLD)));
 			}
 			source.sendSuccess(() -> line, false);
 		}
 		return known.size();
+	}
+
+	/** Grants {@code first_technique} (kept for other modules that cast techniques on the player's behalf). */
+	public static void firstTechnique(ServerPlayer player) {
+		Advancements.grant(player, "first_technique");
 	}
 
 	private Techniques() {

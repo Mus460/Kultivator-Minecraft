@@ -1087,9 +1087,10 @@ public final class Halls {
 		info.putInt("offer_cap", Contribution.OFFER_DAILY_CAP);
 		info.put("offers", Contribution.offers(viewer));
 		info.put("shop", Contribution.shop(owner, core));
+		// Slip Giok Teknik (DESIGN 22.8.4): every spec the pavilion sells, in grade order
 		ListTag books = new ListTag();
-		for (dev.kultivator.data.Technique technique : Contribution.BOOKS.keySet()) {
-			books.add(net.minecraft.nbt.StringTag.valueOf(technique.id()));
+		for (dev.kultivator.data.TechniqueSpec spec : Contribution.slips()) {
+			books.add(net.minecraft.nbt.StringTag.valueOf(spec.id()));
 		}
 		info.put("books", books);
 		info.putInt("arts", core.getIntOr("arts", 0));

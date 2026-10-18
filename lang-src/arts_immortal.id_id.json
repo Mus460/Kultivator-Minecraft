@@ -1,0 +1,21 @@
+{
+  "kultivator.technique.ninth_hex": "Segel Kesembilan",
+  "kultivator.technique.ninth_hex.desc": "Salurkan hingga 8 dtk (qi 50% maksimum, minimal 600, lalu 5/dtk): wilayah segel r 24→32 membekukan waktu di sekitarmu — monster di dalam pingsan tiap detik (bos terpaku, total paling lama 3 dtk) dan proyektil musuh di dalamnya lenyap. Saat penyaluran berakhir, 32 monster terkuat di dalam terkena 9× dan Lambat IV 5 dtk.",
+  "kultivator.technique.ninth_hex.source": "Sumber: I Shall Seal the Heavens bab 1379, 1465, 1534, 1540 · Ninth Hex (Segel Kesembilan), segel milik Meng Hao sendiri dan yang terakhir dari sembilan Segel Penyegel Iblis (efek penyegel waktu adalah desain permainan; Segel Gunung-Laut milik pewaris tetap terpisah)",
+  "kultivator.technique.ninth_hex.lore": "Segel terakhir dari sembilan, dan milik Meng Hao sendiri.",
+
+  "kultivator.technique.five_elements_mountain": "Gunung Lima Unsur",
+  "kultivator.technique.five_elements_mountain.desc": "Telapak emas jatuh dari 64 blok di atas titik bidik (≤ 64) setelah 2 dtk, r 12→24: 14× (×1,5 melawan mayat hidup) dan bantingan; lima gunung bangkit di lingkar 8 blok di sekitarnya, memaku monster 6 dtk (bos 1,5 dtk) dan membakarnya 0,8× per detik selama 6 dtk. Qi 55% maksimum (minimal 700).",
+  "kultivator.technique.five_elements_mountain.source": "Sumber: Journey to the West bab 7 · 五行山: Wukong tak bisa melompat keluar dari telapak Buddha, yang menjadi Gunung Lima Unsur dan disegel dengan jimat enam suku kata",
+  "kultivator.technique.five_elements_mountain.lore": "Tak ada lompatan yang bisa membawamu keluar dari telapak Buddha.",
+
+  "kultivator.technique.tai_chi_diagram": "Diagram Taiji",
+  "kultivator.technique.tai_chi_diagram.desc": "Isi 1,5 dtk, lalu diagram terbentang dan menekan turun dari 30 blok di atas sepanjang bidikanmu (panjang 48→64, lebar 9): 12× (×1,5 melawan mayat hidup) dan eksekusi di bawah 40% darah (bos di bawah 5%). Lepas lebih awal = kerusakan sesuai isian. Qi 55% maksimum (minimal 700).",
+  "kultivator.technique.tai_chi_diagram.source": "Sumber: Investiture of the Gods bab 61 · 太极图 Tai Chi Diagram: \"太极图殷洪绝命\", Yin Hong menjadi abu di dalamnya",
+  "kultivator.technique.tai_chi_diagram.lore": "Yin dan yang menutup, dan yang berdiri di antaranya menjadi abu.",
+
+  "kultivator.technique.heaven_trampling": "Langkah Penginjak Langit",
+  "kultivator.technique.heaven_trampling.desc": "Naik 24 blok di atas sembilan anak tangga cahaya (kerusakan −80% dan tak tersentuh 1,5 dtk, tanpa kerusakan jatuh 10 dtk), lalu injak titik bidik (≤ 48), r 24→32: 14× dan terlempar; tiga gelombang kejut bergulung hingga r 32→40, masing-masing 4×. Qi 80% maksimum.",
+  "kultivator.technique.heaven_trampling.source": "Sumber: Renegade Immortal · Heaven Trampling, langkah di balik tiga langkah yang membawa Wang Lin melampaui segalanya (gelar Penginjak Langit para murid dinamai darinya); sembilan anak tangga cahaya adalah desain permainan",
+  "kultivator.technique.heaven_trampling.lore": "Di balik tiga langkah, masih ada satu lagi."
+}

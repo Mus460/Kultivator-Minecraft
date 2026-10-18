@@ -13,7 +13,9 @@
     "EntityMixin",
     "RedStoneOreBlockMixin",
     "SectSpawnMixin",
-    "SectExplosionMixin"
+    "SectExplosionMixin",
+    "WitherBossMixin",
+    "LivingEntityDamageMixin"
   ],
   "injectors": {
     "defaultRequire": 1

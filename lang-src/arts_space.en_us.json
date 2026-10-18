@@ -1,0 +1,69 @@
+{
+  "kultivator.technique.space_blade": "Space Blade",
+  "kultivator.technique.space_blade.desc": "Pushes a thin crack in space forward 20→48 blocks, cutting through every monster on the line for 1.5×P armour-piercing damage.",
+  "kultivator.technique.space_blade.source": "Source: Martial Peak ch. 1139 · Space Blade, Yang Kai's self-created space art: tiny space cracks pushed forward like a wind blade",
+  "kultivator.technique.space_blade.lore": "The air does not part. It tears.",
+
+  "kultivator.technique.immortal_binding_rope": "Immortal-Binding Rope",
+  "kultivator.technique.immortal_binding_rope.desc": "Stage 1: the rope leaps to your target within 20→40 blocks and on to 2→6 more within 4 blocks: 0.5×P and rooted for 80 ticks (bosses 30). Stage 2 (within 3 s): yank the bound monsters 6 blocks toward you.",
+  "kultivator.technique.immortal_binding_rope.source": "Source: Investiture of the Gods ch. 53–54 · 捆仙绳 Immortal-Binding Rope of Ju Liusun, stolen by Tu Xingsun",
+  "kultivator.technique.immortal_binding_rope.lore": "A golden thread that knows the shape of every immortal it has ever held.",
+
+  "kultivator.technique.qiankun_ring": "Qiankun Ring",
+  "kultivator.technique.qiankun_ring.desc": "Throws a golden ring at your target within 24 blocks; it bounces 4→12 times between monsters up to 8 blocks apart for 1.8×P each (×0.85 per bounce) with knockback, then returns to you.",
+  "kultivator.technique.qiankun_ring.source": "Source: Investiture of the Gods ch. 12 · Nezha's golden 乾坤圈 Qiankun Ring, which kills the Dragon King's yaksha and third son",
+  "kultivator.technique.qiankun_ring.lore": "Thrown by a child, it once silenced a dragon.",
+
+  "kultivator.technique.gravitational_space": "Gravitational Space",
+  "kultivator.technique.gravitational_space.desc": "A domain of crushing gravity, radius 10→24, follows you for 240→360 ticks: every second 0.3×P, Slowness IV, no jumping or flying, double fall damage and a slam toward the ground.",
+  "kultivator.technique.gravitational_space.source": "Source: Coiling Dragon (Books 15–16) · Gravitational Space, a high profound mystery of the Laws of the Earth that Linley struggles to fuse",
+  "kultivator.technique.gravitational_space.lore": "Here even a feather falls like a mountain.",
+
+  "kultivator.technique.moon_blade": "Moon Blade",
+  "kultivator.technique.moon_blade.desc": "Three thin crescents of torn space fan out (−15°, 0°, +15°) and fly 32→64 blocks through walls: 2×P armour-piercing damage, at most two crescents per monster.",
+  "kultivator.technique.moon_blade.source": "Source: Martial Peak · the Moon Blade, Yang Kai's improved Space Blade",
+  "kultivator.technique.moon_blade.lore": "Three new moons, each one a cut in the world.",
+
+  "kultivator.technique.purple_gold_gourd": "Purple-Gold Red Gourd",
+  "kultivator.technique.purple_gold_gourd.desc": "The gourd calls your target's name (24 blocks, no line of sight needed). One second later it swallows it whole if its max health is below 10×P; tougher monsters take 4×P, bosses 3×P and Slowness IV for 80 ticks.",
+  "kultivator.technique.purple_gold_gourd.source": "Source: Journey to the West ch. 32–35 · 紫金红葫芦, the Golden and Silver Horn Kings' red gourd, sucks in whoever answers when it calls their name; Wukong later traps Silver Horn in it",
+  "kultivator.technique.purple_gold_gourd.lore": "Do not answer when a gourd calls your name.",
+
+  "kultivator.technique.heaven_turning_seal": "Heaven-Turning Seal",
+  "kultivator.technique.heaven_turning_seal.desc": "A giant seal falls from 30 blocks up onto the aimed spot (within 40) after 1 s: 3.5×P and rooted for 40 ticks (bosses 10) in radius 7→16, then a shock wave 4 blocks wider deals 1×P and knocks monsters back.",
+  "kultivator.technique.heaven_turning_seal.source": "Source: Investiture of the Gods ch. 46 · Guang Chengzi's 番天印 Heaven-Turning Seal smashes 19 mirrors, then strikes Jin Guang Shengmu's crown and kills her",
+  "kultivator.technique.heaven_turning_seal.lore": "It turns heaven over, and whatever stood beneath is simply gone.",
+
+  "kultivator.technique.spatial_ancestral_symbol": "Spatial Ancestral Symbol",
+  "kultivator.technique.spatial_ancestral_symbol.desc": "Folds a field of radius 16→28 at the aimed spot for 10 s: up to 32 non-boss monsters inside are pulled through space to its centre, and everything inside takes 0.5×P armour-piercing damage every second. Cast again up to 7 times (1 s apart) to blink freely to any spot inside the field.",
+  "kultivator.technique.spatial_ancestral_symbol.source": "Source: Martial Universe ch. 1209 · the Spatial Ancestral Symbol, one of the eight Ancestral Symbols, held by Zhou Tong",
+  "kultivator.technique.spatial_ancestral_symbol.lore": "Space folds like paper, and every corner of it is one step away.",
+  "kultivator.technique.spatial_ancestral_symbol.closed": "The fold has closed: there is no space left to step through.",
+  "kultivator.technique.spatial_ancestral_symbol.wait": "Space is still settling (%s s).",
+  "kultivator.technique.spatial_ancestral_symbol.no_spot": "No safe spot inside the fold there.",
+
+  "kultivator.technique.yellow_brow_bag": "Yellow Brows' Seed Bag and Golden Cymbals",
+  "kultivator.technique.yellow_brow_bag.desc": "A cloth bag opens at the aimed spot: for 3 s it sucks in up to 32 non-boss monsters within 20→32 blocks; then it holds them suspended for 100 ticks with qi damage of 0.5×P per second for 5 s (bosses are pinned under golden cymbals). After 8 s it spits them out for 3×P and knockback.",
+  "kultivator.technique.yellow_brow_bag.source": "Source: Journey to the West ch. 65–66 · the Yellow-Browed King, Maitreya's page boy, traps Wukong under stolen golden cymbals and swallows the heavenly helpers in his cloth bag until Maitreya subdues him",
+  "kultivator.technique.yellow_brow_bag.lore": "The bag was made for seeds. It holds armies just as well.",
+
+  "kultivator.technique.heavenly_restriction": "Layered Heavenly Restriction",
+  "kultivator.technique.heavenly_restriction.desc": "Seals a walled cube (half-side 10→24) at the aimed spot for 8 s: every second 0.6×P, frozen in place and Weakness III; the damage grows 15% per layer (up to 8). When it ends, the cube collapses for 6×P on everything inside.",
+  "kultivator.technique.heavenly_restriction.source": "Source: Inspired by Wang Lin's restrictions (禁制) and his Restriction Flag (Renegade Immortal ch. 207, 233, 291); the layered cube and its name are game design",
+  "kultivator.technique.heavenly_restriction.lore": "One restriction closes, then another, until there is nowhere left to stand.",
+
+  "kultivator.technique.void_mirror": "Void Mirror",
+  "kultivator.technique.void_mirror.desc": "Stage 1: a void mirror stands before you for 10 s: half damage from the front, projectiles from the front are swallowed and answered with a strike on the shooter, and frontal blows are stored. Stage 2, or when the 10 s end: the mirror fires a 64-block void beam through everything for 10×P plus the stored blows.",
+  "kultivator.technique.void_mirror.source": "Source: Shrouded the Heavens · 虚空镜 Void Mirror, the Void Great Emperor's imperial weapon, kept by the Ji family",
+  "kultivator.technique.void_mirror.lore": "Whatever it reflects, it returns as nothing.",
+
+  "kultivator.technique.time_spirit_domain": "Time Spirit Domain",
+  "kultivator.technique.time_spirit_domain.desc": "Time stops in a domain of radius 24→32 around you for 8 s: monsters inside freeze (bosses are rooted 40 ticks and slowed), and every hit you land on a stopped monster is banked. Your cooldowns run twice as fast. When time resumes, every bank is released ×1.5 and everything inside takes 10×P.",
+  "kultivator.technique.time_spirit_domain.source": "Source: A Record of a Mortal's Journey · 时间灵域 Time Spirit Domain, gained at the Golden Immortal stage; Han Li later becomes the Time Dao Ancestor",
+  "kultivator.technique.time_spirit_domain.lore": "Tick. The world holds its breath. Tock. It all arrives at once.",
+
+  "kultivator.technique.stellar_black_hole": "Black Hole",
+  "kultivator.technique.stellar_black_hole.desc": "Opens a black hole at the aimed spot (within 48) for 6 s: everything within 32→40 is dragged toward the core and takes 0.5×P every half second (×5 within 3 blocks of the core). At the collapse the core deals 18×P within 16 and 4×P to everything in the field.",
+  "kultivator.technique.stellar_black_hole.source": "Source: Stellar Transformations · Black Hole, the stage after Dark Star; these post-Star stages were self-evolved and are not recorded in the original art",
+  "kultivator.technique.stellar_black_hole.lore": "Past the darkest star, even light forgets how to leave."
+}

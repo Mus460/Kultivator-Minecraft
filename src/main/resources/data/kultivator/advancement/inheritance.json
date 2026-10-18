@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_technique",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.inheritance.description"
+    },
+    "icon": {
+      "id": "kultivator:giok_warisan"
+    },
+    "title": {
+      "translate": "advancement.kultivator.inheritance.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

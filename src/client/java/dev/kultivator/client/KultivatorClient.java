@@ -38,6 +38,9 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.kehancuran.KehancuranClient.init();
 		// Phase 6b (DESIGN 21.24).
 		dev.kultivator.client.sectbuild.BuildClient.init();
+		// Phase 6c (DESIGN 22.18.1 item 13). The technique registry itself is built by the main entrypoint only.
+		dev.kultivator.client.fx.spec.SpecFx.init();
+		dev.kultivator.client.codex.CodexClient.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));
@@ -48,6 +51,8 @@ public class KultivatorClient implements ClientModInitializer {
 				dev.kultivator.client.hall.HallClient.onInfo(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.BuildPreview.TYPE, (payload, context) ->
 				dev.kultivator.client.sectbuild.BuildClient.onPreview(payload));
+		ClientPlayNetworking.registerGlobalReceiver(Payloads.TechFx.TYPE, (payload, context) ->
+				dev.kultivator.client.fx.spec.SpecFx.play(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.OpenScreen.TYPE, (payload, context) -> {
 			if (payload.screen() == Payloads.OpenScreen.INFO) {
 				context.client().gui.setScreen(new CultivationScreen(payload.arg()));
@@ -66,6 +71,8 @@ public class KultivatorClient implements ClientModInitializer {
 				dev.kultivator.client.kehancuran.KehancuranClient.openConfirm(payload.arg());
 			} else if (payload.screen() == Payloads.OpenScreen.SECT_TEMPLATE) {
 				dev.kultivator.client.sectbuild.BuildClient.openScreen(payload.arg());
+			} else if (payload.screen() == Payloads.OpenScreen.CODEX) {
+				dev.kultivator.client.codex.Codex.open(payload.arg());
 			}
 		});
 

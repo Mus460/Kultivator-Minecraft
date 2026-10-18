@@ -1,46 +1,39 @@
 package dev.kultivator.client.screen;
 
-import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
+import dev.kultivator.client.codex.Codex;
+import dev.kultivator.client.codex.CodexScreen;
+import dev.kultivator.client.codex.SpecInfo;
+import dev.kultivator.client.codex.TeknikSession;
 import dev.kultivator.client.screen.ui.Brush;
-import dev.kultivator.client.screen.ui.Eased;
+import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SealCard;
-import dev.kultivator.client.screen.ui.Widget;
-import dev.kultivator.dao.Comprehension;
+import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.data.CultivationData;
-import dev.kultivator.data.Dao;
-import dev.kultivator.data.Technique;
-import dev.kultivator.network.Actions;
-import dev.kultivator.technique.FlyingSword;
+import dev.kultivator.data.TechniqueRegistry;
+import dev.kultivator.data.TechniqueSpec;
+import dev.kultivator.technique.spec.TechniquePower;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Techniques: every art as a seal card in a grid that wraps to the window (universal arts first, then each Dao's
- * pair). Click a learned card to select it for the cast key; locked cards tell in their tooltip how they are learned
- * (realm, Dao, or which enchanted book to comprehend).
+ * Techniques: since phase 6c a launcher card for the Kitab Teknik (DESIGN 22.12.1): the counter "Teknik 37/168", the
+ * power P, the highest mastery, the selected art as a seal card, and talismans to open the Kodeks, the Cincin Segel and
+ * the Kehancuran page, with the keys written underneath.
  */
 final class TechniquesPage extends Page {
 
-	private static final int GAP = 4;
-	private static final int HEADER = 12;
-	private static final int FOOTER = 13;
+	private static final int BUTTON_H = 18;
 
-	private final List<SealCard> cards = new ArrayList<>();
-	private final List<Integer> baseY = new ArrayList<>();
-	private final Eased scrollShown = new Eased(14.0F);
-	private float scroll;
-	private int gridX;
-	private int gridY;
-	private int gridW;
-	private int gridH;
-	private float contentH;
+	private int cardX;
+	private int cardY;
+	private int cardSize;
+	private int infoX;
 
 	TechniquesPage(CultivationScreen screen) {
 		super(screen);
@@ -58,177 +51,65 @@ final class TechniquesPage extends Page {
 
 	@Override
 	protected void build() {
-		cards.clear();
-		baseY.clear();
-		gridY = y + HEADER;
-		gridH = h - HEADER - FOOTER;
-		int cols = Math.max(3, (w + GAP) / (46 + GAP));
-		int size = Math.max(34, Math.min(56, (w - (cols - 1) * GAP) / cols));
-		gridW = cols * size + (cols - 1) * GAP;
-		gridX = x + (w - gridW) / 2;
-		Technique[] all = Technique.values();
-		int rows = (all.length + cols - 1) / cols;
-		contentH = rows * (size + GAP) - GAP + 6;
-		for (int i = 0; i < all.length; i++) {
-			Technique technique = all[i];
-			int cx = gridX + (i % cols) * (size + GAP);
-			int cy = gridY + 3 + (i / cols) * (size + GAP);
-			SealCard card = new SealCard(cx, cy, size, technique);
-			card.enabledWhen(() -> data().knows(technique));
-			card.onPress(() -> {
-				if (data().selected() != technique) {
-					send(Actions.SELECT_TECHNIQUE, 0, technique.id());
-				}
-			});
-			card.tooltip(() -> tip(technique));
-			cards.add(card);
-			baseY.add(cy);
-			add(card);
-		}
-	}
-
-	@Override
-	protected boolean visible(Widget widget) {
-		return widget.y + widget.h > gridY && widget.y < gridY + gridH;
-	}
-
-	@Override
-	protected boolean hoverable(double mouseX, double mouseY) {
-		return inside(mouseX, mouseY) && mouseY >= gridY && mouseY < gridY + gridH;
+		int columnW = Math.max(110, Math.min(160, Math.round(w * 0.45F)));
+		int bx = x + w - columnW;
+		int top = y + 18;
+		int gap = 6;
+		TalismanButton open = add(new TalismanButton(bx, top, columnW, BUTTON_H, () -> Component.translatable("kultivator.codex.launcher.open")));
+		open.urgentWhen(() -> Util.getMillis() / 1000L % 4L == 0L);
+		open.onPress(() -> Codex.openTab(CodexScreen.TAB_KODEKS));
+		open.tooltip(() -> List.of(Component.translatable("kultivator.codex.launcher.open"),
+				Component.translatable("kultivator.codex.launcher.open.tip", Keys.CODEX.getTranslatedKeyMessage()).withStyle(ChatFormatting.GRAY)));
+		TalismanButton ring = add(new TalismanButton(bx, top + BUTTON_H + gap, columnW, BUTTON_H, () -> Component.translatable("kultivator.codex.tab.ring")));
+		ring.onPress(() -> Codex.openTab(CodexScreen.TAB_RING));
+		ring.tooltip(() -> List.of(Component.translatable("kultivator.codex.tab.ring"),
+				Component.translatable("kultivator.codex.launcher.ring.tip").withStyle(ChatFormatting.GRAY)));
+		TalismanButton red = add(new TalismanButton(bx, top + (BUTTON_H + gap) * 2, columnW, BUTTON_H,
+				() -> Component.translatable(TeknikSession.breakerOn() ? "kultivator.codex.launcher.kh_on" : "kultivator.codex.launcher.kh_off")));
+		red.urgentWhen(TeknikSession::breakerOn);
+		red.onPress(() -> Codex.openTab(CodexScreen.TAB_KEHANCURAN));
+		red.tooltip(() -> List.of(Component.translatable("kultivator.codex.tab.kehancuran"),
+				Component.translatable("kultivator.codex.launcher.kh.tip").withStyle(ChatFormatting.GRAY)));
+		cardSize = Math.max(36, Math.min(56, Math.min(bx - x - 16, h / 3)));
+		cardX = x + 4;
+		cardY = y + 16;
+		infoX = cardX + cardSize + 8;
 	}
 
 	@Override
 	protected void drawBehind(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
 		CultivationData data = data();
-		float maxScroll = Math.max(0.0F, contentH - gridH);
-		scroll = Math.max(0.0F, Math.min(maxScroll, scroll));
-		int offset = Math.round(scrollShown.to(scroll, seconds));
-		for (int i = 0; i < cards.size(); i++) {
-			cards.get(i).y = baseY.get(i) - offset;
-		}
-
-		int learned = data.learnedTechniques().size();
-		Component count = Component.translatable("kultivator.screen.tech.count", learned, Technique.values().length);
-		heading(g, count, x + 2.0F, y, w * 0.45F, 0.8F);
-		Component keys = Component.translatable("kultivator.screen.tech.keys", Keys.CAST.getTranslatedKeyMessage(),
-				Keys.PREVIOUS.getTranslatedKeyMessage(), Keys.NEXT.getTranslatedKeyMessage());
-		float keysScale = Brush.fitScale(font, keys, w * 0.5F, 0.7F, 0.45F);
-		float keysWidth = Math.min(w * 0.5F, font.width(keys) * keysScale);
-		Brush.fit(g, font, keys, x + w - keysWidth - 2.0F, y + 1.0F, w * 0.5F, Palette.INK_SOFT, 0.7F, 0.45F, false);
-
-		g.enableScissor(x, gridY, x + w, gridY + gridH);
-	}
-
-	@Override
-	protected void drawAbove(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
-		g.disableScissor();
-		float maxScroll = Math.max(0.0F, contentH - gridH);
-		if (maxScroll > 0.0F) {
-			float track = gridH - 6.0F;
-			float bead = gridY + 3.0F + track * (scrollShown.get() / maxScroll);
-			g.fill(x + w - 2, gridY, x + w - 1, gridY + gridH, Palette.CORD);
-			Brush.disc(g, x + w - 1.5F, bead, 2.2F, Palette.JADE);
-			Brush.disc(g, x + w - 2.0F, bead - 0.6F, 0.8F, Palette.JADE_PALE);
-		}
-		// The selected art along the bottom.
-		CultivationData data = data();
-		Technique selected = data.selected();
-		Component line;
-		int color;
-		if (selected == null) {
-			line = Component.translatable("kultivator.screen.tech.none_selected");
-			color = Palette.INK_FAINT;
+		heading(g, Component.translatable("kultivator.codex.launcher.title"), x + 2.0F, y, w - 4.0F, 0.85F);
+		TechniqueSpec selected = data.selectedId().isEmpty() ? null : TechniqueRegistry.byId(data.selectedId());
+		int columnLeft = x + w - Math.max(110, Math.min(160, Math.round(w * 0.45F)));
+		if (selected != null) {
+			long left = SpecInfo.cooldownLeft(selected);
+			SealCard.paint(g, font, selected, cardX, cardY, cardSize, new SealCard.Look(true, false, true, left,
+					left > 0L ? SpecInfo.cooldown(data, selected) : 0, SpecInfo.mastery(data, selected), -1, false, false), 0.0F);
 		} else {
-			line = Component.translatable("kultivator.screen.tech.selected", selected.displayName(), selected.qiCost(),
-					SealCard.seconds(selected.cooldownTicks()));
-			color = selected.dao() == null ? Palette.JADE_DARK : Palette.onPaper(selected.dao().color());
+			g.fill(cardX, cardY, cardX + cardSize, cardY + cardSize, Palette.argb(0x40, Palette.PAPER_DEEP));
+			Brush.frame(g, cardX, cardY, cardX + cardSize, cardY + cardSize, Palette.argb(0x90, Palette.GOLD_DARK));
+			Glyphs.tab(g, Glyphs.CODEX, cardX + cardSize / 2.0F, cardY + cardSize / 2.0F, cardSize * 0.4F, Palette.INK_FAINT);
 		}
-		Brush.rect(g, x + 2.0F, y + h - FOOTER + 1.0F, x + w - 2.0F, y + h - FOOTER + 1.6F, Palette.argb(0xA0, Palette.GOLD));
-		Brush.fitCentered(g, font, line, x + w / 2.0F, y + h - FOOTER + 4.0F, w - 6.0F, color, 0.8F, 0.5F, false);
-	}
-
-	@Override
-	boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (mouseY < gridY || mouseY >= gridY + gridH) {
-			return false;
+		float tx = infoX;
+		float room = columnLeft - infoX - 8.0F;
+		float cursor = cardY;
+		int best = 0;
+		for (TechniqueSpec spec : data.learnedSpecs()) {
+			best = Math.max(best, SpecInfo.mastery(data, spec));
 		}
-		return super.mouseClicked(mouseX, mouseY, button);
-	}
-
-	@Override
-	boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-		if (inside(mouseX, mouseY)) {
-			scroll -= (float) amount * 18.0F;
-			return true;
-		}
-		return false;
-	}
-
-	private static List<Component> tip(Technique technique) {
-		CultivationData data = data();
-		Dao dao = technique.dao();
-		List<Component> lines = new ArrayList<>();
-		lines.add(technique.displayName().copy().withColor(dao == null ? 0xFFE6B3 : dao.color()));
-		lines.add(technique.description().copy().withStyle(ChatFormatting.GRAY));
-		boolean flying = technique == Technique.FLYING_SWORD;
-		String costKey = flying ? "kultivator.screen.tech.cost_per_second" : "kultivator.screen.tech.cost";
-		Object cost = flying ? Comprehension.format(FlyingSword.drainPerSecond(data)) : technique.qiCost();
-		lines.add(Component.translatable(costKey, cost, SealCard.seconds(technique.cooldownTicks())).withColor(0x8FD0FF));
-		lines.add(dao == null ? Component.translatable("kultivator.screen.tech.universal").withStyle(ChatFormatting.DARK_AQUA)
-				: Component.translatable("kultivator.screen.tech.dao", dao.displayName()).withColor(dao.color()));
-		if (data.knows(technique)) {
-			long left = ClientCultivation.cooldownLeft(technique);
-			if (left > 0L) {
-				lines.add(Component.translatable("kultivator.screen.tech.cooling", SealCard.seconds(left)).withStyle(ChatFormatting.RED));
-			}
-			lines.add(technique == data.selected()
-					? Component.translatable("kultivator.screen.tech.is_selected", Keys.CAST.getTranslatedKeyMessage()).withStyle(ChatFormatting.GOLD)
-					: Component.translatable("kultivator.screen.tech.click").withStyle(ChatFormatting.YELLOW));
-			return lines;
-		}
-		lines.add(Component.translatable("kultivator.screen.tech.locked").withStyle(ChatFormatting.RED));
-		Component realm = technique.minRealm().displayName().copy().withColor(technique.minRealm().color());
-		switch (technique.unlock()) {
-			case REALM -> lines.add(Component.translatable("kultivator.screen.tech.unlock_realm", realm));
-			case DAO -> lines.add(Component.translatable("kultivator.screen.tech.unlock_dao",
-					dao == null ? Component.empty() : dao.displayName().copy().withColor(dao.color()), realm));
-			case BOOK -> {
-				lines.add(Component.translatable("kultivator.screen.tech.unlock_book", books(technique), realm));
-				if (dao != null) {
-					lines.add(Component.translatable("kultivator.screen.tech.unlock_book_dao", dao.displayName().copy().withColor(dao.color()),
-							Math.round(technique.minComprehension())));
-				}
-			}
-		}
-		return lines;
-	}
-
-	/** The enchantments whose books teach this technique (DESIGN 7), joined with "or". */
-	private static Component books(Technique technique) {
-		String[] ids;
-		if (technique == Technique.BUDDHA_PALM) {
-			ids = new String[]{"smite"};
-		} else if (technique.dao() == null) {
-			ids = new String[0];
-		} else {
-			ids = switch (technique.dao()) {
-				case SWORD -> new String[]{"sharpness", "sweeping_edge"};
-				case FIRE -> new String[]{"fire_aspect", "flame"};
-				case ICE -> new String[]{"frost_walker"};
-				case LIGHTNING -> new String[]{"channeling"};
-				case BODY -> new String[]{"protection", "thorns"};
-				case LIFE -> new String[]{"mending"};
-				case SHADOW -> new String[]{"swift_sneak", "feather_falling"};
-				case SPACE -> new String[]{"infinity", "loyalty"};
-			};
-		}
-		MutableComponent joined = Component.empty();
-		for (int i = 0; i < ids.length; i++) {
-			if (i > 0) {
-				joined.append(Component.translatable("kultivator.screen.tech.or"));
-			}
-			joined.append(Component.translatable("enchantment.minecraft." + ids[i]).withStyle(ChatFormatting.LIGHT_PURPLE));
-		}
-		return joined;
+		Component counter = Component.translatable("kultivator.codex.launcher.counter", SpecInfo.learnedCount(data), TechniqueRegistry.playerTotal());
+		cursor += Brush.wrap(g, font, Brush.bold(counter), tx, cursor, room, Palette.SEAL_DARK, 0.8F, false) + 2.0F;
+		Component power = Component.translatable("kultivator.codex.launcher.power", SpecInfo.compact(TechniquePower.power(data)));
+		cursor += Brush.wrap(g, font, power, tx, cursor, room, Palette.INK, 0.7F, false) + 1.0F;
+		Component mastery = Component.translatable("kultivator.codex.launcher.mastery", SpecInfo.masteryName(best));
+		cursor += Brush.wrap(g, font, mastery, tx, cursor, room, Palette.INK, 0.7F, false) + 3.0F;
+		Component current = selected == null ? Component.translatable("kultivator.screen.tech.none_selected")
+				: Component.translatable("kultivator.codex.launcher.selected", selected.displayName());
+		cursor += Brush.wrap(g, font, current, tx, cursor, room, selected == null ? Palette.INK_FAINT : SpecInfo.ink(selected), 0.65F, false) + 2.0F;
+		float keysY = Math.max(cursor + 4.0F, cardY + cardSize + 8.0F);
+		Component keys = Component.translatable("kultivator.codex.launcher.keys", Keys.CAST.getTranslatedKeyMessage(),
+				Keys.PREVIOUS.getTranslatedKeyMessage(), Keys.NEXT.getTranslatedKeyMessage(), Keys.CODEX.getTranslatedKeyMessage());
+		Brush.wrap(g, font, keys, x + 4.0F, keysY, columnLeft - x - 12.0F, Palette.INK_SOFT, 0.62F, false);
 	}
 }

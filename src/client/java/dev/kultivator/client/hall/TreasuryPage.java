@@ -10,7 +10,8 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.client.screen.ui.Widget;
-import dev.kultivator.data.Technique;
+import dev.kultivator.data.TechniqueRegistry;
+import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.sect.hall.Halls;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -107,12 +108,28 @@ public class TreasuryPage extends HallPage {
 		return list.isEmpty() ? null : list.get(Math.floorMod(targetIndex, list.size()));
 	}
 
-	private @Nullable Technique book() {
+	/** The jade slip picked for the Slip Giok Teknik row: every sellable spec id the hall sends in {@code books} (22.8.4). */
+	private @Nullable TechniqueSpec book() {
 		ListTag books = info().getListOrEmpty("books");
 		if (books.isEmpty()) {
 			return null;
 		}
-		return Technique.byId(books.getStringOr(Math.floorMod(bookIndex, books.size()), ""));
+		return TechniqueRegistry.byId(books.getStringOr(Math.floorMod(bookIndex, books.size()), ""));
+	}
+
+	/** The server's {id, price, need, ok} entry of the picked slip, or null. */
+	private @Nullable CompoundTag slip() {
+		TechniqueSpec book = book();
+		CompoundTag ware = ware("technique");
+		if (book == null || ware == null) {
+			return null;
+		}
+		for (Tag tag : ware.getListOrEmpty("slips")) {
+			if (tag instanceof CompoundTag entry && entry.getStringOr("id", "").equals(book.id())) {
+				return entry;
+			}
+		}
+		return null;
 	}
 
 	private @Nullable CompoundTag ware(String id) {
@@ -207,7 +224,7 @@ public class TreasuryPage extends HallPage {
 			track(pickTarget, cursor, true);
 			cursor += BUTTON_H + 2;
 			TalismanButton pickBook = new TalismanButton(rx + 2, cursor, rw - 4, BUTTON_H, () -> {
-				Technique book = book();
+				TechniqueSpec book = book();
 				return Component.translatable("kultivator.hall.ui.for_book", book == null ? Component.literal("-") : book.displayName());
 			});
 			pickBook.enabledWhen(() -> info().getListOrEmpty("books").size() > 1);
@@ -241,7 +258,7 @@ public class TreasuryPage extends HallPage {
 			return target == null ? "" : target.getStringOr("soul", "");
 		}
 		if ("technique".equals(id)) {
-			Technique book = book();
+			TechniqueSpec book = book();
 			return book == null ? "" : book.id();
 		}
 		return "";
@@ -255,7 +272,11 @@ public class TreasuryPage extends HallPage {
 		if (ware.getBooleanOr("target", false) && target() == null) {
 			return false;
 		}
-		return !"technique".equals(id) || book() != null;
+		if (!"technique".equals(id)) {
+			return true;
+		}
+		CompoundTag slip = slip();
+		return book() != null && (slip == null || slip.getBooleanOr("ok", false));
 	}
 
 	private boolean canRestore(int set) {
@@ -287,9 +308,17 @@ public class TreasuryPage extends HallPage {
 					: Component.translatable("kultivator.hall.ui.for_disciple", HallUi.name(target, "name")).withStyle(ChatFormatting.DARK_AQUA));
 		}
 		if ("technique".equals(id)) {
-			Technique book = book();
+			TechniqueSpec book = book();
 			if (book != null) {
 				lines.add(Component.translatable("kultivator.hall.ui.for_book", book.displayName()).withStyle(ChatFormatting.DARK_AQUA));
+				CompoundTag slip = slip();
+				if (slip != null) {
+					lines.add(Component.translatable("kultivator.hall.ui.price_pk", slip.getIntOr("price", 0), info().getIntOr("pool", 0))
+							.withStyle(ChatFormatting.GOLD));
+					if (slip.getIntOr("need", 1) > info().getIntOr("level", 99)) {
+						lines.add(Component.translatable("kultivator.hall.ui.needs_level", slip.getIntOr("need", 1)).withStyle(ChatFormatting.RED));
+					}
+				}
 			}
 		}
 		lines.add(Component.translatable("kultivator.hall.ui.paviliun.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));

@@ -13,6 +13,7 @@ import dev.kultivator.fx.FxType;
 import dev.kultivator.network.Net;
 import dev.kultivator.network.Payloads;
 import dev.kultivator.sect.hall.Halls;
+import dev.kultivator.technique.spec.TechniquePower;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Targeting;
@@ -24,6 +25,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.ClickEvent;
@@ -56,7 +58,8 @@ import java.util.UUID;
  * all required: the server ({@code modeKehancuran} in {@code config/kultivator.json}, changed by an operator with
  * {@code /kultivasi kehancuran izin on|off} or in the file), the player's Sumpah Kehancuran, and the disciple's released
  * red seal ("Lepaskan Segel" on the Jalan tab). Locks 2 and 3 open the blood-red warning screen; closing any lock is one
- * click and stops that master's casts at once. The player never gets destructive techniques himself.
+ * click and stops that master's casts at once. Since phase 6c the player's own techniques may carve too, through the
+ * one-click switch of DESIGN 22.11 ({@link #setSelf}, {@link #submitSelf}; no oath screen).
  * <p>
  * An ordered destructive cast: the master aims within 10 s (sneak while looking at the target, a read-only ray of up to
  * 64 blocks); the shape is validated against the protected zones ({@link ProtectedZones}) and previewed; a clickable
@@ -105,7 +108,11 @@ public final class Kehancuran {
 	public static void init() {
 		WorldBreaker.init();
 		ServerTickEvents.END_SERVER_TICK.register(Kehancuran::tick);
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> ORDERS.clear());
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+			ORDERS.clear();
+			DEFERRED.clear();
+			NOTED.clear();
+		});
 		ServerPlayerEvents.LEAVE.register(player -> {
 			Order order = ORDERS.get(player.getUUID());
 			if (order != null) {
@@ -142,6 +149,340 @@ public final class Kehancuran {
 				&& DestroyerArts.chosen(entity.data()) != null;
 	}
 
+	// ================================================================== the player's own techniques (DESIGN 22.11)
+
+	/** Results of {@link #submitSelf} (22.11.5). */
+	public enum SelfResult { QUEUED, OFF, QUEUE_FULL, ALL_PROTECTED, NOTHING, DEFERRED }
+
+	/** {@code extra.path.breaker}: the player's own switch ("Saklar gampang"), written only here. */
+	public static final String SELF_KEY = "breaker";
+
+	/**
+	 * Why the player's own switch may not be on, or null when it may (22.11.1): {@code kehancuranPlayerTechniques} must be
+	 * true, and the player must own the integrated server (singleplayer, the LAN host) or the server permission
+	 * {@code modeKehancuran} of 20.3.21 must be on.
+	 */
+	public static @Nullable Component selfAllowed(ServerPlayer player) {
+		KultivatorConfig config = KultivatorConfig.get();
+		if (!config.kehancuranPlayerTechniques) {
+			return Component.translatable("kultivator.kehancuran_diri.why.config");
+		}
+		if (config.modeKehancuran || player.level().getServer().isSingleplayerOwner(player.nameAndId())) {
+			return null;
+		}
+		return Component.translatable("kultivator.kehancuran_diri.why.permission");
+	}
+
+	/** The stored switch is on and still allowed (a guest whose permission was taken reads as off). */
+	public static boolean selfOn(ServerPlayer player) {
+		return Cultivators.get(player).extra().getCompoundOrEmpty(DisciplePaths.PLAYER_EXTRA).getBooleanOr(SELF_KEY, false)
+				&& selfAllowed(player) == null;
+	}
+
+	/**
+	 * The one-click switch (no oath screen, 22.11.1). On: refused with the reason in the action bar and chat unless
+	 * {@link #selfAllowed} is null; otherwise one red chat line with [Matikan] and [Pulihkan] and one low heartbeat. Off:
+	 * works at once, drops this player's queued self jobs and stops a running one (its blocks stay restorable).
+	 */
+	public static boolean setSelf(ServerPlayer player, boolean on) {
+		if (on) {
+			Component why = selfAllowed(player);
+			if (why != null) {
+				Component line = Component.translatable(SELF + "refused", why).withColor(RED);
+				Msg.actionBar(player, line);
+				Msg.chat(player, line);
+				return false;
+			}
+		}
+		section(player).putBoolean(SELF_KEY, on);
+		Cultivators.dirty(player);
+		if (on) {
+			int minutes = KultivatorConfig.get().kehancuranUndoMinutes;
+			MutableComponent off = Component.translatable(SELF + "button.off").withStyle(style -> style.withColor(ChatFormatting.AQUA).withBold(true)
+					.withClickEvent(new ClickEvent.RunCommand("/kultivasi kehancuran mati"))
+					.withHoverEvent(new HoverEvent.ShowText(Component.translatable(SELF + "button.off_hover"))));
+			MutableComponent restore = Component.translatable(SELF + "button.restore").withStyle(style -> style.withColor(0x9FF3E6).withBold(true)
+					.withClickEvent(new ClickEvent.RunCommand("/kultivasi kehancuran pulihkan"))
+					.withHoverEvent(new HoverEvent.ShowText(Component.translatable(SELF + "button.restore_hover"))));
+			MutableComponent line = Component.translatable(SELF + "on_line", Component.translatable(SELF + "on_title").withStyle(ChatFormatting.BOLD),
+					Component.literal("/kultivasi kehancuran pulihkan").withStyle(ChatFormatting.BOLD), minutes).withColor(RED);
+			line.append(Component.literal(" ")).append(off).append(Component.literal(" ")).append(restore);
+			Msg.chat(player, line);
+			player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 0.8F, 0.5F);
+		} else {
+			WorldBreaker.cancelSelf(player.level().getServer(), player.getUUID());
+			DEFERRED.removeIf(pending -> pending.owner().equals(player.getUUID()));
+			Msg.chat(player, Component.translatable(SELF + "off_line").withColor(0x9FF3E6));
+		}
+		return true;
+	}
+
+	/** {@code kultivator.kehancuran_diri.}: the player's own switch (22.11). */
+	private static final String SELF = "kultivator.kehancuran_diri.";
+	/** Submits built per server tick at most, the waiting queue and how long a submit may wait (22.11.5). */
+	private static final int BUILDS_PER_TICK = 2;
+	private static final int DEFERRED_MAX = 8;
+	private static final int DEFERRED_TICKS = 20;
+	/** At most one QUEUE_FULL / ALL_PROTECTED line per player per 5 s. */
+	private static final int NOTE_TICKS = 100;
+	/**
+	 * Placed shapes one submit builds at most: a cast's ≤ 5 KH shapes (22.11.3) resolved in the same tick go together,
+	 * SCATTER and ×n among them with up to 12 anchors.
+	 */
+	private static final int MAX_SHAPES = TechniquePower.SCATTER_POINTS + TechniquePower.MAX_DESTRUCTION_SHAPES;
+
+	/** A submit waiting for a build slot (it is dropped when the caster left that dimension meanwhile). */
+	private record PendingSelf(UUID owner, String specId, List<Shapes.Placed> shapes, int blockCap, long created,
+			net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension) {
+	}
+
+	private static final List<PendingSelf> DEFERRED = new ArrayList<>();
+	private static final Map<UUID, Long> NOTED = new HashMap<>();
+	private static long buildTick = Long.MIN_VALUE;
+	private static int builds;
+
+	/**
+	 * The only entry for destruction by the player's own techniques (22.11.5). Never throws, spends, refunds or delays
+	 * anything: the damage has already happened. Re-checks the switch and the realm (OFF), builds at most 2 submits per
+	 * server tick (others wait up to 20 ticks in a queue of 8: DEFERRED), merges and cuts the shapes to {@code blockCap}
+	 * in proportion, drops protected and never-touched positions and queues one {@link WorldBreaker} job.
+	 */
+	public static SelfResult submitSelf(ServerPlayer caster, String specId, List<Shapes.Placed> shapes, int blockCap) {
+		try {
+			if (!selfOn(caster) || blockCap <= 0 || shapes.isEmpty()) {
+				return SelfResult.OFF;
+			}
+			if (TechniquePower.kScale(Cultivators.get(caster)) <= 0.0D) {
+				return SelfResult.OFF;
+			}
+			long now = caster.level().getServer().getTickCount();
+			if (buildTick != now) {
+				buildTick = now;
+				builds = 0;
+			}
+			List<Shapes.Placed> list = shapes.size() > MAX_SHAPES ? List.copyOf(shapes.subList(0, MAX_SHAPES)) : List.copyOf(shapes);
+			if (builds >= BUILDS_PER_TICK) {
+				if (DEFERRED.size() >= DEFERRED_MAX) {
+					note(caster, "queue_full");
+					return SelfResult.QUEUE_FULL;
+				}
+				DEFERRED.add(new PendingSelf(caster.getUUID(), specId, list, blockCap, now, caster.level().dimension()));
+				return SelfResult.DEFERRED;
+			}
+			builds++;
+			return build(caster, specId, list, blockCap);
+		} catch (RuntimeException exception) {
+			dev.kultivator.Kultivator.LOGGER.error("Kultivator: Mode Kehancuran self cast of {} failed", specId, exception);
+			return SelfResult.NOTHING;
+		}
+	}
+
+	/** Builds the deferred submits that fit this tick (oldest first); older than 20 ticks are dropped. */
+	private static void tickDeferred(MinecraftServer server) {
+		if (DEFERRED.isEmpty()) {
+			return;
+		}
+		long now = server.getTickCount();
+		if (buildTick != now) {
+			buildTick = now;
+			builds = 0;
+		}
+		while (!DEFERRED.isEmpty() && builds < BUILDS_PER_TICK) {
+			PendingSelf pending = DEFERRED.remove(0);
+			if (now - pending.created() > DEFERRED_TICKS) {
+				continue;
+			}
+			ServerPlayer caster = server.getPlayerList().getPlayer(pending.owner());
+			if (caster == null || !selfOn(caster) || !caster.isAlive() || !caster.level().dimension().equals(pending.dimension())) {
+				// the anchors belong to the cast's dimension: never carve the same coordinates somewhere else
+				continue;
+			}
+			builds++;
+			try {
+				build(caster, pending.specId(), pending.shapes(), pending.blockCap());
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Kultivator: Mode Kehancuran self cast of {} failed", pending.specId(), exception);
+			}
+		}
+	}
+
+	/**
+	 * One build: every shape's ordered positions (read-only geometry), duplicates removed, each shape cut to its share of
+	 * the cap (in proportion to its uncut size), protected and never-touched positions dropped; at most 4 x cap reads.
+	 */
+	private static SelfResult build(ServerPlayer caster, String specId, List<Shapes.Placed> shapes, int blockCap) {
+		ServerLevel level = caster.level();
+		List<List<Shapes.Change>> raws = new ArrayList<>(shapes.size());
+		long total = 0L;
+		int minX = Integer.MAX_VALUE;
+		int minY = Integer.MAX_VALUE;
+		int minZ = Integer.MAX_VALUE;
+		int maxX = Integer.MIN_VALUE;
+		int maxY = Integer.MIN_VALUE;
+		int maxZ = Integer.MIN_VALUE;
+		// 22.15: at most 4 × cap block reads per build. The shape geometry (surface scans of RING, STRIP, WITHER and the
+		// impact search) may use up to 3 × cap of them; the merge below gets what is left, at least one cap.
+		int geometryBudget = 3 * blockCap;
+		for (Shapes.Placed placed : shapes) {
+			List<Shapes.Change> raw = Shapes.build(level, placed.spec(), placed.anchor(), placed.direction(), geometryBudget);
+			geometryBudget = Math.max(0, geometryBudget - Shapes.lastReads());
+			raws.add(raw);
+			total += raw.size();
+			for (Shapes.Change change : raw) {
+				BlockPos pos = change.pos();
+				minX = Math.min(minX, pos.getX());
+				minY = Math.min(minY, pos.getY());
+				minZ = Math.min(minZ, pos.getZ());
+				maxX = Math.max(maxX, pos.getX());
+				maxY = Math.max(maxY, pos.getY());
+				maxZ = Math.max(maxZ, pos.getZ());
+			}
+		}
+		if (total == 0L) {
+			return SelfResult.NOTHING;
+		}
+		AABB box = new AABB(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
+		ProtectedZones.Context zones = new ProtectedZones.Context(level, box, caster.getUUID(), List.of(caster.position()));
+		List<Long> positions = new ArrayList<>();
+		List<Byte> modes = new ArrayList<>();
+		java.util.Set<Long> seen = new java.util.HashSet<>();
+		int protectedCount = 0;
+		int candidates = 0;
+		int readsLeft = blockCap + geometryBudget;
+		for (int s = 0; s < shapes.size() && readsLeft > 0; s++) {
+			List<Shapes.Change> raw = raws.get(s);
+			Shapes.Spec spec = shapes.get(s).spec();
+			int quota = (int) Math.max(1L, Math.round((double) blockCap * raw.size() / total));
+			byte mode = spec.kind() == Shapes.Kind.WITHER ? WorldBreaker.MODE_WITHER : spec.kind() == Shapes.Kind.STRIP ? WorldBreaker.MODE_STRIP
+					: spec.naturalOnly() ? WorldBreaker.MODE_NATURAL : WorldBreaker.MODE_REMOVE;
+			int taken = 0;
+			for (Shapes.Change change : raw) {
+				if (taken >= quota || readsLeft <= 0 || positions.size() >= blockCap) {
+					break;
+				}
+				BlockPos pos = change.pos();
+				if (!seen.add(pos.asLong())) {
+					continue;
+				}
+				readsLeft--;
+				ProtectedZones.Zone zone = zones.zoneOf(pos);
+				if (zone == ProtectedZones.Zone.UNLOADED) {
+					continue;
+				}
+				BlockState state = level.getBlockState(pos);
+				if (state.isAir()) {
+					continue;
+				}
+				candidates++;
+				if (zone != null) {
+					protectedCount++;
+					continue;
+				}
+				if (ProtectedZones.neverTouch(level, pos, state) || mode == WorldBreaker.MODE_NATURAL && !Shapes.natural(state)
+						|| mode == WorldBreaker.MODE_STRIP && !state.is(Shapes.STRIPPABLE)
+						|| mode == WorldBreaker.MODE_WITHER && Shapes.witherInto(state) == null) {
+					continue;
+				}
+				positions.add(pos.asLong());
+				modes.add(mode);
+				taken++;
+			}
+		}
+		if (positions.isEmpty()) {
+			if (candidates > 0 && protectedCount >= candidates) {
+				note(caster, "all_protected");
+				return SelfResult.ALL_PROTECTED;
+			}
+			return SelfResult.NOTHING;
+		}
+		long[] packed = new long[positions.size()];
+		byte[] modeArray = new byte[positions.size()];
+		for (int i = 0; i < packed.length; i++) {
+			packed[i] = positions.get(i);
+			modeArray[i] = modes.get(i);
+		}
+		Shapes.Placed first = shapes.get(0);
+		BlockPos centre = first.anchor();
+		WorldBreaker.Job job = WorldBreaker.Job.self(caster, specId, first.spec().kind().id(), centre, packed, modeArray);
+		if (!WorldBreaker.submit(job)) {
+			note(caster, "queue_full");
+			return SelfResult.QUEUE_FULL;
+		}
+		float radius = Math.max(2.0F, first.spec().radius() + 1.0F);
+		Fx.send(level, Vec3.atCenterOf(centre), FxType.KEHANCURAN, KehancuranFxIds.IMPACT, -1, radius);
+		level.playSound(null, centre.getX(), centre.getY(), centre.getZ(), SoundEvents.DEEPSLATE_BREAK, SoundSource.BLOCKS, 1.6F, 0.5F);
+		Advancements.grant(caster, "world_breaker_self");
+		return SelfResult.QUEUED;
+	}
+
+	/** The QUEUE_FULL / ALL_PROTECTED action-bar line, at most once per 5 s per player. */
+	private static void note(ServerPlayer player, String key) {
+		long now = player.level().getGameTime();
+		Long last = NOTED.get(player.getUUID());
+		if (last != null && now >= last && now - last < NOTE_TICKS) {
+			return;
+		}
+		NOTED.put(player.getUUID(), now);
+		Msg.actionBar(player, Component.translatable(SELF + key).withColor(0xFFB0A0));
+	}
+
+	/**
+	 * The Kehancuran page's status ({@code sessionExtra.teknik.kh}, 22.12.6): {@code allowed}, {@code why} (a lang key),
+	 * {@code on}, {@code realm} (K > 0), {@code k}, {@code cap}, {@code r}, {@code queued}, {@code running}, {@code undo}
+	 * [[blocks, seconds]], {@code safe}, {@code home} and the last self casts in {@code log} [{spec, blocks, x, y, z}].
+	 */
+	public static CompoundTag selfStatus(ServerPlayer player) {
+		KultivatorConfig config = KultivatorConfig.get();
+		CompoundTag tag = new CompoundTag();
+		String why = !config.kehancuranPlayerTechniques ? SELF + "why.config"
+				: config.modeKehancuran || player.level().getServer().isSingleplayerOwner(player.nameAndId()) ? "" : SELF + "why.permission";
+		tag.putBoolean("allowed", why.isEmpty());
+		if (!why.isEmpty()) {
+			tag.putString("why", why);
+		}
+		dev.kultivator.data.CultivationData data = Cultivators.get(player);
+		boolean stored = data.extra().getCompoundOrEmpty(DisciplePaths.PLAYER_EXTRA).getBooleanOr(SELF_KEY, false);
+		tag.putBoolean("on", stored && why.isEmpty());
+		double k = TechniquePower.kScale(data);
+		tag.putBoolean("realm", k > 0.0D);
+		tag.putDouble("k", Math.round(k * 100.0D) / 100.0D);
+		tag.putInt("cap", TechniquePower.blockCap(data));
+		tag.putInt("r", config.kehancuranMaxRadius);
+		int[] state = WorldBreaker.selfState(player.getUUID());
+		tag.putInt("queued", state[0]);
+		tag.putBoolean("running", state[1] > 0);
+		ListTag undo = new ListTag();
+		for (int[] entry : WorldBreaker.undoable(player.level().getServer(), player.getUUID())) {
+			ListTag pair = new ListTag();
+			pair.add(IntTag.valueOf(entry[0]));
+			pair.add(IntTag.valueOf(entry[1] / 10 * 10));
+			undo.add(pair);
+		}
+		tag.put("undo", undo);
+		tag.putInt("safe", config.kehancuranCasterSafeRadius);
+		tag.putInt("home", config.kehancuranHomeSafeRadius);
+		ListTag log = new ListTag();
+		for (CompoundTag line : KehancuranLog.recent(player.level().getServer(), player.getUUID(), 12)) {
+			if (!line.getBooleanOr("self", false) || log.size() >= 6) {
+				continue;
+			}
+			CompoundTag entry = new CompoundTag();
+			entry.putString("spec", line.getStringOr("spec", ""));
+			entry.putInt("blocks", line.getIntOr("blocks", 0));
+			entry.putInt("x", line.getIntOr("x", 0));
+			entry.putInt("y", line.getIntOr("y", 0));
+			entry.putInt("z", line.getIntOr("z", 0));
+			log.add(entry);
+		}
+		tag.put("log", log);
+		return tag;
+	}
+
+	/** {running, queued, self jobs} of the WorldBreaker (for {@code debug teknik beban}). */
+	public static int[] jobCounts() {
+		return WorldBreaker.counts();
+	}
+
 	// ================================================================== actions
 
 	/** {@code Actions.KEHANCURAN}: {@code arg} = 0 or a disciple's entity id, {@code text} = "op[:param]". */
@@ -170,6 +511,10 @@ public final class Kehancuran {
 				}
 			}
 			case "restore" -> restore(player);
+			// Phase 6c (DESIGN 22.11.1, 22.12.6): the player's own one-click switch and its undo.
+			case "self_on" -> setSelf(player, true);
+			case "self_off" -> setSelf(player, false);
+			case "self_undo" -> restore(player);
 			case "cancel" -> {
 				Order order = ORDERS.get(player.getUUID());
 				if (order != null) {
@@ -321,7 +666,7 @@ public final class Kehancuran {
 			Msg.chat(master, Component.translatable(PREFIX + "why.order_running").withColor(RED));
 			return;
 		}
-		if (!WorldBreaker.hasRoom()) {
+		if (!WorldBreaker.hasRoom(master.getUUID())) {
 			Msg.chat(master, Component.translatable(PREFIX + "why.queue_full").withColor(RED));
 			return;
 		}
@@ -334,6 +679,7 @@ public final class Kehancuran {
 	}
 
 	private static void tick(MinecraftServer server) {
+		tickDeferred(server);
 		if (ORDERS.isEmpty()) {
 			return;
 		}
@@ -603,6 +949,9 @@ public final class Kehancuran {
 					openOath(ctx.getSource().getPlayerOrException());
 					return 1;
 				}))
+				// Phase 6c (DESIGN 22.11.1): the player's own one-click switch, no oath.
+				.then(Commands.literal("nyala").executes(ctx -> setSelf(ctx.getSource().getPlayerOrException(), true) ? 1 : 0))
+				.then(Commands.literal("mati").executes(ctx -> setSelf(ctx.getSource().getPlayerOrException(), false) ? 1 : 0))
 				.then(Commands.literal("status").executes(ctx -> status(ctx.getSource().getPlayerOrException())))
 				.then(Commands.literal("pulihkan").executes(ctx -> {
 					restore(ctx.getSource().getPlayerOrException());
@@ -655,12 +1004,36 @@ public final class Kehancuran {
 		player.sendSystemMessage(Component.translatable(PREFIX + "status.released", released.isEmpty() ? "-" : String.join(", ", released)).withColor(MUTED));
 		player.sendSystemMessage(Component.translatable(PREFIX + "status.caps", c.kehancuranMaxRadius, c.kehancuranMaxBlocksPerCast, c.kehancuranBlocksPerTick,
 				c.kehancuranDropsPct, c.kehancuranHallSafeRadius, c.kehancuranPlayerSafeRadius, c.kehancuranUndoMinutes).withColor(MUTED));
+		selfStatusLines(player);
 		WorldBreaker.Job running = WorldBreaker.running();
 		player.sendSystemMessage(Component.translatable(PREFIX + "status.jobs", running == null ? 0 : 1, WorldBreaker.queued()).withColor(MUTED));
 		for (int[] undo : WorldBreaker.undoable(player.level().getServer(), player.getUUID())) {
 			player.sendSystemMessage(Component.translatable(PREFIX + "status.undo", undo[0], undo[1] / 60, undo[1] % 60).withColor(0x9FF3E6));
 		}
 		return 1;
+	}
+
+	/** The player's own switch in {@code /kultivasi kehancuran status}: state, size, zones and the last self casts. */
+	private static void selfStatusLines(ServerPlayer player) {
+		CompoundTag kh = selfStatus(player);
+		Component state = Component.translatable(kh.getBooleanOr("on", false) ? SELF + "status.on" : SELF + "status.off")
+				.withStyle(kh.getBooleanOr("on", false) ? ChatFormatting.RED : ChatFormatting.GREEN);
+		player.sendSystemMessage(Component.translatable(SELF + "status.line", state, String.format(java.util.Locale.ROOT, "%.2f", kh.getDoubleOr("k", 0.0D)),
+				kh.getIntOr("cap", 0), kh.getIntOr("safe", 4), kh.getIntOr("home", 24)).withColor(MUTED));
+		if (!kh.getBooleanOr("allowed", false)) {
+			player.sendSystemMessage(Component.translatable(SELF + "status.why", Component.translatable(kh.getStringOr("why", SELF + "why.permission")))
+					.withColor(MUTED));
+		} else if (!kh.getBooleanOr("realm", false)) {
+			player.sendSystemMessage(Component.translatable(SELF + "status.realm").withColor(MUTED));
+		}
+		for (net.minecraft.nbt.Tag entry : kh.getListOrEmpty("log")) {
+			if (entry instanceof CompoundTag line) {
+				dev.kultivator.data.TechniqueSpec spec = dev.kultivator.data.TechniqueRegistry.byId(line.getStringOr("spec", ""));
+				Component name = spec == null ? Component.literal(line.getStringOr("spec", "?")) : spec.displayName();
+				player.sendSystemMessage(Component.translatable(SELF + "status.cast", name, line.getIntOr("blocks", 0), line.getIntOr("x", 0),
+						line.getIntOr("y", 0), line.getIntOr("z", 0)).withColor(0xFFB0A0));
+			}
+		}
 	}
 
 	private static Component lock(boolean open) {

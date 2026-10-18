@@ -9,7 +9,6 @@ import dev.kultivator.data.Realm;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.util.Msg;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.Registries;
@@ -112,11 +111,9 @@ public final class Tribulation {
 	public static void init() {
 		Cultivators.tribulationFlag = Tribulation::isActive;
 		// Safety net for "never lethal": our own damage types (and the fire a Nether strike set) never kill, and neither
-		// does anything in the few seconds after a failed tribulation.
-		ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> {
-			if (!(entity instanceof ServerPlayer player)) {
-				return true;
-			}
+		// does anything in the few seconds after a failed tribulation. Stage TRIBULATION of the spine's DeathGuard (the only
+		// player ALLOW_DEATH listener, DESIGN 22.14.6), so it acts before a held totem and before technique cheat-deaths.
+		dev.kultivator.util.DeathGuard.register(dev.kultivator.util.DeathGuard.Stage.TRIBULATION, (player, source, amount) -> {
 			boolean ours = source.is(DAMAGE) || source.is(Deviation.DAMAGE);
 			if (!ours && source.is(DamageTypes.ON_FIRE)) {
 				Long until = FIRE_GUARD.get(player.getUUID());
@@ -131,12 +128,12 @@ public final class Tribulation {
 				}
 			}
 			if (!ours) {
-				return true;
+				return false;
 			}
 			player.setHealth(1.0F);
 			player.clearFire();
 			player.removeEffect(MobEffects.WITHER);
-			return false;
+			return true;
 		});
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			ACTIVE.clear();
@@ -354,10 +351,33 @@ public final class Tribulation {
 			finish(player, Result.FAILED, "kultivator.breakthrough.fail.strike");
 			return false;
 		}
+		countSurvivedStrike(player, data);
 		if (KultivatorConfig.get().daoProtectorEvent && !last && (number - 1) % 3 == 0) {
 			DaoProtectors.spawnWave(player, t.target, t.variant);
 		}
 		return true;
+	}
+
+	/** {@code extra.kultivasi.trib_strikes}: lifetime survived strikes (DESIGN 22.8.9 TRIB feats, 22.18.4). */
+	public static final String STRIKES_KEY = "trib_strikes";
+
+	/** Lifetime survived tribulation strikes. */
+	public static int strikesSurvived(CultivationData data) {
+		return data.extra().getCompoundOrEmpty(dev.kultivator.technique.spec.TechniquePower.PLAYER_EXTRA).getIntOr(STRIKES_KEY, 0);
+	}
+
+	/** Counts one survived strike in {@code extra.kultivasi.trib_strikes} and tells the feat tracker. */
+	private static void countSurvivedStrike(ServerPlayer player, CultivationData data) {
+		net.minecraft.nbt.CompoundTag extra = data.extra();
+		String key = dev.kultivator.technique.spec.TechniquePower.PLAYER_EXTRA;
+		net.minecraft.nbt.CompoundTag section = extra.getCompound(key).orElse(null);
+		if (section == null) {
+			section = new net.minecraft.nbt.CompoundTag();
+			extra.put(key, section);
+		}
+		section.putInt(STRIKES_KEY, Math.max(0, section.getIntOr(STRIKES_KEY, 0)) + 1);
+		Cultivators.dirty(player);
+		dev.kultivator.technique.spec.run.FeatTracker.onTribStrike(player);
 	}
 
 	private static void trackHealth(ServerPlayer player, Instance t) {

@@ -50,6 +50,8 @@ public final class Deviation {
 					SoundSource.PLAYERS, 0.8F, 1.2F);
 			Cultivators.refreshVisual(player);
 			Cultivators.syncNow(player);
+			// DEVIATION_RECOVERED feats (DESIGN 22.8.9).
+			dev.kultivator.technique.spec.run.FeatTracker.onDeviationRecovered(player);
 			return;
 		}
 		if (left % EFFECT_PERIOD == 0) {

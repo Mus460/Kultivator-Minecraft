@@ -1,0 +1,69 @@
+{
+  "kultivator.technique.octane_blast": "Octane Blast",
+  "kultivator.technique.octane_blast.desc": "Eight layers of force in one punch: seven quick blows (0.15× power, up to 3 foes ahead), then the 8th: 0.9× power and knockback. If all eight strike one foe, the force bursts inside it (radius 3→8, 0.5× power).",
+  "kultivator.technique.octane_blast.source": "Source: Battle Through the Heavens · 八极崩 Octane Blast, a high Xuan-class Dou technique from Yao Lao; mastered, it hides eight layers of force",
+  "kultivator.technique.octane_blast.lore": "The foe feels one blow. Its body feels eight.",
+
+  "kultivator.technique.worldwalking": "Worldwalking",
+  "kultivator.technique.worldwalking.desc": "Sink into the earth and race 16→48 blocks toward the aim in 0.4 s, unseen and without fall damage; where you emerge a stone pillar bursts up (radius 3→6): 1.5× power, a launch and Slowness II for 2 s. Refused when there is no safe exit.",
+  "kultivator.technique.worldwalking.source": "Source: Coiling Dragon · Worldwalking, an earth profound mystery used for stealth and escape; Investiture of the Gods · Tu Xingsun's earth-travel art (地行术)",
+  "kultivator.technique.worldwalking.lore": "The earth does not hold you back. It carries you.",
+  "kultivator.technique.worldwalking.player_only": "Only a player can walk through the earth.",
+  "kultivator.technique.worldwalking.not_grounded": "Your feet must touch the ground to enter the earth.",
+  "kultivator.technique.worldwalking.no_exit": "There is no safe exit in that direction.",
+
+  "kultivator.technique.throbbing_pulse": "Throbbing Pulse of the World",
+  "kultivator.technique.throbbing_pulse.desc": "Three earth-pulse rings spread (radius 6/10/14→36): each 0.6× power through armor, a launch and Slowness III for 3 s; the third ring shatters from within foes hit by both earlier rings (+0.6× power). A 15% Qi Shield for 5 s.",
+  "kultivator.technique.throbbing_pulse.source": "Source: Coiling Dragon (Books 15–16) · Throbbing Pulse of the World, one of the six profound mysteries of the Laws of the Earth; it defends against and launches spiritual attacks",
+  "kultivator.technique.throbbing_pulse.lore": "Listen to the pulse beneath your feet; now it beats with you.",
+
+  "kultivator.technique.disorderly_cloak_hammer": "Disorderly Cloak Hammer Technique",
+  "kultivator.technique.disorderly_cloak_hammer.desc": "Channel 2.7 s: a phantom hammer pounds the aim eight times (radius 3), from 0.2× power and +15% per blow; the 9th blow hits radius 6→14, 2.4× power and launches. Moving, casting another art or taking 15% health breaks it.",
+  "kultivator.technique.disorderly_cloak_hammer.source": "Source: Soul Land · 乱披风锤法 Disorderly Cloak Hammer Technique of the Clear Sky Sect, whose force builds over chained blows",
+  "kultivator.technique.disorderly_cloak_hammer.lore": "The first blow is only a greeting. The ninth is a farewell.",
+
+  "kultivator.technique.bright_king_art": "Bright King Art",
+  "kultivator.technique.bright_king_art.desc": "For 20 s: golden skin, damage taken −35→60%, attack +40%, knockback immune; a quarter of the damage you take (up to 4 hits) is stored. When the time runs out the store bursts out (radius 6→14): twice the stored damage and knockback.",
+  "kultivator.technique.bright_king_art.source": "Source: A Record of a Mortal's Journey · 明王诀 Bright King Art, a Buddhist body art from the Feng family's secret cave, derived from the body-refining base of the Three Brahmic Saint Art; later one of the three arts fused into the Brahmic Saint True Devil Art",
+  "kultivator.technique.bright_king_art.lore": "Strike me. Every blow returns to you as light.",
+
+  "kultivator.technique.great_way_of_buddha": "Great Way of the Buddha",
+  "kultivator.technique.great_way_of_buddha.desc": "Heal 30→50% health over 30 s; each heavy hit taken (≥10% health) heals another 10% (once per 2 s). Afterwards: harmful effects cleansed and Health Boost I for 5 minutes (recasts stack up to III).",
+  "kultivator.technique.great_way_of_buddha.source": "Source: Against the Gods ch. 147/287/786 · 大道浮屠诀 Great Way of the Buddha, Yun Che's body art of astonishing regeneration; brutal tempering leaves his body reborn",
+  "kultivator.technique.great_way_of_buddha.lore": "Break this body, and it rises sturdier than before.",
+
+  "kultivator.technique.dragonblood_warrior": "Dragonblood Warrior Transformation",
+  "kultivator.technique.dragonblood_warrior.desc": "A 30 s dragon form (×1.3 when there is room): armor +10, attack +6, Speed I. On transforming, the tail sweeps (radius 5→12), 2× power and knockback; every melee hit adds a claw cone (0.8× power).",
+  "kultivator.technique.dragonblood_warrior.source": "Source: Coiling Dragon · Linley Baruch awakens his clan's Dragonblood Warrior bloodline transformation",
+  "kultivator.technique.dragonblood_warrior.lore": "Long-sleeping dragon blood finally remembers what it is.",
+
+  "kultivator.technique.six_paths_fist": "Six Paths Reincarnation Fist",
+  "kultivator.technique.six_paths_fist.desc": "Six coloured phantom fists fly one after another (24→48 blocks, piercing), each 0.6× power. Foes that die burst in \"Reincarnation\" (radius 4, 0.8× power), chaining up to 8 times.",
+  "kultivator.technique.six_paths_fist.source": "Source: Shrouded the Heavens · 六道轮回拳 Six Paths Reincarnation Fist of the Holy Physique lineage, created by its founder and passed on through the \"Old Madman\" (老疯子)",
+  "kultivator.technique.six_paths_fist.lore": "Six paths, six fists, and not one way out.",
+
+  "kultivator.technique.eighth_hex_body": "Eighth Hex: Bodily Cultivation Hexing",
+  "kultivator.technique.eighth_hex_body.desc": "A red 封 seal crashes down over radius 16→32: 1.2× power through armor; for 10 s foes lose 60% attack, all armor and 50% speed, and take +40% damage (bosses half). Your attack +30% for 10 s.",
+  "kultivator.technique.eighth_hex_body.source": "Source: I Shall Seal the Heavens ch. 954 · the Eighth Hex, Bodily Cultivation Hexing, a hex laid on the body itself",
+  "kultivator.technique.eighth_hex_body.lore": "It is not your art they fear, but their own bodies turning traitor.",
+
+  "kultivator.technique.undying_emperor_fist": "Undying Emperor's Fist",
+  "kultivator.technique.undying_emperor_fist.desc": "One fist (reach 6, 60° arc): 7× power and a huge knockback, then three aftershocks on what it struck (0.6× power); a shock wave rolls 20→48 blocks (width 6), 3× power and knockback.",
+  "kultivator.technique.undying_emperor_fist.source": "Source: A Will Eternal ch. 671/696/892 · Undying Emperor's Fist, secret art of the Undying Bones level of the Undying Live-Forever Codex",
+  "kultivator.technique.undying_emperor_fist.lore": "Behind your fist stands the shadow of an emperor who refuses to die.",
+
+  "kultivator.technique.golden_ape_roar": "Golden Giant Ape and Vajra Roar",
+  "kultivator.technique.golden_ape_roar.desc": "Stage 1: a 25 s golden ape form (×2.5 when there is room) and the Vajra Roar (16→24 cone): 3× power, Weakness III and Slowness IV for 5 s, knockback; melee hits burst (radius 4, 2× power). Cast again, \"Mountain Slam\": leap to the aim (≤24) and slam radius 10→20, 5× power, ending the form.",
+  "kultivator.technique.golden_ape_roar.source": "Source: A Record of a Mortal's Journey · Han Li's golden giant ape form and its 金刚吼 Vajra Roar, from the 惊蛰十二变 transformations with Mountain Giant Ape true blood (the mountain slam is game design)",
+  "kultivator.technique.golden_ape_roar.lore": "One roar, and monsters forget how to stand.",
+
+  "kultivator.technique.cosmic_giant_form": "Cosmic Heaven-and-Earth Form",
+  "kultivator.technique.cosmic_giant_form.desc": "A colossal golden likeness of you rises for 20 s (you keep your own size): every 2.5 s it stomps the densest crowd (radius 8→14), 4× power and a launch; its fist follows your melee hits (3× power); damage taken −50%. At the end: radius 24→32, 10× power. Qi 55% (min 700).",
+  "kultivator.technique.cosmic_giant_form.source": "Source: Journey to the West ch. 6 · Erlang Shen grows to a ten-thousand-zhang body against the Great Sage, who matches him",
+  "kultivator.technique.cosmic_giant_form.lore": "Its head brushes the clouds; its steps become earthquakes.",
+
+  "kultivator.technique.ancient_god_trample": "Ancient God's Trample",
+  "kultivator.technique.ancient_god_trample.desc": "The Ancient God body for 15 s (×1.5 when there is room, damage taken −30%): eight footprints, one each second, 8 blocks further each (radius 8→12), 3× power and a slam; the 9th: radius 32→40, 16× power, a launch and a 6 s stun. Qi 75%.",
+  "kultivator.technique.ancient_god_trample.source": "Source: Inspired by the Ancient God body of Renegade Immortal, whose stars between the brows mark its might (ch. 921); the trample is game design",
+  "kultivator.technique.ancient_god_trample.lore": "Nine stars light between your brows, one for every step."
+}

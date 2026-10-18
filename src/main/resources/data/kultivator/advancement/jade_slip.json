@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_technique",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.jade_slip.description"
+    },
+    "icon": {
+      "id": "kultivator:jade_slip"
+    },
+    "title": {
+      "translate": "advancement.kultivator.jade_slip.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

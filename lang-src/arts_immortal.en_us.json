@@ -1,0 +1,21 @@
+{
+  "kultivator.technique.ninth_hex": "The Ninth Hex",
+  "kultivator.technique.ninth_hex.desc": "Channel up to 8 s (qi 50% of max, at least 600, then 5/s): a sealing domain of r 24→32 freezes time around you — monsters inside are stunned every second (bosses rooted, at most 3 s in all) and hostile projectiles in it vanish. When the channel ends, the 32 strongest inside take 9× and Slowness IV for 5 s.",
+  "kultivator.technique.ninth_hex.source": "Source: I Shall Seal the Heavens ch. 1379, 1465, 1534, 1540 · the Ninth Hex, Meng Hao's own and the last of the nine Demon Sealing Hexes (the time-sealing effect is game design; the heir's Segel Gunung-Laut stays separate)",
+  "kultivator.technique.ninth_hex.lore": "The last of the nine hexes, and Meng Hao's own.",
+
+  "kultivator.technique.five_elements_mountain": "Five Elements Mountain",
+  "kultivator.technique.five_elements_mountain.desc": "A golden palm falls from 64 blocks up onto the aim (≤ 64) after 2 s, r 12→24: 14× (×1.5 against undead) and a slam; five mountains rise on a ring of 8 around it, rooting monsters for 6 s (bosses 1.5 s) and burning them for 0.8× per second for 6 s. Qi 55% of max (at least 700).",
+  "kultivator.technique.five_elements_mountain.source": "Source: Journey to the West ch. 7 · 五行山: Wukong cannot leap out of the Buddha's palm, which becomes the Five Elements Mountain, sealed with the six-syllable talisman",
+  "kultivator.technique.five_elements_mountain.lore": "No leap can carry you out of the Buddha's palm.",
+
+  "kultivator.technique.tai_chi_diagram": "Tai Chi Diagram",
+  "kultivator.technique.tai_chi_diagram.desc": "Charge 1.5 s, then the diagram unrolls and presses down from 30 blocks up along your aim (48→64 long, 9 wide): 12× (×1.5 against undead), executing below 40% health (bosses below 5%). Releasing early hits at the charged share. Qi 55% of max (at least 700).",
+  "kultivator.technique.tai_chi_diagram.source": "Source: Investiture of the Gods ch. 61 · 太极图 Tai Chi Diagram: \"太极图殷洪绝命\", Yin Hong is turned to ashes inside it",
+  "kultivator.technique.tai_chi_diagram.lore": "Yin and yang close, and what stood between them is ash.",
+
+  "kultivator.technique.heaven_trampling": "Heaven Trampling",
+  "kultivator.technique.heaven_trampling.desc": "Climb 24 blocks on nine steps of light (damage −80% and untouchable for 1.5 s, no fall damage for 10 s), then trample the aim (≤ 48), r 24→32: 14× and launch; three shock waves roll out to r 32→40 for 4× each. Qi 80% of max.",
+  "kultivator.technique.heaven_trampling.source": "Source: Renegade Immortal · Heaven Trampling, the step beyond the three steps by which Wang Lin transcends (the disciples' Penginjak Langit title is named after it); the nine steps of light are game design",
+  "kultivator.technique.heaven_trampling.lore": "Beyond the three steps lies one more."
+}

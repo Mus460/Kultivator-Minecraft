@@ -315,13 +315,17 @@ public final class Heir {
 		DiscipleData data = entity.data();
 		CultivationData masterData = Cultivators.get(master);
 		int learned = 0;
-		for (Technique technique : masterData.learnedTechniques()) {
-			Dao dao = technique.dao();
-			if (!DiscipleTechniques.teachable(technique) || data.knows(technique) || !data.realm().atLeast(technique.minRealm())
-					|| dao != null && dao != data.dao() && !DiscipleHooks.daoBypass(data)) {
+		// Phase 6c (DESIGN 22.13.2): every teachable spec the master knows that the heir qualifies for, free, at the
+		// master's mastery level.
+		for (dev.kultivator.data.TechniqueSpec spec : masterData.learnedSpecs()) {
+			if (data.knows(spec.id()) || !dev.kultivator.disciple.DiscipleCultivation.specQualifies(data, spec)) {
 				continue;
 			}
-			if (data.learn(technique)) {
+			if (data.learn(spec.id())) {
+				int level = dev.kultivator.technique.spec.run.Mastery.level(masterData, spec.id());
+				if (level > 0) {
+					dev.kultivator.technique.spec.run.Mastery.setDiscipleLevel(data, spec.id(), level);
+				}
 				learned++;
 			}
 		}

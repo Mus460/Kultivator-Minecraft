@@ -6,10 +6,16 @@ import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Technique;
+import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.data.XpSource;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
-import dev.kultivator.technique.Techniques;
+import dev.kultivator.technique.source.BookPools;
+import dev.kultivator.technique.source.InheritanceTrials;
+import dev.kultivator.technique.source.JadeSlips;
+import dev.kultivator.technique.source.LearnRules;
+import dev.kultivator.technique.source.TechniqueLoot;
+import dev.kultivator.technique.spec.run.Mastery;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.entity.FakePlayer;
@@ -40,12 +46,17 @@ import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Technique books are vanilla enchanted books (DESIGN 7): sneak + use one to read it. Each stored enchantment maps to a
- * technique; a technique the player can learn now is learned and the book consumed; a known technique, or a book of
- * the player's own Dao that cannot be learned yet, gives +5 comprehension instead; otherwise the player is told exactly
- * what is missing and keeps the book. A book without any mapped enchantment gives 30 cultivation XP.
+ * Technique books are vanilla enchanted books (DESIGN 7, extended by 22.8.2): sneak + use one to read it. Each stored
+ * enchantment maps to a pool of specs ({@link BookPools}); the book teaches the first learnable spec of its pools in grade
+ * order and is consumed. Otherwise it gives insight: +5 comprehension (the Dao of a known art of the pool, or the book
+ * family's Dao when it is the reader's) and +15 mastery to the first known art of the pool. Otherwise the player is told
+ * exactly what is missing and keeps the book. A book without any pool or family gives 30 cultivation XP.
+ * <p>
+ * {@link #init()} also starts the phase-6c acquisition modules of {@code technique.source} (jade slips, inheritance
+ * jades, loot), so their items exist before the creative tab is built.
  */
 public final class TechniqueBooks {
 
@@ -53,6 +64,8 @@ public final class TechniqueBooks {
 	public static final int USE_COOLDOWN = 10;
 	/** Comprehension from a book that teaches nothing new. */
 	public static final double INSIGHT = 5.0D;
+	/** Mastery points a book of a known art gives (22.6). */
+	public static final int INSIGHT_MASTERY = 15;
 	/** Cultivation XP from a book without a technique. */
 	public static final double PLAIN_BOOK_XP = 30.0D;
 	/** {@code FxType.DAO_CHOSEN} b value: a technique learned from a book (a = Dao ordinal, -1 universal). */
@@ -61,8 +74,10 @@ public final class TechniqueBooks {
 	public static final int FX_INSIGHT = 6;
 	/** Colour of universal techniques in texts and effects. */
 	public static final int UNIVERSAL_COLOR = 0xFFD54A;
+	/** At most this many locked arts are explained when a book teaches nothing. */
+	public static final int EXPLAIN_MAX = 3;
 
-	/** Enchantment -> the technique its book teaches. */
+	/** Enchantment -> the legacy technique its book taught before 6c (kept for callers of {@link #techniqueFor}). */
 	private static final Map<ResourceKey<Enchantment>, Technique> MAPPING = new LinkedHashMap<>();
 
 	static {
@@ -84,11 +99,15 @@ public final class TechniqueBooks {
 
 	public static void init() {
 		UseItemCallback.EVENT.register(TechniqueBooks::onUseItem);
+		// Phase 6c acquisition (DESIGN 22.8): items and listeners of technique.source, before ModItems.init builds the tab.
+		JadeSlips.init();
+		InheritanceTrials.init();
+		TechniqueLoot.init();
 	}
 
 	// ================================================================== rules (shared with the client tooltip)
 
-	/** The technique taught by an enchantment's book, or null. */
+	/** The legacy technique an enchantment's book taught before 6c, or null (see {@link #poolFor} for the 6c pools). */
 	public static @Nullable Technique techniqueFor(Holder<Enchantment> enchantment) {
 		for (Map.Entry<ResourceKey<Enchantment>, Technique> entry : MAPPING.entrySet()) {
 			if (enchantment.is(entry.getKey())) {
@@ -98,32 +117,31 @@ public final class TechniqueBooks {
 		return null;
 	}
 
-	/** The techniques an enchanted book teaches, in technique order (empty for other items or unmapped books). */
+	/** The book pool of an enchantment (DESIGN 22.8.2): the specs it can teach, in grade order. */
+	public static List<TechniqueSpec> poolFor(Holder<Enchantment> enchantment) {
+		return BookPools.pool(enchantment);
+	}
+
+	/** The legacy techniques among an enchanted book's pools, in technique order (empty for other items). */
 	public static List<Technique> techniquesOf(ItemStack stack) {
 		if (stack.isEmpty() || !stack.is(Items.ENCHANTED_BOOK)) {
 			return List.of();
 		}
-		ItemEnchantments stored = stack.getOrDefault(DataComponents.STORED_ENCHANTMENTS, ItemEnchantments.EMPTY);
 		EnumSet<Technique> found = EnumSet.noneOf(Technique.class);
-		for (Holder<Enchantment> enchantment : stored.keySet()) {
-			Technique technique = techniqueFor(enchantment);
-			if (technique != null) {
-				found.add(technique);
+		for (TechniqueSpec spec : BookPools.poolOf(stack.getOrDefault(DataComponents.STORED_ENCHANTMENTS, ItemEnchantments.EMPTY))) {
+			if (spec.legacy() != null) {
+				found.add(spec.legacy());
 			}
 		}
 		return new ArrayList<>(found);
 	}
 
-	/** True when the technique could be learned from its book right now. */
+	/** True when the legacy technique could be learned from its book right now. */
 	public static boolean canLearn(CultivationData data, Technique technique) {
-		if (data.knows(technique) || !data.realm().atLeast(technique.minRealm())) {
-			return false;
-		}
-		Dao dao = technique.dao();
-		return dao == null || data.dao() == dao && data.comprehension(dao) + 1.0E-9D >= technique.minComprehension();
+		return LearnRules.canLearn(data, technique.spec());
 	}
 
-	/** The Dao a book of this technique deepens when it teaches nothing new (null: no insight possible). */
+	/** The Dao a book of this legacy technique deepens when it teaches nothing new (null: no insight possible). */
 	public static @Nullable Dao insightDao(CultivationData data, Technique technique) {
 		if (data.knows(technique)) {
 			return technique.dao() != null ? technique.dao() : data.dao();
@@ -131,31 +149,61 @@ public final class TechniqueBooks {
 		return technique.dao() != null && technique.dao() == data.dao() ? technique.dao() : null;
 	}
 
-	/** What keeps the player from learning the technique, one part per missing requirement (empty when nothing). */
+	/** What keeps the player from learning the legacy technique (empty when nothing). */
 	public static List<Component> missing(CultivationData data, Technique technique) {
-		List<Component> parts = new ArrayList<>();
-		if (!data.realm().atLeast(technique.minRealm())) {
-			parts.add(Component.translatable("kultivator.dao.book.missing.realm",
-					technique.minRealm().displayName().copy().withColor(technique.minRealm().color()), data.rank().displayName()));
-		}
-		Dao dao = technique.dao();
-		if (dao != null) {
-			Dao chosen = data.dao();
-			if (chosen != dao) {
-				parts.add(chosen == null
-						? Component.translatable("kultivator.dao.book.missing.dao_none", DaoPaths.colored(dao))
-						: Component.translatable("kultivator.dao.book.missing.dao_other", DaoPaths.colored(dao), DaoPaths.colored(chosen)));
-			} else if (data.comprehension(dao) + 1.0E-9D < technique.minComprehension()) {
-				parts.add(Component.translatable("kultivator.dao.book.missing.comprehension", DaoPaths.colored(dao),
-						Comprehension.format(technique.minComprehension()), Comprehension.format(data.comprehension(dao))));
-			}
-		}
-		return parts;
+		return LearnRules.missing(data, technique.spec());
 	}
 
 	/** The colour of a technique's Dao (gold for universal techniques). */
 	public static int color(Technique technique) {
 		return technique.dao() == null ? UNIVERSAL_COLOR : technique.dao().color();
+	}
+
+	/**
+	 * What a book would do for the player now: the spec it teaches (null when none), the known art that would get the
+	 * insight mastery (null when none) and the insight Dao (null when no comprehension is gained).
+	 */
+	public record Reading(@Nullable TechniqueSpec teaches, @Nullable TechniqueSpec known, @Nullable Dao insight, List<TechniqueSpec> pool) {
+		/** True when reading the book does something (it is then consumed). */
+		public boolean useful() {
+			return teaches != null || known != null || insight != null;
+		}
+	}
+
+	/** What reading a book with these stored enchantments does for the player (pure; the tooltip shows it too). */
+	public static Reading reading(CultivationData data, ItemEnchantments stored) {
+		List<TechniqueSpec> pool = BookPools.poolOf(stored);
+		for (TechniqueSpec spec : pool) {
+			if (LearnRules.canLearn(data, spec)) {
+				return new Reading(spec, null, null, pool);
+			}
+		}
+		TechniqueSpec known = null;
+		for (TechniqueSpec spec : pool) {
+			if (data.knows(spec.id())) {
+				known = spec;
+				break;
+			}
+		}
+		Dao insight = null;
+		Dao chosen = data.dao();
+		if (known != null) {
+			insight = known.dao() != null ? (known.dao() == chosen ? chosen : null) : chosen;
+		}
+		if (insight == null && chosen != null) {
+			Set<BookPools.Family> families = BookPools.familiesOf(stored);
+			for (BookPools.Family family : families) {
+				if (family.dao() == chosen) {
+					insight = chosen;
+				}
+			}
+			for (TechniqueSpec spec : pool) {
+				if (spec.dao() == chosen) {
+					insight = chosen;
+				}
+			}
+		}
+		return new Reading(null, known, insight, pool);
 	}
 
 	// ================================================================== reading a book
@@ -190,108 +238,87 @@ public final class TechniqueBooks {
 
 	private static InteractionResult read(ServerPlayer player, ItemStack stack) {
 		CultivationData data = Cultivators.get(player);
-		List<Technique> taught = techniquesOf(stack);
-		if (taught.isEmpty()) {
+		ItemEnchantments stored = stack.getOrDefault(DataComponents.STORED_ENCHANTMENTS, ItemEnchantments.EMPTY);
+		if (!BookPools.isTechniqueBook(stored)) {
 			readPlain(player, stack);
 			return InteractionResult.SUCCESS;
 		}
-
-		List<Technique> learnable = new ArrayList<>();
-		for (Technique technique : taught) {
-			if (canLearn(data, technique)) {
-				learnable.add(technique);
-			}
+		Reading reading = reading(data, stored);
+		if (reading.teaches() != null) {
+			consume(player, stack);
+			LearnRules.learn(player, reading.teaches(), "book");
+			Advancements.grant(player, "first_book");
+			return InteractionResult.SUCCESS;
 		}
-		if (!learnable.isEmpty()) {
-			learn(player, data, stack, learnable);
+		if (reading.useful()) {
+			insight(player, data, stack, reading);
 			return InteractionResult.SUCCESS;
 		}
 
-		for (Technique technique : taught) {
-			Dao dao = insightDao(data, technique);
-			if (dao != null) {
-				insight(player, data, stack, technique, dao);
-				return InteractionResult.SUCCESS;
-			}
-		}
-
 		// Nothing to take from it yet: say exactly why and keep the book.
-		for (Technique technique : taught) {
-			List<Component> missing = missing(data, technique);
-			Component name = technique.displayName().copy().withColor(color(technique));
-			if (missing.isEmpty() && data.knows(technique)) {
-				Msg.chat(player, Component.translatable("kultivator.dao.book.known_no_dao", name).withStyle(ChatFormatting.GRAY));
-			} else {
-				Msg.chat(player, Component.translatable("kultivator.dao.book.cannot", name, DaoPaths.join(missing))
-						.withStyle(ChatFormatting.GRAY));
+		int explained = 0;
+		for (TechniqueSpec spec : reading.pool()) {
+			if (explained >= EXPLAIN_MAX) {
+				break;
 			}
+			if (data.knows(spec.id())) {
+				continue;
+			}
+			List<Component> missing = LearnRules.missing(data, spec);
+			if (missing.isEmpty()) {
+				continue;
+			}
+			Msg.chat(player, Component.translatable("kultivator.dao.book.cannot", LearnRules.name(spec), DaoPaths.join(missing))
+					.withStyle(ChatFormatting.GRAY));
+			explained++;
+		}
+		if (explained == 0) {
+			Msg.chat(player, Component.translatable("kultivator.sumber.book.nothing").withStyle(ChatFormatting.GRAY));
 		}
 		player.level().playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), SoundEvents.BOOK_PUT, SoundSource.PLAYERS,
 				0.8F, 0.7F);
 		return InteractionResult.PASS;
 	}
 
-	/** Learns every technique of the book the player can learn now. */
-	private static void learn(ServerPlayer player, CultivationData data, ItemStack stack, List<Technique> techniques) {
+	/** Nothing new in the book: +5 comprehension and +15 mastery to a known art of the pool instead. */
+	private static void insight(ServerPlayer player, CultivationData data, ItemStack stack, Reading reading) {
 		consume(player, stack);
-		for (Technique technique : techniques) {
-			data.learn(technique);
-			Component name = technique.displayName().copy().withColor(color(technique)).withStyle(ChatFormatting.BOLD);
-			Msg.chat(player, Component.translatable("kultivator.dao.book.learned", name).withStyle(ChatFormatting.YELLOW));
-			Msg.chat(player, technique.description().copy().withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
-		}
-		Technique first = techniques.get(0);
-		if (data.selected() == null) {
-			data.setSelected(first);
-			Msg.chat(player, Component.translatable("kultivator.dao.book.selected", first.displayName(),
-					Component.keybind("key.kultivator.cast").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
-		} else {
-			Msg.chat(player, Component.translatable("kultivator.dao.book.select_hint", Component.keybind("key.kultivator.previous"),
-					Component.keybind("key.kultivator.next")).withStyle(ChatFormatting.GRAY));
-		}
-		Msg.actionBar(player, Component.translatable("kultivator.dao.book.learned_bar", first.displayName()).withColor(color(first)));
-		// Lets the techniques module check its own rules (selection, collector advancement); books are never auto-learned.
-		Techniques.refreshUnlocks(player);
-
-		ServerLevel level = player.level();
-		Fx.send(level, player.position(), FxType.DAO_CHOSEN, first.dao() == null ? -1 : first.dao().ordinal(), FX_LEARNED, 0.0F);
-		double x = player.getX();
-		double y = player.getY() + 1.0D;
-		double z = player.getZ();
-		level.playSound(null, x, y, z, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 1.0F, 1.0F);
-		level.playSound(null, x, y, z, SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1.0F, 0.9F);
-		level.playSound(null, x, y, z, SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.6F, 1.3F);
-		level.playSound(null, x, y, z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.9F, 1.1F);
-		Advancements.grant(player, "first_book");
-		Cultivators.syncNow(player);
-	}
-
-	/** Nothing new in the book: +5 comprehension instead. */
-	private static void insight(ServerPlayer player, CultivationData data, ItemStack stack, Technique technique, Dao dao) {
-		consume(player, stack);
-		double gained = Comprehension.grant(player, dao, INSIGHT);
-		Component name = technique.displayName().copy().withColor(color(technique));
-		String key = data.knows(technique) ? "kultivator.dao.book.insight_known" : "kultivator.dao.book.insight_future";
-		Msg.chat(player, Component.translatable(key, name, DaoPaths.colored(dao)).withStyle(ChatFormatting.YELLOW));
-		if (gained > 0.0D) {
-			Msg.chat(player, Component.translatable("kultivator.dao.book.insight_gain", Comprehension.format(gained), DaoPaths.colored(dao),
-					Comprehension.format(data.comprehension(dao))).withStyle(ChatFormatting.GRAY));
-		} else {
-			// Comprehension is already complete: the words still nourish the cultivation.
-			double xp = Progression.grantXp(player, PLAIN_BOOK_XP, XpSource.BOOK);
-			Msg.chat(player, Component.translatable("kultivator.dao.book.insight_full", DaoPaths.colored(dao), Msg.number(Math.max(0.0D, xp)))
+		Dao dao = reading.insight();
+		TechniqueSpec known = reading.known();
+		if (known != null) {
+			Msg.chat(player, Component.translatable("kultivator.sumber.book.insight_known", LearnRules.name(known)).withStyle(ChatFormatting.YELLOW));
+			Mastery.add(player, known.id(), INSIGHT_MASTERY, Mastery.Source.BOOK);
+			Msg.chat(player, Component.translatable("kultivator.sumber.book.mastery", INSIGHT_MASTERY, known.displayName())
 					.withStyle(ChatFormatting.GRAY));
+		} else if (dao != null) {
+			Msg.chat(player, Component.translatable("kultivator.sumber.book.insight_future", DaoPaths.colored(dao)).withStyle(ChatFormatting.YELLOW));
 		}
-		if (!data.knows(technique)) {
-			List<Component> missing = missing(data, technique);
-			if (!missing.isEmpty()) {
-				Msg.chat(player, Component.translatable("kultivator.dao.book.still_missing", name, DaoPaths.join(missing))
-						.withStyle(ChatFormatting.DARK_GRAY));
+		if (dao != null) {
+			double gained = Comprehension.grant(player, dao, INSIGHT);
+			if (gained > 0.0D) {
+				Msg.chat(player, Component.translatable("kultivator.dao.book.insight_gain", Comprehension.format(gained), DaoPaths.colored(dao),
+						Comprehension.format(data.comprehension(dao))).withStyle(ChatFormatting.GRAY));
+			} else {
+				// Comprehension is already complete: the words still nourish the cultivation.
+				double xp = Progression.grantXp(player, PLAIN_BOOK_XP, XpSource.BOOK);
+				Msg.chat(player, Component.translatable("kultivator.dao.book.insight_full", DaoPaths.colored(dao), Msg.number(Math.max(0.0D, xp)))
+						.withStyle(ChatFormatting.GRAY));
 			}
 		}
+		for (TechniqueSpec spec : reading.pool()) {
+			if (data.knows(spec.id()) || !LearnRules.daoFits(data, spec)) {
+				continue;
+			}
+			List<Component> missing = LearnRules.missing(data, spec);
+			if (!missing.isEmpty()) {
+				Msg.chat(player, Component.translatable("kultivator.dao.book.still_missing", LearnRules.name(spec), DaoPaths.join(missing))
+						.withStyle(ChatFormatting.DARK_GRAY));
+			}
+			break;
+		}
 
 		ServerLevel level = player.level();
-		Fx.send(level, player.position(), FxType.DAO_CHOSEN, dao.ordinal(), FX_INSIGHT, 0.0F);
+		Fx.send(level, player.position(), FxType.DAO_CHOSEN, dao == null ? -1 : dao.ordinal(), FX_INSIGHT, 0.0F);
 		double x = player.getX();
 		double y = player.getY() + 1.0D;
 		double z = player.getZ();

@@ -99,16 +99,24 @@ public final class ProtectedZones {
 		COMPANION("companion"),
 		FORMATION("formation"),
 		END_ISLAND("end"),
-		UNLOADED("unloaded");
+		UNLOADED("unloaded"),
+		/** The caster's own safe column (DESIGN 22.11.6). */
+		CASTER("kultivator.kehancuran_diri.zone.caster", true),
+		/** Around a known respawn point (DESIGN 22.11.6). */
+		HOME("kultivator.kehancuran_diri.zone.home", true);
 
-		private final String id;
+		private final String key;
 
 		Zone(String id) {
-			this.id = id;
+			this.key = "kultivator.kehancuran.zone." + id;
+		}
+
+		Zone(String key, boolean full) {
+			this.key = key;
 		}
 
 		public String key() {
-			return "kultivator.kehancuran.zone." + id;
+			return key;
 		}
 	}
 
@@ -128,19 +136,40 @@ public final class ProtectedZones {
 		final boolean end;
 		final double hallSafe;
 		final double playerSafe;
+		/** The caster's safe columns (a self cast: at the cast and where the caster stands now), full world height. */
+		final List<Vec3> columns = new ArrayList<>();
+		final double columnSafe;
+		/** Known respawn points of every player in this level (22.11.6). */
+		final List<BlockPos> homes;
+		final double homeSafe;
 
 		/** {@code area}: the box the positions lie in (villagers and golems are looked for around it). */
 		public Context(ServerLevel level, AABB area) {
+			this(level, area, null, List.of());
+		}
+
+		/**
+		 * A self cast's zones (DESIGN 22.11.6): the {@code caster} is exempt from the player zone and protected instead by a
+		 * vertical cylinder of {@code kehancuranCasterSafeRadius} around each of {@code casterColumns}.
+		 */
+		public Context(ServerLevel level, AABB area, java.util.@Nullable UUID caster, List<Vec3> casterColumns) {
 			this.level = level;
 			KultivatorConfig config = KultivatorConfig.get();
 			this.hallSafe = config.kehancuranHallSafeRadius;
 			this.playerSafe = config.kehancuranPlayerSafeRadius;
+			this.columnSafe = config.kehancuranCasterSafeRadius;
+			this.homeSafe = config.kehancuranHomeSafeRadius;
+			this.columns.addAll(casterColumns);
+			this.homes = homeSafe > 0.0D ? dev.kultivator.technique.spec.run.Homes.in(level) : List.of();
 			for (GlobalPos hall : KehancuranLog.knownHalls(level.getServer())) {
 				if (hall.dimension().equals(level.dimension())) {
 					halls.add(hall.pos());
 				}
 			}
 			for (ServerPlayer player : level.players()) {
+				if (caster != null && caster.equals(player.getUUID())) {
+					continue;
+				}
 				players.add(player.position());
 			}
 			AABB around = area.inflate(VILLAGER_RADIUS);
@@ -186,6 +215,18 @@ public final class ProtectedZones {
 			for (Vec3 player : players) {
 				if (player.distanceToSqr(x, y, z) <= playerSafe * playerSafe) {
 					return Zone.PLAYER;
+				}
+			}
+			for (Vec3 column : columns) {
+				double dx = x - column.x;
+				double dz = z - column.z;
+				if (dx * dx + dz * dz <= (columnSafe + 0.5D) * (columnSafe + 0.5D)) {
+					return Zone.CASTER;
+				}
+			}
+			for (BlockPos home : homes) {
+				if (home.distToCenterSqr(x, y, z) <= homeSafe * homeSafe) {
+					return Zone.HOME;
 				}
 			}
 			if (spawn != null) {
