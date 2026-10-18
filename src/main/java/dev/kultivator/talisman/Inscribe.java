@@ -30,7 +30,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Inscribing talismans (DESIGN 19.3.6): a blank talisman in the main hand, the catalyst in the offhand, sneak-use for a
@@ -59,6 +62,26 @@ public final class Inscribe {
 	public static final int STRONG_CORE_BONUS = 2;
 	private static final String XP_KEY = "xp";
 	private static final String MADE_KEY = "made";
+	/** Formation bonuses (phase 7c) never add more than this to an inscription's chance, before {@link #MAX_CHANCE}. */
+	public static final double FORMATION_CHANCE_CAP = 0.10D;
+	private static final List<ToDoubleFunction<ServerPlayer>> CHANCE_PROVIDERS = new ArrayList<>();
+
+	/** Phase 7c (DESIGN 24.13 item 8): extra inscription chance where the player stands (sum, 0 to the cap). */
+	public static void addChanceProvider(ToDoubleFunction<ServerPlayer> provider) {
+		CHANCE_PROVIDERS.add(provider);
+	}
+
+	/** The formation bonus to the player's inscription chance now (0 without providers). */
+	public static double formationChance(ServerPlayer player) {
+		double sum = 0.0D;
+		for (ToDoubleFunction<ServerPlayer> provider : CHANCE_PROVIDERS) {
+			double value = provider.applyAsDouble(player);
+			if (Double.isFinite(value)) {
+				sum += value;
+			}
+		}
+		return Math.max(0.0D, Math.min(FORMATION_CHANCE_CAP, sum));
+	}
 
 	/** What the offhand would inscribe: the kind, the power bonus and whether it is a core. */
 	public record Recipe(TalismanKind kind, int bonus, boolean core) {
@@ -158,7 +181,9 @@ public final class Inscribe {
 		ServerLevel level = player.level();
 		Vec3 hand = player.getEyePosition().add(player.getViewVector(1.0F).scale(0.6D)).subtract(0.0D, 0.35D, 0.0D);
 		CompoundTag section = Talismans.section(data);
-		boolean success = player.getRandom().nextDouble() < chance(levelBefore);
+		double successChance = CHANCE_PROVIDERS.isEmpty() ? chance(levelBefore)
+				: Math.min(MAX_CHANCE, chance(levelBefore) + formationChance(player));
+		boolean success = player.getRandom().nextDouble() < successChance;
 		if (success) {
 			int power = Math.min(TalismanData.MAX_POWER, data.realm().ordinal() + recipe.bonus());
 			ItemStack talisman = Talismans.create(recipe.kind(), power, player.getName().getString());

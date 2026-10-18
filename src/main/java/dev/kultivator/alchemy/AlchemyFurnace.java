@@ -42,7 +42,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The Tungku Alkimia (DESIGN section 9): any cauldron standing on a lit campfire or soul campfire. Everything here only
@@ -106,6 +108,74 @@ public final class AlchemyFurnace {
 				|| CauldronInteractions.WATER.get(stack) != CauldronInteraction.DEFAULT
 				|| CauldronInteractions.LAVA.get(stack) != CauldronInteraction.DEFAULT
 				|| CauldronInteractions.POWDER_SNOW.get(stack) != CauldronInteraction.DEFAULT;
+	}
+
+	// ================================================================ phase 7c formation hooks (DESIGN 24.13 item 8)
+
+	/** A furnace bonus at a cauldron position (the refining's owner may be null or offline). */
+	@FunctionalInterface
+	public interface FurnaceFactor {
+		double at(ServerLevel level, BlockPos pos, @Nullable UUID owner);
+	}
+
+	/** Formation bonuses never add more chance than this, before {@link #MAX_CHANCE}. */
+	public static final double FORMATION_CHANCE_CAP = 0.10D;
+	/** Formations never shorten a refining below this share of {@link #REFINE_TICKS}. */
+	public static final double FORMATION_DURATION_FLOOR = 0.7D;
+
+	private static final List<FurnaceFactor> CHANCE_PROVIDERS = new ArrayList<>();
+	private static final List<FurnaceFactor> QUALITY_STEP_PROVIDERS = new ArrayList<>();
+	private static final List<FurnaceFactor> DURATION_PROVIDERS = new ArrayList<>();
+
+	/** Extra success chance at a furnace: the sum of all providers, clamped to 0 … {@link #FORMATION_CHANCE_CAP}. */
+	public static void addChanceProvider(FurnaceFactor provider) {
+		CHANCE_PROVIDERS.add(provider);
+	}
+
+	/** Extra quality steps at a furnace: the largest provider value, at most 1 (a fraction is the chance of one step). */
+	public static void addQualityStepProvider(FurnaceFactor provider) {
+		QUALITY_STEP_PROVIDERS.add(provider);
+	}
+
+	/** Refining time factor at a furnace: the smallest provider value, at least {@link #FORMATION_DURATION_FLOOR}. */
+	public static void addDurationFactorProvider(FurnaceFactor provider) {
+		DURATION_PROVIDERS.add(provider);
+	}
+
+	/** The formation chance bonus at {@code pos} (0 without providers). */
+	public static double formationChance(ServerLevel level, BlockPos pos, @Nullable UUID owner) {
+		double sum = 0.0D;
+		for (FurnaceFactor provider : CHANCE_PROVIDERS) {
+			double value = provider.at(level, pos, owner);
+			if (Double.isFinite(value)) {
+				sum += value;
+			}
+		}
+		return Math.max(0.0D, Math.min(FORMATION_CHANCE_CAP, sum));
+	}
+
+	/** The formation quality step at {@code pos}, 0 … 1 (0 without providers). */
+	public static double formationQualityStep(ServerLevel level, BlockPos pos, @Nullable UUID owner) {
+		double best = 0.0D;
+		for (FurnaceFactor provider : QUALITY_STEP_PROVIDERS) {
+			double value = provider.at(level, pos, owner);
+			if (Double.isFinite(value)) {
+				best = Math.max(best, value);
+			}
+		}
+		return Math.min(1.0D, best);
+	}
+
+	/** The refining ticks at {@code pos}: {@link #REFINE_TICKS} × the smallest duration factor (never below the floor). */
+	public static int refineTicks(ServerLevel level, BlockPos pos, @Nullable UUID owner) {
+		double factor = 1.0D;
+		for (FurnaceFactor provider : DURATION_PROVIDERS) {
+			double value = provider.at(level, pos, owner);
+			if (Double.isFinite(value)) {
+				factor = Math.min(factor, value);
+			}
+		}
+		return (int) Math.round(REFINE_TICKS * Math.max(FORMATION_DURATION_FLOOR, factor));
 	}
 
 	/** Success chance of a refining that matches a recipe. */
@@ -215,15 +285,16 @@ public final class AlchemyFurnace {
 			return;
 		}
 		CultivationData data = Cultivators.get(player);
-		pot.startRefining(level.getGameTime() + REFINE_TICKS, player.getUUID(), Alchemy.level(data), data.dao() == Dao.FIRE);
+		int ticks = DURATION_PROVIDERS.isEmpty() ? REFINE_TICKS : refineTicks(level, pos, player.getUUID());
+		pot.startRefining(level.getGameTime() + ticks, player.getUUID(), Alchemy.level(data), data.dao() == Dao.FIRE);
 		pots.setDirty();
 
 		Vec3 top = top(pos);
-		Fx.send(level, top, FxType.ALCHEMY, 1, REFINE_TICKS, (float) steamColor(pot));
+		Fx.send(level, top, FxType.ALCHEMY, 1, ticks, (float) steamColor(pot));
 		sound(level, top, SoundEvents.FIRECHARGE_USE, 0.5F, 0.8F);
 		sound(level, top, SoundEvents.BREWING_STAND_BREW, 0.9F, 0.9F);
 		sound(level, top, SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 0.8F, 1.0F);
-		Msg.actionBar(player, Component.translatable("kultivator.alchemy.refine.start", REFINE_TICKS / 20, contents(pot))
+		Msg.actionBar(player, Component.translatable("kultivator.alchemy.refine.start", Math.max(1, Math.round(ticks / 20.0F)), contents(pot))
 				.withColor(BUSY_COLOR));
 	}
 
@@ -346,11 +417,22 @@ public final class AlchemyFurnace {
 		}
 		// Phase 7 (DESIGN 19.3.7): stones and a core add to the chance (still capped at MAX_CHANCE), stones and the
 		// auxiliary herb shift the quality roll, a core sets a quality floor.
-		if (random.nextDouble() >= successChance(alchemyLevel, soul, fireDao, mix)) {
+		double chance = successChance(alchemyLevel, soul, fireDao, mix);
+		if (!CHANCE_PROVIDERS.isEmpty()) {
+			// Phase 7c (DESIGN 24.5): the formation bonus, still capped at MAX_CHANCE.
+			chance = Math.min(MAX_CHANCE, chance + formationChance(level, pos, pot.owner()));
+		}
+		if (random.nextDouble() >= chance) {
 			failure(level, top, owner, "kultivator.alchemy.refine.failed", recipe.xp() * FAILED_XP_SHARE);
 			return;
 		}
 		PillQuality quality = rollQuality(random, alchemyLevel, soul, mix.qualityBonus());
+		if (!QUALITY_STEP_PROVIDERS.isEmpty()) {
+			double step = formationQualityStep(level, pos, pot.owner());
+			if (step >= 1.0D || step > 0.0D && random.nextDouble() < step) {
+				quality = quality.up();
+			}
+		}
 		PillQuality floor = mix.floor();
 		if (floor != null && quality.ordinal() < floor.ordinal()) {
 			quality = floor;

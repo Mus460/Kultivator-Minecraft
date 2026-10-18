@@ -80,7 +80,9 @@ public final class XpSources {
 	// ================================================================== combat
 
 	private static void onKill(ServerLevel level, Entity killer, LivingEntity killed, DamageSource source) {
-		if (!(killer instanceof ServerPlayer player) || player instanceof FakePlayer || player.isSpectator()) {
+		if (!(killer instanceof ServerPlayer player) || player instanceof FakePlayer || player.isSpectator()
+				|| dev.kultivator.util.FormationDamage.is(source)) {
+			// Formation kills (phase 7c, DESIGN 24.1 rule 3) never pay cultivation XP.
 			return;
 		}
 		if (dev.kultivator.elite.EliteMonsters.isElite(killed)) {

@@ -226,7 +226,8 @@ public final class QiHud implements HudElement {
 		lastFrame = nowMillis;
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.player == null || minecraft.gui.hud.isHidden() || minecraft.getDebugOverlay().showDebugScreen()
-				|| !EffectQuality.hudVisible() || !ClientCultivation.received() || minecraft.gui.screen() instanceof ChatScreen) {
+				|| !EffectQuality.hudVisible() || !ClientCultivation.received() || minecraft.gui.screen() instanceof ChatScreen
+				|| dev.kultivator.client.epic.EpicDirector.recordHide()) {
 			return;
 		}
 		CultivationData data = ClientCultivation.data();

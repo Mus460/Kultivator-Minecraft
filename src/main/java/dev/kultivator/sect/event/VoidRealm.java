@@ -431,6 +431,9 @@ public final class VoidRealm {
 			if (floor >= 10 && player != null) {
 				Advancements.grant(player, "void_floor_10");
 			}
+			if ((floor == SACRED_BORDER || floor == DEVIL_CAVE) && body.level() instanceof net.minecraft.server.level.ServerLevel bodyLevel) {
+				dev.kultivator.epic.EpicHooks.extra(bodyLevel, dev.kultivator.epic.EpicIds.EXTRA_VOID_BORDER, player, body, body.position(), floor, 0);
+			}
 			EventUtil.chat(player, Component.translatable("kultivator.sectevent.void.first_clear", body.getDisplayName(), floor,
 					(int) Math.round(share * 100.0D)).withStyle(ChatFormatting.LIGHT_PURPLE));
 		} else {

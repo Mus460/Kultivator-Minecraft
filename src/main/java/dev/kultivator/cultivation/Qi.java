@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.ToDoubleFunction;
 
 /**
  * The qi pool: maximum, regeneration, spending (DESIGN section 2). {@link #max} and {@link #regenPerSecond} are pure
@@ -30,6 +31,30 @@ public final class Qi {
 		ServerPlayerEvents.LEAVE.register(player -> LAST_SENT.remove(player.getUUID()));
 	}
 
+	private static final java.util.List<ToDoubleFunction<ServerPlayer>> REGEN_FACTORS = new java.util.ArrayList<>();
+	/** Server regeneration factors (phase 7c formations) never multiply the regeneration by more than this. */
+	public static final double REGEN_FACTOR_CAP = 2.0D;
+
+	/** Phase 7c (DESIGN 24.13 item 8): multiplies the player's qi regeneration on the server (product of all, 0 to the cap). */
+	public static void addRegenFactor(ToDoubleFunction<ServerPlayer> provider) {
+		REGEN_FACTORS.add(provider);
+	}
+
+	/** The product of the server regeneration factors for {@code player} (1 without providers). */
+	public static double regenFactor(ServerPlayer player) {
+		if (REGEN_FACTORS.isEmpty()) {
+			return 1.0D;
+		}
+		double product = 1.0D;
+		for (ToDoubleFunction<ServerPlayer> provider : REGEN_FACTORS) {
+			double value = provider.applyAsDouble(player);
+			if (Double.isFinite(value) && value >= 0.0D) {
+				product *= value;
+			}
+		}
+		return Math.min(REGEN_FACTOR_CAP, product);
+	}
+
 	/** Called every server tick for every player; regenerates once per second and clamps to the maximum. */
 	public static void tick(ServerPlayer player, CultivationData data) {
 		if (player.tickCount % 20 != 0 || player.isDeadOrDying()) {
@@ -43,7 +68,7 @@ public final class Qi {
 		} else if (before > max) {
 			after = max;
 		} else {
-			after = Math.min(max, before + regenPerSecond(data));
+			after = Math.min(max, before + regenPerSecond(data) * regenFactor(player));
 		}
 		if (after == before) {
 			return;

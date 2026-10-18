@@ -166,6 +166,10 @@ public final class DiscipleLook {
 						rankShort(rank).withColor(realmColor), starLine).withColor(realmColor);
 			}
 		};
+		if (disciple.syncedActivity() == DiscipleEntity.ACTIVITY_FORMATION_KEEPER) {
+			// Phase 7c (DESIGN 24.13 item 7): a formation keeper at its post.
+			tag = tag.append(Component.translatable("kultivator.spine7c.keeper_tag").withColor(0x9FE0C0));
+		}
 		for (BiFunction<DiscipleEntity, MutableComponent, MutableComponent> decorator : NAME_DECORATORS) {
 			MutableComponent decorated = decorator.apply(disciple, tag);
 			if (decorated != null) {

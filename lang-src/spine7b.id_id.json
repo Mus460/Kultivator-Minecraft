@@ -1,0 +1,6 @@
+{
+  "kultivator.spine7b.config.epicMoments": "epicMoments: tribulasi, terobosan dan momen epik lain mendapat sinematik dalam game dan efek raksasa; jika mati, hanya efek biasa yang tampil.",
+  "kultivator.spine7b.config.epicCameraShots": "epicCameraShots: bidikan kamera sinematik boleh berjalan di klien masing-masing pemain; jika mati, kamera klien tidak pernah digerakkan.",
+  "kultivator.spine7b.config.epicRange": "epicRange (96-512): sejauh berapa blok pemain lain melihat momen epik berskala langit.",
+  "kultivator.spine7b.settings.heading": "Momen Epik"
+}

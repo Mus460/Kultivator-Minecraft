@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:formation_eye",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.ten_absolute.description"
+    },
+    "icon": {
+      "id": "minecraft:netherite_block"
+    },
+    "title": {
+      "translate": "advancement.kultivator.ten_absolute.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

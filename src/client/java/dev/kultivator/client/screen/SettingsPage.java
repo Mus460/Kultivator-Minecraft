@@ -180,6 +180,32 @@ final class SettingsPage extends Page {
 		guide.tooltip(() -> List.of(Component.translatable(G + "guide"), Component.translatable(G + "guide.tip").withStyle(ChatFormatting.GRAY)));
 		put(guide, cy);
 		cy += row;
+
+		// Phase 7b Momen Epik (DESIGN 23.2, 23.5.1 item 9): rows from EpicSettings; on/off rows are jade coins, the
+		// camera mode and the VFX scale cycle like "Guncangan layar". Must survive every edit (23.17.5).
+		List<dev.kultivator.client.epic.EpicSettings.Row> epicRows = dev.kultivator.client.epic.EpicSettings.rows();
+		if (!epicRows.isEmpty()) {
+			cy += 2;
+			heading(cy, "kultivator.spine7b.settings.heading");
+			cy += 15;
+			for (dev.kultivator.client.epic.EpicSettings.Row epic : epicRows) {
+				if (epic.cycle()) {
+					TalismanButton cycle = new TalismanButton(rightX + 2, cy, rightW - 6, coin + 2, epic.value());
+					cycle.onPress(epic.next());
+					cycle.tooltip(epic.tooltip());
+					put(cycle, cy);
+					cy += row + 2;
+				} else {
+					String key = epic.key();
+					JadeCoin toggle = new JadeCoin(rightX + 2, cy, rightW - 6, coin, epic.value(),
+							() -> dev.kultivator.client.epic.EpicSettings.flag(key));
+					toggle.onPress(epic.next());
+					toggle.tooltip(epic.tooltip());
+					put(toggle, cy);
+					cy += row;
+				}
+			}
+		}
 		columnHeight = cy - y + 4;
 	}
 

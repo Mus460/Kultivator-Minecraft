@@ -586,6 +586,9 @@ public final class WorldBreaker {
 		if (owner == null) {
 			return;
 		}
+		if (!cancelled && job.changed > 0 && (job.self || job.restore)) {
+			dev.kultivator.epic.EpicHooks.kehancuran(server.getLevel(job.dimension), owner, null, Vec3.atCenterOf(job.centre), -1, 0.0F, job.restore ? dev.kultivator.epic.EpicIds.KEH_RESTORE : dev.kultivator.epic.EpicIds.KEH_CRATER, job.changed);
+		}
 		if (job.self && !job.restore) {
 			if (cancelled) {
 				Msg.chat(owner, Component.translatable("kultivator.kehancuran_diri.stopped", job.changed).withStyle(ChatFormatting.GOLD));

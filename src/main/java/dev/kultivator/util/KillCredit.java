@@ -35,6 +35,10 @@ public final class KillCredit {
 
 	/** The credit for {@code victim}'s death by {@code source}, or null when no online player earned it (fall, lava, mobs). */
 	public static @Nullable Credit resolve(LivingEntity victim, DamageSource source) {
+		if (FormationDamage.is(source)) {
+			// Phase 7c (DESIGN 24.1 rule 3): a formation kill earns nobody anything, even after a player's tap.
+			return null;
+		}
 		Credit credit = of(source.getEntity());
 		if (credit == null) {
 			credit = of(victim.getKillCredit());
@@ -47,6 +51,9 @@ public final class KillCredit {
 	 * credit when that is a player (the rule {@code TechniqueLoot} always used). Beasts and disciples do not count here.
 	 */
 	public static @Nullable ServerPlayer directPlayer(LivingEntity victim, DamageSource source) {
+		if (FormationDamage.is(source)) {
+			return null;
+		}
 		Entity attacker = source.getEntity();
 		if (attacker instanceof ServerPlayer player) {
 			return player;

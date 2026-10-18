@@ -219,6 +219,7 @@ public final class Calamity {
 		HuFa.begin(entity, null, data.rank(), true);
 		sendOmen(level, run, OMEN_TICKS);
 		Fx.send(level, entity.position(), FxType.STAR, PathFxIds.CALAMITY_OMEN, k, OMEN_TICKS / 20.0F);
+		dev.kultivator.epic.EpicHooks.calamity(entity, master, dev.kultivator.epic.EpicIds.CAL_OMEN, k, 0, run.strikeCount);
 		rumble(level, run.start, run.variant, entity.getRandom());
 		DisciplePaths.sound(level, entity.position(), SoundEvents.WARDEN_HEARTBEAT, 1.0F, 0.6F);
 		Component name = DisciplePaths.name(entity);
@@ -276,12 +277,18 @@ public final class Calamity {
 				if (run.ticks % 40 == 0) {
 					rumble(level, run.start, run.variant, entity.getRandom());
 				}
+				if (run.ticks == OMEN_TICKS - 30) {
+					dev.kultivator.epic.EpicHooks.calamity(entity, level.getServer().getPlayerList().getPlayer(run.owner), dev.kultivator.epic.EpicIds.CAL_PRE, run.k, 1, run.strikeCount);
+				}
 				if (run.ticks >= OMEN_TICKS) {
 					run.phase = Phase.STRIKES;
 					run.nextStrikeAt = run.ticks;
 				}
 			}
 			case STRIKES -> {
+				if (run.nextStrikeAt - run.ticks == 30 && run.strikesDone < run.strikeCount) {
+					dev.kultivator.epic.EpicHooks.calamity(entity, level.getServer().getPlayerList().getPlayer(run.owner), dev.kultivator.epic.EpicIds.CAL_PRE, run.k, run.strikesDone + 1, run.strikeCount);
+				}
 				if (run.ticks >= run.nextStrikeAt) {
 					if (!strike(run, level)) {
 						return;
@@ -319,6 +326,7 @@ public final class Calamity {
 		DisciplePaths.sound(level, feet.add(0.0D, 3.0D, 0.0D), SoundEvents.LIGHTNING_BOLT_THUNDER, last ? 2.4F : 1.7F, 0.7F);
 		DisciplePaths.sound(level, feet, SoundEvents.LIGHTNING_BOLT_IMPACT, last ? 1.3F : 0.9F, 0.55F);
 		ServerPlayer master = level.getServer().getPlayerList().getPlayer(run.owner);
+		dev.kultivator.epic.EpicHooks.calamity(entity, master, dev.kultivator.epic.EpicIds.CAL_STRIKE, run.k, number, run.strikeCount);
 		if (master != null && master.level() == level && master.distanceToSqr(entity) < 64.0D * 64.0D) {
 			Msg.actionBar(master, Component.translatable(DisciplePaths.PREFIX + "calamity.strike", number, run.strikeCount, DisciplePaths.name(entity))
 					.withStyle(last ? ChatFormatting.GOLD : ChatFormatting.LIGHT_PURPLE));
@@ -366,6 +374,7 @@ public final class Calamity {
 		Vec3 pos = entity.position();
 		Fx.send(level, run.start, run.start.add(0.0D, SKY_HEIGHT, 0.0D), FxType.TRIBULATION_END, run.variant, 1, 0.0F);
 		Fx.send(level, pos, FxType.STAR, PathFxIds.CALAMITY_PASS, run.k, 1.0F);
+		dev.kultivator.epic.EpicHooks.calamity(entity, master, dev.kultivator.epic.EpicIds.CAL_PASS, run.k, run.strikesDone, run.strikeCount);
 		DisciplePaths.sound(level, pos, SoundEvents.BEACON_ACTIVATE, 1.0F, 1.2F);
 		DisciplePaths.sound(level, pos, SoundEvents.BELL_RESONATE, 1.0F, 0.9F);
 		entity.setHealth(entity.getMaxHealth());
@@ -413,6 +422,7 @@ public final class Calamity {
 			Vec3 pos = entity.position();
 			Fx.send(level, run.start, run.start.add(0.0D, SKY_HEIGHT, 0.0D), FxType.TRIBULATION_END, run.variant, 0, 0.0F);
 			Fx.send(level, pos, FxType.DEVIATION, 0, 0, 1.5F);
+			dev.kultivator.epic.EpicHooks.calamity(entity, level.getServer().getPlayerList().getPlayer(run.owner), dev.kultivator.epic.EpicIds.CAL_FAIL, run.k, run.strikesDone, run.strikeCount);
 			DisciplePaths.sound(level, pos, SoundEvents.LIGHTNING_BOLT_THUNDER, 1.0F, 0.4F);
 			DisciplePaths.sound(level, pos, SoundEvents.WITHER_AMBIENT, 0.5F, 1.3F);
 		}
@@ -434,6 +444,7 @@ public final class Calamity {
 		}
 		Fx.send(level, run.start, run.start.add(0.0D, SKY_HEIGHT, 0.0D), FxType.TRIBULATION_END, run.variant, 0, 0.0F);
 		ServerPlayer master = level.getServer().getPlayerList().getPlayer(run.owner);
+		dev.kultivator.epic.EpicHooks.calamity(entity, master, dev.kultivator.epic.EpicIds.CAL_ABORT, run.k, run.strikesDone, run.strikeCount);
 		if (master != null) {
 			Msg.chat(master, Component.translatable(DisciplePaths.PREFIX + messageKey, DisciplePaths.name(entity)).withStyle(ChatFormatting.GRAY));
 		}

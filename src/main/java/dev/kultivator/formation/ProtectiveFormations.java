@@ -383,6 +383,25 @@ public final class ProtectiveFormations {
 
 	// ================================================================ ticking
 
+	private static final List<java.util.function.Predicate<Formation>> DRAIN_EXEMPTIONS = new ArrayList<>();
+
+	/**
+	 * Phase 7c (DESIGN 24.13 item 8): while any predicate is true for an active formation, its amethyst power is not
+	 * drained (and it does not switch off for lack of power). The only 7c edit to the old formation code.
+	 */
+	public static void addDrainExemption(java.util.function.Predicate<Formation> exemption) {
+		DRAIN_EXEMPTIONS.add(exemption);
+	}
+
+	private static boolean drainExempt(Formation formation) {
+		for (java.util.function.Predicate<Formation> exemption : DRAIN_EXEMPTIONS) {
+			if (exemption.test(formation)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private static void tickServer(MinecraftServer server) {
 		int tick = server.getTickCount();
 		if (tick % PULSE != 0) {
@@ -436,12 +455,14 @@ public final class ProtectiveFormations {
 		}
 		// Formasi Agung Sekte (DESIGN 20.3.2): a larger radius, restriction layers, and no drain while a guard sits by it.
 		GrandFormation.State grand = GrandFormation.state(level, formation, tick);
-		if (formation.power() <= 0 && !grand.guarded()) {
+		// Phase 7c (DESIGN 24.13 item 8): a sect formation (L1) may hold the drain like the Agung's guard does.
+		boolean noDrain = grand.guarded() || drainExempt(formation);
+		if (formation.power() <= 0 && !noDrain) {
 			switchOff(level, data, formation, "kultivator.formations.power_out");
 			return;
 		}
 		repel(level, data, formation, tick % 20 == 0, grand);
-		if (!grand.guarded()) {
+		if (!noDrain) {
 			formation.setPower(formation.power() - PULSE);
 			data.setDirty();
 			if (formation.power() <= 0) {

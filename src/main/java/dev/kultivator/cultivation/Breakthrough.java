@@ -72,6 +72,27 @@ public final class Breakthrough {
 		}
 	}
 
+	/**
+	 * Told about the stages of every breakthrough (DESIGN 23.5.1, spine 7b), for presentation only; {@code kind} is one of
+	 * the {@code KIND_*} constants. Listeners must never change the breakthrough; an exception is logged and ignored.
+	 */
+	public interface Listener {
+		/** A breakthrough from {@code from} into {@code target} began (awakening, qi gathering, or trial / tribulation). */
+		default void onBegin(ServerPlayer p, Rank from, Rank target, int kind, boolean test) {
+		}
+
+		/** The breakthrough succeeded: the rank is already {@code now} and the quality is applied. */
+		default void onSuccess(ServerPlayer p, Rank before, Rank now, BreakthroughQuality q, int kind, boolean test) {
+		}
+
+		/** The breakthrough failed; {@code hardcoreDrop} when the player fell one realm instead of a Qi Deviation. */
+		default void onFail(ServerPlayer p, boolean hardcoreDrop, boolean test) {
+		}
+	}
+
+	/** The breakthrough kinds of {@link Listener} (the private {@code Kind} ordinals). */
+	public static final int KIND_AWAKENING = 0, KIND_CHANCE = 1, KIND_TRIBULATION = 2, KIND_FORCED = 3;
+
 	/** The sum of all {@link QualityBonus} providers is clamped to this range (the {@code DiscipleHooks} range). */
 	public static final double QUALITY_BONUS_MIN = -0.10D;
 	public static final double QUALITY_BONUS_MAX = 0.40D;
@@ -127,6 +148,7 @@ public final class Breakthrough {
 	private static final Map<UUID, Session> SESSIONS = new HashMap<>();
 	private static @Nullable TrialProvider trialProvider;
 	private static final List<QualityBonus> QUALITY_BONUS = new CopyOnWriteArrayList<>();
+	private static final List<Listener> LISTENERS = new CopyOnWriteArrayList<>();
 
 	public static void init() {
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
@@ -153,6 +175,41 @@ public final class Breakthrough {
 	/** Adds a breakthrough-quality bonus (DESIGN 19.2.6); register from a module's {@code init()}. */
 	public static void addQualityBonusProvider(QualityBonus provider) {
 		QUALITY_BONUS.add(provider);
+	}
+
+	/** Adds a breakthrough listener (DESIGN 23.5.1); register from a module's {@code init()}. */
+	public static void addListener(Listener listener) {
+		LISTENERS.add(listener);
+	}
+
+	private static void fireBegin(ServerPlayer p, Rank from, Rank target, Kind kind, boolean test) {
+		for (Listener listener : LISTENERS) {
+			try {
+				listener.onBegin(p, from, target, kind.ordinal(), test);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Breakthrough listener failed at the begin", exception);
+			}
+		}
+	}
+
+	private static void fireSuccess(ServerPlayer p, Rank before, Rank now, BreakthroughQuality quality, Kind kind, boolean test) {
+		for (Listener listener : LISTENERS) {
+			try {
+				listener.onSuccess(p, before, now, quality, kind.ordinal(), test);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Breakthrough listener failed at the success", exception);
+			}
+		}
+	}
+
+	private static void fireFail(ServerPlayer p, boolean hardcoreDrop, boolean test) {
+		for (Listener listener : LISTENERS) {
+			try {
+				listener.onFail(p, hardcoreDrop, test);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Breakthrough listener failed at the failure", exception);
+			}
+		}
 	}
 
 	/**
@@ -357,6 +414,7 @@ public final class Breakthrough {
 					Msg.chat(player, Component.translatable("kultivator.breakthrough.test.failed").withStyle(ChatFormatting.RED));
 					finishQuietly(player, data);
 					Deviation.apply(player, 1.0D);
+					fireFail(player, false, true);
 				} else {
 					fail(player, data, false, true, false);
 				}
@@ -409,6 +467,7 @@ public final class Breakthrough {
 			Fx.send(level, pos, FxType.AWAKENING, Element.mainColor(data.rootElements()), AWAKENING_TICKS, 0.0F);
 			level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 0.6F);
 			Msg.chat(player, Component.translatable("kultivator.breakthrough.awakening.start").withStyle(ChatFormatting.AQUA));
+			fireBegin(player, from, target, Kind.AWAKENING, false);
 			return;
 		}
 		if (!test && from.realm() == Realm.QI_REFINING) {
@@ -420,6 +479,7 @@ public final class Breakthrough {
 			level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS, 1.0F, 0.7F);
 			Msg.chat(player, Component.translatable("kultivator.breakthrough.gathering.start",
 					Component.literal(Math.round(session.chance * 100.0D) + "%").withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.AQUA));
+			fireBegin(player, from, target, Kind.CHANCE, false);
 			return;
 		}
 
@@ -427,6 +487,7 @@ public final class Breakthrough {
 		session.dimension = level.dimension();
 		SESSIONS.put(player.getUUID(), session);
 		Fx.send(level, pos, FxType.BREAKTHROUGH_START, target.realm().ordinal(), 60, 0.0F);
+		fireBegin(player, from, target, Kind.TRIBULATION, test);
 		TrialProvider provider = trialProvider;
 		if (!test && provider != null && KultivatorConfig.get().heartDemonTrials && provider.needsTrial(player, target)) {
 			provider.startTrial(player, target);
@@ -589,6 +650,7 @@ public final class Breakthrough {
 
 		Vec3 pos = player.position();
 		Fx.send(level, pos, FxType.BREAKTHROUGH_SUCCESS, realm.ordinal(), quality.ordinal(), (float) now.step());
+		fireSuccess(player, session.from, now, quality, kind, session.test);
 		successSounds(level, pos, kind, quality);
 
 		MutableComponent rankName = now.displayName().withColor(realm.color());
@@ -664,6 +726,7 @@ public final class Breakthrough {
 		if (test) {
 			Deviation.apply(player, 1.0D);
 			Cultivators.syncNow(player);
+			fireFail(player, false, true);
 			return;
 		}
 		boolean hardcore = data.hardcore() || KultivatorConfig.get().hardcoreForced;
@@ -688,6 +751,7 @@ public final class Breakthrough {
 		}
 		Cultivators.refreshVisual(player);
 		Cultivators.syncNow(player);
+		fireFail(player, hardcore, false);
 	}
 
 	/** Ends a session without success or penalty. */

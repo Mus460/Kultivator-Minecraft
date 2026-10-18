@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "kultivator:block/formation_eye_top",
+    "side": "kultivator:block/formation_eye_side",
+    "bottom": "kultivator:block/formation_eye_bottom"
+  }
+}

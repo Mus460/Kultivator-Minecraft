@@ -121,6 +121,11 @@ final class DiscipleAi {
 		DiscipleEntity.Mode mode = disciple.mode();
 		if (disciple.holdsActivitySpot()) {
 			// Duties, the tower, the spirit body and spectators only fight back; the formation guard keeps its spot clear.
+			if (disciple.activity() == DiscipleEntity.ACTIVITY_FORMATION_KEEPER) {
+				// Phase 7c keepers: only a Waspada keeper seeks intruders, inside its core radius (DESIGN 24.2.8).
+				double watch = DiscipleHooks.keeperWatchRadius(disciple);
+				return watch > 0.0D ? scanAround(disciple, owner, disciple.activitySpot(), watch, true) : null;
+			}
 			return disciple.activity() == DiscipleEntity.ACTIVITY_FORMATION_GUARD
 					? scanAround(disciple, owner, disciple.activitySpot(), GUARD_RADIUS, true) : null;
 		}

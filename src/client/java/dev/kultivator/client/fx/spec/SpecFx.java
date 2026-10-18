@@ -77,6 +77,8 @@ public final class SpecFx {
 		if (spec == null) {
 			return;
 		}
+		// Phase 7b (DESIGN 23.6): ultimates and one's own Kehancuran casts start their epic layers (never throws).
+		dev.kultivator.client.epic.EpicDirector.onTechFx(payload);
 		Entity caster = minecraft.level.getEntity(payload.caster());
 		boolean others = caster instanceof Player && caster != minecraft.player;
 		float othersFactor = others ? EffectQuality.othersScale() : 1.0F;

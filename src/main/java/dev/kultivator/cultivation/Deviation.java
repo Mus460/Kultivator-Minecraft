@@ -34,7 +34,28 @@ public final class Deviation {
 	/** Weakness and Slowness are re-applied this often while deviating. */
 	private static final int EFFECT_PERIOD = 200;
 
+	private static final java.util.List<java.util.function.ToDoubleFunction<ServerPlayer>> TIMER_FACTORS = new java.util.ArrayList<>();
+	/** Timer factors (phase 7c healing fields) never run the deviation timer faster than this. */
+	public static final double TIMER_FACTOR_CAP = 2.0D;
+
 	public static void init() {
+	}
+
+	/** Phase 7c (DESIGN 24.13 item 8): speeds up the player's deviation timer (largest value wins, 1 to the cap). */
+	public static void addTimerFactor(java.util.function.ToDoubleFunction<ServerPlayer> provider) {
+		TIMER_FACTORS.add(provider);
+	}
+
+	/** How fast the player's deviation timer runs now (1 without providers). */
+	public static double timerFactor(ServerPlayer player) {
+		double best = 1.0D;
+		for (java.util.function.ToDoubleFunction<ServerPlayer> provider : TIMER_FACTORS) {
+			double value = provider.applyAsDouble(player);
+			if (Double.isFinite(value)) {
+				best = Math.max(best, value);
+			}
+		}
+		return Math.min(TIMER_FACTOR_CAP, best);
 	}
 
 	public static void tick(ServerPlayer player, CultivationData data) {
@@ -57,6 +78,20 @@ public final class Deviation {
 		}
 		if (left % EFFECT_PERIOD == 0) {
 			applyEffects(player, left);
+		}
+		if (left % 20 == 0 && !TIMER_FACTORS.isEmpty()) {
+			// Phase 7c healing fields: the timer runs faster. At most 19 extra ticks per second, so no multiple of 20 (and so
+			// no effect re-application) is ever skipped, and the normal path still ends the deviation.
+			int extra = Math.min(19, (int) Math.round((timerFactor(player) - 1.0D) * 20.0D));
+			if (extra > 0 && left - extra >= 1) {
+				if (player.getRandom().nextInt(60) == 0) {
+					player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, Math.min(100, left), 0, false, false, true));
+				}
+				left -= extra;
+				data.setDeviationTicks(left);
+				Cultivators.dirty(player);
+				return;
+			}
 		}
 		if (left % 20 == 0) {
 			if (player.getRandom().nextInt(60) == 0) {

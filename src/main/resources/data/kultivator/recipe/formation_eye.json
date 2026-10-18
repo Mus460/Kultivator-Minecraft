@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "A": "minecraft:amethyst_shard",
+    "S": "kultivator:spirit_stone_low",
+    "G": "minecraft:gold_ingot",
+    "L": "minecraft:lodestone"
+  },
+  "pattern": [
+    "ASA",
+    "GLG",
+    "ASA"
+  ],
+  "result": {
+    "id": "kultivator:formation_eye"
+  }
+}

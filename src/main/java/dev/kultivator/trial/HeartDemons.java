@@ -316,6 +316,7 @@ public final class HeartDemons {
 		WARNINGS.put(player.getUUID(), WARNING_TICKS);
 		Msg.chat(player, Component.translatable("kultivator.trial.warning").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
 		Fx.sendTo(player, player.position(), player.position(), FxType.HEART_DEMON_APPEAR, TrialFxIds.WARNING, player.getId(), WARNING_TICKS);
+		dev.kultivator.epic.EpicHooks.heartDemon(player, null, dev.kultivator.epic.EpicIds.HD_WARNING, Kind.PRESSURE.ordinal());
 		heartbeat(player, 1.0F);
 	}
 
@@ -379,6 +380,7 @@ public final class HeartDemons {
 		ServerLevel level = player.level();
 		Vec3 pos = demon.position();
 		Fx.send(level, pos, pos.add(0.0D, 6.0D, 0.0D), FxType.HEART_DEMON_APPEAR, TrialFxIds.APPEAR, demon.getId(), 0.0F);
+		dev.kultivator.epic.EpicHooks.heartDemon(player, demon, dev.kultivator.epic.EpicIds.HD_APPEAR, kind.ordinal());
 		level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.HOSTILE, 0.6F, 0.5F);
 		level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.WARDEN_EMERGE, SoundSource.HOSTILE, 0.8F, 1.4F);
 		level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.SOUL_ESCAPE, SoundSource.HOSTILE, 1.0F, 0.5F);
@@ -501,6 +503,7 @@ public final class HeartDemons {
 			demon = again;
 			Fx.send(player.level(), again.position(), again.position().add(0.0D, 6.0D, 0.0D), FxType.HEART_DEMON_APPEAR, TrialFxIds.APPEAR,
 					again.getId(), 0.0F);
+			dev.kultivator.epic.EpicHooks.heartDemon(player, again, dev.kultivator.epic.EpicIds.HD_APPEAR, trial.kind.ordinal());
 		}
 		if (trial.ticks >= trial.duration) {
 			finish(player, data, trial, Outcome.TIMEOUT);
@@ -595,6 +598,7 @@ public final class HeartDemons {
 	/** "Hati Dao Teguh": the shadow shatters into the owner. */
 	private static void won(ServerPlayer player, CultivationData data, Trial trial, ServerLevel fxLevel, Vec3 at, Vec3 heart) {
 		Fx.send(fxLevel, at, heart, FxType.HEART_DEMON_DEFEAT, TrialFxIds.DEFEAT_SHATTERED, player.getId(), 0.0F);
+		dev.kultivator.epic.EpicHooks.heartDemon(player, trial.demon, dev.kultivator.epic.EpicIds.HD_WON, trial.kind.ordinal());
 		fxLevel.playSound(null, at.x, at.y, at.z, SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 1.0F, 0.5F);
 		fxLevel.playSound(null, heart.x, heart.y, heart.z, SoundEvents.TOTEM_USE, SoundSource.PLAYERS, 0.7F, 1.2F);
 		fxLevel.playSound(null, heart.x, heart.y, heart.z, SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 1.0F, 0.9F);
@@ -640,6 +644,7 @@ public final class HeartDemons {
 			player.resetFallDistance();
 		}
 		Fx.send(fxLevel, at, heart, FxType.HEART_DEMON_DEFEAT, TrialFxIds.DEFEAT_RETURNED, player.getId(), 0.0F);
+		dev.kultivator.epic.EpicHooks.heartDemon(player, trial.demon, dev.kultivator.epic.EpicIds.HD_LOST, trial.kind.ordinal());
 		fxLevel.playSound(null, at.x, at.y, at.z, SoundEvents.WITHER_AMBIENT, SoundSource.HOSTILE, 0.6F, 0.5F);
 		player.level().playSound(null, heart.x, heart.y, heart.z, SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 1.0F, 0.5F);
 		String key = switch (outcome) {

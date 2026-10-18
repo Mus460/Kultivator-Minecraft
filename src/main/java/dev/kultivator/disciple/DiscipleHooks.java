@@ -159,6 +159,7 @@ public final class DiscipleHooks {
 	private static final List<Function<DiscipleData, Double>> POTENTIAL = new ArrayList<>();
 	private static final List<Function<DiscipleData, Double>> RANK_FACTOR = new ArrayList<>();
 	private static final List<XpFactor> XP_FACTOR = new ArrayList<>();
+	private static final List<ToDoubleFunction<DiscipleEntity>> KEEPER_WATCH = new ArrayList<>();
 	private static final List<ToDoubleFunction<DiscipleData>> MASTER_SHARE = new ArrayList<>();
 	private static final List<Predicate<DiscipleData>> MASTER_ANY_RANGE = new ArrayList<>();
 	private static final List<BiConsumer<DiscipleEntity, StatSink>> STATS = new ArrayList<>();
@@ -205,6 +206,26 @@ public final class DiscipleHooks {
 	/** Multiplies the disciple XP multiplier (product of all). The entity is null for data whose body is not loaded. */
 	public static void addXpFactor(XpFactor provider) {
 		XP_FACTOR.add(provider);
+	}
+
+	/**
+	 * Phase 7c (DESIGN 24.2.8, order Waspada): the radius around its post in which a formation keeper (activity 11) seeks
+	 * out intruders itself; the largest provider value wins, 0 (the default) means it only fights back when hit.
+	 */
+	public static void addKeeperWatchRadius(ToDoubleFunction<DiscipleEntity> provider) {
+		KEEPER_WATCH.add(provider);
+	}
+
+	/** The keeper watch radius of {@code disciple} (0 without a provider). */
+	public static double keeperWatchRadius(DiscipleEntity disciple) {
+		double best = 0.0D;
+		for (ToDoubleFunction<DiscipleEntity> provider : KEEPER_WATCH) {
+			double value = provider.applyAsDouble(disciple);
+			if (Double.isFinite(value) && value > best) {
+				best = value;
+			}
+		}
+		return Math.min(48.0D, best);
 	}
 
 	/** Multiplies the 10% share of the master's meditation (product of all). */

@@ -330,6 +330,7 @@ public final class HuFa {
 			master.setHealth(1.0F);
 		}
 		Fx.send(level, master.position().add(0.0D, 1.2D, 0.0D), entity.position().add(0.0D, 1.2D, 0.0D), FxType.STAR, PathFxIds.TAHAN_ARC, 0, 1.0F);
+		dev.kultivator.epic.EpicHooks.takeLightning(entity, master);
 		DisciplePaths.sound(level, master.position(), SoundEvents.LIGHTNING_BOLT_IMPACT, 1.0F, 1.2F);
 		DisciplePaths.sound(level, master.position(), SoundEvents.TRIDENT_THUNDER.value(), 0.8F, 1.0F);
 		Msg.actionBar(master, Component.translatable(DisciplePaths.PREFIX + "hufa.tahan_taken", DisciplePaths.name(entity))

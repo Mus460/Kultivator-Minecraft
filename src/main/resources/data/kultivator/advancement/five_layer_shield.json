@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:formation_powered",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.five_layer_shield.description"
+    },
+    "icon": {
+      "id": "minecraft:diamond_block"
+    },
+    "title": {
+      "translate": "advancement.kultivator.five_layer_shield.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

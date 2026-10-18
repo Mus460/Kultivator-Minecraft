@@ -110,7 +110,11 @@ public enum FxType {
 	/** Spirit stones, beast cores, herbs, treasure finds (client/fx/HartaFx); a = {@code harta.HartaFxIds}. */
 	TREASURE,
 	/** Talismans inscribed, burning into glyphs, the Unbroken Soul shatter (client/fx/TalismanFx); a = {@code talisman.TalismanFxIds}. */
-	TALISMAN;
+	TALISMAN,
+
+	// ---- phase 7c (DESIGN 24.13 item 3)
+	/** Sect formations: slot marks, pattern show, awaken, pulses, hits, alarms, trips (client/formasi/FormasiFx); a = {@code formasi.FormasiFxIds}. */
+	FORMASI;
 
 	public static FxType byOrdinal(int ordinal) {
 		FxType[] values = values();
