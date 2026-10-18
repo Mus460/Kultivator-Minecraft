@@ -668,124 +668,242 @@ Spine (done): `Actions.DISCIPLE_*` (arg = disciple entity id), `Payloads.Discipl
   The screen reuses the jade-scroll widgets in `client/screen/ui/*` (read-only use) and follows DESIGN 5b.
 
 
-## 19. Phase 7 (postponed by the user; was planned as phase 6): "Dunia yang Hidup" (treasures, demonic beasts, guidance)
+## 19. Phase 7 — Dunia yang Hidup (revised 2026-10-18)
 
-> **User rule (2026-10-17): every idea must come from real cultivation comics/stories.** Before this phase is built,
-> each feature below gets a verified "Sumber / Source" (work + concept) and anything without a real source is dropped.
+> **User rule (2026-10-17, still binding): every feature comes from a real cultivation novel, donghua or manhua.**
+> Each item below has a **Sumber / Source** line that cites only concepts the lore verifiers confirmed (work + concept,
+> chapter where it was read). "Terinspirasi dari …" means only the general concept is claimed, never the name or the
+> exact mechanic. Numbers, formulas, ids, recipes, UI and safety rules are game design and are never presented as canon.
+> "game design (UX)" and "game design (balance)" mark rules that make no lore claim at all. Anything without a verified
+> source was dropped or replaced by a sourced equivalent (19.12).
 
-The user asked us to enrich the features and to add or perfect whatever is still missing. Today the mod has a deep cultivation spine. Its gaps:
+This revision replaces the plan written after phase 4. Since then phases 5 (disciples), 6 (Sect Hall, sect events,
+disciple powers and stars, Mode Kehancuran), 6b (sect construction) and 6c (169 data-driven techniques, Kitab Teknik,
+seal wheel and quick seals) were built and committed; sections 20, 21 and 22 describe them and **the code is the
+truth** (HEAD `7297238`). Phase 7 adds what the world still lacks: something worth hunting at every realm, an item
+economy (spirit stones, beast cores, aged spirit herbs, talismans), living spirit veins and closed-door cultivation,
+a tribulation the player can read and prepare for, guidance for new players, and a reason to climb Immortal Ascension
+and the stars beyond True Immortal.
 
-- The world gives the player little reason to go anywhere. Every spirit vein is the same, structures hold nothing for cultivators, and alchemy runs on sugar and berries.
-- Combat stops mattering from Golden Core up, because vanilla mobs die in one hit and flat kill XP is either meaningless or farmable.
-- New players get no guidance after the root test.
-- Picking a technique and preparing for a tribulation are blind.
-- The longest realm, Immortal Ascension, unlocks nothing.
+### 19.0 What changed against the first plan
 
-Phase 6 fixes these with an item economy, elite monsters, a guided path and UX polish. It changes no blocks and uses no world generation.
+**Already built by phases 5–6c (dropped here):** the seal wheel, quick seals 1–4, the carousel, their keys and
+`MouseHandlerMixin` (6c `client/codex/*`); `sessionExtra` (exists in `CultivationData`); effect quality "Otomatis",
+"Efek pemain lain" and the scrolling settings page; the Dharma Form / Dao Domain arcs (drawn from
+`sessionExtra.teknik`); the ancient technique scrolls (6c `TechniqueLoot`, `HallItems`, `JadeSlips`,
+`InheritanceTrials`); the Dao technique damage table (22.10); qi cost scaling (6c `TechniquePower.qi` already lowers it
+with the realm gap); the star damage factor (`TechniquePower.starFactor`); the Jiwa Tak Hancur death hook
+(`DeathGuard.Stage.PERK` is reserved for it).
 
-Phase 6 starts after phase 4 is committed. Its file ownership does not overlap phase 5 (disciples), which may still be in progress. Phase 6 never touches `disciple/*`, `client/disciple/*` or `lang-src/disciple*`.
+**Reduced:** player stars (only condensing, health, qi and UI remain; endless, no cap); the HUD list (19.3.15);
+structure loot (stones, herbs and cores, plus small jade-slip pools only where 6c added none).
 
-### 19.0 Principles for this phase
+**Decisions the synthesizer took where the user had not decided yet** (each is a one-line change if the user disagrees):
 
-* **Block safety (DESIGN 0) holds without exception.**
-  - Drops (stones, herbs) appear only *after* a player broke the block themselves, as item entities through `Block.popResource`.
-  - Structure treasure is added only to built-in chest loot tables through `LootTableEvents.MODIFY` (`source.isBuiltin()`).
-  - Elites are vanilla mobs that vanilla already spawned naturally. The mod upgrades them; it never spawns new world mobs, apart from the existing Dao Protector waves.
-  - Elite skills, talismans and techniques touch entities only: effects, knockback, particle "bolts" and entity fire. Never a `LightningBolt` and never a projectile.
-  - Formation blueprints and Divine Sense pings only read blocks.
-* **Performance (a laptop that also runs Valorant).**
-  - Everything is event-driven or runs every 10–100 ticks, with bounded scans.
-  - Vein grades come from an O(1) seeded hash. Nothing ticks per region.
-  - Continuous visuals are drawn on the client within 32 blocks and scaled by Effect Quality. The new **Otomatis** quality drops effects when FPS falls.
-* **Singleplayer first, LAN bonus.** Every feature works alone. Co-op parts (Pengawal Dao, tradeable talismans and stones) add value on LAN.
-* **Constants and translation.** Every number below is a `public static final` constant in its class, so screens and forecasts read the real value. Every player-facing text is in `id_id` + `en_us`. All GUI follows DESIGN 5b (jade scroll).
+| Open point | Decision in this plan | Why |
+|---|---|---|
+| Tugas Harian | **kept**, renamed **Kewajiban Harian / Daily Chores** (help `harian`) | verified source (RI ch. 10); the player's own chores do not duplicate the disciples' Tugas Sekte or the Kantor Misi |
+| Padatkan Qi | **dropped**, replaced by **Batu Roh di Hambatan** (stones consumed at a successful breakthrough) | no work turns a cultivator's own qi into stones; RMJ ch. 1152 says top-grade stones help break bottlenecks |
+| Lightning-ring dodge | **kept as a graze** (40% of the strike, never zero), config `tribulationTelegraph` | ISSTH ch. 969 shows cultivators avoiding tribulation lightning; every strike still lands, so DESIGN 0 rule 3 holds |
+| Immortal Ascension perks | **kept**, each layer with its own Sumber line, framed as Immortal meridians opening | ISSTH ch. 963–983; L2 cites JTTW ch. 2 instead of the wuxia Lingbo Microsteps |
+| Karma Darah | **kept as a balance rule** under the neutral name **Kejenuhan Bertarung / Battle Fatigue** | no source ties killing to lower gains, so it makes no lore claim |
 
-### 19.1 Spine additions (orchestrator, before the four modules start)
+### 19.1 Principles
 
-1. **`network/Actions.java`.** Append these ids:
-   - `CONDENSE_QI = 21` (arg = count 1–9) → `harta.SpiritStones.handleAction`
-   - `REFORGE = 22` → `cultivation.Reforge.handleAction`
-   - `STAR_CONDENSE = 23` → `cultivation.ImmortalPerks.handleAction`
-   - `GUIDE_HIDE = 24` (arg 1 hide, 0 show) → `goals.Goals.handleAction`
+#### 19.1.1 Block safety
 
-   Route all four in `Net.handle`.
-2. **`data/CultivationData`.** Add a session-only `CompoundTag sessionExtra` with accessor `sessionExtra()`:
-   - not saved
-   - cleared in `resetSession()`
-   - written in `saveForClient()` under `"session_extra"` and read in `loadFromServer()`
+DESIGN 0 holds, with its three user-approved exceptions (Mode Kehancuran for disciples and for the player's own
+techniques, sect construction inside the confirmed footprint). Phase 7 adds no exception.
+- Stones and herbs drop only **after** a player broke the block themselves, as item entities through
+  `Block.popResource` from a `PlayerBlockBreakEvents.AFTER` listener. Carving by `kehancuran/WorldBreaker` and sect
+  construction never fire that event, so craters and building sites give no stones, herbs, mining XP or vein drain.
+  This is intended.
+- Structure treasure is added only to built-in chest loot tables (`LootTableEvents.MODIFY`, `source.isBuiltin()`).
+- Elites are vanilla mobs that vanilla spawned naturally; the mod upgrades them. The only mobs the mod spawns are the
+  existing Dao Protector waves (now with one elite) and the `uji elit` test mobs.
+- Elite skills, talismans and tribulation rings act on entities only: effects, knockback, particle bolts, entity fire.
+  Never a `LightningBolt`, never a vanilla projectile, never a portal.
+- Formation blueprints, the vein compass and Divine Sense pings only read blocks. Blueprints draw with vanilla
+  `net.minecraft.gizmos.Gizmos` from the client tick, like `client/sectbuild/SiteHologram`.
 
-   Modules write HUD values here (keys in 19.3.5) and then call `Cultivators.dirty`. In `Kultivator.onJoin`, write `sessionExtra.cfg = {hd: heartDemonTrials, dp: daoProtectorEvent, guide: guideRewards, daily: dailyTasks, tele: tribulationTelegraph}`.
-3. **`util/Advancements`.** Add `addListener(BiConsumer<ServerPlayer, String>)`. Listeners are called only when `award` really completed the advancement.
-4. **`cultivation/Breakthrough`.** Add `interface QualityBonus { double bonus(ServerPlayer p, CultivationData d, Rank target); }` and `addQualityBonusProvider(QualityBonus)`.
-   - The sum of all providers, clamped to −0.10…+0.35, is added to the quality score of tribulation and non-tribulation rolls.
-   - The awakening is excluded.
-5. **`cultivation/Tribulation`.** Add the following hooks:
-   - `interface StrikeFactor { double factor(ServerPlayer p, Rank target, int strikeIndex, boolean last); }` with `addStrikeFactorProvider`. Providers are multiplied into the raw strike damage.
-     - Providers × pills × config are floored at 0.5×.
-     - The would-kill check uses the final damage.
-   - `interface Listener { default void onOmen(ServerPlayer p, Rank t){} default void onStrike(ServerPlayer p, Rank t, int index, int total){} default void onEnd(ServerPlayer p, Rank t, boolean success, boolean test){} }` with `addListener`.
-6. **`KultivatorConfig`.** New fields:
-   - `eliteMonsters = true`
-   - `eliteChanceScale = 1.0`
-   - `structureLoot = true`
-   - `spiritStoneMining = true`
-   - `herbHarvest = true`
-   - `guideRewards = true`
-   - `dailyTasks = true`
-   - `tribulationTelegraph = true`
-7. **`fx/FxType`.** Append these types and their routes in `FxDispatcher`:
+#### 19.1.2 Performance (the laptop also runs Valorant)
 
-   | FxType | Routed to |
-   |---|---|
-   | `ELITE` | `client/fx/EliteFx` |
-   | `TRIBULATION_RING`, `DAO_GUARDIAN` | `TribulationFx` |
-   | `TALISMAN` | `client/fx/TalismanFx` |
-   | `TREASURE` | `client/fx/HartaFx` |
+| Budget | Limit |
+|---|---|
+| Server, added average | ≤ 0.2 ms per tick with 1 player; everything event-driven or on 10/20/100-tick timers |
+| Elite roll | one random roll per natural spawn near a Qi Refining+ player; bounded AABB counts only after the roll succeeds |
+| Elite skills | one pass every 10 ticks over a tracked UUID set (rebuilt on `ENTITY_LOAD`, cleaned on death or unload) |
+| Vein grade | an O(1) seeded hash; nothing ticks per region; the compass does at most 4,100 hash evaluations per use |
+| Herbs | one hash per broken plant; the site value is read only when the hash is below 4p |
+| Divine Sense | herb pings join the existing 4-slice scan; chest pings read block-entity maps of loaded chunks within 24 blocks, once per cast |
+| Client particles | through `FxBudget.take` and Effect Quality; elite auras 4/8/16 motes per second per elite × quality, at most 12 elites per frame, within 32 blocks |
+| Blueprints | at most 17 `getBlockState` reads every 10 ticks, only while triggered |
+| Sync | `sessionExtra` keys are marked dirty only when they change (tribulation: about one sync every 1.5–3.5 s) |
 
-   `FxDispatcher.tick` also calls `EliteFx.tick`, `TalismanFx.tick` and `client.goals.FormationBlueprint.tick`.
-8. **Entry points.**
-   - `Kultivator.onInitialize` (before `ModItems.init()`) calls `harta.Harta.init()`, `elite.EliteMonsters.init()`, `talisman.Talismans.init()`, `cultivation.ImmortalPerks.init()`, `cultivation.Reforge.init()` and `goals.Goals.init()`.
-   - The per-player tick calls `ImmortalPerks.tick`, `Reforge.tick`, `Talismans.tick` and `Goals.tick`.
-   - `CultivateCommand` calls `addCommands` of `Harta`, `EliteMonsters`, `Talismans`, `ImmortalPerks`, `Reforge` and `Goals`.
-   - `KultivatorClient` calls `client.harta.HartaClient.init()`, `client.elite.EliteClient.init()`, `client.talisman.TalismanClient.init()` and `client.goals.GoalsClient.init()`. `GoalsClient` registers its own HUD elements.
-9. **Mixin stubs.**
-   - Empty `mixin/MobFinalizeSpawnMixin` (target `Mob`), listed in `kultivator.mixins.json`.
-   - Empty `client/mixin/MouseHandlerMixin` (target `MouseHandler`), listed in `kultivator.client.mixins.json`.
-10. **`CultivationScreen` tabs.** Add `TAB_PATH = 5` (stub page `PathPage`, owned by P6-jalan) and `TAB_ALCHEMY = 6` (stub page `AlchemyBookPage`, owned by P6-harta). Existing tab constants keep their numbers. P6-jalan may change the display order of the tablets.
-11. **Stub classes with the exact public signatures of 19.3.4.** Bodies are trivial; the owning module replaces them. Every module then compiles against the others regardless of order.
+#### 19.1.3 Singleplayer first, LAN bonus
 
-### 19.2 The items (biggest value first)
+Every feature works alone. Hu Fa Tribulasi, tradeable stones, herbs, cores and talismans add value on LAN.
 
-#### 19.2.1 Binatang Iblis: elite demonic beasts (new feature, P6-pertempuran)
+#### 19.1.4 Constants, text and UI
 
-**Why.** From Golden Core on, vanilla monsters are neither a challenge nor progress. Elites give every realm something to hunt, and they feed the new loot.
+Every number is a `public static final` in its class so screens and forecasts read the real value. All player-facing
+text is in `id_id` and `en_us` (`lang-src/<file>.<locale>.json`, merged by `mergeLang`). Every new item, elite tier,
+affix, talisman, perk and herb has a `<translation key>.source` line ("Sumber: …" / "Source: …", work titles in
+English in both) shown in its tooltip or detail card; "Terinspirasi" is written in italics. All GUI follows DESIGN 5b
+(jade scroll) and fits 320×240.
 
-**Hook.** `MobFinalizeSpawnMixin`, at the TAIL of `Mob.finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason, SpawnGroupData)`:
+#### 19.1.5 Interactions with phases 5–6c (binding)
 
-- `EntitySpawnReason.SPAWNER` → tag `kultivator.spawner`.
-- `NATURAL` → elite roll.
-- Every other reason, including `TRIAL_SPAWNER`, `STRUCTURE`, `PATROL`, `EVENT` and `COMMAND`, is untouched.
+- **Techniques (6c).** All technique damage goes through `TechniquePower.finalDamage` (player `Techniques.hurt`,
+  `DiscipleTechniques.hurt`, `PowerCore.hurt`). Elites carry `kultivator.elite` and use the **trial-mob rule**
+  (legacy power × 1.5), so their health table below is balanced at every realm. They never get `TAG_BOSS`. Talismans
+  deal `DamageContext.legacy` amounts. The element factor and the elite affix Perisai Unsur are `TechniquePower`
+  target factors (all three choke points; never in arenas, never on players, never on LEGACY amounts). Jiwa Tak Hancur
+  is a `DeathGuard` PERK guard.
+- **Disciples (5, 6).** Disciples may kill elites (`DiscipleHooks.addOnKill`); drops land at the elite. Disciples near
+  a tribulation count for protector targeting only, never for strike reduction (the `HuFa` rule). New pills fed to a
+  disciple are refused and kept (Phase 7b adds disciple effects). `DiscipleCultivation.masterMeditationGain` calls the
+  new `Meditation.gainPerSecond` instead of its own copy of the formula.
+- **Sect (6, 6b).** `SectSpawnMixin` already blocks natural monsters on sect cells, so no elite rolls there. Layer 4
+  of `GrandFormation` damages monsters, elites included. A qi seat built by `sect/build/blueprint/QiSeat` is a normal
+  qi formation (blueprints, abode). The Kantor Misi grades stones, herbs and cores (`Contribution.unitValue`). Expedition
+  missions "Mencari Herba Roh" and "Perburuan Binatang Iblis" return herbs and cores. `/sect` mates get the Hu Fa
+  Tribulasi invitation.
+- **Stars.** Player stars are written to `extra.kultivasi.stars`, which 6c already reads: `TechniquePower.starFactor`
+  (S(n) = (1 + 0.04n) × 1.15^⌊n/9⌋), `casterTier`, `bossBase` (+0.01 per star), `kScale`/`blockCap` (Kehancuran K
+  +0.02 per star up to 2.0), `LearnRules`/`Unlocks` (Gerbang Dewa ★9 and ★18), `FlyingSword` speed,
+  `disciple/path/Surpass` and `DisciplePaths.masterStars`.
+- **Mode Kehancuran.** The Cave Abode is a `ProtectedZones` zone. Kehancuran carving gives no stones or herbs (19.1.1).
+  The tribulation HUD avoids `kehancuran/RedSkyHud` (19.3.10).
 
-**Eligible types (allowlist).** Zombie, husk, skeleton, stray, bogged, spider, wither skeleton, hoglin. Never creeper, enderman, drowned (tridents), slime, magma cube, phantom, witch, blaze, ghast, piglins, raiders or silverfish.
+### 19.2 Spine (orchestrator, after 6c is committed, before the four modules start)
 
-**Roll.** The nearest non-spectator player within 48 blocks must be Qi Refining or higher. Mortals never meet elites.
+1. **`network/Actions`.** One id per module with `text = "op[:param]"` (the 6/6b/6c pattern):
+   - `KULTIVASI = 21` → `cultivation.ImmortalPerks.handleAction(player, text)`; ops `star`, `star:all`, `reforge`,
+     `abode:set`, `abode:clear`.
+   - `JALAN = 22` → `goals.Goals.handleAction(player, text)`; ops `hide`, `show`, `claim:<chapter>`, `seen:codex`.
+   - 23 and 24 stay reserved, 25–29 stay free. Both routes go in `Net.handle`.
+2. **`network/Payloads.OpenScreen`.** Common constants `TAB_JALAN = 5` and `TAB_ALKIMIA = 6` (the server may not
+   reference the client `CultivationScreen`). `/kultivasi jalan` and `/kultivasi resep` send `OpenScreen(INFO, tab)`;
+   no new screen id.
+3. **`Kultivator`.**
+   - In `onInitialize`, before `ModItems.init()`: `harta.Harta.init()`, `elite.EliteMonsters.init()`,
+     `talisman.Talismans.init()`, `cultivation.ImmortalPerks.init()` (which also inits `Reforge` and `CaveAbode`),
+     `goals.Goals.init()`. None of them reads `TechniqueRegistry` eagerly.
+   - The per-player tick calls `ImmortalPerks.tick`, `Talismans.tick` and `Goals.tick` (each throttles itself).
+   - After `data.resetSession()` in **both** `onJoin` and `onRespawn`: `sessionExtra.cfg = {hd: heartDemonTrials,
+     dp: daoProtectorEvent, guide: guideRewards, daily: dailyTasks, tele: tribulationTelegraph}`.
+4. **`util/Advancements.addListener(BiConsumer<ServerPlayer, String>)`**, fired from `grant()` only when `award`
+   really completed the advancement.
+5. **`util/KillCredit`** (new). `resolve(LivingEntity victim, DamageSource source)` → `@Nullable Credit(ServerPlayer
+   owner, Entity killer, Kind kind)`, kinds `PLAYER` (direct, technique source, projectile owner), `BEAST` (the owner of
+   a spirit beast or tamed wolf), `DISCIPLE` (the master of a `DiscipleEntity`). `directPlayer(victim, source)` keeps
+   the old private `TechniqueLoot.killer` rule, and `TechniqueLoot` calls it (behaviour unchanged).
+6. **`cultivation/Breakthrough`.**
+   - `interface QualityBonus { double bonus(ServerPlayer p, CultivationData d, Rank target); default void commit(ServerPlayer p, CultivationData d, Rank target) {} }`
+     and `addQualityBonusProvider(QualityBonus)`.
+   - `qualityBonus(p, d, target)` (public, pure) = the sum of all providers, clamped to −0.10…+0.40 (the
+     `DiscipleHooks` range). It is added to the quality score of tribulation and non-tribulation rolls in `succeed`;
+     the awakening is excluded. Right after the roll every provider's `commit` runs once (spending stones, for example).
+7. **`cultivation/Tribulation`.**
+   - `interface StrikeFactor { double factor(ServerPlayer p, Rank target, int strikeIndex, boolean last); }` and
+     `addStrikeFactorProvider`.
+   - `interface Listener { default void onOmen(ServerPlayer p, Rank t) {} default void onStrike(ServerPlayer p, Rank t, int index, int total) {} default void onEnd(ServerPlayer p, Rank t, boolean success, boolean test) {} }`
+     and `addListener`.
+   - `strikeFactor(p, target, index, last)` (public, pure) = max(0.5, providers × `data.nextTribulationFactor()` ×
+     formation 0.85). The raw strike becomes `maxHealth × pct × (last ? 2 : 1) × strikeFactor × tribulationDamageScale`;
+     the would-kill check uses this final amount. The formation factor, `FeatTracker.onTribStrike`,
+     `countSurvivedStrike` and the protector waves stay exactly where they are.
+8. **`technique/spec/TechniquePower`.**
+   - `TAG_ELITE = "kultivator.elite"`; `isTrialMob` also accepts it.
+   - `interface TargetFactor { double factor(LivingEntity attacker, LivingEntity target, @Nullable TechniqueSpec spec); }`
+     and `addTargetFactor(TargetFactor)`. In `finalDamage` the product of all factors, clamped to 0.5–2.0, multiplies
+     `raw` of the default (coefficient) branch only, and only when `!arena` and the target is not a `Player`. LEGACY,
+     PERCENT and EXEC amounts are untouched; boss caps still apply afterwards.
+9. **`technique/CloudStep`.** The class and `maxJumps(Realm)` become public (the HUD pips read it).
+10. **`KultivatorConfig`** (clamped on load):
+
+    | Field | Default (range) |
+    |---|---|
+    | `eliteMonsters` | true |
+    | `eliteChanceScale` | 1.0 (0–5) |
+    | `structureLoot` | true |
+    | `spiritStoneMining` | true |
+    | `herbHarvest` | true |
+    | `guideRewards` | true |
+    | `dailyTasks` | true |
+    | `tribulationTelegraph` | true |
+
+11. **`fx/FxType`.** Append `ELITE`, `TREASURE`, `TALISMAN` after `SECT_BUILD`. `FxDispatcher` routes them to
+    `client/fx/EliteFx.play`, `client/fx/HartaFx.play` and `client/fx/TalismanFx.play`, and its tick calls
+    `EliteFx.tick` and `TalismanFx.tick`. Sub-ids live in `elite/CombatFxIds` (telegraphs, element sparks, lightning
+    rings, twin rings, Hu Fa threads), `harta/HartaFxIds` and `talisman/TalismanFxIds`.
+12. **`mixin/MobFinalizeSpawnMixin`** (target `Mob`), listed in `kultivator.mixins.json`: an inject at the TAIL of
+    `finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason, SpawnGroupData)` (verify the 26.3
+    signature in the mapped jar) whose body only calls `elite.EliteMonsters.onFinalizeSpawn(mob, level, reason)`.
+13. **`client/screen/CultivationScreen`.** `TAB_JALAN = 5` (stub `JalanPage`, P7-jalan) and `TAB_ALKIMIA = 6` (stub
+    `AlchemyBookPage`, P7-harta); the constructor clamps with `pages.length - 1` instead of `TAB_HELP`. Seven tablets
+    fit at 240 px (each ≥ 24 px).
+14. **Entry points.**
+    - `CultivateCommand` → `addCommands(root, debug)` of `harta.Harta`, `elite.EliteMonsters`,
+      `cultivation.ImmortalPerks`, `goals.Goals`.
+    - `TestCommands` → `addTestCommands(uji)` of the same four classes; `kit()` also adds the stacks of the stubs
+      `Harta.kitItems()` and `talisman.Talismans.kitItems()` in an extra shulker box "Fase 7".
+    - `KultivatorClient` → `client.harta.HartaClient.init()`, `client.elite.EliteClient.init()`,
+      `client.talisman.TalismanClient.init()`, `client.goals.GoalsClient.init()` (it registers its own HUD elements).
+15. **Stubs with the final signatures of 19.8**, so every module compiles alone. `lang-src/spine7.*` holds only the
+    config comments and the two tab names.
+
+### 19.3 The items (biggest value first)
+
+#### 19.3.1 Binatang Iblis: elite demonic beasts (P7-tempur)
+
+**Why.** From Golden Core on, vanilla monsters are neither a challenge nor progress. Elites give every realm something
+to hunt and feed the new item economy.
+
+**Sumber / Source.**
+- Demonic beasts roam the wilds and cultivators hunt them for materials: *Battle Through the Heavens* ch. 11
+  (mercenaries hunt magic beasts for their cores; the hunts are deadly) and ch. 144 (mercenary companies in the Magic
+  Beast Mountain Range); *A Record of a Mortal's Journey to Immortality* (RMJ) ch. 396–397 (Han Li hunts demon beasts in
+  the Outer Star Seas for demon cores and turns back because grade-six beasts are too dangerous).
+- Numbered beast grades: BTTH ch. 14 (a first-level magic beast), ch. 131 (a rank-six magic beast); RMJ ch. 396 (a
+  grade-five beast is intelligent), ch. 548 (grade eight and nine), ch. 1125 (a tenth-grade Ice Phoenix).
+- The three tiers are *Terinspirasi dari* those grades; "Raja" from RMJ ch. 1152 (the Golden Wyrm King leads the raid
+  on Green Spirit Island) and ch. 1502 (demon monarchs). The three names are game names, not canon.
+- Beast elements: RMJ ch. 1497 (the Infernal Lightning Beast devours Han Li's golden lightning), ch. 1561 (a sea
+  beast's defence draws on the essential power of water), ch. 1125 (Ice Phoenix).
+- Telegraphed actives: RMJ ch. 1502 (two Infernal Lightning Beasts rise on their hind legs before a strong technique).
+  The skill names are descriptive game names.
+- Full moon: *Terinspirasi dari* RMJ ch. 1194 (moon essence descends onto the Endless Sky Beast). Spirit-vein draw:
+  *Terinspirasi dari* RMJ ch. 1152 (demon beasts raid an island for a top-grade spirit stone).
+- Rewards: *Terinspirasi dari* *Perfect World* (PW) ch. 18 (the slain Suan Ni leaves true blood and precious bones),
+  RMJ ch. 397 (demon cores fuel cultivation), PW ch. 2 and 557 (beast bones carry symbols that teach).
+- Game design (no lore claim): elites appear only near a Qi Refining+ player and their tier follows that player's
+  realm (canon scales danger by region instead), every number below.
+
+**Hook.** `EliteMonsters.onFinalizeSpawn(mob, level, reason)` from the spine mixin:
+- `EntitySpawnReason.SPAWNER` → tag `kultivator.spawner` (19.3.14).
+- `NATURAL` → the elite roll.
+- Every other reason (`TRIAL_SPAWNER`, `STRUCTURE`, `PATROL`, `EVENT` (Dao Protectors), `COMMAND`, …) is untouched.
+
+**Eligible types (allowlist).** Zombie, husk, skeleton, stray, bogged, spider, wither skeleton, hoglin. Never creeper,
+enderman, drowned (tridents), slime, magma cube, phantom, witch, blaze, ghast, piglins, raiders or silverfish.
+
+**Roll.** The nearest non-spectator player within 48 blocks must be Qi Refining or higher; Mortals never meet elites.
 
 | Factor | Value |
 |---|---|
 | Base chance | `0.01 + 0.005 × realm` of that player |
 | Full-moon night in the Overworld | ×2 |
-| Spawn in a Great Spirit Vein region (19.2.5) | ×1.5 |
-| Config | × `eliteChanceScale` |
+| Spawn in a Great Spirit Vein region (19.3.5) | ×1.5 |
+| Config | × `eliteChanceScale` (and nothing when `eliteMonsters` is false) |
 | Cap | 7% |
 
-**Limits.** These checks run after the random roll succeeds, so they are cheap:
+**Limits** (checked only after the roll succeeds): at most 3 elites within 64 blocks of that player; no other elite
+within 24; 60 s cooldown per player after an elite appeared near them; none when 10 or more `Enemy` mobs are within 16
+of the spawn point (dark-room farms).
 
-- At most 3 elites within 64 blocks of that player.
-- No other elite within 24 blocks.
-- 60 s cooldown per player after an elite appeared near them.
-- No elite if 10 or more `Enemy` mobs are within 16 blocks of the spawn point (stops dark-room farms).
-
-**Tiers.**
+**Tiers.** A tier whose requirement fails falls back to the next lower tier.
 
 | Tier | Indonesian / English | Share | Needs nearest player |
 |---|---|---|---|
@@ -793,9 +911,7 @@ Phase 6 starts after phase 4 is committed. Its file ownership does not overlap p
 | 2 | Binatang Iblis / Demonic Beast | 28% | Foundation+ |
 | 3 | Raja Siluman / Demon Beast King | 7% | Golden Core+, at most one within 128 blocks |
 
-A tier whose requirement fails falls back to the next lower tier.
-
-**Stats.** R = the nearest player's realm ordinal at spawn. All are permanent modifiers with ids `kultivator:elite_*`:
+**Stats.** R = the nearest player's realm ordinal at spawn. Permanent modifiers with ids `kultivator:elite_*`:
 
 | Attribute | Formula / value |
 |---|---|
@@ -806,11 +922,11 @@ A tier whose requirement fails falls back to the next lower tier.
 | SCALE | 1.10 / 1.20 / 1.35 |
 | MOVEMENT_SPEED | +5% / 10% / 15% |
 
-Example: a Golden Core tier-3 zombie has 164 HP. A True Immortal tier-3 zombie has 304 HP.
+Example: a Golden Core tier-3 zombie has 164 HP, a True Immortal tier-3 zombie 304 HP. Because elites are trial mobs
+(legacy power × 1.5), a Golden Core player needs about 7 basic-art hits for the first and a True Immortal about 4 basic
+hits or 1–2 Langit casts for the second. Without the tag they would die in one hit from Deity Transformation up.
 
-**Element.**
-- 75%: the mob's natural element (`elite.MobElements`, see 19.2.13).
-- 25%: a random one of the nine.
+**Element.** 75%: the mob's natural element (`MobElements`, 19.3.12); 25%: a random one of the nine.
 
 **Skills (entity-only).**
 
@@ -818,65 +934,87 @@ Example: a Golden Core tier-3 zombie has 164 HP. A True Immortal tier-3 zombie h
 
 | Element | Effect on hit |
 |---|---|
-| Fire | Entity ignite 3 s |
+| Fire | entity ignite 3 s |
 | Ice / Water | Slowness II 3 s |
 | Wood | Poison I 4 s |
 | Metal | Weakness I 4 s |
-| Earth | Extra knockback 0.6 |
+| Earth | extra knockback 0.6 |
 | Lightning | 20% chance of a 2-damage particle bolt |
-| Wind | Permanent +30% speed |
+| Wind | permanent +30% speed |
 | Space | 15% chance to land behind the target (`Targeting.safeSpot`) |
 
 *Tier 2: adds one telegraphed active every 8–10 s against its current target*
 
 | Elements | Skill | Effect |
 |---|---|---|
-| Fire / Lightning | **Tanda Langit** | Ring of radius 1.5 under the target. After 1.5 s, `6 + 3 × tier + 0.5R` damage if the target is still inside. |
+| Fire / Lightning | **Tanda Langit** | ring of radius 1.5 under the target; after 1.5 s, `6 + 3 × tier + 0.5R` damage if the target is still inside |
 | Ice / Water | **Napas Es** | 6-block cone: Slowness IV 4 s + 3 damage |
-| Earth / Metal | **Hentakan Bumi** | Players within 4 launched 0.6 up + `5 + 2 × tier` damage |
-| Wind / Space | **Kedipan** | Lands behind the target (safe spot) |
+| Earth / Metal | **Hentakan Bumi** | players within 4 launched 0.6 up + `5 + 2 × tier` damage |
+| Wind / Space | **Kedipan** | lands behind the target (safe spot only) |
 | Wood | **Duri Racun** | Poison II 5 s within 5 |
 
-*Tier 3:* the natural element's active plus one random other. It also gets a `ServerBossEvent` ("Raja Siluman · Api" / "Demon Beast King · Fire") shown to players within 24 blocks, updated every 10 ticks.
+*Tier 3:* the natural element's active plus one random other, and a `ServerBossEvent` ("Raja Siluman · Api" / "Demon
+Beast King · Fire") for players within 24 blocks, updated every 10 ticks. It never gets `TechniquePower.TAG_BOSS`.
 
-**Affix.** Tier 2+ rolls one:
-- **Kulit Besi**: technique damage taken ×0.65, applied in `Techniques.hurt`.
-- **Penyerap Qi**: each hit drains 8 qi from a player.
-- **Gesit**: +30% speed.
-- **Pulih Cepat**: regenerates 1 HP/s.
+**Affix.** Tier 2+ rolls one of three:
 
-**Hardening** (shared with `DaoProtectors.harden`, made public):
-- `setCanPickUpLoot(false)`.
-- Zombies `setCanBreakDoors(false)`.
-- Skeleton, stray and bogged swap their bow for an iron sword (arrows break pots, chorus and dripstone).
-- Tags `NoGrief.TAG` + `kultivator.elite`.
-- **No custom name**, so elites still despawn like normal mobs.
-- Data in the synced, persistent attachment `kultivator:elite {tier, element, realm, affix}` (copy the `BeastData` sync pattern).
-- Converted mobs lose elite status.
+| Affix | Effect | Sumber / Source |
+|---|---|---|
+| **Perisai Unsur / Elemental Ward** | technique damage taken ×0.65, unless the technique's element overcomes the elite's element (then ×1.0). A `TechniquePower` target factor, so it covers player, disciple and `PowerCore` casts and knows the spec's element (`ElementRelations.techniqueElement(attacker, spec)`); talismans (LEGACY) pass unchanged | RMJ ch. 1561: the sea beast's defence draws on the essential power of water |
+| **Penyerap Qi / Qi Devourer** | each melee hit on a player removes up to 8 qi | RMJ ch. 1497: the beast devours the cultivator's lightning |
+| **Pulih Cepat / Swift Recovery** | regenerates 1 HP/s | RMJ ch. 1561: blue light rises from the seawater and fills the beast's wounds |
 
-**Rewards.** Only when the killer resolves to a player: direct, technique, projectile owner, or the player's spirit beast or tamed wolf. Fall or lava deaths without credit give nothing extra.
+**Hardening** (`DaoProtectors.harden`, made public by P7-tempur): `setCanPickUpLoot(false)`; zombies
+`setCanBreakDoors(false)`; skeleton, stray and bogged swap their bow for an iron sword (arrows break pots, chorus and
+dripstone); tags `NoGrief.TAG` + `kultivator.elite`; **no custom name**, so elites still despawn like normal mobs. Data
+in the persistent, synced attachment `kultivator:elite {tier, element, realm, affix}`, registered in `elite/EliteData`
+itself like `beast/BeastData`. A converted mob (zombie → drowned, …) loses the tag and the attachment.
 
-- **XP:** `max(combatXp × (3 / 5 / 8), killerBar × (0.01 / 0.025 / 0.05) × clamp(1 + 0.5 × (R − killerRealm), 0.25, 2.0))`.
-  - Then the normal multipliers and Karma Darah (19.2.15) apply.
-  - Example: a tier-3 kill at Immortal Ascension L1 ≈ 5% of the bar.
-- **Comprehension:** +0.3 / +0.6 / +1.5 to the killer's chosen Dao (`Comprehension.grant`).
-- **Drops:**
-  - Always 1 beast core of grade = tier and the elite's element (`BeastCores.drop`).
-  - Tier 2+: 25% chance of a herb (`SpiritHerbs.randomFor(element, …)`, age 50–400).
-  - Tier 3: 1–3 Low spirit stones and a 20% ancient technique scroll (`RelicLoot.randomScroll`).
+**Rewards.** `KillCredit.resolve(victim, source)`; fall or lava deaths without credit give nothing extra. Drops always
+land at the elite's position.
 
-**Dao Protector scaling.**
-- From target Nascent Soul, each protector wave includes 1 elite.
-  - Tier 1 for targets NS and DT, tier 2 for DU and IA, tier 3 for TI.
-  - Realm = target − 2.
-- Protector health ×`(1 + 0.3 × max(0, targetRealm − 3))`.
-- Elite protectors keep the protector rules (half XP, vanish at the end) but do drop their core.
+| Credit | Rewards |
+|---|---|
+| `PLAYER` or `BEAST` | the player gets the XP and comprehension below, the counters `extra.combat.elite1..3`, the advancements |
+| `DISCIPLE` (via `DiscipleHooks.addOnKill`) | the disciple gets an extra `combatXp × KILL_XP × (2 / 4 / 7)` through `DiscipleCultivation.addXp`; the master gets the counters and advancements but no XP or comprehension |
 
-**Client.** `EliteFx` draws an aura of element-coloured motes on elites within 32 blocks (tier 1: 4 per second, tier 2: 8, tier 3: 16, × quality; at most 12 elites per frame). `FxType.ELITE` (a = skill id, b = entity id, f = radius) draws the telegraph rings.
+- **XP** (replaces the plain `combatXp` in `XpSources.onKill`): `max(combatXp × (3 / 5 / 8), killerBar × (0.01 / 0.025
+  / 0.05) × clamp(1 + 0.5 × (R − killerRealm), 0.25, 2.0))`, then the normal multipliers and Kejenuhan Bertarung
+  (19.3.14). A tier-3 kill at Immortal Ascension L1 is about 5% of the bar.
+- **Comprehension:** +0.3 / +0.6 / +1.5 to the killer's chosen Dao (`Comprehension.grant`), at most +3.0 per in-game
+  day from elites (`extra.combat.cday`).
+- **Drops:** always 1 beast core of grade = tier and the elite's element (`BeastCores.drop`); tier 2+: 25% chance of a
+  herb (`SpiritHerbs.randomFor(element, random, 50, 400)`); tier 3: 1–3 Low spirit stones.
 
-**Safety and performance.** No block is touched, and everything listed under Hardening stays in force. Cost: one random roll per natural spawn near a cultivator, bounded AABB counts after a success, and the elite skill tick every 10 ticks over a tracked UUID set. The set is rebuilt on `ENTITY_LOAD` and cleaned on death or unload.
+**Dao Protector scaling** (`DaoProtectors.spawnWave` only, the player's own tribulation; never `spawnWaveFor`, which
+serves disciple calamities, `HuFa`, `PromotionTrial` and `InheritanceTrials`):
+- From target Nascent Soul each wave includes 1 elite: tier 1 for targets NS and DT, tier 2 for DU and IA, tier 3 for
+  TI; its realm is target − 2.
+- Protector health ×`(1 + 0.3 × max(0, targetRealm − 3))` through the existing `spawnOne(..., health)`.
+- Elite protectors keep the protector rules (half XP, vanish at the end, trial-mob rule) but drop their core.
 
-#### 19.2.2 Batu Roh: spirit stones (new feature, P6-harta)
+**Client.** `EliteFx` draws element-coloured motes on elites within 32 blocks (tier 1: 4 per second, tier 2: 8, tier 3:
+16, × quality, at most 12 elites per frame). `FxType.ELITE` with `CombatFxIds` draws the telegraph rings (a = skill id,
+b = entity id, f = radius).
+
+**Safety and performance.** No block is touched; everything in Hardening stays in force; costs as in 19.1.2.
+
+#### 19.3.2 Batu Roh: spirit stones (P7-harta)
+
+**Sumber / Source.**
+- Stones hold qi that cultivators absorb: RMJ ch. 214 (a mid-grade stone releases spiritual qi much faster than a
+  low-grade one), ch. 1156 (a small part of a top-grade stone equals half a month of meditation).
+- Grades: RMJ ch. 214 (low, mid, high), ch. 1155–1156 (top grade, 极品 = Agung); *Renegade Immortal* (RI) ch. 19 (a
+  low quality spirit stone).
+- Mining: the RMJ donghua, season 2 episodes 1–2 (absolute episodes 22–23): the Seven Sects raid a Devil Dao
+  spirit-stone mine; *Invincible* ch. 1392 (mining a spiritual vein yields hundreds of thousands of stones).
+- Instant qi: RMJ ch. 169 (in a battle of attrition both fighters take out spirit stones to refill their power).
+- Formation fuel: RMJ ch. 131 (stones mainly power magic techniques and formations; a better stone makes the formation
+  stronger).
+- Breakthrough help: RMJ ch. 1152 (top-grade stones are very useful for breaking through bottlenecks).
+- Currency: RMJ ch. 214; RI ch. 329 (Wang Lin pays low quality stones to enter Devil Rebel City); *A Will Eternal*
+  (AWE) ch. 79 (an auction bid of 3,000 stones).
+- Game design: the 9 ↔ 1 crafting (canon trades 100 low for 1 mid, RMJ ch. 214), every chance and duration.
 
 **Items.**
 
@@ -887,27 +1025,23 @@ Example: a Golden Core tier-3 zombie has 164 HP. A True Immortal tier-3 zombie h
 | `spirit_stone_high` | Batu Roh Tinggi / High Spirit Stone |
 | `spirit_stone_supreme` | Batu Roh Agung / Supreme Spirit Stone |
 
-Shapeless recipes turn 9 of one grade into 1 of the next, and 1 back into 9 (six JSON files).
+Shapeless recipes turn 9 of one grade into 1 of the next and 1 back into 9 (six JSON files).
 
 **Sources.**
-
-1. **Mining.** Own `PlayerBlockBreakEvents.AFTER` listener; Qi Refining+, survival, not a FakePlayer, no Silk Touch, config `spiritStoneMining`.
+1. **Mining.** Own `PlayerBlockBreakEvents.AFTER` listener; Qi Refining+, survival, not a `FakePlayer`, no Silk Touch,
+   config `spiritStoneMining`.
    - Chance = `min(0.5, 0.015 × XpSources.miningXp(state)) × clamp(SpiritVeins.density(level, pos), 0.5, 2.0)`.
-   - Examples: coal 1.5%, iron 3%, gold 4.5%, diamond 15% (deepslate 22.5%), emerald 18%.
-   - Drops 1 Low (diamond and emerald 1–2) via `popResource`. Fortune does nothing. Ancient debris gives nothing.
-2. **Structure loot.** See 19.2.14.
-3. **Wandering trader.** Data only.
-   - `data/kultivator/villager_trade/spirit_stones.json`: 2 emeralds → 3 Low, max 4 uses.
-   - Added to `data/minecraft/tags/villager_trade/wandering_trader/uncommon.json` with `"replace": false`.
-   - Format: `VillagerTrade.CODEC` (`wants`, `gives`, …); verify against the vanilla JSON in the 26.3 jar.
-4. **Padatkan Qi / Condense Qi.** Action `CONDENSE_QI`, a Status-page talisman, or `/kultivasi qi padatkan <n>`.
-   - Requires meditating with a full bar at a bottleneck (Stored Qi or Qi Abadi > 0).
-   - 1 Low costs `max(100, 5% of the current rank's xpRequired)` Stored Qi; up to 9 per press.
-   - 2 s crystal effect (`FxType.TREASURE`). Stones go to the inventory, or drop at the feet.
+   - Examples at density 1.0: coal 1.5%, iron 3%, gold 4.5%, diamond 15% (deepslate 22.5%), emerald 18%.
+   - 1 Low (diamond and emerald 1–2) via `popResource`. Fortune does nothing; ancient debris gives nothing.
+2. **Structure loot** (19.3.13) and **tier-3 elites** (19.3.1).
+3. **Wandering trader** (data only): `data/kultivator/villager_trade/spirit_stones.json` (2 emeralds → 3 Low, max 4
+   uses), added to `data/minecraft/tags/villager_trade/wandering_trader/uncommon.json` with `"replace": false`. Format
+   `VillagerTrade.CODEC`; verify against the vanilla JSON in the 26.3 jar.
+4. **Expeditions** (`sect/event/Expeditions` loot rows): "caravan" +2–5 Low; "secret_realm" +1 Mid (+5% High at team
+   tier ≥ 7).
 
 **Uses.**
-
-1. **Meditation fuel.** Stones in the offhand while meditating. Applied by P6-kultivasi in `Meditation`.
+1. **Meditation fuel** (stones in the offhand while meditating; applied by P7-kultivasi in `Meditation`):
 
    | Grade | One consumed every | XP factor |
    |---|---|---|
@@ -916,64 +1050,444 @@ Shapeless recipes turn 9 of one grade into 1 of the next, and 1 back into 9 (six
    | High | 300 s | ×2.5 |
    | Supreme | 600 s | ×3.0 |
 
-   - While fuelled, vein drain is ×0.5.
-   - Fuel counts inside the site × formation × fuel cap of ×5.
-   - **Fuel is inactive and nothing is consumed while the bar is full at a bottleneck** (including True Immortal Peak). This makes a Stored Qi → stones → Stored Qi loop impossible. The HUD shows "Batu roh diam".
-2. **Instant qi.** Sneak-use when not meditating, no toxicity, 1 s cooldown:
-   - Low +30 qi, Mid +200, High +900.
-   - Supreme: full qi + qi regen ×3 for 60 s.
-3. **Protective formation fuel**, next to amethyst shards (10 min each, cap 2 h as before).
-   - Low +20 min, Mid +3 h, High +24 h, Supreme sets the formation to the stone cap.
-   - Stone power may reach a cap of 48 h (`MAX_POWER_STONES = 3,456,000` ticks).
-4. **Alchemy catalyst.** See 19.2.9.
-5. **Currency** for talismans (19.2.8), the guide and daily rewards (19.2.3), and trading between LAN friends.
+   - While fuelled, vein drain is ×0.5. Fuel counts inside the site × formation × fuel cap of ×5.
+   - Fuel also works at a full bottleneck: its XP then goes to Stored Qi (at True Immortal Peak to Qi Abadi, the star
+     fuel). The old "fuel idle" rule is gone, because without Padatkan Qi no Stored Qi → stone loop exists.
+2. **Instant qi.** Sneak-use when not meditating, no toxicity, 1 s cooldown: Low +30 qi, Mid +200, High +900, Supreme
+   full qi + qi regen ×3 for 60 s.
+3. **Protective formation fuel** (`ProtectiveFormations`), next to amethyst shards (`TICKS_PER_SHARD` 12,000, amethyst
+   still capped at `MAX_POWER` 144,000 = 2 h): Low +20 min, Mid +3 h, High +24 h, Supreme sets the formation to the
+   stone cap. Stone power may reach `MAX_POWER_STONES = 3,456,000` ticks (48 h).
+4. **Batu Roh di Hambatan / Stones at the bottleneck** (replaces Padatkan Qi). High or Supreme stones in the offhand
+   when a breakthrough succeeds give a `QualityBonus`: +0.03 per High, +0.08 per Supreme, at most 4 stones and +0.16.
+   `commit` consumes them only on success; a failed or cancelled attempt keeps them. Low and Mid give nothing. The
+   forecast shows "+0.11 dari Batu Roh". Not for the awakening.
+5. **Alchemy catalyst** (19.3.7). **Talisman trade and Kantor Misi** (`Contribution.unitValue` rows via
+   `Harta.missionValue`): Low 0.5 PK, Mid 4.5, High 40, Supreme 300 (the daily cap of 300 still applies).
 
-**Advancements:** `first_spirit_stone`, `supreme_spirit_stone`, `qi_condensed`.
+**Advancements:** `first_spirit_stone`, `supreme_spirit_stone`, `stone_bottleneck` (first breakthrough that consumed
+stones).
 
-**Safety.** Drops only after the player broke the ore. No block is changed.
+**Safety.** Drops only after the player broke the ore; no block is changed.
 
-#### 19.2.3 Jalan Kultivasi tablet: Langkah Pertama, Ujian Fondasi, Tugas Harian (new feature, P6-jalan)
+#### 19.3.3 Inti Binatang: beast cores (drops P7-tempur, uses P7-harta)
 
-**Why.** A player who never reads PANDUAN.md has no idea what to do after the root test. The mid game has no direction beyond "fill the bar", and short sessions between Valorant matches need goals.
+**Sumber / Source.**
+- Cores are graded, valuable energy nuclei: BTTH ch. 11 (monster cores, used in alchemy, weapons and armour, very
+  expensive), ch. 14 (a level-one core sells for about 400–450 gold); RMJ ch. 397 (demon cores), ch. 529 (Han Li spends
+  three years refining demon cores into pills).
+- Absorbing a core: *Coiling Dragon* (CD) Book 8 ch. 57 (Linley's bloodline dissolves and absorbs a ninth-rank
+  magicite core, but leftover energy stays unmastered in his body) and BTTH ch. 11 (cores hold extremely violent world
+  energy that even a Dou Wang would not absorb). The toxin below is that violent leftover energy.
+- Feeding a spirit beast: CD Book 8 ch. 57 (Haeru, Linley's Blackcloud Panther, takes days to absorb a Saint-level
+  core).
+- Talisman catalyst: *Terinspirasi dari* RMJ ch. 242 (high-grade talismans need the hides of certain demonic beasts;
+  cores stand in for them).
+- Game design: the grade names (canon uses numbered levels), the element on a core (no chapter says "attribute core"),
+  every elite always dropping one (BTTH ch. 11 says not every beast has a core).
 
-The **"Jalan / Path"** tablet has three sections, switched with jade coins: **Langkah · Ujian · Harian**.
+**Items.** `beast_core_low` / `_mid` / `_high` / `_king` = **Inti Binatang Rendah / Menengah / Tinggi / Raja**.
+Component `kultivator:core_element` (Element id); name "Inti Binatang Api · Menengah" / "Fire Beast Core · Mid". Tint:
+the item definition uses `"tints":[{"type":"minecraft:custom_model_data","index":0,"default":…}]` and the stack carries
+`minecraft:custom_model_data {colors:[element colour]}`; one texture per grade.
 
-**(a) Langkah Pertama / First Steps.** 16 steps in 4 chapters, stored as a bitmask in `extra.goals.guide`.
+**Drops** (P7-tempur):
+- Elites: always, grade = tier (19.3.1).
+- Bosses (Wither, Warden, Ender Dragon, Elder Guardian): 1 Raja core of a random element, only for the first kill of
+  that boss type per player per in-game day (`extra.combat.boss_day`).
+- Normal `Enemy` kills with `PLAYER`/`BEAST` credit by a Qi Refining+ player: 1.5% × Kejenuhan factor for a Low core
+  of the mob's element.
+- Never from protectors (except elite protectors), `kultivator.spawner` mobs, trial guards, training dummies, heart
+  demons or mobs without an element.
+- Expeditions (P7-harta, `Expeditions` loot rows): "hunt" +1 core of a random element, grade by team tier (1–3 Low,
+  4–6 Mid, 7–8 High, 9 Raja at 10% else High); the BTTH hunting source of that mission already fits.
 
-- Steps complete when their advancement is granted (`Advancements.addListener`).
-- **Backfill on join:** each step's advancement is checked with `getOrStartProgress(holder).isDone()`, so veterans are never told to "test your root".
+**Uses** (P7-harta):
+1. **Absorb** (sneak-use, 1 s cooldown, refused while deviating). XP via `Progression.grantXp(…, XpSource.PILL) ×
+   PillToxicity.effectiveness`:
+
+   | Grade | XP | Toxin | Comprehension (element affine to the chosen Dao) |
+   |---|---|---|---|
+   | Low | min(3% of bar, 150) | 6 | +0.5 |
+   | Mid | min(6%, 900) | 10 | +1 |
+   | High | min(10%, 5,000) | 16 | +2 |
+   | Raja | min(15%, 25,000) | 28 | +4 |
+
+   - +50% XP when the element is in the player's root (*Terinspirasi dari* *Tales of Demons and Gods* ch. 13,
+     attribute matching, DESIGN 20.3.18).
+   - Affinity: Metal→Sword, Fire→Fire, Water/Ice→Ice, Lightning→Lightning, Earth→Body, Wood→Life, Wind→Shadow,
+     Space→Space.
+2. **Feed your spirit beast** (own `UseEntityCallback` → `SpiritBeasts.addXp(Mob, double)`): +60 / 150 / 400 / 1,000
+   beast XP, ×1.5 for a matching element (wolf Lightning/Metal, fox Fire/Wood); own 10 s cooldown per beast, separate
+   from the 30 s pill cooldown.
+3. **Alchemy catalyst or required core** (19.3.7). **Talisman catalyst** (19.3.6). **Kantor Misi:** Low 3 PK, Mid 10,
+   High 30, Raja 120.
+
+**Advancements:** `first_beast_core`, `king_core`.
+
+#### 19.3.4 Tanaman Roh: spirit herbs with age (P7-harta)
+
+**Sumber / Source.**
+- Age sets value: RMJ ch. 26 ("the older the medicinal herb was, the more precious it would be"); ch. 164 (a Yellow
+  Essence Mushroom Han Li raised is appraised as a thousand-year herb); ch. 276 (thousand-year spirit herbs as a
+  bargaining subject).
+- Richer land gives older herbs: *Terinspirasi dari* the Hundred Medicine Garden, RMJ ch. 150–151 (DESIGN 20).
+- Each herb's own source is in the table. Game design: herbs hidden among ordinary plants, the daily hash, the age
+  formula; herbs are never plantable (canon grows them in gardens; kept for block safety).
+
+Own `PlayerBlockBreakEvents.AFTER` listener; Qi Refining+, survival, not a `FakePlayer`, config `herbHarvest`.
+
+**Infusion test.** A plant is spirit-infused when `hash(seed, pos, herbKind, overworldDay) < p × mods`. Deterministic
+per position and day, so a bone-meal farm gets one roll per spot per day, and Divine Sense can show the same result.
+mods: Wood root or Life Dao ×2; × `min(2.0, SpiritSites.current(player).multiplier())`, read only when the hash is
+below `4p`.
+
+| Item id | Indonesian / English | Plant and condition | p | Sumber / Source |
+|---|---|---|---|---|
+| `spirit_grass` | Rumput Roh / Spirit Grass | short/tall grass, fern, large fern, Overworld | 1.5% | RMJ ch. 26 (generic spirit herbs) |
+| `ninecurl_ginseng` | Ginseng Roh Sembilan Lekuk / Ninecurl Spirit Ginseng | mature carrot, potato or beetroot; ×2 in jungle, taiga, old growth or cherry | 1% | RMJ ch. 433 (title), 863, 1252 |
+| `eight_angled_ice_grass` | Rumput Es Bersudut Delapan / Eight-Angled Mysterious Ice Grass | any small flower or age-3 sweet berry bush where `Biome#coldEnoughToSnow` | 4% | *Soul Land*: 八角玄冰草, the extreme-cold herb of the Ice Fire Eye (concept, no chapter cited) |
+| `purple_flame_flower` | Bunga Api Ungu / Purple Flame Flower | mature nether wart, crimson/warped fungus or roots, Nether | 3% | RMJ ch. 1174 (name only) |
+| `illusory_spirit_herb` | Rumput Roh Ilusi / Illusionary Spirit Herb | any small flower at night with sky access; full moon ×3 | 2% | RMJ ch. 1174 (name only); the night and full-moon rule *Terinspirasi dari* RMJ ch. 1194 |
+| `gold_lightning_bamboo` | Bambu Petir Emas / Gold Lightning Bamboo | a bamboo block broken by the player during a thunderstorm with sky access | 5% | RMJ ch. 412 (Han Li grows it with the green liquid), ch. 1535 (refined into 72 azure flying swords); the storm trigger is game design |
+| `ginseng_fruit` | Buah Ginseng / Ginseng Fruit | chorus flower or chorus plant, End | 2% (was 4%: the fruit is legendary) | *Journey to the West* (JTTW) ch. 24: Zhenyuan's tree gives 30 fruits every 9,000 years |
+| `yellow_essence_mushroom` | Jamur Inti Kuning / Yellow Essence Mushroom | red/brown mushroom in mushroom fields, the Deep Dark, or below y 0 | 3% | RMJ ch. 164 |
+| `foundation_herb` (existing, `SectEventItems`) | Herba Fondasi / Foundation Herb | not harvested in the world | – | joins the herb family: accepted as an auxiliary herb (its `herb_age`, or 60 years when it has none) |
+
+**Harvest.**
+- The herb pops beside the plant (`popResource`) with component `kultivator:herb_age` (years).
+- Age = `round((10 + r × 90) × clamp(density, 0.5, 2.0) × min(2.0, site))`, r from the same hash; a 1% chance
+  multiplies it ×10.
+- Tooltip "Umur: 340 tahun". From 1,000 years the name is gold ("… Seribu Tahun") and one server-wide line is shown
+  (at most once per player per 10 minutes).
+- Each find drains 0.02 vein density and counts `extra.harta.herbs_found`. Herbs are never plantable (no crop blocks).
+- **Garden** (`sect/event/Duties` garden rows): each herb yield of the duty garden has a 10% chance to add one Spirit
+  Grass of age 50–200 to the storehouse (RMJ ch. 150–151).
+- **Expeditions** (`Expeditions` loot rows): "herbs" +1–2 spirit herbs of age `50 × tier`–`150 × tier`.
+
+**Divine Sense.** Infused plants within the cast radius (12, growing to 16) are pinged green (`0x6CFF8A`) through the
+existing `OrePings` payload from `technique/DivineSense.scan/report`; no payload change.
+
+**Kantor Misi:** `1 + age / 100` PK per herb (100 years 2 PK, 1,000 years 11 PK); `foundation_herb` keeps its row.
+
+**Advancements:** `first_herb`, `thousand_year_herb`.
+
+#### 19.3.5 Urat Roh and Kultivasi Tertutup: living spirit veins, meditation rework, cave abode (P7-kultivasi)
+
+**Why.** Every region is the same, so where you meditate barely matters; flat meditation XP is meaningless from Deity
+Transformation up; formations become a net loss on drained veins at high realms.
+
+**Sumber / Source.**
+- Veins make places richer: RMJ ch. 391 (a natural spirit vein flows through Sage Mountain; "the higher the building,
+  the greater the amount of Spiritual Qi"), ch. 1347 (Han Li's Spirit Land sits on a vein, yet one mountain there is
+  sparse).
+- Vein grades: *Terinspirasi dari* *Martial World* ch. 879 ("Top Grade Spirit Vein"); the grade names are game names.
+- Drain and refill: *Terinspirasi dari* *I Shall Seal the Heavens* (ISSTH) ch. 25 (the spiritual energy of the
+  Immortal's Cave suddenly thins).
+- Closed-door seclusion: RMJ ch. 520 (Han Li lays a concealment restriction in his new cave residence and stays in
+  seclusion about a year), *RMJ: Immortal Realm* ch. 1142 (years of seclusion).
+- Cave abode: RMJ ch. 391 (cave residences on Sage Mountain, a fee every hundred years), ch. 520, ch. 803 (a spell
+  formation outside his cave residence); RI ch. 216 (hidden restrictions before cultivating, DESIGN 20).
+- Vein compass: *Terinspirasi dari* the Source Masters of *Shrouding the Heavens*, who read dragon veins (concept, no
+  chapter cited).
+- Game design: the meditation formula, stacks, timers and all numbers.
+
+**Vein grades.** A seeded hash of `(level.getSeed(), dimension id, regionX, regionZ)` gives u in [0,1):
+
+| u range | Grade | Indonesian / English | Cap |
+|---|---|---|---|
+| < 0.02 | 2 | Urat Roh Agung / Great Spirit Vein | 2.0 |
+| < 0.10 | 1 | Urat Roh Kaya / Rich Spirit Vein | 1.4 |
+| < 0.18 | −1 | Urat Roh Tipis / Thin Spirit Vein | 0.6 |
+| otherwise | 0 | normal | 1.0 |
+
+- Untouched regions sit at their cap and nothing is stored. Regen `0.0004 × cap` per second toward the cap (replaces
+  `REGEN_PER_SECOND` 0.0002; empty → full in about 42 min). Saved entries are clamped to [0, cap]; old saves stay valid.
+- New API `SpiritVeins.grade(level, pos)` and `cap(level, pos)`; `density()` now returns 0…2.0.
+
+**Meditation formula** (one public function, `Meditation.gainPerSecond(player, data)`, used by `Meditation.second`
+and by `DiscipleCultivation.masterMeditationGain`):
+
+```
+base    = max(0.6 + 0.25 × realm, Rank(realm, layer, 0).xpRequired() / 3000)
+xp/s    = base × min(5.0, site × formation × fuel) × max(0.15, density)
+          × Sects.meditationBonus × (1 + 0.05 × seclusionStacks)
+drain/s = 0.0015 × (1 + 0.10 × realm) × fuel 0.5 × formation (Great 0.6, Heavenly 0.35) × abode 0.5
+```
+
+- Base rates: unchanged up to Nascent Soul (1.6/s); Deity Transformation 4.0, Dao Union 10, IA L1 20, IA L9 68, True
+  Immortal 83.3. Pace: a plain Early stage about 50 min; fully optimised about 5–10 min.
+- Formation floor: while a Great (Heavenly) qi formation is active at the seat, drain never takes density below 0.30
+  (0.45).
+- `FeatTracker.onMeditate(player, 20)`, `Sects.meditationBonus` and the site comprehension stay in `second`.
+- **Enlightenment:** burst 25% → **20%** of the bar. Chance per minute = `(0.04 × site + 0.02 with a Dao) × 1.5 after
+  30 min of seclusion × Enlightenment.boostChance factor + 0.02 (perk L8) + 0.01 (abode)`, capped at 0.5. The mastery
+  points of an enlightenment still come from `Unlocks`.
+- `Meditation.percent` shows values above 100% ("Kepadatan Qi 180% · Urat Roh Agung"); `debug vein` accepts 0–200.
+
+**Kompas Urat Roh / Spirit Vein Compass** (`vein_compass`).
+- Shapeless: compass + amethyst shard + gold ingot + glow berries.
+- Use (5 qi, 60 s cooldown): spiral search over hash values only (no chunk loading), up to 32 regions (about 2,048
+  blocks), for the nearest Great vein, else the nearest Rich one.
+- Writes `minecraft:lodestone_tracker {target: region centre, tracked: false}`. The item definition copies the vanilla
+  compass `range_dispatch` with target `lodestone`, so the needle points with zero client code. Tooltip: grade and
+  distance.
+
+**Kultivasi Tertutup / Closed-door seclusion.**
+- Unbroken meditation earns +1 stack every 300 s, up to 5 (+25% XP). After 1,800 s, enlightenment chance ×1.5.
+- When meditation ends after at least 60 s: "Meditasi 32 menit: +4.210 kultivasi · 2 pencerahan · kepadatan 180% →
+  95%" (or "+… Qi Tertimbun").
+- Advancement `closed_door_hour` (60 min unbroken; renamed from `seclusion_hour` so it is not confused with the
+  existing `hour_of_stillness`, 60 h in total).
+
+**Gua Kediaman / Cave Abode** (`cultivation/CaveAbode`).
+- Set with `/kultivasi gua tetapkan` or the Status-page coin (Action `KULTIVASI` `abode:set`) while meditating on a
+  seat with qi formation tier 1+ inside an active protective formation (`ProtectiveFormations.insideActiveFormation`).
+  A seat built by the sect's `QiSeat` counts.
+- One per player in `extra.kultivasi.abode {dim, x, y, z}`; `gua lihat` shows it, `gua hapus` (or `abode:clear`)
+  removes it. While the seat lost its formation or the protective formation is unpowered the bonuses pause ("Gua tidak
+  terlindungi").
+- Within 6 blocks of the seat: vein drain ×0.5; enlightenment +0.01; seclusion stacks survive a break of 10 s or less;
+  the Return Talisman's first target (19.3.6).
+- `kehancuran.ProtectedZones.addZoneProvider`: a zone of radius 16 around the seat, so Mode Kehancuran never carves the
+  abode.
+- Advancements `cave_abode`, `great_vein` (meditate 10 min in a Great vein).
+
+**Stone fuel.** `SpiritStones.isStone/grade` on the offhand stack, consumed at the start of each period (19.3.2).
+
+**HUD data** in `sessionExtra`: `vein_grade`, `seclusion`, `fuel`, `fuel_end`, `abode`.
+
+**Safety and performance.** Data only, O(1) per second; the compass does at most about 4,100 hash evaluations per use.
+
+#### 19.3.6 Jimat: talismans (P7-kultivasi)
+
+**Sumber / Source.**
+- Talismans as consumables and a craft: RMJ ch. 242 "Making Talismans" (Han Li starts with low-grade talismans to
+  build skill; blank paper is made from spirit herbs of a certain maturity and cinnabar from spirit-beast blood;
+  high-grade talismans need demonic beast hides), ch. 765 (three failures before one success), ch. 1346 (an extremely
+  low success rate that better materials raise), ch. 222 (a shop pays back twice the material value if refining
+  fails); AWE ch. 51; RI ch. 12 and 31 (Wang Lin owns about 200 talismans).
+- Anyone, even a Mortal, can use one: RI ch. 12 (a thousand mile immortal talisman stuck on the leg raises a normal
+  person's speed; Wang Lin has no cultivation yet).
+- Each talisman's own source is in the table. Game design: the inscribing flow, qi costs, power from the realm, the
+  skill numbers.
+
+**Blank.** **Kertas Jimat Kosong / Blank Talisman**: shapeless 3 paper + 1 Spirit Grass + 1 red dye → 3 (the herb
+paper and the cinnabar of RMJ ch. 242; red dye stands in for cinnabar).
+
+**Inscribing.**
+- Blank in the main hand, catalyst in the offhand, sneak-use: a 40-tick channel (brush effect); Qi Refining+.
+- At the end it costs the qi below and 1 catalyst. Result: a typed talisman with component `kultivator:talisman
+  {power, inscriber, uses}`, power = the inscriber's realm ordinal (1–8).
+- A **beast core of the matching element** may replace the catalyst: power +1 (+2 for High or Raja), cap 9.
+- **Talisman skill** (`extra.talisman.xp`): +4 XP per success, +1 per failure; level = `min(10, floor(sqrt(xp / 8)))`;
+  success chance = `0.60 + 0.035 × level` (max 0.95). A failure burns the blank and the catalyst into ash particles
+  (items only). `extra.talisman.made` counts successes (for the daily chores).
+
+**Activation.** Anyone can use a talisman: a 10-tick use, consumed (or one use spent), 1 s shared cooldown, stacks to
+16. Offensive talismans go through `Targeting` and `Techniques.hurt(user, DamageContext.legacy(user, target, amount))`
+(monsters only), so the amount passes the choke point unchanged: elites and protectors (legacy-tuned health) take it
+in proportion, ordinary monsters see a fraction of a technique. Talisman damage base `T(p) = 4 + 2.5 × power`.
+
+| Item | Indonesian / English | Catalyst (core) | Inscribe qi | Effect | Sumber / Source |
+|---|---|---|---|---|---|
+| `thunder_talisman` | Jimat Petir / Thunder Talisman | copper ingot (Lightning) | 20 | particle bolt on the looked-at monster within 24: `T(p)`; chains to 1 more within 5 at 50% | *Terinspirasi dari* *Dragon War God* ch. 498 (the Nine Heavens Thunder Talisman, runes turning into tendrils of electricity) and RMJ ch. 1367 (lightning beads refined with lightning symbols) |
+| `fire_cloud_talisman` | Jimat Awan Api / Fire Cloud Talisman | blaze powder (Fire) | 20 | 6-block 60° cone: entity ignite 5 s + `0.75 × T(p)` | RMJ ch. 242 (Fire Cloud, an elementary high-grade talisman) |
+| `shield_talisman` | Jimat Perisai / Shield Talisman | gold ingot (Earth) | 25 | Absorption amplifier `min(4, power / 2)` for 60 s | AWE ch. 51 (talismans slapped onto the body raise shields almost two metres thick; also ch. 346, 560) |
+| `binding_talisman` | Jimat Pengikat / Binding Talisman | chain (Ice) | 20 | looked-at monster within 16: Slowness VII + Weakness I for `3 + 0.5 × power` s (bosses ×0.25) | *Terinspirasi dari* *Ancient Strengthening Technique* ch. 421 (a Binding Talisman lowers the opponent's speed) |
+| `return_talisman` | Jimat Pulang / Return Talisman | ender pearl (ink, never thrown) | 40 | see below | *Terinspirasi dari* *RMJ: Immortal Realm* ch. 289 (a golden talisman bursts into golden flames and its user reappears thousands of km away) and RI ch. 12, 27 (thousand-mile talismans for trips home) |
+| `tribulation_ward_talisman` | Jimat Penangkal Petir / Tribulation Ward | lightning rod item | 35 | only during your own tribulation strikes: next strike ×0.5 (a `StrikeFactor`); at most 2 per tribulation, the count resets in `onOmen` | *Terinspirasi dari* ISSTH ch. 159 (a wooden slip glows blue and seems able to repel lightning) |
+| `thousand_mile_talisman` | Jimat Seribu Li / Thousand Mile Talisman | sugar (Wind) | 15 | **two uses**: Speed II for 60 s each | RI ch. 12 (usable twice; for normal people it raised their speed) |
+| `limpidity_talisman` | Jimat Kejernihan / Limpidity Talisman | fermented spider eye (Space) | 30 | Invisibility for `10 + 2 × power` s; on use and every 20 ticks while active, monsters within 12 that target the user lose the target unless the user hurt them in the last 3 s; attacking ends it; bosses ignore it | RMJ ch. 1365 (a concealment talisman hides its user from mid-Spatial Tempering cultivators and weaker) |
+
+**Return talisman.** A 5 s channel, cancelled by damage or by moving more than 1 block. Target, in order: your Cave
+Abode in this dimension → your respawn point (`ServerPlayer.getRespawnConfig()`) in this dimension → world spawn if in
+the Overworld → otherwise refused. `Targeting.safeSpot` + `setPortalCooldown`; refused without a safe spot. 10 min
+cooldown. Refused during a breakthrough, tribulation or heart-demon trial, `InheritanceTrials.active`, a `DuelRules`
+bout or sparring, a sect promotion trial, tournament bout or Void Realm floor, while holding a `FlightLease`, during a
+Kehancuran aim or countdown, or within 10 s of being hurt. It never uses or creates a portal and never changes dimension.
+
+- Balance: a Thunder Talisman at Golden Core power (11.5 damage, 1 chain) stays below Thunder Palm.
+- Client: `FxType.TALISMAN` (`TalismanFxIds`, a = type) draws the paper burning into glyphs.
+- **Advancements:** `first_talisman`, `talisman_master` (level 10).
+
+**Safety.** Items, particles and entity effects only.
+
+#### 19.3.7 Alkimia Lanjutan and Kitab Alkimia: deeper alchemy and a recipe tablet (P7-harta)
+
+**Sumber / Source.**
+- Cores in the furnace: BTTH ch. 14 (Xiao Yan buys a first-level core with 3 Purple Bluegrass and 2 Bone Washing
+  Flowers; Yao Lao refines them into a medicine and softens the core's violent energy). The word catalyst: BTTH ch. 6
+  (a sliver of the wood attribute acts as a catalysis in pill refining).
+- Aged herbs make better pills: RMJ ch. 26–27 (Han Li ages herbs with the bottle's green liquid and refines them into
+  elixirs).
+- Stone catalysts: *Terinspirasi dari* RMJ ch. 131 and 214 (a formation draws on the effectiveness of its stones);
+  worded as "the furnace formation draws on the stones" (no work puts stones into a furnace).
+- Pill grades (the existing `PillQuality`): the *Talisman Emperor* glossary (Low, Intermediate, High, Top) and *Nine
+  Star Hegemon Body Art* (NSHBA) ch. 53 (high grade shows pill lines and a halo; optional visual for High and Perfect).
+- Recipe tablet: RMJ ch. 153 (Yue Lu Hall stores pill recipes), BTTH ch. 9 (a sixth-grade alchemist).
+- Game design: slots, floors, chances and the tablet's cards.
+
+**Pot rules.**
+- `AlchemyPots.CAPACITY` 8 → 10. Stones, herbs and cores are accepted ingredients.
+- Matching: (1) remove up to 2 spirit stones (catalysts); (2) remove 1 beast core (catalyst) unless the recipe requires
+  a core; (3) the rest must equal a recipe's ingredients **plus at most one extra herb** (the auxiliary herb, the
+  oldest one the recipe does not need).
+
+  | Extra in the pot | Effect |
+  |---|---|
+  | each Low stone | success +0.05 |
+  | each Mid+ stone | success +0.10, quality roll +0.1 |
+  | auxiliary herb | quality roll + `min(0.30, age / 3333)` (100 years +0.03, 1,000 years +0.30) |
+  | catalyst core Low / Mid / High / Raja | success +0.05 / +0.08 / +0.12 / +0.18; quality floor – / Mid / High / Perfect |
+
+  Success stays capped by `AlchemyFurnace.MAX_CHANCE` (0.95). `AlchemyRecipes.Recipe` keeps its accessors.
+- Alchemy-refined Marrow Cleansing Pills carry `pill_quality`; crafting-table marrow pills count as Mid.
+- Each successful refine counts `extra.harta.refined` (read by the trials and chores). `FeatTracker.onAlchemy`,
+  the disciple talent `bakat_pil` and the Heavenly Flames are untouched.
+
+**New pills** (`PillKind` + items):
+
+| Item id | Indonesian / English | Recipe | Effect | Toxin | Sumber / Source |
+|---|---|---|---|---|---|
+| `dao_insight_pill` | Pil Wawasan Dao / Dao Insight Pill | Illusionary Spirit Herb + Yellow Essence Mushroom + Echo Shard → 1 | +3 × quality comprehension to the chosen Dao, never above 60; at most 5 per realm (`extra.harta.insight_pills`); refused (kept) without a Dao | 18 | *Terinspirasi dari* NSHBA ch. 6918 (the Dao Comprehension Divine Tea Tree helps one understand the Heavenly Daos) |
+| `toxin_purging_pill` | Pil Penawar Racun / Toxin Purging Pill | Eight-Angled Ice Grass + Honey Bottle + Spirit Grass → 2 | toxicity −35 × quality; clears Poison, Wither, Nausea, Blindness, Darkness, Slowness, Weakness (the dropped purifying talisman's cleanse) | 0 | AWE ch. 41 (impurities become medicinal toxins; much of them can be expelled) |
+| `enlightenment_pill` | Pil Pencerahan / Enlightenment Pill | Illusionary Spirit Herb + Glow Berries + Amethyst Shard → 2 | `Enlightenment.boostChance(player, 2.0, 12000)` (×2 chance for 10 min) | 10 | *Terinspirasi dari* the Bodhisattva Ancient Tree, BTTH ch. 828 and 1426 (already the source of `bodhisattva_tree`) |
+| `bone_tempering_pill` | Pil Penempa Tulang / Bone Tempering Pill | Bone Block + Iron Ingot + Golden Carrot + **Earth core Mid+** (required) → 2 | +1 max health permanently (Perfect +2), cap +10 in total (`extra.harta.bone_hp`), modifier `kultivator:bone_tempering`, re-applied on join and respawn by `Harta` | 12 | NSHBA ch. 503 (Bone Tempering Pills; dozens temper a single bone) |
+
+Disciples: `Disciples.isPill` accepts every `PillItem` and `DiscipleCultivation.applyAlchemy` has no case for the new
+kinds, so P7-harta registers a `DiscipleHooks.addFeedHandler` that refuses the four new pills for disciples and keeps
+them ("Pil ini belum bisa dicerna murid"). Disciple effects are Phase 7b.
+
+**Alternative recipes** (same outputs, so every herb has a use):
+- Ninecurl Spirit Ginseng + Golden Carrot + Glistering Melon → 3 Healing.
+- Purple Flame Flower + Gold Ingot + Golden Apple → 2 Golden Core.
+- Gold Lightning Bamboo + Copper Ingot + Phantom Membrane + Iron Ingot → 2 Tribulation Warding.
+- Ginseng Fruit + Ghast Tear + Echo Shard + Chorus Fruit → 3 Soul Nurturing.
+
+**Kitab Alkimia tablet** (`client/screen/AlchemyBookPage`, `TAB_ALKIMIA`, also `/kultivasi resep`):
+- A card per `AlchemyRecipes.all()` entry: output icon × count, ingredient icons × n, colour band, alchemy XP.
+- A check mark and "Bisa diracik 2×" when the inventory holds all ingredients.
+- Header: alchemy level, XP to the next level, success chance with campfire / soul campfire / Fire Dao
+  (`AlchemyFurnace.successChance`). Footer: what catalysts and auxiliary herbs do.
+
+**Tooltips** (`PillTooltips`): ingredient items show "[Shift] Bahan alkimia"; holding Shift lists the pills they make.
+
+#### 19.3.8 Tribulasi Hidup: lightning rings, Menantang Langit and Hu Fa Tribulasi (P7-tempur)
+
+**Lingkar Petir / telegraphed strikes.** From target Deity Transformation up; config `tribulationTelegraph`.
+
+**Sumber / Source.** ISSTH Book 6 ch. 969: other cultivators "almost passively transcended the tribulation by madly
+avoiding or rushing past the Tribulation Lightning", while Meng Hao meets it head-on. The ground ring is a game
+telegraph with no canon claim.
+
+- **Telegraph:** 30 ticks before each strike (`STRIKE_INTERVAL` stays 70) the ring centre is captured at the player's
+  feet; `FxType.ELITE` draws a glowing sigil ring of radius 1.5 (`CombatFxIds` ring, b = strike number).
+- **Impact:** if the player stands horizontally more than 1.5 blocks from the centre, the strike only **grazes** for
+  40% damage; otherwise it hits in full. Every strike still lands (a graze is never zero, armour and effects are still
+  ignored, the would-kill check uses the final damage), so DESIGN 0 rule 3 holds. With the config off every strike is
+  a full hit, as today.
+- **Twin strikes (targets IA and TI):** every 4th strike has twin rings, the second 3 blocks away in a random
+  direction; standing in either takes the full hit. Optional (Phase 7b): IA/TI rings in seven colours (ISSTH ch. 969,
+  the seven-coloured Immortal Tribulation Lightning).
+- `MAX_DISTANCE` (6 blocks) is unchanged; a 2-block sidestep is enough.
+
+**Menantang Langit / Defy the Heavens** (a `QualityBonus` provider): +0.12 when every telegraphed strike was taken in
+full; otherwise −0.02 per graze (floor −0.10). Grazing keeps `lowestHealth` higher, so the choice is real. Advancement
+`defy_heaven`.
+
+**Sumber / Source.** *Terinspirasi dari* ISSTH ch. 969 (Meng Hao meets the seven-coloured lightning with his Dharma
+Idol) and PW ch. 1000 (the lightning breaks Shi Hao's flesh and primordial spirit apart and pieces them together again)
+and ch. 1247 (his skin regrows snow-white like jade, an upgrade in his level of life). The name is the generic 逆天.
+
+**Hu Fa Tribulasi / Tribulation Guardian** (co-op; renamed from "Pengawal Dao", distinct from the monster waves
+"Pelindung Dao" and from the disciple `HuFa`).
+
+**Sumber / Source.** BTTH: Yao Lao guards Xiao Yan while he refines a flame (护法; already the source of
+`disciple/path/HuFa`, DESIGN 20.3.18); RMJ ch. 1803 (with the Dao of lightning, Hai Yuetian could assist others in
+transcending their lightning tribulations); NSHBA ch. 6594 (a collective tribulation grows stronger), which supports
+the rule that strikes hit only the cultivator. The factors are game design.
+
+- **Joining:** when the omen starts (target Golden Core+, not a test), online `/sect` mates (`Sects.sectOf`) in the
+  same dimension get a chat line with the target realm, distance and direction and a clickable **[Kawal]** that runs
+  `/kultivasi kawal <player>` (registers from up to 64 blocks). Any player within 24 blocks when strike 1 lands is
+  registered automatically.
+- **Losing the role:** more than 40 blocks away for 10 s, dying, or starting your own breakthrough.
+- **During strikes** (`StrikeFactor`): each guardian within 16 blocks multiplies strike damage by 0.95 (**0.90** for a
+  guardian whose chosen Dao is Lightning, RMJ ch. 1803); all guardians together floor at 0.85.
+- **Quality:** +0.04 per guardian present at the end (max +0.08).
+- **Protectors:** waves get +1 mob per guardian (max +3); each new protector picks its first target at random among the
+  cultivator, the guardians and the cultivator's loaded disciples within 16 (disciples count for targeting only, never
+  for strike reduction).
+- HUD "Dikawal: 2"; gold qi threads (`CombatFxIds` thread) once per strike.
+- **Rewards on success:** each guardian gets 10% of their own bar (`XpSource.SECT`; Stored Qi when bottlenecked);
+  failure gives half. Once per guardian–cultivator pair per 20 min (`extra.combat.guard_last`). No comprehension (no
+  source gives insight for watching a tribulation).
+- Advancements `hu_fa_tribulation` and `great_hu_fa` (5 guards). Strikes still hit only the cultivator.
+
+**Session sync** (`sessionExtra.trib`): `phase` (0 none, 1 omen, 2 strikes, 3 settling), `done`, `total`, `next` (game
+time), `pct` (the next strike's effective share including `strikeFactor` and the last ×2), `cx`, `cz`, `rx`, `rz`,
+`rend`, `tx`, `tz` (twin ring), `guards`. Dirty at the omen, at each telegraph and at each strike.
+
+**Kept in `Tribulation`:** the formation ×0.85, `FeatTracker.onTribStrike`, `countSurvivedStrike`
+(`extra.kultivasi.trib_strikes`), the protector waves every 3 strikes, the Nether fire guard.
+
+#### 19.3.9 Jalan Kultivasi tablet: Langkah Pertama, Ujian Fondasi, Kewajiban Harian (P7-jalan)
+
+**Why.** A player who never reads PANDUAN.md has no idea what to do after the root test; the mid game has no direction
+beyond "fill the bar"; short sessions between Valorant matches need goals.
+
+The **"Jalan / Path"** tablet (`client/screen/JalanPage`, `TAB_JALAN`, also `/kultivasi jalan`) has three sections
+switched with jade coins: **Langkah · Ujian · Harian**. Server logic in `goals/*`, saved in `extra.goals`.
+
+**(a) Langkah Pertama / First Steps.** 20 steps in 5 chapters, a bitmask in `extra.goals.guide`.
+
+**Sumber / Source.** *Terinspirasi dari* Yao Lao's guidance of Xiao Yan (BTTH, DESIGN 20); chapter rewards
+*Terinspirasi dari* BTTH ch. 20 (Yao Lao refines Foundation Elixirs "tailored for you"). The steps are game design.
+
+- Steps complete when their advancement is granted (`Advancements.addListener`). **Backfill on join:** each step's
+  advancement is checked with `getOrStartProgress(holder).isDone()`, so veterans are never told to "test your root".
 - Each step shows a "how" line using live key names (`KeyMapping.getTranslatedKeyMessage()`).
 
-| Chapter | Steps (advancement) |
+| Chapter | Steps (advancement or check) |
 |---|---|
-| 1 Manusia Fana | test your root (`root_tested`) · meditate (`first_meditation`) · fill the bar at Mortal (bar full, shows "Bar 34/60") · awaken (`awakening`) |
-| 2 Pemurnian Qi | cast Qi Palm (`first_technique`) · take a pill (`first_pill`) · sit at a spiritual site or build the Small Qi Formation (`spiritual_site` or `qi_formation_small`) · break through to Foundation (`first_breakthrough`) |
+| 1 Manusia Fana | test your root (`root_tested`) · meditate (`first_meditation`) · fill the bar at Mortal ("Bar 34/60") · awaken (`awakening`) |
+| 2 Pemurnian Qi | cast a technique (`first_technique`) · take a pill (`first_pill`) · sit at a spiritual site or build the Small Qi Formation (`spiritual_site` or `qi_formation_small`) · break through to Foundation (`first_breakthrough`) |
 | 3 Fondasi | fly on your sword (`flying_sword`) · refine a pill (`first_alchemy`) · find a spirit stone (`first_spirit_stone`) · survive the Golden Core tribulation (`first_tribulation`) |
-| 4 Inti Emas | choose a Dao (`dao_chosen`) · comprehend a book or scroll (`first_book` or `first_ancient_scroll`) · slay a demon beast (`first_elite`) · awaken a spirit beast or build a protective formation (`spirit_beast` or `formation_built`) |
+| 4 Inti Emas | choose a Dao (`dao_chosen`) · learn from a book, jade slip or inheritance (`first_book`, `jade_slip` or `inheritance`) · slay a demon beast (`first_elite`) · awaken a spirit beast or build a protective formation (`spirit_beast` or `formation_built`) |
+| 5 Sekte | open the Kitab Teknik and fill 4 seals of the Cincin Segel (JALAN `seen:codex` + `Loadout.slots` ≥ 4, checked every 100 ticks) · found a sect or accept a candidate at the hall (`sect_founded` or `first_recruit_hall`) · take your first disciple (`first_disciple`) · bring home a first expedition (`first_expedition`) |
 
-- **Chapter rewards** (config `guideRewards`, into the inventory or dropped at the feet):
+- **Chapter rewards** (config `guideRewards`; claimed with JALAN `claim:<chapter>`, into the inventory or dropped at
+  the feet):
 
   | Chapter | Reward |
   |---|---|
   | 1 | 2 Qi Gathering Pills (Mid) |
   | 2 | 1 Healing + 1 Qi Recovery Pill |
   | 3 | 1 Tribulation Warding Pill + 4 Low stones |
-  | 4 | 1 Mid stone + an enchanted book mapped to the chosen Dao (DESIGN 7) |
+  | 4 | 1 Mid stone + a jade slip (`JadeSlips.stack`) of a Kuning-grade spec of the chosen Dao the player does not know yet (else 2 Mid stones) |
+  | 5 | 2 Mid stones + 1 Shield Talisman (power 3) |
 
-- **GuideTracker HUD:** a jade slip at the top left, about 120 GUI px wide, scaled down on small screens, avoiding the boss bar and effect icons.
+- **GuideTracker HUD** (`client/goals/GuideTracker`): a jade slip on the **right edge, vertically centred** (clear of
+  `BuildHud` top left, the `CodexHud` toasts and effect icons top right, boss bars and `RedSkyHud` top centre, `QiHud`
+  bottom left), about 120 GUI px wide, scaled down on small screens.
   - Shows the chapter seal, the step, 1–2 "how" lines and progress.
   - Shrinks to a 12 px seal after 20 s without change; expands for 8 s on a change or when the info key is pressed.
-  - Plays an amethyst chime and a gold flash when a step completes.
-  - The **"Sembunyikan panduan"** coin sends `GUIDE_HIDE`. The tracker hides itself after chapter 4.
+  - Amethyst chime and gold flash when a step completes. The **"Sembunyikan panduan"** coin sends JALAN `hide`. The
+    tracker hides itself after chapter 5. Advancement `guide_complete`.
 
 **(b) Ujian Fondasi / Foundation Trials.** Three optional trials for every major breakthrough from Golden Core up.
 
-- A set opens when the player enters the realm or layer below its target. Progress is a snapshot of counters taken at that moment; "ever" items use lifetime flags.
-- Counters come from `extra.combat` (P6-pertempuran) and the module's own `extra.goals.c`:
-  - Meditation seconds by site, formation and dimension, read every 20 ticks while meditating.
-  - Spiritual-site types seen (`SpiritSites.current(player).sites()`).
-  - Dimensions visited.
-  - Ores mined.
+**Sumber / Source.** *Terinspirasi dari* ISSTH ch. 76 and 100 (a Foundation graded by its cracks; the Perfect
+Foundation) and AWE (Earth-Dao and Heaven-Dao Foundation), both already in DESIGN 20.3.18. The trial contents and
+"Fondasi Kokoh" are game design.
+
+- A set opens when the player enters the realm or layer below its target; progress is a snapshot of counters taken at
+  that moment; "ever" items use lifetime flags.
+- Counters: `extra.combat` (elite kills, `boss_ever`; P7-tempur), `extra.harta.refined` (P7-harta), `data`
+  (comprehension, enlightenments), and the module's own `extra.goals.c` (meditation seconds by site, formation tier,
+  dimension and vein grade, read every 20 ticks while meditating; spiritual-site types seen; dimensions visited; ores
+  mined; technique kills).
 
 | Target | Trial 1 | Trial 2 | Trial 3 |
 |---|---|---|---|
@@ -985,482 +1499,248 @@ The **"Jalan / Path"** tablet has three sections, switched with jade coins: **La
 | IA L2 | comprehension 60 | 30 min in a Heavenly formation | 1 Raja Siluman |
 | IA L3 | ever killed a Warden | 3 enlightenments | refine 5 pills |
 | IA L4 | `nether_tribulation` or `end_tribulation` | 10 tier-2+ elites | 20 min in a Great Spirit Vein |
-| IA L5 | 2 boss insights | comprehension 75 | 2 Raja Siluman |
+| IA L5 | 2 boss types ever slain | comprehension 75 | 2 Raja Siluman |
 | IA L6 | 5 enlightenments | 30 min meditating in the End | 15 tier-2+ elites |
 | IA L7 | comprehension 90 | 3 Raja Siluman | refine 8 pills |
-| IA L8 | 4 boss insights | 45 min in a Heavenly formation | 20 tier-2+ elites |
+| IA L8 | all 4 boss types ever slain | 45 min in a Heavenly formation | 20 tier-2+ elites |
 | IA L9 | 6 spiritual-site types seen | 8 enlightenments | 5 Raja Siluman |
-| True Immortal | 6 site types seen | 4 boss insights | comprehension 100 |
-
-- **Rewards** (registered by Goals as Breakthrough/Tribulation providers for exactly that target):
-  - +0.07 quality score per completed trial.
-  - All three: a further +0.05, plus strikes ×0.9 (**"Fondasi Kokoh"**).
-- Nothing is mandatory and there is no penalty. Advancement `foundation_trials` for the first full set.
-
-**(c) Tugas Harian / Daily Tasks** (config `dailyTasks`).
-
-- **Refresh:** 3 tasks per in-game day (overworld `gameTime / 24000`). A refresh also needs at least 18,000 ticks played since the last one, so sleeping through nights cannot farm them.
-- **Pool.** Tasks whose feature is unavailable are never rolled.
-  - Kill `8 + 2 × realm` monsters.
-  - Slay 1 elite (Qi Refining+).
-  - Meditate 8 min without a break.
-  - Meditate 5 min at a site ×2+.
-  - Kill 5 monsters with techniques.
-  - Refine 2 pills (after `first_alchemy`).
-  - Mine 6 gold, diamond or emerald ores without Silk Touch.
-  - Harvest 2 spirit herbs (`extra.harta.herbs_found`).
-  - Kill a monster during a thunderstorm (`extra.combat.thunder_kills`).
-- **Rewards:**
-  - Each task: 4% of the current bar via `Progression.grantXp(…, XpSource.TRIAL)`.
-  - All three: 1 Low stone.
-  - Streak: +10% per consecutive day, up to +50%. A missed day resets it.
-- 3 small dots beside the realm name on the HUD. Advancement `daily_streak_5`.
-
-**Safety and performance.** Pure player data. Checks run every 100 ticks, plus one kill listener and one block-break listener. No world changes.
-
-#### 19.2.4 Roda Segel and Segel Cepat: seal wheel and quick seals (UX, P6-jalan)
-
-- **Opening the wheel.** Hold the cast key (G) for 180 ms or more to open **"Roda Segel"** around the crosshair.
-  - Radius 46 GUI px, up to 12 seals from `Techniques.castableTechniques(data)`.
-  - Each seal: glyph, element-coloured frame, scaled qi cost (`Techniques.qiCost`), radial cooldown sweep, greyed when unaffordable.
-  - The centre shows the hovered name, cost, cooldown and one description line.
-- **Input while open.** `MouseHandlerMixin` cancels `turnPlayer` and feeds the mouse deltas to the selector; WASD keeps working. The mouse wheel steps around the ring (an `onScroll` HEAD cancel). Verify the field names in mcsrc.
-- **Release.** Sends the existing `SELECT_TECHNIQUE` (text = id). With the setting **"Lepas = rapal"** (default off) it sends the existing `CAST` with text = id instead.
-  - A tap under 180 ms casts on release as today.
-  - **"Tahan G untuk roda"** (default on) can be switched off for zero cast delay.
-  - A separate **"Roda Segel"** key is unbound by default.
-- **Segel Cepat 1–4.** Four new keys, unbound by default.
-  - While the wheel is open, hovering a seal and pressing 1–4 pins it to that slot (saved in `kultivator-client.json`). The key then sends `CAST` with text = id.
-  - When any slot is bound, the HUD shows four 10 px tiles with their own cooldown sweeps.
-- **Carousel.** `,` and `.` show a 1.2 s carousel: the previous and next seals as 60%-alpha ghost tiles.
-
-**Safety and performance.** Client-only. The server still runs every check in `tryCast` (no new server action is needed).
-
-#### 19.2.5 Urat Roh and Kultivasi Tertutup: living spirit veins, meditation rework, cave abode (refinement, P6-kultivasi)
-
-**Why.** Every region is the same, so where you meditate barely matters. Flat meditation XP is meaningless from Deity Transformation up. Formations become a net loss on drained veins at high realms.
-
-**Vein grades.** A seeded hash of `(level.getSeed(), dimension id, regionX, regionZ)` gives u in [0,1):
-
-| u range | Grade | Indonesian / English | Cap |
-|---|---|---|---|
-| < 0.02 | 2 | Urat Roh Agung / Great Spirit Vein | 2.0 |
-| < 0.10 | 1 | Urat Roh Kaya / Rich Spirit Vein | 1.4 |
-| < 0.18 | −1 | Urat Roh Tipis / Thin Spirit Vein | 0.6 |
-| otherwise | 0 | normal | 1.0 |
-
-- Untouched regions sit at their cap and nothing is stored.
-- Regen: `0.0004 × cap` per second toward the cap (empty → full in about 42 min).
-- Saved entries are clamped to [0, cap]. Old saves stay valid.
-- New public API: `SpiritVeins.grade(level, pos)` and `cap(level, pos)`. `density()` now returns 0…2.0.
-
-**Meditation formula** (in `Meditation.second`):
-
-```
-base   = max(0.6 + 0.25 × realm, Rank(realm, layer, 0).xpRequired() / 3000)
-xp/s   = base × min(5.0, site × formation × fuel) × max(0.15, density)
-         × Sects.meditationBonus × (1 + 0.05 × seclusionStacks)
-drain/s = 0.0015 × (1 + 0.10 × realm) × fuel 0.5 × formation (Great 0.6, Heavenly 0.35) × abode 0.5
-```
-
-- **Base rates:** unchanged up to Nascent Soul (1.6/s); Deity Transformation 4.0, Dao Union 10, IA L1 20, IA L9 68, True Immortal 83.3.
-- **Pace:** a plain Early stage takes about 50 min; fully optimised, about 5–10 min.
-- **Formation floor:** while a Great (Heavenly) qi formation is active at the seat, drain never takes density below 0.30 (0.45).
-- **Enlightenment:**
-  - Burst 25% → **20%** of the bar.
-  - Chance per minute = `(0.04 × site + 0.02 with a Dao) × 1.5 after 30 min of seclusion × Enlightenment.boostChance factor + 0.02 (IA perk L8)`, capped at 0.5.
-- `Meditation.percent` shows values above 100% ("Kepadatan Qi 180% · Urat Roh Agung").
-
-**Kompas Urat Roh / Spirit Vein Compass.**
-- Shapeless recipe: compass + amethyst shard + gold ingot + glow berries.
-- Use (5 qi, 60 s cooldown): spiral search over hash values only (no chunk loading), up to 32 regions (about 2,048 blocks), for the nearest Great vein, else the nearest Rich.
-- Writes `minecraft:lodestone_tracker {target: region centre, tracked: false}`. The item definition copies the vanilla compass `range_dispatch` with target `lodestone`, so the needle points with zero client code.
-- Tooltip: grade and distance.
-
-**Kultivasi Tertutup / Closed-door seclusion.**
-- Unbroken meditation earns +1 stack every 300 s, up to 5 (+25% XP). After 1,800 s, enlightenment chance ×1.5.
-- When meditation ends after at least 60 s, a summary line: "Meditasi 32 menit: +4.210 kultivasi · 2 pencerahan · kepadatan 180% → 95%" (or "+… Qi Tertimbun").
-- Advancement `seclusion_hour` (60 min unbroken).
-
-**Gua Kediaman / Cave Abode.**
-- `/kultivasi gua tetapkan` while meditating on a seat with qi formation tier 1+ inside an active protective formation (`ProtectiveFormations.insideActiveFormation`).
-- One per player, saved in `extra.kultivasi.abode`. `gua lihat` shows it; `gua hapus` removes it.
-- Within 6 blocks of the seat:
-  - vein drain ×0.5
-  - enlightenment chance +0.01
-  - seclusion stacks survive a break of 10 s or less
-  - the Return Talisman's target (19.2.8)
-- Advancements `cave_abode`, `great_vein`.
-
-**Stone fuel.** `SpiritStones.isStone/grade` on the offhand stack, consumed at the start of each period, inactive at a full bottleneck (19.2.2).
-
-**HUD data** in `sessionExtra`: `vein_grade`, `seclusion`, `fuel`, `fuel_end`, `fuel_idle`, `abode`.
-
-**Safety and performance.** Data only, O(1) per second; the compass does at most about 4,000 hash evaluations per use.
-
-#### 19.2.6 Inti Binatang: beast cores (new feature, uses in P6-harta, drops from P6-pertempuran)
-
-**Items.**
-- `beast_core_low / _mid / _high / _king`: **Inti Binatang Rendah / Menengah / Tinggi / Raja**.
-- Component `kultivator:core_element` (Element id). Display name, for example "Inti Binatang Api · Menengah" / "Fire Beast Core · Mid".
-- Tint: the item definition uses `"tints":[{"type":"minecraft:custom_model_data","index":0,"default":…}]` and the stack carries `minecraft:custom_model_data {colors:[element colour]}`. One texture per grade.
-
-**Drops** (decided by P6-pertempuran):
-- Elites: always, grade = tier.
-- Bosses (Wither, Warden, Ender Dragon, Elder Guardian): 1 Raja core of a random element, only for the first kill of that boss type per player per in-game day.
-- Normal `Enemy` kills by Qi Refining+ players: 1.5% × Karma factor for a Low core of the mob's element.
-- Never from protectors (except elite protectors), spawner mobs, heart demons, or mobs without an element.
-
-**Uses (P6-harta).**
-
-1. **Absorb (sneak-use).** XP via `Progression.grantXp(…, XpSource.PILL) × PillToxicity.effectiveness`:
-
-   | Grade | XP | Toxin | Heart demon pressure | Comprehension (element affine to chosen Dao) |
-   |---|---|---|---|---|
-   | Low | min(3% of bar, 150) | 6 | +4 | +0.5 |
-   | Mid | min(6%, 900) | 10 | +6 | +1 |
-   | High | min(10%, 5,000) | 16 | +10 | +2 |
-   | Raja | min(15%, 25,000) | 28 | +20 | +4 |
-
-   - +50% XP when the element is in the player's root.
-   - Element → Dao affinity per DESIGN 6 (Metal→Sword, Fire→Fire, Water/Ice→Ice, Lightning→Lightning, Earth→Body, Wood→Life, Wind→Shadow, Space→Space).
-2. **Feed your spirit beast** (own `UseEntityCallback`, calls the existing `SpiritBeasts.addXp`).
-   - +60 / 150 / 400 / 1,000 beast XP; ×1.5 for a matching element (wolf: Lightning/Metal, fox: Fire/Wood).
-   - Own 10 s cooldown per beast, separate from the 30 s pill cooldown.
-3. **Alchemy catalyst or required core.** See 19.2.9.
-4. **Talisman catalyst.** See 19.2.8.
-
-**Advancements:** `first_beast_core`, `king_core`.
-
-#### 19.2.7 Tanaman Roh: spirit herbs with age (new feature, P6-harta)
-
-Own `PlayerBlockBreakEvents.AFTER` listener; Qi Refining+, survival, not a FakePlayer, config `herbHarvest`.
-
-**Infusion test.** A plant is "spirit-infused" when `hash(seed, pos, herbKind, overworldDay) < p × mods`.
-- Deterministic per position and day, so a bone-meal farm gets one roll per spot per day. Divine Sense can show the same result.
-- mods: Wood root or Life Dao ×2; × `min(2.0, SpiritSites.current(player).multiplier())`. The site value is only read when the hash is below `4p`, so it is rare.
-
-| Item | Indonesian / English | Plant and condition | p |
-|---|---|---|---|
-| `spirit_grass` | Rumput Roh / Spirit Grass | short/tall grass, fern, large fern, Overworld | 1.5% |
-| `blood_ginseng` | Ginseng Darah / Blood Ginseng | mature carrot/potato/beetroot; ×2 in jungle, taiga, old growth or cherry | 1% |
-| `snow_lotus` | Teratai Salju / Snow Lotus | any small flower or age-3 sweet berry bush where `Biome#coldEnoughToSnow` | 4% |
-| `hellfire_lotus` | Teratai Api Neraka / Hellfire Lotus | mature nether wart, crimson/warped fungus or roots, Nether | 3% |
-| `moonlight_orchid` | Anggrek Cahaya Bulan / Moonlight Orchid | any small flower at night with sky access; full moon ×3 | 2% |
-| `thunder_grass` | Rumput Petir / Thunder Grass | any grass or flower during a thunderstorm with sky access | 5% |
-| `void_lily` | Lili Kehampaan / Void Lily | chorus flower or plant, End | 4% |
-| `purple_lingzhi` | Lingzhi Ungu / Purple Lingzhi | red/brown mushroom in mushroom fields, the Deep Dark, or below y 0 | 3% |
-
-**Harvest.**
-- The herb pops beside the plant (`popResource`) with component `kultivator:herb_age` (years).
-- Age = `round((10 + r × 90) × clamp(density, 0.5, 2.0) × min(2.0, site))`, with r from the same hash. A 1% chance multiplies it ×10.
-- Tooltip: "Umur: 340 tahun". At 1,000 years or more the name is gold ("… Seribu Tahun") and a single server-wide line is shown.
-- Each find drains 0.02 vein density and counts `extra.harta.herbs_found`.
-- Herbs are **never plantable** (no custom crop blocks).
-
-**Uses.** Auxiliary herb and new recipes, see 19.2.9.
-
-**Divine Sense refinement.** Infused plants within the existing radius 12 are pinged in green (`0x6CFF8A`) through the existing `OrePings` payload. It already carries a colour per position, so no payload change is needed.
-
-**Advancements:** `first_herb`, `thousand_year_herb`.
-
-#### 19.2.8 Jimat: talismans (new feature, P6-kultivasi)
-
-**Blank.** **Kertas Jimat Kosong / Blank Talisman**: shapeless 3 paper + ink sac + gold nugget → 3.
-
-**Inscribing.**
-- Blank in the main hand, catalyst in the offhand, sneak-use: a 40-tick channel (brush effect); needs Qi Refining+.
-- At the end it costs the qi below and 1 catalyst.
-- Result: a typed talisman with component `kultivator:talisman {power, inscriber}`, where power = the inscriber's realm ordinal (1–8).
-- A **beast core of the matching element** may replace the catalyst: power +1 (+2 for High or Raja), cap 9.
-- **Talisman skill** (`extra.talisman.xp`):
-  - +4 XP per success, +1 per failure.
-  - Level = `min(10, floor(sqrt(xp / 8)))`.
-  - Success chance = `0.60 + 0.035 × level` (max 0.95).
-  - A failure burns the blank and the catalyst into ash particles (items only).
-
-**Activation.** Anyone can use a talisman, even a Mortal: a 10-tick use, consumed, 1 s shared cooldown. They stack to 16. Every offensive talisman goes through `Targeting` and `Techniques.hurt` (monsters only).
-
-| Item | Indonesian / English | Catalyst | Inscribe qi | Effect |
-|---|---|---|---|---|
-| `thunder_talisman` | Jimat Petir / Thunder | copper ingot (Lightning core) | 20 | Particle bolt on the looked-at monster within 24: `4 + 2 × power`; chains to 1 more within 5 at 50% |
-| `holy_flame_talisman` | Jimat Api Suci / Holy Flame | blaze powder (Fire core) | 20 | 6-block 60° cone: entity ignite 5 s + `3 + 1.5 × power` |
-| `golden_shield_talisman` | Jimat Perisai Emas / Golden Shield | gold ingot (Earth core) | 25 | Absorption amplifier `min(4, power / 2)` for 60 s |
-| `sealing_talisman` | Jimat Penyegel / Sealing | chain (Ice core) | 20 | Looked-at monster within 16: Slowness VII + Weakness I for `3 + 0.5 × power` s (bosses ×0.25) |
-| `return_talisman` | Jimat Pulang / Return | ender pearl (consumed as ink, never thrown) | 40 | 5 s channel (cancelled by damage or moving more than 1 block). Target, in order: your Cave Abode in this dimension → your respawn point (`ServerPlayer.RespawnConfig`) in this dimension → world spawn if in the Overworld → otherwise refused. Uses `Targeting.safeSpot` + `setPortalCooldown`; refused without a safe spot. 10 min cooldown. Refused during a breakthrough, trial, duel, or within 10 s of being hurt. |
-| `tribulation_ward_talisman` | Jimat Penangkal Petir / Tribulation Ward | lightning rod item | 35 | Only during your own tribulation strikes: next strike ×0.5 (a `StrikeFactor` provider). At most 2 per tribulation; the count resets in `onOmen`. |
-| `purifying_talisman` | Jimat Pembersih / Purifying | milk bucket (bucket returned) | 15 | Clears Poison, Wither, Nausea, Blindness, Darkness, Slowness, Weakness; toxicity −`(5 + 1.5 × power)` |
-| `heavens_eye_talisman` | Jimat Mata Langit / Heaven's Eye | glow ink sac | 15 | Glowing on monsters within `16 + 2 × power` for 10 s |
-
-- Balance: a Thunder Talisman at Golden Core power (10 damage, 1 chain) stays below Thunder Palm.
-- Client: `FxType.TALISMAN` (a = type) draws the paper burning into glyphs.
-- **Advancements:** `first_talisman`, `talisman_master` (level 10).
-
-**Safety.** Items, particles and entity effects only. The Return talisman never uses or creates a portal and stays in the same dimension.
-
-#### 19.2.9 Alkimia Lanjutan and Kitab Alkimia: deeper alchemy and a recipe tablet (refinement, P6-harta)
-
-**Pot rules.**
-- `AlchemyPots.CAPACITY` 8 → 10. Stones, herbs and cores are accepted ingredients.
-- Matching:
-  1. Remove up to 2 spirit stones (catalysts).
-  2. Remove 1 beast core (catalyst), unless the recipe requires a core.
-  3. The rest must equal a recipe's ingredients **plus at most one extra herb** (the auxiliary herb, the oldest one not needed by the recipe).
-- Effects:
-
-  | Extra in the pot | Effect |
-  |---|---|
-  | Each Low stone | success +0.05 |
-  | Each Mid+ stone | success +0.10, quality roll +0.1 |
-  | Auxiliary herb | quality roll + `min(0.30, age / 3333)` (100 years +0.03, 1,000 years +0.30) |
-  | Catalyst core Low / Mid / High / Raja | success +0.05 / +0.08 / +0.12 / +0.18; quality floor – / Mid / High / Perfect |
-
-  Success is still capped by `MAX_CHANCE` (0.95).
-- Alchemy-refined Marrow Cleansing Pills now carry `pill_quality` (needed for 19.2.15). Crafting-table marrow pills count as Mid.
-
-**New pills** (`PillKind` + items):
-
-| Item id | Indonesian / English | Recipe | Effect | Toxin |
-|---|---|---|---|---|
-| `dao_insight_pill` | Pil Wawasan Dao / Dao Insight Pill | Moonlight Orchid + Purple Lingzhi + Echo Shard → 1 | +3 × quality comprehension to the chosen Dao, never above 60. At most 5 per realm (`extra.harta.insight_pills`). Refused (pill kept) without a Dao. | 18 |
-| `toxin_purging_pill` | Pil Penawar Racun / Toxin Purging Pill | Snow Lotus + Honey Bottle + Spirit Grass → 2 | Toxicity −35 × quality | 0 |
-| `enlightenment_pill` | Pil Pencerahan / Enlightenment Pill | Moonlight Orchid + Glow Berries + Amethyst Shard → 2 | `Enlightenment.boostChance(player, 2.0, 12000)` (×2 chance for 10 min) | 10 |
-| `bone_tempering_pill` | Pil Penempa Tulang / Bone Tempering Pill | Bone Block + Iron Ingot + Golden Carrot + **Earth core Mid+** (required) → 2 | +1 max health permanently (Perfect +2), cap +10 total, modifier `kultivator:bone_tempering`, re-applied on join and respawn by Harta | 12 |
-
-**Alternative recipes** (same outputs, so every herb has a use):
-- Ginseng Darah + Golden Carrot + Glistering Melon → 3 Healing.
-- Teratai Api Neraka + Gold Ingot + Golden Apple → 2 Golden Core.
-- Rumput Petir + Copper Ingot + Phantom Membrane + Iron Ingot → 2 Tribulation Warding.
-- Lili Kehampaan + Ghast Tear + Echo Shard + Chorus Fruit → 3 Soul Nurturing.
-
-**Kitab Alkimia tablet** (`AlchemyBookPage`):
-- A card per `AlchemyRecipes.all()` entry: output icon × count, ingredient icons × n, colour band, alchemy XP.
-- A check mark and "Bisa diracik 2×" when the inventory holds all the ingredients.
-- Header: alchemy level, XP to the next level, success chance with campfire / soul campfire / Fire Dao (`AlchemyFurnace.successChance`).
-- Footer: what catalysts and auxiliary herbs do.
-
-**Tooltips** (`PillTooltips`): ingredient items show "[Shift] Bahan alkimia"; holding Shift lists the pills they make.
-
-#### 19.2.10 Tribulasi Hidup: lightning rings and Pengawal Dao (refinement, P6-pertempuran)
-
-**Lingkar Petir / telegraphed strikes.** From target Deity Transformation up; config `tribulationTelegraph`.
-
-- **Telegraph:** 30 ticks before each strike, the ring centre is captured at the player's feet. `FxType.TRIBULATION_RING` draws a glowing sigil ring of radius 1.5 (a = variant, b = strike number).
-- **Impact:** if the player is horizontally more than 1.5 blocks from the centre, the strike only **grazes** for 40% damage. Otherwise it hits in full. The would-kill check uses the final damage, so never-lethal stays intact.
-- **Twin strikes (target IA and TI):** every 4th strike has twin rings, the second 3 blocks away in a random direction. Standing in either ring takes the full hit.
-- **"Menantang Langit" (Defy the Heavens):** a quality provider.
-  - +0.12 when every telegraphed strike was taken in full.
-  - Otherwise −0.02 per graze (floor −0.10).
-  - Dodging keeps `lowestHealth` higher, so the player makes a real choice.
-  - Advancement `defy_heaven`.
-- The 6-block cancel radius is unchanged; a 2-block sidestep is enough.
-
-**Pengawal Dao / Dao Guardian** (co-op; distinct from the monster "Pelindung Dao" waves).
-
-- **Joining:**
-  - When the omen starts (target Golden Core+, not a debug test), online sect mates in the same dimension get a chat line with the target realm, distance and direction, and a clickable **[Kawal]** that runs `/kultivasi kawal <player>` (registers from up to 64 blocks).
-  - Any player within 24 blocks when strike 1 lands is registered automatically.
-- **Losing the role:** more than 40 blocks away for 10 s, dying, or starting your own breakthrough.
-- **During strikes:**
-  - Each guardian within 16 blocks multiplies strike damage by 0.95; all guardians together floor at 0.85. This is a `StrikeFactor` provider.
-  - Quality +0.04 per guardian present at the end (max +0.08).
-  - Protector waves get +1 mob per guardian (max +3), and each new protector picks its first target at random among the cultivator and the guardians.
-  - The cultivator's HUD shows "Dikawal: 2". Gold qi threads are drawn by `FxType.DAO_GUARDIAN`, once per strike.
-- **Rewards on success:**
-  - Each guardian gets 10% of their own bar (`XpSource.SECT`; Stored Qi if bottlenecked) and +0.5 comprehension of their Dao (×3 for the Lightning Dao).
-  - Failure: half of that.
-  - Once per guardian–cultivator pair per 20 min (`extra.combat.guard_last`).
-  - Advancements `dao_guardian`, and `great_guardian` after 5 guards.
-- Strikes still hit only the cultivator.
-
-**Session sync for the HUD** (`sessionExtra.trib`): `phase` (0 none, 1 omen, 2 strikes, 3 settling), `done`, `total`, `next` (game time), `pct` (the next strike's effective share, last ×2 included), `cx`, `cz`, `rx`, `rz`, `rend`, `tx`, `tz` (twin ring), `guards`. Marked dirty at the omen, at each telegraph and at each strike, so about one sync every 1.5–3.5 s.
-
-#### 19.2.11 Prakiraan Terobosan and HUD Tribulasi: breakthrough forecast and live tribulation HUD (UX, P6-jalan)
-
-**Persiapan panel.** On the Status page (fold-out) and in the breakthrough talisman's tooltip. It only uses the real helpers, never copies of the formulas:
-
-- **Foundation step:** `Breakthrough.chance(data, site)` with a breakdown (base 75% + root + pill + stored qi), plus a tip about sites.
-- **Tribulation steps:**
-  - Strikes from `Tribulation.strikeCount`.
-  - Per-strike damage `strikePct × nextTribulationFactor × max health` in hearts, last ×2, plus the total and the healing needed.
-  - Golden Core: 3 × 15%, last 30% → 60%, no healing needed.
-  - Dao Union: 9 × 18%, last 36% → 180%, "heal about one full bar during it".
-  - The trial bonus from 19.2.3 is included.
-  - Whether a heart demon comes first (`cfg.hd`, target NS/DU/TI, trial not passed): 120 s, 1.2× your HP.
-  - Protector waves (`cfg.dp`; strikes/3 waves of `1 + target/2` mobs).
-  - Ring telegraphs from Deity Transformation.
-  - The dimension variant (Nether: bring Fire Resistance).
-- **Checklist:**
-  - ✓ health ≥ 90%
-  - ✓ healing items in the inventory (golden apples, enchanted golden apples, Healing Pills: counted)
-  - ✓ Warding taken (factor < 1)
-  - ✓ allies within 16 (visible players and tamed animals)
-  - ✓ toxicity < 80
-  - ✓ not deviating
-  - Hardcore is shown in red.
-
-**Tribulation HUD.** Below the boss bar, from `sessionExtra.trib`:
-
+| True Immortal | 6 site types seen | all 4 boss types ever slain | comprehension 100 |
+
+- **Rewards** (a `QualityBonus` and a `StrikeFactor` provider for exactly that target): +0.07 quality per completed
+  trial; all three a further +0.05 plus strikes ×0.9 (**"Fondasi Kokoh"**). Nothing is mandatory and there is no
+  penalty. Advancement `foundation_trials` for the first full set.
+
+**(c) Kewajiban Harian / Daily Chores** (renamed from Tugas Harian; config `dailyTasks`; help `harian`).
+
+**Sumber / Source.** RI ch. 10: as a servant disciple Wang Lin must fill no fewer than ten vats of water a day; a failed
+day means no food and seven days of failure mean expulsion (referred to again in ch. 16). The streak bonus is game
+design (the reverse of that penalty). These are the player's own chores, unlike the disciples' Tugas Sekte
+(`sect/event/Duties`) and the Kantor Misi offerings.
+
+- **Refresh:** 3 chores per in-game day (overworld `gameTime / 24000`); a refresh also needs at least 18,000 ticks
+  played since the last one, so sleeping through nights cannot farm them.
+- **Pool** (chores whose feature is unavailable are never rolled): kill `8 + 2 × realm` monsters · slay 1 elite (Qi
+  Refining+) · meditate 8 min without a break · meditate 5 min at a site ×2+ · kill 5 monsters with techniques · refine
+  2 pills (after `first_alchemy`) · mine 6 gold, diamond or emerald ores without Silk Touch · harvest 2 spirit herbs
+  (`extra.harta.herbs_found`) · kill a monster during a thunderstorm (`extra.combat.thunder_kills`) · inscribe 2
+  talismans (after `first_talisman`, `extra.talisman.made`).
+- **Rewards:** each chore 4% of the current bar (`Progression.grantXp(…, XpSource.TRIAL)`); all three 1 Low stone;
+  streak +10% per consecutive day up to +50%, a missed day resets it. Three small dots beside the realm name on the HUD.
+  Advancement `daily_streak_5`.
+
+**Safety and performance.** Pure player data; checks every 100 ticks plus one kill and one block-break listener.
+
+#### 19.3.10 Persiapan and HUD Tribulasi: breakthrough forecast and live tribulation HUD (P7-jalan)
+
+**Sumber / Source:** game design (UX). It only reads existing systems.
+
+**Persiapan panel** (Status page fold-out and the breakthrough talisman's tooltip). It never copies a formula:
+- The server (`goals/Prep`) writes `sessionExtra.prep {q, f, allies, stones, trials}` every 100 ticks while the bar is
+  full at a bottleneck: `q = Breakthrough.qualityBonus(...)`, `f = Tribulation.strikeFactor(...)` of the first strike,
+  allies = players plus `Disciples.loaded(owner)` and `SpiritBeasts.loadedBeasts(owner)` within 16.
+- **Foundation step:** `Breakthrough.chance(data, site)` with a breakdown (base 75% + root + pill + stored qi), plus a
+  site tip.
+- **Tribulation steps:** strikes from `Tribulation.strikeCount`; per-strike damage `strikePct × f × max health` in
+  hearts, the last ×2, plus the total and the healing needed. Golden Core: 3 × 15%, last 30% → 60%, no healing needed.
+  Dao Union: 9 × 18%, last 36% → 180%, "heal about one full bar during it". Then: the quality bonus `q` with its parts
+  (trials, stones, guardians); whether a heart demon comes first (`cfg.hd`, targets NS/DU/TI, trial not passed): 120 s,
+  1.2× your HP; protector waves (`cfg.dp`; strikes/3 waves of `1 + target/2` mobs, +1 elite from NS); ring telegraphs
+  from Deity Transformation (`cfg.tele`); the dimension variant (Nether: bring Fire Resistance).
+- **Checklist:** ✓ health ≥ 90% · ✓ healing items (golden apples, enchanted golden apples, Healing Pills: counted) ·
+  ✓ Warding taken (factor < 1) or Tribulation Ward talismans carried · ✓ allies within 16 · ✓ toxicity < 80 · ✓ not
+  deviating · Hardcore in red.
+
+**Tribulation HUD** (`client/goals/TribulationHud`), from `sessionExtra.trib`, on the **left edge, vertically centred**
+(clear of the boss bars of `HeartDemons`, `DuelArena` and Raja Siluman, of `RedSkyHud` and of the toasts):
 - Bolt pips "Petir 4/9" and a ring emptying toward the next strike.
-- "Berikutnya −5.4 ❤":
-  - white normally
-  - yellow when the next strike is more than 50% of current health
-  - flashing red with a heartbeat sound and "Petir berikutnya akan menggagalkan — pulihkan dirimu!" when `pct × max ≥ health + absorption`
+- "Berikutnya −5.4 ❤": white normally; yellow when the next strike is more than 50% of current health; flashing red with
+  a heartbeat sound and "Petir berikutnya akan menggagalkan — pulihkan dirimu!" when `pct × max ≥ health + absorption`.
 - "Keluar dari lingkar!" while a ring is active.
-- A small top-down distance ring against the 6-block limit (amber above 4.5, red above 5.5, with an arrow back to the centre).
-- The guardian count.
+- A small top-down distance ring against the 6-block limit (amber above 4.5, red above 5.5, an arrow back to the
+  centre). The guardian count "Dikawal: 2".
 
-#### 19.2.12 Lapisan Kenaikan Abadi and uses for Qi Tertimbun: layer perks, reforging, stars (new feature, P6-kultivasi)
+#### 19.3.11 Anugerah Kenaikan, Perkokoh Fondasi, player stars and Qi Tertimbun (P7-kultivasi)
 
-**Layer perks.** A perk is active when realm = IA with layer ≥ n − 1, or realm = True Immortal. Attribute perks are added in `Stats.apply` with ids `kultivator:perk_*`.
+**Anugerah Kenaikan / Ascension Boons.** Each Immortal Ascension layer opens Immortal meridians ("Urat Abadi
+terbuka"). A boon is active when realm = IA with layer ≥ n − 1, or realm = True Immortal. Attribute boons are added in
+`Stats.apply` with ids `kultivator:perk_*`.
 
-| Layer | Perk (Indonesian / English) | Effect |
-|---|---|---|
-| L1 | Napas Abadi / Immortal Breath | OXYGEN_BONUS +3, BURNING_TIME −50% (ADD_MULTIPLIED_BASE −0.5) |
-| L2 | Langkah Ringan / Light Step | STEP_HEIGHT +0.5, WATER_MOVEMENT_EFFICIENCY +0.5 |
-| L3 | Kulit Giok / Jade Skin | ARMOR_TOUGHNESS +4, KNOCKBACK_RESISTANCE +0.25 |
-| L4 | Lautan Qi / Qi Sea | max qi ×1.15 (`Qi.max`) |
-| L5 | Tangan Langit / Heaven's Reach | ENTITY_INTERACTION_RANGE +1.5, BLOCK_INTERACTION_RANGE +1.0 |
-| L6 | Arus Abadi / Eternal Flow | qi regen ×1.25 (`Qi.regenPerSecond`) |
-| L7 | Jiwa Tak Hancur / Unbroken Soul | see below |
-| L8 | Pikiran Jernih / Clear Mind | enlightenment +0.02 per minute; heal 0.5 HP/s while meditating |
-| L9 | Gerbang Surgawi / Heavenly Gate | the True Immortal tribulation's strikes ×0.85 (`StrikeFactor`) |
+**Sumber / Source** (the system). ISSTH Book 6 ch. 963–983: at Immortal Ascension the Door of Immortality opens and
+Immortal meridians open with it (Fan Dong'er 96 in ch. 963; Meng Hao 8, then 95, 116 and 122 in ch. 965, 974, 978,
+983). The effects and numbers are game design.
 
-- **L7 details:** `ServerLivingEntityEvents.ALLOW_DEATH`, once per 24,000 game ticks (`extra.kultivasi.unbroken_at`).
-  - The player is left at 1 HP, gets Absorption (amplifier ≈ 50% of max health / 4) for 5 s and Resistance III for 3 s, and loses all current qi.
-  - Golden shatter effect. Advancement `unbroken_soul`.
-  - Not triggered by sources tagged `BYPASSES_INVULNERABILITY` (`/kill`, void).
-- On reaching a new perk, `ImmortalPerks.tick` (every 20 ticks, compares `extra.kultivasi.perk_count`) shows a title and chat line "Anugerah Kenaikan: Napas Abadi — …" and calls `Stats.apply`.
-- **Health curve:** layer coefficient 2 → **4**; True Immortal flat bonus 60 → **40**. IA L9 Peak: +63; True Immortal: +72–75.
+| Layer | Boon (Indonesian / English) | Effect | Sumber / Source |
+|---|---|---|---|
+| L1 | Napas Abadi / Immortal Breath | OXYGEN_BONUS +3, BURNING_TIME −50% (ADD_MULTIPLIED_BASE −0.5) | *Terinspirasi dari* JTTW ch. 3 (Wukong: water cannot drown him, fire cannot burn him) and ch. 7 (the fire gods cannot burn him) |
+| L2 | Langkah Ringan / Light Step | STEP_HEIGHT +0.5, WATER_MOVEMENT_EFFICIENCY +0.5 | *Terinspirasi dari* the cloud-soaring Subodhi teaches in JTTW ch. 2 (already the source of `cloud_step`). The wuxia Lingbo Microsteps are not used unless the user accepts wuxia |
+| L3 | Kulit Giok / Jade Skin | ARMOR_TOUGHNESS +4, KNOCKBACK_RESISTANCE +0.25 | PW ch. 1247 (after the lightning tribulation Shi Hao's skin is snow-white like jade) |
+| L4 | Lautan Qi / Qi Sea | max qi ×1.15 (`Qi.max`) | NSHBA, Mo Nian side story ch. 3 ("his qi sea grew explosively") |
+| L5 | Tangan Langit / Heaven's Reach | ENTITY_INTERACTION_RANGE +1.5, BLOCK_INTERACTION_RANGE +1.0 | *Terinspirasi dari* the Vacuum Hand, BTTH ch. 14 (a suction technique that can suck up boulders) |
+| L6 | Urat Abadi / Immortal Meridians (renamed from Arus Abadi) | qi regen ×1.25 (`Qi.regenPerSecond`, keeping `TechniquePower.qiRegenFactor`) | ISSTH ch. 974 (Immortal qi pouring in makes 95 meridians appear) |
+| L7 | Jiwa Tak Hancur / Unbroken Soul | see below | *Terinspirasi dari* RMJ ch. 2434 (a True Immortal's Nascent Soul could have escaped) |
+| L8 | Pikiran Jernih / Clear Mind | enlightenment +0.02 per minute; heal 0.5 HP/s while meditating | *Terinspirasi dari* the Clear-Heart Melody 清心音 of *Mo Dao Zu Shi* (already the source of `clear_heart_melody`) |
+| L9 | Gerbang Keabadian / Door of Immortality (renamed from Gerbang Surgawi) | the True Immortal tribulation's strikes ×0.85 (`StrikeFactor`) | ISSTH ch. 969 (when the Door of Immortality opens, Immortal light pours out and the Tribulation Clouds dissipate) |
 
-**Tempa Ulang Fondasi / Reforge Foundation.** Action `REFORGE`, a Status-page talisman, or `/kultivasi fondasi tempa`.
-- Requires meditating with qi formation tier 2+, not deviating and not breaking through.
-- Target: the lowest recorded quality among reached realms (earliest realm on ties).
-- 30 s ritual (`BREAKTHROUGH_START` effects); cancelled at no cost if meditation stops.
-- At the end, pays `3 × Rank(realm, 0, 3).xpRequired()` from Stored Qi (Golden Core 9,225; Dao Union 184,500; IA 369,000).
-- Success: Cracked→Normal 100%, Normal→Perfect 60%, Perfect→Heavenly 25%. A failure refunds half.
-- Then `Stats.apply` + `Qi.clamp`. Advancement `foundation_reforged`.
+- **L7:** a `DeathGuard.register(Stage.PERK, …)` guard, once per 24,000 game ticks (`extra.kultivasi.unbroken_at`). The
+  PERK stage does not filter by itself, so the guard refuses `#kultivator:unblockable` (`DamageHooks.UNBLOCKABLE`),
+  `BYPASSES_INVULNERABILITY` (`/kill`, void) and duels or sparring (`DuelRules.inDuel`, `Sparring.inDuel`). The totem and
+  the technique cheat-deaths act first (earlier stages). The player is left at 1 HP, gets Absorption (amplifier ≈ 50%
+  of max health / 4) for 5 s and Resistance III for 3 s, and loses all current qi. Golden shatter (`FxType.TALISMAN`,
+  `TalismanFxIds` soul). Advancement `unbroken_soul`.
+- On reaching a new boon, `ImmortalPerks.tick` (every 20 ticks, compares `extra.kultivasi.perk_count`) shows a title
+  and the chat line "Urat Abadi terbuka: Napas Abadi — …" and calls `Stats.apply`.
+- **Health curve** (`Stats.apply`): layer coefficient 2 → **4**; True Immortal flat bonus 60 → **40**. IA L9 Peak: +63;
+  True Immortal: +72–75.
 
-**Refill after a failure** (`Deviation.tick`, when a deviation ends). If at a bottleneck with the bar not full and Stored Qi > 0, the bar refills by `min(missing, storedQi / 2)`, consuming 2 Stored Qi per XP. Message: "Qi Tertimbun mengalir kembali…".
+**Perkokoh Fondasi / Strengthen Foundation** (renamed from Tempa Ulang Fondasi; class `cultivation/Reforge`). Action
+`KULTIVASI` `reforge`, a Status-page talisman, or `/kultivasi fondasi perkokoh`.
 
-**Bintang Abadi / Immortal Stars.** Ascended, True Immortal Peak. Action `STAR_CONDENSE` or `/kultivasi bintang padatkan`.
-- Star n (1–18) costs `100,000 × 1.15^(n−1)` Qi Abadi (about 7.6 M in total).
-- Each star: +1.5% technique damage (`Techniques.power` × `ImmortalPerks.starDamageFactor`), +2 max HP, +1% max qi.
-- Shown orbiting the dantian on the Status page and as a count on the HUD.
-- Advancements `immortal_star`, `eighteen_stars`.
+**Sumber / Source.** ISSTH Book 2 ch. 134: Meng Hao already has a Perfect Foundation and still lacks a fourth Dao
+Pillar, so a foundation can gain pillars after it is built. Grades: ISSTH ch. 76 and 100 (DESIGN 20.3.18). Raising the
+quality of other realms, the costs and the chances are game design; no work re-forges a finished foundation.
 
-#### 19.2.13 Lima Unsur: the five elements in combat (refinement, P6-pertempuran)
+- Requires meditating with qi formation tier 2+, not deviating and not breaking through. Target: the lowest recorded
+  quality among reached realms (earliest realm on ties).
+- 30 s ritual (`BREAKTHROUGH_START` effects, `sessionExtra.reforge_end`); cancelled at no cost if meditation stops.
+- At the end it pays `3 × Rank(realm, 0, 3).xpRequired()` from Stored Qi (Golden Core 9,225; Dao Union 184,500; IA
+  369,000). Success: Cracked→Normal 100%, Normal→Perfect 60%, Perfect→Heavenly 25%; a failure refunds half.
+- Then `Stats.apply` + `Qi.clamp`; `extra.kultivasi.reforges` +1. Advancement `foundation_strengthened`. The disciple
+  Fondasi Dao types (20.3.18) are untouched.
 
-**Technique element.** The chosen Dao's element (Sword = Metal, Fire, Ice, Lightning, Body = Earth, Life = Wood, Shadow = Wind, Space). Without a Dao, the root's main element. Without a root, none.
+**Refill after a failure** (`Deviation.tick`, when a deviation ends). Game design (balance; Stored Qi is the DESIGN 1
+rule): at a bottleneck with the bar not full and Stored Qi > 0, the bar refills by `min(missing, storedQi / 2)`,
+consuming 2 Stored Qi per XP. "Qi Tertimbun mengalir kembali…".
 
-**Target element.**
-- An elite's element, or `MobElements.of(entity)`:
-  - Earth: zombie, husk, zombie villager, slime, silverfish, ravager
-  - Water: drowned, guardian
-  - Metal: skeleton, pillager, vindicator, piglin brute
-  - Ice: stray
-  - Wood: bogged, spider, cave spider, witch, creaking
-  - Fire: wither skeleton, blaze, magma cube, ghast, hoglin, zoglin
-  - Lightning: creeper
-  - Space: enderman, endermite, shulker
-  - Wind: phantom, vex, evoker, breeze
+**Bintang Abadi for the player.**
+
+**Sumber / Source.** BTTH: Dou grades in 1–9 stars (DESIGN 20.3.19); *Terinspirasi dari* the Ancient God stars of RI
+ch. ~1157–1159. The player's stars have no Three Trials yet (player star calamities are Phase 7b; disciples keep
+theirs).
+
+- At True Immortal Peak with a full bar every XP goes to Qi Abadi (Stored Qi). Star n costs `Stars.cost(n)` =
+  `min(5.0E9, 500,000 × 1.07^(n−1))` (the disciple constants of `disciple/path/Stars`, read-only). Stars are endless.
+- Condense with Action `KULTIVASI` `star` (one) or `star:all` (as many as affordable), the Status-page coin, or
+  `/kultivasi bintang padatkan [semua]`. Writes `extra.kultivasi.stars`.
+- Each star: +2 max health (`kultivator:star_health`) and +1% max qi (`Qi.max`). Technique damage needs no new factor:
+  `TechniquePower.starFactor` already applies, and so do the other consumers of 19.1.5. ★9 and ★18 open Gerbang Dewa I
+  and II for the player's own learning (`LearnRules`/`Unlocks`).
+- Shown orbiting the dantian on the Status page and as a count on the HUD. Advancements `immortal_star`, `nine_stars`,
+  `eighteen_stars`.
+
+**Uses of Qi Tertimbun after phase 7:** Perkokoh Fondasi, the refill, stars; stone fuel at a bottleneck feeds it.
+
+#### 19.3.12 Lima Unsur: the five elements in combat (P7-tempur; the codex line by P7-jalan)
+
+**Sumber / Source.** The overcoming cycle is classical Wuxing 相克 (real Chinese philosophy, not novel canon). Novel
+support for elements interacting in a fight: *RMJ: Immortal Realm* ch. 1049 ("certain laws of interaction have always
+existed between the five elements. Metal enhanced water…"). Mutated elements: RMJ ch. 127 (mutated roots come from two
+or three of the five elements; lightning = earth + water, ice = metal + water). Root resonance: *Tales of Demons and
+Gods* ch. 13 (Nie Li matches each friend's technique to their soul attribute, DESIGN 20.3.18). The Dao→element map, the
+mob elements, Space's +5% and every factor are game design.
+
+**Technique element** (`ElementRelations.techniqueElement(attacker, spec)`): the spec's Dao element when the spec has
+a Dao (`Dao.element()`: Sword = Metal, Fire, Ice, Lightning, Body = Earth, Life = Wood, Shadow = Wind, Space);
+otherwise (universal specs) the caster's chosen Dao's element (`techniqueElement(CultivationData)` /
+`(DiscipleData)`); without a Dao the root's main element; without a root none. Talismans and other LEGACY amounts get
+no element factor.
+
+**Target element.** An elite's element, or `MobElements.of(entity)`:
+- Earth: zombie, husk, zombie villager, slime, silverfish, ravager · Water: drowned, guardian · Metal: skeleton,
+  pillager, vindicator, piglin brute · Ice: stray · Wood: bogged, spider, cave spider, witch, creaking · Fire: wither
+  skeleton, blaze, magma cube, ghast, hoglin, zoglin · Lightning: creeper · Space: enderman, endermite, shulker · Wind:
+  phantom, vex, evoker, breeze.
 - Bosses, players and unknown mobs are neutral (none).
 
-**Families.** Water = {Water, Ice}; Metal = {Metal, Lightning}; Wood = {Wood, Wind}; Fire; Earth.
-- Overcoming cycle: Wood > Earth > Water > Fire > Metal > Wood.
-- Space is neutral and deals +5% to everything.
+**Parents.** The five base elements are their own parent. Lightning = {Earth, Water}; Ice = {Water, Metal} (RMJ ch.
+127). Wind and Space have no stated parents and are neutral in every relation.
 
-**Factor** (in `Techniques.hurt`, non-player targets only, so sparring and tribulations are unaffected):
+**Cycles.** Overcoming: Wood > Earth > Water > Fire > Metal > Wood. Generating: Wood → Fire → Earth → Metal → Water →
+Wood.
+
+**Factor** (a spine `TechniquePower` target factor, so non-player, non-arena targets only; sparring, duels and
+tribulations are unaffected). Over the parent sets A (attacker) and T (target):
 
 | Relation | Factor |
 |---|---|
-| Your element overcomes the target's | ×1.3, with element sparks (`FxType.BURST` in your element colour, at most once per target per 10 ticks) |
-| The target's element overcomes yours | ×0.8 |
-| Same family | ×0.9 |
-| Otherwise | ×1.0 |
-| Technique element in your root (resonance) | additional ×1.1 |
+| some a ∈ A overcomes some t ∈ T, and no t overcomes any a | ×1.3, element sparks (`FxType.BURST` in the element colour, at most once per target per 10 ticks) |
+| some t overcomes some a, and no a overcomes any t | ×0.8 |
+| both directions | ×1.0 |
+| otherwise, A and T share a parent | ×0.9 |
+| otherwise, or either side neutral | ×1.0 |
+| Space technique | ×1.05 against everything (instead of the rows above) |
+| resonance: the technique element is in the attacker's root | additional ×1.1 |
+| else: a root element generates the technique element (or one of its parents) | additional ×1.05 (RMJ-IR ch. 1049) |
 
-**UI.** The Techniques page tooltip shows "Unggul melawan: monster Api, Logam" from `ElementRelations.strongAgainst`.
+Examples: Sword vs spider ×1.3; Life vs zombie ×1.3; Lightning vs drowned ×1.3; Fire vs stray ×1.0; Ice vs blaze ×1.0.
 
-#### 19.2.14 Pusaka Kuno: ancient relics in structure chests and treasure sense (new feature, P6-harta)
+**UI.** `client/codex/DetailSlip` shows "Unggul melawan: monster Api, Logam" from `ElementRelations.strongAgainst`.
 
-`LootTableEvents.MODIFY`, built-in chest tables only (`source.isBuiltin()`), config `structureLoot`. One extra pool per table:
+#### 19.3.13 Relik di Peti Kuno: treasure in structure chests and treasure sense (P7-harta)
+
+**Sumber / Source.** The items carry their own sources (19.3.2–19.3.4); jade slips are 6c's `jade_slip` (RMJ jade
+slips, ch. 1269). Treasure sense: RMJ ch. 1269 (a spiritual sense sweeping the land, the existing `divine_sense` source)
+and *RMJ: Immortal Realm* ch. 367 (Han Li sweeps his sense over his abode). The chest pools are game design.
+
+One `LootTableEvents.MODIFY` listener (`harta/HartaLoot`), built-in chest tables only, config `structureLoot`; at most
+two phase-7 pools per table, next to the 6c `TechniqueLoot` jade and the `HallItems` tokens and pages.
 
 | Table (`minecraft:chests/…`) | Added |
 |---|---|
 | `simple_dungeon`, `abandoned_mineshaft` | 30%: 1–4 Low stones |
 | `desert_pyramid`, `jungle_temple`, `stronghold_corridor`, `stronghold_crossing` | 2–6 Low + 15%: 1 Mid |
-| `stronghold_library` | 2–6 Low + 15%: 1 Mid; **25% scroll: any of the 9 book techniques** |
-| `igloo_chest` | 30% scroll Glacier Prison; 30% Snow Lotus (age 50–300) |
-| `desert_pyramid` (extra) | 10% scroll Phoenix Flame or Mountain Stomp |
-| `jungle_temple` (extra) | 15% scroll Life Drain or Gale |
-| `woodland_mansion` | 15% scroll Buddha Palm |
-| `underwater_ruin_big` | 8% scroll Glacier Prison |
-| `nether_bridge` | 20% Hellfire Lotus (age 50–300) |
-| `buried_treasure` | 10% Moonlight Orchid (age 500–1,500) |
-| `ancient_city` | 1–3 Mid + 10% High; 12% scroll Space Prison, Gale or Life Drain; 15% High core (Space) |
-| `bastion_treasure` | 1–3 Mid + 10% High; 20% scroll Phoenix Flame or Mountain Stomp; 5% Raja core (Fire) |
-| `end_city_treasure` | 1–3 Mid + 10% High; 15% scroll Space Prison, Heavenly Thunder or Thousand Swords |
-| `trial_chambers/reward_ominous_*` | 8% 1 High stone; 10% scroll Thousand Swords or Heavenly Thunder |
+| `stronghold_library` | 2–6 Low + 15%: 1 Mid (no scroll: 6c jade and hall pages are already there) |
+| `woodland_mansion` | 1–3 Low + 10%: 1 Mid |
+| `igloo_chest` | 30% Eight-Angled Ice Grass (age 50–300); 20% jade slip of a random Ice spec, Kuning or Misterius, `slipAllowed` |
+| `underwater_ruin_big` | 20% 1–3 Low; 8% jade slip (Ice, Kuning or Misterius) |
+| `nether_bridge` | 20% Purple Flame Flower (age 50–300); 10% jade slip (Fire, Kuning or Misterius) |
+| `buried_treasure` | 10% Illusionary Spirit Herb (age 500–1,500) |
+| `ancient_city` | 1–3 Mid + 10% High; 15% High core (Space) |
+| `bastion_treasure` | 1–3 Mid + 10% High; 5% Raja core (Fire) |
+| `end_city_treasure` | 1–3 Mid + 10% High; 10% Ginseng Fruit (age 300–900) |
+| `trial_chambers/reward_ominous` | 8%: 1 High stone |
 
-**Gulungan Teknik Kuno / Ancient Technique Scroll** (`ancient_technique_scroll`, component `kultivator:scroll_technique`).
-- Sneak-use calls `TechniqueBooks.learnFromScroll(player, technique)`: the same realm and Dao rules as books, but a comprehension threshold of **20** instead of 30.
-- If the technique is already known, or belongs to your own Dao but is not learnable yet: +6 comprehension, up to a ceiling of 60 (outside the daily book cap).
-- Another Dao's scroll: "you cannot comprehend this", and the scroll is kept. Otherwise it is consumed.
-- Advancement `first_ancient_scroll`.
+Jade-slip pools read the frozen `TechniqueRegistry` inside the MODIFY callback (server start), never at init: one
+`LootItem` of `JadeSlips.JADE_SLIP` per eligible spec with `SetComponentsFunction` on `JadeSlips.TECHNIQUE`.
 
-**Divine Sense treasure sense.** Unlooted containers (block entities with a pending loot table) within 24 blocks, in loaded chunks only, are pinged in gold through `OrePings` (total cap `OrePings.MAX` = 256).
+**Divine Sense treasure sense** (`technique/DivineSense`): unlooted containers (block entities with a pending loot
+table) within 24 blocks, loaded chunks only, pinged gold through `OrePings` (total cap `OrePings.MAX` = 256).
 
-**Safety.** Loot tables only; no structure or block changes. The scan iterates block-entity maps of at most 2 chunks around the player.
+**Safety.** Loot tables only; no structure or block changes.
 
-#### 19.2.15 Keseimbangan: closing exploits and balancing (balance/fix, split between P6-pertempuran and P6-harta)
+#### 19.3.14 Keseimbangan: balance and exploit fixes (P7-tempur and P7-harta)
 
-**Karma Darah (P6-pertempuran, `XpSources`).**
-- Saturation S in `extra.combat.karma`, decaying 1 per 100 ticks (computed lazily).
-- Each `Enemy` kill: +1 (slimes and magma cubes +0.3, elites +3).
-- Kill XP and normal-core chance × `1 / (1 + max(0, S − 25) / 25)`.
-  - Normal fighting (2–6 kills per minute) never passes 25.
-  - A 30-kills-per-minute farm reaches ×0.12 within 10 min.
-- An action-bar hint at most once per minute when the factor is below 0.6: "Karma darah menumpuk: kultivasi dari membunuh ×0.4".
+**Kejenuhan Bertarung / Battle Fatigue** (renamed from Karma Darah; P7-tempur, `XpSources` + `elite/BattleFatigue`).
+
+**Sumber / Source:** game design (balance rule). It makes no lore claim; no verified work ties killing to lower gains.
+
+- Saturation S in `extra.combat.fatigue` (with `fatigue_t`), decaying 1 per 100 ticks (computed lazily).
+- Each `Enemy` kill +1 (slimes and magma cubes +0.3, elites +3).
+- Kill XP and the normal-core chance × `1 / (1 + max(0, S − 25) / 25)`. Normal fighting (2–6 kills per minute) never
+  passes 25; a 30-kills-per-minute farm reaches ×0.12 within 10 min.
+- An action-bar hint at most once per minute while the factor is below 0.6: "Tubuhmu jenuh bertarung: kultivasi dari
+  membunuh ×0.4".
 - Mobs tagged `kultivator.spawner` give ×0.25 XP and no cores or herbs. Trial spawners are unaffected.
-- Bosses: full XP once per boss type per player per in-game day, 25% after that.
+- Bosses: full XP once per boss type per player per in-game day (`extra.combat.boss_day`), 25% after that. Each kill
+  also sets the `boss_ever` bit (1 Wither, 2 Warden, 4 Dragon, 8 Elder Guardian) for the trials.
+- 6c's daily comprehension and mastery caps are unchanged and separate.
 
-**Wawasan Pertempuran / Battle Insight.** The first kill ever of each boss type (Wither, Warden, Ender Dragon, Elder Guardian):
-- +40% of the current bar (`XpSource.TRIAL`) and +5 comprehension.
-- Bit in `extra.combat.boss_ever`.
-- Advancements `boss_insight` and `all_boss_insights`.
+**Enchanted books** (P7-harta, `dao/TechniqueBooks`): only the uncapped insight `Comprehension.grant(player, dao, 5)`
+gets a limit: at most 4 insight books per in-game day (`extra.harta.book_day`, `book_insight`). Over the limit the book
+is kept: "Kata-katanya kabur; pikiranmu sudah penuh hari ini." Learning techniques and book mastery (already inside
+`Mastery.DAILY_NO_HIT_CAP`) are never limited.
 
-**Dao technique damage (P6-pertempuran, `DaoTechniques`).** Target 5–7 D per target; the Golden Core techniques are unchanged.
-
-| Technique | Change |
-|---|---|
-| Heavenly Thunder | at most 3 bolts per target |
-| Thousand Swords | 0.6 D → 0.4 D per sword |
-| Phoenix Flame | 2 D → 3 D + entity ignite 8 s |
-| Mountain Stomp | 2 D → 3.5 D + Slowness IV 3 s |
-| Glacier Prison | 1.5 D → 2.5 D |
-| Space Prison | 1.5 D → 2.5 D |
-| Life Drain | 1 D → 2 D per target, heals 40% of the damage dealt |
-
-**Qi cost scaling.**
-- `Techniques.qiCost(technique, data) = technique.qiCost() × (1 + 0.08 × max(0, realm − minRealm))`, used by `tryCast`, the HUD and the Techniques page.
-- Examples: Sword Qi at True Immortal costs 28; Qi Palm costs 15.6.
-- Flying-sword drain is unchanged.
-
-**Enchanted books (P6-harta, `TechniqueBooks`).**
-- Insight = `1 + enchantment level` (Sharpness I = 2, V = 6), only up to comprehension 30.
-- At 30 or above, the book gives the 30-XP plain reward instead.
-- At most 4 insight books and 6 plain-XP books per in-game day (`extra.harta.book_*`). Over the limit, the book is kept: "Kata-katanya kabur; pikiranmu sudah penuh hari ini."
-- Learning techniques is never limited.
-
-**Toxicity (P6-harta, `PillToxicity`).**
+**Toxicity** (P7-harta, `PillToxicity`). **Sumber / Source.** AWE ch. 41 (impurities become medicinal toxins that
+affect future cultivation). Deviation and numbers are game design.
 - Effectiveness = `clamp(1 − (tox / 100)^1.6, 0, 1)` (25 → 0.89, 50 → 0.67, 80 → 0.30, 100 → 0).
-- Above 90: each pill has a 25% chance of **"Pil Membalik"** = `Deviation.apply(player, 0.3)` (never lethal; ascended players are immune).
+- Above 90: each pill has a 25% chance of **"Pil Membalik"** = `Deviation.apply(player, 0.3)` (never lethal; ascended
+  players are immune).
 - Decay: 1 per 30 s, or 1 per 10 s while meditating.
 
-**Immortal Pill.** XP = 1 bar × pill quality only (`XpSource.EXACT` × 0.8–1.6) instead of also × root × breakthrough quality (up to about 3.5 bars today).
+**Immortal Pill** (P7-harta, `PillEffects`): game design (balance). XP = 1 bar × pill quality only (`XpSource.EXACT` ×
+0.8–1.6) instead of also × root × breakthrough quality (up to about 3.5 bars today).
 
-**Marrow Cleansing Pill (P6-harta).**
+**Marrow Cleansing Pill** (P7-harta). **Sumber / Source.** *Keyboard Immortal* ch. 1943 (the Marrow Cleansing Pill
+raises aptitude). Chances are game design.
 
 | Step | Chance | Requirement |
 |---|---|---|
@@ -1469,206 +1749,466 @@ Own `PlayerBlockBreakEvents.AFTER` listener; Qi Refining+, survival, not a FakeP
 | Mid → High | 55% | Foundation+ |
 | High → Heavenly | 30% | Golden Core+ and a pill of High or Perfect quality |
 
-- Chance × 0.8 / 1.0 / 1.25 / 1.6 by pill quality, capped at 95%.
-- Failure: the pill is used, toxin 15, Nausea, grey smoke, "Sumsum menolak".
-- Toxin 20 for High and above.
-- Requirement messages appear before the pill is consumed. Players who already have Heavenly keep it.
+- Chance × 0.8 / 1.0 / 1.25 / 1.6 by pill quality, capped at 95%. Failure: the pill is used, toxin 15, Nausea, grey
+  smoke, "Sumsum menolak". Toxin 20 for High and above. Requirement messages appear before the pill is consumed. Players
+  who already have Heavenly keep it.
 
-#### 19.2.16 HUD and comfort: timers, alerts, auto quality, formation blueprints (UX, P6-jalan)
+#### 19.3.15 HUD and comfort (P7-jalan)
 
-**HUD additions (`QiHud`).**
+**Sumber / Source:** game design (UX); only existing names are used.
+
+**HUD additions (`QiHud`).** New lines are droppable first on narrow screens.
 
 | Feature | Detail |
 |---|---|
-| Flying-sword gauge | `qi / max(0.01, FlyingSword.drainPerSecond − Qi.regenPerSecond)` as "≈42 s"; amber below 15 s; red below 10 s with chimes at 10/5/3 s; "Turun!" below 2 s |
-| Dharma Form / Dao Domain | gold countdown arcs from `sessionExtra.dharma_end` / `domain_end` |
+| Flying-sword gauge | `qi / max(0.01, FlyingSword.drainPerSecond(data) − Qi.regenPerSecond)` as "≈42 s"; amber below 15 s; red below 10 s with chimes at 10/5/3 s; "Turun!" below 2 s |
 | Enlightenment timer | "Pencerahan 0:07" |
-| Cloud Step pips | 1–3 cloud pips while airborne (`CloudStep.maxJumps`, jumps counted on the client) |
-| Cooldown ping | optional chime and seal flash when a cooldown of 10 s or more ends (setting "Pengingat cooldown") |
+| Cloud Step pips | 1–6 cloud pips while airborne (`CloudStep.maxJumps(realm)`, jumps counted on the client) |
+| Cooldown ping | optional chime and seal flash when a cooldown of 10 s or more ends (setting "Pengingat cooldown", default off) |
 | Toxicity meter | shown from 40 instead of only above 80 |
-| Vein line | density as % of normal + grade name; seclusion "Tertutup +15%"; stone icon + fuel timer (or "diam"); "+N Qi Tertimbun" kept |
+| Vein line | density as % of normal + grade name; seclusion "Tertutup +15%"; stone icon + fuel timer; "+N Qi Tertimbun" kept |
 | Stars | count when > 0 |
-| Daily dots | the 3 daily-task dots |
+| Daily dots | the 3 chore dots |
 
-New lines are droppable first on narrow screens.
+**Meditation danger alert** (`client/goals/MeditationAlert`, setting "Peringatan bahaya", default on): every 10 ticks
+while meditating, checks a 12-block box for visible `Enemy` mobs, excluding the heart demon and the player's own pets.
+First sighting: a quiet bell, a red vignette on the screen edge facing the mob, and "Bahaya: Zombie 7 blok" (elites:
+"Bahaya: Binatang Iblis (Zombie) 7 blok") drawn above the action bar, which meditation uses. Re-pings every 5 s while a
+mob is within 6 blocks.
 
-**Meditation danger alert** (client, setting on by default).
-- Every 10 ticks while meditating, checks a 12-block box for visible `Enemy` mobs, excluding the heart demon and the player's own pets.
-- First sighting: a quiet bell, a red vignette on the screen edge facing the mob, and "Bahaya: Zombie 7 blok".
-- Re-pings every 5 s while a mob is within 6 blocks.
+**Others' effects.** `client/fx/AuraFx` goes through `EffectQuality.othersScale()` (today only `fx/spec/SpecFx` does).
 
-**Effect quality "Otomatis".**
-- Averages `minecraft.getFps()` over 5 s.
-- Below 40 fps → Minimal; after 10 s above 70 fps → Normal. Never Maximal. Hysteresis prevents flicker.
-- **"Efek pemain lain":** Penuh / Ringan (×0.25, no continuous aura) / Mati, applied to other players' auras in `AuraFx` through `EffectQuality.othersScale()`.
+**Settings page** (already scrollable): adds "Pengingat cooldown", "Peringatan bahaya" and "Panduan" (show the tracker).
 
-**Settings page.** Becomes scrollable to hold the new toggles (wheel, release-cast, cooldown ping, danger alert, guide, auto quality, others' effects). It still fits 320×240.
+**Cetak Biru Formasi / Formation blueprints** (`client/goals/FormationBlueprint`; block reads only).
+- **Trigger:** looking within 8 blocks at a Gold Block (qi seat) or a Lodestone (protective) while holding Amethyst
+  Block, End Rod, Gold Block, Beacon, Lodestone or Crying Obsidian, or while sneaking. It stays 30 s after the last
+  trigger.
+- **Slots:** qi tiers from `QiFormations.cardinalOffsets()` / `cornerOffsets()` (end rods at y+1, beacon or lodestone at
+  y−1); protective pillars from `FormationPattern.pillars()`.
+- **Markers:** green outline = correct block; pulsing gold cube = empty slot; red cross = wrong block.
+- **Label above the anchor:** "Formasi Pengumpul Qi Kecil 3/4 · ×1.25 → Agung 5/9", or for a protective formation
+  "Jongkok + pakai Pecahan Kecubung untuk membangunkan".
+- **Rendering:** vanilla `Gizmos` from the client tick (as `SiteHologram`); at most 17 reads every 10 ticks while
+  triggered.
 
-**Cetak Biru Formasi / Formation blueprints** (client, block reads only).
-- **Trigger:**
-  - Looking within 8 blocks at a Gold Block (qi seat) or a Lodestone (protective) while holding Amethyst Block, End Rod, Gold Block, Beacon, Lodestone or Crying Obsidian, or while sneaking.
-  - The blueprint stays for 30 s after the last trigger.
-- **Slots:** qi tiers from `QiFormations.cardinalOffsets()` / `cornerOffsets()` (end rods at y+1, beacon or lodestone at y−1); protective pillars from `FormationPattern.pillars()`.
-- **Markers:**
-  - green outline: correct block
-  - pulsing gold cube: empty slot
-  - red cross: wrong block
-- **Label above the anchor:** "Formasi Pengumpul Qi Kecil 3/4 · ×1.25 → Agung 5/9", or for a protective formation "Jongkok + pakai Pecahan Kecubung untuk membangunkan".
-- **Rendering:** `fabric-rendering-v1` world render event if its 26.3 API is verified; otherwise 1 dust particle per slot every 10 ticks (× quality).
-- At most 17 `getBlockState` reads every 10 ticks, only while triggered.
+### 19.4 Commands
 
-### 19.3 Modules, file ownership and contracts
+`/kultivasi` and `/cultivate` are the same root.
 
-Four agents work in parallel after 19.1. **Never edit a file owned by another module.** Everything a module needs from another goes through the contracts in 19.3.4–19.3.6. A missing need goes into the final report as a TODO.
+**Player.**
 
-#### 19.3.1 P6-harta (items, economy, alchemy): items 2, 6 (uses), 7, 9, 14, 15 (books, toxicity, marrow, Immortal Pill)
+| Command | Effect | Owner |
+|---|---|---|
+| `jalan` | opens the Jalan tablet | P7-jalan |
+| `resep` | opens the Kitab Alkimia | P7-harta |
+| `harian` | today's chores and the streak in chat | P7-jalan |
+| `kawal <player>` | become that player's Hu Fa Tribulasi (≤ 64 blocks) | P7-tempur |
+| `gua tetapkan` / `gua lihat` / `gua hapus` | the Cave Abode | P7-kultivasi |
+| `fondasi perkokoh` | Perkokoh Fondasi | P7-kultivasi |
+| `bintang padatkan [semua]` | condense one star (or all affordable) | P7-kultivasi |
 
-**Owns (new):**
-- `harta/*`:
-  - `Harta` (init, commands, actions, join/respawn re-apply of bone tempering)
-  - `SpiritStones`, `SpiritHerbs`, `BeastCores`, `RelicLoot`
-  - item classes
-  - `HartaComponents` (`herb_age`, `core_element`, `scroll_technique`)
-- `client/harta/*`, `client/fx/HartaFx.java`, `client/screen/AlchemyBookPage.java`
-- Its items' assets plus `tools/gen_harta_textures.py`
-- Recipes for the stones
-- `data/kultivator/villager_trade/*` and the wandering-trader tag file
-- `lang-src/harta.*`
-- Advancements: `first_spirit_stone`, `supreme_spirit_stone`, `qi_condensed`, `first_herb`, `thousand_year_herb`, `first_beast_core`, `king_core`, `first_ancient_scroll`
+**Test (op, `uji …`, each module's `addTestCommands(uji)`).** Every phase-7 feature can be tried without grinding:
 
-**May edit:** `alchemy/*`, `item/MarrowCleansing.java`, `item/MarrowCleansingPillItem.java`, `cultivation/PillToxicity.java`, `cultivation/VanillaPills.java`, `dao/TechniqueBooks.java`, `technique/DivineSense.java`, `formation/ProtectiveFormations.java`, `formation/Formation.java`, `client/PillTooltips.java`, `client/BookTooltips.java`, `client/fx/AlchemyFx.java`, `client/fx/OrePingFx.java`.
+| Command | Effect | Owner |
+|---|---|---|
+| `uji kit` | as today plus a shulker "Fase 7": 16 of each stone, every herb at age 100 and one at 1,200, one core per grade (random elements), the 8 talismans (power 5), 16 blank talismans, a vein compass, the 4 new pills (Perfect) | spine + stubs |
+| `uji batu <rendah\|menengah\|tinggi\|agung> [n]` | spirit stones | P7-harta |
+| `uji herba <id\|semua> [umur]` | herbs with that age (default 100) | P7-harta |
+| `uji herba tampak` | the next plant you break within 60 s counts as infused | P7-harta |
+| `uji inti <rendah\|menengah\|tinggi\|raja> [unsur] [n]` | beast cores | P7-harta |
+| `uji pil <dao_insight\|toxin_purging\|enlightenment\|bone_tempering> [kualitas]` | the new pills | P7-harta |
+| `uji relik <tabel>` | rolls that modified built-in chest table once into your inventory and prints the phase-7 chances | P7-harta |
+| `uji elit <1\|2\|3> [unsur] [jenis] [afiks]` | an elite 4 blocks ahead (allowlist types, hardened, realm = yours) | P7-tempur |
+| `uji elit hapus` | removes elites within 32 blocks | P7-tempur |
+| `uji tribulasi <ranah> [lapis] [biasa\|cincin\|kembar]` | a test tribulation of that target (realm ids as in `uji ranah`; real, never lethal, no rank change); `cincin` forces rings below DT, `kembar` makes every ring twin | P7-tempur |
+| `uji kawal <0-3>` | pretends that many Hu Fa guardians for your next test tribulation (factor, quality and HUD) | P7-tempur |
+| `uji kejenuhan <nilai>` | sets Battle Fatigue S | P7-tempur |
+| `uji unsur` | for the looked-at mob: your technique element, its element, the factor and resonance | P7-tempur |
+| `uji urat <persen 0-200>` / `uji urat cari` | sets the density here / prints the nearest Great and Rich veins | P7-kultivasi |
+| `uji tertutup <0-5>` / `uji tertutup 30m` | seclusion stacks / jumps the unbroken time to 1,800 s | P7-kultivasi |
+| `uji gua` | sets the abode here without the formation checks | P7-kultivasi |
+| `uji jimat <jenis\|semua> [kekuatan]` / `uji jimat tingkat <0-10>` | talismans / talisman skill | P7-kultivasi |
+| `uji anugerah` / `uji jiwa` | lists the active boons and replays the newest boon title / resets the Jiwa Tak Hancur cooldown | P7-kultivasi |
+| `uji fondasi <ranah> <retak\|normal\|sempurna\|surgawi>` | sets a recorded quality (to try Perkokoh) | P7-kultivasi |
+| `uji bintang <n>` | sets the player's stars (the existing `uji murid <name> bintang` stays for disciples) | P7-kultivasi |
+| `uji jalan reset` / `uji jalan bab <1-5>` | resets the guide, trials and chores / completes chapters up to n | P7-jalan |
+| `uji jalan ujian [selesai]` | prints the current trial set / completes it | P7-jalan |
+| `uji harian ulang` / `uji harian selesai` / `uji harian beruntun <n>` | reroll / complete / set the streak | P7-jalan |
+| `uji hud` | shows every phase-7 HUD element with sample values for 10 s (`sessionExtra.hud_demo`) | P7-jalan |
 
-**Help topics:** `stones`, `herbs`, `cores`, `relics`.
+Existing helpers stay useful: `uji ranah <realm> [stage] [layer]`, `debug set storedqi`, `debug enlighten`,
+`debug tribulation test`.
 
-#### 19.3.2 P6-pertempuran (combat and tribulation): items 1, 6 (drops), 10 (server), 13, 15 (karma, boss insight, Dao techniques, qi cost)
+**Debug (op).** `debug vein grade` (in `Meditation.addCommands`), `debug elit info` (the looked-at elite),
+`debug kejenuhan show|reset`, `debug perks show`.
 
-**Owns (new):**
-- `elite/*`: `EliteMonsters`, `EliteData` attachment, `EliteSkills`, `MobElements`
-- `data/ElementRelations.java`
-- `mixin/MobFinalizeSpawnMixin.java` (body)
-- `client/elite/*`, `client/fx/EliteFx.java`
-- `lang-src/combat.*`
-- Advancements: `first_elite`, `beast_king_slain`, `elite_hunter` (50 elites), `boss_insight`, `all_boss_insights`, `defy_heaven`, `dao_guardian`, `great_guardian`
+### 19.5 Advancements
 
-**May edit:** `cultivation/XpSources.java`, `cultivation/DaoProtectors.java`, `cultivation/Tribulation.java`, `cultivation/Breakthrough.java`, `technique/Techniques.java`, `technique/DaoTechniques.java`, `technique/DaoTechniqueState.java`, `technique/CloudStep.java`, `technique/DharmaForm.java`, `technique/DaoDomain.java`, `client/fx/TribulationFx.java`.
+All use `docs/ADVANCEMENT_TEMPLATE.json` and hang under an existing parent (in brackets).
 
-**Commands:** `/kultivasi kawal <player>`; debug `elite summon <tier> [element]` (zombie or skeleton only, hardened) and `karma show|reset`.
+| Advancement | Name (id_id) | When | Owner |
+|---|---|---|---|
+| `first_spirit_stone` | Batu Roh Pertama | first spirit stone (`root_tested`) | harta |
+| `supreme_spirit_stone` | Batu Roh Agung | first Supreme stone | harta |
+| `stone_bottleneck` | Batu di Hambatan | first breakthrough that consumed stones | harta |
+| `first_herb` | Tanaman Roh | first spirit herb (`first_alchemy`) | harta |
+| `thousand_year_herb` | Herba Seribu Tahun | a herb of 1,000 years | harta |
+| `first_beast_core` | Inti Binatang | first beast core | harta |
+| `king_core` | Inti Raja | first Raja core | harta |
+| `first_elite` | Pemburu Siluman | first elite slain (`first_technique`) | tempur |
+| `beast_king_slain` | Penakluk Raja Siluman | first Raja Siluman | tempur |
+| `elite_hunter` | Pemburu Binatang Iblis | 50 elites | tempur |
+| `defy_heaven` | Menantang Langit | every telegraphed strike taken in full | tempur |
+| `hu_fa_tribulation` | Hu Fa Tribulasi | guard a tribulation to success | tempur |
+| `great_hu_fa` | Pelindung Agung | 5 guarded tribulations | tempur |
+| `great_vein` | Urat Roh Agung | 10 min meditating in a Great vein (`first_meditation`) | kultivasi |
+| `cave_abode` | Gua Kediaman | set an abode | kultivasi |
+| `closed_door_hour` | Satu Jam Tertutup | 60 min unbroken meditation | kultivasi |
+| `foundation_strengthened` | Fondasi Diperkokoh | first successful Perkokoh Fondasi | kultivasi |
+| `unbroken_soul` | Jiwa Tak Hancur | the L7 boon saves you | kultivasi |
+| `immortal_star` | Bintang Pertama | first player star (`realm_true_immortal`) | kultivasi |
+| `nine_stars` | Sembilan Bintang | ★9 (Gerbang Dewa I) | kultivasi |
+| `eighteen_stars` | Delapan Belas Bintang | ★18 (Gerbang Dewa II) | kultivasi |
+| `first_talisman` | Jimat Pertama | first inscribed talisman | kultivasi |
+| `talisman_master` | Ahli Jimat | talisman level 10 | kultivasi |
+| `guide_complete` | Jalan Telah Terbuka | all 20 steps (`root`) | jalan |
+| `foundation_trials` | Fondasi Kokoh | a full trial set | jalan |
+| `daily_streak_5` | Lima Hari Tekun | a 5-day chore streak | jalan |
 
-**Help topics:** `elites`, `elements`, `karma`, `guardians`.
+Removed from the old plan: `qi_condensed`, `first_ancient_scroll`, `boss_insight`, `all_boss_insights`; renamed:
+`seclusion_hour` → `closed_door_hour`, `foundation_reforged` → `foundation_strengthened`, `dao_guardian` →
+`hu_fa_tribulation`, `great_guardian` → `great_hu_fa`. `first_stone` (sect build) and `hour_of_stillness` stay as they
+are.
 
-#### 19.3.3 P6-kultivasi (meditation, veins, perks, talismans): items 5, 8, 12
+### 19.6 Text and help topics
 
-**Owns (new):**
-- `cultivation/ImmortalPerks.java`, `cultivation/Reforge.java`, `cultivation/VeinCompassItem.java`
-- `talisman/*`, `client/talisman/*`, `client/fx/TalismanFx.java`
-- Its items' assets plus `tools/gen_kultivasi_textures.py`
-- Recipes for the blank talisman and the compass
-- `lang-src/kultivasi.*` and `lang-src/talismans.*`
-- Advancements: `great_vein`, `cave_abode`, `seclusion_hour`, `foundation_reforged`, `unbroken_soul`, `immortal_star`, `eighteen_stars`, `first_talisman`, `talisman_master`
+| File | Contents | Owner |
+|---|---|---|
+| `spine7.*` | config comments, tab names "Jalan" and "Alkimia" | spine |
+| `harta.*` | stones, herbs, cores, pills, loot, recipe tablet, tooltips, `.source` lines, help topics `batu_roh`, `tanaman_roh`, `inti_binatang`, `relik`, `alkimia_lanjut` | P7-harta |
+| `combat.*` | tiers, skills, affixes, elements, Battle Fatigue, rings, Menantang Langit, Hu Fa Tribulasi, help topics `elit`, `unsur`, `kejenuhan`, `hu_fa_tribulasi` | P7-tempur |
+| `kultivasi.*` | veins, compass, seclusion, abode, boons, Perkokoh, stars, help topics `urat_roh`, `anugerah` | P7-kultivasi |
+| `talismans.*` | the 8 talismans, blank, skill, refusals, help topic `jimat` | P7-kultivasi |
+| `goals.*` | steps, chapters, trials, chores, forecast, HUD, help topics `jalan`, `harian`, `persiapan` | P7-jalan |
 
-**May edit:** `cultivation/Meditation.java`, `cultivation/SpiritVeins.java`, `cultivation/SpiritSites.java`, `cultivation/Enlightenment.java`, `cultivation/QiFormations.java`, `cultivation/Stats.java`, `cultivation/Qi.java`, `cultivation/Deviation.java`, `client/fx/MeditationFx.java`.
+`HelpPage.TOPICS` (P7-jalan) gains the 15 topics above. Each topic text ends with its sources. The help topic is
+`relik`, never `pusaka` (taken by the disciples' natal treasures); `harian`, never `tugas` (sect duties).
 
-**Commands:** `/kultivasi gua tetapkan|lihat|hapus`, `fondasi tempa`, `bintang padatkan`; debug `vein grade`, `perks show`, `stars set <n>`.
+### 19.7 Modules and file ownership
 
-**Help topics:** `veins`, `talismans`, `immortal_perks`.
+Four implementation agents work in parallel after the spine. **They never edit each other's files.** A missing need
+goes into the final report as a TODO. Paths: `src/main/java/dev/kultivator/` (server), `src/client/java/dev/kultivator/client/`
+(client).
 
-#### 19.3.4 P6-jalan (goals and client UX): items 3, 4, 11, 16 (+ the HUD side of 5, 10, 12)
+| Module | Owns (new) | May edit (nobody else touches these) |
+|---|---|---|
+| **P7-harta** (items, economy, alchemy, loot): 19.3.2, 19.3.3 uses, 19.3.4, 19.3.7, 19.3.13, 19.3.14 books/toxicity/Immortal Pill/marrow | `harta/*` (`Harta`, `HartaItems`, `HartaComponents` (`herb_age`, `core_element`), `SpiritStones`, `StoneBottleneck`, `SpiritHerbs`, `BeastCores`, `HartaLoot`, `HartaFxIds`), `client/harta/*`, `client/fx/HartaFx`, `client/screen/AlchemyBookPage`, the items' assets and `tools/gen_harta_textures.py`, the stone recipes, `data/kultivator/villager_trade/spirit_stones.json`, `data/minecraft/tags/villager_trade/wandering_trader/uncommon.json`, its advancements, `lang-src/harta.*` | `alchemy/*`, `item/MarrowCleansing`, `item/MarrowCleansingPillItem`, `cultivation/PillToxicity`, `cultivation/VanillaPills`, `formation/ProtectiveFormations` (stone fuel), `dao/TechniqueBooks` (insight cap), `technique/DivineSense` (herb and chest pings), `client/BookTooltips`, `client/PillTooltips`, `client/fx/AlchemyFx`, `client/fx/OrePingFx`, `sect/event/Expeditions` (loot rows only), `sect/event/Duties` (garden rows only), `sect/hall/Contribution` (`unitValue` rows only) |
+| **P7-tempur** (combat and tribulation): 19.3.1, 19.3.3 drops, 19.3.8, 19.3.12 server, 19.3.14 fatigue | `elite/*` (`EliteMonsters`, `EliteData`, `EliteSkills`, `EliteRewards`, `MobElements`, `ElementRelations`, `CombatFxIds`, `BattleFatigue`, `LightningRings`, `HuFaTribulation`), the body of `mixin/MobFinalizeSpawnMixin`, `client/elite/*`, `client/fx/EliteFx`, its advancements, `lang-src/combat.*` | `cultivation/XpSources`, `cultivation/DaoProtectors`, `cultivation/Tribulation` (after the spine), `client/fx/TribulationFx` |
+| **P7-kultivasi** (meditation, veins, boons, stars, talismans): 19.3.5, 19.3.6, 19.3.11 | `cultivation/ImmortalPerks` (boons and stars), `cultivation/Reforge`, `cultivation/CaveAbode`, `cultivation/VeinCompassItem`, `talisman/*` (`Talismans`, `TalismanItem`, `TalismanKind`, `Inscribe`, `ReturnTalisman`, `TalismanFxIds`), `client/talisman/*`, `client/fx/TalismanFx`, the items' assets and `tools/gen_kultivasi_textures.py`, the blank-talisman and compass recipes, its advancements, `lang-src/kultivasi.*`, `lang-src/talismans.*` | `cultivation/Meditation`, `SpiritVeins`, `SpiritSites`, `Enlightenment`, `QiFormations`, `Stats`, `Qi`, `Deviation`, `client/fx/MeditationFx`, `disciple/DiscipleCultivation` (`masterMeditationGain` only) |
+| **P7-jalan** (goals and client UX): 19.3.9, 19.3.10, 19.3.15, the codex element line | `goals/*` (`Goals`, `Guide`, `RealmTrials`, `DailyChores`, `GoalCounters`, `Prep`), `client/goals/*` (`GoalsClient`, `GuideTracker`, `TribulationHud`, `MeditationAlert`, `FormationBlueprint`, `HudDemo`), `client/screen/JalanPage`, its advancements, `lang-src/goals.*` | `client/QiHud`, `client/EffectQuality`, `client/screen/CultivationScreen` (after the spine), `StatusPage`, `SettingsPage`, `HelpPage`, `client/screen/ui/*`, `client/fx/AuraFx`, `client/codex/DetailSlip` (the element line only), `lang-src/screen.*`, `lang-src/hud.*` |
 
-**Owns (new):**
-- `goals/*`: `Goals`, `Guide`, `RealmTrials`, `DailyTasks`, `GoalCounters`
-- `client/goals/*`: `GoalsClient`, `GuideTracker`, `SealWheel`, `TribulationHud`, `MeditationAlert`, `FormationBlueprint`
-- `client/mixin/MouseHandlerMixin.java` (body), `client/screen/PathPage.java`
-- `lang-src/goals.*`
-- Advancements: `guide_complete`, `foundation_trials`, `daily_streak_5`
+**Spine-only files:** `network/Actions`, `Net`, `Payloads`, `Kultivator`, `KultivatorClient`, `KultivatorConfig`,
+`util/Advancements`, `util/KillCredit`, `technique/source/TechniqueLoot` (the `KillCredit` call), `cultivation/Breakthrough`,
+`technique/spec/TechniquePower`, `technique/CloudStep`, `fx/FxType`, `client/fx/FxDispatcher`,
+`kultivator.mixins.json`, `command/CultivateCommand`, `command/TestCommands`, `lang-src/spine7.*`.
 
-**May edit:** `client/QiHud.java`, `client/Keys.java`, `client/EffectQuality.java`, `client/screen/CultivationScreen.java`, `StatusPage.java`, `TechniquesPage.java`, `SettingsPage.java`, `HelpPage.java`, `client/screen/ui/*`, `client/fx/AuraFx.java`, `lang-src/screen.*`, `lang-src/hud.*`.
+**Hooks that must survive every edit:** `FeatTracker.onMeditate(player, 20)` in `Meditation.second`;
+`FeatTracker.onTribStrike` and `countSurvivedStrike` in `Tribulation.strike`; `FeatTracker.onAlchemy` in
+`AlchemyFurnace`; `Sects.meditationBonus`; the enlightenment mastery points from `Unlocks`.
 
-- `HelpPage.TOPICS` gains the 13 new topics plus its own `path` and `seal_wheel`.
-- Each module defines `kultivator.screen.help.<topic>.title` and `kultivator.screen.help.<topic>` in its own fragment.
+### 19.8 Public contracts (spine stubs; the owner fills them)
 
-**Keys:** `key.kultivator.seal_wheel`, `key.kultivator.quick_1` … `quick_4`, all unbound.
+```java
+// spine
+Breakthrough.QualityBonus { double bonus(ServerPlayer, CultivationData, Rank target); default void commit(ServerPlayer, CultivationData, Rank target) {} }
+Breakthrough.addQualityBonusProvider(QualityBonus) ; Breakthrough.qualityBonus(ServerPlayer, CultivationData, Rank target) → double  // pure, −0.10…+0.40
+Tribulation.StrikeFactor { double factor(ServerPlayer, Rank target, int strikeIndex, boolean last); }
+Tribulation.Listener { onOmen(ServerPlayer, Rank) ; onStrike(ServerPlayer, Rank, int index, int total) ; onEnd(ServerPlayer, Rank, boolean success, boolean test) }
+Tribulation.addStrikeFactorProvider(StrikeFactor) ; addListener(Listener) ; strikeFactor(ServerPlayer, Rank, int index, boolean last) → double  // pure, ≥ 0.5
+TechniquePower.TAG_ELITE ; TechniquePower.TargetFactor { double factor(LivingEntity attacker, LivingEntity target, @Nullable TechniqueSpec spec); } ; addTargetFactor(TargetFactor)
+CloudStep.maxJumps(Realm) → int                                   // now public
+Advancements.addListener(BiConsumer<ServerPlayer, String>)
+KillCredit.resolve(LivingEntity victim, DamageSource) → @Nullable KillCredit.Credit(ServerPlayer owner, Entity killer, Kind kind) ; KillCredit.directPlayer(LivingEntity, DamageSource) → @Nullable ServerPlayer
+Payloads.OpenScreen.TAB_JALAN = 5 ; TAB_ALKIMIA = 6
+Harta.kitItems() → List<ItemStack> ; Talismans.kitItems() → List<ItemStack>   // used by uji kit
 
-**Commands:** `/kultivasi jalan` (opens the tab); debug `goals reset` and `daily reroll`.
+// P7-harta
+SpiritStones.isStone(ItemStack) ; grade(ItemStack) → int (0–3, −1) ; stack(int grade, int count) → ItemStack
+BeastCores.create(Element, int grade) → ItemStack ; drop(ServerLevel, Vec3, Element, int grade) ; isCore(ItemStack) ; grade(ItemStack) ; element(ItemStack) → @Nullable Element
+SpiritHerbs.randomFor(@Nullable Element, RandomSource, int minAge, int maxAge) → ItemStack ; isHerb(ItemStack) ; age(ItemStack) → int
+Harta.missionValue(ItemStack) → double                            // Kantor Misi rows
 
-#### 19.3.5 Public API contracts (stubbed by the spine, filled by the owner)
+// P7-tempur
+EliteMonsters.isElite(Entity) ; tier(Entity) → int (0 = none) ; element(Entity) → @Nullable Element ; makeElite(Mob, int tier, @Nullable Element, int realm) → boolean
+EliteMonsters.onFinalizeSpawn(Mob, ServerLevelAccessor, EntitySpawnReason)
+MobElements.of(Entity) → @Nullable Element
+ElementRelations.factor(@Nullable Element attacker, @Nullable Element target) → double ; overcomes(Element, Element) → boolean ; parents(Element) → Set<Element>
+ElementRelations.strongAgainst(Element) → List<Element> ; techniqueElement(LivingEntity attacker, @Nullable TechniqueSpec) / techniqueElement(CultivationData) / techniqueElement(DiscipleData) → @Nullable Element
+BattleFatigue.factor(ServerPlayer) → double ; HuFaTribulation.guards(ServerPlayer cultivator) → int
 
-| Owner | Signature |
-|---|---|
-| harta | `SpiritStones.isStone(ItemStack)`, `int grade(ItemStack)` (0–3, −1), `ItemStack stack(int grade, int count)`, `double condenseCost(CultivationData)` |
-| harta | `BeastCores.create(Element, int grade)`, `void drop(ServerLevel, Vec3, Element, int grade)` |
-| harta | `SpiritHerbs.randomFor(@Nullable Element, RandomSource, int minAge, int maxAge)` |
-| harta | `RelicLoot.randomScroll(RandomSource)` |
-| pertempuran | `EliteMonsters.isElite(Entity)`, `int tier(Entity)` (0 = none), `@Nullable Element element(Entity)` |
-| pertempuran | `MobElements.of(Entity)` |
-| pertempuran | `ElementRelations.factor(@Nullable Element attacker, @Nullable Element target)`, `List<Element> strongAgainst(Element)`, `@Nullable Element techniqueElement(CultivationData)` |
-| pertempuran | `Techniques.qiCost(Technique, CultivationData)`, `CloudStep.maxJumps(CultivationData)` |
-| kultivasi | `SpiritVeins.grade(ServerLevel, BlockPos)`, `double cap(ServerLevel, BlockPos)`; `density()` now 0–2.0 |
-| kultivasi | `QiFormations.cardinalOffsets()`, `cornerOffsets()` (copies) |
-| kultivasi | `Enlightenment.boostChance(ServerPlayer, double factor, int ticks)` |
-| kultivasi | `ImmortalPerks.starDamageFactor(CultivationData)`, `int stars(CultivationData)`, `double nextStarCost(CultivationData)` |
-| kultivasi | `Reforge.cost(CultivationData)`, `@Nullable Realm target(CultivationData)` |
-| existing, read-only | `Techniques.hurt / power / castableTechniques`, `Targeting.*`, `Progression.grantXp`, `Comprehension.grant`, `SpiritBeasts.addXp / data`, `SpiritSites.current`, `Meditation.isMeditating`, `Tribulation.strikeCount / strikePct`, `Breakthrough.chance`, `FlyingSword.drainPerSecond`, `Qi.*`, `XpSources.miningXp`, `ProtectiveFormations.insideActiveFormation`, `FormationPattern.pillars`, `Alchemy.level`, `AlchemyFurnace.successChance`, `AlchemyRecipes.all()` (the `Recipe` record keeps its accessors) |
+// P7-kultivasi
+SpiritVeins.grade(ServerLevel, BlockPos) → int (−1, 0, 1, 2) ; cap(ServerLevel, BlockPos) → double ; density(...) → 0–2.0
+QiFormations.cardinalOffsets() / cornerOffsets() → int[][]      // copies
+Enlightenment.boostChance(ServerPlayer, double factor, int ticks)
+Meditation.gainPerSecond(ServerPlayer, CultivationData) → double
+ImmortalPerks.stars(CultivationData) → int ; nextStarCost(CultivationData) → double ; boonActive(CultivationData, int layer) → boolean
+Reforge.cost(CultivationData) → double ; target(CultivationData) → @Nullable Realm
+CaveAbode.of(ServerPlayer) → @Nullable GlobalPos ; near(ServerPlayer, double range) → boolean
+ImmortalPerks.handleAction(ServerPlayer, String text)
 
-#### 19.3.6 Data keys
+// P7-jalan
+Goals.handleAction(ServerPlayer, String text)
+```
 
-**Saved, in `extra()`:** each module writes only its own sub-compound; others may read it.
+Removed from the old contracts: `SpiritStones.condenseCost`, `RelicLoot.randomScroll`, `Techniques.qiCost`,
+`ImmortalPerks.starDamageFactor`, `CloudStep.maxJumps(CultivationData)`.
 
-- `extra.harta`: `herbs_found`, `condensed`, `insight_pills{realmId:int}`, `bone_hp`, `book_day`, `book_insight`, `book_plain`
-- `extra.combat`: `karma`, `karma_t`, `kills`, `elite1` (tier ≥ 1 kills), `elite2` (tier ≥ 2), `elite3` (tier 3), `thunder_kills`, `boss_ever` (bits: 1 Wither, 2 Warden, 4 Dragon, 8 Elder Guardian), `boss_day{type:long}`, `guards`, `guard_last{uuid:long}`
-- `extra.kultivasi`: `abode{dim, x, y, z}`, `stars`, `perk_count`, `unbroken_at`, `reforges`
-- `extra.talisman`: `xp`
-- `extra.goals`: owned by P6-jalan (guide bits, hidden flag, rewarded chapters, trial snapshot, daily state, counters `c{…}`)
+Existing, read-only: `Techniques.hurt`, `DamageContext.legacy`, `TechniquePower.*`, `Targeting.*`,
+`Progression.grantXp`, `Comprehension.grant`, `SpiritBeasts.addXp(Mob, double)` / `loadedBeasts`, `Disciples.loaded`,
+`DiscipleHooks.addOnKill` / `addFeedHandler`, `DiscipleCultivation.addXp`, `SpiritSites.current`,
+`Meditation.isMeditating`, `Tribulation.strikeCount` / `strikePct`, `Breakthrough.chance`, `FlyingSword.drainPerSecond`,
+`Qi.*`, `XpSources.miningXp`, `ProtectiveFormations.insideActiveFormation`, `FormationPattern.pillars`,
+`ProtectedZones.addZoneProvider`, `DamageHooks.register` / `isTechnique` / `UNBLOCKABLE`, `DeathGuard.register`,
+`JadeSlips.JADE_SLIP` / `TECHNIQUE` / `stack`, `TechniqueRegistry.all`, `Loadout.slots`, `Stars.cost`,
+`InheritanceTrials.active`, `DuelRules.inDuel`, `Sparring.inDuel`, `FlightLease.holder`, `Sects.sectOf`,
+`AlchemyRecipes.all`, `AlchemyFurnace.successChance`.
 
-**Session, in `sessionExtra`:**
+### 19.9 Data keys
 
-- spine: `cfg{hd, dp, guide, daily, tele}`
-- pertempuran: `trib{…}` (19.2.10), `dharma_end`, `domain_end`
-- kultivasi: `vein_grade`, `seclusion`, `fuel`, `fuel_end`, `fuel_idle`, `abode`, `reforge_end`
+**Saved, in `extra()`** (each module writes only its own sub-compound; others may read):
 
-**Advancement names used across modules (guide steps):** `first_spirit_stone` and `first_ancient_scroll` (harta), `first_elite` (pertempuran), plus the existing names listed in 19.2.3.
+| Key | Contents | Owner |
+|---|---|---|
+| `extra.harta` | `herbs_found`, `refined`, `insight_pills {realmId: int}`, `bone_hp`, `book_day`, `book_insight` | P7-harta |
+| `extra.combat` | `fatigue`, `fatigue_t`, `kills`, `elite1` (tier ≥ 1 kills), `elite2`, `elite3`, `thunder_kills`, `boss_ever` (bits 1 Wither, 2 Warden, 4 Dragon, 8 Elder Guardian), `boss_day {type: long}`, `cday [day, gained]`, `guards`, `guard_last {uuid: long}` | P7-tempur |
+| `extra.kultivasi` | `abode {dim, x, y, z}`, `perk_count`, `unbroken_at`, `reforges`, `stars` (written here from now on, read by 6c); `trib_strikes` stays written by `Tribulation` | P7-kultivasi (keeps both existing keys) |
+| `extra.talisman` | `xp`, `made` | P7-kultivasi |
+| `extra.goals` | `guide` (bits), `hidden`, `claimed` (chapter bits), `seen` (codex), `trial {target, base {…}, done, full}`, `daily {day, last, chores [3] {id, need, have}, done, streak, last_full}`, `c {…}` counters | P7-jalan |
 
-### 19.4 Order of work and deliverables
+Never use a `path` key (`extra.path` belongs to `DisciplePaths`).
 
-1. **P6-spine** (orchestrator, 19.1).
-2. The four modules in parallel. No Gradle; each module also returns a player-facing summary and a test checklist.
-3. A single compile: `compileJava`, `compileClientJava`, `jar --no-daemon` (never tests, `runClient` or `build`), then a fix pass.
-4. **P6-docs:** PANDUAN sections for every item, `docs/uji/FASE-6.md` built from the module checklists, README.
+**Session, in `sessionExtra`:** `cfg {hd, dp, guide, daily, tele}` (spine); `trib {…}` (P7-tempur); `vein_grade`,
+`seclusion`, `fuel`, `fuel_end`, `abode`, `reforge_end` (P7-kultivasi); `prep {…}`, `hud_demo` (P7-jalan). The old
+`dharma_end`, `domain_end` and `fuel_idle` are not used.
 
-If a module runs long, these sub-parts may slip to a Phase 6b without breaking contracts:
+**Items:** `kultivator:herb_age` (int), `kultivator:core_element` (string), `kultivator:talisman {power, inscriber,
+uses}`. **Entities:** attachment `kultivator:elite {tier, element, realm, affix}` (persistent, synced); tags
+`kultivator.elite`, `kultivator.spawner`. **SavedData:** `kultivator:spirit_veins`, same format, clamped to the cap.
+
+### 19.10 Order of work and deliverables
+
+1. **P7-spine** (19.2).
+2. The four modules in parallel. No Gradle; each returns a player-facing summary and its checklist lines.
+3. One compile: `compileJava`, `compileClientJava`, `jar --no-daemon` (never tests, `runClient` or `build`), then a fix
+   pass.
+4. **P7-docs:** PANDUAN sections for every item, `docs/uji/FASE-7.md` from 19.11, README.
+
+If a module runs long, these parts may slip to **Phase 7b** without breaking contracts:
 
 | Module | May slip |
 |---|---|
-| harta | wandering-trader trade, ingredient Shift tooltips |
-| pertempuran | twin rings |
-| kultivasi | Immortal Stars |
-| jalan | world-render blueprints (keep the particle fallback), carousel, others'-effects scale |
+| harta | wandering-trader trade, Shift ingredient tooltips, garden herbs, disciple effects of the new pills |
+| tempur | twin rings, seven-coloured rings |
+| kultivasi | the star orbit on the Status page (the count stays) |
+| jalan | formation blueprints, cooldown ping, `uji hud` |
 
-### 19.5 Rejected and deferred proposals
+### 19.11 Test checklist (for `docs/uji/FASE-7.md`)
 
-* **Metode Kultivasi (gongfa manuals):** deferred to Phase 7. Effort L; its hooks sit in XP, stats, qi, tribulation and toxicity files owned by three Phase 6 modules. Manuals can later reuse the Phase 6 loot pools.
-* **Pusaka/Fabao (refined, blood-bound artifacts):** deferred to Phase 7. Effort L; item attribute modifiers stack with vanilla enchantments, which needs its own balance pass.
-* **Alam Rahasia inside vanilla structures:** deferred to Phase 7. It should reuse the elite and protector spawners once they are proven in play.
-* **Secret-realm dimension:** rejected. World generation and chunk-generation spikes on the Valorant laptop; the structure-based version is preferred.
-* **Kultivator Sesat ambushes:** deferred until phase 5 lands. Needs the player-model NPC renderer and AI the disciples are building.
-* **Teleport formations:** deferred. Needs a formation-module refactor and safe cross-dimension entity teleport; the Return Talisman and the flying sword cover travel for now.
-* **Concealment and vein-nurturing formations:** deferred. Vein protection now comes from qi formations, the floor and the abode; concealment needs per-second mob target clearing.
-* **Heavenly treasure falls:** deferred to Phase 7, together with the secret-realm event spawner.
-* **Spirit mounts (Kuda Awan / Qilin):** deferred. Lower value; the flying sword is the travel fantasy.
-* **Epithets and Dao Name, realm nameplates, inspect card:** deferred to a social phase. They need a `VisualState` codec change and render hooks in P4-visuals territory; low singleplayer value.
-* **Heaven Ranking / Daftar Langit with NPC rivals and rated duels:** deferred to Phase 7, after the Jalan tablet proves out.
-* **Sect ranks, contribution, missions, hall, treasury, sect screen, raids, identity, qi resonance:** deferred as one "Sekte Hidup" phase after disciples exist. The user mostly plays alone.
-* **Disciples × sects spec and disciple expeditions:** deferred to phase 5 follow-ups. Note for phase 5: disciples near a tribulation should count as Pengawal Dao for protector targeting only, never for strike reduction.
-* **Sharing pills and channelling qi to allies:** deferred to the social phase (LAN-only value).
-* **Jade-slip technique teaching:** rejected for now. It undercuts book rarity; ancient scrolls cover technique acquisition.
-* **Jade notification slips and message log:** deferred. Converting about 40 `Msg.chat` sites across many modules needs a single coordinated pass, not parallel modules.
-* **Help → full Kitab codex rewrite with unlock dots:** deferred. Phase 6 only adds topics.
-* **HUD layout editor (anchor, scale, drag):** deferred. Auto quality and HUD tidying come first.
-* **Pendamping tablet (beasts, formations, sect):** deferred to the social phase.
-* **Alchemy furnace look-at card:** deferred. Needs a pot request payload; the recipe tablet comes first.
-* **Nine Heavens tribulation:** deferred. Immortal Stars give the endgame first.
-* **Explorer's codex (Catatan Penjelajah):** deferred until the new content has settled.
-* **Qi Sense server neighbour-scan compass:** merged into the vein compass and the HUD vein line instead of a 40-tick server poll.
+> Bahasa Indonesia. Persiapan: dunia uji dengan cheat aktif, mode Survival kecuali disebut lain. Ubah ranah dengan
+> `/kultivasi uji ranah <ranah> [tahap] [lapis]`. Barang fase 7 cepat didapat dengan `/kultivasi uji kit`. Setiap barang,
+> tingkat elit, afiks, jimat, herba dan anugerah baru punya baris **Sumber** di tooltip atau kartunya (poin S).
 
+**A. Simpanan lama dan dasar**
+1. Muat simpanan dari fase 6c: ranah, teknik, bintang murid, aula dan Qi Tertimbun tetap sama. Tidak ada crash, tidak ada peringatan kunci bahasa.
+2. Buka layar kultivasi: tujuh tablet (Status, Akar & Dao, Teknik, Pengaturan, Bantuan, Jalan, Alkimia) muat di 320×240. `/kultivasi jalan` dan `/kultivasi resep` membuka tab yang benar.
+3. Matikan `eliteMonsters`, `structureLoot`, `spiritStoneMining`, `herbHarvest`, `dailyTasks` di config → fiturnya benar-benar hilang. Nyalakan lagi → kembali.
+
+**B. Binatang Iblis**
+4. `uji elit 1`, `uji elit 2 api`, `uji elit 3 petir zombie` → aura warna unsur, ukuran membesar per tingkat, tingkat 3 punya bilah bos "Raja Siluman · Petir".
+5. Di Inti Emas, bunuh elit tingkat 3 (164 HP) dengan jurus dasar → sekitar 7 pukulan. Di Dewa Abadi (304 HP) → sekitar 4 pukulan dasar atau 1–2 jurus Langit. Elit tidak pernah mati dalam satu pukulan biasa di Transformasi Dewa.
+6. Tingkat 2: setiap 8–10 detik ada skill dengan cincin peringatan; keluar dari lingkar Tanda Langit dalam 1,5 detik → tidak kena. Kedipan hanya mendarat di tempat aman.
+7. `uji elit 2 air zombie perisai_unsur`: jurus Api ×0,65, jurus Tanah (Tubuh) normal. Afiks Penyerap Qi mengurangi qi saat memukulmu; Pulih Cepat memulihkan 1 HP/detik.
+8. Bunuh elit → inti binatang selalu jatuh di tempat elit; tingkat 3 juga batu roh. Biarkan murid membunuh elit → inti tetap jatuh, murid dapat XP, kamu dapat hitungan elit.
+9. Elit dari spawner monster tidak pernah muncul; mob dari spawner bertanda dan memberi XP ×0,25 tanpa inti. Di sel sekte tidak ada elit. Manusia Fana tidak pernah bertemu elit.
+10. Zombie elit tidak bisa mendobrak pintu, kerangka elit memakai pedang (tidak memanah), elit tidak memungut barang dan tetap hilang (despawn) seperti mob biasa.
+11. `uji tribulasi nascent_soul` lalu tunggu gelombang Pelindung Dao → satu elit tingkat 1 ikut, memberi setengah XP dan menjatuhkan inti, lalu lenyap saat tribulasi selesai.
+
+**C. Batu Roh**
+12. Tambang bijih berlian tanpa Silk Touch di Pemurnian Qi → kadang batu roh rendah keluar dari blok. Dengan Silk Touch atau di mode Kreatif → tidak pernah.
+13. Resep 9 ↔ 1 bekerja untuk keempat tingkat.
+14. Pegang batu rendah di tangan kiri saat meditasi → satu habis setiap 30 detik, XP ×1,5, HUD menunjukkan ikon dan waktu. Saat bilah penuh di hambatan → XP masuk Qi Tertimbun.
+15. Jongkok + pakai batu di luar meditasi → qi bertambah (Agung: qi penuh + regen ×3 selama 60 detik).
+16. Jongkok + pakai batu tinggi pada Lodestone formasi pelindung → daya +24 jam, batas 48 jam; kecubung tetap batas 2 jam.
+17. Pegang 2 batu Agung saat terobosan berhasil → panel Persiapan menulis "+0,16 dari Batu Roh", kualitas naik, batu habis. Gagal atau batal → batu tetap ada.
+18. Kantor Misi menerima batu, herba dan inti dengan nilai PK dan tetap dibatasi 300 PK per hari.
+
+**D. Inti Binatang**
+19. Jongkok + pakai inti rendah → XP (batas 150), racun +6, pemahaman jika unsurnya cocok dengan Dao. Unsur ada di akar → XP +50%.
+20. Beri inti ke binatang roh → XP binatang bertambah; unsur cocok ×1,5; cooldown 10 detik per binatang.
+21. Bunuh Warden pertama hari ini → inti Raja. Bunuh lagi hari yang sama → tidak ada inti Raja kedua.
+22. Ekspedisi "Perburuan Binatang Iblis" pulang membawa inti; "Mencari Herba Roh" membawa herba roh.
+
+**E. Tanaman Roh**
+23. `uji herba tampak`, lalu patahkan rumput → Rumput Roh dengan umur. Tooltip "Umur: … tahun".
+24. Wortel matang di hutan rimba → Ginseng Roh Sembilan Lekuk lebih sering; bunga di bioma bersalju → Rumput Es Bersudut Delapan; kutil Nether → Bunga Api Ungu; bunga di malam hari (bulan purnama ×3) → Rumput Roh Ilusi; bambu saat badai petir → Bambu Petir Emas; tanaman korus di End → Buah Ginseng; jamur di bawah y 0 → Jamur Inti Kuning.
+25. Patahkan tempat yang sama dua kali di hari yang sama dengan tepung tulang → paling banyak satu herba per tempat per hari.
+26. `uji herba semua 1200` → nama emas "… Seribu Tahun"; temuan asli ≥ 1.000 tahun memunculkan satu baris di chat server.
+27. Indra Ilahi menandai tanaman yang terinfus dengan warna hijau. Herba tidak bisa ditanam.
+
+**F. Urat Roh, tertutup, gua**
+28. `debug vein grade` di beberapa wilayah → ada Agung/Kaya/normal/Tipis. Kepadatan di wilayah Agung bisa 200%.
+29. Kompas Urat Roh: pakai → jarum menunjuk wilayah Agung (atau Kaya) terdekat, tooltip menulis tingkat dan jarak; cooldown 60 detik.
+30. Meditasi tanpa putus: setiap 5 menit "Tertutup +5%" sampai +25%. `uji tertutup 30m` → peluang pencerahan ×1,5. Berhenti setelah ≥ 60 detik → baris ringkasan.
+31. Di Transformasi Dewa, meditasi 60 detik tanpa situs atau formasi di kepadatan 100% memberi sekitar 240 XP (dasar 4,0/detik); di Dewa Abadi sekitar 5.000 XP (83,3/detik).
+32. `/kultivasi gua tetapkan` di kursi formasi qi dalam formasi pelindung aktif → berhasil; di luar formasi pelindung → ditolak dengan alasan. Dalam 6 blok: kuras urat ×0,5, istirahat ≤ 10 detik tidak menghapus tumpukan.
+33. Dengan Mode Kehancuran nyala, jurus di dekat gua tidak membuat kawah dalam 16 blok dari kursi gua.
+34. Murid yang bermeditasi dekat guru tetap mendapat bagian XP meditasi yang sama dengan rumus baru.
+
+**G. Jimat**
+35. Buat kertas jimat (3 kertas + Rumput Roh + pewarna merah). Tulis jimat: kertas di tangan kanan, katalis di tangan kiri, jongkok + pakai → 2 detik, qi berkurang. Gagal → kertas dan katalis jadi abu.
+36. Pakai inti unsur yang cocok sebagai katalis → kekuatan +1 (+2 untuk Tinggi/Raja), maksimal 9.
+37. Manusia Fana bisa memakai jimat (Jimat Seribu Li: Kecepatan II, dua kali pakai).
+38. Jimat Petir pada elit vs zombie biasa: kerusakan sama (4 + 2,5 × kekuatan) dan merantai ke satu monster lain 50%. Tidak pernah mengenai hewan, penduduk atau pemain.
+39. Jimat Awan Api membakar entitas saja; tidak ada api di blok. Jimat Perisai memberi Absorption 60 detik. Jimat Pengikat memperlambat monster (bos ×0,25). Jimat Kejernihan: tak terlihat, monster di dekatmu kehilangan target sampai kamu menyerang.
+40. Jimat Pulang: 5 detik, batal jika dipukul atau bergerak > 1 blok; tujuan gua → titik bangkit → spawn dunia. Ditolak saat tribulasi, ujian warisan, duel, turnamen, saat menunggangi pedang terbang, atau 10 detik setelah dipukul. Tidak pernah berpindah dimensi.
+41. Jimat Penangkal Petir saat tribulasi sendiri: petir berikutnya ×0,5, paling banyak 2 per tribulasi.
+
+**H. Alkimia**
+42. Masukkan 10 bahan ke panci. Tambah batu menengah → peluang +0,10 dan kualitas naik. Tambah herba 1.000 tahun sebagai herba pembantu → kualitas jauh lebih tinggi. Inti Raja sebagai katalis → kualitas paling rendah Sempurna. Peluang tidak pernah lebih dari 95%.
+43. Racik keempat pil baru dan resep alternatif. Pil Wawasan Dao ditolak tanpa Dao dan berhenti di 5 per ranah. Pil Penempa Tulang: +1 darah permanen, tetap ada setelah mati dan masuk ulang, batas +10.
+44. Beri pil baru ke murid → ditolak dan pil tetap ada.
+45. Kitab Alkimia: setiap resep tampil, tanda centang dan "Bisa diracik 2×" sesuai isi inventori, peluang sesuai api unggun / api jiwa / Dao Api.
+
+**I. Tribulasi hidup dan Hu Fa**
+46. `uji tribulasi deity_transformation cincin` → 1,5 detik sebelum tiap petir muncul cincin di kaki. Melangkah 2 blok → petir hanya menyerempet (40%), tetap kena. Tidak pernah mati.
+47. Semua petir diterima penuh → pencapaian *Menantang Langit* dan kualitas +0,12. Setiap serempetan −0,02.
+48. `uji tribulasi immortal_ascension 1 kembar` → cincin kembar setiap petir ke-4; berdiri di salah satunya tetap kena penuh.
+49. LAN: teman sekte mendapat baris [Kawal]; klik → terdaftar. Pemain dalam 24 blok saat petir pertama terdaftar otomatis. HUD menulis "Dikawal: 1", petir ×0,95 (Dao Petir ×0,90), gelombang pelindung +1 mob. Berhasil → penjaga dapat 10% bilahnya.
+50. Matikan `tribulationTelegraph` → tidak ada cincin, semua petir penuh seperti dulu.
+
+**J. Jalan, Ujian, Harian**
+51. Dunia baru: panduan di tepi kanan tengah, tidak menutupi panel pembangunan sekte, toast, ikon efek atau bilah bos. Mengecil jadi segel setelah 20 detik.
+52. Pemain lama: langkah yang sudah dilakukan langsung tercentang saat masuk. Ambil hadiah tiap bab sekali saja. Koin "Sembunyikan panduan" menyembunyikannya.
+53. `uji jalan ujian` di Inti Emas puncak menuju Jiwa Baru Lahir → tiga ujian dengan progres. `uji jalan ujian selesai` → kualitas +0,26 di panel Persiapan dan petir ×0,9 ("Fondasi Kokoh").
+54. `/kultivasi harian` → tiga kewajiban. Selesaikan → 4% bilah tiap kewajiban, batu rendah saat ketiganya selesai, beruntun +10% per hari. Tidur melewati malam tidak memberi kewajiban baru sebelum 18.000 tick bermain.
+
+**K. Persiapan dan HUD tribulasi**
+55. Bilah penuh di Penyatuan Dao puncak: panel Persiapan menulis 9 petir × 18%, terakhir 36%, total 180%, iblis hati, gelombang pelindung, cincin, dan daftar periksa (darah, penyembuh, penangkal, sekutu, racun).
+56. Saat tribulasi: HUD di tepi kiri tengah menunjukkan pip petir, cincin waktu, "Berikutnya −x ❤" (kuning/merah berkedip), "Keluar dari lingkar!" dan cincin jarak 6 blok. Tidak bertabrakan dengan bilah bos iblis hati atau langit merah Kehancuran.
+
+**L. Anugerah, Perkokoh Fondasi, Bintang**
+57. `uji ranah immortal_ascension 4 1` → judul "Urat Abadi terbuka: Napas Abadi" (L1). Naik lapis → anugerah berikutnya muncul satu per satu. `uji anugerah` mendaftar yang aktif.
+58. L7: terima pukulan mematikan dari monster → hidup dengan 1 HP, qi habis, sekali per hari game. `/kill`, void dan petir tribulasi tidak pernah dicegah. Totem tetap terpakai lebih dulu.
+59. `uji fondasi golden_core retak` lalu `/kultivasi fondasi perkokoh` di formasi tingkat 2 dengan Qi Tertimbun ≥ 9.225 → ritual 30 detik → Normal. Berhenti meditasi → batal tanpa biaya.
+60. Di Dewa Abadi puncak dengan Qi Abadi: `/kultivasi bintang padatkan` → bintang 1 (biaya 500.000). `uji bintang 9` → jurus tingkat Dewa (Gerbang I) bisa dipelajari; `uji bintang 18` → Gerbang II. Darah +2 dan qi +1% per bintang; kerusakan jurus naik lewat faktor bintang yang sudah ada.
+
+**M. Lima Unsur**
+61. `uji unsur` pada laba-laba dengan Dao Pedang → ×1,3; Dao Api pada stray → ×1,0; Dao Petir pada drowned → ×1,3. Unsur jurus ada di akar → tambahan ×1,1.
+62. Sparring, duel turnamen dan tribulasi tidak terpengaruh faktor unsur. Detail Kitab Teknik menulis "Unggul melawan: …".
+
+**N. Relik di peti**
+63. `uji relik desert_pyramid`, `uji relik igloo_chest`, `uji relik ancient_city` → batu, herba, inti atau slip giok sesuai tabel, bersama isi vanila dan barang fase 6c yang sudah ada.
+64. Indra Ilahi di dekat struktur menandai peti yang belum dibuka dengan warna emas.
+
+**O. Keseimbangan**
+65. `uji kejenuhan 75` lalu bunuh monster → XP ×0,33 dan muncul petunjuk di bilah aksi. Tunggu → nilainya turun lagi.
+66. Bos kedua di hari yang sama → XP 25%. Lebih dari 4 buku wawasan per hari → buku tetap ada dengan pesan "pikiranmu sudah penuh".
+67. Racun > 90: pil kadang "Membalik" (deviasi, tidak pernah mati). Pil Abadi memberi 1 bilah × kualitas.
+
+**P. HUD dan kenyamanan**
+68. `uji hud` → semua elemen HUD fase 7 tampil 10 detik. Pedang terbang: "≈42 s", kuning < 15 detik, merah < 10 detik dengan bunyi. Pip Langkah Awan sesuai ranah (sampai 6).
+69. Meditasi lalu biarkan zombie mendekat → bel, vinyet merah ke arah mob, "Bahaya: Zombie 7 blok". Elit ditulis "Binatang Iblis".
+70. Lihat Gold Block kursi formasi sambil memegang End Rod → cetak biru: garis hijau, kubus emas berdenyut, silang merah, label progres. Tidak ada blok yang berubah.
+71. "Efek pemain lain: Mati" juga menyembunyikan aura kultivasi pemain lain.
+
+**Q. Murid, sekte dan Kehancuran**
+72. Kawah Mode Kehancuran di bijih atau tanaman tidak pernah memberi batu roh, herba atau XP tambang.
+73. Murid tidak pernah mengurangi petir tribulasimu, tetapi pelindung bisa memilih mereka sebagai target.
+74. Bintang pemain membuat ukuran kawah (K) dan batas blok naik sesuai rumus 6c.
+
+**R. Keamanan blok dan performa**
+75. Elit Api, Jimat Awan Api, Jimat Petir dan cincin tribulasi di dekat penangkal petir, tembaga, rumput, salju dan ladang → tidak ada blok berubah, tidak ada `LightningBolt`.
+76. Dengan 3 elit dan tribulasi berjalan, server tetap 20 TPS dan FPS layak di kualitas Normal; "Otomatis" turun ke Minimal di bawah 40 fps.
+
+**S. Sumber**
+77. Arahkan kursor ke setiap batu, herba, inti, pil baru, jimat, tingkat elit, afiks dan anugerah → ada baris Sumber. Konsep yang tidak terverifikasi namanya ditulis "Terinspirasi dari …"; aturan UX dan keseimbangan tidak mengaku kanon.
+
+### 19.12 Dropped, replaced and renamed
+
+| Old plan | Now | Change | Why |
+|---|---|---|---|
+| 19.2.4 Roda Segel, Segel Cepat, carousel, keys `seal_wheel`/`quick_1..4`, `MouseHandlerMixin` stub | – | drop | built in 6c (`client/codex/*`, `Keys.WHEEL`, `SEAL_1..4`, loadout slots on the server) |
+| `sessionExtra` spine step | only the `cfg` write | reduce | exists in `CultivationData` |
+| Otomatis quality, "Efek pemain lain", scrolling settings | `AuraFx` routing only | reduce | built in 6c |
+| Dharma Form / Dao Domain arcs, `dharma_end`, `domain_end` | – | drop | `QiHud` draws them from `sessionExtra.teknik` |
+| `ancient_technique_scroll`, `TechniqueBooks.learnFromScroll`, `RelicLoot`, `first_ancient_scroll`, the scroll rows of 19.2.14 | 6c jade slips in three tables | drop + replace | 6c `TechniqueLoot`, `HallItems`, `JadeSlips`, `InheritanceTrials` already deliver techniques |
+| Dao technique damage table, `Techniques.qiCost` scaling | – | drop | 22.10 and `TechniquePower.qi` (which lowers the cost) |
+| `starDamageFactor`, the 18-star cap, cost `100,000 × 1.15^(n−1)` | `Stars.cost(n)`, endless | reduce | `TechniquePower.starFactor` already applies; stars are open-ended in 22.8 and the code |
+| Wawasan Pertempuran (+40% bar, +5 comprehension) | `boss_ever` kept as a trial counter | drop | no source; 6c's first-boss Giok Warisan, flame seeds and FIRST_KILL feats already reward first boss kills |
+| Padatkan Qi, `CONDENSE_QI`, `/kultivasi qi padatkan`, the Status talisman, `qi_condensed`, `condenseCost` | **Batu Roh di Hambatan** | replace | no work turns one's own qi into stones; RMJ ch. 1152 |
+| Fuel idle at a full bottleneck, `fuel_idle` | fuel always works | drop | goes against RMJ ch. 1152; no loop is left to block |
+| Actions 21–24 single-purpose | `KULTIVASI = 21`, `JALAN = 22` with text ops | reshape | the 6/6b/6c one-id-per-module pattern |
+| FxTypes `TRIBULATION_RING`, `DAO_GUARDIAN` | `ELITE` + `CombatFxIds` | merge | one FxType per module |
+| `PathPage`, `TAB_PATH`, `TAB_ALCHEMY` | `JalanPage`, `TAB_JALAN`, `TAB_ALKIMIA` | rename | clashes with `client/disciple/path/*` and `extra.path` |
+| Tugas Harian | **Kewajiban Harian** (help `harian`) | rename | clashes with Tugas Sekte; source RI ch. 10 |
+| Karma Darah (`extra.combat.karma`) | **Kejenuhan Bertarung** (`fatigue`) | rename + reword | no source; kept as a balance rule with no lore claim |
+| Pengawal Dao | **Hu Fa Tribulasi** | rename | clashes with Pelindung Dao; source BTTH 护法, RMJ ch. 1803 |
+| Hu Fa comprehension reward (×3 for Lightning) | Lightning-Dao guardians reduce strikes more (×0.90) | replace | no source for insight from watching; RMJ ch. 1803 |
+| `dao_guardian`, `great_guardian` | `hu_fa_tribulation`, `great_hu_fa` | rename | follows the feature |
+| Affix Kulit Besi | **Perisai Unsur** | replace | no source; RMJ ch. 1561 |
+| Affix Gesit | – | drop | weak source; the Wind passive already gives +30% speed |
+| Core heart-demon pressure | – | drop | no source; the toxin (BTTH ch. 11, CD B8 ch. 57) covers the cost |
+| `blood_ginseng` | `ninecurl_ginseng` | replace | minor works only; RMJ ch. 433 |
+| `snow_lotus` | `eight_angled_ice_grass` | replace | *Soul Land* concept |
+| `hellfire_lotus` | `purple_flame_flower` | replace | no source; RMJ ch. 1174 |
+| `moonlight_orchid` | `illusory_spirit_herb` | replace | no source; RMJ ch. 1174 |
+| `thunder_grass` | `gold_lightning_bamboo` | replace | no source; RMJ ch. 412, 1535 |
+| `void_lily` | `ginseng_fruit` (p 4% → 2%) | replace | no source; JTTW ch. 24 |
+| `purple_lingzhi` | `yellow_essence_mushroom` | replace | real-world lore only; RMJ ch. 164 |
+| a lookalike foundation herb | `foundation_herb` joins the family | merge | already a spirit herb (`SectEventItems`) |
+| `holy_flame_talisman` | `fire_cloud_talisman` | rename | "Holy Flame" not found; RMJ ch. 242 |
+| `golden_shield_talisman` | `shield_talisman` | rename | "Golden" has no source; AWE ch. 51 |
+| `sealing_talisman` | `binding_talisman` | rename | *Ancient Strengthening Technique* ch. 421 |
+| `purifying_talisman` | `thousand_mile_talisman`; the cleanse moves to the Toxin Purging Pill | replace | no source; RI ch. 12 |
+| `heavens_eye_talisman` | `limpidity_talisman` | replace | no source; RMJ ch. 1365 |
+| Blank talisman with a gold nugget | spirit grass + red dye | reword | RMJ ch. 242 (herb paper, cinnabar) |
+| Talisman damage `4 + 2 × power` through `Techniques.hurt(caster, target, amount)` | `T(p) = 4 + 2.5p` through `DamageContext.legacy` | fix | the old call became almost zero against trial mobs |
+| Element families Water {Ice}, Metal {Lightning}, Wood {Wind} | parents: Lightning {Earth, Water}, Ice {Water, Metal}; Wind neutral | replace | RMJ ch. 127 |
+| Element factor "in `Techniques.hurt`", Kulit Besi "in `Techniques.hurt`" | `TechniquePower` target factors (element, Perisai Unsur) | fix | the 6c choke point `finalDamage` covers player, disciple and `PowerCore` casts and knows the spec |
+| Technique element = the chosen Dao's element | the spec's Dao element first, then the chosen Dao, then the root | fix | 169 specs of every Dao exist |
+| `ElementRelations` in `data/` | in `elite/` | move | module ownership |
+| Arus Abadi, Gerbang Surgawi | Urat Abadi, Gerbang Keabadian | rename | ISSTH ch. 974, 969 |
+| L2 source (Lingbo Microsteps) | JTTW ch. 2 | replace | wuxia, not cultivation; user may restore it |
+| L7 via `ALLOW_DEATH` | `DeathGuard` PERK guard | fix | the single death listener of 22.14.6 |
+| Tempa Ulang Fondasi, `foundation_reforged` | Perkokoh Fondasi, `foundation_strengthened` | rename + reword | no work re-forges a finished foundation; ISSTH B2 ch. 134 |
+| `seclusion_hour` | `closed_door_hour` | rename | next to `hour_of_stillness` |
+| Pusaka Kuno (help `relics`) | Relik di Peti Kuno (help `relik`) | rename | `pusaka` is the disciples' natal treasures |
+| Chapter-4 reward: an enchanted book | a Kuning jade slip of the chosen Dao | replace | 6c jade slips |
+| 16 guide steps | 20 steps, new chapter 5 Sekte | extend | phases 5–6c exist |
+| "boss insights" in the trials | "boss types ever slain" | reword | Battle Insight is dropped |
+| GuideTracker top left; tribulation HUD below the boss bar | right edge middle; left edge middle | move | `BuildHud`, `RedSkyHud`, boss bars, toasts |
+| fabric world-render blueprints with a particle fallback | vanilla `Gizmos` | replace | as `SiteHologram` |
+| `CloudStep.maxJumps(CultivationData)`, 1–3 pips | public `maxJumps(Realm)`, up to 6 pips | fix | 6c changed the jumps |
+| Elite protectors in every wave helper | `spawnWave` only | fix | `spawnWaveFor` serves disciples and trials |
+| Module names P6-*, "slip to Phase 6b" | P7-*, Phase 7b | rename | the real phase 6b exists |
+
+### 19.13 Deferred and rejected (replaces the old 19.5)
+
+* **Built since the first plan** (no longer deferred): sect ranks, contribution, missions, hall and treasury (phase 6);
+  disciple expeditions (`sect/event/Expeditions`); Alam Rahasia as an expedition type and `VoidRealm`; Heaven Ranking in
+  part (`Tournament`, `HundredDynasties`, `Rivals`); Fabao for disciples (`NatalTreasure`); the Nine Heavens tribulation
+  for disciples (`Calamity`); jade-slip technique teaching (6c `JadeSlips`); a codex for techniques (Kitab Teknik).
+* **Phase 7b:** player star calamities (the RI Three Trials, reusing the 20.3.19 rules); disciple effects of the new
+  pills and cores; the slip list of 19.10.
+* **Deferred to Phase 8 or later, each needing its own source check:** Metode Kultivasi (gongfa manuals, effort L);
+  Fabao for the player; Kultivator Sesat ambushes (the NPC parts now exist in `Rivals` and phantoms); heavenly treasure
+  falls; teleport formations (`SpaceFold`, `CloudTravel` ≤ 128 blocks and the Return Talisman cover travel);
+  concealment and vein-nurturing formations; spirit mounts; epithets, Dao names and nameplates; sharing pills and
+  channelling qi; jade notification slips and a message log; a general codex with unlock dots; a HUD layout editor; the
+  Pendamping tablet; the alchemy furnace look-at card; the explorer's codex; elites inside Alam Rahasia.
+* **Rejected:** a secret-realm dimension (world generation and chunk spikes on the Valorant laptop); a server Qi Sense
+  neighbour poll (merged into the vein compass and the HUD vein line).
 
 ## 20. Phase 6 — Sekte Abadi & Murid OP (user priority, 2026-10-17)
 
