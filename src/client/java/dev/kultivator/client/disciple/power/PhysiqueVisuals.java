@@ -22,17 +22,20 @@ public final class PhysiqueVisuals {
 	/** Alpha of a translucent body (spirit body, clone, phantom). */
 	private static final int GHOST_ALPHA = 140;
 
-	private static final ItemStack SWORD = new ItemStack(Items.IRON_SWORD);
-	private static final ItemStack SWORD_SILVER = glint(new ItemStack(Items.IRON_SWORD));
-	private static final ItemStack SWORD_GOLD = glint(new ItemStack(Items.GOLDEN_SWORD));
-	private static final ItemStack PARASOL = model("natal_parasol", false);
-	private static final ItemStack PARASOL_SILVER = model("natal_parasol", true);
-	private static final ItemStack PARASOL_GOLD = model("natal_parasol_gold", true);
-	private static final ItemStack WOK = model("natal_wok", false);
-	private static final ItemStack WOK_SILVER = model("natal_wok", true);
-	private static final ItemStack WOK_GOLD = model("natal_wok_gold", true);
-	private static final ItemStack BELL = new ItemStack(Items.BELL);
-	private static final ItemStack BELL_SILVER = glint(new ItemStack(Items.BELL));
+	/** The natal treasure looks, made on first use (item components are not bound while renderers are created). */
+	private static final class Stacks {
+		private static final ItemStack SWORD = new ItemStack(Items.IRON_SWORD);
+		private static final ItemStack SWORD_SILVER = glint(new ItemStack(Items.IRON_SWORD));
+		private static final ItemStack SWORD_GOLD = glint(new ItemStack(Items.GOLDEN_SWORD));
+		private static final ItemStack PARASOL = model("natal_parasol", false);
+		private static final ItemStack PARASOL_SILVER = model("natal_parasol", true);
+		private static final ItemStack PARASOL_GOLD = model("natal_parasol_gold", true);
+		private static final ItemStack WOK = model("natal_wok", false);
+		private static final ItemStack WOK_SILVER = model("natal_wok", true);
+		private static final ItemStack WOK_GOLD = model("natal_wok_gold", true);
+		private static final ItemStack BELL = new ItemStack(Items.BELL);
+		private static final ItemStack BELL_SILVER = glint(new ItemStack(Items.BELL));
+	}
 
 	private static ItemStack glint(ItemStack stack) {
 		stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
@@ -52,10 +55,10 @@ public final class PhysiqueVisuals {
 			return ItemStack.EMPTY;
 		}
 		return switch (PowerIds.natalForm(power)) {
-			case PowerIds.NATAL_PARASOL -> tier >= 3 ? PARASOL_GOLD : tier == 2 ? PARASOL_SILVER : PARASOL;
-			case PowerIds.NATAL_WOK -> tier >= 3 ? WOK_GOLD : tier == 2 ? WOK_SILVER : WOK;
-			case PowerIds.NATAL_BELL -> tier >= 2 ? BELL_SILVER : BELL;
-			default -> tier >= 3 ? SWORD_GOLD : tier == 2 ? SWORD_SILVER : SWORD;
+			case PowerIds.NATAL_PARASOL -> tier >= 3 ? Stacks.PARASOL_GOLD : tier == 2 ? Stacks.PARASOL_SILVER : Stacks.PARASOL;
+			case PowerIds.NATAL_WOK -> tier >= 3 ? Stacks.WOK_GOLD : tier == 2 ? Stacks.WOK_SILVER : Stacks.WOK;
+			case PowerIds.NATAL_BELL -> tier >= 2 ? Stacks.BELL_SILVER : Stacks.BELL;
+			default -> tier >= 3 ? Stacks.SWORD_GOLD : tier == 2 ? Stacks.SWORD_SILVER : Stacks.SWORD;
 		};
 	}
 
