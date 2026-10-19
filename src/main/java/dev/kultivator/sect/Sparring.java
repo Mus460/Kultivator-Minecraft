@@ -317,6 +317,10 @@ public final class Sparring {
 		if (DUELS.containsKey(self.getUUID())) {
 			return Component.translatable("kultivator.sects.spar.busy_self");
 		}
+		if (dev.kultivator.alam.Alam.blocked(self) || dev.kultivator.alam.Alam.blocked(other)) {
+			// Phase 8 (DESIGN 25.2 item 12): no sparring in or out of a secret realm run.
+			return dev.kultivator.alam.Alam.refusal();
+		}
 		if (DUELS.containsKey(other.getUUID())) {
 			return Component.translatable("kultivator.sects.spar.busy_other", other.getDisplayName());
 		}

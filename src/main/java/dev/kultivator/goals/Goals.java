@@ -4,8 +4,14 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.kultivator.Kultivator;
+import dev.kultivator.alam.Alam;
+import dev.kultivator.ascension.Stars;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
+import dev.kultivator.musuh.RogueCultivators;
+import dev.kultivator.musuh.SectRaids;
+import dev.kultivator.util.KillCredit;
 import dev.kultivator.network.Net;
 import dev.kultivator.network.Payloads;
 import dev.kultivator.util.Advancements;
@@ -16,9 +22,15 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 /**
  * P7-jalan (DESIGN 19.3.9, 19.3.10): the Jalan Kultivasi tablet with Langkah Pertama ({@link Guide}), Ujian Fondasi
@@ -31,6 +43,19 @@ public final class Goals {
 	/** {@code sessionExtra.hud_demo}: the game time until which {@code uji hud} shows sample HUD values. */
 	public static final String HUD_DEMO = "hud_demo";
 	public static final int HUD_DEMO_TICKS = 200;
+
+	/**
+	 * Phase-8 lifetime counters of the glue (DESIGN 25.8.3) in {@code extra.goals.row4}: rogue cultivators slain (any credit
+	 * kind), village requests finished, secret realm clears, demonic elders (tier 3) slain during a live sect raid.
+	 */
+	public static final String WORLD = "row4";
+	public static final String W_ROGUES = "rk";
+	public static final String W_REQUESTS = "vq";
+	public static final String W_CLEARS = "rc";
+	public static final String W_ELDERS = "tt";
+	/** Star condensing sink (DESIGN 25.8.4): each Esensi Energi Makam carried lowers the star's cost by 2%, at most 10. */
+	public static final double ESSENCE_DISCOUNT = 0.02D;
+	public static final int ESSENCE_MAX = 10;
 
 	public static void init() {
 		Advancements.addListener(Guide::onAdvancement);
@@ -45,6 +70,75 @@ public final class Goals {
 		ServerLivingEntityEvents.AFTER_DEATH.register(GoalCounters::onDeath);
 		PlayerBlockBreakEvents.AFTER.register(GoalCounters::onBlockBroken);
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> GoalCounters.clear());
+		// Phase 8 glue (DESIGN 25.8): the world counters and the star condensing sink.
+		ServerLivingEntityEvents.AFTER_DEATH.register(Goals::onWorldKill);
+		Alam.addClearListener((player, id, layer, first) -> addWorldCounter(player, W_CLEARS, 1));
+		Stars.addCostModifier(player -> 1.0D - ESSENCE_DISCOUNT * Math.min(ESSENCE_MAX, essence(player)));
+		Stars.addCondenseListener((player, stars) -> takeEssence(player, Math.min(ESSENCE_MAX, essence(player))));
+	}
+
+	/** A rogue cultivator died: the credited player's rogue counter, and the elder counter during a live sect raid. */
+	private static void onWorldKill(LivingEntity victim, DamageSource source) {
+		if (victim.level().isClientSide() || !RogueCultivators.isRogue(victim)) {
+			return;
+		}
+		KillCredit.Credit credit = KillCredit.resolve(victim, source);
+		if (credit == null) {
+			return;
+		}
+		ServerPlayer player = credit.owner();
+		addWorldCounter(player, W_ROGUES, 1);
+		if (RogueCultivators.tier(victim) == 3 && SectRaids.active(player.getUUID())) {
+			addWorldCounter(player, W_ELDERS, 1);
+		}
+	}
+
+	/** Adds to a phase-8 world counter (written silently; the trials and chores read it on their next pass). */
+	public static void addWorldCounter(ServerPlayer player, String key, int amount) {
+		CompoundTag world = GoalCounters.section(GoalCounters.goals(Cultivators.get(player)), WORLD);
+		world.putInt(key, Math.max(0, world.getIntOr(key, 0)) + amount);
+	}
+
+	/** A phase-8 world counter (pure). */
+	public static int worldCounter(CultivationData data, String key) {
+		return GoalCounters.view(data).getCompoundOrEmpty(WORLD).getIntOr(key, 0);
+	}
+
+	private static Item essenceItem() {
+		return BuiltInRegistries.ITEM.getValue(Kultivator.id("tomb_essence"));
+	}
+
+	/** Esensi Energi Makam in the player's inventory (0 while module A's item is not registered). */
+	static int essence(ServerPlayer player) {
+		Item item = essenceItem();
+		if (item == Items.AIR) {
+			return 0;
+		}
+		int count = 0;
+		for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+			ItemStack stack = player.getInventory().getItem(i);
+			if (stack.is(item)) {
+				count += stack.getCount();
+			}
+		}
+		return count;
+	}
+
+	private static void takeEssence(ServerPlayer player, int amount) {
+		Item item = essenceItem();
+		int left = amount;
+		for (int i = 0; i < player.getInventory().getContainerSize() && left > 0 && item != Items.AIR; i++) {
+			ItemStack stack = player.getInventory().getItem(i);
+			if (stack.is(item)) {
+				int take = Math.min(left, stack.getCount());
+				stack.shrink(take);
+				left -= take;
+			}
+		}
+		if (amount > 0) {
+			Msg.chat(player, Component.translatable("kultivator.jalan8.essence_used", amount - left,
+					Math.round(ESSENCE_DISCOUNT * 100.0D * (amount - left))).withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE));
+		}
 	}
 
 	/** Every server tick for each player: counters every 20 ticks, the guide, trials, chores and Persiapan every 100. */
@@ -64,7 +158,7 @@ public final class Goals {
 		}
 	}
 
-	/** Action {@code JALAN}: text = "hide", "show", "claim:N" (N = chapter 1-5) or "seen:codex" (DESIGN 19.2.1). */
+	/** Action {@code JALAN}: text = "hide", "show", "claim:N" (N = chapter 1-10) or "seen:codex" (DESIGN 19.2.1). */
 	public static void handleAction(ServerPlayer player, String text) {
 		CultivationData data = Cultivators.get(player);
 		CompoundTag goals = GoalCounters.goals(data);
@@ -100,7 +194,7 @@ public final class Goals {
 		uji.then(Commands.literal("jalan")
 				.then(Commands.literal("reset").executes(Goals::reset))
 				.then(Commands.literal("bab")
-						.then(Commands.argument("n", IntegerArgumentType.integer(1, Guide.CHAPTERS))
+						.then(Commands.argument("n", IntegerArgumentType.integer(1, Guide.ALL_CHAPTERS))
 								.executes(ctx -> {
 									ServerPlayer player = ctx.getSource().getPlayerOrException();
 									Guide.completeUpTo(player, IntegerArgumentType.getInteger(ctx, "n"));
@@ -138,7 +232,10 @@ public final class Goals {
 			data.sessionExtra().putLong(HUD_DEMO, player.level().getGameTime() + HUD_DEMO_TICKS);
 			Cultivators.syncNow(player);
 			return ok(ctx, Component.translatable("kultivator.goals.test.hud"));
-		}));
+		}).then(Commands.literal("dunia").executes(ctx -> {
+			dev.kultivator.command.HudDunia.show(ctx.getSource().getPlayerOrException());
+			return ok(ctx, Component.translatable("kultivator.jalan8.test.hud_dunia"));
+		})));
 	}
 
 	/** {@code uji jalan reset}: forgets the guide, the trials and the chores (the lifetime counters stay). */
@@ -146,7 +243,7 @@ public final class Goals {
 		ServerPlayer player = ctx.getSource().getPlayerOrException();
 		CultivationData data = Cultivators.get(player);
 		CompoundTag goals = GoalCounters.goals(data);
-		for (String key : new String[]{Guide.KEY, Guide.CLAIMED, Guide.HIDDEN, Guide.SEEN, RealmTrials.KEY, DailyChores.KEY}) {
+		for (String key : new String[]{Guide.KEY, Guide.KEY2, Guide.CLAIMED, Guide.HIDDEN, Guide.SEEN, RealmTrials.KEY, DailyChores.KEY}) {
 			goals.remove(key);
 		}
 		Cultivators.syncNow(player);

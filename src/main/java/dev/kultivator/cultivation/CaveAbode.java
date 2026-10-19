@@ -135,6 +135,11 @@ public final class CaveAbode {
 		CultivationData data = Cultivators.get(player);
 		ServerLevel level = player.level();
 		BlockPos seat = player.blockPosition().below();
+		if (dev.kultivator.alam.Alam.blocked(player)) {
+			// Phase 8 (DESIGN 25.2 item 12).
+			Msg.chat(player, dev.kultivator.alam.Alam.refusal().withStyle(net.minecraft.ChatFormatting.RED));
+			return false;
+		}
 		if (!data.meditating()) {
 			return refuse(player, "kultivator.kultivasi.abode.need_meditation");
 		}

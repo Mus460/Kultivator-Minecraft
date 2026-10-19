@@ -163,6 +163,38 @@ public final class KultivatorConfig {
 	/** MSPT above which killing arrays pulse only every 40 ticks (30-50). */
 	public int formationMsptSlow = 45;
 
+	// ---- phase 8: Jalan Dunia Kultivasi (DESIGN 25.12)
+	/** Secret realm gates can be opened at all. */
+	public boolean secretRealms = true;
+	/** Runs use the kultivator:alam_rahasia dimension; false runs every realm in Mode Ringan around the gate (zero blocks). */
+	public boolean secretRealmDimension = true;
+	/** Realm slots that may run at once in the dimension (1-8). */
+	public int secretRealmSlots = 8;
+	/** Rogue cultivators ambush travellers. */
+	public boolean rogueAmbushes = true;
+	/** Multiplies the ambush chance (0-3; the 15% cap stays). */
+	public double rogueAmbushChanceScale = 1.0D;
+	/** Rogue cultivators alive in the whole world (6-16). */
+	public int rogueWorldCap = 12;
+	/** Demonic sects raid Sect Halls. */
+	public boolean sectRaids = true;
+	/** Days between raids from hall level 3 (5-30; 0 = off). */
+	public int sectRaidIntervalDays = 9;
+	/** Raiders alive at once in one raid (4-12). */
+	public int raidMaxAlive = 8;
+	/** Seconds without input after which an owner counts as away and the raid resolves as data (30-300). */
+	public int raidAfkSeconds = 60;
+	/** The Earthfire Forge and artifact forging. */
+	public boolean artifactForging = true;
+	/** Storage pouches and rings. */
+	public boolean storageRings = true;
+	/** Storage rings stay with the player on death (default false: they drop like any item). */
+	public boolean storageRingKeepOnDeath = false;
+	/** Villages near a hall can pledge allegiance. */
+	public boolean vassalVillages = true;
+	/** Blocks from the hall stele a vassal village may lie (128-512). */
+	public int vassalRange = 256;
+
 	public static KultivatorConfig get() {
 		return instance;
 	}
@@ -199,7 +231,7 @@ public final class KultivatorConfig {
 		}
 	}
 
-	/** Keeps every phase-6, 6b, 6c, 7 and 7b number inside its allowed range (DESIGN 20.2.11, 21.24, 22.18.1, 19.2.10, 23.2). */
+	/** Keeps every phase-6, 6b, 6c, 7, 7b, 7c and 8 number inside its allowed range (DESIGN 20.2.11, 21.24, 22.18.1, 19.2.10, 23.2, 24.13, 25.12). */
 	private void clamp() {
 		recruitmentIntervalDays = clamp(recruitmentIntervalDays, 1, 15);
 		tournamentIntervalDays = clamp(tournamentIntervalDays, 3, 30);
@@ -236,6 +268,14 @@ public final class KultivatorConfig {
 		formationReadsPerTick = clamp(formationReadsPerTick, 8, 64);
 		formationBudgetMs = clamp(formationBudgetMs, 0.05D, 1.0D, 0.15D);
 		formationMsptSlow = clamp(formationMsptSlow, 30, 50);
+		// Phase 8 (DESIGN 25.12).
+		secretRealmSlots = clamp(secretRealmSlots, 1, 8);
+		rogueAmbushChanceScale = clamp(rogueAmbushChanceScale, 0.0D, 3.0D, 1.0D);
+		rogueWorldCap = clamp(rogueWorldCap, 6, 16);
+		sectRaidIntervalDays = sectRaidIntervalDays <= 0 ? 0 : clamp(sectRaidIntervalDays, 5, 30);
+		raidMaxAlive = clamp(raidMaxAlive, 4, 12);
+		raidAfkSeconds = clamp(raidAfkSeconds, 30, 300);
+		vassalRange = clamp(vassalRange, 128, 512);
 	}
 
 	private static int clamp(int value, int min, int max) {

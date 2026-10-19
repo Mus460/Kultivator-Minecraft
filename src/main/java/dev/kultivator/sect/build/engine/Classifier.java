@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.SmokerBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,6 +46,10 @@ public final class Classifier {
 
 	public static final TagKey<Block> NATURAL = TagKey.create(Registries.BLOCK, Kultivator.id("sect_natural"));
 	public static final TagKey<Block> PROTECTED = TagKey.create(Registries.BLOCK, Kultivator.id("sect_protected"));
+	/** Blocks that are natural only in a rocky-surface biome (cobble mountains of Terralith and similar worldgen). */
+	public static final TagKey<Block> NATURAL_ROCKY = TagKey.create(Registries.BLOCK, Kultivator.id("sect_natural_rocky"));
+	/** Biomes whose generator lays cobblestone or cobbled deepslate as surface rock. */
+	public static final TagKey<Biome> ROCKY_SURFACE_BIOMES = TagKey.create(Registries.BIOME, Kultivator.id("rocky_surface_biomes"));
 	private static final Identifier STELE = Kultivator.id("sect_hall_stele");
 
 	public enum Kind {
@@ -113,10 +118,18 @@ public final class Classifier {
 		if (state.is(BlockTags.LOGS)) {
 			return naturalLog(level, pos, state, site) ? Kind.NATURAL : Kind.PLAYER_MADE;
 		}
-		if (naturalTagged(state)) {
+		if (naturalTagged(state) || rockySurface(level, pos, state)) {
 			return Kind.NATURAL;
 		}
 		return Kind.PLAYER_MADE;
+	}
+
+	/**
+	 * Cobblestone or cobbled deepslate in a rocky-surface biome (e.g. Terralith's Rocky Mountains, whose surface rule lays
+	 * a 12-20 block cobble band): natural there, while a player's cobble house anywhere else stays player-made.
+	 */
+	public static boolean rockySurface(ServerLevel level, BlockPos pos, BlockState state) {
+		return state.is(NATURAL_ROCKY) && level.getBiome(pos).is(ROCKY_SURFACE_BIOMES);
 	}
 
 	/**

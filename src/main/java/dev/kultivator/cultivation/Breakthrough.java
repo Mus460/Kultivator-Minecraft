@@ -302,6 +302,10 @@ public final class Breakthrough {
 		if (Sparring.inDuel(player)) {
 			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.sparring"));
 		}
+		if (dev.kultivator.alam.Alam.blocked(player)) {
+			// Phase 8 (DESIGN 25.2 item 12): never inside a secret realm or a run.
+			return refuse(player, dev.kultivator.alam.Alam.refusal());
+		}
 		if (HeartDemons.inTrial(player)) {
 			// A pressure Heart Demon is still fighting: it must be faced first.
 			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.heart_demon"));

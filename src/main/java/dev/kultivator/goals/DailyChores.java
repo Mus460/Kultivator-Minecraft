@@ -35,6 +35,9 @@ import java.util.Locale;
  * {@code extra.goals.daily {day, n, last, chores [{id, need, have, base}], done, streak, last_full, full}}.
  * <p>
  * Sumber: RI ch. 10 (as a servant disciple Wang Lin must fill ten vats of water a day). The streak is game design.
+ * <p>
+ * Phase 8 (DESIGN 25.8.3) adds four world chores: slay 2 rogue cultivators, finish 1 village request, forge or refine
+ * once, clear a secret realm; each joins the pool once its feature was met (an advancement or a vassal).
  */
 public final class DailyChores {
 
@@ -50,7 +53,9 @@ public final class DailyChores {
 
 	/** The pool; chores whose feature is unavailable are never rolled. */
 	public enum Chore {
-		KILLS, ELITE, MED_LONG, MED_SITE, TECH, REFINE, ORES, HERBS, THUNDER, TALISMAN;
+		KILLS, ELITE, MED_LONG, MED_SITE, TECH, REFINE, ORES, HERBS, THUNDER, TALISMAN,
+		/** Phase 8 (DESIGN 25.8.3). */
+		ROGUES, VILLAGE, FORGE, CHAMBER;
 
 		public String id() {
 			return name().toLowerCase(Locale.ROOT);
@@ -75,7 +80,8 @@ public final class DailyChores {
 	public static int need(Chore chore, CultivationData data) {
 		return switch (chore) {
 			case KILLS -> 8 + 2 * data.realm().ordinal();
-			case ELITE, THUNDER -> 1;
+			case ELITE, THUNDER, VILLAGE, FORGE, CHAMBER -> 1;
+			case ROGUES -> 2;
 			case MED_LONG -> 8 * 60;
 			case MED_SITE -> 5 * 60;
 			case TECH -> 5;
@@ -157,6 +163,10 @@ public final class DailyChores {
 			case REFINE -> RealmTrials.done(player, "first_alchemy");
 			case HERBS -> refining && config.herbHarvest;
 			case TALISMAN -> RealmTrials.done(player, "first_talisman");
+			case ROGUES -> refining && RealmTrials.done(player, "rogue_slain");
+			case VILLAGE -> config.vassalVillages && dev.kultivator.desa.Vassals.count(player.getUUID()) > 0;
+			case FORGE -> config.artifactForging && RealmTrials.done(player, "first_forge");
+			case CHAMBER -> config.secretRealms && RealmTrials.done(player, "realm_gate");
 		};
 	}
 
@@ -173,6 +183,11 @@ public final class DailyChores {
 			case HERBS -> GoalCounters.herbsFound(data);
 			case THUNDER -> GoalCounters.thunderKills(data);
 			case TALISMAN -> GoalCounters.talismansMade(data);
+			case ROGUES -> Goals.worldCounter(data, Goals.W_ROGUES);
+			case VILLAGE -> Goals.worldCounter(data, Goals.W_REQUESTS);
+			// Forging and refining counters are module C's data (extra.tempa.made / refined, DESIGN 25.14).
+			case FORGE -> data.extra().getCompoundOrEmpty("tempa").getIntOr("made", 0) + data.extra().getCompoundOrEmpty("tempa").getIntOr("refined", 0);
+			case CHAMBER -> Goals.worldCounter(data, Goals.W_CLEARS);
 		};
 	}
 

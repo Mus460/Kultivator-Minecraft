@@ -115,6 +115,14 @@ public final class Payloads {
 		public static final int SECT_TEMPLATE = 5;
 		/** The Kitab Teknik (DESIGN 22.12.1); {@code arg} = the net id to focus, or −1. */
 		public static final int CODEX = 6;
+		/** The Dunia screen (DESIGN 25.10); {@code arg} = the tab: 0 Alam, 1 Pusaka, 2 Musuh, 3 Desa. */
+		public static final int DUNIA = 7;
+
+		/** Tabs of {@link #DUNIA}. */
+		public static final int DUNIA_ALAM = 0;
+		public static final int DUNIA_PUSAKA = 1;
+		public static final int DUNIA_MUSUH = 2;
+		public static final int DUNIA_DESA = 3;
 
 		/** Tab {@code arg} of {@link #INFO}: the Jalan tablet (DESIGN 19.2.2, {@code /kultivasi jalan}). Same as {@code CultivationScreen.TAB_JALAN}. */
 		public static final int TAB_JALAN = 5;
@@ -302,6 +310,48 @@ public final class Payloads {
 
 		@Override
 		public Type<FormasiSync> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * One phase-8 module's data for the Dunia screen and its pages (DESIGN 25.2 item 2): sent only when a screen opens
+	 * (the module answers its "sync" action) or the data changes, at most {@link #MAX_BYTES}. {@code KultivatorClient}
+	 * routes {@code channel} to {@code client.alam.AlamClient}, {@code client.musuh.MusuhClient},
+	 * {@code client.tempa.TempaClient} or {@code client.desa.DesaClient}{@code .onSync(data)}. Send it with {@link #send}.
+	 */
+	public record DuniaSync(int channel, CompoundTag data) implements CustomPacketPayload {
+		public static final int CH_ALAM = 0;
+		public static final int CH_MUSUH = 1;
+		public static final int CH_TEMPA = 2;
+		public static final int CH_DESA = 3;
+		/** The size budget of one sync (DESIGN 25.13). */
+		public static final int MAX_BYTES = 8192;
+
+		public static final Type<DuniaSync> TYPE = typeOf("dunia_sync");
+		public static final StreamCodec<RegistryFriendlyByteBuf, DuniaSync> CODEC = StreamCodec.of(
+				(buf, p) -> {
+					buf.writeVarInt(p.channel);
+					ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, p.data);
+				},
+				buf -> new DuniaSync(buf.readVarInt(), ByteBufCodecs.TRUSTED_COMPOUND_TAG.decode(buf)));
+
+		/**
+		 * Sends {@code data} on {@code channel} to the player (skipped for vanilla clients). Data over {@link #MAX_BYTES} is
+		 * not sent: a warning is logged and the client gets {@code {too_big: true}} instead, so the budget bug is visible.
+		 */
+		public static void send(net.minecraft.server.level.ServerPlayer player, int channel, CompoundTag data) {
+			CompoundTag out = data == null ? new CompoundTag() : data;
+			if (out.sizeInBytes() > MAX_BYTES) {
+				Kultivator.LOGGER.warn("DuniaSync channel {} is {} bytes, over the {} byte budget; not sent", channel, out.sizeInBytes(), MAX_BYTES);
+				out = new CompoundTag();
+				out.putBoolean("too_big", true);
+			}
+			Net.send(player, new DuniaSync(channel, out));
+		}
+
+		@Override
+		public Type<DuniaSync> type() {
 			return TYPE;
 		}
 	}

@@ -9,20 +9,26 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
  * The two arts of rivals and phantoms (DESIGN 20.3.12, 20.3.14), cast through the {@code combatCast} hook: a 12-block
  * qi line of 1 U every 6 s and an element burst of radius 3 and 1 U every 10 s. Phantoms from floor 10 cast one of them
  * every 8 s. They hit only the caster's {@link DuelRules} partner (a mob attack of the caster), entities only.
  * U = {@code DiscipleTechniques.power} of the caster (a phantom: its melee damage) times its {@code damageFactor} hooks.
+ * <p>
+ * Public since phase 8 (DESIGN 25.2 item 11): rogue cultivators cast the same qi line and element burst through
+ * {@link #qiLine} and {@link #elementBurst}, which hit only targets the caller's {@code mayHit} accepts (entities only).
  */
-final class RivalSkills {
+public final class RivalSkills {
 
 	public static final double LINE_RANGE = 12.0D;
 	public static final int LINE_COOLDOWN = 120;
@@ -111,6 +117,55 @@ final class RivalSkills {
 		}
 		target.hurtServer(level, level.damageSources().mobAttack(caster), damage);
 		return true;
+	}
+
+	// ================================================================== phase-8 primitives (DESIGN 25.2 item 11, 25.4.2)
+
+	/**
+	 * The qi line of any mob caster: the same FX and sound as a rival's, then {@code damage} as a mob attack of the caster on
+	 * {@code target} when {@code mayHit} accepts it and it stands within {@link #LINE_RANGE}. True when it hit.
+	 */
+	public static boolean qiLine(ServerLevel level, Mob caster, LivingEntity target, double damage, int rgb, Predicate<LivingEntity> mayHit) {
+		if (!target.isAlive() || caster.distanceTo(target) > LINE_RANGE) {
+			return false;
+		}
+		Vec3 from = caster.position().add(0.0D, caster.getBbHeight() * 0.7D, 0.0D);
+		Vec3 to = target.position().add(0.0D, target.getBbHeight() * 0.5D, 0.0D);
+		EventUtil.fx(level, from, to, SectEventFxIds.RIVAL_LINE, rgb, 0.0F);
+		level.playSound(null, from.x, from.y, from.z, SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.HOSTILE, 0.6F, 1.6F);
+		caster.getLookControl().setLookAt(to.x, to.y, to.z);
+		return strike(level, caster, target, damage, mayHit);
+	}
+
+	/**
+	 * The element burst of any mob caster: radius {@link #BURST_RADIUS} around {@code target}'s feet; every living entity
+	 * inside that {@code mayHit} accepts takes {@code damage} as a mob attack of the caster. Returns how many were hit.
+	 */
+	public static int elementBurst(ServerLevel level, Mob caster, LivingEntity target, double damage, int rgb, Predicate<LivingEntity> mayHit) {
+		Vec3 at = target.position();
+		EventUtil.fx(level, at, SectEventFxIds.RIVAL_BURST, rgb, (float) BURST_RADIUS);
+		level.playSound(null, at.x, at.y, at.z, SoundEvents.FIRECHARGE_USE, SoundSource.HOSTILE, 0.5F, 1.4F);
+		caster.getLookControl().setLookAt(at.x, at.y, at.z);
+		int hits = 0;
+		for (LivingEntity each : level.getEntitiesOfClass(LivingEntity.class, new AABB(at, at).inflate(BURST_RADIUS),
+				e -> e != caster && e.isAlive() && e.distanceToSqr(at) <= BURST_RADIUS * BURST_RADIUS)) {
+			if (strike(level, caster, each, damage, mayHit)) {
+				hits++;
+			}
+		}
+		return hits;
+	}
+
+	private static boolean strike(ServerLevel level, Mob caster, LivingEntity target, double damage, Predicate<LivingEntity> mayHit) {
+		float amount = (float) damage;
+		if (!(amount > 0.0F) || !Float.isFinite(amount) || !mayHit.test(target)) {
+			return false;
+		}
+		if (!(target instanceof Player)) {
+			target.addTag(NoGrief.TAG);
+			target.setPortalCooldown();
+		}
+		return target.hurtServer(level, level.damageSources().mobAttack(caster), amount);
 	}
 
 	private static void face(DiscipleEntity caster, Vec3 point) {

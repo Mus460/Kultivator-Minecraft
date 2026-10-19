@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "kultivator:eight_angled_ice_grass",
+    "kultivator:eight_angled_ice_grass",
+    {
+      "fabric:type": "fabric:components",
+      "base": [
+        "kultivator:beast_core_low",
+        "kultivator:beast_core_mid",
+        "kultivator:beast_core_high",
+        "kultivator:beast_core_king"
+      ],
+      "components": {
+        "kultivator:core_element": "ice"
+      }
+    },
+    "minecraft:snowball"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:cold_ice_pearl"
+  }
+}

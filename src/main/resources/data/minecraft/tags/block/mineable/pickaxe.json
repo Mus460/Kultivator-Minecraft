@@ -1,6 +1,7 @@
 {
   "values": [
     "kultivator:sect_hall_stele",
+    "kultivator:earthfire_forge",
     {
       "id": "kultivator:formation_eye",
       "required": false

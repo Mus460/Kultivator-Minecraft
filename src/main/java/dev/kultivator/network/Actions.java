@@ -77,6 +77,17 @@ public final class Actions {
 	/** Formasi Sekte: the Formasi tablet, keepers, deposits, holograms, transport ({@code formasi.Formasi.handleAction}). */
 	public static final int FORMASI = 37;
 
+	// Phase 8 "Jalan Dunia Kultivasi" (DESIGN 25.2 item 1): text = "op[:param]"; every module answers "sync" with its
+	// DuniaSync channel (the Dunia screen asks for it when it opens). 23-29 stay free for phase 7 follow-ups.
+	/** Secret realms ({@code alam.Alam.handleAction}). */
+	public static final int ALAM = 38;
+	/** Rogue cultivators and sect raids ({@code musuh.Musuh.handleAction}). */
+	public static final int MUSUH = 39;
+	/** Forging, the natal treasure and storage rings ({@code tempa.Tempa.handleAction}); the ring key sends "ring:open". */
+	public static final int TEMPA = 40;
+	/** Vassal villages ({@code desa.Desa.handleAction}). */
+	public static final int DESA = 41;
+
 	private Actions() {
 	}
 }

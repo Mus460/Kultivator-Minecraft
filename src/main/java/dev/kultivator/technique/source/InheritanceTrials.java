@@ -247,6 +247,10 @@ public final class InheritanceTrials {
 		if (DuelRules.inDuel(player) || Sparring.inDuel(player)) {
 			return Component.translatable(PREFIX + "why.duel");
 		}
+		if (dev.kultivator.alam.Alam.blocked(player)) {
+			// Phase 8 (DESIGN 25.2 item 12).
+			return dev.kultivator.alam.Alam.refusal();
+		}
 		long left = cooldownLeft(player);
 		if (left > 0L) {
 			return Component.translatable(PREFIX + "why.cooldown", Msg.number(Math.ceil(left / 1200.0D)));

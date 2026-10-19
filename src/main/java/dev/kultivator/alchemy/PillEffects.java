@@ -159,6 +159,11 @@ public final class PillEffects {
 						PillKind.ENLIGHTENMENT_TICKS / 1200));
 			}
 			case BONE_TEMPERING -> boneTempering(player, data, quality, parts);
+			case MATA_TERANG -> {
+				// Phase 8 glue (DESIGN 25.3.9): module A reveals the phantom exits and outlines the phantoms.
+				dev.kultivator.alam.Alam.grantClearSight(player, PillKind.MATA_TERANG_TICKS);
+				parts.add(Component.translatable("kultivator.jalan8.pill.part.mata_terang", PillKind.MATA_TERANG_TICKS / 1200));
+			}
 		}
 		if (kind.givesXp() && kind != PillKind.IMMORTAL && efficacy < 0.995D) {
 			parts.add(Component.translatable("kultivator.alchemy.part.efficacy", Msg.number(efficacy * 100.0D + 1.0E-6D)));
@@ -387,6 +392,7 @@ public final class PillEffects {
 					multiplierText(PillKind.ENLIGHTENMENT_FACTOR), PillKind.ENLIGHTENMENT_TICKS / 1200));
 			case BONE_TEMPERING -> lines.add(Component.translatable("kultivator.harta.pill.tooltip.bone",
 					quality == PillQuality.PERFECT ? PillKind.BONE_HEALTH_PERFECT : PillKind.BONE_HEALTH, PillKind.BONE_HEALTH_CAP));
+			case MATA_TERANG -> lines.add(Component.translatable("kultivator.jalan8.pill.tooltip.mata_terang", PillKind.MATA_TERANG_TICKS / 1200));
 		}
 		return lines;
 	}

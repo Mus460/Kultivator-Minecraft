@@ -13,6 +13,7 @@ import dev.kultivator.harta.SpiritStones;
 import dev.kultivator.item.MarrowCleansingPillItem;
 import dev.kultivator.item.RootItems;
 import dev.kultivator.sect.event.SectEventItems;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
@@ -53,7 +54,15 @@ import java.util.function.Supplier;
  * soul_nurturing      Ghast Tear + Echo Shard + Chorus Fruit + Nether Wart                    -> 2 Soul Nurturing Pills
  * soul_nurturing_fruit Ginseng Fruit + Ghast Tear + Echo Shard + Chorus Fruit                 -> 3 Soul Nurturing Pills
  * immortal            Nether Star + Totem of Undying + Enchanted Golden Apple + Echo Shard + Heart of the Sea -> 1 Immortal Pill
+ * phase 8 (DESIGN 25.8.1, alternative recipes fed by the secret realms; module A items looked up by registry id):
+ * foundation_herba    3 Herba Fondasi + Healing Pill                                          -> 1 Foundation Pill
+ * soul_nurturing_wood Kayu Pemelihara Jiwa + Ghast Tear + Glow Berries                        -> 3 Soul Nurturing Pills
+ * bone_tempering_blood Darah Dewa Kuno + Bone Block + Golden Carrot + an Earth beast core Mid+ -> 3 Bone Tempering Pills
+ * tribulation_warding_essence Esensi Energi Makam + Echo Shard + Golden Apple                 -> 2 Warding Pills
+ * mata_terang         Illusionary Spirit Herb + Spider Eye + Glow Berries                     -> 2 Pil Mata Terang
  * </pre>
+ * The table is built on first use (after every module registered its items); a phase-8 recipe whose item is not
+ * registered is left out.
  * Matching a pot ({@link #analyze}): (1) up to {@link #MAX_STONE_CATALYSTS} spirit stones are catalysts; (2) one beast
  * core is a catalyst unless the recipe requires a core; (3) the rest must equal a recipe's ingredients plus at most one
  * extra spirit herb, the auxiliary herb (the oldest one the recipe does not need). An exact match wins over one with an
@@ -142,7 +151,7 @@ public final class AlchemyRecipes {
 		}
 	}
 
-	private static final List<Recipe> RECIPES = List.of(
+	private static final List<Recipe> BASE = List.of(
 			recipe("qi_gathering", () -> AlchemyItems.QI_GATHERING_PILL, 2, PillKind.QI_GATHERING.color(), 15.0D,
 					Items.GLOWSTONE_DUST, Items.SUGAR, Items.GLOW_BERRIES),
 			recipe("qi_recovery", () -> AlchemyItems.QI_RECOVERY_PILL, 2, PillKind.QI_RECOVERY.color(), 15.0D,
@@ -182,13 +191,12 @@ public final class AlchemyRecipes {
 			recipe("immortal", () -> AlchemyItems.IMMORTAL_PILL, 1, PillKind.IMMORTAL.color(), 200.0D,
 					Items.NETHER_STAR, Items.TOTEM_OF_UNDYING, Items.ENCHANTED_GOLDEN_APPLE, Items.ECHO_SHARD, Items.HEART_OF_THE_SEA));
 
-	private static final Set<Item> INGREDIENTS = new HashSet<>();
 	private static final Map<Item, Integer> COLORS = new HashMap<>();
+	private static volatile List<Recipe> recipes;
+	private static volatile Set<Item> ingredients;
 
 	static {
-		for (Recipe recipe : RECIPES) {
-			INGREDIENTS.addAll(recipe.ingredients().keySet());
-		}
+		COLORS.put(Items.SPIDER_EYE, 0x9C2B3A);
 		COLORS.put(Items.GLOWSTONE_DUST, 0xFFD54A);
 		COLORS.put(Items.SUGAR, 0xF4F4F4);
 		COLORS.put(Items.GLOW_BERRIES, 0xFFB43C);
@@ -241,9 +249,69 @@ public final class AlchemyRecipes {
 		return new Recipe(id, output, count, Collections.unmodifiableMap(ingredients), color, xp, core);
 	}
 
-	/** Every recipe, from the simplest to the Immortal Pill. */
+	/** Every recipe, from the simplest to the Immortal Pill, then the phase-8 alternatives. */
 	public static List<Recipe> all() {
-		return RECIPES;
+		List<Recipe> list = recipes;
+		if (list == null) {
+			list = build();
+		}
+		return list;
+	}
+
+	private static synchronized List<Recipe> build() {
+		if (recipes != null) {
+			return recipes;
+		}
+		List<Recipe> list = new ArrayList<>(BASE);
+		Item wood = registered("soul_nurturing_wood");
+		Item blood = registered("ancient_god_blood");
+		Item essence = registered("tomb_essence");
+		list.add(new Recipe("foundation_herba", () -> AlchemyItems.FOUNDATION_PILL, 1, map(SectEventItems.FOUNDATION_HERB, SectEventItems.FOUNDATION_HERB,
+				SectEventItems.FOUNDATION_HERB, AlchemyItems.HEALING_PILL), PillKind.FOUNDATION.color(), 28.0D, null));
+		if (wood != null) {
+			list.add(new Recipe("soul_nurturing_wood", () -> AlchemyItems.SOUL_NURTURING_PILL, 3, map(wood, Items.GHAST_TEAR, Items.GLOW_BERRIES),
+					PillKind.SOUL_NURTURING.color(), 75.0D, null));
+		}
+		if (blood != null) {
+			list.add(new Recipe("bone_tempering_blood", () -> AlchemyItems.BONE_TEMPERING_PILL, 3, map(blood, Items.BONE_BLOCK, Items.GOLDEN_CARROT),
+					PillKind.BONE_TEMPERING.color(), 50.0D, new CoreNeed(Element.EARTH, BeastCores.MID)));
+		}
+		if (essence != null) {
+			list.add(new Recipe("tribulation_warding_essence", () -> AlchemyItems.TRIBULATION_WARDING_PILL, 2, map(essence, Items.ECHO_SHARD,
+					Items.GOLDEN_APPLE), PillKind.TRIBULATION_WARDING.color(), 55.0D, null));
+		}
+		list.add(new Recipe("mata_terang", () -> AlchemyItems.MATA_TERANG_PILL, 2, map(HartaItems.ILLUSORY_SPIRIT_HERB, Items.SPIDER_EYE,
+				Items.GLOW_BERRIES), PillKind.MATA_TERANG.color(), 30.0D, null));
+		Set<Item> used = new HashSet<>();
+		for (Recipe recipe : list) {
+			used.addAll(recipe.ingredients().keySet());
+		}
+		ingredients = Set.copyOf(used);
+		List<Recipe> done = List.copyOf(list);
+		recipes = done;
+		return done;
+	}
+
+	private static @Nullable Item registered(String path) {
+		Item item = BuiltInRegistries.ITEM.getValue(dev.kultivator.Kultivator.id(path));
+		return item == Items.AIR ? null : item;
+	}
+
+	private static Map<Item, Integer> map(Item... items) {
+		Map<Item, Integer> map = new LinkedHashMap<>();
+		for (Item item : items) {
+			map.merge(item, 1, Integer::sum);
+		}
+		return Collections.unmodifiableMap(map);
+	}
+
+	private static Set<Item> ingredientSet() {
+		Set<Item> set = ingredients;
+		if (set == null) {
+			all();
+			set = ingredients;
+		}
+		return set == null ? Set.of() : set;
 	}
 
 	/** The recipe without a required core whose ingredients are exactly {@code contents}, or null (no catalysts). */
@@ -251,7 +319,7 @@ public final class AlchemyRecipes {
 		if (contents.isEmpty()) {
 			return null;
 		}
-		for (Recipe recipe : RECIPES) {
+		for (Recipe recipe : all()) {
 			if (recipe.matches(contents)) {
 				return recipe;
 			}
@@ -260,7 +328,7 @@ public final class AlchemyRecipes {
 	}
 
 	public static @Nullable Recipe byId(String id) {
-		for (Recipe recipe : RECIPES) {
+		for (Recipe recipe : all()) {
 			if (recipe.id().equals(id)) {
 				return recipe;
 			}
@@ -270,7 +338,7 @@ public final class AlchemyRecipes {
 
 	/** True when {@code item} is used by at least one recipe. */
 	public static boolean isIngredient(Item item) {
-		return INGREDIENTS.contains(item);
+		return ingredientSet().contains(item);
 	}
 
 	/** True when {@code stack} may go into a pot: a recipe ingredient, a spirit stone, a beast core or any spirit herb. */
@@ -282,7 +350,7 @@ public final class AlchemyRecipes {
 	/** The recipes that use {@code item} as an ingredient or, for a core, as their required core. */
 	public static List<Recipe> usesOf(ItemStack stack) {
 		List<Recipe> list = new ArrayList<>();
-		for (Recipe recipe : RECIPES) {
+		for (Recipe recipe : all()) {
 			if (recipe.ingredients().containsKey(stack.getItem())
 					|| recipe.core() != null && BeastCores.isCore(stack) && recipe.core().accepts(BeastCores.element(stack), BeastCores.grade(stack))) {
 				list.add(recipe);
@@ -334,7 +402,7 @@ public final class AlchemyRecipes {
 			}
 		}
 		for (int pass = 0; pass < 2; pass++) {
-			for (Recipe recipe : RECIPES) {
+			for (Recipe recipe : all()) {
 				Mix mix = tryRecipe(recipe, rest, cores, coreItems, pot.units(), pass == 1, low, high);
 				if (mix != null) {
 					return mix;

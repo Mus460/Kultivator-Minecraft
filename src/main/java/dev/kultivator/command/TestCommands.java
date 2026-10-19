@@ -225,6 +225,11 @@ public final class TestCommands {
 		dev.kultivator.epic.EpicCommands.addTestCommands(uji);
 		// Phase 7c (DESIGN 24.10): uji formasi ...
 		dev.kultivator.formasi.Formasi.addTestCommands(uji);
+		// Phase 8 (DESIGN 25.2 item 18, 25.11).
+		dev.kultivator.alam.Alam.addTestCommands(uji);
+		dev.kultivator.musuh.Musuh.addTestCommands(uji);
+		dev.kultivator.tempa.Tempa.addTestCommands(uji);
+		dev.kultivator.desa.Desa.addTestCommands(uji);
 		root.then(uji);
 	}
 
@@ -584,6 +589,16 @@ public final class TestCommands {
 		phase7c.removeIf(ItemStack::isEmpty);
 		if (!phase7c.isEmpty()) {
 			give(player, box("kultivator.spine7c.kit", phase7c));
+		}
+		// Phase 8 (DESIGN 25.11): keys, realm materials, forge, plaque, rings, artifacts and pouches from the four modules.
+		List<ItemStack> phase8 = new ArrayList<>();
+		phase8.addAll(dev.kultivator.alam.Alam.kitItems());
+		phase8.addAll(dev.kultivator.musuh.Musuh.kitItems());
+		phase8.addAll(dev.kultivator.tempa.Tempa.kitItems());
+		phase8.addAll(dev.kultivator.desa.Desa.kitItems());
+		phase8.removeIf(ItemStack::isEmpty);
+		if (!phase8.isEmpty()) {
+			give(player, box("kultivator.spine8.kit", phase8));
 		}
 		Msg.chat(player, Component.translatable("kultivator.test.kit").withStyle(ChatFormatting.GOLD));
 		return 1;

@@ -50,6 +50,11 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.epic.EpicClient.init();
 		// Phase 7c Formasi Sekte (DESIGN 24.13 item 5).
 		dev.kultivator.client.formasi.FormasiClient.init();
+		// Phase 8 Jalan Dunia Kultivasi (DESIGN 25.2 item 18).
+		dev.kultivator.client.alam.AlamClient.init();
+		dev.kultivator.client.musuh.MusuhClient.init();
+		dev.kultivator.client.tempa.TempaClient.init();
+		dev.kultivator.client.desa.DesaClient.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));
@@ -65,6 +70,8 @@ public class KultivatorClient implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.EpicMoment.TYPE, dev.kultivator.client.epic.EpicClient::onPayload);
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.FormasiSync.TYPE, (payload, context) ->
 				dev.kultivator.client.formasi.FormasiClient.onSync(payload.data()));
+		ClientPlayNetworking.registerGlobalReceiver(Payloads.DuniaSync.TYPE, (payload, context) ->
+				dev.kultivator.client.dunia.DuniaClient.onSync(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.OpenScreen.TYPE, (payload, context) -> {
 			if (payload.screen() == Payloads.OpenScreen.INFO) {
 				context.client().gui.setScreen(new CultivationScreen(payload.arg()));
@@ -85,6 +92,8 @@ public class KultivatorClient implements ClientModInitializer {
 				dev.kultivator.client.sectbuild.BuildClient.openScreen(payload.arg());
 			} else if (payload.screen() == Payloads.OpenScreen.CODEX) {
 				dev.kultivator.client.codex.Codex.open(payload.arg());
+			} else if (payload.screen() == Payloads.OpenScreen.DUNIA) {
+				dev.kultivator.client.dunia.DuniaClient.open(payload.arg());
 			}
 		});
 

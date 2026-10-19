@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "kultivator:item/artifact_payung",
+    "layer1": "kultivator:item/artifact_payung_accent"
+  }
+}

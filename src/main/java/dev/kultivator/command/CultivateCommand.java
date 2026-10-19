@@ -138,10 +138,27 @@ public final class CultivateCommand {
 		dev.kultivator.epic.EpicCommands.addCommands(root, debug);
 		// Phase 7c (DESIGN 24.10): formasi ... and debug formasi ...
 		dev.kultivator.formasi.Formasi.addCommands(root, debug);
+		// Phase 8 (DESIGN 25.2 item 18, 25.11): the Dunia screen, then each module's own nodes.
+		root.then(Commands.literal("dunia")
+				.executes(ctx -> openDunia(self(ctx), dev.kultivator.network.Payloads.OpenScreen.DUNIA_ALAM))
+				.then(Commands.literal("alam").executes(ctx -> openDunia(self(ctx), dev.kultivator.network.Payloads.OpenScreen.DUNIA_ALAM)))
+				.then(Commands.literal("pusaka").executes(ctx -> openDunia(self(ctx), dev.kultivator.network.Payloads.OpenScreen.DUNIA_PUSAKA)))
+				.then(Commands.literal("musuh").executes(ctx -> openDunia(self(ctx), dev.kultivator.network.Payloads.OpenScreen.DUNIA_MUSUH)))
+				.then(Commands.literal("desa").executes(ctx -> openDunia(self(ctx), dev.kultivator.network.Payloads.OpenScreen.DUNIA_DESA))));
+		dev.kultivator.alam.Alam.addCommands(root, debug);
+		dev.kultivator.musuh.Musuh.addCommands(root, debug);
+		dev.kultivator.tempa.Tempa.addCommands(root, debug);
+		dev.kultivator.desa.Desa.addCommands(root, debug);
 
 		TestCommands.addCommands(root);
 		root.then(debug);
 		return root;
+	}
+
+	/** {@code /kultivasi dunia [tab]}: opens the Dunia screen on {@code tab}; the screen asks each module for its data. */
+	private static int openDunia(ServerPlayer player, int tab) {
+		Net.send(player, new dev.kultivator.network.Payloads.OpenScreen(dev.kultivator.network.Payloads.OpenScreen.DUNIA, tab));
+		return 1;
 	}
 
 	private static ServerPlayer self(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

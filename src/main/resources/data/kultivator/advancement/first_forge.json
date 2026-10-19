@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_alchemy",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.first_forge.description"
+    },
+    "icon": {
+      "id": "kultivator:earthfire_forge"
+    },
+    "title": {
+      "translate": "advancement.kultivator.first_forge.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

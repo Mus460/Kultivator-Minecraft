@@ -17,6 +17,7 @@
   },
   "mixins": [
     "kultivator.mixins.json",
+    "kultivator.tempa.mixins.json",
     {
       "config": "kultivator.client.mixins.json",
       "environment": "client"

@@ -1,0 +1,244 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "minecraft:compass",
+    "target": "lodestone",
+    "entries": [
+      {
+        "threshold": 0.0,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_00"
+        }
+      },
+      {
+        "threshold": 0.015625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_01"
+        }
+      },
+      {
+        "threshold": 0.046875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_02"
+        }
+      },
+      {
+        "threshold": 0.078125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_03"
+        }
+      },
+      {
+        "threshold": 0.109375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_04"
+        }
+      },
+      {
+        "threshold": 0.140625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_05"
+        }
+      },
+      {
+        "threshold": 0.171875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_06"
+        }
+      },
+      {
+        "threshold": 0.203125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_07"
+        }
+      },
+      {
+        "threshold": 0.234375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_08"
+        }
+      },
+      {
+        "threshold": 0.265625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_09"
+        }
+      },
+      {
+        "threshold": 0.296875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_10"
+        }
+      },
+      {
+        "threshold": 0.328125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_11"
+        }
+      },
+      {
+        "threshold": 0.359375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_12"
+        }
+      },
+      {
+        "threshold": 0.390625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_13"
+        }
+      },
+      {
+        "threshold": 0.421875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_14"
+        }
+      },
+      {
+        "threshold": 0.453125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_15"
+        }
+      },
+      {
+        "threshold": 0.484375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_16"
+        }
+      },
+      {
+        "threshold": 0.515625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_17"
+        }
+      },
+      {
+        "threshold": 0.546875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_18"
+        }
+      },
+      {
+        "threshold": 0.578125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_19"
+        }
+      },
+      {
+        "threshold": 0.609375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_20"
+        }
+      },
+      {
+        "threshold": 0.640625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_21"
+        }
+      },
+      {
+        "threshold": 0.671875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_22"
+        }
+      },
+      {
+        "threshold": 0.703125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_23"
+        }
+      },
+      {
+        "threshold": 0.734375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_24"
+        }
+      },
+      {
+        "threshold": 0.765625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_25"
+        }
+      },
+      {
+        "threshold": 0.796875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_26"
+        }
+      },
+      {
+        "threshold": 0.828125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_27"
+        }
+      },
+      {
+        "threshold": 0.859375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_28"
+        }
+      },
+      {
+        "threshold": 0.890625,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_29"
+        }
+      },
+      {
+        "threshold": 0.921875,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_30"
+        }
+      },
+      {
+        "threshold": 0.953125,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_31"
+        }
+      },
+      {
+        "threshold": 0.984375,
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/village_letter_00"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "kultivator:item/village_letter_00"
+    }
+  }
+}

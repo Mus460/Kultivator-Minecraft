@@ -8,6 +8,7 @@ import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Rank;
+import dev.kultivator.data.Realm;
 import dev.kultivator.goals.Guide;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
@@ -30,7 +31,8 @@ import java.util.List;
  * left), about 120 GUI px wide and scaled down on small screens. It shows the chapter seal, the next step with one or two
  * "how" lines (with the live key names) and the progress. It shrinks to a 12 px seal 20 s after joining and opens again
  * for 8 s on a change or while the info key is pressed; a finished step rings an amethyst chime with a gold flash.
- * Hidden by the "Sembunyikan panduan" coin and after the last step.
+ * Hidden by the "Sembunyikan panduan" coin and after the last step. After chapter 5 it wakes again for chapters 6-10
+ * (DESIGN 25.8.2) once the player is Foundation+.
  */
 public final class GuideTracker implements HudElement {
 
@@ -53,12 +55,13 @@ public final class GuideTracker implements HudElement {
 			return;
 		}
 		long now = Util.getMillis();
-		int bits = Guide.bits(ClientCultivation.data());
+		CultivationData data = ClientCultivation.data();
+		int bits = world(data) ? Guide.bits2(data) | (1 << 30) : Guide.bits(data);
 		if (lastBits < 0) {
 			lastBits = bits;
 			lastChange = now;
 		} else if (bits != lastBits) {
-			if ((bits & ~lastBits) != 0) {
+			if ((bits & ~lastBits & ~(1 << 30)) != 0) {
 				flashUntil = now + FLASH_MILLIS;
 				minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.AMETHYST_BLOCK_CHIME, 1.3F, 0.9F));
 			}
@@ -79,7 +82,12 @@ public final class GuideTracker implements HudElement {
 
 	/** True when the tracker is shown at all (not hidden, steps left, or the HUD demo). */
 	public static boolean visible(CultivationData data) {
-		return HudDemo.active() || !Guide.hidden(data) && Guide.bits(data) != Guide.ALL;
+		return HudDemo.active() || !Guide.hidden(data) && (Guide.bits(data) != Guide.ALL || world(data));
+	}
+
+	/** True when chapters 1-5 are done and the tracker follows chapters 6-10 (Foundation+, steps left). */
+	public static boolean world(CultivationData data) {
+		return Guide.bits(data) == Guide.ALL && data.rank().realm().atLeast(Realm.FOUNDATION) && Guide.bits2(data) != Guide.ALL;
 	}
 
 	@Override
@@ -99,16 +107,18 @@ public final class GuideTracker implements HudElement {
 		boolean demo = HudDemo.active();
 		boolean expanded = demo || now - lastChange < IDLE_MILLIS || now < peekUntil;
 		float t = open.to(expanded ? 1.0F : 0.0F, seconds);
-		int bits = demo ? 0x7F : Guide.bits(data);
+		boolean world = !demo && world(data);
+		int bits = demo ? 0x7F : world ? Guide.bits2(data) : Guide.bits(data);
 		int chapter = Math.min(Guide.CHAPTERS - 1, Guide.currentChapter(bits));
 		int step = Guide.currentStep(bits);
+		int offset = world ? Guide.CHAPTERS : 0;
 		float flash = now < flashUntil ? (flashUntil - now) / (float) FLASH_MILLIS : 0.0F;
 		Font font = minecraft.font;
 		int width = g.guiWidth();
 		int height = g.guiHeight();
 		float scale = Math.max(0.65F, Math.min(1.0F, (width - 180.0F) / 300.0F));
 		if (t < 0.05F) {
-			drawSeal(g, font, width - 9.0F, height / 2.0F, chapter, bits, flash);
+			drawSeal(g, font, width - 9.0F, height / 2.0F, chapter, offset, bits, flash);
 			return;
 		}
 		g.pose().pushMatrix();
@@ -116,12 +126,12 @@ public final class GuideTracker implements HudElement {
 		float x0 = width - 4.0F - panelW * t;
 		g.pose().translate(x0, height / 2.0F);
 		g.pose().scale(scale, scale);
-		drawPanel(g, font, data, bits, chapter, step, flash, t);
+		drawPanel(g, font, data, bits, chapter, offset, step, flash, t);
 		g.pose().popMatrix();
 	}
 
 	/** The collapsed form: a 12 px red seal with the chapter number and a gold ring of the chapter's progress. */
-	private static void drawSeal(GuiGraphicsExtractor g, Font font, float cx, float cy, int chapter, int bits, float flash) {
+	private static void drawSeal(GuiGraphicsExtractor g, Font font, float cx, float cy, int chapter, int offset, int bits, float flash) {
 		if (flash > 0.0F) {
 			Brush.halo(g, cx, cy, 6.0F, 4.0F, 0xFFE07A, flash);
 		}
@@ -129,22 +139,25 @@ public final class GuideTracker implements HudElement {
 		Brush.arc(g, cx, cy, 6.2F, 7.4F, 0.0F, 1.0F, 0xFF3A2D12);
 		Brush.arc(g, cx, cy, 6.2F, 7.4F, 0.0F, Guide.doneIn(bits, chapter) / (float) Guide.PER_CHAPTER, Palette.GOLD);
 		Brush.rect(g, cx - 4.5F, cy - 4.5F, cx + 4.5F, cy + 4.5F, Palette.SEAL);
-		Brush.centered(g, font, Component.literal(String.valueOf(chapter + 1)), cx + 0.3F, cy - 3.0F, 0xFFF1D57E, 0.75F, false);
+		Brush.centered(g, font, Component.literal(String.valueOf(chapter + offset + 1)), cx + 0.3F, cy - 3.0F, 0xFFF1D57E, 0.75F, false);
 	}
 
-	private static void drawPanel(GuiGraphicsExtractor g, Font font, CultivationData data, int bits, int chapter, int step, float flash, float t) {
+	private static void drawPanel(GuiGraphicsExtractor g, Font font, CultivationData data, int bits, int chapter, int offset, int step,
+			float flash, float t) {
 		int w = WIDTH;
 		float inner = w - 12.0F;
-		Component chapterTitle = Component.translatable("kultivator.goals.tracker.chapter", chapter + 1,
-				Component.translatable("kultivator.goals.chapter." + (chapter + 1)));
+		Guide.Step[] steps = offset > 0 ? Guide.STEPS2 : Guide.STEPS;
+		Component chapterTitle = Component.translatable("kultivator.goals.tracker.chapter", chapter + offset + 1,
+				Component.translatable("kultivator.goals.chapter." + (chapter + offset + 1)));
 		Component title = step < 0 ? Component.translatable("kultivator.goals.tracker.all_done")
-				: Component.translatable("kultivator.goals.step." + Guide.STEPS[step].id());
-		Component how = step < 0 ? Component.empty() : how(step, data);
+				: Component.translatable("kultivator.goals.step." + steps[step].id());
+		Component how = step < 0 ? Component.empty()
+				: offset > 0 ? Component.translatable("kultivator.goals.step." + steps[step].id() + ".how") : how(step, data);
 		List<FormattedCharSequence> titleRows = font.split(Brush.bold(title), (int) (inner / 0.7F));
 		List<FormattedCharSequence> howRows = font.split(how, (int) (inner / 0.6F));
 		int titleCount = Math.min(2, titleRows.size());
 		int howCount = Math.min(2, howRows.size());
-		boolean reward = GoalsClient.cfg("guide", true) && rewardWaiting(data, bits);
+		boolean reward = GoalsClient.cfg("guide", true) && rewardWaiting(data, Guide.bits(data));
 		float h = 16.0F + titleCount * 6.5F + howCount * 5.6F + 10.0F + (reward ? 6.0F : 0.0F);
 		float top = -h / 2.0F;
 		int alpha = Math.round(255 * Math.min(1.0F, t * 1.4F));
@@ -203,6 +216,12 @@ public final class GuideTracker implements HudElement {
 		int claimed = Guide.claimed(data);
 		for (int chapter = 0; chapter < Guide.CHAPTERS; chapter++) {
 			if (Guide.chapterDone(bits, chapter) && (claimed & (1 << chapter)) == 0) {
+				return true;
+			}
+		}
+		// Chapters 6-10 keep their claimed bits at 5-9.
+		for (int chapter = Guide.CHAPTERS; chapter < Guide.ALL_CHAPTERS; chapter++) {
+			if (Guide.chapterDoneAny(data, chapter) && (claimed & (1 << chapter)) == 0) {
 				return true;
 			}
 		}

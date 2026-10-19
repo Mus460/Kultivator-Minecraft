@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:ancient_god_crystal",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.seventy_crystals.description"
+    },
+    "icon": {
+      "id": "kultivator:ancient_god_blood"
+    },
+    "title": {
+      "translate": "advancement.kultivator.seventy_crystals.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

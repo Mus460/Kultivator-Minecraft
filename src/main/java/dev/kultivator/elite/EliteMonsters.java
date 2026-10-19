@@ -83,6 +83,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * P7-tempur (DESIGN 19.3.1): Binatang Iblis, elite demonic beasts made from naturally spawned vanilla monsters near a
@@ -239,6 +240,37 @@ public final class EliteMonsters {
 	}
 
 	// ================================================================== public API (DESIGN 19.8)
+
+	/**
+	 * Extra drops of a slain elite (phase 8, DESIGN 25.2 item 13: heavenvoid fragments and inheritance crystals from a Raja
+	 * Siluman). Asked after the elite's own drops, for player, beast and disciple kills, never for Dao Protectors or kills
+	 * without credit. {@code killer} is the credited player (the master for a disciple's kill); items given to {@code out}
+	 * drop block-safe at the mob.
+	 */
+	@FunctionalInterface
+	public interface EliteDropProvider {
+		void drops(ServerLevel level, LivingEntity victim, int tier, @Nullable Element element, ServerPlayer killer, Consumer<ItemStack> out);
+	}
+
+	private static final List<EliteDropProvider> DROP_PROVIDERS = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+	/** Adds an elite drop provider (DESIGN 25.2 item 13); register from a module's {@code init()}. */
+	public static void addDropProvider(EliteDropProvider provider) {
+		if (provider != null) {
+			DROP_PROVIDERS.add(provider);
+		}
+	}
+
+	/** Asks every drop provider for this kill (called by {@code EliteRewards}). */
+	static void extraDrops(ServerLevel level, LivingEntity victim, int tier, @Nullable Element element, ServerPlayer killer, Consumer<ItemStack> out) {
+		for (EliteDropProvider provider : DROP_PROVIDERS) {
+			try {
+				provider.drops(level, victim, tier, element, killer, out);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("An elite drop provider failed", exception);
+			}
+		}
+	}
 
 	/** True for an elite (it carries {@link TechniquePower#TAG_ELITE}). */
 	public static boolean isElite(Entity entity) {

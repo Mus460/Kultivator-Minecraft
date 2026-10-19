@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sect_gate_open",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.raid_repelled.description"
+    },
+    "icon": {
+      "id": "kultivator:demonic_loot_pouch"
+    },
+    "title": {
+      "translate": "advancement.kultivator.raid_repelled.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -97,6 +97,10 @@ public class HallScreen extends Screen {
 		// Phase 7c (DESIGN 24.13 item 6): the Formasi tablet is index Halls.PAGE_FORMASI (10) of allPages, drawn third.
 		HallPage formasi = new dev.kultivator.client.formasi.FormasiPage(this);
 		allPages.add(formasi);
+		// Phase 8 (DESIGN 25.2 item 3): Pertahanan (Halls.PAGE_PERTAHANAN = 11, module B) and Desa (PAGE_DESA = 12, module D),
+		// drawn last.
+		allPages.add(new dev.kultivator.client.musuh.PertahananPage(this));
+		allPages.add(new dev.kultivator.client.desa.HallDesaPage(this));
 		drawOrder.addAll(allPages);
 		drawOrder.remove(formasi);
 		drawOrder.add(Math.min(2, drawOrder.size()), formasi);

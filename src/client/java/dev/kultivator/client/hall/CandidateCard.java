@@ -82,6 +82,12 @@ final class CandidateCard extends Widget {
 		} else if (card.getBooleanOr("war", false)) {
 			flags.add(Component.translatable("kultivator.hall.ui.flag.war").withColor(Palette.SEAL_DARK));
 		}
+		String origin = card.getStringOr("origin", "");
+		if (!origin.isEmpty()) {
+			// Phase 8 (DESIGN 25.6.5): "dari Desa <nama>".
+			Component from = origin.startsWith("kultivator.") ? Component.translatable(origin) : Component.literal(origin);
+			flags.add(Component.translatable("kultivator.spine8.cand_origin", from).withColor(Palette.JADE_DARK));
+		}
 		MutableComponent flagLine = Component.empty();
 		for (int i = 0; i < flags.size(); i++) {
 			if (i > 0) {

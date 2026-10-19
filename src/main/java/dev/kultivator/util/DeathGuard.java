@@ -25,6 +25,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * the first that prevents the death.
  * <ol>
  * <li>{@code DUEL}: sparring and duel clamps (they end the bout instead);</li>
+ * <li>{@code REALM}: a lethal hit inside a secret realm expels the player at 1 HP (phase 8, DESIGN 25.2 item 5); before
+ * the Totem so totems, cheat-death charges and Jiwa Tak Hancur are never spent in a realm; never against
+ * {@code BYPASSES_INVULNERABILITY} ({@code /kill}, {@code out_of_world});</li>
  * <li>{@code TRIBULATION}: the never-lethal tribulation rule;</li>
  * <li>{@code TOTEM}: a death-protection item (Totem of Undying) in either hand always acts first. Fabric's ALLOW_DEATH
  * wraps the {@code isDeadOrDying} check that guards vanilla's {@code checkTotemDeathProtection} (verified in 26.3), so
@@ -36,7 +39,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class DeathGuard {
 
-	public enum Stage { DUEL, TRIBULATION, TOTEM, TECHNIQUE, PERK }
+	public enum Stage { DUEL, REALM, TRIBULATION, TOTEM, TECHNIQUE, PERK }
 
 	@FunctionalInterface
 	public interface Guard {
@@ -109,6 +112,9 @@ public final class DeathGuard {
 		for (Stage stage : Stage.values()) {
 			if (stage == Stage.TOTEM && holdsDeathProtection(player) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
 				return true;
+			}
+			if (stage == Stage.REALM && source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+				continue;
 			}
 			if (stage == Stage.TECHNIQUE && (source.is(DamageHooks.UNBLOCKABLE) || DuelRules.inDuel(player) || Sparring.inDuel(player)
 					|| techniqueLocked(player))) {

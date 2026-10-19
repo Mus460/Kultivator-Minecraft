@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:realm_gate",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.blood_fire_trial.description"
+    },
+    "icon": {
+      "id": "kultivator:token_darah_api"
+    },
+    "title": {
+      "translate": "advancement.kultivator.blood_fire_trial.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

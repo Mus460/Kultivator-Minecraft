@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 
 /**
  * The Heavenly Tribulation (DESIGN section 3): a 12 s omen of gathering clouds, then a series of strikes whose damage is
@@ -217,6 +218,28 @@ public final class Tribulation {
 	/** Adds a tribulation listener (DESIGN 19.2.7); register from a module's {@code init()}. */
 	public static void addListener(Listener listener) {
 		LISTENERS.add(listener);
+	}
+
+	/**
+	 * A survived tribulation (phase 8, DESIGN 25.2 item 13): {@code target} the rank it ran at, {@code strikes} the strikes
+	 * that fell, {@code test} true for a {@code uji} test tribulation (realm keys must skip those).
+	 */
+	public record TribulationInfo(Rank target, int strikes, boolean test) {
+	}
+
+	/** Told once after every successful tribulation, after the breakthrough result was applied (tests included, see {@code test}). */
+	public static void addSuccessListener(BiConsumer<ServerPlayer, TribulationInfo> listener) {
+		if (listener == null) {
+			return;
+		}
+		LISTENERS.add(new Listener() {
+			@Override
+			public void onFinish(ServerPlayer p, Rank t, @Nullable Result result, int strikesDone, boolean test) {
+				if (result == Result.SUCCESS) {
+					listener.accept(p, new TribulationInfo(t, strikesDone, test));
+				}
+			}
+		});
 	}
 
 	/**

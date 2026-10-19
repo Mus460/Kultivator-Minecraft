@@ -349,7 +349,9 @@ public final class Candidates {
 			}
 		}
 
-		if (KultivatorConfig.get().sectHall && loaded && masterDistSq <= ARRIVAL_RANGE * ARRIVAL_RANGE
+		// Phase 8 (DESIGN 25.2 item 13): a live sect raid holds the arrival back and the bodies step aside.
+		boolean paused = Halls.recruitPaused(owner);
+		if (KultivatorConfig.get().sectHall && loaded && !paused && masterDistSq <= ARRIVAL_RANGE * ARRIVAL_RANGE
 				&& core.getLongOr("last_arrival", day) < day && isArrivalDay(core, day)) {
 			core.putLong("last_arrival", day);
 			if (isWarDay(owner, day)) {
@@ -373,7 +375,15 @@ public final class Candidates {
 			}
 			return false;
 		});
-		if (loaded && masterDistSq <= VIEW_RANGE * VIEW_RANGE) {
+		if (paused) {
+			for (Integer id : List.copyOf(views.keySet())) {
+				DiscipleEntity entity = views.get(id);
+				final int key = id;
+				if (entity != null && !DuelRules.inDuel(entity) && TESTS.stream().noneMatch(test -> test.owner.equals(owner) && test.id == key)) {
+					leave(owner, key, level, false);
+				}
+			}
+		} else if (loaded && masterDistSq <= VIEW_RANGE * VIEW_RANGE) {
 			int cap = maxViews(owner);
 			for (Tag tag : list) {
 				if (views.size() >= cap) {
@@ -533,10 +543,17 @@ public final class Candidates {
 			}
 			DiscipleData data = spec.data().copy();
 			Talents.rollFor(data, spec.tekad(), spec.talentChance(), spec.physiqueChance(), hallLevel, random);
+			if (spec.resolveBonus() != 0) {
+				// Phase 8 (DESIGN 25.6.5): village youths come with more resolve.
+				Talents.setTekad(data, Talents.tekad(data) + spec.resolveBonus());
+			}
 			if (spec.tested()) {
 				Talents.setTested(data, true);
 			}
 			CompoundTag rec = newRecord(core, data, random, spec.source());
+			if (spec.originKey() != null && !spec.originKey().isEmpty()) {
+				rec.putString("origin", spec.originKey());
+			}
 			if ("war".equals(spec.source())) {
 				rec.putBoolean("war", true);
 				// Module B sends the champion tested (Qi Refining, bond already given) and the other finalist untested.
@@ -1179,6 +1196,7 @@ public final class Candidates {
 			entry.putBoolean("war", rec.getBooleanOr("war", false));
 			entry.putBoolean("champion", rec.getBooleanOr("champion", false));
 			entry.putString("source", rec.getStringOr("source", ""));
+			entry.putString("origin", rec.getStringOr("origin", ""));
 			entry.putLong("expires", Math.max(0L, rec.getLongOr("expires_day", 0L) * 24000L - dayTime));
 			list.add(entry);
 		}

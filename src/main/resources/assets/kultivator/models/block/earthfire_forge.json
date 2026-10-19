@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "kultivator:block/earthfire_forge_top",
+    "side": "kultivator:block/earthfire_forge_side",
+    "bottom": "kultivator:block/earthfire_forge_bottom"
+  }
+}

@@ -121,6 +121,11 @@ public class Kultivator implements ModInitializer {
 		// Phase 7c: Formasi Sekte (DESIGN 24.13 item 4). Registers the eye block, builds and freezes the formation registry
 		// (it calls FormasiB.init itself) on both physical sides.
 		dev.kultivator.formasi.Formasi.init();
+		// Phase 8: Jalan Dunia Kultivasi (DESIGN 25.2 item 18). Each registers its own items, entity, menus and providers.
+		dev.kultivator.alam.Alam.init();
+		dev.kultivator.musuh.Musuh.init();
+		dev.kultivator.tempa.Tempa.init();
+		dev.kultivator.desa.Desa.init();
 		// After every module registered its items.
 		ModItems.init();
 		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its

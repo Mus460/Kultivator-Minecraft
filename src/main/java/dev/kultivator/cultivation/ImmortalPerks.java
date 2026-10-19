@@ -278,17 +278,19 @@ public final class ImmortalPerks {
 		double stored = data.storedQi();
 		double spent = 0.0D;
 		while (stars - before < (all ? MAX_STARS_AT_ONCE : 1)) {
-			double cost = Stars.cost(stars + 1);
+			// Phase 8 (DESIGN 25.8.4): the cost modifiers (Esensi discount) are asked per star; their listener consumes.
+			double cost = Stars.cost(stars + 1) * dev.kultivator.ascension.Stars.costFactor(player);
 			if (stored + 1.0E-6D < cost) {
 				break;
 			}
 			stored -= cost;
 			spent += cost;
 			stars++;
+			dev.kultivator.ascension.Stars.condensed(player, stars);
 		}
 		if (stars == before) {
 			Msg.chat(player, Component.translatable("kultivator.kultivasi.star.cost", Msg.number(data.storedQi()),
-					Msg.number(Stars.cost(before + 1))).withColor(0xFF9A7A));
+					Msg.number(Stars.cost(before + 1) * dev.kultivator.ascension.Stars.costFactor(player))).withColor(0xFF9A7A));
 			return 0;
 		}
 		data.setStoredQi(Math.max(0.0D, stored));

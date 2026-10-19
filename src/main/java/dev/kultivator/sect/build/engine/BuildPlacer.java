@@ -97,6 +97,10 @@ public final class BuildPlacer {
 		if (!plan.inFootprint(pos) || pos.equals(site.stele) || pos.equals(site.stele.below())) {
 			return Result.OUTSIDE;
 		}
+		if (dev.kultivator.alam.Alam.isRealmLevel(level)) {
+			// Phase 8 (DESIGN 25.1.1, 25.2 item 12): the realm dimension is never built in.
+			return Result.OUTSIDE;
+		}
 		if (!level.isLoaded(pos)) {
 			return Result.UNLOADED;
 		}

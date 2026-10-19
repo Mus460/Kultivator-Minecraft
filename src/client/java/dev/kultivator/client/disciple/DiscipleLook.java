@@ -78,8 +78,13 @@ public final class DiscipleLook {
 
 	/** One of the nine default characters ({@code skinIndex}) with slim or wide arms. */
 	public static PlayerSkin skin(DiscipleEntity disciple) {
-		int index = Math.floorMod(disciple.skinIndex(), CHARACTERS.length);
-		return disciple.slimSkin() ? SLIM[index] : WIDE[index];
+		return skinByIndex(disciple.skinIndex(), disciple.slimSkin());
+	}
+
+	/** One of the nine default characters by index (any int, wrapped) with slim or wide arms (phase 8: rogue cultivators). */
+	public static PlayerSkin skinByIndex(int index, boolean slim) {
+		int wrapped = Math.floorMod(index, CHARACTERS.length);
+		return slim ? SLIM[wrapped] : WIDE[wrapped];
 	}
 
 	public static int realm(DiscipleEntity disciple) {
@@ -169,6 +174,9 @@ public final class DiscipleLook {
 		if (disciple.syncedActivity() == DiscipleEntity.ACTIVITY_FORMATION_KEEPER) {
 			// Phase 7c (DESIGN 24.13 item 7): a formation keeper at its post.
 			tag = tag.append(Component.translatable("kultivator.spine7c.keeper_tag").withColor(0x9FE0C0));
+		} else if (disciple.syncedActivity() == DiscipleEntity.ACTIVITY_FORGE_ASSIST) {
+			// Phase 8 (DESIGN 25.2 item 8): a forge assistant at the Earthfire Forge.
+			tag = tag.append(Component.translatable("kultivator.spine8.forge_tag").withColor(0xFFB070));
 		}
 		for (BiFunction<DiscipleEntity, MutableComponent, MutableComponent> decorator : NAME_DECORATORS) {
 			MutableComponent decorated = decorator.apply(disciple, tag);

@@ -130,6 +130,7 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
 | 7 | Dunia yang Hidup: Binatang Iblis (elit), Batu Roh, Inti Binatang, herba roh berumur, Urat Roh dan Kultivasi Tertutup, Gua Kediaman, jimat, Alkimia Lanjutan dan Kitab Alkimia, lingkar petir, Menantang Langit, Hu Fa Tribulasi, tablet Jalan (Langkah Pertama, Ujian Fondasi, Kewajiban Harian), Persiapan dan HUD tribulasi, Anugerah Kenaikan, Perkokoh Fondasi, Bintang Abadi pemain, Lima Unsur, Relik di Peti Kuno, keseimbangan, kenyamanan HUD, perintah uji `uji elit|batu|herba|inti|pil|relik|tribulasi|jimat|jalan|hud|...` ([daftar uji](docs/uji/FASE-7.md), [panduan](docs/PANDUAN.md#33-dunia-yang-hidup-fase-7)). Belum diuji di game; ditunda ke 7b: efek pil baru untuk murid, lingkar petir tujuh warna, bencana bintang pemain, tooltip Sumber anugerah di tab Status | ✅ |
 | 7b | Momen Epik: tribulasi dan semua momen besar menjadi adegan sinematik langsung di game: shot kamera pendek yang aman dan bisa dilewati (Backspace), bilah layar lebar, kartu judul kaligrafi, langit berubah, pusaran awan dan petir raksasa, pilar cahaya, gerbang, efek layar, gerak lambat tampilan saja, suara berlapis dan musik; Mode Rekam; pengaturan `Kamera sinematik: Penuh / Singkat / Mati`, `/sinematik`, perintah uji `uji momen <id>|tribulasi_penuh|semua|berhenti` ([daftar uji](docs/uji/FASE-7b.md), [panduan](docs/PANDUAN.md#54-momen-epik-fase-7b)). Belum diuji di game; belum dicoba dengan paket shader | ✅ |
 | 7c | Formasi Sekte: 24 formasi bersumber cerita dalam 13 aliran dan 5 tingkat, berpusat pada balok Mata Formasi dan pola yang kamu bangun sendiri (hologram cetak biru), Daya dari kecubung dan Batu Roh, Kas Daya, murid sebagai penjaga formasi, batas tumpuk, tablet Formasi di aula dengan peta simpul perpindahan, formasi pembunuh yang hanya melukai monster bermusuhan, perintah `formasi ...` dan uji `uji formasi pasang|semua|musuh|...` ([daftar uji](docs/uji/FASE-7c.md), [panduan](docs/PANDUAN.md#20c-formasi-sekte)). Belum diuji di game; Panji Induk Formasi ditunda | ✅ |
+| 8 | Jalan Dunia Kultivasi: empat Alam Rahasia di dimensi datar `kultivator:alam_rahasia` (ruang uji sebagai entitas, penjaga, Gulungan Harta, Mode Ringan tanpa blok), Kultivator Liar (penyergapan, sarang perampok) dan Serbuan Sekte Iblis ke aula dengan Segel Penjarah, Tungku Api Bumi dengan 6 tingkat pusaka, tempa ulang +12, Pusaka Natal Diri dan Roh Senjata, Cincin Penyimpanan (9-54 slot, jejak jiwa), Desa Bawahan (sumpah, kesetiaan, upeti, permohonan, penjarahan), lem progresi (Jalan bab 6-10, baris ke-4 Ujian Fondasi, kewajiban harian, resep pil alternatif, diskon bintang), layar Dunia, perintah `alam|pusaka|cincin|desa|serbuan` dan uji `uji alam|perampok|sergap|serbuan|pusaka|tempa|roh|cincin|desa|hud dunia` ([daftar uji](docs/uji/FASE-8.md), [panduan](docs/PANDUAN.md#55-jalan-dunia-kultivasi-fase-8)). **Belum diuji di game** (hanya dikompilasi) | ✅ |
 
 ## Perintah singkat
 
@@ -151,6 +152,10 @@ Fase 7: `uji elit <1-3> [unsur] [jenis] [afiks]|hapus`, `uji tribulasi <ranah> [
 Fase 7b: `/sinematik penuh|singkat|mati|vfx|rekam|info|reset`, `uji momen daftar|<id>|tribulasi_penuh <ranah>|semua|berhenti`
 ([panduan](docs/PANDUAN.md#545-perintah-uji-op)). Fase 7c: `formasi [info|pola <id>|setor|isi|penjaga|simpul|pindah ...]`,
 `uji formasi pasang <id>|semua|musuh <n>|aula <1-9>|audit|bersih ...` ([panduan](docs/PANDUAN.md#20c3-perintah-modul-a)).
+Fase 8: `dunia [alam|pusaka|musuh|desa]`, `alam daftar|masuk <id> [lapisan]|keluar|ikut`, `pusaka info|ikat|lepas|tautkan|lepastautan`,
+`cincin`, `desa daftar|info <nama>|nama <lama> <baru>`, `serbuan info`; uji `uji alam <id>|ruang|selesai|gagal|ringan`, `uji perampok <1-4>`,
+`uji sergap`, `uji serbuan mulai|menang|kalah|data`, `uji pusaka|tempa|roh|cincin ...`, `uji desa ikrar|minta|jarah ...`, `uji hud dunia`
+([daftar lengkap dengan contoh](docs/PANDUAN.md#5511-perintah-uji-op)).
 `/sekte` atau `/sect` — `create`, `invite`, `join`, `leave`, `kick`, `disband`, `info`, `list`, `chat`,
 `spar <pemain>|accept|decline`. Perintah uji operator ada di bawah `/kultivasi debug` — daftar lengkapnya di
 [panduan](docs/PANDUAN.md#33-perintah-uji-untuk-operator-kultivasi-debug-).
@@ -221,6 +226,14 @@ Heavens and co-op Tribulation Guardians; a Path tablet with 20 first steps, Foun
 breakthrough forecast and a live tribulation HUD; Immortal Ascension boons, Strengthen Foundation and endless Immortal
 Stars for the player; the five elements in combat; relics in structure chests. Every feature keeps its verified source,
 nothing places or breaks a block, and the phase is compiled but not yet tested in game.
+
+**The world path (phase 8).** Four secret realms on the generated flat floor of a `kultivator:alam_rahasia` dimension
+(trial chambers built only from entities, a guardian, a treasure scroll, and a zero-block Light Mode fallback); rogue
+cultivators who ambush travellers and demonic sects that raid your Sect Hall in waves; an Earthfire Forge whose heat comes
+from the block below it, six artifact grades, refinement to +12, a natal treasure bound inside your body with a growing
+weapon spirit; storage rings from 9 to 54 slots bound by a spiritual imprint; vassal villages that pledge, pay tribute,
+send petitions and must be defended; and progression glue (Path chapters 6-10, a fourth Foundation Trial row, new chores,
+alternative pills, a star discount). No new block-changing code; compiled but not yet tested in game.
 
 Nothing in this mod ever burns, breaks, places or changes a block; tribulation lightning is particles and sound only,
 the weather and time are never changed, and a failed tribulation injures you (Qi Deviation) instead of killing you.

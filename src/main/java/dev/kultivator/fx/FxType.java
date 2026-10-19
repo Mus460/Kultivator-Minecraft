@@ -114,7 +114,17 @@ public enum FxType {
 
 	// ---- phase 7c (DESIGN 24.13 item 3)
 	/** Sect formations: slot marks, pattern show, awaken, pulses, hits, alarms, trips (client/formasi/FormasiFx); a = {@code formasi.FormasiFxIds}. */
-	FORMASI;
+	FORMASI,
+
+	// ---- phase 8 (DESIGN 25.2 item 4); a = the module's FxIds sub-id
+	/** Secret realms: gates, chamber pads, telegraph rings, relics (client/alam/AlamFx); a = {@code alam.AlamFxIds}. */
+	ALAM,
+	/** Rogue cultivators and sect raids: skills, vanish puffs, breach seals (client/musuh/MusuhFx); a = {@code musuh.MusuhFxIds}. */
+	MUSUH,
+	/** Forging, the natal treasure, weapon spirits, rings (client/tempa/TempaFx); a = {@code tempa.TempaFxIds}. */
+	TEMPA,
+	/** Vassal villages: oaths, tribute, camps (client/desa/DesaFx); a = {@code desa.DesaFxIds}. */
+	DESA;
 
 	public static FxType byOrdinal(int ordinal) {
 		FxType[] values = values();

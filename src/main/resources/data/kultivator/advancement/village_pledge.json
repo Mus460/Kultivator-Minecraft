@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sect_gate_open",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.village_pledge.description"
+    },
+    "icon": {
+      "id": "kultivator:sect_patron_plaque"
+    },
+    "title": {
+      "translate": "advancement.kultivator.village_pledge.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

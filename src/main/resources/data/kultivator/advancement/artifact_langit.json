@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_forge",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.artifact_langit.description"
+    },
+    "icon": {
+      "id": "kultivator:forged_artifact"
+    },
+    "title": {
+      "translate": "advancement.kultivator.artifact_langit.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

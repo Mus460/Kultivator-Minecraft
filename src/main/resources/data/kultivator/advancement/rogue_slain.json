@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_elite",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.rogue_slain.description"
+    },
+    "icon": {
+      "id": "kultivator:loot_pouch"
+    },
+    "title": {
+      "translate": "advancement.kultivator.rogue_slain.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

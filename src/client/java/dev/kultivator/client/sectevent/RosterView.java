@@ -165,6 +165,9 @@ final class RosterView {
 		if (entry.getIntOr("act", 0) == dev.kultivator.disciple.DiscipleEntity.ACTIVITY_FORMATION_KEEPER) {
 			// Phase 7c (DESIGN 24.13 item 7).
 			lines.add(Component.translatable("kultivator.spine7c.keeper_duty").withStyle(ChatFormatting.GOLD));
+		} else if (entry.getIntOr("act", 0) == dev.kultivator.disciple.DiscipleEntity.ACTIVITY_FORGE_ASSIST) {
+			// Phase 8 (DESIGN 25.2 item 8).
+			lines.add(Component.translatable("kultivator.spine8.forge_duty").withStyle(ChatFormatting.GOLD));
 		}
 		if (entry.getBooleanOr("injured", false)) {
 			lines.add(Component.translatable("kultivator.sectevent.ui.injured").withStyle(ChatFormatting.RED));

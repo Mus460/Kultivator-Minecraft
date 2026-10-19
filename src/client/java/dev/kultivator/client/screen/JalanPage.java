@@ -38,12 +38,17 @@ import java.util.Map;
  * the "Sembunyikan panduan" coin; Ujian the open Foundation Trial set with progress bars and its bonus; Harian today's
  * chores, the streak and when the next set comes. Everything is read from the synced {@code extra.goals}; the server
  * owns every rule. Jade-scroll style, fits 320×240.
+ * <p>
+ * Phase 8 (DESIGN 25.8.2, 25.8.3): a jade coin under the tablets turns the book between chapters 1-5 and 6-10
+ * "Jalan Dunia"; Ujian shows the optional fourth row (any three rows make Fondasi Kokoh).
  */
 class JalanPage extends Page {
 
 	private static final String P = "kultivator.goals.page.";
 	private static final int SECTIONS = 3;
-	private static final int[] TRIAL_COLORS = {0xFF2E8963, 0xFF8A671B, 0xFF6E160F};
+	private static final int[] TRIAL_COLORS = {0xFF2E8963, 0xFF8A671B, 0xFF6E160F, 0xFF3A5E9A};
+	/** 0: chapters 1-5, 1: chapters 6-10 (Jalan Dunia). */
+	private static int book;
 
 	private static int section;
 	private static int chapter = -1;
@@ -76,7 +81,8 @@ class JalanPage extends Page {
 	protected void build() {
 		owner.clear();
 		if (chapter < 0) {
-			chapter = Math.min(Guide.CHAPTERS - 1, Guide.currentChapter(Guide.bits(data())));
+			chapter = Math.min(Guide.ALL_CHAPTERS - 1, Guide.currentChapterAny(data()));
+			book = chapter / Guide.CHAPTERS;
 		}
 		// The three section coins along the top.
 		String[] names = {"steps", "trials", "daily"};
@@ -99,17 +105,26 @@ class JalanPage extends Page {
 
 		// Langkah: five chapter tablets, the claim talisman and the hide coin.
 		int tabletW = Math.max(78, Math.min(118, Math.round(w * 0.36F)));
-		int tabletH = Math.max(14, Math.min(22, (bodyH - 18) / Guide.CHAPTERS - 2));
+		int tabletH = Math.max(12, Math.min(22, (bodyH - 32) / Guide.CHAPTERS - 2));
 		for (int i = 0; i < Guide.CHAPTERS; i++) {
 			ChapterTablet tablet = new ChapterTablet(x + 2, bodyY + i * (tabletH + 2), tabletW, tabletH, i);
 			tablet.onPress(() -> {
-				chapter = tablet.index;
+				chapter = tablet.index();
 				stepScroll = 0.0F;
 			});
-			tablet.tooltip(() -> List.of(Component.translatable("kultivator.goals.chapter." + (tablet.index + 1)),
-					Component.translatable("kultivator.goals.reward." + (tablet.index + 1)).withStyle(ChatFormatting.GOLD)));
+			tablet.tooltip(() -> List.of(Component.translatable("kultivator.goals.chapter." + (tablet.index() + 1)),
+					Component.translatable("kultivator.goals.reward." + (tablet.index() + 1)).withStyle(ChatFormatting.GOLD)));
 			put(tablet, 0);
 		}
+		JadeCoin turn = new JadeCoin(x + 2, y + h - 25, tabletW, 11, () -> Component.translatable(book == 0 ? "kultivator.jalan8.page.book.1"
+				: "kultivator.jalan8.page.book.2"), () -> book == 1);
+		turn.onPress(() -> {
+			book = 1 - book;
+			chapter = book * Guide.CHAPTERS + Math.floorMod(chapter, Guide.CHAPTERS);
+			stepScroll = 0.0F;
+		});
+		turn.tooltip(() -> List.of(Component.translatable("kultivator.jalan8.page.book.tip").withStyle(ChatFormatting.GRAY)));
+		put(turn, 0);
 		JadeCoin hide = new JadeCoin(x + 2, y + h - 12, tabletW, 11, () -> Component.translatable(P + "hide"), () -> Guide.hidden(data()));
 		hide.enabledWhen(Keys::connected);
 		hide.onPress(() -> send(Actions.JALAN, 0, Guide.hidden(data()) ? "show" : "hide"));
@@ -119,7 +134,7 @@ class JalanPage extends Page {
 		listW = x + w - listX;
 		TalismanButton claim = new TalismanButton(listX, y + h - 15, Math.min(140, listW), 15, () -> Component.translatable(
 				(Guide.claimed(data()) & (1 << chapter)) != 0 ? P + "claimed" : P + "claim"));
-		claim.enabledWhen(() -> Keys.connected() && GoalsClient.cfg("guide", true) && Guide.chapterDone(Guide.bits(data()), chapter)
+		claim.enabledWhen(() -> Keys.connected() && GoalsClient.cfg("guide", true) && Guide.chapterDoneAny(data(), chapter)
 				&& (Guide.claimed(data()) & (1 << chapter)) == 0);
 		claim.urgentWhen(() -> claim.isEnabled());
 		claim.onPress(() -> send(Actions.JALAN, 0, "claim:" + (chapter + 1)));
@@ -142,7 +157,8 @@ class JalanPage extends Page {
 
 	@Override
 	void onData() {
-		chapter = Math.max(0, Math.min(Guide.CHAPTERS - 1, chapter));
+		chapter = Math.max(0, Math.min(Guide.ALL_CHAPTERS - 1, chapter));
+		book = chapter / Guide.CHAPTERS;
 	}
 
 	// ================================================================== drawing
@@ -158,10 +174,9 @@ class JalanPage extends Page {
 	}
 
 	private void drawSteps(GuiGraphicsExtractor g, CultivationData data, float seconds) {
-		int bits = Guide.bits(data);
 		float scale = listW >= 180 ? 0.68F : 0.6F;
 		Component chapterName = Component.translatable(P + "chapter", chapter + 1, Component.translatable("kultivator.goals.chapter." + (chapter + 1)));
-		Component total = Component.translatable(P + "total", Integer.bitCount(bits), Guide.STEP_COUNT);
+		Component total = Component.translatable(P + "total", Guide.totalDone(data), Guide.ALL_STEPS);
 		float totalW = font.width(total) * 0.6F;
 		heading(g, chapterName, listX, bodyY, listW - totalW - 4.0F, 0.8F);
 		Brush.text(g, font, total, x + w - totalW - 1.0F, bodyY + 1.5F, Palette.INK_SOFT, 0.6F, false);
@@ -173,18 +188,29 @@ class JalanPage extends Page {
 		g.enableScissor(listX, top, listX + listW, bottom);
 		float cursor = top + 1.0F - offset;
 		float start = cursor;
-		int current = Guide.currentStep(bits);
+		int current = Guide.currentStepAny(data);
 		float pulse = 0.5F + 0.5F * (float) Math.sin(Util.getMillis() / 220.0D);
+		if (chapter >= Guide.CHAPTERS) {
+			// Jalan Dunia: the realm the chapter is meant for, and the cosmetic title once chapter 10 was claimed.
+			Component meant = Component.translatable("kultivator.jalan8.page.realm", Guide.CHAPTER_REALM[chapter - Guide.CHAPTERS].displayName());
+			cursor += Brush.wrap(g, font, meant, listX + 1.0F, cursor, listW - 4.0F, Palette.INK_FAINT, scale - 0.06F, false) + 2.0F;
+			if (chapter == Guide.ALL_CHAPTERS - 1 && Guide.worldTitle(data)) {
+				cursor += Brush.wrap(g, font, Brush.bold(Component.translatable("kultivator.jalan8.page.title")), listX + 1.0F, cursor, listW - 4.0F,
+						Palette.SEAL_DARK, scale, false) + 2.0F;
+			}
+		}
 		for (int s = 0; s < Guide.PER_CHAPTER; s++) {
 			int step = chapter * Guide.PER_CHAPTER + s;
-			boolean done = (bits & (1 << step)) != 0;
+			boolean done = Guide.stepDone(data, step);
 			int mark = done ? 0xFF2E8963 : step == current ? Palette.mix(Palette.GOLD_DARK, Palette.SEAL, pulse) : Palette.INK_FAINT;
 			Brush.text(g, font, Component.literal(done ? "✓" : step == current ? "◆" : "·"), listX + 1.0F, cursor, mark, scale + 0.1F, false);
-			Component name = Component.translatable("kultivator.goals.step." + Guide.STEPS[step].id());
+			Component name = Component.translatable("kultivator.goals.step." + Guide.step(step).id());
 			cursor += Brush.wrap(g, font, done ? name : Brush.bold(name), listX + 10.0F, cursor, listW - 12.0F, done ? Palette.INK_SOFT : Palette.INK,
 					scale, false);
 			if (!done) {
-				cursor += Brush.wrap(g, font, GuideTracker.how(step, data), listX + 10.0F, cursor, listW - 12.0F, Palette.INK_SOFT, scale - 0.06F, false);
+				Component how = step < Guide.STEP_COUNT ? GuideTracker.how(step, data)
+						: Component.translatable("kultivator.goals.step." + Guide.step(step).id() + ".how");
+				cursor += Brush.wrap(g, font, how, listX + 10.0F, cursor, listW - 12.0F, Palette.INK_SOFT, scale - 0.06F, false);
 			}
 			cursor += 3.0F;
 		}
@@ -202,7 +228,7 @@ class JalanPage extends Page {
 	private void drawTrials(GuiGraphicsExtractor g, CultivationData data) {
 		CompoundTag trial = RealmTrials.view(data);
 		String key = trial.getStringOr("target", "");
-		RealmTrials.Trial[] set = key.isEmpty() ? null : RealmTrials.set(key);
+		RealmTrials.Trial[] set = key.isEmpty() ? null : RealmTrials.full(key);
 		float scale = w >= 260 ? 0.7F : 0.62F;
 		float cursor = bodyY;
 		if (set == null) {
@@ -214,15 +240,16 @@ class JalanPage extends Page {
 		}
 		heading(g, Component.translatable(P + "trials.title", RealmTrials.targetName(key)), x + 2.0F, cursor, w - 4.0F, 0.8F);
 		cursor += 14.0F;
-		int[] prog = trial.getIntArray("prog").orElse(new int[6]);
+		int[] prog = trial.getIntArray("prog").orElse(new int[0]);
 		int done = trial.getIntOr("done", 0);
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < set.length; i++) {
 			RealmTrials.Trial each = set[i];
 			boolean ok = (done & (1 << i)) != 0;
-			int have = prog.length == 6 ? prog[i * 2] : 0;
+			int have = i * 2 < prog.length ? prog[i * 2] : 0;
 			int goal = Math.max(1, each.goal());
 			String amount = each.kind().minutes() ? have / 60 + "/" + goal / 60 : have + "/" + goal;
-			Brush.text(g, font, Component.literal(ok ? "✓" : String.valueOf(i + 1)), x + 4.0F, cursor, ok ? 0xFF2E8963 : TRIAL_COLORS[i], scale + 0.1F, false);
+			Brush.text(g, font, Component.literal(ok ? "✓" : String.valueOf(i + 1)), x + 4.0F, cursor, ok ? 0xFF2E8963 : TRIAL_COLORS[i % TRIAL_COLORS.length],
+					scale + 0.1F, false);
 			Brush.fit(g, font, RealmTrials.describe(each), x + 14.0F, cursor, w - 70.0F, ok ? Palette.INK_SOFT : Palette.INK, scale, 0.45F, false);
 			Component number = Component.literal(amount);
 			float numberW = font.width(number) * scale;
@@ -236,11 +263,12 @@ class JalanPage extends Page {
 		cursor += 2.0F;
 		cursor += Brush.wrap(g, font, Component.translatable(P + "trials.bonus", String.format(Locale.ROOT, "%+.2f", bonus)),
 				x + 4.0F, cursor, w - 8.0F, bonus > 0.0D ? Palette.GOLD_DARK : Palette.INK_SOFT, scale, false) + 1.0F;
-		if (done == 7) {
+		if (RealmTrials.isFull(done)) {
 			cursor += Brush.wrap(g, font, Brush.bold(Component.translatable(P + "trials.full")), x + 4.0F, cursor, w - 8.0F, Palette.SEAL_DARK, scale,
 					false) + 1.0F;
 		}
-		cursor += Brush.wrap(g, font, Component.translatable(P + "trials.rule", String.format(Locale.ROOT, "%.2f", RealmTrials.QUALITY_PER_TRIAL),
+		cursor += Brush.wrap(g, font, Component.translatable(set.length > 3 ? "kultivator.jalan8.page.trials.rule4" : P + "trials.rule",
+				String.format(Locale.ROOT, "%.2f", RealmTrials.QUALITY_PER_TRIAL),
 				String.format(Locale.ROOT, "%.2f", RealmTrials.FULL_BONUS), String.format(Locale.ROOT, "%.1f", RealmTrials.FULL_STRIKE_FACTOR)),
 				x + 4.0F, cursor, w - 8.0F, Palette.INK_FAINT, scale - 0.06F, false);
 		sourceLine(g, Component.translatable(P + "trials.source"));
@@ -332,19 +360,24 @@ class JalanPage extends Page {
 	/** One chapter as a small jade tablet: the red seal with its number, the name, n/4 and a gold stamp once claimed. */
 	private final class ChapterTablet extends Widget {
 
-		final int index;
+		/** The tablet's place 0-4; the chapter it shows depends on the open book. */
+		final int slot;
 
-		ChapterTablet(int x, int y, int w, int h, int index) {
+		ChapterTablet(int x, int y, int w, int h, int slot) {
 			super(x, y, w, h);
-			this.index = index;
+			this.slot = slot;
+		}
+
+		int index() {
+			return book * Guide.CHAPTERS + slot;
 		}
 
 		@Override
 		protected void draw(GuiGraphicsExtractor g, Font font, boolean over, float seconds) {
 			CultivationData data = data();
-			int bits = Guide.bits(data);
+			int index = index();
 			boolean chosen = chapter == index;
-			boolean done = Guide.chapterDone(bits, index);
+			boolean done = Guide.chapterDoneAny(data, index);
 			boolean claimed = (Guide.claimed(data) & (1 << index)) != 0;
 			float glow = hover.get();
 			int off = pressOffset(over);
@@ -362,7 +395,7 @@ class JalanPage extends Page {
 			g.fill(sx, sy, sx + seal, sy + seal, done ? Palette.SEAL : Palette.grey(Palette.SEAL, 0.6F));
 			Brush.centered(g, font, Component.literal(String.valueOf(index + 1)), sx + seal / 2.0F + 0.3F, sy + (seal - 7.0F) / 2.0F, 0xFFF1D57E, 0.8F,
 					false);
-			Component count = Component.literal(Guide.doneIn(bits, index) + "/" + Guide.PER_CHAPTER);
+			Component count = Component.literal(Guide.doneInAny(data, index) + "/" + Guide.PER_CHAPTER);
 			float countW = font.width(count) * 0.6F;
 			float tx = sx + seal + 3.0F;
 			float room = x0 + w - (chosen ? 3 : 0) - tx - countW - (claimed ? 9.0F : 4.0F);
