@@ -50,7 +50,7 @@ public class DiscipleScreen extends Screen {
 	private static final int MAX_W = 420;
 	private static final int MAX_H = 270;
 	/** Same reach as the server's {@code Disciples.ACTION_RANGE}, so a refresh never meets a "too far" refusal. */
-	private static final double MAX_DISTANCE_SQ = Disciples.ACTION_RANGE * Disciples.ACTION_RANGE;
+	private static final double MAX_DISTANCE_SQ = Disciples.VIEW_RANGE * Disciples.VIEW_RANGE;
 	/** Live values (qi, xp, health) are asked for again this often while the scroll is open, in ticks. */
 	private static final int REFRESH_TICKS = 100;
 	private static final int[] ICONS = {Glyphs.STATUS, Glyphs.TECHNIQUES, Glyphs.HELP, Glyphs.ROOT_DAO, Glyphs.TALENT, Glyphs.TREASURE, Glyphs.PATH};
@@ -358,6 +358,11 @@ public class DiscipleScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
+		if (Keys.MURID.matches(event)) {
+			// The Murid key again: the next disciple by name.
+			Keys.send(new Payloads.Action(Actions.DISCIPLE_OPEN, -1, "next:" + entityId));
+			return true;
+		}
 		int number = event.key() - InputConstants.KEY_1;
 		if (number >= 0 && number < tabs.length) {
 			if (number != tab) {

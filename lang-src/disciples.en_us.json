@@ -96,5 +96,8 @@
   "kultivator.disciples.name.32": "Qiao Feixue",
   "kultivator.disciples.name.33": "Long Aotian",
   "kultivator.disciples.name.34": "Jin Shaoyang",
-  "kultivator.disciples.name.35": "An Ruyi"
+  "kultivator.disciples.name.35": "An Ruyi",
+  "kultivator.disciples.none_near": "No disciple of yours within %s blocks.",
+  "kultivator.disciples.none_named": "No disciple named %s nearby.",
+  "key.kultivator.murid": "Open disciple scroll (again: next disciple)"
 }
