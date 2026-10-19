@@ -22,7 +22,8 @@ import net.minecraft.world.item.Items;
  */
 public class MeteorRenderer extends EntityRenderer<BatinMeteorEntity, MeteorRenderer.State> {
 
-	private static final ItemStack LOOK = new ItemStack(Items.MAGMA_BLOCK);
+	/** Made on first use: item components are not bound yet when entity renderers are created at resource reload. */
+	private static ItemStack look;
 	private static final float SCALE = 2.6F;
 
 	private final ItemModelResolver itemModelResolver;
@@ -52,7 +53,10 @@ public class MeteorRenderer extends EntityRenderer<BatinMeteorEntity, MeteorRend
 	@Override
 	public void extractRenderState(BatinMeteorEntity entity, State state, float partialTicks) {
 		super.extractRenderState(entity, state, partialTicks);
-		itemModelResolver.updateForNonLiving(state.item, LOOK, ItemDisplayContext.GROUND, entity);
+		if (look == null) {
+			look = new ItemStack(Items.MAGMA_BLOCK);
+		}
+		itemModelResolver.updateForNonLiving(state.item, look, ItemDisplayContext.GROUND, entity);
 		state.spin = (entity.tickCount + partialTicks) * 7.0F;
 	}
 
