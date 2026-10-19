@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -475,6 +476,9 @@ public final class WorldBreaker {
 			job.changed++;
 			budget--;
 			done++;
+			if (!job.restore && to.isAir()) {
+				budget -= clearLoosePlants(level, job, zones, pos);
+			}
 			sx += pos.getX() + 0.5D;
 			sy += pos.getY() + 0.5D;
 			sz += pos.getZ() + 0.5D;
@@ -511,6 +515,52 @@ public final class WorldBreaker {
 			columns.add(caster.position());
 		}
 		return new ProtectedZones.Context(level, box, job.owner, columns);
+	}
+
+	/** How many plants above a carved cell are cleared at most (a sugar cane or bamboo stalk, a tall flower). */
+	private static final int LOOSE_PLANT_REACH = 4;
+
+	/**
+	 * Clears the grass, flowers and other loose plants that would float above a cell just carved: block updates are off
+	 * (no cascades), so they would never pop on their own. Only natural ground cover that can no longer survive there,
+	 * never a block entity, a fluid, a protected zone or anything solid; recorded for Pulihkan like the carving itself.
+	 *
+	 * @return the number of plants cleared (spent from the batch budget)
+	 */
+	private static int clearLoosePlants(ServerLevel level, Job job, @Nullable ProtectedZones.Context zones, BlockPos carved) {
+		int cleared = 0;
+		BlockPos.MutableBlockPos cursor = carved.mutable();
+		for (int step = 0; step < LOOSE_PLANT_REACH; step++) {
+			cursor.move(Direction.UP);
+			BlockState plant = level.getBlockState(cursor);
+			if (!loosePlant(plant) || plant.canSurvive(level, cursor) || zones != null && zones.zoneOf(cursor) != null) {
+				break;
+			}
+			BlockPos at = cursor.immutable();
+			if (!level.setBlock(at, Blocks.AIR.defaultBlockState(), FLAGS)) {
+				break;
+			}
+			if (job.undoable) {
+				job.undoPositions.add(at.asLong());
+				job.undoOld.add(plant);
+				job.undoPlaced.add(Blocks.AIR.defaultBlockState());
+			}
+			job.changed++;
+			cleared++;
+		}
+		return cleared;
+	}
+
+	/** Natural ground cover that hangs on the block below it: grass, ferns, flowers, saplings, mushrooms, canes, carpets of moss. */
+	private static boolean loosePlant(BlockState state) {
+		if (state.isAir() || state.hasBlockEntity() || !state.getFluidState().isEmpty()) {
+			return false;
+		}
+		return state.canBeReplaced() && !state.is(Blocks.WATER) && !state.is(Blocks.LAVA)
+				|| state.is(BlockTags.FLOWERS) || state.is(BlockTags.SAPLINGS) || state.is(Blocks.BROWN_MUSHROOM) || state.is(Blocks.RED_MUSHROOM)
+				|| state.is(Blocks.SUGAR_CANE) || state.is(Blocks.BAMBOO) || state.is(Blocks.BAMBOO_SAPLING) || state.is(Blocks.SWEET_BERRY_BUSH)
+				|| state.is(Blocks.MOSS_CARPET) || state.is(Blocks.PALE_MOSS_CARPET) || state.is(Blocks.CACTUS) || state.is(Blocks.SMALL_DRIPLEAF)
+				|| state.is(Blocks.AZALEA) || state.is(Blocks.FLOWERING_AZALEA) || state.is(Blocks.LILY_PAD);
 	}
 
 	/** Records a solid or fluid block a carving position had to leave (see {@link Job#kept}). */
