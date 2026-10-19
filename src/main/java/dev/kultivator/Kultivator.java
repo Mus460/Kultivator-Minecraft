@@ -64,6 +64,8 @@ public class Kultivator implements ModInitializer {
 		KultivatorConfig.load();
 		ModAttachments.init();
 		Net.init();
+		// Polish pass (DESIGN 27.1 S5): the emissive qi particle types (registered on both sides, drawn by the client).
+		dev.kultivator.fx.QiParticles.register();
 		// Phase 6c spine (DESIGN 22.14.6): DeathGuard is the only player ALLOW_DEATH listener; modules register their guards.
 		dev.kultivator.util.DeathGuard.init();
 

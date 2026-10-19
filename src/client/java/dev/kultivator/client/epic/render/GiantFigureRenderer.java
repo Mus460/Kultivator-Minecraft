@@ -45,6 +45,9 @@ public final class GiantFigureRenderer extends Element {
 	private float armTarget;
 	private boolean bow;
 	private float frameAge;
+	private dev.kultivator.technique.spec.dsl.Pose castPose;
+	private int castHold;
+	private float castAge;
 
 	/** A figure standing at {@code feet}, {@code height} blocks tall, facing {@code yaw} (degrees). */
 	public GiantFigureRenderer(int delay, float life, Vec3 feet, float yaw, float height, Identifier skin, int tint, float alpha) {
@@ -58,12 +61,23 @@ public final class GiantFigureRenderer extends Element {
 		this.largeRank = 3;
 	}
 
-	/** The skin of a tracked player (its own skin tinted), or the fallback texture. */
+	/** The skin of a tracked player or disciple (its own skin tinted), or the fallback texture. */
 	public static Identifier skinOf(Entity entity, Identifier fallback) {
 		if (entity instanceof AbstractClientPlayer player) {
 			return player.getSkin().body().texturePath();
 		}
+		if (entity instanceof dev.kultivator.disciple.DiscipleEntity disciple) {
+			return dev.kultivator.client.disciple.DiscipleLook.skin(disciple).body().texturePath();
+		}
 		return fallback;
+	}
+
+	/** Poses the figure with a cast pose of the pose library (polish 2.4 / finding 230), replacing the default stance. */
+	public GiantFigureRenderer pose(dev.kultivator.technique.spec.dsl.Pose pose, int hold) {
+		this.castPose = pose;
+		this.castHold = Math.max(4, hold);
+		this.castAge = 0.0F;
+		return this;
 	}
 
 	/** Moves the feet to {@code to} over {@code ticks} (the clone's climb). */
@@ -92,6 +106,7 @@ public final class GiantFigureRenderer extends Element {
 
 	@Override
 	protected void tick() {
+		castAge++;
 		armSwing += (armTarget - armSwing) * 0.35F;
 		if (moveTo != null) {
 			moveAge++;
@@ -147,6 +162,18 @@ public final class GiantFigureRenderer extends Element {
 	}
 
 	private void pose(ModelPart root) {
+		if (castPose != null) {
+			dev.kultivator.client.anim.PoseAngles a = dev.kultivator.client.fx.spec.AnimBridge.sample(castPose, Math.min(1.0F, castAge / castHold), frameAge);
+			if (a != null) {
+				apply(child(root, "head"), a.headX(), a.headY(), 0.0F);
+				apply(child(root, "body"), a.bodyX(), a.bodyY(), 0.0F);
+				apply(child(root, "right_arm"), a.rArmX(), a.rArmY(), a.rArmZ());
+				apply(child(root, "left_arm"), a.lArmX(), a.lArmY(), a.lArmZ());
+				apply(child(root, "right_leg"), a.rLegX(), 0.0F, a.rLegZ());
+				apply(child(root, "left_leg"), a.lLegX(), 0.0F, a.lLegZ());
+				return;
+			}
+		}
 		ModelPart rightArm = child(root, "right_arm");
 		ModelPart leftArm = child(root, "left_arm");
 		ModelPart head = child(root, "head");
@@ -168,6 +195,14 @@ public final class GiantFigureRenderer extends Element {
 			}
 		} else if (head != null) {
 			head.xRot = Mth.sin(frameAge * 0.02F) * 0.05F;
+		}
+	}
+
+	private static void apply(ModelPart part, float x, float y, float z) {
+		if (part != null) {
+			part.xRot = x;
+			part.yRot = y;
+			part.zRot = z;
 		}
 	}
 

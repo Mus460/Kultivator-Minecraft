@@ -155,6 +155,13 @@ public final class EpicIds {
 	public static final int EXTRA_OWN_ART_BORN = 20;
 	/** An Immortal auction lot won. */
 	public static final int EXTRA_AUCTION_WIN = 21;
+	/**
+	 * A disciple's signature ultimate (DESIGN 27.6): subject = the disciple, viewer = its master, pos = the centre,
+	 * a = the Dao ordinal, b = the radius in blocks (the client stamps the name and seal 劍 雷 禁 拳 炎 生 冰 影 and grades the sky).
+	 */
+	public static final int EXTRA_DISCIPLE_ULT = 22;
+	/** A Jurus Pemusnah in its block-safe form (DESIGN 27.6): subject = the disciple, pos = the centre, a = the art ordinal, b = radius. */
+	public static final int EXTRA_DESTROYER_ART = 23;
 
 	// TECH_ULTIMATE: the TechFx phases (CAST the pre-roll, TRAVEL / IMPACT the climax, END the release).
 	public static final int TECH_CAST = 0;
@@ -346,7 +353,7 @@ public final class EpicIds {
 	public static int maxBeat(int moment) {
 		return switch (moment) {
 			case TRIBULATION, DISCIPLE_BT -> 6;
-			case EXTRA -> EXTRA_AUCTION_WIN;
+			case EXTRA -> EXTRA_DESTROYER_ART;
 			case BREAKTHROUGH, RECRUIT, SECT, TECH_ULTIMATE -> 2;
 			case ASCENSION -> 5;
 			case HEART_DEMON -> 3;

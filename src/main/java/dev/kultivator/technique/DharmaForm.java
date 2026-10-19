@@ -108,6 +108,8 @@ final class DharmaForm {
 		Vec3 pos = player.position();
 		Techniques.fx(player, Technique.DHARMA_FORM, 0, pos, pos.add(0.0D, player.getBbHeight(), 0.0D), (float) scale);
 		ctx.castFx(pos, pos.add(0.0D, player.getBbHeight(), 0.0D), (float) scale, player.getBbHeight(), 1, duration);
+		// the dharma armour every client draws on the grown body (DESIGN 27.4 FormSync)
+		dev.kultivator.technique.spec.run.VisualSync.form(player, "dharma", duration, 0);
 		level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 0.6F);
 		level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.PLAYERS, 0.8F, 0.7F);
 		level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 0.7F, 0.8F);
@@ -146,6 +148,7 @@ final class DharmaForm {
 
 	/** Ends the form: modifiers off, our effects off, flag cleared. {@code messageKey} null = quietly. */
 	static void end(ServerPlayer player, @Nullable String messageKey) {
+		dev.kultivator.technique.spec.run.VisualSync.form(player, "", 0, 0);
 		Active active = ACTIVE.remove(player.getUUID());
 		CultivationData data = Cultivators.get(player);
 		removeModifiers(player);

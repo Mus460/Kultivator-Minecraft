@@ -6,6 +6,7 @@ import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueType;
 import dev.kultivator.technique.spec.dsl.DShape;
 import dev.kultivator.technique.spec.dsl.Phase;
+import dev.kultivator.technique.spec.dsl.Pose;
 import net.minecraft.sounds.SoundEvents;
 
 import static dev.kultivator.data.TechniqueSpec.Flag.NO_ECHO;
@@ -45,13 +46,29 @@ public final class CiptaanArts {
 					.special(OwnArt.ID)
 					.flag(NO_TEACH, NO_ECHO)
 					.qiPct(QI_PCT).cooldown(COOLDOWN_SECONDS)
+					// the body of each form (DESIGN 27.2): a summoning raise, then the form's own strike
+					.pose(Pose.SUMMON_RAISE)
+					.pose(Phase.extra(OwnArt.PHASE_CUT), Pose.SWORD_SLASH).pose(Phase.extra(OwnArt.PHASE_BURST), Pose.TWIN_PALM)
+					.pose(Phase.extra(OwnArt.PHASE_RAIN), Pose.SKY_RAISE).pose(Phase.extra(OwnArt.PHASE_WAVE), Pose.STOMP)
+					.pose(Phase.extra(OwnArt.PHASE_DOMAIN), Pose.ARMS_SPREAD).pose(Phase.extra(OwnArt.PHASE_SEAL), Pose.SEAL)
+					.climax(Phase.extra(1))
 					.step(at(KEEP_ALIVE_TICKS))
 					// The real shapes and colours come from the stored composition (client/batin/CiptaanFx); these layers keep
 					// the audit's CAST FX and SHAKE rules and give a cast without a composition a visible answer.
 					.fx(Phase.CAST, runeCircle(GOLD).count(24).ticks(20), shell(WHITE).onCaster().count(16).ticks(10))
-					.fx(Phase.extra(0), shockRing(GOLD).size(16.0F).count(60).ticks(16), shake(0.8F, 20))
-					// EXTRA1: the Daos' domain pulses and the pair row burst at the aim (OwnArt.burst).
-					.fx(Phase.extra(1), impact(WHITE).count(16).ticks(8))
+					// EXTRA1: the Daos' domain pulses and the pair row burst at the aim (OwnArt.burst): the climax, one shake.
+					.fx(Phase.extra(1), impact(WHITE).count(16).ticks(8), shockRing(GOLD).radius(16.0F).count(60).ticks(16), flash(WHITE, 0.2F, 5),
+							shake(0.8F, 20))
+					// the forms (the client paints them in the stored Daos' colours: FLAG_TWO_DAO and CiptaanFx)
+					.fx(Phase.extra(OwnArt.PHASE_CUT), beamCore(GOLD).count(60).ticks(10), crescentFly(WHITE).vertical().radius(4.0F).count(30).ticks(8),
+							shake(0.3F, 8))
+					.fx(Phase.extra(OwnArt.PHASE_BURST), shell(GOLD).radius(12.0F).count(80).ticks(12), shockRing(WHITE).radius(12.0F).count(40).ticks(12),
+							shake(0.6F, 14))
+					.fx(Phase.extra(OwnArt.PHASE_RAIN), impact(GOLD).count(10).ticks(8), column(WHITE).count(8).ticks(6).detail())
+					.fx(Phase.extra(OwnArt.PHASE_WAVE), crescentFly(GOLD).vertical().radius(8.0F).count(60).ticks(16), shake(0.4F, 10))
+					.fx(Phase.extra(OwnArt.PHASE_DOMAIN), dome(GOLD).count(30).ticks(16), shockRing(WHITE).count(24).ticks(10).detail())
+					.fx(Phase.extra(OwnArt.PHASE_SEAL), chains(GOLD).count(24).ticks(20), glyph("封").scale(2.0F).onTarget().above(1.5F).ticks(30),
+							runeCircle(GOLD).onTarget().radius(2.0F).count(20).ticks(30).detail())
 					.sound(Phase.CAST, SoundEvents.BEACON_POWER_SELECT, 1.4F, 0.8F)
 					.sound(Phase.extra(0), SoundEvents.AMETHYST_BLOCK_RESONATE, 1.6F, 0.6F)
 					// Mode Kehancuran only (the existing switch): the runner carves this bowl where a form strikes (caps and undo apply).

@@ -16,7 +16,9 @@ import dev.kultivator.technique.spec.dsl.Payload.DotKind;
 import dev.kultivator.technique.spec.dsl.Payload.Eff;
 import dev.kultivator.technique.spec.dsl.Payload.Facing;
 import dev.kultivator.technique.spec.dsl.Payload.Versus;
+import dev.kultivator.technique.spec.dsl.FxLayer;
 import dev.kultivator.technique.spec.dsl.Phase;
+import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
@@ -54,6 +56,7 @@ public final class ImmortalArts {
 		// 1000 · Segel Kesembilan (I Shall Seal the Heavens, the Ninth Hex)
 		sink.add(art("ninth_hex", 1000, null)
 				.grade(TechniqueGrade.ABADI, 0).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Pose.SEAL).pose(Phase.EXTRA0, Pose.OVERHEAD_SLAM).bindLook(dev.kultivator.technique.spec.run.BindKind.SEAL).climax(Phase.EXTRA0)
 				.route(Route.scr(5)).prereq("karmic_hex", 3)
 				.flag(NO_TEACH)
 				.channel(160, 20).qiPct(50.0D, 600).qiPerSecond(5.0D).cooldown(300.0D)
@@ -64,10 +67,11 @@ public final class ImmortalArts {
 				.step(atEnd().shape(all().radius(24, 32).max(32).order(Shape.All.Order.STRONGEST))
 						.hit(damage(9.0D), eff(Eff.SLOWNESS, 4, 100)).phase(0))
 				.fx(Phase.CAST, dome(SEAL).count(80).ticks(160),
-						glyph("封").scale(20.0F).n(9).radius(18.0F).ticks(160).minTier(DISPLAY_TIER),
+						glyph("封封封封封封封封").scale(6.0F).n(8).radius(18.0F).ticks(160),
 						shake(0.4F, 10))
 				.fx(Phase.PULSE, dome(SEAL).count(20).ticks(20).detail())
 				.fx(Phase.extra(0), shell(WHITE).count(80).ticks(12), flash(WHITE, 0.3F, 6), shake(1.0F, 20))
+				.fx(Phase.EXTRA7, impact(SEAL).particle(ParticleTypes.END_ROD).count(6).ticks(6))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 0.5F, 0.5F))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 0.5F, 0.6F).delay(8))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 0.5F, 0.7F).delay(16))
@@ -81,6 +85,7 @@ public final class ImmortalArts {
 		// 1001 · Gunung Lima Unsur (Journey to the West, the Five Elements Mountain)
 		sink.add(art("five_elements_mountain", 1001, null)
 				.grade(TechniqueGrade.ABADI, 1).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Pose.SKY_RAISE).pose(Phase.IMPACT, Pose.OVERHEAD_SLAM).pose(Phase.EXTRA0, Pose.SEAL)
 				.route(Route.realm()).prereq("buddha_palm", 3)
 				.flag(TEACHABLE).teachStars(27)
 				.qiPct(55.0D, 700).cooldown(300.0D)
@@ -88,20 +93,19 @@ public final class ImmortalArts {
 						.hit(damage(14.0D).vs(Versus.UNDEAD, 1.5D), slam(0.6D)))
 				.step(at(40).shape(pillar(Anchor.AIM).ring(5, 8.0D).radius(4).height(20).delay(0))
 						.hit(bind(BindKind.ROOT, 120).boss(30), dot(0.8D, 6, DotKind.QI)).phase(0))
-				.fx(Phase.CAST, cloudDisc(HEAVEN).above(40.0F).count(80).ticks(40),
-						giantBlock(gold).blockSize(6.0F, 2.0F, 8.0F).n(3).fall(64.0F, 40.0F).ticks(60).minTier(DISPLAY_TIER),
-						palm(GOLD).count(60).ticks(40))
+				.fx(Phase.CAST, cloudDisc(HEAVEN).above(40.0F).count(80).ticks(40))
+				// the Buddha's palm comes down from 64 up on the pre-impact TRAVEL (40 ticks), palm-down, and lands on the IMPACT
+				.fx(Phase.TRAVEL, model("buddha_palm").scale(24.0F).fall(64.0F, 40.0F).ticks(46).facing(FxLayer.Facing.FLAT),
+						palm(GOLD).inSky().count(60).ticks(40), cloudDisc(HEAVEN).inSky().count(30).ticks(40).detail())
 				.fx(Phase.IMPACT, shockRing(GOLD).count(60).ticks(16),
 						// The 9th display of the cast: EXTRA, so the Normal budget of 8 (3 palm blocks + 5 mountains) drops it first.
-						glyph("唵嘛呢叭咪吽").scale(10.0F).above(14.0F).ticks(120).minTier(DISPLAY_TIER).extra(),
+						glyph("唵嘛呢叭咪吽").scale(10.0F).above(14.0F).ticks(120).minTier(1).extra(),
 						shake(1.0F, 20))
 				// The five mountains rise on the ring (one block per pillar, in order) and sink after 120t.
+				// one mountain peak rises at each of the five ring points (one EXTRA0 per point, index/of)
 				.fx(Phase.extra(0), column(GOLD).count(30).ticks(20),
-						giantBlock(Blocks.STONE.defaultBlockState()).blockSize(6.0F, 14.0F, 6.0F).rise(14.0F, 10.0F).ticks(120).minTier(DISPLAY_TIER),
-						giantBlock(gold).blockSize(6.0F, 14.0F, 6.0F).rise(14.0F, 10.0F).ticks(120).minTier(DISPLAY_TIER),
-						giantBlock(Blocks.OAK_LOG.defaultBlockState()).blockSize(6.0F, 14.0F, 6.0F).rise(14.0F, 10.0F).ticks(120).minTier(DISPLAY_TIER),
-						giantBlock(Blocks.PRISMARINE.defaultBlockState()).blockSize(6.0F, 14.0F, 6.0F).rise(14.0F, 10.0F).ticks(120).minTier(DISPLAY_TIER),
-						giantBlock(Blocks.MAGMA_BLOCK.defaultBlockState()).blockSize(6.0F, 14.0F, 6.0F).rise(14.0F, 10.0F).ticks(120).minTier(DISPLAY_TIER))
+						model("mountain_peak").scale(10.0F).rise(14.0F, 10.0F).ticks(120).facing(FxLayer.Facing.UPRIGHT),
+						impact(0x8A7A60).particle(ParticleTypes.POOF).count(20).ticks(12).detail())
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 0.5F, 0.5F))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 0.5F, 0.55F).delay(12))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 0.5F, 0.6F).delay(24))
@@ -114,16 +118,18 @@ public final class ImmortalArts {
 		// 1002 · Diagram Taiji (Investiture of the Gods, the Tai Chi Diagram)
 		sink.add(art("tai_chi_diagram", 1002, null)
 				.grade(TechniqueGrade.ABADI, 2).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Phase.CHARGE, Pose.SEAL).pose(Pose.TWIN_PALM)
 				.route(Route.inh("universal"), Route.feat(Feat.tribAverage(BreakthroughQuality.PERFECT)))
 				.flag(TEACHABLE).teachStars(27)
 				.charge(30).qiPct(55.0D, 700).cooldown(300.0D)
-				.step(at(0).shape(front().length(48, 64).width(9).height(12).speed(8.0D).fromSky(30.0D))
+				.step(at(0).shape(front().length(48, 64).width(9).height(12).speed(8.0D).skyBand(30.0D))
 						.hit(damage(12.0D).vs(Versus.UNDEAD, 1.5D).charged(), exec(0.40D)))
 				.fx(Phase.CAST, runeCircle(WHITE).color2(0x101010).radius(4.0F).count(40).ticks(30))
 				.fx(Phase.CHARGE, runeCircle(WHITE).color2(0x101010).radius(6.0F).spin(6.0F).count(40).ticks(30))
 				// The bands show up to 176 b in the catalogue; one LASER is at most 128, so the client draws two in a row (TODO kitab).
-				.fx(Phase.TRAVEL, laser(whiteGlass, 4.5F, 128.0F).ticks(24).minTier(DISPLAY_TIER),
-						laser(blackGlass, 4.5F, 128.0F).delay(2).ticks(24).minTier(DISPLAY_TIER),
+				.fx(Phase.TRAVEL, model("taiji_disc").scale(9.0F).fall(30.0F, 10.0F).ticks(24).facing(FxLayer.Facing.FLAT),
+						laser(whiteGlass, 4.5F, 128.0F).ticks(24).minTier(1).extra(),
+						laser(blackGlass, 4.5F, 128.0F).delay(2).ticks(24).minTier(1).extra(),
 						trail(WHITE).color2(0x101010).count(60).ticks(12), shake(0.8F, 16), cracks())
 				.fx(Phase.HIT, healRise(0xF0F0F0).particle(ParticleTypes.WHITE_ASH).count(16).ticks(30))
 				.sound(Phase.CAST, SoundEvents.BEACON_ACTIVATE, 1.4F, 0.8F)
@@ -136,6 +142,7 @@ public final class ImmortalArts {
 		// 1003 · Langkah Penginjak Langit (Renegade Immortal, Heaven Trampling)
 		sink.add(art("heaven_trampling", 1003, null)
 				.grade(TechniqueGrade.DEWA, 0).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Pose.STOMP).pose(Phase.IMPACT, Pose.KNEEL_STRIKE).pose(Phase.EXTRA0, Pose.STOMP).climax(Phase.IMPACT)
 				.gate(Gate.DEWA_I).prereq("five_elements_mountain", 3).dewaStars(60)
 				.flag(TEACHABLE, NO_ECHO)
 				.qiPct(80.0D).cooldown(600.0D)
@@ -147,6 +154,8 @@ public final class ImmortalArts {
 				.fx(Phase.IMPACT, shell(HEAVEN).radius(24.0F).count(120).ticks(20), sky(HEAVEN).ticks(60).minTier(SKY_TIER),
 						skyTear(HEAVEN).ticks(60).minTier(SKY_TIER), flash(WHITE, 0.35F, 8), shake(1.0F, 24))
 				.fx(Phase.extra(0), shockRing(HEAVEN).count(60).ticks(12))
+				.fx(Phase.TRAVEL, shockRing(HEAVEN).n(9).radius(2.0F).count(40).ticks(27), trail(HEAVEN).count(30).ticks(27).detail())
+				.fx(Phase.IMPACT, model("god_foot").scale(12.0F).fall(12.0F, 4.0F).ticks(16).facing(FxLayer.Facing.FLAT))
 				.sound(Phase.IMPACT, SoundEvents.WARDEN_SONIC_BOOM, 0.5F, 0.8F)
 				.sound(Phase.extra(0), SoundEvents.LIGHTNING_BOLT_THUNDER, 1.0F, 0.7F)
 				.kehancuran(DShape.sphere(6), DShape.disc(16, 2).nat())

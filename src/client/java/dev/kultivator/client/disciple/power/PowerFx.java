@@ -1,8 +1,18 @@
 package dev.kultivator.client.disciple.power;
 
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.anim.model.Anim;
+import dev.kultivator.client.anim.model.ModelHandle;
 import dev.kultivator.client.disciple.DiscipleLook;
 import dev.kultivator.client.fx.CommonFx;
+import dev.kultivator.client.fx.quad.BoltQuad;
+import dev.kultivator.client.fx.quad.GlowQuad;
+import dev.kultivator.client.fx.quad.QuadFx;
+import dev.kultivator.client.fx.quad.RingQuad;
+import dev.kultivator.client.fx.quad.StreakQuad;
+import dev.kultivator.client.fx.spec.AnimBridge;
+import dev.kultivator.client.fx.spec.CameraShake;
+import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Realm;
 import dev.kultivator.disciple.DiscipleEntity;
@@ -34,6 +44,12 @@ import java.util.List;
  * on this client and scaled by Effect Quality: every ultimate's particles, flame orbs, the Poison Body haze, the dragon
  * form, the golden-body glint, the Heretic gate veins, the Purple Mist, the soul-colour motes, the Double Pupils' eye
  * glyphs (only the master gets those packets), the natal treasure's glints and the soul's flight.
+ * <p>
+ * Polish pass (DESIGN 27.6, plan 2.4 and 6.14): every power plays its cast pose on the disciple (CastPoses through
+ * {@link AnimBridge}); the sword formation is a ring of light-sword models orbiting the dome with three diving per damage
+ * pulse; bolts are quad geometry (particles at Minimal) at the struck monsters; the emperor fist is a golden fist prop
+ * thrusting from the hand and shattering on the target; the fire lotus grows between the hands while it charges and flies
+ * on release; Kunpeng dashes leave afterimages; the Seven Fairies link up with seven coloured threads.
  */
 public final class PowerFx {
 
@@ -53,6 +69,7 @@ public final class PowerFx {
 		final int life;
 		final int entityId;
 		int age;
+		final List<ModelHandle> models = new ArrayList<>();
 
 		Timed(int sub, Vec3 pos, Vec3 target, int b, float f, int life, int entityId) {
 			this.sub = sub;
@@ -81,25 +98,57 @@ public final class PowerFx {
 		int b = fx.b();
 		float f = fx.f();
 		RandomSource random = level.getRandom();
+		DiscipleEntity caster = nearestDisciple(level, pos);
+		int who = caster == null ? -1 : caster.getId();
 		switch (fx.a()) {
 			case PowerIds.FX_ULT_SWORD -> {
-				TIMED.add(new Timed(fx.a(), pos, target, b, f, (int) target.y, -1));
+				Timed timed = new Timed(fx.a(), pos, target, b, f, (int) target.y, who);
+				TIMED.add(timed);
+				swordFormation(timed);
 				CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), 0xD8E6FF, f, 64);
 				CommonFx.pillar(pos, 0xD8E6FF, f + 2.0F);
+				DiscipleEntity master = nearestDiscipleWithin(level, pos, 24.0D);
+				if (master != null) {
+					AnimBridge.pose(master.getId(), Pose.SWORD_SKY, Math.max(20, (int) target.y));
+				}
+				ring(pos, 0xD8E6FF, f * 0.3F, f, 0.8F, 20);
 			}
+			case PowerIds.FX_ULT_SWORD_DIVE -> swordDive(pos, target, b);
 			case PowerIds.FX_ULT_BOLT -> {
-				if (b == PowerIds.BOLT_STORM) {
-					boltStorm(level, pos, f, random);
-				} else if (b == 1) {
-					CommonFx.bolt(target, pos, GOLD, 4);
+				if (b == PowerIds.BOLT_STORM && f > 1.5F) {
+					// the cast itself: the disciple calls the sky; the bolts come one packet per victim
+					if (who >= 0) {
+						AnimBridge.pose(who, Pose.SKY_RAISE, 16);
+					}
+					CommonFx.burst(pos.add(0.0D, 2.2D, 0.0D), 0xFFF2B0, 14, 0.6F);
+				} else if (f > 0.5F) {
+					// a chain bolt from the struck monster to the next one
+					if (!quadBolt(target, pos, 0.14F, b, 6)) {
+						CommonFx.bolt(target, pos, GOLD, 4);
+					}
 				} else {
-					CommonFx.bolt(target, pos, GOLD, 8);
+					Vec3 sky = target.y > pos.y + 4.0D ? target : pos.add(0.0D, 20.0D, 0.0D);
+					if (!quadBolt(sky, pos, 0.32F, b, 8)) {
+						CommonFx.bolt(sky, pos, GOLD, 8);
+					}
 					CommonFx.burst(pos.add(0.0D, 0.5D, 0.0D), 0xFFF2B0, 18, 1.2F);
-					CommonFx.ring(pos.add(0.0D, 0.05D, 0.0D), GOLD, 1.2F, 20);
+					ring(pos, GOLD, 0.4F, 2.4F, 0.9F, 12);
+					DiscipleEntity near = nearestDiscipleWithin(level, pos, 24.0D);
+					if (near != null) {
+						AnimBridge.accent(near.getId());
+					}
 				}
 			}
-			case PowerIds.FX_ULT_PRISON -> TIMED.add(new Timed(fx.a(), pos, target, b, f, b, -1));
+			case PowerIds.FX_ULT_PRISON -> {
+				TIMED.add(new Timed(fx.a(), pos, target, b, f, b, who));
+				prisonFaces(pos, f, b);
+				DiscipleEntity near = nearestDiscipleWithin(level, pos, 24.0D);
+				if (near != null) {
+					AnimBridge.pose(near.getId(), Pose.SEAL, 12);
+				}
+			}
 			case PowerIds.FX_ULT_FIST -> {
+				emperorFist(level, pos, f);
 				CommonFx.burst(pos.add(0.0D, 1.0D, 0.0D), GOLD, 40, 1.6F);
 				TIMED.add(new Timed(fx.a(), pos, target, 0, f, 8, -1));
 				for (int i = 0; i < EffectQuality.scale(14); i++) {
@@ -107,12 +156,47 @@ public final class PowerFx {
 							random.nextGaussian() * 0.15D, 0.05D, random.nextGaussian() * 0.15D);
 				}
 			}
-			case PowerIds.FX_LOTUS_CHARGE -> TIMED.add(new Timed(fx.a(), pos, target, 0, f, Math.round(f), b));
+			case PowerIds.FX_LOTUS_CHARGE -> {
+				Timed timed = new Timed(fx.a(), pos, target, 0, f, Math.round(f), b);
+				TIMED.add(timed);
+				AnimBridge.pose(b, Pose.CHARGE_OVERHEAD, Math.round(f));
+				if (AnimBridge.modelKnown("fury_lotus") && !EffectQuality.minimal()) {
+					int ticks = Math.max(1, Math.round(f));
+					ModelHandle lotus = AnimBridge.model("fury_lotus", pos.add(0.0D, 2.4D, 0.0D), 0.3F, 0.0F, 0.0F, 0.0F, ticks + 4,
+							List.of(AnimBridge.step(Anim.SPIN, 0, ticks + 4, 6.0F, 0.0F, null)), b, new Vec3(0.0D, 2.4D, 0.0D), true, true, b,
+							dev.kultivator.technique.spec.dsl.FxLayer.Priority.CORE);
+					if (lotus != null) {
+						// 0.3 → 1.2 over the charge
+						AnimBridge.scaleTo(lotus, 1.2F, ticks);
+						timed.models.add(lotus);
+					}
+				}
+			}
+			case PowerIds.FX_LOTUS_RELEASE -> {
+				// the lotus leaves the hands and flies to the impact (b = flight ticks)
+				endLotus(pos);
+				DiscipleEntity near = nearestDiscipleWithin(level, pos, 4.0D);
+				if (near != null) {
+					AnimBridge.pose(near.getId(), Pose.TWIN_PALM, 10);
+				}
+				if (!EffectQuality.minimal()) {
+					QuadFx.add(new StreakQuad(pos, target, 0.8F, 0xFF7A2A, 0xFFF0B0, Math.max(1, b), 4.0F, 0.0F, random.nextInt(), Math.max(8, b + 6)));
+					if (AnimBridge.modelKnown("fury_lotus")) {
+						AnimBridge.model("fury_lotus", pos, 1.2F, 0.0F, Math.max(1, b) + 2, Anim.SLIDE, 0.0F, 0.0F, target, near == null ? -1 : near.getId());
+					}
+				}
+				CommonFx.beam(pos, target, 0xFF9A3A, 0.25F);
+			}
 			case PowerIds.FX_LOTUS_BLAST -> lotusBlast(pos, target, b, f, random);
 			case PowerIds.FX_ULT_LIFE -> {
 				CommonFx.spiralIn(pos.add(0.0D, 1.0D, 0.0D), Dao.LIFE.color(), f, 60, 0.0F);
 				CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), Dao.LIFE.color(), f, 72);
 				CommonFx.pillar(pos, 0x9CFFB0, 5.0F);
+				ring(pos, Dao.LIFE.color(), 0.5F, f, 0.8F, 24);
+				DiscipleEntity near = nearestDiscipleWithin(level, pos, 24.0D);
+				if (near != null) {
+					AnimBridge.pose(near.getId(), Pose.PRAY, 20);
+				}
 			}
 			case PowerIds.FX_ULT_CAST -> {
 				Dao dao = Dao.byOrdinal(b);
@@ -120,12 +204,34 @@ public final class PowerFx {
 				CommonFx.pillar(pos, color, 6.0F);
 				CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), color, 2.0F, 40);
 				CommonFx.burst(pos.add(0.0D, 1.2D, 0.0D), color, 24, 1.0F);
+				ring(pos, color, 0.4F, 3.2F, 0.9F, 16);
+				if (!EffectQuality.minimal()) {
+					QuadFx.add(new GlowQuad(pos.add(0.0D, 1.2D, 0.0D), 0.8F, 2.4F, color, 0.8F, 0.0F, 10));
+				}
+				if (who >= 0) {
+					AnimBridge.pose(who, castPose(dao), 20);
+				}
 			}
-			case PowerIds.FX_KUNPENG -> kunpeng(pos, target, b == 1, random);
+			case PowerIds.FX_KUNPENG -> {
+				kunpeng(pos, target, b == 1, random);
+				if (who >= 0) {
+					AnimBridge.pose(who, Pose.DASH_LEAN, 6);
+				}
+			}
+			case PowerIds.FX_KUNPENG_DASH -> kunpengDash(level, pos, target, Math.max(1, b), f > 0.5F);
 			case PowerIds.FX_DASH -> {
 				CommonFx.beam(pos.add(0.0D, 1.0D, 0.0D), target.add(0.0D, 1.0D, 0.0D), 0xE0B050, 0.25F);
 				CommonFx.add(ParticleTypes.POOF, pos.x, pos.y + 0.2D, pos.z, 0.0D, 0.05D, 0.0D);
+				if (!EffectQuality.minimal()) {
+					QuadFx.add(new StreakQuad(pos.add(0.0D, 1.0D, 0.0D), target.add(0.0D, 1.0D, 0.0D), 0.45F, 0xE0B050, 0xFFF2C0, 3.0F, 3.0F, 0.0F,
+							random.nextInt(), 10));
+				}
+				DiscipleEntity near = nearestDiscipleWithin(level, target, 4.0D);
+				if (near != null) {
+					AnimBridge.pose(near.getId(), Pose.DASH_LEAN, 6);
+				}
 			}
+			case PowerIds.FX_FAIRIES -> fairy(level, pos, target, b, Math.round(f));
 			case PowerIds.FX_POISON_CLOUD -> TIMED.add(new Timed(fx.a(), pos, target, b, f, b, -1));
 			case PowerIds.FX_DRAGON -> {
 				CommonFx.burst(pos.add(0.0D, 1.2D, 0.0D), 0xB05AFF, 40, 1.8F);
@@ -135,13 +241,26 @@ public final class PowerFx {
 							pos.z + random.nextGaussian() * 0.6D, 0.0D, 0.05D, 0.0D);
 				}
 			}
-			case PowerIds.FX_DRAGON_BREATH -> breath(pos, target, random);
+			case PowerIds.FX_DRAGON_BREATH -> {
+				breath(pos, target, random);
+				DiscipleEntity near = nearestDiscipleWithin(level, pos, 4.0D);
+				if (near != null) {
+					AnimBridge.pose(near.getId(), Pose.ROAR, 8);
+				}
+			}
 			case PowerIds.FX_GATE_OPEN -> {
+				if (who >= 0) {
+					AnimBridge.pose(who, Pose.GATE_FLEX, 10);
+				}
 				CommonFx.pillar(pos, CRIMSON, 4.0F + b);
 				CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), CRIMSON, 1.0F + 0.3F * b, 24 + 6 * b);
 				CommonFx.burst(pos.add(0.0D, 1.0D, 0.0D), 0x6A0A12, 20 + 4 * b, 1.2F);
 			}
 			case PowerIds.FX_GATE_BURST -> {
+				if (who >= 0) {
+					AnimBridge.pose(who, Pose.GATE_FLEX, 10);
+				}
+				ring(pos, CRIMSON, 0.5F, 3.5F, 0.9F, 14);
 				CommonFx.burst(pos.add(0.0D, 1.0D, 0.0D), CRIMSON, 50, 2.0F);
 				CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), CRIMSON, 3.0F, 60);
 				CommonFx.pillar(pos, 0xFF4A4A, 7.0F);
@@ -155,7 +274,21 @@ public final class PowerFx {
 			case PowerIds.FX_PETALS -> petals(pos, b, f, random);
 			case PowerIds.FX_FLAME_RITUAL -> {
 				DiscipleEntity near = nearestDisciple(level, pos);
-				TIMED.add(new Timed(fx.a(), pos, target, b, f, Math.round(f * 20.0F), near == null ? -1 : near.getId()));
+				int ticks = Math.round(f * 20.0F);
+				Timed timed = new Timed(fx.a(), pos, target, b, f, ticks, near == null ? -1 : near.getId());
+				TIMED.add(timed);
+				if (near != null) {
+					AnimBridge.pose(near.getId(), Pose.FLAME_CUP, ticks);
+					// the flame seed over the cupped palms, shrinking into the dantian at the end of the ritual
+					if (AnimBridge.modelKnown("heavenly_flame_orb") && !EffectQuality.minimal()) {
+						ModelHandle orb = AnimBridge.model("heavenly_flame_orb", near.position().add(0.0D, 1.1D, 0.0D), 0.6F, 0.0F, 0.0F, 0.0F, ticks + 4,
+								List.of(AnimBridge.step(Anim.PULSE, 0, ticks, 0.12F, 0.0F, null), AnimBridge.step(Anim.SHRINK, Math.max(0, ticks - 20), 20, 1.0F, 0.0F, null)),
+								near.getId(), new Vec3(0.0D, 1.1D, 0.45D), true, true, near.getId(), dev.kultivator.technique.spec.dsl.FxLayer.Priority.CORE);
+						if (orb != null) {
+							timed.models.add(orb);
+						}
+					}
+				}
 			}
 			case PowerIds.FX_FLAME_RESULT -> {
 				int color = flameColor(b);
@@ -177,11 +310,22 @@ public final class PowerFx {
 			}
 			case PowerIds.FX_NATAL_FOLD -> natalFold(pos, b, f > 0.5F, random);
 			case PowerIds.FX_PAYUNG -> {
+				if (who >= 0) {
+					AnimBridge.pose(who, Pose.HOLD_ITEM_UP, 40);
+				}
+				ring(pos, GOLD, f * 0.4F, f, 0.7F, 30);
 				ringAt(pos.add(0.0D, 2.6D, 0.0D), GOLD, f * 0.5F, 32);
 				CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), b == 1 ? 0xFFF2B0 : GOLD, f, 40);
 			}
 			case PowerIds.FX_LONCENG -> TIMED.add(new Timed(fx.a(), pos, target, b, f, 12, -1));
-			case PowerIds.FX_SOUL_FLIGHT -> TIMED.add(new Timed(fx.a(), pos, target, 0, 0.0F, 30, -1));
+			case PowerIds.FX_SOUL_FLIGHT -> {
+				// to the hall's stele (straight up 24 blocks when it is in another dimension)
+				Vec3 to = target.distanceToSqr(pos) < 1.0E-4D ? pos.add(0.0D, 24.0D, 0.0D) : target;
+				TIMED.add(new Timed(fx.a(), pos, to, 0, 0.0F, 30, -1));
+				if (!EffectQuality.minimal()) {
+					QuadFx.add(new StreakQuad(pos.add(0.0D, 1.0D, 0.0D), to, 0.35F, 0x9FF3E6, 0xFFFFFF, 30.0F, 10.0F, 0.0F, random.nextInt(), 40));
+				}
+			}
 			case PowerIds.FX_SOUL_RETURN -> {
 				CommonFx.pillar(pos.add(0.0D, -1.0D, 0.0D), 0x9FF3E6, 6.0F);
 				CommonFx.burst(pos, 0x9FF3E6, 40, 1.4F);
@@ -242,6 +386,9 @@ public final class PowerFx {
 		for (Iterator<Timed> it = TIMED.iterator(); it.hasNext(); ) {
 			Timed timed = it.next();
 			if (timed.age++ >= timed.life) {
+				for (ModelHandle handle : timed.models) {
+					AnimBridge.end(handle, 6);
+				}
 				it.remove();
 				continue;
 			}
@@ -270,6 +417,21 @@ public final class PowerFx {
 		int flames = power & PowerIds.BITS_FLAMES;
 		if (flames != 0 && t % 2L == 0L) {
 			flameOrbs(feet, height, flames, random, t);
+		}
+		int flags = disciple.syncedFlags();
+		if ((flags & PowerIds.BIT_FAIRIES) != 0 && t % 4L == 0L) {
+			// the linked Seven Fairies: a slow ring of seven coloured motes at the feet
+			for (int i = 0; i < 7; i++) {
+				double angle = t * 0.03D + i * Math.PI * 2.0D / 7.0D;
+				CommonFx.add(dev.kultivator.client.fx.qi.Qi.mote(SEVEN[i], 0.18F, 8), feet.add(Math.cos(angle) * 0.9D, 0.15D, Math.sin(angle) * 0.9D),
+						Vec3.ZERO, false);
+			}
+		}
+		if ((flags & PowerIds.BIT_KUNPENG) != 0 && EffectQuality.chance(random, 0.3F)) {
+			double yaw = Math.toRadians(disciple.yBodyRot);
+			Vec3 back = new Vec3(Math.sin(yaw), 0.0D, -Math.cos(yaw));
+			CommonFx.add(dev.kultivator.client.fx.qi.Qi.feather(0xBFE8FF, 0.35F, 40), feet.add(back.scale(0.5D)).add(random.nextGaussian() * 0.6D,
+					height * 0.8D + random.nextDouble() * 0.6D, random.nextGaussian() * 0.6D), new Vec3(0.0D, -0.02D, 0.0D), false);
 		}
 		if ((power & PowerIds.BIT_POISON) != 0 && EffectQuality.chance(random, 0.25F)) {
 			double angle = random.nextDouble() * Math.PI * 2.0D;
@@ -343,10 +505,18 @@ public final class PowerFx {
 	private static void drawTimed(ClientLevel level, Timed timed, RandomSource random) {
 		float progress = timed.age / (float) timed.life;
 		switch (timed.sub) {
-			case PowerIds.FX_ULT_SWORD -> swordDome(timed, random);
+			case PowerIds.FX_ULT_SWORD -> {
+				if (timed.models.isEmpty()) {
+					swordDome(timed, random);
+				} else {
+					driveSwords(timed);
+				}
+			}
 			case PowerIds.FX_ULT_PRISON -> {
-				if (timed.age % 4 == 0) {
-					cube(timed.pos.add(0.0D, timed.f * 0.5D, 0.0D), timed.f, Dao.SPACE.color(), random);
+				// the cube closes in over 4 ticks, then holds with three times the edge density
+				float close = Math.max(1.0F, 1.6F - 0.15F * timed.age);
+				if (timed.age < 4 || timed.age % 3 == 0) {
+					cube(timed.pos.add(0.0D, timed.f * 0.5D, 0.0D), timed.f * close, Dao.SPACE.color(), random);
 				}
 			}
 			case PowerIds.FX_ULT_FIST -> {
@@ -437,7 +607,7 @@ public final class PowerFx {
 
 	/** The edges of a cube of restriction glyphs. */
 	private static void cube(Vec3 centre, double half, int color, RandomSource random) {
-		int perEdge = Math.max(2, EffectQuality.scale(5));
+		int perEdge = Math.max(3, EffectQuality.scale(15));
 		for (int edge = 0; edge < 12; edge++) {
 			for (int i = 0; i < perEdge; i++) {
 				double t = (i + random.nextDouble() * 0.5D) / perEdge * 2.0D - 1.0D;
@@ -550,8 +720,9 @@ public final class PowerFx {
 		if (side.lengthSqr() > 1.0E-4D) {
 			side = side.normalize();
 			// Two great wings of wind at the start.
-			for (int i = 0; i < EffectQuality.scale(16); i++) {
-				double t = i / 16.0D;
+			int n = EffectQuality.scale(16);
+			for (int i = 0; i < n; i++) {
+				double t = i / (double) Math.max(1, n - 1);
 				double lift = Math.sin(t * Math.PI) * 0.8D;
 				for (int sign = -1; sign <= 1; sign += 2) {
 					Vec3 point = from.add(side.scale(sign * (0.4D + t * 2.4D))).add(0.0D, 1.2D + lift, 0.0D);
@@ -648,6 +819,239 @@ public final class PowerFx {
 		if (variant < 1.0F) {
 			CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), color, 1.8F, 36);
 		}
+	}
+
+	// ================================================================== polish pass helpers (DESIGN 27.6)
+
+	/** Light swords visible at once by quality (the rest of the formation stays particles). */
+	private static final int[] FORMATION_SWORDS = {0, 12, 36};
+
+	/** The sword formation's light-sword models (12 / 24 / 36 by quality and realm), driven by {@link #driveSwords}. */
+	private static void swordFormation(Timed timed) {
+		int cap = FORMATION_SWORDS[EffectQuality.level().ordinal()];
+		if (cap == 0 || !AnimBridge.modelKnown("light_sword")) {
+			return;
+		}
+		int swords = Math.min(cap, Math.max(1, timed.b));
+		for (int i = 0; i < swords; i++) {
+			Vec3 at = swordPoint(timed, i, swords, 0);
+			ModelHandle sword = AnimBridge.model("light_sword", at, 1.6F, 0.0F, 90.0F, 0.0F, Math.max(20, timed.life + 4),
+					List.of(AnimBridge.step(Anim.GROW, i % 6, 6, 0.1F, 0.0F, null)), -1, Vec3.ZERO, false, true, timed.entityId,
+					dev.kultivator.technique.spec.dsl.FxLayer.Priority.DETAIL);
+			if (sword == null) {
+				break;
+			}
+			timed.models.add(sword);
+		}
+	}
+
+	/** Where formation sword {@code i} of {@code n} flies at {@code age}: a turning golden-angle shell over the dome. */
+	private static Vec3 swordPoint(Timed timed, int i, int n, int age) {
+		double spin = age * 0.08D;
+		double angle = spin + i * Math.PI * 2.0D / n * 2.39996D;
+		double lift = 0.25D + (i % 5) / 5.0D * 0.7D;
+		double r = timed.f * Math.cos(lift * Math.PI * 0.5D);
+		double y = timed.f * Math.sin(lift * Math.PI * 0.5D);
+		return timed.pos.add(Math.cos(angle) * r, y + 0.3D, Math.sin(angle) * r);
+	}
+
+	/** Every 2 ticks: each sword glides to its next point, pointing along its orbit (2-tick interpolation). */
+	private static void driveSwords(Timed timed) {
+		if (timed.age % 2 != 0) {
+			return;
+		}
+		int n = timed.models.size();
+		for (int i = 0; i < n; i++) {
+			ModelHandle sword = timed.models.get(i);
+			Vec3 now = swordPoint(timed, i, n, timed.age);
+			Vec3 next = swordPoint(timed, i, n, timed.age + 2);
+			Vec3 d = next.subtract(now);
+			AnimBridge.moveTo(sword, next, 2);
+			AnimBridge.rotateTo(sword, (float) Math.toDegrees(Math.atan2(-d.x, d.z)), 90.0F, 0.0F, 2);
+		}
+		if (timed.age % 10 == 0) {
+			CommonFx.ring(timed.pos.add(0.0D, 0.1D, 0.0D), 0xD8E6FF, timed.f, 24);
+		}
+	}
+
+	/** One damage pulse of the formation: a sword leaves the dome and dives on the struck foe. */
+	private static void swordDive(Vec3 victim, Vec3 centre, int victimId) {
+		Vec3 from = centre.add((victim.x - centre.x) * 0.3D, 8.0D, (victim.z - centre.z) * 0.3D);
+		if (!EffectQuality.minimal()) {
+			QuadFx.add(new StreakQuad(from, victim, 0.25F, 0xD8E6FF, 0xFFFFFF, 4.0F, 3.0F, 0.0F, victimId, 9));
+			if (AnimBridge.modelKnown("light_sword")) {
+				float yaw = (float) Math.toDegrees(Math.atan2(-(victim.x - from.x), victim.z - from.z));
+				AnimBridge.model("light_sword", from, 1.6F, yaw, 6, Anim.SLIDE, 0.0F, 0.0F, victim, -1);
+			}
+		} else {
+			CommonFx.beam(from, victim, 0xD8E6FF, 0.06F);
+		}
+		CommonFx.burst(victim, 0xFFFFFF, 10, 0.5F);
+		CommonFx.add(ParticleTypes.SWEEP_ATTACK, victim, Vec3.ZERO, false);
+	}
+
+	/** A quad bolt from {@code from} to {@code to}, following entity {@code toId} when it lives; false when refused. */
+	private static boolean quadBolt(Vec3 from, Vec3 to, float width, int toId, int life) {
+		if (EffectQuality.minimal()) {
+			return false;
+		}
+		BoltQuad bolt = new BoltQuad(from, to, width, GOLD, 0xFFF8D8, toId * 31 + (int) (from.y * 7.0D), 2, life);
+		ClientLevel level = CommonFx.level();
+		Entity target = level == null ? null : level.getEntity(toId);
+		if (target != null) {
+			bolt.follow(-1, 0.0F, toId, (float) (target.getBbHeight() * 0.5D));
+		}
+		return QuadFx.add(bolt);
+	}
+
+	/** The prison's six faces: restriction-seal plates (models) closing in on the cube. */
+	private static void prisonFaces(Vec3 pos, float half, int ticks) {
+		if (EffectQuality.minimal() || !AnimBridge.modelKnown("restriction_seal")) {
+			return;
+		}
+		Vec3 centre = pos.add(0.0D, half * 0.5D, 0.0D);
+		float[][] faces = {{0, 0, 1, 0, 0}, {0, 0, -1, 180, 0}, {1, 0, 0, -90, 0}, {-1, 0, 0, 90, 0}, {0, 1, 0, 0, -90}, {0, -1, 0, 0, 90}};
+		for (float[] face : faces) {
+			Vec3 at = centre.add(face[0] * half, face[1] * half, face[2] * half);
+			AnimBridge.model("restriction_seal", at, Math.max(1.0F, half * 2.0F), face[3], face[4], 0.0F, Math.max(10, ticks),
+					List.of(AnimBridge.step(Anim.GROW, 0, 4, 1.6F, 0.0F, null)), -1, Vec3.ZERO, false, true, -1,
+					dev.kultivator.technique.spec.dsl.FxLayer.Priority.DETAIL);
+		}
+	}
+
+	/** Ultimates.fist: a golden fist thrusts 3 blocks from the disciple's hand and shatters on the target, a shock ring. */
+	private static void emperorFist(ClientLevel level, Vec3 impact, float wave) {
+		DiscipleEntity disciple = nearestDiscipleWithin(level, impact, 6.0D);
+		if (disciple != null) {
+			AnimBridge.pose(disciple.getId(), Pose.PUNCH, 6);
+			if (!EffectQuality.minimal() && AnimBridge.modelKnown("emperor_fist")) {
+				Vec3 hand = disciple.getEyePosition().add(disciple.getLookAngle().scale(0.6D)).add(0.0D, -0.35D, 0.0D);
+				float yaw = (float) Math.toDegrees(Math.atan2(-(impact.x - hand.x), impact.z - hand.z));
+				AnimBridge.model("emperor_fist", hand, 1.4F, yaw, 0.0F, 0.0F, 10,
+						List.of(AnimBridge.step(Anim.THRUST, 0, 4, 3.0F, 0.0F, null), AnimBridge.step(Anim.SHATTER, 6, 4, 0.0F, 0.0F, null)), -1, Vec3.ZERO, false,
+						true, disciple.getId(), dev.kultivator.technique.spec.dsl.FxLayer.Priority.CORE);
+			}
+		}
+		ring(impact, GOLD, 0.5F, Math.max(1.5F, wave), 0.9F, 12);
+		if (!EffectQuality.minimal()) {
+			QuadFx.add(new GlowQuad(impact.add(0.0D, 1.0D, 0.0D), 0.6F, 2.0F, 0xFFE7A0, 0.85F, 0.0F, 6));
+		}
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.player != null && minecraft.player.position().distanceToSqr(impact) <= 12.0D * 12.0D) {
+			CameraShake.add(0.3F, 8, impact, 12.0F);
+		}
+	}
+
+	/** The charge ended (release): the lotus models of the charge near {@code hands} go. */
+	private static void endLotus(Vec3 hands) {
+		for (Timed timed : TIMED) {
+			if (timed.sub == PowerIds.FX_LOTUS_CHARGE && timed.pos.distanceToSqr(hands) < 9.0D * 9.0D) {
+				for (ModelHandle handle : timed.models) {
+					AnimBridge.end(handle, 0);
+				}
+				timed.models.clear();
+				timed.age = timed.life;
+			}
+		}
+	}
+
+	/** The signature cast pose of a Dao (plan 2.4 table). */
+	private static Pose castPose(@Nullable Dao dao) {
+		if (dao == null) {
+			return Pose.SUMMON_RAISE;
+		}
+		return switch (dao) {
+			case SWORD -> Pose.SWORD_SKY;
+			case LIGHTNING -> Pose.SKY_RAISE;
+			case SPACE -> Pose.SEAL;
+			case BODY -> Pose.PUNCH;
+			case FIRE -> Pose.CHARGE_OVERHEAD;
+			case LIFE -> Pose.PRAY;
+			case ICE -> Pose.TWIN_PALM;
+			case SHADOW -> Pose.FAN_SWING;
+		};
+	}
+
+	/** A Kunpeng Wings dash drawn over its ticks: a wind streak, three fading afterimages, feathers. */
+	private static void kunpengDash(ClientLevel level, Vec3 from, Vec3 to, int ticks, boolean full) {
+		int color = full ? 0xBFE8FF : 0x8FD0FF;
+		DiscipleEntity disciple = nearestDiscipleWithin(level, to, 6.0D);
+		if (disciple == null) {
+			disciple = nearestDiscipleWithin(level, from, 6.0D);
+		}
+		if (disciple != null) {
+			AnimBridge.pose(disciple.getId(), Pose.DASH_LEAN, Math.max(6, ticks + 2));
+		}
+		if (!EffectQuality.minimal()) {
+			QuadFx.add(new StreakQuad(from.add(0.0D, 1.2D, 0.0D), to.add(0.0D, 1.2D, 0.0D), full ? 0.9F : 0.6F, color, 0xFFFFFF, ticks, 4.0F, 0.0F,
+					(int) (from.x * 13.0D), ticks + 10));
+			if (disciple != null) {
+				java.util.List<Vec3> points = new ArrayList<>(3);
+				for (int i = 0; i < 3; i++) {
+					points.add(from.lerp(to, (i + 0.5D) / 3.0D));
+				}
+				dev.kultivator.client.fx.spec.AvatarFx.fixed(disciple.getId(), points, (float) Math.toDegrees(Math.atan2(-(to.x - from.x), to.z - from.z)),
+						color, 120, ticks + 10);
+			}
+		}
+		RandomSource random = CommonFx.random();
+		for (int i = 0; i < EffectQuality.scale(12); i++) {
+			Vec3 at = from.lerp(to, random.nextDouble()).add(random.nextGaussian() * 0.6D, 1.0D + random.nextDouble(), random.nextGaussian() * 0.6D);
+			CommonFx.add(dev.kultivator.client.fx.qi.Qi.feather(color, 0.4F, 40), at, new Vec3(0.0D, -0.02D, 0.0D), false);
+		}
+	}
+
+	/** The Seven Fairies' link: packets of the seven fairies within 2 s are joined by threads in their seven colours. */
+	private static final long[] FAIRY_SEEN = new long[7];
+	private static final int[] FAIRY_IDS = new int[7];
+
+	private static void fairy(ClientLevel level, Vec3 pos, Vec3 centre, int id, int index) {
+		int k = Math.floorMod(index, 7);
+		long now = level.getGameTime();
+		FAIRY_IDS[k] = id;
+		FAIRY_SEEN[k] = now;
+		int color = SEVEN[k];
+		CommonFx.pillar(pos, color, 3.0F);
+		ringAt(pos.add(0.0D, 0.1D, 0.0D), color, 0.9F, 14);
+		int prev = Math.floorMod(k - 1, 7);
+		if (now - FAIRY_SEEN[prev] <= 40L && !EffectQuality.minimal()) {
+			Entity a = level.getEntity(FAIRY_IDS[prev]);
+			Entity b = level.getEntity(id);
+			if (a != null && b != null) {
+				QuadFx.add(new StreakQuad(a.position().add(0.0D, 1.2D, 0.0D), b.position().add(0.0D, 1.2D, 0.0D), 0.1F, SEVEN[prev], 0xFFFFFF, 6.0F, 0.0F, 0.0F,
+						id, 40));
+			}
+		}
+		if (k == 6 && now - FAIRY_SEEN[0] <= 40L && !EffectQuality.minimal()) {
+			Entity a = level.getEntity(id);
+			Entity b = level.getEntity(FAIRY_IDS[0]);
+			if (a != null && b != null) {
+				QuadFx.add(new StreakQuad(a.position().add(0.0D, 1.2D, 0.0D), b.position().add(0.0D, 1.2D, 0.0D), 0.1F, color, 0xFFFFFF, 6.0F, 0.0F, 0.0F,
+						id + 7, 40));
+			}
+			QuadFx.add(new RingQuad(new Vec3(centre.x, centre.y + 0.05D, centre.z), 1.0F, 6.0F, 0xFFF2C0, 0.8F, 30));
+		}
+	}
+
+	/** A flat ground ring of light (quad) from {@code r0} to {@code r1}; particles carry it at Minimal. */
+	private static void ring(Vec3 pos, int color, float r0, float r1, float alpha, int life) {
+		if (EffectQuality.minimal()) {
+			return;
+		}
+		QuadFx.add(new RingQuad(new Vec3(pos.x, pos.y + 0.05D, pos.z), r0, r1, color, alpha, life));
+	}
+
+	private static @Nullable DiscipleEntity nearestDiscipleWithin(ClientLevel level, Vec3 pos, double range) {
+		DiscipleEntity best = null;
+		double bestSq = range * range;
+		for (DiscipleEntity disciple : level.getEntitiesOfClass(DiscipleEntity.class, new AABB(pos, pos).inflate(range))) {
+			double distanceSq = disciple.position().distanceToSqr(pos);
+			if (distanceSq < bestSq) {
+				bestSq = distanceSq;
+				best = disciple;
+			}
+		}
+		return best;
 	}
 
 	// ================================================================== helpers

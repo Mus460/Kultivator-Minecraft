@@ -274,12 +274,15 @@ public final class EffectQuality {
 		return others.factor();
 	}
 
-	/** Phantom displays one cast may create at the level in effect: 2 (Minimal, grade ≥ Langit only) / 8 / 24. */
+	/**
+	 * Phantom displays one layer of a cast may create at the level in effect (polish S13: per layer, not per event):
+	 * 2 (Minimal, grade ≥ Langit only) / 12 / 32.
+	 */
 	public static int displayAllowance(int gradeTier) {
 		return switch (level()) {
 			case MINIMAL -> gradeTier >= 3 ? 2 : 0;
-			case NORMAL -> 8;
-			case MAXIMAL -> 24;
+			case NORMAL -> 12;
+			case MAXIMAL -> 32;
 		};
 	}
 

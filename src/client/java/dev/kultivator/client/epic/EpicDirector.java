@@ -139,28 +139,64 @@ public final class EpicDirector {
 		if (!ultimate || (payload.flags() & Payloads.TechFx.FLAG_ECHO) != 0) {
 			return;
 		}
+		String cast = payload.caster() + ":" + spec.id();
+		if (phase == Phase.ABORT) {
+			// polish S8: a cancelled or replaced ultimate ends its moment at once (sky, shot, card)
+			Scene scene = find(EpicIds.TECH_ULTIMATE, payload.caster());
+			TECH_SEEN.remove(cast + ":cast");
+			TECH_SEEN.remove(cast + ":climax");
+			if (scene != null) {
+				SceneCatalog.ultimate(scene, spec, EpicIds.TECH_END, target, false);
+				if (own) {
+					CinematicDirector.skip();
+				}
+			}
+			dev.kultivator.client.fx.spec.AnimBridge.stopPose(payload.caster());
+			return;
+		}
+		// polish S12: CAST of an uncharged ultimate (or the release of a charged one) opens the moment; only the event the
+		// server marks FLAG_CLIMAX is the climax, once per cast; PULSE and MASS_HIT never are.
+		boolean charged = spec.charge() != null;
 		int beat;
-		if (phase == Phase.CAST || phase == Phase.CHARGE) {
+		if (phase == Phase.CHARGE) {
+			return;
+		} else if (phase == Phase.CAST && !charged || charged && phase != Phase.CAST && !recent(cast + ":cast", 200L)) {
 			beat = EpicIds.TECH_CAST;
-		} else if (phase == Phase.TRAVEL || phase == Phase.IMPACT || phase == Phase.MASS_HIT) {
+		} else if ((payload.flags() & Payloads.TechFx.FLAG_CLIMAX) != 0 && phase != Phase.PULSE && phase != Phase.MASS_HIT) {
 			beat = EpicIds.TECH_CLIMAX;
 		} else if (phase == Phase.END) {
 			beat = EpicIds.TECH_END;
 		} else {
 			return;
 		}
-		String key = payload.caster() + ":" + spec.id() + ":" + beat;
+		String key = beat == EpicIds.TECH_CAST ? cast + ":cast" : beat == EpicIds.TECH_CLIMAX ? cast + ":climax" : cast + ":end";
 		Long seen = TECH_SEEN.get(key);
-		if (seen != null && ticks - seen < (beat == EpicIds.TECH_CLIMAX ? 40L : 20L)) {
+		long window = beat == EpicIds.TECH_CLIMAX ? Math.max(40L, payload.duration()) : 20L;
+		if (seen != null && ticks - seen < window) {
 			return;
 		}
 		TECH_SEEN.put(key, ticks);
+		if (beat == EpicIds.TECH_END) {
+			TECH_SEEN.remove(cast + ":cast");
+			TECH_SEEN.remove(cast + ":climax");
+		}
 		Scene scene = sceneFor(EpicIds.TECH_ULTIMATE, payload.caster(), own ? minecraft.player.getId() : -1, own, at, payload.seed(), true);
 		scene.flags = localFlags(own);
 		scene.idle = 0;
 		scene.pos = at;
 		EpicBudget.sceneStarted();
-		SceneCatalog.ultimate(scene, spec, beat, target, false);
+		SceneCatalogPower.ultimate(scene, spec, beat, target, false, payload.duration());
+		if (beat == EpicIds.TECH_CAST && (payload.flags() & Payloads.TechFx.FLAG_CLIMAX) != 0 && !recent(cast + ":climax", 40L)) {
+			// the opening event is also the climax (a spec whose only layers are CAST): the climax beat follows, ≥ 8 ticks on
+			TECH_SEEN.put(cast + ":climax", ticks);
+			SceneCatalogPower.ultimate(scene, spec, EpicIds.TECH_CLIMAX, target, false, payload.duration());
+		}
+	}
+
+	/** True when {@code key} was seen within the last {@code window} ticks. */
+	private static boolean recent(String key, long window) {
+		Long seen = TECH_SEEN.get(key);
+		return seen != null && ticks - seen < window;
 	}
 
 	/** True while any 7b scene owns the camera, the bars or a FULL card. */

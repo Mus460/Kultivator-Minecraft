@@ -21,6 +21,7 @@ import dev.kultivator.technique.spec.dsl.Payload.Eff;
 import dev.kultivator.technique.spec.dsl.Payload.SummonMode;
 import dev.kultivator.technique.spec.dsl.Payload.Versus;
 import dev.kultivator.technique.spec.dsl.Phase;
+import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
@@ -55,6 +56,7 @@ public final class IceArts {
 		// 400 · Capit Permaisuri Es · GC · Misterius-R · SERANG · DAO, COMP 10 · Mrd Y
 		sink.add(done(art("ice_empress_pincer", 400, Dao.ICE)
 				.grade(TechniqueGrade.XUAN, 0).type(TechniqueType.SERANG).realm(Realm.GOLDEN_CORE)
+				.pose(Pose.TWIN_PALM).pose(Phase.IMPACT, Pose.TWIN_PALM)
 				.route(Route.dao()).comprehension(10)
 				.qi(20).cooldown(8.0D)
 				// STRIKE(r4, 90°) > DMG 1 + slowness III 60t; GRANT_HOOK melee (3 charges, 160t) > DMG 1 + slowness III, the 3rd also
@@ -68,26 +70,30 @@ public final class IceArts {
 				.fx(Phase.CAST, arc(0x7FFFD4).count(20), trail(0x7FFFD4).onCaster().count(12).ticks(40),
 						trail(0xFFFFFF).particle(ParticleTypes.SNOWFLAKE).onCaster().count(6).detail())
 				.fx(Phase.HIT, shards(0x7FFFD4).count(8))
+				.fx(Phase.IMPACT, arc(0x7FFFD4).size(1.2F).count(14).ticks(6), shards(0xBFFFF0).count(6).ticks(8).detail())
 				.sound(Phase.CAST, SoundEvents.GLASS_BREAK, 0.8F, 1.5F)
 				.perfection(Bonus.payload(freeze(20)))));
 
 		// 401 · Pembekuan Es Adas Bintang · GC · Misterius-M · AREA · DAO, COMP 20 · Mrd Y
 		sink.add(done(art("star_anise_ice_coagulation", 401, Dao.ICE)
 				.grade(TechniqueGrade.XUAN, 1).type(TechniqueType.AREA).realm(Realm.GOLDEN_CORE)
+				.pose(Pose.PALM_THRUST)
 				.route(Route.dao()).comprehension(20)
 				.qi(30).cooldown(6.0D)
 				.step(at(0).shape(volley().sim().count(6.0D, 18.0D).spread(Shape.Volley.Spread.FAN, 40.0D).range(20.0D, 32.0D).pierce(1))
 						.hit(damage(0.8D), eff(Eff.SLOWNESS, 2, 60)))
 				// An eight-pointed snowflake glyph, then thin ice spears.
-				.fx(Phase.CAST, FxLayer.of(FxLayer.Template.GLYPH, 0xBFEFFF).text("❄").scale(2.0F).minTier(3), shards(0xBFEFFF).count(16))
-				.fx(Phase.TRAVEL, giantBlock(Blocks.PACKED_ICE.defaultBlockState()).blockSize(0.25F, 0.25F, 2.0F).n(6).minTier(3),
+				.fx(Phase.CAST, FxLayer.of(FxLayer.Template.GLYPH, 0xBFEFFF).text("❄").scale(2.0F).minTier(1), shards(0xBFEFFF).count(16))
+				.fx(Phase.TRAVEL, model("ice_spear").scale(1.5F).slide(10.0F).ticks(12).facing(FxLayer.Facing.BLADE),
 						trail(0xCFF4FF).particle(ParticleTypes.SNOWFLAKE).count(8))
+				.fx(Phase.LAND, shards(0xCFF4FF).count(6).ticks(8))
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.0F)
 				.perfection(Bonus.extraCount(4))));
 
 		// 402 · Seni Awan Beku · NS · Misterius-M · AREA · BOOK frost_walker, COMP 30 · Mrd Y
 		sink.add(done(art("frozen_cloud_art", 402, Dao.ICE)
 				.grade(TechniqueGrade.XUAN, 1).type(TechniqueType.AREA).realm(Realm.NASCENT_SOUL)
+				.pose(Pose.TWIN_PALM)
 				.route(Route.book("minecraft:frost_walker")).comprehension(30)
 				.qi(60).cooldown(12.0D)
 				.step(at(0).shape(cone().length(12.0D, 24.0D).halfAngle(30.0D)).hit(damage(1.5D), eff(Eff.SLOWNESS, 4, 80), freeze(40)))
@@ -103,6 +109,7 @@ public final class IceArts {
 		// 403 · Sungai Tongtian Membeku · NS · Misterius-T · KENDALI · FEAT kills_with(any, drowned/guardian, snowy biome, 30), COMP 35 · Mrd Y
 		sink.add(done(art("tongtian_river_freeze", 403, Dao.ICE)
 				.grade(TechniqueGrade.XUAN, 2).type(TechniqueType.KENDALI).realm(Realm.NASCENT_SOUL)
+				.pose(Pose.KNEEL_STRIKE).pose(Phase.EXTRA0, Pose.SEAL)
 				.route(Route.feat(Feat.killsWith(null, SNOWY, List.of("minecraft:drowned", "minecraft:guardian"), 30))).comprehension(35)
 				.qi(80).cooldown(25.0D)
 				.step(at(0).shape(wave().r1(8.0D, 22.0D).speed(1.0D)).hit(freeze(80)))
@@ -110,7 +117,7 @@ public final class IceArts {
 				.step(at(80).shape(recall()).hit(damage(2.5D).vs(Versus.AQUATIC, 1.5D).shatter(), eff(Eff.SLOWNESS, 3, 60)).phase(0))
 				// Flat packed-ice tiles and spreading snowflakes (displays and particles, never real blocks), crack lines, shards.
 				.fx(Phase.CAST, mist(0xCFF4FF).particle(ParticleTypes.SNOWFLAKE).count(20))
-				.fx(Phase.TRAVEL, giantBlock(Blocks.PACKED_ICE.defaultBlockState()).blockSize(3.0F, 0.1F, 3.0F).n(8).minTier(3),
+				.fx(Phase.TRAVEL, giantBlock(Blocks.PACKED_ICE.defaultBlockState()).blockSize(3.0F, 0.1F, 3.0F).n(8).minTier(1),
 						shockRing(0xCFF4FF).particle(ParticleTypes.SNOWFLAKE).count(40), cracksAlways(0xBFE8FF))
 				.fx(Phase.EXTRA0, shards(0xDFF6FF).count(40))
 				.sound(Phase.EXTRA0, SoundEvents.GLASS_BREAK, 1.0F, 0.8F)
@@ -121,15 +128,17 @@ public final class IceArts {
 		// 404 · Api Es Qianlan · DT · Bumi-R · SERANG · BOOK frost_walker, COMP 45; PAV · Mrd Y
 		sink.add(done(art("qianlan_ice_flame", 404, Dao.ICE)
 				.grade(TechniqueGrade.DI, 0).type(TechniqueType.SERANG).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.PALM_THRUST)
 				.route(Route.book("minecraft:frost_walker"), Route.pav()).comprehension(45).flag(PAVILION)
 				.qi(110).cooldown(20.0D)
 				.step(at(0).shape(beam().length(24.0D, 48.0D).halfWidth(1.0D)).hit(damage(2.5D), freeze(60), dot(0.4D, 6, DotKind.COLD))
 						.onKill(at(0).shape(nova().radius(3.0D).at(Anchor.HIT)).hit(damage(1.0D))))
 				// A deep-blue cold flame.
-				.fx(Phase.CAST, beamCore(0x2050FF).particle(ParticleTypes.SOUL_FIRE_FLAME).count(40),
-						beamCore(0xCFF4FF).particle(ParticleTypes.SNOWFLAKE).count(16).detail())
+				.fx(Phase.CAST, impact(0x2050FF).particle(ParticleTypes.SOUL_FIRE_FLAME).onCaster().above(1.2F).count(10).ticks(6))
+				.fx(Phase.TRAVEL, beamCore(0x2050FF).particle(ParticleTypes.SOUL_FIRE_FLAME).count(40),
+						beamCore(0xCFF4FF).particle(ParticleTypes.SNOWFLAKE).count(16).detail(), mist(0xBFE8FF).onTarget().count(10).ticks(16).extra())
 				.fx(Phase.HIT, shards(0x80B0FF).count(10))
-				.sound(Phase.CAST, SoundEvents.SOUL_ESCAPE, 1.2F, 0.8F)
+				.sound(Phase.TRAVEL, SoundEvents.SOUL_ESCAPE, 1.2F, 0.8F)
 				.sound(Phase.CAST, SoundEvents.GLASS_BREAK, 0.8F, 1.2F)
 				.kehancuran(DShape.tunnel(1, 16))
 				.perfection(Bonus.area(0.25D))));
@@ -137,6 +146,7 @@ public final class IceArts {
 		// 405 · Kebanggaan Dua Kaisar Es dan Salju · DT · Bumi-T · PANGGIL · FEAT kills_with(any, stray, frozen biome, 50) · Mrd Y(½)
 		sink.add(done(art("ice_snow_emperors_pride", 405, Dao.ICE)
 				.grade(TechniqueGrade.DI, 2).type(TechniqueType.PANGGIL).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.SUMMON_RAISE)
 				.route(Route.feat(Feat.killsWith(null, FROZEN, List.of("minecraft:stray"), 50)))
 				.qi(140).cooldown(50.0D)
 				// SUMMON 2 (200t): the Ice Emperor attacks every 10t (range 12) > DMG .7 ...
@@ -152,6 +162,7 @@ public final class IceArts {
 						mist(0xE0F0FF).particle(ParticleTypes.SNOWFLAKE).count(50))
 				.fx(Phase.PULSE, mist(0xE0F0FF).count(12).extra())
 				.fx(Phase.EXTRA0, shards(0xE8F8FF).count(60))
+				.fx(Phase.PHANTOM, shards(0xBFEFFF).onTarget().count(10).ticks(6), arc(0xDFF6FF).count(8).ticks(6).detail())
 				.sound(Phase.CAST, SoundEvents.SNOW_GOLEM_AMBIENT, 1.2F, 0.6F)
 				.sound(Phase.CAST, SoundEvents.GLASS_BREAK, 1.0F, 0.8F)
 				.perfection(Bonus.durationTicks(60))));
@@ -159,16 +170,19 @@ public final class IceArts {
 		// 406 · Formasi Es Dingin · DU · Bumi-R · AREA · PAV; BOOK frost_walker, COMP 60 · Mrd Y
 		sink.add(done(art("cold_ice_formation", 406, Dao.ICE)
 				.grade(TechniqueGrade.DI, 0).type(TechniqueType.AREA).realm(Realm.DAO_UNION)
+				.pose(Pose.SEAL).pose(Phase.EXTRA0, Pose.SKY_RAISE)
 				.route(Route.pav(), Route.book("minecraft:frost_walker")).comprehension(60).flag(PAVILION)
 				.qi(220).cooldown(60.0D)
 				.step(at(0).shape(zone(Anchor.AIM).range(32.0D).radius(8.0D, 18.0D)).hit(damage(2.0D), launch(0.5D), bind(BindKind.ROOT, 30)))
 				// @20 the same zone falls from the sky (20 b): the ice mountain.
 				.step(at(20).shape(zone(Anchor.AIM).range(32.0D).radius(8.0D, 18.0D).fromSky(20.0D)).hit(damage(5.0D), freeze(80)).phase(0))
 				// A black banner, angled ice spikes, then a packed-ice mountain (12→20 b) falling.
-				.fx(Phase.CAST, giantItem(Items.BANNER.black()).scale(6.0F).minTier(3), shards(0x9FD8FF).count(20))
-				.fx(Phase.IMPACT, giantBlock(Blocks.BLUE_ICE.defaultBlockState()).blockSize(0.6F, 4.0F, 0.6F).n(8).minTier(3),
-						giantBlock(Blocks.PACKED_ICE.defaultBlockState()).blockSize(0.5F, 3.0F, 0.5F).n(8).minTier(3).extra())
-				.fx(Phase.EXTRA0, giantBlock(Blocks.PACKED_ICE.defaultBlockState()).blockSize(12.0F, 12.0F, 12.0F).fall(20.0F, 20.0F).minTier(3),
+				.fx(Phase.CAST, model("formation_banner_black").scale(3.0F).ticks(60).facing(FxLayer.Facing.UPRIGHT), shards(0x9FD8FF).count(20))
+				.fx(Phase.IMPACT, giantBlock(Blocks.BLUE_ICE.defaultBlockState()).blockSize(0.6F, 4.0F, 0.6F).n(8).minTier(1),
+						giantBlock(Blocks.PACKED_ICE.defaultBlockState()).blockSize(0.5F, 3.0F, 0.5F).n(8).minTier(1).extra())
+				// the ice mountain falls on the sky zone's pre-impact TRAVEL and stands on its EXTRA0
+				.fx(Phase.TRAVEL, model("ice_mountain").scale(12.0F).fall(20.0F, 10.0F).ticks(11).facing(FxLayer.Facing.UPRIGHT), mist(0xDFF6FF).inSky().count(16).ticks(10).detail())
+				.fx(Phase.EXTRA0, model("ice_mountain").scale(12.0F).ticks(40).facing(FxLayer.Facing.UPRIGHT),
 						shards(0xDFF6FF).count(60), shake(0.7F, 20))
 				.sound(Phase.CAST, SoundEvents.GLASS_BREAK, 1.0F, 0.7F)
 				.sound(Phase.EXTRA0, SoundEvents.ANVIL_LAND, 1.4F, 0.5F)
@@ -179,6 +193,7 @@ public final class IceArts {
 		// 407 · Bulan Patah Menyapu Bayangan · DU · Bumi-T · GERAK · PAV · Mrd Y
 		sink.add(done(art("broken_moon_shadow", 407, Dao.ICE)
 				.grade(TechniqueGrade.DI, 2).type(TechniqueType.GERAK).realm(Realm.DAO_UNION)
+				.pose(Pose.DASH_LEAN).pose(Phase.IMPACT, Pose.SWORD_SLASH)
 				.route(Route.pav()).flag(PAVILION)
 				.qi(100).cooldown(25.0D)
 				// "CHARGES 3 (window 100t)": three recasts within the window, written as three stages so the end of the 3rd can act.
@@ -196,12 +211,15 @@ public final class IceArts {
 				.fx(Phase.CAST, shards(0xE0ECFF).count(16))
 				.fx(Phase.TRAVEL, afterimage(0xC8DCFF), shards(0xE0ECFF).count(10).detail())
 				.fx(Phase.EXTRA0, mist(0xC8DCFF).count(20))
+				.fx(Phase.TRAVEL, crescentFly(0xC8DCFF).vertical().count(20).ticks(6))
+				.fx(Phase.IMPACT, crescentFly(0xE0ECFF).count(16).ticks(6), shards(0xE0ECFF).count(14).ticks(8))
 				.sound(Phase.CAST, SoundEvents.AMETHYST_CLUSTER_BREAK, 1.0F, 1.0F)
 				.perfection(Bonus.cooldown(0.2D))));
 
 		// 408 · Api Dingin Tulang Roh · IA T1 · Langit-R · AREA · ITEM heavenly_flame_seed:bone_chilling; INH(ICE) · Mrd Y
 		sink.add(done(art("bone_chilling_flame", 408, Dao.ICE)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.AREA).realm(Realm.IMMORTAL_ASCENSION, 1)
+				.pose(Pose.ARMS_SPREAD)
 				.route(Route.item("heavenly_flame_seed:bone_chilling"), Route.inh("ice"))
 				.qi(280).cooldown(70.0D)
 				.step(at(0).shape(wave().r1(20.0D, 36.0D).speed(1.5D)).hit(damage(3.0D), freeze(80)).self(costMod(Dao.ICE, 0.7D, 1.0D, 200)))
@@ -216,13 +234,14 @@ public final class IceArts {
 		// 409 · Dingin Tak Tertandingi · IA T3 · Langit-R · SERANG · BOOK frost_walker, COMP 80 · Mrd Y
 		sink.add(done(art("unparalleled_chill", 409, Dao.ICE)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.SERANG).realm(Realm.IMMORTAL_ASCENSION, 3)
+				.pose(Pose.SWORD_THRUST)
 				.route(Route.book("minecraft:frost_walker")).comprehension(80)
 				.qi(260).cooldown(40.0D)
 				.step(at(0).shape(volley().seek().count(1.0D).range(40.0D)).hit(damage(5.0D))
 						.onHit(at(0).shape(nova().radius(6.0D, 10.0D).at(Anchor.HIT)).hit(damage(3.0D).shatter(), freeze(80))))
 				// A crystal blade bursting into hundreds of shards.
 				.fx(Phase.CAST, shards(0xDFF6FF).count(12), mist(0xE8F8FF).count(10).detail())
-				.fx(Phase.TRAVEL, giantItem(Items.DIAMOND_SWORD).scale(2.0F), trail(0xDFF6FF).count(12))
+				.fx(Phase.TRAVEL, model("crystal_blade").scale(3.0F).slide(10.0F).ticks(12).facing(FxLayer.Facing.BLADE), trail(0xDFF6FF).count(12))
 				.fx(Phase.HIT, shards(0xE8F8FF).count(200), shake(0.4F, 10))
 				.sound(Phase.HIT, SoundEvents.GLASS_BREAK, 1.4F, 0.9F)
 				.perfection(Bonus.area(0.25D))));
@@ -230,6 +249,7 @@ public final class IceArts {
 		// 410 · Seni Ilahi Akhir Beku · IA T5 · Langit-M · WILAYAH · FEAT meditate_at(frozen peaks or ice spikes, 20 min), COMP 80 · Mrd N
 		sink.add(done(art("frozen_end_divine_art", 410, Dao.ICE)
 				.grade(TechniqueGrade.TIAN, 1).type(TechniqueType.WILAYAH).realm(Realm.IMMORTAL_ASCENSION, 5)
+				.pose(Pose.ARMS_SPREAD)
 				.route(Route.feat(Feat.meditateAt(Cond.any(Cond.biome("minecraft:frozen_peaks"), Cond.biome("minecraft:ice_spikes")), 20)))
 				.comprehension(80).flag(NO_TEACH)
 				.qi(380).cooldown(120.0D)
@@ -239,7 +259,7 @@ public final class IceArts {
 				.step(at(240).shape(all().ofArea().max(32.0D)).hit(exec(0.25D)).when(Cond.TARGET_BOSS, 1.0D, damage(10.0D)).phase(0))
 				// Snowflakes hang still inside the dome (a lasting snowflake mist) and an aurora ring glows along its edge.
 				.fx(Phase.CAST, dome(0xF0F8FF).count(60), mist(0xFFFFFF).particle(ParticleTypes.SNOWFLAKE).count(60).ticks(240),
-						runeCircle(0x80FFD0).color2(0xB080FF).radius(28.0F).count(60).ticks(240).detail())
+						runeCircle(0x80FFD0).color2(0xB080FF).count(60).ticks(240).detail())
 				.fx(Phase.PULSE, mist(0xF0F8FF).count(12).extra())
 				.fx(Phase.EXTRA0, shards(0xF0F8FF).count(80), shake(0.3F, 14))
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.2F, 0.5F)
@@ -248,6 +268,7 @@ public final class IceArts {
 		// 411 · Segel Embun Beku Phoenix Es · IA T9 · Langit-T · PAMUNGKAS · FEAT kills_with(ICE, elder_guardian, 3) · Mrd Y
 		sink.add(done(art("ice_phoenix_frost_seal", 411, Dao.ICE)
 				.grade(TechniqueGrade.TIAN, 2).type(TechniqueType.PAMUNGKAS).realm(Realm.IMMORTAL_ASCENSION, 9)
+				.pose(Pose.SKY_RAISE).pose(Phase.EXTRA0, Pose.SEAL)
 				.route(Route.feat(Feat.killsWith(Dao.ICE, Cond.NONE, List.of("minecraft:elder_guardian"), 3)))
 				.qi(500).cooldown(180.0D)
 				.step(at(0).shape(zone(Anchor.AIM).range(64.0D).radius(20.0D, 24.0D).fromSky(40.0D)).hit(damage(4.0D), freeze(120)))
@@ -257,6 +278,7 @@ public final class IceArts {
 						FxLayer.of(FxLayer.Template.GLYPH, 0xDFF6FF).text("❄").scale(40.0F).fall(40.0F, 20.0F))
 				.fx(Phase.IMPACT, shards(0xDFF6FF).count(80), shake(0.6F, 18))
 				.fx(Phase.EXTRA0, shards(0xFFFFFF).count(100))
+				.fx(Phase.TRAVEL, model("ice_phoenix").scale(10.0F).fall(40.0F, 20.0F).ticks(22))
 				.sound(Phase.CAST, SoundEvents.BEACON_ACTIVATE, 1.5F, 0.5F)
 				.sound(Phase.CAST, SoundEvents.BELL_BLOCK, 1.5F, 1.0F)
 				.kehancuran(DShape.disc(10, 2))
@@ -265,6 +287,7 @@ public final class IceArts {
 		// 412 · Turunnya Phoenix Es · TI · Abadi-R · PAMUNGKAS · FEAT first_kill(ENDER_DRAGON, ICE) · Mrd Y★27
 		sink.add(done(art("ice_phoenix_descent", 412, Dao.ICE)
 				.grade(TechniqueGrade.ABADI, 0).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Pose.SUMMON_RAISE)
 				.route(Route.feat(Feat.firstKill("minecraft:ender_dragon", Dao.ICE)))
 				.teachStars(27).flag(NO_ECHO)
 				.qiPct(55.0D, 700).cooldown(360.0D)
@@ -277,9 +300,10 @@ public final class IceArts {
 				// @240 NOVA(r 20→32) > DMG 10.
 				.step(at(240).shape(nova().radius(20.0D, 32.0D)).hit(damage(10.0D)).phase(0))
 				// A 40-b ice phoenix across the sky; shards.
-				.fx(Phase.CAST, skySilhouette(FxLayer.BeastKind.BIRD, 0xCFEFFF).size(40.0F), beast(FxLayer.BeastKind.BIRD, 0xCFEFFF).size(4.0F).count(60))
+				.fx(Phase.CAST, skySilhouette(FxLayer.BeastKind.BIRD, 0xCFEFFF).scale(40.0F), beast(FxLayer.BeastKind.BIRD, 0xCFEFFF).size(4.0F).count(60))
 				.fx(Phase.TRAVEL, trail(0xDFF6FF).particle(ParticleTypes.SNOWFLAKE).count(20), shards(0xDFF6FF).count(30))
 				.fx(Phase.EXTRA0, shards(0xFFFFFF).count(120), shake(0.7F, 24))
+				.fx(Phase.TRAVEL, model("ice_phoenix").scale(12.0F).slide(10.0F).ticks(12))
 				.sound(Phase.CAST, SoundEvents.ENDER_DRAGON_GROWL, 1.5F, 1.6F)
 				.sound(Phase.CAST, SoundEvents.GLASS_BREAK, 1.2F, 0.8F)
 				.kehancuran(DShape.bowl(8))
@@ -288,6 +312,7 @@ public final class IceArts {
 		// 413 · Membekukan Gunung Qi · Dewa · Dewa-R · PAMUNGKAS · GATE I (prereq ice_phoenix_descent L3) · Mrd Y★36
 		sink.add(done(art("freeze_mount_qi", 413, Dao.ICE)
 				.grade(TechniqueGrade.DEWA, 0).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Pose.ARMS_SPREAD).climax(Phase.EXTRA1)
 				.gate(TechniqueSpec.Gate.DEWA_I).prereq("ice_phoenix_descent", 3).dewaStars(36).teachStars(36)
 				.qiPct(75.0D).cooldown(900.0D)
 				.step(at(0).shape(domain().radius(40.0D).duration(400).pulse(40)).hit(damage(2.0D), eff(Eff.SLOWNESS, 3, 50)))

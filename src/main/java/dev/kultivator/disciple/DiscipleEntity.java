@@ -81,6 +81,10 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	public static final int FLAG_BREAKING_THROUGH = 2;
 	public static final int FLAG_FIGHTING = 4;
 	public static final int FLAG_DEVIATING = 8;
+	/** Kunpeng Wings spread (= {@code PowerIds.BIT_KUNPENG}). */
+	public static final int FLAG_KUNPENG = 16;
+	/** The Seven Fairies linked (= {@code PowerIds.BIT_FAIRIES}). */
+	public static final int FLAG_FAIRIES = 32;
 	/** The default player skins a disciple can wear (index 0..8). */
 	public static final int SKIN_COUNT = 9;
 	/** Key of {@link DiscipleData#save()} in the entity's saved data. */
@@ -795,9 +799,17 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		return lastSafePos;
 	}
 
-	/** It holds still: meditating, breaking through or bowing to leave. */
+	/**
+	 * It holds still: meditating, breaking through, bowing to leave, charging or channelling a technique, holding the fire
+	 * lotus or sitting in a heavenly-flame ritual (DESIGN 27.6: the cast pose stays put instead of running about).
+	 */
 	boolean shouldHoldStill() {
-		return meditating || data.breakingThrough() || releaseTicks > 0;
+		return meditating || data.breakingThrough() || releaseTicks > 0 || castHold();
+	}
+
+	/** Charging or channelling a technique, the lotus charge or a flame ritual. */
+	private boolean castHold() {
+		return dev.kultivator.technique.spec.run.TechniqueRunner.holding(this) || dev.kultivator.disciple.power.DisciplePowers.holdingStill(this);
 	}
 
 	/** In combat recently: hurt, attacking or with a target. */
@@ -1096,6 +1108,17 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		super.customServerAiStep(level);
 		if ((this.tickCount + this.getId()) % STATE_INTERVAL == 0) {
 			updateState(level);
+		} else if ((this.tickCount & 1) == 0) {
+			// the short look flags (wings spread, a cast hold) reach the clients within two ticks
+			syncFlags();
+		}
+		if (castHold()) {
+			// a charge or channel: stand still and face the foe so the cast pose reads (216)
+			this.getNavigation().stop();
+			LivingEntity target = this.getTarget();
+			if (target != null && target.isAlive()) {
+				this.getLookControl().setLookAt(target, 30.0F, 30.0F);
+			}
 		}
 	}
 
@@ -1186,7 +1209,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 
 	private void syncFlags() {
 		LivingEntity target = this.getTargetUnchecked();
-		int flags = (meditating ? FLAG_MEDITATING : 0) | (target != null && target.isAlive() ? FLAG_FIGHTING : 0) | data.cultivationFlags();
+		int flags = (meditating || dev.kultivator.disciple.power.DisciplePowers.inRitual(this) ? FLAG_MEDITATING : 0) | (target != null && target.isAlive() ? FLAG_FIGHTING : 0) | data.cultivationFlags()
+				| dev.kultivator.disciple.power.DisciplePowers.lookFlags(this);
 		if (this.entityData.get(DATA_FLAGS) != flags) {
 			this.entityData.set(DATA_FLAGS, flags);
 		}

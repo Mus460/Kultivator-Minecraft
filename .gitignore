@@ -16,7 +16,7 @@ classes/
 bin/
 
 # fabric
-run/
+/run/
 
 # local reference material (not part of the mod)
 reference/

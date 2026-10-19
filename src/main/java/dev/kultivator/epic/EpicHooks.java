@@ -252,9 +252,30 @@ public final class EpicHooks {
 
 	/** A disciple cheat-death; {@code kind} one of {@code EpicIds.SAVE_*}. */
 	public static void discipleSave(DiscipleEntity disciple, @Nullable ServerPlayer master, int kind) {
+		discipleSave(disciple, master, kind, null);
+	}
+
+	/**
+	 * Like {@link #discipleSave(DiscipleEntity, ServerPlayer, int)} with a point the save flies to (SAVE_SOUL_FLIGHT: the
+	 * Sect Hall). The direction, capped at 40 blocks, travels as b = (dx & 0xFFFF) << 16 | (dz & 0xFFFF) and f = dy.
+	 */
+	public static void discipleSave(DiscipleEntity disciple, @Nullable ServerPlayer master, int kind, @Nullable Vec3 to) {
 		guard(() -> {
 			if (disciple.level() instanceof ServerLevel level) {
-				send(level, EpicIds.CHEAT_DEATH, EpicIds.CHEAT_SAVED, disciple, master, disciple.position(), kind, 0, 0.0F,
+				int b = 0;
+				float f = 0.0F;
+				if (to != null) {
+					Vec3 d = to.subtract(disciple.position());
+					double length = d.length();
+					if (length > 40.0D) {
+						d = d.scale(40.0D / length);
+					}
+					int dx = (int) Math.round(d.x);
+					int dz = (int) Math.round(d.z);
+					b = (dx & 0xFFFF) << 16 | (dz & 0xFFFF);
+					f = (float) d.y;
+				}
+				send(level, EpicIds.CHEAT_DEATH, EpicIds.CHEAT_SAVED, disciple, master, disciple.position(), kind, b, f,
 						EpicScale.ofDisciple(disciple), EpicIds.FLAG_FINAL);
 			}
 		});
@@ -304,6 +325,27 @@ public final class EpicHooks {
 			int flags = beat == EpicIds.KEH_WARNING ? 0 : EpicIds.FLAG_FINAL;
 			int s = owner == null ? 4 : EpicScale.of(Cultivators.get(owner).rank());
 			send(level, EpicIds.KEHANCURAN, beat, caster, owner, centre, art, blocks, radius, s, flags);
+		});
+	}
+
+	/** A disciple's signature ultimate: a short stamp and a sky grade for its master (DESIGN 27.6). */
+	public static void discipleUltimate(DiscipleEntity disciple, @Nullable ServerPlayer master, @Nullable dev.kultivator.data.Dao dao, Vec3 centre,
+			double radius) {
+		guard(() -> {
+			if (disciple.level() instanceof ServerLevel level) {
+				send(level, EpicIds.EXTRA, EpicIds.EXTRA_DISCIPLE_ULT, disciple, master, centre, dao == null ? -1 : dao.ordinal(),
+						(int) Math.max(0L, Math.min(255L, Math.round(radius))), 0.0F, EpicScale.ofDisciple(disciple), EpicIds.FLAG_FINAL);
+			}
+		});
+	}
+
+	/** A disciple's Jurus Pemusnah in its block-safe form: a light impact beat (stamp + sky grade, no warning) for its master. */
+	public static void destroyerArt(DiscipleEntity disciple, @Nullable ServerPlayer master, int art, Vec3 centre, double radius) {
+		guard(() -> {
+			if (disciple.level() instanceof ServerLevel level) {
+				send(level, EpicIds.EXTRA, EpicIds.EXTRA_DESTROYER_ART, disciple, master, centre, art,
+						(int) Math.max(0L, Math.min(255L, Math.round(radius))), 0.0F, EpicScale.ofDisciple(disciple), EpicIds.FLAG_FINAL);
+			}
 		});
 	}
 

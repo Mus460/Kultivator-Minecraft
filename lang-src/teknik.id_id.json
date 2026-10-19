@@ -220,6 +220,7 @@
   "kultivator.teknik.test.audit.prereq": "%1$s: prasyarat %2$s tidak ada",
   "kultivator.teknik.test.audit.echo": "%s: ECHO pada jenis yang tidak mengizinkannya (menjadi DURASI +25%%)",
   "kultivator.teknik.test.audit.cap": "%1$s: %2$s %3$s melewati batas %4$s (dipangkas)",
+  "kultivator.teknik.test.audit.polish": "%1$s: %2$s",
   "kultivator.teknik.test.audit.ok": "%1$s spec OK · %2$s untuk pemain",
   "kultivator.teknik.test.audit.bad": "%1$s masalah, %2$s peringatan (%3$s spec, %4$s untuk pemain)",
 

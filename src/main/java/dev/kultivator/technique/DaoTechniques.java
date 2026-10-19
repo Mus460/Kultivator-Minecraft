@@ -379,6 +379,9 @@ public final class DaoTechniques {
 					ctx.schedule(stagger, () -> {
 						if (valid(ctx, target)) {
 							fx(level, Technique.THOUSAND_SWORDS, DaoTechniqueSub.SWORD_FALL, target.position(), target.position(), SWORD_FALL_TICKS);
+							// the falling sword on every client, timed to land with the strike (FLAG_PRE_IMPACT)
+							ctx.fx(dev.kultivator.technique.spec.dsl.Phase.IMPACT, target.position().add(0.0D, 14.0D, 0.0D), target.position(), 1.0F, 14.0F,
+									1, SWORD_FALL_TICKS, target.getId(), 0, 1, 0, dev.kultivator.network.Payloads.TechFx.FLAG_PRE_IMPACT);
 							ctx.schedule(SWORD_FALL_TICKS, () -> {
 								if (valid(ctx, target) && strike(ctx, target, 0.6D, false)) {
 									sound(level, target.position(), SoundEvents.TRIDENT_HIT, 0.5F, 1.3F + random.nextFloat() * 0.4F);
@@ -599,7 +602,7 @@ public final class DaoTechniques {
 		}
 		ServerLevel level = player.level();
 		fx(level, Technique.GLACIER_PRISON, DaoTechniqueSub.CAST, middleOf(main), hand(player), (float) splash);
-		ctx.castFx(middleOf(main), hand(player), (float) splash, 0.0F, victims.size(), 0);
+		ctx.castFx(middleOf(main), hand(player), (float) splash, 0.0F, victims.size(), 0, main.getId());
 		sound(level, main.position(), SoundEvents.POWDER_SNOW_BREAK, 1.2F, 0.5F);
 		sound(level, main.position(), SoundEvents.AMETHYST_CLUSTER_BREAK, 1.0F, 0.6F);
 		sound(level, main.position(), SoundEvents.GLASS_PLACE, 1.0F, 0.7F);
@@ -611,6 +614,9 @@ public final class DaoTechniques {
 				ctx.apply(victim, new Payload.Bind(Payload.BindKind.ROOT, dev.kultivator.technique.spec.dsl.Val.of(ticks), 40));
 				freezeLook(victim, 20);
 				fx(level, Technique.GLACIER_PRISON, DaoTechniqueSub.MARK, victim.position(), new Vec3(victim.getId(), ticks, 0.0D), victim.getBbHeight());
+				// one prison per sealed monster on every client (pos = its body, target = its id)
+				ctx.fx(dev.kultivator.technique.spec.dsl.Phase.IMPACT, middleOf(victim), hand(player), victim.getBbWidth(), 0.0F, 1, ticks,
+						victim.getId(), sealed, victims.size(), 0, 0);
 				sealed++;
 			}
 		}

@@ -130,7 +130,8 @@ public sealed interface Shape permits Shape.Self, Shape.Strike, Shape.Cone, Shap
 	 */
 	record Front(Val length, Val width, Val height, double speed, boolean passBlocks, boolean travelling, Mode mode,
 			double skyHeight, double ahead, Val count, double fan, int perTarget, Anchor from) implements Shape {
-		public enum Mode { LOOK, AIM, SKY }
+		/** SKY_BAND (DESIGN 27.1 S10): the damage line runs along the ground like LOOK; the visual comes down from a band {@code skyHeight} up. */
+		public enum Mode { LOOK, AIM, SKY, SKY_BAND }
 
 		public static final Front DEFAULT = new Front(Val.of(16.0D), Val.of(1.0D), Val.of(3.0D), 2.0D, false, false, Mode.LOOK,
 				0.0D, 0.0D, Val.of(1.0D), 0.0D, 1, Anchor.CASTER);
@@ -154,6 +155,8 @@ public sealed interface Shape permits Shape.Self, Shape.Strike, Shape.Cone, Shap
 		public Front toAim() { return new Front(length, width, height, speed, passBlocks, travelling, Mode.AIM, skyHeight, ahead, count, fan, perTarget, from); }
 		/** Falls or is pressed down from {@code height} blocks up, along the aim line. */
 		public Front fromSky(double blocks) { return new Front(length, width, height, speed, passBlocks, travelling, Mode.SKY, blocks, ahead, count, fan, perTarget, from); }
+		/** A forward line whose visual (a staff, a diagram, a diving phoenix) comes down from {@code blocks} up along the look. */
+		public Front skyBand(double blocks) { return new Front(length, width, height, speed, passBlocks, travelling, Mode.SKY_BAND, blocks, ahead, count, fan, perTarget, from); }
 		public Front ahead(double blocks) { return new Front(length, width, height, speed, passBlocks, travelling, mode, skyHeight, blocks, count, fan, perTarget, from); }
 		public Front count(Val value) { return new Front(length, width, height, speed, passBlocks, travelling, mode, skyHeight, ahead, value, fan, perTarget, from); }
 		public Front count(double value) { return count(Val.of(value)); }

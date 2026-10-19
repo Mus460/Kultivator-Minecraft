@@ -24,10 +24,11 @@ import java.util.List;
  * on a world change or disconnect. A failure turns phantom displays off for the session (templates fall back to
  * particles).
  */
-final class PhantomDisplays {
+public final class PhantomDisplays {
 
 	public static final int FIRST_ID = -2_000_000;
-	public static final int CREATED_PER_TICK = 4;
+	/** Displays created per tick at Normal (Minimal 4, Maximal 12; polish S13). */
+	public static final int CREATED_PER_TICK = 8;
 	public static final double VIEW_DISTANCE = 64.0D;
 	public static final int LARGE_LAYERS = 2;
 
@@ -39,14 +40,14 @@ final class PhantomDisplays {
 	private static @Nullable ClientLevel owner;
 
 	/** True while displays may be created at all (setting, server switch, no earlier failure). */
-	static boolean enabled() {
+	public static boolean enabled() {
 		return !broken && EffectQuality.phantoms() && SpecFx.serverDisplays();
 	}
 
 	/** True when one more display may be created this tick near {@code at}. */
-	static boolean canCreate(Vec3 at) {
+	public static boolean canCreate(Vec3 at) {
 		Minecraft minecraft = Minecraft.getInstance();
-		if (!enabled() || minecraft.level == null || createdThisTick >= CREATED_PER_TICK || alive() >= EffectQuality.displaysAlive()) {
+		if (!enabled() || minecraft.level == null || createdThisTick >= createdPerTick() || alive() >= EffectQuality.displaysAlive()) {
 			return false;
 		}
 		Vec3 camera = minecraft.gameRenderer.mainCamera().position();
@@ -54,7 +55,7 @@ final class PhantomDisplays {
 	}
 
 	/** Creates a display of {@code type} at {@code at}, or null (limits, failure). */
-	static <T extends Display> @Nullable T create(EntityType<T> type, Vec3 at, float viewRange) {
+	public static <T extends Display> @Nullable T create(EntityType<T> type, Vec3 at, float viewRange) {
 		Minecraft minecraft = Minecraft.getInstance();
 		ClientLevel level = minecraft.level;
 		if (level == null || !canCreate(at)) {
@@ -90,7 +91,7 @@ final class PhantomDisplays {
 	}
 
 	/** Removes one display (safe to call twice). */
-	static void remove(@Nullable Display display) {
+	public static void remove(@Nullable Display display) {
 		if (display == null) {
 			return;
 		}
@@ -101,9 +102,23 @@ final class PhantomDisplays {
 		}
 	}
 
-	static int alive() {
+	public static int alive() {
 		ALIVE.removeIf(Entity::isRemoved);
 		return ALIVE.size();
+	}
+
+	/** Displays one tick may create at the quality in effect: 4 / 8 / 12. */
+	public static int createdPerTick() {
+		return switch (EffectQuality.level()) {
+			case MINIMAL -> 4;
+			case NORMAL -> CREATED_PER_TICK;
+			case MAXIMAL -> 12;
+		};
+	}
+
+	/** Displays still allowed alive right now. */
+	public static int room() {
+		return Math.max(0, EffectQuality.displaysAlive() - alive());
 	}
 
 	/** Takes one of the large translucent layer slots (≤ 2 at once); false when both are in use. */

@@ -183,6 +183,8 @@ public final class MysteryFusion implements SpecialTechnique {
 		if (main == null || second == null) {
 			return false;
 		}
+		// both Daos' colours on every event of the fusion (FLAG_TWO_DAO)
+		ctx.twoDao(second.color());
 		LivingEntity target = ctx.target();
 		Vec3 eye = ctx.eye();
 		Vec3 point = impactPoint(ctx, target, eye);

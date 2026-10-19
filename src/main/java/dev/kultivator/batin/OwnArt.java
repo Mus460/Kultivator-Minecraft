@@ -65,6 +65,14 @@ public final class OwnArt implements SpecialTechnique {
 
 	private static final String KEY = "kultivator.batin.art.";
 
+	/** The EXTRA phase of each form's main hit (CiptaanArts draws them): cut, burst, rain, wave, domain, seal. */
+	public static final int PHASE_CUT = 2;
+	public static final int PHASE_BURST = 3;
+	public static final int PHASE_RAIN = 4;
+	public static final int PHASE_WAVE = 5;
+	public static final int PHASE_DOMAIN = 6;
+	public static final int PHASE_SEAL = 7;
+
 	private OwnArt() {
 	}
 
@@ -105,6 +113,10 @@ public final class OwnArt implements SpecialTechnique {
 		if (art.form() == Creation.Form.SEGEL && (target == null || !target.isAlive())) {
 			return false;
 		}
+		if (!art.pure()) {
+			// a two-Dao art: Dao A's layers with Dao B's rim on every event (FLAG_TWO_DAO)
+			ctx.twoDao(art.b().color());
+		}
 		// The runner applies the run's own factor (echo, replay) inside the choke point.
 		double scale = art.q() * (art.pure() ? Creation.PURE_BONUS : 1.0D);
 		Vec3 eye = ctx.eye();
@@ -112,17 +124,18 @@ public final class OwnArt implements SpecialTechnique {
 		ctx.markEnd(point);
 		Payload.Hit main = damage(art.form().coef() * scale);
 		switch (art.form()) {
-			case TEBASAN -> ctx.run(at(0).shape(beam().length(BEAM_LENGTH).halfWidth(BEAM_HALF_WIDTH).pierce().ignoreBlocks()).hit(main).phase(0));
-			case LEDAKAN -> ctx.run(at(0).shape(nova().radius(NOVA_RADIUS, NOVA_RADIUS_CAP).at(Anchor.AIM)).hit(main).phase(0));
+			// each form has its own phase (DESIGN 27.5: EXTRA2 cut ... EXTRA7 seal) and so its own layers and pose
+			case TEBASAN -> ctx.run(at(0).shape(beam().length(BEAM_LENGTH).halfWidth(BEAM_HALF_WIDTH).pierce().ignoreBlocks()).hit(main).phase(PHASE_CUT));
+			case LEDAKAN -> ctx.run(at(0).shape(nova().radius(NOVA_RADIUS, NOVA_RADIUS_CAP).at(Anchor.AIM)).hit(main).phase(PHASE_BURST));
 			case HUJAN -> ctx.run(at(0).shape(rain(Anchor.AIM, RANGE).radius(RAIN_RADIUS).impacts(RAIN_IMPACTS).over(RAIN_TICKS).impactRadius(2.5D)
-					.targeted(0.7D)).hit(damage(art.form().coef() / RAIN_IMPACTS * scale)).phase(0));
+					.targeted(0.7D)).hit(damage(art.form().coef() / RAIN_IMPACTS * scale)).phase(PHASE_RAIN));
 			case GELOMBANG -> ctx.run(at(0).shape(front().length(FRONT_LENGTH).width(FRONT_WIDTH).height(FRONT_HEIGHT).speed(FRONT_SPEED).ignoreBlocks())
-					.hit(main).phase(0));
+					.hit(main).phase(PHASE_WAVE));
 			case WILAYAH -> ctx.run(at(0).shape(zone(Anchor.AIM).range(RANGE).radius(ZONE_RADIUS)).hit(damage(art.form().coef() / ZONE_PULSES * scale))
-					.repeat(ZONE_PULSES, ZONE_EVERY).phase(0));
+					.repeat(ZONE_PULSES, ZONE_EVERY).phase(PHASE_DOMAIN));
 			case SEGEL -> {
-				ctx.run(at(0).shape(target().range(RANGE)).hit(bind(Payload.BindKind.ROOT, SEAL_ROOT_TICKS)).phase(0));
-				ctx.schedule(SEAL_ROOT_TICKS, () -> ctx.run(at(0).shape(target().range(RANGE).noLos()).hit(main).phase(0)));
+				ctx.run(at(0).shape(target().range(RANGE)).hit(bind(Payload.BindKind.ROOT, SEAL_ROOT_TICKS)).phase(PHASE_SEAL));
+				ctx.schedule(SEAL_ROOT_TICKS, () -> ctx.run(at(0).shape(target().range(RANGE).noLos()).hit(main).phase(PHASE_SEAL)));
 			}
 		}
 		burst(ctx, art, art.form() == Creation.Form.SEGEL ? Anchor.TARGET : Anchor.AIM);

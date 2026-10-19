@@ -12,7 +12,10 @@
     "MouseCinematicMixin",
     "EnvironmentProbeMixin",
     "HudTitleMixin",
-    "AvatarNameMixin"
+    "AvatarNameMixin",
+    "FirstPersonHandsMixin",
+    "FirstPersonHandsInvoker",
+    "BindFreezeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

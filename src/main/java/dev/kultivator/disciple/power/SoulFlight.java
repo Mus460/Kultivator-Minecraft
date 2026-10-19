@@ -77,7 +77,7 @@ final class SoulFlight {
 		Vec3 from = entity.position().add(0.0D, 1.0D, 0.0D);
 		Vec3 to = hall.dim().equals(level.dimension()) ? Vec3.atBottomCenterOf(hall.pos()).add(0.0D, 1.5D, 0.0D) : from.add(0.0D, 24.0D, 0.0D);
 		PowerCore.fx(level, from, to, PowerIds.FX_SOUL_FLIGHT, 0, 0.0F);
-		dev.kultivator.epic.EpicHooks.discipleSave(entity, entity.owner(), dev.kultivator.epic.EpicIds.SAVE_SOUL_FLIGHT);
+		dev.kultivator.epic.EpicHooks.discipleSave(entity, entity.owner(), dev.kultivator.epic.EpicIds.SAVE_SOUL_FLIGHT, to);
 		PowerCore.sound(level, from, SoundEvents.SOUL_ESCAPE.value(), 1.5F, 1.2F);
 		PowerCore.sound(level, from, SoundEvents.BEACON_DEACTIVATE, 0.8F, 1.6F);
 		PowerCore.tell(entity, PowerCore.key("soul_flight.fled", PowerCore.name(entity), AWAY_TICKS / 1200).withStyle(ChatFormatting.AQUA));

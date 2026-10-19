@@ -179,6 +179,10 @@ public final class CloudStep {
 
 		Vec3 feet = player.position();
 		Techniques.fx(player, technique, 0, feet, feet.add(vx, 0.0D, vz), 1.0F + 0.1F * state.used);
+		// every air jump is a CAST of its own on every client (the cloud puff under the feet, DESIGN 27.1)
+		PlayerCaster jump = new PlayerCaster(player, Technique.CLOUD_STEP.spec(), new CastOptions(false, true, false, false, true));
+		TechniqueRunner.start(jump);
+		jump.castFx(feet, feet.add(vx, 0.0D, vz), 1.0F + 0.1F * state.used, 0.0F, state.used, 6);
 		level.playSound(null, feet.x, feet.y, feet.z, SoundEvents.BREEZE_JUMP, SoundSource.PLAYERS, 0.45F, 1.35F + 0.1F * state.used);
 		level.playSound(null, feet.x, feet.y, feet.z, SoundEvents.WOOL_PLACE, SoundSource.PLAYERS, 0.5F, 0.7F);
 		Advancements.grant(player, "cloud_step");

@@ -6,6 +6,7 @@ import dev.kultivator.technique.spec.dsl.Flow;
 import dev.kultivator.technique.spec.dsl.FxLayer;
 import dev.kultivator.technique.spec.dsl.Payload;
 import dev.kultivator.technique.spec.dsl.Phase;
+import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.SoundCue;
 import dev.kultivator.technique.spec.dsl.Step;
@@ -105,6 +106,11 @@ public final class TechniqueSpec {
 	private final @Nullable Technique legacy;
 	private final int teachStars;
 	private final int discipleStages;
+	private final Map<Phase, Pose> poses;
+	private final @Nullable Phase climax;
+	private final int windup;
+	private final int castTicks;
+	private final dev.kultivator.technique.spec.run.@Nullable BindKind bindLook;
 
 	private TechniqueSpec(Builder b) {
 		this.id = b.id;
@@ -148,6 +154,13 @@ public final class TechniqueSpec {
 		this.legacy = b.legacy;
 		this.teachStars = Math.max(0, b.teachStars);
 		this.discipleStages = Math.max(1, b.discipleStages);
+		EnumMap<Phase, Pose> poseCopy = new EnumMap<>(Phase.class);
+		poseCopy.putAll(b.poses);
+		this.poses = Collections.unmodifiableMap(poseCopy);
+		this.climax = b.climax;
+		this.windup = b.windup;
+		this.castTicks = b.castTicks;
+		this.bindLook = b.bindLook;
 	}
 
 	/** Stages of a STAGES spec a disciple runs in one cast (22.13.1 "Y (st1-3)"; 1 = only the first). */
@@ -341,6 +354,131 @@ public final class TechniqueSpec {
 	/** Disciples learn it only from this star on (Y★n); 0 = no star gate besides {@link #dewaStars} for Dewa. */
 	public int teachStars() {
 		return teachStars;
+	}
+
+	// ================================================================== cast animation and pacing (DESIGN 27.2, 27.5)
+
+	/** The CAST pose (AUTO = the client derives it from the type, the first shape, the Dao and the phase). */
+	public Pose pose() {
+		return pose(Phase.CAST);
+	}
+
+	/** The pose authored for {@code phase} ({@code .pose(phase, pose)}), else AUTO. */
+	public Pose pose(Phase phase) {
+		return poses.getOrDefault(phase, Pose.AUTO);
+	}
+
+	/**
+	 * The pose to play for {@code phase} (DESIGN 27.2.4): the authored one, else for CAST and CHARGE the automatic choice
+	 * from the type, the first shape and the Dao; other phases without an authored pose return AUTO (the client accents
+	 * the running pose). Pure, shared by the server (hand swing) and the client (CastPoses).
+	 */
+	public Pose resolvedPose(Phase phase) {
+		Pose authored = poses.get(phase);
+		if (authored != null && authored != Pose.AUTO) {
+			return authored;
+		}
+		if (phase == Phase.CHARGE) {
+			Pose cast = poses.getOrDefault(Phase.CAST, Pose.AUTO);
+			return cast == Pose.CHARGE_OVERHEAD || cast == Pose.SWORD_SKY || cast == Pose.SUMMON_RAISE ? cast : Pose.CHARGE_BACK;
+		}
+		if (phase != Phase.CAST) {
+			return Pose.AUTO;
+		}
+		dev.kultivator.technique.spec.dsl.Shape.Kind kind = dev.kultivator.technique.spec.dsl.Shape.Kind.SELF;
+		for (Step step : timeline) {
+			kind = step.shape().kind();
+			if (kind != dev.kultivator.technique.spec.dsl.Shape.Kind.SELF) {
+				break;
+			}
+		}
+		if (type == TechniqueType.WILAYAH || kind.lasting()) {
+			return Pose.ARMS_SPREAD;
+		}
+		if (type == TechniqueType.PANGGIL) {
+			return Pose.SUMMON_RAISE;
+		}
+		if (type == TechniqueType.GERAK || kind == dev.kultivator.technique.spec.dsl.Shape.Kind.PATH) {
+			return Pose.DASH_LEAN;
+		}
+		return switch (kind) {
+			case STRIKE -> dao == Dao.BODY ? Pose.PUNCH : dao == Dao.SWORD ? Pose.SWORD_SLASH : Pose.PALM_THRUST;
+			case TARGET -> Pose.FINGER_POINT;
+			case CONE -> dao == Dao.FIRE || dao == Dao.ICE ? Pose.TWIN_PALM : Pose.PALM_THRUST;
+			case BEAM -> dao == Dao.SWORD ? Pose.SWORD_THRUST : dao == Dao.LIGHTNING ? Pose.SKY_RAISE : Pose.TWIN_PALM;
+			case FRONT, WAVE -> dao == Dao.SWORD ? Pose.SWORD_SLASH : Pose.TWIN_PALM;
+			case NOVA -> dao == Dao.BODY || dao == Dao.ICE || dao == Dao.LIFE ? Pose.STOMP : Pose.ARMS_SPREAD;
+			case ZONE, PILLAR, RAIN -> dao == Dao.SWORD ? Pose.SWORD_SKY : Pose.SKY_RAISE;
+			case CHAIN -> Pose.SKY_RAISE;
+			case VOLLEY -> dao == Dao.SWORD ? Pose.SWORD_THRUST : Pose.PALM_THRUST;
+			case ALL, RECALL -> Pose.SEAL;
+			case SELF -> switch (type) {
+				case PULIH -> grade.tier() >= TechniqueGrade.TIAN.tier() ? Pose.MEDITATE_FLOAT : Pose.SEAL;
+				case UBAH -> Pose.SUMMON_RAISE;
+				default -> Pose.SEAL;
+			};
+			default -> Pose.SEAL;
+		};
+	}
+
+	/** Every authored pose by phase. */
+	public Map<Phase, Pose> poses() {
+		return poses;
+	}
+
+	/** The explicitly authored climax phase ({@code .climax(phase)}), or null. */
+	public @Nullable Phase climax() {
+		return climax;
+	}
+
+	/**
+	 * The phase whose first event of a cast carries {@code TechFx.FLAG_CLIMAX} (7b climax beat, the one big shake): the
+	 * authored one, else the highest EXTRA phase with layers, else IMPACT, else TRAVEL, else CAST. Never PULSE, HIT or
+	 * MASS_HIT (they repeat).
+	 */
+	public Phase climaxPhase() {
+		if (climax != null) {
+			return climax;
+		}
+		for (int i = 7; i >= 0; i--) {
+			if (!fx(Phase.extra(i)).isEmpty()) {
+				return Phase.extra(i);
+			}
+		}
+		if (!fx(Phase.IMPACT).isEmpty()) {
+			return Phase.IMPACT;
+		}
+		if (!fx(Phase.TRAVEL).isEmpty()) {
+			return Phase.TRAVEL;
+		}
+		return Phase.CAST;
+	}
+
+	/**
+	 * Ticks between the CAST event (build-up: pose wind-back, gathering qi) and the release of a wave, front, beam or rain
+	 * (the TRAVEL event and the first query): the authored {@code .windup(t)}, else 4 (6 for PAMUNGKAS). Charged casts
+	 * release at the end of the charge and add nothing.
+	 */
+	public int windup() {
+		if (windup >= 0) {
+			return windup;
+		}
+		return type == TechniqueType.PAMUNGKAS ? 6 : 4;
+	}
+
+	/** What this spec's binds look like on the clients (null = by the gameplay bind: ROOT vines, STUN chains...). */
+	public dev.kultivator.technique.spec.run.@Nullable BindKind bindLook() {
+		return bindLook;
+	}
+
+	/** The duration the CAST event carries (0 = derived: the channel, else the longest self boon). */
+	public int castTicks() {
+		return castTicks;
+	}
+
+	/** True when {@code .windup(t)} was authored. */
+	public boolean windupAuthored() {
+		return windup >= 0;
 	}
 
 	// ================================================================== derived
@@ -538,6 +676,11 @@ public final class TechniqueSpec {
 		private @Nullable Technique legacy;
 		private int teachStars;
 		private int discipleStages = 1;
+		private final EnumMap<Phase, Pose> poses = new EnumMap<>(Phase.class);
+		private @Nullable Phase climax;
+		private int windup = -1;
+		private int castTicks;
+		private dev.kultivator.technique.spec.run.@Nullable BindKind bindLook;
 
 		private Builder(String id, int netId, @Nullable Dao dao) {
 			this.id = id;
@@ -774,6 +917,48 @@ public final class TechniqueSpec {
 		/** Disciples learn it from star {@code stars} (Y★n). */
 		public Builder teachStars(int stars) {
 			this.teachStars = stars;
+			return this;
+		}
+
+		/** The CAST pose (DESIGN 27.2): what the caster's body does when the cast starts. */
+		public Builder pose(Pose value) {
+			return pose(Phase.CAST, value);
+		}
+
+		/** The pose of {@code phase} (a stomp on EXTRA0, a slam on release...). */
+		public Builder pose(Phase phase, Pose value) {
+			this.poses.put(phase, value);
+			return this;
+		}
+
+		/** The pose at the cast and the pose the release / first impact plays (SKY_RAISE then OVERHEAD_SLAM). */
+		public Builder poses(Pose cast, Phase release, Pose then) {
+			this.poses.put(Phase.CAST, cast);
+			this.poses.put(release, then);
+			return this;
+		}
+
+		/** The climax phase (7b climax beat, FLAG_CLIMAX); the default is {@link TechniqueSpec#climaxPhase()}. */
+		public Builder climax(Phase phase) {
+			this.climax = phase;
+			return this;
+		}
+
+		/** Build-up ticks between CAST and the release of travelling shapes (default 4, PAMUNGKAS 6). */
+		public Builder windup(int ticks) {
+			this.windup = Math.max(0, Math.min(20, ticks));
+			return this;
+		}
+
+		/** How long the CAST event says the cast lasts (wings spread, a held prop), when no boon tells it. */
+		public Builder castTicks(int ticks) {
+			this.castTicks = Math.max(0, ticks);
+			return this;
+		}
+
+		/** The look of this spec's binds (sleep, seal, rope, time stop...; DESIGN 27.4). */
+		public Builder bindLook(dev.kultivator.technique.spec.run.BindKind value) {
+			this.bindLook = value;
 			return this;
 		}
 

@@ -15,6 +15,8 @@ import dev.kultivator.technique.spec.dsl.Anchor;
 import dev.kultivator.technique.spec.dsl.Bonus;
 import dev.kultivator.technique.spec.dsl.DShape;
 import dev.kultivator.technique.spec.dsl.Payload;
+import dev.kultivator.technique.spec.dsl.Phase;
+import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.run.SpecialTechnique;
@@ -87,6 +89,19 @@ public final class TechniqueRegistry {
 		module("CiptaanArts", 1100, 1199, dev.kultivator.batin.CiptaanArts::register);
 		freeze();
 		Kultivator.LOGGER.info("Kultivator: {} technique specs ({} for the player), {} special handlers", all.size(), playerTotal(), SPECIALS.size());
+		if (net.fabricmc.loader.api.FabricLoader.getInstance().isDevelopmentEnvironment()) {
+			// DESIGN 27.1 S2: phases nobody sends, ignored template parameters, missing models (dev only; also in "uji teknik audit")
+			int warned = 0;
+			for (TechniqueSpec spec : all) {
+				for (String warning : dev.kultivator.technique.spec.run.SpecLint.check(spec)) {
+					Kultivator.LOGGER.warn("Kultivator: technique {}: {}", spec.id(), warning);
+					warned++;
+				}
+			}
+			if (warned > 0) {
+				Kultivator.LOGGER.warn("Kultivator: {} technique spec warning(s) (DESIGN 27.1 S2)", warned);
+			}
+		}
 	}
 
 	/** Runs one module's registration with its own net id block; a crash in a module only loses that module's specs. */
@@ -283,6 +298,7 @@ public final class TechniqueRegistry {
 					.perfection(Bonus.payload(dev.kultivator.technique.spec.dsl.Dsl.freeze(40)))
 					.peak(Bonus.steps(at(20).shape(wave().r1Previous(0.0D).speed(1.5D)).hit(damage(0.5D).shatter()))));
 			legacy(map, Technique.GLACIER_PRISON, TechniqueGrade.XUAN, 2, TechniqueType.KENDALI, true, b -> b
+					.bindLook(dev.kultivator.technique.spec.run.BindKind.FREEZE)
 					.perfection(Bonus.durationTicks(40))
 					.peak(Bonus.steps(atEnd().shape(recall()).hit(damage(1.0D).shatter()))));
 			legacy(map, Technique.THUNDER_PALM, TechniqueGrade.XUAN, 0, TechniqueType.SERANG, true, b -> b
@@ -339,6 +355,7 @@ public final class TechniqueRegistry {
 					.comprehension(technique.minComprehension())
 					.flag(teachable ? TechniqueSpec.Flag.TEACHABLE : TechniqueSpec.Flag.NO_TEACH)
 					.legacy(technique);
+			legacyPose(builder, technique);
 			switch (technique.unlock()) {
 				case REALM -> builder.route(Route.realm());
 				case DAO -> builder.route(Route.dao());
@@ -346,6 +363,32 @@ public final class TechniqueRegistry {
 			}
 			extra.accept(builder);
 			map.put(technique, builder.build());
+		}
+
+		/** The cast pose of each legacy technique (DESIGN 27.2.4 table 6.12): what the body does when it is cast. */
+		private static void legacyPose(TechniqueSpec.Builder builder, Technique technique) {
+			switch (technique) {
+				case QI_PALM, FLAME_PALM -> builder.pose(Pose.PALM_THRUST);
+				case THUNDER_PALM -> builder.pose(Pose.SKY_RAISE).pose(Phase.IMPACT, Pose.PALM_THRUST);
+				case MOUNTAIN_STOMP -> builder.pose(Pose.STOMP);
+				case DAO_DOMAIN -> builder.pose(Pose.ARMS_SPREAD);
+				case SPRING_OF_LIFE -> builder.pose(Pose.MEDITATE_FLOAT);
+				case LIFE_DRAIN -> builder.pose(Pose.FINGER_POINT);
+				case GALE -> builder.pose(Pose.FAN_SWING);
+				case SPACE_PRISON, FROST_LOTUS -> builder.pose(Pose.SEAL);
+				case BUDDHA_PALM -> builder.pose(Pose.SKY_RAISE).pose(Phase.IMPACT, Pose.OVERHEAD_SLAM);
+				case THOUSAND_SWORDS -> builder.pose(Pose.SWORD_SKY);
+				case SWORD_QI -> builder.pose(Pose.SWORD_SLASH);
+				case PHOENIX_FLAME, GLACIER_PRISON -> builder.pose(Pose.TWIN_PALM);
+				case HEAVENLY_THUNDER -> builder.pose(Pose.SKY_RAISE);
+				case IRON_BODY -> builder.pose(Pose.GATE_FLEX);
+				case DHARMA_FORM -> builder.pose(Pose.SUMMON_RAISE);
+				case DIVINE_SENSE -> builder.pose(Pose.SEAL);
+				case SHADOW_STEP, SPACE_BLINK -> builder.pose(Pose.DASH_LEAN);
+				case CLOUD_STEP, FLYING_SWORD -> builder.pose(Pose.NONE);
+				default -> {
+				}
+			}
 		}
 
 		/** The enchantments of DESIGN 7 that teach each legacy book technique. */

@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "kultivator:item/natal_wok_gold"
-  }
+ "parent": "kultivator:item/fx/natal_wok_gold"
 }

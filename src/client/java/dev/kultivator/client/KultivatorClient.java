@@ -39,6 +39,9 @@ public class KultivatorClient implements ClientModInitializer {
 		// Phase 6b (DESIGN 21.24).
 		dev.kultivator.client.sectbuild.BuildClient.init();
 		// Phase 6c (DESIGN 22.18.1 item 13). The technique registry itself is built by the main entrypoint only.
+		// Polish pass (DESIGN 27): the emissive qi particles, the animation and model module, then the technique effects.
+		dev.kultivator.client.fx.qi.Qi.init();
+		dev.kultivator.client.fx.spec.AnimBridge.init();
 		dev.kultivator.client.fx.spec.SpecFx.init();
 		dev.kultivator.client.codex.CodexClient.init();
 		// Phase 7 (DESIGN 19.2.14); GoalsClient registers its own HUD elements.
@@ -74,6 +77,8 @@ public class KultivatorClient implements ClientModInitializer {
 				dev.kultivator.client.sectbuild.BuildClient.onPreview(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.TechFx.TYPE, (payload, context) ->
 				dev.kultivator.client.fx.spec.SpecFx.play(payload));
+		ClientPlayNetworking.registerGlobalReceiver(Payloads.PhantomSync.TYPE, (payload, context) ->
+				dev.kultivator.client.fx.spec.PhantomFx.onSync(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.EpicMoment.TYPE, dev.kultivator.client.epic.EpicClient::onPayload);
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.FormasiSync.TYPE, (payload, context) ->
 				dev.kultivator.client.formasi.FormasiClient.onSync(payload.data()));

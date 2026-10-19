@@ -54,8 +54,14 @@ public final class DivineClones {
 	private static final Identifier HEALTH_ID = Kultivator.id("path_clone_health");
 	private static final Identifier ATTACK_ID = Kultivator.id("path_clone_attack");
 
-	private record Clone(DiscipleEntity body, DiscipleEntity source, long until) {
+	private record Clone(DiscipleEntity body, DiscipleEntity source, long until, boolean fading) {
+		Clone(DiscipleEntity body, DiscipleEntity source, long until) {
+			this(body, source, until, false);
+		}
 	}
+
+	/** Ticks the fade-out (PathFxIds.CLONE b = 1) runs on the clients before the body goes (DESIGN 27.6). */
+	public static final int FADE_TICKS = 10;
 
 	/** Clone entity UUID -> its record. */
 	private static final Map<UUID, Clone> CLONES = new HashMap<>();
@@ -149,9 +155,12 @@ public final class DivineClones {
 		return count;
 	}
 
-	/** Once a second: clones fade when their time is up or their source is gone. */
+	/**
+	 * Every half second: clones fade when their time is up or their source is gone. The fade packet goes out
+	 * {@link #FADE_TICKS} before the body is removed, so the clients ramp the clone's alpha down instead of a pop.
+	 */
 	static void tick(MinecraftServer server) {
-		if (CLONES.isEmpty() || server.getTickCount() % 20 != 0) {
+		if (CLONES.isEmpty() || server.getTickCount() % FADE_TICKS != 0) {
 			return;
 		}
 		long now = DisciplePaths.now(server);
@@ -163,18 +172,25 @@ public final class DivineClones {
 				CLONES.remove(entry.getKey());
 				continue;
 			}
-			if (now >= clone.until() || sourceGone) {
+			if (clone.fading() && now >= clone.until()) {
 				CLONES.remove(entry.getKey());
-				vanish(body);
+				vanish(body, false);
+			} else if (!clone.fading() && (now + FADE_TICKS >= clone.until() || sourceGone)) {
+				if (body.level() instanceof ServerLevel level) {
+					Fx.send(level, body.position(), FxType.STAR, PathFxIds.CLONE, 1, FADE_TICKS);
+				}
+				CLONES.put(entry.getKey(), new Clone(body, clone.source(), now + FADE_TICKS, true));
 			} else if (body.getTarget() == null && clone.source().getTarget() != null && body.mayAttack(clone.source().getTarget())) {
 				body.setTarget(clone.source().getTarget());
 			}
 		}
 	}
 
-	private static void vanish(DiscipleEntity body) {
+	private static void vanish(DiscipleEntity body, boolean fadePacket) {
 		if (body.level() instanceof ServerLevel level) {
-			Fx.send(level, body.position(), FxType.STAR, PathFxIds.CLONE, 1, 1.0F);
+			if (fadePacket) {
+				Fx.send(level, body.position(), FxType.STAR, PathFxIds.CLONE, 1, 1.0F);
+			}
 			DisciplePaths.sound(level, body.position(), SoundEvents.ILLUSIONER_MIRROR_MOVE, 0.7F, 1.4F);
 		}
 		body.discard();

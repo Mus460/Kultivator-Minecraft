@@ -509,7 +509,8 @@ public final class Heir {
 			castingId = id;
 			boolean cast;
 			try {
-				cast = DiscipleTechniques.cast(entity, technique, target);
+				// through the spec runner (DESIGN 27.6): the hex gets its TechFx, its pose and its layers on every client
+				cast = DiscipleTechniques.trySpec(entity, dev.kultivator.data.TechniqueRegistry.legacy(technique), target);
 			} finally {
 				castingEntity = null;
 				castingId = null;

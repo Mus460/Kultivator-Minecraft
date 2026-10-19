@@ -329,7 +329,10 @@ public final class TechniquePower {
 	public static final int GLOWING_PER_CAST = 64;
 	public static final int FIELDS_PER_CASTER = 2;
 	public static final int TELEPORT_GAP = 3;
-	public static final int FX_EVENTS_PER_SECOND = 20;
+	/** IMPACT / TRAVEL / EXTRA / PULSE events of one cast per second (CAST, CHARGE, END and ABORT are never capped). */
+	public static final int FX_EVENTS_PER_SECOND = 40;
+	/** HIT events of one cast per second; the rest fold into one MASS_HIT per tick. */
+	public static final int FX_HITS_PER_SECOND = 12;
 	public static final int FX_MASS_HIT = 8;
 	public static final double FX_RANGE = 96.0D;
 	public static final double FX_RANGE_BIG = 160.0D;
