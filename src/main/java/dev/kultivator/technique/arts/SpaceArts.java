@@ -24,6 +24,7 @@ import dev.kultivator.technique.spec.dsl.Payload.Eff;
 import dev.kultivator.technique.spec.dsl.Payload.Facing;
 import dev.kultivator.technique.spec.dsl.Payload.Store;
 import dev.kultivator.technique.spec.dsl.Phase;
+import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.SoundCue;
 import net.minecraft.core.particles.ParticleTypes;
@@ -64,15 +65,18 @@ public final class SpaceArts {
 		// 900 · Bilah Ruang (Martial Peak ch. 1139)
 		sink.add(art("space_blade", 900, Dao.SPACE)
 				.grade(TechniqueGrade.XUAN, 0).type(TechniqueType.SERANG).realm(Realm.GOLDEN_CORE)
+				.pose(Pose.SWORD_SLASH)
 				.route(Route.dao()).comprehension(10)
 				.qi(22).cooldown(4.0D)
 				.step(at(0).shape(beam().length(20, 48).halfWidth(0.6D).pierce()).hit(damage(1.5D).pierce()))
-				.fx(Phase.CAST,
+				.fx(Phase.CAST, impact(PURPLE).particle(ParticleTypes.REVERSE_PORTAL).onCaster().above(1.2F).count(10).ticks(6))
+				.fx(Phase.TRAVEL,
 						beamCore(VOID).count(40).ticks(10),
 						beamCore(0xFFFFFF).particle(ParticleTypes.END_ROD).count(16).detail(),
-						laser(blackGlass, 0.3F, 48.0F).ticks(14).minTier(3))
+						laser(blackGlass, 0.3F, 48.0F).ticks(14),
+						trail(PURPLE).particle(ParticleTypes.REVERSE_PORTAL).count(16).ticks(10).extra())
 				.fx(Phase.HIT, impact(PURPLE).particle(ParticleTypes.REVERSE_PORTAL).count(12))
-				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_BREAK, 1.0F, 1.8F)
+				.sound(Phase.TRAVEL, SoundEvents.AMETHYST_BLOCK_BREAK, 1.0F, 1.8F)
 				.sound(Phase.CAST, SoundEvents.ENDERMAN_TELEPORT, 0.7F, 2.0F)
 				.kehancuran(DShape.trench(16, 1, 2))
 				.perfection(Bonus.extraCount(2, 0.6D))
@@ -82,6 +86,7 @@ public final class SpaceArts {
 		// 901 · Tali Pengikat Abadi (Investiture of the Gods ch. 53-54)
 		sink.add(art("immortal_binding_rope", 901, Dao.SPACE)
 				.grade(TechniqueGrade.XUAN, 1).type(TechniqueType.KENDALI).realm(Realm.GOLDEN_CORE)
+				.pose(Pose.FINGER_POINT).pose(Phase.EXTRA0, Pose.CHARGE_BACK).bindLook(dev.kultivator.technique.spec.run.BindKind.ROPE)
 				.route(Route.book("minecraft:loyalty"))
 				.flag(Flag.REQUIRES_TARGET)
 				.stages(2, 60).qiPerStage(28, 0)
@@ -91,7 +96,7 @@ public final class SpaceArts {
 				.step(at(0).stage(2).shape(recall()).hit(pull(6.0D).blocks()).phase(0))
 				.fx(Phase.CAST,
 						chains(GOLD).count(30).ticks(16),
-						giantItem(Items.LEAD).scale(1.5F).spin(6.0F).onTarget().ticks(80).minTier(3))
+						model("chain_link_gold").onTarget().scale(1.5F).spin(6.0F).ticks(80))
 				.fx(Phase.HIT, chains(GOLD).count(12).ticks(80))
 				.fx(Phase.EXTRA0, chains(GOLD).count(24).ticks(10))
 				.sound(Phase.CAST, SoundEvents.ARMOR_EQUIP_CHAIN, 1.0F, 1.0F)
@@ -103,6 +108,7 @@ public final class SpaceArts {
 		// 902 · Gelang Qiankun (Investiture of the Gods ch. 12)
 		sink.add(art("qiankun_ring", 902, Dao.SPACE)
 				.grade(TechniqueGrade.XUAN, 2).type(TechniqueType.SERANG).realm(Realm.NASCENT_SOUL)
+				.pose(Pose.PALM_THRUST)
 				.route(Route.comp(30), Route.book("minecraft:infinity"))
 				.flag(Flag.REQUIRES_TARGET)
 				.qi(50).cooldown(12.0D)
@@ -113,6 +119,7 @@ public final class SpaceArts {
 						runeCircle(GOLD).n(16).radius(0.8F).spin(30.0F).count(16).ticks(6).detail())
 				.fx(Phase.HIT, impact(GOLD).particle(ParticleTypes.FIREWORK).count(12))
 				.fx(Phase.END, trail(GOLD).count(16))
+				.fx(Phase.TRAVEL, model("qiankun_ring").scale(1.5F).slide(4.0F).ticks(6).facing(FxLayer.Facing.FLAT))
 				.sound(Phase.CAST, SoundEvents.TRIDENT_THROW, 1.0F, 1.4F)
 				.sound(Phase.HIT, SoundEvents.BELL_BLOCK, 0.8F, 1.2F)
 				.perfection(Bonus.chain(2))
@@ -122,6 +129,7 @@ public final class SpaceArts {
 		// 903 · Ruang Gravitasi (Coiling Dragon, Books 15-16)
 		sink.add(art("gravitational_space", 903, Dao.SPACE)
 				.grade(TechniqueGrade.DI, 0).type(TechniqueType.KENDALI).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.ARMS_SPREAD)
 				.route(Route.comp(30), Route.book("minecraft:silk_touch"))
 				.qi(110).cooldown(40.0D)
 				.step(at(0).shape(domain().radius(10, 24).height(12).duration(240, 360).pulse(20))
@@ -145,6 +153,7 @@ public final class SpaceArts {
 		// 904 · Bilah Rembulan (Martial Peak)
 		sink.add(art("moon_blade", 904, Dao.SPACE)
 				.grade(TechniqueGrade.DI, 1).type(TechniqueType.AREA).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.SWORD_SLASH)
 				.route(Route.comp(60), Route.pav())
 				.flag(Flag.PAVILION)
 				.qi(100).cooldown(18.0D)
@@ -154,7 +163,7 @@ public final class SpaceArts {
 				.fx(Phase.TRAVEL,
 						crescentFly(0xFFFFFF).count(50),
 						crescentFly(VOID).particle(ParticleTypes.REVERSE_PORTAL).count(20).detail(),
-						laser(whiteGlass, 0.2F, 4.0F).ticks(16).minTier(3))
+						laser(whiteGlass, 0.2F, 4.0F).slide(16.0F).ticks(16))
 				.fx(Phase.HIT, impact(0xFFFFFF).particle(ParticleTypes.END_ROD).count(10))
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.6F)
 				.sound(Phase.CAST, SoundEvents.ILLUSIONER_CAST_SPELL, 0.8F, 1.0F)
@@ -166,6 +175,7 @@ public final class SpaceArts {
 		// 905 · Labu Merah Ungu-Emas (Journey to the West ch. 32-35)
 		sink.add(art("purple_gold_gourd", 905, Dao.SPACE)
 				.grade(TechniqueGrade.DI, 0).type(TechniqueType.SERANG).realm(Realm.DAO_UNION)
+				.pose(Pose.HOLD_ITEM_UP).pose(Phase.EXTRA0, Pose.HOLD_ITEM_UP)
 				.route(Route.book("minecraft:piercing"), Route.pav())
 				.flag(Flag.NO_TEACH, Flag.PAVILION, Flag.REQUIRES_TARGET)
 				.qi(160).cooldown(30.0D)
@@ -178,10 +188,12 @@ public final class SpaceArts {
 				.fx(Phase.CAST,
 						mist(RED).color2(GOLD).above(3.0F).count(40).ticks(20),
 						vortex(GOLD).above(3.0F).count(20).ticks(20).detail())
-				.fx(Phase.HIT, glyph("名").scale(2.0F).above(1.5F).onTarget().ticks(20).minTier(3))
+				.fx(Phase.HIT, glyph("名").scale(2.0F).above(1.5F).onTarget().ticks(20).minTier(1))
 				.fx(Phase.EXTRA0,
 						vortex(RED).inward().count(40).ticks(16),
 						motesTo(GOLD).count(30).ticks(16).detail())
+				.fx(Phase.CAST, model("zijin_gourd").fromHand().above(1.5F).scale(1.5F).ticks(30).until(Phase.EXTRA0))
+				.fx(Phase.EXTRA0, model("zijin_gourd").fromHand().above(1.5F).scale(1.5F).ticks(20), model("gourd_stopper").fromHand().above(2.3F).scale(1.0F).rise(1.5F, 6.0F).ticks(12))
 				.sound(Phase.CAST, SoundEvents.CHORUS_FRUIT_TELEPORT, 1.0F, 0.6F)
 				.sound(Phase.EXTRA0, SoundEvents.BOTTLE_FILL_DRAGONBREATH, 1.0F, 1.0F)
 				.sound(Phase.EXTRA0, SoundCue.of(SoundEvents.SHULKER_CLOSE, 1.0F, 1.0F).delay(6))
@@ -192,6 +204,7 @@ public final class SpaceArts {
 		// 906 · Segel Pembalik Langit (Investiture of the Gods ch. 46)
 		sink.add(art("heaven_turning_seal", 906, Dao.SPACE)
 				.grade(TechniqueGrade.DI, 2).type(TechniqueType.AREA).realm(Realm.DAO_UNION)
+				.pose(Pose.SKY_RAISE).pose(Phase.IMPACT, Pose.OVERHEAD_SLAM)
 				.route(Route.pav(), Route.feat(Feat.killsWith(Dao.SPACE, Cond.IN_END, null, 100)))
 				.flag(Flag.PAVILION)
 				.qi(220).cooldown(50.0D)
@@ -199,13 +212,14 @@ public final class SpaceArts {
 						.hit(damage(3.5D), bind(BindKind.ROOT, 40).boss(10)))
 				.step(at(20).shape(wave().from(Anchor.AIM).r1Previous(4.0D).speed(2.0D)).hit(damage(1.0D), knock(1.0D)))
 				.fx(Phase.CAST,
-						runeCircle(0xC8A050).size(8.0F).count(40).ticks(20),
-						giantBlock(Blocks.GILDED_BLACKSTONE.defaultBlockState()).blockSize(8.0F, 8.0F, 8.0F).fall(30.0F, 20.0F)
-								.ticks(30).minTier(3),
-						glyph("番天").scale(6.0F).fall(30.0F, 20.0F).ticks(30).minTier(3))
+						runeCircle(0xC8A050).radius(8.0F).count(40).ticks(20),
+						mist(0xC8A050).inSky().count(20).ticks(20).detail())
+				// the seal falls on the pre-impact TRAVEL (30 up, 20 ticks) and lands exactly on the IMPACT
+				.fx(Phase.TRAVEL, model("fantian_seal").scale(8.0F).fall(30.0F, 20.0F).ticks(24).facing(FxLayer.Facing.FLAT),
+						glyph("番天").scale(6.0F).fall(30.0F, 20.0F).ticks(22))
 				.fx(Phase.IMPACT,
 						flash(0xFFE0A0, 0.3F, 6),
-						shockRing(0x8A7A60).size(16.0F).count(60),
+						shockRing(0x8A7A60).radius(16.0F).count(60),
 						impact(0xC8A050).count(30).detail(),
 						shake(0.45F, 14))
 				.sound(Phase.CAST, SoundEvents.ANVIL_LAND, 1.0F, 0.4F)
@@ -219,6 +233,7 @@ public final class SpaceArts {
 		// 907 · Simbol Leluhur Ruang (Martial Universe ch. 1209), special space_fold
 		sink.add(art("spatial_ancestral_symbol", 907, Dao.SPACE)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.KENDALI).realm(Realm.IMMORTAL_ASCENSION, 1)
+				.pose(Pose.SEAL)
 				.route(Route.comp(70), Route.inh("space"))
 				.special(SpaceFold.ID)
 				.flag(Flag.NO_TEACH, Flag.NO_ECHO)
@@ -228,13 +243,14 @@ public final class SpaceArts {
 								.height(SpaceFold.HEIGHT).duration(SpaceFold.DURATION).pulse(20))
 						.hit(damage(0.5D).pierce()))
 				.fx(Phase.CAST,
-						runeCircle(RUNE).variant(FxLayer.Variant.VERTICAL).size(16.0F).count(60).ticks(40),
+						runeCircle(RUNE).variant(FxLayer.Variant.VERTICAL).radius(16.0F).count(60).ticks(40),
 						mist(PURPLE).particle(ParticleTypes.REVERSE_PORTAL).count(40).ticks(30),
 						glyph("空").scale(12.0F).above(10.0F).ticks(200),
 						shake(0.2F, 10))
-				.fx(Phase.PULSE, runeCircle(RUNE).size(16.0F).count(30).ticks(20), mist(PURPLE).particle(ParticleTypes.REVERSE_PORTAL).count(20).detail())
-				.fx(Phase.EXTRA0, vortex(PURPLE).inward().particle(ParticleTypes.REVERSE_PORTAL).size(16.0F).count(60).ticks(16), shake(0.2F, 8))
+				.fx(Phase.PULSE, runeCircle(RUNE).radius(16.0F).count(30).ticks(20), mist(PURPLE).particle(ParticleTypes.REVERSE_PORTAL).count(20).detail())
+				.fx(Phase.EXTRA0, vortex(PURPLE).inward().particle(ParticleTypes.REVERSE_PORTAL).radius(16.0F).count(60).ticks(16), shake(0.2F, 8))
 				.fx(Phase.EXTRA1, trail(PURPLE).particle(ParticleTypes.REVERSE_PORTAL).count(24), afterimage(RUNE).count(12).detail())
+				.fx(Phase.CAST, model("space_symbol").above(10.0F).scale(6.0F).ticks(200).facing(FxLayer.Facing.FACE_VIEWER))
 				.sound(Phase.CAST, SoundEvents.RESPAWN_ANCHOR_CHARGE, 1.2F, 1.0F)
 				.sound(Phase.EXTRA0, SoundEvents.PORTAL_TRIGGER, 0.5F, 1.8F)
 				.sound(Phase.EXTRA0, SoundEvents.RESPAWN_ANCHOR_CHARGE, 1.0F, 0.8F)
@@ -247,6 +263,7 @@ public final class SpaceArts {
 		// 908 · Kantong Benih Alis Kuning (Journey to the West ch. 65-66)
 		sink.add(art("yellow_brow_bag", 908, Dao.SPACE)
 				.grade(TechniqueGrade.TIAN, 1).type(TechniqueType.KENDALI).realm(Realm.IMMORTAL_ASCENSION, 4)
+				.pose(Pose.HOLD_ITEM_UP).castTicks(160)
 				.route(Route.comp(75), Route.pav())
 				.flag(Flag.NO_TEACH, Flag.PAVILION, Flag.NO_ECHO)
 				.qi(350).cooldown(110.0D)
@@ -257,13 +274,13 @@ public final class SpaceArts {
 						.hit(bind(BindKind.SUSPEND, 100), dot(0.5D, 5, DotKind.QI)).phase(0))
 				.step(at(160).shape(recall()).hit(knock(2.0D), damage(3.0D)).phase(1))
 				.fx(Phase.CAST,
-						giantItem(Items.BUNDLE).scale(10.0F).above(4.0F).ticks(160),
-						vortex(0xC8A060).inward().size(20.0F).count(60).ticks(60))
+						model("seed_bag").above(4.0F).scale(4.0F).grow(0.3F, 10.0F).ticks(160).facing(FxLayer.Facing.FACE_FORWARD),
+						vortex(0xC8A060).inward().radius(20.0F).count(60).ticks(60))
 				.fx(Phase.EXTRA0,
-						giantBlock(Blocks.GOLD_BLOCK.defaultBlockState()).blockSize(4.0F, 0.4F, 4.0F).fall(6.0F, 10.0F).ticks(100),
+						model("cymbal").scale(3.0F).fall(6.0F, 10.0F).ticks(100).facing(FxLayer.Facing.FLAT),
 						shell(GOLD).count(30).detail(),
 						shake(0.2F, 10))
-				.fx(Phase.EXTRA1, shell(0xC8A060).size(8.0F).count(60), shake(0.2F, 10))
+				.fx(Phase.EXTRA1, shell(0xC8A060).radius(8.0F).count(60), shake(0.2F, 10))
 				.sound(Phase.CAST, SoundEvents.BUNDLE_INSERT, 1.4F, 0.6F)
 				.sound(Phase.EXTRA0, SoundEvents.BELL_RESONATE, 1.2F, 1.0F)
 				.sound(Phase.EXTRA1, SoundEvents.BUNDLE_INSERT, 1.4F, 0.5F)
@@ -274,6 +291,7 @@ public final class SpaceArts {
 		// 909 · Larangan Langit Berlapis (inspired by Renegade Immortal)
 		sink.add(art("heavenly_restriction", 909, Dao.SPACE)
 				.grade(TechniqueGrade.TIAN, 2).type(TechniqueType.PAMUNGKAS).realm(Realm.IMMORTAL_ASCENSION, 7)
+				.pose(Pose.SEAL).pose(Phase.EXTRA0, Pose.TWIN_PALM).climax(Phase.EXTRA0)
 				.route(Route.comp(85), Route.feat(Feat.castsWith(Dao.SPACE, Cond.IN_END, 100)))
 				.flag(Flag.NO_TEACH)
 				.qi(450).cooldown(150.0D)
@@ -282,11 +300,12 @@ public final class SpaceArts {
 						.hit(damage(0.6D), attrPct(AttrKind.MOVEMENT_SPEED, -1.0D, 40), eff(Eff.WEAKNESS, 3, 40)))
 				.step(at(160).shape(all().ofArea().max(32)).hit(damage(6.0D)).phase(0))
 				.fx(Phase.CAST,
-						runeCircle(RUNE).variant(FxLayer.Variant.VERTICAL).size(10.0F).count(80).ticks(40),
+						runeCircle(RUNE).variant(FxLayer.Variant.VERTICAL).radius(10.0F).count(80).ticks(40),
 						swordRing(Items.BANNER.purple(), 4, 14.0F).orbit(14.0F, 0.0F).scale(3.0F).ticks(160),
 						shake(0.1F, 8))
-				.fx(Phase.PULSE, shell(RUNE).size(10.0F).count(40).ticks(20), shake(0.1F, 6))
-				.fx(Phase.EXTRA0, shell(RUNE).inward().size(10.0F).count(120), flash(0xB070FF, 0.25F, 6), shake(0.7F, 20))
+				.fx(Phase.PULSE, shell(RUNE).radius(10.0F).count(40).ticks(20))
+				.fx(Phase.EXTRA0, shell(RUNE).inward().radius(10.0F).count(120), flash(0xB070FF, 0.25F, 6), shake(0.7F, 20))
+				.fx(Phase.CAST, model("restriction_seal").n(4).radius(14.0F).scale(7.0F).ticks(160).facing(FxLayer.Facing.FACE_FORWARD).extra())
 				.sound(Phase.CAST, SoundEvents.RESPAWN_ANCHOR_CHARGE, 1.4F, 0.8F)
 				.sound(Phase.CAST, SoundEvents.BEACON_POWER_SELECT, 1.2F, 1.0F)
 				.sound(Phase.PULSE, SoundEvents.RESPAWN_ANCHOR_CHARGE, 0.6F, 1.2F)
@@ -299,6 +318,7 @@ public final class SpaceArts {
 		// 910 · Cermin Hampa (Shrouded the Heavens)
 		sink.add(art("void_mirror", 910, Dao.SPACE)
 				.grade(TechniqueGrade.ABADI, 0).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Pose.HOLD_ITEM_UP).pose(Phase.EXTRA0, Pose.TWIN_PALM)
 				.route(Route.feat(Feat.firstKill("minecraft:ender_dragon", Dao.SPACE)), Route.inh("space"))
 				.flag(Flag.NO_TEACH, Flag.CAST_ALWAYS, Flag.NO_ECHO)
 				.stages(2, 200)
@@ -310,16 +330,17 @@ public final class SpaceArts {
 				.step(at(0).stageOrEnd(2).shape(beam().length(64).halfWidth(3).pierce().ignoreBlocks())
 						.hit(damage(10.0D).perStored(1.0D)).phase(0))
 				.fx(Phase.CAST,
-						giantBlock(Blocks.COPPER_BLOCK.weathering().unaffected().defaultBlockState()).blockSize(9.0F, 9.0F, 0.3F)
-								.above(1.0F).onCaster().ticks(200),
-						giantBlock(Blocks.TINTED_GLASS.defaultBlockState()).blockSize(8.0F, 8.0F, 0.4F).above(1.5F).onCaster().ticks(200),
-						vortex(0x2A1050).particle(ParticleTypes.PORTAL).onCaster().size(4.0F).count(40).ticks(200),
+						model("void_mirror").onCaster().above(1.5F).scale(4.0F).ticks(200).until(Phase.EXTRA0).facing(FxLayer.Facing.FACE_FORWARD),
+						vortex(0x2A1050).particle(ParticleTypes.PORTAL).onCaster().size(1.5F).count(40).ticks(200),
 						shake(0.3F, 10))
 				.fx(Phase.EXTRA0,
 						laser(blackGlass, 3.0F, 128.0F).ticks(30),
 						beamCore(VOID).particle(ParticleTypes.REVERSE_PORTAL).count(80).ticks(16),
 						flash(0x2A1050, 0.3F, 6),
 						shake(0.7F, 24))
+				// every blow and shot the mirror takes ripples its glass
+				.fx(Phase.EXTRA6, shockRing(0x2A1050).onCaster().above(1.5F).radius(2.5F).vertical().count(16).ticks(8))
+				.fx(Phase.EXTRA7, shockRing(0x2A1050).onCaster().above(1.5F).radius(2.5F).vertical().count(16).ticks(8), impact(VOID).particle(ParticleTypes.REVERSE_PORTAL).count(8).ticks(6))
 				.sound(Phase.CAST, SoundEvents.PORTAL_AMBIENT, 1.2F, 1.0F)
 				.sound(Phase.EXTRA0, SoundEvents.WARDEN_SONIC_BOOM, 2.0F, 0.8F)
 				.sound(Phase.EXTRA0, SoundEvents.PORTAL_AMBIENT, 1.0F, 0.6F)
@@ -331,6 +352,7 @@ public final class SpaceArts {
 		// 911 · Wilayah Roh Waktu (A Record of a Mortal's Journey), special time_bank
 		sink.add(art("time_spirit_domain", 911, Dao.SPACE)
 				.grade(TechniqueGrade.DEWA, 0).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Pose.ARMS_SPREAD).bindLook(dev.kultivator.technique.spec.run.BindKind.TIME_STOP)
 				.gate(Gate.DEWA_I).prereq("void_mirror", 3)
 				.special(TimeBank.ID)
 				.flag(Flag.NO_TEACH)
@@ -350,9 +372,11 @@ public final class SpaceArts {
 				.fx(Phase.PULSE, dome(TIME).count(20).ticks(20).detail())
 				.fx(Phase.EXTRA0,
 						flash(0xE0E8FF, 0.35F, 8),
-						shell(0xFFFFFF).particle(ParticleTypes.SONIC_BOOM).size(8.0F).count(12),
-						shell(TIME).size(24.0F).count(80).detail(),
+						shell(0xFFFFFF).particle(ParticleTypes.SONIC_BOOM).radius(8.0F).count(12),
+						shell(TIME).radius(24.0F).count(80).detail(),
 						shake(1.0F, 30))
+				.fx(Phase.CAST, model("time_clock").onCaster().above(6.0F).scale(6.0F).ticks(TimeBank.DURATION).facing(FxLayer.Facing.FACE_VIEWER))
+				.fx(Phase.EXTRA1, impact(0xF0D080).particle(ParticleTypes.END_ROD).count(6).ticks(8), shockRing(TIME).radius(1.0F).count(10).ticks(6).detail())
 				.sound(Phase.CAST, SoundEvents.NOTE_BLOCK_HAT, 1.0F, 1.6F)
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.NOTE_BLOCK_HAT, 1.0F, 1.2F).delay(10))
 				.sound(Phase.PULSE, SoundEvents.NOTE_BLOCK_HAT, 0.8F, 1.6F)
@@ -366,6 +390,7 @@ public final class SpaceArts {
 		// 912 · Lubang Hitam (Stellar Transformations)
 		sink.add(art("stellar_black_hole", 912, Dao.SPACE)
 				.grade(TechniqueGrade.DEWA, 1).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Pose.CHARGE_OVERHEAD).climax(Phase.EXTRA0)
 				.gate(Gate.DEWA_II).prereq("void_mirror", 3).prereq("gravitational_space", 4).prereq("time_spirit_domain", 4)
 				.flag(Flag.TEACHABLE)
 				.dewaStars(64).teachStars(64)
@@ -376,17 +401,17 @@ public final class SpaceArts {
 				.step(at(120).shape(nova().radius(16).at(Anchor.AREA)).hit(damage(18.0D)).phase(0))
 				.step(at(120).shape(all().ofArea().max(64)).hit(damage(4.0D)))
 				.fx(Phase.CAST,
-						giantBlock(Blocks.CONCRETE.black().defaultBlockState()).blockSize(4.0F, 4.0F, 4.0F).spin(3.0F).ticks(120),
-						petalRing(Blocks.STAINED_GLASS.orange().defaultBlockState(), 16, 10.0F).spin(6.0F).ticks(120),
-						vortex(ACCRETION).inward().size(32.0F).count(80).ticks(40),
+						model("black_hole_core").scale(4.0F).spin(3.0F).ticks(120),
+						model("accretion_segment").n(16).radius(10.0F).scale(2.0F).spin(6.0F).ticks(120).facing(FxLayer.Facing.FLAT),
+						petalRing(Blocks.STAINED_GLASS.orange().defaultBlockState(), 16, 10.0F).spin(6.0F).ticks(120).extra(),
+						vortex(ACCRETION).inward().radius(32.0F).count(80).ticks(40),
 						sky(0x100010).ticks(120),
 						shake(0.5F, 20))
 				.fx(Phase.PULSE,
-						vortex(ACCRETION).inward().size(24.0F).count(40).ticks(10),
-						vortex(0x3A1060).inward().particle(ParticleTypes.REVERSE_PORTAL).size(16.0F).count(30).ticks(10).detail(),
-						shake(0.5F, 10))
+						vortex(ACCRETION).inward().radius(24.0F).count(40).ticks(10),
+						vortex(0x3A1060).inward().particle(ParticleTypes.REVERSE_PORTAL).radius(16.0F).count(30).ticks(10).detail())
 				.fx(Phase.EXTRA0,
-						shell(0xFFFFFF).size(16.0F).count(160),
+						shell(0xFFFFFF).radius(16.0F).count(160),
 						flash(0xFFE8C0, 0.35F, 8),
 						impact(ACCRETION).particle(ParticleTypes.EXPLOSION_EMITTER).count(3).detail(),
 						shake(1.0F, 30))

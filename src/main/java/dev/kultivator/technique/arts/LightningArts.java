@@ -22,6 +22,7 @@ import dev.kultivator.technique.spec.dsl.Payload.BindKind;
 import dev.kultivator.technique.spec.dsl.Payload.BuffKind;
 import dev.kultivator.technique.spec.dsl.Payload.Eff;
 import dev.kultivator.technique.spec.dsl.Phase;
+import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
@@ -61,6 +62,7 @@ public final class LightningArts {
 		// 500 · Cambuk Zidian (Mo Dao Zu Shi)
 		sink.add(art("zidian_whip", 500, Dao.LIGHTNING)
 				.grade(TechniqueGrade.XUAN, 0).type(TechniqueType.SERANG).realm(Realm.GOLDEN_CORE)
+				.pose(Pose.SWORD_SLASH).pose(Phase.TRAVEL, Pose.SWORD_SLASH)
 				.route(Route.book("minecraft:channeling")).comprehension(15)
 				.flag(Flag.TEACHABLE, Flag.REQUIRES_TARGET)
 				.qi(25).cooldown(6.0D)
@@ -75,6 +77,7 @@ public final class LightningArts {
 				.fx(Phase.HIT,
 						bolt(VIOLET).count(24).ticks(6),
 						impact(SPARK).particle(ParticleTypes.ELECTRIC_SPARK).count(8).detail())
+				.fx(Phase.TRAVEL, ribbon(VIOLET).color2(PALE).count(16).ticks(6))
 				.sound(Phase.CAST, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.3F, 2.0F)
 				.sound(Phase.HIT, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.2F, 1.8F)
 				.perfection(Bonus.chain(2))
@@ -84,13 +87,14 @@ public final class LightningArts {
 		// 501 · Kilat: Tiga Ribu Gerak Petir (Battle Through the Heavens)
 		sink.add(art("lightning_flash_step", 501, Dao.LIGHTNING)
 				.grade(TechniqueGrade.XUAN, 1).type(TechniqueType.GERAK).realm(Realm.GOLDEN_CORE)
+				.pose(Pose.DASH_LEAN)
 				.route(Route.dao()).comprehension(10)
 				.flag(Flag.TEACHABLE, Flag.CAST_ALWAYS, Flag.NO_ECHO)
 				.charges(2, 80)
 				.qi(20).cooldownTicks(80)
 				.step(at(0).shape(path().halfWidth(1.5D)).self(dash(8, 16))
 						.hit(damage(0.8D), bind(BindKind.STUN, 10)))
-				.step(at(6).minTier(2).shape(nova().radius(3).at(Anchor.AFTERIMAGE)).hit(damage(1.0D)))
+				.step(at(6).minTier(1).shape(nova().radius(3).at(Anchor.AFTERIMAGE)).hit(damage(1.0D)))
 				.fx(Phase.CAST,
 						afterimage(SPARK).count(16).ticks(12),
 						impact(PALE).particle(ParticleTypes.ELECTRIC_SPARK).count(10).detail())
@@ -108,6 +112,7 @@ public final class LightningArts {
 		// 502 · Tanda, Zirah dan Sayap Petir (Martial God Asura)
 		sink.add(art("lightning_mark_armor", 502, Dao.LIGHTNING)
 				.grade(TechniqueGrade.XUAN, 2).type(TechniqueType.LINDUNG).realm(Realm.GOLDEN_CORE)
+				.pose(Pose.GATE_FLEX)
 				.route(Route.dao()).comprehension(20)
 				.flag(Flag.TEACHABLE, Flag.CAST_ALWAYS, Flag.NO_ECHO)
 				.qi(40).cooldown(45.0D)
@@ -120,7 +125,7 @@ public final class LightningArts {
 				.step(at(0).minTier(2).only(Cond.PLAYER_CASTER).self(buff(BuffKind.SLOW_FALLING, 1, 600)))
 				.fx(Phase.CAST,
 						shieldShell(VIOLET).particle(ParticleTypes.ELECTRIC_SPARK).count(40).ticks(200),
-						wings(SPARK).minTier(2).count(40).ticks(600).detail())
+						wings(SPARK).count(40).ticks(600).detail())
 				.fx(Phase.HIT, bolt(VIOLET).count(20).ticks(5))
 				.sound(Phase.CAST, SoundEvents.BEACON_POWER_SELECT, 1.0F, 1.4F)
 				.sound(Phase.HIT, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.2F, 2.0F)
@@ -131,6 +136,7 @@ public final class LightningArts {
 		// 503 · Tiga Gaya Guntur (Martial God Asura)
 		sink.add(art("three_thunder_styles", 503, Dao.LIGHTNING)
 				.grade(TechniqueGrade.XUAN, 1).type(TechniqueType.AREA).realm(Realm.NASCENT_SOUL)
+				.pose(Pose.PALM_THRUST).pose(Phase.EXTRA1, Pose.TWIN_PALM).pose(Phase.EXTRA2, Pose.SKY_RAISE)
 				.route(Route.book("minecraft:channeling"), Route.pav()).comprehension(30)
 				.flag(Flag.TEACHABLE, Flag.PAVILION)
 				.stages(3, 80).qiPerStage(25, 30, 45)
@@ -155,6 +161,7 @@ public final class LightningArts {
 		// 504 · Metode Lima Guntur (Journey to the West ch. 45)
 		sink.add(art("five_thunder_method", 504, Dao.LIGHTNING)
 				.grade(TechniqueGrade.XUAN, 2).type(TechniqueType.KENDALI).realm(Realm.NASCENT_SOUL)
+				.pose(Pose.SEAL).pose(Phase.EXTRA2, Pose.SKY_RAISE)
 				.route(Route.feat(Feat.castsWith(Dao.LIGHTNING, Cond.any(Cond.RAINING, Cond.THUNDERING), 50)))
 				.flag(Flag.TEACHABLE)
 				.stages(4, 120).qiPerStage(20, 20, 50, 20)
@@ -175,6 +182,7 @@ public final class LightningArts {
 				.fx(Phase.EXTRA2, boltStorm(SPARK).count(40).ticks(30), shake(0.25F, 10))
 				.fx(Phase.IMPACT, bolt(PALE).count(20).ticks(5))
 				.fx(Phase.EXTRA3, mist(0x9FC8FF).particle(ParticleTypes.FALLING_WATER).count(80).ticks(40), cloudDisc(0x5A6A8A).above(12).count(30).detail())
+				.fx(Phase.CAST, model("talisman_ling").above(2.5F).scale(1.5F).spin(6.0F).ticks(20).facing(FxLayer.Facing.FACE_VIEWER))
 				.sound(Phase.CAST, SoundEvents.BELL_BLOCK, 0.6F, 1.8F)
 				.sound(Phase.CAST, SoundEvents.BREEZE_WIND_CHARGE_BURST, 0.8F, 1.0F)
 				.sound(Phase.EXTRA1, SoundEvents.ELYTRA_FLYING, 0.4F, 0.6F)
@@ -189,6 +197,7 @@ public final class LightningArts {
 		// 505 · Seni Pusaka Kaisar Petir (Perfect World)
 		sink.add(art("lightning_emperor_art", 505, Dao.LIGHTNING)
 				.grade(TechniqueGrade.DI, 0).type(TechniqueType.SERANG).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.SKY_RAISE).pose(Phase.TRAVEL, Pose.PALM_THRUST)
 				.route(Route.book("minecraft:channeling"), Route.pav()).comprehension(50)
 				.flag(Flag.TEACHABLE, Flag.PAVILION)
 				.qi(100).cooldown(15.0D)
@@ -196,11 +205,12 @@ public final class LightningArts {
 						.hit(damage(3.0D), mark(Mark.daoVuln(Dao.LIGHTNING, 0.3D), 200))
 						.onHit(at(0).minTier(4).shape(rain(Anchor.HIT, 0).radius(4).impacts(5).over(10)).hit(damage(1.0D))))
 				.fx(Phase.CAST,
-						palm(VIOLET).inSky().size(6.0F).count(80).ticks(20),
+						palm(VIOLET).inSky().radius(8.0F).count(80).ticks(20),
 						impact(PALE).particle(ParticleTypes.ELECTRIC_SPARK).count(12).detail())
 				.fx(Phase.TRAVEL, beamCore(PALE).size(1.0F).count(60).ticks(8), bolt(VIOLET).count(20).detail())
 				.fx(Phase.HIT, impact(VIOLET).particle(ParticleTypes.ELECTRIC_SPARK).count(12))
 				.fx(Phase.IMPACT, bolt(SPARK).count(14).ticks(4))
+				.fx(Phase.TRAVEL, model("thunder_palm").scale(8.0F).slide(8.0F).ticks(12).facing(FxLayer.Facing.FACE_FORWARD))
 				.sound(Phase.CAST, SoundEvents.LIGHTNING_BOLT_IMPACT, 1.0F, 0.8F)
 				.sound(Phase.TRAVEL, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.6F, 1.4F)
 				.sound(Phase.IMPACT, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.3F, 1.6F)
@@ -212,6 +222,7 @@ public final class LightningArts {
 		// 506 · Formasi Cahaya Emas (Investiture of the Gods ch. 44/46)
 		sink.add(art("golden_light_formation", 506, Dao.LIGHTNING)
 				.grade(TechniqueGrade.DI, 2).type(TechniqueType.AREA).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.SEAL)
 				.route(Route.pav(), Route.feat(Feat.killsWith(Dao.LIGHTNING, Cond.NONE, List.of("#minecraft:undead"), 100)))
 				.flag(Flag.TEACHABLE, Flag.PAVILION, Flag.NO_ECHO)
 				.qi(150).cooldown(45.0D)
@@ -222,7 +233,8 @@ public final class LightningArts {
 						.hit(damage(0.9D).vs(Payload.Versus.UNDEAD, 1.5D), eff(Eff.BLINDNESS, 1, 40)).phase(0))
 				// The CAST event runs from the caster to the aim; the formation stands at the aim (TARGET attach).
 				.fx(Phase.CAST,
-						swordRing(Items.GLASS_PANE, 9, 10.0F).scale(3.0F).onTarget().minTier(3).ticks(160),
+						model("golden_mirror").n(9).radius(10.0F).scale(2.0F).spin(2.0F).onTarget().ticks(160).facing(FxLayer.Facing.FACE_VIEWER),
+						swordRing(Items.GLASS_PANE, 9, 10.0F).scale(3.0F).onTarget().minTier(1).ticks(160).extra(),
 						shockRing(GOLD).size(2.0F).onTarget().count(40),
 						column(GOLD).size(0.6F).onTarget().count(30).ticks(160).detail())
 				.fx(Phase.EXTRA0, shell(0xFFF0C0).particle(ParticleTypes.END_ROD).count(10).detail())
@@ -237,6 +249,7 @@ public final class LightningArts {
 		// 507 · Seni Awan Ungu: Awan Petir Pemusnah (Against the Gods)
 		sink.add(art("extinction_thundercloud", 507, Dao.LIGHTNING)
 				.grade(TechniqueGrade.DI, 0).type(TechniqueType.AREA).realm(Realm.DAO_UNION)
+				.pose(Pose.SKY_RAISE)
 				.route(Route.pav(), Route.book("minecraft:channeling")).comprehension(60)
 				.flag(Flag.TEACHABLE, Flag.PAVILION, Flag.NO_ECHO)
 				.qi(220).cooldown(75.0D)
@@ -249,7 +262,7 @@ public final class LightningArts {
 						boltStorm(SPARK).above(24).onTarget().count(40).ticks(200).detail())
 				.fx(Phase.IMPACT, bolt(PALE).count(24).ticks(5), impact(VIOLET).particle(ParticleTypes.ELECTRIC_SPARK).count(8).detail())
 				.fx(Phase.PULSE, boltStorm(SPARK).above(24).count(12).ticks(10).extra())
-				.fx(Phase.EXTRA0, boltStorm(PALE).count(80).ticks(12), shell(VIOLET).size(3.0F).count(40), flash(PALE, 0.2F, 4))
+				.fx(Phase.EXTRA0, boltStorm(PALE).count(80).ticks(12), shell(VIOLET).size(1.5F).count(40), flash(PALE, 0.2F, 4))
 				.sound(Phase.CAST, SoundEvents.LIGHTNING_BOLT_THUNDER, 1.2F, 0.8F)
 				.sound(Phase.IMPACT, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.4F, 1.2F)
 				.sound(Phase.PULSE, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.5F, 1.0F)
@@ -263,6 +276,7 @@ public final class LightningArts {
 		// 508 · Seni Sejati Pedang Ilahi Mengendalikan Guntur (Jade Dynasty)
 		sink.add(art("divine_sword_imperial_thunder", 508, Dao.LIGHTNING)
 				.grade(TechniqueGrade.DI, 2).type(TechniqueType.SERANG).realm(Realm.DAO_UNION)
+				.pose(Phase.CHARGE, Pose.SWORD_SKY).pose(Pose.SWORD_THRUST)
 				.route(Route.feat(Feat.killsWith(Dao.LIGHTNING, Cond.HOLDING_SWORD, null, 200))).comprehension(70)
 				.flag(Flag.TEACHABLE)
 				.charge(30)
@@ -273,13 +287,14 @@ public final class LightningArts {
 						.onEnd(at(0).shape(chain().from(Anchor.END).jumps(6).jump(6)).hit(damage(2.0D))))
 				.fx(Phase.CHARGE,
 						column(SPARK).size(1.2F).count(60).ticks(30),
-						swordRing(Items.IRON_SWORD, 12, 2.5F).scale(1.5F).minTier(3).ticks(40))
+						swordRing(Items.IRON_SWORD, 12, 2.5F).scale(1.5F).minTier(1).ticks(40))
 				.fx(Phase.CAST,
 						beamCore(PALE).size(1.6F).count(80).ticks(8),
 						bolt(VIOLET).fanned().count(30).ticks(8).detail(),
 						shake(0.5F, 12))
 				.fx(Phase.TRAVEL, bolt(SPARK).count(24).ticks(6))
 				.fx(Phase.HIT, bolt(SPARK).count(20).ticks(5), impact(PALE).particle(ParticleTypes.ELECTRIC_SPARK).count(10).detail())
+				.fx(Phase.TRAVEL, model("thunder_sword").scale(6.0F).slide(6.0F).ticks(10).facing(FxLayer.Facing.BLADE))
 				.sound(Phase.CHARGE, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.6F, 1.4F)
 				.sound(Phase.CAST, SoundEvents.TRIDENT_THUNDER, 1.2F, 1.0F)
 				.sound(Phase.HIT, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.4F, 1.4F)
@@ -291,6 +306,7 @@ public final class LightningArts {
 		// 509 · Sayap Lei Zhenzi (Investiture of the Gods ch. 21) — special flight_form
 		sink.add(art("lei_zhenzi_wings", 509, Dao.LIGHTNING)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.UBAH).realm(Realm.IMMORTAL_ASCENSION, 1)
+				.pose(Pose.SUMMON_RAISE)
 				.route(Route.feat(Feat.meditateAt(Cond.all(Cond.altitude(150), Cond.THUNDERING), 5)), Route.inh(Dao.LIGHTNING.id()))
 				.flag(Flag.NO_TEACH, Flag.CAST_ALWAYS, Flag.NO_ECHO)
 				.special(FlightForm.ID)
@@ -305,9 +321,8 @@ public final class LightningArts {
 				.step(at(1).stage(2).shape(path()).self(dash(16)).hit(damage(2.0D)).phase(0))
 				.fx(Phase.CAST,
 						wings(0xFFE08A).size(1.6F).count(60).ticks(FlightForm.FORM_TICKS),
-						FxLayer.of(FxLayer.Template.GLYPH, 0xEEF4F0).text("風").scale(1.5F).above(1.0F).onCaster().minTier(2).ticks(FlightForm.FORM_TICKS),
-						FxLayer.of(FxLayer.Template.GLYPH, VIOLET).text("雷").scale(1.5F).above(1.6F).onCaster().minTier(2).ticks(FlightForm.FORM_TICKS),
-						giantItem(Items.BLAZE_ROD).scale(3.0F).onCaster().minTier(3).ticks(FlightForm.FORM_TICKS),
+						FxLayer.of(FxLayer.Template.GLYPH, 0xEEF4F0).text("風").scale(1.5F).above(1.0F).onCaster().ticks(FlightForm.FORM_TICKS),
+						FxLayer.of(FxLayer.Template.GLYPH, VIOLET).text("雷").scale(1.5F).above(1.6F).onCaster().ticks(FlightForm.FORM_TICKS),
 						bolt(SPARK).count(20).ticks(6).detail())
 				.fx(Phase.HIT, shell(GOLD).size(1.2F).count(16), bolt(VIOLET).count(10).detail())
 				.fx(Phase.EXTRA0, trail(0xFFE08A).count(30).ticks(8), bolt(PALE).count(20).detail())
@@ -322,6 +337,7 @@ public final class LightningArts {
 		// 510 · Pedang Petir Kesengsaraan Surgawi (Against the Gods)
 		sink.add(art("tribulation_thunder_sword", 510, Dao.LIGHTNING)
 				.grade(TechniqueGrade.TIAN, 1).type(TechniqueType.PAMUNGKAS).realm(Realm.IMMORTAL_ASCENSION, 4)
+				.pose(Phase.CHARGE, Pose.SWORD_SKY).pose(Pose.OVERHEAD_SLAM)
 				.route(Route.feat(Feat.tribStrikes(30)))
 				.flag(Flag.TEACHABLE)
 				.charge(40)
@@ -332,7 +348,7 @@ public final class LightningArts {
 				.step(at(0).shape(pillar(Anchor.AIM).onTargets(5).radius(3)).hit(damage(2.0D)).phase(0))
 				.fx(Phase.CHARGE, cloudDisc(STORM).above(30).size(2.0F).count(80).ticks(40), bolt(SPARK).above(30).count(16).detail())
 				.fx(Phase.CAST,
-						laser(violetGlass, 1.5F, 60.0F).fall(40, 8).minTier(3).ticks(30),
+						model("thunder_sword").scale(6.0F).fall(40.0F, 8.0F).ticks(30).facing(FxLayer.Facing.BLADE), laser(violetGlass, 1.5F, 60.0F).fall(40, 8).minTier(1).ticks(30).extra(),
 						beamCore(PALE).size(1.5F).count(80).ticks(10),
 						shake(0.7F, 16))
 				.fx(Phase.TRAVEL, bolt(VIOLET).count(30).ticks(10), cracks())
@@ -349,6 +365,7 @@ public final class LightningArts {
 		// 511 · Simbol Leluhur Halilintar (Martial Universe)
 		sink.add(art("thunderbolt_ancestral_symbol", 511, Dao.LIGHTNING)
 				.grade(TechniqueGrade.TIAN, 2).type(TechniqueType.WILAYAH).realm(Realm.IMMORTAL_ASCENSION, 7)
+				.pose(Pose.SEAL).climax(Phase.EXTRA0)
 				.route(Route.feat(Feat.killsWith(null, Cond.THUNDERING, null, 300)))
 				.flag(Flag.NO_TEACH, Flag.CAST_ALWAYS, Flag.NO_ECHO)
 				.qi(420).cooldown(150.0D)
@@ -358,11 +375,12 @@ public final class LightningArts {
 				.step(at(10).repeat(30, 10).shape(all().ofArea().max(1).order(Shape.All.Order.RANDOM)).hit(damage(1.5D)).phase(1))
 				.step(at(60).repeat(5, 60).shape(nova().radius(12)).hit(damage(2.0D)).phase(0))
 				.fx(Phase.CAST,
-						giantBlock(Blocks.AMETHYST_BLOCK.defaultBlockState()).blockSize(2.0F, 2.0F, 2.0F).above(4.0F).onCaster().spin(3.0F).minTier(3).ticks(300),
+						model("thunder_ancestral_symbol").onCaster().above(5.0F).scale(6.0F).spin(3.0F).ticks(300).facing(FxLayer.Facing.FACE_VIEWER),
 						shell(SPARK).particle(ParticleTypes.GLOW).above(5.0F).onCaster().count(20).ticks(300),
 						dome(VIOLET).count(40).ticks(300).detail())
 				.fx(Phase.EXTRA0, shockRing(VIOLET).size(2.0F).count(40), boltStorm(SPARK).count(24).ticks(8).detail())
 				.fx(Phase.HIT, bolt(PALE).count(20).ticks(5))
+				.fx(Phase.EXTRA1, bolt(PALE).count(14).ticks(4), impact(SPARK).particle(ParticleTypes.ELECTRIC_SPARK).onTarget().count(8).ticks(6).detail())
 				.sound(Phase.CAST, SoundEvents.BEACON_AMBIENT, 1.2F, 1.0F)
 				.sound(Phase.CAST, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.8F, 1.0F)
 				.sound(Phase.EXTRA1, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.4F, 1.4F)
@@ -374,6 +392,7 @@ public final class LightningArts {
 		// 512 · Formasi Kaisar Petir Kesengsaraan (Against the Gods)
 		sink.add(art("tribulation_thunder_emperor_array", 512, Dao.LIGHTNING)
 				.grade(TechniqueGrade.ABADI, 1).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Pose.SKY_RAISE).climax(Phase.EXTRA1)
 				.route(Route.feat(Feat.tribQuality(Realm.TRUE_IMMORTAL, -1, BreakthroughQuality.PERFECT)))
 				.flag(Flag.TEACHABLE, Flag.NO_ECHO).teachStars(27)
 				.qiPct(55, 700).cooldown(420.0D)
@@ -382,7 +401,7 @@ public final class LightningArts {
 				.step(at(22).repeat(8, 22).shape(all().ofArea().max(32)).hit(damage(2.0D), damagePct(0.08D, 0.03D)).phase(0))
 				.step(at(198).shape(all().ofArea().max(32)).hit(damage(4.0D), damagePct(0.16D, 0.06D)).phase(1))
 				.fx(Phase.CAST,
-						runeCircle(VIOLET).size(32.0F).mirrored().onTarget().minTier(2).count(80).ticks(200),
+						runeCircle(VIOLET).radius(32.0F).mirrored().onTarget().count(80).ticks(200),
 						boltStorm(SPARK).above(30).onTarget().count(40).ticks(200),
 						sky(STORM).minTier(4).ticks(200),
 						shake(0.3F, 10))
@@ -401,6 +420,7 @@ public final class LightningArts {
 		// 513 · Tianzun Guntur Sembilan Langit (Investiture of the Gods ch. 99)
 		sink.add(art("nine_heavens_thunder_venerable", 513, Dao.LIGHTNING)
 				.grade(TechniqueGrade.DEWA, 0).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
+				.pose(Pose.SUMMON_RAISE).climax(Phase.EXTRA1)
 				.gate(Gate.DEWA_I).prereq("tribulation_thunder_emperor_array", 3)
 				.flag(Flag.TEACHABLE, Flag.NO_ECHO).dewaStars(36).teachStars(36)
 				.qiPct(75).cooldown(900.0D)
@@ -418,8 +438,9 @@ public final class LightningArts {
 						avatar(VIOLET).alpha(0.3F).ticks(400).detail(),
 						shake(0.6F, 20))
 				.fx(Phase.HIT, bolt(PALE).count(16).ticks(5))
-				.fx(Phase.EXTRA0, beamCore(0xF0E8FF).size(1.2F).count(40).ticks(8), shockRing(VIOLET).size(3.0F).count(60), shake(0.6F, 12))
+				.fx(Phase.EXTRA0, beamCore(0xF0E8FF).size(1.2F).count(40).ticks(8), shockRing(VIOLET).size(1.5F).count(60), shake(0.6F, 12))
 				.fx(Phase.EXTRA1, boltStorm(PALE).size(2.5F).count(160).ticks(20), flash(0xF0E8FF, 0.35F, 8), shake(1.0F, 30))
+				.fx(Phase.PHANTOM, bolt(PALE).count(12).ticks(4), impact(SPARK).particle(ParticleTypes.ELECTRIC_SPARK).onTarget().count(6).ticks(6))
 				.sound(Phase.CAST, SoundEvents.LIGHTNING_BOLT_THUNDER, 2.0F, 0.5F)
 				.sound(Phase.CAST, SoundEvents.ENDER_DRAGON_GROWL, 0.6F, 0.8F)
 				.sound(Phase.EXTRA0, SoundEvents.LIGHTNING_BOLT_THUNDER, 1.5F, 0.8F)

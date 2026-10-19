@@ -33,4 +33,13 @@ public class DiscipleRenderState extends AvatarRenderState {
 	public int power;
 	/** The natal treasure's item (empty when it has none). */
 	public final ItemStackRenderState natalItem = new ItemStackRenderState();
+	// Polish pass (DESIGN 27.2): cast pose, held qi sword, the open Eternal Parasol and the clone fade.
+	/** True while a cast pose drives the model (the duty pose stays off). */
+	public boolean castActive;
+	/** True when the right hand shows the natal or qi sword for a sword pose. */
+	public boolean heldSword;
+	/** The opened natal parasol held above the head (empty unless the Eternal Parasol is out). */
+	public final ItemStackRenderState parasolItem = new ItemStackRenderState();
+	/** 0..1 how solid a Divine Clone is (fading in after it appears and out before it is removed). */
+	public float cloneFade = 1.0F;
 }

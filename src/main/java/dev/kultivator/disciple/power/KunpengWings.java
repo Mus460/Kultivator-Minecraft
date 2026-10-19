@@ -34,6 +34,8 @@ final class KunpengWings {
 	public static final double CRESCENT_U_FULL = 6.0D;
 	public static final double CRESCENT_WIDTH = 1.5D;
 	public static final int COOLDOWN = 400;
+	/** Ticks the clients draw the dash over (FX_KUNPENG_DASH). */
+	public static final int DASH_TICKS = 4;
 	/** Inti (Core) and above may receive the wings. */
 	public static final int MIN_RANK = 3;
 
@@ -119,6 +121,9 @@ final class KunpengWings {
 			}
 		}
 		PowerCore.fx(level, from, spot, PowerIds.FX_KUNPENG, full ? 1 : 0, 0.0F);
+		// the trail and the wings: the clients draw the move over DASH_TICKS (vanilla lerps the body) with the wings spread
+		PowerCore.fx(level, from, spot, PowerIds.FX_KUNPENG_DASH, DASH_TICKS, full ? 1.0F : 0.0F);
+		DisciplePowers.live(entity).kunpengUntil = now + DASH_TICKS + 6L;
 		PowerCore.sound(level, from, SoundEvents.ENDER_DRAGON_FLAP, 1.0F, 1.2F);
 		PowerCore.sound(level, spot, SoundEvents.BREEZE_SHOOT, 1.0F, 0.7F);
 		return null;

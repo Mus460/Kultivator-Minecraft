@@ -187,6 +187,8 @@ final class Ultimates {
 		}
 		PowerCore.setCooldown(data, "ult", now + cooldownFor(dao));
 		PowerCore.fx(level, entity.position(), PowerIds.FX_ULT_CAST, dao.ordinal(), 0.0F);
+		// the 7b beat of a disciple's ultimate: the master sees the stamp and the sky turn (DESIGN 27.6)
+		dev.kultivator.epic.EpicHooks.discipleUltimate(entity, master, dao, target.position(), 12.0D * range);
 		PowerCore.sound(level, entity.position(), SoundEvents.BEACON_POWER_SELECT, 1.0F, 0.7F);
 		Msg.actionBar(master, PowerCore.key("ult.cast", PowerCore.name(entity), PowerCore.key("ult." + dao.id()))
 				.withColor(dao.color()));
@@ -224,8 +226,14 @@ final class Ultimates {
 				return false;
 			}
 			boolean any = false;
+			int dives = 0;
 			for (LivingEntity victim : PowerCore.hostiles(e, owner, centre, radius)) {
-				any |= PowerCore.hurt(e, owner, victim, amount, PowerCore.HIT_ULTIMATE);
+				boolean struck = PowerCore.hurt(e, owner, victim, amount, PowerCore.HIT_ULTIMATE);
+				any |= struck;
+				if (struck && dives++ < 3) {
+					// three swords leave the dome and dive on what they cut (DESIGN 27.6)
+					PowerCore.fx(lvl, victim.getBoundingBox().getCenter(), centre, PowerIds.FX_ULT_SWORD_DIVE, victim.getId(), (float) radius);
+				}
 			}
 			if (any && index % 2 == 0) {
 				PowerCore.sound(lvl, centre, SoundEvents.TRIDENT_HIT, 0.6F, 1.5F);
@@ -262,10 +270,12 @@ final class Ultimates {
 		for (LivingEntity victim : victims) {
 			Vec3 ground = victim.position();
 			double amount = u * BOLT_U * (victim.is(EntityTypeTags.UNDEAD) ? UNDEAD_FACTOR : 1.0D);
+			PowerCore.fx(level, ground, ground.add(0.0D, 20.0D, 0.0D), PowerIds.FX_ULT_BOLT, victim.getId(), 0.0F);
 			PowerCore.hurt(entity, master, victim, amount, PowerCore.HIT_ULTIMATE);
 			PowerCore.sound(level, ground, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.8F, 1.1F);
 			for (LivingEntity chain : PowerCore.hostiles(entity, master, ground, CHAIN_RANGE)) {
 				if (struck.add(chain.getId()) && PowerCore.safeCentre(level, master, chain.position())) {
+					PowerCore.fx(level, chain.getBoundingBox().getCenter(), victim.getBoundingBox().getCenter(), PowerIds.FX_ULT_BOLT, chain.getId(), 1.0F);
 					PowerCore.hurt(entity, master, chain, u * CHAIN_U, PowerCore.HIT_ULTIMATE);
 					break;
 				}
@@ -327,6 +337,9 @@ final class Ultimates {
 			return false;
 		}
 		double punch = entity.getAttributeValue(Attributes.ATTACK_DAMAGE) * FIST_ATTACK;
+		// mcsrc world/entity/LivingEntity.java:2022: a vanilla stab swing every tracker sees
+		entity.swing(net.minecraft.world.InteractionHand.MAIN_HAND,
+				new net.minecraft.world.item.component.SwingAnimation(net.minecraft.world.item.SwingAnimationType.STAB, 8), false);
 		PowerCore.hurt(entity, master, target, punch, PowerCore.HIT_ULTIMATE);
 		double wave = FIST_WAVE * range;
 		double amount = DiscipleTechniques.power(entity.data()) * FIST_WAVE_U;
@@ -401,7 +414,29 @@ final class Ultimates {
 		double range = DisciplePowers.ultimateRange(entity);
 		double radius = (lotus.fused ? FUSION_RADIUS : flames >= 2 ? LOTUS_RADIUS_FLAMES : LOTUS_RADIUS) * range;
 		double amount = u * (lotus.fused ? FUSION_U : LOTUS_U) * Math.max(1, flames);
-		Vec3 impact = target.position();
+		Vec3 aimed = target.position();
+		Vec3 hands = entity.getEyePosition().add(entity.getViewVector(1.0F).scale(0.6D)).add(0.0D, -0.3D, 0.0D);
+		// the lotus leaves the hands and flies (DESIGN 27.6): the blast lands when it arrives
+		int flight = (int) Math.max(6L, Math.min(8L, Math.round(hands.distanceTo(aimed) / 3.0D)));
+		PowerCore.fx(level, hands, aimed, PowerIds.FX_LOTUS_RELEASE, flight, (float) radius);
+		PowerCore.sound(level, hands, SoundEvents.FIRECHARGE_USE, 1.2F, 0.7F);
+		LivingEntity aimedAt = target;
+		boolean fused = lotus.fused;
+		PowerPulses.later(entity, flight, e -> blastLotus(e, aimedAt, aimed, radius, amount, flames, fused));
+	}
+
+	private static void blastLotus(DiscipleEntity entity, LivingEntity aimedAt, Vec3 aimed, double radius, double amount, int flames, boolean fused) {
+		ServerPlayer master = entity.owner();
+		if (master == null || !(entity.level() instanceof ServerLevel level)) {
+			return;
+		}
+		Vec3 impact = aimedAt.isAlive() && aimedAt.level() == level && aimedAt.position().distanceTo(aimed) <= 4.0D ? aimedAt.position() : aimed;
+		if (!PowerCore.safeCentre(level, master, impact)) {
+			PowerCore.fx(level, impact.add(0.0D, 1.2D, 0.0D), PowerIds.FX_LOTUS_BLAST, 0, 0.5F);
+			return;
+		}
+		Lotus lotus = new Lotus(aimedAt);
+		lotus.fused = fused;
 		for (LivingEntity victim : PowerCore.hostiles(entity, master, impact, radius)) {
 			if (PowerCore.hurt(entity, master, victim, amount, PowerCore.HIT_ULTIMATE) && victim.isAlive()) {
 				DaoTechniques.ignite(victim, LOTUS_FIRE);

@@ -1,0 +1,76 @@
+{
+ "textures": {
+  "t0": "kultivator:item/fx/mat_iron_black",
+  "particle": "kultivator:item/fx/mat_iron_black"
+ },
+ "elements": [
+  {
+   "from": [
+    7.3,
+    7.4,
+    6.4
+   ],
+   "to": [
+    8.7,
+    12.6,
+    7.0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0.0,
+      0.0,
+      1.4,
+      5.2
+     ],
+     "texture": "#t0"
+    },
+    "south": {
+     "uv": [
+      4.11,
+      6.33,
+      5.51,
+      11.53
+     ],
+     "texture": "#t0"
+    },
+    "east": {
+     "uv": [
+      8.22,
+      1.86,
+      8.82,
+      7.06
+     ],
+     "texture": "#t0"
+    },
+    "west": {
+     "uv": [
+      12.33,
+      8.19,
+      12.93,
+      13.39
+     ],
+     "texture": "#t0"
+    },
+    "up": {
+     "uv": [
+      1.84,
+      9.92,
+      3.24,
+      10.52
+     ],
+     "texture": "#t0"
+    },
+    "down": {
+     "uv": [
+      2.74,
+      4.22,
+      4.14,
+      4.82
+     ],
+     "texture": "#t0"
+    }
+   }
+  }
+ ]
+}

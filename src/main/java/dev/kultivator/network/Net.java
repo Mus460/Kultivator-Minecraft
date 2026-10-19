@@ -33,6 +33,10 @@ public final class Net {
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.FormasiSync.TYPE, Payloads.FormasiSync.CODEC);
 		// Phase 8 (DESIGN 25.2 item 2).
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.DuniaSync.TYPE, Payloads.DuniaSync.CODEC);
+		// Polish pass (DESIGN 27.4): synced phantoms, forms and binds.
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.PhantomSync.TYPE, Payloads.PhantomSync.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.FormSync.TYPE, Payloads.FormSync.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.BindSync.TYPE, Payloads.BindSync.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Payloads.Action.TYPE, Payloads.Action.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Action.TYPE, (payload, context) -> handle(context.player(), payload));

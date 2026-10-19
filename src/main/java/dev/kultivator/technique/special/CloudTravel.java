@@ -129,8 +129,17 @@ public final class CloudTravel implements SpecialTechnique {
 		if (!level.isLoaded(BlockPos.containing(point))) {
 			return;
 		}
-		player.teleportTo(level, point.x, point.y, point.z, Relative.ROTATION, 0.0F, 0.0F, false);
-		player.setDeltaMovement(Vec3.ZERO);
+		// a real ride (DESIGN 27.1 S16): the cloud carries the body toward the next checked point with the server's motion
+		// packet (ServerEntity sends ClientboundSetEntityMotionPacket on syncVelocity), the landing snaps to the checked exit
+		Vec3 delta = point.subtract(player.position());
+		if (delta.lengthSqr() > 36.0D) {
+			// far behind (a wall, lag): one safe hop instead of a huge velocity
+			player.teleportTo(level, point.x, point.y, point.z, Relative.ROTATION, 0.0F, 0.0F, false);
+			player.setDeltaMovement(Vec3.ZERO);
+		} else {
+			player.setDeltaMovement(delta);
+			player.syncVelocity = true;
+		}
 		player.resetFallDistance();
 		player.setPortalCooldown();
 	}

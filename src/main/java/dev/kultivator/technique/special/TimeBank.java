@@ -4,6 +4,7 @@ import dev.kultivator.data.Cultivators;
 import dev.kultivator.technique.Techniques;
 import dev.kultivator.technique.spec.DamageContext;
 import dev.kultivator.technique.spec.TechniquePower;
+import dev.kultivator.technique.spec.dsl.Phase;
 import dev.kultivator.technique.spec.run.CastContext;
 import dev.kultivator.technique.spec.run.EndReason;
 import dev.kultivator.technique.spec.run.SpecialTechnique;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,6 +70,9 @@ public final class TimeBank implements SpecialTechnique {
 		private boolean closed;
 		private final Map<UUID, LivingEntity> victims = new LinkedHashMap<>();
 		private final Map<UUID, Double> banked = new HashMap<>();
+		/** The cast that opened the bank (its EXTRA1 marks every banked hit on the clients). */
+		private @Nullable CastContext ctx;
+		private int hits;
 
 		private Bank(UUID caster, long expires) {
 			this.caster = caster;
@@ -134,6 +139,7 @@ public final class TimeBank implements SpecialTechnique {
 			drop(old);
 		}
 		Bank bank = new Bank(ctx.caster().getUUID(), ctx.level().getGameTime() + STALE);
+		bank.ctx = ctx;
 		BANKS.put(bank.caster, bank);
 		collect(ctx, bank);
 	}
@@ -176,6 +182,12 @@ public final class TimeBank implements SpecialTechnique {
 			return amount;
 		}
 		bank.banked.merge(entity.getUUID(), (double) amount, Double::sum);
+		bank.hits++;
+		if (bank.ctx != null && !bank.ctx.ended()) {
+			// EXTRA1: a banked hit, a gold mote on the stopped monster (aux = hits banked so far)
+			Vec3 body = entity.getBoundingBox().getCenter();
+			bank.ctx.fx(Phase.EXTRA1, body, attacker.position(), 1.0F, 0.0F, 1, 0, entity.getId(), 0, 1, bank.hits, 0);
+		}
 		return 0.0F;
 	}
 

@@ -70,6 +70,8 @@ final class DaoDomain {
 		Dao dao = data.dao();
 		Vec3 pos = player.position();
 		Techniques.fx(player, Technique.DAO_DOMAIN, (dao == null ? 0 : dao.ordinal() + 1) << 4, pos, pos, (float) radius);
+		// the domain rides its caster: FLAG_FOLLOW on its CAST and PULSE events, the real radius (DESIGN 27.1 S9)
+		ctx.followCaster();
 		ctx.castFx(pos, pos, (float) radius, (float) Math.min(16.0D, radius), dao == null ? 0 : dao.ordinal() + 1, duration);
 		level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 1.2F, 0.5F);
 		level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 1.0F, 0.5F);

@@ -30,7 +30,7 @@ public final class PathFxIds {
 	public static final int HUFA_SEAL = 10;
 	/** Dao foundation pillars rise: pos = disciple, b = type (1 Fana .. 4 Sempurna). */
 	public static final int FOUNDATION = 11;
-	/** A Divine Clone appears (b = 0) or fades (b = 1) at pos. */
+	/** A Divine Clone appears (b = 0) or starts fading (b = 1, f = fade ticks; the body is removed after them) at pos. */
 	public static final int CLONE = 12;
 	/** Jiwa Guru Turun: the master's aura on the heir, pos = disciple, b = master's realm colour, f = seconds. */
 	public static final int DESCEND = 13;

@@ -207,23 +207,48 @@ public final class Payloads {
 	}
 
 	/**
-	 * One visual event of a technique spec (DESIGN 22.4.1): every client draws the spec's FX layers of {@code phase} from
-	 * the registry with its own quality and budget; one event per phase occurrence, never per particle.
+	 * One visual event of a technique spec (DESIGN 22.4.1, v2 in 27.4): every client draws the spec's FX layers of
+	 * {@code phase} from the registry with its own quality and budget; one event per phase occurrence, never per particle.
 	 * {@code spec} = net id; {@code x,y,z} the event position, {@code tx,ty,tz} the second point; {@code tier} = caster
 	 * grade tier 0-5 | mastery level << 3; {@code flags} = the {@code FLAG_*} bits; {@code seed} draws the same shape on
 	 * every client; {@code caster} = entity id auras and forms attach to.
+	 * <p>
+	 * v2: {@code target} = the entity id of the victim, target or bound entity (-1 none); {@code index} / {@code of} = this
+	 * event's place in a multi-point or per-projectile group ({@code of} 1 = single; {@code index} -1 with {@code of} > 1 =
+	 * "the client places {@code of} copies on a ring of radius {@code aux / 100}"); {@code aux} by flag or phase
+	 * ({@link #FLAG_STAGE} stage index, {@link #FLAG_TWO_DAO} second Dao RGB, {@link #FLAG_VOLLEY} spread mode, PHANTOM the
+	 * phantom kind, a second linked entity id for karma pairs, charges left...). The server never sends NaN or infinite
+	 * floats. CAST of a charge or channel carries the charge or channel ticks as {@code duration}; HIT has pos = the
+	 * victim's middle, to = the caster's hand, target = the victim.
 	 */
 	public record TechFx(int spec, byte phase, double x, double y, double z, double tx, double ty, double tz, float radius,
-			float length, byte tier, byte flags, short count, int seed, int caster, short duration) implements CustomPacketPayload {
+			float length, byte tier, short flags, short count, int seed, int caster, short duration, int target, short index, short of,
+			int aux) implements CustomPacketPayload {
 		/** A Kehancuran cast (CRACKS layer, BLOCK_CRUMBLE at the impact). */
 		public static final int FLAG_KEHANCURAN = 1;
 		public static final int FLAG_ECHO = 2;
-		/** Server under load: draw ×0.5 and no displays. */
+		/** Server under load: draw x0.5 and no displays. */
 		public static final int FLAG_LOW_LOAD = 4;
 		public static final int FLAG_BOSS_HIT = 8;
 		public static final int FLAG_DISCIPLE = 16;
 		public static final int FLAG_ALLY = 32;
 		public static final int FLAG_SHOWCASE = 64;
+		/** The cast's climax event (once per cast, on {@code TechniqueSpec.climaxPhase()}). */
+		public static final int FLAG_CLIMAX = 128;
+		/** A falling visual (meteor, seal, palm, sun): {@code duration} = ticks until it lands at {@code tx,ty,tz}. */
+		public static final int FLAG_PRE_IMPACT = 256;
+		/** A lasting area that follows the caster: POS layers attach to the caster. */
+		public static final int FLAG_FOLLOW = 512;
+		/** A DOT tick hit: light layers only. */
+		public static final int FLAG_DOT = 1024;
+		/** A stage recast: {@code aux & 0xFF} = the stage index. */
+		public static final int FLAG_STAGE = 2048;
+		/** A movement (dash, blink, leap) TRAVEL: pos = from, to = to. */
+		public static final int FLAG_BLINK = 4096;
+		/** A two-Dao art: {@code aux} = the second Dao's RGB. */
+		public static final int FLAG_TWO_DAO = 8192;
+		/** One projectile of a volley: {@code aux} = the spread mode, {@code count} = projectiles, index / of set. */
+		public static final int FLAG_VOLLEY = 16384;
 
 		public static final Type<TechFx> TYPE = typeOf("tech_fx");
 		public static final StreamCodec<RegistryFriendlyByteBuf, TechFx> CODEC = StreamCodec.of(
@@ -239,15 +264,25 @@ public final class Payloads {
 					buf.writeFloat(p.radius);
 					buf.writeFloat(p.length);
 					buf.writeByte(p.tier);
-					buf.writeByte(p.flags);
+					buf.writeShort(p.flags);
 					buf.writeShort(p.count);
 					buf.writeInt(p.seed);
 					buf.writeVarInt(p.caster);
 					buf.writeShort(p.duration);
+					buf.writeVarInt(Math.max(0, p.target + 1));
+					buf.writeShort(p.index);
+					buf.writeShort(p.of);
+					buf.writeInt(p.aux);
 				},
 				buf -> new TechFx(buf.readVarInt(), buf.readByte(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble(),
-						buf.readDouble(), buf.readDouble(), buf.readFloat(), buf.readFloat(), buf.readByte(), buf.readByte(), buf.readShort(),
-						buf.readInt(), buf.readVarInt(), buf.readShort()));
+						buf.readDouble(), buf.readDouble(), buf.readFloat(), buf.readFloat(), buf.readByte(), buf.readShort(), buf.readShort(),
+						buf.readInt(), buf.readVarInt(), buf.readShort(), buf.readVarInt() - 1, buf.readShort(), buf.readShort(), buf.readInt()));
+
+		/** A v1-shaped event (no target, single, no aux). */
+		public TechFx(int spec, byte phase, double x, double y, double z, double tx, double ty, double tz, float radius, float length,
+				byte tier, short flags, short count, int seed, int caster, short duration) {
+			this(spec, phase, x, y, z, tx, ty, tz, radius, length, tier, flags, count, seed, caster, duration, -1, (short) 0, (short) 1, 0);
+		}
 
 		/** The caster grade tier 0-5. */
 		public int gradeTier() {
@@ -263,8 +298,129 @@ public final class Payloads {
 			return (flags & flag) != 0;
 		}
 
+		/** True when the event names a target entity. */
+		public boolean hasTarget() {
+			return target >= 0;
+		}
+
+		/** The stage index of a {@link #FLAG_STAGE} event (0 otherwise). */
+		public int stageIndex() {
+			return has(FLAG_STAGE) ? aux & 0xFF : 0;
+		}
+
+		/** True for one event of a group the client should spread itself ({@code index} -1, {@code of} > 1). */
+		public boolean clientRing() {
+			return index < 0 && of > 1;
+		}
+
 		@Override
 		public Type<TechFx> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * The phantoms of one cast (DESIGN 27.4): sent on spawn, every 10 ticks while any is alive and once empty when they end,
+	 * to the players tracking the caster. The server keeps phantoms virtual; clients draw each {@link Entry} by its
+	 * {@code PhantomKind} and lerp between syncs. {@code spec} = net id.
+	 */
+	public record PhantomSync(int caster, int spec, List<Entry> entries) implements CustomPacketPayload {
+		public static final int MAX = 32;
+
+		/**
+		 * One phantom: {@code slot} its index in the cast, {@code kind} the {@code PhantomKind} ordinal, the position and yaw,
+		 * {@code cling} the entity it clings to (-1 none), {@code mode} FOLLOW 0 / ANCHOR 1 / CLING 2, {@code ticksLeft}.
+		 */
+		public record Entry(byte slot, byte kind, float x, float y, float z, float yaw, int cling, byte mode, short ticksLeft) {
+		}
+
+		public static final Type<PhantomSync> TYPE = typeOf("phantom_sync");
+		public static final StreamCodec<RegistryFriendlyByteBuf, PhantomSync> CODEC = StreamCodec.of(
+				(buf, p) -> {
+					buf.writeVarInt(p.caster);
+					buf.writeVarInt(p.spec);
+					int count = Math.min(MAX, p.entries.size());
+					buf.writeVarInt(count);
+					for (int i = 0; i < count; i++) {
+						Entry e = p.entries.get(i);
+						buf.writeByte(e.slot);
+						buf.writeByte(e.kind);
+						buf.writeFloat(e.x);
+						buf.writeFloat(e.y);
+						buf.writeFloat(e.z);
+						buf.writeFloat(e.yaw);
+						buf.writeVarInt(Math.max(0, e.cling + 1));
+						buf.writeByte(e.mode);
+						buf.writeShort(e.ticksLeft);
+					}
+				},
+				buf -> {
+					int caster = buf.readVarInt();
+					int spec = buf.readVarInt();
+					int count = Math.min(MAX, buf.readVarInt());
+					List<Entry> entries = new ArrayList<>(count);
+					for (int i = 0; i < count; i++) {
+						entries.add(new Entry(buf.readByte(), buf.readByte(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(),
+								buf.readVarInt() - 1, buf.readByte(), buf.readShort()));
+					}
+					return new PhantomSync(caster, spec, entries);
+				});
+
+		@Override
+		public Type<PhantomSync> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * A TRANSFORM form of a player or disciple (DESIGN 27.4): {@code form} the form id ("" = none, the form ended),
+	 * {@code ticks} its remaining duration, {@code stage} a form-specific stage (heaven fire 1-3, ancient god stomps...).
+	 * Sent to the entity's trackers and the entity itself on start, stage change and end.
+	 */
+	public record FormSync(int entity, String form, short ticks, byte stage) implements CustomPacketPayload {
+		public static final Type<FormSync> TYPE = typeOf("form_sync");
+		public static final StreamCodec<RegistryFriendlyByteBuf, FormSync> CODEC = StreamCodec.of(
+				(buf, p) -> {
+					buf.writeVarInt(p.entity);
+					buf.writeUtf(p.form, 64);
+					buf.writeShort(p.ticks);
+					buf.writeByte(p.stage);
+				},
+				buf -> new FormSync(buf.readVarInt(), buf.readUtf(64), buf.readShort(), buf.readByte()));
+
+		public boolean ended() {
+			return form.isEmpty();
+		}
+
+		@Override
+		public Type<FormSync> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * A visual bind on an entity (DESIGN 27.4): {@code kind} the {@code BindKind} ordinal (vines, rope, chains, seal, frost,
+	 * time stop, suspension, sleep, karmic link), {@code ticks} the remaining duration (0 = ended), {@code caster} the
+	 * binder's entity id, {@code spec} the spec net id (-1 none). Sent to the bound entity's trackers.
+	 */
+	public record BindSync(int entity, byte kind, short ticks, int caster, int spec) implements CustomPacketPayload {
+		public static final Type<BindSync> TYPE = typeOf("bind_sync");
+		public static final StreamCodec<RegistryFriendlyByteBuf, BindSync> CODEC = StreamCodec.of(
+				(buf, p) -> {
+					buf.writeVarInt(p.entity);
+					buf.writeByte(p.kind);
+					buf.writeShort(p.ticks);
+					buf.writeVarInt(Math.max(0, p.caster + 1));
+					buf.writeVarInt(Math.max(0, p.spec + 1));
+				},
+				buf -> new BindSync(buf.readVarInt(), buf.readByte(), buf.readShort(), buf.readVarInt() - 1, buf.readVarInt() - 1));
+
+		public boolean ended() {
+			return ticks <= 0;
+		}
+
+		@Override
+		public Type<BindSync> type() {
 			return TYPE;
 		}
 	}

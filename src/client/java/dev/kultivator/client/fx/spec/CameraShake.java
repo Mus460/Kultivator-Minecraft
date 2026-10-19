@@ -17,6 +17,8 @@ import net.minecraft.world.phys.Vec3;
 public final class CameraShake {
 
 	public static final float MAX_DEGREES = 2.5F;
+	/** The total amplitude per frame never exceeds this (polish S13). */
+	public static final float CLAMP_DEGREES = 1.2F;
 	public static final float MIN_FULL_RADIUS = 8.0F;
 
 	private static float intensity;
@@ -27,11 +29,25 @@ public final class CameraShake {
 
 	/** Starts a shake of {@code intensity} (0-1) for {@code ticks} centred at {@code at}; a weaker one never replaces it. */
 	public static void add(float intensity, int ticks, Vec3 at, float radius) {
+		add(intensity, ticks, at, radius, false);
+	}
+
+	/**
+	 * Starts a shake (polish S7/S13): non-finite values are dropped, Minimal quality shakes at 0.4 and a climax may reach
+	 * the full intensity; the per-frame amplitude is clamped to {@link #CLAMP_DEGREES}.
+	 */
+	public static void add(float intensity, int ticks, Vec3 at, float radius, boolean climax) {
+		if (!Float.isFinite(intensity) || !Float.isFinite(radius) || at == null || !Double.isFinite(at.x) || !Double.isFinite(at.y)
+				|| !Double.isFinite(at.z)) {
+			return;
+		}
 		if (intensity <= 0.0F || ticks <= 0 || EffectQuality.shake() == EffectQuality.Shake.OFF) {
 			return;
 		}
+		float quality = EffectQuality.minimal() ? 0.4F : 1.0F;
 		long now = Util.getMillis();
-		float strength = Math.min(1.0F, intensity);
+		float strength = Math.min(climax ? 1.0F : 0.8F, intensity) * quality;
+		radius = Math.max(0.0F, radius);
 		if (now < endMillis && current(now) >= strength) {
 			return;
 		}
@@ -62,7 +78,7 @@ public final class CameraShake {
 			return;
 		}
 		float tilt = (float) (double) minecraft.options.damageTiltStrength().get();
-		float degrees = MAX_DEGREES * current(now) * setting * tilt * falloff;
+		float degrees = Math.min(CLAMP_DEGREES, MAX_DEGREES * current(now) * setting * tilt * falloff);
 		if (degrees <= 0.001F) {
 			return;
 		}

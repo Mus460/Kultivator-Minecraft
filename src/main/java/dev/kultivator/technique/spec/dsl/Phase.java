@@ -28,13 +28,31 @@ public enum Phase {
 	EXTRA4,
 	EXTRA5,
 	EXTRA6,
-	EXTRA7;
+	EXTRA7,
+	/**
+	 * The cast stopped early (cancelled, replaced, interrupted, the caster died or a toggle was cast off): every client
+	 * ends this caster's runs of the spec, its pose and its cinematic. Position = caster, duration 0. Never has layers.
+	 */
+	ABORT,
+	/**
+	 * A summoned phantom attacks: pos = the phantom, to = the victim, {@code target} = the victim's id, {@code aux} = the
+	 * {@code PhantomKind} ordinal.
+	 */
+	PHANTOM,
+	/** A simulated projectile hit the ground without a target (pos = the landing point, to = where it came from). */
+	LAND;
 
 	private static final Phase[] VALUES = values();
 
 	/** Spec-specific moment {@code index} (0-7). */
 	public static Phase extra(int index) {
 		return VALUES[EXTRA0.ordinal() + Math.max(0, Math.min(7, index))];
+	}
+
+	/** The index 0-7 of an EXTRA phase, or −1. */
+	public int extraIndex() {
+		int i = ordinal() - EXTRA0.ordinal();
+		return i >= 0 && i <= 7 ? i : -1;
 	}
 
 	public static Phase byOrdinal(int ordinal) {

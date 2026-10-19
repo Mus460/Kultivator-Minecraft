@@ -496,7 +496,18 @@ public final class Dsl {
 	/** {@code n} (≤ 24) orbiting ItemDisplays on a ring of radius {@code r}. */
 	public static FxLayer swordRing(Item item, int n, float r) { return FxLayer.of(FxLayer.Template.SWORD_RING, 0xFFFFFF).item(item).n(n).radius(r); }
 
+	/**
+	 * A 3D prop model {@code kultivator:fx/<id>} (DESIGN 27.3): an item display with the cuboid model, posed and animated
+	 * by the client's ModelFx (scale, fall, grow, slide, swing...). Falls back to particles at Minimal or without budget.
+	 */
+	public static FxLayer model(String id) { return FxLayer.of(FxLayer.Template.MODEL, 0xFFFFFF).model(id); }
+	/** A glowing 3D prop model (light 15, the prop carries its own emissive texture). */
+	public static FxLayer modelGlow(String id, int tint) { return FxLayer.of(FxLayer.Template.MODEL, tint).model(id).color2(tint); }
+
 	// ================================================================== custom renderers (22.4.4)
+
+	/** A segmented ribbon from the position to the second point (dragons, whips, flame and blood ribbons). */
+	public static FxLayer ribbon(int color) { return FxLayer.of(FxLayer.Template.RIBBON, color).line(); }
 
 	public static FxLayer avatar(int color) { return FxLayer.of(FxLayer.Template.AVATAR, color).onCaster(); }
 	public static FxLayer cloneOf(int color) { return FxLayer.of(FxLayer.Template.CLONE, color); }

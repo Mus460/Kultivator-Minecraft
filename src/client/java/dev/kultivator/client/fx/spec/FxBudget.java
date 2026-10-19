@@ -43,6 +43,14 @@ public final class FxBudget {
 		return granted;
 	}
 
+	/** Gives back tokens a layer took but could not use (a refused partial grant, polish S13). */
+	public static void refund(int granted) {
+		if (granted > 0) {
+			tokens = Math.min(perTick() * 2.0F, tokens + granted);
+			spentThisSecond = Math.max(0, spentThisSecond - granted);
+		}
+	}
+
 	/** Tokens left right now (the HUD's debug line and templates that size themselves). */
 	public static int available() {
 		return Math.max(0, Math.round(tokens));

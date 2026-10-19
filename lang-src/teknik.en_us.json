@@ -220,6 +220,7 @@
   "kultivator.teknik.test.audit.prereq": "%1$s: prerequisite %2$s does not exist",
   "kultivator.teknik.test.audit.echo": "%s: ECHO on a type that does not allow it (it becomes DURATION +25%%)",
   "kultivator.teknik.test.audit.cap": "%1$s: %2$s %3$s is above the cap %4$s (clamped)",
+  "kultivator.teknik.test.audit.polish": "%1$s: %2$s",
   "kultivator.teknik.test.audit.ok": "%1$s specs OK · %2$s for the player",
   "kultivator.teknik.test.audit.bad": "%1$s problems, %2$s warnings (%3$s specs, %4$s for the player)",
 

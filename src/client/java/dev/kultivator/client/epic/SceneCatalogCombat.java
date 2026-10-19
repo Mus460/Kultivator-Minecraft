@@ -148,6 +148,9 @@ final class SceneCatalogCombat {
 				stamp(s, delay, t("save.tree"), "菩", 0x3B9A50);
 			}
 			case EpicIds.SAVE_UNDYING_BLOOD -> {
+				// polish S22: the subject kneels inside a blood shell (not only a camera move)
+				s.at(delay, () -> dev.kultivator.client.fx.spec.AnimBridge.pose(s.subjectId, dev.kultivator.technique.spec.dsl.Pose.KNEEL_STRIKE, 30));
+				s.add(new RingRenderer(delay, 40, s.feet(0.0F), 1.0F, 4.0F, 1.0F, 8.0F, 0xC03020, 0.6F));
 				emit(s, delay, 40, (tick, self) -> {
 					if (tick % 10 == 0) {
 						EpicParticles.ring(s.feet(0.0F).add(0.0D, 1.0D, 0.0D), 1.0F, n(s, 12, 4), EpicParticles.dust(0xC03020, 1.2F), 0.04F);
@@ -171,7 +174,10 @@ final class SceneCatalogCombat {
 				stamp(s, delay, t("save.repay", name), "恩", 0xC8A030);
 			}
 			case EpicIds.SAVE_SOUL_FLIGHT -> {
-				Vec3 stele = at.add(30.0D, 0.0D, 0.0D);
+				// b = (dx << 16 | dz) as signed 16-bit halves, f = dy: the way to the Sect Hall (EpicHooks.discipleSave)
+				short dx = (short) (s.b >> 16);
+				short dz = (short) s.b;
+				Vec3 stele = s.b == 0 && s.f == 0.0F ? at.add(0.0D, 24.0D, 0.0D) : at.add(dx, s.f, dz);
 				s.add(new TrailRenderer(delay, 60, at.add(0.0D, 1.0D, 0.0D), stele, 24.0F, 0.3F, GOLD, 0.9F, false, s.seed).travel(40).tail(14));
 				stamp(s, delay, t("save.soul_flight", name), "魂", 0xC8A030);
 			}
@@ -254,6 +260,15 @@ final class SceneCatalogCombat {
 				int index = Math.max(0, Math.min(FLAME_IDS.length - 1, s.a));
 				int rgb = FLAME_RGB[index];
 				emit(s, delay, 60, (tick, self) -> EpicParticles.column(s.feet(0.0F), 8.0F, 0.6F, n(s, 5, 1), EpicParticles.dust(rgb, 1.3F), 0.08F));
+				// polish S22: a pillar and a ring of the flame on the subject, the flame orb joining its orbit
+				s.add(new PillarRenderer(delay, 50, s.feet(0.0F), 10.0F, rgb, 0.45F).rise(8));
+				s.add(new RingRenderer(delay + 4, 40, s.feet(0.0F), 1.0F, 6.0F, 1.0F, 12.0F, rgb, 0.6F));
+				if (dev.kultivator.client.fx.spec.AnimBridge.modelKnown("heavenly_flame_orb") && !lite(s)) {
+					s.at(delay + 10, () -> dev.kultivator.client.fx.spec.AnimBridge.model("heavenly_flame_orb", s.feet(0.0F).add(0.0D, 1.2D, 0.0D), 0.6F, 0.0F,
+							0.0F, 0.0F, 80, java.util.List.of(dev.kultivator.client.fx.spec.AnimBridge.step(dev.kultivator.client.anim.model.Anim.ORBIT, 0, 80, 0.8F,
+									90.0F, null)), s.subjectId, new Vec3(0.0D, 1.2D, 0.0D), false, true, s.subjectId,
+							dev.kultivator.technique.spec.dsl.FxLayer.Priority.CORE));
+				}
 				stamp(s, delay, t("flame_absorbed", Component.translatable("item.kultivator.heavenly_flame_seed." + FLAME_IDS[index])), "炎", SEAL_RED);
 			}
 			case EpicIds.EXTRA_VOID_BORDER -> {
@@ -286,10 +301,45 @@ final class SceneCatalogCombat {
 			case EpicIds.EXTRA_INNER_CALAMITY -> stamp(s, delay, Component.translatable("kultivator.spine9.momen.inner_calamity"), "災", SEAL_RED);
 			case EpicIds.EXTRA_OWN_ART_BORN -> stamp(s, delay, Component.translatable("kultivator.spine9.momen.own_art_born"), "創", 0xC8A030);
 			case EpicIds.EXTRA_AUCTION_WIN -> stamp(s, delay, Component.translatable("kultivator.spine9.momen.auction_win"), "拍", 0x5A8AC8);
+			// polish: a disciple's signature ultimate / block-safe Jurus Pemusnah. a = Dao or art ordinal, b = radius.
+			// Rings, a pillar, a sky grade and a stamp; never a camera shot (the master may be fighting, 23.1).
+			case EpicIds.EXTRA_DISCIPLE_ULT -> {
+				dev.kultivator.data.Dao dao = dev.kultivator.data.Dao.byOrdinal(s.a);
+				int rgb = dao == null ? GOLD : dao.color();
+				float radius = Math.max(4.0F, Math.min(48.0F, s.b));
+				discipleBlast(s, delay, rgb, radius, dao == dev.kultivator.data.Dao.FIRE ? SkyDirector.Grade.SK_RED
+						: dao == dev.kultivator.data.Dao.SHADOW || dao == dev.kultivator.data.Dao.SPACE ? SkyDirector.Grade.SK_VOID : SkyDirector.Grade.SK_GOLD);
+				Component title = dao == null ? t("save.generic") : upper(dao.displayName());
+				stamp(s, delay, title, "絕", dao == null ? 0xC8A030 : SEAL_RED);
+			}
+			case EpicIds.EXTRA_DESTROYER_ART -> {
+				dev.kultivator.disciple.path.DestroyerArts.Art art = dev.kultivator.disciple.path.DestroyerArts.Art.byOrdinal(s.a);
+				int rgb = art == null ? SEAL_RED : art.color();
+				float radius = Math.max(4.0F, Math.min(48.0F, s.b));
+				discipleBlast(s, delay, rgb, radius, art == dev.kultivator.disciple.path.DestroyerArts.Art.LOTUS
+						|| art == dev.kultivator.disciple.path.DestroyerArts.Art.HELL_MONARCH ? SkyDirector.Grade.SK_RED : SkyDirector.Grade.SK_VOID);
+				if (art != null) {
+					stamp(s, delay, upper(art.displayName()), "滅", SEAL_RED);
+				}
+			}
 			default -> {
 			}
 		}
 		s.end(delay + 140);
+	}
+
+	/** The shared look of a disciple's big art: two expanding rings, a pillar, a short flash and a brief sky grade. */
+	private static void discipleBlast(Scene s, int delay, int rgb, float radius, SkyDirector.Grade grade) {
+		Vec3 ground = s.feet(0.0F);
+		s.add(new RingRenderer(delay, 30, ground, 0.5F, radius, 1.4F, 10.0F, rgb, 0.7F));
+		if (!lite(s)) {
+			s.add(new RingRenderer(delay + 6, 36, ground, 0.5F, radius * 0.6F, 0.9F, 14.0F, 0xFFFFFF, 0.45F));
+			s.add(new PillarRenderer(delay, 40, ground, Math.min(40.0F, 8.0F + radius), rgb, 0.5F).rise(6));
+		}
+		flash(s, delay, rgb, 0.12F, 3, 0);
+		edge(s, delay, rgb, 0.35F, 24);
+		sky(s, delay, grade, 0.35F, 0.0F, 10);
+		skyRelease(s, delay + 10, 30, 40);
 	}
 
 	/** Momen Pencerahan (client-derived, local player): an orbit, a golden lotus under the player, soft gold sky. */

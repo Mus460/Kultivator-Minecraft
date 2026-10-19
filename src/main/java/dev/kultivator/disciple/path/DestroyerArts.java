@@ -457,6 +457,8 @@ public final class DestroyerArts {
 			}
 		}
 		DisciplePaths.sound(level, origin, SoundEvents.BEACON_POWER_SELECT, 1.0F, 0.6F);
+		// the light 7b beat of the block-safe art (DESIGN 27.6): a stamp and a sky grade for the master, no warning
+		dev.kultivator.epic.EpicHooks.destroyerArt(entity, master, art.ordinal(), centre, Math.max(spec.radius(), 4.0D) * range);
 		return true;
 	}
 
@@ -490,8 +492,14 @@ public final class DestroyerArts {
 		if (!(entity.level() instanceof ServerLevel level) || !DiscipleTechniques.mayHit(entity, master, target)) {
 			return false;
 		}
-		float damage = (float) (amount * DiscipleHooks.damageFactor(entity, target, true));
-		if (!(damage > 0.0F) || !Float.isFinite(damage)) {
+		float factored = (float) (amount * DiscipleHooks.damageFactor(entity, target, true));
+		if (!(factored > 0.0F) || !Float.isFinite(factored)) {
+			return false;
+		}
+		// the one damage function of the choke points (DESIGN 22.5.5): sanitised like every other technique hit
+		float damage = dev.kultivator.technique.spec.TechniquePower.finalDamage(
+				dev.kultivator.technique.spec.DamageContext.legacy(entity, target, factored));
+		if (!(damage > 0.0F)) {
 			return false;
 		}
 		if (target.damageCooldownTime > 10) {

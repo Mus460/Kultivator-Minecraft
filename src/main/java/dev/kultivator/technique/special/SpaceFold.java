@@ -178,6 +178,7 @@ public final class SpaceFold implements SpecialTechnique {
 		List<LivingEntity> found = ctx.hostiles(centre, fold.radius, false);
 		int moved = 0;
 		int index = 0;
+		List<Vec3[]> pairs = new java.util.ArrayList<>();
 		for (LivingEntity target : found) {
 			if (moved >= MAX_MOVED) {
 				break;
@@ -189,6 +190,9 @@ public final class SpaceFold implements SpecialTechnique {
 			Vec3 spot = spotFor(ctx, level, target, centre, index++);
 			if (spot == null) {
 				continue;
+			}
+			if (pairs.size() < 32) {
+				pairs.add(new Vec3[]{target.getBoundingBox().getCenter(), spot.add(0.0D, target.getBbHeight() * 0.5D, 0.0D)});
 			}
 			target.teleportTo(spot.x, spot.y, spot.z);
 			target.setDeltaMovement(Vec3.ZERO);
@@ -203,6 +207,11 @@ public final class SpaceFold implements SpecialTechnique {
 		}
 		ctx.fx(Phase.EXTRA0, centre, centre, (float) fold.radius, (float) SPREAD, moved, 16);
 		ctx.sound(Phase.EXTRA0, centre);
+		// every folded monster's way, old place to new place (EXTRA1 per pair, index / of)
+		for (int i = 0; i < pairs.size(); i++) {
+			Vec3[] pair = pairs.get(i);
+			ctx.fx(Phase.EXTRA1, pair[0], pair[1], 1.0F, (float) pair[0].distanceTo(pair[1]), 1, 10, -1, i, pairs.size(), 0, 0);
+		}
 	}
 
 	/** A safe spot for {@code target} within {@link #SPREAD} of {@code centre}, spread on a golden-angle spiral, or null. */

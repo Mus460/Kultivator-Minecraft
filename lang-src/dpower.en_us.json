@@ -356,6 +356,7 @@
   "kultivator.dpower.fairies": "Seven Fairies Formation",
   "kultivator.dpower.fairies.desc": "Seven or more Core Disciples (or higher) of yours fight within 16 blocks of each other: each deals +10%% damage.",
   "kultivator.dpower.fairies.source": "Source: Against the Gods, ch. 739: the Frozen Cloud Seven Fairies, the sect's elite seven.",
+  "kultivator.dpower.fairies.linked": "The Seven Fairies link their qi: seven lights, one formation (+10%% damage).",
 
   "kultivator.dpower.soul_flight.fled": "%s's body is destroyed, but its Nascent Soul flees to the Sect Hall as a streak of light. It re-forms there in %s minutes.",
   "kultivator.dpower.soul_flight.source": "Source: A Record of a Mortal's Journey (a Nascent Soul flees as a streak of light when its body is destroyed).",

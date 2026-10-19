@@ -31,7 +31,7 @@ public final class ScreenFlash {
 	private static long vignetteEnd;
 
 	public static void add(int rgb, float alpha, int ticks) {
-		if (!EffectQuality.flash() || EffectQuality.reduceMotion() || alpha <= 0.0F) {
+		if (!EffectQuality.flash() || EffectQuality.reduceMotion() || !Float.isFinite(alpha) || alpha <= 0.0F) {
 			return;
 		}
 		long now = Util.getMillis();
@@ -53,9 +53,27 @@ public final class ScreenFlash {
 		vignetteEnd = now + Math.max(10, Math.min(200, ticks)) * 50L;
 	}
 
+	/** Speed lines over the screen edges in {@code rgb} for {@code ticks} (one's own dashes and blinks, S16). */
+	public static void speedLines(int rgb, int ticks) {
+		if (EffectQuality.reduceMotion() || ticks <= 0) {
+			return;
+		}
+		long now = Util.getMillis();
+		speedRgb = rgb & 0xFFFFFF;
+		speedStart = now;
+		speedEnd = now + Math.max(2, Math.min(20, ticks)) * 50L;
+		speedSeed = (int) (now & 0x7FFFFFFF);
+	}
+
+	private static int speedRgb;
+	private static long speedStart;
+	private static long speedEnd;
+	private static int speedSeed;
+
 	static void clear() {
 		flashEnd = 0L;
 		vignetteEnd = 0L;
+		speedEnd = 0L;
 	}
 
 	/** The HUD element (registered by {@link SpecFx#init}). */
@@ -86,6 +104,33 @@ public final class ScreenFlash {
 					int color = Palette.argb(alpha, vignetteRgb);
 					g.fill(i, band, i + 2, height - band, color);
 					g.fill(width - i - 2, band, width - i, height - band, color);
+				}
+			}
+			if (now < speedEnd) {
+				// radial streaks converging on the centre, thickest at the edges (motion, not a camera snap)
+				float t = (now - speedStart) / (float) Math.max(1L, speedEnd - speedStart);
+				float strength = (t < 0.2F ? t / 0.2F : 1.0F - (t - 0.2F) / 0.8F) * Math.max(0.3F, effect);
+				java.util.Random random = new java.util.Random(speedSeed + (now - speedStart) / 50L);
+				int lines = 26;
+				float cx = width / 2.0F;
+				float cy = height / 2.0F;
+				for (int i = 0; i < lines; i++) {
+					double angle = random.nextDouble() * Math.PI * 2.0D;
+					float inner = 0.55F + random.nextFloat() * 0.25F;
+					int alpha = Math.round(120 * strength * (0.5F + random.nextFloat() * 0.5F));
+					if (alpha <= 4) {
+						continue;
+					}
+					int color = Palette.argb(alpha, speedRgb);
+					float reach = (float) Math.hypot(cx, cy);
+					int steps = 8;
+					for (int k = 0; k < steps; k++) {
+						float f = inner + (1.0F - inner) * k / steps;
+						int x = Math.round(cx + (float) Math.cos(angle) * reach * f);
+						int y = Math.round(cy + (float) Math.sin(angle) * reach * f);
+						int size = 1 + k / 3;
+						g.fill(x, y, x + size, y + size, color);
+					}
 				}
 			}
 			if (now < flashEnd && effect > 0.0F) {

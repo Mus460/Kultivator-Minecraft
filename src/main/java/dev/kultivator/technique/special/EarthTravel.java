@@ -115,7 +115,14 @@ public final class EarthTravel implements SpecialTechnique {
 		Vec3 along = from.add(exit.subtract(from).scale(Math.max(0, age) / (double) TRAVEL_TICKS));
 		Vec3 spot = ctx.safeSpot(along);
 		if (spot != null && spot.distanceToSqr(player.position()) > 0.25D) {
-			moveTo(player, spot);
+			// racing under the ground as real motion (S16); a spot far off (a cliff) is reached with one safe hop
+			Vec3 delta = spot.subtract(player.position());
+			if (delta.lengthSqr() > 36.0D) {
+				moveTo(player, spot);
+			} else {
+				player.setDeltaMovement(delta);
+				player.syncVelocity = true;
+			}
 		}
 		player.resetFallDistance();
 	}

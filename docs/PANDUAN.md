@@ -46,7 +46,8 @@ bulat di dalam game.
     * 12.1 [Kitab Teknik](#121-kitab-teknik) · 12.4 [Kekuatan](#124-kekuatan-tumbuh-bersama-ranah) ·
       12.5 [Penguasaan Jurus](#125-penguasaan-jurus) · 12.6 [Cara memperoleh](#126-cara-memperoleh-teknik) ·
       12.7 [Katalog](#127-katalog-teknik-baru) · 12.8 [23 teknik lama](#128-dua-puluh-tiga-teknik-lama-yang-diperkuat) ·
-      12.10 [Murid](#1210-teknik-dan-murid) · 12.12 [Perintah](#1212-perintah-teknik)
+      12.10 [Murid](#1210-teknik-dan-murid) · 12.12 [Perintah](#1212-perintah-teknik) ·
+      12.15 [Penyempurnaan teknik](#1215-penyempurnaan-teknik)
     * 12.11 [**MODE KEHANCURAN untuk jurusmu sendiri**](#1211-mode-kehancuran-untuk-jurusmu-sendiri-saklar-gampang)
 13. [Pil vanilla dan racun pil](#13-pil-vanilla-dan-racun-pil)
 14. [Alkimia](#14-alkimia)
@@ -1857,6 +1858,40 @@ Server bisa melarang tampilan raksasa untuk semua klien dengan `techniqueDisplay
 * Segel Kesembilan: ikatan per denyut bisa terkena pelemahan kendali berulang, jadi monster kadang lepas lebih cepat.
 * Semua fitur Fase 6c dibuat dan dikompilasi, tetapi **belum diuji di dalam game**, dan angka keseimbangannya belum disetel
   dari permainan nyata. Daftar uji: [docs/uji/FASE-6c.md](uji/FASE-6c.md).
+
+### 12.15 Penyempurnaan teknik
+
+Semua 146 teknik baru, 23 teknik lama, kekuatan murid, Jurus Pemusnah, jurus ciptaan sendiri, dan Momen Epik dipoles ulang.
+Yang dulu "cuma gerakan kamera" sekarang benar-benar terlihat di dunia.
+
+* **Animasi merapal.** 26 pose (segel tangan, dorongan telapak, tebasan dan tusukan pedang, angkat ke langit, hantaman dari
+  atas, hentakan kaki, raungan, pukul dada, kipas, seruling, doa, cawan api, dan lainnya) dengan ancang-ancang singkat,
+  pukulan, tahan, lalu kembali; setiap hantaman memberi aksen kecil. Pose dipakai pemain (orang ketiga **dan** tangan orang
+  pertama, termasuk tangan kiri untuk jurus dua tangan), murid, avatar raksasa, dan sosok raksasa Momen Epik. Rapalan juga
+  mengayunkan tangan di server, jadi pemain lain melihatnya.
+* **Model 3D baru** (dibuat sendiri dari kubus, tekstur buatan skrip `tools/gen_fx_model_textures.py`): sekitar 230 model
+  untuk pedang (Zhuxian, pedang langit, pedang bulan darah), telapak dan kaki raksasa, binatang (naga, burung api, kumbang
+  emas, kupu-kupu perak), bagian wujud (Kera Emas, Tiga Kepala Enam Lengan, zirah Dharma, Darah Naga, 72 wujud), pusaka
+  (payung, wajan, cermin, panji, pagoda bertingkat), dan segel. Model menyala sendiri dan bergerak (berputar, jatuh dan
+  menghentak, terbang ujung lebih dulu, terbuka, pecah jadi serpihan).
+* **Wujud, ikatan, dan makhluk maya terlihat.** Wujud transformasi tampil di tubuh perapal; musuh yang dibekukan, dihentikan
+  waktunya, disegel, atau dirantai berhenti bergerak dan berubah warna; makhluk maya memberi tanda cincin sebelum hantaman
+  besar.
+* **VFX baru.** Partikel qi `kultivator:qi` yang terang dan tembus pandang dengan tiga warna per Dao, ditambah pita naga,
+  sambaran petir, sinar, bulan sabit, cincin kejut, dan cahaya. Hantaman tidak lagi hilang karena anggaran; efek yang lama
+  dihitung per detik; ukuran mengikuti radius jurus; ranah lebih tinggi membuat efek lebih **besar**, bukan disembunyikan.
+* **Gerak sungguhan.** Jurus lari, lompat, dan tunggang sekarang benar-benar memindahkan perapal, tidak hanya kamera.
+* **Momen Epik.** Puncak sinematik muncul sekali di fase puncak jurus; jurus pamungkas murid dan Jurus Pemusnah mendapat
+  cincin, pilar, warna langit, dan cap judul (tanpa merebut kamera); Pelarian Jiwa murid terbang ke arah Aula Sekte.
+
+**Cara mencoba:** `/kultivasi uji teknik pamer` (semua teknik bergiliran), atau `/kultivasi uji teknik pamer dao fire`,
+`/kultivasi uji teknik pamer tingkat dewa`, `/kultivasi uji teknik pamer 6 dari qi_palm`. Coba dengan **Kualitas efek
+Maksimal** untuk tampilan paling megah dan **Minimal** untuk laptop lemah (efek tetap jelas, hanya lebih sedikit).
+
+**Belum sempurna:** semua ini dikompilasi tetapi **belum diuji di dalam game**; ukuran, posisi model, dan kekuatan pose
+mungkin masih perlu disetel. Jurus pamungkas tanda Es dan Bayangan milik murid masih memakai jalur lama; Lompatan Menginjak
+Langit belum menukik ke arah bidikan; beberapa tambahan kecil per jurus (dinding kaca Larangan Langit, aksara 帝 api kaisar,
+bilah rumput Musim Semi Abadi, dan sejenisnya) belum ada.
 
 ---
 

@@ -81,6 +81,8 @@ public final class DisciplePowers {
 		int lastCasts = -1;
 		double codexFraction;
 		long fairiesUntil;
+		/** The Kunpeng wings stay spread on the clients until this tick (BIT_KUNPENG). */
+		long kunpengUntil;
 		long lifeBuffUntil;
 		long dragonUntil;
 		@Nullable Ultimates.Lotus lotus;
@@ -111,6 +113,31 @@ public final class DisciplePowers {
 
 	static Live live(DiscipleEntity entity) {
 		return LIVE.computeIfAbsent(entity, key -> new Live());
+	}
+
+	/** Held in place by a lotus or a ritual. */
+	public static boolean holdingStill(DiscipleEntity entity) {
+		Live live = LIVE.get(entity);
+		return live != null && (live.lotus != null || live.ritualKind >= 0);
+	}
+
+	/** Sitting in a heavenly-flame ritual (drawn as meditating: the FLAME_CUP pose). */
+	public static boolean inRitual(DiscipleEntity entity) {
+		Live live = LIVE.get(entity);
+		return live != null && live.ritualKind >= 0;
+	}
+
+	/**
+	 * The look bits module C adds to the disciple's synced flags (DESIGN 27.6): {@link PowerIds#BIT_KUNPENG} while the
+	 * wings are spread, {@link PowerIds#BIT_FAIRIES} while the Seven Fairies are linked. Read by the client renderer.
+	 */
+	public static int lookFlags(DiscipleEntity entity) {
+		Live live = LIVE.get(entity);
+		if (live == null) {
+			return 0;
+		}
+		long now = PowerCore.now(entity);
+		return (live.kunpengUntil > now ? PowerIds.BIT_KUNPENG : 0) | (live.fairiesUntil > now ? PowerIds.BIT_FAIRIES : 0);
 	}
 
 	// ================================================================== init

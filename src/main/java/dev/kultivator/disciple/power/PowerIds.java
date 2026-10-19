@@ -176,6 +176,34 @@ public final class PowerIds {
 	/** pos disciple, b physique id: a rare physique stirs (first sight, awakening). */
 	public static final int FX_PHYSIQUE = 33;
 
+	// ------------------------------------------------------------------ polish pass (DESIGN 27.6)
+
+	/**
+	 * The Seven Fairies link up (edge-triggered once when the seventh joins): one packet per fairy, pos = the fairy, target
+	 * = the centre of the seven, b = its entity id, f = its index 0-6 (the client links the seven ids it got within 2 s).
+	 */
+	public static final int FX_FAIRIES = 34;
+	/** The fire ultimate lotus leaves the hands: pos = the hands, target = the impact, b = flight ticks, f = radius. */
+	public static final int FX_LOTUS_RELEASE = 35;
+	/** A Kunpeng Wings dash: pos = from, target = to, b = ticks the move takes, f = 1 at full power. */
+	public static final int FX_KUNPENG_DASH = 36;
+	/**
+	 * A Divine Clone starts fading: the same event as {@code PathFxIds.CLONE} with b = 1 (f = fade ticks), named here for
+	 * the power code; the clone body is removed {@code DivineClones.FADE_TICKS} later.
+	 */
+	public static final int FX_CLONE_FADE = 37;
+	/** A damage pulse of the sword formation: pos = the struck foe's middle, target = the dome centre, b = its entity id. */
+	public static final int FX_ULT_SWORD_DIVE = 38;
+
+	/**
+	 * Kunpeng Wings are spread (the dash window is open). A bit of {@code DiscipleEntity.syncedFlags()} (the power bits are
+	 * full): read it as {@code (disciple.syncedFlags() & PowerIds.BIT_KUNPENG) != 0}. Same value as
+	 * {@code DiscipleEntity.FLAG_KUNPENG}.
+	 */
+	public static final int BIT_KUNPENG = 1 << 4;
+	/** The Seven Fairies are linked (all seven near each other). A bit of {@code syncedFlags()}, = {@code DiscipleEntity.FLAG_FAIRIES}. */
+	public static final int BIT_FAIRIES = 1 << 5;
+
 	private PowerIds() {
 	}
 }

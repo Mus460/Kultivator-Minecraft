@@ -1,8 +1,17 @@
 package dev.kultivator.client.disciple.path;
 
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.anim.model.Anim;
+import dev.kultivator.client.anim.model.ModelHandle;
 import dev.kultivator.client.disciple.DiscipleLook;
 import dev.kultivator.client.fx.CommonFx;
+import dev.kultivator.client.fx.quad.GlowQuad;
+import dev.kultivator.client.fx.quad.QuadFx;
+import dev.kultivator.client.fx.quad.RingQuad;
+import dev.kultivator.client.fx.quad.StreakQuad;
+import dev.kultivator.client.fx.spec.AnimBridge;
+import dev.kultivator.technique.spec.dsl.FxLayer;
+import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.path.DestroyerArts;
 import dev.kultivator.disciple.path.DisciplePaths;
@@ -19,7 +28,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,6 +41,11 @@ import java.util.Map;
  * and calamity glyphs, the Heaven-Dao golden pillar and the descended master's aura. One-shot effects: condensing,
  * calamity omen and passing, seal glyphs, the heir's dantian link, the ring's old sage, the surpass pillar, the Tahan
  * Petir arc, Divine Clones, hexes, soul lamps and the block-safe Jurus Pemusnah.
+ * <p>
+ * Polish pass (DESIGN 27.6, plan 6.14): the Jurus Pemusnah play their poses on the disciple and show their objects as
+ * the model module's props (the Xuantian sword rising and cleaving along a light line, the prison hand falling open and
+ * closing, the Sumeru hammer growing over the nine blows and smashing down, nine mountain-sea seals stamping in turn,
+ * the fury lotus), with quad rings for the quake, hell and devouring arts; a Divine Clone's maker raises its arms.
  */
 public final class PathFx {
 
@@ -116,9 +132,17 @@ public final class PathFx {
 			case PathFxIds.FOUNDATION -> foundation(pos, b, Math.round(f));
 			case PathFxIds.CLONE -> {
 				if (b == 0) {
+					Entity maker = nearestDiscipleBeyond(pos, 1.0D, 6.0D);
+					if (maker != null) {
+						AnimBridge.pose(maker.getId(), Pose.SUMMON_RAISE, 8);
+					}
+					if (!EffectQuality.minimal()) {
+						QuadFx.add(new GlowQuad(pos.add(0.0D, 1.0D, 0.0D), 0.6F, 1.8F, 0xE8F6FF, 0.8F, 0.0F, 10));
+					}
 					CommonFx.burst(pos.add(0.0D, 1.0D, 0.0D), 0xBFE8FF, 24, 1.0F);
 					CommonFx.pillar(pos, 0xE8F6FF, 2.5F);
 				} else {
+					dev.kultivator.client.disciple.power.PhysiqueVisuals.fadeOutNear(pos, Math.max(1, Math.round(f)));
 					for (int i = 0; i < EffectQuality.scale(10); i++) {
 						CommonFx.add(ParticleTypes.POOF, pos.add(random.nextGaussian() * 0.3D, 0.2D + random.nextFloat() * 1.6D, random.nextGaussian() * 0.3D),
 								Vec3.ZERO, false);
@@ -139,7 +163,11 @@ public final class PathFx {
 				CommonFx.burst(pos.add(0.0D, 1.2D, 0.0D), GOLD, 16, 0.8F);
 			}
 			case PathFxIds.ART -> art(DestroyerArts.Art.byOrdinal(b), pos, target, f, random);
-			case PathFxIds.ART_CHARGE -> hammer(pos, b);
+			case PathFxIds.ART_CHARGE -> {
+				if (!hammerModel(pos, b)) {
+					hammer(pos, b);
+				}
+			}
 			case PathFxIds.LAMP -> {
 				for (int i = 0; i < EffectQuality.scale(14); i++) {
 					CommonFx.add(ParticleTypes.SOUL_FIRE_FLAME, pos.add(random.nextGaussian() * 0.4D, 1.0D + random.nextFloat(), random.nextGaussian() * 0.4D),
@@ -243,14 +271,48 @@ public final class PathFx {
 		}
 	}
 
-	/** The block-safe forms of the Jurus Pemusnah: big particles only. */
+	/** The growing Sumeru hammer of each charging disciple (ART_CHARGE blows 1-9), by entity id. */
+	private static final Map<Integer, ModelHandle> HAMMERS = new HashMap<>();
+
+	/** The Sumeru hammer prop over the disciple, a size step per blow; false when the model module cannot show it. */
+	private static boolean hammerModel(Vec3 feet, int blow) {
+		if (EffectQuality.minimal() || !AnimBridge.modelKnown("sumeru_hammer")) {
+			return false;
+		}
+		Entity disciple = nearestDisciple(feet);
+		int key = disciple == null ? -1 : disciple.getId();
+		ModelHandle hammer = HAMMERS.get(key);
+		float scale = 1.2F + 0.45F * Math.max(1, Math.min(9, blow));
+		if (hammer == null || !AnimBridge.alive(hammer)) {
+			hammer = AnimBridge.model("sumeru_hammer", feet.add(0.0D, 3.2D, 0.0D), 1.2F, 0.0F, 0.0F, 0.0F, 400,
+					List.of(AnimBridge.step(Anim.BOB, 0, 400, 0.15F, 30.0F, null)), key, new Vec3(0.0D, 3.2D, 0.0D), true, true, key, FxLayer.Priority.CORE);
+			if (hammer == null) {
+				return false;
+			}
+			HAMMERS.put(key, hammer);
+			if (disciple != null) {
+				AnimBridge.pose(disciple.getId(), Pose.HOLD_ITEM_UP, 200);
+			}
+		}
+		AnimBridge.scaleTo(hammer, scale, 4);
+		AnimBridge.play(hammer, AnimBridge.step(Anim.PULSE, 0, 6, 0.12F, 0.0F, null));
+		CommonFx.burst(feet.add(0.0D, 3.2D + 0.1D * blow, 0.0D), 0xB57CFF, 6 + blow, 0.4F + 0.05F * blow);
+		return true;
+	}
+
+	/** The block-safe forms of the Jurus Pemusnah: poses on the disciple, the art's object as a prop, rings and particles. */
 	private static void art(DestroyerArts.Art art, Vec3 pos, Vec3 target, float size, RandomSource random) {
 		if (art == null) {
 			return;
 		}
 		int color = art.color();
+		boolean props = !EffectQuality.minimal();
+		Entity disciple = nearestDiscipleBeyond(pos, 0.0D, 24.0D);
+		int who = disciple == null ? -1 : disciple.getId();
 		switch (art) {
 			case XUANTIAN -> {
+				// the black-gold sword rises behind the disciple and cleaves along a 48-block light line
+				pose(who, Pose.SWORD_SKY, 8);
 				CommonFx.beam(pos, target, color, 0.5F);
 				CommonFx.beam(pos, target, 0xFFFFFF, 0.15F);
 				Vec3 delta = target.subtract(pos);
@@ -258,16 +320,34 @@ public final class PathFx {
 				for (int i = 0; i <= n; i++) {
 					CommonFx.add(ParticleTypes.SWEEP_ATTACK, pos.add(delta.scale((double) i / Math.max(1, n))), Vec3.ZERO, true);
 				}
+				if (props) {
+					QuadFx.add(new StreakQuad(pos.add(0.0D, 1.0D, 0.0D), target.add(0.0D, 1.0D, 0.0D), 1.2F, color, 0xFFFFFF, 6.0F, 14.0F, 0.0F, random.nextInt(), 30));
+					if (AnimBridge.modelKnown("xuantian_sword")) {
+						float yaw = (float) Math.toDegrees(Math.atan2(-delta.x, delta.z));
+						AnimBridge.model("xuantian_sword", pos.add(0.0D, 2.0D, 0.0D), 12.0F, yaw, 0.0F, 0.0F, 40,
+								List.of(AnimBridge.step(Anim.RISE, 0, 8, 6.0F, 0.0F, null), AnimBridge.step(Anim.SWING, 8, 6, -120.0F, 0.0F, null)), -1, Vec3.ZERO,
+								false, true, who, FxLayer.Priority.CORE);
+					}
+				}
+				later(who, Pose.SWORD_SLASH, 8);
 			}
 			case LOTUS -> {
+				pose(who, Pose.TWIN_PALM, 10);
 				sphereBurst(pos, color, size, 60);
 				for (int i = 0; i < EffectQuality.scale(30); i++) {
 					Vec3 dir = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
 					CommonFx.add(ParticleTypes.FLAME, pos.add(dir.scale(size * random.nextFloat())), dir.scale(0.12D), false);
 				}
 				CommonFx.add(ParticleTypes.EXPLOSION, pos, Vec3.ZERO, true);
+				if (props && AnimBridge.modelKnown("fury_lotus")) {
+					AnimBridge.model("fury_lotus", pos.add(0.0D, 1.0D, 0.0D), Math.max(2.0F, size * 0.5F), 0.0F, 0.0F, 0.0F, 24,
+							List.of(AnimBridge.step(Anim.GROW, 0, 6, 0.2F, 0.0F, null), AnimBridge.step(Anim.SPIN, 0, 24, 8.0F, 0.0F, null),
+									AnimBridge.step(Anim.SHATTER, 16, 6, 0.0F, 0.0F, null)), -1, Vec3.ZERO, false, true, who, FxLayer.Priority.CORE);
+				}
+				flatRing(pos, color, 1.0F, size * 1.4F, 16);
 			}
 			case QUAKE -> {
+				pose(who, Pose.KNEEL_STRIKE, 10);
 				for (int ring = 1; ring <= 4; ring++) {
 					CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), color, size * ring / 4.0F, 40 + ring * 8);
 				}
@@ -276,26 +356,48 @@ public final class PathFx {
 					double r = random.nextDouble() * size;
 					CommonFx.add(ParticleTypes.DUST_PLUME, pos.add(Math.cos(angle) * r, 0.2D, Math.sin(angle) * r), new Vec3(0.0D, 0.15D, 0.0D), false);
 				}
+				for (int k = 0; k < 3; k++) {
+					flatRing(pos, color, 1.0F, size * (1.0F + k * 0.4F), 16 + k * 6);
+				}
 			}
 			case DESOLATION -> {
+				pose(who, Pose.ARMS_SPREAD, 16);
 				CommonFx.spiralIn(pos.add(0.0D, 1.0D, 0.0D), color, size, 50, random.nextFloat() * 10.0F);
 				CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), color, size, 64);
 				CommonFx.pillar(pos, color, 4.0F);
+				flatRing(pos, 0x7A7A7A, size * 0.3F, size * 1.4F, 24);
 			}
 			case PRISON_HAND -> {
+				pose(who, Pose.SKY_RAISE, 12);
 				squareColumn(pos, size, color, 6.0F);
 				for (int i = 0; i < EffectQuality.scale(20); i++) {
 					CommonFx.add(ParticleTypes.REVERSE_PORTAL, pos.add(random.nextGaussian() * size * 0.4D, random.nextFloat() * 4.0D, random.nextGaussian() * size * 0.4D),
 							Vec3.ZERO, false);
 				}
+				if (props && AnimBridge.modelKnown("prison_hand_open")) {
+					ModelHandle hand = AnimBridge.model("prison_hand_open", pos, Math.max(4.0F, size), 0.0F, 0.0F, 0.0F, 40,
+							List.of(AnimBridge.step(Anim.FALL, 0, 14, 20.0F, 0.0F, null)), -1, Vec3.ZERO, false, true, who, FxLayer.Priority.CORE);
+					CLOSING.add(new Closing(hand, 14));
+				}
+				later(who, Pose.OVERHEAD_SLAM, 12);
 			}
 			case SUMERU -> {
+				pose(who, Pose.OVERHEAD_SLAM, 10);
 				sphereBurst(pos, color, size, 70);
 				CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), color, size, 72);
 				CommonFx.add(ParticleTypes.EXPLOSION, pos, Vec3.ZERO, true);
 				CommonFx.add(ParticleTypes.SONIC_BOOM, pos.add(0.0D, 1.0D, 0.0D), Vec3.ZERO, true);
+				ModelHandle hammer = HAMMERS.remove(who);
+				if (hammer != null) {
+					// the grown hammer smashes down on the zone
+					AnimBridge.moveTo(hammer, pos, 4);
+					AnimBridge.play(hammer, AnimBridge.step(Anim.SHATTER, 4, 4, 0.0F, 0.0F, null));
+					AnimBridge.end(hammer, 8);
+				}
+				flatRing(pos, color, 1.0F, size * 1.5F, 18);
 			}
 			case HELL_MONARCH -> {
+				pose(who, Pose.ARMS_SPREAD, 20);
 				for (int ring = 1; ring <= 3; ring++) {
 					CommonFx.ring(pos.add(0.0D, 0.2D, 0.0D), CRIMSON, size * ring / 3.0F, 60 + ring * 20);
 				}
@@ -304,8 +406,10 @@ public final class PathFx {
 							Vec3.ZERO, false);
 				}
 				CommonFx.pillar(pos, CRIMSON, 10.0F);
+				flatRing(pos, CRIMSON, size * 0.2F, size * 1.2F, 30);
 			}
 			case DEVOURING -> {
+				pose(who, Pose.SEAL, 16);
 				for (int i = 0; i < 3; i++) {
 					CommonFx.spiralIn(pos.add(0.0D, 0.5D + i, 0.0D), color, size, 30, random.nextFloat() * 20.0F);
 				}
@@ -313,13 +417,99 @@ public final class PathFx {
 					CommonFx.add(ParticleTypes.PORTAL, pos.add(random.nextGaussian() * size * 0.5D, random.nextFloat() * 3.0D, random.nextGaussian() * size * 0.5D),
 							Vec3.ZERO, false);
 				}
+				// the ring closes inward (devouring)
+				flatRing(pos, color, size * 1.4F, 0.3F, 24);
 			}
 			case MOUNTAIN_SEA -> {
+				pose(who, Pose.SKY_RAISE, 12);
 				CommonFx.ring(pos.add(0.0D, 0.1D, 0.0D), color, size, 40);
 				squareColumn(pos, size * 0.7F, color, 2.0F);
 				CommonFx.burst(pos.add(0.0D, 1.0D, 0.0D), 0xFFF4C0, 12, size * 0.5F);
+				if (props && AnimBridge.modelKnown("mountain_sea_seal")) {
+					// nine seals stamping one after another on a 3 x 3 grid
+					float step = Math.max(1.5F, size * 0.45F);
+					int k = 0;
+					for (int x = -1; x <= 1; x++) {
+						for (int z = -1; z <= 1; z++) {
+							AnimBridge.model("mountain_sea_seal", pos.add(x * step, 0.0D, z * step), Math.max(1.5F, step * 0.8F), 0.0F, 0.0F, 0.0F, 40,
+									List.of(AnimBridge.step(Anim.FALL, k * 3, 8, 12.0F, 0.0F, null), AnimBridge.step(Anim.STAMP, k * 3 + 8, 3, 1.15F, 0.85F, null)), -1,
+									Vec3.ZERO, false, true, who, FxLayer.Priority.CORE);
+							k++;
+						}
+					}
+				}
+				later(who, Pose.OVERHEAD_SLAM, 10);
 			}
 		}
+	}
+
+	/** A prison hand waiting to close (swapped to the closed model when it lands). */
+	private static final class Closing {
+		final ModelHandle hand;
+		int left;
+
+		Closing(ModelHandle hand, int left) {
+			this.hand = hand;
+			this.left = left;
+		}
+	}
+
+	private static final List<Closing> CLOSING = new ArrayList<>();
+	private static final List<int[]> LATER = new ArrayList<>();
+
+	private static void pose(int who, Pose pose, int hold) {
+		if (who >= 0) {
+			AnimBridge.pose(who, pose, hold);
+		}
+	}
+
+	/** A second pose {@code delay} ticks later (raise, then strike). */
+	private static void later(int who, Pose pose, int delay) {
+		if (who >= 0) {
+			LATER.add(new int[]{who, pose.ordinal(), delay});
+		}
+	}
+
+	/** Once per client tick (from {@link #tick}): closing hands and delayed strike poses. */
+	private static void tickArts() {
+		for (java.util.Iterator<Closing> it = CLOSING.iterator(); it.hasNext(); ) {
+			Closing closing = it.next();
+			if (--closing.left <= 0) {
+				it.remove();
+				AnimBridge.swap(closing.hand, "prison_hand_closed");
+			}
+		}
+		for (java.util.Iterator<int[]> it = LATER.iterator(); it.hasNext(); ) {
+			int[] entry = it.next();
+			if (--entry[2] <= 0) {
+				it.remove();
+				AnimBridge.pose(entry[0], Pose.values()[entry[1]], 8);
+			}
+		}
+	}
+
+	private static void flatRing(Vec3 pos, int color, float r0, float r1, int life) {
+		if (!EffectQuality.minimal()) {
+			QuadFx.add(new RingQuad(new Vec3(pos.x, pos.y + 0.06D, pos.z), r0, r1, color, 0.8F, life));
+		}
+	}
+
+	/** The disciple nearest {@code pos} between {@code min} and {@code max} blocks (the maker of a clone is not the clone). */
+	private static Entity nearestDiscipleBeyond(Vec3 pos, double min, double max) {
+		ClientLevel level = Minecraft.getInstance().level;
+		if (level == null) {
+			return null;
+		}
+		DiscipleEntity best = null;
+		double bestSq = max * max;
+		for (DiscipleEntity disciple : level.getEntitiesOfClass(DiscipleEntity.class, new AABB(pos, pos).inflate(max))) {
+			double distanceSq = disciple.position().distanceToSqr(pos);
+			if (distanceSq >= min * min && distanceSq < bestSq && disciple.syncedRole() != DiscipleEntity.Role.CLONE) {
+				bestSq = distanceSq;
+				best = disciple;
+			}
+		}
+		return best;
 	}
 
 	private static void sphereBurst(Vec3 centre, int color, float radius, int count) {
@@ -368,6 +558,10 @@ public final class PathFx {
 		ClientLevel level = minecraft.level;
 		if (level == null || minecraft.player == null) {
 			return;
+		}
+		tickArts();
+		if (level.getGameTime() % 100L == 0L) {
+			HAMMERS.values().removeIf(handle -> !AnimBridge.alive(handle));
 		}
 		long time = level.getGameTime();
 		if (time % 100L == 0L && !DESCENTS.isEmpty()) {

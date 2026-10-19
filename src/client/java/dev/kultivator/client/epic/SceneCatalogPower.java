@@ -438,6 +438,16 @@ final class SceneCatalogPower {
 	}
 
 	static void ultimate(Scene s, TechniqueSpec spec, int beat, Vec3 target, boolean test) {
+		ultimate(s, spec, beat, target, test, 0);
+	}
+
+	/**
+	 * One ultimate beat; {@code duration} is the event's (a lasting ultimate's field or channel ticks). Polish S12: the
+	 * moment ends {@code max(duration, 60) + 40} ticks after the cast unless END comes first, a climax never shortens a
+	 * lasting one, the climax plays at least 8 ticks after the cast beat with its subject-side layers first, and slow
+	 * motion or a pull-back plays once per cast (never with "Kurangi gerak").
+	 */
+	static void ultimate(Scene s, TechniqueSpec spec, int beat, Vec3 target, boolean test, int duration) {
 		boolean dewa = spec.dewa() || spec.grade() == TechniqueGrade.DEWA;
 		String id = spec.id();
 		String seal = sealOf(id, dewa);
@@ -448,8 +458,12 @@ final class SceneCatalogPower {
 			u.target = target;
 			s.data = u;
 		}
+		long now = EpicDirector.ticks();
 		if (beat == EpicIds.TECH_CAST) {
 			u.target = target;
+			u.castTick = now;
+			u.duration = Math.max(0, duration);
+			u.slowmoDone = false;
 			boolean first = dewa ? !EpicSettings.seenThisSession(id) : !EpicSettings.seenEver(id);
 			if (first) {
 				full(s, 0, upper(spec.displayName()), null, seal, SEAL_RED, 60, card -> card.safeBeat(false));
@@ -475,20 +489,29 @@ final class SceneCatalogPower {
 			}
 			castLayers(s, id, caster, target);
 			// Most ultimates send no END cue (the spec has no END layers): end the moment on our own when nothing follows.
-			ultFallback(s, spec, u, 200);
+			ultFallback(s, spec, u, Math.max(u.duration, 60) + 40);
 		} else if (beat == EpicIds.TECH_CLIMAX) {
 			Vec3 aim = u.target;
-			if (dewa) {
-				slowmo(s, 0, 20);
-				hitStop(s, 0);
-			} else {
-				slowmo(s, 0, 12);
+			// the climax waits at least 8 ticks after the cast beat (the build-up reads first)
+			int wait = u.castTick < 0L ? 0 : (int) Math.max(0L, 8L - (now - u.castTick));
+			boolean motion = !u.slowmoDone && !dev.kultivator.client.EffectQuality.reduceMotion();
+			if (motion) {
+				u.slowmoDone = true;
+				if (dewa) {
+					slowmo(s, wait, 20);
+					hitStop(s, wait);
+				} else {
+					slowmo(s, wait, 12);
+				}
 			}
-			climaxLayers(s, id, caster, aim);
-			if (dewa) {
-				shotPenuh(s, 40, () -> Shots.pullback(4.0F, 14.0F, 2.0F, 8.0F, 2.0F), CinematicDirector.KIND_ULTIMATE);
+			final Vec3 climaxAim = aim;
+			s.at(wait, () -> climaxLayers(s, id, caster, climaxAim));
+			if (dewa && motion) {
+				shotPenuh(s, 40 + wait, () -> Shots.pullback(4.0F, 14.0F, 2.0F, 8.0F, 2.0F), CinematicDirector.KIND_ULTIMATE);
 			}
-			ultFallback(s, spec, u, 60);
+			// a lasting ultimate keeps its moment until its own end; others close 60 ticks after the climax
+			long left = u.castTick < 0L ? 0L : u.castTick + Math.max(u.duration, 60) + 40L - now;
+			ultFallback(s, spec, u, (int) Math.max(60L + wait, left));
 		} else if (beat == EpicIds.TECH_END) {
 			ultEnd(s, spec, u);
 		}
@@ -499,6 +522,9 @@ final class SceneCatalogPower {
 		Vec3 target;
 		int token;
 		boolean ended;
+		long castTick = -1L;
+		int duration;
+		boolean slowmoDone;
 	}
 
 	/** Runs the end beat {@code delay} ticks from now unless a later cast or climax beat postpones it. */
@@ -605,12 +631,8 @@ final class SceneCatalogPower {
 				s.add("vortex", vortex);
 			}
 			case "cosmic_giant_form" -> {
-				if (!lite(s)) {
-					Entity subject = s.subject();
-					Vec3 behind = caster.add(SceneCatalog.forward(s.yaw()).scale(-6.0D));
-					s.add(new GiantFigureRenderer(0, 200, behind, s.yaw(), 40.0F,
-							subject == null ? EpicRenderTypes.IMMORTAL_AVATAR : GiantFigureRenderer.skinOf(subject, EpicRenderTypes.IMMORTAL_AVATAR), 0xFFE6B0, 0.3F));
-				}
+				// polish S21 / finding 169: the giant is the cast's own AVATAR (a posed world-level GiantAvatar that walks to each
+				// stomp and slams); no second epic colossus behind it
 			}
 			case "guanyin_sweet_dew" -> s.add(new RaysRenderer(0, 120, caster.add(0.0D, 2.4D, 0.0D), 10.0F, 4, 30.0F, 1.5F, 0xCFFFE8, 0.2F, false));
 			case "life_death_domain" -> emit(s, 0, 120, (tick, self) -> {
@@ -840,6 +862,22 @@ final class SceneCatalogPower {
 		}
 	}
 
+	/**
+	 * A 3D prop of the model module for a scene beat (polish S22: an object on the subject, not only a camera move), with
+	 * one animation; the old glyph when the model is missing or the scene is light.
+	 */
+	private static void prop(Scene s, int delay, String model, Vec3 at, float scale, float roll, int life, dev.kultivator.client.anim.model.Anim anim,
+			float a, int animTicks, String glyph, int rgb, float glyphSize) {
+		if (!dev.kultivator.client.fx.spec.AnimBridge.modelKnown(model) || lite(s)) {
+			Vec3 glyphAt = anim == dev.kultivator.client.anim.model.Anim.FALL ? at.add(0.0D, a, 0.0D) : at;
+			glyph(s, delay, glyphAt, glyph, rgb, glyphSize, life);
+			return;
+		}
+		s.at(delay, () -> dev.kultivator.client.fx.spec.AnimBridge.model(model, at, scale, 0.0F, 0.0F, roll, life,
+				java.util.List.of(dev.kultivator.client.fx.spec.AnimBridge.step(anim, 0, animTicks, a, 0.0F, null)), -1, Vec3.ZERO, false, true,
+				s.subjectId, dev.kultivator.technique.spec.dsl.FxLayer.Priority.CORE));
+	}
+
 	/** The art ids of {@code DestroyerArts.Art} (the ordinal travels in {@code a}; names read-only from its lang keys). */
 	private static final String[] ARTS = {"xuantian", "lotus", "quake", "desolation", "prison_hand", "sumeru", "hell_monarch", "devouring", "mountain_sea"};
 
@@ -853,8 +891,8 @@ final class SceneCatalogPower {
 		shake(s, delay, 0.8F, 20);
 		switch (art) {
 			case 0 -> {
-				// Tebasan Xuantian: a 24-b sword descends with a 48-b light line.
-				glyph(s, delay, zone.add(0.0D, 30.0D, 0.0D), "剑", 0xE8F4FF, 24.0F, 40);
+				// Tebasan Xuantian: the black-gold sword (a 3D prop; the 剑 glyph without the model module) descends with a light line.
+				prop(s, delay, "xuantian_sword", zone, 14.0F, 180.0F, 50, dev.kultivator.client.anim.model.Anim.FALL, 30.0F, 14, "剑", 0xE8F4FF, 24.0F);
 				s.add(new TrailRenderer(delay + 10, 40, zone.add(0.0D, 48.0D, 0.0D), zone, 0.0F, 1.0F, 0xE8F4FF, 0.9F, true, s.seed));
 			}
 			case 1 -> emit(s, delay, 60, (tick, self) -> {
@@ -875,16 +913,25 @@ final class SceneCatalogPower {
 				s.add(new RingRenderer(delay + 20, 50, zone, 2.0F, radius * 1.4F, 4.0F, 40.0F, 0x7A7A7A, 0.6F));
 			}
 			case 4 -> {
-				// Tangan Penjara Langit: a 9×9 glyph cube falls from 40 b (shown as a 3×3 face).
-				for (int x = -1; x <= 1; x++) {
-					for (int z = -1; z <= 1; z++) {
-						glyph(s, delay + (x + 1) * 2 + (z + 1), zone.add(x * 4.0D, 40.0D - (x + z + 2) * 2.0D, z * 4.0D), "囚", 0x9A80FF, 4.0F, 40);
+				// Tangan Penjara Langit: the bronze hand falls open from 20 b and closes on the zone (the 囚 cube without models).
+				if (dev.kultivator.client.fx.spec.AnimBridge.modelKnown("prison_hand_open") && !lite(s)) {
+					s.at(delay, () -> {
+						var hand = dev.kultivator.client.fx.spec.AnimBridge.model("prison_hand_open", zone, 9.0F, 0.0F, 60,
+								dev.kultivator.client.anim.model.Anim.FALL, 20.0F, 0.0F, null, s.subjectId);
+						s.at(16, () -> dev.kultivator.client.fx.spec.AnimBridge.swap(hand, "prison_hand_closed"));
+					});
+				} else {
+					for (int x = -1; x <= 1; x++) {
+						for (int z = -1; z <= 1; z++) {
+							glyph(s, delay + (x + 1) * 2 + (z + 1), zone.add(x * 4.0D, 40.0D - (x + z + 2) * 2.0D, z * 4.0D), "囚", 0x9A80FF, 4.0F, 40);
+						}
 					}
 				}
 			}
 			case 5 -> {
-				// Palu Agung Sumeru: a hammer glyph grows over nine blows, each a ring and a shake.
-				glyph(s, delay, zone.add(0.0D, 24.0D, 0.0D), "锤", 0xC8A0FF, 8.0F, 90);
+				// Palu Agung Sumeru: the hammer grows over nine blows above the zone, each a ring and a shake (the 锤 glyph without models).
+				prop(s, delay, "sumeru_hammer", zone.add(0.0D, 24.0D, 0.0D), 10.0F, 0.0F, 96, dev.kultivator.client.anim.model.Anim.GROW, 0.2F, 88, "锤", 0xC8A0FF,
+						8.0F);
 				for (int k = 0; k < 9; k++) {
 					s.add(new RingRenderer(delay + k * 10, 20, zone, 1.0F, radius * 0.6F + k, 2.0F, 10.0F, 0xB57CFF, 0.6F));
 					shake(s, delay + k * 10, 0.4F, 6);
@@ -907,7 +954,8 @@ final class SceneCatalogPower {
 				// Segel Gunung-Laut: nine 8-b seal glyphs stamping down in a 3×3 grid.
 				for (int x = -1; x <= 1; x++) {
 					for (int z = -1; z <= 1; z++) {
-						glyph(s, delay + ((x + 1) * 3 + (z + 1)) * 3, zone.add(x * 6.0D, 12.0D, z * 6.0D), "封", 0xFFD54A, 8.0F, 40);
+						prop(s, delay + ((x + 1) * 3 + (z + 1)) * 3, "mountain_sea_seal", zone.add(x * 6.0D, 0.0D, z * 6.0D), 6.0F, 0.0F, 40,
+								dev.kultivator.client.anim.model.Anim.FALL, 12.0F, 8, "封", 0xFFD54A, 8.0F);
 					}
 				}
 			}

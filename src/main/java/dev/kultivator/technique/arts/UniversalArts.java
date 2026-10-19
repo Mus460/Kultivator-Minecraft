@@ -29,6 +29,7 @@ import dev.kultivator.technique.spec.dsl.Payload.Facing;
 import dev.kultivator.technique.spec.dsl.Payload.Store;
 import dev.kultivator.technique.spec.dsl.Payload.SummonMode;
 import dev.kultivator.technique.spec.dsl.Phase;
+import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
@@ -106,6 +107,7 @@ public final class UniversalArts {
 		// 100 · Langkah Bayangan Hantu (Soul Land, Ghost Shadow Perplexing Track)
 		sink.add(art("ghost_shadow_track", 100, null)
 				.grade(TechniqueGrade.HUANG, 0).type(TechniqueType.GERAK).realm(Realm.FOUNDATION)
+				.pose(Pose.DASH_LEAN)
 				.route(Route.book("minecraft:soul_speed"), Route.pav())
 				.flag(TEACHABLE, PAVILION, CAST_ALWAYS)
 				.qi(10).charges(2, 4, 60).cooldownTicks(60)
@@ -125,6 +127,7 @@ public final class UniversalArts {
 		// 101 · Tangan Giok Misterius (Soul Land, Mysterious Jade Hand)
 		sink.add(art("mysterious_jade_hand", 101, null)
 				.grade(TechniqueGrade.HUANG, 1).type(TechniqueType.LINDUNG).realm(Realm.FOUNDATION)
+				.pose(Pose.SEAL)
 				.route(Route.book("minecraft:unbreaking"), Route.pav())
 				.flag(TEACHABLE, PAVILION, CAST_ALWAYS)
 				.qi(12).cooldown(6.0D)
@@ -135,6 +138,8 @@ public final class UniversalArts {
 						cleanse()))
 				.fx(Phase.CAST, shieldShell(JADE).particle(ParticleTypes.GLOW).count(16).ticks(30))
 				.fx(Phase.HIT, impact(0xE8FFF0).particle(ParticleTypes.CRIT).count(8))
+				.fx(Phase.CAST, model("jade_palm").onCaster().above(1.3F).scale(1.2F).ticks(50).facing(FxLayer.Facing.FACE_FORWARD))
+				.fx(Phase.EXTRA7, shockRing(JADE).radius(1.2F).count(18).ticks(8), impact(0xE8FFF0).particle(ParticleTypes.GLOW).count(10).ticks(6))
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_HIT, 1.0F, 1.2F)
 				.sound(Phase.CAST, SoundEvents.ANVIL_LAND, 0.25F, 1.6F)
 				.perfection(Bonus.extraCount(2))
@@ -144,6 +149,7 @@ public final class UniversalArts {
 		// 102 · Mata Iblis Ungu (Soul Land, Purple Demon Eyes)
 		sink.add(art("purple_demon_eye", 102, null)
 				.grade(TechniqueGrade.HUANG, 1).type(TechniqueType.SERANG).realm(Realm.FOUNDATION)
+				.pose(Pose.FINGER_POINT)
 				.route(Route.book("minecraft:piercing"), Route.pav())
 				.flag(TEACHABLE, PAVILION)
 				.qi(10).cooldown(3.0D)
@@ -154,6 +160,7 @@ public final class UniversalArts {
 				.fx(Phase.TRAVEL, beamCore(VIOLET).size(0.6F).count(30).ticks(8),
 						beamCore(0x6020C0).particle(ParticleTypes.PORTAL).count(14).ticks(10).detail())
 				.fx(Phase.HIT, impact(VIOLET).count(6))
+				.fx(Phase.CAST, impact(0xC070FF).onCaster().above(1.7F).count(4).ticks(10).extra())
 				.sound(Phase.CAST, SoundEvents.EVOKER_CAST_SPELL, 0.8F, 1.5F)
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.2F)
 				.perfection(Bonus.area(0.25D))
@@ -163,6 +170,7 @@ public final class UniversalArts {
 		// 103 · Jarum Hujan Bunga Pir (Soul Land, Violent Rain Pear Blossom Needles)
 		sink.add(art("pear_blossom_needles", 103, null)
 				.grade(TechniqueGrade.HUANG, 2).type(TechniqueType.AREA).realm(Realm.FOUNDATION)
+				.pose(Pose.PALM_THRUST)
 				.route(Route.book("minecraft:multishot"), Route.pav())
 				.flag(TEACHABLE, PAVILION)
 				.qi(15).cooldown(6.0D)
@@ -173,6 +181,8 @@ public final class UniversalArts {
 				.fx(Phase.TRAVEL, trail(SILVER).count(27).ticks(10),
 						petals(0xFFB7D5).particle(ParticleTypes.CHERRY_LEAVES).count(16).ticks(20).extra())
 				.fx(Phase.HIT, impact(SILVER).particle(ParticleTypes.CRIT).count(4))
+				.fx(Phase.TRAVEL, model("needle").scale(0.6F).slide(8.0F).ticks(10).facing(FxLayer.Facing.BLADE).detail())
+				.fx(Phase.LAND, petals(0xFFB7D5).particle(ParticleTypes.CHERRY_LEAVES).count(4).ticks(16).extra())
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.CROSSBOW_SHOOT, 0.8F, 1.8F))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.CROSSBOW_SHOOT, 0.8F, 1.8F).delay(2))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.CROSSBOW_SHOOT, 0.8F, 1.8F).delay(4))
@@ -185,15 +195,16 @@ public final class UniversalArts {
 		// 104 · Serangga Tidur (Journey to the West, sleep-inducing bugs)
 		sink.add(art("sleep_insects", 104, null)
 				.grade(TechniqueGrade.XUAN, 0).type(TechniqueType.KENDALI).realm(Realm.GOLDEN_CORE)
+				.pose(Pose.SEAL)
 				.route(Route.book("minecraft:lure"))
 				.flag(TEACHABLE)
 				.qi(30).cooldown(14.0D)
 				.step(at(0).shape(cone().length(8, 16).halfAngle(30))
 						.hit(bind(BindKind.SLEEP, 60, 100).boss(20), eff(Eff.BLINDNESS, 1, 40), mark(Mark.soul(2.0D), 200)))
-				.fx(Phase.CAST, swarm(0xFFE680).particle(ParticleTypes.GLOW).count(40).ticks(30),
+				.fx(Phase.CAST, swarm(0xFFE680).particle(ParticleTypes.GLOW).model("sleep_bug").n(6).count(40).ticks(30),
 						coneSpray(0xFFE680).count(30).ticks(16))
 				.fx(Phase.HIT, impact(0xFFE680).count(6),
-						glyph("Zzz").scale(1.5F).above(1.0F).ticks(60).minTier(DISPLAY_TIER))
+						glyph("Zzz").scale(1.5F).above(1.0F).ticks(60).minTier(1))
 				.sound(Phase.CAST, SoundEvents.BEE_LOOP, 0.3F, 1.0F)
 				.sound(Phase.CAST, SoundEvents.CAT_PURR_BABY, 0.8F, 0.8F)
 				.perfection(Bonus.durationTicks(20))
@@ -203,6 +214,7 @@ public final class UniversalArts {
 		// 105 · Mantra Pembeku Tubuh (Journey to the West, the immobilization magic)
 		sink.add(art("immobilization_spell", 105, null)
 				.grade(TechniqueGrade.XUAN, 1).type(TechniqueType.KENDALI).realm(Realm.GOLDEN_CORE)
+				.pose(Pose.FINGER_POINT)
 				.route(Route.book("minecraft:binding_curse"))
 				.flag(TEACHABLE, REQUIRES_TARGET)
 				.qi(25).cooldown(10.0D)
@@ -212,7 +224,8 @@ public final class UniversalArts {
 						.hit(bind(BindKind.STUN, 60, 100).boss(15)))
 				.fx(Phase.CAST, chains(GOLD).count(24).ticks(10))
 				.fx(Phase.HIT, chains(GOLD).count(10).ticks(20).detail(),
-						glyph("定").scale(2.0F).above(1.2F).ticks(60).minTier(DISPLAY_TIER))
+						glyph("定").scale(2.0F).above(1.2F).ticks(60).minTier(1))
+				.fx(Phase.TRAVEL, chains(GOLD).count(20).ticks(8), impact(GOLD).particle(ParticleTypes.END_ROD).onTarget().count(6).ticks(6))
 				.sound(Phase.CAST, SoundEvents.CHAIN_PLACE, 1.0F, 1.0F)
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.6F)
 				.perfection(Bonus.durationTicks(20))
@@ -222,6 +235,7 @@ public final class UniversalArts {
 		// 106 · Seni Segel Kaisar (Battle Through the Heavens, Emperor Seal Jue; stages 2-4 are game design)
 		sink.add(art("emperor_seal_jue", 106, null)
 				.grade(TechniqueGrade.XUAN, 1).type(TechniqueType.AREA).realm(Realm.GOLDEN_CORE)
+				.pose(Pose.SKY_RAISE).pose(Phase.EXTRA0, Pose.OVERHEAD_SLAM).pose(Phase.EXTRA3, Pose.OVERHEAD_SLAM)
 				.route(Route.book("minecraft:knockback"), Route.pav())
 				.flag(TEACHABLE, PAVILION)
 				.stages(4, 80).stageRealm(2, Realm.NASCENT_SOUL).stageRealm(3, Realm.DEITY_TRANSFORMATION).stageRealm(4, Realm.DAO_UNION)
@@ -237,12 +251,13 @@ public final class UniversalArts {
 				.step(at(0).stage(4).shape(zone(Anchor.AIM).range(24).radius(8, 14)).hit(damage(2.5D), bind(BindKind.STUN, 40)).phase(3))
 				.fx(Phase.CAST, runeCircle(GOLD).radius(1.2F).count(16).ticks(10))
 				.fx(Phase.extra(0), column(STONE).count(24).ticks(10),
-						giantBlock(stoneBricks).blockSize(4.0F, 1.0F, 4.0F).fall(12.0F, 8.0F).ticks(30).minTier(DISPLAY_TIER),
+						model("emperor_seal").scale(4.0F).ticks(30).facing(FxLayer.Facing.FLAT),
 						shake(0.1F, 8))
 				.fx(Phase.extra(1), shockRing(BLUE).count(40).ticks(16), shake(0.2F, 8))
 				.fx(Phase.extra(2), impact(STONE).particle(ParticleTypes.CRIT).count(16).ticks(10), shake(0.3F, 10))
 				.fx(Phase.extra(3), shockRing(GOLD).count(48).ticks(16),
-						glyph("帝").scale(6.0F).above(4.0F).ticks(40).minTier(DISPLAY_TIER), shake(0.4F, 12))
+						glyph("帝").scale(6.0F).above(4.0F).ticks(40).minTier(1), shake(0.4F, 12))
+				.fx(Phase.TRAVEL, model("emperor_seal").scale(4.0F).fall(12.0F, 6.0F).ticks(8).facing(FxLayer.Facing.FLAT), column(GOLD).inSky().count(10).ticks(6).detail())
 				.sound(Phase.extra(0), SoundEvents.ANVIL_LAND, 1.0F, 0.6F)
 				.sound(Phase.extra(1), SoundEvents.GENERIC_SPLASH, 1.2F, 0.6F)
 				.sound(Phase.extra(2), SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.0F, 0.8F)
@@ -257,6 +272,7 @@ public final class UniversalArts {
 		// 107 · Mata Api Pupil Emas (Journey to the West, fiery eyes and golden pupils)
 		sink.add(art("fiery_golden_eyes", 107, null)
 				.grade(TechniqueGrade.XUAN, 1).type(TechniqueType.INDRA).realm(Realm.NASCENT_SOUL)
+				.pose(Pose.SEAL)
 				.route(Route.book("minecraft:fortune"))
 				.flag(NO_TEACH, CAST_ALWAYS)
 				.qi(45).cooldown(45.0D)
@@ -277,6 +293,7 @@ public final class UniversalArts {
 		// 108 · Jari Kematian (Renegade Immortal, Finger of Death)
 		sink.add(art("finger_of_death", 108, null)
 				.grade(TechniqueGrade.XUAN, 2).type(TechniqueType.SERANG).realm(Realm.NASCENT_SOUL)
+				.pose(Pose.FINGER_POINT)
 				.route(Route.book("minecraft:breach"))
 				.flag(TEACHABLE, REQUIRES_TARGET)
 				.qi(35).cooldown(6.0D)
@@ -286,6 +303,7 @@ public final class UniversalArts {
 				.fx(Phase.TRAVEL, beamCore(0x404040).particle(ParticleTypes.SOUL).count(16).ticks(8).detail())
 				.fx(Phase.HIT, impact(0x555555).particle(ParticleTypes.SOUL).count(8))
 				.fx(Phase.extra(0), motesTo(0x9FE8FF).particle(ParticleTypes.SCULK_SOUL).count(12).ticks(20))
+				.fx(Phase.IMPACT, glyph("死").color2(0x202020).scale(1.6F).above(1.0F).ticks(20), impact(0x303030).particle(ParticleTypes.SCULK_SOUL).count(10).ticks(8))
 				.sound(Phase.CAST, SoundEvents.WITHER_SHOOT, 0.4F, 1.6F)
 				.perfection(Bonus.payload(exec(0.35D)))
 				.peak(Bonus.echo(0.4D))
@@ -294,6 +312,7 @@ public final class UniversalArts {
 		// 109 · Tubuh di Luar Tubuh (Journey to the West, Body Beyond Body)
 		sink.add(art("body_beyond_body", 109, null)
 				.grade(TechniqueGrade.XUAN, 2).type(TechniqueType.PANGGIL).realm(Realm.NASCENT_SOUL)
+				.pose(Pose.SUMMON_RAISE)
 				.route(Route.pav())
 				.flag(NO_TEACH, PAVILION, CAST_ALWAYS)
 				.qi(60).cooldown(40.0D)
@@ -301,8 +320,9 @@ public final class UniversalArts {
 						.attack(at(0).shape(nova().radius(1.5D).at(Anchor.SUMMON)).hit(damage(0.25D)))))
 				.fx(Phase.CAST, motesTo(GOLD).count(16).ticks(10),
 						mist(GOLD).particle(ParticleTypes.LARGE_SMOKE).count(20).ticks(12),
-						cloneOf(0xD9A040).scale(0.4F).n(8).ticks(200))
+						cloneOf(0xD9A040).scale(0.4F).n(8).ticks(16))
 				.fx(Phase.HIT, impact(GOLD).count(4))
+				.fx(Phase.PHANTOM, arc(GOLD).count(10).ticks(6), impact(GOLD).onTarget().count(6).ticks(6))
 				.sound(Phase.CAST, SoundEvents.FOX_AMBIENT, 1.0F, 2.0F)
 				.perfection(Bonus.extraCount(2))
 				.peak(Bonus.duration(0.25D))
@@ -311,6 +331,7 @@ public final class UniversalArts {
 		// 110 · Harimau Putih Alam Baka (Soul Land, Netherworld White Tiger) ★ fusion_pair
 		sink.add(art("netherworld_white_tiger", 110, null)
 				.grade(TechniqueGrade.XUAN, 2).type(TechniqueType.AREA).realm(Realm.NASCENT_SOUL)
+				.pose(Pose.ROAR)
 				.route(Route.realm(), Route.pair(FusionPair.MIN_BOND))
 				.special(FusionPair.ID)
 				.flag(NO_TEACH, NO_ECHO, CAST_ALWAYS)
@@ -322,6 +343,7 @@ public final class UniversalArts {
 				.fx(Phase.TRAVEL, beast(FxLayer.BeastKind.TIGER, 0xF4F4FF).color2(0x2A1440).count(80).ticks(16), shake(0.3F, 10))
 				.fx(Phase.HIT, impact(0xF4F4FF).color2(0x2A1440).count(8))
 				.fx(Phase.extra(0), bolt(0xC8B0FF).count(16).ticks(6))
+				.fx(Phase.TRAVEL, model("white_tiger").scale(3.0F).slide(14.0F).ticks(18), trail(0x8040C0).particle(ParticleTypes.SOUL_FIRE_FLAME).count(24).ticks(16).detail())
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F)
 				.sound(Phase.CHARGE, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.4F)
 				.sound(Phase.TRAVEL, SoundEvents.RAVAGER_ROAR, 1.0F, 1.4F)
@@ -336,6 +358,7 @@ public final class UniversalArts {
 		// 111 · Awan Jungkir Balik (Journey to the West, cloud somersault) ★ cloud_travel
 		sink.add(art("somersault_cloud", 111, null)
 				.grade(TechniqueGrade.DI, 0).type(TechniqueType.GERAK).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.SEAL)
 				.route(Route.realm())
 				.special(CloudTravel.ID)
 				.flag(NO_TEACH, CAST_ALWAYS)
@@ -346,6 +369,7 @@ public final class UniversalArts {
 				.fx(Phase.TRAVEL, trail(WHITE).onCaster().count(40).ticks(CloudTravel.RIDE_TICKS),
 						mist(WHITE).color2(GOLD).onCaster().count(20).ticks(CloudTravel.RIDE_TICKS).detail())
 				.fx(Phase.extra(0), mist(WHITE).color2(GOLD).count(20).ticks(10))
+				.fx(Phase.TRAVEL, model("nimbus_cloud").onCaster().above(-0.6F).scale(1.5F).ticks(CloudTravel.RIDE_TICKS).facing(FxLayer.Facing.FACE_FORWARD))
 				.sound(Phase.CAST, SoundEvents.PHANTOM_SWOOP, 1.0F, 1.2F)
 				.sound(Phase.TRAVEL, SoundEvents.ELYTRA_FLYING, 0.6F, 1.4F)
 				.sound(Phase.extra(0), SoundEvents.PHANTOM_FLAP, 0.6F, 1.0F)
@@ -356,6 +380,7 @@ public final class UniversalArts {
 		// 112 · Istana Suci Qilin (Against the Gods, Qilin Sacred Palace)
 		sink.add(art("qilin_sacred_palace", 112, null)
 				.grade(TechniqueGrade.DI, 0).type(TechniqueType.LINDUNG).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.ARMS_SPREAD)
 				.route(Route.pav(), Route.book("minecraft:projectile_protection"))
 				.flag(TEACHABLE, PAVILION, CAST_ALWAYS)
 				.qi(120).cooldown(60.0D)
@@ -365,10 +390,12 @@ public final class UniversalArts {
 						.ally(dr(0.6D, Facing.ALL, 30)))
 				.step(at(0).self(projectileGuard(360.0D, 8.0D, 64, 120).ticks(120, 200).wholeArea()))
 				.fx(Phase.CAST, dome(GOLD).count(60).ticks(120),
-						runeCircle(0xC0302A).color2(GOLD).above(7.0F).radius(6.0F).count(24).ticks(120).minTier(GLYPH_TIER),
-						giantBlock(gold).blockSize(1.0F, 6.0F, 1.0F).n(4).radius(6.0F).ticks(120).minTier(DISPLAY_TIER),
+						runeCircle(0xC0302A).color2(GOLD).above(7.0F).radius(6.0F).count(24).ticks(120),
+						giantBlock(gold).blockSize(1.0F, 6.0F, 1.0F).n(4).radius(6.0F).ticks(120).minTier(1),
 						shake(0.2F, 8))
 				.fx(Phase.PULSE, dome(GOLD).count(20).ticks(20).detail())
+				.fx(Phase.CAST, model("qilin_palace").scale(7.0F).rise(4.0F, 10.0F).ticks(120).facing(FxLayer.Facing.FACE_FORWARD), model("qilin").above(7.5F).scale(4.0F).grow(0.2F, 10.0F).ticks(40))
+				.fx(Phase.EXTRA7, impact(GOLD).particle(ParticleTypes.END_ROD).count(10).ticks(6), shockRing(GOLD).radius(1.0F).count(12).ticks(6))
 				.sound(Phase.CAST, SoundEvents.RAVAGER_ROAR, 1.0F, 1.3F)
 				.sound(Phase.CAST, SoundEvents.BELL_BLOCK, 1.2F, 0.8F)
 				.perfection(Bonus.area(0.25D))
@@ -378,6 +405,7 @@ public final class UniversalArts {
 		// 113 · Tujuh Puluh Dua Perubahan (Journey to the West, seventy-two earthly transformations) ★ seventy_two
 		sink.add(art("seventy_two_transformations", 113, null)
 				.grade(TechniqueGrade.DI, 1).type(TechniqueType.UBAH).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.SEAL)
 				.route(Route.feat(Feat.meditateAt(Cond.site("mountain"), 10)))
 				.special(SeventyTwo.ID)
 				.flag(NO_TEACH, CAST_ALWAYS)
@@ -385,7 +413,7 @@ public final class UniversalArts {
 				.qi(50).cooldownTicks(10)
 				.step(at(SeventyTwo.KEEP_ALIVE_TICKS))
 				.fx(Phase.CAST, mist(GOLD).particle(ParticleTypes.LARGE_SMOKE).count(24).ticks(12),
-						glyph("变").scale(2.0F).above(2.5F).ticks(20).minTier(DISPLAY_TIER))
+						glyph("变").scale(2.0F).above(2.5F).ticks(20).minTier(1))
 				.fx(Phase.extra(0), mist(SeventyTwo.Form.HARIMAU.color()).onCaster().count(16).ticks(20))
 				.fx(Phase.extra(1), mist(SeventyTwo.Form.ELANG.color()).onCaster().count(16).ticks(20))
 				.fx(Phase.extra(2), mist(SeventyTwo.Form.IKAN.color()).onCaster().count(16).ticks(20))
@@ -402,6 +430,7 @@ public final class UniversalArts {
 		// 114 · Tiga Kepala Enam Lengan (Journey to the West ch. 4; Desolate Era)
 		sink.add(art("three_heads_six_arms", 114, null)
 				.grade(TechniqueGrade.DI, 1).type(TechniqueType.UBAH).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.SUMMON_RAISE)
 				.route(Route.realm())
 				.flag(NO_TEACH, CAST_ALWAYS)
 				.qi(100).cooldown(60.0D)
@@ -411,7 +440,7 @@ public final class UniversalArts {
 						new Payload.Dr(Val.of(0.5D), Facing.BACK, Val.of(400, 600), false, 0.0D),
 						new Payload.Buff(BuffKind.CD_RATE, 1.25D, 0.0D, Val.of(400, 600), null, false, false, 1))))
 				.fx(Phase.CAST, shell(GOLD).onCaster().count(24).ticks(12),
-						avatar(0xFFE08A).variant(FxLayer.Variant.SPLIT).ticks(400).minTier(DISPLAY_TIER))
+						avatar(0xFFE08A).alpha(0.25F).scale(1.05F).ticks(400))
 				.fx(Phase.HIT, arc(0xFFE08A).count(10).ticks(6))
 				.sound(Phase.CAST, SoundEvents.BELL_BLOCK, 1.2F, 0.7F)
 				.sound(Phase.CAST, SoundEvents.ILLUSIONER_CAST_SPELL, 1.0F, 1.0F)
@@ -422,6 +451,7 @@ public final class UniversalArts {
 		// 115 · Dunia Kematian Darah (I Shall Seal the Heavens, Blood Finger and Blood Death World)
 		sink.add(art("blood_death_world", 115, null)
 				.grade(TechniqueGrade.DI, 2).type(TechniqueType.WILAYAH).realm(Realm.DEITY_TRANSFORMATION)
+				.pose(Pose.ARMS_SPREAD)
 				.route(Route.realm())
 				.flag(NO_TEACH, FORBIDDEN, CAST_ALWAYS)
 				.qi(90).cooldown(75.0D)
@@ -432,7 +462,7 @@ public final class UniversalArts {
 				.step(at(20).repeat(12, 20).shape(all().ofArea().max(1).order(Shape.All.Order.WEAKEST))
 						.hit(damage(1.2D), exec(0.10D)).phase(0))
 				.fx(Phase.CAST, dome(BLOOD).count(60).ticks(160),
-						runeCircle(0xA00000).radius(8.0F).count(30).ticks(160).minTier(GLYPH_TIER),
+						runeCircle(0xA00000).radius(8.0F).count(30).ticks(160),
 						vignette(BLOOD, 40), shake(0.25F, 10))
 				.fx(Phase.PULSE, mist(BLOOD).count(30).ticks(20))
 				.fx(Phase.extra(0), beamCore(CRIMSON).count(12).ticks(6))
@@ -448,6 +478,7 @@ public final class UniversalArts {
 		// 116 · Pelarian Bayangan Darah (A Record of a Mortal's Journey, Bloodshadow Evasion)
 		sink.add(art("bloodshadow_evasion", 116, null)
 				.grade(TechniqueGrade.DI, 0).type(TechniqueType.GERAK).realm(Realm.DAO_UNION)
+				.pose(Pose.DASH_LEAN)
 				.route(Route.book("minecraft:vanishing_curse"))
 				.flag(NO_TEACH, FORBIDDEN, CAST_ALWAYS)
 				.qi(0).cooldown(120.0D)
@@ -456,6 +487,7 @@ public final class UniversalArts {
 						dr(0.8D, Facing.ALL, 60), buff(BuffKind.NO_FALL, 1, 100), selfPenalty(600, 1, false, 1.0D)))
 				.fx(Phase.CAST, afterimage(CRIMSON).ticks(20), impact(CRIMSON).count(16).ticks(6))
 				.fx(Phase.TRAVEL, trail(CRIMSON).count(40).ticks(12))
+				.fx(Phase.TRAVEL, mist(CRIMSON).onTarget().count(24).ticks(14), vignette(BLOOD, 10))
 				.sound(Phase.CAST, SoundEvents.WARDEN_HEARTBEAT, 1.2F, 1.2F)
 				.sound(Phase.TRAVEL, SoundEvents.ELYTRA_FLYING, 0.8F, 1.6F)
 				.perfection(Bonus.cooldown(0.2D))
@@ -465,6 +497,7 @@ public final class UniversalArts {
 		// 117 · Bulan Ditarik Bintang Kembali (Against the Gods, Moon Star Restoration)
 		sink.add(art("moon_star_restoration", 117, null)
 				.grade(TechniqueGrade.DI, 1).type(TechniqueType.LINDUNG).realm(Realm.DAO_UNION)
+				.pose(Pose.SEAL)
 				.route(Route.feat(Feat.heartDemonWin(Realm.DAO_UNION)))
 				.flag(NO_TEACH, FORBIDDEN, CAST_ALWAYS)
 				.qi(120).cooldown(45.0D)
@@ -474,6 +507,8 @@ public final class UniversalArts {
 				.fx(Phase.CAST, arc(0xDDE6FF).onCaster().size(2.0F).count(20).ticks(40),
 						motesTo(0xE8F0FF).particle(ParticleTypes.END_ROD).count(24).ticks(40))
 				.fx(Phase.extra(0), starfield(0xE8F0FF).count(40).ticks(20), shell(0xE8F0FF).count(40).ticks(12), shake(0.3F, 10))
+				.fx(Phase.CAST, model("crescent_moon").onCaster().above(1.4F).scale(2.5F).ticks(60).until(Phase.EXTRA0).facing(FxLayer.Facing.FACE_FORWARD))
+				.fx(Phase.EXTRA6, starfield(0xE8F0FF).count(12).ticks(10), shockRing(0xDDE6FF).radius(1.5F).count(14).ticks(6))
 				.sound(Phase.CAST, SoundEvents.RESPAWN_ANCHOR_CHARGE, 1.0F, 1.0F)
 				.sound(Phase.extra(0), SoundEvents.RESPAWN_ANCHOR_DEPLETE, 1.0F, 1.0F)
 				.kehancuran(DShape.disc(4, 2).atRelease())
@@ -484,6 +519,7 @@ public final class UniversalArts {
 		// 118 · Alam Ji (Renegade Immortal, Wang Lin's Ji Realm)
 		sink.add(art("ji_realm", 118, null)
 				.grade(TechniqueGrade.DI, 2).type(TechniqueType.AREA).realm(Realm.DAO_UNION)
+				.pose(Pose.TWIN_PALM)
 				.route(Route.feat(Feat.firstKill("minecraft:warden", null, Realm.DAO_UNION, -1)))
 				.flag(NO_TEACH)
 				.qi(160).cooldown(60.0D)
@@ -500,6 +536,7 @@ public final class UniversalArts {
 		// 119 · Fusi Misteri Mendalam (Coiling Dragon, fused profound mysteries) ★ mystery_fusion
 		sink.add(art("profound_mystery_fusion", 119, null)
 				.grade(TechniqueGrade.DI, 2).type(TechniqueType.AREA).realm(Realm.DAO_UNION)
+				.pose(Pose.CHARGE_OVERHEAD).pose(Phase.TRAVEL, Pose.TWIN_PALM)
 				.comprehension(60).route(Route.comp(60), Route.secondDao((int) MysteryFusion.SECOND_DAO_MIN))
 				.special(MysteryFusion.ID)
 				.flag(NO_TEACH, NO_ECHO, CAST_ALWAYS)
@@ -510,6 +547,7 @@ public final class UniversalArts {
 				.fx(Phase.TRAVEL, trail(WHITE).count(30).ticks(16), trail(WHITE).variant(FxLayer.Variant.MIRRORED).count(30).ticks(16))
 				.fx(Phase.extra(0), shell(WHITE).count(60).ticks(12), shake(0.3F, 10))
 				.fx(Phase.extra(1), impact(WHITE).count(12).ticks(8))
+				.fx(Phase.TRAVEL, model("fusion_orb").scale(1.5F).slide(16.0F).ticks(18))
 				.sound(Phase.TRAVEL, SoundEvents.BEACON_POWER_SELECT, 1.0F, 1.4F)
 				.sound(Phase.extra(0), SoundEvents.AMETHYST_BLOCK_RESONATE, 1.4F, 0.8F)
 				.sound(Phase.extra(0), SoundEvents.MACE_SMASH_GROUND, 1.0F, 1.0F)
@@ -521,19 +559,23 @@ public final class UniversalArts {
 		// 120 · Teratai Tang Murka Buddha (Soul Land, Buddha's Fury Tang Lotus)
 		sink.add(art("buddha_wrath_tang_lotus", 120, null)
 				.grade(TechniqueGrade.DI, 2).type(TechniqueType.AREA).realm(Realm.DAO_UNION)
+				.pose(Pose.CHARGE_OVERHEAD).pose(Phase.TRAVEL, Pose.TWIN_PALM)
 				.route(Route.pav())
 				.flag(TEACHABLE, PAVILION)
 				.qi(140).cooldown(40.0D)
 				// The thrown lotus (visual travel to the aim, ≤ 24), then the 108-blade bursts at the landing.
 				.step(at(0).shape(volley().count(1).range(24).seek()))
 				.step(at(10).repeat(3, 4).shape(zone(Anchor.AIM).range(24).radius(10, 16)).hit(damage(0.7D), eff(Eff.POISON, 2, 100)))
-				.step(at(10).shape(zone(Anchor.AIM).range(24).radius(4, 6)).hit(damage(2.5D)))
+				.step(at(10).shape(zone(Anchor.AIM).range(24).radius(4, 6)).hit(damage(2.5D)).phase(0))
 				.fx(Phase.CAST, impact(0x7FE0A0).count(10).ticks(6))
 				.fx(Phase.TRAVEL, trail(0x7FE0A0).count(20).ticks(10))
-				.fx(Phase.IMPACT, shards(SILVER).count(108).ticks(12), trail(SILVER).count(54).ticks(10).detail(),
-						petalRing(jadeGlass, 8, 3.0F).ticks(30).minTier(DISPLAY_TIER), shake(0.4F, 10))
+				.fx(Phase.IMPACT, shards(SILVER).count(36).ticks(12), trail(SILVER).count(18).ticks(10).detail())
+				// the core burst: the lotus opens, 108 blades leave it, one shake
+				.fx(Phase.EXTRA0, model("tang_lotus").scale(3.0F).grow(0.6F, 6.0F).ticks(24).facing(FxLayer.Facing.FLAT),
+						petalRing(jadeGlass, 8, 3.0F).ticks(30), shards(SILVER).count(108).ticks(14), shake(0.4F, 10))
+				.fx(Phase.TRAVEL, model("tang_lotus").scale(1.6F).slide(10.0F).ticks(12).facing(FxLayer.Facing.FLAT))
 				.sound(Phase.IMPACT, SoundEvents.GLASS_BREAK, 1.2F, 1.0F)
-				.sound(Phase.IMPACT, SoundEvents.BELL_BLOCK, 1.0F, 1.2F)
+				.sound(Phase.EXTRA0, SoundEvents.BELL_BLOCK, 1.0F, 1.2F)
 				// SPHERE 3 only when the burst is within 3 blocks of the ground (22.9.9 KH cell; one read-only downward scan)
 				.kehancuran(DShape.sphere(3).nearGround(3))
 				.perfection(Bonus.extraWave(1))
@@ -545,6 +587,7 @@ public final class UniversalArts {
 		// 121 · Sayap Angin-Petir Han Li (A Record of a Mortal's Journey, Wind-Thunder Wings)
 		sink.add(art("wind_thunder_wings", 121, null)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.GERAK).realm(Realm.IMMORTAL_ASCENSION, 1)
+				.pose(Pose.DASH_LEAN).castTicks(30)
 				.route(Route.feat(Feat.killsWith(null, Cond.THUNDERING, List.of("minecraft:breeze"), 1)))
 				.flag(TEACHABLE, CAST_ALWAYS)
 				.qi(110).charges(2, 160).cooldownTicks(160)
@@ -555,6 +598,7 @@ public final class UniversalArts {
 				.fx(Phase.TRAVEL, trail(0xB0C8FF).particle(ParticleTypes.ELECTRIC_SPARK).count(40).ticks(6),
 						bolt(0xC8D8FF).count(12).ticks(4).extra())
 				.fx(Phase.HIT, bolt(0xC8D8FF).count(8).ticks(4))
+				.fx(Phase.TRAVEL, shockRing(0xC8D8FF).onTarget().radius(3.0F).count(20).ticks(8).detail())
 				.sound(Phase.CAST, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.5F, 1.4F)
 				.sound(Phase.CAST, SoundEvents.PHANTOM_FLAP, 1.0F, 1.2F)
 				.kehancuran(DShape.trenchPath(1, 1))
@@ -565,6 +609,7 @@ public final class UniversalArts {
 		// 122 · Tubuh Emas Pantang Tunduk (Martial Peak, Proud Golden Body)
 		sink.add(art("proud_golden_body", 122, null)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.LINDUNG).realm(Realm.IMMORTAL_ASCENSION, 1)
+				.pose(Pose.SEAL).pose(Phase.HIT, Pose.CHEST_BEAT)
 				.route(Route.realm())
 				.flag(TEACHABLE, CAST_ALWAYS)
 				.qi(150).cooldown(75.0D)
@@ -583,6 +628,7 @@ public final class UniversalArts {
 		{
 			var builder = art("fa_tian_xiang_di", 123, null)
 					.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.UBAH).realm(Realm.IMMORTAL_ASCENSION, 1)
+					.pose(Pose.SUMMON_RAISE).pose(Phase.EXTRA0, Pose.STOMP)
 					.route(Route.realm())
 					.flag(NO_TEACH, CAST_ALWAYS)
 					// ST: stage 1 grows the caster, every later recast inside the form stomps (≥ 60t apart; the form drains 5 qi/s).
@@ -599,8 +645,8 @@ public final class UniversalArts {
 			stageQi[0] = 250;
 			sink.add(builder.qiPerStage(stageQi)
 					.fx(Phase.CAST, shell(GOLD).onCaster().count(30).ticks(16),
-							avatar(GOLD).scale(3.0F).ticks(600).minTier(DISPLAY_TIER))
-					.fx(Phase.extra(0), shockRing(0xC8B08A).count(48).ticks(14), shake(0.6F, 12))
+							avatar(GOLD).alpha(0.3F).scale(1.05F).ticks(600))
+					.fx(Phase.extra(0), shockRing(0xC8B08A).count(48).ticks(14), cracksAlways(0x4A3A2A).count(24).ticks(30), impact(0x8A7A60).particle(ParticleTypes.POOF).count(20).ticks(16).detail(), shake(0.6F, 12))
 					.sound(Phase.CAST, SoundEvents.RAVAGER_ROAR, 0.5F, 0.6F)
 					.sound(Phase.extra(0), SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.4F, 0.7F)
 					// DISC r4 d2 nat at each stomp (the stomps share the shape's part of the one cap)
@@ -614,13 +660,16 @@ public final class UniversalArts {
 		// 124 · Hati Membara (Against the Gods, Burning Heart)
 		sink.add(art("burning_heart", 124, null)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.UBAH).realm(Realm.IMMORTAL_ASCENSION, 1)
+				.pose(Pose.GATE_FLEX)
 				.route(Route.feat(Feat.deviationRecovered(Realm.DAO_UNION)))
 				.flag(NO_TEACH, FORBIDDEN, CAST_ALWAYS)
 				.qi(0).cooldown(240.0D)
+				.step(at(20).repeat(15, 20).phase(1))
 				.step(at(0).self(forbiddenCost(0.35D, false, 0.20D), empower(1.0D, 300), costMod(null, 0.5D, 1.0D, 300),
 						cdRate(null, 1.4D, 300), buff(BuffKind.KH_RADIUS, 1, 300), selfPenalty(1200, 2, true, 0.7D)))
 				.fx(Phase.CAST, mist(0xFF7070).particle(ParticleTypes.FLAME).onCaster().count(30).ticks(300),
 						shell(0xFF7070).onCaster().count(24).ticks(10))
+				.fx(Phase.EXTRA1, shell(0xFF4040).onCaster().radius(1.6F).count(18).ticks(8), vignette(0xA00000, 8))
 				.sound(Phase.CAST, SoundEvents.WARDEN_HEARTBEAT, 1.4F, 1.0F)
 				.perfection(Bonus.durationTicks(60))
 				.peak(Bonus.duration(0.25D))
@@ -629,6 +678,7 @@ public final class UniversalArts {
 		// 125 · Segel Hidup-Mati (I Shall Seal the Heavens, the Sixth Hex)
 		sink.add(art("life_death_hex", 125, null)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.AREA).realm(Realm.IMMORTAL_ASCENSION, 2)
+				.pose(Pose.SEAL)
 				.route(Route.scr(2))
 				.flag(TEACHABLE)
 				.qi(260).cooldown(75.0D)
@@ -637,8 +687,8 @@ public final class UniversalArts {
 						.onKill(at(0).self(heal(0.03D)), at(0).shape(chain().from(Anchor.HIT).jump(4).jumps(2)).hit(damage(1.0D)))
 						.onEnd(at(0).shape(all().ofArea().max(32)).hit(exec(0.25D)).when(Cond.TARGET_BOSS, 1.0D, damage(4.0D)).phase(0)))
 				.fx(Phase.CAST, vortex(ASH).count(60).ticks(200), vortex(ASH).mirrored().inSky().count(40).ticks(200).detail(),
-						giantBlock(greyGlass).blockSize(6.0F, 0.2F, 6.0F).spin(2.0F).ticks(200).minTier(3),
-						glyph("生死").scale(6.0F).above(8.0F).ticks(60).minTier(DISPLAY_TIER), shake(0.4F, 12))
+						model("hex_disc").scale(6.0F).above(0.3F).spin(2.0F).ticks(200).facing(FxLayer.Facing.FLAT),
+						glyph("生死").scale(6.0F).above(8.0F).ticks(60).minTier(1), shake(0.4F, 12))
 				.fx(Phase.PULSE, vortex(ASH).count(20).ticks(20).detail())
 				.fx(Phase.extra(0), impact(WHITE).particle(ParticleTypes.SOUL).count(16).ticks(10))
 				.sound(Phase.CAST, SoundEvents.BEACON_DEACTIVATE, 1.0F, 0.8F)
@@ -651,20 +701,21 @@ public final class UniversalArts {
 		// 126 · Pukulan Tongkat Ruyi (Journey to the West, Ruyi Jingu Bang)
 		sink.add(art("ruyi_staff", 126, null)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.PAMUNGKAS).realm(Realm.IMMORTAL_ASCENSION, 2)
+				.pose(Phase.CHARGE, Pose.CHARGE_OVERHEAD).pose(Pose.OVERHEAD_SLAM)
 				.route(Route.feat(Feat.firstKill("minecraft:elder_guardian", null, Realm.IMMORTAL_ASCENSION, -1)))
 				.flag(TEACHABLE)
 				.charge(20).qi(300).cooldown(60.0D)
-				.step(at(0).shape(front().length(40, 64).width(3).height(12).speed(8.0D).fromSky(12.0D).ahead(3.0D))
+				.step(at(0).shape(front().length(40, 64).width(3).height(12).speed(8.0D).skyBand(12.0D).ahead(3.0D))
 						.hit(damage(9.0D).charged(), launch(0.8D)))
-				.step(at(0).minTier(7).shape(front().length(40, 64).width(3).height(12).speed(8.0D).fromSky(12.0D).ahead(3.0D).count(2).fan(40.0D))
+				.step(at(0).minTier(7).shape(front().length(40, 64).width(3).height(12).speed(8.0D).skyBand(12.0D).ahead(3.0D).count(2).fan(40.0D))
 						.hit(damage(4.5D).charged()))
 				.fx(Phase.CAST, impact(GOLD).onCaster().count(12).ticks(10))
-				.fx(Phase.CHARGE, laser(blackGlass, 1.2F, 64.0F).grow(0.02F, 20.0F).ticks(30).minTier(DISPLAY_TIER),
-						giantBlock(gold).blockSize(2.0F, 0.5F, 2.0F).n(2).ticks(30).minTier(DISPLAY_TIER),
+				.fx(Phase.CHARGE, model("ruyi_staff").fromHand().scale(1.0F).grow(0.2F, 20.0F).ticks(22).until(Phase.TRAVEL),
 						column(GOLD).count(30).ticks(20))
-				.fx(Phase.TRAVEL, laser(blackGlass, 1.2F, 120.0F).topple(8.0F).ticks(20).minTier(DISPLAY_TIER),
+				.fx(Phase.TRAVEL, model("ruyi_staff").scale(16.0F).topple(8.0F).ticks(24).facing(FxLayer.Facing.FACE_FORWARD),
 						trail(0x202020).count(40).ticks(8), shake(0.9F, 16), cracks())
 				.fx(Phase.HIT, impact(STONE).particle(ParticleTypes.CRIT).count(10))
+				.fx(Phase.TRAVEL, impact(STONE).particle(ParticleTypes.POOF).line().count(30).ticks(16).detail())
 				.sound(Phase.CHARGE, SoundEvents.BEACON_POWER_SELECT, 1.0F, 0.5F)
 				.sound(Phase.TRAVEL, SoundEvents.ANVIL_LAND, 1.2F, 0.5F)
 				.sound(Phase.TRAVEL, SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.6F, 0.6F)
@@ -677,6 +728,7 @@ public final class UniversalArts {
 		// 127 · Tiga Helai Rambut Penyelamat (Journey to the West, three life-saving hairs)
 		sink.add(art("three_life_saving_hairs", 127, null)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.LINDUNG).realm(Realm.IMMORTAL_ASCENSION, 3)
+				.pose(Pose.SEAL)
 				.route(Route.realm())
 				.flag(NO_TEACH, CAST_ALWAYS)
 				.qi(300).cooldown(600.0D)
@@ -688,6 +740,7 @@ public final class UniversalArts {
 				.fx(Phase.CAST, healRise(GOLD).particle(ParticleTypes.END_ROD).onCaster().count(12).ticks(40))
 				.fx(Phase.extra(0), impact(GOLD).particle(ParticleTypes.TOTEM_OF_UNDYING).count(16).ticks(20),
 						mist(GOLD).count(20).ticks(16))
+				.fx(Phase.CAST, model("golden_hair").onCaster().above(2.2F).scale(0.5F).orbit(0.6F, 90.0F).ticks(400))
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.4F)
 				.sound(Phase.extra(0), SoundEvents.TOTEM_USE, 1.0F, 1.2F)
 				.perfection(Bonus.cooldown(0.2D))
@@ -697,6 +750,7 @@ public final class UniversalArts {
 		// 128 · Wilayah Jiwa Naga (Against the Gods, Dragon Soul Domain)
 		sink.add(art("dragon_soul_domain", 128, null)
 				.grade(TechniqueGrade.TIAN, 0).type(TechniqueType.WILAYAH).realm(Realm.IMMORTAL_ASCENSION, 3)
+				.pose(Pose.ARMS_SPREAD)
 				.route(Route.feat(Feat.firstKill("minecraft:ender_dragon", null)))
 				.flag(NO_TEACH, CAST_ALWAYS)
 				.qi(240).cooldown(90.0D)
@@ -704,7 +758,8 @@ public final class UniversalArts {
 						.hit(untarget(), dot(0.4D, 2, DotKind.SOUL), eff(Eff.SLOWNESS, 3, 40), knock(0.4D)))
 				.step(at(60).repeat(5, 60).shape(all().ofArea().max(32)).hit(bind(BindKind.STUN, 20).boss(5)).phase(0))
 				.fx(Phase.CAST, shockRing(DRAGON).count(60).ticks(20), mist(0x7A3FBF).count(40).ticks(200),
-						beast(FxLayer.BeastKind.DRAGON, DRAGON).n(3).count(60).ticks(200))
+						ribbon(DRAGON).color2(0x5A20B0).model("dragon_segment_purple").onCaster().n(3).radius(8.0F).ticks(200),
+						beast(FxLayer.BeastKind.DRAGON, DRAGON).n(3).count(30).ticks(200).extra())
 				.fx(Phase.PULSE, mist(0x7A3FBF).count(16).ticks(20).detail())
 				.fx(Phase.extra(0), shockRing(DRAGON).count(30).ticks(10))
 				.sound(Phase.CAST, SoundEvents.ENDER_DRAGON_GROWL, 0.3F, 1.0F)
@@ -716,6 +771,7 @@ public final class UniversalArts {
 		// 129 · Kuali Induk Qi Segala Benda (Shrouded the Heavens, Myriad Things Mother Qi Cauldron)
 		sink.add(art("myriad_cauldron", 129, null)
 				.grade(TechniqueGrade.TIAN, 1).type(TechniqueType.KENDALI).realm(Realm.IMMORTAL_ASCENSION, 4)
+				.pose(Pose.SKY_RAISE).pose(Phase.IMPACT, Pose.OVERHEAD_SLAM)
 				.route(Route.feat(Feat.alchemyCount(81)))
 				.flag(TEACHABLE)
 				.qi(280).cooldown(75.0D)
@@ -728,10 +784,11 @@ public final class UniversalArts {
 						.hit(dot(0.5D, 2, DotKind.QI))
 						.onKill(at(0).self(restoreQi(0.03D, 0.15D))))
 				.fx(Phase.CAST, cloudDisc(0xE0E0E0).above(24.0F).count(40).ticks(24))
-				.fx(Phase.IMPACT, giantBlock(cauldron).blockSize(8.0F, 8.0F, 8.0F).fall(24.0F, 20.0F).ticks(100).minTier(DISPLAY_TIER),
+				.fx(Phase.IMPACT, model("mother_qi_cauldron").scale(6.0F).ticks(80).facing(FxLayer.Facing.UPRIGHT), impact(0x6FA87A).particle(ParticleTypes.POOF).count(30).ticks(14),
 						shockRing(0x6FA87A).count(40).ticks(14), shake(0.7F, 14))
 				.fx(Phase.extra(0), mist(0xB0F0C0).count(40).ticks(80))
 				.fx(Phase.PULSE, mist(0xB0F0C0).count(20).ticks(20).detail())
+				.fx(Phase.TRAVEL, model("mother_qi_cauldron").scale(6.0F).fall(24.0F, 20.0F).ticks(21).facing(FxLayer.Facing.UPRIGHT), column(0xB0F0C0).inSky().count(16).ticks(18).detail())
 				.sound(Phase.IMPACT, SoundEvents.BELL_BLOCK, 1.4F, 0.5F)
 				.sound(Phase.IMPACT, SoundEvents.LAVA_POP, 1.0F, 0.8F)
 				.sound(Phase.IMPACT, SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.4F, 0.7F)
@@ -743,6 +800,7 @@ public final class UniversalArts {
 		// 130 · Rahasia Xing (Shrouded the Heavens, the Xing Secret)
 		sink.add(art("xing_secret", 130, null)
 				.grade(TechniqueGrade.TIAN, 1).type(TechniqueType.GERAK).realm(Realm.IMMORTAL_ASCENSION, 5)
+				.pose(Pose.SEAL)
 				.route(Route.enlight())
 				.flag(NO_TEACH, CAST_ALWAYS)
 				.qi(200).cooldown(90.0D)
@@ -750,11 +808,11 @@ public final class UniversalArts {
 						new Payload.Buff(BuffKind.CD_RATE, 2.0D, 0.0D, Val.of(200, 300), null, false, false, 1)))
 				.step(at(0).shape(aura().radius(6, 10).duration(200, 300).pulse(20)).hit(eff(Eff.SLOWNESS, 4, 40)))
 				.step(at(60).repeat(5, 60).shape(all().ofArea().max(32)).hit(bind(BindKind.STUN, 10)).phase(0))
-				.fx(Phase.CAST, runeCircle(0xD8E8FF).onCaster().radius(1.5F).count(24).ticks(200).minTier(GLYPH_TIER),
+				.fx(Phase.CAST, runeCircle(0xD8E8FF).onCaster().radius(1.5F).count(24).ticks(200),
 						impact(0xD8E8FF).particle(ParticleTypes.REVERSE_PORTAL).count(16).ticks(10))
 				.fx(Phase.PULSE, trail(0x8040FF).particle(ParticleTypes.REVERSE_PORTAL).onCaster().count(12).ticks(20).detail(),
 						afterimage(0xD8E8FF).ticks(10).extra())
-				.fx(Phase.extra(0), runeCircle(0xD8E8FF).count(16).ticks(10).minTier(GLYPH_TIER))
+				.fx(Phase.extra(0), runeCircle(0xD8E8FF).count(16).ticks(10))
 				.sound(Phase.CAST, SoundEvents.BEACON_POWER_SELECT, 1.0F, 1.2F)
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.NOTE_BLOCK_HAT, 0.8F, 1.6F))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.NOTE_BLOCK_HAT, 0.8F, 1.3F).delay(6))
@@ -766,6 +824,7 @@ public final class UniversalArts {
 		// 131 · Segel Karma (I Shall Seal the Heavens, the Seventh Hex)
 		sink.add(art("karmic_hex", 131, null)
 				.grade(TechniqueGrade.TIAN, 1).type(TechniqueType.KENDALI).realm(Realm.IMMORTAL_ASCENSION, 6)
+				.pose(Pose.FINGER_POINT)
 				.route(Route.scr(3))
 				.flag(TEACHABLE, REQUIRES_TARGET)
 				.qi(300).cooldown(60.0D)
@@ -776,7 +835,7 @@ public final class UniversalArts {
 				.step(at(0).shape(all().at(Anchor.TARGET).radius(24).max(12, 24)).hit(link(0.5D, 240, 0.25D)))
 				.fx(Phase.CAST, chains(0xD03030).color2(GOLD).count(30).ticks(240))
 				.fx(Phase.HIT, chains(0xD03030).color2(GOLD).count(8).ticks(20).detail(),
-						glyph("因果").scale(2.5F).above(1.5F).ticks(60).minTier(DISPLAY_TIER))
+						glyph("因果").scale(2.5F).above(1.5F).ticks(60).minTier(1))
 				.fx(Phase.extra(0), chains(0xD03030).color2(GOLD).count(20).ticks(240))
 				.sound(Phase.CAST, SoundEvents.CHAIN_PLACE, 1.0F, 0.8F)
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.0F)
@@ -787,6 +846,7 @@ public final class UniversalArts {
 		// 132 · Roda Enam Jalan Reinkarnasi (Perfect World, Six Dao Reincarnations Heavenly Art) ★ echo_wheel
 		sink.add(art("six_dao_reincarnation", 132, null)
 				.grade(TechniqueGrade.TIAN, 2).type(TechniqueType.PAMUNGKAS).realm(Realm.IMMORTAL_ASCENSION, 7)
+				.pose(Pose.SEAL)
 				.route(Route.realm(), Route.known(30))
 				.special(EchoWheel.ID)
 				.flag(NO_TEACH, NO_ECHO, CAST_ALWAYS)
@@ -801,6 +861,7 @@ public final class UniversalArts {
 				.fx(Phase.extra(4), runeCircle(0x50A0FF).variant(FxLayer.Variant.VERTICAL).onCaster().radius(10.0F).count(20).ticks(8))
 				.fx(Phase.extra(5), runeCircle(0xB060FF).variant(FxLayer.Variant.VERTICAL).onCaster().radius(10.0F).count(20).ticks(8))
 				.fx(Phase.extra(6), shell(WHITE).count(80).ticks(12), shake(0.6F, 14))
+				.fx(Phase.CAST, model("six_path_wheel").onCaster().above(1.5F).scale(4.0F).spin(3.0F).ticks(60).facing(FxLayer.Facing.FACE_FORWARD))
 				.sound(Phase.CAST, SoundEvents.BELL_RESONATE, 1.0F, 1.0F)
 				.sound(Phase.extra(0), SoundEvents.BELL_BLOCK, 1.0F, 0.6F)
 				.sound(Phase.extra(1), SoundEvents.BELL_BLOCK, 1.0F, 0.7F)
@@ -818,16 +879,17 @@ public final class UniversalArts {
 				.onHit(at(0).shape(nova().radius(6).at(Anchor.HIT)).hit(damage(3.0D)));
 		sink.add(art("heavenly_fate_finger", 133, null)
 				.grade(TechniqueGrade.TIAN, 2).type(TechniqueType.PAMUNGKAS).realm(Realm.IMMORTAL_ASCENSION, 9)
+				.pose(Phase.CHARGE, Pose.SKY_RAISE).pose(Pose.FINGER_POINT).climax(Phase.HIT)
 				.route(Route.realm()).prereq("divine_sense", 3)
 				.flag(NO_TEACH, REQUIRES_TARGET)
 				.charge(20).qi(320).cooldown(90.0D)
 				// LOS, or none needed while the caster's Divine Sense glow is active.
 				.step(fateHit.only(Cond.not(Cond.DIVINE_SENSE)).shape(target().range(64)))
 				.step(fateHit.only(Cond.DIVINE_SENSE).shape(target().range(64).noLos()))
-				.fx(Phase.CAST, cloudDisc(0xF8F8FF).above(40.0F).count(60).ticks(30))
-				.fx(Phase.CHARGE, cloudDisc(0xF8F8FF).above(40.0F).count(40).ticks(20), runeCircle(WHITE).count(20).ticks(20).minTier(GLYPH_TIER))
-				.fx(Phase.HIT, laser(whiteGlass, 3.0F, 40.0F).ticks(16).minTier(DISPLAY_TIER), column(WHITE).count(40).ticks(12),
-						runeCircle(WHITE).onTarget().radius(4.0F).count(24).ticks(20).minTier(GLYPH_TIER),
+				.fx(Phase.CAST, cloudDisc(0xF8F8FF).onTarget().above(40.0F).count(60).ticks(30))
+				.fx(Phase.CHARGE, cloudDisc(0xF8F8FF).onTarget().above(40.0F).count(40).ticks(20), model("fate_finger").onTarget().scale(6.0F).fall(40.0F, 20.0F).ticks(24).until(Phase.HIT).facing(FxLayer.Facing.UPRIGHT), runeCircle(WHITE).count(20).ticks(20))
+				.fx(Phase.HIT, laser(whiteGlass, 3.0F, 40.0F).ticks(16).minTier(1), column(WHITE).count(40).ticks(12),
+						runeCircle(WHITE).onTarget().radius(4.0F).count(24).ticks(20),
 						flash(WHITE, 0.3F, 6), shake(1.0F, 16))
 				.sound(Phase.CAST, SoundEvents.BEACON_ACTIVATE, 1.0F, 0.5F)
 				.sound(Phase.HIT, SoundEvents.BELL_BLOCK, 1.6F, 0.5F)
