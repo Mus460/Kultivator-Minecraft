@@ -73,7 +73,8 @@ public final class KillingEffect implements FormationEffect {
 		Params params = ctx.spec().params();
 		int kind = params.getInt("kind", CatalogB.KILL_SWORD);
 		boolean dalam = BUtil.keeperRank(ctx.core(), SectRanks.DALAM);
-		int extra = GrandArrayEffect.absoluteTargets(ctx.core()) + (dalam ? kind == CatalogB.KILL_HEAVEN ? 1 : 2 : 0);
+		int extra = GrandArrayEffect.absoluteTargets(ctx.core()) + (dalam ? kind == CatalogB.KILL_HEAVEN ? 1 : 2 : 0)
+				+ (dev.kultivator.formasi.core.CoreTicker.flagged(ctx.core()) ? 1 : 0);
 		int count = Math.min(24, params.getInt("targets", 6) + extra);
 		List<Mob> targets = new ArrayList<>();
 		for (Mob mob : ctx.hostiles(24)) {

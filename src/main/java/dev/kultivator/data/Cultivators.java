@@ -30,6 +30,10 @@ public final class Cultivators {
 		return player.getAttachedOrCreate(ModAttachments.CULTIVATION);
 	}
 
+	/** Keys of the server's {@code epicMoments} / {@code epicCameraShots} added to every snapshot. */
+	public static final String SERVER_EPIC_KEY = "srv_epic";
+	public static final String SERVER_EPIC_CAMERA_KEY = "srv_epic_camera";
+
 	/** Marks the player's data as changed: their client gets a new snapshot within 5 ticks and their look is refreshed. */
 	public static void dirty(ServerPlayer player) {
 		DIRTY.add(player.getUUID());
@@ -38,7 +42,11 @@ public final class Cultivators {
 	/** Sends the snapshot right now (use after big changes the player should see at once). */
 	public static void syncNow(ServerPlayer player) {
 		DIRTY.remove(player.getUUID());
-		Net.send(player, new Payloads.SyncSelf(get(player).saveForClient(), player.level().getGameTime()));
+		net.minecraft.nbt.CompoundTag tag = get(player).saveForClient();
+		// The two server switches of 7b, so client-derived scenes follow them too (DESIGN 23 config table).
+		tag.putBoolean(SERVER_EPIC_KEY, dev.kultivator.KultivatorConfig.get().epicMoments);
+		tag.putBoolean(SERVER_EPIC_CAMERA_KEY, dev.kultivator.KultivatorConfig.get().epicCameraShots);
+		Net.send(player, new Payloads.SyncSelf(tag, player.level().getGameTime()));
 		refreshVisual(player);
 	}
 

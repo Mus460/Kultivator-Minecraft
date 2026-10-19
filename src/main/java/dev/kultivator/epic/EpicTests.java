@@ -536,6 +536,11 @@ public final class EpicTests {
 			EpicMoments.send(level, EpicIds.DISCIPLE_BT, EpicIds.DBT_CANCEL, disciple, player, disciple != null ? disciple.position() : places.discipleAt(),
 					now, 0, 0, 0.0F, run.s, flags);
 		}
+		// Every other moment (Heart Demon, ultimates, sect, ...) has no stop beat: the tester's own client ends all scenes
+		// at once and restores sky, sound, music and camera.
+		Vec3 self = player.position();
+		dev.kultivator.network.Net.send(player, new dev.kultivator.network.Payloads.EpicMoment(EpicIds.EXTRA, EpicIds.BEAT_STOP_ALL, -1, player.getId(),
+				self.x, self.y, self.z, now, 0, 0, 0, 0.0F, 0, flags));
 	}
 
 	private static Places places(ServerPlayer player) {

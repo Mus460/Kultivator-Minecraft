@@ -102,11 +102,16 @@ public final class EpicMoments {
 		while (!window.isEmpty() && now - window.peekFirst() >= RATE_WINDOW) {
 			window.pollFirst();
 		}
+		// Closing beats (FINAL, results, ABORT / STOP / CANCEL) always go out and take no slot: a dropped end beat would
+		// leave the client's vortex, sky grade and scene alive until the watchdog.
+		boolean closing = (extraFlags & EpicIds.FLAG_FINAL) != 0 || EpicIds.closing(moment, beat);
 		// PRE beats go first: they only take a slot while two are still free.
-		if (window.size() >= (pre ? RATE_MAX - 1 : RATE_MAX)) {
+		if (!closing && window.size() >= (pre ? RATE_MAX - 1 : RATE_MAX)) {
 			return false;
 		}
-		window.addLast(now);
+		if (!closing) {
+			window.addLast(now);
+		}
 		if (RATE.size() > 256) {
 			prune(now);
 		}

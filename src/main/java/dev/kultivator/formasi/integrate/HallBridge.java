@@ -205,7 +205,11 @@ public final class HallBridge {
 		}
 		int id = parseInt(parts[1]);
 		UUID owner = Halls.viewedOwner(player);
-		for (CoreStore store : CoreTicker.stores()) {
+		// Ids are global for new cores; older worlds may hold the same id in two dimensions, so the player's own
+		// dimension is tried first.
+		java.util.List<CoreStore> stores = CoreTicker.stores();
+		stores.sort(java.util.Comparator.comparingInt(store -> player.level().dimension().equals(store.dim()) ? 0 : 1));
+		for (CoreStore store : stores) {
 			CoreRecord record = store.byId(id);
 			if (record == null || !record.owner.equals(owner)) {
 				continue;
@@ -351,6 +355,7 @@ public final class HallBridge {
 	private static CompoundTag coreTag(MinecraftServer server, CoreRecord record, @Nullable FormationSpec spec) {
 		CompoundTag tag = new CompoundTag();
 		tag.putInt("id", record.id);
+		tag.putString("dim", record.dim.identifier().toString());
 		tag.putString("spec", record.spec);
 		tag.putInt("x", record.eye.getX());
 		tag.putInt("y", record.eye.getY());

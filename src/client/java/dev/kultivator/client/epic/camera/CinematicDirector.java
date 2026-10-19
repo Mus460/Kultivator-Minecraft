@@ -151,8 +151,13 @@ public final class CinematicDirector {
 		Vec3 eye = feet.add(0.0D, scene.height() * 0.9D, 0.0D);
 		int remaining = request.danger ? shotCap : Math.min(shotCap, sceneCap - used);
 		request.validate(feet, eye, subjectYaw, Math.max(20, remaining));
-		boolean chain = active && (owner == scene) && last != null;
-		blendFrom = chain ? last : null;
+		if (active && owner != scene) {
+			// Another scene takes over the running shot: it counts as ended for the cooldowns.
+			KIND_LAST.put(kind, ticks);
+			lastCameraEnd = ticks;
+		}
+		// Blend from the pose shown last frame whenever a shot runs (also when another scene takes over), never snap.
+		blendFrom = active && last != null ? last : null;
 		shot = request;
 		owner = scene;
 		priority = prio;

@@ -627,7 +627,11 @@ Butter Bot mod; Butter Bot stays a separate mod).
   cultivate near them". With realm = ordinal (Mortal 0 … True Immortal 8): share of the master's meditation gain =
   10% + 3% × master realm + 5% × max(0, master realm − disciple realm), at most 60%; range = 8 + 2 × master realm blocks,
   at most 24; while the master meditates within that range the disciple's own meditation gain is also ×(1 + 0.05 ×
-  master realm). Constants `DiscipleCultivation.GUIDANCE_*` (public static final) with the pure functions
+  master realm). **Balance (2026-10-19):** the master's gain is first scaled to the disciple's realm with
+  `guidanceRealmScale = min(1, Meditation.baseRate(disciple rank) / Meditation.baseRate(master rank))` (from Deity
+  Transformation up the master's base follows the master's own bar, so the raw share filled a low disciple's realm in
+  seconds), and the 60% cap applies after the heir factor (`min(0.60, share × masterShareFactor)`), so an heir never gets
+  more than 60%. Same-realm guidance is unchanged. Constants `DiscipleCultivation.GUIDANCE_*` (public static final) with the pure functions
   `guidanceShare`, `guidanceRange`, `guidanceSelfFactor`; shown on the disciple Status tab (cultivation bar tooltip) and in
   the guide topic `bimbingan` (`lang-src/disciplecult.*`). The any-range talent hook still lifts the range limit for
   the share only. Sumber: terinspirasi dari Battle Through the Heavens (Yao Lao, the teacher living in Xiao Yan's ring,
@@ -1219,13 +1223,24 @@ and by `DiscipleCultivation.masterMeditationGain`):
 
 ```
 base    = max(0.6 + 0.25 × realm, Rank(realm, layer, 0).xpRequired() / 3000)
-xp/s    = base × min(5.0, site × formation × fuel) × max(0.15, density)
+xp/s    = base × min(3.5, site × formation × fuel) × clamp(density, 0.15, 1.4)
           × Sects.meditationBonus × (1 + 0.05 × seclusionStacks)
 drain/s = 0.0015 × (1 + 0.10 × realm) × fuel 0.5 × formation (Great 0.6, Heavenly 0.35) × abode 0.5
 ```
 
 - Base rates: unchanged up to Nascent Soul (1.6/s); Deity Transformation 4.0, Dao Union 10, IA L1 20, IA L9 68, True
   Immortal 83.3. Pace: a plain Early stage about 50 min; fully optimised about 5–10 min.
+- **Balance (2026-10-19):** `MULTIPLIER_CAP` 5.0 → 3.5 and a new `DENSITY_XP_CAP` 1.4 (the vein still reads 0–200%; only
+  its XP effect stops at 1.4). With the old cap a prepared player (Heavenly formation, mountain site, top fuel, Great vein,
+  seclusion, HIGH root, PERFECT quality, Enlightenment Pill) finished a DT+ Early stage in about 2.9 min and a max stack in
+  77 s, because the cap of 5 was multiplied again by density 2.0, seclusion, the sect mate and Progression (about 36× the
+  plain rate). Simulated now: prepared HIGH/PERFECT 5.1 min, prepared MID/NORMAL 8.5 min, max stack 2.1 min; casual
+  unchanged (52 min in place, 32 min moving between fresh veins). Immortal Ascension stays 9 layers each about one realm
+  long (IA L1 20, IA L9 68; casual about 30 h for IA), as listed above.
+- **Disciple own meditation (2026-10-19):** `max(0.4 + 0.2 × realm, 0.75 × Meditation.baseRate(rank))` × 1.5 under the
+  MEDITATE order (`DiscipleCultivation.DISCIPLE_BASE_SHARE`). The flat term wins up to Nascent Soul (unchanged); from Deity
+  Transformation on an average disciple needs about 74 min per Early stage (about 1.5× the casual player, DESIGN 18
+  "slower than the master") instead of 2.6 h (DT) … 38.6 h (TI). `Surpass` honour share reuses `meditationBase`.
 - Formation floor: while a Great (Heavenly) qi formation is active at the seat, drain never takes density below 0.30
   (0.45).
 - `FeatTracker.onMeditate(player, 20)`, `Sects.meditationBonus` and the site comprehension stay in `second`.
@@ -1835,6 +1850,7 @@ mob is within 6 blocks.
 | `uji kejenuhan <nilai>` | sets Battle Fatigue S | P7-tempur |
 | `uji unsur` | for the looked-at mob: your technique element, its element, the factor and resonance | P7-tempur |
 | `uji urat <persen 0-200>` / `uji urat cari` | sets the density here / prints the nearest Great and Rich veins | P7-kultivasi |
+| `uji urat tingkat <agung\|kaya\|biasa\|tipis\|reset>` | overrides the grade of the 4×4-chunk region here (saved in `kultivator:spirit_veins` as `overrides`, region starts full at the new cap); every `SpiritVeins.grade/cap` read honours it (meditation, compass, `uji urat cari`, HUD, formation upkeep, elites, goals); `reset` restores the seeded grade | P7-kultivasi |
 | `uji tertutup <0-5>` / `uji tertutup 30m` | seclusion stacks / jumps the unbroken time to 1,800 s | P7-kultivasi |
 | `uji gua` | sets the abode here without the formation checks | P7-kultivasi |
 | `uji jimat <jenis\|semua> [kekuatan]` / `uji jimat tingkat <0-10>` | talismans / talisman skill | P7-kultivasi |
@@ -9738,6 +9754,26 @@ heart-demon mirror; kill-cams; all camera work, music cues, sky grades and title
 | an advancement per moment | none | drop | presentation, not gameplay |
 | "Phase 7b" in 19.1.5, 19.3.7, 19.3.8, 19.3.11, 19.10, 19.12 and 19.13 (player star calamities, disciple pill effects, the slip list) | **Phase 7c** | rename | Phase 7b is now Momen Epik |
 
+### 23.22 Review fixes (2026-10-19, code is the truth)
+
+- **Sky ownership.** `SkyDirector` remembers the scene whose tick set the grade (`EpicDirector` sets a context around
+  each `scene.tick()`); when that scene ends with no release scheduled, the grade fades over 2 s. A grade with no new
+  `grade()` call for 5 min also fades (watchdog). Ultimates end on their own: most specs have no END layers, so
+  `TECH_END` rarely arrives; the end beat (sky release, Dewa crane-up, `cosmic_giant_form` pull-back) runs 60 ticks after
+  the last climax beat, or 200 ticks after the cast when no climax follows, and at most once.
+- **Death:** the dead edge also fades the protagonist's own sky grade (`SkyDirector.releaseOwn`) and clears the title
+  cards and the letterbox.
+- **Skip key:** a double press hides the bars only while an own scene runs (no more permanent suppression).
+- **Server switches on the client:** the self snapshot carries `srv_epic` / `srv_epic_camera`; with `epicMoments = false`
+  no client-derived scene starts, and with `epicCameraShots = false` client-derived scenes never get CAMERA_OK.
+- **Closing beats are never rate limited:** FINAL beats and every result / ABORT / STOP / CANCEL / TECH_END beat
+  (`EpicIds.closing`) skip the 3-per-20-ticks window and take no slot.
+- **`uji momen berhenti`:** after the ABORT / STOP / CANCEL cues the tester's client gets a reserved beat
+  `EpicIds.BEAT_STOP_ALL` (120, with FLAG_TEST) that runs `EpicDirector.stopAll()`; older clients drop it (above every
+  `maxBeat`).
+- **Camera takeover:** a shot of another scene blends from the pose shown last frame (never snaps to the eye) and the
+  replaced shot's kind and camera cooldowns are recorded.
+
 ## 24. Phase 7c — Formasi Sekte (sect formations)
 
 User request (id, 2026-10-18): "Formasi untuk sekte besar, saya mau sangat lengkap." ("Formations for a big sect, I want
@@ -11606,7 +11642,7 @@ citations (22.9).
 
 | Effect | Combine rule | Cap | Notes |
 |---|---|---|---|
-| Gathering, players | sect term `G = min(GATHER_SECT_CAP 1.5, max(K2, B5) × M5)` | formation term `min(FORMATION_STACK_CAP 2.6, or 2.8 with A1, QiFormations.multiplier(tier) × G)` | still inside the existing `min(5.0, site × formation × fuel)`. Without a seat: ≤ ×1.5. Heavenly Star seat ×2.2: +18% (+27% with A1) |
+| Gathering, players | sect term `G = min(GATHER_SECT_CAP 1.5, max(K2, B5) × M5)` | formation term `min(FORMATION_STACK_CAP 2.6, or 2.8 with A1, QiFormations.multiplier(tier) × G)` | still inside the existing `min(3.5, site × formation × fuel)` (5.0 before the 2026-10-19 balance). Without a seat: ≤ ×1.5. Heavenly Star seat ×2.2: +18% (+27% with A1) |
 | Gathering, disciples | the disciple's **own** meditation XP × G, through `DiscipleHooks.addXpFactor` for `XpSource.MEDITATION` | 1.5 | the master share is never multiplied again (`masterMeditationGain` already uses `gainPerSecond`); multiplies with the Tetua aura |
 | Meditation vein drain | strongest: K2 0.9, B5 0.8, B5 with a Dalam+ keeper 0.7 | ≥ 0.7 | other drain factors (Great 0.6, Heavenly 0.35, fuel 0.5, abode 0.5) are unchanged |
 | Healing | strongest | players Regeneration amplifier ≤ 1; disciple `regenFactor` ≤ ×2; qi regen ≤ ×1.39; deviation timer ≤ ×1.33 | paused during the target's own tribulation |
@@ -12026,6 +12062,34 @@ formasi {
 ```
 
 ---------------------------------------------------------------------------------------------------------------------
+
+### 24.12a Review fixes (2026-10-19, code is the truth)
+
+- **Damage cooldown:** `kultivator:formation` is in `#minecraft:bypasses_cooldown` (the per-second `KillLedger` cap still
+  bounds DPS), and the ledger books the health the mob really lost, not the requested amount.
+- **Transport:** the source node must be POWERED or KEPT (ACTIVE with a keeper at its post counts as kept: "no Daya
+  cost"); DORMANT, SUSPENDED and BROKEN sources refuse ("source_off"). DORMANT or SUSPENDED destinations refuse
+  ("dest_off"), checked again on arrival. An instant (`uji formasi teleport`) L5 trip to an unloaded node waits 20 ticks
+  for its ender-pearl ticket instead of failing; the ticket is removed on arrival or cancel. M3 nodes of one owner must
+  stand at least 16 blocks apart (registration refusal "node_spacing").
+- **Core ids are global:** a new core takes an id above every store's counter (`CoreTicker.allocateId`), so the tablet's
+  `op:<id>` names one core; for older worlds the player's own dimension is tried first, the hall core tag carries `dim`,
+  and the active-slot unit is `c:<dim>/<id>`.
+- **Active slots** go only to cores that would run: a core with an unmet requirement, an effect blocker or config off no
+  longer holds a slot.
+- **Tiered-eye upgrade (24.2.3 step 4):** using a registered eye as its owner re-runs detection (the detect cooldown
+  applies unless the core is BROKEN); when a higher-grade pattern is complete and passes the registration limits (this
+  core counted as replaced) the core becomes that formation in place: same id, keepers and Daya (above the new cap to the
+  Kas), new rotation and slot states, re-indexed.
+- **Fuel pools stay apart (24.2.7):** `CoreRecord.dayaA` (saved as `daya_a`; older saves: all amethyst when no stone was
+  ever fed) is the amethyst part. Upkeep and `spend` burn it first; `draw` adds the amethyst pool's share to it; removing
+  or upgrading a core refunds the stone part to the stone pool and the amethyst part to the amethyst pool. A feed whose
+  overflow does not fit in the Kas leaves the item in the hand.
+- **Core full:** one item of the hand that was used goes to the Kas (`Kas.depositOne`), never a whole stack per click.
+- **L6:** a flagged killing array gets +1 target. `SyncSender.forget` runs on join, leave and respawn so the first sync
+  after rejoining is never skipped as unchanged. `ProjectileTracker` clears on `SERVER_STOPPED`. `target:x:y:z:id`
+  refuses unloaded or out-of-reach (`LOOK_RANGE + 2`) positions before reading a block.
+- **Recipe book:** `advancement/recipes/misc/formation_eye.json` unlocks the Formation Eye recipe with a lodestone.
 
 ### 24.13 Spine (orchestrator, after 7 and 7b are committed, before both modules start)
 

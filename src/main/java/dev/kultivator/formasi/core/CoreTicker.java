@@ -95,6 +95,12 @@ public final class CoreTicker {
 		ServerLifecycleEvents.SERVER_STARTED.register(started -> server = started);
 		ServerLifecycleEvents.SERVER_STOPPED.register(stopped -> clearSession());
 		ServerTickEvents.END_SERVER_TICK.register(CoreTicker::tick);
+		// The client wipes its formation state on disconnect and respawn: forget the last sync so the next one goes out
+		// in full instead of being skipped as unchanged.
+		net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.JOIN.register(player -> SyncSender.forget(player.getUUID()));
+		net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.LEAVE.register(player -> SyncSender.forget(player.getUUID()));
+		net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) ->
+				SyncSender.forget(newPlayer.getUUID()));
 	}
 
 	private static void clearSession() {
@@ -121,6 +127,17 @@ public final class CoreTicker {
 		if (server == null) {
 			server = running;
 		}
+	}
+
+	/** A core id not used in any dimension (ids are global, so the tablet's {@code op:<id>} names one core). */
+	static int allocateId(CoreStore requester) {
+		int next = requester.nextId();
+		for (CoreStore store : stores()) {
+			if (store != requester) {
+				next = Math.max(next, store.nextId());
+			}
+		}
+		return next;
 	}
 
 	public static CoreStore store(ServerLevel level) {
@@ -190,6 +207,12 @@ public final class CoreTicker {
 		CoreRecord record = record(view.dim(), view.id());
 		int grade = spec == null ? 1 : spec.grade().number();
 		return grade + (record != null && record.keeperDalam && record.keepersAtPost > 0 ? 1 : 0);
+	}
+
+	/** True while an L6 Restriction Flag strengthens this core (24.4.6: killing arrays +1 target). */
+	public static boolean flagged(CoreView view) {
+		CoreRecord record = view == null ? null : record(view.dim(), view.id());
+		return record != null && record.flaggedBy >= 0;
 	}
 
 	public static CoreView view(CoreRecord record) {
@@ -374,7 +397,7 @@ public final class CoreTicker {
 		double cost = record.rate * elapsed + record.carry;
 		long whole = (long) Math.floor(cost);
 		record.carry = cost - whole;
-		record.daya = Math.max(0L, record.daya - whole);
+		record.spendDaya(whole);
 		if (record.daya == 0L) {
 			record.best = -1;
 			record.carry = 0.0D;
@@ -395,6 +418,7 @@ public final class CoreTicker {
 		long got = 0L;
 		if (!spec.has(Flag.STONE_ONLY)) {
 			got += Kas.take(record.owner, want, false);
+			record.dayaA = record.amethystPart() + got;
 		}
 		if (got < want) {
 			int best = Kas.bestGrade(record.owner);
@@ -667,7 +691,11 @@ public final class CoreTicker {
 				if (level == null || !Halls.inTerritory(owner, level, Vec3.atCenterOf(record.eye))) {
 					continue;
 				}
-				String unit = Limits.transport(spec) ? "t:" + spec.grade().name() : "c:" + record.id;
+				// A core that would be suspended anyway (requirement not met, an effect blocker, config off) takes no slot.
+				if (blocker(level, record, spec, hallLevel, Halls.hallOf(owner)) != null) {
+					continue;
+				}
+				String unit = Limits.transport(spec) ? "t:" + spec.grade().name() : "c:" + record.dim.identifier() + "/" + record.id;
 				if (units.contains(unit) || units.size() < max) {
 					units.add(unit);
 				} else {
@@ -739,11 +767,36 @@ public final class CoreTicker {
 		forget(level, store, record, true);
 	}
 
+	/**
+	 * Takes {@code centi} out of the core into the Kas, the stone part first into the stone pool, the amethyst part into the
+	 * amethyst pool (24.2.7: the two never mix). Returns what did not fit in the pools.
+	 */
+	public static long refund(CoreRecord record, long centi) {
+		long take = Math.max(0L, Math.min(centi, record.daya));
+		long amethyst = record.amethystPart();
+		long stone = record.daya - amethyst;
+		long fromStone = Math.min(take, stone);
+		long fromAmethyst = take - fromStone;
+		long lost = 0L;
+		if (fromStone > 0L) {
+			lost += fromStone - Kas.add(record.owner, fromStone, Math.max(0, record.best));
+		}
+		if (fromAmethyst > 0L) {
+			lost += fromAmethyst - Kas.add(record.owner, fromAmethyst, -1);
+		}
+		record.daya -= take;
+		record.dayaA = Math.max(0L, amethyst - fromAmethyst);
+		if (lost > 0L) {
+			Kultivator.LOGGER.info("Kultivator: {} centi-Daya of core {} did not fit in the Formation Kas", lost, record.id);
+		}
+		return lost;
+	}
+
 	/** Forgets a real record (blocks untouched, Daya to the Kas, keepers freed). */
 	public static void forget(ServerLevel level, CoreStore store, CoreRecord record, boolean tell) {
 		FormationSpec spec = FormationRegistry.byId(record.spec);
 		if (!record.virtual && record.daya > 0L) {
-			Kas.add(record.owner, record.daya, record.best >= 0 ? record.best : -1);
+			refund(record, record.daya);
 		}
 		for (DiscipleEntity disciple : Disciples.loaded(record.owner)) {
 			if (record.hasKeeper(disciple.soulId())) {

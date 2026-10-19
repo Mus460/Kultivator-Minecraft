@@ -119,8 +119,7 @@ public final class Surpass {
 		}
 		if (surpassed(data) && DisciplePaths.tag(data).getBooleanOr("honor", false) && entity.isMeditatingNow()
 				&& Cultivators.get(master).meditating() && DisciplePaths.near(master, entity, HONOR_RANGE)) {
-			double rate = (0.4D + 0.2D * data.realm().ordinal()) * (entity.mode() == DiscipleEntity.Mode.MEDITATE ? 1.5D : 1.0D)
-					* DiscipleCultivation.xpMultiplier(entity, data, XpSource.MEDITATION);
+			double rate = DiscipleCultivation.meditationBase(entity, data) * DiscipleCultivation.xpMultiplier(entity, data, XpSource.MEDITATION);
 			Progression.addXp(master, rate * HONOR_SHARE, XpSource.SECT);
 		}
 	}

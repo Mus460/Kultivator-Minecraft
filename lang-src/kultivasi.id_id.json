@@ -20,6 +20,8 @@
   "kultivator.kultivasi.summary.density": "kepadatan %1$s%% → %2$s%%",
   "kultivator.kultivasi.refill": "Qi Tertimbun mengalir kembali ke meridianmu: +%1$s kultivasi (%2$s Qi Tertimbun terpakai).",
   "kultivator.kultivasi.debug.vein_set": "Kepadatan qi wilayah ini diatur ke %1$s%% (%2$s, batas %3$s).",
+  "kultivator.kultivasi.test.vein_grade_set": "Wilayah ini sekarang %1$s (batas %2$s, penuh) sampai \"uji urat tingkat reset\"; wilayah %3$s, %4$s. Tersimpan bersama dunia.",
+  "kultivator.kultivasi.test.vein_grade_reset": "Wilayah ini kembali ke tingkat aslinya: %1$s (batas %2$s, penuh).",
   "kultivator.kultivasi.debug.vein_grade": "%1$s · batas %2$s · kepadatan sekarang %3$s%% · wilayah %4$s, %5$s",
 
   "kultivator.kultivasi.abode.need_meditation": "Gua kediaman ditetapkan saat kamu bermeditasi di kursinya.",

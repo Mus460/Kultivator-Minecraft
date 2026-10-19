@@ -50,6 +50,8 @@ public final class CoreRecord {
 	public boolean on;
 	/** Centi-Daya. */
 	public long daya;
+	/** The amethyst part of {@link #daya} (centi-Daya): it burns first and goes back to the amethyst pool (24.2.7). */
+	public long dayaA;
 	public double carry;
 	/** Best stone grade since the core was last empty (-1 amethyst or none). */
 	public int best = -1;
@@ -101,6 +103,22 @@ public final class CoreRecord {
 	public final List<Pretend> pretend = new ArrayList<>();
 	/** Free scratch values of the handler (M5 cushion count, L1 last activity...). */
 	public final CompoundTag scratch = new CompoundTag();
+
+	/** The amethyst part now (never above the whole Daya). */
+	public long amethystPart() {
+		return Math.max(0L, Math.min(dayaA, daya));
+	}
+
+	/** Spends {@code centi} from the Daya, the amethyst part first. */
+	public void spendDaya(long centi) {
+		long spent = Math.max(0L, Math.min(centi, daya));
+		dayaA = Math.max(0L, amethystPart() - spent);
+		daya -= spent;
+		if (daya <= 0L) {
+			daya = 0L;
+			dayaA = 0L;
+		}
+	}
 
 	public CoreRecord(int id, ResourceKey<Level> dim, String spec, BlockPos eye, int rot, UUID owner, String ownerName, int kind,
 			boolean virtual) {
@@ -156,6 +174,7 @@ public final class CoreRecord {
 		tag.putInt("kind", kind);
 		tag.putBoolean("on", on);
 		tag.putLong("daya", daya);
+		tag.putLong("daya_a", amethystPart());
 		tag.putDouble("carry", carry);
 		tag.putInt("best", best);
 		tag.putBoolean("draw", draw);
@@ -186,6 +205,8 @@ public final class CoreRecord {
 		record.daya = Math.max(0L, tag.getLongOr("daya", 0L));
 		record.carry = tag.getDoubleOr("carry", 0.0D);
 		record.best = tag.getIntOr("best", -1);
+		// Older saves: a core never fed a stone holds only amethyst Daya.
+		record.dayaA = Math.max(0L, tag.getLongOr("daya_a", record.best < 0 ? record.daya : 0L));
 		record.draw = tag.getBooleanOr("draw", true);
 		for (Tag each : tag.getListOrEmpty("keepers")) {
 			if (each instanceof CompoundTag entry) {

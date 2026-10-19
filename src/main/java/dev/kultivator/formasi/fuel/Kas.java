@@ -129,6 +129,31 @@ public final class Kas {
 		return total;
 	}
 
+	/** Deposits one item of {@code stack} when it fits; returns the Daya added (0 when the pool is full). */
+	public static int depositOne(ServerPlayer player, UUID owner, ItemStack stack) {
+		int grade = FuelTable.grade(stack);
+		int each = FuelTable.daya(stack);
+		if (grade == FuelTable.NONE || each <= 0 || stack.isEmpty()) {
+			return 0;
+		}
+		long room = grade < 0 ? AMETHYST_CAP * 100L - amethyst(owner) : STONE_CAP * 100L - stone(owner);
+		if (room < each * 100L) {
+			return 0;
+		}
+		add(owner, each * 100L, grade);
+		if (!player.hasInfiniteMaterials()) {
+			stack.shrink(1);
+		}
+		if (!owner.equals(player.getUUID())) {
+			OwnerStore store = store();
+			if (store != null) {
+				store.log(owner, day(), "kultivator.formasi.log.donation", player.getPlainTextName(), Integer.toString(each));
+			}
+			Halls.log(owner, Component.translatable("kultivator.formasi.log.donation", player.getPlainTextName(), each));
+		}
+		return each;
+	}
+
 	/** Deposits whole items of {@code stack} while each fits; returns the Daya added. */
 	private static int depositStack(ServerPlayer player, UUID owner, ItemStack stack) {
 		int grade = FuelTable.grade(stack);

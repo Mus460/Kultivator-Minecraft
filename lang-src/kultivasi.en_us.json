@@ -20,6 +20,8 @@
   "kultivator.kultivasi.summary.density": "density %1$s%% → %2$s%%",
   "kultivator.kultivasi.refill": "Stored Qi flows back into your meridians: +%1$s cultivation (%2$s Stored Qi used).",
   "kultivator.kultivasi.debug.vein_set": "Qi density of this region set to %1$s%% (%2$s, cap %3$s).",
+  "kultivator.kultivasi.test.vein_grade_set": "This region is now %1$s (cap %2$s, full) until \"uji urat tingkat reset\"; region %3$s, %4$s. Saved with the world.",
+  "kultivator.kultivasi.test.vein_grade_reset": "This region is back to its natural grade: %1$s (cap %2$s, full).",
   "kultivator.kultivasi.debug.vein_grade": "%1$s · cap %2$s · density now %3$s%% · region %4$s, %5$s",
 
   "kultivator.kultivasi.abode.need_meditation": "A cave abode is set while you meditate on its seat.",

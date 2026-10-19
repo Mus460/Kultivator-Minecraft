@@ -380,6 +380,12 @@ public final class ImmortalPerks {
 	public static void addTestCommands(LiteralArgumentBuilder<CommandSourceStack> uji) {
 		uji.then(Commands.literal("urat")
 				.then(Commands.literal("cari").executes(ctx -> findVeins(ctx.getSource(), self(ctx))))
+				.then(Commands.literal("tingkat")
+						.then(Commands.literal("agung").executes(ctx -> Meditation.setVeinGrade(ctx.getSource(), self(ctx), SpiritVeins.GREAT)))
+						.then(Commands.literal("kaya").executes(ctx -> Meditation.setVeinGrade(ctx.getSource(), self(ctx), SpiritVeins.RICH)))
+						.then(Commands.literal("biasa").executes(ctx -> Meditation.setVeinGrade(ctx.getSource(), self(ctx), SpiritVeins.NORMAL)))
+						.then(Commands.literal("tipis").executes(ctx -> Meditation.setVeinGrade(ctx.getSource(), self(ctx), SpiritVeins.THIN)))
+						.then(Commands.literal("reset").executes(ctx -> Meditation.setVeinGrade(ctx.getSource(), self(ctx), null))))
 				.then(Commands.argument("persen", DoubleArgumentType.doubleArg(0.0D, 200.0D))
 						.executes(ctx -> Meditation.setDensity(ctx.getSource(), self(ctx), DoubleArgumentType.getDouble(ctx, "persen")))));
 		uji.then(Commands.literal("tertutup")
