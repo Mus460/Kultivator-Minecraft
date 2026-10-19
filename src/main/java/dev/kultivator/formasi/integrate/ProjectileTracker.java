@@ -55,6 +55,8 @@ public final class ProjectileTracker {
 	public static void init() {
 		ServerEntityEvents.ENTITY_LOAD.register(ProjectileTracker::onLoad);
 		ServerTickEvents.END_SERVER_TICK.register(ProjectileTracker::tick);
+		// Never keep the old world's levels and entities reachable after leaving it.
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> TRACKED.clear());
 	}
 
 	private static void onLoad(Entity entity, ServerLevel level) {
@@ -85,8 +87,12 @@ public final class ProjectileTracker {
 		while (iterator.hasNext()) {
 			Tracked tracked = iterator.next();
 			Projectile projectile = tracked.projectile;
+			if (projectile.isRemoved() || tracked.level.getServer() != server) {
+				iterator.remove();
+				continue;
+			}
 			CoreRecord record = CoreTicker.store(tracked.level).byId(tracked.core);
-			if (projectile.isRemoved() || record == null || !record.state.running() || ++tracked.age > MAX_AGE) {
+			if (record == null || !record.state.running() || ++tracked.age > MAX_AGE) {
 				iterator.remove();
 				continue;
 			}

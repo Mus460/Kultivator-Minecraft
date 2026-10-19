@@ -18,9 +18,13 @@ public final class ClientCultivation {
 	private static long serverTime;
 	private static long clientTimeAtReceive;
 	private static long version;
+	private static boolean serverEpic = true;
+	private static boolean serverEpicCamera = true;
 
 	public static void update(Payloads.SyncSelf sync) {
 		data = CultivationData.loadFromServer(sync.data());
+		serverEpic = sync.data().getBooleanOr(dev.kultivator.data.Cultivators.SERVER_EPIC_KEY, true);
+		serverEpicCamera = sync.data().getBooleanOr(dev.kultivator.data.Cultivators.SERVER_EPIC_CAMERA_KEY, true);
 		received = true;
 		serverTime = sync.gameTime();
 		Minecraft minecraft = Minecraft.getInstance();
@@ -31,7 +35,19 @@ public final class ClientCultivation {
 	public static void clear() {
 		data = new CultivationData();
 		received = false;
+		serverEpic = true;
+		serverEpicCamera = true;
 		version++;
+	}
+
+	/** The server's {@code epicMoments} switch (true until a snapshot says otherwise). */
+	public static boolean serverEpic() {
+		return serverEpic;
+	}
+
+	/** The server's {@code epicCameraShots} switch (true until a snapshot says otherwise). */
+	public static boolean serverEpicCamera() {
+		return serverEpicCamera;
 	}
 
 	/** The latest snapshot (a blank Mortal before the first one arrives). Read only; changes are made on the server. */

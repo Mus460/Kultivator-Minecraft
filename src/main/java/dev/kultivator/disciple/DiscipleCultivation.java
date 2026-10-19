@@ -193,8 +193,11 @@ public final class DiscipleCultivation {
 			}
 			boolean anyRange = guide != null && DiscipleHooks.masterShareAnyRange(data);
 			if (guide != null && guideData.meditating() && (guided || anyRange)) {
-				addXp(entity, masterMeditationGain(guide, guideData) * guidanceShare(guideData.realm(), data.realm())
-						* DiscipleHooks.masterShareFactor(data) * (data.deviating() ? 0.5D : 1.0D), XpSource.EXACT);
+				// The master's gain is scaled down to the disciple's realm (its bar is much smaller) and the share is capped
+				// after the heir factor, so a guided disciple never gets more than 60% of what the master would at its realm.
+				double share = Math.min(GUIDANCE_SHARE_CAP, guidanceShare(guideData.realm(), data.realm()) * DiscipleHooks.masterShareFactor(data));
+				addXp(entity, masterMeditationGain(guide, guideData) * guidanceRealmScale(guideData, data) * share
+						* (data.deviating() ? 0.5D : 1.0D), XpSource.EXACT);
 			}
 		}
 		if (data.fledNoticePending()) {
@@ -221,6 +224,15 @@ public final class DiscipleCultivation {
 		int m = master.ordinal();
 		int gap = Math.max(0, m - disciple.ordinal());
 		return Math.min(GUIDANCE_SHARE_CAP, GUIDANCE_BASE_SHARE + GUIDANCE_SHARE_PER_REALM * m + GUIDANCE_SHARE_PER_GAP * gap);
+	}
+
+	/**
+	 * The master's meditation gain scaled to the disciple's realm (pure): {@code min(1, baseRate(disciple) / baseRate(master))}.
+	 * Same realm: 1; a True Immortal guiding a Nascent Soul disciple: about 0.02.
+	 */
+	public static double guidanceRealmScale(CultivationData master, DiscipleData disciple) {
+		double masterRate = dev.kultivator.cultivation.Meditation.baseRate(master.rank());
+		return masterRate <= 0.0D ? 1.0D : Math.min(1.0D, dev.kultivator.cultivation.Meditation.baseRate(disciple.rank()) / masterRate);
 	}
 
 	/** How close the master must meditate to guide (pure). */
@@ -280,9 +292,15 @@ public final class DiscipleCultivation {
 		return dev.kultivator.cultivation.Meditation.gainPerSecond(master, masterData) * Progression.xpMultiplier(master, XpSource.MEDITATION);
 	}
 
-	/** Meditation XP per second before multipliers: {@code 0.4 + 0.2 x realm}, x1.5 when ordered to meditate. */
-	private static double meditationBase(DiscipleEntity entity, DiscipleData data) {
-		double base = 0.4D + 0.2D * data.realm().ordinal();
+	/** The share of the player's realm base rate a disciple's own meditation reaches from Deity Transformation on. */
+	public static final double DISCIPLE_BASE_SHARE = 0.75D;
+
+	/**
+	 * Meditation XP per second before multipliers: {@code max(0.4 + 0.2 x realm, 0.75 x Meditation.baseRate)} (the flat term
+	 * up to Nascent Soul, then a share of the realm's bar like the player), x1.5 when ordered to meditate.
+	 */
+	public static double meditationBase(DiscipleEntity entity, DiscipleData data) {
+		double base = Math.max(0.4D + 0.2D * data.realm().ordinal(), dev.kultivator.cultivation.Meditation.baseRate(data.rank()) * DISCIPLE_BASE_SHARE);
 		return "MEDITATE".equals(entity.mode().name()) ? base * 1.5D : base;
 	}
 

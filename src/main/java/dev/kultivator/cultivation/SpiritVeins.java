@@ -23,7 +23,8 @@ import java.util.Map;
  * from an O(1) seeded hash ({@link #grade}): Great (cap 2.0), Rich (1.4), normal (1.0) or Thin (0.6). Untouched regions
  * sit at their cap and nothing is stored; meditation drains a region and it grows back by itself at
  * {@link #REGEN_SHARE_PER_SECOND} of its cap per second, computed lazily from the game time stored with the region, so
- * nothing ticks. Regions that are full again are forgotten. Only data, never blocks.
+ * nothing ticks. Regions that are full again are forgotten. Only data, never blocks. {@code uji urat tingkat} may override
+ * a region's grade (saved with the world, honoured by every grade and cap read) until {@code uji urat tingkat reset}.
  * <p>
  * Sumber: veins make places richer, RMJ ch. 391 and 1347; grades <i>terinspirasi dari</i> Martial World ch. 879; drain
  * and refill <i>terinspirasi dari</i> ISSTH ch. 25. The numbers are game design.
@@ -66,9 +67,31 @@ public final class SpiritVeins {
 		return gradeOf(level, regionX(pos), regionZ(pos));
 	}
 
-	/** Vein grade of region {@code (regionX, regionZ)} of {@code level}. */
+	/** Vein grade of region {@code (regionX, regionZ)} of {@code level} (a test override first, else the seeded hash). */
 	public static int gradeOf(ServerLevel level, int regionX, int regionZ) {
+		Integer override = data(level).override(key(regionX, regionZ));
+		return override != null ? override : naturalGrade(level, regionX, regionZ);
+	}
+
+	/** The seeded grade of a region, ignoring any test override. */
+	public static int naturalGrade(ServerLevel level, int regionX, int regionZ) {
 		return gradeOf(hash(level.getSeed(), dimensionHash(level), regionX, regionZ));
+	}
+
+	/**
+	 * Overrides the grade of the region around {@code pos} ({@code uji urat tingkat}); null restores the natural grade. The
+	 * region starts full at its new cap. Saved with the world.
+	 */
+	public static void setOverride(ServerLevel level, BlockPos pos, @Nullable Integer grade) {
+		Data data = data(level);
+		long key = key(pos);
+		data.setOverride(key, grade == null ? null : Math.max(THIN, Math.min(GREAT, grade)));
+		data.set(key, MAX_CAP, level.getGameTime(), cap(level, pos));
+	}
+
+	/** True when the region around {@code pos} has a test override. */
+	public static boolean overridden(ServerLevel level, BlockPos pos) {
+		return data(level).override(key(pos)) != null;
 	}
 
 	/** Grade of a hash value u in [0, 1). */
@@ -170,6 +193,7 @@ public final class SpiritVeins {
 	public static SearchResult search(ServerLevel level, BlockPos pos, int radius) {
 		long seed = level.getSeed();
 		int dim = dimensionHash(level);
+		Data data = data(level);
 		int cx = regionX(pos);
 		int cz = regionZ(pos);
 		Found great = null;
@@ -183,7 +207,8 @@ public final class SpiritVeins {
 					continue;
 				}
 				evaluated++;
-				int grade = gradeOf(hash(seed, dim, cx + dx, cz + dz));
+				Integer override = data.override(key(cx + dx, cz + dz));
+				int grade = override != null ? override : gradeOf(hash(seed, dim, cx + dx, cz + dz));
 				if (grade == GREAT && (great == null || distSq < great.distance() * great.distance())) {
 					great = new Found(cx + dx, cz + dz, grade, Math.sqrt(distSq));
 				} else if (grade == RICH && (rich == null || distSq < rich.distance() * rich.distance())) {
@@ -220,7 +245,12 @@ public final class SpiritVeins {
 
 	/** Region key: chunk x and z, each divided by 4, packed into one long. */
 	public static long key(BlockPos pos) {
-		return ((long) regionX(pos) << 32) | (regionZ(pos) & 0xFFFFFFFFL);
+		return key(regionX(pos), regionZ(pos));
+	}
+
+	/** Region key of region {@code (regionX, regionZ)}. */
+	public static long key(int regionX, int regionZ) {
+		return ((long) regionX << 32) | (regionZ & 0xFFFFFFFFL);
 	}
 
 	private static Data data(ServerLevel level) {
@@ -244,19 +274,52 @@ public final class SpiritVeins {
 		).apply(instance, Entry::new));
 	}
 
-	/** The drained regions of one dimension. */
+	/** How a grade override is saved. */
+	private record OverrideEntry(long key, int grade) {
+		static final Codec<OverrideEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				Codec.LONG.fieldOf("key").forGetter(OverrideEntry::key),
+				Codec.INT.fieldOf("grade").forGetter(OverrideEntry::grade)
+		).apply(instance, OverrideEntry::new));
+	}
+
+	/** The drained regions and the test grade overrides of one dimension. */
 	public static final class Data extends SavedData {
 
-		public static final Codec<Data> CODEC = Entry.CODEC.listOf().fieldOf("regions").codec()
-				.xmap(Data::fromEntries, Data::toEntries);
+		public static final Codec<Data> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				Entry.CODEC.listOf().fieldOf("regions").forGetter(Data::toEntries),
+				OverrideEntry.CODEC.listOf().optionalFieldOf("overrides", List.of()).forGetter(Data::toOverrides)
+		).apply(instance, Data::fromEntries));
 
 		private final Map<Long, Region> regions = new HashMap<>();
+		private final Map<Long, Integer> overrides = new HashMap<>();
 
 		public Data() {
 		}
 
-		private static Data fromEntries(List<Entry> entries) {
+		@Nullable Integer override(long key) {
+			return overrides.isEmpty() ? null : overrides.get(key);
+		}
+
+		void setOverride(long key, @Nullable Integer grade) {
+			if (grade == null) {
+				overrides.remove(key);
+			} else {
+				overrides.put(key, grade);
+			}
+			setDirty();
+		}
+
+		private List<OverrideEntry> toOverrides() {
+			List<OverrideEntry> list = new ArrayList<>(overrides.size());
+			overrides.forEach((key, grade) -> list.add(new OverrideEntry(key, grade)));
+			return list;
+		}
+
+		private static Data fromEntries(List<Entry> entries, List<OverrideEntry> overrides) {
 			Data data = new Data();
+			for (OverrideEntry entry : overrides) {
+				data.overrides.put(entry.key(), Math.max(THIN, Math.min(GREAT, entry.grade())));
+			}
 			for (Entry entry : entries) {
 				// Old saves (0..1) stay valid; the region's own cap is applied when it is read.
 				double density = Math.max(0.0D, Math.min(MAX_CAP, entry.density()));

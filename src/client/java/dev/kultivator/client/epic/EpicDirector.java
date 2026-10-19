@@ -69,10 +69,14 @@ public final class EpicDirector {
 		if (minecraft.level == null || minecraft.player == null || !EpicIds.known(cue.moment())) {
 			return;
 		}
+		boolean own = cue.viewer() == minecraft.player.getId();
+		if (cue.beat() == EpicIds.BEAT_STOP_ALL && own && (cue.flags() & EpicIds.FLAG_TEST) != 0) {
+			stopAll();
+			return;
+		}
 		if (cue.beat() < 0 || cue.beat() > EpicIds.maxBeat(cue.moment())) {
 			return;
 		}
-		boolean own = cue.viewer() == minecraft.player.getId();
 		// Others' scenes follow "Efek pemain lain" (the Kehancuran safety banner is the one exception).
 		if (!own && EffectQuality.othersScale() <= 0.0F && cue.moment() != EpicIds.KEHANCURAN) {
 			return;
@@ -107,7 +111,7 @@ public final class EpicDirector {
 
 	private static void techFx(Payloads.TechFx payload) {
 		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.level == null || minecraft.player == null) {
+		if (minecraft.level == null || minecraft.player == null || !ClientCultivation.serverEpic()) {
 			return;
 		}
 		TechniqueSpec spec = TechniqueRegistry.byNet(payload.spec());
@@ -258,7 +262,7 @@ public final class EpicDirector {
 		if (player == null) {
 			return 0;
 		}
-		int flags = EpicIds.FLAG_CAMERA_OK;
+		int flags = ClientCultivation.serverEpicCamera() ? EpicIds.FLAG_CAMERA_OK : 0;
 		boolean calm = !player.isOnFire() && player.fallDistance <= 2.0D && !player.isInWater() && !player.isInLava() && !player.isPassenger();
 		boolean targeted = false;
 		boolean enemy = false;
@@ -344,6 +348,9 @@ public final class EpicDirector {
 			EpicSound.restore();
 			MusicCue.clear();
 			EpicClock.reset();
+			SkyDirector.releaseOwn(20);
+			TitleCard.clear();
+			Letterbox.clear();
 		}
 		wasDead = dead;
 		if (ticks % 5 == 0) {
@@ -381,16 +388,20 @@ public final class EpicDirector {
 				scene.end(40);
 			}
 			boolean alive;
+			SkyDirector.context(scene);
 			try {
 				alive = scene.tick();
 			} catch (RuntimeException exception) {
 				warn("scene", exception);
 				alive = false;
 				scene.kill();
+			} finally {
+				SkyDirector.context(null);
 			}
 			if (!alive) {
 				it.remove();
 				Letterbox.sceneEnded(scene);
+				SkyDirector.sceneEnded(scene);
 				changed = true;
 			}
 		}
@@ -465,6 +476,7 @@ public final class EpicDirector {
 	/** The visual-state edge scan: Dharma, Domain and Deviation of players within 64 b; Enlightenment of the local player. */
 	private static void scanVisuals(Minecraft minecraft, ClientLevel level) {
 		LocalPlayer self = minecraft.player;
+		boolean enabled = ClientCultivation.serverEpic();
 		for (AbstractClientPlayer player : level.players()) {
 			if (player.distanceToSqr(self) > 64.0D * 64.0D) {
 				continue;
@@ -476,7 +488,7 @@ public final class EpicDirector {
 				continue;
 			}
 			int rising = flags & ~previous;
-			if (rising == 0) {
+			if (rising == 0 || !enabled) {
 				continue;
 			}
 			boolean own = player == self;
@@ -528,7 +540,10 @@ public final class EpicDirector {
 					break;
 				}
 			}
-			Letterbox.suppress(own != null ? own : Boolean.TRUE);
+			// Only an own scene can hold the bars; a double press with nothing playing changes nothing.
+			if (own != null) {
+				Letterbox.suppress(own);
+			}
 		}
 	}
 

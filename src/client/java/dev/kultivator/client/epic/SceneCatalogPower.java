@@ -442,8 +442,14 @@ final class SceneCatalogPower {
 		String id = spec.id();
 		String seal = sealOf(id, dewa);
 		Vec3 caster = s.feet(0.0F);
+		Ult u = s.data instanceof Ult x ? x : null;
+		if (u == null) {
+			u = new Ult();
+			u.target = target;
+			s.data = u;
+		}
 		if (beat == EpicIds.TECH_CAST) {
-			s.data = target;
+			u.target = target;
 			boolean first = dewa ? !EpicSettings.seenThisSession(id) : !EpicSettings.seenEver(id);
 			if (first) {
 				full(s, 0, upper(spec.displayName()), null, seal, SEAL_RED, 60, card -> card.safeBeat(false));
@@ -468,8 +474,10 @@ final class SceneCatalogPower {
 				}
 			}
 			castLayers(s, id, caster, target);
+			// Most ultimates send no END cue (the spec has no END layers): end the moment on our own when nothing follows.
+			ultFallback(s, spec, u, 200);
 		} else if (beat == EpicIds.TECH_CLIMAX) {
-			Vec3 aim = s.data instanceof Vec3 v ? v : target;
+			Vec3 aim = u.target;
 			if (dewa) {
 				slowmo(s, 0, 20);
 				hitStop(s, 0);
@@ -480,16 +488,44 @@ final class SceneCatalogPower {
 			if (dewa) {
 				shotPenuh(s, 40, () -> Shots.pullback(4.0F, 14.0F, 2.0F, 8.0F, 2.0F), CinematicDirector.KIND_ULTIMATE);
 			}
+			ultFallback(s, spec, u, 60);
 		} else if (beat == EpicIds.TECH_END) {
-			skyRelease(s, 0, 20, 60);
-			if (dewa && s.own && noEnemy(16.0D)) {
-				shot(s, 4, () -> Shots.craneUp(3.0F, 2.0F, 8.0F, 10.0F, 0.0F, 30.0F, 2.5F), CinematicDirector.KIND_ULTIMATE, true);
-			}
-			if (id.equals("cosmic_giant_form") && s.own && noEnemy(16.0D)) {
-				shot(s, 4, () -> Shots.pullback(4.0F, 24.0F, 2.0F, 14.0F, 4.0F), CinematicDirector.KIND_ULTIMATE, true);
-			}
-			s.end(80);
+			ultEnd(s, spec, u);
 		}
+	}
+
+	/** Shared state of one ultimate scene: the aim, the fallback token and whether the end beat already ran. */
+	private static final class Ult {
+		Vec3 target;
+		int token;
+		boolean ended;
+	}
+
+	/** Runs the end beat {@code delay} ticks from now unless a later cast or climax beat postpones it. */
+	private static void ultFallback(Scene s, TechniqueSpec spec, Ult u, int delay) {
+		int token = ++u.token;
+		s.at(delay, () -> {
+			if (u.token == token) {
+				ultEnd(s, spec, u);
+			}
+		});
+	}
+
+	/** The end beat (TECH_END, or the fallback): releases the sky, the closing shots, ends the scene. Runs once. */
+	private static void ultEnd(Scene s, TechniqueSpec spec, Ult u) {
+		if (u.ended) {
+			return;
+		}
+		u.ended = true;
+		boolean dewa = spec.dewa() || spec.grade() == TechniqueGrade.DEWA;
+		skyRelease(s, 0, 20, 60);
+		if (dewa && s.own && noEnemy(16.0D)) {
+			shot(s, 4, () -> Shots.craneUp(3.0F, 2.0F, 8.0F, 10.0F, 0.0F, 30.0F, 2.5F), CinematicDirector.KIND_ULTIMATE, true);
+		}
+		if (spec.id().equals("cosmic_giant_form") && s.own && noEnemy(16.0D)) {
+			shot(s, 4, () -> Shots.pullback(4.0F, 24.0F, 2.0F, 14.0F, 4.0F), CinematicDirector.KIND_ULTIMATE, true);
+		}
+		s.end(80);
 	}
 
 	private static boolean noEnemy(double radius) {

@@ -121,6 +121,8 @@
 	"kultivator.formasib.trip.refuse.broken": "The destination node's pattern is broken or not verified yet.",
 	"kultivator.formasib.trip.refuse.unloaded": "The destination node is not loaded.",
 	"kultivator.formasib.trip.refuse.unpowered": "The source node has no Daya and no keeper.",
+	"kultivator.formasib.trip.refuse.source_off": "The source node is not running (switched off, suspended or broken).",
+	"kultivator.formasib.trip.refuse.dest_off": "The destination node is switched off or suspended.",
 	"kultivator.formasib.trip.refuse.daya": "The source node needs %s Daya for this trip.",
 	"kultivator.formasib.trip.refuse.qi": "You need %s qi to travel.",
 	"kultivator.formasib.trip.refuse.cooldown": "The array is still settling: %s s.",

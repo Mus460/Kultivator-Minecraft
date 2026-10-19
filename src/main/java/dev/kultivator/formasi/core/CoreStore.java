@@ -70,6 +70,11 @@ public final class CoreStore extends SavedData {
 		index.rebuild(cores.values());
 	}
 
+	/** The next id this store would hand out (see {@code CoreTicker.allocateId}). */
+	int nextId() {
+		return nextId;
+	}
+
 	public @Nullable ResourceKey<Level> dim() {
 		return dim;
 	}
@@ -112,7 +117,12 @@ public final class CoreStore extends SavedData {
 
 	/** Registers a new real core and indexes it. */
 	public CoreRecord create(String spec, BlockPos eye, int rot, java.util.UUID owner, String ownerName, int kind) {
-		CoreRecord record = new CoreRecord(nextId++, dim, spec, eye, rot, owner, ownerName, kind, false);
+		int id = CoreTicker.allocateId(this);
+		while (cores.containsKey(id)) {
+			id++;
+		}
+		nextId = id + 1;
+		CoreRecord record = new CoreRecord(id, dim, spec, eye, rot, owner, ownerName, kind, false);
 		cores.put(record.id, record);
 		index.add(record);
 		setDirty();

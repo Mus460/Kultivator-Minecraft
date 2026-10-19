@@ -194,9 +194,16 @@ public final class CoreContextImpl implements CoreContext {
 		if (damage < 0.05D) {
 			return false;
 		}
+		float before = mob.getHealth() + mob.getAbsorptionAmount();
 		boolean hit = mob.hurtServer(level, FormationDamage.source(level), (float) damage);
 		if (hit) {
-			KillLedger.note(level, mob, record.id, damage);
+			// Book what the mob really lost (armour, resistance and absorption may take part), so the DPS cap is not used
+			// up by damage that never landed.
+			float after = mob.isAlive() ? mob.getHealth() + mob.getAbsorptionAmount() : 0.0F;
+			double lost = Math.max(0.0D, Math.min(damage, before - after));
+			if (lost > 0.0D) {
+				KillLedger.note(level, mob, record.id, lost);
+			}
 			if (!mob.isAlive()) {
 				record.stat("kills", 1);
 			}
@@ -321,7 +328,7 @@ public final class CoreContextImpl implements CoreContext {
 		if (record.daya < centi) {
 			return false;
 		}
-		record.daya -= centi;
+		record.spendDaya(centi);
 		CoreTicker.markDirty(level);
 		return true;
 	}

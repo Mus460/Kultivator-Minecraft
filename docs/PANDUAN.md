@@ -360,6 +360,7 @@ diterima); mutu pil `rendah`, `menengah`, `tinggi`, `sempurna`.
 | `uji kejenuhan <nilai>` | Mengatur Kejenuhan Bertarung |
 | `uji unsur` | Untuk monster yang kamu tatap: unsur jurusmu, unsurnya, hubungan, resonansi akar, total |
 | `uji urat <0-200>` / `uji urat cari` | Mengatur kepadatan di sini (dibatasi batas urat) / mencetak Urat Roh Agung dan Kaya terdekat |
+| `uji urat tingkat <agung\|kaya\|biasa\|tipis>` / `uji urat tingkat reset` | Mengubah tingkat urat wilayah 4×4 chunk tempatmu berdiri (langsung penuh, tersimpan bersama dunia; meditasi, HUD, kompas, `uji urat cari`, dan formasi ikut membacanya) / mengembalikan tingkat aslinya |
 | `uji tertutup <0-5>` / `uji tertutup 30m` | Saat bermeditasi: tumpukan Tertutup / lompat ke 30 menit tanpa putus |
 | `uji gua` | Menetapkan Gua Kediaman di sini tanpa pemeriksaan formasi |
 | `uji jimat <jenis\|semua> [kekuatan 1-9]` / `uji jimat tingkat <0-10>` | Jimat (bawaan kekuatan 5; jenis `petir`, `awan_api`, `perisai`, `pengikat`, `pulang`, `penangkal`, `seribu_li`, `kejernihan`; jimat `pulang` uji juga mereset jeda 10 menit) / keahlian jimat |
@@ -640,7 +641,7 @@ dimensi, atau mati.
 
 Setiap detik bermeditasi:
 * qi pulih **×6** (×1,5 lagi di tempat spiritual),
-* kultivasi `laju dasar × min(5; tempat × formasi × bahan bakar) × max(0,15; kepadatan qi) × (1 + 0,05 × tumpukan
+* kultivasi `laju dasar × min(3,5; tempat × formasi × bahan bakar) × kepadatan qi (antara 0,15 dan 1,4) × (1 + 0,05 × tumpukan
   Tertutup)` × pengali umum (×1,15 di dekat saudara sekte). Laju dasar sama dengan dulu (`0,6 + 0,25 × ranah`) sampai Jiwa
   Baru Lahir dan jauh lebih tinggi sesudahnya (Transformasi Dewa 4,0 … Dewa Abadi 83,3); rumus lengkap di
   [38.2](#382-rumus-meditasi-baru),
@@ -665,8 +666,9 @@ Dunia dibagi menjadi wilayah 4×4 chunk, masing-masing dengan **kepadatan qi**. 
 **tingkat urat**: Agung (sampai 200%), Kaya (140%), biasa (100%), atau Tipis (60%), dan wilayah yang belum disentuh berada
 di batasnya. Meditasi menguras `0,15%/detik × (1 + 0,10 × ranah)` (separuh dengan bahan bakar batu roh atau di Gua
 Kediaman, lebih kecil di formasi Agung dan Bintang Surgawi); kepadatan pulih `0,04% × batas` per detik. Kultivasi meditasi
-dikalikan kepadatan (paling kecil ×0,15). Di bawah 20% kamu diperingatkan: saatnya pindah tempat. Kepadatan tampil di HUD
-dan di bar aksi selama meditasi, misalnya "Kepadatan Qi 180% · Urat Roh Agung". Selengkapnya di
+dikalikan kepadatan (paling kecil ×0,15, paling besar ×1,4; urat Agung tetap terbaca sampai 200% dan pulih lebih cepat). Di bawah 20% kamu diperingatkan: saatnya pindah tempat. Kepadatan tampil di HUD
+dan di bar aksi selama meditasi, misalnya "Kepadatan Qi 180% · Urat Roh Agung". Untuk mencoba tiap tingkat, operator bisa
+memakai `/kultivasi uji urat tingkat <agung|kaya|biasa|tipis>` (dan `reset`) di wilayah tempatnya berdiri. Selengkapnya di
 [38](#38-urat-roh-kultivasi-tertutup-dan-gua-kediaman), termasuk Kultivasi Tertutup, Gua Kediaman, dan Kompas Urat Roh.
 
 ### 8.3 Momen Pencerahan
@@ -2199,8 +2201,8 @@ Kuning) dan jenjang sesuai ranahnya.
 
 | Sumber | Kultivasi |
 |---|---|
-| Meditasi (duduk bersila: di posnya, di sebelahmu saat kamu diam 5 detik atau bermeditasi, atau saat kamu luring / di dimensi lain) | `0,4 + 0,2 × ranah` per detik, ×1,5 dengan perintah Meditasi |
-| Bermeditasi dalam 8 blok darimu saat kamu juga bermeditasi | tambahan **10%** dari kultivasi meditasimu sendiri (tempat spiritual, formasi, urat roh, dan pengalimu ikut terhitung) |
+| Meditasi (duduk bersila: di posnya, di sebelahmu saat kamu diam 5 detik atau bermeditasi, atau saat kamu luring / di dimensi lain) | `maks(0,4 + 0,2 × ranah; 0,75 × laju dasar pemain di ranah itu)` per detik, ×1,5 dengan perintah Meditasi (sampai Jiwa Baru Lahir sama seperti dulu; sejak Transformasi Dewa murid rata-rata butuh sekitar 74 menit per tahap Awal) |
+| Bermeditasi di dekatmu saat kamu juga bermeditasi (**Bimbingan Guru**) | `10% + 3% × ranahmu + 5% × selisih ranah` dari kultivasi meditasimu (paling banyak 60%, ahli waris juga), dihitung pada ranah murid: hasilmu × laju dasar ranah murid ÷ laju dasarmu. Jarak `8 + 2 × ranahmu` blok (paling jauh 24) |
 | Monster yang ia kalahkan | nyawa maks. monster × 0,4 |
 | Monster yang ia lukai dalam 5 detik terakhir tetapi dikalahkan orang lain (dalam 16 blok) | separuhnya |
 | Pil darimu | lihat 19.6 |
@@ -3627,7 +3629,7 @@ turun menjadi ×0,25. Formasi peringatan dan penyembunyi selalu membayar penuh.
   F afinitas (0,10), A penguat (≤ 0,40: Panji Larangan +0,25, A1 +0,15, A2 +0,03 × N). Aliran pendukung (Pengumpul,
   Pemulihan, Penempaan) paling tinggi 1,3 dan tidak memakai A.
 * **Meditasi:** faktor sekte paling tinggi ×1,5; seluruh suku formasi paling tinggi ×2,6 (×2,8 dengan A1 lengkap), tetap
-  di dalam batas ×5 meditasi. Pengurasan urat paling rendah ×0,7.
+  di dalam batas ×3,5 meditasi. Pengurasan urat paling rendah ×0,7.
 * **Pemulihan:** Regenerasi pemain paling tinggi II; pemulihan qi ≤ ×1,39; waktu penyimpangan ≤ ×1,33.
 * **Penempaan:** keberhasilan alkimia ≤ +0,10, mutu ≤ +1 langkah, waktu ≥ ×0,7, jimat ≤ +0,065.
 * **Kesengsaraan:** semua formasi bersama tidak pernah di bawah ×0,70 (termasuk Formasi Pelindung ×0,85); lantai
@@ -4969,7 +4971,7 @@ adalah bencana dengan `k = 8 + lampu yang sudah padam`. Setiap lampu padam: jang
 * Semua teknik yang bisa diajarkan yang kamu kuasai, gratis.
 * Pemahaman `max(miliknya, milikmu × 0,5)` di Dao-nya.
 * Faktor kultivasi +0,05.
-* Bagian meditasi dari Guru ×2 (20%, bukan 10%; murid langsung).
+* Bagian meditasi dari Guru ×2 (murid langsung), tetap paling banyak 60% dari hasil Guru yang dihitung pada ranah murid.
 
 **Segel Generasi:** pilih salah satu teknikmu yang dikuasai pewaris dengan pemilih ‹ › lalu **Tandai Segel Generasi**:
 versi pewaris memberi +50% dan memperlihatkan cincin segel.
@@ -5484,7 +5486,7 @@ bab 1152; mata uang: RMJ bab 214, RI bab 329, *A Will Eternal* (AWE) bab 79. Des
 | **Kantor Misi** | tawarkan di Aula Sekte | 0,5 / 4,5 / 40 / 300 PK per batu (batas 300 PK per hari tetap) |
 
 * **Bahan bakar:** kuras urat ×0,5 selama ada bahan bakar. Bahan bakar ikut dalam batas gabungan tempat × formasi ×
-  bahan bakar ×5. Saat bilah penuh di leher botol, hasilnya masuk **Qi Tertimbun** (di Puncak Dewa Abadi menjadi Qi Abadi
+  bahan bakar ×3,5. Saat bilah penuh di leher botol, hasilnya masuk **Qi Tertimbun** (di Puncak Dewa Abadi menjadi Qi Abadi
   untuk bintang). **Batu Tinggi dan Agung tidak dibakar di leher botol**: batu itu disimpan untuk Batu di Hambatan, dan
   satu baris chat menjelaskannya. Batu Rendah dan Menengah tetap membakar menjadi Qi Tertimbun.
 * **Qi seketika** ditolak saat bermeditasi (pakai batunya di tangan kiri) dan saat qi sudah penuh.
@@ -5617,19 +5619,25 @@ Setiap wilayah 4×4 chunk berada di atas satu urat, tetap untuk benih dunia itu:
   sekitar 42 menit). Simpanan lama tetap berlaku.
 * Bilah aksi meditasi menulis "Kepadatan Qi 180% · Urat Roh Agung"; `debug vein grade` menulis tingkat, batas, dan
   kepadatan sekarang.
+* **Uji:** `/kultivasi uji urat tingkat <agung|kaya|biasa|tipis>` mengubah tingkat wilayah 4×4 chunk tempatmu berdiri
+  (wilayah langsung penuh pada batas barunya) dan tersimpan bersama dunia sampai `/kultivasi uji urat tingkat reset`.
+  Meditasi, HUD, Kompas Urat Roh, `uji urat cari`, upkeep formasi sekte, monster elit, dan target harian membaca tingkat
+  itu.
 
 ### 38.2 Rumus meditasi baru
 
 ```
 dasar      = maks(0,6 + 0,25 × ranah, kebutuhan bar tahap Awal ranah/tingkat ini ÷ 3000)
-kultivasi/dtk = dasar × min(5, tempat × formasi × bahan bakar) × maks(0,15; kepadatan)
+kultivasi/dtk = dasar × min(3,5; tempat × formasi × bahan bakar) × kepadatan (antara 0,15 dan 1,4)
              × bonus sekte × (1 + 0,05 × tumpukan Tertutup)
 kuras/dtk  = 0,15% × (1 + 0,10 × ranah) × bahan bakar 0,5 × formasi (Agung 0,6, Bintang Surgawi 0,35) × gua 0,5
 ```
 
 * Laju dasar: sama seperti dulu sampai Jiwa Baru Lahir (1,6/detik); Transformasi Dewa 4,0, Penyatuan Dao 10, Kenaikan
   Abadi tingkat 1 20, tingkat 9 68, Dewa Abadi 83,3. Satu tahap Awal tanpa bantuan sekitar 50 menit; dengan semuanya
-  sekitar 5–10 menit.
+  sekitar 5–10 menit (persiapan penuh dengan akar Tinggi dan kualitas Sempurna sekitar 5 menit, semua bonus sekitar
+  2 menit). Batas gabungan ×3,5 dan batas kepadatan ×1,4 menjaga angka itu; dulu ×5 dan ×2,0 membuat satu tahap selesai
+  dalam 1–3 menit.
 * Selama Formasi Pengumpul Qi Agung (Bintang Surgawi) aktif di kursimu, kuras tidak pernah menurunkan kepadatan di bawah
   30% (45%).
 * Bahan bakar batu roh: [35.2](#352-kegunaan). Rumus ini juga dipakai untuk bagian meditasi murid yang bermeditasi di

@@ -155,8 +155,12 @@ public final class TransportChannel {
 		Trip trip = new Trip(player.getUUID(), from.dim(), from.id(), to.id(), player.position(), now, now + length, length, ancient, cost, payQi,
 				to.eye());
 		if (instant) {
-			if (ancient) {
+			if (ancient && !level.isLoaded(trip.dest())) {
+				// A ticket loads the chunk asynchronously: wait one second for it instead of refusing at once.
 				ticket(level, trip);
+				CHANNELS.put(player.getUUID(), new Trip(trip.player(), trip.dim(), trip.fromId(), trip.toId(), trip.start(), now, now + 20L, 20,
+						true, cost, payQi, trip.dest()));
+				return null;
 			}
 			finish(player, trip);
 			return null;
@@ -179,18 +183,23 @@ public final class TransportChannel {
 			ServerPlayer player = server.getPlayerList().getPlayer(trip.player());
 			if (player == null || !player.level().dimension().equals(trip.dim()) || !player.isAlive()) {
 				it.remove();
+				if (player != null) {
+					unticket(server.getLevel(trip.dim()), trip);
+				}
 				continue;
 			}
 			ServerLevel level = player.level();
 			long now = level.getGameTime();
 			if (player.position().distanceToSqr(trip.start()) > MAX_MOVE * MAX_MOVE) {
 				it.remove();
+				unticket(level, trip);
 				cancel(player, "kultivator.formasib.trip.moved");
 				continue;
 			}
 			Long hurt = LAST_HURT.get(player.getUUID());
 			if (hurt != null && hurt >= trip.startTick()) {
 				it.remove();
+				unticket(level, trip);
 				cancel(player, "kultivator.formasib.trip.hurt");
 				continue;
 			}
@@ -207,6 +216,13 @@ public final class TransportChannel {
 				it.remove();
 				finish(player, trip);
 			}
+		}
+	}
+
+	/** Drops the trip's ender-pearl ticket at once (arrival or cancel; it would expire after 40 ticks anyway). */
+	private static void unticket(@Nullable ServerLevel level, Trip trip) {
+		if (level != null && trip.ancient()) {
+			level.getChunkSource().removeTicketWithRadius(TicketType.ENDER_PEARL, ChunkPos.containing(trip.dest()), TICKET_RADIUS);
 		}
 	}
 
@@ -227,6 +243,9 @@ public final class TransportChannel {
 		if (why == null && (dest == null || dest.state() == CoreState.BROKEN)) {
 			why = Component.translatable("kultivator.formasib.trip.refuse.broken");
 		}
+		if (why == null && TransportNetwork.destinationOff(dest)) {
+			why = Component.translatable("kultivator.formasib.trip.refuse.dest_off");
+		}
 		if (why == null && !level.isLoaded(trip.dest())) {
 			why = Component.translatable("kultivator.formasib.trip.refuse.unloaded");
 		}
@@ -246,6 +265,9 @@ public final class TransportChannel {
 				Cultivators.dirty(player);
 			}
 		}
+		// The arrival spot is known (or the trip failed): the ticket is no longer needed; the traveller's own ticket keeps
+		// the destination loaded from here on.
+		unticket(level, trip);
 		if (why != null) {
 			Msg.chat(player, why.copy().withColor(0xFF9A7A));
 			return;

@@ -224,10 +224,18 @@ public final class Formasi {
 			Msg.chat(player, Component.translatable("kultivator.formasi.reason.unknown_spec", record.spec).withStyle(ChatFormatting.RED));
 			return InteractionResult.SUCCESS;
 		}
+		FormationSpec upgraded = owner ? tryUpgrade(player, level, store, record, spec) : null;
+		if (upgraded != null) {
+			if (!fuel) {
+				return InteractionResult.SUCCESS;
+			}
+			spec = upgraded;
+		}
 		if (fuel) {
 			int result = feed(player, level, record, spec, held);
 			if (result == 0) {
-				int daya = Kas.depositInventory(player, record.owner, false);
+				// The core is full: one item of the hand that was used goes to the Kas (never a whole stack per click).
+				int daya = Kas.depositOne(player, record.owner, held);
 				Msg.chat(player, Component.translatable(daya > 0 ? "kultivator.formasi.core_full_kas" : "kultivator.formasi.kas_full", spec.name(), daya)
 						.withStyle(ChatFormatting.YELLOW));
 			} else if (result > 0 && mate) {
@@ -281,7 +289,7 @@ public final class Formasi {
 		}
 		MatchResult match = outcome.match();
 		FormationSpec spec = match.spec();
-		Component refusal = registrationRefusal(player, level, spec, personal, hallLevel);
+		Component refusal = registrationRefusal(player, level, spec, personal, hallLevel, pos, null);
 		if (refusal != null) {
 			Msg.chat(player, refusal.copy().withStyle(ChatFormatting.RED));
 			return InteractionResult.SUCCESS;
@@ -314,13 +322,66 @@ public final class Formasi {
 		return InteractionResult.SUCCESS;
 	}
 
+	private static final String SECT_TRANSFER = "sect_transfer";
+	/** M3 nodes stand at least this many blocks apart (24.4.10). */
+	public static final int NODE_SPACING = 16;
+
+	/**
+	 * The tiered-eye upgrade (24.2.3 step 4: K4 to M2, K3 to B7, M3 to L5): when the owner uses a registered eye and a
+	 * higher-grade pattern is now complete around it, the core becomes that formation in place (same id, Daya and keepers;
+	 * Daya above the new cap goes to the Kas). Returns the new spec, or null when nothing changed.
+	 */
+	private static @Nullable FormationSpec tryUpgrade(ServerPlayer player, ServerLevel level, CoreStore store, CoreRecord record, FormationSpec spec) {
+		if (record.virtual || !record.owner.equals(player.getUUID())) {
+			return null;
+		}
+		long now = level.getGameTime();
+		Long last = DETECT_COOLDOWN.get(player.getUUID());
+		if (last != null && now - last < Detect.COOLDOWN_TICKS && now >= last && record.state != dev.kultivator.formasi.core.CoreState.BROKEN) {
+			return null;
+		}
+		DETECT_COOLDOWN.put(player.getUUID(), now);
+		boolean personal = record.kind == Ownership.KIND_PERSONAL;
+		int hallLevel = personal ? Limits.PERSONAL_HALL_LEVEL : CoreTicker.hallLevel(player.getUUID());
+		Detect.Outcome outcome = Detect.detect(level, record.eye, null, hallLevel, personal);
+		MatchResult match = outcome.match();
+		if (match == null) {
+			return null;
+		}
+		FormationSpec next = match.spec();
+		if (next.id().equals(spec.id()) || next.grade().ordinal() <= spec.grade().ordinal()) {
+			return null;
+		}
+		Component refusal = registrationRefusal(player, level, next, personal, hallLevel, record.eye, record);
+		if (refusal != null) {
+			Msg.chat(player, Component.translatable("kultivator.formasi.upgrade_refused", next.name(), refusal).withStyle(ChatFormatting.YELLOW));
+			return null;
+		}
+		record.spec = next.id();
+		record.rot = match.rot();
+		Verifier.apply(record, match);
+		long cap = Upkeep.capCenti(next);
+		if (record.daya > cap) {
+			CoreTicker.refund(record, record.daya - cap);
+		}
+		store.reindex();
+		Stacking.invalidate();
+		CoreTicker.refreshState(level, record);
+		Vec3 centre = Vec3.atCenterOf(record.eye);
+		Fx.send(level, centre, FxType.FORMASI, FormasiFxIds.AWAKEN, next.netId(), (float) record.radius);
+		sound(level, centre, SoundEvents.BEACON_POWER_SELECT, 1.0F, 1.0F);
+		Msg.chat(player, Component.translatable("kultivator.formasi.upgraded", spec.name(), next.name()).withStyle(ChatFormatting.GOLD));
+		return next;
+	}
+
 	/** Why {@code player} may not register {@code spec} here, or null. */
-	private static @Nullable Component registrationRefusal(ServerPlayer player, ServerLevel level, FormationSpec spec, boolean personal, int hallLevel) {
+	private static @Nullable Component registrationRefusal(ServerPlayer player, ServerLevel level, FormationSpec spec, boolean personal, int hallLevel,
+			BlockPos eye, @Nullable CoreRecord replacing) {
 		if (!KultivatorConfig.get().sectFormations) {
 			return Component.translatable("kultivator.formasi.reason.config");
 		}
 		CoreStore store = CoreTicker.store(level);
-		if (store.realCount() >= KultivatorConfig.get().formationMaxCores) {
+		if (store.realCount() - (replacing != null ? 1 : 0) >= KultivatorConfig.get().formationMaxCores) {
 			return Component.translatable("kultivator.formasi.refuse.dimension", KultivatorConfig.get().formationMaxCores);
 		}
 		int personalCount = 0;
@@ -331,6 +392,14 @@ public final class Formasi {
 			FormationSpec other = FormationRegistry.byId(view.spec());
 			if (view.virtual() || other == null) {
 				continue;
+			}
+			if (replacing != null && view.id() == replacing.id && view.dim().equals(replacing.dim)) {
+				continue;
+			}
+			// M3: the nodes of one network stand at least 16 blocks apart (24.4.10).
+			if (SECT_TRANSFER.equals(spec.id()) && SECT_TRANSFER.equals(other.id()) && view.dim().equals(level.dimension())
+					&& view.eye().distSqr(eye) < NODE_SPACING * NODE_SPACING) {
+				return Component.translatable("kultivator.formasi.refuse.node_spacing", NODE_SPACING);
 			}
 			if (view.kind() == Ownership.KIND_PERSONAL) {
 				personalCount++;
@@ -381,9 +450,18 @@ public final class Formasi {
 			return 0;
 		}
 		long accepted = Math.min(value, room);
+		long overflow = value - accepted;
+		if (overflow > 0L) {
+			// The overflow goes to the Kas and is never lost: when the pool cannot take it, the item stays in the hand.
+			long kasRoom = grade < 0 ? Kas.AMETHYST_CAP * 100L - Kas.amethyst(record.owner) : Kas.STONE_CAP * 100L - Kas.stone(record.owner);
+			if (kasRoom < overflow) {
+				return 0;
+			}
+			Kas.add(record.owner, overflow, grade);
+		}
 		record.daya += accepted;
-		if (value > accepted) {
-			Kas.add(record.owner, value - accepted, grade);
+		if (grade < 0) {
+			record.dayaA = record.amethystPart() + accepted;
 		}
 		if (grade >= 0) {
 			record.best = Math.max(record.best, grade);
@@ -464,6 +542,12 @@ public final class Formasi {
 	/** Sets the target spec of an unregistered eye ({@code formasi tuju}, the Kitab button); true when set. */
 	public static boolean setTarget(ServerPlayer player, ServerLevel level, BlockPos pos, String specId) {
 		FormationSpec spec = FormationRegistry.byId(specId);
+		// The position comes from client text: never read (and so load or generate) a chunk out of reach.
+		double reach = LOOK_RANGE + 2.0D;
+		if (player.level() != level || !level.isLoaded(pos) || player.distanceToSqr(Vec3.atCenterOf(pos)) > reach * reach) {
+			Msg.chat(player, Component.translatable("kultivator.formasi.target.bad").withStyle(ChatFormatting.RED));
+			return false;
+		}
 		if (!level.getBlockState(pos).is(FormasiItems.FORMATION_EYE) || spec == null || spec.has(Flag.LEGACY_MIRROR)) {
 			Msg.chat(player, Component.translatable("kultivator.formasi.target.bad").withStyle(ChatFormatting.RED));
 			return false;

@@ -121,6 +121,8 @@
 	"kultivator.formasib.trip.refuse.broken": "Pola simpul tujuan rusak atau belum diperiksa.",
 	"kultivator.formasib.trip.refuse.unloaded": "Simpul tujuan belum termuat.",
 	"kultivator.formasib.trip.refuse.unpowered": "Simpul asal tidak punya Daya dan tidak punya penjaga.",
+	"kultivator.formasib.trip.refuse.source_off": "Simpul asal tidak berjalan (dimatikan, tertahan, atau rusak).",
+	"kultivator.formasib.trip.refuse.dest_off": "Simpul tujuan dimatikan atau tertahan.",
 	"kultivator.formasib.trip.refuse.daya": "Simpul asal butuh %s Daya untuk perjalanan ini.",
 	"kultivator.formasib.trip.refuse.qi": "Kamu butuh %s qi untuk berpindah.",
 	"kultivator.formasib.trip.refuse.cooldown": "Formasi masih mengendap: %s detik.",

@@ -105,6 +105,12 @@ public final class SkyDirector {
 	private static int holdTicks = -1;
 	private static float releaseRate;
 	private static long ticks;
+	/** The scene whose tick set the grade (the director's context), so its end can release a grade nobody released. */
+	private static Object owner;
+	private static Object context;
+	private static int sinceGrade;
+	/** A grade with no new grade call for this long fades out (5 min; a safety net, scenes release their own). */
+	private static final int WATCHDOG = 6000;
 	// per-call outputs (no allocation per call)
 	private static final Vector3f OUT_SKY = new Vector3f();
 	private static final Vector3f OUT_FOG = new Vector3f();
@@ -151,7 +157,33 @@ public final class SkyDirector {
 		rate = 1.0F / blend;
 		holdTicks = -1;
 		releaseRate = 0.0F;
+		owner = context;
+		sinceGrade = 0;
 		any = true;
+	}
+
+	/** Set by the director around each scene tick: grades started inside it belong to that scene. */
+	public static void context(Object scene) {
+		context = scene;
+	}
+
+	/**
+	 * A scene ended: when it set the grade alive and nothing scheduled its release, fade the grade out (an END beat that
+	 * never came, a stop, a dropped cue). A release already running keeps its own hold and fade.
+	 */
+	public static void sceneEnded(Object scene) {
+		if (any && owner != null && owner == scene && holdTicks < 0) {
+			holdTicks = 0;
+			releaseRate = 1.0F / 40.0F;
+		}
+	}
+
+	/** Fades out a grade of the protagonist's own scenes at once (death); others' grades keep running. */
+	public static void releaseOwn(int ticks) {
+		if (any && own) {
+			holdTicks = 0;
+			releaseRate = 1.0F / Math.max(1, ticks);
+		}
 	}
 
 	/** The Dao grade with its colour. */
@@ -179,6 +211,9 @@ public final class SkyDirector {
 		any = false;
 		grade = null;
 		priority = -1;
+		owner = null;
+		holdTicks = -1;
+		releaseRate = 0.0F;
 		w = 0.0F;
 		wTarget = 0.0F;
 	}
@@ -200,6 +235,10 @@ public final class SkyDirector {
 		if (!EpicSettings.sky()) {
 			clear();
 			return;
+		}
+		if (++sinceGrade > WATCHDOG && holdTicks < 0) {
+			holdTicks = 0;
+			releaseRate = 1.0F / 40.0F;
 		}
 		Minecraft minecraft = Minecraft.getInstance();
 		Vec3 camera = minecraft.gameRenderer.mainCamera().position();

@@ -80,9 +80,11 @@ public final class Meditation {
 	public static final double BASE_PER_REALM = 0.25D;
 	public static final double BASE_DIVISOR = 3000.0D;
 	/** Site × formation × fuel never multiplies the base by more than this. */
-	public static final double MULTIPLIER_CAP = 5.0D;
+	public static final double MULTIPLIER_CAP = 3.5D;
 	/** Density never lowers the gain below this share. */
 	public static final double DENSITY_FLOOR = 0.15D;
+	/** Density never raises the gain above this share (the vein itself still reads 0-200%). */
+	public static final double DENSITY_XP_CAP = 1.4D;
 	/** Vein drain per second: {@code DRAIN_BASE × (1 + DRAIN_PER_REALM × realm)} × the factors below. */
 	public static final double DRAIN_BASE = 0.0015D;
 	public static final double DRAIN_PER_REALM = 0.10D;
@@ -362,14 +364,15 @@ public final class Meditation {
 
 	/**
 	 * Meditation XP per second before {@code Progression}'s multipliers (DESIGN 19.3.5), shared with
-	 * {@code DiscipleCultivation.masterMeditationGain}: {@code base × min(5, site × formation × fuel) × max(0.15, density)
+	 * {@code DiscipleCultivation.masterMeditationGain}: {@code base × min(3.5, site × formation × fuel) × clamp(density, 0.15, 1.4)
 	 * × Sects.meditationBonus × (1 + 0.05 × seclusion stacks)}. Site and formation are the synced values of the session.
 	 */
 	public static double gainPerSecond(ServerPlayer player, CultivationData data) {
 		double site = data.siteMultiplier() > 0.0D ? data.siteMultiplier() : 1.0D;
 		double formation = formationTerm(player, QiFormations.multiplier(data.formationTier()));
 		double density = SpiritVeins.density(player.level(), player.blockPosition());
-		return baseRate(data.rank()) * Math.min(MULTIPLIER_CAP, site * formation * fuelFactor(player)) * Math.max(DENSITY_FLOOR, density)
+		return baseRate(data.rank()) * Math.min(MULTIPLIER_CAP, site * formation * fuelFactor(player))
+				* Math.max(DENSITY_FLOOR, Math.min(DENSITY_XP_CAP, density))
 				* dev.kultivator.sect.Sects.meditationBonus(player) * (1.0D + SECLUSION_BONUS * seclusionStacks(player));
 	}
 
@@ -930,6 +933,29 @@ public final class Meditation {
 				.then(Commands.argument("percent", DoubleArgumentType.doubleArg(0.0D, 200.0D))
 						.executes(ctx -> setDensity(ctx.getSource(), ctx.getSource().getPlayerOrException(),
 								DoubleArgumentType.getDouble(ctx, "percent")))));
+	}
+
+	/**
+	 * {@code uji urat tingkat <agung|kaya|biasa|tipis|reset>}: overrides the grade of the 4x4-chunk region the player stands
+	 * in (saved with the world; meditation, compass, {@code uji urat cari}, HUD and formations all read it), or restores the
+	 * natural grade with null. The region starts full at its new cap.
+	 */
+	public static int setVeinGrade(CommandSourceStack source, ServerPlayer player, @org.jetbrains.annotations.Nullable Integer grade) {
+		ServerLevel level = player.level();
+		BlockPos pos = player.blockPosition();
+		SpiritVeins.setOverride(level, pos, grade);
+		int now = SpiritVeins.grade(level, pos);
+		double density = SpiritVeins.density(level, pos);
+		if (isMeditating(player)) {
+			Cultivators.get(player).setVeinDensity(density);
+			Cultivators.dirty(player);
+		}
+		Component name = SpiritVeins.gradeName(now).copy().withColor(SpiritVeins.gradeColor(now));
+		String cap = percentText(SpiritVeins.cap(level, pos));
+		source.sendSuccess(() -> Msg.prefixed(grade == null
+				? Component.translatable("kultivator.kultivasi.test.vein_grade_reset", name, cap)
+				: Component.translatable("kultivator.kultivasi.test.vein_grade_set", name, cap, SpiritVeins.regionX(pos), SpiritVeins.regionZ(pos))), false);
+		return 1;
 	}
 
 	/** Sets the density of the region the player stands in (debug vein, uji urat); clamped to the region's cap. */

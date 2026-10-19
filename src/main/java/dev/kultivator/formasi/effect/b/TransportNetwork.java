@@ -141,11 +141,20 @@ public final class TransportNetwork {
 		if (to.state() == CoreState.BROKEN) {
 			return Component.translatable("kultivator.formasib.trip.refuse.broken");
 		}
+		if (destinationOff(to)) {
+			return Component.translatable("kultivator.formasib.trip.refuse.dest_off");
+		}
 		if (!level.isLoaded(to.eye()) && !ancient(from)) {
 			return Component.translatable("kultivator.formasib.trip.refuse.unloaded");
 		}
-		boolean kept = from.state() == CoreState.KEPT || from.keepers() > 0;
-		if (!from.state().running() && !kept) {
+		// The source must run: a switched-off, suspended or broken node never sends anyone, keeper or not. A keeper at
+		// its post carries a node without Daya ("no Daya cost"), so ACTIVE with a keeper counts as kept.
+		CoreState state = from.state();
+		boolean kept = from.keepers() > 0 && (state.running() || state == CoreState.ACTIVE);
+		if (state == CoreState.DORMANT || state == CoreState.SUSPENDED || state == CoreState.BROKEN) {
+			return Component.translatable("kultivator.formasib.trip.refuse.source_off");
+		}
+		if (!state.running() && !kept) {
 			return Component.translatable("kultivator.formasib.trip.refuse.unpowered");
 		}
 		boolean space = BUtil.keeperDao(from, Dao.SPACE);
@@ -161,6 +170,11 @@ public final class TransportNetwork {
 		}
 		int length = ancient(from) ? TransportChannel.L5_CHANNEL : kept ? TransportChannel.M3_CHANNEL_KEPT : TransportChannel.M3_CHANNEL;
 		return TransportChannel.start(player, from, to, length, ancient(from), cost, !space, instant);
+	}
+
+	/** True when a destination node is switched off or suspended (it takes no traveller; BROKEN has its own line). */
+	static boolean destinationOff(CoreView to) {
+		return to.state() == CoreState.DORMANT || to.state() == CoreState.SUSPENDED;
 	}
 
 	/** A trip happened: the source owes {@code daya}, paid on its next pulse. */

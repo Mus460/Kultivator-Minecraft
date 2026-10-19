@@ -129,6 +129,30 @@ public final class EpicIds {
 	public static final int TECH_CLIMAX = 1;
 	public static final int TECH_END = 2;
 
+	/**
+	 * A reserved beat valid with any known moment and FLAG_TEST: the viewer's client ends every scene at once and restores
+	 * sky, sound, music and camera ({@code uji momen berhenti}). Above every {@link #maxBeat}, so older clients drop it.
+	 */
+	public static final int BEAT_STOP_ALL = 120;
+
+	/**
+	 * True for the beats that end a scene (results, ABORT / STOP / CANCEL, TECH_END): the per-subject rate limit never drops
+	 * them, or the client would keep the vortex, the sky grade and the scene until its watchdog.
+	 */
+	public static boolean closing(int moment, int beat) {
+		return switch (moment) {
+			case TRIBULATION -> beat == TRIB_END_OK || beat == TRIB_END_FAIL || beat == TRIB_ABORT;
+			case BREAKTHROUGH -> beat == BT_SUCCESS || beat == BT_FAIL;
+			case ASCENSION -> beat == ASC_FINALE || beat == ASC_STOP;
+			case HEART_DEMON -> beat == HD_WON || beat == HD_LOST;
+			case DISCIPLE_BT -> beat == DBT_END_OK || beat == DBT_END_FAIL || beat == DBT_CANCEL;
+			case CALAMITY -> beat == CAL_PASS || beat == CAL_FAIL || beat == CAL_ABORT;
+			case KEHANCURAN -> beat == KEH_ABORT || beat == KEH_RESTORE;
+			case TECH_ULTIMATE -> beat == TECH_END;
+			default -> false;
+		};
+	}
+
 	/** The one beat of DHARMA, DOMAIN, ENLIGHTEN, DEVIATION and KEHANCURAN_SELF (RISE, UNFOLD, START, BURST, IMPACT). */
 	public static final int SINGLE = 0;
 
