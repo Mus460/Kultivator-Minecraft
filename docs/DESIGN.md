@@ -12549,3 +12549,1176 @@ RI ch. 216 (20.3.2, now worded *Terinspirasi* for layering); BTTH ch. 2 (22.7); 
 
 **Searched but not usable:** Martial Peak arrays; a TDG chapter for the soul array; a canon healing array; a canon
 tribulation-blocking formation (so B6 is *Terinspirasi*); a canon source for 九宮八卦陣.
+
+## 25. Phase 8 — Jalan Dunia Kultivasi
+
+**Status:** synthesized design (GAME + ARCH merged, LORE verdicts and CRITIC corrections applied). Nothing in `kultivator-mod` was edited and Gradle was not run.
+**Basis:** DESIGN 0, 5b, 19, 20 (20.3), 21.0–21.2, 22.2–22.5, 22.14, 23.1, 24.1–24.2, and the code at HEAD `48ec6a1` (`sect/**`, `disciple/**`, `harta/**`, `elite/**`, `alchemy/**`, `formasi/**`, `technique/spec/**`). Ids below were checked against the code: `Actions` uses 11–22 and 30–37 (23–29 free, 38+ free); `OpenScreen` uses 0–6; `Halls.PAGE_FORMASI = 10`; `DeathGuard.Stage = {DUEL, TRIBULATION, TOTEM, TECHNIQUE, PERK}`; `FxType` ends at `FORMASI`; `EpicIds.EXTRA = 14`; `DiscipleEntity.ACTIVITY_FORMATION_KEEPER = 11`; `sect/event/RivalSkills` is package-private; `FormationTargets.neverAffected` skips `hasCustomName()`; `isTrialMob` accepts `TAG_DAO_PROTECTOR`, `TAG_TRIAL_GUARD`, `TAG_ELITE`.
+**User request:** "gaskan aja yang menurutmu bagus" ("just go with what you think is good"). Each decision in 25.0 can be reversed with a small change.
+
+**Phase 8 in one table: five features plus glue, chained into one progression.**
+
+| # | Feature | One line |
+|---|---|---|
+| A | **Alam Rahasia** (secret realms) | Take a key to open a gate. It sends the party into a private, temporary run on the flat floor of the `kultivator:alam_rahasia` dimension: trial chambers, then a guardian, then treasure. There are four realms, from Qi Refining to beyond the stars. |
+| B | **Kultivator Liar & Serbuan Sekte Iblis** | A hostile NPC cultivator built on the disciple model. It ambushes travellers, guards bandit camps, and raids the Sect Hall in waves. The player, the disciples and the 7c formations defend. |
+| C | **Penempaan & Pusaka Natal Diri** | Forging as a profession: an Earthfire Forge whose heat comes from the block below it, 6 artifact grades, refinement from +0 to +12, a weapon spirit that grows with time, and one artifact bound inside the player's body as their natal treasure. |
+| D | **Desa Bawahan** (vassal villages) | Vanilla villages near the sect can pledge allegiance. They pay tribute, send help requests, supply disciple candidates, and must be defended. |
+| E | **Cincin Penyimpanan** (storage rings) | A storage pouch plus 4 ring tiers (9 to 54 slots). A spiritual imprint binds each ring to its owner, and its dropped item entity is protected. |
+| + | **Glue** | A material ladder in which each realm's spoils unlock the next forging grade and alternative pill recipes. Jalan chapters 6–10, an optional 4th Ujian Fondasi row, new daily chores and a star-condensing sink. |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.0 Decisions taken for the user (each is reversible)
+
+| Open point | Decision | Why (source of the decision) |
+|---|---|---|
+| Secret realm hosting | **One datapack void dimension `kultivator:alam_rahasia` with a flat generator.** The floor *is* the world generation layers. Chambers are entity mechanics: client-only Display scenery, a server-side wall grid, relic entities and telegraphed rings. Fallback **Mode Ringan** (`secretRealmDimension=false`) runs the same trials around the player in the Overworld. | ARCH and CRITIC. **The mod never calls `setBlock`.** One dimension, not three: each `LevelStem` is a full `ServerLevel` with its own chunk source, POI and region files. GAME's arena builder is deferred (25.1.1). |
+| Block-safety exception for the arena | **None taken.** Phase 8 adds no block-changing path. GAME's `ArenaBuilder` (a third exception inside reserved slot boxes of the realm dimension) is written down as an **option that needs the user's explicit OK** and is not built. | DESIGN 0 records exceptions only as user decisions. A generated floor gives the same play with zero risk. |
+| Rogue NPC | New entity `kultivator:rogue_cultivator` that **`extends Monster`** (so it is an `Enemy`). It reuses the disciple render state, layers and player model. It is not a `DiscipleEntity` subclass and not a new `Role`. | `DiscipleTechniques.mayHit` and `FormationTargets` exclude `instanceof DiscipleEntity`. An `Enemy` is hit by player techniques, disciples, GUARD_HALL patrols, the Grand Formation and 7c arrays with no special cases. |
+| New mob spawn paths | Two paths are added on purpose: (1) rogue cultivators; (2) realm guards and village quest elites (allowlist vanilla mobs made elite). All use spawn reason `EVENT`, are hardened, are never saved and never pick up loot. A world-wide cap of 12 rogues applies. | Extends the 19.1.1 list. |
+| Player natal treasure | **Virtual, held inside the body** (`extra.dunia.natal`). There is no summon toggle and no death listener. "Lepas" turns it back into an item. | RMJ ch. 415. CRITIC: no duplication path. |
+| Forge | A **menu without a block entity**, like the crafting table. Materials are consumed only when a job completes. | CRITIC: no refund duplication when the forge is broken, and no first block entity in the mod. |
+| Storage ring | Vanilla `minecraft:container` plus `kultivator:ring`. `stacksTo(1)`, a unique `ring_id`, write-through by `ring_id` lookup. It drops on death (`storageRingKeepOnDeath=false`). | ARCH storage path plus GAME's death rule (a soulbound 54-slot ring would be keepInventory). |
+| Screens | **`OpenScreen.DUNIA = 7` is a new screen** with 4 tablets. The forge and the ring use Fabric `ExtendedMenuType` menus, not `OpenScreen`. There are 2 new hall pages. | CRITIC: GAME's `FORGE=5`/`RING=6` collide with `SECT_TEMPLATE`/`CODEX`, and 8 tablets in `CultivationScreen` is too tight. |
+| HUD | Realm and raid progress use **vanilla `ServerBossEvent` bars** (zero client HUD code). | ARCH. Cheap on the laptop and never collides with the GuideTracker. |
+| Help topics | `alam_rahasia`, `kultivator_liar`, `serbuan`, `tempa`, `pusaka_diri`, `roh_senjata`, `cincin`, `desa`. Never `pusaka`, which is the disciples' natal treasure (19.6). | GAME. |
+| Package names | `alam`, `musuh`, `tempa`, `desa`. | `tempa` rather than `pusaka`, to avoid the 19.6 name. |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.1 Principles (binding)
+
+#### 25.1.1 Block safety (DESIGN 0 statement for Phase 8)
+
+> **Phase 8 adds no block-changing code.** The only block-changing paths remain the two existing ones: Mode Kehancuran (disciples and player) and sect construction (`BuildPlacer`) inside the confirmed footprint.
+> The realm dimension's floor is produced by vanilla's flat chunk generator from datapack JSON when a chunk is first generated. This is world generation, the same as vanilla terrain. No mod code writes a block there or anywhere else.
+
+The rules that make this hold:
+
+- **Dimension data (module A, data files only).**
+  - `dimension/alam_rahasia.json`: generator `minecraft:flat` with these settings:
+    - `biome: "minecraft:the_void"`;
+    - `features: false`. This is mandatory: otherwise `the_void` places `void_start_platform`;
+    - `lakes: false`;
+    - `structure_overrides: []`. This is mandatory: if the field is absent, every structure set is used;
+    - `layers`: bedrock ×1, stone ×3, smooth_basalt ×1. The walking surface is at y = 5, and none of these blocks random-ticks.
+  - `dimension_type/alam_rahasia.json`:
+    - `min_y 0`, `height 64`, `logical_height 64`;
+    - `has_fixed_time: false`. There is **no fixed time**: this level never changes world time and shares overworld time and weather through `DerivedLevelData`;
+    - `has_skylight true`, `has_ceiling false`, `ambient_light 0.1`;
+    - `monster_spawn_light_level 0`, `monster_spawn_block_light_limit 0`;
+    - `skybox "overworld"`;
+    - the 26.3 attributes `gameplay/natural_mob_spawns: false`, `gameplay/can_start_raid: false`, `gameplay/can_pillager_patrol_spawn: false`, `gameplay/bed_rule {can_sleep: never, can_set_spawn: never}`, `gameplay/respawn_anchor_works: false`.
+    - **The 1.21 fields `has_raids`, `bed_works` and `respawn_anchor_works` do not exist in 26.3.** Verify the exact attribute JSON in the mapped jar, and check that no "Experimental settings" screen appears when a world loads.
+  - The theme (fog and sky colour) is applied client-side by the 7b `SkyDirector` grade per realm, not by the dimension type.
+- **Prevention only, inside the realm dimension** (module A). These apply to every player not in creative mode:
+  - `PlayerBlockBreakEvents.BEFORE` → false;
+  - `UseBlockCallback` → `FAIL` for every block use and placement (beds, anchors, chests, steles, plaques, forges);
+  - `UseItemCallback` → `FAIL` for buckets, flint and steel, fire charges, bone meal, spawn eggs, ender pearls, chorus fruit and wind charges;
+  - a `ProtectedZones.addZoneProvider` entry covers the whole dimension, so Kehancuran never acts there;
+  - `BuildPlacer` refuses the dimension (spine hook 25.2 #12).
+- **Nothing else in Phase 8 touches blocks:**
+  - the forge reads the block below it with `getBlockState`, in loaded chunks only;
+  - villages are found through `PoiManager`;
+  - rogues, guards and quest elites carry `NoGrief.TAG` and use `setCanPickUpLoot(false)`. They do not open doors (path navigation `setCanOpenDoors(false)`, no door goals) and have no projectiles, no `Explosion`, no block fire and no `LightningBolt`;
+  - tribute, quests, raids and breach meters are entity events plus data;
+  - there are no weather or time changes anywhere.
+- **Known, documented gap.** `NoGrief.TAG` covers farmland, turtle eggs, dripleaf, redstone ore and sculk, but not pressure plates or tripwires. A rogue walking over them can trigger player redstone. Elites already have the same gap. This goes in PANDUAN.
+- **Deferred option, needs the user's explicit OK:** `alam/arena/ArenaBuilder` would be a third exception, building real chamber blocks only inside leased slot boxes of `kultivator:alam_rahasia`. It is not built in Phase 8.
+
+#### 25.1.2 Targeting and damage
+
+- All player and disciple damage goes through `TechniquePower.finalDamage` and the three existing choke points. Rogue and artifact skill damage goes only to targets accepted by `RogueTargets.mayHit` or by `Targeting.hostilesAround`.
+- **Tags:**
+  - `kultivator.rogue` (`TechniquePower.TAG_ROGUE`, spine): every rogue cultivator;
+  - `kultivator.realm_guard`: realm chamber mobs, for tracking only. They are made with `EliteMonsters.makeElite`, so they already carry `TAG_ELITE`;
+  - `kultivator.boss` (existing `TAG_BOSS`): realm guardians and the Patriarch. They get the boss cap and the 7b BOSS KILL beat.
+- **Trial-mob rule (spine):** `isTrialMob` additionally accepts **only** `TAG_ROGUE`. Rogue health below is balanced against legacy power × 1.5, as for elites (19.1.5). `kultivator.trial_guard` is never used on anything that raids, because it is in `FormationTargets.NEVER_TAGS`.
+- **Formations (spine edit in `FormationTargets`):**
+  - `damageFactor`: ×0.6 for rogue tiers 1–3 (the elite rule). The Patriarch gets the boss factor through `TAG_BOSS`;
+  - `resists`: uses `RogueCultivators.tier()` next to `EliteMonsters.tier()` for Daya Tembus;
+  - **rogues must never get `setCustomName`**, or `neverAffected` skips them. They override `getTypeName()` to show "Tetua Sekte Bulan Darah" and similar names;
+  - formation kills keep `KillCredit = null`: no XP and no loot, but they count toward clearing a raid wave.
+- **Rogue and guard targets:** survival players, `DiscipleEntity` of role DISCIPLE, spirit beasts on raids and ambushes, iron golems (vanilla), and anything that hurt them (`HurtByTargetGoal`, never other rogues).
+  - **Never:** villagers, passive animals, pets, candidates, or creative and spectator players.
+- **Peaceful difficulty:** no ambushes, raids, village raids or realm gates.
+
+#### 25.1.3 Performance (a weak laptop that also runs Valorant)
+
+The full budget table is 25.13. Headlines:
+- at most **12 rogues alive in the world** (`rogueWorldCap`): at most 8 per raid (`raidMaxAlive`), 3 per ambush, 5 per camp;
+- every timer is lazy on game time;
+- the realm dimension holds only the players' own chunk tickets (no force-loading); an empty level stops ticking entities after 300 ticks;
+- village POI lookups are cheap and run only near players;
+- the forge and the rings never tick on their own.
+
+#### 25.1.4 Sources, text and UI
+
+- These follow DESIGN 19 and 20.1.
+- Every item, rogue tier, realm, chamber, artifact grade, spirit stage, ring tier and vassal mechanic has a `.source` key ("Sumber: …" / "Source: …"), with work titles in English.
+- *Terinspirasi dari* marks a concept-only borrowing. Every number, UI element and safety rule is game design and says so.
+- All text exists in `id_id` and `en_us`. Every GUI follows DESIGN 5b (jade scroll) and fits 320×240.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.2 Spine (orchestrator, before the modules; it compiles alone with stubs)
+
+1. **`network/Actions`:** `ALAM = 38`, `MUSUH = 39`, `TEMPA = 40`, `DESA = 41`. Each carries `text = "op[:param]"`. `Net.handle` routes them to `alam.Alam.handleAction`, `musuh.Musuh.handleAction`, `tempa.Tempa.handleAction` and `desa.Desa.handleAction`. The range 23–29 stays free for Phase 7 follow-ups.
+2. **`network/Payloads`:**
+   - S2C `DuniaSync(int channel, CompoundTag data)`, ≤ 8 KB, sent only when a screen opens or the data changes. Channels: `CH_ALAM=0, CH_MUSUH=1, CH_TEMPA=2, CH_DESA=3`. `KultivatorClient` routes each channel to `client.<pkg>.<X>Client.onSync`.
+   - `OpenScreen.DUNIA = 7`. The arg selects the tab: 0 Alam, 1 Pusaka, 2 Musuh, 3 Desa.
+3. **`sect/hall/Halls`:** `PAGE_PERTAHANAN = 11` (stub `client/musuh/PertahananPage`) and `PAGE_DESA = 12` (stub `client/desa/HallDesaPage`) in `HallScreen.allPages`.
+4. **`fx/FxType`:** append `ALAM, MUSUH, TEMPA, DESA` after `FORMASI`. `FxDispatcher` calls `client/<pkg>/<X>Fx.play` and `.tick`. Sub-ids live in `alam/AlamFxIds`, `musuh/MusuhFxIds`, `tempa/TempaFxIds` and `desa/DesaFxIds`.
+5. **`util/DeathGuard`:** `Stage = {DUEL, REALM, TRIBULATION, TOTEM, TECHNIQUE, PERK}`. REALM goes before the Totem so that totems, cheat-death charges and Jiwa Tak Hancur are not spent inside a realm. It never acts on `BYPASSES_INVULNERABILITY` (`/kill`, `out_of_world`).
+6. **`technique/spec/TechniquePower`:**
+   - `TAG_ROGUE = "kultivator.rogue"`, accepted by `isTrialMob`;
+   - `interface CasterFactor { double factor(LivingEntity attacker, @Nullable TechniqueSpec spec, LivingEntity target); }` with `addCasterFactor(CasterFactor)`. The product of all caster factors is **clamped to 0.8–1.30 on its own** and then multiplied into the default branch. It never applies in arenas, duels or against players.
+7. **`formasi/effect/FormationTargets`:** the rogue `damageFactor` and `resists` edits of 25.1.2.
+8. **`disciple/DiscipleEntity`:** `ACTIVITY_FORGE_ASSIST = 12`, and widen the same range checks the 7c spine widened for 11.
+9. **`disciple/Disciples.onChangeLevel`:** returns early when the origin or the destination satisfies `Alam.isRealmLevel(level)`, so FOLLOW disciples never auto-follow into or out of a realm.
+10. **`disciple/DiscipleHooks`:** `addDeathGuard(DiscipleDeathGuard)`, where `interface DiscipleDeathGuard { boolean save(DiscipleEntity e, DamageSource src); }`. When a guard returns true, the disciple is left at 1 HP and the guard handles it (sent to rest through `depart`). No Soul Tablet, no soul flight. Module A registers one for realm runs and module B one for raids.
+11. **`sect/event/RivalSkills`:** made `public` (class and the skill methods B calls). Nothing else changes.
+12. **Refusal hooks (one line each, calling stubs):**
+    - start of a breakthrough, Cave Abode entry, the Kehancuran order, 7c formation placement, Hu Fa invitations and `BuildPlacer` refuse while `Alam.isRealmLevel(level)` or `Alam.inRun(player)`, with the message `kultivator.alam.refuse`;
+    - `InheritanceTrials` and the duel and spar start checks refuse while `Alam.inRun`.
+13. **Provider hooks** (each added only if absent; verify during the spine):
+    - `Halls.addRecruitPauseProvider(Predicate<UUID> owner)`: B pauses candidates during live raids;
+    - `Duties.addOutputFactorProvider(ToDoubleFunction<UUID>)`: B's "Aula Terluka" ×0.5;
+    - `ReturnTalisman.addRefusalProvider(Function<ServerPlayer, @Nullable Component>)`: B's "Sekte sedang diserbu";
+    - `EliteMonsters.addDropProvider(EliteDropProvider)`: A's fragment and crystal drops from Raja Siluman;
+    - `Tribulation.addSuccessListener(BiConsumer<ServerPlayer, TribulationInfo>)`: A's crystal on the first Deity Transformation tribulation and a sigil per IA layer;
+    - a star-condensing cost modifier `Stars.addCostModifier(ToDoubleFunction<ServerPlayer>)` in `ascension/*`: the glue's Esensi discount;
+    - `CandidateSpec` gains `@Nullable String originKey` (shown as "dari Desa ‹nama›") and an `int resolveBonus`: D.
+14. **`sect/event/Expeditions`:** the "secret_realm" mission gains a 15% `kultivator:heavenvoid_fragment` row, looked up by registry id.
+15. **`epic/EpicIds`:**
+    - EXTRA (14) beat sub-ids `REALM_GATE, REALM_CLEAR, RAID_OMEN, SPIRIT_AWAKEN, NATAL_BOND, VILLAGE_OATH`, handled by the existing generic EXTRA client path;
+    - BOSS (12) subjects `penjaga_alam` and `tetua_iblis`.
+    - Every one of these obeys 23.1: no camera shot while in danger.
+16. **`client/disciple/DiscipleLook`:** `public static PlayerSkin skinByIndex(int index, boolean slim)`.
+17. **`KultivatorConfig`:** the fields of 25.12, clamped on load.
+18. **Entry points:**
+    - `Kultivator.onInitialize` calls `alam.Alam.init()`, `musuh.Musuh.init()`, `tempa.Tempa.init()` and `desa.Desa.init()` before `ModItems.init()`;
+    - `CultivateCommand` calls each module's `addCommands`, plus the spine command `/kultivasi dunia [tab]`;
+    - `TestCommands` calls each module's `addTestCommands(uji)`. `uji kit` gains a shulker "Fase 8" built from each module's `kitItems()`;
+    - `KultivatorClient` calls the four client `init()`s;
+    - `Keys` gains two unbound keys: `key.kultivator.dunia` and `key.kultivator.cincin` (→ `TEMPA "ring:open"`).
+19. **Mixins json:** one entry `tempa.mixin.ItemEntityBelowWorldMixin` (stub owned by module C) for the ring void rescue.
+20. **Stubs** with the final signatures of 25.15. `lang-src/spine8.*` holds config comments, tab names and key names.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.3 A. Alam Rahasia: secret realms
+
+#### 25.3.1 Sumber / Source (the system)
+
+- **Periodic opening, map-fragment key:** RMJ ch. 1129. The Heavenvoid Hall appears, a cultivator says "It hasn't been 300 years since it last opened!", and no one can enter without a Heavenvoid map fragment.
+- **Maze, illusions and stone gates:** RMJ ch. 1126. In the tower's maze-like paths, illusions are broken by Brightsight Spirit Eyes. A teleportation formation leads to the next level. Several stone gates open onto treasure rooms where no treasure was found.
+- **Level restriction and deadly odds:** RMJ ch. 155–160. Ch. 155 gives the Foundation Establishment Pill formula. Ch. 160 calls the herb ground "incomparably dangerous". The fan wiki page *Trial by Blood and Fire* cites ch. 160 for two rules: Foundation Establishment and above are barred, and fewer than a third survive.
+- **Injuries carry over from a spirit realm:** *Perfect World* (PW) ch. 345 ("Injuries in the Void God Realm would impact the real body").
+- **Game design:** the instance, slots, chamber mechanics, timers, the expel rule and every reward amount.
+
+#### 25.3.2 The four realms
+
+| # | id | Nama / English | Who may enter | Key (consumed?) | Chambers | Time | Cooldown |
+|---|---|---|---|---|---|---|---|
+| 1 | `blood_fire_trial` | **Lembah Ujian Darah dan Api** / Vale of the Trial by Blood and Fire | Qi Refining and Foundation **only** (higher: "Pembatasan kedua menolakmu") | `token_darah_api` (consumed on success; kept on expel) | 3 + guardian | 8 min | 1 in-game day |
+| 2 | `heavenvoid_hall` | **Aula Hampa Langit** / Heavenvoid Hall | Golden Core – Dao Union | `heavenvoid_map` (3 fragments, shapeless; consumed on success) | 3 + guardian | 15 min | 1 day |
+| 3 | `ancient_god_land` | **Tanah Dewa Kuno** / Land of the Ancient God | Deity Transformation and up (rewards scale) | `inheritance_crystal` (**consumed on success**; kept on expel) | 3 crystal halls + guardian | 15 min | 1 day |
+| 4 | `heavenly_tomb` | **Makam Langit** / Heavenly Tomb | IA Tahap 1 and up, endless | `tomb_sigil` (consumed per descent) | up to 3 layers per descent | 6 min per layer | none (sigil-gated) |
+
+**Sumber per realm:**
+1. RMJ ch. 155–160 (above). The fan wiki's canon name *Trial by Blood and Fire* supports the name. "Lembah" (vale) is the game's name for the player's instance, so it is not confused with the disciples' Forbidden Ground event (20.3.11).
+2. RMJ ch. 1126 and 1129 (above). Ch. 480: the famous Heavenvoid Cauldron, seen as blue flame at the bottom of a deep hole. Ch. 499: its lid "wouldn't open in the slightest". The lava trial and the Ironfire Ants are *Terinspirasi dari* the RMJ Heavenvoid Hall arc (no chapter verified; names taken from Chinese summaries: 熔岩路, 寒冰珠, 铁火蚁).
+3. *Renegade Immortal* (RI) ch. 187–199:
+   - ch. 198: 94 ice crystals; a crystal melts and fuses with Wang Lin's soul;
+   - ch. 199: "after the 70th ice crystal, they took several times longer", and the star on his forehead counts his body's reconstructions.
+   - The permanent HP reward is game design.
+4. *Battle Through the Heavens* (BTTH) ch. 1352 (the Tomb's energy may come, in part, from Ancient Devouring Insects) and ch. 1600 (the Tomb's energy bodies shrink and tremble under a huge pressure). Layers, endless depth and sigils are game design.
+
+#### 25.3.3 Hosting (dimension mode)
+
+- **Slots.** Slot `s` (0–7) is centred at `x = 1024 + s × 2048, z = 1024`, on the surface y = 5. Slots are allocated first-free in memory and reused. A reused slot reloads identical generated chunks, because no one can change them. Disk use is about 1 MB per slot.
+- **Stage.** Every chamber of a run is played on the **same 48×48 stage** around the slot centre:
+  - the soft boundary pushes the player back with velocity and `syncVelocity` beyond 32 blocks from the centre, and teleports them back to the pad beyond 48;
+  - floor check **every tick** (not throttled): below y = −4, snap back to the pad. `out_of_world` bypasses DeathGuard, so this check is the only protection against void deaths.
+- **Chamber change, "Formasi Teleportasi"** (RMJ ch. 1126). When a chamber is cleared, a glyph pad appears. Stepping on it gives a 1 s 7b fade, then the tracked mobs and relics are discarded, the Display scenery is swapped for the next chamber's, and the party is placed on the entry mark.
+- **Scenery.** Client-only Display entities built from a seed sent in `DuniaSync(CH_ALAM)`, following the 22.4.3 rules:
+  - negative ids, removed on level change, at most 4 created per tick, no glowing;
+  - wall runs merged into ≤ 60 block Displays per chamber.
+  - The server keeps a **wall grid** (a `BitSet` of 48×48 cells) for each chamber. A player or mob moving into a wall cell is pushed back, a cheap O(1) lookup per tick per party member.
+- **Spawning.** Mobs spawn only after `level.areEntitiesActuallyLoadedAndTicking(chunkPos)`. Every run entity is tracked by UUID and discarded at run end; the run never relies on the `ALLOW_LOAD` refusal. Run entities are also refused in `ALLOW_LOAD` as a safety net.
+
+#### 25.3.4 Flow (the same for every realm)
+
+1. **Open the gate.** Use the key on open ground in the Overworld, the Nether or the End. The gate is refused:
+   - during a breakthrough, tribulation, heart demon, inheritance, duel, sparring, Void Realm climb or Kehancuran aim, or while holding a `FlightLease`, flying a sword, gliding, riding, being leashed, or suffering deviation;
+   - within 10 s of being hurt;
+   - on Peaceful difficulty.
+
+   A 10 s **omen** follows: the EXTRA `REALM_GATE` beat (sky grade, a gate of glyph rings as client Displays, bells). There is no portal block and no weather.
+2. **Party.** The player, plus up to 3 `/sect` mates within 8 blocks (each clicks **[Masuk]** in chat during the omen), plus up to 2 of the player's own **Murid Dalam+** disciples within 16 (25.3.9).
+3. **Enter.**
+   - The return point `{dim, x, y, z, yRot, xRot}` is written to `extra.dunia.realm.ret` (persistent, copied on death) **before** the teleport.
+   - `player.teleport(new TeleportTransition(level, pad, Vec3.ZERO, yRot, 0f, TeleportTransition.DO_NOTHING))`, then `setPortalCooldown`.
+4. **Chambers** (25.3.6) are played one after another. A boss bar shows the objective in its name, and the timer (or the guardian's health) as its progress.
+5. **Guardian** (`kultivator.boss`; the trial-mob rule applies, then the boss cap). Its death fires the BOSS beat with subject `penjaga_alam`.
+6. **Treasure.** A jade-scroll **Gulungan Harta** screen opens. Guaranteed items go to the inventory. Overflow goes to the Lumbung if the player has a hall, otherwise it drops at the return point with an owner lock. Where the realm says so, the player also **chooses 1 of 3**.
+7. **Return.** The party is teleported to `ret`. Two ticks later, if the player is `isInWall()`, they are moved with `Targeting.safeSpot`, falling back to the heightmap top. If `ret` is missing or its level is gone: the respawn point, then world spawn. `ItemEntity`s within 80 blocks of the slot are swept to their owners. The slot is released.
+
+**Expel or fail.** Any of these ends the run:
+- a lethal hit (DeathGuard `REALM`: left at 1 HP);
+- the time limit;
+- `/kultivasi alam keluar`;
+- any level change out of the realm dimension (`AFTER_PLAYER_CHANGE_LEVEL`). This also covers a Return Talisman, which works inside a realm as an exit;
+- logging out;
+- `/kill`, which kills as usual.
+
+The effects of an expel:
+- **"Luka Alam"** for 5 min: technique damage ×0.8 and no kill XP (PW ch. 345). A voluntary exit gives no Luka Alam;
+- the key is kept and the cooldown starts.
+
+**Rejoin, restart, crash.** Runs are session-only and never saved. On the **next tick** after joining, a non-creative, non-spectator player found in the realm dimension with no live run is sent to `ret`, with no penalty. At server start and at every run end, any `DiscipleEntity` found in the realm level is moved to `AwayStore` with `Disciples.depart`.
+
+**Inside a realm:**
+- breakthroughs, Cave Abode, Kehancuran, formations, Hu Fa invitations, duels and spars are refused (spine #12);
+- qi regen, techniques and talismans work normally;
+- party disciples fight as usual.
+
+#### 25.3.5 Guard and guardian numbers
+
+R is the realm ordinal of the strongest party member (QR = 1 … TI = 8), clamped into the realm's range. For realm 4, add `layer / 9 + stars / 9`.
+
+| Mob | Health | Melee | Notes |
+|---|---|---|---|
+| Chamber guard, tier g = 1/2/3 | `24 × {1.5, 2.5, 4.0}[g] × (1 + 0.35R)` | `4 + R + 1.5g` | allowlist vanilla mobs (19.3.1, no creeper, ghast, blaze, enderman or silverfish) through `EliteMonsters.makeElite`, or rogue variants; tag `kultivator.realm_guard` |
+| Guardian | `24 × 8 × (1 + 0.35R) × (1 + 0.25 × extra party members incl. disciples)` | `6 + 1.5R`, plus 2 telegraphed skills from the elite tier-2 list | `kultivator.boss`, boss bar |
+
+- Example guardians: Golden Core 394 HP, Dao Union 595, True Immortal 730.
+- A Golden Core player (legacy basic hit about 44 under the trial-mob rule) needs about 9 hits. The boss cap (22.14.2) stops ultimates from one-shotting a guardian below Dewa Abadi.
+- Chamber guards are hardened like elites: no loot pickup, no door breaking, swords instead of bows. Battle Fatigue: +1 per realm guard.
+
+#### 25.3.6 Chamber catalogue (entity mechanics on the stage)
+
+| Chamber | Nama | Objective | Mechanics | Sumber |
+|---|---|---|---|---|
+| `battle` | **Ujian Tempur** | survive 3 waves (`2 + R/2` mobs; the last wave includes one tier-2 elite) | each wave starts 3 s after the previous one dies | RMJ ch. 160 per the fan wiki (fewer than a third survive) |
+| `lava_road` | **Jalan Lava** / Lava Road | reach the end of a 40-block lane (Display walls and magma-tile Displays on the floor) within 60 s | a jet every 2 s per segment: a telegraph ring, then 3 s of entity fire plus `0.06 × max HP`. It can never kill (REALM guard). A **Mutiara Es Dingin** in the offhand halves it, and so does Fire Resistance | *Terinspirasi dari* RMJ, Heavenvoid Hall arc: the lava road (熔岩路) crossed with Man Huzi's Cold Ice Pearl (寒冰珠) and the Fire-Avoiding Treasure Robe (辟火宝衣) |
+| `ant_field` | **Padang Lava Semut Api Besi** (50/50 alternative to `lava_road`) | kill 12 "Semut Api Besi" (cave spiders made Fire elites, tier 1) | standing on the magma-tile zone gives Slowness I (no damage). Cave spiders appear only inside realms | *Terinspirasi dari* RMJ: Ironfire Ants (铁火蚁) live in hot lava terrain |
+| `illusion_maze` | **Labirin Ilusi** | find the true exit of a 25×25 maze (wall grid plus Displays) within 3 min | 4 phantom exits. Stepping into one costs 10% of max HP and returns the player to the start. Translucent illusory phantoms (tier-1 rogue `GHOST` variant at 50% health) wander the paths. Divine Sense or **Pil Mata Terang** marks the true exit and outlines the phantoms for 6 s | RMJ ch. 1126 |
+| `stone_gates` | **Gerbang Batu Harta** | open 1 of 3 stone gates (relic entities) | one holds nothing ("tidak ada harta"), one starts a trap wave, one holds the bonus treasure. Divine Sense shows "ada qi" on two of them | RMJ ch. 1126 |
+| `ice_crystals` | **Aula Kristal Es** | absorb 1 crystal: a 10 s channel standing on it, 30 s once the player's lifetime total is above 70 | waves attack during the channel. A hit above 15% of max HP interrupts it; progress is kept | RI ch. 198–199 |
+| `energy_bodies` | **Lapisan Badan Energi** | destroy the layer's energy bodies (`4 + layer/3`, translucent rogue `ENERGY` variant) | each one drops an **Esensi Energi Makam** shard. Every 9th layer is a guardian floor | BTTH ch. 1352, 1600 |
+
+**Chamber order:**
+- realm 1: `battle` → `lava_road` → `battle` → guardian;
+- realm 2: `lava_road` or `ant_field` → `illusion_maze` → `stone_gates` → guardian;
+- realm 3: `ice_crystals` ×3 → guardian;
+- realm 4: `energy_bodies` on each layer, with a guardian on layers 9, 18, 27 …
+
+GAME's `ghost_fog` chamber is dropped because its canon claim could not be verified. Its phantoms now live in `illusion_maze`.
+
+#### 25.3.7 Mode Ringan: projected realms (fallback, zero blocks)
+
+This mode is used when `secretRealmDimension=false`, when the dimension fails to load, or after `uji alam ringan nyala`.
+- The realm "descends" around the gate as a 20-block ring of glyph Displays, with the 7b sky grade and fog for the party (client only).
+- The chambers run as the same entity mechanics, with the wall grid laid over the ring.
+- Leaving the ring for more than 5 s forfeits the run, with no Luka Alam.
+- At least 70% of the ring cells must be `safeSpot`; otherwise the gate is refused with a hint.
+- The REALM DeathGuard applies only to the run's damage sources.
+
+#### 25.3.8 Rewards
+
+| Realm | First clear | Repeat clear | Choose 1 of 3 | XP |
+|---|---|---|---|---|
+| 1 | 4 **Herba Fondasi** (age 60–120), 4 Low stones, one Kuning or Misterius jade slip, presented as "a golden page" (RMJ ch. 213: Han Li obtains a golden page) | **1** herb, 2 Low stones | – | 10% of the bar (`XpSource.TRIAL`) |
+| 2 | **Kuali Hampa Langit** (unique, 25.5.9), 2 **Kayu Pemelihara Jiwa**, 2 Mid stones, 1 High core | 50%: 1 Kayu; 1–3 Mid stones; 1 Mid or High core | a Bumi jade slip, 2 High stones, or a Mid core of the chosen element | 15% |
+| 3 | per crystal: **+0.25 max HP permanently** through the `Stats` sink with the stable id `kultivator:ancient_god_crystal` (lifetime cap 94 crystals = +23.5); per run: 1 **Darah Dewa Kuno** per hall | the same (the key is consumed, 25.3.2) | – | 15% |
+| 4 | per layer: `1 + floor(layer/9)` **Esensi Energi Makam**. **On a new best layer only:** 5% of the bar, and on layers 9k 1 Supreme stone + 1 Raja core + 1 `tomb_sigil` | replayed layers below the saved best: half the Esensi, no 9k rewards | on each **new** 9th layer: an Abadi-band jade slip, 3 Esensi, or 1 Supreme stone | 5% per new best layer |
+
+- **Realm 4 checkpoint:** a descent starts at `max(1, best − 8)` rounded down to a multiple of 9, plus 1. Depth is endless.
+
+#### 25.3.9 New items (module A)
+
+| Item id | Nama / English | Where it comes from | Use | Sumber |
+|---|---|---|---|---|
+| `token_darah_api` | Token Ujian Darah-Api | 15% in the `simple_dungeon` and `abandoned_mineshaft` chests (Fabric `LootTableEvents.MODIFY`); Jalan chapter 6 reward | key to realm 1 | RMJ ch. 155–160 |
+| `heavenvoid_fragment` | Fragmen Peta Hampa Langit | Raja Siluman 10% (spine drop hook); rogue Tetua 20%; Patriarch 60%; `ancient_city` 8%; `end_city_treasure` 10%; the "secret_realm" expedition 15% | 3 → `heavenvoid_map` | RMJ ch. 1129 |
+| `heavenvoid_map` | Peta Aula Hampa Langit | crafted (shapeless) | key to realm 2 | RMJ ch. 1129 |
+| `cold_ice_pearl` | Mutiara Es Dingin / Cold Ice Pearl | shapeless: 2 Eight-Angled Ice Grass + an Ice core (any grade) + a snowball | held in the offhand: Jalan Lava ×0.5, entity fire duration ×0.5 | *Terinspirasi dari* RMJ, Heavenvoid Hall arc (寒冰珠) |
+| `soul_nurturing_wood` | Kayu Pemelihara Jiwa | realm 2 | weapon-spirit seed; ring tier 4; alternative Soul Nurturing recipe; tag `#kultivator:spirit_seed` | *Terinspirasi dari* RMJ: Soul Nurturing Wood, one of the Three Divine Woods that keep a soul from scattering |
+| `inheritance_crystal` | Kristal Es Warisan | Raja Siluman 2%; Patriarch 25%; first Deity Transformation tribulation success: 1 | key to realm 3 | RI ch. 198 |
+| `ancient_god_blood` | Darah Dewa Kuno | realm 3 | Abadi forging; refinement +7…+9 | *Terinspirasi dari* RI ch. 198–199 (the body is reconstructed) |
+| `tomb_sigil` | Lencana Makam Langit | Patriarch from IA (100%); each IA layer tribulation success: 1; realm 4 new best 9k layer: 1 | key to realm 4 | game design (the key), set in BTTH ch. 1352 |
+| `tomb_essence` | Esensi Energi Makam | realm 4 | Dewa forging; refinement +10…+12; star condensing discount | BTTH ch. 1352, 1600 |
+| `heavenvoid_cauldron` | Kuali Hampa Langit | realm 2 first clear | 25.5.9 | RMJ ch. 480, 499 |
+
+- **Pil Mata Terang** (`PillKind.MATA_TERANG`, glue module D): alchemy recipe Illusionary Spirit Herb + Spider Eye + Glow Berries → 2 pills. For 2 min it calls `Alam.grantClearSight(player, 2400)`: phantom exits are revealed and phantoms are outlined. Sumber: RMJ ch. 1126, Brightsight Spirit Eyes. In canon the eyes are a technique; the pill stand-in is game design.
+- **Item tags A provides** (the data contract C reads, so C never imports A's classes):
+  - `#kultivator:realm_material/bumi` (Herba Fondasi);
+  - `/langit` (Kayu Pemelihara Jiwa);
+  - `/abadi` (Darah Dewa Kuno);
+  - `/dewa` (Esensi Energi Makam);
+  - `#kultivator:spirit_seed`.
+
+#### 25.3.10 Disciples in realms
+
+- **Going in:** up to 2 Murid Dalam+ within 16 blocks go through `Disciples.depart(e, "alam")` at the gate, then `Disciples.arrive` on the pad.
+- **Coming out:** they return the same way next to the master. If an arrive fails, the existing AwayStore return at the stele applies.
+- They fight under their normal rules. Each one raises the guardian's health by +25%.
+- **On a clear:** each gets a 15% bar share (`DisciplePaths.grantBarShare`) and 20 PK.
+- **A disciple "killed" inside** is caught by A's `DiscipleDeathGuard` (spine #10): left at 1 HP and sent home through `depart`. No Soul Tablet.
+- In Mode Ringan they simply follow.
+- The pure-data expedition **Ekspedisi Alam Rahasia** (20.3.10) is unchanged apart from the 15% fragment row.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.4 B. Kultivator Liar & Serbuan Sekte Iblis
+
+#### 25.4.1 Sumber / Source
+
+- **Road ambushes:**
+  - RMJ ch. 388: about 5 km from Minor Expanse Island, eight Foundation Establishment cultivators who had restrained their cultivation lie in wait. Han Li senses them and calls "Don't hide! Reveal yourself!".
+  - RMJ ch. 402: masked cultivators with profound and evil techniques, six of them at Core Formation, intercept the Exquisite Sound Sect's convoy and steal the storage pouches.
+- **The spoils are the foe's storage pouch:** RMJ ch. 190 (Han Li searches for the slain foe's storage pouches) and ch. 273 (he plans to exchange what he found in his enemies' storage pouches for more spirit stones).
+- **Demonic sects versus righteous sects:**
+  - RMJ ch. 263: a conscription order signed by every sect master, set next to the Six Devil Dao Sects' invasion. The text places them side by side.
+  - RMJ ch. 1203: the six sects of the State of Yue were first vanquished by the Devil Dao.
+- **Defending with sect formations kept by experts:** ISSTH Book 5 ch. 735 "War!", a five-layered restrictive shield maintained by Spirit Severing experts. This is already the keeper source in 24.2.8.
+- **Victories spread a sect's name:** *Return of the Mount Hua Sect* (20.3.12).
+- **"Kultivator Liar"** is the genre term 散修 (loose or rogue cultivator), not a claim about one work.
+- **Game design:** tier names, the 8 demonic sect names (`kultivator.musuh.sect.<n>`), the breach meter and every number.
+
+#### 25.4.2 The entity `rogue_cultivator`
+
+- `RogueCultivatorEntity extends Monster`. It is never saved (`shouldBeSaved()` false, and refused in `ALLOW_LOAD` by `TAG_ROGUE`), `removeWhenFarAway` false (the module despawns it), `NoGrief.TAG`, `setCanPickUpLoot(false)`, no door goals, `setCanOpenDoors(false)`. It never rides and never sets a custom name.
+- **Synced data:** realm, stage, tier, variant (`ROGUE`, `GHOST`, `ENERGY`, `DEMONIC`), sect (0–7), skin index, slim, role (`AMBUSH, RAID, CAMP, QUEST, REALM, TEST`). `home` (a `BlockPos` anchor) is server-only.
+- **AI:** `FloatGoal`, `RogueSkillGoal`, `MeleeAttackGoal`, a retreat at 20% HP for tiers 1–2 (a vanish puff, counted as fled), stroll, look. The target goals follow 25.1.2.
+  - When stuck for 30 s without path progress toward its goal, it leaps with `snapTo` to `Targeting.safeSpot`. Path range is 48 blocks, with waypoints.
+- **Skills:** the public `RivalSkills` primitives (qi line, element burst, the telegraphed elite tier-2 skill), as particle FX through `Fx.send` and `hurtServer(level, damageSources().mobAttack(this), amount)` on `RogueTargets.mayHit` targets.
+- **Despawn:** with a cloud-step puff when no player is within 64 blocks for 30 s, when its chunk unloads, or when its event ends.
+- **Renderer:** `client/musuh/RogueRenderer extends LivingEntityRenderer<RogueCultivatorEntity, DiscipleRenderState, PlayerModel>`. It fills the state like `DiscipleRenderer.extractRenderState` and adds `DiscipleRobeLayer` and `DiscipleHeldItemLayer` with a rogue skin set: dark robes, a mask overlay and a tier trim colour. `getModelTint` gives the translucent `GHOST` and `ENERGY` variants.
+  - Beyond 32 blocks the robe layer is dropped. No glowing outline. `FLAG_LOW_LOAD` is honoured.
+
+**Tiers** (R = realm ordinal at spawn; skill damage = `U_legacy(R) × (0.5 + 0.25 × tier)`, with `U_legacy = 3 + 2R + 0.5 × stage` from 22.5.1):
+
+| Tier | Nama / English | Health | Melee | Skills | GC HP | TI HP |
+|---|---|---|---|---|---|---|
+| 1 | **Pengembara Liar** / Rogue Wanderer | `24 × 1.5 × (1 + 0.35R)` | `4 + R + 1.5` | a qi line every 6 s | 74 | 137 |
+| 2 | **Perampok Kultivator** / Cultivator Robber | `24 × 2.5 × (1 + 0.35R)` | `4 + R + 3` | + an element burst every 10 s | 123 | 228 |
+| 3 | **Tetua Sekte Iblis** / Demonic Sect Elder | `24 × 4 × (1 + 0.35R)` | `4 + R + 4.5` | + one telegraphed elite tier-2 skill | 197 | 365 |
+| 4 | **Patriark Sekte Iblis** / Demonic Patriarch (raids only) | `24 × 10 × (1 + 0.35R)`, `kultivator.boss` | `6 + 1.5R` | 3 skills + **Segel Darah**: a 6-block ring telegraphed for 2 s, then Wither I for 4 s + `U_legacy × 1.5` | 492 | 912 |
+
+**Rewards** (through `KillCredit.resolve`; `PLAYER`, `BEAST` and `DISCIPLE` count as for elites):
+- XP `max(combatXp × {3, 5, 8, 12}[tier], killerBar × {0.01, 0.025, 0.05, 0.08} × clamp)`, with Battle Fatigue +3 per rogue. Disciple kills give the disciple XP `× {2, 4, 7, 10}`;
+- a **Kantong Rampasan**: always at tier 2+, 40% at tier 1;
+- tier 3: 20% `heavenvoid_fragment`;
+- tier 4: 60% fragment, 25% `inheritance_crystal`, and from IA 100% `tomb_sigil`;
+- no beast cores: rogues are not beasts;
+- formation kills give nothing but count for waves.
+
+#### 25.4.3 Penyergapan: ambushes
+
+- **Check:** a roll every 6,000 ticks per eligible player (staggered). Eligible means all of these:
+  - Qi Refining+, survival, Overworld or Nether, not Peaceful;
+  - more than 160 blocks from their own hall and outside every hall territory;
+  - not near a village (`ServerLevel.isVillage`);
+  - not airborne, flying, gliding, riding, in a boat or in water;
+  - not in a realm, trial, duel, spar or tribulation;
+  - config `rogueAmbushes`.
+- **Chance:** `(0.06 + 0.01 × realm) × rogueAmbushChanceScale`, capped at 0.15. Cooldown 1 in-game day after an ambush (`extra.dunia.ambush_cd`).
+- **Party:** spawned on `safeSpot`s 12–18 blocks ahead in a loose arc, in entity-ticking chunks, within the world cap.
+
+  | Player realm | Party |
+  |---|---|
+  | QR–FE | 1–2 × tier 1 |
+  | GC–NS | 2 × tier 1 + 1 × tier 2 |
+  | DT–DU | 1 × tier 1 + 2 × tier 2 (15%: a tier-3 leader) |
+  | IA+ | 2 × tier 2 + 1 × tier 3 |
+
+- **Telegraph** (RMJ ch. 388): 3 s before they step out, the 19.3.15 danger alert rings ("Niat membunuh terasa… 3 sosok") and Divine Sense shows them.
+- **Chat flavour:** "Tiga kultivator bertopeng menghadang jalanmu: 'Serahkan kantong penyimpananmu!'". It is always a fight.
+- **End:** win, or leave beyond 96 blocks for 30 s.
+
+#### 25.4.4 Sarang Perampok: bandit camps (for village quests)
+
+- A data point 64–160 blocks from a vassal village. It has no blocks: a client particle column of campfire smoke, visible from 48 blocks.
+- When a member player comes within 48, 3–5 rogues spawn (tiers by the raid level of 25.4.5). They despawn after 2 min without members. Clearing them completes the quest.
+
+#### 25.4.5 Serbuan Sekte Iblis: sect raids
+
+**Schedule** (`HallData.extra.raid`):
+- Every `sectRaidIntervalDays` (default 9; 5–30; 0 = off), from hall level 3, counted from the day the hall reached level 3.
+- **Omen** at the sunset before: "Panji hitam terlihat di cakrawala — Sekte ‹nama› akan menyerbu saat malam tiba esok.". It comes 2 sunsets before when a K1 Alarm formation is active. The EXTRA `RAID_OMEN` beat shows black banners as client Displays on the horizon, a Catatan log line, and an Alarm Restriction ping of the direction.
+- **Raid night:** sleeping is refused in the territory of the raided hall (`EntitySleepEvents.ALLOW_SLEEPING`; no time change), so the raid cannot be slept through.
+- **Live raid:** from nightfall (dayTime 13,000) on the raid day, **only** while:
+  - the hall is active and its chunk is loaded;
+  - the owner is inside the territory, not in their own tribulation (the raid then starts 60 s after the tribulation ends), not on Peaceful;
+  - the owner had input in the last `raidAfkSeconds` (60).
+- **Otherwise it resolves as data** at the next sunrise (see Outcome). A LAN world does not pause while the user is in Valorant, so an AFK owner is never sacked live.
+
+**Raid level:** `L_r = clamp(max(owner realm, strongest disciple realm) − 1, 1, 8)`, + stars/9 at True Immortal. Rogues spawn at R = L_r.
+
+**Waves:** `2 + floor(hallLevel / 3)` waves (3–5). The next wave comes 20 s after the previous one is cleared, or when ≤ 2 rogues remain for 40 s.
+
+| Wave | Composition |
+|---|---|
+| 1 | 4 × tier 1 |
+| 2 | 3 × tier 1 + 2 × tier 2 |
+| 3 | 2 × tier 2 + 1 × tier 3 (from hall 4) |
+| 4 (hall 6+) | 3 × tier 2 + 1 × tier 3 |
+| final (hall 6+, or every 3rd raid) | the Patriarch + 2 × tier 2 |
+
+- **Spawning:**
+  - alive cap `raidMaxAlive` (8; 4–12) inside the world cap; extras queue;
+  - spawn points: on the territory edge + 4…8, **clamped to `simulationDistance × 16 − 16` from the owner**, entity-ticking chunks only, from 1 direction (2 from hall 6);
+  - they march to the stele.
+- **Breach meter "Segel Penjarah"** (a virtual integrity; the stele block is never touched):
+  - a rogue within 6 blocks of the stele stands and channels a blood-red seal (particles);
+  - the meter rises per second by 1 (tier 1), 2 (tier 2), 4 (tier 3) or 6 (Patriarch), up to 100;
+  - killing the channeller or knocking it out of range stops its share;
+  - it shows as a second, red boss bar.
+- **Timeout:** 10 min.
+
+**Outcome:**
+
+| Result | Condition | Effect |
+|---|---|---|
+| **Dipukul mundur** (repelled) | every wave cleared, meter < 100 | pool PK `+50 × waves`; one **Kantong Rampasan Sekte Iblis** to the Lumbung (+1 per Tetua, +2 for the Patriarch); each participating disciple +40 PK and a 5% bar share; **renown `+30 × waves` only if an own disciple dealt damage or killed** (20.3.1); the Patriarch's drops; trophy item `demonic_banner` (Panji Sekte Iblis, display only, one per Patriarch); vassal loyalty +3 |
+| **Ditahan** (held) | timeout, meter < 100 | the rogues retreat; half PK; no trophy |
+| **Dijarah** (sacked) | meter = 100 | the rogues vanish with loot: **at most 3 random Lumbung stacks**, never items in `#kultivator:raid_safe` (keys, rings, artifacts, uniques, trophies, the Kuali); **10% of the Kas Daya pool, capped at two days of the hall's Daya upkeep** (verify the unit against 24.x); vassal loyalty −10; duty output ×0.5 for 1 day ("Aula Terluka", spine provider). **Never** blocks, renown or disciples' saved data |
+| **Data resolution** (owner absent or AFK) | at sunrise of the next day | `S = Σ(home and GUARD_HALL disciples, ≤ 12) (realm ordinal + 1) + 2 × Σ active 7c formation grades + 6 × Grand Formation layer`; `P(repel) = clamp(S / (8 × L_r + 10 × waves), 0.10, 0.95)`. A repel gives half the live rewards (renown counts, because disciples did it). A failure is a sack with the caps above |
+
+**Defenders:**
+- **The player:** full techniques; the trial-mob rule keeps it a fight.
+- **Disciples:**
+  - GUARD_HALL patrols fight inside the territory, and Pelindung Sekte gets Regeneration II there (20.3.6);
+  - disciples on duty posts or tower training drop their activity and fight while a raid is live, then return;
+  - ultimates use their normal triggers;
+  - **no disciple ever dies in a raid:** B's `DiscipleDeathGuard` leaves them "Terluka" at 1 HP and sends them to rest through `depart`.
+- **Formations:**
+  - Formasi Agung layers and 7c killing, maze and control arrays work on rogues under the ×0.6 and boss rules;
+  - Daya Tembus: a rogue tier ≥ the formation grade ignores illusion and concealment;
+  - Alarm K1 and the territory sweep report waves by name ("Sekte Iblis");
+  - standby ends while raiders are inside;
+  - Daya upkeep is unchanged.
+- **Candidates** step aside (despawned, then restored) and recruiting pauses (spine provider).
+- **Sect construction** placement pauses during a live raid and resumes afterwards.
+- **Kehancuran** never acts near halls (unchanged).
+- **The Return Talisman** is refused for a player inside the raided territory ("Sekte sedang diserbu", spine provider).
+
+#### 25.4.6 Kantong Rampasan (loot pouches)
+
+- `loot_pouch` (from rogues) and `demonic_loot_pouch` (raid rewards). Use one to roll its loot table; the pouch is consumed. Sumber: RMJ ch. 190, 273.
+- **Rogue pouch** (one roll per tier):
+  - 1–3 Low stones (Mid from tier 3);
+  - 30%: a herb aged `50 × tier` to `150 × tier`;
+  - 25%: a talisman of power R;
+  - 5%: a jade slip of a random learnable spec (Kuning–Bumi by R);
+  - 3%: a `heavenvoid_fragment` from tier 2.
+- **Demonic pouch:** 2 tier-3 rolls, plus 1 Mid–High stone and 1 core of the sect's element (grade by `L_r`).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.5 C. Penempaan & Pusaka Natal Diri: forging and the player's natal treasure
+
+#### 25.5.1 Sumber / Source
+
+- **Refining hall, heat by depth:** RMJ ch. 928. The Earthfire Hall has three floors: material storage; earthfire for refining materials and low-grade spirit tools; and a deep pit where high-grade magic tools are refined with earthfire essence. RMJ ch. 520: a tool-refining room in Han Li's new cave residence.
+- **Fire tiers:** RMJ ch. 156. Earth Lung Fire is "a bit more impressive than Innate True Fire", and a furnace can bear the heat of earth fire.
+- **Natal treasure refined inside the body:** RMJ ch. 415. Seventy-two Bamboo Cloudswarm Swords are absorbed into Han Li's body and meticulously refined for twenty years.
+- **Re-tempering:** RMJ ch. 1393 (damaged swords tempered to restore their spirituality), ch. 1237 (Auric Essence infused into all 72 swords), ch. 1535 (Golden Lightning Bamboo transformed into 72 azure swords).
+- **Limit on treasures at once:** *RMJ: Immortal Realm* ch. 345 (three immortal treasures at once is still his limit). The split into 1 natal + 2 linked is game design.
+- **Enhancement failure rises with each step:** *A Will Eternal* (AWE) ch. 5 and 29–38 (DESIGN 20.3.17).
+- **Weapon spirit:**
+  - *Martial World* (MW) ch. 1128 "Spirit Artifact Spear": the core of a spirit artifact is its spirit, and the spear has only an elementary artifact spirit that seems to act with its own will. MW ch. 1132: tribulation tempering later makes it a full spirit artifact.
+  - *Martial Peak*, as a concept from the fan wiki page *Artifact Refiner*: natural artifact spirits take at least a thousand years and harsh conditions, while artificial ones made from beast souls are costly and carry less prestige. Marked *Terinspirasi*.
+- **Forms:** the four disciple forms of 20.3.17 (Pedang from RMJ; Payung and Wajan from AWE; Lonceng from 20.3.17).
+- **Grade ladder** (BTTH ch. 2, DESIGN 22.7) and **Heavenly Flame** (BTTH, 20.3.16): *Terinspirasi* when used for artifacts and forge heat.
+- **Game design:** the forge block, heat-to-grade mapping beyond the cited fires, recipes, skill and every number.
+
+#### 25.5.2 Tungku Api Bumi: the Earthfire Forge
+
+- **Block** `earthfire_forge`:
+  - shaped recipe `B I B / I C I / D D D` (B blackstone bricks, I iron block, C cauldron, D polished deepslate);
+  - hardness 3.5, any pickaxe, push reaction BLOCK;
+  - no random tick, **no block-state properties, no block entity**; the glow is client FX;
+  - placed and broken only by players.
+- **Menu:** `ExtendedMenuType<ForgeMenu, BlockPos>`; client `ForgeScreen extends AbstractContainerScreen` (jade scroll, `extractRenderState` / `extractContents` / `extractSlots`).
+  - The slots live in the menu, like a crafting table: closing the menu returns them. Materials are consumed only when a job completes.
+  - `stillValid` requires the player within 5 blocks and the block still present.
+- **Heat** is read from the block directly below the forge when the menu opens and every 20 ticks during a channel (read only, loaded chunk):
+
+| Heat below the forge | Nama | Grade cap | Sumber |
+|---|---|---|---|
+| nothing (the player's own qi; qi cost ×2) | **Api Sejati Bawaan** / Innate True Fire | Kuning | RMJ ch. 156 |
+| a lit campfire | **Api Biasa** / Common Fire | Misterius | game design |
+| a magma block | **Api Bumi** / Earth Fire | Bumi | RMJ ch. 156, 928 |
+| a lava source, or a magma block with lava directly beneath it | **Api Paru Bumi** / Earth Lung Fire | Langit | RMJ ch. 156 |
+| as above, with the forge at y < 0 | **Esensi Api Bumi** / Earthfire Essence | Abadi | RMJ ch. 928 (the deep pit) |
+| a lit soul campfire **plus** one `heavenly_flame_seed` consumed per job (or a Fire-Dao player with comprehension ≥ 90) | **Api Surgawi** / Heavenly Flame | Dewa | *Terinspirasi* BTTH Heavenly Flames (20.3.16) |
+
+- **7c glue:** `formasi.stack.Stacking.fieldAtBlock(level, pos, owner).refineChance()` adds to the success chance, and `.refineTime()` scales the channel, the same way `AlchemyBridge` does.
+
+#### 25.5.3 Keahlian Tempa: the forging skill
+
+- `extra.tempa.xp`: +5 × (grade + 1) per success, +2 per failure. **0 XP when the grade's skill gate is more than 2 levels below the forger's level** (anti-grind).
+- Level = `min(10, floor(sqrt(xp / 10)))`. Titles: Ahli Tempa Tingkat 1–9, Grandmaster at 10 (*Terinspirasi dari* Martial Peak's refiner grades; the names are the game's).
+- **Skill gates:** Kuning 0, Misterius 2, Bumi 4, Langit 6, Abadi 8, Dewa 10.
+
+#### 25.5.4 Tempa Baru: forging an artifact
+
+**Slots:** Embryo (sets the form), Metal, Core (sets the element), Catalyst (≤ 2 stones), Herb (optional), Realm material (Bumi and up, read through the A tags).
+
+| Form | Embryo |
+|---|---|
+| Pedang | any vanilla sword |
+| Payung | bamboo block + 4 sticks |
+| Wajan | cauldron |
+| Lonceng | bell |
+
+| Grade | Metal | Core | Realm material (the glue) | Player realm | Qi | Channel |
+|---|---|---|---|---|---|---|
+| Kuning | 4 iron ingots | Low | – | Qi Refining | 20 | 10 s |
+| Misterius | 4 gold ingots + 1 diamond | Low or Mid | – | Foundation | 60 | 15 s |
+| Bumi | 2 diamonds + 2 amethyst blocks | Mid | 2 × `#realm_material/bumi` | Golden Core | 150 | 20 s |
+| Langit | 1 netherite ingot + 2 diamonds | High | 1 × `/langit` | Nascent Soul | 400 | 30 s |
+| Abadi | 2 netherite ingots + 1 echo shard | Raja | 2 × `/abadi` | Deity Transformation | 1,000 | 40 s |
+| Dewa | 4 netherite ingots + 1 nether star | 2 × Raja | 3 × `/dewa` | IA Tahap 7 or True Immortal | 80% of qi | 60 s |
+
+- **Result grade** = the lowest of the heat cap, the material row, the skill gate and the realm gate. The preview card shows which one limits it.
+- **Sub-quality** Rendah / Menengah / Tinggi (0/1/2). Roll `random + 0.1 × (core grade above the minimum) + min(0.3, herb age / 3333)`. Golden Lightning Bamboo counts double for a Pedang (RMJ ch. 1535). Below 0.5 is Rendah, below 0.85 Menengah, otherwise Tinggi.
+- **Success chance** = `0.60 + 0.035 × skill + stones (Low +0.05 each, Mid+ +0.10 each) + 0.05 Fire Dao + assistant + formation field`, capped at 0.95.
+  - **Failure** ("Leburan gagal", smoke FX) loses everything except the embryo and the realm material, and refunds half the qi.
+- **Channel:** runs while the menu is open and the player stays within 4 blocks. A hit above 20% of max HP pauses it; 10 s paused cancels it (materials returned, because they were never consumed).
+- **Output:** `forged_artifact` with component `kultivator:artifact {form, grade, sub, element, refine 0, spirit {stage 0, years 0, kind}, maker, bound}`.
+  - Name example: "Pedang Pusaka Api · Langit Tinggi +0". The tooltip shows stats from the real constants and the Sumber line.
+
+#### 25.5.5 Artifact power and form effects
+
+- **Artifact power:** `AP = base[grade] × (1 + 0.15 × sub) × (1 + 0.08 × refine) × natal (1.25) × spirit (1.1 / 1.25 / 1.5)`, with `base = {1, 1.6, 2.5, 4, 6, 9}`.
+  - **All multipliers apply to AP before the caps below.**
+  - Examples: Kuning Rendah +0 = 1.0; Langit Tinggi +6 = 7.5; Dewa Tinggi +12 = 22.8 before the natal and spirit factors.
+- **Where it works:** a Pedang in the main hand, the other forms in the offhand, or as the natal treasure (always).
+- **One effect per form:** if the natal treasure and a held or linked artifact share a form, only the highest AP applies.
+
+| Form | Effect | Caps |
+|---|---|---|
+| **Pedang** | a real sword: attack damage `6 + 0.6 × AP`, attack speed 1.6. `CasterFactor` `1 + 0.02 × AP` for Sword-Dao specs, half that for other Daos, +0.05 when the element matches the spec. Flying Sword speed +5% per grade | attack ≤ 22; caster product ≤ 1.30 (spine clamp); never in arenas or duels, never against players |
+| **Payung** | every `60 − 4 × grade` s: Absorption with amplifier `floor(grade / 2)` for 10 s (15 s at spirit stage ≥ 2) on the wielder and allies within 4 (players, own disciples, pets) | amplifier ≤ 2 |
+| **Wajan** | damage reduction against monster sources `min(0.25, 0.015 × AP)` (+0.03 against an element it overcomes, 19.3.12), registered through `DamageHooks`; knockback resistance +0.05 per grade | inside the 22.14.3 DR cap; never against unblockable damage |
+| **Lonceng** | each technique cast that hits: Slowness II for 2 s on hostiles within `4 + grade` (the `StatusTracker` diminishing returns); from Abadi also Weakness I | control ×0.25 on bosses; **never affects players** |
+
+#### 25.5.6 Pusaka Natal Diri: binding the natal treasure
+
+- **Requirements:** Golden Core+, an artifact of grade ≥ Misterius (made by anyone and not bound to someone else), 4 Mid stones, and a 30 s meditation while holding it. Use the Pusaka tablet ("Ikat") or `/kultivasi pusaka ikat`.
+- **Effect:** the item vanishes into the body (RMJ ch. 415) and becomes a virtual record in `extra.dunia.natal` (stack NBT + years + kind). Its form effect applies permanently with the ×1.25 factor.
+  - **Pedang Natal melee:** a `kultivator:natal_sword` attack modifier (its sword damage minus the fist) **only while the main hand holds no weapon**. Against players it is capped at +8 and it is off in duels.
+  - Rendering: a back sword (Pedang) or an orbit (the other forms) through C's own player render layer (`LivingEntityFeatureRendererRegistrationCallback`), reusing the 20.3.17 drawing code read-only.
+- **Linked artifacts:** besides the natal treasure, up to **2 more** forged artifacts can be linked (`bound` = owner UUID), for 3 at once (RMJ-IR ch. 345). A linked artifact works only for its owner; anyone else sees "Pusaka ini mengenali tuan lain".
+- **Lepas** (unbind): the treasure returns as an item. 5 min of Qi Deviation (backlash, game design), spirit years −10%, cooldown 1 in-game day.
+- **Refinement and spirit feeding work on the virtual record.** No item is ever created except through Lepas.
+- **Spirit years** ("Umur roh: 340 tahun", shown like herb ages, 19.3.4):
+  - +1 year per minute of meditation;
+  - +0.5 year per technique kill of a **trial mob, rogue or boss**, under Battle Fatigue, at most 50 years per in-game day from kills;
+  - feeding a beast core of its element: Low 5, Mid 15, High 50, Raja 150 years, with a 10 s cooldown.
+
+#### 25.5.7 Roh Senjata: the weapon spirit (natal treasure only)
+
+| Stage | Nama | How | Effect |
+|---|---|---|---|
+| 0 | **Tanpa Roh** / Spiritless | – | – |
+| 1 | **Benih Roh** / Spirit Seed | grade ≥ Langit + 1 `#spirit_seed` fed + 100 years | AP ×1.1; the treasure glows (client) |
+| 2 | **Roh Dasar** / Elementary Spirit (MW ch. 1128) | 400 years (natural), **or at once** with a "Jiwa Binatang" (a Raja core + 1 `#spirit_seed` at the forge, *Roh Buatan*, artificial) | AP ×1.25; **Sahutan** (the spirit acts with its own will): Wajan blocks one monster hit every 30 s; Payung renews itself at 50% HP; Pedang strikes once by itself on your target every 4 s for `0.3 × P` (a virtual strike through `Techniques.hurt`, with its own boss-cap ledger); Lonceng chimes every 6 s (a control pulse without a cast) |
+| 3 | **Roh Lengkap** / Complete Spirit (MW ch. 1128, 1132) | **natural spirits only**: 1,000 years, grade ≥ Abadi, **and** the natal treasure tempered by a tribulation the owner passes while it is bound (MW ch. 1132) | AP ×1.5; Pedang: two strikes every 3 s at `0.5 × P`, chained to a second target; below 30% HP the treasure acts by itself (one Sahutan of its form, cooldown 60 s); a unique epithet in the tooltip |
+
+- **Roh Buatan is capped at stage 2** (Martial Peak concept: artificial spirits are lesser). "Murnikan Roh" at the forge removes it: stage back to 0, years kept.
+- **Safety:** the spirit never hits players, disciples or candidates. Its strikes obey 22.3.5 and target only `Targeting.hostilesAround`.
+- Moments: EXTRA `SPIRIT_AWAKEN` (stages 2 and 3) and `NATAL_BOND`.
+
+#### 25.5.8 Tempa Ulang: refinement +0…+12
+
+At the forge, tab "Tempa Ulang", put in an artifact, or choose "Pusaka Natal" to refine the virtual record in place.
+
+| Level n | Stones | Core (the artifact's element) | Extra |
+|---|---|---|---|
+| 1–3 | `4n` Low | Low | 1 iron ingot |
+| 4–6 | `n − 2` Mid | Mid | 1 gold ingot |
+| 7–9 | `n − 6` High | High | 1 `#realm_material/abadi` |
+| 10–12 (True Immortal with stars ≥ 9 / 18 / 27) | 1 Supreme | Raja | 1 `#realm_material/dewa` |
+
+- **Success** = `0.95 − 0.08 × (n − 1) + 0.02 × skill + 0.05 Fire Dao + assistant + formation field`, between 0.15 and 0.95. The heat must be at least the artifact's grade cap.
+- **Failure:** at n ≤ 3 only the materials are lost; at n ≥ 4 the artifact also drops one level (AWE: failure rises with each step).
+- Each level is +8% AP: +9 = ×1.72, +12 = ×1.96. Tints: silver at +3, gold at +6, azure at +9, white flame at +12.
+- Sumber: RMJ ch. 1237, 1393; AWE ch. 29–38.
+
+**Asisten Tempa (disciples).**
+- The owner assigns a disciple to the forge (activity 12; it stays within 2 blocks): success +0.05.
+- +0.10 instead with the talent **Jari Penempa Roh** (AWE spirit enhancer, 20.3.5).
+- +0.03 more with a Fire root or Fire Dao.
+- The disciple meditates at ×0.5 XP while assigned.
+- The assignment is stored in `DiscipleData.extra().dunia`.
+
+#### 25.5.9 Kuali Hampa Langit: the Heavenvoid Cauldron
+
+- **Its lid cannot be opened** (RMJ ch. 499) until the owner is Nascent Soul+ with forging skill ≥ 6, at a forge with Langit heat: "Buka Tutup", a 60 s channel costing 400 qi.
+- It then yields one **Langit Tinggi embryo** of a chosen form, forged at once with no failure. The cauldron becomes a decorative item.
+- The effect is game design. C finds the item by its registry id, without importing A's classes.
+
+#### 25.5.10 Forge interactions
+
+- The forge menu has 4 vertical tablets: **Tempa Baru · Tempa Ulang · Roh · Cincin** (ring crafting and upgrades, 25.7).
+- In the centre, an anvil drawing with a **heat gauge** naming the fire and its grade cap. Slot rows on the left. On the right, a preview card: result grade and the limiting factor, sub-quality odds, success chance with its parts, qi, channel time.
+- The "Tempa" talisman starts the channel, shown as a progress ring.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.6 D. Desa Bawahan: vassal villages
+
+#### 25.6.1 Sumber / Source
+
+- **A village makes offerings to its guardian after every hunt and prays for protection:** PW ch. 3 "Guardian Spirit". Stone Village holds a solemn sacrifice before the Willow, which never uses the offerings.
+- **The guardian protects the village at night and fights a rival village's guardian:** PW ch. 27. The Willow emits tranquil light at night to protect the village, and its buds pierce the Wolf Village's guardian.
+- **Village youths put forward for a sect's test:** *Terinspirasi dari* RMJ ch. 1–5. Han Li, a poor mountain-village boy, is put forward by his uncle for the entrance test of the Seven Mysteries Sect, a **mortal jianghu martial sect**. This is not a cultivation sect and not a vassal pledge.
+- **Mortal states under the protection and control of sects:** RMJ ch. 263 (the Seven Sects of the State of Yue).
+- **Game design:** the plaque, loyalty, tribute, quests, raids and every number. The trade discount uses vanilla gossip.
+
+#### 25.6.2 Plakat Pelindung Sekte and the pledge
+
+- **Block** `sect_patron_plaque`:
+  - shaped recipe: 2 gold ingots, 3 stone bricks, 2 Low stones, 1 banner;
+  - placed by the player (vanilla placement), push reaction BLOCK, `#kultivator:sect_protected`;
+  - it works only in the Overworld.
+- **Valid** when, at placement:
+  - a `PoiTypes.MEETING` (bell) POI lies within 24 blocks (`PoiManager.findClosest`, loaded sections only);
+  - the owner's active hall level is ≥ 2 and its stele is within `vassalRange` (256; 128–512) in the Overworld;
+  - the village is not already a vassal, and any other pledged centre is ≥ 96 blocks away;
+  - the owner's vassal count is below `1 + floor(hallLevel / 3)` (1–4).
+- **Ujian Kepercayaan: Malam Penjagaan.** At the next nightfall with the owner within 48 blocks (and active within 60 s), 3 small waves of tier-1 rogues (R = raid level − 1) march on the plaque. The breach meter of 25.4.5 applies, rising at most 10 per second; 100 means failure. Villagers are never targeted.
+  - Survived: "Desa ‹nama› bersumpah setia kepada Sekte ‹nama›!" (EXTRA `VILLAGE_OATH`), loyalty 40.
+  - Failed: retry the next night.
+- **Name:** from a 24-name list (`kultivator.desa.name.<n>`), renamable on the card.
+- **Villager count:** only villagers whose `MEETING_POINT` memory equals this bell, counted by bounding box every 200 ticks while a player is within 64, capped at 20.
+- **Lost village:** no bell POI and no counted villagers at a visit → the record is marked lost; tribute stops.
+- **Kehancuran:** every pledged village adds a `ProtectedZones` zone of radius 48 around its bell.
+
+#### 25.6.3 Kesetiaan / loyalty (0–100)
+
+| Change | Amount |
+|---|---|
+| quest completed | +8 … +15 (by type) |
+| village raid repelled with the owner present | +10 |
+| sect raid repelled | +3 to every vassal |
+| Pelindung Desa posted | +2 per in-game day |
+| gift at the plaque (sneak-use): bread, baked potato, cake, Hidangan Roh | +1 per 8 food points (Hidangan Roh counts ×4), at most +5 per day |
+| hall level up | +3 to every vassal |
+| quest expired | −10 |
+| village sacked, sect raid sacked | −10 each |
+| hall dormant | −1 per day |
+| **0** | the village renounces the pledge; the plaque turns inert ("Desa melepaskan diri") |
+
+#### 25.6.4 Upeti / tribute (PW ch. 3 offerings)
+
+- Every 3 in-game days at sunrise, computed lazily, with **at most 3 cycles of catch-up** (no `/time` or sleep exploit).
+- Goes to `Storehouse.insert` (the Lumbung). The rest waits in the village's **`owed` buffer** (≤ 9 stacks) and is retried on the next cycle. Nothing is silently lost.
+- `V = villagers × (0.5 + loyalty / 100)`.
+  - `round(V × 2)` crops (wheat, carrots, potatoes or bread, by weight);
+  - `round(V / 2)` wool or leather;
+  - `floor(V / 4)` emeralds (loyalty ≥ 50);
+  - `floor(V / 6)` iron ingots;
+  - loyalty ≥ 70: 15% chance of a Spirit Grass or Ninecurl Ginseng aged 50–200;
+  - loyalty 100: 2 Low stones.
+- Halved after a sack; skipped while the hall is dormant.
+
+#### 25.6.5 Calon dari desa (candidates)
+
+- Each vassal at loyalty ≥ 50 gives +1 candidate per arrival through `Halls.addCandidateBonusProvider`. The cap of 6 (8 on war days) still holds.
+- These candidates get `originKey` "dari Desa ‹nama›" and Tekad +10 (minimum 40) (*Terinspirasi dari* RMJ ch. 1–5).
+- At loyalty 100, once per 9 days, one candidate with root ≥ MID arrives ("Pemuda Berbakat") through `Halls.addCandidates`.
+
+#### 25.6.6 Permohonan Bantuan: help requests
+
+- One request per vassal every 2–4 in-game days. It expires after 2 days.
+- Delivery: an owner chat line, a toast, and a **Surat Permohonan** (`village_letter`) carrying `minecraft:lodestone_tracker` to the target (the needle points with zero client code). Quests run only while the owner is within 64 blocks of the target.
+
+| Weight | Nama | Task | Reward |
+|---|---|---|---|
+| 35 | **Binatang Iblis di Ladang** | at night an elite (tier 1, tier 2 from hall 5) roams within 48 of the bell. It is an allowlist mob **excluding zombies, drowned, husks and illagers**, made elite with reason `EVENT` and hardened. Kill it | loyalty +10, its normal elite drops, 4 emeralds |
+| 25 | **Sarang Perampok** | clear the bandit camp (25.4.4) | loyalty +15, pool PK +40, pouches |
+| 15 | **Wabah** | sneak-use 2 Healing Pills or 1 Toxin Purging Pill on the plaque | loyalty +10 |
+| 15 | **Panen Gagal** | deliver 32 food points at the plaque | loyalty +8, one tribute cycle at ×1.5 |
+| 10 | **Jaga Malam** | Malam Penjagaan again (2 waves) | loyalty +12 |
+
+- Each completed request adds vanilla gossip **`MINOR_POSITIVE` +5** for the owner with the villagers counted for this bell. Its max is 25 and it decays 1 per day, so there is no permanent price exploit and no block change.
+
+#### 25.6.7 Penjarahan Desa: village raids (PW ch. 27 rival threats)
+
+- One raid roll per vassal every 7–12 days, at night.
+- **Owner within 128 and active:** 2 waves of tier-1/2 rogues march on the plaque (breach meter as in 25.4.5).
+  - Repelled: loyalty +10 and 1 pouch.
+  - Sacked: loyalty −10 and the next tribute halved.
+- **Owner away:** resolved lazily.
+  - With a **Pelindung Desa:** success chance `clamp(0.4 + 0.15 × (disciple realm ordinal − raid level), 0.1, 0.95)`.
+  - Without one: always sacked.
+- Villagers are never targeted. Iron golems may fight rogues (vanilla).
+- **Pelindung Desa** (any rank, including Tercatat):
+  - a **data assignment through `depart`**, like a duty post (no live disciple left standing in an unloaded village);
+  - the disciple appears at the plaque only while the owner is within 64 (`arrive`), then fights raiders and quest elites within 32;
+  - gives +2 loyalty per day;
+  - a repelled raid gives renown +20, because the disciple did it (20.3.1);
+  - at most one per vassal.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.7 E. Cincin Penyimpanan: storage rings
+
+#### 25.7.1 Sumber / Source
+
+- **Storage pouches carry a cultivator's goods and are the spoils of a fight:** RMJ ch. 190, 273, 402.
+- **Storage rings:** BTTH ch. 267 (items taken out of a storage ring) and ch. 1353 (energy cores stored in it).
+- **A spiritual imprint binds a ring:** BTTH ch. 867 (the spiritual imprint on Fang Yan's storage ring disappeared along with him).
+- **Game design:** tiers, slot counts, recipes, the protection of the dropped ring and every rule. Death in Minecraft is not permanent, so the imprint is removed by the owner, not by death.
+
+#### 25.7.2 Tiers
+
+| Tier | Item | Slots | Made at | Recipe | Realm to bind |
+|---|---|---|---|---|---|
+| 0 | **Kantong Penyimpanan** / Storage Pouch | 9 | crafting table | shaped: 3 leather, 1 string, 1 Low stone | anyone (no bond) |
+| 1 | **Cincin Penyimpanan Rendah** | 18 | forge, any heat | 2 gold ingots + a Low core + 4 Low stones (+ an optional pouch, whose contents move over) | Qi Refining |
+| 2 | **Cincin Penyimpanan Menengah** | 27 | forge, Misterius heat | gold block + Mid core + 2 Mid stones + ender pearl + the tier-1 ring | Foundation |
+| 3 | **Cincin Penyimpanan Tinggi** | 36 | forge, Bumi heat | 2 diamonds + High core + 2 High stones + shulker shell + the tier-2 ring | Golden Core |
+| 4 | **Cincin Ruang Agung** / Supreme Spatial Ring | 54 | forge, Langit heat | netherite ingot + Raja core + 1 Supreme stone + 1 `#spirit_seed` + the tier-3 ring | Nascent Soul |
+
+- A **Space-element core** in the recipe adds +9 slots to tiers 1–3, never above 54 (game design, 19.3.12).
+- Upgrades keep the contents and the bond. Success is 100% and the upgrade gives forging XP.
+
+#### 25.7.3 Rules
+
+- **Components:** `kultivator:ring {tier, extra_slots, owner UUID?, owner_name, ring_id UUID}` plus vanilla `minecraft:container`.
+  - `stacksTo(1)`. A unique `ring_id` is set at craft (no merging, no copying the container by splitting a stack).
+  - `canFitInsideContainerItems()` returns false.
+- **Contents:** rings, pouches, shulker boxes and **all bundles** are refused inside a ring, with a message.
+- **Menu:** `RingMenu` over a `RingContainer`, opened through `ExtendedMenuType<RingMenu, RingOpen(slot, rows, tier)>`. Jade-scroll `RingScreen`: 6 rows × 9 + inventory fits 320×240.
+  - **Write-through:** on every change, server side, the inventory slot is looked up **by `ring_id`**. If it is not found, the menu closes and nothing is written. No `ItemStack` reference is ever held.
+  - The ring's own slot is locked: `mayPickup = false` (which also blocks THROW). `clicked` refuses SWAP into that hotbar index and the offhand swap (button 40).
+  - The menu closes on death (`ALLOW_DEATH`) and when another menu opens.
+- **Opening:** sneak-use, the unbound key **"Buka Cincin"** (the highest-tier bound ring in the inventory), or `/kultivasi cincin`.
+- **Bond "Tanam Jejak Jiwa"** (BTTH ch. 867): the first use by a Qi Refining+ player of the required realm costs 10 qi and writes the owner.
+  - Anyone else sees "Jejak jiwa ‹nama› menolakmu" and cannot open it.
+  - **"Hapus Jejak"** (owner only, in the screen) releases the bond.
+  - **"Runtuhkan Ruang"** at a forge (for anyone, 5 Mid stones) erases a foreign bond and **destroys the contents** ("ruang runtuh"). This frees a ring left behind by a player who left the LAN world without making theft possible.
+  - Ops bypass the bond with `uji cincin buka`.
+- **Dropped-ring protection:**
+  - in `ServerEntityEvents.ENTITY_LOAD`, every `ItemEntity` whose stack carries an owned `kultivator:ring` gets `setTarget(owner)` (pickup is owner-only, **permanently**) and `setUnlimitedLifetime()`;
+  - `DAMAGE_RESISTANT` uses C's damage-type tag `#kultivator:ring_immune` (fire, lava, cactus, explosions);
+  - **void:** `ItemEntityBelowWorldMixin` gives the ring back to the owner if online; otherwise it goes into `extra.dunia.ring_rescue` and is returned on join;
+  - known gaps: hoppers, foxes and allays ignore `target`. That is acceptable: a bound ring is useless to anyone else.
+- **Death:** the ring drops under vanilla rules (`storageRingKeepOnDeath`, default false).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.8 Progression glue
+
+#### 25.8.1 The material ladder (each realm feeds the next)
+
+| Player realm | Hunting | Secret realm / event | Its material | Feeds |
+|---|---|---|---|---|
+| Qi Refining – Foundation | Low stones, Spirit Grass, tier-1 rogues, Low cores, pouches | **Lembah Darah-Api** (token from dungeon chests, Jalan ch. 6) | Herba Fondasi | Foundation pills (20.3.11, alt recipe); **Bumi** forging; ring tier 2 |
+| Golden Core | Mid cores, ambushes, the first vassal, the first raid | Heavenvoid fragments (Raja Siluman, Tetua, structures, expeditions) | – | the map to realm 2 |
+| Golden Core – Dao Union | Mid/High stones, High cores | **Aula Hampa Langit** | Kayu Pemelihara Jiwa, Kuali | **Langit** forging; weapon spirit; ring tier 4; Soul Nurturing alt recipe |
+| Deity Transformation – IA T3 | Raja cores, raid Patriarchs | **Tanah Dewa Kuno** (crystal from the DT tribulation and Patriarchs) | Darah Dewa Kuno, +HP | **Abadi** forging; refinement +7…+9; Bone Tempering alt recipe |
+| IA T1 – True Immortal | Supreme stones | **Makam Langit** (sigils from IA tribulations and Patriarchs) | Esensi Energi Makam | **Dewa** forging; refinement +10…+12; Tribulation Warding alt recipe |
+| True Immortal + stars | endless | Makam Langit depth | Esensi, Supreme stones | star condensing discount |
+
+**Alternative alchemy recipes** (glue module D, `AlchemyRecipes`, following 19.3.7; the only new PillKind is `MATA_TERANG`):
+
+| Recipe | Output |
+|---|---|
+| 3 Herba Fondasi + Healing Pill | 1 Foundation Establishment Pill |
+| Kayu Pemelihara Jiwa + Ghast Tear + Glow Berries | 3 Soul Nurturing |
+| Darah Dewa Kuno + Bone Block + Golden Carrot + an Earth core Mid+ | 3 Bone Tempering (its +10 HP cap is unchanged) |
+| Esensi Energi Makam + Echo Shard + Golden Apple | 2 Tribulation Warding |
+| Illusionary Spirit Herb + Spider Eye + Glow Berries | 2 Pil Mata Terang |
+
+#### 25.8.2 Jalan tablet chapters 6–10: "Jalan Dunia"
+
+- They follow chapter 5. The saved bits use a **new int key `goals.guide2`**; the type of the existing `guide` does not change.
+- The GuideTracker, which hides after chapter 5, wakes again for chapter 6 once the player is Foundation+. The hide coin still works.
+- Steps complete from advancements, with backfill on join (19.3.9). Rewards can be claimed once.
+
+| Chapter | Steps (advancement) | Reward |
+|---|---|---|
+| 6 **Dunia Luas** (FE+) | bind a pouch or ring (`first_ring`) · forge an artifact (`first_forge`) · open a realm gate (`realm_gate`) · pledge a village (`village_pledge`) | `token_darah_api` + 4 Low stones |
+| 7 **Penguasa Wilayah** (GC+) | survive an ambush (`ambush_survivor`) · repel a sect raid (`raid_repelled`) · bind a natal treasure (`natal_bond`) · clear the Heavenvoid Hall (`heavenvoid_hall`) | 2 Mid stones + 1 `heavenvoid_fragment` |
+| 8 **Kekuatan Dewa** (DT+) | a Langit artifact (`artifact_langit`) · Roh Dasar (`spirit_elementary`) · absorb a crystal (`ancient_god_crystal`) · defeat a Patriarch (`demonic_patriarch`) | 1 High stone + 1 Darah Dewa Kuno |
+| 9 **Kenaikan** (IA+) | refine to +9 (`refine_9`) · Makam layer 9 (`heavenly_tomb_9`) · 3 vassals (`three_vassals`) · Cincin Ruang Agung (`ring_supreme`) | 1 Supreme stone + 1 tomb sigil |
+| 10 **Abadi** (TI) | Roh Lengkap (`spirit_complete`) · a Dewa artifact (`artifact_dewa`) · Makam layer 81 (`heavenly_tomb_81`) · a village at loyalty 100 (`village_loyal`) | 3 Esensi + the cosmetic title "Penguasa Jalan Dunia" |
+
+All 20 steps of chapters 6–10 grant `world_path_complete`.
+
+#### 25.8.3 Ujian Fondasi row 4 and new chores
+
+- **Trial row 4** (optional; any 3 of the 4 rows now count as "all three" for Fondasi Kokoh):
+
+  | Target | Row 4 |
+  |---|---|
+  | Golden Core | survive 1 ambush |
+  | Nascent Soul | 1 vassal or a Misterius artifact |
+  | Deity Transformation | clear the Aula Hampa Langit |
+  | Dao Union | a Benih Roh or a repelled raid |
+  | IA L1–3 | 9 crystals absorbed |
+  | IA L4–6 | a Tetua killed in a raid |
+  | IA L7–9 | Makam layer `9 × (L − 6)` |
+  | True Immortal | a Dewa artifact or Makam layer 27 |
+
+- **Daily chore pool** (19.3.9 c): kill 2 rogue cultivators · finish 1 village request · forge or refine once · clear 1 realm chamber.
+
+#### 25.8.4 Late-game sinks
+
+- **Star condensing:** each Esensi Energi Makam carried when condensing lowers that star's cost by 2%, at most 10 Esensi per star (−20%). They are consumed (spine cost-modifier hook, filled by the glue).
+- Makam Langit depth is endless and scales with stars.
+- Refinement +10…+12 is gated by stars.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.9 Interactions with existing systems (binding)
+
+- **Elites (19.3.1):**
+  - realm guards come from `makeElite` (no natural roll); quest elites use reason `EVENT`; every elite rule holds;
+  - "elites inside Alam Rahasia" leaves the 19.13 deferred list.
+- **Talismans:** they work inside realms; Return exits the realm (level change). Return is refused inside a raided territory.
+- **Techniques (6c):** everything goes through the choke points. Rogues use the trial-mob rule. The Pedang caster factor never applies in arenas or duels, or against players.
+- **Disciples:**
+  - raid defence: GUARD_HALL, Pelindung, keepers in WASPADA;
+  - realm companions; Asisten Tempa; Pelindung Desa;
+  - their rogue kills credit the master's counters;
+  - they never die in raids or realms (spine #10). Elsewhere, the existing death rules apply.
+- **Hall (6):**
+  - raid state in `HallData.extra.raid`; Catatan log lines;
+  - new hall pages Pertahanan (raid schedule, last 10 results, defence score preview) and Desa;
+  - candidates pause during live raids; renown only through disciples.
+- **Sect construction (6b):** raiders never touch blocks. Placement pauses during a live raid. `BuildPlacer` refuses the realm dimension.
+- **Formations (7c):** see 25.4.5. The forge reads `Stacking.fieldAtBlock`.
+- **Cinematics (7b):** EXTRA beats `REALM_GATE`, `REALM_CLEAR`, `RAID_OMEN`, `SPIRIT_AWAKEN`, `NATAL_BOND` and `VILLAGE_OATH`; BOSS subjects `penjaga_alam` and `tetua_iblis`. All obey 23.1 (no camera shot in danger).
+- **Tribulation:** raids never start during the owner's tribulation. Rogues are never Dao Protectors. A tribulation success can temper the natal spirit (25.5.7) and gives realm keys (25.3.9).
+- **Mode Kehancuran:** inert in the realm dimension and in pledged villages (radius 48); halls are unchanged.
+- **Kejenuhan Bertarung (Battle Fatigue):** rogues +3, realm guards +1.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.10 UI (jade scroll, 320×240)
+
+- **Dunia screen** (`OpenScreen.DUNIA = 7`; `/kultivasi dunia [tab]`; the `dunia` key). Four tablets: **Alam · Pusaka · Musuh · Desa**.
+  - **Alam:** 4 realm seal cards. Each shows the lock reason or "Siap", the key count (e.g. 3/3 fragments), best clear or layer, cooldown, a reward preview, a "Buka Gerbang" talisman (needs the key) and a note when Mode Ringan is on.
+  - **Pusaka:** the natal treasure as a large seal: form glyph, grade ribbon, +refine, element frame, a spirit-years ring like the dantian rings, and the stage. Stat lines come from the real constants. "Ikat" / "Lepas" talismans, 2 linked-artifact slots, and the forging skill bar.
+  - **Musuh:** next raid countdown ("Serbuan berikutnya: hari 31 · Sekte Bulan Darah"), the last 10 encounters (ambush, camp and raid results), and the ambush cooldown.
+  - **Desa:** a compact list of vassals, linking to the hall Desa page.
+- **Forge screen:** 25.5.10. **Ring screen:** 25.7.3.
+- **Hall pages:**
+  - **Pertahanan:** schedule, omen, defence score, raid log;
+  - **Desa:** one scroll card per vassal with name, loyalty bar, villagers, next tribute, owed buffer, active request ("Ambil Surat"), Pelindung Desa (assign or release), last raid; plus a "Penjarahan" log.
+- **HUD:**
+  - realm: a vanilla boss bar (objective plus timer or guardian health);
+  - raid: two boss bars ("Serbuan · Gelombang 3/5 · Musuh 6", and a red "Segel Penjarah" bar);
+  - village request and raid toasts reuse the codex toast slot.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.11 Commands
+
+**Player** (`/kultivasi` = `/cultivate`):
+
+| Command | Effect |
+|---|---|
+| `dunia [alam\|pusaka\|musuh\|desa]` | opens the Dunia screen |
+| `alam daftar` / `alam masuk <id>` (key in the inventory) / `alam keluar` | realms |
+| `pusaka info` / `pusaka ikat` / `pusaka lepas` | natal treasure |
+| `desa daftar` / `desa info <nama>` | vassals |
+| `cincin` | opens the best bound ring |
+| `serbuan info` | the next raid |
+
+**Test** (op; `/kultivasi uji …`; every feature can be tried without grinding):
+
+| Command | Effect |
+|---|---|
+| `uji kit` | + shulker "Fase 8": every key (3 fragments, map, token, crystal, sigil), 4 of each realm material, a Cold Ice Pearl, 4 Pil Mata Terang, a forge, a plaque, a pouch and one ring of each tier, one artifact of each form at Langit +3, 4 loot pouches, the Kuali |
+| `uji alam <id> [lapisan]` | opens that realm at once (no key, no omen, no cooldown) |
+| `uji alam ruang <n>` / `selesai` / `gagal` / `penjaga` | skip to chamber n / win now / expel now / spawn the guardian now |
+| `uji alam ringan <nyala\|mati>` | force Mode Ringan for your next run |
+| `uji alam slot` | prints leased slots and tracked run entities |
+| `uji kristal <n>` | sets the lifetime crystal count |
+| `uji perampok <1-4> [n] [unsur] [varian]` | rogues 6 blocks ahead (R = yours) |
+| `uji perampok hapus` | removes rogues within 64 blocks |
+| `uji sergap` | an ambush now (ignores chance and cooldown, not the safety checks) |
+| `uji serbuan peringatan` / `mulai [gelombang]` / `menang` / `kalah` / `segel <0-100>` / `data` / `jadwal` | omen now / live raid now or from a wave / force an outcome / set the breach meter / resolve as data now / print the schedule |
+| `uji pusaka <bentuk> <tingkat> [sub] [tempa] [roh 0-3] [umur]` | an artifact with those values |
+| `uji pusaka natal` | binds the held artifact without the ritual |
+| `uji tempa tingkat <0-10>` / `uji tempa panas <0-5>` / `uji tempa selesai` | forging skill / pretend heat for 60 s / finish the current channel |
+| `uji roh <tahap>` / `uji roh umur <tahun>` | natal spirit stage / years |
+| `uji cincin <0-4> [penuh]` / `uji cincin buka` | a ring of that tier (optionally filled) / open the ring you look at, ignoring the bond |
+| `uji desa ikrar` | pledges the plaque's village you look at, at once |
+| `uji desa setia <0-100>` / `upeti [siklus]` / `minta <jenis>` / `jarah [hadir\|jauh]` | loyalty / tribute now / a request of that type / a village raid now |
+| `uji jalan bab <1-10>` | extended to 10 |
+| `uji hud dunia` | sample realm and raid boss bars for 10 s |
+
+**Debug (op):** `debug alam info`, `debug perampok info` (the rogue you look at), `debug desa poi` (the bell and the counted villagers around a plaque), `debug tempa panas` (the heat read and the formation field).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.12 Config (clamped on load)
+
+| Field | Default (range) |
+|---|---|
+| `secretRealms` | true |
+| `secretRealmDimension` | true (false = Mode Ringan everywhere) |
+| `secretRealmSlots` | 8 (1–8) |
+| `rogueAmbushes` | true |
+| `rogueAmbushChanceScale` | 1.0 (0–3) |
+| `rogueWorldCap` | 12 (6–16) |
+| `sectRaids` | true |
+| `sectRaidIntervalDays` | 9 (0 off, 5–30) |
+| `raidMaxAlive` | 8 (4–12) |
+| `raidAfkSeconds` | 60 (30–300) |
+| `artifactForging` | true |
+| `storageRings` | true |
+| `storageRingKeepOnDeath` | false |
+| `vassalVillages` | true |
+| `vassalRange` | 256 (128–512) |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.13 Performance budgets
+
+| Budget | Limit |
+|---|---|
+| Added server time | ≤ 0.15–0.2 ms per tick average with 1 player, outside raids |
+| Rogues | ≤ `rogueWorldCap` (12) in the world; vanilla goals; a skill pass every 10 ticks over a tracked UUID set (the elite pattern); robe layer culled beyond 32 blocks on the client |
+| Raid | ≤ `raidMaxAlive`; one hall check per second; spawn points inside simulation distance; live only with the owner present and active |
+| Ambush | one roll per player per 6,000 ticks; ≤ 3 rogues |
+| Realm | ≤ 8 slots; player tickets only (no force-loading); ≤ 12 live mobs and 8 relics per run; ≤ 60 block Displays per chamber, ≤ 4 created per tick; a per-tick floor and wall-grid check per party member; an empty level stops ticking entities after 300 ticks |
+| Villages | `findClosest` radius 48 every 100 ticks per Overworld player; villager count every 200 ticks while within 64; tribute and raids lazy on game time |
+| Forge | one `getBlockState` per 20 ticks while the menu is open; no ticking block entity |
+| Rings | zero ticking; data moves only on clicks |
+| Natal strikes | one entity query per strike (at most 1 per 3 s) |
+| `DuniaSync` | ≤ 8 KB, only when a screen opens or the data changes |
+| Client | auras and banners through `FxBudget` and Effect Quality; ≤ 8 rogue auras within 32 blocks; realm sky through `SkyDirector` grades |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.14 Data keys
+
+| Where | Key | Owner |
+|---|---|---|
+| player `extra.dunia` | `realm {<id>: {best, clears, cd}}`, `ret`, `crystals`, `luka_until` | P8-alam |
+| player `extra.dunia` | `natal {stack, years, kind, tempered}`, `linked [uuid]`, `bind_cd`, `ring_rescue [stacks]` | P8-tempa |
+| player `extra.dunia` | `ambush_cd`, `rogue_kills` | P8-musuh |
+| player `extra.tempa` | `xp`, `made`, `refined` | P8-tempa |
+| player `extra.goals` | `guide2` (int bits for chapters 6–10), `row4` | P8-desa (glue) |
+| `HallData.extra` | `raid {next_day, omen, state, wave, meter, sect, count, log[10]}` | P8-musuh |
+| SavedData `kultivator:vassals` (Overworld) | per owner: `[{id, plaque, bell, name, loyalty, villagers, next_tribute, owed[≤9], request {type, pos, expires}, guard uuid, last_raid, sacked, lost}]` | P8-desa |
+| memory only | realm slot leases, live runs, live raid state, camp spawns | owners above |
+| `DiscipleData.extra()` | `dunia {activity: forge\|village, ref}` | P8-tempa (forge) / P8-desa (village) |
+| item components | `kultivator:artifact {…}`, `kultivator:ring {…}`, `minecraft:container` (rings), `minecraft:lodestone_tracker` (letters) | P8-tempa, P8-desa |
+| entity | `kultivator:rogue_cultivator` (never saved); tags `kultivator.rogue`, `kultivator.realm_guard`, `kultivator.realm_relic`, `kultivator.boss` | P8-musuh, P8-alam |
+| session `sessionExtra` | `alam {id, room, rooms, end, obj}`, `raid {wave, waves, meter, alive}` | P8-alam, P8-musuh |
+| tags | `#kultivator:realm_material/{bumi,langit,abadi,dewa}`, `#kultivator:spirit_seed` (A); `#kultivator:raid_safe` (B, item ids listed in this doc); `#kultivator:ring_immune` damage types (C) | as listed |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.15 Modules and contracts (no module edits another module's files)
+
+| Module | Owns (new files) | Exclusive edits of existing files |
+|---|---|---|
+| **P8-alam** | `alam/*`: `Alam`, `RealmSpec`, `RealmSpecs`, `Slots`, `RealmRun`, `Chambers`, `WallGrid`, `ProjectedRealm`, `RealmRelicEntity`, `AlamEntities`, `RealmGuard` (DeathGuard REALM + disciple guard + prevention hooks), `ReturnPoint`, `AlamItems`, `AlamLoot`, `AlamFxIds`, `AlamTests`. `client/alam/*`: `AlamClient`, `AlamPage`, `RealmScenery`, `AlamFx`, `TreasureScreen`. Data: `dimension/alam_rahasia.json`, `dimension_type/alam_rahasia.json`, `tags/item/realm_material/*`, `tags/item/spirit_seed.json`, loot modifiers. Assets, advancements, `lang-src/alam.*` | none |
+| **P8-musuh** | `musuh/*`: `Musuh`, `RogueCultivatorEntity`, `RogueCultivators`, `RogueAi`, `RogueSkills`, `RogueTargets`, `Ambushes`, `Camps`, `SectRaids`, `RaidState`, `LootPouches`, `MusuhFxIds`, `MusuhTests`. `client/musuh/*`: `MusuhClient`, `RogueRenderer`, `MusuhPage`, `PertahananPage`, `MusuhFx`. Loot tables, `tags/item/raid_safe.json`, advancements, `lang-src/musuh.*` | none (uses the spine providers) |
+| **P8-tempa** | `tempa/*`: `Tempa`, `EarthfireForgeBlock`, `ForgeMenu`, `Forging`, `Heat`, `ArtifactItem`, `ArtifactEffects`, `NatalTreasureSelf`, `WeaponSpirit`, `Refine`, `StorageRingItem`, `RingMenu`, `RingContainer`, `RingProtection`, `mixin/ItemEntityBelowWorldMixin`, `TempaMenus`, `TempaFxIds`, `TempaTests`. `client/tempa/*`: `TempaClient`, `ForgeScreen`, `RingScreen`, `PusakaPage`, `NatalRenderLayer`, `TempaFx`. Recipes, block assets, block loot table, `tags/damage_type/ring_immune.json`, advancements, `lang-src/tempa.*` | none (Wajan DR through the existing `DamageHooks` registration API; if absent, the spine adds it) |
+| **P8-desa + glue** | `desa/*`: `Desa`, `PatronPlaqueBlock`, `Vassals`, `VillageScan`, `Pledge`, `Tribute`, `Requests`, `VillageRaids`, `VillageGuards`, `DesaFxIds`, `DesaTests`. `client/desa/*`: `DesaClient`, `DesaPage`, `HallDesaPage`, `DesaFx`. Advancements, `lang-src/desa.*`, `lang-src/jalan8.*` | `goals/Guide`, `goals/Goals`, `goals/DailyChores`, `goals/RealmTrials`, `client/screen/JalanPage`, `client/screen/HelpPage` (topic list; each module writes its own topic text keys), `alchemy/AlchemyRecipes`, `alchemy/PillKind` (+`MATA_TERANG`), `alchemy/PillEffects` (Mata Terang → `Alam.grantClearSight`) |
+
+**Public contracts (spine stubs, filled by the owner):**
+```java
+// spine
+DeathGuard.Stage.REALM
+TechniquePower.TAG_ROGUE ; TechniquePower.CasterFactor ; TechniquePower.addCasterFactor(CasterFactor)
+DiscipleHooks.addDeathGuard(DiscipleDeathGuard)
+Halls.addRecruitPauseProvider(Predicate<UUID>) ; Duties.addOutputFactorProvider(ToDoubleFunction<UUID>)
+ReturnTalisman.addRefusalProvider(Function<ServerPlayer, @Nullable Component>)
+EliteMonsters.addDropProvider(EliteDropProvider) ; Tribulation.addSuccessListener(...) ; Stars.addCostModifier(...)
+// P8-alam
+boolean Alam.inRun(ServerPlayer) ; boolean Alam.isRealmLevel(Level) ; @Nullable String Alam.activeRealm(ServerPlayer)
+boolean Alam.enter(ServerPlayer, String realmId, boolean free) ; int Alam.clears(ServerPlayer, String realmId)
+void Alam.grantClearSight(ServerPlayer, int ticks) ; void Alam.addClearListener(ClearListener) // onClear(ServerPlayer, String id, int layer, boolean first)
+// P8-musuh
+boolean RogueCultivators.isRogue(Entity) ; int RogueCultivators.tier(Entity)            // 0 none, 1–4
+@Nullable Mob RogueCultivators.spawn(ServerLevel, Vec3, int tier, int realm, int variant, int role, @Nullable BlockPos home)
+int RogueCultivators.spawnBand(ServerLevel, Vec3 center, int[] tiers, int realm, int role, @Nullable BlockPos home, Consumer<Boolean> onCleared)
+boolean SectRaids.active(UUID owner) ; int SectRaids.meter(UUID owner) ; void SectRaids.addListener(RaidListener) // onWarn, onStart, onEnd(repelled)
+int SectRaids.raidLevel(UUID owner)
+// P8-tempa
+@Nullable ItemStack NatalTreasureSelf.of(ServerPlayer) ; int NatalTreasureSelf.grade(ServerPlayer) // -1 none
+double ArtifactItem.power(ItemStack) ; ItemStack ArtifactItem.create(String form, int grade, int sub, int refine)
+@Nullable UUID StorageRingItem.bondOwner(ItemStack) ; ItemStack StorageRingItem.create(int tier, @Nullable UUID owner)
+int Forging.skillLevel(ServerPlayer)
+// P8-desa
+int Vassals.count(UUID owner) ; int Vassals.maxLoyalty(UUID owner) ; List<VillageView> Vassals.views(UUID owner)
+// record VillageView(BlockPos bell, String name, int loyalty, int villagers, boolean threatened)
+```
+
+- **Cross-module wiring:**
+  - D calls `RogueCultivators.spawnBand` for camps, trust nights and village raids, and `SectRaids.addListener` for loyalty;
+  - glue steps read advancements only;
+  - C reads A's tags and A's item ids through the registry;
+  - B's `raid_safe` tag lists A's and C's item ids as strings.
+- **Order of work:** spine → the four modules in parallel (no Gradle) → one compile (`compileJava`, `compileClientJava`, `jar --no-daemon`; never tests, runClient or build) → fix pass → docs (`docs/uji/FASE-8.md`, PANDUAN).
+- **May slip to a later phase without breaking contracts:**
+  - alam: Mode Ringan maze projection, the `ant_field` alternative;
+  - musuh: two-direction raids, camp smoke FX;
+  - tempa: the Kuali opening channel (it could open instantly), the ring void-rescue mixin, Runtuhkan Ruang;
+  - desa: gift loyalty, the Panen Gagal request.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.16 Advancements (`docs/ADVANCEMENT_TEMPLATE.json`; parent in brackets)
+
+| Id | Nama (id_id) | When |
+|---|---|---|
+| `realm_gate` | Gerbang Alam Rahasia | first realm gate opened (`first_breakthrough`) |
+| `blood_fire_trial` | Lolos Darah dan Api | realm 1 cleared |
+| `heavenvoid_hall` | Aula Hampa Langit | realm 2 cleared |
+| `cauldron_opened` | Tutup Kuali Terbuka | Kuali opened |
+| `ancient_god_crystal` | Kristal Dewa Kuno | first crystal absorbed |
+| `seventy_crystals` | Tujuh Puluh Kristal | 70 crystals |
+| `heavenly_tomb_9` | Lapisan Kesembilan | Makam layer 9 |
+| `heavenly_tomb_81` | Delapan Puluh Satu Lapisan | Makam layer 81 |
+| `rogue_slain` | Kultivator Liar Tumbang | first rogue killed (`first_elite`) |
+| `ambush_survivor` | Lolos Penyergapan | an ambush of 3 or more cleared |
+| `raid_repelled` | Gerbang Tak Tertembus | live raid repelled (`sect_gate_open`) |
+| `raid_flawless` | Tanpa Segel | raid repelled with the meter at 0 |
+| `demonic_patriarch` | Patriark Tumbang | Patriarch slain |
+| `first_forge` | Tungku Pertama | first artifact (`first_alchemy`) |
+| `artifact_langit` | Pusaka Langit | Langit artifact |
+| `artifact_dewa` | Pusaka Dewa | Dewa artifact |
+| `refine_9` | Tempa Sembilan | refinement +9 |
+| `natal_bond` | Pusaka Natal | natal treasure bound |
+| `spirit_elementary` | Roh Terjaga | spirit stage 2 |
+| `spirit_complete` | Roh Lengkap | spirit stage 3 |
+| `first_ring` | Jejak Jiwa | first bound ring (`root_tested`) |
+| `ring_supreme` | Cincin Ruang Agung | tier-4 ring |
+| `village_pledge` | Sumpah Desa | first vassal (`sect_gate_open`) |
+| `village_loyal` | Desa Setia | loyalty 100 |
+| `three_vassals` | Tiga Desa | 3 vassals |
+| `world_path_complete` | Jalan Dunia Tuntas | Jalan chapters 6–10 (`guide_complete`) |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.17 Daftar uji untuk `docs/uji/FASE-8.md`
+
+**A. Alam Rahasia**
+1. `uji alam blood_fire_trial` saat Pemurnian Qi: omen 10 detik, lalu pindah ke lantai datar dimensi `kultivator:alam_rahasia`. Bilah bos menampilkan "Ruang 1/3" dan waktunya. Saat Inti Emas, gerbang ditolak dengan pesan "Pembatasan kedua menolakmu".
+2. Di dalam alam tidak bisa memecah atau menaruh blok, memakai ember, mutiara ender, korus, wind charge, ranjang atau peti. Kehancuran tidak bekerja. Lantainya sama persis setiap kali slot dipakai ulang.
+3. Pukulan mematikan: keluar dengan 1 HP, mendapat Luka Alam 5 menit, kunci masih ada, Totem tidak terpakai. `/kill` tetap membunuh seperti biasa.
+4. Lompat keluar batas panggung: didorong balik pada jarak 32 blok dan diteleport ke bantalan pada jarak 48. Jatuh di bawah lantai: langsung kembali ke bantalan, tidak mati.
+5. Keluar dari game di dalam alam lalu masuk lagi: dikirim ke titik asal pada tick berikutnya tanpa hukuman. Pemain kreatif tidak dikirim pulang.
+6. Aula Hampa Langit: Jalan Lava (Mutiara Es Dingin atau Fire Resistance memotong separuh), Labirin Ilusi (Pil Mata Terang atau Indra Ilahi menandai pintu asli, bayangan terlihat), tiga gerbang batu (satu "tidak ada harta"), lalu penjaga dengan bilah bos. Menang memberi Kuali Hampa Langit, peta habis terpakai.
+7. Tanah Dewa Kuno: setiap kristal memberi +0,25 HP permanen. Setelah `uji kristal 71`, kristal berikutnya butuh 30 detik. Kristal Es Warisan habis saat menang dan tetap ada saat gagal.
+8. Makam Langit: lapisan 9 memberi penjaga, batu Agung, inti Raja dan lencana hanya pada rekor baru. Mengulang lapisan lama memberi separuh Esensi.
+9. `uji alam ringan nyala` (atau `secretRealmDimension=false`): alam turun di sekitar pemain dan tidak ada satu blok pun yang berubah. Meninggalkan cincin lebih dari 5 detik menggagalkan run tanpa Luka Alam.
+10. Bawa 2 murid Dalam+ (murid FOLLOW lain tidak ikut): mereka masuk lewat depart/arrive, tidak pernah mendapat Papan Arwah di dalam, dan pulang di samping guru. Setelah server dimulai ulang, tidak ada murid tertinggal di dimensi alam.
+
+**B. Kultivator Liar dan Serbuan**
+11. `uji perampok 1` sampai `4`: model murid bertopeng dengan warna trim per tingkat, tingkat 4 memiliki bilah bos. Mereka tidak pernah menyerang penduduk desa, hewan, peliharaan atau pemain kreatif, tidak membuka pintu dan tidak memungut barang. Namanya muncul tanpa custom name.
+12. Saat Inti Emas, perampok tingkat 3 (sekitar 197 HP) kena aturan trial-mob. Formasi pembunuh 7c mengenai perampok dengan ×0,6. Kill oleh formasi tidak memberi XP atau jarahan.
+13. `uji sergap`: peringatan bahaya 3 detik, lalu 1–3 perampok di depan. Menang memberi Kantong Rampasan. Tidak ada penyergapan di Peaceful, di atas perahu, saat terbang atau di dekat desa.
+14. `uji serbuan peringatan`: panji hitam terlihat dan tidur ditolak pada malam serbuan. `uji serbuan mulai`: gelombang datang dari tepi wilayah di dalam jarak simulasi, dengan bilah "Gelombang 1/N" dan bilah merah Segel Penjarah yang naik saat perampok dekat prasasti.
+15. Murid GUARD_HALL, Pelindung Sekte dan formasi ikut bertahan. Murid yang "mati" menjadi Terluka, bukan Papan Arwah. Calon menghilang selama serbuan dan kembali setelahnya.
+16. `uji serbuan menang`: PK, Kantong Rampasan Sekte Iblis, dan ketenaran hanya jika ada murid yang menyerang. `uji serbuan kalah`: paling banyak 3 tumpuk Lumbung hilang (kunci, cincin dan pusaka aman), Kas Daya berkurang sesuai batas, tidak ada blok berubah.
+17. Pemilik AFK lebih dari 60 detik atau berada di luar wilayah: serbuan diselesaikan sebagai data saat fajar (`uji serbuan data`), dengan peluang sesuai skor pertahanan.
+18. Dengan 12 perampok hidup di dunia, perampok baru masuk antrean.
+
+**C. Tempa dan Pusaka Natal**
+19. Tungku di atas magma menampilkan "Api Bumi · batas Bumi". Di atas lava pada y < 0 menampilkan "Esensi Api Bumi · batas Abadi". Tanpa apa pun di bawahnya: Api Sejati Bawaan dengan biaya qi ×2.
+20. Tempa pedang Kuning: hasilnya pedang dengan kerusakan dan baris Sumber. Saat gagal, bahan hilang kecuali embrio. Menutup layar di tengah proses mengembalikan semua bahan. Memecah tungku tidak menggandakan barang.
+21. `pusaka ikat` saat Inti Emas: pedang masuk ke tubuh dan tampak di punggung. Bonus serangan hanya berlaku saat tangan utama kosong (tanpa senjata), tidak berlaku saat duel, dan paling banyak +8 melawan pemain. `pusaka lepas`: kembali menjadi item, deviasi 5 menit, cooldown 1 hari.
+22. Tempa Ulang +4 gagal turun ke +3. Pada +9 warnanya biru langit. Pedang Dewa Tinggi +12 natal tetap berhenti di serangan 22.
+23. Roh Buatan (Jiwa Binatang) langsung menjadi Roh Dasar dan tidak pernah Lengkap. Roh alami 1.000 tahun pada pusaka Abadi yang ikut lolos satu kesengsaraan menjadi Roh Lengkap, dan pedang menyerang sendiri. Serangannya tidak pernah mengenai pemain atau murid.
+24. Murid dengan bakat Jari Penempa Roh sebagai asisten: kartu pratinjau menampilkan peluang +0,10.
+25. Faktor kaster total tidak pernah melebihi 1,30 (cek dengan `debug` kerusakan), dan Wajan maksimum DR 0,25.
+
+**D. Desa Bawahan**
+26. Taruh plakat ≤ 24 blok dari lonceng, dalam 256 blok dari aula level ≥ 2: Malam Penjagaan, lalu desa bersumpah setia. Plakat kedua di desa yang sama (< 96 blok) ditolak.
+27. Upeti masuk Lumbung tiap 3 hari. `/time add` besar hanya memberi paling banyak 3 siklus. Lumbung penuh membuat sisa menunggu di buffer `owed`, tidak hilang.
+28. Kesetiaan ≥ 50 memberi +1 calon dengan label "dari Desa …" dan Tekad +10.
+29. `uji desa minta sarang`: surat dengan jarum kompas menunjuk ke sarang. Setelah dibersihkan, kesetiaan +15 dan harga dagang turun sedikit lalu pulih perlahan (MINOR_POSITIVE).
+30. `uji desa minta binatang`: elite tidak pernah berupa zombi, drowned, husk atau illager, dan tidak ada penduduk yang berubah.
+31. `uji desa jarah jauh` tanpa Pelindung Desa: desa dijarah dan upeti separuh. Dengan murid Tercatat sebagai Pelindung Desa, ada peluang berhasil, dan murid hanya muncul saat pemilik dalam 64 blok.
+32. Kehancuran murid tidak pernah memahat desa yang bersumpah (radius 48).
+
+**E. Cincin**
+33. Kantong 9 slot, Cincin Rendah 18 sampai Agung 54. Peningkatan di tungku menyimpan isi dan ikatan. Inti Ruang memberi +9 slot.
+34. Pemain lain tidak bisa membuka cincin terikat. Cincin yang jatuh tahan lava dan ledakan, tidak hilang dimakan waktu, dan hanya pemilik yang bisa memungutnya. Cincin yang jatuh ke void kembali ke pemilik.
+35. Cincin, kotak shulker dan bundel tidak bisa dimasukkan ke dalam cincin. Saat cincin terbuka: membuang, menukar ke offhand atau menekan angka hotbar ke slot cincin ditolak. Mati saat layar terbuka menutup layar dan tidak terjadi duplikasi. Cincin tidak bisa ditumpuk.
+
+**F. Lem progresi**
+36. `uji jalan bab 5` lalu naik ke Fondasi: pelacak panduan muncul lagi untuk bab 6. Hadiah bab 6–10 hanya bisa diambil sekali.
+37. Ujian Fondasi menampilkan baris ke-4. Tiga dari empat baris selesai sudah memberi "Fondasi Kokoh".
+38. Esensi Energi Makam di tas saat memadatkan bintang: biaya turun 2% per esensi (maksimum −20%), dan esensinya habis.
+39. Resep alternatif (Herba Fondasi → Pil Fondasi, Kayu Pemelihara Jiwa, Darah Dewa Kuno, Esensi) muncul di Buku Alkimia.
+
+**G. Keamanan dan performa**
+40. Di luar dimensi alam, tidak ada blok yang berubah oleh fitur fase 8 (cek ladang, pintu, lonceng, tungku, plakat). `grep setBlock` di paket `alam`, `musuh`, `tempa` dan `desa` kosong.
+41. Serbuan 8 musuh dengan formasi aktif: server tetap mendekati 20 TPS di laptop. Dimensi alam yang kosong tidak menambah beban (tidak ada chunk yang dipaksa termuat).
+42. Setiap item, tingkat perampok, alam, ruang, tingkat pusaka, tahap roh, cincin dan mekanik desa punya baris Sumber dalam `id_id` dan `en_us`.
+43. Tidak ada perubahan cuaca, waktu atau LightningBolt dari fitur fase 8. Dimensi alam memakai waktu overworld (tidak ada waktu tetap).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 25.18 Dropped and reworded (from GAME, ARCH, LORE and CRITIC)
+
+| Item | Was | Now | Reason |
+|---|---|---|---|
+| Realm arena | GAME: `ArenaBuilder` builds blocks in leased slot boxes (third exception) | floor from world generation, chambers as entity mechanics; `ArenaBuilder` deferred pending the user's explicit OK | CRITIC/ARCH: zero new `setBlock` paths, no build tickets, no light updates |
+| Realm dimensions | ARCH: 3 themed dimensions | 1 dimension, themed by the client sky grade | each `LevelStem` is a full `ServerLevel` |
+| Dimension JSON | GAME: `has_raids`, `bed_works`, `respawn_anchor_works`, custom biome; ARCH: `has_fixed_time: true` | 26.3 attributes, `minecraft:the_void`, `has_fixed_time: false` | those fields do not exist in 26.3; no fixed time |
+| `ghost_fog` chamber | GAME: RMJ wiki "fog with hostile ghosts" | dropped; its phantoms live in `illusion_maze` (RMJ ch. 1126) | LORE: no verification in any language |
+| Path of Fire, Glacial Ice Pearl | GAME names | **Jalan Lava / Lava Road**, **Mutiara Es Dingin / Cold Ice Pearl** (`cold_ice_pearl`), *Terinspirasi*, no chapter | LORE: 熔岩路, 寒冰珠; the pearl was Man Huzi's own item |
+| Fire Resistance halving | game design | backed by the Fire-Avoiding Treasure Robe (*Terinspirasi*) | LORE bonus |
+| Black desert of Ironfire Ants | GAME | lava field with Ironfire Ants (`ant_field`), *Terinspirasi* | LORE: the desert is unverified, the ants are canon |
+| Soul Nurturing Tree in the inner hall | GAME | Soul Nurturing Wood, one of the Three Divine Woods, with no location claim | LORE |
+| "Golden page" as a trial reward | GAME (ch. 213) | "Han Li obtains a golden page (ch. 213)"; the realm reward is a game-design homage | LORE |
+| Stone gates "empty" | GAME | "no treasure was found" | LORE wording |
+| Luka Alam source | PW ch. 339–345 | PW ch. 345 | LORE: narrower cite |
+| Village youths | RMJ ch. 1–5 as a sect test | *Terinspirasi*: a mortal jianghu sect's entrance test, no vassal claim | LORE |
+| Gold Lightning Bamboo "refined into" | GAME | "Golden Lightning Bamboo transformed into 72 azure swords" | LORE wording |
+| Earthfire Hall "low-grade tools" | GAME | "low-grade spirit tools" | LORE wording |
+| Weapon spirit "attacks on its own" | GAME (MW ch. 1128) | "acts with its own will"; Roh Lengkap also needs a tribulation tempering (MW ch. 1132) | LORE |
+| BTTH ch. 1352 | "energy created by insects" | "possibly, in part" | LORE wording |
+| RMJ ch. 263 | invasion caused the conscription | the two are set side by side | LORE wording |
+| `TAB_DUNIA` in CultivationScreen; `OpenScreen.FORGE=5`, `RING=6` | GAME | `OpenScreen.DUNIA = 7` as its own screen; forge and ring as `ExtendedMenuType` | CRITIC: id collisions, too many tablets |
+| Actions 25–27 | GAME | 38–41 | CRITIC: keep the 23–29 range for P7 |
+| DeathGuard REALM after PERK | ARCH | after DUEL, before TRIBULATION | CRITIC: totems and cheat-death charges would be spent |
+| `DeathGuard.addDeathListener`, soulbound natal and rings, `natal:toggle` key | ARCH | dropped; virtual natal (GAME); rings drop on death | CRITIC: duplication and keepInventory |
+| Forge block entity | ARCH | menu-only forge, materials consumed on completion | CRITIC: refund duplication |
+| Ring seal erase keeps contents | ARCH | "Runtuhkan Ruang" destroys the contents; otherwise only the owner's Hapus Jejak | CRITIC: theft |
+| Ring owner lock for 10 min | GAME | permanent `setTarget` in `ENTITY_LOAD` + unlimited lifetime + void mixin | CRITIC: vanilla has no expiry |
+| Village gossip `MAJOR_POSITIVE` +10 | GAME | `MINOR_POSITIVE` +5 | CRITIC: permanent minimum prices |
+| Tribute overflow lost; unbounded catch-up | GAME / ARCH | ≤ 3 cycles, `owed` buffer ≤ 9 stacks | CRITIC |
+| Pelindung Desa as live activity 13 | GAME | data assignment through `depart`, entity only near the owner | CRITIC: saved in unloaded chunks, attacked at night |
+| Sack loses 25% of the Lumbung | GAME | ≤ 3 stacks, `#raid_safe` excluded, capped stone loss | CRITIC |
+| Raid absent rule "retreat after 2 nights" | GAME | sleep refused on raid night; absent or AFK owner → data resolution | CRITIC: skipping and AFK sacking |
+| Ambush roll every 600 ticks | ARCH | every 6,000 ticks, capped at 15%, 1-day cooldown, extra skips | CRITIC |
+| Rogue `PathfinderMob` / custom names | GAME | `extends Monster`, `getTypeName()` only | CRITIC: formations skip custom names |
+| `isTrialMob` + `realm_guard` tag | GAME | only `TAG_ROGUE` added | CRITIC: realm guards already carry `TAG_ELITE` |
+| Pedang `6 + 1.5 × AP` stacking with the held sword | GAME | `6 + 0.6 × AP`, cap 22; natal melee only with no weapon in hand, +8 cap vs players, off in duels | CRITIC: balance |
+| Multipliers after the caps; caster cap 1.40 | GAME | all multipliers before the caps; caster product ≤ 1.30; one effect per form | CRITIC |
+| Payung amplifier `min(4, 1 + AP/4)` | GAME | `floor(grade/2)`, max 2 | CRITIC |
+| Lonceng affects players | implicit | never affects players | CRITIC |
+| Realm 1 repeat: 2 herbs | GAME | 1 herb | CRITIC |
+| Crystal key not consumed; Makam rewards on replay | GAME | crystal consumed on success; 9k rewards only on new best; replay gives half Esensi | CRITIC: loot loops |
+| Forging XP from any grade | GAME | 0 XP for grades more than 2 levels below the forger's level | CRITIC |
+| Spirit years from any kill | GAME | trial mobs, rogues and bosses only, ≤ 50 years per day | CRITIC |
+| FOLLOW disciples auto-follow into realms | ARCH | depart/arrive only; `onChangeLevel` skips realm levels; sweeps at run end and server start | CRITIC |
+| Quest elites near villagers | GAME | zombies, drowned, husks and illagers excluded | CRITIC: villager conversion |
+| `bahan_alam/t1..t9` tags | ARCH | named items + 5 tags (`realm_material/*`, `spirit_seed`) | fits GAME's 4-realm ladder |
+| Utus Perekrut +1 candidate per vassal | GAME | dropped | it needed an edit to `Envoys`; the candidate provider covers villages |
+| Custom right-edge raid HUD | GAME | vanilla boss bars | ARCH: zero client HUD code |
+| `REALM_GATE` and other moment ids | GAME | EXTRA (14) beat sub-ids + BOSS subjects | CRITIC: `EpicIds` has no such ids |
+| ISSTH spirit refining, Mount Hua Huayin patronage, Coiling Dragon blood ring, a BTTH tomb layer structure | early GAME drafts | already replaced (RMJ/AWE, PW Stone Village, BTTH ch. 867, game-design layers) | unverifiable |
