@@ -70,6 +70,8 @@ public final class EpicHooks {
 	public static final int TRAMPLING_DELAY = 120;
 	/** Saved key in {@code extra()}: {@code {firsts: long, kills: int}}. */
 	public static final String SAVED_KEY = "momen";
+	/** The tag of secret realm guards (owned by P8-alam, DESIGN 25.14); a guardian also carries {@code kultivator.boss}. */
+	private static final String REALM_GUARD_TAG = "kultivator.realm_guard";
 
 	static final int TAG_TRIB = 1;
 	static final int TAG_TEST = 2;
@@ -505,6 +507,13 @@ public final class EpicHooks {
 		}
 		if (entity.entityTags().contains(TechniquePower.TAG_BOSS) && entity.entityTags().contains(TechniquePower.TAG_TRIAL_GUARD)) {
 			return EpicIds.BOSS_INHERITANCE;
+		}
+		// Phase 8 (DESIGN 25.2 item 15): realm guardians and the Demonic Patriarch.
+		if (entity.entityTags().contains(TechniquePower.TAG_BOSS) && entity.entityTags().contains(REALM_GUARD_TAG)) {
+			return EpicIds.BOSS_REALM_GUARDIAN;
+		}
+		if (entity.entityTags().contains(TechniquePower.TAG_BOSS) && entity.entityTags().contains(TechniquePower.TAG_ROGUE)) {
+			return EpicIds.BOSS_DEMONIC_ELDER;
 		}
 		return EliteMonsters.tier(entity) == 3 ? EpicIds.BOSS_DEMON_KING : -1;
 	}

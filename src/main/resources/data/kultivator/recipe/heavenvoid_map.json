@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "kultivator:heavenvoid_fragment",
+    "kultivator:heavenvoid_fragment",
+    "kultivator:heavenvoid_fragment"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:heavenvoid_map"
+  }
+}

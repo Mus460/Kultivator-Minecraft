@@ -121,6 +121,48 @@ public final class TechniquePower {
 	public static final String TAG_TRIAL_GUARD = "kultivator.trial_guard";
 	/** Elite demonic beasts (DESIGN 19.2.8, 19.3.1): trial-mob rule, never {@link #TAG_BOSS}. */
 	public static final String TAG_ELITE = "kultivator.elite";
+	/** Rogue cultivators (DESIGN 25.1.2, phase 8): trial-mob rule; the Patriarch also carries {@link #TAG_BOSS}. */
+	public static final String TAG_ROGUE = "kultivator.rogue";
+	/** The product of all {@link CasterFactor}s is clamped to this range on its own (DESIGN 25.2 item 6). */
+	public static final double CASTER_FACTOR_MIN = 0.8D;
+	public static final double CASTER_FACTOR_MAX = 1.30D;
+
+	/**
+	 * A phase-8 factor of the attacker (DESIGN 25.2 item 6: the Pedang artifact, Luka Alam). Only used for the coefficient
+	 * branch of {@link #finalDamage}, never in an arena or duel, never against players. Server only.
+	 */
+	public interface CasterFactor {
+		double factor(LivingEntity attacker, @Nullable TechniqueSpec spec, LivingEntity target);
+	}
+
+	private static final List<CasterFactor> CASTER_FACTORS = new CopyOnWriteArrayList<>();
+
+	/** Adds a caster factor (DESIGN 25.2 item 6); register from a module's {@code init()}. */
+	public static void addCasterFactor(CasterFactor factor) {
+		CASTER_FACTORS.add(factor);
+	}
+
+	/** The product of every {@link CasterFactor}, clamped to {@link #CASTER_FACTOR_MIN}..{@link #CASTER_FACTOR_MAX} (1 without any). */
+	public static double casterFactor(LivingEntity attacker, @Nullable TechniqueSpec spec, LivingEntity target) {
+		if (CASTER_FACTORS.isEmpty()) {
+			return 1.0D;
+		}
+		double product = 1.0D;
+		for (CasterFactor factor : CASTER_FACTORS) {
+			double value;
+			try {
+				value = factor.factor(attacker, spec, target);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("Kultivator caster factor failed", exception);
+				continue;
+			}
+			if (Double.isFinite(value) && value >= 0.0D) {
+				product *= value;
+			}
+		}
+		return Math.max(CASTER_FACTOR_MIN, Math.min(CASTER_FACTOR_MAX, product));
+	}
+
 	/** The product of all {@link TargetFactor}s is clamped to this range (DESIGN 19.2.8). */
 	public static final double TARGET_FACTOR_MIN = 0.5D;
 	public static final double TARGET_FACTOR_MAX = 2.0D;
@@ -568,10 +610,10 @@ public final class TechniquePower {
 		return entity.is(TECHNIQUE_BOSSES) || entity.entityTags().contains(TAG_BOSS) || entity.entityTags().contains(TAG_DUMMY_BOSS);
 	}
 
-	/** Dao Protectors, trial guards and elites (19.2.8): legacy power × 1.5 instead of P (22.14.4). */
+	/** Dao Protectors, trial guards, elites (19.2.8) and rogue cultivators (25.1.2): legacy power × 1.5 instead of P (22.14.4). */
 	public static boolean isTrialMob(LivingEntity entity) {
 		Set<String> tags = entity.entityTags();
-		return tags.contains(TAG_DAO_PROTECTOR) || tags.contains(TAG_TRIAL_GUARD) || tags.contains(TAG_ELITE);
+		return tags.contains(TAG_DAO_PROTECTOR) || tags.contains(TAG_TRIAL_GUARD) || tags.contains(TAG_ELITE) || tags.contains(TAG_ROGUE);
 	}
 
 	/** The attacker's own heart demon. */
@@ -737,6 +779,8 @@ public final class TechniquePower {
 				// Phase 7 target factors (DESIGN 19.2.8): elements and Perisai Unsur, never in arenas or against players.
 				if (!arena && !(target instanceof Player)) {
 					raw *= targetFactor(attacker, target, spec);
+					// Phase 8 caster factors (DESIGN 25.2 item 6): their own clamp, the same exclusions.
+					raw *= casterFactor(attacker, spec, target);
 				}
 			}
 		}

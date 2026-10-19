@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_ring",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.ring_supreme.description"
+    },
+    "icon": {
+      "id": "kultivator:storage_ring_supreme"
+    },
+    "title": {
+      "translate": "advancement.kultivator.ring_supreme.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

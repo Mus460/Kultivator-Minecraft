@@ -73,6 +73,8 @@ final class Expeditions {
 	static final double MIN_CHANCE = 0.10D;
 	static final double MAX_CHANCE = 0.95D;
 	static final double KUNPENG_CHANCE = 0.08D;
+	/** Phase 8 (DESIGN 25.2 item 14): the Alam Rahasia mission's chance of a {@code kultivator:heavenvoid_fragment}. */
+	static final double HEAVENVOID_FRAGMENT_CHANCE = 0.15D;
 	/** A failed team returns at this share of health, with this Qi Deviation (ticks). */
 	static final float FAIL_HEALTH = 0.30F;
 	static final int FAIL_DEVIATION = 3600;
@@ -363,6 +365,14 @@ final class Expeditions {
 				loot.add(dev.kultivator.harta.SpiritStones.stack(dev.kultivator.harta.SpiritStones.MID, 1));
 				if (tier >= 7 && random.nextDouble() < 0.05D) {
 					loot.add(dev.kultivator.harta.SpiritStones.stack(dev.kultivator.harta.SpiritStones.HIGH, 1));
+				}
+				// Phase 8 (DESIGN 25.2 item 14): 15% a Heavenvoid map fragment, looked up by id (absent until module A registers it).
+				if (random.nextDouble() < HEAVENVOID_FRAGMENT_CHANCE) {
+					net.minecraft.world.item.Item fragment = net.minecraft.core.registries.BuiltInRegistries.ITEM
+							.getValue(dev.kultivator.Kultivator.id("heavenvoid_fragment"));
+					if (fragment != net.minecraft.world.item.Items.AIR) {
+						loot.add(new ItemStack(fragment));
+					}
 				}
 			}
 			case TYPE_HUNT -> {

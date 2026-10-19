@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 /**
  * Jimat Pulang / Return Talisman (DESIGN 19.3.6): a 5 s channel (holding the talisman), cancelled by damage or by moving
@@ -65,6 +66,7 @@ public final class ReturnTalisman {
 
 	private static final Map<UUID, Channel> CHANNELS = new HashMap<>();
 	private static final Map<UUID, Long> LAST_HURT = new HashMap<>();
+	private static final List<Function<ServerPlayer, Component>> REFUSAL_PROVIDERS = new java.util.concurrent.CopyOnWriteArrayList<>();
 
 	static void init() {
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
@@ -113,7 +115,24 @@ public final class ReturnTalisman {
 		if (hurt != null && now - hurt < HURT_LOCK_TICKS) {
 			return Component.translatable("kultivator.talismans.return.refuse.hurt", Math.max(1L, (HURT_LOCK_TICKS - (now - hurt) + 19L) / 20L));
 		}
+		for (Function<ServerPlayer, Component> provider : REFUSAL_PROVIDERS) {
+			try {
+				Component why = provider.apply(player);
+				if (why != null) {
+					return why;
+				}
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("A Return Talisman refusal provider failed", exception);
+			}
+		}
 		return null;
+	}
+
+	/** Phase 8 (DESIGN 25.2 item 13): another reason to refuse a return ("Sekte sedang diserbu"); null lets it pass. */
+	public static void addRefusalProvider(Function<ServerPlayer, Component> provider) {
+		if (provider != null) {
+			REFUSAL_PROVIDERS.add(provider);
+		}
 	}
 
 	/** Ticks left of the 10-minute cooldown ({@code extra.talisman.ret} = game time of the last return). */

@@ -123,6 +123,19 @@ public final class EpicIds {
 	public static final int EXTRA_MASTER_DESCENDS = 4;
 	public static final int EXTRA_FLAME_ABSORBED = 5;
 	public static final int EXTRA_VOID_BORDER = 6;
+	// Phase 8 (DESIGN 25.2 item 15); every one obeys 23.1 (no camera shot while in danger), the client only stamps them.
+	/** A secret realm gate opens (the omen). a = realm ordinal 1-4. */
+	public static final int EXTRA_REALM_GATE = 7;
+	/** A secret realm cleared. a = realm ordinal 1-4, b = layer (realm 4). */
+	public static final int EXTRA_REALM_CLEAR = 8;
+	/** Black banners of a demonic sect on the horizon. a = sect index 0-7. */
+	public static final int EXTRA_RAID_OMEN = 9;
+	/** The natal weapon spirit awakens. a = spirit stage 2-3. */
+	public static final int EXTRA_SPIRIT_AWAKEN = 10;
+	/** The natal treasure vanishes into the body. a = form index. */
+	public static final int EXTRA_NATAL_BOND = 11;
+	/** A village swears allegiance. */
+	public static final int EXTRA_VILLAGE_OATH = 12;
 
 	// TECH_ULTIMATE: the TechFx phases (CAST the pre-roll, TRAVEL / IMPACT the climax, END the release).
 	public static final int TECH_CAST = 0;
@@ -213,13 +226,17 @@ public final class EpicIds {
 	public static final int TOUR_ELITE = 1;
 	public static final int TOUR_HUNDRED_DYNASTIES = 2;
 
-	/** BOSS kinds, in the order of {@code uji momen bos <warden|wither|naga|penjaga|warisan|raja_siluman>}. */
+	/** BOSS kinds, in the order of {@code uji momen bos <warden|wither|naga|penjaga|warisan|raja_siluman|penjaga_alam|tetua_iblis>}. */
 	public static final int BOSS_WARDEN = 0;
 	public static final int BOSS_WITHER = 1;
 	public static final int BOSS_DRAGON = 2;
 	public static final int BOSS_ELDER_GUARDIAN = 3;
 	public static final int BOSS_INHERITANCE = 4;
 	public static final int BOSS_DEMON_KING = 5;
+	/** Phase 8 (DESIGN 25.2 item 15): a secret realm guardian (subject {@code penjaga_alam}; tags {@code kultivator.boss} + {@code kultivator.realm_guard}). */
+	public static final int BOSS_REALM_GUARDIAN = 6;
+	/** Phase 8: the Demonic Patriarch of a sect raid (subject {@code tetua_iblis}; tags {@code kultivator.boss} + {@code kultivator.rogue}). */
+	public static final int BOSS_DEMONIC_ELDER = 7;
 
 	/** Heavenly Flame seed kinds of a first boss kill (F1); 0 = none. */
 	public static final int FLAME_NONE = 0;
@@ -305,7 +322,8 @@ public final class EpicIds {
 	/** The highest beat id of a moment, or −1 for an unknown moment. */
 	public static int maxBeat(int moment) {
 		return switch (moment) {
-			case TRIBULATION, DISCIPLE_BT, EXTRA -> 6;
+			case TRIBULATION, DISCIPLE_BT -> 6;
+			case EXTRA -> EXTRA_VILLAGE_OATH;
 			case BREAKTHROUGH, RECRUIT, SECT, TECH_ULTIMATE -> 2;
 			case ASCENSION -> 5;
 			case HEART_DEMON -> 3;

@@ -25,6 +25,8 @@ public final class AlchemyItems {
 	public static final Item TOXIN_PURGING_PILL = register(PillKind.TOXIN_PURGING);
 	public static final Item ENLIGHTENMENT_PILL = register(PillKind.ENLIGHTENMENT);
 	public static final Item BONE_TEMPERING_PILL = register(PillKind.BONE_TEMPERING);
+	// Phase 8 glue (DESIGN 25.3.9, 25.8.1).
+	public static final Item MATA_TERANG_PILL = register(PillKind.MATA_TERANG);
 
 	private static Item register(PillKind kind) {
 		Item item = ModItems.register(kind.id(), properties -> new PillItem(properties, kind), new Item.Properties()

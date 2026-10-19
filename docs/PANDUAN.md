@@ -12,7 +12,8 @@ Sejak Fase 6c ada **169 teknik** (Teknik Dewa) dari cerita kultivasi sungguhan, 
 Sejak Fase 7 **dunianya hidup** ([33](#33-dunia-yang-hidup-fase-7)): monster elit Binatang Iblis di setiap ranah, Batu Roh,
 Inti Binatang, herba roh berumur, urat roh dan Kultivasi Tertutup di Gua Kediaman, jimat, alkimia lanjutan, tribulasi
 dengan lingkar petir dan Hu Fa bersama teman, tablet **Jalan** yang menuntun pemain baru, anugerah Kenaikan Abadi, dan
-Bintang Abadi untuk dirimu sendiri.
+Bintang Abadi untuk dirimu sendiri. Fase 8 membuka **Jalan Dunia Kultivasi** ([55](#55-jalan-dunia-kultivasi-fase-8)):
+alam rahasia, kultivator liar dan serbuan Sekte Iblis, tempa pusaka dan pusaka natal, cincin penyimpanan, dan desa bawahan.
 
 Semua angka di panduan ini diambil langsung dari kode mod. Angka kultivasi (XP) selalu ditampilkan sebagai bilangan
 bulat di dalam game.
@@ -93,6 +94,8 @@ bulat di dalam game.
 52. [Berkas konfigurasi](#52-berkas-konfigurasi)
 53. [Janji keamanan blok](#53-janji-keamanan-blok)
 54. [**Momen Epik (Fase 7b)**](#54-momen-epik-fase-7b): kamera sinematik, kartu judul, langit, `/sinematik`, `uji momen`
+55. [**Jalan Dunia Kultivasi (Fase 8)**](#55-jalan-dunia-kultivasi-fase-8): alam rahasia, kultivator liar dan serbuan,
+    tempa dan pusaka natal, cincin, desa bawahan, lem progresi, [perintah uji](#5511-perintah-uji-op)
 
 ---
 
@@ -6710,3 +6713,445 @@ Contoh:
   lebih sering diam.
 * **Sumber:** setiap kartu dengan klaim cerita punya Sumber di DESIGN 23.13. Pilar cahaya, warna petir, gerakan kamera,
   dan musik adalah tampilan mod, bukan kanon.
+
+---
+
+## 55. Jalan Dunia Kultivasi (Fase 8)
+
+Fase 8 membawamu keluar dari sekte: **alam rahasia** yang kamu masuki bersama teman dan murid, **kultivator liar** yang
+menyergap di jalan dan **Sekte Iblis** yang menyerbu aulamu, **penempaan** pusaka di Tungku Api Bumi sampai **pusaka
+natal** di dalam tubuhmu sendiri, **desa bawahan** yang bersumpah setia, dan **cincin penyimpanan**. Rampasan tiap alam
+membuka tingkat tempa berikutnya, jadi setiap ranah memberi makan ranah berikutnya.
+
+> **Status:** seluruh Fase 8 sudah dikompilasi tetapi **belum diuji di game**. Daftar uji: [docs/uji/FASE-8.md](uji/FASE-8.md).
+>
+> **Keamanan blok:** Fase 8 **tidak menambah satu pun jalur pengubah blok**. Lantai alam rahasia dibuat oleh generator
+> dunia datar vanilla saat chunk pertama kali dibuat (sama seperti medan biasa); ruang, dinding, dan gerbang hanyalah
+> entitas tampilan dan aturan server. Perampok, penjaga alam, dan elite desa membawa tanda NoGrief, tidak memungut
+> barang, tidak membuka pintu, tanpa ledakan, api blok, atau petir. Tidak ada perubahan cuaca atau waktu. Celah yang
+> diketahui: NoGrief tidak mencakup pelat tekan dan tripwire, jadi perampok yang lewat bisa memicu redstone (sama seperti
+> elit Fase 7).
+
+### 55.1 Mulai cepat
+
+1. Buka **layar Dunia**: `/kultivasi dunia [alam|pusaka|musuh|desa]`, atau ikat tombol "Layar Dunia Kultivasi" di
+   Kontrol (bawaan tanpa tombol). Empat tablet: **Alam · Pusaka · Musuh · Desa**.
+2. Pemurnian Qi–Fondasi: cari **Token Ujian Darah-Api (Blood-Fire Trial Token)** di peti dungeon/mineshaft (15%) atau dari
+   hadiah Jalan bab 6, lalu pakai di tanah lapang → Lembah Ujian Darah dan Api.
+3. Buat **Tungku Api Bumi (Earthfire Forge)**, taruh di atas magma, dan tempa pusaka pertamamu.
+4. Buat **Kantong Penyimpanan (Storage Pouch)**, lalu naikkan ke cincin di tungku.
+5. Dengan aula level ≥ 2, taruh **Plakat Pelindung Sekte (Sect Patron Plaque)** dekat lonceng desa.
+6. Ikuti tablet **Jalan** bab 6–10 ("Jalan Dunia"); pelacak di tepi kanan layar bangun lagi setelah bab 5 begitu kamu
+   Fondasi.
+
+Tombol baru (bawaan tanpa tombol, ikat di Kontrol): **Layar Dunia Kultivasi** dan **Buka Cincin Penyimpanan**.
+
+### 55.2 Alam Rahasia
+
+**Apa:** empat alam rahasia. Pakai kunci di tanah lapang (Overworld, Nether, atau End): pertanda 10 detik (gerbang glif,
+lonceng), lalu kamu masuk ke panggung pribadi di dimensi `kultivator:alam_rahasia`. Ruang uji datang satu per satu,
+lalu penjaga (bilah bos), lalu **Gulungan Harta**. Sampai 3 saudara sekte dalam 8 blok bisa ikut dengan menekan
+**[Masuk]** di chat (`/kultivasi alam ikut`), dan sampai 2 Murid Dalam+ milikmu dalam 16 blok ikut otomatis.
+
+| Alam (id) | Siapa | Kunci | Ruang | Waktu |
+|---|---|---|---|---|
+| Lembah Ujian Darah dan Api (`blood_fire_trial`) | Pemurnian Qi–Fondasi saja | Token Ujian Darah-Api (Blood-Fire Trial Token) | Tempur → Jalan Lava → Tempur → penjaga | 8 mnt |
+| Aula Hampa Langit (`heavenvoid_hall`) | Inti Emas–Penyatuan Dao | Peta Aula Hampa Langit (Heavenvoid Hall Map) | Jalan Lava atau Padang Semut Api Besi → Labirin Ilusi → Gerbang Batu Harta → penjaga | 15 mnt |
+| Tanah Dewa Kuno (`ancient_god_land`) | Transformasi Dewa+ | Kristal Es Warisan (Inheritance Ice Crystal) | 3 Aula Kristal Es → penjaga | 15 mnt |
+| Makam Langit (`heavenly_tomb`) | Kenaikan Abadi Tahap 1+ | Lencana Makam Langit (Heavenly Tomb Sigil), habis per turun | sampai 3 lapisan Badan Energi; penjaga tiap lapisan 9, 18, 27… | 6 mnt/lapis |
+
+Kunci habis hanya saat menang (kecuali lencana, habis per turun). Cooldown 1 hari game untuk alam 1–3.
+
+**Ruang:**
+* **Ujian Tempur:** bertahan 3 gelombang; gelombang terakhir membawa elit tingkat 2. Penjaga ruang memakai husk, laba-laba,
+  wither skeleton, laba-laba gua ("Semut Api Besi"), dan kultivator liar (tidak ada monster yang terbakar matahari).
+* **Jalan Lava:** capai ujung lorong 40 blok dalam 60 detik. Semburan bertanda lingkar membakar dan melukai 6% HP maks,
+  tidak pernah membunuh. **Mutiara Es Dingin (Cold Ice Pearl)** di tangan kiri atau Fire Resistance membuatnya separuh.
+* **Padang Semut Api Besi:** bunuh 12 Semut Api Besi; berdiri di ubin magma memberi Slowness.
+* **Labirin Ilusi:** temukan pintu asli labirin 25×25 dalam 3 menit. Pintu palsu: −10% HP dan kembali ke awal. Bayangan
+  tembus pandang berkeliaran. **Pil Mata Terang (Brightsight Pill)** menandai pintu asli dan bayangan selama 2 menit.
+* **Gerbang Batu Harta:** buka 1 dari 3 gerbang: satu kosong ("tidak ada harta"), satu jebakan, satu harta bonus.
+* **Aula Kristal Es:** berdiri di kristal 10 detik (30 detik setelah 70 kristal seumur hidup); pukulan > 15% HP memotong
+  saluran, kemajuan tetap.
+* **Badan Energi:** hancurkan badan energi lapisan itu; masing-masing menjatuhkan Esensi.
+
+Gagal waktu di Jalan Lava atau Labirin mengulang ruang itu dari awal (batas waktu run tetap berjalan). Saat ruang tuntas,
+injak **bantalan glif** (Formasi Teleportasi) untuk ruang berikutnya.
+
+**Diusir atau gagal:** pukulan mematikan (kamu tetap hidup dengan 1 HP; totem dan nyawa cadangan tidak terpakai), waktu
+habis, `/kultivasi alam keluar`, pindah dimensi (Jimat Kembali berfungsi sebagai pintu keluar), atau keluar game.
+Diusir memberi **Luka Alam** 5 menit (kerusakan teknik ×0,8); keluar sukarela tidak. Kunci tetap ada, cooldown mulai.
+`/kill` tetap membunuh seperti biasa. Keluar game atau server mati saat di dalam: saat masuk lagi kamu dikirim ke titik
+asal tanpa hukuman. Jatuh di bawah lantai mengembalikanmu ke bantalan; berlari keluar panggung didorong balik.
+
+Di dalam alam: memecah/menaruh blok, ember, mutiara ender, korus, wind charge, ranjang, dan peti tidak bisa dipakai;
+terobosan, Gua Kediaman, Kehancuran, formasi, undangan Hu Fa, duel, dan latih tanding ditolak. Qi, teknik, dan jimat
+bekerja biasa.
+
+**Hadiah:**
+* Alam 1: menang pertama 4 Herba Fondasi (Foundation Herb), 4 Batu Roh Rendah, satu slip giok Kuning/Misterius
+  ("halaman emas"); ulang 1 herba + 2 batu. 10% bar kultivasi.
+* Alam 2: menang pertama **Kuali Hampa Langit (Heavenvoid Cauldron)**, 2 **Kayu Pemelihara Jiwa (Soul Nurturing Wood)**,
+  2 batu Menengah, 1 inti Tinggi; lalu pilih 1 dari 3. 15% bar.
+* Alam 3: tiap kristal **+0,25 HP maksimum permanen** (maks 94 kristal = +23,5); 1 **Darah Dewa Kuno (Ancient God Blood)**
+  per aula. 15% bar.
+* Alam 4: tiap lapisan `1 + lapisan/9` **Esensi Energi Makam (Tomb Energy Essence)**. Hanya pada rekor baru: 5% bar, dan di
+  lapisan 9, 18, 27… 1 batu Agung + 1 inti Raja + 1 lencana + pilih 1 dari 3. Turun berikutnya mulai dari rekor + 1;
+  `/kultivasi alam masuk heavenly_tomb <lapisan>` juga boleh mulai dari titik 9k+1 yang tidak melebihi rekor + 1
+  (lapisan ulangan memberi separuh Esensi, tanpa hadiah 9k).
+* Murid yang ikut: 15% bar dan 20 PK saat menang. Murid yang "mati" di dalam pulang Terluka, tanpa Papan Arwah.
+
+**Mode Ringan** (`secretRealmDimension=false`, atau dimensi gagal dimuat, atau `uji alam ringan nyala` untuk run
+berikutnya saja): alam "turun" di sekitar gerbang sebagai lingkar glyph 20 blok, aturan ruang sama, tanpa satu blok pun
+berubah. Keluar lingkar lebih dari 5 detik menggagalkan run tanpa Luka Alam.
+
+**Resep alam:**
+* **Peta Aula Hampa Langit (Heavenvoid Hall Map):** tanpa pola, 3 Fragmen Peta Hampa Langit (Heavenvoid Map Fragment).
+  Fragmen dari Raja Siluman 10%, Tetua Sekte Iblis 20%, Patriark 60%, peti ancient city 8%, end city 10%, misi
+  "Alam Rahasia" 15%, dan kantong rampasan.
+* **Mutiara Es Dingin (Cold Ice Pearl):** tanpa pola, 2 Rumput Es Bersudut Delapan (Eight-Angled Mysterious Ice Grass) +
+  1 inti binatang unsur Es (Beast Core, tingkat apa pun) + 1 Snowball.
+* **Kristal Es Warisan:** Raja Siluman 2%, Patriark 25%, tribulasi Transformasi Dewa pertama yang berhasil: 1.
+* **Lencana Makam Langit:** Patriark dari Kenaikan Abadi (100%), tiap tribulasi lapis Kenaikan Abadi yang berhasil, rekor
+  baru lapisan 9k.
+
+**Perintah:** `/kultivasi alam daftar` · `alam masuk <id> [lapisan]` (kunci di tas) · `alam keluar` · `alam ikut`.
+Contoh: `/kultivasi alam masuk heavenvoid_hall`, `/kultivasi alam masuk heavenly_tomb 10`.
+
+Sumber: RMJ bab 155–160 dan 1126–1129 (Aula Hampa Langit, peta fragmen, labirin ilusi, gerbang batu), *Renegade Immortal*
+bab 187–199 (kristal es), BTTH bab 1352 dan 1600 (badan energi Makam), *Perfect World* bab 345 (luka terbawa). Jalan
+Lava, Mutiara Es Dingin, dan Semut Api Besi *Terinspirasi dari* RMJ. Instans, ruang, waktu, dan semua angka adalah desain
+permainan.
+
+### 55.3 Kultivator Liar
+
+**Apa:** NPC kultivator bertopeng (model murid, jubah gelap, warna trim per tingkat) yang memusuhimu.
+
+| Tingkat | Nama | Nyawa (Inti Emas) | Keterampilan |
+|---|---|---|---|
+| 1 | Pengembara Liar (Rogue Wanderer) | ±74 | garis qi tiap 6 dtk |
+| 2 | Perampok Kultivator (Cultivator Robber) | ±123 | + ledakan unsur tiap 10 dtk |
+| 3 | Tetua Sekte Iblis (Demonic Sect Elder) | ±197 | + satu jurus elit bertanda |
+| 4 | Patriark Sekte Iblis (Demonic Patriarch), hanya serbuan | ±492, bilah bos | 3 jurus + **Segel Darah** (lingkar 6 blok, Wither) |
+
+Mereka tidak pernah menyerang penduduk desa, hewan, peliharaan, calon murid, atau pemain kreatif/penonton. Tingkat 1–2
+kabur di 20% nyawa (dihitung kalah). Maksimal 12 perampok hidup di dunia. Tidak muncul di Peaceful.
+
+**Hadiah:** XP seperti elit (Kejenuhan Bertarung +3), **Kantong Rampasan (Loot Pouch)** selalu dari tingkat 2+ (40% dari
+tingkat 1); tingkat 3: 20% fragmen peta; Patriark: 60% fragmen, 25% Kristal Es Warisan, dan dari Kenaikan Abadi 100%
+lencana Makam. Pakai kantong untuk membukanya: batu roh, herba berumur, jimat, kadang slip giok atau fragmen.
+
+**Penyergapan:** saat menjelajah jauh (lebih dari 160 blok dari aula, di luar wilayah sekte, jauh dari desa, di darat),
+kadang 1–3 perampok menghadang 12–18 blok di depan setelah peringatan bahaya 3 detik ("Niat membunuh terasa…"). Peluang
+`6% + 1% × ranah` (maks 15%), sekali per 6.000 tick, cooldown 1 hari setelah penyergapan. Menang = Kantong Rampasan;
+pergi lebih dari 96 blok selama 30 detik mengakhirinya.
+
+Sumber: RMJ bab 388 dan 402 (penyergapan kultivator bertopeng), bab 190 dan 273 (kantong penyimpanan musuh sebagai
+rampasan); "kultivator liar" adalah istilah genre (散修). Tingkat, nama sekte iblis, dan angka adalah desain permainan.
+
+### 55.4 Serbuan Sekte Iblis
+
+**Apa:** mulai aula level 3, setiap `sectRaidIntervalDays` (bawaan 9) hari sebuah Sekte Iblis menyerbu aulamu pada malam
+hari. **Pertanda** saat matahari terbenam sebelumnya ("Panji hitam terlihat di cakrawala…"; dua senja lebih awal bila
+Formasi Alarm K1 aktif). Pada malam serbuan tidur ditolak di wilayah aula.
+
+**Serbuan hidup** hanya jika kamu berada di wilayahmu, tidak AFK (input dalam 60 detik terakhir), dan tidak sedang
+tribulasi. Gelombang `2 + tingkat aula/3` (3–5) datang dari tepi wilayah, berbaris ke prasasti. Bilah ungu "Serbuan ·
+Gelombang 3/5 · Musuh 6" dan bilah merah **Segel Penjarah**: perampok dalam 6 blok dari prasasti menyalurkan segel
+(+1/+2/+4/+6 per detik menurut tingkat). Batas waktu 10 menit.
+
+| Hasil | Syarat | Akibat |
+|---|---|---|
+| **Dipukul mundur** | semua gelombang habis, segel < 100 | PK kolam +50 × gelombang, Kantong Rampasan Sekte Iblis (Demonic Sect Loot Pouch) ke Lumbung (+1 per Tetua, +2 Patriark), murid ikut +40 PK; ketenaran +30 × gelombang hanya bila muridmu ikut menyerang; Panji Sekte Iblis (Demonic Sect Banner) per Patriark; kesetiaan desa +3 |
+| **Ditahan** | waktu habis, segel < 100 | perampok mundur, separuh PK |
+| **Dijarah** | segel = 100 | paling banyak 3 tumpuk Lumbung hilang (kunci, cincin, pusaka, Kuali, panji, prasasti aman: tag `#kultivator:raid_safe`), 10% Kas Daya (maks 2 hari upkeep), kesetiaan desa −10, hasil tugas ×0,5 selama 1 hari. **Tidak pernah** blok, ketenaran, atau data murid |
+| **Data** | kamu tidak hadir atau AFK | saat fajar: peluang menang dari skor pertahanan (murid di rumah dan GUARD_HALL, formasi 7c, lapisan Formasi Agung) |
+
+Selama serbuan: calon murid menyingkir dan perekrutan berhenti, pembangunan sekte jeda, Jimat Kembali ditolak di dalam
+wilayah yang diserbu. Murid GUARD_HALL dan Pelindung Sekte bertarung; murid yang "mati" menjadi Terluka. Formasi 7c
+mengenai perampok (×0,6, Patriark dengan aturan bos), kill formasi tanpa XP tetapi menghitung gelombang. Halaman
+**Pertahanan** di Aula menampilkan jadwal, skor pertahanan, dan 10 hasil terakhir; tablet **Musuh** di layar Dunia
+menampilkan hitung mundur dan catatan pertemuan.
+
+**Perintah:** `/kultivasi serbuan info`.
+
+Sumber: RMJ bab 263 dan 1203 (sekte iblis dan sekte lurus), ISSTH buku 5 bab 735 (perisai sekte yang dijaga ahli),
+*Return of the Mount Hua Sect* (kemenangan menyebarkan nama). Segel Penjarah dan angka adalah desain permainan.
+
+### 55.5 Tungku Api Bumi dan tempa pusaka
+
+**Resep Tungku Api Bumi (Earthfire Forge):** berpola
+```
+B I B      B = Polished Blackstone Bricks, I = Block of Iron
+I C I      C = Cauldron
+D D D      D = Polished Deepslate
+```
+Tambang dengan beliung. Tidak punya block entity: bahan ada di layar seperti meja kerajinan, menutup layar
+mengembalikannya, dan bahan baru habis saat proses selesai.
+
+**Panas** dibaca dari blok tepat di bawah tungku:
+
+| Di bawah tungku | Api | Batas tingkat |
+|---|---|---|
+| kosong (qi-mu sendiri, biaya qi ×2) | Api Sejati Bawaan | Kuning |
+| Campfire menyala | Api Biasa | Misterius |
+| Magma Block | Api Bumi | Bumi |
+| Lava source, atau magma dengan lava tepat di bawahnya | Api Paru Bumi | Langit |
+| seperti di atas, tungku di y < 0 | Esensi Api Bumi | Abadi |
+| Soul Campfire menyala + 1 Benih Api Surgawi (Heavenly Flame Seed) per tempa (atau Dao Api pemahaman ≥ 90) | Api Surgawi | Dewa |
+
+**Tempa Baru:** embrio menentukan bentuk: **Pedang** (pedang vanilla apa pun), **Payung** (Block of Bamboo + 4 Stick),
+**Wajan** (Cauldron), **Lonceng** (Bell). Inti binatang menentukan unsur.
+
+| Tingkat | Logam | Inti | Bahan alam | Ranah | Qi | Waktu |
+|---|---|---|---|---|---|---|
+| Kuning | 4 Iron Ingot | Rendah | – | Pemurnian Qi | 20 | 10 dtk |
+| Misterius | 4 Gold Ingot + 1 Diamond | Rendah/Menengah | – | Fondasi | 60 | 15 dtk |
+| Bumi | 2 Diamond + 2 Amethyst Block | Menengah | 2 Herba Fondasi | Inti Emas | 150 | 20 dtk |
+| Langit | 1 Netherite Ingot + 2 Diamond | Tinggi | 1 Kayu Pemelihara Jiwa | Jiwa Baru Lahir | 400 | 30 dtk |
+| Abadi | 2 Netherite Ingot + 1 Echo Shard | Raja | 2 Darah Dewa Kuno | Transformasi Dewa | 1.000 | 40 dtk |
+| Dewa | 4 Netherite Ingot + 1 Nether Star | 2 × Raja | 3 Esensi Energi Makam | Kenaikan Abadi T7 / Dewa Abadi | 80% qi | 60 dtk |
+
+Hasil = yang terendah dari batas panas, baris bahan, keahlian, dan ranah (kartu pratinjau menunjukkan pembatasnya).
+Peluang `60% + 3,5% × keahlian + batu katalis + Dao Api + asisten + formasi` (maks 95%). Gagal ("Leburan gagal")
+menghilangkan bahan kecuali embrio dan bahan alam, separuh qi kembali. Proses berjalan selama layar terbuka dan kamu dalam
+4 blok; pukulan > 20% HP menjedanya. **Keahlian Tempa** naik per tempa (0–10, gerbang: Kuning 0, Misterius 2, Bumi 4,
+Langit 6, Abadi 8, Dewa 10); tempa tingkat jauh di bawah keahlianmu tidak memberi XP.
+
+**Efek bentuk** (Pedang di tangan utama, lainnya di tangan kiri, atau sebagai pusaka natal):
+* **Pedang:** serangan `6 + 0,6 × AP` (maks 22), teknik Dao Pedang lebih kuat (total faktor maks ×1,30; tidak di arena,
+  duel, atau melawan pemain).
+* **Payung:** Absorption berkala untukmu dan sekutu dalam 4 blok.
+* **Wajan:** pengurangan kerusakan dari monster sampai 25%, tahan dorong.
+* **Lonceng:** teknik yang kena memberi Slowness II di sekitar (Abadi+: juga Weakness); bos hanya ¼ durasi; tidak pernah
+  pemain.
+
+**Tempa Ulang +0…+12** (tab kedua): batu, inti unsur pusaka, dan tambahan (Iron Ingot / Gold Ingot / Darah Dewa Kuno /
+Esensi Energi Makam). +10…+12 butuh Dewa Abadi dengan bintang ≥ 9 / 18 / 27. Peluang turun 8% tiap tingkat; gagal di +4
+atau lebih menurunkan pusaka satu tingkat. Tiap tingkat +8% AP; warna perak +3, emas +6, biru langit +9, api putih +12.
+
+**Asisten Tempa:** tugaskan murid ke tungku: +5% peluang (+10% dengan bakat Jari Penempa Roh, +3% dengan akar/Dao Api).
+
+**Kuali Hampa Langit:** tutupnya tidak bisa dibuka sampai kamu Jiwa Baru Lahir+, keahlian ≥ 6, di tungku dengan panas
+Langit: "Buka Tutup" (60 dtk, 400 qi) → satu embrio Langit Tinggi bentuk pilihanmu, tanpa gagal.
+
+Sumber: RMJ bab 928 (Aula Api Bumi), 156 (Api Paru Bumi), 520, 1237, 1393, 1535; AWE bab 29–38 (kegagalan meningkat);
+BTTH (tangga tingkat, Api Surgawi, *Terinspirasi*). Blok tungku, resep, dan angka adalah desain permainan.
+
+### 55.6 Pusaka Natal Diri dan Roh Senjata
+
+**Ikat:** Inti Emas+, pusaka tingkat ≥ Misterius yang tidak terikat orang lain, 4 Batu Roh Menengah, dan meditasi 30
+detik sambil memegangnya (tablet Pusaka "Ikat" atau `/kultivasi pusaka ikat`). Pusaka masuk ke tubuhmu (catatan virtual,
+tidak bisa hilang atau digandakan) dan efek bentuknya berlaku selalu dengan faktor ×1,25. Pedang natal menambah serangan
+hanya saat tangan utama tidak memegang senjata (maks +8 melawan pemain, mati saat duel). Tampak di punggung (Pedang) atau
+mengorbit (bentuk lain).
+
+**Pusaka tertaut:** selain natal, 2 pusaka lagi bisa ditautkan padamu (`pusaka tautkan` / `pusaka lepastautan` sambil
+memegangnya); orang lain melihat "Pusaka ini mengenali tuan lain".
+
+**Lepas:** `/kultivasi pusaka lepas` → kembali jadi item, Penyimpangan Qi 5 menit, umur roh −10%, cooldown 1 hari.
+
+**Roh Senjata** (hanya pusaka natal; umur roh +1 tahun per menit meditasi, +0,5 per kill trial mob/perampok/bos maks 50
+per hari, atau suapi inti unsurnya: Rendah 5, Menengah 15, Tinggi 50, Raja 150 tahun):
+
+| Tahap | Syarat | Efek |
+|---|---|---|
+| Benih Roh | Langit+ dan 1 Kayu Pemelihara Jiwa disuapkan, 100 tahun | AP ×1,1, bercahaya |
+| Roh Dasar | 400 tahun, **atau** langsung dengan "Jiwa Binatang" (inti Raja + Kayu Pemelihara Jiwa di tungku, Roh Buatan) | AP ×1,25 dan **Sahutan**: Wajan menahan satu pukulan tiap 30 dtk, Payung memperbarui diri di 50% HP, Pedang menebas sendiri tiap 4 dtk, Lonceng berdentang tiap 6 dtk |
+| Roh Lengkap | hanya roh alami: 1.000 tahun, Abadi+, dan lolos satu tribulasi saat terikat | AP ×1,5, Pedang dua tebasan berantai tiap 3 dtk, bertindak sendiri di bawah 30% HP |
+
+Roh Buatan berhenti di Roh Dasar; "Murnikan Roh" di tungku menghapusnya (umur tetap). Roh tidak pernah mengenai pemain,
+murid, atau calon.
+
+**Perintah:** `/kultivasi pusaka info|ikat|lepas|tautkan|lepastautan`.
+
+Sumber: RMJ bab 415 (pedang dimurnikan di dalam tubuh), *RMJ: Immortal Realm* bab 345 (tiga pusaka sekaligus),
+*Martial World* bab 1128 dan 1132 (roh artefak dan tribulasi), *Martial Peak* (roh buatan lebih rendah, *Terinspirasi*).
+
+### 55.7 Cincin Penyimpanan
+
+| Tingkat | Item | Slot | Dibuat di | Resep | Ranah ikat |
+|---|---|---|---|---|---|
+| 0 | Kantong Penyimpanan (Storage Pouch) | 9 | meja kerajinan | lihat di bawah | siapa saja |
+| 1 | Cincin Penyimpanan Rendah (Low Storage Ring) | 18 | tungku, panas apa pun | 2 Gold Ingot + inti Rendah + 4 batu Rendah (+ kantong, isinya pindah) | Pemurnian Qi |
+| 2 | Cincin Penyimpanan Menengah (Mid Storage Ring) | 27 | tungku, Misterius | Block of Gold + inti Menengah + 2 batu Menengah + Ender Pearl + cincin 1 | Fondasi |
+| 3 | Cincin Penyimpanan Tinggi (High Storage Ring) | 36 | tungku, Bumi | 2 Diamond + inti Tinggi + 2 batu Tinggi + Shulker Shell + cincin 2 | Inti Emas |
+| 4 | Cincin Ruang Agung (Supreme Spatial Ring) | 54 | tungku, Langit | Netherite Ingot + inti Raja + 1 batu Agung + 1 Kayu Pemelihara Jiwa + cincin 3 | Jiwa Baru Lahir |
+
+**Resep Kantong Penyimpanan (Storage Pouch):** berpola
+```
+  S        S = String
+L K L      L = Leather, K = Batu Roh Rendah (Low Spirit Stone)
+  L
+```
+Inti unsur **Ruang** memberi +9 slot untuk tingkat 1–3 (maks 54). Peningkatan menyimpan isi dan ikatan.
+
+**Aturan:** pemakaian pertama oleh pemain dengan ranah cukup menanam **Jejak Jiwa** (10 qi): orang lain tidak bisa
+membukanya ("Jejak jiwa ‹nama› menolakmu"). **Hapus Jejak** (tombol di layar, hanya pemilik) melepas ikatan; **Runtuhkan
+Ruang** di tungku (siapa saja, 5 batu Menengah) menghapus ikatan asing **dan memusnahkan isinya**. Cincin tidak bisa
+ditumpuk, dan cincin, kantong, kotak shulker, serta bundel tidak bisa dimasukkan. Saat cincin terbuka, slot cincin itu
+terkunci (tidak bisa dibuang atau ditukar). Cincin terikat yang jatuh hanya bisa dipungut pemiliknya, tidak pernah hilang
+dimakan waktu, tahan api, lava, kaktus, dan ledakan, dan bila jatuh ke void kembali ke pemilik (atau disimpan sampai ia
+masuk lagi). Saat mati, cincin jatuh seperti barang biasa (`storageRingKeepOnDeath`, bawaan mati).
+
+**Membuka:** jongkok + pakai, tombol "Buka Cincin Penyimpanan" (cincin terikat tertinggi di tas), atau `/kultivasi cincin`.
+
+Sumber: RMJ bab 190, 273, 402 (kantong penyimpanan), BTTH bab 267 dan 1353 (cincin penyimpanan), bab 867 (jejak jiwa).
+
+### 55.8 Desa Bawahan
+
+**Resep Plakat Pelindung Sekte (Sect Patron Plaque):** berpola
+```
+S B S      S = Stone Bricks, B = banner apa pun (any Banner)
+G S G      G = Gold Ingot
+L   L      L = Batu Roh Rendah (Low Spirit Stone)
+```
+**Sumpah:** taruh plakat di Overworld ≤ 24 blok dari lonceng desa, dengan aula aktif level ≥ 2 dalam `vassalRange` (256)
+blok, pusat bersumpah lain ≥ 96 blok, dan jumlah desamu di bawah `1 + tingkat aula/3`. Malam berikutnya, saat kamu dalam
+48 blok, datang **Ujian Kepercayaan: Malam Penjagaan**: 3 gelombang kecil perampok berbaris ke plakat (Segel Penjarah,
+100 = gagal, coba lagi malam berikutnya). Berhasil → "Desa ‹nama› bersumpah setia…", kesetiaan 40.
+
+**Kesetiaan 0–100:** naik dari permohonan selesai (+8…+15), penjarahan dipukul mundur (+10), serbuan sekte dipukul mundur
+(+3), Pelindung Desa (+2/hari), hadiah makanan di plakat (jongkok + pakai Bread, Baked Potato, Cake, Hidangan Roh; maks +5
+per hari), aula naik tingkat (+3). Turun dari permohonan kedaluwarsa (−10), dijarah (−10), aula tidur (−1/hari). Pada 0
+desa melepaskan diri.
+
+**Upeti** tiap 3 hari ke Lumbung (paling banyak 3 siklus susulan; sisa menunggu di buffer `owed`, maks 9 tumpuk):
+tanaman, wol/kulit, emerald (kesetiaan ≥ 50), besi, herba roh (≥ 70), 2 batu Rendah (100). Jumlah menurut penduduk ×
+kesetiaan.
+
+**Calon dari desa:** kesetiaan ≥ 50 → +1 calon per Hari Penerimaan dengan label "dari Desa ‹nama›" dan Tekad +10; pada
+100, sekali per 9 hari "Pemuda Berbakat" dengan akar ≥ MID.
+
+**Permohonan Bantuan** (tiap 2–4 hari, kedaluwarsa 2 hari; datang sebagai **Surat Permohonan (Letter of Petition)** yang
+jarumnya menunjuk sasaran):
+* **Binatang Iblis di Ladang** — bunuh elit (bukan zombi, drowned, husk, atau illager) dekat lonceng: kesetiaan +10, 4 emerald.
+* **Sarang Perampok** — bersihkan sarang (asap kemah, 3–5 perampok): +15, PK kolam +40, kantong.
+* **Wabah** — jongkok + pakai 2 Pil Penyembuh atau 1 Pil Pembersih Racun di plakat: +10.
+* **Panen Gagal** — setor 32 poin makanan di plakat: +8 dan satu upeti ×1,5.
+* **Jaga Malam** — Malam Penjagaan lagi (2 gelombang): +12.
+
+Setiap permohonan selesai memberi gosip vanilla MINOR_POSITIVE +5 (harga dagang turun sedikit, lalu pulih).
+
+**Penjarahan Desa** (tiap 7–12 hari, malam): kamu dalam 128 blok → 2 gelombang ke plakat; kamu jauh → diselesaikan
+sebagai data (dengan **Pelindung Desa** ada peluang berhasil, tanpa itu selalu dijarah). **Pelindung Desa:** tugaskan satu
+murid (jenjang apa pun) per desa dari halaman **Desa** di Aula; ia hanya muncul di plakat saat kamu dalam 64 blok.
+Penduduk tidak pernah diserang. Desa bersumpah dilindungi dari Kehancuran (radius 48).
+
+**Perintah:** `/kultivasi desa daftar` · `desa info <nama>` · `desa nama <lama> <baru>`.
+
+Sumber: *Perfect World* bab 3 dan 27 (persembahan desa untuk Roh Penjaga dan perlindungan malam), RMJ bab 263 (negeri
+fana di bawah sekte), RMJ bab 1–5 (*Terinspirasi*: ujian masuk sekte bela diri). Plakat, kesetiaan, upeti, dan angka adalah
+desain permainan.
+
+### 55.9 Lem progresi
+
+| Ranah | Alam / acara | Bahan | Membuka |
+|---|---|---|---|
+| Pemurnian Qi–Fondasi | Lembah Darah dan Api | Herba Fondasi | tempa Bumi, resep Pil Fondasi alternatif, cincin 2 |
+| Inti Emas | fragmen dari Raja Siluman, Tetua, peti, misi | – | Peta alam 2 |
+| Inti Emas–Penyatuan Dao | Aula Hampa Langit | Kayu Pemelihara Jiwa, Kuali | tempa Langit, roh senjata, cincin 4, resep Soul Nurturing alternatif |
+| Transformasi Dewa–KA T3 | Tanah Dewa Kuno | Darah Dewa Kuno, +HP | tempa Abadi, tempa ulang +7…+9, resep Bone Tempering alternatif |
+| KA T1–Dewa Abadi | Makam Langit | Esensi Energi Makam | tempa Dewa, +10…+12, resep Tribulation Warding alternatif, diskon bintang |
+
+**Resep alkimia baru** (di Kitab Alkimia `/kultivasi resep`):
+* 3 Herba Fondasi (Foundation Herb) + Pil Penyembuh (Healing Pill) → 1 Pil Fondasi (Foundation Establishment Pill)
+* Kayu Pemelihara Jiwa (Soul Nurturing Wood) + Ghast Tear + Glow Berries → 3 Pil Pemelihara Jiwa (Soul Nurturing Pill)
+* Darah Dewa Kuno (Ancient God Blood) + Bone Block + Golden Carrot + inti Tanah Menengah+ → 3 Pil Penempaan Tulang (Bone
+  Tempering Pill)
+* Esensi Energi Makam (Tomb Energy Essence) + Echo Shard + Golden Apple → 2 Pil Penangkal Tribulasi (Tribulation Warding
+  Pill)
+* Rumput Roh Ilusi (Illusionary Spirit Herb) + Spider Eye + Glow Berries → 2 **Pil Mata Terang (Brightsight Pill)**: 2 menit
+  melihat pintu asli Labirin Ilusi dan bayangan (RMJ bab 1126, Mata Roh Brightsight; pil sebagai pengganti adalah desain
+  permainan)
+
+**Jalan bab 6–10 "Jalan Dunia"** (tablet Jalan, koin di bawah tablet bab; pelacak HUD bangun lagi setelah bab 5 saat
+Fondasi+). Tiap langkah dicentang oleh pencapaiannya, hadiah tiap bab sekali:
+* **6 Dunia Luas:** ikat kantong/cincin · tempa pusaka · buka gerbang alam · desa bersumpah → Token Darah-Api + 4 batu Rendah
+* **7 Penguasa Wilayah:** lolos penyergapan · pukul mundur serbuan · ikat pusaka natal · taklukkan Aula Hampa Langit → 2
+  batu Menengah + 1 fragmen
+* **8 Kekuatan Dewa:** pusaka Langit · Roh Dasar · serap kristal · kalahkan Patriark → 1 batu Tinggi + 1 Darah Dewa Kuno
+* **9 Kenaikan:** tempa ulang +9 · Makam lapis 9 · 3 desa · Cincin Ruang Agung → 1 batu Agung + 1 lencana
+* **10 Abadi:** Roh Lengkap · pusaka Dewa · Makam lapis 81 · desa setia 100 → 3 Esensi + gelar "Penguasa Jalan Dunia"
+
+**Ujian Fondasi baris ke-4** (pilihan; tiga baris mana pun sudah "Fondasi Kokoh"): Inti Emas lolos penyergapan; Jiwa Baru
+Lahir 1 desa atau pusaka Misterius; Transformasi Dewa Aula Hampa Langit; Penyatuan Dao Roh Dasar atau serbuan dipukul
+mundur; KA 1–3 9 kristal; KA 4–6 Tetua dibunuh dalam serbuan; KA 7–9 Makam lapis `9 × (L − 6)`; Dewa Abadi pusaka Dewa atau
+Makam lapis 27.
+
+**Kewajiban harian baru:** kalahkan 2 kultivator liar · selesaikan 1 permohonan desa · tempa atau tempa ulang sekali ·
+taklukkan 1 alam rahasia.
+
+**Pemadatan bintang:** setiap Esensi Energi Makam yang kamu bawa memotong biaya bintang 2% (maks 10 esensi = −20%);
+esensinya habis.
+
+### 55.10 Pengaturan (`config/kultivator.json`)
+
+| Kunci | Bawaan (rentang) |
+|---|---|
+| `secretRealms` | true |
+| `secretRealmDimension` | true (false = Mode Ringan di mana-mana) |
+| `secretRealmSlots` | 8 (1–8) |
+| `rogueAmbushes` | true |
+| `rogueAmbushChanceScale` | 1.0 (0–3) |
+| `rogueWorldCap` | 12 (6–16) |
+| `sectRaids` | true |
+| `sectRaidIntervalDays` | 9 (0 = mati, 5–30) |
+| `raidMaxAlive` | 8 (4–12) |
+| `raidAfkSeconds` | 60 (30–300) |
+| `artifactForging` | true |
+| `storageRings` | true |
+| `storageRingKeepOnDeath` | false |
+| `vassalVillages` | true |
+| `vassalRange` | 256 (128–512) |
+
+### 55.11 Perintah uji (op)
+
+Semua di bawah `/kultivasi uji …` (dan `/kultivasi debug …`):
+
+| Perintah | Efek |
+|---|---|
+| `uji kit` | + kotak shulker "Fase 8": semua kunci, bahan alam, Mutiara Es Dingin, Pil Mata Terang, tungku, plakat, kantong dan cincin tiap tingkat, pusaka tiap bentuk Langit +3, Kantong Rampasan, Kuali |
+| `uji alam <id> [lapisan]` | buka alam itu langsung (tanpa kunci, pertanda, atau cooldown) |
+| `uji alam ruang <n>` / `selesai` / `gagal` / `penjaga` | lompat ke ruang n / menang sekarang / diusir sekarang / panggil penjaga |
+| `uji alam ringan nyala\|mati` | paksa Mode Ringan untuk run berikutnya |
+| `uji alam slot` | slot yang dipakai dan entitas run |
+| `uji kristal <n>` | atur jumlah kristal seumur hidup (0–94) |
+| `uji perampok <1-4> [n] [unsur] [liar\|hantu\|energi\|iblis]` | perampok 6 blok di depan |
+| `uji perampok hapus` | hapus perampok dalam 64 blok |
+| `uji sergap` | penyergapan sekarang (pemeriksaan keamanan tetap berlaku) |
+| `uji serbuan peringatan\|mulai [gelombang]\|menang\|kalah\|segel <0-100>\|data\|jadwal` | pertanda / serbuan hidup / paksa hasil / atur segel / selesaikan sebagai data / cetak jadwal |
+| `uji pusaka <pedang\|payung\|wajan\|lonceng> <tingkat 0-5> [sub 0-2] [tempa 0-12] [roh 0-3] [umur]` | pusaka dengan nilai itu |
+| `uji pusaka natal` | ikat pusaka yang dipegang tanpa ritual |
+| `uji tempa tingkat <0-10>` / `panas <0-5>` / `selesai` | keahlian tempa / pura-pura panas 60 dtk / tuntaskan proses |
+| `uji roh <0-3>` / `uji roh umur <tahun>` | tahap / umur roh natal |
+| `uji cincin <0-4> [penuh]` / `uji cincin buka` | cincin tingkat itu (opsional terisi) / buka cincin yang kamu lihat tanpa ikatan |
+| `uji desa ikrar` | desa plakat yang kamu lihat langsung bersumpah |
+| `uji desa setia <0-100>` / `upeti [siklus]` / `minta <binatang\|sarang\|wabah\|panen\|jaga>` / `jarah [hadir\|jauh]` | kesetiaan / upeti sekarang / permohonan jenis itu / penjarahan sekarang |
+| `uji jalan bab <1-10>` | selesaikan bab Jalan sampai n |
+| `uji hud dunia` | contoh bilah bos alam dan serbuan selama 10 dtk |
+| `debug alam info` · `debug perampok info` · `debug desa poi` · `debug tempa panas` | info run / perampok yang kamu lihat / lonceng dan penduduk di sekitar plakat / panas dan medan formasi tungku |
+
+Contoh:
+* `/kultivasi uji alam heavenvoid_hall` lalu `/kultivasi uji alam ruang 2` — langsung ke Labirin Ilusi.
+* `/kultivasi uji alam heavenly_tomb 9` — lapisan penjaga Makam Langit.
+* `/kultivasi uji perampok 4` — Patriark dengan bilah bos; `/kultivasi uji perampok 1 3 api hantu` — 3 bayangan api.
+* `/kultivasi uji serbuan mulai 3` — serbuan langsung dari gelombang 3.
+* `/kultivasi uji pusaka pedang 3 2 6` lalu `/kultivasi uji pusaka natal` — pedang Langit Tinggi +6 sebagai natal.
+* `/kultivasi uji tempa panas 5` di depan tungku — coba tempa Dewa tanpa api surgawi.
+* `/kultivasi uji cincin 4 penuh` — Cincin Ruang Agung berisi.
+* `/kultivasi uji desa minta sarang` — surat dengan jarum ke sarang perampok.
+
+### 55.12 Yang belum lengkap
+
+* Luka Alam hanya memotong kerusakan teknik ×0,8; "tanpa XP kill" belum ada (Progression belum punya kait per sumber).
+* Kejenuhan Bertarung untuk penjaga alam tetap +3 seperti elit biasa (rancangan: +1).
+* Murid di pos tugas atau latihan menara belum meninggalkan tugasnya untuk bertarung saat serbuan hidup (GUARD_HALL dan
+  Pelindung Sekte sudah). Siaga formasi belum berakhir saat perampok masuk, dan Alarm K1 belum menyebut gelombang
+  "Sekte Iblis". Pertanda penyergapan belum disorot Indra Ilahi.
+* Pedang belum menambah kecepatan Pedang Terbang. Lonceng memakai efek vanilla (tanpa pengurangan berulang).
+* Pudar layar Formasi Teleportasi berupa kilatan tipis, bukan layar hitam penuh. Dinding labirin memakai kubus tampilan
+  yang diregangkan.
+* Mengganti nama desa lewat perintah `desa nama`, bukan kotak teks di kartu. Gelar "Penguasa Jalan Dunia" hanya tampil di
+  tablet Jalan dan chat.
+* Kewajiban harian "alam rahasia" menghitung alam yang ditaklukkan, bukan ruang tunggal.

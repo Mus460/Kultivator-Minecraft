@@ -1,0 +1,96 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:custom_model_data",
+    "index": 0,
+    "cases": [
+      {
+        "when": "pedang",
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/artifact_pedang",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "minecraft:custom_model_data",
+              "index": 0,
+              "default": -1
+            }
+          ]
+        }
+      },
+      {
+        "when": "payung",
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/artifact_payung",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "minecraft:custom_model_data",
+              "index": 0,
+              "default": -1
+            }
+          ]
+        }
+      },
+      {
+        "when": "wajan",
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/artifact_wajan",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "minecraft:custom_model_data",
+              "index": 0,
+              "default": -1
+            }
+          ]
+        }
+      },
+      {
+        "when": "lonceng",
+        "model": {
+          "type": "minecraft:model",
+          "model": "kultivator:item/artifact_lonceng",
+          "tints": [
+            {
+              "type": "minecraft:constant",
+              "value": -1
+            },
+            {
+              "type": "minecraft:custom_model_data",
+              "index": 0,
+              "default": -1
+            }
+          ]
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "kultivator:item/artifact_pedang",
+      "tints": [
+        {
+          "type": "minecraft:constant",
+          "value": -1
+        },
+        {
+          "type": "minecraft:custom_model_data",
+          "index": 0,
+          "default": -1
+        }
+      ]
+    }
+  }
+}

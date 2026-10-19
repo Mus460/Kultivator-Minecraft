@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:raid_repelled",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.demonic_patriarch.description"
+    },
+    "icon": {
+      "id": "kultivator:demonic_banner"
+    },
+    "title": {
+      "translate": "advancement.kultivator.demonic_patriarch.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

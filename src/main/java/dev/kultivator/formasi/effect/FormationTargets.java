@@ -7,6 +7,7 @@ import dev.kultivator.formasi.core.CoreTicker;
 import dev.kultivator.formasi.core.CoreView;
 import dev.kultivator.formasi.own.Ownership;
 import dev.kultivator.formasi.stack.Stacking;
+import dev.kultivator.musuh.RogueCultivators;
 import dev.kultivator.technique.spec.TechniquePower;
 import dev.kultivator.trial.HeartDemonEntity;
 import dev.kultivator.util.Targeting;
@@ -104,7 +105,7 @@ public final class FormationTargets {
 		return false;
 	}
 
-	/** The target modifier applied before the caps: elites ×0.6, bosses ×0.25, silverfish 0. */
+	/** The target modifier applied before the caps: elites and rogue tiers 1-3 ×0.6, bosses (the Patriarch too) ×0.25, silverfish 0. */
 	public static double damageFactor(Mob mob) {
 		if (mob instanceof Silverfish) {
 			return 0.0D;
@@ -112,15 +113,18 @@ public final class FormationTargets {
 		if (TechniquePower.isBoss(mob)) {
 			return Stacking.BOSS_DAMAGE;
 		}
-		return EliteMonsters.isElite(mob) ? Stacking.ELITE_DAMAGE : 1.0D;
+		return EliteMonsters.isElite(mob) || RogueCultivators.isRogue(mob) ? Stacking.ELITE_DAMAGE : 1.0D;
 	}
 
-	/** Daya Tembus: an elite whose tier is at least the core's effective grade ignores its illusion and concealment. */
+	/**
+	 * Daya Tembus: an elite or a rogue cultivator (phase 8, DESIGN 25.1.2) whose tier is at least the core's effective grade
+	 * ignores its illusion and concealment.
+	 */
 	public static boolean resists(Mob mob, CoreView core) {
 		if (immuneToMind(mob)) {
 			return true;
 		}
-		int tier = EliteMonsters.isElite(mob) ? EliteMonsters.tier(mob) : 0;
+		int tier = Math.max(EliteMonsters.isElite(mob) ? EliteMonsters.tier(mob) : 0, RogueCultivators.tier(mob));
 		return tier > 0 && tier >= CoreTicker.effectiveGrade(core);
 	}
 

@@ -196,6 +196,10 @@ public final class HuFaTribulation {
 		if (guardian == cultivator) {
 			return refuse(guardian, "kultivator.combat.hufa.fail.self", cultivator);
 		}
+		if (dev.kultivator.alam.Alam.blocked(guardian) || dev.kultivator.alam.Alam.blocked(cultivator)) {
+			// Phase 8 (DESIGN 25.2 item 12): no Hu Fa duty in or from a secret realm.
+			return refuse(guardian, dev.kultivator.alam.Alam.REFUSE_KEY, cultivator);
+		}
 		Session session = SESSIONS.get(cultivator.getUUID());
 		if (session == null || !Tribulation.isActive(cultivator)) {
 			return refuse(guardian, "kultivator.combat.hufa.fail.none", cultivator);

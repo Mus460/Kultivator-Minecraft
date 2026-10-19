@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:heavenvoid_hall",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.cauldron_opened.description"
+    },
+    "icon": {
+      "id": "kultivator:heavenvoid_cauldron"
+    },
+    "title": {
+      "translate": "advancement.kultivator.cauldron_opened.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

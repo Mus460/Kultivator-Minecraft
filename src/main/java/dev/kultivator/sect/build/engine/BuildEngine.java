@@ -349,7 +349,7 @@ public final class BuildEngine implements EngineApi {
 		}
 		// Test builds "instan" and the debug "komponen selesai": up to 512 ops every tick, paused above 50 ms.
 		for (Site site : list) {
-			if (site.restoring || site.status != SiteView.STATUS_RUNNING || mspt >= INSTANT_MSPT) {
+			if (site.restoring || site.status != SiteView.STATUS_RUNNING || mspt >= INSTANT_MSPT || placementPaused(site.owner)) {
 				continue;
 			}
 			if (site.speedMode == 1 || site.fastId != null && site.fastId.equals(site.openId)) {
@@ -366,7 +366,8 @@ public final class BuildEngine implements EngineApi {
 		int n = list.size();
 		for (int k = 0; k < n && global > 0; k++) {
 			Site site = list.get(Math.floorMod(roundRobin + k, n));
-			if (site.restoring || site.status != SiteView.STATUS_RUNNING || site.speedMode == 1 || site.fastId != null) {
+			if (site.restoring || site.status != SiteView.STATUS_RUNNING || site.speedMode == 1 || site.fastId != null
+					|| placementPaused(site.owner)) {
 				continue;
 			}
 			site.rate = rate(site, config, factor);
@@ -386,6 +387,32 @@ public final class BuildEngine implements EngineApi {
 			}
 		}
 		roundRobin++;
+	}
+
+	private static final java.util.List<java.util.function.Predicate<UUID>> PAUSE_PROVIDERS = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+	/**
+	 * Phase 8 (DESIGN 25.4.5): while any provider returns true for the owner (a live sect raid), the owner's construction
+	 * places nothing; it resumes by itself afterwards. Repairs and restores are not paused.
+	 */
+	public static void addPauseProvider(java.util.function.Predicate<UUID> provider) {
+		if (provider != null) {
+			PAUSE_PROVIDERS.add(provider);
+		}
+	}
+
+	/** True while a pause provider holds the owner's construction. */
+	public static boolean placementPaused(UUID owner) {
+		for (java.util.function.Predicate<UUID> provider : PAUSE_PROVIDERS) {
+			try {
+				if (provider.test(owner)) {
+					return true;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A sect construction pause provider failed", exception);
+			}
+		}
+		return false;
 	}
 
 	/** The base rate of a template in blocks per second (DESIGN 21.15 table). */

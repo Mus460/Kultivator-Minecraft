@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:demonic_banner",
+    "kultivator:token_darah_api",
+    "kultivator:heavenvoid_fragment",
+    "kultivator:heavenvoid_map",
+    "kultivator:inheritance_crystal",
+    "kultivator:tomb_sigil",
+    "kultivator:heavenvoid_cauldron",
+    "kultivator:forged_artifact",
+    "kultivator:storage_pouch",
+    "kultivator:storage_ring_low",
+    "kultivator:storage_ring_mid",
+    "kultivator:storage_ring_high",
+    "kultivator:storage_ring_supreme",
+    "kultivator:immortal_ascension_token",
+    "kultivator:sect_hall_stele",
+    "kultivator:earthfire_forge",
+    "kultivator:sect_patron_plaque",
+    "kultivator:village_letter"
+  ]
+}

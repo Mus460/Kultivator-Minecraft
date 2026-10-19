@@ -916,6 +916,10 @@ public final class Disciples {
 	 * still loading, during the next 5 s.
 	 */
 	private static void onChangeLevel(ServerPlayer player, ServerLevel origin) {
+		// Phase 8 (DESIGN 25.2 item 9): secret realm companions go in and out through depart/arrive only.
+		if (dev.kultivator.alam.Alam.isRealmLevel(origin) || dev.kultivator.alam.Alam.isRealmLevel(player.level())) {
+			return;
+		}
 		Set<UUID> souls = new HashSet<>();
 		for (DiscipleEntity disciple : loaded(player.getUUID())) {
 			if (disciple.level() == origin && disciple.mode().follows() && disciple.wasNearOwner() && !disciple.isReleasing()

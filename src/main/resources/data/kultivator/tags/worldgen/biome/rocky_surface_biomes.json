@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    { "id": "terralith:rocky_mountains", "required": false },
+    { "id": "terralith:shield", "required": false },
+    { "id": "terralith:shield_clearing", "required": false },
+    { "id": "terralith:rocky_jungle", "required": false },
+    { "id": "terralith:rocky_shrubland", "required": false }
+  ]
+}

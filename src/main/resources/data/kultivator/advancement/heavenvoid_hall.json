@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:realm_gate",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.heavenvoid_hall.description"
+    },
+    "icon": {
+      "id": "kultivator:heavenvoid_map"
+    },
+    "title": {
+      "translate": "advancement.kultivator.heavenvoid_hall.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

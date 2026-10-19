@@ -33,7 +33,9 @@ public enum PillKind {
 	/** Pil Pencerahan (phase 7): enlightenment chance x2 for 10 minutes. */
 	ENLIGHTENMENT("enlightenment_pill", 0xFFE070, 10, 2, Rarity.RARE),
 	/** Pil Penempa Tulang (phase 7): +1 max health for good (Perfect +2), at most +10 in total. */
-	BONE_TEMPERING("bone_tempering_pill", 0xE8DCC0, 12, 2, Rarity.RARE);
+	BONE_TEMPERING("bone_tempering_pill", 0xE8DCC0, 12, 2, Rarity.RARE),
+	/** Pil Mata Terang (phase 8, DESIGN 25.3.9): for 2 minutes the secret realm's phantom exits show and phantoms are outlined. */
+	MATA_TERANG("mata_terang_pill", 0xB8E8FF, 4, 1, Rarity.UNCOMMON);
 
 	public static final double QI_GATHERING_XP = 0.15D;
 	/** Cap of the Qi Gathering XP before quality (about 15% of a Golden Core Peak bar), so late realms cannot be pill-farmed. */
@@ -67,6 +69,8 @@ public enum PillKind {
 	public static final int BONE_HEALTH = 1;
 	public static final int BONE_HEALTH_PERFECT = 2;
 	public static final int BONE_HEALTH_CAP = 10;
+	/** Pil Mata Terang: how long the clear sight lasts (ticks, quality does not change it). */
+	public static final int MATA_TERANG_TICKS = 2400;
 
 	private static final PillKind[] ALL = values();
 

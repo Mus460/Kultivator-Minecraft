@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "dev.kultivator.tempa.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "ItemEntityBelowWorldMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

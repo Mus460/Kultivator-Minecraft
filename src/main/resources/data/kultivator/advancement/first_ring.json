@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root_tested",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.first_ring.description"
+    },
+    "icon": {
+      "id": "kultivator:storage_ring_low"
+    },
+    "title": {
+      "translate": "advancement.kultivator.first_ring.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

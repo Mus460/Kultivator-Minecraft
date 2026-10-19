@@ -111,6 +111,11 @@ public final class DuelRules {
 				|| a.level() != b.level() || a.level().isClientSide() || inDuel(a) || inDuel(b) || listener == null) {
 			return false;
 		}
+		// Phase 8 (DESIGN 25.2 item 12): no duel inside a secret realm or with a player in a run.
+		if (dev.kultivator.alam.Alam.isRealmLevel(a.level()) || a instanceof net.minecraft.server.level.ServerPlayer pa && dev.kultivator.alam.Alam.inRun(pa)
+				|| b instanceof net.minecraft.server.level.ServerPlayer pb && dev.kultivator.alam.Alam.inRun(pb)) {
+			return false;
+		}
 		Duel duel = new Duel(a, b, maxTicks, listener);
 		DUELS.put(a.getUUID(), duel);
 		DUELS.put(b.getUUID(), duel);

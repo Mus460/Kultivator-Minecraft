@@ -43,6 +43,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Tugas Sekte and the herb refining (DESIGN 20.3.9, 20.3.11): duty posts 5 blocks N/E/S/W of the stele, a disciple per
@@ -125,6 +126,37 @@ public final class Duties {
 	}
 
 	// ================================================================== API (DESIGN 20.4.5)
+
+	/** The product of every output factor is kept inside this range (phase 8, DESIGN 25.2 item 13). */
+	public static final double OUTPUT_FACTOR_MIN = 0.0D;
+	public static final double OUTPUT_FACTOR_MAX = 2.0D;
+	private static final List<ToDoubleFunction<UUID>> OUTPUT_FACTORS = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+	/** Phase 8 (DESIGN 25.2 item 13): multiplies every duty post's output of the owner's hall ("Aula Terluka" ×0.5). */
+	public static void addOutputFactorProvider(ToDoubleFunction<UUID> provider) {
+		if (provider != null) {
+			OUTPUT_FACTORS.add(provider);
+		}
+	}
+
+	/** The product of every output factor for the owner, clamped to {@link #OUTPUT_FACTOR_MIN}..{@link #OUTPUT_FACTOR_MAX} (1 without any). */
+	public static double outputFactor(UUID owner) {
+		if (OUTPUT_FACTORS.isEmpty()) {
+			return 1.0D;
+		}
+		double product = 1.0D;
+		for (ToDoubleFunction<UUID> provider : OUTPUT_FACTORS) {
+			try {
+				double value = provider.applyAsDouble(owner);
+				if (Double.isFinite(value) && value >= 0.0D) {
+					product *= value;
+				}
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("A duty output-factor provider failed", exception);
+			}
+		}
+		return Math.max(OUTPUT_FACTOR_MIN, Math.min(OUTPUT_FACTOR_MAX, product));
+	}
 
 	/** The disciple's duty id ("water", "garden", "kitchen", "farm"), or null for none. */
 	public static @Nullable String dutyOf(DiscipleData data) {
@@ -371,7 +403,7 @@ public final class Duties {
 				continue;
 			}
 			DiscipleData data = disciple.data();
-			double minutes = elapsed / 1200.0D * (SectRanks.rank(data) == 0 ? REGISTERED_OUTPUT : 1.0D);
+			double minutes = elapsed / 1200.0D * (SectRanks.rank(data) == 0 ? REGISTERED_OUTPUT : 1.0D) * outputFactor(owner);
 			switch (duty) {
 				case WATER -> water(disciple, data, minutes);
 				case GARDEN -> {

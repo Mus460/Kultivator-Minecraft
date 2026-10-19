@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "minecraft:polished_blackstone_bricks",
+    "I": "minecraft:iron_block",
+    "C": "minecraft:cauldron",
+    "D": "minecraft:polished_deepslate"
+  },
+  "pattern": [
+    "BIB",
+    "ICI",
+    "DDD"
+  ],
+  "result": {
+    "id": "kultivator:earthfire_forge"
+  }
+}

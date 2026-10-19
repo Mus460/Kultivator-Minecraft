@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:heavenly_tomb_9",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.heavenly_tomb_81.description"
+    },
+    "icon": {
+      "id": "kultivator:tomb_essence"
+    },
+    "title": {
+      "translate": "advancement.kultivator.heavenly_tomb_81.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

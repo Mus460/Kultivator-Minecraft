@@ -42,6 +42,11 @@ public final class FxDispatcher {
 			case TALISMAN -> TalismanFx.play(type, fx);
 			// Phase 7c (DESIGN 24.13 item 3).
 			case FORMASI -> dev.kultivator.client.formasi.FormasiFx.play(fx);
+			// Phase 8 (DESIGN 25.2 item 4).
+			case ALAM -> dev.kultivator.client.alam.AlamFx.play(fx);
+			case MUSUH -> dev.kultivator.client.musuh.MusuhFx.play(fx);
+			case TEMPA -> dev.kultivator.client.tempa.TempaFx.play(fx);
+			case DESA -> dev.kultivator.client.desa.DesaFx.play(fx);
 		}
 	}
 
@@ -72,6 +77,10 @@ public final class FxDispatcher {
 		TalismanFx.tick(minecraft);
 		// Phase 7c: formation domes, rings, marks and holograms.
 		dev.kultivator.client.formasi.FormasiFx.tick();
+		dev.kultivator.client.alam.AlamFx.tick();
+		dev.kultivator.client.musuh.MusuhFx.tick();
+		dev.kultivator.client.tempa.TempaFx.tick();
+		dev.kultivator.client.desa.DesaFx.tick();
 	}
 
 	private FxDispatcher() {

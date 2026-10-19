@@ -62,7 +62,7 @@ public final class EpicTests {
 	static final List<String> DEWA_SPECS = List.of("heaven_punishing_sword", "emperor_flame", "freeze_mount_qi", "nine_heavens_thunder_venerable",
 			"ancient_god_trample", "bodhisattva_tree", "kunpeng_art", "karma_domain", "time_spirit_domain", "stellar_black_hole", "heaven_trampling");
 	static final List<String> QUALITIES = List.of("retak", "normal", "sempurna", "surgawi");
-	static final List<String> BOSSES = List.of("warden", "wither", "naga", "penjaga", "warisan", "raja_siluman");
+	static final List<String> BOSSES = List.of("warden", "wither", "naga", "penjaga", "warisan", "raja_siluman", "penjaga_alam", "tetua_iblis");
 	static final List<String> SAVES = List.of("jiwa_tak_hancur", "rambut", "teratai", "pohon", "darah_abadi", "perlindungan_jiwa", "balas_budi",
 			"pelarian_jiwa");
 	static final List<String> TOURNAMENTS = List.of("internal", "elit", "seratus");
@@ -119,7 +119,7 @@ public final class EpicTests {
 		add("sekte_templat", "sekte", "", 20, null);
 		add("istana_langit", "sekte", "", 20, null);
 		add("aula", "sekte", "", 4, null);
-		add("bos", "tempur", "<warden|wither|naga|penjaga|warisan|raja_siluman>", 5, "warden");
+		add("bos", "tempur", "<warden|wither|naga|penjaga|warisan|raja_siluman|penjaga_alam|tetua_iblis>", 5, "warden");
 		add("lolos_maut", "tempur", "<jiwa_tak_hancur|rambut|teratai|pohon|darah_abadi|perlindungan_jiwa|balas_budi|pelarian_jiwa>", 4,
 				"jiwa_tak_hancur");
 		add("akar", "lain", "", 8, null);

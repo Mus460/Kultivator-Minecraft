@@ -1,0 +1,26 @@
+{
+  "type": "kultivator:alam_rahasia",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "minecraft:the_void",
+      "features": false,
+      "lakes": false,
+      "layers": [
+        {
+          "block": "minecraft:bedrock",
+          "height": 1
+        },
+        {
+          "block": "minecraft:stone",
+          "height": 3
+        },
+        {
+          "block": "minecraft:smooth_basalt",
+          "height": 1
+        }
+      ],
+      "structure_overrides": []
+    }
+  }
+}

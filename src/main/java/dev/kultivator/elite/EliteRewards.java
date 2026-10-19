@@ -172,6 +172,8 @@ public final class EliteRewards {
 				int stones = KING_STONES_MIN + random.nextInt(KING_STONES_MAX - KING_STONES_MIN + 1);
 				drop(level, pos, SpiritStones.stack(SpiritStones.LOW, stones));
 			}
+			// Phase 8 providers (DESIGN 25.2 item 13): realm keys and fragments.
+			EliteMonsters.extraDrops(level, victim, data.tier(), element, credit.owner(), stack -> drop(level, pos, stack));
 		}
 		if (credit.kind() == KillCredit.Kind.DISCIPLE) {
 			// The disciple's XP and the master's counters come through DiscipleHooks.addOnKill.

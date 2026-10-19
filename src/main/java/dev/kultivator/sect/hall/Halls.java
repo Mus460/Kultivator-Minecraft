@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
 /**
@@ -90,7 +91,17 @@ public final class Halls {
 	 * roll), the chance of a talent and of a physique (negative = the hall's normal chance), whether it is already tested,
 	 * and a source id ("envoy", "war", ...).
 	 */
-	public record CandidateSpec(DiscipleData data, int tekad, double talentChance, double physiqueChance, boolean tested, String source) {
+	/**
+	 * A candidate sent by another module. {@code originKey} (phase 8, DESIGN 25.6.5) is shown on the candidate card as
+	 * "dari ‹origin›": a translation key when it starts with {@code kultivator.}, otherwise a plain name (null for none).
+	 * {@code resolveBonus} is added to the Tekad (rolled or given; the total stays 0-100).
+	 */
+	public record CandidateSpec(DiscipleData data, int tekad, double talentChance, double physiqueChance, boolean tested, String source,
+			@Nullable String originKey, int resolveBonus) {
+		/** The phase-6 form: no origin, no resolve bonus. */
+		public CandidateSpec(DiscipleData data, int tekad, double talentChance, double physiqueChance, boolean tested, String source) {
+			this(data, tekad, talentChance, physiqueChance, tested, source, null, 0);
+		}
 	}
 
 	/**
@@ -152,6 +163,10 @@ public final class Halls {
 	 * page list) but drawn third, after Bangun. The indices above stay unchanged.
 	 */
 	public static final int PAGE_FORMASI = 10;
+	/** Phase 8 (DESIGN 25.2 item 3): the Pertahanan tablet (raid schedule and log, module B), appended after Formasi. */
+	public static final int PAGE_PERTAHANAN = 11;
+	/** Phase 8 (DESIGN 25.2 item 3): the Desa tablet (vassal villages, module D). */
+	public static final int PAGE_DESA = 12;
 	public static final int OP_REFRESH = 0;
 	public static final int OP_RENAME = 1;
 	public static final int OP_TEST = 2;
@@ -186,6 +201,7 @@ public final class Halls {
 	private static final List<InfoProvider> INFO_PROVIDERS = new ArrayList<>();
 	// Phase 6b providers (DESIGN 21.24 item 5). With none registered every phase-6 rule is unchanged.
 	private static final List<ArrivalSpotProvider> ARRIVAL_SPOT_PROVIDERS = new ArrayList<>();
+	private static final List<Predicate<UUID>> RECRUIT_PAUSE_PROVIDERS = new java.util.concurrent.CopyOnWriteArrayList<>();
 	private static final List<StatusLineProvider> STATUS_LINE_PROVIDERS = new ArrayList<>();
 	private static final List<SteleMoveListener> STELE_MOVE_LISTENERS = new ArrayList<>();
 	private static final Map<UUID, HallView> VIEW_CACHE = new HashMap<>();
@@ -1588,6 +1604,30 @@ public final class Halls {
 	/** Extra candidates per arrival (summed, negative values ignored); the total stays at most {@code MAX_CANDIDATES}. */
 	public static void addCandidateBonusProvider(ToIntFunction<UUID> provider) {
 		HallLevel.addCandidateBonusProvider(provider);
+	}
+
+	/**
+	 * Phase 8 (DESIGN 25.2 item 13): while any provider returns true for the owner (a live sect raid), no candidates arrive
+	 * (the arrival waits for the next check) and their bodies step aside; the records stay and the bodies come back after.
+	 */
+	public static void addRecruitPauseProvider(Predicate<UUID> provider) {
+		if (provider != null) {
+			RECRUIT_PAUSE_PROVIDERS.add(provider);
+		}
+	}
+
+	/** True while a recruit-pause provider holds the owner's candidates back. */
+	public static boolean recruitPaused(UUID owner) {
+		for (Predicate<UUID> provider : RECRUIT_PAUSE_PROVIDERS) {
+			try {
+				if (provider.test(owner)) {
+					return true;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A Sect Hall recruit-pause provider failed", exception);
+			}
+		}
+		return false;
 	}
 
 	/** Where candidates arrive (the first provider with a usable spot wins; none keeps the 8-14 ring). */

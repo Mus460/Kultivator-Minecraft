@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:realm_gate",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.ancient_god_crystal.description"
+    },
+    "icon": {
+      "id": "kultivator:inheritance_crystal"
+    },
+    "title": {
+      "translate": "advancement.kultivator.ancient_god_crystal.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

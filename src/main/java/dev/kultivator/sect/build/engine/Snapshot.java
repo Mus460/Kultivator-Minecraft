@@ -226,7 +226,7 @@ public final class Snapshot {
 						continue;
 					}
 					groundY = y;
-					if (!Classifier.naturalTagged(state)) {
+					if (!Classifier.naturalTagged(state) && !Classifier.rockySurface(level, cursor, state)) {
 						flag |= TerrainView.PLAYER_MADE;
 					}
 					break;

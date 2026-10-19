@@ -205,6 +205,11 @@ public final class Formasi {
 	}
 
 	private static InteractionResult useEye(ServerPlayer player, ServerLevel level, BlockPos pos, ItemStack held, boolean fuel) {
+		if (dev.kultivator.alam.Alam.blocked(player) || dev.kultivator.alam.Alam.isRealmLevel(level)) {
+			// Phase 8 (DESIGN 25.2 item 12): no sect formation in a secret realm or during a run.
+			Msg.actionBar(player, dev.kultivator.alam.Alam.refusal().withStyle(net.minecraft.ChatFormatting.RED));
+			return InteractionResult.SUCCESS;
+		}
 		CoreStore store = CoreTicker.store(level);
 		CoreRecord record = store.atEye(pos);
 		if (record == null) {

@@ -1,6 +1,10 @@
 package dev.kultivator.goals;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.alam.Alam;
+import dev.kultivator.desa.Vassals;
+import dev.kultivator.tempa.ArtifactItem;
+import dev.kultivator.tempa.NatalTreasureSelf;
 import dev.kultivator.cultivation.Breakthrough;
 import dev.kultivator.cultivation.Tribulation;
 import dev.kultivator.data.CultivationData;
@@ -15,6 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -24,7 +29,11 @@ import java.util.Arrays;
  * Core up. A set opens when the player enters the realm (or Immortal Ascension layer) below its target; counters are a
  * snapshot taken at that moment, "ever" items read lifetime flags. Each completed trial gives +0.07 breakthrough quality
  * for exactly that target, all three a further +0.05 and strikes ×0.9 ("Fondasi Kokoh"). Nothing is mandatory.
- * Saved in {@code extra.goals.trial {target, b0..b2, done, full, prog}}; the table itself is pure (the tablet reads it).
+ * Saved in {@code extra.goals.trial {target, b0..b3, done, full, prog}}; the table itself is pure (the tablet reads it).
+ * <p>
+ * Phase 8 (DESIGN 25.8.3) adds an optional fourth row per target from the world features (ambushes, vassals, secret
+ * realms, the natal spirit, raids). Any three of the four rows now count as "all three" for Fondasi Kokoh, and at most
+ * three rows add quality, so the bonus ceiling is unchanged.
  * <p>
  * Sumber: Terinspirasi dari ISSTH ch. 76 and 100 (a Foundation graded by its cracks) and AWE (Earth-Dao and Heaven-Dao
  * Foundation). The trial contents are game design.
@@ -58,7 +67,16 @@ public final class RealmTrials {
 		WARDEN(false, false),
 		DIM_TRIBULATION(false, false),
 		BOSS_TYPES(false, false),
-		SITE_TYPES(false, false);
+		SITE_TYPES(false, false),
+		// Phase 8 row 4 (DESIGN 25.8.3).
+		AMBUSH(false, false),
+		VASSAL_OR_ARTIFACT(false, false),
+		HEAVENVOID(false, false),
+		SPIRIT_OR_RAID(false, false),
+		CRYSTALS(true, false),
+		ELDERS(true, false),
+		TOMB_LAYER(false, false),
+		DEWA_OR_TOMB(false, false);
 
 		private final boolean counter;
 		private final boolean minutes;
@@ -153,6 +171,45 @@ public final class RealmTrials {
 		return realm == null ? null : new Rank(realm, 0, 0);
 	}
 
+	/** Artifact power of a Misterius Rendah +0 artifact (base 1.6, DESIGN 25.5.5): the row-4 "Misterius artifact" check. */
+	private static final double MISTERIUS_POWER = 1.6D - 1.0E-6D;
+
+	/** The optional fourth row of a target key (DESIGN 25.8.3), or null below Golden Core. */
+	public static @Nullable Trial row4(String key) {
+		Rank target = rankOf(key);
+		if (target == null || !target.realm().atLeast(Realm.GOLDEN_CORE)) {
+			return null;
+		}
+		return switch (target.realm()) {
+			case GOLDEN_CORE -> t(Kind.AMBUSH, 1);
+			case NASCENT_SOUL -> t(Kind.VASSAL_OR_ARTIFACT, 1);
+			case DEITY_TRANSFORMATION -> t(Kind.HEAVENVOID, 1);
+			case DAO_UNION -> t(Kind.SPIRIT_OR_RAID, 1);
+			case IMMORTAL_ASCENSION -> {
+				int layer = target.layer() + 1;
+				yield layer <= 3 ? t(Kind.CRYSTALS, 9) : layer <= 6 ? t(Kind.ELDERS, 1) : t(Kind.TOMB_LAYER, 9 * (layer - 6));
+			}
+			default -> t(Kind.DEWA_OR_TOMB, 1);
+		};
+	}
+
+	/** The three trials plus the fourth row of a target key, or null below Golden Core. */
+	public static @Nullable Trial[] full(String key) {
+		Trial[] set = set(key);
+		Trial extra = row4(key);
+		if (set == null || extra == null) {
+			return set;
+		}
+		Trial[] all = Arrays.copyOf(set, set.length + 1);
+		all[set.length] = extra;
+		return all;
+	}
+
+	/** Fondasi Kokoh: any three of the (up to) four rows (DESIGN 25.8.3). */
+	public static boolean isFull(int done) {
+		return Integer.bitCount(done & 15) >= 3;
+	}
+
 	/** The three trials of a target key, or null below Golden Core. */
 	public static @Nullable Trial[] set(String key) {
 		Rank target = rankOf(key);
@@ -184,21 +241,21 @@ public final class RealmTrials {
 		return GoalCounters.view(data).getCompoundOrEmpty(KEY);
 	}
 
-	/** Completed trials of the open set for {@code target} (bits 0-2), 0 when the open set is another one. */
+	/** Completed trials of the open set for {@code target} (bits 0-3), 0 when the open set is another one. */
 	public static int doneFor(CultivationData data, Rank target) {
 		CompoundTag trial = view(data);
-		return key(target).equals(trial.getStringOr("target", "")) ? trial.getIntOr("done", 0) & 7 : 0;
+		return key(target).equals(trial.getStringOr("target", "")) ? trial.getIntOr("done", 0) & 15 : 0;
 	}
 
 	/** The quality bonus the trials give the breakthrough into {@code target}. Pure. */
 	public static double bonus(CultivationData data, Rank target) {
 		int done = doneFor(data, target);
-		return Integer.bitCount(done) * QUALITY_PER_TRIAL + (done == 7 ? FULL_BONUS : 0.0D);
+		return Math.min(3, Integer.bitCount(done)) * QUALITY_PER_TRIAL + (isFull(done) ? FULL_BONUS : 0.0D);
 	}
 
 	/** The strike factor of "Fondasi Kokoh" for {@code target} (0.9 with all three, else 1). Pure. */
 	public static double strikeFactor(CultivationData data, Rank target) {
-		return doneFor(data, target) == 7 ? FULL_STRIKE_FACTOR : 1.0D;
+		return isFull(doneFor(data, target)) ? FULL_STRIKE_FACTOR : 1.0D;
 	}
 
 	// ================================================================== server
@@ -212,7 +269,7 @@ public final class RealmTrials {
 	static boolean update(ServerPlayer player, CultivationData data) {
 		CompoundTag goals = GoalCounters.goals(data);
 		String key = targetKey(data.rank());
-		Trial[] set = key == null ? null : set(key);
+		Trial[] set = key == null ? null : full(key);
 		if (key == null || set == null) {
 			if (goals.contains(KEY)) {
 				goals.remove(KEY);
@@ -226,10 +283,10 @@ public final class RealmTrials {
 			open(player, data, trial, key, set);
 			changed = true;
 		}
-		int[] prog = new int[6];
-		int done = trial.getIntOr("done", 0) & 7;
+		int[] prog = new int[set.length * 2];
+		int done = trial.getIntOr("done", 0) & 15;
 		int before = done;
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < set.length; i++) {
 			Trial each = set[i];
 			int raw = value(player, data, each.kind());
 			int have = each.kind().counter() ? Math.max(0, raw - trial.getIntOr("b" + i, raw)) : raw;
@@ -248,14 +305,14 @@ public final class RealmTrials {
 		if (done != before) {
 			trial.putInt("done", done);
 			changed = true;
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < set.length; i++) {
 				if ((done & (1 << i)) != 0 && (before & (1 << i)) == 0) {
 					Msg.chat(player, Component.translatable("kultivator.goals.trial.done_one", describe(set[i]),
 							targetName(key)).withStyle(ChatFormatting.GREEN));
 				}
 			}
 		}
-		if (done == 7 && !trial.getBooleanOr("full", false)) {
+		if (isFull(done) && !trial.getBooleanOr("full", false)) {
 			trial.putBoolean("full", true);
 			changed = true;
 			Msg.chat(player, Component.translatable("kultivator.goals.trial.full", targetName(key)).withStyle(ChatFormatting.GOLD));
@@ -271,7 +328,7 @@ public final class RealmTrials {
 		trial.putString("target", key);
 		trial.putInt("done", 0);
 		trial.putBoolean("full", false);
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < set.length; i++) {
 			if (set[i].kind().counter()) {
 				trial.putInt("b" + i, value(player, data, set[i].kind()));
 			}
@@ -304,7 +361,31 @@ public final class RealmTrials {
 			case DIM_TRIBULATION -> done(player, "nether_tribulation") || done(player, "end_tribulation") ? 1 : 0;
 			case BOSS_TYPES -> Integer.bitCount(bosses & 15);
 			case SITE_TYPES -> Integer.bitCount(GoalCounters.value(data, GoalCounters.SITES));
+			case AMBUSH -> done(player, "ambush_survivor") ? 1 : 0;
+			case VASSAL_OR_ARTIFACT -> Vassals.count(player.getUUID()) > 0 || NatalTreasureSelf.grade(player) >= 1 || carriesArtifact(player) ? 1 : 0;
+			case HEAVENVOID -> Alam.clears(player, "heavenvoid_hall") > 0 || done(player, "heavenvoid_hall") ? 1 : 0;
+			case SPIRIT_OR_RAID -> done(player, "spirit_elementary") || done(player, "raid_repelled") ? 1 : 0;
+			case CRYSTALS -> data.extra().getCompoundOrEmpty("dunia").getIntOr("crystals", 0);
+			case ELDERS -> Goals.worldCounter(data, Goals.W_ELDERS);
+			case TOMB_LAYER -> tombBest(data);
+			case DEWA_OR_TOMB -> done(player, "artifact_dewa") || tombBest(data) >= 27 ? 1 : 0;
 		};
+	}
+
+	/** The best Makam Langit layer ({@code extra.dunia.realm.heavenly_tomb.best}, module A's data, DESIGN 25.14). */
+	static int tombBest(CultivationData data) {
+		return data.extra().getCompoundOrEmpty("dunia").getCompoundOrEmpty("realm").getCompoundOrEmpty("heavenly_tomb").getIntOr("best", 0);
+	}
+
+	/** A forged artifact of Misterius power or more in the inventory. */
+	private static boolean carriesArtifact(ServerPlayer player) {
+		for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+			ItemStack stack = player.getInventory().getItem(i);
+			if (stack.getItem() instanceof ArtifactItem && ArtifactItem.power(stack) >= MISTERIUS_POWER) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/** True when the player has the advancement {@code kultivator:<name>}. */
@@ -326,14 +407,13 @@ public final class RealmTrials {
 		if (trial == null) {
 			return false;
 		}
-		trial.putInt("done", 7);
-		int[] prog = trial.getIntArray("prog").orElse(new int[6]);
-		if (prog.length == 6) {
-			for (int i = 0; i < 3; i++) {
-				prog[i * 2] = prog[i * 2 + 1];
-			}
-			trial.putIntArray("prog", prog);
+		int[] prog = trial.getIntArray("prog").orElse(new int[0]);
+		int rows = Math.max(3, prog.length / 2);
+		trial.putInt("done", (1 << rows) - 1);
+		for (int i = 0; i + 1 < prog.length; i += 2) {
+			prog[i] = prog[i + 1];
 		}
+		trial.putIntArray("prog", prog);
 		trial.putBoolean("full", true);
 		Advancements.grant(player, "foundation_trials");
 		Cultivators.dirty(player);
@@ -346,7 +426,7 @@ public final class RealmTrials {
 		update(player, data);
 		CompoundTag trial = view(data);
 		String key = trial.getStringOr("target", "");
-		Trial[] set = key.isEmpty() ? null : set(key);
+		Trial[] set = key.isEmpty() ? null : full(key);
 		if (set == null) {
 			Msg.chat(player, Component.translatable("kultivator.goals.trial.none").withStyle(ChatFormatting.GRAY));
 			return 0;
@@ -355,10 +435,10 @@ public final class RealmTrials {
 		double bonus = target == null ? 0.0D : bonus(data, target);
 		Msg.chat(player, Component.translatable("kultivator.goals.trial.header", targetName(key),
 				String.format(java.util.Locale.ROOT, "%+.2f", bonus)).withStyle(ChatFormatting.GOLD));
-		int[] prog = trial.getIntArray("prog").orElse(new int[6]);
+		int[] prog = trial.getIntArray("prog").orElse(new int[0]);
 		int done = trial.getIntOr("done", 0);
-		for (int i = 0; i < 3; i++) {
-			int have = prog.length == 6 ? prog[i * 2] : 0;
+		for (int i = 0; i < set.length; i++) {
+			int have = i * 2 < prog.length ? prog[i * 2] : 0;
 			int goal = set[i].goal();
 			String amount = set[i].kind().minutes() ? have / 60 + "/" + goal / 60 : have + "/" + goal;
 			boolean ok = (done & (1 << i)) != 0;

@@ -38,6 +38,11 @@ public final class Keys {
 	public static final KeyMapping SEAL_2 = key("seal_2", InputConstants.UNKNOWN.getValue());
 	public static final KeyMapping SEAL_3 = key("seal_3", InputConstants.UNKNOWN.getValue());
 	public static final KeyMapping SEAL_4 = key("seal_4", InputConstants.UNKNOWN.getValue());
+	// Phase 8 (DESIGN 25.2 item 18): unbound by default.
+	/** Opens or closes the Dunia screen. */
+	public static final KeyMapping DUNIA = key("dunia", InputConstants.UNKNOWN.getValue());
+	/** Buka Cincin: opens the highest-tier bound ring in the inventory ({@code TEMPA "ring:open"}). */
+	public static final KeyMapping CINCIN = key("cincin", InputConstants.UNKNOWN.getValue());
 
 	private static boolean jumpWasDown;
 	private static int airTicks;
@@ -72,6 +77,16 @@ public final class Keys {
 			}
 		}
 		press(MEDITATE, free, Actions.MEDITATE_TOGGLE);
+		while (DUNIA.consumeClick()) {
+			if (free) {
+				dev.kultivator.client.dunia.DuniaClient.open(Payloads.OpenScreen.DUNIA_ALAM);
+			}
+		}
+		while (CINCIN.consumeClick()) {
+			if (free) {
+				send(new Payloads.Action(Actions.TEMPA, 0, "ring:open"));
+			}
+		}
 		press(FLYING_SWORD, free, Actions.FLYING_SWORD_TOGGLE);
 		tickCloudStep(minecraft, player, free);
 	}

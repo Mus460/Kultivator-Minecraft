@@ -692,6 +692,11 @@ public final class Kehancuran {
 
 	/** Begins the 10 s aim of a destructive cast (all three locks are open; checked by the caller). */
 	public static void beginAim(ServerPlayer master, DiscipleEntity entity, DestroyerArts.Art art) {
+		if (dev.kultivator.alam.Alam.blocked(master) || dev.kultivator.alam.Alam.isRealmLevel(entity.level())) {
+			// Phase 8 (DESIGN 25.2 item 12): no destructive order in or from a secret realm.
+			Msg.chat(master, dev.kultivator.alam.Alam.refusal().withColor(RED));
+			return;
+		}
 		if (ORDERS.containsKey(master.getUUID())) {
 			Msg.chat(master, Component.translatable(PREFIX + "why.order_running").withColor(RED));
 			return;

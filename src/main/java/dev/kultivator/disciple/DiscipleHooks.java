@@ -154,6 +154,16 @@ public final class DiscipleHooks {
 		void info(DiscipleEntity entity, ServerPlayer master, CompoundTag tag);
 	}
 
+	/**
+	 * A phase-8 death guard (DESIGN 25.2 item 10): secret realm runs and sect raids. True keeps the disciple at 1 HP and the
+	 * guard handles it (sends it to rest through {@code Disciples.depart}); no Soul Tablet, no soul flight. Asked before
+	 * every {@link DeathHandler}.
+	 */
+	@FunctionalInterface
+	public interface DiscipleDeathGuard {
+		boolean save(DiscipleEntity e, DamageSource src);
+	}
+
 	// ================================================================== registries
 
 	private static final List<Function<DiscipleData, Double>> POTENTIAL = new ArrayList<>();
@@ -167,6 +177,7 @@ public final class DiscipleHooks {
 	private static final List<ToDoubleBiFunction<DiscipleEntity, DamageSource>> HURT_FACTOR = new ArrayList<>();
 	private static final List<HurtListener> ON_HURT = new ArrayList<>();
 	private static final List<DeathHandler> ON_DEATH = new ArrayList<>();
+	private static final List<DiscipleDeathGuard> DEATH_GUARDS = new ArrayList<>();
 	private static final List<BiPredicate<DiscipleEntity, LivingEntity>> COMBAT_CAST = new ArrayList<>();
 	private static final List<Consumer<DiscipleEntity>> TICK20 = new ArrayList<>();
 	private static final List<BiConsumer<DiscipleEntity, LivingEntity>> ON_KILL = new ArrayList<>();
@@ -261,6 +272,11 @@ public final class DiscipleHooks {
 	/** Called before the death and the Soul Tablet; the first provider returning true handles it. */
 	public static void addOnDeath(DeathHandler handler) {
 		ON_DEATH.add(handler);
+	}
+
+	/** A phase-8 death guard (realm runs, raids), asked before every {@link DeathHandler}; the first true wins. */
+	public static void addDeathGuard(DiscipleDeathGuard guard) {
+		DEATH_GUARDS.add(guard);
 	}
 
 	/** Asked at the start of every combat cast (each second in a fight); the first provider returning true has cast. */
@@ -470,6 +486,21 @@ public final class DiscipleHooks {
 	}
 
 	public static boolean onDeath(DiscipleEntity entity, DamageSource source) {
+		for (DiscipleDeathGuard guard : DEATH_GUARDS) {
+			boolean saved;
+			try {
+				saved = guard.save(entity, source);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Kultivator disciple death guard failed", exception);
+				saved = false;
+			}
+			if (saved) {
+				if (!entity.isRemoved() && entity.getHealth() < 1.0F) {
+					entity.setHealth(1.0F);
+				}
+				return true;
+			}
+		}
 		for (DeathHandler handler : ON_DEATH) {
 			if (handler.onDeath(entity, source)) {
 				return true;

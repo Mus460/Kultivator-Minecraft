@@ -31,6 +31,8 @@ public final class Net {
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.EpicMoment.TYPE, Payloads.EpicMoment.CODEC);
 		// Phase 7c (DESIGN 24.12, 24.13 item 2).
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.FormasiSync.TYPE, Payloads.FormasiSync.CODEC);
+		// Phase 8 (DESIGN 25.2 item 2).
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.DuniaSync.TYPE, Payloads.DuniaSync.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Payloads.Action.TYPE, Payloads.Action.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Action.TYPE, (payload, context) -> handle(context.player(), payload));
@@ -86,6 +88,11 @@ public final class Net {
 			case Actions.JALAN -> dev.kultivator.goals.Goals.handleAction(player, action.text());
 			// Phase 7c (DESIGN 24.13 item 1).
 			case Actions.FORMASI -> dev.kultivator.formasi.Formasi.handleAction(player, action.text());
+			// Phase 8 (DESIGN 25.2 item 1).
+			case Actions.ALAM -> dev.kultivator.alam.Alam.handleAction(player, action.text());
+			case Actions.MUSUH -> dev.kultivator.musuh.Musuh.handleAction(player, action.text());
+			case Actions.TEMPA -> dev.kultivator.tempa.Tempa.handleAction(player, action.text());
+			case Actions.DESA -> dev.kultivator.desa.Desa.handleAction(player, action.text());
 			default -> {
 			}
 		}
