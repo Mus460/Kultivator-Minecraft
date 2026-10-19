@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "kultivator:immortal_origin_stone",
+    "kultivator:immortal_origin_stone",
+    "minecraft:paper",
+    "minecraft:ender_eye"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:realm_crossing_talisman"
+  }
+}

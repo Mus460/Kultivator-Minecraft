@@ -72,6 +72,8 @@ public final class EpicHooks {
 	public static final String SAVED_KEY = "momen";
 	/** The tag of secret realm guards (owned by P8-alam, DESIGN 25.14); a guardian also carries {@code kultivator.boss}. */
 	private static final String REALM_GUARD_TAG = "kultivator.realm_guard";
+	/** Phase 9: the tag of the primordial beasts and their relics (relics are never bosses). */
+	private static final String PURBA_TAG = "kultivator.purba";
 
 	static final int TAG_TRIB = 1;
 	static final int TAG_TEST = 2;
@@ -507,6 +509,13 @@ public final class EpicHooks {
 		}
 		if (entity.entityTags().contains(TechniquePower.TAG_BOSS) && entity.entityTags().contains(TechniquePower.TAG_TRIAL_GUARD)) {
 			return EpicIds.BOSS_INHERITANCE;
+		}
+		// Phase 9 (DESIGN 26.14 item 4): primordial beasts and the Panglima Langit (before the generic phase-8 checks).
+		if (entity.entityTags().contains(TechniquePower.TAG_BOSS) && entity.entityTags().contains(PURBA_TAG)) {
+			return EpicIds.BOSS_PRIMORDIAL;
+		}
+		if (entity.entityTags().contains(TechniquePower.TAG_BOSS) && entity.entityTags().contains(TechniquePower.TAG_ABADI_FOE)) {
+			return EpicIds.BOSS_HEAVEN_GENERAL;
 		}
 		// Phase 8 (DESIGN 25.2 item 15): realm guardians and the Demonic Patriarch.
 		if (entity.entityTags().contains(TechniquePower.TAG_BOSS) && entity.entityTags().contains(REALM_GUARD_TAG)) {

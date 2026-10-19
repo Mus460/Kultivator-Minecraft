@@ -281,6 +281,12 @@ public final class Alam {
 			Msg.chat(player, Component.translatable("kultivator.alam.why.unknown", realmId).withStyle(ChatFormatting.GRAY));
 			return false;
 		}
+		if (dev.kultivator.purba.Purba.inFight(player) || dev.kultivator.purba.Purba.inCalamity(player) || dev.kultivator.purba.Purba.inWrath(player)
+				|| dev.kultivator.batin.Batin.inDefence(player) || dev.kultivator.abadi.Abadi.inAscension(player)) {
+			// Phase 9 (DESIGN 26.14 item 13): never during a primordial fight, a calamity, a wrath descent, a batin defence or the ascension.
+			Msg.chat(player, Component.translatable("kultivator.spine9.refuse.busy").withStyle(ChatFormatting.GRAY));
+			return false;
+		}
 		int startLayer = startLayer(player, spec, layer, free);
 		if (startLayer < 0) {
 			Msg.chat(player, Component.translatable("kultivator.alam.why.layer", best(player, spec.id()) + 1).withStyle(ChatFormatting.GRAY));

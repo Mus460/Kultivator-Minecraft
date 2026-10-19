@@ -1,0 +1,11 @@
+{
+  "type": "kultivator:alam_abadi",
+  "generator": {
+    "type": "minecraft:noise",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "kultivator:alam_abadi"
+    },
+    "settings": "minecraft:floating_islands"
+  }
+}

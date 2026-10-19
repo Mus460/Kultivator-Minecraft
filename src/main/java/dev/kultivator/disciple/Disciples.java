@@ -994,6 +994,10 @@ public final class Disciples {
 		if (dev.kultivator.alam.Alam.isRealmLevel(origin) || dev.kultivator.alam.Alam.isRealmLevel(player.level())) {
 			return;
 		}
+		// Phase 9 (DESIGN 26.14 item 10): Alam Abadi companions travel by depart/arrive only (P9-langit's crossing and sweep).
+		if (dev.kultivator.abadi.Abadi.isImmortalLevel(origin) || dev.kultivator.abadi.Abadi.isImmortalLevel(player.level())) {
+			return;
+		}
 		Set<UUID> souls = new HashSet<>();
 		for (DiscipleEntity disciple : loaded(player.getUUID())) {
 			if (disciple.level() == origin && disciple.mode().follows() && disciple.wasNearOwner() && !disciple.isReleasing()

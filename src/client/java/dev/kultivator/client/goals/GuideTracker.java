@@ -32,7 +32,8 @@ import java.util.List;
  * "how" lines (with the live key names) and the progress. It shrinks to a 12 px seal 20 s after joining and opens again
  * for 8 s on a change or while the info key is pressed; a finished step rings an amethyst chime with a gold flash.
  * Hidden by the "Sembunyikan panduan" coin and after the last step. After chapter 5 it wakes again for chapters 6-10
- * (DESIGN 25.8.2) once the player is Foundation+.
+ * (DESIGN 25.8.2) once the player is Foundation+, and after chapter 10 for chapters 11-15 "Jalan Abadi" (DESIGN 26.9) once the
+ * player is Dewa Abadi Puncak.
  */
 public final class GuideTracker implements HudElement {
 
@@ -56,12 +57,12 @@ public final class GuideTracker implements HudElement {
 		}
 		long now = Util.getMillis();
 		CultivationData data = ClientCultivation.data();
-		int bits = world(data) ? Guide.bits2(data) | (1 << 30) : Guide.bits(data);
+		int bits = abadi(data) ? Guide.bits3(data) | (1 << 29) : world(data) ? Guide.bits2(data) | (1 << 30) : Guide.bits(data);
 		if (lastBits < 0) {
 			lastBits = bits;
 			lastChange = now;
 		} else if (bits != lastBits) {
-			if ((bits & ~lastBits & ~(1 << 30)) != 0) {
+			if ((bits & ~lastBits & ~(1 << 30) & ~(1 << 29)) != 0) {
 				flashUntil = now + FLASH_MILLIS;
 				minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.AMETHYST_BLOCK_CHIME, 1.3F, 0.9F));
 			}
@@ -82,7 +83,12 @@ public final class GuideTracker implements HudElement {
 
 	/** True when the tracker is shown at all (not hidden, steps left, or the HUD demo). */
 	public static boolean visible(CultivationData data) {
-		return HudDemo.active() || !Guide.hidden(data) && (Guide.bits(data) != Guide.ALL || world(data));
+		return HudDemo.active() || !Guide.hidden(data) && (Guide.bits(data) != Guide.ALL || world(data) || abadi(data));
+	}
+
+	/** True when chapters 1-10 are done and the tracker follows chapters 11-15 (Dewa Abadi Puncak, steps left). */
+	public static boolean abadi(CultivationData data) {
+		return Guide.bits(data) == Guide.ALL && Guide.bits2(data) == Guide.ALL && data.rank().isMax() && Guide.bits3(data) != Guide.ALL;
 	}
 
 	/** True when chapters 1-5 are done and the tracker follows chapters 6-10 (Foundation+, steps left). */
@@ -107,11 +113,12 @@ public final class GuideTracker implements HudElement {
 		boolean demo = HudDemo.active();
 		boolean expanded = demo || now - lastChange < IDLE_MILLIS || now < peekUntil;
 		float t = open.to(expanded ? 1.0F : 0.0F, seconds);
-		boolean world = !demo && world(data);
-		int bits = demo ? 0x7F : world ? Guide.bits2(data) : Guide.bits(data);
+		boolean abadi = !demo && abadi(data);
+		boolean world = !demo && !abadi && world(data);
+		int bits = demo ? 0x7F : abadi ? Guide.bits3(data) : world ? Guide.bits2(data) : Guide.bits(data);
 		int chapter = Math.min(Guide.CHAPTERS - 1, Guide.currentChapter(bits));
 		int step = Guide.currentStep(bits);
-		int offset = world ? Guide.CHAPTERS : 0;
+		int offset = abadi ? Guide.ABADI_FIRST : world ? Guide.CHAPTERS : 0;
 		float flash = now < flashUntil ? (flashUntil - now) / (float) FLASH_MILLIS : 0.0F;
 		Font font = minecraft.font;
 		int width = g.guiWidth();
@@ -146,7 +153,7 @@ public final class GuideTracker implements HudElement {
 			float flash, float t) {
 		int w = WIDTH;
 		float inner = w - 12.0F;
-		Guide.Step[] steps = offset > 0 ? Guide.STEPS2 : Guide.STEPS;
+		Guide.Step[] steps = offset >= Guide.ABADI_FIRST ? Guide.STEPS3 : offset > 0 ? Guide.STEPS2 : Guide.STEPS;
 		Component chapterTitle = Component.translatable("kultivator.goals.tracker.chapter", chapter + offset + 1,
 				Component.translatable("kultivator.goals.chapter." + (chapter + offset + 1)));
 		Component title = step < 0 ? Component.translatable("kultivator.goals.tracker.all_done")
@@ -219,7 +226,7 @@ public final class GuideTracker implements HudElement {
 				return true;
 			}
 		}
-		// Chapters 6-10 keep their claimed bits at 5-9.
+		// Chapters 6-10 keep their claimed bits at 5-9, chapters 11-15 at 10-14.
 		for (int chapter = Guide.CHAPTERS; chapter < Guide.ALL_CHAPTERS; chapter++) {
 			if (Guide.chapterDoneAny(data, chapter) && (claimed & (1 << chapter)) == 0) {
 				return true;

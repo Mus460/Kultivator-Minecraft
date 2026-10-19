@@ -53,6 +53,12 @@ public final class Goals {
 	public static final String W_REQUESTS = "vq";
 	public static final String W_CLEARS = "rc";
 	public static final String W_ELDERS = "tt";
+	/**
+	 * Phase-9 lifetime counters of the glue (DESIGN 26.9, P9-batin) in the same {@code extra.goals.row4}: Alam Abadi natives
+	 * slain (any {@code kultivator.abadi_foe} that is not a boss, killed in Alam Abadi) and inner-world plots harvested.
+	 */
+	public static final String W_NATIVES = "an";
+	public static final String W_PLOTS = "bh";
 	/** Star condensing sink (DESIGN 25.8.4): each Esensi Energi Makam carried lowers the star's cost by 2%, at most 10. */
 	public static final double ESSENCE_DISCOUNT = 0.02D;
 	public static final int ESSENCE_MAX = 10;
@@ -79,7 +85,18 @@ public final class Goals {
 
 	/** A rogue cultivator died: the credited player's rogue counter, and the elder counter during a live sect raid. */
 	private static void onWorldKill(LivingEntity victim, DamageSource source) {
-		if (victim.level().isClientSide() || !RogueCultivators.isRogue(victim)) {
+		if (victim.level().isClientSide()) {
+			return;
+		}
+		// Phase 9 (DESIGN 26.9): an Alam Abadi native (an abadi_foe that is not a boss, slain in Alam Abadi).
+		if (victim.entityTags().contains(dev.kultivator.technique.spec.TechniquePower.TAG_ABADI_FOE) && !victim.entityTags().contains("kultivator.boss")
+				&& dev.kultivator.abadi.Abadi.isImmortalLevel(victim.level())) {
+			KillCredit.Credit nativeCredit = KillCredit.resolve(victim, source);
+			if (nativeCredit != null) {
+				addWorldCounter(nativeCredit.owner(), W_NATIVES, 1);
+			}
+		}
+		if (!RogueCultivators.isRogue(victim)) {
 			return;
 		}
 		KillCredit.Credit credit = KillCredit.resolve(victim, source);
@@ -158,7 +175,7 @@ public final class Goals {
 		}
 	}
 
-	/** Action {@code JALAN}: text = "hide", "show", "claim:N" (N = chapter 1-10) or "seen:codex" (DESIGN 19.2.1). */
+	/** Action {@code JALAN}: text = "hide", "show", "claim:N" (N = chapter 1-15) or "seen:codex" (DESIGN 19.2.1). */
 	public static void handleAction(ServerPlayer player, String text) {
 		CultivationData data = Cultivators.get(player);
 		CompoundTag goals = GoalCounters.goals(data);
@@ -194,7 +211,8 @@ public final class Goals {
 		uji.then(Commands.literal("jalan")
 				.then(Commands.literal("reset").executes(Goals::reset))
 				.then(Commands.literal("bab")
-						.then(Commands.argument("n", IntegerArgumentType.integer(1, Guide.ALL_CHAPTERS))
+						// Phase 9 (DESIGN 26.14 item 18): 1-15; the glue (P9-batin) completes chapters 11-15 in guide3.
+						.then(Commands.argument("n", IntegerArgumentType.integer(1, 15))
 								.executes(ctx -> {
 									ServerPlayer player = ctx.getSource().getPlayerOrException();
 									Guide.completeUpTo(player, IntegerArgumentType.getInteger(ctx, "n"));
@@ -243,7 +261,8 @@ public final class Goals {
 		ServerPlayer player = ctx.getSource().getPlayerOrException();
 		CultivationData data = Cultivators.get(player);
 		CompoundTag goals = GoalCounters.goals(data);
-		for (String key : new String[]{Guide.KEY, Guide.KEY2, Guide.CLAIMED, Guide.HIDDEN, Guide.SEEN, RealmTrials.KEY, DailyChores.KEY}) {
+		for (String key : new String[]{Guide.KEY, Guide.KEY2, Guide.KEY3, Guide.CLAIMED, Guide.HIDDEN, Guide.SEEN, Guide.ABADI_TITLE, RealmTrials.KEY,
+				DailyChores.KEY}) {
 			goals.remove(key);
 		}
 		Cultivators.syncNow(player);

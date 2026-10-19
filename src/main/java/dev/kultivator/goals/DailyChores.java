@@ -38,6 +38,9 @@ import java.util.Locale;
  * <p>
  * Phase 8 (DESIGN 25.8.3) adds four world chores: slay 2 rogue cultivators, finish 1 village request, forge or refine
  * once, clear a secret realm; each joins the pool once its feature was met (an advancement or a vassal).
+ * <p>
+ * Phase 9 (DESIGN 26.9, P9-batin) adds four Immortal chores: slay 3 Alam Abadi natives, mine 1 Batu Asal Abadi, harvest an
+ * inner-world plot, bid at an Immortal auction; each joins the pool once the player ascended (or has an inner world).
  */
 public final class DailyChores {
 
@@ -55,7 +58,9 @@ public final class DailyChores {
 	public enum Chore {
 		KILLS, ELITE, MED_LONG, MED_SITE, TECH, REFINE, ORES, HERBS, THUNDER, TALISMAN,
 		/** Phase 8 (DESIGN 25.8.3). */
-		ROGUES, VILLAGE, FORGE, CHAMBER;
+		ROGUES, VILLAGE, FORGE, CHAMBER,
+		/** Phase 9 (DESIGN 26.9). */
+		NATIVES, ORIGIN, PLOT, BID;
 
 		public String id() {
 			return name().toLowerCase(Locale.ROOT);
@@ -80,7 +85,8 @@ public final class DailyChores {
 	public static int need(Chore chore, CultivationData data) {
 		return switch (chore) {
 			case KILLS -> 8 + 2 * data.realm().ordinal();
-			case ELITE, THUNDER, VILLAGE, FORGE, CHAMBER -> 1;
+			case ELITE, THUNDER, VILLAGE, FORGE, CHAMBER, ORIGIN, PLOT, BID -> 1;
+			case NATIVES -> 3;
 			case ROGUES -> 2;
 			case MED_LONG -> 8 * 60;
 			case MED_SITE -> 5 * 60;
@@ -167,6 +173,9 @@ public final class DailyChores {
 			case VILLAGE -> config.vassalVillages && dev.kultivator.desa.Vassals.count(player.getUUID()) > 0;
 			case FORGE -> config.artifactForging && RealmTrials.done(player, "first_forge");
 			case CHAMBER -> config.secretRealms && RealmTrials.done(player, "realm_gate");
+			case NATIVES, ORIGIN -> config.immortalRealm && dev.kultivator.abadi.Abadi.ascended(player);
+			case PLOT -> config.innerWorld && dev.kultivator.batin.Batin.has(player);
+			case BID -> config.immortalAuction && dev.kultivator.abadi.Abadi.ascended(player);
 		};
 	}
 
@@ -188,7 +197,26 @@ public final class DailyChores {
 			// Forging and refining counters are module C's data (extra.tempa.made / refined, DESIGN 25.14).
 			case FORGE -> data.extra().getCompoundOrEmpty("tempa").getIntOr("made", 0) + data.extra().getCompoundOrEmpty("tempa").getIntOr("refined", 0);
 			case CHAMBER -> Goals.worldCounter(data, Goals.W_CLEARS);
+			case NATIVES -> Goals.worldCounter(data, Goals.W_NATIVES);
+			case PLOT -> Goals.worldCounter(data, Goals.W_PLOTS);
+			// Module A's data (DESIGN 26.13 extra.abadi): a lifetime counter when it keeps one, else today's count.
+			case ORIGIN -> abadiCounter(player, data.extra().getCompoundOrEmpty("abadi"), "mined_total", "mined", "mined_day");
+			case BID -> abadiCounter(player, data.extra().getCompoundOrEmpty("abadi").getCompoundOrEmpty("auction"), "bids", "won", "");
 		};
+	}
+
+	/**
+	 * A counter of module A for the phase-9 chores: the lifetime key when present, else the fallback key (a daily count is
+	 * read only on its own day, so a new day starts from 0 and the chore's "have" never falls).
+	 */
+	private static int abadiCounter(ServerPlayer player, CompoundTag tag, String lifetime, String fallback, String dayKey) {
+		if (tag.contains(lifetime)) {
+			return tag.getIntOr(lifetime, 0);
+		}
+		if (!dayKey.isEmpty() && tag.getLongOr(dayKey, -1L) != today(player)) {
+			return 0;
+		}
+		return tag.getIntOr(fallback, 0);
 	}
 
 	private static boolean progress(ServerPlayer player, CultivationData data, CompoundTag daily) {

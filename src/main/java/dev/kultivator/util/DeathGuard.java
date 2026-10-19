@@ -28,6 +28,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * <li>{@code REALM}: a lethal hit inside a secret realm expels the player at 1 HP (phase 8, DESIGN 25.2 item 5); before
  * the Totem so totems, cheat-death charges and Jiwa Tak Hancur are never spent in a realm; never against
  * {@code BYPASSES_INVULNERABILITY} ({@code /kill}, {@code out_of_world});</li>
+ * <li>{@code LANGIT}: phase 9 (DESIGN 26.14 item 6): a lethal blow during the ascension ritual, a star calamity, a wrath
+ * descent or a primordial skill becomes that event's failure at 1 HP (P9-langit and P9-purba register their own guards);
+ * before the Totem, never against {@code BYPASSES_INVULNERABILITY};</li>
  * <li>{@code TRIBULATION}: the never-lethal tribulation rule;</li>
  * <li>{@code TOTEM}: a death-protection item (Totem of Undying) in either hand always acts first. Fabric's ALLOW_DEATH
  * wraps the {@code isDeadOrDying} check that guards vanilla's {@code checkTotemDeathProtection} (verified in 26.3), so
@@ -39,7 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class DeathGuard {
 
-	public enum Stage { DUEL, REALM, TRIBULATION, TOTEM, TECHNIQUE, PERK }
+	public enum Stage { DUEL, REALM, LANGIT, TRIBULATION, TOTEM, TECHNIQUE, PERK }
 
 	@FunctionalInterface
 	public interface Guard {
@@ -113,7 +116,7 @@ public final class DeathGuard {
 			if (stage == Stage.TOTEM && holdsDeathProtection(player) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
 				return true;
 			}
-			if (stage == Stage.REALM && source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+			if ((stage == Stage.REALM || stage == Stage.LANGIT) && source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
 				continue;
 			}
 			if (stage == Stage.TECHNIQUE && (source.is(DamageHooks.UNBLOCKABLE) || DuelRules.inDuel(player) || Sparring.inDuel(player)

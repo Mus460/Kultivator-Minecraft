@@ -105,7 +105,10 @@ public final class FormationTargets {
 		return false;
 	}
 
-	/** The target modifier applied before the caps: elites and rogue tiers 1-3 ×0.6, bosses (the Patriarch too) ×0.25, silverfish 0. */
+	/**
+	 * The target modifier applied before the caps: elites, rogue tiers 1-3 and phase-9 foes ({@code kultivator.abadi_foe},
+	 * DESIGN 26.14 item 11) ×0.6, bosses (the Patriarch, primordials and the Panglima too) ×0.25, silverfish 0.
+	 */
 	public static double damageFactor(Mob mob) {
 		if (mob instanceof Silverfish) {
 			return 0.0D;
@@ -113,7 +116,8 @@ public final class FormationTargets {
 		if (TechniquePower.isBoss(mob)) {
 			return Stacking.BOSS_DAMAGE;
 		}
-		return EliteMonsters.isElite(mob) || RogueCultivators.isRogue(mob) ? Stacking.ELITE_DAMAGE : 1.0D;
+		return EliteMonsters.isElite(mob) || RogueCultivators.isRogue(mob) || mob.entityTags().contains(TechniquePower.TAG_ABADI_FOE)
+				? Stacking.ELITE_DAMAGE : 1.0D;
 	}
 
 	/**

@@ -471,6 +471,11 @@ public final class Halls {
 			Msg.chat(player, Component.translatable("kultivator.hall.disabled").withStyle(ChatFormatting.RED));
 			return;
 		}
+		if (dev.kultivator.abadi.Abadi.isImmortalLevel(level)) {
+			// Phase 9 (DESIGN 26.14 item 13): no Sect Hall in Alam Abadi.
+			Msg.chat(player, Component.translatable("kultivator.spine9.refuse.hall").withStyle(ChatFormatting.RED));
+			return;
+		}
 		UUID owner = player.getUUID();
 		UUID other = otherHallNear(owner, level, pos);
 		if (other != null) {

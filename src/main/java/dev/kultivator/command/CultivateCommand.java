@@ -149,10 +149,29 @@ public final class CultivateCommand {
 		dev.kultivator.musuh.Musuh.addCommands(root, debug);
 		dev.kultivator.tempa.Tempa.addCommands(root, debug);
 		dev.kultivator.desa.Desa.addCommands(root, debug);
+		// Phase 9 (DESIGN 26.14 item 18, 26.11): the Keabadian screen, then each module's own nodes (Brigadier merges the
+		// module's "abadi naik|lintas|info|ikut" into the same "abadi" node).
+		root.then(Commands.literal("abadi")
+				.executes(ctx -> openAbadi(self(ctx), dev.kultivator.network.Payloads.OpenScreen.ABADI_ALAM))
+				.then(Commands.literal("alam").executes(ctx -> openAbadi(self(ctx), dev.kultivator.network.Payloads.OpenScreen.ABADI_ALAM)))
+				.then(Commands.literal("purba").executes(ctx -> openAbadi(self(ctx), dev.kultivator.network.Payloads.OpenScreen.ABADI_PURBA)))
+				.then(Commands.literal("bencana").executes(ctx -> openAbadi(self(ctx), dev.kultivator.network.Payloads.OpenScreen.ABADI_BENCANA)))
+				.then(Commands.literal("batin").executes(ctx -> openAbadi(self(ctx), dev.kultivator.network.Payloads.OpenScreen.ABADI_BATIN)))
+				.then(Commands.literal("ciptaan").executes(ctx -> openAbadi(self(ctx), dev.kultivator.network.Payloads.OpenScreen.ABADI_CIPTAAN)))
+				.then(Commands.literal("lelang").executes(ctx -> openAbadi(self(ctx), dev.kultivator.network.Payloads.OpenScreen.ABADI_LELANG))));
+		dev.kultivator.abadi.Abadi.addCommands(root, debug);
+		dev.kultivator.purba.Purba.addCommands(root, debug);
+		dev.kultivator.batin.Batin.addCommands(root, debug);
 
 		TestCommands.addCommands(root);
 		root.then(debug);
 		return root;
+	}
+
+	/** {@code /kultivasi abadi [tab]}: opens the Keabadian screen on {@code tab}; the screen asks each phase-9 module for its data. */
+	private static int openAbadi(ServerPlayer player, int tab) {
+		Net.send(player, new dev.kultivator.network.Payloads.OpenScreen(dev.kultivator.network.Payloads.OpenScreen.ABADI, tab));
+		return 1;
 	}
 
 	/** {@code /kultivasi dunia [tab]}: opens the Dunia screen on {@code tab}; the screen asks each module for its data. */

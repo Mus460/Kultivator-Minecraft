@@ -251,7 +251,7 @@ public final class CodexHud implements HudElement {
 			Glyphs.spec(g, spec, x, y, size * 0.6F, Palette.fade(SpecInfo.ink(spec), fade));
 		}
 		if (carouselCurrent != null) {
-			Brush.centered(g, font, carouselCurrent.displayName(), cx, y + 10.0F, Palette.fade(0xFFF7DC7E, alpha), 0.6F, true);
+			Brush.centered(g, font, CodexNames.name(carouselCurrent), cx, y + 10.0F, Palette.fade(0xFFF7DC7E, alpha), 0.6F, true);
 		}
 	}
 

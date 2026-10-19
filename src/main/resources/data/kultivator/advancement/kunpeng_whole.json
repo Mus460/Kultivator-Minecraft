@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:kunpeng_slain",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.kunpeng_whole.description"
+    },
+    "icon": {
+      "id": "kultivator:kunpeng_bone_fragment"
+    },
+    "title": {
+      "translate": "advancement.kultivator.kunpeng_whole.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

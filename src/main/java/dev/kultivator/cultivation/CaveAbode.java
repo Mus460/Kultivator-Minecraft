@@ -140,6 +140,11 @@ public final class CaveAbode {
 			Msg.chat(player, dev.kultivator.alam.Alam.refusal().withStyle(net.minecraft.ChatFormatting.RED));
 			return false;
 		}
+		if (dev.kultivator.purba.Purba.inCalamity(player) || dev.kultivator.abadi.Abadi.inAscension(player)) {
+			// Phase 9 (DESIGN 26.14 item 13).
+			Msg.chat(player, net.minecraft.network.chat.Component.translatable("kultivator.spine9.refuse.busy").withStyle(net.minecraft.ChatFormatting.RED));
+			return false;
+		}
 		if (!data.meditating()) {
 			return refuse(player, "kultivator.kultivasi.abode.need_meditation");
 		}

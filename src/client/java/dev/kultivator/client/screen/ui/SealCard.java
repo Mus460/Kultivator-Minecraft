@@ -87,7 +87,7 @@ public class SealCard extends Widget {
 		Glyphs.spec(g, spec, mid, markY, markSize, mark);
 
 		if (named) {
-			Component name = spec.displayName();
+			Component name = dev.kultivator.client.codex.CodexNames.name(spec);
 			float scale = size >= 46 ? 0.5F : 0.42F;
 			Brush.fitCentered(g, font, name, mid, markY + markSize / 2.0F + 2.0F, size - 6.0F, bright ? Palette.INK : Palette.INK_SOFT, scale, scale * 0.8F,
 					false);

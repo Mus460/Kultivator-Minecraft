@@ -136,6 +136,25 @@ public final class EpicIds {
 	public static final int EXTRA_NATAL_BOND = 11;
 	/** A village swears allegiance. */
 	public static final int EXTRA_VILLAGE_OATH = 12;
+	// Phase 9 (DESIGN 26.14 item 4); every one obeys 23.1, the client only stamps them.
+	/** The ascension tribulation's omen: the five-coloured sky and the cloud disc. */
+	public static final int EXTRA_ASCEND_OMEN = 13;
+	/** The ascension passed: the player rises into Alam Abadi (sent only after the danger is over). */
+	public static final int EXTRA_ASCEND_PASS = 14;
+	/** A primordial beast's silhouette crosses the far sky. a = kind 0 Kun-Peng, 1 Zhulong, 2 Taotie. */
+	public static final int EXTRA_PRIMORDIAL_OMEN = 15;
+	/** A primordial beast changes phase. a = kind, b = the new phase 1-2. */
+	public static final int EXTRA_PRIMORDIAL_PHASE = 16;
+	/** "The Heavens gaze at you": the white-gold sky of a wrath descent. */
+	public static final int EXTRA_WRATH_OMEN = 17;
+	/** The player passed the seventh calamity: Penginjak Langit. */
+	public static final int EXTRA_PLAYER_TRAMPLING = 18;
+	/** An earthly calamity strikes the inner world. a = type 0 meteor, 1 flood, 2 lightning shadow; b = calamity number. */
+	public static final int EXTRA_INNER_CALAMITY = 19;
+	/** The first cast of a self-created art. a = slot 0-2. */
+	public static final int EXTRA_OWN_ART_BORN = 20;
+	/** An Immortal auction lot won. */
+	public static final int EXTRA_AUCTION_WIN = 21;
 
 	// TECH_ULTIMATE: the TechFx phases (CAST the pre-roll, TRAVEL / IMPACT the climax, END the release).
 	public static final int TECH_CAST = 0;
@@ -226,7 +245,7 @@ public final class EpicIds {
 	public static final int TOUR_ELITE = 1;
 	public static final int TOUR_HUNDRED_DYNASTIES = 2;
 
-	/** BOSS kinds, in the order of {@code uji momen bos <warden|wither|naga|penjaga|warisan|raja_siluman|penjaga_alam|tetua_iblis>}. */
+	/** BOSS kinds, in the order of {@code uji momen bos <warden|wither|naga|penjaga|warisan|raja_siluman|penjaga_alam|tetua_iblis|binatang_purba|panglima_langit>}. */
 	public static final int BOSS_WARDEN = 0;
 	public static final int BOSS_WITHER = 1;
 	public static final int BOSS_DRAGON = 2;
@@ -237,6 +256,10 @@ public final class EpicIds {
 	public static final int BOSS_REALM_GUARDIAN = 6;
 	/** Phase 8: the Demonic Patriarch of a sect raid (subject {@code tetua_iblis}; tags {@code kultivator.boss} + {@code kultivator.rogue}). */
 	public static final int BOSS_DEMONIC_ELDER = 7;
+	/** Phase 9 (DESIGN 26.14 item 4): a primordial beast (subject {@code binatang_purba}; tags {@code kultivator.boss} + {@code kultivator.purba}). */
+	public static final int BOSS_PRIMORDIAL = 8;
+	/** Phase 9: the Panglima Langit of a wrath descent (subject {@code panglima_langit}; tags {@code kultivator.boss} + {@code kultivator.abadi_foe}). */
+	public static final int BOSS_HEAVEN_GENERAL = 9;
 
 	/** Heavenly Flame seed kinds of a first boss kill (F1); 0 = none. */
 	public static final int FLAME_NONE = 0;
@@ -323,7 +346,7 @@ public final class EpicIds {
 	public static int maxBeat(int moment) {
 		return switch (moment) {
 			case TRIBULATION, DISCIPLE_BT -> 6;
-			case EXTRA -> EXTRA_VILLAGE_OATH;
+			case EXTRA -> EXTRA_AUCTION_WIN;
 			case BREAKTHROUGH, RECRUIT, SECT, TECH_ULTIMATE -> 2;
 			case ASCENSION -> 5;
 			case HEART_DEMON -> 3;

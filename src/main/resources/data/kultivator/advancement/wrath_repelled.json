@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:star_calamity_1",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.wrath_repelled.description"
+    },
+    "icon": {
+      "id": "kultivator:heaven_seal_shard"
+    },
+    "title": {
+      "translate": "advancement.kultivator.wrath_repelled.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -41,13 +41,15 @@ import java.util.Map;
  * <p>
  * Phase 8 (DESIGN 25.8.2, 25.8.3): a jade coin under the tablets turns the book between chapters 1-5 and 6-10
  * "Jalan Dunia"; Ujian shows the optional fourth row (any three rows make Fondasi Kokoh).
+ * <p>
+ * Phase 9 (DESIGN 26.9): the coin turns through a third book, chapters 11-15 "Jalan Abadi".
  */
 class JalanPage extends Page {
 
 	private static final String P = "kultivator.goals.page.";
 	private static final int SECTIONS = 3;
 	private static final int[] TRIAL_COLORS = {0xFF2E8963, 0xFF8A671B, 0xFF6E160F, 0xFF3A5E9A};
-	/** 0: chapters 1-5, 1: chapters 6-10 (Jalan Dunia). */
+	/** 0: chapters 1-5, 1: chapters 6-10 (Jalan Dunia), 2: chapters 11-15 (Jalan Abadi). */
 	private static int book;
 
 	private static int section;
@@ -117,13 +119,13 @@ class JalanPage extends Page {
 			put(tablet, 0);
 		}
 		JadeCoin turn = new JadeCoin(x + 2, y + h - 25, tabletW, 11, () -> Component.translatable(book == 0 ? "kultivator.jalan8.page.book.1"
-				: "kultivator.jalan8.page.book.2"), () -> book == 1);
+				: book == 1 ? "kultivator.jalan8.page.book.2" : "kultivator.jalan9.page.book.3"), () -> book > 0);
 		turn.onPress(() -> {
-			book = 1 - book;
+			book = (book + 1) % 3;
 			chapter = book * Guide.CHAPTERS + Math.floorMod(chapter, Guide.CHAPTERS);
 			stepScroll = 0.0F;
 		});
-		turn.tooltip(() -> List.of(Component.translatable("kultivator.jalan8.page.book.tip").withStyle(ChatFormatting.GRAY)));
+		turn.tooltip(() -> List.of(Component.translatable("kultivator.jalan9.page.book.tip").withStyle(ChatFormatting.GRAY)));
 		put(turn, 0);
 		JadeCoin hide = new JadeCoin(x + 2, y + h - 12, tabletW, 11, () -> Component.translatable(P + "hide"), () -> Guide.hidden(data()));
 		hide.enabledWhen(Keys::connected);
@@ -190,12 +192,20 @@ class JalanPage extends Page {
 		float start = cursor;
 		int current = Guide.currentStepAny(data);
 		float pulse = 0.5F + 0.5F * (float) Math.sin(Util.getMillis() / 220.0D);
-		if (chapter >= Guide.CHAPTERS) {
+		if (chapter >= Guide.CHAPTERS && chapter < Guide.ABADI_FIRST) {
 			// Jalan Dunia: the realm the chapter is meant for, and the cosmetic title once chapter 10 was claimed.
 			Component meant = Component.translatable("kultivator.jalan8.page.realm", Guide.CHAPTER_REALM[chapter - Guide.CHAPTERS].displayName());
 			cursor += Brush.wrap(g, font, meant, listX + 1.0F, cursor, listW - 4.0F, Palette.INK_FAINT, scale - 0.06F, false) + 2.0F;
-			if (chapter == Guide.ALL_CHAPTERS - 1 && Guide.worldTitle(data)) {
+			if (chapter == Guide.WORLD_CHAPTER && Guide.worldTitle(data)) {
 				cursor += Brush.wrap(g, font, Brush.bold(Component.translatable("kultivator.jalan8.page.title")), listX + 1.0F, cursor, listW - 4.0F,
+						Palette.SEAL_DARK, scale, false) + 2.0F;
+			}
+		} else if (chapter >= Guide.ABADI_FIRST) {
+			// Jalan Abadi: meant for Dewa Abadi Puncak, and the title "Leluhur Abadi" once chapter 15 was claimed.
+			cursor += Brush.wrap(g, font, Component.translatable("kultivator.jalan9.page.realm"), listX + 1.0F, cursor, listW - 4.0F, Palette.INK_FAINT,
+					scale - 0.06F, false) + 2.0F;
+			if (chapter == Guide.ALL_CHAPTERS - 1 && Guide.abadiTitle(data)) {
+				cursor += Brush.wrap(g, font, Brush.bold(Component.translatable("kultivator.jalan9.page.title")), listX + 1.0F, cursor, listW - 4.0F,
 						Palette.SEAL_DARK, scale, false) + 2.0F;
 			}
 		}

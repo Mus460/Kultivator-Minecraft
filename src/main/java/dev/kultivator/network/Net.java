@@ -93,6 +93,10 @@ public final class Net {
 			case Actions.MUSUH -> dev.kultivator.musuh.Musuh.handleAction(player, action.text());
 			case Actions.TEMPA -> dev.kultivator.tempa.Tempa.handleAction(player, action.text());
 			case Actions.DESA -> dev.kultivator.desa.Desa.handleAction(player, action.text());
+			// Phase 9 (DESIGN 26.14 item 1).
+			case Actions.ABADI -> dev.kultivator.abadi.Abadi.handleAction(player, action.text());
+			case Actions.PURBA -> dev.kultivator.purba.Purba.handleAction(player, action.text());
+			case Actions.BATIN -> dev.kultivator.batin.Batin.handleAction(player, action.text());
 			default -> {
 			}
 		}

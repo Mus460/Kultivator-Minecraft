@@ -45,6 +45,9 @@ public final class Keys {
 	public static final KeyMapping CINCIN = key("cincin", InputConstants.UNKNOWN.getValue());
 	/** Opens the scroll of the disciple you look at (else the nearest); pressed again inside it, the next disciple. */
 	public static final KeyMapping MURID = key("murid", InputConstants.KEY_M);
+	// Phase 9 (DESIGN 26.14 item 18, 26.10): unbound by default.
+	/** Opens or closes the Keabadian screen. */
+	public static final KeyMapping ABADI = key("abadi", InputConstants.UNKNOWN.getValue());
 
 	private static boolean jumpWasDown;
 	private static int airTicks;
@@ -82,6 +85,11 @@ public final class Keys {
 		while (DUNIA.consumeClick()) {
 			if (free) {
 				dev.kultivator.client.dunia.DuniaClient.open(Payloads.OpenScreen.DUNIA_ALAM);
+			}
+		}
+		while (ABADI.consumeClick()) {
+			if (free) {
+				dev.kultivator.client.dunia.DuniaClient.openAbadi(Payloads.OpenScreen.ABADI_ALAM);
 			}
 		}
 		while (MURID.consumeClick()) {

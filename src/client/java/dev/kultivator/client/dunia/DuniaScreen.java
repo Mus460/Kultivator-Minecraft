@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * The Dunia screen (DESIGN 25.10, {@code OpenScreen.DUNIA = 7}, {@code /kultivasi dunia [tab]}, the {@code dunia} key): the
@@ -58,12 +59,36 @@ public class DuniaScreen extends Screen {
 
 	/** Opens on {@code tab}: 0 Alam, 1 Pusaka, 2 Musuh, 3 Desa ({@code Payloads.OpenScreen.DUNIA_*}). */
 	public DuniaScreen(int tab) {
-		super(Component.translatable("kultivator.spine8.dunia.title"));
-		pages.add(new dev.kultivator.client.alam.AlamPage(this));
-		pages.add(new dev.kultivator.client.tempa.PusakaPage(this));
-		pages.add(new dev.kultivator.client.musuh.MusuhPage(this));
-		pages.add(new dev.kultivator.client.desa.DesaPage(this));
-		this.tab = Math.max(0, Math.min(pages.size() - 1, tab));
+		this(Component.translatable("kultivator.spine8.dunia.title"), tab, screen -> List.of(
+				new dev.kultivator.client.alam.AlamPage(screen),
+				new dev.kultivator.client.tempa.PusakaPage(screen),
+				new dev.kultivator.client.musuh.MusuhPage(screen),
+				new dev.kultivator.client.desa.DesaPage(screen)));
+	}
+
+	/**
+	 * A jade scroll with other tablets (phase 9, DESIGN 26.14 item 19: the Keabadian screen): {@code pages} builds the pages
+	 * for this screen; the subclass overrides {@link #maxTabletHeight()}, {@link #requestData()} and {@link #isCloseKey}.
+	 */
+	protected DuniaScreen(Component title, int tab, Function<DuniaScreen, List<DuniaPage>> pages) {
+		super(title);
+		this.pages.addAll(pages.apply(this));
+		this.tab = Math.max(0, Math.min(this.pages.size() - 1, tab));
+	}
+
+	/** The tallest a jade tablet may be (46 here; 36 for six tablets). */
+	protected int maxTabletHeight() {
+		return MAX_TABLET_H;
+	}
+
+	/** Asks the modules behind the pages for their data (once, when the screen opens). */
+	protected void requestData() {
+		DuniaClient.requestAll();
+	}
+
+	/** True for the key that toggles this screen (pressed while open, it closes it). */
+	protected boolean isCloseKey(KeyEvent event) {
+		return Keys.DUNIA.matches(event);
 	}
 
 	/** Shows {@code lines} as this frame's tooltip (drawn last, over everything). */
@@ -73,7 +98,7 @@ public class DuniaScreen extends Screen {
 		}
 	}
 
-	/** The tab shown now (0-3). */
+	/** The tab shown now (0-3; 0-5 on the Keabadian screen). */
 	public int tab() {
 		return tab;
 	}
@@ -90,7 +115,7 @@ public class DuniaScreen extends Screen {
 			openedAt = Util.getMillis();
 			lastFrame = openedAt;
 			UiSound.open();
-			DuniaClient.requestAll();
+			requestData();
 		}
 		int scrollW = Math.min(MAX_W, width - TABLET_W - 26);
 		int scrollH = Math.min(MAX_H, height - 12);
@@ -107,7 +132,7 @@ public class DuniaScreen extends Screen {
 		int count = pages.size();
 		int top = paperTop + 10;
 		int gap = height < 250 ? 2 : 3;
-		int tabletH = Math.max(24, Math.min(MAX_TABLET_H, (paperBottom - paperTop - 20 - gap * (count - 1)) / count));
+		int tabletH = Math.max(24, Math.min(maxTabletHeight(), (paperBottom - paperTop - 20 - gap * (count - 1)) / count));
 		for (int i = 0; i < count; i++) {
 			int index = i;
 			DuniaPage page = pages.get(i);
@@ -297,7 +322,7 @@ public class DuniaScreen extends Screen {
 			}
 			return event.key() == InputConstants.KEY_ESCAPE ? super.keyPressed(event) : true;
 		}
-		if (Keys.DUNIA.matches(event)) {
+		if (isCloseKey(event)) {
 			onClose();
 			return true;
 		}

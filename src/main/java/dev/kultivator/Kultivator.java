@@ -126,6 +126,10 @@ public class Kultivator implements ModInitializer {
 		dev.kultivator.musuh.Musuh.init();
 		dev.kultivator.tempa.Tempa.init();
 		dev.kultivator.desa.Desa.init();
+		// Phase 9: Petualangan Dewa Abadi (DESIGN 26.14 item 18). Each registers its own items, entities and hooks.
+		dev.kultivator.abadi.Abadi.init();
+		dev.kultivator.purba.Purba.init();
+		dev.kultivator.batin.Batin.init();
 		// After every module registered its items.
 		ModItems.init();
 		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its

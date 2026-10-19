@@ -294,6 +294,8 @@ public final class ShadowArts {
 		sink.add(art("kunpeng_art", 809, Dao.SHADOW)
 				.grade(TechniqueGrade.DEWA, 0).type(TechniqueType.PAMUNGKAS).realm(Realm.TRUE_IMMORTAL)
 				.gate(Gate.DEWA_I).prereq("wind_roaring_formation", 3)
+				// Phase 9 (DESIGN 26.14 item 16, 26.4.6): six distinct bone pieces held when Kun-Peng dies.
+				.route(Route.item("kunpeng_whole"))
 				.flag(Flag.NO_TEACH)
 				.charge(20)
 				.qiPct(75).cooldown(600.0D)

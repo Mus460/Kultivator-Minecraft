@@ -195,6 +195,36 @@ public final class KultivatorConfig {
 	/** Blocks from the hall stele a vassal village may lie (128-512). */
 	public int vassalRange = 256;
 
+	// ---- phase 9: Petualangan Dewa Abadi (DESIGN 26.12)
+	/** The ascension to Alam Abadi (the kultivator:alam_abadi dimension) is possible at all. */
+	public boolean immortalRealm = true;
+	/** Radius of the soft circular border around 0,0 in Alam Abadi (512-4096). */
+	public int immortalRealmRadius = 2048;
+	/** Alam Abadi natives within 48 blocks of one player (0-6). */
+	public int immortalNativesPerPlayer = 4;
+	/** Alam Abadi natives alive in the whole dimension (4-16). */
+	public int immortalNativeWorldCap = 12;
+	/** Primordial beasts (Kun-Peng, Zhulong, Taotie) appear at all. */
+	public boolean primordialBeasts = true;
+	/** Multiplies the natural Gejolak Purba chance (0-3). */
+	public double primordialChanceScale = 1.0D;
+	/** A lethal hit from a primordial skill leaves the player at 1 HP with Luka Purba instead of killing. */
+	public boolean primordialDeathGuard = true;
+	/** The player's Seven Star Calamities gate the stars (false: stars are never gated). */
+	public boolean starCalamities = true;
+	/** The Heavens send wrath descents and the Panglima Langit. */
+	public boolean heavenlyWrath = true;
+	/** In-game days between two wrath rolls (3-15, ±1). */
+	public int heavenlyWrathDays = 5;
+	/** The inner world (Dunia Batin) is born at the ascension. */
+	public boolean innerWorld = true;
+	/** In-game days between two earthly calamities of the inner world (3-15; 0 = off). */
+	public int innerWorldCalamityDays = 5;
+	/** The Immortal auction holds sessions in Alam Abadi. */
+	public boolean immortalAuction = true;
+	/** Chance that an offended rival bidder sends a pursuit (0-1). */
+	public double auctionPursuitChance = 0.35D;
+
 	public static KultivatorConfig get() {
 		return instance;
 	}
@@ -231,7 +261,7 @@ public final class KultivatorConfig {
 		}
 	}
 
-	/** Keeps every phase-6, 6b, 6c, 7, 7b, 7c and 8 number inside its allowed range (DESIGN 20.2.11, 21.24, 22.18.1, 19.2.10, 23.2, 24.13, 25.12). */
+	/** Keeps every phase-6, 6b, 6c, 7, 7b, 7c, 8 and 9 number inside its allowed range (DESIGN 20.2.11, 21.24, 22.18.1, 19.2.10, 23.2, 24.13, 25.12, 26.12). */
 	private void clamp() {
 		recruitmentIntervalDays = clamp(recruitmentIntervalDays, 1, 15);
 		tournamentIntervalDays = clamp(tournamentIntervalDays, 3, 30);
@@ -276,6 +306,14 @@ public final class KultivatorConfig {
 		raidMaxAlive = clamp(raidMaxAlive, 4, 12);
 		raidAfkSeconds = clamp(raidAfkSeconds, 30, 300);
 		vassalRange = clamp(vassalRange, 128, 512);
+		// Phase 9 (DESIGN 26.12).
+		immortalRealmRadius = clamp(immortalRealmRadius, 512, 4096);
+		immortalNativesPerPlayer = clamp(immortalNativesPerPlayer, 0, 6);
+		immortalNativeWorldCap = clamp(immortalNativeWorldCap, 4, 16);
+		primordialChanceScale = clamp(primordialChanceScale, 0.0D, 3.0D, 1.0D);
+		heavenlyWrathDays = clamp(heavenlyWrathDays, 3, 15);
+		innerWorldCalamityDays = innerWorldCalamityDays <= 0 ? 0 : clamp(innerWorldCalamityDays, 3, 15);
+		auctionPursuitChance = clamp(auctionPursuitChance, 0.0D, 1.0D, 0.35D);
 	}
 
 	private static int clamp(int value, int min, int max) {

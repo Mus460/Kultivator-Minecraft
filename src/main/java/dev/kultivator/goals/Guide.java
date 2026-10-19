@@ -47,6 +47,10 @@ import java.util.List;
  * (the type of {@code guide} is unchanged); their claimed bits are bits 5-9 of {@code claimed}. All 20 grant
  * {@code world_path_complete}. They complete only from advancements, back-filled on join.
  * <p>
+ * Phase 9 (DESIGN 26.9, the P9-batin glue) adds chapters 11-15 "Jalan Abadi" with 20 more steps in a third int
+ * {@code extra.goals.guide3}; their claimed bits are bits 10-14 of {@code claimed}. All 20 grant
+ * {@code immortal_path_complete}; claiming chapter 15 gives the cosmetic title "Leluhur Abadi" ({@code abadi_title}).
+ * <p>
  * Sumber: Terinspirasi dari Yao Lao's guidance of Xiao Yan (BTTH); chapter rewards Terinspirasi dari BTTH ch. 20
  * (Foundation Elixirs "tailored for you"). The steps are game design.
  */
@@ -62,10 +66,18 @@ public final class Guide {
 	public static final int ALL = (1 << STEP_COUNT) - 1;
 	/** Phase 8: chapters 6-10 in {@code guide2}. */
 	public static final String KEY2 = "guide2";
-	public static final int ALL_CHAPTERS = 10;
+	/** Phase 9: chapters 11-15 in {@code guide3}. */
+	public static final String KEY3 = "guide3";
+	public static final int ALL_CHAPTERS = 15;
 	public static final int ALL_STEPS = ALL_CHAPTERS * PER_CHAPTER;
+	/** The chapter index (0-based) of chapter 10, whose claim gives the World Path title. */
+	public static final int WORLD_CHAPTER = 9;
+	/** The first chapter index of Jalan Abadi (chapter 11). */
+	public static final int ABADI_FIRST = 10;
 	/** {@code extra.goals.world_title}: the cosmetic title "Penguasa Jalan Dunia" of chapter 10. */
 	public static final String WORLD_TITLE = "world_title";
+	/** {@code extra.goals.abadi_title}: the cosmetic title "Leluhur Abadi" of chapter 15. */
+	public static final String ABADI_TITLE = "abadi_title";
 	/** Seals of the Cincin Segel the chapter-5 step asks for. */
 	public static final int SEALS_NEEDED = 4;
 	/** The power of the chapter-5 Shield Talisman. */
@@ -99,6 +111,19 @@ public final class Guide {
 			new Step("w_spirit3", "spirit_complete"), new Step("w_dewa", "artifact_dewa"), new Step("w_tomb81", "heavenly_tomb_81"),
 			new Step("w_loyal", "village_loyal")
 	};
+	/** Chapters 11-15 "Jalan Abadi" (DESIGN 26.9), each step completed by one phase-9 advancement. */
+	public static final Step[] STEPS3 = {
+			new Step("a_realm", "immortal_realm"), new Step("a_stone", "origin_stone"), new Step("a_essence", "essence_half"),
+			new Step("a_cross", "realm_crossing"),
+			new Step("a_primordial", "primordial_slain"), new Step("a_kunpeng", "kunpeng_slain"), new Step("a_auction", "auction_win"),
+			new Step("a_pursuit", "pursuit_survived"),
+			new Step("a_calamity", "star_calamity_1"), new Step("a_trial", "first_trial"), new Step("a_wrath", "wrath_repelled"),
+			new Step("a_general", "heaven_general"),
+			new Step("a_nine", "batin_nine"), new Step("a_millennium", "batin_millennium"), new Step("a_batin_cal", "batin_calamity"),
+			new Step("a_rockmen", "rockmen"),
+			new Step("a_own", "own_art"), new Step("a_perfect", "own_art_perfect"), new Step("a_three", "three_primordials"),
+			new Step("a_trampler", "heaven_trampler_player")
+	};
 	/** The realm each phase-8 chapter is meant for (FE, GC, DT, IA, TI), shown on the tablet. */
 	public static final Realm[] CHAPTER_REALM = {Realm.FOUNDATION, Realm.GOLDEN_CORE, Realm.DEITY_TRANSFORMATION, Realm.IMMORTAL_ASCENSION,
 			Realm.TRUE_IMMORTAL};
@@ -116,19 +141,42 @@ public final class Guide {
 		return GoalCounters.view(data).getIntOr(KEY2, 0) & ALL;
 	}
 
-	/** The step of any of the 40 indices (0-19 chapters 1-5, 20-39 chapters 6-10). */
+	/** The phase-9 step bits of chapters 11-15 (bit i = step 40 + i). */
+	public static int bits3(CultivationData data) {
+		return GoalCounters.view(data).getIntOr(KEY3, 0) & ALL;
+	}
+
+	/** The step of any of the 60 indices (0-19 chapters 1-5, 20-39 chapters 6-10, 40-59 chapters 11-15). */
 	public static Step step(int index) {
-		return index < STEP_COUNT ? STEPS[Math.max(0, index)] : STEPS2[Math.min(STEP_COUNT - 1, index - STEP_COUNT)];
+		if (index < STEP_COUNT) {
+			return STEPS[Math.max(0, index)];
+		}
+		if (index < 2 * STEP_COUNT) {
+			return STEPS2[index - STEP_COUNT];
+		}
+		return STEPS3[Math.min(STEP_COUNT - 1, index - 2 * STEP_COUNT)];
 	}
 
-	/** The four step bits (0-15) of any chapter 0-9. */
+	/** The four step bits (0-15) of any chapter 0-14. */
 	public static int chapterBits(CultivationData data, int chapter) {
-		return chapter < CHAPTERS ? (bits(data) >> (chapter * PER_CHAPTER)) & 0xF : (bits2(data) >> ((chapter - CHAPTERS) * PER_CHAPTER)) & 0xF;
+		if (chapter < CHAPTERS) {
+			return (bits(data) >> (chapter * PER_CHAPTER)) & 0xF;
+		}
+		if (chapter < ABADI_FIRST) {
+			return (bits2(data) >> ((chapter - CHAPTERS) * PER_CHAPTER)) & 0xF;
+		}
+		return (bits3(data) >> ((chapter - ABADI_FIRST) * PER_CHAPTER)) & 0xF;
 	}
 
-	/** True when step {@code index} (0-39) is done. */
+	/** True when step {@code index} (0-59) is done. */
 	public static boolean stepDone(CultivationData data, int index) {
-		return index < STEP_COUNT ? (bits(data) & (1 << index)) != 0 : (bits2(data) & (1 << (index - STEP_COUNT))) != 0;
+		if (index < STEP_COUNT) {
+			return (bits(data) & (1 << index)) != 0;
+		}
+		if (index < 2 * STEP_COUNT) {
+			return (bits2(data) & (1 << (index - STEP_COUNT))) != 0;
+		}
+		return (bits3(data) & (1 << (index - 2 * STEP_COUNT))) != 0;
 	}
 
 	/** Steps done in any chapter 0-9. */
@@ -141,17 +189,21 @@ public final class Guide {
 		return chapterBits(data, chapter) == 0xF;
 	}
 
-	/** The first step left among all 40 (0-39), or -1 when everything is done. */
+	/** The first step left among all 60 (0-59), or -1 when everything is done. */
 	public static int currentStepAny(CultivationData data) {
 		int first = currentStep(bits(data));
 		if (first >= 0) {
 			return first;
 		}
 		int second = currentStep(bits2(data));
-		return second < 0 ? -1 : STEP_COUNT + second;
+		if (second >= 0) {
+			return STEP_COUNT + second;
+		}
+		int third = currentStep(bits3(data));
+		return third < 0 ? -1 : 2 * STEP_COUNT + third;
 	}
 
-	/** The first chapter 0-9 with a step left (10 when all are done). */
+	/** The first chapter 0-14 with a step left (15 when all are done). */
 	public static int currentChapterAny(CultivationData data) {
 		for (int chapter = 0; chapter < ALL_CHAPTERS; chapter++) {
 			if (!chapterDoneAny(data, chapter)) {
@@ -161,13 +213,18 @@ public final class Guide {
 		return ALL_CHAPTERS;
 	}
 
-	/** Steps done of all 40. */
+	/** Steps done of all 60. */
 	public static int totalDone(CultivationData data) {
-		return Integer.bitCount(bits(data)) + Integer.bitCount(bits2(data));
+		return Integer.bitCount(bits(data)) + Integer.bitCount(bits2(data)) + Integer.bitCount(bits3(data));
 	}
 
 	public static boolean worldTitle(CultivationData data) {
 		return GoalCounters.view(data).getBooleanOr(WORLD_TITLE, false);
+	}
+
+	/** The cosmetic title "Leluhur Abadi" of chapter 15 was claimed. */
+	public static boolean abadiTitle(CultivationData data) {
+		return GoalCounters.view(data).getBooleanOr(ABADI_TITLE, false);
 	}
 
 	public static int claimed(CultivationData data) {
@@ -253,6 +310,17 @@ public final class Guide {
 		if (add2 != 0) {
 			mark2(player, Cultivators.get(player), add2);
 		}
+		int add3 = 0;
+		for (int i = 0; i < STEPS3.length; i++) {
+			for (String advancement : STEPS3[i].advancements()) {
+				if (advancement.equals(name)) {
+					add3 |= 1 << i;
+				}
+			}
+		}
+		if (add3 != 0) {
+			mark3(player, Cultivators.get(player), add3);
+		}
 	}
 
 	/** On join: every step whose advancement is already done (or that the rank proves) is ticked. */
@@ -291,6 +359,15 @@ public final class Guide {
 			}
 		}
 		mark2(player, data, add2);
+		int add3 = 0;
+		for (int i = 0; i < STEPS3.length; i++) {
+			for (String advancement : STEPS3[i].advancements()) {
+				if (RealmTrials.done(player, advancement)) {
+					add3 |= 1 << i;
+				}
+			}
+		}
+		mark3(player, data, add3);
 	}
 
 	/** Every 100 ticks: the two steps without an advancement. */
@@ -377,7 +454,39 @@ public final class Guide {
 		}
 	}
 
-	/** Action JALAN {@code claim:<chapter>} (1-10): the chapter's reward into the inventory or at the feet. */
+	/** Sets phase-9 step bits (chapters 11-15); tells about finished chapters and grants {@code immortal_path_complete}. */
+	static void mark3(ServerPlayer player, CultivationData data, int add) {
+		CompoundTag goals = GoalCounters.goals(data);
+		int before = goals.getIntOr(KEY3, 0) & ALL;
+		int after = (before | add) & ALL;
+		if (after == before) {
+			return;
+		}
+		goals.putInt(KEY3, after);
+		Cultivators.dirty(player);
+		MutableComponent names = Component.empty();
+		int finished = 0;
+		boolean reward = false;
+		for (int chapter = 0; chapter < CHAPTERS; chapter++) {
+			if (chapterDone(after, chapter) && !chapterDone(before, chapter)) {
+				if (finished > 0) {
+					names.append(Component.literal(", "));
+				}
+				names.append(Component.translatable("kultivator.goals.chapter." + (chapter + ABADI_FIRST + 1)));
+				finished++;
+				reward |= KultivatorConfig.get().guideRewards && (claimed(data) & (1 << (chapter + ABADI_FIRST))) == 0;
+			}
+		}
+		if (finished > 0) {
+			Msg.chat(player, Component.translatable(reward ? "kultivator.goals.guide.chapter_done_reward" : "kultivator.goals.guide.chapter_done",
+					names).withStyle(ChatFormatting.GOLD));
+		}
+		if (after == ALL && before != ALL) {
+			Advancements.grant(player, "immortal_path_complete");
+		}
+	}
+
+	/** Action JALAN {@code claim:<chapter>} (1-15): the chapter's reward into the inventory or at the feet. */
 	static void claim(ServerPlayer player, int chapterNumber) {
 		int chapter = chapterNumber - 1;
 		CultivationData data = Cultivators.get(player);
@@ -404,9 +513,13 @@ public final class Guide {
 		for (ItemStack stack : stacks) {
 			give(player, stack);
 		}
-		if (chapter == ALL_CHAPTERS - 1) {
+		if (chapter == WORLD_CHAPTER) {
 			goals.putBoolean(WORLD_TITLE, true);
 			Msg.chat(player, Component.translatable("kultivator.jalan8.title_won").withStyle(ChatFormatting.LIGHT_PURPLE));
+		}
+		if (chapter == ALL_CHAPTERS - 1) {
+			goals.putBoolean(ABADI_TITLE, true);
+			Msg.chat(player, Component.translatable("kultivator.jalan9.title_won").withStyle(ChatFormatting.LIGHT_PURPLE));
 		}
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.9F, 1.3F);
 		Msg.chat(player, Component.translatable("kultivator.goals.guide.claimed", Component.translatable("kultivator.goals.chapter." + chapterNumber))
@@ -453,7 +566,19 @@ public final class Guide {
 				list.add(SpiritStones.stack(SpiritStones.SUPREME, 1));
 				list.add(byId("tomb_sigil", 1, SpiritStones.stack(SpiritStones.HIGH, 2)));
 			}
-			default -> list.add(byId("tomb_essence", 3, SpiritStones.stack(SpiritStones.SUPREME, 1)));
+			case 9 -> list.add(byId("tomb_essence", 3, SpiritStones.stack(SpiritStones.SUPREME, 1)));
+			// Phase 9 (DESIGN 26.9): other modules' items by registry id, a Supreme spirit stone while one is not registered.
+			case 10 -> {
+				list.add(byId("immortal_origin_stone", 8, SpiritStones.stack(SpiritStones.SUPREME, 2)));
+				list.add(byId("realm_crossing_talisman", 1, SpiritStones.stack(SpiritStones.SUPREME, 1)));
+			}
+			case 11 -> list.add(byId("shan_hai_scroll", 1, SpiritStones.stack(SpiritStones.SUPREME, 2)));
+			case 12 -> {
+				list.add(byId("immortal_essence_pearl", 20, SpiritStones.stack(SpiritStones.SUPREME, 2)));
+				list.add(byId("heaven_seal_shard", 2, SpiritStones.stack(SpiritStones.SUPREME, 1)));
+			}
+			case 13 -> list.add(byId("land_expansion_token", 1, SpiritStones.stack(SpiritStones.SUPREME, 3)));
+			default -> list.add(SpiritStones.stack(SpiritStones.SUPREME, 1));
 		}
 		list.removeIf(ItemStack::isEmpty);
 		return list;
@@ -508,7 +633,7 @@ public final class Guide {
 		}
 	}
 
-	/** {@code uji jalan bab <n>} (1-10): completes chapters 1..n. */
+	/** {@code uji jalan bab <n>} (1-15): completes chapters 1..n. */
 	static void completeUpTo(ServerPlayer player, int chapters) {
 		int add = 0;
 		for (int chapter = 0; chapter < Math.min(CHAPTERS, chapters); chapter++) {
@@ -516,11 +641,18 @@ public final class Guide {
 		}
 		mark(player, Cultivators.get(player), add);
 		int add2 = 0;
-		for (int chapter = CHAPTERS; chapter < Math.min(ALL_CHAPTERS, chapters); chapter++) {
+		for (int chapter = CHAPTERS; chapter < Math.min(ABADI_FIRST, chapters); chapter++) {
 			add2 |= chapterMask(chapter - CHAPTERS);
 		}
 		if (add2 != 0) {
 			mark2(player, Cultivators.get(player), add2);
+		}
+		int add3 = 0;
+		for (int chapter = ABADI_FIRST; chapter < Math.min(ALL_CHAPTERS, chapters); chapter++) {
+			add3 |= chapterMask(chapter - ABADI_FIRST);
+		}
+		if (add3 != 0) {
+			mark3(player, Cultivators.get(player), add3);
 		}
 	}
 
