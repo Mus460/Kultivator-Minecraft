@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.ToDoubleFunction;
 
 /**
  * All technique math (DESIGN 22.5, 22.6, 22.11.3, 22.14): power P, the A/D/N growth, qi and cooldown after mastery and
@@ -123,6 +124,62 @@ public final class TechniquePower {
 	public static final String TAG_ELITE = "kultivator.elite";
 	/** Rogue cultivators (DESIGN 25.1.2, phase 8): trial-mob rule; the Patriarch also carries {@link #TAG_BOSS}. */
 	public static final String TAG_ROGUE = "kultivator.rogue";
+	/**
+	 * Every phase-9 hostile (DESIGN 26.2.2): natives, envoys, the Panglima, primordials, relics, batin meteors and calamity
+	 * foes. Trial-mob rule with the attacker's stars counted again: legacy power × 1.5 × sqrt(S(stars)).
+	 */
+	public static final String TAG_ABADI_FOE = "kultivator.abadi_foe";
+	/** The product of every player star factor (DESIGN 26.14 item 5: the T factor of the Seven Calamities) stays in this range. */
+	public static final double PLAYER_STAR_FACTOR_MIN = 1.0D;
+	public static final double PLAYER_STAR_FACTOR_MAX = 1.331D;
+
+	private static final List<ToDoubleFunction<CultivationData>> PLAYER_STAR_FACTORS = new CopyOnWriteArrayList<>();
+
+	/**
+	 * Adds a factor multiplied into the player's star factor S(stars) and the star health bonus (DESIGN 26.14 item 5); the
+	 * product of all of them is clamped to {@link #PLAYER_STAR_FACTOR_MIN}..{@link #PLAYER_STAR_FACTOR_MAX}. Must be pure
+	 * (it reads the data only); register from a module's {@code init()}. Players only, never disciples.
+	 */
+	public static void addPlayerStarFactor(ToDoubleFunction<CultivationData> factor) {
+		if (factor != null) {
+			PLAYER_STAR_FACTORS.add(factor);
+		}
+	}
+
+	/** The clamped product of every player star factor (1 without any). */
+	public static double playerStarProduct(CultivationData data) {
+		if (PLAYER_STAR_FACTORS.isEmpty() || data == null) {
+			return 1.0D;
+		}
+		double product = 1.0D;
+		for (ToDoubleFunction<CultivationData> factor : PLAYER_STAR_FACTORS) {
+			try {
+				double value = factor.applyAsDouble(data);
+				if (Double.isFinite(value) && value >= 0.0D) {
+					product *= value;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("Kultivator player star factor failed", exception);
+			}
+		}
+		return Math.max(PLAYER_STAR_FACTOR_MIN, Math.min(PLAYER_STAR_FACTOR_MAX, product));
+	}
+
+	/** The player's S(stars) × {@link #playerStarProduct}: the star factor of P_player. */
+	public static double playerStarFactor(CultivationData data) {
+		return starFactor(playerStars(data)) * playerStarProduct(data);
+	}
+
+	/** The attacker's star factor for the phase-9 trial-mob branch: a player's {@link #playerStarFactor}, a disciple's S(stars), else 1. */
+	public static double attackerStarFactor(LivingEntity attacker) {
+		if (attacker instanceof ServerPlayer player) {
+			return playerStarFactor(Cultivators.get(player));
+		}
+		if (attacker instanceof DiscipleEntity disciple) {
+			return starFactor(DisciplePaths.stars(disciple.data()));
+		}
+		return 1.0D;
+	}
 	/** The product of all {@link CasterFactor}s is clamped to this range on its own (DESIGN 25.2 item 6). */
 	public static final double CASTER_FACTOR_MIN = 0.8D;
 	public static final double CASTER_FACTOR_MAX = 1.30D;
@@ -334,7 +391,7 @@ public final class TechniquePower {
 	public static double power(CultivationData data, @Nullable Dao dao) {
 		double quality = Math.sqrt(Math.max(0.01D, data.qualityFactor()));
 		double multiplier = KultivatorConfig.get().techniqueDamageMultiplier;
-		return PLAYER_BASE * rankFactor(data.rank()) * comprehensionFactor(data, dao) * quality * starFactor(playerStars(data)) * multiplier;
+		return PLAYER_BASE * rankFactor(data.rank()) * comprehensionFactor(data, dao) * quality * playerStarFactor(data) * multiplier;
 	}
 
 	public static double power(CultivationData data, TechniqueSpec spec) {
@@ -610,10 +667,14 @@ public final class TechniquePower {
 		return entity.is(TECHNIQUE_BOSSES) || entity.entityTags().contains(TAG_BOSS) || entity.entityTags().contains(TAG_DUMMY_BOSS);
 	}
 
-	/** Dao Protectors, trial guards, elites (19.2.8) and rogue cultivators (25.1.2): legacy power × 1.5 instead of P (22.14.4). */
+	/**
+	 * Dao Protectors, trial guards, elites (19.2.8), rogue cultivators (25.1.2) and phase-9 foes (26.2.2): legacy power × 1.5
+	 * instead of P (22.14.4); against {@link #TAG_ABADI_FOE} also × sqrt(S(attacker stars)).
+	 */
 	public static boolean isTrialMob(LivingEntity entity) {
 		Set<String> tags = entity.entityTags();
-		return tags.contains(TAG_DAO_PROTECTOR) || tags.contains(TAG_TRIAL_GUARD) || tags.contains(TAG_ELITE) || tags.contains(TAG_ROGUE);
+		return tags.contains(TAG_DAO_PROTECTOR) || tags.contains(TAG_TRIAL_GUARD) || tags.contains(TAG_ELITE) || tags.contains(TAG_ROGUE)
+				|| tags.contains(TAG_ABADI_FOE);
 	}
 
 	/** The attacker's own heart demon. */
@@ -774,6 +835,10 @@ public final class TechniquePower {
 					mastery = 1.0D;
 				} else if (isTrialMob(target)) {
 					power = legacyPower(attacker, spec) * TRIAL_MOB_FACTOR;
+					// Phase 9 (DESIGN 26.2.2, 26.14 item 5): stars matter again against Alam Abadi foes, sub-linearly.
+					if (target.entityTags().contains(TAG_ABADI_FOE)) {
+						power *= Math.sqrt(attackerStarFactor(attacker));
+					}
 				}
 				raw = ctx.coef() * power * mastery * clampF(ctx.f(), arena);
 				// Phase 7 target factors (DESIGN 19.2.8): elements and Perisai Unsur, never in arenas or against players.

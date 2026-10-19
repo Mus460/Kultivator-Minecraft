@@ -96,6 +96,8 @@ bulat di dalam game.
 54. [**Momen Epik (Fase 7b)**](#54-momen-epik-fase-7b): kamera sinematik, kartu judul, langit, `/sinematik`, `uji momen`
 55. [**Jalan Dunia Kultivasi (Fase 8)**](#55-jalan-dunia-kultivasi-fase-8): alam rahasia, kultivator liar dan serbuan,
     tempa dan pusaka natal, cincin, desa bawahan, lem progresi, [perintah uji](#5511-perintah-uji-op)
+56. [**Petualangan Dewa Abadi (Fase 9)**](#56-petualangan-dewa-abadi-fase-9): Alam Abadi, Batu Asal Abadi, Binatang
+    Purba, Bencana Bintang dan Murka Langit, Dunia Batin, Jurus Ciptaan, Lelang, [perintah](#5612-perintah)
 
 ---
 
@@ -7155,3 +7157,248 @@ Contoh:
 * Mengganti nama desa lewat perintah `desa nama`, bukan kotak teks di kartu. Gelar "Penguasa Jalan Dunia" hanya tampil di
   tablet Jalan dan chat.
 * Kewajiban harian "alam rahasia" menghitung alam yang ditaklukkan, bukan ruang tunggal.
+
+---
+
+## 56. Petualangan Dewa Abadi (Fase 9)
+
+Fase 9 memberi Dewa Abadi Puncak tujuan baru setelah ranah terakhir: **naik ke Alam Abadi** (dimensi pulau melayang),
+mengumpulkan **Batu Asal Abadi**, memburu tiga **Binatang Purba**, menghadapi **Tujuh Bencana Bintang** dan **Murka
+Langit**, merawat **Dunia Batin** di dalam tubuhmu, menciptakan **jurusmu sendiri**, dan menawar di **Lelang Abadi**.
+Tablet Jalan bab 11–15 ("Jalan Abadi") menuntunmu.
+
+> **Status:** seluruh Fase 9 sudah dikompilasi tetapi **belum diuji di game**. Daftar uji: [docs/uji/FASE-9.md](uji/FASE-9.md).
+>
+> **Keamanan blok:** Fase 9 **tidak menambah jalur pengubah blok**. Pulau Alam Abadi dibuat oleh generator dunia vanilla
+> (`floating_islands`) saat chunk pertama kali dibuat. Petir, pusaran, meteor dan cahaya langit hanya visual di client:
+> tidak ada `LightningBolt`, tidak ada perubahan cuaca, waktu, atau tick-rate. Malam Zhulong memakai efek Darkness, bukan
+> mengubah jam dunia. Semua musuh baru membawa tanda NoGrief dan tidak pernah disimpan ke dunia.
+
+### 56.1 Mulai cepat
+
+1. Buka **Layar Keabadian**: `/kultivasi abadi [alam|purba|bencana|batin|ciptaan|lelang]`, atau ikat tombol
+   "Layar Keabadian" di Kontrol (bawaan tanpa tombol). Enam tablet: **Alam · Purba · Bencana · Batin · Ciptaan · Lelang**.
+2. Capai **Dewa Abadi Puncak** dengan **★9** dan sudah melewati Pengakuan Langit (ascension).
+3. Siapkan sesajen: **9 Esensi Makam (Tomb Essence)** + **1 Batu Roh Agung (Supreme Spirit Stone)**.
+4. Tekan **Mulai Kenaikan** di tablet Alam (atau `/kultivasi abadi naik`) dan bertahanlah.
+5. Ikuti tablet **Jalan** bab 11–15; pelacak di tepi kanan bangun lagi setelah bab 10.
+
+### 56.2 Kenaikan ke Alam Abadi
+
+*Sumber: A Record of a Mortal's Journey to Immortality (RMJ) bab 2451 "Ascension": Han Li melampaui kesengsaraannya dan
+lubang hitam raksasa muncul di awan lima warna.*
+
+* **Syarat:** Dewa Abadi Puncak, ★9+, sudah ascension, tidak sedang deviasi, terobosan, alam rahasia, serbuan, duel,
+  bencana, pertarungan purba, murka langit, pertahanan batin atau sewa terbang, tidak terluka 10 detik terakhir, bukan
+  Peaceful. Sesajen habis saat ritual mulai. Gagal: tunggu 1 hari game.
+* **Kesengsaraan Kenaikan** (bilah bos): pertanda 10 detik (langit lima warna) → **9 sambaran** tiap 3 detik, makin kuat
+  (14%–22% HP maks) → setelah sambaran 3 dan 6 datang **gelombang Utusan Murka Langit** → **Lubang Hitam**: 15 detik
+  bertahan di dalam lingkaran 8 blok sambil ditarik keluar.
+* Pukulan yang akan membunuh selama ritual berarti **gagal**, bukan mati (Totem tidak terpakai). Keluar lingkaran juga
+  gagal. Utusan yang tersisa pergi saat ritual berakhir.
+* **Berhasil:** kamu tiba di pulau kedatangan Alam Abadi, mendapat 1 **Jimat Lintas Alam** dan 16 **Batu Asal Abadi**,
+  dan Dunia Batin-mu lahir. **Gagal:** "Luka Kenaikan" (Deviasi Qi 10 menit), sesajen hilang.
+
+### 56.3 Alam Abadi
+
+Dimensi `kultivator:alam_abadi`: pulau melayang di atas kehampaan, tanpa hujan dan tanpa monster alami.
+
+* **Batas lunak** 2048 blok dari pusat: kamu didorong balik. **Jatuh ke kehampaan** (di bawah y −8): kembali ke tanah
+  terakhir dengan −10% HP, tidak mati.
+* **Jimat Lintas Alam (Realm Crossing Talisman)** — resep tanpa pola: 2 **Batu Asal Abadi (Immortal Origin Stone)** +
+  **Kertas (Paper)** + **Mata Ender (Eye of Ender)**. Bisa dipakai berulang. Channel 5 detik (batal jika terluka atau
+  bergerak), cooldown 60 detik. Dari dunia biasa ke posisi terakhirmu di Alam Abadi; dari Alam Abadi ke titik asalmu.
+  Teman sekte yang sudah naik bisa klik **[Ikut]** di chat; sampai 3 Murid Inti+ yang mengikutimu ikut pindah.
+* Murid yang tertinggal di Alam Abadi tersapu pulang saat kamu keluar (jimat, mati, portal, keluar game). Murid di bawah
+  Kenaikan Abadi terkena Weakness I di sana. Pemain yang belum naik dikirim pulang.
+* **Jimat Pulang (Return Talisman)** juga bisa dipakai untuk keluar.
+
+**Makhluk Alam Abadi** (tingkat 2–3, HP naik dengan bintangmu): Laba-laba Benang Langit (angin), Prajurit Tulang Abadi
+(es, tidak terbakar siang hari), Babi Taring Emas (tanah, tidak jadi zoglin), Penjaga Tulang Kuno (logam), Kultivator
+Abadi Liar. Paling banyak 4 di sekitarmu dan 12 di dunia. Hadiah: XP besar, 50% Batu Asal Abadi, kadang herba roh tua,
+1% slip giok tingkat Dewa.
+
+### 56.4 Batu Asal Abadi dan Esensi Abadi
+
+*Sumber: RMJ: Immortal Realm bab 567 "Pursuit" dan bab 615 "Another Beast Bone" (Batu Asal Abadi sebagai mata uang dan
+daya Alam Abadi). Meteran Esensi adalah rancangan game, terinspirasi dari sumber yang sama.*
+
+* **Batu Asal Abadi (Immortal Origin Stone)** didapat dari: makhluk Alam Abadi, **menambang batu dengan tangan** di Alam
+  Abadi (0,6% per blok, naik dengan Fortune, maks. 16 per hari, jatuh sebagai item), Binatang Purba, Murka Langit,
+  lelang titipan, dan Manusia Batu Dunia Batin.
+* **Esensi Abadi (0–100%)**: meditasi di Alam Abadi +1% per 30 detik; `/kultivasi abadi konversi <n>` memakai Batu
+  (+2% tiap batu, maks. 10 per hari). Esensi menaikkan kerusakanmu ke makhluk Alam Abadi (×0,6 → ×1,0) dan regenerasi Qi
+  di sana.
+* **Meditasi di Alam Abadi memberi XP ×3**; pada Dewa Abadi Puncak semuanya menjadi Qi Tertimbun untuk bintang.
+* **Diskon bintang:** setiap Batu di tas memotong biaya pemadatan bintang 1% (maks. 10%); batu yang dipakai habis.
+
+### 56.5 Binatang Purba
+
+*Sumber: Zhuangzi bab 1 "Free and Easy Wandering" (Kun menjadi Peng); Perfect World bab 261 dan 347 (warisan Kunpeng);
+Shan Hai Jing bagian 8 dan 17 (Zhulong / Zhuyin, Naga Lilin); Zuo Zhuan dan Lüshi Chunqiu 16/3a (Taotie).*
+
+* **Gejolak Purba**: di Alam Abadi kadang seekor binatang purba datang sendiri (peluang kecil tiap 5 menit, cooldown
+  2 hari game per pemain; jenis yang paling jarang kamu bunuh).
+* **Gulungan Gunung dan Laut (Mountains and Seas Scroll)** — resep tanpa pola: 7 **Batu Asal Abadi (Immortal Origin
+  Stone)** + **Buku (Book)** + satu material: **Sisik Kun (Kun Scale)** atau **Bulu Peng (Peng Feather)** → Kun-Peng,
+  **Sisik Zhulong (Zhulong Scale)** → Zhulong, **Taring Taotie (Taotie Fang)** → Taotie. Pakai di Alam Abadi untuk
+  memanggil binatang itu (tanpa cooldown alami).
+* Pertanda 20 detik, lalu arena 48 blok. Tiga fase per binatang; setiap serangan besar bertelegraf 1,5–2 detik. Binatang
+  hanya bisa dilukai cepat saat **Celah** terbuka.
+  * **Kun-Peng:** Kun berenang di bawah pulau dan muncul dengan *Gelombang Tiga Ribu Li*; berubah menjadi Peng yang
+    menukik; fase 3 angin puyuh menarikmu dan tiga **Mata Angin** mengitari: pecahkan untuk membuka celah.
+  * **Zhulong:** *Mata Terbuka* (tatapan berputar; berdiri di belakang kepala), *Mata Tertutup* (Darkness, serangan dari
+    gelap, pukul Lilin untuk celah), *Napas Musim* (dingin membekukan, panas membakar entitas).
+  * **Taotie:** kepala tanpa tubuh memanggil **Pelahap** (yang sampai ke kepala menyembuhkannya); *Hisapan* menelan lalu
+    memuntahkanmu; fase 3 teknik saat mulut terbuka menyembuhkannya.
+* Pukulan mematikan dari binatang purba menyisakan 1 HP dengan **Luka Purba** (konfigurasi `primordialDeathGuard`).
+* **Hadiah** (peserta dengan ≥ 3% kerusakan): bunuh pertama 2 material, 30 Batu, 40% bilah bintang; ulang 1 material,
+  15 Batu, 15%. Paling banyak 3 hadiah ulang per hari, setelah itu hanya material 50%. Kun-Peng memberi pecahan tulang
+  Kunpeng yang belum kamu punya; **memegang enam pecahan berbeda saat Kun-Peng mati** mengajarkan `kunpeng_art`.
+  Zhulong pertama memberi **Mata Lilin Zhulong (Zhulong Candle Eye)**: di tangan kiri memberi Night Vision dan menghapus
+  Darkness.
+
+### 56.6 Tujuh Bencana Bintang dan Murka Langit
+
+*Sumber: Renegade Immortal bab ~1157–1159 (Tiga Ujian dan Tujuh Bencana Dewa Kuno, Penginjak Langit); I Shall Seal the
+Heavens bab 385–386 (langit mencoba membunuh Meng Hao). Utusan dan Panglima terinspirasi dari bab itu.*
+
+* **Bencana ke-k** menahan bintang `f + 9(k−1)` (f = 6 untuk kualitas terobosan Normal, 7 Sempurna, 8 Surgawi). Saat
+  memadatkan bintang itu muncul "Bencana ke-k menanti" dengan tautan [Mulai]. Qi Tertimbun tetap terisi.
+* Mulai dari tablet Bencana atau `/kultivasi bencana mulai [k]`: `6 + k` sambaran (yang terakhir ×2) dan gelombang
+  utusan tiap 3 sambaran. **Segel Penangkal**: 3 **Serpihan Segel Langit (Heaven Seal Shard)** membuat sambaran ×0,85.
+* **Lulus:** bintang terpadatkan; menuntaskan Ujian (k = 2, 4, 7) mengalikan faktor T ×1,1 (maks. ×1,331) untuk kekuatan
+  dan darah bintang. **Gagal:** Luka Bencana (Deviasi Qi), tanpa bintang, 50% biaya kembali. Setelah bencana ke-7: gelar
+  **Penginjak Langit**.
+* Dunia lama dengan bintang di atas gerbang: bencana yang terlewati ditandai "Terlewati" dan bisa diambil kapan saja
+  untuk faktor T (bintang tidak berkurang).
+* **Murka Langit**: setelah ≥ 1 bencana, kira-kira tiap 5 hari saat senja langit bisa turun. Pertanda 30 detik → tiga
+  gelombang Utusan (2, 3, 4) → **Duel Kehendak Langit** dengan **Panglima Langit** (hanya kerusakanmu yang dihitung).
+  Menang: 25% bilah bintang, 6–12 Batu, 2 Serpihan Segel Langit. Kalah: 1 HP dan Luka Langit 10 menit (teknik ×0,85).
+  Tidak terjadi saat AFK, Peaceful, serbuan, alam rahasia, atau kesengsaraan; setelah 2 kali terlewat tanpa hukuman.
+
+### 56.7 Dunia Batin
+
+*Sumber: Reverend Insanity bab 409 "Managing the Blessed Land" (roh tanah, bencana bumi tiap sepuluh tahun: hujan api
+meteor, banjir, bayangan petir yang menghindari Gunung Dang Hun; mutiara esensi abadi; suku manusia batu; rubah).*
+
+* Lahir saat kenaikan berhasil. Tingkat dari kualitas terobosanmu: **Kecil** 4 petak, **Sedang** 6, **Besar** 9,
+  **Agung** 12. **Perluas** +1 petak (16 Batu + 1 material purba, maks. 16) atau pakai **Token Perluasan Tanah (Land
+  Expansion Token)**.
+* 1 hari game di luar = 2 **Tahun Batin**. Semua berjalan saat tablet Batin dibuka (tanpa beban tick).
+* **Petak Herba:** tanam herba roh apa pun; umur +25 per hari (+ Kesuburan rubah), maks. 3.000. Panen umur ≥ 1.000
+  memberi herba kedua umur 100.
+* **Kawanan Rubah:** tumbuh 5% per hari; tiap 100 rubah +1% pertumbuhan herba (maks. +40%).
+* **Manusia Batu:** setor 64 bijih (`#kultivator:rockmen_ore`, tanpa ancient debris) sekali untuk membangunkan; lalu
+  mereka makan dari Lubang Bijih (maks. 256, tidak bisa diambil lagi) dan menghasilkan batu roh tiap hari, plus 1 Batu
+  Asal Abadi tiap hari ke-7.
+* **Mutiara Esensi Abadi (Immortal Essence Pearl):** terisi sesuai tingkat (maks. 99), ambil maks. 16 per hari.
+  **Seduh** (`/kultivasi batin seduh <n>`): 1 mutiara = 1% bilah bintang sebagai Qi Tertimbun, maks. 5 per hari.
+* **Roh Tanah** melaporkan keadaan dan memperingatkan sehari sebelum bencana.
+* **Bencana Bumi** tiap 5 hari (bergiliran **Hujan Api Meteor → Banjir Besar → Bayangan Petir**, makin kuat):
+  * Meteor: hancurkan meteor di udara; yang mendarat membakar petak (bukan blok).
+  * Banjir: salurkan **Tanggul Qi** di lingkaran 4 blok total 60 detik sambil menahan Roh Air Bah.
+  * Petir: pancing Bayangan Petir ke lingkaran **Gunung Dang Hun** (di dalamnya ia menerima ×2 dan melambat).
+  * Menang: 5n mutiara dan rubah +10%. Jika kamu tidak bisa bertahan langsung, bencana diselesaikan sebagai data
+    (peluang 30–90%, naik dengan **Perkokoh**: 10 mutiara per tingkat, maks. 3); kalah hanya separuh kerugian. Barang di
+    tasmu dan blok dunia tidak pernah terkena.
+
+### 56.8 Jurus Ciptaan Sendiri
+
+*Sumber: I Shall Seal the Heavens bab 1379 (Hex Kesembilan milik Meng Hao sendiri); Battle Through the Heavens bab 262
+dan 363 (memadukan dua api menjadi Api Teratai Buddha Murka); Coiling Dragon (perpaduan misteri unsur).*
+
+* **Syarat:** Dunia Batin, Dewa Abadi Puncak, dua Dao dengan pemahaman ≥ 60 (Dao yang sama dua kali ≥ 90 = **Murni**).
+* Di tablet Ciptaan pilih Dao A, Dao B, **bentuk** (Tebasan, Ledakan, Hujan, Gelombang, Wilayah, Segel) dan **nama
+  sendiri** (1–24 huruf, tanpa kode warna).
+* **Biaya:** 20 Mutiara Esensi Abadi + 1 material purba + 10% bilah bintang dari Qi Tertimbun. **Pencerahan Ciptaan**:
+  meditasi 60 detik; terputus = semua biaya kembali.
+* **Kesempurnaan** 55–100% (dari pemahaman dua Dao dan jumlah jenis binatang purba yang sudah kamu bunuh).
+  **Sempurnakan**: separuh biaya, acak ulang, simpan yang lebih tinggi. Maks. 3 jurus.
+* Jurus muncul dengan namamu di Kitab Teknik dan bilah aksi. `/kultivasi ciptaan daftar`, `/kultivasi ciptaan hapus <1-3>`.
+
+### 56.9 Lelang Abadi dan Pengejaran
+
+*Sumber: RMJ: Immortal Realm bab 615 "Another Beast Bone" (perang tawar dalam Batu Asal Abadi) dan bab 567 "Pursuit".*
+
+* **Sesi** tiap 2 hari game, dari senja sampai tengah malam dunia (day time 12000–18000). Tablet Lelang aktif hanya saat
+  kamu di Alam Abadi; di tempat lain ia menunjukkan sesi berikutnya. `/kultivasi lelang info`.
+* 5 barang per sesi (pecahan Kunpeng, benih api surgawi, herba tua, slip giok Dewa, Esensi Makam, material purba, Token
+  Perluasan Tanah, dan lain-lain). 4 saingan NPC menawar tiap 4 detik; klik **+5% / +10% / +25%**. Barang terjual setelah
+  8 detik tanpa tawaran. Batu diambil **hanya saat menang**; jika saat itu Batu-mu kurang, barang pindah ke saingan dan
+  kamu tidak bisa menawar sampai sesi selesai.
+* **Titip jual:** maks. 2 barang `#kultivator:auction_sellable` per sesi (satu dari tangan utama per klik), dibayar
+  dalam Batu saat sesi selesai (atau saat masuk lagi).
+* **Pengejaran:** saingan yang tersinggung (35%) bisa mengirim kawanan kultivator liar 1–3 menit setelah sesi, dengan
+  peringatan 3 detik. Menang: Kantong Rampasan Iblis dan 5–15 Batu.
+
+### 56.10 Jalan Abadi (bab 11–15) dan kewajiban harian
+
+| Bab | Langkah | Hadiah |
+|---|---|---|
+| 11 Di Atas Langit | naik ke Alam Abadi · Batu pertama · Esensi 50% · lintas alam | 8 Batu + 1 Jimat Lintas Alam |
+| 12 Binatang Purba | binatang purba pertama · Kun-Peng · menang lelang · lolos pengejaran | 1 Gulungan Gunung dan Laut |
+| 13 Bencana Bintang | bencana ke-1 · Ujian pertama · murka ditolak · Panglima tumbang | 20 mutiara + 2 Serpihan Segel Langit |
+| 14 Dunia Batin | 9 petak · herba 1.000 tahun · bencana bumi dilalui · Manusia Batu | Token Perluasan Tanah |
+| 15 Leluhur Abadi | jurus ciptaan · kesempurnaan 100% · tiga binatang purba · Penginjak Langit | gelar "Leluhur Abadi" |
+
+Kewajiban harian baru: bunuh 3 makhluk Alam Abadi · tambang 1 Batu Asal Abadi · panen petak batin · menawar di lelang.
+
+### 56.11 Pengaturan (`config/kultivator.json`)
+
+`immortalRealm` (true), `immortalRealmRadius` (2048; 512–4096), `immortalNativesPerPlayer` (4; 0–6),
+`immortalNativeWorldCap` (12; 4–16), `primordialBeasts` (true), `primordialChanceScale` (1.0; 0–3),
+`primordialDeathGuard` (true), `starCalamities` (true; false = bintang tidak pernah ditahan), `heavenlyWrath` (true),
+`heavenlyWrathDays` (5; 3–15), `innerWorld` (true), `innerWorldCalamityDays` (5; 0 mati, 3–15), `immortalAuction` (true),
+`auctionPursuitChance` (0.35; 0–1).
+
+### 56.12 Perintah
+
+**Pemain** (`/kultivasi ...`): `abadi [tab]`, `abadi info`, `abadi naik`, `abadi lintas`, `abadi ikut <nama>`,
+`abadi konversi <n>`, `purba info`, `bencana info`, `bencana mulai [k]`, `batin [info]`, `batin seduh <n>`,
+`ciptaan [daftar]`, `ciptaan hapus <1-3>`, `lelang info`.
+
+**Uji (op)** — `uji ...` = `/kultivasi uji ...`:
+
+| Perintah | Contoh | Efek |
+|---|---|---|
+| `uji kit` | `/kultivasi uji kit` | kotak shulker "Fase 9": Batu, jimat, gulungan tiap jenis, material purba, mutiara, serpihan segel, token, sesajen, Mata Lilin |
+| `uji abadi naik [sukses\|gagal]` | `/kultivasi uji abadi naik sukses` | ritual kenaikan sekarang tanpa syarat/sesajen; bisa paksa hasil |
+| `uji abadi masuk` / `pulang` | `/kultivasi uji abadi masuk` | langsung ke pulau kedatangan (ditandai sudah naik) / pulang |
+| `uji abadi konversi <0-100>` | `/kultivasi uji abadi konversi 100` | atur Esensi Abadi |
+| `uji abadi batu <n>` | `/kultivasi uji abadi batu 64` | beri Batu Asal Abadi |
+| `uji abadi pribumi <laba\|tulang\|babi\|penjaga\|liar> [2-3]` / `pribumi hapus` | `/kultivasi uji abadi pribumi babi 3` | makhluk Alam Abadi 6 blok di depan / hapus dalam 64 blok |
+| `uji abadi pulau` | `/kultivasi uji abadi pulau` | tampilkan dan cari ulang pulau kedatangan |
+| `uji abadi tepi` / `void` | `/kultivasi uji abadi void` | ke dekat batas lunak / ke y −4 (uji tangkapan kehampaan) |
+| `uji purba <kunpeng\|zhulong\|taotie> [fase 1-3]` | `/kultivasi uji purba zhulong fase 2` | panggil binatang purba sekarang |
+| `uji purba celah\|hapus\|gejolak\|enam\|reset` | `/kultivasi uji purba enam` | celah 6 detik / hapus / roll gejolak alami / enam pecahan Kunpeng / reset cooldown dan batas harian |
+| `uji bencana <k> [lulus\|gagal]` | `/kultivasi uji bencana 1 lulus` | bencana ke-k sekarang, bisa paksa hasil |
+| `uji bencana t <1.0-1.331>` | `/kultivasi uji bencana t 1.21` | atur faktor T |
+| `uji bencana lewati <k>` | `/kultivasi uji bencana lewati 2` | tandai bencana terlewati |
+| `uji murka [gelombang <1-3>\|panglima]` | `/kultivasi uji murka panglima` | murka langit sekarang / langsung gelombang atau duel |
+| `uji murka menang\|kalah\|jadwal` | `/kultivasi uji murka jadwal` | paksa hasil / cetak jadwal |
+| `uji utusan <n> [k]` | `/kultivasi uji utusan 4 2` | n utusan di depan (k = kekuatan bencana) |
+| `uji batin lahir [kecil\|sedang\|besar\|agung]` | `/kultivasi uji batin lahir besar` | buat atau reset Dunia Batin |
+| `uji batin hari <n>` | `/kultivasi uji batin hari 4` | majukan n hari (maks. 30) |
+| `uji batin bencana <meteor\|banjir\|petir> [n]` / `bencana data` | `/kultivasi uji batin bencana petir 2` | bencana bumi langsung / selesaikan sebagai data |
+| `uji batin herba <petak> <umur>` | `/kultivasi uji batin herba 1 1200` | atur umur herba |
+| `uji batin rubah <n>` / `batu` / `mutiara <n>` | `/kultivasi uji batin mutiara 40` | jumlah rubah / bangunkan Manusia Batu / mutiara |
+| `uji ciptaan <slot> <daoA> <daoB> <bentuk> [kesempurnaan]` | `/kultivasi uji ciptaan 1 api es ledakan 1.0` | buat jurus tanpa ritual dan biaya (Dao: pedang, api, es, petir, tubuh, kehidupan, bayangan, ruang; bentuk: tebasan, ledakan, hujan, gelombang, wilayah, segel) |
+| `uji lelang sesi\|tutup\|kejar` | `/kultivasi uji lelang sesi` | buka sesi sekarang / tutup / panggil pengejaran |
+| `uji jalan bab <1-15>` | `/kultivasi uji jalan bab 11` | lompat ke bab Jalan |
+
+**Debug (op):** `debug abadi info`, `debug purba info`, `debug batin`, `debug ciptaan <slot>`.
+
+### 56.13 Yang belum lengkap
+
+* Belum diuji di game: periksa bahwa memuat dunia tidak menampilkan layar "Experimental settings" karena dimensi baru.
+* Jika tidak ada pulau di dekat 0,0, kedatangan memakai titik cadangan 0,120,0 dengan Slow Falling.
+* Makhluk Alam Abadi juga memakai hadiah elit biasa, jadi XP dan barangnya sedikit di atas angka rancangan. Helm
+  Prajurit Tulang Abadi adalah helm besi biasa (tidak berwarna).
+* Gulungan Gunung dan Laut memakai 7 Batu (bukan 8) agar muat di petak 3×3.
+* Status lelang hanya di memori; sesi uji paksa tidak menghabiskan jadwal sesi asli. Titip jual mengambil satu barang
+  dari tangan utama per klik.
+* Gelar "Penginjak Langit" tampil di tablet Bencana, belum di tab Status. Indra Ilahi belum menunjukkan sisi serangan
+  Zhulong. Lingkaran Gunung Dang Hun dan cincin telegraf memakai partikel, bukan Display.
+* Hujan Dao belum membatasi 6 tumbukan per target secara khusus (hanya batas bos biasa); Tebasan dan Gelombang tidak
+  memahat parit saat Mode Kehancuran.

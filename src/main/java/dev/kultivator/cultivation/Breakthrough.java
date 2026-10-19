@@ -306,6 +306,10 @@ public final class Breakthrough {
 			// Phase 8 (DESIGN 25.2 item 12): never inside a secret realm or a run.
 			return refuse(player, dev.kultivator.alam.Alam.refusal());
 		}
+		if (dev.kultivator.purba.Purba.inCalamity(player) || dev.kultivator.abadi.Abadi.inAscension(player)) {
+			// Phase 9 (DESIGN 26.14 item 13): never during a star calamity or the ascension ritual.
+			return refuse(player, Component.translatable("kultivator.spine9.refuse.busy"));
+		}
 		if (HeartDemons.inTrial(player)) {
 			// A pressure Heart Demon is still fighting: it must be faced first.
 			return refuse(player, Component.translatable("kultivator.breakthrough.refuse.heart_demon"));

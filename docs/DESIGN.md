@@ -13722,3 +13722,855 @@ int Vassals.count(UUID owner) ; int Vassals.maxLoyalty(UUID owner) ; List<Villag
 | Custom right-edge raid HUD | GAME | vanilla boss bars | ARCH: zero client HUD code |
 | `REALM_GATE` and other moment ids | GAME | EXTRA (14) beat sub-ids + BOSS subjects | CRITIC: `EpicIds` has no such ids |
 | ISSTH spirit refining, Mount Hua Huayin patronage, Coiling Dragon blood ring, a BTTH tomb layer structure | early GAME drafts | already replaced (RMJ/AWE, PW Stone Village, BTTH ch. 867, game-design layers) | unverifiable |
+
+
+---------------------------------------------------------------------------------------------------------------------
+
+## 26. Phase 9 — Petualangan Dewa Abadi
+
+**Status:** synthesized design (draft + LORE and feasibility verification; CRITIC corrections applied, see 26.18). Nothing in `kultivator-mod` code was edited and Gradle was not run.
+**Basis:** DESIGN 0, 1, 5b, 19.13, 20.3.16, 20.3.19, 22.2, 22.5, 22.14, 23.1, 24.1, 25; the code at HEAD `031423d` (`ascension/*`, `alam/*`, `musuh/*`, `tempa/*`, `desa/*`, `epic/*`, `cultivation/ImmortalPerks`, `technique/spec/TechniquePower`, `technique/special/*`, `harta/*`, `elite/EliteMonsters`); the 26.3 vanilla jar for worldgen JSON and `reference/mcsrc` for vanilla APIs.
+**User request:** "Give me more suggestions to complete what is still missing so that being a Dewa Abadi feels more like an adventure ... implement what you recommend directly." Phase 9 is the end-game loop after Dewa Abadi Puncak: the strongest player still has goals, danger and wonder.
+
+**Ids checked in the code (HEAD `031423d`):**
+
+| Where | Used | Phase 9 takes |
+|---|---|---|
+| `network/Actions` | up to `DESA = 41` | `ABADI = 42`, `PURBA = 43`, `BATIN = 44` |
+| `Payloads.OpenScreen` | 0–7 (`DUNIA = 7`) | `ABADI = 8` |
+| `Payloads.DuniaSync` | `CH_ALAM 0` … `CH_DESA 3`; `DuniaClient.VERSIONS` length 4 | `CH_ABADI 4`, `CH_PURBA 5`, `CH_BATIN 6`; length 7 |
+| `fx/FxType` | ends at `DESA` | append `ABADI`, `PURBA`, `BATIN` |
+| `EpicIds` EXTRA sub-ids | 0–12 (`EXTRA_VILLAGE_OATH`) | 13–21 |
+| `EpicIds` BOSS kinds (ints) | 0–7 (`BOSS_DEMONIC_ELDER`) | `BOSS_PRIMORDIAL = 8`, `BOSS_HEAVEN_GENERAL = 9` |
+| `DeathGuard.Stage` | `{DUEL, REALM, TRIBULATION, TOTEM, TECHNIQUE, PERK}` | `LANGIT` after `REALM` |
+| Technique net ids | block 1000–1099 (1000–1003 used) | new block 1100–1199 (1100–1102) |
+| `TechniquePower` trial tags | `TAG_DAO_PROTECTOR`, `TAG_TRIAL_GUARD`, `TAG_ELITE`, `TAG_ROGUE` | `TAG_ABADI_FOE` |
+| `Goals` int keys | `guide`, `guide2` | `guide3` |
+
+**Phase 9 in one table: six features plus glue, chained into one loop.**
+
+| # | Feature | One line |
+|---|---|---|
+| A | **Kenaikan ke Alam Abadi** | A final ascension tribulation at Dewa Abadi Puncak ★9 opens the datapack dimension `kultivator:alam_abadi`: floating islands made only by world generation, the currency Batu Asal Abadi, the Esensi Abadi conversion meter, star-scaled natives and a reusable crossing talisman. |
+| B | **Binatang Purba** | Three classical primordial beasts (Kun-Peng, Zhulong, Taotie) as rare three-phase fights in Alam Abadi. Their damage intake is capped per second, so no ultimate one-shots them. Legendary materials. |
+| C | **Bencana Bintang & Murka Langit** | The player's own Three Trials with Seven Calamities gate the stars (the deferred 19.13 item), and the Heavens periodically send envoys and a champion who duels the player at home, scaled with stars. |
+| D | **Dunia Batin** | An inner world born at ascension, managed in a jade-scroll page (pure data, no blocks): herb plots with ×5 time, a land spirit, foxes and rockmen, immortal essence pearls, and an earthly calamity every "ten inner years". |
+| E | **Jurus Ciptaan Sendiri** | Fuse two comprehended Daos and a form into up to 3 self-named, self-created Dewa ultimates, run by the 6c engine through one special handler. |
+| F | **Lelang Abadi & Pengejaran** | A periodic auction paid in Batu Asal Abadi with NPC rival bidders, consignment, and a rival's pursuit after a contested win. |
+| + | **Glue** | Jalan chapters 11–15 "Jalan Abadi", new daily chores, star sinks. |
+
+**How the features feed each other:** A gives the world, the currency and the natives → B and F spend and earn the currency → C gates the stars and brings danger home → D turns primordial materials and Batu into a domain with its own calamities → E is the capstone and costs pearls (D), a primordial material (B), Qi Abadi and comprehension, and its quality rises with primordial kinds slain (B).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.0 What the end game lacks (diagnosis) and the spine list
+
+**Diagnosis (code-checked):**
+1. **Nothing is dangerous at True Immortal.** `TechniquePower.bossBase` at TI is `0.70 + 0.10 × stage` (+0.01 per star), so at TI Puncak one cast may take 100% of a boss. Trial mobs use `legacyPower × TRIAL_MOB_FACTOR`, which ignores stars.
+2. **Stars have no gate for the player.** 19.13 deferred "player star calamities (the RI Three Trials)". `ImmortalPerks.condense` only pays Qi.
+3. **No new place.** Phase 8 realms are short instanced runs; after Makam Langit there is no next realm, which every source novel has.
+4. **Nothing personal to grow.** No domain, and all 169 techniques come from the catalogue.
+5. **Loops close.** Esensi Energi Makam and Supreme stones are the last materials; only star condensing consumes surplus.
+
+**Spine list (one line each; details in 26.14):**
+1. `Actions.ABADI/PURBA/BATIN = 42/43/44` and routing.
+2. `OpenScreen.ABADI = 8`; `DuniaSync.CH_ABADI/CH_PURBA/CH_BATIN = 4/5/6`; `DuniaClient.VERSIONS` length 7.
+3. `FxType` + `ABADI, PURBA, BATIN`.
+4. `EpicIds` EXTRA 13–21, BOSS kinds 8–9.
+5. `TechniquePower.TAG_ABADI_FOE`, the star-scaled trial branch, `addPlayerStarFactor`.
+6. `DeathGuard.Stage.LANGIT`.
+7. `Stars.StarGate` / `addGate`; `ImmortalPerks.condense` asks the gates.
+8. `Stars.barSize`, `Stars.grantShare`.
+9. `Tribulation.strike(ServerPlayer, double)` public helper.
+10. `Disciples.onChangeLevel` skips Alam Abadi.
+11. `FormationTargets`: `TAG_ABADI_FOE` → elite ×0.6.
+12. Own-art name providers (`Codex.addNameProvider`, client `CodexNames`).
+13. One-line refusal hooks (BuildPlacer, Sect Hall placement, realm gate, breakthrough, Cave Abode).
+14. `KultivatorConfig` fields of 26.12.
+15. `TechniqueRegistry.module("CiptaanArts", 1100, 1199, …)` + `special("own_art", stub)`.
+16. `kunpeng_art` gains `.route(Route.item("kunpeng_whole"))`.
+17. `PointClouds.beast` public + public `PointClouds.sample(float[][])`.
+18. Entry points, commands, keys, kit.
+19. Screen shell `client/keabadian/KeabadianScreen` + 6 page stubs.
+20. Module stubs with the final signatures of 26.15.2; `lang-src/spine9.*`.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.1 Decisions taken for the user (each is reversible)
+
+| Open point | Decision | Why |
+|---|---|---|
+| New dimension | **One** datapack dimension `kultivator:alam_abadi`: generator `minecraft:noise`, `settings: "minecraft:floating_islands"` (26.3 jar: `noise {min_y 0, height 256}`, `sea_level -64`, `default_block stone`, `material_rule "minecraft:overworld_floating_islands"`), biome source `minecraft:fixed` with the datapack biome `kultivator:alam_abadi`. | Floating-island Immortal Realm; terrain, trees and ores are all world generation (rule 0.1). One `LevelStem` only. |
+| Exploration size | Soft circular border `immortalRealmRadius` 2048 (512–4096) around 0,0, push-back like the Phase 8 stage. No world-border change, no pre-generation. | Region files only grow where the player explores. |
+| Void | Below y −8 a non-creative, non-spectator player is snapped to the last solid ground position (recorded every 10 ticks while on ground, else the arrival island), loses 10% of max HP (never lethal), gets Slow Falling 3 s. | `out_of_world` (below `minY − 64`) bypasses DeathGuard; islands + whirlwinds would mean cheap deaths. Game design. |
+| Primordial deaths | `primordialDeathGuard = true`: a lethal hit from a Binatang Purba skill leaves the player at 1 HP with "Luka Purba" (5 min, technique ×0.85); that player's part in the fight ends. | Danger without item loss over the void. |
+| Calamity gates for existing worlds | Calamities whose gate star ≤ current stars at first load are **Terlewati** (skipped): no T factor, can be taken later for T. | Never removes stars from an old save. |
+| Screens | **`OpenScreen.ABADI = 8`**, new jade-scroll "Keabadian" screen with 6 tablets sized by the `DuniaScreen` formula `max(24, min(36, (paper height − 20 − gaps) / 6))` (`MAX_TABLET_H` 36): **Alam · Purba · Bencana · Batin · Ciptaan · Lelang**. Pages extend `client/dunia/DuniaPage`. | DuniaScreen's 4 × 46 tablets cannot take more. |
+| Sync | Reuse `Payloads.DuniaSync`, channels 4–6. | Zero new payload types. |
+| Packages | `abadi` (A + F), `purba` (B + C), `batin` (D + E + glue). | `batin` = inner world; `purba` = primordials and the Heavens. |
+| Help topics | `alam_abadi`, `batu_asal`, `binatang_purba`, `bencana_bintang`, `murka_langit`, `dunia_batin`, `jurus_ciptaan`, `lelang`. | No collision with 19.6 or 25.0. |
+| Undead natives in daylight | The 26.3 `minecraft:day` timeline turns on `gameplay/monsters_burn`; the stray native wears an **unbreakable** (component `minecraft:unbreakable`) tinted iron helmet with drop chance 0. Hoglins: dimension attribute `minecraft:gameplay/piglins_zombify: false` plus `setImmuneToZombification(true)`. | Verified in `Mob.burnUndead` / `isSunBurnTick` and `Hoglin.isConverting` (26.3 `EnvironmentAttributes.MONSTERS_BURN`, `PIGLINS_ZOMBIFY`). |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.2 Principles (binding)
+
+#### 26.2.1 Block safety (the DESIGN 0 statement for Phase 9)
+
+> **Phase 9 adds no block-changing code.** The only block-changing paths remain Mode Kehancuran (`kehancuran/WorldBreaker`) and sect construction (`sect/build/engine/BuildPlacer`).
+> Alam Abadi terrain, trees, grass, flowers and ores are produced by vanilla's noise chunk generator and the vanilla placed features listed in the datapack biome when a chunk is first generated. This is world generation. No mod code writes a block there or anywhere else.
+
+**`data/kultivator/worldgen/biome/alam_abadi.json`** (P9-langit; same top-level keys as the 26.3 `cherry_grove.json`):
+- `has_precipitation: false` (static biome data, not a weather change), `temperature 0.7`, `downfall 0.4`.
+- `effects {grass_color "#9ee8b8", foliage_color "#f6b8d8", water_color "#7fd8ff"}`; `carvers: []`.
+- `attributes` (formats verified in 26.3 biomes):
+  - `minecraft:visual/sky_color "#9fc8ff"`, `minecraft:visual/fog_color "#e8f0ff"`, `minecraft:visual/water_fog_color "#7fd8ff"`;
+  - `minecraft:visual/ambient_particles {"argument": [{"particle": {"type": "minecraft:end_rod"}, "probability": 0.003}], "modifier": "append"}` (the `warped_forest` format): drifting qi motes;
+  - `minecraft:audio/background_music {"default": {"sound": "minecraft:music.overworld.cherry_grove", "min_delay": 12000, "max_delay": 24000}}`;
+  - `minecraft:gameplay/natural_mob_spawns {"argument": {"spawn_costs": {}, "spawns_by_category": {"creature": [rabbit 2–4 weight 2, sheep 2–3 weight 2], every other category []}}, "modifier": "overlay"}`. Natives come only from module code.
+- `features`: 11 steps (the cherry grove count).
+  - Step 6 keeps a **subset of vanilla ores**: `ore_coal_upper`, `ore_iron_upper`, `ore_iron_middle`, `ore_copper`, `ore_gold`, `ore_redstone`, `ore_lapis`, `ore_diamond`, `ore_emerald` (island mining and rockmen food; their absolute height ranges only partly fit 0–256, which is fine).
+  - Step 9: `minecraft:patch_tall_grass_2`, `minecraft:patch_grass_plain`, `minecraft:flower_cherry`, `minecraft:trees_cherry`.
+  - Every other step `[]`.
+  - **Deliberately absent:** `ore_infested` (silverfish), `monster_room*` (spawners), `lake_lava_*`, `spring_lava`, `spring_water` (fire on cherry leaves, fluid ticks), `underwater_magma`, `amethyst_geode`, `freeze_top_layer`, `glow_lichen`.
+- The biome is in no `has_structure/*` tag: no structure generates.
+
+**`data/kultivator/dimension/alam_abadi.json`:**
+```json
+{"type": "kultivator:alam_abadi",
+ "generator": {"type": "minecraft:noise",
+   "biome_source": {"type": "minecraft:fixed", "biome": "kultivator:alam_abadi"},
+   "settings": "minecraft:floating_islands"}}
+```
+
+**`data/kultivator/dimension_type/alam_abadi.json`:** copy `alam_rahasia.json` (proven 26.3 attribute format), then: `min_y 0`, `height 256`, `logical_height 256`, `ambient_light 0.0`, `has_skylight true`, `has_fixed_time false`, `default_clock "minecraft:overworld"`, `timelines ["minecraft:day", "minecraft:moon"]`, `skybox "overworld"`; keep `bed_rule` / `straw_bed_rule` `never` with `error_message {"translate": "kultivator.spine9.no_sleep"}`, `respawn_anchor_works false`, `can_start_raid false`, `can_pillager_patrol_spawn false`, empty dimension-level `natural_mob_spawns`; add `minecraft:gameplay/piglins_zombify: false`, `minecraft:visual/cloud_height 192.33`, `minecraft:visual/cloud_color "#ccffffff"`. The spine verifies that loading a world shows no "Experimental settings" screen (Phase 8 already proves a datapack dimension does not).
+
+**Blocks inside Alam Abadi:**
+- Players mine and build there as in the Overworld (their own action). Vanilla portals behave as vanilla (a Nether portal built in Alam Abadi leads to the Nether, whose portal leads to the Overworld).
+- Mode Kehancuran works there (the existing exception with caps and undo). Blocks it breaks never roll Batu Asal Abadi.
+- `ProtectedZones.addZoneProvider`: a 48-block radius around the arrival island is protected from Kehancuran.
+- `BuildPlacer` and Sect Hall placement refuse the dimension (spine #13).
+- **Nothing else in Phase 9 touches blocks.** The inner world is data; meteors, envoys, beasts, relics and pursuers are entities; Zhulong's "night" is the vanilla `DARKNESS` mob effect plus a client sky grade (**no time change**); every lightning visual is the client 7b `BoltRenderer` (**never a `LightningBolt`**); fire is entity fire (`setRemainingFireTicks`), never a fire block; no `Explosion`.
+
+#### 26.2.2 Targeting and damage
+
+**Tag `kultivator.abadi_foe`** (`TechniquePower.TAG_ABADI_FOE`, spine) on every Phase 9 hostile: natives, envoys, Panglima, primordials, relics, batin meteors and batin calamity foes.
+- `isTrialMob` accepts it.
+- Trial-mob branch for targets with this tag: `power = legacyPower × TRIAL_MOB_FACTOR × sqrt(starFactor(attacker stars))` (player: `playerStars`, disciple: `DisciplePaths.stars`). Stars matter again, sub-linearly: ★9 ×1.25, ★36 ×2.07, ★72 ×3.45 (`S(n) = (1 + 0.04n) × 1.15^floor(n/9)`).
+- Essence conversion (A) is a registered `TargetFactor`: `0.6 + 0.4 × conv` against `abadi_foe`, inside the existing 0.5–2.0 clamp.
+
+**Intake clamp (own `hurtServer` override)** on primordials, the Panglima and relics: total damage taken per 20-tick window from all sources is capped.
+
+| Foe | Normal window | During a Celah (opening) | Phase lines |
+|---|---|---|---|
+| Binatang Purba | 1.5% max HP | 6% | at 66% and 33%: damage stops at the line, then a 3 s invulnerable transition |
+| Panglima Langit | 4% | – | – |
+| Envoys, natives, relics | none | – | – |
+
+Game design: a TI ★72 player still needs mechanics, not one ultimate.
+
+**Damage dealt by Phase 9 foes:**
+- melee `4 + R_eff + 1.5 × tier`;
+- skills = a share of the **target's** max HP (tables below) through `damageSources().mobAttack(this)` (armour applies);
+- only targets accepted by `RogueTargets.mayHit`: survival players, the master's disciples, hunting pets, golems; never villagers, animals, creative or spectator players;
+- **Tekanan Abadi** (A): a `DamageHooks` modifier adds +3% of the victim's max HP to every melee hit from an Alam Abadi native.
+
+**Effective realm:** `R_eff = 8 + floor(stars / 9)` from the strongest participant (the Phase 8 Makam rule generalised).
+
+**Formations:** `abadi_foe` uses the elite ×0.6 `damageFactor` (spine #11). Phase 9 foes never get `setCustomName`; names come from `getTypeName()`.
+
+**Peaceful:** no natives, primordials, wrath descents, live batin calamities or pursuits. Batin calamities resolve as data, kindly (always the survive result).
+
+#### 26.2.3 Performance (a weak laptop that also runs Valorant)
+
+Full table in 26.12. Headlines: no forced chunks; arrival search samples the generator heightmap (no chunk loads); ≤ 6 natives per player, ≤ 12 per world; ≤ 1 primordial alive; ≤ 8 envoys alive; the inner world and the auction never tick on their own.
+
+#### 26.2.4 Sources, text and UI
+
+- DESIGN 19, 20.1 and 25.1.4 apply. Every item, foe, phase, calamity, form and auction rule has a `.source` key ("Sumber: …" / "Source: …").
+- *Terinspirasi dari* marks a concept-only borrowing. Every number and safety rule is game design and says so.
+- *Reverend Insanity* is written "RevI" in keys and text (never "RI", which is *Renegade Immortal*).
+- All text in `lang-src/<fragment>.id_id.json` and `.en_us.json` with identical keys. Every GUI follows DESIGN 5b (jade scroll) and fits 320×240.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.3 A. Kenaikan ke Alam Abadi (ascension to the Immortal Realm)
+
+#### 26.3.1 Sumber / Source
+
+- **Ascension by transcending a tribulation:** *A Record of a Mortal's Journey to Immortality* (RMJ) ch. 2451 "Ascension": Han Li says he is about to transcend his tribulation; a giant black hole appears inside the five-coloured cloud.
+- **Immortal Origin Stones, the higher realm's currency and power:** *RMJ: Immortal Realm* (RMJIR) ch. 567 "Pursuit" (Han Li slots Immortal Origin Stones into a hexagonal array to power a flying carriage); ch. 615 "Another Beast Bone" (an auction priced in Immortal Origin Stones).
+- **Immortal essence differs from spiritual power:** *Terinspirasi dari* RMJIR (origin stones as a separate grade of power). The conversion meter and its numbers are game design.
+- **Game design:** gate, offering, strike numbers, soft border, void catch, natives, crossing talisman.
+
+#### 26.3.2 The gate and the offering
+
+| Needs | Value |
+|---|---|
+| Rank | Dewa Abadi **Puncak** (`data.rank().isMax()`) |
+| Stars | ★9 or more (`ImmortalPerks.GATE_I_STARS`) |
+| Ascension | `Ascension.isAscended(player)` |
+| State | not deviating; no breakthrough, realm run, raid, duel, calamity, primordial fight, wrath descent, batin defence or flight lease; not hurt in the last 10 s; not Peaceful (the 25.3.4 refusals plus Phase 9's own) |
+| Offering (consumed at start) | 9 `kultivator:tomb_essence` + 1 Supreme spirit stone (`SpiritStones.stack(SpiritStones.SUPREME, 1)`), looked up by registry id |
+| Retry | 1 in-game day after a failure (`extra.abadi.asc_cd`) |
+
+#### 26.3.3 Kesengsaraan Kenaikan Alam (the ascension tribulation)
+
+Started from the Alam tablet ("Mulai Kenaikan") or `/kultivasi abadi naik`. A boss bar "Kesengsaraan Kenaikan" shows progress.
+1. **Omen, 10 s.** EXTRA `ASCEND_OMEN`: five-colour sky grade (client `SkyDirector`) and a cloud disc; bells.
+2. **Strikes.** 9 strikes, one every 60 ticks. Strike `i` (1–9) = `(0.13 + 0.01 × i) × max HP` through `Tribulation.strike` (spine #9: tribulation damage type, Tribulation Warding and Hu Fa apply, DESIGN 0 rule 3 clamp). A would-kill strike means **failure**, never death.
+3. **Envoy waves.** After strikes 3 and 6: `Purba.spawnEnvoyWave(player, 2 + i/3, 0, cleared -> …)` (contract of P9-purba). Uncleared envoys despawn at the end.
+4. **Lubang Hitam (RMJ ch. 2451).** A vortex (client `VortexRenderer`) opens 14 blocks above. For 15 s the player must stay within 8 blocks of the start point ("Bertahan di bawah pusaran"); a velocity drag pulls the player outward (0.08 per tick, never blocks). Leaving the circle = failure.
+5. **Success.** EXTRA `ASCEND_PASS` (23.1: the camera shot only after the danger is over); `extra.abadi.ascended = true`; return point saved (`ReturnPoint` layout, key `extra.abadi.ret`); teleport to the arrival island; first-arrival title card "ALAM ABADI"; gifts 1 `realm_crossing_talisman` + 16 `immortal_origin_stone`; ascend listeners run (D creates the inner world); advancement `immortal_realm`.
+6. **Failure.** "Luka Kenaikan": Qi Deviation 12,000 ticks; the offering is lost; the cooldown starts; one chat line.
+
+During the ritual DeathGuard `LANGIT` (registered by P9-langit's own guard) turns any lethal blow into failure, so totems and cheat-death charges are never spent.
+
+#### 26.3.4 Arrival island and travel
+
+**Arrival island.** On the first ascension in a world the server searches a spiral of up to 25 chunk centres around 0,0 for a column with `ChunkGenerator.getBaseHeight(x, z, MOTION_BLOCKING, level, randomState) ≥ 40` (26.3 `ChunkGenerator.getBaseHeight`, `ServerChunkCache.randomState()`): pure noise sampling, no chunk is loaded or generated, ≤ 8 samples per tick. The result is stored in `SavedData kultivator:alam_abadi` (Overworld) as `arrival`. Fallback 0, 120, 0 with Slow Falling 10 s and the void catch.
+
+**`realm_crossing_talisman` (Jimat Lintas Alam).**
+- Recipe: shapeless, 2 Batu Asal Abadi + paper + ender eye. Reusable, `stacksTo(1)`.
+- Use: 5 s channel (cancelled when hurt or moving > 1 block, the `ReturnTalisman` rule), then a teleport: Overworld/Nether/End → `extra.abadi.last` (else the arrival island); Alam Abadi → `extra.abadi.ret`, then the respawn point, then world spawn.
+- Cooldown 60 s. Same state refusals as 26.3.2. Not ascended → "Langit Abadi belum menerimamu".
+
+**Companions.**
+- Sect mates within 8 blocks who have ascended may click **[Ikut]** in chat during the channel (runs `/kultivasi abadi ikut <name>`).
+- Up to **3** of the player's Murid Inti+ disciples in FOLLOW within 16 blocks travel via `Disciples.depart(e, "abadi")` / `Disciples.arrive(...)`.
+- `Disciples.onChangeLevel` skips Alam Abadi (spine #10).
+- **Sapuan murid (sweep):** when the owner leaves Alam Abadi by any route (talisman, Return Talisman, death, portal, logout, op teleport), their disciples in Alam Abadi are departed and arrive beside the owner on the owner's next level (or when the owner next logs in). The same sweep runs at server start. (CRITIC: otherwise disciples are stranded in unloaded island chunks.)
+
+**Disciples in Alam Abadi.** Below Kenaikan Abadi: Weakness I while there ("Tekanan Alam Abadi", applied by P9-langit's own 40-tick pass). Death rules unchanged.
+
+**Return Talisman** works as an exit. **Join check:** a non-ascended player found in Alam Abadi is sent to `ret` (else spawn) on the next tick.
+
+#### 26.3.5 Batu Asal Abadi and Esensi Abadi
+
+**`immortal_origin_stone` — Batu Asal Abadi / Immortal Origin Stone** (`Rarity.EPIC`, stacks to 64).
+
+| Source | Amount |
+|---|---|
+| Natives | 50%: 1–3 (tier 3: 2–4) |
+| Mining | each block in `#minecraft:base_stone_overworld` a player breaks by hand in Alam Abadi (Fabric `PlayerBlockBreakEvents.AFTER`, no Silk Touch): 0.6% × (1 + 0.5 × Fortune), ≤ 16 per in-game day (`extra.abadi.mined_day`); an item drop, never a block |
+| Primordials | 30 first / 15 repeat (26.4.6) |
+| Wrath descents | 6–12 |
+| Auction consignments | 26.8 |
+| Rockmen | 1 per 7 inner days (26.6) |
+
+**Uses:** auction bids; conversion (+2% each, ≤ 10 per day); Dunia Batin expansion; crossing talismans; scrolls; **star condensing**: `Stars.addCostModifier` gives −1% per stone carried, at most 10 (−10%), inside the existing 0.5–1.0 clamp together with the Phase 8 Esensi discount; the stones used are consumed in `addCondenseListener`.
+
+**Esensi Abadi (`conv`, 0–100%, `extra.abadi.conv`).** Meditating inside Alam Abadi: +1% per 30 s. Each Batu used for conversion: +2%. Effects: the TargetFactor `0.6 + 0.4 × conv` against `abadi_foe`; qi regeneration in Alam Abadi ×(0.5 + 0.5 × conv). Advancements `essence_half` (50) and `essence_converted` (100).
+
+**Meditation XP in Alam Abadi:** ×3 (`Progression.addMultiplierProvider`). At TI Puncak all of it becomes Qi Abadi (Stored Qi), the dimension's main lure.
+
+#### 26.3.6 Makhluk Alam Abadi (natives)
+
+**Spawning:** every 400 ticks per player in Alam Abadi (staggered by UUID) when < `immortalNativesPerPlayer` (4) natives are within 48 blocks and < 12 in the world: 1 group of 1–2 at a `Targeting.safeSpot` 24–40 blocks away over solid ground (never over the void), entity-ticking chunks only. Spawn reason `EVENT`, `NoGrief.TAG`, never saved (`ALLOW_LOAD` refusal by tag), `setCanPickUpLoot(false)`, `setPersistenceRequired` never. Despawn after 60 s with no player within 64 blocks.
+
+| Native | Base | Tier | Element | Notes |
+|---|---|---|---|---|
+| Laba-laba Benang Langit | spider | 2 | Wind | 19.3 elite skills |
+| Prajurit Tulang Abadi | stray (sword, no bow) | 2 | Ice | unbreakable tinted helmet, drop chance 0 (26.1) |
+| Babi Taring Emas | hoglin | 2–3 | Earth | immune to zombification |
+| Penjaga Tulang Kuno | wither skeleton | 3 | Metal | |
+| Kultivator Abadi Liar | `RogueCultivators.spawn(level, pos, 2–3, R_eff, VARIANT_ROGUE, ROLE_QUEST, null)` | 2–3 | random | 25% of groups |
+
+**Numbers** (after `EliteMonsters.makeElite`, health modifier id `kultivator:abadi_native`): HP = `24 × {2.5, 4.0}[tier] × (1 + 0.35 × R_eff)` → tier 2: ★0 228, ★9 249, ★36 312; tier 3: ★0 365, ★36 499. Melee `4 + R_eff + 1.5 × tier` plus Tekanan Abadi.
+
+**Rewards** (`KillCredit.resolve`): XP `max(combatXp × 6, 0.01 × Stars.barSize)`; Batu (above); 15% herb `SpiritHerbs.randomFor(element, random, 500, 1500)`; 1% a Dewa-band jade slip (`TechniqueLoot`, Dewa gate rules unchanged); Battle Fatigue +2.
+
+**Sumber:** names and numbers are game design, *Terinspirasi dari* RMJIR (the Immortal Realm is dangerous for a newcomer ascender).
+
+#### 26.3.7 Commands (A)
+
+| Command | Effect |
+|---|---|
+| `abadi info` / `abadi naik` / `abadi lintas` / `abadi ikut <name>` | status / start ascension / use the talisman in the inventory / join a mate's crossing |
+| `uji abadi naik [sukses\|gagal]` | the ritual now, no gate or offering; optionally force the result |
+| `uji abadi masuk` / `uji abadi pulang` | to the arrival island / to `ret`, ignoring the gate (sets `ascended`) |
+| `uji abadi konversi <0-100>` / `uji abadi batu <n>` | set conv / give stones |
+| `uji abadi pribumi <laba\|tulang\|babi\|penjaga\|liar> [tier]` / `uji abadi pribumi hapus` | a native 6 blocks ahead / remove natives within 64 |
+| `uji abadi pulau` | print the arrival island and re-run the search |
+| `uji abadi tepi` / `uji abadi void` | 10 blocks inside the soft border / to y −4 |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.4 B. Binatang Purba (primordial beasts)
+
+#### 26.4.1 Sumber / Source
+
+- **Kun-Peng:** *Zhuangzi* ch. 1 "Free and Easy Wandering" (逍遙遊): the fish Kun of the northern darkness changes into the bird Peng, whose wings are like clouds across the sky; it rises ninety thousand li on a whirlwind toward the southern darkness; the same chapter quotes the *Qixie*: the waters are roiled for three thousand li. *Perfect World* ch. 261 "Devil Refinement Cave's True Precious Technique": the Kunpeng's precious bone was split into six pieces that together give only about a third of the legacy; ch. 347: Shi Hao's Kun Peng precious technique (already in DESIGN 22.9). "The living beast yields the rest" is game design *terinspirasi dari* ch. 261.
+- **Zhulong / Zhuyin (Candle Dragon):** *Shan Hai Jing* section 8 "Regions Beyond the Seas: North" (Zhuyin of Bell Mountain: scarlet, human face, serpent body a thousand li long; eyes open = day, closed = night; blowing = winter, calling = summer) and section 17 "Great Wilderness: North" (Zhulong: eyes, human face, serpent body; no seasons).
+- **Taotie:** *Zuo Zhuan* (one of the four evil creatures, a by-word for gluttony); *Lüshi Chunqiu* 16/3a (on Zhou *ding* the taotie has a head but no body; it eats people but harms them without swallowing).
+- **Game design:** three-phase fights, numbers, telegraphs, intake clamps, drops, spawn rules.
+
+#### 26.4.2 Entity `kultivator:primordial_beast`
+
+- `PrimordialBeastEntity extends Monster`; synced `kind` (0 Kun-Peng, 1 Zhulong, 2 Taotie), `phase` (0–2), `celah` (bool).
+- Never saved (`shouldBeSaved()` false + `ALLOW_LOAD` refusal by tag `kultivator.purba`), `removeWhenFarAway` false, `NoGrief.TAG`, `setNoGravity(true)`, `FlyingMoveControl`. No block collision effects, no projectiles, no `Explosion`.
+- Tags `kultivator.boss` (vanilla `ServerBossEvent` bar + 7b BOSS beat kind `BOSS_PRIMORDIAL`), `kultivator.abadi_foe`, `kultivator.purba`.
+- Hitbox (`EntityDimensions.scalable`): Kun 8×3, Peng 6×2, Zhulong head 4×4 (body visual only), Taotie 6×6; switched by `refreshDimensions()` on phase change.
+- Renderer `client/purba/PrimordialRenderer`: no model; point-cloud silhouettes via spine-public `PointClouds.beast(FxLayer.BeastKind.KUN | BIRD | DRAGON)` and a module-owned Taotie mask polyline through `PointClouds.sample(float[][])` (cached), drawn as additive quads; ≤ 800 points, halved beyond 48 blocks; particle outline at Minimal quality.
+- Relics `kultivator:primordial_relic` (`PrimordialRelicEntity`: Mata Angin, Lilin): never saved, `abadi_foe`, own small renderer, ≤ 3 alive.
+
+#### 26.4.3 Appearance
+
+- **Gejolak Purba (natural):** every 6,000 ticks per player in Alam Abadi (staggered): chance `0.08 × primordialChanceScale`, only when ≥ 70% of a 24-block ring around the player is solid ground. World cap 1; per-player cooldown 2 in-game days (`extra.purba.cd`). Kind = the one this player has killed least (random tie-break).
+- **`shan_hai_scroll` — Gulungan Gunung dan Laut** (component `kultivator:purba_kind`): recipe 8 Batu + 1 book + the kind's material (any `#kultivator:primordial_material` for the very first scroll; a special recipe class checks the kind). Used in Alam Abadi only, same refusals as 26.3.2; consumed when the beast arrives. Ignores the natural cooldown.
+- **Omen, 20 s:** EXTRA `PRIMORDIAL_OMEN` (the silhouette crosses the far sky), chat line, boss bar "Binatang Purba mendekat".
+- **Arena:** 48-block soft ring around the summon point. A participant outside it for 30 s stops counting; with no participant for 30 s the beast "departs" with no reward.
+
+#### 26.4.4 Numbers
+
+| | Formula | ★9 | ★36 | ★72 |
+|---|---|---|---|---|
+| HP | `24 × 40 × (1 + 0.35 R_eff) × (1 + 0.5 × extra players) × (1 + 0.25 × disciples, ≤ 3)` | 3,984 | 4,992 | 6,336 |
+| Intake per second | 1.5% / 6% in a Celah | 60 / 239 | 75 / 300 | 95 / 380 |
+| Fastest clear | ≈ 33 s of pure damage (Celah 35% of the time) + 2 × 3 s transitions + mechanics | ≈ 3–4 min | | |
+
+Skill damage to players is a share of the target's max HP; every big skill has a 1.5–2 s telegraph (ground ring Displays + chat colour); `primordialDeathGuard` applies.
+
+#### 26.4.5 The three fights
+
+**Kun-Peng (Zhuangzi ch. 1; Perfect World ch. 261, 347):**
+
+| Phase | Name | Mechanics | Celah |
+|---|---|---|---|
+| 1 (100–66%) | **Kun di Kegelapan Utara** | Kun swims a 40-block loop below and around the island edge as a cloud-sea silhouette. Every 8 s it surfaces: **Gelombang Tiga Ribu Li**, ring telegraphed 2 s, 18% max HP + knockback 1.5 to players on the ring | 4 s at each surfacing |
+| 2 (66–33%) | **Berubah menjadi Peng** | 3 s transition (EXTRA `PRIMORDIAL_PHASE`). **Sayap Bagai Awan**: wing-shadow discs (12 blocks) give Darkness + Slowness II 3 s. **Terkam**: line telegraphed 1.5 s on a marked player, 25% | 3 s after each dive |
+| 3 (33–0%) | **Naik Sembilan Puluh Ribu Li** | **Angin Puyuh**: whirlwind pulls players toward the centre by velocity (never blocks; void catch applies). Wind blades 8% every 3 s. Three **Mata Angin** relics (HP 6% of the beast each) orbit at 10 blocks | breaking a Mata Angin: 6 s Celah, the beast drops 20 blocks |
+
+**Zhulong (Shan Hai Jing sections 8 and 17):**
+
+| Phase | Name | Mechanics | Celah |
+|---|---|---|---|
+| 1 | **Mata Terbuka** (day) | gaze beam sweeps a 60° cone for 6 s: 6% max HP per second + entity fire 3 s; standing behind the head avoids it | head glows: 5 s after each sweep |
+| 2 | **Mata Tertutup** (night) | vanilla `MobEffects.DARKNESS` on players within 64 blocks (**no time change**), dark client sky grade, serpent hidden except a candle glow. **Sambaran dari Gelap**: strikes from random sides at 20%, telegraphed by the candle flaring 1 s before (Divine Sense shows the side) | a Lilin relic appears; hitting it opens 4 s |
+| 3 | **Napas Musim** | alternates **Hembusan Musim Dingin** (Slowness III, `setTicksFrozen` up to `getTicksRequiredToFreeze()`, 10%) and **Seruan Musim Panas** (entity fire 5 s, 12%) every 6 s; the next one telegraphed 2 s by chat and colour | 3 s between breaths |
+
+**Taotie (Zuo Zhuan; Lüshi Chunqiu 16/3a):**
+
+| Phase | Name | Mechanics | Celah |
+|---|---|---|---|
+| 1 | **Kepala Tanpa Tubuh** | summons 6 **Pelahap** (tier 2 natives, `abadi_foe`); each that reaches the head is eaten and heals it 5% | while no Pelahap lives |
+| 2 | **Melahap** | **Hisapan**: 30° cone pull 3 s; a player in the mouth zone for 2 s is "devoured": 30% max HP, then spat out 12 blocks (harms without swallowing) | 4 s after each inhale |
+| 3 | **Rakus Tak Berujung** | mouth open/closed cycles of 5 s; technique damage while **open** heals it by half the amount (punishes spam) | while closed |
+
+#### 26.4.6 Rewards (each participant with ≥ 3% of the damage, or whose disciple dealt it)
+
+| Beast | First kill | Repeat | Unique |
+|---|---|---|---|
+| Kun-Peng | 2 `kun_scale`, 2 `peng_feather`, 30 Batu, 40% star share | 1 scale or 1 feather, 15 Batu, 15% | 1 `kunpeng_bone_fragment` with a piece the player lacks (existing item, component `kultivator:kunpeng_piece`). **Holding six distinct pieces when Kun-Peng dies:** the player learns `kunpeng_art` (via `Route.item("kunpeng_whole")`, spine #16), the six pieces are consumed, advancement `kunpeng_whole`. If `kunpeng_art` is already known, nothing is consumed (the pieces remain for disciples' Kunpeng Wings, 20.3.10). |
+| Zhulong | 2 `zhulong_scale`, 30 Batu, 40% | 1 scale, 15 Batu, 15% | `zhulong_candle_eye` (once per player): in the offhand, Night Vision (refreshed every 10 s) and Darkness removed |
+| Taotie | 2 `taotie_fang`, 30 Batu, 40% | 1 fang, 15 Batu, 15% | – |
+
+- Star share = fraction of `Stars.barSize(player)`, paid by `Stars.grantShare` (`XpSource.TRIAL`).
+- **Kelelahan Purba (CRITIC: scroll farm loop):** repeat rewards (Batu and star share) at most 3 per player per in-game day; beyond that only the material at 50%.
+- Tag `#kultivator:primordial_material` = `kun_scale`, `peng_feather`, `zhulong_scale`, `taotie_fang`. Other modules read it as data.
+- Disciple participants: 10% bar share and 30 PK.
+- Advancements `primordial_slain`, `kunpeng_slain`, `zhulong_slain`, `taotie_slain`, `three_primordials`.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.5 C. Bencana Bintang & Murka Langit
+
+#### 26.5.1 Sumber / Source
+
+- *Renegade Immortal* ch. ~1157–1159 (DESIGN 20.3.19 / 23.20): Ancient Gods grow by stars and face Three Trials with Seven Calamities (2 + 2 + 3); most meet the first at six stars; failing means death (here: injury); Wang Lin ends at Heaven Trampling.
+- *I Shall Seal the Heavens* Book 4 ch. 385 "Bring It On!": Meng Hao says the Heavens are trying to slay him; the lightning gathers far more intensely after his defiance. Ch. 386 "Five Colored Sky, Cultivation Base Breakthrough!": his laughter angers the heavens and more lightning joins. The envoys and the Panglima are *terinspirasi dari* these chapters; the beings themselves are game design (the source answers with lightning, drawn here by the client only).
+- In-mod precedent: DESIGN 3 Dao Protectors.
+
+#### 26.5.2 The player's Seven Calamities
+
+**Gate.** Calamity k (1–7) gates star `s_k = f + 9(k − 1)`, with the 20.3.19 rule: f = 6 (average breakthrough quality Normal or lower), 7 (Perfect), 8 (Heavenly, Sempurna Foundation or Darah Dewa Kuno). Spine `Stars.StarGate` (#7): `ImmortalPerks.condense` stops before `s_k` with "Bencana ke-k menanti" and a [Mulai] link; Stored Qi keeps filling.
+
+**Run** (`purba/StarCalamity`): start from the Bencana tablet or `/kultivasi bencana mulai`; the star's cost is deducted at the start; omen 6 s; `6 + k` strikes of `(0.12 + 0.01 × trial) × max HP` (trial 1 for k 1–2, 2 for k 3–4, 3 for k 5–7), one per 60 ticks, the last ×2, through `Tribulation.strike` (would-kill = failure); every 3 strikes an envoy wave of `2 + k` with health ×(1 + 0.5k). DeathGuard `LANGIT` covers every source during the run.
+
+**Segel Penangkal:** consuming 3 `heaven_seal_shard` at the start makes every strike ×0.85 for that run (game design; the shards' sink).
+
+| Result | Effect |
+|---|---|
+| **Lulus** | The star condenses. Finishing a Trial (k = 2, 4, 7) multiplies T by 1.1 (≤ 1.331). T multiplies `S(stars)` in `P_player` (spine #5 `addPlayerStarFactor`) and the star health bonus in `Stats`. |
+| **Gagal** | "Luka Bencana": Qi Deviation 12,000 ticks; no star; 50% of the cost back to Stored Qi. |
+| After k = 7 | title **Penginjak Langit** (Status page), server announcement, EXTRA `PLAYER_TRAMPLING`, advancement `heaven_trampler_player` |
+
+Skipped calamities (26.1) can be run any time for T alone; they never take a star back. `starCalamities = false` registers no gate.
+
+#### 26.5.3 Murka Langit: the wrath descent and the Heaven's duel
+
+**Who:** players with ≥ 1 calamity passed or skipped, when `heavenlyWrath = true`.
+
+**Schedule:** a roll at each dusk (overworld day time 12,000) when `game day ≥ extra.purba.wrath_next`; then `wrath_next = day + heavenlyWrathDays (5; 3–15) ± 1`. **Live only if** the player had input in the last 60 s, not Peaceful, not in a realm run, a live raid of their own hall, a tribulation, a calamity, an ascension, a primordial fight or a batin defence, not riding or gliding, and in the Overworld or Alam Abadi. Otherwise retried next dusk; after 2 skips it lapses with no penalty.
+
+**Flow:** omen 30 s ("Langit menatapmu…", EXTRA `WRATH_OMEN`, white-gold sky grade, a chat line citing ISSTH) → three waves of 2, 3, 4 Utusan, 15 s apart or when the previous wave is cleared (advancement `wrath_repelled`) → **Duel Kehendak Langit**: the **Panglima Langit** descends; only the challenged player's damage counts (disciples, mates and formations deal 0 to it, but still fight the waves); boss bar "Panglima Langit · ★{stars}".
+
+| Result | Effect |
+|---|---|
+| **Menang** | 25% star share; 6–12 Batu (in the Overworld too); 2 `heaven_seal_shard`; BOSS beat kind `BOSS_HEAVEN_GENERAL`; advancement `heaven_general` |
+| **Kalah** (DeathGuard `LANGIT`) | 1 HP; "Luka Langit" 10 min (technique ×0.85); the descent ends; no item loss |
+
+#### 26.5.4 Entity `kultivator:heaven_envoy` (Utusan Murka Langit and the Panglima)
+
+- `HeavenEnvoyEntity extends Monster`, built like `RogueCultivatorEntity`: never saved, `NoGrief.TAG`, no loot pickup, no doors, no custom name. Synced `kind` (0 envoy, 1 Panglima).
+- Renderer `client/purba/EnvoyRenderer` like `RogueRenderer`: `DiscipleRenderState` + player model, white-gold robe tint, client halo ring (FxBudget), slightly translucent `getModelTint`.
+- Tags `kultivator.abadi_foe`; the Panglima also `kultivator.boss`.
+
+| | HP | Melee | Skills (share of the target's max HP) |
+|---|---|---|---|
+| Utusan | `24 × 3 × (1 + 0.35 R_eff) × (1 + 0.5k in calamities)`; ★9 299 | `4 + R_eff + 3` | **Tombak Cahaya**: line telegraphed 1 s, 8% |
+| Panglima Langit | `24 × 12 × (1 + 0.35 R_eff)`; ★9 1,195; ★36 1,498; intake 4%/s | `6 + 1.5 R_eff` | **Pedang Hukuman**: line telegraphed 1.5 s, 20% · **Rantai Langit**: root 2 s (BIND rules) · **Segel Pengadilan**: 6-block ring telegraphed 2 s, 15% + Weakness II 5 s · at 50% HP **Murka**: skill frequency ×1.3 |
+
+**Drops:** envoys 20% `heaven_seal_shard`, XP `combatXp × 5`, no beast cores. ≤ 8 envoys alive (waves queue).
+
+**Contract for A:** `int Purba.spawnEnvoyWave(ServerPlayer target, int count, int k, Consumer<Boolean> onCleared)`.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.6 D. Dunia Batin (the inner world)
+
+#### 26.6.1 Sumber / Source
+
+*Reverend Insanity* (RevI) ch. 409 "Managing the Blessed Land": the land spirit represents the land and knows everything in it; earthly calamities strike every ten years and Hu Immortal withstood five; the 2nd was a meteor fire rain that ruined the east; the 4th a flood over the northern grassland; the 5th a human-shaped blue lightning shadow that avoids Dang Hun Mountain, where its soul would be shocked to ash; over 1,300 of 4,000 km² were lost; time inside passes five times faster; green, grape-like immortal essence pearls; an underground rockman tribe that eats ore; about 4.7 million foxes. *Terinspirasi dari* RevI (fan wiki, unofficial): rank 6–7 Gu Immortals' apertures are blessed lands graded by size — the reason the inner world is born at the Immortal ascension. **Game design:** plots, rates, calendar scale, defence events, every number.
+
+#### 26.6.2 Birth and grade
+
+Born on A's ascension success (`Abadi.addAscendListener`); advancement `batin_born`. Grade from the average breakthrough quality and `Ascension.flawlessPath(data)`:
+
+| Grade | When | Plots | Pearls per day | Fox cap |
+|---|---|---|---|---|
+| Kecil | average ≤ Normal | 4 | 1 | 1,000 |
+| Sedang | Perfect | 6 | 2 | 2,000 |
+| Besar | Heavenly | 9 | 3 | 3,000 |
+| Agung | Heavenly + flawless path | 12 | 4 | 4,000 |
+
+- **Perluas:** +1 plot for 16 Batu + 1 `#kultivator:primordial_material`, up to 16. `land_expansion_token` (auction lot) gives +1 plot when used.
+- **Calendar:** 1 in-game day outside = 2 "Tahun Batin" (game scale). The ×5 of RevI ch. 409 is the herb growth multiplier.
+
+#### 26.6.3 What lives inside (data in `extra.batin`, zero ticking)
+
+Everything advances by elapsed overworld days when the Batin page opens or on the player's day roll (lazy). Catch-up ≤ 10 days.
+
+- **Petak Herba:** plant any `SpiritHerbs.isHerb` item (consumed). Age +25 per outside day × (1 + Kesuburan), cap 3,000. Harvest returns `SpiritHerbs.create(kind, age)`; from age ≥ 1,000 a harvest also returns a second herb of the same kind at age 100. One herb per plot; only clicks move herbs.
+- **Kawanan Rubah:** starts at 100, +5% per day up to the grade cap. **Kesuburan** = +1% herb growth per 100 foxes (≤ +40%). Shown as a number and a sprite; no entities.
+- **Manusia Batu:** awakened once by depositing 64 items of `#kultivator:rockmen_ore` (P9-batin tag: iron/copper ores incl. deepslate, `raw_iron`, `raw_copper`, gold/redstone/lapis ores, `raw_gold`, diamond/emerald ores; never ancient debris). Then they eat from **Lubang Bijih** (≤ 256 items, consumed on deposit; no withdrawal, so no duplication). Each day 32 items: 8 iron/copper → 1 Mid stone; 4 gold/redstone/lapis → 1 Mid; 1 diamond/emerald ore → 1 High. Every 7th day 1 Batu. Advancement `rockmen`.
+- **Mutiara Esensi Abadi:** virtual counter (≤ 99) filled by the grade rate. Withdraw as `immortal_essence_pearl` (≤ 16 per day). Uses: Jurus Ciptaan, Perkokoh, **Seduh** (1 pearl = 1% of `Stars.barSize` as Qi Abadi, ≤ 5 per day).
+- **Roh Tanah:** a card with a name rolled from 8 (e.g. "Roh Rubah Kecil"); reports status, warns one outside day before a calamity, keeps the last 10 events.
+
+#### 26.6.4 Bencana Bumi (every `innerWorldCalamityDays` = "ten inner years"; default 5; 3–15; 0 = off)
+
+Type cycles with the calamity number n: **Hujan Api Meteor → Banjir Besar → Bayangan Petir**, then again at +1 strength.
+
+**Due:** **live** when the owner is online, active (input in 60 s), not in a run, raid, tribulation, calamity, ascension, primordial fight or wrath descent, and ≥ 70% of a 16-block ring is `safeSpot`. It waits up to 1 outside day for that, then **resolves as data**. EXTRA `INNER_CALAMITY` and a land-spirit chat line. Boss bar "Bencana Bumi ke-n".
+
+**Live defence (90 s, around the player, entity-only):**
+
+| Calamity | Mechanic | Loss |
+|---|---|---|
+| **Hujan Api Meteor** (RevI 2nd) | `12 + 4n` `batin_meteor` entities (≤ 16 alive; HP `20 × (1 + 0.35 R_eff)`, `abadi_foe`) fall from 40 blocks over 6 s each with a ground-ring telegraph. Destroy them in the air. A landing: 3-block burst 10% max HP + entity fire (no block fire, no explosion) | landed / 4 plots "Terbakar" (herbs destroyed, plot unusable 3 days) |
+| **Banjir Besar** (RevI 4th) | channel **Tanggul Qi** inside a 4-block circle for a total of 60 s (progress kept). `2 + n` waves of "Roh Air Bah" (`RogueCultivators.spawn` tier 2, `VARIANT_ENERGY`, `ROLE_QUEST`, tracked). A hit above 15% max HP interrupts | unfinished share × plots "Terendam" (herb age −30%, never below 1) |
+| **Bayangan Petir** (RevI 5th) | one "Bayangan Petir Berbentuk Manusia": `RogueCultivators.spawn` tier 4, `VARIANT_ENERGY`, health modifier `kultivator:batin_calamity` ×(1 + 0.15n), boss bar, `abadi_foe`. A **Gunung Dang Hun** glyph ring (r 5, client Displays) 8 blocks away: inside it the shadow takes ×2 damage and is slowed. Lure it in. Lightning visuals client-only | foxes −20%, pearls −10, 1 plot "Hangus" |
+
+**Win:** `5 × n` pearls, foxes +10%, a land-spirit line, advancement `batin_calamity`.
+
+**Data resolution:** `P(survive) = clamp(0.30 + 0.10 × fortify + 0.05 × rockmen awake + 0.05 × grade index, 0.30, 0.90)`. **Perkokoh** (fortify): 10 pearls per step, ≤ 3, bought before the due time. A loss applies **half** of the live loss. Peaceful: always survive.
+
+**Never:** items in the player's inventory, blocks, or the land below 2 usable plots.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.7 E. Jurus Ciptaan Sendiri (self-created techniques)
+
+#### 26.7.1 Sumber / Source
+
+- *I Shall Seal the Heavens* ch. 1379 "Incredible Power": Meng Hao calls his last Hex "my own Ninth Hex" (`ninth_hex` already cites ch. 1379, 1465, 1534, 1540).
+- *Battle Through the Heavens* ch. 262 "Merging the 'Heavenly Flames', Angry Buddha Lotus Flame!" and ch. 363 "Killing Yun Leng" (Xiao Yan brings two flames together; even Medusa did not know the Angry Buddha Lotus Flame existed): the precedent for a technique born from fusing two powers. The disciples' Buddha lotus (20.3.16) stays separate.
+- *Coiling Dragon*: Linley fuses profound mysteries of different elements (`mystery_fusion`, 22.2.7); its pair rows are reused.
+- **Game design:** slots, forms, coefficients, quality, costs, naming.
+
+#### 26.7.2 Registration (6c engine, no runtime registry change)
+
+`TechniqueRegistry` is frozen at init on both sides, so **three fixed specs** go in the new net-id block 1100–1199 (`module("CiptaanArts", 1100, 1199, CiptaanArts::register)` before `freeze()`, spine #15):
+
+| netId | id | Spec |
+|---|---|---|
+| 1100 / 1101 / 1102 | `own_art_1` / `own_art_2` / `own_art_3` | Dao `null`, grade DEWA sub 0, type PAMUNGKAS, realm TRUE_IMMORTAL, flag `NO_TEACH`, `special = "own_art"`, keep-alive timeline (40 t), qiPct 70, cooldown 480 s; fx/shake/source entries so `uji teknik audit` passes |
+
+- Lang: "Jurus Ciptaan I/II/III" / "Created Art I/II/III" + `.desc`, `.source`, `.lore` (in `lang-src/arts_ciptaan.*`). No route; never loot.
+- The player's own name: `extra.batin.ciptaan[i].name`, shown on the Ciptaan page, in the Kitab Teknik (server `Codex.addNameProvider`, client `CodexNames.register`, spine #12, fed from `CH_BATIN`) and on the cast action bar. Lists still sort by spec id.
+- Creation calls `data.learn("own_art_i")`; destroying a creation un-learns it and clears its loadout slots and mastery.
+
+#### 26.7.3 Creating an art (the Ciptaan tablet)
+
+- **Needs:** Dunia Batin born, TI Puncak, two Daos with comprehension ≥ 60 (the same Dao twice at ≥ 90 = "Murni").
+- **Choose:** Dao A, Dao B, a form, a name of 1–24 characters matching `[\p{L}\p{N} '\-]` (trimmed, server-sanitised, no formatting codes, `§` refused).
+- **Cost:** 20 pearls + 1 `#primordial_material` + 10% of `Stars.barSize` in Qi Abadi (Stored Qi).
+- **Pencerahan Ciptaan:** 60 s meditation channel; interrupted = full refund (costs are taken only at completion).
+- **Quality** `Q = clamp(0.55 + (compA + compB − 120) / 200 + 0.03 × Purba.distinctKinds, 0.55, 1.0)`, shown as "Kesempurnaan 55–100%". **Sempurnakan:** half the cost, re-roll Q, keep the higher.
+- **Slots:** ≤ 3; overwriting asks for confirmation.
+
+**Forms (CRITIC: coefficients held at or below the catalogue's strongest single coefficient, 18):**
+
+| Form | Shape (built at cast time through `CastContext` and the same run helpers `MysteryFusion` uses; every 22.3.5 rule and cap) | Coef at Q = 1 |
+|---|---|---|
+| Tebasan Dao | BEAM 64 × width 3 (`BEAM_LENGTH_CAP_DEWA`) | 18 |
+| Ledakan Dao | NOVA at the aim, r 12 → 20 (≤ 32) | 15 |
+| Hujan Dao | RAIN r 16, 18 impacts × 1.0, ≤ 6 impacts per target | 18 total |
+| Gelombang Dao | FRONT 64 × 16 × 8, speed 4 | 16 |
+| Wilayah Dao | ZONE r 14 for 8 s, 10 pulses × 1.4 (each ≤ the 2% boss tick) | 14 |
+| Segel Dao | needs a target: ROOT 3 s (BIND rules), then a strike | 16 |
+
+- **Dao pair effect:** the two Daos' 22.10.1 domain pulses at ×1.5; where `MysteryFusion` has a pair row, that row applies (its public constants, e.g. `FIRE_ICE_FACTOR`). Murni: coef +15% and its pulse ×2.
+- Damage = coef × Q × P through the choke points; boss caps, trial-mob, `abadi_foe` and arena rules all apply. Mastery levels 3–4 as 22.6 (no ECHO, as `mystery_fusion`).
+- Kehancuran: `DShape.bowl(4)` for NOVA and RAIN, `DShape.trench(...)` for BEAM and FRONT, only when the existing switch is on.
+- FX: TechFx events with the two Dao colours packed in `count` (the `MysteryFusion` convention), drawn by `client/batin/CiptaanFx` from existing templates (RUNE_CIRCLE, LASER, SHOCK_RING, SKY) + a SHAKE layer. EXTRA `OWN_ART_BORN` on the first cast. Advancements `own_art`, `own_art_perfect` (Q = 100%).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.8 F. Lelang Abadi & Pengejaran (the Immortal auction)
+
+#### 26.8.1 Sumber / Source
+
+*RMJ: Immortal Realm* ch. 615 "Another Beast Bone" (a bidding war in Immortal Origin Stones: 3,800 → 4,000 → 4,300 → 5,000) and ch. 567 "Pursuit" (Han Li flees on an origin-stone-powered carriage). "A contested win draws a pursuer" is *terinspirasi dari* these two chapters; rival names, lots, prices and timings are game design.
+
+#### 26.8.2 Sessions
+
+- **When:** one session per 2 in-game days, overworld day time 12,000 → 18,000. Lots seeded by `(world seed, session index)`; all players see the same lots and compete. State is session-only, in memory; a restart mid-session voids open lots with no charge.
+- **Where:** the Lelang tablet, active only while the viewer is in Alam Abadi; elsewhere it shows the next session time.
+- **Lots:** 5 per session from a weighted table (items looked up by registry id; a missing id skips the row):
+
+| Lot | Base (Batu) |
+|---|---|
+| `kunpeng_bone_fragment` (random piece) | 40 |
+| `heavenly_flame_seed` (random kind) | 60 |
+| herb aged 1,000–1,500 | 25 |
+| Dewa-band jade slip (`TechniqueLoot`) | 120 |
+| 5 × `tomb_essence` | 30 |
+| `tomb_sigil` | 35 |
+| `ancient_god_blood` | 30 |
+| `inheritance_crystal` | 40 |
+| 1 `#primordial_material` | 50 |
+| `land_expansion_token` | 80 |
+| 2 `tribulation_warding_pill` | 20 |
+| `soul_nurturing_wood` | 25 |
+| 2 Supreme spirit stones | 30 |
+| forging embryo of grade Abadi (`ArtifactItem.create`) | 90 |
+
+- **Bidding:** 4 NPC rivals (game-design names, e.g. "Tetua Paviliun Awan Ungu"), each with a hidden limit 0.6–1.6 × base; every 4 s each rival under its limit may raise 5–15%. The player clicks +5%, +10%, +25% (the Action carries lot index and expected price; a stale click is refused). A bid is refused if the Batu in the player's inventory is below it. A lot sells after 8 s with no raise.
+- **Payment:** Batu are taken from the inventory only on a win. **CRITIC:** if the winner no longer holds enough, the lot passes to the best rival and that player cannot bid for the rest of the session. The lot goes to the inventory; overflow to the Lumbung, else dropped with an owner lock. Advancement `auction_win`; EXTRA `AUCTION_WIN`.
+- **Consign:** ≤ 2 items per session from `#kultivator:auction_sellable` (P9-langit tag); sold at 0.7–1.3 × a value table always ≤ 50% of the same item's lot base (no buy-sell loop); paid in Batu at session end (if offline: on next login, `extra.abadi.auction.owed`).
+
+#### 26.8.3 Pengejaran (pursuit)
+
+- **Tersinggung:** a rival whose limit was ≥ 90% of the final price of a lot the player won. Chance `auctionPursuitChance` (0.35) per offended rival, ≤ 1 pursuit per session.
+- **When:** 60–180 s after the session ends, the next time the player is in Alam Abadi or the Overworld outside any hall territory, active, and not in a run, raid, tribulation, calamity or fight.
+- **Band:** `RogueCultivators.spawnBand(level, center 12–18 blocks ahead, {4, 2, 2}, 8, ROLE_QUEST, null, onCleared)`; the leader gets its own boss bar; all get `abadi_foe` and a health modifier `kultivator:abadi_pursuit` ×`(1 + 0.35 R_eff) / 3.8`.
+- **Telegraph:** the 19.3.15 danger alert 3 s before.
+- **Win:** a `demonic_loot_pouch`, 5–15 Batu, advancement `pursuit_survived`. **Lose:** normal death rules (like a Phase 8 ambush).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.9 Glue: "Jalan Abadi" (Jalan chapters 11–15) and chores
+
+New int key **`extra.goals.guide3`**. The GuideTracker wakes after chapter 10 once the player is TI Puncak. Steps complete from advancements (backfill on join); each reward claims once.
+
+| Chapter | Steps (advancement) | Reward |
+|---|---|---|
+| 11 **Di Atas Langit** | `immortal_realm` · `origin_stone` · `essence_half` · `realm_crossing` | 8 Batu + 1 extra talisman |
+| 12 **Binatang Purba** | `primordial_slain` · `kunpeng_slain` · `auction_win` · `pursuit_survived` | 1 `shan_hai_scroll` (free kind) |
+| 13 **Bencana Bintang** | `star_calamity_1` · `first_trial` · `wrath_repelled` · `heaven_general` | 20 pearls + 2 `heaven_seal_shard` |
+| 14 **Dunia Batin** | `batin_nine` · `batin_millennium` · `batin_calamity` · `rockmen` | `land_expansion_token` |
+| 15 **Leluhur Abadi** | `own_art` · `own_art_perfect` · `three_primordials` · `heaven_trampler_player` | cosmetic title **"Leluhur Abadi"** + `immortal_path_complete` |
+
+- **Daily chores** (19.3.9 c) additions: kill 3 Alam Abadi natives · mine 1 Batu Asal Abadi · harvest a batin plot · bid at an auction.
+- **Ujian Fondasi:** unchanged.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.10 UI (jade scroll, 320×240)
+
+**Keabadian screen** (`OpenScreen.ABADI = 8`; `/kultivasi abadi [tab]`; key `key.kultivator.abadi`, unbound):
+
+| Tablet | Content |
+|---|---|
+| **Alam** | ascension card (gate checklist and offering) or Alam Abadi status: conv bar, Batu, mined today, crossing cooldown, [Lintas] |
+| **Purba** | three beast seals (kills, first-kill claimed, unique owned), cooldown, today's repeat rewards (≤ 3), scroll recipe, Gejolak chance |
+| **Bencana** | the 7 calamity seals (Lulus / Terlewati / gate star), T factor, [Mulai] next, [Segel Penangkal], next wrath day, last 5 results |
+| **Batin** | plot grid (≤ 4×4; herb glyph, age, state Terbakar/Terendam/Hangus), land-spirit card, foxes, rockmen buffer, pearls, [Seduh] [Perkokoh] [Perluas], countdown "Bencana ke-n · 3 tahun batin lagi" |
+| **Ciptaan** | 3 slots (name, Dao glyphs, form, Kesempurnaan); creator panel: name `EditBox`, Dao and form pickers, cost preview from the real constants |
+| **Lelang** | session clock, 5 lot cards, price, leading bidder, +5/+10/+25, 2 consign slots |
+
+**HUD:** vanilla `ServerBossEvent` bars only (ascension, beasts, calamities, Panglima, batin defence, pursuit leader). No new HUD code.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.11 Commands
+
+**Player** (`/kultivasi`):
+
+| Command | Effect |
+|---|---|
+| `abadi [alam\|purba\|bencana\|batin\|ciptaan\|lelang]` | opens the screen (spine) |
+| `abadi naik` / `abadi lintas` / `abadi info` / `abadi ikut <name>` | 26.3 |
+| `purba info` | kills, cooldown, today's rewards |
+| `bencana info` / `bencana mulai [k]` | next calamity / start it (or a skipped k) |
+| `batin info` / `batin seduh <n>` | inner world |
+| `ciptaan daftar` / `ciptaan hapus <1-3>` | created arts |
+| `lelang info` | next session and lots |
+
+**Test** (op; `/kultivasi uji …`; every feature without grinding):
+
+| Command | Effect |
+|---|---|
+| `uji kit` | + a shulker "Fase 9" built from each module's `kitItems()`: 64 Batu, 2 talismans, 3 scrolls (one per kind), 4 of each primordial material, 32 pearls, 8 seal shards, 1 `land_expansion_token`, 9 `tomb_essence` + 1 Supreme stone, the candle eye |
+| `uji abadi …` | 26.3.7 |
+| `uji purba <kunpeng\|zhulong\|taotie> [fase 1-3]` | spawn now (no omen), optionally at a phase |
+| `uji purba celah` / `uji purba hapus` / `uji purba gejolak` / `uji purba enam` / `uji purba reset` | force a 6 s opening / remove / roll a natural appearance / give six distinct Kunpeng pieces / clear cooldown and daily caps |
+| `uji bencana <k> [lulus\|gagal]` / `uji bencana t <1.0-1.331>` / `uji bencana lewati <k>` | a calamity now / set T / mark skipped |
+| `uji murka [gelombang <1-3>\|panglima]` / `uji murka menang\|kalah` / `uji murka jadwal` | a descent now / force outcome / print schedule |
+| `uji utusan <n> [k]` | n envoys ahead |
+| `uji batin lahir [kecil\|sedang\|besar\|agung]` | create or reset the inner world |
+| `uji batin hari <n>` | advance n days (≤ 30) |
+| `uji batin bencana <meteor\|banjir\|petir> [n]` / `uji batin bencana data` | live calamity now / resolve as data now |
+| `uji batin herba <slot> <umur>` / `uji batin rubah <n>` / `uji batin batu` / `uji batin mutiara <n>` | plot age / foxes / awaken rockmen / pearls |
+| `uji ciptaan <slot> <daoA> <daoB> <bentuk> [kesempurnaan]` | create without ritual or cost |
+| `uji lelang sesi` / `uji lelang tutup` / `uji lelang kejar` | start a session now / end it / spawn the pursuit now |
+| `uji jalan bab <1-15>` | extended to 15 |
+
+**Debug (op):** `debug abadi info` (conv, border distance, natives near, arrival), `debug purba info` (looked-at beast: phase, intake window, Celah), `debug batin` (raw `extra.batin`), `debug ciptaan <slot>` (resolved coefficients and caps).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.12 Config (clamped on load) and performance budgets
+
+| Field | Default (range) |
+|---|---|
+| `immortalRealm` | true |
+| `immortalRealmRadius` | 2048 (512–4096) |
+| `immortalNativesPerPlayer` | 4 (0–6) |
+| `immortalNativeWorldCap` | 12 (4–16) |
+| `primordialBeasts` | true |
+| `primordialChanceScale` | 1.0 (0–3) |
+| `primordialDeathGuard` | true |
+| `starCalamities` | true (false = stars never gated) |
+| `heavenlyWrath` | true |
+| `heavenlyWrathDays` | 5 (3–15) |
+| `innerWorld` | true |
+| `innerWorldCalamityDays` | 5 (0 off, 3–15) |
+| `immortalAuction` | true |
+| `auctionPursuitChance` | 0.35 (0–1) |
+
+| Budget | Limit |
+|---|---|
+| Added server time | ≤ 0.2 ms per tick average with 1 player outside fights |
+| Alam Abadi | no force-loading; arrival search ≤ 8 heightmap samples per tick, once per world, no chunk loads; border and ground-record check per player every 10 ticks; void check every tick only below y 16 |
+| Natives | ≤ 6 per player, ≤ 12 world; spawn pass every 400 ticks; skill pass every 10 ticks over a tracked UUID set (the elite pattern) |
+| Primordial | ≤ 1 alive; ≤ 3 relics; one entity query per skill; client ≤ 800 points, halved beyond 48 blocks |
+| Envoys | ≤ 8 alive |
+| Inner world | zero ticking; lazy catch-up ≤ 10 days; ≤ 2 KB NBT |
+| Batin live calamity | ≤ 16 meteors, ≤ 6 foes |
+| Auction | memory only; one 4 s bid tick only while a session has open lots and ≥ 1 viewer |
+| `DuniaSync` channels 4–6 | ≤ 8 KB each; only on screen open or a data change |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.13 Data keys
+
+| Where | Key | Owner |
+|---|---|---|
+| player `extra.abadi` | `ascended`, `asc_cd`, `ret {dim,x,y,z,yRot,xRot}`, `last {x,y,z}`, `ground {x,y,z}`, `conv`, `conv_day`, `conv_n`, `mined_day`, `mined`, `cross_cd`, `auction {consign[2], won, owed, ban_session, pursuit_due}` | P9-langit |
+| player `extra.purba` | `kills {kunpeng, zhulong, taotie}`, `cd`, `rep_day`, `rep_n`, `unique [ids]`, `calamity {passed bits, skipped bits}`, `t`, `wrath_next`, `wrath_skips`, `luka_until`, `title` | P9-purba |
+| player `extra.batin` | `grade`, `plots [{kind, age, state, until}]`, `foxes`, `rock {awake, buffer, day}`, `pearls`, `withdrawn_day`, `brew_day`, `last_day`, `cal {n, due, fortify}`, `spirit`, `log[10]`, `ciptaan [{a, b, form, name, q}]` | P9-batin |
+| player `extra.goals` | `guide3` | P9-batin (glue) |
+| SavedData `kultivator:alam_abadi` (Overworld) | `arrival`, `auction {session, seed}` | P9-langit |
+| memory only | live ascensions, primordial fights, wrath descents, calamity runs, batin defences, auction sessions and bids | owners above |
+| entities | `kultivator:primordial_beast`, `kultivator:primordial_relic`, `kultivator:heaven_envoy` (P9-purba); `kultivator:batin_meteor` (P9-batin); all never saved; tags `kultivator.abadi_foe`, `kultivator.purba`, `kultivator.boss` | as listed |
+| item tags | `#kultivator:primordial_material` (P9-purba), `#kultivator:auction_sellable` (P9-langit), `#kultivator:rockmen_ore` (P9-batin) | as listed |
+| data | `dimension/alam_abadi.json`, `dimension_type/alam_abadi.json`, `worldgen/biome/alam_abadi.json` | P9-langit |
+| items | `immortal_origin_stone`, `realm_crossing_talisman` (P9-langit); `shan_hai_scroll`, `kun_scale`, `peng_feather`, `zhulong_scale`, `taotie_fang`, `zhulong_candle_eye`, `heaven_seal_shard` (P9-purba); `immortal_essence_pearl`, `land_expansion_token` (P9-batin); data component `kultivator:purba_kind` (P9-purba) | as listed |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.14 Spine (orchestrator, before the modules; compiles alone with stubs)
+
+1. **`network/Actions`:** `ABADI = 42`, `PURBA = 43`, `BATIN = 44`, each `text = "op[:param]"`; `Net.handle` routes to `abadi.Abadi.handleAction`, `purba.Purba.handleAction`, `batin.Batin.handleAction`.
+2. **`network/Payloads`:** `OpenScreen.ABADI = 8` (tab arg 0–5); `DuniaSync.CH_ABADI = 4`, `CH_PURBA = 5`, `CH_BATIN = 6`; `client/dunia/DuniaClient.VERSIONS` length 7, routing the channels to `client.abadi.AbadiClient.onSync`, `client.purba.PurbaClient.onSync`, `client.batin.BatinClient.onSync`.
+3. **`fx/FxType`:** append `ABADI, PURBA, BATIN`; `FxDispatcher` calls `client/<pkg>/<X>Fx.play` / `.tick`. Sub-ids in `abadi/AbadiFxIds`, `purba/PurbaFxIds`, `batin/BatinFxIds`.
+4. **`epic/EpicIds`:** EXTRA `ASCEND_OMEN 13`, `ASCEND_PASS 14`, `PRIMORDIAL_OMEN 15`, `PRIMORDIAL_PHASE 16`, `WRATH_OMEN 17`, `PLAYER_TRAMPLING 18`, `INNER_CALAMITY 19`, `OWN_ART_BORN 20`, `AUCTION_WIN 21` (the max-sub-id switch updated to 21); BOSS kinds `BOSS_PRIMORDIAL 8`, `BOSS_HEAVEN_GENERAL 9` (with `uji momen bos` names `binatang_purba`, `panglima_langit`); all through the generic EXTRA and BOSS client paths; all obey 23.1.
+5. **`technique/spec/TechniquePower`:** `TAG_ABADI_FOE = "kultivator.abadi_foe"` accepted by `isTrialMob`; in the trial-mob branch ×`sqrt(starFactor(attacker stars))` when the target has the tag; `addPlayerStarFactor(ToDoubleFunction<CultivationData>)`, a product clamped 1.0–1.331 multiplied into `starFactor` for players only; `Stats` reads the same product for star health.
+6. **`util/DeathGuard`:** `Stage = {DUEL, REALM, LANGIT, TRIBULATION, TOTEM, TECHNIQUE, PERK}`; never acts on `BYPASSES_INVULNERABILITY`. Both P9-langit and P9-purba register their own guards at `LANGIT`.
+7. **`ascension/Stars`:** `interface StarGate { @Nullable Component blocks(ServerPlayer p, int nextStar); }` + `addGate(StarGate)`; `ImmortalPerks.condense` asks every gate before each star and stops with the first message.
+8. **`ascension/Stars`:** `static double barSize(ServerPlayer)` = `max(rank.xpRequired(), ImmortalPerks.nextStarCost(data))`; `static void grantShare(ServerPlayer, double fraction)` adds XP with `XpSource.TRIAL`.
+9. **`cultivation/Tribulation`:** `public static boolean strike(ServerPlayer, double shareOfMaxHealth)`: tribulation damage type, existing modifiers (Tribulation Warding, Hu Fa), rule-3 clamp; returns true when the strike would have killed (the caller fails the ritual). The private per-instance `strike` stays as it is.
+10. **`disciple/Disciples.onChangeLevel`:** also returns early when origin or destination `Abadi.isImmortalLevel(level)`.
+11. **`formasi/effect/FormationTargets`:** `TAG_ABADI_FOE` gets the elite ×0.6 `damageFactor`.
+12. **Names:** `technique/spec/run/Codex.addNameProvider(BiFunction<ServerPlayer, String, @Nullable String>)`; client `client/codex/CodexNames` with `register(Function<String, @Nullable String>)` and `lookup(String)`, used by the Kitab list and the cast action bar.
+13. **Refusal hooks (one line each, calling stubs):** `BuildPlacer` and Sect Hall placement refuse `Abadi.isImmortalLevel`; the Phase 8 realm gate refuses during `Purba.inFight`, `Purba.inCalamity`, `Purba.inWrath`, `Batin.inDefence`, `Abadi.inAscension`; breakthroughs and Cave Abode entry refuse during `Purba.inCalamity` and `Abadi.inAscension`.
+14. **`KultivatorConfig`:** the fields of 26.12, clamped on load.
+15. **`data/TechniqueRegistry`:** `module("CiptaanArts", 1100, 1199, CiptaanArts::register)` in fixed order before `freeze()`; stub `batin/CiptaanArts` registers the three specs and `special("own_art", OwnArt.STUB)`.
+16. **`technique/arts/ShadowArts`:** `kunpeng_art` gains `.route(Route.item("kunpeng_whole"))`.
+17. **`client/fx/spec/PointClouds`:** `beast(FxLayer.BeastKind)` public; `public static float[] sample(float[][] polylines)`.
+18. **Entry points:** `Kultivator.onInitialize` calls `abadi.Abadi.init()`, `purba.Purba.init()`, `batin.Batin.init()` before `ModItems.init()`; `CultivateCommand` calls each module's `addCommands` plus the spine `/kultivasi abadi [tab]` opener; `TestCommands` calls each `addTestCommands(uji)` and `uji kit` adds the "Fase 9" shulker from each `kitItems()`; `KultivatorClient` calls the three client `init()`s and `registerRenderers()`; `Keys` gains `key.kultivator.abadi` (unbound); `goals` `uji jalan bab` accepts 1–15 (the glue fills chapters 11–15).
+19. **Screen shell:** `client/keabadian/KeabadianScreen` (6 tablets, height 36, built like `DuniaScreen`) with page stubs `client/abadi/AlamAbadiPage`, `client/abadi/LelangPage`, `client/purba/PurbaPage`, `client/purba/BencanaPage`, `client/batin/BatinPage`, `client/batin/CiptaanPage`, all extending `DuniaPage`.
+20. **Stubs** with the final signatures of 26.15.2; `lang-src/spine9.*`: config comments, tab names, key name, `kultivator.spine9.no_sleep`, BOSS/EXTRA beat names.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.15 Modules, file ownership and contracts (exactly 3; no module edits another module's files)
+
+#### 26.15.1 Ownership
+
+| Module | Scope | Owns (new files) | Exclusive edits of existing files |
+|---|---|---|---|
+| **P9-langit** | A + F: Alam Abadi, Batu Asal Abadi, natives, crossing, auction and pursuit | `abadi/*`: `Abadi` (init, actions, commands, refusals, `isImmortalLevel`, `inAscension`), `Ascend` (gate, offering, ritual, DeathGuard `LANGIT` guard for the ritual), `Crossing` (talisman, companions, disciple sweep, return, join check), `ImmortalBorder` (soft border, void catch, ground record, protected arrival zone), `ArrivalIsland` (heightmap search, SavedData `AlamAbadiData`), `OriginStones` (mining drop, conversion, star cost modifier and listener, meditation multiplier), `Natives` (spawner, health modifier, Tekanan Abadi, sun helmet, drops, disciple weakness), `Auction` (sessions, lots, rivals, bids, consign), `Pursuit`, `AbadiItems`, `AbadiFxIds`, `AbadiTests`. `client/abadi/*`: `AbadiClient`, `AlamAbadiPage`, `LelangPage`, `AbadiFx`, `VortexRenderer`. Data: `dimension/alam_abadi.json`, `dimension_type/alam_abadi.json`, `worldgen/biome/alam_abadi.json`, `tags/item/auction_sellable.json`, talisman recipe, item models/textures, advancements of A and F, `lang-src/abadi.*` | none |
+| **P9-purba** | B + C: primordial beasts, star calamities, heavenly wrath | `purba/*`: `Purba` (init, actions, commands, `inFight`, `inCalamity`, `inWrath`), `PrimordialBeastEntity`, `PrimordialKinds` (Kun-Peng, Zhulong, Taotie phase scripts), `PrimordialEvents` (appearance, omen, arena, rewards, daily cap), `PrimordialRelicEntity`, `HeavenEnvoyEntity`, `EnvoyAi`, `StarCalamity` (gate, run, T provider, Segel Penangkal), `HeavenlyWrath` (schedule, waves, duel), `PurbaItems` (scroll + `purba_kind` component + recipe class, materials, candle eye, seal shard), `PurbaGuard` (DeathGuard `LANGIT` for calamity, wrath, primordial), `PurbaFxIds`, `PurbaTests`. `client/purba/*`: `PurbaClient`, `PrimordialRenderer`, `RelicRenderer`, `EnvoyRenderer`, `PurbaPage`, `BencanaPage`, `PurbaFx`, `TaotieMask`. Data: `tags/item/primordial_material.json`, scroll recipe, entity and item assets, advancements of B and C, `lang-src/purba.*` | none |
+| **P9-batin** | D + E + glue: inner world, self-created techniques, Jalan Abadi | `batin/*`: `Batin` (init, actions, commands, `inDefence`), `InnerWorld` (grade, plots, foxes, rockmen, pearls, lazy catch-up), `LandSpirit`, `InnerCalamity` (schedule, live defence, data resolution), `BatinMeteorEntity`, `CiptaanArts` (3 specs, netIds 1100–1102; spine stub filled), `OwnArt` (`SpecialTechnique` `own_art`), `Creation` (ritual, quality, naming, slots, name providers), `BatinItems` (pearl, expansion token), `BatinFxIds`, `BatinTests`. `client/batin/*`: `BatinClient`, `BatinPage`, `CiptaanPage`, `BatinFx`, `CiptaanFx`, `MeteorRenderer`. Data: `tags/item/rockmen_ore.json`, advancements of D, E and glue, `lang-src/batin.*`, `lang-src/arts_ciptaan.*`, `lang-src/jalan9.*` | `goals/Guide`, `goals/Goals`, `goals/DailyChores`, `client/screen/JalanPage`, `client/goals/GuideTracker`, `client/screen/HelpPage` (topic list only; each module writes its own help text keys in its own lang fragment) |
+
+#### 26.15.2 Public contracts (spine stubs, filled by the owner)
+
+```java
+// spine
+TechniquePower.TAG_ABADI_FOE ; TechniquePower.addPlayerStarFactor(ToDoubleFunction<CultivationData>)
+DeathGuard.Stage.LANGIT
+Stars.addGate(StarGate) ; double Stars.barSize(ServerPlayer) ; void Stars.grantShare(ServerPlayer, double)
+boolean Tribulation.strike(ServerPlayer, double share)            // true = would have killed
+float[] PointClouds.beast(FxLayer.BeastKind) ; float[] PointClouds.sample(float[][])
+Codex.addNameProvider(BiFunction<ServerPlayer, String, @Nullable String>) ; CodexNames.register(Function<String, @Nullable String>)
+// P9-langit
+boolean Abadi.isImmortalLevel(@Nullable Level) ; boolean Abadi.ascended(ServerPlayer) ; double Abadi.conversion(ServerPlayer)
+boolean Abadi.inAscension(ServerPlayer) ; boolean Abadi.startAscension(ServerPlayer, boolean free)
+void Abadi.addAscendListener(Consumer<ServerPlayer>)              // D creates the inner world
+boolean Abadi.inAuction(ServerPlayer)
+// P9-purba
+boolean Purba.inFight(ServerPlayer) ; boolean Purba.inCalamity(ServerPlayer) ; boolean Purba.inWrath(ServerPlayer)
+int Purba.spawnEnvoyWave(ServerPlayer target, int count, int k, Consumer<Boolean> onCleared) // A's ascension waves
+int Purba.kills(ServerPlayer, String kind) ; int Purba.distinctKinds(ServerPlayer)
+double Purba.trialFactor(ServerPlayer)                             // T, 1.0–1.331
+// P9-batin
+boolean Batin.has(ServerPlayer) ; boolean Batin.inDefence(ServerPlayer) ; int Batin.pearls(ServerPlayer)
+boolean Batin.addPlot(ServerPlayer)                                // land_expansion_token use (P9-batin's own item)
+@Nullable String Batin.ownArtName(ServerPlayer, String specId)
+```
+
+**Cross-module wiring:** A calls `Purba.spawnEnvoyWave` in the ascension; D registers `Abadi.addAscendListener`; E reads `Purba.distinctKinds`; B, C, D, F refer to each other's items **by registry id** and `#kultivator:primordial_material`, never by class; batin and langit use P8's `RogueCultivators.spawn` / `spawnBand`; the busy checks (`inFight`, `inCalamity`, `inWrath`, `inDefence`, `inAscension`) are read through the contracts above; the glue reads advancements only.
+
+**Order of work:** (1) spine; (2) the 3 modules in parallel, no Gradle; (3) one compile: `compileJava`, `compileClientJava`, `jar --no-daemon` (never tests, `runClient` or `build`); (4) fix pass; (5) docs: `docs/uji/FASE-9.md`, PANDUAN.
+
+**May slip without breaking contracts:** langit: consignment, pursuit; purba: Taotie mouth-heal (becomes a plain Celah cycle), Zhulong Lilin relic, Segel Penangkal; batin: rockmen, Sempurnakan.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.16 Advancements (`docs/ADVANCEMENT_TEMPLATE.json`; parent in brackets)
+
+| Id | Nama (id_id) | When | Owner |
+|---|---|---|---|
+| `immortal_realm` | Naik ke Alam Abadi | ascension passed (`nine_stars`) | langit |
+| `origin_stone` | Batu Asal Abadi | first stone (`immortal_realm`) | langit |
+| `essence_half` / `essence_converted` | Esensi Setengah / Esensi Abadi | conv 50 / 100 | langit |
+| `realm_crossing` | Lintas Alam | first talisman crossing home | langit |
+| `auction_win` / `pursuit_survived` | Menang Lelang / Lolos Pengejaran | first won lot / pursuit band cleared | langit |
+| `primordial_slain` | Binatang Purba Tumbang | any primordial (`immortal_realm`) | purba |
+| `kunpeng_slain` / `zhulong_slain` / `taotie_slain` | Kun Menjadi Peng / Mata Lilin Terpejam / Kepala Tanpa Tubuh | each kind | purba |
+| `three_primordials` | Gunung dan Laut | all three kinds | purba |
+| `kunpeng_whole` | Warisan Kunpeng Utuh | `kunpeng_art` via the six pieces | purba |
+| `star_calamity_1` / `first_trial` / `heaven_trampler_player` | Bencana Pertama / Ujian Pertama / Penginjak Langit | k = 1 / k = 2 / k = 7 | purba |
+| `wrath_repelled` / `heaven_general` | Murka Ditolak / Panglima Langit Tumbang | waves cleared / Panglima slain | purba |
+| `batin_born` / `batin_nine` / `batin_millennium` / `batin_calamity` / `rockmen` | Dunia Batin Lahir / Sembilan Petak / Herba Seribu Tahun Batin / Bencana Bumi Dilalui / Manusia Batu | born / 9 plots / harvest ≥ 1,000 / live or data survive / rockmen awake | batin |
+| `own_art` / `own_art_perfect` | Jurus Ciptaanku / Kesempurnaan Penuh | first creation / Q = 100% | batin |
+| `immortal_path_complete` | Jalan Abadi Tuntas | Jalan chapters 11–15 (`world_path_complete`) | batin |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.17 Daftar uji untuk `docs/uji/FASE-9.md`
+
+**A. Alam Abadi**
+1. `uji abadi naik` saat Dewa Abadi Puncak ★9: langit lima warna, 9 sambaran, dua gelombang utusan, pusaran 15 detik. Keluar dari lingkaran 8 blok berarti gagal. Sambaran yang akan membunuh menjadi gagal, bukan mati, dan Totem tidak terpakai.
+2. Berhasil: tiba di pulau kedatangan di `kultivator:alam_abadi`. Ada pulau melayang, pohon sakura, bijih vanilla dan partikel qi. Tidak ada hujan, struktur, spawner, silverfish, lava, atau monster alami. Layar "Experimental settings" tidak muncul.
+3. Prajurit Tulang Abadi tidak terbakar di siang hari dan helmnya tidak jatuh. Babi Taring Emas tidak berubah menjadi zoglin.
+4. Jimat Lintas Alam: channel 5 detik, pulang ke titik asal, lalu kembali ke posisi terakhir. Pemain yang belum naik ditolak. Murid Inti+ (maks. 3) ikut; murid yang tertinggal tersapu pulang saat pemain keluar lewat portal Nether atau mati.
+5. Lewat batas 2048 blok: didorong balik. Jatuh di bawah y −8: kembali ke tanah terakhir dengan −10% HP, tidak mati.
+6. Menambang batu dengan tangan di Alam Abadi: kadang mendapat Batu Asal Abadi, paling banyak 16 per hari. Mode Kehancuran tidak memberi Batu dan tidak memahat pulau kedatangan (radius 48). `grep setBlock` di paket `abadi`, `purba` dan `batin` kosong.
+7. `uji abadi konversi 0` lalu `100`: kerusakan ke penduduk asli naik dari ×0,6 ke ×1,0. Meditasi di Alam Abadi memberi XP ×3. Memadatkan bintang dengan 10 Batu di tas: biaya −10% dan Batu terpakai.
+8. Penduduk asli muncul ≤ 4 di sekitar pemain dan ≤ 12 di dunia, tidak di atas void, dan HP-nya naik dengan bintang. Murid di bawah Kenaikan Abadi terkena Weakness I.
+
+**B. Binatang Purba**
+9. `uji purba kunpeng`: Kun muncul ke permukaan dengan gelombang bertelegraf, Peng menukik, angin puyuh menarik pemain tanpa merusak blok, memecah Mata Angin membuka celah. Ultimate tidak pernah membunuh dalam satu serangan (`debug purba info` menunjukkan batas per detik dan garis fase).
+10. `uji purba zhulong`: Mata Tertutup memberi Darkness dan waktu dunia tidak berubah. Napas dingin membekukan, napas panas hanya membakar entitas.
+11. `uji purba taotie`: Pelahap yang mencapai kepala menyembuhkannya. Serangan teknik saat mulut terbuka menyembuhkan setengahnya.
+12. `uji purba enam` lalu membunuh Kun-Peng: `kunpeng_art` dipelajari dan pecahan habis. Jika sudah tahu `kunpeng_art`, pecahan tidak terpakai.
+13. `primordialDeathGuard=true`: pukulan mematikan menyisakan 1 HP dengan Luka Purba, tanpa kehilangan barang. Setelah 3 hadiah ulang dalam sehari, hanya material 50% yang diberikan.
+
+**C. Bencana dan Murka**
+14. Pada ★5 dengan kualitas Normal, memadatkan ★6 berhenti dengan "Bencana ke-1 menanti". `uji bencana 1 lulus` lalu ★6 terpadatkan. Gagal: Luka Bencana dan 50% biaya kembali. Segel Penangkal (3 serpihan) membuat sambaran ×0,85.
+15. Dunia lama dengan ★20: bencana 1–2 "Terlewati", bintang tidak berkurang, dan bisa diambil untuk faktor T.
+16. `uji murka`: tiga gelombang utusan lalu Panglima. Murid dan formasi tidak bisa melukai Panglima. Kalah: 1 HP dan Luka Langit 10 menit.
+17. Murka tidak terjadi saat AFK, Peaceful, serbuan, alam rahasia atau kesengsaraan. Setelah 2 kali terlewat tidak ada hukuman.
+
+**D. Dunia Batin**
+18. `uji batin lahir besar`: 9 petak. Tanam herba lalu `uji batin hari 4`: umurnya +100 tahun (+ Kesuburan rubah). Panen pada umur ≥ 1.000 memberi herba kedua umur 100.
+19. Manusia Batu: setor 64 bijih sekali, lalu bijih berubah menjadi batu roh tiap hari. Ancient debris ditolak. Bijih yang disetor tidak bisa diambil lagi.
+20. `uji batin bencana meteor`: meteor jatuh dengan telegraf dan bisa dihancurkan di udara; yang mendarat membakar petak, bukan blok.
+21. `uji batin bencana petir`: Bayangan Petir menerima ×2 di dalam lingkaran Gunung Dang Hun. `uji batin bencana data`: peluang sesuai Perkokoh, dan kalah hanya memberi separuh kerugian.
+
+**E. Jurus Ciptaan**
+22. `uji ciptaan 1 api es ledakan 1.0`: "Jurus Ciptaan I" dengan nama sendiri di Kitab dan bar aksi. Kerusakan lewat batas bos dan aturan trial-mob. `uji teknik audit` tetap lulus (FX, SHAKE, sumber).
+23. Nama dengan kode warna (`§`) atau lebih dari 24 karakter ditolak. Menghapus ciptaan mengosongkan slot loadout dan penguasaannya. Ritual yang terputus mengembalikan semua biaya.
+
+**F. Lelang**
+24. `uji lelang sesi`: 5 barang, saingan menawar tiap 4 detik, terjual setelah 8 detik tanpa tawaran. Batu diambil hanya saat menang. Klik dengan harga basi ditolak. Menang tanpa Batu cukup: barang pindah ke saingan dan pemain tidak bisa menawar sampai sesi berakhir.
+25. Barang titipan terjual ≤ 50% harga dasar lot (tidak ada lingkaran beli-jual). `uji lelang kejar`: saingan tingkat 4 menghadang dengan peringatan 3 detik.
+
+**G. Keamanan dan performa**
+26. Tidak ada LightningBolt, perubahan cuaca, waktu atau tick-rate, dan tidak ada blok yang berubah dari fitur fase 9.
+27. Pertarungan purba + 6 penduduk asli: server tetap mendekati 20 TPS di laptop. Tidak ada chunk yang dipaksa termuat; pencarian pulau kedatangan tidak membuat lag.
+28. Setiap item, makhluk, fase, bencana, bentuk dan aturan lelang punya baris Sumber dalam `id_id` dan `en_us` dengan kunci yang sama. Kode server tidak merujuk kelas client.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 26.18 Sources (verification log) and dropped / reworded
+
+**Verified this pass:**
+
+| Claim | Work and place | Status |
+|---|---|---|
+| Ascension by transcending a tribulation; black hole in a five-coloured cloud | RMJ ch. 2451 "Ascension" | verified (wuxiaworld teaser) |
+| Immortal Origin Stones power a carriage array | RMJIR ch. 567 "Pursuit" | verified (teaser) |
+| Auction bidding war in Immortal Origin Stones, 3,800 → 5,000 | RMJIR ch. 615 "Another Beast Bone" | verified (teaser); who bids is not stated, so the text no longer says "Han Li bids" |
+| Kun becomes Peng; wings like clouds; 90,000 li on a whirlwind; 3,000 li (quoting the *Qixie*) | *Zhuangzi* ch. 1 | verified (Wikipedia, *Peng (mythology)*) |
+| Bone split into six pieces, about a third of the legacy | *Perfect World* ch. 261 "Devil Refinement Cave's True Precious Technique" (and ch. 347 [D]) | verified (teaser); title corrected |
+| Zhuyin: eyes day/night, blowing winter, calling summer, a thousand li; Zhulong: eyes, face, serpent | *Shan Hai Jing* sections 8 and 17 | verified (Wikipedia); seasons only in section 8 |
+| Taotie: gluttonous evil creature; head without body; harms without swallowing | *Zuo Zhuan*; *Lüshi Chunqiu* 16/3a | verified (Wikipedia) |
+| Ancient God Three Trials, Seven Calamities, Heaven Trampling | *Renegade Immortal* ch. ~1157–1159 | [D] DESIGN 20.3.19 / 23.20 |
+| The Heavens try to slay Meng Hao; lightning gathers more fiercely; more lightning joins | *ISSTH* Book 4 ch. 385 "Bring It On!", ch. 386 "Five Colored Sky, Cultivation Base Breakthrough!" | verified (teasers) |
+| Land spirit; calamity every 10 years; meteor fire rain, flood, lightning shadow avoiding Dang Hun Mountain; ×5 time; essence pearls; rockmen; ~4.7 M foxes; 1,300 of 4,000 km² lost | *Reverend Insanity* ch. 409 "Managing the Blessed Land" | verified (full chapter) |
+| Rank 6–7 apertures are blessed lands | RevI fan wiki | unofficial → *Terinspirasi* |
+| "My own Ninth Hex" | *ISSTH* ch. 1379 "Incredible Power" | verified (teaser) |
+| Merging Heavenly Flames into the Angry Buddha Lotus Flame; Medusa did not know the flame existed | *BTTH* ch. 262 (title), ch. 363 "Killing Yun Leng" | verified (teasers); "lotus" corrected to "flame" |
+
+Links: https://www.wuxiaworld.com/novel/rmji/rmji-chapter-2451 · https://www.wuxiaworld.com/novel/rmjiir/rmjiir-chapter-567 · https://www.wuxiaworld.com/novel/rmjiir/rmjiir-chapter-615 · https://en.wikipedia.org/wiki/Peng_(mythology) · https://www.wuxiaworld.com/novel/perfect-world/pw-chapter-261 · https://en.wikipedia.org/wiki/Zhulong_(mythology) · https://en.wikipedia.org/wiki/Taotie · https://www.wuxiaworld.com/novel/i-shall-seal-the-heavens/issth-book-4-chapter-385 · https://www.wuxiaworld.com/novel/i-shall-seal-the-heavens/issth-book-4-chapter-386 · https://roliascan.com/read/reverend-insanity/ch409-97799/ · https://reverend-insanity.fandom.com/wiki/Gu_Immortal · https://www.wuxiaworld.com/novel/i-shall-seal-the-heavens/issth-book-8-chapter-1379 · https://www.wuxiaworld.com/novel/battle-through-the-heavens/btth-chapter-262 · https://www.wuxiaworld.com/novel/battle-through-the-heavens/btth-chapter-363
+
+**Unverifiable, therefore not used:** Shrouding the Heavens Forbidden Zones; a Coiling Dragon divine-kingdom chapter; RI "Allheaven" as a hunting will (it is a star system); a Qilin or true-dragon boss source; a source for the player leaving an inheritance (Kronik Leluhur).
+
+**Dropped and reworded:**
+
+| Item | Was | Now | Reason |
+|---|---|---|---|
+| Inner world housing spirit beasts | orchestrator example | fox and rockmen populations (RevI ch. 409) | duplication risk; would edit `beast/*`; the source has foxes and rockmen |
+| Kronik Leluhur | orchestrator example | dropped; title "Leluhur Abadi" in Jalan ch. 15 | no verified source; overlaps Heir and InheritanceTrials |
+| Utusan Langit from RI | orchestrator example | ISSTH ch. 385–386 + RI calamities; envoys are game design | RI "Allheaven" is a star system |
+| Qilin, true dragon | orchestrator example | Zhulong, Taotie | classical sources verified |
+| Self-created technique as a runtime spec | orchestrator example | 3 pre-registered specs + one special handler + stored composition | registry frozen at init on both sides |
+| Amplified preset; return portal block | orchestrator example | `minecraft:floating_islands`; reusable talisman | user's floating-island look; no blocks |
+| Spring water/lava, infested ore, monster rooms, geodes in the biome | vanilla cherry grove | removed; vanilla ores kept | fluid ticks, fire, silverfish, spawners; ores give mining and rockmen food |
+| Arrival search loading one chunk per tick | draft | `ChunkGenerator.getBaseHeight` sampling, no chunk loads | CRITIC: generating up to 25 floating-island chunks causes hitches on the laptop |
+| Strays and hoglins as plain natives | draft | unbreakable helmet; `piglins_zombify: false` + immune flag | CRITIC: the `minecraft:day` timeline burns undead; hoglins zombify outside the Nether |
+| BOSS "subjects" `binatang_purba`, `panglima_langit` | draft | BOSS kinds `BOSS_PRIMORDIAL = 8`, `BOSS_HEAVEN_GENERAL = 9` | `EpicIds` BOSS uses int kinds |
+| Ciptaan coefficients 20–25 | draft | 14–18 (Murni +15%) | CRITIC: the strongest catalogue coefficient is 18; the capstone is personal, not power creep |
+| Unlimited scroll-summoned repeats | draft | ≤ 3 repeat rewards per day ("Kelelahan Purba") | CRITIC: scroll (8 Batu) → repeat (15 Batu + material) was a self-sustaining farm |
+| Win without enough Batu | draft ("refused") | lot passes to the best rival + session bid ban | CRITIC: bid-and-stash griefing of rivals and other players |
+| `heaven_seal_shard` with no use | draft | Segel Penangkal (3 shards → strikes ×0.85 in one calamity run) | every material needs a sink |
+| Disciples stranded in Alam Abadi | draft (only talisman companions) | disciple sweep on any exit and at server start | CRITIC: `onChangeLevel` skips the dimension |
+| Six Kunpeng pieces always consumed | draft | not consumed when `kunpeng_art` is already known | the pieces also teach the disciples' Kunpeng Wings (20.3.10) |
+| "The living Kunpeng gives the rest" as canon | draft | game design, *terinspirasi dari* PW ch. 261 | the chapter places the true technique in the Devil Refinement Cave |
+| Boss cap 1.0 at TI on primordials | 22.14.2 | per-second intake clamp + phase lines | otherwise one cast kills |
+| Legacy power ignoring stars on Phase 9 foes | 22.14.4 | × sqrt(S(stars)) for `abadi_foe` only | stars matter again without touching Phase 7–8 balance |

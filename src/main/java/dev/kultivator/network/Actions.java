@@ -88,6 +88,15 @@ public final class Actions {
 	/** Vassal villages ({@code desa.Desa.handleAction}). */
 	public static final int DESA = 41;
 
+	// Phase 9 "Petualangan Dewa Abadi" (DESIGN 26.14 item 1): text = "op[:param]"; every module answers "sync" with its
+	// DuniaSync channel (the Keabadian screen asks for it when it opens).
+	/** Alam Abadi, the ascension, Batu Asal Abadi, the crossing talisman and the Immortal auction ({@code abadi.Abadi.handleAction}). */
+	public static final int ABADI = 42;
+	/** Primordial beasts, the player's Seven Star Calamities and the Heavenly Wrath ({@code purba.Purba.handleAction}). */
+	public static final int PURBA = 43;
+	/** The inner world, self-created techniques and Jalan Abadi ({@code batin.Batin.handleAction}). */
+	public static final int BATIN = 44;
+
 	private Actions() {
 	}
 }

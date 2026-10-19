@@ -277,7 +277,13 @@ public final class ImmortalPerks {
 		int stars = before;
 		double stored = data.storedQi();
 		double spent = 0.0D;
+		Component gated = null;
 		while (stars - before < (all ? MAX_STARS_AT_ONCE : 1)) {
+			// Phase 9 (DESIGN 26.14 item 7): a star gate (the Seven Calamities) stops before the gated star.
+			gated = dev.kultivator.ascension.Stars.gateBlock(player, stars + 1);
+			if (gated != null) {
+				break;
+			}
 			// Phase 8 (DESIGN 25.8.4): the cost modifiers (Esensi discount) are asked per star; their listener consumes.
 			double cost = Stars.cost(stars + 1) * dev.kultivator.ascension.Stars.costFactor(player);
 			if (stored + 1.0E-6D < cost) {
@@ -287,6 +293,10 @@ public final class ImmortalPerks {
 			spent += cost;
 			stars++;
 			dev.kultivator.ascension.Stars.condensed(player, stars);
+		}
+		if (stars == before && gated != null) {
+			Msg.chat(player, gated);
+			return 0;
 		}
 		if (stars == before) {
 			Msg.chat(player, Component.translatable("kultivator.kultivasi.star.cost", Msg.number(data.storedQi()),
@@ -306,6 +316,9 @@ public final class ImmortalPerks {
 		Msg.chat(player, Component.translatable("kultivator.kultivasi.star.done", gained, stars, Msg.number(spent),
 				Msg.number(Stars.cost(stars + 1))).withColor(GOLD));
 		announceGates(player, before, stars);
+		if (gated != null) {
+			Msg.chat(player, gated);
+		}
 		return gained;
 	}
 

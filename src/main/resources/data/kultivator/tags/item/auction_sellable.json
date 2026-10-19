@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    { "id": "kultivator:kunpeng_bone_fragment", "required": false },
+    { "id": "kultivator:heavenly_flame_seed", "required": false },
+    { "id": "kultivator:tomb_essence", "required": false },
+    { "id": "kultivator:tomb_sigil", "required": false },
+    { "id": "kultivator:ancient_god_blood", "required": false },
+    { "id": "kultivator:inheritance_crystal", "required": false },
+    { "id": "kultivator:tribulation_warding_pill", "required": false },
+    { "id": "kultivator:soul_nurturing_wood", "required": false },
+    { "id": "kultivator:kun_scale", "required": false },
+    { "id": "kultivator:peng_feather", "required": false },
+    { "id": "kultivator:zhulong_scale", "required": false },
+    { "id": "kultivator:taotie_fang", "required": false },
+    { "id": "kultivator:land_expansion_token", "required": false }
+  ]
+}

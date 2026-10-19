@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:immortal_star",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.star_calamity_1.description"
+    },
+    "icon": {
+      "id": "kultivator:heaven_seal_shard"
+    },
+    "title": {
+      "translate": "advancement.kultivator.star_calamity_1.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

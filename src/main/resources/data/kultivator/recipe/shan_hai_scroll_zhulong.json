@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "shan_hai_scroll",
+  "ingredients": [
+    "kultivator:immortal_origin_stone",
+    "kultivator:immortal_origin_stone",
+    "kultivator:immortal_origin_stone",
+    "kultivator:immortal_origin_stone",
+    "kultivator:immortal_origin_stone",
+    "kultivator:immortal_origin_stone",
+    "kultivator:immortal_origin_stone",
+    "minecraft:book",
+    "kultivator:zhulong_scale"
+  ],
+  "result": {
+    "components": {
+      "kultivator:purba_kind": 1
+    },
+    "count": 1,
+    "id": "kultivator:shan_hai_scroll"
+  }
+}

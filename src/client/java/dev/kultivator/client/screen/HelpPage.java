@@ -25,7 +25,9 @@ final class HelpPage extends Page {
 			"harian", "batu_roh", "tanaman_roh", "inti_binatang", "alkimia_lanjut", "relik", "urat_roh", "jimat", "anugerah", "elit", "unsur",
 			"kejenuhan", "hu_fa_tribulasi", "momen", "formasi", "formasi_pola",
 			// Phase 8 (DESIGN 25.0): each module writes its own topic text; jalan_dunia is the glue's.
-			"alam_rahasia", "kultivator_liar", "serbuan", "tempa", "pusaka_diri", "roh_senjata", "cincin", "desa", "jalan_dunia"};
+			"alam_rahasia", "kultivator_liar", "serbuan", "tempa", "pusaka_diri", "roh_senjata", "cincin", "desa", "jalan_dunia",
+			// Phase 9 (DESIGN 26.1): each module writes its own topic text; jalan_abadi is the glue's (P9-batin).
+			"alam_abadi", "batu_asal", "binatang_purba", "bencana_bintang", "murka_langit", "dunia_batin", "jurus_ciptaan", "lelang", "jalan_abadi"};
 	private static final KeyMapping[] KEYS = {Keys.MEDITATE, Keys.CAST, Keys.PREVIOUS, Keys.NEXT, Keys.FLYING_SWORD, Keys.INFO, Keys.CODEX, Keys.WHEEL,
 			Keys.SEAL_1, Keys.SEAL_2, Keys.SEAL_3, Keys.SEAL_4};
 

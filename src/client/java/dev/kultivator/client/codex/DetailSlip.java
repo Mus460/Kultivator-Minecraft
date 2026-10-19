@@ -203,7 +203,7 @@ public final class DetailSlip {
 		Glyphs.spec(g, s, tx + glyph / 2.0F + 2.0F, cursor + glyph / 2.0F + 2.0F, glyph * 0.8F, ink);
 		float nameX = tx + glyph + 8.0F;
 		float nameRoom = room - glyph - 8.0F;
-		float used = Brush.wrap(g, font, Brush.bold(s.displayName()), nameX, cursor + 1.0F, nameRoom, ink, 0.8F, false);
+		float used = Brush.wrap(g, font, Brush.bold(CodexNames.name(s)), nameX, cursor + 1.0F, nameRoom, ink, 0.8F, false);
 		Brush.fit(g, font, Component.literal(SearchIndex.otherName(s)), nameX, cursor + 2.0F + used, nameRoom, Palette.INK_FAINT, 0.6F, 0.45F, false);
 		cursor += Math.max(glyph + 6.0F, used + 10.0F);
 

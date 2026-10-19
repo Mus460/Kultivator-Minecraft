@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:primordial_slain",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.taotie_slain.description"
+    },
+    "icon": {
+      "id": "kultivator:taotie_fang"
+    },
+    "title": {
+      "translate": "advancement.kultivator.taotie_slain.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

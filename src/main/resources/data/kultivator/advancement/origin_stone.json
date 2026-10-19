@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:immortal_realm",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.origin_stone.description"
+    },
+    "icon": {
+      "id": "kultivator:immortal_origin_stone"
+    },
+    "title": {
+      "translate": "advancement.kultivator.origin_stone.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

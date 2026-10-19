@@ -230,6 +230,10 @@ public final class TestCommands {
 		dev.kultivator.musuh.Musuh.addTestCommands(uji);
 		dev.kultivator.tempa.Tempa.addTestCommands(uji);
 		dev.kultivator.desa.Desa.addTestCommands(uji);
+		// Phase 9 (DESIGN 26.14 item 18, 26.11).
+		dev.kultivator.abadi.Abadi.addTestCommands(uji);
+		dev.kultivator.purba.Purba.addTestCommands(uji);
+		dev.kultivator.batin.Batin.addTestCommands(uji);
 		root.then(uji);
 	}
 
@@ -599,6 +603,15 @@ public final class TestCommands {
 		phase8.removeIf(ItemStack::isEmpty);
 		if (!phase8.isEmpty()) {
 			give(player, box("kultivator.spine8.kit", phase8));
+		}
+		// Phase 9 (DESIGN 26.11): Batu, talismans, scrolls, primordial materials, pearls, seal shards and the offering.
+		List<ItemStack> phase9 = new ArrayList<>();
+		phase9.addAll(dev.kultivator.abadi.Abadi.kitItems());
+		phase9.addAll(dev.kultivator.purba.Purba.kitItems());
+		phase9.addAll(dev.kultivator.batin.Batin.kitItems());
+		phase9.removeIf(ItemStack::isEmpty);
+		if (!phase9.isEmpty()) {
+			give(player, box("kultivator.spine9.kit", phase9));
 		}
 		Msg.chat(player, Component.translatable("kultivator.test.kit").withStyle(ChatFormatting.GOLD));
 		return 1;

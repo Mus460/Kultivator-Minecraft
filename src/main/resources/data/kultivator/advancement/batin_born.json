@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:nine_stars",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.batin_born.description"
+    },
+    "icon": {
+      "id": "kultivator:immortal_essence_pearl"
+    },
+    "title": {
+      "translate": "advancement.kultivator.batin_born.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

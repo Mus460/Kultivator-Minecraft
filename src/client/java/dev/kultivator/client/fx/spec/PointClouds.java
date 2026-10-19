@@ -10,8 +10,11 @@ import java.util.Map;
  * the avatar outline): each is a set of polylines in a unit box (x right, y up, about −1..1), sampled once into evenly
  * spaced points and cached, so templates never allocate per frame. A template places the points in a plane of its
  * choice and scales them to blocks.
+ * <p>
+ * Phase 9 (DESIGN 26.14 item 17): {@link #beast} and {@link #sample} are public so the primordial renderer can reuse the
+ * Kun, bird and dragon silhouettes and sample its own polylines (callers cache the result).
  */
-final class PointClouds {
+public final class PointClouds {
 
 	/** Distance between sampled points in unit space. */
 	private static final float STEP = 0.035F;
@@ -23,8 +26,8 @@ final class PointClouds {
 	private static float[] fist;
 	private static float[] palm;
 
-	/** Sampled points of a beast as x0, y0, x1, y1, ... */
-	static float[] beast(FxLayer.BeastKind kind) {
+	/** Sampled points of a beast as x0, y0, x1, y1, ... (cached; never modify the array). */
+	public static float[] beast(FxLayer.BeastKind kind) {
 		return BEASTS.computeIfAbsent(kind, PointClouds::buildBeast);
 	}
 
@@ -232,8 +235,11 @@ final class PointClouds {
 		return all;
 	}
 
-	/** Evenly spaced points along every polyline. */
-	private static float[] sample(float[][] lines) {
+	/**
+	 * Evenly spaced points along every polyline ({@code {x0, y0, x1, y1, ...}} in the unit box), as x0, y0, x1, y1, ...
+	 * Allocates: call once and cache.
+	 */
+	public static float[] sample(float[][] lines) {
 		int count = 0;
 		for (float[] line : lines) {
 			for (int i = 2; i + 1 < line.length; i += 2) {

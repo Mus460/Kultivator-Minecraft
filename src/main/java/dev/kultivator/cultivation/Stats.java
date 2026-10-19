@@ -100,9 +100,9 @@ public final class Stats {
 		return bonus * data.qualityFactor();
 	}
 
-	/** Max health from the player's stars: {@link #HEALTH_PER_STAR} per star. */
+	/** Max health from the player's stars: {@link #HEALTH_PER_STAR} per star, × the player star factors (phase 9 T, DESIGN 26.14 item 5). */
 	public static double starHealthBonus(CultivationData data) {
-		return ImmortalPerks.stars(data) * HEALTH_PER_STAR;
+		return ImmortalPerks.stars(data) * HEALTH_PER_STAR * dev.kultivator.technique.spec.TechniquePower.playerStarProduct(data);
 	}
 
 	/** The attribute boons of Anugerah Kenaikan (L1, L2, L3, L5); L4, L6 to L9 act in their own places. */

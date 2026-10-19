@@ -124,7 +124,15 @@ public enum FxType {
 	/** Forging, the natal treasure, weapon spirits, rings (client/tempa/TempaFx); a = {@code tempa.TempaFxIds}. */
 	TEMPA,
 	/** Vassal villages: oaths, tribute, camps (client/desa/DesaFx); a = {@code desa.DesaFxIds}. */
-	DESA;
+	DESA,
+
+	// ---- phase 9 (DESIGN 26.14 item 3); a = the module's FxIds sub-id
+	/** Alam Abadi: ascension, crossing, border, natives, auction (client/abadi/AbadiFx); a = {@code abadi.AbadiFxIds}. */
+	ABADI,
+	/** Primordial beasts, star calamities, the Heavenly Wrath (client/purba/PurbaFx); a = {@code purba.PurbaFxIds}. */
+	PURBA,
+	/** The inner world, its calamities and the self-created arts (client/batin/BatinFx); a = {@code batin.BatinFxIds}. */
+	BATIN;
 
 	public static FxType byOrdinal(int ordinal) {
 		FxType[] values = values();

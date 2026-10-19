@@ -447,6 +447,36 @@ public final class Tribulation {
 		POST_GUARD.remove(player.getUUID());
 	}
 
+	/**
+	 * One stand-alone heavenly strike for the phase-9 rituals (DESIGN 26.14 item 9: the ascension, the player's star
+	 * calamities): {@code shareOfMaxHealth} × max health × {@link #strikeFactor} (Tribulation Warding, a powered protective
+	 * formation, Hu Fa and the other providers) × {@code tribulationDamageScale}, dealt with the tribulation damage type and
+	 * never lethal (the DESIGN 0 rule-3 clamp: at most health − 1). Creative, spectator and invulnerable players take
+	 * nothing. Returns true when the full strike would have killed: the caller fails its ritual. The visuals are the
+	 * caller's (client {@code BoltRenderer}, never a {@code LightningBolt}).
+	 */
+	public static boolean strike(ServerPlayer player, double shareOfMaxHealth) {
+		if (player == null || !player.isAlive() || player.isCreative() || player.isSpectator() || player.getAbilities().invulnerable
+				|| !(shareOfMaxHealth > 0.0D) || !Double.isFinite(shareOfMaxHealth)) {
+			return false;
+		}
+		ServerLevel level = player.level();
+		CultivationData data = Cultivators.get(player);
+		float maxHealth = player.getMaxHealth();
+		double raw = maxHealth * shareOfMaxHealth * strikeFactor(player, data.rank(), 1, false) * KultivatorConfig.get().tribulationDamageScale;
+		float amount = (float) Math.max(0.0D, raw);
+		float pool = player.getHealth() + player.getAbsorptionAmount();
+		boolean wouldKill = amount >= pool;
+		float dealt = Math.min(amount, pool - 1.0F);
+		if (dealt > 0.0F) {
+			player.hurtServer(level, damageSource(level), dealt);
+		}
+		if (player.isAlive() && player.getHealth() < 1.0F) {
+			player.setHealth(1.0F);
+		}
+		return wouldKill;
+	}
+
 	// ================================================================== internals
 
 	/** One strike. False when the tribulation ended with it. */

@@ -51,7 +51,7 @@ import static dev.kultivator.client.epic.SceneCatalog.upper;
 final class SceneCatalogCombat {
 
 	private static final String[] BOSS_KEYS = {"warden", "wither", "dragon", "elder_guardian", "inheritance", "demon_king", "penjaga_alam",
-			"tetua_iblis"};
+			"tetua_iblis", "binatang_purba", "panglima_langit"};
 	/** The Heavenly Flame ids and colours of {@code PowerIds} (copied, read-only). */
 	private static final String[] FLAME_IDS = {"green_lotus", "bone_chilling", "sea_heart", "fallen_heart", "pure_lotus"};
 	private static final int[] FLAME_RGB = {0x4FE07A, 0xBFEFFF, 0x3D8BFF, 0xFF7A2A, 0xC24BFF};
@@ -80,7 +80,9 @@ final class SceneCatalogCombat {
 			shot(s, delay + 6, () -> Shots.killcam(at, r, 60.0F, 3.0F), CinematicDirector.KIND_BOSS, true);
 		}
 		// Phase 8 subjects (DESIGN 25.2 item 15) keep their names in the spine8 fragment.
-		Component name = kind >= EpicIds.BOSS_REALM_GUARDIAN ? Component.translatable("kultivator.spine8.boss." + BOSS_KEYS[kind])
+		// Phase 9 subjects (DESIGN 26.14 item 4) keep theirs in the spine9 fragment.
+		Component name = kind >= EpicIds.BOSS_PRIMORDIAL ? Component.translatable("kultivator.spine9.boss." + BOSS_KEYS[kind])
+				: kind >= EpicIds.BOSS_REALM_GUARDIAN ? Component.translatable("kultivator.spine8.boss." + BOSS_KEYS[kind])
 				: t("boss." + BOSS_KEYS[kind]);
 		Component title = kind == EpicIds.BOSS_DEMON_KING ? t("boss_demon_king.title") : t("boss.title", upper(name));
 		if (first) {
@@ -268,6 +270,22 @@ final class SceneCatalogCombat {
 			case EpicIds.EXTRA_SPIRIT_AWAKEN -> stamp(s, delay, Component.translatable("kultivator.spine8.momen.spirit_awaken"), "靈", SEAL_RED);
 			case EpicIds.EXTRA_NATAL_BOND -> stamp(s, delay, Component.translatable("kultivator.spine8.momen.natal_bond"), "寶", SEAL_RED);
 			case EpicIds.EXTRA_VILLAGE_OATH -> stamp(s, delay, Component.translatable("kultivator.spine8.momen.village_oath"), "誓", 0x5A8AC8);
+			// Phase 9 (DESIGN 26.14 item 4): stamps and rings only, never a camera shot (23.1).
+			case EpicIds.EXTRA_ASCEND_OMEN -> {
+				s.add(new RingRenderer(delay, 80, at, 1.0F, 8.0F, 1.0F, 18.0F, GOLD, 0.5F));
+				stamp(s, delay, Component.translatable("kultivator.spine9.momen.ascend_omen"), "昇", SEAL_RED);
+			}
+			case EpicIds.EXTRA_ASCEND_PASS -> {
+				s.add(new RingRenderer(delay, 60, at, 1.0F, 6.0F, 1.0F, 14.0F, GOLD, 0.6F));
+				stamp(s, delay, Component.translatable("kultivator.spine9.momen.ascend_pass"), "仙", SEAL_RED);
+			}
+			case EpicIds.EXTRA_PRIMORDIAL_OMEN -> stamp(s, delay, Component.translatable("kultivator.spine9.momen.primordial_omen"), "獸", SEAL_RED);
+			case EpicIds.EXTRA_PRIMORDIAL_PHASE -> stamp(s, delay, Component.translatable("kultivator.spine9.momen.primordial_phase"), "變", SEAL_RED);
+			case EpicIds.EXTRA_WRATH_OMEN -> stamp(s, delay, Component.translatable("kultivator.spine9.momen.wrath_omen"), "天", SEAL_RED);
+			case EpicIds.EXTRA_PLAYER_TRAMPLING -> stamp(s, delay, Component.translatable("kultivator.spine9.momen.player_trampling"), "踏", SEAL_RED);
+			case EpicIds.EXTRA_INNER_CALAMITY -> stamp(s, delay, Component.translatable("kultivator.spine9.momen.inner_calamity"), "災", SEAL_RED);
+			case EpicIds.EXTRA_OWN_ART_BORN -> stamp(s, delay, Component.translatable("kultivator.spine9.momen.own_art_born"), "創", 0xC8A030);
+			case EpicIds.EXTRA_AUCTION_WIN -> stamp(s, delay, Component.translatable("kultivator.spine9.momen.auction_win"), "拍", 0x5A8AC8);
 			default -> {
 			}
 		}

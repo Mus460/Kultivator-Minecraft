@@ -55,6 +55,13 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.musuh.MusuhClient.init();
 		dev.kultivator.client.tempa.TempaClient.init();
 		dev.kultivator.client.desa.DesaClient.init();
+		// Phase 9 Petualangan Dewa Abadi (DESIGN 26.14 item 18).
+		dev.kultivator.client.abadi.AbadiClient.init();
+		dev.kultivator.client.purba.PurbaClient.init();
+		dev.kultivator.client.batin.BatinClient.init();
+		dev.kultivator.client.abadi.AbadiClient.registerRenderers();
+		dev.kultivator.client.purba.PurbaClient.registerRenderers();
+		dev.kultivator.client.batin.BatinClient.registerRenderers();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));
@@ -94,6 +101,8 @@ public class KultivatorClient implements ClientModInitializer {
 				dev.kultivator.client.codex.Codex.open(payload.arg());
 			} else if (payload.screen() == Payloads.OpenScreen.DUNIA) {
 				dev.kultivator.client.dunia.DuniaClient.open(payload.arg());
+			} else if (payload.screen() == Payloads.OpenScreen.ABADI) {
+				dev.kultivator.client.dunia.DuniaClient.openAbadi(payload.arg());
 			}
 		});
 

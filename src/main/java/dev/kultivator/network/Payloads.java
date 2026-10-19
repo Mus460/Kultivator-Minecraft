@@ -124,6 +124,20 @@ public final class Payloads {
 		public static final int DUNIA_MUSUH = 2;
 		public static final int DUNIA_DESA = 3;
 
+		/**
+		 * The Keabadian screen (DESIGN 26.10, phase 9); {@code arg} = the tab: 0 Alam, 1 Purba, 2 Bencana, 3 Batin, 4 Ciptaan,
+		 * 5 Lelang.
+		 */
+		public static final int ABADI = 8;
+
+		/** Tabs of {@link #ABADI}. */
+		public static final int ABADI_ALAM = 0;
+		public static final int ABADI_PURBA = 1;
+		public static final int ABADI_BENCANA = 2;
+		public static final int ABADI_BATIN = 3;
+		public static final int ABADI_CIPTAAN = 4;
+		public static final int ABADI_LELANG = 5;
+
 		/** Tab {@code arg} of {@link #INFO}: the Jalan tablet (DESIGN 19.2.2, {@code /kultivasi jalan}). Same as {@code CultivationScreen.TAB_JALAN}. */
 		public static final int TAB_JALAN = 5;
 		/** Tab {@code arg} of {@link #INFO}: the Kitab Alkimia (DESIGN 19.2.2, {@code /kultivasi resep}). Same as {@code CultivationScreen.TAB_ALKIMIA}. */
@@ -325,6 +339,12 @@ public final class Payloads {
 		public static final int CH_MUSUH = 1;
 		public static final int CH_TEMPA = 2;
 		public static final int CH_DESA = 3;
+		/** Phase 9 (DESIGN 26.14 item 2): routed to {@code client.abadi.AbadiClient}, {@code client.purba.PurbaClient}, {@code client.batin.BatinClient}. */
+		public static final int CH_ABADI = 4;
+		public static final int CH_PURBA = 5;
+		public static final int CH_BATIN = 6;
+		/** The number of channels (the client keeps one version counter per channel). */
+		public static final int CHANNELS = 7;
 		/** The size budget of one sync (DESIGN 25.13). */
 		public static final int MAX_BYTES = 8192;
 

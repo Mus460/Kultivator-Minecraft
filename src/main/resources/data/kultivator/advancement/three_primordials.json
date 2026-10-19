@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:primordial_slain",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.three_primordials.description"
+    },
+    "icon": {
+      "id": "kultivator:shan_hai_scroll"
+    },
+    "title": {
+      "translate": "advancement.kultivator.three_primordials.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

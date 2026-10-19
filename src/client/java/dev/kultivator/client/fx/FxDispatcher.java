@@ -47,6 +47,10 @@ public final class FxDispatcher {
 			case MUSUH -> dev.kultivator.client.musuh.MusuhFx.play(fx);
 			case TEMPA -> dev.kultivator.client.tempa.TempaFx.play(fx);
 			case DESA -> dev.kultivator.client.desa.DesaFx.play(fx);
+			// Phase 9 (DESIGN 26.14 item 3).
+			case ABADI -> dev.kultivator.client.abadi.AbadiFx.play(fx);
+			case PURBA -> dev.kultivator.client.purba.PurbaFx.play(fx);
+			case BATIN -> dev.kultivator.client.batin.BatinFx.play(fx);
 		}
 	}
 
@@ -81,6 +85,9 @@ public final class FxDispatcher {
 		dev.kultivator.client.musuh.MusuhFx.tick();
 		dev.kultivator.client.tempa.TempaFx.tick();
 		dev.kultivator.client.desa.DesaFx.tick();
+		dev.kultivator.client.abadi.AbadiFx.tick();
+		dev.kultivator.client.purba.PurbaFx.tick();
+		dev.kultivator.client.batin.BatinFx.tick();
 	}
 
 	private FxDispatcher() {

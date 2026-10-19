@@ -83,6 +83,8 @@ public final class TechniqueRegistry {
 		module("ShadowArts", 800, 899, ShadowArts::register);
 		module("SpaceArts", 900, 999, SpaceArts::register);
 		module("ImmortalArts", 1000, 1099, ImmortalArts::register);
+		// Phase 9 (DESIGN 26.14 item 15): the three self-created art slots own_art_1..3.
+		module("CiptaanArts", 1100, 1199, dev.kultivator.batin.CiptaanArts::register);
 		freeze();
 		Kultivator.LOGGER.info("Kultivator: {} technique specs ({} for the player), {} special handlers", all.size(), playerTotal(), SPECIALS.size());
 	}

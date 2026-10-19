@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:primordial_slain",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.kunpeng_slain.description"
+    },
+    "icon": {
+      "id": "kultivator:peng_feather"
+    },
+    "title": {
+      "translate": "advancement.kultivator.kunpeng_slain.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}
