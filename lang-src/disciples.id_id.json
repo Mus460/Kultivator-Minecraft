@@ -96,5 +96,8 @@
   "kultivator.disciples.name.32": "Qiao Feixue",
   "kultivator.disciples.name.33": "Long Aotian",
   "kultivator.disciples.name.34": "Jin Shaoyang",
-  "kultivator.disciples.name.35": "An Ruyi"
+  "kultivator.disciples.name.35": "An Ruyi",
+  "kultivator.disciples.none_near": "Tidak ada muridmu dalam %s blok.",
+  "kultivator.disciples.none_named": "Tidak ada murid bernama %s di dekatmu.",
+  "key.kultivator.murid": "Buka gulungan murid (tekan lagi: murid berikutnya)"
 }

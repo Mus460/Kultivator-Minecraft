@@ -43,6 +43,8 @@ public final class Keys {
 	public static final KeyMapping DUNIA = key("dunia", InputConstants.UNKNOWN.getValue());
 	/** Buka Cincin: opens the highest-tier bound ring in the inventory ({@code TEMPA "ring:open"}). */
 	public static final KeyMapping CINCIN = key("cincin", InputConstants.UNKNOWN.getValue());
+	/** Opens the scroll of the disciple you look at (else the nearest); pressed again inside it, the next disciple. */
+	public static final KeyMapping MURID = key("murid", InputConstants.KEY_M);
 
 	private static boolean jumpWasDown;
 	private static int airTicks;
@@ -80,6 +82,11 @@ public final class Keys {
 		while (DUNIA.consumeClick()) {
 			if (free) {
 				dev.kultivator.client.dunia.DuniaClient.open(Payloads.OpenScreen.DUNIA_ALAM);
+			}
+		}
+		while (MURID.consumeClick()) {
+			if (free) {
+				send(new Payloads.Action(Actions.DISCIPLE_OPEN, -1, ""));
 			}
 		}
 		while (CINCIN.consumeClick()) {

@@ -104,6 +104,8 @@ public final class Disciples {
 	public static final int MAX_DISCIPLES = 5;
 	/** Screen actions and orders reach disciples within this distance. */
 	public static final double ACTION_RANGE = 16.0D;
+	/** Opening a disciple's scroll and giving it orders work from this far (same dimension, loaded): the Murid key. */
+	public static final double VIEW_RANGE = 64.0D;
 	/** Sub-key of {@code CultivationData.extra()} owned by this module. */
 	public static final String EXTRA = "disciples";
 	private static final String LIST = "list";
@@ -164,6 +166,10 @@ public final class Disciples {
 	 */
 	public static void handleAction(ServerPlayer player, Payloads.Action action) {
 		String text = action.text() == null ? "" : action.text();
+		if (action.action() == Actions.DISCIPLE_OPEN && action.arg() < 0) {
+			openFromKey(player, text);
+			return;
+		}
 		boolean refresh = action.action() == Actions.DISCIPLE_OPEN && "refresh".equals(text);
 		Entity entity = player.level().getEntity(action.arg());
 		if (!(entity instanceof DiscipleEntity disciple) || !disciple.isAlive() || disciple.isReleasing()
@@ -179,9 +185,11 @@ public final class Disciples {
 			}
 			return;
 		}
-		if (player.distanceToSqr(disciple) > ACTION_RANGE * ACTION_RANGE) {
+		boolean remote = action.action() == Actions.DISCIPLE_OPEN || action.action() == Actions.DISCIPLE_MODE;
+		double range = remote ? VIEW_RANGE : ACTION_RANGE;
+		if (player.distanceToSqr(disciple) > range * range) {
 			if (!refresh) {
-				Msg.chat(player, Component.translatable("kultivator.disciples.too_far", disciple.getDisplayName(), (int) ACTION_RANGE)
+				Msg.chat(player, Component.translatable("kultivator.disciples.too_far", disciple.getDisplayName(), (int) range)
 						.withStyle(ChatFormatting.YELLOW));
 			}
 			return;
@@ -233,6 +241,72 @@ public final class Disciples {
 		}
 		if (disciple.isAlive() && !disciple.isRemoved()) {
 			sendInfo(player, disciple);
+		}
+	}
+
+	/**
+	 * The Murid key and {@code /kultivasi murid buka}: opens the scroll of the own disciple the player looks at (within
+	 * 15 degrees), else the nearest one, within {@link #VIEW_RANGE} in the same dimension. {@code next:<id>} opens the
+	 * next disciple by name after that one (the key pressed again while a scroll is open); {@code name:<name>} opens the
+	 * disciple with that name (spaces may be written as underscores).
+	 */
+	public static void openFromKey(ServerPlayer player, String text) {
+		List<DiscipleEntity> near = new ArrayList<>();
+		for (DiscipleEntity disciple : loaded(player.getUUID())) {
+			if (disciple.level() == player.level() && disciple.role() == DiscipleEntity.Role.DISCIPLE && !disciple.isReleasing()
+					&& player.distanceToSqr(disciple) <= VIEW_RANGE * VIEW_RANGE) {
+				near.add(disciple);
+			}
+		}
+		if (near.isEmpty()) {
+			Msg.actionBar(player, Component.translatable("kultivator.disciples.none_near", (int) VIEW_RANGE).withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		near.sort(java.util.Comparator.comparing((DiscipleEntity d) -> d.getName().getString().toLowerCase(java.util.Locale.ROOT))
+				.thenComparingInt(DiscipleEntity::getId));
+		DiscipleEntity pick = null;
+		if (text.startsWith("next:")) {
+			int current;
+			try {
+				current = Integer.parseInt(text.substring(5));
+			} catch (NumberFormatException exception) {
+				current = -1;
+			}
+			int at = -1;
+			for (int i = 0; i < near.size(); i++) {
+				if (near.get(i).getId() == current) {
+					at = i;
+				}
+			}
+			pick = near.get((at + 1) % near.size());
+		} else if (text.startsWith("name:")) {
+			String wanted = text.substring(5).replace('_', ' ').trim().toLowerCase(java.util.Locale.ROOT);
+			for (DiscipleEntity disciple : near) {
+				if (disciple.getName().getString().toLowerCase(java.util.Locale.ROOT).equals(wanted)) {
+					pick = disciple;
+				}
+			}
+			if (pick == null) {
+				Msg.actionBar(player, Component.translatable("kultivator.disciples.none_named", text.substring(5)).withStyle(ChatFormatting.GRAY));
+				return;
+			}
+		} else {
+			net.minecraft.world.phys.Vec3 eye = player.getEyePosition();
+			net.minecraft.world.phys.Vec3 look = player.getViewVector(1.0F);
+			double best = Double.MAX_VALUE;
+			for (DiscipleEntity disciple : near) {
+				net.minecraft.world.phys.Vec3 to = disciple.getBoundingBox().getCenter().subtract(eye);
+				double distance = to.length();
+				boolean aimed = distance > 0.0D && to.normalize().dot(look) > 0.966D;
+				double score = aimed ? distance - 1000.0D : distance;
+				if (score < best) {
+					best = score;
+					pick = disciple;
+				}
+			}
+		}
+		if (pick != null) {
+			openScreen(player, pick);
 		}
 	}
 
@@ -1143,6 +1217,13 @@ public final class Disciples {
 	public static void addCommands(LiteralArgumentBuilder<CommandSourceStack> root, LiteralArgumentBuilder<CommandSourceStack> debug) {
 		LiteralArgumentBuilder<CommandSourceStack> murid = Commands.literal("murid");
 		murid.then(Commands.literal("list").executes(ctx -> list(ctx.getSource().getPlayerOrException())));
+		murid.then(Commands.literal("buka").executes(ctx -> {
+			openFromKey(ctx.getSource().getPlayerOrException(), "");
+			return 1;
+		}).then(Commands.argument("nama", com.mojang.brigadier.arguments.StringArgumentType.greedyString()).executes(ctx -> {
+			openFromKey(ctx.getSource().getPlayerOrException(), "name:" + com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "nama"));
+			return 1;
+		})));
 		murid.then(Commands.literal("panggil").executes(ctx -> call(ctx.getSource().getPlayerOrException())));
 		murid.then(Commands.literal("ikut").executes(ctx -> orderCommand(ctx.getSource().getPlayerOrException(), DiscipleEntity.Mode.FOLLOW)));
 		murid.then(Commands.literal("tinggal").executes(ctx -> orderCommand(ctx.getSource().getPlayerOrException(), DiscipleEntity.Mode.STAY)));
