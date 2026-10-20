@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "kultivator:heaven_seal_shard",
+    "kultivator:heaven_seal_shard",
+    "kultivator:heaven_seal_shard",
+    "kultivator:heaven_seal_shard",
+    "kultivator:heaven_seal_shard",
+    "kultivator:heaven_seal_shard",
+    "kultivator:immortal_origin_stone",
+    "kultivator:immortal_origin_stone",
+    "kultivator:soul_seal_jade"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:heaven_decree_seal"
+  }
+}

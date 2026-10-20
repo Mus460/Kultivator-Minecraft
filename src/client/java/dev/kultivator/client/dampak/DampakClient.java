@@ -165,6 +165,14 @@ public final class DampakClient {
 		} catch (RuntimeException | LinkageError exception) {
 			warn("world techFx", exception);
 		}
+		// 6. Phase 10b (29.10 C10b.6): a Titah decree's own world pieces (falling stars, the cleaving line, the lifted cells)
+		if (spec.has(TechniqueSpec.Flag.TITAH)) {
+			try {
+				dev.kultivator.client.pusakalangit.world.TitahWorld.onTechFx(p, spec, phase, own, others);
+			} catch (RuntimeException | LinkageError exception) {
+				warn("titah world techFx", exception);
+			}
+		}
 	}
 
 	private static boolean dewa(TechniqueSpec spec) {
@@ -297,9 +305,15 @@ public final class DampakClient {
 		} catch (RuntimeException | LinkageError exception) {
 			warn("world clear", exception);
 		}
+		try {
+			dev.kultivator.client.pusakalangit.world.TitahWorld.clear();
+		} catch (RuntimeException | LinkageError exception) {
+			warn("titah world clear", exception);
+		}
 	}
 
-	static void warn(String where, Throwable exception) {
+	/** Logs a presentation error at most 8 times per session (shared with the Titah client, Phase 10b). */
+	public static void warn(String where, Throwable exception) {
 		if (warnings++ < 8) {
 			Kultivator.LOGGER.warn("Kultivator: Dampak Langit error in {}", where, exception);
 		}

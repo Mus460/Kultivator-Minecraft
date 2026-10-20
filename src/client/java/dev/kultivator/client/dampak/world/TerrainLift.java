@@ -31,12 +31,21 @@ import java.util.Set;
  * above the cap; one cell per group per job); visual cells (Mode Kehancuran off) sample the client's surface (one
  * heightmap read per cell) and rise from 0.1 b above the ground while the ground stays, a glowing crack decal under each.
  * The grid shows on the ground 10-20 ticks before the cells lift.
+ * <p>
+ * Titah Pemindah Gunung (DESIGN 29.5.4, {@link #slab}): CARRY cells of any size (2-16 b) torn out as three-layer slabs
+ * (the surface block, the soil under it and the rock deeper down, one display each, turning as one body) that rise 30-60 b
+ * turning 2-5°/t, then drift off towards the sky along a carry direction (the Kua'e giants carry them) and crumble in the
+ * clouds. Visual only: the ground stays (Mode Kehancuran carves the real pit on the server).
  */
 final class TerrainLift {
 
 	static final int LIFT = 0;
 	static final int IMPLODE = 1;
 	static final int FLIP = 2;
+	static final int CARRY = 3;
+
+	/** CARRY: drift ticks after the rise, and the crumble at the end. */
+	private static final int CARRY_DRIFT = 50;
 
 	private static final int HANG = 10;
 	private static final int CRUMBLE = 6;
@@ -344,6 +353,173 @@ final class TerrainLift {
 			}
 			if (p < 0.3F && (int) t % 4 == 0) {
 				DampakParticles.one(DampakParticles.block(state), at.x, at.y - h * 0.5D, at.z, 0.0D, -0.05D, 0.0D);
+			}
+			return true;
+		}
+	}
+
+	// ================================================================== Titah: three-layer CARRY slabs
+
+	/**
+	 * One sky-carried slab of side {@code cs} over the cell {@code (x0, z0)} whose surface is at {@code ground}: three
+	 * layers (surface, soil, rock) read from the client's own terrain, one display each; it trembles for {@code delay}
+	 * ticks, rises, then drifts along {@code carry} (a horizontal unit vector) and up. False when the top layer could not be
+	 * made (budget, range): the caller shows particles instead. A glowing grid square marks the cell.
+	 */
+	static boolean slab(ClientLevel level, double x0, double z0, float cs, double ground, long cast, int delay, Vec3 carry, int gridRgb, boolean grid) {
+		if (!Double.isFinite(ground) || !(cs > 0.5F)) {
+			return false;
+		}
+		double cx = x0 + cs * 0.5D;
+		double cz = z0 + cs * 0.5D;
+		BlockPos top = BlockPos.containing(cx, ground - 0.5D, cz);
+		BlockState topState = level.getBlockState(top);
+		if (!DampakDisplays.solid(level, topState, top)) {
+			return false;
+		}
+		BlockState soil = layerState(level, top.below(Math.max(1, Math.round(cs * 0.2F))), net.minecraft.world.level.block.Blocks.DIRT.defaultBlockState());
+		BlockState rock = layerState(level, top.below(Math.max(2, Math.round(cs * 0.6F))), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+		float hTop = Math.max(0.5F, cs * 0.16F);
+		float hSoil = Math.max(0.8F, cs * 0.3F);
+		float hRock = Math.max(1.0F, cs * 0.42F);
+		float total = hTop + hSoil + hRock;
+		RandomSource random = DampakParticles.random();
+		Vector3f axis = new Vector3f(random.nextFloat() - 0.5F, 1.2F, random.nextFloat() - 0.5F).normalize();
+		float spin = (2.0F + random.nextFloat() * 3.0F) * (random.nextBoolean() ? 1.0F : -1.0F);
+		float rise = (30.0F + random.nextFloat() * 30.0F) * DampakWorldBudget.speedScale();
+		int riseTicks = 30 + random.nextInt(11);
+		Vec3 drift = (carry == null || carry.lengthSqr() < 1.0E-6D ? new Vec3(1.0D, 0.0D, 0.0D) : carry.normalize()).scale(30.0D + random.nextDouble() * 20.0D)
+				.add(0.0D, 24.0D + random.nextDouble() * 16.0D, 0.0D);
+		// the slab's centre starts with its top face 0.1 b over the ground (the ground stays: visual only)
+		Vec3 start = new Vec3(cx, ground + 0.1D - total * 0.5D, cz);
+		Motion motion = new Motion(start, axis, spin, rise, riseTicks, delay, drift);
+		// bottoms of the layers relative to the slab centre: rock lowest, then soil, the surface on top
+		float bottom = -total * 0.5F;
+		Layer surface = Layer.make(topState, motion, cast, cs, hTop, bottom + hRock + hSoil, true);
+		if (surface == null) {
+			return false;
+		}
+		Layer.make(soil, motion, cast, cs, hSoil, bottom + hRock, false);
+		Layer.make(rock, motion, cast, cs, hRock, bottom, false);
+		if (grid && DampakWorldBudget.tier() >= 1) {
+			square(x0, z0, cs, ground, gridRgb, delay + 16);
+		}
+		return true;
+	}
+
+	private static BlockState layerState(ClientLevel level, BlockPos pos, BlockState fallback) {
+		BlockState state = level.getBlockState(pos);
+		return DampakDisplays.solid(level, state, pos) ? state : fallback;
+	}
+
+	/** The shared motion of one slab: every layer computes the same centre and turn for the same age. */
+	private record Motion(Vec3 start, Vector3f axis, float spin, float rise, int riseTicks, int delay, Vec3 drift) {
+
+		int life() {
+			return delay + riseTicks + CARRY_DRIFT;
+		}
+
+		/** The slab centre at slab time {@code t} (ticks after the delay). */
+		Vec3 at(float t) {
+			if (t <= 0.0F) {
+				return start;
+			}
+			float p = Math.min(1.0F, t / riseTicks);
+			Vec3 up = start.add(0.0D, rise * ShockRing.cubic(p), 0.0D);
+			if (t <= riseTicks) {
+				return up;
+			}
+			float q = Math.min(1.0F, (t - riseTicks) / CARRY_DRIFT);
+			return up.add(drift.scale(q * q));
+		}
+
+		Quaternionf rotation(float t) {
+			float turn = Math.max(0.0F, t) * spin;
+			return new Quaternionf().rotateAxis((float) Math.toRadians(turn), axis.x, axis.y, axis.z);
+		}
+	}
+
+	/** One layer display of a CARRY slab. */
+	private static final class Layer extends DampakDisplays.Piece {
+		private final Motion motion;
+		private final float cs;
+		private final float h;
+		private final float yBottom;
+		private final boolean leader;
+		private float endAge = -1.0F;
+
+		private Layer(Display.BlockDisplay display, long cast, Motion motion, float cs, float h, float yBottom, boolean leader) {
+			super(display, DampakDisplays.CELL, cast);
+			this.motion = motion;
+			this.cs = cs;
+			this.h = h;
+			this.yBottom = yBottom;
+			this.leader = leader;
+		}
+
+		static @Nullable Layer make(BlockState state, Motion motion, long cast, float cs, float h, float yBottom, boolean leader) {
+			Display.BlockDisplay display = DampakDisplays.create(state, motion.start(), Math.max(cs, h) * 1.5F, false);
+			if (display == null) {
+				return null;
+			}
+			Layer layer = new Layer(display, cast, motion, cs, h, yBottom, leader);
+			layer.place(motion.rotation(0.0F), 1.0F, true, 0);
+			DampakDisplays.add(layer);
+			return layer;
+		}
+
+		/** Poses the layer: rotated with the slab about the slab centre (the entity position), {@code k} = its size factor. */
+		void place(Quaternionf rotation, float k, boolean snap, int duration) {
+			float w = cs * k;
+			Vector3f translation = new Vector3f(-w * 0.5F, yBottom * k, -w * 0.5F);
+			rotation.transform(translation);
+			Vector3f scale = new Vector3f(Math.max(0.001F, w), Math.max(0.001F, h * k), Math.max(0.001F, w));
+			if (snap) {
+				key.snap(translation, rotation, scale);
+			} else {
+				key.key(translation, rotation, scale, duration);
+			}
+		}
+
+		@Override
+		void abort() {
+			if (endAge < 0.0F) {
+				endAge = age;
+				place(motion.rotation(age - motion.delay()), 0.01F, false, CRUMBLE);
+			}
+		}
+
+		@Override
+		boolean tick(ClientLevel level, float sigma, boolean keyNow, int duration) {
+			if (endAge >= 0.0F) {
+				return age - endAge < CRUMBLE;
+			}
+			float t = age - motion.delay();
+			if (t < 0.0F) {
+				// the grid is showing: the slab trembles in place
+				if (keyNow && DampakWorldBudget.index() >= 1) {
+					float shake = 0.04F * (float) Math.sin(age * 2.9F);
+					key.move(motion.start().add(shake, 0.0D, -shake));
+				}
+				return true;
+			}
+			if (age >= motion.life()) {
+				endAge = age;
+				crumble(level, leader ? 10 : 6);
+				if (leader) {
+					DampakParticles.burst(level, ParticleTypes.CLOUD, display.position(), 6, 0.08F);
+				}
+				place(motion.rotation(t), 0.01F, false, CRUMBLE);
+				return true;
+			}
+			Vec3 at = motion.at(t);
+			key.move(at);
+			if (keyNow) {
+				place(motion.rotation(t + duration), 1.0F, false, duration);
+			}
+			if (leader && t < 8.0F && (int) t % 2 == 0) {
+				// torn out: soil rains from under the slab
+				DampakParticles.one(DampakParticles.block(display.getBlockState()), at.x, at.y - h, at.z, 0.0D, -0.08D, 0.0D);
 			}
 			return true;
 		}

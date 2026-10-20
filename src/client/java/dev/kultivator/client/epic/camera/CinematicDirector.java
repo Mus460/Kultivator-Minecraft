@@ -250,6 +250,14 @@ public final class CinematicDirector {
 		return active && owner == scene;
 	}
 
+	/**
+	 * Phase 10b (29.4): true while a shot of {@code scene} runs and is not easing back yet. A chained film segment starts
+	 * only then, so a Backspace skip, a movement key or the end of the shot is never undone by the next segment.
+	 */
+	public static boolean shooting(Scene scene) {
+		return active && !exiting && owner == scene;
+	}
+
 	/** An FOV punch to {@code percent} (±12 % × fovEffectScale) over {@code inTicks}, held {@code holdTicks}, then back. */
 	public static void snap(float percent, int inTicks, int holdTicks) {
 		if (EffectQuality.reduceMotion()) {

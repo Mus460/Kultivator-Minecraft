@@ -34,9 +34,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -53,6 +55,12 @@ import java.util.UUID;
  * {@code kehancuranUndoMinutes} so the master can restore them (lost on restart). A restore ignores the zones (it only puts
  * back what the cast took, where it is still air), waits for unloaded chunks and for anyone standing in a block, and hands
  * what it could not place back to the restore buffer so Pulihkan can be pressed again.
+ * <p>
+ * Phase 10b (DESIGN 29.6.3, 29.7.1): a Titah job ({@code Kehancuran.submitTitah}) is a self job with its own block cap,
+ * 0 % drops and no merge; after its carve and surface pass it may build a capped block monument of Batu Pusaka and Urat
+ * Pusaka into air of its own crater, recorded in the SAME undo entry (a carved position's record is rewritten, never
+ * doubled). A clear job ({@link #submitClear}) is a restore-flavoured job that sets air only where the monument block
+ * still stands; it waits for unloaded chunks and hands what it could not reach back to {@code TitahMonuments}.
  */
 public final class WorldBreaker {
 
@@ -134,6 +142,37 @@ public final class WorldBreaker {
 		int surfaceIndex;
 		int surfaceChanged;
 
+		// ---- Phase 10b (DESIGN 29.6.3, 29.7.1)
+		/** A Titah Langit job: its own block cap, never merged, the monument phase and the DONE callback. */
+		boolean titah;
+		/** The Titah job's own block cap ({@code noteCarved} uses it). */
+		int carveCap;
+		/** The {@code TitahMonuments} record of the cast (-1 = none). */
+		int recordId = -1;
+		/** The planned monument cells as {@code BlockPos.asLong(x, layer, z)} (layer 0 = the crater floor's first air). */
+		long @Nullable [] monumentPlan;
+		/** 0 Batu Pusaka, 1 Urat Pusaka per planned cell. */
+		byte @Nullable [] monumentKinds;
+		boolean monumentPhase;
+		long[] monumentCells = new long[0];
+		byte[] monumentCellKinds = new byte[0];
+		int monumentIndex;
+		final List<Long> monumentPlaced = new ArrayList<>();
+		final List<Byte> monumentPlacedKinds = new ArrayList<>();
+		/** Position → index of its record in {@code undoPositions} (the undo rewrite of 29.6.3). */
+		@Nullable Map<Long, Integer> undoIndex;
+		/** What this job carved (the monument goes only into its own crater). */
+		@Nullable Set<Long> carvedSet;
+		int carveMinX;
+		int carveMinY;
+		int carveMinZ;
+		int carveMaxX;
+		int carveMaxY;
+		int carveMaxZ;
+		/** A Titah clear job (restore-flavoured): its id in {@code TitahMonuments}, -1 = untracked. */
+		boolean clear;
+		int clearId = -1;
+
 		Job(UUID owner, String ownerName, String disciple, String shape, ResourceKey<Level> dimension, BlockPos centre, long[] positions,
 				BlockState[] targets, BlockState[] placed, boolean restore, boolean naturalOnly, boolean wither, int dropsPct) {
 			this.owner = owner;
@@ -164,9 +203,26 @@ public final class WorldBreaker {
 			return job;
 		}
 
-		/** Remembers a removed position for the surface pass (at most the per-cast cap). */
+		/**
+		 * A Titah job (Phase 10b, DESIGN 29.7.1): a self job with 0 % drops whatever {@code kehancuranDropsPct} says (so it
+		 * is always undoable while the undo window is above 0) and its own block cap.
+		 */
+		static Job titah(ServerPlayer caster, String specId, String shape, BlockPos centre, long[] positions, byte[] modes, int carveCap) {
+			Job job = new Job(caster.getUUID(), caster.getName().getString(), "", shape, caster.level().dimension(), centre, positions,
+					new BlockState[positions.length], null, false, false, false, 0);
+			job.self = true;
+			job.specId = specId;
+			job.castPos = caster.position();
+			job.modes = modes;
+			job.casterEntityId = caster.getId();
+			job.titah = true;
+			job.carveCap = Math.max(1, carveCap);
+			return job;
+		}
+
+		/** Remembers a removed position for the surface pass (at most the per-cast cap; a Titah job's own cap). */
 		void noteCarved(long pos) {
-			int cap = Math.max(1, KultivatorConfig.get().kehancuranMaxBlocksPerCast);
+			int cap = titah ? Math.max(1, carveCap) : Math.max(1, KultivatorConfig.get().kehancuranMaxBlocksPerCast);
 			if (carvedCount >= cap) {
 				return;
 			}
@@ -274,9 +330,45 @@ public final class WorldBreaker {
 		return count;
 	}
 
+	/** Phase 10b (29.3.2): a Titah job of {@code owner} is running or queued (one per owner). */
+	static boolean hasTitah(UUID owner) {
+		for (Job job : JOBS) {
+			if (job.titah && !job.restore && job.owner.equals(owner)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** {@link #submitClear(UUID, ResourceKey, long[], BlockState[], int)} without a tracking id. */
+	public static boolean submitClear(UUID owner, ResourceKey<Level> dimension, long[] positions, BlockState[] placed) {
+		return submitClear(owner, dimension, positions, placed, -1);
+	}
+
+	/**
+	 * Phase 10b (DESIGN 29.6.3, contract C10b.3): queues the clear of a Titah block monument, a restore-flavoured job that
+	 * sets AIR only where the current state is still {@code placed[i]} (our own block), checks no zone (it removes only our
+	 * own blocks), never loads a chunk (those positions wait) and is logged. When it ends, what it could not reach goes back
+	 * to {@code TitahMonuments.onClearFinished(clearId, ...)}. False when the queue is full (the caller keeps the request).
+	 */
+	public static boolean submitClear(UUID owner, ResourceKey<Level> dimension, long[] positions, BlockState[] placed, int clearId) {
+		if (positions == null || placed == null || positions.length == 0 || positions.length != placed.length || !hasRoom()) {
+			return false;
+		}
+		BlockState[] air = new BlockState[positions.length];
+		java.util.Arrays.fill(air, Blocks.AIR.defaultBlockState());
+		Job job = new Job(owner, "", "", "titah_clear", dimension, BlockPos.of(positions[0]), positions.clone(), air, placed.clone(), true, false,
+				false, 0);
+		job.clear = true;
+		job.clearId = clearId;
+		job.expiresAt = Long.MAX_VALUE;
+		JOBS.addLast(job);
+		return true;
+	}
+
 	/** Queues a cast. False when the queue is full (or, for a destructive job, its owner already has 2). */
 	static boolean submit(Job job) {
-		if (job.self && !job.restore && ownerJobs(job.owner) >= MAX_PER_OWNER && merge(job)) {
+		if (job.self && !job.titah && !job.restore && ownerJobs(job.owner) >= MAX_PER_OWNER && merge(job)) {
 			return true;
 		}
 		if (!hasRoom() || !job.restore && ownerJobs(job.owner) >= MAX_PER_OWNER) {
@@ -297,7 +389,7 @@ public final class WorldBreaker {
 		int limit = 2 * Math.max(1, KultivatorConfig.get().kehancuranMaxBlocksPerCast);
 		for (int i = 0; i < list.size(); i++) {
 			Job queued = list.get(i);
-			if (queued == running || !queued.self || queued.restore || !queued.owner.equals(job.owner)
+			if (queued == running || !queued.self || queued.titah || queued.restore || !queued.owner.equals(job.owner)
 					|| !java.util.Objects.equals(queued.specId, job.specId) || !queued.dimension.equals(job.dimension)) {
 				continue;
 			}
@@ -451,6 +543,10 @@ public final class WorldBreaker {
 			}
 			return;
 		}
+		if (job.monumentPhase) {
+			tickMonument(server, level, job, config);
+			return;
+		}
 		if (job.surfacePhase) {
 			tickSurface(server, level, job, config);
 			return;
@@ -571,6 +667,9 @@ public final class WorldBreaker {
 		}
 		if (job.index >= job.positions.length) {
 			if (!job.restore && startSurface(level, job, config)) {
+				return;
+			}
+			if (!job.restore && startMonument(level, job, config)) {
 				return;
 			}
 			JOBS.pollFirst();
@@ -721,9 +820,203 @@ public final class WorldBreaker {
 			}
 		}
 		if (job.surfaceIndex >= plan.positions().length) {
+			if (startMonument(level, job, config)) {
+				return;
+			}
 			JOBS.pollFirst();
 			finish(server, job, false);
 		}
+	}
+
+	// ================================================================== Phase 10b: the Titah block monument (DESIGN 29.6.3)
+
+	/**
+	 * The carve (and surface pass) of a Titah job is done: resolves its planned monument cells onto the crater floor (each
+	 * planned column's lowest carved cell is layer 0) and starts the monument phase. Only for a Titah job whose record is
+	 * still live, with 0 % drops, an undo window above 0 and {@code titahMonumentBlocks} above 0. True when it now runs.
+	 */
+	private static boolean startMonument(ServerLevel level, Job job, KultivatorConfig config) {
+		if (job.monumentPhase || !job.titah || job.restore || job.monumentPlan == null || job.monumentKinds == null
+				|| job.monumentPlan.length == 0 || !job.undoable || job.dropsPct > 0 || config.titahMonumentBlocks <= 0
+				|| config.kehancuranUndoMinutes <= 0 || job.carvedCount == 0
+				|| !dev.kultivator.pusakalangit.TitahMonuments.live(level.getServer(), job.recordId)) {
+			return false;
+		}
+		Map<Long, Integer> lowest = new HashMap<>();
+		Set<Long> carved = new HashSet<>(Math.max(16, job.carvedCount * 2));
+		int minX = Integer.MAX_VALUE;
+		int minY = Integer.MAX_VALUE;
+		int minZ = Integer.MAX_VALUE;
+		int maxX = Integer.MIN_VALUE;
+		int maxY = Integer.MIN_VALUE;
+		int maxZ = Integer.MIN_VALUE;
+		for (int i = 0; i < job.carvedCount; i++) {
+			long packed = job.carved[i];
+			carved.add(packed);
+			int x = BlockPos.getX(packed);
+			int y = BlockPos.getY(packed);
+			int z = BlockPos.getZ(packed);
+			lowest.merge(BlockPos.asLong(x, 0, z), y, Math::min);
+			minX = Math.min(minX, x);
+			minY = Math.min(minY, y);
+			minZ = Math.min(minZ, z);
+			maxX = Math.max(maxX, x);
+			maxY = Math.max(maxY, y);
+			maxZ = Math.max(maxZ, z);
+		}
+		int cap = Math.min(config.titahMonumentBlocks, job.monumentPlan.length);
+		List<Long> cells = new ArrayList<>(cap);
+		List<Byte> kinds = new ArrayList<>(cap);
+		for (int i = 0; i < job.monumentPlan.length && cells.size() < cap; i++) {
+			long packed = job.monumentPlan[i];
+			int x = BlockPos.getX(packed);
+			int layer = Math.max(0, BlockPos.getY(packed));
+			int z = BlockPos.getZ(packed);
+			Integer floor = lowest.get(BlockPos.asLong(x, 0, z));
+			if (floor == null) {
+				// not in this job's crater: never built outside its own carve
+				continue;
+			}
+			cells.add(BlockPos.asLong(x, floor + layer, z));
+			kinds.add(i < job.monumentKinds.length ? job.monumentKinds[i] : 0);
+		}
+		if (cells.isEmpty()) {
+			return false;
+		}
+		Map<Long, Integer> index = new HashMap<>(Math.max(16, job.undoPositions.size() * 2));
+		for (int i = 0; i < job.undoPositions.size(); i++) {
+			// the last record of a position is the one a rewrite must change
+			index.put(job.undoPositions.get(i), i);
+		}
+		job.undoIndex = index;
+		job.carvedSet = carved;
+		job.carveMinX = minX;
+		job.carveMinY = minY;
+		job.carveMinZ = minZ;
+		job.carveMaxX = maxX;
+		job.carveMaxY = maxY;
+		job.carveMaxZ = maxZ;
+		job.monumentCells = cells.stream().mapToLong(Long::longValue).toArray();
+		job.monumentCellKinds = new byte[kinds.size()];
+		for (int i = 0; i < kinds.size(); i++) {
+			job.monumentCellKinds[i] = kinds.get(i);
+		}
+		job.monumentIndex = 0;
+		job.surfacePhase = false;
+		job.monumentPhase = true;
+		return true;
+	}
+
+	/**
+	 * One tick of the monument phase: the same budget, zones (re-checked per batch, the caster's safe column included),
+	 * unsafe-neighbour rule and player checks as the carve. A cell is placed only into AIR that this job carved, or into
+	 * air right above a solid block inside the carve's box; never where an entity or a standing player is. Every placement
+	 * goes into the job's own undo entry: a carved cell's record (old, AIR) is REWRITTEN to (old, monument block), a new
+	 * cell gets (AIR, monument block). Two records for one cell would end a Pulihkan on AIR and lose the original stone,
+	 * because a restore only puts {@code old} back where the block is air or still {@code placed}.
+	 */
+	private static void tickMonument(MinecraftServer server, ServerLevel level, Job job, KultivatorConfig config) {
+		int budget = config.kehancuranBlocksPerTick;
+		int reads = budget * READ_FACTOR;
+		ProtectedZones.Context zones = zonesFor(server, level, job, monumentBox(job, reads));
+		Map<Long, Integer> index = job.undoIndex == null ? new HashMap<>() : job.undoIndex;
+		Set<Long> carved = job.carvedSet == null ? Set.of() : job.carvedSet;
+		double sx = 0.0D;
+		double sy = 0.0D;
+		double sz = 0.0D;
+		int done = 0;
+		while (budget > 0 && reads > 0 && job.monumentIndex < job.monumentCells.length) {
+			int i = job.monumentIndex++;
+			reads--;
+			long packed = job.monumentCells[i];
+			BlockPos pos = BlockPos.of(packed);
+			if (zones.zoneOf(pos) != null) {
+				// a protected zone, the caster's safe column or an unloaded chunk
+				continue;
+			}
+			BlockState state = level.getBlockState(pos);
+			if (!state.isAir()) {
+				continue;
+			}
+			if (!carved.contains(packed)) {
+				BlockState below = level.getBlockState(pos.below());
+				if (below.isAir() || !below.canOcclude() || !insideCarve(job, pos)) {
+					continue;
+				}
+			}
+			if (touchesUnsafe(level, pos) || standing(level, pos) || occupied(level, pos)) {
+				continue;
+			}
+			byte kind = i < job.monumentCellKinds.length ? job.monumentCellKinds[i] : 0;
+			BlockState to = dev.kultivator.pusakalangit.TitahItems.monumentState(kind);
+			if (!level.setBlock(pos, to, FLAGS)) {
+				continue;
+			}
+			Integer at = index.get(packed);
+			if (at != null && at < job.undoPlaced.size()) {
+				job.undoPlaced.set(at, to);
+			} else {
+				job.undoPositions.add(packed);
+				job.undoOld.add(state);
+				job.undoPlaced.add(to);
+				index.put(packed, job.undoPositions.size() - 1);
+			}
+			job.monumentPlaced.add(packed);
+			job.monumentPlacedKinds.add(kind);
+			budget--;
+			done++;
+			sx += pos.getX() + 0.5D;
+			sy += pos.getY() + 0.5D;
+			sz += pos.getZ() + 0.5D;
+		}
+		if (done > 0) {
+			Vec3 centroid = new Vec3(sx / done, sy / done, sz / done);
+			Fx.send(level, centroid, FxType.KEHANCURAN, KehancuranFxIds.SHIMMER, done, (float) Math.min(8.0D, 1.0D + Math.sqrt(done)));
+			if (server.getTickCount() % 10 == 0) {
+				level.playSound(null, centroid.x, centroid.y, centroid.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 1.2F, 0.6F);
+			}
+		}
+		if (job.monumentIndex >= job.monumentCells.length) {
+			JOBS.pollFirst();
+			finish(server, job, false);
+		}
+	}
+
+	/** Inside the box of what this job carved. */
+	private static boolean insideCarve(Job job, BlockPos pos) {
+		return pos.getX() >= job.carveMinX && pos.getX() <= job.carveMaxX && pos.getY() >= job.carveMinY && pos.getY() <= job.carveMaxY + 1
+				&& pos.getZ() >= job.carveMinZ && pos.getZ() <= job.carveMaxZ;
+	}
+
+	/** Some entity (an item, a mob, a player) stands in the cell; the planted weapon itself never counts. */
+	private static boolean occupied(ServerLevel level, BlockPos pos) {
+		return !level.getEntities((net.minecraft.world.entity.Entity) null, new AABB(pos),
+				entity -> !entity.isSpectator() && !(entity instanceof dev.kultivator.pusakalangit.TitahMonumentEntity)).isEmpty();
+	}
+
+	/** The box around the monument cells this tick may look at. */
+	private static AABB monumentBox(Job job, int reads) {
+		long[] cells = job.monumentCells;
+		int end = Math.min(cells.length, job.monumentIndex + reads);
+		if (job.monumentIndex >= end) {
+			return new AABB(job.centre);
+		}
+		int minX = Integer.MAX_VALUE;
+		int minY = Integer.MAX_VALUE;
+		int minZ = Integer.MAX_VALUE;
+		int maxX = Integer.MIN_VALUE;
+		int maxY = Integer.MIN_VALUE;
+		int maxZ = Integer.MIN_VALUE;
+		for (int i = job.monumentIndex; i < end; i++) {
+			long packed = cells[i];
+			minX = Math.min(minX, BlockPos.getX(packed));
+			minY = Math.min(minY, BlockPos.getY(packed));
+			minZ = Math.min(minZ, BlockPos.getZ(packed));
+			maxX = Math.max(maxX, BlockPos.getX(packed));
+			maxY = Math.max(maxY, BlockPos.getY(packed));
+			maxZ = Math.max(maxZ, BlockPos.getZ(packed));
+		}
+		return new AABB(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
 	}
 
 	/** A player stands on (or just above) {@code pos}: no magma under their feet. */
@@ -907,10 +1200,46 @@ public final class WorldBreaker {
 				KehancuranLog.record(server, job.owner, job.ownerName, job.disciple, job.shape, job.dimension, job.centre, job.changed, job.restore);
 			}
 		}
+		if (job.clear) {
+			// Phase 10b (29.6.3): a monument clear never feeds the restore buffer; what it could not reach goes back to the registry
+			List<Long> leftPositions = new ArrayList<>();
+			List<BlockState> leftStates = new ArrayList<>();
+			for (int i : job.deferred) {
+				leftPositions.add(job.positions[i]);
+				leftStates.add(job.placed == null ? Blocks.AIR.defaultBlockState() : job.placed[i]);
+			}
+			for (int i = job.index; i < job.positions.length; i++) {
+				leftPositions.add(job.positions[i]);
+				leftStates.add(job.placed == null ? Blocks.AIR.defaultBlockState() : job.placed[i]);
+			}
+			try {
+				dev.kultivator.pusakalangit.TitahMonuments.onClearFinished(server, job.clearId, job.owner, job.dimension,
+						leftPositions.stream().mapToLong(Long::longValue).toArray(), leftStates.toArray(new BlockState[0]));
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Kultivator: Titah clear callback failed", exception);
+			}
+			return;
+		}
 		ServerPlayer owner = server.getPlayerList().getPlayer(job.owner);
 		int minutes = KultivatorConfig.get().kehancuranUndoMinutes;
 		if (job.undoable && !job.undoPositions.isEmpty()) {
 			addUndo(server, new Undo(nextUndo++, job, server.overworld().getGameTime() + minutes * 1200L));
+		}
+		if (job.titah) {
+			// Phase 10b (29.6.3, 29.7.1): the placed monument (kept in the saved record) and the DONE callback (re-seating)
+			try {
+				if (!job.monumentPlaced.isEmpty()) {
+					byte[] kinds = new byte[job.monumentPlacedKinds.size()];
+					for (int i = 0; i < kinds.length; i++) {
+						kinds[i] = job.monumentPlacedKinds.get(i);
+					}
+					dev.kultivator.pusakalangit.TitahMonuments.onMonumentPlaced(server, job.recordId, job.owner, job.dimension,
+							job.monumentPlaced.stream().mapToLong(Long::longValue).toArray(), kinds);
+				}
+				dev.kultivator.pusakalangit.TitahMonuments.onJobDone(server, job.recordId, job.jobId);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Kultivator: Titah job callback failed", exception);
+			}
 		}
 		int left = job.restore ? rebuffer(server, job) : 0;
 		if (owner == null) {

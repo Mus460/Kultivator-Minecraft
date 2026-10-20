@@ -557,6 +557,10 @@ public final class CastPoses {
 		if (pose == Pose.MEDITATE_FLOAT || pose == Pose.PRAY || pose == Pose.FLAME_CUP) {
 			return Mth.clamp(duration > 0 ? duration : 60, 20, MAX_HOLD);
 		}
+		if (spec.has(TechniqueSpec.Flag.TITAH)) {
+			// Phase 10b (29.5): a decree holds its call until its next beat (the throw, the seal's rise, the stars' fall)
+			return Mth.clamp(duration > 0 ? Math.min(duration, 40) : 20, 10, 40);
+		}
 		return switch (kind) {
 			case BEAM, FRONT, WAVE, RAIN, VOLLEY, CHAIN -> Mth.clamp(duration > 0 ? duration : 10, 6, 30);
 			case ZONE, PILLAR -> Mth.clamp(duration > 0 ? duration : 12, 8, 30);
@@ -819,6 +823,12 @@ public final class CastPoses {
 		t("karmic_hex", Pose.FINGER_POINT);
 		t("six_dao_reincarnation", Pose.SEAL);
 		t("heavenly_fate_finger", Pose.FINGER_POINT);
+		// Phase 10b Titah Langit (DESIGN 29.5): fallbacks when TitahArts authors no pose of its own. The second beat plays on
+		// the decree's next event (Tiang: the javelin throw of the iron pillar into heaven).
+		t("titah_pedang", Pose.SWORD_SKY);
+		t("titah_tiang", Pose.CHARGE_OVERHEAD, Pose.JAVELIN_THROW);
+		t("titah_bintang", Pose.PRAY, Pose.FINGER_POINT);
+		t("titah_gunung", Pose.HOLD_ITEM_UP, Pose.SEAL);
 		// legacy techniques (TechniqueRegistry.legacy)
 		t("qi_palm", Pose.PALM_THRUST);
 		t("flame_palm", Pose.PALM_THRUST);

@@ -138,6 +138,9 @@ public final class Payloads {
 		public static final int ABADI_CIPTAAN = 4;
 		public static final int ABADI_LELANG = 5;
 
+		/** Phase 10b (DESIGN 29.2.2): the Titah Langit jade-scroll menu; its data comes first in a {@link TitahSync}. */
+		public static final int TITAH = 9;
+
 		/** Tab {@code arg} of {@link #INFO}: the Jalan tablet (DESIGN 19.2.2, {@code /kultivasi jalan}). Same as {@code CultivationScreen.TAB_JALAN}. */
 		public static final int TAB_JALAN = 5;
 		/** Tab {@code arg} of {@link #INFO}: the Kitab Alkimia (DESIGN 19.2.2, {@code /kultivasi resep}). Same as {@code CultivationScreen.TAB_ALKIMIA}. */
@@ -648,6 +651,39 @@ public final class Payloads {
 
 		@Override
 		public Type<DampakDebris> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * Phase 10b (DESIGN 29.10 C10b.5): the Titah Langit menu's data, sent when the menu opens or a value changes (at most
+	 * {@link #MAX_BYTES}). Keys: {@code selected} (0-3), {@code kehancuranOn}, {@code kawahOn}, {@code bypass},
+	 * {@code recover} (ticks of the shared seal recovery left), {@code skills} (a list of 4 compounds in Skill order:
+	 * {@code unlocked}, {@code why} (a lang key when locked, else ""), {@code cdLeft} and {@code cdMax} (ticks),
+	 * {@code k}, {@code d} (0-100), {@code v}, {@code h}, {@code m}, {@code kMax}, {@code readout} (a plain line of
+	 * numbers) and {@code ro} {rVis, rDmg, blocks, cdSec, qiPct, carveR}). Routed to
+	 * {@code client.pusakalangit.TitahClient.onSync}.
+	 */
+	public record TitahSync(CompoundTag data) implements CustomPacketPayload {
+		public static final int MAX_BYTES = 8192;
+		public static final Type<TitahSync> TYPE = typeOf("titah_sync");
+		public static final StreamCodec<RegistryFriendlyByteBuf, TitahSync> CODEC = StreamCodec.of(
+				(buf, p) -> ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, p.data),
+				buf -> new TitahSync(ByteBufCodecs.TRUSTED_COMPOUND_TAG.decode(buf)));
+
+		/** Sends {@code data} to the player (skipped for vanilla clients); over {@link #MAX_BYTES}: a warning and {too_big}. */
+		public static void send(net.minecraft.server.level.ServerPlayer player, CompoundTag data) {
+			CompoundTag out = data == null ? new CompoundTag() : data;
+			if (out.sizeInBytes() > MAX_BYTES) {
+				Kultivator.LOGGER.warn("TitahSync is {} bytes, over the {} byte budget; not sent", out.sizeInBytes(), MAX_BYTES);
+				out = new CompoundTag();
+				out.putBoolean("too_big", true);
+			}
+			Net.send(player, new TitahSync(out));
+		}
+
+		@Override
+		public Type<TitahSync> type() {
 			return TYPE;
 		}
 	}

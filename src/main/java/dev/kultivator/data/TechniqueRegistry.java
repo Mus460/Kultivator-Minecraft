@@ -87,6 +87,8 @@ public final class TechniqueRegistry {
 		module("ImmortalArts", 1000, 1099, ImmortalArts::register);
 		// Phase 9 (DESIGN 26.14 item 15): the three self-created art slots own_art_1..3.
 		module("CiptaanArts", 1100, 1199, dev.kultivator.batin.CiptaanArts::register);
+		// Phase 10b (DESIGN 29.3.1): the four Titah Langit decrees titah_pedang..titah_gunung, cast only by the seal.
+		module("TitahArts", 1200, 1299, dev.kultivator.pusakalangit.TitahArts::register);
 		freeze();
 		Kultivator.LOGGER.info("Kultivator: {} technique specs ({} for the player), {} special handlers", all.size(), playerTotal(), SPECIALS.size());
 		if (net.fabricmc.loader.api.FabricLoader.getInstance().isDevelopmentEnvironment()) {

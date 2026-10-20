@@ -233,6 +233,13 @@ public final class SpecLint {
 		if (dampak.rideTicks() > Dampak.MAX_RIDE_TICKS) {
 			out.add("Dampak rideTicks " + dampak.rideTicks() + " > " + Dampak.MAX_RIDE_TICKS);
 		}
+		// Phase 10b (DESIGN 29.7.3): the Film Pusaka belongs to the Titah decrees only, at most 240 ticks in all
+		if (dampak.ride() == Dampak.Ride.FILM && !spec.titah()) {
+			out.add("Dampak ride FILM without the TITAH flag");
+		}
+		if (dampak.ride() == Dampak.Ride.FILM && (dampak.filmTicks() <= 0 || dampak.filmTicks() > Dampak.MAX_FILM_TICKS)) {
+			out.add("Dampak filmTicks " + dampak.filmTicks() + " outside 1-" + Dampak.MAX_FILM_TICKS);
+		}
 		if (dampak.ride() == Dampak.Ride.FULL && dampak.climaxAt() < dampak.rideTicks() && spec.charge() == null) {
 			out.add("Dampak FULL ride of " + dampak.rideTicks() + " ticks cannot end on a climax at " + dampak.climaxAt() + " (not charged)");
 		}
@@ -242,7 +249,8 @@ public final class SpecLint {
 				out.add("Dampak climaxAt " + dampak.climaxAt() + " but the first step sending " + spec.climaxPhase() + " runs at " + first);
 			}
 		}
-		if (dampak.sigilTrench() && spec.destruction().isEmpty()) {
+		if (dampak.sigilTrench() && spec.destruction().isEmpty() && !spec.titah()) {
+			// (a Titah decree burns its trenches through Kehancuran.submitTitah, not through spec shapes)
 			out.add("Dampak sigilTrench without Mode Kehancuran shapes");
 		}
 		String monument = dampak.monument();

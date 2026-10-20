@@ -46,7 +46,11 @@ public final class Shapes {
 		SCATTER("scatter"),
 		ARC("arc"),
 		FAN("fan"),
-		STRIP("strip");
+		STRIP("strip"),
+		/** Phase 10b (DESIGN 29.7.2): the square terraced pit of Titah Pemindah Gunung. */
+		STEPPED_PIT("stepped_pit"),
+		/** Phase 10b (DESIGN 29.7.2): the shock ring's flattening of natural ground above the impact level. */
+		SHAVE("shave");
 
 		private final String id;
 
@@ -156,6 +160,22 @@ public final class Shapes {
 			return new Spec(Kind.STRIP, 0, 0, length, 0, 0, false, 0, degrees);
 		}
 
+		/**
+		 * {@code STEPPED_PIT hw/steps/d} (Phase 10b, 29.7.2): square terraces; terrace i (0..steps-1) removes the columns
+		 * within Chebyshev distance hw x (1 - i / steps) of the anchor, d deep each, below the anchor's surface level.
+		 */
+		public static Spec steppedPit(int halfWidth, int steps, int depth) {
+			return new Spec(Kind.STEPPED_PIT, halfWidth, depth, 0, 0, Math.max(1, steps), false, 0, 0.0D);
+		}
+
+		/**
+		 * {@code SHAVE r h} (Phase 10b, 29.7.2): natural blocks only, in a disc r, from each column's top down to at most h
+		 * blocks and never below {@code impactY + 1}; top-down, centre-out.
+		 */
+		public static Spec shave(int radius, int height) {
+			return new Spec(Kind.SHAVE, radius, Math.max(1, height), 0, 0, 0, true, 0, 0.0D);
+		}
+
 		/** The same shape, natural blocks only. */
 		public Spec natural() {
 			return new Spec(kind, radius, depth, length, width, spacing, true, inner, angle);
@@ -241,6 +261,8 @@ public final class Shapes {
 			case ARC -> arc(level, centre, direction, spec);
 			case FAN -> fan(level, centre, direction, spec);
 			case STRIP -> strip(level, centre, direction, spec);
+			case STEPPED_PIT -> steppedPit(level, centre, spec.radius(), spec.spacing(), Math.max(1, spec.depth()));
+			case SHAVE -> shave(level, centre, spec.radius(), Math.max(1, spec.depth()));
 		};
 	}
 
@@ -666,6 +688,85 @@ public final class Shapes {
 					} else if (state.canOcclude()) {
 						break;
 					}
+				}
+			}
+		}
+		list.sort(Comparator.comparingInt((BlockPos pos) -> -pos.getY()).thenComparingDouble(pos -> horizontal(pos, centre)));
+		return air(list);
+	}
+
+	/** Blocks above the pit's base level a STEPPED_PIT column may open (higher columns are left: no lids, no cliffs). */
+	private static final int PIT_HILL = 6;
+
+	/**
+	 * STEPPED_PIT hw/steps/d (Phase 10b, DESIGN 29.7.2): the base is the anchor's surface (or impact block); a column at
+	 * Chebyshev distance c goes down {@code d} x (the terraces covering it) below the base, from its own top (at most
+	 * {@link #PIT_HILL} above the base; higher columns are skipped). Ordered outer terrace first, each top-down, so a cut
+	 * at the block cap still reads as a shallow square pit.
+	 */
+	static List<Change> steppedPit(ServerLevel level, BlockPos anchor, int half, int steps, int depth) {
+		BlockPos centre = impact(level, anchor);
+		if (centre == null || half <= 0) {
+			return List.of();
+		}
+		int base = centre.getY();
+		int n = Math.max(1, steps);
+		List<BlockPos> list = new ArrayList<>();
+		List<Double> keys = new ArrayList<>();
+		for (int dx = -half; dx <= half; dx++) {
+			for (int dz = -half; dz <= half; dz++) {
+				int c = Math.max(Math.abs(dx), Math.abs(dz));
+				int covering = 0;
+				for (int i = 0; i < n; i++) {
+					if (c <= half * (1.0D - (double) i / n) + 1.0E-6D) {
+						covering++;
+					}
+				}
+				if (covering <= 0) {
+					continue;
+				}
+				Integer top = surface(level, centre.getX() + dx, centre.getZ() + dz);
+				if (top == null || top > base + PIT_HILL) {
+					continue;
+				}
+				int floor = base - covering * depth + 1;
+				for (int y = top; y >= floor; y--) {
+					BlockPos pos = new BlockPos(centre.getX() + dx, y, centre.getZ() + dz);
+					int terrace = Math.max(0, Math.min(n - 1, (base - y) / Math.max(1, depth)));
+					list.add(pos);
+					// outer terrace first, then top-down, then outside-in
+					keys.add(terrace * 1.0E7D + (base + PIT_HILL - y) * 1.0E4D + (half - c));
+				}
+			}
+		}
+		return air(sortBy(list, keys));
+	}
+
+	/**
+	 * SHAVE r h (Phase 10b, DESIGN 29.7.2): the flattening shock ring. In a disc r around the impact, each column's top is
+	 * taken down by at most h blocks and never below {@code impactY + 1}; natural blocks only (the caller plans it as
+	 * MODE_NATURAL, so a log or a built block on top keeps its whole column). Top-down, then centre-out.
+	 */
+	static List<Change> shave(ServerLevel level, BlockPos anchor, int radius, int height) {
+		BlockPos centre = impact(level, anchor);
+		if (centre == null || radius <= 0) {
+			return List.of();
+		}
+		int floor = centre.getY() + 1;
+		List<BlockPos> list = new ArrayList<>();
+		double limit = (radius + 0.5D) * (radius + 0.5D);
+		for (int dx = -radius; dx <= radius; dx++) {
+			for (int dz = -radius; dz <= radius; dz++) {
+				if (dx * dx + dz * dz > limit) {
+					continue;
+				}
+				Integer top = surface(level, centre.getX() + dx, centre.getZ() + dz);
+				if (top == null || top < floor) {
+					continue;
+				}
+				int lowest = Math.max(floor, top - height + 1);
+				for (int y = top; y >= lowest; y--) {
+					list.add(new BlockPos(centre.getX() + dx, y, centre.getZ() + dz));
 				}
 			}
 		}

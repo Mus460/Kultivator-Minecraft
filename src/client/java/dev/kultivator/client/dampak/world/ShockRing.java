@@ -26,6 +26,10 @@ import java.util.List;
  * second, fainter ring 8 ticks later to 1.4 R. A ring wider than 16 b takes a large layer. Variants: DUST, EMBER (flame
  * front), FROST (snow front and packed-ice spikes rising along it, staying 10 s), VOID (contracts to 0.3 R first, then
  * bursts out), GOLD (glow motes). Minimal: a particle ring.
+ * <p>
+ * Titah Langit rings ({@link #startTitah}, DESIGN 29.8) may reach 256 b: they grow over 12-40 ticks (at most about 6.5 b
+ * per tick), draw 64 / 96 segments with a wider band, take two large layers above 64 b, and fall back to a dotted particle
+ * ring at Minimal.
  */
 final class ShockRing {
 
@@ -47,10 +51,21 @@ final class ShockRing {
 		final double start;
 		final boolean second;
 		final boolean dust;
+		/** Ticks to the full radius (12; Titah rings 12-40). */
+		final int grow;
+		/** A Titah ring (its own segment table, wider band, two layers above 64 b). */
+		final boolean titah;
 		boolean spikesDone;
 		int lastParticleTick = -1;
 
 		Ring(Vec3 centre, float radius, String variant, int rgb, float alpha, boolean own, double start, boolean second, boolean dust) {
+			this(centre, radius, variant, rgb, alpha, own, start, second, dust, GROW, false);
+		}
+
+		Ring(Vec3 centre, float radius, String variant, int rgb, float alpha, boolean own, double start, boolean second, boolean dust, int grow,
+			 boolean titah) {
+			this.grow = Math.max(1, grow);
+			this.titah = titah;
 			this.centre = centre;
 			this.radius = radius;
 			this.variant = variant;
@@ -63,7 +78,7 @@ final class ShockRing {
 		}
 
 		int growTicks() {
-			return "VOID".equals(variant) ? GROW + VOID_IN : GROW;
+			return "VOID".equals(variant) ? grow + VOID_IN : grow;
 		}
 
 		int life() {
@@ -77,10 +92,10 @@ final class ShockRing {
 					float t = age / VOID_IN;
 					return radius * (0.8F - 0.5F * t * t);
 				}
-				float t = Math.min(1.0F, (age - VOID_IN) / GROW);
+				float t = Math.min(1.0F, (age - VOID_IN) / grow);
 				return radius * (0.3F + 0.7F * cubic(t));
 			}
-			return radius * cubic(Math.min(1.0F, age / GROW));
+			return radius * cubic(Math.min(1.0F, age / grow));
 		}
 
 		float alphaAt(float age) {
@@ -115,6 +130,35 @@ final class ShockRing {
 			add(new Ring(centre, Math.min(64.0F, radius * 1.4F), kind, rgb, 0.45F * othersAlpha, own, now + SECOND_DELAY, true, false));
 		}
 		DampakWorld.touchGeometry();
+	}
+
+	/**
+	 * A Titah ring (DESIGN 29.8): radius {@code r} up to 256 b (already clamped by the caller to this client's tier and
+	 * render distance), growing over 12-40 ticks, with its second ring 1.4 R (≤ 256) {@code SECOND_DELAY} later when
+	 * {@code twin}. "Daya dampak" scales it by 0.8-1.2 like every ring.
+	 */
+	static void startTitah(Vec3 centre, float r, String variant, int rgb, boolean own, int delay, boolean twin) {
+		if (centre == null || !Double.isFinite(centre.x) || !Double.isFinite(centre.y) || !Double.isFinite(centre.z) || !(r > 0.5F)) {
+			return;
+		}
+		if (DampakWorldBudget.othersFactor(own) <= 0.0F) {
+			return;
+		}
+		float othersAlpha = own ? 1.0F : Math.max(0.35F, DampakWorldBudget.othersFactor(false));
+		String kind = variant == null ? "DUST" : variant;
+		float radius = Math.min(256.0F, r * DampakWorldBudget.ringScale());
+		double now = DampakWorld.clock(0.0F) + Math.max(0, delay);
+		add(new Ring(centre, radius, kind, rgb, 0.95F * othersAlpha, own, now, false, true, titahGrow(radius), true));
+		if (twin) {
+			float second = Math.min(256.0F, radius * 1.4F);
+			add(new Ring(centre, second, kind, rgb, 0.5F * othersAlpha, own, now + SECOND_DELAY, true, false, titahGrow(second), true));
+		}
+		DampakWorld.touchGeometry();
+	}
+
+	/** Grow ticks of a Titah ring: 12 + r / 8, at most 40 (a 256 b ring sweeps about 6.4 b per tick). */
+	private static int titahGrow(float radius) {
+		return Math.max(GROW, Math.min(40, Math.round(GROW + radius / 8.0F)));
 	}
 
 	private static void add(Ring ring) {
@@ -185,8 +229,9 @@ final class ShockRing {
 
 	/** Minimal (and the geometry fallback): a dust particle ring. */
 	private static void particleRing(ClientLevel level, Ring ring, float r) {
-		int n = DampakParticles.grant(Math.min(48, 12 + Math.round(r * 2.0F)));
-		ParticleOptions dust = new net.minecraft.core.particles.DustParticleOptions(ring.rgb & 0xFFFFFF, 1.4F);
+		// a Titah ring wider than the tier draws is a dotted ring: fewer dots per block, bigger dots
+		int n = DampakParticles.grant(ring.titah ? Math.min(96, 16 + Math.round(r * 0.75F)) : Math.min(48, 12 + Math.round(r * 2.0F)));
+		ParticleOptions dust = new net.minecraft.core.particles.DustParticleOptions(ring.rgb & 0xFFFFFF, ring.titah ? 2.2F : 1.4F);
 		for (int i = 0; i < n; i++) {
 			double angle = Math.PI * 2.0D * i / Math.max(1, n);
 			double x = ring.centre.x + Math.cos(angle) * r;
@@ -319,17 +364,22 @@ final class ShockRing {
 				continue;
 			}
 			float r = ring.radiusAt(age);
-			if (r < 0.3F || frame.dist2(ring.centre.x, ring.centre.y, ring.centre.z) > (r + 96.0D) * (r + 96.0D)) {
+			double reach = r + (ring.titah ? 160.0D : 96.0D);
+			if (r < 0.3F || frame.dist2(ring.centre.x, ring.centre.y, ring.centre.z) > reach * reach) {
 				continue;
 			}
 			if (r > 16.0F && !EpicBudget.takeLarge()) {
 				continue;
 			}
-			int n = r < 6.0F ? Math.max(16, segments / 2) : segments;
+			if (ring.titah && r > 64.0F && !EpicBudget.takeLarge()) {
+				// a Titah ring above 64 b is two large layers (DESIGN 29.8)
+				continue;
+			}
+			int n = ring.titah ? Math.max(segments, DampakWorldBudget.TITAH_RING_SEGMENTS[index]) : r < 6.0F ? Math.max(16, segments / 2) : segments;
 			if (!EpicBudget.takeQuads(n)) {
 				continue;
 			}
-			float width = Math.max(0.8F, Math.min(4.0F, r * 0.22F));
+			float width = ring.titah ? Math.max(1.2F, Math.min(10.0F, r * 0.08F)) : Math.max(0.8F, Math.min(4.0F, r * 0.22F));
 			float inner = Math.max(0.0F, r - width);
 			int outerColor = ARGB.color(Math.round(a * 255.0F), ring.rgb);
 			int innerColor = ARGB.color(Math.round(a * 90.0F), ring.rgb);

@@ -15285,3 +15285,854 @@ impact frames of a spec), `sunyi <jarak>` (a test boom at that distance), `tanda
 25. Ganti dimensi, putus koneksi, `uji dampak berhenti` → semua puing, sel, sigil dan monumen hilang.
 26. Teks: setiap kunci `dampak.*.json` dan `dampak_server.*.json` ada di en_us dan id_id dengan kunci yang sama;
     `uji teknik audit` tidak melaporkan peringatan Dampak.
+
+---------------------------------------------------------------------------------------------------------------------
+
+## 29. Phase 10b — Pusaka Langit
+
+**Status:** design, verified by the lore and feasibility pass (29.15). Nothing in the code is edited yet. Code basis:
+HEAD `3d0792d` (Phase 10 Dampak Langit is built). Minecraft APIs are checked against `butterbot-fabric/reference/mcsrc`.
+
+**Request (2026-10-20):** "Make everything yourself up to rimuru's level", with "3D AND objects", for example a giant
+sword that stays planted in the ground as a real object. We build our own cultivation versions of the four weapons of
+that sky-strike mod. As in Phase 10, only the **presentation ideas** of its public description are used. None of its
+code, models, textures or sounds are copied.
+
+**One summoner, four world-scale decrees, one persistent object:**
+
+| Their weapon | Our decree (game name) | One line |
+|---|---|---|
+| The Shooting Star (sky beam) | **Pedang Pemisah Langit** (Heaven-Splitting Sword) | A sword of Heaven's decree falls point-first down a pillar of light. The land splits along the aim. The sword stays planted. |
+| Gungnir (thrown spear: silent strike, molten crater, stays planted) | **Tiang Penenang Samudra** (Sea-Stabilising Pillar) | The iron pillar thrown into heaven comes back down in silence. The shock ring flattens the land into a molten crater, and the pillar keeps standing. |
+| Seven Stars (constellation, star impacts, burning lines) | **Tujuh Bintang Biduk Utara** (Seven Stars of the Northern Dipper) | The Dipper is drawn onto the land. Seven stars fall in order, star crystals grow, and the lines ignite. |
+| Tesseract (light grid, cells torn out and lifted) | **Titah Pemindah Gunung** (Mountain-Moving Decree) | A square jade seal stamps the land. A light grid cuts it into cells that heaven carries off. A stepped glowing pit is left behind. |
+
+---
+
+### 29.0 Amendments and naming
+
+| Rule | Amendment (10b only) |
+|---|---|
+| 28.1.1 rule 2 "no entity is added on the server" | Still holds for every Phase 10 ultimate. **Exception:** Titah Pedang and Titah Tiang add one saved, inert server entity, `kultivator:titah_monument` (29.6.1). It is never a mob, never hurts, never drops anything. |
+| 28.10 "no real block remnant" | Still holds for every Phase 10 ultimate. **Exception:** a Titah cast under Mode Kehancuran may build a capped **block monument** from two new no-drop blocks. It is built only by WorldBreaker inside the same job, with undo records, and is removed by a clear job (29.6.3). The 28.10 objections are answered there: no drops (no farming), never touched by any other carve (own protection rule), and removal does not depend on the in-memory undo window. |
+| 28.10 monuments are client-only | Titah Pedang and Titah Tiang leave the saved entity. Phase 10 ultimates keep client props, unless the op sets `titahUltimateMonuments` (default false, no reward). |
+| 28.3 ride ≤ 80 ticks | A new `Dampak.Ride.FILM`, ≤ 240 ticks (12 s), only for specs with flag `TITAH`. It is several short segments (each ≤ 80 ticks, each validated) joined by masked cuts. It obeys every 7b gate, Penuh/Singkat/Mati and Backspace (29.4). |
+| 22.11.3 caps (radius 12, 4,096 blocks) | Titah jobs get their own clamped caps (29.3.2). Every other technique keeps 22.11 exactly. |
+| Name clash | "Pusaka Langit" is already the title of advancement `artifact_langit` (`lang-src/tempa.*`). The phase keeps "Pusaka Langit" as its internal name. In game it is called **Titah Langit** (item "Segel Titah Langit", menu "Titah Langit", advancements `titah_*`). Package `dev.kultivator.pusakalangit`. |
+
+---
+
+### 29.1 Principles (binding; they extend 0, 22.11, 23.1 and 28.1)
+
+#### 29.1.1 Blocks
+1. **Blocks change only through `kehancuran/WorldBreaker`**, and only when the caster's own opt-in Mode Kehancuran
+   switch is on (`Kehancuran.selfOn`). Without it, every Titah effect is visual only: displays, quads, particles and
+   the saved monument entity, which is not a block.
+2. A Titah carve is a self job (22.11.5) submitted through a new `Kehancuran.submitTitah`. It uses the same protected
+   zones, never-touched list, caster safe column, unsafe-neighbour rule, MSPT pause and the shared
+   `kehancuranBlocksPerTick` (48). It always runs with **0 % drops** whatever `kehancuranDropsPct` says, so it is
+   always undoable (anti-farm). If `kehancuranUndoMinutes == 0`, the carve still runs but no block monument is built.
+3. The block monument places only `kultivator:batu_pusaka` and `kultivator:urat_pusaka`:
+   - no item form, `noLootTable()`, so a broken monument drops nothing (Silk Touch, explosions and the Wither included);
+   - placed only into **air inside the job's own carve** (29.6.3);
+   - both blocks are on the WorldBreaker **never-touched** list for every other job (carves, surface passes, Destroyer
+     Arts), so only the Titah's own restore or clear job ever changes them;
+   - Pulihkan removes them (inside the undo window); pulling the weapon out, expiry, revocation or `/kill` removes them
+     through the clear job (29.6.3), also after a restart.
+4. Never `LightningBolt`, `Explosion`, fire blocks, fluids, falling-block entities, weather, time or tick-rate changes.
+   Lightning visuals use the 7b `BoltRenderer`. "Molten" is the Phase 10 palette pass plus the client glow.
+5. Disciples never cast Titah. Disciple Destroyer Arts are unchanged.
+
+#### 29.1.2 Targets and damage
+- Damage goes through the 6c choke point (`TechniquePower.finalDamage`) with `Targeting.isHostileTo`: monsters and mobs
+  attacking the caster. Never the caster, pets, villagers or passive animals.
+- Other players are hit only as sparring/duel partners. But **a Titah cannot start during a duel, sparring,
+  tournament, breakthrough, heart-demon trial or realm run**, so in practice it never hits players.
+- Boss cap (22.14.2), trial-mob rule, `abadi_foe` intake clamps and the Ender Dragon rule apply unchanged.
+- **Per-target total per cast ≤ 28 × P**, the Dewa PAMUNGKAS band (22.5.6): Pedang 12 + 16, Tiang 18 + 10, Bintang
+  3 × 6 + 5 × 1.0 DOT = 23, Gunung 20. Controls stay inside the 22.3 whitelist (stun 1 s, LEVITATION 30 t ≤ 40 t,
+  Weakness II 5 s).
+- **Kerusakan** scales the authored coefficient from 0 to 100 %. It never goes above the authored value; 0 % is pure
+  spectacle. **Kekuatan** (size) never raises per-target damage; the damage radius stays ≤ 40 (the Dewa WAVE/DOMAIN cap).
+
+#### 29.1.3 Camera (7b)
+- The film is for the **own client only**. Kamera **Penuh** gives the film, **Singkat** the 28.3 crane, **Mati** nothing.
+- Never in real danger (the 28.3.4 gates). Any movement key ends it, Backspace skips it, a hurt snaps back.
+  "Kurangi gerak" forces Mati, and the global "Perjalanan langit" = `Mati` also wins over the per-decree setting.
+- The server never waits for the camera.
+
+#### 29.1.4 Performance (the user's laptop is weak)
+- The heavy-shader look is faked:
+  - nested additive quads;
+  - `glow_strip.png` / `ring_soft.png`;
+  - `SkyDirector` grades and `ClientLevel.setSkyFlashTime` (client presentation only, not weather);
+  - full-bright displays and HUD layers.
+- No post chain, no core shader and no new `RenderPipeline`. The invert frame uses the existing `RenderPipelines.GUI_INVERT`.
+- All geometry draws from `EpicBudget` (× `PACK_QUADS` 0.6 under a shader pack) and `DampakWorldBudget`. Particles go
+  through `FxBudget` / `EffectQuality.scale`.
+- Idle cost is one boolean per system.
+
+#### 29.1.5 Verified 26.3 API (new uses; Phase 10's list in 28.1.5 still applies)
+
+| Area | Verified API |
+|---|---|
+| Entity | `Entity.interact(Player, InteractionHand, Vec3)` (3 args); `hurtServer(ServerLevel, DamageSource, float)` (abstract); `defineSynchedData(SynchedEntityData.Builder)`; `readAdditionalSaveData(ValueInput)` / `addAdditionalSaveData(ValueOutput)` (`putInt`, `putLong`, `putFloat`, `putString`, `putIntArray`, `store(name, Codec, value)`, `child`, `list`) |
+| Entity flags | `setNoGravity`, `setPermanentlyInvulnerable`, `isPickable`, `canBeHitByProjectile` (vanilla returns `isAlive() && isPickable()`, so it **must** be overridden to false), `isPushable`, `canBeCollidedWith(@Nullable Entity)`, `getPistonPushReaction`, `isIgnoringBlockTriggers`, `canUsePortal(boolean)`, `shouldRenderAtSqrDistance`, `skipAttackInteraction`, `onRemoval(RemovalReason)` (`KILLED` and `DISCARDED` have `shouldDestroy()` true; `UNLOADED_TO_CHUNK`, `UNLOADED_WITH_PLAYER`, `CHANGED_DIMENSION` false), `kill(ServerLevel)` → `remove(KILLED)`, `discard()` → `remove(DISCARDED)` |
+| EntityType.Builder | `sized`, `fireImmune`, `noSummon`, `noLootTable`, `clientTrackingRange`, `updateInterval`, `build(ResourceKey)`; we leave out `noSave` so the entity is saved. Precedent: `alam/RealmRelicEntity` (same inert overrides, but `noSave`) |
+| Block | `BlockBehaviour.Properties.of().strength(float, float).lightLevel(ToIntFunction).noLootTable().pushReaction(PushReaction).setId(ResourceKey)` |
+| Heightmap | `Heightmap.Types.MOTION_BLOCKING_NO_LEAVES` (read-only `getHeight`) |
+| Client | `EntityRenderers.register`; `EntityRenderer.getBoundingBoxForCulling` / `affectedByCulling` (protected, override); `ItemModelResolver.updateForNonLiving` (the `client/batin/MeteorRenderer` pattern); `AbstractSliderButton(x, y, w, h, Component, double)` with `updateMessage()` / `applyValue()`; `SoundManager.playDelayed(SoundInstance, int)` |
+| Particles | `ParticleTypes.END_ROD`, `FLAME`, `LAVA`, `GLOW`, `ELECTRIC_SPARK`, `SCRAPE` |
+
+---
+
+### 29.2 The summoner: Segel Titah Langit (`kultivator:heaven_decree_seal`)
+
+**Look:** a square white-jade seal with a gold cord and a coiled-dragon knob, carved with the glyph 敕 ("by decree").
+This is a design object; the Sumber line says so ("Segel Titah Langit adalah rancangan permainan; titah Langit yang
+dibawa Panglima Langit mengikuti 26.5.3").
+
+**Sources (cultivation, no shop, no random loot):**
+1. **First victory over the Panglima Langit** (26.5.3, `purba/HeavenlyWrath`, next to the `heaven_general` grant):
+   the seal is granted once per player, flag `extra.titah.granted`. Story text: "the Panglima's decree seal falls from
+   his hand".
+2. **Crafting** (shapeless, `data/kultivator/recipe/heaven_decree_seal.json`): 6 `heaven_seal_shard` + 2
+   `immortal_origin_stone` + 1 `soul_seal_jade`. This gives the shards a second sink. A second seal gives nothing
+   extra: cooldowns, settings and monument caps live on the **player** (`extra.titah`), not on the item.
+
+**Item rules:**
+- `stacksTo(1)`, `Rarity.EPIC`.
+- It binds to its first user (component `kultivator:titah_owner`, UUID). Others get: "Segel ini sudah mengenali tuannya."
+- Tooltip shows the selected decree, its cooldown and the Sumber line.
+
+| Input | Effect |
+|---|---|
+| right-click | casts the **selected** decree at the crosshair (aim range `titahRange` 128, one read-only `Targeting.blockHit`) |
+| sneak + right-click | opens the **Titah Langit** jade-scroll menu |
+| `/kultivasi titah` | opens the menu without holding the seal (it must be in the inventory) |
+| `/kultivasi titah daftar` | lists own monuments: coordinates, days left |
+
+#### 29.2.1 Gates
+
+| Gate | Value |
+|---|---|
+| use the seal | realm `TRUE_IMMORTAL` (Dewa Abadi) |
+| Pedang / Tiang / Bintang / Gunung | Dewa Abadi Awal / Tengah / Akhir / Puncak |
+| Kekuatan maximum | Awal ×3, Tengah ×5, Akhir ×7, Puncak or ★27+ ×10 (then the config caps of 29.3.2) |
+| qi | `qiPct` 85 (Dewa ultimate band 70-90) |
+| cooldown | Pedang 600 s, Tiang 600 s, Bintang 900 s, Gunung 900 s (Dewa band 300-900), × `sqrt(max(1, Kekuatan))` (×10 → ×3.16, so a larger decree only waits longer); shared seal recovery 60 s; shares `TechniquePower.ULTIMATE_LOCKOUT` (400 t) with every PAMUNGKAS |
+| refusals (spend nothing) | duel or sparring (`Sparring.inDuel`, `DuelRules.inDuel`), tournament, breakthrough, heart-demon trial, realm run (`alam/RealmRun`, `alam_rahasia`), `Techniques.castBlocker`, another Titah of the same caster still active |
+
+`/kultivasi uji pusaka_langit bypass nyala` skips realm, cooldown and qi, through `TechniqueRunner.setBypass` plus a
+Titah flag.
+
+#### 29.2.2 The menu: Titah Langit (jade scroll, 5b style, fits 320×240; M2)
+
+- **Left column:** four `SealCard`s (Pedang, Tiang, Bintang, Gunung), each showing lock state, cooldown ring and the
+  decree glyph (劍 柱 斗 山). Clicking one selects it, and right-click with the seal casts it.
+- **Right panel**, for the selected decree:
+
+| Row | Control | Range (step) | Stored |
+|---|---|---|---|
+| Kekuatan (ukuran) | `JadeSlider`, log steps | 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 7, 10 (above the realm limit greyed with a red seal) | server, `extra.titah.s<i>.k` |
+| Kerusakan | `JadeSlider` | 0-100 % (10) | server, `.d` |
+| Kecepatan (incl. film) | `JadeSlider` | 0.3, 0.5, 0.75, 1, 1.5, 2, 3 | server, `.v` |
+| Hancurkan tanah | `JadeCoin` | Ikut / Tidak; shown only while Mode Kehancuran is on; default Ikut | server, `.h` |
+| Tinggalkan pusaka | `JadeCoin` | Ya / Tidak (Pedang, Tiang); default Ya | server, `.m` |
+| Film | three seals | Penuh / Singkat / Mati; default Penuh | client, `titah_film_<skill>` in `kultivator-client.json` |
+
+- **Readout line**, computed by the server and sent in the sync: "Jari-jari ≈ 96 b · luka ≤ 40 b · ≤ 8.192 blok ·
+  jeda 16 mnt · qi 85 %".
+- **Hint line:** "Backspace: lewati film · Gerak: hentikan kamera".
+- **Talismans:** *Pilih*, *Bawaan* (reset this decree), *Peringatan cahaya* (opens `PhotosensitivityScreen`).
+- The server sanitises every value (clamped to the steps and the realm limit).
+
+---
+
+### 29.3 Shared skill rules
+
+#### 29.3.1 Runtime (6c engine, no registry change at runtime)
+
+Four fixed specs in a new net-id block, `TechniqueRegistry.module("TitahArts", 1200, 1299, TitahArts::register)`,
+added after CiptaanArts and before `freeze()`, registered like `batin/CiptaanArts` (`sink.special(...)` stub plus
+`art(id, net, null)`):
+
+| net | id | Spec |
+|---|---|---|
+| 1200 | `titah_pedang` | Dao null, `grade(DEWA, 0)`, `type(PAMUNGKAS)`, `realm(TRUE_IMMORTAL)`, flags `NO_TEACH`, `NO_ECHO`, **`TITAH`** (new), `special("titah")`, keep-alive step, qiPct 85, cd per 29.2.1, Dampak row of 29.5.5 |
+| 1201 | `titah_tiang` | same |
+| 1202 | `titah_bintang` | same |
+| 1203 | `titah_gunung` | same |
+
+- **`TechniqueSpec.Flag.TITAH`** (appended): never in the loadout (`Loadout.castable` false), never learned, codex
+  section "Titah Langit", no mastery (level fixed at 0), no feats.
+- **The cast:** only `Titah.cast` → `TechniqueRunner.cast(player, spec, options)` with a per-cast `TitahSettings`
+  snapshot (`CastOptions.DEFAULT`, or `CastOptions.TEST` for test casts). The special handler `TitahSkill` reads the
+  snapshot (like `OwnArt` reads the creation) and builds its steps with `ctx.run(...)` / `ctx.schedule(...)`.
+- **Timing:** step ticks are authored at Kecepatan 1. Each authored tick becomes `t' = round(t / v)`, with the
+  build-up clamped to 30-300 ticks.
+- **Abort:** if the caster dies, changes dimension or logs out before the climax, the cast ends (ABORT, no strike,
+  qi stays spent, cooldown halved).
+
+**TechFx encoding** (no new cast packet; every Phase 10 client path works unchanged; `aux` is an int):
+
+| Field | Meaning on a Titah event |
+|---|---|
+| `radius` | R_vis (visual radius, already clamped) |
+| `length` | line length (Pedang) or square half-side (Gunung) |
+| `duration` | on CAST: ticks to the climax (the film times itself to it); on pre-impact TRAVEL: ticks to land |
+| `count` | stars (7) or cells per side |
+| `aux` | bits 0-9 Kecepatan × 100 (≤ 300); bit 10 monument planned; bit 11 real Kehancuran; bits 12-13 skill |
+| `index`, `of` | star order for Bintang |
+
+#### 29.3.2 Scale defaults and caps
+
+| | Pedang | Tiang | Bintang | Gunung |
+|---|---|---|---|---|
+| base R_vis at ×1 | line 96 (±48), ring 48 | ring 64 | sigil 48 | square half-side 32 |
+| R_vis | `base × Kekuatan` clamped to [4, `titahVisualRadiusMax`]; on the client also ≤ `renderDistance × 16 − 16` | | | |
+| damage radius | `min(R_vis, titahDamageRadiusMax)` per evaluation; lines are 16-b travelling segments (22.15) | | | |
+| real carve radius | `min(0.25 × R_vis, titahCarveRadiusMax)` | | | |
+| real blocks per cast | `≤ titahBlocksPerCast` (one block cap per cast, split by shape as 22.11.3) | | | |
+
+Config (`KultivatorConfig`, clamped on load):
+
+| Key | Default | Range |
+|---|---|---|
+| `titahEnabled` | true | |
+| `titahVisualRadiusMax` | 128 | 32-256 |
+| `titahDamageRadiusMax` | 40 (the Dewa WAVE/DOMAIN cap) | 16-64 |
+| `titahCarveRadiusMax` | 24 | 8-48 |
+| `titahBlocksPerCast` | 8,192 (≈ 8.5 s at 48 blocks per tick) | 1,024-32,768 |
+| `titahMonumentBlocks` | 96 | 0-256 (0 = no block monuments) |
+| `titahMonumentDays` | 3 | 1-14 |
+| `titahMonumentsPerPlayer` | 3 | 1-8 |
+| `titahMonumentsPerWorld` | 12 | 1-32 |
+| `titahRewardsPerDay` | 3 | 0-10 |
+| `titahRange` | 128 | 64-192 |
+| `titahUltimateMonuments` | false | |
+
+**Queue:** one Titah job per owner; `WorldBreaker.MAX_PER_OWNER` (2) and `MAX_JOBS` (8) still hold. If a Titah or two
+other self jobs of the owner are queued, the cast still happens visually and the bar says "Bumi masih runtuh —
+kehancuran dilewati". Titah jobs never merge (`merge()` skips them). `noteCarved` uses the job's own cap.
+
+---
+
+### 29.4 Film Pusaka (Ride FILM, M2)
+
+**Acts** (presentation ticks at Kecepatan 1; the total equals the CAST `duration` and is ≤ 240):
+
+| Act | Share | Camera (every segment ≤ 80 ticks and passes `Shot.validate`: ≤ 7.6 b/s, ≤ 25°/s, crane ≤ 24 b) | On screen |
+|---|---|---|---|
+| F1 **Tanda** | 0-0.15 | over the shoulder onto the mark | the Tanda Langit pillar and ring lock on; crosshair seal |
+| F2 **Naik** | 0.15-0.35 | 28.3 R1 rise beside the pillar; cloud wipe at the end | qi motes stream up |
+| cut | | masked, `CloudWipe.cover() ≥ 0.8` | |
+| F3 **Istana** | 0.35-0.65 | world-anchored high above the aim, slow 15° yaw (two segments if > 80 t) | the decree's vista (29.4.1): the weapon is forged, drawn or summoned in heaven; title card of the decree (7b `TitleCard`, jade style) |
+| cut | | second wipe, ≥ 1 s after the first | |
+| F4 **Turun** | 0.65-1 | 28.3 R3 behind and above the falling weapon | speed lines, FOV punch −8 % |
+| impact | | instant cut under the impact frame | silence, then the delayed boom (28.4.3) |
+| F5 **Akibat** | +40 after the climax, only if still safe | low crane reveal circling the planted weapon / pit (≤ 20°) | the shock ring's second wave, debris, molten glow; 10-tick blend to the eye |
+
+- New `Shots.Type.PUSAKA_FILM(80)`: the per-segment maximum stays 80; only the film's total (≤ 240) is new.
+- **Kecepatan:** the film follows the server build-up. Below 120 ticks, F3 shortens first, then F2 is dropped. Below
+  40 ticks it falls back to 28.3 Singkat. It **never** speeds the camera past the caps.
+- **Above 240 ticks** (Kecepatan < 1): F1 and F3 hold still poses, and the film starts at `climax − 240`.
+- Counts as `KIND_ULTIMATE`, inside the Penuh scene cap of 400.
+- **Settings:** per-decree Film (29.2.2) and the global "Perjalanan langit". `Pertama` acts as `Selalu` for Titah,
+  because the per-decree Film control is the player's explicit choice; global `Mati` and "Kurangi gerak" always win;
+  Backspace always skips.
+
+#### 29.4.1 New vistas (`Dampak.Vista`, appended after `BY_DAO`; sky-projected, 1-2 large layers)
+
+| Vista | Built from | Lore |
+|---|---|---|
+| `ISTANA_LANGIT` | `GateRenderer` gate plus gold `RaysRenderer`; the `heaven_splitting_sword` prop lowered from the gate | the Lingxiao Hall of the Celestial Court, *Journey to the West* (setting only) |
+| `LAUT_TIMUR` | a dark sea plane under the clouds, a dragon-palace glint, the `dinghai_pillar` rising out of it and growing | JttW ch. 3 (the East Sea Dragon King Ao Guang's treasury) |
+| `BIDUK_UTARA` | starfield; seven bright star sprites joined in Dipper order (Tianshu → Yaoguang) | Beidou, Daoist lore |
+| `KUA_E` | two vast silhouettes (`GiantFigureRenderer`) stooping beneath the clouds, the jade seal between them | *Liezi*, Tang Wen (the two sons of the Kua'e clan; drawing them as giants is design) |
+
+---
+
+### 29.5 The four decrees (storyboards at Kecepatan 1)
+
+**Common to all four:**
+- Times are ticks after the CAST.
+- Frames are written `frame1 / frame2 / frame3` (INV = the Penuh invert). Penuh frames only after the photosensitivity
+  screen was acknowledged (28.4.1).
+- Lembut and Mati follow 28.4.1 exactly.
+- Every visual plays without Kehancuran; the real parts need the switch and Hancurkan tanah = Ikut.
+
+#### 29.5.1 Pedang Pemisah Langit (`titah_pedang`): Shooting Star analogue
+
+**Sumber:** "Terinspirasi dari: Pangu memisahkan langit dan bumi (*Sanwu Liji*, Xu Zheng, abad ke-3; teks itu tidak
+menyebut senjata). Pedang Titah dan Istana Langit sebagai latarnya adalah rancangan permainan (Istana Lingxiao dari
+*Perjalanan ke Barat*)."
+
+| t | Phase | What happens |
+|---|---|---|
+| 0 | CAST | pose `SWORD_SKY`; Tanda **PATH**: a white-gold line along the aim (length 2 × R_vis line) plus a **PILLAR** of light from the clouds onto the impact point, narrowing as it locks on; sky grade gold-dusk |
+| 20 | EXTRA1 | the gate opens above the impact (vista `ISTANA_LANGIT` for the film; bystanders see a gold ring tear in the clouds, a sky-projected `RingRenderer`) |
+| 60 | EXTRA2 | the sword appears in the tear; pre-impact TRAVEL from h 120, duration 40: the sword falls point-first down the pillar, a widening light trail behind it |
+| 100 | IMPACT, climax, silence 8 | nova r 10 **DMG 12** + stun 20 t; frames **INV / 0xFFF4D0 / 0xFF2A1A** (white, then red); hit-stop 3; ShockRing GOLD to R_vis |
+| 104 | EXTRA3 "Bumi terbelah" | a cleaving front runs **both ways** along the aim from the impact (visual 8 b/t; damage front w 3, **DMG 16**, each side ≤ damage cap × 2, each target hit once); WAKE debris; `CLEAVE_LINE` sigil lights outward |
+| 140 | EXTRA4 | second ring 1.4 R, dust wall; the planted sword hums (light breathing) |
+
+- **Monument:** the `heaven_splitting_sword` entity, PLANTED at the impact, tilt 10° toward the caster, scale 12
+  (× Kekuatan^0.5, 6-24).
+- **Real (K):**
+  - BOWL r 6 at the impact;
+  - two FISSURE L × 3 × d with d = ceil(L / 8) ≤ 12, L ≤ `2 × titahCarveRadiusMax`;
+  - SHAVE ring r = carve radius, h 6 (29.7.2);
+  - palette SWORD (calcite scour), with the fissure lips joining the pass;
+  - block monument "Penyangga Pedang" (29.6.3).
+
+#### 29.5.2 Tiang Penenang Samudra (`titah_tiang`): Gungnir analogue
+
+**Sumber:** "*Perjalanan ke Barat* bab 3: di perbendaharaan Raja Naga Laut Timur tersimpan besi sakti penetap dasar
+Sungai Langit, tiang yang dipakai Yu Agung untuk menetapkan kedalaman sungai dan laut saat menjinakkan banjir. Tiang itu
+mulai memancarkan cahaya ketika Sun Wukong datang; itulah Ruyi Jingu Bang. Melempar tiang dari langit, kawah lebur dan
+mencabutnya kembali adalah rancangan permainan."
+
+This is distinct from `ruyi_staff` (the toppling-staff smash). Here the pillar plays its first role, the planted
+pillar of the sea.
+
+| t | Phase | What happens |
+|---|---|---|
+| 0 | CAST | pose `CHARGE_OVERHEAD` → new `JAVELIN_THROW` at 10; the pillar leaves the hand and streaks straight up into the sky (TRAVEL up, ember trail); Tanda **PILLAR** in ember red plus a ring with glyph 定 on the aim |
+| 30 | EXTRA1 | film: vista `LAUT_TIMUR`, the pillar grows in the sea of clouds and its gold hoops flare; bystanders see a red star overhead |
+| 90 | EXTRA2 | pre-impact TRAVEL from h 160, duration 30: a thin white-hot streak with a heat-haze trail (additive quads) and a sky flash at its start |
+| 120 | IMPACT, climax, **silence 12** (the strike lands mute) | core r 6 **DMG 18** + entity fire 6 s; frames **0xFFFFFF / 0xFF7A1A / 0x1A0A05** (white, ember, dark); hit-stop 3; ShockRing EMBER to R_vis, an ember wall front |
+| 128 | EXTRA3 | flattening wave: ring r = damage cap **DMG 10** + knockback 1.5 (never on players); grass and leaf particles blown outward |
+| 160+ | | the pillar's hoops glow, cooling over 60 s; molten decal 30 s |
+
+- **Monument:** the `dinghai_pillar` entity, UPRIGHT, sunk 25 %, scale 10 (5-20).
+- **Real (K):**
+  - BOWL r = carve radius (default ≤ 24);
+  - SHAVE r × 1.5 (still ≤ `titahCarveRadiusMax` × 1.5), h 8: the shock ring flattens hills above the impact level,
+    natural blocks only;
+  - STRIP r × 2: foliage blown flat;
+  - palette FIRE (molten bowl, magma ≥ 6 b from the caster and never under a standing player);
+  - block monument "Alas Penenang".
+
+#### 29.5.3 Tujuh Bintang Biduk Utara (`titah_bintang`): Seven Stars analogue
+
+**Sumber:** "Beidou, tujuh bintang Biduk Utara: Tianshu, Tianxuan, Tianji, Tianquan, Yuheng, Kaiyang, Yaoguang. Dalam
+*Soushen Ji* (Gan Bao, abad ke-4) Guan Lu menjelaskan bahwa Biduk Selatan mengatur kehidupan dan Biduk Utara mengatur
+kematian. Mazhab Shangqing berjalan mengikuti bintang-bintang Biduk (bugang). Bintang yang jatuh, kristal dan parit
+menyala adalah rancangan permainan."
+
+| t | Phase | What happens |
+|---|---|---|
+| 0 | CAST | pose `PRAY` → `FINGER_POINT`; sky grade night-blue with star brightness up (presentation only, **no time change**); seven star sprites flare in the sky above; Tanda **RING_ONLY** plus a faint `BEIDOU_SEVEN` outline projected at R_vis |
+| 20-56 | EXTRA1 ×7 (6 t apart) | each node lights and its incoming line draws from star to star |
+| 60 | EXTRA2 | film vista `BIDUK_UTARA` |
+| 100-136 | EXTRA0 ×7 (6 t apart, Tianshu → Yaoguang) | each star falls (pre-impact TRAVEL 10 t, a `star_core` model wrapped in white fire); impact r 8 **DMG 6** (one target takes at most 3 stars per cast), small VOID ShockRing tinted ember-violet by the client, a **star crystal** (`star_core` grounded plus 3 `AMETHYST_CLUSTER` / `END_ROD` displays) grows on the spot |
+| 140 | climax, silence 6 | the lines **ignite**: burning trench light along every segment; DOT strip w 2 along the lines **1.0 / s for 5 s**; frames **INV / 0xB57CFF / 0x2A1050** (violet); the handle star Yaoguang shoots a last sky pillar |
+
+- **Monument:** no persistent entity. The seven crystals are client props kept for 120 s (Normal), 60 s (Minimal).
+  They are visual only and never a block.
+- **Real (K):**
+  - one SCATTER r 3 with 7 points at the stars (≤ 12 points per cast, 22.11.3);
+  - sigil trenches along the six segments, 2 wide and 2 deep (28.9.3, share raised to 30 % for Titah; 6 ≤
+    `Kehancuran.MAX_SIGIL_TRENCHES` 24);
+  - palette LIGHTNING (tuff, smooth basalt, fulgurite glass) with the trench floors in the pass.
+
+#### 29.5.4 Titah Pemindah Gunung (`titah_gunung`): Tesseract analogue
+
+**Sumber:** "Terinspirasi dari *Liezi*, bab Tang Wen: Penguasa Langit tersentuh oleh ketulusan Yu Gong (Orang Tua
+Bodoh) dan menyuruh dua putra keluarga Kua'e memikul kedua gunung itu pergi. Raksasa, segel giok, kisi cahaya dan
+lubang berundak adalah rancangan permainan."
+
+`fantian_seal` is not used: that idea is already `heaven_turning_seal`.
+
+| t | Phase | What happens |
+|---|---|---|
+| 0 | CAST | pose `HOLD_ITEM_UP` → `SEAL`; the `yishan_seal` (a square jade seal with a mountain knob) leaves the hand and rises; Tanda: PILLAR plus four corner brackets of the square |
+| 30 | EXTRA1 | **light grid**: `GRID` pattern over the square (side 2H), cells `c = clamp(2H / 8, 2, 16)` b |
+| 60 | EXTRA2 | **SHADOW** mark: the seal's square shadow grows; pre-impact TRAVEL from h 96, duration 30; film vista `KUA_E` |
+| 90 | IMPACT, climax, silence 6 | the seal stamps; every hostile in the square (≤ damage cap) gets LEVITATION 30 t; frames **INV / 0xFFE8A0 / 0x6A4AFF** (gold, violet); hit-stop 3 |
+| 95-135 | EXTRA3 | **cells torn out**: each cell becomes a 3D slab (top / dirt / stone BlockDisplays) rising 30-60 b and turning 2-5°/t, then drifting off toward the sky (the Kua'e giants carry them), then crumbling in the clouds |
+| 125 | EXTRA4 | the levitated foes slam down: **DMG 20** + Weakness II 5 s; the seal lifts away and fades |
+
+- **Monument:** none (the seal returns to heaven).
+- **Real (K):**
+  - new shape **STEPPED_PIT** (29.7.2): a square terraced pit of side ≤ 2 × carve radius, 3-5 terraces each 2 deep;
+  - palette EARTH;
+  - the terrace edges glow through the client `MoltenGlow` decal (violet-gold) for 30 s.
+
+#### 29.5.5 Dampak rows (authored in `TitahArts` by M1; M2 and M3 read them, never hard-code ids)
+
+| id | mark | ride | vista | frames | silence | debris | ring | palette | sigil (trench) |
+|---|---|---|---|---|---|---|---|---|---|
+| `titah_pedang` | PATH + PILLAR | FILM | ISTANA_LANGIT | INV / 0xFFF4D0 / 0xFF2A1A | 8 | WAKE | GOLD | SWORD | CLEAVE_LINE (no) |
+| `titah_tiang` | PILLAR | FILM | LAUT_TIMUR | 0xFFFFFF / 0xFF7A1A / 0x1A0A05 | 12 | BURST | EMBER | FIRE | DINGHAI_RINGS (no) |
+| `titah_bintang` | RING_ONLY | FILM | BIDUK_UTARA | INV / 0xB57CFF / 0x2A1050 | 6 | BURST | VOID | LIGHTNING | BEIDOU_SEVEN (yes, 30 %) |
+| `titah_gunung` | SHADOW | FILM | KUA_E | INV / 0xFFE8A0 / 0x6A4AFF | 6 | LIFT | DUST | EARTH | GRID (no) |
+
+Silence values stay inside the `Dampak` clamp (≤ 20). Client monuments (`Dampak.monument`) stay null for Pedang and
+Tiang, because the entity is the monument.
+
+---
+
+### 29.6 Persistent monuments ("3D and objects")
+
+#### 29.6.1 Entity `kultivator:titah_monument` (`TitahMonumentEntity extends Entity`, M1)
+
+**Registration** (like `alam/AlamEntities`, but saved):
+```java
+EntityType.Builder.<TitahMonumentEntity>of(TitahMonumentEntity::new, MobCategory.MISC)
+    .sized(1.2F, 4.0F).fireImmune().noSummon().noLootTable()
+    .clientTrackingRange(10).updateInterval(20).build(KEY)   // saved: no noSave()
+```
+
+**Behaviour:** no AI and no gravity (`setNoGravity(true)`), `MobCategory.MISC` (never despawns).
+- `hurtServer` always returns false; `setPermanentlyInvulnerable(true)`.
+- `isPushable` false; `canBeCollidedWith` false; `isPickable` true, so it can be targeted for use;
+  `canBeHitByProjectile` **false** (vanilla would let arrows hit it because it is pickable).
+- `getPistonPushReaction` IGNORE; `isIgnoringBlockTriggers` true; `canUsePortal` false; `skipAttackInteraction` true.
+
+**Synced data** (`defineSynchedData`):
+
+| Field | Type | Meaning |
+|---|---|---|
+| `MODEL` | byte | 0 `heaven_splitting_sword`, 1 `dinghai_pillar`, 2 `heaven_punishing_sword`, 3 `zhuxian_sword` (2-3 only with `titahUltimateMonuments`) |
+| `SCALE`, `TILT` | float | model scale and tilt |
+| `STATE` | byte | 0 settling, 1 standing, 2 pulling, 3 leaving |
+| `STATE_TICK` | int | game time the state began |
+| `OWNER_NAME` | String | shown in the look-at tooltip |
+| `BORN` | long | for heat and cooling |
+
+**Saved data** (`addAdditionalSaveData(ValueOutput)` / `readAdditionalSaveData(ValueInput)`): record id, owner UUID,
+model, scale, tilt, born, expires, `rewarded` and `test` flags.
+
+**Seating:** for the first 400 ticks, and on the job's DONE callback, it re-seats every 20 ticks to
+`getHeight(MOTION_BLOCKING_NO_LEAVES)` minus the sink, a read-only call, so it stays planted while the crater forms
+under it.
+
+**Expiry and revocation:** checked every 100 ticks against `TitahMonuments` (SavedData `kultivator_titah_monuments`).
+When expired or revoked: STATE 3 (rise and fade over 40 t), then `discard()`.
+
+**`onRemoval(reason)`:** if `reason.shouldDestroy()` (KILLED from `/kill`, DISCARDED), it hands the record to
+`TitahMonuments.release(recordId)`, which drops the record and queues the block-monument clear (29.6.3). `release` is
+**idempotent** (our own `discard()` after a pull or expiry also arrives here as DISCARDED). `UNLOADED_*` and
+`CHANGED_DIMENSION` do nothing.
+
+#### 29.6.2 Pulling it out (the only interaction)
+
+- **Owner, sneak + use** (`interact(player, hand, location)`, any hand): STATE 2 for 40 ticks.
+  - Client: the weapon rises 1.5 b with shaking, dust and debris bursts, the glow brightens, then a white-gold column
+    carries it up and away.
+  - The owner must stay ≤ 4 b and alive, or the pull cancels.
+- **At the end:** the reward if eligible, the block-monument clear job, then `discard()`. Action bar: "Pusaka dicabut —
+  kembali ke langit".
+- **Anyone else:** "Pusaka milik {owner} — hanya pemiliknya yang bisa mencabutnya." Ops can run
+  `/kultivasi uji pusaka_langit monumen hapus_semua`.
+
+**Reward** (one modest gift, never farmable):
+- 1 `spirit_stone_high` (`SpiritStones.stack(SpiritStones.HIGH, 1)`, made at grant time) plus a refill of 20 % of max qi.
+- Only if all of these hold:
+  - it is a real (non-test, non-bypass) Titah cast;
+  - age ≥ 600 ticks;
+  - not already rewarded (one per cast);
+  - the owner is under `titahRewardsPerDay` (3) per game day, counted as `level.getGameTime() / 24000` (sleeping
+    does not reset it, unlike `getDayTime`);
+  - it is not an ultimate monument.
+- Monuments are limited by cooldowns (10-47 min), the per-player and per-world caps and expiry, so the yield is a few
+  high stones per hour. Those are trivial at Dewa Abadi.
+
+**Caps:**
+- `TitahMonuments` counts live, non-expired records per player (3) and per world (12).
+- A new cast beyond a cap revokes the **oldest** record. A loaded entity leaves at once; an unloaded one leaves when its
+  chunk loads. Its block monument is cleared at once (the clear job waits for unloaded chunks).
+- Records expire by game time even if never loaded again, so stale records never block the cap.
+
+#### 29.6.3 Block monument (Mode Kehancuran only, `titahMonumentBlocks` > 0, undo window > 0)
+
+**Blocks** (M1 registration; M3 assets), both with no item, `noLootTable()`, `pushReaction(BLOCK)`:
+
+| Block | Name | Look | Strength / light |
+|---|---|---|---|
+| `kultivator:batu_pusaka` | Batu Pusaka | dark jade-black stone | `strength(50, 1200)`, like obsidian (hard, but a player may break it, for nothing) |
+| `kultivator:urat_pusaka` | Urat Pusaka | glowing gold veins | the same, `lightLevel(s -> 10)` |
+
+**Shapes** (planned by `TitahSkill` at the climax, passed in `TitahPlan.monument`, ≤ cap; the planted point's own column
+stays free for the entity):
+- *Penyangga Pedang* (Pedang): a cradle of three stepped square rings around the planted point (3×3 minus centre,
+  5×5, 7×7: 48 blocks) plus 8 vein lines of 4 → 80.
+- *Alas Penenang* (Tiang): an octagonal base ring of radius 3, 2 high, with 8 veins under the hoops → 60.
+
+**WorldBreaker monument phase** (after carve and surface, same job, same undo entry, same per-tick budget):
+1. A position is placed only if all of these hold:
+   - it is AIR now and was **carved by this job**, or it is air directly above a crater-floor block inside the carve's
+     bounding box;
+   - not in a zone (re-checked per batch), not in the caster safe column and not `touchesUnsafe`;
+   - no entity AABB intersects it, and `standing` is false.
+2. **Undo rewrite:** at a carved position P, the existing undo record (old = stone, placed = AIR) gets
+   `placed = batu_pusaka` (the job keeps a position → undo-index map for this). It must be a rewrite, not a second
+   record: the restore puts `old` back only where the block is air or still `placed`, so two records for P would end
+   with AIR and lose the stone. Pulihkan then restores the original stone wherever the monument block is still there. A
+   new position (air above the floor) gets a new record (AIR, block).
+3. The placed list (positions plus kind bytes) goes to `TitahMonuments.onMonumentPlaced(recordId, ...)` and is kept in
+   the record, which persists across restarts.
+
+**Clear job** (pull-out, expiry, revocation, `/kill`): `WorldBreaker.submitClear(owner, dim, long[] positions,
+BlockState[] placed)`.
+- A restore-flavoured job that sets AIR only where the current state is still the placed monument state.
+- No zones checked (it removes only our own blocks).
+- Waits for unloaded chunks; logged.
+- The undo buffer is **in memory and lost on restart** (WorldBreaker). Inside the undo window, a later Pulihkan still
+  restores the stone where the position is now air. After a restart or after the window, the clear job leaves the
+  crater as carved, which is what a Pulihkan-less carve leaves anyway.
+
+**Never:** valuable blocks, block entities, gravity blocks, fluids, vanilla light-source blocks; anything in a
+protected zone; anything when drops > 0 or the undo window is 0.
+
+---
+
+### 29.7 Server additions in detail (M1)
+
+#### 29.7.1 `Kehancuran.submitTitah` (contract C10b.3)
+```java
+public static SelfResult submitTitah(ServerPlayer caster, String specId, List<Shapes.Placed> shapes,
+                                     TitahPlan plan);   // never throws, never spends or refunds
+public record TitahPlan(int blockCap, int carveRadius, Dampak.Palette palette, int debrisFlags,
+                        int recordId, long[] monumentPositions, byte[] monumentKinds) {}
+```
+- It re-checks `selfOn`, the realm and `titahEnabled`, then builds like `build(...)` (≤ 2 builds per tick, DEFERRED
+  queue of 8).
+- Job flags: `titah = true`, `carveCap = plan.blockCap`, drops 0, no merge.
+- The DONE callback is `TitahMonuments.onJobDone(recordId, jobId)`.
+
+#### 29.7.2 New shape kinds (appended after `STRIP` 14; ordinals are never reordered)
+
+| # | Kind | Geometry |
+|---|---|---|
+| 15 | `STEPPED_PIT hw/steps/d` | square terraces: terrace i (0..steps−1) removes the columns with Chebyshev distance ≤ hw × (1 − i / steps), d deep below the surface of the anchor's level; order outer to inner, top-down |
+| 16 | `SHAVE r h` | natural blocks only (20.3.21 `nat` list), above `impactY + 1` up to `impactY + h`, in a disc r; top-down, centre-out |
+
+#### 29.7.3 Other server pieces
+- **`SigilPattern`** (appended after `DAO_CIRCLE`, pure geometry):
+  - `BEIDOU_SEVEN`: the seven Dipper stars of the `BEIDOU_NINE` table without Zuofu and Youbi, yaw from the aim,
+    joined in order;
+  - `CLEAVE_LINE`: rune ticks every 4 b along ±L with a cross bar at the impact;
+  - `DINGHAI_RINGS`: three concentric rings with 8 hoop ticks and the glyph 定.
+- **`Dampak`:** `Ride.FILM`; `filmTicks` (builder, default 0); vistas appended (29.4.1). SpecLint: FILM only with flag
+  TITAH and `filmTicks ≤ 240`; `rideTicks ≤ MAX_RIDE_TICKS` (80) unchanged for the rest.
+- **`Pose.JAVELIN_THROW`** appended after `FLAME_CUP` (M2 authors its keyframes in `CastPoses`).
+- **WorldBreaker never-touched:** `batu_pusaka` and `urat_pusaka` for every job except the Titah restore and clear.
+
+---
+
+### 29.8 Client budgets (M2 / M3)
+
+| | Minimal | Normal | Maximal |
+|---|---|---|---|
+| R_vis drawn | ≤ 48 b (larger becomes a dotted particle ring) | ≤ 128 | ≤ 256 (and ≤ render distance) |
+| ShockRing segments | particles | 64 | 96 (rank-6 large layer; ring > 64 b uses 2 layers) |
+| sigil segments (sampled every max(1, R/64) b) | dust dots | 256 | 512 |
+| lift cells (3 displays each) | 0 | 12 cells | 32 cells |
+| star crystals | 0 (particles) | 7 + 7 displays | 7 + 21 displays |
+| debris displays | 16 | 96 | 256 (the shared Phase 10 pool, −6,000,000 ids) |
+| falling weapon | particle column | model prop plus 2 bloom quads | plus a halo pillar |
+| monument entity extras | none (the model only) | heat glow, 1 mote / 4 t | plus hoop or edge glow quads |
+
+- Others' casts are scaled by `othersScale()`. `FLAG_LOW_LOAD` gives rings and sigils only. The 7b frame guard
+  (`EpicBudget`) lowers the tier.
+- The monument renderer draws the item model full-bright while hot (heat = 1 − age / 1200), then normal light.
+  `getBoundingBoxForCulling` is inflated to the model's size (`FxModels.Info.scale × SCALE`). `shouldRenderAtSqrDistance`
+  allows ≤ 160 b (the tracking range of 10 chunks).
+- Sodium: entity and displays only, no chunk meshes. Iris: the monument renders in the shadow pass (a real entity);
+  FX quads skip the shadow pass (28.1.4).
+
+---
+
+### 29.9 Spine (orchestrator, before the modules; must compile alone with stubs)
+
+1. `TechniqueRegistry.module("TitahArts", 1200, 1299, TitahArts::register)` (stub registers the 4 ids) and
+   `TechniqueSpec.Flag.TITAH`; `Loadout.castable` / codex hide TITAH.
+2. `Actions.TITAH = 45` with routing to `PusakaLangit.handleAction`; `OpenScreen.TITAH = 9`;
+   `Payloads.TitahSync(CompoundTag)` (S2C, ≤ 8 KB) registered in `Net`.
+3. `EpicIds.EXTRA_TITAH = 24` (title card plus the PULL beat).
+4. Enum appends:
+   - `Shapes.Kind` STEPPED_PIT 15, SHAVE 16;
+   - `SigilPattern` BEIDOU_SEVEN, CLEAVE_LINE, DINGHAI_RINGS;
+   - `Dampak.Ride.FILM` + `filmTicks`, `Dampak.Vista` ISTANA_LANGIT, LAUT_TIMUR, BIDUK_UTARA, KUA_E;
+   - `Pose.JAVELIN_THROW`;
+   - `Shots.Type.PUSAKA_FILM(80)`.
+5. `KultivatorConfig` fields of 29.3.2 with clamps.
+6. Registration stubs: item `heaven_decree_seal`, blocks `batu_pusaka` / `urat_pusaka` (no block items), entity
+   `titah_monument` with the public getters of C10b.4.
+7. Client stubs: `TitahClient.init()` (one line in `KultivatorClient` after `DampakClient.init()`), `TitahWorld.init()`,
+   an empty `TitahScreen`.
+8. `lang-src/spine10b.en_us.json` + `.id_id.json` (registry names: item, both blocks, entity) with identical keys.
+
+---
+
+### 29.10 Modules (exactly three, disjoint files) and contracts
+
+#### M1: server and shared (`src/main`, `data/**`, server lang)
+
+**New:**
+- `pusakalangit/PusakaLangit.java` (init, `handleAction`, commands `titah`, `titah daftar`, `uji pusaka_langit ...`)
+- `Titah.java` (C10b.1), `TitahItems.java` (item, blocks, entity type)
+- `HeavenDecreeSealItem.java`
+- `TitahArts.java` (4 specs, Dampak rows, poses, fx, sounds, Sumber keys)
+- `TitahSkill.java` (`SpecialTechnique`: steps, damage, scaling, shapes, plan)
+- `TitahSettings.java` (data in `extra.titah`, sanitising, `TitahSync`)
+- `TitahMonumentEntity.java`
+- `TitahMonuments.java` (SavedData registry, caps, expiry, reward, `release`, `onJobDone`, `onMonumentPlaced`)
+- `TitahTests.java`
+- `data/kultivator/recipe/heaven_decree_seal.json`
+- `data/kultivator/advancement/titah_first.json`, `titah_all.json`, `titah_pull.json`
+- `lang-src/pusaka_langit.en_us.json` + `.id_id.json`
+
+**Edits:**
+- `data/TechniqueRegistry.java`, `data/TechniqueSpec.java`
+- `technique/spec/run/Loadout.java`, `Codex.java`, `SpecLint.java`
+- `technique/spec/dsl/Dampak.java`, `SigilPattern.java`, `Pose.java`
+- `kehancuran/Shapes.java`, `Kehancuran.java`, `WorldBreaker.java` (Titah job fields, carve cap, no merge, monument
+  phase with undo rewrite, never-touched blocks, `submitClear`, DONE callback)
+- `network/Payloads.java`, `Net.java`, `Actions.java`
+- `KultivatorConfig.java`, `Kultivator.java` (init)
+- `purba/HeavenlyWrath.java` (one-time seal grant on the Panglima win)
+- `epic/EpicIds.java`
+
+#### M2: client cinema and GUI
+
+**New:**
+- `client/pusakalangit/TitahClient.java` (TitahSync receiver, screen opener, routes TITAH TechFx to the film)
+- `TitahScreen.java`
+- `client/screen/ui/JadeSlider.java` (extends `AbstractSliderButton`, jade style, discrete steps)
+- `client/pusakalangit/cinema/PusakaFilm.java`
+- `assets/kultivator/textures/gui/titah/*.png` + `tools/gen_titah_gui_textures.py`
+- `lang-src/pusaka_langit_client.en_us.json` + `.id_id.json`
+
+**Edits:**
+- `KultivatorClient.java` (one line)
+- `dampak/DampakClient.java`, `dampak/cinema/SkyRide.java` (FILM delegation), `Vistas.java` (4 vistas),
+  `TargetMark.java` (radius from `p.radius`, square brackets)
+- `epic/camera/Shots.java` (`Type.PUSAKA_FILM(80)`), `CinematicDirector.java`
+- `epic/EpicSettings.java` (`titahFilm(skill)`), `EpicClientCommands.java` (`/sinematik pusaka ...`)
+- `anim/CastPoses.java` (JAVELIN_THROW)
+
+#### M3: client world FX, models and the monument renderer
+
+**New:**
+- `client/pusakalangit/world/TitahWorld.java` (init registers `EntityRenderers.register(TitahItems.MONUMENT,
+  TitahMonumentRenderer::new)`; TechFx hub)
+- `TitahMonumentRenderer.java` (lazy `ModelFx.stack(id)` in `extractRenderState`, never in the constructor)
+- `StarFall.java`, `CleaveLine.java`, `LiftCarry.java`
+- `assets/kultivator/items/fx/{heaven_splitting_sword,dinghai_pillar,star_core,yishan_seal}.json` with their
+  `models/item/fx/*.json` and textures (all four are new models)
+- `items/heaven_decree_seal.json`, `models/item/heaven_decree_seal.json`
+- `blockstates/batu_pusaka.json`, `urat_pusaka.json`, `models/block/*.json`, `textures/block/batu_pusaka.png`,
+  `urat_pusaka.png`
+- `textures/item/heaven_decree_seal.png`
+
+**Edits:**
+- `tools/gen_fx_model_textures.py`
+- `anim/model/FxModels.java` (4 infos)
+- `dampak/world/DampakWorld.java` (Titah scale passthrough), `ShockRing.java` (R > 40, segment counts),
+  `TerrainLift.java` (cell-size parameter, 3-layer slabs, CARRY mode), `GroundSigil.java` + `SigilRenderer.java` (new
+  patterns, point cap by R), `DampakWorldBudget.java`
+
+#### Contracts
+
+**C10b.1 `pusakalangit/Titah` (M1, server):**
+```java
+public enum Skill { PEDANG, TIANG, BINTANG, GUNUNG }       // ordinal = net - 1200
+public record Settings(float kekuatan, float kerusakan, float kecepatan, boolean hancur, boolean monumen) {}
+public static Settings settings(ServerPlayer p, Skill s);
+public static @Nullable Component whyNot(ServerPlayer p, Skill s);
+public static boolean cast(ServerPlayer p, Skill s, boolean test);
+```
+
+**C10b.2 TechFx encoding:** 29.3.1. Phases per decree: 29.5. The client derives everything else from `spec.dampak()`.
+
+**C10b.3:** `Kehancuran.submitTitah` / `WorldBreaker.submitClear` (29.7.1, 29.6.3).
+
+**C10b.4 `TitahMonumentEntity` (M1 → M3):**
+```java
+public String modelId(); public float scale(); public float tilt(); public byte state();
+public float stateAge(float partial); public float heat(float partial); public String ownerName();
+```
+
+**C10b.5 TitahSync (M1 → M2):** CompoundTag with:
+- `skills[4]`: unlocked, cdLeft, k, d, v, h, m, kMax, readout;
+- `selected`, `kehancuranOn`.
+
+Actions `TITAH` arg = `op << 16 | skill << 8 | field`, text = value (op 0 sync, 1 set, 2 select, 3 reset).
+
+**C10b.6 (M2 → M3):** `TitahWorld.init()`, `TitahWorld.onTechFx(p, spec, phase, own, othersScale)` (called by
+`DampakClient` for TITAH specs), `TitahWorld.stats()`, `TitahWorld.clear()`.
+
+**Global rules:**
+- Text in `lang-src/<fragment>.en_us.json` + `.id_id.json` with identical keys.
+- Files keep their line endings.
+- ItemStacks are made lazily (never in static initializers or renderer constructors).
+- Server code never references a client class.
+
+---
+
+### 29.11 Test commands
+
+Server, op (`/kultivasi uji pusaka_langit ...`, M1):
+
+| Command | Does |
+|---|---|
+| `beri` | gives a bound seal |
+| `bypass nyala\|mati` | skips realm, cooldown and qi for Titah |
+| `<pedang\|tiang\|bintang\|gunung> [kekuatan] [kecepatan] [kerusakan]` | a test cast at the aim (`CastOptions.TEST`, no mastery, no reward); carves only with `uji teknik kehancuran nyala` and the own switch on |
+| `semua` | all four, 20 s apart, each 48 b further along the look |
+| `monumen <pedang\|tiang> [skala]` | spawns a test monument at the aim (test flag, no reward) |
+| `monumen daftar` / `hapus_semua` / `umur <hari>` | list; remove all (with clear jobs); age every record for an expiry test |
+| `cabut` | finishes the nearest own pull instantly |
+| `beban` | jobs, blocks left, live monuments, per-player counts |
+| `reset` | cooldowns, settings, the daily reward counter |
+
+Client (`/sinematik pusaka ...`, M2): `film <skill>` (still gated), `vista <name>`, `info` (gates and
+`TitahWorld.stats()`).
+
+Player: `/kultivasi titah`, `/kultivasi titah daftar`.
+
+---
+
+### 29.12 Daftar uji (for `docs/uji/FASE-10b.md`)
+
+**Segel dan menu**
+1. Segel Titah Langit didapat dari kemenangan pertama atas Panglima Langit (sekali saja) dan dari resep 6 serpihan
+   segel + 2 Batu Asal Abadi + 1 giok segel jiwa. Pemain lain tidak bisa memakai segel yang sudah terikat. Segel kedua
+   tidak memberi jeda atau monumen tambahan.
+2. Di bawah Dewa Abadi segel menolak dengan pesan. Tiap titah terbuka di Awal/Tengah/Akhir/Puncak. Batas Kekuatan
+   ×3/×5/×7/×10.
+3. Shift + klik kanan membuka menu gulungan giok (muat di 320×240):
+   - slider Kekuatan, Kerusakan dan Kecepatan tersimpan setelah relog;
+   - nilai di luar batas tidak bisa dikirim;
+   - baris "Hancurkan tanah" hanya muncul saat Mode Kehancuran nyala.
+4. Klik kanan memanggil titah terpilih ke crosshair. Qi 85 % terpakai. Jeda sesuai tabel dan bertambah pada
+   Kekuatan > 1.
+5. Titah ditolak saat duel, sparring, turnamen, terobosan, ujian iblis hati dan di alam rahasia.
+
+**Film dan layar**
+6. Film Penuh: tanda langit → naik → awan → istana/laut/bintang/raksasa → awan → turun bersama senjata → bingkai
+   dampak. Total ≤ 12 detik, tiap potongan kamera ≤ 4 detik. Backspace melewati, tombol gerak menghentikan, terkena
+   serangan langsung kembali ke mata.
+7. Kecepatan 3×: film memendek tanpa kamera bergerak terlalu cepat. Kecepatan 0,3×: build-up lebih lama, film ≤ 12 detik.
+8. Film tidak mulai bila ada musuh ≤ 24 b atau nyawa < 50 %. Singkat memberi crane, Mati tanpa kamera. "Perjalanan
+   langit" = Mati atau "Kurangi gerak" mematikan film. Serangan tetap mendarat tepat waktu.
+9. Dampak sunyi: senjata mendarat tanpa suara, dentuman menyusul (Tiang paling lama). Bingkai putih-merah (Pedang),
+   bara (Tiang), ungu (Bintang), emas-ungu (Gunung). Bingkai Penuh hanya setelah layar peringatan fotosensitif.
+
+**Tanpa Mode Kehancuran**
+10. `uji pusaka_langit semua` tidak mengubah satu blok pun (cek F3 dan tangkapan layar). Retakan, kawah, parit, sel
+    terangkat dan lubang berundak hanya visual lalu hilang.
+11. Pedang dan Tiang meninggalkan objek 3D yang tertancap.
+12. Objek itu:
+    - masih ada setelah keluar-masuk dunia dan setelah server restart;
+    - tidak bisa dipukul, ditembak panah, didorong piston atau masuk portal;
+    - tidak jatuh.
+13. Pemilik shift + klik → animasi cabut 2 detik → senjata naik ke langit → 1 batu roh tinggi + qi 20 %. Pemain lain
+    mendapat pesan "milik …".
+14. Tidak bisa difarm:
+    - hadiah hanya sekali per casting, umur ≥ 30 detik, maksimal 3 per hari game (tidur tidak mereset hitungan);
+    - casting uji/bypass tanpa hadiah;
+    - monumen ke-4 seorang pemain menghapus yang tertua; batas dunia 12;
+    - `monumen umur 4` membuat monumen hilang;
+    - `/kill` pada monumen tidak memberi apa pun dan membersihkan monumen bloknya.
+
+**Dengan Mode Kehancuran**
+15. Pedang membelah tanah sepanjang garis bidik. Tiang meratakan bukit dan meninggalkan kawah lebur (magma ≥ 6 b dari
+    kastor). Bintang membuat 7 kawah kecil dan parit menyala. Gunung meninggalkan lubang berundak. Semua dalam batas
+    jari-jari 24 dan ≤ 8.192 blok, 48 blok/tick, berhenti saat MSPT > 45.
+16. Monumen blok (Batu Pusaka, Urat Pusaka bercahaya) hanya di dalam kawah. Dipecahkan tidak menjatuhkan apa pun (juga
+    dengan Silk Touch). Tidak ada blok di zona terlindung, dekat air/lava/peti, atau di kolom aman kastor. Kehancuran
+    lain (teknik atau murid Destroyer) tidak menyentuhnya.
+17. Pulihkan (dalam jendela undo, sebelum restart) mengembalikan tanah asli termasuk posisi monumen blok. Mencabut
+    senjata atau kedaluwarsa (juga setelah restart) menghapus monumen blok saja.
+18. Drop Kehancuran selalu 0 % untuk Titah. Bila jendela undo 0, monumen blok tidak dibangun.
+
+**Kerusakan dan target**
+19. Hanya musuh yang terluka. Kastor, hewan peliharaan, penduduk desa, hewan pasif dan pemain lain tidak pernah
+    terluka. Kerusakan 0 % berarti tontonan murni. Batas bos tetap berlaku.
+
+**Performa dan kompatibilitas**
+20. Laptop lemah (Minimal/Otomatis): Kekuatan ×10 tidak membuat FPS < 30 lebih dari sesaat. Lingkaran besar menjadi
+    titik partikel. Penjaga frame menurunkan tingkat.
+21. Sodium + Iris: monumen terlihat dan berbayang. Cincin dan sigil tidak masuk bayangan dan tidak berkedip.
+22. Teks: setiap kunci `pusaka_langit.*`, `pusaka_langit_client.*` dan `spine10b.*` ada di en_us dan id_id.
+    `uji teknik audit` tanpa peringatan TITAH.
+
+---
+
+### 29.13 Dropped or reworded
+
+| Their idea / candidate | Decision | Why |
+|---|---|---|
+| Red orbital laser, "into space" | heaven's light pillar from the Celestial Court; space told by sky vistas | 7b speed caps; cultivation setting |
+| Long free camera journey | Film ≤ 12 s in masked acts of ≤ 4 s segments, skippable, gated | 7b safety; amended only for TITAH |
+| Heavy post shaders | faked with additive quads, glow textures, sky grades, HUD | weak laptop; Sodium/Iris |
+| Power slider above full damage | Kerusakan 0-100 % of the authored Dewa band; Kekuatan changes size only | balance (22.5) |
+| 10× world-scale real craters | visual up to 256 b; real carve ≤ 24-48 r and ≤ 32,768 blocks by config | server budget, 48 blocks per tick |
+| Gungnir (Norse) | Ruyi Jingu Bang as the sea-fixing pillar (JttW ch. 3); pulling it out = Wukong taking it | cultivation canon; verified |
+| Xuanyuan Sword for the sword | dropped; Pangu (*Sanwu Liji*) as "terinspirasi dari"; the sword is design | sword lore found only in game sources |
+| Fanshan/Fantian Yin for the grid | dropped; Liezi's Kua'e sons carrying mountains | Fantian is already `heaven_turning_seal` |
+| Seven Stars "glowing crystals stay" | client crystals 60-120 s, never blocks | anti-farm, 28.10 |
+| Planted weapon as blocks | a saved entity; blocks only as a capped no-drop plinth under Kehancuran | the request "real object" plus block-safety |
+| Name "Pusaka Langit" in game | "Titah Langit" | clashes with advancement `artifact_langit` |
+| Thrown weapon returns to the hand | the owner pulls it out of the crater; one modest reward | the user's "pull it out" idea; non-farmable |
+| Lightning, explosions, fire blocks | `BoltRenderer`, debris displays, palette pass, entity fire | DESIGN 0 |
+| Monuments for every Dewa ultimate | optional `titahUltimateMonuments`, default off, no reward | world clutter; caps |
+
+---
+
+### 29.14 Sources (verification log)
+
+- Ruyi Jingu Bang, JttW ch. 3: the divine iron that fixed the bottom of the Heavenly River (天河定底神珍铁), also called
+  Yu's gauge for the depths of rivers and seas (定江海浅深的一个定子); kept in Ao Guang's East Sea treasury; it began to
+  glow before Wukong came ([Wikipedia: Ruyi Jingu Bang](https://en.wikipedia.org/wiki/Ruyi_Jingu_Bang),
+  [Wikipedia: Ao Guang](https://en.wikipedia.org/wiki/Ao_Guang),
+  [Journey to the West Research](https://journeytothewestresearch.com/tag/ruyi-jingu-bang-zhong-yiwan-sanqian-wubai-jin/)).
+- *Liezi*, chapter 湯問 Tang Wen: "帝感其誠，命夸蛾氏二子負二山" (the Lord of Heaven, moved by his sincerity, ordered the
+  two sons of the Kua'e clan to carry the two mountains away), checked in the Chinese Text Project
+  ([ctext: Liezi, Tang Wen](https://ctext.org/liezi/tang-wen),
+  [Wikipedia: The Foolish Old Man Removes the Mountains](https://en.wikipedia.org/wiki/The_Foolish_Old_Man_Removes_the_Mountains)).
+  The source does not call them giants; that look is design (stated in the Sumber line).
+- *Soushen Ji* (Gan Bao, 4th century), Guan Lu: the Southern Dipper rules life, the Northern Dipper death
+  ([Source Library: Soushen Ji](https://sourcelibrary.org/book/soushen-ji/page/6992cff5f5b4f75c1a4c9c8e),
+  [MDPI Religions 16(12) 1555](https://www.mdpi.com/2077-1444/16/12/1555)).
+- Beidou star names, Shangqing and bugang ([Wikipedia: Bugang](https://en.wikipedia.org/wiki/Bugang),
+  [Wikipedia: Big Dipper](https://en.wikipedia.org/wiki/Big_Dipper)).
+- Pangu in *Sanwu Liji* (Xu Zheng, Three Kingdoms Wu), no weapon in the text
+  ([Wikipedia: Pangu](https://en.wikipedia.org/wiki/Pangu),
+  [Oral Tradition PDF](https://journal.oraltradition.org/wp-content/uploads/files/articles/16ii/Wu.pdf)). The Lingxiao
+  Hall is setting only.
+- Xuanyuan Sword: rejected; the sources are game lore ([Wikipedia: Xuan-Yuan Sword](https://en.wikipedia.org/wiki/Xuan-Yuan_Sword)).
+
+### 29.15 Verification pass (lore, 26.3 feasibility, block safety, balance, budgets)
+
+Changes made to the game-designer draft:
+
+| Area | Finding | Fix in this section |
+|---|---|---|
+| Lore | Ruyi line said the pillar "then became" the staff; JttW calls it both the Heavenly River's bottom-fixing iron and Yu's depth gauge | Sumber reworded (29.5.2); both readings logged (29.14) |
+| Lore | Kua'e "giants" was presented as source text; ctext reads 夸蛾氏二子 ("two sons of the Kua'e clan") | Sumber says the giants are design; `[lore verify]` resolved |
+| Lore | malformed source links (`wikipedia.com`, mixed case hosts) | replaced by `en.wikipedia.org` and ctext links |
+| 26.3 | `canBeHitByProjectile` defaults to `isPickable()`, so arrows would hit a pickable monument | override to false; `isIgnoringBlockTriggers` true (`RealmRelicEntity` precedent) |
+| 26.3 | `discard()` is `remove(DISCARDED)`, so our own pull/expiry also reaches `onRemoval` | `TitahMonuments.release` is idempotent |
+| 26.3 | a `PUSAKA_FILM(240)` shot type would allow one 12 s segment | `PUSAKA_FILM(80)`: segments stay ≤ 80 t, only the film total is 240 |
+| 28.1.1 | rule 2 forbids server entities for Phase 10 | amended for Titah only (29.0) |
+| Blocks | WorldBreaker undo is in memory and lost on restart | 29.6.3 and Daftar uji 17 say so; the clear job does not depend on it |
+| Blocks | a second undo record at a carved position would make Pulihkan end on AIR | undo rewrite with a position → index map, reason written down |
+| Blocks | another carve could remove a monument block and its undo could later bring it back as an orphan | both blocks are never-touched for every other job |
+| Balance | per-target totals were not stated | ≤ 28 × P per cast (Dewa PAMUNGKAS band) |
+| Balance | "per in-game day" via day time can be skipped by sleeping | counted by `getGameTime() / 24000` |
+| Balance | extra crafted seals | cooldowns, settings and caps live on the player |
+| Engine | Bintang's 7 separate bowls exceed the 5-shape cast rule | one SCATTER r 3 with 7 points (≤ 12) plus 6 sigil trenches (≤ 24) |
+| Engine | `Dampak.Ring` has no "VOID→EMBER" value | ring VOID, tinted ember-violet by the client |
+| Camera | `Pertama` override could beat a player's global Mati | global Mati and "Kurangi gerak" always win |
+
+Confirmed unchanged: `Shapes.Kind` ends at `STRIP` (14), so STEPPED_PIT 15 / SHAVE 16 are correct appends;
+`Actions` ends at `BATIN = 44`, `OpenScreen` at `ABADI = 8`, `EpicIds` extras at 23; net block 1200-1299 is free;
+`heaven_seal_shard`, `immortal_origin_stone`, `soul_seal_jade`, `spirit_stone_high` exist; `heaven_splitting_sword`,
+`dinghai_pillar`, `star_core` and `yishan_seal` are new fx models (none exists yet); `Dampak` silence clamp ≤ 20;
+`TechFx.aux` is an int; `EpicBudget.PACK_QUADS` = 0.6.

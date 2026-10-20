@@ -4,6 +4,7 @@ import dev.kultivator.Kultivator;
 import dev.kultivator.client.anim.model.ModelFx;
 import dev.kultivator.client.epic.EpicClock;
 import dev.kultivator.client.fx.spec.CameraShake;
+import dev.kultivator.client.pusakalangit.world.TitahWorld;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.TechniqueGrade;
 import dev.kultivator.data.TechniqueRegistry;
@@ -40,6 +41,10 @@ import java.util.Map;
  * Every public method never throws and runs on the client thread. Presentation time advances by the 7b σ
  * ({@link EpicClock#sigma()}), so a hit-stop freezes the debris, cells, sigils and rings while vanilla entities, particles
  * and the server go on. Idle cost: one boolean per frame and a few list checks per tick.
+ * <p>
+ * Titah Langit (DESIGN 29, phase 10b): the events of the four TITAH specs ({@code titah_*}) go to
+ * {@code client/pusakalangit/world/TitahWorld} instead of the Phase 10 flow (their radii reach 256 b and their timelines
+ * are their own); the {@code titah*} methods below are its pass-through to these package systems, with the Titah scale.
  */
 public final class DampakWorld {
 
@@ -121,6 +126,11 @@ public final class DampakWorld {
 	 */
 	public static void onTechFx(Payloads.TechFx p, TechniqueSpec spec, Phase phase, boolean own, float othersScale) {
 		try {
+			if (TitahWorld.isTitah(spec)) {
+				// Titah specs have their own world flow (TitahWorld drops the copy when the hub also calls it directly)
+				TitahWorld.onTechFx(p, spec, phase, own, othersScale);
+				return;
+			}
 			handleTechFx(p, spec, phase, own, othersScale);
 		} catch (RuntimeException exception) {
 			warn("techfx", exception);
@@ -216,6 +226,148 @@ public final class DampakWorld {
 		}
 	}
 
+	// ================================================================== Titah Langit pass-through (DESIGN 29.8, contract C10b.6)
+
+	/** The cast key (caster × spec net) the Phase 10 systems file a cast's pieces under. */
+	public static long titahCastKey(int caster, int specNet) {
+		return castKey(caster, specNet);
+	}
+
+	/** Presentation time in ticks (σ-scaled; a hit-stop holds it). */
+	public static double titahClock(float partial) {
+		return clock(partial);
+	}
+
+	/** The client surface height of a column (first free y above MOTION_BLOCKING_NO_LEAVES), or {@code fallback}. */
+	public static double titahGround(ClientLevel level, double x, double z, double fallback) {
+		return DampakDisplays.ground(level, x, z, fallback);
+	}
+
+	/**
+	 * A Titah shock ring up to 256 b ({@link ShockRing#startTitah}); {@code variant} is a {@code Dampak.Ring} name (its
+	 * front), {@code rgb} the band's tint as given (Bintang's VOID rings are tinted ember-violet, 29.15).
+	 */
+	public static void titahRing(Vec3 centre, float radius, String variant, int rgb, boolean own, int delay, boolean twin) {
+		try {
+			ShockRing.startTitah(centre, radius, variant, rgb & 0xFFFFFF, own, delay, twin);
+		} catch (RuntimeException exception) {
+			warn("titah ring", exception);
+		}
+	}
+
+	/** A Titah sigil of {@code pattern} up to 256 b, faint until its nodes light; false when none is drawn. */
+	public static boolean titahSigil(ClientLevel level, long cast, @Nullable SigilPattern pattern, Vec3 castPos, Vec3 centre, float radius, int seed,
+									 int rgb, boolean own, @Nullable String palette) {
+		try {
+			return GroundSigil.createTitah(level, cast, pattern, castPos, centre, radius, seed, rgb, own, palette) != null;
+		} catch (RuntimeException exception) {
+			warn("titah sigil", exception);
+			return false;
+		}
+	}
+
+	/** The next node of a cast's sigil lights (with its incoming lines). */
+	public static void titahSigilIgnite(ClientLevel level, long cast, Vec3 at) {
+		try {
+			GroundSigil.ignite(level, cast, at);
+		} catch (RuntimeException exception) {
+			warn("titah ignite", exception);
+		}
+	}
+
+	/** The whole sigil lights; with {@code burnTicks} &gt; 0 its lines burn as glowing trenches in {@code hotRgb}. */
+	public static void titahSigilClimax(long cast, int burnTicks, int hotRgb) {
+		try {
+			GroundSigil.climaxTitah(cast, burnTicks, hotRgb);
+		} catch (RuntimeException exception) {
+			warn("titah sigil climax", exception);
+		}
+	}
+
+	/** The node positions of a cast's sigil (ground y), in pattern order; empty when it has none. */
+	public static List<Vec3> titahSigilNodes(long cast) {
+		try {
+			return GroundSigil.nodesOf(cast);
+		} catch (RuntimeException exception) {
+			return List.of();
+		}
+	}
+
+	/** The cast ended without its climax: its sigil fades. */
+	public static void titahSigilEnd(long cast) {
+		GroundSigil.end(cast);
+	}
+
+	/** ABORT: the cast's sigil fades now, its lift slabs and crystals end. */
+	public static void titahAbort(long cast) {
+		try {
+			GroundSigil.abort(cast);
+			DampakDisplays.abort(cast);
+		} catch (RuntimeException exception) {
+			warn("titah abort", exception);
+		}
+	}
+
+	/**
+	 * Visual debris of the client's own surface ({@code wake}: along {@code lineFrom → centre}, else a burst around
+	 * {@code centre}); displays only when the budget allows ({@link DampakWorldBudget#displays}), else particles.
+	 */
+	public static void titahDebris(Vec3 centre, float radius, int n, boolean wake, @Nullable Vec3 lineFrom, long cast, boolean own, boolean lowLoad) {
+		ClientLevel level = Minecraft.getInstance().level;
+		if (level == null || !finite(centre) || n <= 0) {
+			return;
+		}
+		try {
+			boolean displays = DampakWorldBudget.displays(own, lowLoad);
+			DebrisFx.fake(level, centre, Math.max(1.0F, radius), n, wake ? DebrisFx.WAKE : DebrisFx.BURST, null, lineFrom, cast, own, displays);
+		} catch (RuntimeException exception) {
+			warn("titah debris", exception);
+		}
+	}
+
+	/** A cooling molten decal (≤ 24 b) at {@code centre} in a {@code Dampak.Palette}'s glow colour. */
+	public static void titahDecal(Vec3 centre, float radius, String palette, int rgb, boolean crack) {
+		ClientLevel level = Minecraft.getInstance().level;
+		if (level == null) {
+			return;
+		}
+		try {
+			MoltenGlow.decal(level, centre, radius, palette, rgb, crack);
+		} catch (RuntimeException exception) {
+			warn("titah decal", exception);
+		}
+	}
+
+	/** One sky-carried three-layer slab ({@link TerrainLift#slab}); false when it could not be made. */
+	public static boolean titahSlab(ClientLevel level, double x0, double z0, float size, double ground, long cast, int delay, Vec3 carry, int gridRgb,
+									boolean grid) {
+		try {
+			return TerrainLift.slab(level, x0, z0, size, ground, cast, delay, carry, gridRgb, grid);
+		} catch (RuntimeException exception) {
+			warn("titah slab", exception);
+			return false;
+		}
+	}
+
+	/** A glowing crystal block display (grows after {@code delay}, stays {@code life} ticks, then shrinks away). */
+	public static void titahCrystal(ClientLevel level, BlockState state, Vec3 at, long cast, int delay, int life) {
+		try {
+			GroundSigil.crystal(level, state, at, cast, delay, life);
+		} catch (RuntimeException exception) {
+			warn("titah crystal", exception);
+		}
+	}
+
+	/** Live Dampak displays of the crystal kind (the Seven Stars' crystals count against the shared pool). */
+	public static int titahCrystals() {
+		return DampakDisplays.count(DampakDisplays.CRYSTAL);
+	}
+
+	/** Lift cells and slab layers alive. */
+	public static int titahCells() {
+		return DampakDisplays.count(DampakDisplays.CELL);
+	}
+
 	// ================================================================== package helpers
 
 	/** Presentation time in ticks (σ-scaled), with the frame's partial tick. */
@@ -282,7 +434,7 @@ public final class DampakWorld {
 			CASTS.values().removeIf(state -> clock - state.lastSeen > CAST_MEMORY);
 			JOBS.values().removeIf(job -> clock - job.seen() > JOB_MEMORY);
 		}
-		geometry = ShockRing.active() || GroundSigil.active() || MoltenGlow.active() || TerrainLift.active();
+		geometry = ShockRing.active() || GroundSigil.active() || MoltenGlow.active() || TerrainLift.active() || TitahWorld.active();
 	}
 
 	private static void schedule(double delay, long cast, Runnable action) {

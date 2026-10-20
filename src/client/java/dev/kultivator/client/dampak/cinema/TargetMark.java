@@ -125,7 +125,12 @@ public final class TargetMark {
 			fresh.range = Math.max(12.0D, Math.min(64.0D, pos.distanceTo(aim)));
 			boolean light = lightOnly(own, p);
 			Dampak.Mark kind = d.mark() == Dampak.Mark.MULTI ? Dampak.Mark.RING_ONLY : d.mark();
-			fresh.main = new MarkElement(life, ground(aim), pos, kind, ringRadius(d.mark(), p), rgb, light, EpicDirector.seal(spec), own);
+			boolean titah = spec.has(TechniqueSpec.Flag.TITAH);
+			float ring = titah ? titahRing(kind, p) : ringRadius(d.mark(), p);
+			fresh.main = new MarkElement(life, ground(aim), pos, kind, ring, rgb, light, EpicDirector.seal(spec), own);
+			if (titah) {
+				fresh.main.titah(kind, p, ground(aim), pos);
+			}
 			scene.add(fresh.main);
 			CASTS.put(key, fresh);
 			if (own) {
@@ -236,7 +241,7 @@ public final class TargetMark {
 	}
 
 	/** The pillar the own sky ride climbs (28.3.2 R1): a fresh mark pillar at the aim for the ride's length. */
-	static void ridePillar(Scene scene, Vec3 aim, int rgb, int life) {
+	public static void ridePillar(Scene scene, Vec3 aim, int rgb, int life) {
 		MarkElement pillar = new MarkElement(life, ground(aim), aim, Dampak.Mark.PILLAR, 4.0F, rgb, false, "", true);
 		pillar.noGlyph = true;
 		scene.add(pillar);
@@ -302,6 +307,30 @@ public final class TargetMark {
 			return r > 0.0F ? Math.max(3.0F, Math.min(16.0F, r)) : 6.0F;
 		}
 		return r > 0.0F ? Math.max(4.0F, Math.min(6.0F, r * 0.5F)) : 5.0F;
+	}
+
+	/**
+	 * Phase 10b (29.3.1, 29.5): a Titah decree's ring from {@code radius} = R_vis. The lock-on ring stays a readable size
+	 * (the full R_vis outline is the ground sigil's job, M3): PILLAR, PATH and SHADOW 15 % of R_vis (5-20 b), RING_ONLY
+	 * 30 % (8-24 b).
+	 */
+	private static float titahRing(Dampak.Mark kind, Payloads.TechFx p) {
+		float r = p.radius() > 0.0F ? p.radius() : 32.0F;
+		if (kind == Dampak.Mark.RING_ONLY) {
+			return Math.max(8.0F, Math.min(24.0F, r * 0.3F));
+		}
+		return Math.max(5.0F, Math.min(20.0F, r * 0.15F));
+	}
+
+	/**
+	 * The largest world size a Titah mark draws at this tier (29.8: Minimal 48, Normal 128, Maximal 256), never past the
+	 * render distance.
+	 */
+	public static float visualCap() {
+		int tier = EpicBudget.tierOrMinimal();
+		float cap = tier <= 0 ? 48.0F : tier == 1 ? 128.0F : 256.0F;
+		int chunks = Minecraft.getInstance().options.getEffectiveRenderDistance();
+		return Math.max(16.0F, Math.min(cap, chunks * 16.0F - 16.0F));
 	}
 
 	/**
@@ -412,6 +441,13 @@ public final class TargetMark {
 		private float motes;
 		boolean small;
 		boolean noGlyph;
+		// Phase 10b Titah marks (29.5): a taller pillar, a line through the impact along the aim (Pedang), the square's
+		// four corner brackets (Gunung) and a pillar over the shadow
+		private float pillarHeight = PILLAR_HEIGHT;
+		private @Nullable Vec3 pathA;
+		private @Nullable Vec3 pathB;
+		private float square;
+		private boolean shadowPillar;
 
 		MarkElement(int life, Vec3 centre, Vec3 from, Dampak.Mark kind, float radius, int rgb, boolean light, String glyph, boolean own) {
 			super(0, life);
@@ -426,6 +462,32 @@ public final class TargetMark {
 			this.glyph = glyph == null ? "" : glyph;
 			this.own = own;
 			this.largeRank = radius > 16.0F ? 6 : 0;
+		}
+
+		/**
+		 * Phase 10b: dresses this mark as a Titah decree's (29.5). The pillar comes from heaven's height (128 b); a PATH runs
+		 * {@code length} (2 × R_vis) through the impact along the aim instead of from the caster; a SHADOW gets the pillar
+		 * and the four corner brackets of the square of half side {@code length}. Sizes stay within {@link #visualCap()}.
+		 */
+		void titah(Dampak.Mark mark, Payloads.TechFx p, Vec3 impact, Vec3 caster) {
+			pillarHeight = 128.0F;
+			float cap = visualCap();
+			if (mark == Dampak.Mark.PATH && p.length() > 0.0F) {
+				Vec3 dir = new Vec3(impact.x - caster.x, 0.0D, impact.z - caster.z);
+				if (dir.lengthSqr() < 1.0E-4D) {
+					double yaw = Math.toRadians(Math.floorMod(p.seed(), 360));
+					dir = new Vec3(-Math.sin(yaw), 0.0D, Math.cos(yaw));
+				}
+				Vec3 half = dir.normalize().scale(Math.min(cap, p.length()) * 0.5D);
+				pathA = impact.subtract(half).add(0.0D, 0.15D, 0.0D);
+				pathB = impact.add(half).add(0.0D, 0.15D, 0.0D);
+			}
+			if (mark == Dampak.Mark.SHADOW) {
+				shadowPillar = true;
+				if (p.length() > 0.0F) {
+					square = Math.max(4.0F, Math.min(cap, p.length()));
+				}
+			}
 		}
 
 		/** Eases the centre to {@code target} over {@code ticks}. */
@@ -535,6 +597,12 @@ public final class TargetMark {
 						RingRenderer.annulus(frame, frame.ring, x, y, z, 0.0F, r, 24, ARGB.color(Math.round(0.55F * f * 255.0F), 0x0C0A0A),
 								ARGB.color(Math.round(0.15F * f * 255.0F), 0x0C0A0A), 0.0F);
 					}
+					if (square > 0.0F && !light) {
+						brackets(frame, f, at);
+					}
+					if (shadowPillar && !light && tier >= 1) {
+						pillar(frame, at, f, tier);
+					}
 					return;
 				}
 				case FOOT -> {
@@ -557,7 +625,25 @@ public final class TargetMark {
 				RingRenderer.annulus(frame, frame.ring, x, y + 0.01F, z, outer - 0.25F, outer, 32, ARGB.color(Math.round(0.35F * f * 255.0F), rgb),
 						ARGB.color(Math.round(0.6F * f * 255.0F), rgb), (float) (frame.clock * 0.02D));
 			}
-			if (kind == Dampak.Mark.PATH && !light && EpicBudget.takeQuads(2)) {
+			if (kind == Dampak.Mark.PATH && pathA != null && pathB != null && !light && EpicBudget.takeQuads(tier >= 2 ? 4 : 2)) {
+				// Titah Pedang (29.5.1): a white-gold line through the impact along the aim, brightest at the impact; it draws
+				// outward from the centre over the first 10 ticks (the decree being written)
+				float grow = Math.min(1.0F, at / 10.0F);
+				Vec3 a = centre.lerp(pathA, grow);
+				Vec3 b = centre.lerp(pathB, grow);
+				int c0 = ARGB.color(Math.round(0.15F * f * 255.0F), rgb);
+				int c1 = ARGB.color(Math.round(0.9F * f * 255.0F), 0xFFF6D8);
+				float cy = frame.ry(centre.y + 0.15D);
+				frame.segment(frame.glow, frame.rx(a.x), frame.ry(a.y), frame.rz(a.z), x, cy, z, 0.3F, 0.9F, c0, c1, 0.0F, 1.0F);
+				frame.segment(frame.glow, x, cy, z, frame.rx(b.x), frame.ry(b.y), frame.rz(b.z), 0.9F, 0.3F, c1, c0, 0.0F, 1.0F);
+				if (tier >= 2) {
+					// Maximal: a faint wide bloom strip along the line (a cheap glow instead of a post shader)
+					int b0 = ARGB.color(0, rgb);
+					int b1 = ARGB.color(Math.round(0.25F * f * 255.0F), rgb);
+					frame.segment(frame.glow, frame.rx(a.x), frame.ry(a.y), frame.rz(a.z), x, cy, z, 1.2F, 3.0F, b0, b1, 0.0F, 1.0F);
+					frame.segment(frame.glow, x, cy, z, frame.rx(b.x), frame.ry(b.y), frame.rz(b.z), 3.0F, 1.2F, b1, b0, 0.0F, 1.0F);
+				}
+			} else if (kind == Dampak.Mark.PATH && !light && EpicBudget.takeQuads(2)) {
 				// a glowing line along the beam or front, with the ring at its end
 				float ax = frame.rx(from.x);
 				float ay = frame.ry(from.y + 0.15D);
@@ -569,9 +655,39 @@ public final class TargetMark {
 			if (light || kind == Dampak.Mark.RING_ONLY || tier < 1) {
 				return;
 			}
-			// the pillar of heaven's light coming down from the clouds (28.2: glow 0.6, a thread over the last 4 ticks)
+			pillar(frame, at, f, tier);
+		}
+
+		/**
+		 * Phase 10b (29.5.4): the four corner brackets of the decree's square (half side {@code square}), axis-aligned like
+		 * the real stepped pit; they slide in from 1.3× and lock on over the first 20 ticks.
+		 */
+		private void brackets(EpicRenderer.Frame frame, float f, float at) {
+			if (!EpicBudget.takeQuads(8)) {
+				return;
+			}
+			float lock = Math.min(1.0F, at / 20.0F);
+			float eased = 1.0F - (1.0F - lock) * (1.0F - lock);
+			float h = square * (1.3F - 0.3F * eased);
+			float arm = Math.max(2.0F, Math.min(10.0F, h * 0.3F));
+			float y = frame.ry(centre.y + 0.12D);
+			int color = ARGB.color(Math.round(0.9F * f * 255.0F), 0xFFE8A0);
+			int fadeColor = ARGB.color(Math.round(0.25F * f * 255.0F), 0xFFE8A0);
+			float width = Math.max(0.3F, Math.min(1.2F, h / 40.0F));
+			for (int k = 0; k < 4; k++) {
+				float sx = (k & 1) == 0 ? -1.0F : 1.0F;
+				float sz = (k & 2) == 0 ? -1.0F : 1.0F;
+				float cx = frame.rx(centre.x + sx * h);
+				float cz = frame.rz(centre.z + sz * h);
+				frame.segment(frame.glow, cx, y, cz, frame.rx(centre.x + sx * (h - arm)), y, cz, width, width * 0.6F, color, fadeColor, 0.0F, 1.0F);
+				frame.segment(frame.glow, cx, y, cz, cx, y, frame.rz(centre.z + sz * (h - arm)), width, width * 0.6F, color, fadeColor, 0.0F, 1.0F);
+			}
+		}
+
+		/** The pillar of heaven's light coming down from the clouds (28.2: glow 0.6, a thread over the last 4 ticks). */
+		private void pillar(EpicRenderer.Frame frame, float at, float f, int tier) {
 			float descend = Math.min(1.0F, at / 8.0F);
-			float height = small ? 28.0F : PILLAR_HEIGHT;
+			float height = small ? 28.0F : pillarHeight;
 			float glow = small ? 0.3F : 0.6F;
 			if (snapAt >= 0.0F) {
 				glow = Math.max(0.12F, glow - (glow - 0.15F) * Math.min(1.0F, (at - snapAt) / 2.0F));

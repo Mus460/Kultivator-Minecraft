@@ -162,6 +162,8 @@ public final class CultivateCommand {
 		dev.kultivator.abadi.Abadi.addCommands(root, debug);
 		dev.kultivator.purba.Purba.addCommands(root, debug);
 		dev.kultivator.batin.Batin.addCommands(root, debug);
+		// Phase 10b (DESIGN 29.11): /kultivasi titah [daftar].
+		dev.kultivator.pusakalangit.PusakaLangit.addCommands(root, debug);
 
 		TestCommands.addCommands(root);
 		root.then(debug);

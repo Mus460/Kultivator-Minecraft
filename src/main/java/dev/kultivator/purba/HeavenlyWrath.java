@@ -328,6 +328,8 @@ final class HeavenlyWrath {
 		Purba.give(player, new ItemStack(PurbaItems.HEAVEN_SEAL_SHARD, WIN_SHARDS));
 		Advancements.grant(player, "heaven_general");
 		Msg.chat(player, Component.translatable("kultivator.purba.wrath.win").withStyle(ChatFormatting.GOLD));
+		// Phase 10b (DESIGN 29.2): the first victory only, the Panglima's decree seal falls from his hand (bound to the winner)
+		dev.kultivator.pusakalangit.Titah.grantFromPanglima(player);
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.0F, 1.0F);
 	}
 

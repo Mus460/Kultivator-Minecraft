@@ -54,7 +54,19 @@ public enum SigilPattern {
 	/** Feather chevrons along the dash line (from {@code radius} behind the centre to the centre). */
 	WIND_PATH,
 	/** The Dao's glyph ring (own arts). */
-	DAO_CIRCLE;
+	DAO_CIRCLE,
+	/**
+	 * Phase 10b (DESIGN 29.7.3): the seven Dipper stars of {@link #BEIDOU_NINE} without Zuofu and Youbi (Tianshu →
+	 * Yaoguang), joined in order by six major lines; node i lights the line from star i − 1.
+	 */
+	BEIDOU_SEVEN,
+	/**
+	 * Phase 10b: the cleaving line of Pedang Pemisah Langit, ±radius along the aim (local forward), rune ticks every 4 blocks
+	 * and a cross bar at the impact. Every line is structure (lights with the climax).
+	 */
+	CLEAVE_LINE,
+	/** Phase 10b: three concentric rings with eight hoop ticks and the glyph 定 on the centre (Tiang Penenang Samudra). */
+	DINGHAI_RINGS;
 
 	/** One line of a pattern in world coordinates. */
 	public record Segment(Vec3 from, Vec3 to, int node, boolean major) {
@@ -69,6 +81,7 @@ public enum SigilPattern {
 			case ZHUXIAN_SQUARE -> "誅戮陷絕";
 			case OCTAGRAM_SEAL -> "封";
 			case WUXING -> "木火土金水";
+			case DINGHAI_RINGS -> "定";
 			default -> "";
 		};
 	}
@@ -169,6 +182,17 @@ public enum SigilPattern {
 					out.add(p);
 				}
 			}
+			case BEIDOU_SEVEN -> {
+				for (int i = 0; i < 7; i++) {
+					out.add(BEIDOU[i]);
+				}
+			}
+			case CLEAVE_LINE -> {
+				out.add(new double[]{0.0D, 0.0D});
+				out.add(new double[]{0.0D, 1.0D});
+				out.add(new double[]{0.0D, -1.0D});
+			}
+			case DINGHAI_RINGS -> out.add(new double[]{0.0D, 0.0D});
 			case LUOSHU -> {
 				for (double[] p : LUOSHU_AT) {
 					out.add(new double[]{p[0] * 0.7D, p[1] * 0.7D});
@@ -252,6 +276,33 @@ public enum SigilPattern {
 				line(out, BEIDOU[3], BEIDOU[0], 3, true);
 				line(out, BEIDOU[5], BEIDOU[7], 7, true);
 				line(out, BEIDOU[4], BEIDOU[8], 8, true);
+			}
+			case BEIDOU_SEVEN -> {
+				for (int i = 0; i < 6; i++) {
+					line(out, BEIDOU[i], BEIDOU[i + 1], i + 1, true);
+				}
+			}
+			case CLEAVE_LINE -> {
+				line(out, new double[]{0.0D, 0.0D}, new double[]{0.0D, 1.0D}, -1, true);
+				line(out, new double[]{0.0D, 0.0D}, new double[]{0.0D, -1.0D}, -1, true);
+				double unit = 1.0D / Math.max(1.0D, radius);
+				double bar = Math.min(0.5D, 3.0D * unit);
+				out.add(new double[]{-bar, 0.0D, bar, 0.0D, -1, 0});
+				double tick = Math.min(0.2D, 0.8D * unit);
+				int steps = (int) Math.floor(Math.max(0.0D, radius) / 4.0D);
+				for (int k = 1; k <= Math.min(64, steps); k++) {
+					double z = k * 4.0D * unit;
+					out.add(new double[]{-tick, z, tick, z, -1, 0});
+					out.add(new double[]{-tick, -z, tick, -z, -1, 0});
+				}
+			}
+			case DINGHAI_RINGS -> {
+				circle(out, 0.0D, 0.0D, 0.4D, 24, -1);
+				circle(out, 0.0D, 0.0D, 0.7D, 32, -1);
+				circle(out, 0.0D, 0.0D, 1.0D, 48, -1);
+				for (int i = 0; i < 8; i++) {
+					line(out, polar(0.7D, i * 45.0D), polar(1.0D, i * 45.0D), -1, false);
+				}
 			}
 			case LUOSHU -> {
 				double s = 0.7D;

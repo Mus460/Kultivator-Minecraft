@@ -97,6 +97,13 @@ public final class Actions {
 	/** The inner world, self-created techniques and Jalan Abadi ({@code batin.Batin.handleAction}). */
 	public static final int BATIN = 44;
 
+	// Phase 10b (DESIGN 29.10 C10b.5): arg = op << 16 | skill << 8 | field, text = the value.
+	/**
+	 * The Titah Langit menu ({@code pusakalangit.PusakaLangit.handleAction}): op 0 sync, 1 set (field 0 Kekuatan, 1
+	 * Kerusakan %, 2 Kecepatan, 3 Hancurkan tanah "1"/"0", 4 Tinggalkan pusaka "1"/"0"), 2 select, 3 reset this decree.
+	 */
+	public static final int TITAH = 45;
+
 	private Actions() {
 	}
 }

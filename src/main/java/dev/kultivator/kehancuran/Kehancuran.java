@@ -258,7 +258,20 @@ public final class Kehancuran {
 	/** A submit waiting for a build slot (it is dropped when the caster left that dimension meanwhile). */
 	private record PendingSelf(UUID owner, String specId, List<Shapes.Placed> shapes, int blockCap, long created,
 			net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension,
-			dev.kultivator.technique.spec.dsl.Dampak.@Nullable Palette palette) {
+			dev.kultivator.technique.spec.dsl.Dampak.@Nullable Palette palette, @Nullable TitahPlan titah) {
+	}
+
+	/**
+	 * Phase 10b (DESIGN 29.7.1, contract C10b.3): the plan of one Titah Langit carve. {@code blockCap} the cast's own
+	 * block cap ({@code titahBlocksPerCast}), {@code carveRadius} the real carve radius (for the readout and the log),
+	 * {@code palette} the Kawah Lebur palette (NONE = no surface pass), {@code debrisFlags} the {@code DampakDebris} motion
+	 * flags, {@code recordId} the {@code TitahMonuments} record (-1 = none), {@code monumentPositions} the planned block
+	 * monument cells as {@code BlockPos.asLong(x, layer, z)} (layer 0 = the first air on the crater floor of that column;
+	 * the planted point's own column is never in it) and {@code monumentKinds} 0 Batu Pusaka / 1 Urat Pusaka per cell
+	 * (both may be empty: no block monument).
+	 */
+	public record TitahPlan(int blockCap, int carveRadius, dev.kultivator.technique.spec.dsl.Dampak.Palette palette, int debrisFlags,
+			int recordId, long[] monumentPositions, byte[] monumentKinds) {
 	}
 
 	private static final List<PendingSelf> DEFERRED = new ArrayList<>();
@@ -302,15 +315,76 @@ public final class Kehancuran {
 					note(caster, "queue_full");
 					return SelfResult.QUEUE_FULL;
 				}
-				DEFERRED.add(new PendingSelf(caster.getUUID(), specId, list, blockCap, now, caster.level().dimension(), palette));
+				DEFERRED.add(new PendingSelf(caster.getUUID(), specId, list, blockCap, now, caster.level().dimension(), palette, null));
 				return SelfResult.DEFERRED;
 			}
 			builds++;
-			return build(caster, specId, list, blockCap, palette);
+			return build(caster, specId, list, blockCap, palette, null);
 		} catch (RuntimeException exception) {
 			dev.kultivator.Kultivator.LOGGER.error("Kultivator: Mode Kehancuran self cast of {} failed", specId, exception);
 			return SelfResult.NOTHING;
 		}
+	}
+
+	/**
+	 * Phase 10b (DESIGN 29.7.1, contract C10b.3): the only entry for a Titah Langit carve. Never throws, spends or refunds:
+	 * the decree has already struck. Re-checks the caster's own switch ({@link #selfOn}), the realm (K above 0) and
+	 * {@code titahEnabled}; one Titah job per owner and the 2-per-owner rule hold (QUEUE_FULL: "Bumi masih runtuh —
+	 * kehancuran dilewati", the strike stays visual); then builds like {@link #submitSelf} (at most 2 builds per tick, a
+	 * DEFERRED queue of 8) with the plan's own cap, 0 % drops, no merge and the monument phase.
+	 */
+	public static SelfResult submitTitah(ServerPlayer caster, String specId, List<Shapes.Placed> shapes, TitahPlan plan) {
+		try {
+			if (plan == null || shapes == null || shapes.isEmpty() || plan.blockCap() <= 0 || !KultivatorConfig.get().titahEnabled
+					|| !selfOn(caster)) {
+				return SelfResult.OFF;
+			}
+			if (TechniquePower.kScale(Cultivators.get(caster)) <= 0.0D) {
+				return SelfResult.OFF;
+			}
+			if (WorldBreaker.hasTitah(caster.getUUID()) || WorldBreaker.ownerJobs(caster.getUUID()) >= WorldBreaker.MAX_PER_OWNER
+					|| !WorldBreaker.hasRoom()) {
+				titahNote(caster);
+				return SelfResult.QUEUE_FULL;
+			}
+			for (PendingSelf pending : DEFERRED) {
+				if (pending.titah() != null && pending.owner().equals(caster.getUUID())) {
+					titahNote(caster);
+					return SelfResult.QUEUE_FULL;
+				}
+			}
+			long now = caster.level().getServer().getTickCount();
+			if (buildTick != now) {
+				buildTick = now;
+				builds = 0;
+			}
+			int maxShapes = MAX_SHAPES + MAX_SIGIL_TRENCHES;
+			List<Shapes.Placed> list = shapes.size() > maxShapes ? List.copyOf(shapes.subList(0, maxShapes)) : List.copyOf(shapes);
+			if (builds >= BUILDS_PER_TICK) {
+				if (DEFERRED.size() >= DEFERRED_MAX) {
+					titahNote(caster);
+					return SelfResult.QUEUE_FULL;
+				}
+				DEFERRED.add(new PendingSelf(caster.getUUID(), specId, list, plan.blockCap(), now, caster.level().dimension(), plan.palette(), plan));
+				return SelfResult.DEFERRED;
+			}
+			builds++;
+			return build(caster, specId, list, plan.blockCap(), plan.palette(), plan);
+		} catch (RuntimeException exception) {
+			dev.kultivator.Kultivator.LOGGER.error("Kultivator: Titah carve of {} failed", specId, exception);
+			return SelfResult.NOTHING;
+		}
+	}
+
+	/** "Bumi masih runtuh — kehancuran dilewati" (the decree stays visual), at most once per 5 s per player. */
+	private static void titahNote(ServerPlayer player) {
+		long now = player.level().getGameTime();
+		Long last = NOTED.get(player.getUUID());
+		if (last != null && now >= last && now - last < NOTE_TICKS) {
+			return;
+		}
+		NOTED.put(player.getUUID(), now);
+		Msg.actionBar(player, Component.translatable("kultivator.pusaka_langit.carve.busy").withColor(0xFFB0A0));
 	}
 
 	/** Builds the deferred submits that fit this tick (oldest first); older than 20 ticks are dropped. */
@@ -335,7 +409,7 @@ public final class Kehancuran {
 			}
 			builds++;
 			try {
-				build(caster, pending.specId(), pending.shapes(), pending.blockCap(), pending.palette());
+				build(caster, pending.specId(), pending.shapes(), pending.blockCap(), pending.palette(), pending.titah());
 			} catch (RuntimeException exception) {
 				dev.kultivator.Kultivator.LOGGER.error("Kultivator: Mode Kehancuran self cast of {} failed", pending.specId(), exception);
 			}
@@ -347,7 +421,7 @@ public final class Kehancuran {
 	 * the cap (in proportion to its uncut size), protected and never-touched positions dropped; at most 4 x cap reads.
 	 */
 	private static SelfResult build(ServerPlayer caster, String specId, List<Shapes.Placed> shapes, int blockCap,
-			dev.kultivator.technique.spec.dsl.Dampak.@Nullable Palette palette) {
+			dev.kultivator.technique.spec.dsl.Dampak.@Nullable Palette palette, @Nullable TitahPlan titah) {
 		ServerLevel level = caster.level();
 		List<List<Shapes.Change>> raws = new ArrayList<>(shapes.size());
 		long total = 0L;
@@ -465,7 +539,8 @@ public final class Kehancuran {
 		}
 		Shapes.Placed first = shapes.get(0);
 		BlockPos centre = first.anchor();
-		WorldBreaker.Job job = WorldBreaker.Job.self(caster, specId, first.spec().kind().id(), centre, packed, modeArray);
+		WorldBreaker.Job job = titah != null ? WorldBreaker.Job.titah(caster, specId, first.spec().kind().id(), centre, packed, modeArray, blockCap)
+				: WorldBreaker.Job.self(caster, specId, first.spec().kind().id(), centre, packed, modeArray);
 		// Phase 10 (DESIGN 28.6.1, 28.8.1): debris flags, the spec's net id and the Kawah Lebur palette ride in the job
 		dev.kultivator.data.TechniqueSpec spec = dev.kultivator.data.TechniqueRegistry.byId(specId);
 		dev.kultivator.technique.spec.dsl.Dampak dampak = spec == null ? null : spec.dampak();
@@ -481,8 +556,21 @@ public final class Kehancuran {
 			}
 		}
 		job.palette = kawahOn(caster) && KultivatorConfig.get().kehancuranSurfacePass ? chosen : dev.kultivator.technique.spec.dsl.Dampak.Palette.NONE;
+		if (titah != null) {
+			// Phase 10b (29.7.1): the plan's debris flags, record and block monument (built only by this job, 29.6.3)
+			job.debrisFlags = titah.debrisFlags();
+			job.recordId = titah.recordId();
+			if (titah.monumentPositions() != null && titah.monumentKinds() != null && titah.monumentPositions().length > 0) {
+				job.monumentPlan = titah.monumentPositions().clone();
+				job.monumentKinds = titah.monumentKinds().clone();
+			}
+		}
 		if (!WorldBreaker.submit(job)) {
-			note(caster, "queue_full");
+			if (titah != null) {
+				titahNote(caster);
+			} else {
+				note(caster, "queue_full");
+			}
 			return SelfResult.QUEUE_FULL;
 		}
 		float radius = Math.max(2.0F, first.spec().radius() + 1.0F);

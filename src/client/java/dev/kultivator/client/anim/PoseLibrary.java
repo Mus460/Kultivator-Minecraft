@@ -225,6 +225,14 @@ public final class PoseLibrary {
 				.strike(RLX, -1.48F, RLY, -0.52F, RLZ, 0.06F, LLX, -1.56F, LLY, 0.52F, LLZ, -0.06F, RAX, -0.90F, RAY, -0.45F,
 						LAX, -0.90F, LAY, 0.45F, HX, 0.25F, LIFT, -0.50F)
 				.ticks(6, 6).mods(MOD_BREATH_X, 0.02F).twoHand().fp(FirstPerson.TWIN);
+		// Phase 10b (DESIGN 29.5.2): the javelin throw of Tiang Penenang Samudra. The windup cocks the right arm high behind
+		// the head with the body turned back and the left arm aimed at the sky; the strike whips the arm over and down
+		// past the face, the hips turn through and the body follows forward onto the front leg.
+		put(Pose.JAVELIN_THROW).wind(RAX, -2.80F, RAY, 0.30F, RAZ, 0.20F, TWIST, -0.50F, LAX, -1.90F, LAY, 0.25F, LAZ, -0.10F, LEAN, -0.15F,
+				HX, -0.30F, RLX, 0.30F, LLX, -0.35F)
+				.strike(RAX, -1.05F, RAY, -0.30F, RAZ, 0.05F, TWIST, 0.55F, LAX, -0.25F, LAY, 0.0F, LAZ, -0.40F, LEAN, 0.28F, HX, 0.05F,
+						RLX, -0.45F, LLX, 0.30F)
+				.ticks(6, 2).strikes().fp(FirstPerson.SLAM);
 	}
 
 	/** The definition of {@code pose}, or null for AUTO, NONE and unknown poses. */

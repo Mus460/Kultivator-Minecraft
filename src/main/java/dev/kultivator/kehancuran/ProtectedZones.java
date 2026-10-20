@@ -55,6 +55,9 @@ public final class ProtectedZones {
 	public static final int MIN_SPAWN_RADIUS = 16;
 	public static final TagKey<Block> INDESTRUCTIBLE = TagKey.create(Registries.BLOCK, Kultivator.id("indestructible"));
 	private static final Identifier STELE = Kultivator.id("sect_hall_stele");
+	/** Phase 10b: Batu Pusaka and Urat Pusaka, the Titah block monument. */
+	private static final Identifier MONUMENT_STONE = Kultivator.id("batu_pusaka");
+	private static final Identifier MONUMENT_VEIN = Kultivator.id("urat_pusaka");
 
 	/**
 	 * An extra protected area (phase 6b: within 16 blocks of any confirmed sect footprint or showcase,
@@ -288,7 +291,10 @@ public final class ProtectedZones {
 		if (state.is(INDESTRUCTIBLE)) {
 			return true;
 		}
-		return STELE.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
+		Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+		// Phase 10b (DESIGN 29.6.3): the Titah block monument is never touched by any other carve, surface pass or
+		// Destroyer Art; only the Titah's own restore and clear jobs (which never ask this) change it
+		return STELE.equals(id) || MONUMENT_STONE.equals(id) || MONUMENT_VEIN.equals(id);
 	}
 
 	/** Remembers where a hall is (any hall, active or not) whenever one is seen: the zone list survives restarts. */

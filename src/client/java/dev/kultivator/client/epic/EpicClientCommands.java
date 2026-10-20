@@ -45,6 +45,8 @@ final class EpicClientCommands {
 		root.then(ClientCommands.literal("info").executes(EpicClientCommands::info));
 		// Phase 10 (DESIGN 28.15): /sinematik dampak ...
 		root.then(dev.kultivator.client.dampak.DampakClient.command());
+		// Phase 10b (DESIGN 29.11): /sinematik pusaka film|atur|vista|info
+		root.then(dev.kultivator.client.pusakalangit.TitahClient.command());
 		root.then(ClientCommands.literal("reset").executes(context -> {
 			EpicSettings.resetAll();
 			EpicBudget.resetSession();

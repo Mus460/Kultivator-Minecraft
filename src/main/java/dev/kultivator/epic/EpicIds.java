@@ -162,6 +162,16 @@ public final class EpicIds {
 	public static final int EXTRA_DISCIPLE_ULT = 22;
 	/** A Jurus Pemusnah in its block-safe form (DESIGN 27.6): subject = the disciple, pos = the centre, a = the art ordinal, b = radius. */
 	public static final int EXTRA_DESTROYER_ART = 23;
+	/**
+	 * Phase 10b (DESIGN 29.9 item 3): a Titah Langit decree. subject = viewer = the caster, pos = the aim (or the planted
+	 * weapon), a = the decree 0 Pedang, 1 Tiang, 2 Bintang, 3 Gunung, b = the beat: {@link #TITAH_CARD} the jade title card
+	 * at the cast, {@link #TITAH_PULL} the weapon pulled out and carried back to heaven.
+	 */
+	public static final int EXTRA_TITAH = 24;
+	/** {@code b} of {@link #EXTRA_TITAH}: the decree's title card. */
+	public static final int TITAH_CARD = 0;
+	/** {@code b} of {@link #EXTRA_TITAH}: the planted weapon was pulled out. */
+	public static final int TITAH_PULL = 1;
 
 	// TECH_ULTIMATE: the TechFx phases (CAST the pre-roll, TRAVEL / IMPACT the climax, END the release).
 	public static final int TECH_CAST = 0;
@@ -353,7 +363,7 @@ public final class EpicIds {
 	public static int maxBeat(int moment) {
 		return switch (moment) {
 			case TRIBULATION, DISCIPLE_BT -> 6;
-			case EXTRA -> EXTRA_DESTROYER_ART;
+			case EXTRA -> EXTRA_TITAH;
 			case BREAKTHROUGH, RECRUIT, SECT, TECH_ULTIMATE -> 2;
 			case ASCENSION -> 5;
 			case HEART_DEMON -> 3;
