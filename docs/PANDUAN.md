@@ -103,6 +103,9 @@ bulat di dalam game.
     Dampak Sunyi, puing, Kawah Lebur, Sigil Bumi, monumen, [perintah uji](#574-perintah-uji-op)
 58. [**Pusaka Langit (Fase 10b)**](#58-pusaka-langit-fase-10b): Segel Titah Langit, empat titah, menu dan penggeser,
     Film Pusaka, pusaka tertancap dan alas blok, [perintah uji](#589-perintah-uji)
+59. [**Film Spektakuler dan Hancur Total**](#59-film-spektakuler-dan-hancur-total): Kamera Spektakuler, lapisan
+    lensa, Langit Kosmik, waktu beku, pamungkas yang diperbarui, Hancur Total, [perintah](#596-perintah-client-sinematik-tanpa-cheat)
+60. [**Suara Bicara (Jepang)**](#60-suara-bicara-jepang): siapa berbicara, pengaturan, kredit VOICEVOX
 
 ---
 
@@ -7999,3 +8002,190 @@ tengah ke luar:
 * Satu pahat cepat berjalan dan satu antre di seluruh server; satu titah per pemain.
 
 Daftar uji lengkap (24 butir) ada di `docs/uji/FASE-10b-tingkat.md`.
+
+## 59. Film Spektakuler dan Hancur Total
+
+Bagian ini membuat pamungkas **Dewa** dan **Abadi**, Titah Langit dan Mode Kehancuran terasa seperti menonton film
+dengan efek visual besar: sudut kamera yang tidak biasa, lensa film, langit kosmik, waktu beku, partikel dan suara
+baru, model 3D baru untuk hampir semua pamungkas, dan pilihan **Hancur Total** untuk Mode Kehancuran. Idenya dari cara
+sebuah mod senjata populer menampilkan serangan langitnya; **hanya idenya** yang dipakai. Tidak ada kode, tekstur, model
+atau suara mod itu yang disalin; semua model dan tekstur dibuat sendiri, partikel dan efek suara dari paket CC0 Kenney
+(lihat [CREDITS.md](CREDITS.md)).
+
+> **Status:** sudah dikompilasi tetapi **belum diuji di game**: sudut kamera, kecepatan shot, terang lapisan lensa dan
+> waktu koreografi model masih bisa meleset.
+>
+> **Keamanan blok:** tanpa Mode Kehancuran **semua efek bab ini hanya visual**. Blok asli hanya berubah lewat
+> `WorldBreaker`, dengan Mode Kehancuran milikmu sendiri atau Jurus Pemusnah murid. Tidak ada `LightningBolt`, cuaca,
+> waktu atau tick-rate yang berubah. Angka gameplay (kerusakan, biaya Qi, cooldown) dan baris Sumber tidak berubah.
+
+### 59.1 Kamera Spektakuler
+
+Pengaturan **Kamera sinematik** (grup Momen Epik) mendapat pilihan keempat: **Spektakuler** / Penuh / **Singkat**
+(bawaan) / Mati. Dengan Spektakuler, jurusmu sendiri memutar **film** pendek berbabak (persiapan, pelepasan, dampak,
+sesudahnya) dengan shot yang lebih liar: sapuan kamera cepat, zoom kilat, putaran, sudut dari bawah tanah, sudut atas
+lurus, POV menunggang pusaka, naik menembus langit sampai **Langit Kosmik** lalu turun bersama serangan.
+
+* **Peringatan gerak:** saat pertama memilih Spektakuler muncul layar *Peringatan gerak*. "Aktifkan" menyalakannya,
+  "Kembali ke Penuh" membatalkan. Tanpa persetujuan itu Spektakuler tidak pernah jalan. **Kurangi gerak** menyala =
+  Spektakuler tidak aktif.
+* **Backspace** melewati satu babak, **dua kali** melewati seluruh film; tombol gerak apa pun mengembalikan kamera
+  kepadamu; terkena serangan langsung kembali ke mata.
+* Film hanya untuk **jurusmu sendiri** dan hanya saat aman (tidak ada musuh dalam 24 blok, nyawa ≥ 50 %, tidak ada layar
+  terbuka, izin kamera server menyala). Bila syarat gagal, babak itu dilewati dan kamera tetap padamu.
+* Setiap shot dibatasi panjang dan kecepatannya; potongan keras paling cepat tiap 10 tick.
+
+### 59.2 Pengaturan baru (grup Momen Epik)
+
+| Pengaturan | Pilihan (bawaan tebal) | Artinya |
+|---|---|---|
+| Kamera sinematik | Spektakuler / Penuh / **Singkat** / Mati | Spektakuler = film berbabak (perlu persetujuan peringatan gerak) |
+| Lapisan lensa | **Nyala** / Ringan / Mati | butiran film, suar lensa, garis anamorfik (Maksimal), kebocoran cahaya, coretan sapuan, pinggiran warna saat dampak, riak panas. Ringan: hanya bilah, vinyet, coretan dan garis kecepatan |
+| Langit kosmik | **Nyala** / Mati | perjalanan naik sampai sungai bintang, nebula, matahari dan bulan langit, siluet istana langit. Hanya kamu yang melihatnya |
+| Waktu beku | **Nyala** / Mati | efek jurusmu sendiri hampir berhenti (≤ 30 tick, paling cepat tiap 6 detik) sementara kamera tetap bergerak. Mob, server dan kerusakan **tidak pernah** melambat. "Gerak lambat" mati juga mematikannya |
+
+**Laptop lemah:** tampilan "shader berat" dipalsukan dengan quad aditif berlapis, tekstur glow dan lapisan HUD, **tanpa
+post shader**, jadi aman untuk Sodium dan Iris. **Kualitas Efek** Minimal/Normal/Maksimal membatasi partikel film
+(40 / 160 / 400 per shot) dan lapisan lensa; penjaga frame Momen Epik ikut menurunkan tingkat bila FPS turun.
+
+### 59.3 Partikel dan suara baru
+
+13 jenis partikel film (`kultivator:film_spark`, `film_flare`, `film_star`, `film_smoke`, `film_flame`, `film_magic`,
+`film_slash`, `film_trace`, `film_twirl`, `film_circle`, `film_muzzle`, `film_dirt`, `film_symbol`) dan 16 efek suara
+(`kultivator:film.riser_long`, `riser_short`, `hum_energy`, `hum_vortex`, `whoosh`, `zap`, `twinkle`, `crunch`, `clang`,
+`sub_boom`, `bell`, `glass`, `punch`, `gong`, `thud`, `rock`) dari paket CC0 Kenney, dengan subtitle dua bahasa. Partikel
+hanya dibuat di komputermu dan ikut berhenti saat waktu beku.
+
+### 59.4 Pamungkas yang diperbarui
+
+Semua pamungkas Dewa dan Abadi di bawah ini mendapat **model 3D baru** (kubus buatan sendiri) dan **koreografi penuh**
+dengan babak jelas: persiapan, pelepasan, dampak, sesudahnya. Gerakannya tetap (tidak acak), dan jumlah model mengikuti
+Kualitas Efek. Api Kaisar dan Murka Langit Sembilan Matahari sudah diperbarui sebelumnya dan menjadi patokan mutunya.
+
+| Pedang, Petir, Es, Ruang | Tubuh, Kehidupan, Bayangan, Semesta, Abadi |
+|---|---|
+| Formasi Pedang Zhuxian | Wujud Kosmik Langit-Bumi |
+| Seni Pedang Hukuman Langit | Injakan Dewa Kuno |
+| Formasi Kaisar Petir Kesengsaraan | Embun Manis Guanyin |
+| Tianzun Guntur Sembilan Langit | Wilayah Hidup dan Mati |
+| Turunnya Phoenix Es | Pohon Kuno Bodhisattva: Seratus Kehidupan |
+| Membekukan Gunung Qi | Segel Harimau Alam Baka |
+| Cermin Hampa | Teknik Pusaka Kunpeng |
+| Wilayah Roh Waktu | Wilayah Karma |
+| Lubang Hitam | Segel Kesembilan |
+| | Gunung Lima Unsur |
+| | Diagram Taiji |
+| | Langkah Penginjak Langit |
+
+Jurus Ciptaan sendiri (`own_art_1..3`) memakai film templat "ciptaan" dengan warna Dao-mu. Titah Langit dan Mode
+Kehancuran juga punya film sendiri; daftar lengkapnya: `/sinematik film daftar`.
+
+### 59.5 Hancur Total (Mode Kehancuran)
+
+Dengan Mode Kehancuran menyala dan **Hancur Total** menyala, `WorldBreaker` boleh mengangkat **setiap blok**: batuan
+dasar, air dan lava, obsidian, crying obsidian, reinforced deepslate, lodestone, respawn anchor, portal dan bingkainya,
+serta balok-entitas (peti, tong, tungku dan sejenisnya). **Tidak ada drop.**
+
+* **Selalu aman:** zona terlindung (aula sekte, tapak pembangunan, pemain lain, spawn, Gua Kediaman), Prasasti Aula
+  Sekte, Mata Formasi, Batu/Urat Pusaka, dan blok khusus (command block, structure block, jigsaw, barrier, blok uji).
+  Daftarnya ada di tag `kultivator:hancur_total_keep`. Blok di bawah blok yang harus dibiarkan juga dibiarkan, supaya
+  tidak ada yang melayang di atas rongga.
+* **Air dan lava:** cairan di dalam bentuk diangkat seluruhnya, jadi tidak ada air melayang; tepinya boleh mengalir
+  masuk belakangan secara alami.
+* **Pulihkan:** jurus biasa dan Titah tingkat 1-5 menyimpan isi balok-entitas, jadi **Pulihkan mengembalikan peti
+  beserta isinya** (batas per pekerjaan: `kehancuranUndoBlockEntities` balok dan `kehancuranUndoNbtKiB` KiB; lewat dari
+  itu peti dibiarkan utuh dan chat memberi tahu). Air yang mengalir ke lubang tidak menghalangi Pulihkan. **Titah tingkat
+  6-9 permanen: peti dan isinya hilang** (teks konfirmasinya mengatakan itu).
+* Pahat cepat Titah tingkat 2-9 tetap berhenti 6 blok di atas dasar dunia.
+
+| Perintah | Fungsi |
+|---|---|
+| `/kultivasi kehancuran total` | status saklarmu |
+| `/kultivasi kehancuran total nyala\|mati` | saklar pribadi, **bawaan nyala**; mati = aturan lama (batuan dasar, cairan, portal, peti tidak disentuh). Pekerjaan yang sedang berjalan ikut aturan baru mulai batch berikutnya |
+
+Server (`config/kultivator.json`): `kehancuranTotalAllowed` (bawaan true; false = Hancur Total dimatikan untuk semua),
+`kehancuranUndoBlockEntities` (512, 0-4096), `kehancuranUndoNbtKiB` (4096, 256-65536), `kehancuranFluidSettle` (0,
+0-256: berapa sel air di tepi lubang yang didorong mengalir sesudah pemotongan; 0 = mati karena mahal).
+
+### 59.6 Perintah client `/sinematik` (tanpa cheat)
+
+| Perintah | Fungsi |
+|---|---|
+| `/sinematik spektakuler` | memilih Kamera Spektakuler (membuka peringatan gerak dulu bila belum disetujui) |
+| `/sinematik film daftar` | semua film |
+| `/sinematik film info` | pengaturan, syarat yang menolak film saat ini, shot terakhir |
+| `/sinematik film <id> [act <n>]` | memutar film uji (atau satu babaknya) dengan semua syarat aman |
+| `/sinematik kosmik [detik]` | Langit Kosmik uji (1-30 detik) |
+| `/sinematik lensa grain\|flare\|leak\|smear\|fringe\|haze [detik]` | satu lapisan lensa uji |
+| `/sinematik waktu_beku` | waktu beku uji |
+
+### 59.7 Perintah uji (op)
+
+| Perintah | Fungsi |
+|---|---|
+| `/kultivasi uji dampak <id>` | satu casting pamer jurus itu (dengan Kamera Spektakuler filmnya ikut diputar bila syarat aman terpenuhi) |
+| `/kultivasi uji kehancuran total info` | aturan rapalan berikutnya dan isi peti yang tersimpan untuk Pulihkan |
+| `/kultivasi uji kehancuran total uji bedrock\|cairan\|peti\|portal` | membangun situs uji kecil di depanmu lalu memotongnya dengan Hancur Total; Pulihkan membersihkannya |
+
+Contoh:
+
+```
+/sinematik spektakuler
+/sinematik film daftar
+/sinematik film heaven_punishing_sword
+/kultivasi uji dampak stellar_black_hole
+/kultivasi kehancuran nyala
+/kultivasi kehancuran total nyala
+/kultivasi uji kehancuran total uji peti
+/kultivasi kehancuran pulihkan
+```
+
+### 59.8 Yang belum lengkap
+
+* Belum diuji di game: sudut dan kecepatan shot, terang lensa, waktu koreografi model (engsel gerbang, arah sayap,
+  kemiringan pedang formasi, waktu menukik phoenix).
+* Halaman Mode Kehancuran di gulungan giok belum punya tombol Hancur Total (pakai perintah di atas).
+* Guncangan kamera belum dikecilkan selama shot film; partikel `kultivator:qi` belum ikut waktu beku.
+
+## 60. Suara Bicara (Jepang)
+
+Dunia sekarang berbicara dalam **bahasa Jepang**: Langit bersabda dengan suara bergema, iblis hati berbisik, makhluk
+purba meraung, pertapa tua memberi nasihat, kultivator jahat mengancam, dan murid-muridmu menyapa dan bersorak. Di bawah
+layar muncul **teks suara**: nama pembicara, kalimatnya dalam bahasamu dan teks Jepang aslinya yang kecil.
+
+### 60.1 Siapa berbicara dan kapan
+
+| Pembicara | Kapan |
+|---|---|
+| **Suara Langit** (dari langit, bergema, tidak berposisi) | terobosan tahap dan ranah, Kenaikan Abadi, menjadi Dewa Abadi, mulai/lulus/gagal tribulasi, pencerahan Dao, sekte didirikan, Titah Langit (sabda + kalimat tiap titah), pamungkas Dewa/Abadi (paling sering sekali per 60 detik), Murka Langit, Bencana Bintang, Alam Rahasia terbuka |
+| **Iblis Hati** | saat goyah, menggoda, menang, kalah, berbisik, tertawa, menggeram, mati |
+| **Binatang Purba** | bangun, mengejek, mengamuk di separuh nyawa, kalah, meraung saat serangan besar |
+| **Pertapa Tua** | sumpah desa, Gua Kediaman, ujian warisan |
+| **Kultivator Liar** | menyergap, kabur, kalah |
+| **Murid** (6 suara: 3 laki-laki, 3 perempuan, tetap per murid) | menyapa saat kamu kembali sesudah 5+ menit pergi, berterima kasih, terobosan, bersorak saat kamu menerobos, mengingatkan saat nyawamu < 30 %, berseru dalam pertarungan, menang, takut pada musuh jauh lebih kuat, lelah/terluka, berkultivasi, setia saat direkrut, formasi selesai, berpamitan saat kamu pergi jauh |
+
+Suara murid dan pembicara lain berposisi (terdengar dari tempatnya, dengan teks untuk pemain dalam 24 blok). Ada jeda
+per pembicara dan per pemain, jadi dunia tidak pernah ramai bersahutan. Gameplay tidak berubah sama sekali.
+
+### 60.2 Pengaturan (grup Suara)
+
+| Pengaturan | Pilihan (bawaan tebal) | Artinya |
+|---|---|---|
+| Suara bicara | **Semua** / Hanya Langit / Mati | Hanya Langit: hanya suara bergema dari langit |
+| Teks suara | **Nyala** / Mati | teks di bawah layar |
+| Kredit suara (VOICEVOX) | tombol | memutar contoh kalimat dan menunjukkan kredit |
+
+Volumenya diatur penggeser vanilla **Suara/Ucapan** (Voice/Speech) di Musik & Suara.
+
+### 60.3 Kredit VOICEVOX
+
+Suara dibuat dengan VOICEVOX (voicevox.hiroshiba.jp). Ketentuan VOICEVOX mewajibkan kredit "VOICEVOX:<karakter>":
+VOICEVOX:青山龍星 (Suara Langit), VOICEVOX:剣崎雌雄 (Iblis Hati), VOICEVOX:麒ヶ島宗麟 (Binatang Purba),
+VOICEVOX:ちび式じい (Pertapa Tua), VOICEVOX:†聖騎士 紅桜† (Kultivator Liar), VOICEVOX:白上虎太郎, VOICEVOX:玄野武宏,
+VOICEVOX:雀松朱司 (murid laki-laki), VOICEVOX:四国めたん, VOICEVOX:春日部つむぎ, VOICEVOX:小夜/SAYO (murid perempuan).
+Kredit lengkap: [CREDITS.md](CREDITS.md).
+
+### 60.4 Perintah uji (op)
+
+`/kultivasi uji suara` menampilkan grupnya; `/kultivasi uji suara <kunci>` memutar satu kalimat tanpa jeda, misalnya
+`heaven.realm`, `demon.tempt`, `boss.awaken`, `disciple.f2.greet`.

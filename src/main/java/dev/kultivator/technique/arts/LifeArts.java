@@ -384,9 +384,8 @@ public final class LifeArts {
 				.step(at(200).shape(nova().radius(24, 32))
 						.self(buff(BuffKind.REGENERATION, 3, 200))
 						.ally(buff(BuffKind.REGENERATION, 3, 200)).phase(0))
+				// Phase 30 (DESIGN 30.4.7): the vase, the willow and the lotus seat are drawn by client/anim/model/UltimatesB
 				.fx(Phase.CAST,
-						model("guanyin_vase").above(8.0F).scale(4.0F).swing(20.0F, 40.0F).swingEvery(40).ticks(200).facing(FxLayer.Facing.UPRIGHT),
-						model("willow_sprig").above(10.5F).scale(2.0F).swing(30.0F, 20.0F).swingEvery(20).ticks(200).facing(FxLayer.Facing.UPRIGHT),
 						mist(0xFFFFFF).particle(ParticleTypes.GLOW).above(16.0F).size(1.5F).count(30).ticks(200))
 				.fx(Phase.PULSE,
 						mist(0xE8F8FF).particle(ParticleTypes.END_ROD).size(1.5F).count(20),
@@ -452,8 +451,8 @@ public final class LifeArts {
 						.ally(heal(0.9D).over(600), buff(BuffKind.QI_REGEN, 3.0D, 600)))
 				.step(at(100).repeat(5, 100).shape(nova().radius(40)).hit(damage(4.0D), eff(Eff.SLOWNESS, 3, 100)).phase(0))
 				.step(at(600).shape(nova().radius(40)).hit(damage(14.0D)).phase(1))
+				// Phase 30 (DESIGN 30.4.7): the trunk, the canopy tiers, the roots and the fruits are drawn by client/anim/model/UltimatesB
 				.fx(Phase.CAST,
-						model("bodhi_tree").scale(20.0F).grow(0.1F, 40.0F).ticks(600).facing(FxLayer.Facing.FACE_FORWARD),
 						mist(0x9AE05A).size(1.5F).count(40).ticks(600),
 						mist(0xFFF0A0).particle(ParticleTypes.GLOW).above(20.0F).size(1.5F).count(20).ticks(600).detail(),
 						sky(0x9AE05A).minTier(4).ticks(600),

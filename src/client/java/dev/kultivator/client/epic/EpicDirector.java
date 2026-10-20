@@ -102,6 +102,8 @@ public final class EpicDirector {
 
 	/** Called by {@code SpecFx.play} for every technique cue; starts TECH_ULTIMATE or KEHANCURAN_SELF. Never throws. */
 	public static void onTechFx(Payloads.TechFx payload) {
+		// Phase 30 (DESIGN 30.2): Film Spektakuler sees every event first (arming, the climax, event anchors; never throws)
+		dev.kultivator.client.epic.film.FilmDirector.onTechFx(payload);
 		try {
 			techFx(payload);
 		} catch (RuntimeException | LinkageError exception) {
@@ -667,6 +669,7 @@ public final class EpicDirector {
 		geometry = false;
 		telegraphUntil = 0L;
 		EpicBudget.sceneEnded();
+		dev.kultivator.client.epic.film.FilmDirector.clear();
 		CinematicDirector.clear();
 		SkyDirector.clear();
 		MusicCue.clear();

@@ -337,8 +337,8 @@ public final class SpaceArts {
 						counter(200, 2.0D, 6, Store.FRONT_MELEE)))
 				.step(at(0).stageOrEnd(2).shape(beam().length(64).halfWidth(3).pierce().ignoreBlocks())
 						.hit(damage(10.0D).perStored(1.0D)).phase(0))
+				// DESIGN 30.4.5: the mirror, its rune ring and the stored-blow shards are UltimatesA props (no model layer here)
 				.fx(Phase.CAST,
-						model("void_mirror").onCaster().above(1.5F).scale(4.0F).ticks(200).until(Phase.EXTRA0).facing(FxLayer.Facing.FACE_FORWARD),
 						vortex(0x2A1050).particle(ParticleTypes.PORTAL).onCaster().size(1.5F).count(40).ticks(200),
 						shake(0.3F, 10))
 				.fx(Phase.EXTRA0,
@@ -390,7 +390,7 @@ public final class SpaceArts {
 						shell(0xFFFFFF).particle(ParticleTypes.SONIC_BOOM).radius(8.0F).count(12),
 						shell(TIME).radius(24.0F).count(80).detail(),
 						shake(1.0F, 30))
-				.fx(Phase.CAST, model("time_clock").onCaster().above(6.0F).scale(6.0F).ticks(TimeBank.DURATION).facing(FxLayer.Facing.FACE_VIEWER))
+				// DESIGN 30.4.5: the clock, its hands, the gears, the hourglass and the droplets are UltimatesA props (no model layer here)
 				.fx(Phase.EXTRA1, impact(0xF0D080).particle(ParticleTypes.END_ROD).count(6).ticks(8), shockRing(TIME).radius(1.0F).count(10).ticks(6).detail())
 				.sound(Phase.CAST, SoundEvents.NOTE_BLOCK_HAT, 1.0F, 1.6F)
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.NOTE_BLOCK_HAT, 1.0F, 1.2F).delay(10))
@@ -420,9 +420,8 @@ public final class SpaceArts {
 				.step(at(0).repeat(12, 10).shape(nova().radius(3).at(Anchor.AREA)).hit(damage(2.0D)))
 				.step(at(120).shape(nova().radius(16).at(Anchor.AREA)).hit(damage(18.0D)).phase(0))
 				.step(at(120).shape(all().ofArea().max(64)).hit(damage(4.0D)))
+				// DESIGN 30.4.5: the star, the core, the disc, the jets and the debris are UltimatesA props (no model layer here)
 				.fx(Phase.CAST,
-						model("black_hole_core").scale(4.0F).spin(3.0F).ticks(120),
-						model("accretion_segment").n(16).radius(10.0F).scale(2.0F).spin(6.0F).ticks(120).facing(FxLayer.Facing.FLAT),
 						petalRing(Blocks.STAINED_GLASS.orange().defaultBlockState(), 16, 10.0F).spin(6.0F).ticks(120).extra(),
 						vortex(ACCRETION).inward().radius(32.0F).count(80).ticks(40),
 						sky(0x100010).ticks(120),

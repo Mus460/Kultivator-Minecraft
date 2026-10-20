@@ -22,7 +22,14 @@ public final class Shots {
 		 * Phase 10b (DESIGN 29.4): one world-anchored segment of Film Pusaka. The per-segment maximum stays 80 ticks; only
 		 * the whole film (several validated segments joined by masked cuts) may run 240.
 		 */
-		PUSAKA_FILM(80);
+		PUSAKA_FILM(80),
+		/**
+		 * Phase 30 (DESIGN 30.2.3): one shot of a Film Spektakuler, evaluated per frame by its {@code FilmPath} with the
+		 * film caps (≤ 6 s; the path is validated by the film, not by {@link Shot#validate}). Built only by
+		 * {@code FilmDirector} through {@link Shots#film}; {@code CinematicDirector} accepts it only while Kamera Spektakuler
+		 * is in effect.
+		 */
+		FILM(120);
 
 		final int max;
 
@@ -73,6 +80,8 @@ public final class Shots {
 		public int hold;
 		/** The look target at the end of a SKY_RIDE or PUSAKA_FILM segment ({@code look} is the start). */
 		@Nullable Vec3 lookEnd;
+		/** Phase 30: the per-frame evaluator of a FILM shot. */
+		public dev.kultivator.client.epic.film.@Nullable FilmPath film;
 
 		Shot(Type type, float seconds) {
 			this.type = type;
@@ -462,6 +471,18 @@ public final class Shots {
 		shot.second = to;
 		shot.look = look0;
 		shot.lookEnd = look1;
+		shot.ceremony = true;
+		return shot;
+	}
+
+	/**
+	 * Phase 30 (DESIGN 30.2.3): a Film Spektakuler shot of {@code path} (its validated length); only {@code FilmDirector}
+	 * builds these, and only {@code CinematicDirector.shootFilm} plays them.
+	 */
+	public static Shot film(dev.kultivator.client.epic.film.FilmPath path) {
+		Shot shot = new Shot(Type.FILM, path.ticks() / 20.0F);
+		shot.ticks = Math.max(4, Math.min(Type.FILM.max, path.ticks()));
+		shot.film = path;
 		shot.ceremony = true;
 		return shot;
 	}

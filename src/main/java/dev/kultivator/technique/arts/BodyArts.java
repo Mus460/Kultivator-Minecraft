@@ -465,7 +465,8 @@ public final class BodyArts {
 						shell(0xFFD070).size(1.5F).count(100),
 						flash(0xFFE8A0, 0.3F, 6),
 						shake(1.0F, 30))
-				.fx(Phase.EXTRA0, model("god_foot").scale(10.0F).fall(12.0F, 4.0F).ticks(14).facing(FxLayer.Facing.FLAT), cracksAlways(0x5A4A2A).count(24).ticks(40).detail())
+				// Phase 30 (DESIGN 30.4.6): the god's foot is drawn by client/anim/model/UltimatesB
+				.fx(Phase.EXTRA0, cracksAlways(0x5A4A2A).count(24).ticks(40).detail())
 				.sound(Phase.CAST, SoundEvents.BEACON_ACTIVATE, 1.2F, 0.5F)
 				.sound(Phase.EXTRA0, SoundEvents.WARDEN_STEP, 1.5F, 0.5F)
 				.sound(Phase.EXTRA1, SoundEvents.BEACON_DEACTIVATE, 1.5F, 0.8F)

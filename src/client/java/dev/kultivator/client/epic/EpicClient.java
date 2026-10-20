@@ -38,6 +38,13 @@ public final class EpicClient {
 				EpicDirector.warn("tick", exception);
 			}
 		});
+		// Phase 30 (DESIGN 30.2): the film engine ticks after the 7b director (it reads the skip presses of this tick)
+		ClientTickEvents.END_CLIENT_TICK.register(dev.kultivator.client.epic.film.FilmDirector::tick);
+		dev.kultivator.client.epic.film.FilmParticleProviders.init();
+		EpicSettings.motionWarning(() -> {
+			net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+			minecraft.gui.setScreen(new dev.kultivator.client.epic.screen.MotionWarningScreen(minecraft.gui.screen()));
+		});
 		LevelRenderEvents.COLLECT_SUBMITS.register(EpicRenderer::collect);
 		LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register((context, outline) -> !CinematicDirector.active());
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> registerHud());

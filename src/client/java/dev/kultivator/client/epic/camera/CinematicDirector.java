@@ -73,6 +73,10 @@ public final class CinematicDirector {
 	/** Phase 10 (28.3.2): the running segment started with a masked cut (no enter blend). */
 	private static boolean snapEnter;
 	private static final float[] OUT = new float[5];
+	// Phase 30 (DESIGN 30.2.3): the FOV factor and roll of the running film shot, and the skip presses of the last tick
+	private static float filmFov = 1.0F;
+	private static float filmRoll;
+	private static int lastPresses;
 
 	private static long ticks;
 	private static long lastCameraEnd = -100_000L;
@@ -100,6 +104,14 @@ public final class CinematicDirector {
 	 */
 	public static boolean shoot(Scene scene, Shots.Shot request, int cameraKind, int prio, boolean safeBeat) {
 		if (!scene.own || !scene.has(EpicIds.FLAG_CAMERA_OK)) {
+			return false;
+		}
+		if (request.type == Shots.Type.FILM) {
+			// Phase 30: film shots enter only through shootFilm
+			return false;
+		}
+		if (dev.kultivator.client.epic.film.FilmDirector.holdsCamera() && !request.danger) {
+			// Phase 30 (30.2.2): while a Film Spektakuler is armed, the 7b and Phase 10 shots of that moment yield to it
 			return false;
 		}
 		EpicSettings.Camera mode = mode();
@@ -198,6 +210,73 @@ public final class CinematicDirector {
 	}
 
 	/**
+	 * Phase 30 (DESIGN 30.2.2, 30.2.3): starts one Film Spektakuler shot of {@code scene}. Only {@code FilmDirector} calls
+	 * it, after its own gates; this re-checks the local scene, CAMERA_OK, Kamera Spektakuler, every hard gate of 23.7.4
+	 * ({@link ShotGuard#blocked} with the Penuh floor) and the scene's 400-tick camera cap. {@code masked} = a hard cut
+	 * hidden by a mask (black dip, cloud wipe, impact frame or a whip smear ≥ 0.8): no enter blend. A running shot (of
+	 * the film or not) is taken over with a blend from the pose shown last.
+	 */
+	public static boolean shootFilm(Scene scene, Shots.Shot request, boolean masked) {
+		if (request.type != Shots.Type.FILM || request.film == null || !scene.own || !scene.has(EpicIds.FLAG_CAMERA_OK)) {
+			return false;
+		}
+		if (mode() != EpicSettings.Camera.PENUH || !EpicSettings.spektakuler()) {
+			return false;
+		}
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.player == null) {
+			return false;
+		}
+		int used = SCENE_TICKS.getOrDefault(scene, 0);
+		if (used >= 400) {
+			return false;
+		}
+		ShotGuard.scanNow(true);
+		if (ShotGuard.blocked(true, false, scene.has(EpicIds.FLAG_LETHAL_NEXT), telegraph(scene)) != null) {
+			return false;
+		}
+		request.ticks = Math.min(request.ticks + request.hold, Math.max(request.ticks, 400 - used));
+		if (active && owner != scene) {
+			KIND_LAST.put(kind, ticks);
+			lastCameraEnd = ticks;
+		}
+		blendFrom = active && last != null && !masked ? last : null;
+		snapEnter = masked;
+		shot = request;
+		owner = scene;
+		priority = Math.max(priority, scene.priority);
+		kind = KIND_ULTIMATE;
+		age = 0.0F;
+		exiting = false;
+		exitAge = 0.0F;
+		anchor = scene.feet(1.0F);
+		yaw0 = scene.yaw();
+		subjectHeight = scene.height();
+		mirrored = false;
+		resultSafe = false;
+		mouseDegrees = 0.0F;
+		active = true;
+		lastScene = scene;
+		SkipKey.arm();
+		return true;
+	}
+
+	/** Phase 30: true while a film shot runs and is not easing back. */
+	public static boolean filmShooting() {
+		return active && !exiting && shot != null && shot.type == Shots.Type.FILM;
+	}
+
+	/** Phase 30: the skip-key presses of the last tick (0, 1, or 2 for a double press). */
+	public static int lastPresses() {
+		return lastPresses;
+	}
+
+	/** Phase 30: the film clock rate (1, or 0 while a hit-stop holds; bullet time never slows the film camera). */
+	private static float filmRate() {
+		return EpicClock.hitStopped() ? 0.0F : 1.0F;
+	}
+
+	/**
 	 * Phase 10 (28.3.2): the sky ride's exit on the climax: an instant cut back to the eye while an impact frame or the
 	 * cloud wipe hides it, else the normal 10-tick blend.
 	 */
@@ -292,6 +371,11 @@ public final class CinematicDirector {
 
 	/** The FOV multiplier (1 = unchanged). */
 	public static float fovScale() {
+		if (active && shot != null && shot.type == Shots.Type.FILM && filmFov != 1.0F) {
+			// Phase 30 (30.2.3): the film's factor k in 0.55-1.45, applied as 1 + (k - 1) x fovEffectScale
+			float effect = (float) (double) Minecraft.getInstance().options.fovEffectScale().get();
+			return 1.0F + (Mth.clamp(filmFov, 0.55F, 1.45F) - 1.0F) * effect;
+		}
 		if (snapStart == 0L) {
 			return 1.0F;
 		}
@@ -307,6 +391,11 @@ public final class CinematicDirector {
 
 	/** The Dutch roll in degrees (0 = none). */
 	public static float roll() {
+		if (active && shot != null && shot.type == Shots.Type.FILM) {
+			// Phase 30 (30.2.3): the film roll, ≤ 20° × damageTiltStrength (rate-limited by the film path)
+			float tilt = (float) (double) Minecraft.getInstance().options.damageTiltStrength().get();
+			return Mth.clamp(filmRoll, -20.0F, 20.0F) * tilt;
+		}
 		if (rollNow == 0.0F) {
 			return 0.0F;
 		}
@@ -347,6 +436,7 @@ public final class CinematicDirector {
 	public static int tick() {
 		ticks++;
 		int presses = SkipKey.presses();
+		lastPresses = presses;
 		if (rollLeft > 0 && --rollLeft == 0) {
 			rollTarget = 0.0F;
 		}
@@ -374,9 +464,14 @@ public final class CinematicDirector {
 			finish();
 			return presses;
 		}
-		age += EpicClock.sigma();
+		boolean film = running.type == Shots.Type.FILM;
+		age += film ? filmRate() : EpicClock.sigma();
 		if (!running.danger) {
 			SCENE_TICKS.merge(scene, 1, Integer::sum);
+		}
+		if (film && !EpicSettings.spektakuler()) {
+			abort();
+			return presses;
 		}
 		boolean penuh = mode() == EpicSettings.Camera.PENUH;
 		boolean hurtOk = ShotGuard.tick(true, penuh);
@@ -413,7 +508,14 @@ public final class CinematicDirector {
 			if (t >= 1.0F || last == null) {
 				return null;
 			}
+			if (running.type == Shots.Type.FILM) {
+				filmFov = 1.0F + (filmFov - 1.0F) * (1.0F - ease(t) * 0.5F);
+				filmRoll *= 1.0F - ease(t) * 0.5F;
+			}
 			return blend(last, eye, ease(t));
+		}
+		if (running.type == Shots.Type.FILM && running.film != null) {
+			return filmPose(level, minecraft, running, eye, partial);
 		}
 		Scene scene = owner;
 		Vec3 feet = scene != null ? scene.feet(partial) : anchor;
@@ -467,7 +569,53 @@ public final class CinematicDirector {
 		return pose;
 	}
 
+	/** Phase 30: one frame of a film shot (the path, then one clip, the floor, the enter blend). */
+	private static Pose filmPose(ClientLevel level, Minecraft minecraft, Shots.Shot running, Pose eye, float partial) {
+		float rate = filmRate();
+		float filmAge = age + partial * rate;
+		dev.kultivator.client.epic.film.FilmPath path = running.film;
+		path.evaluate(Math.min(filmAge, path.ticks()), partial);
+		double[] o = path.out;
+		Vec3 target = new Vec3(o[0], o[1], o[2]);
+		boolean first = last == null || snapEnter && age < 1.0F;
+		if (!first) {
+			// one clip per frame from the pose shown last: the camera never passes into a block
+			Vec3 from = last.pos();
+			BlockHitResult hit = level.clip(new ClipContext(from, target, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, minecraft.player));
+			if (hit.getType() != HitResult.Type.MISS) {
+				Vec3 dir = target.subtract(from);
+				double length = dir.length();
+				double reach = Math.max(0.0D, from.distanceTo(hit.getLocation()) - 0.3D);
+				if (length > 0.001D) {
+					target = from.add(dir.scale(reach / length));
+				}
+			}
+		} else {
+			net.minecraft.core.BlockPos cell = net.minecraft.core.BlockPos.containing(target);
+			if (!level.getBlockState(cell).getCollisionShape(level, cell).isEmpty()) {
+				// a masked jump into a block: stand on the surface of that column instead
+				int surface = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, cell.getX(), cell.getZ());
+				target = new Vec3(target.x, surface + 0.3D, target.z);
+			}
+		}
+		double minY = level.getMinY() + 1.0D;
+		if (target.y < minY) {
+			target = new Vec3(target.x, minY, target.z);
+		}
+		Pose shotPose = new Pose(target, (float) o[3], (float) o[4]);
+		float enter = snapEnter ? 1.0F : Math.min(1.0F, filmAge / ENTER);
+		float e = ease(enter);
+		filmFov = (float) (1.0D + (o[5] - 1.0D) * e);
+		filmRoll = (float) o[6] * e;
+		Pose from = blendFrom != null ? blendFrom : eye;
+		Pose pose = enter >= 1.0F ? shotPose : blend(from, shotPose, e);
+		last = pose;
+		return pose;
+	}
+
 	private static void finish() {
+		filmFov = 1.0F;
+		filmRoll = 0.0F;
 		if (active) {
 			lastCameraEnd = ticks;
 			KIND_LAST.put(kind, ticks);

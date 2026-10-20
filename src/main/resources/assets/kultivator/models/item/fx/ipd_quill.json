@@ -1,0 +1,289 @@
+{
+ "textures": {
+  "t0": "kultivator:item/fx/ipd_quill_shaft",
+  "t1": "kultivator:item/fx/ipd_quill_vane",
+  "t2": "kultivator:item/fx/ipd_quill_tip",
+  "particle": "kultivator:item/fx/ipd_quill_shaft"
+ },
+ "elements": [
+  {
+   "from": [
+    7.8,
+    7.8,
+    -4.0
+   ],
+   "to": [
+    8.2,
+    8.2,
+    16.0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    }
+   }
+  },
+  {
+   "from": [
+    7.95,
+    6.6,
+    0.0
+   ],
+   "to": [
+    8.05,
+    9.4,
+    12.0
+   ],
+   "faces": {
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "west": {
+     "uv": [
+      16,
+      0,
+      0,
+      16
+     ],
+     "texture": "#t1"
+    }
+   }
+  },
+  {
+   "from": [
+    6.6,
+    7.95,
+    0.0
+   ],
+   "to": [
+    9.4,
+    8.05,
+    12.0
+   ],
+   "faces": {
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "down": {
+     "uv": [
+      16,
+      0,
+      0,
+      16
+     ],
+     "texture": "#t1"
+    }
+   }
+  },
+  {
+   "from": [
+    7.4,
+    7.4,
+    -8.0
+   ],
+   "to": [
+    8.6,
+    8.6,
+    -4.0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    }
+   },
+   "light_emission": 15
+  },
+  {
+   "from": [
+    7.55,
+    7.55,
+    -9.2
+   ],
+   "to": [
+    8.45,
+    8.45,
+    -8.0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8.0,
+     8.0,
+     -8.6
+    ],
+    "axis": "z",
+    "angle": 45.0
+   },
+   "light_emission": 15
+  }
+ ]
+}

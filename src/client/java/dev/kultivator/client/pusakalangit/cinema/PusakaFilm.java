@@ -136,6 +136,9 @@ public final class PusakaFilm {
 
 	/** One event of the local player's own decree (a row with {@code Dampak.Ride.FILM}); never a disciple's or an echo. */
 	public static void onTechFx(Payloads.TechFx p, TechniqueSpec spec, Dampak d, Phase phase, Vec3 aim) {
+		if (dev.kultivator.client.epic.film.FilmDirector.claims(spec.id())) {
+			return; // Phase 30 (30.5): the decree plays its Film Spektakuler; a refused film leaves Film Pusaka as it was
+		}
 		long key = ((long) p.caster() << 32) | (spec.netId() & 0xFFFFFFFFL);
 		Film film = current;
 		if (phase == Phase.ABORT) {

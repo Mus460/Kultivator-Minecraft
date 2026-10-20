@@ -256,6 +256,7 @@ public class RogueCultivatorEntity extends Monster {
 		}
 		if (flee) {
 			this.fled = true;
+			dev.kultivator.voice.VoiceHooks.rogueFlee(this);
 		} else {
 			this.despawned = true;
 		}

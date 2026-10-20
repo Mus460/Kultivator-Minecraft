@@ -1,0 +1,119 @@
+{
+ "textures": {
+  "t0": "kultivator:item/fx/fmq_flake_plate",
+  "t1": "kultivator:item/fx/fmq_rim",
+  "particle": "kultivator:item/fx/fmq_flake_plate"
+ },
+ "elements": [
+  {
+   "from": [
+    -8.0,
+    8.0,
+    -8.0
+   ],
+   "to": [
+    24.0,
+    8.05,
+    24.0
+   ],
+   "faces": {
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "down": {
+     "uv": [
+      0,
+      16,
+      16,
+      0
+     ],
+     "texture": "#t0"
+    }
+   }
+  },
+  {
+   "from": [
+    7.2,
+    8.0,
+    7.2
+   ],
+   "to": [
+    8.8,
+    9.6,
+    8.8
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8.0,
+     8.8,
+     8.0
+    ],
+    "axis": "y",
+    "angle": 45.0
+   },
+   "light_emission": 15
+  }
+ ]
+}

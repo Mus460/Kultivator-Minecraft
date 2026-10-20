@@ -47,6 +47,8 @@ final class EpicClientCommands {
 		root.then(dev.kultivator.client.dampak.DampakClient.command());
 		// Phase 10b (DESIGN 29.11): /sinematik pusaka film|atur|vista|info
 		root.then(dev.kultivator.client.pusakalangit.TitahClient.command());
+		// Phase 30 (DESIGN 30.6): /sinematik spektakuler | film ... | kosmik | lensa | waktu_beku
+		dev.kultivator.client.epic.film.FilmCommands.register(root);
 		root.then(ClientCommands.literal("reset").executes(context -> {
 			EpicSettings.resetAll();
 			EpicBudget.resetSession();

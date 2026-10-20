@@ -66,6 +66,9 @@ public class Kultivator implements ModInitializer {
 		Net.init();
 		// Polish pass (DESIGN 27.1 S5): the emissive qi particle types (registered on both sides, drawn by the client).
 		dev.kultivator.fx.QiParticles.register();
+		// Phase 30 (DESIGN 30.2.11): the Kenney CC0 film particle types and presentation sounds (drawn and played by the client).
+		dev.kultivator.fx.FilmParticles.register();
+		dev.kultivator.sound.FilmSounds.register();
 		// Phase 6c spine (DESIGN 22.14.6): DeathGuard is the only player ALLOW_DEATH listener; modules register their guards.
 		dev.kultivator.util.DeathGuard.init();
 
@@ -134,6 +137,8 @@ public class Kultivator implements ModInitializer {
 		dev.kultivator.batin.Batin.init();
 		// Phase 10b: Pusaka Langit / Titah Langit (DESIGN 29.9): the seal, the monument blocks and entity, the saved registry.
 		dev.kultivator.pusakalangit.PusakaLangit.init();
+		// Voices (module V): the Japanese voice lines of Heaven, demons, ancient beasts, hermits, rogues and disciples.
+		dev.kultivator.voice.Voices.init();
 		// After every module registered its items.
 		ModItems.init();
 		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its

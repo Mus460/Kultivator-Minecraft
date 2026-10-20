@@ -206,6 +206,28 @@ final class SettingsPage extends Page {
 				}
 			}
 		}
+		// Voices (module V): Suara bicara, Teks suara and the VOICEVOX credits (a click plays a sample line).
+		List<dev.kultivator.client.voice.VoiceSettings.Row> voiceRows = dev.kultivator.client.voice.VoiceSettings.rows();
+		if (!voiceRows.isEmpty()) {
+			cy += 2;
+			heading(cy, dev.kultivator.client.voice.VoiceSettings.heading());
+			cy += 15;
+			for (dev.kultivator.client.voice.VoiceSettings.Row voice : voiceRows) {
+				if (voice.cycle()) {
+					TalismanButton cycle = new TalismanButton(rightX + 2, cy, rightW - 6, coin + 2, voice.value());
+					cycle.onPress(voice.next());
+					cycle.tooltip(voice.tooltip());
+					put(cycle, cy);
+					cy += row + 2;
+				} else {
+					JadeCoin toggle = new JadeCoin(rightX + 2, cy, rightW - 6, coin, voice.value(), voice.on());
+					toggle.onPress(voice.next());
+					toggle.tooltip(voice.tooltip());
+					put(toggle, cy);
+					cy += row;
+				}
+			}
+		}
 		columnHeight = cy - y + 4;
 	}
 

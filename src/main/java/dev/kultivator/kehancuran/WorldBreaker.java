@@ -16,6 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceKey;
@@ -28,6 +29,7 @@ import net.minecraft.server.level.TicketType;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.item.ItemStack;
@@ -35,10 +37,14 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -77,6 +83,12 @@ import java.util.concurrent.CompletableFuture;
  * Pusaka into air of its own crater, recorded in the SAME undo entry (a carved position's record is rewritten, never
  * doubled). A clear job ({@link #submitClear}) is a restore-flavoured job that sets air only where the monument block
  * still stands; it waits for unloaded chunks and hands what it could not reach back to {@code TitahMonuments}.
+ * <p>
+ * Phase 30 "Hancur Total" (DESIGN 30.1): every job carries the never-touch rules of its owner's switch
+ * ({@link ProtectedZones.Rules}). Under {@code TOTAL} bedrock, portals, obsidian, fluids and block entities are removed too
+ * (only the keep-list and the protected zones stay); a block entity is removed with
+ * {@link Block#UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS} so nothing spills, and an undoable job saves its full NBT (capped) so
+ * Pulihkan puts containers back with their contents. Only an unloaded neighbour still makes a position unsafe.
  */
 public final class WorldBreaker {
 
@@ -96,6 +108,137 @@ public final class WorldBreaker {
 	private static final int READ_FACTOR = 8;
 	/** The only flags blocks are changed with: clients see it, nothing else reacts (see the class comment). */
 	private static final int FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_SKIP_ON_PLACE;
+	/** Phase 30 (30.1.4): a block entity is removed without its side effects (no spilled contents, no popped records). */
+	private static final int FLAGS_ENTITY = FLAGS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS;
+
+	/**
+	 * Phase 30 (DESIGN 30.1.4): the block-entity NBT one undoable job saved for Pulihkan, capped by
+	 * {@code kehancuranUndoBlockEntities} entries and {@code kehancuranUndoNbtKiB}. When a cap is reached the remaining
+	 * block entities of the job are kept (counted in {@link #kept}), so items are never lost in an undoable job.
+	 */
+	static final class BeUndo {
+		final Map<Long, CompoundTag> tags = new HashMap<>();
+		long bytes;
+		int kept;
+
+		/** Saves the block entity at {@code pos}; false when a cap is reached or it cannot be saved (the block must stay). */
+		boolean save(ServerLevel level, long pos, BlockEntity entity) {
+			KultivatorConfig config = KultivatorConfig.get();
+			if (tags.size() >= config.kehancuranUndoBlockEntities) {
+				kept++;
+				return false;
+			}
+			CompoundTag tag;
+			try {
+				tag = entity.saveWithFullMetadata(level.registryAccess());
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Kultivator: could not save a block entity for Pulihkan; it stays", exception);
+				kept++;
+				return false;
+			}
+			long size = tag.sizeInBytes();
+			if (bytes + size > config.kehancuranUndoNbtKiB * 1024L) {
+				kept++;
+				return false;
+			}
+			tags.put(pos, tag);
+			bytes += size;
+			return true;
+		}
+
+		/** The removal failed after the save: forget the tag again. */
+		void unsave(long pos) {
+			CompoundTag tag = tags.remove(pos);
+			if (tag != null) {
+				bytes -= tag.sizeInBytes();
+			}
+		}
+	}
+
+	/**
+	 * Phase 30 (DESIGN 30.1.3 item 4): the fluid cells next to what a Hancur Total job carved (outside the shape), nudged
+	 * with a scheduled fluid tick after the last carve batch so the rim settles at once. Only with
+	 * {@code kehancuranFluidSettle} above 0 (off by default: a draining lake is expensive), at most that many cells, spread
+	 * over 20 ticks, never in unloaded chunks.
+	 */
+	static final class FluidRim {
+		@Nullable LongOpenHashSet cells;
+
+		void note(ServerLevel level, BlockPos carved) {
+			int max = KultivatorConfig.get().kehancuranFluidSettle;
+			if (max <= 0) {
+				return;
+			}
+			if (cells == null) {
+				cells = new LongOpenHashSet();
+			}
+			if (cells.size() >= max * 4) {
+				return;
+			}
+			BlockPos.MutableBlockPos next = new BlockPos.MutableBlockPos();
+			for (Direction direction : Direction.values()) {
+				if (direction == Direction.DOWN) {
+					continue;
+				}
+				next.setWithOffset(carved, direction);
+				if (level.isLoaded(next) && !level.getFluidState(next).isEmpty()) {
+					cells.add(next.asLong());
+				}
+			}
+		}
+
+		void settle(@Nullable ServerLevel level) {
+			LongOpenHashSet list = cells;
+			cells = null;
+			int max = KultivatorConfig.get().kehancuranFluidSettle;
+			if (level == null || list == null || list.isEmpty() || max <= 0) {
+				return;
+			}
+			int i = 0;
+			for (long packed : list.toLongArray()) {
+				if (i >= max) {
+					break;
+				}
+				BlockPos pos = BlockPos.of(packed);
+				if (!level.isLoaded(pos)) {
+					continue;
+				}
+				FluidState fluid = level.getFluidState(pos);
+				if (fluid.isEmpty()) {
+					continue;
+				}
+				level.scheduleTick(pos, fluid.getType(), 2 + i % 20);
+				i++;
+			}
+		}
+	}
+
+	/** A flowing (not source) fluid block: a restore treats it as empty (fluid that ran into the pit, 30.1.3 item 5). */
+	private static boolean flowing(BlockState state) {
+		return state.getBlock() instanceof LiquidBlock && !state.getFluidState().isEmpty() && !state.getFluidState().isSource();
+	}
+
+	/**
+	 * Loads a saved block-entity tag into the block just restored at {@code pos} (30.1.4). True when it was loaded.
+	 */
+	private static boolean loadTag(ServerLevel level, BlockPos pos, BlockState state, @Nullable CompoundTag tag) {
+		if (tag == null) {
+			return false;
+		}
+		BlockEntity entity = level.getBlockEntity(pos);
+		if (entity == null) {
+			return false;
+		}
+		try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(entity.problemPath(), Kultivator.LOGGER)) {
+			entity.loadWithComponents(TagValueInput.create(reporter, level.registryAccess(), tag));
+		} catch (RuntimeException exception) {
+			Kultivator.LOGGER.warn("Kultivator: could not restore a block entity's contents at {}", pos, exception);
+			return false;
+		}
+		entity.setChanged();
+		level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
+		return true;
+	}
 
 	/** One cast (or restore) being worked through. */
 	static final class Job {
@@ -188,6 +331,21 @@ public final class WorldBreaker {
 		/** A Titah clear job (restore-flavoured): its id in {@code TitahMonuments}, -1 = untracked. */
 		boolean clear;
 		int clearId = -1;
+
+		// ---- Phase 30 (DESIGN 30.1)
+		/** The never-touch rules (the owner's Hancur Total switch at submit time; a later toggle updates queued jobs). */
+		ProtectedZones.Rules rules = ProtectedZones.Rules.CLASSIC;
+		/** The block-entity NBT this (undoable) carve saved for Pulihkan. */
+		final BeUndo beUndo = new BeUndo();
+		/** For a restore: the saved block-entity tags by position (empty for most restores). */
+		Map<Long, CompoundTag> nbt = Map.of();
+		/** For a restore: the block entities it put back with their contents. */
+		int restoredBe;
+		/** The rim fluid cells to settle after the carve (only with {@code kehancuranFluidSettle}). */
+		final FluidRim rim = new FluidRim();
+		/** A test site (30.6): a restore-flavoured job that places test blocks, recorded in an undo entry, then {@link #onDone}. */
+		boolean site;
+		@Nullable Runnable onDone;
 
 		Job(UUID owner, String ownerName, String disciple, String shape, ResourceKey<Level> dimension, BlockPos centre, long[] positions,
 				BlockState[] targets, BlockState[] placed, boolean restore, boolean naturalOnly, boolean wither, int dropsPct) {
@@ -286,6 +444,8 @@ public final class WorldBreaker {
 		/** Phase 10b (DESIGN 29.16.9): a compact bulk undo (Tingkat 2-5); Pulihkan runs it as a bulk restore job. */
 		final boolean bulk;
 		final int tier;
+		/** Phase 30 (30.1.4): the saved block-entity tags by position (only for positions in this buffer). */
+		Map<Long, CompoundTag> nbt = Map.of();
 
 		Undo(int id, Job job, long expiresAt) {
 			this(id, job, job.undoPositions.stream().mapToLong(Long::longValue).toArray(), job.undoOld.toArray(new BlockState[0]),
@@ -466,6 +626,9 @@ public final class WorldBreaker {
 			merged.specNet = queued.specNet;
 			merged.palette = queued.palette;
 			merged.debrisFlags = queued.debrisFlags;
+			// Phase 30: the newer cast's rules (the owner's switch now) and every column top-down (30.1.3 item 2)
+			merged.rules = job.rules;
+			Shapes.topDown(merged.positions, merged.modes);
 			list.set(i, merged);
 			JOBS.clear();
 			JOBS.addAll(list);
@@ -645,14 +808,21 @@ public final class WorldBreaker {
 				continue;
 			}
 			BlockState state = level.getBlockState(pos);
+			boolean total = !job.restore && job.rules.total();
 			if (zone != null) {
-				keep(job, i, pos, state);
+				if (total) {
+					keepHard(job, i, pos, state);
+				} else {
+					keep(job, i, pos, state);
+				}
 				continue;
 			}
 			BlockState to;
+			CompoundTag saved = null;
 			if (job.restore) {
 				BlockState left = job.placed == null ? Blocks.AIR.defaultBlockState() : job.placed[i];
-				if (!state.isAir() && state != left) {
+				// Phase 30 (30.1.3 item 5): fluid that ran into the pit never blocks Pulihkan
+				if (!state.isAir() && state != left && !flowing(state)) {
 					continue;
 				}
 				to = job.targets[i];
@@ -672,8 +842,13 @@ public final class WorldBreaker {
 					keep(job, i, pos, state);
 					continue;
 				}
-				if (ProtectedZones.neverTouch(level, pos, state) || mode == MODE_NATURAL && !Shapes.natural(state)
-						|| mode == MODE_STRIP && !state.is(Shapes.STRIPPABLE) || touchesUnsafe(level, pos)) {
+				if (total && (ProtectedZones.neverTouch(level, pos, state, job.rules) || touchesUnsafe(level, pos, job.rules))) {
+					// Hancur Total: a kept block (keep-list, unloaded neighbour) keeps its whole column below (30.1.1)
+					keepHard(job, i, pos, state);
+					continue;
+				}
+				if (ProtectedZones.neverTouch(level, pos, state, job.rules) || mode == MODE_NATURAL && !Shapes.natural(state)
+						|| mode == MODE_STRIP && !state.is(Shapes.STRIPPABLE) || touchesUnsafe(level, pos, job.rules)) {
 					keep(job, i, pos, state);
 					continue;
 				}
@@ -681,7 +856,19 @@ public final class WorldBreaker {
 				if (to == null) {
 					continue;
 				}
-				if (to.isAir() && job.dropsPct > 0 && job.stacks < MAX_DROP_STACKS && level.getRandom().nextInt(100) < job.dropsPct) {
+				if (state.hasBlockEntity() && job.undoable) {
+					// Phase 30 (30.1.4): the contents go into the undo entry, or (cap reached) the block stays
+					BlockEntity entity = level.getBlockEntity(pos);
+					if (entity != null) {
+						if (!job.beUndo.save(level, pos.asLong(), entity)) {
+							keepHard(job, i, pos, state);
+							continue;
+						}
+						saved = job.beUndo.tags.get(pos.asLong());
+					}
+				}
+				if (!state.hasBlockEntity() && to.isAir() && job.dropsPct > 0 && job.stacks < MAX_DROP_STACKS
+						&& level.getRandom().nextInt(100) < job.dropsPct) {
 					for (ItemStack drop : Block.getDrops(state, level, pos, null)) {
 						if (job.stacks >= MAX_DROP_STACKS) {
 							break;
@@ -691,14 +878,23 @@ public final class WorldBreaker {
 					}
 				}
 			}
-			if (!level.setBlock(pos, to, FLAGS)) {
+			if (!level.setBlock(pos, to, state.hasBlockEntity() ? FLAGS_ENTITY : FLAGS)) {
 				// Nothing changed (the same state, or the level refused): no count and no undo entry.
+				if (saved != null) {
+					job.beUndo.unsave(pos.asLong());
+				}
 				continue;
 			}
-			if (job.undoable) {
+			if (job.undoable || job.site) {
 				job.undoPositions.add(pos.asLong());
 				job.undoOld.add(state);
 				job.undoPlaced.add(to);
+			}
+			if (job.restore && !job.nbt.isEmpty() && loadTag(level, pos, to, job.nbt.get(pos.asLong()))) {
+				job.restoredBe++;
+			}
+			if (total && to.isAir()) {
+				job.rim.note(level, pos);
 			}
 			job.changed++;
 			budget--;
@@ -858,7 +1054,7 @@ public final class WorldBreaker {
 				continue;
 			}
 			BlockState state = level.getBlockState(pos);
-			if (state != plan.from()[i] || ProtectedZones.neverTouch(level, pos, state) || touchesUnsafe(level, pos)) {
+			if (state != plan.from()[i] || ProtectedZones.neverTouch(level, pos, state, job.rules) || touchesUnsafe(level, pos)) {
 				continue;
 			}
 			BlockState to = plan.to()[i];
@@ -1213,6 +1409,35 @@ public final class WorldBreaker {
 	}
 
 	/**
+	 * Phase 30 (30.1.1): a block a Hancur Total job had to leave (a zone, the keep-list, an unloaded neighbour, a container
+	 * beyond the save cap) keeps every position below it in its column, solid or not, so nothing is ever left over a hollow.
+	 */
+	private static void keepHard(Job job, int i, BlockPos pos, BlockState state) {
+		byte mode = job.mode(i);
+		if ((mode == MODE_REMOVE || mode == MODE_NATURAL) && !state.isAir()) {
+			job.kept.merge(BlockPos.asLong(pos.getX(), 0, pos.getZ()), pos.getY(), Math::max);
+		}
+	}
+
+	/**
+	 * {@link #touchesUnsafe(ServerLevel, BlockPos)} under {@code rules}: with Hancur Total only an unloaded neighbour is
+	 * unsafe (chunk-edge safety, 30.1.1); fluids and block entities next door no longer keep a block.
+	 */
+	private static boolean touchesUnsafe(ServerLevel level, BlockPos pos, ProtectedZones.Rules rules) {
+		if (!rules.total()) {
+			return touchesUnsafe(level, pos);
+		}
+		BlockPos.MutableBlockPos next = new BlockPos.MutableBlockPos();
+		for (Direction direction : Direction.values()) {
+			next.setWithOffset(pos, direction);
+			if (!level.isLoaded(next)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * True when a neighbour holds a fluid or a block entity, or lies in an unloaded chunk: removing this block could later
 	 * let water or lava in or pop a sign, and nothing may load a chunk.
 	 */
@@ -1260,6 +1485,24 @@ public final class WorldBreaker {
 
 	/** A job ends (done or cancelled): the record, the restore buffer and the owner's message. */
 	private static void finish(MinecraftServer server, Job job, boolean cancelled) {
+		if (job.site) {
+			// Phase 30 (30.6): the test site is recorded so Pulihkan clears it, then the carve of the test starts
+			if (!job.undoPositions.isEmpty()) {
+				addUndo(server, new Undo(nextUndo++, job, server.overworld().getGameTime() + KultivatorConfig.get().kehancuranUndoMinutes * 1200L));
+			}
+			if (!cancelled && job.onDone != null) {
+				try {
+					job.onDone.run();
+				} catch (RuntimeException exception) {
+					Kultivator.LOGGER.error("Kultivator: Hancur Total test site callback failed", exception);
+				}
+			}
+			return;
+		}
+		if (!job.restore) {
+			// Phase 30 (30.1.3 item 4): the rim fluid settles now (only with kehancuranFluidSettle above 0)
+			job.rim.settle(server.getLevel(job.dimension));
+		}
 		sendDone(server, job);
 		if (job.changed > 0) {
 			if (job.self) {
@@ -1292,7 +1535,9 @@ public final class WorldBreaker {
 		ServerPlayer owner = server.getPlayerList().getPlayer(job.owner);
 		int minutes = KultivatorConfig.get().kehancuranUndoMinutes;
 		if (job.undoable && !job.undoPositions.isEmpty()) {
-			addUndo(server, new Undo(nextUndo++, job, server.overworld().getGameTime() + minutes * 1200L));
+			Undo undo = new Undo(nextUndo++, job, server.overworld().getGameTime() + minutes * 1200L);
+			undo.nbt = job.beUndo.tags.isEmpty() ? Map.of() : job.beUndo.tags;
+			addUndo(server, undo);
 		}
 		if (job.titah) {
 			// Phase 10b (29.6.3, 29.7.1): the placed monument (kept in the saved record) and the DONE callback (re-seating)
@@ -1314,6 +1559,10 @@ public final class WorldBreaker {
 		if (owner == null) {
 			return;
 		}
+		if (!job.restore && job.beUndo.kept > 0) {
+			// Phase 30 (30.1.4): the container save cap was reached; the rest stayed intact (said once per job)
+			Msg.chat(owner, Component.translatable("kultivator.kehancuran_total.undo_full", job.beUndo.kept).withStyle(ChatFormatting.YELLOW));
+		}
 		if (!cancelled && job.changed > 0 && (job.self || job.restore)) {
 			dev.kultivator.epic.EpicHooks.kehancuran(server.getLevel(job.dimension), owner, null, Vec3.atCenterOf(job.centre), -1, 0.0F, job.restore ? dev.kultivator.epic.EpicIds.KEH_RESTORE : dev.kultivator.epic.EpicIds.KEH_CRATER, job.changed);
 		}
@@ -1327,7 +1576,8 @@ public final class WorldBreaker {
 			return;
 		}
 		if (job.restore) {
-			Msg.chat(owner, Component.translatable("kultivator.kehancuran.restored", job.changed).withColor(0x9FF3E6));
+			Msg.chat(owner, job.restoredBe > 0 ? Component.translatable("kultivator.kehancuran_total.restored_be", job.changed, job.restoredBe).withColor(0x9FF3E6)
+					: Component.translatable("kultivator.kehancuran.restored", job.changed).withColor(0x9FF3E6));
 			if (left > 0) {
 				Msg.chat(owner, Component.translatable("kultivator.kehancuran.restore_left", left).withStyle(ChatFormatting.YELLOW));
 			}
@@ -1363,8 +1613,25 @@ public final class WorldBreaker {
 			old[n] = job.targets[i];
 			placed[n] = job.placed == null ? Blocks.AIR.defaultBlockState() : job.placed[i];
 		}
-		addUndo(server, new Undo(nextUndo++, job, positions, old, placed, job.expiresAt));
+		Undo undo = new Undo(nextUndo++, job, positions, old, placed, job.expiresAt);
+		undo.nbt = subset(job.nbt, positions);
+		addUndo(server, undo);
 		return rest.size();
+	}
+
+	/** The tags of {@code all} for {@code positions} only (a deferred restore keeps its containers' contents, 30.1.4). */
+	private static Map<Long, CompoundTag> subset(Map<Long, CompoundTag> all, long[] positions) {
+		if (all.isEmpty()) {
+			return Map.of();
+		}
+		Map<Long, CompoundTag> out = new HashMap<>();
+		for (long pos : positions) {
+			CompoundTag tag = all.get(pos);
+			if (tag != null) {
+				out.put(pos, tag);
+			}
+		}
+		return out.isEmpty() ? Map.of() : out;
 	}
 
 	/** Keeps a restore buffer; beyond {@link #MAX_UNDO} the oldest is released with a note to its owner (22.11.7). */
@@ -1413,7 +1680,9 @@ public final class WorldBreaker {
 					continue;
 				}
 				UNDO.remove(i);
-				submitBulk(BulkJob.restore(undo));
+				BulkJob bulk = BulkJob.restore(undo);
+				bulk.restoreNbt = undo.nbt;
+				submitBulk(bulk);
 				queued++;
 				continue;
 			}
@@ -1424,6 +1693,7 @@ public final class WorldBreaker {
 			Job job = new Job(undo.owner, undo.ownerName, undo.disciple, undo.shape, undo.dimension, undo.centre, undo.positions, undo.old,
 					undo.placed, true, false, false, 0);
 			job.expiresAt = undo.expiresAt;
+			job.nbt = undo.nbt;
 			submit(job);
 			queued++;
 		}
@@ -1441,6 +1711,65 @@ public final class WorldBreaker {
 			}
 		}
 		return list;
+	}
+
+	// ================================================================== Phase 30: Hancur Total helpers (DESIGN 30.1)
+
+	/**
+	 * The owner switched Hancur Total (30.1.2): every queued or running destructive job of {@code owner} (self, Titah,
+	 * disciple and bulk) takes {@code rules} from its next batch on (a bulk carve from its next chunk). Returns how many.
+	 */
+	static int applyRules(UUID owner, ProtectedZones.Rules rules) {
+		int n = 0;
+		for (Job job : JOBS) {
+			if (!job.restore && !job.site && job.owner.equals(owner)) {
+				job.rules = rules;
+				n++;
+			}
+		}
+		for (BulkJob job : BULK) {
+			if (!job.restore && job.owner.equals(owner)) {
+				job.rules = rules;
+				n++;
+			}
+		}
+		return n;
+	}
+
+	/** {stored block-entity tags, their bytes} across the owner's restore buffers (the {@code uji kehancuran total info} line). */
+	static long[] undoNbtStats(MinecraftServer server, UUID owner) {
+		long count = 0L;
+		long bytes = 0L;
+		long now = server.overworld().getGameTime();
+		for (Undo undo : UNDO) {
+			if (!undo.owner.equals(owner) || undo.expiresAt <= now) {
+				continue;
+			}
+			for (CompoundTag tag : undo.nbt.values()) {
+				count++;
+				bytes += tag.sizeInBytes();
+			}
+		}
+		return new long[]{count, bytes};
+	}
+
+	/**
+	 * The test site of {@code /kultivasi uji kehancuran total uji <kind>} (30.6): a restore-flavoured job that places
+	 * {@code targets} where the world still holds {@code current} (or air), never loads a chunk, records what it placed in
+	 * an undo entry of {@code owner} (so Pulihkan clears the site) and then runs {@code onDone} (the test carve). False
+	 * when the queue is full. The caller has already checked the zones and that only natural ground or air is replaced.
+	 */
+	static boolean submitSite(ServerPlayer owner, long[] positions, BlockState[] targets, BlockState[] current, Runnable onDone) {
+		if (positions.length == 0 || positions.length != targets.length || positions.length != current.length || !hasRoom()) {
+			return false;
+		}
+		Job job = new Job(owner.getUUID(), owner.getName().getString(), "", "uji_total", owner.level().dimension(), BlockPos.of(positions[0]),
+				positions.clone(), targets.clone(), current.clone(), true, false, false, 0);
+		job.site = true;
+		job.onDone = onDone;
+		job.expiresAt = Long.MAX_VALUE;
+		JOBS.addLast(job);
+		return true;
 	}
 
 	// ================================================================== Phase 10b: the fast bulk carve (DESIGN 29.16.7)
@@ -1557,6 +1886,8 @@ public final class WorldBreaker {
 		int yMax = Integer.MIN_VALUE;
 		/** A restore: the chunk's entity boxes (read once). */
 		@Nullable List<AABB> boxes;
+		/** Phase 30: the job's rules when this chunk started (a toggle applies from the next chunk). */
+		ProtectedZones.Rules rules = ProtectedZones.Rules.CLASSIC;
 
 		ChunkWork(ChunkPos pos) {
 			this.pos = pos;
@@ -1663,6 +1994,13 @@ public final class WorldBreaker {
 		int ticksWorked;
 		int drainTicks;
 		long lastFxTick = Long.MIN_VALUE;
+		// ---- Phase 30 (DESIGN 30.1)
+		ProtectedZones.Rules rules = ProtectedZones.Rules.CLASSIC;
+		final BeUndo beUndo = new BeUndo();
+		/** A bulk restore: the saved block-entity tags by position. */
+		Map<Long, CompoundTag> restoreNbt = Map.of();
+		int restoredBe;
+		final FluidRim rim = new FluidRim();
 
 		BulkJob(UUID owner, String ownerName, String specId, ResourceKey<Level> dimension, BlockPos centre, Vec3 castPos, int tier, boolean restore,
 				boolean permanent, BulkShape shape) {
@@ -1690,6 +2028,7 @@ public final class WorldBreaker {
 			BulkJob job = new BulkJob(caster.getUUID(), caster.getName().getString(), specId, caster.level().dimension(), shape.impact(), castPos,
 					tier, false, permanent, shape);
 			job.casterEntityId = caster.getId();
+			job.rules = Kehancuran.rulesFor(caster);
 			return job;
 		}
 
@@ -2147,6 +2486,7 @@ public final class WorldBreaker {
 		}
 		AABB box = new AABB(work.minX, work.yMin, work.minZ, work.minX + 16, work.yMax + 1, work.minZ + 16);
 		work.zones = new ProtectedZones.Context(level, box, job.owner, columns);
+		work.rules = job.rules;
 		buildUnsafe(level, work, chunk);
 		return work;
 	}
@@ -2163,7 +2503,9 @@ public final class WorldBreaker {
 		int sFrom = chunk.getSectionIndex(yFrom);
 		int sTo = chunk.getSectionIndex(yTo);
 		LevelChunkSection[] sections = chunk.getSections();
-		for (int si = Math.max(0, sFrom - 1); si <= Math.min(sections.length - 1, sTo + 1); si++) {
+		// Phase 30 (30.1.1): under Hancur Total only a border to an unloaded neighbour is unsafe
+		boolean total = work.rules.total();
+		for (int si = Math.max(0, sFrom - 1); !total && si <= Math.min(sections.length - 1, sTo + 1); si++) {
 			LevelChunkSection section = sections[si];
 			if (section == null || !section.hasFluid()) {
 				continue;
@@ -2179,7 +2521,7 @@ public final class WorldBreaker {
 				}
 			}
 		}
-		for (BlockPos pos : chunk.getBlockEntitiesPos()) {
+		for (BlockPos pos : total ? java.util.Set.<BlockPos>of() : chunk.getBlockEntitiesPos()) {
 			if (pos.getY() >= yFrom - 1 && pos.getY() <= yTo + 1) {
 				work.markAround(chunk, pos.getX() & 15, pos.getY(), pos.getZ() & 15);
 			}
@@ -2202,6 +2544,9 @@ public final class WorldBreaker {
 						}
 					}
 				}
+				continue;
+			}
+			if (total) {
 				continue;
 			}
 			LevelChunkSection[] theirs = next.getSections();
@@ -2286,13 +2631,16 @@ public final class WorldBreaker {
 					continue;
 				}
 				cursor.set(x, y, z);
-				boolean keep = y > hi || work.unsafe(chunk, lx, y, lz) || ProtectedZones.neverTouch(level, cursor, state)
+				boolean total = work.rules.total();
+				boolean hard = y <= hi && (work.unsafe(chunk, lx, y, lz) || ProtectedZones.neverTouch(level, cursor, state, work.rules));
+				boolean keep = y > hi || hard
 						|| mode == MODE_NATURAL && !Shapes.natural(state) && !loosePlant(state)
 						|| mode == MODE_STRIP && !state.is(Shapes.STRIPPABLE) && !loosePlant(state);
 				if (keep) {
 					job.kept++;
-					if (Shapes.roofs(state)) {
-						// nothing under a kept roof is carved: no sealed hollow, no unsupported fluid
+					if (Shapes.roofs(state) || total && hard && mode != MODE_STRIP) {
+						// nothing under a kept roof is carved: no sealed hollow, no unsupported fluid (Hancur Total: under
+						// anything it had to keep)
 						stop = true;
 						break;
 					}
@@ -2304,13 +2652,37 @@ public final class WorldBreaker {
 					stop = true;
 					break;
 				}
-				BlockState old = chunk.setBlockState(cursor, air, FLAGS);
+				long packed = BlockPos.asLong(x, y, z);
+				BlockState old;
+				if (state.hasBlockEntity()) {
+					// Phase 30 (30.1.4): a block entity goes one by one through the level, without side effects (no spill),
+					// so the chunk's block-entity map stays consistent; an undoable job saves its contents first
+					BlockPos at = cursor.immutable();
+					if (job.undo) {
+						BlockEntity entity = level.getBlockEntity(at);
+						if (entity != null && !job.beUndo.save(level, packed, entity)) {
+							job.kept++;
+							stop = true;
+							break;
+						}
+					}
+					if (level.setBlock(at, air, FLAGS_ENTITY)) {
+						old = state;
+					} else {
+						job.beUndo.unsave(packed);
+						old = null;
+					}
+				} else {
+					old = chunk.setBlockState(cursor, air, FLAGS);
+					if (old != null && PoiTypes.hasPoi(old)) {
+						level.updatePOIOnBlockStateChange(cursor.immutable(), old, air);
+					}
+				}
 				if (old != null) {
-					long packed = BlockPos.asLong(x, y, z);
 					job.changed++;
 					work.changedHere++;
-					if (PoiTypes.hasPoi(old)) {
-						level.updatePOIOnBlockStateChange(cursor.immutable(), old, air);
+					if (total) {
+						job.rim.note(level, cursor);
 					}
 					job.record(packed, old, null);
 					work.sample.add(packed, Block.getId(old), level.getRandom().nextInt(Integer.MAX_VALUE));
@@ -2400,7 +2772,11 @@ public final class WorldBreaker {
 	private static boolean convert(ServerLevel level, BulkJob job, ChunkWork work, LevelChunk chunk, BlockPos.MutableBlockPos pos, int lx, int lz,
 			boolean rim, long seed, Vec3 axis, @Nullable Vec3 casterNow) {
 		BlockState state = chunk.getBlockState(pos);
-		if (state.isAir() || !Shapes.natural(state) || ProtectedZones.neverTouch(level, pos, state) || work.unsafe(chunk, lx, pos.getY(), lz)) {
+		if (state.isAir() || !Shapes.natural(state) || ProtectedZones.neverTouch(level, pos, state, work.rules) || work.unsafe(chunk, lx, pos.getY(), lz)) {
+			return false;
+		}
+		if (work.rules.total() && touchesUnsafe(level, pos)) {
+			// the surface pass keeps the old neighbour rule (30.1.1: its filters are unchanged)
 			return false;
 		}
 		Vec3 at = Vec3.atCenterOf(pos);
@@ -2596,8 +2972,8 @@ public final class WorldBreaker {
 				cursor.set(BlockPos.getX(data.positions[k]), BlockPos.getY(data.positions[k]), BlockPos.getZ(data.positions[k]));
 				BlockState current = chunk.getBlockState(cursor);
 				BlockState left = data.placed[k] == null ? air : data.placed[k];
-				if (!current.isAir() && current != left) {
-					// someone built here meanwhile: never overwritten
+				if (!current.isAir() && current != left && !flowing(current)) {
+					// someone built here meanwhile: never overwritten (fluid that ran into the pit is, 30.1.3)
 					continue;
 				}
 				BlockState target = data.old[k];
@@ -2606,6 +2982,22 @@ public final class WorldBreaker {
 				}
 				if (occupiedBy(work.boxes, cursor)) {
 					data.deferred.add(k);
+					continue;
+				}
+				CompoundTag tag = job.restoreNbt.isEmpty() ? null : job.restoreNbt.get(data.positions[k]);
+				if (tag != null || current.hasBlockEntity() || target.hasBlockEntity()) {
+					// Phase 30 (30.1.4): a block entity goes back through the level and gets its contents
+					BlockPos at = cursor.immutable();
+					if (level.setBlock(at, target, current.hasBlockEntity() ? FLAGS_ENTITY : FLAGS)) {
+						job.changed++;
+						work.changedHere++;
+						if (loadTag(level, at, target, tag)) {
+							job.restoredBe++;
+						}
+						work.sx += cursor.getX() + 0.5D;
+						work.sy += cursor.getY() + 0.5D;
+						work.sz += cursor.getZ() + 0.5D;
+					}
 					continue;
 				}
 				BlockState old = chunk.setBlockState(cursor, target, FLAGS);
@@ -2660,6 +3052,10 @@ public final class WorldBreaker {
 		ServerPlayer owner = server.getPlayerList().getPlayer(job.owner);
 		ServerLevel level = server.getLevel(job.dimension);
 		int minutes = KultivatorConfig.get().kehancuranUndoMinutes;
+		if (!job.restore) {
+			// Phase 30 (30.1.3 item 4): the rim fluid settles now (only with kehancuranFluidSettle above 0)
+			job.rim.settle(level);
+		}
 		if (job.restore) {
 			int left = rebufferBulk(server, job);
 			if (job.changed > 0) {
@@ -2671,7 +3067,8 @@ public final class WorldBreaker {
 					dev.kultivator.epic.EpicHooks.kehancuran(level, owner, null, Vec3.atCenterOf(job.centre), -1, 0.0F, dev.kultivator.epic.EpicIds.KEH_RESTORE,
 							(int) Math.min(Integer.MAX_VALUE, job.changed));
 				}
-				Msg.chat(owner, Component.translatable("kultivator.kehancuran.restored", job.changed).withColor(0x9FF3E6));
+				Msg.chat(owner, job.restoredBe > 0 ? Component.translatable("kultivator.kehancuran_total.restored_be", job.changed, job.restoredBe)
+						.withColor(0x9FF3E6) : Component.translatable("kultivator.kehancuran.restored", job.changed).withColor(0x9FF3E6));
 				if (left > 0) {
 					Msg.chat(owner, Component.translatable("kultivator.kehancuran.restore_left", left).withStyle(ChatFormatting.YELLOW));
 				}
@@ -2695,8 +3092,10 @@ public final class WorldBreaker {
 			job.undoPos = new long[0];
 			job.undoOld = new BlockState[0];
 			job.undoPlaced = new BlockState[0];
-			addUndo(server, new Undo(nextUndo++, job.owner, job.ownerName, "", Shapes.Kind.BOWL.id(), job.dimension, job.centre, positions, old, placed,
-					server.overworld().getGameTime() + minutes * 1200L, true, job.specId, true, job.tier));
+			Undo undo = new Undo(nextUndo++, job.owner, job.ownerName, "", Shapes.Kind.BOWL.id(), job.dimension, job.centre, positions, old, placed,
+					server.overworld().getGameTime() + minutes * 1200L, true, job.specId, true, job.tier);
+			undo.nbt = job.beUndo.tags.isEmpty() ? Map.of() : job.beUndo.tags;
+			addUndo(server, undo);
 		}
 		if (total > 0 && level != null) {
 			Vec3 centre = Vec3.atCenterOf(job.centre);
@@ -2712,6 +3111,9 @@ public final class WorldBreaker {
 		}
 		if (owner == null) {
 			return;
+		}
+		if (job.beUndo.kept > 0) {
+			Msg.chat(owner, Component.translatable("kultivator.kehancuran_total.undo_full", job.beUndo.kept).withStyle(ChatFormatting.YELLOW));
 		}
 		if (!cancelled && total > 0 && level != null) {
 			dev.kultivator.epic.EpicHooks.kehancuran(level, owner, null, Vec3.atCenterOf(job.centre), -1, 0.0F, dev.kultivator.epic.EpicIds.KEH_CRATER,
@@ -2766,8 +3168,10 @@ public final class WorldBreaker {
 			old[n] = data.old[k];
 			placed[n] = data.placed[k];
 		}
-		addUndo(server, new Undo(nextUndo++, job.owner, job.ownerName, "", Shapes.Kind.BOWL.id(), job.dimension, job.centre, positions, old, placed,
-				job.restoreExpires, true, job.specId, true, job.tier));
+		Undo undo = new Undo(nextUndo++, job.owner, job.ownerName, "", Shapes.Kind.BOWL.id(), job.dimension, job.centre, positions, old, placed,
+				job.restoreExpires, true, job.specId, true, job.tier);
+		undo.nbt = subset(job.restoreNbt, positions);
+		addUndo(server, undo);
 		return rest.size();
 	}
 

@@ -236,6 +236,8 @@ public final class TestCommands {
 		dev.kultivator.batin.Batin.addTestCommands(uji);
 		// Phase 10b (DESIGN 29.11): uji pusaka_langit ...
 		dev.kultivator.pusakalangit.TitahTests.addTestCommands(uji);
+		// Voices (module V): uji suara <key>
+		dev.kultivator.voice.VoiceTests.addTestCommands(uji);
 		root.then(uji);
 	}
 

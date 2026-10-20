@@ -60,6 +60,9 @@ public final class AnimClient {
 			ticks++;
 			ModelFx.tick(level);
 			FireUltimates.tick(level);
+			// Phase 30 (DESIGN 30.5 C30.1): the new ultimate drivers tick after FireUltimates
+			dev.kultivator.client.anim.model.UltimatesA.tick(level);
+			dev.kultivator.client.anim.model.UltimatesB.tick(level);
 		}
 		if (++pruneTicks >= 20) {
 			pruneTicks = 0;
@@ -77,6 +80,8 @@ public final class AnimClient {
 		BindVisuals.clear();
 		ModelFx.clear();
 		FireUltimates.clear();
+		dev.kultivator.client.anim.model.UltimatesA.clear();
+		dev.kultivator.client.anim.model.UltimatesB.clear();
 	}
 
 	private AnimClient() {

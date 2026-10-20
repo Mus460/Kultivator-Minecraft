@@ -42,9 +42,13 @@ import java.util.List;
  * falls into a pit), the End within 160 blocks of (0, 0), and unloaded chunks. The hall list holds every hall of
  * {@code HallData} (online or not), every position the log remembers and every stele ever placed.
  * <p>
- * Never touched: bedrock and anything with hardness below 0, every block with a block entity, portals and their frames,
- * obsidian, crying obsidian, reinforced deepslate, lodestone, respawn anchor, the Sect Hall stele, fluids and
- * waterlogged blocks, and the datapack tag {@code #kultivator:indestructible}.
+ * Never touched ({@link Rules#CLASSIC}): bedrock and anything with hardness below 0, every block with a block entity,
+ * portals and their frames, obsidian, crying obsidian, reinforced deepslate, lodestone, respawn anchor, the Sect Hall
+ * stele, fluids and waterlogged blocks, and the datapack tag {@code #kultivator:indestructible}.
+ * <p>
+ * Phase 30 "Hancur Total" ({@link Rules#TOTAL}, DESIGN 30.1.1): only air, the datapack tag
+ * {@code #kultivator:hancur_total_keep}, the Sect Hall stele, the Titah block monument, formation eyes and the
+ * lodestones registered as formation cores are never touched; everything else outside the protected zones may go.
  */
 public final class ProtectedZones {
 
@@ -54,6 +58,23 @@ public final class ProtectedZones {
 	public static final double COMPANION_RADIUS = 6.0D;
 	public static final int MIN_SPAWN_RADIUS = 16;
 	public static final TagKey<Block> INDESTRUCTIBLE = TagKey.create(Registries.BLOCK, Kultivator.id("indestructible"));
+	/** Phase 30 (DESIGN 30.1.6): what Hancur Total never touches (stele, monument, formation eye, operator blocks). */
+	public static final TagKey<Block> HANCUR_TOTAL_KEEP = TagKey.create(Registries.BLOCK, Kultivator.id("hancur_total_keep"));
+	/** Phase 7c formation eyes are never touched by any rule set. */
+	private static final Identifier FORMATION_EYE = Kultivator.id("formation_eye");
+
+	/**
+	 * The never-touch rule set of one job (DESIGN 30.1.1, contract C30.5), fixed at submit time from the owner's switch
+	 * ({@code Kehancuran.rulesFor}). {@code CLASSIC}: the old blacklist. {@code TOTAL}: Hancur Total, only the keep-list.
+	 */
+	public enum Rules {
+		CLASSIC,
+		TOTAL;
+
+		public boolean total() {
+			return this == TOTAL;
+		}
+	}
 	private static final Identifier STELE = Kultivator.id("sect_hall_stele");
 	/** Phase 10b: Batu Pusaka and Urat Pusaka, the Titah block monument. */
 	private static final Identifier MONUMENT_STONE = Kultivator.id("batu_pusaka");
@@ -359,8 +380,28 @@ public final class ProtectedZones {
 		return new Context(level, new AABB(pos)).zoneOf(pos) != null;
 	}
 
-	/** True for a block Mode Kehancuran never touches (whatever the zone). Air counts as untouchable too. */
+	/** True for a block Mode Kehancuran never touches (whatever the zone) under {@link Rules#CLASSIC}. Air counts as untouchable too. */
 	public static boolean neverTouch(ServerLevel level, BlockPos pos, BlockState state) {
+		return neverTouch(level, pos, state, Rules.CLASSIC);
+	}
+
+	/**
+	 * True for a block Mode Kehancuran never touches (whatever the zone) under {@code rules} (DESIGN 30.1.1). Air is always
+	 * untouchable. {@link Rules#TOTAL}: only the keep-list ({@code #kultivator:hancur_total_keep}, the Sect Hall stele, the
+	 * Titah block monument, formation eyes and the lodestones registered as protective formation cores); bedrock, portals,
+	 * obsidian, fluids and block entities may all go. Zones are checked separately (and always).
+	 */
+	public static boolean neverTouch(ServerLevel level, BlockPos pos, BlockState state, @Nullable Rules rules) {
+		if (rules == Rules.TOTAL) {
+			if (state.isAir() || state.is(HANCUR_TOTAL_KEEP)) {
+				return true;
+			}
+			Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+			if (STELE.equals(id) || MONUMENT_STONE.equals(id) || MONUMENT_VEIN.equals(id) || FORMATION_EYE.equals(id)) {
+				return true;
+			}
+			return state.is(Blocks.LODESTONE) && formationCore(level, pos);
+		}
 		if (state.isAir() || state.hasBlockEntity() || !state.getFluidState().isEmpty()) {
 			return true;
 		}
@@ -379,6 +420,21 @@ public final class ProtectedZones {
 		// Phase 10b (DESIGN 29.6.3): the Titah block monument is never touched by any other carve, surface pass or
 		// Destroyer Art; only the Titah's own restore and clear jobs (which never ask this) change it
 		return STELE.equals(id) || MONUMENT_STONE.equals(id) || MONUMENT_VEIN.equals(id);
+	}
+
+	/** A lodestone at {@code pos} is the core of a registered protective formation (only asked for lodestones: rare). */
+	private static boolean formationCore(ServerLevel level, BlockPos pos) {
+		try {
+			for (Formation formation : FormationData.get(level).all()) {
+				if (pos.equals(formation.pos())) {
+					return true;
+				}
+			}
+			return false;
+		} catch (RuntimeException exception) {
+			// never guess "free" when the registry cannot be read
+			return true;
+		}
 	}
 
 	/** Remembers where a hall is (any hall, active or not) whenever one is seen: the zone list survives restarts. */
