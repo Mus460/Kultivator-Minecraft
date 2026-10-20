@@ -18,6 +18,7 @@
   "kultivator.meditation.bar.site": "Site ×%s",
   "kultivator.meditation.bar.density": "Qi density %s%%",
   "kultivator.meditation.bar.no_formation": "no formation",
+  "kultivator.meditation.bar.vein_exhausted": "The spirit vein here is running dry (%s%%) — move to another vein / use a Spirit Stone",
   "kultivator.meditation.bar.bottleneck": "Bottleneck! Press %1$s to break through (or use the button in the %2$s scroll)",
   "kultivator.meditation.vein_thin": "The spirit vein here has grown thin (qi density %s%%). Meditate somewhere else; it recovers slowly on its own.",
   "kultivator.meditation.formation_awake": "The %s awakens: qi flows from its pillars into you.",

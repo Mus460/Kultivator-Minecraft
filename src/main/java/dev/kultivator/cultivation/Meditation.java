@@ -92,6 +92,10 @@ public final class Meditation {
 	public static final double DRAIN_GREAT_FORMATION = 0.6D;
 	public static final double DRAIN_HEAVENLY_FORMATION = 0.35D;
 	public static final double DRAIN_ABODE = 0.5D;
+	/** Balance change (flow audit): below Deity Transformation the vein drains at this share (a casual seat lasts twice as long). */
+	public static final double DRAIN_LOW_REALM = 0.5D;
+	/** Balance change (flow audit): the site factor in the enlightenment chance never counts above this. */
+	public static final double ENLIGHTENMENT_SITE_CAP = 2.0D;
 	/** A Great (Heavenly) qi formation keeps the density at or above this while it is active at the seat. */
 	public static final double FLOOR_GREAT_FORMATION = 0.30D;
 	public static final double FLOOR_HEAVENLY_FORMATION = 0.45D;
@@ -447,6 +451,9 @@ public final class Meditation {
 	/** Vein drain per second of the player's meditation now (fuel, formation tier, abode and sect formation factors). */
 	public static double drainPerSecond(ServerPlayer player, CultivationData data, int tier, boolean abode) {
 		double drain = DRAIN_BASE * (1.0D + DRAIN_PER_REALM * data.realm().ordinal());
+		if (!data.realm().atLeast(Realm.DEITY_TRANSFORMATION)) {
+			drain *= DRAIN_LOW_REALM;
+		}
 		if (!DRAIN_FACTOR.isEmpty()) {
 			drain *= sectDrainFactor(player);
 		}
@@ -465,11 +472,11 @@ public final class Meditation {
 	}
 
 	/**
-	 * The enlightenment chance for one minute: {@code (0.04 × site + 0.02 with a Dao) × 1.5 after 30 min of seclusion ×
+	 * The enlightenment chance for one minute: {@code (0.04 × min(site, 2) + 0.02 with a Dao) × 1.5 after 30 min of seclusion ×
 	 * the pill boost + 0.02 (Clear Mind) + 0.01 (abode)}, at most {@link Enlightenment#MAX_CHANCE}.
 	 */
 	public static double enlightenmentChance(ServerPlayer player, CultivationData data, double site, int unbroken, boolean abode) {
-		double chance = Enlightenment.chance(data, site);
+		double chance = Enlightenment.chance(data, Math.min(ENLIGHTENMENT_SITE_CAP, site));
 		if (unbroken >= SECLUSION_DEEP) {
 			chance *= SECLUSION_DEEP_FACTOR;
 		}
@@ -682,6 +689,11 @@ public final class Meditation {
 		}
 		double site = session.site.multiplier();
 		double density = data.veinDensity();
+		if (density < THIN_VEIN && (session.ticks / 40) % 2 == 0) {
+			// Balance change (flow audit): every other line, a plain hint while the vein under the player is nearly exhausted.
+			Msg.actionBar(player, Component.translatable("kultivator.meditation.bar.vein_exhausted", percent(density)).withColor(0xFF9A7A));
+			return;
+		}
 		int densityColor = density >= 0.6D ? 0x7FD8FF : density >= THIN_VEIN ? GOLD : 0xFF6A5A;
 		MutableComponent line = Component.literal("☯ ").withColor(JADE)
 				.append(Component.translatable("kultivator.meditation.bar.site", multiplier(site)).withColor(site > 1.0001D ? GOLD : MUTED))

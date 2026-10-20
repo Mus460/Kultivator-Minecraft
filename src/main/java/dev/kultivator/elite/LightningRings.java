@@ -30,7 +30,7 @@ import java.util.UUID;
 
 /**
  * Lingkar Petir, the telegraphed tribulation strikes (DESIGN 19.3.8; ISSTH ch. 969: cultivators avoiding or rushing past
- * the Tribulation Lightning; the ground ring itself is a game telegraph). From target Deity Transformation up (config
+ * the Tribulation Lightning; the ground ring itself is a game telegraph). From target Nascent Soul up (config
  * {@code tribulationTelegraph}), 30 ticks before each strike a ring of radius 1.5 is drawn at the player's feet; standing
  * more than 1.5 blocks away when it falls makes the strike graze for 40% (never zero, so DESIGN 0 rule 3 holds). Targets
  * Immortal Ascension and True Immortal get twin rings on every 4th strike. Also the Menantang Langit quality bonus: +0.12
@@ -40,7 +40,7 @@ import java.util.UUID;
 public final class LightningRings {
 
 	public static final int MODE_UNSET = -1;
-	/** The normal rules (DT+ rings, IA/TI twins every 4th strike). */
+	/** The normal rules (NS+ rings, IA/TI twins every 4th strike). */
 	public static final int MODE_NORMAL = 0;
 	/** Rings at any target ({@code uji tribulasi ... cincin}). */
 	public static final int MODE_RINGS = 1;
@@ -55,7 +55,8 @@ public final class LightningRings {
 	public static final double GRAZE_FACTOR = 0.4D;
 	public static final int TWIN_EVERY = 4;
 	public static final double TWIN_DISTANCE = 3.0D;
-	public static final Realm RINGS_FROM = Realm.DEITY_TRANSFORMATION;
+	/** Balance change (flow audit): rings from target Nascent Soul (was Deity Transformation), the first hard tribulation. */
+	public static final Realm RINGS_FROM = Realm.NASCENT_SOUL;
 	public static final Realm TWINS_FROM = Realm.IMMORTAL_ASCENSION;
 	/** Menantang Langit (DESIGN 19.3.8). */
 	public static final double DEFY_BONUS = 0.12D;

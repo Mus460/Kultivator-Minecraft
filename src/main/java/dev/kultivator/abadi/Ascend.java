@@ -55,7 +55,7 @@ import java.util.UUID;
 /**
  * Kesengsaraan Kenaikan Alam, the ascension tribulation (DESIGN 26.3.2-26.3.3). Gate: Dewa Abadi Puncak, ★9 or more, the
  * DESIGN 17 ascension, not busy, not hurt for 10 s, not Peaceful; offering 9 Esensi Energi Makam + 1 Supreme spirit stone,
- * consumed at the start; a failure waits one in-game day. The ritual: a 10 s omen, nine strikes through
+ * taken at the start and given back on a failure (balance change); a failure waits one in-game day. The ritual: a 10 s omen, nine strikes through
  * {@code Tribulation.strike} (a would-kill strike is a failure, never a death), envoy waves after strikes 3 and 6
  * ({@code Purba.spawnEnvoyWave}), then the black hole (RMJ ch. 2451): 15 s inside an 8-block circle against an outward drag.
  * Success opens Alam Abadi; failure gives "Luka Kenaikan" (Qi Deviation 12,000 ticks). DeathGuard {@code LANGIT} turns any
@@ -99,6 +99,9 @@ final class Ascend {
 		int vortexT;
 		long passAt;
 		boolean over;
+		/** What {@link #takeOffering} took: refunded on a failure (balance change). */
+		int essencePaid;
+		boolean stonePaid;
 
 		Ritual(ServerPlayer player, boolean free, @Nullable Boolean forced) {
 			this.id = player.getUUID();
@@ -215,7 +218,8 @@ final class Ascend {
 		return null;
 	}
 
-	private static void takeOffering(ServerPlayer player) {
+	/** Takes the offering and notes on {@code ritual} what was taken, so a failure can give it back. */
+	private static void takeOffering(ServerPlayer player, Ritual ritual) {
 		if (player.isCreative()) {
 			return;
 		}
@@ -233,6 +237,44 @@ final class Ascend {
 				stoneTaken = true;
 			}
 		}
+		ritual.essencePaid = OFFER_ESSENCE - needEssence;
+		ritual.stonePaid = stoneTaken;
+	}
+
+	/**
+	 * Balance change (flow audit): a failed ritual gives the whole offering back (the 9 Esensi Energi Makam and the Supreme
+	 * spirit stone); the Ascension Wound and the one-day wait stay. Into the inventory (overflow to the sect storehouse or
+	 * the ground, as {@code Abadi.give}); a player who is no longer alive gets it as items on the ground.
+	 */
+	private static void refundOffering(ServerPlayer player, Ritual ritual) {
+		int essence = ritual.essencePaid;
+		boolean stone = ritual.stonePaid;
+		ritual.essencePaid = 0;
+		ritual.stonePaid = false;
+		if (essence <= 0 && !stone) {
+			return;
+		}
+		List<ItemStack> stacks = new java.util.ArrayList<>();
+		if (essence > 0) {
+			stacks.add(essenceStack(essence));
+		}
+		if (stone) {
+			stacks.add(SpiritStones.stack(SpiritStones.SUPREME, 1));
+		}
+		for (ItemStack stack : stacks) {
+			if (stack.isEmpty()) {
+				continue;
+			}
+			if (player.isAlive()) {
+				Abadi.give(player, stack);
+			} else {
+				net.minecraft.world.entity.item.ItemEntity item = new net.minecraft.world.entity.item.ItemEntity(player.level(), player.getX(),
+						player.getY() + 0.5D, player.getZ(), stack);
+				item.addTag(dev.kultivator.util.NoGrief.TAG);
+				player.level().addFreshEntity(item);
+			}
+		}
+		Msg.chat(player, Component.translatable("kultivator.abadi.ritual.refund", essence, stone ? 1 : 0).withStyle(ChatFormatting.GOLD));
 	}
 
 	// ================================================================== the ritual (26.3.3)
@@ -244,10 +286,10 @@ final class Ascend {
 			Msg.chat(player, Component.translatable("kultivator.abadi.ritual.refuse", why).withStyle(ChatFormatting.GRAY));
 			return false;
 		}
-		if (!free) {
-			takeOffering(player);
-		}
 		Ritual ritual = new Ritual(player, free, forced);
+		if (!free) {
+			takeOffering(player, ritual);
+		}
 		RITUALS.put(player.getUUID(), ritual);
 		ritual.bar.addPlayer(player);
 		ritual.bar.setProgress(0.0F);
@@ -453,7 +495,10 @@ final class Ascend {
 		Cultivators.dirty(player);
 	}
 
-	/** Ends the ritual as a failure: Luka Kenaikan (Qi Deviation 12,000 ticks), the offering is lost, the cooldown starts. */
+	/**
+	 * Ends the ritual as a failure: Luka Kenaikan (Qi Deviation 12,000 ticks), the cooldown starts, and (balance change)
+	 * the offering comes back.
+	 */
 	private static void fail(ServerPlayer player, Ritual ritual, String reasonKey) {
 		if (ritual.over) {
 			return;
@@ -478,6 +523,7 @@ final class Ascend {
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 1.0F, 0.6F);
 		Msg.chat(player, Component.translatable("kultivator.abadi.ritual.fail", Component.translatable(reasonKey), LUKA_TICKS / 1200)
 				.withStyle(ChatFormatting.RED));
+		refundOffering(player, ritual);
 	}
 
 	/** DeathGuard {@code LANGIT}: a lethal blow during the ritual leaves 1 HP and fails it (never the passing phase). */

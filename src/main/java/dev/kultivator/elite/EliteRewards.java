@@ -74,6 +74,8 @@ public final class EliteRewards {
 	public static final int HERB_MAX_AGE = 400;
 	public static final int KING_STONES_MIN = 1;
 	public static final int KING_STONES_MAX = 3;
+	/** Balance change (flow audit): a Raja Siluman (tier 3) drops a King core instead of a High one at this chance. */
+	public static final double KING_CORE_CHANCE = 0.10D;
 	/** Ordinary monsters: a Low core of their element, × Battle Fatigue. */
 	public static final double NORMAL_CORE_CHANCE = 0.015D;
 	/** A boss type slain again on the same in-game day gives this share of its XP. */
@@ -162,7 +164,11 @@ public final class EliteRewards {
 		Vec3 pos = victim.position();
 		Element element = data.elementValue();
 		boolean protector = DaoProtectors.isProtector(victim);
-		BeastCores.drop(level, pos, element, Math.max(BeastCores.LOW, Math.min(BeastCores.HIGH, data.tier())));
+		int coreGrade = Math.max(BeastCores.LOW, Math.min(BeastCores.HIGH, data.tier()));
+		if (data.tier() >= 3 && level.getRandom().nextDouble() < KING_CORE_CHANCE) {
+			coreGrade = BeastCores.KING;
+		}
+		BeastCores.drop(level, pos, element, coreGrade);
 		if (!protector) {
 			RandomSource random = level.getRandom();
 			if (data.tier() >= 2 && random.nextDouble() < HERB_CHANCE) {

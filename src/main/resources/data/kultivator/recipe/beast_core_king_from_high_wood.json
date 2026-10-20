@@ -1,0 +1,100 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "beast_core_king_from_high",
+  "ingredients": [
+    {
+      "fabric:type": "fabric:components",
+      "base": [
+        "kultivator:beast_core_high"
+      ],
+      "components": {
+        "kultivator:core_element": "wood"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": [
+        "kultivator:beast_core_high"
+      ],
+      "components": {
+        "kultivator:core_element": "wood"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": [
+        "kultivator:beast_core_high"
+      ],
+      "components": {
+        "kultivator:core_element": "wood"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": [
+        "kultivator:beast_core_high"
+      ],
+      "components": {
+        "kultivator:core_element": "wood"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": [
+        "kultivator:beast_core_high"
+      ],
+      "components": {
+        "kultivator:core_element": "wood"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": [
+        "kultivator:beast_core_high"
+      ],
+      "components": {
+        "kultivator:core_element": "wood"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": [
+        "kultivator:beast_core_high"
+      ],
+      "components": {
+        "kultivator:core_element": "wood"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": [
+        "kultivator:beast_core_high"
+      ],
+      "components": {
+        "kultivator:core_element": "wood"
+      }
+    },
+    {
+      "fabric:type": "fabric:components",
+      "base": [
+        "kultivator:beast_core_high"
+      ],
+      "components": {
+        "kultivator:core_element": "wood"
+      }
+    }
+  ],
+  "result": {
+    "components": {
+      "kultivator:core_element": "wood",
+      "minecraft:custom_model_data": {
+        "colors": [
+          6081354
+        ]
+      }
+    },
+    "count": 1,
+    "id": "kultivator:beast_core_king"
+  }
+}

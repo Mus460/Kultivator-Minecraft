@@ -372,7 +372,7 @@ diterima); mutu pil `rendah`, `menengah`, `tinggi`, `sempurna`.
 | `uji relik <tabel>` | Menggulirkan tabel peti bawaan yang sudah ditambah sekali ke inventorimu dan menulis peluang kolam Fase 7. Tabel: `simple_dungeon`, `abandoned_mineshaft`, `desert_pyramid`, `jungle_temple`, `stronghold_corridor`, `stronghold_crossing`, `stronghold_library`, `woodland_mansion`, `igloo_chest`, `underwater_ruin_big`, `nether_bridge`, `buried_treasure`, `ancient_city`, `bastion_treasure`, `end_city_treasure`, `reward_ominous` |
 | `uji elit <1\|2\|3> [unsur\|alami] [jenis] [afiks]` | Elit 4 blok di depanmu (ranahnya = ranahmu). Jenis: `zombie`, `husk`, `skeleton`, `stray`, `bogged`, `spider`, `wither_skeleton`, `hoglin`. Afiks: `tanpa`, `perisai_unsur`, `penyerap_qi`, `pulih_cepat` |
 | `uji elit hapus` | Menghapus semua elit dalam 32 blok |
-| `uji tribulasi <ranah> [lapis 1-9] [biasa\|cincin\|kembar]` | Tribulasi uji menuju ranah itu (sungguhan tetapi tidak pernah mematikan dan tanpa naik ranah). `cincin` memaksa lingkar petir di bawah Transformasi Dewa, `biasa` memakai aturan biasa, `kembar` membuat setiap lingkar kembar |
+| `uji tribulasi <ranah> [lapis 1-9] [biasa\|cincin\|kembar]` | Tribulasi uji menuju ranah itu (sungguhan tetapi tidak pernah mematikan dan tanpa naik ranah). `cincin` memaksa lingkar petir di bawah Jiwa Baru Lahir, `biasa` memakai aturan biasa, `kembar` membuat setiap lingkar kembar |
 | `uji kawal <0-3>` | Tribulasi ujimu berikutnya berpura-pura dikawal sekian Hu Fa (faktor, mutu, HUD, pelindung) |
 | `uji kejenuhan <nilai>` | Mengatur Kejenuhan Bertarung |
 | `uji unsur` | Untuk monster yang kamu tatap: unsur jurusmu, unsurnya, hubungan, resonansi akar, total |
@@ -395,7 +395,7 @@ Contoh singkat (`uji ...` = `/kultivasi uji ...`):
 uji ranah golden_core              # Inti Emas Puncak
 uji elit 3 petir zombie            # Raja Siluman Petir, bilah bos "Raja Siluman · Petir"
 uji elit 2 air zombie perisai_unsur
-uji tribulasi deity_transformation # lingkar petir mulai Transformasi Dewa
+uji tribulasi nascent_soul         # lingkar petir mulai Jiwa Baru Lahir
 uji tribulasi immortal_ascension 1 # lingkar kembar setiap petir ke-4
 uji kawal 2                        # lalu: uji tribulasi dao_union
 uji herba semua 1200               # semua herba "Seribu Tahun"
@@ -553,10 +553,10 @@ Penyimpangan Qi, tidak sedang Latih Tanding atau menghadapi Iblis Hati. Manusia 
 | Jiwa Baru Lahir | 5 | 16% |
 | Transformasi Dewa | 7 | 17% |
 | Penyatuan Dao | 9 | 18% |
-| Kenaikan Abadi tingkat N | 9 + N | 19% + 0,5% × (N − 1) |
-| Dewa Abadi | 18 | 20% |
+| Kenaikan Abadi tingkat N | 9 + N | 19% + 0,5% × (N − 1), dibatasi (lihat di bawah) |
+| Dewa Abadi | 18 | 20%, dibatasi (lihat di bawah) |
 
-* Sambaran terakhir **dua kali lipat**.
+* Sambaran terakhir **dua kali lipat** (×1,5 untuk target Kenaikan Abadi dan Dewa Abadi).
 * Kerusakan tribulasi menembus zirah, pesona, efek, Ketahanan, dan perisai: tidak bisa ditahan.
 * **Tidak pernah mematikan.** Kalau sebuah sambaran *seharusnya* membunuhmu (kerusakan ≥ nyawa + penyerapan),
   tribulasi **gagal** saat itu juga, kamu tersisa minimal 1 nyawa dan terkena Penyimpangan Qi.
@@ -565,15 +565,27 @@ Penyimpangan Qi, tidak sedang Latih Tanding atau menghadapi Iblis Hati. Manusia 
   memberi ×0,85 lagi. Sejak Fase 7 semua pengali petir (pil, apel, formasi, jimat, Hu Fa, Fondasi Kokoh, anugerah)
   bersama-sama paling kecil ×0,5.
   Server bisa mengubah skala dengan `tribulationDamageScale`.
-* Tetaplah dalam **6 blok** dari tempatmu memulai. Pergi saat pertanda = batal tanpa hukuman; pergi setelah
-  sambaran pertama = gagal. Keluar dunia atau mati setelah sambaran pertama juga dihitung gagal (diterapkan saat kamu
-  kembali).
-* **Sejak Fase 7** ([41](#41-tribulasi-hidup-lingkar-petir-menantang-langit-hu-fa-tribulasi)): mulai target Transformasi
-  Dewa **lingkar petir** muncul 1,5 detik sebelum setiap sambaran (keluar = hanya terserempet 40%, tetap di dalam =
+* Tetaplah dalam **6 blok** dari tempatmu memulai. Pergi saat pertanda = batal tanpa hukuman. Setelah sambaran
+  pertama, terpental keluar oleh petir atau monster **bukan** melarikan diri: bilah aksi memanggilmu kembali, dan baru
+  dihitung lari (gagal) bila kamu berada **lebih dari 10 blok selama 3 detik berturut-turut** atau pindah dimensi. Keluar
+  dunia atau mati setelah sambaran pertama juga dihitung gagal (diterapkan saat kamu kembali).
+* **Sejak Fase 7** ([41](#41-tribulasi-hidup-lingkar-petir-menantang-langit-hu-fa-tribulasi)): mulai target Jiwa Baru
+  Lahir (dulu Transformasi Dewa) **lingkar petir** muncul 1,5 detik sebelum setiap sambaran (keluar = hanya terserempet 40%, tetap di dalam =
   Menantang Langit +0,12 mutu); teman sekte bisa menjadi **Hu Fa Tribulasi** (setiap Hu Fa ×0,95); **Jimat Penangkal Petir**
   membuat satu sambaran ×0,5 (2 per tribulasi); **Fondasi Kokoh** ×0,9 dan anugerah **Gerbang Keabadian** ×0,85 (tribulasi
   Dewa Abadi). Semua pengali ini bersama pil, apel, dan formasi paling kecil ×0,5. Panel **Persiapan** dan **HUD tribulasi**
   menunjukkan angkanya ([43](#43-persiapan-dan-hud-tribulasi)).
+
+> **Perubahan keseimbangan (audit alur Fana → Dewa Abadi):** tantangannya tetap, temboknya dibuat adil.
+> * Lingkar petir kini mulai target **Jiwa Baru Lahir**, dan gelombang Pelindung Dao di tribulasi itu hanya 2 monster
+>   biasa (tanpa Binatang Iblis, nyawa normal) ([7.4](#74-pelindung-dao)).
+> * Terpental bukan lari: lari = lebih dari 10 blok selama 3 detik (atau pindah dimensi).
+> * Target **Kenaikan Abadi** dan **Dewa Abadi**: semua sambaran bersama-sama paling banyak **2,2 × nyawa maks.**
+>   sebelum menghindar dan sebelum pengali petir (dulu 2,1–4,4×; batas ini berlaku mulai tingkat 2 supaya tidak ada
+>   tingkat yang lebih berat dari berikutnya), sambaran terakhir ×1,5 (bukan ×2), dan setiap petir yang kamu hindari
+>   lewat lingkar (serempetan 40%) **memulihkan 6% nyawa maks.** Contoh: Kenaikan Abadi 5 = 14 × 15,2%, Dewa Abadi
+>   18 × 11,9%.
+> * Paling banyak **10 Pelindung Dao hidup** sekaligus: gelombang baru hanya mengisi sampai 10.
 
 **Varian per dimensi:**
 * **Permukaan** (dan dimensi lain): *Tribulasi Langit*, petir putih-ungu dari awan gelap.
@@ -583,8 +595,8 @@ Penyimpangan Qi, tidak sedang Latih Tanding atau menghadapi Iblis Hati. Manusia 
 
 ### 7.4 Pelindung Dao
 
-Selama sambaran, gejolak langit menarik gelombang monster (setiap 3 sambaran, `1 + ranah target ÷ 2` ekor) yang muncul
-10–16 blok darimu di tanah yang aman:
+Selama sambaran, gejolak langit menarik gelombang monster (setiap 3 sambaran, `1 + ranah target ÷ 2` ekor; target Jiwa
+Baru Lahir hanya 2 ekor; paling banyak 10 pelindung hidup sekaligus) yang muncul 10–16 blok darimu di tanah yang aman:
 * Permukaan: tengkorak (pakai pedang, bukan busur), laba-laba, zombi (tidak bisa mendobrak pintu), stray, husk;
   vindicator mulai Transformasi Dewa.
 * Nether: tengkorak wither, kubus magma, hoglin.
@@ -594,8 +606,8 @@ Mereka tidak memungut barang, tidak memanggil bala bantuan, tidak ikut raid, dan
 peliharaan, dan saudara sekte di dekatmu bisa membantu: merekalah *Pelindung Dao*-mu. Sisa monster lenyap saat
 tribulasi berakhir. Server bisa mematikan peristiwa ini (`daoProtectorEvent`).
 
-Sejak Fase 7, mulai target Jiwa Baru Lahir setiap gelombang membawa satu **Binatang Iblis**, nyawa pelindung naik bersama
-ranah target, dan setiap Hu Fa Tribulasi menarik satu pelindung lagi ([34.6](#346-elit-di-gelombang-pelindung-dao)).
+Sejak Fase 7, mulai target Transformasi Dewa (dulu Jiwa Baru Lahir) setiap gelombang membawa satu **Binatang Iblis**,
+nyawa pelindung naik bersama ranah target (tidak di target Jiwa Baru Lahir), dan setiap Hu Fa Tribulasi menarik satu pelindung lagi ([34.6](#346-elit-di-gelombang-pelindung-dao)).
 
 ### 7.5 Kualitas Terobosan
 
@@ -681,16 +693,19 @@ Diperiksa saat mulai dan setiap 5 detik; pengalinya dikalikan satu sama lain, **
 
 Dunia dibagi menjadi wilayah 4×4 chunk, masing-masing dengan **kepadatan qi**. Sejak Fase 7 setiap wilayah punya
 **tingkat urat**: Agung (sampai 200%), Kaya (140%), biasa (100%), atau Tipis (60%), dan wilayah yang belum disentuh berada
-di batasnya. Meditasi menguras `0,15%/detik × (1 + 0,10 × ranah)` (separuh dengan bahan bakar batu roh atau di Gua
-Kediaman, lebih kecil di formasi Agung dan Bintang Surgawi); kepadatan pulih `0,04% × batas` per detik. Kultivasi meditasi
-dikalikan kepadatan (paling kecil ×0,15, paling besar ×1,4; urat Agung tetap terbaca sampai 200% dan pulih lebih cepat). Di bawah 20% kamu diperingatkan: saatnya pindah tempat. Kepadatan tampil di HUD
+di batasnya. Meditasi menguras `0,15%/detik × (1 + 0,10 × ranah)` (separuh di bawah Transformasi Dewa, separuh lagi
+dengan bahan bakar batu roh atau di Gua Kediaman, lebih kecil di formasi Agung dan Bintang Surgawi); kepadatan pulih
+`0,04% × batas` per detik. Kultivasi meditasi
+dikalikan kepadatan (paling kecil ×0,15, paling besar ×1,4; urat Agung tetap terbaca sampai 200% dan pulih lebih cepat). Di bawah 20% kamu diperingatkan: saatnya pindah tempat;
+selama itu bar aksi bergantian menulis "Urat roh di sini menipis — pindah ke urat lain / pakai Batu Roh". Kepadatan tampil di HUD
 dan di bar aksi selama meditasi, misalnya "Kepadatan Qi 180% · Urat Roh Agung". Untuk mencoba tiap tingkat, operator bisa
 memakai `/kultivasi uji urat tingkat <agung|kaya|biasa|tipis>` (dan `reset`) di wilayah tempatnya berdiri. Selengkapnya di
 [38](#38-urat-roh-kultivasi-tertutup-dan-gua-kediaman), termasuk Kultivasi Tertutup, Gua Kediaman, dan Kompas Urat Roh.
 
 ### 8.3 Momen Pencerahan
 
-Setiap 60 detik meditasi ada peluang `4% × pengali tempat` (+2% bila sudah memilih Dao). Saat terjadi: 10 detik cahaya
+Setiap 60 detik meditasi ada peluang `4% × pengali tempat` (pengali tempat dihitung paling banyak ×2 untuk peluang ini;
++2% bila sudah memilih Dao). Saat terjadi: 10 detik cahaya
 keemasan, ledakan kultivasi **20% bar** (sejak Fase 7; masuk ke Qi Tertimbun bila di leher botol), dan **+3 Pemahaman
 Dao**. Sejak Fase 7 peluangnya ×1,5 setelah 30 menit Kultivasi Tertutup, ×2 dengan Pil Pencerahan, +2% dengan anugerah
 Pikiran Jernih, dan +1% di Gua Kediaman, paling tinggi 50% ([38.3](#383-momen-pencerahan-diubah)).
@@ -5476,16 +5491,19 @@ tambahan. Barang selalu jatuh di tempat elit mati.
   Siluman di Kenaikan Abadi tingkat 1 kira-kira 5% bilah.
 * **Pemahaman:** +0,3 / +0,6 / +1,5 untuk Dao pilihanmu, paling banyak +3 per hari game dari elit.
 * **Barang:** selalu 1 [Inti Binatang](#36-inti-binatang) bertingkat sama dengan elit dan berunsur sama; tingkat 2+: 25%
-  satu herba roh (umur 50–400) yang cocok dengan unsurnya; tingkat 3: 1–3 Batu Roh Rendah.
+  satu herba roh (umur 50–400) yang cocok dengan unsurnya; tingkat 3: 1–3 Batu Roh Rendah, dan 10% intinya menjadi
+  **Inti Raja** (perubahan keseimbangan).
 
 Kematian Raja Siluman diumumkan di chat: "… telah tumbang! Inti dan batu rohnya tergeletak di tempat ia mati."
 
 ### 34.6 Elit di gelombang Pelindung Dao
 
 Hanya pada tribulasimu sendiri ([7.4](#74-pelindung-dao)):
-* mulai target Jiwa Baru Lahir setiap gelombang membawa 1 elit: tingkat 1 untuk Jiwa Baru Lahir dan Transformasi Dewa,
-  tingkat 2 untuk Penyatuan Dao dan Kenaikan Abadi, tingkat 3 untuk Dewa Abadi; ranahnya = target − 2;
-* nyawa pelindung × `1 + 0,3 × (ranah target − Inti Emas)`;
+* mulai target Transformasi Dewa setiap gelombang membawa 1 elit: tingkat 1 untuk Transformasi Dewa, tingkat 2 untuk
+  Penyatuan Dao dan Kenaikan Abadi, tingkat 3 untuk Dewa Abadi; ranahnya = target − 2 (perubahan keseimbangan: target
+  Jiwa Baru Lahir kini tanpa elit, 2 monster biasa per gelombang);
+* nyawa pelindung × `1 + 0,3 × (ranah target − Inti Emas)` (×1 di target Jiwa Baru Lahir);
+* paling banyak 10 pelindung hidup sekaligus; gelombang baru hanya mengisi sampai 10;
 * +1 monster per Hu Fa Tribulasi (paling banyak +3), dan setiap pelindung baru memilih sasaran pertamanya secara acak di
   antara kamu, para Hu Fa, dan muridmu dalam 16 blok;
 * elit pelindung tetap mengikuti aturan pelindung (setengah kultivasi, lenyap saat tribulasi berakhir) tetapi
@@ -5569,7 +5587,10 @@ bab 13. Desain permainan: nama tingkat, unsur pada inti, dan elit yang selalu me
 
 ### 36.1 Cara mendapatkan
 
-* **Elit:** selalu satu, tingkat = tingkat elit ([34.5](#345-hadiah)).
+* **Elit:** selalu satu, tingkat = tingkat elit ([34.5](#345-hadiah)); Raja Siluman (tingkat 3) 10% Inti Raja
+  sebagai ganti Inti Tinggi.
+* **Meja kerajinan:** 9 Inti Tinggi berunsur sama → 1 Inti Raja berunsur sama (satu resep per unsur, terbuka di buku
+  resep begitu kamu memegang Inti Tinggi).
 * **Bos** (Wither, Warden, Naga Ender, Elder Guardian): satu Inti Raja berunsur acak, hanya untuk pembunuhan **pertama**
   jenis bos itu per pemain per hari game.
 * **Monster biasa** yang kamu atau binatang rohmu bunuh, di Pemurnian Qi ke atas: 1,5% × faktor Kejenuhan Bertarung untuk
@@ -5602,6 +5623,10 @@ Penempa Tulang **memerlukan** inti Tanah Menengah ke atas, dan inti berunsur sam
 ([39](#39-jimat)).
 
 **Pencapaian:** *Inti Binatang* (inti pertama), *Inti Raja*.
+
+> **Perubahan keseimbangan:** Inti Raja dulu hanya dari bos, peti bastion (~5%), Makam lapis 9k, dan ekspedisi; tempa
+> Abadi butuh 1 dan Dewa butuh 2. Kini Raja Siluman menjatuhkannya 10%, dan 9 Inti Tinggi berunsur sama bisa
+> dirakit menjadi 1 Inti Raja.
 
 ---
 
@@ -5685,8 +5710,13 @@ Setiap wilayah 4×4 chunk berada di atas satu urat, tetap untuk benih dunia itu:
 dasar      = maks(0,6 + 0,25 × ranah, kebutuhan bar tahap Awal ranah/tingkat ini ÷ 3000)
 kultivasi/dtk = dasar × min(3,5; tempat × formasi × bahan bakar) × kepadatan (antara 0,15 dan 1,4)
              × bonus sekte × (1 + 0,05 × tumpukan Tertutup)
-kuras/dtk  = 0,15% × (1 + 0,10 × ranah) × bahan bakar 0,5 × formasi (Agung 0,6, Bintang Surgawi 0,35) × gua 0,5
+kuras/dtk  = 0,15% × (1 + 0,10 × ranah) × 0,5 di bawah Transformasi Dewa × bahan bakar 0,5
+             × formasi (Agung 0,6, Bintang Surgawi 0,35) × gua 0,5
 ```
+
+> **Perubahan keseimbangan:** di bawah Transformasi Dewa pengurasan urat kini separuh (dulu 4–7 kali laju pulih, urat
+> habis dalam sekitar 7 menit), dan saat kepadatan di bawah 20% bar aksi bergantian menampilkan petunjuk "Urat roh di
+> sini menipis — pindah ke urat lain / pakai Batu Roh". Peluang pencerahan memakai `min(tempat, 2)`.
 
 * Laju dasar: sama seperti dulu sampai Jiwa Baru Lahir (1,6/detik); Transformasi Dewa 4,0, Penyatuan Dao 10, Kenaikan
   Abadi tingkat 1 20, tingkat 9 68, Dewa Abadi 83,3. Satu tahap Awal tanpa bantuan sekitar 50 menit; dengan semuanya
@@ -5700,7 +5730,7 @@ kuras/dtk  = 0,15% × (1 + 0,10 × ranah) × bahan bakar 0,5 × formasi (Agung 0
 
 ### 38.3 Momen Pencerahan (diubah)
 
-Ledakan kultivasi kini **20% bilah** (dulu 25%). Peluang per menit = `(4% × tempat + 2% dengan Dao) × 1,5 setelah 30
+Ledakan kultivasi kini **20% bilah** (dulu 25%). Peluang per menit = `(4% × min(tempat, 2) + 2% dengan Dao) × 1,5 setelah 30
 menit tertutup × pengali Pil Pencerahan + 2% (anugerah Pikiran Jernih) + 1% (gua kediaman)`, paling tinggi 50%.
 
 ### 38.4 Kultivasi Tertutup
@@ -5855,7 +5885,7 @@ Tablet **Alkimia** di gulungan (`'`, tablet ketujuh) atau `/kultivasi resep`:
 
 ### 41.1 Lingkar Petir
 
-Mulai target **Transformasi Dewa** (saklar `tribulationTelegraph`).
+Mulai target **Jiwa Baru Lahir** (saklar `tribulationTelegraph`; perubahan keseimbangan, dulu Transformasi Dewa).
 
 **Sumber:** ISSTH Buku 6 bab 969 (kultivator lain melewati tribulasi dengan mati-matian menghindari atau menerobos petir,
 sementara Meng Hao menyambutnya langsung). Lingkar di tanah adalah tanda permainan tanpa klaim kanon.
@@ -5867,7 +5897,9 @@ sementara Meng Hao menyambutnya langsung). Lingkar di tanah adalah tanda permain
   menggagalkan" memakai angka akhirnya. Bilah aksi menulis "Di luar lingkar petir: petir hanya menyerempetmu (40%)".
 * **Lingkar kembar** (target Kenaikan Abadi dan Dewa Abadi): setiap petir ke-4 punya dua cincin, yang kedua 3 blok jauhnya;
   berdiri di salah satunya tetap kena penuh.
-* Batas 6 blok dari tempat mulai tetap berlaku; satu langkah ke samping 2 blok sudah cukup.
+* Batas 6 blok dari tempat mulai tetap berlaku (lari baru dihitung lebih dari 10 blok selama 3 detik); satu langkah ke
+  samping 2 blok sudah cukup.
+* Target Kenaikan Abadi dan Dewa Abadi: setiap petir yang kamu hindari lewat lingkar memulihkan 6% nyawa maks.
 * Saklar mati = tidak ada cincin, semua petir kena penuh seperti dulu.
 
 ### 41.2 Menantang Langit
@@ -7243,14 +7275,18 @@ lubang hitam raksasa muncul di awan lima warna.*
 
 * **Syarat:** Dewa Abadi Puncak, ★9+, sudah ascension, tidak sedang deviasi, terobosan, alam rahasia, serbuan, duel,
   bencana, pertarungan purba, murka langit, pertahanan batin atau sewa terbang, tidak terluka 10 detik terakhir, bukan
-  Peaceful. Sesajen habis saat ritual mulai. Gagal: tunggu 1 hari game.
+  Peaceful. Sesajen diambil saat ritual mulai. Gagal: tunggu 1 hari game.
 * **Kesengsaraan Kenaikan** (bilah bos): pertanda 10 detik (langit lima warna) → **9 sambaran** tiap 3 detik, makin kuat
   (14%–22% HP maks) → setelah sambaran 3 dan 6 datang **gelombang Utusan Murka Langit** → **Lubang Hitam**: 15 detik
   bertahan di dalam lingkaran 8 blok sambil ditarik keluar.
 * Pukulan yang akan membunuh selama ritual berarti **gagal**, bukan mati (Totem tidak terpakai). Keluar lingkaran juga
   gagal. Utusan yang tersisa pergi saat ritual berakhir.
 * **Berhasil:** kamu tiba di pulau kedatangan Alam Abadi, mendapat 1 **Jimat Lintas Alam** dan 16 **Batu Asal Abadi**,
-  dan Dunia Batin-mu lahir. **Gagal:** "Luka Kenaikan" (Deviasi Qi 10 menit), sesajen hilang.
+  dan Dunia Batin-mu lahir. **Gagal:** "Luka Kenaikan" (Deviasi Qi 10 menit), tunggu 1 hari game, tetapi seluruh
+  sesajen (9 Esensi Makam + 1 Batu Roh Agung) **dikembalikan** ke inventori (sisanya ke gudang sekte atau tanah).
+
+> **Perubahan keseimbangan:** dulu sesajen hilang saat ritual gagal, padahal Esensi Makam butuh berjam-jam di Makam
+> Langit. Kini dikembalikan penuh; hukuman gagal tinggal Luka Kenaikan dan jeda 1 hari.
 
 ### 56.3 Alam Abadi
 

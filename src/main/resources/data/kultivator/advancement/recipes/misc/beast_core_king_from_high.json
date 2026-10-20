@@ -1,0 +1,33 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_core": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kultivator:beast_core_high"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_core"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "kultivator:beast_core_king_from_high_metal",
+      "kultivator:beast_core_king_from_high_wood",
+      "kultivator:beast_core_king_from_high_water",
+      "kultivator:beast_core_king_from_high_fire",
+      "kultivator:beast_core_king_from_high_earth",
+      "kultivator:beast_core_king_from_high_lightning",
+      "kultivator:beast_core_king_from_high_ice",
+      "kultivator:beast_core_king_from_high_wind",
+      "kultivator:beast_core_king_from_high_space"
+    ]
+  }
+}

@@ -119,19 +119,30 @@ public final class DaoProtectors {
 	/** Phase 7 (DESIGN 19.3.1): protector health ×(1 + 0.3 × max(0, target realm − Golden Core)) in the player's own waves. */
 	public static final double HEALTH_PER_REALM = 0.3D;
 
+	/** Balance change (flow audit): a wave into Nascent Soul has this many plain monsters (no elite, no extra health). */
+	public static final int GENTLE_WAVE_SIZE = 2;
+	/** Balance change (flow audit): a new wave only tops the player's living protectors up to this many. */
+	public static final int MAX_ALIVE = 10;
+
 	/**
-	 * Spawns one wave of {@code 1 + targetRealm / 2} monsters around the player, +1 per Hu Fa guardian (at most 3). From
-	 * target Nascent Soul the first one is an elite demonic beast (tier 1 NS/DT, 2 DU/IA, 3 TI; realm = target − 2); every
-	 * protector picks its first target among the cultivator, the guardians and the cultivator's disciples within 16
-	 * (DESIGN 19.3.1, 19.3.8). Only the player's own tribulation calls this; {@link #spawnWaveFor} stays unchanged.
-	 * Returns how many arrived.
+	 * Spawns one wave of {@code 1 + targetRealm / 2} monsters around the player, +1 per Hu Fa guardian (at most 3); at
+	 * target Nascent Soul only {@link #GENTLE_WAVE_SIZE} plain monsters at normal health. The wave never brings the
+	 * player's living protectors above {@link #MAX_ALIVE}. From target Deity Transformation the first one is an elite
+	 * demonic beast (tier 1 DT, 2 DU/IA, 3 TI; realm = target − 2); every protector picks its first target among the
+	 * cultivator, the guardians and the cultivator's disciples within 16 (DESIGN 19.3.1, 19.3.8). Only the player's own
+	 * tribulation calls this; {@link #spawnWaveFor} stays unchanged. Returns how many arrived.
 	 */
 	public static int spawnWave(ServerPlayer player, Rank target, int variant) {
 		ServerLevel level = player.level();
 		RandomSource random = player.getRandom();
 		int targetRealm = target.realm().ordinal();
-		int count = 1 + targetRealm / 2 + dev.kultivator.elite.HuFaTribulation.extraProtectors(player);
-		double health = 1.0D + HEALTH_PER_REALM * Math.max(0, targetRealm - Realm.GOLDEN_CORE.ordinal());
+		boolean gentle = target.realm() == Realm.NASCENT_SOUL;
+		int count = (gentle ? GENTLE_WAVE_SIZE : 1 + targetRealm / 2) + dev.kultivator.elite.HuFaTribulation.extraProtectors(player);
+		count = Math.min(count, MAX_ALIVE - alive(player));
+		if (count <= 0) {
+			return 0;
+		}
+		double health = gentle ? 1.0D : 1.0D + HEALTH_PER_REALM * Math.max(0, targetRealm - Realm.GOLDEN_CORE.ordinal());
 		int eliteTier = eliteTier(target.realm());
 		List<LivingEntity> targets = dev.kultivator.elite.HuFaTribulation.protectorTargets(player);
 		int spawned = 0;
@@ -227,6 +238,22 @@ public final class DaoProtectors {
 		return ids == null ? 0 : ids.size();
 	}
 
+	/** The player's protectors that are still alive (killed ones stay tracked until the wave is cleared). */
+	public static int alive(ServerPlayer player) {
+		Set<UUID> ids = BY_OWNER.get(player.getUUID());
+		if (ids == null) {
+			return 0;
+		}
+		int alive = 0;
+		for (UUID id : ids) {
+			Entity entity = findEntity(player.level(), id);
+			if (entity != null && entity.isAlive()) {
+				alive++;
+			}
+		}
+		return alive;
+	}
+
 	// ================================================================== internals
 
 	private static EntityType<? extends Mob> pick(int variant, Rank target, RandomSource random) {
@@ -257,7 +284,10 @@ public final class DaoProtectors {
 		return pool.get(random.nextInt(pool.size()));
 	}
 
-	/** The elite protector's tier for a target realm: 1 for NS and DT, 2 for DU and IA, 3 for TI, 0 below NS. */
+	/**
+	 * The elite protector's tier for a target realm: 1 for DT, 2 for DU and IA, 3 for TI, 0 below DT (balance change: the
+	 * Nascent Soul waves lost their tier-1 elite).
+	 */
 	private static int eliteTier(Realm target) {
 		if (target == Realm.TRUE_IMMORTAL) {
 			return 3;
@@ -265,7 +295,7 @@ public final class DaoProtectors {
 		if (target.atLeast(Realm.DAO_UNION)) {
 			return 2;
 		}
-		return target.atLeast(Realm.NASCENT_SOUL) ? 1 : 0;
+		return target.atLeast(Realm.DEITY_TRANSFORMATION) ? 1 : 0;
 	}
 
 	/** A monster type that may carry the elite of a wave (no magma cube: it would split). */

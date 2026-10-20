@@ -116,10 +116,11 @@ public final class PrepView {
 		int strikes = Tribulation.strikeCount(strength);
 		double factor = prep.contains("f") ? prep.getDoubleOr("f", 1.0D) : data.nextTribulationFactor();
 		double share = strikeShare(data, strength, prep);
-		double total = share * (strikes + 1);
+		double last = Tribulation.finalMultiplier(strength);
+		double total = share * (strikes - 1 + last);
 		double max = maxHealth();
-		rows.add(new Row(Component.translatable(P + "strikes", strikes, percent(share), percent(share * 2.0D), percent(total)), Palette.INK, false));
-		rows.add(new Row(Component.translatable(P + "per_strike", hearts(share * max), hearts(share * 2.0D * max), decimal(factor)), Palette.INK_SOFT,
+		rows.add(new Row(Component.translatable(P + "strikes", strikes, percent(share), percent(share * last), percent(total)), Palette.INK, false));
+		rows.add(new Row(Component.translatable(P + "per_strike", hearts(share * max), hearts(share * last * max), decimal(factor)), Palette.INK_SOFT,
 				false));
 		double heal = total * max - (max - 1.0D);
 		if (heal <= 0.0D) {
@@ -149,11 +150,12 @@ public final class PrepView {
 		}
 		if (cfg.getBooleanOr("dp", true)) {
 			int waves = (strikes + 1) / 3;
-			int mobs = 1 + strength.realm().ordinal() / 2;
-			rows.add(new Row(Component.translatable(strength.realm().atLeast(Realm.NASCENT_SOUL) ? P + "protectors_elite" : P + "protectors", waves, mobs),
+			int mobs = strength.realm() == Realm.NASCENT_SOUL ? dev.kultivator.cultivation.DaoProtectors.GENTLE_WAVE_SIZE
+					: 1 + strength.realm().ordinal() / 2;
+			rows.add(new Row(Component.translatable(strength.realm().atLeast(Realm.DEITY_TRANSFORMATION) ? P + "protectors_elite" : P + "protectors", waves, mobs),
 					Palette.INK_SOFT, false));
 		}
-		if (cfg.getBooleanOr("tele", true) && strength.realm().atLeast(Realm.DEITY_TRANSFORMATION)) {
+		if (cfg.getBooleanOr("tele", true) && strength.realm().atLeast(dev.kultivator.elite.LightningRings.RINGS_FROM)) {
 			rows.add(new Row(Component.translatable(P + "rings"), Palette.INK_SOFT, false));
 		}
 		Minecraft minecraft = Minecraft.getInstance();
@@ -204,13 +206,14 @@ public final class PrepView {
 			Rank strength = Prep.strength(target);
 			int strikes = Tribulation.strikeCount(strength);
 			double share = strikeShare(data, strength, prep);
-			lines.add(Component.translatable(P + "strikes", strikes, percent(share), percent(share * 2.0D), percent(share * (strikes + 1)))
+			double last = Tribulation.finalMultiplier(strength);
+			lines.add(Component.translatable(P + "strikes", strikes, percent(share), percent(share * last), percent(share * (strikes - 1 + last)))
 					.withStyle(ChatFormatting.LIGHT_PURPLE));
 			if (prep.contains("q")) {
 				lines.add(Component.translatable(P + "quality_short", signed2(prep.getDoubleOr("q", 0.0D))).withStyle(ChatFormatting.GOLD));
 			}
 			double max = maxHealth();
-			double heal = share * (strikes + 1) * max - (max - 1.0D);
+			double heal = share * (strikes - 1 + last) * max - (max - 1.0D);
 			if (heal > 0.0D) {
 				lines.add(Component.translatable(P + "heal", hearts(heal), decimal(heal / max)).withStyle(ChatFormatting.RED));
 			}
