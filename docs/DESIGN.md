@@ -18259,3 +18259,535 @@ Client, no op (F, `/sinematik ...`):
     besar, tanpa latar end-portal), tidak ada bayangan aneh dari quad efek.
 31. Idle: tanpa film yang berjalan, `/sinematik film info` menunjukkan nol kerja per bingkai.
 32. Teks: setiap kunci `kehancuran_total.*` dan `film.*` ada di en_us dan id_id; semua Sumber tetap sama.
+
+---------------------------------------------------------------------------------------------------------------------
+
+## 31. Aura Kultivasi
+
+The user asked (2026-10-21, translated): "While I (or a disciple) cultivate, show a rich aura that is different for each of
+the nine realms, visibly grows with every stage, follows my Dao, and looks like the cultivation novels." This section
+is the contract for that feature. It is **presentation only**: no gameplay number, no Sumber line of an existing
+feature, no block and no server entity changes.
+
+### 31.0 Scope, facts from the code, and what stays (binding)
+
+**Stays exactly as it is:** every existing Sumber line and gameplay number; rule 0.1 (no block changes: the aura never
+touches `WorldBreaker` or `BuildPlacer`, never a `LightningBolt`, weather, time or tick-rate change); rule 0.4 (all
+effects client side from synced state); the weak-laptop rule (no post chain, no core shader, no custom
+`RenderPipeline`; the "heavy shader" look is faked with layered additive quads, glow textures and a HUD overlay); the
+budgets of 22.15 / 23.14 (`EffectQuality`, `FxBudget`, `EpicBudget`, `PhantomDisplays`); Sodium/Iris (28.1.4, the pack
+profile of 23.14.3); `DisplayKey` for every display transform (through `ModelFx`); ItemStacks created lazily
+(`ModelFx.stack` only, never in a static initialiser or renderer constructor); each file's line endings
+(`KultivatorClient.java` is CRLF, the other files touched here are LF; check `git ls-files --eol` first); text in
+`lang-src/<fragment>.en_us.json` and `.id_id.json` with identical keys; server code never references a client class.
+The aura never moves the camera (the 7b camera rules are untouched; it adds no shot).
+
+**Facts found in the code (the code is the truth):**
+
+| Fact | Where | Consequence for 31 |
+|---|---|---|
+| "Cultivating" = `CultivationData.meditating()`, synced as `VisualState.MEDITATING`; the seat is `MeditationPose.posed(visual) && MeditationPose.canSit(player)` (MEDITATING, or BREAKING_THROUGH without TRIBULATION); its eased strength is `MeditationPose.strength(entity, partial)` | `cultivation/Meditation`, `data/Cultivators.refreshVisual`, `client/render/MeditationPose` | the aura is active exactly while seated (or previewed, 31.6); it fades with its own clock, started from the same state |
+| Disciples: `DiscipleEntity.FLAG_MEDITATING` / `FLAG_BREAKING_THROUGH` in `syncedFlags()`; seat `DiscipleLook.seated`, `DiscipleLook.seatStrength` | `disciple/DiscipleEntity`, `client/disciple/DiscipleLook` | same rule for disciples |
+| Ranks: `Rank(realm, layer, stage)`, stage 0..3 (Awal, Tengah, Akhir, Puncak); **only Immortal Ascension has layers (9)**; Qi Refining has 4 stages and no layers; Mortal has one stage | `data/Rank`, `data/Realm` | "grows with Qi Refining layers" is read as: grows with the 4 stages in every realm, and additionally with the 9 layers of Immortal Ascension |
+| `Rank.isBottleneck()` (stage = Peak) and `CultivationData.barFull()` / `DiscipleData.barFull()` | `data/Rank`, `data/CultivationData`, `disciple/DiscipleData` | breakthrough-ready = `isBottleneck() && barFull() && !isMax()`; not synced today, S adds it |
+| Root grade `RootGrade.HEAVENLY` (players and disciples); the root element mask is synced only as its main colour (`VisualState.rootColor`, `DiscipleEntity.syncedRootColor`) | `data/RootGrade`, `data/Element` | S syncs the Heavenly flag and the element mask |
+| Special physiques exist **only for disciples** (`PowerIds.PHYSIQUE_*` 1..9, synced in `syncedTalent()` bits 0-3); players have none | `disciple/power/PowerIds`, `DiscipleEntity.packTalent` | accent for players: Heavenly root only; for disciples: Heavenly root or physique ≠ 0 |
+| Dao colour `Dao.color()`; `DiscipleLook.color(realm, dao)` (Dao colour once chosen, else realm colour) | `data/Dao` | the aura tint (31.3) |
+| `AuraFx` draws the subtle realm aura of players (≥ Qi Refining, `SHOW_AURA`), `DiscipleFx` the disciples' aura and meditation motes, `MeditationFx` the root-colour motes into the dantian and the Maximal ground ring | `client/fx/*` | kept when NOT cultivating; while the new aura is active they skip their aura/meditation-mote parts for that entity (31.2.6) |
+| `QuadFx` kinds have technique caps; `FilmParticleProviders.spawn` counts a per-shot cap that only resets inside films | `client/fx/quad`, `client/epic/film` | the aura has its own quad renderer and budget; E adds an ambient spawn method that skips the shot cap (C31.4) |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 31.1 What the player sees (summary)
+
+When a cultivator sits down to cultivate, the old faint aura cross-fades (30 ticks, smoothstep) into the **Aura
+Kultivasi** of their realm: a glowing ground decal opens under the seat, the realm's layered light appears around the
+body, its 3D props grow in once, motes of qi start to flow, and a very quiet realm hum fades in. Every stage adds a
+clearly visible element (31.4); Immortal Ascension layers add more. The colours follow the cultivator's Dao, a
+Heavenly root or a special physique adds an accent, and a full bottleneck makes the aura pulse with an amber warning
+glow. When cultivation stops the aura fades out over 20 ticks, props shrink away once (fade 12), and the subtle
+`AuraFx` aura returns.
+
+### 31.2 The shared aura engine (module E)
+
+#### 31.2.1 Classes (all in `src/client/java/dev/kultivator/client/aura/`, E)
+
+| Class | Role |
+|---|---|
+| `AuraClient` | `init()` (from `KultivatorClient`, one line): registers the preview receiver, the render hook, the HUD element, the realm drivers (E's five, then `AuraHigh.init()`); `tick(Minecraft)` (from `AuraFx.tick`); `clear()` (world change / disconnect) |
+| `AuraEngine` | finds subjects (players and disciples ≤ 64 b), owns one `AuraRig` per entity id, runs the lifecycle (31.2.2), LOD (31.2.4), budgets (31.2.5), the driver registry `register(Realm, AuraRealmDriver)`, `covers(int entityId)` |
+| `AuraSubject` | immutable per-tick snapshot of one cultivator (C31.2) |
+| `AuraRig` | per-entity state: fade, clocks, props (`ModelHandle`s by key), eased stage values, driver scratch data |
+| `AuraDraw` | the per-frame quad writer (billboard glow, flat decal, tilted ring, beam, ribbon, upright textured card) with the aura quad budget; render types made lazily per texture through `RenderTypes.entityTranslucentEmissive(Identifier)` and `RenderTypes.lightning()` (via `EpicRenderTypes` where one exists) |
+| `AuraParticles` | qi and film particles through `FxBudget` (DETAIL for own and own disciples, EXTRA for others), vanilla particle setting respected, seeded positions |
+| `AuraColors` | the palette of a subject (31.3) and the physique accent table |
+| `AuraRng` | deterministic hash noise `float of(int entityId, long tick, int salt)` (no `RandomSource` for shapes) |
+| `AuraHum` | the looping hum (`AbstractTickableSoundInstance`, `SoundSource.AMBIENT`) and rare chimes; ≤ 2 hums at once (the nearest), fade in/out with the aura |
+| `AuraHud` | the first-person screen-edge glow (`HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("aura_edge"), …)`) |
+| `AuraPreviewClient` | the client side of the preview payload (31.6): entity id → preview rank and flags until a tick |
+| `AuraSettings` | the three settings rows (31.5), stored through `EffectQuality.get/put` |
+| `realm/MortalAura`, `realm/QiRefiningAura`, `realm/FoundationAura`, `realm/GoldenCoreAura`, `realm/NascentSoulAura` | E's five drivers (31.4.1-31.4.5) |
+
+H adds `src/client/java/dev/kultivator/client/aura/high/**` (31.4.6-31.4.9) with the entry class `AuraHigh`.
+
+#### 31.2.2 Lifecycle (per entity)
+
+1. **Active** = (seated: players `MeditationPose.posed(visual) && canSit`, disciples `DiscipleLook.seated`) or a live
+   preview for that entity id; and not invisible / spectator / removed; and the settings allow it (31.5); and
+   `SHOW_AURA` is set for players (their own cosmetic choice; previews ignore it).
+2. **Fade** `f` (0..1) ages by client ticks: in over 30 t, out over 20 t, smoothstep. While BREAKING_THROUGH the aura is
+   held at `f × 0.5` so `BreakthroughFx` reads clearly; DEVIATION or TRIBULATION end it (fade out).
+3. **Start**: the driver's `start` is called once when `f` leaves 0 (or the realm changes); props are requested then
+   (grow-in 20 t, once). **Stage or layer change** while active: `AuraRig.ease` values move to the new stage over 20 t,
+   props `scaleTo` the new size once over 20 t, and a one-shot ring of light rolls out of the decal (the only "swell").
+   **Realm change**: the old driver `stop`s (props end, fade 10) and the new one starts.
+4. **Stop**: when `f` reaches 0 after the fade-out, the driver's `stop` ends every prop (`end(12)`) and the rig is
+   dropped; rigs of entities out of range or gone for 40 t are dropped too.
+5. Idle cost with nobody cultivating: one pass over `level.players()` plus one disciple box query every 10 ticks.
+
+**Deterministic animation:** shapes are functions of `clock = gameTime + entityId × 37` and the eased stage values;
+"breathing" is done only by alpha or display light (`ModelHandle.lightCycle`), never by size; particle positions come
+from `AuraRng`; there is no random size anywhere.
+
+#### 31.2.3 Geometry and the body frame
+
+The frame of a subject: `feet` (entity position, lerped with the partial tick), `seatTop = feet + 0.55 × scale` when
+seated (the pose lowers the model by `MeditationPose.LOWER`), `dantian = feet + 0.45 × scale` seated (0.9 standing),
+`crown = feet + bbHeight × 0.69 + 0.15` seated, the body yaw `yBodyRot`, the scale `entity.getScale()`. Every radius in
+31.4 is in blocks at scale 1 and multiplied by the scale. Ground decals sit `0.04` b above `feet.y` and are drawn only
+while `onGround()` (no polygon offset, 28.1.4). Quads are drawn from Fabric `LevelRenderEvents.COLLECT_SUBMITS`
+(registered after `QuadFx`), never during `ShaderCompat.shadowPass()`.
+
+#### 31.2.4 Distance LOD (distance from the camera)
+
+| Band | What is drawn |
+|---|---|
+| ≤ 24 b: **full** | everything the quality and settings allow |
+| 24-64 b: **reduced** | decal + one body glow + the realm's identity quad (no props, no ribbons, no hum), particles × 0.25 |
+| > 64 b | nothing (the rig fades out) |
+
+A preview of your own aura is always full when within 24 b.
+
+#### 31.2.5 Budgets (per Effect Quality: Minimal / Normal / Maximal)
+
+| Item | Minimal | Normal | Maximal |
+|---|---|---|---|
+| auras drawn at full LOD (nearest first; your own always first) | 1 | 4 | 8 |
+| auras drawn at reduced LOD in addition | 2 | 8 | 16 |
+| aura quads per frame, all auras (× `EpicBudget.PACK_QUADS` 0.6 with a shader pack) | 120 | 600 | 1500 |
+| quads per aura | 60 | 200 | 400 |
+| props (displays) per aura (through `ModelFx`, priority DETAIL, so techniques win) | 0 | 3 | 6 |
+| props of all auras alive | 0 | 9 | 24 (and never more than a third of `EffectQuality.displaysAlive()`) |
+| particles per aura per tick (before share and LOD) | 1 | 4 | 10 |
+| ribbons per aura | 0 | 2 | 4 |
+| hums at once | 1 | 2 | 2 |
+
+- The quality in effect is `min(EffectQuality.level(), EpicBudget.tier())` while a 7b/10/30 scene runs; when
+  `EpicBudget.tier()` is −1 the aura draws particles only. The EpicBudget frame guard therefore thins the aura first.
+- `share` = 1 for yourself and your own disciples, `EffectQuality.othersScale()` for other players and their disciples
+  (Penuh 1, Ringan 0.25: no props, half the quads, a quarter of the particles; Mati: none).
+- "Sederhana" (31.5) = Minimal-sized aura at any quality: decal, two glow layers, the identity quad, particles; no
+  props, no ribbons.
+- Every particle goes through `FxBudget.take` (cost `max(1, life / 20)`); a refused particle is simply not made.
+
+#### 31.2.6 Interplay with existing effects
+
+- `AuraFx` (E): unchanged when not cultivating; for a player with `AuraEngine.covers(id)` it skips that player
+  (the new aura replaces it while active; it cross-fades back by the engine's fade-out).
+- `MeditationFx` (E, one guard): `meditationMotes` is skipped for players the engine covers (the realm drivers draw
+  their own inflow in the root colour). The enlightenment halo, formation lines and one-shot effects stay.
+- `DiscipleFx` (E, one guard): `aura(...)` and `meditation(...)` are skipped for covered disciples; breakthrough,
+  deviation and fighting effects stay.
+- `DaoCircleLayer`, robe, eyes, back sword: untouched (they still draw; the aura is around them).
+- While the subject's own `DHARMA` flag is set, H's Deity Transformation idol is hidden (no double giant).
+
+#### 31.2.7 First person (your own aura with a first-person camera)
+
+No world quads, props or decal for yourself. Instead: (a) `AuraHud` draws a soft screen-edge glow (a vignette made of
+4 gradient strips, alpha ≤ 0.16 × f, the realm's body colour mixed 35 % with the tint, breathing by alpha over 80 t);
+bottleneck-ready adds an amber edge pulse (31.3); (b) at most one mote every 4 ticks drifts across the lower half of
+the view 1.2-2.0 b in front of the eyes, below the eye line, life 30 t. Hidden with F1 (`hideGui`), while a film
+plays (`FilmDirector.playing()`), in spectator, and when Aura Kultivasi is Mati. Third person (F5) shows the full aura.
+
+#### 31.2.8 Shader packs (Iris) and Sodium
+
+Sodium: nothing touches chunk meshes; props are client displays, the rest are world quads. Iris: no geometry in the
+shadow pass; with `ShaderCompat.packOn()` the pack profile applies: × 0.6 quads, at most one large layer per aura
+(the biggest glow or the idol card), `entityTranslucentEmissive` only (no `lightning()` thin glow under a pack, like
+`EpicRenderTypes.BOLT_EMISSIVE_UNDER_PACK = false`), decals at 0.04 b. The HUD glow is unaffected by packs.
+
+#### 31.2.9 Sound
+
+Each driver names its hum (31.4): a vanilla looping sound at volume ≤ 0.08, played as an `AuraHum` instance bound to the
+subject (`AbstractTickableSoundInstance`, `SoundSource.AMBIENT`, looping, volume × f each tick, stopped when f = 0),
+only for the two nearest active auras within 12 b; chimes (one-shot `SimpleSoundInstance` at ≤ 0.12) at most one per 60
+ticks per aura. Film sounds are not used (C30.4 keeps them in `FilmSound`). "Dengung aura: Mati" silences all of it.
+Vanilla sounds used (verified in mcsrc `SoundEvents`): `BEACON_AMBIENT`, `CONDUIT_AMBIENT`, `RESPAWN_ANCHOR_AMBIENT`,
+`AMETHYST_BLOCK_CHIME`, `BELL_RESONATE`, `ENCHANTMENT_TABLE_USE`, `NOTE_BLOCK_CHIME` (a `Holder.Reference`: use
+`.value()`).
+
+### 31.3 Colours, accent and the breakthrough-ready glow
+
+`AuraColors.of(subject)` returns:
+
+| Name | Value |
+|---|---|
+| `body` | the realm colour of the table in 31.4 (not `Realm.color()` for Immortal Ascension, whose white is too flat) |
+| `tint` | the Dao colour (`Dao.color()`) when a Dao is chosen, else `body`; mixed 35 % into ribbons, rings and decals, 20 % into glows |
+| `inflow` | the root's main element colour (`rootColor`): the qi motes drawn in |
+| `elements` | the element colours of the root mask (≤ 4, `Element.fromMask(rootElements)`): Dao Union runes and the True Immortal wheel |
+| `accent` | Heavenly root: `RootGrade.HEAVENLY.color()` `FFC93C`; else a disciple physique: Poison `6BCB3A`, Taixu `7FD8FF`, Dou Di `C02030`, Golden Body `FFD54A`, Devouring `5A2A8A`, Supreme Bone `F0F0FF`, Double Pupils `9A6AFF`, Heretic `D04020`, Attributeless `D8D8D8`; else none (−1) |
+| `warn` | `FF9A3A` → `FF4A3A` (breakthrough ready) |
+
+**Accent** (when `accent ≠ −1`): a thin outer ring at 1.15 × the realm's widest radius in the accent colour (alpha 0.45,
+turning 0.6°/t), and three accent sparks orbiting the dantian at r 0.5 (period 60 t). Heavenly roots also give the decal
+a second, outer gilded line.
+
+**Breakthrough ready** (`isBottleneck && barFull && !isMax`): an amber rim glow around the whole aura whose alpha follows
+`0.25 + 0.2 × (1 − cos(2π t / 30)) / 2` (deterministic, never a size change); thin red crack lines fade in on the decal
+(texture `aura/decal_crack`); one quiet `BELL_RESONATE` chime every 120 t (pitch 1.6, volume 0.06); in first person
+the screen edge pulses amber with the same curve.
+
+### 31.4 The nine realms
+
+Common stage words: **Awal** (stage 0), **Tengah** (1), **Akhir** (2), **Puncak** (3). Every stage adds what its row
+says on top of the earlier stages; sizes ease to the new value once (31.2.2). Model ids start with `aura_` and carry no
+`FxModels` row (they use `FxModels.DEFAULT`; each driver passes its own scale), so `FxModels.java` is not edited. Quad
+textures live in `textures/misc/aura/` (E) and `textures/misc/aura_high/` (H). The Sumber lines below go into the realm
+aura text keys (C31.6) exactly as written (Indonesian here; the English key says the same).
+
+#### 31.4.1 Mortal (Manusia Fana) — E, `MortalAura`
+
+| Field | Value |
+|---|---|
+| Imagery | a mortal practising a breathing art: a faint warm glow in the belly that swells and dims with the breath, and a few pale motes drifting in |
+| Colours | warm white `F2E8D8`, inflow = root colour (if tested) |
+| Layers | one soft glow at the dantian (r 0.25, alpha 0.10-0.22 on a 100 t breath cosine) |
+| Models | none |
+| Particles | 1 `Qi.mote` every 8 t from 1.2 b, drifting to the dantian (life 30) |
+| Decal | none |
+| Sound | none |
+| Stages | one stage only (Mortal has no stages) |
+| Sumber | Sumber: A Record of a Mortal's Journey · 长春功 Seni Musim Semi Abadi, seni dasar beratribut kayu yang pertama kali dilatih Han Li saat masih manusia biasa (napas dan kehangatan di perut adalah rancangan permainan) |
+
+#### 31.4.2 Qi Refining (Pemurnian Qi) — E, `QiRefiningAura`
+
+| Field | Value |
+|---|---|
+| Imagery | the qi of heaven and earth drawn into the body: motes spiralling in on curved arms, a pale green-white airflow wrapping the seated body, and above the head a slowly turning qi vortex, as if the body had become a sink devouring the surrounding energy |
+| Colours | body `DDF3E6` (pale jade-white), core `FFFFFF`, inflow = root colour, vortex mixed 35 % with tint |
+| Layers | vortex: a flat swirl quad (`aura/qi_vortex`, a 4-arm cloud swirl) above the crown, turning 2°/t; a second, smaller counter-turning swirl from Puncak; a body glow (r 0.6) |
+| Models | none (a light realm; the budget stays free for others) |
+| Particles | `Qi.mote` in `inflow` colour on spiral arms from r 1.6 to the dantian (life 24-30, the angle advancing 0.18 rad/t, so each mote traces a spiral); `Qi.mist` wisps around the body |
+| Decal | `aura/decal_mist_ring`: a soft double ring of mist (r 1.0 → 1.6 by stage) |
+| Sound | `CONDUIT_AMBIENT` pitch 1.6, volume 0.05 |
+| Stages | Awal: 2 spiral arms, vortex r 0.5, no decal. Tengah: 3 arms, vortex r 0.8, one mist ribbon (an orbit path, r 0.7, at the waist). Akhir: 4 arms, vortex r 1.1, the decal appears, a second ribbon. Puncak: vortex r 1.4 with the counter-turning inner swirl and a thin column of light from the vortex down to the crown (beam, alpha 0.25) |
+| Sumber | Sumber: Battle Through the Heavens, bab 27 (aliran udara hijau yang makin banyak menyelimuti Xiao Yan saat berlatih) dan bab 159 (tubuh Xiao Yan seperti lubang hitam yang terus melahap energi di sekitarnya); pusaran di atas kepala adalah rancangan permainan |
+
+#### 31.4.3 Foundation Establishment (Pembentukan Fondasi) — E, `FoundationAura`
+
+| Field | Value |
+|---|---|
+| Imagery | the Dao Foundation: a platform of light under the seat and Dao pillars of light around it, flawless, without a single crack (crack lines appear only as the bottleneck warning, 31.3) |
+| Colours | body `7FE0FF` (sky cyan), core `E8FBFF`, pillars mixed 35 % with tint |
+| Layers | the platform: a flat octagonal glow at 0.06 b (`aura/fe_platform`); pillar glows (vertical cards, `aura/fe_pillar`, 0.25 × 1.6 b); a body glow |
+| Models | `aura_fe_pillar` (a slim octagonal pillar of translucent light with a base ring and a capital, 22 px tall, scale 1.0) on the platform rim |
+| Particles | `Qi.mote` rising along each pillar (life 26), `film_magic` sparkles at the capitals (Maximal) |
+| Decal | `aura/decal_bagua`: an eight-sided array of the eight trigrams in the body colour |
+| Sound | `BEACON_AMBIENT` pitch 1.2, volume 0.06 |
+| Stages | Awal: platform r 0.9 and 1 pillar (behind). Tengah: 2 pillars (left/right), the decal appears. Akhir: 3 pillars (triangle), the platform gains a second rim. Puncak: 4 pillars and a faint ring of light joining their tops (alpha 0.3); props only where the budget allows, pillar cards otherwise |
+| Sumber | Sumber: I Shall Seal the Heavens, bab 76 dan 100 (pilar fondasi dinilai dari retaknya; Fondasi Sempurna tanpa retak) dan A Will Eternal (Fondasi Dao Fana, Bumi, dan Langit); platform cahaya dan susunan delapan trigram adalah rancangan permainan |
+
+#### 31.4.4 Golden Core (Inti Emas) — E, `GoldenCoreAura`
+
+| Field | Value |
+|---|---|
+| Imagery | the golden core: a small sun of golden light glowing in the dantian through the body, golden halo rings turning around it, and golden light filling the space around the cultivator like the light of the pill furnace |
+| Colours | body `FFD54A`, core `FFF6C8`, rim `E0A020`, halo rings mixed 20 % with tint |
+| Layers | the core sun: a bright billboard glow at the dantian (r 0.18 → 0.3) with a ray fan (`aura/gc_rays`, 12 rays) turning 1°/t; halo rings: tilted rings (`aura/gc_halo`) around the dantian; a wide warm body glow |
+| Models | `aura_gc_core` (a faceted golden pearl, 6 px, glass rim, scale 0.6) at the dantian, `lightCycle(11, 80, 0)`; `aura_gc_halo` (a thin golden ring with nine bead studs, 16 px, scale 1.2) for the outer halo at Puncak |
+| Particles | golden `Qi.glint` motes falling inward to the core; `film_flare` glints on the halo beads (Maximal) |
+| Decal | `aura/decal_sun_array`: a sun disc with twelve rays and a ring of nine dots |
+| Sound | `BEACON_AMBIENT` pitch 0.8, volume 0.07; `AMETHYST_BLOCK_CHIME` every 100 t (pitch 1.4, 0.08) |
+| Stages | Awal: core sun r 0.18, 1 halo ring (r 0.55). Tengah: 2 rings (tilted ±25°), the ray fan appears. Akhir: 3 rings, the decal appears, a soft golden column (alpha 0.18) from the decal to the crown. Puncak: the core sun r 0.3, the outer halo prop `aura_gc_halo` (r 1.2, turning 0.5°/t) and nine golden beads orbiting on it |
+| Sumber | Sumber: I Shall Seal the Heavens, bab 337-339 (Inti Emas Sempurna Meng Hao: cahaya emas memenuhi gua dan emas cair mengental); 金丹 "pil emas" dalam alkimia batin Daois; matahari kecil di dantian dan cincin halo adalah rancangan permainan |
+
+#### 31.4.5 Nascent Soul (Jiwa Baru Lahir) — E, `NascentSoulAura`
+
+| Field | Value |
+|---|---|
+| Imagery | the Nascent Soul: a small infant with the cultivator's own face (two and a half inches tall in the novel), meditating; here it sits cross-legged on a small lotus above the head with a tiny halo, its faint aura echoing the body's |
+| Colours | body `B98CFF` (soul violet), soul `E9DCFF`, lotus `F6C8E8` with tint 20 %, halo `FFFFFF` |
+| Layers | a soft violet body glow; the soul glow card around the infant; a small halo ring behind its head; a faint thread of light from the crown up to the lotus |
+| Models | `aura_ns_infant` (a seated chibi figure, legs crossed, hands on the knees, 10 px, translucent violet-white glass, scale 0.45, facing the body yaw), `aura_ns_lotus` (an eight-petal lotus seat, 12 px, scale 0.5); at Puncak `aura_ns_lotus16` (16 petals) replaces it by `swap` |
+| Particles | violet `Qi.mote` rising from the body into the infant (life 28), `film_star` twinkles around the halo (Maximal) |
+| Decal | `aura/decal_lotus8` (Awal-Akhir), `aura/decal_lotus16` (Puncak) |
+| Sound | `CONDUIT_AMBIENT` pitch 1.0, volume 0.06; `NOTE_BLOCK_CHIME` pitch 2.0 every 120 t |
+| Stages | Awal: the infant as a glow card only (no prop), faint (alpha 0.35), at the crown + 0.35. Tengah: the infant prop and the lotus grow in, halo ring r 0.18. Akhir: the decal lotus opens (alpha fade), the infant brighter (`lightCycle(12, 90, 0)`), the thread of light. Puncak: the 16-petal lotus, halo r 0.26 with a second ring, and a faint echo of the infant's glow at the dantian |
+| Minimal / Sederhana | the infant is a glow card (the mote figure of `AuraFx.soulInfant` may be reused as the particle stand-in) |
+| Sumber | Sumber: A Record of a Mortal's Journey, bab 1077 (Jiwa Baru Lahir Han Li keluar dan berputar di atas kepalanya, bayi dengan wajahnya sendiri, setinggi sekitar dua setengah inci) dan bab 1262 (Jiwa Baru Lahir bermeditasi di dalam tubuhnya); teratai tempat duduknya adalah rancangan permainan |
+
+#### 31.4.6 Deity Transformation (Transformasi Dewa) — H, `DeityAura`
+
+| Field | Value |
+|---|---|
+| Imagery | the Dharma Idol: an enormous translucent seated figure of the cultivator rising behind and above them, as if holding up the sky; rings of divine sense ripple out over the ground |
+| Colours | body `FF7AD9` (deity rose), idol fill = tint 50 % + body 50 % at alpha 0.12-0.32, idol rim `FFF0FA`, ripples mixed 35 % with tint |
+| Layers | the idol: an upright textured card pair (`aura_high/dt_idol`: a seated figure silhouette with a flaming halo; two crossed cards so it reads from every side; it is the aura's one large layer) 3.5 → 6 b tall behind the body; divine-sense ripples: ground rings expanding from r 0.5 to 6 (alpha falls with radius); a crown flame-halo glow |
+| Models | `aura_dt_halo` (a flaming halo wheel of 12 flame tongues, 16 px, scale 1.5 → 3) behind the idol's head; `aura_dt_hands` (two idol hands in a meditation mudra, 14 px, scale 2 → 3) in the idol's lap from Akhir |
+| Particles | `film_flame` tongues licking upward along the idol's outline (body colour, life 16), rose `Qi.mote` drifting up |
+| Decal | `aura_high/decal_dharma_wheel`: an eight-spoke wheel inside a ripple ring |
+| Sound | `RESPAWN_ANCHOR_AMBIENT` pitch 0.7, volume 0.06 |
+| Stages | Awal: ripples only (every 60 t) and the crown flame halo; the idol at alpha 0.12, 3.5 b. Tengah: idol 4.3 b at 0.2, `aura_dt_halo`, the decal appears. Akhir: idol 5.2 b at 0.26, the mudra hands, ripples every 40 t. Puncak: idol 6 b at 0.32 with a rim glow, two ripple trains interleaved, the halo turning 0.4°/t |
+| Notes | hidden while the subject's own `DHARMA` flag is set; at reduced LOD only the idol card at alpha 0.15 |
+| Sumber | Sumber: I Shall Seal the Heavens, bab 805 (Meng Hao memanggil Dharma Idol raksasa yang seakan mampu menyangga langit) dan A Record of a Mortal's Journey, bab 1269 (indra ilahi 神识 yang dipancarkan Han Li untuk memindai sekitar); riak di tanah adalah rancangan permainan |
+
+#### 31.4.7 Dao Union (Penyatuan Dao) — H, `DaoUnionAura`
+
+| Field | Value |
+|---|---|
+| Imagery | the Dao and the self become one: Dao runes orbit the cultivator on tilted rings and slowly fuse the colours of their elements; a taiji turns under the seat, and the generating cycle of the five elements turns around it ("the Dao gives birth to one, one to two, two to three, three to the ten thousand things") |
+| Colours | body `7CFFB2` (dao jade), yang `F6FFF9`, yin `16201C`, runes in `elements` colours (the Dao colour when the mask is empty), fusing toward tint |
+| Layers | rune cards (`aura_high/du_rune_*`, eight glyph cards: 道 一 二 三 天 地 人 合) orbiting on 1-3 tilted rings; rune trails as short ribbons; a yin-yang pair of comets on the waist ring (the old `yinYang` motif, now as glows); a fused-colour core glow at the dantian |
+| Models | `aura_du_taiji` (a flat taiji disc with a raised rim, 16 px, scale 1.6, turning 0.8°/t) just above the decal; `aura_du_rune_ring` (a bronze ring engraved with eight rune plates, 16 px, scale 1.8) from Akhir |
+| Particles | `film_symbol` glyph motes in rune colours drifting inward and fading into the core (life 30) |
+| Decal | `aura_high/decal_wuxing`: the five-element pentagon of the generating cycle around a taiji |
+| Sound | `CONDUIT_AMBIENT` pitch 0.7, volume 0.07; `AMETHYST_BLOCK_CHIME` pitch 0.9 every 90 t |
+| Stages | Awal: 1 ring of 3 runes (r 1.1), the comets. Tengah: 2 rings (5 runes), the taiji prop, the decal appears. Akhir: 3 rings (8 runes), the rune-ring prop, rune colours begin to blend into each other (25 %). Puncak: runes fuse (60 % blend) and every 60 t one rune flies into the core with a soft flash, then reappears on its ring (fixed order) |
+| Sumber | Sumber: Daodejing, bab 42 (道生一，一生二，二生三，三生萬物) dan diagram taiji (Taijitu Shuo, Zhou Dunyi); Lima Unsur (wuxing): siklus melahirkan sebagai segi lima; rune yang mengorbit adalah rancangan permainan |
+
+#### 31.4.8 Immortal Ascension (Kenaikan Abadi) — H, `AscensionAura`
+
+| Field | Value |
+|---|---|
+| Imagery | the Immortal Gate opening above the cultivator and immortal light pouring down; purple qi coming from the east like the sign Yin Xi saw before Laozi passed the gate; heavenly flowers raining down |
+| Colours | body `FFF4D0` (immortal light), purple qi `B07CFF` → `E2C8FF`, gate rim `FFE9A8` mixed 20 % with tint, petals `FFD8EC` |
+| Layers | the immortal light: a soft beam from the gate down onto the body (alpha 0.2-0.35); the gate halo: a vertical ring card (`aura_high/ia_gate`) 2.2 b above the crown; the purple qi: a broad ribbon flowing in from the east (world +x), along the ground, then rising into the dantian; pillars of light around the body (the old `pillars` motif as beams) |
+| Models | `aura_ia_gate` (a heavenly gate: two cloud-carved posts and a curved lintel with a plaque, 20 px, scale 1.4 → 2.4), `aura_ia_cloud` (a flat auspicious cloud scroll, 16 px, scale 1.5) under the gate |
+| Particles | `Qi.petal` heavenly flowers falling around the body (life 60), purple `Qi.mist` along the ribbon |
+| Decal | `aura_high/decal_cloud_seal`: a ring of nine auspicious clouds |
+| Sound | `BEACON_AMBIENT` pitch 1.5, volume 0.07; `NOTE_BLOCK_CHIME` pitch 1.8 every 100 t |
+| The 9 layers | light pillars around the body = 1 + (layer + 1) / 2 (1..5); the gate lintel shows one more lit stud per layer (models `aura_ia_gate_l1..l9`, swapped once on a layer change); the purple ribbon width × (1 + layer / 12) |
+| Stages | Awal: the beam of light and the pillars only. Tengah: the purple-qi ribbon, the decal. Akhir: the gate prop and its halo ring. Puncak: the gate opens (`swap` to `aura_ia_gate_open`: the doors become light), the cloud under it, petals fall |
+| Sumber | Sumber: I Shall Seal the Heavens, bab 969 (saat Gerbang Keabadian terbuka, cahaya Abadi tercurah); 紫气东来, legenda Laozi di Gerbang Hangu (penjaga gerbang Yin Xi melihat qi ungu datang dari timur sebelum Laozi lewat, Liexian Zhuan); Sutra Vimalakirti, bab 7 (dewi menaburkan bunga surgawi); gerbang di atas kepala adalah rancangan permainan |
+
+#### 31.4.9 True Immortal (Abadi Sejati / Dewa Abadi) — H, `TrueImmortalAura`
+
+| Field | Value |
+|---|---|
+| Imagery | a celestial wheel of stars turning around the immortal like the Great Heavenly Circuit, a domain of immortal radiance spreading over the ground, and the immortal seated on a nine-grade lotus throne; once ascended, shifting rainbow light and drifting petals (kept from `AuraFx`) |
+| Colours | body `FFE9A8` (immortal gold), stars `E8F0FF`, wheel in `elements` colours fused with tint, lotus tiers white to gold (`FFFFFF` → `FFD54A`); ascended: a slow hue cycle (240 t) |
+| Layers | the star wheel: a tilted ring of star glows (`aura_high/ti_wheel`, 28 star points, the seven Beidou stars brighter) at r 2.4 turning 0.3°/t; the domain: a wide flat radiance disc (r 3 → 6) with a faint edge, alpha ≤ 0.2; a vertical light column; the immortal's body glow |
+| Models | `aura_ti_lotus` (a three-tier lotus throne, 9 + 9 + 9 petals, 20 px, scale 1.2) under the seat; `aura_ti_wheel` (a thin armillary ring with star studs, 16 px, scale 2.4) on the wheel's plane; at Puncak `aura_ti_lotus9` (nine grades shown as three tiers of three brightening rims, `swap`) |
+| Particles | `film_star` points riding the wheel, golden `Qi.glint` rising in the column; ascended: `Qi.petal` in the hue cycle |
+| Decal | `aura_high/decal_star_chart`: a circle of the twenty-eight lunar mansions with the Beidou dipper |
+| Sound | `BEACON_AMBIENT` pitch 0.6, volume 0.08; `ENCHANTMENT_TABLE_USE` pitch 0.6 every 140 t |
+| Stages | Awal: the lotus throne and the star wheel (9 stars). Tengah: 18 stars, the domain r 3, the decal. Akhir: 28 stars with the Beidou seven bright, the domain r 4.5, the armillary prop. Puncak: the domain r 6 with a second wheel crossing the first at 60°, the nine-grade throne, the light column. True Immortal Puncak is the maximum rank: never a bottleneck glow |
+| Sumber | Sumber: alkimia batin Daois, 大周天 Sirkuit Langit Agung (peredaran qi yang mengikuti putaran langit); Beidou, tujuh bintang Biduk Utara, dan dua puluh delapan rumah bulan; wilayah (领域) dalam Renegade Immortal, seperti wilayah Hidup-Mati dan Karma milik Wang Lin (bab 826, 851); Sutra Kontemplasi Amitayus (观无量寿经): sembilan tingkat kelahiran di atas teratai (九品莲台); roda bintang dan singgasana adalah rancangan permainan |
+
+**Sumber check (designer, 2026-10-21):** BTTH ch. 27 and 159, ISSTH ch. 337-339 and 805, RMJI ch. 1077 and 1262 were
+checked against the Wuxiaworld chapter pages; ISSTH ch. 76/100 and 969, RMJI ch. 1269, Renegade Immortal ch. 826/851,
+the Eternal Spring Art, A Will Eternal's foundations and the wuxing / Beidou lines reuse Sumber lines already verified
+in `lang-src`; 紫气东来 (Yin Xi and Laozi at Hangu Pass) was checked in zdic; the nine grades of lotus rebirth of the
+Contemplation Sutra in Buddhist dictionaries. The lotus seat, the sun in the dantian, the gate above the head and the
+star wheel are marked "rancangan permainan". Implementers copy these lines; they do not add chapter numbers.
+
+### 31.5 Settings (E, `AuraSettings`, keys in `config/kultivator-client.json`)
+
+A heading **"Aura Kultivasi"** in `SettingsPage` right after the "Efek pemain lain" row (before the Phase 7 goals
+heading), three rows in the jade-coin / talisman style of `EpicSettings.Row` / `VoiceSettings.Row`:
+
+| Row (id_id) | Key | Values | Default | Effect |
+|---|---|---|---|---|
+| Aura Kultivasi: Penuh / Sederhana / Mati | `aura_mode` | `penuh`, `sederhana`, `mati` | `penuh` | Penuh: 31.4 at the quality in effect; Sederhana: decal, two glows, the identity quad, particles, no props or ribbons; Mati: the new aura is off everywhere and the old `AuraFx` / `DiscipleFx` aura shows as before |
+| Aura orang lain: Nyala / Mati | `aura_others` | true / false | true | Mati hides the Aura Kultivasi of other players and of their disciples (your own disciples still show); "Efek pemain lain" still scales them when Nyala |
+| Dengung aura: Nyala / Mati | `aura_hum` | true / false | true | the hum and chimes of 31.2.9 |
+
+Each row has a tooltip; the Aura Kultivasi tooltip also names the aura of your current realm and its Sumber line
+(C31.6 keys).
+
+### 31.6 Test commands (S, server, op; under `/kultivasi uji` and `/cultivate uji`)
+
+| Command | Does |
+|---|---|
+| `/kultivasi uji aura <realm> [stage 1-4] [layer 1-9]` | previews that aura on yourself for 20 s **without changing your rank** (default stage 4, layer 1; the layer only matters for `immortal_ascension`); uses your real Dao, root and accent; a Puncak preview below True Immortal shows the breakthrough-ready glow in its last 10 s |
+| `/kultivasi uji aura semua` | cycles every realm and stage on yourself, 3 s each: Mortal; Qi Refining .. Dao Union stages 1-4; Immortal Ascension (layer 1 Awal, 3 Tengah, 6 Akhir, 9 Puncak); True Immortal 1-4 (33 steps, 99 s); Puncak steps below True Immortal show the bottleneck glow; an action-bar line names each step |
+| `/kultivasi uji aura murid <name> <realm> [stage] [layer]` | the same 20-s preview on that loaded disciple of yours (name token as in `uji murid`, the same suggestions) |
+| `/kultivasi uji aura aksen` | toggles, for your previews, a forced accent (Heavenly gold) to check 31.3 |
+| `/kultivasi uji aura stop` | ends your preview or cycle and those of your disciples |
+
+The preview draws the aura as if the subject were cultivating (seated or not; sit with the meditation key to see the
+pose too). Previews end on death, dimension change, logout and server stop; nothing is saved.
+
+### 31.7 Modules (exactly three, disjoint files)
+
+**Order of work.** S and E start in parallel; E commits the API of C31.1-C31.4 first as compiling skeletons so H builds
+on it. A single compile step runs after all three (rule 0.6); E's `AuraClient.init` calls `AuraHigh.init()` directly,
+as `FxModels` calls `UltimatesA/B` (30.5).
+
+#### S: server and shared (sync, preview, test commands, server text)
+
+Owns: `src/main/java/dev/kultivator/data/VisualState.java` (C31.5), the aura lines of `Cultivators.refreshVisual`,
+`src/main/java/dev/kultivator/disciple/DiscipleEntity.java` (the new `DATA_AURA` accessor, its define, `syncedAura()`,
+the packing in `syncFlags`), `DiscipleData` only if a helper is needed, the new package
+`src/main/java/dev/kultivator/aura/**` (`AuraPreviewPayload`, `AuraPreviews`: payload registration, the `aura` command
+node, the preview/cycle ticker, cleanup on death / dimension change / leave / stop), one line in
+`Kultivator.onInitialize` (`AuraPreviews.init()`), one `.then(AuraPreviews.command())` line in
+`TestCommands.addCommands` (plus `token(DiscipleEntity)` and the name suggestions made public), and
+`lang-src/aura_server.{en_us,id_id}.json` (`kultivator.aura.cmd.*`).
+
+#### E: client aura engine, realms 1-5, settings, disciple hook
+
+Owns: `src/client/java/dev/kultivator/client/aura/**` except `aura/high/**` (31.2.1), the guards in
+`client/fx/AuraFx.java`, `client/fx/MeditationFx.java`, `client/fx/DiscipleFx.java` (31.2.6), the settings block in
+`client/screen/SettingsPage.java`, the one init line in `client/KultivatorClient.java` (CRLF), the ambient spawn method
+in `client/epic/film/FilmParticleProviders.java` (C31.4; nothing else in that file), `tools/gen_aura_assets.py` (new;
+uses `tools/png.py`), `tools/fx_model_ids_aura.txt`, the assets `textures/misc/aura/**` and the models, item
+definitions and textures with the prefixes `aura_fe_`, `aura_gc_`, `aura_ns_` (`models/item/fx/`, `items/fx/`,
+`textures/item/fx/`), and `lang-src/aura.{en_us,id_id}.json` (settings rows and tooltips; realm aura names, lines and
+Sumber of Mortal .. Nascent Soul).
+
+#### H: client realms 6-9
+
+Owns: `src/client/java/dev/kultivator/client/aura/high/**` (`AuraHigh` with `init()`, `DeityAura`, `DaoUnionAura`,
+`AscensionAura`, `TrueImmortalAura`, any helper), `tools/gen_aura_high_assets.py` (new; uses `tools/png.py`),
+`tools/fx_model_ids_aura_high.txt`, the assets `textures/misc/aura_high/**` and the prefixes `aura_dt_`, `aura_du_`,
+`aura_ia_`, `aura_ti_`, and `lang-src/aura_high.{en_us,id_id}.json` (realm aura names, lines and Sumber of Deity
+Transformation .. True Immortal).
+
+Nobody edits another module's file. Every generated texture is opened with Read once (no magenta, glows fade to alpha 0
+at the border), every model follows the rules of the `gen_fire_ultimate_models.py` docstring (anchor 8,8,8; coords
+−16..32; single-axis rotations by 22.5° steps), and every new Minecraft or Fabric API use is checked in
+`butterbot-fabric/reference/mcsrc` (or the Fabric API sources) and listed in the module's report.
+
+### 31.8 Contracts
+
+**C31.1 Driver API** (E, `dev.kultivator.client.aura`):
+
+```java
+public interface AuraRealmDriver {
+    void start(AuraSubject s, AuraRig rig);                 // the aura of this realm begins (props grow in here)
+    void tick(AuraSubject s, AuraRig rig);                  // every unpaused client tick while f > 0 (particles, props)
+    void render(AuraSubject s, AuraRig rig, AuraDraw draw, float partial); // every frame, quads only
+    void stop(AuraSubject s, AuraRig rig);                  // fade-out done or realm changed: end every prop
+    AuraHum.Spec hum(AuraSubject s);                        // the hum and chime of 31.4 (AuraHum.Spec.NONE for none)
+}
+public final class AuraEngine {
+    public static void register(Realm realm, AuraRealmDriver driver); // one per realm; E registers 0-4, AuraHigh.init() 5-8
+    public static boolean covers(int entityId);             // true while the new aura draws this entity (f > 0)
+}
+```
+
+**C31.2 Subject** (E): `public record AuraSubject(int entityId, @Nullable Entity entity, boolean disciple, boolean own,
+Vec3 feet, double scale, double height, float bodyYaw, boolean seated, boolean onGround, Realm realm, int layer, int
+stage, int dao, int rootColor, int rootElements, int accent, boolean bottleneck, boolean ascended, boolean dharma,
+float fade, float lod /* 1 full, 0.5 reduced */, float share, boolean firstPersonSelf, boolean simple /* Sederhana */,
+boolean preview)` with helpers `Vec3 dantian()`, `Vec3 crown()`, `Vec3 seatTop()`, `float stageGrow()` (0.55, 0.7,
+0.85, 1.0 by stage), `float layerGrow()` (layer / 8 for Immortal Ascension, else 0), `AuraColors.Palette colors()`.
+
+**C31.3 Rig, draw, particles, hum** (E):
+
+```java
+public final class AuraRig {
+    public long clock();                                    // gameTime + entityId * 37
+    public float ease(String key, float target, int ticks); // eased value; moves to a new target once (stage changes)
+    public @Nullable ModelHandle prop(String key, Supplier<ModelRequest> request); // made once; null if refused (budget)
+    public void endProp(String key, int fadeTicks);
+    public void endProps(int fadeTicks);
+    public int stageChangedAgo();                           // ticks since the last stage/layer change (MAX_VALUE if none)
+    public <T> T data(String key, Supplier<T> init);        // driver scratch state
+}
+public final class AuraDraw {                               // every method returns false when the quad budget is spent
+    public boolean glow(Vec3 c, float radius, int rgb, float alpha);                                  // camera-facing soft disc
+    public boolean flat(Vec3 c, float radius, float turnDeg, Identifier tex, int rgb, float alpha);   // ground decal / disc
+    public boolean ring(Vec3 c, Vec3 axis, float r0, float r1, float turnDeg, Identifier tex, int rgb, float alpha);
+    public boolean beam(Vec3 from, Vec3 to, float width, int rgb, float alpha);
+    public boolean card(Vec3 base, float w, float h, float yawDeg, boolean crossed, Identifier tex, int rgb, float alpha);
+    public boolean ribbon(List<Vec3> points, float width, float tailWidth, int head, int tail, float alpha);
+    public boolean large();                                 // takes the aura's one large-layer slot (pack profile)
+}
+```
+
+`AuraParticles` (E): `mote`, `glint`, `mist`, `petal(AuraSubject s, Vec3 at, Vec3 vel, int rgb, float size, int life)`
+and `film(AuraSubject s, SimpleParticleType type, Vec3 at, Vec3 vel, int rgb, float size, int life)`, each applying
+share, LOD, quality and `FxBudget`. `AuraRng.of(int entityId, long tick, int salt)` in 0..1. `AuraHum.Spec(SoundEvent
+loop, float volume, float pitch, @Nullable SoundEvent chime, float chimePitch, int chimeEvery)` with `Spec.NONE`.
+
+**C31.4 Ambient film particles** (E edits F's file, this method only):
+`public static boolean FilmParticleProviders.spawnAmbient(SimpleParticleType type, Vec3 pos, Vec3 velocity, int rgb,
+float size, int life, FxBudget.Priority priority)`: like `spawn` but without the per-shot cap (the vanilla particle
+setting and `FxBudget` still apply).
+
+**C31.5 Sync** (S, server and shared):
+- `VisualState` gains the component `int rootElements` after `rootColor` (codec: a VarInt after the colour) and the
+  flags `HEAVENLY_ROOT = 1 << 14`, `BOTTLENECK_READY = 1 << 15`; a 7-argument constructor with the old signature stays
+  (rootElements 0); `NONE` keeps its values. `Cultivators.refreshVisual` sets them: Heavenly = `rootTested() &&
+  rootGrade() == RootGrade.HEAVENLY`, ready = `rank.isBottleneck() && data.barFull() && !rank.isMax()`, elements =
+  `data.rootElements()`.
+- `DiscipleEntity`: `DATA_AURA` (INT, default 0) defined after the existing accessors; `public int syncedAura()`; bits
+  `AURA_HEAVENLY_ROOT = 1`, `AURA_BOTTLENECK_READY = 2`, the root element mask in bits 8-23 (`AURA_ELEMENT_SHIFT = 8`);
+  set from `syncFlags()` only when changed. The physique stays in `syncedTalent()` bits 0-3.
+- `AuraPreviewPayload(int entityId, int realm, int layer, int stage, int flags, int ticks)` (clientbound, id
+  `kultivator:aura_preview`, registered with `PayloadTypeRegistry.clientboundPlay()` from `AuraPreviews.init()`);
+  `flags`: 1 forced accent, 2 bottleneck glow, 4 cycle step; `ticks` 0 = stop. The server re-sends a live preview every
+  20 ticks with the remaining ticks to the subject's owner and to `PlayerLookup.tracking(entity)` (late viewers catch
+  up), through `Net.send`. Dao, root colour and elements come from the subject's real synced data.
+- Server text keys (S): `kultivator.aura.cmd.preview`, `.cycle_step`, `.disciple`, `.accent_on`, `.accent_off`, `.stop`,
+  `.no_disciple`, `.unknown_realm`; realm names come from the client keys of C31.6 (`Component.translatable`; the lang
+  fragments are merged into one file).
+
+**C31.6 Text keys** (E for Mortal .. Nascent Soul and the settings, H for Deity Transformation .. True Immortal; both
+languages): `kultivator.aura.realm.<realm id>.name` (e.g. "Aura Inti Emas"), `.desc` (one line of the 31.4 imagery),
+`.source` (the Sumber line of 31.4, "Sumber: …" / "Source: …"); E: `kultivator.aura.setting.heading`,
+`kultivator.aura.setting.mode` (`%s`), `.mode.penuh|sederhana|mati`, `.mode.tip`, `.others`, `.others.tip`, `.hum`,
+`.hum.tip`.
+
+### 31.9 Daftar uji (untuk `docs/uji/FASE-31.md`)
+
+**Dasar**
+1. Duduk bermeditasi (tombol meditasi): aura lama memudar dan Aura Kultivasi muncul halus dalam ±1,5 detik; berdiri:
+   aura memudar dalam ±1 detik, model 3D mengecil sekali lalu hilang, aura lama kembali. Tidak ada kedip.
+2. `/kultivasi uji aura semua`: 33 langkah, tiap 3 detik, baris aksi menyebut ranah dan tahapnya. Setiap ranah jelas
+   berbeda; setiap tahap menambah unsur yang terlihat (tabel 31.4); Kenaikan Abadi bertambah pilar dan paku gerbang
+   per lapisan.
+3. `/kultivasi uji aura golden_core 2`, lalu `... 4`: ukuran berubah mulus sekali, ada satu cincin cahaya dari dekal;
+   tidak ada denyut ukuran acak. Ulangi dua kali: gerakannya sama persis.
+4. Peringkat asli tidak berubah setelah pratinjau (status `/kultivasi` sama sebelum dan sesudah); pratinjau berhenti
+   sendiri setelah 20 detik dan dengan `/kultivasi uji aura stop`.
+5. `/kultivasi uji aura murid <nama> nascent_soul 3`: murid itu menampilkan aura Jiwa Baru Lahir; murid yang benar-benar
+   bermeditasi juga menampilkan auranya sendiri; efek meditasi lama murid tidak tampil ganda.
+
+**Warna dan aksen**
+6. Pilih Dao berbeda (Api, Es, Petir, ...): cincin, pita, dekal dan rune ikut warna Dao; motes yang masuk memakai warna
+   akar.
+7. Akar Surgawi (atau `/kultivasi uji aura aksen`): cincin luar emas dan tiga percikan emas; murid dengan fisik langka
+   memakai warna aksen fisiknya.
+8. Bar kultivasi penuh di Puncak: cahaya peringatan kuning-merah berdenyut (bukan berubah ukuran), garis retak tipis di
+   dekal, denting lonceng pelan; di Abadi Sejati Puncak tidak pernah muncul.
+
+**Pengaturan**
+9. "Aura Kultivasi: Sederhana": hanya dekal, cahaya dan partikel; tanpa model 3D dan pita. "Mati": hanya aura lama.
+10. "Aura orang lain: Mati": aura pemain lain dan murid mereka hilang; aura sendiri dan murid sendiri tetap.
+11. "Dengung aura: Mati": tidak ada dengung atau denting. Nyala: dengung sangat pelan, berbeda per ranah, ikut slider
+    Suara Sekitar vanilla.
+12. Kualitas Minimal / Normal / Maksimal: jumlah lapisan, model dan partikel sesuai tabel 31.2.5; "Efek pemain lain:
+    Ringan" mengurangi aura orang lain.
+
+**Kamera, jarak dan keamanan**
+13. Orang pertama: tidak ada model atau quad menutupi pandangan; hanya cahaya lembut di tepi layar dan beberapa motes di
+    bawah garis mata. F5: aura lengkap. F1: cahaya tepi hilang.
+14. Jarak: ≤ 24 b lengkap; 24-64 b hanya dekal, satu cahaya dan sedikit partikel; > 64 b tidak ada.
+15. Aura tidak pernah menggerakkan kamera; film dan sinematik tetap seperti biasa, dan cahaya tepi hilang saat film main.
+16. Tidak ada blok berubah, tidak ada petir vanilla, cuaca, waktu atau kecepatan tick yang berubah; Mode Kehancuran tidak
+    berpengaruh pada aura.
+17. Terobosan: aura meredup separuh agar efek terobosan jelas; Penyimpangan Qi dan Tribulasi mengakhiri aura.
+
+**Performa dan kompatibilitas (laptop lemah, Minimal/Otomatis, jarak render 8)**
+18. Lima murid bermeditasi + diri sendiri di Abadi Sejati: FPS tidak turun di bawah 30 lebih dari sesaat; teknik tetap
+    mendapat model lebih dulu (aura memakai prioritas DETAIL).
+19. Sodium + Iris dengan paket shader: aura tampil, tidak ada bayangan aneh dari quad, dekal tidak berkedip di tanah,
+    paling banyak satu lapisan besar per aura.
+20. Tidak ada yang bermeditasi: biaya aura hampir nol (tanpa rig, tanpa quad).
+21. Teks: setiap kunci `kultivator.aura.*` ada di en_us dan id_id; semua baris Sumber lama tetap sama; setiap ranah punya
+    baris Sumber aura sesuai 31.4.
+22. Semua tekstur aura tampak benar (tanpa ungu-hitam), tepi cahaya lembut; model 3D aura tampil rapi dari segala arah.

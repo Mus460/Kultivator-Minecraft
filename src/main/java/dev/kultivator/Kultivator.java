@@ -139,6 +139,8 @@ public class Kultivator implements ModInitializer {
 		dev.kultivator.pusakalangit.PusakaLangit.init();
 		// Voices (module V): the Japanese voice lines of Heaven, demons, ancient beasts, hermits, rogues and disciples.
 		dev.kultivator.voice.Voices.init();
+		// Aura Kultivasi (DESIGN 31.6, C31.5): the preview payload, its ticker and the uji aura cleanup.
+		dev.kultivator.aura.AuraPreviews.init();
 		// After every module registered its items.
 		ModItems.init();
 		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its

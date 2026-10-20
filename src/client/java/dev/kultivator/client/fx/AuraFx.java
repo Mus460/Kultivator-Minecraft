@@ -59,6 +59,8 @@ public final class AuraFx {
 
 	/** Every client tick: aura particles around every visible player whose VisualState shows the aura. */
 	public static void tick(Minecraft minecraft) {
+		// DESIGN 31: the Aura Kultivasi engine runs first, so covers() is current for this tick
+		dev.kultivator.client.aura.AuraClient.tick(minecraft);
 		ClientLevel level = minecraft.level;
 		if (level == null || minecraft.player == null) {
 			return;
@@ -83,6 +85,10 @@ public final class AuraFx {
 			}
 			share = player == minecraft.player ? 1.0F : EffectQuality.othersScale();
 			if (share <= 0.0F) {
+				continue;
+			}
+			// DESIGN 31.2.6: while the Aura Kultivasi draws this player, it replaces this aura (cross-fading back after)
+			if (dev.kultivator.client.aura.AuraEngine.covers(player.getId())) {
 				continue;
 			}
 			aura(minecraft, player, visual, random, time);

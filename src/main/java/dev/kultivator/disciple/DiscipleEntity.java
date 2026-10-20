@@ -4,6 +4,7 @@ import dev.kultivator.Kultivator;
 import dev.kultivator.cultivation.Tribulation;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Rank;
+import dev.kultivator.data.RootGrade;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.trial.HeartDemonEntity;
 import dev.kultivator.util.NoGrief;
@@ -226,6 +227,14 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	private static final EntityDataAccessor<Integer> DATA_STARS = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> DATA_TALENT = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> DATA_POWER = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	// Aura Kultivasi (DESIGN 31, C31.5): Heavenly root, breakthrough ready and the root element mask.
+	private static final EntityDataAccessor<Integer> DATA_AURA = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	/** {@link #syncedAura()} bit: the root is of the Heavenly grade. */
+	public static final int AURA_HEAVENLY_ROOT = 1;
+	/** {@link #syncedAura()} bit: at the bottleneck with a full bar, not the maximum rank. */
+	public static final int AURA_BOTTLENECK_READY = 2;
+	/** {@link #syncedAura()}: the root element mask sits in bits 8-23. */
+	public static final int AURA_ELEMENT_SHIFT = 8;
 	/** Transient attack modifier that carries the {@code damageFactor} hooks into a melee blow. */
 	private static final Identifier MELEE_FACTOR_ID = Kultivator.id("disciple_melee_factor");
 
@@ -293,6 +302,7 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		builder.define(DATA_STARS, 0);
 		builder.define(DATA_TALENT, 0);
 		builder.define(DATA_POWER, 0);
+		builder.define(DATA_AURA, 0);
 	}
 
 	@Override
@@ -490,6 +500,19 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	/** Physique (bits 0-3), soul colour (bits 4-6) and special type (bits 7-8); see {@link #packTalent}. */
 	public int syncedTalent() {
 		return this.entityData.get(DATA_TALENT);
+	}
+
+	/**
+	 * The Aura Kultivasi bits (DESIGN 31.3): {@link #AURA_HEAVENLY_ROOT}, {@link #AURA_BOTTLENECK_READY} and the root
+	 * element mask in bits 8-23 (see {@link #auraElements}).
+	 */
+	public int syncedAura() {
+		return this.entityData.get(DATA_AURA);
+	}
+
+	/** The root element mask of a {@link #syncedAura()} value. */
+	public static int auraElements(int aura) {
+		return aura >>> AURA_ELEMENT_SHIFT & 0xFFFF;
 	}
 
 	/** Visual power flags: bits 0-15 belong to module C, bits 16-31 to module D. */
@@ -1214,6 +1237,23 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		if (this.entityData.get(DATA_FLAGS) != flags) {
 			this.entityData.set(DATA_FLAGS, flags);
 		}
+		int aura = auraBits();
+		if (this.entityData.get(DATA_AURA) != aura) {
+			this.entityData.set(DATA_AURA, aura);
+		}
+	}
+
+	/** The value of {@link #syncedAura()} for the current data (DESIGN 31, C31.5). */
+	private int auraBits() {
+		Rank rank = data.rank();
+		int aura = (data.rootElements() & 0xFFFF) << AURA_ELEMENT_SHIFT;
+		if (data.rootGrade() == RootGrade.HEAVENLY) {
+			aura |= AURA_HEAVENLY_ROOT;
+		}
+		if (rank.isBottleneck() && data.barFull() && !rank.isMax()) {
+			aura |= AURA_BOTTLENECK_READY;
+		}
+		return aura;
 	}
 
 	private void applyBonuses() {

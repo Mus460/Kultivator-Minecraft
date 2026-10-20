@@ -67,8 +67,12 @@ public final class DiscipleFx {
 		double height = disciple.getBbHeight() * (seated ? SEATED_HEIGHT : 1.0D);
 		double width = disciple.getBbWidth();
 		Vec3 feet = disciple.position();
-		aura(feet, width, height, rank, DiscipleLook.color(rank.realm().ordinal(), DiscipleLook.dao(disciple)), random, t);
-		if ((flags & DiscipleLook.MEDITATING) != 0) {
+		// DESIGN 31.2.6: while the Aura Kultivasi covers this disciple it replaces the aura and the meditation motes
+		boolean covered = dev.kultivator.client.aura.AuraEngine.covers(disciple.getId());
+		if (!covered) {
+			aura(feet, width, height, rank, DiscipleLook.color(rank.realm().ordinal(), DiscipleLook.dao(disciple)), random, t);
+		}
+		if ((flags & DiscipleLook.MEDITATING) != 0 && !covered) {
 			meditation(feet, DiscipleLook.rootColor(disciple), random, t);
 		}
 		if ((flags & DiscipleLook.BREAKING_THROUGH) != 0) {

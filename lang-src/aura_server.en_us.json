@@ -1,0 +1,14 @@
+{
+  "kultivator.aura.cmd.usage": "Aura Kultivasi preview: /kultivasi uji aura <realm> [stage 1-4] [layer 1-9] (20 s on yourself, your real rank does not change) · semua (every realm and stage, 3 s each) · murid <name> <realm> [stage] [layer] · aksen (force the Heavenly accent) · stop",
+  "kultivator.aura.cmd.preview": "Previewing %s, %s, on yourself for %s s. Your real rank does not change. /kultivasi uji aura stop ends it.",
+  "kultivator.aura.cmd.disciple": "%s shows %s, %s, for %s s. Their real rank does not change.",
+  "kultivator.aura.cmd.cycle_start": "Aura tour: %s steps, %s s each (%s s). /kultivasi uji aura stop ends it.",
+  "kultivator.aura.cmd.cycle_step": "Aura %s/%s: %s · %s",
+  "kultivator.aura.cmd.cycle_end": "Aura tour finished.",
+  "kultivator.aura.cmd.accent_on": "Forced accent on: your aura previews wear the gold of a Heavenly root.",
+  "kultivator.aura.cmd.accent_off": "Forced accent off: previews show your real accent (if any).",
+  "kultivator.aura.cmd.stop": "Aura previews ended (%s).",
+  "kultivator.aura.cmd.no_disciple": "No loaded disciple of yours is named '%s'.",
+  "kultivator.aura.cmd.unknown_realm": "Unknown realm: %s. Use mortal, qi_refining, foundation, golden_core, nascent_soul, deity_transformation, dao_union, immortal_ascension or true_immortal.",
+  "kultivator.test.help.aura": "/kultivasi uji aura <realm> [stage] [layer] | semua | murid <name> <realm> [stage] | aksen | stop — preview the Aura Kultivasi of any realm for 20 s while your real rank stays the same."
+}

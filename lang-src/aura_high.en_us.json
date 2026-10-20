@@ -1,0 +1,14 @@
+{
+  "kultivator.aura.realm.deity_transformation.name": "Deity Transformation Aura",
+  "kultivator.aura.realm.deity_transformation.desc": "A giant translucent Dharma Idol sits cross-legged behind you with a flaming halo, as if holding up the sky, while ripples of divine sense spread over the ground.",
+  "kultivator.aura.realm.deity_transformation.source": "Source: I Shall Seal the Heavens, ch. 805 (Meng Hao calls up a giant Dharma Idol that seems able to hold up the sky) and A Record of a Mortal's Journey, ch. 1269 (the divine sense 神识 Han Li sends out to scan his surroundings); the ripples on the ground are game design",
+  "kultivator.aura.realm.dao_union.name": "Dao Union Aura",
+  "kultivator.aura.realm.dao_union.desc": "The Dao and the self become one: Dao runes orbit on tilted rings and slowly fuse the colours of your elements, a taiji turns under the seat and the cycle of the five elements turns around it.",
+  "kultivator.aura.realm.dao_union.source": "Source: Daodejing, ch. 42 (道生一，一生二，二生三，三生萬物) and the taiji diagram (Taijitu Shuo, Zhou Dunyi); the Five Elements (wuxing): the generating cycle as a pentagon; the orbiting runes are game design",
+  "kultivator.aura.realm.immortal_ascension.name": "Immortal Ascension Aura",
+  "kultivator.aura.realm.immortal_ascension.desc": "The Immortal Gate opens above you and Immortal light pours down; purple qi comes from the east and heavenly flowers fall. Every layer adds a pillar of light and a lit stud on the gate.",
+  "kultivator.aura.realm.immortal_ascension.source": "Source: I Shall Seal the Heavens, ch. 969 (when the Door of Immortality opens, Immortal light pours out); 紫气东来, the legend of Laozi at Hangu Pass (the gatekeeper Yin Xi saw purple qi coming from the east before Laozi passed, Liexian Zhuan); the Vimalakirti Sutra, ch. 7 (the goddess scatters heavenly flowers); the gate above the head is game design",
+  "kultivator.aura.realm.true_immortal.name": "True Immortal Aura",
+  "kultivator.aura.realm.true_immortal.desc": "A wheel of stars turns around you like the Great Heavenly Circuit, a domain of immortal radiance spreads over the ground, and you sit on a nine-grade lotus throne.",
+  "kultivator.aura.realm.true_immortal.source": "Source: Daoist inner alchemy, 大周天 the Great Heavenly Circuit (the circulation of qi that follows the turning of the heavens); Beidou, the seven stars of the Northern Dipper, and the twenty-eight lunar mansions; the domains (领域) of Renegade Immortal, such as Wang Lin's Life-and-Death and Karma domains (ch. 826, 851); the Contemplation Sutra of Amitayus (观无量寿经): the nine grades of rebirth on the lotus (九品莲台); the star wheel and the throne are game design"
+}

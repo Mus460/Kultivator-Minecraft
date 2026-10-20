@@ -1,0 +1,14 @@
+{
+  "kultivator.aura.cmd.usage": "Pratinjau Aura Kultivasi: /kultivasi uji aura <ranah> [tahap 1-4] [lapisan 1-9] (20 detik pada dirimu, peringkat aslimu tidak berubah) · semua (setiap ranah dan tahap, 3 detik masing-masing) · murid <nama> <ranah> [tahap] [lapisan] · aksen (paksa aksen Akar Surgawi) · stop",
+  "kultivator.aura.cmd.preview": "Pratinjau %s, %s, pada dirimu selama %s detik. Peringkat aslimu tidak berubah. /kultivasi uji aura stop untuk mengakhiri.",
+  "kultivator.aura.cmd.disciple": "%s menampilkan %s, %s, selama %s detik. Peringkat aslinya tidak berubah.",
+  "kultivator.aura.cmd.cycle_start": "Tur aura: %s langkah, %s detik masing-masing (%s detik). /kultivasi uji aura stop untuk mengakhiri.",
+  "kultivator.aura.cmd.cycle_step": "Aura %s/%s: %s · %s",
+  "kultivator.aura.cmd.cycle_end": "Tur aura selesai.",
+  "kultivator.aura.cmd.accent_on": "Aksen paksa nyala: pratinjau auramu memakai emas Akar Surgawi.",
+  "kultivator.aura.cmd.accent_off": "Aksen paksa mati: pratinjau memakai aksen aslimu (jika ada).",
+  "kultivator.aura.cmd.stop": "Pratinjau aura diakhiri (%s).",
+  "kultivator.aura.cmd.no_disciple": "Tidak ada murid termuat milikmu bernama '%s'.",
+  "kultivator.aura.cmd.unknown_realm": "Ranah tidak dikenal: %s. Pakai mortal, qi_refining, foundation, golden_core, nascent_soul, deity_transformation, dao_union, immortal_ascension atau true_immortal.",
+  "kultivator.test.help.aura": "/kultivasi uji aura <ranah> [tahap] [lapisan] | semua | murid <nama> <ranah> [tahap] | aksen | stop — pratinjau Aura Kultivasi ranah mana pun selama 20 detik tanpa mengubah peringkat aslimu."
+}

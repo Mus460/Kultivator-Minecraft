@@ -115,11 +115,18 @@ public final class Cultivators {
 		if (tribulationFlag.test(player)) {
 			flags |= VisualState.TRIBULATION;
 		}
+		// Aura Kultivasi (DESIGN 31.3 / C31.5): the Heavenly-root accent and the breakthrough-ready pulse.
+		if (data.rootTested() && data.rootGrade() == RootGrade.HEAVENLY) {
+			flags |= VisualState.HEAVENLY_ROOT;
+		}
+		if (rank.isBottleneck() && data.barFull() && !rank.isMax()) {
+			flags |= VisualState.BOTTLENECK_READY;
+		}
 		Dao dao = data.dao();
 		ItemStack sword = data.flyingSword() ? flightSword(player) : bestSword(player);
 		String swordId = sword.isEmpty() ? "" : BuiltInRegistries.ITEM.getKey(sword.getItem()).toString();
 		VisualState state = new VisualState(rank.realm().ordinal(), rank.layer(), rank.stage(), dao == null ? -1 : dao.ordinal(),
-				Element.mainColor(data.rootElements()), flags, swordId);
+				Element.mainColor(data.rootElements()), data.rootElements(), flags, swordId);
 		if (!state.equals(player.getAttached(ModAttachments.VISUAL))) {
 			player.setAttached(ModAttachments.VISUAL, state);
 		}
