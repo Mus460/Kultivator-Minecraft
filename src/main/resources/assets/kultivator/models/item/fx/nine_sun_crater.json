@@ -1,0 +1,66 @@
+{
+ "textures": {
+  "t0": "kultivator:item/fx/nine_sun_crater",
+  "t1": "kultivator:item/fx/nine_sun_crater_core",
+  "particle": "kultivator:item/fx/nine_sun_crater"
+ },
+ "elements": [
+  {
+   "from": [
+    -6.0,
+    8.0,
+    -6.0
+   ],
+   "to": [
+    22.0,
+    8.12,
+    22.0
+   ],
+   "faces": {
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    }
+   },
+   "light_emission": 15
+  },
+  {
+   "from": [
+    3.0,
+    8.16,
+    3.0
+   ],
+   "to": [
+    13.0,
+    8.24,
+    13.0
+   ],
+   "faces": {
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    }
+   },
+   "light_emission": 15
+  }
+ ]
+}

@@ -8,7 +8,8 @@ package dev.kultivator.client.anim.model;
  * <li>BOB: a = amplitude (blocks), b = period (ticks)</li>
  * <li>GROW: a = the starting fraction of the scale (easeOutCubic, no overshoot; held at a before it starts); SHRINK: to nothing (easeInCubic)</li>
  * <li>FALL: a = height (easeInQuad drop; add a STAMP for the landing squash); RISE: a = depth it rises from (easeOutCubic)</li>
- * <li>SLIDE: travel to {@code to} (b = 1: easeOutCubic, else linear), facing the travel</li>
+ * <li>SLIDE: travel to {@code to} (b = 1: easeOutCubic, facing the travel; b = 2: easeInQuad, keeping the prop's own turn
+ * (a falling sun); else linear, facing the travel)</li>
  * <li>THRUST: a = distance along the facing (out with easeOutBack, a 3 tick hold, then it fades)</li>
  * <li>SWING: a = degrees about the side axis; b = period (repeating) or 0 (one sweep)</li>
  * <li>TOPPLE: falls over by 90 degrees about the side axis (easeInQuad)</li>
@@ -20,6 +21,12 @@ package dev.kultivator.client.anim.model;
  * <li>LUNGE: 4 ticks forward 2 blocks towards {@code to}, then back</li>
  * <li>STAMP: a 2 tick squash (landing)</li>
  * <li>DISSOLVE: shrinks a little while bleeding particles, then ends</li>
+ * <li>TILT: a = degrees about the prop's own side axis (smoothstep over the duration, held after; several add up): a
+ * petal unfolding or folding back</li>
+ * <li>REVOLVE: a = degrees per tick about the world vertical through the position (eased in over 2 s), b = radius: the
+ * prop stands that far out along its front (b &ge; 0) or along its side, flying forward (b &lt; 0); its turn follows</li>
+ * <li>FLATTEN: a = the final height factor, b = the final width factor (easeOutCubic): a sun squashing into a disc</li>
  * </ul>
  */
-public enum Anim { NONE, SPIN, BOB, GROW, SHRINK, FALL, RISE, SLIDE, THRUST, SWING, TOPPLE, OPEN, CLOSE, SHATTER, PULSE, FLAP, ORBIT, LUNGE, STAMP, DISSOLVE }
+public enum Anim { NONE, SPIN, BOB, GROW, SHRINK, FALL, RISE, SLIDE, THRUST, SWING, TOPPLE, OPEN, CLOSE, SHATTER, PULSE, FLAP, ORBIT, LUNGE, STAMP, DISSOLVE,
+	TILT, REVOLVE, FLATTEN }
