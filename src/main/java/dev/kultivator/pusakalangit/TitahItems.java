@@ -50,6 +50,14 @@ public final class TitahItems {
 	public static final DataComponentType<Integer> VIEW = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Kultivator.id("titah_view"),
 			DataComponentType.<Integer>builder().persistent(ExtraCodecs.intRange(0, 3)).networkSynchronized(ByteBufCodecs.VAR_INT).build());
 
+	/**
+	 * {@code kultivator:titah_tier_view} (Phase 10b Tingkat, DESIGN 29.16.3): the selected decree's Tingkat (bits 0-3) and
+	 * bit 4 when its cast would be permanent, shown in the seal's tooltip; written when it changes.
+	 */
+	public static final DataComponentType<Integer> TIER_VIEW = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE,
+			Kultivator.id("titah_tier_view"), DataComponentType.<Integer>builder().persistent(ExtraCodecs.intRange(0, 31))
+					.networkSynchronized(ByteBufCodecs.VAR_INT).build());
+
 	public static final ResourceKey<Block> BATU_KEY = ResourceKey.create(Registries.BLOCK, Kultivator.id("batu_pusaka"));
 	public static final ResourceKey<Block> URAT_KEY = ResourceKey.create(Registries.BLOCK, Kultivator.id("urat_pusaka"));
 

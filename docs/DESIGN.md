@@ -16136,3 +16136,2126 @@ Confirmed unchanged: `Shapes.Kind` ends at `STRIP` (14), so STEPPED_PIT 15 / SHA
 `heaven_seal_shard`, `immortal_origin_stone`, `soul_seal_jade`, `spirit_stone_high` exist; `heaven_splitting_sword`,
 `dinghai_pillar`, `star_core` and `yishan_seal` are new fx models (none exists yet); `Dampak` silence clamp ≤ 20;
 `TechFx.aux` is an int; `EpicBudget.PACK_QUADS` = 0.6.
+
+---
+
+### 29.16 Tingkat Titah 1-9 dan pahat cepat
+
+**Numbering:** this is the section requested as "29.13 Tingkat Titah 1-9 dan pahat cepat". It is numbered 29.16 because
+29.13-29.15 already exist. Code comments cite "DESIGN 29.16".
+
+**Request (2026-10-20):** a size and damage slider for the decrees. Tier 1 is today's size and damage. Each tier above
+it is bigger, up to 9 tiers, with the damage reaching hundreds and then thousands of blocks.
+
+**Code basis:** HEAD `4bda8d6` (Phase 10b built). Every Minecraft API named here was checked against
+`butterbot-fabric/reference/mcsrc` (29.16.13).
+
+#### 29.16.0 Amendments (Titah only; every other technique keeps its rules)
+
+| Rule | Amendment |
+|---|---|
+| 29.1.2 "the damage radius stays ≤ 40" | `dmgR(t) = min(R(t), titahDamageRadiusMax × s(t))`. Only the AREA grows. The per-target total stays ≤ 28 × P per cast, and every choke-point clamp still applies: boss cap, trial-mob rule, `abadi_foe` intake, Ender Dragon. |
+| 29.3.2 R_vis ≤ `titahVisualRadiusMax`, carve ≤ `titahCarveRadiusMax` | These still clamp **tier 1**. Tier t multiplies the tier-1 values by s(t), and the result is clamped by `titahMaxRadius` (29.16.1). |
+| 22.11 / 29.1.1 "48 blocks per tick, one position at a time, through `level.setBlock`" | Tier 1 still uses that path. Tiers 2-9 use the **bulk path** (pahat cepat, 29.16.7) inside `WorldBreaker`, which stays the only class that changes blocks. It works chunk by chunk and is paced by time (`titahBulkMillisPerTick`) instead of a block count. |
+| 22.11 "a shape touching a protected zone is refused" / `ALL_PROTECTED` | Bulk jobs are never refused for a zone. Protected columns are **skipped column by column** ("carve around"), so a sect hall is left standing on its own pillar. |
+| WorldBreaker "unloaded chunks are dropped, never loaded" | Still true. The bulk job adds a custom chunk **ticket** only to chunks that are already FULL-loaded when the job is planned, so they cannot unload mid-job. A ticket never loads or generates a chunk. |
+| WorldBreaker undo "every cast with 0 % drops is undoable" | Tiers 1-5 stay undoable (tiers 2-5 through a compact bulk undo with a block cap). **Tiers 6-9 are permanent**: they need a chat confirmation, are logged, and Pulihkan says it cannot restore them (29.16.5, 29.16.9). |
+| 29.6.3 block monument | Tier 1 only. At tier ≥ 2 the giant planted entity is the monument and no plinth is built. |
+
+#### 29.16.1 The tier scale
+
+```
+s(t) = 1.6^(t − 1)          (t = 1..9; s = 1, 1.6, 2.56, 4.10, 6.55, 10.49, 16.78, 26.84, 42.95)
+q(t) = sqrt(s(t))           (used for depths, widths, heights and fall heights, which grow slower than the radius)
+R1   = TitahSkill.visualRadius(skill, K)             today's R_vis: base × K in [4, titahVisualRadiusMax]
+R(t)     = min(titahMaxRadius, R1 × s(t))                         visual world scale
+dmgR(t)  = max(1, min(R(t), titahDamageRadiusMax × s(t)))         damage area
+carveR(t)= max(2, min(round(0.25 × R(t)), titahCarveRadiusMax × s(t)))   requested real carve radius
+mScale(t)= min(1100, mScale1 × s(t))     monument / falling weapon model scale (mScale1 = today's clamp(12·√K, 6, 24) or clamp(10·√K, 5, 20))
+fall(t)  = min(1024, fall1 × q(t))       start heights of the falling weapons (120 / 160 / 80 / 96)
+cooldown = authored × sqrt(max(1, K)) × sqrt(t)
+```
+
+- Timing (climax ticks, Kecepatan) does not change with the tier. A larger decree falls faster, never longer.
+- Qi stays 85 %. Mastery and rewards are unchanged.
+- Area radii scale by s: Pedang nova 10, Tiang core 6, Bintang star 8 (each still ≤ dmgR).
+- Strip and front half-widths scale by q: Pedang cleave half-width 1.5, Bintang DOT strip half 1.
+- Pedang cleave front: `side = min(R(t), 2 × dmgR(t))` at speed `max(8, side / 40)` b/t, so the front always takes
+  ≤ 40 ticks.
+- Gunung cell size: `clamp(round(2H / 8), 2, 16 × s)`, so there are about 8 cells per side at every tier.
+
+**Tier table at Kekuatan ×1** (b = blocks; "sword" ≈ 1.87 × scale, "pillar" ≈ 3 × scale, from the renderer's
+`SWORD_TIP` / `PILLAR_HALF`):
+
+| t | s | Pedang R / line / dmgR / carveR | Tiang R / dmgR / carveR | Bintang R | Gunung H / dmgR / carveR / cell | sword (scale) | pillar (scale) | fall P / T |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1.00 | 48 / 96 / 40 / 12 | 64 / 40 / 16 | 48 | 32 / 32 / 8 / 8 | 22 (12) | 30 (10) | 120 / 160 |
+| 2 | 1.60 | 77 / 154 / 64 / 19 | 102 / 64 / 26 | 77 | 51 / 51 / 13 / 13 | 36 (19) | 48 (16) | 152 / 202 |
+| 3 | 2.56 | 123 / 246 / 102 / 31 | 164 / 102 / 41 | 123 | 82 / 82 / 20 / 20 | 57 (31) | 77 (26) | 192 / 256 |
+| 4 | 4.10 | 197 / 393 / 164 / 49 | 262 / 164 / 66 | 197 | 131 / 131 / 33 / 33 | 92 (49) | 123 (41) | 243 / 324 |
+| 5 | 6.55 | 315 / 629 / 262 / 79 | 419 / 262 / 105 | 315 | 210 / 210 / 52 / 52 | 147 (79) | 197 (66) | 307 / 410 |
+| 6 | 10.49 | 503 / 1007 / 419 / 126 | 671 / 419 / 168 | 503 | 336 / 336 / 84 / 84 | 235 (126) | 315 (105) | 389 / 518 |
+| 7 | 16.78 | 805 / 1611 / 671 / 201 | 1074 / 671 / 268 | 805 | 537 / 537 / 134 / 134 | 376 (201) | 503 (168) | 492 / 655 |
+| 8 | 26.84 | 1288 / 2577 / 1074 / 322 | 1718 / 1074 / 429 | 1288 | 859 / 859 / 215 / 215 | 602 (322) | 805 (268) | 622 / 829 |
+| 9 | 42.95 | 2062 / 4123 / 1718 / 515 | 2500 (cap) / 1718 / 625 | 2062 | 1374 / 1374 / 344 / 344 | 964 (515) | 1288 (429) | 786 / 1049 |
+
+- **Kekuatan ≥ ×4** (sword scale 24): the tier-9 sword is about 1.9 km long. R reaches the 2,500 cap from tier 8 at
+  ×10.
+- **carveR is the requested radius.** The real carve is clipped to the loaded land (29.16.7, step P2). With a render
+  distance of 10 chunks the clip is usually 40-170 b, so the realistic tier-9 crater is "everything heaven can see".
+
+#### 29.16.2 Gates
+
+| Tingkat | Needs (`Titah.tierMax(data)`) |
+|---|---|
+| 1-3 | any Dewa Abadi stage (the seal's own gate) |
+| 4-6 | Dewa Abadi Puncak (`rank().stage() == 3`) |
+| 7-8 | ★ 27+ (`TechniquePower.playerStars(data) >= 27`) |
+| 9 | ★ 45+ |
+
+- The final limit is `min(tierMax, titahMaxTier)`.
+- `uji pusaka_langit bypass` and test casts may use up to `titahMaxTier` (the existing bypass, no new switch).
+- `TitahSettings.sanitize` clamps the tier exactly like Kekuatan (stored value kept, used value clamped).
+- Locked tiers show greyed in the menu with a red seal and the reason key `pusaka_langit.tier.why.<4|7|9>`.
+
+#### 29.16.3 Settings, sync, actions and player commands (S)
+
+- `Titah.Settings` gains `int tingkat` (1-9). `DEFAULT` keeps tingkat 1. It is stored as `extra.titah.s<i>.t`; a
+  missing value reads as 1, so old saves are unchanged.
+- `TitahSettings.FIELD_T = 5` and `T_MAX = 9`. Actions `OP_SET` with field 5 takes the text "1".."9".
+- **TitahSync additions** (contract C10b.8), per skill entry:
+  - `t` (the used tier), `tMax`, `tWhy` (lang key or "");
+  - `perm` (true when t ≥ 6 **and** this cast would carve for real: `kehancuranOn && h`);
+  - `ro.tier`, `ro.dmgR`, `ro.carveR` (requested), `ro.rVis`, `ro.weapon` (sword or pillar length in b, 0 for Bintang
+    and Gunung), `ro.permanent`.
+- **Readout line** (server-made, `pusaka_langit.tier.readout`): "Tingkat 7 · R ≈ 805 b · luka ≤ 671 b · pahat ≤ 201 b
+  · PERMANEN · jeda 26 mnt · qi 85 %".
+- **Player commands** (`PusakaLangit.addCommands`):
+  - `/kultivasi titah tingkat <1-9> [pedang|tiang|bintang|gunung]` sets the tier of the named decree, or of the
+    selected one. It is clamped and answers with the readout.
+  - `/kultivasi titah ya <kode>` and `/kultivasi titah batal` handle the permanent confirmation (29.16.5).
+- `HeavenDecreeSealItem` tooltip adds "Tingkat n" and, when `perm`, a red "Permanen" line.
+
+#### 29.16.4 Damage at scale (S, `TitahSkill`)
+
+- **`Run` gains:** `tier`, `s`, `q`; `dmgR = dmgR(t)`; `carveR = carveR(t)`; `rVis = R(t)`.
+- **`foes(centre, r)`:**
+  - calls `Targeting.hostilesAround(player, centre, min(r, dmgR), false)`. Entity sections exist only in loaded chunks,
+    so damage reaches only loaded chunks;
+  - nothing in the cast adds a ticket or loads a chunk for damage;
+  - the list is cut to `titahMaxTargets` (default 256): bosses (`TAG_BOSS`) first, then nearest first.
+- **`hurtAll(list, coef, payload)`** replaces the direct loops for every area hit:
+  - at most 64 `ctx.hurt` calls per tick; the rest is `ctx.schedule`d over the next ticks (still before the cast ends,
+    so the keep-alive covers them; the keep-alive is raised to `KEEP_ALIVE_TICKS + ceil(n / 64)`);
+  - a HIT `TechFx` for the first 24 targets of each phase only.
+- **Per-target rules unchanged:** Pedang 12 + 16, Tiang 18 + 10, Bintang 3 × 6 + 5 × 1.0 DOT, Gunung 20. Bintang still
+  takes at most 3 stars per target. Kerusakan 0 % is still pure spectacle.
+- **Gunung:** the `getEntitiesOfClass` square query is bounded by `min(half, dmgR)`. The lifted list obeys the
+  `titahMaxTargets` cap.
+- **Scaled numbers:** fall heights `fall(t)`, `CLEAVE_SPEED` replaced by the front speed of 29.16.1, `TechFx.length`
+  and `radius` carry the scaled values.
+- **`TitahArts.packAux(speed, monument, real, skill, tier)`:** bits 14-17 = tier − 1 (`AUX_TIER_SHIFT = 14`,
+  `AUX_TIER_MASK = 0xF`). Bits 0-13 are unchanged, so old client logic keeps working (contract C10b.7).
+
+#### 29.16.5 Permanent confirmation (tiers 6-9, only when the cast would carve for real)
+
+1. `Titah.castWith` computes `real` as today. If `real && tier >= 6 && !confirmed`, nothing is spent. Instead:
+   - it stores `PendingConfirm(UUID player, Skill skill, Settings settings, Vec3 impact, boolean test, int code,
+     long expires = gameTime + 300)`, one per player; a new request replaces the old one;
+   - it sends one red chat block:
+     - "Titah tingkat {t} akan menghancurkan tanah secara PERMANEN (tidak bisa dipulihkan). Cadangkan dunia dulu bila ragu.";
+     - `[Ya, hancurkan permanen]` (`ClickEvent.RunCommand("/kultivasi titah ya <code>")`);
+     - `[Batal]` (`/kultivasi titah batal`);
+     - `[Turunkan ke tingkat 5]` (`/kultivasi titah tingkat 5`);
+   - it sends one low `BELL_RESONATE` sound.
+2. **`ya <code>`** (≤ 15 s, the same code, the same dimension, the impact still loaded and within `titahRange + 16` of
+   the player):
+   - calls `castWith(player, skill, test, settings, impact)` with `confirmed = true`, so every other gate (qi,
+     cooldown, refusals) runs again;
+   - a wrong or expired code says "Kode kedaluwarsa — panggil titah lagi".
+3. The confirmation is per cast and is never remembered. Test casts (`uji pusaka_langit ...`, `pahat_cepat ... permanen`)
+   need it too.
+4. Without Mode Kehancuran, or with "Hancurkan tanah" = Tidak, tiers 6-9 cast at once: the decree is visual only and
+   nothing is permanent.
+
+#### 29.16.6 Routing of the carve
+
+| Tier | Real (K) | Path |
+|---|---|---|
+| any | no | visual only, no block changes (unchanged) |
+| 1 | yes | classic `Kehancuran.submitTitah` exactly as today, including the block monument |
+| 2-5 | yes | `Kehancuran.submitTitahBulk(..., undo = true)` |
+| 6-9 | yes, confirmed | `Kehancuran.submitTitahBulk(..., undo = false, permanent = true)` |
+
+```java
+// kehancuran/Kehancuran.java (S)
+public record TitahBulk(int tier, boolean permanent, boolean confirmed, Dampak.Palette palette, int debrisFlags,
+                        int recordId, Vec3 castPos) {}
+public static SelfResult submitTitahBulk(ServerPlayer caster, String specId, BulkShape shape, TitahBulk plan);
+```
+
+`submitTitahBulk` never throws, spends or refunds. It:
+- re-checks `titahEnabled`, `selfOn`, `kScale > 0`, `plan.permanent → plan.confirmed`;
+- applies one Titah job per owner (`WorldBreaker.hasTitah` also sees bulk jobs) and the bulk queue limits (1 running
+  plus 1 queued server-wide), else QUEUE_FULL with "Bumi masih runtuh — kehancuran dilewati";
+- queues `WorldBreaker.submitBulk(job)`.
+
+The kawah palette applies only with `kawahOn && kehancuranSurfacePass`, as today.
+
+#### 29.16.7 Bulk carve ("pahat cepat") in `WorldBreaker`
+
+**Geometry** (`kehancuran/BulkShape.java`, new, read-only, no block writes):
+- A union of analytic **column profiles**. For a world column (x, z) with surface top `top`
+  (`chunk.getHeight(WORLD_SURFACE, x, z)`) it returns one span `[lo, hi]` and a mode (REMOVE > NATURAL > STRIP when
+  shapes overlap), or none.
+- Each profile has an `outer()` radius for the clip and an `estimate(top)` for the volume.
+
+```java
+public final class BulkShape {
+    public static BulkShape of(BlockPos impact, Vec3 dir, List<Profile> profiles);
+    public sealed interface Profile permits Bowl, Fissure, Shave, Strip, SteppedPit, Trench {}
+    public record Bowl(double cx, double cz, int impactY, double r, double depth) implements Profile {}   // floor = impactY − depth·sqrt(1 − h²/r²); hi = min(top, impactY + r)
+    public record Fissure(Vec3 start, Vec3 dir, double length, double width, double depth) implements Profile {} // lens: depth·sin(π·f), below top
+    public record Shave(double cx, double cz, int impactY, double r, int h) implements Profile {}          // NATURAL: [max(impactY+1, top−h+1), top]
+    public record Strip(double cx, double cz, double r) implements Profile {}                             // STRIP: from top down while #strippable
+    public record SteppedPit(double cx, double cz, int baseY, int half, int steps, int depth) implements Profile {}
+    public record Trench(Vec3 from, Vec3 to, double width, int depth) implements Profile {}
+    /** The span of column (x, z) with surface {@code top}; false when none. out[0] = lo, out[1] = hi, out[2] = mode. */
+    public boolean span(int x, int z, int top, int minY, int maxY, int[] out);
+    public int outer();                               // max horizontal reach from the impact
+    public BulkShape scaled(double f);                // radial radii × f (depth kept); linear lengths clipped to outer·f
+    public ChunkPos[] chunksCentreOut();              // every chunk the union touches, ring by ring from the impact chunk
+}
+```
+
+**Per-decree profiles at tier t ≥ 2** (`TitahSkill.bulkShape(run)`; cR = carveR(t)):
+
+| Decree | Profiles |
+|---|---|
+| Pedang | Bowl r = 6s, depth = 4q at the impact. Two Fissures both ways, L = min(R(t), 2 × titahCarveRadiusMax × s), width = max(3, round(3q)), depth = min(ceil(L / 8), round(12q)). Shave r = cR, h = round(6q). |
+| Tiang | Bowl r = cR, depth = ceil(0.6 × cR / s) × q. Shave r = min(1.5 cR, 1.5 × titahCarveRadiusMax × s), h = round(8q). Strip r = min(2 cR, 32 s). |
+| Bintang | 7 Bowls (stars) r = 3s, depth = 2q. 6 Trenches along the Dipper segments, width = max(2, round(2q)), depth = round(2q). |
+| Gunung | SteppedPit half = min(H, cR), steps = clamp(3 + half1 / 12, 3, 5) + (t ≥ 4 ? 2 : 0) + (t ≥ 7 ? 2 : 0) (≤ 9), terrace depth = round(2q). |
+
+- **Height limits:** every span is clamped to `[level.getMinY() + 6, level.getMaxY()]`. Bedrock and every block with
+  hardness < 0 are never touched (`neverTouch`).
+- **Overhangs** behave as the classic bowl does: `hi = min(top, impactY + r)`.
+
+**The job** (`WorldBreaker.BulkJob`, nested, the only writer):
+
+```java
+static final class BulkJob {
+    final UUID owner; final String ownerName; final String specId; final ResourceKey<Level> dimension;
+    final BlockPos centre; final Vec3 castPos; final int tier; final boolean restore; final boolean permanent; final boolean undo;
+    BulkShape shape; ChunkPos[] chunks; int chunkIndex;            // centre-out order
+    byte phase;                                                    // PLAN 0, CARVE 1, DRAIN 2 (wait for light/resend), DONE 3
+    final LongOpenHashSet held = new LongOpenHashSet();            // chunks carrying our ticket
+    final ArrayDeque<CompletableFuture<?>> inFlight = new ArrayDeque<>(); // light waits before resend
+    int column; int cursorY;                                       // resume point inside the current chunk
+    long changed, kept, protectedColumns, estimate; int chunksDone, chunksSkipped;
+    long[] undoPos = new long[0]; BlockState[] undoOld = new BlockState[0]; BlockState[] undoPlaced = new BlockState[0]; int undoCount; // tiers 2-5
+    final ServerBossEvent bar;                                     // owner only
+    final int jobId; int casterEntityId; int specNet; Dampak.Palette palette; int debrisFlags; int recordId; double clip = 1.0;
+    @Nullable Restore restoreData;                                 // a bulk Pulihkan: positions grouped by chunk, bottom-up
+}
+static boolean submitBulk(BulkJob job);           // BULK queue: 1 running + 1 queued
+static int cancelBulk(MinecraftServer server, UUID owner);
+private static void tickBulk(MinecraftServer server);   // called first in tick(); the classic queue keeps running after it
+```
+
+**Ticket:** `WorldBreaker.TITAH_TICKET = Registry.register(BuiltInRegistries.TICKET_TYPE, Kultivator.id("titah_carve"),
+new TicketType(200L, TicketType.FLAG_LOADING))`, registered in `WorldBreaker.init()` during mod init.
+- No PERSIST flag, so it is never saved.
+- The timeout is a safety net: a ticket the job stops refreshing expires.
+- It is added with `level.getChunkSource().addTicketWithRadius(TITAH_TICKET, pos, 0)` (the FULL level of a loaded chunk;
+  it does not simulate) and removed with `removeTicketWithRadius(...)`.
+- It is refreshed every 100 ticks by adding it again (`TicketStorage.addTicket` resets `ticksLeft`).
+- It is **only ever added to a chunk for which `getChunkNow(x, z) != null`** (already FULL-loaded).
+
+**Phase PLAN** (time-budgeted like CARVE; usually 1-3 ticks):
+- **P1.** Bail out when the level is gone, the owner's switch is off (not for a restore), or the MSPT pause holds.
+- **P2. Loaded clip.** Walk chunk rings around the impact chunk. `rLoaded` is the distance from the impact to the nearest
+  chunk with `getChunkNow == null`, minus 2. `clip = min(1, rLoaded / shape.outer())`. If `clip < 1`:
+  - `shape = shape.scaled(clip)`: radial profiles shrink with their rims intact, and fissures and trenches are clipped
+    with their sin taper recomputed;
+  - the owner is told "Kawah dipangkas ke tanah yang termuat: R {a} b (diminta {b} b)".
+- **P3.** `chunks = shape.chunksCentreOut()` keeps only loaded chunks and at most `titahBulkMaxChunks` (default 1024).
+  Each kept chunk gets the ticket; its key goes into `held`.
+- **P4. Estimate.** Sum the span heights from the heightmaps (one read per column, no block reads). Then:
+  - **undoable** (tiers 2-5, test without `permanen`): while `estimate > titahUndoMaxBlocks`, `shape =
+    shape.scaled(0.9)` (radius only) and estimate again. The owner is told "Kawah diperkecil agar tetap bisa
+    dipulihkan";
+  - **every tier:** while `estimate > titahBulkMaxBlocks`, the same shrink applies.
+  - `estimate` feeds the boss bar.
+
+**Phase CARVE** (each tick: `deadline = now + effective budget`; the effective budget is `titahBulkMillisPerTick` (8 ms),
+halved while the average tick time is above `titahBulkMsptSlow` (35 ms), and 0 (a pause with an action-bar note once)
+above `kehancuranMsptPause`):
+
+- **C1.** If `inFlight.size() >= titahBulkLightChunks` (default 8), skip starting a new chunk this tick, so the light
+  engine sets the pace.
+- **C2. Chunk start.** `LevelChunk chunk = level.getChunkSource().getChunkNow(cx, cz)`. If it is null (impossible while
+  held, but checked), count it skipped and continue. Then build:
+  - `ProtectedZones.Context zones = new ProtectedZones.Context(level, chunkBox, owner, [castPos, caster now])`, re-read
+    per chunk, so moving players and villagers are seen;
+  - **`zones.columnZone(x, z, lo, hi)`** (new, conservative): sphere zones (players, homes, villagers, companions,
+    formations) are tested as **vertical cylinders**; halls, the caster column, spawn and the End are tested as today;
+    zone providers (sect sites, cave abodes, villages, realm guard, immortal border, formation bridge) are sampled
+    every 4 b from `lo − 1` to `hi + 1`; `!level.isLoaded` gives UNLOADED;
+  - **the unsafe mask** (`BitSet` per touched section): every cell 6-adjacent to a fluid cell (scanned only in sections
+    whose `hasFluid()` is true, own and neighbour sections, the neighbour chunks' 1-wide border slices included) or to a
+    block entity (`chunk.getBlockEntitiesPos()` plus the neighbours' border block entities). Border cells next to a
+    neighbour chunk that `getChunkNow` returns null for are all unsafe. This is the old `touchesUnsafe` rule, made
+    cheap.
+- **C3. Columns.** Iterate the 256 columns from `column`. For each:
+  1. `top = chunk.getHeight(WORLD_SURFACE, x, z)`. If `!shape.span(...)`, continue.
+  2. If `columnZone != null`: `protectedColumns++`, keep the whole column, continue.
+  3. Walk y from `min(hi, cursorY)` down to `lo` with a `MutableBlockPos`. Per y, `section = chunk.getSection(chunk.getSectionIndex(y))`;
+     skip whole sections when `section.hasOnlyAir()`. Then `state = section.getBlockState(x & 15, y & 15, z & 15)`:
+     - air: continue;
+     - **keep** when `ProtectedZones.neverTouch(level, pos, state)` (bedrock, hardness < 0, block entities, fluids and
+       waterlogged blocks, portals, obsidian, `#kultivator:indestructible`, stele, Batu/Urat Pusaka), or the unsafe bit is
+       set, or the mode is NATURAL and `!Shapes.natural(state)`, or the mode is STRIP and `!state.is(STRIPPABLE)`.
+       `kept++`; if `Shapes.roofs(state)`, **stop the column** (nothing under a kept roof is carved, so there is no
+       sealed hollow and no unsupported fluid); else continue;
+     - **remove:** `BlockState old = chunk.setBlockState(pos, AIR, FLAGS)`. `LevelChunk.setBlockState` updates the four
+       heightmaps, section emptiness (`updateSectionStatus`, `onSectionEmptinessChanged`), sky-light sources and
+       queues `checkBlock` for light, and marks the chunk unsaved.
+       If `old != null`: `changed++`; if `PoiTypes.hasPoi(old)`, call `level.updatePOIOnBlockStateChange(pos, old,
+       AIR)` (the only side effect of `Level.setBlock` we would otherwise skip besides the client update, which the
+       resend covers); if `undo`, append (pos, old, AIR); add to the chunk's debris reservoir sample.
+  4. Every column, check `System.nanoTime() > deadline`. On timeout, save `column` / `cursorY` and return (resume
+     next tick; the chunk is not sent half-done).
+- **C4. Chunk surface (kawah).** When the palette is not NONE (with `kawahOn` and `kehancuranSurfacePass`), for the
+  chunk's carved columns, use `Surface.target(palette, state, rim, pos, seed, magmaOk, centre, axis)` on:
+  - the floor block (the first solid block below the lowest carved cell), rim = false;
+  - the wall block of an edge column (a carved column with a kept or uncarved horizontal neighbour), rim = true.
+
+  Same rules as the classic pass: the state is still what was read, it is not `neverTouch`, the unsafe bit is not set,
+  there is no magma within `Surface.MAGMA_SAFE` of the caster or under a standing player (BLACKSTONE then). Each change
+  goes through `chunk.setBlockState(..., FLAGS)` and the undo as (old, new). At most 256 floor + 64 rim per chunk.
+- **C5. Chunk end.**
+  - One `DampakDebris` CARVE packet from the reservoir sample (≤ `DampakDebris.MAX`, players ≤ 96 b, `FLAG_LOW_LOAD`
+    as today); one `Fx.send(... KEHANCURAN DUST ...)` per tick at most; the DEEPSLATE_BREAK sound every 10 ticks.
+  - **Resend:** `inFlight.add(level.getChunkSource().getLightEngine().waitForPendingTasks(cx, cz).thenRunAsync(() ->
+    resend(level, cx, cz), server))`. `resend` re-reads `getChunkNow`; if it is present, then for every player in
+    `level.getChunkSource().chunkMap.getPlayers(chunkPos, false)` it sends `player.connection.send(new
+    ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null))`.
+  - The ticket is released and the key removed from `held`. Light changes spilling into neighbour chunks are broadcast by
+    vanilla (`ChunkHolder` light tracking).
+  - Then `chunksDone++` and the boss bar progress `chunksDone / chunks.length` is updated.
+- **C6.** After the last chunk: phase DRAIN until `inFlight` is empty (each future is removed when done; a future that
+  failed is logged and dropped), then finish.
+
+**Finish** (also on cancel, owner switch-off, server stop):
+- Release every held ticket and remove the bar's players.
+- `KehancuranLog.recordSelf(...)`. A permanent job also calls the new `KehancuranLog.recordPermanent(server, owner, name,
+  specId, tier, dim, centre, radius, blocks)`: a `LOGGER.warn` line plus a saved line with `perm: true` shown by
+  `/kultivasi kehancuran status`.
+- If `undo && undoCount > 0`: `addUndo(new Undo(..., bulk = true))` keeps the compact arrays, with the same window and
+  the same `MAX_UNDO`.
+- Then `sendDone`, `EpicHooks.kehancuran(... KEH_CRATER ...)`, `TitahMonuments.onJobDone(recordId, jobId)` (re-seat the
+  giant monument), and the owner message "Kawah selesai: {n} blok · {c} chunk · {p} kolom dilindungi" (+ "permanen" or
+  "Pulihkan {m} mnt").
+
+**Cancel:**
+- `/kultivasi kehancuran batal` cancels the disciple order when there is one (unchanged), else `WorldBreaker.cancelBulk`
+  for the caller. A cancelled job stops after the current column; the current chunk is still resent, so clients match
+  the server.
+- `setSelf(false)` → `cancelSelf` and `cancelOwner` / `cancelAll` include bulk jobs.
+- `busy()` and `counts()` include bulk jobs, so sect construction pauses as for any job.
+
+**Bulk Pulihkan** (tiers 2-5): `WorldBreaker.restore(owner)` turns a `bulk` undo into a restore `BulkJob`. Positions are
+grouped by chunk and walked **bottom-up**, so each restored block has support.
+- Only chunks loaded now are worked (held with the ticket while worked). The rest goes back to the buffer with the
+  original expiry (the `rebuffer` rule).
+- A block is restored only where the current state is AIR or still the placed state, and no entity box in the chunk (read
+  once per chunk) intersects the cell; otherwise it is deferred.
+- `PoiTypes.hasPoi` is handled as above; the chunk is resent the same way.
+- The time budget and light pacing match the carve; no zones are checked (it only puts back what the cast took).
+
+#### 29.16.8 Safety rules (binding for S)
+
+1. Blocks change only in `WorldBreaker`, and only for the owner's own Mode Kehancuran self switch with "Hancurkan tanah"
+   = Ikut. The bulk test command also needs `uji teknik kehancuran nyala`.
+2. No `LightningBolt`, explosion, fire block, falling-block entity, fluid placement or removal, weather, time or
+   tick-rate change. There are no drops: bulk jobs always run with 0 % drops and never call `Block.getDrops`.
+3. Fluids are never removed and never exposed: the 1-cell unsafe shell plus the "stop under a kept roof" rule keep every
+   water and lava cell supported exactly as before. A lake inside the crater stays as a lake held by a 1-block wall.
+   This is decided and documented; we do not drain water because that would need neighbour updates and flow cascades.
+4. No neighbour or shape updates (`FLAGS` unchanged). A gravity block may float until touched, as today; bulk columns
+   are carved top-down from the surface, so this only happens beside kept columns.
+5. Protected zones are skipped column by column, never refused. Zones are re-read for every chunk. The caster's safe
+   column holds at the cast position and where the caster stands now.
+6. Never below `minY + 6`, never above `maxY`. Bedrock, hardness < 0 and `#kultivator:indestructible` are never touched.
+7. Only already-loaded chunks are touched. The ticket only holds them; nothing is loaded or generated, for carving or for
+   damage.
+8. One bulk job runs server-wide. The budget is time-based (≤ `titahBulkMillisPerTick`), halves above
+   `titahBulkMsptSlow` and pauses above `kehancuranMsptPause`. The light backlog is capped.
+9. Undoable tiers never exceed `titahUndoMaxBlocks`; the crater shrinks first (29.16.7, step P4). Permanent tiers need the
+   15 s chat confirmation and are logged as WARN and in the saved log.
+10. Batu Pusaka and Urat Pusaka stay never-touched. Bulk jobs build no block monument.
+
+#### 29.16.9 Undo and permanence
+
+| Tier | Undo |
+|---|---|
+| 1 | classic per-block undo, block monument (unchanged) |
+| 2-5 | compact bulk undo, ≤ `titahUndoMaxBlocks` (default 1,000,000 ≈ 16 MB), same window `kehancuranUndoMinutes`, lost on restart (as today); Pulihkan runs as a bulk restore |
+| 6-9 | none. `WorldBreaker` keeps a session list `PERMANENT` (owner, time, blocks). When Pulihkan finds nothing restorable but the owner has a permanent entry inside the undo window: "Titah tingkat 6-9 bersifat permanen — {n} kawah tidak bisa dipulihkan." |
+
+#### 29.16.10 Client (C)
+
+**Menu** (`TitahScreen`, `TitahClient`):
+- New `JadeSlider` row **"Tingkat"** above Kekuatan. Steps `T_STEPS = {1, 2, 3, 4, 5, 6, 7, 8, 9}`,
+  `limit(() -> tMax - 1)`; locked steps are greyed with a red seal, and the tooltip shows `tWhy`.
+  - The label is "Tingkat {t} · ×{s}" (s with 1 decimal).
+  - At t ≥ 6 with `perm` a red **"PERMANEN"** stamp sits right of the slider; its tooltip is "Tanah hancur selamanya;
+    Pulihkan tidak berlaku; minta konfirmasi di chat".
+- Rows move down 19 px. The layout must still fit 320×240 at GUI scale 3. If it does not, the Kerusakan and Kecepatan
+  sliders share one row (half width each).
+- `TitahClient.Decree` gains `t`, `tMax`, `tWhy`, `perm`, `weapon`, `dmgR`, `carveR`. `FIELD_T = 5`, and
+  `set(skill, FIELD_T, value)`.
+- The readout is the server line. The client fallback multiplies by `s(t)`.
+
+**Decoding** (`TitahWorld.Cast`):
+- `tier = 1 + (aux >> 14 & 0xF)`, `s`, `q`.
+- `kekuatan()` becomes `rawRadius / (base × s)`, so the old size logic stays right.
+- `TitahWorld.tierScale(int)` is the one shared helper.
+
+**Visual scaling and LOD** (every count stays inside 29.8 and `EpicBudget` / `DampakWorldBudget`):
+
+| Element | Near (≤ drawable radius) | Far LOD (beyond it) |
+|---|---|---|
+| Rings, shock rings (`ShockRing`) | as today, R drawn = `titahRadius(R)` | ≤ 32 (Normal) / 64 (Maximal) **horizon arc segments**: only the arc parts within render distance of the camera, as one additive layer (no second layer); Minimal: particle dots on the visible arc, ≤ 48 |
+| Sigils (`GroundSigil`, `SigilRenderer`) | stride `max(1, R / 64)` (unchanged) | stride raised so points stay ≤ 128 / 256 / 512 (Minimal dust / Normal / Maximal) over the visible part only |
+| Cleave line (`CleaveLine`) | half-length R(t), front at the server speed | beyond render distance the line continues as a sky-projected light streak (1 quad strip, ≤ 16 segments) |
+| Lift cells (`LiftCarry`) | cell size from the server (≈ 8 per side) | cells beyond render distance are not spawned; displays get `setViewRange(size / 64 + 1)`, width and height for culling; ≤ 0 / 12 / 32 cells |
+| Stars (`StarFall`) | crystal scale × q | beyond render distance: sky star sprite only |
+| Falling weapon (`RelicFall`) | the `ModelFx` prop at `mScale(t)` from `fall(t)` | **impostor** (below) |
+| Monument | the entity renderer at its scale: scale clamp raised 40 → 1100, `getBoundingBoxForCulling` from the scaled model, `shouldRenderAtSqrDistance` ≤ max(160, 1.5 × length) | **FarRelic** (below) |
+
+**FarRelic** (`client/pusakalangit/world/FarRelic.java`, new) draws giant decree weapons that this client cannot see
+as an entity:
+- the monuments of `TitahFar` (C10b.9) whose entity is not in the client level, or whose base is beyond the tracking
+  range;
+- falling weapons whose height is beyond render distance.
+
+Three LOD steps:
+1. **Within render distance** (base ≤ `viewRange − 16`): a client `ItemDisplay` through `DisplayKey` (snap/key/move
+   only). Use `ModelFx.stack(id)`, created lazily on first use. Model only, no parts, no glow quads. `setViewRange(D / 64
+   + 1)` and `setWidth`/`setHeight` = the scaled model size, so Sodium and culling mods keep it (the
+   `EpicDisplays` precedent).
+2. **Beyond render distance, no shader pack, Maximal or Normal:** the same display as a **perspective impostor**:
+   - with C the camera, A the anchor and D = |A − C|, it stands at `P = C + (A − C) × Dm / D` with `Dm = viewRange − 24`;
+   - its scale is `mScale × Dm / D`;
+   - it is re-keyed each client tick, so its angular size is exact and terrain nearer than Dm still occludes it.
+3. **Minimal, or a shader pack on** (`ShaderCompat.packOn()`): two additive silhouette quads (new textures
+   `textures/fx/titah/sword_far.png`, `pillar_far.png`) through the FX quad path, which skips the Iris shadow pass. They
+   use the same projection.
+
+Caps: at most 3 / 6 / 12 far relics (Minimal / Normal / Maximal), nearest first, and the `EpicBudget` frame guard drops
+LOD 2 to LOD 3.
+
+**Film framing** (`PusakaFilm`): framing factor `f = s(t)^0.6`. Every segment still passes `Shot.validate` (≤ 7.6 b/s,
+≤ 25°/s, crane ≤ 24 b, ≤ 80 ticks; total ≤ 240).
+
+| Act | Change |
+|---|---|
+| F1, F2 | unchanged distances; the Tanda pillar is the far LOD when the mark is beyond render distance |
+| F3 | world-anchored at `60 + 40 f` b above the aim (static start position, same ≤ 15° yaw) |
+| F4 | the camera start is placed by the masked cut, `24 f` b behind and above the impact. For t ≥ 5 the camera is **static** and the falling weapon (or its impostor) crosses the frame; the shot never follows a fall faster than the caps |
+| F5 | orbit radius `16 f`, angular sweep `min(20°, deg(7.6 × seconds / radius))`, so the arc speed stays ≤ 7.6 b/s |
+
+All gates are unchanged: Penuh / Singkat / Mati, "Kurangi gerak", Backspace, never in danger, the hurt snap-back.
+
+**Silence then boom at scale** (`TitahWorld` / `PusakaFilm`, client presentation only):
+- The boom is delayed by the listener's distance: `delay = clamp(dist / 17, silence, 120)` ticks (≈ 340 m/s), through
+  `SoundManager.playDelayed`.
+- Impact frames and the photosensitivity rules are unchanged.
+- The HUD shock overlay strength is `min(1, 0.5 + t / 9)` inside the existing caps.
+
+**Budgets** (additions to 29.8):
+
+| | Minimal | Normal | Maximal |
+|---|---|---|---|
+| far ring segments | ≤ 48 particle dots | ≤ 32 | ≤ 64 |
+| far sigil points | ≤ 128 dust | ≤ 256 | ≤ 512 |
+| lift cells | 0 | ≤ 12 | ≤ 32 |
+| far relics | ≤ 3 quads | ≤ 6 (display or quads) | ≤ 12 |
+| giant model parts | 0 | base model only beyond 64 b | parts within 64 b |
+
+Others' casts keep `othersScale()`. `FLAG_LOW_LOAD` gives rings and sigils only.
+
+#### 29.16.11 Contracts (S → C)
+
+- **C10b.7 TechFx aux:** bits 14-17 = tier − 1. `radius`, `length` and fall heights are already scaled. `count` for
+  Gunung is cells per side (≈ 8).
+- **C10b.8 TitahSync:** the per-skill additions of 29.16.3. `OP_SET` field 5 = tier.
+- **C10b.9 `Payloads.TitahFar(CompoundTag data)`** (S2C, ≤ 4 KB, registered in `Net`). `data.m` is a list of ≤ 24
+  `{id:int, x:double, y:double, z:double, model:byte, scale:float, yaw:float, tilt:float, state:byte, born:long,
+  tier:byte}`, the live monuments of the receiver's dimension. `TitahMonuments` sends it:
+  - to every player of the dimension on create, state change, removal and expiry;
+  - to a player whose dimension differs from the last one sent (checked every 100 ticks in `TitahMonuments.tick`; no
+    event API is needed).
+- **C10b.10 `TitahMonumentEntity`:** new synced `DATA_RECORD` (int) and `DATA_TIER` (byte) with `recordId()` and
+  `tier()`. The scale clamp in `readAdditionalSaveData` / `setup` is raised 64 → 1100.
+
+**Order:** S lands first (its first commit carries the record, getters, the aux constants and the payload). C builds
+against them. C never references server classes beyond `Payloads`, `TechniqueSpec`, `TitahMonumentEntity` and
+`TitahItems` (the existing shared ones).
+
+#### 29.16.12 Config (`KultivatorConfig`, clamped on load; S)
+
+| Key | Default | Range | Meaning |
+|---|---|---|---|
+| `titahMaxTier` | 9 | 1-9 | highest tier any player can reach |
+| `titahMaxRadius` | 2500 | 128-4096 | cap on R(t), dmgR(t), carveR(t) |
+| `titahMaxTargets` | 256 | 32-1024 | targets per area hit |
+| `titahBulkMillisPerTick` | 8 | 1-20 | bulk time budget per tick |
+| `titahBulkMsptSlow` | 35 | 25-50 | above it the budget halves |
+| `titahBulkMaxBlocks` | 6,000,000 | 100,000-50,000,000 | blocks per bulk job (the shape shrinks to fit) |
+| `titahUndoMaxBlocks` | 1,000,000 | 0-4,000,000 | undoable tiers 2-5 (0 = tiers 2-5 carve nothing; never silently permanent) |
+| `titahBulkMaxChunks` | 1024 | 64-4096 | chunks one job may hold |
+| `titahBulkLightChunks` | 8 | 2-32 | chunks waiting for light before resend |
+
+The permanent threshold is fixed at tier 6 (`Titah.PERMANENT_TIER = 6`) as decided.
+
+#### 29.16.13 Verified 26.3 API (new uses)
+
+| Area | API (mcsrc) |
+|---|---|
+| Ticket | `record TicketType(long timeout, int flags)` with public constructor; `FLAG_LOADING = 2`; `Registry.register(BuiltInRegistries.TICKET_TYPE, id, type)`; `ServerChunkCache.addTicketWithRadius(TicketType, ChunkPos, int)` / `removeTicketWithRadius(...)`; `TicketStorage.addTicket` re-adding an equal ticket calls `resetTicksLeft()`; non-PERSIST tickets are not saved |
+| Chunks | `ServerChunkCache.getChunkNow(int, int)` (null unless loaded), public field `chunkMap`; `ChunkMap.getPlayers(ChunkPos, boolean)`; `ChunkPos` is a record with `x()`, `z()`, `pack()`, `unpack(long)` |
+| Writes | `LevelChunk.setBlockState(BlockPos, BlockState, int)` returns the old state or null; it updates heightmaps (`MOTION_BLOCKING`, `MOTION_BLOCKING_NO_LEAVES`, `OCEAN_FLOOR`, `WORLD_SURFACE`), `updateSectionStatus`, `onSectionEmptinessChanged`, sky-light sources, `checkBlock` (copies the pos with `immutable()`), `markUnsaved()`; `Level.setBlock` adds only `sendBlockUpdated`, neighbour/shape updates (off in our FLAGS) and `updatePOIOnBlockStateChange` (public, ServerLevel override) |
+| Sections | `ChunkAccess.getSection(int)`, `getSectionIndex(int)`, `getHeight(Heightmap.Types, int, int)`, `getBlockEntitiesPos()`; `LevelChunkSection.getBlockState(int, int, int)`, `hasOnlyAir()`, `hasFluid()`; `PoiTypes.hasPoi(BlockState)` |
+| Light and resend | `ThreadedLevelLightEngine.waitForPendingTasks(int, int)` returns `CompletableFuture<?>`; `new ClientboundLevelChunkWithLightPacket(LevelChunk, LevelLightEngine, BitSet, BitSet)`; `ServerPlayer.connection.send(Packet)` |
+| Load | `MinecraftServer.getAverageTickTimeNanos()`; `ServerBossEvent(UUID, Component, BossBarColor, BossBarOverlay)`, `setProgress`, `addPlayer`, `removeAllPlayers` (precedent `abadi/Ascend`) |
+| Client | `Display.setViewRange`, `setWidth`, `setHeight` (public final); `Display.shouldRenderAtSqrDistance` uses `viewRange × 64 × viewScale` |
+
+#### 29.16.14 Modules (exactly two, disjoint files)
+
+**S: server and shared** (`src/main`, server lang, docs):
+- **New:** `kehancuran/BulkShape.java`; `lang-src/titah_tingkat.en_us.json` + `.id_id.json`;
+  `docs/uji/FASE-10b-tingkat.md` (copy of 29.16.16).
+- **Edits:**
+  - `kehancuran/WorldBreaker.java`: `BulkJob`, BULK queue, `TITAH_TICKET`, `submitBulk`, `tickBulk`, `cancelBulk`, the
+    bulk `Undo`, bulk restore, `PERMANENT`, the `busy` / `counts` / `cancel*` / `hasTitah` inclusion.
+  - `kehancuran/Kehancuran.java`: `TitahBulk`, `submitTitahBulk`, `batal` fallback, the permanent Pulihkan line.
+  - `kehancuran/ProtectedZones.java`: `Context.columnZone`.
+  - `kehancuran/KehancuranLog.java`: `recordPermanent`, the status lines.
+  - `pusakalangit/Titah.java`: `tierMax`, `PERMANENT_TIER`, `PendingConfirm`, `ya` / `batal`, the cooldown × √t.
+  - `pusakalangit/TitahSettings.java`: field t, sanitize, sync, readout.
+  - `pusakalangit/TitahSkill.java`: scaling, `foes` cap, `hurtAll`, `bulkShape`, routing.
+  - `pusakalangit/TitahArts.java`: `packAux` tier, `AUX_TIER_*`.
+  - `pusakalangit/TitahMonumentEntity.java`: C10b.10.
+  - `pusakalangit/TitahMonuments.java`: `TitahFar` sends.
+  - `pusakalangit/TitahTests.java`: test commands.
+  - `pusakalangit/PusakaLangit.java`: player commands.
+  - `pusakalangit/HeavenDecreeSealItem.java`: tooltip.
+  - `network/Payloads.java`, `network/Net.java`: `TitahFar`.
+  - `KultivatorConfig.java`: 29.16.12.
+
+**C: client** (`src/client`, client assets and lang):
+- **New:** `client/pusakalangit/world/FarRelic.java`; `assets/kultivator/textures/fx/titah/sword_far.png`,
+  `pillar_far.png` with `tools/gen_titah_far_textures.py`; `lang-src/titah_tingkat_client.en_us.json` + `.id_id.json`.
+- **Edits:**
+  - `client/pusakalangit/TitahClient.java`: Decree fields, `FIELD_T`, `T_STEPS`, the `TitahFar` receiver, `/sinematik
+    pusaka` additions.
+  - `TitahScreen.java`: the Tingkat row and the PERMANEN stamp.
+  - `cinema/PusakaFilm.java`: framing f, static F4, F5 sweep cap, boom delay.
+  - `world/TitahWorld.java`: tier decode, `tierScale`, `kekuatan()`, routing to FarRelic, boom delay.
+  - `world/RelicFall.java`, `CleaveLine.java`, `LiftCarry.java`, `StarFall.java`, `SkyMarks.java`: scaling and far LOD.
+  - `world/TitahMonumentRenderer.java`: the scale clamp 1100, culling box, render distance, far parts LOD.
+  - `client/dampak/world/DampakWorldBudget.java`: far caps.
+  - `ShockRing.java`, `GroundSigil.java`, `SigilRenderer.java`: horizon arcs, point caps.
+
+Global rules hold:
+- lang keys are identical in en_us and id_id;
+- files keep their line endings (all of the above are LF in git);
+- ItemStacks are made lazily;
+- server code never references a client class;
+- every display transform goes through `DisplayKey`.
+
+#### 29.16.15 Test commands
+
+Server, op (`/kultivasi uji pusaka_langit ...`, S):
+
+| Command | Does |
+|---|---|
+| `<pedang\|tiang\|bintang\|gunung> [kekuatan] [kecepatan] [kerusakan] [tingkat]` | a test cast as today with `tingkat` 1-9 (≤ `titahMaxTier`); it carves only with `uji teknik kehancuran nyala` plus the own switch; t ≥ 6 real asks the chat confirmation |
+| `tingkat <1-9>` | sets the tier of all four stored decrees (shortcut for tests) |
+| `pahat_cepat <radius 8-512> [kedalaman 4-128] [permanen]` | a bulk Bowl at the aim through `submitTitahBulk` (spec `titah_tiang`, palette FIRE): undoable and shrunk to `titahUndoMaxBlocks` without `permanen`; permanent with the confirmation with it |
+| `pahat_cepat info` | the running bulk job: phase, chunks done/total/skipped, blocks changed/kept, protected columns, ms per tick (average), light queue, tickets held, clip and shrink factors |
+| `pahat_cepat batal` | same as `/kultivasi kehancuran batal` for the caller |
+| `tingkat_tabel` | prints 29.16.1's table for the caller's settings (radii, dmgR, carveR, weapon length, cooldown) |
+
+Player: `/kultivasi titah tingkat <1-9> [decree]`, `/kultivasi titah ya <kode>`, `/kultivasi titah batal`,
+`/kultivasi kehancuran batal`, `/kultivasi kehancuran pulihkan`.
+
+Client (`/sinematik pusaka ...`, C):
+- `film <skill> [tingkat]` plays the film framing at that tier (still gated);
+- `jauh` lists the far relics with distance, LOD step and scale;
+- `info` adds the tier and LOD counters to `TitahWorld.stats()`.
+
+#### 29.16.16 Daftar uji (for `docs/uji/FASE-10b-tingkat.md`)
+
+**Menu dan gerbang**
+1. Menu Titah Langit punya slider "Tingkat 1-9" di atas Kekuatan. Tetap muat di layar 320×240 (skala GUI 3).
+   Nilainya tersimpan setelah relog. Dunia lama tanpa nilai tingkat terbaca sebagai Tingkat 1.
+2. Batas tingkat:
+   - Dewa Abadi Awal/Tengah/Akhir maksimal 3, Puncak 6, ★27+ 8, ★45+ 9;
+   - tingkat terkunci tampil abu-abu dengan segel merah dan alasannya;
+   - `/kultivasi titah tingkat 9` di bawah syarat dipotong ke batas dan diberi tahu;
+   - config `titahMaxTier 5` membatasi semua pemain ke 5.
+3. Tingkat 1 sama persis dengan sebelum fase ini: ukuran, kerusakan, jeda, kawah dan monumen blok.
+4. Readout menunjukkan R, jangkauan luka, jari-jari pahat, panjang pedang/tiang dan jeda. Jeda bertambah ×√tingkat
+   (tingkat 9 = ×3).
+
+**Visual tanpa Mode Kehancuran**
+5. `uji pusaka_langit pedang 1 1 100 9` tanpa Kehancuran:
+   - tidak ada satu blok pun yang berubah (cek F3 dan tangkapan layar sebelum/sesudah);
+   - pedang jatuh terlihat sangat besar, lalu tertancap kira-kira 960 b (Kekuatan ×4: sekitar 1,9 km);
+   - tidak ada konfirmasi permanen.
+6. Monumen raksasa:
+   - terlihat dari jauh di luar jarak render sebagai siluet/impostor, berukuran benar, tidak berkedip saat berjalan;
+   - di dekatnya model asli;
+   - masih ada setelah keluar-masuk dunia dan restart;
+   - pindah dimensi lalu kembali: impostor muncul lagi.
+7. Cincin, sigil, garis belahan dan kisi Gunung di tingkat 6-9 tetap terlihat sebagai busur di cakrawala. Tidak ada
+   lonjakan partikel.
+
+**Kerusakan**
+8. Tingkat 5 Tiang: musuh pada 200 b terkena gelombang; tingkat 1 tidak. Kerusakan per musuh tidak lebih besar dari
+   tingkat 1 (bos tetap dibatasi). Hewan, penduduk desa, peliharaan dan pemain lain tidak pernah terluka.
+9. Musuh di chunk yang tidak termuat tidak terkena dan tidak ada chunk yang dimuat paksa. Uji dengan render distance 4
+   dan `/forceload query` sebelum/sesudah.
+10. 300 zombie di area: kerusakan menyebar beberapa tick, tanpa lag besar dan tanpa spam partikel HIT.
+
+**Pahat cepat (Mode Kehancuran nyala + Hancurkan tanah = Ikut)**
+11. Tingkat 2-5:
+    - kawah besar terbentuk chunk demi chunk dari tengah ke luar;
+    - bar bos menunjukkan persen, lalu pesan "Kawah selesai … Pulihkan 10 mnt";
+    - tidak ada blok jatuh sebagai item;
+    - kawah lebur (magma/basal) hanya di lantai dan dinding, tidak di bawah pemain.
+12. Pulihkan (sebelum restart, dalam 10 menit) mengembalikan tanah tingkat 2-5 sepenuhnya, termasuk lantai kawah lebur.
+    Bagian yang chunk-nya tidak termuat menunggu dan bisa dipulihkan lagi.
+13. Tingkat 6-9:
+    - muncul pesan merah di chat dengan [Ya, hancurkan permanen] [Batal] [Turunkan ke tingkat 5];
+    - tanpa klik dalam 15 detik tidak terjadi apa-apa dan qi tidak terpakai;
+    - setelah "Ya": kawah tercatat permanen di log server (WARN) dan di `/kultivasi kehancuran status`;
+    - Pulihkan berkata tidak bisa dipulihkan.
+14. Zona terlindung di dalam kawah tetap berdiri sebagai pilar, tidak menolak seluruh titah: aula sekte, situs
+    konstruksi, rumah gua, desa, pemain lain, spawn, kolom aman kastor. Kastor tidak jatuh.
+15. Air dan lava:
+    - tidak ada air/lava melayang atau mengalir keluar;
+    - danau di dalam kawah tetap dengan dinding 1 blok;
+    - tidak ada lubang tertutup di bawah blok yang dibiarkan.
+16. Lantai kawah tidak pernah menembus bedrock (paling rendah minY + 6). Bedrock, obsidian, portal, spawner, peti dan
+    blok `#kultivator:indestructible` tetap utuh.
+17. Kawah dipangkas ke tanah termuat: render distance 6 lalu tingkat 9 → pesan "Kawah dipangkas … R {a} b". Tepi kawah
+    tetap berbentuk bibir kawah, bukan tebing kotak.
+18. `/kultivasi kehancuran batal` menghentikan pahat dalam satu tick. Chunk terakhir tetap konsisten (relog tidak
+    menunjukkan blok hantu). Mematikan Mode Kehancuran juga menghentikannya.
+19. Restart server di tengah pahat: tidak ada tiket chunk tersisa (`/forceload query`, F3 "chunks"). Dunia terbuka
+    normal.
+
+**Performa (laptop lemah, Minimal/Otomatis, render distance 8)**
+20. Pahat tingkat 9: MSPT rata-rata < 45 dan pahat berhenti sendiri saat MSPT tinggi. FPS tidak turun < 30 lebih dari
+    sesaat. Kawah dalam area termuat selesai < 90 detik.
+21. Film Penuh tingkat 9:
+    - semua potongan kamera ≤ 4 detik, total ≤ 12 detik;
+    - kamera tidak bergerak lebih cepat dari biasanya (F4 diam, pedang melintas);
+    - Backspace melewati;
+    - dentuman datang terlambat sesuai jarak.
+22. Sodium + Iris (shader pack): monumen jauh tampil sebagai siluet tanpa bayangan aneh, tidak berkedip. Chunk yang
+    dipahat dimuat ulang benar di klien (tanpa lubang cahaya hitam).
+
+**Uji perintah**
+23. `uji pusaka_langit pahat_cepat 64` lalu `pahat_cepat info` menunjukkan fase, chunk, blok, ms/tick dan antrean
+    cahaya. Pulihkan mengembalikannya. `pahat_cepat 256 permanen` meminta konfirmasi.
+24. Teks: setiap kunci `titah_tingkat.*` dan `titah_tingkat_client.*` ada di en_us dan id_id. Semua Sumber tetap sama.
+
+---------------------------------------------------------------------------------------------------------------------
+
+## 30. Film Spektakuler, Hancur Total, dan pamungkas baru
+
+The user asked (2026-10-20, translated): "Study the animation and impact of the rimuru.dev weapon mod (The Shooting
+Star); I want Kultivator's techniques to have animations, effects and impacts as cool as that." Three follow-ups:
+**(A)** "Every block can be destroyed without exception, except protected areas." **(B)** "The cinematics are not as
+cool as rimuru's; make it feel like watching a film with spectacular VFX and out-of-this-world angles; open-source or
+free components are fine." **(C)** "Fix or upgrade the effects of the other ultimate techniques."
+
+That mod's code and assets are All Rights Reserved: **nothing of it is copied**, only presentation ideas from its public
+CurseForge description. Phase 10 (28) and 10b (29) already translated its first wave of ideas (target mark, sky ride,
+silent impact, shock ring, molten crater, monument, constellation trenches, light grid). Phase 30 goes further on
+three axes: real destruction without the block blacklist (A), a film engine whose camera may move like a film camera
+(B), and new detailed 3D props with full choreography for every Dewa and Abadi ultimate not yet reworked (C).
+
+Open-source VFX libraries (Veil, Satin, Effekseer / AAA Particles, Photon, Lodestone) have **no 26.3 builds**, so
+nothing is added as a dependency. We build our own "Film Spektakuler" engine on the vanilla render types already in
+use, and use only **CC0 assets from Kenney** (particle-pack, impact-sounds, sci-fi-sounds; each `License.txt` read:
+Creative Commons Zero, credit optional), which the user approved and which are already downloaded under the session
+scratchpad `kenney_dl/`.
+
+### 30.0 Scope, amendments and what stays (binding)
+
+**Stays exactly as it is:** every Sumber line, every gameplay number (damage, ranges, radii, timelines, cooldowns,
+costs, block caps, runner caps, `climaxAt`, silence values), every `.step(...)` and `.dampak(...)` row, the 22.15 and
+23.14 budgets, the weak-laptop rule (no post chain, no core shader, no custom `RenderPipeline`, 23.1.5 and 28.1.3),
+never `LightningBolt`, `Explosion`, weather, time or tick-rate changes, no server entity added for presentation, server
+code never references a client class, Sodium and Iris compatibility (28.1.4), `DisplayKey` for every display
+transform, ItemStacks created lazily (never in static initialisers or renderer constructors), each file's existing
+line endings, text in `lang-src/<fragment>.en_us.json` and `.id_id.json` with identical keys.
+
+**Amendments (only these):**
+1. 0, 20.3.21, 22.11 and 28.1.1: under the new per-player switch **Hancur Total** (default ON) Mode Kehancuran's
+   block blacklist is replaced by a much shorter keep-list (30.1). Blocks still change **only** through
+   `kehancuran/WorldBreaker`, **only** for the existing opt-in jobs (own casts with Mode Kehancuran on, Titah carves,
+   disciple Destroyer Arts), and **never** inside a protected zone. Without Mode Kehancuran every Phase 30 effect is
+   visual only.
+2. 23.1.2, 23.7.3, 23.1.6: a new camera value **Spektakuler** above Penuh (opt-in, motion warning). It lifts the speed,
+   FOV and roll caps **only** for authored film shots of the four Titah decrees, the Dewa and Abadi ultimates and the
+   Kehancuran crater reveal (30.2.3). Every other shot of 7b, 10 and 10b keeps its caps. Every hard gate of 23.7.4
+   stays and the film adds stricter ones (30.2.2).
+3. 23.1.7: new client presentation sounds from Kenney (30.2.11). World sounds stay server cues (≤ 4 per beat).
+
+**The rimuru-style ideas in our cultivation language** (where each lives):
+
+| Idea (theirs, from the public description) | Ours | Where |
+|---|---|---|
+| Target mark from the sky on the crosshair | Tanda Langit (exists); the film opens on it with a crash zoom and a seal-bracket lock-on sting | 28.2, 30.3 |
+| Long camera journey up the beam into space, the weapon charging, riding it back down | **Perjalanan ke Langit Kosmik**: aerial climb shots with speed ramps, a masked cut into the **Langit Kosmik** backdrop (star river, nebulae, celestial sun and moon, heavenly palace silhouettes), the weapon forged or drawn there, then a POV ride on the weapon down to the mark | 30.2.5, 30.2.8, 30.3 |
+| Silence then boom, full-screen impact frames | Dampak Sunyi (exists) + bullet-time on the frozen impact + the Kenney sub-boom on the delayed boom | 28.4, 30.2.9 |
+| Shock ring flattening land into a molten crater | ShockRing + Kawah Lebur (exist); the film's aftermath orbit and aerial reveal show them; Hancur Total lets the crater cut through anything that is not protected | 28.5, 28.8, 30.1 |
+| Lingering monument | Monumen (exists); every new prop set has a clear aftermath beat that hands over to it | 28.10, 30.4 |
+| Constellation, star impacts, crystals, burning trenches | Titah Bintang (exists); its film is a seven-angle montage and a top-down ignition reveal | 29.5.3, 30.3.3 |
+| Light grid tearing cells out into the sky | Titah Gunung and Lubang Hitam (exist); their films ride up among the rising cells in bullet time | 29.5.4, 30.3 |
+| Heavy post shaders, power and speed sliders | faked: layered additive quads, Kenney glow sprites, HUD lens layers (grain, fringe, flare, leaks, smear), vanilla `endPortal()` starfield; Daya dampak and Kecepatan exist | 30.2.7 |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 30.1 Hancur Total (module K)
+
+#### 30.1.1 The rule, before and after
+
+`ProtectedZones.neverTouch(level, pos, state)` gains an overload with the job's rule set:
+`neverTouch(ServerLevel level, BlockPos pos, BlockState state, ProtectedZones.Rules rules)`; the old signature stays
+and means `Rules.CLASSIC`. A job carries its rules from submit time (the owner's switch then; a later toggle affects
+only new casts and the queued jobs of that owner, never the running batch mid-tick).
+
+| Block or situation | `CLASSIC` (Hancur Total off, today) | `TOTAL` (Hancur Total on, default) |
+|---|---|---|
+| air | never | never |
+| bedrock, anything with hardness < 0 (end portal frame, barrier, light, test blocks…) | never | **removed**, except the keep-tag below |
+| obsidian, crying obsidian, reinforced deepslate, respawn anchor, lodestone (unregistered) | never | **removed** |
+| nether portal, end portal, end gateway blocks and frames | never | **removed** (the End around (0, 0) is a protected zone, so the exit portal and the gateways stay) |
+| blocks with a block entity (chests, barrels, shulker boxes, furnaces, hoppers, spawners, trial spawners, vaults, beds, signs, lecterns, jukeboxes, beacons, conduits…) | never | **removed without drops**; undoable jobs save the full block-entity NBT (30.1.4) |
+| fluids (sources and flowing) and waterlogged blocks inside the shape | never; a column whose top is fluid is skipped (`Shapes` lake-bed rule) | **removed** as cells of the shape (30.1.3) |
+| a position next to a fluid or a block entity (`touchesUnsafe`) | kept | removed; only an **unloaded** neighbour still keeps it (chunk-edge safety) |
+| datapack tag `#kultivator:indestructible` | never | not consulted |
+| new datapack tag `#kultivator:hancur_total_keep` (30.1.6) | – | **never** |
+| the Sect Hall stele (`kultivator:sect_hall_stele`, any owner) | never | **never** (it is also the centre of a hall zone) |
+| Titah monument blocks (`batu_pusaka`, `urat_pusaka`) | never | **never** (their own restore and clear jobs own them, 29.6.3) |
+| a formation eye (`kultivator:formation_eye`) and every lodestone registered as a formation core | never | **never** (registered formations are also a 32-b zone) |
+| inside any protected zone of `ProtectedZones` and every zone provider: sect halls, sect construction footprints and margins (`HallBridge`), players and the caster's safe column, world spawn, villagers and golems, companions, the End island, cave abodes (`CaveAbode`), villages (`Desa`), secret realms (`RealmGuard`), the immortal border (`ImmortalBorder`), formation zones (`ZoneBridge`), unloaded chunks | never | **never** (unchanged, checked again every batch) |
+
+Natural-only shapes (`MODE_NATURAL`), `MODE_STRIP` and `MODE_WITHER` keep their own filters (a natural-only carve
+still only takes natural blocks; Hancur Total widens only what "never touch" means). The surface pass (Kawah Lebur,
+`Surface`) and the Titah block monument are unchanged: they only convert or place natural states into air of their own
+crater and never touch fluids or block entities. Restore and clear jobs never read the rules (they ignore zones and
+only put back what the cast took).
+
+**Kept-column rule extended:** a kept position (zone, keep-tag, unloaded neighbour) still keeps every position below it
+in the same column, exactly as today, so a protected or kept block never sits over a sealed hollow and a kept fluid
+never hangs over air.
+
+**Bottom of the world:** removing the bedrock floor opens the void. That is what the player asked for; the switch's
+"on" line says so plainly (30.1.2), and the caster's safe column (22.11.6) still protects the caster's own footing.
+
+**Hanging entities** (paintings, item frames) and multi-block parts (bed halves, doors, tall plants, piston heads):
+blocks are removed with no neighbour updates (as today, `FLAGS`), so a leftover half or a hanging entity behaves as it
+does in vanilla when its support vanishes without an update; Kehancuran never touches entities.
+
+#### 30.1.2 The switch and its messages (per player, default ON)
+
+- Stored as `kh_total` in the same `DisciplePaths.PLAYER_EXTRA` section as the Mode Kehancuran switch, read with
+  `getBooleanOr(TOTAL_KEY, true)`. `Kehancuran.totalOn(ServerPlayer)`; disciple Destroyer Art jobs use the **master's**
+  switch.
+- Server permission: new config `kehancuranTotalAllowed` (default **true**). When false every job runs `CLASSIC` and
+  the switch shows "dimatikan server".
+- Commands (no op, under the existing `kehancuran` literal in `Kehancuran.addCommands`):
+  - `/kultivasi kehancuran total` → status line;
+  - `/kultivasi kehancuran total nyala` / `mati` → set; works at once for new casts and queued jobs.
+- Lines (`lang-src/kehancuran_total.*`, keys `kultivator.kehancuran_total.*`):
+
+| Key | id_id | en_us |
+|---|---|---|
+| `on` | "Hancur Total NYALA: dengan Mode Kehancuran, setiap blok bisa hancur (batuan dasar, obsidian, portal, cairan, peti beserta isinya) kecuali di zona terlindung. Batuan dasar yang hancur membuka kehampaan." | "Total Destruction ON: with Mode Kehancuran, every block can be destroyed (bedrock, obsidian, portals, fluids, chests with their contents) except inside protected zones. Destroyed bedrock opens the void." |
+| `off` | "Hancur Total MATI: aturan lama berlaku (batuan dasar, obsidian, portal, cairan dan blok berpenyimpanan tidak disentuh)." | "Total Destruction OFF: the old rules apply (bedrock, obsidian, portals, fluids and blocks with storage are left alone)." |
+| `is_on` / `is_off` | "Hancur Total: NYALA" / "Hancur Total: MATI" | "Total Destruction: ON" / "Total Destruction: OFF" |
+| `server_off` | "Hancur Total dimatikan oleh server." | "Total Destruction is disabled by the server." |
+| `status` | "Hancur Total: %s · wadah dipulihkan beserta isinya: %s" | "Total Destruction: %s · containers restored with contents: %s" |
+| `undo_full` | "Batas simpanan wadah tercapai: %s wadah lain dibiarkan utuh agar isinya tidak hilang." | "Container save limit reached: %s more containers were left intact so their contents are not lost." |
+| `restored_be` | "Dipulihkan: %s blok, %s wadah beserta isinya." | "Restored: %s blocks, %s containers with their contents." |
+| `permanent_be` | "Titah tingkat 6-9 bersifat permanen: peti dan wadah yang hancur hilang bersama isinya." | "Decree tiers 6-9 are permanent: destroyed chests and containers are lost with their contents." |
+
+- The Mode Kehancuran "on" line (22.11.1) gets one appended clause key `kultivator.kehancuran_total.on_suffix`
+  ("Hancur Total: %s [ubah]") with a click to `/kultivasi kehancuran total mati|nyala`.
+- `/kultivasi kehancuran status` (`selfStatusLines`) prints the `status` line.
+- **The 29.16.5 permanent confirmation text** (its existing key in the Titah tier fragment, both languages) gains the
+  container clause: "…secara PERMANEN (tidak bisa dipulihkan). Peti dan wadah di dalamnya hilang bersama isinya.
+  Cadangkan dunia dulu bila ragu." / "…PERMANENTLY (cannot be restored). Chests and containers inside are lost with
+  their contents. Back up the world first if unsure." The clause shows only when the cast would run `TOTAL`.
+- Help topic `kehancuran` (`kultivator.screen.help.kehancuran`, both languages) gains one paragraph on Hancur Total.
+
+#### 30.1.3 Fluids (no floating water)
+
+1. **Planning (`Shapes`):** under `TOTAL` a column whose top cell is a fluid is no longer skipped; fluid cells and
+   waterlogged blocks inside the shape are ordinary cells of the shape. Shapes that "follow the surface"
+   (`Shapes.surface`, line 298 and 316 today) take the fluid surface as the surface.
+2. **Order:** within each column the breaker takes cells top-down (the current order of every shape; K asserts it in
+   `Shapes` and sorts a shape that is not), so the fluid of a column always goes before the solid cells under it.
+3. **Inside the shape nothing hangs:** every fluid cell inside the shape is removed (a waterlogged block becomes air,
+   not its dry form); a fluid cell kept by a zone keeps its column below (30.1.1), so no fluid ever ends above a new
+   hole inside the shape.
+4. **Edges:** fluid **outside** the shape stays where it is (walls of water at the crater rim, like a cut aquarium). It
+   flows naturally later, when any neighbour update reaches it. New config `kehancuranFluidSettle` (default **0** =
+   off, 0-256): when above 0, after the job's last carve batch the breaker schedules
+   `level.scheduleTick(pos, fluidState.getType(), 2 + i % 20)` on at most that many rim fluid cells (cells outside the
+   shape with a carved neighbour; spread over 20 ticks; never in unloaded chunks), so the rim settles at once. Off by
+   default on the weak laptop: a draining lake is the most expensive thing vanilla can do.
+5. **Undo:** the removed fluid states are recorded like any other state. A restore treats a cell that now holds a
+   **flowing** (non-source) fluid as empty (`state.getFluidState().isSource()` false and the block is a `LiquidBlock`),
+   so fluid that ran into the pit does not block Pulihkan; a cell with a source or a solid block that someone placed
+   is still left alone (as today).
+
+#### 30.1.4 Block entities: no drops, undo with NBT
+
+- **No spill, no drops:** a removal of a state with a block entity uses `FLAGS | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS`
+  (256). Verified in `LevelChunk.setBlockState`: `sideEffects = (flags & 256) == 0` gates
+  `BlockEntity.preRemoveSideEffects`, which is what calls `Containers.dropContents` (and pops jukebox records and
+  lectern books). The block entity is then removed by `removeBlockEntity`. Block-entity blocks never drop as items,
+  even with `kehancuranDropsPct` above 0.
+- **Undoable jobs** (normal arts with 0 % drops and an undo window above 0; Titah tiers 1-5): before the removal the
+  breaker stores `CompoundTag nbt = blockEntity.saveWithFullMetadata(level.registryAccess())`.
+  - Classic undo (tier 1, normal arts): `Job.undoNbt : Map<Long, CompoundTag>` (position → tag), copied into `Undo`.
+  - Bulk undo (tiers 2-5, 29.16.9): a sparse pair `long[] nbtPos` + `CompoundTag[] nbtTag` beside the compact arrays.
+  - Cap per job: `kehancuranUndoBlockEntities` (default 512, 0-4096) entries and `kehancuranUndoNbtKiB` (default 4096,
+    256-65536) by `CompoundTag.sizeInBytes()`. **When a cap is reached the remaining block-entity positions of that job
+    are kept, not removed** (and their columns below, 30.1.1), and the owner gets `undo_full` once. Items are never
+    lost in an undoable job.
+- **Restore:** after `level.setBlock(pos, old, FLAGS)` succeeds and a tag is stored for that position:
+  `BlockEntity be = level.getBlockEntity(pos)`; when not null, inside
+  `try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(be.problemPath(), LOGGER))`
+  call `be.loadWithComponents(TagValueInput.create(reporter, level.registryAccess(), nbt))`, then `be.setChanged()`
+  and `level.sendBlockUpdated(pos, old, old, Block.UPDATE_CLIENTS)`. A restore deferred for an unloaded chunk keeps
+  its tag in the restore buffer. `restored_be` reports the count.
+- **Permanent jobs** (Titah tiers 6-9; any job with drops above 0): no NBT is kept, contents are gone (the confirm text
+  says so, 30.1.2). The bulk carve path of 29.16.7 never writes a block-entity cell through its section writer: such a
+  cell goes through `level.setBlock(pos, AIR, FLAGS | 256)` one by one (they are few), so the chunk's block-entity map
+  stays consistent.
+- Memory: the tags live only in the undo window (lost on restart, like the block undo). `/kultivasi uji kehancuran
+  total info` prints the stored count and KiB.
+
+#### 30.1.5 Where the rules apply
+
+| Path | Rules |
+|---|---|
+| `Kehancuran.submitSelf` (own arts, Mode Kehancuran on) | the owner's switch |
+| `Kehancuran.submitTitah` (all tiers; classic and bulk carve) | the owner's switch |
+| disciple Destroyer Arts / Pemusnah orders (three locks, countdown) | the master's switch; the preview outline and the confirm line name the mode |
+| preview and validation in `Kehancuran` (lines 583 and 1024 today) | the same rules as the job they validate |
+| surface pass, sigil trenches, block monument | unchanged filters (natural states, no fluids, no block entities), inside the job's rules for "never" |
+| restore, clear | never consult the rules |
+
+#### 30.1.6 Data and config (K)
+
+- New block tag `data/kultivator/tags/block/hancur_total_keep.json` (`"replace": false`): `kultivator:sect_hall_stele`,
+  `kultivator:formation_eye`, `kultivator:batu_pusaka`, `kultivator:urat_pusaka` (all `"required": false`) and the
+  operator blocks `minecraft:command_block`, `chain_command_block`, `repeating_command_block`, `structure_block`,
+  `jigsaw`, `barrier`, `test_block`, `test_instance_block`. Operator blocks are a server owner's protection devices,
+  so they count as "protected" in the sense of the request; a server owner who wants them breakable empties the tag.
+  `#kultivator:indestructible` stays as it is for `CLASSIC`.
+- `KultivatorConfig` (clamped on load): `kehancuranTotalAllowed` true, `kehancuranFluidSettle` 0 (0-256),
+  `kehancuranUndoBlockEntities` 512 (0-4096), `kehancuranUndoNbtKiB` 4096 (256-65536).
+
+#### 30.1.7 Verified 26.3 API (mcsrc)
+
+`Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS = 256`, `LevelChunk.setBlockState` (side-effect gate),
+`BlockEntity.preRemoveSideEffects` → `Containers.dropContents`, `BlockEntity.saveWithFullMetadata(HolderLookup.Provider)
+: CompoundTag`, `BlockEntity.loadWithComponents(ValueInput)`, `TagValueInput.create(ProblemReporter,
+HolderLookup.Provider, CompoundTag)`, `ProblemReporter.ScopedCollector`, `CompoundTag.sizeInBytes()`,
+`ScheduledTickAccess.scheduleTick(BlockPos, Fluid, int)`, `FluidState.isSource()`, `Blocks.TEST_BLOCK`,
+`Blocks.TEST_INSTANCE_BLOCK`, `Blocks.LIGHT`.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 30.2 Film Spektakuler (module F)
+
+#### 30.2.1 The setting and its warning
+
+- Row "Kamera sinematik" cycles **Singkat → Penuh → Spektakuler → Mati** (Singkat stays the default). Stored as
+  `epic_camera = "spektakuler"`. `EpicSettings.camera()` returns `Camera.PENUH` for it, so every existing `== PENUH`
+  check (7b, `SkyRide`, `PusakaFilm`) keeps working unchanged; the new `EpicSettings.spektakuler()` is true only when
+  the stored value is `spektakuler` **and** `epic_spektakuler_ok` is set **and** "Kurangi gerak" is off.
+- The first switch to Spektakuler opens `client/epic/screen/MotionWarningScreen` (jade style, like
+  `PhotosensitivityScreen`): "Peringatan gerak: Kamera Spektakuler memakai gerakan cepat (sapuan, zoom kilat, putaran,
+  waktu melambat). Jika gerakan cepat membuatmu pusing, pilih Penuh." with **Aktifkan** / **Kembali ke Penuh**
+  (`epic_spektakuler_ok`). `/sinematik spektakuler` does the same.
+- New rows in the Momen Epik group (F): "Lapisan lensa" (`epic_lens`: **Nyala** / Ringan / Mati: grain, flare, leaks,
+  smear, fringe), "Langit kosmik" (`epic_cosmic`: **Nyala** / Mati), "Waktu beku" (`epic_bullet`: **Nyala** / Mati).
+  "Gerak lambat" off also turns bullet time off.
+
+#### 30.2.2 Gates and safety (stricter than Penuh)
+
+A film plays only when **all** hold at the start of **each act** (30.2.6), else the act is skipped and the cast falls
+back to the Penuh path of today (SkyRide, Film Pusaka, D3/D4 shots), then to Singkat, then to nothing:
+- `spektakuler()`; the scene is the local player's own; CAMERA_OK and the server's SAFE flag;
+- `ShotGuard.blocked(penuh = true, …)` is null (every 23.7.4 gate: LETHAL_NEXT, telegraph windows, fall, fluid, fire,
+  air, riding, gliding, flying sword, sleeping, spectating, screens, death, dimension change);
+- no `Enemy` and no `Mob` targeting the player within **24 b**, health ≥ **50 %**, not `FLAG_LOW_LOAD`;
+- the KIND_ULTIMATE gap (1200 ticks) except for Titah (29.4) and except a recast of the same spec in a test;
+- for Dewa and Abadi ultimates the setting "Perjalanan langit" decides the long climb acts (`Pertama` = the first cast
+  of each spec per session, `Selalu`, `Mati` = only the short acts).
+
+While a film shot runs, every 23.7.4 abort applies (a foreign hurt, a movement key, a big mouse motion, Backspace: the
+skip eases back in 10 ticks, a danger abort snaps at once). **Backspace** skips the act; a double press skips the whole
+film. The film never delays or changes anything on the server; when the server's climax comes the film cuts to it.
+
+#### 30.2.3 Caps (film shots only, `Shots.Type.FILM`)
+
+| | Penuh and every other shot (23.7.3, unchanged) | Spektakuler film shot |
+|---|---|---|
+| translation, average / peak | ≤ 7.6 / 12 b/s | ≤ 24 / 48 b/s (≤ 2.4 b per tick, under the 8 b per tick rule) |
+| rotation, average / peak | ≤ 25 / 40 °/s | ≤ 120 / 240 °/s; a **whip pan** (≤ 6 ticks) up to 900 °/s, only with the smear layer ≥ 0.6 (30.2.7) |
+| FOV | ±12 % × `fovEffectScale` | factor k in 0.55-1.45, applied as `1 + (k − 1) × fovEffectScale` (slider 0 = no FOV change) |
+| roll | ≤ 8° × `damageTiltStrength`, ≤ 5 °/s | ≤ 20° × `damageTiltStrength`, ≤ 60 °/s; no full barrel roll |
+| height above the subject's feet | ≤ 24 b (cranes) | ≤ 48 b (aerial shots); "space" is sold by the cosmic backdrop, not by distance |
+| distance from the protagonist | ≤ 32 b (ceremony 48) | ≤ 64 b and ≤ (render distance × 16 − 24) |
+| per shot / per act / per film | ≤ 6 s / – / ≤ 20 s | ≤ 6 s / ≤ 8 s (one-act films ≤ 12 s) / ≤ 20 s of camera time (the Penuh scene cap, unchanged); Titah films keep 29.16 (shots ≤ 4 s, film ≤ 12 s) |
+| cuts | blends; masked cuts only under a cloud wipe or impact frame (28.3.2) | hard cuts allowed, each under a mask: a 2-tick **black dip** (not a luminance event), a cloud wipe, an impact frame or a whip smear ≥ 0.8; ≥ 10 ticks apart |
+| luminance | one event per 500 ms | unchanged |
+| collision | one `level.clip` per frame | unchanged; low angles keep ≥ 0.2 b above the ground surface |
+
+- **Subject motion is not counted.** A shot in subject space (30.2.5) moves with the caster (a dash, the nine steps);
+  only the camera's motion relative to its space is capped, exactly as first person is never capped.
+- `Shots.Type.FILM` can only be built by `FilmDirector`; `CinematicDirector.shoot` accepts it only while
+  `spektakuler()` is true. `Shot.validateFilm` applies the right column (stretch the shot, then shorten its path).
+- "Kurangi gerak" makes Spektakuler unavailable (Mati, as 23.1.2).
+
+#### 30.2.4 Architecture (F owns `client/epic/**`)
+
+| File | Role |
+|---|---|
+| `client/epic/film/FilmDirector.java` | the public film API (30.5 C30.2); arms, gates, plays and re-times films; hands each shot to `CinematicDirector` |
+| `client/epic/film/Film.java`, `FilmAct.java`, `FilmShot.java`, `FilmKey.java`, `FilmSpace.java`, `Ease.java`, `FilmLens.java`, `FilmShake.java` | the shot DSL (30.2.5) |
+| `client/epic/film/FilmPath.java` | evaluates a shot per frame: centripetal Catmull-Rom position, slerped look, FOV, roll, shake |
+| `client/epic/film/FilmCatalog.java`, `FilmCatalogTitah.java`, `FilmCatalogUltimate.java` | every shot list of 30.3 (camera work is F's; the drivers only report props and beats) |
+| `client/epic/film/BulletTime.java` | 30.2.9 |
+| `client/epic/lens/LensLayers.java` + `Grain`, `Flare`, `LightLeak`, `Smear`, `HeatHaze` | HUD and world lens layers (30.2.7), drawn from the existing `epic_screen` HUD element |
+| `client/epic/cosmic/CosmicSky.java`, `CosmicLayers.java` | Langit Kosmik (30.2.8), drawn from `EpicRenderer` |
+| `client/epic/film/FilmParticleProviders.java` | client providers of the Kenney particle types |
+| `client/epic/sound/FilmSound.java` | plays the Kenney cues of a beat (30.2.12) |
+| `client/epic/screen/MotionWarningScreen.java` | 30.2.1 |
+| `src/main/java/dev/kultivator/fx/FilmParticles.java` | the particle types (common registry, like `QiParticles`) |
+| `src/main/java/dev/kultivator/sound/FilmSounds.java` | the `SoundEvent`s (common registry) |
+| `tools/gen_film_assets.py` | the Kenney pipeline and our own lens and cosmic textures (30.2.11) |
+
+`CinematicDirector` gains the FILM branch: `compute` asks the running `FilmPath` for (pos, yaw, pitch, fov k, roll) at
+presentation time, then runs the collision clip and the shake. `fovScale()` and `roll()` read the film values while a
+film shot runs.
+
+#### 30.2.5 The shot DSL
+
+**Spaces** (every key point is given in a space; the space is evaluated per frame, so a moving subject or prop carries
+the camera):
+
+| Space | Origin and axes |
+|---|---|
+| `S` subject | the caster's interpolated feet; z = body yaw at the act start (forward), x = right, y = up |
+| `A` aim | the aim point (the CAST `tx,ty,tz`); z = from the caster to the aim, y = up |
+| `W` world | absolute coordinates (rare: test shots) |
+| `P(key)` prop | a tracked prop (30.5 C30.2 `track`): its interpolated position; z = its facing, y = its up |
+| `K` sky | a direction (yaw, pitch) at the sky-projection radius; only for the look of cosmic shots |
+
+**A shot** is `FilmShot.of(ticks)` with keys, look, lens and sound:
+
+| Primitive | Meaning |
+|---|---|
+| `key(t, space, x, y, z)` | a position key at shot fraction t (0..1); ≥ 2 keys; centripetal Catmull-Rom between them |
+| `ease(Ease)` per segment | `LINEAR`, `IN`, `OUT`, `IN_OUT` (sine), `EXPO_IN`, `EXPO_OUT`, `BACK_OUT` (≤ 6 % overshoot), `HOLD` (the speed ramp: time is reparameterised by the ease, so a shot can creep, then rocket) |
+| `look(space, x, y, z)` / `lookProp(key)` / `lookYawPitch(keys…)` | the look target (slerped; shortest arc) |
+| `fov(t, k)` keys, `dolly(target)` | FOV curve; `dolly` computes k(t) = tan(φ₀/2)·d₀ / (tan(φ/2)·d(t)) so the target keeps its screen size (the vertigo effect), clamped to the caps |
+| `roll(t, deg)` keys | Dutch roll |
+| `cut(Mask)` | the next shot starts without a blend; `Mask.BLACK_DIP`, `CLOUD_WIPE`, `IMPACT`, `SMEAR`. `matchCut(shape)` additionally aligns the next shot so a round shape (`RING`, `SUN`, `EYE`, `MIRROR`) sits at the same screen point and size |
+| `whip(deg, ticks)` | a whip pan modifier on the look (≤ 6 ticks), always with the smear |
+| `crash(k, ticks)` | crash zoom: FOV to k in ≤ 4 ticks, `EXPO_OUT`, speed lines |
+| `orbit(space, centre, r, h, sweep)` | an orbit key set generated around a point |
+| `bullet(σ, realTicks)` | bullet time during the shot (30.2.9) |
+| `pov(key, back, up)` | ride a prop: the camera sits `back` behind and `up` above the prop and looks along its facing |
+| `worm(h)` | a low angle: the camera 0.2-0.5 b above the surface (heightmap), looking up 25-45° |
+| `aerial(h0, h1)` | an aerial reveal pullback (height and distance grow together) |
+| `shake(Profile, amp, ticks)` | 30.2.10 |
+| `lens(Lens…)`, `sound(at, FilmSound.Cue)`, `card(key)` | HUD layers, Kenney cues, a title card at that moment |
+| `cosmic()` | this shot shows Langit Kosmik (30.2.8) |
+
+**An act** groups shots: `FilmAct.at(Anchor, offset)` with anchors `CAST`, `CHARGE`, `CLIMAX` (the server climax time
+`castTick + climaxAt`, or the climax event when the spec's climax is player-timed), `EVENT(phase, index)` (the n-th
+event of that phase), `BEAT(key)` (a driver cue). A film is a list of acts; between acts the camera is the player's
+own. Example (the heaven-punishing sword's first act):
+
+```java
+Film.of("heaven_punishing_sword").act(FilmAct.at(Anchor.CAST, 0)
+    .shot(FilmShot.of(20).worm(0.3F).key(0, S, 1.5, 0.3, 2.0).key(1, S, 2.0, 0.4, 3.0).ease(Ease.IN_OUT)
+        .look(A, 0, 40, 0).fov(0, 1.0F).fov(1, 1.25F).lens(Lens.LETTERBOX, Lens.GRAIN).sound(0, FilmSound.RISER_LONG))
+    .cut(Mask.BLACK_DIP)
+    .shot(FilmShot.of(15).dolly(Target.SUBJECT).key(0, S, 0, 1.6, 5).key(1, S, 0, 1.6, 12).fov(0, 1.0F)
+        .shake(Profile.RUMBLE, 0.15F, 15)));
+```
+
+Seeds: every random choice of a film (grain offset, flare jitter, montage order of equal shots) comes from the TechFx
+`seed`, so a replay of the same cast looks the same.
+
+#### 30.2.6 Timing against the server
+
+- Act start times are computed from the CAST tick: an act anchored at `CLIMAX − n` starts at `castTick + climaxAt − n`
+  (presentation time; hit-stop and bullet time stretch the film, not the server).
+- **Re-timing:** when the climax event arrives earlier than planned, the running pre-climax shot jumps to its last key
+  under a black dip; when it is late, the last shot holds its final pose up to 20 ticks (as 28.3.2), then the film
+  blends out. The impact cut always happens **on the event**.
+- Long fields (200-600 ticks): Act I at the cast (≤ 8 s), the player's own camera through the fight, Act II ending on
+  the climax (≤ 6 s), Act III aftermath (≤ 5 s). Short casts (≤ 60 ticks) use one continuous act.
+- Kecepatan of Titah (29.4): the film's acts scale with the build-up; below 120 ticks the cosmic act shortens first; it
+  never speeds the camera past the film caps.
+
+#### 30.2.7 Lens and HUD layers (no post chain)
+
+| Layer | How (all HUD `GuiGraphicsExtractor` blits with `RenderPipelines.GUI_TEXTURED`, except where noted) | Minimal | Normal | Maximal |
+|---|---|---|---|---|
+| `LETTERBOX` | the existing `Letterbox`, film ratio 2.39:1 (bar height recomputed from the window aspect) | yes | yes | yes |
+| `GRAIN` | 4 frames of our 64-px noise (`textures/misc/film/grain_0..3.png`) tiled, α 0.06, offset by the seed each tick; plus Kenney `scratch` at α 0.04 for one tick in 40 | – | yes | yes |
+| `VIGNETTE` | the existing `EpicScreen.vignette`, film colour | yes | yes | yes |
+| `FRINGE` | chromatic aberration: the existing `CHROMA` bands, plus at impacts three 1-px offset copies of the edge bands (red, green, blue) for 4 ticks | – | yes | yes |
+| `FLARE` | lens flare: the shot's light point (sun, sword tip, core) projected to the screen with the camera matrix; a hot core (Kenney `flare`), 4-6 ghosts (Kenney `circle`, `light`) on the line through the screen centre, sized and dimmed by the distance from the centre; fades when the point is off screen or occluded (one cheap depth test: the light point's `level.clip` from the camera, once per 4 ticks) | – | 3 ghosts | 6 ghosts |
+| `ANAMORPHIC` | a horizontal streak (our `anamorphic.png`, 256 × 16) through the light point, tinted, α ≤ 0.35 | – | – | yes |
+| `LIGHT_LEAK` | warm or Dao-tinted gradients (`leak_0..2.png`) sliding in from a screen edge over 10-20 ticks, α ≤ 0.25; also the mask of a soft cut | – | yes | yes |
+| `SMEAR` | motion-blur smear for whip pans: 6-10 stretched Kenney `trace` strokes across the screen along the pan direction, α ∝ angular speed (0.6-0.9 at the whip peak) | yes (4) | yes | yes |
+| `SPEED_LINES` | the existing `ScreenFlash.speedLines` for crash zooms and POV rides | yes | yes | yes |
+| `HEAT_HAZE` | **not refraction** (no post): world-space shimmer quads (`haze.png`, scrolling, α 0.08, `entityTranslucentEmissive`) standing over hot ground plus rising WHITE_ASH; reads as heat shimmer | – | 2 quads | 4 quads |
+| `IMPACT` | the existing `ImpactFrame.play` (28.4.1) with its settings and warning | yes | yes | yes |
+| `TITLE` | the existing `TitleCard` (jade style), the technique's name and seal | yes | yes | yes |
+
+"Lapisan lensa: Ringan" keeps letterbox, vignette, smear and speed lines only. Every layer is HUD or one draw per
+frame; nothing allocates per frame (textures and meshes built once).
+
+#### 30.2.8 Langit Kosmik (the cosmic backdrop)
+
+Shown only in `cosmic()` shots (and never to bystanders): the "space" of the journey up the beam. Built from seeded
+meshes, turned with the `PoseStack`, drawn from `EpicRenderer` in `LevelRenderEvents.COLLECT_SUBMITS`.
+
+| Layer | Look | Render type | Budget rank |
+|---|---|---|---|
+| Sungai Bintang (star river) | a wide band of our `star_river.png` across the sky plus 20-60 Kenney `star` billboards with slow twinkle | `entityTranslucentEmissive` | large layer 1 |
+| Awan Nebula (nebula clouds) | 1-2 huge soft quads of our fbm `nebula_0..2.png` in the film's palette (violet-teal, ember-gold, frost-blue), turning 1°/s | `entityTranslucentEmissive` | large layer 2-3 |
+| Matahari dan Bulan Langit | a celestial sun (3 nested additive discs + corona of Kenney `flare`) and a pale moon disc, placed by the film | `entityTranslucentEmissive` | small |
+| Istana Langit (heavenly palace silhouettes) | one strip of tiered roofs and pillars (`palace_strip.png`, ours) on a cloud bank at 20-30° elevation with a gold rim | `entityTranslucentEmissive` | large layer |
+| Dasar bintang (deep starfield backing) | the vanilla end-portal starfield on a far quad behind everything | `RenderTypes.endPortal()` (vanilla pipeline) | Maximal, vanilla only (skipped under a shader pack) |
+
+- **Depth:** by default every layer is sky-projected with depth testing on (`SkyProjection`, elevation ≥ 15°, as the
+  vistas of 28.3.3). **Depth off** (`RenderTypes.textSeeThrough(texture)`: pipeline `TEXT_SEE_THROUGH`, translucent
+  blend, `withDepthStencilState(Optional.empty())`, verified) is used only while the shot guarantees an open sky: the
+  camera looks up (pitch ≤ −45°) and is at least 4 b above the highest `WORLD_SURFACE` block of 9 heightmap samples in
+  the view cone within 48 b. Then the backdrop may cover clouds and fog fully, which is what makes it read as space.
+- The vanilla sky grade of the shot comes from `SkyDirector` (star-dark grade, STAR_BRIGHTNESS up), no time change.
+- Vistas of 28.3.3 and 29.4.1 are reused inside the cosmic shots (the gate, the Nine Heavens rims, the accretion disc,
+  the Dipper, the Kua'e giants).
+- Budgets: Minimal: star river only, 20 stars; Normal: + 1 nebula, sun or moon, 40 stars; Maximal: + 2nd nebula,
+  palaces, end-portal backing, 60 stars. Under a shader pack the 23.14.3 profile applies (× 0.6, one large layer: the
+  star river).
+
+#### 30.2.9 Bullet time and hit-stop
+
+- `BulletTime.start(σ, realTicks)` asks `EpicClock.request(σ, in 2, hold, out 6, prio)` with σ 0.03-0.1 for ≤ 30 real
+  ticks (`EpicClock.MAX_WINDOW`), ≥ 6 s apart (`MIN_GAP`), only with "Waktu beku" and "Gerak lambat" on.
+- **What freezes:** everything that reads presentation time: 7b layers, Phase 10 and 10b world FX, `ModelFx` props,
+  `DisplayRun` layers (interpolation held through `DisplayKey`), cast poses, the `FireUltimates`, `UltimatesA` and
+  `UltimatesB` clocks, `kultivator:qi` and the Kenney film particles (spawned and aged by σ).
+- **What never freezes** (23.1.1 rule 3, 23.11.2): vanilla entities and their interpolation, vanilla particles,
+  `DeltaTracker`, the tick-rate managers, the server, damage. The camera keeps moving in real time, which is the
+  bullet-time look. Shots are framed so the frozen layers dominate the frame; a real mob that moves meanwhile is the
+  truth of the world and is allowed to.
+- Hit-stop (28.4.2) stays: Dewa 3 ticks, Abadi 2.
+
+#### 30.2.10 Camera shake (frequency shaped)
+
+`FilmShake` adds an offset and a small rotation after the path and before the clip (so a shake never pushes the camera
+into a block). Deterministic sums of sines with seeded phases and an attack/decay envelope:
+
+| Profile | Components | Use |
+|---|---|---|
+| `RUMBLE` | 5.0, 7.3 and 11.1 Hz, falling weights | build-up, vortex, engines |
+| `QUAKE` | 2.2 Hz sway + 3.7 Hz + 14 Hz grit | stomps, mountains, the crater |
+| `JOLT` | a damped 9 Hz spring, decay 6 ticks | single impacts, cuts on a hit |
+| `HUM` | 25 Hz jitter, tiny | energy hums, the time stop |
+
+Amplitude ≤ 0.35 b and ≤ 1.5° at full, × "Guncangan layar" × `screenEffectScale`; "Kurangi gerak" → 0. The vanilla
+`CameraShake` keeps its × 0.3 while a film shot runs (no double shake).
+
+#### 30.2.11 The Kenney asset pipeline (F)
+
+`tools/gen_film_assets.py <kenney_dir>` (run with `python -I`, the Kenney folder passed as an argument and only read):
+a pure-Python PNG decoder (zlib, 8-bit RGBA, filters 0-4) and our `tools/png.py` writer. Sprites are box-downscaled
+from 512 px, turned into white RGB with alpha = source alpha × luminance (so they tint cleanly), and written to
+`assets/kultivator/textures/particle/film_<name>_<n>.png`; each type gets `assets/kultivator/particles/film_<name>.json`.
+F checks a sample of the outputs with the Read tool. Only these files are used:
+
+| Type (`kultivator:`) | Kenney sources (`PNG (Transparent)`) | Size |
+|---|---|---|
+| `film_spark` | spark_01, spark_02, spark_04, spark_05 | 64 |
+| `film_flare` | flare_01, light_01, light_02, light_03 | 64 |
+| `film_star` | star_01, star_04, star_06, star_08 | 64 |
+| `film_smoke` | smoke_01, smoke_04, smoke_07, smoke_10 | 64 |
+| `film_flame` | flame_01, flame_03, flame_05, fire_01 | 64 |
+| `film_magic` | magic_01, magic_02, magic_03, magic_04 | 64 |
+| `film_slash` | slash_01, slash_02, slash_03, slash_04 | 64 |
+| `film_trace` | trace_01, trace_03, trace_05 | 64 |
+| `film_twirl` | twirl_01, twirl_02, twirl_03 | 64 |
+| `film_circle` | circle_01, circle_03, circle_05 | 64 |
+| `film_muzzle` | muzzle_01, muzzle_03, muzzle_05 | 64 |
+| `film_dirt` | dirt_01, dirt_02, dirt_03 | 32 |
+| `film_symbol` | symbol_01, symbol_02 | 64 |
+| HUD and world textures under `textures/misc/film/` | `smear.png` ← Rotated/trace_02_rotated (128 × 32); `scratch.png` ← scratch_01; `scorch_0..2.png` ← scorch_01..03 (ground decals of film-owned quads); `leak_window.png` ← window_02 | 32-128 |
+
+Our own procedural textures (same script, no Kenney source): `grain_0..3.png`, `anamorphic.png`, `leak_0..2.png`,
+`haze.png`, `star_river.png`, `nebula_0..2.png`, `palace_strip.png`, `sun_corona.png`, `moon_disc.png`.
+
+Particles: `FilmParticles.register()` (common, from `Kultivator.onInitialize`, one line beside `QiParticles.register()`)
+registers 13 simple particle types the way `QiParticles` does; `FilmParticleProviders` (client) registers sprite-set
+providers drawn full-bright and additive like `QiParticle`, aged by σ. They count in `FxBudget` like `kultivator:qi`.
+
+Sounds: the selected `.ogg` files are copied byte for byte (no conversion tool exists here; the files are already
+44.1 kHz Vorbis) to `assets/kultivator/sounds/film/`. **Stereo files never play positioned** (Minecraft does not
+attenuate stereo): they are protagonist-only presentation cues (`SimpleSoundInstance` relative, no attenuation).
+Mono files may be positioned (every client in range derives them from the same TechFx, 23.1.7).
+
+| Event (`kultivator:film.<id>`) | Files (→ `sounds/film/<id>_<n>.ogg`) | Channels | Use |
+|---|---|---|---|
+| `riser_long` | sci-fi `spaceEngineLarge_000`, `_001` | mono | climbs, charging (pitch ramp 0.5 → 1.6 with `EpicRampSound`) |
+| `riser_short` | `forceField_000`-`_002` | mono | lock-on, gate opening, short build-ups |
+| `hum_energy` | `spaceEngineLow_000` | mono | fields, domains, cosmic shots (looped by ramp) |
+| `hum_vortex` | `engineCircular_000` | mono | vortices, black hole, thunder array |
+| `whoosh` | `thrusterFire_000`, `_001` | mono | camera whips, dives, POV rides (short envelope) |
+| `zap` | `laserLarge_000`-`_002` | mono | beams, bolts, the void beam |
+| `twinkle` | `laserRetro_000` | mono | stars lighting, crystals |
+| `crunch` | `explosionCrunch_000`-`_002` | mono | impacts (positioned) |
+| `clang` | sci-fi `impactMetal_000`-`_002` | mono | swords planting, pillars |
+| `sub_boom` | `lowFrequency_explosion_000`, `_001` | stereo | the delayed boom (own client) |
+| `bell` | impact `impactBell_heavy_000`-`_002` | stereo | seals, Buddhist and Daoist beats (own) |
+| `glass` | `impactGlass_heavy_000`-`_002` | stereo | ice shatter, mirror crack (own) |
+| `punch` | `impactPunch_heavy_000`-`_002` | stereo | body arts, stomps (own) |
+| `gong` | `impactPlate_heavy_000`, `_001` | stereo | thunder drums, mountains (own) |
+| `thud` | `impactSoft_heavy_000`, `_001` | stereo | giant footsteps (own) |
+| `rock` | `impactMining_000` | stereo | cracking earth, cells tearing out (own) |
+
+`assets/kultivator/sounds.json` is new (the mod has none yet): one entry per event with `"subtitle":
+"subtitles.kultivator.film.<id>"`. `FilmSounds.register()` (common, `Kultivator.onInitialize`, one line) registers
+each with `SoundEvent.createVariableRangeEvent(id)` in `BuiltInRegistries.SOUND_EVENT`. About 35 files, ≤ 2 MB.
+
+`docs/CREDITS.md` (new, LF): "Particle sprites and sound effects: Kenney (www.kenney.nl), Particle Pack 1.1, Impact
+Sounds 1.0 and Sci-Fi Sounds 1.0, licensed CC0 1.0 (credit not required, given with thanks). Every other texture,
+model and sound selection of Kultivator is our own." with the list of used files.
+
+#### 30.2.12 Sound beats
+
+- Beat words used in 30.3: **riser** (`riser_long` under climbs and charges, `riser_short` under lock-ons), **whoosh**
+  (every whip pan, POV ride start and dive), **hum** (cosmic shots, fields), **zap** (beams), **impact** = the spec's own
+  server cues (silenced by 28.4.3) + `crunch` (positioned) at the impact + `sub_boom` on the delayed boom, **bell**,
+  **gong**, **glass**, **punch**, **thud**, **rock**, **twinkle** as named.
+- During a cosmic shot the world categories duck (`EpicSound.duck`, never HOSTILE or PLAYERS) and `hum_energy` plays
+  at pitch 0.6: space is quiet. The silence of 28.4.3 is kept exactly; film cues never fill it.
+- ≤ 3 film cues per beat on the own client; the music cues of 23.12.2 still play under the film.
+
+#### 30.2.13 Budgets
+
+| | Minimal | Normal | Maximal |
+|---|---|---|---|
+| film shots | all (camera motion never depends on the budget) | all | all |
+| lens layers | letterbox, vignette, smear, speed lines | + grain, fringe, flare 3 ghosts, light leaks, haze 2 | + anamorphic, flare 6 ghosts, haze 4 |
+| cosmic layers | star river, 20 stars | + 1 nebula, sun or moon, 40 stars | + nebula 2, palaces, end-portal backing, 60 stars |
+| Kenney particles per shot | ≤ 40 | ≤ 160 | ≤ 400 (all in `FxBudget`) |
+
+The frame guard (`EpicBudget.tier()`) lowers film extras first (lens extras, then cosmic layers, then particles), then
+the rest of 7b. Idle cost: one boolean in each new mixin path and HUD layer.
+
+#### 30.2.14 Compatibility
+
+- Sodium: no chunk mesh is touched; aerial shots stay ≤ 48 b up and inside render distance; hard cuts are masked
+  (Sodium's visibility rebuild after a jump hides under the mask).
+- Iris: lens layers are HUD (after the pack's composite); cosmic and haze quads skip the shadow pass; the end-portal
+  backing is skipped under a pack; the 23.14.3 pack profile applies.
+- Butter Bot and other mods: Backspace stays the skip key; no key or input is taken.
+
+#### 30.2.15 Verified 26.3 API (mcsrc, new uses)
+
+`RenderTypes.textSeeThrough(Identifier)` (pipeline `TEXT_SEE_THROUGH`: `BlendFunction.TRANSLUCENT`,
+`withDepthStencilState(Optional.empty())`), `RenderTypes.endPortal()`, `RenderTypes.dragonRays()` (additive rays),
+`RenderTypes.entityTranslucentEmissive(Identifier)`, `RenderPipelines.GUI_TEXTURED`, the `GuiGraphicsExtractor.blit(
+RenderPipeline, Identifier, x, y, u, v, width, height, …)` overloads already used by `EpicScreen`,
+`SoundEvent.createVariableRangeEvent(Identifier)`, `BuiltInRegistries.SOUND_EVENT`, `SimpleParticleType`,
+`Level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z)`, `FluidState.isSource()`. Fabric:
+`LevelRenderEvents.COLLECT_SUBMITS` (already used) and `ParticleProviderRegistry` (as `Qi` uses it).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 30.3 Shot lists (one film per spec; F authors them in `FilmCatalog*`)
+
+**Notation.** `when`: `C+n` ticks after the CAST (or the CHARGE where written), `K` = the climax (`climaxAt` of the
+spec's Dampak row or the climax event), `K±n`; `E0#k` = the k-th EXTRA0 event. `len` in ticks (presentation time). Shot
+words are the DSL of 30.2.5 (spaces `S`, `A`, `P(key)`; `worm`, `aerial`, `orbit`, `pov`, `dolly`, `crash`, `whip`,
+`bullet`, `cosmic`). Lens: LB letterbox, GR grain, VG vignette, FR fringe, FL flare, AN anamorphic, LL light leak, SM
+smear, SL speed lines, HZ haze, IF impact frames (28.4.1), TC title card, BD black-dip cut, CW cloud-wipe cut, MC match
+cut. Sound words: 30.2.12. Prop keys `P(...)` are reported by the drivers (30.4, contract C30.2 `track`); a missing
+prop falls back to the anchor point it would stand on. Every film: LB + VG on every shot; GR from Normal; acts
+separated by the player's own camera; total camera time ≤ 400 ticks; every number inside 30.2.3. **Titah films** are
+one continuous act and keep the 29.16 limits at every tier (each shot ≤ 4 s, the whole film ≤ 12 s); single-act
+films of short casts may run ≤ 12 s in one act.
+
+**Every film ends** with the same safe exit: a 10-tick blend to the eye (or, after an impact cut, the instant cut under
+the impact frame already used by 28.3.2). If Mode Kehancuran carved ≥ 512 blocks, the aftermath act adds the crater
+reveal of 30.3.9.
+
+#### 30.3.1 Titah Pedang Pemisah Langit (`titah_pedang`, K = 100 at Kecepatan 1)
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 18 | `worm(0.3)` at the caster's boots, looking up past the raised sword arm to the PATH line and the falling pillar; FOV 1.0 → 1.2 | FL on the pillar | riser_short (lock-on) |
+| 2 | C+18 | 22 | climb: `key S(2,2,−1)` → `A(3,46,−4)` with `EXPO_IN` (creeps, then rockets up the pillar); look along the pillar; SL from 0.6; CW at the end | SL, CW | riser_long, whoosh |
+| 3 | C+40 | 36 | `cosmic()`: looking up (pitch −70°) at the vista `ISTANA_LANGIT` on the Langit Kosmik: the Lingxiao gate opens, the sword is drawn from it; slow push 4 b, roll 0 → 6°; TC (decree name, seal) | AN off the blade, LL gold | hum (pitch 0.6), bell |
+| 4 | C+76 | 24 | MC (the blade's ring flare → the mark ring): `pov(P(sword), back 3, up 0.6)` riding the falling sword point-first down the pillar; FOV 1.3; SM edges | SM, SL, FR | whoosh |
+| 5 | K | 20 | IF cut to `worm(0.4)` 12 b from the impact; `bullet(0.05, 18)` while `orbit(A, r 12, h 0.4, 40°)` circles the planted sword and the frozen shock ring | IF, HZ | silence 8 → sub_boom, crunch |
+| 6 | K+20 | 24 | the cleave ("Bumi terbelah", EXTRA3 @104): `whip(+90°, 5)` to follow the front one way, BD, `whip(−180°, 6)` the other way | SM | whoosh ×2, rock |
+| 7 | K+44 | 40 | `aerial(h 6 → 40)`: the camera pulls back and up over the cleave line splitting the land, the sword planted at its centre | LL | hum fades |
+
+#### 30.3.2 Titah Tiang Penenang Samudra (`titah_tiang`, K = 120)
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 20 | low dolly behind the caster through the javelin throw (`JAVELIN_THROW` at 10): `S(−2.5,0.6,−3)` → `S(−1.5,0.9,−1.5)`, look at the hand | – | riser_short |
+| 2 | C+20 | 30 | side tracking ride beside the rising pillar: `pov(P(pillar), back 0, up −2)` offset 4 b aside, looking up its length; ember trail; sky darkens | HZ trail, SL | whoosh, riser_long |
+| 3 | C+50 | 40 | `cosmic()` + vista `LAUT_TIMUR` from below the sea of clouds: `dolly(P(pillar))`: the camera pulls back 10 b while FOV narrows 1.3 → 0.75 (vertigo) as the pillar grows and its gold hoops flare | AN gold-red, FL | hum, gong |
+| 4 | C+95 | 24 | static wide 30 b from the aim at horizon level: the white-hot streak crosses from the top of the frame (EXTRA2 @90) | HZ, FR | zap |
+| 5 | K | 3 | `crash(0.6, 3)` onto the impact | IF (white, ember, dark) | silence 12 |
+| 6 | K+3 | 30 | `aerial(h 30)` slow-motion high wide of the flattening wave (EXTRA3 @128) blowing grass outward, `bullet(0.1, 20)` | LL ember | sub_boom on the delayed boom, crunch |
+| 7 | K+40 | 40 | low `orbit(P(pillar), r 7, h 1, 50°)` around the glowing hoops of the planted pillar, steam haze | HZ | hum (cooling) |
+
+#### 30.3.3 Titah Tujuh Bintang Biduk Utara (`titah_bintang`, K = 140)
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 24 | "telescope": from the pointing finger the look tilts up to the seven stars; FOV 1.0 → 0.7 | FL star | twinkle |
+| 2 | C+24 | 36 | `cosmic()` + vista `BIDUK_UTARA`: the camera drifts through the star river; each node lights and its line draws (EXTRA1 ×7 at 6-tick steps); roll 0 → 10° | AN violet | twinkle ×7, hum |
+| 3 | C+100 | 42 | montage: one shot per falling star (E0#1..7, 6 ticks each), each from a different angle, chosen by the seed from {worm, top-down 40 b, side 12 b, OTS, under the crystal, behind the star, wide}; BD between | SM | crunch per star, glass |
+| 4 | C+136 | 4 | Yaoguang (the 7th): `bullet(0.05, 24)` + `orbit(P(crystal7), r 5, h 1, 90°)` around the crystal growing | FL | twinkle |
+| 5 | K | 40 | `aerial` top-down 48 b, turning 30°, as the lines ignite into burning trenches across the land; the constellation from above | IF (INV, violet), LL violet | silence 6 → sub_boom |
+| 6 | K+40 | 30 | crane down to the caster's silhouette against the burning lines | – | hum fades |
+
+#### 30.3.4 Titah Pemindah Gunung (`titah_gunung`, K = 90)
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 20 | hero `worm(0.4)` on the jade seal leaving the hand and rising | FL jade | riser_short |
+| 2 | C+20 | 26 | top-down `aerial(h 40)` as the light grid draws cell by cell (EXTRA1 @30) | – | twinkle per row |
+| 3 | C+46 | 24 | `cosmic()` + vista `KUA_E`: between the stooping giants' arms, looking up at the seal | AN gold | hum, gong |
+| 4 | C+70 | 20 | `worm(0.3)` inside the square under the descending seal; its shadow covers the lens; FOV 1.0 → 1.3 | VG dark | riser_long |
+| 5 | K | 30 | IF (gold, violet), hit-stop, then a spiral crane rising **among** the torn cells (EXTRA3): `orbit(A, r 10 → 16, h 2 → 40, 120°)` with `bullet(0.3, 20)` while the slabs turn slowly | IF, SM | silence 6 → sub_boom, rock ×3 |
+| 6 | K+35 (EXTRA4 @125) | 12 | BD cut to OTS as the levitated foes slam down | IF Lembut | punch |
+| 7 | K+47 | 24 | `aerial` looking down into the stepped glowing pit as the slabs drift away | LL violet | hum |
+
+#### 30.3.5 Sword Dao
+
+**Formasi Pedang Zhuxian (`zhuxian_sword_formation`, Abadi, K = 240)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 24 | montage of the four corner swords landing on their plinths (the four bell cues 0/6/12/18), one 6-tick `worm` shot per corner, BD cuts | SM | the spec's bells + clang ×4 |
+| 2 | C+24 | 40 | `aerial(h 8 → 44)` straight up over the centre: the square, the map rails and the four glyphs 誅 戮 陷 絕 light | LL red | riser_long |
+| 3 | K−80 | 50 | `orbit(A, r 22, h 6, 270°)` around the four corners with a `whip` between corners (SM), red sky | SM, FR | whoosh ×3 |
+| 4 | K−30 | 22 | `cosmic()` (red-tinted nebula): looking up at the giant sky sword emerging from the clouds, `dolly(P(sky_sword))` | AN red | hum, riser_short |
+| 5 | K−8 | 8 | `pov(P(sky_sword), back 4, up 1)` down the blade toward the formation centre, FOV 1.35 | SL, SM | whoosh |
+| 6 | K | 30 | IF cut to `worm(0.4)`; `bullet(0.05, 20)` as the four corner swords tilt inward and the shock ring freezes | IF (INV, red, dark) | silence 3 → sub_boom, crunch |
+| 7 | K+30 | 40 | `aerial(h 4 → 30)` reveal: the planted sky sword in the crater, the corner swords fading one by one | LL | hum fades |
+
+**Seni Pedang Hukuman Langit (`heaven_punishing_sword`, Dewa, K = 60, one act)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 20 | `worm(0.3)` looking straight up at the gate (`P(gate)`) opening in the sky, FOV 1.25 | FL white-gold | riser_long |
+| 2 | C+20 | 15 | `dolly(SUBJECT)` as the stun nova's dark ring passes the caster (vertigo) | VG dark, FR | the nova cue |
+| 3 | C+35 | 15 | `cosmic()`: the sword slides out through the gate; `look P(sword)`; slow push | AN, LL | bell |
+| 4 | C+50 | 10 | `crash(0.65, 3)` on the blade tip, then `whip(−70°, 5)` down along the beam's path | SM | whoosh |
+| 5 | K | 30 | lateral tracking beside the travelling beam at 40 b/s, 6 b from its axis, the sword's light ahead; IF on the beam start | IF (INV, white, dark), SL | silence 6 → sub_boom, zap |
+| 6 | K+30 | 40 | `aerial(h 10 → 36)` along the trench to the sword planted at its end | LL | hum |
+
+#### 30.3.6 Lightning Dao
+
+**Formasi Kaisar Petir Kesengsaraan (`tribulation_thunder_emperor_array`, Abadi, K = 198)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 40 | `worm(0.3)` at palace 5 (the centre) looking straight up into the opening whirlpool; roll 0 → 8° | FR | hum_vortex, riser_long |
+| 2 | E0#1-3 | 3 × 8 | strobe: a hard cut on each of the first three strikes to a close shot of the lit palace drum (`P(drum_n)`); each cut under the strike's own flash (BD otherwise) | FR | gong ×3 |
+| 3 | K−60 | 46 | `orbit(S, r 6, h 2, 150°)` around the caster in the array's centre, Dutch 15°, the silhouettes in the storm | AN violet | hum_vortex |
+| 4 | K−14 | 14 | `crash(0.6, 4)` upward into the vortex eye | SL | riser_short |
+| 5 | K | 24 | the 9th strike (EXTRA1): `bullet(0.05, 24)`, `orbit(A, r 10, h 3, 120°)` around the giant bolt frozen mid-strike at peak brightness | IF (INV, violet, white) | silence 3 → sub_boom, zap |
+| 6 | K+24 | 40 | `aerial(h 6 → 40)`: the Luo Shu path burned into the land | LL violet | hum fades |
+
+**Tianzun Guntur Sembilan Langit (`nine_heavens_thunder_venerable`, Dewa, K = 400)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 24 | hero `worm(0.4)` dolly-in on the transforming caster; the black qilin rears behind | FL | riser_short, gong |
+| 2 | C+24 | 56 | "ring tunnel": a spline rising through the nine stacked sky rings (`P(ring_1..9)`, 48 b), each ring centre passing the lens with SM; `cosmic()` at the top: the Nine Heavens vista | SM, AN | riser_long, whoosh ×3, hum |
+| 3 | E0#4 (@320) | 30 | three `whip`s between deities striking (`P(deity_n)`) | SM | whoosh ×3, zap |
+| 4 | K−40 | 40 | slow push on the caster raising the golden whip, FOV 1.0 → 0.8, `shake(RUMBLE)` | VG | hum_vortex |
+| 5 | K | 30 | BD cut to top-down 48 b: the bolt storm strikes everywhere; `bullet(0.05, 16)` | IF (INV, white, violet) | silence 6 → sub_boom |
+| 6 | K+30 | 40 | `worm(0.3)` under the dissolving rings (top-down), looking up | LL | hum fades |
+
+#### 30.3.7 Ice Dao
+
+**Turunnya Phoenix Es (`ice_phoenix_descent`, Abadi, K = 240)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 50 | rising spiral `orbit(P(phoenix), r 14 → 10, h 2 → 18, 200°)` as the phoenix forms from snow and unfolds its wings | AN cyan | riser_long, glass |
+| 2 | C+60 (dive 1) | 20 | `pov(P(phoenix), back 5, up 1.5)` riding its back down onto the densest point, FOV 1.35; BD at the impact | SM, SL | whoosh |
+| 3 | C+80 | 16 | top-down 30 b on the six-fold frost ring blooming | – | glass |
+| 4 | K−50 | 46 | `aerial` wide: the phoenix rising to full wingspan against pale aurora | AN cyan, LL | hum |
+| 5 | K−4 | 4 | `crash(0.6, 4)` into the phoenix's eye (MC eye → the nova ring) | – | riser_short |
+| 6 | K | 30 | `bullet(0.05, 24)`: `orbit(A, r 8, h 4, 100°)` through the frozen shards of the shattered phoenix | IF (white, ice) | silence 3 → sub_boom, glass |
+| 7 | K+30 | 34 | `aerial(h 3 → 26)` pullback over the frost rings and the planted ice quill | LL cyan | hum fades |
+
+**Membekukan Gunung Qi (`freeze_mount_qi`, Dewa, K = 400)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 30 | `dolly(SUBJECT)` as the whiteout floods outward (vertigo), frost on the lens edges | VG ice | riser_long |
+| 2 | C+30 | 50 | `aerial(h 4 → 32)`: the frost crown and the six ice peaks rising one per pulse on the rim | – | rock, glass |
+| 3 | @200 (EXTRA0) | 40 | "freeze frame": hit-stop, then a slow lateral track past the frozen foes in their ice coffins with `bullet(0.1, 30)` | FR, grey grade | glass, silence |
+| 4 | K−40 | 36 | `worm(0.3)` looking up at the cracking ice peaks | – | rock ×2 |
+| 5 | K | 30 | the recall shatter (EXTRA1): `orbit(S, r 10, h 4, 360°)` with `whip`s, the peaks exploding inward | IF (INV, white, ice), SM | silence 6 → sub_boom, glass ×2 |
+| 6 | K+30 | 40 | crane down onto the ice lotus monument in the snowfall | LL white | hum fades |
+
+#### 30.3.8 Space Dao
+
+**Cermin Hampa (`void_mirror`, Abadi, K = the release EXTRA0)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 40 | macro 1.2 b from the mirror face (`P(mirror)`), slow `orbit` 60°: stars drift inside the glass | FL violet | hum |
+| 2 | first EXTRA6 or 7 | 10 | one snap close-up of the ripple on the glass (at most once per cast) | FR | glass |
+| 3 | K | 6 | OTS behind the mirror, `crash(0.6, 3)` along the black beam | IF (INV, violet, black) | silence 3 → zap |
+| 4 | K+6 | 24 | reverse tracking: the camera rushes backward 40 b ahead of the beam, facing the caster, the beam chasing the lens | SL, SM | whoosh, sub_boom |
+| 5 | K+30 | 40 | `aerial` along the strip as the cells lift and break into portal motes | LL violet | hum fades |
+
+**Wilayah Roh Waktu (`time_spirit_domain`, Dewa, K = 160)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 10 | `crash(0.6, 4)` on the caster's eyes as the great clock unfolds behind | FR | riser_short |
+| 2 | C+10 | 110 | "stopped time": the foes are stunned for real (the spec's STUN), the world FX freeze (σ 0): a long `orbit(S, r 12, h 2 → 6, 180°)` through the still battlefield, droplets and shards hanging, grey grade; the clock's hands crawl back | VG grey, GR heavy | the world ducks; hum at pitch 0.5; tick-tock from `twinkle` at pitch 0.5 every 20 ticks |
+| 3 | K−30 | 24 | macro push along the clock hands (`P(clock)`), ticking | – | twinkle |
+| 4 | K−6 | 6 | `dolly(SUBJECT)` | – | riser_short |
+| 5 | K | 20 | time resumes: two `whip`s as every frozen thing snaps forward | IF (grey, INV, white), SM | silence 10 → sub_boom |
+| 6 | K+20 | 36 | pullback to the clock monument | LL | hum fades |
+
+**Lubang Hitam (`stellar_black_hole`, Dewa, K = 120)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 20 | macro on the star igniting, then `crash(0.6, 4)` as it collapses into the core | FL white, FR | riser_short |
+| 2 | C+20 | 50 | in the accretion plane: `orbit(A, r 14, h 0, 90°)` with Dutch 20°, the photon ring's streak | AN orange | hum_vortex |
+| 3 | K−40 | 34 | spiral-in spline toward the core with the debris, accelerating (`EXPO_IN`), FOV 1.0 → 1.4, SM growing | SM, SL | whoosh, riser_long |
+| 4 | K−6 | 6 | BD → `cosmic()`: "inside": stars on every side, the world gone | – | hum (pitch 0.4) |
+| 5 | K | 30 | IF cut out to `aerial` 48 b as the jets fire up and down | IF (black, INV, gold) | silence 6 → sub_boom |
+| 6 | K+30 | 40 | slow pullback; the core shrinks to its hovering monument | LL violet | hum fades |
+
+#### 30.3.9 Fire Dao (props by `FireUltimates`; films wired by F from `ArtModels`) and the Kehancuran crater
+
+**Api Kaisar (`emperor_flame`, Dewa, K = 400)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 30 | macro on the closed bud rising, the glyph 帝 forming above it | FL violet | riser_short |
+| 2 | C+30 | 50 | top-down 30 b turning 90° as the petals unfold ("kaleidoscope") | AN violet | riser_long |
+| 3 | K−60 | 46 | low `orbit(A, r 18, h 1.5, 120°)` through the flame wisps | HZ, LL | hum |
+| 4 | K−14 | 14 | `crash(0.6, 4)` on the heart as the petals fold | – | riser_short |
+| 5 | K | 24 | IF white-out → `worm(0.4)` on the nova's two rings | IF | silence 6 → sub_boom, crunch |
+| 6 | K+24 | 40 | `aerial(h 4 → 36)` over the ring of petal shards | LL | hum fades |
+
+**Murka Langit Sembilan Matahari (`nine_suns_heavens_fury`, Abadi, charge 60, K = 60)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | CHARGE+0 | 30 | `worm(0.3)` looking up as the nine suns kindle one by one; slow pan across them | FL ×9, HZ | twinkle ×9, riser_long |
+| 2 | CHARGE+30 | 30 | chase shot following the golden crow round the middle sun (`P(crow)`) | AN gold | whoosh |
+| 3 | TRAVEL ×3 | 3 × 8 | montage cuts to three of the falling suns' impacts (BD) | SM | crunch ×3 |
+| 4 | K | 24 | `cosmic()` flash of the great sun bursting over the aim, then IF | IF (white, ember, dark) | silence 3 → sub_boom |
+| 5 | K+24 | 40 | `aerial` over the crater field | HZ, LL ember | hum fades |
+
+**Kawah (the Kehancuran crater reveal; Spektakuler variant of D5 (a) CRATER)** for any own cast (or film aftermath)
+that removed ≥ 512 blocks, centre ≤ 16 b away: `aerial(h 6 → 30)` rising over the crater centre looking down at 70°
+(3 s), then `orbit(crater, r 14, h 18, 60°)` (2 s) while debris settles; LL red; `rock`, then `hum`. With Hancur Total
+on and a fluid edge, the shot frames the water walls.
+
+#### 30.3.10 Body Dao
+
+**Wujud Kosmik Langit-Bumi (`cosmic_giant_form`, Abadi, K = 400)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 50 | tilt-up reveal: from `worm(0.3)` at the giant's feet, a crane rising 40 b along its front to its burning eyes | FL gold | riser_long, thud |
+| 2 | PHANTOM#1 | 14 | under the lifted foot: its shadow covers the lens, BD on the stomp (E0#1) | VG dark | thud, punch |
+| 3 | K−60 | 46 | OTS of the giant: behind its shoulder 30 b up, looking down at the field | AN gold | hum |
+| 4 | K | 24 | the kneel punch (EXTRA1): low `bullet(0.05, 20)` orbit 70° around the fist on the ground | IF (gold) | silence 3 → sub_boom, punch |
+| 5 | K+24 | 40 | pullback as the giant dissolves upward into gold dust | LL gold | hum fades |
+
+**Injakan Dewa Kuno (`ancient_god_trample`, Dewa, K = 180)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 20 | macro on the brow: nine dim star marks | FL silver | twinkle |
+| 2 | E0#1-2 | 40 | low tracking dolly beside the footprints, `shake(JOLT)` on each step | – | thud ×2 |
+| 3 | K−30 | 22 | `cosmic()` + vista `SUNGAI_BINTANG`: the god foot forming in the sky tear | AN gold | hum, riser_short |
+| 4 | K−8 | 8 | `worm(0.3)` under the descending foot | VG dark | riser_long |
+| 5 | K | 16 | IF; then `whip(up)` and MC from the crater ring to the 9th star mark on the brow | IF (gold, silver), SM | silence 6 → sub_boom, punch |
+| 6 | K+16 | 40 | `aerial(h 4 → 34)`: the nine footprints joined by the silver line | LL | hum fades |
+
+#### 30.3.11 Life Dao
+
+**Embun Manis Guanyin (`guanyin_sweet_dew`, Abadi, K = 200; gentle: no shake, Lembut frames only)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 50 | slow crane beside the floating vase on its lotus seat | LL white | bell (soft) |
+| 2 | C+60 | 30 | macro on the willow sprig flicking dew: `bullet(0.1, 20)` on the drops | FL | twinkle |
+| 3 | K−40 | 36 | top-down 24 b over the healing circle and its dew rings | – | hum (pitch 1.2) |
+| 4 | K | 30 | low angle through the arc of the pour (EXTRA0): a rainbow light leak | LL rainbow | bell |
+| 5 | K+30 | 30 | pullback; the vase lingers | – | – |
+
+**Wilayah Hidup dan Mati (`life_death_domain`, Abadi, K = 400)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 40 | top-down 30 b turning 60° as the split disc unfolds (half green, half grey) | – | riser_long |
+| 2 | C+40 | 40 | the camera on the dividing line, roll 0 → 15°: half the frame life, half death | GR | hum |
+| 3 | K−60 | 50 | tracking along the soul river, following one soul lantern (`P(lantern_0)`) | LL teal | twinkle |
+| 4 | K | 20 | the disc flips (EXTRA0): `whip(180°, 6)` across the dividing line, green to grey | IF (grey, green), SM | silence 4 → sub_boom |
+| 5 | K+20 | 40 | macro on the half-withered lotus monument | – | hum fades |
+
+**Pohon Kuno Bodhisattva (`bodhisattva_tree`, Dewa, K = 600)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 60 | time-lapse growth: the camera rises with the trunk, crane 30 b, the canopy tiers opening | LL green-gold | riser_long |
+| 2 | E0#1 (@100) | 30 | top-down 30 b as the first root arm extends (the ROOTS sigil) | – | rock |
+| 3 | K−80 | 56 | fly-through: a spline through the three canopy tiers, leaves smearing past, god rays | SM, AN gold | whoosh ×2 |
+| 4 | K−24 | 20 | `cosmic()` + vista `POHON_CAHAYA` above the canopy | FL | hum, bell |
+| 5 | K | 24 | `bullet(0.05, 20)` as the fruits burst into light (EXTRA1) | IF (soft gold) | silence 4 → sub_boom, bell |
+| 6 | K+24 | 40 | pullback to the bodhi sapling | LL | hum fades |
+
+#### 30.3.12 Shadow Dao
+
+**Segel Harimau Alam Baka (`stygian_tiger_seal`, Abadi, K = 100)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 24 | macro on the flute and its red tassel, Dutch 15°, as the tiger tally rises and splits | VG red-black, GR heavy | riser_short |
+| 2 | C+24 | 40 | `worm(0.2)` as the corpses claw out of the ground around the caster | FR | thud ×2 |
+| 3 | K | 16 | `whip` between the two tally halves as they clap together (the nova) | SM | punch, bell (pitch 0.5) |
+| 4 | K+16 | 30 | pullback | – | – |
+
+**Teknik Pusaka Kunpeng (`kunpeng_art`, Dewa, charge 20, K = the release)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | CHARGE+0 | 20 | `cosmic()` + vista `LAUT_UTARA`: at cloud-sea level the Kun breaches and turns into the Peng; `crash(0.7, 4)` at the turn | AN white | riser_long, whoosh |
+| 2 | K | 10 | `pov(S, back 1, up 1.4)`: riding on the Peng's head with the dash (the subject's motion is not counted), FOV 1.4 | SL, SM | whoosh |
+| 3 | K+10 | 30 | `aerial` wide behind as the wake erupts and feathers drift (EXTRA0) | IF Lembut, LL | crunch, hum |
+| 4 | K+40 | 24 | pullback | – | – |
+
+**Wilayah Karma (`karma_domain`)**: no film. It is disciple-only and the master's view of it is never a camera
+(28.12); U2 still gives it props and choreography (30.4).
+
+#### 30.3.13 Immortal arts (no Dao)
+
+**Segel Kesembilan (`ninth_hex`, Abadi, K = the channel's end, ≤ 160)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 40 | top-down 26 b turning 45° as the first pillars rise on the octagram points | – | bell |
+| 2 | K−40 | 30 | slow `orbit(S, r 10, h 1.2, 60°)` inside the domain among the sealed foes, grey grade | VG grey | hum |
+| 3 | K−10 | 10 | `cosmic()`: looking up at the descending octagram seal | FL | riser_short |
+| 4 | K | 8 | `pov(P(seal), back 0, up −1)`: just under the seal looking down as the ground rushes up | SL | whoosh |
+| 5 | K+8 | 40 | IF, then `aerial` over the stamped seal | IF (white, gold) | silence 3 → sub_boom, bell |
+
+**Gunung Lima Unsur (`five_elements_mountain`, Abadi, K = 40)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 25 | `worm(0.3)` looking up as the clouds part and the palm descends, FOV 1.35 | FL gold | riser_long |
+| 2 | C+25 | 15 | `dolly(A)` on the targets under the growing shadow | VG dark | riser_short |
+| 3 | K | 30 | IF, then five `whip`s from peak to peak as the five-element mountains rise in generating order | IF (gold), SM | gong ×5 |
+| 4 | K+30 | 40 | `aerial(h 6 → 34)`: the Wuxing star, the talisman descending onto the circle | LL gold | bell, hum fades |
+
+**Diagram Taiji (`tai_chi_diagram`, Abadi, K = the release TRAVEL)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | CHARGE+0 | 30 | top-down macro on the yin-yang and bagua ring spinning between the palms | – | hum |
+| 2 | K | 24 | follow-cam behind the flying disc as it unrolls into the black-and-white bridge planks ahead | SL | whoosh |
+| 3 | K+24 | 30 | lateral wide along the twin bands, the cells flipping | AN white | twinkle |
+| 4 | K+54 | 30 | the disc stands upright; MC from its circle to the sun of a short `cosmic()` sky | LL | bell |
+
+**Langkah Penginjak Langit (`heaven_trampling`, Dewa, K = 30)**
+
+| # | when | len | shot | lens | sound |
+|---|---|---|---|---|---|
+| 1 | C+0 | 27 | `orbit(S, r 6, h 1, 180°)` climbing with the caster through the nine steps (subject motion not counted), a ring node lit per step | SL | thud ×9 (rising pitch) |
+| 2 | C+27 | 3 | `cosmic()` beat at the apex: the caster against the star river | AN | hum |
+| 3 | K | 12 | `whip(down)` from the caster to the aim, `crash(0.6, 3)` | IF (INV, white, gold), SM | silence 6 → sub_boom |
+| 4 | K+12 | 40 | `aerial` over the three waves (EXTRA0 ×3) | LL | crunch ×3 |
+
+#### 30.3.14 Own arts (`own_art_1..3`, Dewa; one film template "ciptaan")
+
+Built at the CAST from the stored composition (the Daos and form order the server sent; `client/batin/CiptaanFx` is
+read only): shot 1 hero `worm(0.4)` in the first Dao's colour (LL Dao); then up to three form shots chosen by the
+form phases in order: CUT → `whip` along the cut; BURST → `crash`; RAIN → `worm` looking up; WAVE → lateral track;
+DOMAIN → top-down turning; SEAL → macro on the seal; the climax EXTRA1 → IF in the Dao colours + `aerial` pullback.
+Vista `BY_DAO` for one `cosmic()` beat when the composition is longer than 80 ticks. ≤ 6 shots.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 30.4 New 3D props and choreography (modules U1 and U2)
+
+#### 30.4.1 Rules for every new prop set (the `FireUltimates` quality bar)
+
+- **Ours only:** cuboid item models generated by Python under `tools/` with `tools/png.py`; procedural textures; no
+  download, no Kenney texture on a model. Anchor (8, 8, 8); front faces north; element coordinates within −16..32; uv
+  within 0..16; an element rotation is one axis by a multiple of 22.5° within −45..45 (the generator's `validate()`
+  refuses anything else, as `gen_fire_ultimate_models.py` does). Each texture is checked with the Read tool.
+- Files: `assets/kultivator/models/item/fx/<id>.json`, `items/fx/<id>.json`, `textures/item/fx/<id>*.png`. Each
+  module writes its own id list (`tools/fx_model_ids_ua.txt`, `tools/fx_model_ids_ub.txt`) and never rewrites
+  `tools/fx_model_ids.txt` (owned by the older generators).
+- **Choreography:** one clock per driver (client ticks, paused with the game, held by hit-stop and bullet time through
+  `EpicClock.frozen()` / σ, like `FireUltimates`), timed beats on the server's events, clear beats **build-up, release,
+  impact, aftermath**. Deterministic: positions and counts come from the event and its seed; **no random size change**:
+  props grow in once (GROW), unfold or fold by eased TILT, turn at a steady SPIN or REVOLVE, breathe by light
+  (`lightCycle`, `lightTo`), never by scale, and leave by one fade (`end`) or one SHATTER / DISSOLVE.
+- Every prop through `ModelFx` (its per-tick and alive caps; `FxLayer.Priority.CORE` for identity props, `DETAIL` for
+  extras), every display transform through `DisplayKey`, every particle through `FxBudget`. ItemStacks only through
+  `ModelFx.stack(id)` at show time (lazy).
+- Quality: **Minimal** keeps the identity prop of each beat (the one prop named first in each table) and plain
+  particles; **Normal** the full set at the counts given; **Maximal** the counts marked "Max". Others' casts follow
+  "Efek pemain lain" (`othersScale() < 0.5`: no props, as `ArtModels` today).
+- **Spec edits are fx-only**: the driver replaces the spec's own `model(...)` layers of that ultimate (they are removed
+  from its `.fx(...)` lines so nothing is drawn twice); every particle, flash, shake, sky, glyph, sound, `.step`,
+  `.dampak`, `.kehancuran`, Sumber, number and monument row stays untouched.
+- Each driver reports props to the film (`FilmDirector.track(casterId, key, track)`) under the keys of 30.3.
+
+Model sizes below are in display scale (1 = 16 px = 1 block at the model's full 16-px extent). "Parts" are separate
+models moved by the driver (or `FxModels.Part` children for wings, hands and hoops).
+
+#### 30.4.2 U1 · Sword Dao
+
+**`zhuxian_sword_formation`** (prefix `zx_`; K 240; events: CAST field, PULSE /20, corner pillars at 40, 80 … 200,
+EXTRA0 @240)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `zx_sword_zhu`, `zx_sword_lu`, `zx_sword_xian`, `zx_sword_jue` | the four formation swords: a long blade with a raised fuller and a 1-px edge bevel, a beast-mouth guard (two tilted 22.5° wings), a wrapped grip of alternating bands, a ring pommel and a hanging tassel part | 誅 crimson `B0102A`/white edge; 戮 jade `6CFF8A`; 陷 frost `9FF3FF`; 絕 violet `B57CFF`; all with a dark steel spine `2A2A33` | 8 |
+| `zx_plinth` | an octagonal stone plinth (stacked cuboids turned 22.5°/45°), a glyph plate on its front and a socket for the sword | grey stone `7D7566`, gold trim `FFD54A` | 3 |
+| `zx_map` | the formation diagram laid flat: four nested square rails, corner nodes and a centre seal disc (FLAT ground prop) | red-black lacquer `400010`, glowing rails `FF3A4A` | 34 (side) |
+| `zx_sky_sword` | the 24-b sword from the clouds: seven blade segments with alternating rune studs, a cloud-scroll guard, a long grip, a pommel with a red jewel | white steel `E8ECF4`, crimson `B0102A`, gold `FFD54A` | 24 |
+| `zx_seam` | a thin 48-px light bar with soft ends, for the lines joining the swords | `FF6A6A` core, transparent rim | 32 (length) |
+
+- **Build-up (0-30):** the plinths RISE (depth 3, 10 t) at the four corners; the swords FALL point-down from 30 b onto
+  them at 0/6/12/18 (each with the spec's bell, a STAMP and a small ring); the map unfolds from TILT 45° to 0 over 20 t;
+  seams grow along the four sides (GROW 0.1 → 1 over 8 t each, in turn).
+- **Field (30-230):** each PULSE runs a light wave around the seams (`lightTo` 15 then back, a quarter side per 5 t);
+  each corner pillar step lifts that corner's sword 2 b (SLIDE, easeOut 6 t) and slams it back (FALL 2 b, 3 t, STAMP)
+  with a shock ring; swords breathe by light out of phase.
+- **Release (K−20):** the four swords TILT 45° inward; the sky sword appears 40 b over the centre (GROW 0.3 → 1, 10 t),
+  point down; seams flare.
+- **Impact (K):** the sky sword FALLs 40 b in 10 t (easeInQuad), STAMP, a double ring (the Phase 10 `ShockRing` draws
+  it), the map SHATTERs.
+- **Aftermath:** the corner swords end one by one (fade 6, 6 t apart); the sky sword stays 2 s then hands over to the
+  Dampak monument (`zhuxian_sword`, PLANTED) by a 6-tick crossfade.
+- Tracks: `corner_0..3`, `sky_sword`. Spec edit: drop the three `model("zhuxian_sword")` layers (CAST, IMPACT, EXTRA0).
+
+**`heaven_punishing_sword`** (prefix `hps_`; K 60; CAST: the sky sword falls 40 b over 60 t; @20 stun nova, @40 nova;
+TRAVEL @60 the 128-b beam)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `hps_sword` | the punishing sword: a broad blade with three inlaid rune plates (raised 1 px), a winged double guard, a long grip, a gold pommel with a sun disc | white-gold `FFF1C0`, gold `FFD54A`, violet edge glow `C7A2FF` | 24 |
+| `hps_gate` | Nantianmen in the sky: two pillars with cloud capitals, a double-eaved roof beam, a name plaque; parts `hps_gate_door_l/_r` (each door a framed panel with studs) | red lacquer `B0201A`, gold `FFD54A`, jade roof `5FD6A0` | 20 |
+| `hps_halo` | a vertical ring of 12 rune segments behind the sword | white `FFFFFF`, gold `FFE88A` | 10 |
+| `hps_chain` | a falling chain of law: four links and a seal weight | gold `FFF1C0` | 2 |
+
+- **Build-up (0-20):** the gate GROWs 0.3 → 1 (12 t) 40 b over the aim; the doors open by turning ±45° about their
+  hinges (`rotateTo`, 16 t, smoothstep).
+- **Stun nova (@20):** eight chains FALL from the gate onto the eight strongest targets (or ring points), 8 t, each with
+  a STAMP; they DISSOLVE after 30 t.
+- **Draw (@20-60):** the sword slides out of the gate point-down (SLIDE 10 b, easeOut, 20 t) with the halo SPIN 2°/t
+  behind its guard; at @40 the halo flashes (`lightTo` 15) with the second nova.
+- **Release (@60, TRAVEL):** the sword TILTs to the beam's axis (6 t) and SLIDEs 128 b along the beam (linear, the
+  beam's travel time), the halo trailing then ending (fade 8).
+- **Impact / aftermath:** at the beam's end the sword plants (STAMP, angle 10° toward the caster) and crossfades to the
+  Dampak monument; the gate's doors close (16 t) and it ends (fade 12).
+- Tracks: `gate`, `sword`. Spec edit: drop both `model("heaven_punishing_sword")` layers (CAST, TRAVEL).
+
+#### 30.4.3 U1 · Lightning Dao
+
+**`tribulation_thunder_emperor_array`** (prefix `tte_`; K 198; strikes EXTRA0 at 22 + 22n, the 9th EXTRA1 @198)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `tte_drum` | a palace war drum: red hide faces, a ring of gold studs, a carved frame on three cloud feet; variant `tte_drum_lit` with glowing hide | red `B0201A`, gold `FFD54A`, lit violet `E8D8FF` | 3 |
+| `tte_grid` | the Luo Shu grid laid flat: a 3×3 frame, number pips (1-9 dots) in each cell, a rim of cloud scrolls | dark bronze `3A2A50`, violet glow `B57CFF` | 20 (side) |
+| `tte_bolt` | a jagged bolt segment: five zigzag cuboids (±22.5°) with a bright core and a halo shell | white `F0E8FF`, violet `B57CFF` | 6 (Max 2 per strike) |
+| `tte_vortex_rim` | one arc of the tribulation whirlpool: cloud lumps on a ring segment (8 make the ring) | storm grey `4A4660`, violet underglow | 16 |
+
+- **Build-up (0-22):** the grid unfolds under the aim (TILT 90° → 0, 14 t); the eight rim arcs GROW and REVOLVE 1°/t 30 b
+  above; the drums RISE on the nine palaces in Luo Shu order (4 9 2 / 3 5 7 / 8 1 6), one per 2 t.
+- **Strikes (E0#1-8):** the drum of the next palace swaps to `tte_drum_lit` and gives a light PULSE; a bolt FALLs from
+  the rim onto it (4 t) and ends (fade 3); the grid cell lights.
+- **Release (K−10):** every drum SWINGs ±8° once (a beat); the rim's REVOLVE speeds to 3°/t.
+- **Impact (K, EXTRA1):** a 3× bolt (`tte_bolt` at 18) onto palace 5; all drums lit; the grid flashes and SHATTERs 6 t
+  later.
+- **Aftermath:** drums sink (RISE in reverse via SLIDE −2 b, 10 t) and end; the rim dissolves arc by arc.
+- Tracks: `drum_1..9`, `rim`. Spec edit: none (it authors no model layer).
+
+**`nine_heavens_thunder_venerable`** (prefix `nhtv_`; K 400; summons, novas EXTRA0 @80/160/240/320, EXTRA1 @400)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `nhtv_ring` | one of the Nine Heavens: a sky ring of cloud lumps on a gold band with nine rune studs; variant `nhtv_ring_lit` | cloud `E8ECF4`, gold `FFD54A`, lit violet | 14 |
+| `nhtv_qilin` | a rearing black qilin behind the caster (design: the mount of the Thunder Venerable): body, maned head with antlers, flame-tufted legs, tail part `nhtv_qilin_tail` (SWING) | ink black `1A1A22`, violet flame `B57CFF`, gold eyes | 6 |
+| `nhtv_whip` | a gold rod whip (segmented, 6 knuckles) held in the caster's hand | gold `FFD54A`, white glint | 1.4 |
+| `nhtv_deity` | a thunder deity: armoured torso, bird-beaked mask, small wings, part `nhtv_deity_hammer` (SWING) | slate `5A5A70`, violet `C7A2FF`, gold | 2.5 (on each summon, ≤ 8, Minimal 0) |
+
+- **Build-up (0-80):** the qilin RISEs behind the caster (12 t) and rears (TILT −22.5°, 10 t); the whip appears in the
+  hand (GROW 6 t); the nine rings appear stacked 8-40 b above the caster one by one every 8 t (GROW 0.4 → 1).
+- **Field:** each nova (E0#n) lights two rings (`nhtv_ring_lit`) and the deities' hammers SWING once on their PHANTOM
+  strikes; the rings REVOLVE in alternating directions, 0.5°/t.
+- **Release (K−20):** all rings lit and speeding to 2°/t; the qilin's tail lashes (SWING ±30°, period 10).
+- **Impact (K, EXTRA1):** the whip comes down (TILT 45°, 4 t); every ring flashes; deity props SHATTER.
+- **Aftermath:** the rings end top-down 4 t apart; the qilin DISSOLVEs.
+- Tracks: `ring_1..9`, `deity_1..8`, `qilin`. Spec edit: none.
+
+#### 30.4.4 U1 · Ice Dao
+
+**`ice_phoenix_descent`** (prefix `ipd_`; K 240; dives at 60/120/180 as TRAVEL pre-impact + IMPACT; EXTRA0 @240)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `ipd_phoenix` | a detailed ice phoenix: a crest of five quills, a long arched neck, a beak with a frost glint; parts `ipd_wing_l/_r` (three feather rows, FLAP) and `ipd_tail` (seven long tail feathers, SWING) | ice `BFF6FF`, white `FFFFFF`, deep blue shadow `5A8AD8` | 10 |
+| `ipd_quill` | a frost quill projectile (shaft, vane, a glowing tip) | white-blue | 1.5 |
+| `ipd_hexring` | a flat six-fold frost ring (six arms of three crystal cuboids each) | `DFF6FF` | 6 |
+
+- **Build-up (0-60):** the phoenix GROWs from 0.3 in a snow swirl over 30 t, wings unfolding (TILT 45 → 0) and FLAPping
+  slowly (20° / 40 t); it REVOLVEs 1°/t, r 14, 18 b up.
+- **Dives (each TRAVEL):** wings fold (TILT 30°, 4 t), it SLIDEs onto the densest point (easeIn, the travel ticks);
+  on IMPACT a hexring GROWs flat, 4-6 quills THRUST out; the phoenix climbs back (SLIDE, easeOut, 16 t).
+- **Release (K−20):** it rises 10 b over the caster and spreads to full span (TILT −22.5°), wings held.
+- **Impact (K, EXTRA0):** the phoenix SHATTERs into its own ice shards; three hexrings at once.
+- **Aftermath:** hexrings fade 20 t apart; the quill monument (`ice_spear`) stays (Dampak).
+- Tracks: `phoenix`. Spec edit: drop `model("ice_phoenix")` (TRAVEL).
+
+**`freeze_mount_qi`** (prefix `fmq_`; K 400; pulses /40; EXTRA0 @200 mass freeze; EXTRA1 @400 recall shatter)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `fmq_peak` | a crystal mountain: a faceted core spire with four shoulder crystals tilted 22.5°, a cracked base; variant `fmq_peak_cracked` | ice `9FF3FF`, white rim, blue core `3A6AC8` | 8 |
+| `fmq_crown` | a ring of icicles standing round the caster (12 spikes on a frost band) | white-blue | 3 |
+| `fmq_coffin` | an ice coffin: a block with bevelled edges and inner crack lines, room for a mob | `CFEFFF` α 0.6 | sized to the target's box (≤ 8 shown) |
+| `fmq_flake` | a flat 6-arm snowflake sigil | white | 4 |
+
+- **Build-up (0-40):** the crown RISEs round the caster; the whiteout mist (spec) floods.
+- **Field:** each PULSE raises one peak on the domain rim at the six hex points (RISE depth 6, 16 t) until six stand.
+- **Mass freeze (@200):** a flake flashes under each frozen foe (≤ 8, Max 16) and a coffin GROWs round it (6 t).
+- **Release (K−20):** peaks swap to the cracked variant one by one (3 t apart).
+- **Impact (K):** peaks and coffins SHATTER toward the caster (inward), the crown too.
+- **Aftermath:** snowfall continues; the ice lotus monument (Dampak) stands.
+- Tracks: `peak_1..6`. Spec edit: none (the HIT `giantBlock(ICE)` particle-layer stays; coffins are drawn only when
+  that layer's display is refused or at Maximal).
+
+#### 30.4.5 U1 · Space Dao
+
+**`void_mirror`** (prefix `vm_`; stage 1 200 t; EXTRA6/7 hits; EXTRA0 the release beam)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `vm_mirror` | the Void mirror: an octagonal bronze frame of 8 tilted segments, the face as a dark glass plate with star specks in its texture, a back knob with a cord, eight trigram studs; variant `vm_mirror_ripple` | bronze `A86A32`, void glass `140A28`, violet `7A4AFF` | 4 |
+| `vm_rune_ring` | an outer ring of rune plates turning round the mirror | violet `C8B8FF` | 6 |
+| `vm_shard` | a black glass shard (stored blows) | `08060C` with violet edge | 0.6 |
+
+- **Build-up:** the mirror rises from the palm (SLIDE 1.5 b up, 8 t) to face forward; the rune ring GROWs and SPINs
+  1.5°/t.
+- **Field (stage 1):** each EXTRA6/7 swaps the face to the ripple variant for 3 t and adds one orbiting shard (ORBIT r
+  1.6, ≤ 6 shards, Max 12) — the stored blows made visible.
+- **Release (EXTRA0):** the mirror TILTs to the aim; the ring SPINs 8°/t; the shards SLIDE into the face (4 t); the
+  spec's black laser fires; the mirror recoils (SLIDE −0.6 b, 3 t, back 6 t).
+- **Aftermath:** the ring ends; the mirror hovers as the Dampak monument (`void_mirror`, HOVER) by crossfade.
+- Tracks: `mirror`. Spec edit: drop the `model("void_mirror")` CAST layer.
+
+**`time_spirit_domain`** (prefix `tsd_`; K 160 = `TimeBank.DURATION`; EXTRA0 the release; EXTRA1 per stored hit)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `tsd_clock` | the great clock: a rim with 12 hour studs, an inner ring of minute bars, visible gear teeth at the rim; parts `tsd_hand_long`, `tsd_hand_short` | antique gold `F2C24A`, ivory face `FFF4C8`, ink hands `2A2A33` | 8 |
+| `tsd_gear_l`, `tsd_gear_s` | two gear wheels (16 and 10 teeth as tilted cuboids) | brass `C8A040` | 3 / 1.5 |
+| `tsd_hourglass` | an hourglass: two glass bulbs (stepped cuboids), a wooden frame, a sand column part | wood `8A5A2A`, glass `E0E8FF` α 0.5, sand `F0D080` | 2 |
+| `tsd_drop` | a suspended droplet | `C8D8FF` | 0.4 |
+
+- **Build-up (0-10):** the clock unfolds behind and above the caster (TILT 90° → 0, 10 t); gears GROW and spin up.
+- **Stopped time (10-150):** at 10 the gears and the sand **stop dead** (SPIN 0); droplets (≤ 12, Max 24) hang around the
+  stunned foes; the long hand crawls **backwards** (−0.5°/t) and the short hand −0.04°/t; light breathing only.
+- **Release (K−10):** the hourglass flips (`rotateTo` 180° over 8 t; the 22.5° rule binds model elements only, a
+  display's rotation is free).
+- **Impact (K):** the hands spin forward twelve turns in 10 t; the gears burst outward (SLIDE 6 b, fade); droplets
+  fall (FALL 2 b).
+- **Aftermath:** the clock stands as the Dampak monument (`time_clock`) by crossfade.
+- Tracks: `clock`. Spec edit: drop the `model("time_clock")` CAST layer.
+
+**`stellar_black_hole`** (prefix `sbh_`; K 120; pulses /10; EXTRA0 @120 collapse)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `sbh_star` | a bright young star: a stepped sphere with a corona shell | white `FFFFF0`, gold `FFD54A` | 3 |
+| `sbh_core` | the black core: a stepped sphere, matte black, with a thin bright **photon ring** part `sbh_photon_ring` standing vertical | `08060C`, photon ring `FFF0C0` | 4 |
+| `sbh_disk` | the accretion disc: 16 tilted plates in a ring, the approaching side brighter (texture gradient) | orange `FF8A20` → violet `7A3AC8`, hot inner `FFF0C0` | 10 |
+| `sbh_jet` | a polar jet: a long tapering column of light | blue-white `C8E0FF` | 12 |
+| `sbh_debris` | a spiralling rock chunk (stone texture) | `5A5048` lit orange rim | 0.8 |
+
+- **Build-up (0-20):** the star GROWs at the aim, then FLATTENs and SHRINKs into the core (the collapse) at 16; the core
+  GROWs; the disc unfolds (TILT 90° → 10°) and SPINs 3°/t.
+- **Field:** each PULSE adds debris that REVOLVE inward (b shrinking radius by SLIDE) and dissolves at the core; the
+  disc's SPIN steps up 0.5°/t per pulse (to 9°/t).
+- **Release (K−10):** the disc FLATTENs; the photon ring flares.
+- **Impact (K, EXTRA0):** two jets GROW up and down (6 t), the disc SHATTERs, the core PULSEs once.
+- **Aftermath:** jets end (fade 10); the core shrinks to the Dampak monument (`black_hole_core`, 1.0) by crossfade.
+- Tracks: `core`, `disk`. Spec edit: drop the `model("black_hole_core")` and `model("accretion_segment")` CAST layers
+  (the glass `petalRing` particle-layer stays).
+
+#### 30.4.6 U2 · Body Dao
+
+**`cosmic_giant_form`** (prefix `cgf_`; K 400; PHANTOM pre-impact warnings, EXTRA0 stomps every 50; EXTRA1 @400)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `cgf_giant` | the cosmic avatar's torso and head: a crowned head with burning eyes, broad shoulders, a sash; parts `cgf_arm_l/_r` (upper arm, forearm, fist), `cgf_leg_l/_r` (thigh, shin, foot with toes) | weathered gold-stone `C8A040`, gold `FFD54A`, star-speck sash `3A3A8A` | 12 (≈ 36-40 b tall) |
+| `cgf_footprint` | a flat footprint glyph | gold `FFE88A` | 4 |
+
+- **Build-up (0-40):** the giant RISEs from the ground behind the caster (depth 30, 40 t, easeOutCubic); the eyes ignite
+  (`lightTo` 15).
+- **Stomps:** on each PHANTOM pre-impact the target leg lifts (TILT −30°, 8 t) and a footprint glyph GROWs at the target;
+  on its EXTRA0 the leg comes down (TILT back, 2 t), STAMP, ring.
+- **Release (K−20):** the giant kneels (legs TILT, torso SLIDE −8 b) and raises the right fist (TILT −45°).
+- **Impact (K, EXTRA1):** the fist slams (TILT 45° in 3 t), STAMP, ring.
+- **Aftermath:** the giant DISSOLVEs upward from the feet (three parts, 6 t apart).
+- Tracks: `giant`, `foot_l`, `foot_r`. Spec edit: none (it authors no model layer; the `avatar(...)` particle-layer
+  stays as the Minimal stand-in).
+
+**`ancient_god_trample`** (prefix `agt_`; K 180; EXTRA0 steps at 20 + 20n; EXTRA1 @180)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `agt_foot` | an ancient god's foot: bronze skin, toe rings, a nine-star tattoo on the instep | bronze `A86A32`, silver stars `C8C8D8` | 10 |
+| `agt_brow_star` | one small silver star (nine of them on the caster's brow) | `E8ECF4` | 0.15 |
+| `agt_glyph` | a flat footprint glyph with a star in the heel | dark gold `8A6A20` | 4 |
+
+- **Build-up:** nine brow stars appear dim on the caster (follow, offset above the eyes).
+- **Steps (E0#n):** 10 t before each step (the spec's timing) a glyph GROWs 8 b ahead; on the step the foot FALLs 12 b
+  (4 t), STAMP, cracks; one more brow star lights (`lightTo` 15).
+- **Release (K−20):** a 3× foot (scale 30) forms in the sky tear 40 b up (GROW 0.3 → 1, 16 t), sole down.
+- **Impact (K):** it FALLs (8 t), STAMP; the glyphs join by a silver line (the spec's sigil); all nine brow stars flash.
+- **Aftermath:** the big foot stays pressed in the crater and crossfades to the Dampak monument (`god_foot`, FLAT).
+- Tracks: `foot`, `sky_foot`, `brow`. Spec edit: drop the `model("god_foot")` EXTRA0 layer.
+
+#### 30.4.7 U2 · Life Dao
+
+**`guanyin_sweet_dew`** (prefix `gsd_`; K 200; pulses /20; EXTRA0 @200)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `gsd_vase` | the white-jade vase: a lotus-petal lip, three neck bands, a rounded body with a faint cloud pattern; part `gsd_willow` (a sprig of seven leaves, SWING) | jade-white `EEF2F8`, pale cyan `9FF3FF`, willow `3FAE3A` | 4 |
+| `gsd_seat` | a floating lotus seat (two petal rings tilted 22.5°/45°) | pink `FF9EC8`, white | 3 |
+| `gsd_drop` | a glowing dew drop | `E8F8FF` | 0.4 |
+
+- **Build-up:** the seat RISEs 8 b over the caster; the vase GROWs on it; the willow GROWs in the vase.
+- **Field:** each PULSE the willow flicks (SWING 30°, one sweep) and a ring of 6 drops (Max 12) FALLs 7 b onto the field.
+- **Release (K−10):** the vase TILTs 45° forward.
+- **Impact (K, EXTRA0):** a pour arc of drops (a SLIDE chain of 8 drops along an arc) and a bloom ring.
+- **Aftermath:** the seat folds (TILT) and ends; the vase hovers as the Dampak monument.
+- Tracks: `vase`. Spec edit: drop the `model("guanyin_vase")` and `model("willow_sprig")` CAST layers.
+
+**`life_death_domain`** (prefix `ldd_`; K 400; pulses /20; EXTRA0 @400)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `ldd_disc` | the life-death diagram laid flat: one half green with sprouting leaves, one half ash grey with bones, a dividing ribbon | green `9AE05A`, ash `A0A0A0`, ribbon white | 20 |
+| `ldd_lantern` | a soul lantern (paper body, wire ribs, a blue soul flame) | paper `E8E0C8`, soul blue `80C0FF` | 0.8 |
+| `ldd_lotus` | a half-blooming, half-withered lotus | `9AE05A` / `707070` | 3 |
+
+- **Build-up (0-30):** the disc unfolds under the caster (TILT 90° → 0); it SPINs 0.3°/t.
+- **Field:** lanterns (≤ 8, Max 16) drift along a river path round the rim (REVOLVE 0.6°/t); each PULSE they flicker.
+- **Release (K−10):** the disc's SPIN stops.
+- **Impact (K):** the disc flips (`rotateTo` roll 180° over 6 t), shell; lanterns rise and end.
+- **Aftermath:** the lotus grows at the centre (GROW 12 t) and crossfades to the Dampak monument (`tang_lotus`).
+- Tracks: `disc`, `lantern_0..7`. Spec edit: none.
+
+**`bodhisattva_tree`** (prefix `bt_`; K 600; pulses /20; EXTRA0 novas @100 ×5; EXTRA1 @600)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `bt_trunk` | a twisted ancient trunk with root flare and bark ridges | bark `5A3A20`, moss `3FAE3A` | 12 |
+| `bt_canopy_1`, `_2`, `_3` | three canopy tiers (each a ring of leaf masses) | leaf `3FAE3A` → gold tips `FFD54A` | 12 |
+| `bt_root` | a root arm crawling along the ground (five segments) | bark, glowing veins `9AE05A` | 6 |
+| `bt_fruit` | a glowing bodhi fruit | gold `FFF0A0` | 0.6 |
+
+- **Build-up (0-40):** the trunk RISEs (depth 12, 30 t); the canopy tiers GROW one by one (8 t apart); fruits hang (≤ 9).
+- **Field:** each nova (E0#n) a new root arm GROWs outward along one of five directions (the ROOTS sigil) and one fruit
+  lights; the canopy breathes by light.
+- **Release (K−20):** every fruit at full light; leaves drift.
+- **Impact (K, EXTRA1):** the fruits SHATTER into light; the canopy flashes.
+- **Aftermath:** the canopy tiers end top-down; the trunk DISSOLVEs; the sapling monument (Dampak `bodhi_tree`, 3.0).
+- Tracks: `tree`, `canopy`. Spec edit: drop the `model("bodhi_tree")` CAST layer.
+
+#### 30.4.8 U2 · Shadow Dao
+
+**`stygian_tiger_seal`** (prefix `sts_`; K 100; summons; novas at 100 + 100n)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `sts_tally` | the tiger tally: a crouching tiger on a black iron base; parts `sts_tally_l/_r` (the two halves) | black iron `2A2A33`, ember `FF6A2A`, blood red `802030` | 1.2 |
+| `sts_flute` | a black flute with a red tassel at the caster's mouth | black `1A1A22`, red `C0201A` | 0.8 |
+
+- **Build-up:** the flute appears at the mouth (follow); the tally rises from the hand and splits into its halves
+  (SLIDE ±0.6 b), which ORBIT the caster (r 1.4).
+- **Each nova:** the halves clap together (SLIDE in, 3 t), a resentment ring, then part again.
+- **Aftermath (END):** the halves rejoin and sink into the hand (SLIDE, fade).
+- Tracks: `tally`. Spec edit: drop the `model("yin_tiger_seal")` CAST layer.
+
+**`kunpeng_art`** (prefix `kp_`; charge 20; TRAVEL the dash; EXTRA0 the wave at the end)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `kp_kun` | the Kun: a vast fish body in five segments, whiskers, fins | deep sea `1A2A4A`, silver belly `C8D8E8` | 16 |
+| `kp_peng` | the Peng: a great bird body; parts `kp_wing_l/_r` (five feather rows each, FLAP) and `kp_tail` | storm blue `3A5A9A`, white `E8F0FF` | 20 |
+| `kp_crescent` | a wind crescent | white α 0.6 | 3 |
+
+- **Build-up (CHARGE 0-20):** the Kun RISEs out of a cloud sea above-behind the caster (14 t), turns once (`rotateTo`),
+  and at 16 swaps into the Peng (a 2-tick crossfade under the spec's wings particles).
+- **Release (TRAVEL):** the Peng follows the caster above-behind (follow), wings sweeping forward (FLAP 22°/10 t, two
+  beats); crescents THRUST off the wingtips (≤ 4).
+- **Impact (EXTRA0):** one great flap (TILT −45° then back); wave.
+- **Aftermath:** the Peng climbs away and DISSOLVEs.
+- Tracks: `peng`. Spec edit: drop the `model("kunpeng")` CHARGE layer.
+
+**`karma_domain`** (prefix `kd_`, disciple-only; domain 400; pulses /20; no film)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `kd_wheel` | a karma wheel of eight spokes wound with red threads | dark wood `3A2018`, red `D04020` | 4 |
+| `kd_knot` | a red thread knot on a linked foe | `D04020`, gold bead | 0.5 |
+
+- **Build-up:** the wheel GROWs over the disciple's head and SPINs 1°/t.
+- **Field:** each PULSE a knot appears on each linked foe (≤ 6) and PULSEs; the wheel ticks one spoke (`rotateTo` 45°).
+- **End:** the wheel stops; knots SHATTER.
+- Tracks: none. Spec edit: none.
+
+#### 30.4.9 U2 · Immortal arts and own arts
+
+**`ninth_hex`** (prefix `nh_`; K = channel end ≤ 160; pulses /20; EXTRA0 the release)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `nh_seal` | the eight-pointed seal: two square frames at 0° and 45° with 封 plates at the points and a centre boss | old gold `E8D8A0`, violet `7A6AA0` | 12 |
+| `nh_pillar` | a talisman pillar: a stone post wrapped with a paper talisman (red script) | stone `C8BEDC`, paper `F0D890`, red `C0182A` | 3 |
+
+- **Build-up / field:** one pillar RISEs per PULSE on the octagram points (≤ 8); the sigil point lights with it.
+- **Release (K−10):** the seal appears 24 b up (GROW 0.3 → 1, 10 t), turning slowly.
+- **Impact (K):** the seal FALLs (6 t), STAMP; pillars TILT 22.5° inward and crack (swap).
+- **Aftermath:** pillars sink; the seal crossfades to the Dampak monument (`seal_ring_feng`, FLAT).
+- Tracks: `seal`. Spec edit: none.
+
+**`five_elements_mountain`** (prefix `fem_`; K 40; TRAVEL palm fall 64 b over 40; IMPACT; EXTRA0 ×5 peaks)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `fem_palm` | the Buddha's palm: five three-segment fingers, palm creases, a dharma-wheel mark on the palm (design) | gold `FFD54A`, light `FFF2B0` | 24 |
+| `fem_peak_metal`, `_wood`, `_water`, `_fire`, `_earth` | five peaks in their element shapes: metal a white spire, wood a green jagged ridge, water a blue rounded dome, fire a red flame-tipped crag, earth a yellow flat-topped mesa | `E8E8EE`, `3FAE3A`, `3A7AE8`, `E03A1A`, `D9A05B` | 10 |
+| `fem_talisman` | the six-syllable talisman strip | paper `F0D890`, gold script | 3 |
+
+- **Build-up (0-40):** the palm FALLs 64 b palm-down (easeInQuad, 40 t) through the parting clouds.
+- **Impact (K, IMPACT):** STAMP, ring; the palm stays 20 t, then lifts away (SLIDE up, fade).
+- **Release of the peaks (EXTRA0 #1-5):** each peak RISEs at its ring point in the generating order wood → fire →
+  earth → metal → water (the spec's ring index decides which point gets which element), 10 t each.
+- **Aftermath:** the talisman descends onto the circle (FALL 14 b, 20 t) and hands over to the Dampak monument
+  (`talisman_ling`, HOVER); peaks sink after 120 t (as the spec's layer).
+- Tracks: `palm`, `peak_1..5`. Spec edit: drop the `model("buddha_palm")` TRAVEL layer and the `model("mountain_peak")`
+  EXTRA0 layer.
+
+**`tai_chi_diagram`** (prefix `tcd_`; CHARGE; TRAVEL the front; HIT)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `tcd_taiji` | the yin-yang disc: two fish with eyes (stepped cuboids), a raised rim; part `tcd_bagua` (a ring of eight trigram bars) | white `F8F6EC`, black `16141C`, gold rim | 9 |
+| `tcd_plank_yin`, `tcd_plank_yang` | bridge planks of the unrolled diagram | black / white with a gold edge | 3 |
+
+- **Build-up (CHARGE):** the disc GROWs between the palms and SPINs 6°/t; the bagua ring counter-spins.
+- **Release (TRAVEL):** the disc flies forward 10 b (SLIDE) and unrolls: planks GROW along the front, alternating yin
+  and yang, 2 t apart (≤ 16, Max 32), the disc rolling ahead.
+- **Impact (HIT):** the plank under a hit target flips (`rotateTo` 180°, 4 t).
+- **Aftermath:** the planks fold back into the disc (SLIDE to it, 2 t apart), which stands upright and hands over to
+  the Dampak monument (`taiji_disc`, UPRIGHT).
+- Tracks: `disc`. Spec edit: drop the `model("taiji_disc")` TRAVEL layer.
+
+**`heaven_trampling`** (prefix `ht_`; TRAVEL the nine steps 27 t; K 30 IMPACT; EXTRA0 waves ×3)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `ht_step` | a stepping ring of light with nine nodes | white-gold `FFF4D0` | 2 |
+| `ht_star` | a Beidou star node | white `FFFFFF`, gold glow | 0.6 |
+| `ht_sky_foot` | a white-gold foot of light from the heavens | `FFF4D0`, gold `F0E0A0` | 12 |
+
+- **Build-up (0-27):** a step ring GROWs under the caster's foot every 3 t at the rising heights; a star node lights
+  above each.
+- **Release (27-30):** the sky foot forms over the aim (GROW 3 t).
+- **Impact (K):** the foot FALLs (4 t), STAMP; the step rings collapse downward (SLIDE, fade).
+- **Aftermath (waves):** each wave a ring; the nine star nodes stay in the sky as the Dipper for 3 s and fade.
+- Tracks: `foot`. Spec edit: drop the `model("god_foot")` IMPACT layer.
+
+**`own_art_1..3`** (prefix `oa_`; the composition's phases EXTRA2..7; climax EXTRA1)
+
+| Model | Build | Palette | Scale |
+|---|---|---|---|
+| `oa_seal_<dao>` (8: sword, fire, ice, lightning, body, life, shadow, space) | a Dao seal disc: a ring of eight plates, the Dao's emblem in the centre (one shared geometry, eight textures) | each Dao's colour from `Dao.color()` with white and gold | 4 |
+| `oa_blade`, `oa_orb`, `oa_needle`, `oa_crescent`, `oa_rib`, `oa_plate` | the six forms (CUT, BURST, RAIN, WAVE, DOMAIN, SEAL), white-gold, tinted by light only | white `F4F4FF`, gold `FFD54A` | 1-4 |
+
+- **Build-up:** the first Dao's seal GROWs behind the caster (and the second's, smaller, when the art has two Daos).
+- **Forms (each EXTRA2..7):** the form's prop plays its own beat (blade SLIDE along the cut, orb GROW then SHATTER, ≤ 6
+  needles FALL, crescent THRUST, eight ribs GROW in a dome, plate FALL and STAMP).
+- **Climax (EXTRA1):** the seals SPIN up and SHATTER.
+- **Aftermath:** the Dampak monument by Dao (`MONUMENT_BY_DAO`).
+- The composition is read from the same data `client/batin/CiptaanFx` reads (read only, never edited). Spec edit:
+  none (`CiptaanArts` authors no model layer).
+
+`UniversalArts` has **no** grade 11 or 12 ultimate in the code (its highest rows are Xuan); U2 owns the file for
+ownership only and does not edit it.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 30.5 Modules (exactly four, disjoint files) and contracts
+
+**Order of work.** First, compiling skeletons with the final signatures: F commits the film API of C30.2-C30.4
+(`FilmDirector.play` returning false, the DSL classes, the particle and sound holders); U1 and U2 commit their driver
+skeletons of C30.1 (`handles` returning false). Then K, F, U1 and U2 work in parallel, and F's wiring compiles against
+the skeletons from the start. The 29.16 tier work (bulk carve, permanent confirm) must be merged before K starts, since K edits the
+same `WorldBreaker` paths.
+
+#### K: server Hancur Total
+
+Owns: `src/main/java/dev/kultivator/kehancuran/**` (`WorldBreaker`, `ProtectedZones`, `Kehancuran`, `Shapes`,
+`KehancuranLog`; `Surface` only if a signature must pass the rules), the new fields in `KultivatorConfig`, the new tag
+`data/kultivator/tags/block/hancur_total_keep.json`, `lang-src/kehancuran_total.{en_us,id_id}.json` (new), the help
+text key `kultivator.screen.help.kehancuran` in `lang-src/kehancuran.*`, and the **value** of the 29.16.5 permanent
+confirmation key in its Titah tier fragment (both languages; no other key of that fragment). Test commands of 30.6
+under `uji kehancuran` registered from `Kehancuran.addCommands` (the `debug`/`uji` builder it already receives, or
+the hook the test registry already calls for kehancuran).
+
+#### F: client film engine, lens and HUD layers, cosmic sky, the Kenney pipeline, settings
+
+Owns: `src/client/java/dev/kultivator/client/epic/**` (incl. the new `film/`, `lens/`, `cosmic/`, `screen/
+MotionWarningScreen`, `sound/FilmSound`, `EpicSettings` rows, `EpicClientCommands`), `client/anim/model/ArtModels.java`
+and `client/anim/model/FxModels.java` (**only F edits these two**: the dispatch to both drivers and the model-info
+hook), `client/anim/AnimClient.java` (the drivers' tick and clear lines next to `FireUltimates`), one yield guard
+each in `client/dampak/cinema/SkyRide.java` and `client/pusakalangit/cinema/PusakaFilm.java`
+(`if (FilmDirector.claims(specId)) return …;`), `src/main/java/dev/kultivator/fx/FilmParticles.java`,
+`src/main/java/dev/kultivator/sound/FilmSounds.java`, the two register lines in `Kultivator.onInitialize`, the
+assets `textures/particle/film_*`, `particles/film_*.json`, `textures/misc/film/**`, `sounds/film/**`, `sounds.json`,
+`tools/gen_film_assets.py`, `docs/CREDITS.md`, `lang-src/film.{en_us,id_id}.json` (settings, warning, commands,
+subtitles `subtitles.kultivator.film.*`, film title cards), and the films of the two Fire ultimates (their props stay
+`FireUltimates`, untouched).
+
+#### U1: ultimates of the Sword, Lightning, Ice and Space Daos
+
+Owns: `client/anim/model/UltimatesA.java` (new), `tools/gen_ultimates_a_models.py` (new), the models, item
+definitions and textures with the prefixes `zx_`, `hps_`, `tte_`, `nhtv_`, `ipd_`, `fmq_`, `vm_`, `tsd_`, `sbh_`,
+`tools/fx_model_ids_ua.txt`, and fx-only edits (30.4.1) in `technique/arts/SwordArts.java`, `LightningArts.java`,
+`IceArts.java`, `SpaceArts.java`. Specs: `zhuxian_sword_formation`, `heaven_punishing_sword`,
+`tribulation_thunder_emperor_array`, `nine_heavens_thunder_venerable`, `ice_phoenix_descent`, `freeze_mount_qi`,
+`void_mirror`, `time_spirit_domain`, `stellar_black_hole`.
+
+#### U2: ultimates of the Body, Life, Shadow, Universal and Immortal arts and the own arts
+
+Owns: `client/anim/model/UltimatesB.java` (new), `tools/gen_ultimates_b_models.py` (new), the models with the
+prefixes `cgf_`, `agt_`, `gsd_`, `ldd_`, `bt_`, `sts_`, `kp_`, `kd_`, `nh_`, `fem_`, `tcd_`, `ht_`, `oa_`,
+`tools/fx_model_ids_ub.txt`, and fx-only edits in `technique/arts/BodyArts.java`, `LifeArts.java`, `ShadowArts.java`,
+`UniversalArts.java` (no change expected), `ImmortalArts.java`, `batin/CiptaanArts.java` (no change expected). Specs:
+`cosmic_giant_form`, `ancient_god_trample`, `guanyin_sweet_dew`, `life_death_domain`, `bodhisattva_tree`,
+`stygian_tiger_seal`, `kunpeng_art`, `karma_domain`, `ninth_hex`, `five_elements_mountain`, `tai_chi_diagram`,
+`heaven_trampling`, `own_art_1..3`.
+
+Nobody else edits a file of another module. Every module keeps each file's line endings (several are CRLF in git:
+check `git ls-files --eol` before the first edit).
+
+#### Contracts
+
+**C30.1 Driver API** (`UltimatesA` and `UltimatesB`, same shape as `FireUltimates`, all `public static`):
+
+```java
+boolean handles(String specId);                       // the spec ids of 30.4 owned by this driver
+void onTechFx(Payloads.TechFx p, TechniqueSpec spec, Phase phase, @Nullable Entity caster); // every phase incl. ABORT
+void tick(ClientLevel level);                         // once per unpaused client tick, after FireUltimates.tick
+void abort(int casterId);                             // idempotent; ends that caster's runs (fade 6)
+void clear();                                         // world change, disconnect
+void models(FxModels.Sink sink);                      // registers the Info rows of its models
+```
+
+F wires: in `ArtModels.onTechFx`, after the "Efek pemain lain" check and the ABORT handling, `if (UltimatesA.handles(id))
+{ UltimatesA.onTechFx(p, spec, phase, caster); return; }` (same for B), before `place(...)`; `ArtModels.endCast` also
+calls both `abort`s; `AnimClient` calls both `tick`s and `clear`s; `FxModels` gains
+`public interface Sink { void put(String id, float scale, Axis axis, boolean glow, int color, int color2, float baseY,
+Part... parts); }` and its static block ends with `UltimatesA.models(FxModels::put); UltimatesB.models(FxModels::put);`
+(the private `put` is passed as a method reference; no other change to the table).
+
+**C30.2 Film API** (`client/epic/film/FilmDirector`, F):
+
+```java
+public record Ctx(int casterId, String specId, Vec3 origin, Vec3 aim, float yaw, long seed, int climaxIn, int duration) {}
+public interface Track { Vec3 pos(float partial); float yaw(float partial); float pitch(float partial); boolean alive(); }
+public static boolean play(String filmId, Ctx ctx);   // own caster only; false: not played (setting, gates, no film)
+public static void cue(int casterId, String beat, Vec3 at);   // driver beats: "release", "impact", "dive", "step", …
+public static void track(int casterId, String key, @Nullable Track track); // props for P(key) spaces (null removes)
+public static void abort(int casterId);
+public static boolean claims(String specId);          // true while a film of that spec is armed or playing
+public static boolean playing();
+```
+
+- The drivers call `play(spec.id(), ctx)` on the CAST (or the CHARGE for charged specs) with `climaxIn` = the spec's
+  `dampak().climaxAt()` minus the event's age, or −1 when the climax is player-timed (`void_mirror`, `tai_chi_diagram`,
+  `kunpeng_art`, `ninth_hex` released early, own arts). They call `track` when a tracked prop appears and `cue` on the
+  beats their tables name. A driver's choreography never depends on whether the film plays.
+- F starts the films of `emperor_flame`, `nine_suns_heavens_fury` (from its `ArtModels` dispatch, using
+  `FireUltimates`' props through positions it computes from the events) and of the four Titah decrees (from the
+  `PusakaFilm` hand-off).
+- `claims` lets `SkyRide` and `PusakaFilm` yield; when a film is refused they run exactly as today.
+
+**C30.3 Shot DSL** (30.2.5): `Film`, `FilmAct`, `FilmShot`, `FilmSpace`, `Ease`, `FilmLens`, `FilmShake`,
+`FilmSound.Cue`; public so that test commands and future films can build shots. Only `FilmDirector` turns them into
+`Shots.Type.FILM`.
+
+**C30.4 Particles and sounds** (F, common): `FilmParticles.SPARK, FLARE, STAR, SMOKE, FLAME, MAGIC, SLASH, TRACE, TWIRL,
+CIRCLE, MUZZLE, DIRT, SYMBOL` (`SimpleParticleType`), and `FilmSounds.RISER_LONG … ROCK` (`SoundEvent`); drivers may
+spawn the particles (through `FxBudget`) but play film sounds only through `FilmSound` (F), never as world sounds.
+
+**C30.5 Hancur Total** (K, server): `ProtectedZones.Rules { CLASSIC, TOTAL }`, `ProtectedZones.neverTouch(level, pos,
+state, rules)`, `Kehancuran.totalOn(ServerPlayer)`, `Kehancuran.rulesFor(UUID owner, MinecraftServer)`. No client code
+reads them; the client learns nothing new (the debris packets of 28.13.2 already carry any removed state).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 30.6 Test commands
+
+Server, op:
+
+| Command | Does (K unless noted) |
+|---|---|
+| `/kultivasi kehancuran total [nyala\|mati]` | the player's switch (no op needed) |
+| `/kultivasi uji kehancuran total info` | the rules of the next own cast, the stored block-entity tags and KiB of the player's undo entries |
+| `/kultivasi uji kehancuran total uji <bedrock\|cairan\|peti\|portal>` | builds a small test site of that kind 8 b ahead (test blocks placed through `WorldBreaker`'s restore path, recorded so Pulihkan clears them) and carves an r 3 bowl into it with the player's own rules; refused unless Mode Kehancuran is on |
+| `/kultivasi uji dampak <id>` | (exists) one showcase cast of the spec; with Spektakuler the film plays |
+| `/kultivasi uji teknik pamer <id>` | (exists) the showcase runner |
+| `/kultivasi uji pusaka_langit <pedang\|tiang\|bintang\|gunung>` | (exists) a test decree; with Spektakuler its film plays |
+
+Client, no op (F, `/sinematik ...`):
+
+| Command | Does |
+|---|---|
+| `/sinematik spektakuler` | sets the camera to Spektakuler (opens the motion warning the first time) |
+| `/sinematik film <id>` | plays that film around the player at a point 16 b ahead, still under every gate of 30.2.2, with a fake timeline (no server event; the climax at the film's planned time) |
+| `/sinematik film <id> act <n>` | one act only |
+| `/sinematik film daftar` | every film id with its acts and length |
+| `/sinematik kosmik [detik]` | shows Langit Kosmik overhead for that long (default 6 s) |
+| `/sinematik lensa <grain\|flare\|leak\|smear\|fringe\|haze> [detik]` | one lens layer alone |
+| `/sinematik waktu_beku` | a 1-s bullet time on the current world FX |
+| `/sinematik film info` | settings, gates (the reason a film would be refused), the last film's shots and peak speeds |
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 30.7 Daftar uji (untuk `docs/uji/FASE-30.md`)
+
+**Hancur Total (K)**
+1. Mode Kehancuran nyala, Hancur Total nyala (bawaan). Rapal jurus berpahat di atas batuan dasar, obsidian, portal
+   Nether, dan peti berisi: semuanya hilang, tidak ada item jatuh, tidak ada lava atau api.
+2. `/kultivasi kehancuran total mati`, ulangi: batuan dasar, obsidian, portal, cairan dan peti dibiarkan (aturan lama).
+3. Di dekat aula sekte, lokasi pembangunan sekte, gua tinggal, desa, ranah rahasia, titik spawn dan pemain lain: tidak
+   satu blok pun berubah walau Hancur Total nyala. Prasasti aula, mata formasi dan blok monumen Titah tidak pernah hancur.
+4. Pahat ke dalam danau: air di dalam bentuk ikut hilang, tidak ada air melayang di dalam kawah; dinding air di tepi
+   tetap diam sampai ada pembaruan di sebelahnya. Dengan `kehancuranFluidSettle 64` tepi langsung mengalir.
+5. Peti berisi ikut terpahat lalu **Pulihkan**: peti kembali **beserta isinya** (cek satu per satu), tungku dengan isinya,
+   kotak shulker dengan isinya. Pesan "Dipulihkan: … wadah beserta isinya" muncul.
+6. Titah tingkat 3 (undo massal) di atas peti: Pulihkan mengembalikan isi peti. Titah tingkat 6-9: teks konfirmasi
+   menyebut peti hilang bersama isinya; setelah "Ya", Pulihkan menjawab permanen.
+7. Batas simpanan wadah (`kehancuranUndoBlockEntities 2`, tiga peti dalam bentuk): peti ketiga tetap utuh dan pesan
+   batas muncul sekali.
+8. Batuan dasar paling bawah terpahat: kehampaan terbuka; pesan "Hancur Total NYALA" sudah memperingatkannya.
+   Kolom aman perapal tetap berdiri.
+9. Murid dengan Jurus Pemusnah memakai saklar Hancur Total milik guru.
+10. `kehancuranTotalAllowed false` di server: semua jalan memakai aturan lama, saklar menampilkan "dimatikan server".
+
+**Film Spektakuler (F)**
+11. Pengaturan Kamera sinematik berputar Singkat → Penuh → Spektakuler → Mati; pertama kali memilih Spektakuler muncul
+    peringatan gerak; "Kembali ke Penuh" benar-benar kembali ke Penuh.
+12. "Kurangi gerak" nyala: Spektakuler tidak tersedia (Mati). Mati, Singkat dan Penuh berperilaku persis seperti sebelumnya.
+13. `/sinematik film titah_pedang`: naik ke langit, Langit Kosmik (sungai bintang, nebula, istana), POV menunggang
+    pedang turun, bingkai dampak, waktu beku, dentuman terlambat, sapuan cepat mengikuti belahan, tarikan udara.
+    Tidak ada potongan kasar tanpa penutup (tirai hitam, awan, bingkai, coretan sapuan).
+14. Kecepatan: kamera Spektakuler tidak pernah tampak melompat; F3 tidak menunjukkan chunk hilang atau berkedip
+    (Sodium); di ketinggian 48 b tanah tetap termuat.
+15. Bahaya: zombie mendekat dalam 24 b, nyawa di bawah 50 %, terkena pukulan, jatuh, di air, berkuda: film tidak mulai
+    atau langsung kembali ke mata; Backspace melewati satu babak, tekan dua kali melewati seluruh film.
+16. Setiap babak dimulai ulang hanya jika semua syarat aman masih terpenuhi; pertarungan di antara babak memakai kamera
+    pemain sendiri.
+17. Lapisan lensa: butiran film, pinggiran warna, suar lensa (hilang saat sumber tertutup), garis anamorfik
+    (Maksimal), kebocoran cahaya, coretan sapuan, riak panas. "Lapisan lensa: Ringan" dan "Mati" bekerja.
+18. Kilatan: tidak lebih dari satu kilatan layar per 500 ms; "Sembunyikan kilat" vanilla dan "Kilatan layar" mati
+    mematikan bingkai dampak.
+19. Langit Kosmik hanya terlihat oleh perapal; pemain lain melihat langit dan efek dunia biasa.
+20. Waktu beku: efek mod membeku, kamera tetap bergerak; mob vanilla tetap bergerak sesuai server; server tidak melambat
+    (`/tick query` tetap 20).
+21. Suara Kenney: riser saat naik, whoosh tiap sapuan, dengung di angkasa, sub-boom tepat pada dentuman terlambat;
+    subtitle muncul dalam dua bahasa. Suara stereo hanya terdengar oleh perapal; suara mono berposisi untuk pemain dekat.
+22. `docs/CREDITS.md` menyebut Kenney (CC0) dan daftar berkas yang dipakai.
+
+**Pamungkas baru (U1, U2)**
+23. Setiap jurus di 30.4 (`/kultivasi uji dampak <id>`): ada empat babak yang jelas (persiapan, pelepasan, dampak,
+    akibat), model 3D baru tampil rapi tanpa tekstur ungu-hitam, tidak ada model ganda (lapisan model lama sudah dibuang).
+24. Tidak ada perubahan ukuran acak: properti tumbuh sekali, membuka atau melipat dengan halus, berputar tetap, bernapas
+    lewat cahaya, lalu hilang sekali. Ulangi dua kali dengan seed yang sama: gerakannya sama.
+25. Minimal: hanya properti identitas; Normal: set lengkap; Maksimal: jumlah "Max". "Efek pemain lain: Mati" tanpa properti.
+26. Angka permainan tidak berubah: kerusakan, jangkauan, durasi, cooldown dan baris Sumber sama persis (bandingkan
+    `/kultivasi teknik info <id>` sebelum dan sesudah).
+27. Monumen Dampak tetap muncul dan properti akhir berganti ke monumen dengan memudar, tanpa kedip.
+28. Tanpa Mode Kehancuran semua efek hanya visual; dengan Mode Kehancuran kawah dan parit mengikuti Hancur Total.
+
+**Performa dan kompatibilitas (laptop lemah, Minimal/Otomatis, jarak render 8)**
+29. Film terpanjang (`bodhisattva_tree`, `nine_heavens_thunder_venerable`): FPS tidak turun di bawah 30 lebih dari sesaat;
+    penjaga bingkai menurunkan lapisan lensa dan kosmik dulu, gerak kamera tetap sama.
+30. Sodium + Iris dengan paket shader: lapisan lensa tampil di atas, Langit Kosmik memakai profil paket (satu lapisan
+    besar, tanpa latar end-portal), tidak ada bayangan aneh dari quad efek.
+31. Idle: tanpa film yang berjalan, `/sinematik film info` menunjukkan nol kerja per bingkai.
+32. Teks: setiap kunci `kehancuran_total.*` dan `film.*` ada di en_us dan id_id; semua Sumber tetap sama.

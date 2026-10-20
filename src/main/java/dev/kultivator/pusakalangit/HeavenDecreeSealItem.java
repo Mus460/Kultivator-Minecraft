@@ -76,16 +76,28 @@ public class HeavenDecreeSealItem extends Item {
 
 	/** Writes the selected decree into the player's own seals (the tooltip); only where it changed. */
 	static void refreshView(ServerPlayer player) {
-		int selected = TitahSettings.selected(dev.kultivator.data.Cultivators.get(player)).ordinal();
+		Titah.Skill skill = TitahSettings.selected(dev.kultivator.data.Cultivators.get(player));
+		int selected = skill.ordinal();
+		// Phase 10b Tingkat (29.16.3): the selected decree's Tingkat and whether it would be permanent
+		Titah.Settings settings = TitahSettings.read(player, skill);
+		int tierView = Math.max(1, Math.min(TitahSettings.T_MAX, settings.tingkat()))
+				| (TitahSettings.permanent(settings, dev.kultivator.kehancuran.Kehancuran.selfOn(player)) ? 16 : 0);
 		for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
 			ItemStack stack = player.getInventory().getItem(i);
 			if (!stack.is(TitahItems.SEAL)) {
 				continue;
 			}
 			UUID owner = stack.get(TitahItems.OWNER);
+			if (owner != null && !owner.equals(player.getUUID())) {
+				continue;
+			}
 			Integer view = stack.get(TitahItems.VIEW);
-			if ((owner == null || owner.equals(player.getUUID())) && (view == null || view != selected)) {
+			if (view == null || view != selected) {
 				stack.set(TitahItems.VIEW, selected);
+			}
+			Integer tiers = stack.get(TitahItems.TIER_VIEW);
+			if (tiers == null || tiers != tierView) {
+				stack.set(TitahItems.TIER_VIEW, tierView);
 			}
 		}
 	}
@@ -108,6 +120,12 @@ public class HeavenDecreeSealItem extends Item {
 		Titah.Skill skill = Titah.Skill.byOrdinal(view == null ? 0 : view);
 		builder.accept(Component.translatable(KEY + "seal.selected", Component.translatable("kultivator.technique." + skill.specId())
 				.withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
+		Integer tiers = stack.get(TitahItems.TIER_VIEW);
+		int tier = tiers == null ? 1 : Math.max(1, Math.min(9, tiers & 15));
+		builder.accept(Component.translatable(KEY + "tier.seal", tier).withStyle(ChatFormatting.GRAY));
+		if (tiers != null && (tiers & 16) != 0) {
+			builder.accept(Component.translatable(KEY + "tier.seal_permanent").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+		}
 		builder.accept(Component.translatable(KEY + "seal.cooldown_hint").withStyle(ChatFormatting.DARK_GRAY));
 		builder.accept(Component.translatable(KEY + "seal.use").withStyle(ChatFormatting.GRAY));
 		builder.accept(Component.translatable(KEY + "seal.menu").withStyle(ChatFormatting.GRAY));

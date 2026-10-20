@@ -71,6 +71,13 @@ public class TitahMonumentEntity extends Entity {
 	private static final EntityDataAccessor<Integer> DATA_STATE_TICK = SynchedEntityData.defineId(TitahMonumentEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<String> DATA_OWNER_NAME = SynchedEntityData.defineId(TitahMonumentEntity.class, EntityDataSerializers.STRING);
 	private static final EntityDataAccessor<Long> DATA_BORN = SynchedEntityData.defineId(TitahMonumentEntity.class, EntityDataSerializers.LONG);
+	/** Phase 10b Tingkat (DESIGN 29.16.11, contract C10b.10): the record id and the Tingkat, synced for the far LOD. */
+	private static final EntityDataAccessor<Integer> DATA_RECORD = SynchedEntityData.defineId(TitahMonumentEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Byte> DATA_TIER = SynchedEntityData.defineId(TitahMonumentEntity.class, EntityDataSerializers.BYTE);
+	/** The largest model scale (29.16.1: mScale(t) ≤ 1100). */
+	public static final float MAX_SCALE = 1100.0F;
+	/** Model length per scale of each MODEL value (the renderer's {@code SWORD_TIP} / {@code PILLAR_HALF}; 29.16.1). */
+	private static final float[] LENGTH_PER_SCALE = {1.87F, 3.0F, 1.87F, 1.87F};
 
 	// ---- server only (saved)
 	private int recordId = -1;
@@ -99,6 +106,8 @@ public class TitahMonumentEntity extends Entity {
 		builder.define(DATA_STATE_TICK, 0);
 		builder.define(DATA_OWNER_NAME, "");
 		builder.define(DATA_BORN, 0L);
+		builder.define(DATA_RECORD, -1);
+		builder.define(DATA_TIER, (byte) 1);
 	}
 
 	// ================================================================== contract C10b.4 (read by the client renderer)
@@ -151,26 +160,46 @@ public class TitahMonumentEntity extends Entity {
 		return entityData.get(DATA_BORN);
 	}
 
+	/** The Tingkat of the decree that planted it (1-9; 1 for every weapon planted before Tingkat existed). */
+	public int tier() {
+		return Math.max(1, Math.min(9, entityData.get(DATA_TIER)));
+	}
+
+	/** The model's length in blocks at its scale (Pedang ≈ 1.87 × scale, Tiang ≈ 3 × scale). */
+	public float length() {
+		int model = Math.max(0, Math.min(LENGTH_PER_SCALE.length - 1, model()));
+		return LENGTH_PER_SCALE[model] * scale();
+	}
+
 	// ================================================================== server setup and accessors
+
+	/** Sets everything once, before {@code addFreshEntity} (Tingkat 1). */
+	void setup(int record, UUID ownerId, String name, byte model, float scale, float tilt, long born, long expiresAt, boolean isTest,
+			boolean isUltimate) {
+		setup(record, ownerId, name, model, scale, tilt, born, expiresAt, isTest, isUltimate, 1);
+	}
 
 	/** Sets everything once, before {@code addFreshEntity}. */
 	void setup(int record, UUID ownerId, String name, byte model, float scale, float tilt, long born, long expiresAt, boolean isTest,
-			boolean isUltimate) {
+			boolean isUltimate, int tier) {
 		this.recordId = record;
 		this.owner = ownerId;
 		this.expires = expiresAt;
 		this.test = isTest;
 		this.ultimate = isUltimate;
 		entityData.set(DATA_MODEL, model);
-		entityData.set(DATA_SCALE, scale);
+		entityData.set(DATA_SCALE, Math.max(0.5F, Math.min(MAX_SCALE, scale)));
 		entityData.set(DATA_TILT, tilt);
 		entityData.set(DATA_OWNER_NAME, name == null ? "" : name);
 		entityData.set(DATA_BORN, born);
+		entityData.set(DATA_RECORD, record);
+		entityData.set(DATA_TIER, (byte) Math.max(1, Math.min(9, tier)));
 		setState(STATE_SETTLING, born);
 	}
 
+	/** The {@code TitahMonuments} record id (synced, so the client can match it with {@code TitahFar}). */
 	public int recordId() {
-		return recordId;
+		return level().isClientSide() ? entityData.get(DATA_RECORD) : recordId;
 	}
 
 	public @Nullable UUID owner() {
@@ -194,6 +223,14 @@ public class TitahMonumentEntity extends Entity {
 		entityData.set(DATA_STATE_TICK, (int) gameTime);
 	}
 
+	/** A state change while it stands in the world: the far clients hear of it too ({@code TitahFar}, 29.16.11). */
+	private void changeState(byte state, long gameTime) {
+		setState(state, gameTime);
+		if (level() instanceof ServerLevel level && recordId >= 0) {
+			TitahMonuments.noteState(level.getServer(), recordId, state);
+		}
+	}
+
 	// ================================================================== tick (server)
 
 	@Override
@@ -206,7 +243,7 @@ public class TitahMonumentEntity extends Entity {
 		long age = now - born();
 		byte state = state();
 		if (state == STATE_SETTLING && age >= SETTLE_TICKS) {
-			setState(STATE_STANDING, now);
+			changeState(STATE_STANDING, now);
 			state = STATE_STANDING;
 		}
 		if (age <= seatUntil && tickCount % 20 == 0) {
@@ -238,7 +275,12 @@ public class TitahMonumentEntity extends Entity {
 			return;
 		}
 		if (Math.abs(top - getY()) > 0.01D) {
+			double before = getY();
 			setPos(getX(), top, getZ());
+			if (Math.abs(top - before) >= 2.0D && recordId >= 0) {
+				// a crater formed under it: the far clients' copy moves too (TitahFar)
+				TitahMonuments.noteSeat(level.getServer(), recordId, getX(), top, getZ());
+			}
 		}
 	}
 
@@ -254,7 +296,7 @@ public class TitahMonumentEntity extends Entity {
 	void leave() {
 		if (state() != STATE_LEAVING) {
 			puller = null;
-			setState(STATE_LEAVING, level().getGameTime());
+			changeState(STATE_LEAVING, level().getGameTime());
 		}
 	}
 
@@ -263,7 +305,7 @@ public class TitahMonumentEntity extends Entity {
 		if (player == null || !player.isAlive() || player.level() != level || Math.abs(player.getY() - getY()) > 8.0D
 				|| horizontalDistance(player) > PULL_RANGE) {
 			puller = null;
-			setState(STATE_STANDING, now);
+			changeState(STATE_STANDING, now);
 			if (player != null) {
 				dev.kultivator.util.Msg.actionBar(player, Component.translatable("kultivator.pusaka_langit.pull.cancel").withColor(0xFF8A7A));
 			}
@@ -322,7 +364,7 @@ public class TitahMonumentEntity extends Entity {
 			return InteractionResult.SUCCESS_SERVER;
 		}
 		puller = serverPlayer.getUUID();
-		setState(STATE_PULLING, level.getGameTime());
+		changeState(STATE_PULLING, level.getGameTime());
 		dev.kultivator.util.Msg.actionBar(serverPlayer, Component.translatable("kultivator.pusaka_langit.pull.start").withColor(0xFFF4D0));
 		level.playSound(null, getX(), getY(), getZ(), net.minecraft.sounds.SoundEvents.BEACON_POWER_SELECT, net.minecraft.sounds.SoundSource.PLAYERS,
 				1.4F, 0.6F);
@@ -384,7 +426,9 @@ public class TitahMonumentEntity extends Entity {
 
 	@Override
 	public boolean shouldRenderAtSqrDistance(double distance) {
-		return distance < RENDER_RANGE * RENDER_RANGE;
+		// 29.16.10: a giant weapon stays drawn up to max(160, 1.5 × its length) (the far LOD takes over beyond tracking)
+		double range = Math.max(RENDER_RANGE, 1.5D * length());
+		return distance < range * range;
 	}
 
 	@Override
@@ -402,13 +446,15 @@ public class TitahMonumentEntity extends Entity {
 	@Override
 	protected void readAdditionalSaveData(ValueInput input) {
 		recordId = input.getIntOr("record", -1);
+		entityData.set(DATA_RECORD, recordId);
+		entityData.set(DATA_TIER, (byte) Math.max(1, Math.min(9, input.getIntOr("tier", 1))));
 		owner = input.read("owner", UUIDUtil.CODEC).orElse(null);
 		expires = input.getLongOr("expires", 0L);
 		rewarded = input.getBooleanOr("rewarded", false);
 		test = input.getBooleanOr("test", false);
 		ultimate = input.getBooleanOr("ultimate", false);
 		entityData.set(DATA_MODEL, (byte) Math.max(0, Math.min(MODELS.length - 1, input.getIntOr("model", 0))));
-		entityData.set(DATA_SCALE, Math.max(0.5F, Math.min(64.0F, input.getFloatOr("scale", 12.0F))));
+		entityData.set(DATA_SCALE, Math.max(0.5F, Math.min(MAX_SCALE, input.getFloatOr("scale", 12.0F))));
 		entityData.set(DATA_TILT, input.getFloatOr("tilt", 0.0F));
 		entityData.set(DATA_OWNER_NAME, input.getStringOr("owner_name", ""));
 		long born = input.getLongOr("born", 0L);
@@ -421,6 +467,7 @@ public class TitahMonumentEntity extends Entity {
 	@Override
 	protected void addAdditionalSaveData(ValueOutput output) {
 		output.putInt("record", recordId);
+		output.putInt("tier", tier());
 		if (owner != null) {
 			output.store("owner", UUIDUtil.CODEC, owner);
 		}

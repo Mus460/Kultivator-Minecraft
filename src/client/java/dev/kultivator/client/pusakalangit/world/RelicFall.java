@@ -28,6 +28,10 @@ import java.util.List;
  * ({@link ModelFx}, created at its landing point so the 64 b display range holds, its height carried by the FALL step) with
  * two bloom layers drawn here: a camera-facing light trail and a soft halo; Maximal adds a halo pillar; Minimal draws a
  * particle column instead of the model. The planted monument (a real entity) takes over at the climax; the prop ends then.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): a tier 2-9 weapon (up to scale 1100, falling from up to 1024 b) is too large and too
+ * high for a phantom prop: {@link FarRelic} draws it (a true-size display within render distance, an impostor or a
+ * silhouette beyond it) and this class keeps only its light trail, whose widths grow with the square root of the scale.
  */
 final class RelicFall {
 
@@ -131,6 +135,12 @@ final class RelicFall {
 	 */
 	static void fall(long cast, String model, int kind, Vec3 ground, float height, int duration, float scale, float yaw, int rgb, int trailRgb, boolean own,
 					 boolean hold, @Nullable Runnable onLand) {
+		fall(cast, model, kind, ground, height, duration, scale, yaw, rgb, trailRgb, own, hold, onLand, 1);
+	}
+
+	/** {@link #fall} of a decree of Tingkat {@code tier}: from tier 2 the weapon itself is a {@link FarRelic}. */
+	static void fall(long cast, String model, int kind, Vec3 ground, float height, int duration, float scale, float yaw, int rgb, int trailRgb, boolean own,
+					 boolean hold, @Nullable Runnable onLand, int tier) {
 		if (!TitahWorld.finite(ground) || FALLS.size() >= MAX) {
 			return;
 		}
@@ -143,7 +153,8 @@ final class RelicFall {
 			default -> ground.add(0.0D, 0.02D, 0.0D);
 		};
 		Fall f = new Fall(cast, kind, anchor, ground, Math.max(4.0F, height), duration, scale, rgb, trailRgb, own, hold, false, TitahWorld.clock(), onLand);
-		if (DampakWorldBudget.tier() >= 1 && DampakWorldBudget.worldFx()) {
+		boolean far = tier >= 2 && kind != STAR && FarRelic.falling(cast, model, kind, ground, f.height, f.duration, scale, yaw, hold, tier);
+		if (!far && DampakWorldBudget.tier() >= 1 && DampakWorldBudget.worldFx()) {
 			List<AnimStep> anims = new ArrayList<>(2);
 			anims.add(AnimStep.of(Anim.FALL, 0, f.duration, f.height, 0.0F));
 			if (kind == SEAL || kind == STAR) {
@@ -188,6 +199,7 @@ final class RelicFall {
 
 	/** The cast's climax: its falling weapon has landed (the monument entity takes over; a held seal stays). */
 	static void land(long cast) {
+		FarRelic.land(cast);
 		double now = TitahWorld.clock();
 		for (Fall f : FALLS) {
 			if (f.cast == cast && !f.up && !f.landed) {
@@ -198,6 +210,7 @@ final class RelicFall {
 
 	/** A held prop (the seal) rises {@code up} b over {@code ticks} and fades. */
 	static void liftAway(long cast, float up, int ticks) {
+		FarRelic.liftAway(cast, up, ticks);
 		double now = TitahWorld.clock();
 		for (Fall f : FALLS) {
 			if (f.cast == cast && f.hold && Double.isNaN(f.liftStart)) {
@@ -215,6 +228,7 @@ final class RelicFall {
 	}
 
 	static void abort(long cast) {
+		FarRelic.abort(cast);
 		for (Fall f : FALLS) {
 			if (f.cast == cast) {
 				if (f.handle != null) {
@@ -326,6 +340,7 @@ final class RelicFall {
 			return;
 		}
 		double range = TitahWorld.viewRange() + 64.0D;
+		double far = TitahWorld.viewRange() - 24.0D;
 		boolean maximal = DampakWorldBudget.tier() >= 2;
 		for (int i = 0; i < FALLS.size(); i++) {
 			Fall f = FALLS.get(i);
@@ -334,6 +349,10 @@ final class RelicFall {
 			}
 			Vec3 at = f.at(frame.clock);
 			if (frame.dist2(at.x, at.y, at.z) > range * range) {
+				// a giant weapon falling far away: its trail as the impostor's, projected inside render distance
+				if (f.scale > 24.0F && frame.dist2(at.x, at.y, at.z) <= 16.0D * range * range) {
+					farTrail(frame, f, at, far / Math.sqrt(frame.dist2(at.x, at.y, at.z)));
+				}
 				continue;
 			}
 			if (!TitahWorld.quads(4)) {
@@ -343,12 +362,14 @@ final class RelicFall {
 			float fadeIn = Math.min(1.0F, p * 6.0F + 0.15F);
 			// the trail runs from the weapon's leading end back along its path (up while it falls, down while it rises)
 			double lead = f.up ? f.topAbove() : -f.tipBelow();
-			double tailLength = Math.min(f.up ? 30.0D : 48.0D, Math.max(6.0D, f.height * (f.up ? 0.35D : 0.5D) * (0.3D + p)));
+			// a giant weapon (Tingkat Titah) has a longer, wider trail: the caps grow with sqrt(scale / 12)
+			float giant = (float) Math.max(1.0D, Math.sqrt(f.scale / 12.0D));
+			double tailLength = Math.min((f.up ? 30.0D : 48.0D) * giant, Math.max(6.0D, f.height * (f.up ? 0.35D : 0.5D) * (0.3D + p)));
 			float ax = frame.rx(at.x);
 			float az = frame.rz(at.z);
 			float ay = frame.ry(at.y + lead * 0.6D);
 			float by = frame.ry(at.y + (f.up ? -tailLength : tailLength));
-			float width = Math.max(0.8F, Math.min(6.0F, f.scale * (f.kind == SEAL ? 0.5F : 0.22F)));
+			float width = Math.max(0.8F, Math.min(6.0F * giant, f.scale * (f.kind == SEAL ? 0.5F : 0.22F)));
 			int head = TitahWorld.argb(0.85F * fadeIn, f.trailRgb);
 			int tail = TitahWorld.argb(0.0F, f.trailRgb);
 			// the heat-haze / light trail (glow strip) and its white core
@@ -356,13 +377,29 @@ final class RelicFall {
 			frame.beam(frame.lightning, ax, ay, az, ax, frame.ry(at.y + (f.up ? -tailLength : tailLength) * 0.7D), az, Math.max(0.15F, width * 0.18F),
 					TitahWorld.argb(0.9F * fadeIn, f.rgb), TitahWorld.argb(0.0F, f.rgb));
 			// the halo round the leading end
-			float halo = Math.max(1.5F, Math.min(10.0F, f.scale * (f.kind == STAR ? 1.2F : 0.45F)));
+			float halo = Math.max(1.5F, Math.min(10.0F * giant, f.scale * (f.kind == STAR ? 1.2F : 0.45F)));
 			frame.billboard(frame.ground, ax, frame.ry(at.y + lead), az, halo, TitahWorld.argb(0.7F * fadeIn, f.rgb));
 			if (maximal && !f.up && f.kind != SEAL) {
 				// the halo pillar over the falling weapon
 				frame.pillar(at.x, at.y + f.topAbove(), at.z, (int) Math.min(64.0D, tailLength), f.trailRgb, Math.max(0.3F, f.scale * 0.06F));
 			}
 		}
+	}
+
+	/** The trail of a giant fall beyond render distance, scaled by {@code k} about the camera (one glow strip). */
+	private static void farTrail(SigilRenderer.Frame frame, Fall f, Vec3 at, double k) {
+		if (f.up || !(k > 0.0D) || !TitahWorld.quads(1)) {
+			return;
+		}
+		float p = f.progress(frame.clock);
+		double giant = Math.sqrt(f.scale / 12.0D);
+		double tail = Math.min(48.0D * giant, Math.max(6.0D, f.height * 0.5D * (0.3D + p)));
+		float ax = (float) (frame.rx(at.x) * k);
+		float ay = (float) (frame.ry(at.y - f.tipBelow()) * k);
+		float az = (float) (frame.rz(at.z) * k);
+		float by = (float) (frame.ry(at.y + tail) * k);
+		float width = (float) Math.max(0.3D, Math.min(6.0D * giant, f.scale * 0.22D) * 2.2D * k);
+		frame.beam(frame.glow, ax, ay, az, ax, by, az, width, TitahWorld.argb(0.8F, f.trailRgb), TitahWorld.argb(0.0F, f.trailRgb));
 	}
 
 	private RelicFall() {

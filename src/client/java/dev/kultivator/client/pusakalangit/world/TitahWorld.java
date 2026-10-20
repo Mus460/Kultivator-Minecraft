@@ -39,6 +39,12 @@ import java.util.Map;
  * {@code duration} = ticks to the climax on CAST and ticks to land on a pre-impact TRAVEL, {@code aux} bits 0-9 the
  * speed × 100, bit 10 a monument planned, bit 11 real Kehancuran, bits 12-13 the decree. Every public method never throws
  * and runs on the client thread; idle cost is one boolean per frame.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10, contract C10b.7): bits 14-17 of {@code aux} carry the tier − 1. The tier's world scale
+ * {@code s = 1.6^(t − 1)} ({@link #tierScale}) and {@code q = sqrt(s)} size everything here: the server's radii and
+ * lengths already carry it, the weapons grow by {@code s} (≤ 1100), heights and widths by {@code q}. Tier 1 draws exactly
+ * as before. From tier 2 the giant weapons are {@link FarRelic}s, rings get a far horizon arc, the cleaving line a far
+ * streak and the grid its true size; whatever lies beyond render distance draws with fewer layers or not at all.
  */
 public final class TitahWorld {
 
@@ -81,6 +87,10 @@ public final class TitahWorld {
 		boolean lowLoad;
 		float others;
 		int seed;
+		/** Tingkat Titah: the tier (1-9), its world scale {@code s} and {@code q = sqrt(s)}. */
+		int tier = 1;
+		float s = 1.0F;
+		float q = 1.0F;
 		double born;
 		double climaxEta;
 		boolean climaxed;
@@ -103,7 +113,7 @@ public final class TitahWorld {
 			return Math.max(1, Math.round(ticks / Math.max(0.3F, speed)));
 		}
 
-		/** Kekuatan as seen from the radius (R_vis / the decree's base radius at ×1). */
+		/** Kekuatan as seen from the radius (R_vis / (the decree's base radius at ×1 × the tier's scale)). */
 		float kekuatan() {
 			float base = switch (skill) {
 				case PEDANG -> 48.0F;
@@ -111,7 +121,12 @@ public final class TitahWorld {
 				case BINTANG -> 48.0F;
 				default -> 32.0F;
 			};
-			return Math.max(0.1F, rawRadius / base);
+			return Math.max(0.1F, rawRadius / (base * Math.max(1.0F, s)));
+		}
+
+		/** A weapon's model scale at this tier: the tier-1 scale × s, at most 1100 (29.16.1 mScale). */
+		float giant(float scale1) {
+			return Math.min(TitahMonumentRenderer.MAX_SCALE, scale1 * s);
 		}
 
 		/** The horizontal unit direction caster → aim (or +z). */
@@ -137,6 +152,8 @@ public final class TitahWorld {
 	private static @Nullable ClientLevel lastLevel;
 	private static boolean registered;
 	private static boolean active;
+	/** The tier of the last decree seen (stats). */
+	private static int lastTier = 1;
 
 	// ================================================================== C10b.6
 
@@ -181,9 +198,10 @@ public final class TitahWorld {
 	/** Live pieces and the last frame's state (for {@code /sinematik pusaka info}). */
 	public static String stats() {
 		try {
-			return String.format(Locale.ROOT, "Titah dunia: titah %d, jatuh %d, langit %d, belahan %d, bintang %d, kisi/lubang %d, slab %d, monumen %d, antre %d, tier %d",
+			return String.format(Locale.ROOT,
+					"Titah dunia: titah %d, jatuh %d, langit %d, belahan %d, bintang %d, kisi/lubang %d, slab %d, monumen %d, antre %d, tier %d; tingkat terakhir %d (x%.2f); %s",
 					CASTS.size(), RelicFall.count(), SkyMarks.count(), CleaveLine.count(), StarFall.count(), LiftCarry.count(), DampakWorld.titahCells(),
-					MonumentNotes.count(), SCHEDULED.size(), DampakWorldBudget.tier());
+					MonumentNotes.count(), SCHEDULED.size(), DampakWorldBudget.tier(), lastTier, tierScale(lastTier), FarRelic.stats());
 		} catch (RuntimeException exception) {
 			return "Titah dunia: -";
 		}
@@ -198,6 +216,7 @@ public final class TitahWorld {
 			StarFall.clear();
 			LiftCarry.clear();
 			MonumentNotes.clear();
+			FarRelic.clear();
 			CASTS.clear();
 			SCHEDULED.clear();
 			lastPayload = null;
@@ -223,9 +242,48 @@ public final class TitahWorld {
 			StarFall.render(frame);
 			RelicFall.render(frame);
 			SkyMarks.render(frame);
+			FarRelic.render(frame);
 		} catch (RuntimeException exception) {
 			warn("render", exception);
 		}
+	}
+
+	// ================================================================== Tingkat Titah (29.16.1)
+
+	/** The tier's world scale {@code s(t) = 1.6^(t − 1)} (t clamped to 1-9): 1, 1.6, 2.56 … 42.95. The one shared helper. */
+	public static float tierScale(int tier) {
+		return (float) Math.pow(1.6D, Math.max(1, Math.min(9, tier)) - 1);
+	}
+
+	/** The tier carried in bits 14-17 of a Titah event's {@code aux} (1-9; 1 for an older server). */
+	public static int tierOf(int aux) {
+		return Math.max(1, Math.min(9, 1 + (aux >> 14 & 0xF)));
+	}
+
+	/** Far relics: {@link FarRelic#describe} for {@code /sinematik pusaka jauh}. */
+	public static List<String> farRelics() {
+		try {
+			return FarRelic.describe();
+		} catch (RuntimeException exception) {
+			return List.of();
+		}
+	}
+
+	/**
+	 * The impostor projection (29.16.10): {@code (x, y, z)} as a camera-relative point, pulled in along its view ray to
+	 * {@code Dm} = render distance − 24 b when farther; returns the factor {@code k ≤ 1} that sizes scale with.
+	 */
+	static float project(SigilRenderer.Frame frame, double x, double y, double z, float[] out) {
+		double rx = frame.rx(x);
+		double ry = frame.ry(y);
+		double rz = frame.rz(z);
+		double d = Math.sqrt(rx * rx + ry * ry + rz * rz);
+		double dm = Math.max(32.0D, viewRange() - 24.0D);
+		double k = d > dm ? dm / d : 1.0D;
+		out[0] = (float) (rx * k);
+		out[1] = (float) (ry * k);
+		out[2] = (float) (rz * k);
+		return (float) k;
 	}
 
 	// ================================================================== package helpers
@@ -329,10 +387,12 @@ public final class TitahWorld {
 		StarFall.tick(level, now);
 		LiftCarry.tick(level, now);
 		MonumentNotes.tick(level, now);
+		FarRelic.tick(level, now);
 		if (level.getGameTime() % 40L == 0L) {
 			CASTS.values().removeIf(cast -> now - cast.lastSeen > CAST_MEMORY);
 		}
-		active = RelicFall.count() > 0 || SkyMarks.count() > 0 || CleaveLine.count() > 0 || StarFall.count() > 0 || LiftCarry.count() > 0;
+		active = RelicFall.count() > 0 || SkyMarks.count() > 0 || CleaveLine.count() > 0 || StarFall.count() > 0 || LiftCarry.count() > 0
+				|| FarRelic.count() > 0;
 	}
 
 	// ================================================================== events
@@ -440,6 +500,10 @@ public final class TitahWorld {
 			cast.count = p.count();
 		}
 		int aux = p.aux();
+		cast.tier = tierOf(aux);
+		cast.s = tierScale(cast.tier);
+		cast.q = (float) Math.sqrt(cast.s);
+		lastTier = cast.tier;
 		int speed = aux & 0x3FF;
 		cast.speed = speed <= 0 ? 1.0F : Math.max(0.3F, Math.min(3.0F, speed / 100.0F));
 		cast.monument = (aux & 1 << 10) != 0;
@@ -474,6 +538,7 @@ public final class TitahWorld {
 	private static void strike(ClientLevel level, Cast cast, Vec3 impact, String ring, int ringRgb, int flashRgb, String palette, int decalRgb, float decal,
 							   int debris, float shake) {
 		DampakWorld.titahRing(impact, ringRadius(cast.rawRadius), ring, ringRgb, cast.own, 0, true);
+		farRing(cast, impact, cast.rawRadius, ring, ringRgb, 0);
 		SkyMarks.flash(cast.key, impact, flashRgb, 16, 180, 1.0F);
 		if (!cast.kehancuran) {
 			int index = DampakWorldBudget.index();
@@ -483,6 +548,20 @@ public final class TitahWorld {
 		DampakWorld.titahDecal(impact, decal, palette, decalRgb, true);
 		if (cast.own) {
 			CameraShake.add(Math.min(0.8F, shake * DampakWorldBudget.power()), 16, impact, cast.radius * 2.0F, true);
+		}
+	}
+
+	/**
+	 * Tingkat Titah: a ring of true radius {@code raw} wider than this client's near ring also sweeps on as a far horizon
+	 * arc (tier 2-9 only; tier 1 draws as before).
+	 */
+	private static void farRing(Cast cast, Vec3 at, float raw, String variant, int rgb, int delay) {
+		if (cast.tier < 2) {
+			return;
+		}
+		float near = ringRadius(raw);
+		if (raw > near + 8.0F) {
+			DampakWorld.titahFarRing(at, raw, near, variant, rgb, cast.own, delay);
 		}
 	}
 
@@ -498,20 +577,21 @@ public final class TitahWorld {
 		}
 		if (phase == Phase.EXTRA1 && !cast.lowLoad) {
 			// the gate opens above the impact: a gold ring tears the clouds (what bystanders see of the Celestial Court)
-			float r = Math.max(12.0F, Math.min(48.0F, cast.radius * 0.35F));
-			SkyMarks.gate(cast.key, cast.ground(level).add(0.0D, 96.0D, 0.0D), r, GOLD, WHITE_GOLD, cast.climaxEta + 30.0D);
+			float r = Math.max(12.0F, Math.min(48.0F * cast.q, cast.radius * 0.35F * cast.q));
+			SkyMarks.gate(cast.key, cast.ground(level).add(0.0D, 96.0D * cast.q, 0.0D), r, GOLD, WHITE_GOLD, cast.climaxEta + 30.0D);
 			return;
 		}
 		if ((phase == Phase.EXTRA2 || preImpact) && !cast.fell) {
 			// EXTRA2 (sky → impact) and the pre-impact TRAVEL arrive together: the first one drops the sword
 			cast.fell = true;
 			int duration = p.duration() > 0 ? p.duration() : cast.t(40);
-			float height = drop(pos, to, hasTo, 120.0F);
-			float scale = Math.max(6.0F, Math.min(24.0F, 12.0F * (float) Math.sqrt(cast.kekuatan())));
+			float height = drop(pos, to, hasTo, 120.0F * cast.q);
+			float scale = cast.giant(Math.max(6.0F, Math.min(24.0F, 12.0F * (float) Math.sqrt(cast.kekuatan()))));
 			Vec3 ground = cast.ground(level);
 			float yaw = (float) Math.toDegrees(Math.atan2(-(cast.castPos.x - ground.x), cast.castPos.z - ground.z));
 			if (!cast.lowLoad) {
-				RelicFall.fall(cast.key, "heaven_splitting_sword", RelicFall.SWORD, ground, height, duration, scale, yaw, WHITE_GOLD, GOLD, cast.own, false, null);
+				RelicFall.fall(cast.key, "heaven_splitting_sword", RelicFall.SWORD, ground, height, duration, scale, yaw, WHITE_GOLD, GOLD, cast.own, false, null,
+						cast.tier);
 			}
 			return;
 		}
@@ -529,16 +609,25 @@ public final class TitahWorld {
 			Vec3 along = hasTo ? new Vec3(to.x - pos.x, 0.0D, to.z - pos.z) : Vec3.ZERO;
 			Vec3 dir = along.lengthSqr() > 1.0E-4D ? along.normalize() : cast.dir();
 			if (!cast.lowLoad) {
-				CleaveLine.start(level, cast.key, impact, dir, half, 8.0F * cast.speed, WHITE_GOLD, 0xFF2A1A, cast.own, cast.kehancuran, cast.lowLoad);
+				if (cast.tier >= 2) {
+					// the front runs at the server speed to the true half-length; beyond the drawn fissure, a far streak
+					float farHalf = cast.length > 0.5F ? cast.length * 0.5F : cast.rawRadius;
+					float speed = Math.max(8.0F, farHalf / 40.0F) * cast.speed;
+					CleaveLine.start(level, cast.key, impact, dir, half, farHalf, speed, WHITE_GOLD, 0xFF2A1A, cast.own, cast.kehancuran, cast.lowLoad);
+				} else {
+					CleaveLine.start(level, cast.key, impact, dir, half, 8.0F * cast.speed, WHITE_GOLD, 0xFF2A1A, cast.own, cast.kehancuran, cast.lowLoad);
+				}
 			}
 			DampakWorld.titahSigilClimax(cast.key, 0, 0);
 			return;
 		}
 		if (phase == Phase.EXTRA4) {
 			Vec3 impact = cast.ground(level);
-			float second = ringRadius(p.radius() > 0.5F ? p.radius() : cast.rawRadius * 1.4F);
+			float rawSecond = p.radius() > 0.5F ? p.radius() : cast.rawRadius * 1.4F;
+			float second = ringRadius(rawSecond);
 			DampakWorld.titahRing(impact, second, "DUST", mix(GOLD, DUST, 0.5F), cast.own, 0, false);
-			SkyMarks.wave(cast.key, impact, Math.min(cast.radius, 40.0F), DUST, false);
+			farRing(cast, impact, rawSecond, "DUST", mix(GOLD, DUST, 0.5F), 0);
+			SkyMarks.wave(cast.key, impact, cast.tier >= 2 ? Math.min(rawSecond, 40.0F * cast.s) : Math.min(cast.radius, 40.0F), DUST, false);
 		}
 	}
 
@@ -549,25 +638,25 @@ public final class TitahWorld {
 		if (phase == Phase.EXTRA0 && !cast.ascended && !cast.lowLoad) {
 			// JAVELIN_THROW releases (EXTRA0, hand → sky): the pillar streaks straight up into the sky with an ember trail
 			cast.ascended = true;
-			float up = Math.min(120.0F, drop(pos, to, hasTo, 90.0F));
+			float up = Math.min(120.0F * cast.q, drop(pos, to, hasTo, 90.0F * cast.q));
 			int ticks = p.duration() > 0 ? Math.min(40, p.duration()) : cast.t(20);
-			RelicFall.ascend(cast.key, "dinghai_pillar", pos.subtract(0.0D, 0.3D, 0.0D), up, ticks, 1.6F, EMBER, cast.own);
+			RelicFall.ascend(cast.key, "dinghai_pillar", pos.subtract(0.0D, 0.3D, 0.0D), up, ticks, 1.6F * cast.q, EMBER, cast.own);
 			return;
 		}
 		if (phase == Phase.EXTRA1 && !cast.lowLoad) {
 			// bystanders see a red star overhead (the event's position is the sky above the aim)
-			Vec3 star = pos.y > cast.aim.y + 40.0D ? pos.subtract(0.0D, 10.0D, 0.0D) : cast.ground(level).add(0.0D, 150.0D, 0.0D);
-			SkyMarks.star(cast.key, star, 0xFF3A1A, 7.0F, cast.climaxEta + 4.0D);
+			Vec3 star = pos.y > cast.aim.y + 40.0D ? pos.subtract(0.0D, 10.0D, 0.0D) : cast.ground(level).add(0.0D, 150.0D * cast.q, 0.0D);
+			SkyMarks.star(cast.key, star, 0xFF3A1A, 7.0F * cast.q, cast.climaxEta + 4.0D, cast.tier >= 2);
 			return;
 		}
 		if ((phase == Phase.EXTRA2 || preImpact) && !cast.fell) {
 			cast.fell = true;
 			int duration = p.duration() > 0 ? p.duration() : cast.t(30);
-			float height = drop(pos, to, hasTo, 160.0F);
-			float scale = Math.max(5.0F, Math.min(20.0F, 10.0F * (float) Math.sqrt(cast.kekuatan())));
+			float height = drop(pos, to, hasTo, 160.0F * cast.q);
+			float scale = cast.giant(Math.max(5.0F, Math.min(20.0F, 10.0F * (float) Math.sqrt(cast.kekuatan()))));
 			if (!cast.lowLoad) {
 				RelicFall.fall(cast.key, "dinghai_pillar", RelicFall.PILLAR, cast.ground(level), height, duration, scale, 0.0F, 0xFFFFFF, EMBER, cast.own, false,
-						null);
+						null, cast.tier);
 			}
 			if (cast.own || Minecraft.getInstance().player != null && Minecraft.getInstance().player.position().distanceToSqr(cast.aim) < 128.0D * 128.0D) {
 				// a sky flash where the streak starts (client presentation, not weather)
@@ -587,9 +676,11 @@ public final class TitahWorld {
 		if (phase == Phase.EXTRA3) {
 			// the flattening wave out to the damage radius (the event's radius): grass and leaves blown outward
 			Vec3 impact = cast.ground(level);
-			float r = Math.min(cast.radius, p.radius() > 0.5F ? p.radius() : 40.0F);
+			float rawWave = p.radius() > 0.5F ? p.radius() : 40.0F * cast.s;
+			float r = Math.min(cast.radius, rawWave);
 			DampakWorld.titahRing(impact, r, "DUST", mix(EMBER, DUST, 0.6F), cast.own, 0, false);
-			SkyMarks.wave(cast.key, impact, r, DUST, true);
+			farRing(cast, impact, rawWave, "DUST", mix(EMBER, DUST, 0.6F), 0);
+			SkyMarks.wave(cast.key, impact, cast.tier >= 2 ? rawWave : r, DUST, true);
 		}
 	}
 
@@ -601,7 +692,7 @@ public final class TitahWorld {
 			// at the true radius (≤ 256): its nodes are where the server's stars fall (the lines are sampled by R / 64)
 			DampakWorld.titahSigil(level, cast.key, sigil(cast), cast.castPos, cast.aim, cast.rawRadius, cast.seed, VIOLET, cast.own, palette(cast, "LIGHTNING"));
 			if (!cast.lowLoad) {
-				SkyMarks.dipper(cast.key, cast.ground(level), DampakWorld.titahSigilNodes(cast.key), cast.dir(), STAR_WHITE, cast.climaxEta + 60.0D);
+				SkyMarks.dipper(cast.key, cast.ground(level), DampakWorld.titahSigilNodes(cast.key), cast.dir(), STAR_WHITE, cast.climaxEta + 60.0D, cast.q);
 			}
 			return;
 		}
@@ -618,7 +709,7 @@ public final class TitahWorld {
 			Vec3 ground = new Vec3(at.x, DampakWorld.titahGround(level, at.x, at.z, at.y), at.z);
 			int index = Math.max(0, p.index());
 			if (preImpact) {
-				StarFall.fall(level, cast, ground, Math.max(4, p.duration()), drop(pos, to, hasTo, 80.0F), index);
+				StarFall.fall(level, cast, ground, Math.max(4, p.duration()), drop(pos, to, hasTo, 80.0F * cast.q), index);
 			} else {
 				StarFall.land(level, cast, ground, index, 0);
 			}
@@ -647,7 +738,11 @@ public final class TitahWorld {
 							   boolean hasTo) {
 		float rawHalf = cast.length > 0.5F ? cast.length : cast.rawRadius;
 		float half = DampakWorldBudget.titahRadius(rawHalf);
-		float cell = cast.count > 0 ? Math.max(2.0F, Math.min(16.0F, 2.0F * rawHalf / cast.count)) : Math.max(2.0F, Math.min(16.0F, 2.0F * rawHalf / 8.0F));
+		// the cell size from the server (about 8 per side at every tier; at most 16 × s)
+		float cellCap = 16.0F * Math.max(1.0F, cast.s);
+		float cell = cast.count > 0 ? Math.max(2.0F, Math.min(cellCap, 2.0F * rawHalf / cast.count)) : Math.max(2.0F, Math.min(cellCap, 2.0F * rawHalf / 8.0F));
+		// from tier 2 the grid and the torn cells keep the true size of the decree (only what is in view draws)
+		float landHalf = cast.tier >= 2 ? rawHalf : half;
 		if (phase == Phase.CAST) {
 			if (!cast.ascended && !cast.lowLoad) {
 				cast.ascended = true;
@@ -659,19 +754,20 @@ public final class TitahWorld {
 		}
 		if (phase == Phase.EXTRA1) {
 			// the light grid cuts the square into cells
-			LiftCarry.grid(cast.key, cast.ground(level), half, cell, JADE_GOLD, cast.climaxEta + cast.t(70), cast.own);
+			LiftCarry.grid(cast.key, cast.ground(level), landHalf, cell, JADE_GOLD, cast.climaxEta + cast.t(70), cast.own);
 			return;
 		}
 		if ((phase == Phase.EXTRA2 || preImpact) && !cast.fell) {
 			cast.fell = true;
 			int duration = p.duration() > 0 ? p.duration() : cast.t(30);
-			float height = drop(pos, to, hasTo, 96.0F);
+			float height = drop(pos, to, hasTo, 96.0F * cast.q);
 			// the seal covers most of the square (its jade face is 0.875 b wide at scale 1)
-			float scale = Math.max(4.0F, Math.min(48.0F, 2.0F * half * 0.8F / 0.875F));
+			float scale = cast.tier >= 2 ? Math.max(4.0F, Math.min(TitahMonumentRenderer.MAX_SCALE, 2.0F * rawHalf * 0.8F / 0.875F))
+					: Math.max(4.0F, Math.min(48.0F, 2.0F * half * 0.8F / 0.875F));
 			Vec3 ground = cast.ground(level);
 			float yaw = (float) Math.toDegrees(Math.atan2(-(cast.castPos.x - ground.x), cast.castPos.z - ground.z));
 			if (!cast.lowLoad) {
-				RelicFall.fall(cast.key, "yishan_seal", RelicFall.SEAL, ground, height, duration, scale, yaw, 0xFFE8A0, SEAL_VIOLET, cast.own, true, null);
+				RelicFall.fall(cast.key, "yishan_seal", RelicFall.SEAL, ground, height, duration, scale, yaw, 0xFFE8A0, SEAL_VIOLET, cast.own, true, null, cast.tier);
 			}
 			return;
 		}
@@ -682,23 +778,25 @@ public final class TitahWorld {
 			strike(level, cast, impact, ringName(cast, "DUST"), mix(0xFFE8A0, DUST, 0.5F), 0xFFE8A0, palette(cast, "EARTH"), 0xFFE8A0,
 					Math.max(4.0F, Math.min(16.0F, half * 0.5F)), 2, 0.6F);
 			// the stepped glowing pit: the real one's size under Mode Kehancuran, the whole square otherwise (visual only)
-			float pit = cast.kehancuran ? Math.max(4.0F, Math.min(half, Math.min(24.0F, cast.rawRadius * 0.25F))) : half;
+			float pit = cast.kehancuran ? Math.max(4.0F, Math.min(half, Math.min(24.0F * cast.s, cast.rawRadius * 0.25F))) : half;
 			int steps = pit >= 24.0F ? 5 : pit >= 12.0F ? 4 : 3;
+			// Tingkat Titah: a deeper pit has more terraces (+2 from tier 4, +2 more from tier 7; at most 9)
+			steps = Math.min(9, steps + (cast.tier >= 4 ? 2 : 0) + (cast.tier >= 7 ? 2 : 0));
 			LiftCarry.pit(cast.key, impact, pit, steps, 0xC8A0FF, 0xFFD878, cast.own);
 			return;
 		}
 		if (phase == Phase.EXTRA3) {
 			// cells torn out: three-layer slabs rise turning and are carried off into the sky
 			int spread = p.duration() > 0 ? p.duration() : cast.t(40);
-			LiftCarry.tear(level, cast.key, cast.ground(level), half, cell, cast.dir(), spread, JADE_GOLD, cast.own, cast.lowLoad, cast.kehancuran,
+			LiftCarry.tear(level, cast.key, cast.ground(level), landHalf, cell, cast.s, cast.dir(), spread, JADE_GOLD, cast.own, cast.lowLoad, cast.kehancuran,
 					cast.others);
 			return;
 		}
 		if (phase == Phase.EXTRA4) {
 			// the levitated foes slam down; the seal lifts away and fades
 			Vec3 impact = cast.ground(level);
-			DampakWorld.titahRing(impact, Math.min(24.0F, cast.radius), "DUST", DUST, cast.own, 0, false);
-			RelicFall.liftAway(cast.key, 60.0F, cast.t(30));
+			DampakWorld.titahRing(impact, Math.min(24.0F * cast.s, cast.radius), "DUST", DUST, cast.own, 0, false);
+			RelicFall.liftAway(cast.key, 60.0F * cast.q, cast.t(30));
 		}
 	}
 

@@ -25,6 +25,11 @@ import java.util.List;
  * the thrown pillar, the seven stars of the Northern Dipper flaring above the land and lighting one by one, the impact
  * light pillars (beacon beams with a soft base) and the flattening wave's blown grass and dust. Minimal draws particles
  * only.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): stars (the red star, the Dipper and the far star impacts of {@link #farStar}) beyond
+ * render distance are drawn pulled in along their view ray to just inside it, scaled with the pull, so a sky thousands
+ * of blocks wide keeps its true directions and sizes; a flattening wave wider than render distance spends its particles
+ * only on the arc of its front that the camera can see.
  */
 final class SkyMarks {
 
@@ -51,6 +56,10 @@ final class SkyMarks {
 		double[] lit = new double[0];
 		boolean leaves;
 		int lastTick = -1;
+		/** A far star impact (Tingkat Titah): a short flare at the star's landing point, drawn at any distance. */
+		boolean farImpact;
+		/** Drawn at any distance, pulled inside render distance (a tier 2-9 sky mark); tier-1 marks draw as before. */
+		boolean projected;
 
 		Mark(long cast, int kind, Vec3 at, float size, int rgb, int rgb2, double born, double until) {
 			this.cast = cast;
@@ -91,9 +100,28 @@ final class SkyMarks {
 		}
 	}
 
+	/**
+	 * A star of the Dipper landing beyond render distance (Tingkat Titah): only its sky sprite, a flare that fades over
+	 * {@code ticks}, drawn pulled inside render distance along its view ray.
+	 */
+	static void farStar(long cast, Vec3 at, int rgb, float size, int ticks) {
+		double now = TitahWorld.clock();
+		Mark mark = new Mark(cast, STAR, at, size, rgb, 0xFFFFFF, now - 10.0D, now + Math.max(2, ticks) - FADE);
+		mark.farImpact = true;
+		mark.projected = true;
+		add(mark);
+	}
+
 	/** A single bright star overhead (Tiang's red star) until {@code until}. */
 	static void star(long cast, Vec3 at, int rgb, float size, double until) {
-		add(new Mark(cast, STAR, at, size, rgb, 0xFFFFFF, TitahWorld.clock(), until));
+		star(cast, at, rgb, size, until, false);
+	}
+
+	/** {@link #star}; {@code projected} draws it at any distance, pulled inside render distance (tier 2-9). */
+	static void star(long cast, Vec3 at, int rgb, float size, double until, boolean projected) {
+		Mark mark = new Mark(cast, STAR, at, size, rgb, 0xFFFFFF, TitahWorld.clock(), until);
+		mark.projected = projected;
+		add(mark);
 	}
 
 	/**
@@ -101,8 +129,14 @@ final class SkyMarks {
 	 * 110 b and drawn together at 60 %, or a drawn Dipper along {@code dir} when the sigil has none.
 	 */
 	static void dipper(long cast, Vec3 ground, List<Vec3> nodes, Vec3 dir, int rgb, double until) {
-		Mark mark = new Mark(cast, DIPPER, ground, 1.0F, rgb, TitahWorld.VIOLET, TitahWorld.clock(), until);
-		Vec3 sky = ground.add(0.0D, 110.0D, 0.0D);
+		dipper(cast, ground, nodes, dir, rgb, until, 1.0F);
+	}
+
+	/** {@link #dipper} of a Tingkat Titah decree: lifted {@code 110 × q} b, the stars {@code q} times larger. */
+	static void dipper(long cast, Vec3 ground, List<Vec3> nodes, Vec3 dir, int rgb, double until, float q) {
+		Mark mark = new Mark(cast, DIPPER, ground, Math.max(1.0F, q), rgb, TitahWorld.VIOLET, TitahWorld.clock(), until);
+		mark.projected = q > 1.001F;
+		Vec3 sky = ground.add(0.0D, 110.0D * Math.max(1.0F, q), 0.0D);
 		if (nodes.size() >= 7) {
 			double cx = 0.0D;
 			double cz = 0.0D;
@@ -241,10 +275,22 @@ final class SkyMarks {
 			return;
 		}
 		float front = mark.size * ease(Math.min(1.0F, tick / (float) WAVE_TICKS));
+		// a front wider than render distance: only the arc the camera can see (Tingkat Titah)
+		double middle = 0.0D;
+		double spread = Math.PI;
+		if (front > 48.0F) {
+			Vec3 camera = net.minecraft.client.Minecraft.getInstance().gameRenderer.mainCamera().position();
+			double[] arc = new double[2];
+			if (!DampakWorldBudget.visibleArc(mark.at.x, mark.at.z, front, camera.x, camera.z, Math.max(48.0D, TitahWorld.viewRange() - 32.0D), arc)) {
+				return;
+			}
+			middle = arc[0];
+			spread = arc[1];
+		}
 		int wanted = DampakWorldBudget.scaled(DampakWorldBudget.RING_DUST[DampakWorldBudget.index()], true, 48);
 		int n = EpicParticles.grant(wanted, false);
 		for (int i = 0; i < n; i++) {
-			double angle = random.nextDouble() * Math.PI * 2.0D;
+			double angle = middle + (random.nextDouble() * 2.0D - 1.0D) * spread;
 			double x = mark.at.x + Math.cos(angle) * front;
 			double z = mark.at.z + Math.sin(angle) * front;
 			double y = DampakWorld.titahGround(level, x, z, mark.at.y);
@@ -285,12 +331,18 @@ final class SkyMarks {
 			Mark mark = MARKS.get(i);
 			// a flash is at full strength from its first frame and shrinks by itself
 			float a = mark.kind == FLASH ? 1.0F : mark.alpha(frame.clock);
-			if (a <= 0.01F || frame.dist2(mark.at.x, mark.at.y, mark.at.z) > range * range) {
+			// stars and the Dipper are drawn at any distance, pulled inside render distance (Tingkat Titah)
+			boolean sky = mark.projected && (mark.kind == STAR || mark.kind == DIPPER);
+			if (a <= 0.01F || !sky && frame.dist2(mark.at.x, mark.at.y, mark.at.z) > range * range) {
 				continue;
 			}
 			switch (mark.kind) {
 				case GATE -> drawGate(frame, mark, a);
-				case STAR -> drawStar(frame, mark.at, mark.size, mark.rgb, a, frame.clock + mark.cast % 97);
+				case STAR -> {
+					// a far star impact flares at once and shrinks with its fade
+					float size = mark.farImpact ? mark.size * (0.6F + 0.8F * a) : mark.size;
+					drawStar(frame, mark.at, size, mark.rgb, a, frame.clock + mark.cast % 97, mark.projected);
+				}
 				case DIPPER -> drawDipper(frame, mark, a);
 				case FLASH -> drawFlash(frame, mark);
 				default -> {
@@ -326,13 +378,21 @@ final class SkyMarks {
 	}
 
 	/** One star: a soft halo, a white core and a four-point flare, twinkling. */
-	private static void drawStar(SigilRenderer.Frame frame, Vec3 at, float size, int rgb, float a, double phase) {
+	private static void drawStar(SigilRenderer.Frame frame, Vec3 at, float size, int rgb, float a, double phase, boolean projected) {
 		if (!TitahWorld.quads(4)) {
 			return;
 		}
 		float x = frame.rx(at.x);
 		float y = frame.ry(at.y);
 		float z = frame.rz(at.z);
+		if (projected) {
+			float[] p = new float[3];
+			float k = TitahWorld.project(frame, at.x, at.y, at.z, p);
+			x = p[0];
+			y = p[1];
+			z = p[2];
+			size *= k;
+		}
 		float twinkle = 0.85F + 0.15F * (float) Math.sin(phase * 0.35D);
 		frame.billboard(frame.ground, x, y, z, size * twinkle, TitahWorld.argb(0.8F * a, rgb));
 		frame.billboard(frame.ground, x, y, z, size * 0.35F, TitahWorld.argb(a, 0xFFFFFF));
@@ -354,18 +414,27 @@ final class SkyMarks {
 			Vec3 s1 = mark.stars.get(k + 1);
 			boolean lit = !Double.isNaN(mark.lit[k + 1]);
 			int c = TitahWorld.argb((lit ? 0.6F : 0.18F) * a, lit ? mark.rgb2 : mark.rgb);
-			frame.beam(frame.glow, frame.rx(s0.x), frame.ry(s0.y), frame.rz(s0.z), frame.rx(s1.x), frame.ry(s1.y), frame.rz(s1.z), 1.2F, c, c);
+			if (mark.projected) {
+				float[] p0 = new float[3];
+				float[] p1 = new float[3];
+				float k0 = TitahWorld.project(frame, s0.x, s0.y, s0.z, p0);
+				float k1 = TitahWorld.project(frame, s1.x, s1.y, s1.z, p1);
+				frame.beam(frame.glow, p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], 1.2F * mark.size * (k0 + k1) * 0.5F, c, c);
+			} else {
+				frame.beam(frame.glow, frame.rx(s0.x), frame.ry(s0.y), frame.rz(s0.z), frame.rx(s1.x), frame.ry(s1.y), frame.rz(s1.z), 1.2F, c, c);
+			}
 		}
 		for (int k = 0; k < n; k++) {
 			double litAt = mark.lit[k];
-			float size = 2.2F;
+			float size = 2.2F * mark.size;
 			float glow = 0.55F;
 			if (!Double.isNaN(litAt)) {
 				float t = (float) Math.min(1.0D, Math.max(0.0D, (frame.clock - litAt) / 8.0D));
-				size = 2.6F + 3.0F * (1.0F - t);
+				size = (2.6F + 3.0F * (1.0F - t)) * mark.size;
 				glow = 1.0F;
 			}
-			drawStar(frame, mark.stars.get(k), size, k == n - 1 ? TitahWorld.mix(mark.rgb, mark.rgb2, 0.4F) : mark.rgb, a * glow, frame.clock + k * 13.0D);
+			drawStar(frame, mark.stars.get(k), size, k == n - 1 ? TitahWorld.mix(mark.rgb, mark.rgb2, 0.4F) : mark.rgb, a * glow, frame.clock + k * 13.0D,
+					mark.projected);
 		}
 	}
 

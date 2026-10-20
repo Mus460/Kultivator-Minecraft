@@ -234,6 +234,68 @@ public final class KehancuranLog extends SavedData {
 		data.setDirty();
 	}
 
+	/**
+	 * Phase 10b (DESIGN 29.16.7 "Finish", 29.16.9): a permanent Titah carve (Tingkat 6-9) that Pulihkan cannot restore. One
+	 * WARN line in the server log, a Catatan tablet line, and {@code perm: true} (with the Tingkat and radius) on the saved
+	 * line {@link #recordSelf} just wrote for it (a new saved line when there is none), so
+	 * {@code /kultivasi kehancuran status} can list it.
+	 */
+	static void recordPermanent(MinecraftServer server, UUID owner, String ownerName, String specId, int tier, ResourceKey<Level> dim, BlockPos pos,
+			int radius, long blocks) {
+		String dimension = dim.identifier().toString();
+		Kultivator.LOGGER.warn("[Kultivator] Kehancuran PERMANENT: {} self:{} tingkat {} {} {} {} {} r {} -> {} blocks (cannot be restored)", ownerName,
+				specId, tier, dimension, pos.getX(), pos.getY(), pos.getZ(), radius, blocks);
+		int count = (int) Math.min(Integer.MAX_VALUE, Math.max(0L, blocks));
+		Halls.log(owner, Component.translatable("kultivator.kehancuran.bulk.log.permanent", tier, pos.getX(), pos.getY(), pos.getZ(), count));
+		KehancuranLog data = get(server);
+		String id = owner.toString();
+		for (int i = data.log.size() - 1; i >= 0; i--) {
+			if (data.log.get(i) instanceof CompoundTag line && id.equals(line.getStringOr("owner", "")) && specId.equals(line.getStringOr("spec", ""))
+					&& line.getIntOr("x", 0) == pos.getX() && line.getIntOr("y", 0) == pos.getY() && line.getIntOr("z", 0) == pos.getZ()
+					&& !line.getBooleanOr("perm", false)) {
+				line.putBoolean("perm", true);
+				line.putInt("tier", tier);
+				line.putInt("radius", radius);
+				data.setDirty();
+				return;
+			}
+		}
+		CompoundTag line = new CompoundTag();
+		line.putString("owner", id);
+		line.putString("disciple", ownerName);
+		line.putString("shape", "bowl");
+		line.putBoolean("self", true);
+		line.putString("spec", specId);
+		line.putString("dim", dimension);
+		line.putInt("x", pos.getX());
+		line.putInt("y", pos.getY());
+		line.putInt("z", pos.getZ());
+		line.putInt("blocks", count);
+		line.putBoolean("restore", false);
+		line.putBoolean("perm", true);
+		line.putInt("tier", tier);
+		line.putInt("radius", radius);
+		line.putLong("day", server.overworld().getOverworldClockTime() / 24000L);
+		data.log.add(line);
+		while (data.log.size() > MAX_GLOBAL_LOG) {
+			data.log.remove(0);
+		}
+		data.setDirty();
+	}
+
+	/** The owner's last {@code max} permanent carves ({@code perm: true}), newest first. */
+	static List<CompoundTag> permanent(MinecraftServer server, UUID owner, int max) {
+		List<CompoundTag> list = new ArrayList<>();
+		ListTag source = get(server).log;
+		String id = owner.toString();
+		for (int i = source.size() - 1; i >= 0 && list.size() < max; i--) {
+			if (source.get(i) instanceof CompoundTag line && id.equals(line.getStringOr("owner", "")) && line.getBooleanOr("perm", false)) {
+				list.add(line);
+			}
+		}
+		return list;
+	}
+
 	/** The owner's last {@code max} records, newest first. */
 	static List<CompoundTag> recent(MinecraftServer server, UUID owner, int max) {
 		List<CompoundTag> list = new ArrayList<>();

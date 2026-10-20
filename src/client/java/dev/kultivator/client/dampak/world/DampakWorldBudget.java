@@ -8,7 +8,8 @@ import dev.kultivator.client.fx.spec.PhantomDisplays;
 /**
  * The budgets of the Phase 10 world effects (DESIGN 28.6.3, 28.7, 28.9.2, 28.10): every table indexed by the 7b tier in
  * effect ({@link EpicBudget#tier()}: 0 Minimal, 1 Normal, 2 Maximal; −1 = the frame guard took the geometry, particles
- * only). Also the two M2 settings M3 reads: "Puing &amp; monumen" and "Daya dampak". Client thread only.
+ * only). Also the two M2 settings M3 reads: "Puing &amp; monumen" and "Daya dampak". Client thread only. Tingkat Titah
+ * (DESIGN 29.16.10) adds the far LOD caps and the visible-arc helper of the horizon arcs.
  */
 public final class DampakWorldBudget {
 
@@ -53,6 +54,56 @@ public final class DampakWorldBudget {
 	/** Displays never spawn farther than this from the camera, and only every other one beyond {@link #HALF_RANGE}. */
 	public static final double SPAWN_RANGE = 64.0D;
 	public static final double HALF_RANGE = 32.0D;
+	// ---------------------------------------------------------------- Tingkat Titah (DESIGN 29.16.10, far LOD)
+	/** Far horizon-arc segments of a Titah ring beyond the drawable radius (Minimal: particle dots on the visible arc). */
+	public static final int[] FAR_RING_SEGMENTS = {48, 32, 64};
+	/** Far sigil points drawn over the visible part of a wide Titah sigil (Minimal: dust dots). */
+	public static final int[] FAR_SIGIL_POINTS = {128, 256, 512};
+	/** Far relics (giant decree weapons beyond render distance or not tracked): Minimal quads only. */
+	public static final int[] FAR_RELICS = {3, 6, 12};
+	/** Far streak segments of a cleaving line beyond render distance. */
+	public static final int FAR_STREAK_SEGMENTS = 16;
+	/** Within this distance a giant model may show its parts (Maximal only; Normal shows the base model only). */
+	public static final double PARTS_RANGE = 64.0D;
+
+	/** True while the 7b frame guard has dropped this scene below the chosen quality (far relics then use quads only). */
+	public static boolean guardDropped() {
+		try {
+			return EpicBudget.tier() < EffectQuality.level().ordinal();
+		} catch (RuntimeException exception) {
+			return false;
+		}
+	}
+
+	/**
+	 * The arc of a horizontal circle (centre {@code cx, cz}, radius {@code r}) that lies within {@code range} of the
+	 * camera ({@code camX, camZ}): {@code out[0]} the angle (radians) of the arc's middle, {@code out[1]} its half width
+	 * (π = the whole circle). False when no part of the circle is that close.
+	 */
+	public static boolean visibleArc(double cx, double cz, double r, double camX, double camZ, double range, double[] out) {
+		if (!(r > 0.0D) || !(range > 0.0D) || out == null || out.length < 2) {
+			return false;
+		}
+		double dx = camX - cx;
+		double dz = camZ - cz;
+		double d = Math.sqrt(dx * dx + dz * dz);
+		if (d < 1.0E-3D) {
+			if (r > range) {
+				return false;
+			}
+			out[0] = 0.0D;
+			out[1] = Math.PI;
+			return true;
+		}
+		// |P(θ) − C|² = r² + d² − 2 r d cos(θ − φ) ≤ range²
+		double cos = (r * r + d * d - range * range) / (2.0D * r * d);
+		if (cos > 1.0D) {
+			return false;
+		}
+		out[0] = Math.atan2(dz, dx);
+		out[1] = cos < -1.0D ? Math.PI : Math.acos(cos);
+		return true;
+	}
 
 	/** The 7b tier in effect (−1 = no geometry: particles only). */
 	public static int tier() {

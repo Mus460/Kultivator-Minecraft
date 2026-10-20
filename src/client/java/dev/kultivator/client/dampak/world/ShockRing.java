@@ -30,6 +30,12 @@ import java.util.List;
  * Titah Langit rings ({@link #startTitah}, DESIGN 29.8) may reach 256 b: they grow over 12-40 ticks (at most about 6.5 b
  * per tick), draw 64 / 96 segments with a wider band, take two large layers above 64 b, and fall back to a dotted particle
  * ring at Minimal.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): a decree wider than this client draws also starts a <b>far ring</b>
+ * ({@link #startTitahFar}) at its true radius (up to 4096 b). It draws nothing while it is inside the near ring; beyond it
+ * only the <b>horizon arc</b> within render distance of the camera is drawn, as one additive layer of at most 32 / 64
+ * segments (Minimal: at most 48 particle dots on that arc), so a wave thousands of blocks wide sweeps past the viewer
+ * without a quad or a particle spent where nobody can see it.
  */
 final class ShockRing {
 
@@ -55,6 +61,10 @@ final class ShockRing {
 		final int grow;
 		/** A Titah ring (its own segment table, wider band, two layers above 64 b). */
 		final boolean titah;
+		/** A far Titah ring (DESIGN 29.16.10): only its visible horizon arc beyond {@link #nearCap} draws. */
+		boolean far;
+		/** The radius the near ring of the same decree draws (a far ring is silent inside it). */
+		float nearCap;
 		boolean spikesDone;
 		int lastParticleTick = -1;
 
@@ -156,6 +166,38 @@ final class ShockRing {
 		DampakWorld.touchGeometry();
 	}
 
+	/**
+	 * A far Titah ring (DESIGN 29.16.10): the decree's true radius {@code r} (≤ 4096 b) beyond the near ring of radius
+	 * {@code nearCap}; it grows over 40-100 ticks and draws only its arc within render distance of the camera.
+	 */
+	static void startTitahFar(Vec3 centre, float r, float nearCap, String variant, int rgb, boolean own, int delay) {
+		if (centre == null || !Double.isFinite(centre.x) || !Double.isFinite(centre.y) || !Double.isFinite(centre.z) || !(r > nearCap + 8.0F)) {
+			return;
+		}
+		if (DampakWorldBudget.othersFactor(own) <= 0.0F) {
+			return;
+		}
+		float othersAlpha = own ? 1.0F : Math.max(0.35F, DampakWorldBudget.othersFactor(false));
+		// a VOID ring's contraction reads as nothing at this size: its far front is a plain dust front
+		String kind = variant == null || "VOID".equals(variant) || "FROST".equals(variant) ? "DUST" : variant;
+		float radius = Math.min(4096.0F, r);
+		int grow = Math.max(40, Math.min(100, Math.round(GROW + radius / 32.0F)));
+		Ring ring = new Ring(centre, radius, kind, rgb, 0.8F * othersAlpha, own, DampakWorld.clock(0.0F) + Math.max(0, delay), false, true, grow, true);
+		ring.far = true;
+		ring.nearCap = Math.max(0.0F, nearCap);
+		add(ring);
+		DampakWorld.touchGeometry();
+	}
+
+	/** The render distance in blocks (the far rings' visible range). */
+	static double viewRange() {
+		try {
+			return Math.max(64.0D, net.minecraft.client.Minecraft.getInstance().options.getEffectiveRenderDistance() * 16.0D);
+		} catch (RuntimeException exception) {
+			return 128.0D;
+		}
+	}
+
 	/** Grow ticks of a Titah ring: 12 + r / 8, at most 40 (a 256 b ring sweeps about 6.4 b per tick). */
 	private static int titahGrow(float radius) {
 		return Math.max(GROW, Math.min(40, Math.round(GROW + radius / 8.0F)));
@@ -214,6 +256,10 @@ final class ShockRing {
 			}
 			ring.lastParticleTick = tick;
 			float r = ring.radiusAt(age);
+			if (ring.far) {
+				farTick(level, ring, r, tick, minimal);
+				continue;
+			}
 			if (minimal && tick % 2 == 0) {
 				particleRing(level, ring, r);
 			}
@@ -224,6 +270,50 @@ final class ShockRing {
 				ring.spikesDone = true;
 				spikes(level, ring);
 			}
+		}
+	}
+
+	/**
+	 * A far ring's particles: its dust front and (Minimal) up to 48 dots, both only on the arc within render distance of
+	 * the camera and only once the front has left the near ring.
+	 */
+	private static void farTick(ClientLevel level, Ring ring, float r, int tick, boolean minimal) {
+		if (r <= ring.nearCap || tick > ring.growTicks() + 2) {
+			return;
+		}
+		Vec3 camera = net.minecraft.client.Minecraft.getInstance().gameRenderer.mainCamera().position();
+		double[] arc = new double[2];
+		if (!DampakWorldBudget.visibleArc(ring.centre.x, ring.centre.z, r, camera.x, camera.z, viewRange() - 8.0D, arc)) {
+			return;
+		}
+		RandomSource random = DampakParticles.random();
+		if (minimal && tick % 2 == 0) {
+			int n = DampakParticles.grant(Math.min(DampakWorldBudget.FAR_RING_SEGMENTS[0], 8 + (int) Math.round(r * arc[1] * 0.25D)));
+			ParticleOptions dust = new net.minecraft.core.particles.DustParticleOptions(ring.rgb & 0xFFFFFF, 2.4F);
+			for (int i = 0; i < n; i++) {
+				double angle = arc[0] - arc[1] + 2.0D * arc[1] * (i + 0.5D) / Math.max(1, n);
+				double x = ring.centre.x + Math.cos(angle) * r;
+				double z = ring.centre.z + Math.sin(angle) * r;
+				DampakParticles.one(dust, x, DampakDisplays.ground(level, x, z, ring.centre.y) + 0.1D, z, Math.cos(angle) * 0.05D, 0.0D, Math.sin(angle) * 0.05D);
+			}
+		}
+		int index = DampakWorldBudget.index();
+		int n = DampakParticles.grant(DampakWorldBudget.scaled(DampakWorldBudget.RING_DUST[index], ring.own, DampakWorldBudget.RING_DUST[index]));
+		for (int i = 0; i < n; i++) {
+			double angle = arc[0] + (random.nextDouble() * 2.0D - 1.0D) * arc[1];
+			double x = ring.centre.x + Math.cos(angle) * r;
+			double z = ring.centre.z + Math.sin(angle) * r;
+			double y = DampakDisplays.ground(level, x, z, ring.centre.y);
+			ParticleOptions particle;
+			if ("EMBER".equals(ring.variant)) {
+				particle = ParticleTypes.FLAME;
+			} else if ("GOLD".equals(ring.variant)) {
+				particle = ParticleTypes.END_ROD;
+			} else {
+				BlockState ground = level.getBlockState(BlockPos.containing(x, y - 0.5D, z));
+				particle = index >= 1 && i % 3 == 0 ? DampakParticles.pillar(ground) : DampakParticles.block(ground);
+			}
+			DampakParticles.one(particle, x, y + 0.1D, z, Math.cos(angle) * 0.15D, 0.12D + random.nextDouble() * 0.2D, Math.sin(angle) * 0.15D);
 		}
 	}
 
@@ -364,6 +454,10 @@ final class ShockRing {
 				continue;
 			}
 			float r = ring.radiusAt(age);
+			if (ring.far) {
+				renderFar(frame, ring, r, a, index);
+				continue;
+			}
 			double reach = r + (ring.titah ? 160.0D : 96.0D);
 			if (r < 0.3F || frame.dist2(ring.centre.x, ring.centre.y, ring.centre.z) > reach * reach) {
 				continue;
@@ -384,6 +478,56 @@ final class ShockRing {
 			int outerColor = ARGB.color(Math.round(a * 255.0F), ring.rgb);
 			int innerColor = ARGB.color(Math.round(a * 90.0F), ring.rgb);
 			annulus(frame, ring, inner, r, n, innerColor, outerColor);
+		}
+	}
+
+	/**
+	 * A far ring's horizon arc: the part of the ring within render distance of the camera, one additive layer of at most
+	 * 32 / 64 segments (DESIGN 29.16.10); nothing inside the near ring.
+	 */
+	private static void renderFar(SigilRenderer.Frame frame, Ring ring, float r, float a, int index) {
+		if (r <= ring.nearCap || r < 1.0F) {
+			return;
+		}
+		double cx = ring.centre.x;
+		double cz = ring.centre.z;
+		// the camera from the frame's camera-relative coordinates
+		double camX = cx - frame.rx(cx);
+		double camZ = cz - frame.rz(cz);
+		double[] arc = new double[2];
+		if (!DampakWorldBudget.visibleArc(cx, cz, r, camX, camZ, viewRange() - 8.0D, arc)) {
+			return;
+		}
+		int n = Math.max(4, Math.min(DampakWorldBudget.FAR_RING_SEGMENTS[Math.max(1, index)], (int) Math.ceil(r * 2.0D * arc[1] / 6.0D)));
+		if (!EpicBudget.takeLarge() || !EpicBudget.takeQuads(n)) {
+			return;
+		}
+		float width = Math.max(2.0F, Math.min(24.0F, r * 0.02F));
+		float inner = Math.max(0.0F, r - width);
+		int outerColor = ARGB.color(Math.round(a * 255.0F), ring.rgb);
+		int innerColor = ARGB.color(Math.round(a * 80.0F), ring.rgb);
+		double from = arc[0] - arc[1];
+		double step = 2.0D * arc[1] / n;
+		double fallback = ring.centre.y;
+		float uOffset = (float) (frame.clock * 0.01D);
+		SigilRenderer.Sink sink = frame.ring;
+		for (int i = 0; i < n; i++) {
+			double a0 = from + i * step;
+			double a1 = a0 + step;
+			double c0 = Math.cos(a0);
+			double s0 = Math.sin(a0);
+			double c1 = Math.cos(a1);
+			double s1 = Math.sin(a1);
+			float yi0 = frame.ry(frame.groundY(cx + c0 * inner, cz + s0 * inner, fallback));
+			float yo0 = frame.ry(frame.groundY(cx + c0 * r, cz + s0 * r, fallback));
+			float yi1 = frame.ry(frame.groundY(cx + c1 * inner, cz + s1 * inner, fallback));
+			float yo1 = frame.ry(frame.groundY(cx + c1 * r, cz + s1 * r, fallback));
+			float u0 = i * 0.5F + uOffset;
+			float u1 = (i + 1) * 0.5F + uOffset;
+			sink.vertex(frame.rx(cx + c0 * inner), yi0, frame.rz(cz + s0 * inner), u0, 0.0F, innerColor, 0.0F, 1.0F, 0.0F);
+			sink.vertex(frame.rx(cx + c0 * r), yo0, frame.rz(cz + s0 * r), u0, 1.0F, outerColor, 0.0F, 1.0F, 0.0F);
+			sink.vertex(frame.rx(cx + c1 * r), yo1, frame.rz(cz + s1 * r), u1, 1.0F, outerColor, 0.0F, 1.0F, 0.0F);
+			sink.vertex(frame.rx(cx + c1 * inner), yi1, frame.rz(cz + s1 * inner), u1, 0.0F, innerColor, 0.0F, 1.0F, 0.0F);
 		}
 	}
 

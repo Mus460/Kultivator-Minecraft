@@ -23,6 +23,11 @@ import java.util.List;
  * bloom strip and a white-gold core line, sampled every {@code max(1, L / 48)} b; dust pillars and sparks burst at the
  * fronts and visual debris (Mode Kehancuran off) is thrown out of the line. The fissure cools from white-gold through red
  * to a dark ember over 30 s. Visual only: Mode Kehancuran carves the real fissures on the server.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): the front runs at the server's speed ({@code max(8, side / 40)} b/t × Kecepatan, so
+ * it always takes at most 40 ticks) out to the decree's true half-length; the drawn fissure stops at this client's
+ * drawable half-length, and beyond it the line goes on as a sky-projected light streak (one glow strip of at most 16
+ * segments, its far points pulled inside render distance along the view ray).
  */
 final class CleaveLine {
 
@@ -36,6 +41,8 @@ final class CleaveLine {
 		final double ux;
 		final double uz;
 		final float half;
+		/** The true half-length (Tingkat Titah; {@code half} when the line fits). */
+		final float farHalf;
 		final float speed;
 		final int rgb;
 		final int hot;
@@ -51,12 +58,14 @@ final class CleaveLine {
 		int refreshIn;
 		int lastTick = -1;
 
-		Line(long cast, Vec3 origin, Vec3 dir, float half, float speed, int rgb, int hot, boolean own, boolean kehancuran, boolean lowLoad, double start) {
+		Line(long cast, Vec3 origin, Vec3 dir, float half, float farHalf, float speed, int rgb, int hot, boolean own, boolean kehancuran, boolean lowLoad,
+			 double start) {
 			this.cast = cast;
 			this.origin = origin;
 			this.ux = dir.x;
 			this.uz = dir.z;
 			this.half = half;
+			this.farHalf = Math.max(half, farHalf);
 			this.speed = Math.max(1.0F, speed);
 			this.rgb = rgb;
 			this.hot = hot;
@@ -70,12 +79,19 @@ final class CleaveLine {
 			this.width = Math.max(0.6F, Math.min(2.5F, half * 0.03F));
 		}
 
+		/** The front's distance from the origin, up to the true half-length. */
 		float front(double now) {
-			return (float) Math.min(half, Math.max(0.0D, (now - start) * speed));
+			return (float) Math.min(farHalf, Math.max(0.0D, (now - start) * speed));
 		}
 
-		double travel() {
+		/** Ticks until the front reaches the end of the drawn fissure. */
+		double nearTravel() {
 			return half / speed;
+		}
+
+		/** Ticks until the front reaches the true end of the line. */
+		double travel() {
+			return farHalf / speed;
 		}
 
 		double end() {
@@ -97,6 +113,12 @@ final class CleaveLine {
 
 	static void start(ClientLevel level, long cast, Vec3 origin, Vec3 dir, float half, float speed, int rgb, int hot, boolean own, boolean kehancuran,
 					  boolean lowLoad) {
+		start(level, cast, origin, dir, half, half, speed, rgb, hot, own, kehancuran, lowLoad);
+	}
+
+	/** {@link #start} of a Tingkat Titah line: drawn to {@code half}, its front and far streak running to {@code farHalf}. */
+	static void start(ClientLevel level, long cast, Vec3 origin, Vec3 dir, float half, float farHalf, float speed, int rgb, int hot, boolean own,
+					  boolean kehancuran, boolean lowLoad) {
 		if (!TitahWorld.finite(origin) || !(half > 1.0F)) {
 			return;
 		}
@@ -105,12 +127,13 @@ final class CleaveLine {
 		if (LINES.size() >= MAX) {
 			LINES.remove(0);
 		}
-		Line line = new Line(cast, origin, unit, half, speed, rgb, hot, own, kehancuran, lowLoad, TitahWorld.clock());
+		Line line = new Line(cast, origin, unit, half, Float.isFinite(farHalf) ? Math.min(4096.0F, farHalf) : half, speed, rgb, hot, own, kehancuran, lowLoad,
+				TitahWorld.clock());
 		refresh(level, line);
 		LINES.add(line);
 		TitahWorld.touch();
 		if (own) {
-			CameraShake.add(Math.min(0.5F, 0.35F * DampakWorldBudget.power()), (int) Math.min(40.0D, line.travel() + 6.0D), origin, half, false);
+			CameraShake.add(Math.min(0.5F, 0.35F * DampakWorldBudget.power()), (int) Math.min(40.0D, line.nearTravel() + 6.0D), origin, half, false);
 		}
 	}
 
@@ -147,9 +170,9 @@ final class CleaveLine {
 				continue;
 			}
 			line.lastTick = tick;
-			float front = line.front(now);
+			float front = Math.min(line.half, line.front(now));
 			boolean running = front < line.half;
-			if (running || tick <= line.travel() + 1) {
+			if (running || tick <= line.nearTravel() + 1) {
 				for (int side = -1; side <= 1; side += 2) {
 					double fx = line.origin.x + line.ux * front * side;
 					double fz = line.origin.z + line.uz * front * side;
@@ -198,7 +221,8 @@ final class CleaveLine {
 			if (frame.dist2(line.origin.x, line.origin.y, line.origin.z) > (range + line.half) * (range + line.half)) {
 				continue;
 			}
-			float front = line.front(frame.clock);
+			float farFront = line.front(frame.clock);
+			float front = Math.min(line.half, farFront);
 			int reach = Math.min(line.samples, (int) Math.ceil(front / line.step));
 			if (reach <= 0) {
 				continue;
@@ -246,8 +270,52 @@ final class CleaveLine {
 					int idx = Math.min(line.samples, (int) Math.round(front / line.step)) * side + line.samples;
 					frame.billboard(frame.ground, frame.rx(fx), frame.ry(line.heights[idx] + 1.0D), frame.rz(fz), 3.0F + w, TitahWorld.argb(0.9F, line.rgb));
 				}
+				if (farFront > line.half + 1.0F) {
+					streak(frame, line, side, farFront, TitahWorld.argb(0.6F * alpha, bloom), TitahWorld.argb(0.9F * alpha, core));
+				}
 			}
 		}
+	}
+
+	/**
+	 * The line beyond the drawn fissure (Tingkat Titah): one glow strip of at most 16 segments from the drawn end to the
+	 * front, every point beyond render distance pulled in along its view ray (so it reads as a streak to the horizon),
+	 * and a flare at the front.
+	 */
+	private static void streak(SigilRenderer.Frame frame, Line line, int side, float farFront, int color, int flare) {
+		int n = DampakWorldBudget.FAR_STREAK_SEGMENTS;
+		if (!TitahWorld.quads(n + 1)) {
+			return;
+		}
+		double dm = Math.max(32.0D, TitahWorld.viewRange() - 24.0D);
+		double y = line.heights[line.samples + side * line.samples];
+		float baseWidth = Math.max(2.0F, Math.min(24.0F, line.farHalf * 0.006F)) * 2.0F;
+		float px = 0.0F;
+		float py = 0.0F;
+		float pz = 0.0F;
+		float pw = 0.0F;
+		for (int i = 0; i <= n; i++) {
+			double d = line.half + (farFront - line.half) * i / (double) n;
+			double wx = line.origin.x + line.ux * d * side;
+			double wz = line.origin.z + line.uz * d * side;
+			double rx = frame.rx(wx);
+			double ry = frame.ry(y);
+			double rz = frame.rz(wz);
+			double dist = Math.sqrt(rx * rx + ry * ry + rz * rz);
+			double k = dist > dm ? dm / dist : 1.0D;
+			float x = (float) (rx * k);
+			float yy = (float) (ry * k);
+			float z = (float) (rz * k);
+			float width = (float) Math.max(0.3D, baseWidth * k);
+			if (i > 0) {
+				frame.beam(frame.glow, px, py, pz, x, yy, z, (pw + width) * 0.5F, color, color);
+			}
+			px = x;
+			py = yy;
+			pz = z;
+			pw = width;
+		}
+		frame.billboard(frame.ground, px, py + pw, pz, Math.max(1.0F, pw * 1.5F), flare);
 	}
 
 	private CleaveLine() {

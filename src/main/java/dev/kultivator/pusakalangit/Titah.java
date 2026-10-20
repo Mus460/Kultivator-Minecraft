@@ -25,11 +25,17 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -38,6 +44,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -115,17 +122,51 @@ public final class Titah {
 	 * (0.3-3), {@code hancur} "Hancurkan tanah" (only matters while Mode Kehancuran is on), {@code monumen} "Tinggalkan
 	 * pusaka" (Pedang, Tiang).
 	 */
-	public record Settings(float kekuatan, float kerusakan, float kecepatan, boolean hancur, boolean monumen) {
-		public static final Settings DEFAULT = new Settings(1.0F, 1.0F, 1.0F, true, true);
+	public record Settings(float kekuatan, float kerusakan, float kecepatan, boolean hancur, boolean monumen, int tingkat) {
+		public static final Settings DEFAULT = new Settings(1.0F, 1.0F, 1.0F, true, true, 1);
+
+		/** Tingkat 1 (DESIGN 29.16.3: a missing value reads as 1). */
+		public Settings(float kekuatan, float kerusakan, float kecepatan, boolean hancur, boolean monumen) {
+			this(kekuatan, kerusakan, kecepatan, hancur, monumen, 1);
+		}
+
+		public Settings withTingkat(int tier) {
+			return new Settings(kekuatan, kerusakan, kecepatan, hancur, monumen, tier);
+		}
 	}
 
 	/** One cast in the making: what {@link TitahSkill} reads (like {@code OwnArt} reads the creation). */
-	record Order(Skill skill, Settings settings, Vec3 castPos, Vec3 impact, boolean test, boolean bypass, boolean real) {
+	record Order(Skill skill, Settings settings, Vec3 castPos, Vec3 impact, boolean test, boolean bypass, boolean real, boolean confirmed) {
 		/** No reward, never counted as a real cast (a test or a bypass cast). */
 		boolean practice() {
 			return test || bypass;
 		}
+
+		/** The Tingkat of this cast (1-9, already clamped). */
+		int tier() {
+			return Math.max(1, Math.min(TitahSettings.T_MAX, settings.tingkat()));
+		}
+
+		/** Tingkat 6-9 that really carves (29.16.5): permanent, confirmed in chat. */
+		boolean permanent() {
+			return real && tier() >= PERMANENT_TIER;
+		}
 	}
+
+	/** Tingkat 6-9 carve permanently (DESIGN 29.16.0, 29.16.12: fixed, never a config value). */
+	public static final int PERMANENT_TIER = 6;
+	/** The permanent confirmation waits this long (15 s, 29.16.5). */
+	public static final int CONFIRM_TICKS = 300;
+
+	/**
+	 * A permanent cast waiting for "[Ya, hancurkan permanen]" (29.16.5): one per player, a new request replaces the old one,
+	 * never remembered beyond the 15 s. {@code skill} null with {@code bulkRadius > 0}: the {@code pahat_cepat} test.
+	 */
+	record PendingConfirm(UUID player, @Nullable Skill skill, Settings settings, Vec3 impact, boolean test, int code, long created, long expires,
+			ResourceKey<Level> dimension, int bulkRadius, int bulkDepth) {
+	}
+
+	private static final Map<UUID, PendingConfirm> CONFIRMS = new HashMap<>();
 
 	/** The shared seal recovery after any decree (29.2.1). */
 	public static final int RECOVERY_TICKS = 1200;
@@ -233,9 +274,58 @@ public final class Titah {
 		};
 	}
 
-	/** The decree's cooldown in ticks for {@code kekuatan}: the authored band × sqrt(max(1, K)). */
+	/** The decree's cooldown in ticks for {@code kekuatan} at Tingkat 1: the authored band × sqrt(max(1, K)). */
 	static int cooldownTicks(Skill skill, float kekuatan) {
-		return (int) Math.round(TitahArts.COOLDOWN_SECONDS[skill.ordinal()] * 20.0D * Math.sqrt(Math.max(1.0D, kekuatan)));
+		return cooldownTicks(skill, kekuatan, 1);
+	}
+
+	/** The decree's cooldown in ticks (29.16.1): the authored band × sqrt(max(1, K)) × sqrt(Tingkat). */
+	static int cooldownTicks(Skill skill, float kekuatan, int tier) {
+		double t = Math.max(1, Math.min(TitahSettings.T_MAX, tier));
+		return (int) Math.round(TitahArts.COOLDOWN_SECONDS[skill.ordinal()] * 20.0D * Math.sqrt(Math.max(1.0D, kekuatan)) * Math.sqrt(t));
+	}
+
+	// ================================================================== Tingkat gates (DESIGN 29.16.2)
+
+	/**
+	 * The highest Tingkat the realm allows: 1-3 any Dewa Abadi stage, 4-6 Dewa Abadi Puncak, 7-8 ★27+, 9 ★45+ (below Dewa
+	 * Abadi 1: the decrees are locked anyway). The config cap is applied by {@link #tierLimit}.
+	 */
+	static int tierMax(CultivationData data) {
+		if (!data.realm().atLeast(Realm.TRUE_IMMORTAL)) {
+			return 1;
+		}
+		int stars = TechniquePower.playerStars(data);
+		if (stars >= 45) {
+			return 9;
+		}
+		if (stars >= 27) {
+			return 8;
+		}
+		return data.rank().stage() >= 3 ? 6 : 3;
+	}
+
+	/** {@code min(tierMax, titahMaxTier)}: the Tingkat a normal cast may use. */
+	static int tierLimit(CultivationData data) {
+		return Math.max(1, Math.min(tierMax(data), KultivatorConfig.get().titahMaxTier));
+	}
+
+	/** The Tingkat a test or bypass cast may use: {@code titahMaxTier} (the existing bypass, no new switch). */
+	static int freeTierLimit() {
+		return Math.max(1, Math.min(TitahSettings.T_MAX, KultivatorConfig.get().titahMaxTier));
+	}
+
+	/** Why the next Tingkat is locked (a lang key), or "" when all nine are open. */
+	static String tierWhy(CultivationData data, boolean bypass) {
+		int config = KultivatorConfig.get().titahMaxTier;
+		int max = bypass ? TitahSettings.T_MAX : tierMax(data);
+		if (config < TitahSettings.T_MAX && config <= max) {
+			return KEY + "tier.why.config";
+		}
+		if (max >= TitahSettings.T_MAX) {
+			return "";
+		}
+		return KEY + "tier.why." + (max <= 3 ? 4 : max <= 6 ? 7 : 9);
 	}
 
 	// ================================================================== the cast
@@ -245,6 +335,15 @@ public final class Titah {
 	 * may use up to ×10) and {@code aimOverride} the impact point (else the crosshair, ≤ {@code titahRange}).
 	 */
 	static boolean castWith(ServerPlayer player, Skill skill, boolean test, @Nullable Settings override, @Nullable Vec3 aimOverride) {
+		return castWith(player, skill, test, override, aimOverride, false);
+	}
+
+	/**
+	 * {@code confirmed}: the player clicked "[Ya, hancurkan permanen]" for this cast (29.16.5). A real cast of Tingkat 6-9
+	 * without it spends nothing and asks in chat instead (false is returned).
+	 */
+	static boolean castWith(ServerPlayer player, Skill skill, boolean test, @Nullable Settings override, @Nullable Vec3 aimOverride,
+			boolean confirmed) {
 		Component why = whyNot(player, skill, test);
 		if (why != null) {
 			return refuse(player, why);
@@ -256,14 +355,20 @@ public final class Titah {
 		CultivationData data = Cultivators.get(player);
 		boolean bypass = bypass(player);
 		float limit = test || bypass ? 10.0F : kMax(data);
-		Settings settings = TitahSettings.sanitize(override != null ? override : TitahSettings.read(player, skill), limit);
+		int tierLimit = test || bypass ? freeTierLimit() : tierLimit(data);
+		Settings settings = TitahSettings.sanitize(override != null ? override : TitahSettings.read(player, skill), limit, tierLimit);
 		Vec3 impact = aimOverride != null ? aimOverride : aim(player);
 		if (impact == null) {
 			return refuse(player, Component.translatable(KEY + "refuse.aim", KultivatorConfig.get().titahRange));
 		}
 		boolean real = settings.hancur() && Kehancuran.selfOn(player) && TechniquePower.kScale(data) > 0.0D
 				&& (!test || TechniqueTests.kehancuranTests(player));
-		Order order = new Order(skill, settings, player.position(), impact, test, bypass, real);
+		if (real && settings.tingkat() >= PERMANENT_TIER && !confirmed) {
+			// 29.16.5: nothing is spent; the cast waits for the chat confirmation (15 s, same code, same dimension)
+			askConfirm(player, skill, settings, impact, test, 0, 0);
+			return false;
+		}
+		Order order = new Order(skill, settings, player.position(), impact, test, bypass, real, confirmed);
 		UUID id = player.getUUID();
 		PENDING.put(id, order);
 		boolean done;
@@ -278,7 +383,7 @@ public final class Titah {
 		long now = player.level().getGameTime();
 		if (!test && !bypass) {
 			// the decree's own cooldown over the runner's authored one, and the shared seal recovery (both on the player)
-			data.setCooldown(skill.specId(), now, cooldownTicks(skill, settings.kekuatan()));
+			data.setCooldown(skill.specId(), now, cooldownTicks(skill, settings.kekuatan(), settings.tingkat()));
 			TitahSettings.setRecover(data, now + RECOVERY_TICKS);
 			if (TitahSettings.markCast(data, skill)) {
 				Advancements.grant(player, "titah_all");
@@ -322,12 +427,108 @@ public final class Titah {
 		PENDING.remove(id);
 		ACTIVE.remove(id);
 		BYPASS.remove(id);
+		CONFIRMS.remove(id);
 	}
 
 	static void clearAll() {
 		PENDING.clear();
 		ACTIVE.clear();
 		BYPASS.clear();
+		CONFIRMS.clear();
+	}
+
+	// ================================================================== the permanent confirmation (DESIGN 29.16.5)
+
+	/**
+	 * Stores the request (replacing an older one) and sends one red chat block with [Ya, hancurkan permanen], [Batal] and
+	 * (for a decree) [Turunkan ke tingkat 5], plus one low bell. {@code bulkRadius > 0}: the {@code pahat_cepat} test.
+	 */
+	static void askConfirm(ServerPlayer player, @Nullable Skill skill, Settings settings, Vec3 impact, boolean test, int bulkRadius, int bulkDepth) {
+		long now = player.level().getServer().overworld().getGameTime();
+		int code = 1000 + player.getRandom().nextInt(9000);
+		CONFIRMS.put(player.getUUID(), new PendingConfirm(player.getUUID(), skill, settings, impact, test, code, now, now + CONFIRM_TICKS,
+				player.level().dimension(), bulkRadius, bulkDepth));
+		int tier = Math.max(1, Math.min(TitahSettings.T_MAX, settings.tingkat()));
+		Component head = skill == null ? Component.translatable(KEY + "tier.confirm.bulk", bulkRadius)
+				: Component.translatable(KEY + "tier.confirm.line", tier);
+		Msg.chat(player, head.copy().withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+		player.sendSystemMessage(Component.translatable(KEY + "tier.confirm.backup", CONFIRM_TICKS / 20).withColor(0xFF8A7A));
+		MutableComponent yes = Component.translatable(KEY + "tier.confirm.yes").withStyle(style -> style.withColor(ChatFormatting.DARK_RED)
+				.withBold(true).withClickEvent(new ClickEvent.RunCommand("/kultivasi titah ya " + code))
+				.withHoverEvent(new HoverEvent.ShowText(Component.translatable(KEY + "tier.confirm.yes_hover"))));
+		MutableComponent no = Component.translatable(KEY + "tier.confirm.no").withStyle(style -> style.withColor(ChatFormatting.AQUA)
+				.withBold(true).withClickEvent(new ClickEvent.RunCommand("/kultivasi titah batal")));
+		MutableComponent line = Component.empty().append(yes).append(Component.literal("   ")).append(no);
+		if (skill != null) {
+			MutableComponent lower = Component.translatable(KEY + "tier.confirm.lower").withStyle(style -> style.withColor(ChatFormatting.GOLD)
+					.withClickEvent(new ClickEvent.RunCommand("/kultivasi titah tingkat 5 " + skill.key())));
+			line.append(Component.literal("   ")).append(lower);
+		}
+		player.sendSystemMessage(line);
+		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 1.0F, 0.5F);
+	}
+
+	/** True when this tick's cast asked for the permanent confirmation (for the test command's answer). */
+	static boolean askedNow(ServerPlayer player) {
+		PendingConfirm pending = CONFIRMS.get(player.getUUID());
+		return pending != null && pending.created() == player.level().getServer().overworld().getGameTime();
+	}
+
+	/**
+	 * {@code /kultivasi titah ya <kode>}: within 15 s, the same code, the same dimension, the impact still loaded and
+	 * within {@code titahRange + 16} of the player; the cast runs again with every gate (qi, cooldown, refusals) and
+	 * {@code confirmed}. A wrong or expired code says "Kode kedaluwarsa — panggil titah lagi".
+	 */
+	static int confirm(ServerPlayer player, int code) {
+		PendingConfirm pending = CONFIRMS.get(player.getUUID());
+		long now = player.level().getServer().overworld().getGameTime();
+		if (pending == null || pending.code() != code || now > pending.expires()) {
+			if (pending != null && now > pending.expires()) {
+				CONFIRMS.remove(player.getUUID());
+			}
+			Msg.chat(player, Component.translatable(KEY + "tier.confirm.expired").withColor(0xFF8A7A));
+			return 0;
+		}
+		CONFIRMS.remove(player.getUUID());
+		ServerLevel level = player.level();
+		double reach = KultivatorConfig.get().titahRange + 16.0D;
+		if (!level.dimension().equals(pending.dimension()) || !level.isLoaded(BlockPos.containing(pending.impact()))
+				|| player.position().distanceToSqr(pending.impact()) > reach * reach) {
+			Msg.chat(player, Component.translatable(KEY + "tier.confirm.moved").withColor(0xFF8A7A));
+			return 0;
+		}
+		if (pending.skill() == null) {
+			return TitahTests.bulk(player, pending.impact(), pending.bulkRadius(), pending.bulkDepth(), true, true);
+		}
+		return castWith(player, pending.skill(), pending.test(), pending.settings(), pending.impact(), true) ? 1 : 0;
+	}
+
+	/** {@code /kultivasi titah batal}: drops the waiting confirmation. */
+	static int cancelConfirm(ServerPlayer player) {
+		if (CONFIRMS.remove(player.getUUID()) == null) {
+			Msg.chat(player, Component.translatable(KEY + "tier.confirm.none").withColor(0xA8B5B0));
+			return 0;
+		}
+		Msg.chat(player, Component.translatable(KEY + "tier.confirm.cancelled").withColor(0x9FF3E6));
+		return 1;
+	}
+
+	/** Every 20 ticks: expired requests go with one quiet note (nothing happened, no qi was spent). */
+	static void tick(MinecraftServer server) {
+		if (CONFIRMS.isEmpty() || server.getTickCount() % 20 != 0) {
+			return;
+		}
+		long now = server.overworld().getGameTime();
+		for (Iterator<PendingConfirm> it = CONFIRMS.values().iterator(); it.hasNext(); ) {
+			PendingConfirm pending = it.next();
+			if (now > pending.expires()) {
+				it.remove();
+				ServerPlayer player = server.getPlayerList().getPlayer(pending.player());
+				if (player != null) {
+					Msg.actionBar(player, Component.translatable(KEY + "tier.confirm.lapsed").withColor(0xA8B5B0));
+				}
+			}
+		}
 	}
 
 	/**

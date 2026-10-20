@@ -66,6 +66,9 @@ public final class TitahArts {
 	public static final int AUX_REAL = 1 << 11;
 	/** Bits 12-13: the decree (Skill ordinal). */
 	public static final int AUX_SKILL_SHIFT = 12;
+	/** Bits 14-17: Tingkat − 1 (DESIGN 29.16.4, contract C10b.7); 0 = Tingkat 1, so old events read as Tingkat 1. */
+	public static final int AUX_TIER_SHIFT = 14;
+	public static final int AUX_TIER_MASK = 0xF;
 
 	private static final int GOLD = 0xFFD54A;
 	private static final int WHITE_GOLD = 0xFFF4D0;
@@ -78,10 +81,22 @@ public final class TitahArts {
 	private static final int SEAL_GOLD = 0xFFE8A0;
 	private static final int SEAL_VIOLET = 0x6A4AFF;
 
-	/** The {@code aux} of every Titah event. */
+	/** The {@code aux} of every Titah event at Tingkat 1. */
 	public static int packAux(float speed, boolean monument, boolean real, int skill) {
+		return packAux(speed, monument, real, skill, 1);
+	}
+
+	/** The {@code aux} of every Titah event (29.16.4): bits 0-13 as before, bits 14-17 = {@code tier} − 1. */
+	public static int packAux(float speed, boolean monument, boolean real, int skill, int tier) {
 		int v = Math.max(30, Math.min(300, Math.round(speed * 100.0F)));
-		return v & AUX_SPEED_MASK | (monument ? AUX_MONUMENT : 0) | (real ? AUX_REAL : 0) | (Math.max(0, Math.min(3, skill)) << AUX_SKILL_SHIFT);
+		int t = Math.max(1, Math.min(9, tier)) - 1;
+		return v & AUX_SPEED_MASK | (monument ? AUX_MONUMENT : 0) | (real ? AUX_REAL : 0) | (Math.max(0, Math.min(3, skill)) << AUX_SKILL_SHIFT)
+				| (t & AUX_TIER_MASK) << AUX_TIER_SHIFT;
+	}
+
+	/** The Tingkat (1-9) of an event's {@code aux}. */
+	public static int tier(int aux) {
+		return Math.max(1, Math.min(9, 1 + (aux >>> AUX_TIER_SHIFT & AUX_TIER_MASK)));
 	}
 
 	/** Kecepatan of an event's {@code aux} (0.3-3; 1 when unset). */

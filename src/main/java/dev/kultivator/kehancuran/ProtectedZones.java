@@ -259,6 +259,90 @@ public final class ProtectedZones {
 			}
 			return null;
 		}
+
+		/**
+		 * Phase 10b (DESIGN 29.16.7 step C2): the zone of a whole column (x, z) from {@code lo} to {@code hi}, or null when the
+		 * column is free; conservative, for the bulk carve that skips protected columns ("carve around"). Sphere zones
+		 * (players, homes, villagers and golems, companions, formations) are tested as vertical cylinders; halls, the caster's
+		 * safe columns, spawn and the End as in {@link #zoneOf}; the zone providers are sampled every 4 blocks from
+		 * {@code lo − 1} to {@code hi + 1}; an unloaded column is UNLOADED.
+		 */
+		public @Nullable Zone columnZone(int bx, int bz, int lo, int hi) {
+			BlockPos.MutableBlockPos probe = new BlockPos.MutableBlockPos(bx, Math.max(level.getMinY(), lo), bz);
+			if (!level.isLoaded(probe)) {
+				return Zone.UNLOADED;
+			}
+			double x = bx + 0.5D;
+			double z = bz + 0.5D;
+			for (BlockPos hall : halls) {
+				double dx = x - (hall.getX() + 0.5D);
+				double dz = z - (hall.getZ() + 0.5D);
+				if (dx * dx + dz * dz <= hallSafe * hallSafe) {
+					return Zone.HALL;
+				}
+			}
+			if (!ZONE_PROVIDERS.isEmpty()) {
+				int from = Math.max(level.getMinY(), lo - 1);
+				int to = Math.min(level.getMaxY(), hi + 1);
+				for (int y = from; ; y += 4) {
+					int at = Math.min(y, to);
+					probe.setY(at);
+					if (provided(level, probe)) {
+						return Zone.HALL;
+					}
+					if (at >= to) {
+						break;
+					}
+				}
+			}
+			for (Vec3 player : players) {
+				if (cylinder(x, z, player.x, player.z, playerSafe)) {
+					return Zone.PLAYER;
+				}
+			}
+			for (Vec3 column : columns) {
+				if (cylinder(x, z, column.x, column.z, columnSafe + 0.5D)) {
+					return Zone.CASTER;
+				}
+			}
+			for (BlockPos home : homes) {
+				if (cylinder(x, z, home.getX() + 0.5D, home.getZ() + 0.5D, homeSafe)) {
+					return Zone.HOME;
+				}
+			}
+			if (spawn != null) {
+				double dx = x - (spawn.getX() + 0.5D);
+				double dz = z - (spawn.getZ() + 0.5D);
+				if (Math.max(Math.abs(dx), Math.abs(dz)) <= spawnRadius) {
+					return Zone.SPAWN;
+				}
+			}
+			for (Vec3 villager : villagers) {
+				if (cylinder(x, z, villager.x, villager.z, VILLAGER_RADIUS)) {
+					return Zone.VILLAGER;
+				}
+			}
+			for (Vec3 companion : companions) {
+				if (cylinder(x, z, companion.x, companion.z, COMPANION_RADIUS)) {
+					return Zone.COMPANION;
+				}
+			}
+			for (BlockPos lodestone : formations) {
+				if (cylinder(x, z, lodestone.getX() + 0.5D, lodestone.getZ() + 0.5D, FORMATION_RADIUS)) {
+					return Zone.FORMATION;
+				}
+			}
+			if (end && x * x + z * z <= END_ISLAND_RADIUS * END_ISLAND_RADIUS) {
+				return Zone.END_ISLAND;
+			}
+			return null;
+		}
+
+		private static boolean cylinder(double x, double z, double cx, double cz, double radius) {
+			double dx = x - cx;
+			double dz = z - cz;
+			return dx * dx + dz * dz <= radius * radius;
+		}
 	}
 
 	/** Disciples (the caster too), tamed pets and spirit beasts: pets and disciples are never hurt (DESIGN 20.3.21). */

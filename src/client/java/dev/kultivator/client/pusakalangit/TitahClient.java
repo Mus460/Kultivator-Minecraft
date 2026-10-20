@@ -42,6 +42,11 @@ import java.util.Locale;
  * module's start ({@code TitahWorld.init}, M3) and {@code /sinematik pusaka}. The TITAH technique events reach the film
  * through the Phase 10 hub ({@code DampakClient} → {@code SkyRide} → {@link PusakaFilm}). Client thread only; never
  * throws into the game.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10, contracts C10b.8 and C10b.9): each decree also carries its tier {@code t} (1-9), the
+ * highest tier allowed {@code tMax} with the reason {@code tWhy}, {@code perm} (this cast would carve permanently) and
+ * the readout numbers {@code ro.tier, ro.dmgR, ro.carveR, ro.weapon, ro.permanent}; {@link #FIELD_T} sets the tier. The
+ * {@code TitahFar} list of giant monuments goes to the world module's {@code FarRelic}.
  */
 public final class TitahClient {
 
@@ -58,6 +63,10 @@ public final class TitahClient {
 	public static final int FIELD_V = 2;
 	public static final int FIELD_H = 3;
 	public static final int FIELD_M = 4;
+	/** Tingkat (29.16.3): sent as "1".."9". */
+	public static final int FIELD_T = 5;
+	/** The tier at which a real carve becomes permanent (29.16.5; the server's {@code Titah.PERMANENT_TIER}). */
+	public static final int PERMANENT_TIER = 6;
 
 	/** Kekuatan steps (29.2.2, log steps). */
 	public static final float[] K_STEPS = {0.1F, 0.25F, 0.5F, 0.75F, 1.0F, 1.5F, 2.0F, 3.0F, 4.0F, 5.0F, 7.0F, 10.0F};
@@ -65,6 +74,9 @@ public final class TitahClient {
 	public static final float[] D_STEPS = {0.0F, 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F, 0.9F, 1.0F};
 	/** Kecepatan steps (incl. the film). */
 	public static final float[] V_STEPS = {0.3F, 0.5F, 0.75F, 1.0F, 1.5F, 2.0F, 3.0F};
+	/** Tingkat steps (29.16.10). */
+	public static final float[] T_STEPS = {1.0F, 2.0F, 3.0F, 4.0F, 5.0F, 6.0F, 7.0F, 8.0F, 9.0F};
+	private static final String KT = "kultivator.titah_tingkat_client.";
 	/** The decree glyphs: sword, pillar, dipper, mountain. */
 	public static final String[] GLYPHS = {"劍", "柱", "斗", "山"};
 	/** Base visual radius at ×1 (29.3.2) and base cooldown in seconds (29.2.1), for the client's own readout fallback. */
@@ -91,6 +103,18 @@ public final class TitahClient {
 		public int blocks = -1;
 		public int cdSec = -1;
 		public int qiPct = -1;
+		// Tingkat Titah (29.16.3): the used tier, its limit and why, the permanent flag and the scaled readout numbers
+		public int t = 1;
+		public int tMax = 9;
+		public String tWhy = "";
+		public boolean perm;
+		/** The sword's or pillar's length in blocks (0 for Bintang and Gunung; -1 when not sent). */
+		public int weapon = -1;
+		public int dmgR = -1;
+		public int carveR = -1;
+		/** The tier of the server's readout numbers (-1 when not sent). */
+		public int roTier = -1;
+		public boolean roPermanent;
 	}
 
 	private static final Decree[] DECREES = {new Decree(), new Decree(), new Decree(), new Decree()};
@@ -123,13 +147,26 @@ public final class TitahClient {
 		} catch (RuntimeException | LinkageError exception) {
 			DampakClient.warn("titah world init", exception);
 		}
+		try {
+			// Tingkat Titah (C10b.9): the live giant monuments of this dimension, for the far relics
+			ClientPlayNetworking.registerGlobalReceiver(Payloads.TitahFar.TYPE, (payload, context) -> {
+				try {
+					dev.kultivator.client.pusakalangit.world.FarRelic.onFar(payload.data());
+				} catch (RuntimeException | LinkageError exception) {
+					DampakClient.warn("titah far", exception);
+				}
+			});
+		} catch (RuntimeException | LinkageError exception) {
+			DampakClient.warn("titah far receiver", exception);
+		}
 	}
 
 	// ================================================================ the sync (C10b.5)
 
 	/**
 	 * Reads one {@code TitahSync}: {@code skills[4]} (unlocked, why, cdLeft, cdMax, k, d (0-100), v, h, m, kMax, readout,
-	 * ro {rVis, rDmg, blocks, cdSec, qiPct}), {@code selected}, {@code kehancuranOn}, {@code recover}.
+	 * ro {rVis, rDmg, blocks, cdSec, qiPct}), {@code selected}, {@code kehancuranOn}, {@code recover}; Tingkat Titah adds
+	 * per skill {@code t, tMax, tWhy, perm} and {@code ro {tier, dmgR, carveR, weapon, permanent}} (missing = tier 1).
 	 */
 	public static void onSync(CompoundTag data) {
 		ListTag skills = data.getListOrEmpty("skills");
@@ -155,6 +192,15 @@ public final class TitahClient {
 			decree.blocks = ro.getIntOr("blocks", -1);
 			decree.cdSec = ro.getIntOr("cdSec", -1);
 			decree.qiPct = ro.getIntOr("qiPct", -1);
+			decree.t = Math.max(1, Math.min(9, tag.getIntOr("t", 1)));
+			decree.tMax = Math.max(1, Math.min(9, tag.getIntOr("tMax", 9)));
+			decree.tWhy = tag.getStringOr("tWhy", "");
+			decree.perm = tag.getBooleanOr("perm", false);
+			decree.roTier = ro.getIntOr("tier", -1);
+			decree.dmgR = ro.getIntOr("dmgR", decree.rDmg);
+			decree.carveR = ro.getIntOr("carveR", -1);
+			decree.weapon = ro.getIntOr("weapon", -1);
+			decree.roPermanent = ro.getBooleanOr("permanent", false);
 		}
 		selected = Math.max(0, Math.min(3, data.getIntOr("selected", selected)));
 		kehancuranOn = data.getBooleanOr("kehancuranOn", false);
@@ -231,6 +277,15 @@ public final class TitahClient {
 	 */
 	public static Component readout(int skill) {
 		Decree decree = decree(skill);
+		if (decree.roTier >= 1 && decree.rVis >= 0 && decree.cdSec >= 0) {
+			// Tingkat Titah (29.16.3): "Tingkat 7 · R ≈ 805 b · luka ≤ 671 b · pahat ≤ 201 b · pedang 376 b · PERMANEN · jeda · qi"
+			return tierReadout(skill, decree.roTier, decree.rVis, decree.dmgR >= 0 ? decree.dmgR : decree.rDmg, decree.carveR, decree.weapon, decree.roPermanent,
+					decree.cdSec, decree.qiPct >= 0 ? decree.qiPct : 85);
+		}
+		if (decree.t >= 2 && decree.rVis < 0) {
+			// the slider moved and the sync is on its way: the client estimate of the tier (29.16.10 fallback)
+			return tierEstimate(skill, decree);
+		}
 		if (decree.rVis >= 0 && decree.rDmg >= 0 && decree.blocks >= 0 && decree.cdSec >= 0) {
 			return Component.translatable(K + "screen.readout", decree.rVis, decree.rDmg, grouped(decree.blocks), minutes(decree.cdSec),
 					decree.qiPct >= 0 ? decree.qiPct : 85);
@@ -242,6 +297,43 @@ public final class TitahClient {
 		int wound = Math.round(Math.min(radius, 40.0F));
 		int seconds = Math.round(BASE_COOLDOWN[skill] * (float) Math.sqrt(Math.max(1.0F, decree.k)));
 		return Component.translatable(K + "screen.readout", Math.round(radius), wound, "8.192", minutes(seconds), 85);
+	}
+
+	/** The tier readout line from its numbers (29.16.3), in the player's language. */
+	private static Component tierReadout(int skill, int tier, int rVis, int dmgR, int carveR, int weapon, boolean permanent, int cdSec, int qiPct) {
+		Component weaponPart = weapon > 0 && skill <= 1 ? Component.translatable(KT + (skill == 0 ? "readout.sword" : "readout.pillar"), grouped(weapon))
+				: Component.empty();
+		Component permPart = permanent ? Component.translatable(KT + "readout.perm") : Component.empty();
+		return Component.translatable(KT + "readout", tier, grouped(Math.max(0, rVis)), grouped(Math.max(0, dmgR)), carveR >= 0 ? grouped(carveR) : "-", weaponPart,
+				permPart, minutes(Math.max(0, cdSec)), qiPct);
+	}
+
+	/**
+	 * The client estimate of a tier (29.16.1) until the server answers: R ≈ base × K × s (≤ 2500), wounds ≤ 40 × s, the
+	 * carve ≤ R / 4, the weapon ≈ 1.87 × 12 √K × s or 3 × 10 √K × s, the cooldown × √K × √t.
+	 */
+	private static Component tierEstimate(int skill, Decree decree) {
+		float s = (float) Math.pow(1.6D, decree.t - 1);
+		float k = Math.max(0.1F, decree.k);
+		float base = BASE_RADIUS[skill] * (skill == 0 ? 0.5F : 1.0F);
+		int radius = Math.round(Math.min(2500.0F, Math.max(4.0F, Math.min(256.0F, base * k)) * s));
+		int wound = Math.round(Math.min(radius, 40.0F * s));
+		int carve = Math.round(Math.min(radius * 0.25F, (skill == 1 ? 16.0F : skill == 0 ? 12.0F : 8.0F) * s));
+		int weapon = skill == 0 ? Math.round(1.87F * Math.min(1100.0F, Math.max(6.0F, Math.min(24.0F, 12.0F * (float) Math.sqrt(k))) * s))
+				: skill == 1 ? Math.round(3.0F * Math.min(1100.0F, Math.max(5.0F, Math.min(20.0F, 10.0F * (float) Math.sqrt(k))) * s)) : 0;
+		int seconds = Math.round(BASE_COOLDOWN[skill] * (float) Math.sqrt(Math.max(1.0F, k)) * (float) Math.sqrt(decree.t));
+		return tierReadout(skill, decree.t, radius, wound, carve, weapon, permanent(skill), seconds, 85);
+	}
+
+	/** The index in {@link #T_STEPS} of the highest tier allowed now. */
+	public static int tMaxIndex(int skill) {
+		return Math.max(0, Math.min(T_STEPS.length - 1, decree(skill).tMax - 1));
+	}
+
+	/** True when this decree at its tier would carve permanently (tier 6-9 with Mode Kehancuran and Hancurkan tanah). */
+	public static boolean permanent(int skill) {
+		Decree decree = decree(skill);
+		return decree.t >= PERMANENT_TIER && (decree.perm || kehancuranOn && decree.h && decree.roTier < 0);
 	}
 
 	/** A whole number with dots between the thousands (8.192). */
@@ -281,12 +373,15 @@ public final class TitahClient {
 			case FIELD_K -> decree.k = value;
 			case FIELD_D -> decree.d = value;
 			case FIELD_V -> decree.v = value;
+			case FIELD_T -> decree.t = Math.max(1, Math.min(9, Math.round(value)));
 			default -> {
 			}
 		}
 		decree.readout = "";
 		decree.rVis = -1;
-		send(OP_SET, skill, field, field == FIELD_D ? String.valueOf(Math.round(value * 100.0F)) : trim(value));
+		decree.roTier = -1;
+		String text = field == FIELD_D ? String.valueOf(Math.round(value * 100.0F)) : field == FIELD_T ? String.valueOf(decree.t) : trim(value);
+		send(OP_SET, skill, field, text);
 	}
 
 	/** Sets a switch field (Hancurkan tanah, Tinggalkan pusaka); sent as "1" / "0". */
@@ -332,9 +427,13 @@ public final class TitahClient {
 		for (int i = 0; i < EpicSettings.TITAH_SKILLS.length; i++) {
 			int skill = i;
 			String name = EpicSettings.TITAH_SKILLS[i];
-			films.then(ClientCommands.literal(name).executes(context -> film(context, skill, 160))
+			films.then(ClientCommands.literal(name).executes(context -> film(context, skill, 160, 1))
 					.then(ClientCommands.argument("detik", IntegerArgumentType.integer(2, 12))
-							.executes(context -> film(context, skill, IntegerArgumentType.getInteger(context, "detik") * 20))));
+							.executes(context -> film(context, skill, IntegerArgumentType.getInteger(context, "detik") * 20, 1))
+							// Tingkat Titah (29.16.15): the film framing of that tier, still under every gate
+							.then(ClientCommands.argument("tingkat", IntegerArgumentType.integer(1, 9))
+									.executes(context -> film(context, skill, IntegerArgumentType.getInteger(context, "detik") * 20,
+											IntegerArgumentType.getInteger(context, "tingkat"))))));
 			LiteralArgumentBuilder<FabricClientCommandSource> modes = ClientCommands.literal(name);
 			for (EpicSettings.TitahFilm mode : EpicSettings.TitahFilm.values()) {
 				modes.then(ClientCommands.literal(mode.id()).executes(context -> {
@@ -352,19 +451,42 @@ public final class TitahClient {
 		}
 		root.then(vista);
 		root.then(ClientCommands.literal("info").executes(TitahClient::info));
+		root.then(ClientCommands.literal("jauh").executes(TitahClient::far));
 		return root;
 	}
 
-	private static int film(CommandContext<FabricClientCommandSource> context, int skill, int ticks) {
+	/** {@code /sinematik pusaka jauh}: the far relics with distance, LOD step and scale (29.16.15). */
+	private static int far(CommandContext<FabricClientCommandSource> context) {
+		FabricClientCommandSource source = context.getSource();
+		java.util.List<String> lines;
+		try {
+			lines = dev.kultivator.client.pusakalangit.world.TitahWorld.farRelics();
+		} catch (RuntimeException | LinkageError exception) {
+			lines = java.util.List.of();
+		}
+		source.sendFeedback(Component.translatable(KT + "cmd.far.title", lines.size()).withStyle(ChatFormatting.GOLD));
+		if (lines.isEmpty()) {
+			source.sendFeedback(Component.translatable(KT + "cmd.far.none").withStyle(ChatFormatting.GRAY));
+		}
+		for (int i = 0; i < lines.size() && i < 24; i++) {
+			source.sendFeedback(Component.literal(lines.get(i)).withStyle(ChatFormatting.GRAY));
+		}
+		return 1;
+	}
+
+	private static int film(CommandContext<FabricClientCommandSource> context, int skill, int ticks, int tier) {
 		TechniqueSpec spec = TechniqueRegistry.byId("titah_" + EpicSettings.TITAH_SKILLS[skill]);
 		if (spec == null || spec.dampak() == null) {
 			context.getSource().sendError(Component.translatable(K + "cmd.unknown", EpicSettings.TITAH_SKILLS[skill]));
 			return 0;
 		}
-		String refused = PusakaFilm.test(spec, skill, ahead(24.0D), ticks);
+		String refused = PusakaFilm.test(spec, skill, ahead(24.0D), ticks, tier);
 		if (refused != null) {
 			context.getSource().sendError(Component.translatable(K + "cmd.film_refused", refused, ShotGuard.reason().isEmpty() ? "-" : ShotGuard.reason()));
 			return 0;
+		}
+		if (tier >= 2) {
+			return ok(context, Component.translatable(KT + "cmd.film", decreeName(skill), Math.round(ticks / 20.0F), tier));
 		}
 		return ok(context, Component.translatable(K + "cmd.film", decreeName(skill), Math.round(ticks / 20.0F)));
 	}

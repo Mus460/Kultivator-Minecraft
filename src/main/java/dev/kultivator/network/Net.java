@@ -41,6 +41,8 @@ public final class Net {
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.DampakDebris.TYPE, Payloads.DampakDebris.CODEC);
 		// Phase 10b (DESIGN 29.9 item 2): the Titah Langit menu data.
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.TitahSync.TYPE, Payloads.TitahSync.CODEC);
+		// Phase 10b Tingkat (DESIGN 29.16.11, C10b.9): the far planted weapons of the receiver's dimension.
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.TitahFar.TYPE, Payloads.TitahFar.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Payloads.Action.TYPE, Payloads.Action.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Action.TYPE, (payload, context) -> handle(context.player(), payload));

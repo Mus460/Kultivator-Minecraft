@@ -7707,6 +7707,7 @@ Kolom kiri: empat kartu segel (terkunci atau siap, cincin jeda, glif 劍 柱 斗
 
 | Baris | Pilihan (bawaan tebal) | Artinya |
 |---|---|---|
+| **Tingkat** | **1** - 9 | skala dunia titah: tiap tingkat ×1,6 lebih lebar (tingkat 9 ≈ ×43). Label "Tingkat t · ×s". Tingkat yang terkunci tampak kelabu dengan segel merah dan alasannya di tooltip. Pada tingkat 6-9 dengan pahat sungguhan muncul cap merah **PERMANEN**. Lihat 58.11 |
 | Kekuatan (ukuran) | 0,1 / 0,25 / 0,5 / 0,75 / **1** / 1,5 / 2 / 3 / 4 / 5 / 7 / 10 | ukuran tanda, cincin, sigil dan kawah. Di atas batas ranahmu tampak kelabu dengan segel merah. Makin besar, makin lama jedanya |
 | Kerusakan | 0-**100** % (langkah 10) | 0 % = tontonan murni: tanpa luka, tanpa efek kendali |
 | Kecepatan (termasuk film) | 0,3 / 0,5 / 0,75 / **1** / 1,5 / 2 / 3 | seberapa cepat langit menjawab; jeda sebelum klimaks 1,5-15 detik. Kamera tidak pernah bergerak melewati batas kecepatannya |
@@ -7715,7 +7716,7 @@ Kolom kiri: empat kartu segel (terkunci atau siap, cincin jeda, glif 劍 柱 斗
 | Film | **Penuh** / Singkat / Mati | disimpan di komputermu (`config/kultivator-client.json`) |
 
 Di bawahnya ada **baris ringkasan** dari server, misalnya "Jari-jari ≈ 96 b · luka ≤ 40 b · ≤ 8.192 blok · jeda 16 mnt ·
-qi 85 %", dan baris petunjuk "Backspace: lewati film · Gerak: hentikan kamera". Tombol **Bawaan** mengembalikan titah itu
+qi 85 %" (pada tingkat 2-9: "Tingkat 7 · R ≈ 805 b · luka ≤ 671 b · pahat ≤ 201 b · PERMANEN · jeda 26 mnt · qi 85 %"), dan baris petunjuk "Backspace: lewati film · Gerak: hentikan kamera". Tombol **Bawaan** mengembalikan titah itu
 ke bawaan; **Peringatan cahaya** membuka layar peringatan fotosensitif. Server selalu merapikan nilai yang dikirim (ke
 langkah terdekat dan ke batas ranahmu).
 
@@ -7799,6 +7800,9 @@ Tujuh Bintang dan Pemindah Gunung tidak meninggalkan objek.
    kehancuran dilewati").
 5. Batalkan dengan `/kultivasi kehancuran pulihkan`.
 
+Langkah 3 berlaku untuk **Tingkat 1**. Tingkat 2-9 memakai **pahat cepat** (58.11): kawahnya jauh lebih besar,
+tingkat 2-5 masih bisa dipulihkan, dan tingkat 6-9 **permanen** dengan konfirmasi di chat.
+
 ### 58.8 Pengaturan server (`config/kultivator.json`)
 
 | Kunci | Bawaan | Rentang |
@@ -7815,6 +7819,15 @@ Tujuh Bintang dan Pemindah Gunung tidak meninggalkan objek.
 | `titahRewardsPerDay` | 3 | 0-10 |
 | `titahRange` | 128 | 64-192 |
 | `titahUltimateMonuments` | false | true = Seni Pedang Hukuman Langit dan Formasi Pedang Zhuxian juga meninggalkan pedang tertancap (tanpa hadiah) |
+| `titahMaxTier` | 9 | 1-9; tingkat tertinggi untuk semua pemain |
+| `titahMaxRadius` | 2500 | 128-4096; batas R, jangkauan luka dan jari-jari pahat semua tingkat |
+| `titahMaxTargets` | 256 | 32-1024; sasaran per serangan area (bos dulu, lalu yang terdekat) |
+| `titahBulkMillisPerTick` | 8 | 1-20; waktu pahat cepat per tick (ms) |
+| `titahBulkMsptSlow` | 35 | 25-50; di atas MSPT ini waktunya dibagi dua |
+| `titahBulkMaxBlocks` | 6000000 | 100000-50000000; blok per pahat cepat (kawah menyusut agar muat) |
+| `titahUndoMaxBlocks` | 1000000 | 0-4000000; batas pemulihan tingkat 2-5 (0 = tingkat 2-5 tidak memahat) |
+| `titahBulkMaxChunks` | 1024 | 64-4096; chunk yang boleh ditahan satu pahat |
+| `titahBulkLightChunks` | 8 | 2-32; chunk yang menunggu cahaya sebelum dikirim ulang |
 
 **Laptop lemah:** semua cahaya "shader berat" dipalsukan dengan lapisan quad bercahaya, tekstur glow dan lapisan HUD,
 tanpa post shader. Kualitas Efek Minimal / Normal / Maksimal dan penjaga frame Momen Epik membatasi bintang, kristal,
@@ -7828,7 +7841,12 @@ Operator, di bawah `/kultivasi uji pusaka_langit`:
 |---|---|
 | `beri` | memberi segel yang sudah terikat padamu |
 | `bypass nyala\|mati` | melewati syarat ranah, jeda dan Qi untuk titah |
-| `pedang\|tiang\|bintang\|gunung [kekuatan] [kecepatan] [kerusakan]` | titah uji ke bidikan (Kekuatan 0,1-10, Kecepatan 0,3-3, Kerusakan 0-100); tanpa hadiah. Memahat hanya bila `uji teknik kehancuran nyala` **dan** saklar Mode Kehancuranmu menyala |
+| `pedang\|tiang\|bintang\|gunung [kekuatan] [kecepatan] [kerusakan] [tingkat]` | titah uji ke bidikan (Kekuatan 0,1-10, Kecepatan 0,3-3, Kerusakan 0-100, Tingkat 1-9 sampai `titahMaxTier`); tanpa hadiah. Memahat hanya bila `uji teknik kehancuran nyala` **dan** saklar Mode Kehancuranmu menyala; tingkat 6-9 yang memahat tetap minta konfirmasi |
+| `tingkat <1-9>` | memasang tingkat keempat titah sekaligus |
+| `tingkat_tabel [pedang\|tiang\|bintang\|gunung]` | tabel tingkat 1-9 untuk pengaturanmu: R, luka, pahat, panjang senjata, jeda |
+| `pahat_cepat <radius 8-512> [kedalaman 4-128] [permanen]` | mangkuk pahat cepat di bidikan (palet api). Tanpa `permanen`: bisa dipulihkan dan menyusut sampai `titahUndoMaxBlocks`. Dengan `permanen`: minta konfirmasi di chat |
+| `pahat_cepat info` | pahat cepat yang berjalan: fase, chunk selesai/total/dilewati, blok, kolom dilindungi, md per tick, antrean cahaya, tiket, pangkas dan susut |
+| `pahat_cepat batal` | sama dengan `/kultivasi kehancuran batal` |
 | `semua` | keempat titah bergiliran, 20 detik sekali, tiap titah 48 blok lebih jauh di arah pandangmu |
 | `monumen pedang\|tiang [skala]` | pusaka uji di bidikan (skala 1-32, tanpa hadiah) |
 | `monumen daftar` | semua pusaka di dunia |
@@ -7842,7 +7860,8 @@ Client (tanpa cheat, di komputermu), di bawah `/sinematik pusaka`:
 
 | Perintah | Fungsi |
 |---|---|
-| `film <pedang\|tiang\|bintang\|gunung> [detik]` | memutar film titah itu ke depanmu (2-12 detik, bawaan 8; tetap dengan syarat aman) |
+| `film <pedang\|tiang\|bintang\|gunung> [detik] [tingkat]` | memutar film titah itu ke depanmu (2-12 detik, bawaan 8; tingkat 1-9 mengubah bingkai kamera; tetap dengan syarat aman) |
+| `jauh` | senjata titah jauh: jarak, langkah LOD, skala |
 | `atur <titah> penuh\|singkat\|mati` | pengaturan Film titah itu |
 | `vista istana_langit\|laut_timur\|biduk_utara\|kua_e` | menampilkan pemandangan langit itu di depan |
 | `info` | syarat kamera, pengaturan film, alasan penolakan terakhir, statistik efek dunia |
@@ -7874,7 +7893,21 @@ Contoh:
 /sinematik pusaka info
 ```
 
-Pemain: `/kultivasi titah` dan `/kultivasi titah daftar`.
+Contoh tingkat:
+
+```
+/kultivasi uji pusaka_langit tingkat_tabel tiang
+/kultivasi uji pusaka_langit tiang 1 1 100 3
+/kultivasi uji pusaka_langit pahat_cepat 64 24
+/kultivasi uji pusaka_langit pahat_cepat info
+/kultivasi uji pusaka_langit pahat_cepat batal
+/kultivasi uji pusaka_langit pahat_cepat 48 16 permanen
+/sinematik pusaka film pedang 8 7
+/sinematik pusaka jauh
+```
+
+Pemain: `/kultivasi titah`, `/kultivasi titah daftar`, `/kultivasi titah tingkat <1-9> [titah]`,
+`/kultivasi titah ya <kode>`, `/kultivasi titah batal`, `/kultivasi kehancuran batal` dan `/kultivasi kehancuran pulihkan`.
 
 ### 58.10 Yang belum lengkap
 
@@ -7885,3 +7918,84 @@ Pemain: `/kultivasi titah` dan `/kultivasi titah daftar`.
 * Batu Pusaka dan Urat Pusaka masih kubus polos (cahaya Urat hanya dari tingkat cahaya 10). Ikon segel datar dan tidak
   berubah menurut titah yang dipilih.
 * Dengan `titahUltimateMonuments` nyala, pedang monumen visual Fase 10 dan pedang objek bisa tampil bersamaan.
+* Tingkat Titah 1-9 dan pahat cepat (58.11) juga belum diuji di game: kecepatan pahat tingkat 9 di laptop lemah,
+  kiriman ulang chunk setelah cahaya, pembatalan, konfirmasi permanen, dan pengganti senjata jauh dengan Sodium/Iris.
+
+### 58.11 Tingkat Titah 1-9 dan pahat cepat
+
+Penggeser **Tingkat** (di atas Kekuatan) membuat titah makin besar. **Tingkat 1 sama persis dengan sebelumnya**: ukuran,
+kerusakan, jalur pahat dan alas blok yang sama. Tiap tingkat di atasnya mengalikan skala dunia titah dengan **1,6**
+(tingkat 9 ≈ ×43), dibatasi `titahMaxRadius` (bawaan 2.500 b).
+
+* **Hanya luasnya yang tumbuh.** Satu sasaran tetap paling banyak menerima 28 × P per titah, dengan batas bos dan
+  semua aturan lain. Luka hanya mengenai chunk yang termuat, paling banyak 256 sasaran (bos dulu, lalu yang terdekat),
+  paling banyak 64 per tick.
+* **Jeda** dikali √tingkat (tingkat 9 = ×3). Qi tetap 85 %. Waktu klimaks tidak berubah: titah besar jatuh lebih cepat,
+  bukan lebih lama.
+* Pada tingkat 2 ke atas pusaka tertancap adalah objek raksasa saja (tanpa alas Batu/Urat Pusaka). Senjata yang lebih
+  jauh dari jarak pandang tampil sebagai pengganti berskala atau siluet datar (siluet selalu dipakai saat shader pack
+  nyala). Film tetap ≤ 12 detik dengan batas kecepatan kamera yang sama; kameranya hanya mengambil jarak lebih lebar.
+  Dentuman datang terlambat sesuai jarakmu (± 340 m/detik).
+
+**Tabel tingkat pada Kekuatan ×1** (b = blok; pahat = jari-jari yang diminta):
+
+| Tingkat | Skala | Pedang R | Tiang R | Luka ≤ | Pahat Tiang ≤ | Pedang | Tiang | Butuh | Pulihkan |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | ×1 | 48 | 64 | 40 | 16 | 22 b | 30 b | Dewa Abadi | ya (biasa) |
+| 2 | ×1,6 | 77 | 102 | 64 | 26 | 36 b | 48 b | Dewa Abadi | ya |
+| 3 | ×2,56 | 123 | 164 | 102 | 41 | 57 b | 77 b | Dewa Abadi | ya |
+| 4 | ×4,1 | 197 | 262 | 164 | 66 | 92 b | 123 b | Dewa Abadi Puncak | ya |
+| 5 | ×6,55 | 315 | 419 | 262 | 105 | 147 b | 197 b | Dewa Abadi Puncak | ya |
+| 6 | ×10,5 | 503 | 671 | 419 | 168 | 235 b | 315 b | Dewa Abadi Puncak | **tidak, PERMANEN** |
+| 7 | ×16,8 | 805 | 1.074 | 671 | 268 | 376 b | 503 b | ★ 27+ | **tidak, PERMANEN** |
+| 8 | ×26,8 | 1.288 | 1.718 | 1.074 | 429 | 602 b | 805 b | ★ 27+ | **tidak, PERMANEN** |
+| 9 | ×43 | 2.062 | 2.500 | 1.718 | 625 | 964 b | 1.288 b | ★ 45+ | **tidak, PERMANEN** |
+
+* Bintang memakai R yang sama dengan Pedang; Gunung memakai sisi 32 b × skala (sekitar 8 petak per sisi di semua
+  tingkat).
+* Pada Kekuatan ×4 atau lebih pedang tingkat 9 sekitar 1,9 km.
+* Batas akhir = yang lebih kecil dari gerbangmu dan `titahMaxTier`. `uji pusaka_langit bypass` dan rapalan uji melewati
+  gerbang (tetap sampai `titahMaxTier`). `/kultivasi uji pusaka_langit tingkat_tabel` mencetak tabel untuk pengaturanmu.
+* Atur juga dari chat: `/kultivasi titah tingkat <1-9> [pedang|tiang|bintang|gunung]`.
+
+**Tanpa Mode Kehancuran semua tingkat tetap hanya visual.** Kawah raksasa, cincin dan parit hanya tampilan; tingkat 6-9
+pun langsung dirapal tanpa konfirmasi karena tidak ada yang permanen.
+
+> **Peringatan: tingkat 6-9 dengan Mode Kehancuran = PERMANEN.** Tanah yang dipahat **tidak pernah kembali**: Pulihkan
+> tidak berlaku dan menjawab "Titah tingkat 6-9 bersifat permanen — n kawah tidak bisa dipulihkan". Setiap pahatan
+> permanen dicatat di log Kehancuran. **Cadangkan dunia dulu bila ragu.**
+
+**Konfirmasi permanen.** Bila titah tingkat 6-9 akan benar-benar memahat, belum ada yang terpakai. Chat menampilkan blok
+merah dengan tiga tombol:
+
+* **[Ya, hancurkan permanen]**: harus diklik dalam **15 detik**, di dimensi yang sama, dengan tanda masih termuat dan
+  dalam jangkauan. Titah dipanggil lagi dengan semua pemeriksaan (Qi, jeda, penolakan).
+* **[Batal]** (`/kultivasi titah batal`): tidak ada yang terpakai.
+* **[Turunkan ke tingkat 5]**: memasang tingkat 5 (masih bisa dipulihkan).
+
+Konfirmasi berlaku untuk satu rapalan saja dan tidak pernah diingat. Rapalan uji (`uji pusaka_langit ...`,
+`pahat_cepat ... permanen`) juga memintanya. Kode yang salah atau kedaluwarsa: "Kode kedaluwarsa — panggil titah lagi".
+
+**Pahat cepat (tingkat 2-9).** Pahatannya tetap hanya lewat `WorldBreaker`, tetapi bekerja chunk demi chunk dari
+tengah ke luar:
+
+* Waktunya 8 ms per tick (`titahBulkMillisPerTick`), dibagi dua bila server lambat (MSPT > 35) dan **berhenti
+  sementara** bila MSPT terlalu tinggi (`kehancuranMsptPause`). Bilah bos merah "Bumi runtuh · Tingkat n" menunjukkan
+  kemajuannya.
+* **Hanya tanah yang sudah termuat.** Tidak ada chunk yang dimuat atau dibuat; chunk yang sedang dipahat ditahan dengan
+  tiket sementara. Karena itu kawah sungguhan dipangkas ke tanah di sekitarmu (biasanya 40-170 b pada jarak pandang 10),
+  sedangkan tampilannya tetap sampai ribuan blok. Chat memberi tahu bila kawah dipangkas atau diperkecil.
+* Setiap chunk yang selesai dikirim ulang ke pemain setelah cahayanya beres.
+* **Tingkat 2-5** masih bisa dipulihkan dalam jendela Pulihkan biasa: kawah diperkecil sampai muat 1.000.000 blok
+  pemulihan (`titahUndoMaxBlocks`). Catatan pulih ada di memori dan hilang bila server dimulai ulang.
+* **Zona terlindung** (aula sekte, pemain lain, penduduk desa, titik bangkit, spawn, sekitar tubuhmu) tidak membatalkan
+  titah: kolomnya dibiarkan berdiri sebagai pilar.
+* **Air dan lava tidak pernah diambil** dan selalu disisakan dinding 1 blok; tidak ada yang dipahat di bawah air.
+* Batuan dasar dan 6 blok di atas dasar dunia tidak pernah disentuh, balok-entitas (peti dan sejenisnya) dibiarkan,
+  tidak ada drop.
+* **Membatalkan:** `/kultivasi kehancuran batal` (atau `/kultivasi uji pusaka_langit pahat_cepat batal`) menghentikan
+  pahatmu setelah chunk yang sedang dikerjakan. Mematikan saklar Mode Kehancuran milikmu juga menghentikannya. Yang
+  sudah terpahat pada tingkat 2-5 tetap bisa dipulihkan.
+* Satu pahat cepat berjalan dan satu antre di seluruh server; satu titah per pemain.
+
+Daftar uji lengkap (24 butir) ada di `docs/uji/FASE-10b-tingkat.md`.

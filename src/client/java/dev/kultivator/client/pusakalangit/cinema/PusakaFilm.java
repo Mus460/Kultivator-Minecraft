@@ -17,6 +17,7 @@ import dev.kultivator.client.epic.screen.TitleCard;
 import dev.kultivator.client.epic.sky.SkyDirector;
 import dev.kultivator.client.fx.qi.Qi;
 import dev.kultivator.client.fx.spec.ScreenFlash;
+import dev.kultivator.client.pusakalangit.world.TitahWorld;
 import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.epic.EpicIds;
 import dev.kultivator.network.Payloads;
@@ -63,6 +64,13 @@ import java.util.Locale;
  * through {@link CinematicDirector#shoot}. Any movement key ends it, Backspace skips it, a hurt snaps back; a chained
  * segment only starts while the previous one still runs ({@link CinematicDirector#shooting}), so a skip is never undone.
  * The server never waits for the camera: the strike lands when the server says. Client thread only.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): from tier 2 the framing widens by {@code f = s^0.6} (the tier's scale {@code s}) while
+ * every segment keeps the same caps: F3 stands {@code 60 + 40 f} b above the aim; F4 starts {@code 24 f} b behind and
+ * above the impact and, from tier 5, holds still while the giant weapon (or its impostor) crosses the frame; F5 circles at
+ * {@code 16 f} b and sweeps at most {@code min(20°, 7 × 2 s / r)} so its arc stays under 7.6 b/s. Every tier-scaled move
+ * and turn is clipped to 7 b/s and 16°/s before the shot's own validation. The F4 vignette grows with the tier
+ * ({@code min(1, 0.5 + t / 9)}) inside its cap. Tier 1 frames exactly as before.
  */
 public final class PusakaFilm {
 
@@ -74,6 +82,9 @@ public final class PusakaFilm {
 	/** The aftermath crane after the climax (F5). */
 	public static final int AFTERMATH = 40;
 	private static final int SEGMENT = 80;
+	/** The tier-scaled framing's own caps, under the shot validation's 7.6 b/s and 25°/s (29.16.10). */
+	private static final double TIER_SPEED = 7.0D;
+	private static final double TIER_TURN = 16.0D;
 	private static final String[] GLYPHS = {"劍", "柱", "斗", "山"};
 	private static final int JADE = 0x2E8963;
 
@@ -97,6 +108,9 @@ public final class PusakaFilm {
 		final int skill;
 		final float radius;
 		final boolean test;
+		/** Tingkat Titah: the tier (1-9) and the framing factor {@code f = s^0.6} (1 at tier 1). */
+		int tier = 1;
+		double frame = 1.0D;
 		boolean full;
 		boolean running;
 		boolean cancelled;
@@ -158,6 +172,7 @@ public final class PusakaFilm {
 			abandon(film);
 		}
 		Film fresh = new Film(scene, spec, d, key, TargetMark.ground(aim), colour(spec, d), p.caster(), skillOf(spec, p), p.radius(), false);
+		tier(fresh, TitahWorld.tierOf(p.aux()));
 		current = fresh;
 		plan(fresh, total, p.has(Payloads.TechFx.FLAG_LOW_LOAD));
 	}
@@ -167,6 +182,11 @@ public final class PusakaFilm {
 	 * gate (only the cooldowns of a test scene are skipped). Null = started, else the refusal reason.
 	 */
 	public static @Nullable String test(TechniqueSpec spec, int skill, Vec3 aim, int ticks) {
+		return test(spec, skill, aim, ticks, 1);
+	}
+
+	/** {@link #test} with the framing of Tingkat {@code tier} (29.16.15 {@code film <skill> [detik] [tingkat]}). */
+	public static @Nullable String test(TechniqueSpec spec, int skill, Vec3 aim, int ticks, int tier) {
 		Dampak d = spec.dampak();
 		if (d == null) {
 			return "dampak";
@@ -186,7 +206,9 @@ public final class PusakaFilm {
 			abandon(current);
 		}
 		int length = Math.max(MIN_FILM, Math.min(MAX_FILM, ticks));
-		Film film = new Film(scene, spec, d, -1L, TargetMark.ground(aim), colour(spec, d), minecraft.player.getId(), skill, 48.0F, true);
+		int t = Math.max(1, Math.min(9, tier));
+		Film film = new Film(scene, spec, d, -1L, TargetMark.ground(aim), colour(spec, d), minecraft.player.getId(), skill, 48.0F * TitahWorld.tierScale(t), true);
+		tier(film, t);
 		current = film;
 		film.full = true;
 		lastRefusal = "";
@@ -233,6 +255,48 @@ public final class PusakaFilm {
 	/** Why the last film fell back (for {@code /sinematik pusaka info}); empty when none did. */
 	public static String lastRefusal() {
 		return lastRefusal;
+	}
+
+	/** Sets a film's tier and its framing factor {@code f = s^0.6}. */
+	private static void tier(Film film, int tier) {
+		film.tier = Math.max(1, Math.min(9, tier));
+		film.frame = film.tier <= 1 ? 1.0D : Math.pow(TitahWorld.tierScale(film.tier), 0.6D);
+	}
+
+	/** {@code to} pulled back towards {@code from} so the move takes at most 7 b/s over {@code ticks}. */
+	static Vec3 capMove(Vec3 from, Vec3 to, int ticks) {
+		double max = TIER_SPEED * Math.max(1, ticks) / 20.0D;
+		Vec3 move = to.subtract(from);
+		double length = move.length();
+		return length <= max || length < 1.0E-6D ? to : from.add(move.scale(max / length));
+	}
+
+	/**
+	 * {@code look1} turned back towards the first view direction so the view turns at most 16°/s over {@code ticks}
+	 * (between the camera at {@code cam0} looking at {@code look0} and at {@code cam1} looking at {@code look1}).
+	 */
+	static Vec3 capLook(Vec3 cam0, Vec3 cam1, Vec3 look0, Vec3 look1, int ticks) {
+		Vec3 a = look0.subtract(cam0);
+		Vec3 b = look1.subtract(cam1);
+		double la = a.length();
+		double lb = b.length();
+		if (la < 1.0E-4D || lb < 1.0E-4D) {
+			return look1;
+		}
+		Vec3 d0 = a.scale(1.0D / la);
+		Vec3 d1 = b.scale(1.0D / lb);
+		double angle = Math.acos(Math.max(-1.0D, Math.min(1.0D, d0.dot(d1))));
+		double max = Math.toRadians(TIER_TURN) * Math.max(1, ticks) / 20.0D;
+		if (angle <= max) {
+			return look1;
+		}
+		double t = max / angle;
+		double sin = Math.sin(angle);
+		Vec3 d = sin < 1.0E-4D ? d0.scale(1.0D - t).add(d1.scale(t)) : d0.scale(Math.sin((1.0D - t) * angle) / sin).add(d1.scale(Math.sin(t * angle) / sin));
+		if (d.lengthSqr() < 1.0E-8D) {
+			return look0.subtract(cam0).add(cam1);
+		}
+		return cam1.add(d.normalize().scale(lb));
 	}
 
 	// ================================================================ planning
@@ -396,10 +460,15 @@ public final class PusakaFilm {
 
 		// F3 Istana: above the aim, a slow 15° turn, the vista and the decree's title card
 		boolean low = Vistas.lowVista(film.d.vista());
-		Vec3 v0 = aim.add(side.scale(8.0D)).add(0.0D, 26.0D, 0.0D);
+		boolean tiered = film.tier >= 2;
+		double f = film.frame;
+		// Tingkat Titah: world-anchored 60 + 40 f b above the aim (tier 1: 26 b, as before)
+		double high = tiered ? 60.0D + 40.0D * f : 26.0D;
+		double orbit = tiered ? 8.0D * f : 8.0D;
+		Vec3 v0 = aim.add(side.scale(orbit)).add(0.0D, high, 0.0D);
 		double turn = Math.toRadians(15.0D);
-		Vec3 turned = side.scale(Math.cos(turn) * 8.0D).add(h.scale(Math.sin(turn) * 8.0D));
-		Vec3 v1 = aim.add(turned).add(0.0D, 28.0D, 0.0D);
+		Vec3 turned = side.scale(Math.cos(turn) * orbit).add(h.scale(Math.sin(turn) * orbit));
+		Vec3 v1 = tiered ? capMove(v0, aim.add(turned).add(0.0D, high + 2.0D, 0.0D), f3) : aim.add(turned).add(0.0D, 28.0D, 0.0D);
 		Vec3 look0;
 		Vec3 look1;
 		Vec3 vistaAt;
@@ -415,6 +484,10 @@ public final class PusakaFilm {
 			look1 = v1.add(lookUp40.scale(50.0D));
 			vistaAt = v0.add(h.scale(Math.cos(Math.toRadians(47.0D)) * 110.0D)).add(0.0D, Math.sin(Math.toRadians(47.0D)) * 110.0D, 0.0D);
 		}
+		if (tiered) {
+			look1 = capLook(v0, v1, look0, look1, f3);
+		}
+		Vec3 f3Look1 = look1;
 		scene.at(Math.max(0, cut1 - 2), () -> {
 			if (alive(film)) {
 				Vistas.spawn(scene, film.d.vista(), film.spec, vistaAt, v0, f3 + 10, film.rgb, null, 1.0F, film.casterId);
@@ -424,7 +497,7 @@ public final class PusakaFilm {
 			if (!chained(film)) {
 				return;
 			}
-			if (!act(film, v0, v1, look0, look1, f3, true, true)) {
+			if (!act(film, v0, v1, look0, f3Look1, f3, true, true)) {
 				abandon(film);
 				return;
 			}
@@ -442,6 +515,21 @@ public final class PusakaFilm {
 		double lift = 24.0D + Math.min(28.0D, distance * 0.25D);
 		Vec3 r3From = aim.subtract(h.scale(8.0D)).add(0.0D, lift, 0.0D);
 		Vec3 r3To = aim.subtract(h.scale(5.0D)).add(0.0D, 10.0D, 0.0D);
+		Vec3 r3Look0 = aim.add(0.0D, 6.0D, 0.0D);
+		Vec3 r3Look1 = aim;
+		if (tiered) {
+			// Tingkat Titah: 24 f b behind and above the impact (placed by the masked cut); from tier 5 the camera holds still
+			// and the giant weapon crosses the frame, never followed faster than the caps
+			r3From = aim.subtract(h.scale(24.0D * f)).add(0.0D, 24.0D * f, 0.0D);
+			r3To = film.tier >= 5 ? r3From : capMove(r3From, aim.subtract(h.scale(12.0D * f)).add(0.0D, 8.0D * f, 0.0D), f4);
+			r3Look0 = aim.add(0.0D, 21.0D * f, 0.0D);
+			r3Look1 = capLook(r3From, r3To, r3Look0, aim.add(0.0D, 2.0D, 0.0D), f4);
+		}
+		Vec3 f4From = r3From;
+		Vec3 f4To = r3To;
+		Vec3 f4Look0 = r3Look0;
+		Vec3 f4Look1 = r3Look1;
+		float vignette = tiered ? 0.3F + 0.2F * Math.max(0.0F, Math.min(1.0F, (Math.min(1.0F, 0.5F + film.tier / 9.0F) - 0.611F) / 0.389F)) : 0.3F;
 		scene.at(cut2, () -> {
 			if (!chained(film)) {
 				return;
@@ -450,13 +538,13 @@ public final class PusakaFilm {
 				SkyDirector.release(20, scene.priority);
 				film.graded = false;
 			}
-			if (!act(film, r3From, r3To, aim.add(0.0D, 6.0D, 0.0D), aim, f4, true, false)) {
+			if (!act(film, f4From, f4To, f4Look0, f4Look1, f4, true, false)) {
 				abandon(film);
 				return;
 			}
 			ScreenFlash.speedLines(film.rgb, Math.min(20, f4));
 			CinematicDirector.snap(-8.0F, 4, f4);
-			EpicScreen.vignette(film.rgb, 0.3F, f4);
+			EpicScreen.vignette(film.rgb, vignette, f4);
 		});
 	}
 
@@ -590,11 +678,21 @@ public final class PusakaFilm {
 		Vec3 back = new Vec3(minecraft.player.getX() - aim.x, 0.0D, minecraft.player.getZ() - aim.z);
 		back = back.lengthSqr() < 1.0E-4D ? new Vec3(0.0D, 0.0D, -1.0D) : back.normalize();
 		double r = 12.0D + Math.min(12.0D, Math.max(0.0F, film.radius) / 8.0D);
-		double a0 = Math.atan2(back.z, back.x) - Math.toRadians(10.0D);
-		double a1 = a0 + Math.toRadians(20.0D);
-		Vec3 from = aim.add(Math.cos(a0) * r, 3.0D, Math.sin(a0) * r);
-		Vec3 to = aim.add(Math.cos(a1) * r, 6.0D, Math.sin(a1) * r);
-		Shots.Shot shot = Shots.pusakaFilm(from, to, aim.add(0.0D, 4.0D, 0.0D), aim.add(0.0D, 5.0D, 0.0D), AFTERMATH).cut();
+		double sweep = Math.toRadians(20.0D);
+		double low = 3.0D;
+		double look = 4.0D;
+		if (film.tier >= 2) {
+			// Tingkat Titah: a wider orbit (16 f b) whose arc stays under 7 b/s: sweep min(20°, 7 × 2 s / r)
+			r = Math.max(r, 16.0D * film.frame);
+			sweep = Math.min(sweep, TIER_SPEED * (AFTERMATH / 20.0D) / r);
+			low = 3.0D * film.frame;
+			look = 4.0D * film.frame;
+		}
+		double a0 = Math.atan2(back.z, back.x) - sweep * 0.5D;
+		double a1 = a0 + sweep;
+		Vec3 from = aim.add(Math.cos(a0) * r, low, Math.sin(a0) * r);
+		Vec3 to = aim.add(Math.cos(a1) * r, low + 3.0D, Math.sin(a1) * r);
+		Shots.Shot shot = Shots.pusakaFilm(from, to, aim.add(0.0D, look, 0.0D), aim.add(0.0D, look + 1.0D, 0.0D), AFTERMATH).cut();
 		EpicDirector.refreshFlags(film.scene);
 		return CinematicDirector.shoot(film.scene, shot, CinematicDirector.KIND_ULTIMATE, film.scene.priority, true);
 	}

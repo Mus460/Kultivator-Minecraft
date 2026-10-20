@@ -36,6 +36,12 @@ import java.util.List;
  * {@code max(1, R / 64)} b (the point cap stays 2048), drawn wider, never make star impacts here (the Seven Stars fall in
  * {@code StarFall}), stay 200 ticks after the climax and, on the climax, ignite: the lines burn as glowing trenches in the
  * hot colour for the DOT window, visual only.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): a Titah sigil may span the decree's true radius (≤ 4096 b, so its nodes stay where the
+ * server's stars fall). A sigil wider than this client draws ({@link DampakWorldBudget#titahRadius}) draws only the part
+ * of its lines within render distance of the camera (tier-1 sigils, ≤ 256 b, draw as before), with the stride raised so
+ * at most 128 / 256 / 512 points (Minimal
+ * dust / Normal / Maximal) draw.
  */
 final class GroundSigil {
 
@@ -140,7 +146,7 @@ final class GroundSigil {
 			double dx = bx - ax;
 			double dz = bz - az;
 			double length = Math.sqrt(dx * dx + dz * dz);
-			if (!(length > 0.05D) || length > (titah ? 512.0D : 256.0D)) {
+			if (!(length > 0.05D) || length > (titah ? 8192.0D : 256.0D)) {
 				return;
 			}
 			int samples = Math.max(1, (int) Math.ceil(length / Math.max(1.0D, step)));
@@ -258,7 +264,8 @@ final class GroundSigil {
 		if (SIGILS.size() >= MAX_SIGILS) {
 			SIGILS.remove(0);
 		}
-		Sigil sigil = new Sigil(cast, pattern, rgb & 0xFFFFFF, centre, Math.min(256.0F, Math.max(1.0F, radius)), own, palette == null ? "NONE" : palette,
+		// up to the decree's true radius (29.16.10): the nodes stay where the server's stars fall
+		Sigil sigil = new Sigil(cast, pattern, rgb & 0xFFFFFF, centre, Math.min(4096.0F, Math.max(1.0F, radius)), own, palette == null ? "NONE" : palette,
 				DampakWorld.clock(0.0F));
 		sigil.titah = true;
 		sigil.afterClimax = 200;
@@ -487,11 +494,22 @@ final class GroundSigil {
 	private static void dots(Sigil sigil) {
 		DustParticleOptions dim = new DustParticleOptions(sigil.rgb, 0.6F);
 		DustParticleOptions bright = new DustParticleOptions(sigil.rgb, 1.1F);
-		int budget = DampakParticles.grant(64);
+		boolean wide = wide(sigil);
+		int budget = DampakParticles.grant(wide ? DampakWorldBudget.FAR_SIGIL_POINTS[0] : 64);
+		// a wide Titah sigil (29.16.10): only the dots within render distance of the camera
+		Vec3 camera = wide ? net.minecraft.client.Minecraft.getInstance().gameRenderer.mainCamera().position() : Vec3.ZERO;
+		double range2 = wide ? visibleRange() * visibleRange() : 0.0D;
 		for (int i = 0; i < sigil.lines.size() && budget > 0; i++) {
 			float[] line = sigil.lines.get(i);
 			boolean lit = !Double.isNaN(sigil.lineLit.get(i)[0]);
 			for (int p = 0; p + 2 < line.length && budget > 0; p += 6) {
+				if (wide) {
+					double dx = line[p] - camera.x;
+					double dz = line[p + 2] - camera.z;
+					if (dx * dx + dz * dz > range2) {
+						continue;
+					}
+				}
 				budget--;
 				DampakParticles.one(lit ? bright : dim, line[p], line[p + 1] + 0.1D, line[p + 2], 0.0D, 0.0D, 0.0D);
 			}
@@ -606,6 +624,9 @@ final class GroundSigil {
 			litBloom = ARGB.color(Math.round(master * 110.0F * heat), sigil.hotRgb);
 			trench = ARGB.color(Math.round(master * 200.0F * heat * flicker), sigil.hotRgb);
 		}
+		if (wide(sigil)) {
+			return drawWide(frame, sigil, budget, width, dimCore, dimBloom, litCore, litBloom, burning, trench);
+		}
 		for (int i = 0; i < sigil.lines.size() && budget > 0; i++) {
 			float[] line = sigil.lines.get(i);
 			int samples = line.length / 3 - 1;
@@ -635,6 +656,86 @@ final class GroundSigil {
 				float bx = frame.rx(line[o + 3]);
 				float by = frame.ry(line[o + 4]);
 				float bz = frame.rz(line[o + 5]);
+				frame.groundStrip(frame.lightning, ax, ay, az, bx, by, bz, lit ? width : width * 0.6F, core, core, 0.0F, 1.0F);
+				frame.groundStrip(frame.glow, ax, ay + 0.01F, az, bx, by + 0.01F, bz, width * 4.0F, bloom, bloom, 0.0F, 1.0F);
+				if (burning && lit) {
+					frame.groundStrip(frame.crack, ax, ay + 0.005F, az, bx, by + 0.005F, bz, width * 2.6F, trench, trench, 0.0F, 1.0F);
+				}
+			}
+		}
+		return budget;
+	}
+
+	/**
+	 * A Titah sigil wider than any tier-1 sigil and than this client draws (Tingkat Titah, 29.16.10): only its visible
+	 * part, stride-capped. Tier-1 sigils (≤ 256 b) draw as before.
+	 */
+	private static boolean wide(Sigil sigil) {
+		return sigil.titah && sigil.radius > 256.0F && sigil.radius > DampakWorldBudget.titahRadius(sigil.radius) + 1.0F;
+	}
+
+	/** The render distance in blocks less a chunk (where the client has ground to draw on). */
+	private static double visibleRange() {
+		try {
+			return Math.max(48.0D, net.minecraft.client.Minecraft.getInstance().options.getEffectiveRenderDistance() * 16.0D - 16.0D);
+		} catch (RuntimeException exception) {
+			return 112.0D;
+		}
+	}
+
+	/**
+	 * The visible part of a wide Titah sigil: only samples within render distance of the camera, the stride raised so at
+	 * most {@link DampakWorldBudget#FAR_SIGIL_POINTS} points draw this frame.
+	 */
+	private static int drawWide(SigilRenderer.Frame frame, Sigil sigil, int budget, float width, int dimCore, int dimBloom, int litCore, int litBloom,
+								boolean burning, int trench) {
+		double range = visibleRange();
+		double range2 = range * range;
+		int visible = 0;
+		for (float[] line : sigil.lines) {
+			for (int o = 0; o + 2 < line.length; o += 3) {
+				float dx = frame.rx(line[o]);
+				float dz = frame.rz(line[o + 2]);
+				if (dx * dx + dz * dz <= range2) {
+					visible++;
+				}
+			}
+		}
+		if (visible <= 0) {
+			return budget;
+		}
+		int cap = DampakWorldBudget.FAR_SIGIL_POINTS[DampakWorldBudget.index()];
+		int stride = Math.max(1, (int) Math.ceil(visible / (double) cap));
+		for (int i = 0; i < sigil.lines.size() && budget > 0; i++) {
+			float[] line = sigil.lines.get(i);
+			int samples = line.length / 3 - 1;
+			if (samples <= 0) {
+				continue;
+			}
+			double[] state = sigil.lineLit.get(i);
+			float litShare = Double.isNaN(state[0]) ? 0.0F : (float) Math.min(1.0D, Math.max(0.0D, (frame.clock - state[0]) / LIGHT_TICKS));
+			boolean fromB = state[1] > 0.5D;
+			for (int p = 0; p < samples && budget > 0; p += stride) {
+				int q = Math.min(samples, p + stride);
+				int o = p * 3;
+				int e = q * 3;
+				float ax = frame.rx(line[o]);
+				float az = frame.rz(line[o + 2]);
+				float bx = frame.rx(line[e]);
+				float bz = frame.rz(line[e + 2]);
+				if (ax * ax + az * az > range2 && bx * bx + bz * bz > range2) {
+					continue;
+				}
+				if (!EpicBudget.takeQuads(burning ? 3 : 2)) {
+					return 0;
+				}
+				budget--;
+				float f = (p + q) * 0.5F / samples;
+				boolean lit = (fromB ? 1.0F - f : f) <= litShare;
+				int core = lit ? litCore : dimCore;
+				int bloom = lit ? litBloom : dimBloom;
+				float ay = frame.ry(line[o + 1]);
+				float by = frame.ry(line[e + 1]);
 				frame.groundStrip(frame.lightning, ax, ay, az, bx, by, bz, lit ? width : width * 0.6F, core, core, 0.0F, 1.0F);
 				frame.groundStrip(frame.glow, ax, ay + 0.01F, az, bx, by + 0.01F, bz, width * 4.0F, bloom, bloom, 0.0F, 1.0F);
 				if (burning && lit) {

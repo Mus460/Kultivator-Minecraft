@@ -31,6 +31,9 @@ import java.util.List;
  * <p>
  * A star may arrive as a pre-impact TRAVEL (it falls, its impact plays on landing) and/or as its EXTRA0 (landing): the
  * second view of the same star (within 4 b and its flight time) adds nothing.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): the falling star and its crystal grow by {@code q = sqrt(s)}, its ring by {@code s}
+ * (the server's star radius); a star landing beyond render distance shows only its sky sprite ({@link SkyMarks#farStar}).
  */
 final class StarFall {
 
@@ -44,12 +47,15 @@ final class StarFall {
 		final Vec3 at;
 		final double born;
 		final int life;
+		/** The glow's size factor ({@code q} of the decree's tier). */
+		final float size;
 
-		Glow(long cast, Vec3 at, double born, int life) {
+		Glow(long cast, Vec3 at, double born, int life, float size) {
 			this.cast = cast;
 			this.at = at;
 			this.born = born;
 			this.life = life;
+			this.size = Math.max(1.0F, size);
 		}
 	}
 
@@ -67,13 +73,18 @@ final class StarFall {
 		}
 		PENDING.add(new Pending(cast.key, ground, now + duration));
 		TitahWorld.Cast c = cast;
+		if (cast.tier >= 2 && far(ground)) {
+			// beyond render distance: the star's flare in the sky when it lands, nothing on the land
+			TitahWorld.schedule(duration, cast.key, () -> farImpact(c, ground));
+			return;
+		}
 		if (cast.lowLoad) {
 			// server under load: no falling prop, the impact (its ring) at the landing time
 			TitahWorld.schedule(duration, cast.key, () -> impact(level, c, ground, index));
 			return;
 		}
-		RelicFall.fall(cast.key, "star_core", RelicFall.STAR, ground, Math.min(120.0F, height), duration, 1.6F, (index * 51) % 360, TitahWorld.STAR_WHITE,
-				TitahWorld.VIOLET, cast.own, false, () -> impact(level, c, ground, index));
+		RelicFall.fall(cast.key, "star_core", RelicFall.STAR, ground, Math.min(120.0F * cast.q, height), duration, 1.6F * cast.q, (index * 51) % 360,
+				TitahWorld.STAR_WHITE, TitahWorld.VIOLET, cast.own, false, () -> impact(level, c, ground, index));
 		TitahWorld.touch();
 	}
 
@@ -86,10 +97,33 @@ final class StarFall {
 			return;
 		}
 		if (duration > 0 && duration <= 30) {
-			fall(level, cast, ground, duration, 60.0F, index);
+			fall(level, cast, ground, duration, 60.0F * cast.q, index);
+			return;
+		}
+		if (cast.tier >= 2 && far(ground)) {
+			farImpact(cast, ground);
 			return;
 		}
 		impact(level, cast, ground, index);
+	}
+
+	/** True when {@code at} lies beyond render distance of the camera (the land there is not drawn on this client). */
+	private static boolean far(Vec3 at) {
+		Vec3 camera = net.minecraft.client.Minecraft.getInstance().gameRenderer.mainCamera().position();
+		double range = TitahWorld.viewRange() - 16.0D;
+		double dx = at.x - camera.x;
+		double dz = at.z - camera.z;
+		return dx * dx + dz * dz > range * range;
+	}
+
+	/** A star landing beyond render distance: its flare in the sky only (once per star). */
+	private static void farImpact(TitahWorld.Cast cast, Vec3 ground) {
+		PENDING.removeIf(p -> p.cast() == cast.key && p.at().distanceToSqr(ground) < 16.0D);
+		if (near(RECENT, cast.key, ground)) {
+			return;
+		}
+		RECENT.add(new Pending(cast.key, ground, TitahWorld.clock()));
+		SkyMarks.farStar(cast.key, ground.add(0.0D, 4.0D * cast.q, 0.0D), TitahWorld.EMBER_VIOLET, 5.0F * cast.q, 40);
 	}
 
 	static void abort(long cast) {
@@ -124,7 +158,7 @@ final class StarFall {
 			return;
 		}
 		RECENT.add(new Pending(cast.key, ground, now));
-		DampakWorld.titahRing(ground, 8.0F, "VOID", TitahWorld.EMBER_VIOLET, cast.own, 0, false);
+		DampakWorld.titahRing(ground, TitahWorld.ringRadius(8.0F * cast.s), "VOID", TitahWorld.EMBER_VIOLET, cast.own, 0, false);
 		SkyMarks.flash(cast.key, ground, 0xE8D8FF, 12, 70, 0.6F);
 		RandomSource random = EpicParticles.random();
 		int n = EpicParticles.grant(DampakWorldBudget.scaled(16, cast.own, 24), false);
@@ -148,7 +182,7 @@ final class StarFall {
 		int life = DampakWorldBudget.TITAH_CRYSTAL_LIFE[tier];
 		boolean displays = DampakWorldBudget.displays(cast.own, cast.lowLoad) && tier >= 1;
 		if (displays) {
-			float scale = 1.4F;
+			float scale = 1.4F * cast.q;
 			List<AnimStep> anims = List.of(AnimStep.of(Anim.GROW, 0, 8, 0.1F, 0.0F), AnimStep.of(Anim.SPIN, 8, life, 0.6F, 0.0F));
 			ModelHandle handle = ModelFx.show(new ModelRequest("star_core", ground.add(0.0D, 0.58D * scale - 0.15D, 0.0D), scale, (index * 51) % 360, 0.0F, 0.0F,
 					life, anims, -1, Vec3.ZERO, false, true, -1, FxLayer.Priority.CORE));
@@ -170,7 +204,7 @@ final class StarFall {
 		if (GLOWS.size() >= MAX_GLOWS) {
 			GLOWS.remove(0);
 		}
-		GLOWS.add(new Glow(cast.key, ground, TitahWorld.clock(), displays ? life : Math.min(life, 1200)));
+		GLOWS.add(new Glow(cast.key, ground, TitahWorld.clock(), displays ? life : Math.min(life, 1200), cast.q));
 		TitahWorld.touch();
 	}
 
@@ -212,7 +246,7 @@ final class StarFall {
 			float breathe = 0.75F + 0.25F * (float) Math.sin(frame.clock * 0.08D + i);
 			float flare = age < 12.0D ? 1.0F + 1.5F * (float) (1.0D - age / 12.0D) : 1.0F;
 			double y = DampakWorld.titahGround(frame.level, glow.at.x, glow.at.z, glow.at.y) + SigilRenderer.LIFT + 0.02D;
-			frame.flat(frame.ground, frame.rx(glow.at.x), frame.ry(y), frame.rz(glow.at.z), 2.6F * flare, (float) (frame.clock * 0.01D),
+			frame.flat(frame.ground, frame.rx(glow.at.x), frame.ry(y), frame.rz(glow.at.z), 2.6F * flare * glow.size, (float) (frame.clock * 0.01D),
 					TitahWorld.argb(Math.max(0.0F, 0.7F * fade * breathe), TitahWorld.EMBER_VIOLET));
 		}
 	}

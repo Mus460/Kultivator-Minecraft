@@ -10,6 +10,7 @@ import dev.kultivator.client.epic.ShaderCompat;
 import dev.kultivator.client.epic.render.EpicRenderTypes;
 import dev.kultivator.pusakalangit.TitahMonumentEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -41,6 +42,12 @@ import org.jetbrains.annotations.Nullable;
  * leaving (rises and shrinks away over 40 ticks). Extras by tier (never in the shadow pass): Normal a glow on the ground
  * at its foot, Maximal also a light strip along the blade or glows on the pillar's hoops. The entity renders in Iris's
  * shadow pass like any entity. The item stack is made lazily ({@link ModelFx#stack}), never in the constructor.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): the scale clamp is 1100 (a tier-9 sword is about 960 b long at Kekuatan ×1), the
+ * culling box follows the scaled model and the monument draws up to {@code max(160, 1.5 × length)} b from the camera
+ * (its own test, not the entity's 160 b). Beyond render distance, where its chunk section is not drawn, {@link FarRelic}
+ * shows it instead (an impostor or a silhouette from the server's {@code TitahFar} list), and this renderer steps aside
+ * for it.
  */
 public class TitahMonumentRenderer extends EntityRenderer<TitahMonumentEntity, TitahMonumentRenderer.State> {
 
@@ -50,6 +57,8 @@ public class TitahMonumentRenderer extends EntityRenderer<TitahMonumentEntity, T
 	/** The pillar's half length at scale 1 (its anchor is its middle). */
 	private static final float PILLAR_HALF = 1.5F;
 	private static final int PULL_TICKS = 40;
+	/** The largest scale drawn (Tingkat Titah, 29.16.10; the server clamps to the same 1100). */
+	static final float MAX_SCALE = 1100.0F;
 
 	private static @Nullable RenderType groundGlow;
 
@@ -94,9 +103,36 @@ public class TitahMonumentRenderer extends EntityRenderer<TitahMonumentEntity, T
 		return new State();
 	}
 
+	/** The model's length in blocks at scale {@code s}: about 1.87 × s for a sword, 3 × s for the pillar (29.16.1). */
+	static float length(boolean sword, float s) {
+		return (sword ? 1.87F : 2.0F * PILLAR_HALF) * s;
+	}
+
+	/**
+	 * Its own distance test (29.16.10): up to {@code max(160, 1.5 × length)} b instead of the entity's fixed 160 b, then the
+	 * frustum with the scaled culling box. Beyond render distance {@link FarRelic} draws it when it knows it.
+	 */
+	@Override
+	public boolean shouldRender(TitahMonumentEntity entity, Frustum culler, double camX, double camY, double camZ, float partialTicks) {
+		float s = Mth.clamp(Float.isFinite(entity.scale()) ? entity.scale() : 12.0F, 0.5F, MAX_SCALE);
+		String id = entity.modelId();
+		double range = Math.max(TitahMonumentEntity.RENDER_RANGE, 1.5D * length(id != null && id.endsWith("_sword"), s));
+		if (entity.distanceToSqr(camX, camY, camZ) > range * range) {
+			return false;
+		}
+		double dx = entity.getX() - camX;
+		double dz = entity.getZ() - camZ;
+		double near = TitahWorld.viewRange() - 16.0D;
+		if (dx * dx + dz * dz > near * near && FarRelic.drawsAt(entity.getX(), entity.getZ())) {
+			return false;
+		}
+		AABB box = getBoundingBoxForCulling(entity, partialTicks).inflate(0.5D);
+		return box.hasNaN() || culler.isVisible(box);
+	}
+
 	@Override
 	protected AABB getBoundingBoxForCulling(TitahMonumentEntity entity, float partialTicks) {
-		float s = Mth.clamp(entity.scale(), 0.5F, 40.0F);
+		float s = Mth.clamp(Float.isFinite(entity.scale()) ? entity.scale() : 12.0F, 0.5F, MAX_SCALE);
 		double w = Math.max(1.5D, s * 0.7D);
 		double up = s * 3.2D + (entity.state() >= MonumentNotes.STATE_PULLING ? 48.0D : 0.0D);
 		double x = Mth.lerp(partialTicks, entity.xOld, entity.getX());
@@ -129,7 +165,7 @@ public class TitahMonumentRenderer extends EntityRenderer<TitahMonumentEntity, T
 		state.sword = id.endsWith("_sword");
 		// made on first use: item components are not bound yet when entity renderers are created at resource reload
 		itemModelResolver.updateForNonLiving(state.item, ModelFx.stack(id), ItemDisplayContext.FIXED, entity);
-		float s = Mth.clamp(Float.isFinite(entity.scale()) ? entity.scale() : 12.0F, 0.5F, 40.0F);
+		float s = Mth.clamp(Float.isFinite(entity.scale()) ? entity.scale() : 12.0F, 0.5F, MAX_SCALE);
 		state.scale = s;
 		state.yaw = entity.getYRot();
 		state.tilt = Mth.clamp(Float.isFinite(entity.tilt()) ? entity.tilt() : 0.0F, -30.0F, 30.0F);

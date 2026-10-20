@@ -24,6 +24,10 @@ import java.util.List;
  * ticks; Minimal: soil and cloud bursts) and the stepped glowing pit left behind (terraces of darkening depth with violet
  * and gold edges cooling over 30 s). Visual only: the ground never changes here (Mode Kehancuran carves the real
  * STEPPED_PIT on the server, and this glow then lies on it).
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): from tier 2 the grid is laid at the decree's true size (about 8 cells per side, the
+ * cell size from the server) and only its segments within render distance of the camera draw; cells beyond render
+ * distance are never torn out here; the pit may have up to 9 terraces.
  */
 final class LiftCarry {
 
@@ -139,6 +143,10 @@ final class LiftCarry {
 		int lineCount = Math.max(1, Math.min(64, (int) Math.floor(half * 2.0F / Math.max(2.0F, cell)))) + 1;
 		boolean maximal = DampakWorldBudget.tier() >= 2;
 		int samples = Math.max(4, Math.min(maximal ? 32 : 16, (maximal ? 1600 : 700) / (lineCount * 4)));
+		if (half > DampakWorldBudget.titahRadius(half) + 1.0F) {
+			// a grid wider than this client draws: finer samples along its lines, of which only the visible ones draw
+			samples = Math.max(samples, Math.min(maximal ? 96 : 48, (int) Math.ceil(half * 2.0F / 24.0F)));
+		}
 		Grid grid = new Grid(cast, centre, half, Math.max(2.0F, cell), rgb, TitahWorld.clock(), until, samples);
 		ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
 		if (level != null) {
@@ -158,13 +166,30 @@ final class LiftCarry {
 		if (!TitahWorld.finite(centre) || !(half > 1.0F)) {
 			return;
 		}
-		float size = Math.max(2.0F, Math.min(16.0F, cell));
+		tear(level, cast, centre, half, cell, 1.0F, dir, spread, rgb, own, lowLoad, kehancuran, others);
+	}
+
+	/** {@link #tear} of a Tingkat Titah decree: cells up to {@code 16 × s} b, none beyond render distance. */
+	static void tear(ClientLevel level, long cast, Vec3 centre, float half, float cell, float s, Vec3 dir, int spread, int rgb, boolean own, boolean lowLoad,
+					 boolean kehancuran, float others) {
+		if (!TitahWorld.finite(centre) || !(half > 1.0F)) {
+			return;
+		}
+		float size = Math.max(2.0F, Math.min(16.0F * Math.max(1.0F, s), cell));
 		int per = Math.max(1, Math.min(64, (int) Math.floor(half * 2.0F / size)));
+		Vec3 camera = net.minecraft.client.Minecraft.getInstance().gameRenderer.mainCamera().position();
+		double range = TitahWorld.viewRange() - 16.0D;
 		List<double[]> cells = new ArrayList<>(per * per);
 		double x0 = centre.x - per * size * 0.5D;
 		double z0 = centre.z - per * size * 0.5D;
 		for (int i = 0; i < per; i++) {
 			for (int j = 0; j < per; j++) {
+				double cx = x0 + (i + 0.5D) * size - camera.x;
+				double cz = z0 + (j + 0.5D) * size - camera.z;
+				if (cx * cx + cz * cz > range * range) {
+					// beyond render distance: nothing to tear out on this client
+					continue;
+				}
 				cells.add(new double[]{x0 + i * size, z0 + j * size});
 			}
 		}
@@ -205,7 +230,7 @@ final class LiftCarry {
 		if (PITS.size() >= 4) {
 			PITS.remove(0);
 		}
-		Pit pit = new Pit(cast, centre, half, Math.max(3, Math.min(5, steps)), rgb, rgb2, TitahWorld.clock());
+		Pit pit = new Pit(cast, centre, half, Math.max(3, Math.min(9, steps)), rgb, rgb2, TitahWorld.clock());
 		ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
 		if (level != null) {
 			refresh(level, pit);
@@ -366,7 +391,26 @@ final class LiftCarry {
 		if (a <= 0.02F) {
 			return;
 		}
+		boolean wide = grid.half > DampakWorldBudget.titahRadius(grid.half) + 1.0F;
+		double visible = TitahWorld.viewRange() - 16.0D;
+		double visible2 = visible * visible;
 		int quads = grid.lines * 2 * grid.samples * 2;
+		if (wide) {
+			// only the segments within render distance of the camera (Tingkat Titah)
+			quads = 0;
+			for (int l = 0; l < grid.lines * 2; l++) {
+				boolean alongZ = l < grid.lines;
+				float off = grid.offset(l % grid.lines);
+				for (int s = 0; s < grid.samples; s++) {
+					if (segmentVisible(frame, grid, alongZ, off, s, visible2)) {
+						quads += 2;
+					}
+				}
+			}
+			if (quads == 0) {
+				return;
+			}
+		}
 		if (!TitahWorld.quads(quads)) {
 			return;
 		}
@@ -382,6 +426,9 @@ final class LiftCarry {
 			float off = grid.offset(l % grid.lines);
 			float[] h = grid.heights[l];
 			for (int s = Math.max(0, mid - reach); s < Math.min(grid.samples, mid + reach); s++) {
+				if (wide && !segmentVisible(frame, grid, alongZ, off, s, visible2)) {
+					continue;
+				}
 				float a0 = length * s / grid.samples;
 				float a1 = length * (s + 1) / grid.samples;
 				double wx0 = alongZ ? grid.x0() + off : grid.x0() + a0;
@@ -398,6 +445,22 @@ final class LiftCarry {
 				frame.groundStrip(frame.glow, ax, ay + 0.01F, az, bx, by + 0.01F, bz, width * 5.0F, bloom, bloom, 0.0F, 1.0F);
 			}
 		}
+	}
+
+	/** True when either end of grid segment {@code s} of a line lies within the visible range (horizontal distance²). */
+	private static boolean segmentVisible(SigilRenderer.Frame frame, Grid grid, boolean alongZ, float off, int s, double range2) {
+		float length = grid.half * 2.0F;
+		for (int e = 0; e <= 1; e++) {
+			float a = length * (s + e) / grid.samples;
+			double wx = alongZ ? grid.x0() + off : grid.x0() + a;
+			double wz = alongZ ? grid.z0() + a : grid.z0() + off;
+			float dx = frame.rx(wx);
+			float dz = frame.rz(wz);
+			if (dx * dx + dz * dz <= range2) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

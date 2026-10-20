@@ -376,6 +376,88 @@ public final class Kehancuran {
 		}
 	}
 
+	/**
+	 * Phase 10b (DESIGN 29.16.6, contract of S): the plan of one fast bulk carve. {@code tier} the Tingkat (2-9; the
+	 * {@code pahat_cepat} test passes 2 or 6), {@code permanent} Tingkat 6-9 (no undo, logged), {@code confirmed} the
+	 * chat confirmation was clicked (required for a permanent carve), {@code palette} the Kawah Lebur palette (applied
+	 * only with the player's {@code kawah} switch and {@code kehancuranSurfacePass}), {@code debrisFlags} the
+	 * {@code DampakDebris} motion flags, {@code recordId} the planted weapon's record (-1 = none) and {@code castPos}
+	 * where the caster stood.
+	 */
+	public record TitahBulk(int tier, boolean permanent, boolean confirmed, dev.kultivator.technique.spec.dsl.Dampak.Palette palette, int debrisFlags,
+			int recordId, Vec3 castPos) {
+	}
+
+	/**
+	 * Phase 10b (DESIGN 29.16.6): the only entry for a fast bulk carve. Never throws, spends or refunds (the decree has
+	 * struck). Re-checks {@code titahEnabled}, the caster's own switch, the realm (K above 0) and "permanent needs the
+	 * confirmation"; an undoable carve with {@code titahUndoMaxBlocks = 0} carves nothing (never silently permanent). One
+	 * Titah job per owner and 1 running plus 1 queued bulk job server-wide, else QUEUE_FULL with "Bumi masih runtuh —
+	 * kehancuran dilewati". The job is planned and carved by {@link WorldBreaker} (time-budgeted, chunk by chunk).
+	 */
+	public static SelfResult submitTitahBulk(ServerPlayer caster, String specId, BulkShape shape, TitahBulk plan) {
+		try {
+			KultivatorConfig config = KultivatorConfig.get();
+			if (plan == null || shape == null || shape.isEmpty() || !config.titahEnabled || !selfOn(caster)) {
+				return SelfResult.OFF;
+			}
+			if (TechniquePower.kScale(Cultivators.get(caster)) <= 0.0D) {
+				return SelfResult.OFF;
+			}
+			if (plan.permanent() && !plan.confirmed()) {
+				return SelfResult.OFF;
+			}
+			if (!plan.permanent() && (config.titahUndoMaxBlocks <= 0 || config.kehancuranUndoMinutes <= 0)) {
+				// 29.16.12: with no undo room Tingkat 2-5 carve nothing; they never turn permanent on their own
+				Msg.actionBar(caster, Component.translatable("kultivator.kehancuran.bulk.no_undo").withColor(0xFFB0A0));
+				return SelfResult.OFF;
+			}
+			if (WorldBreaker.hasTitah(caster.getUUID()) || !WorldBreaker.bulkHasRoom()) {
+				titahNote(caster);
+				return SelfResult.QUEUE_FULL;
+			}
+			for (PendingSelf pending : DEFERRED) {
+				if (pending.titah() != null && pending.owner().equals(caster.getUUID())) {
+					titahNote(caster);
+					return SelfResult.QUEUE_FULL;
+				}
+			}
+			WorldBreaker.BulkJob job = WorldBreaker.BulkJob.carve(caster, specId, shape, Math.max(2, Math.min(9, plan.tier())), plan.permanent(),
+					plan.castPos() == null ? caster.position() : plan.castPos());
+			dev.kultivator.data.TechniqueSpec spec = dev.kultivator.data.TechniqueRegistry.byId(specId);
+			job.specNet = spec == null ? -1 : spec.netId();
+			job.debrisFlags = plan.debrisFlags();
+			job.recordId = plan.recordId();
+			job.palette = plan.palette() != null && kawahOn(caster) && config.kehancuranSurfacePass ? plan.palette()
+					: dev.kultivator.technique.spec.dsl.Dampak.Palette.NONE;
+			if (!WorldBreaker.submitBulk(job)) {
+				titahNote(caster);
+				return SelfResult.QUEUE_FULL;
+			}
+			BlockPos centre = shape.impact();
+			Fx.send(caster.level(), Vec3.atCenterOf(centre), FxType.KEHANCURAN, KehancuranFxIds.IMPACT, -1, (float) Math.min(64, Math.max(2, shape.outer())));
+			caster.level().playSound(null, centre.getX(), centre.getY(), centre.getZ(), SoundEvents.DEEPSLATE_BREAK, SoundSource.BLOCKS, 1.6F, 0.5F);
+			Advancements.grant(caster, "world_breaker_self");
+			return SelfResult.QUEUED;
+		} catch (RuntimeException exception) {
+			dev.kultivator.Kultivator.LOGGER.error("Kultivator: Titah bulk carve of {} failed", specId, exception);
+			return SelfResult.NOTHING;
+		}
+	}
+
+	/** The running bulk carve for the test command's {@code pahat_cepat info} (29.16.15), or null. */
+	public static WorldBreaker.@Nullable BulkInfo bulkInfo() {
+		return WorldBreaker.bulkInfo();
+	}
+
+	/** {@code /kultivasi kehancuran batal} without a disciple order: stops the caller's own bulk carve. Returns how many. */
+	public static int cancelBulk(ServerPlayer player) {
+		int stopped = WorldBreaker.cancelBulk(player.level().getServer(), player.getUUID());
+		Msg.chat(player, Component.translatable(stopped > 0 ? "kultivator.kehancuran.bulk.cancelled" : "kultivator.kehancuran.bulk.none")
+				.withColor(stopped > 0 ? 0x9FF3E6 : MUTED));
+		return stopped;
+	}
+
 	/** "Bumi masih runtuh — kehancuran dilewati" (the decree stays visual), at most once per 5 s per player. */
 	private static void titahNote(ServerPlayer player) {
 		long now = player.level().getGameTime();
@@ -807,6 +889,12 @@ public final class Kehancuran {
 	private static void restore(ServerPlayer player) {
 		int queued = WorldBreaker.restore(player.getUUID());
 		if (queued <= 0) {
+			// Phase 10b (29.16.9): Tingkat 6-9 carves are permanent and say so
+			int permanent = WorldBreaker.permanentInWindow(player.level().getServer(), player.getUUID());
+			if (permanent > 0) {
+				Msg.chat(player, Component.translatable("kultivator.kehancuran.bulk.restore_permanent", permanent).withColor(0xFF8A7A));
+				return;
+			}
 			Msg.chat(player, Component.translatable(PREFIX + "why.nothing_to_restore").withColor(MUTED));
 			return;
 		}
@@ -1170,8 +1258,8 @@ public final class Kehancuran {
 					ServerPlayer player = ctx.getSource().getPlayerOrException();
 					Order order = ORDERS.get(player.getUUID());
 					if (order == null) {
-						Msg.chat(player, Component.translatable(PREFIX + "why.no_order").withColor(MUTED));
-						return 0;
+						// Phase 10b (29.16.7 "Cancel"): no disciple order, so the caller's own bulk carve stops
+						return cancelBulk(player) > 0 ? 1 : 0;
 					}
 					cancel(player.level().getServer(), order, "cancel.master");
 					return 1;
@@ -1217,6 +1305,19 @@ public final class Kehancuran {
 		player.sendSystemMessage(Component.translatable(PREFIX + "status.jobs", running == null ? 0 : 1, WorldBreaker.queued()).withColor(MUTED));
 		for (int[] undo : WorldBreaker.undoable(player.level().getServer(), player.getUUID())) {
 			player.sendSystemMessage(Component.translatable(PREFIX + "status.undo", undo[0], undo[1] / 60, undo[1] % 60).withColor(0x9FF3E6));
+		}
+		// Phase 10b (29.16.7, 29.16.9): the running bulk carve and the saved permanent carves
+		WorldBreaker.BulkInfo bulk = WorldBreaker.bulkInfo();
+		if (bulk != null) {
+			player.sendSystemMessage(Component.translatable("kultivator.kehancuran.bulk.status.running", bulk.ownerName(), bulk.tier(), bulk.chunksDone(),
+					bulk.chunksTotal(), bulk.changed() + bulk.surface()).withColor(0xFFB0A0));
+		}
+		for (CompoundTag line : KehancuranLog.permanent(player.level().getServer(), player.getUUID(), 5)) {
+			dev.kultivator.data.TechniqueSpec spec = dev.kultivator.data.TechniqueRegistry.byId(line.getStringOr("spec", ""));
+			Component name = spec == null ? Component.literal(line.getStringOr("spec", "?")) : spec.displayName();
+			player.sendSystemMessage(Component.translatable("kultivator.kehancuran.bulk.status.permanent", name, line.getIntOr("tier", 6),
+					line.getIntOr("blocks", 0), line.getIntOr("x", 0), line.getIntOr("y", 0), line.getIntOr("z", 0), line.getStringOr("dim", "?"))
+					.withColor(0xFF6A5A));
 		}
 		return 1;
 	}
