@@ -1,0 +1,29 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "kultivator:sect_hall_stele",
+      "required": false
+    },
+    {
+      "id": "kultivator:formation_eye",
+      "required": false
+    },
+    {
+      "id": "kultivator:batu_pusaka",
+      "required": false
+    },
+    {
+      "id": "kultivator:urat_pusaka",
+      "required": false
+    },
+    "minecraft:command_block",
+    "minecraft:chain_command_block",
+    "minecraft:repeating_command_block",
+    "minecraft:structure_block",
+    "minecraft:jigsaw",
+    "minecraft:barrier",
+    "minecraft:test_block",
+    "minecraft:test_instance_block"
+  ]
+}

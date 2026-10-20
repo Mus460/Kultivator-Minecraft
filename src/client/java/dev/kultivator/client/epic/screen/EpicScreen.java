@@ -131,7 +131,7 @@ public final class EpicScreen implements HudElement {
 
 	private static boolean anything(long now) {
 		return now < edgeEnd || now < vignetteEnd || now < greyEnd || now < chromaEnd || SkyDirector.active() || Letterbox.amount() > 0.0F
-				|| Letterbox.wanted();
+				|| Letterbox.wanted() || dev.kultivator.client.epic.lens.LensLayers.active();
 	}
 
 	// ================================================================ drawing
@@ -186,7 +186,10 @@ public final class EpicScreen implements HudElement {
 			g.fillGradient(width - band * 2, 0, width, height, Palette.argb(alpha / 2, 0x20F0FF), Palette.argb(alpha, 0x20F0FF));
 			g.fill(width - band * 3, 0, width - band * 2, height, Palette.argb(alpha / 3, 0x20F0FF));
 		}
+		// Phase 30 (DESIGN 30.2.7): the film's lens layers under the bars, the black dip of a hard cut over everything
+		dev.kultivator.client.epic.lens.LensLayers.draw(g);
 		Letterbox.draw(g);
+		dev.kultivator.client.epic.lens.LensLayers.drawDip(g);
 		EpicBudget.addCpu(System.nanoTime() - start);
 	}
 

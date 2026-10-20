@@ -254,6 +254,7 @@ final class Ambushes {
 			mob.setTarget(player);
 		}
 		LIVE.put(id, new Live(band));
+		dev.kultivator.voice.VoiceHooks.rogueAmbush(band.mobs);
 		Msg.chat(player, Component.translatable("kultivator.musuh.ambush.flavour", band.mobs.size()).withStyle(ChatFormatting.RED));
 	}
 

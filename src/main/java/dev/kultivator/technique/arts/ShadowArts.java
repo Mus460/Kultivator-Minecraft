@@ -298,8 +298,8 @@ public final class ShadowArts {
 								.attack(at(0).shape(all().at(Anchor.SUMMON).radius(16).max(1)).hit(damage(1.5D)))))
 				.step(at(100).repeat(5, 100).shape(nova().radius(24))
 						.hit(eff(Eff.WEAKNESS, 2, 100), eff(Eff.SLOWNESS, 2, 100)))
+				// Phase 30 (DESIGN 30.4.8): the tiger tally and the flute are drawn by client/anim/model/UltimatesB
 				.fx(Phase.CAST,
-						model("yin_tiger_seal").fromHand().above(0.6F).scale(1.0F).spin(4.0F).ticks(500),
 						cloneOf(0x301018).count(8).ticks(20),
 						mist(RESENT).count(50).ticks(60),
 						trail(0x802030).count(16).detail(),
@@ -343,7 +343,7 @@ public final class ShadowArts {
 						crescentFly(WIND).particle(ParticleTypes.GUST).count(8).detail(),
 						mist(0xF4F4F4).count(40).ticks(40).extra())
 				.fx(Phase.EXTRA0, shockRing(WIND).radius(24.0F).count(80), shake(0.6F, 16))
-				.fx(Phase.CHARGE, model("kunpeng").onCaster().above(14.0F).scale(30.0F).ticks(24).until(Phase.TRAVEL).facing(FxLayer.Facing.FACE_FORWARD))
+				// Phase 30 (DESIGN 30.4.8): the Kun and the Peng are drawn by client/anim/model/UltimatesB
 				.sound(Phase.CHARGE, SoundEvents.ENDER_DRAGON_FLAP, 1.6F, 0.5F)
 				.sound(Phase.CAST, SoundEvents.BREEZE_WIND_CHARGE_BURST, 2.0F, 0.6F)
 				.sound(Phase.CAST, SoundEvents.WARDEN_SONIC_BOOM, 2.0F, 0.8F)

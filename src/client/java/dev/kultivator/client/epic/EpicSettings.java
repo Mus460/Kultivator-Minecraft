@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.epic.lens.LensLayers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -61,6 +62,18 @@ public final class EpicSettings {
 	public static final String WORLD_FX = "epic_world_fx";
 	public static final String IMPACT_POWER = "epic_impact_power";
 
+	// Phase 30 Film Spektakuler (DESIGN 30.2.1): the camera value above Penuh and the film rows.
+	/** The stored camera value of Kamera Spektakuler ({@link #camera()} reads it as Penuh). */
+	public static final String SPEKTAKULER = "spektakuler";
+	/** True once the player confirmed the motion warning of Kamera Spektakuler. */
+	public static final String SPEKTAKULER_OK = "epic_spektakuler_ok";
+	public static final String LENS = "epic_lens";
+	public static final String COSMIC = "epic_cosmic";
+	public static final String BULLET = "epic_bullet";
+	private static final String F = "kultivator.film.setting.";
+	/** Opens the motion warning (set by the film module). */
+	private static Runnable motionWarning;
+
 	// Phase 10b Titah Langit (DESIGN 29.2.2, 29.4): the per-decree Film choice of the Titah Langit menu.
 	/** Prefix of the per-decree film keys: {@code titah_film_pedang}, {@code _tiang}, {@code _bintang}, {@code _gunung}. */
 	public static final String TITAH_FILM = "titah_film_";
@@ -116,10 +129,8 @@ public final class EpicSettings {
 		if (!Language.getInstance().has(T + "camera")) {
 			return List.of();
 		}
-		return List.of(
-				new Row(CAMERA, true, () -> Component.translatable(T + "camera", Component.translatable(T + "camera." + camera().id())),
-						() -> setCamera(Camera.values()[(camera().ordinal() + 1) % Camera.values().length]), () -> tip("camera",
-						Component.translatable(T + "camera", Component.translatable(T + "camera." + camera().id())))),
+		List<Row> rows = new java.util.ArrayList<>(List.of(
+				new Row(CAMERA, true, EpicSettings::cameraText, EpicSettings::nextCamera, () -> tip("camera", cameraText())),
 				// Phase 10 (28.11): Perjalanan langit, Bingkai dampak, Dampak sunyi, Puing & monumen, Daya dampak
 				new Row(SKYRIDE, true, EpicSettings::skyRideText, () -> setSkyRide(SkyRide.values()[(skyRide().ordinal() + 1) % SkyRide.values().length]),
 						() -> dampakTip("skyride", skyRideText())),
@@ -139,7 +150,136 @@ public final class EpicSettings {
 				toggle(SKY, "sky"),
 				new Row(VFX, true, () -> Component.translatable(T + "vfx", vfxText()), EpicSettings::nextVfx,
 						() -> tip("vfx", Component.translatable(T + "vfx", vfxText()))),
-				toggle(RECORD, "record"));
+				toggle(RECORD, "record")));
+		if (Language.getInstance().has(F + "lens")) {
+			// Phase 30 (30.2.1): Lapisan lensa, Langit kosmik, Waktu beku, right after the camera row
+			rows.add(1, new Row(LENS, true, EpicSettings::lensText, EpicSettings::nextLens, () -> filmTip("lens", lensText())));
+			rows.add(2, new Row(COSMIC, false, () -> Component.translatable(F + "cosmic"), () -> setFlag(COSMIC, !flag(COSMIC)),
+					() -> filmTip("cosmic", Component.translatable(F + "cosmic"))));
+			rows.add(3, new Row(BULLET, false, () -> Component.translatable(F + "bullet"), () -> setFlag(BULLET, !flag(BULLET)),
+					() -> filmTip("bullet", Component.translatable(F + "bullet"))));
+		}
+		return List.copyOf(rows);
+	}
+
+	// ================================================================ Phase 30 (DESIGN 30.2.1)
+
+	/** The raw stored camera value ({@code penuh}, {@code singkat}, {@code spektakuler} or {@code mati}). */
+	public static String cameraValue() {
+		JsonElement value = EffectQuality.get(CAMERA);
+		if (value != null && value.isJsonPrimitive()) {
+			String id = value.getAsString();
+			if (SPEKTAKULER.equals(id)) {
+				return id;
+			}
+			for (Camera camera : Camera.values()) {
+				if (camera.id().equals(id)) {
+					return id;
+				}
+			}
+		}
+		return Camera.SINGKAT.id();
+	}
+
+	/**
+	 * Kamera Spektakuler is in effect: stored, its motion warning confirmed, and "Kurangi gerak" off (which makes it
+	 * unavailable, as 23.1.2). Every {@code == PENUH} check of 7b, 10 and 10b keeps working: {@link #camera()} reads it as
+	 * Penuh.
+	 */
+	public static boolean spektakuler() {
+		return SPEKTAKULER.equals(cameraValue()) && spektakulerConfirmed() && !EffectQuality.reduceMotion();
+	}
+
+	public static boolean spektakulerConfirmed() {
+		JsonElement value = EffectQuality.get(SPEKTAKULER_OK);
+		return value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isBoolean() && value.getAsBoolean();
+	}
+
+	/** "Aktifkan" on the motion warning: remembers the confirmation and switches to Spektakuler. */
+	public static void confirmSpektakuler() {
+		EffectQuality.put(SPEKTAKULER_OK, new JsonPrimitive(true));
+		EffectQuality.put(CAMERA, new JsonPrimitive(SPEKTAKULER));
+	}
+
+	/** Switches to Spektakuler when confirmed (true), else opens the motion warning (false). */
+	public static boolean requestSpektakuler() {
+		if (spektakulerConfirmed()) {
+			EffectQuality.put(CAMERA, new JsonPrimitive(SPEKTAKULER));
+			return true;
+		}
+		if (motionWarning != null) {
+			motionWarning.run();
+		}
+		return false;
+	}
+
+	/** Set once by the film module: opens the motion warning (the first switch to Spektakuler). */
+	public static void motionWarning(Runnable opener) {
+		motionWarning = opener;
+	}
+
+	/** Singkat, Penuh, Spektakuler, Mati, Singkat...; "Kurangi gerak" skips Spektakuler. */
+	private static void nextCamera() {
+		switch (cameraValue()) {
+			case "singkat" -> setCamera(Camera.PENUH);
+			case "penuh" -> {
+				if (EffectQuality.reduceMotion() || motionWarning == null && !spektakulerConfirmed()) {
+					setCamera(Camera.MATI);
+				} else if (!requestSpektakuler()) {
+					// the warning decides: "Aktifkan" switches to Spektakuler, "Kembali ke Penuh" keeps Penuh
+					setCamera(Camera.PENUH);
+				}
+			}
+			case SPEKTAKULER -> setCamera(Camera.MATI);
+			default -> setCamera(Camera.SINGKAT);
+		}
+	}
+
+	private static Component cameraText() {
+		Component value = SPEKTAKULER.equals(cameraValue()) && Language.getInstance().has(F + "camera.spektakuler")
+				? Component.translatable(F + "camera.spektakuler") : Component.translatable(T + "camera." + camera().id());
+		return Component.translatable(T + "camera", value);
+	}
+
+	/** Lapisan lensa: Nyala (default), Ringan (letterbox, vignette, smear, speed lines), Mati. */
+	public static LensLayers.Setting lens() {
+		JsonElement value = EffectQuality.get(LENS);
+		if (value != null && value.isJsonPrimitive()) {
+			String id = value.getAsString();
+			for (LensLayers.Setting setting : LensLayers.Setting.values()) {
+				if (setting.name().toLowerCase(Locale.ROOT).equals(id)) {
+					return setting;
+				}
+			}
+		}
+		return LensLayers.Setting.NYALA;
+	}
+
+	public static void setLens(LensLayers.Setting setting) {
+		EffectQuality.put(LENS, new JsonPrimitive(setting.name().toLowerCase(Locale.ROOT)));
+	}
+
+	private static void nextLens() {
+		LensLayers.Setting[] all = LensLayers.Setting.values();
+		setLens(all[(lens().ordinal() + 1) % all.length]);
+	}
+
+	private static Component lensText() {
+		return Component.translatable(F + "lens", Component.translatable(F + "lens." + lens().name().toLowerCase(Locale.ROOT)));
+	}
+
+	/** Langit kosmik (default on). */
+	public static boolean cosmic() {
+		return flag(COSMIC);
+	}
+
+	/** Waktu beku (default on); "Gerak lambat" off also turns bullet time off. */
+	public static boolean bullet() {
+		return flag(BULLET) && slowmo();
+	}
+
+	private static List<Component> filmTip(String id, Component title) {
+		return List.of(title, Component.translatable(F + id + ".tip").withStyle(ChatFormatting.GRAY));
 	}
 
 	/** The on/off state of a boolean {@code epic_*} key with its default (Mode Rekam off, everything else on). */
@@ -160,6 +300,10 @@ public final class EpicSettings {
 		JsonElement value = EffectQuality.get(CAMERA);
 		if (value != null && value.isJsonPrimitive()) {
 			String id = value.getAsString();
+			if (SPEKTAKULER.equals(id)) {
+				// Phase 30: Spektakuler is Penuh plus the film; every Penuh check stays true for it
+				return Camera.PENUH;
+			}
 			for (Camera camera : Camera.values()) {
 				if (camera.id().equals(id)) {
 					return camera;
@@ -416,7 +560,7 @@ public final class EpicSettings {
 	/** Every 7b setting back to its default ({@code /sinematik reset}). */
 	public static void resetAll() {
 		for (String key : new String[]{CAMERA, LETTERBOX, CARDS, MUSIC, SLOWMO, GEOMETRY, SKY, VFX, RECORD, PACK_GEOMETRY, SKYRIDE, IMPACT_FRAMES,
-				SILENT_IMPACT, WORLD_FX, IMPACT_POWER}) {
+				SILENT_IMPACT, WORLD_FX, IMPACT_POWER, LENS, COSMIC, BULLET}) {
 			EffectQuality.put(key, null);
 		}
 		for (String skill : TITAH_SKILLS) {

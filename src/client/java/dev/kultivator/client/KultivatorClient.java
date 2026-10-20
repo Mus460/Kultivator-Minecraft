@@ -55,6 +55,8 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.dampak.DampakClient.init();
 		// Phase 10b Titah Langit (DESIGN 29.9 item 7): the TitahSync cache, the jade-scroll menu, the film, TitahWorld (M3).
 		dev.kultivator.client.pusakalangit.TitahClient.init();
+		// Voices (module V): plays the spoken lines and draws their captions.
+		dev.kultivator.client.voice.VoiceClient.init();
 		// Phase 7c Formasi Sekte (DESIGN 24.13 item 5).
 		dev.kultivator.client.formasi.FormasiClient.init();
 		// Phase 8 Jalan Dunia Kultivasi (DESIGN 25.2 item 18).

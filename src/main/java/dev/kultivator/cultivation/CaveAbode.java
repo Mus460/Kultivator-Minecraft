@@ -155,6 +155,7 @@ public final class CaveAbode {
 			return refuse(player, "kultivator.kultivasi.abode.need_protection");
 		}
 		write(player, data, level, seat);
+		dev.kultivator.voice.VoiceHooks.caveAbode(player);
 		return true;
 	}
 

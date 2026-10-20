@@ -870,7 +870,9 @@ final class SceneCatalogPower {
 				Minecraft minecraft = Minecraft.getInstance();
 				double distance = minecraft.player == null ? 99.0D : Math.sqrt(minecraft.player.position().distanceToSqr(zone.x, minecraft.player.getY(), zone.z));
 				boolean penuh = CinematicDirector.mode() == EpicSettings.Camera.PENUH;
-				if (distance <= 16.0D && (blocks >= 512 || penuh && blocks >= 128)) {
+				// Phase 30 (DESIGN 30.3.9): with Kamera Spektakuler the crater reveal is a film (or the aftermath of the running one)
+				boolean film = s.own && distance <= 16.0D && blocks >= 512 && dev.kultivator.client.epic.film.FilmDirector.crater(zone, blocks);
+				if (!film && distance <= 16.0D && (blocks >= 512 || penuh && blocks >= 128)) {
 					float seconds = distance >= 10.0D ? 4.0F : 3.0F;
 					shot(s, delay, () -> Shots.craneLook(1.0F, 2.0F, 2.0F, 20.0F, seconds).lookAt(zone), CinematicDirector.KIND_KEHANCURAN, true);
 				}

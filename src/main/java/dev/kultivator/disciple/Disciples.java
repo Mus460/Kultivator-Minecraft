@@ -482,6 +482,7 @@ public final class Disciples {
 
 	/** The welcome of a new disciple (scroll or Sect Hall): FX and sounds at {@code spot}, chat lines, advancements. */
 	private static void welcome(ServerPlayer player, ServerLevel level, DiscipleEntity disciple, Vec3 spot, int aliveBefore, int cap) {
+		dev.kultivator.voice.VoiceHooks.discipleLoyal(disciple);
 		DiscipleData data = disciple.data();
 		int color = data.rootColor();
 		Fx.pillar(level, spot, color, 3.5F);

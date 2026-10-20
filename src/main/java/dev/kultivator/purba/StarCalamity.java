@@ -325,6 +325,7 @@ final class StarCalamity {
 		Msg.chat(player, Component.translatable(gate ? "kultivator.purba.calamity.begin" : "kultivator.purba.calamity.begin_t", chosen, run.total,
 				Component.translatable("kultivator.purba.calamity.trial." + trialOf(chosen))).withStyle(ChatFormatting.LIGHT_PURPLE));
 		Msg.chat(player, Component.translatable("kultivator.purba.calamity.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+		dev.kultivator.voice.Voice.heaven(player, "calamity");
 		Purba.sync(player);
 		return true;
 	}
@@ -433,6 +434,7 @@ final class StarCalamity {
 
 	/** Pass or fail; the wave envoys of the run leave. */
 	static void finish(ServerPlayer player, Run run, boolean pass) {
+		dev.kultivator.voice.Voice.heaven(player, pass ? "tribulation_pass" : "tribulation_fail");
 		run.bar.removeAllPlayers();
 		EnvoyAi.dismissFor(player.getUUID());
 		Fx.send(player.level(), player.position(), FxType.PURBA, PurbaFxIds.WRATH_SKY, 0, 0.0F);

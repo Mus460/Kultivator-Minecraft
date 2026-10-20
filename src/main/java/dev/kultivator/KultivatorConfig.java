@@ -118,6 +118,14 @@ public final class KultivatorConfig {
 	public boolean kehancuranSurfacePass = true;
 	/** The most blocks one surface pass converts (16-512). */
 	public int kehancuranSurfaceMax = 256;
+	/** Phase 30 (DESIGN 30.1.2): players may switch Hancur Total on (every block but the keep-list, outside protected zones). */
+	public boolean kehancuranTotalAllowed = true;
+	/** Rim fluid cells nudged to flow after a Hancur Total carve (0-256; 0 = off, the rim waits for a neighbour update). */
+	public int kehancuranFluidSettle = 0;
+	/** Block entities (with their contents) one undoable job may save for Pulihkan (0-4096); beyond it they are left intact. */
+	public int kehancuranUndoBlockEntities = 512;
+	/** KiB of block-entity data one undoable job may save (256-65536); beyond it the containers are left intact. */
+	public int kehancuranUndoNbtKiB = 4096;
 
 	// ---- phase 7: Dunia yang Hidup (DESIGN 19.2.10)
 	/** Naturally spawned monsters near a Qi Refining+ player may become elite demonic beasts (DESIGN 19.3.1). */
@@ -340,6 +348,10 @@ public final class KultivatorConfig {
 		kehancuranHomeSafeRadius = clamp(kehancuranHomeSafeRadius, 0, 64);
 		// Phase 10 (DESIGN 28.8.1).
 		kehancuranSurfaceMax = clamp(kehancuranSurfaceMax, 16, 512);
+		// Phase 30 Hancur Total (DESIGN 30.1.6).
+		kehancuranFluidSettle = clamp(kehancuranFluidSettle, 0, 256);
+		kehancuranUndoBlockEntities = clamp(kehancuranUndoBlockEntities, 0, 4096);
+		kehancuranUndoNbtKiB = clamp(kehancuranUndoNbtKiB, 256, 65536);
 		// Phase 7 (DESIGN 19.2.10).
 		eliteChanceScale = clamp(eliteChanceScale, 0.0D, 5.0D, 1.0D);
 		// Phase 7b (DESIGN 23.2).

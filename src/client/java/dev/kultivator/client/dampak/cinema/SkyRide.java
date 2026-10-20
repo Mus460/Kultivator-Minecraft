@@ -76,6 +76,9 @@ public final class SkyRide {
 
 	/** One event of the local player's own Dampak cast (never a disciple's, never an echo). */
 	public static void onTechFx(Payloads.TechFx p, TechniqueSpec spec, Dampak d, Phase phase, Vec3 aim) {
+		if (dev.kultivator.client.epic.film.FilmDirector.claims(spec.id())) {
+			return; // Phase 30 (30.5): a Film Spektakuler owns this cast; refused films leave the ride as it was
+		}
 		if (d.ride() == Dampak.Ride.FILM) {
 			// Phase 10b (29.4): a Titah decree plays Film Pusaka instead (its own acts, timing and settings)
 			dev.kultivator.client.pusakalangit.cinema.PusakaFilm.onTechFx(p, spec, d, phase, aim);

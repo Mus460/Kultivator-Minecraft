@@ -40,6 +40,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -199,6 +200,70 @@ public final class Kehancuran {
 		return 1;
 	}
 
+	// ================================================================== Phase 30: Hancur Total (DESIGN 30.1.2, contract C30.5)
+
+	/** {@code extra.path.kh_total}: the player's Hancur Total switch (default ON), stored with the self switch. */
+	public static final String TOTAL_KEY = "kh_total";
+	private static final String TOTAL = "kultivator.kehancuran_total.";
+
+	/** The player's Hancur Total switch is on (default true) and the server allows it ({@code kehancuranTotalAllowed}). */
+	public static boolean totalOn(ServerPlayer player) {
+		return KultivatorConfig.get().kehancuranTotalAllowed
+				&& Cultivators.get(player).extra().getCompoundOrEmpty(DisciplePaths.PLAYER_EXTRA).getBooleanOr(TOTAL_KEY, true);
+	}
+
+	/** The rules of a new job of {@code player} (own casts, Titah carves; a disciple's Destroyer Art uses its master's). */
+	public static ProtectedZones.Rules rulesFor(@Nullable ServerPlayer player) {
+		return player != null && totalOn(player) ? ProtectedZones.Rules.TOTAL : ProtectedZones.Rules.CLASSIC;
+	}
+
+	/** The rules of a new job of {@code owner}; an owner who is not online gets {@code CLASSIC} (the safe side). */
+	public static ProtectedZones.Rules rulesFor(UUID owner, MinecraftServer server) {
+		return owner == null || server == null ? ProtectedZones.Rules.CLASSIC : rulesFor(server.getPlayerList().getPlayer(owner));
+	}
+
+	/**
+	 * {@code /kultivasi kehancuran total nyala|mati}: sets the switch; it works at once for new casts and for this player's
+	 * queued jobs (a running batch finishes its tick first). Refused with "dimatikan server" when the server forbids it.
+	 */
+	public static int setTotal(ServerPlayer player, boolean on) {
+		if (on && !KultivatorConfig.get().kehancuranTotalAllowed) {
+			Msg.chat(player, Component.translatable(TOTAL + "server_off").withColor(MUTED));
+			return 0;
+		}
+		section(player).putBoolean(TOTAL_KEY, on);
+		Cultivators.dirty(player);
+		WorldBreaker.applyRules(player.getUUID(), rulesFor(player));
+		Msg.chat(player, Component.translatable(on ? TOTAL + "on" : TOTAL + "off").withColor(on ? RED : 0x9FF3E6));
+		return 1;
+	}
+
+	/** The state word of the switch: NYALA, MATI or "dimatikan server". */
+	private static Component totalWord(ServerPlayer player) {
+		if (!KultivatorConfig.get().kehancuranTotalAllowed) {
+			return Component.translatable(TOTAL + "word.server_off").withStyle(ChatFormatting.GRAY);
+		}
+		return totalOn(player) ? Component.translatable(TOTAL + "word.on").withStyle(ChatFormatting.RED)
+				: Component.translatable(TOTAL + "word.off").withStyle(ChatFormatting.GREEN);
+	}
+
+	/** {@code status}: "Hancur Total: %s · containers restored with contents: %s". */
+	public static Component totalStatus(ServerPlayer player) {
+		KultivatorConfig config = KultivatorConfig.get();
+		boolean contents = config.kehancuranUndoMinutes > 0 && config.kehancuranDropsPct <= 0 && config.kehancuranUndoBlockEntities > 0;
+		return Component.translatable(TOTAL + "status", totalWord(player),
+				Component.translatable(contents ? TOTAL + "yes" : TOTAL + "no")).withColor(MUTED);
+	}
+
+	/** {@code on_suffix}: " Hancur Total: %s [ubah]", one click flips the switch. */
+	private static Component totalSuffix(ServerPlayer player) {
+		boolean on = totalOn(player);
+		String command = on ? "/kultivasi kehancuran total mati" : "/kultivasi kehancuran total nyala";
+		return Component.translatable(TOTAL + "on_suffix", totalWord(player)).withStyle(style -> style.withColor(0xFFB0A0)
+				.withClickEvent(new ClickEvent.RunCommand(command))
+				.withHoverEvent(new HoverEvent.ShowText(Component.translatable(on ? TOTAL + "on" : TOTAL + "off"))));
+	}
+
 	/**
 	 * The one-click switch (no oath screen, 22.11.1). On: refused with the reason in the action bar and chat unless
 	 * {@link #selfAllowed} is null; otherwise one red chat line with [Matikan] and [Pulihkan] and one low heartbeat. Off:
@@ -227,6 +292,8 @@ public final class Kehancuran {
 			MutableComponent line = Component.translatable(SELF + "on_line", Component.translatable(SELF + "on_title").withStyle(ChatFormatting.BOLD),
 					Component.literal("/kultivasi kehancuran pulihkan").withStyle(ChatFormatting.BOLD), minutes).withColor(RED);
 			line.append(Component.literal(" ")).append(off).append(Component.literal(" ")).append(restore);
+			// Phase 30 (30.1.2): the Hancur Total state with its one-click toggle
+			line.append(Component.literal(" ")).append(totalSuffix(player));
 			Msg.chat(player, line);
 			player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 0.8F, 0.5F);
 		} else {
@@ -430,9 +497,14 @@ public final class Kehancuran {
 			job.recordId = plan.recordId();
 			job.palette = plan.palette() != null && kawahOn(caster) && config.kehancuranSurfacePass ? plan.palette()
 					: dev.kultivator.technique.spec.dsl.Dampak.Palette.NONE;
+			job.rules = rulesFor(caster);
 			if (!WorldBreaker.submitBulk(job)) {
 				titahNote(caster);
 				return SelfResult.QUEUE_FULL;
+			}
+			if (plan.permanent() && job.rules.total()) {
+				// Phase 30 (30.1.2): containers in a permanent carve are lost with their contents
+				Msg.chat(caster, Component.translatable(TOTAL + "permanent_be").withColor(0xFF8A7A));
 			}
 			BlockPos centre = shape.impact();
 			Fx.send(caster.level(), Vec3.atCenterOf(centre), FxType.KEHANCURAN, KehancuranFxIds.IMPACT, -1, (float) Math.min(64, Math.max(2, shape.outer())));
@@ -505,6 +577,9 @@ public final class Kehancuran {
 	private static SelfResult build(ServerPlayer caster, String specId, List<Shapes.Placed> shapes, int blockCap,
 			dev.kultivator.technique.spec.dsl.Dampak.@Nullable Palette palette, @Nullable TitahPlan titah) {
 		ServerLevel level = caster.level();
+		// Phase 30 (30.1.5): the owner's Hancur Total switch now; the job carries the same rules
+		ProtectedZones.Rules rules = rulesFor(caster);
+		boolean hancur = rules.total();
 		List<List<Shapes.Change>> raws = new ArrayList<>(shapes.size());
 		long total = 0L;
 		int minX = Integer.MAX_VALUE;
@@ -518,7 +593,7 @@ public final class Kehancuran {
 		// open-top column check at most one read per planned column (≤ cap).
 		int geometryBudget = 2 * blockCap;
 		for (Shapes.Placed placed : shapes) {
-			List<Shapes.Change> raw = Shapes.build(level, placed.spec(), placed.anchor(), placed.direction(), geometryBudget);
+			List<Shapes.Change> raw = Shapes.build(level, placed.spec(), placed.anchor(), placed.direction(), geometryBudget, rules);
 			geometryBudget = Math.max(0, geometryBudget - Shapes.lastReads());
 			raws.add(raw);
 			total += raw.size();
@@ -540,6 +615,7 @@ public final class Kehancuran {
 		List<Long> positions = new ArrayList<>();
 		List<Byte> modes = new ArrayList<>();
 		List<Boolean> checks = new ArrayList<>();
+		List<Boolean> fluidChecks = new ArrayList<>();
 		java.util.Set<Long> seen = new java.util.HashSet<>();
 		// Per column: the highest solid block that has to stay; nothing under it is planned (no sealed hollows).
 		java.util.Map<Long, Integer> kept = new java.util.HashMap<>();
@@ -575,16 +651,18 @@ public final class Kehancuran {
 				long column = Shapes.columnKey(pos);
 				if (zone != null) {
 					protectedCount++;
-					if (carves && Shapes.roofs(state)) {
+					if (carves && (Shapes.roofs(state) || hancur)) {
 						kept.merge(column, pos.getY(), Math::max);
 					}
 					continue;
 				}
-				if (ProtectedZones.neverTouch(level, pos, state) || mode == WorldBreaker.MODE_NATURAL && !Shapes.natural(state)
+				boolean never = ProtectedZones.neverTouch(level, pos, state, rules);
+				if (never || mode == WorldBreaker.MODE_NATURAL && !Shapes.natural(state)
 						|| mode == WorldBreaker.MODE_STRIP && !state.is(Shapes.STRIPPABLE)
 						|| mode == WorldBreaker.MODE_WITHER && Shapes.witherInto(state) == null
 						|| carves && kept.getOrDefault(column, Integer.MIN_VALUE) > pos.getY()) {
-					if (carves && Shapes.roofs(state)) {
+					// Hancur Total: a keep-list block keeps its column below whatever its shape (30.1.1)
+					if (carves && (Shapes.roofs(state) || hancur && never)) {
 						kept.merge(column, pos.getY(), Math::max);
 					}
 					continue;
@@ -592,6 +670,8 @@ public final class Kehancuran {
 				positions.add(pos.asLong());
 				modes.add(mode);
 				checks.add(carves && !Shapes.pointBlast(spec.kind()));
+				// Hancur Total point blasts: never leave a fluid hanging over the hole (30.1.3 item 3)
+				fluidChecks.add(hancur && carves && Shapes.pointBlast(spec.kind()));
 				taken++;
 			}
 		}
@@ -605,11 +685,13 @@ public final class Kehancuran {
 		// A column whose top planned block sits under a solid, unplanned block would become a sealed hollow: drop it.
 		List<BlockPos> planned = new ArrayList<>(positions.size());
 		boolean[] check = new boolean[positions.size()];
+		boolean[] fluidCheck = new boolean[positions.size()];
 		for (int i = 0; i < positions.size(); i++) {
 			planned.add(BlockPos.of(positions.get(i)));
 			check[i] = checks.get(i);
+			fluidCheck[i] = fluidChecks.get(i);
 		}
-		List<Integer> open = Shapes.openColumns(level, planned, check);
+		List<Integer> open = Shapes.openColumns(level, planned, check, hancur ? fluidCheck : null);
 		if (open.isEmpty()) {
 			return SelfResult.NOTHING;
 		}
@@ -619,10 +701,13 @@ public final class Kehancuran {
 			packed[i] = positions.get(open.get(i));
 			modeArray[i] = modes.get(open.get(i));
 		}
+		// Phase 30 (30.1.3 item 2): overlapping shapes still work each column top-down
+		Shapes.topDown(packed, modeArray);
 		Shapes.Placed first = shapes.get(0);
 		BlockPos centre = first.anchor();
 		WorldBreaker.Job job = titah != null ? WorldBreaker.Job.titah(caster, specId, first.spec().kind().id(), centre, packed, modeArray, blockCap)
 				: WorldBreaker.Job.self(caster, specId, first.spec().kind().id(), centre, packed, modeArray);
+		job.rules = rules;
 		// Phase 10 (DESIGN 28.6.1, 28.8.1): debris flags, the spec's net id and the Kawah Lebur palette ride in the job
 		dev.kultivator.data.TechniqueSpec spec = dev.kultivator.data.TechniqueRegistry.byId(specId);
 		dev.kultivator.technique.spec.dsl.Dampak dampak = spec == null ? null : spec.dampak();
@@ -708,6 +793,9 @@ public final class Kehancuran {
 		tag.put("undo", undo);
 		tag.putInt("safe", config.kehancuranCasterSafeRadius);
 		tag.putInt("home", config.kehancuranHomeSafeRadius);
+		// Phase 30 (30.1.2): the Hancur Total switch (server read-only data; no client reads it yet)
+		tag.putBoolean("total", totalOn(player));
+		tag.putBoolean("total_allowed", config.kehancuranTotalAllowed);
 		ListTag log = new ListTag();
 		for (CompoundTag line : KehancuranLog.recent(player.level().getServer(), player.getUUID(), 12)) {
 			if (!line.getBooleanOr("self", false) || log.size() >= 6) {
@@ -762,6 +850,9 @@ public final class Kehancuran {
 			case "self_on" -> setSelf(player, true);
 			case "self_off" -> setSelf(player, false);
 			case "self_undo" -> restore(player);
+			// Phase 30 (DESIGN 30.1.2): the Hancur Total switch (for a page button; the commands do the same)
+			case "total_on" -> setTotal(player, true);
+			case "total_off" -> setTotal(player, false);
 			case "cancel" -> {
 				Order order = ORDERS.get(player.getUUID());
 				if (order != null) {
@@ -999,7 +1090,9 @@ public final class Kehancuran {
 		Shapes.Spec spec = DestroyerArts.spec(order.art, DisciplePaths.stars(data));
 		Vec3 look = master.getViewVector(1.0F);
 		Vec3 direction = new Vec3(look.x, 0.0D, look.z);
-		List<Shapes.Change> raw = Shapes.build(level, spec, aimed, direction);
+		// Phase 30 (30.1.5): validated with the master's Hancur Total rules, as the job will run
+		ProtectedZones.Rules rules = rulesFor(master);
+		List<Shapes.Change> raw = Shapes.build(level, spec, aimed, direction, Integer.MAX_VALUE, rules);
 		if (raw.isEmpty()) {
 			Msg.chat(master, Component.translatable(PREFIX + "why.empty").withColor(RED));
 			return;
@@ -1021,9 +1114,10 @@ public final class Kehancuran {
 			}
 			BlockState state = level.getBlockState(change.pos());
 			long column = Shapes.columnKey(change.pos());
-			if (ProtectedZones.neverTouch(level, change.pos(), state) || spec.naturalOnly() && !Shapes.natural(state)
+			boolean never = ProtectedZones.neverTouch(level, change.pos(), state, rules);
+			if (never || spec.naturalOnly() && !Shapes.natural(state)
 					|| carves && kept.getOrDefault(column, Integer.MIN_VALUE) > change.pos().getY()) {
-				if (carves && Shapes.roofs(state)) {
+				if (carves && (Shapes.roofs(state) || rules.total() && never && !state.isAir())) {
 					kept.merge(column, change.pos().getY(), Math::max);
 				}
 				continue;
@@ -1048,7 +1142,22 @@ public final class Kehancuran {
 				open.add(plan.get(i));
 			}
 			plan = open;
+		} else if (carves && rules.total() && !plan.isEmpty()) {
+			// Hancur Total point blast: no fluid left hanging over the hole (30.1.3 item 3)
+			List<BlockPos> planned = new ArrayList<>(plan.size());
+			boolean[] check = new boolean[plan.size()];
+			boolean[] fluidCheck = new boolean[plan.size()];
+			for (int i = 0; i < plan.size(); i++) {
+				planned.add(plan.get(i).pos());
+				fluidCheck[i] = plan.get(i).to() == null;
+			}
+			List<Shapes.Change> open = new ArrayList<>(plan.size());
+			for (int i : Shapes.openColumns(level, planned, check, fluidCheck)) {
+				open.add(plan.get(i));
+			}
+			plan = open;
 		}
+		plan = Shapes.topDownChanges(plan);
 		if (plan.isEmpty()) {
 			Msg.chat(master, Component.translatable(PREFIX + "why.empty").withColor(RED));
 			return;
@@ -1067,7 +1176,7 @@ public final class Kehancuran {
 				.withClickEvent(new ClickEvent.RunCommand("/kultivasi kehancuran batal")));
 		Msg.chat(master, Component.translatable(PREFIX + "confirm", order.entity.getDisplayName(), order.art.displayName(),
 				Component.translatable(PREFIX + "shape." + spec.kind().id()), plan.size(), aimed.getX(), aimed.getY(), aimed.getZ(),
-				CONFIRM_TICKS / 20).withColor(RED));
+				CONFIRM_TICKS / 20).withColor(RED).append(Component.literal(" · ")).append(Component.translatable(rules.total() ? TOTAL + "is_on" : TOTAL + "is_off")));
 		master.sendSystemMessage(Component.empty().append(yes).append(Component.literal("   ")).append(no));
 	}
 
@@ -1163,6 +1272,8 @@ public final class Kehancuran {
 				config.kehancuranDropsPct);
 		// Phase 10 (DESIGN 28.13.1): the Destroyer Art's debris fly from the disciple's crater too (BURST, no palette)
 		job.casterEntityId = entity.getId();
+		// Phase 30 (30.1.5): a disciple's Destroyer Art follows its master's Hancur Total switch
+		job.rules = rulesFor(master);
 		if (!WorldBreaker.submit(job)) {
 			Msg.chat(master, Component.translatable(PREFIX + "why.queue_full").withColor(RED));
 			return;
@@ -1248,6 +1359,15 @@ public final class Kehancuran {
 						})
 						.then(Commands.literal("nyala").executes(ctx -> setKawah(ctx.getSource().getPlayerOrException(), true)))
 						.then(Commands.literal("mati").executes(ctx -> setKawah(ctx.getSource().getPlayerOrException(), false))))
+				// Phase 30 (DESIGN 30.1.2): Hancur Total, the player's own switch (no op)
+				.then(Commands.literal("total")
+						.executes(ctx -> {
+							ServerPlayer player = ctx.getSource().getPlayerOrException();
+							Msg.chat(player, totalStatus(player));
+							return 1;
+						})
+						.then(Commands.literal("nyala").executes(ctx -> setTotal(ctx.getSource().getPlayerOrException(), true)))
+						.then(Commands.literal("mati").executes(ctx -> setTotal(ctx.getSource().getPlayerOrException(), false))))
 				.then(Commands.literal("status").executes(ctx -> status(ctx.getSource().getPlayerOrException())))
 				.then(Commands.literal("pulihkan").executes(ctx -> {
 					restore(ctx.getSource().getPlayerOrException());
@@ -1267,6 +1387,210 @@ public final class Kehancuran {
 				.then(Commands.literal("izin").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 						.then(Commands.literal("on").executes(ctx -> permit(ctx.getSource(), true)))
 						.then(Commands.literal("off").executes(ctx -> permit(ctx.getSource(), false)))));
+		// Phase 30 (DESIGN 30.6): uji kehancuran total ... (op). Brigadier merges this "uji" literal with the test
+		// registry's own "uji" node, whichever is registered first; both require the gamemaster level.
+		root.then(Commands.literal("uji").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+				.then(Commands.literal("kehancuran")
+						.then(Commands.literal("total")
+								.then(Commands.literal("info").executes(ctx -> testInfo(ctx.getSource().getPlayerOrException())))
+								.then(Commands.literal("uji")
+										.then(Commands.literal("bedrock").executes(ctx -> testSite(ctx.getSource().getPlayerOrException(), "bedrock")))
+										.then(Commands.literal("cairan").executes(ctx -> testSite(ctx.getSource().getPlayerOrException(), "cairan")))
+										.then(Commands.literal("peti").executes(ctx -> testSite(ctx.getSource().getPlayerOrException(), "peti")))
+										.then(Commands.literal("portal").executes(ctx -> testSite(ctx.getSource().getPlayerOrException(), "portal")))))));
+	}
+
+	// ================================================================== Phase 30 test commands (DESIGN 30.6)
+
+	private static final String TEST = "kultivator.kehancuran_total.test.";
+
+	/** {@code uji kehancuran total info}: the rules of the next own cast and the saved container tags of the undo window. */
+	private static int testInfo(ServerPlayer player) {
+		KultivatorConfig config = KultivatorConfig.get();
+		ProtectedZones.Rules rules = rulesFor(player);
+		Msg.chat(player, Component.translatable(TEST + "info.rules", Component.translatable(rules.total() ? TOTAL + "word.on" : TOTAL + "word.off"),
+				Component.translatable(selfOn(player) ? TOTAL + "yes" : TOTAL + "no"),
+				Component.translatable(config.kehancuranTotalAllowed ? TOTAL + "yes" : TOTAL + "no")).withColor(0xFFB0A0));
+		long[] stats = WorldBreaker.undoNbtStats(player.level().getServer(), player.getUUID());
+		Msg.chat(player, Component.translatable(TEST + "info.undo", stats[0], String.format(java.util.Locale.ROOT, "%.1f", stats[1] / 1024.0D),
+				config.kehancuranUndoBlockEntities, config.kehancuranUndoNbtKiB, config.kehancuranFluidSettle).withColor(MUTED));
+		player.sendSystemMessage(totalStatus(player));
+		return 1;
+	}
+
+	/** Test site half width (the site is (2h+1)² columns; the test bowl has radius 3). */
+	private static final int SITE_HALF = 4;
+
+	/**
+	 * {@code uji kehancuran total uji <bedrock|cairan|peti|portal>}: builds a small test site 8 b ahead through the
+	 * WorldBreaker's restore path (recorded, so Pulihkan clears it; only natural ground and air are replaced, never inside a
+	 * protected zone), then carves an r 3 bowl into it with the player's own rules. Refused unless Mode Kehancuran is on.
+	 */
+	private static int testSite(ServerPlayer player, String kind) {
+		if (!selfOn(player)) {
+			Msg.chat(player, Component.translatable(TEST + "needs").withColor(RED));
+			return 0;
+		}
+		if (KultivatorConfig.get().kehancuranUndoMinutes <= 0) {
+			Msg.chat(player, Component.translatable(TEST + "no_undo").withColor(RED));
+			return 0;
+		}
+		ServerLevel level = player.level();
+		Vec3 look = player.getViewVector(1.0F);
+		Vec3 flat = new Vec3(look.x, 0.0D, look.z);
+		flat = flat.lengthSqr() < 1.0E-4D ? new Vec3(0.0D, 0.0D, 1.0D) : flat.normalize();
+		int cx = net.minecraft.util.Mth.floor(player.getX() + flat.x * 8.0D);
+		int cz = net.minecraft.util.Mth.floor(player.getZ() + flat.z * 8.0D);
+		BlockPos probe = new BlockPos(cx, player.getBlockY(), cz);
+		if (!level.isLoaded(probe)) {
+			Msg.chat(player, Component.translatable(TEST + "refused").withColor(RED));
+			return 0;
+		}
+		int top = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, cx, cz) - 1;
+		boolean portalAxisX = Math.abs(flat.z) >= Math.abs(flat.x);
+		List<Long> positions = new ArrayList<>();
+		List<BlockState> targets = new ArrayList<>();
+		List<BlockState> current = new ArrayList<>();
+		List<BlockPos> fill = new ArrayList<>();
+		ProtectedZones.Context zones = new ProtectedZones.Context(level, new AABB(cx - SITE_HALF, top - 6, cz - SITE_HALF, cx + SITE_HALF + 1, top + 6,
+				cz + SITE_HALF + 1), player.getUUID(), List.of(player.position()));
+		for (int dx = -SITE_HALF; dx <= SITE_HALF; dx++) {
+			for (int dz = -SITE_HALF; dz <= SITE_HALF; dz++) {
+				for (int dy = -4; dy <= 0; dy++) {
+					BlockState to = siteBlock(kind, dx, dy, dz, portalAxisX);
+					if (to == null) {
+						continue;
+					}
+					BlockPos pos = new BlockPos(cx + dx, top + dy, cz + dz);
+					ProtectedZones.Zone zone = zones.zoneOf(pos);
+					if (zone == ProtectedZones.Zone.CASTER) {
+						// the caster's own safe column: the site simply leaves it out
+						continue;
+					}
+					if (zone != null) {
+						Msg.chat(player, Component.translatable(TEST + "zone").withColor(RED));
+						return 0;
+					}
+					BlockState now = level.getBlockState(pos);
+					if (!now.isAir() && !Shapes.natural(now) && !now.canBeReplaced()) {
+						// only natural ground, air or loose plants are replaced by the test site
+						continue;
+					}
+					positions.add(pos.asLong());
+					targets.add(to);
+					current.add(now);
+					if (to.hasBlockEntity()) {
+						fill.add(pos);
+					}
+				}
+			}
+		}
+		if (positions.isEmpty()) {
+			Msg.chat(player, Component.translatable(TEST + "refused").withColor(RED));
+			return 0;
+		}
+		BlockPos anchor = new BlockPos(cx, top, cz);
+		Vec3 direction = flat;
+		java.util.UUID owner = player.getUUID();
+		MinecraftServer server = level.getServer();
+		boolean queued = WorldBreaker.submitSite(player, positions.stream().mapToLong(Long::longValue).toArray(), targets.toArray(new BlockState[0]),
+				current.toArray(new BlockState[0]), () -> {
+					ServerPlayer caster = server.getPlayerList().getPlayer(owner);
+					if (caster == null || caster.level() != level) {
+						return;
+					}
+					fillContainers(level, fill);
+					SelfResult result = build(caster, "uji_kehancuran_total", List.of(new Shapes.Placed(Shapes.Spec.bowl(3), anchor, direction)),
+							Math.max(256, KultivatorConfig.get().kehancuranMaxBlocksPerCast), dev.kultivator.technique.spec.dsl.Dampak.Palette.NONE, null);
+					Msg.chat(caster, Component.translatable(TEST + "carve", result.name(), Component.translatable(rulesFor(caster).total()
+							? TOTAL + "word.on" : TOTAL + "word.off")).withColor(0xFFB0A0));
+				});
+		if (!queued) {
+			Msg.chat(player, Component.translatable(PREFIX + "why.queue_full").withColor(RED));
+			return 0;
+		}
+		Msg.chat(player, Component.translatable(TEST + "site", Component.translatable(TEST + "kind." + kind), positions.size(), cx, top, cz)
+				.withColor(0xFFB0A0));
+		return 1;
+	}
+
+	/** The block of the test site at offset (dx, dy, dz) from the surface centre (dy 0 = the surface), or null = untouched. */
+	private static @Nullable BlockState siteBlock(String kind, int dx, int dy, int dz, boolean axisX) {
+		int c = Math.max(Math.abs(dx), Math.abs(dz));
+		switch (kind) {
+			case "bedrock" -> {
+				// a bedrock slab two layers deep under the surface, with obsidian and reinforced deepslate in it
+				if (c > 3 || dy < -2 || dy > -1) {
+					return null;
+				}
+				if (dx == 0 && dz == 0) {
+					return Blocks.REINFORCED_DEEPSLATE.defaultBlockState();
+				}
+				return (dx + dz & 1) == 0 ? Blocks.BEDROCK.defaultBlockState() : Blocks.OBSIDIAN.defaultBlockState();
+			}
+			case "cairan" -> {
+				// a pool two deep and wider than the bowl: its rim stays as a wall of water
+				if (c > SITE_HALF || dy < -1) {
+					return null;
+				}
+				return Blocks.WATER.defaultBlockState();
+			}
+			case "peti" -> {
+				// three chests, a barrel and a furnace with contents, in the ground
+				if (dy != -1) {
+					return null;
+				}
+				if (dx == 0 && dz == 0) {
+					return Blocks.FURNACE.defaultBlockState();
+				}
+				if (dx == 1 && dz == 0 || dx == -1 && dz == 0 || dx == 0 && dz == 1) {
+					return Blocks.CHEST.defaultBlockState();
+				}
+				return dx == 0 && dz == -1 ? Blocks.BARREL.defaultBlockState() : null;
+			}
+			case "portal" -> {
+				// an upright Nether portal sunk into the ground (frame 4 wide, 5 tall), crying obsidian, a respawn anchor,
+				// a lodestone and an end portal frame beside it
+				int along = axisX ? dx : dz;
+				int across = axisX ? dz : dx;
+				if (across == 0 && along >= -1 && along <= 2 && dy >= -4 && dy <= 0) {
+					boolean frame = along == -1 || along == 2 || dy == -4 || dy == 0;
+					if (frame) {
+						return Blocks.OBSIDIAN.defaultBlockState();
+					}
+					return Blocks.NETHER_PORTAL.defaultBlockState().setValue(net.minecraft.world.level.block.NetherPortalBlock.AXIS,
+							axisX ? net.minecraft.core.Direction.Axis.X : net.minecraft.core.Direction.Axis.Z);
+				}
+				if (dy == -1 && across == 2) {
+					return switch (along) {
+						case -1 -> Blocks.CRYING_OBSIDIAN.defaultBlockState();
+						case 0 -> Blocks.RESPAWN_ANCHOR.defaultBlockState();
+						case 1 -> Blocks.LODESTONE.defaultBlockState();
+						case 2 -> Blocks.END_PORTAL_FRAME.defaultBlockState();
+						default -> null;
+					};
+				}
+				return null;
+			}
+			default -> {
+				return null;
+			}
+		}
+	}
+
+	/** Puts some ordinary items into the test site's containers (so Pulihkan can be checked one by one). */
+	private static void fillContainers(ServerLevel level, List<BlockPos> positions) {
+		int n = 0;
+		for (BlockPos pos : positions) {
+			if (level.getBlockEntity(pos) instanceof net.minecraft.world.Container container && container.getContainerSize() > 0) {
+				container.setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COBBLESTONE, 16 + n));
+				if (container.getContainerSize() > 2) {
+					container.setItem(2, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BREAD, 3 + n));
+				}
+				container.setChanged();
+				n++;
+			}
+		}
 	}
 
 	private static int permit(CommandSourceStack source, boolean on) {
@@ -1324,6 +1648,8 @@ public final class Kehancuran {
 
 	/** The player's own switch in {@code /kultivasi kehancuran status}: state, size, zones and the last self casts. */
 	private static void selfStatusLines(ServerPlayer player) {
+		// Phase 30 (30.1.2): the Hancur Total line
+		player.sendSystemMessage(totalStatus(player));
 		CompoundTag kh = selfStatus(player);
 		Component state = Component.translatable(kh.getBooleanOr("on", false) ? SELF + "status.on" : SELF + "status.off")
 				.withStyle(kh.getBooleanOr("on", false) ? ChatFormatting.RED : ChatFormatting.GREEN);

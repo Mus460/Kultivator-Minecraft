@@ -602,6 +602,7 @@ public final class EpicHooks {
 	/** Sends a beat that lands at {@code at} and plays its world sounds when the cue went out. */
 	static void send(ServerLevel level, int moment, int beat, @Nullable Entity subject, @Nullable ServerPlayer viewer, Vec3 pos, long at, int a,
 					 int b, float f, int s, int flags) {
+		dev.kultivator.voice.VoiceHooks.onMoment(level, moment, beat, subject, viewer, pos, a, b, flags);
 		if (EpicMoments.sendChecked(level, moment, beat, subject, viewer, pos, at, a, b, f, s, flags)) {
 			beatSounds(level, moment, beat, pos, s, a, b, flags);
 		}

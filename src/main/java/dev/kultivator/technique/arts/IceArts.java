@@ -317,7 +317,7 @@ public final class IceArts {
 				.fx(Phase.CAST, skySilhouette(FxLayer.BeastKind.BIRD, 0xCFEFFF).scale(40.0F), beast(FxLayer.BeastKind.BIRD, 0xCFEFFF).size(4.0F).count(60))
 				.fx(Phase.TRAVEL, trail(0xDFF6FF).particle(ParticleTypes.SNOWFLAKE).count(20), shards(0xDFF6FF).count(30))
 				.fx(Phase.EXTRA0, shards(0xFFFFFF).count(120), shake(0.7F, 24))
-				.fx(Phase.TRAVEL, model("ice_phoenix").scale(12.0F).slide(10.0F).ticks(12))
+				// DESIGN 30.4.4: the phoenix (body, wings, tail), its rings and quills are UltimatesA props (no model layer here)
 				.sound(Phase.CAST, SoundEvents.ENDER_DRAGON_GROWL, 1.5F, 1.6F)
 				.sound(Phase.CAST, SoundEvents.GLASS_BREAK, 1.2F, 0.8F)
 				.kehancuran(DShape.bowl(8))

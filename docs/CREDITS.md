@@ -1,0 +1,55 @@
+# Kredit / Credits
+
+Semua kode, model dan tekstur Kultivator dibuat sendiri. Aset pihak ketiga di bawah ini gratis dan dipakai sesuai lisensinya.
+All Kultivator code, models and textures are our own. The third-party assets below are free and used under their licences.
+
+## Suara bicara (bahasa Jepang) / Japanese voices
+
+Dibuat dengan VOICEVOX (https://voicevox.hiroshiba.jp/), VOICEVOX CORE 0.17.0 dan model suara VOICEVOX VVM 0.16.4.
+Teks kalimatnya ditulis untuk Kultivator; efek gema, paduan suara dan suara iblis diolah dengan `tools/gen_voices.py`.
+Generated with VOICEVOX (VOICEVOX CORE 0.17.0, VOICEVOX VVM 0.16.4). The lines are written for Kultivator and
+processed (echo, choir, demon voice) by `tools/gen_voices.py`.
+
+- VOICEVOX:青山龍星 — Suara Langit / voice of Heaven
+- VOICEVOX:剣崎雌雄 — Iblis Hati / Heart Demon
+- VOICEVOX:麒ヶ島宗麟 — Makhluk Purba / Ancient Ones
+- VOICEVOX:ちび式じい — Pertapa Tua / Old Hermit
+- VOICEVOX:†聖騎士 紅桜† — Kultivator Jahat / Rogue Cultivators
+- VOICEVOX:白上虎太郎, VOICEVOX:玄野武宏, VOICEVOX:雀松朱司 — murid laki-laki / male disciples
+- VOICEVOX:四国めたん, VOICEVOX:春日部つむぎ, VOICEVOX:小夜/SAYO — murid perempuan / female disciples
+
+Ketentuan tiap karakter: https://github.com/VOICEVOX/voicevox_vvm (TERMS). Kultivator adalah proyek pribadi non-komersial.
+Character terms: see the VOICEVOX VVM TERMS. Kultivator is a personal, non-commercial project.
+
+## Suara tanpa kata / Non-verbal vocal clips
+
+- "Voice Clip Pack - Male Adventurer RPG" oleh/by Brandon Song (wolfwoot) — CC0 —
+  https://opengameart.org/content/voice-clip-pack-male-adventurer-rpg (teriakan, rintihan murid laki-laki)
+- "Female RPG Character voice pack" oleh/by RiddlesYouThis — CC-BY 3.0 (https://creativecommons.org/licenses/by/3.0/) —
+  https://opengameart.org/content/female-rpg-character-voice-pack (oww, gah; diolah/processed)
+- "Demon voice" oleh/by Tim Rockk — CC0 — https://opengameart.org/content/demon-voice (tawa, geraman, jeritan iblis; diolah/processed)
+
+## Partikel dan efek suara film / Film particles and sound effects (Kenney, CC0)
+
+Particle sprites and sound effects: Kenney (www.kenney.nl), Particle Pack 1.1, Impact Sounds 1.0 and Sci-Fi Sounds 1.0,
+licensed CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/; credit not required, given with thanks). Every
+other texture, model and sound selection of Kultivator is our own. The sprites were downscaled to 32-64 px and turned
+into white tintable sprites by `tools/gen_film_assets.py`; the sounds are copied unchanged.
+Sprite partikel dan efek suara: Kenney (www.kenney.nl), lisensi CC0 1.0 (kredit tidak wajib, diberikan dengan terima
+kasih). Semua tekstur, model dan pilihan suara Kultivator lainnya buatan sendiri.
+
+Berkas yang dipakai / Files used:
+
+- Particle Pack 1.1 (`PNG (Transparent)`): spark_01, spark_02, spark_04, spark_05; flare_01, light_01, light_02, light_03;
+  star_01, star_04, star_06, star_08; smoke_01, smoke_04, smoke_07, smoke_10; flame_01, flame_03, flame_05, fire_01;
+  magic_01-04; slash_01-04; trace_01, trace_03, trace_05; twirl_01-03; circle_01, circle_03, circle_05; muzzle_01,
+  muzzle_03, muzzle_05; dirt_01-03; symbol_01, symbol_02; scratch_01; scorch_01-03; window_02; Rotated/trace_02_rotated
+  (→ `textures/particle/film_*`, `textures/misc/film/`)
+- Sci-Fi Sounds 1.0: spaceEngineLarge_000-001, forceField_000-002, spaceEngineLow_000, engineCircular_000,
+  thrusterFire_000-001, laserLarge_000-002, laserRetro_000, explosionCrunch_000-002, impactMetal_000-002,
+  lowFrequency_explosion_000-001 (→ `sounds/film/`)
+- Impact Sounds 1.0: impactBell_heavy_000-002, impactGlass_heavy_000-002, impactPunch_heavy_000-002,
+  impactPlate_heavy_000-001, impactSoft_heavy_000-001, impactMining_000 (→ `sounds/film/`)
+
+Tekstur film buatan sendiri / Our own film textures (procedural, same script): grain_0..3, anamorphic, leak_0..2, haze,
+star_river, nebula_0..2, palace_strip, sun_corona, moon_disc.

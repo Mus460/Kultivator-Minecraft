@@ -1,0 +1,163 @@
+{
+ "textures": {
+  "t0": "kultivator:item/fx/tcd_gold",
+  "t1": "kultivator:item/fx/tcd_plank_white",
+  "t2": "kultivator:item/fx/tcd_plank_black",
+  "particle": "kultivator:item/fx/tcd_gold"
+ },
+ "elements": [
+  {
+   "from": [
+    -16.0,
+    7.3,
+    -2.0
+   ],
+   "to": [
+    32.0,
+    8.7,
+    18.0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    }
+   },
+   "light_emission": 10
+  },
+  {
+   "from": [
+    -16.0,
+    8.7,
+    -2.0
+   ],
+   "to": [
+    32.0,
+    8.9,
+    -1.0
+   ],
+   "faces": {
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    }
+   },
+   "light_emission": 14
+  },
+  {
+   "from": [
+    -16.0,
+    8.7,
+    17.0
+   ],
+   "to": [
+    32.0,
+    8.9,
+    18.0
+   ],
+   "faces": {
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    }
+   },
+   "light_emission": 14
+  }
+ ]
+}

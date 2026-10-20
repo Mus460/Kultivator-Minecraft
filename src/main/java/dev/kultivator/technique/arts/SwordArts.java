@@ -289,11 +289,11 @@ public final class SwordArts {
 				// @240 ALL(field, max 32) > DMG 10.
 				.step(at(240).shape(all().ofArea().max(32.0D)).hit(damage(10.0D)).phase(0))
 				// The four swords and the four glyphs 誅 戮 陷 絕 stand at the square field's corners (n = 4 on a ring turned 45°).
-				.fx(Phase.CAST, model("zhuxian_sword").scale(10.0F).n(4).radius(32.0F).above(6.0F).ticks(240).facing(FxLayer.Facing.UPRIGHT),
-						FxLayer.of(FxLayer.Template.GLYPH, 0xB0102A).text("誅戮陷絕").n(4).radius(32.0F).scale(6.0F), mist(0x400010).count(60))
+				// DESIGN 30.4.2: the swords, plinths, map, seams and the sky sword are UltimatesA props (no model layer here)
+				.fx(Phase.CAST, FxLayer.of(FxLayer.Template.GLYPH, 0xB0102A).text("誅戮陷絕").n(4).radius(32.0F).scale(6.0F), mist(0x400010).count(60))
 				.fx(Phase.PULSE, mist(0x1A0505).count(20).extra())
-				.fx(Phase.IMPACT, column(0xB0102A).count(30), model("zhuxian_sword").scale(6.0F).fall(16.0F, 4.0F).ticks(12).facing(FxLayer.Facing.BLADE), shockRing(0xB0102A).radius(6.0F).count(24).ticks(8).detail())
-				.fx(Phase.EXTRA0, swordShape(0xB0102A).falling().count(80), model("zhuxian_sword").scale(24.0F).inSky().fall(30.0F, 10.0F).ticks(30).facing(FxLayer.Facing.BLADE), flash(0xB0102A, 0.25F, 6), shake(1.0F, 30))
+				.fx(Phase.IMPACT, column(0xB0102A).count(30), shockRing(0xB0102A).radius(6.0F).count(24).ticks(8).detail())
+				.fx(Phase.EXTRA0, swordShape(0xB0102A).falling().count(80), flash(0xB0102A, 0.25F, 6), shake(1.0F, 30))
 				.sound(Phase.CAST, SoundEvents.BELL_BLOCK, 1.5F, 0.5F)
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 1.5F, 0.5F).delay(6))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 1.5F, 0.5F).delay(12))
@@ -317,12 +317,11 @@ public final class SwordArts {
 				.step(at(20).shape(nova().radius(40.0D)).hit(bind(BindKind.STUN, 60), eff(Eff.DARKNESS, 1, 60)))
 				.step(at(40).shape(nova().radius(40.0D)).hit(damage(5.0D)))
 				.step(at(60).shape(beam().length(128.0D).halfWidth(3.0D).pierce().ignoreBlocks().travel()).hit(damage(12.0D)))
-				.fx(Phase.CAST, sky(0xFFF1C0), skyTear(0xFFF1C0).length(128.0F), swordShape(0xFFF1C0).falling().count(60),
-						model("heaven_punishing_sword").inSky().scale(24.0F).fall(40.0F, 60.0F).ticks(64).until(Phase.TRAVEL).facing(FxLayer.Facing.BLADE))
+				.fx(Phase.CAST, sky(0xFFF1C0), skyTear(0xFFF1C0).length(128.0F), swordShape(0xFFF1C0).falling().count(60))
 				.fx(Phase.TRAVEL, beamCore(0xFFF1C0).size(3.0F).count(120), flash(0xFFF8E0, 0.35F, 6), shake(1.0F, 30))
 				// the stun and darkness novas: a dark ring and falling chains of heaven's law
 				.fx(Phase.IMPACT, shockRing(0x302040).count(60).ticks(14), mist(0x101018).count(30).ticks(20), chains(0xFFF1C0).count(16).ticks(10).detail())
-				.fx(Phase.TRAVEL, model("heaven_punishing_sword").scale(24.0F).slide(8.0F).ticks(16).facing(FxLayer.Facing.BLADE))
+				// DESIGN 30.4.2: the gate, the chains and the sword riding the beam are UltimatesA props (no model layer here)
 				.sound(Phase.CAST, SoundEvents.ENDER_DRAGON_GROWL, 1.5F, 0.6F)
 				.sound(Phase.TRAVEL, SoundEvents.TRIDENT_THUNDER, 1.5F, 1.0F)
 				.sound(Phase.TRAVEL, SoundEvents.BELL_BLOCK, 1.5F, 1.0F)

@@ -219,15 +219,32 @@ public final class Shapes {
 	 * how many were used.
 	 */
 	public static List<Change> build(ServerLevel level, Spec spec, BlockPos centre, Vec3 direction, int readBudget) {
+		return build(level, spec, centre, direction, readBudget, ProtectedZones.Rules.CLASSIC);
+	}
+
+	/**
+	 * Phase 30 (DESIGN 30.1.3): as {@link #build(ServerLevel, Spec, BlockPos, Vec3, int)} under the job's {@code rules}.
+	 * Under {@link ProtectedZones.Rules#TOTAL} a column whose top is a fluid is no longer skipped (the fluid surface is the
+	 * surface, the fluid cells are ordinary cells of the shape) and the impact search stops on a fluid like on a solid
+	 * block. Every result is ordered top-down within each column ({@link #topDownChanges}), so a column's fluid always
+	 * goes before the solid cells under it.
+	 */
+	public static List<Change> build(ServerLevel level, Spec spec, BlockPos centre, Vec3 direction, int readBudget,
+			ProtectedZones.@Nullable Rules rules) {
 		int budget = Math.max(0, readBudget);
 		readsLeft = budget;
+		fluidTop = rules == ProtectedZones.Rules.TOTAL;
 		try {
-			return buildShape(level, spec, centre, direction);
+			return topDownChanges(buildShape(level, spec, centre, direction));
 		} finally {
 			lastReads = budget == Integer.MAX_VALUE ? 0 : budget - Math.max(0, readsLeft);
 			readsLeft = Integer.MAX_VALUE;
+			fluidTop = false;
 		}
 	}
+
+	/** Phase 30: the build running now takes a fluid surface as the surface (Hancur Total; server thread only). */
+	private static boolean fluidTop;
 
 	/** Reads used by the last budgeted {@link #build}. */
 	public static int lastReads() {
@@ -295,7 +312,10 @@ public final class Shapes {
 			return null;
 		}
 		int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z) - 1;
-		if (!read() || !level.getBlockState(new BlockPos(x, top, z)).getFluidState().isEmpty()) {
+		if (!read()) {
+			return null;
+		}
+		if (!fluidTop && !level.getBlockState(new BlockPos(x, top, z)).getFluidState().isEmpty()) {
 			return null;
 		}
 		return top;
@@ -314,7 +334,8 @@ public final class Shapes {
 			cursor.setY(anchor.getY() - d);
 			BlockState state = level.getBlockState(cursor);
 			if (!state.getFluidState().isEmpty()) {
-				return null;
+				// Hancur Total (30.1.3): the fluid surface is the impact; otherwise a bowl never sinks to a lake bed
+				return fluidTop ? cursor.immutable() : null;
 			}
 			if (!state.isAir()) {
 				return cursor.immutable();
@@ -489,7 +510,7 @@ public final class Shapes {
 				for (int y = centre.getY() + RING_SURFACE_SPAN; y >= centre.getY() - RING_SURFACE_SPAN && read(); y--) {
 					cursor.set(x, y, z);
 					BlockState state = level.getBlockState(cursor);
-					if (!state.isAir() && state.getFluidState().isEmpty() && state.canOcclude()) {
+					if (!state.isAir() && (state.getFluidState().isEmpty() && state.canOcclude() || fluidTop && !state.getFluidState().isEmpty())) {
 						top = y;
 						break;
 					}
@@ -859,16 +880,30 @@ public final class Shapes {
 	 * position i out of the test (point blasts, wither, strip). Returns the kept indices in their order.
 	 */
 	public static List<Integer> openColumns(ServerLevel level, List<BlockPos> planned, boolean[] check) {
+		return openColumns(level, planned, check, null);
+	}
+
+	/**
+	 * As {@link #openColumns(ServerLevel, List, boolean[])}; {@code fluidCheck[i]} true (Hancur Total point blasts, 30.1.3)
+	 * puts a position that {@code check} leaves out into a lighter test: its column is dropped only when a FLUID sits right
+	 * above its highest planned block (a solid lid stays allowed, as for every point blast), so no water hangs over a new
+	 * hole.
+	 */
+	public static List<Integer> openColumns(ServerLevel level, List<BlockPos> planned, boolean[] check, boolean @Nullable [] fluidCheck) {
 		Map<Long, Integer> highest = new HashMap<>();
+		Map<Long, Integer> highestFluid = new HashMap<>();
 		Set<Long> all = new HashSet<>(planned.size() * 2);
 		for (int i = 0; i < planned.size(); i++) {
 			BlockPos pos = planned.get(i);
 			all.add(pos.asLong());
 			if (check[i]) {
 				highest.merge(columnKey(pos), pos.getY(), Math::max);
+			} else if (fluidCheck != null && i < fluidCheck.length && fluidCheck[i]) {
+				highestFluid.merge(columnKey(pos), pos.getY(), Math::max);
 			}
 		}
 		Set<Long> sealed = new HashSet<>();
+		Set<Long> sealedFluid = new HashSet<>();
 		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		for (Map.Entry<Long, Integer> entry : highest.entrySet()) {
 			BlockPos column = BlockPos.of(entry.getKey());
@@ -880,13 +915,115 @@ public final class Shapes {
 				sealed.add(entry.getKey());
 			}
 		}
+		for (Map.Entry<Long, Integer> entry : highestFluid.entrySet()) {
+			BlockPos column = BlockPos.of(entry.getKey());
+			cursor.set(column.getX(), entry.getValue() + 1, column.getZ());
+			if (all.contains(cursor.asLong())) {
+				continue;
+			}
+			if (!level.isLoaded(cursor) || !level.getBlockState(cursor).getFluidState().isEmpty()) {
+				sealedFluid.add(entry.getKey());
+			}
+		}
 		List<Integer> kept = new ArrayList<>(planned.size());
 		for (int i = 0; i < planned.size(); i++) {
-			if (!check[i] || !sealed.contains(columnKey(planned.get(i)))) {
+			long column = columnKey(planned.get(i));
+			boolean keep;
+			if (check[i]) {
+				keep = !sealed.contains(column);
+			} else if (fluidCheck != null && i < fluidCheck.length && fluidCheck[i]) {
+				keep = !sealedFluid.contains(column);
+			} else {
+				keep = true;
+			}
+			if (keep) {
 				kept.add(i);
 			}
 		}
 		return kept;
+	}
+
+	// ================================================================== top-down per column (DESIGN 30.1.3 item 2)
+
+	/**
+	 * Reorders {@code positions} (and {@code modes} with them) so every column is worked top-down, keeping the slots each
+	 * column uses in the list: the overall order (centre-out, near to far) stays, only the cells of one column swap places
+	 * among themselves. Every single shape is already top-down; this sorts merged plans whose shapes overlap in a column.
+	 */
+	public static void topDown(long[] positions, byte @Nullable [] modes) {
+		if (positions.length < 2) {
+			return;
+		}
+		Map<Long, List<Integer>> slots = new HashMap<>();
+		for (int i = 0; i < positions.length; i++) {
+			long packed = positions[i];
+			slots.computeIfAbsent(BlockPos.asLong(BlockPos.getX(packed), 0, BlockPos.getZ(packed)), key -> new ArrayList<>(4)).add(i);
+		}
+		for (List<Integer> list : slots.values()) {
+			if (list.size() < 2 || descending(positions, list)) {
+				continue;
+			}
+			Integer[] order = list.toArray(new Integer[0]);
+			java.util.Arrays.sort(order, Comparator.comparingInt((Integer i) -> -BlockPos.getY(positions[i])));
+			long[] pos = new long[order.length];
+			byte[] mode = new byte[order.length];
+			for (int k = 0; k < order.length; k++) {
+				pos[k] = positions[order[k]];
+				mode[k] = modes != null && order[k] < modes.length ? modes[order[k]] : 0;
+			}
+			for (int k = 0; k < order.length; k++) {
+				int slot = list.get(k);
+				positions[slot] = pos[k];
+				if (modes != null && slot < modes.length) {
+					modes[slot] = mode[k];
+				}
+			}
+		}
+	}
+
+	/** {@link #topDown(long[], byte[])} for a list of changes (each change keeps its target). */
+	public static List<Change> topDownChanges(List<Change> changes) {
+		if (changes.size() < 2) {
+			return changes;
+		}
+		Map<Long, List<Integer>> slots = new HashMap<>();
+		for (int i = 0; i < changes.size(); i++) {
+			slots.computeIfAbsent(columnKey(changes.get(i).pos()), key -> new ArrayList<>(4)).add(i);
+		}
+		List<Change> out = null;
+		for (List<Integer> list : slots.values()) {
+			boolean sorted = true;
+			for (int k = 1; k < list.size(); k++) {
+				if (changes.get(list.get(k)).pos().getY() > changes.get(list.get(k - 1)).pos().getY()) {
+					sorted = false;
+					break;
+				}
+			}
+			if (sorted) {
+				continue;
+			}
+			if (out == null) {
+				out = new ArrayList<>(changes);
+			}
+			List<Change> column = new ArrayList<>(list.size());
+			for (int i : list) {
+				column.add(changes.get(i));
+			}
+			column.sort(Comparator.comparingInt((Change change) -> -change.pos().getY()));
+			for (int k = 0; k < list.size(); k++) {
+				out.set(list.get(k), column.get(k));
+			}
+		}
+		return out == null ? changes : out;
+	}
+
+	private static boolean descending(long[] positions, List<Integer> list) {
+		for (int k = 1; k < list.size(); k++) {
+			if (BlockPos.getY(positions[list.get(k)]) > BlockPos.getY(positions[list.get(k - 1)])) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private static double horizontal(BlockPos pos, BlockPos centre) {

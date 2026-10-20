@@ -110,6 +110,7 @@ public final class Enlightenment {
 		Cultivators.syncNow(player);
 
 		Fx.send(level, player.position(), FxType.ENLIGHTENMENT, GOLD, DURATION_TICKS, 0.0F);
+		dev.kultivator.voice.VoiceHooks.daoInsight(player);
 		double x = player.getX();
 		double y = player.getY() + 1.0D;
 		double z = player.getZ();

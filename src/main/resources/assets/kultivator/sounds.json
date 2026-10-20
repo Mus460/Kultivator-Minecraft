@@ -1,0 +1,1713 @@
+{
+  "film.bell": {
+    "subtitle": "subtitles.kultivator.film.bell",
+    "sounds": [
+      {
+        "name": "kultivator:film/bell_0"
+      },
+      {
+        "name": "kultivator:film/bell_1"
+      },
+      {
+        "name": "kultivator:film/bell_2"
+      }
+    ]
+  },
+  "film.clang": {
+    "subtitle": "subtitles.kultivator.film.clang",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0"
+      },
+      {
+        "name": "kultivator:film/clang_1"
+      },
+      {
+        "name": "kultivator:film/clang_2"
+      }
+    ]
+  },
+  "film.crunch": {
+    "subtitle": "subtitles.kultivator.film.crunch",
+    "sounds": [
+      {
+        "name": "kultivator:film/crunch_0"
+      },
+      {
+        "name": "kultivator:film/crunch_1"
+      },
+      {
+        "name": "kultivator:film/crunch_2"
+      }
+    ]
+  },
+  "film.glass": {
+    "subtitle": "subtitles.kultivator.film.glass",
+    "sounds": [
+      {
+        "name": "kultivator:film/glass_0"
+      },
+      {
+        "name": "kultivator:film/glass_1"
+      },
+      {
+        "name": "kultivator:film/glass_2"
+      }
+    ]
+  },
+  "film.gong": {
+    "subtitle": "subtitles.kultivator.film.gong",
+    "sounds": [
+      {
+        "name": "kultivator:film/gong_0"
+      },
+      {
+        "name": "kultivator:film/gong_1"
+      }
+    ]
+  },
+  "film.hum_energy": {
+    "subtitle": "subtitles.kultivator.film.hum_energy",
+    "sounds": [
+      {
+        "name": "kultivator:film/hum_energy_0"
+      }
+    ]
+  },
+  "film.hum_vortex": {
+    "subtitle": "subtitles.kultivator.film.hum_vortex",
+    "sounds": [
+      {
+        "name": "kultivator:film/hum_vortex_0"
+      }
+    ]
+  },
+  "film.punch": {
+    "subtitle": "subtitles.kultivator.film.punch",
+    "sounds": [
+      {
+        "name": "kultivator:film/punch_0"
+      },
+      {
+        "name": "kultivator:film/punch_1"
+      },
+      {
+        "name": "kultivator:film/punch_2"
+      }
+    ]
+  },
+  "film.riser_long": {
+    "subtitle": "subtitles.kultivator.film.riser_long",
+    "sounds": [
+      {
+        "name": "kultivator:film/riser_long_0"
+      },
+      {
+        "name": "kultivator:film/riser_long_1"
+      }
+    ]
+  },
+  "film.riser_short": {
+    "subtitle": "subtitles.kultivator.film.riser_short",
+    "sounds": [
+      {
+        "name": "kultivator:film/riser_short_0"
+      },
+      {
+        "name": "kultivator:film/riser_short_1"
+      },
+      {
+        "name": "kultivator:film/riser_short_2"
+      }
+    ]
+  },
+  "film.rock": {
+    "subtitle": "subtitles.kultivator.film.rock",
+    "sounds": [
+      {
+        "name": "kultivator:film/rock_0"
+      }
+    ]
+  },
+  "film.sub_boom": {
+    "subtitle": "subtitles.kultivator.film.sub_boom",
+    "sounds": [
+      {
+        "name": "kultivator:film/sub_boom_0"
+      },
+      {
+        "name": "kultivator:film/sub_boom_1"
+      }
+    ]
+  },
+  "film.thud": {
+    "subtitle": "subtitles.kultivator.film.thud",
+    "sounds": [
+      {
+        "name": "kultivator:film/thud_0"
+      },
+      {
+        "name": "kultivator:film/thud_1"
+      }
+    ]
+  },
+  "film.twinkle": {
+    "subtitle": "subtitles.kultivator.film.twinkle",
+    "sounds": [
+      {
+        "name": "kultivator:film/twinkle_0"
+      }
+    ]
+  },
+  "film.whoosh": {
+    "subtitle": "subtitles.kultivator.film.whoosh",
+    "sounds": [
+      {
+        "name": "kultivator:film/whoosh_0"
+      },
+      {
+        "name": "kultivator:film/whoosh_1"
+      }
+    ]
+  },
+  "film.zap": {
+    "subtitle": "subtitles.kultivator.film.zap",
+    "sounds": [
+      {
+        "name": "kultivator:film/zap_0"
+      },
+      {
+        "name": "kultivator:film/zap_1"
+      },
+      {
+        "name": "kultivator:film/zap_2"
+      }
+    ]
+  },
+  "voice.boss.awaken": {
+    "subtitle": "subtitles.kultivator.voice.boss.awaken",
+    "sounds": [
+      {
+        "name": "kultivator:voice/boss/awaken",
+        "stream": false
+      }
+    ]
+  },
+  "voice.boss.defeat": {
+    "subtitle": "subtitles.kultivator.voice.boss.defeat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/boss/defeat",
+        "stream": false
+      }
+    ]
+  },
+  "voice.boss.enraged": {
+    "subtitle": "subtitles.kultivator.voice.boss.enraged",
+    "sounds": [
+      {
+        "name": "kultivator:voice/boss/enraged",
+        "stream": false
+      }
+    ]
+  },
+  "voice.boss.roar": {
+    "subtitle": "subtitles.kultivator.voice.boss.roar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/boss/roar/0",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/boss/roar/1",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/boss/roar/2",
+        "stream": false
+      }
+    ]
+  },
+  "voice.boss.taunt": {
+    "subtitle": "subtitles.kultivator.voice.boss.taunt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/boss/taunt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.demon.death": {
+    "subtitle": "subtitles.kultivator.voice.demon.death",
+    "sounds": [
+      {
+        "name": "kultivator:voice/demon/death/0",
+        "stream": false
+      }
+    ]
+  },
+  "voice.demon.growl": {
+    "subtitle": "subtitles.kultivator.voice.demon.growl",
+    "sounds": [
+      {
+        "name": "kultivator:voice/demon/growl/0",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/demon/growl/1",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/demon/growl/2",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/demon/growl/3",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/demon/growl/4",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/demon/growl/5",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/demon/growl/6",
+        "stream": false
+      }
+    ]
+  },
+  "voice.demon.laugh": {
+    "subtitle": "subtitles.kultivator.voice.demon.laugh",
+    "sounds": [
+      {
+        "name": "kultivator:voice/demon/laugh/0",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/demon/laugh/1",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/demon/laugh/2",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/demon/laugh/3",
+        "stream": false
+      }
+    ]
+  },
+  "voice.demon.lose": {
+    "subtitle": "subtitles.kultivator.voice.demon.lose",
+    "sounds": [
+      {
+        "name": "kultivator:voice/demon/lose",
+        "stream": false
+      }
+    ]
+  },
+  "voice.demon.tempt": {
+    "subtitle": "subtitles.kultivator.voice.demon.tempt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/demon/tempt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.demon.waver": {
+    "subtitle": "subtitles.kultivator.voice.demon.waver",
+    "sounds": [
+      {
+        "name": "kultivator:voice/demon/waver",
+        "stream": false
+      }
+    ]
+  },
+  "voice.demon.whisper": {
+    "subtitle": "subtitles.kultivator.voice.demon.whisper",
+    "sounds": [
+      {
+        "name": "kultivator:voice/demon/whisper",
+        "stream": false
+      }
+    ]
+  },
+  "voice.demon.win": {
+    "subtitle": "subtitles.kultivator.voice.demon.win",
+    "sounds": [
+      {
+        "name": "kultivator:voice/demon/win",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.attack": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.attack",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/attack",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.attack_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.attack_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.breakthrough": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.breakthrough",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/breakthrough",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.careful": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.careful",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/careful",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.cheer": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.cheer",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/cheer",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.cultivate": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.cultivate",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.farewell": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.farewell",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/farewell",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.fear": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.fear",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/fear",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.formation": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.formation",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/formation",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.greet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.greet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/greet",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.greet_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.greet_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/greet_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.injured": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.injured",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.loyal": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.loyal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.protect": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.protect",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.technique": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.technique",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/technique",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.thanks": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.thanks",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/thanks",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.tired": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.tired",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.victory": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.victory",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/victory",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.attack": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.attack",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/attack",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.attack_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.attack_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.breakthrough": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.breakthrough",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/breakthrough",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.careful": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.careful",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/careful",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.cheer": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.cheer",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/cheer",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.cultivate": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.cultivate",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.farewell": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.farewell",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/farewell",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.fear": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.fear",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/fear",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.formation": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.formation",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/formation",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.greet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.greet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/greet",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.greet_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.greet_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/greet_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.injured": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.injured",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.loyal": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.loyal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.protect": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.protect",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.technique": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.technique",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/technique",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.thanks": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.thanks",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/thanks",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.tired": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.tired",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.victory": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.victory",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/victory",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.attack": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.attack",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/attack",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.attack_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.attack_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.breakthrough": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.breakthrough",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/breakthrough",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.careful": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.careful",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/careful",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.cheer": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.cheer",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/cheer",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.cultivate": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.cultivate",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.farewell": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.farewell",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/farewell",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.fear": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.fear",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/fear",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.formation": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.formation",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/formation",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.greet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.greet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/greet",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.greet_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.greet_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/greet_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.injured": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.injured",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.loyal": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.loyal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.protect": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.protect",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.technique": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.technique",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/technique",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.thanks": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.thanks",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/thanks",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.tired": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.tired",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.victory": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.victory",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/victory",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.attack": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.attack",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/attack",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.attack_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.attack_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.breakthrough": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.breakthrough",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/breakthrough",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.careful": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.careful",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/careful",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.cheer": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.cheer",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/cheer",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.cultivate": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.cultivate",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.farewell": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.farewell",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/farewell",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.fear": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.fear",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/fear",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.formation": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.formation",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/formation",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.greet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.greet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/greet",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.greet_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.greet_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/greet_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.injured": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.injured",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.loyal": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.loyal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.protect": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.protect",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.technique": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.technique",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/technique",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.thanks": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.thanks",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/thanks",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.tired": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.tired",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.victory": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.victory",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/victory",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.attack": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.attack",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/attack",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.attack_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.attack_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.breakthrough": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.breakthrough",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/breakthrough",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.careful": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.careful",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/careful",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.cheer": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.cheer",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/cheer",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.cultivate": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.cultivate",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.farewell": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.farewell",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/farewell",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.fear": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.fear",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/fear",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.formation": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.formation",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/formation",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.greet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.greet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/greet",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.greet_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.greet_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/greet_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.injured": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.injured",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.loyal": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.loyal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.protect": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.protect",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.technique": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.technique",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/technique",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.thanks": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.thanks",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/thanks",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.tired": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.tired",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.victory": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.victory",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/victory",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.attack": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.attack",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/attack",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.attack_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.attack_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.breakthrough": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.breakthrough",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/breakthrough",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.careful": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.careful",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/careful",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.cheer": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.cheer",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/cheer",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.cultivate": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.cultivate",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.farewell": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.farewell",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/farewell",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.fear": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.fear",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/fear",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.formation": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.formation",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/formation",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.greet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.greet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/greet",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.greet_alt": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.greet_alt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/greet_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.injured": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.injured",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.loyal": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.loyal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.protect": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.protect",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.technique": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.technique",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/technique",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.thanks": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.thanks",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/thanks",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.tired": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.tired",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.victory": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.victory",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/victory",
+        "stream": false
+      }
+    ]
+  },
+  "voice.elder.advice": {
+    "subtitle": "subtitles.kultivator.voice.elder.advice",
+    "sounds": [
+      {
+        "name": "kultivator:voice/elder/advice",
+        "stream": false
+      }
+    ]
+  },
+  "voice.elder.inheritance": {
+    "subtitle": "subtitles.kultivator.voice.elder.inheritance",
+    "sounds": [
+      {
+        "name": "kultivator:voice/elder/inheritance",
+        "stream": false
+      }
+    ]
+  },
+  "voice.elder.welcome": {
+    "subtitle": "subtitles.kultivator.voice.elder.welcome",
+    "sounds": [
+      {
+        "name": "kultivator:voice/elder/welcome",
+        "stream": false
+      }
+    ]
+  },
+  "voice.grunt.female.attack": {
+    "subtitle": "subtitles.kultivator.voice.grunt.female.attack",
+    "sounds": [
+      {
+        "name": "kultivator:voice/grunt/female/f1_kiai0",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/female/f1_kiai1",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/female/f1_kiai2",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/female/f2_kiai0",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/female/f2_kiai1",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/female/f2_kiai2",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/female/f3_kiai0",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/female/f3_kiai1",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/female/f3_kiai2",
+        "stream": false
+      }
+    ]
+  },
+  "voice.grunt.female.hurt": {
+    "subtitle": "subtitles.kultivator.voice.grunt.female.hurt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/grunt/female/hurt/0",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/female/hurt/1",
+        "stream": false
+      }
+    ]
+  },
+  "voice.grunt.male.attack": {
+    "subtitle": "subtitles.kultivator.voice.grunt.male.attack",
+    "sounds": [
+      {
+        "name": "kultivator:voice/grunt/male/attack/0",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/1",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/2",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/3",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/4",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/5",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/6",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/7",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/8",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/9",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/10",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/11",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/12",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/13",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/attack/14",
+        "stream": false
+      }
+    ]
+  },
+  "voice.grunt.male.death": {
+    "subtitle": "subtitles.kultivator.voice.grunt.male.death",
+    "sounds": [
+      {
+        "name": "kultivator:voice/grunt/male/death/0",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/death/1",
+        "stream": false
+      }
+    ]
+  },
+  "voice.grunt.male.hurt": {
+    "subtitle": "subtitles.kultivator.voice.grunt.male.hurt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/grunt/male/hurt/0",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/hurt/1",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/hurt/2",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/hurt/3",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/hurt/4",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/hurt/5",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/hurt/6",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/hurt/7",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/hurt/8",
+        "stream": false
+      },
+      {
+        "name": "kultivator:voice/grunt/male/hurt/9",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.breakthrough": {
+    "subtitle": "subtitles.kultivator.voice.heaven.breakthrough",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/breakthrough",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.calamity": {
+    "subtitle": "subtitles.kultivator.voice.heaven.calamity",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/calamity",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.dao_insight": {
+    "subtitle": "subtitles.kultivator.voice.heaven.dao_insight",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/dao_insight",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.decree": {
+    "subtitle": "subtitles.kultivator.voice.heaven.decree",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/decree",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.decree_lift": {
+    "subtitle": "subtitles.kultivator.voice.heaven.decree_lift",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/decree_lift",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.decree_spear": {
+    "subtitle": "subtitles.kultivator.voice.heaven.decree_spear",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/decree_spear",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.decree_stars": {
+    "subtitle": "subtitles.kultivator.voice.heaven.decree_stars",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/decree_stars",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.decree_sword": {
+    "subtitle": "subtitles.kultivator.voice.heaven.decree_sword",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/decree_sword",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.immortal_ascend": {
+    "subtitle": "subtitles.kultivator.voice.heaven.immortal_ascend",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/immortal_ascend",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.realm": {
+    "subtitle": "subtitles.kultivator.voice.heaven.realm",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/realm",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.secret_realm": {
+    "subtitle": "subtitles.kultivator.voice.heaven.secret_realm",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/secret_realm",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.sect_founded": {
+    "subtitle": "subtitles.kultivator.voice.heaven.sect_founded",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/sect_founded",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.tribulation_begin": {
+    "subtitle": "subtitles.kultivator.voice.heaven.tribulation_begin",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/tribulation_begin",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.tribulation_fail": {
+    "subtitle": "subtitles.kultivator.voice.heaven.tribulation_fail",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/tribulation_fail",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.tribulation_pass": {
+    "subtitle": "subtitles.kultivator.voice.heaven.tribulation_pass",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/tribulation_pass",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.true_immortal": {
+    "subtitle": "subtitles.kultivator.voice.heaven.true_immortal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/true_immortal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.witness": {
+    "subtitle": "subtitles.kultivator.voice.heaven.witness",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/witness",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.wrath": {
+    "subtitle": "subtitles.kultivator.voice.heaven.wrath",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/wrath",
+        "stream": false
+      }
+    ]
+  },
+  "voice.rogue.ambush": {
+    "subtitle": "subtitles.kultivator.voice.rogue.ambush",
+    "sounds": [
+      {
+        "name": "kultivator:voice/rogue/ambush",
+        "stream": false
+      }
+    ]
+  },
+  "voice.rogue.defeat": {
+    "subtitle": "subtitles.kultivator.voice.rogue.defeat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/rogue/defeat",
+        "stream": false
+      }
+    ]
+  },
+  "voice.rogue.flee": {
+    "subtitle": "subtitles.kultivator.voice.rogue.flee",
+    "sounds": [
+      {
+        "name": "kultivator:voice/rogue/flee",
+        "stream": false
+      }
+    ]
+  }
+}

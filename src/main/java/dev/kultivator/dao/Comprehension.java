@@ -291,6 +291,7 @@ public final class Comprehension {
 			Msg.chat(player, Component.translatable("kultivator.dao.level.domain", daoName).withStyle(ChatFormatting.GOLD));
 		}
 		Msg.actionBar(player, Component.translatable("kultivator.dao.level.bar", daoName, levelName));
+		dev.kultivator.voice.VoiceHooks.daoInsight(player);
 
 		ServerLevel level = player.level();
 		Fx.send(level, player.position(), FxType.DAO_CHOSEN, dao.ordinal(), newLevel, 0.0F);

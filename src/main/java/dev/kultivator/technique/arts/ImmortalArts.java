@@ -16,7 +16,6 @@ import dev.kultivator.technique.spec.dsl.Payload.DotKind;
 import dev.kultivator.technique.spec.dsl.Payload.Eff;
 import dev.kultivator.technique.spec.dsl.Payload.Facing;
 import dev.kultivator.technique.spec.dsl.Payload.Versus;
-import dev.kultivator.technique.spec.dsl.FxLayer;
 import dev.kultivator.technique.spec.dsl.Phase;
 import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
@@ -102,8 +101,8 @@ public final class ImmortalArts {
 						.hit(bind(BindKind.ROOT, 120).boss(30), dot(0.8D, 6, DotKind.QI)).phase(0))
 				.fx(Phase.CAST, cloudDisc(HEAVEN).above(40.0F).count(80).ticks(40))
 				// the Buddha's palm comes down from 64 up on the pre-impact TRAVEL (40 ticks), palm-down, and lands on the IMPACT
-				.fx(Phase.TRAVEL, model("buddha_palm").scale(24.0F).fall(64.0F, 40.0F).ticks(46).facing(FxLayer.Facing.FLAT),
-						palm(GOLD).inSky().count(60).ticks(40), cloudDisc(HEAVEN).inSky().count(30).ticks(40).detail())
+				// Phase 30 (DESIGN 30.4.9): the palm and the five peaks are drawn by client/anim/model/UltimatesB
+				.fx(Phase.TRAVEL, palm(GOLD).inSky().count(60).ticks(40), cloudDisc(HEAVEN).inSky().count(30).ticks(40).detail())
 				.fx(Phase.IMPACT, shockRing(GOLD).count(60).ticks(16),
 						// The 9th display of the cast: EXTRA, so the Normal budget of 8 (3 palm blocks + 5 mountains) drops it first.
 						glyph("唵嘛呢叭咪吽").scale(10.0F).above(14.0F).ticks(120).minTier(1).extra(),
@@ -111,7 +110,6 @@ public final class ImmortalArts {
 				// The five mountains rise on the ring (one block per pillar, in order) and sink after 120t.
 				// one mountain peak rises at each of the five ring points (one EXTRA0 per point, index/of)
 				.fx(Phase.extra(0), column(GOLD).count(30).ticks(20),
-						model("mountain_peak").scale(10.0F).rise(14.0F, 10.0F).ticks(120).facing(FxLayer.Facing.UPRIGHT),
 						impact(0x8A7A60).particle(ParticleTypes.POOF).count(20).ticks(12).detail())
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 0.5F, 0.5F))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 0.5F, 0.55F).delay(12))
@@ -139,8 +137,8 @@ public final class ImmortalArts {
 				.fx(Phase.CAST, runeCircle(WHITE).color2(0x101010).radius(4.0F).count(40).ticks(30))
 				.fx(Phase.CHARGE, runeCircle(WHITE).color2(0x101010).radius(6.0F).spin(6.0F).count(40).ticks(30))
 				// The bands show up to 176 b in the catalogue; one LASER is at most 128, so the client draws two in a row (TODO kitab).
-				.fx(Phase.TRAVEL, model("taiji_disc").scale(9.0F).fall(30.0F, 10.0F).ticks(24).facing(FxLayer.Facing.FLAT),
-						laser(whiteGlass, 4.5F, 128.0F).ticks(24).minTier(1).extra(),
+				// Phase 30 (DESIGN 30.4.9): the disc and its planks are drawn by client/anim/model/UltimatesB
+				.fx(Phase.TRAVEL, laser(whiteGlass, 4.5F, 128.0F).ticks(24).minTier(1).extra(),
 						laser(blackGlass, 4.5F, 128.0F).delay(2).ticks(24).minTier(1).extra(),
 						trail(WHITE).color2(0x101010).count(60).ticks(12), shake(0.8F, 16), cracks())
 				.fx(Phase.HIT, healRise(0xF0F0F0).particle(ParticleTypes.WHITE_ASH).count(16).ticks(30))
@@ -172,7 +170,7 @@ public final class ImmortalArts {
 						skyTear(HEAVEN).ticks(60).minTier(SKY_TIER), flash(WHITE, 0.35F, 8), shake(1.0F, 24))
 				.fx(Phase.extra(0), shockRing(HEAVEN).count(60).ticks(12))
 				.fx(Phase.TRAVEL, shockRing(HEAVEN).n(9).radius(2.0F).count(40).ticks(27), trail(HEAVEN).count(30).ticks(27).detail())
-				.fx(Phase.IMPACT, model("god_foot").scale(12.0F).fall(12.0F, 4.0F).ticks(16).facing(FxLayer.Facing.FLAT))
+				// Phase 30 (DESIGN 30.4.9): the foot of light, the step rings and the Dipper stars are drawn by client/anim/model/UltimatesB
 				.sound(Phase.IMPACT, SoundEvents.WARDEN_SONIC_BOOM, 0.5F, 0.8F)
 				.sound(Phase.extra(0), SoundEvents.LIGHTNING_BOLT_THUNDER, 1.0F, 0.7F)
 				.kehancuran(DShape.sphere(6), DShape.disc(16, 2).nat())

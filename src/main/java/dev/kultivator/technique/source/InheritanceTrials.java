@@ -285,6 +285,7 @@ public final class InheritanceTrials {
 				Component.translatable(PREFIX + "subtitle", themeName(theme)), 10, 60, 20);
 		Msg.chat(player, Component.translatable(PREFIX + "omen", themeName(theme), OMEN_TICKS / 20, FIGHT_TICKS / 20, (int) LEASH)
 				.withStyle(ChatFormatting.GOLD));
+		dev.kultivator.voice.VoiceHooks.inheritance(player, false);
 		return true;
 	}
 
@@ -462,6 +463,7 @@ public final class InheritanceTrials {
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.2F);
 		Msg.title(player, Component.translatable(PREFIX + "won_title").withStyle(ChatFormatting.GOLD), themeName(trial.theme), 10, 60, 20);
 		Advancements.grant(player, "inheritance");
+		dev.kultivator.voice.VoiceHooks.inheritance(player, true);
 		List<String> ids = roll(data, trial.theme, player.getRandom());
 		if (ids.isEmpty()) {
 			Dao dao = Dao.byId(trial.theme);

@@ -1,0 +1,1248 @@
+{
+ "lines": [
+  {
+   "event": "voice.heaven.breakthrough",
+   "ja": "道が、共鳴している。",
+   "en": "The Dao resonates.",
+   "id": "Dao beresonansi.",
+   "speaker": "heaven",
+   "style": 84
+  },
+  {
+   "event": "voice.heaven.realm",
+   "ja": "新たなる境地。天が、震えている。",
+   "en": "A new realm. The heavens tremble.",
+   "id": "Ranah baru. Langit bergetar.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.heaven.tribulation_begin",
+   "ja": "天劫、降臨。耐え抜くか、滅びるか。",
+   "en": "The Heavenly Tribulation descends. Endure, or perish.",
+   "id": "Kesengsaraan Langit turun. Bertahanlah, atau binasa.",
+   "speaker": "heaven",
+   "style": 81
+  },
+  {
+   "event": "voice.heaven.tribulation_pass",
+   "ja": "天劫を越えし者よ。天は、汝を認めた。",
+   "en": "You who crossed the tribulation: Heaven acknowledges you.",
+   "id": "Wahai yang melewati kesengsaraan: Langit mengakuimu.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.heaven.tribulation_fail",
+   "ja": "汝の道は、まだ足りぬ。",
+   "en": "Your Dao is not yet enough.",
+   "id": "Dao-mu belum cukup.",
+   "speaker": "heaven",
+   "style": 84
+  },
+  {
+   "event": "voice.heaven.immortal_ascend",
+   "ja": "天地よ、証人となれ。新たなる仙人が、今ここに誕生した。",
+   "en": "Heaven and Earth, bear witness. A new Immortal is born this day.",
+   "id": "Langit dan Bumi, jadilah saksi. Seorang Abadi baru lahir hari ini.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.heaven.true_immortal",
+   "ja": "万界よ、ひれ伏せ。不滅の仙帝が、目覚めた。",
+   "en": "All realms, bow down. The undying Immortal Emperor has awakened.",
+   "id": "Wahai seluruh alam, bersujudlah. Kaisar Abadi yang tak binasa telah bangkit.",
+   "speaker": "heaven",
+   "style": 81
+  },
+  {
+   "event": "voice.heaven.dao_insight",
+   "ja": "大道の理、ここに悟れり。",
+   "en": "The principle of the Great Dao is understood.",
+   "id": "Prinsip Dao Agung telah dipahami.",
+   "speaker": "heaven",
+   "style": 84
+  },
+  {
+   "event": "voice.heaven.sect_founded",
+   "ja": "一つの宗門が生まれた。その道よ、永遠なれ。",
+   "en": "A sect is born. May its Dao endure forever.",
+   "id": "Sebuah sekte lahir. Semoga Dao-nya abadi selamanya.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.heaven.witness",
+   "ja": "刮目せよ。",
+   "en": "Behold.",
+   "id": "Saksikanlah.",
+   "speaker": "heaven",
+   "style": 81
+  },
+  {
+   "event": "voice.heaven.decree",
+   "ja": "天の勅命を、ここに下す！",
+   "en": "Heaven's decree is hereby handed down!",
+   "id": "Titah Langit dengan ini diturunkan!",
+   "speaker": "heaven",
+   "style": 81
+  },
+  {
+   "event": "voice.heaven.decree_sword",
+   "ja": "天剣よ、落ちよ！",
+   "en": "Heavenly Sword, fall!",
+   "id": "Pedang Langit, jatuhlah!",
+   "speaker": "heaven",
+   "style": 81
+  },
+  {
+   "event": "voice.heaven.decree_spear",
+   "ja": "天の槍よ、大地を貫け！",
+   "en": "Spear of Heaven, pierce the earth!",
+   "id": "Tombak Langit, tembuslah bumi!",
+   "speaker": "heaven",
+   "style": 81
+  },
+  {
+   "event": "voice.heaven.decree_stars",
+   "ja": "北斗七星よ、陣を成せ！",
+   "en": "Seven Stars of the Northern Dipper, form the array!",
+   "id": "Tujuh Bintang Biduk Utara, bentuklah formasi!",
+   "speaker": "heaven",
+   "style": 81
+  },
+  {
+   "event": "voice.heaven.decree_lift",
+   "ja": "天地よ、浮かび上がれ！",
+   "en": "Heaven and Earth, rise up!",
+   "id": "Langit dan Bumi, terangkatlah!",
+   "speaker": "heaven",
+   "style": 81
+  },
+  {
+   "event": "voice.heaven.wrath",
+   "ja": "愚かなる者よ。天を怒らせたな。",
+   "en": "Foolish one. You have angered Heaven.",
+   "id": "Wahai makhluk bodoh. Kau telah membuat Langit murka.",
+   "speaker": "heaven",
+   "style": 81
+  },
+  {
+   "event": "voice.heaven.calamity",
+   "ja": "災厄が、近づいている。",
+   "en": "A calamity draws near.",
+   "id": "Malapetaka mendekat.",
+   "speaker": "heaven",
+   "style": 84
+  },
+  {
+   "event": "voice.heaven.secret_realm",
+   "ja": "秘境の門が、開かれた。",
+   "en": "The gate of the secret realm has opened.",
+   "id": "Gerbang alam rahasia telah terbuka.",
+   "speaker": "heaven",
+   "style": 84
+  },
+  {
+   "event": "voice.demon.waver",
+   "ja": "心が、揺らいでいるな……",
+   "en": "Your heart is wavering...",
+   "id": "Hatimu sedang goyah...",
+   "speaker": "demon",
+   "style": 21
+  },
+  {
+   "event": "voice.demon.tempt",
+   "ja": "力が欲しいか？ならば、我を受け入れよ。",
+   "en": "Do you want power? Then accept me.",
+   "id": "Kau ingin kekuatan? Maka terimalah aku.",
+   "speaker": "demon",
+   "style": 21
+  },
+  {
+   "event": "voice.demon.win",
+   "ja": "お前の心は、もう我のものだ。",
+   "en": "Your heart already belongs to me.",
+   "id": "Hatimu sudah menjadi milikku.",
+   "speaker": "demon",
+   "style": 21
+  },
+  {
+   "event": "voice.demon.lose",
+   "ja": "くっ……この程度で、我を退けたつもりか……",
+   "en": "Tch... you think this is enough to drive me away...",
+   "id": "Cih... kau kira ini cukup untuk mengusirku...",
+   "speaker": "demon",
+   "style": 21
+  },
+  {
+   "event": "voice.demon.whisper",
+   "ja": "弱き者よ……",
+   "en": "Weakling...",
+   "id": "Wahai yang lemah...",
+   "speaker": "demon",
+   "style": 21
+  },
+  {
+   "event": "voice.boss.awaken",
+   "ja": "我が眠りを妨げるは、何者だ。",
+   "en": "Who dares disturb my slumber?",
+   "id": "Siapa yang berani mengusik tidurku?",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.boss.taunt",
+   "ja": "蟻が、天に挑むか。",
+   "en": "An ant challenges the heavens?",
+   "id": "Seekor semut menantang langit?",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.boss.enraged",
+   "ja": "よかろう……本気を見せてやる！",
+   "en": "Very well... I will show you my true power!",
+   "id": "Baiklah... akan kutunjukkan kekuatan sejatiku!",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.boss.defeat",
+   "ja": "見事……汝こそ、真の強者……",
+   "en": "Splendid... you are truly the strong one...",
+   "id": "Luar biasa... kaulah yang benar-benar kuat...",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.elder.welcome",
+   "ja": "ほっほっ、よく来たのう、若き修行者よ。",
+   "en": "Ho ho, welcome, young cultivator.",
+   "id": "Ho ho, selamat datang, kultivator muda.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.elder.advice",
+   "ja": "焦るでない。道は、一歩ずつ歩むものじゃ。",
+   "en": "Do not rush. The Dao is walked one step at a time.",
+   "id": "Jangan terburu-buru. Dao ditempuh selangkah demi selangkah.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.elder.inheritance",
+   "ja": "この伝承、お主に託そう。",
+   "en": "I entrust this inheritance to you.",
+   "id": "Kuwariskan warisan ini kepadamu.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.rogue.ambush",
+   "ja": "ここで会ったが百年目！その宝、置いていけ！",
+   "en": "At last we meet! Leave your treasures behind!",
+   "id": "Akhirnya kita bertemu! Tinggalkan hartamu!",
+   "speaker": "rogue",
+   "style": 51
+  },
+  {
+   "event": "voice.rogue.flee",
+   "ja": "くっ……覚えていろ！",
+   "en": "Tch... you will remember this!",
+   "id": "Cih... ingat saja ini!",
+   "speaker": "rogue",
+   "style": 51
+  },
+  {
+   "event": "voice.rogue.defeat",
+   "ja": "ば、馬鹿な……",
+   "en": "I-impossible...",
+   "id": "T-tidak mungkin...",
+   "speaker": "rogue",
+   "style": 51
+  },
+  {
+   "event": "voice.disciple.m1.greet",
+   "ja": "師尊！お帰りなさいませ！",
+   "en": "Master! Welcome back!",
+   "id": "Guru! Selamat datang kembali!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.greet",
+   "ja": "師尊！お帰りなさいませ！",
+   "en": "Master! Welcome back!",
+   "id": "Guru! Selamat datang kembali!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.greet",
+   "ja": "師尊！お帰りなさいませ！",
+   "en": "Master! Welcome back!",
+   "id": "Guru! Selamat datang kembali!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.greet",
+   "ja": "師尊！お帰りなさいませ！",
+   "en": "Master! Welcome back!",
+   "id": "Guru! Selamat datang kembali!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.greet",
+   "ja": "師尊！お帰りなさいませ！",
+   "en": "Master! Welcome back!",
+   "id": "Guru! Selamat datang kembali!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.greet",
+   "ja": "師尊！お帰りなさいませ！",
+   "en": "Master! Welcome back!",
+   "id": "Guru! Selamat datang kembali!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.greet_alt",
+   "ja": "師尊、ご機嫌麗しゅう。",
+   "en": "Master, I hope you are well.",
+   "id": "Guru, semoga Guru sehat selalu.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.greet_alt",
+   "ja": "師尊、ご機嫌麗しゅう。",
+   "en": "Master, I hope you are well.",
+   "id": "Guru, semoga Guru sehat selalu.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.greet_alt",
+   "ja": "師尊、ご機嫌麗しゅう。",
+   "en": "Master, I hope you are well.",
+   "id": "Guru, semoga Guru sehat selalu.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.greet_alt",
+   "ja": "師尊、ご機嫌麗しゅう。",
+   "en": "Master, I hope you are well.",
+   "id": "Guru, semoga Guru sehat selalu.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.greet_alt",
+   "ja": "師尊、ご機嫌麗しゅう。",
+   "en": "Master, I hope you are well.",
+   "id": "Guru, semoga Guru sehat selalu.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.greet_alt",
+   "ja": "師尊、ご機嫌麗しゅう。",
+   "en": "Master, I hope you are well.",
+   "id": "Guru, semoga Guru sehat selalu.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.thanks",
+   "ja": "ご指導、感謝いたします！",
+   "en": "Thank you for your guidance!",
+   "id": "Terima kasih atas bimbingannya!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.thanks",
+   "ja": "ご指導、感謝いたします！",
+   "en": "Thank you for your guidance!",
+   "id": "Terima kasih atas bimbingannya!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.thanks",
+   "ja": "ご指導、感謝いたします！",
+   "en": "Thank you for your guidance!",
+   "id": "Terima kasih atas bimbingannya!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.thanks",
+   "ja": "ご指導、感謝いたします！",
+   "en": "Thank you for your guidance!",
+   "id": "Terima kasih atas bimbingannya!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.thanks",
+   "ja": "ご指導、感謝いたします！",
+   "en": "Thank you for your guidance!",
+   "id": "Terima kasih atas bimbingannya!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.thanks",
+   "ja": "ご指導、感謝いたします！",
+   "en": "Thank you for your guidance!",
+   "id": "Terima kasih atas bimbingannya!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.breakthrough",
+   "ja": "やった！弟子、突破いたしました！",
+   "en": "I did it! This disciple has broken through!",
+   "id": "Berhasil! Murid ini telah menerobos!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.breakthrough",
+   "ja": "やった！弟子、突破いたしました！",
+   "en": "I did it! This disciple has broken through!",
+   "id": "Berhasil! Murid ini telah menerobos!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.breakthrough",
+   "ja": "やった！弟子、突破いたしました！",
+   "en": "I did it! This disciple has broken through!",
+   "id": "Berhasil! Murid ini telah menerobos!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.breakthrough",
+   "ja": "やった！弟子、突破いたしました！",
+   "en": "I did it! This disciple has broken through!",
+   "id": "Berhasil! Murid ini telah menerobos!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.breakthrough",
+   "ja": "やった！弟子、突破いたしました！",
+   "en": "I did it! This disciple has broken through!",
+   "id": "Berhasil! Murid ini telah menerobos!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.breakthrough",
+   "ja": "やった！弟子、突破いたしました！",
+   "en": "I did it! This disciple has broken through!",
+   "id": "Berhasil! Murid ini telah menerobos!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.cheer",
+   "ja": "さすが師尊！",
+   "en": "As expected of Master!",
+   "id": "Memang hebat, Guru!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.cheer",
+   "ja": "さすが師尊！",
+   "en": "As expected of Master!",
+   "id": "Memang hebat, Guru!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.cheer",
+   "ja": "さすが師尊！",
+   "en": "As expected of Master!",
+   "id": "Memang hebat, Guru!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.cheer",
+   "ja": "さすが師尊！",
+   "en": "As expected of Master!",
+   "id": "Memang hebat, Guru!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.cheer",
+   "ja": "さすが師尊！",
+   "en": "As expected of Master!",
+   "id": "Memang hebat, Guru!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.cheer",
+   "ja": "さすが師尊！",
+   "en": "As expected of Master!",
+   "id": "Memang hebat, Guru!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.careful",
+   "ja": "師尊、お気をつけて！",
+   "en": "Master, be careful!",
+   "id": "Guru, hati-hati!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 33
+  },
+  {
+   "event": "voice.disciple.m2.careful",
+   "ja": "師尊、お気をつけて！",
+   "en": "Master, be careful!",
+   "id": "Guru, hati-hati!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.careful",
+   "ja": "師尊、お気をつけて！",
+   "en": "Master, be careful!",
+   "id": "Guru, hati-hati!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.careful",
+   "ja": "師尊、お気をつけて！",
+   "en": "Master, be careful!",
+   "id": "Guru, hati-hati!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.careful",
+   "ja": "師尊、お気をつけて！",
+   "en": "Master, be careful!",
+   "id": "Guru, hati-hati!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.careful",
+   "ja": "師尊、お気をつけて！",
+   "en": "Master, be careful!",
+   "id": "Guru, hati-hati!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.protect",
+   "ja": "宗門を守れ！",
+   "en": "Protect the sect!",
+   "id": "Lindungi sekte!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.protect",
+   "ja": "宗門を守れ！",
+   "en": "Protect the sect!",
+   "id": "Lindungi sekte!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.protect",
+   "ja": "宗門を守れ！",
+   "en": "Protect the sect!",
+   "id": "Lindungi sekte!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.protect",
+   "ja": "宗門を守れ！",
+   "en": "Protect the sect!",
+   "id": "Lindungi sekte!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.protect",
+   "ja": "宗門を守れ！",
+   "en": "Protect the sect!",
+   "id": "Lindungi sekte!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.protect",
+   "ja": "宗門を守れ！",
+   "en": "Protect the sect!",
+   "id": "Lindungi sekte!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.attack",
+   "ja": "くらえ！",
+   "en": "Take this!",
+   "id": "Rasakan ini!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.attack",
+   "ja": "くらえ！",
+   "en": "Take this!",
+   "id": "Rasakan ini!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.attack",
+   "ja": "くらえ！",
+   "en": "Take this!",
+   "id": "Rasakan ini!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.attack",
+   "ja": "くらえ！",
+   "en": "Take this!",
+   "id": "Rasakan ini!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.attack",
+   "ja": "くらえ！",
+   "en": "Take this!",
+   "id": "Rasakan ini!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.attack",
+   "ja": "くらえ！",
+   "en": "Take this!",
+   "id": "Rasakan ini!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.attack_alt",
+   "ja": "はぁっ！",
+   "en": "Haah!",
+   "id": "Haah!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.attack_alt",
+   "ja": "はぁっ！",
+   "en": "Haah!",
+   "id": "Haah!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.attack_alt",
+   "ja": "はぁっ！",
+   "en": "Haah!",
+   "id": "Haah!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.attack_alt",
+   "ja": "はぁっ！",
+   "en": "Haah!",
+   "id": "Haah!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.attack_alt",
+   "ja": "はぁっ！",
+   "en": "Haah!",
+   "id": "Haah!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.attack_alt",
+   "ja": "はぁっ！",
+   "en": "Haah!",
+   "id": "Haah!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.technique",
+   "ja": "奥義、発動！",
+   "en": "Secret art, unleash!",
+   "id": "Jurus rahasia, lepaskan!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.technique",
+   "ja": "奥義、発動！",
+   "en": "Secret art, unleash!",
+   "id": "Jurus rahasia, lepaskan!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.technique",
+   "ja": "奥義、発動！",
+   "en": "Secret art, unleash!",
+   "id": "Jurus rahasia, lepaskan!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.technique",
+   "ja": "奥義、発動！",
+   "en": "Secret art, unleash!",
+   "id": "Jurus rahasia, lepaskan!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.technique",
+   "ja": "奥義、発動！",
+   "en": "Secret art, unleash!",
+   "id": "Jurus rahasia, lepaskan!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.technique",
+   "ja": "奥義、発動！",
+   "en": "Secret art, unleash!",
+   "id": "Jurus rahasia, lepaskan!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.victory",
+   "ja": "勝ちました、師尊！",
+   "en": "We won, Master!",
+   "id": "Kita menang, Guru!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.victory",
+   "ja": "勝ちました、師尊！",
+   "en": "We won, Master!",
+   "id": "Kita menang, Guru!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.victory",
+   "ja": "勝ちました、師尊！",
+   "en": "We won, Master!",
+   "id": "Kita menang, Guru!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.victory",
+   "ja": "勝ちました、師尊！",
+   "en": "We won, Master!",
+   "id": "Kita menang, Guru!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.victory",
+   "ja": "勝ちました、師尊！",
+   "en": "We won, Master!",
+   "id": "Kita menang, Guru!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.victory",
+   "ja": "勝ちました、師尊！",
+   "en": "We won, Master!",
+   "id": "Kita menang, Guru!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.fear",
+   "ja": "ひ、ひぃっ……強すぎる……",
+   "en": "Eek... it is too strong...",
+   "id": "Hiii... terlalu kuat...",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 33
+  },
+  {
+   "event": "voice.disciple.m2.fear",
+   "ja": "ひ、ひぃっ……強すぎる……",
+   "en": "Eek... it is too strong...",
+   "id": "Hiii... terlalu kuat...",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.fear",
+   "ja": "ひ、ひぃっ……強すぎる……",
+   "en": "Eek... it is too strong...",
+   "id": "Hiii... terlalu kuat...",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.fear",
+   "ja": "ひ、ひぃっ……強すぎる……",
+   "en": "Eek... it is too strong...",
+   "id": "Hiii... terlalu kuat...",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.fear",
+   "ja": "ひ、ひぃっ……強すぎる……",
+   "en": "Eek... it is too strong...",
+   "id": "Hiii... terlalu kuat...",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.fear",
+   "ja": "ひ、ひぃっ……強すぎる……",
+   "en": "Eek... it is too strong...",
+   "id": "Hiii... terlalu kuat...",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.tired",
+   "ja": "少し、休ませてください……",
+   "en": "Please let me rest a little...",
+   "id": "Izinkan saya istirahat sebentar...",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.tired",
+   "ja": "少し、休ませてください……",
+   "en": "Please let me rest a little...",
+   "id": "Izinkan saya istirahat sebentar...",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.tired",
+   "ja": "少し、休ませてください……",
+   "en": "Please let me rest a little...",
+   "id": "Izinkan saya istirahat sebentar...",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.tired",
+   "ja": "少し、休ませてください……",
+   "en": "Please let me rest a little...",
+   "id": "Izinkan saya istirahat sebentar...",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.tired",
+   "ja": "少し、休ませてください……",
+   "en": "Please let me rest a little...",
+   "id": "Izinkan saya istirahat sebentar...",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.tired",
+   "ja": "少し、休ませてください……",
+   "en": "Please let me rest a little...",
+   "id": "Izinkan saya istirahat sebentar...",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.cultivate",
+   "ja": "修行あるのみ！",
+   "en": "Nothing but cultivation!",
+   "id": "Hanya ada latihan!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.cultivate",
+   "ja": "修行あるのみ！",
+   "en": "Nothing but cultivation!",
+   "id": "Hanya ada latihan!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.cultivate",
+   "ja": "修行あるのみ！",
+   "en": "Nothing but cultivation!",
+   "id": "Hanya ada latihan!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.cultivate",
+   "ja": "修行あるのみ！",
+   "en": "Nothing but cultivation!",
+   "id": "Hanya ada latihan!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.cultivate",
+   "ja": "修行あるのみ！",
+   "en": "Nothing but cultivation!",
+   "id": "Hanya ada latihan!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.cultivate",
+   "ja": "修行あるのみ！",
+   "en": "Nothing but cultivation!",
+   "id": "Hanya ada latihan!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.loyal",
+   "ja": "この命、師尊に捧げます！",
+   "en": "I offer my life to you, Master!",
+   "id": "Nyawa ini kupersembahkan untuk Guru!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.loyal",
+   "ja": "この命、師尊に捧げます！",
+   "en": "I offer my life to you, Master!",
+   "id": "Nyawa ini kupersembahkan untuk Guru!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.loyal",
+   "ja": "この命、師尊に捧げます！",
+   "en": "I offer my life to you, Master!",
+   "id": "Nyawa ini kupersembahkan untuk Guru!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.loyal",
+   "ja": "この命、師尊に捧げます！",
+   "en": "I offer my life to you, Master!",
+   "id": "Nyawa ini kupersembahkan untuk Guru!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.loyal",
+   "ja": "この命、師尊に捧げます！",
+   "en": "I offer my life to you, Master!",
+   "id": "Nyawa ini kupersembahkan untuk Guru!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.loyal",
+   "ja": "この命、師尊に捧げます！",
+   "en": "I offer my life to you, Master!",
+   "id": "Nyawa ini kupersembahkan untuk Guru!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.formation",
+   "ja": "陣法、準備完了です！",
+   "en": "The formation is ready!",
+   "id": "Formasi sudah siap!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.formation",
+   "ja": "陣法、準備完了です！",
+   "en": "The formation is ready!",
+   "id": "Formasi sudah siap!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.formation",
+   "ja": "陣法、準備完了です！",
+   "en": "The formation is ready!",
+   "id": "Formasi sudah siap!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.formation",
+   "ja": "陣法、準備完了です！",
+   "en": "The formation is ready!",
+   "id": "Formasi sudah siap!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.formation",
+   "ja": "陣法、準備完了です！",
+   "en": "The formation is ready!",
+   "id": "Formasi sudah siap!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.formation",
+   "ja": "陣法、準備完了です！",
+   "en": "The formation is ready!",
+   "id": "Formasi sudah siap!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.injured",
+   "ja": "うっ……まだ、戦えます……",
+   "en": "Ugh... I can still fight...",
+   "id": "Ugh... saya masih bisa bertarung...",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.injured",
+   "ja": "うっ……まだ、戦えます……",
+   "en": "Ugh... I can still fight...",
+   "id": "Ugh... saya masih bisa bertarung...",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.injured",
+   "ja": "うっ……まだ、戦えます……",
+   "en": "Ugh... I can still fight...",
+   "id": "Ugh... saya masih bisa bertarung...",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.injured",
+   "ja": "うっ……まだ、戦えます……",
+   "en": "Ugh... I can still fight...",
+   "id": "Ugh... saya masih bisa bertarung...",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.injured",
+   "ja": "うっ……まだ、戦えます……",
+   "en": "Ugh... I can still fight...",
+   "id": "Ugh... saya masih bisa bertarung...",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.injured",
+   "ja": "うっ……まだ、戦えます……",
+   "en": "Ugh... I can still fight...",
+   "id": "Ugh... saya masih bisa bertarung...",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.farewell",
+   "ja": "いってらっしゃいませ、師尊。",
+   "en": "Have a safe journey, Master.",
+   "id": "Selamat jalan, Guru.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.farewell",
+   "ja": "いってらっしゃいませ、師尊。",
+   "en": "Have a safe journey, Master.",
+   "id": "Selamat jalan, Guru.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.farewell",
+   "ja": "いってらっしゃいませ、師尊。",
+   "en": "Have a safe journey, Master.",
+   "id": "Selamat jalan, Guru.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.farewell",
+   "ja": "いってらっしゃいませ、師尊。",
+   "en": "Have a safe journey, Master.",
+   "id": "Selamat jalan, Guru.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.farewell",
+   "ja": "いってらっしゃいませ、師尊。",
+   "en": "Have a safe journey, Master.",
+   "id": "Selamat jalan, Guru.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.farewell",
+   "ja": "いってらっしゃいませ、師尊。",
+   "en": "Have a safe journey, Master.",
+   "id": "Selamat jalan, Guru.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  }
+ ],
+ "disciple_voices": {
+  "m1": "白上虎太郎",
+  "m2": "玄野武宏",
+  "m3": "雀松朱司",
+  "f1": "四国めたん",
+  "f2": "春日部つむぎ",
+  "f3": "小夜/SAYO"
+ }
+}

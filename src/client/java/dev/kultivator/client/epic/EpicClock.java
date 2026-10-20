@@ -33,6 +33,8 @@ public final class EpicClock {
 	private static long ticks;
 	/** Presentation time in ticks (advances by σ per tick). */
 	private static double time;
+	/** Phase 30: the running window is bullet time (σ below 0.1). */
+	private static boolean bullet;
 
 	/** Asks for a slow-motion window; dropped when a higher one runs, too soon after the last, or switched off. */
 	public static boolean request(float slow, int in, int hold, int out, int prio) {
@@ -50,6 +52,7 @@ public final class EpicClock {
 			hold = Math.max(0, MAX_WINDOW - Math.max(1, in) - Math.max(1, out));
 		}
 		target = Math.max(0.1F, Math.min(1.0F, slow));
+		bullet = false;
 		inTicks = Math.max(1, in);
 		holdTicks = Math.max(0, hold);
 		outTicks = Math.max(1, out);
@@ -57,6 +60,46 @@ public final class EpicClock {
 		phase = 1;
 		priority = prio;
 		return true;
+	}
+
+	/**
+	 * Phase 30 (DESIGN 30.2.9): bullet time, a window at σ 0.03-0.1 (below the 0.1 floor of {@link #request}) for ≤ 30 real
+	 * ticks (2 in, hold, 6 out), ≥ 6 s after the last window. While it holds below σ 0.15 the integer-keyed presentation
+	 * clocks read {@link #frozen()} as true (props, display layers, the ultimate drivers), while the film camera keeps
+	 * moving in real time: that is the bullet-time look. Vanilla entities, particles and the server never slow.
+	 */
+	public static boolean bullet(float slow, int realTicks, int prio) {
+		if (!enabled()) {
+			return false;
+		}
+		if (active() && prio < priority) {
+			return false;
+		}
+		if (!active() && ticks - lastWindowEnd < MIN_GAP) {
+			return false;
+		}
+		int in = 2;
+		int out = 6;
+		int hold = Math.max(0, Math.min(MAX_WINDOW, realTicks) - in - out);
+		target = Math.max(0.03F, Math.min(0.1F, slow));
+		inTicks = in;
+		holdTicks = hold;
+		outTicks = out;
+		age = 0;
+		phase = 1;
+		priority = prio;
+		bullet = true;
+		return true;
+	}
+
+	/** True while a bullet-time window runs. */
+	public static boolean bulletTime() {
+		return bullet && phase != 0;
+	}
+
+	/** True while a hit-stop holds σ at 0 (the film camera holds too; bullet time does not stop it). */
+	public static boolean hitStopped() {
+		return hitLeft > 0;
 	}
 
 	/** A Gerak lambat window of {@code realTicks} at σ 0.35 (≤ 1.5 s). */
@@ -90,6 +133,7 @@ public final class EpicClock {
 	public static void reset() {
 		sigma = 1.0F;
 		phase = 0;
+		bullet = false;
 		priority = -1;
 		hitLeft = 0;
 		hitRamp = 0;
@@ -117,6 +161,7 @@ public final class EpicClock {
 			} else {
 				phase = 0;
 				priority = -1;
+				bullet = false;
 				lastWindowEnd = ticks;
 			}
 		}
@@ -155,7 +200,7 @@ public final class EpicClock {
 	 * {@code ModelFx}, {@code DisplayRun} layers, the {@code FireUltimates} clock) hold their frame while this is true.
 	 */
 	public static boolean frozen() {
-		return hitLeft > 0;
+		return hitLeft > 0 || bullet && phase != 0 && sigma < 0.15F;
 	}
 
 	private static boolean active() {

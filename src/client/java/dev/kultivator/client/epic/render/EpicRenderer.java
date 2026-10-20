@@ -35,7 +35,9 @@ public final class EpicRenderer {
 
 	/** The {@code COLLECT_SUBMITS} listener. */
 	public static void collect(LevelRenderContext context) {
-		if (!EpicDirector.anyGeometry()) {
+		// Phase 30 (DESIGN 30.2.7, 30.2.8): the film's heat haze and Langit Kosmik draw here too (one boolean each while idle)
+		boolean film = dev.kultivator.client.epic.cosmic.CosmicSky.active() || dev.kultivator.client.epic.lens.HeatHaze.active();
+		if (!EpicDirector.anyGeometry() && !film) {
 			return;
 		}
 		if (ShaderCompat.shadowPass()) {
@@ -58,6 +60,10 @@ public final class EpicRenderer {
 				}
 			}
 			FRAME.flush();
+			if (film) {
+				dev.kultivator.client.epic.cosmic.CosmicSky.render(FRAME);
+				dev.kultivator.client.epic.lens.HeatHaze.render(FRAME);
+			}
 		} catch (RuntimeException exception) {
 			EpicDirector.warn("render", exception);
 			FRAME.clear();
@@ -272,7 +278,8 @@ public final class EpicRenderer {
 		private int count;
 		private final SubmitNodeCollector.CustomGeometryRenderer writer = this::write;
 
-		Sink(RenderType type, boolean entity) {
+		/** A sink of one render type; {@code entity} = the entity vertex format (UV, overlay, light, normal). */
+		public Sink(RenderType type, boolean entity) {
 			this.type = type;
 			this.entity = entity;
 		}
@@ -300,16 +307,31 @@ public final class EpicRenderer {
 			count++;
 		}
 
+		/**
+		 * Appends a reversed copy of every quad written so far (for culled pipelines such as the see-through text and the
+		 * end portal, whose quads must show from either side). Phase 30 (DESIGN 30.2.8).
+		 */
+		public void doubleSided() {
+			int quads = count / 4;
+			for (int q = 0; q < quads; q++) {
+				for (int k = 3; k >= 0; k--) {
+					int i = q * 4 + k;
+					int o = i * STRIDE;
+					vertex(data[o], data[o + 1], data[o + 2], data[o + 3], data[o + 4], colors[i], data[o + 5], data[o + 6], data[o + 7]);
+				}
+			}
+		}
+
 		/** Vertices written so far (a quad is 4). */
 		public int vertices() {
 			return count;
 		}
 
-		void reset() {
+		public void reset() {
 			count = 0;
 		}
 
-		void submit(net.minecraft.client.renderer.OrderedSubmitNodeCollector collector) {
+		public void submit(net.minecraft.client.renderer.OrderedSubmitNodeCollector collector) {
 			if (count < 4) {
 				return;
 			}

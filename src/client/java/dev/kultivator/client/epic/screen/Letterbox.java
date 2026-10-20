@@ -81,7 +81,12 @@ public final class Letterbox {
 		float eased = amount * amount * (3.0F - 2.0F * amount);
 		int width = g.guiWidth();
 		int height = g.guiHeight();
-		int bar = Math.round(height * HEIGHT * eased);
+		float share = HEIGHT;
+		if (dev.kultivator.client.epic.camera.CinematicDirector.filmShooting()) {
+			// Phase 30 (DESIGN 30.2.7 LETTERBOX): the film ratio 2.39:1, recomputed from the window aspect
+			share = Math.max(HEIGHT, Math.min(0.2F, (height - width / 2.39F) / 2.0F / Math.max(1, height)));
+		}
+		int bar = Math.round(height * share * eased);
 		if (bar <= 0) {
 			return;
 		}

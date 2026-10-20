@@ -30,6 +30,13 @@ public final class FxModels {
 	public record Info(float scale, Axis axis, boolean glow, int color, int color2, float baseY, List<Part> parts) {
 	}
 
+	/**
+	 * Where a driver registers the Info rows of its models (DESIGN 30.5 C30.1): {@code UltimatesA.models(FxModels::put)}.
+	 */
+	public interface Sink {
+		void put(String id, float scale, Axis axis, boolean glow, int color, int color2, float baseY, Part... parts);
+	}
+
 	private static final Info DEFAULT = new Info(1.0F, Axis.NORTH, true, 0xFFE88A, 0xFFFFFF, -0.5F, List.of());
 	private static final Map<String, Info> INFO = new HashMap<>();
 
@@ -191,6 +198,9 @@ public final class FxModels {
 		put("star_core", 2.0F, north, true, 0xE8F0FF, 0xB57CFF, -0.58F);
 		put("yishan_seal", 8.0F, north, true, 0x5FD6A0, 0xFFD54A, 0.0F);
 		put("missing", 1.0F, north, true, 0xFFD54A, 0xFFFFFF, -0.25F);
+		// Phase 30 (DESIGN 30.5 C30.1): the model rows of the new ultimate drivers
+		UltimatesA.models(FxModels::put);
+		UltimatesB.models(FxModels::put);
 	}
 
 	/** The child parts of exactly this model id (a family's variants and pieces get none). */

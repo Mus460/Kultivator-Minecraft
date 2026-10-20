@@ -224,6 +224,7 @@ public final class ProtectiveFormations {
 			sound(level, centre, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 0.9F);
 			sendDome(level, formation, 1, 1);
 			Msg.chat(player, Component.translatable("kultivator.formations.awakened", duration(formation.power())).withStyle(ChatFormatting.GREEN));
+			dev.kultivator.voice.VoiceHooks.formationReady(player, centre);
 		} else if (charged) {
 			sound(level, centre, SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.0F);
 			sound(level, centre, SoundEvents.RESPAWN_ANCHOR_CHARGE, 0.6F, 1.4F);

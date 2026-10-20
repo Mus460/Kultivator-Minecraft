@@ -3,6 +3,7 @@ package dev.kultivator.client.anim.model;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.anim.ClientBinds;
+import dev.kultivator.client.epic.film.FilmDirector;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.network.Payloads;
@@ -48,6 +49,16 @@ public final class ArtModels {
 				if (caster != null) {
 					endCast(caster.getId());
 				}
+				return;
+			}
+			// Phase 30 (DESIGN 30.5 C30.1): the new ultimate drivers own their specs' props and choreography
+			String id = spec.id();
+			if (UltimatesA.handles(id)) {
+				UltimatesA.onTechFx(p, spec, phase, caster);
+				return;
+			}
+			if (UltimatesB.handles(id)) {
+				UltimatesB.onTechFx(p, spec, phase, caster);
 				return;
 			}
 			place(new Ev(p, spec, phase, caster));
@@ -251,6 +262,91 @@ public final class ArtModels {
 		}
 		CAST_PROPS.remove(casterId);
 		FireUltimates.abort(casterId);
+		UltimatesA.abort(casterId);
+		UltimatesB.abort(casterId);
+	}
+
+	// ================================================================ Phase 30: the films of the two Fire ultimates
+
+	/** A fixed film prop (the lotus centre, a sun). */
+	private record FixedTrack(Vec3 at, float facing, long until) implements FilmDirector.Track {
+		@Override
+		public Vec3 pos(float partial) {
+			return at;
+		}
+
+		@Override
+		public float yaw(float partial) {
+			return facing;
+		}
+
+		@Override
+		public float pitch(float partial) {
+			return 0.0F;
+		}
+
+		@Override
+		public boolean alive() {
+			Minecraft minecraft = Minecraft.getInstance();
+			return minecraft.level != null && minecraft.level.getGameTime() < until;
+		}
+	}
+
+	/** The golden crow circling the middle sun (radius 4.5 b, one turn in 3 s), facing along its path. */
+	private record CrowTrack(Vec3 sun, long until) implements FilmDirector.Track {
+		private double angle(float partial) {
+			return dev.kultivator.client.epic.EpicClock.time(partial) * (Math.PI * 2.0D / 60.0D);
+		}
+
+		@Override
+		public Vec3 pos(float partial) {
+			double a = angle(partial);
+			return sun.add(Math.cos(a) * 4.5D, Math.sin(a * 2.0D) * 0.6D, Math.sin(a) * 4.5D);
+		}
+
+		@Override
+		public float yaw(float partial) {
+			double a = angle(partial);
+			// the tangent (−sin a, cos a) as a Minecraft yaw (forward = (−sin yaw, cos yaw))
+			return (float) Math.toDegrees(Math.atan2(Math.sin(a), Math.cos(a)));
+		}
+
+		@Override
+		public float pitch(float partial) {
+			return 0.0F;
+		}
+
+		@Override
+		public boolean alive() {
+			Minecraft minecraft = Minecraft.getInstance();
+			return minecraft.level != null && minecraft.level.getGameTime() < until;
+		}
+	}
+
+	/**
+	 * Phase 30 (DESIGN 30.5 C30.2): starts the film of {@code emperor_flame} or {@code nine_suns_heavens_fury} for the
+	 * local player's own cast and reports the props {@code FireUltimates} draws (positions computed from the events, its
+	 * code untouched). The props never depend on whether the film plays.
+	 */
+	private static void fireFilm(Ev ev, Vec3 aim, int fallbackK) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.player == null || ev.caster() != minecraft.player || ev.p().has(Payloads.TechFx.FLAG_DISCIPLE)
+				|| minecraft.level == null) {
+			return;
+		}
+		long until = minecraft.level.getGameTime() + 20L * 40L;
+		int casterId = ev.casterId();
+		if ("emperor_flame".equals(ev.spec().id())) {
+			FilmDirector.track(casterId, "lotus", new FixedTrack(ev.pos(), ev.yaw(), until));
+		} else {
+			Vec3 sun = aim.add(0.0D, 24.0D, 0.0D);
+			FilmDirector.track(casterId, "crow", new CrowTrack(sun, until));
+			FilmDirector.track(casterId, "sun", new FixedTrack(sun, ev.yaw(), until));
+		}
+		dev.kultivator.technique.spec.dsl.Dampak d = ev.spec().dampak();
+		int climaxIn = d != null && d.climaxAt() > 0 ? d.climaxAt() : fallbackK;
+		FilmDirector.play(ev.spec().id(), new FilmDirector.Ctx(casterId, ev.spec().id(), ev.casterPos(), aim, ev.yaw(), ev.p().seed(), climaxIn,
+				ev.duration()));
 	}
 
 	private static AnimStep step(Anim kind, int start, int duration, float a, float b) {
@@ -583,6 +679,7 @@ public final class ArtModels {
 				if (charge) {
 					Vec3 aim = ev.hasTo() ? ev.to() : ev.casterPos().add(ev.forward().scale(16.0D));
 					FireUltimates.sunsCharge(ev.casterId(), aim, ev.duration() > 0 ? ev.duration() : 60, sun);
+					fireFilm(ev, aim, 60);
 				} else if (travel && ev.preImpact() && ev.hasTo()) {
 					FireUltimates.sunsFall(ev.casterId(), ev.to(), ev.fall(), sun);
 				} else if (impact) {
@@ -595,6 +692,7 @@ public final class ArtModels {
 				// FireUltimates: the glass lotus (bud, bloom, flame field, fold) at the field's centre; EXTRA0 is the nova
 				if (cast) {
 					FireUltimates.lotus(ev.casterId(), ev.pos(), ev.p().radius(), ev.duration());
+					fireFilm(ev, ev.pos(), 400);
 				} else if (phase == Phase.PULSE) {
 					FireUltimates.lotusPulse(ev.casterId());
 				} else if (phase == Phase.EXTRA0) {

@@ -1577,6 +1577,7 @@ public abstract class Caster implements CastContext {
 			flags |= Payloads.TechFx.FLAG_STAGE;
 			aux = stage - 1;
 		}
+		dev.kultivator.voice.VoiceHooks.techCast(caster, spec, phase, parent == null && !echo && !options.showcase());
 		byte tier = (byte) ((Math.max(0, Math.min(7, visualTier)) & 7) | (Math.max(0, Math.min(7, parent == null ? mastery : 0)) << 3));
 		Payloads.TechFx payload = new Payloads.TechFx(spec.netId(), (byte) phase.ordinal(), at.x, at.y, at.z, to.x, to.y, to.z, clean(radius),
 				clean(length), tier, (short) flags, (short) Math.max(0, Math.min(Short.MAX_VALUE, count)), (int) (seed ^ (seed >>> 32)), caster.getId(),
