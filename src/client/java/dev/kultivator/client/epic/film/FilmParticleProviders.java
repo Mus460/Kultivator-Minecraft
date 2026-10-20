@@ -100,6 +100,35 @@ public final class FilmParticleProviders {
 		return particle != null;
 	}
 
+	/**
+	 * Spawns one film particle outside a film (DESIGN 31.8 C31.4, the Aura Kultivasi): like {@link #spawn} but without the
+	 * per-shot cap, which only resets inside films. The vanilla "Particles" setting and {@link FxBudget} (at
+	 * {@code priority}) still apply. Returns false when refused.
+	 */
+	public static boolean spawnAmbient(SimpleParticleType type, Vec3 pos, Vec3 velocity, int rgb, float size, int life, FxBudget.Priority priority) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (!ready || minecraft.level == null) {
+			return false;
+		}
+		int option = minecraft.options.particles().get().ordinal();
+		if (option == 2 || option == 1 && (minecraft.level.getGameTime() & 1L) == 1L) {
+			// "Particles: Minimal" draws none of them, "Decreased" every other tick's
+			return false;
+		}
+		int cost = FxBudget.cost(life);
+		int granted = FxBudget.take(cost, priority);
+		if (granted < cost) {
+			FxBudget.refund(granted);
+			return false;
+		}
+		Particle particle = minecraft.particleEngine.createParticle(type, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z);
+		if (particle instanceof FilmParticle film) {
+			film.configure(rgb, size, life);
+			return true;
+		}
+		return particle != null;
+	}
+
 	/** A ring of {@code n} particles around {@code centre} (radius r, flat), moving outward at {@code speed} b/tick. */
 	public static void ring(SimpleParticleType type, Vec3 centre, double r, int n, double speed, int rgb, float size, int life) {
 		for (int i = 0; i < n; i++) {

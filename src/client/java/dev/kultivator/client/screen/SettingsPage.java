@@ -35,6 +35,7 @@ final class SettingsPage extends Page {
 	private static final long CONFIRM_MILLIS = 3000L;
 	private static final String C = "kultivator.codex.settings.";
 	private static final String G = "kultivator.goals.settings.";
+	private static final String AURA = "kultivator.aura.setting.";
 
 	private long hardcoreAskUntil;
 	private int leftW;
@@ -167,6 +168,29 @@ final class SettingsPage extends Page {
 		cy = coin(cy, row, coin, "release_cast", EffectQuality::releaseCast, EffectQuality::setReleaseCast);
 		cy = coin(cy, row, coin, "reduce_motion", EffectQuality::reduceMotion, EffectQuality::setReduceMotion);
 
+		// Aura Kultivasi (DESIGN 31.5): the aura mode cycles like "Efek pemain lain"; others' auras and the hum are coins.
+		cy += 2;
+		heading(cy, AURA + "heading");
+		cy += 15;
+		TalismanButton auraMode = new TalismanButton(rightX + 2, cy, rightW - 6, coin + 2, () -> Component.translatable(AURA + "mode",
+				Component.translatable(AURA + "mode." + dev.kultivator.client.aura.AuraSettings.mode().id())));
+		auraMode.onPress(dev.kultivator.client.aura.AuraSettings::cycleMode);
+		auraMode.tooltip(SettingsPage::auraModeTooltip);
+		put(auraMode, cy);
+		cy += row + 2;
+		JadeCoin auraOthers = new JadeCoin(rightX + 2, cy, rightW - 6, coin, () -> Component.translatable(AURA + "others"),
+				dev.kultivator.client.aura.AuraSettings::others);
+		auraOthers.onPress(() -> dev.kultivator.client.aura.AuraSettings.setOthers(!dev.kultivator.client.aura.AuraSettings.others()));
+		auraOthers.tooltip(() -> List.of(Component.translatable(AURA + "others"), Component.translatable(AURA + "others.tip").withStyle(ChatFormatting.GRAY)));
+		put(auraOthers, cy);
+		cy += row;
+		JadeCoin auraHum = new JadeCoin(rightX + 2, cy, rightW - 6, coin, () -> Component.translatable(AURA + "hum"),
+				dev.kultivator.client.aura.AuraSettings::hum);
+		auraHum.onPress(() -> dev.kultivator.client.aura.AuraSettings.setHum(!dev.kultivator.client.aura.AuraSettings.hum()));
+		auraHum.tooltip(() -> List.of(Component.translatable(AURA + "hum"), Component.translatable(AURA + "hum.tip").withStyle(ChatFormatting.GRAY)));
+		put(auraHum, cy);
+		cy += row;
+
 		// Phase 7 HUD comfort (DESIGN 19.3.15): the cooldown ping, the meditation danger alert and the guide tracker.
 		cy += 2;
 		heading(cy, G + "heading");
@@ -229,6 +253,22 @@ final class SettingsPage extends Page {
 			}
 		}
 		columnHeight = cy - y + 4;
+	}
+
+	/** The Aura Kultivasi mode row's tooltip: the modes, then the aura of your current realm and its Sumber line. */
+	private static List<Component> auraModeTooltip() {
+		List<Component> lines = new ArrayList<>();
+		lines.add(Component.translatable(AURA + "mode", Component.translatable(AURA + "mode." + dev.kultivator.client.aura.AuraSettings.mode().id())));
+		lines.add(Component.translatable(AURA + "mode.tip").withStyle(ChatFormatting.GRAY));
+		net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+		if (minecraft.player != null) {
+			String realm = dev.kultivator.client.ClientCultivation.visual(minecraft.player).realmEnum().id();
+			lines.add(Component.translatable(AURA + "mode.current", Component.translatable("kultivator.aura.realm." + realm + ".name"))
+					.withStyle(ChatFormatting.GOLD));
+			lines.add(Component.translatable("kultivator.aura.realm." + realm + ".desc").withStyle(ChatFormatting.GRAY));
+			lines.add(Component.translatable("kultivator.aura.realm." + realm + ".source").withStyle(ChatFormatting.DARK_GRAY));
+		}
+		return lines;
 	}
 
 	private int goalCoin(int cy, int row, int coin, String key, BooleanSupplier value, Consumer<Boolean> set) {

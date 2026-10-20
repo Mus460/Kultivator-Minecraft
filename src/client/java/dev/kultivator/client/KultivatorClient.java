@@ -71,6 +71,8 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.abadi.AbadiClient.registerRenderers();
 		dev.kultivator.client.purba.PurbaClient.registerRenderers();
 		dev.kultivator.client.batin.BatinClient.registerRenderers();
+		// Aura Kultivasi (DESIGN 31): after SpecFx.init, so its quads are collected after QuadFx's.
+		dev.kultivator.client.aura.AuraClient.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));

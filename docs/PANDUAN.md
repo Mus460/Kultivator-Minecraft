@@ -106,6 +106,8 @@ bulat di dalam game.
 59. [**Film Spektakuler dan Hancur Total**](#59-film-spektakuler-dan-hancur-total): Kamera Spektakuler, lapisan
     lensa, Langit Kosmik, waktu beku, pamungkas yang diperbarui, Hancur Total, [perintah](#596-perintah-client-sinematik-tanpa-cheat)
 60. [**Suara Bicara (Jepang)**](#60-suara-bicara-jepang): siapa berbicara, pengaturan, kredit VOICEVOX
+61. [**Aura Kultivasi**](#61-aura-kultivasi): aura yang berbeda di setiap ranah dan tumbuh di setiap tahap saat
+    berkultivasi, [pengaturan](#614-pengaturan-tab-pengaturan-grup-aura-kultivasi), [perintah uji](#616-perintah-uji-op)
 
 ---
 
@@ -6496,6 +6498,9 @@ Nilai yang hilang diisi bawaan, nilai di luar rentang dipotong ke batasnya, dan 
 | `reduce_motion` | `true` / `false` | Kurangi gerak |
 | `cooldown_ping` | `true` / `false` | Pengingat cooldown (Fase 7, bawaan `false`) |
 | `danger_alert` | `true` / `false` | Peringatan bahaya saat meditasi (Fase 7, bawaan `true`) |
+| `aura_mode` | `penuh`, `sederhana`, `mati` | Aura Kultivasi (bawaan `penuh`, [61](#61-aura-kultivasi)) |
+| `aura_others` | `true` / `false` | Aura orang lain (bawaan `true`) |
+| `aura_hum` | `true` / `false` | Dengung aura (bawaan `true`) |
 | `codex_filters`, `codex_sort`, `teach_filters`, `teach_sort`, `codex_seen` | – | Saringan dan urutan terakhir Kitab Teknik dan tab Teknik murid, serta kartu yang sudah dilihat (lencana BARU) |
 
 Semuanya diatur dari tab Pengaturan gulungan atau langsung di Kitab Teknik. Pilihan **Panduan** (tampilkan atau
@@ -8189,3 +8194,115 @@ Kredit lengkap: [CREDITS.md](CREDITS.md).
 
 `/kultivasi uji suara` menampilkan grupnya; `/kultivasi uji suara <kunci>` memutar satu kalimat tanpa jeda, misalnya
 `heaven.realm`, `demon.tempt`, `boss.awaken`, `disciple.f2.greet`.
+
+---
+
+## 61. Aura Kultivasi
+
+Saat kamu (atau muridmu) duduk bersila berkultivasi, sebuah **Aura Kultivasi** muncul di sekelilingmu. Auranya
+**berbeda di setiap ranah** dari sembilan ranah, **tumbuh di setiap tahap** (Awal, Tengah, Akhir, Puncak), dan di
+Kenaikan Abadi juga tumbuh di setiap **lapisan** (1-9). Gambarannya diambil dari novel kultivasi sungguhan, dan setiap
+ranah punya baris **Sumber** (lihat tooltip pengaturan *Aura Kultivasi*).
+
+> Semuanya **hanya tampilan** di komputermu: tidak ada blok yang berubah, tidak ada petir, cuaca, waktu, atau
+> kecepatan tick yang diubah, dan tidak ada angka kultivasi yang berubah. Kamera juga tidak pernah digerakkan.
+
+### 61.1 Kapan aura muncul
+
+* **Kamu**: bermeditasi (`;` atau `/kultivasi meditate`) sampai duduk bersila. Kosmetik `aura` harus nyala
+  (`/kultivasi visual aura on`, bawaan nyala). **Murid**: saat mereka duduk bermeditasi.
+* Aura muncul perlahan dalam 1,5 detik dan memudar dalam 1 detik setelah kamu berdiri. Model 3D tumbuh sekali saat
+  muncul dan mengecil saat aura berakhir.
+* Saat **menerobos**, aura diredam setengah supaya efek terobosan terlihat jelas. **Penyimpangan Qi** atau
+  **tribulasi** mengakhiri aura (memudar).
+* Gerakannya tetap dan tenang (tidak ada denyut ukuran acak). Ukuran hanya berubah **sekali** saat tahap atau lapisan
+  naik: semuanya meluncur ke ukuran baru dalam 1 detik dan satu cincin cahaya bergulir keluar dari dekal di tanah.
+* Selama Aura Kultivasi tampil, aura ranah lama yang samar dan butir meditasi lama minggir. Saat kamu **tidak**
+  bermeditasi, aura ranah lama tetap seperti dulu ([49](#49-tampilan-kualitas-efek-dan-kosmetik)).
+
+### 61.2 Warna, aksen, dan tanda siap menerobos
+
+* **Warna dasar** per ranah (lihat tabel 61.3), diwarnai **Dao**-mu: 35 % pada cincin, pita, dan dekal, 20 % pada
+  cahaya. Butir qi yang ditarik masuk berwarna **unsur utama akarmu**. Rune Penyatuan Dao dan roda bintang Abadi Sejati
+  memakai warna **semua unsur akarmu** (paling banyak 4).
+* **Aksen Akar Surgawi** (akar sudah diuji, mutu Surgawi): cincin luar tipis berwarna emas yang berputar pelan, tiga
+  percik emas yang mengorbit dantian, dan garis emas kedua di tepi dekal.
+* **Aksen fisik langka** (hanya murid; pemain tidak punya fisik): warna fisiknya, misalnya Tubuh Racun Malapetaka hijau,
+  Darah Naga Purba Taixu biru muda, Garis Darah Dou Di merah tua, Tubuh Emas Tulang Angkuh emas, Pembawa Simbol Melahap
+  ungu tua, Tulang Mahatinggi putih, Pupil Ganda ungu, Nadi Dewa Sesat jingga-merah, Alam Jiwa Tanpa Atribut abu-abu. Akar Surgawi menang bila keduanya ada.
+* **Siap menerobos** (leher botol dengan bar kultivasi penuh, bukan peringkat tertinggi): cahaya tepi kuning-merah yang
+  **berdenyut terang-redup** (ukurannya tidak berubah), garis retak merah tipis muncul di dekal, dan denting lonceng pelan
+  setiap 6 detik. Dari sudut pandang orang pertama, tepi layarmu berdenyut kuning. Di Abadi Sejati Puncak tidak pernah
+  muncul.
+
+### 61.3 Sembilan aura
+
+| Ranah | Gambaran | Yang bertambah per tahap | Sumber (ringkas) |
+|---|---|---|---|
+| **Manusia Fana** | cahaya hangat samar di perut yang mengembang dan meredup mengikuti napas, beberapa butir qi pucat melayang masuk | satu tahap saja | *A Record of a Mortal's Journey*: Seni Musim Semi Abadi (长春功) |
+| **Pemurnian Qi** | qi langit dan bumi ditarik masuk: butir qi berputar masuk pada lengan spiral, aliran udara putih kehijauan, pusaran qi di atas kepala; dekal cincin kabut | **Awal** 2 lengan spiral, pusaran kecil · **Tengah** 3 lengan, satu pita kabut di pinggang · **Akhir** 4 lengan, dekal muncul, pita kedua · **Puncak** pusaran besar dengan pusaran dalam yang berputar berlawanan dan tiang cahaya tipis ke ubun-ubun | *Battle Through the Heavens* bab 27 dan 159 |
+| **Pembentukan Fondasi** | Fondasi Dao: platform cahaya segi delapan di bawah tempat duduk dan pilar cahaya tanpa retak di sekelilingnya (pilar 3D); dekal delapan trigram (bagua) | **Awal** platform dan 1 pilar · **Tengah** 2 pilar, dekal muncul · **Akhir** 3 pilar, tepi platform kedua · **Puncak** 4 pilar dan cincin cahaya yang menghubungkan puncaknya | *I Shall Seal the Heavens* bab 76 dan 100; *A Will Eternal* |
+| **Inti Emas** | matahari emas kecil bersinar di dantian menembus tubuh (mutiara emas 3D), cincin halo emas berputar, cahaya emas memenuhi sekitar; dekal susunan matahari | **Awal** inti kecil dan 1 cincin halo · **Tengah** 2 cincin miring, kipas sinar · **Akhir** 3 cincin, dekal muncul, tiang emas lembut sampai ubun-ubun · **Puncak** inti lebih besar, halo luar 3D dengan sembilan butir emas yang mengorbit | *I Shall Seal the Heavens* bab 337-339; 金丹 alkimia batin Daois |
+| **Jiwa Baru Lahir** | bayi kecil berwajah dirimu duduk bersila bermeditasi di atas teratai di atas kepala, dengan halo mungil; dekal teratai | **Awal** bayi sebagai bayangan cahaya samar · **Tengah** bayi kaca 3D dan teratai delapan kelopak, halo · **Akhir** teratai di tanah mekar, bayi lebih terang dan bernapas cahaya, benang cahaya dari ubun-ubun · **Puncak** teratai enam belas kelopak, halo kedua, gema cahaya bayi di dantian | *A Record of a Mortal's Journey* bab 1077 dan 1262 |
+| **Transformasi Dewa** | Dharma Idol raksasa tembus pandang duduk di belakangmu seakan menyangga langit, lingkaran api di kepalanya, riak indra ilahi menyebar di tanah; dekal roda dharma | **Awal** riak (tiap 3 detik), halo api di ubun-ubun, Idol samar 3,5 blok · **Tengah** Idol 4,3 blok, roda halo api 3D, dekal muncul · **Akhir** Idol 5,2 blok, tangan mudra 3D, riak tiap 2 detik · **Puncak** Idol 6 blok bertepi cahaya, dua rangkaian riak | *I Shall Seal the Heavens* bab 805; *A Record of a Mortal's Journey* bab 1269 |
+| **Penyatuan Dao** | rune Dao (道 一 二 三 天 地 人 合) mengorbit pada cincin miring dan meleburkan warna unsurmu, sepasang komet yin-yang, taiji 3D di bawah tempat duduk; dekal siklus lima unsur | **Awal** 1 cincin dengan 3 rune, komet · **Tengah** 2 cincin (5 rune), taiji, dekal muncul · **Akhir** 3 cincin (8 rune), cincin rune perunggu 3D, warna mulai melebur · **Puncak** rune melebur dan setiap 3 detik satu rune terbang ke inti lalu kembali | *Daodejing* bab 42; diagram taiji (Zhou Dunyi); siklus wuxing |
+| **Kenaikan Abadi** | Gerbang Keabadian di atasmu dan cahaya Abadi tercurah, qi ungu datang dari timur, bunga surgawi berjatuhan; dekal cincin sembilan awan | **Awal** sinar cahaya dan pilar · **Tengah** pita qi ungu dari timur, dekal muncul · **Akhir** gerbang 3D dan halonya · **Puncak** gerbang terbuka (pintunya jadi cahaya), awan di bawahnya, bunga berjatuhan. **Lapisan 1-9**: pilar cahaya = 1 + lapisan/2 (1 sampai 5), satu paku gerbang lagi menyala per lapisan, pita ungu makin lebar | *I Shall Seal the Heavens* bab 969; 紫气东来 (Yin Xi dan Laozi, *Liexian Zhuan*); Sutra Vimalakirti bab 7 |
+| **Abadi Sejati (Dewa Abadi)** | roda bintang berputar seperti Sirkuit Langit Agung, wilayah cahaya abadi menyebar di tanah, singgasana teratai bertingkat; dekal peta 28 rumah bulan dan Biduk Utara | **Awal** singgasana teratai dan roda 9 bintang · **Tengah** 18 bintang, wilayah cahaya, dekal muncul · **Akhir** 28 bintang dengan tujuh bintang Biduk terang, cincin armila 3D · **Puncak** wilayah terlebar, roda kedua menyilang, singgasana teratai sembilan tingkat, tiang cahaya. Setelah diakui Langit: cahaya pelangi berganti dan kelopak | 大周天; Beidou; wilayah (领域) dalam *Renegade Immortal* bab 826 dan 851; 九品莲台 (Sutra Kontemplasi Amitayus) |
+
+Bagian yang tidak ada di novel (pusaran di atas kepala, platform dan bagua, matahari dan halo, teratai tempat duduk bayi,
+riak di tanah, rune yang mengorbit, gerbang di atas kepala, roda bintang dan singgasana) ditandai **rancangan
+permainan** di baris Sumber.
+
+### 61.4 Pengaturan (tab Pengaturan, grup **Aura Kultivasi**)
+
+| Pengaturan | Pilihan (bawaan tebal) | Artinya |
+|---|---|---|
+| Aura Kultivasi | **Penuh** / Sederhana / Mati | Penuh: semua lapisan, model 3D, pita, dan partikel sesuai Kualitas Efek. Sederhana: hanya dekal, dua cahaya, bentuk khas ranah, dan partikel (tanpa model 3D dan pita; ringan untuk laptop lemah). Mati: aura baru mati di mana saja, aura lama tampil seperti dulu |
+| Aura orang lain | **Nyala** / Mati | Mati menyembunyikan aura pemain lain dan murid mereka (auramu dan murid-muridmu tetap tampil). "Efek pemain lain" tetap mengecilkan aura mereka |
+| Dengung aura | **Nyala** / Mati | dengung pelan yang berbeda per ranah dan denting langka |
+
+Tooltip *Aura Kultivasi* juga menyebut aura ranahmu sekarang beserta baris Sumbernya. Tersimpan di
+`config/kultivator-client.json` sebagai `aura_mode` (`penuh`, `sederhana`, `mati`), `aura_others`, dan `aura_hum`.
+
+### 61.5 Performa, jarak, orang pertama, dan shader
+
+* **Jarak** dari kamera: sampai **24 blok** aura penuh; sampai **64 blok** aura ringkas (dekal, satu cahaya, bentuk khas
+  ranah; tanpa model 3D, pita, dan dengung; partikel ×0,25); lebih jauh tidak digambar.
+* **Batas per Kualitas Efek** (auramu selalu didahulukan, lalu yang terdekat):
+
+  | | Minimal | Normal | Maksimal |
+  |---|---|---|---|
+  | aura penuh / aura ringkas | 1 / 2 | 4 / 8 | 8 / 16 |
+  | quad per frame (semua aura) | 120 | 600 | 1500 |
+  | model 3D per aura / semua aura | 0 / 0 | 3 / 9 | 6 / 24 |
+  | partikel per aura per tick | 1 | 4 | 10 |
+  | pita per aura | 0 | 2 | 4 |
+
+  Aura pemain lain dikalikan "Efek pemain lain" (Ringan: tanpa model 3D, setengah quad, seperempat partikel). Saat Momen
+  Epik atau film berjalan dan FPS turun, pengaman frame menipiskan aura lebih dulu.
+* **Orang pertama**: pandanganmu tetap bersih. Hanya ada cahaya lembut di tepi layar dalam warna ranahmu dan sesekali
+  satu butir qi melayang di bawah garis mata. Tekan **F5** untuk melihat aura lengkapmu. Tersembunyi dengan F1, saat
+  film diputar, dan dalam mode penonton.
+* **Sodium dan Iris**: aura tidak menyentuh mesh chunk dan tidak digambar di shadow pass. Dengan shader pack, jumlah quad
+  ×0,6 dan hanya satu lapisan besar per aura. Tampilan "shader berat" dipalsukan dengan quad bertumpuk, tekstur cahaya,
+  dan lapisan HUD, tanpa post shader.
+* **Dengung**: suara vanilla yang sangat pelan (paling keras 0,08) dari dua aura terdekat dalam 12 blok, mengikuti slider
+  Suara Sekitar vanilla.
+
+### 61.6 Perintah uji (op)
+
+Pratinjau **tidak mengubah peringkat asli** siapa pun dan tidak disimpan. Aura digambar seolah subjeknya sedang
+berkultivasi (duduk atau tidak), memakai Dao, akar, dan aksen aslinya.
+
+| Perintah | Fungsinya |
+|---|---|
+| `/kultivasi uji aura <ranah> [tahap 1-4] [lapisan 1-9]` | aura ranah itu pada dirimu selama 20 detik (bawaan tahap 4 Puncak, lapisan 1; lapisan hanya berlaku untuk `immortal_ascension`). Pratinjau Puncak di bawah Abadi Sejati menampilkan tanda siap menerobos pada 10 detik terakhir |
+| `/kultivasi uji aura semua` | tur semua ranah dan tahap, 3 detik per langkah (33 langkah, 99 detik); baris di atas hotbar menyebut setiap langkah |
+| `/kultivasi uji aura murid <nama\|semua> <ranah> [tahap] [lapisan]` | pratinjau yang sama 20 detik pada murid termuat milikmu (nama seperti di `uji murid`) |
+| `/kultivasi uji aura aksen` | nyala/matikan aksen emas Akar Surgawi paksa untuk pratinjaumu |
+| `/kultivasi uji aura stop` | mengakhiri pratinjau atau turmu dan milik murid-muridmu |
+
+Nama ranah: `mortal`, `qi_refining`, `foundation`, `golden_core`, `nascent_soul`, `deity_transformation`, `dao_union`,
+`immortal_ascension`, `true_immortal`. Contoh: `/kultivasi uji aura golden_core 2`,
+`/kultivasi uji aura immortal_ascension 4 9`. Pratinjau berakhir sendiri, dan juga saat mati, pindah dimensi, keluar,
+atau server berhenti.

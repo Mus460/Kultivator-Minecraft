@@ -123,7 +123,7 @@ public final class TestCommands {
 	private static final Map<UUID, DiscipleTour> DISCIPLE_TOURS = new HashMap<>();
 
 	/** Suggests the names of the player's loaded disciples (spaces as underscores) and "semua". */
-	private static final SuggestionProvider<CommandSourceStack> DISCIPLE_NAMES = (ctx, builder) -> {
+	public static final SuggestionProvider<CommandSourceStack> DISCIPLE_NAMES = (ctx, builder) -> {
 		ServerPlayer player = ctx.getSource().getPlayer();
 		List<String> names = new ArrayList<>();
 		names.add("semua");
@@ -238,6 +238,8 @@ public final class TestCommands {
 		dev.kultivator.pusakalangit.TitahTests.addTestCommands(uji);
 		// Voices (module V): uji suara <key>
 		dev.kultivator.voice.VoiceTests.addTestCommands(uji);
+		// Aura Kultivasi (DESIGN 31.6): uji aura <realm> [stage] [layer] | semua | murid <name> ... | aksen | stop
+		uji.then(dev.kultivator.aura.AuraPreviews.command());
 		root.then(uji);
 	}
 
@@ -259,7 +261,7 @@ public final class TestCommands {
 
 	private static int help(CommandSourceStack source) {
 		source.sendSuccess(() -> Component.translatable("kultivator.test.help.title").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
-		for (String key : List.of("maks", "ranah", "tur", "kit", "teknik", "murid", "more")) {
+		for (String key : List.of("maks", "ranah", "tur", "kit", "teknik", "murid", "aura", "more")) {
 			source.sendSuccess(() -> Component.translatable("kultivator.test.help." + key).withStyle(ChatFormatting.GRAY), false);
 		}
 		return 1;
@@ -390,7 +392,7 @@ public final class TestCommands {
 	// ================================================================ disciples
 
 	/** The disciple's name as one command word (spaces become underscores). */
-	private static String token(DiscipleEntity disciple) {
+	public static String token(DiscipleEntity disciple) {
 		return disciple.getName().getString().trim().replace(' ', '_');
 	}
 

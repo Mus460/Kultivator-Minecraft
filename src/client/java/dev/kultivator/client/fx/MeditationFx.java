@@ -74,7 +74,10 @@ public final class MeditationFx {
 			// Our own motes would float right in front of the camera in first person: keep those near the ground.
 			boolean ownView = player == minecraft.player && firstPersonView;
 			if (seated) {
-				meditationMotes(player, visual, random, ownView);
+				// DESIGN 31.2.6: the Aura Kultivasi draws its own inflow in the root colour while it covers this player
+				if (!dev.kultivator.client.aura.AuraEngine.covers(player.getId())) {
+					meditationMotes(player, visual, random, ownView);
+				}
 				if (player == minecraft.player) {
 					CultivationData data = ClientCultivation.data();
 					if (data.meditating() && data.formationTier() > 0) {
