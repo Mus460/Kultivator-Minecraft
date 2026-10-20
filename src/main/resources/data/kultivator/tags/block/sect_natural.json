@@ -14,9 +14,18 @@
     "minecraft:tuff",
     "minecraft:dripstone_block",
     "minecraft:pointed_dripstone",
-    "minecraft:cinnabar",
-    "minecraft:sulfur",
-    "minecraft:potent_sulfur",
+    {
+      "id": "minecraft:cinnabar",
+      "required": false
+    },
+    {
+      "id": "minecraft:sulfur",
+      "required": false
+    },
+    {
+      "id": "minecraft:potent_sulfur",
+      "required": false
+    },
     "minecraft:sandstone",
     "minecraft:red_sandstone",
     "minecraft:terracotta",

@@ -18,6 +18,7 @@
   "kultivator.meditation.bar.site": "Tempat ×%s",
   "kultivator.meditation.bar.density": "Kepadatan Qi %s%%",
   "kultivator.meditation.bar.no_formation": "tanpa formasi",
+  "kultivator.meditation.bar.vein_exhausted": "Urat roh di sini menipis (%s%%) — pindah ke urat lain / pakai Batu Roh",
   "kultivator.meditation.bar.bottleneck": "Leher botol! Tekan %1$s untuk menerobos (atau tombol di gulungan %2$s)",
   "kultivator.meditation.vein_thin": "Urat roh di sini menipis (kepadatan qi %s%%). Bermeditasilah di tempat lain; urat ini pulih sendiri secara perlahan.",
   "kultivator.meditation.formation_awake": "%s bangkit: qi mengalir dari pilar-pilarnya ke dalam dirimu.",

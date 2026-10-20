@@ -54,8 +54,26 @@ public final class Tribulation {
 	public static final int OMEN_TICKS = 240;
 	/** Ticks between two strikes. */
 	public static final int STRIKE_INTERVAL = 70;
-	/** How far (horizontally) the cultivator may wander from the starting point. */
+	/** How far (horizontally) the cultivator may wander from the starting point (the ground; leaving it in the omen cancels). */
 	public static final double MAX_DISTANCE = 6.0D;
+	/**
+	 * Balance change (flow audit): after the first strike, being knocked out of the ground by a strike or a monster is not
+	 * fleeing. The tribulation only counts as fled when the player stays more than {@link #FLEE_DISTANCE} blocks from the
+	 * start for {@link #FLEE_TICKS} ticks in a row (or changes dimension).
+	 */
+	public static final double FLEE_DISTANCE = 10.0D;
+	public static final int FLEE_TICKS = 60;
+	/**
+	 * Balance change (flow audit): an Immortal Ascension or True Immortal tribulation never takes more than this many max
+	 * healths over all its strikes before dodging and the strike factor (it was 2.1-4.4×). Applies from IA layer 2 on, so
+	 * no layer is harder than the next one.
+	 */
+	public static final double HIGH_TOTAL_CAP = 2.2D;
+	/** The final strike: ×2, but ×1.5 at Immortal Ascension and True Immortal targets (balance change). */
+	public static final double FINAL_MULTIPLIER = 2.0D;
+	public static final double FINAL_MULTIPLIER_HIGH = 1.5D;
+	/** Balance change: at IA and TI targets a strike sidestepped through the lightning ring heals this share of max health. */
+	public static final double SIDESTEP_HEAL = 0.06D;
 	/** The clouds hang this high above the starting point; strikes come from this height. */
 	public static final double SKY_HEIGHT = 22.0D;
 	/** Pause after the final strike before the result. */
@@ -134,6 +152,8 @@ public final class Tribulation {
 		int strikesDone;
 		int nextStrikeAt = OMEN_TICKS;
 		int settleAt;
+		/** Ticks in a row beyond {@link #FLEE_DISTANCE} (reset when the player is back). */
+		int outsideTicks;
 		float lowestHealth = 1.0F;
 		/** The lightning rings of this tribulation (DESIGN 19.3.8; P7-tempur). */
 		@Nullable dev.kultivator.elite.LightningRings.State rings;
@@ -283,9 +303,30 @@ public final class Tribulation {
 		return Math.max(3, 3 + 2 * (realm.ordinal() - Realm.GOLDEN_CORE.ordinal()));
 	}
 
-	/** Share of max health one (normal) strike takes: 0.12 + 0.01 x realm + 0.005 x layer. */
+	/**
+	 * Share of max health one (normal) strike takes: 0.12 + 0.01 x realm + 0.005 x layer. At Immortal Ascension and True
+	 * Immortal targets it is lowered so that all strikes together (the final one × {@link #finalMultiplier}) stay at or
+	 * below {@link #HIGH_TOTAL_CAP} (balance change).
+	 */
 	public static double strikePct(Rank target) {
-		return 0.12D + 0.01D * target.realm().ordinal() + 0.005D * target.layer();
+		double pct = 0.12D + 0.01D * target.realm().ordinal() + 0.005D * target.layer();
+		if (highTribulation(target)) {
+			double weight = strikeCount(target) - 1 + finalMultiplier(target);
+			if (pct * weight > HIGH_TOTAL_CAP) {
+				pct = HIGH_TOTAL_CAP / weight;
+			}
+		}
+		return pct;
+	}
+
+	/** The final strike's multiplier: ×2, ×1.5 at Immortal Ascension and True Immortal targets. */
+	public static double finalMultiplier(Rank target) {
+		return highTribulation(target) ? FINAL_MULTIPLIER_HIGH : FINAL_MULTIPLIER;
+	}
+
+	/** True for a tribulation into Immortal Ascension (any layer) or True Immortal. */
+	public static boolean highTribulation(Rank target) {
+		return target.realm().atLeast(Realm.IMMORTAL_ASCENSION);
 	}
 
 	/** 0 Overworld (and other dimensions), 1 Nether, 2 End. */
@@ -317,7 +358,8 @@ public final class Tribulation {
 		Msg.title(player, Component.translatable("kultivator.breakthrough.omen.title." + variant).withStyle(variantColor(variant), ChatFormatting.BOLD),
 				Component.translatable("kultivator.breakthrough.omen.subtitle", strikes), 10, 80, 20);
 		Msg.chat(player, Component.translatable("kultivator.breakthrough.omen.chat." + variant, strikes).withStyle(variantColor(variant)));
-		Msg.chat(player, Component.translatable("kultivator.breakthrough.omen.stay", Component.literal(String.valueOf((int) MAX_DISTANCE)))
+		Msg.chat(player, Component.translatable("kultivator.breakthrough.omen.stay", Component.literal(String.valueOf((int) MAX_DISTANCE)),
+				Component.literal(String.valueOf((int) FLEE_DISTANCE)), Component.literal(String.valueOf(FLEE_TICKS / 20)))
 				.withStyle(ChatFormatting.GRAY));
 		sendOmen(level, instance, OMEN_TICKS);
 		rumble(level, player, instance.variant, player.getRandom());
@@ -368,7 +410,21 @@ public final class Tribulation {
 		}
 
 		if (t.phase == Phase.STRIKES) {
-			if (away) {
+			// Balance change: a knock-back is not fleeing. Only another dimension, or staying beyond FLEE_DISTANCE for
+			// FLEE_TICKS in a row, ends the tribulation; outside the ground the action bar calls the player back.
+			boolean otherDimension = !level.dimension().equals(t.dimension);
+			double distanceSq = dx * dx + dz * dz;
+			t.outsideTicks = !otherDimension && distanceSq > FLEE_DISTANCE * FLEE_DISTANCE ? t.outsideTicks + 1 : 0;
+			boolean fled = otherDimension || t.outsideTicks >= FLEE_TICKS;
+			if (!fled && distanceSq > MAX_DISTANCE * MAX_DISTANCE && t.ticks % 10 == 0 && t.ticks < t.nextStrikeAt) {
+				Component back = Component.literal(String.valueOf((int) MAX_DISTANCE));
+				Msg.actionBar(player, t.outsideTicks > 0
+						? Component.translatable("kultivator.breakthrough.return.flee", back,
+								Msg.number(Math.max(0, FLEE_TICKS - t.outsideTicks) / 20.0D)).withStyle(ChatFormatting.RED)
+						: Component.translatable("kultivator.breakthrough.return.warn", back,
+								Component.literal(String.valueOf((int) FLEE_DISTANCE))).withStyle(ChatFormatting.GOLD));
+			}
+			if (fled) {
 				if (t.strikesDone > 0) {
 					finish(player, Result.FLED, "kultivator.breakthrough.fled");
 				} else {
@@ -502,7 +558,7 @@ public final class Tribulation {
 			// The pill, a powered protective formation around the cultivator (DESIGN 3) and the phase-7 providers, all in
 			// strikeFactor (DESIGN 19.2.7); a graze outside the lightning ring lands at 40% but never at zero (19.3.8).
 			// The would-kill check below uses this final amount.
-			double raw = maxHealth * t.pct * (last ? 2.0D : 1.0D) * strikeFactor(player, t.target, number, last)
+			double raw = maxHealth * t.pct * (last ? finalMultiplier(t.target) : 1.0D) * strikeFactor(player, t.target, number, last)
 					* KultivatorConfig.get().tribulationDamageScale * impact.factor();
 			float amount = (float) Math.max(0.0D, raw);
 			float health = player.getHealth();
@@ -534,6 +590,10 @@ public final class Tribulation {
 		if (wouldKill) {
 			finish(player, Result.FAILED, "kultivator.breakthrough.fail.strike");
 			return false;
+		}
+		if (impact.grazed() && !protectedPlayer && highTribulation(t.target) && player.isAlive()) {
+			// Balance change: sidestepping through the ring is rewarded at the long IA / TI tribulations.
+			player.heal((float) (player.getMaxHealth() * SIDESTEP_HEAL));
 		}
 		countSurvivedStrike(player, data);
 		if (KultivatorConfig.get().daoProtectorEvent && !last && (number - 1) % 3 == 0) {
@@ -624,7 +684,7 @@ public final class Tribulation {
 
 	/**
 	 * {@code sessionExtra.trib} for the tribulation HUD (DESIGN 19.3.8): phase (1 omen, 2 strikes, 3 settling), done, total,
-	 * next (game time of the next strike), pct (its effective share of max health with strikeFactor, the last ×2 and the
+	 * next (game time of the next strike), pct (its effective share of max health with strikeFactor, the last × finalMultiplier and the
 	 * config scale), cx/cz (the ground's centre) and max (its radius), guards, test; while a ring waits rx/rz/rr/rend
 	 * (rend = the strike's game time), tx/tz for a twin, and tele (rings on). Dirty only at the omen, telegraphs and strikes.
 	 */
@@ -638,7 +698,7 @@ public final class Tribulation {
 		if (t.phase != Phase.SETTLING && next <= t.strikeCount) {
 			boolean last = next >= t.strikeCount;
 			trib.putLong("next", now + Math.max(0, t.nextStrikeAt - t.ticks));
-			trib.putDouble("pct", t.pct * (last ? 2.0D : 1.0D) * strikeFactor(player, t.target, next, last)
+			trib.putDouble("pct", t.pct * (last ? finalMultiplier(t.target) : 1.0D) * strikeFactor(player, t.target, next, last)
 					* KultivatorConfig.get().tribulationDamageScale);
 		} else {
 			trib.putLong("next", now + Math.max(0, t.settleAt - t.ticks));

@@ -12,5 +12,5 @@
   "kultivator.spine7.config.herbHarvest": "herbHarvest: plants broken by a Qi Refining or higher player may hold aged spirit herbs.",
   "kultivator.spine7.config.guideRewards": "guideRewards: the chapters of First Steps on the Path tablet give their rewards.",
   "kultivator.spine7.config.dailyTasks": "dailyTasks: Daily Chores, three small tasks every in-game day.",
-  "kultivator.spine7.config.tribulationTelegraph": "tribulationTelegraph: lightning rings warn of tribulation strikes from Deity Transformation up; off means every strike is a full hit."
+  "kultivator.spine7.config.tribulationTelegraph": "tribulationTelegraph: lightning rings warn of tribulation strikes from Nascent Soul up; off means every strike is a full hit."
 }

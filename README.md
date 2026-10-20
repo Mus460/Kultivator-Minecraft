@@ -105,12 +105,13 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
   Tipis dengan kepadatan sampai 200%, rumus meditasi baru, **Kultivasi Tertutup**, **Gua Kediaman** yang terlindung, dan
   Kompas Urat Roh. **Delapan jimat** yang kamu tulis sendiri (Petir, Awan Api, Perisai, Pengikat, Pulang, Penangkal Petir,
   Seribu Li, Kejernihan). **Alkimia Lanjutan**: panci 10 bahan, katalis batu dan inti, herba pembantu, empat pil baru,
-  resep alternatif, tablet **Kitab Alkimia**. **Tribulasi Hidup**: lingkar petir mulai Transformasi Dewa (keluar = hanya
+  resep alternatif, tablet **Kitab Alkimia**. **Tribulasi Hidup**: lingkar petir mulai Jiwa Baru Lahir (keluar = hanya
   terserempet), Menantang Langit, dan **Hu Fa Tribulasi** bersama saudara sekte. Tablet **Jalan**: 20 Langkah Pertama
   dengan pelacak dan hadiah, Ujian Fondasi, Kewajiban Harian. Panel **Persiapan** dan HUD tribulasi langsung. **Anugerah
   Kenaikan** di setiap tingkat Kenaikan Abadi, **Perkokoh Fondasi**, dan **Bintang Abadi** tanpa batas untuk pemain.
   **Lima Unsur** dalam pertarungan, **Relik di Peti Kuno** dengan Indra Ilahi yang mencium harta, Kejenuhan Bertarung,
   dan kenyamanan HUD (pengukur pedang terbang, peringatan bahaya saat meditasi, cetak biru formasi).
+* **Perubahan keseimbangan** (audit alur Fana → Dewa Abadi): tribulasi lebih adil (lingkar petir mulai Jiwa Baru Lahir, terpental bukan lari, total petir Kenaikan Abadi/Dewa Abadi paling banyak 2,2× nyawa, maks. 10 pelindung hidup), urat roh separuh lebih awet di bawah Transformasi Dewa, Inti Raja dari Raja Siluman atau 9 Inti Tinggi, sesajen ritual Alam Abadi dikembalikan saat gagal ([panduan](docs/PANDUAN.md#73-tribulasi-langit)).
 * Semua teks dalam **Bahasa Indonesia** dan **English**. Kompatibel dengan Sodium, Iris, ImmediatelyFast, EMF/ETF,
   Lithium, FerriteCore.
 
