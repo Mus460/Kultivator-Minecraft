@@ -285,7 +285,7 @@ public final class BindFx {
 		text.setText(Component.literal(glyph).withColor(color & 0xFFFFFF));
 		text.setBackgroundColor(0);
 		text.setBillboardConstraints(Display.BillboardConstraints.CENTER);
-		text.setTransformation(new com.mojang.math.Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.2F, 1.2F, 1.2F), null));
+		DisplayKey.place(text, new Vector3f(), new Quaternionf(), new Vector3f(1.2F, 1.2F, 1.2F));
 		return text;
 	}
 

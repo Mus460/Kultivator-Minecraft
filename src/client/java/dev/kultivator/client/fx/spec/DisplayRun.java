@@ -1,6 +1,5 @@
 package dev.kultivator.client.fx.spec;
 
-import com.mojang.math.Transformation;
 import dev.kultivator.client.anim.model.Anim;
 import dev.kultivator.client.anim.model.AnimStep;
 import dev.kultivator.client.anim.model.ModelHandle;
@@ -34,8 +33,9 @@ import java.util.List;
  * GIANT_ITEM (≤ 24), GIANT_BLOCK (≤ 24 per side), LASER (a quad beam since the polish pass; a stretched block when the
  * beam cap is full), PETAL_RING (≤ 16 slabs opening, spinning, flat or tilted), GLYPH (billboard text, ≤ 40) and
  * SWORD_RING (≤ 24 orbiting items, riding the caster when attached to it), plus the polish MODEL template (a 3D prop
- * through the animation module's ModelFx). Keyframes are set every 2 ticks with a 2-tick interpolation: fall, rise, spin,
- * grow, orbit, topple, slide, swing; the last 6 ticks shrink to nothing.
+ * through the animation module's ModelFx). Each display is re-keyed every tick through {@link DisplayKey} (the next tick's
+ * frame with a one-tick interpolation, re-armed only when the frame changed; the first frame placed without one): fall,
+ * rise, spin, grow (one eased ramp), orbit, topple, slide, swing; the last 6 ticks (or a cut's length) shrink to nothing.
  * <p>
  * Polish S15: displays face the viewer by default (item sprites billboard), FACE_FORWARD turns a model along the caster's
  * look, BLADE keeps the old 45° sword tip, UPRIGHT stands flags upright, FLAT lays discs and seals face up; SWING and
@@ -46,10 +46,14 @@ import java.util.List;
  */
 final class DisplayRun extends LayerRun {
 
-	private static final int STEP = 2;
-
 	private final FxLayer.Template template;
 	private final Display[] displays;
+	/** The keyer of each display (same index; see {@link DisplayKey}). */
+	private final DisplayKey[] keys;
+	/** The age each display was made at (its first frame is placed then, so it is not keyed again that tick). */
+	private final int[] born;
+	/** The fade length of a cut run (ABORT, followUntil), fixed when the cut first arrives. */
+	private int endTotal = 1;
 	private final Vec3 origin;
 	private final float[] scatter;
 	/** The glyph text split by code point (GLYPH with n > 1 shows one per display). */
@@ -113,6 +117,8 @@ final class DisplayRun extends LayerRun {
 		}
 		ev.displaysLeft -= granted;
 		this.displays = new Display[model ? 0 : granted];
+		this.keys = new DisplayKey[displays.length];
+		this.born = new int[displays.length];
 		this.scatter = new float[Math.max(1, granted) * 2];
 		float r = layer.radius() > 0.0F ? layer.radius() * ev.sizeF : ev.clientRing() ? ev.aux / 100.0F : 4.0F * ev.sizeF;
 		boolean several = template == FxLayer.Template.GIANT_ITEM || template == FxLayer.Template.GIANT_BLOCK || template == FxLayer.Template.GLYPH
@@ -354,7 +360,7 @@ final class DisplayRun extends LayerRun {
 			boolean all = true;
 			for (int i = 0; i < displays.length; i++) {
 				if (displays[i] == null) {
-					displays[i] = create(i);
+					displays[i] = create(i, age);
 					all &= displays[i] != null;
 				}
 			}
@@ -367,41 +373,46 @@ final class DisplayRun extends LayerRun {
 		if (layer.swingPeriod() > 0 && layer.motion() == FxLayer.Motion.SWING && age - swingStart >= layer.swingPeriod()) {
 			swingStart = age;
 		}
+		// Every tick: the entity stands where it is at this age (setPos, lerped by the renderer over the next frames) and
+		// the transformation targets the next age with a one-tick interpolation, which the display starts at its next tick,
+		// so both arrive together.
 		boolean moving = template == FxLayer.Template.SWORD_RING || attach() == FxLayer.Attach.CASTER;
 		for (int i = 0; i < displays.length; i++) {
 			Display display = displays[i];
-			if (display == null || display.isRemoved()) {
+			if (display == null || display.isRemoved() || keys[i] == null || born[i] == age) {
 				continue;
 			}
 			if (moving) {
-				Vec3 at = position(i, age + 1);
-				display.setPos(at.x, at.y, at.z);
+				keys[i].move(position(i, age));
 			}
-			if (age % STEP == 0) {
-				place(display, i, Math.min(life, age + STEP), age == 0 ? 0 : STEP);
-			}
+			place(keys[i], i, Math.min(life, age + 1), false);
 		}
 		return true;
 	}
 
-	/** An IMPACT of the same cast: a swinging prop swings again (S15). */
+	/**
+	 * An IMPACT of the same cast: a swinging prop swings again (S15). Nothing else: a prop that swelled on every IMPACT /
+	 * PULSE / EXTRA event looked like it grew and shrank at random.
+	 */
 	void accent() {
-		if (layer.motion() == FxLayer.Motion.SWING) {
-			swingStart = Math.max(0, age);
+		if (layer.motion() != FxLayer.Motion.SWING) {
+			return;
 		}
+		swingStart = Math.max(0, age);
 		for (ModelHandle handle : handles) {
-			if (layer.motion() == FxLayer.Motion.SWING) {
-				AnimBridge.play(handle, AnimBridge.step(Anim.SWING, 0, Math.max(1, Math.round(layer.motionB())), layer.motionA() == 0.0F ? 90.0F
-						: layer.motionA(), 0.0F, null));
-			} else {
-				AnimBridge.play(handle, AnimBridge.step(Anim.PULSE, 0, 6, 0.12F, 0.0F, null));
-			}
+			// the same swing the layer authored (repeating when it repeats); the model module replaces the running swing
+			AnimBridge.play(handle, AnimBridge.step(Anim.SWING, 0, Math.max(1, Math.round(layer.motionB())), layer.motionA() == 0.0F ? 90.0F
+					: layer.motionA(), layer.swingPeriod(), null));
 		}
 	}
 
 	@Override
 	void finish(int ticks) {
+		boolean first = endIn < 0;
 		super.finish(ticks);
+		if (first) {
+			endTotal = Math.max(1, endIn);
+		}
 		for (ModelHandle handle : handles) {
 			AnimBridge.end(handle, ticks);
 		}
@@ -430,8 +441,8 @@ final class DisplayRun extends LayerRun {
 		}
 	}
 
-	private @Nullable Display create(int index) {
-		Vec3 at = position(index, 0);
+	private @Nullable Display create(int index, int age) {
+		Vec3 at = position(index, age);
 		float range = template == FxLayer.Template.LASER || layer.attach() == FxLayer.Attach.SKY ? 2.0F : 1.2F;
 		Display display;
 		switch (template) {
@@ -472,7 +483,10 @@ final class DisplayRun extends LayerRun {
 				display = block;
 			}
 		}
-		place(display, index, 0, 0);
+		// the first frame (the next age's, like every key) without interpolation: no zoom from the default scale 1
+		keys[index] = new DisplayKey(display);
+		born[index] = age;
+		place(keys[index], index, Math.min(life, age + 1), true);
 		return display;
 	}
 
@@ -513,9 +527,15 @@ final class DisplayRun extends LayerRun {
 		return origin;
 	}
 
-	/** Sets display {@code index}'s keyframe for tick {@code age}, reached after {@code duration} ticks. */
-	private void place(Display display, int index, int age, int duration) {
-		float fade = Math.min(1.0F, Math.max(0.0F, (life - age) / 6.0F)) * (endIn >= 0 ? Math.min(1.0F, endIn / 6.0F) : 1.0F);
+	/**
+	 * Keys display {@code index}'s frame of tick {@code age} (one tick ahead of the run's age), interpolated over one tick;
+	 * {@code first} places it without interpolation.
+	 */
+	private void place(DisplayKey key, int index, int age, boolean first) {
+		// one ramp to nothing over the last 6 ticks; a cut run (endIn ticks left, counting down after this update) ramps
+		// down over its cut length from where it was, never back up
+		float cut = endIn >= 0 ? Math.min(1.0F, Math.max(0.0F, (endIn - 1) / (float) Math.max(1, endTotal))) : 1.0F;
+		float fade = Math.min(1.0F, Math.max(0.0F, (life - age) / 6.0F)) * cut;
 		float p = motionProgress(displays.length > 1 && template != FxLayer.Template.SWORD_RING && template != FxLayer.Template.PETAL_RING
 				? Math.max(0, age - index * 3) : age);
 		Vector3f offset = new Vector3f();
@@ -616,9 +636,11 @@ final class DisplayRun extends LayerRun {
 				offset.add(motionOffset(p, index));
 			}
 		}
-		display.setTransformation(new Transformation(offset, rotation, scale, null));
-		display.setTransformationInterpolationDuration(duration);
-		display.setTransformationInterpolationDelay(0);
+		if (first) {
+			key.snap(offset, rotation, scale);
+		} else {
+			key.key(offset, rotation, scale, 1);
+		}
 	}
 
 	/** The horizontal yaw (radians, display space) of this layer: the caster's turn when riding it (S15), else the event's. */
@@ -656,10 +678,9 @@ final class DisplayRun extends LayerRun {
 			return 1.0F;
 		}
 		float from = Math.max(0.05F, Math.min(1.0F, layer.motionA() / Math.max(0.01F, layer.scale() > 1.0F ? layer.scale() : 4.0F)));
-		// ease out with a slight overshoot so props pop into place
-		float k = p - 1.0F;
-		float back = 1.0F + 2.4F * k * k * k + 1.4F * k * k;
-		return from + (1.0F - from) * back;
+		// one eased ramp (easeOutCubic): an overshoot reads as the prop growing and then shrinking
+		float u = 1.0F - Math.min(1.0F, Math.max(0.0F, p));
+		return from + (1.0F - from) * (1.0F - u * u * u);
 	}
 
 	private float spin(int age) {

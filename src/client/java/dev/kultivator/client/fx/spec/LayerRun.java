@@ -181,7 +181,9 @@ abstract class LayerRun {
 
 	/** Fades the layer out over {@code ticks} (ABORT, followUntil); displays override to shrink their props. */
 	void finish(int ticks) {
-		endIn = Math.max(0, ticks);
+		// a second cut may shorten the fade but never restarts it (a display would grow back and shrink again)
+		int wanted = Math.max(0, ticks);
+		endIn = endIn >= 0 ? Math.min(endIn, wanted) : wanted;
 	}
 
 	boolean extra() {

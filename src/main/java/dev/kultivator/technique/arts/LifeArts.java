@@ -108,6 +108,8 @@ public final class LifeArts {
 						shell(0xE8F8FF).particle(ParticleTypes.END_ROD).size(0.5F).count(4).detail())
 				.sound(Phase.CAST, SoundEvents.CREAKING_SWAY, 1.0F, 1.0F)
 				.sound(Phase.CAST, SoundEvents.AMETHYST_CLUSTER_PLACE, 1.0F, 1.2F)
+				// the grass drains the ground it rises from (surface only, never a hole)
+				.kehancuran(DShape.wither(3))
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -456,6 +458,8 @@ public final class LifeArts {
 				.sound(Phase.EXTRA0, SoundEvents.BELL_BLOCK, 1.0F, 0.8F)
 				.sound(Phase.EXTRA1, SoundEvents.BELL_RESONATE, 2.0F, 0.6F)
 				.sound(Phase.EXTRA1, SoundEvents.BEACON_ACTIVATE, 1.5F, 0.6F)
+				// the tree draws life from the land around it (first damaging nova), then the @600 burst breaks a ring of natural ground
+				.kehancuran(DShape.wither(12), DShape.ring(14, 6, 1).nat().at(600))
 				.perfection(Bonus.area(0.2D))
 				.peak(Bonus.duration(0.25D))
 				.build());

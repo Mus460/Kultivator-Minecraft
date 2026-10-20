@@ -139,9 +139,9 @@ public class FormLayer<S extends AvatarRenderState, M extends PlayerModel> exten
 				case "azure_sword" -> {
 					poseStack.pushPose();
 					model.translateToHand(state, HumanoidArm.RIGHT, poseStack);
-					float pulse = 1.0F + 0.04F * Mth.sin(age * 0.4F);
+					// held steady (no size throb)
 					FormModels.submitPiece("light_sword", poseStack, collector, LightCoordsUtil.FULL_BRIGHT, in, -1.0F, 10.0F, -1.0F, 0.0F, 90.0F,
-							0.0F, 0.85F * pulse);
+							0.0F, 0.85F);
 					poseStack.popPose();
 				}
 				case "iron_plates" -> {
@@ -303,8 +303,8 @@ public class FormLayer<S extends AvatarRenderState, M extends PlayerModel> exten
 			double a = Math.PI * 2.0D * i / n + age * 0.02D;
 			float x = (float) Math.cos(a) * 11.0F;
 			float y = 4.0F + (float) Math.sin(a) * 11.0F;
-			float beat = 1.0F + 0.06F * Mth.sin(age * 0.5F + i);
-			FormModels.submitPiece("thunder_drum", ps, c, light, grow, x, y, 8.0F, 0.0F, 0.0F, (float) Math.toDegrees(a), 0.5F * beat);
+			// the drums circle at a steady size (no per-drum throb)
+			FormModels.submitPiece("thunder_drum", ps, c, light, grow, x, y, 8.0F, 0.0F, 0.0F, (float) Math.toDegrees(a), 0.5F);
 		}
 		ps.popPose();
 	}

@@ -54,12 +54,30 @@ final class Signatures {
 	/** A display that pops and is removed after a while (glyphs over victims). */
 	private static final class Timed {
 		final Display display;
+		final DisplayKey key;
 		final int life;
 		int age;
 
 		Timed(Display display, int life) {
 			this.display = display;
+			this.key = new DisplayKey(display);
 			this.life = life;
+		}
+
+		/**
+		 * The pop at age {@code a} (one ramp up to 1.1 over the first fifth, held, one ramp down over the last 30%, rising
+		 * 0.4 blocks); keyed one tick ahead each tick, the first frame without interpolation.
+		 */
+		void pose(int a, boolean first) {
+			float t = Math.min(1.0F, a / (float) Math.max(1, life));
+			float s = (t < 0.2F ? 0.5F + 3.0F * t : t > 0.7F ? Math.max(0.05F, 1.1F * (1.0F - t) / 0.3F) : 1.1F) * 2.0F;
+			Vector3f translation = new Vector3f(0.0F, t * 0.4F, 0.0F);
+			Vector3f scale = new Vector3f(s, s, s);
+			if (first) {
+				key.snap(translation, new Quaternionf(), scale);
+			} else {
+				key.key(translation, new Quaternionf(), scale, 1);
+			}
 		}
 	}
 
@@ -614,14 +632,7 @@ final class Signatures {
 				it.remove();
 				continue;
 			}
-			if (timed.age % 2 == 0) {
-				float t = timed.age / (float) timed.life;
-				float s = t < 0.2F ? 0.5F + 3.0F * t : t > 0.7F ? Math.max(0.05F, 1.1F * (1.0F - t) / 0.3F) : 1.1F;
-				timed.display.setTransformation(new com.mojang.math.Transformation(new Vector3f(0.0F, t * 0.4F, 0.0F), new Quaternionf(),
-						new Vector3f(s * 2.0F, s * 2.0F, s * 2.0F), null));
-				timed.display.setTransformationInterpolationDuration(2);
-				timed.display.setTransformationInterpolationDelay(0);
-			}
+			timed.pose(timed.age + 1, false);
 		}
 		if (ONCE.size() > 256) {
 			ONCE.values().removeIf(at -> ticks - at > 400L);
@@ -716,7 +727,10 @@ final class Signatures {
 		display.setText(Component.literal(text).withColor(color & 0xFFFFFF));
 		display.setBackgroundColor(0);
 		display.setBillboardConstraints(Display.BillboardConstraints.CENTER);
-		TIMED.add(new Timed(display, life));
+		Timed timed = new Timed(display, life);
+		// the first frame now (it used to show at the default scale 1 until the first key, then zoom)
+		timed.pose(1, true);
+		TIMED.add(timed);
 	}
 
 	private static void cone(Vec3 from, Vec3 dir, ParticleOptions particle, int count, double halfDeg, double speed) {

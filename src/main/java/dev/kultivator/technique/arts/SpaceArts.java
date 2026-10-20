@@ -101,6 +101,8 @@ public final class SpaceArts {
 				.fx(Phase.EXTRA0, chains(GOLD).count(24).ticks(10))
 				.sound(Phase.CAST, SoundEvents.ARMOR_EQUIP_CHAIN, 1.0F, 1.0F)
 				.sound(Phase.EXTRA0, SoundEvents.ARMOR_EQUIP_CHAIN, 1.0F, 0.8F)
+				// the rope deals damage (.5) where it lashes each bound foe: a small pit per hop
+				.kehancuran(DShape.scatter(1))
 				.perfection(Bonus.chain(2))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -122,6 +124,8 @@ public final class SpaceArts {
 				.fx(Phase.TRAVEL, model("qiankun_ring").scale(1.5F).slide(4.0F).ticks(6).facing(FxLayer.Facing.FLAT))
 				.sound(Phase.CAST, SoundEvents.TRIDENT_THROW, 1.0F, 1.4F)
 				.sound(Phase.HIT, SoundEvents.BELL_BLOCK, 0.8F, 1.2F)
+				// a small crater at every foe the ring bounces off
+				.kehancuran(DShape.scatter(1))
 				.perfection(Bonus.chain(2))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -284,6 +288,8 @@ public final class SpaceArts {
 				.sound(Phase.CAST, SoundEvents.BUNDLE_INSERT, 1.4F, 0.6F)
 				.sound(Phase.EXTRA0, SoundEvents.BELL_RESONATE, 1.2F, 1.0F)
 				.sound(Phase.EXTRA1, SoundEvents.BUNDLE_INSERT, 1.4F, 0.5F)
+				// the cymbal falls on the aim at @60 (suspend + qi DOT): a square pit where the bag swallows the ground
+				.kehancuran(DShape.pit(5, 3).at(60))
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.duration(0.25D))
 				.build());

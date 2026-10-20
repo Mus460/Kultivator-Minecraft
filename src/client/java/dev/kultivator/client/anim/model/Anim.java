@@ -6,15 +6,15 @@ package dev.kultivator.client.anim.model;
  * <ul>
  * <li>SPIN: a = degrees per tick, b = axis (0 Y, 1 X, 2 Z)</li>
  * <li>BOB: a = amplitude (blocks), b = period (ticks)</li>
- * <li>GROW: a = the starting fraction of the scale (easeOutBack); SHRINK: to nothing (easeInCubic)</li>
- * <li>FALL: a = height (easeInQuad drop, then a 2 tick stamp squash); RISE: a = depth it rises from (easeOutCubic)</li>
+ * <li>GROW: a = the starting fraction of the scale (easeOutCubic, no overshoot; held at a before it starts); SHRINK: to nothing (easeInCubic)</li>
+ * <li>FALL: a = height (easeInQuad drop; add a STAMP for the landing squash); RISE: a = depth it rises from (easeOutCubic)</li>
  * <li>SLIDE: travel to {@code to} (b = 1: easeOutCubic, else linear), facing the travel</li>
  * <li>THRUST: a = distance along the facing (out with easeOutBack, a 3 tick hold, then it fades)</li>
  * <li>SWING: a = degrees about the side axis; b = period (repeating) or 0 (one sweep)</li>
  * <li>TOPPLE: falls over by 90 degrees about the side axis (easeInQuad)</li>
- * <li>OPEN / CLOSE: the width grows from 0.1 / shrinks to 0.1 (parasols, fans, bags, cymbals)</li>
+ * <li>OPEN / CLOSE: the width grows from 0.1 (held closed before it starts) / shrinks to 0.1 (parasols, fans, bags, cymbals)</li>
  * <li>SHATTER: swells by 30% over 2 ticks and bursts into shards of its own texture</li>
- * <li>PULSE: a = amplitude of a 2 Hz breathing of the scale</li>
+ * <li>PULSE: one swell up and back over the duration (a, at most 0.1); never stacked; a PULSE longer than 20 ticks is ignored (idle props stay steady)</li>
  * <li>FLAP: a = degrees, b = period (wings: roll about the body axis)</li>
  * <li>ORBIT: a = radius, b = degrees per second (about the position or the followed entity)</li>
  * <li>LUNGE: 4 ticks forward 2 blocks towards {@code to}, then back</li>

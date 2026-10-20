@@ -162,13 +162,15 @@ public final class DaoTechniques {
 	/**
 	 * One pulse of the Dao Domain's law (22.10.1), coefficients × P through the cast's choke point (DOT and pulse ticks
 	 * ≤ 2% of a boss each); {@code factor} ×2 for {@code profound_mystery_fusion}. {@code pulseIndex} counts the pulses
-	 * (Ice: every 4th from Dao Union freezes).
+	 * (Ice: every 4th from Dao Union freezes). True when the pulse's damage landed on a monster (the Kehancuran impact of
+	 * the domain, 22.11.4: the first one carves the Dao Domain's ring around the caster).
 	 */
-	public static void domainPulse(CastContext ctx, @Nullable Dao dao, List<LivingEntity> inside, double areaRadius, double factor, int pulseIndex) {
+	public static boolean domainPulse(CastContext ctx, @Nullable Dao dao, List<LivingEntity> inside, double areaRadius, double factor, int pulseIndex) {
 		LivingEntity caster = ctx.caster();
 		if (caster.isRemoved() || caster.isDeadOrDying()) {
-			return;
+			return false;
 		}
+		boolean struck = false;
 		List<LivingEntity> targets = new ArrayList<>();
 		for (LivingEntity entity : inside) {
 			if (entity.isAlive() && !entity.isRemoved() && entity.level() == caster.level() && ctx.mayHit(entity, false)) {
@@ -184,16 +186,18 @@ public final class DaoTechniques {
 		boolean arena = ctx.arena();
 		if (dao == null) {
 			for (LivingEntity target : targets) {
-				if (pulse(ctx, target, 0.4D * factor) && target.isAlive()) {
+				boolean hit = pulse(ctx, target, 0.4D * factor);
+				struck |= hit;
+				if (hit && target.isAlive()) {
 					target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, DOMAIN_EFFECT_TICKS, 0, false, true), caster);
 				}
 			}
-			return;
+			return struck;
 		}
 		switch (dao) {
 			case SWORD -> {
 				for (LivingEntity target : targets) {
-					pulse(ctx, target, 0.5D * factor);
+					struck |= pulse(ctx, target, 0.5D * factor);
 					fx(level, Technique.SWORD_QI, DaoTechniqueSub.HIT, middleOf(target), middleOf(target), target.getBbWidth());
 				}
 				if (!targets.isEmpty()) {
@@ -204,7 +208,7 @@ public final class DaoTechniques {
 				Payload.Dot dot = new Payload.Dot(0.4D, 3, Payload.DotKind.FIRE, false, Map.of());
 				for (LivingEntity target : targets) {
 					ignite(target, 3.0F);
-					pulse(ctx, target, 0.3D * factor);
+					struck |= pulse(ctx, target, 0.3D * factor);
 					if (!arena && target.isAlive()) {
 						ctx.apply(target, dot);
 					}
@@ -229,7 +233,7 @@ public final class DaoTechniques {
 					LivingEntity target = pool.remove(random.nextInt(pool.size()));
 					Vec3 ground = target.position();
 					fx(level, Technique.THUNDER_PALM, DaoTechniqueSub.BOLT, skyAbove(level, caster, ground), ground, 1.0F);
-					pulse(ctx, target, 0.8D * factor);
+					struck |= pulse(ctx, target, 0.8D * factor);
 					sound(level, ground, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.6F, 1.3F);
 				}
 			}
@@ -239,7 +243,7 @@ public final class DaoTechniques {
 				dev.kultivator.technique.spec.run.Boons.trackResistance(caster, 1, DOMAIN_EFFECT_TICKS);
 				if (!arena) {
 					for (LivingEntity target : targets) {
-						pulse(ctx, target, 0.4D * factor);
+						struck |= pulse(ctx, target, 0.4D * factor);
 					}
 				}
 			}
@@ -250,6 +254,7 @@ public final class DaoTechniques {
 				for (LivingEntity target : targets) {
 					target.addEffect(new MobEffectInstance(MobEffects.WITHER, DOMAIN_EFFECT_TICKS, 0), caster);
 					if (!arena && pulse(ctx, target, 0.3D * factor)) {
+						struck = true;
 						ctx.apply(target, new Payload.Drain(1.0D, 0.0D, 0.0D, 0.0D, 0.0D));
 					}
 				}
@@ -258,7 +263,7 @@ public final class DaoTechniques {
 				for (LivingEntity target : targets) {
 					target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, DOMAIN_EFFECT_TICKS, 0), caster);
 					if (!arena) {
-						pulse(ctx, target, 0.4D * factor);
+						struck |= pulse(ctx, target, 0.4D * factor);
 					}
 				}
 				caster.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, DOMAIN_EFFECT_TICKS, 0, false, false, true), caster);
@@ -267,7 +272,7 @@ public final class DaoTechniques {
 				for (LivingEntity target : targets) {
 					target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, DOMAIN_EFFECT_TICKS, 4), caster);
 					if (!arena) {
-						pulse(ctx, target, 0.3D * factor);
+						struck |= pulse(ctx, target, 0.3D * factor);
 					}
 					if (target.isAlive() && ctx.moveAllowed(target)) {
 						Vec3 to = pos.subtract(target.position()).horizontal();
@@ -279,6 +284,7 @@ public final class DaoTechniques {
 				}
 			}
 		}
+		return struck;
 	}
 
 	private static boolean pulse(CastContext ctx, LivingEntity target, double coef) {
@@ -608,8 +614,9 @@ public final class DaoTechniques {
 		sound(level, main.position(), SoundEvents.GLASS_PLACE, 1.0F, 0.7F);
 		int ticks = ctx.duration(160.0D, 160.0D);
 		int sealed = 0;
+		boolean struck = false;
 		for (LivingEntity victim : victims) {
-			strike(ctx, victim, 1.5D, victim == main);
+			struck |= strike(ctx, victim, 1.5D, victim == main);
 			if (victim.isAlive()) {
 				ctx.apply(victim, new Payload.Bind(Payload.BindKind.ROOT, dev.kultivator.technique.spec.dsl.Val.of(ticks), 40));
 				freezeLook(victim, 20);
@@ -628,6 +635,10 @@ public final class DaoTechniques {
 				}
 			}
 		});
+		if (struck) {
+			// the Kehancuran impact (22.11.4): the ice shatters a crater under the sealed target
+			ctx.impact(main.position(), ctx.look());
+		}
 		ctx.keepAlive(ticks + 1);
 		ctx.runBonusSteps();
 		Msg.actionBar(player, Component.translatable("kultivator.daotech.glacier", String.valueOf(sealed)).withColor(Dao.ICE.color()));

@@ -1,8 +1,8 @@
 package dev.kultivator.client.anim.model;
 
-import com.mojang.math.Transformation;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.fx.spec.DisplayKey;
 import dev.kultivator.client.fx.spec.PhantomDisplays;
 import dev.kultivator.technique.spec.dsl.FxLayer;
 import net.minecraft.client.Minecraft;
@@ -37,14 +37,21 @@ import java.util.Set;
 /**
  * The 3D technique props (polish plan section 3, contract C3): our cuboid item models ({@code kultivator:fx/<id>}) shown
  * on client-only item displays from {@code PhantomDisplays}, posed and animated here. Every prop is re-keyed each client
- * tick with a one-tick transformation interpolation (smooth at any frame rate; the interpolation start is re-armed by
- * toggling the start delay, since setting the same value does not notify the display). Each prop costs one display (and
+ * tick through {@link DisplayKey}: the entity is moved to the prop's base point ({@code setPos}, lerped by the renderer
+ * like the body it rides; a prop that turns with its rider takes the rider's yaw as its entity yaw) and the
+ * transformation (the animation offset, turn and size) targets the next tick with a one-tick interpolation, re-armed
+ * only when the frame changed. Scale only ever ramps once: grow-in, an optional one-shot swell on an event, fade-out.
+ * Each prop costs one display (and
  * one per child part when the budget allows) and counts in the PhantomDisplays caps; models made per tick are capped at
  * 2 / 12 / 32 by quality (Minimal only for CORE props). Nothing here is ever sent to or made by the server.
  */
 public final class ModelFx {
 
 	private static final int[] PER_TICK = {2, 12, 32};
+	/** A PULSE up to this long is a one-shot swell; a longer one was an idle throb and is held steady. */
+	static final int PULSE_MAX_TICKS = 20;
+	/** The largest swell (+10%). */
+	static final float PULSE_MAX_SWELL = 0.1F;
 	private static final float VIEW_RANGE = 2.5F;
 	private static final Brightness DIM = new Brightness(11, 15);
 	private static final Set<String> WARNED = new HashSet<>();
@@ -116,7 +123,7 @@ public final class ModelFx {
 				prop.parts.add(new PartProp(part, child));
 			}
 		}
-		prop.key(0.0F, 0);
+		prop.key(true);
 		PROPS.add(prop);
 		return prop;
 	}
@@ -213,7 +220,7 @@ public final class ModelFx {
 		display.setItemStack(stack(id));
 		display.setItemTransform(ItemDisplayContext.FIXED);
 		display.setBrightnessOverride(glow ? Brightness.FULL_BRIGHT : DIM);
-		display.setTransformationInterpolationDuration(1);
+		// the first frame is placed by Prop.key (DisplayKey.snap, no interpolation)
 		return display;
 	}
 
@@ -227,10 +234,12 @@ public final class ModelFx {
 	static final class PartProp {
 		final FxModels.Part part;
 		final Display.ItemDisplay display;
+		final DisplayKey pose;
 
 		PartProp(FxModels.Part part, Display.ItemDisplay display) {
 			this.part = part;
 			this.display = display;
+			this.pose = new DisplayKey(display);
 		}
 	}
 
@@ -238,13 +247,22 @@ public final class ModelFx {
 	static final class Prop implements ModelHandle {
 		final ModelRequest request;
 		final Display.ItemDisplay display;
+		final DisplayKey pose;
 		final List<PartProp> parts = new ArrayList<>(2);
 		final List<AnimStep> anims;
 		final FxModels.Info info;
 		final Vec3 spawn;
 		String modelId;
-		int age;
+		/**
+		 * Ticks since the prop was made, -1 at the first frame. Each tick the entity stands at the base point of
+		 * {@code age} and the transformation targets {@code age + 1} (shown one tick later, so both stay in step);
+		 * {@link #now()} is the time of the frame last sent, where re-timed values (moveTo, scaleTo, play) start.
+		 */
+		int age = -1;
 		int life;
+		/** The entity yaw (degrees): the rider's body yaw while the prop turns with it, else 0 (kept when the rider goes). */
+		float entityYaw;
+		Vec3 lastBase;
 		// eased base values
 		Vec3 pos;
 		Vec3 posFrom;
@@ -266,10 +284,12 @@ public final class ModelFx {
 		Prop(ModelRequest request, Display.ItemDisplay display) {
 			this.request = request;
 			this.display = display;
+			this.pose = new DisplayKey(display);
 			this.anims = new ArrayList<>(request.anims() == null ? List.of() : request.anims());
 			this.info = FxModels.info(request.id());
 			this.modelId = request.id();
 			this.spawn = request.pos();
+			this.lastBase = request.pos();
 			this.pos = request.pos();
 			this.posFrom = request.pos();
 			this.yaw = this.yawFrom = request.yaw();
@@ -288,7 +308,7 @@ public final class ModelFx {
 			}
 			age++;
 			if (endAt < 0 && age >= life) {
-				end(fade);
+				fadeFrom(age, fade);
 			}
 			if (endAt >= 0 && age >= endAt + fade) {
 				return false;
@@ -296,27 +316,41 @@ public final class ModelFx {
 			if (follow >= 0) {
 				Entity target = level.getEntity(follow);
 				if (target == null || target.isRemoved()) {
-					end(6);
+					fadeFrom(age, 6);
+					// stay where the rider was last seen while fading (not back at the spawn point)
 					follow = -1;
+					pos = posFrom = lastBase;
+					posLerp = 0;
 				}
 			}
-			key(1.0F, 1);
+			key(false);
 			return true;
 		}
 
-		/** Computes the transform at {@code age + ahead} and sets it, eased over {@code duration} ticks. */
-		void key(float ahead, int duration) {
-			float t = age + ahead;
-			Vec3 base = basePosition(t);
+		/** The time of the frame last sent (the next tick's frame is {@code now() + 1}). */
+		int now() {
+			return age + 1;
+		}
+
+		/**
+		 * Moves the entity to the base point of {@code age} and keys the transformation of {@code age + 1}; the first
+		 * frame ({@code first}) is placed without interpolation.
+		 */
+		void key(boolean first) {
+			float t = age + 1.0F;
+			Vec3 base = basePosition(age);
+			lastBase = base;
 			float yawNow = ease(yawFrom, yaw, rotStart, rotLerp, t);
 			float pitchNow = ease(pitchFrom, pitch, rotStart, rotLerp, t);
 			float rollNow = ease(rollFrom, roll, rotStart, rotLerp, t);
-			if (follow >= 0 && followYaw) {
-				Entity target = Minecraft.getInstance().level == null ? null : Minecraft.getInstance().level.getEntity(follow);
+			if (followYaw) {
+				Entity target = follow < 0 || Minecraft.getInstance().level == null ? null : Minecraft.getInstance().level.getEntity(follow);
 				if (target != null) {
-					// the prop's own yaw (rotateTo) is relative to the body it rides
-					yawNow = (target instanceof LivingEntity living ? living.yBodyRot : target.getYRot()) + yawNow;
+					// the prop's own yaw (rotateTo) is relative to the body it rides; the body's turn is the entity yaw, which
+					// the renderer lerps in step with the body itself (kept when the rider goes)
+					entityYaw = target instanceof LivingEntity living ? living.yBodyRot : target.getYRot();
 				}
+				yawNow = entityYaw + yawNow;
 			}
 			float s = ease(scaleFrom, scale, scaleStart, scaleLerp, t);
 			Vector3f offset = new Vector3f();
@@ -327,7 +361,12 @@ public final class ModelFx {
 			for (AnimStep step : anims) {
 				float into = t - step.start();
 				if (into < 0.0F) {
-					continue;
+					if (!holdsBefore(step)) {
+						continue;
+					}
+					// an entry motion that starts later (a staggered copy, an OPEN after a GROW) waits in its first pose
+					// instead of showing the finished pose and then jumping back to the start
+					into = 0.0F;
 				}
 				int dur = Math.max(1, step.duration());
 				float p = Mth.clamp(into / dur, 0.0F, 1.0F);
@@ -342,18 +381,14 @@ public final class ModelFx {
 					}
 					case BOB -> offset.y += step.a() * Mth.sin((float) (Math.PI * 2.0D * into / Math.max(1.0F, step.b())));
 					case GROW -> {
+						// one eased ramp, no overshoot (an overshoot reads as the prop growing and shrinking)
 						float from = step.a() <= 0.0F || step.a() >= 1.0F ? 0.1F : step.a();
-						float g = from + (1.0F - from) * back(p);
+						float g = from + (1.0F - from) * cubic(p);
 						scl.mul(g);
 					}
 					case SHRINK -> scl.mul(Math.max(0.0F, 1.0F - p * p * p));
-					case FALL -> {
-						offset.y += step.a() * (1.0F - p * p);
-						float landed = into - dur;
-						if (landed >= 0.0F && landed < 2.0F) {
-							scl.mul(1.15F, 0.85F, 1.15F);
-						}
-					}
+					// the landing squash is the STAMP step's (both together squashed twice)
+					case FALL -> offset.y += step.a() * (1.0F - p * p);
 					case RISE -> offset.y -= step.a() * (1.0F - cubic(p));
 					case SLIDE -> {
 						if (step.to() != null) {
@@ -390,7 +425,7 @@ public final class ModelFx {
 					}
 					case TOPPLE -> local.rotateX(rad(90.0F * p * p));
 					case OPEN -> {
-						float w = 0.1F + 0.9F * back(p);
+						float w = 0.1F + 0.9F * cubic(p);
 						scl.mul(w, 1.0F, w);
 					}
 					case CLOSE -> {
@@ -406,7 +441,12 @@ public final class ModelFx {
 							fade = 1;
 						}
 					}
-					case PULSE -> scl.mul(1.0F + step.a() * Mth.sin((float) (Math.PI * 2.0D * into / 10.0D)));
+					case PULSE -> {
+						// one gentle swell on an event (up once, back once); a long PULSE was an idle throb and is held steady
+						if (step.duration() <= PULSE_MAX_TICKS) {
+							scl.mul(1.0F + Math.min(PULSE_MAX_SWELL, Math.abs(step.a())) * Mth.sin((float) Math.PI * p));
+						}
+					}
 					case FLAP -> local.rotateZ(rad(step.a() * Mth.sin((float) (Math.PI * 2.0D * into / Math.max(2.0F, step.b())))));
 					case ORBIT -> {
 						double angle = Math.toRadians(step.b() / 20.0D * into);
@@ -460,15 +500,41 @@ public final class ModelFx {
 			}
 			rotation.mul(local);
 			Vector3f scaleVec = new Vector3f(scl).mul(s);
-			Vector3f translation = new Vector3f((float) (base.x - spawn.x) + offset.x, (float) (base.y - spawn.y) + offset.y,
-					(float) (base.z - spawn.z) + offset.z);
-			set(display, translation, rotation, scaleVec, duration);
+			// the base point is the entity position; the translation carries only the animation offset (world axes here)
+			Vector3f translation = new Vector3f(offset);
+			send(pose, base, translation, rotation, scaleVec, first);
 			for (PartProp part : parts) {
-				keyPart(part, translation, rotation, scaleVec, t, duration);
+				keyPart(part, base, translation, rotation, scaleVec, t, first);
 			}
 		}
 
-		private void keyPart(PartProp part, Vector3f translation, Quaternionf rotation, Vector3f scaleVec, float t, int duration) {
+		/** Holds the first pose before the step starts (entry motions), instead of skipping the step. */
+		private static boolean holdsBefore(AnimStep step) {
+			return switch (step.kind()) {
+				case GROW, OPEN, FALL, RISE -> true;
+				case SWING -> step.b() <= 0.0F;
+				default -> false;
+			};
+		}
+
+		/**
+		 * Stands the entity on {@code base} turned by {@link #entityYaw} and keys the world-axis frame in the entity's own
+		 * frame (the renderer turns the transformation by the entity yaw first).
+		 */
+		private void send(DisplayKey target, Vec3 base, Vector3f translation, Quaternionf rotation, Vector3f scale, boolean first) {
+			Quaternionf undo = new Quaternionf().rotationY(rad(entityYaw));
+			Vector3f t = undo.transform(new Vector3f(translation));
+			Quaternionf r = new Quaternionf(undo).mul(rotation);
+			target.move(base);
+			target.turn(entityYaw);
+			if (first) {
+				target.snap(t, r, scale);
+			} else {
+				target.key(t, r, scale, 1);
+			}
+		}
+
+		private void keyPart(PartProp part, Vec3 base, Vector3f translation, Quaternionf rotation, Vector3f scaleVec, float t, boolean first) {
 			FxModels.Part def = part.part;
 			// model pixels to the display's local frame (the item renderer turns models by 180 degrees about y)
 			Vector3f local = new Vector3f(-def.x() / 16.0F, def.y() / 16.0F, -def.z() / 16.0F).mul(scaleVec);
@@ -489,18 +555,7 @@ public final class ModelFx {
 				default -> {
 				}
 			}
-			set(part.display, at, rot, scaleVec, duration);
-		}
-
-		private static void set(Display display, Vector3f translation, Quaternionf rotation, Vector3f scale, int duration) {
-			if (!Float.isFinite(translation.x) || !Float.isFinite(translation.y) || !Float.isFinite(translation.z) || !Float.isFinite(scale.x)) {
-				return;
-			}
-			display.setTransformation(new Transformation(translation, rotation, scale, null));
-			display.setTransformationInterpolationDuration(duration);
-			// re-arm the interpolation start: the display only restarts it when the delay value changes
-			display.setTransformationInterpolationDelay(1);
-			display.setTransformationInterpolationDelay(0);
+			send(part.pose, base, at, rot, scaleVec, first);
 		}
 
 		/** The eased (or followed) base position at time {@code t}. */
@@ -579,14 +634,16 @@ public final class ModelFx {
 			if (dead || !Float.isFinite(yaw) || !Float.isFinite(pitch) || !Float.isFinite(roll)) {
 				return;
 			}
-			yawFrom = ease(yawFrom, this.yaw, rotStart, rotLerp, age);
-			pitchFrom = ease(pitchFrom, this.pitch, rotStart, rotLerp, age);
-			rollFrom = ease(rollFrom, this.roll, rotStart, rotLerp, age);
+			// turn from the frame last sent (the transformation runs one tick ahead of the age)
+			int now = now();
+			yawFrom = ease(yawFrom, this.yaw, rotStart, rotLerp, now);
+			pitchFrom = ease(pitchFrom, this.pitch, rotStart, rotLerp, now);
+			rollFrom = ease(rollFrom, this.roll, rotStart, rotLerp, now);
 			// turn the short way round
 			this.yaw = yawFrom + Mth.wrapDegrees(yaw - yawFrom);
 			this.pitch = pitch;
 			this.roll = roll;
-			rotStart = age;
+			rotStart = now;
 			rotLerp = Math.max(0, lerpTicks);
 		}
 
@@ -595,9 +652,11 @@ public final class ModelFx {
 			if (dead || !Float.isFinite(scale)) {
 				return;
 			}
-			scaleFrom = ease(scaleFrom, this.scale, scaleStart, scaleLerp, age);
+			// resize from the size last sent: one continuous ramp, never a jump back to an older size
+			int now = now();
+			scaleFrom = ease(scaleFrom, this.scale, scaleStart, scaleLerp, now);
 			this.scale = Mth.clamp(scale, 0.05F, 40.0F);
-			scaleStart = age;
+			scaleStart = now;
 			scaleLerp = Math.max(0, lerpTicks);
 		}
 
@@ -606,8 +665,20 @@ public final class ModelFx {
 			if (dead || step == null) {
 				return;
 			}
-			anims.add(new AnimStep(step.kind(), age + Math.max(0, step.start()), step.duration(), step.a(), step.b(), step.to()));
-			life = Math.max(life, age + step.start() + step.duration() + 2);
+			int start = now() + Math.max(0, step.start());
+			if (step.kind() == Anim.PULSE) {
+				// swells never stack or restart: a swell already under way plays out
+				for (AnimStep running : anims) {
+					if (running.kind() == Anim.PULSE && running.duration() <= PULSE_MAX_TICKS && start < running.start() + running.duration()) {
+						return;
+					}
+				}
+			} else if (step.kind() == Anim.SWING) {
+				// a new swing replaces the old one (two swings would add up)
+				anims.removeIf(running -> running.kind() == Anim.SWING);
+			}
+			anims.add(new AnimStep(step.kind(), start, step.duration(), step.a(), step.b(), step.to()));
+			life = Math.max(life, start + step.duration() + 2);
 		}
 
 		@Override
@@ -631,10 +702,16 @@ public final class ModelFx {
 
 		@Override
 		public void end(int fadeTicks) {
+			// the fade starts with the next frame
+			fadeFrom(now(), fadeTicks);
+		}
+
+		/** Starts the one fade-out ramp at age {@code at} (a later call never restarts it). */
+		private void fadeFrom(int at, int fadeTicks) {
 			if (dead || endAt >= 0) {
 				return;
 			}
-			endAt = age;
+			endAt = at;
 			fade = Math.max(1, fadeTicks);
 		}
 

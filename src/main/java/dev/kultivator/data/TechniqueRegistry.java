@@ -275,6 +275,8 @@ public final class TechniqueRegistry {
 					.perfection(Bonus.durationTicks(100))
 					.peak(Bonus.special("golden_arc", 0.8D)));
 			legacy(map, Technique.DAO_DOMAIN, TechniqueGrade.DI, 2, TechniqueType.WILAYAH, false, b -> b
+					// the domain rides the caster: its first pulse that hurts a monster cracks a ring of ground around them
+					.kehancuran(DShape.ring(10, 5, 1))
 					.perfection(Bonus.area(0.20D))
 					.peak(Bonus.special("pulse_10", 10.0D)));
 			legacy(map, Technique.SWORD_QI, TechniqueGrade.XUAN, 0, TechniqueType.SERANG, true, b -> b
@@ -299,6 +301,8 @@ public final class TechniqueRegistry {
 					.peak(Bonus.steps(at(20).shape(wave().r1Previous(0.0D).speed(1.5D)).hit(damage(0.5D).shatter()))));
 			legacy(map, Technique.GLACIER_PRISON, TechniqueGrade.XUAN, 2, TechniqueType.KENDALI, true, b -> b
 					.bindLook(dev.kultivator.technique.spec.run.BindKind.FREEZE)
+					// a shatter crater (carving only, never ice blocks) under the sealed target when the strike lands
+					.kehancuran(DShape.bowl(3))
 					.perfection(Bonus.durationTicks(40))
 					.peak(Bonus.steps(atEnd().shape(recall()).hit(damage(1.0D).shatter()))));
 			legacy(map, Technique.THUNDER_PALM, TechniqueGrade.XUAN, 0, TechniqueType.SERANG, true, b -> b
