@@ -3,7 +3,6 @@ package dev.kultivator.client.epic;
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.epic.camera.CinematicDirector;
 import dev.kultivator.client.epic.camera.Shots;
-import dev.kultivator.client.epic.fx.EpicDisplays;
 import dev.kultivator.client.epic.fx.EpicParticles;
 import dev.kultivator.client.epic.fx.PointClouds;
 import dev.kultivator.client.epic.render.AuroraRenderer;
@@ -499,7 +498,12 @@ final class SceneCatalogPower {
 				u.slowmoDone = true;
 				if (dewa) {
 					slowmo(s, wait, 20);
-					hitStop(s, wait);
+					if (silentClimax(spec)) {
+						// Phase 10 (28.4.3): the impact lands silent; the sub-bass comes with the delayed boom (SilentImpact)
+						s.at(wait, () -> EpicClock.hitStop(EpicClock.HIT_TICKS));
+					} else {
+						hitStop(s, wait);
+					}
 				} else {
 					slowmo(s, wait, 12);
 				}
@@ -515,6 +519,12 @@ final class SceneCatalogPower {
 		} else if (beat == EpicIds.TECH_END) {
 			ultEnd(s, spec, u);
 		}
+	}
+
+	/** True when the spec's climax is silent (Phase 10 Dampak sunyi): the boom is the client's, delayed by distance. */
+	private static boolean silentClimax(TechniqueSpec spec) {
+		dev.kultivator.technique.spec.dsl.Dampak dampak = spec.dampak();
+		return dampak != null && dampak.silence() > 0 && EpicSettings.silentImpact();
 	}
 
 	/** Shared state of one ultimate scene: the aim, the fallback token and whether the end beat already ran. */
@@ -562,7 +572,8 @@ final class SceneCatalogPower {
 		return player.level().getEntities(player, new AABB(player.blockPosition()).inflate(radius), e -> e instanceof Enemy && e.isAlive()).isEmpty();
 	}
 
-	private static String sealOf(String id, boolean dewa) {
+	/** The seal glyph of an ultimate (also the Phase 10 mark glyph, through {@code EpicDirector.seal}). */
+	static String sealOf(String id, boolean dewa) {
 		return switch (id) {
 			case "zhuxian_sword_formation" -> "誅";
 			case "nine_suns_heavens_fury" -> "陽";
@@ -778,20 +789,7 @@ final class SceneCatalogPower {
 		float radius = Math.max(1.0F, s.f);
 		EpicParticles.dustCrown(c, Math.max(2.0F, radius), n(s, tier() == 0 ? 8 : tier() == 1 ? 24 : 40, 4));
 		s.add(new RingRenderer(0, 30, c, radius * 0.5F, radius * 1.5F, 1.5F, 12.0F, 0x8A7A60, 0.5F));
-		if (tier() >= 2 && !lite(s) && !s.has(EpicIds.FLAG_LOW_LOAD)) {
-			Minecraft minecraft = Minecraft.getInstance();
-			if (minecraft.level != null) {
-				var ground = minecraft.level.getBlockState(net.minecraft.core.BlockPos.containing(c.x, c.y - 0.5D, c.z));
-				if (!ground.isAir()) {
-					for (int k = 0; k < 6; k++) {
-						double angle = Math.PI * 2.0D * k / 6.0D + s.random().nextDouble();
-						double speed = 0.4D + s.random().nextDouble() * 0.5D;
-						EpicDisplays.chunk(c.add(0.0D, 0.5D, 0.0D), ground, 0.6F + 0.1F * (k % 4), new Vec3(Math.cos(angle) * speed, 0.7D, Math.sin(angle) * speed),
-								0.08D, 22);
-					}
-				}
-			}
-		}
+		// Phase 10 (28.13.1): the six fake chunks of Maximal are gone; the real carve batches throw the debris now
 		if (spec != null && spec.dewa() && spec.pamungkas()) {
 			sky(s, 0, SkyDirector.Grade.SK_RED, 0.5F, 0.4F, 20);
 			skyRelease(s, 20, 60, 40);

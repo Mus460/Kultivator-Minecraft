@@ -70,6 +70,8 @@ public final class CinematicDirector {
 	private static boolean mirrored;
 	private static boolean resultSafe;
 	private static float mouseDegrees;
+	/** Phase 10 (28.3.2): the running segment started with a masked cut (no enter blend). */
+	private static boolean snapEnter;
 	private static final float[] OUT = new float[5];
 
 	private static long ticks;
@@ -151,6 +153,10 @@ public final class CinematicDirector {
 		Vec3 eye = feet.add(0.0D, scene.height() * 0.9D, 0.0D);
 		int remaining = request.danger ? shotCap : Math.min(shotCap, sceneCap - used);
 		request.validate(feet, eye, subjectYaw, Math.max(20, remaining));
+		if (request.hold > 0) {
+			// Phase 10: the held last pose (R3 waiting for a late climax) comes after the validated path
+			request.ticks = Math.min(request.ticks + request.hold, Math.max(request.ticks, remaining));
+		}
 		if (active && owner != scene) {
 			// Another scene takes over the running shot: it counts as ended for the cooldowns.
 			KIND_LAST.put(kind, ticks);
@@ -158,6 +164,14 @@ public final class CinematicDirector {
 		}
 		// Blend from the pose shown last frame whenever a shot runs (also when another scene takes over), never snap.
 		blendFrom = active && last != null ? last : null;
+		// Phase 10 (28.3.2): a masked cut jumps straight to the new segment, only while the cloud wipe or an impact frame
+		// hides the jump; otherwise it blends like any other shot.
+		boolean masked = request.cut && (dev.kultivator.client.epic.screen.CloudWipe.cover() >= 0.8F
+				|| dev.kultivator.client.epic.screen.ImpactFrame.showing());
+		if (masked) {
+			blendFrom = null;
+		}
+		snapEnter = masked;
 		shot = request;
 		owner = scene;
 		priority = prio;
@@ -177,8 +191,25 @@ public final class CinematicDirector {
 		if (request.roll != 0.0F) {
 			roll(request.roll, request.ticks);
 		}
-		EpicSound.whoosh(Math.min(40, request.ticks));
+		if (!masked) {
+			EpicSound.whoosh(Math.min(40, request.ticks));
+		}
 		return true;
+	}
+
+	/**
+	 * Phase 10 (28.3.2): the sky ride's exit on the climax: an instant cut back to the eye while an impact frame or the
+	 * cloud wipe hides it, else the normal 10-tick blend.
+	 */
+	public static void cutToEye() {
+		if (!active) {
+			return;
+		}
+		if (dev.kultivator.client.epic.screen.ImpactFrame.showing() || dev.kultivator.client.epic.screen.CloudWipe.cover() >= 0.8F) {
+			abort();
+		} else {
+			skip();
+		}
 	}
 
 	/** Ends the shot with the 10-tick ease back (skip key, inputs, the shot's end). */
@@ -380,7 +411,7 @@ public final class CinematicDirector {
 		Vec3 feet = scene != null ? scene.feet(partial) : anchor;
 		Vec3 subjectEye = feet.add(0.0D, subjectHeight * 0.9D, 0.0D);
 		float sigma = EpicClock.sigma();
-		float progress = Mth.clamp((age + partial * sigma) / running.ticks, 0.0F, 1.0F);
+		float progress = Mth.clamp((age + partial * sigma) / Math.max(1, running.ticks - running.hold), 0.0F, 1.0F);
 		running.evaluate(ease(progress), feet, subjectEye, yaw0, OUT);
 		double ox = OUT[0];
 		double oz = OUT[2];
@@ -421,7 +452,7 @@ public final class CinematicDirector {
 			target = new Vec3(target.x, minY, target.z);
 		}
 		Pose shotPose = new Pose(target, yaw, pitch);
-		float enter = Math.min(1.0F, (age + partial * sigma) / ENTER);
+		float enter = snapEnter ? 1.0F : Math.min(1.0F, (age + partial * sigma) / ENTER);
 		Pose from = blendFrom != null ? blendFrom : eye;
 		Pose pose = enter >= 1.0F ? shotPose : blend(from, shotPose, ease(enter));
 		last = pose;
@@ -438,6 +469,7 @@ public final class CinematicDirector {
 		shot = null;
 		last = null;
 		blendFrom = null;
+		snapEnter = false;
 		priority = -1;
 		rollTarget = 0.0F;
 	}

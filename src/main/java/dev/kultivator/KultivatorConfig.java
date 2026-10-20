@@ -114,6 +114,10 @@ public final class KultivatorConfig {
 	public int kehancuranCasterSafeRadius = 4;
 	/** Nothing is carved within this many blocks of any player's respawn point (0-64). */
 	public int kehancuranHomeSafeRadius = 24;
+	/** Phase 10 (DESIGN 28.8.1): a Kehancuran job of a spec with a Dampak palette turns its crater floor and rim (same job and undo). */
+	public boolean kehancuranSurfacePass = true;
+	/** The most blocks one surface pass converts (16-512). */
+	public int kehancuranSurfaceMax = 256;
 
 	// ---- phase 7: Dunia yang Hidup (DESIGN 19.2.10)
 	/** Naturally spawned monsters near a Qi Refining+ player may become elite demonic beasts (DESIGN 19.3.1). */
@@ -288,6 +292,8 @@ public final class KultivatorConfig {
 		techniqueMaxActiveCasts = clamp(techniqueMaxActiveCasts, 16, 128);
 		kehancuranCasterSafeRadius = clamp(kehancuranCasterSafeRadius, 3, 8);
 		kehancuranHomeSafeRadius = clamp(kehancuranHomeSafeRadius, 0, 64);
+		// Phase 10 (DESIGN 28.8.1).
+		kehancuranSurfaceMax = clamp(kehancuranSurfaceMax, 16, 512);
 		// Phase 7 (DESIGN 19.2.10).
 		eliteChanceScale = clamp(eliteChanceScale, 0.0D, 5.0D, 1.0D);
 		// Phase 7b (DESIGN 23.2).

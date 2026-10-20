@@ -26,6 +26,8 @@ import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
+import dev.kultivator.technique.spec.dsl.Dampak;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.DyeColor;
@@ -419,6 +421,10 @@ public final class LightningArts {
 				.sound(Phase.EXTRA1, SoundEvents.LIGHTNING_BOLT_THUNDER, 2.0F, 0.5F)
 				.sound(Phase.EXTRA1, SoundEvents.LIGHTNING_BOLT_IMPACT, 1.5F, 0.7F)
 				.kehancuran(DShape.scatter(3).times(9))
+				// Phase 10 (DESIGN 28.12): each strike lights the next Luo Shu palace; with Kehancuran the path burns into the land
+				.dampak(Dampak.builder().mark(Dampak.Mark.PILLAR).ride(Dampak.Ride.SHORT).climaxAt(198)
+						.frames(Dampak.INV, 0xB57CFF, 0xF0E8FF).silence(3).debris(Dampak.Debris.BURST).ring(Dampak.Ring.DUST).palette(Dampak.Palette.LIGHTNING)
+						.sigil(SigilPattern.LUOSHU, 20.0F).ignite(Phase.EXTRA0).trench().build())
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.duration(0.25D))
 				.build());
@@ -454,6 +460,10 @@ public final class LightningArts {
 				.sound(Phase.EXTRA1, SoundCue.of(SoundEvents.TRIDENT_THUNDER, 1.5F, 0.7F).delay(4))
 				// "SCATTER r4 ×6 (DENSEST)": the six densest impact points of the cast.
 				.kehancuran(DShape.scatter(4).times(6))
+				// Phase 10 (DESIGN 28.12): the Nine Heavens open; each nova lights two of the nine rings
+				.dampak(Dampak.builder().mark(Dampak.Mark.PILLAR).ride(Dampak.Ride.FULL, 80, Dampak.Vista.SEMBILAN_LANGIT).climaxAt(400)
+						.frames(Dampak.INV, 0xF0E8FF, 0xB57CFF).silence(6).debris(Dampak.Debris.BURST).ring(Dampak.Ring.DUST).palette(Dampak.Palette.LIGHTNING)
+						.sigil(SigilPattern.NINE_RINGS, 40.0F).ignite(Phase.EXTRA0).build())
 				.perfection(Bonus.area(0.2D))
 				.peak(Bonus.duration(0.25D))
 				.build());

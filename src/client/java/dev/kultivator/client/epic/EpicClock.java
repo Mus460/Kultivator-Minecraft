@@ -74,6 +74,18 @@ public final class EpicClock {
 		hitRamp = 0;
 	}
 
+	/**
+	 * Phase 10 (DESIGN 28.4.2): a hit-stop of {@code ticks} (1-6; Dewa impacts 3, Abadi 2), then the 20-tick ramp. Never
+	 * shortens a longer hit-stop that is already holding; nothing with "Gerak lambat" off or "Kurangi gerak".
+	 */
+	public static void hitStop(int ticks) {
+		if (!enabled()) {
+			return;
+		}
+		hitLeft = Math.max(hitLeft, Math.max(1, Math.min(6, ticks)));
+		hitRamp = 0;
+	}
+
 	/** Ends every window at once (skip, death, dimension change, disconnect, {@code uji momen berhenti}). */
 	public static void reset() {
 		sigma = 1.0F;
@@ -138,7 +150,10 @@ public final class EpicClock {
 		return sigma < 0.999F;
 	}
 
-	/** True while a hit-stop freezes 7b (σ = 0). */
+	/**
+	 * True while a hit-stop freezes 7b (σ = 0). Phase 10 (28.4.2): the integer-keyed presentation clocks (cast props of
+	 * {@code ModelFx}, {@code DisplayRun} layers, the {@code FireUltimates} clock) hold their frame while this is true.
+	 */
 	public static boolean frozen() {
 		return hitLeft > 0;
 	}

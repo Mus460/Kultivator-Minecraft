@@ -28,6 +28,8 @@ import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
 import dev.kultivator.technique.spec.dsl.Step;
+import dev.kultivator.technique.spec.dsl.Dampak;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -426,6 +428,10 @@ public final class BodyArts {
 				.sound(Phase.EXTRA0, SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.0F, 0.7F)
 				.sound(Phase.EXTRA1, SoundEvents.MACE_SMASH_GROUND_HEAVY, 2.0F, 0.5F)
 				.kehancuran(DShape.disc(6, 2).nat().times(8))
+				// Phase 10 (DESIGN 28.12): a footprint glyph before each avatar stomp
+				.dampak(Dampak.builder().mark(Dampak.Mark.FOOT).ride(Dampak.Ride.SHORT).climaxAt(400)
+						.frames(0xFFF0C0, 0xC8A040).silence(3).debris(Dampak.Debris.BURST).ring(Dampak.Ring.GOLD).palette(Dampak.Palette.EARTH)
+						.monumentSeconds(60).build())
 				.perfection(Bonus.area(0.2D))
 				.peak(Bonus.duration(0.25D))
 				.build());
@@ -465,6 +471,11 @@ public final class BodyArts {
 				.sound(Phase.EXTRA1, SoundEvents.BEACON_DEACTIVATE, 1.5F, 0.8F)
 				.sound(Phase.EXTRA1, SoundEvents.ENDER_DRAGON_GROWL, 1.2F, 0.5F)
 				.kehancuran(DShape.nine(3, 8), DShape.bowl(10).at(180))
+				// Phase 10 (DESIGN 28.12): a golden footprint before each step, a silver line joins them, the god's foot stays pressed in the crater
+				.dampak(Dampak.builder().mark(Dampak.Mark.FOOT).ride(Dampak.Ride.FULL, 80, Dampak.Vista.SUNGAI_BINTANG).climaxAt(180)
+						.frames(0xFFE8A0, 0xC8C8D8).silence(6).debris(Dampak.Debris.BURST).ring(Dampak.Ring.DUST).palette(Dampak.Palette.EARTH)
+						.sigil(SigilPattern.EVENT_CHAIN, 8.0F).ignite(Phase.EXTRA0)
+						.monument("god_foot", 10.0F, 120, Dampak.MonumentPose.FLAT).build())
 				.perfection(Bonus.area(0.2D))
 				.peak(Bonus.duration(0.25D))
 				.build());

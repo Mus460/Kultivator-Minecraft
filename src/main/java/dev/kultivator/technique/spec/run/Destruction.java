@@ -6,6 +6,8 @@ import dev.kultivator.kehancuran.Kehancuran;
 import dev.kultivator.kehancuran.Shapes;
 import dev.kultivator.technique.spec.TechniquePower;
 import dev.kultivator.technique.spec.dsl.DShape;
+import dev.kultivator.technique.spec.dsl.Dampak;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,6 +48,13 @@ final class Destruction {
 	/** Shapes resolved this tick, submitted together by {@link #flushAll}. */
 	private final List<Shapes.Placed> batch = new ArrayList<>();
 	private int batchCap;
+	/** Phase 10 (DESIGN 28.9.3): the fixed 15 % of the cast's block cap kept for the sigil trenches, and whether they went. */
+	private int trenchCap;
+	private boolean sigilDone;
+	/** The sigil trenches waiting for this tick's submit (after the climax's own shapes, so the job centre stays theirs). */
+	private final List<Shapes.Placed> trenches = new ArrayList<>();
+	/** The share of the block cap the sigil trenches take before the existing split. */
+	static final double TRENCH_SHARE = 0.15D;
 
 	Destruction(Caster cast) {
 		this.cast = cast;
@@ -66,6 +75,13 @@ final class Destruction {
 				areaFactor = TechniquePower.masteryArea(cast.mastery);
 				maxRadius = KultivatorConfig.get().kehancuranMaxRadius;
 				int total = TechniquePower.blockCap(Cultivators.get(player));
+				int cap = total;
+				Dampak dampak = cast.spec.dampak();
+				if (dampak != null && dampak.sigilTrench()) {
+					// the sigil trenches' fixed share comes off the top: the cast's total never exceeds blockCap
+					trenchCap = (int) Math.floor(total * TRENCH_SHARE);
+					total = Math.max(1, total - trenchCap);
+				}
 				int n = Math.min(TechniquePower.MAX_DESTRUCTION_SHAPES, shapes.size());
 				caps = new int[n];
 				submitted = new boolean[n];
@@ -83,7 +99,7 @@ final class Destruction {
 					points.add(new ArrayList<>());
 					directions.add(new ArrayList<>());
 				}
-				enabled = k > 0.0D && total > 0;
+				enabled = k > 0.0D && cap > 0;
 			}
 		}
 		return enabled;
@@ -280,6 +296,67 @@ final class Destruction {
 		return any;
 	}
 
+	/**
+	 * The climax of a Dampak spec with {@code sigilTrench} (DESIGN 28.9.3): the pattern's major lines at the radius the
+	 * clients draw, those within twice {@code kehancuranMaxRadius} of the centre, become TRENCH shapes 1 block wide and 1 deep (2 at Dewa) on
+	 * the surface, added to this tick's submit (one job, one undo entry) with their fixed 15 % share of the cast's cap.
+	 * {@code castPos} / {@code centre} are the CAST event's position and aim as sent, {@code seed} the event seed, so the
+	 * clients draw the same lines ({@link SigilPattern}).
+	 */
+	void sigil(Vec3 castPos, Vec3 centre, int seed) {
+		if (sigilDone || !on()) {
+			return;
+		}
+		Dampak dampak = cast.spec.dampak();
+		if (dampak == null || !dampak.sigilTrench() || trenchCap <= 0) {
+			return;
+		}
+		sigilDone = true;
+		// the trenches follow the lines the clients draw (the spec's own sigil radius), so the glow and the burn line up;
+		// the reach is limited by dropping lines beyond 2 x kehancuranMaxRadius instead of shrinking the pattern
+		double radius = dampak.sigilRadius();
+		double limit = maxRadius * 2.0D;
+		if (radius < 2.0D || limit < 2.0D) {
+			return;
+		}
+		double yaw = SigilPattern.yawFor(castPos, centre, seed);
+		List<SigilPattern.Segment> lines = new ArrayList<>();
+		for (SigilPattern.Segment line : SigilPattern.majorSegments(dampak.sigil(), centre, yaw, radius, seed, 256)) {
+			if (lines.size() >= Kehancuran.MAX_SIGIL_TRENCHES) {
+				break;
+			}
+			if (horizontal(line.from(), centre) <= limit && horizontal(line.to(), centre) <= limit) {
+				lines.add(line);
+			}
+		}
+		int depth = cast.spec.dewa() ? 2 : 1;
+		boolean natural = cast.spec.naturalOnly();
+		List<Shapes.Placed> placed = new ArrayList<>();
+		for (SigilPattern.Segment line : lines) {
+			Vec3 dir = line.to().subtract(line.from());
+			int length = Math.max(2, (int) Math.round(dir.horizontalDistance()) + 1);
+			Shapes.Spec spec = Shapes.Spec.trench(length, 1, depth);
+			if (natural) {
+				spec = spec.natural();
+			}
+			placed.add(new Shapes.Placed(spec, BlockPos.containing(line.from()), dir));
+		}
+		if (placed.isEmpty()) {
+			return;
+		}
+		trenches.addAll(placed);
+		batchCap += trenchCap;
+		if (!PENDING.contains(this)) {
+			PENDING.add(this);
+		}
+	}
+
+	private static double horizontal(Vec3 a, Vec3 b) {
+		double dx = a.x - b.x;
+		double dz = a.z - b.z;
+		return Math.sqrt(dx * dx + dz * dz);
+	}
+
 	/** The cast ended: release shapes, and what the collected points still hold. */
 	void release() {
 		if (!on()) {
@@ -457,12 +534,15 @@ final class Destruction {
 
 	/** Submits this cast's shapes of the tick as one {@code Kehancuran.submitSelf} (one job, one undo entry). */
 	private void submitBatch() {
-		if (batch.isEmpty()) {
+		if (batch.isEmpty() && trenches.isEmpty()) {
 			return;
 		}
-		List<Shapes.Placed> placed = List.copyOf(batch);
+		List<Shapes.Placed> all = new ArrayList<>(batch);
+		all.addAll(trenches);
+		List<Shapes.Placed> placed = List.copyOf(all);
 		int cap = batchCap;
 		batch.clear();
+		trenches.clear();
 		batchCap = 0;
 		if (cast.caster instanceof ServerPlayer player && !player.isRemoved()) {
 			Kehancuran.submitSelf(player, cast.spec.id(), placed, cap);
@@ -485,6 +565,7 @@ final class Destruction {
 	static void clearAll() {
 		for (Destruction destruction : PENDING) {
 			destruction.batch.clear();
+			destruction.trenches.clear();
 			destruction.batchCap = 0;
 		}
 		PENDING.clear();

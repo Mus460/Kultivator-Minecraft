@@ -150,6 +150,8 @@ public final class TechniqueTests {
 
 	static void init() {
 		ServerTickEvents.END_SERVER_TICK.register(TechniqueTests::tick);
+		// Phase 10 (DESIGN 28.15): uji dampak
+		DampakTests.init();
 		ServerPlayerEvents.LEAVE.register(player -> {
 			SHOWCASES.remove(player.getUUID());
 			PENDING.remove(player.getUUID());
@@ -227,6 +229,8 @@ public final class TechniqueTests {
 								.executes(ctx -> teachDisciples(self(ctx), StringArgumentType.getString(ctx, "name")))))
 				.then(Commands.argument("id", StringArgumentType.word()).suggests(SPECS)
 						.executes(ctx -> castOne(self(ctx), StringArgumentType.getString(ctx, "id")))));
+		// Phase 10 (DESIGN 28.15): uji dampak ...
+		DampakTests.addCommands(uji);
 		uji.then(Commands.literal("boneka")
 				.executes(ctx -> dummies(self(ctx), 1, false))
 				.then(Commands.literal("hapus").executes(ctx -> removeDummies(self(ctx))))

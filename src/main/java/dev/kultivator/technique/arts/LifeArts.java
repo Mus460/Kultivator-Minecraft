@@ -25,6 +25,8 @@ import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
+import dev.kultivator.technique.spec.dsl.Dampak;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -395,6 +397,9 @@ public final class LifeArts {
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F)
 				.sound(Phase.CAST, SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 1.0F, 1.2F)
 				.sound(Phase.PULSE, SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, 0.6F, 1.4F)
+				// Phase 10 (DESIGN 28.12): lite row (not an ultimate): a soft white ring and the vase lingering after the field
+				.dampak(Dampak.builder().mark(Dampak.Mark.RING_ONLY).climaxAt(200).debris(Dampak.Debris.NONE).ring(Dampak.Ring.GOLD)
+						.monument("guanyin_vase", 4.0F, 30, Dampak.MonumentPose.HOVER).build())
 				.perfection(Bonus.area(0.2D))
 				.peak(Bonus.duration(0.25D))
 				.build());
@@ -424,6 +429,11 @@ public final class LifeArts {
 				.sound(Phase.PULSE, SoundEvents.WARDEN_HEARTBEAT, 0.6F, 1.0F)
 				.sound(Phase.EXTRA0, SoundEvents.BEACON_DEACTIVATE, 1.5F, 0.6F)
 				.kehancuran(DShape.wither(10))
+				// Phase 10 (DESIGN 28.12): the life-death sigil turns; the land withers to ash; a half-withered lotus stays
+				.dampak(Dampak.builder().mark(Dampak.Mark.RING_ONLY).ride(Dampak.Ride.SHORT).climaxAt(400)
+						.frames(0xE0E0E0, 0x9AE05A).silence(4).debris(Dampak.Debris.CONVERT).ring(Dampak.Ring.GOLD)
+						.sigil(SigilPattern.LIFE_DEATH, 20.0F)
+						.monument("tang_lotus", 4.0F, 60, Dampak.MonumentPose.UPRIGHT).build())
 				.perfection(Bonus.area(0.2D))
 				.peak(Bonus.duration(0.25D))
 				.build());
@@ -460,6 +470,11 @@ public final class LifeArts {
 				.sound(Phase.EXTRA1, SoundEvents.BEACON_ACTIVATE, 1.5F, 0.6F)
 				// the tree draws life from the land around it (first damaging nova), then the @600 burst breaks a ring of natural ground
 				.kehancuran(DShape.wither(12), DShape.ring(14, 6, 1).nat().at(600))
+				// Phase 10 (DESIGN 28.12): the roots grow one branch per pulse; a bodhi sapling stays
+				.dampak(Dampak.builder().mark(Dampak.Mark.PILLAR).ride(Dampak.Ride.FULL, 80, Dampak.Vista.POHON_CAHAYA).climaxAt(600)
+						.frames(0xE8FFD0, 0xFFF0A0).silence(4).debris(Dampak.Debris.CONVERT).ring(Dampak.Ring.GOLD).palette(Dampak.Palette.LIFE)
+						.sigil(SigilPattern.ROOTS, 24.0F).ignite(Phase.EXTRA0)
+						.monument("bodhi_tree", 3.0F, 180, Dampak.MonumentPose.UPRIGHT).build())
 				.perfection(Bonus.area(0.2D))
 				.peak(Bonus.duration(0.25D))
 				.build());

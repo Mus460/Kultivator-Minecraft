@@ -24,6 +24,8 @@ import dev.kultivator.technique.spec.dsl.Phase;
 import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.SoundCue;
+import dev.kultivator.technique.spec.dsl.Dampak;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -310,6 +312,8 @@ public final class ShadowArts {
 				.sound(Phase.CAST, SoundEvents.SCULK_SHRIEKER_SHRIEK, 0.8F, 0.9F)
 				.sound(Phase.IMPACT, SoundEvents.NOTE_BLOCK_FLUTE, 0.8F, 0.7F)
 				.kehancuran(DShape.wither(8))
+				// Phase 10 (DESIGN 28.12): lite row (not an ultimate): a dark red ring
+				.dampak(Dampak.builder().mark(Dampak.Mark.RING_ONLY).climaxAt(100).debris(Dampak.Debris.NONE).build())
 				.perfection(Bonus.cooldown(0.2D))
 				.peak(Bonus.duration(0.25D))
 				.build());
@@ -345,6 +349,10 @@ public final class ShadowArts {
 				.sound(Phase.CAST, SoundEvents.WARDEN_SONIC_BOOM, 2.0F, 0.8F)
 				.sound(Phase.EXTRA0, SoundEvents.BREEZE_WIND_CHARGE_BURST, 1.6F, 0.5F)
 				.kehancuran(DShape.trench(64, 3, 2).ahead(6))
+				// Phase 10 (DESIGN 28.12): a 128-b wind line through the charge; the Kun turns in the northern sky; the ground erupts behind the dash
+				.dampak(Dampak.builder().mark(Dampak.Mark.PATH).ride(Dampak.Ride.SHORT).vista(Dampak.Vista.LAUT_UTARA).climaxAt(0)
+						.frames(0xFFFFFF, 0xD8ECFF).silence(0).debris(Dampak.Debris.WAKE).ring(Dampak.Ring.DUST)
+						.sigil(SigilPattern.WIND_PATH, 128.0F).monumentSeconds(60).build())
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -367,6 +375,9 @@ public final class ShadowArts {
 				.fx(Phase.HIT, chains(KARMA).count(6))
 				.sound(Phase.CAST, SoundEvents.BELL_RESONATE, 1.2F, 1.4F)
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F)
+				// Phase 10 (DESIGN 28.12): red threads between the linked foes; never a camera (disciple-only)
+				.dampak(Dampak.builder().mark(Dampak.Mark.RING_ONLY).climaxAt(0).debris(Dampak.Debris.NONE).ring(Dampak.Ring.DUST)
+						.sigil(SigilPattern.EVENT_CHAIN, 16.0F).build())
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.duration(0.25D))
 				.build());

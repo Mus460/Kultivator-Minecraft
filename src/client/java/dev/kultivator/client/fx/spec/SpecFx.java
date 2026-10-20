@@ -94,6 +94,9 @@ public final class SpecFx {
 		AnimBridge.onTechFx(payload, spec, caster);
 		// Phase 7b (DESIGN 23.6): ultimates and one's own Kehancuran casts start their epic layers (never throws).
 		dev.kultivator.client.epic.EpicDirector.onTechFx(payload);
+		// Phase 10 (DESIGN 28.14): the silent boom, marks, rides, impact frames and world FX of Dampak rows (never throws),
+		// before the others gate so "Efek pemain lain: Mati" still hears the boom.
+		dev.kultivator.client.dampak.DampakClient.onTechFx(payload);
 		Phase phase = Phase.byOrdinal(payload.phase());
 		if (phase == Phase.ABORT) {
 			abort(payload.caster(), spec.netId());

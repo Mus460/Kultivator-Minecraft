@@ -1,8 +1,10 @@
 package dev.kultivator.technique.spec.run;
 
+import dev.kultivator.data.TechniqueGrade;
 import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.data.TechniqueType;
 import dev.kultivator.technique.spec.dsl.Bonus;
+import dev.kultivator.technique.spec.dsl.Dampak;
 import dev.kultivator.technique.spec.dsl.FxLayer;
 import dev.kultivator.technique.spec.dsl.Payload;
 import dev.kultivator.technique.spec.dsl.Phase;
@@ -50,6 +52,7 @@ public final class SpecLint {
 		if (spec.climax() != null && !ownCode && !sent.contains(spec.climax())) {
 			out.add("climax " + spec.climax() + " is never sent");
 		}
+		dampak(spec, ownCode, out);
 		return out;
 	}
 
@@ -210,6 +213,85 @@ public final class SpecLint {
 			}
 			default -> {
 			}
+		}
+	}
+
+	/** EpicDirector's ultimate rule (DESIGN 23, 28.12): a PAMUNGKAS of grade Abadi or higher, or any Dewa spec. */
+	public static boolean ultimate(TechniqueSpec spec) {
+		return spec.pamungkas() && spec.grade().tier() >= TechniqueGrade.ABADI.tier() || spec.dewa();
+	}
+
+	/** The Phase 10 checks (DESIGN 28.14 M1): rows of 28.12 that cannot play as authored. */
+	private static void dampak(TechniqueSpec spec, boolean ownCode, List<String> out) {
+		Dampak dampak = spec.dampak();
+		if (dampak == null) {
+			if (ultimate(spec) && !spec.isLegacy()) {
+				out.add("an Abadi or Dewa ultimate without a Dampak row (.dampak(...), DESIGN 28.12)");
+			}
+			return;
+		}
+		if (dampak.rideTicks() > Dampak.MAX_RIDE_TICKS) {
+			out.add("Dampak rideTicks " + dampak.rideTicks() + " > " + Dampak.MAX_RIDE_TICKS);
+		}
+		if (dampak.ride() == Dampak.Ride.FULL && dampak.climaxAt() < dampak.rideTicks() && spec.charge() == null) {
+			out.add("Dampak FULL ride of " + dampak.rideTicks() + " ticks cannot end on a climax at " + dampak.climaxAt() + " (not charged)");
+		}
+		if (!ownCode) {
+			int first = firstClimaxTick(spec);
+			if (first >= 0 && first != dampak.climaxAt()) {
+				out.add("Dampak climaxAt " + dampak.climaxAt() + " but the first step sending " + spec.climaxPhase() + " runs at " + first);
+			}
+		}
+		if (dampak.sigilTrench() && spec.destruction().isEmpty()) {
+			out.add("Dampak sigilTrench without Mode Kehancuran shapes");
+		}
+		String monument = dampak.monument();
+		if (monument != null && !Dampak.MONUMENT_BY_DAO.equals(monument)
+				&& SpecLint.class.getResource("/assets/kultivator/items/fx/" + monument + ".json") == null) {
+			out.add("Dampak monument '" + monument + "' has no assets/kultivator/items/fx/" + monument + ".json");
+		}
+		if (dampak.monumentSeconds() < 30 || dampak.monumentSeconds() > 180) {
+			out.add("Dampak monumentSeconds " + dampak.monumentSeconds() + " outside 30-180");
+		}
+	}
+
+	/** The step tick of the first timed step that sends the climax phase, or -1 (delayed zones and pillars are skipped). */
+	private static int firstClimaxTick(TechniqueSpec spec) {
+		Phase climax = spec.climaxPhase();
+		int best = -1;
+		for (Step step : spec.timeline()) {
+			if (step.timing() != Step.Timing.AT || step.stage() > 1) {
+				continue;
+			}
+			Shape.Kind kind = step.shape().kind();
+			if (kind == Shape.Kind.ZONE || kind == Shape.Kind.PILLAR || kind == Shape.Kind.RAIN) {
+				continue;
+			}
+			EnumSet<Phase> phases = EnumSet.noneOf(Phase.class);
+			walkOwn(step, phases);
+			if (phases.contains(climax) && (best < 0 || step.at() < best)) {
+				best = step.at();
+			}
+		}
+		return best;
+	}
+
+	/** The phases one step sends by itself (no children, no boons). */
+	private static void walkOwn(Step step, Set<Phase> sent) {
+		Phase own = step.extraPhase() >= 0 ? Phase.extra(step.extraPhase()) : null;
+		switch (step.shape().kind()) {
+			case SELF -> {
+				if (own != null) {
+					sent.add(own);
+				}
+			}
+			case DOMAIN, FIELD, AURA -> {
+				if (own != null) {
+					sent.add(own);
+				}
+			}
+			case WAVE, FRONT, CHAIN, VOLLEY, BEAM, TARGET -> sent.add(own != null ? own : Phase.TRAVEL);
+			default -> sent.add(own != null ? own : Phase.IMPACT);
 		}
 	}
 

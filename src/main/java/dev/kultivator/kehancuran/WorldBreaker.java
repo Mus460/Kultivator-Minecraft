@@ -3,6 +3,9 @@ package dev.kultivator.kehancuran;
 import dev.kultivator.KultivatorConfig;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
+import dev.kultivator.network.Net;
+import dev.kultivator.network.Payloads;
+import dev.kultivator.technique.spec.dsl.Dampak;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -111,6 +114,26 @@ public final class WorldBreaker {
 		 */
 		final Map<Long, Integer> kept = new HashMap<>();
 
+		// ---- Phase 10 (DESIGN 28.6.1, 28.8.1, 28.13.2)
+		/** Groups this job's debris batches on the clients (a per-server counter). */
+		final int jobId = nextJobId++;
+		/** The caster's (player or disciple) entity id, -1 when unknown. */
+		int casterEntityId = -1;
+		/** The spec's net id of a self job, -1 for Destroyer Arts. */
+		int specNet = -1;
+		/** The Kawah Lebur palette of the surface pass (NONE = no pass). */
+		Dampak.Palette palette = Dampak.Palette.NONE;
+		/** {@code DampakDebris} motion flags (LIFT, IMPLODE, SUSPEND, WAKE). */
+		int debrisFlags;
+		/** The positions this job removed (at most the per-cast cap), kept also when the job is not undoable. */
+		long[] carved = new long[0];
+		int carvedCount;
+		/** True once the carve is done and the surface pass runs. */
+		boolean surfacePhase;
+		Surface.Plan surface = Surface.EMPTY;
+		int surfaceIndex;
+		int surfaceChanged;
+
 		Job(UUID owner, String ownerName, String disciple, String shape, ResourceKey<Level> dimension, BlockPos centre, long[] positions,
 				BlockState[] targets, BlockState[] placed, boolean restore, boolean naturalOnly, boolean wither, int dropsPct) {
 			this.owner = owner;
@@ -137,7 +160,30 @@ public final class WorldBreaker {
 			job.specId = specId;
 			job.castPos = caster.position();
 			job.modes = modes;
+			job.casterEntityId = caster.getId();
 			return job;
+		}
+
+		/** Remembers a removed position for the surface pass (at most the per-cast cap). */
+		void noteCarved(long pos) {
+			int cap = Math.max(1, KultivatorConfig.get().kehancuranMaxBlocksPerCast);
+			if (carvedCount >= cap) {
+				return;
+			}
+			if (carvedCount == carved.length) {
+				carved = java.util.Arrays.copyOf(carved, Math.min(cap, Math.max(64, carved.length * 2)));
+			}
+			carved[carvedCount++] = pos;
+		}
+
+		/** The {@code DampakDebris} flags of this job's batches. */
+		int packetFlags(MinecraftServer server) {
+			int flags = debrisFlags;
+			flags |= self ? Payloads.DampakDebris.FLAG_SELF : Payloads.DampakDebris.FLAG_DISCIPLE;
+			if (server.getAverageTickTimeNanos() > LOW_LOAD_NANOS) {
+				flags |= Payloads.DampakDebris.FLAG_LOW_LOAD;
+			}
+			return flags;
 		}
 
 		/** The mode of position {@code i}. */
@@ -190,6 +236,12 @@ public final class WorldBreaker {
 	private static final Deque<Job> JOBS = new ArrayDeque<>();
 	private static final List<Undo> UNDO = new ArrayList<>();
 	private static int nextUndo = 1;
+	/** Phase 10: the next {@code DampakDebris} job id. */
+	private static int nextJobId = 1;
+	/** Debris packets go to players this close to the batch (28.1.3). */
+	private static final double DEBRIS_RANGE = 96.0D;
+	/** Above this average tick time the debris batches carry LOW_LOAD (clients draw particles only). */
+	private static final long LOW_LOAD_NANOS = 40_000_000L;
 
 	static void init() {
 		ServerTickEvents.END_SERVER_TICK.register(WorldBreaker::tick);
@@ -269,6 +321,10 @@ public final class WorldBreaker {
 			merged.specId = queued.specId;
 			merged.castPos = queued.castPos;
 			merged.modes = modes;
+			merged.casterEntityId = queued.casterEntityId;
+			merged.specNet = queued.specNet;
+			merged.palette = queued.palette;
+			merged.debrisFlags = queued.debrisFlags;
 			list.set(i, merged);
 			JOBS.clear();
 			JOBS.addAll(list);
@@ -395,9 +451,15 @@ public final class WorldBreaker {
 			}
 			return;
 		}
+		if (job.surfacePhase) {
+			tickSurface(server, level, job, config);
+			return;
+		}
 		int budget = config.kehancuranBlocksPerTick;
 		int reads = budget * READ_FACTOR;
 		ProtectedZones.Context zones = job.restore ? null : zonesFor(server, level, job, batchBox(job, reads));
+		Sample carvedSample = new Sample();
+		Sample convertSample = new Sample();
 		double sx = 0.0D;
 		double sy = 0.0D;
 		double sz = 0.0D;
@@ -476,6 +538,15 @@ public final class WorldBreaker {
 			job.changed++;
 			budget--;
 			done++;
+			if (!job.restore) {
+				// Phase 10: the batch's debris (the OLD state) and the crater the surface pass works on
+				if (to.isAir()) {
+					job.noteCarved(pos.asLong());
+					carvedSample.add(pos.asLong(), Block.getId(state), level.getRandom().nextInt(Integer.MAX_VALUE));
+				} else {
+					convertSample.add(pos.asLong(), Block.getId(state), level.getRandom().nextInt(Integer.MAX_VALUE));
+				}
+			}
 			if (!job.restore && to.isAir()) {
 				budget -= clearLoosePlants(level, job, zones, pos);
 			}
@@ -491,11 +562,219 @@ public final class WorldBreaker {
 				level.playSound(null, centroid.x, centroid.y, centroid.z, job.restore ? SoundEvents.AMETHYST_BLOCK_CHIME : SoundEvents.DEEPSLATE_BREAK,
 						SoundSource.BLOCKS, 1.2F, job.restore ? 1.4F : 0.6F);
 			}
+			if (!job.restore) {
+				// at most one debris packet per job per tick (28.1.3): the removed blocks, else the withered ones
+				boolean carvedAny = carvedSample.count > 0;
+				sendDebris(server, level, job, carvedAny ? Payloads.DampakDebris.CARVE : Payloads.DampakDebris.CONVERT,
+						carvedAny ? carvedSample : convertSample, centroid);
+			}
 		}
 		if (job.index >= job.positions.length) {
+			if (!job.restore && startSurface(level, job, config)) {
+				return;
+			}
 			JOBS.pollFirst();
 			finish(server, job, false);
 		}
+	}
+
+	// ================================================================== Phase 10: debris and the surface pass (DESIGN 28.6, 28.8)
+
+	/** A uniform sample of at most {@code DampakDebris.MAX} changed positions of one batch (reservoir sampling). */
+	private static final class Sample {
+		final long[] positions = new long[Payloads.DampakDebris.MAX];
+		final int[] states = new int[Payloads.DampakDebris.MAX];
+		int count;
+		int seen;
+
+		void add(long pos, int state, int random) {
+			seen++;
+			if (count < positions.length) {
+				positions[count] = pos;
+				states[count] = state;
+				count++;
+				return;
+			}
+			int slot = random % seen;
+			if (slot < positions.length) {
+				positions[slot] = pos;
+				states[slot] = state;
+			}
+		}
+	}
+
+	/** Sends one batch to the players within 96 blocks of {@code near} in the job's dimension (never for a restore). */
+	private static void sendDebris(MinecraftServer server, ServerLevel level, Job job, byte kind, Sample sample, Vec3 near) {
+		if (sample.count <= 0 || job.restore) {
+			return;
+		}
+		BlockPos base = BlockPos.containing(Vec3.atCenterOf(job.centre));
+		int[] offsets = new int[sample.count];
+		int[] states = new int[sample.count];
+		int n = 0;
+		for (int i = 0; i < sample.count; i++) {
+			BlockPos pos = BlockPos.of(sample.positions[i]);
+			int dx = pos.getX() - base.getX();
+			int dy = pos.getY() - base.getY();
+			int dz = pos.getZ() - base.getZ();
+			if (Math.abs(dx) > 511 || Math.abs(dy) > 511 || Math.abs(dz) > 511) {
+				continue;
+			}
+			offsets[n] = Payloads.DampakDebris.pack(dx, dy, dz);
+			states[n] = sample.states[i];
+			n++;
+		}
+		if (n == 0) {
+			return;
+		}
+		if (n < offsets.length) {
+			offsets = java.util.Arrays.copyOf(offsets, n);
+			states = java.util.Arrays.copyOf(states, n);
+		}
+		Vec3 centre = Vec3.atCenterOf(job.centre);
+		broadcast(level, near, new Payloads.DampakDebris(job.jobId, kind, job.casterEntityId, job.specNet, centre.x, centre.y, centre.z,
+				(short) Math.min(Short.MAX_VALUE, sample.seen), (short) job.packetFlags(server), offsets, states));
+	}
+
+	/** Sends {@code payload} to every player of {@code level} within 96 blocks of {@code near}. */
+	static void broadcast(ServerLevel level, Vec3 near, Payloads.DampakDebris payload) {
+		double range = DEBRIS_RANGE * DEBRIS_RANGE;
+		for (ServerPlayer player : level.players()) {
+			if (player.distanceToSqr(near) <= range) {
+				Net.send(player, payload);
+			}
+		}
+	}
+
+	/**
+	 * The carve is done: plans the Kawah Lebur pass of a job whose spec names a palette (server config
+	 * {@code kehancuranSurfacePass}, at most {@code kehancuranSurfaceMax}). True when the pass now runs in this job.
+	 */
+	private static boolean startSurface(ServerLevel level, Job job, KultivatorConfig config) {
+		if (job.surfacePhase || job.palette == Dampak.Palette.NONE || !config.kehancuranSurfacePass || job.carvedCount == 0) {
+			return false;
+		}
+		Vec3 axis = job.castPos == null ? new Vec3(0.0D, 0.0D, 1.0D) : Vec3.atCenterOf(job.centre).subtract(job.castPos);
+		int cap = Surface.cap(job.changed, config.kehancuranSurfaceMax);
+		Surface.Plan plan = Surface.plan(level, job.carved, job.carvedCount, job.palette, cap, job.centre, job.castPos, axis);
+		if (plan.isEmpty()) {
+			return false;
+		}
+		job.surface = plan;
+		job.surfaceIndex = 0;
+		job.surfacePhase = true;
+		return true;
+	}
+
+	/**
+	 * One tick of the surface pass: the same budget, zones (re-checked per batch), never-touched, unsafe-neighbour and
+	 * caster-column rules as the carve; a block is converted only while it is still what was planned; magma never under a
+	 * standing player. Recorded in the job's undo entry as (old, placed).
+	 */
+	private static void tickSurface(MinecraftServer server, ServerLevel level, Job job, KultivatorConfig config) {
+		Surface.Plan plan = job.surface;
+		int budget = config.kehancuranBlocksPerTick;
+		int reads = budget * READ_FACTOR;
+		ProtectedZones.Context zones = zonesFor(server, level, job, surfaceBox(job, reads));
+		Sample sample = new Sample();
+		double sx = 0.0D;
+		double sy = 0.0D;
+		double sz = 0.0D;
+		int done = 0;
+		while (budget > 0 && reads > 0 && job.surfaceIndex < plan.positions().length) {
+			int i = job.surfaceIndex++;
+			reads--;
+			BlockPos pos = BlockPos.of(plan.positions()[i]);
+			ProtectedZones.Zone zone = zones.zoneOf(pos);
+			if (zone != null) {
+				continue;
+			}
+			BlockState state = level.getBlockState(pos);
+			if (state != plan.from()[i] || ProtectedZones.neverTouch(level, pos, state) || touchesUnsafe(level, pos)) {
+				continue;
+			}
+			BlockState to = plan.to()[i];
+			if (Surface.magma(to) && standing(level, pos)) {
+				to = Blocks.BLACKSTONE.defaultBlockState();
+			}
+			if (!level.setBlock(pos, to, FLAGS)) {
+				continue;
+			}
+			if (job.undoable) {
+				job.undoPositions.add(pos.asLong());
+				job.undoOld.add(state);
+				job.undoPlaced.add(to);
+			}
+			job.surfaceChanged++;
+			budget--;
+			done++;
+			sample.add(pos.asLong(), Block.getId(to), level.getRandom().nextInt(Integer.MAX_VALUE));
+			sx += pos.getX() + 0.5D;
+			sy += pos.getY() + 0.5D;
+			sz += pos.getZ() + 0.5D;
+		}
+		if (done > 0) {
+			Vec3 centroid = new Vec3(sx / done, sy / done, sz / done);
+			sendDebris(server, level, job, Payloads.DampakDebris.SURFACE, sample, centroid);
+			if (server.getTickCount() % 10 == 0) {
+				level.playSound(null, centroid.x, centroid.y, centroid.z, SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS, 0.6F, 0.7F);
+			}
+		}
+		if (job.surfaceIndex >= plan.positions().length) {
+			JOBS.pollFirst();
+			finish(server, job, false);
+		}
+	}
+
+	/** A player stands on (or just above) {@code pos}: no magma under their feet. */
+	private static boolean standing(ServerLevel level, BlockPos pos) {
+		for (ServerPlayer player : level.players()) {
+			BlockPos feet = player.blockPosition();
+			int above = feet.getY() - pos.getY();
+			if (feet.getX() == pos.getX() && feet.getZ() == pos.getZ() && above >= 0 && above <= 2) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** The box around the surface positions this tick may look at. */
+	private static AABB surfaceBox(Job job, int reads) {
+		long[] positions = job.surface.positions();
+		int end = Math.min(positions.length, job.surfaceIndex + reads);
+		if (job.surfaceIndex >= end) {
+			return new AABB(job.centre);
+		}
+		int minX = Integer.MAX_VALUE;
+		int minY = Integer.MAX_VALUE;
+		int minZ = Integer.MAX_VALUE;
+		int maxX = Integer.MIN_VALUE;
+		int maxY = Integer.MIN_VALUE;
+		int maxZ = Integer.MIN_VALUE;
+		for (int i = job.surfaceIndex; i < end; i++) {
+			long packed = positions[i];
+			minX = Math.min(minX, BlockPos.getX(packed));
+			minY = Math.min(minY, BlockPos.getY(packed));
+			minZ = Math.min(minZ, BlockPos.getZ(packed));
+			maxX = Math.max(maxX, BlockPos.getX(packed));
+			maxY = Math.max(maxY, BlockPos.getY(packed));
+			maxZ = Math.max(maxZ, BlockPos.getZ(packed));
+		}
+		return new AABB(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
+	}
+
+	/** The job ended: the clients near it close the crater with a ring sized by the blocks changed (DONE). */
+	private static void sendDone(MinecraftServer server, Job job) {
+		if (job.restore || job.changed + job.surfaceChanged <= 0) {
+			return;
+		}
+		ServerLevel level = server.getLevel(job.dimension);
+		if (level == null) {
+			return;
+		}
+		Vec3 centre = Vec3.atCenterOf(job.centre);
+		broadcast(level, centre, new Payloads.DampakDebris(job.jobId, Payloads.DampakDebris.DONE, job.casterEntityId, job.specNet, centre.x,
+				centre.y, centre.z, (short) Math.min(Short.MAX_VALUE, job.changed), (short) job.packetFlags(server), new int[0], new int[0]));
 	}
 
 	/**
@@ -619,6 +898,7 @@ public final class WorldBreaker {
 
 	/** A job ends (done or cancelled): the record, the restore buffer and the owner's message. */
 	private static void finish(MinecraftServer server, Job job, boolean cancelled) {
+		sendDone(server, job);
 		if (job.changed > 0) {
 			if (job.self) {
 				KehancuranLog.recordSelf(server, job.owner, job.ownerName, job.specId == null ? "?" : job.specId, job.shape, job.dimension, job.centre,

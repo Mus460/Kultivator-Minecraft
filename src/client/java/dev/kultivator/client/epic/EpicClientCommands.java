@@ -43,6 +43,8 @@ final class EpicClientCommands {
 		root.then(toggle("rekam", EpicSettings.RECORD, "record"));
 		root.then(toggle("paket", EpicSettings.PACK_GEOMETRY, "pack"));
 		root.then(ClientCommands.literal("info").executes(EpicClientCommands::info));
+		// Phase 10 (DESIGN 28.15): /sinematik dampak ...
+		root.then(dev.kultivator.client.dampak.DampakClient.command());
 		root.then(ClientCommands.literal("reset").executes(context -> {
 			EpicSettings.resetAll();
 			EpicBudget.resetSession();

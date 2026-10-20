@@ -318,6 +318,10 @@ public final class ModelFx {
 			if (dead || display.isRemoved()) {
 				return false;
 			}
+			if (dev.kultivator.client.epic.EpicClock.frozen() && age >= 0 && follow < 0 && endAt < 0) {
+				// Phase 10 (DESIGN 28.4.2): a hit-stop holds the prop's frame (σ = 0); its life waits with it
+				return true;
+			}
 			age++;
 			if (endAt < 0 && age >= life) {
 				fadeFrom(age, fade);

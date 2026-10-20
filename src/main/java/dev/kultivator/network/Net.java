@@ -37,6 +37,8 @@ public final class Net {
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.PhantomSync.TYPE, Payloads.PhantomSync.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.FormSync.TYPE, Payloads.FormSync.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.BindSync.TYPE, Payloads.BindSync.CODEC);
+		// Phase 10 (DESIGN 28.13.2): real debris, the molten surface and the closing ring of Mode Kehancuran jobs.
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.DampakDebris.TYPE, Payloads.DampakDebris.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Payloads.Action.TYPE, Payloads.Action.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Action.TYPE, (payload, context) -> handle(context.player(), payload));

@@ -110,6 +110,10 @@ public final class FireUltimates {
 
 	/** Once per unpaused client tick (AnimClient, after ModelFx). */
 	public static void tick(ClientLevel level) {
+		if (dev.kultivator.client.epic.EpicClock.frozen() && !RUNS.isEmpty()) {
+			// Phase 10 (DESIGN 28.4.2): a hit-stop holds the choreography's clock (σ = 0) for its 2-3 ticks
+			return;
+		}
 		// a run made since the last tick plays its tick-0 beats now; the clock moves on after the pass
 		for (Iterator<Run> it = RUNS.iterator(); it.hasNext(); ) {
 			Run run = it.next();

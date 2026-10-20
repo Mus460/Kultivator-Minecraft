@@ -111,6 +111,7 @@ public final class TechniqueSpec {
 	private final int windup;
 	private final int castTicks;
 	private final dev.kultivator.technique.spec.run.@Nullable BindKind bindLook;
+	private final dev.kultivator.technique.spec.dsl.@Nullable Dampak dampak;
 
 	private TechniqueSpec(Builder b) {
 		this.id = b.id;
@@ -161,6 +162,7 @@ public final class TechniqueSpec {
 		this.windup = b.windup;
 		this.castTicks = b.castTicks;
 		this.bindLook = b.bindLook;
+		this.dampak = b.dampak;
 	}
 
 	/** Stages of a STAGES spec a disciple runs in one cast (22.13.1 "Y (st1-3)"; 1 = only the first). */
@@ -471,6 +473,11 @@ public final class TechniqueSpec {
 		return bindLook;
 	}
 
+	/** How the strike of this ultimate is presented (Phase 10, DESIGN 28, C10.1), or null for none. */
+	public dev.kultivator.technique.spec.dsl.@Nullable Dampak dampak() {
+		return dampak;
+	}
+
 	/** The duration the CAST event carries (0 = derived: the channel, else the longest self boon). */
 	public int castTicks() {
 		return castTicks;
@@ -681,6 +688,7 @@ public final class TechniqueSpec {
 		private int windup = -1;
 		private int castTicks;
 		private dev.kultivator.technique.spec.run.@Nullable BindKind bindLook;
+		private dev.kultivator.technique.spec.dsl.@Nullable Dampak dampak;
 
 		private Builder(String id, int netId, @Nullable Dao dao) {
 			this.id = id;
@@ -959,6 +967,12 @@ public final class TechniqueSpec {
 		/** The look of this spec's binds (sleep, seal, rope, time stop...; DESIGN 27.4). */
 		public Builder bindLook(dev.kultivator.technique.spec.run.BindKind value) {
 			this.bindLook = value;
+			return this;
+		}
+
+		/** The Phase 10 presentation of the strike (DESIGN 28.12; authoring only, no gameplay number changes). */
+		public Builder dampak(dev.kultivator.technique.spec.dsl.Dampak value) {
+			this.dampak = value;
 			return this;
 		}
 

@@ -93,20 +93,33 @@ public final class EpicScreen implements HudElement {
 	 */
 	public static void flash(int rgb, float alpha, int ticks, int skyFlash) {
 		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.options.hideLightningFlash().get()) {
+		if (!tryLuminance()) {
 			return;
 		}
-		long now = Util.getMillis();
-		if (now - lastLuminance < LUMINANCE_GAP) {
-			return;
-		}
-		lastLuminance = now;
 		if (alpha > 0.0F) {
 			ScreenFlash.add(rgb, Math.min(MAX_FLASH, alpha), Math.min(ScreenFlash.MAX_TICKS, ticks));
 		}
 		if (skyFlash > 0 && minecraft.level != null) {
 			minecraft.level.setSkyFlashTime(skyFlash);
 		}
+	}
+
+	/**
+	 * The shared luminance gate (Phase 10, DESIGN 28.1.2): true when a full-screen luminance event may play now, and then
+	 * counts it (the next one waits {@link #LUMINANCE_GAP}). False with vanilla "Hide Lightning Flashes". Used by the
+	 * 7b flashes, the impact frames and the cloud wipes, so any two of them are at least 500 ms apart.
+	 */
+	public static boolean tryLuminance() {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.options.hideLightningFlash().get()) {
+			return false;
+		}
+		long now = Util.getMillis();
+		if (now - lastLuminance < LUMINANCE_GAP) {
+			return false;
+		}
+		lastLuminance = now;
+		return true;
 	}
 
 	public static void clear() {

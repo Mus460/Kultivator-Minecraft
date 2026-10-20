@@ -370,6 +370,10 @@ final class DisplayRun extends LayerRun {
 			}
 			started = all || age > 10;
 		}
+		if (dev.kultivator.client.epic.EpicClock.frozen() && started && age + 8 < life) {
+			// Phase 10 (DESIGN 28.4.2): a hit-stop holds the frame (σ = 0): no new key, the displays stay where they are
+			return true;
+		}
 		if (layer.swingPeriod() > 0 && layer.motion() == FxLayer.Motion.SWING && age - swingStart >= layer.swingPeriod()) {
 			swingStart = age;
 		}

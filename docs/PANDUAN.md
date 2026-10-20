@@ -99,6 +99,8 @@ bulat di dalam game.
     tempa dan pusaka natal, cincin, desa bawahan, lem progresi, [perintah uji](#5511-perintah-uji-op)
 56. [**Petualangan Dewa Abadi (Fase 9)**](#56-petualangan-dewa-abadi-fase-9): Alam Abadi, Batu Asal Abadi, Binatang
     Purba, Bencana Bintang dan Murka Langit, Dunia Batin, Jurus Ciptaan, Lelang, [perintah](#5612-perintah)
+57. [**Dampak Langit (Fase 10)**](#57-dampak-langit-fase-10): Tanda Langit, Perjalanan Langit, Bingkai Dampak,
+    Dampak Sunyi, puing, Kawah Lebur, Sigil Bumi, monumen, [perintah uji](#574-perintah-uji-op)
 
 ---
 
@@ -7437,3 +7439,167 @@ Kewajiban harian baru: bunuh 3 makhluk Alam Abadi · tambang 1 Batu Asal Abadi �
   Zhulong. Lingkaran Gunung Dang Hun dan cincin telegraf memakai partikel, bukan Display.
 * Hujan Dao belum membatasi 6 tumbukan per target secara khusus (hanya batas bos biasa); Tebasan dan Gelombang tidak
   memahat parit saat Mode Kehancuran.
+
+## 57. Dampak Langit (Fase 10)
+
+Fase 10 membuat pamungkas tingkat **Abadi** dan **Dewa** terasa seperti serangan dari langit: titik sasaran ditandai
+cahaya langit sebelum serangan datang, kamera bisa naik menembus awan lalu turun mengikuti serangan, layar berkilat saat
+mendarat, dentumannya datang belakangan, dan tanah bergetar, beterbangan, menyala, lalu meninggalkan monumen. Idenya
+berasal dari cara sebuah mod senjata populer menampilkan serangan langitnya; **hanya idenya** yang dipakai, diceritakan
+ulang dengan gaya kultivasi, dan dibangun di mesin teknik, Momen Epik dan Mode Kehancuran milik Kultivator sendiri.
+Tidak ada kode, tekstur, model atau suara yang disalin.
+
+> **Status:** seluruh Fase 10 sudah dikompilasi tetapi **belum diuji di game**. Daftar uji:
+> [docs/uji/FASE-10.md](uji/FASE-10.md).
+>
+> **Keamanan blok:** tanpa Mode Kehancuran **semua efek Fase 10 hanya visual** (puing, tanah terangkat, kawah, sigil
+> dan monumen adalah tampilan di komputermu lalu hilang). Blok asli hanya berubah lewat `WorldBreaker`, dengan Mode
+> Kehancuran milikmu sendiri atau Jurus Pemusnah murid, dengan batas, zona terlindung dan Pulihkan yang sama seperti
+> sebelumnya. Monumen **tidak pernah** meninggalkan blok. Tidak ada `LightningBolt`, cuaca, waktu atau tick-rate yang
+> berubah. Angka gameplay (kerusakan, biaya Qi, cooldown) dan baris Sumber tidak berubah.
+
+### 57.1 Apa yang baru
+
+| Nama di game | Yang terlihat |
+|---|---|
+| **Tanda Langit** | Sebelum pamungkas mendarat: pilar cahaya turun dari langit dan cincin glif berputar di titik sasaran, braket segel di crosshair. Saat mengisi (Sembilan Matahari, Diagram Taiji, Kunpeng) tanda ikut crosshair, lalu pindah ke titik server saat dilepas. Pemain lain melihat pilar dan cincinnya. |
+| **Perjalanan Langit** | Pamungkas Dewa milikmu sendiri: kamera naik di samping pilar, menembus lautan awan ke langit berbintang dengan pemandangan langit jurus itu (gerbang langit, matahari kaisar, gunung es, sembilan langit, sungai bintang, cakram akresi, pohon cahaya), lalu turun mengikuti serangan. Total ≤ 4 detik; perpindahan kamera disembunyikan di balik awan. |
+| **Bingkai Dampak** | Kilatan layar sesaat saat serangan mendarat. Lembut: satu warna tipis. Penuh: tiga bingkai (pembalikan warna, warna Dao, memudar) dengan garis hantaman. |
+| **Dampak Sunyi** | Serangan mendarat tanpa suara, dentumannya datang sesudah jeda; makin jauh, makin lambat, seperti guruh. Ditambah *hit-stop*: model 3D, tampilan dan puing berhenti sekejap (2 tick Abadi, 3 tick Dewa). |
+| **Gelombang Kejut** | Cincin debu, api, es, petir atau emas yang menyapu tanah dari titik dampak. |
+| **Puing** | Bongkahan tanah beterbangan, berputar, memantul sekali, lalu hancur. Dengan Mode Kehancuran bongkahannya adalah blok asli dari kawah. |
+| **Gunung Terangkat** | Kisi cahaya memotong tanah menjadi sel yang terangkat dan berputar ke langit (Lubang Hitam: berputar masuk ke inti). |
+| **Kawah Lebur** | Dasar dan bibir kawah berubah sesuai Dao: api (blackstone, basalt, magma), es (packed ice, snow block), petir, pedang, ruang, tanah, kehidupan, bayangan, taiji. Tanpa Mode Kehancuran hanya tempelan cahaya yang mendingin. |
+| **Sigil Bumi** | Diagram formasi di tanah, mengikuti bukit dan lubang: Sembilan Bintang Biduk Utara, Istana Luo Shu, Lima Unsur, Delapan Trigram, Cincin Sembilan Pedang, Bujur Sangkar Zhuxian, Teratai, Sembilan Langit, Dua Belas Jam, dan lain-lain. Simpulnya menyala satu per satu, lalu semuanya saat klimaks; pola bintang mendapat hantaman bintang dan kristal bercahaya. |
+| **Monumen** | Senjata atau pusaka jurus tertinggal di kawah 60-180 detik (pedang tertancap, teratai kaisar, jam waktu, cermin hampa, cakram taiji...), berpendar pelan lalu memudar. Hanya visual. |
+
+Semua pamungkas Abadi dan Dewa punya "papan cerita" sendiri, misalnya:
+
+* **Seni Pedang Hukuman Langit:** pilar emas-putih di ujung sinar, Perjalanan Langit ke Gerbang Langit tempat pedang
+  dicabut, bingkai balik warna, pedang raksasa tertancap di kawah.
+* **Api Kaisar:** teratai enam belas kelopak menyala kelopak demi kelopak, kawah lebur api, inti teratai melayang 120 detik.
+* **Wilayah Roh Waktu:** layar kelabu, jarum jam menyapu satu putaran, bongkahan tanah tergantung di udara sampai waktu
+  berjalan lagi, jam raksasa tertinggal.
+* **Lubang Hitam:** kisi cahaya memotong tanah, sel-sel terangkat berputar masuk ke inti.
+* **Langkah Penginjak Langit:** tiap langkah menyalakan satu bintang Biduk Utara; dengan Mode Kehancuran garisnya menjadi
+  parit menyala.
+* **Formasi Pedang Zhuxian:** empat pilar merah di sudut bujur sangkar, pedang Zhuxian raksasa tertancap 120 detik.
+* **Jurus Ciptaan sendiri:** pilar, bingkai, kawah dan monumen mengikuti warna dan Dao pertamamu.
+
+**Mode Kehancuran secara umum:** setiap pemotongan (jurusmu, jurus ciptaan, Jurus Pemusnah murid, perintah Pemusnah)
+sekarang mendapat gelombang kejut dan puing sesuai banyaknya blok yang terangkat. Debu lama dikurangi separuh saat puing
+terbang supaya tidak dobel.
+
+### 57.2 Pengaturan
+
+Grup **Momen Epik** di tab Pengaturan gulungan giok (tersimpan di `config/kultivator-client.json`), baris baru di bawah
+"Kamera sinematik":
+
+| Pengaturan | Pilihan (bawaan tebal) | Artinya |
+|---|---|---|
+| Kamera sinematik | Penuh / **Singkat** / Mati | (sudah ada) Perjalanan Langit **hanya dengan Penuh**. Singkat: crane pendek 2 detik melihat serangan jatuh. Mati: kamera tidak bergerak sama sekali |
+| Perjalanan langit | **Pertama** / Selalu / Mati | Pertama: sekali per jurus per sesi. Selalu: setiap kali. Mati: tanpa perjalanan |
+| Bingkai dampak | **Lembut** / Penuh / Mati | Lembut: satu kilatan tipis (≤ 0,35) tanpa pembalikan warna. Penuh: tiga bingkai layar penuh dengan pembalikan warna; pertama kali dipilih membuka **peringatan fotosensitif** (Batal = tetap Lembut). Mati: tanpa bingkai |
+| Dampak sunyi | **Nyala** / Mati | Mati: dentuman langsung terdengar. Suara monster tidak pernah diredam |
+| Puing & monumen | **Nyala** / Mati | Mati: hanya partikel (tanpa bongkahan, sel terangkat, kristal dan monumen) |
+| Daya dampak | **100 %** / 150 % / 50 % | mengalikan jumlah dan kecepatan puing, lebar gelombang kejut dan guncangan; tidak pernah melewati batas kinerja |
+
+Pengaturan lama tetap berlaku: **Kilatan layar** mati atau "Hide Lightning Flashes" vanilla menyala = tidak ada bingkai
+sama sekali; **Kurangi gerak** = tanpa garis hantaman dan tanpa Penuh; **Efek pemain lain** mengecilkan efek pemain lain
+(pemain lain hanya mendapat bingkai Lembut setengah terang, dan hanya bila dampaknya ≤ 32 blok di depanmu); **Kualitas
+Efek** menentukan batas puing, sel, kristal dan monumen.
+
+**Laptop lemah:** tampilan "shader berat" dipalsukan dengan lapisan quad bercahaya, tekstur glow dan lapisan HUD, tanpa
+post shader. Di **Minimal** puing dan sel terangkat diganti partikel, sigil hanya titik debu, monumen paling banyak 1
+(Normal 2, Maksimal 4). Penjaga frame Momen Epik ikut menurunkan tingkat bila FPS turun. Dibuat untuk Sodium dan Iris
+(lapisan Fase 10 tidak digambar di bayangan shader).
+
+**Keamanan kamera Perjalanan Langit:** hanya untuk jurusmu sendiri (tidak pernah untuk jurus murid), hanya saat aman:
+tidak ada musuh dalam 24 blok, nyawa ≥ 50 %, tidak jatuh, tidak di air/lava, tidak menunggang, tidak ada layar terbuka.
+Tombol gerak menghentikan shot, **Backspace** melewatinya, terkena serangan langsung kembali ke mata. Bila syarat gagal,
+yang tersisa hanya crane Singkat, lalu tidak ada.
+
+**Kawah Lebur (pribadi):** `/kultivasi kehancuran kawah nyala|mati` (bawaan nyala) menentukan apakah pemotongan Mode
+Kehancuran jurusmu juga mengubah dasar kawah. Kawah Lebur memakai pekerjaan dan catatan Pulihkan yang sama, paling banyak
+256 blok, tidak pernah memakai obsidian, crying obsidian, blue ice, es biasa (meleleh jadi air) atau amethyst, dan tidak
+ada magma dalam 6 blok dari tempatmu merapal atau di bawah pemain yang berdiri.
+
+**Server** (`config/kultivator.json`): `kehancuranSurfacePass` (bawaan true; false = tidak ada Kawah Lebur untuk siapa
+pun) dan `kehancuranSurfaceMax` (bawaan 256, 16–512 blok per pemotongan). Parit sigil memakai 15 % tetap dari batas blok
+per casting, jadi total blok per casting tidak bertambah.
+
+### 57.3 Perintah client `/sinematik dampak` (tanpa cheat, di komputermu)
+
+| Perintah | Fungsi |
+|---|---|
+| `/sinematik dampak info` | pengaturan, penjaga kamera, statistik efek dunia (tampilan, cincin, sigil, monumen, quad) |
+| `/sinematik dampak skyride pertama\|selalu\|mati` | Perjalanan langit |
+| `/sinematik dampak frames lembut\|penuh\|mati` | Bingkai dampak (penuh membuka peringatan dulu) |
+| `/sinematik dampak silent nyala\|mati` | Dampak sunyi |
+| `/sinematik dampak worldfx nyala\|mati` | Puing & monumen |
+| `/sinematik dampak power 50\|100\|150` | Daya dampak |
+| `/sinematik dampak naik <id>` | Perjalanan Langit jurus itu saja (tetap dengan semua syarat aman; perlu Kamera Penuh) |
+| `/sinematik dampak bingkai <id>` | bingkai dampak jurus itu |
+| `/sinematik dampak tanda <id>` | Tanda Langit jurus itu 12 blok di depan |
+| `/sinematik dampak sunyi <jarak>` | dentuman uji pada jarak itu (0-96 blok) |
+| `/sinematik dampak monumen <model> [detik]` | monumen uji 10 blok di depan |
+| `/sinematik dampak cincin <radius>` | gelombang kejut uji (1-48) |
+
+Contoh:
+
+```
+/sinematik penuh
+/sinematik dampak skyride selalu
+/sinematik dampak naik heaven_punishing_sword
+/sinematik dampak sunyi 8
+/sinematik dampak sunyi 48
+/sinematik dampak frames penuh
+/sinematik dampak monumen zhuxian_sword 60
+/sinematik dampak cincin 16
+```
+
+### 57.4 Perintah uji (op)
+
+Semua di bawah `/kultivasi uji dampak`:
+
+| Perintah | Fungsi |
+|---|---|
+| `uji dampak <id>` | satu casting pamer jurus itu di depanmu (lewat runner `uji teknik pamer`: tanpa biaya, tanpa kerusakan). Kehancuran hanya bila `uji teknik kehancuran nyala` **dan** saklar Mode Kehancuranmu menyala |
+| `uji dampak semua` | semua papan cerita bergiliran, 14 detik sekali |
+| `uji dampak puing [n]` | paket puing UJI dari blok di sekitar bidikan (n ≤ 256, dipecah 64 per paket); tidak ada blok berubah |
+| `uji dampak angkat [n]` | paket UJI dengan sel terangkat (n sel) |
+| `uji dampak kawah <palet>` | mangkuk asli r 4 lewat Mode Kehancuran dengan palet itu (`fire`, `ice`, `lightning`, `sword`, `space`, `earth`, `life`, `shadow`, `taiji`); ditolak bila saklar Mode Kehancuranmu mati |
+| `uji dampak sigil <pola> [radius]` | klimaks uji supaya client menggambar pola itu di bidikan (tanpa parit) |
+| `uji dampak berhenti` | semua client di dekatmu membersihkan efek Fase 10 |
+
+Contoh:
+
+```
+/kultivasi uji dampak heaven_punishing_sword
+/kultivasi uji dampak stellar_black_hole
+/kultivasi uji dampak semua
+/kultivasi uji dampak puing 128
+/kultivasi uji dampak angkat 24
+/kultivasi uji dampak sigil beidou_nine 24
+/kultivasi uji dampak sigil luoshu
+/kultivasi kehancuran nyala
+/kultivasi uji dampak kawah fire
+/kultivasi kehancuran pulihkan
+/kultivasi uji dampak berhenti
+```
+
+`uji teknik audit` sekarang juga memeriksa baris Dampak (pamungkas tanpa baris Dampak, waktu klimaks yang tidak cocok,
+model monumen yang tidak ada).
+
+### 57.5 Yang belum lengkap
+
+* Belum diuji di game sama sekali: arah dan waktu Perjalanan Langit, letak pemandangan langit, tampilan pembalikan warna
+  dengan Sodium/Iris, lebar cincin, terang sigil, ukuran kristal, pantulan puing, dan FPS di laptop lemah.
+* `uji dampak semua` merapal setiap jurus di titik crosshair yang sama, belum maju 24 blok tiap baris.
+* Pose casting belum ikut berhenti saat hit-stop (model 3D, tampilan dan puing sudah).
+* Gunung Lima Unsur: lima puncaknya belum bertahan 120 detik sebagai monumen (hanya jimat segel).
+* Monumen Cermin Hampa muncul di titik dampak, bukan di pangkal sinar.
+* Beberapa klimaks tidak punya suara sendiri (Api Kaisar, Phoenix Es, Membekukan Gunung Qi, Gunung Lima Unsur), jadi
+  Dampak Sunyi di sana hanya menambah dentum rendah dari client.
+* Baris Sumber baru untuk Biduk Utara, Luo Shu, Kun-Peng Zhuangzi dan Perjalanan ke Barat bab 7 bertanda
+  `[lore verify]` (belum dicek ke sumbernya).

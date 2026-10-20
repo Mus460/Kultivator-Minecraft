@@ -1,6 +1,7 @@
 package dev.kultivator.client.kehancuran;
 
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.dampak.world.DampakWorld;
 import dev.kultivator.client.fx.CommonFx;
 import dev.kultivator.disciple.path.DestroyerArts;
 import dev.kultivator.fx.FxType;
@@ -39,6 +40,10 @@ public final class KehancuranFx {
 			}
 			case KehancuranFxIds.DUST -> {
 				int n = Math.max(2, EffectQuality.scale(Math.min(24, 4 + fx.b() / 3)));
+				if (DampakWorld.debrisRunning()) {
+					// Phase 10 debris displays carry the dust now (DESIGN 28.13.1): no double dust
+					n = Math.max(1, n / 2);
+				}
 				float spread = Math.max(1.0F, fx.f());
 				for (int i = 0; i < n; i++) {
 					Vec3 at = pos.add(random.nextGaussian() * spread * 0.5D, random.nextGaussian() * spread * 0.3D, random.nextGaussian() * spread * 0.5D);
@@ -75,10 +80,31 @@ public final class KehancuranFx {
 					Vec3 dir = new Vec3(random.nextGaussian(), Math.abs(random.nextGaussian()), random.nextGaussian()).normalize();
 					CommonFx.add(ParticleTypes.LARGE_SMOKE, pos.add(dir.scale(radius * random.nextFloat())), dir.scale(0.08D), false);
 				}
+				// Phase 10 (DESIGN 28.13.1): every carve gets a shock ring; a self job whose nearest player is the local one
+				// counts as the local player's own (the packet names no caster)
+				DampakWorld.onKehancuranImpact(pos, radius, art == null && nearestIsLocal(pos, radius + 32.0D));
 			}
 			default -> {
 			}
 		}
+	}
+
+	/** True when the local player is within {@code range} of {@code pos} and no other player is nearer. */
+	private static boolean nearestIsLocal(Vec3 pos, double range) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.player == null || minecraft.level == null) {
+			return false;
+		}
+		double own = minecraft.player.position().distanceToSqr(pos);
+		if (own > range * range) {
+			return false;
+		}
+		for (net.minecraft.world.entity.player.Player other : minecraft.level.players()) {
+			if (other != minecraft.player && other.position().distanceToSqr(pos) < own) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/** Every client tick: ash under the red sky, and the preview outline redrawn twice a second while it lasts. */

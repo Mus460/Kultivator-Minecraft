@@ -51,6 +51,8 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.goals.GoalsClient.init();
 		// Phase 7b Momen Epik (DESIGN 23.5.1 item 5).
 		dev.kultivator.client.epic.EpicClient.init();
+		// Phase 10 Dampak Langit (DESIGN 28.14 M2): marks, sky rides, impact frames, the delayed boom, the world FX.
+		dev.kultivator.client.dampak.DampakClient.init();
 		// Phase 7c Formasi Sekte (DESIGN 24.13 item 5).
 		dev.kultivator.client.formasi.FormasiClient.init();
 		// Phase 8 Jalan Dunia Kultivasi (DESIGN 25.2 item 18).
