@@ -23,7 +23,7 @@
   "kultivator.pusaka_langit.tier.confirm.lapsed": "Titah permanen kedaluwarsa. Tidak terjadi apa-apa.",
   "kultivator.pusaka_langit.tier.test.asked": "Rapalan uji menunggu konfirmasi permanen di chat.",
   "kultivator.pusaka_langit.tier.test.all": "Keempat titah dipasang ke Tingkat %s.",
-  "kultivator.pusaka_langit.tier.test.bulk_needs": "Uji pahat cepat butuh \"uji teknik kehancuran nyala\" dan saklar Mode Kehancuran milikmu sendiri menyala.",
+  "kultivator.pusaka_langit.tier.test.bulk_needs": "Uji pahat cepat butuh \"uji teknik kehancuran nyala\" dan saklar Mode Kehancuran milikmu sendiri menyala (keduanya sekaligus: /kultivasi kehancuran semua nyala).",
   "kultivator.pusaka_langit.tier.test.bulk": "Pahat cepat: jari-jari %1$s, kedalaman %2$s%3$s → %4$s",
   "kultivator.pusaka_langit.tier.test.undoable": " · bisa dipulihkan",
   "kultivator.pusaka_langit.tier.table.head": "Tabel tingkat %1$s pada Kekuatan ×%2$s (batasmu %3$s, server %4$s):",

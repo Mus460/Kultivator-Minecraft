@@ -441,7 +441,7 @@ final class SectCommands {
 	// ================================================================== debug
 
 	/** Adds an offline test member (a made-up player) to the caller's sect, to try sect features alone. */
-	private static int debugAddMember(CommandSourceStack source, String name) throws CommandSyntaxException {
+	static int debugAddMember(CommandSourceStack source, String name) throws CommandSyntaxException {
 		ServerPlayer player = source.getPlayerOrException();
 		MinecraftServer server = source.getServer();
 		SectData data = SectData.get(server);

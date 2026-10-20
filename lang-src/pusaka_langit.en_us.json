@@ -72,7 +72,7 @@
   "kultivator.pusaka_langit.test.bypass.off": "Titah bypass off.",
   "kultivator.pusaka_langit.test.refused": "%s could not be cast here.",
   "kultivator.pusaka_langit.test.cast": "Test %s · %s · %s",
-  "kultivator.pusaka_langit.test.real": "Mode Kehancuran on (carves only with \"uji teknik kehancuran nyala\")",
+  "kultivator.pusaka_langit.test.real": "Mode Kehancuran on (carves only with \"uji teknik kehancuran nyala\" or /kultivasi kehancuran semua nyala)",
   "kultivator.pusaka_langit.test.visual": "visual only",
   "kultivator.pusaka_langit.test.tour": "All four decrees, one every %s s, further along your look.",
   "kultivator.pusaka_langit.test.unloaded": "%s skipped: that spot is not loaded.",

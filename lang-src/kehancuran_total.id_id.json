@@ -14,7 +14,7 @@
   "kultivator.kehancuran_total.word.server_off": "dimatikan server",
   "kultivator.kehancuran_total.yes": "ya",
   "kultivator.kehancuran_total.no": "tidak",
-  "kultivator.kehancuran_total.test.needs": "Uji Hancur Total butuh saklar Mode Kehancuran milikmu sendiri menyala (/kultivasi kehancuran nyala).",
+  "kultivator.kehancuran_total.test.needs": "Uji Hancur Total butuh saklar Mode Kehancuran milikmu sendiri menyala (satu perintah untuk semuanya: /kultivasi kehancuran semua nyala).",
   "kultivator.kehancuran_total.test.no_undo": "Uji Hancur Total butuh jendela Pulihkan (kehancuranUndoMinutes di atas 0) agar lokasinya bisa dibersihkan.",
   "kultivator.kehancuran_total.test.refused": "Tidak ada tanah termuat yang bisa dipakai untuk lokasi uji di depanmu.",
   "kultivator.kehancuran_total.test.zone": "Lokasi uji akan menyentuh zona terlindung; pindah ke tempat lain.",

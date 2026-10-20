@@ -172,8 +172,10 @@ Fase 10b: `titah`, `titah daftar`, `titah tingkat <1-9> [titah]`, `titah ya <kod
 Aura Kultivasi: uji `uji aura <ranah> [tahap] [lapisan]|semua|murid <nama> <ranah> [tahap]|aksen|stop`
 ([panduan](docs/PANDUAN.md#616-perintah-uji-op)).
 `/sekte` atau `/sect` — `create`, `invite`, `join`, `leave`, `kick`, `disband`, `info`, `list`, `chat`,
-`spar <pemain>|accept|decline`. Perintah uji operator ada di bawah `/kultivasi debug` — daftar lengkapnya di
+`spar <pemain>|accept|decline`. Semua perintah cheat operator ada di `/kultivasi uji` (ketik tanpa tambahan untuk daftar yang bisa diklik;
+`/kultivasi debug ...` tetap jalan sebagai alias lama) — daftar lengkapnya di
 [panduan](docs/PANDUAN.md#33-perintah-uji-untuk-operator-kultivasi-debug-).
+Mode Kehancuran cukup satu perintah: `/kultivasi kehancuran semua nyala` (matikan: `... semua mati`).
 
 ## Tombol bawaan
 

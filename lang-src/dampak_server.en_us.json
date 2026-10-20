@@ -15,7 +15,7 @@
   "kultivator.dampak_server.test.debris.empty": "No solid ground around the aim to sample.",
   "kultivator.dampak_server.test.palette.unknown": "Unknown palette '%s'.",
   "kultivator.dampak_server.test.pattern.unknown": "Unknown sigil pattern '%s'.",
-  "kultivator.dampak_server.test.kawah.refused": "A real crater needs your own Mode Kehancuran switch on (/kultivasi kehancuran nyala).",
+  "kultivator.dampak_server.test.kawah.refused": "A real crater needs your own Mode Kehancuran switch on (/kultivasi kehancuran nyala, or everything at once: /kultivasi kehancuran semua nyala).",
   "kultivator.dampak_server.test.kawah.result": "Test crater (%s): %s.",
   "kultivator.dampak_server.test.sigil": "Test sigil %s (from %s), radius %s: drawn by the clients only, nothing carved.",
   "kultivator.dampak_server.test.sigil.none": "No Dampak row uses the pattern %s.",

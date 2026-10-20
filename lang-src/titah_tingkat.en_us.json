@@ -23,7 +23,7 @@
   "kultivator.pusaka_langit.tier.confirm.lapsed": "The permanent decree lapsed. Nothing happened.",
   "kultivator.pusaka_langit.tier.test.asked": "Test cast waits for the permanent confirmation in chat.",
   "kultivator.pusaka_langit.tier.test.all": "All four decrees set to Tingkat %s.",
-  "kultivator.pusaka_langit.tier.test.bulk_needs": "The fast carve test needs \"uji teknik kehancuran nyala\" and your own Mode Kehancuran switch on.",
+  "kultivator.pusaka_langit.tier.test.bulk_needs": "The fast carve test needs \"uji teknik kehancuran nyala\" and your own Mode Kehancuran switch on (both at once: /kultivasi kehancuran semua nyala).",
   "kultivator.pusaka_langit.tier.test.bulk": "Fast carve: radius %1$s, depth %2$s%3$s → %4$s",
   "kultivator.pusaka_langit.tier.test.undoable": " · undoable",
   "kultivator.pusaka_langit.tier.table.head": "Tingkat table of %1$s at Kekuatan ×%2$s (your limit %3$s, server %4$s):",

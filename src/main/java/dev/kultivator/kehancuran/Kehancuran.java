@@ -304,6 +304,66 @@ public final class Kehancuran {
 		return true;
 	}
 
+	// ================================================================== one command for everything (kehancuran semua)
+
+	/** {@code extra.path.kh_all_permit}: {@code kehancuran semua nyala} of this player turned the server permission on. */
+	static final String ALL_PERMIT_KEY = "kh_all_permit";
+
+	/**
+	 * {@code kehancuran semua nyala|mati} ({@link KehancuranSemua}): the player's own switch (on only while
+	 * {@link #selfAllowed} is null), Hancur Total (on only while the server allows it) and Kawah Lebur, without their own
+	 * chat lines (the caller prints one summary). Off drops this player's queued self jobs exactly like {@link #setSelf}.
+	 */
+	static void quietSwitches(ServerPlayer player, boolean on) {
+		CompoundTag path = section(player);
+		if (!on || selfAllowed(player) == null) {
+			path.putBoolean(SELF_KEY, on);
+		}
+		if (!on || KultivatorConfig.get().kehancuranTotalAllowed) {
+			path.putBoolean(TOTAL_KEY, on);
+		}
+		path.putBoolean(KAWAH_KEY, on);
+		Cultivators.dirty(player);
+		WorldBreaker.applyRules(player.getUUID(), rulesFor(player));
+		if (!on) {
+			WorldBreaker.cancelSelf(player.level().getServer(), player.getUUID());
+			DEFERRED.removeIf(pending -> pending.owner().equals(player.getUUID()));
+		} else if (selfOn(player)) {
+			player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 0.8F, 0.5F);
+		}
+	}
+
+	/** The flag of {@link #ALL_PERMIT_KEY}, read and written by {@link KehancuranSemua}. */
+	static boolean allPermit(ServerPlayer player) {
+		return Cultivators.get(player).extra().getCompoundOrEmpty(DisciplePaths.PLAYER_EXTRA).getBooleanOr(ALL_PERMIT_KEY, false);
+	}
+
+	static void setAllPermit(ServerPlayer player, boolean on) {
+		section(player).putBoolean(ALL_PERMIT_KEY, on);
+		Cultivators.dirty(player);
+	}
+
+	/** The stored own switch, whether or not it is allowed now. */
+	static boolean selfStored(ServerPlayer player) {
+		return Cultivators.get(player).extra().getCompoundOrEmpty(DisciplePaths.PLAYER_EXTRA).getBooleanOr(SELF_KEY, false);
+	}
+
+	/**
+	 * The server permission ({@code modeKehancuran}) as {@code kehancuran izin on|off} sets it, without its broadcast;
+	 * off cancels every order and job like {@code izin off}. Returns false when the config could not be written.
+	 */
+	static boolean setPermissionQuiet(MinecraftServer server, boolean on) {
+		KultivatorConfig.get().modeKehancuran = on;
+		boolean saved = KultivatorConfig.save();
+		if (!on) {
+			for (Order order : List.copyOf(ORDERS.values())) {
+				cancel(server, order, "cancel.lock");
+			}
+			WorldBreaker.cancelAll(server);
+		}
+		return saved;
+	}
+
 	/** {@code kultivator.kehancuran_diri.}: the player's own switch (22.11). */
 	private static final String SELF = "kultivator.kehancuran_diri.";
 	/** Submits built per server tick at most, the waiting queue and how long a submit may wait (22.11.5). */
@@ -1341,7 +1401,12 @@ public final class Kehancuran {
 
 	public static void addCommands(LiteralArgumentBuilder<CommandSourceStack> root, LiteralArgumentBuilder<CommandSourceStack> debug) {
 		root.then(Commands.literal("kehancuran")
-				.executes(ctx -> status(ctx.getSource().getPlayerOrException()))
+				// One command for everything: the summary with [Nyalakan semua] / [Matikan semua] (KehancuranSemua).
+				.executes(ctx -> KehancuranSemua.summary(ctx.getSource().getPlayerOrException()))
+				.then(Commands.literal("semua")
+						.executes(ctx -> KehancuranSemua.summary(ctx.getSource().getPlayerOrException()))
+						.then(Commands.literal("nyala").executes(ctx -> KehancuranSemua.set(ctx.getSource().getPlayerOrException(), true)))
+						.then(Commands.literal("mati").executes(ctx -> KehancuranSemua.set(ctx.getSource().getPlayerOrException(), false))))
 				.then(Commands.literal("sumpah").executes(ctx -> {
 					openOath(ctx.getSource().getPlayerOrException());
 					return 1;
@@ -1387,6 +1452,11 @@ public final class Kehancuran {
 				.then(Commands.literal("izin").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 						.then(Commands.literal("on").executes(ctx -> permit(ctx.getSource(), true)))
 						.then(Commands.literal("off").executes(ctx -> permit(ctx.getSource(), false)))));
+		// The short alias of "kehancuran semua nyala|mati".
+		root.then(Commands.literal("hancur")
+				.executes(ctx -> KehancuranSemua.summary(ctx.getSource().getPlayerOrException()))
+				.then(Commands.literal("nyala").executes(ctx -> KehancuranSemua.set(ctx.getSource().getPlayerOrException(), true)))
+				.then(Commands.literal("mati").executes(ctx -> KehancuranSemua.set(ctx.getSource().getPlayerOrException(), false))));
 		// Phase 30 (DESIGN 30.6): uji kehancuran total ... (op). Brigadier merges this "uji" literal with the test
 		// registry's own "uji" node, whichever is registered first; both require the gamemaster level.
 		root.then(Commands.literal("uji").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))

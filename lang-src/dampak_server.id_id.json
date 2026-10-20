@@ -15,7 +15,7 @@
   "kultivator.dampak_server.test.debris.empty": "Tidak ada tanah padat di sekitar bidikan untuk diambil.",
   "kultivator.dampak_server.test.palette.unknown": "Palet '%s' tidak dikenal.",
   "kultivator.dampak_server.test.pattern.unknown": "Pola sigil '%s' tidak dikenal.",
-  "kultivator.dampak_server.test.kawah.refused": "Kawah sungguhan butuh saklar Mode Kehancuran-mu sendiri nyala (/kultivasi kehancuran nyala).",
+  "kultivator.dampak_server.test.kawah.refused": "Kawah sungguhan butuh saklar Mode Kehancuran-mu sendiri nyala (/kultivasi kehancuran nyala, atau semuanya sekaligus: /kultivasi kehancuran semua nyala).",
   "kultivator.dampak_server.test.kawah.result": "Uji kawah (%s): %s.",
   "kultivator.dampak_server.test.sigil": "Uji sigil %s (dari %s), jari-jari %s: hanya digambar klien, tidak ada yang dipahat.",
   "kultivator.dampak_server.test.sigil.none": "Tidak ada baris Dampak yang memakai pola %s.",

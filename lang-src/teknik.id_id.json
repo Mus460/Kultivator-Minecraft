@@ -192,7 +192,7 @@
   "kultivator.teknik.test.gate": "Dewa Abadi Puncak, sudah naik, pemahaman 90: %s prasyarat Gerbang Dewa diatur ke Puncak Jurus.",
   "kultivator.teknik.test.carve_on": "Rapalan uji kini boleh memahat dunia (aturan saklar Mode Kehancuran tetap berlaku).",
   "kultivator.teknik.test.carve_off": "Rapalan uji tidak lagi memahat.",
-  "kultivator.teknik.test.carve_switch": "Saklar Mode Kehancuran milikmu mati atau tidak diizinkan: nyalakan dengan /kultivasi kehancuran nyala.",
+  "kultivator.teknik.test.carve_switch": "Saklar Mode Kehancuran milikmu mati atau tidak diizinkan: nyalakan semuanya sekaligus dengan /kultivasi kehancuran semua nyala.",
   "kultivator.teknik.test.cast.title": "Rapalan uji %1$s (%2$s) · %3$s · %4$s",
   "kultivator.teknik.test.cast.kh": "Kehancuran: K %1$s · %2$s blok per rapalan · %3$s",
   "kultivator.teknik.test.cast.refused": "Rapalan tidak terjadi (lihat alasannya di atas).",

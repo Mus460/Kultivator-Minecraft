@@ -232,6 +232,8 @@ bentrok dengan tombol vanilla, Butter Bot, maupun Iris (K, O, R).
 
 ### 3.3 Perintah uji untuk operator (`/kultivasi debug ...`)
 
+> **Semua perintah cheat ada di `/kultivasi uji`.** Semua perintah di tabel ini sekarang juga ada di bawah `/kultivasi uji` (contoh: `/kultivasi uji set realm golden_core 3`, `/kultivasi uji murid summon`). `/kultivasi debug ...` tetap jalan sebagai alias lama. Ketik `/kultivasi uji` saja untuk daftar berkelompok yang bisa diklik.
+
 Butuh izin operator (level 2). `[pemain]` berarti target pemain boleh ditambahkan di akhir.
 
 | Perintah | Fungsi |
@@ -1607,6 +1609,8 @@ menerobos, dengan qi ≥ 30%. Murid membayar separuh biaya dari qinya, dan kalia
 bersama pewarismu ×1,5.
 
 ### 12.11 MODE KEHANCURAN untuk jurusmu sendiri (Saklar gampang)
+
+> **Satu perintah: `/kultivasi kehancuran semua nyala`** menyalakan saklar ini beserta semua saklar lain yang dibutuhkan (lihat bab 31).
 
 > **PERINGATAN — SAKLAR MERAH.** Selama saklar ini **NYALA**, jurus serangmu **benar-benar menghancurkan blok dunia**:
 > kawah, parit, retakan, dan tanah terbelah yang makin besar seiring ranahmu. Saklarnya **MATI secara bawaan**, juga di dunia
@@ -5120,6 +5124,8 @@ Kerusakan selalu hanya pada monster: pemain, hewan peliharaan, penduduk desa, da
 ---
 
 ## 31. MODE KEHANCURAN (peringatan)
+
+> **Satu perintah: `/kultivasi kehancuran semua nyala`** (singkat: `/kultivasi hancur nyala`). Sekaligus menyalakan izin server (bila kamu operator atau pemilik dunia; selain itu operator harus mengizinkan), saklarmu sendiri, Hancur Total, Kawah Lebur, pahatan rapalan uji (`uji teknik kehancuran`) dan "Hancurkan tanah" keempat Titah, lalu menampilkan ringkasan ✔/✖ dan zona yang tetap terlindung. `/kultivasi kehancuran semua mati` mematikan semuanya (izin server ikut mati hanya bila perintah ini yang menyalakannya dan tidak ada pemain lain yang masih memakai saklarnya). `/kultivasi kehancuran` saja menampilkan ringkasan dengan tombol [Nyalakan semua] / [Matikan semua]. Sumpah Kehancuran untuk Jurus Pemusnah murid tetap terpisah (tombol [Buka sumpah] di ringkasan).
 
 > **PERINGATAN — SEGEL MERAH.** Mode Kehancuran adalah **satu-satunya** bagian Kultivator yang menghancurkan **blok
 > sungguhan**. Mode ini **MATI secara bawaan** dan tidak bisa menyala sendiri. Nyalakan hanya di dunia uji atau dunia

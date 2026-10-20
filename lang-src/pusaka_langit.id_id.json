@@ -72,7 +72,7 @@
   "kultivator.pusaka_langit.test.bypass.off": "Bypass titah mati.",
   "kultivator.pusaka_langit.test.refused": "%s tidak dapat dijatuhkan di sini.",
   "kultivator.pusaka_langit.test.cast": "Uji %s · %s · %s",
-  "kultivator.pusaka_langit.test.real": "Mode Kehancuran nyala (memahat hanya dengan \"uji teknik kehancuran nyala\")",
+  "kultivator.pusaka_langit.test.real": "Mode Kehancuran nyala (memahat hanya dengan \"uji teknik kehancuran nyala\" atau /kultivasi kehancuran semua nyala)",
   "kultivator.pusaka_langit.test.visual": "hanya visual",
   "kultivator.pusaka_langit.test.tour": "Keempat titah, satu tiap %s dtk, makin jauh searah pandangan.",
   "kultivator.pusaka_langit.test.unloaded": "%s dilewati: tempat itu tidak dimuat.",

@@ -169,12 +169,12 @@ public final class TestCommands {
 		});
 	}
 
-	/** Adds {@code uji ...} to /cultivate (op only). */
-	public static void addCommands(LiteralArgumentBuilder<CommandSourceStack> root) {
-		LiteralArgumentBuilder<CommandSourceStack> uji = Commands.literal("uji");
-		uji.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-				.executes(ctx -> help(ctx.getSource()))
-				.then(Commands.literal("maks").executes(ctx -> max(ctx)))
+	/**
+	 * Adds the test commands to the op-only {@code uji} node of /cultivate (built by {@code CultivateCommand}, which also
+	 * puts the former {@code debug} commands there and gives it the grouped help, {@link CheatHelp}).
+	 */
+	public static void addCommands(LiteralArgumentBuilder<CommandSourceStack> uji) {
+		uji.then(Commands.literal("maks").executes(ctx -> max(ctx)))
 				.then(Commands.literal("ranah")
 						.then(Commands.argument("realm", StringArgumentType.word()).suggests(REALMS)
 								.executes(ctx -> realm(ctx, 4, 1))
@@ -240,7 +240,10 @@ public final class TestCommands {
 		dev.kultivator.voice.VoiceTests.addTestCommands(uji);
 		// Aura Kultivasi (DESIGN 31.6): uji aura <realm> [stage] [layer] | semua | murid <name> ... | aksen | stop
 		uji.then(dev.kultivator.aura.AuraPreviews.command());
-		root.then(uji);
+		// Formerly "/sekte debug addmember <name>" (still there): a stand-in member so a sect can be tested alone.
+		uji.then(Commands.literal("sekte").then(Commands.literal("addmember")
+				.then(Commands.argument("name", StringArgumentType.word())
+						.executes(ctx -> dev.kultivator.sect.Sects.testAddMember(ctx.getSource(), StringArgumentType.getString(ctx, "name"))))));
 	}
 
 	/** Sets the Bintang Abadi star tier through module D's API (True Immortal Peak first, calamities below it passed). */
@@ -257,14 +260,6 @@ public final class TestCommands {
 
 	private static ServerPlayer self(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
 		return ctx.getSource().getPlayerOrException();
-	}
-
-	private static int help(CommandSourceStack source) {
-		source.sendSuccess(() -> Component.translatable("kultivator.test.help.title").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
-		for (String key : List.of("maks", "ranah", "tur", "kit", "teknik", "murid", "aura", "more")) {
-			source.sendSuccess(() -> Component.translatable("kultivator.test.help." + key).withStyle(ChatFormatting.GRAY), false);
-		}
-		return 1;
 	}
 
 	// ================================================================ realms

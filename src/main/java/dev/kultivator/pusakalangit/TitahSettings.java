@@ -134,6 +134,32 @@ public final class TitahSettings {
 		Cultivators.dirty(player);
 	}
 
+	/**
+	 * {@code kehancuran semua nyala|mati}: "Hancurkan tanah" of all four decrees, then the seal's tooltip and the menu
+	 * are refreshed (a fresh {@code TitahSync}).
+	 */
+	public static void setAllHancur(ServerPlayer player, boolean on) {
+		CultivationData data = Cultivators.get(player);
+		for (Titah.Skill skill : Titah.Skill.values()) {
+			Titah.Settings now = raw(data, skill);
+			write(player, skill, new Titah.Settings(now.kekuatan(), now.kerusakan(), now.kecepatan(), on, now.monumen(), now.tingkat()));
+		}
+		HeavenDecreeSealItem.refreshView(player);
+		sync(player);
+	}
+
+	/** How many of the four decrees have "Hancurkan tanah" on. */
+	public static int hancurCount(ServerPlayer player) {
+		CultivationData data = Cultivators.get(player);
+		int n = 0;
+		for (Titah.Skill skill : Titah.Skill.values()) {
+			if (raw(data, skill).hancur()) {
+				n++;
+			}
+		}
+		return n;
+	}
+
 	/** The selected decree (the seal's right-click casts it). */
 	static Titah.Skill selected(CultivationData data) {
 		return Titah.Skill.byOrdinal(view(data).getIntOr("sel", 0));

@@ -54,7 +54,7 @@ public final class PillToxicity {
 	}
 
 	/**
-	 * {@code /cultivate debug toxicity set <0..100>} for testing (merges with the spine's {@code debug toxicity clear}).
+	 * {@code /cultivate uji toxicity set <0..100>} for testing (merges with the spine's {@code uji toxicity clear}; the old {@code debug} alias still works).
 	 * Only active if the command tree calls it.
 	 */
 	public static void addCommands(LiteralArgumentBuilder<CommandSourceStack> root, LiteralArgumentBuilder<CommandSourceStack> debug) {
