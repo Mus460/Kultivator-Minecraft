@@ -184,6 +184,21 @@ public final class Kehancuran {
 				&& selfAllowed(player) == null;
 	}
 
+	/** The player's Kawah Lebur switch (DESIGN 28.8.1; default on): their self jobs run the molten surface pass. */
+	public static boolean kawahOn(ServerPlayer player) {
+		return Cultivators.get(player).extra().getCompoundOrEmpty(DisciplePaths.PLAYER_EXTRA).getBooleanOr(KAWAH_KEY, true);
+	}
+
+	/** {@code /kultivasi kehancuran kawah nyala|mati}. */
+	public static int setKawah(ServerPlayer player, boolean on) {
+		section(player).putBoolean(KAWAH_KEY, on);
+		Cultivators.dirty(player);
+		Msg.chat(player, Component.translatable(on ? "kultivator.dampak_server.kawah.on" : "kultivator.dampak_server.kawah.off",
+				KultivatorConfig.get().kehancuranSurfacePass ? Component.empty()
+						: Component.translatable("kultivator.dampak_server.kawah.server_off")).withColor(on ? 0xFF8A5A : 0x9FF3E6));
+		return 1;
+	}
+
 	/**
 	 * The one-click switch (no oath screen, 22.11.1). On: refused with the reason in the action bar and chat unless
 	 * {@link #selfAllowed} is null; otherwise one red chat line with [Matikan] and [Pulihkan] and one low heartbeat. Off:
@@ -235,10 +250,15 @@ public final class Kehancuran {
 	 * SCATTER and ×n among them with up to 12 anchors.
 	 */
 	private static final int MAX_SHAPES = TechniquePower.SCATTER_POINTS + TechniquePower.MAX_DESTRUCTION_SHAPES;
+	/** Phase 10 (DESIGN 28.9.3): the sigil trench lines one cast may add on top (they share the cast's block cap). */
+	public static final int MAX_SIGIL_TRENCHES = 24;
+	/** {@code extra.path.kawah}: the player's Kawah Lebur switch (28.8.1, default on), stored with the self switch. */
+	public static final String KAWAH_KEY = "kawah";
 
 	/** A submit waiting for a build slot (it is dropped when the caster left that dimension meanwhile). */
 	private record PendingSelf(UUID owner, String specId, List<Shapes.Placed> shapes, int blockCap, long created,
-			net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension) {
+			net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension,
+			dev.kultivator.technique.spec.dsl.Dampak.@Nullable Palette palette) {
 	}
 
 	private static final List<PendingSelf> DEFERRED = new ArrayList<>();
@@ -253,6 +273,16 @@ public final class Kehancuran {
 	 * in proportion, drops protected and never-touched positions and queues one {@link WorldBreaker} job.
 	 */
 	public static SelfResult submitSelf(ServerPlayer caster, String specId, List<Shapes.Placed> shapes, int blockCap) {
+		return submitSelf(caster, specId, shapes, blockCap, null);
+	}
+
+	/**
+	 * As {@link #submitSelf(ServerPlayer, String, List, int)} with the Kawah Lebur palette of the job (Phase 10, DESIGN
+	 * 28.8; null = the spec's own {@code Dampak.palette()}). The spec's net id, debris flags and palette go into the job;
+	 * the surface pass runs only when the server allows it and the player's {@code kawah} switch is on.
+	 */
+	public static SelfResult submitSelf(ServerPlayer caster, String specId, List<Shapes.Placed> shapes, int blockCap,
+			dev.kultivator.technique.spec.dsl.Dampak.@Nullable Palette palette) {
 		try {
 			if (!selfOn(caster) || blockCap <= 0 || shapes.isEmpty()) {
 				return SelfResult.OFF;
@@ -265,17 +295,18 @@ public final class Kehancuran {
 				buildTick = now;
 				builds = 0;
 			}
-			List<Shapes.Placed> list = shapes.size() > MAX_SHAPES ? List.copyOf(shapes.subList(0, MAX_SHAPES)) : List.copyOf(shapes);
+			int maxShapes = MAX_SHAPES + MAX_SIGIL_TRENCHES;
+			List<Shapes.Placed> list = shapes.size() > maxShapes ? List.copyOf(shapes.subList(0, maxShapes)) : List.copyOf(shapes);
 			if (builds >= BUILDS_PER_TICK) {
 				if (DEFERRED.size() >= DEFERRED_MAX) {
 					note(caster, "queue_full");
 					return SelfResult.QUEUE_FULL;
 				}
-				DEFERRED.add(new PendingSelf(caster.getUUID(), specId, list, blockCap, now, caster.level().dimension()));
+				DEFERRED.add(new PendingSelf(caster.getUUID(), specId, list, blockCap, now, caster.level().dimension(), palette));
 				return SelfResult.DEFERRED;
 			}
 			builds++;
-			return build(caster, specId, list, blockCap);
+			return build(caster, specId, list, blockCap, palette);
 		} catch (RuntimeException exception) {
 			dev.kultivator.Kultivator.LOGGER.error("Kultivator: Mode Kehancuran self cast of {} failed", specId, exception);
 			return SelfResult.NOTHING;
@@ -304,7 +335,7 @@ public final class Kehancuran {
 			}
 			builds++;
 			try {
-				build(caster, pending.specId(), pending.shapes(), pending.blockCap());
+				build(caster, pending.specId(), pending.shapes(), pending.blockCap(), pending.palette());
 			} catch (RuntimeException exception) {
 				dev.kultivator.Kultivator.LOGGER.error("Kultivator: Mode Kehancuran self cast of {} failed", pending.specId(), exception);
 			}
@@ -315,7 +346,8 @@ public final class Kehancuran {
 	 * One build: every shape's ordered positions (read-only geometry), duplicates removed, each shape cut to its share of
 	 * the cap (in proportion to its uncut size), protected and never-touched positions dropped; at most 4 x cap reads.
 	 */
-	private static SelfResult build(ServerPlayer caster, String specId, List<Shapes.Placed> shapes, int blockCap) {
+	private static SelfResult build(ServerPlayer caster, String specId, List<Shapes.Placed> shapes, int blockCap,
+			dev.kultivator.technique.spec.dsl.Dampak.@Nullable Palette palette) {
 		ServerLevel level = caster.level();
 		List<List<Shapes.Change>> raws = new ArrayList<>(shapes.size());
 		long total = 0L;
@@ -434,6 +466,21 @@ public final class Kehancuran {
 		Shapes.Placed first = shapes.get(0);
 		BlockPos centre = first.anchor();
 		WorldBreaker.Job job = WorldBreaker.Job.self(caster, specId, first.spec().kind().id(), centre, packed, modeArray);
+		// Phase 10 (DESIGN 28.6.1, 28.8.1): debris flags, the spec's net id and the Kawah Lebur palette ride in the job
+		dev.kultivator.data.TechniqueSpec spec = dev.kultivator.data.TechniqueRegistry.byId(specId);
+		dev.kultivator.technique.spec.dsl.Dampak dampak = spec == null ? null : spec.dampak();
+		job.specNet = spec == null ? -1 : spec.netId();
+		job.debrisFlags = dampak == null ? 0 : dampak.debrisFlags();
+		dev.kultivator.technique.spec.dsl.Dampak.Palette chosen = palette != null ? palette
+				: dampak == null ? dev.kultivator.technique.spec.dsl.Dampak.Palette.NONE : dampak.palette();
+		if (palette == null && dampak != null && dampak.vista() == dev.kultivator.technique.spec.dsl.Dampak.Vista.BY_DAO) {
+			// own arts (28.12): the palette of the creation's first Dao
+			dev.kultivator.batin.Creation.Art art = dev.kultivator.batin.Creation.art(caster, dev.kultivator.batin.CiptaanArts.slotOf(specId));
+			if (art != null) {
+				chosen = Surface.forDao(art.a());
+			}
+		}
+		job.palette = kawahOn(caster) && KultivatorConfig.get().kehancuranSurfacePass ? chosen : dev.kultivator.technique.spec.dsl.Dampak.Palette.NONE;
 		if (!WorldBreaker.submit(job)) {
 			note(caster, "queue_full");
 			return SelfResult.QUEUE_FULL;
@@ -938,6 +985,8 @@ public final class Kehancuran {
 		WorldBreaker.Job job = new WorldBreaker.Job(master.getUUID(), master.getName().getString(), entity.getName().getString(),
 				spec.kind().id(), dimension, centre, positions, targets, null, false, spec.naturalOnly(), spec.kind() == Shapes.Kind.WITHER,
 				config.kehancuranDropsPct);
+		// Phase 10 (DESIGN 28.13.1): the Destroyer Art's debris fly from the disciple's crater too (BURST, no palette)
+		job.casterEntityId = entity.getId();
 		if (!WorldBreaker.submit(job)) {
 			Msg.chat(master, Component.translatable(PREFIX + "why.queue_full").withColor(RED));
 			return;
@@ -1013,6 +1062,16 @@ public final class Kehancuran {
 				// Phase 6c (DESIGN 22.11.1): the player's own one-click switch, no oath.
 				.then(Commands.literal("nyala").executes(ctx -> setSelf(ctx.getSource().getPlayerOrException(), true) ? 1 : 0))
 				.then(Commands.literal("mati").executes(ctx -> setSelf(ctx.getSource().getPlayerOrException(), false) ? 1 : 0))
+				// Phase 10 (DESIGN 28.8.1): the molten crater of the player's own casts
+				.then(Commands.literal("kawah")
+						.executes(ctx -> {
+							ServerPlayer player = ctx.getSource().getPlayerOrException();
+							Msg.chat(player, Component.translatable(kawahOn(player) ? "kultivator.dampak_server.kawah.is_on" : "kultivator.dampak_server.kawah.is_off")
+									.withColor(MUTED));
+							return 1;
+						})
+						.then(Commands.literal("nyala").executes(ctx -> setKawah(ctx.getSource().getPlayerOrException(), true)))
+						.then(Commands.literal("mati").executes(ctx -> setKawah(ctx.getSource().getPlayerOrException(), false))))
 				.then(Commands.literal("status").executes(ctx -> status(ctx.getSource().getPlayerOrException())))
 				.then(Commands.literal("pulihkan").executes(ctx -> {
 					restore(ctx.getSource().getPlayerOrException());

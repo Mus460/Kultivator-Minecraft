@@ -28,6 +28,8 @@ import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
+import dev.kultivator.technique.spec.dsl.Dampak;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Items;
@@ -329,6 +331,10 @@ public final class FireArts {
 				.sound(Phase.IMPACT, SoundEvents.FIREWORK_ROCKET_LARGE_BLAST, 1.5F, 0.7F)
 				.sound(Phase.EXTRA0, SoundEvents.GENERIC_EXPLODE, 1.6F, 0.6F)
 				.kehancuran(DShape.bowl(4).times(9), DShape.bowl(8))
+				// Phase 10 (DESIGN 28.12): nine sun marks on the dense points; the great sun lands silent, then the boom
+				.dampak(Dampak.builder().mark(Dampak.Mark.MULTI).ride(Dampak.Ride.SHORT).climaxAt(60)
+						.frames(0xFFF1C0, 0xFF8020).silence(3).debris(Dampak.Debris.BURST).ring(Dampak.Ring.EMBER).palette(Dampak.Palette.FIRE)
+						.monument("nine_sun_crater", 8.0F, 60, Dampak.MonumentPose.FLAT).build())
 				.perfection(Bonus.extraCount(3))));
 
 		// 314 · Api Kaisar · Dewa · Dewa-R · PAMUNGKAS · GATE I (prereq nine_suns_heavens_fury L3) · Mrd Y★36
@@ -355,6 +361,11 @@ public final class FireArts {
 				.sound(Phase.CAST, SoundEvents.BEACON_ACTIVATE, 1.5F, 0.5F)
 				.sound(Phase.CAST, SoundEvents.BELL_BLOCK, 1.5F, 1.0F)
 				.kehancuran(DShape.bowl(10))
+				// Phase 10 (DESIGN 28.12): the violet-white sun core kindles in the sky; one lotus petal lights per pulse; a molten bowl remains
+				.dampak(Dampak.builder().mark(Dampak.Mark.PILLAR).ride(Dampak.Ride.FULL, 80, Dampak.Vista.MATAHARI_KAISAR).climaxAt(400)
+						.frames(Dampak.INV, 0xF8F0FF, 0x5A2A90).silence(6).debris(Dampak.Debris.BURST).ring(Dampak.Ring.EMBER).palette(Dampak.Palette.FIRE)
+						.sigil(SigilPattern.LOTUS16, 40.0F).ignite(Phase.PULSE)
+						.monument("emperor_lotus_core", 4.0F, 120, Dampak.MonumentPose.HOVER).build())
 				.perfection(Bonus.area(0.2D))));
 	}
 

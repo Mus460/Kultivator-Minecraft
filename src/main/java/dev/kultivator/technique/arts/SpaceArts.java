@@ -27,6 +27,8 @@ import dev.kultivator.technique.spec.dsl.Phase;
 import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.SoundCue;
+import dev.kultivator.technique.spec.dsl.Dampak;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Items;
@@ -351,6 +353,11 @@ public final class SpaceArts {
 				.sound(Phase.EXTRA0, SoundEvents.WARDEN_SONIC_BOOM, 2.0F, 0.8F)
 				.sound(Phase.EXTRA0, SoundEvents.PORTAL_AMBIENT, 1.0F, 0.6F)
 				.kehancuran(DShape.trench(48, 3, 3).ahead(6).atRelease())
+				// Phase 10 (DESIGN 28.12): the beam's strip lifts into the light and shatters into portal motes
+				.dampak(Dampak.builder().mark(Dampak.Mark.PATH, 6).ride(Dampak.Ride.SHORT).climaxAt(0)
+						.frames(Dampak.INV, 0x2A1050, Dampak.BLACK).silence(3).debris(Dampak.Debris.LIFT).ring(Dampak.Ring.VOID).palette(Dampak.Palette.SPACE)
+						.sigil(SigilPattern.GRID, 8.0F)
+						.monument("void_mirror", 4.0F, 60, Dampak.MonumentPose.HOVER).build())
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.duration(0.25D))
 				.build());
@@ -361,6 +368,8 @@ public final class SpaceArts {
 				.pose(Pose.ARMS_SPREAD).bindLook(dev.kultivator.technique.spec.run.BindKind.TIME_STOP)
 				.gate(Gate.DEWA_I).prereq("void_mirror", 3)
 				.special(TimeBank.ID)
+				// Phase 10: the climax is the release of the banked time at DURATION (EXTRA0), not the per-hit EXTRA1
+				.climax(Phase.EXTRA0)
 				.flag(Flag.NO_TEACH)
 				.qiPct(75).cooldown(600.0D)
 				.step(at(0).shape(domain().radius(TimeBank.RADIUS, TimeBank.RADIUS_CAP).height(TimeBank.HEIGHT)
@@ -389,6 +398,11 @@ public final class SpaceArts {
 				.sound(Phase.PULSE, SoundCue.of(SoundEvents.NOTE_BLOCK_HAT, 0.8F, 1.2F).delay(10))
 				.sound(Phase.EXTRA0, SoundEvents.WARDEN_SONIC_BOOM, 2.0F, 1.0F)
 				.kehancuran(DShape.scatter(2).times(12).at(TimeBank.DURATION))
+				// Phase 10 (DESIGN 28.12): the clock sigil sweeps once; chunks hang in the stopped air until time resumes
+				.dampak(Dampak.builder().mark(Dampak.Mark.RING_ONLY).ride(Dampak.Ride.FULL, 80, Dampak.Vista.SUNGAI_BINTANG).climaxAt(160)
+						.frames(0x808080, Dampak.INV, 0xE0E8FF).silence(10).debris(Dampak.Debris.SUSPEND).ring(Dampak.Ring.DUST)
+						.sigil(SigilPattern.CLOCK12, 24.0F)
+						.monument("time_clock", 6.0F, 60, Dampak.MonumentPose.UPRIGHT).build())
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.duration(0.25D))
 				.build());
@@ -426,6 +440,11 @@ public final class SpaceArts {
 				.sound(Phase.EXTRA0, SoundEvents.GENERIC_EXPLODE, 2.0F, 0.6F)
 				.sound(Phase.EXTRA0, SoundEvents.END_PORTAL_SPAWN, 1.6F, 0.5F)
 				.kehancuran(DShape.sphere(10).at(120))
+				// Phase 10 (DESIGN 28.12): a light grid cuts the land, the cells rise and spiral into the core
+				.dampak(Dampak.builder().mark(Dampak.Mark.PILLAR).ride(Dampak.Ride.FULL, 80, Dampak.Vista.CAKRAM_AKRESI).climaxAt(120)
+						.frames(Dampak.BLACK, Dampak.INV, 0xFFE8C0).silence(6).debris(Dampak.Debris.IMPLODE).ring(Dampak.Ring.VOID).palette(Dampak.Palette.SPACE)
+						.sigil(SigilPattern.GRID, 32.0F).trench()
+						.monument("black_hole_core", 1.0F, 60, Dampak.MonumentPose.HOVER).build())
 				.perfection(Bonus.payload(eff(Eff.SLOWNESS, 3, 40)))
 				.peak(Bonus.duration(0.25D))
 				.build());

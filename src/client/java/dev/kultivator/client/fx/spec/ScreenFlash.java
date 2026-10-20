@@ -35,7 +35,7 @@ public final class ScreenFlash {
 			return;
 		}
 		long now = Util.getMillis();
-		if (now - lastFlash < GAP_MILLIS) {
+		if (now - lastFlash < GAP_MILLIS || now < suppressUntil) {
 			return;
 		}
 		lastFlash = now;
@@ -43,6 +43,16 @@ public final class ScreenFlash {
 		flashAlpha = Math.min(MAX_ALPHA, alpha);
 		flashStart = now;
 		flashEnd = now + Math.max(1, Math.min(MAX_TICKS, ticks)) * 50L;
+	}
+
+	private static long suppressUntil;
+
+	/**
+	 * Phase 10 (DESIGN 28.4.1): drops every technique flash for the next {@code ticks} (the impact frame of a climax is the
+	 * one luminance event; the spec's own climax flash layer would be a second). Vignettes and speed lines still play.
+	 */
+	public static void suppress(int ticks) {
+		suppressUntil = Math.max(suppressUntil, Util.getMillis() + Math.max(0, Math.min(20, ticks)) * 50L);
 	}
 
 	/** An edge vignette of {@code rgb} for {@code ticks}. */

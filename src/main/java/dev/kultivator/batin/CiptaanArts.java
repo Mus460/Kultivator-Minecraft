@@ -5,8 +5,10 @@ import dev.kultivator.data.TechniqueGrade;
 import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueType;
 import dev.kultivator.technique.spec.dsl.DShape;
+import dev.kultivator.technique.spec.dsl.Dampak;
 import dev.kultivator.technique.spec.dsl.Phase;
 import dev.kultivator.technique.spec.dsl.Pose;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.sounds.SoundEvents;
 
 import static dev.kultivator.data.TechniqueSpec.Flag.NO_ECHO;
@@ -71,6 +73,11 @@ public final class CiptaanArts {
 							runeCircle(GOLD).onTarget().radius(2.0F).count(20).ticks(30).detail())
 					.sound(Phase.CAST, SoundEvents.BEACON_POWER_SELECT, 1.4F, 0.8F)
 					.sound(Phase.extra(0), SoundEvents.AMETHYST_BLOCK_RESONATE, 1.6F, 0.6F)
+					// Phase 10 (DESIGN 28.12): heaven marks the aim in the first Dao's colour; the Dao circle and its signature prop
+					.dampak(Dampak.builder().mark(Dampak.Mark.PILLAR).ride(Dampak.Ride.SHORT).vista(Dampak.Vista.BY_DAO)
+							.frames(Dampak.DAO, Dampak.DAO2, 0xFFFFFF).silence(6).debris(Dampak.Debris.BURST)
+							.sigil(SigilPattern.DAO_CIRCLE, 12.0F)
+							.monument(Dampak.MONUMENT_BY_DAO, 6.0F, 60, Dampak.MonumentPose.UPRIGHT).build())
 					// Mode Kehancuran only (the existing switch): the runner carves this bowl where a form strikes (caps and undo apply).
 					.kehancuran(DShape.bowl(4))
 					.build());

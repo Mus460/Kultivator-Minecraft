@@ -1410,13 +1410,21 @@ public abstract class Caster implements CastContext {
 				duration = castDuration();
 			}
 		}
-		// the sound of a phase plays whatever its layers and the event caps say (S11)
-		sound(phase, at);
+		// the sound of a phase plays whatever its layers and the event caps say (S11); Phase 10 (DESIGN 28.4.3): the climax
+		// cues of a silent spec are played by every client after the silence, so the server skips them on the event that
+		// carries FLAG_CLIMAX (decided below, once the event is known to go out)
+		boolean silentCandidate = silentClimax(phase);
+		if (!silentCandidate) {
+			sound(phase, at);
+		}
 		swingFor(phase);
 		// HIT, MASS_HIT, ABORT and PHANTOM always go out: a spec without hit layers gets the client's default hit spark, an
 		// abort ends whatever the client still draws, a phantom attack lunges the phantom.
 		if (spec.fx(phase).isEmpty() && !legacyPhase && phase != Phase.HIT && phase != Phase.MASS_HIT && phase != Phase.ABORT
 				&& phase != Phase.PHANTOM) {
+			if (silentCandidate) {
+				sound(phase, at);
+			}
 			return;
 		}
 		long now = level.getGameTime();
@@ -1440,17 +1448,83 @@ public abstract class Caster implements CastContext {
 					fxCount = 0;
 				}
 				if (fxCount >= TechniquePower.FX_EVENTS_PER_SECOND) {
+					if (silentCandidate) {
+						sound(phase, at);
+					}
 					return;
 				}
 				fxCount++;
 			}
 		}
+		if (silentCandidate) {
+			// this event is the climax: its cues belong to the clients (same tick, same phase stays silent here)
+			markSounded(phase);
+		}
 		send(phase, at, to, radius, length, count, duration, target, index, of, aux, extraFlags, now);
 	}
+
+	/**
+	 * True when the next event of {@code phase} will carry FLAG_CLIMAX for a spec whose Dampak is silent (DESIGN 28.4.3):
+	 * the same test {@link #send} uses to set the flag.
+	 */
+	private boolean silentClimax(Phase phase) {
+		dev.kultivator.technique.spec.dsl.Dampak dampak = spec.dampak();
+		return dampak != null && dampak.silent() && !climaxSent && parent == null && !echo && phase == spec.climaxPhase()
+				&& phase != Phase.ABORT;
+	}
+
+	/**
+	 * The aim a Dampak spec's CAST and CHARGE carry in {@code tx,ty,tz} (DESIGN 28.2, server contract M1): the caster's
+	 * feet for ring-only domains and caster-centred ultimates (self forms, novas, domains, waves; not specials), else the
+	 * far end of the spec's beam, else the event's own second point when it lies away from the caster (a zone or field
+	 * centre, a target, the end of a front), else the event's position when that lies away from the caster (a delayed
+	 * zone's CAST sits on its centre), else the feet.
+	 */
+	private Vec3 dampakAim(dev.kultivator.technique.spec.dsl.Dampak dampak, Vec3 at, Vec3 to) {
+		Vec3 feet = caster.position();
+		if (dampak.mark() == dev.kultivator.technique.spec.dsl.Dampak.Mark.RING_ONLY) {
+			return feet;
+		}
+		Vec3 eyePos = caster.getEyePosition();
+		boolean aimed = spec.special() != null;
+		for (Step step : spec.timeline()) {
+			if (step.shape() instanceof dev.kultivator.technique.spec.dsl.Shape.Beam beam) {
+				Vec3 far = eyePos.add(look.scale(Steps.beamLength(this, beam)));
+				return finite(far) ? far : to;
+			}
+			switch (step.shape().kind()) {
+				case STRIKE, CONE, FRONT, ZONE, PILLAR, RAIN, CHAIN, TARGET, VOLLEY, FIELD, PATH -> aimed = true;
+				default -> {
+				}
+			}
+		}
+		if (!aimed) {
+			// a caster-centred ultimate: heaven marks the caster
+			return feet;
+		}
+		if (to.distanceToSqr(feet) > 2.25D && to.distanceToSqr(eyePos) > 2.25D) {
+			return to;
+		}
+		if (at.distanceToSqr(feet) > 9.0D) {
+			return at;
+		}
+		return feet;
+	}
+
+	/** The CAST (or CHARGE) of a Dampak spec as sent: where it started and the resolved aim (the sigil's frame, 28.9.1). */
+	private @Nullable Vec3 dampakCastPos;
+	private @Nullable Vec3 dampakCastAim;
 
 	/** Builds and sends one event (no caps; the caller checked them). */
 	private void send(Phase phase, Vec3 at, Vec3 to, float radius, float length, int count, int duration, int target, int index, int of,
 			int aux, int extraFlags, long now) {
+		dev.kultivator.technique.spec.dsl.Dampak dampak = spec.dampak();
+		if (dampak != null && parent == null && !echo && (phase == Phase.CAST || phase == Phase.CHARGE)) {
+			// Phase 10 (DESIGN 28.2): every CAST and CHARGE of a Dampak spec carries the resolved aim
+			to = dampakAim(dampak, at, to);
+			dampakCastPos = at;
+			dampakCastAim = to;
+		}
 		int flags = extraFlags & 0x7FFF;
 		if (kehancuran) {
 			flags |= Payloads.TechFx.FLAG_KEHANCURAN;
@@ -1479,6 +1553,10 @@ public abstract class Caster implements CastContext {
 		if (!climaxSent && parent == null && !echo && phase == spec.climaxPhase() && phase != Phase.ABORT) {
 			climaxSent = true;
 			flags |= Payloads.TechFx.FLAG_CLIMAX;
+			if (dampak != null && dampak.sigilTrench() && dampakCastAim != null && dampakCastPos != null) {
+				// Phase 10 (DESIGN 28.9.3): the sigil's lines burn with the climax's shapes (Mode Kehancuran only)
+				destruction.sigil(dampakCastPos, dampakCastAim, (int) (seed ^ (seed >>> 32)));
+			}
 		}
 		if (twoDaoRgb >= 0 && aux == 0 && (flags & Payloads.TechFx.FLAG_VOLLEY) == 0 && phase != Phase.PHANTOM) {
 			flags |= Payloads.TechFx.FLAG_TWO_DAO;
@@ -1678,6 +1756,16 @@ public abstract class Caster implements CastContext {
 	}
 	private final Set<Phase> soundedThisTick = new java.util.HashSet<>();
 	private long soundTick = -1L;
+
+	/** Marks {@code phase} as sounded this tick without playing it (the silent climax of DESIGN 28.4.3). */
+	private void markSounded(Phase phase) {
+		long now = level.getGameTime();
+		if (now != soundTick) {
+			soundTick = now;
+			soundedThisTick.clear();
+		}
+		soundedThisTick.add(phase);
+	}
 
 	@Override
 	public void sound(Phase phase, Vec3 at) {

@@ -24,6 +24,8 @@ import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
+import dev.kultivator.technique.spec.dsl.Dampak;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvent;
@@ -298,6 +300,11 @@ public final class SwordArts {
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 1.5F, 0.5F).delay(18))
 				.sound(Phase.EXTRA0, SoundEvents.LIGHTNING_BOLT_THUNDER, 1.5F, 1.0F)
 				.kehancuran(DShape.column(3, 12).times(4), DShape.trench(48, 2, 3).edges())
+				// Phase 10 (DESIGN 28.12): four red corner pillars, the square lights corner by corner, the giant sword falls into the centre
+				.dampak(Dampak.builder().mark(Dampak.Mark.MULTI).ride(Dampak.Ride.SHORT).climaxAt(240)
+						.frames(Dampak.INV, 0xB0102A, 0x1A0505).silence(3).debris(Dampak.Debris.BURST).ring(Dampak.Ring.DUST).palette(Dampak.Palette.SWORD)
+						.sigil(SigilPattern.ZHUXIAN_SQUARE, 34.0F).ignite(Phase.IMPACT)
+						.monument("zhuxian_sword", 16.0F, 120, Dampak.MonumentPose.PLANTED).build())
 				.perfection(Bonus.duration(0.2D))));
 
 		// 213 · Seni Pedang Hukuman Langit · Dewa · Dewa-R · PAMUNGKAS · GATE I (prereq zhuxian_sword_formation L3) · Mrd Y★36
@@ -320,6 +327,11 @@ public final class SwordArts {
 				.sound(Phase.TRAVEL, SoundEvents.TRIDENT_THUNDER, 1.5F, 1.0F)
 				.sound(Phase.TRAVEL, SoundEvents.BELL_BLOCK, 1.5F, 1.0F)
 				.kehancuran(DShape.trench(64, 3, 5).alongBeam())
+				// Phase 10 (DESIGN 28.12): the sword is drawn out of the opening Southern Heavenly Gate, rides the beam down and stays planted at its end
+				.dampak(Dampak.builder().mark(Dampak.Mark.PILLAR).ride(Dampak.Ride.FULL, 60, Dampak.Vista.GERBANG_LANGIT).climaxAt(60)
+						.frames(Dampak.INV, 0xFFF1C0, 0x101018).silence(6).debris(Dampak.Debris.WAKE).ring(Dampak.Ring.DUST).palette(Dampak.Palette.SWORD)
+						.sigil(SigilPattern.SWORD_RING, 12.0F).ignite(Phase.IMPACT).trench()
+						.monument("heaven_punishing_sword", 12.0F, 180, Dampak.MonumentPose.PLANTED).build())
 				.perfection(Bonus.area(0.25D))));
 	}
 

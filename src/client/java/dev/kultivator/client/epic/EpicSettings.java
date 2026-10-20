@@ -52,6 +52,39 @@ public final class EpicSettings {
 	/** Spec ids already cast once (the first cast of an Abadi ultimate gets a FULL card). */
 	public static final String SEEN = "epic_seen";
 
+	// Phase 10 Dampak Langit (DESIGN 28.11): the rows after "Kamera sinematik".
+	public static final String SKYRIDE = "epic_skyride";
+	public static final String IMPACT_FRAMES = "epic_impact_frames";
+	/** True once the player confirmed the photosensitivity warning of "Bingkai dampak: Penuh". */
+	public static final String IMPACT_FRAMES_OK = "epic_impact_frames_ok";
+	public static final String SILENT_IMPACT = "epic_silent_impact";
+	public static final String WORLD_FX = "epic_world_fx";
+	public static final String IMPACT_POWER = "epic_impact_power";
+
+	/** Perjalanan langit: Pertama (the first cast of each spec per session, default), Selalu, Mati. */
+	public enum SkyRide {
+		PERTAMA, SELALU, MATI;
+
+		public String id() {
+			return name().toLowerCase(Locale.ROOT);
+		}
+	}
+
+	/** Bingkai dampak: Lembut (default, one tint at most 0.35, no inversion), Penuh (after the warning), Mati. */
+	public enum ImpactFrames {
+		LEMBUT, PENUH, MATI;
+
+		public String id() {
+			return name().toLowerCase(Locale.ROOT);
+		}
+	}
+
+	/** The steps of "Daya dampak" in cycling order (default first). */
+	private static final float[] POWER_STEPS = {1.0F, 1.5F, 0.5F};
+	private static final String D = "kultivator.dampak.setting.";
+	/** Opens the photosensitivity warning (set by the client cinema module). */
+	private static Runnable impactWarning;
+
 	private static final Set<String> SESSION_SEEN = new HashSet<>();
 
 	private static final float[] VFX_STEPS = {0.5F, 1.0F, 1.5F};
@@ -69,6 +102,17 @@ public final class EpicSettings {
 				new Row(CAMERA, true, () -> Component.translatable(T + "camera", Component.translatable(T + "camera." + camera().id())),
 						() -> setCamera(Camera.values()[(camera().ordinal() + 1) % Camera.values().length]), () -> tip("camera",
 						Component.translatable(T + "camera", Component.translatable(T + "camera." + camera().id())))),
+				// Phase 10 (28.11): Perjalanan langit, Bingkai dampak, Dampak sunyi, Puing & monumen, Daya dampak
+				new Row(SKYRIDE, true, EpicSettings::skyRideText, () -> setSkyRide(SkyRide.values()[(skyRide().ordinal() + 1) % SkyRide.values().length]),
+						() -> dampakTip("skyride", skyRideText())),
+				new Row(IMPACT_FRAMES, true, EpicSettings::impactFramesText, EpicSettings::nextImpactFrames,
+						() -> dampakTip("frames", impactFramesText())),
+				new Row(SILENT_IMPACT, false, () -> Component.translatable(D + "silent"), () -> setFlag(SILENT_IMPACT, !flag(SILENT_IMPACT)),
+						() -> dampakTip("silent", Component.translatable(D + "silent"))),
+				new Row(WORLD_FX, false, () -> Component.translatable(D + "worldfx"), () -> setFlag(WORLD_FX, !flag(WORLD_FX)),
+						() -> dampakTip("worldfx", Component.translatable(D + "worldfx"))),
+				new Row(IMPACT_POWER, true, EpicSettings::impactPowerText, EpicSettings::nextImpactPower,
+						() -> dampakTip("power", impactPowerText())),
 				toggle(LETTERBOX, "letterbox"),
 				toggle(CARDS, "cards"),
 				toggle(MUSIC, "music"),
@@ -167,6 +211,143 @@ public final class EpicSettings {
 		return flag(PACK_GEOMETRY);
 	}
 
+	// ================================================================ Phase 10 (DESIGN 28.11)
+
+	public static SkyRide skyRide() {
+		JsonElement value = EffectQuality.get(SKYRIDE);
+		if (value != null && value.isJsonPrimitive()) {
+			String id = value.getAsString();
+			for (SkyRide mode : SkyRide.values()) {
+				if (mode.id().equals(id)) {
+					return mode;
+				}
+			}
+		}
+		return SkyRide.PERTAMA;
+	}
+
+	public static void setSkyRide(SkyRide mode) {
+		EffectQuality.put(SKYRIDE, new JsonPrimitive(mode.id()));
+	}
+
+	/** The stored choice; Penuh only counts once the warning was confirmed (else Lembut). */
+	public static ImpactFrames impactFrames() {
+		JsonElement value = EffectQuality.get(IMPACT_FRAMES);
+		if (value != null && value.isJsonPrimitive()) {
+			String id = value.getAsString();
+			for (ImpactFrames mode : ImpactFrames.values()) {
+				if (mode.id().equals(id)) {
+					return mode == ImpactFrames.PENUH && !impactFramesConfirmed() ? ImpactFrames.LEMBUT : mode;
+				}
+			}
+		}
+		return ImpactFrames.LEMBUT;
+	}
+
+	/** Stores the choice; Penuh is stored only after the photosensitivity warning was confirmed. */
+	public static void setImpactFrames(ImpactFrames mode) {
+		if (mode == ImpactFrames.PENUH && !impactFramesConfirmed()) {
+			return;
+		}
+		EffectQuality.put(IMPACT_FRAMES, new JsonPrimitive(mode.id()));
+	}
+
+	public static boolean impactFramesConfirmed() {
+		JsonElement value = EffectQuality.get(IMPACT_FRAMES_OK);
+		return value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isBoolean() && value.getAsBoolean();
+	}
+
+	/** "Aktifkan" on the warning screen: remembers the confirmation and switches to Penuh. */
+	public static void confirmImpactFrames() {
+		EffectQuality.put(IMPACT_FRAMES_OK, new JsonPrimitive(true));
+		EffectQuality.put(IMPACT_FRAMES, new JsonPrimitive(ImpactFrames.PENUH.id()));
+	}
+
+	/** Set once by the client cinema: opens the photosensitivity warning (the first switch to Penuh). */
+	public static void impactWarning(Runnable opener) {
+		impactWarning = opener;
+	}
+
+	/** Dampak sunyi: the climax lands silent and the boom follows by distance (default on). */
+	public static boolean silentImpact() {
+		return flag(SILENT_IMPACT);
+	}
+
+	/** Puing dan monumen: debris displays, lift cells and monuments (off = particles only; default on). */
+	public static boolean worldFx() {
+		return flag(WORLD_FX);
+	}
+
+	/** Daya dampak: 1.0 (default), 1.5 or 0.5; scales debris counts and speeds, ring radii and shake, never above the caps. */
+	public static float impactPower() {
+		JsonElement value = EffectQuality.get(IMPACT_POWER);
+		if (value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber()) {
+			float stored = value.getAsFloat();
+			for (float step : POWER_STEPS) {
+				if (Math.abs(step - stored) < 0.01F) {
+					return step;
+				}
+			}
+		}
+		return 1.0F;
+	}
+
+	public static void setImpactPower(float power) {
+		float best = 1.0F;
+		for (float step : POWER_STEPS) {
+			if (Math.abs(step - power) < Math.abs(best - power)) {
+				best = step;
+			}
+		}
+		EffectQuality.put(IMPACT_POWER, new JsonPrimitive(best));
+	}
+
+	private static Component skyRideText() {
+		return Component.translatable(D + "skyride", Component.translatable(D + "skyride." + skyRide().id()));
+	}
+
+	private static Component impactFramesText() {
+		return Component.translatable(D + "frames", Component.translatable(D + "frames." + impactFrames().id()));
+	}
+
+	private static Component impactPowerText() {
+		return Component.translatable(D + "power", Math.round(impactPower() * 100.0F) + "%");
+	}
+
+	/** Lembut, Mati, Penuh, Lembut...; the first step to Penuh opens the photosensitivity warning instead. */
+	private static void nextImpactFrames() {
+		switch (impactFrames()) {
+			case LEMBUT -> setImpactFrames(ImpactFrames.MATI);
+			case MATI -> {
+				if (impactFramesConfirmed()) {
+					setImpactFrames(ImpactFrames.PENUH);
+				} else {
+					// "Batal" keeps Lembut (28.16 item 9); "Aktifkan" switches to Penuh
+					setImpactFrames(ImpactFrames.LEMBUT);
+					if (impactWarning != null) {
+						impactWarning.run();
+					}
+				}
+			}
+			case PENUH -> setImpactFrames(ImpactFrames.LEMBUT);
+		}
+	}
+
+	private static void nextImpactPower() {
+		float now = impactPower();
+		int index = 0;
+		for (int i = 0; i < POWER_STEPS.length; i++) {
+			if (POWER_STEPS[i] == now) {
+				index = i;
+			}
+		}
+		setImpactPower(POWER_STEPS[(index + 1) % POWER_STEPS.length]);
+	}
+
+	private static List<Component> dampakTip(String id, Component title) {
+		return List.of(title, Component.translatable(D + id + ".tip").withStyle(ChatFormatting.GRAY));
+	}
+
 	/** True when the spec was cast before (ever, from {@code epic_seen}); marks it seen. */
 	public static boolean seenEver(String specId) {
 		JsonElement value = EffectQuality.get(SEEN);
@@ -190,7 +371,8 @@ public final class EpicSettings {
 
 	/** Every 7b setting back to its default ({@code /sinematik reset}). */
 	public static void resetAll() {
-		for (String key : new String[]{CAMERA, LETTERBOX, CARDS, MUSIC, SLOWMO, GEOMETRY, SKY, VFX, RECORD, PACK_GEOMETRY}) {
+		for (String key : new String[]{CAMERA, LETTERBOX, CARDS, MUSIC, SLOWMO, GEOMETRY, SKY, VFX, RECORD, PACK_GEOMETRY, SKYRIDE, IMPACT_FRAMES,
+				SILENT_IMPACT, WORLD_FX, IMPACT_POWER}) {
 			EffectQuality.put(key, null);
 		}
 	}

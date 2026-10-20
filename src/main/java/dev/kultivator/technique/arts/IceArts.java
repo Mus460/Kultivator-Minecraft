@@ -25,6 +25,8 @@ import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
+import dev.kultivator.technique.spec.dsl.Dampak;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Items;
@@ -319,6 +321,10 @@ public final class IceArts {
 				.sound(Phase.CAST, SoundEvents.ENDER_DRAGON_GROWL, 1.5F, 1.6F)
 				.sound(Phase.CAST, SoundEvents.GLASS_BREAK, 1.2F, 0.8F)
 				.kehancuran(DShape.bowl(8))
+				// Phase 10 (DESIGN 28.12): a six-fold frost ring under each dive; an ice quill stays planted
+				.dampak(Dampak.builder().mark(Dampak.Mark.MULTI).ride(Dampak.Ride.SHORT).climaxAt(240)
+						.frames(0xFFFFFF, 0xCFEFFF).silence(3).debris(Dampak.Debris.BURST).ring(Dampak.Ring.FROST).palette(Dampak.Palette.ICE)
+						.monument("ice_spear", 8.0F, 60, Dampak.MonumentPose.PLANTED).build())
 				.perfection(Bonus.durationTicks(60))));
 
 		// 413 · Membekukan Gunung Qi · Dewa · Dewa-R · PAMUNGKAS · GATE I (prereq ice_phoenix_descent L3) · Mrd Y★36
@@ -338,6 +344,11 @@ public final class IceArts {
 				.fx(Phase.EXTRA1, shards(0xFFFFFF).count(160), shake(0.5F, 20))
 				// the first pulse cracks the frozen ground around the caster; the @400 shatter breaks a deeper ring
 				.kehancuran(DShape.ring(16, 6, 1), DShape.ring(20, 8, 3).at(400))
+				// Phase 10 (DESIGN 28.12): an ice ring round the caster, the snowflake reaches each frozen foe, frost spikes burst at the recall
+				.dampak(Dampak.builder().mark(Dampak.Mark.RING_ONLY).ride(Dampak.Ride.FULL, 80, Dampak.Vista.GUNUNG_ES).climaxAt(400)
+						.frames(Dampak.INV, 0xFFFFFF, 0xCFEFFF).silence(6).debris(Dampak.Debris.BURST).ring(Dampak.Ring.FROST).palette(Dampak.Palette.ICE)
+						.sigil(SigilPattern.SNOWFLAKE, 40.0F).ignite(Phase.EXTRA0)
+						.monument("ice_lotus", 6.0F, 90, Dampak.MonumentPose.UPRIGHT).build())
 				.perfection(Bonus.area(0.2D))));
 	}
 

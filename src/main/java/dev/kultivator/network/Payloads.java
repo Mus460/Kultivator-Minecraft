@@ -532,6 +532,126 @@ public final class Payloads {
 		}
 	}
 
+	/**
+	 * Phase 10 (DESIGN 28.6.1, 28.13.2): the blocks one Mode Kehancuran job changed this tick, so the clients near it throw
+	 * real debris, light a molten floor or close the crater with a shock ring. At most one per running job per tick, at
+	 * most {@link #MAX} entries, only to players within 96 blocks of the batch in the job's dimension; restores send
+	 * nothing. {@code job} groups the batches of one job (a per-server counter), {@code caster} is the caster's entity id
+	 * (-1 when absent), {@code spec} the spec's net id (-1 for Destroyer Arts and plain jobs), {@code cx,cy,cz} the job
+	 * centre, {@code total} the entries' count before sampling (DONE: the blocks changed), {@code flags} the
+	 * {@code FLAG_*} bits, {@code offsets} the packed {@link #pack} offsets relative to {@code BlockPos.containing(cx, cy,
+	 * cz)} and {@code states} the {@code Block.getId(state)} ids (the OLD state for CARVE, CONVERT and TEST, the NEW state
+	 * for SURFACE).
+	 */
+	public record DampakDebris(int job, byte kind, int caster, int spec, double cx, double cy, double cz, short total, short flags,
+			int[] offsets, int[] states) implements CustomPacketPayload {
+		public static final int MAX = 64;
+		/** Blocks removed. */
+		public static final byte CARVE = 0;
+		/** Blocks withered or stripped (no displays: ash and leaves). */
+		public static final byte CONVERT = 1;
+		/** The molten surface pass (Kawah Lebur): states are the new states. */
+		public static final byte SURFACE = 2;
+		/** The job finished: {@code total} = blocks changed; no entries. */
+		public static final byte DONE = 3;
+		/** {@code uji dampak puing / angkat}: nothing changed. */
+		public static final byte TEST = 4;
+		/** Clear the Phase 10 visuals: of this job, or all when {@code job} = -1. */
+		public static final byte STOP = 5;
+
+		public static final int FLAG_SELF = 1;
+		public static final int FLAG_DISCIPLE = 2;
+		public static final int FLAG_LIFT = 4;
+		public static final int FLAG_IMPLODE = 8;
+		public static final int FLAG_SUSPEND = 16;
+		public static final int FLAG_WAKE = 32;
+		public static final int FLAG_LOW_LOAD = 64;
+
+		public static final Type<DampakDebris> TYPE = typeOf("dampak_debris");
+		public static final StreamCodec<RegistryFriendlyByteBuf, DampakDebris> CODEC = StreamCodec.of(
+				(buf, p) -> {
+					int count = Math.min(MAX, Math.min(p.offsets.length, p.states.length));
+					buf.writeVarInt(p.job + 1);
+					buf.writeByte(p.kind);
+					buf.writeVarInt(p.caster + 1);
+					buf.writeVarInt(p.spec + 1);
+					buf.writeDouble(p.cx);
+					buf.writeDouble(p.cy);
+					buf.writeDouble(p.cz);
+					buf.writeShort(p.total);
+					buf.writeShort(p.flags);
+					buf.writeVarInt(count);
+					for (int i = 0; i < count; i++) {
+						buf.writeInt(p.offsets[i]);
+						buf.writeVarInt(p.states[i]);
+					}
+				},
+				buf -> {
+					int job = buf.readVarInt() - 1;
+					byte kind = buf.readByte();
+					int caster = buf.readVarInt() - 1;
+					int spec = buf.readVarInt() - 1;
+					double cx = buf.readDouble();
+					double cy = buf.readDouble();
+					double cz = buf.readDouble();
+					short total = buf.readShort();
+					short flags = buf.readShort();
+					int count = buf.readVarInt();
+					if (count < 0 || count > MAX) {
+						throw new IllegalArgumentException("DampakDebris with " + count + " entries (max " + MAX + ")");
+					}
+					int[] offsets = new int[count];
+					int[] states = new int[count];
+					for (int i = 0; i < count; i++) {
+						offsets[i] = buf.readInt();
+						states[i] = buf.readVarInt();
+					}
+					return new DampakDebris(job, kind, caster, spec, cx, cy, cz, total, flags, offsets, states);
+				});
+
+		/** Packs an offset of at most ±511 per axis: {@code (dx + 512) << 20 | (dy + 512) << 10 | (dz + 512)}. */
+		public static int pack(int dx, int dy, int dz) {
+			return (clamp(dx) + 512) << 20 | (clamp(dy) + 512) << 10 | (clamp(dz) + 512);
+		}
+
+		private static int clamp(int value) {
+			return Math.max(-511, Math.min(511, value));
+		}
+
+		public static int dx(int packed) {
+			return ((packed >> 20) & 0x3FF) - 512;
+		}
+
+		public static int dy(int packed) {
+			return ((packed >> 10) & 0x3FF) - 512;
+		}
+
+		public static int dz(int packed) {
+			return (packed & 0x3FF) - 512;
+		}
+
+		/** Entries in this batch. */
+		public int size() {
+			return Math.min(offsets.length, states.length);
+		}
+
+		/** The block of entry {@code i}: {@code BlockPos.containing(cx, cy, cz)} plus its offset. */
+		public net.minecraft.core.BlockPos pos(int i) {
+			net.minecraft.core.BlockPos base = net.minecraft.core.BlockPos.containing(cx, cy, cz);
+			int packed = offsets[i];
+			return base.offset(dx(packed), dy(packed), dz(packed));
+		}
+
+		public boolean has(int flag) {
+			return (flags & flag) != 0;
+		}
+
+		@Override
+		public Type<DampakDebris> type() {
+			return TYPE;
+		}
+	}
+
 	// ================================================================ client -> server
 
 	/** A key press or screen button: {@code action} from {@link Actions}, plus an int and a short text argument. */

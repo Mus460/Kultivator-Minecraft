@@ -14625,3 +14625,663 @@ Disciples stand still and face their foe while they charge or channel (`Techniqu
 ### 27.7 Client (modules M2, M3)
 
 The client side of this pass (the emissive `kultivator:qi` particles, quad bolts and ribbons, phantom and bind visuals, the 3D prop models, cast poses and first-person hands, the giant avatar renderer and the 7b director changes) follows the polish plan and is documented with its code.
+
+---------------------------------------------------------------------------------------------------------------------
+
+## 28. Phase 10 — Dampak Langit (impact sinematik)
+
+Numbered 28 because 27 is the polish pass. The user asked (2026-10-20, Indonesian) to study how a popular sky-strike
+weapon mod presents its strikes and to give the Kultivator ultimates "animations, effects and impacts as cool as that".
+Only the **presentation ideas** of that mod's public description are used (its code and assets are All Rights Reserved:
+nothing is copied, no texture, model, sound or line of code). Every idea is re-told in our cultivation language and
+built on our own engines: the 6c technique runner (22), the client FX of the polish pass (27), 7b cinematics (23) and
+Mode Kehancuran (22.11, `kehancuran/WorldBreaker`).
+
+| Their idea | Ours (name in game) | Section |
+|---|---|---|
+| target mark from the sky on the crosshair | **Tanda Langit**: a pillar of heaven's light and a turning glyph ring on the aim, a seal bracket on the crosshair | 28.2 |
+| long camera trip up the beam into space and back down | **Perjalanan Langit**: a ≤ 4 s three-part shot up the pillar, through the cloud sea, to a heavenly vista, then riding the strike down | 28.3 |
+| silence, then the boom; full-screen impact frames | **Dampak Sunyi** and **Bingkai Dampak** (Penuh / Lembut / Mati, photosensitivity warning) | 28.4 |
+| shock ring flattening the land into a molten crater | **Gelombang Kejut** and **Kawah Lebur** (real blocks only under Mode Kehancuran) | 28.5, 28.8 |
+| the weapon stays planted in the crater | **Monumen**: a lingering client-only prop (60-180 s) | 28.10 |
+| a constellation projected on the land, star impacts, burning lines | **Sigil Bumi**: formation diagrams on the terrain (the Northern Dipper's nine stars, Luoshu, Wuxing, bagua, sword rings) | 28.9 |
+| a light grid cuts the land into cells lifted into the sky | **Gunung Terangkat**: cells rising and turning, the real carving still by WorldBreaker | 28.7 |
+| heavy post shaders, power sliders | faked with layered additive quads, glow textures, sky grades and HUD overlays; a **Daya dampak** setting | 28.1.3, 28.11 |
+
+### 28.1 Principles (binding; they extend 0, 22.11, 23.1)
+
+#### 28.1.1 Blocks and gameplay
+
+1. **Blocks change only through `kehancuran/WorldBreaker`**, and only for jobs that already exist: the player's own
+   casts with the opt-in Mode Kehancuran switch (`Kehancuran.submitSelf`, via `technique/spec/run/Destruction`) and
+   the disciple Destroyer Arts / Pemusnah orders. Phase 10 adds two things to those jobs and nothing else: a capped
+   **surface pass** (Kawah Lebur, 28.8) inside the same job and undo entry, and **sigil trenches** (28.9.3) inside the
+   same cast's block cap. Without Kehancuran every Phase 10 effect is visual only (client displays, particles, quads).
+2. Never `LightningBolt`, `Explosion`, fire, fluids, falling-block entities, weather, time or tick-rate changes. No
+   entity is added on the server. Client displays use their own negative id range (28.6.4).
+3. **No gameplay number changes**: damage, ranges, radii, timelines, cooldowns, costs, caps
+   (`kehancuranMaxBlocksPerCast`, `TechniquePower.blockCap`, `kehancuranBlocksPerTick`), the 22.15 runner caps and
+   every spec's Sumber line stay exactly as they are. The only server-visible change of a cast is that the climax
+   event's sounds of a spec marked silent are played by the clients instead of the server (28.4.3).
+4. Server code never references a client class; the shared description of a spec's impact (`technique/spec/dsl/Dampak`)
+   and the sigil geometry (`technique/spec/dsl/SigilPattern`) are plain common code used by both sides.
+
+#### 28.1.2 Camera and comfort (amends 23.1.2, 23.1.6 and 23.1.7)
+
+- Perjalanan Langit is a 7b shot like any other: **own client only**, Kamera **Penuh** only for the full ride,
+  **Singkat** gets a short crane-up, **Mati** none; never in danger (28.3.4); every key ends it; Backspace skips; a
+  hurt snaps back at once. "Kurangi gerak" forces Mati for the ride and Lembut for the frames.
+- **Amendment of 23.1.6 "No invert frame"**: an inverted impact frame is allowed **only** under the new setting
+  "Bingkai dampak: Penuh", which the player must confirm on a photosensitivity warning screen the first time. The
+  default "Lembut" keeps 23.1.6 exactly (one tint ≤ 0.35, no inversion). Every impact frame is one luminance event of
+  the 500 ms rule (`EpicScreen.LUMINANCE_GAP`), obeys vanilla "Hide Lightning Flashes" (then Mati), "Kilatan layar"
+  (off = Mati) and `screenEffectScale`.
+- **Amendment of 23.1.7**: the climax sounds of a silent spec are client presentation sounds (the same cues, at the
+  same position; every client in range derives them from the same TechFx). The ≤ 4 cues per phase rule
+  (`TechniquePower.SOUNDS_PER_PHASE`) still holds; HOSTILE and PLAYERS are never ducked.
+
+#### 28.1.3 Performance (the laptop also runs Valorant)
+
+- The "heavy shader" look is **faked**: nested additive quads at falling alpha (a cheap bloom), emissive glow strips
+  (`glow_strip.png`), soft rings (`ring_soft.png`), sky grades (`SkyDirector`), the vanilla sky flash
+  (`ClientLevel.setSkyFlashTime`), full-bright displays (`Display.setBrightnessOverride(new Brightness(15, 15))`) and
+  HUD layers. **No post chain, no core shader, no custom `RenderPipeline`** (23.1.5 stays; the one invert frame uses
+  the vanilla `RenderPipelines.GUI_INVERT`).
+- Geometry takes from the shared 7b budget (`EpicBudget.takeQuads / takeLarge / takePillar`, × 0.6 under a shader
+  pack) and is cut by the 7b frame guard (`EpicBudget.tier()`); displays have their own pool (28.6.4); particles go
+  through `FxBudget` and `EffectQuality.scale`. Idle cost: one boolean per system.
+- Server: at most one debris packet per running WorldBreaker job per tick (≤ 64 entries, about 400 bytes), only to
+  players within 96 b; no extra block reads for debris (the breaker reads the state anyway); the surface pass is
+  capped and spends the same `kehancuranBlocksPerTick` budget.
+
+#### 28.1.4 Compatibility
+
+- Sodium: nothing touches chunk meshes; debris are entity displays, sigils and rings are world quads drawn from Fabric
+  `LevelRenderEvents.COLLECT_SUBMITS` (registered after `EpicRenderer`, so `EpicBudget.beginFrame` already ran).
+- Iris: no geometry in the shadow pass (the event does not fire there; `isRenderingShadowPass` is still checked);
+  ground quads sit 0.04 b above the surface (no polygon offset); the pack profile of 23.14.3 applies (× 0.6 quads, one
+  large layer, HUD sky channel).
+- Only vanilla render types through `EpicRenderTypes`: `entityTranslucentEmissive` for soft layers, `lightning()` for
+  thin glow, the beacon beam for pillars.
+
+#### 28.1.5 Verified Minecraft API (26.3, `butterbot-fabric/reference/mcsrc`)
+
+`Display.setBrightnessOverride / setViewRange / setWidth / setHeight / setGlowColorOverride /
+setTransformationInterpolationDuration / setTransformationInterpolationDelay` (always through `DisplayKey`),
+`Display.BlockDisplay.setBlockState`, `Display.ItemDisplay.setItemStack`, `ClientLevel.addEntity`,
+`Block.getId(BlockState)` / `Block.stateById(int)`, `SoundManager.playDelayed(SoundInstance, int)`,
+`new SimpleSoundInstance(SoundEvent, SoundSource, float, float, RandomSource, double, double, double)`,
+`ClientLevel.playLocalSound(x, y, z, sound, source, volume, pitch, distanceDelay)` (vanilla delays by distance / 40 b/s;
+we schedule ourselves, 28.4.3), `ClientLevel.setSkyFlashTime`, `RenderPipelines.GUI_INVERT` with
+`GuiGraphicsExtractor.fill(RenderPipeline, x0, y0, x1, y1, col)`, `Level.getHeight(Heightmap.Types, x, z)` with
+`WORLD_SURFACE` / `MOTION_BLOCKING_NO_LEAVES` (both `Usage.CLIENT`), `ParticleTypes.BLOCK`, `BLOCK_CRUMBLE`,
+`DUST_PILLAR`, `FALLING_DUST`, and `Blocks.MAGMA_BLOCK, BLACKSTONE, POLISHED_BLACKSTONE, BASALT, SMOOTH_BASALT, TUFF,
+COBBLED_DEEPSLATE, PACKED_ICE, SNOW_BLOCK, CALCITE, SMOOTH_STONE, POLISHED_DIORITE, GLASS, MOSS_BLOCK, ROOTED_DIRT,
+SOUL_SOIL, COARSE_DIRT, AMETHYST_CLUSTER, END_ROD, SEA_LANTERN` (all plain `Block` constants; `LIGHTNING_ROD` is a
+`WeatheringCopperCollection` and is not used).
+
+### 28.2 Tanda Langit (TargetMark)
+
+**What.** Before an ultimate lands, heaven marks the spot: a thin pillar of light in the Dao colour comes down from
+the clouds onto the aim, a glyph ring turns on the ground and slowly tightens (a "lock-on"), qi motes rise, and for the
+caster a small seal bracket closes around the crosshair. Bystanders see the pillar and ring too (a fair warning in PvP).
+
+**When (no new packet).** From the TechFx stream, for specs whose `Dampak.mark() != NONE`:
+- the **CAST** of an uncharged cast, or the **CHARGE** of a charged one (the mark lives through the charge and snaps at
+  the release CAST);
+- every TRAVEL with `FLAG_PRE_IMPACT` of a `MULTI` mark (one sub-mark per falling sun, palm, sword or dive at `to`,
+  living `duration` ticks; the Nine Suns get nine);
+- every PHANTOM with `FLAG_PRE_IMPACT` (cosmic avatar stomps) and every step EXTRA0 of a dash for `FOOT` marks.
+
+The mark ends on the climax event (it becomes the impact), on ABORT, after `Dampak.markTicks` (default: until the
+climax, at most 200 ticks) or 20 ticks after a lasting field starts (the ring then hands over to the Sigil Bumi).
+
+**Server contract (M1).** Every CAST and CHARGE of a spec with a Dampak carries the resolved aim in `tx,ty,tz` (the
+field or zone centre, the densest point of a sky zone, the beam's or front's far end, the caster's feet for
+caster-centred domains). Most shapes already do (27.1 geometry); M1 checks the rest in `Caster` / `Steps` and SpecLint
+reports a Dampak spec whose CAST would send `to == pos` for a non-caster-centred shape.
+
+**Own charge follows the crosshair.** While the local player charges, the mark follows a client clip along the look
+(one `ClientLevel.clip` per tick, ≤ the spec's range, blocks only); at the release CAST it eases to the server's point
+in 4 ticks. Purely visual: the server's aim is the truth.
+
+**Kinds** (`Dampak.Mark`): `PILLAR` (pillar + ring), `MULTI` (one small pillar + ring per pre-impact), `SHADOW` (a dark
+soft disc the size of the falling object grows under it: palms, feet, mountains), `PATH` (a glowing line along a beam
+or front, with the ring at its end), `FOOT` (a golden footprint glyph 10 ticks before each stomp), `RING_ONLY` (no
+pillar: domains around the caster), `NONE`.
+
+**Look and budgets.**
+
+| | Minimal | Normal | Maximal |
+|---|---|---|---|
+| pillar | none (particle column, 1 per 2 ticks) | `PillarRenderer` descending, glow 0.6 b, narrows to 0.15 b over the last 4 ticks (`takePillar`) | + a second fainter halo pillar (glow 1.4 b, α 0.3) |
+| ring | `RingRenderer` rune circle r 3 b | r 4-6 b, contracts 2× → 1×, + the art's glyph (`EpicDisplays.glyph`) | + an outer dotted ring |
+| motes | 4 / s | 12 / s `kultivator:qi` | 24 / s |
+| sub-marks (MULTI) | 3 | 9 | 9 + their pillars |
+| crosshair seal (own) | yes (HUD, 2 quads) | yes | yes |
+
+Others' marks follow "Efek pemain lain" (Ringan: ring only, Mati: none). Under `FLAG_LOW_LOAD`: ring only.
+
+### 28.3 Perjalanan Langit (SkyRide shot)
+
+#### 28.3.1 The idea within our speed caps
+
+The weapon mod flies the camera kilometres up a beam. 7b caps camera speed (23.7.3: ≤ 7.6 b/s average, ≤ 25°/s,
+crane ≤ 24 b), so the trip is **told, not travelled**: three short segments joined by **masked cuts** (a cloud wipe
+covering the screen), the height sold by parallax (cloud streaks passing the lens), an FOV punch and a sky grade that
+turns star-dark, and "space" shown by a **vista** sky-projected above (23.10.3), not by moving far.
+
+#### 28.3.2 Segments (Penuh, total `Dampak.rideTicks` ≤ 80, timed to END on the climax event)
+
+| Part | Share | Camera (each segment validated by `Shot.validate`) | On screen |
+|---|---|---|---|
+| R1 **Naik** (rise) | 0-0.375 | from over the shoulder up beside the mark pillar: side 4 b, h 2 → 14, pitch −15° → −55°, yaw sweep ≤ 20° | the pillar, motes streaming up; at 0.30 the **cloud wipe** starts (HUD cloud texture α 0 → 0.9 over 4 ticks, scrolling down: we rise) |
+| cut 1 | | instant, allowed only while the wipe covers ≥ 0.8 | |
+| R2 **Puncak** (vista) | 0.375-0.625 | world-anchored above the aim: h 22-24, 6 b aside, pitch −55° → −40°, slow 15° yaw | sky grade star-dark (`SkyDirector`, STAR_BRIGHTNESS up), the **vista** (28.3.3) and the technique's object charging in it (the sword drawn, the sun core kindling); the wipe clears over 6 ticks |
+| cut 2 | | instant under a second wipe (≥ 1 s after the first: one luminance event each) | |
+| R3 **Turun** (ride down) | 0.625-1 | behind and above the falling object: start aim + (back 6, up 20), pitch 60° → 70° (looking down), descend ≤ 11 b | the object falls past the lens, speed lines (`ScreenFlash.speedLines`), FOV punch −8 % (`CinematicDirector.snap`) |
+| exit | | on the climax: instant cut to the eye **under the impact frame** (Penuh frames), else the normal 10-tick blend | 28.4 |
+
+If the climax event is late (server lag) R3 holds its last pose up to 20 ticks, then exits by blend. If the aim is
+more than 40 b from the caster's feet, R3 is dropped (the ride ends after R2 with a blend). `Shots.Type.SKY_RIDE` has
+`max = 80` and `ceremony = true` (48 b reach), and counts in the Penuh scene cap (400 ticks) and the KIND_ULTIMATE gap
+(1200 ticks). A new `Shot.cut()` marks a segment start that may skip the blend; `CinematicDirector` honours it only
+when `CloudWipe.cover() ≥ 0.8` or an impact frame shows, otherwise it blends as before.
+
+A FULL ride of a lasting ultimate (field, domain) starts `climaxAt − rideTicks` ticks after the CAST (a client timer
+of the TECH_ULTIMATE scene, cancelled by ABORT or END); a charged one may start at the CHARGE.
+
+#### 28.3.3 Vistas (`Dampak.Vista`, own client only, sky-projected, life = R2 + 10 ticks)
+
+| Vista | Built from | Lore |
+|---|---|---|
+| `GERBANG_LANGIT` | `GateRenderer` 64 × 96 (doors opening), gold rays (`RaysRenderer`) | the Southern Heavenly Gate (Nantianmen), Journey to the West |
+| `PUSARAN` | `VortexRenderer` tribulation whirlpool, micro-arcs | the tribulation clouds of 7b |
+| `SEMBILAN_LANGIT` | three (Maximal: five) thin stacked vortex rims at rising heights, deity silhouettes | the Nine Heavens |
+| `SUNGAI_BINTANG` | a wide `TrailRenderer` seam across the sky in star-white, starfield motes | the Heavenly River (Tianhe), Journey to the West |
+| `MATAHARI_KAISAR` | a violet-white sun core (`emperor_lotus_core` sky prop) with corona quads | design |
+| `GUNUNG_ES` | `AuroraRenderer` pale ribbons and an `ice_mountain` prop high in the sky | design |
+| `CAKRAM_AKRESI` | an orange-violet `VortexRenderer` laid flat as an accretion disc around a black core | Stellar Transformations (the art's own source) |
+| `POHON_CAHAYA` | golden god rays and drifting petals around the bodhi canopy | Battle Through the Heavens (the art's own source) |
+| `LAUT_UTARA` | a dark sea plane far below the clouds with the Kun silhouette turning | Zhuangzi, "Free and Easy Wandering" (the Kun of the Northern Darkness) [lore verify] |
+| `BY_DAO` | the vista of the first stored Dao (own arts) | — |
+
+Each vista is one or two large layers (rank 2-5); Minimal shows only the sky grade and particles.
+
+#### 28.3.4 Gates (all must hold at the ride's start; a failure falls back to Singkat's crane, then to nothing)
+
+Kamera sinematik Penuh; setting "Perjalanan langit" allows it (`Pertama` = the first cast of each spec per session,
+default; `Selalu`; `Mati`); the scene is the local player's own (never a disciple's or another player's); the local
+`FLAG_SAFE` (calm, not targeted, 23.5) **and** no `Enemy` within 24 b **and** health ≥ 50 % **and** the 23.7.4 gates
+(`ShotGuard.blocked`); not `FLAG_LOW_LOAD`; the KIND_ULTIMATE gap passed. During the ride every 23.7.4 abort applies
+(a foreign hurt snaps back at once). The ride never delays or changes anything on the server: the strike lands when
+the server says, whether the camera is still flying or not.
+
+**Singkat** (and `Dampak.Ride.SHORT` at Penuh): `Shots.craneUp` 2 s that looks up at the falling object and ends on the
+climax (or a reveal crane after it when the climax time is player-timed). **Mati**: none; the player still sees the
+mark, the frames and the impact.
+
+### 28.4 Dampak Sunyi (SilentImpact): impact frames, delayed boom, hit-stop
+
+#### 28.4.1 Bingkai Dampak (impact frames, HUD only)
+
+On the event with `FLAG_CLIMAX` of a Dampak spec (own casts always; others only when the impact is ≤ 32 b away and in
+front of the camera, view dot > 0.3):
+
+| Setting | Tick 0 | Tick 1 | Tick 2 |
+|---|---|---|---|
+| **Penuh** (opt-in, warning) | `GUI_INVERT` full-screen fill, then the `frame1` tint α 0.45 (a black frame when `frame1` = `BLACK`) | `frame2` α 0.8 with radial impact streaks (`dampak_streaks.png`, turned by the seed) | `frame3` α 0.5 → 0 |
+| **Lembut** (default) | `frame1` tint α ≤ 0.35 (`EpicScreen.MAX_FLASH`) | fading | — |
+| **Mati** | nothing (the spec's own `flash()` layer still plays as before) | | |
+
+Rules: one luminance event (the spec's own climax `flash()` layer is suppressed for 2 ticks: `ScreenFlash.suppress`);
+"Hide Lightning Flashes" or "Kilatan layar" off → Mati; `screenEffectScale` multiplies alpha; "Kurangi gerak" →
+Lembut without streaks; F1 hides it; Mode Rekam keeps it. Bystanders' frames are always Lembut at half alpha.
+
+The first switch to Penuh opens `PhotosensitivityScreen`: "Peringatan fotosensitif: Bingkai dampak Penuh memakai
+kilatan layar penuh dan pembalikan warna. Jangan aktifkan jika kamu peka terhadap cahaya berkedip." with
+**Aktifkan** / **Batal** (remembered as `epic_impact_frames_ok`).
+
+#### 28.4.2 Hit-stop (presentation time only)
+
+At the climax: Dewa `EpicClock.hitStop(3)`, Abadi `hitStop(2)` (a new overload; σ = 0, then the 20-tick ramp), only
+with "Gerak lambat" on and never with "Kurangi gerak". Phase 10 makes more presentation clocks read σ: cast poses
+(`PoseApplier` keyframe time), prop animations (`ModelFx` step age), the `FireUltimates` clock, `DisplayRun` layer
+ages, and the debris, lift cells, sigils and rings of 28.5-28.10. Vanilla entities, vanilla particles,
+`DeltaTracker`, the tick-rate managers, the server and damage are never touched (23.1.1 rule 3).
+
+#### 28.4.3 The delayed boom
+
+- **Server (M1).** For a spec with `Dampak.silence() > 0`, `Caster.sound(phase, at)` does not play the cues of the
+  event it marks `FLAG_CLIMAX` (same tick, same phase); every other event plays as before.
+- **Client (M2).** `SilentImpact.onClimax(payload, spec)` runs on **every** client that receives the event, before any
+  VFX gate ("Efek pemain lain: Mati" still hears it): for each cue of `spec.sounds(climaxPhase)` (≤ 4) it plays
+  `new SimpleSoundInstance(cue.sound(), SoundSource.PLAYERS, volume, pitch, RandomSource.create(seed + i), x, y, z)`
+  through `SoundManager.playDelayed(instance, delay)` with
+  `delay = cue.delay() + silence + min(16, round(distance(camera, impact) / 2))` (40 b/s, the vanilla thunder speed).
+  Setting "Dampak sunyi" off: `delay = cue.delay()`.
+- During the silence the local player's ambient, weather, music and block categories duck to 0.35
+  (`EpicSound.duck`; never HOSTILE or PLAYERS), and a sub-bass thump (`EpicSound.subBass`) lands with the boom.
+- Silence values: Dewa 6 ticks, Abadi 3, the time art 10 ("time resumes"), life arts 4, 0 = classic.
+
+### 28.5 Gelombang Kejut (ShockRing)
+
+An expanding ground ripple following the terrain: a soft annulus (`ring_soft.png`, `entityTranslucentEmissive`)
+sampled at 32 / 48 / 64 segments, each vertex at `Level.getHeight(MOTION_BLOCKING_NO_LEAVES) + 0.04`, growing 0 → R
+over 12 ticks (easeOutCubic) and fading; a **dust wall** at the front (`ParticleTypes.BLOCK` of the ground block under
+the front, `DUST_PILLAR` at Normal+, 8 / 24 / 48 per tick through `FxBudget`); a **second ring** 8 ticks later to
+1.4 R, fainter. A ring wider than 16 b takes a large layer (rank 6). Variants (`Dampak.Ring`): `DUST` (default),
+`EMBER` (flame and lava-drip front: fire), `FROST` (frost front and ice spikes: up to 8 / 16 / 32 `PACKED_ICE`
+BlockDisplays rising 1-3 b along the front, staying 10 s, then shattering into `BLOCK` particles), `VOID` (contracts
+to 0.3 R first, then bursts out: black hole, mirror), `GOLD` (glow motes: life and body arts). Minimal: a particle
+ring.
+
+### 28.6 Puing (Debris)
+
+#### 28.6.1 Real debris (Mode Kehancuran on)
+
+While a WorldBreaker job (self or disciple, not a restore) changes blocks, the server sends per tick at most one
+`Payloads.DampakDebris` (28.13.2) with up to 64 of the positions it changed that tick (a uniform sample when more) and
+the **old** block state ids, to the players within 96 b of the batch centroid in the job's dimension. The client:
+
+- skips states without a solid model (air, plants, fluids, `RenderShape.INVISIBLE`): `BLOCK` particles instead;
+- spawns a client-only `Display.BlockDisplay` of the state at the position, size 0.35-0.9 (Maximal: one in eight is a
+  full 1.0 block), launched up 0.35-0.9 b/t and outward 0.15-0.6 b/t from the job centre (scaled by "Daya dampak"),
+  spinning 6-20°/t about a seeded axis, gravity 0.06 b/t², drag 0.98; it bounces once on the client heightmap
+  (`vy × −0.3`, spin halves), rests, then leaves by one shrink over 8 ticks with `BLOCK_CRUMBLE` particles (life 40-70
+  ticks, Minimal 30);
+- modes from the spec's `Dampak.debris()`: `BURST` (default), `WAKE` (along a line: spawn delay = distance along the
+  line / 4 ticks, so the ground erupts behind a dash or a beam), `LIFT` (28.7), `IMPLODE` (pulled toward the centre
+  and up, shrinking: black hole), `SUSPEND` (rise 1-3 b and hang still until the spec's climax, then drop: the time
+  art), `CONVERT` (wither: ash and leaf particles, no displays);
+- `CONVERT` batches (wither, strip) spawn no displays; `SURFACE` batches light the new surface (28.8.3); restore jobs
+  send nothing (the existing shimmer stays); `DONE` (job finished, `total` = changed) fires the closing ShockRing
+  (28.5) with `R = clamp(2 + sqrt(total) / 2, 4, 40)` and a last dust wall.
+
+#### 28.6.2 Visual debris (Mode Kehancuran off)
+
+On the climax of a Dampak spec whose event lacks `FLAG_KEHANCURAN`: chunks of the **client's** surface block under the
+impact (`ClientLevel.getBlockState` at the heightmap), 6 / 24 / 48 by quality, the same motion as above, and a cracked
+glowing decal under them (28.8.3). Nothing is read from or sent to the server; real blocks are never touched.
+
+#### 28.6.3 Budgets
+
+| | Minimal | Normal | Maximal |
+|---|---|---|---|
+| Dampak displays alive (debris + lift cells + crystals + ice spikes) | 16 | 96 | 256 |
+| created per tick | 4 | 16 | 32 |
+| re-key (`DisplayKey.key`) | every 2 ticks, duration 2 | every 2 ticks, duration 2 | every tick, duration 1 |
+| fake debris per climax | 6 | 24 | 48 |
+| particles per batch | 8 | 24 | 48 (all via `FxBudget`) |
+
+Others' casts × `EffectQuality.othersScale()`; "Efek pemain lain: Ringan" → no displays (particles only);
+`FLAG_LOW_LOAD` → no displays; the 7b frame guard lowers the tier (tier −1 → particles only); no spawn farther than
+64 b from the camera, half beyond 32 b. Setting "Puing & monumen" off → particles only.
+
+#### 28.6.4 Display pool
+
+`client/dampak/world/DampakDisplays`: displays made with `EntityType.create(clientLevel, LOAD)`, ids counting down from
+**−6,000,000** (PhantomDisplays −2 M, EpicDisplays −3 M, RealmScenery −5 M), added with `ClientLevel.addEntity`, never
+sent anywhere, `setViewRange` and width/height set so culling mods keep them, removed on their end, on a dimension
+change, on disconnect and on `uji dampak berhenti` (ABORT of their cast ends lift cells and suspended chunks, not
+debris already flying). Every transform goes through `DisplayKey` (snap first, then key). A creation failure turns the
+pool off for the session (particles stand in).
+
+### 28.7 Gunung Terangkat (TerrainLift)
+
+For `Dampak.debris() == LIFT` (space and earth-shaping arts): the positions of a job's batches are grouped into
+**cells** (2 × 2 columns at Normal and Maximal, 3 × 3 at Minimal or above the cap); each cell is one BlockDisplay of its
+most common top state, scaled (cell, 1-2, cell), that rises 12-30 b over 40-60 ticks (easeOutCubic) while turning
+2-5°/t about a seeded tilted axis, hangs 10 ticks, then crumbles (one shrink over 6 ticks + `BLOCK` particles).
+`IMPLODE` cells spiral into the black hole core instead. A **light grid** (thin glow lines along the cell borders,
+pattern `GRID` of 28.9) shows on the ground 10-20 ticks before the cells lift.
+
+Without Kehancuran the cells are visual: sampled from the client's surface around the impact (one heightmap read per
+cell), they rise from 0.1 b above the ground while the ground stays, with a glowing crack decal under each.
+
+| | Minimal | Normal | Maximal |
+|---|---|---|---|
+| lift cells alive (inside the display pool) | 0 (particles) | 24 | 64 |
+| grid lines | particles every 2 b | 48 segments | 128 segments |
+
+### 28.8 Kawah Lebur (MoltenCrater)
+
+#### 28.8.1 Server surface pass (Mode Kehancuran only, M1)
+
+After a job's carve positions are done, a job whose spec names a palette (`Dampak.palette() != NONE`) gets a second
+phase in the **same job, same undo entry, same per-tick budget**:
+
+1. Candidates (reads stay within 4 × cap): for each carved position, the block directly below if it was not carved,
+   and the four side neighbours of each carved column's top (the rim). Duplicates dropped.
+2. Kept only if `Shapes.natural(state)`, not `ProtectedZones.neverTouch`, not in a protected zone (re-checked per batch
+   like the carve), not `touchesUnsafe` (no fluid or block-entity neighbour), not in the caster's safe column and, for
+   magma, at least 6 b from the cast position and not under a standing player.
+3. Cap: `min(kehancuranSurfaceMax (256), max(16, changed / 8))`, a seeded sample (seed = job centre hash).
+4. Each candidate becomes the palette's target by a position hash (deterministic), set with WorldBreaker's `FLAGS`
+   (no updates, no drops) and recorded in the undo entry as (old, placed); Pulihkan restores it only where the placed
+   state is still there. Never a gravity block, fluid, fire, block entity or valuable block.
+5. One `DampakDebris` `SURFACE` batch per tick lets clients glow the converted blocks; `DONE` follows the pass.
+
+Server config `kehancuranSurfacePass` (default true) and `kehancuranSurfaceMax` (16-512, default 256); per player
+`/kultivasi kehancuran kawah nyala|mati` (stored with the self switch, default on). Disciple Destroyer Arts keep their
+20.3 look (no palette).
+
+#### 28.8.2 Palettes (`kehancuran/Surface.Palette`)
+
+| Palette | Bottom (weights) | Rim | Notes |
+|---|---|---|---|
+| `FIRE` Kawah Lebur | magma 12 %, blackstone 40 %, basalt 30 %, smooth basalt 18 % | blackstone, basalt; sand → glass | magma never ≤ 6 b from the cast position |
+| `ICE` Kawah Beku | packed ice 55 %, snow block 45 % | snow block | no ICE (it melts into water), no blue ice |
+| `LIGHTNING` Bekas Petir | tuff 60 %, smooth basalt 40 % | dirt-likes → coarse dirt | sand / red sand → glass (fulgurite) |
+| `SWORD` Goresan Pedang | calcite 50 %, smooth stone 35 %, polished diorite 15 % | calcite | sword qi scours the stone white |
+| `SPACE` Retakan Hampa | polished blackstone 40 %, blackstone 30 %, tuff 30 % | tuff | no obsidian or crying obsidian (portals, value) |
+| `EARTH` Bumi Retak | cobbled deepslate 40 %, tuff 30 %, coarse dirt 30 % | coarse dirt | body arts, Five Elements Mountain, Ninth Hex |
+| `LIFE` Tanah Hidup | dirt-likes → moss block 60 %, rooted dirt 40 %; stone untouched | moss block | life returns to the wound |
+| `SHADOW` Tanah Arwah | dirt-likes → soul soil 50 %; stone → blackstone 50 % | soul soil | |
+| `TAIJI` | calcite / blackstone in bands 2 b wide across the path | — | Tai Chi Diagram |
+
+Excluded on purpose (anti-farm and world safety): obsidian, crying obsidian, blue ice, ice, amethyst, ores, lava, fire,
+powder snow, sand and gravel as targets, anything with a block entity.
+
+#### 28.8.3 Without Kehancuran: the glowing decal (M3)
+
+A crater-shaped ground decal (`ground_glow.png` in the palette's glow colour, ≤ 64 quads following the heightmap) that
+cools over 20-40 s (alpha and colour ramp to dark), plus 1-2 palette particles per tick (lava drip, snowflake,
+electric spark, end rod, spore blossom, soul) for the first 10 s. Real `SURFACE` batches get the same glow on the
+converted blocks for 10 s.
+
+### 28.9 Sigil Bumi (GroundSigil)
+
+#### 28.9.1 Patterns (`technique/spec/dsl/SigilPattern`, common code, pure geometry)
+
+`SigilPattern.nodes(pattern, centre, yawDeg, radius, seed)` and `segments(...)` return the same points on server and
+client; `yawFor(castPos, aim, seed)` is the horizontal angle of `aim − castPos`, or `seed % 360` when they coincide.
+
+| Pattern | Nodes / lines | Lore (Sumber line in `dampak_server.*.json`) |
+|---|---|---|
+| `BEIDOU_NINE` | the seven Dipper stars plus the two hidden attendants (Zuofu, Youbi) in their sky layout, joined in order | Daoist Northern Dipper veneration and "pacing the Dipper" (bugang, the Steps of Yu) [lore verify] |
+| `LUOSHU` | 3 × 3 palaces, the path 1 → 9 of the Luo Shu square | the Luo Shu magic square [lore verify] |
+| `WUXING` | five nodes: the generating cycle as a pentagon, the overcoming cycle as a pentagram | the Five Phases (wuxing) |
+| `BAGUA` | octagon with the eight trigram bars around a taiji circle | the Eight Trigrams, I Ching |
+| `SWORD_RING` | nine radial blade marks around the aim | design |
+| `ZHUXIAN_SQUARE` | square, two diagonals, a glyph at each corner (誅 戮 陷 絕) | the Zhuxian array, the spec's own source |
+| `LOTUS16` | sixteen petal outlines in two rings | design (the Api Kaisar lotus) |
+| `SNOWFLAKE` | six arms with branch ticks | design |
+| `NINE_RINGS` | nine concentric rings | the Nine Heavens |
+| `CLOCK12` | twelve hour ticks and two hands | design (the time art) |
+| `GRID` | square cells (2-3 b) over the area, or along a strip | design |
+| `ROOTS` | eight branching root lines from the centre | design |
+| `OCTAGRAM_SEAL` | an eight-pointed star joining the eight 封 glyphs | design (the Ninth Hex) |
+| `LIFE_DEATH` | a circle split by an S-curve, grey and green halves | design |
+| `EVENT_CHAIN` | no fixed geometry: nodes are the cast's own event positions in order (footprints, frozen targets, karma links) | — |
+| `WIND_PATH` | feather chevrons along the dash line | design |
+| `DAO_CIRCLE` | the Dao's glyph ring (own arts) | — |
+
+#### 28.9.2 Drawing (M3)
+
+Lines are thin glow strips (width 0.25-0.6 b, additive `lightning()` type, the Dao colour; a second wider strip at
+α 0.25 fakes the bloom) sampled every 1 b along the line, each vertex at the client heightmap + 0.04 (so they climb
+hills and drop into craters); nodes are soft glow discs (r 0.8-1.5 b). **Ignition** follows `Dampak.sigilIgnite`: one
+node and its incoming line light per event of that phase (EXTRA0 strikes, PULSE ticks, each step of a dash), the
+remaining ones all together on the climax; lit lines brighten from the node outward over 6 ticks. **Star impacts**
+(`BEIDOU_NINE`, `WUXING`, `LUOSHU`): on the climax each node gets a staggered strike (2 ticks apart): a short sky
+pillar, a small ShockRing and a **glowing crystal** (a client BlockDisplay of `AMETHYST_CLUSTER`, `END_ROD` or
+`SEA_LANTERN` by Dao, full bright, 0.6-1.6 b) that stays as part of the monument (28.10). A sigil lives until its
+cast's climax + 100 ticks (crystals: the monument's time), then fades over 20 ticks.
+
+| | Minimal | Normal | Maximal |
+|---|---|---|---|
+| segments drawn | none (dust dots every 2 b) | 256 | 512 |
+| node discs | 0 | 16 | 32 |
+| crystals (in the display pool) | 0 | 9 | 18 (two per node) |
+
+#### 28.9.3 Burning trenches (Mode Kehancuran only, M1)
+
+For `Dampak.sigilTrench() == true`, `Destruction` adds the pattern's segments (scaled by `K × mastery area`, clamped to
+`kehancuranMaxRadius × 2`) as TRENCH shapes 1 b wide and 1 b deep (2 at Dewa), anchored on the surface and submitted
+with the climax's shapes in the same `Kehancuran.submitSelf` (one job, one undo entry). They take a fixed **15 %
+share** of the cast's block cap, carved out before the existing split, so the total never exceeds `blockCap`. With a
+`FIRE` or `LIGHTNING` palette the trench floors join the surface pass (molten lines). The client draws the burning
+look (ember or spark particles along the lit lines for 10 s).
+
+### 28.10 Monumen (Monument)
+
+A lingering giant prop at the impact: a client-only `ModelFx` prop (`ModelRequest` with `casterId` −1 so ABORT does not
+end it, `glow` true, `FxLayer.Priority.CORE`) of an existing `kultivator:fx/<id>` model, posed by `Dampak.pose`:
+`PLANTED` (tilted 8-12°, sunk 20 % into the ground), `FLAT` (lying on the ground), `UPRIGHT` (standing, a slow 0.3°/t
+turn), `HOVER` (floating 2 b up, slow BOB). It appears on the climax with one `GROW` from 0.6 (or a `FALL` + `STAMP`
+for planted swords), breathes by light (`lightCycle(9, 80, seed)`), cools by `lightTo(6, life)` and leaves by one
+`end(20)` after `Dampak.monumentSeconds` (30-180). The crystals of a sigil (28.9.2) belong to it.
+
+| | Minimal | Normal | Maximal |
+|---|---|---|---|
+| monuments alive (all casters; the oldest ends first; inside the PhantomDisplays caps) | 1 | 2 | 4 |
+| child parts | no | yes | yes |
+
+Ended early when the camera is more than 128 b away or the dimension changes. **Decision: no real block remnant**, not
+even under Kehancuran: a placed "sword block" would be farmable, would need protection rules of its own and would
+outlive the undo window. The crater (28.8) is the only real trace.
+
+### 28.11 Settings (Momen Epik page, M2) and the shader look
+
+New rows after "Kamera sinematik" (keys in `kultivator-client.json`, read through `EpicSettings`):
+
+| Key | Row (id_id) | Values (default first) |
+|---|---|---|
+| `epic_skyride` | Perjalanan langit | Pertama / Selalu / Mati |
+| `epic_impact_frames` | Bingkai dampak | Lembut / Penuh (warning screen) / Mati |
+| `epic_silent_impact` | Dampak sunyi | Nyala / Mati |
+| `epic_world_fx` | Puing & monumen | Nyala / Mati |
+| `epic_impact_power` | Daya dampak | 100 % / 150 % / 50 % (scales debris counts and speeds, ring radius × 0.8-1.2 and shake; never above the caps) |
+
+M3 reads them through `EpicSettings.worldFx()` and `EpicSettings.impactPower()` (added by M2). Client commands:
+`/sinematik dampak <key> <value>` and `/sinematik dampak info`.
+
+### 28.12 Storyboards (every Abadi and Dewa ultimate)
+
+"Ultimate" is EpicDirector's rule: `spec.pamungkas() && grade ≥ ABADI || spec.dewa()`. Times are ticks after the CAST
+(after the release for charged casts). Frames list `frame1 / frame2 / frame3` (INV = the invert of Penuh, BLACK = a
+black frame). Ride: FULL = 28.3 at Penuh (Singkat: crane), SHORT = crane only, NONE. Each row is authored in its arts
+file as `.dampak(...)` (M1) with exactly these values; the client side (M2, M3) reads them and never hard-codes an id.
+
+| id (grade) | Tanda | Langit | Build-up | Bingkai / sunyi | Tanah (debris · palette · sigil) | Monumen | Finale |
+|---|---|---|---|---|---|---|---|
+| `heaven_punishing_sword` (Dewa) | PILLAR white-gold from the sky tear onto the beam's end; PATH line along the 128-b beam | FULL 60 (R1 0-22, R2 22-36, R3 36-60), vista GERBANG_LANGIT: the sword is drawn out of the opening gate | 0 dark ring and chains, 20 stun nova, 40 nova: the sword ring lights 3 blades per nova | INV / 0xFFF1C0 / 0x101018, silence 6 (trident thunder and bell after) | WAKE along the beam (near → far); SWORD; SWORD_RING (9 blades), trench with K | `heaven_punishing_sword` PLANTED at the beam's end, scale 12, 180 s | chains of heaven's law fall around the planted sword; double DUST ring |
+| `emperor_flame` (Dewa) | PILLAR violet-white at the lotus centre, 帝 over it | FULL 80 from 320 (climax 400), vista MATAHARI_KAISAR | the lotus field 0-400; LOTUS16: one petal per PULSE (16 of 20) | INV / 0xF8F0FF / 0x5A2A90, silence 6 | BURST; FIRE (molten bowl); LOTUS16, no trench | `emperor_lotus_core` HOVER over the crater, cooling, 120 s | the petals fold into the heart → nova, EMBER double ring, ember wall |
+| `freeze_mount_qi` (Dewa) | RING_ONLY ice ring r 40 around the caster | FULL 80 from 320 (climax 400), vista GUNUNG_ES | 0 whiteout; 200 freeze: SNOWFLAKE arms reach each frozen target (EVENT nodes ≤ 24) | INV / 0xFFFFFF / 0xCFEFFF, silence 6 (glass-break boom) | BURST ice chunks; ICE; FROST ring with ice spikes | `ice_lotus` UPRIGHT at the caster's spot, 90 s | the recall shatter: spikes burst outward in sequence |
+| `nine_heavens_thunder_venerable` (Dewa) | PILLAR violet over the caster (the Venerable descends) | FULL 80 from 320 (climax 400), vista SEMBILAN_LANGIT | 4 novas (80, 160, 240, 320): each lights two of the NINE_RINGS | INV / 0xF0E8FF / 0xB57CFF, silence 6 (thunder by distance) | BURST per scatter crater; LIGHTNING (fulgurite glass); NINE_RINGS, no trench | none (the deities fade) | the 9th ring lights, storm bolts, DUST ring with a spark front |
+| `time_spirit_domain` (Dewa) | RING_ONLY clock ring r 24 | FULL 80 from 80 (climax 160), vista SUNGAI_BINTANG | grey wash over the domain (`EpicScreen.grey`); CLOCK12: the hand sweeps one turn over 160, hours light as it passes; ground chunks SUSPEND in the air | grey / INV / 0xE0E8FF, silence 10 ("time resumes") | SUSPEND (real chunks with K hang until 160); no palette | `time_clock` UPRIGHT, hands stopped, 60 s | the suspended chunks drop and shatter, sonic boom |
+| `stellar_black_hole` (Dewa II) | PILLAR dark-violet (a soft dark disc with a violet halo) at the field centre | FULL 80 from 40 (climax 120), vista CAKRAM_AKRESI | GRID lights over the field at 10-20; cells lift and spiral in during the pull | BLACK / INV / 0xFFE8C0, silence 6 | IMPLODE + LIFT (Gunung Terangkat); SPACE; GRID with K trench (the grid cuts the land) | `black_hole_core` HOVER scale 1 with an `accretion_segment` ring, 60 s | the crush: white shell, VOID ring, chroma fringe (Normal+) |
+| `ancient_god_trample` (Dewa) | FOOT: a golden footprint glyph 10 ticks before each of the 8 steps | FULL 80 from 100 (climax 180), vista: nine silver stars (`brow_star` sky props) | each footprint: the god foot falls, a ShockRing, a silver line joins it to the last (EVENT_CHAIN) | 0xFFE8A0 / 0xC8C8D8, silence 6 | BURST per footprint; EARTH; EVENT_CHAIN | the 9th `god_foot` FLAT, pressed in the crater, silver glow, 120 s | the kneel strike: big DUST ring, the chain flares |
+| `bodhisattva_tree` (Dewa II) | PILLAR green at the tree | FULL 80 from 520 (climax 600), vista POHON_CAHAYA (R1 climbs the trunk, the canopy is the cloud sea) | ROOTS grow one branch per EXTRA0 (5) | 0xE8FFD0 / 0xFFF0A0 (never INV, even at Penuh), silence 4 (bell) | leaves (particles, no displays); LIFE; ROOTS | `bodhi_tree` scale 3 sapling UPRIGHT, 180 s | golden shell, GOLD ring, falling petals |
+| `kunpeng_art` (Dewa) | PATH: a 128-b wind line with feather chevrons through the charge | SHORT (a pullback reveal after the dash; the dash is too fast to ride) | charge 20: the Kun turns in the sky (LAUT_UTARA silhouette, others see it too) | 0xFFFFFF / 0xD8ECFF, silence 0 (the boom rolls along the path: each 16 b of the line gets its dust 1 tick later) | WAKE along the dash; no palette; WIND_PATH | none (drifting feather motes 60 s) | the end wave: wide DUST ring |
+| `heaven_trampling` (Dewa) | PILLAR gold onto the aim, BEIDOU_NINE drawn at the aim | SHORT (a low-hero look-up at the ascent; 30 ticks is too short for FULL) | the nine steps up: each lights one Dipper star (9 steps, 9 stars) | INV / 0xFFFFFF / 0xF0E0A0, silence 6 | BURST; EARTH; BEIDOU_NINE with K trench (the lines burn into the land), star impacts with crystals | the nine crystals (END_ROD) stay 90 s | the foot lands, 3 waves = 3 DUST rings |
+| `karma_domain` (Dewa II, disciple-only) | RING_ONLY red | NONE (never a disciple camera) | threads between linked targets (EVENT_CHAIN) | none | none (no Kehancuran shapes) | none | — |
+| `own_art_1..3` (Dewa, Ciptaan) | PILLAR in the first stored Dao's colour | SHORT at the EXTRA1 burst (the timing is the composition's); vista BY_DAO only with `uji` | the forms as stored | first Dao / second Dao / 0xFFFFFF, silence 6 | BURST; the first Dao's palette; DAO_CIRCLE | the first Dao's signature prop (sword, sun orb, ice spear...) 60 s | the EXTRA1 burst |
+| `zhuxian_sword_formation` (Abadi) | MULTI: four red pillars at the square's corners | SHORT at 200 (climax 240) | corner pillars every 40: ZHUXIAN_SQUARE lights corner by corner, then its edges | INV / 0xB0102A / 0x1A0505, silence 3 | BURST; SWORD; ZHUXIAN_SQUARE (its edges are already carved by the spec's own trench) | the giant `zhuxian_sword` PLANTED at the centre, 120 s (the four small swords fade with the field) | the four swords fly into the centre and the giant one falls |
+| `nine_suns_heavens_fury` (Abadi) | MULTI: nine sun marks (日 rings) on the dense points through the charge | SHORT 20-60 after the release (watching the suns fall) | the suns kindle (FireUltimates), each falls on its pre-impact | 0xFFF1C0 / 0xFF8020, silence 3 (on the great sun only) | BURST per sun; FIRE (nine small molten bowls and one big) | `nine_sun_crater` glow FLAT, cooling, 60 s | the great sun flattens, EMBER double ring |
+| `ice_phoenix_descent` (Abadi) | MULTI: a six-fold frost ring at each dive point before the dive | SHORT at 200 (climax 240) | 3 dives at 60 / 120 / 180 | 0xFFFFFF / 0xCFEFFF, silence 3 | BURST ice chunks; ICE; FROST ring | `ice_spear` PLANTED (a phoenix quill of ice), 60 s | the phoenix folds its wings, the nova shatters |
+| `tribulation_thunder_emperor_array` (Abadi) | PILLAR violet at the field centre; the rune circle | SHORT at 158 (climax 198) | 8 strikes (22-176): each lights the next LUOSHU palace in order | INV / 0xB57CFF / 0xF0E8FF, silence 3 (thunder by distance, the classic) | BURST per scatter; LIGHTNING; LUOSHU with K trench | none | the 9th palace lights, double-width storm |
+| `void_mirror` (Abadi) | none at stage 1 (a guard); stage 2: a PATH grid strip along the beam for 6 ticks | SHORT (a crane after the release; the release is player-timed) | the mirror ripples on each stored blow (existing) | INV / 0x2A1050 / BLACK, silence 3 | LIFT along the beam strip (cells rise into the beam and shatter into portal motes); SPACE; GRID (strip) | `void_mirror` HOVER, cracked, at the beam's start, 60 s | VOID ring at the beam's end |
+| `cosmic_giant_form` (Abadi) | FOOT before each avatar stomp (PHANTOM pre-impact) | SHORT at the end (the existing pullback) | stomps every 50 | 0xFFF0C0 / 0xC8A040, silence 3 | BURST per stomp; EARTH | glowing footprint decals 60 s (no prop) | the kneel strike nova, GOLD ring |
+| `life_death_domain` (Abadi) | RING_ONLY grey-green | SHORT at 360 (climax 400) | the LIFE_DEATH sigil turns slowly through the domain | 0xE0E0E0 / 0x9AE05A, silence 4 | CONVERT (wither: ash, no debris) | `tang_lotus` UPRIGHT, half withered, 60 s | the halves swap colours, GOLD ring |
+| `ninth_hex` (Abadi) | RING_ONLY: the eight 封 glyphs | SHORT after the release (a crane reveal) | OCTAGRAM_SEAL: one point per channel pulse (8 × 20 = 160) | 0xFFFFFF / 0xE8D8A0, silence 3 | BURST (the seal presses the ground: chunks thrown sideways, low); EARTH; OCTAGRAM_SEAL with K trench | `seal_ring_feng` FLAT at the centre, 90 s | the seal STAMPs, DUST ring |
+| `five_elements_mountain` (Abadi) | SHADOW of the Buddha's palm growing under the fall (0-40) | SHORT 0-40 (a crane up to watch the palm come down from 64) | the palm falls; at 40 the five mountains rise on the ring (`mountain_peak_metal / wood / water / fire / earth`) and WUXING lights between them | 0xFFE8A0 / 0x8A7A60, silence 3 | BURST and a ring of 5 visual LIFT cells under the peaks; EARTH; WUXING with K trench | the five peaks stay 120 s (instead of sinking at 120 ticks) with a gold `talisman_ling` on the middle one (the six-syllable seal of Journey to the West ch. 7) [lore verify] | the mountain is sealed: the six-syllable glyph flares |
+| `tai_chi_diagram` (Abadi) | PATH: twin black and white bands along the front through the charge | SHORT during the charge (30) | the sky band descends (the existing laser pair) | INV / 0xFFFFFF / 0x101010, silence 3 | LIFT along the path (cells flip 180°, yin-yang, and fall back as dust); TAIJI; BAGUA at the path's end | `taiji_disc` UPRIGHT at the path's end over the bagua, 90 s | the bands cross, BAGUA lights |
+| `guanyin_sweet_dew` (Abadi PULIH, not an ultimate) | RING_ONLY soft white | NONE | — | none | none | `guanyin_vase` stays 30 s after the field | lite row: mark and monument only |
+| `stygian_tiger_seal` (Abadi PANGGIL, not an ultimate) | RING_ONLY dark red | NONE | — | none | none | none | lite row: mark only |
+
+Rows without K shapes simply skip the real parts; every row's visuals play without Kehancuran (visual debris, decal,
+visual lift cells, untrenched sigils). A disciple casting any of these (Dewa disciples, karma_domain) gets the world
+FX at "Efek pemain lain" scale and never a camera, frame or ride on anyone's client.
+
+### 28.13 Mode Kehancuran in general
+
+#### 28.13.1 Every carve looks like an impact
+
+Every WorldBreaker job (own technique casts, own arts, disciple Destroyer Arts, Pemusnah orders), not only Dampak
+specs, gets on the clients near it:
+- on `KehancuranFxIds.IMPACT` (the build was accepted): a ShockRing with `R = max(4, 1.5 × radius)` and a second ring
+  8 ticks later, and a short camera shake for the owner (`0.2 + 0.1 × log10(blocks) ≤ 0.6`, × "Guncangan");
+- for each `DampakDebris` batch: debris (28.6.1) at the batch's sampled positions (Destroyer Arts: BURST; a self job:
+  its spec's mode, scaled by the blocks removed in that batch);
+- on `DONE`: the closing ring sized by the blocks changed and a last dust wall; the old per-tick `DUST` particles are
+  halved while debris displays run (no double dust).
+
+The 6 chunks that `SceneCatalogPower.kehancuranSelf` made at Maximal are removed (debris now comes from the real
+batches). The red sky, the undo, the caps and the warnings of 22.11 are unchanged.
+
+#### 28.13.2 `Payloads.DampakDebris` (M1 → M3)
+
+```
+record DampakDebris(int job, byte kind, int caster, int spec, double cx, double cy, double cz,
+                    short total, short flags, int[] offsets, int[] states)
+kind:    0 CARVE, 1 CONVERT (wither / strip), 2 SURFACE (molten pass, states = the NEW state), 3 DONE (total = changed),
+         4 TEST (uji dampak puing / angkat: nothing changed), 5 STOP (clear: this job, or all when job = -1)
+flags:   1 SELF, 2 DISCIPLE, 4 LIFT, 8 IMPLODE, 16 SUSPEND, 32 WAKE, 64 LOW_LOAD
+offsets: (dx + 512) << 20 | (dy + 512) << 10 | (dz + 512), relative to BlockPos.containing(cx, cy, cz)
+states:  Block.getId(state) (the old state for CARVE, CONVERT and TEST)
+```
+At most 64 entries (the codec rejects more; `offsets.length == states.length`); `job` is a per-server counter so
+clients group batches; `caster` is the caster's entity id (−1 when absent), `spec` the spec's net id (−1 for Destroyer
+Arts). `WorldBreaker.Job` gains `jobId`, `casterEntityId`, `specNet`, `palette`, `debrisFlags`, `carved` (the removed
+positions, ≤ cap, kept also when the job is not undoable) and `surfacePhase`.
+
+### 28.14 Modules (exactly three, disjoint files) and contracts
+
+#### M1 — server and shared (`src/main`)
+
+New: `technique/spec/dsl/Dampak.java` (the record and its builder), `technique/spec/dsl/SigilPattern.java`,
+`kehancuran/Surface.java` (palettes, candidate planner), `technique/spec/run/DampakTests.java`,
+`lang-src/dampak_server.en_us.json` + `.id_id.json` (commands, the kawah toggle, the Sumber lines of the new patterns).
+Edits: `data/TechniqueSpec.java` (`@Nullable Dampak dampak()`, `Builder.dampak(Dampak)`),
+`technique/spec/run/Caster.java` (silent climax cues, CAST / CHARGE aim), `technique/spec/run/Steps.java` (only if an
+aim is missing), `technique/spec/run/Destruction.java` (sigil trenches, the 15 % share, palette and flags into the
+job), `kehancuran/Kehancuran.java` (submitSelf passes them; the `kawah` command), `kehancuran/WorldBreaker.java` (debris
+batches, the surface phase, DONE, the job fields), `network/Payloads.java` (+ `DampakDebris`), `network/Net.java`
+(register), `KultivatorConfig.java` (`kehancuranSurfacePass`, `kehancuranSurfaceMax`),
+`technique/spec/run/SpecLint.java`, `technique/spec/run/TechniqueTests.java` (registers `uji dampak`), every
+`technique/arts/*Arts.java` with a row in 28.12 and `batin/CiptaanArts.java` (authoring only: `.dampak(...)`; no other
+line of a spec changes).
+
+`Dampak` (contract C10.1):
+```
+record Dampak(Mark mark, int markTicks, Ride ride, Vista vista, int rideTicks, int climaxAt,
+              int frame1, int frame2, int frame3, int silence,
+              Debris debris, Ring ring, Palette palette,
+              SigilPattern sigil, float sigilRadius, @Nullable Phase sigilIgnite, boolean sigilTrench,
+              @Nullable String monument, float monumentScale, int monumentSeconds, MonumentPose pose)
+enum Mark { NONE, PILLAR, MULTI, SHADOW, PATH, FOOT, RING_ONLY }
+enum Ride { NONE, SHORT, FULL }
+enum Vista { NONE, GERBANG_LANGIT, PUSARAN, SEMBILAN_LANGIT, SUNGAI_BINTANG, MATAHARI_KAISAR, GUNUNG_ES,
+             CAKRAM_AKRESI, POHON_CAHAYA, LAUT_UTARA, BY_DAO }
+enum Debris { NONE, BURST, WAKE, LIFT, IMPLODE, SUSPEND, CONVERT }
+enum Ring { DUST, EMBER, FROST, VOID, GOLD }
+enum Palette { NONE, FIRE, ICE, LIGHTNING, SWORD, SPACE, EARTH, LIFE, SHADOW, TAIJI }
+enum MonumentPose { PLANTED, FLAT, UPRIGHT, HOVER }
+static final int INV = -1, BLACK = -2;   // frame colour markers; -3 = "the Dao colour" for own arts
+```
+`kehancuran/Surface` maps `Dampak.Palette` to block targets (the dsl enum stays plain and server-safe). SpecLint
+warns for: an ultimate (EpicDirector's rule) without a Dampak, `rideTicks > 80`, a `climaxAt` other than the tick of
+the first step sending the climax phase, a FULL ride with `climaxAt < rideTicks` that is not charged, `sigilTrench`
+without K shapes, a monument id without `assets/kultivator/items/fx/<id>.json`, `monumentSeconds` outside 30-180.
+
+#### M2 — client cinema (`src/client`, 7b and the cast presentation)
+
+New: `client/dampak/DampakClient.java` (init, the `DampakDebris` receiver → `DampakWorld.onDebris`, the TechFx hub),
+`client/dampak/cinema/TargetMark.java`, `SkyRide.java`, `Vistas.java`, `SilentImpact.java`,
+`client/epic/screen/ImpactFrame.java`, `client/epic/screen/CloudWipe.java`,
+`client/epic/screen/PhotosensitivityScreen.java`, `textures/gui/dampak/cloud_wipe.png`, `dampak_streaks.png`,
+`seal_bracket.png`, `tools/gen_dampak_hud_textures.py`, `lang-src/dampak.en_us.json` + `.id_id.json` (settings rows,
+tooltips, the warning screen, `/sinematik dampak`).
+Edits: `KultivatorClient.java` (one line `DampakClient.init()` after `EpicClient.init()`), `fx/spec/SpecFx.java` (calls
+`DampakClient.onTechFx(payload)` right after `EpicDirector.onTechFx`, before the others gate),
+`fx/spec/ScreenFlash.java` (`suppress(ticks)`), `fx/spec/DisplayRun.java`, `anim/PoseApplier.java`,
+`anim/model/ModelFx.java`, `anim/model/FireUltimates.java` (σ only), `epic/EpicClock.java` (`hitStop(int)`),
+`epic/EpicSettings.java` (rows and getters `skyRide() impactFrames() silentImpact() worldFx() impactPower()`),
+`epic/EpicDirector.java`, `epic/SceneCatalogPower.java` (storyboard hookups: marks, rides, vistas, frames; removes the
+kehancuranSelf chunks), `epic/camera/Shots.java` (`SKY_RIDE`, `Shot.cut()`), `epic/camera/CinematicDirector.java`
+(masked cuts), `epic/screen/EpicScreen.java` (a shared luminance gate `tryLuminance()`),
+`epic/EpicClientCommands.java`.
+
+#### M3 — client world FX (`src/client`, the world)
+
+New: `client/dampak/world/DampakWorld.java` (the API below), `DampakDisplays.java` (the pool, −6,000,000),
+`DebrisFx.java`, `TerrainLift.java`, `GroundSigil.java`, `SigilRenderer.java`, `ShockRing.java`, `Monument.java`,
+`MoltenGlow.java`, `DampakWorldBudget.java`, `textures/misc/dampak/ground_glow.png`, `crack_decal.png`,
+`tools/gen_dampak_world_textures.py`.
+Edits: `client/kehancuran/KehancuranFx.java` (IMPACT → `DampakWorld.onKehancuranImpact`; DUST halved while debris run).
+
+`DampakWorld` (contract C10.2; every method never throws; client thread only):
+```
+public static void init();   // its END_CLIENT_TICK and COLLECT_SUBMITS; called by DampakClient.init()
+public static void onTechFx(Payloads.TechFx p, TechniqueSpec spec, Phase phase, boolean own, float othersScale);
+public static void onDebris(Payloads.DampakDebris p);
+public static void onKehancuranImpact(Vec3 pos, float radius, boolean own);
+public static void test(String what, Vec3 at, int n, @Nullable String arg); // puing, angkat, sigil, monumen, cincin
+public static String stats();  // alive displays, cells, sigils, monuments, last frame quads
+public static void clear();
+```
+M2 → M3 also: `EpicSettings.worldFx()`, `EpicSettings.impactPower()`, `EpicClock.sigma()`. M3 → M2: nothing. Both
+read `TechniqueSpec.dampak()` and `SigilPattern` (M1). Order on the client: `SpecFx.play` → `EpicDirector.onTechFx` →
+`DampakClient.onTechFx` (the SilentImpact sound first, then marks, rides and frames, then `DampakWorld.onTechFx`) →
+the existing layer runs. Text in `lang-src/<fragment>.en_us.json` and `.id_id.json` with identical keys; files keep
+their line endings; ItemStacks are made lazily (never in static initializers or renderer constructors).
+
+### 28.15 Test commands
+
+Server (`/kultivasi uji dampak ...`, op, M1):
+
+| Command | Does |
+|---|---|
+| `uji dampak <id>` | one showcase cast of the spec ahead of the player through the `uji teknik pamer` runner (no damage, no cost); Kehancuran only if `uji teknik kehancuran nyala` and the player's own switch are on |
+| `uji dampak semua` | every row of 28.12 in turn, 14 s apart, each 24 b further along the look |
+| `uji dampak puing <n>` | a TEST debris batch of n (≤ 256, split into 64-entry packets) sampled from the real states around the aim; nothing changes |
+| `uji dampak angkat <n>` | a TEST batch with the LIFT flag (n cells) |
+| `uji dampak kawah <palet>` | a real r 4 bowl through `Kehancuran.submitSelf` with that palette; refused unless the player's Mode Kehancuran switch is on |
+| `uji dampak sigil <pola> [radius]` | a test climax so clients draw the pattern at the aim (no trench) |
+| `uji dampak berhenti` | a STOP packet: every client near clears the Phase 10 visuals |
+
+Client (`/sinematik dampak ...`, M2): `naik <id>` (the SkyRide alone, still under every gate), `bingkai <id>` (the
+impact frames of a spec), `sunyi <jarak>` (a test boom at that distance), `tanda <id>`, `monumen <model> [detik]`,
+`cincin <radius>`, `info` (settings, gates, `DampakWorld.stats()`), `<key> <value>`.
+
+### 28.16 Daftar uji (for `docs/uji/FASE-10.md`)
+
+1. Tanpa Mode Kehancuran: `uji dampak semua` → tidak ada satu blok pun berubah (bandingkan tangkapan layar tanah
+   sebelum/sesudah dan cek F3); puing, sel terangkat dan kawah hanya visual lalu hilang.
+2. Tanda Langit muncul di titik bidik sebelum setiap pamungkas Abadi/Dewa, ikut crosshair saat mengisi (Sembilan
+   Matahari, Diagram Taiji, Kunpeng) dan berpindah ke titik server saat dilepas.
+3. Pemain lain melihat pilar dan cincin tanda; dengan "Efek pemain lain: Ringan" hanya cincin; "Mati" tidak ada.
+4. Perjalanan Langit (Penuh, Pertama): Pedang Hukuman Langit naik → awan menutup layar → gerbang langit → awan → turun
+   mengikuti pedang → bingkai dampak tepat saat beam mendarat; total ≤ 4 detik.
+5. Perjalanan tidak dimulai bila ada musuh ≤ 24 b, nyawa < 50 %, sedang jatuh, di air/lava, menunggang, atau ada layar
+   terbuka; Singkat memberi crane pendek; Mati tanpa kamera.
+6. Selama perjalanan: tombol gerak menghentikan shot, Backspace melewati, terkena serangan langsung kembali ke mata.
+7. Gerak kamera tidak memusingkan; tidak ada lompatan kamera yang tidak tertutup awan atau bingkai.
+8. Bingkai dampak Lembut (bawaan): satu kilatan ≤ 0,35, tanpa pembalikan warna.
+9. Mengganti ke Penuh membuka layar peringatan fotosensitif; Batal tetap Lembut; Aktifkan memberi 3 bingkai (balik
+   warna, warna Dao, memudar).
+10. "Hide Lightning Flashes" vanilla atau "Kilatan layar" mati → tidak ada bingkai sama sekali.
+11. Dampak sunyi: pukulan mendarat tanpa suara, dentuman datang setelah jeda; makin jauh makin lambat
+    (`/sinematik dampak sunyi 8` lawan `48`); dengan "Dampak sunyi: Mati" suara langsung.
+12. Dentuman tetap terdengar walau "Efek pemain lain: Mati"; suara musuh (HOSTILE) tidak pernah diredam.
+13. Hit-stop: pose, model 3D dan puing berhenti sesaat saat klimaks; mob, partikel vanilla dan damage tidak.
+14. Dengan Mode Kehancuran: puing berupa blok asli kawah beterbangan, berputar, memantul sekali, lalu hilang.
+15. Kawah Lebur Api: dasar/bibir kawah jadi blackstone/basalt/magma; tidak ada magma dalam 6 b dari posisi casting;
+    Pulihkan mengembalikan semua blok, termasuk yang berubah.
+16. Kawah Es: hanya packed ice dan snow block (tidak ada es biasa yang mencair, tidak ada blue ice).
+17. Tidak ada blok berubah di zona terlindung, dekat air/lava, dekat chest/blok entitas, atau di kolom aman kastor.
+18. Sigil Bumi: Biduk Utara pada Langkah Penginjak Langit, satu bintang menyala tiap langkah, garis mengikuti bukit dan
+    lubang; dengan Kehancuran garis menjadi parit menyala dan total blok tidak melebihi batas per casting.
+19. Lubang Hitam: grid cahaya memotong tanah, sel terangkat berputar masuk ke inti; Minimal hanya partikel.
+20. Monumen: pedang tertancap bertahan 180 s, berpendar pelan, lalu memudar; tidak ada blok sisa; paling banyak
+    1 / 2 / 4 monumen hidup sesuai kualitas.
+21. Setiap pemotongan Mode Kehancuran (termasuk Jurus Pemusnah murid) mendapat gelombang kejut dan puing.
+22. Laptop lemah (Minimal atau Otomatis): FPS tidak jatuh di bawah 30 lebih dari sesaat saat `uji dampak semua`;
+    penjaga frame menurunkan tingkat bila perlu.
+23. Sodium + Iris (Complementary): sigil dan cincin terlihat, tidak masuk bayangan, tidak berkedip (z-fight).
+24. Server: `uji dampak puing 256` → paket ≤ 64 entri, ≤ 1 per job per tick, hanya ke pemain dalam 96 b.
+25. Ganti dimensi, putus koneksi, `uji dampak berhenti` → semua puing, sel, sigil dan monumen hilang.
+26. Teks: setiap kunci `dampak.*.json` dan `dampak_server.*.json` ada di en_us dan id_id dengan kunci yang sama;
+    `uji teknik audit` tidak melaporkan peringatan Dampak.

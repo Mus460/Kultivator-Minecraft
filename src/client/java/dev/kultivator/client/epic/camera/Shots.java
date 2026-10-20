@@ -15,7 +15,9 @@ public final class Shots {
 
 	public enum Type {
 		CRANE_UP(100), CRANE_DOWN(80), ORBIT(120), PUSH(80), PULLBACK(100), SKYPAN(70), LOWHERO(60), OTS(50), TWO_SHOT(80), STATIC(100),
-		FLYOVER(160), KILLCAM(80);
+		FLYOVER(160), KILLCAM(80),
+		/** Phase 10 (DESIGN 28.3): one world-anchored segment of Perjalanan Langit (a ceremony, 48 b reach). */
+		SKY_RIDE(80);
 
 		final int max;
 
@@ -57,6 +59,15 @@ public final class Shots {
 		public boolean danger;
 		/** Ceremonies may go to 48 b instead of 32. */
 		public boolean ceremony;
+		/**
+		 * Phase 10 (28.3.2): a segment start that may skip the enter blend (a masked cut). The director honours it only
+		 * while the cloud wipe covers the screen or an impact frame shows; otherwise it blends as before.
+		 */
+		public boolean cut;
+		/** Ticks the last pose is held after the path ends (R3 waits for a late climax), added after validation. */
+		public int hold;
+		/** The look target at the end of a SKY_RIDE segment ({@code look} is the start). */
+		@Nullable Vec3 lookEnd;
 
 		Shot(Type type, float seconds) {
 			this.type = type;
@@ -91,6 +102,18 @@ public final class Shots {
 
 		public Shot asCeremony() {
 			this.ceremony = true;
+			return this;
+		}
+
+		/** Marks a masked cut (28.3.2): no enter blend while the cloud wipe or an impact frame hides the jump. */
+		public Shot cut() {
+			this.cut = true;
+			return this;
+		}
+
+		/** Holds the last pose {@code ticks} more (≤ 20) once the path is done. */
+		public Shot hold(int ticks) {
+			this.hold = Math.max(0, Math.min(20, ticks));
 			return this;
 		}
 
@@ -194,6 +217,16 @@ public final class Shots {
 					px = center.x - Math.sin(a) * r;
 					py = center.y + h0;
 					pz = center.z + Math.cos(a) * r;
+				}
+				case SKY_RIDE -> {
+					Vec3 a = world != null ? world : feet;
+					Vec3 b = second != null ? second : a;
+					px = a.x + (b.x - a.x) * t;
+					py = a.y + (b.y - a.y) * t;
+					pz = a.z + (b.z - a.z) * t;
+					Vec3 l0 = look != null ? look : eye;
+					Vec3 l1 = lookEnd != null ? lookEnd : l0;
+					target = l0.lerp(l1, t);
 				}
 				case FLYOVER -> {
 					Vec3[] points = path;
@@ -394,6 +427,21 @@ public final class Shots {
 	public static Shot flyover(Vec3[] points, float seconds) {
 		Shot shot = new Shot(Type.FLYOVER, seconds);
 		shot.path = points.length > 6 ? java.util.Arrays.copyOf(points, 6) : points;
+		shot.ceremony = true;
+		return shot;
+	}
+
+	/**
+	 * Phase 10 (DESIGN 28.3.2): one segment of Perjalanan Langit, flying in a straight line from {@code from} to
+	 * {@code to} (world points) while the look moves from {@code look0} to {@code look1}; {@code ticks} long before the
+	 * speed caps (validation may stretch it, then shrink the path). A ceremony (48 b reach).
+	 */
+	public static Shot skyRide(Vec3 from, Vec3 to, Vec3 look0, Vec3 look1, int ticks) {
+		Shot shot = new Shot(Type.SKY_RIDE, Math.max(10, ticks) / 20.0F);
+		shot.world = from;
+		shot.second = to;
+		shot.look = look0;
+		shot.lookEnd = look1;
 		shot.ceremony = true;
 		return shot;
 	}

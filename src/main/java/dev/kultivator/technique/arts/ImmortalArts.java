@@ -22,6 +22,8 @@ import dev.kultivator.technique.spec.dsl.Pose;
 import dev.kultivator.technique.spec.dsl.Route;
 import dev.kultivator.technique.spec.dsl.Shape;
 import dev.kultivator.technique.spec.dsl.SoundCue;
+import dev.kultivator.technique.spec.dsl.Dampak;
+import dev.kultivator.technique.spec.dsl.SigilPattern;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Blocks;
@@ -78,6 +80,11 @@ public final class ImmortalArts {
 				.sound(Phase.PULSE, SoundEvents.BELL_BLOCK, 0.5F, 0.8F)
 				.sound(Phase.extra(0), SoundEvents.BELL_RESONATE, 1.4F, 0.6F)
 				.kehancuran(DShape.disc(12, 2).atRelease())
+				// Phase 10 (DESIGN 28.12): one point of the eight-pointed seal per channel pulse; the seal stamps the ground
+				.dampak(Dampak.builder().mark(Dampak.Mark.RING_ONLY).ride(Dampak.Ride.SHORT).climaxAt(160)
+						.frames(0xFFFFFF, 0xE8D8A0).silence(3).debris(Dampak.Debris.BURST).ring(Dampak.Ring.DUST).palette(Dampak.Palette.EARTH)
+						.sigil(SigilPattern.OCTAGRAM_SEAL, 18.0F).ignite(Phase.PULSE).trench()
+						.monument("seal_ring_feng", 8.0F, 90, Dampak.MonumentPose.FLAT).build())
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.duration(0.25D))
 				.build());
@@ -111,6 +118,11 @@ public final class ImmortalArts {
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BELL_BLOCK, 0.5F, 0.6F).delay(24))
 				.sound(Phase.IMPACT, SoundEvents.MACE_SMASH_GROUND_HEAVY, 2.0F, 0.5F)
 				.kehancuran(DShape.disc(10, 3), DShape.column(2, 8).times(5).at(40))
+				// Phase 10 (DESIGN 28.12): the palm's shadow grows, the five peaks rise and the Wuxing lines light between them
+				.dampak(Dampak.builder().mark(Dampak.Mark.SHADOW, 40).ride(Dampak.Ride.SHORT).climaxAt(40)
+						.frames(0xFFE8A0, 0x8A7A60).silence(3).debris(Dampak.Debris.BURST).ring(Dampak.Ring.GOLD).palette(Dampak.Palette.EARTH)
+						.sigil(SigilPattern.WUXING, 9.0F).trench()
+						.monument("talisman_ling", 3.0F, 120, Dampak.MonumentPose.HOVER).build())
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -135,6 +147,11 @@ public final class ImmortalArts {
 				.sound(Phase.CAST, SoundEvents.BEACON_ACTIVATE, 1.4F, 0.8F)
 				.sound(Phase.TRAVEL, SoundEvents.END_PORTAL_FRAME_FILL, 1.6F, 0.6F)
 				.kehancuran(DShape.trench(64, 9, 1))
+				// Phase 10 (DESIGN 28.12): twin bands along the front, the cells flip yin-yang, the bagua lights at the path's end
+				.dampak(Dampak.builder().mark(Dampak.Mark.PATH).ride(Dampak.Ride.SHORT).climaxAt(0)
+						.frames(Dampak.INV, 0xFFFFFF, 0x101010).silence(3).debris(Dampak.Debris.LIFT).ring(Dampak.Ring.DUST).palette(Dampak.Palette.TAIJI)
+						.sigil(SigilPattern.BAGUA, 9.0F)
+						.monument("taiji_disc", 9.0F, 90, Dampak.MonumentPose.UPRIGHT).build())
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -159,6 +176,10 @@ public final class ImmortalArts {
 				.sound(Phase.IMPACT, SoundEvents.WARDEN_SONIC_BOOM, 0.5F, 0.8F)
 				.sound(Phase.extra(0), SoundEvents.LIGHTNING_BOLT_THUNDER, 1.0F, 0.7F)
 				.kehancuran(DShape.sphere(6), DShape.disc(16, 2).nat())
+				// Phase 10 (DESIGN 28.12): nine steps up light the nine Dipper stars; with Kehancuran the lines burn into the land
+				.dampak(Dampak.builder().mark(Dampak.Mark.PILLAR).ride(Dampak.Ride.SHORT).climaxAt(30)
+						.frames(Dampak.INV, 0xFFFFFF, 0xF0E0A0).silence(6).debris(Dampak.Debris.BURST).ring(Dampak.Ring.DUST).palette(Dampak.Palette.EARTH)
+						.sigil(SigilPattern.BEIDOU_NINE, 24.0F).ignite(Phase.TRAVEL).trench().monumentSeconds(90).build())
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.duration(0.25D))
 				.build());

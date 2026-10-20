@@ -199,6 +199,74 @@ public final class EpicDirector {
 		return seen != null && ticks - seen < window;
 	}
 
+	// ================================================================ Phase 10 hooks (DESIGN 28.2, 28.3)
+
+	/** The live (not ending) TECH_ULTIMATE scene of this caster, or null. */
+	public static @Nullable Scene ultimateScene(int casterId) {
+		for (Scene scene : SCENES) {
+			if (scene.moment == EpicIds.TECH_ULTIMATE && scene.subjectId == casterId && !scene.ending()) {
+				return scene;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * The scene that carries a cast's Phase 10 marks and rides: the caster's live TECH_ULTIMATE scene, or a new one (a
+	 * charge before its release, a lite row that is no ultimate, a server without 7b cues). A scene made here ends by
+	 * itself {@code life} ticks later unless an ultimate beat took it over meanwhile. Null without a level.
+	 */
+	public static @Nullable Scene dampakScene(int casterId, boolean own, Vec3 pos, int seed, int life) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.level == null || minecraft.player == null) {
+			return null;
+		}
+		Scene scene = ultimateScene(casterId);
+		if (scene != null) {
+			return scene;
+		}
+		scene = sceneFor(EpicIds.TECH_ULTIMATE, casterId, own ? minecraft.player.getId() : -1, own, pos, seed, true);
+		scene.flags = localFlags(own);
+		scene.idle = 0;
+		scene.pos = pos;
+		EpicBudget.sceneStarted();
+		Scene made = scene;
+		made.at(Math.max(20, life), () -> {
+			if (made.data == null) {
+				made.end(20);
+			}
+		});
+		return scene;
+	}
+
+	/** Re-reads the local SAFE, RESULT_SAFE and CAMERA_OK flags of an own scene (a timed shot checks the moment it starts). */
+	public static void refreshFlags(Scene scene) {
+		int local = EpicIds.FLAG_SAFE | EpicIds.FLAG_RESULT_SAFE | EpicIds.FLAG_CAMERA_OK;
+		scene.flags = (scene.flags & ~local) | localFlags(scene.own);
+	}
+
+	/** A test scene of the local player ({@code /sinematik dampak}: FLAG_TEST skips the cooldowns, never the gates). */
+	public static @Nullable Scene testScene() {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.player == null) {
+			return null;
+		}
+		Scene scene = clientScene(EpicIds.TECH_ULTIMATE, minecraft.player, true);
+		scene.flags |= EpicIds.FLAG_TEST;
+		Scene made = scene;
+		made.at(400, () -> {
+			if (made.data == null) {
+				made.end(20);
+			}
+		});
+		return scene;
+	}
+
+	/** The seal glyph of an ultimate (its title card), for the marks of Phase 10. */
+	public static String seal(TechniqueSpec spec) {
+		return SceneCatalogPower.sealOf(spec.id(), spec.dewa() || spec.grade() == TechniqueGrade.DEWA);
+	}
+
 	/** True while any 7b scene owns the camera, the bars or a FULL card. */
 	public static boolean cinematicActive() {
 		return CinematicDirector.active() || Letterbox.amount() > 0.0F || TitleCard.fullInSafeBeat();
@@ -406,7 +474,7 @@ public final class EpicDirector {
 			if (EpicSound.busy()) {
 				EpicSound.restore();
 			}
-			if (EpicClock.slowed()) {
+			if (EpicClock.slowed() || EpicClock.frozen()) {
 				EpicClock.reset();
 			}
 			SkyDirector.tick();
