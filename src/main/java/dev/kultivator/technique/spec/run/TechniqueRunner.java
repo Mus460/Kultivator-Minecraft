@@ -605,7 +605,8 @@ public final class TechniqueRunner {
 	/** The refusals 3-6 of 22.2.6: known, rank, Dao, Dewa gate and prerequisites (null = castable). */
 	static @Nullable Component whyNotCastable(CultivationData data, TechniqueSpec spec) {
 		Component name = spec.displayName().copy().withColor(0xFFD54A);
-		if (!data.knows(spec.id())) {
+		// Phase 10b (DESIGN 29.3.1): a Titah decree is never learned; its own gates live in pusakalangit.Titah.whyNot
+		if (!data.knows(spec.id()) && !spec.titah()) {
 			return Component.translatable("kultivator.techniques.refuse.not_known", name);
 		}
 		Rank need = spec.minRank();

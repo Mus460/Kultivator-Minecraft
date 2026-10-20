@@ -39,6 +39,8 @@ public final class Net {
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.BindSync.TYPE, Payloads.BindSync.CODEC);
 		// Phase 10 (DESIGN 28.13.2): real debris, the molten surface and the closing ring of Mode Kehancuran jobs.
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.DampakDebris.TYPE, Payloads.DampakDebris.CODEC);
+		// Phase 10b (DESIGN 29.9 item 2): the Titah Langit menu data.
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.TitahSync.TYPE, Payloads.TitahSync.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Payloads.Action.TYPE, Payloads.Action.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Action.TYPE, (payload, context) -> handle(context.player(), payload));
@@ -103,6 +105,8 @@ public final class Net {
 			case Actions.ABADI -> dev.kultivator.abadi.Abadi.handleAction(player, action.text());
 			case Actions.PURBA -> dev.kultivator.purba.Purba.handleAction(player, action.text());
 			case Actions.BATIN -> dev.kultivator.batin.Batin.handleAction(player, action.text());
+			// Phase 10b (DESIGN 29.9 item 2).
+			case Actions.TITAH -> dev.kultivator.pusakalangit.PusakaLangit.handleAction(player, action);
 			default -> {
 			}
 		}

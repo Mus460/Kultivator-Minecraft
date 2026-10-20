@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:heaven_general",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.titah_first.description"
+    },
+    "icon": {
+      "id": "kultivator:heaven_decree_seal"
+    },
+    "title": {
+      "translate": "advancement.kultivator.titah_first.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

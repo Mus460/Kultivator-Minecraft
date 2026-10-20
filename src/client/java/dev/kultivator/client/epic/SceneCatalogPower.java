@@ -464,7 +464,9 @@ final class SceneCatalogPower {
 			u.duration = Math.max(0, duration);
 			u.slowmoDone = false;
 			boolean first = dewa ? !EpicSettings.seenThisSession(id) : !EpicSettings.seenEver(id);
-			if (first) {
+			if (film(spec)) {
+				// Phase 10b: the decree's own jade card comes from its EXTRA_TITAH beat or from the film's F3
+			} else if (first) {
 				full(s, 0, upper(spec.displayName()), null, seal, SEAL_RED, 60, card -> card.safeBeat(false));
 				if (s.own && CinematicDirector.mode() == EpicSettings.Camera.PENUH) {
 					Letterbox.flick(20);
@@ -510,7 +512,7 @@ final class SceneCatalogPower {
 			}
 			final Vec3 climaxAim = aim;
 			s.at(wait, () -> climaxLayers(s, id, caster, climaxAim));
-			if (dewa && motion) {
+			if (dewa && motion && !film(spec)) {
 				shotPenuh(s, 40 + wait, () -> Shots.pullback(4.0F, 14.0F, 2.0F, 8.0F, 2.0F), CinematicDirector.KIND_ULTIMATE);
 			}
 			// a lasting ultimate keeps its moment until its own end; others close 60 ticks after the climax
@@ -525,6 +527,15 @@ final class SceneCatalogPower {
 	private static boolean silentClimax(TechniqueSpec spec) {
 		dev.kultivator.technique.spec.dsl.Dampak dampak = spec.dampak();
 		return dampak != null && dampak.silence() > 0 && EpicSettings.silentImpact();
+	}
+
+	/**
+	 * Phase 10b (DESIGN 29.4): a Titah decree (ride FILM) directs its own camera and title card through {@code PusakaFilm}
+	 * (the F3 card, the F5 reveal), so the 7b ultimate adds no FULL card, pull-back or closing crane of its own.
+	 */
+	private static boolean film(TechniqueSpec spec) {
+		dev.kultivator.technique.spec.dsl.Dampak dampak = spec.dampak();
+		return dampak != null && dampak.ride() == dev.kultivator.technique.spec.dsl.Dampak.Ride.FILM;
 	}
 
 	/** Shared state of one ultimate scene: the aim, the fallback token and whether the end beat already ran. */
@@ -555,7 +566,7 @@ final class SceneCatalogPower {
 		u.ended = true;
 		boolean dewa = spec.dewa() || spec.grade() == TechniqueGrade.DEWA;
 		skyRelease(s, 0, 20, 60);
-		if (dewa && s.own && noEnemy(16.0D)) {
+		if (dewa && s.own && noEnemy(16.0D) && !film(spec)) {
 			shot(s, 4, () -> Shots.craneUp(3.0F, 2.0F, 8.0F, 10.0F, 0.0F, 30.0F, 2.5F), CinematicDirector.KIND_ULTIMATE, true);
 		}
 		if (spec.id().equals("cosmic_giant_form") && s.own && noEnemy(16.0D)) {
@@ -597,6 +608,11 @@ final class SceneCatalogPower {
 			case "time_spirit_domain" -> "时";
 			case "stellar_black_hole" -> "星";
 			case "heaven_trampling" -> "踏";
+			// Phase 10b Titah Langit (29.5): the decree glyphs (Tiang's mark ring carries 定, "to fix")
+			case "titah_pedang" -> "劍";
+			case "titah_tiang" -> "定";
+			case "titah_bintang" -> "斗";
+			case "titah_gunung" -> "山";
 			default -> dewa ? "神" : "仙";
 		};
 	}
@@ -622,6 +638,12 @@ final class SceneCatalogPower {
 			case "kunpeng_art" -> sky(s, 0, SkyDirector.Grade.SK_ICE, 0.4F, 0.0F, 20);
 			case "karma_domain" -> s.at(0, () -> SkyDirector.dao(0xE06030, 0.35F, 20, s.priority, s.pos, s.own, 1.0F));
 			case "time_spirit_domain" -> sky(s, 0, SkyDirector.Grade.SK_ASH, 0.6F, 0.3F, 20);
+			// Phase 10b (29.5): gold dusk under the Celestial Court, an ember sky, the night of the Dipper (presentation
+			// only, never the time of day), the gold of the jade seal
+			case "titah_pedang" -> sky(s, 0, SkyDirector.Grade.SK_DAWN, w, 0.1F, 20);
+			case "titah_tiang" -> sky(s, 0, SkyDirector.Grade.SK_RED, 0.4F, 0.25F, 20);
+			case "titah_bintang" -> sky(s, 0, SkyDirector.Grade.SK_STARS, 0.85F, 0.55F, 30);
+			case "titah_gunung" -> sky(s, 0, SkyDirector.Grade.SK_GOLD, 0.5F, 0.1F, 20);
 			default -> {
 			}
 		}

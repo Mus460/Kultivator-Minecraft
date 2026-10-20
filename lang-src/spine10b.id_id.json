@@ -1,0 +1,18 @@
+{
+  "item.kultivator.heaven_decree_seal": "Segel Titah Langit",
+  "block.kultivator.batu_pusaka": "Batu Pusaka",
+  "block.kultivator.urat_pusaka": "Urat Pusaka",
+  "entity.kultivator.titah_monument": "Pusaka Tertancap",
+  "kultivator.spine10b.config.titahEnabled": "titahEnabled: Segel Titah Langit dan keempat titahnya berfungsi.",
+  "kultivator.spine10b.config.titahVisualRadiusMax": "titahVisualRadiusMax (32-256): jari-jari visual terbesar sebuah titah.",
+  "kultivator.spine10b.config.titahDamageRadiusMax": "titahDamageRadiusMax (16-64): jari-jari luka terbesar satu evaluasi.",
+  "kultivator.spine10b.config.titahCarveRadiusMax": "titahCarveRadiusMax (8-48): jari-jari pahatan nyata terbesar di bawah Mode Kehancuran.",
+  "kultivator.spine10b.config.titahBlocksPerCast": "titahBlocksPerCast (1024-32768): blok yang boleh diubah satu titah di bawah Mode Kehancuran.",
+  "kultivator.spine10b.config.titahMonumentBlocks": "titahMonumentBlocks (0-256): blok satu monumen blok (0 = tidak ada).",
+  "kultivator.spine10b.config.titahMonumentDays": "titahMonumentDays (1-14): hari game sebuah pusaka tetap tertancap.",
+  "kultivator.spine10b.config.titahMonumentsPerPlayer": "titahMonumentsPerPlayer (1-8): pusaka tertancap yang boleh dimiliki satu pemain.",
+  "kultivator.spine10b.config.titahMonumentsPerWorld": "titahMonumentsPerWorld (1-32): pusaka tertancap di seluruh dunia.",
+  "kultivator.spine10b.config.titahRewardsPerDay": "titahRewardsPerDay (0-10): hadiah cabut yang boleh didapat satu pemain per hari game.",
+  "kultivator.spine10b.config.titahRange": "titahRange (64-192): jangkauan bidik segel.",
+  "kultivator.spine10b.config.titahUltimateMonuments": "titahUltimateMonuments: ultimate Dewa lain juga meninggalkan pusaka tertancap (tanpa hadiah)."
+}

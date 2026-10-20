@@ -198,7 +198,8 @@ public final class PlayerCaster extends Caster {
 	@Override
 	void finished(EndReason reason) {
 		TechniqueRunner.forgetCast(this);
-		if (parent != null || options.test() || TechniqueRunner.bypass(player)) {
+		if (parent != null || options.test() || TechniqueRunner.bypass(player) || spec.titah()) {
+			// Phase 10b (DESIGN 29.3.1): Titah decrees have no mastery (level fixed at 0)
 			return;
 		}
 		if (reason == EndReason.DONE || reason == EndReason.CANCELLED || reason == EndReason.REPLACED) {

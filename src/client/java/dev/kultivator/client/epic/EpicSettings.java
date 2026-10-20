@@ -61,6 +61,24 @@ public final class EpicSettings {
 	public static final String WORLD_FX = "epic_world_fx";
 	public static final String IMPACT_POWER = "epic_impact_power";
 
+	// Phase 10b Titah Langit (DESIGN 29.2.2, 29.4): the per-decree Film choice of the Titah Langit menu.
+	/** Prefix of the per-decree film keys: {@code titah_film_pedang}, {@code _tiang}, {@code _bintang}, {@code _gunung}. */
+	public static final String TITAH_FILM = "titah_film_";
+	/** The four decrees in the order of the server's {@code Titah.Skill} (ordinal = net id − 1200). */
+	public static final String[] TITAH_SKILLS = {"pedang", "tiang", "bintang", "gunung"};
+
+	/**
+	 * Film of one decree: Penuh (the film, default), Singkat (the 28.3 crane), Mati (no camera). The global camera Mati,
+	 * "Kurangi gerak" and "Perjalanan langit: Mati" always win over it (29.4).
+	 */
+	public enum TitahFilm {
+		PENUH, SINGKAT, MATI;
+
+		public String id() {
+			return name().toLowerCase(Locale.ROOT);
+		}
+	}
+
 	/** Perjalanan langit: Pertama (the first cast of each spec per session, default), Selalu, Mati. */
 	public enum SkyRide {
 		PERTAMA, SELALU, MATI;
@@ -302,6 +320,32 @@ public final class EpicSettings {
 		EffectQuality.put(IMPACT_POWER, new JsonPrimitive(best));
 	}
 
+	// ================================================================ Phase 10b (DESIGN 29.2.2)
+
+	/** The stored Film choice of decree {@code skill} (0 Pedang, 1 Tiang, 2 Bintang, 3 Gunung); Penuh by default. */
+	public static TitahFilm titahFilm(int skill) {
+		if (skill < 0 || skill >= TITAH_SKILLS.length) {
+			return TitahFilm.PENUH;
+		}
+		JsonElement value = EffectQuality.get(TITAH_FILM + TITAH_SKILLS[skill]);
+		if (value != null && value.isJsonPrimitive()) {
+			String id = value.getAsString();
+			for (TitahFilm mode : TitahFilm.values()) {
+				if (mode.id().equals(id)) {
+					return mode;
+				}
+			}
+		}
+		return TitahFilm.PENUH;
+	}
+
+	/** Stores the Film choice of decree {@code skill}. */
+	public static void setTitahFilm(int skill, TitahFilm mode) {
+		if (skill >= 0 && skill < TITAH_SKILLS.length) {
+			EffectQuality.put(TITAH_FILM + TITAH_SKILLS[skill], new JsonPrimitive(mode.id()));
+		}
+	}
+
 	private static Component skyRideText() {
 		return Component.translatable(D + "skyride", Component.translatable(D + "skyride." + skyRide().id()));
 	}
@@ -374,6 +418,9 @@ public final class EpicSettings {
 		for (String key : new String[]{CAMERA, LETTERBOX, CARDS, MUSIC, SLOWMO, GEOMETRY, SKY, VFX, RECORD, PACK_GEOMETRY, SKYRIDE, IMPACT_FRAMES,
 				SILENT_IMPACT, WORLD_FX, IMPACT_POWER}) {
 			EffectQuality.put(key, null);
+		}
+		for (String skill : TITAH_SKILLS) {
+			EffectQuality.put(TITAH_FILM + skill, null);
 		}
 	}
 

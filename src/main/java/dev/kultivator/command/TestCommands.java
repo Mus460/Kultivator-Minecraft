@@ -234,6 +234,8 @@ public final class TestCommands {
 		dev.kultivator.abadi.Abadi.addTestCommands(uji);
 		dev.kultivator.purba.Purba.addTestCommands(uji);
 		dev.kultivator.batin.Batin.addTestCommands(uji);
+		// Phase 10b (DESIGN 29.11): uji pusaka_langit ...
+		dev.kultivator.pusakalangit.TitahTests.addTestCommands(uji);
 		root.then(uji);
 	}
 

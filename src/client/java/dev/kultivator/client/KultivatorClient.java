@@ -53,6 +53,8 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.epic.EpicClient.init();
 		// Phase 10 Dampak Langit (DESIGN 28.14 M2): marks, sky rides, impact frames, the delayed boom, the world FX.
 		dev.kultivator.client.dampak.DampakClient.init();
+		// Phase 10b Titah Langit (DESIGN 29.9 item 7): the TitahSync cache, the jade-scroll menu, the film, TitahWorld (M3).
+		dev.kultivator.client.pusakalangit.TitahClient.init();
 		// Phase 7c Formasi Sekte (DESIGN 24.13 item 5).
 		dev.kultivator.client.formasi.FormasiClient.init();
 		// Phase 8 Jalan Dunia Kultivasi (DESIGN 25.2 item 18).
@@ -110,6 +112,8 @@ public class KultivatorClient implements ClientModInitializer {
 				dev.kultivator.client.dunia.DuniaClient.open(payload.arg());
 			} else if (payload.screen() == Payloads.OpenScreen.ABADI) {
 				dev.kultivator.client.dunia.DuniaClient.openAbadi(payload.arg());
+			} else if (payload.screen() == Payloads.OpenScreen.TITAH) {
+				dev.kultivator.client.pusakalangit.TitahClient.openScreen(payload.arg());
 			}
 		});
 

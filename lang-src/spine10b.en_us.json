@@ -1,0 +1,18 @@
+{
+  "item.kultivator.heaven_decree_seal": "Segel Titah Langit",
+  "block.kultivator.batu_pusaka": "Batu Pusaka",
+  "block.kultivator.urat_pusaka": "Urat Pusaka",
+  "entity.kultivator.titah_monument": "Planted Treasure",
+  "kultivator.spine10b.config.titahEnabled": "titahEnabled: the Segel Titah Langit and its four decrees work at all.",
+  "kultivator.spine10b.config.titahVisualRadiusMax": "titahVisualRadiusMax (32-256): the largest visual radius of a decree.",
+  "kultivator.spine10b.config.titahDamageRadiusMax": "titahDamageRadiusMax (16-64): the largest damage radius of one evaluation.",
+  "kultivator.spine10b.config.titahCarveRadiusMax": "titahCarveRadiusMax (8-48): the largest real carve radius under Mode Kehancuran.",
+  "kultivator.spine10b.config.titahBlocksPerCast": "titahBlocksPerCast (1024-32768): blocks one decree may change under Mode Kehancuran.",
+  "kultivator.spine10b.config.titahMonumentBlocks": "titahMonumentBlocks (0-256): blocks of one block monument (0 = none).",
+  "kultivator.spine10b.config.titahMonumentDays": "titahMonumentDays (1-14): game days a planted weapon stays.",
+  "kultivator.spine10b.config.titahMonumentsPerPlayer": "titahMonumentsPerPlayer (1-8): planted weapons one player may have.",
+  "kultivator.spine10b.config.titahMonumentsPerWorld": "titahMonumentsPerWorld (1-32): planted weapons in the whole world.",
+  "kultivator.spine10b.config.titahRewardsPerDay": "titahRewardsPerDay (0-10): pull-out rewards one player may get per game day.",
+  "kultivator.spine10b.config.titahRange": "titahRange (64-192): how far the seal aims.",
+  "kultivator.spine10b.config.titahUltimateMonuments": "titahUltimateMonuments: other Dewa ultimates also leave a planted weapon (no reward)."
+}

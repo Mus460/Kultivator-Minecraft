@@ -1482,6 +1482,11 @@ public abstract class Caster implements CastContext {
 	 */
 	private Vec3 dampakAim(dev.kultivator.technique.spec.dsl.Dampak dampak, Vec3 at, Vec3 to) {
 		Vec3 feet = caster.position();
+		if (spec.titah()) {
+			// Phase 10b (DESIGN 29.3.1): a Titah decree's own CAST carries the resolved crosshair point (≤ titahRange), every
+			// mark kind included; the sigil, the mark and the film are framed on it
+			return finite(to) ? to : feet;
+		}
 		if (dampak.mark() == dev.kultivator.technique.spec.dsl.Dampak.Mark.RING_ONLY) {
 			return feet;
 		}
@@ -1556,6 +1561,12 @@ public abstract class Caster implements CastContext {
 			if (dampak != null && dampak.sigilTrench() && dampakCastAim != null && dampakCastPos != null) {
 				// Phase 10 (DESIGN 28.9.3): the sigil's lines burn with the climax's shapes (Mode Kehancuran only)
 				destruction.sigil(dampakCastPos, dampakCastAim, (int) (seed ^ (seed >>> 32)));
+			}
+			if (dampak != null && dampak.monument() != null && !spec.titah() && !options.test()
+					&& caster instanceof net.minecraft.server.level.ServerPlayer owner) {
+				// Phase 10b (DESIGN 29.0): with the op's titahUltimateMonuments the sword ultimates leave a planted weapon too
+				dev.kultivator.pusakalangit.TitahMonuments.ultimateMonument(owner, dampak.monument(), dampak.monumentScale(),
+						dampakCastAim != null ? dampakCastAim : at);
 			}
 		}
 		if (twoDaoRgb >= 0 && aux == 0 && (flags & Payloads.TechFx.FLAG_VOLLEY) == 0 && phase != Phase.PHANTOM) {

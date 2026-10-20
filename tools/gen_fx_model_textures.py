@@ -345,6 +345,9 @@ def build_materials():
     m("mat_glow_white", "FFFFFF", "FFFFFF", "D8E0FF", "porcelain", seed=72)
     m("mat_glow_gold", "FFFFFF", "FFE88A", "F0B030", "porcelain", seed=73)
     m("mat_rope_gold", "FFF4B0", "E8B840", "7A5410", "straw", seed=74)
+    # Titah Langit (DESIGN 29): the white-gold steel of the Heaven-Splitting Sword, the star crystal's amethyst
+    m("mat_heaven_steel", "FFFFFF", "F6F0DC", "B89A58", "blade", seed=120)
+    m("mat_amethyst", "FAF0FF", "B57CFF", "4A1A8A", "ice", alpha=225, seed=121)
     # eight Dao energies (qi palms, glyph rings, fists): translucent, glowing
     for dao, (c, b, r) in DAO_RAMP.items():
         m("mat_qi_" + dao, c, b, r, "energy", alpha=170, seed=80 + len(dao))
@@ -420,6 +423,12 @@ GLYPHS = {
     "wan": [(8, 2, 8, 14), (2, 8, 14, 8), (8, 2, 3, 2), (2, 8, 2, 13), (8, 14, 13, 14), (14, 8, 14, 3)],
     "tian": [(3, 2.6, 13, 2.6), (1.4, 7.2, 14.6, 7.2), (8, 2.6, 8, 7.2), (8, 7.2, 2, 15), (8, 7.2, 14, 15)],
     "xian": [(5.4, 1, 2, 7), (4, 4.4, 4, 15.2), (11, 2, 11, 14), (7, 7, 7, 14), (7, 14, 15, 14), (15, 14, 15, 7)],
+    # Titah Langit (DESIGN 29): 山 (the Mountain-Moving seal face), 定 (the sea-stabilising pillar), 敕 (by decree)
+    "shan": [(8, 1.6, 8, 13.6), (2.6, 5.8, 2.6, 13.6), (13.4, 5.8, 13.4, 13.6), (2.6, 13.6, 13.4, 13.6)],
+    "ding": [(8, 0.6, 8, 2.4), (2, 3.4, 14, 3.4), (2, 3.4, 2, 5.6), (14, 3.4, 13.4, 5.6), (4, 7.2, 12, 7.2), (8, 7.2, 8, 12.6),
+             (8, 10, 11.6, 10), (5, 9.4, 2.8, 14.6), (5.4, 12.2, 14.6, 14.8)],
+    "chi": [(1, 3.6, 8, 3.6), (4.5, 0.8, 4.5, 15.2), (2, 5.8, 7, 5.8), (2, 5.8, 2, 9.6), (7, 5.8, 7, 9.6), (2, 9.6, 7, 9.6),
+            (4.5, 10, 1.4, 14), (4.5, 10, 7.6, 13.4), (10.6, 0.8, 9.2, 5.6), (9.6, 3.8, 15, 3.8), (13.6, 3.8, 9, 15.2), (10.2, 8, 15, 15)],
 }
 
 
@@ -527,6 +536,9 @@ def build_sheets():
     glyph_plate("glyph_wan", "wan", "FFE88A", "FFFFFF", "F0B020")
     glyph_plate("glyph_tian", "tian", "F0C080", "4A2A10", "E8B840")
     glyph_plate("glyph_xian", "xian", "FFFFFF", "C89A20", "E8D080")
+    glyph_plate("glyph_shan", "shan", "D8FFEA", "8A1A10", "E8B840")
+    glyph_plate("glyph_ding", "ding", "2A2A33", "FFD54A", "E8B840")
+    glyph_plate("glyph_chi", "chi", "FFF6D8", "B0201A", "E8B840")
 
     # glowing glyph faces (thunder and space symbols): the glyph bright on a dark field
     for name, glyph, field, ink in (("rune_lei_glow", "lei", "2A1060", "F4E8FF"), ("rune_space_glow", "tian", "140830", "C8B8FF")):
@@ -1791,6 +1803,75 @@ def build_treasures():
     ms2.cbox((8, 8, 8), (7.6, 7.6, 7.6), "mat_qi_gold", glow=12, rot={"y": 45.0, "x": 35.0, "origin": [8, 8, 8]})
 
 
+# ---------------------------------------------------------------------------------------------- Titah Langit (DESIGN 29)
+
+def build_titah():
+    """The four weapons of the Titah Langit decrees (DESIGN 29.4-29.6): all our own cuboid designs."""
+    FULL_SHEETS.update({"glyph_shan", "glyph_ding", "glyph_chi"})
+    # Pedang Pemisah Langit: a white-gold jian of heaven's decree, grip at the anchor, blade up (planted point-first by the
+    # monument renderer); 敕 plates on the guard, cloud flourishes, a gold halo ring above the guard
+    hs = sword("heaven_splitting_sword", "mat_heaven_steel", "mat_gold", grip_tex="mat_cloth_white", w0=5.0, w1=2.8, length=30.5,
+               guard_w=13.0, edge="mat_glow_white", ridge="mat_glow_gold", runes="mat_glow_gold", gem="mat_jade", thick=1.0, tassel=True)
+    for side in (-1, 1):
+        x = 8 + side * 4.6
+        hs.cbox((x, 12.8, 8), (3.2, 1.0, 1.4), "mat_gold", glow=8, rot={"z": side * -32.0, "origin": [x, 12.8, 8]})
+        hs.cbox((x + side * 1.6, 13.9, 8), (1.6, 1.6, 1.2), "mat_gold", glow=8, rot={"z": 45.0, "origin": [x + side * 1.6, 13.9, 8]})
+    hs.box([6.6, 9.9, 6.55], [9.4, 12.3, 6.75], "glyph_chi", glow=12, full=("north", "south"))
+    hs.box([6.6, 9.9, 9.25], [9.4, 12.3, 9.45], "glyph_chi", glow=12, full=("north", "south"))
+    ring(hs, (8, 14.2, 8), 3.6, 6, 0.45, 0.55, "y", "mat_glow_gold", glow=15)
+
+    # Tiang Penenang Samudra: the iron pillar of the East Sea, gold hoops at both ends, 定 panels round its middle, glowing
+    # rune bands and seams; the anchor is its middle (it spans y -16..32: 3 blocks at scale 1)
+    dp = model("dinghai_pillar")
+    oct_prism(dp, (8, 8.0, 8), 1.8, 44.0, "y", "mat_iron_black")
+    oct_prism(dp, (8, 30.25, 8), 2.4, 3.5, "y", "mat_gold", glow=10)
+    oct_prism(dp, (8, -14.25, 8), 2.4, 3.5, "y", "mat_gold", glow=10)
+    oct_prism(dp, (8, 26.4, 8), 2.1, 0.8, "y", "mat_gold", glow=12)
+    oct_prism(dp, (8, -10.4, 8), 2.1, 0.8, "y", "mat_gold", glow=12)
+    oct_prism(dp, (8, 12.6, 8), 1.95, 1.2, "y", "rune_band", glow=12)
+    oct_prism(dp, (8, 3.4, 8), 1.95, 1.2, "y", "rune_band", glow=12)
+    dp.box([6.3, 5.0, 6.0], [9.7, 11.0, 6.3], "glyph_ding", glow=13, full=("north",))
+    dp.box([6.3, 5.0, 9.7], [9.7, 11.0, 10.0], "glyph_ding", glow=13, full=("south",))
+    dp.box([6.0, 5.0, 6.3], [6.3, 11.0, 9.7], "glyph_ding", glow=13, full=("west",))
+    dp.box([9.7, 5.0, 6.3], [10.0, 11.0, 9.7], "glyph_ding", glow=13, full=("east",))
+    for a in (0.0, 90.0, 180.0, 270.0):
+        r = math.radians(a + 22.5)
+        px, pz = 8 + math.cos(r) * 1.86, 8 + math.sin(r) * 1.86
+        dp.box([px - 0.12, -9.6, pz - 0.12], [px + 0.12, 25.6, pz + 0.12], "mat_glow_gold", glow=15)
+
+    # star_core: a fallen star of the Northern Dipper, a white-hot heart, six star spikes, four amethyst shards and a violet
+    # halo; centred on the anchor (grounded crystals stand it on its lowest spike)
+    sc = model("star_core")
+    sphere(sc, (8, 8, 8), 2.6, "mat_glow_white", glow=15)
+    sc.cbox((8, 8, 8), (4.4, 4.4, 4.4), "mat_star", glow=15, rot={"x": 45.0, "y": 45.0, "origin": [8, 8, 8]})
+    for size in ((1.2, 1.2, 14.0), (14.0, 1.2, 1.2), (1.2, 15.0, 1.2)):
+        sc.cbox((8, 8, 8), size, "mat_star", glow=14)
+    sc.cbox((8, 8, 8), (1.0, 1.0, 11.0), "mat_star", glow=14, rot={"y": 45.0, "origin": [8, 8, 8]})
+    sc.cbox((8, 8, 8), (1.0, 1.0, 11.0), "mat_star", glow=14, rot={"y": -45.0, "origin": [8, 8, 8]})
+    sc.cbox((8, 8, 8), (1.0, 11.0, 1.0), "mat_star", glow=14, rot={"z": 45.0, "origin": [8, 8, 8]})
+    for i, (ax, deg) in enumerate((("x", 30.0), ("x", -30.0), ("z", 30.0), ("z", -30.0))):
+        off = 3.6 if i % 2 == 0 else -3.6
+        c = (8 + (off if ax == "z" else 0.0), 10.6, 8 + (off if ax == "x" else 0.0))
+        sc.cbox(c, (1.8, 6.0, 1.8), "mat_amethyst", glow=12, rot={ax: deg, "origin": [c[0], 8.0, c[2]]})
+    ring(sc, (8, 8, 8), 6.4, 8, 0.4, 0.5, "y", "mat_qi_lightning", glow=15)
+
+    # yishan_seal: the Mountain-Moving seal, square jade with the 山 face below, a three-peak mountain knob, gold cord and a
+    # red tassel; it stands on its face (base at the anchor)
+    ys = model("yishan_seal")
+    ys.box([1.0, 8.0, 1.0], [15.0, 14.0, 15.0], "mat_jade", faces={"down": "glyph_shan"}, full=("down",), glow=4)
+    ys.box([0.6, 8.0, 0.6], [15.4, 9.0, 15.4], "mat_gold", glow=8, skip=("down",))
+    ys.box([0.8, 12.2, 0.8], [15.2, 13.0, 15.2], "rune_band", glow=12, skip=("down",))
+    taper(ys, (8, 0, 8), 14.0, 26.0, 7.0, 1.4, 6.0, 1.4, 4, "mat_jade", glow=3)
+    taper(ys, (4.4, 0, 8.6), 14.0, 21.0, 4.2, 1.0, 4.0, 1.0, 3, "mat_jade", glow=3)
+    taper(ys, (11.6, 0, 7.4), 14.0, 22.0, 4.4, 1.0, 4.2, 1.0, 3, "mat_jade", glow=3)
+    ys.cbox((8, 25.6, 8), (1.8, 1.2, 1.8), "mat_white_stone", glow=6)
+    ys.cbox((4.4, 20.6, 8.6), (1.4, 0.9, 1.4), "mat_white_stone", glow=6)
+    ys.cbox((11.6, 21.6, 7.4), (1.4, 0.9, 1.4), "mat_white_stone", glow=6)
+    ring(ys, (8, 14.6, 8), 4.9, 8, 0.6, 0.8, "y", "mat_rope_gold", glow=6)
+    ys.box([12.6, 9.6, 12.6], [13.2, 14.4, 13.2], "mat_cloth_red")
+    ys.cbox((12.9, 9.4, 12.9), (1.2, 1.6, 1.2), "mat_cloth_red")
+
+
 ALIASES = {}  # id -> target model id
 
 
@@ -1849,6 +1930,7 @@ def main():
     build_beasts()
     build_forms()
     build_treasures()
+    build_titah()
 
     os.makedirs(TEX_DIR, exist_ok=True)
     used = set()

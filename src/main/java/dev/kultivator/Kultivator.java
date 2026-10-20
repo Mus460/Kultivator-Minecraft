@@ -132,6 +132,8 @@ public class Kultivator implements ModInitializer {
 		dev.kultivator.abadi.Abadi.init();
 		dev.kultivator.purba.Purba.init();
 		dev.kultivator.batin.Batin.init();
+		// Phase 10b: Pusaka Langit / Titah Langit (DESIGN 29.9): the seal, the monument blocks and entity, the saved registry.
+		dev.kultivator.pusakalangit.PusakaLangit.init();
 		// After every module registered its items.
 		ModItems.init();
 		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its

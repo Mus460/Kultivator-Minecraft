@@ -43,7 +43,9 @@ public enum Pose {
 	PRAY(Swing.NONE, 0),
 	HOLD_ITEM_UP(Swing.NONE, 0),
 	GATE_FLEX(Swing.NONE, 0),
-	FLAME_CUP(Swing.NONE, 0);
+	FLAME_CUP(Swing.NONE, 0),
+	/** Phase 10b (DESIGN 29.5.2): the overhead javelin throw of Tiang Penenang Samudra (the pillar flies into the sky). */
+	JAVELIN_THROW(Swing.WHACK, 8);
 
 	/** The vanilla hand swing a pose sends with its cast ({@code LivingEntity.swing(hand, SwingAnimation, true)}). */
 	public enum Swing { NONE, WHACK, STAB }

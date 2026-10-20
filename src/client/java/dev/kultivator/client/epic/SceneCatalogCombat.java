@@ -322,11 +322,31 @@ final class SceneCatalogCombat {
 					stamp(s, delay, upper(art.displayName()), "滅", SEAL_RED);
 				}
 			}
+			// Phase 10b Titah Langit (DESIGN 29.9 item 3): a = the decree (0 Pedang, 1 Tiang, 2 Bintang, 3 Gunung), b =
+			// TITAH_CARD the decree's jade title card at the cast (unless the own film shows it in F3), TITAH_PULL the owner
+			// drew the weapon out of the crater and it returns to heaven. Cards, a pillar and a ring only, never a camera
+			// shot (23.1).
+			case EpicIds.EXTRA_TITAH -> {
+				int skill = Math.max(0, Math.min(3, s.a));
+				if (s.b == EpicIds.TITAH_PULL) {
+					s.add(new PillarRenderer(delay, 50, at, 48.0F, 0xFFF4D0, 0.6F).rise(12));
+					s.add(new RingRenderer(delay, 36, at, 0.5F, 6.0F, 1.0F, 12.0F, GOLD, 0.6F));
+					stamp(s, delay, Component.translatable("kultivator.titah_client.momen.pull"), "歸", 0xC8A030);
+				} else if (!dev.kultivator.client.pusakalangit.cinema.PusakaFilm.cardPlanned()) {
+					dev.kultivator.client.pusakalangit.cinema.PusakaFilm.noteCard(skill);
+					full(s, delay, upper(dev.kultivator.client.pusakalangit.TitahClient.decreeName(skill)),
+							() -> Component.translatable("kultivator.titah_client.film.sub"), TITAH_GLYPHS[skill], 0x2E8963, 60,
+							card -> card.goldRim());
+				}
+			}
 			default -> {
 			}
 		}
 		s.end(delay + 140);
 	}
+
+	/** The decree glyphs of Titah Langit (Phase 10b): sword, pillar, dipper, mountain. */
+	private static final String[] TITAH_GLYPHS = {"劍", "柱", "斗", "山"};
 
 	/** The shared look of a disciple's big art: two expanding rings, a pillar, a short flash and a brief sky grade. */
 	private static void discipleBlast(Scene s, int delay, int rgb, float radius, SkyDirector.Grade grade) {

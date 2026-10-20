@@ -229,6 +229,32 @@ public final class KultivatorConfig {
 	/** Chance that an offended rival bidder sends a pursuit (0-1). */
 	public double auctionPursuitChance = 0.35D;
 
+	// ---- phase 10b: Pusaka Langit / Titah Langit (DESIGN 29.3.2)
+	/** The Segel Titah Langit and its four decrees work at all. */
+	public boolean titahEnabled = true;
+	/** Largest visual radius of a decree in blocks (32-256); clients also stay inside their render distance. */
+	public int titahVisualRadiusMax = 128;
+	/** Largest damage radius of one evaluation (16-64; 40 = the Dewa WAVE/DOMAIN cap). */
+	public int titahDamageRadiusMax = 40;
+	/** Largest real carve radius under Mode Kehancuran (8-48). */
+	public int titahCarveRadiusMax = 24;
+	/** Blocks one decree may change under Mode Kehancuran (1024-32768), at kehancuranBlocksPerTick. */
+	public int titahBlocksPerCast = 8192;
+	/** Blocks of one block monument (Batu Pusaka, Urat Pusaka) under Mode Kehancuran (0-256; 0 = none). */
+	public int titahMonumentBlocks = 96;
+	/** In-game days a planted weapon stays (1-14). */
+	public int titahMonumentDays = 3;
+	/** Planted weapons one player may have (1-8); a new one beyond it sends the oldest back to heaven. */
+	public int titahMonumentsPerPlayer = 3;
+	/** Planted weapons in the whole world (1-32). */
+	public int titahMonumentsPerWorld = 12;
+	/** Pull-out rewards one player may get per game day (0-10). */
+	public int titahRewardsPerDay = 3;
+	/** How far the seal aims (64-192). */
+	public int titahRange = 128;
+	/** The other Dewa ultimates also leave a planted weapon entity (default false, never a reward). */
+	public boolean titahUltimateMonuments = false;
+
 	public static KultivatorConfig get() {
 		return instance;
 	}
@@ -320,6 +346,17 @@ public final class KultivatorConfig {
 		heavenlyWrathDays = clamp(heavenlyWrathDays, 3, 15);
 		innerWorldCalamityDays = innerWorldCalamityDays <= 0 ? 0 : clamp(innerWorldCalamityDays, 3, 15);
 		auctionPursuitChance = clamp(auctionPursuitChance, 0.0D, 1.0D, 0.35D);
+		// Phase 10b (DESIGN 29.3.2).
+		titahVisualRadiusMax = clamp(titahVisualRadiusMax, 32, 256);
+		titahDamageRadiusMax = clamp(titahDamageRadiusMax, 16, 64);
+		titahCarveRadiusMax = clamp(titahCarveRadiusMax, 8, 48);
+		titahBlocksPerCast = clamp(titahBlocksPerCast, 1024, 32768);
+		titahMonumentBlocks = clamp(titahMonumentBlocks, 0, 256);
+		titahMonumentDays = clamp(titahMonumentDays, 1, 14);
+		titahMonumentsPerPlayer = clamp(titahMonumentsPerPlayer, 1, 8);
+		titahMonumentsPerWorld = clamp(titahMonumentsPerWorld, 1, 32);
+		titahRewardsPerDay = clamp(titahRewardsPerDay, 0, 10);
+		titahRange = clamp(titahRange, 64, 192);
 	}
 
 	private static int clamp(int value, int min, int max) {

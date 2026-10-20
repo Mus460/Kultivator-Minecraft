@@ -17,7 +17,12 @@ public final class Shots {
 		CRANE_UP(100), CRANE_DOWN(80), ORBIT(120), PUSH(80), PULLBACK(100), SKYPAN(70), LOWHERO(60), OTS(50), TWO_SHOT(80), STATIC(100),
 		FLYOVER(160), KILLCAM(80),
 		/** Phase 10 (DESIGN 28.3): one world-anchored segment of Perjalanan Langit (a ceremony, 48 b reach). */
-		SKY_RIDE(80);
+		SKY_RIDE(80),
+		/**
+		 * Phase 10b (DESIGN 29.4): one world-anchored segment of Film Pusaka. The per-segment maximum stays 80 ticks; only
+		 * the whole film (several validated segments joined by masked cuts) may run 240.
+		 */
+		PUSAKA_FILM(80);
 
 		final int max;
 
@@ -66,7 +71,7 @@ public final class Shots {
 		public boolean cut;
 		/** Ticks the last pose is held after the path ends (R3 waits for a late climax), added after validation. */
 		public int hold;
-		/** The look target at the end of a SKY_RIDE segment ({@code look} is the start). */
+		/** The look target at the end of a SKY_RIDE or PUSAKA_FILM segment ({@code look} is the start). */
 		@Nullable Vec3 lookEnd;
 
 		Shot(Type type, float seconds) {
@@ -218,7 +223,7 @@ public final class Shots {
 					py = center.y + h0;
 					pz = center.z + Math.cos(a) * r;
 				}
-				case SKY_RIDE -> {
+				case SKY_RIDE, PUSAKA_FILM -> {
 					Vec3 a = world != null ? world : feet;
 					Vec3 b = second != null ? second : a;
 					px = a.x + (b.x - a.x) * t;
@@ -438,6 +443,21 @@ public final class Shots {
 	 */
 	public static Shot skyRide(Vec3 from, Vec3 to, Vec3 look0, Vec3 look1, int ticks) {
 		Shot shot = new Shot(Type.SKY_RIDE, Math.max(10, ticks) / 20.0F);
+		shot.world = from;
+		shot.second = to;
+		shot.look = look0;
+		shot.lookEnd = look1;
+		shot.ceremony = true;
+		return shot;
+	}
+
+	/**
+	 * Phase 10b (DESIGN 29.4): one segment of Film Pusaka, the same straight world-anchored flight as {@link #skyRide}
+	 * (from {@code from} to {@code to}, the look from {@code look0} to {@code look1}) but of type {@link Type#PUSAKA_FILM}:
+	 * at most 80 ticks, validated against the speed caps like every shot. A ceremony (48 b reach).
+	 */
+	public static Shot pusakaFilm(Vec3 from, Vec3 to, Vec3 look0, Vec3 look1, int ticks) {
+		Shot shot = new Shot(Type.PUSAKA_FILM, Math.max(10, Math.min(Type.PUSAKA_FILM.max, ticks)) / 20.0F);
 		shot.world = from;
 		shot.second = to;
 		shot.look = look0;

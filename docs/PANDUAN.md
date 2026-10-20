@@ -101,6 +101,8 @@ bulat di dalam game.
     Purba, Bencana Bintang dan Murka Langit, Dunia Batin, Jurus Ciptaan, Lelang, [perintah](#5612-perintah)
 57. [**Dampak Langit (Fase 10)**](#57-dampak-langit-fase-10): Tanda Langit, Perjalanan Langit, Bingkai Dampak,
     Dampak Sunyi, puing, Kawah Lebur, Sigil Bumi, monumen, [perintah uji](#574-perintah-uji-op)
+58. [**Pusaka Langit (Fase 10b)**](#58-pusaka-langit-fase-10b): Segel Titah Langit, empat titah, menu dan penggeser,
+    Film Pusaka, pusaka tertancap dan alas blok, [perintah uji](#589-perintah-uji)
 
 ---
 
@@ -7603,3 +7605,283 @@ model monumen yang tidak ada).
   Dampak Sunyi di sana hanya menambah dentum rendah dari client.
 * Baris Sumber baru untuk Biduk Utara, Luo Shu, Kun-Peng Zhuangzi dan Perjalanan ke Barat bab 7 bertanda
   `[lore verify]` (belum dicek ke sumbernya).
+
+## 58. Pusaka Langit (Fase 10b)
+
+Fase 10b memberi Dewa Abadi sebuah pusaka baru, **Segel Titah Langit**, yang memanggil empat **titah** dari langit ke
+titik crosshair. Setiap titah punya tanda di sasaran, film kamera yang naik ke langit lalu turun bersama senjatanya,
+dampak sunyi lalu dentuman, bingkai layar, gelombang kejut, dan bekas yang tertinggal: pedang atau tiang yang tetap
+tertancap, kristal bintang, atau lubang berundak. Idenya berasal dari cara sebuah mod senjata populer menampilkan
+serangan langitnya; **hanya idenya** yang dipakai, diceritakan ulang dengan gaya kultivasi. Tidak ada kode, tekstur,
+model atau suara yang disalin.
+
+> **Status:** Fase 10b sudah dikompilasi tetapi **belum diuji di game**.
+>
+> **Keamanan blok:** tanpa Mode Kehancuran **semua titah hanya visual**: kawah, parit, sel terangkat dan lubang hanya
+> tampilan di komputermu. Blok asli hanya berubah lewat `WorldBreaker`, hanya bila Mode Kehancuran milikmu menyala
+> **dan** "Hancurkan tanah" = Ikut, dengan batas, zona terlindung dan Pulihkan yang sama seperti biasa. Tidak ada
+> `LightningBolt`, cuaca, waktu atau tick-rate yang berubah (langit malam Tujuh Bintang hanya warna tampilan).
+
+### 58.1 Mendapatkan Segel Titah Langit
+
+| Cara | Keterangan |
+|---|---|
+| Mengalahkan **Panglima Langit** pertama kali | segel jatuh dari tangannya, sekali per pemain (lihat Murka Langit, bab 56) |
+| Meracik (tanpa pola) | 6 Pecahan Segel Langit (`heaven_seal_shard`) + 2 Batu Asal Abadi + 1 Giok Segel Jiwa (`soul_seal_jade`) |
+
+* Segel tidak bisa ditumpuk, langka (ungu) dan tahan api.
+* Segel **mengikat diri** ke pemakai pertamanya. Pemain lain mendapat pesan "Segel ini sudah mengenali tuannya."
+* Membuat segel kedua tidak memberi apa-apa: jeda, pengaturan dan batas monumen tersimpan **pada pemain**, bukan pada
+  segel.
+* Tooltip menunjukkan pemilik, titah yang dipilih dan baris Sumber. Sisa jeda dilihat di menu.
+
+### 58.2 Cara memakai
+
+| Masukan | Fungsi |
+|---|---|
+| **Klik kanan** dengan segel | merapal titah yang dipilih ke titik crosshair (jangkauan 128 blok) |
+| **Jongkok + klik kanan** | membuka menu **Titah Langit** (gulungan giok) |
+| `/kultivasi titah` | membuka menu tanpa memegang segel (segel harus ada di inventaris) |
+| `/kultivasi titah daftar` | daftar pusaka tertancap milikmu: koordinat, sisa hari, jumlah blok |
+
+**Syarat:**
+
+| | Nilai |
+|---|---|
+| Memakai segel | ranah **Dewa Abadi** |
+| Pedang / Tiang / Bintang / Gunung | Dewa Abadi Awal / Tengah / Akhir / Puncak |
+| Kekuatan maksimum | Awal ×3, Tengah ×5, Akhir ×7, Puncak atau ★27+ ×10 |
+| Qi | 85 % dari Qi maksimum |
+| Jeda | Pedang 10 menit, Tiang 10 menit, Bintang 15 menit, Gunung 15 menit, dikali √Kekuatan (×10 → ×3,16); jeda segel bersama 60 detik; ikut jeda pamungkas bersama (20 detik) |
+| Ditolak (tanpa biaya) | saat duel atau tanding, turnamen, terobosan, ujian iblis hati, di Alam Rahasia, saat teknik diblokir, atau saat titahmu yang lain masih berjalan |
+
+Titah tidak dipelajari, tidak masuk slot teknik, tidak punya penguasaan dan tidak bisa diajarkan ke murid. Bila kamu mati,
+pindah dimensi atau keluar sebelum klimaks, titah batal: tanpa serangan, Qi tetap terpakai, jeda dipotong separuh.
+
+### 58.3 Empat titah
+
+**Pedang Pemisah Langit** (劍, Dewa Abadi Awal). Garis putih-emas di sepanjang bidikan dan pilar cahaya mengunci
+sasaran. Gerbang emas terbuka di awan, pedang raksasa muncul lalu jatuh dengan ujung lebih dulu menyusuri pilar.
+Mendarat dalam sunyi, layar berkilat putih lalu merah, dan **tanah terbelah ke dua arah** sepanjang bidikan. Pedang tetap
+tertancap di kawah dan berdengung pelan.
+*Kerusakan:* ledakan r 10 = 12 × P plus pingsan 1 detik; belahan tanah = 16 × P (tiap musuh sekali).
+*Dengan Mode Kehancuran:* mangkuk r 6, dua celah sepanjang bidikan, cincin pengikis, palet pedang, dan alas
+**Penyangga Pedang**.
+*Sumber:* Pangu memisahkan langit dan bumi (*Sanwu Liji*); pedang dan Istana Langit adalah rancangan permainan.
+
+**Tiang Penenang Samudra** (柱, Dewa Abadi Tengah). Kamu melempar tiang besi lurus ke langit. Di film, tiang itu tumbuh
+di lautan awan dan gelang emasnya menyala; orang lain melihat bintang merah di atas. Tiang turun sebagai garis putih
+panas, mendarat **tanpa suara**, dan dentumannya menyusul. Cincin kejut merah bara meratakan tanah menjadi kawah lebur;
+tiang tetap tegak di tengahnya dan mendingin selama semenit.
+*Kerusakan:* inti r 6 = 18 × P plus terbakar 6 detik; gelombang perata = 10 × P plus dorongan (tidak pernah ke pemain).
+*Dengan Mode Kehancuran:* mangkuk sebesar jari-jari pahat, bukit di atas titik dampak diratakan, dedaunan tersapu,
+palet api (magma tidak pernah dalam 6 blok darimu atau di bawah pemain), dan alas **Alas Penenang**.
+*Sumber:* *Perjalanan ke Barat* bab 3, besi penetap dasar Sungai Langit dan pengukur kedalaman Yu Agung (Ruyi Jingu Bang).
+
+**Tujuh Bintang Biduk Utara** (斗, Dewa Abadi Akhir). Langit menjadi biru malam (hanya tampilan). Biduk Utara digambar di
+tanah, simpul demi simpul. Lalu ketujuh bintang jatuh berurutan dari Tianshu sampai Yaoguang, masing-masing
+menumbuhkan **kristal bintang** di tempat jatuhnya. Saat klimaks setiap garis di antaranya **menyala menjadi parit
+cahaya**. Tidak ada objek yang tertinggal; kristalnya hanya tampilan (120 detik, Minimal 60 detik).
+*Kerusakan:* tiap bintang r 8 = 6 × P (satu musuh paling banyak kena 3 bintang); parit menyala 1 × P per detik selama 5
+detik.
+*Dengan Mode Kehancuran:* tujuh lubang kecil di titik bintang dan enam parit di sepanjang garis, palet petir.
+*Sumber:* Beidou dan Guan Lu dalam *Soushen Ji* (Biduk Utara mengatur kematian), langkah Biduk mazhab Shangqing.
+
+**Titah Pemindah Gunung** (山, Dewa Abadi Puncak). Segel giok persegi naik dari tanganmu. **Kisi cahaya** memotong
+tanah di bawahnya menjadi petak, bayangan segel membesar, lalu segel itu mencap tanah. Setiap musuh di dalam persegi
+terangkat ke udara, petak-petak tanah **dicabut dan dibawa berputar ke langit**, lalu musuh dibanting ke bawah. Segel
+kembali ke langit; tidak ada pusaka yang tertinggal.
+*Kerusakan:* bantingan = 20 × P plus Lemah II 5 detik (musuh melayang 1,5 detik sebelumnya).
+*Dengan Mode Kehancuran:* **lubang berundak** persegi 3-5 teras dengan tepi bercahaya ungu-emas 30 detik, palet tanah.
+*Sumber:* *Liezi*, bab Tang Wen: dua putra keluarga Kua'e memikul gunung pergi; raksasa, segel dan kisi adalah
+rancangan permainan.
+
+Kerusakan hanya mengenai makhluk yang bermusuhan denganmu (tidak pernah murid, hewan jinak, penduduk desa atau pemain
+yang tidak bermusuhan). Satu sasaran tidak pernah menerima lebih dari 28 × P per titah. Kekuatan **hanya mengubah
+ukuran**, tidak pernah luka per musuh; jangkauan luka tetap dibatasi 40 blok.
+
+### 58.4 Menu Titah Langit dan penggeser
+
+Kolom kiri: empat kartu segel (terkunci atau siap, cincin jeda, glif 劍 柱 斗 山). Klik kartu untuk memilihnya; tombol
+**Pilih** memasangnya pada segel. Panel kanan untuk titah yang dipilih:
+
+| Baris | Pilihan (bawaan tebal) | Artinya |
+|---|---|---|
+| Kekuatan (ukuran) | 0,1 / 0,25 / 0,5 / 0,75 / **1** / 1,5 / 2 / 3 / 4 / 5 / 7 / 10 | ukuran tanda, cincin, sigil dan kawah. Di atas batas ranahmu tampak kelabu dengan segel merah. Makin besar, makin lama jedanya |
+| Kerusakan | 0-**100** % (langkah 10) | 0 % = tontonan murni: tanpa luka, tanpa efek kendali |
+| Kecepatan (termasuk film) | 0,3 / 0,5 / 0,75 / **1** / 1,5 / 2 / 3 | seberapa cepat langit menjawab; jeda sebelum klimaks 1,5-15 detik. Kamera tidak pernah bergerak melewati batas kecepatannya |
+| Hancurkan tanah | **Ikut** / Tidak | hanya tampak selama Mode Kehancuran milikmu nyala |
+| Tinggalkan pusaka | **Ya** / Tidak | Pedang dan Tiang: senjata tetap tertancap sebagai objek |
+| Film | **Penuh** / Singkat / Mati | disimpan di komputermu (`config/kultivator-client.json`) |
+
+Di bawahnya ada **baris ringkasan** dari server, misalnya "Jari-jari ≈ 96 b · luka ≤ 40 b · ≤ 8.192 blok · jeda 16 mnt ·
+qi 85 %", dan baris petunjuk "Backspace: lewati film · Gerak: hentikan kamera". Tombol **Bawaan** mengembalikan titah itu
+ke bawaan; **Peringatan cahaya** membuka layar peringatan fotosensitif. Server selalu merapikan nilai yang dikirim (ke
+langkah terdekat dan ke batas ranahmu).
+
+### 58.5 Film Pusaka
+
+Dengan Film **Penuh** dan Kamera sinematik **Penuh**, titahmu sendiri diputar sebagai film pendek (paling lama 12 detik
+pada Kecepatan 1):
+
+1. **Tanda:** dari balik bahu ke tanda di sasaran.
+2. **Naik:** kamera naik di samping pilar cahaya, menembus awan.
+3. **Istana:** tinggi di atas sasaran, pemandangan langit titah itu: gerbang Istana Langit (Pedang), laut gelap di bawah
+   awan dengan tiang yang tumbuh (Tiang), langit berbintang dengan Biduk tersambung (Bintang), dua siluet raksasa Kua'e
+   dengan segel di antaranya (Gunung), dan kartu judul giok titah itu.
+4. **Turun:** di belakang dan di atas senjata yang jatuh, garis kecepatan, FOV sedikit menyempit.
+5. **Dampak:** potong di bawah bingkai dampak; sunyi, lalu dentuman.
+6. **Akibat:** bila masih aman, crane rendah mengitari pusaka atau lubang, lalu kembali ke mata.
+
+* Tiap potongan kamera ≤ 4 detik dan disembunyikan di balik awan. **Backspace** melewati film, tombol gerak
+  menghentikannya, terkena serangan langsung kembali ke mata.
+* Film **Singkat** = crane 2 detik yang menatap senjata jatuh. **Mati** = tanpa kamera; tanda, bingkai dan serangannya
+  tetap tampil.
+* Kamera sinematik **Mati**, "Kurangi gerak" dan Perjalanan langit **Mati** selalu menang atas pengaturan Film per titah.
+  "Pertama" berlaku sebagai "Selalu" untuk titah.
+* Film hanya diputar saat aman (syarat yang sama seperti Perjalanan Langit di 57.2: tidak ada musuh dekat, nyawa cukup,
+  tidak jatuh, tidak di air atau lava, tidak ada layar terbuka). Bila gagal, yang tersisa hanya crane Singkat atau tidak
+  ada sama sekali.
+* Kecepatan tinggi memendekkan film (adegan Istana dulu, lalu adegan Naik); di bawah 2 detik film menjadi crane Singkat.
+* Bingkai dampak penuh (kilat putih/merah, bara, ungu) hanya muncul setelah peringatan fotosensitif disetujui;
+  pengaturan Bingkai dampak, Kilatan layar dan Kualitas Efek dari bab 57 tetap berlaku.
+
+### 58.6 Pusaka tertancap (objek)
+
+Pedang Pemisah Langit dan Tiang Penenang Samudra (dengan "Tinggalkan pusaka" = Ya) meninggalkan **objek nyata**: pedang
+raksasa yang miring ke arahmu atau tiang besi yang tegak di kawah. Objek ini tersimpan bersama dunia, tetap ada setelah
+keluar-masuk, tidak bisa dilukai, didorong, dikenai panah atau dibawa lewat portal, dan tidak menjatuhkan apa pun.
+Mengarahkan crosshair padanya menampilkan nama pemiliknya. Saat baru mendarat ia menyala panas lalu mendingin selama
+semenit.
+
+* **Umur:** 3 hari game (`titahMonumentDays`). Setelah itu pusaka naik dan memudar sendiri.
+* **Batas:** 3 per pemain dan 12 per dunia. Titah baru yang melewati batas mencabut pusaka **tertua** (pusaka yang
+  chunk-nya tidak dimuat pergi saat chunk-nya dimuat lagi).
+
+**Mencabut:** pemiliknya **jongkok + klik kanan** pada pusaka. Selama 2 detik pusaka bergetar, terangkat dan makin
+terang, lalu pilar cahaya putih-emas membawanya kembali ke langit ("Pusaka dicabut — kembali ke langit"). Tetaplah dalam
+4 blok dan hidup, kalau tidak pencabutan batal. Pemain lain hanya mendapat pesan "Pusaka milik {pemilik} — hanya
+pemiliknya yang bisa mencabutnya."
+
+**Hadiah mencabut** (kecil dan tidak bisa di-farm): 1 Batu Roh Tinggi plus Qi terisi 20 %, hanya bila titahnya asli
+(bukan uji, bukan bypass), pusaka sudah berumur ≥ 30 detik, belum pernah memberi hadiah, dan kamu belum mendapat 3
+hadiah hari ini. Hari dihitung dari waktu game, jadi tidur tidak mengatur ulang hitungannya.
+
+**Versi blok (hanya Mode Kehancuran):** bila titah benar-benar memahat tanah, server juga menaruh alas dari dua blok
+baru di dasar kawah, mengikuti lantai kawah:
+
+| Blok | Rupa |
+|---|---|
+| **Batu Pusaka** | batu giok hitam, sekeras obsidian, tidak menjatuhkan apa pun |
+| **Urat Pusaka** | urat emas bercahaya (cahaya 10), sama kerasnya, tidak menjatuhkan apa pun |
+
+* *Penyangga Pedang* (Pedang): pelataran 7×7 di sekitar pedang (tanpa tengahnya) dengan cincin dalam Urat Pusaka dan 8
+  garis urat.
+* *Alas Penenang* (Tiang): cincin segi delapan jari-jari 3, setinggi 2 blok, dengan 8 urat di lapisan bawah.
+* Paling banyak 96 blok (`titahMonumentBlocks`; 0 = tanpa alas blok). Tidak pernah di zona terlindung, tidak menimpa
+  balok berharga atau balok-entitas, dan tidak dibuat bila `kehancuranDropsPct` > 0 atau jendela Pulihkan 0.
+* Blok ini **bukan item**, tidak bisa didorong piston, dan tidak menjatuhkan apa pun bila dipecahkan.
+* Saat pusaka dicabut, kedaluwarsa, digantikan atau dihapus operator, alasnya dibersihkan otomatis (hanya blok yang masih
+  berupa Batu atau Urat Pusaka; chunk yang belum dimuat menunggu).
+* **Pulihkan** (`/kultivasi kehancuran pulihkan`, dalam jendela pulih 10 menit) mengembalikan batu asli di tempat alas dan
+  kawah, sama seperti pemotongan Mode Kehancuran lain. Catatan pulih disimpan di memori: setelah server dimulai ulang,
+  pembersihan alas tetap jalan tetapi kawahnya dibiarkan seperti dipahat.
+
+Tujuh Bintang dan Pemindah Gunung tidak meninggalkan objek.
+
+### 58.7 Mode Kehancuran dengan titah
+
+1. Nyalakan Mode Kehancuran milikmu: `/kultivasi kehancuran nyala` (sumpah sekali bila diminta).
+2. Di menu, pastikan "Hancurkan tanah" = **Ikut** untuk titah itu.
+3. Rapal. Pemotongan berjalan pelan (48 blok per tick) dalam satu pekerjaan, paling banyak 8.192 blok per titah
+   (`titahBlocksPerCast`) dengan jari-jari pahat ≤ 24 blok (`titahCarveRadiusMax`), tanpa drop, tanpa ledakan.
+4. Bila tanah dari titahmu sebelumnya masih runtuh, titah tetap tampil tetapi pahatannya dilewati ("Bumi masih runtuh —
+   kehancuran dilewati").
+5. Batalkan dengan `/kultivasi kehancuran pulihkan`.
+
+### 58.8 Pengaturan server (`config/kultivator.json`)
+
+| Kunci | Bawaan | Rentang |
+|---|---|---|
+| `titahEnabled` | true | |
+| `titahVisualRadiusMax` | 128 | 32-256 |
+| `titahDamageRadiusMax` | 40 | 16-64 |
+| `titahCarveRadiusMax` | 24 | 8-48 |
+| `titahBlocksPerCast` | 8192 | 1024-32768 |
+| `titahMonumentBlocks` | 96 | 0-256 |
+| `titahMonumentDays` | 3 | 1-14 |
+| `titahMonumentsPerPlayer` | 3 | 1-8 |
+| `titahMonumentsPerWorld` | 12 | 1-32 |
+| `titahRewardsPerDay` | 3 | 0-10 |
+| `titahRange` | 128 | 64-192 |
+| `titahUltimateMonuments` | false | true = Seni Pedang Hukuman Langit dan Formasi Pedang Zhuxian juga meninggalkan pedang tertancap (tanpa hadiah) |
+
+**Laptop lemah:** semua cahaya "shader berat" dipalsukan dengan lapisan quad bercahaya, tekstur glow dan lapisan HUD,
+tanpa post shader. Kualitas Efek Minimal / Normal / Maksimal dan penjaga frame Momen Epik membatasi bintang, kristal,
+sel terangkat dan cahaya tambahan. Dibuat untuk Sodium dan Iris.
+
+### 58.9 Perintah uji
+
+Operator, di bawah `/kultivasi uji pusaka_langit`:
+
+| Perintah | Fungsi |
+|---|---|
+| `beri` | memberi segel yang sudah terikat padamu |
+| `bypass nyala\|mati` | melewati syarat ranah, jeda dan Qi untuk titah |
+| `pedang\|tiang\|bintang\|gunung [kekuatan] [kecepatan] [kerusakan]` | titah uji ke bidikan (Kekuatan 0,1-10, Kecepatan 0,3-3, Kerusakan 0-100); tanpa hadiah. Memahat hanya bila `uji teknik kehancuran nyala` **dan** saklar Mode Kehancuranmu menyala |
+| `semua` | keempat titah bergiliran, 20 detik sekali, tiap titah 48 blok lebih jauh di arah pandangmu |
+| `monumen pedang\|tiang [skala]` | pusaka uji di bidikan (skala 1-32, tanpa hadiah) |
+| `monumen daftar` | semua pusaka di dunia |
+| `monumen hapus_semua` | menghapus semua pusaka beserta alas bloknya |
+| `monumen umur <hari>` | menuakan semua pusaka (uji kedaluwarsa) |
+| `cabut` | menyelesaikan pencabutan pusakamu yang terdekat seketika |
+| `beban` | pekerjaan, sisa blok, pusaka hidup, jumlah per pemain |
+| `reset` | jeda, pengaturan dan hitungan hadiah harian |
+
+Client (tanpa cheat, di komputermu), di bawah `/sinematik pusaka`:
+
+| Perintah | Fungsi |
+|---|---|
+| `film <pedang\|tiang\|bintang\|gunung> [detik]` | memutar film titah itu ke depanmu (2-12 detik, bawaan 8; tetap dengan syarat aman) |
+| `atur <titah> penuh\|singkat\|mati` | pengaturan Film titah itu |
+| `vista istana_langit\|laut_timur\|biduk_utara\|kua_e` | menampilkan pemandangan langit itu di depan |
+| `info` | syarat kamera, pengaturan film, alasan penolakan terakhir, statistik efek dunia |
+
+Contoh:
+
+```
+/kultivasi uji pusaka_langit beri
+/kultivasi uji pusaka_langit bypass nyala
+/kultivasi uji pusaka_langit pedang
+/kultivasi uji pusaka_langit tiang 3 0.5
+/kultivasi uji pusaka_langit bintang 2 1 0
+/kultivasi uji pusaka_langit gunung 1 2 100
+/kultivasi uji pusaka_langit semua
+/kultivasi uji pusaka_langit monumen pedang 16
+/kultivasi uji pusaka_langit monumen daftar
+/kultivasi uji pusaka_langit cabut
+/kultivasi kehancuran nyala
+/kultivasi uji teknik kehancuran nyala
+/kultivasi uji pusaka_langit tiang
+/kultivasi kehancuran pulihkan
+/kultivasi uji pusaka_langit monumen umur 5
+/kultivasi uji pusaka_langit monumen hapus_semua
+/kultivasi uji pusaka_langit reset
+/sinematik penuh
+/sinematik pusaka film pedang 10
+/sinematik pusaka atur bintang singkat
+/sinematik pusaka vista kua_e
+/sinematik pusaka info
+```
+
+Pemain: `/kultivasi titah` dan `/kultivasi titah daftar`.
+
+### 58.10 Yang belum lengkap
+
+* Belum diuji di game sama sekali: waktu dan arah film, keempat papan cerita, pencabutan pusaka dan alas bloknya, batas
+  Minimal/Normal/Maksimal, FPS di laptop lemah, dan Sodium/Iris.
+* Tooltip segel belum menunjukkan sisa jeda dalam detik (lihat di menu).
+* Parit Tujuh Bintang keluar 3 blok lebar, bukan 2.
+* Batu Pusaka dan Urat Pusaka masih kubus polos (cahaya Urat hanya dari tingkat cahaya 10). Ikon segel datar dan tidak
+  berubah menurut titah yang dipilih.
+* Dengan `titahUltimateMonuments` nyala, pedang monumen visual Fase 10 dan pedang objek bisa tampil bersamaan.

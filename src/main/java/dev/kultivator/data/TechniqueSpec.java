@@ -54,7 +54,12 @@ public final class TechniqueSpec {
 		/** Never in the player's codex or the 168 counter (karma_domain). */
 		DISCIPLE_ONLY,
 		/** Sold as a jade slip in the Paviliun Yue Lu. */
-		PAVILION
+		PAVILION,
+		/**
+		 * Phase 10b (DESIGN 29.3.1): a Titah Langit decree. Cast only through {@code pusakalangit.Titah.cast} (the seal),
+		 * never in the loadout, never learned, no mastery, no feats; hidden from the codex lists and the 168 counter.
+		 */
+		TITAH
 	}
 
 	/** The Dewa gate (22.8.8). */
@@ -536,7 +541,12 @@ public final class TechniqueSpec {
 
 	/** Shown in the player's codex and counted in "Teknik x/168". */
 	public boolean playerVisible() {
-		return !has(Flag.DISCIPLE_ONLY);
+		return !has(Flag.DISCIPLE_ONLY) && !has(Flag.TITAH);
+	}
+
+	/** Phase 10b (DESIGN 29.3.1): a Titah Langit decree (cast by the Segel Titah Langit only). */
+	public boolean titah() {
+		return has(Flag.TITAH);
 	}
 
 	public boolean hasDestruction() {

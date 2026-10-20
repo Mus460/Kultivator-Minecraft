@@ -31,23 +31,36 @@ import org.jetbrains.annotations.Nullable;
  * @param monumentScale   the monument's display scale
  * @param monumentSeconds how long the monument stays (30-180)
  * @param pose            how the monument stands
+ * @param filmTicks       Phase 10b (DESIGN 29.4): the whole Film Pusaka of a {@link Ride#FILM} row at Kecepatan 1 (≤ 240; 0 for
+ *                        every other row); each camera segment of it stays ≤ {@link #MAX_RIDE_TICKS}
  */
 public record Dampak(Mark mark, int markTicks, Ride ride, Vista vista, int rideTicks, int climaxAt,
 		int frame1, int frame2, int frame3, int silence,
 		Debris debris, Ring ring, Palette palette,
 		SigilPattern sigil, float sigilRadius, @Nullable Phase sigilIgnite, boolean sigilTrench,
-		@Nullable String monument, float monumentScale, int monumentSeconds, MonumentPose pose) {
+		@Nullable String monument, float monumentScale, int monumentSeconds, MonumentPose pose, int filmTicks) {
 
 	/** Tanda Langit kinds (28.2). */
 	public enum Mark { NONE, PILLAR, MULTI, SHADOW, PATH, FOOT, RING_ONLY }
 
-	/** Perjalanan Langit (28.3). */
-	public enum Ride { NONE, SHORT, FULL }
+	/**
+	 * Perjalanan Langit (28.3). {@code FILM} (Phase 10b, DESIGN 29.4): the Film Pusaka of the Titah Langit decrees only
+	 * (flag {@code TITAH}), several masked segments of ≤ 80 ticks each, ≤ {@link #MAX_FILM_TICKS} in all.
+	 */
+	public enum Ride { NONE, SHORT, FULL, FILM }
 
 	/** The sky vistas of a FULL ride (28.3.3). */
 	public enum Vista {
 		NONE, GERBANG_LANGIT, PUSARAN, SEMBILAN_LANGIT, SUNGAI_BINTANG, MATAHARI_KAISAR, GUNUNG_ES,
-		CAKRAM_AKRESI, POHON_CAHAYA, LAUT_UTARA, BY_DAO
+		CAKRAM_AKRESI, POHON_CAHAYA, LAUT_UTARA, BY_DAO,
+		/** Phase 10b (29.4.1): the Lingxiao Hall's gate with gold rays; the Heaven-Splitting Sword lowered from it. */
+		ISTANA_LANGIT,
+		/** Phase 10b: a dark sea under the clouds, the dragon palace's glint, the Sea-Stabilising Pillar rising and growing. */
+		LAUT_TIMUR,
+		/** Phase 10b: a starfield with the seven Dipper stars joined Tianshu → Yaoguang. */
+		BIDUK_UTARA,
+		/** Phase 10b: two vast silhouettes of the Kua'e sons stooping under the clouds, the jade seal between them. */
+		KUA_E
 	}
 
 	/** Debris modes (28.6.1). */
@@ -77,6 +90,8 @@ public record Dampak(Mark mark, int markTicks, Ride ride, Vista vista, int rideT
 
 	/** The longest FULL ride (28.3.2). */
 	public static final int MAX_RIDE_TICKS = 80;
+	/** The longest Film Pusaka in all (29.4); every segment of it is still ≤ {@link #MAX_RIDE_TICKS}. */
+	public static final int MAX_FILM_TICKS = 240;
 	/** The longest a mark lives (28.2). */
 	public static final int MAX_MARK_TICKS = 200;
 
@@ -138,6 +153,7 @@ public record Dampak(Mark mark, int markTicks, Ride ride, Vista vista, int rideT
 		private float monumentScale = 1.0F;
 		private int monumentSeconds = 60;
 		private MonumentPose pose = MonumentPose.UPRIGHT;
+		private int filmTicks;
 
 		private Builder() {
 		}
@@ -163,6 +179,14 @@ public record Dampak(Mark mark, int markTicks, Ride ride, Vista vista, int rideT
 		public Builder ride(Ride value, int ticks, Vista vistaValue) {
 			this.ride = value;
 			this.rideTicks = ticks;
+			this.vista = vistaValue;
+			return this;
+		}
+
+		/** Phase 10b (29.4): a {@link Ride#FILM} of {@code ticks} in all (≤ 240) with {@code vistaValue} for its act F3. */
+		public Builder film(int ticks, Vista vistaValue) {
+			this.ride = Ride.FILM;
+			this.filmTicks = ticks;
 			this.vista = vistaValue;
 			return this;
 		}
@@ -247,7 +271,7 @@ public record Dampak(Mark mark, int markTicks, Ride ride, Vista vista, int rideT
 			return new Dampak(mark, Math.max(0, Math.min(MAX_MARK_TICKS, markTicks)), ride, vista, Math.max(0, rideTicks),
 					Math.max(0, climaxAt), frame1, frame2, frame3, Math.max(0, Math.min(20, silence)), debris, ring, palette, sigil,
 					Math.max(0.0F, sigilRadius), sigilIgnite, sigilTrench && sigil != SigilPattern.NONE, monument, Math.max(0.1F, monumentScale),
-					monumentSeconds, pose);
+					monumentSeconds, pose, ride == Ride.FILM ? Math.max(0, filmTicks) : 0);
 		}
 	}
 }

@@ -184,6 +184,12 @@ public final class FxModels {
 		put("chain_link", 0.5F, north, true, 0xFFD54A, 0xFFF2B0, -0.2F);
 		put("seal_ring_feng", 1.5F, north, true, 0xFF6A2A, 0xFFE0D8, -0.05F);
 		put("ice_claw", 1.0F, north, true, 0x9FF3FF, 0xFFFFFF, -1.1F);
+		// Titah Langit (DESIGN 29): the Heaven-Splitting Sword (grip at the anchor, tip 1.47 b up), the Sea-Stabilising Pillar
+		// (anchor at its middle, 1.5 b each way), the fallen Dipper star (centred) and the Mountain-Moving seal (base at the anchor)
+		put("heaven_splitting_sword", 12.0F, up, true, 0xFFF4D0, 0xFFD54A, -0.52F);
+		put("dinghai_pillar", 10.0F, up, true, 0xFFD54A, 0xFF7A1A, -1.5F);
+		put("star_core", 2.0F, north, true, 0xE8F0FF, 0xB57CFF, -0.58F);
+		put("yishan_seal", 8.0F, north, true, 0x5FD6A0, 0xFFD54A, 0.0F);
 		put("missing", 1.0F, north, true, 0xFFD54A, 0xFFFFFF, -0.25F);
 	}
 

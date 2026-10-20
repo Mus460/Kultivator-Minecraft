@@ -52,7 +52,8 @@ public final class Loadout {
 
 	/** Known, not passive, not disciple-only, rank and Dao allow it (gates included). Pure. */
 	public static boolean castable(CultivationData data, TechniqueSpec spec) {
-		return spec.type() != TechniqueType.PASIF && spec.playerVisible() && TechniqueRunner.whyNotCastable(data, spec) == null;
+		// Phase 10b (DESIGN 29.3.1): a Titah decree is never in the loadout (only the seal casts it)
+		return spec.type() != TechniqueType.PASIF && spec.playerVisible() && !spec.titah() && TechniqueRunner.whyNotCastable(data, spec) == null;
 	}
 
 	/** Puts {@code id} ("" or "-" empties) into slot {@code index} (0-11). False when refused. */

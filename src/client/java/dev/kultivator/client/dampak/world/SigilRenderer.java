@@ -30,6 +30,10 @@ import org.joml.Vector3f;
  * 0.04 b above the client heightmap (no polygon offset). Only vanilla render types: {@code entityTranslucentEmissive}
  * for soft layers and decals, {@code lightning()} for thin glow lines, the beacon beam for pillars. Idle cost: one
  * boolean.
+ * <p>
+ * Titah Langit (DESIGN 29.8): {@link Frame} and {@link Sink} are public so {@code client/pusakalangit/world/TitahWorld}
+ * draws its sky marks, falling-weapon trails, cleaving fissures, light grids and stepped pits into the same frame (same
+ * budget, same sinks, never in the shadow pass).
  */
 public final class SigilRenderer {
 
@@ -66,6 +70,7 @@ public final class SigilRenderer {
 				TerrainLift.render(FRAME);
 				GroundSigil.render(FRAME);
 				ShockRing.render(FRAME);
+				dev.kultivator.client.pusakalangit.world.TitahWorld.render(FRAME);
 			}
 			lastQuads = FRAME.quads();
 			FRAME.flush();
@@ -82,29 +87,35 @@ public final class SigilRenderer {
 	}
 
 	/** The per-frame drawing state. Positions are camera-relative floats. */
-	static final class Frame {
+	public static final class Frame {
 		static final RenderType GROUND_TYPE = RenderTypes.entityTranslucentEmissive(GROUND_GLOW);
 		static final RenderType CRACK_TYPE = RenderTypes.entityTranslucentEmissive(CRACK_DECAL);
 
-		ClientLevel level;
+		public ClientLevel level;
 		double camX;
 		double camY;
 		double camZ;
-		float partial;
+		public float partial;
 		/** Presentation time (ticks, σ-scaled) of this frame. */
-		double clock;
+		public double clock;
 		PoseStack poseStack;
 		SubmitNodeCollector collector;
 		final Vector3f right = new Vector3f();
 		final Vector3f up = new Vector3f();
 		final Vector3f forward = new Vector3f();
 
-		final Sink ground = new Sink(GROUND_TYPE, true);
-		final Sink crack = new Sink(CRACK_TYPE, true);
-		final Sink ring = new Sink(EpicRenderTypes.RING, true);
-		final Sink rune = new Sink(EpicRenderTypes.RUNE, true);
-		final Sink glow = new Sink(EpicRenderTypes.GLOW, true);
-		final Sink lightning = new Sink(EpicRenderTypes.LIGHTNING, false);
+		/** Soft round glows and decals ({@code ground_glow.png}). */
+		public final Sink ground = new Sink(GROUND_TYPE, true);
+		/** Glowing crack decals ({@code crack_decal.png}). */
+		public final Sink crack = new Sink(CRACK_TYPE, true);
+		/** Soft annuli ({@code ring_soft.png}). */
+		public final Sink ring = new Sink(EpicRenderTypes.RING, true);
+		/** The Dao circle sheet. */
+		public final Sink rune = new Sink(EpicRenderTypes.RUNE, true);
+		/** Soft strips with a bright centre line ({@code glow_strip.png}, v across the strip). */
+		public final Sink glow = new Sink(EpicRenderTypes.GLOW, true);
+		/** Thin additive lines ({@code lightning()}: colour only). */
+		public final Sink lightning = new Sink(EpicRenderTypes.LIGHTNING, false);
 
 		private int pillarCount;
 		private final double[] pillarPos = new double[16 * 3];
@@ -142,19 +153,19 @@ public final class SigilRenderer {
 			return (ground.vertices() + crack.vertices() + ring.vertices() + rune.vertices() + glow.vertices() + lightning.vertices()) / 4;
 		}
 
-		float rx(double x) {
+		public float rx(double x) {
 			return (float) (x - camX);
 		}
 
-		float ry(double y) {
+		public float ry(double y) {
 			return (float) (y - camY);
 		}
 
-		float rz(double z) {
+		public float rz(double z) {
 			return (float) (z - camZ);
 		}
 
-		double dist2(double x, double y, double z) {
+		public double dist2(double x, double y, double z) {
 			double dx = x - camX;
 			double dy = y - camY;
 			double dz = z - camZ;
@@ -162,7 +173,7 @@ public final class SigilRenderer {
 		}
 
 		/** The surface height (world y) of a column plus {@link #LIFT}, or {@code fallback}. */
-		double groundY(double x, double z, double fallback) {
+		public double groundY(double x, double z, double fallback) {
 			return DampakDisplays.ground(level, x, z, fallback) + LIFT;
 		}
 
@@ -170,7 +181,7 @@ public final class SigilRenderer {
 		 * A flat strip on the ground between two camera-relative points: a horizontal quad {@code width} wide with
 		 * colours at each end; v runs across the strip (the glow-strip texture's bright centre line).
 		 */
-		void groundStrip(Sink sink, float ax, float ay, float az, float bx, float by, float bz, float width, int ca, int cb, float u0, float u1) {
+		public void groundStrip(Sink sink, float ax, float ay, float az, float bx, float by, float bz, float width, int ca, int cb, float u0, float u1) {
 			float dx = bx - ax;
 			float dz = bz - az;
 			float length = (float) Math.sqrt(dx * dx + dz * dz);
@@ -191,7 +202,7 @@ public final class SigilRenderer {
 		}
 
 		/** A horizontal textured square of half size {@code half}, turned by {@code angle} radians, normal up. */
-		void flat(Sink sink, float x, float y, float z, float half, float angle, int color) {
+		public void flat(Sink sink, float x, float y, float z, float half, float angle, int color) {
 			float c = (float) Math.cos(angle) * half;
 			float s = (float) Math.sin(angle) * half;
 			sink.vertex(x - c + s, y, z - s - c, 0.0F, 0.0F, color, 0.0F, 1.0F, 0.0F);
@@ -201,7 +212,7 @@ public final class SigilRenderer {
 		}
 
 		/** A horizontal axis-aligned quad with its own uv window (decal cells). */
-		void cell(Sink sink, float x0, float z0, float x1, float z1, float y, float u0, float v0, float u1, float v1, int color) {
+		public void cell(Sink sink, float x0, float z0, float x1, float z1, float y, float u0, float v0, float u1, float v1, int color) {
 			sink.vertex(x0, y, z0, u0, v0, color, 0.0F, 1.0F, 0.0F);
 			sink.vertex(x0, y, z1, u0, v1, color, 0.0F, 1.0F, 0.0F);
 			sink.vertex(x1, y, z1, u1, v1, color, 0.0F, 1.0F, 0.0F);
@@ -209,7 +220,7 @@ public final class SigilRenderer {
 		}
 
 		/** A camera-facing square of half size {@code half} (node glows). */
-		void billboard(Sink sink, float x, float y, float z, float half, int color) {
+		public void billboard(Sink sink, float x, float y, float z, float half, int color) {
 			float rxh = right.x * half;
 			float ryh = right.y * half;
 			float rzh = right.z * half;
@@ -222,8 +233,61 @@ public final class SigilRenderer {
 			sink.vertex(x - rxh + uxh, y - ryh + uyh, z - rzh + uzh, 0.0F, 1.0F, color, -forward.x, -forward.y, -forward.z);
 		}
 
+		/**
+		 * A strip between two camera-relative points that turns about its own axis to face the camera ({@code width} wide,
+		 * colours per end; v runs across): light trails, beams and falling streaks.
+		 */
+		public void beam(Sink sink, float ax, float ay, float az, float bx, float by, float bz, float width, int ca, int cb) {
+			float dx = bx - ax;
+			float dy = by - ay;
+			float dz = bz - az;
+			// side = axis × (view direction to the strip's middle)
+			float mx = (ax + bx) * 0.5F;
+			float my = (ay + by) * 0.5F;
+			float mz = (az + bz) * 0.5F;
+			float sx = dy * mz - dz * my;
+			float sy = dz * mx - dx * mz;
+			float sz = dx * my - dy * mx;
+			float length = (float) Math.sqrt(sx * sx + sy * sy + sz * sz);
+			if (length < 1.0E-5F) {
+				sx = right.x;
+				sy = right.y;
+				sz = right.z;
+				length = 1.0F;
+			}
+			float h = width * 0.5F / length;
+			sx *= h;
+			sy *= h;
+			sz *= h;
+			sink.vertex(ax - sx, ay - sy, az - sz, 0.0F, 0.0F, ca, -forward.x, -forward.y, -forward.z);
+			sink.vertex(ax + sx, ay + sy, az + sz, 0.0F, 1.0F, ca, -forward.x, -forward.y, -forward.z);
+			sink.vertex(bx + sx, by + sy, bz + sz, 1.0F, 1.0F, cb, -forward.x, -forward.y, -forward.z);
+			sink.vertex(bx - sx, by - sy, bz - sz, 1.0F, 0.0F, cb, -forward.x, -forward.y, -forward.z);
+		}
+
+		/**
+		 * A flat horizontal annulus at camera-relative height {@code y} (sky rings, gate tears): {@code segments} quads from
+		 * {@code inner} to {@code outer}, u around (turned by {@code uOffset}), v from inside to outside.
+		 */
+		public void flatRing(Sink sink, float cx, float y, float cz, float inner, float outer, int segments, int innerColor, int outerColor, float uOffset) {
+			int n = Math.max(8, segments);
+			double step = Math.PI * 2.0D / n;
+			for (int i = 0; i < n; i++) {
+				float c0 = (float) Math.cos(i * step);
+				float s0 = (float) Math.sin(i * step);
+				float c1 = (float) Math.cos((i + 1) * step);
+				float s1 = (float) Math.sin((i + 1) * step);
+				float u0 = (float) i / n * 4.0F + uOffset;
+				float u1 = (float) (i + 1) / n * 4.0F + uOffset;
+				sink.vertex(cx + c0 * inner, y, cz + s0 * inner, u0, 0.0F, innerColor, 0.0F, -1.0F, 0.0F);
+				sink.vertex(cx + c0 * outer, y, cz + s0 * outer, u0, 1.0F, outerColor, 0.0F, -1.0F, 0.0F);
+				sink.vertex(cx + c1 * outer, y, cz + s1 * outer, u1, 1.0F, outerColor, 0.0F, -1.0F, 0.0F);
+				sink.vertex(cx + c1 * inner, y, cz + s1 * inner, u1, 0.0F, innerColor, 0.0F, -1.0F, 0.0F);
+			}
+		}
+
 		/** Queues a beacon-beam pillar (world position; drawn after the soft layers). */
-		boolean pillar(double x, double y, double z, int height, int rgb, float glowRadius) {
+		public boolean pillar(double x, double y, double z, int height, int rgb, float glowRadius) {
 			if (pillarCount >= pillarHeight.length || height <= 0 || !EpicBudget.takePillar()) {
 				return false;
 			}
@@ -260,7 +324,7 @@ public final class SigilRenderer {
 	}
 
 	/** Vertices of one render type for this frame, submitted once through a reused writer. */
-	static final class Sink {
+	public static final class Sink {
 		private static final int STRIDE = 8;
 		private final RenderType type;
 		private final boolean entity;
@@ -274,7 +338,7 @@ public final class SigilRenderer {
 			this.entity = entity;
 		}
 
-		void vertex(float x, float y, float z, float u, float v, int argb, float nx, float ny, float nz) {
+		public void vertex(float x, float y, float z, float u, float v, int argb, float nx, float ny, float nz) {
 			if (count >= colors.length) {
 				int size = colors.length * 2;
 				float[] more = new float[size * STRIDE];

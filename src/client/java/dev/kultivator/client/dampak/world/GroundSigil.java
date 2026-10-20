@@ -31,6 +31,11 @@ import java.util.List;
  * display that stays with the monument). A sigil lives until its climax + 100 ticks, then fades over 20. With Mode
  * Kehancuran and a trench, the lit lines burn (palette particles) for 10 s. The geometry comes from the shared
  * {@code SigilPattern} (the same points as the server's trenches); Minimal draws dust dots every 2 b instead.
+ * <p>
+ * Titah Langit sigils ({@link #createTitah}, DESIGN 29.8) may span up to 256 b: their lines are sampled every
+ * {@code max(1, R / 64)} b (the point cap stays 2048), drawn wider, never make star impacts here (the Seven Stars fall in
+ * {@code StarFall}), stay 200 ticks after the climax and, on the climax, ignite: the lines burn as glowing trenches in the
+ * hot colour for the DOT window, visual only.
  */
 final class GroundSigil {
 
@@ -79,6 +84,14 @@ final class GroundSigil {
 		int refreshIn = REFRESH;
 		int crystalLife = 1200;
 		int dotTick;
+		/** Sample spacing of the lines in blocks (1; Titah: max(1, R / 64)). */
+		double step = 1.0D;
+		/** A Titah sigil (wide, no star impacts here, ignites on the climax). */
+		boolean titah;
+		/** Ticks it stays after the climax. */
+		int afterClimax = AFTER_CLIMAX;
+		/** The burning-trench colour after a Titah climax (-1 = none). */
+		int hotRgb = -1;
 
 		Sigil(long cast, SigilPattern pattern, int rgb, Vec3 centre, float radius, boolean own, String palette, double born) {
 			this.cast = cast;
@@ -105,7 +118,7 @@ final class GroundSigil {
 				return endAt;
 			}
 			if (!Double.isNaN(climaxAt)) {
-				return climaxAt + AFTER_CLIMAX;
+				return climaxAt + afterClimax;
 			}
 			return born + NO_CLIMAX_LIFE;
 		}
@@ -122,15 +135,15 @@ final class GroundSigil {
 			nodeCount++;
 		}
 
-		/** Adds a segment lit by node {@code node} (-1 = the climax), sampled every 1 b. */
+		/** Adds a segment lit by node {@code node} (-1 = the climax), sampled every {@link #step} b (1 b by default). */
 		void addLine(double ax, double az, double bx, double bz, int node) {
 			double dx = bx - ax;
 			double dz = bz - az;
 			double length = Math.sqrt(dx * dx + dz * dz);
-			if (!(length > 0.05D) || length > 256.0D) {
+			if (!(length > 0.05D) || length > (titah ? 512.0D : 256.0D)) {
 				return;
 			}
-			int samples = Math.max(1, (int) Math.ceil(length));
+			int samples = Math.max(1, (int) Math.ceil(length / Math.max(1.0D, step)));
 			float[] points = new float[(samples + 1) * 3];
 			for (int i = 0; i <= samples; i++) {
 				double f = (double) i / samples;
@@ -230,6 +243,80 @@ final class GroundSigil {
 		SIGILS.add(sigil);
 		DampakWorld.touchGeometry();
 		return sigil;
+	}
+
+	/**
+	 * A Titah sigil (DESIGN 29.3.2, 29.8): like {@link #create} but up to 256 b, sampled every {@code max(1, R / 64)} b,
+	 * without star impacts; null when none is drawn.
+	 */
+	static @Nullable Sigil createTitah(ClientLevel level, long cast, @Nullable SigilPattern pattern, Vec3 castPos, Vec3 centre, float radius, int seed,
+									   int rgb, boolean own, @Nullable String palette) {
+		if (pattern == null || pattern == SigilPattern.NONE || pattern == SigilPattern.EVENT_CHAIN || !(radius > 0.0F)) {
+			return null;
+		}
+		end(cast);
+		if (SIGILS.size() >= MAX_SIGILS) {
+			SIGILS.remove(0);
+		}
+		Sigil sigil = new Sigil(cast, pattern, rgb & 0xFFFFFF, centre, Math.min(256.0F, Math.max(1.0F, radius)), own, palette == null ? "NONE" : palette,
+				DampakWorld.clock(0.0F));
+		sigil.titah = true;
+		sigil.afterClimax = 200;
+		sigil.step = Math.max(1.0D, sigil.radius / 64.0D);
+		if (!sigil.daoCircle()) {
+			double yaw = SigilPattern.yawFor(castPos, centre, seed);
+			for (Vec3 node : SigilPattern.nodes(pattern, centre, yaw, sigil.radius, seed)) {
+				sigil.addNode((float) node.x, (float) centre.y, (float) node.z);
+			}
+			for (SigilPattern.Segment segment : SigilPattern.segments(pattern, centre, yaw, sigil.radius, seed)) {
+				if (sigil.points() >= MAX_POINTS) {
+					break;
+				}
+				sigil.addLine(segment.from().x, segment.from().z, segment.to().x, segment.to().z, segment.node());
+			}
+		}
+		refresh(level, sigil);
+		SIGILS.add(sigil);
+		DampakWorld.touchGeometry();
+		return sigil;
+	}
+
+	/**
+	 * A Titah climax: every node and line lights; with {@code burnTicks} &gt; 0 the lines ignite as burning trenches in
+	 * {@code hotRgb} (glow strips and palette particles) for that long. Visual only.
+	 */
+	static void climaxTitah(long cast, int burnTicks, int hotRgb) {
+		Sigil sigil = find(cast);
+		if (sigil == null) {
+			return;
+		}
+		double now = DampakWorld.clock(0.0F);
+		sigil.lightAll(now);
+		sigil.climaxAt = now;
+		if (burnTicks > 0) {
+			sigil.burnUntil = now + burnTicks;
+			sigil.hotRgb = hotRgb & 0xFFFFFF;
+			sigil.afterClimax = Math.max(sigil.afterClimax, burnTicks + 60);
+		}
+		DampakWorld.touchGeometry();
+	}
+
+	/** The node positions (x, ground y, z) of a cast's sigil, or an empty list. */
+	static List<Vec3> nodesOf(long cast) {
+		Sigil sigil = find(cast);
+		if (sigil == null) {
+			return List.of();
+		}
+		List<Vec3> out = new ArrayList<>(sigil.nodeCount);
+		for (int k = 0; k < sigil.nodeCount; k++) {
+			out.add(new Vec3(sigil.nodes[k * 3], sigil.nodes[k * 3 + 1], sigil.nodes[k * 3 + 2]));
+		}
+		return out;
+	}
+
+	/** A glowing crystal display (a star impact's crystal; the Seven Stars use it): grows after {@code delay}, stays {@code life}. */
+	static void crystal(ClientLevel level, BlockState state, Vec3 at, long cast, int delay, int life) {
+		Crystal.make(level, state, at, cast, delay, life);
 	}
 
 	/** An ignition event of the cast: the next node lights (EVENT_CHAIN: a new node at {@code at}, joined to the last). */
@@ -426,6 +513,17 @@ final class GroundSigil {
 		if (sigil.lines.isEmpty()) {
 			return;
 		}
+		if (sigil.titah && sigil.hotRgb >= 0 && (sigil.dotTick & 1) == 0) {
+			// the burning trenches of a Titah: rising embers in the hot colour
+			int embers = DampakParticles.grant(DampakWorldBudget.scaled(4, sigil.own, 8));
+			DustParticleOptions ember = new DustParticleOptions(sigil.hotRgb, 1.2F);
+			RandomSource sparks = DampakParticles.random();
+			for (int i = 0; i < embers; i++) {
+				float[] line = sigil.lines.get(sparks.nextInt(sigil.lines.size()));
+				int p = sparks.nextInt(line.length / 3) * 3;
+				DampakParticles.one(ember, line[p], line[p + 1] + 0.1D, line[p + 2], 0.0D, 0.06D + sparks.nextDouble() * 0.05D, 0.0D);
+			}
+		}
 		ParticleOptions particle = switch (sigil.palette) {
 			case "FIRE" -> ParticleTypes.FLAME;
 			case "LIGHTNING" -> ParticleTypes.ELECTRIC_SPARK;
@@ -492,18 +590,29 @@ final class GroundSigil {
 	}
 
 	private static int drawLines(SigilRenderer.Frame frame, Sigil sigil, float master, int budget) {
-		float width = Math.max(0.25F, Math.min(0.6F, sigil.radius * 0.03F));
+		float width = sigil.titah ? Math.max(0.5F, Math.min(1.6F, sigil.radius * 0.012F)) : Math.max(0.25F, Math.min(0.6F, sigil.radius * 0.03F));
 		int dimCore = ARGB.color(Math.round(master * 70.0F), sigil.rgb);
 		int dimBloom = ARGB.color(Math.round(master * 26.0F), sigil.rgb);
 		int litCore = ARGB.color(Math.round(master * 240.0F), sigil.rgb);
 		int litBloom = ARGB.color(Math.round(master * 64.0F), sigil.rgb);
+		// a Titah climax: the lit lines burn as glowing trenches in the hot colour, flickering, then cool with the fade
+		boolean burning = sigil.titah && sigil.hotRgb >= 0 && !Double.isNaN(sigil.burnUntil);
+		int trench = 0;
+		if (burning) {
+			double left = sigil.burnUntil - frame.clock;
+			float heat = (float) Math.max(0.25D, Math.min(1.0D, left / 40.0D + 0.25D));
+			float flicker = 0.85F + 0.15F * (float) Math.sin(frame.clock * 0.9D + (sigil.cast & 0xFF));
+			litCore = ARGB.color(Math.round(Math.min(1.0F, master * flicker) * 255.0F), mixRgb(sigil.hotRgb, 0xFFFFFF, 0.35F * heat));
+			litBloom = ARGB.color(Math.round(master * 110.0F * heat), sigil.hotRgb);
+			trench = ARGB.color(Math.round(master * 200.0F * heat * flicker), sigil.hotRgb);
+		}
 		for (int i = 0; i < sigil.lines.size() && budget > 0; i++) {
 			float[] line = sigil.lines.get(i);
 			int samples = line.length / 3 - 1;
 			if (samples <= 0) {
 				continue;
 			}
-			if (!EpicBudget.takeQuads(samples * 2)) {
+			if (!EpicBudget.takeQuads(samples * (burning ? 3 : 2))) {
 				return 0;
 			}
 			budget -= samples;
@@ -528,6 +637,9 @@ final class GroundSigil {
 				float bz = frame.rz(line[o + 5]);
 				frame.groundStrip(frame.lightning, ax, ay, az, bx, by, bz, lit ? width : width * 0.6F, core, core, 0.0F, 1.0F);
 				frame.groundStrip(frame.glow, ax, ay + 0.01F, az, bx, by + 0.01F, bz, width * 4.0F, bloom, bloom, 0.0F, 1.0F);
+				if (burning && lit) {
+					frame.groundStrip(frame.crack, ax, ay + 0.005F, az, bx, by + 0.005F, bz, width * 2.6F, trench, trench, 0.0F, 1.0F);
+				}
 			}
 		}
 		return budget;
@@ -605,6 +717,14 @@ final class GroundSigil {
 			}
 			return true;
 		}
+	}
+
+	private static int mixRgb(int a, int b, float t) {
+		float k = Math.max(0.0F, Math.min(1.0F, t));
+		int r = Math.round((a >> 16 & 0xFF) + ((b >> 16 & 0xFF) - (a >> 16 & 0xFF)) * k);
+		int g = Math.round((a >> 8 & 0xFF) + ((b >> 8 & 0xFF) - (a >> 8 & 0xFF)) * k);
+		int bl = Math.round((a & 0xFF) + ((b & 0xFF) - (a & 0xFF)) * k);
+		return r << 16 | g << 8 | bl;
 	}
 
 	private GroundSigil() {
