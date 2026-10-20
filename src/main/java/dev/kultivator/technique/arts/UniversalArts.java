@@ -163,6 +163,8 @@ public final class UniversalArts {
 				.fx(Phase.CAST, impact(0xC070FF).onCaster().above(1.7F).count(4).ticks(10).extra())
 				.sound(Phase.CAST, SoundEvents.EVOKER_CAST_SPELL, 0.8F, 1.5F)
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.2F)
+				// a thin bore from the first block the eye beam meets
+				.kehancuran(DShape.tunnel(1, 8))
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -186,6 +188,8 @@ public final class UniversalArts {
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.CROSSBOW_SHOOT, 0.8F, 1.8F))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.CROSSBOW_SHOOT, 0.8F, 1.8F).delay(2))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.CROSSBOW_SHOOT, 0.8F, 1.8F).delay(4))
+				// a small pit where the needle storm strikes (≤ 12 points)
+				.kehancuran(DShape.scatter(1))
 				.perfection(Bonus.extraCount(6))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -305,6 +309,8 @@ public final class UniversalArts {
 				.fx(Phase.extra(0), motesTo(0x9FE8FF).particle(ParticleTypes.SCULK_SOUL).count(12).ticks(20))
 				.fx(Phase.IMPACT, glyph("死").color2(0x202020).scale(1.6F).above(1.0F).ticks(20), impact(0x303030).particle(ParticleTypes.SCULK_SOUL).count(10).ticks(8))
 				.sound(Phase.CAST, SoundEvents.WITHER_SHOOT, 0.4F, 1.6F)
+				// the death finger pierces the ground under the struck target
+				.kehancuran(DShape.column(1, 6))
 				.perfection(Bonus.payload(exec(0.35D)))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -529,6 +535,8 @@ public final class UniversalArts {
 				.fx(Phase.CAST, coneSpray(0xF0F0F0).particle(ParticleTypes.WHITE_ASH).count(60).ticks(16), shake(0.3F, 10))
 				.fx(Phase.HIT, motesTo(0xCFEFFF).particle(ParticleTypes.SCULK_SOUL).count(6).ticks(20))
 				.sound(Phase.CAST, SoundEvents.WARDEN_SONIC_CHARGE, 1.0F, 1.3F)
+				// the killing-intent cone scours the ground in front of the caster
+				.kehancuran(DShape.fan(14, 30, 1))
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -764,6 +772,8 @@ public final class UniversalArts {
 				.fx(Phase.extra(0), shockRing(DRAGON).count(30).ticks(10))
 				.sound(Phase.CAST, SoundEvents.ENDER_DRAGON_GROWL, 0.3F, 1.0F)
 				.sound(Phase.extra(0), SoundEvents.ENDER_DRAGON_GROWL, 0.2F, 1.4F)
+				// the pulses are soul DOTs (no instant hit), so the dragon's first roar (@60) cracks a ring around the caster
+				.kehancuran(DShape.ring(10, 5, 1).at(60))
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.duration(0.25D))
 				.build());

@@ -1,9 +1,9 @@
 package dev.kultivator.client.alam;
 
-import com.mojang.math.Transformation;
 import dev.kultivator.Kultivator;
 import dev.kultivator.alam.RealmRelicEntity;
 import dev.kultivator.client.epic.sky.SkyDirector;
+import dev.kultivator.client.fx.spec.DisplayKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.nbt.CompoundTag;
@@ -297,7 +297,7 @@ public final class RealmScenery {
 			text.setBackgroundColor(0);
 			text.setBillboardConstraints(Display.BillboardConstraints.CENTER);
 			Vector3f scale = pending.scale();
-			text.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), scale, null));
+			DisplayKey.place(text, new Vector3f(), new Quaternionf(), scale);
 			text.setWidth(scale.x() / 2.0F);
 			text.setHeight(scale.y() / 2.0F);
 			return text;
@@ -308,7 +308,7 @@ public final class RealmScenery {
 		}
 		block.setBlockState(pending.block());
 		Vector3f scale = pending.scale();
-		block.setTransformation(new Transformation(pending.translation(), new Quaternionf(), scale, null));
+		DisplayKey.place(block, pending.translation(), new Quaternionf(), scale);
 		block.setWidth(Math.max(scale.x(), scale.z()) + 1.0F);
 		block.setHeight(scale.y() + 0.5F);
 		return block;
@@ -333,7 +333,6 @@ public final class RealmScenery {
 			display.setBrightnessOverride(Brightness.FULL_BRIGHT);
 			display.setViewRange(4.0F);
 			display.setShadowRadius(0.0F);
-			display.setTransformationInterpolationDelay(0);
 			level.addEntity(display);
 			createdThisTick++;
 			return display;

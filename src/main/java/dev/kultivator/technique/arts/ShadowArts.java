@@ -129,6 +129,8 @@ public final class ShadowArts {
 				.sound(Phase.TRAVEL, SoundEvents.ENDERMAN_TELEPORT, 0.7F, 1.8F)
 				.sound(Phase.HIT, SoundEvents.AMETHYST_BLOCK_HIT, 1.0F, 1.2F)
 				.sound(Phase.EXTRA0, SoundEvents.ENDERMAN_TELEPORT, 0.8F, 1.6F)
+				// a small star-shard pit at each hop that strikes (and each afterimage burst that lands)
+				.kehancuran(DShape.scatter(1))
 				.perfection(Bonus.chain(2))
 				.peak(Bonus.duration(0.25D))
 				.build());
@@ -149,6 +151,9 @@ public final class ShadowArts {
 				.fx(Phase.HIT, impact(SILVER).particle(ParticleTypes.WHITE_ASH).count(10))
 				.fx(Phase.EXTRA7, impact(SILVER).particle(ParticleTypes.END_ROD).count(8).ticks(6))
 				.sound(Phase.CAST, SoundEvents.PHANTOM_FLAP, 0.6F, 2.0F)
+				// soul DOTs only (no instant hit to anchor on): like gold_devouring_beetles the swarm withers the ground at the
+				// cast's end, and only when its DOTs really hurt something (release + hitAny)
+				.kehancuran(DShape.wither(6))
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -241,6 +246,8 @@ public final class ShadowArts {
 				.fx(Phase.EXTRA0, healRise(SOUL_BLUE).particle(ParticleTypes.SCULK_SOUL).count(60), shake(0.3F, 10))
 				.sound(Phase.CAST, SoundEvents.SCULK_SHRIEKER_SHRIEK, 0.5F, 1.6F)
 				.sound(Phase.EXTRA0, SoundEvents.SCULK_SHRIEKER_SHRIEK, 0.6F, 1.4F)
+				// the pulses are soul DOTs (no instant hit), so the formation carves when the souls fall (@240) at its centre
+				.kehancuran(DShape.wither(12).at(240), DShape.disc(5, 1).at(240))
 				.perfection(Bonus.payload(eff(Eff.DARKNESS, 1, 60)))
 				.peak(Bonus.duration(0.25D))
 				.build());

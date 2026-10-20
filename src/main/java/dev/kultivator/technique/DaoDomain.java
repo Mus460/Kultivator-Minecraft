@@ -116,7 +116,11 @@ final class DaoDomain {
 				inside.add(entity);
 			}
 		}
-		DaoTechniques.domainPulse(active.ctx, data.dao(), inside, active.radius, 1.0D, active.pulses++);
+		if (DaoTechniques.domainPulse(active.ctx, data.dao(), inside, active.radius, 1.0D, active.pulses++)) {
+			// a pulse whose damage landed is the domain's Kehancuran impact (22.11.4); only the first one carves its ring,
+			// and only when the cast's own flag is set (the switch, not sneaking, not a duel or test cast)
+			active.ctx.impact(centre, active.ctx.look());
+		}
 		active.ctx.fx(dev.kultivator.technique.spec.dsl.Phase.PULSE, centre, centre, (float) active.radius, 0.0F, inside.size(), active.pulse);
 	}
 

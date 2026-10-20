@@ -1,9 +1,9 @@
 package dev.kultivator.client.epic.fx;
 
-import com.mojang.math.Transformation;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.epic.EpicBudget;
+import dev.kultivator.client.fx.spec.DisplayKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
@@ -63,7 +63,7 @@ public final class EpicDisplays {
 		display.setBillboardConstraints(Display.BillboardConstraints.CENTER);
 		display.setLineWidth(400);
 		float scale = size / 0.25F;
-		display.setTransformation(new Transformation(new Vector3f(0.0F, 0.0F, 0.0F), new Quaternionf(), new Vector3f(scale, scale, scale), null));
+		DisplayKey.place(display, new Vector3f(0.0F, 0.0F, 0.0F), new Quaternionf(), new Vector3f(scale, scale, scale));
 		display.setWidth(size * 2.0F);
 		display.setHeight(size * 1.5F);
 		ALIVE.add(new Live(display, ticks, ticks + life, null, 0.0D));
@@ -77,8 +77,7 @@ public final class EpicDisplays {
 			return null;
 		}
 		display.setBlockState(state);
-		display.setTransformation(new Transformation(new Vector3f(-size / 2.0F, -size / 2.0F, -size / 2.0F), new Quaternionf(),
-				new Vector3f(size, size, size), null));
+		DisplayKey.place(display, new Vector3f(-size / 2.0F, -size / 2.0F, -size / 2.0F), new Quaternionf(), new Vector3f(size, size, size));
 		display.setWidth(size + 0.5F);
 		display.setHeight(size + 0.5F);
 		ALIVE.add(new Live(display, ticks, ticks + life, velocity, gravity));
@@ -158,7 +157,6 @@ public final class EpicDisplays {
 			display.setBrightnessOverride(Brightness.FULL_BRIGHT);
 			display.setViewRange(viewRange);
 			display.setShadowRadius(0.0F);
-			display.setTransformationInterpolationDelay(0);
 			level.addEntity(display);
 			createdThisTick++;
 			return display;

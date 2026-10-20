@@ -324,6 +324,8 @@ public final class BodyArts {
 				.fx(Phase.HIT, vortex(HEX_RED).particle(ParticleTypes.ENCHANT).size(0.8F).count(14).ticks(30), vortex(HEX_RED).size(0.6F).count(10).detail())
 				.sound(Phase.CAST, SoundEvents.BELL_BLOCK, 1.0F, 0.6F)
 				.sound(Phase.CAST, SoundEvents.ANVIL_LAND, 0.8F, 0.8F)
+				// the falling 封 seal slams a ring of ground around the caster
+				.kehancuran(DShape.ring(14, 6, 2))
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.echo(0.4D))
 				.build());

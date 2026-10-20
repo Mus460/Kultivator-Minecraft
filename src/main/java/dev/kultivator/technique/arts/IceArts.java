@@ -88,6 +88,8 @@ public final class IceArts {
 						trail(0xCFF4FF).particle(ParticleTypes.SNOWFLAKE).count(8))
 				.fx(Phase.LAND, shards(0xCFF4FF).count(6).ticks(8))
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.0F)
+				// a small shatter pit where each ice spear strikes
+				.kehancuran(DShape.scatter(1))
 				.perfection(Bonus.extraCount(4))));
 
 		// 402 · Seni Awan Beku · NS · Misterius-M · AREA · BOOK frost_walker, COMP 30 · Mrd Y
@@ -123,6 +125,8 @@ public final class IceArts {
 				.sound(Phase.EXTRA0, SoundEvents.GLASS_BREAK, 1.0F, 0.8F)
 				.sound(Phase.EXTRA0, SoundCue.of(SoundEvents.GLASS_BREAK, 1.0F, 1.0F).delay(2))
 				.sound(Phase.EXTRA0, SoundCue.of(SoundEvents.GLASS_BREAK, 1.0F, 1.3F).delay(4))
+				// the frozen ground shatters in a ring around the caster with the @80 shatter
+				.kehancuran(DShape.ring(10, 5, 1))
 				.perfection(Bonus.area(0.25D))));
 
 		// 404 · Api Es Qianlan · DT · Bumi-R · SERANG · BOOK frost_walker, COMP 45; PAV · Mrd Y
@@ -165,6 +169,8 @@ public final class IceArts {
 				.fx(Phase.PHANTOM, shards(0xBFEFFF).onTarget().count(10).ticks(6), arc(0xDFF6FF).count(8).ticks(6).detail())
 				.sound(Phase.CAST, SoundEvents.SNOW_GOLEM_AMBIENT, 1.2F, 0.6F)
 				.sound(Phase.CAST, SoundEvents.GLASS_BREAK, 1.0F, 0.8F)
+				// the closing @200 nova shatters the ground in a ring around the caster
+				.kehancuran(DShape.ring(12, 5, 1).at(200))
 				.perfection(Bonus.durationTicks(60))));
 
 		// 406 · Formasi Es Dingin · DU · Bumi-R · AREA · PAV; BOOK frost_walker, COMP 60 · Mrd Y
@@ -214,6 +220,8 @@ public final class IceArts {
 				.fx(Phase.TRAVEL, crescentFly(0xC8DCFF).vertical().count(20).ticks(6))
 				.fx(Phase.IMPACT, crescentFly(0xE0ECFF).count(16).ticks(6), shards(0xE0ECFF).count(14).ticks(8))
 				.sound(Phase.CAST, SoundEvents.AMETHYST_CLUSTER_BREAK, 1.0F, 1.0F)
+				// a shatter pit at each afterimage that bursts on a foe (≤ 3 per cast, one per dash)
+				.kehancuran(DShape.scatter(2))
 				.perfection(Bonus.cooldown(0.2D))));
 
 		// 408 · Api Dingin Tulang Roh · IA T1 · Langit-R · AREA · ITEM heavenly_flame_seed:bone_chilling; INH(ICE) · Mrd Y
@@ -244,6 +252,8 @@ public final class IceArts {
 				.fx(Phase.TRAVEL, model("crystal_blade").scale(3.0F).slide(10.0F).ticks(12).facing(FxLayer.Facing.BLADE), trail(0xDFF6FF).count(12))
 				.fx(Phase.HIT, shards(0xE8F8FF).count(200), shake(0.4F, 10))
 				.sound(Phase.HIT, SoundEvents.GLASS_BREAK, 1.4F, 0.9F)
+				// the blade bursts into shards: a shatter crater where it strikes
+				.kehancuran(DShape.bowl(5))
 				.perfection(Bonus.area(0.25D))));
 
 		// 410 · Seni Ilahi Akhir Beku · IA T5 · Langit-M · WILAYAH · FEAT meditate_at(frozen peaks or ice spikes, 20 min), COMP 80 · Mrd N
@@ -263,6 +273,8 @@ public final class IceArts {
 				.fx(Phase.PULSE, mist(0xF0F8FF).count(12).extra())
 				.fx(Phase.EXTRA0, shards(0xF0F8FF).count(80), shake(0.3F, 14))
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.2F, 0.5F)
+				// the domain follows the caster: its first pulse shatters a ring of ground around them
+				.kehancuran(DShape.ring(14, 6, 1))
 				.perfection(Bonus.area(0.2D))));
 
 		// 411 · Segel Embun Beku Phoenix Es · IA T9 · Langit-T · PAMUNGKAS · FEAT kills_with(ICE, elder_guardian, 3) · Mrd Y
@@ -324,6 +336,8 @@ public final class IceArts {
 				.fx(Phase.HIT, giantBlock(Blocks.ICE.defaultBlockState()).scale(2.0F))
 				.fx(Phase.EXTRA0, shards(0xDFF6FF).count(80))
 				.fx(Phase.EXTRA1, shards(0xFFFFFF).count(160), shake(0.5F, 20))
+				// the first pulse cracks the frozen ground around the caster; the @400 shatter breaks a deeper ring
+				.kehancuran(DShape.ring(16, 6, 1), DShape.ring(20, 8, 3).at(400))
 				.perfection(Bonus.area(0.2D))));
 	}
 

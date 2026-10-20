@@ -78,7 +78,6 @@ public final class PhantomDisplays {
 			display.setBrightnessOverride(Brightness.FULL_BRIGHT);
 			display.setViewRange(viewRange);
 			display.setShadowRadius(0.0F);
-			display.setTransformationInterpolationDelay(0);
 			level.addEntity(display);
 			ALIVE.add(display);
 			createdThisTick++;

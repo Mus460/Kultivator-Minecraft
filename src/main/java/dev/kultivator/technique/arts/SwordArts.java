@@ -85,6 +85,8 @@ public final class SwordArts {
 				.fx(Phase.TRAVEL, heldItem().scale(2.0F).flying().slide(10.0F).ticks(14), model("light_sword").scale(1.4F).slide(10.0F).ticks(14).facing(FxLayer.Facing.BLADE).extra(), trail(0xCFE8FF).count(10))
 				.sound(Phase.CAST, SoundEvents.TRIDENT_THROW, 1.0F, 1.6F)
 				.sound(Phase.CAST, SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 1.0F)
+				// a small cut pit where each sword shadow strikes
+				.kehancuran(DShape.scatter(1))
 				.perfection(Bonus.extraCount(3))));
 
 		// 202 · Cahaya Pedang Raksasa · NS · Misterius-M · SERANG · BOOK sharpness, COMP 30 · Mrd Y
@@ -243,6 +245,8 @@ public final class SwordArts {
 				.fx(Phase.END, glyph("血").color2(0x600008).scale(1.4F).above(1.6F).ticks(20).extra())
 				.sound(Phase.CAST, SoundEvents.TRIDENT_RIPTIDE_1, 1.0F, 1.6F)
 				.sound(Phase.HIT, SoundEvents.PLAYER_ATTACK_CRIT, 1.0F, 1.0F)
+				// the strikes land at each hop's target (anchor HIT): a small cut pit per struck foe
+				.kehancuran(DShape.scatter(1))
 				.perfection(Bonus.chain(2))));
 
 		// 211 · Niat Pedang Inti: Sikap Bintang · IA T7 · Langit-T · WILAYAH · FEAT meditate_at(open sky at night, 30 min), COMP 90 · Mrd N
@@ -261,6 +265,8 @@ public final class SwordArts {
 				.fx(Phase.TRAVEL, model("star_sword").onTarget().scale(2.0F).fall(12.0F, 6.0F).ticks(9).facing(FxLayer.Facing.BLADE), trail(0xE0E8FF).count(8).ticks(6).detail())
 				.sound(Phase.CAST, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.2F, 1.0F)
 				.sound(Phase.CAST, SoundEvents.BEACON_AMBIENT, 1.0F, 1.0F)
+				// the domain rides the caster: the first star-sword pulse scars a ring of ground around them
+				.kehancuran(DShape.ring(12, 5, 1))
 				.perfection(Bonus.area(0.25D))));
 
 		// 212 · Formasi Pedang Zhuxian · TI · Abadi-M · PAMUNGKAS · FEAT first_kill set {WITHER, WARDEN, ELDER_GUARDIAN, ENDER_DRAGON} with SWORD; INH(SWORD) · Mrd Y★18

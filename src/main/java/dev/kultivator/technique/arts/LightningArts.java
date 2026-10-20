@@ -80,6 +80,8 @@ public final class LightningArts {
 				.fx(Phase.TRAVEL, ribbon(VIOLET).color2(PALE).count(16).ticks(6))
 				.sound(Phase.CAST, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.3F, 2.0F)
 				.sound(Phase.HIT, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.2F, 1.8F)
+				// a small scorch pit at every foe the whip's lightning hops to
+				.kehancuran(DShape.scatter(1))
 				.perfection(Bonus.chain(2))
 				.peak(Bonus.echo(0.4D))
 				.build());
@@ -242,6 +244,8 @@ public final class LightningArts {
 				.sound(Phase.CAST, SoundEvents.BELL_BLOCK, 1.0F, 1.0F)
 				.sound(Phase.CAST, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.6F, 1.2F)
 				.sound(Phase.EXTRA0, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.4F, 1.6F)
+				// the mirrors' first strike burns a pit at the formation's centre
+				.kehancuran(DShape.pit(4, 2))
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.duration(0.25D))
 				.build());
@@ -385,6 +389,8 @@ public final class LightningArts {
 				.sound(Phase.CAST, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.8F, 1.0F)
 				.sound(Phase.EXTRA1, SoundEvents.LIGHTNING_BOLT_IMPACT, 0.4F, 1.4F)
 				.sound(Phase.EXTRA0, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.8F, 1.2F)
+				// the domain rides the caster: its first strike scorches a ring of ground around them
+				.kehancuran(DShape.ring(14, 6, 2))
 				.perfection(Bonus.area(0.25D))
 				.peak(Bonus.duration(0.25D))
 				.build());

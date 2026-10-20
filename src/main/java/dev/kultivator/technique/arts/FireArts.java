@@ -275,6 +275,8 @@ public final class FireArts {
 				.sound(Phase.CAST, SoundEvents.BLAZE_AMBIENT, 1.4F, 0.8F)
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BLAZE_AMBIENT, 1.4F, 1.0F).delay(5))
 				.sound(Phase.CAST, SoundCue.of(SoundEvents.BLAZE_AMBIENT, 1.4F, 1.2F).delay(10))
+				// the first burning pulse scorches a crater at the field's centre
+				.kehancuran(DShape.bowl(8))
 				.perfection(Bonus.area(0.2D))));
 
 		// 312 · Pilar Api Ilahi Penembus Langit · IA T9 · Langit-T · AREA · FEAT trib(IA layer quality ≥ Sempurna) · Mrd Y
