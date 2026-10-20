@@ -668,7 +668,7 @@ public final class Payloads {
 	 * {@code carveR} are the scaled values. Routed to {@code client.pusakalangit.TitahClient.onSync}.
 	 */
 	public record TitahSync(CompoundTag data) implements CustomPacketPayload {
-		public static final int MAX_BYTES = 8192;
+		public static final int MAX_BYTES = 65536; // the Tingkat readouts (29.16) pushed it past 10 KiB; vanilla allows 1 MiB
 		public static final Type<TitahSync> TYPE = typeOf("titah_sync");
 		public static final StreamCodec<RegistryFriendlyByteBuf, TitahSync> CODEC = StreamCodec.of(
 				(buf, p) -> ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, p.data),
