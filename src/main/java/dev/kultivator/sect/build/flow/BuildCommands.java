@@ -52,7 +52,7 @@ import java.util.stream.Stream;
  * <li><b>Player</b> ({@code /kultivasi aula bangun ...}, merged into module A's {@code aula} node): status, templat,
  * pratinjau, putar, konfirmasi [ya], batal, setor [semua|butuh], jeda, lanjut, prioritas, naik, perbaiki, bongkar
  * [ya], lepaskan [ya], plus the buttons' helpers ganti, sendiri, pindah, periksa-ulang, lewati, tanpa-terhalang.</li>
- * <li><b>Debug</b> ({@code /kultivasi debug aula bangun ...}): tingkat-set, komponen selesai, bank, rencana ulang.</li>
+ * <li><b>Debug</b> ({@code /kultivasi uji aula bangun ...}): tingkat-set, komponen selesai, bank, rencana ulang.</li>
  * <li><b>Test</b> ({@code /kultivasi uji sekte ...}, op): templat, tingkat [instan|cepat], sumber, pamer (+ konfirmasi,
  * hapus, daftar), hologram, bandingkan, info, periksa, audit, kamera, upacara, kecepatan, naik, bongkar, reset, misi,
  * pekerja. Every test placement still passes preview and confirm and goes to the engine's undo log.</li>

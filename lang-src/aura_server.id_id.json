@@ -9,6 +9,5 @@
   "kultivator.aura.cmd.accent_off": "Aksen paksa mati: pratinjau memakai aksen aslimu (jika ada).",
   "kultivator.aura.cmd.stop": "Pratinjau aura diakhiri (%s).",
   "kultivator.aura.cmd.no_disciple": "Tidak ada murid termuat milikmu bernama '%s'.",
-  "kultivator.aura.cmd.unknown_realm": "Ranah tidak dikenal: %s. Pakai mortal, qi_refining, foundation, golden_core, nascent_soul, deity_transformation, dao_union, immortal_ascension atau true_immortal.",
-  "kultivator.test.help.aura": "/kultivasi uji aura <ranah> [tahap] [lapisan] | semua | murid <nama> <ranah> [tahap] | aksen | stop — pratinjau Aura Kultivasi ranah mana pun selama 20 detik tanpa mengubah peringkat aslimu."
+  "kultivator.aura.cmd.unknown_realm": "Ranah tidak dikenal: %s. Pakai mortal, qi_refining, foundation, golden_core, nascent_soul, deity_transformation, dao_union, immortal_ascension atau true_immortal."
 }

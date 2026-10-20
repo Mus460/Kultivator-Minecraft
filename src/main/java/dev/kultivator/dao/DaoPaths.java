@@ -51,7 +51,7 @@ import java.util.UUID;
 /**
  * Choosing a Dao (DESIGN 7): once, at Golden Core or higher, through the info screen, the prompt after reaching Golden
  * Core or {@code /cultivate dao choose <dao>}. Choosing grants the Dao's techniques, the Body Dao armour and a first
- * insight. Only an admin can undo it ({@code /cultivate debug dao reset}).
+ * insight. Only an admin can undo it ({@code /cultivate uji dao reset}).
  */
 public final class DaoPaths {
 

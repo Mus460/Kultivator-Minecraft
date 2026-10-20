@@ -192,7 +192,7 @@
   "kultivator.teknik.test.gate": "True Immortal Peak, ascended, comprehension 90: %s Divine Gate prerequisites set to Peak.",
   "kultivator.teknik.test.carve_on": "Test casts may now carve the world (the Destruction Mode switch rules still apply).",
   "kultivator.teknik.test.carve_off": "Test casts no longer carve.",
-  "kultivator.teknik.test.carve_switch": "Your own Destruction Mode switch is off or not allowed: turn it on with /kultivasi kehancuran nyala.",
+  "kultivator.teknik.test.carve_switch": "Your own Destruction Mode switch is off or not allowed: turn everything on at once with /kultivasi kehancuran semua nyala.",
   "kultivator.teknik.test.cast.title": "Test cast %1$s (%2$s) · %3$s · %4$s",
   "kultivator.teknik.test.cast.kh": "Destruction: K %1$s · %2$s blocks per cast · %3$s",
   "kultivator.teknik.test.cast.refused": "The cast did not happen (see the reason above).",

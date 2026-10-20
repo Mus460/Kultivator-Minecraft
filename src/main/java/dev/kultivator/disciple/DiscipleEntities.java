@@ -16,7 +16,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 /**
  * The disciple entity type {@code kultivator:disciple} (a humanoid 0.6 x 1.8 like a player) and its base attributes.
  * Disciples are saved with the world, have no loot table (death leaves only the soul tablet) and cannot be made with
- * /summon (a disciple needs a master; {@code /kultivasi debug murid summon} recruits one for free).
+ * /summon (a disciple needs a master; {@code /kultivasi uji murid summon} recruits one for free).
  */
 public final class DiscipleEntities {
 

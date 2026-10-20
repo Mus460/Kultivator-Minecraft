@@ -1,6 +1,6 @@
 {
   "kultivator.kehancuran_diri.why.config": "server ini mematikan kehancuran oleh jurus pemain sendiri (kehancuranPlayerTechniques)",
-  "kultivator.kehancuran_diri.why.permission": "di server ini seorang operator harus mengizinkan Mode Kehancuran dulu (/kultivasi kehancuran izin on)",
+  "kultivator.kehancuran_diri.why.permission": "di server ini seorang operator harus mengizinkan Mode Kehancuran dulu (/kultivasi kehancuran izin on, atau operator menjalankan /kultivasi kehancuran semua nyala)",
   "kultivator.kehancuran_diri.refused": "Mode Kehancuran tidak bisa dinyalakan: %s.",
   "kultivator.kehancuran_diri.on_title": "MODE KEHANCURAN NYALA",
   "kultivator.kehancuran_diri.on_line": "%1$s — jurusmu kini benar-benar menghancurkan blok dunia. Batalkan dengan %2$s (%3$s menit).",
@@ -33,7 +33,7 @@
   "kultivator.kehancuran.shape.fan": "kerukan kipas",
   "kultivator.kehancuran.shape.strip": "dedaunan tersapu",
   "kultivator.screen.help.kehancuran_diri.title": "Mode Kehancuran untuk jurusmu sendiri (MATI secara bawaan)",
-  "kultivator.screen.help.kehancuran_diri": "PERINGATAN: saat saklar ini nyala, jurusmu sendiri benar-benar menghancurkan blok dunia. Bawaannya MATI dan cukup satu klik untuk menyalakan atau mematikan (segel merah di halaman Kehancuran Kitab Teknik, atau /kultivasi kehancuran nyala dan mati). Jurus baru memahat mulai Inti Emas. Tahan Shift saat merapal agar rapalan itu aman bagi blok. Tidak pernah tersentuh: 4 blok di sekitarmu (setinggi dunia), 24 blok di sekitar kasur dan pemain lain, 64 di sekitar Balai Sekte, serta tanah di dekat penduduk desa, hewan peliharaan, dan murid. Batalkan dengan /kultivasi kehancuran pulihkan dalam 10 menit; pemulihan hilang saat server dimulai ulang.",
+  "kultivator.screen.help.kehancuran_diri": "PERINGATAN: saat saklar ini nyala, jurusmu sendiri benar-benar menghancurkan blok dunia. Bawaannya MATI dan cukup satu klik untuk menyalakan atau mematikan (segel merah di halaman Kehancuran Kitab Teknik, atau /kultivasi kehancuran nyala dan mati; /kultivasi kehancuran semua nyala menyalakan semuanya sekaligus, termasuk Hancur Total, Kawah Lebur, dan Titah). Jurus baru memahat mulai Inti Emas. Tahan Shift saat merapal agar rapalan itu aman bagi blok. Tidak pernah tersentuh: 4 blok di sekitarmu (setinggi dunia), 24 blok di sekitar kasur dan pemain lain, 64 di sekitar Balai Sekte, serta tanah di dekat penduduk desa, hewan peliharaan, dan murid. Batalkan dengan /kultivasi kehancuran pulihkan dalam 10 menit; pemulihan hilang saat server dimulai ulang.",
   "advancement.kultivator.world_breaker_self.title": "Tanganku Membelah Bumi",
   "advancement.kultivator.world_breaker_self.description": "Pahat kawah pertamamu dengan jurusmu sendiri"
 }

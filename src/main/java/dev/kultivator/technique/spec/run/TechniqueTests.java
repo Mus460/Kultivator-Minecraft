@@ -165,6 +165,15 @@ public final class TechniqueTests {
 		});
 	}
 
+	/** {@code kehancuran semua nyala|mati}: the switch of {@code uji teknik kehancuran nyala|mati}, without its chat line. */
+	public static void setKehancuranTests(ServerPlayer player, boolean on) {
+		if (on) {
+			CARVE.add(player.getUUID());
+		} else {
+			CARVE.remove(player.getUUID());
+		}
+	}
+
 	/** True while {@code uji teknik kehancuran nyala} lets this player's test and showcase casts carve (22.11.2 rule 7). */
 	public static boolean kehancuranTests(ServerPlayer player) {
 		return CARVE.contains(player.getUUID());

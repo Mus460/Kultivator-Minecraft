@@ -10,6 +10,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.tree.CommandNode;
 import dev.kultivator.cultivation.Breakthrough;
 import dev.kultivator.cultivation.Meditation;
 import dev.kultivator.cultivation.PillToxicity;
@@ -51,13 +52,15 @@ import java.util.Arrays;
 import java.util.Locale;
 
 /**
- * {@code /cultivate} and its alias {@code /kultivasi}. Player subcommands plus op-only {@code debug} test commands.
- * Modules add their own subcommands through their {@code addCommands(root, debug)}; that method is called once per
- * alias, so it must only build nodes.
+ * {@code /cultivate} and its alias {@code /kultivasi}. Player subcommands plus ONE op-only cheat root, {@code uji}.
+ * Modules add their own subcommands through their {@code addCommands(root, debug)}: the second builder IS the
+ * {@code uji} node (the former {@code debug} commands live there now), and {@code addTestCommands(uji)} adds to the same
+ * node. {@code /kultivasi debug ...} is kept as a hidden alias that redirects to {@code uji}. That method is called once
+ * per alias, so it must only build nodes.
  */
 public final class CultivateCommand {
 
-	/** Name of the optional target argument of the debug commands. */
+	/** Name of the optional target argument of the cheat commands (formerly under {@code debug}). */
 	private static final String PLAYER = "player";
 	private static final String[] COSMETICS = {"aura", "robe", "back_sword", "eyes", "dao_circle"};
 	private static final int[] COSMETIC_FLAGS = {CultivationData.COSMETIC_AURA, CultivationData.COSMETIC_ROBE,
@@ -103,41 +106,45 @@ public final class CultivateCommand {
 		}
 		root.then(visual);
 
-		LiteralArgumentBuilder<CommandSourceStack> debug = Commands.literal("debug")
-				.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS));
-		addDebug(debug);
+		// ONE cheat root: every op-only test command lives under "uji". The former "debug ..." nodes are built straight
+		// into it (Brigadier merges equal literals, e.g. "uji murid", "uji teknik", "uji momen"), and "debug" stays as a
+		// hidden alias that redirects here so old commands, scripts and notes still work.
+		LiteralArgumentBuilder<CommandSourceStack> uji = Commands.literal("uji")
+				.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+				.executes(ctx -> CheatHelp.show(ctx.getSource(), name));
+		addDebug(uji);
 
-		Meditation.addCommands(root, debug);
-		Breakthrough.addCommands(root, debug);
-		PillToxicity.addCommands(root, debug);
-		SpiritRoots.addCommands(root, debug);
-		DaoPaths.addCommands(root, debug);
-		Techniques.addCommands(root, debug);
-		// Phase 6c (DESIGN 22.16.1, 22.16.3): teknik ... and debug teknik ...
-		dev.kultivator.technique.spec.run.TechniqueCommands.add(root, debug);
-		HeartDemons.addCommands(root, debug);
-		SpiritBeasts.addCommands(root, debug);
-		ProtectiveFormations.addCommands(root, debug);
-		Alchemy.addCommands(root, debug);
-		Ascension.addCommands(root, debug);
-		dev.kultivator.disciple.Disciples.addCommands(root, debug);
+		Meditation.addCommands(root, uji);
+		Breakthrough.addCommands(root, uji);
+		PillToxicity.addCommands(root, uji);
+		SpiritRoots.addCommands(root, uji);
+		DaoPaths.addCommands(root, uji);
+		Techniques.addCommands(root, uji);
+		// Phase 6c (DESIGN 22.16.1, 22.16.3): teknik ... and uji teknik mastery|cooldowns|... (formerly debug teknik)
+		dev.kultivator.technique.spec.run.TechniqueCommands.add(root, uji);
+		HeartDemons.addCommands(root, uji);
+		SpiritBeasts.addCommands(root, uji);
+		ProtectiveFormations.addCommands(root, uji);
+		Alchemy.addCommands(root, uji);
+		Ascension.addCommands(root, uji);
+		dev.kultivator.disciple.Disciples.addCommands(root, uji);
 		// Phase 6 (DESIGN 20.2.12).
-		dev.kultivator.sect.hall.Halls.addCommands(root, debug);
-		dev.kultivator.sect.event.SectEvents.addCommands(root, debug);
-		dev.kultivator.disciple.power.DisciplePowers.addCommands(root, debug);
-		dev.kultivator.disciple.path.DisciplePaths.addCommands(root, debug);
-		dev.kultivator.kehancuran.Kehancuran.addCommands(root, debug);
+		dev.kultivator.sect.hall.Halls.addCommands(root, uji);
+		dev.kultivator.sect.event.SectEvents.addCommands(root, uji);
+		dev.kultivator.disciple.power.DisciplePowers.addCommands(root, uji);
+		dev.kultivator.disciple.path.DisciplePaths.addCommands(root, uji);
+		dev.kultivator.kehancuran.Kehancuran.addCommands(root, uji);
 		// Phase 6b (DESIGN 21.24): aula bangun ... (merged into module A's aula node).
-		dev.kultivator.sect.build.SectBuild.addCommands(root, debug);
-		// Phase 7 (DESIGN 19.2.14): jalan, resep, harian, kawal, gua, fondasi, bintang and their debug nodes.
-		dev.kultivator.harta.Harta.addCommands(root, debug);
-		dev.kultivator.elite.EliteMonsters.addCommands(root, debug);
-		dev.kultivator.cultivation.ImmortalPerks.addCommands(root, debug);
-		dev.kultivator.goals.Goals.addCommands(root, debug);
-		// Phase 7b (DESIGN 23.5.1 item 5): debug momen ...
-		dev.kultivator.epic.EpicCommands.addCommands(root, debug);
-		// Phase 7c (DESIGN 24.10): formasi ... and debug formasi ...
-		dev.kultivator.formasi.Formasi.addCommands(root, debug);
+		dev.kultivator.sect.build.SectBuild.addCommands(root, uji);
+		// Phase 7 (DESIGN 19.2.14): jalan, resep, harian, kawal, gua, fondasi, bintang and their cheat nodes under uji.
+		dev.kultivator.harta.Harta.addCommands(root, uji);
+		dev.kultivator.elite.EliteMonsters.addCommands(root, uji);
+		dev.kultivator.cultivation.ImmortalPerks.addCommands(root, uji);
+		dev.kultivator.goals.Goals.addCommands(root, uji);
+		// Phase 7b (DESIGN 23.5.1 item 5): uji momen info|bendera (formerly debug momen)
+		dev.kultivator.epic.EpicCommands.addCommands(root, uji);
+		// Phase 7c (DESIGN 24.10): formasi ... and uji formasi stats|verify|clear
+		dev.kultivator.formasi.Formasi.addCommands(root, uji);
 		// Phase 8 (DESIGN 25.2 item 18, 25.11): the Dunia screen, then each module's own nodes.
 		root.then(Commands.literal("dunia")
 				.executes(ctx -> openDunia(self(ctx), dev.kultivator.network.Payloads.OpenScreen.DUNIA_ALAM))
@@ -145,10 +152,10 @@ public final class CultivateCommand {
 				.then(Commands.literal("pusaka").executes(ctx -> openDunia(self(ctx), dev.kultivator.network.Payloads.OpenScreen.DUNIA_PUSAKA)))
 				.then(Commands.literal("musuh").executes(ctx -> openDunia(self(ctx), dev.kultivator.network.Payloads.OpenScreen.DUNIA_MUSUH)))
 				.then(Commands.literal("desa").executes(ctx -> openDunia(self(ctx), dev.kultivator.network.Payloads.OpenScreen.DUNIA_DESA))));
-		dev.kultivator.alam.Alam.addCommands(root, debug);
-		dev.kultivator.musuh.Musuh.addCommands(root, debug);
-		dev.kultivator.tempa.Tempa.addCommands(root, debug);
-		dev.kultivator.desa.Desa.addCommands(root, debug);
+		dev.kultivator.alam.Alam.addCommands(root, uji);
+		dev.kultivator.musuh.Musuh.addCommands(root, uji);
+		dev.kultivator.tempa.Tempa.addCommands(root, uji);
+		dev.kultivator.desa.Desa.addCommands(root, uji);
 		// Phase 9 (DESIGN 26.14 item 18, 26.11): the Keabadian screen, then each module's own nodes (Brigadier merges the
 		// module's "abadi naik|lintas|info|ikut" into the same "abadi" node).
 		root.then(Commands.literal("abadi")
@@ -159,14 +166,22 @@ public final class CultivateCommand {
 				.then(Commands.literal("batin").executes(ctx -> openAbadi(self(ctx), dev.kultivator.network.Payloads.OpenScreen.ABADI_BATIN)))
 				.then(Commands.literal("ciptaan").executes(ctx -> openAbadi(self(ctx), dev.kultivator.network.Payloads.OpenScreen.ABADI_CIPTAAN)))
 				.then(Commands.literal("lelang").executes(ctx -> openAbadi(self(ctx), dev.kultivator.network.Payloads.OpenScreen.ABADI_LELANG))));
-		dev.kultivator.abadi.Abadi.addCommands(root, debug);
-		dev.kultivator.purba.Purba.addCommands(root, debug);
-		dev.kultivator.batin.Batin.addCommands(root, debug);
+		dev.kultivator.abadi.Abadi.addCommands(root, uji);
+		dev.kultivator.purba.Purba.addCommands(root, uji);
+		dev.kultivator.batin.Batin.addCommands(root, uji);
 		// Phase 10b (DESIGN 29.11): /kultivasi titah [daftar].
-		dev.kultivator.pusakalangit.PusakaLangit.addCommands(root, debug);
+		dev.kultivator.pusakalangit.PusakaLangit.addCommands(root, uji);
 
-		TestCommands.addCommands(root);
-		root.then(debug);
+		TestCommands.addCommands(uji);
+		root.then(uji);
+		// Kehancuran registers its own "uji kehancuran total ..." straight on the root, so the merged node is whichever
+		// "uji" was built first: look it up instead of building the builder again.
+		CommandNode<CommandSourceStack> ujiNode = root.getArguments().stream().filter(node -> node.getName().equals("uji"))
+				.findFirst().orElseThrow();
+		root.then(Commands.literal("debug")
+				.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+				.executes(ctx -> CheatHelp.show(ctx.getSource(), name))
+				.redirect(ujiNode));
 		return root;
 	}
 
@@ -186,7 +201,7 @@ public final class CultivateCommand {
 		return ctx.getSource().getPlayerOrException();
 	}
 
-	/** The debug target: the {@code player} argument when the command has one, else the executing player. */
+	/** The cheat target: the {@code player} argument when the command has one, else the executing player. */
 	private static ServerPlayer target(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
 		try {
 			return EntityArgument.getPlayer(ctx, PLAYER);
@@ -249,10 +264,10 @@ public final class CultivateCommand {
 		return 1;
 	}
 
-	// ================================================================ debug commands
+	// ================================================================ cheat commands (formerly "debug")
 
 	/**
-	 * The debug commands of the spine. Each one acts on the executing player, or on the optional trailing
+	 * The cheat commands of the spine ({@code uji set|addxp|fill|learn|forget|deviation|toxicity|reset|show}). Each one acts on the executing player, or on the optional trailing
 	 * {@code [player]} (see {@link #target}), so an operator, the console or a command block can set up anyone.
 	 */
 	private static void addDebug(LiteralArgumentBuilder<CommandSourceStack> debug) {

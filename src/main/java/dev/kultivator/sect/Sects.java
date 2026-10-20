@@ -56,6 +56,12 @@ public final class Sects {
 		});
 	}
 
+	/** {@code /kultivasi uji sekte addmember <name>} (op): the same stand-in member as {@code /sekte debug addmember}. */
+	public static int testAddMember(net.minecraft.commands.CommandSourceStack source, String name)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		return SectCommands.debugAddMember(source, name);
+	}
+
 	/** XP multiplier for meditation near a sect mate (1.15) or 1.0. */
 	public static double meditationBonus(ServerPlayer player) {
 		MinecraftServer server = player.level().getServer();

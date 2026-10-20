@@ -14,7 +14,7 @@
   "kultivator.kehancuran_total.word.server_off": "disabled by the server",
   "kultivator.kehancuran_total.yes": "yes",
   "kultivator.kehancuran_total.no": "no",
-  "kultivator.kehancuran_total.test.needs": "The Total Destruction test needs your own Mode Kehancuran switch on (/kultivasi kehancuran nyala).",
+  "kultivator.kehancuran_total.test.needs": "The Total Destruction test needs your own Mode Kehancuran switch on (one command for everything: /kultivasi kehancuran semua nyala).",
   "kultivator.kehancuran_total.test.no_undo": "The Total Destruction test needs a restore window (kehancuranUndoMinutes above 0) so its site can be cleared.",
   "kultivator.kehancuran_total.test.refused": "No loaded ground ahead of you can hold the test site.",
   "kultivator.kehancuran_total.test.zone": "The test site would touch a protected zone; move somewhere else.",

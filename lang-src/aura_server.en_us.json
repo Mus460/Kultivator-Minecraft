@@ -9,6 +9,5 @@
   "kultivator.aura.cmd.accent_off": "Forced accent off: previews show your real accent (if any).",
   "kultivator.aura.cmd.stop": "Aura previews ended (%s).",
   "kultivator.aura.cmd.no_disciple": "No loaded disciple of yours is named '%s'.",
-  "kultivator.aura.cmd.unknown_realm": "Unknown realm: %s. Use mortal, qi_refining, foundation, golden_core, nascent_soul, deity_transformation, dao_union, immortal_ascension or true_immortal.",
-  "kultivator.test.help.aura": "/kultivasi uji aura <realm> [stage] [layer] | semua | murid <name> <realm> [stage] | aksen | stop — preview the Aura Kultivasi of any realm for 20 s while your real rank stays the same."
+  "kultivator.aura.cmd.unknown_realm": "Unknown realm: %s. Use mortal, qi_refining, foundation, golden_core, nascent_soul, deity_transformation, dao_union, immortal_ascension or true_immortal."
 }
