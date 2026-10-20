@@ -661,8 +661,11 @@ public final class Payloads {
 	 * {@code recover} (ticks of the shared seal recovery left), {@code skills} (a list of 4 compounds in Skill order:
 	 * {@code unlocked}, {@code why} (a lang key when locked, else ""), {@code cdLeft} and {@code cdMax} (ticks),
 	 * {@code k}, {@code d} (0-100), {@code v}, {@code h}, {@code m}, {@code kMax}, {@code readout} (a plain line of
-	 * numbers) and {@code ro} {rVis, rDmg, blocks, cdSec, qiPct, carveR}). Routed to
-	 * {@code client.pusakalangit.TitahClient.onSync}.
+	 * numbers) and {@code ro} {rVis, rDmg, blocks, cdSec, qiPct, carveR}). Phase 10b Tingkat (DESIGN 29.16.3, contract
+	 * C10b.8) adds per skill {@code t} (the used Tingkat), {@code tMax}, {@code tWhy} (a lang key or ""), {@code perm}
+	 * (Tingkat ≥ 6 and this cast would really carve) and in {@code ro} {@code tier}, {@code dmgR}, {@code weapon} (the
+	 * planted sword or pillar length in blocks, 0 for Bintang and Gunung) and {@code permanent}; {@code rVis} and
+	 * {@code carveR} are the scaled values. Routed to {@code client.pusakalangit.TitahClient.onSync}.
 	 */
 	public record TitahSync(CompoundTag data) implements CustomPacketPayload {
 		public static final int MAX_BYTES = 8192;
@@ -684,6 +687,44 @@ public final class Payloads {
 
 		@Override
 		public Type<TitahSync> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * Phase 10b Tingkat (DESIGN 29.16.11, contract C10b.9): the live planted Titah weapons of the receiver's dimension, so
+	 * a client can draw giant monuments beyond its entity tracking range ({@code client.pusakalangit.world.FarRelic}).
+	 * Keys: {@code dim} (the dimension id) and {@code m}, a list of at most 24 {@code {id:int, x:double, y:double,
+	 * z:double, model:byte, scale:float, yaw:float, tilt:float, state:byte, born:long, tier:byte}} (newest first). Sent by
+	 * {@code TitahMonuments} to every player of the dimension on create, state change, removal and expiry, and to a player
+	 * whose dimension differs from the last one sent; an empty {@code m} clears the client's list. At most
+	 * {@link #MAX_BYTES} (the oldest entries are dropped to fit).
+	 */
+	public record TitahFar(CompoundTag data) implements CustomPacketPayload {
+		public static final int MAX_BYTES = 4096;
+		public static final int MAX_ENTRIES = 24;
+		public static final Type<TitahFar> TYPE = typeOf("titah_far");
+		public static final StreamCodec<RegistryFriendlyByteBuf, TitahFar> CODEC = StreamCodec.of(
+				(buf, p) -> ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, p.data),
+				buf -> new TitahFar(ByteBufCodecs.TRUSTED_COMPOUND_TAG.decode(buf)));
+
+		/** Sends {@code data} to the player (skipped for vanilla clients), trimmed to {@link #MAX_BYTES}. */
+		public static void send(net.minecraft.server.level.ServerPlayer player, CompoundTag data) {
+			CompoundTag out = data == null ? new CompoundTag() : data.copy();
+			net.minecraft.nbt.ListTag list = out.getListOrEmpty("m").copy();
+			while (list.size() > MAX_ENTRIES) {
+				list.remove(list.size() - 1);
+			}
+			out.put("m", list);
+			while (out.sizeInBytes() > MAX_BYTES && !list.isEmpty()) {
+				list.remove(list.size() - 1);
+				out.put("m", list);
+			}
+			Net.send(player, new TitahFar(out));
+		}
+
+		@Override
+		public Type<TitahFar> type() {
 			return TYPE;
 		}
 	}

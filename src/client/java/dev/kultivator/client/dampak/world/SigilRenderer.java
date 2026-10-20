@@ -33,12 +33,16 @@ import org.joml.Vector3f;
  * <p>
  * Titah Langit (DESIGN 29.8): {@link Frame} and {@link Sink} are public so {@code client/pusakalangit/world/TitahWorld}
  * draws its sky marks, falling-weapon trails, cleaving fissures, light grids and stepped pits into the same frame (same
- * budget, same sinks, never in the shadow pass).
+ * budget, same sinks, never in the shadow pass). Tingkat Titah (DESIGN 29.16.10) adds the two far-silhouette sinks of
+ * {@code FarRelic}'s quad LOD (Minimal, shader packs, the frame guard), which share that path and skip the shadow pass.
  */
 public final class SigilRenderer {
 
 	public static final Identifier GROUND_GLOW = Kultivator.id("textures/misc/dampak/ground_glow.png");
 	public static final Identifier CRACK_DECAL = Kultivator.id("textures/misc/dampak/crack_decal.png");
+	/** Tingkat Titah far silhouettes (DESIGN 29.16.10, LOD 3 of {@code FarRelic}): a sword and a pillar seen from afar. */
+	public static final Identifier SWORD_FAR = Kultivator.id("textures/fx/titah/sword_far.png");
+	public static final Identifier PILLAR_FAR = Kultivator.id("textures/fx/titah/pillar_far.png");
 	/** Ground quads sit this far above the surface. */
 	public static final float LIFT = 0.04F;
 
@@ -90,6 +94,8 @@ public final class SigilRenderer {
 	public static final class Frame {
 		static final RenderType GROUND_TYPE = RenderTypes.entityTranslucentEmissive(GROUND_GLOW);
 		static final RenderType CRACK_TYPE = RenderTypes.entityTranslucentEmissive(CRACK_DECAL);
+		static final RenderType SWORD_FAR_TYPE = RenderTypes.entityTranslucentEmissive(SWORD_FAR);
+		static final RenderType PILLAR_FAR_TYPE = RenderTypes.entityTranslucentEmissive(PILLAR_FAR);
 
 		public ClientLevel level;
 		double camX;
@@ -116,6 +122,9 @@ public final class SigilRenderer {
 		public final Sink glow = new Sink(EpicRenderTypes.GLOW, true);
 		/** Thin additive lines ({@code lightning()}: colour only). */
 		public final Sink lightning = new Sink(EpicRenderTypes.LIGHTNING, false);
+		/** Far silhouettes of the giant decree weapons ({@code sword_far.png}, {@code pillar_far.png}; u across, v along). */
+		public final Sink farSword = new Sink(SWORD_FAR_TYPE, true);
+		public final Sink farPillar = new Sink(PILLAR_FAR_TYPE, true);
 
 		private int pillarCount;
 		private final double[] pillarPos = new double[16 * 3];
@@ -146,11 +155,14 @@ public final class SigilRenderer {
 			rune.reset();
 			glow.reset();
 			lightning.reset();
+			farSword.reset();
+			farPillar.reset();
 			pillarCount = 0;
 		}
 
 		int quads() {
-			return (ground.vertices() + crack.vertices() + ring.vertices() + rune.vertices() + glow.vertices() + lightning.vertices()) / 4;
+			return (ground.vertices() + crack.vertices() + ring.vertices() + rune.vertices() + glow.vertices() + lightning.vertices() + farSword.vertices()
+					+ farPillar.vertices()) / 4;
 		}
 
 		public float rx(double x) {
@@ -308,6 +320,8 @@ public final class SigilRenderer {
 			ring.submit(collector, poseStack);
 			rune.submit(collector, poseStack);
 			glow.submit(collector, poseStack);
+			farSword.submit(collector, poseStack);
+			farPillar.submit(collector, poseStack);
 			for (int i = 0; i < pillarCount; i++) {
 				poseStack.pushPose();
 				double x = pillarPos[i * 3] - camX;

@@ -255,6 +255,26 @@ public final class KultivatorConfig {
 	/** The other Dewa ultimates also leave a planted weapon entity (default false, never a reward). */
 	public boolean titahUltimateMonuments = false;
 
+	// ---- phase 10b: Tingkat Titah 1-9 and the fast bulk carve (DESIGN 29.16.12)
+	/** Highest Tingkat any player can reach (1-9). */
+	public int titahMaxTier = 9;
+	/** Cap on a decree's scaled visual, damage and carve radius in blocks (128-4096). */
+	public int titahMaxRadius = 2500;
+	/** Targets one area hit of a decree takes at most (32-1024), bosses first, then nearest. */
+	public int titahMaxTargets = 256;
+	/** Milliseconds the bulk carve may use per server tick (1-20). */
+	public int titahBulkMillisPerTick = 8;
+	/** Above this average tick time (ms, 25-50) the bulk carve budget halves. */
+	public int titahBulkMsptSlow = 35;
+	/** Blocks one bulk job may change at most (100,000-50,000,000); the crater shrinks to fit. */
+	public int titahBulkMaxBlocks = 6_000_000;
+	/** Blocks an undoable bulk job (Tingkat 2-5) may change (0-4,000,000; 0 = Tingkat 2-5 carve nothing). */
+	public int titahUndoMaxBlocks = 1_000_000;
+	/** Chunks one bulk job may hold (64-4096). */
+	public int titahBulkMaxChunks = 1024;
+	/** Carved chunks that may wait for their light before the resend (2-32). */
+	public int titahBulkLightChunks = 8;
+
 	public static KultivatorConfig get() {
 		return instance;
 	}
@@ -357,6 +377,16 @@ public final class KultivatorConfig {
 		titahMonumentsPerWorld = clamp(titahMonumentsPerWorld, 1, 32);
 		titahRewardsPerDay = clamp(titahRewardsPerDay, 0, 10);
 		titahRange = clamp(titahRange, 64, 192);
+		// Phase 10b Tingkat (DESIGN 29.16.12).
+		titahMaxTier = clamp(titahMaxTier, 1, 9);
+		titahMaxRadius = clamp(titahMaxRadius, 128, 4096);
+		titahMaxTargets = clamp(titahMaxTargets, 32, 1024);
+		titahBulkMillisPerTick = clamp(titahBulkMillisPerTick, 1, 20);
+		titahBulkMsptSlow = clamp(titahBulkMsptSlow, 25, 50);
+		titahBulkMaxBlocks = clamp(titahBulkMaxBlocks, 100_000, 50_000_000);
+		titahUndoMaxBlocks = clamp(titahUndoMaxBlocks, 0, 4_000_000);
+		titahBulkMaxChunks = clamp(titahBulkMaxChunks, 64, 4096);
+		titahBulkLightChunks = clamp(titahBulkLightChunks, 2, 32);
 	}
 
 	private static int clamp(int value, int min, int max) {

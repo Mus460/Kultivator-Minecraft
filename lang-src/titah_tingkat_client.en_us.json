@@ -1,0 +1,15 @@
+{
+  "kultivator.titah_tingkat_client.screen.t": "Tier %s · %s",
+  "kultivator.titah_tingkat_client.screen.t.tip": "The size of the decree: every tier makes its world 1.6 times wider (tier 9 is about 43 times tier 1). Only the area grows; a single foe never takes more. Higher tiers wait longer (the cooldown × √tier).",
+  "kultivator.titah_tingkat_client.screen.t.limit": "Highest tier now: %s",
+  "kultivator.titah_tingkat_client.screen.t.visual": "Without Mode Kehancuran (or with Destroy land: No) this tier is visual only: nothing is permanent.",
+  "kultivator.titah_tingkat_client.screen.perm": "PERMANENT",
+  "kultivator.titah_tingkat_client.screen.perm.tip": "The land is destroyed forever; Restore does not apply; you will be asked to confirm in chat.",
+  "kultivator.titah_tingkat_client.readout": "Tier %s · R ≈ %s b · wounds ≤ %s b · carve ≤ %s b%s%s · wait %s · qi %s%%",
+  "kultivator.titah_tingkat_client.readout.sword": " · sword %s b",
+  "kultivator.titah_tingkat_client.readout.pillar": " · pillar %s b",
+  "kultivator.titah_tingkat_client.readout.perm": " · PERMANENT",
+  "kultivator.titah_tingkat_client.cmd.film": "Film of %s, the strike in %s s, framed for tier %s",
+  "kultivator.titah_tingkat_client.cmd.far.title": "Far decree weapons: %s",
+  "kultivator.titah_tingkat_client.cmd.far.none": "None known (no giant monument in this dimension and nothing falling)."
+}

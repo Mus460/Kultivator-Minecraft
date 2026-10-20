@@ -1,0 +1,15 @@
+{
+  "kultivator.titah_tingkat_client.screen.t": "Tingkat %s · %s",
+  "kultivator.titah_tingkat_client.screen.t.tip": "Ukuran titah: setiap tingkat membuat dunianya 1,6 kali lebih lebar (tingkat 9 sekitar 43 kali tingkat 1). Hanya luasnya yang bertambah; satu musuh tidak pernah terluka lebih besar. Tingkat tinggi menunggu lebih lama (jeda × √tingkat).",
+  "kultivator.titah_tingkat_client.screen.t.limit": "Tingkat tertinggi sekarang: %s",
+  "kultivator.titah_tingkat_client.screen.t.visual": "Tanpa Mode Kehancuran (atau Hancurkan tanah: Tidak) tingkat ini hanya visual: tidak ada yang permanen.",
+  "kultivator.titah_tingkat_client.screen.perm": "PERMANEN",
+  "kultivator.titah_tingkat_client.screen.perm.tip": "Tanah hancur selamanya; Pulihkan tidak berlaku; minta konfirmasi di chat.",
+  "kultivator.titah_tingkat_client.readout": "Tingkat %s · R ≈ %s b · luka ≤ %s b · pahat ≤ %s b%s%s · jeda %s · qi %s%%",
+  "kultivator.titah_tingkat_client.readout.sword": " · pedang %s b",
+  "kultivator.titah_tingkat_client.readout.pillar": " · tiang %s b",
+  "kultivator.titah_tingkat_client.readout.perm": " · PERMANEN",
+  "kultivator.titah_tingkat_client.cmd.film": "Film %s, serangan dalam %s detik, bingkai tingkat %s",
+  "kultivator.titah_tingkat_client.cmd.far.title": "Senjata titah jauh: %s",
+  "kultivator.titah_tingkat_client.cmd.far.none": "Tidak ada (tidak ada monumen raksasa di dimensi ini dan tidak ada yang jatuh)."
+}

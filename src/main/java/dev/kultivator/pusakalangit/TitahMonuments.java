@@ -9,6 +9,7 @@ import dev.kultivator.epic.EpicHooks;
 import dev.kultivator.epic.EpicIds;
 import dev.kultivator.harta.SpiritStones;
 import dev.kultivator.kehancuran.WorldBreaker;
+import dev.kultivator.network.Payloads;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
@@ -84,7 +85,23 @@ public final class TitahMonuments extends SavedData {
 		boolean revoked;
 		long[] blocks = new long[0];
 		byte[] kinds = new byte[0];
+		// ---- Phase 10b Tingkat (DESIGN 29.16.11, C10b.9): what far clients need to draw it
+		double x;
+		double y;
+		double z;
+		float yaw;
+		float tilt;
+		int tier = 1;
+		/** Session only: the entity's last state (0 settling, 1 standing, 2 pulling, 3 leaving). */
+		byte state = TitahMonumentEntity.STATE_STANDING;
 	}
+
+	/** Far monuments of one dimension are sent at most this many (contract C10b.9). */
+	public static final int FAR_MAX = 24;
+	/** Dimensions whose far list changed this tick (sent once at the end of the tick). */
+	private static final java.util.Set<ResourceKey<Level>> FAR_DIRTY = new java.util.HashSet<>();
+	/** The dimension each player was last sent a far list for (checked every 100 ticks). */
+	private static final Map<UUID, ResourceKey<Level>> FAR_SENT = new java.util.HashMap<>();
 
 	/** A block monument to clear (its weapon left); saved until its clear job finished. */
 	static final class Clear {
@@ -132,6 +149,12 @@ public final class TitahMonuments extends SavedData {
 				record.revoked = r.getBooleanOr("revoked", false);
 				record.blocks = r.getLongArray("blocks").orElse(new long[0]);
 				record.kinds = r.getByteArray("kinds").orElse(new byte[0]);
+				record.x = r.getDoubleOr("fx", record.pos.getX() + 0.5D);
+				record.y = r.getDoubleOr("fy", record.pos.getY());
+				record.z = r.getDoubleOr("fz", record.pos.getZ() + 0.5D);
+				record.yaw = r.getFloatOr("yaw", 0.0F);
+				record.tilt = r.getFloatOr("tilt", record.model == TitahMonumentEntity.MODEL_PILLAR ? 0.0F : 10.0F);
+				record.tier = Math.max(1, Math.min(9, r.getIntOr("tier", 1)));
 				if (record.id >= 0) {
 					records.put(record.id, record);
 					nextId = Math.max(nextId, record.id + 1);
@@ -190,6 +213,12 @@ public final class TitahMonuments extends SavedData {
 			r.putBoolean("revoked", record.revoked);
 			r.putLongArray("blocks", record.blocks);
 			r.putByteArray("kinds", record.kinds);
+			r.putDouble("fx", record.x);
+			r.putDouble("fy", record.y);
+			r.putDouble("fz", record.z);
+			r.putFloat("yaw", record.yaw);
+			r.putFloat("tilt", record.tilt);
+			r.putInt("tier", record.tier);
 			list.add(r);
 		}
 		tag.put("records", list);
@@ -222,6 +251,12 @@ public final class TitahMonuments extends SavedData {
 	 * of the world) is revoked first. Returns the record id, or -1 when it could not be spawned.
 	 */
 	static int create(ServerLevel level, ServerPlayer owner, byte model, Vec3 at, float yaw, float scale, float tilt, boolean test, boolean ultimate) {
+		return create(level, owner, model, at, yaw, scale, tilt, test, ultimate, 1);
+	}
+
+	/** As above at Tingkat {@code tier} (29.16.11: synced to the entity and to far clients). */
+	static int create(ServerLevel level, ServerPlayer owner, byte model, Vec3 at, float yaw, float scale, float tilt, boolean test, boolean ultimate,
+			int tier) {
 		MinecraftServer server = level.getServer();
 		TitahMonuments data = get(server);
 		KultivatorConfig config = KultivatorConfig.get();
@@ -236,7 +271,8 @@ public final class TitahMonuments extends SavedData {
 		long expires = now + config.titahMonumentDays * 24000L;
 		entity.snapTo(at.x, at.y, at.z, yaw, 0.0F);
 		entity.setYRot(yaw);
-		entity.setup(id, owner.getUUID(), owner.getName().getString(), model, scale, tilt, now, expires, test, ultimate);
+		int t = Math.max(1, Math.min(9, tier));
+		entity.setup(id, owner.getUUID(), owner.getName().getString(), model, scale, tilt, now, expires, test, ultimate, t);
 		if (!level.addFreshEntity(entity)) {
 			return -1;
 		}
@@ -253,8 +289,16 @@ public final class TitahMonuments extends SavedData {
 		record.expires = expires;
 		record.test = test;
 		record.ultimate = ultimate;
+		record.x = at.x;
+		record.y = at.y;
+		record.z = at.z;
+		record.yaw = yaw;
+		record.tilt = tilt;
+		record.tier = t;
+		record.state = TitahMonumentEntity.STATE_SETTLING;
 		data.records.put(id, record);
 		data.setDirty();
+		markFar(record.dimension);
 		return id;
 	}
 
@@ -308,6 +352,7 @@ public final class TitahMonuments extends SavedData {
 			return;
 		}
 		record.revoked = true;
+		markFar(record.dimension);
 		queueClear(record);
 		TitahMonumentEntity entity = loaded(server, record);
 		if (entity != null) {
@@ -363,6 +408,7 @@ public final class TitahMonuments extends SavedData {
 		if (record == null) {
 			return;
 		}
+		markFar(record.dimension);
 		data.queueClear(record);
 		data.setDirty();
 	}
@@ -473,6 +519,7 @@ public final class TitahMonuments extends SavedData {
 
 	/** Prunes expired records (their block monuments are queued for clearing) and submits the pending clears. */
 	static void tick(MinecraftServer server) {
+		tickFar(server);
 		if (server.getTickCount() % CLEAR_RETRY_TICKS != 7) {
 			return;
 		}
@@ -486,6 +533,7 @@ public final class TitahMonuments extends SavedData {
 			Planted record = it.next();
 			if (now >= record.expires) {
 				it.remove();
+				markFar(record.dimension);
 				data.queueClear(record);
 				TitahMonumentEntity entity = loaded(server, record);
 				if (entity != null) {
@@ -539,6 +587,7 @@ public final class TitahMonuments extends SavedData {
 		for (Planted record : all) {
 			TitahMonumentEntity entity = loaded(server, record);
 			data.records.remove(record.id);
+			markFar(record.dimension);
 			data.queueClear(record);
 			if (entity != null) {
 				entity.leave();
@@ -554,9 +603,120 @@ public final class TitahMonuments extends SavedData {
 		for (Planted record : data.records.values()) {
 			record.born -= days * 24000L;
 			record.expires -= days * 24000L;
+			markFar(record.dimension);
 		}
 		data.setDirty();
 		return data.records.size();
+	}
+
+	// ================================================================== far monuments (DESIGN 29.16.11, contract C10b.9)
+
+	/** The entity's state changed (settling, standing, pulling, leaving): far clients hear of it. */
+	static void noteState(MinecraftServer server, int id, byte state) {
+		Planted record = get(server).records.get(id);
+		if (record != null && record.state != state) {
+			record.state = state;
+			markFar(record.dimension);
+		}
+	}
+
+	/** The entity re-seated onto a crater floor by at least 2 blocks: the record's exact place follows. */
+	static void noteSeat(MinecraftServer server, int id, double x, double y, double z) {
+		TitahMonuments data = get(server);
+		Planted record = data.records.get(id);
+		if (record == null) {
+			return;
+		}
+		record.x = x;
+		record.y = y;
+		record.z = z;
+		record.pos = BlockPos.containing(x, y, z);
+		data.setDirty();
+		markFar(record.dimension);
+	}
+
+	private static void markFar(ResourceKey<Level> dimension) {
+		if (dimension != null) {
+			FAR_DIRTY.add(dimension);
+		}
+	}
+
+	/**
+	 * Every tick: the dimensions whose list changed go out to all their players; every 100 ticks a player whose dimension
+	 * differs from the last one sent (a join, a portal) gets its dimension's list (no event API needed).
+	 */
+	private static void tickFar(MinecraftServer server) {
+		if (!FAR_DIRTY.isEmpty()) {
+			List<ResourceKey<Level>> dims = new ArrayList<>(FAR_DIRTY);
+			FAR_DIRTY.clear();
+			for (ResourceKey<Level> dimension : dims) {
+				ServerLevel level = server.getLevel(dimension);
+				if (level == null || level.players().isEmpty()) {
+					continue;
+				}
+				CompoundTag tag = farList(server, dimension);
+				for (ServerPlayer player : level.players()) {
+					Payloads.TitahFar.send(player, tag);
+					FAR_SENT.put(player.getUUID(), dimension);
+				}
+			}
+		}
+		if (server.getTickCount() % CLEAR_RETRY_TICKS != 3) {
+			return;
+		}
+		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+			ResourceKey<Level> dimension = player.level().dimension();
+			if (!dimension.equals(FAR_SENT.get(player.getUUID()))) {
+				Payloads.TitahFar.send(player, farList(server, dimension));
+				FAR_SENT.put(player.getUUID(), dimension);
+			}
+		}
+	}
+
+	/**
+	 * The {@code TitahFar} data of {@code dimension}: {@code m} = up to 24 live monuments (newest first) as
+	 * {id, x, y, z, model, scale, yaw, tilt, state, born, tier}.
+	 */
+	static CompoundTag farList(MinecraftServer server, ResourceKey<Level> dimension) {
+		long now = now(server);
+		List<Planted> live = new ArrayList<>();
+		for (Planted record : get(server).records.values()) {
+			if (!record.revoked && now < record.expires && dimension.equals(record.dimension)) {
+				live.add(record);
+			}
+		}
+		live.sort(Comparator.comparingLong((Planted record) -> -record.born).thenComparingInt(record -> -record.id));
+		ListTag list = new ListTag();
+		for (int i = 0; i < live.size() && i < FAR_MAX; i++) {
+			Planted record = live.get(i);
+			CompoundTag m = new CompoundTag();
+			m.putInt("id", record.id);
+			m.putDouble("x", record.x);
+			m.putDouble("y", record.y);
+			m.putDouble("z", record.z);
+			m.putByte("model", record.model);
+			m.putFloat("scale", record.scale);
+			m.putFloat("yaw", record.yaw);
+			m.putFloat("tilt", record.tilt);
+			m.putByte("state", record.state);
+			m.putLong("born", record.born);
+			m.putByte("tier", (byte) record.tier);
+			list.add(m);
+		}
+		CompoundTag tag = new CompoundTag();
+		tag.putString("dim", dimension.identifier().toString());
+		tag.put("m", list);
+		return tag;
+	}
+
+	/** Session cleanup (server stop, a player leaving). */
+	static void forgetFar(@Nullable UUID player) {
+		if (player == null) {
+			FAR_DIRTY.clear();
+			FAR_SENT.clear();
+		} else {
+			FAR_SENT.remove(player);
+		}
 	}
 
 	/** {records, pending clears, block cells held} for {@code beban}. */

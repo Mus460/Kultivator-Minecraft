@@ -5,11 +5,14 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.kultivator.kehancuran.BulkShape;
 import dev.kultivator.kehancuran.Kehancuran;
+import dev.kultivator.technique.spec.dsl.Dampak;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -51,16 +54,44 @@ public final class TitahTests {
 				.then(Commands.literal("mati").executes(ctx -> bypass(self(ctx), false))));
 		for (Titah.Skill skill : Titah.Skill.values()) {
 			root.then(Commands.literal(skill.key())
-					.executes(ctx -> cast(self(ctx), skill, 1.0F, 1.0F, 1.0F))
+					.executes(ctx -> cast(self(ctx), skill, 1.0F, 1.0F, 1.0F, 1))
 					.then(Commands.argument("kekuatan", FloatArgumentType.floatArg(0.1F, 10.0F))
-							.executes(ctx -> cast(self(ctx), skill, FloatArgumentType.getFloat(ctx, "kekuatan"), 1.0F, 1.0F))
+							.executes(ctx -> cast(self(ctx), skill, FloatArgumentType.getFloat(ctx, "kekuatan"), 1.0F, 1.0F, 1))
 							.then(Commands.argument("kecepatan", FloatArgumentType.floatArg(0.3F, 3.0F))
 									.executes(ctx -> cast(self(ctx), skill, FloatArgumentType.getFloat(ctx, "kekuatan"),
-											FloatArgumentType.getFloat(ctx, "kecepatan"), 1.0F))
+											FloatArgumentType.getFloat(ctx, "kecepatan"), 1.0F, 1))
 									.then(Commands.argument("kerusakan", FloatArgumentType.floatArg(0.0F, 100.0F))
 											.executes(ctx -> cast(self(ctx), skill, FloatArgumentType.getFloat(ctx, "kekuatan"),
-													FloatArgumentType.getFloat(ctx, "kecepatan"), FloatArgumentType.getFloat(ctx, "kerusakan") / 100.0F))))));
+													FloatArgumentType.getFloat(ctx, "kecepatan"), FloatArgumentType.getFloat(ctx, "kerusakan") / 100.0F, 1))
+											// Phase 10b Tingkat (DESIGN 29.16.15): [tingkat] 1-9 (≤ titahMaxTier)
+											.then(Commands.argument("tingkat", IntegerArgumentType.integer(1, TitahSettings.T_MAX))
+													.executes(ctx -> cast(self(ctx), skill, FloatArgumentType.getFloat(ctx, "kekuatan"),
+															FloatArgumentType.getFloat(ctx, "kecepatan"), FloatArgumentType.getFloat(ctx, "kerusakan") / 100.0F,
+															IntegerArgumentType.getInteger(ctx, "tingkat"))))))));
 		}
+		// Phase 10b Tingkat (DESIGN 29.16.15)
+		root.then(Commands.literal("tingkat")
+				.then(Commands.argument("tingkat", IntegerArgumentType.integer(1, TitahSettings.T_MAX))
+						.executes(ctx -> tierAll(self(ctx), IntegerArgumentType.getInteger(ctx, "tingkat")))));
+		root.then(Commands.literal("tingkat_tabel")
+				.executes(ctx -> table(self(ctx), null))
+				.then(Commands.literal("pedang").executes(ctx -> table(self(ctx), Titah.Skill.PEDANG)))
+				.then(Commands.literal("tiang").executes(ctx -> table(self(ctx), Titah.Skill.TIANG)))
+				.then(Commands.literal("bintang").executes(ctx -> table(self(ctx), Titah.Skill.BINTANG)))
+				.then(Commands.literal("gunung").executes(ctx -> table(self(ctx), Titah.Skill.GUNUNG))));
+		root.then(Commands.literal("pahat_cepat")
+				.then(Commands.literal("info").executes(ctx -> bulkInfo(ctx.getSource())))
+				.then(Commands.literal("batal").executes(ctx -> Kehancuran.cancelBulk(self(ctx)) > 0 ? 1 : 0))
+				.then(Commands.argument("radius", IntegerArgumentType.integer(8, 512))
+						.executes(ctx -> bulk(self(ctx), null, IntegerArgumentType.getInteger(ctx, "radius"), -1, false, false))
+						.then(Commands.literal("permanen")
+								.executes(ctx -> bulk(self(ctx), null, IntegerArgumentType.getInteger(ctx, "radius"), -1, true, false)))
+						.then(Commands.argument("kedalaman", IntegerArgumentType.integer(4, 128))
+								.executes(ctx -> bulk(self(ctx), null, IntegerArgumentType.getInteger(ctx, "radius"),
+										IntegerArgumentType.getInteger(ctx, "kedalaman"), false, false))
+								.then(Commands.literal("permanen")
+										.executes(ctx -> bulk(self(ctx), null, IntegerArgumentType.getInteger(ctx, "radius"),
+												IntegerArgumentType.getInteger(ctx, "kedalaman"), true, false))))));
 		root.then(Commands.literal("semua").executes(ctx -> tour(self(ctx))));
 		LiteralArgumentBuilder<CommandSourceStack> monument = Commands.literal("monumen");
 		monument.then(Commands.literal("pedang")
@@ -100,18 +131,116 @@ public final class TitahTests {
 		return 1;
 	}
 
-	private static int cast(ServerPlayer player, Titah.Skill skill, float kekuatan, float kecepatan, float kerusakan) {
+	private static int cast(ServerPlayer player, Titah.Skill skill, float kekuatan, float kecepatan, float kerusakan, int tingkat) {
 		Titah.Settings stored = TitahSettings.raw(dev.kultivator.data.Cultivators.get(player), skill);
-		Titah.Settings settings = new Titah.Settings(kekuatan, kerusakan, kecepatan, stored.hancur(), stored.monumen());
+		Titah.Settings settings = new Titah.Settings(kekuatan, kerusakan, kecepatan, stored.hancur(), stored.monumen(), tingkat);
 		boolean done = Titah.castWith(player, skill, true, settings, null);
 		if (!done) {
+			if (Titah.askedNow(player)) {
+				// 29.16.5: a real Tingkat 6-9 test cast waits for the chat confirmation too
+				Msg.chat(player, Component.translatable("kultivator.pusaka_langit.tier.test.asked").withStyle(ChatFormatting.GOLD));
+				return 1;
+			}
 			Msg.chat(player, Component.translatable(KEY + "refused", skill.displayName()).withStyle(ChatFormatting.RED));
 			return 0;
 		}
-		Titah.Settings used = TitahSettings.sanitize(settings, 10.0F);
-		TitahSettings.Readout readout = TitahSettings.readout(skill, used, dev.kultivator.KultivatorConfig.get());
+		Titah.Settings used = TitahSettings.sanitize(settings, 10.0F, Titah.freeTierLimit());
+		boolean perm = TitahSettings.permanent(used, Kehancuran.selfOn(player)) && dev.kultivator.technique.spec.run.TechniqueTests.kehancuranTests(player);
+		TitahSettings.Readout readout = TitahSettings.readout(skill, used, dev.kultivator.KultivatorConfig.get(), perm);
 		Msg.chat(player, Component.translatable(KEY + "cast", skill.displayName(), readout.line(), Kehancuran.selfOn(player)
 				? Component.translatable(KEY + "real") : Component.translatable(KEY + "visual")).withStyle(ChatFormatting.GOLD));
+		return 1;
+	}
+
+	/** {@code tingkat <1-9>}: the Tingkat of all four stored decrees (≤ {@code titahMaxTier}). */
+	private static int tierAll(ServerPlayer player, int tier) {
+		dev.kultivator.data.CultivationData data = dev.kultivator.data.Cultivators.get(player);
+		int t = Math.max(1, Math.min(Titah.freeTierLimit(), tier));
+		for (Titah.Skill skill : Titah.Skill.values()) {
+			TitahSettings.write(player, skill, TitahSettings.raw(data, skill).withTingkat(t));
+		}
+		HeavenDecreeSealItem.refreshView(player);
+		TitahSettings.sync(player);
+		Msg.chat(player, Component.translatable("kultivator.pusaka_langit.tier.test.all", t).withStyle(ChatFormatting.YELLOW));
+		return 1;
+	}
+
+	/** {@code tingkat_tabel [decree]}: 29.16.1's table for the caller's settings of the decree (the selected one by default). */
+	private static int table(ServerPlayer player, Titah.@Nullable Skill wanted) {
+		dev.kultivator.data.CultivationData data = dev.kultivator.data.Cultivators.get(player);
+		Titah.Skill skill = wanted != null ? wanted : TitahSettings.selected(data);
+		Titah.Settings stored = TitahSettings.sanitize(TitahSettings.raw(data, skill), 10.0F);
+		dev.kultivator.KultivatorConfig config = dev.kultivator.KultivatorConfig.get();
+		Msg.chat(player, Component.translatable("kultivator.pusaka_langit.tier.table.head", skill.displayName(),
+				String.format(java.util.Locale.ROOT, "%.2f", stored.kekuatan()), Titah.tierLimit(data), config.titahMaxTier).withStyle(ChatFormatting.GOLD));
+		for (int t = 1; t <= TitahSettings.T_MAX; t++) {
+			TitahSettings.Readout r = TitahSettings.readout(skill, stored.withTingkat(t), config, false);
+			player.sendSystemMessage(Component.translatable("kultivator.pusaka_langit.tier.table.row", t,
+					String.format(java.util.Locale.ROOT, "%.2f", TitahSkill.tierScale(t)), r.rVis(), r.rDmg(), r.carveR(), r.weapon(), (r.cdSec() + 59) / 60,
+					t >= Titah.PERMANENT_TIER ? Component.translatable("kultivator.pusaka_langit.tier.readout.permanent") : Component.empty())
+					.withStyle(t <= Titah.tierLimit(data) ? ChatFormatting.GRAY : ChatFormatting.DARK_GRAY));
+		}
+		return 1;
+	}
+
+	/**
+	 * {@code pahat_cepat <radius> [kedalaman] [permanen]} (29.16.15): one bulk Bowl at the aim through
+	 * {@code Kehancuran.submitTitahBulk} (spec {@code titah_tiang}, palette FIRE). Needs {@code uji teknik kehancuran nyala}
+	 * and the own switch. Without {@code permanen} it is undoable (shrunk to {@code titahUndoMaxBlocks}); with it, it asks
+	 * the chat confirmation first ({@code confirmed} after "[Ya, hancurkan permanen]").
+	 */
+	static int bulk(ServerPlayer player, @Nullable Vec3 aimed, int radius, int depthArg, boolean permanent, boolean confirmed) {
+		if (!dev.kultivator.technique.spec.run.TechniqueTests.kehancuranTests(player) || !Kehancuran.selfOn(player)) {
+			Msg.chat(player, Component.translatable("kultivator.pusaka_langit.tier.test.bulk_needs").withStyle(ChatFormatting.RED));
+			return 0;
+		}
+		Vec3 at = aimed != null ? aimed : Titah.aim(player);
+		if (at == null) {
+			Msg.chat(player, Component.translatable("kultivator.pusaka_langit.refuse.aim", dev.kultivator.KultivatorConfig.get().titahRange)
+					.withStyle(ChatFormatting.RED));
+			return 0;
+		}
+		int r = Math.max(8, Math.min(512, radius));
+		int depth = depthArg > 0 ? Math.max(4, Math.min(128, depthArg)) : Math.max(4, Math.min(128, (int) Math.ceil(0.6D * r)));
+		if (permanent && !confirmed) {
+			Titah.askConfirm(player, null, Titah.Settings.DEFAULT.withTingkat(Titah.PERMANENT_TIER), at, true, r, depth);
+			return 1;
+		}
+		BlockPos anchor = BlockPos.containing(at);
+		BlockPos impact = new BlockPos(anchor.getX(), BulkShape.impactY(player.level(), anchor), anchor.getZ());
+		BulkShape shape = BulkShape.of(impact, player.getViewVector(1.0F), List.of(new BulkShape.Bowl(impact.getX() + 0.5D, impact.getZ() + 0.5D,
+				impact.getY(), r, depth)));
+		Kehancuran.SelfResult result = Kehancuran.submitTitahBulk(player, TitahArts.IDS[Titah.Skill.TIANG.ordinal()], shape,
+				new Kehancuran.TitahBulk(permanent ? Titah.PERMANENT_TIER : 2, permanent, confirmed, Dampak.Palette.FIRE, 0, -1, player.position()));
+		Msg.chat(player, Component.translatable("kultivator.pusaka_langit.tier.test.bulk", r, depth,
+				Component.translatable(permanent ? "kultivator.pusaka_langit.tier.readout.permanent" : "kultivator.pusaka_langit.tier.test.undoable"),
+				result.name()).withStyle(result == Kehancuran.SelfResult.QUEUED ? ChatFormatting.GOLD : ChatFormatting.RED));
+		return result == Kehancuran.SelfResult.QUEUED ? 1 : 0;
+	}
+
+	/** {@code pahat_cepat info}: the running bulk job (phase, chunks, blocks, ms per tick, light queue, tickets, clip, shrink). */
+	private static int bulkInfo(CommandSourceStack source) {
+		dev.kultivator.kehancuran.WorldBreaker.BulkInfo info = Kehancuran.bulkInfo();
+		if (info == null) {
+			source.sendSuccess(() -> Component.translatable("kultivator.pusaka_langit.tier.info.none").withStyle(ChatFormatting.GRAY), false);
+			return 0;
+		}
+		String phase = switch (info.phase()) {
+			case 0 -> "PLAN";
+			case 1 -> info.restore() ? "RESTORE" : "CARVE";
+			case 2 -> "DRAIN";
+			default -> "DONE";
+		};
+		source.sendSuccess(() -> Component.translatable("kultivator.pusaka_langit.tier.info.head", info.ownerName(), phase, info.tier(),
+				Component.translatable(info.permanent() ? "kultivator.pusaka_langit.tier.readout.permanent" : "kultivator.pusaka_langit.tier.test.undoable"),
+				info.queued()).withStyle(ChatFormatting.GOLD), false);
+		source.sendSuccess(() -> Component.translatable("kultivator.pusaka_langit.tier.info.chunks", info.chunksDone(), info.chunksTotal(),
+				info.chunksSkipped(), info.tickets(), info.light()).withStyle(ChatFormatting.GRAY), false);
+		source.sendSuccess(() -> Component.translatable("kultivator.pusaka_langit.tier.info.blocks", info.changed(), info.surface(), info.kept(),
+				info.protectedColumns(), info.estimate()).withStyle(ChatFormatting.GRAY), false);
+		source.sendSuccess(() -> Component.translatable("kultivator.pusaka_langit.tier.info.time", String.format(java.util.Locale.ROOT, "%.2f",
+				info.msPerTick()), String.format(java.util.Locale.ROOT, "%.2f", info.clip()), String.format(java.util.Locale.ROOT, "%.2f", info.shrink()),
+				info.outer(), info.requestedOuter()).withStyle(ChatFormatting.GRAY), false);
 		return 1;
 	}
 

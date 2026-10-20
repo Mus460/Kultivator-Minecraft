@@ -27,6 +27,10 @@ import java.util.List;
  * {@code SoundManager.playDelayed}. This runs before any VFX gate, so "Efek pemain lain: Mati" still hears the boom.
  * During the silence the world categories duck to 0.35 ({@link EpicSound#duck}: never HOSTILE or PLAYERS), and a
  * sub-bass lands with the boom for a nearby viewer. "Dampak sunyi: Mati" plays the cues at their own delays.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): the boom of a tier 2-9 decree also travels at about 340 m/s, so a listener far away
+ * hears it up to 120 ticks later ({@code max(silence + near travel, min(120, distance / 17))}); tier 1 keeps the timing
+ * above.
  */
 public final class SilentImpact {
 
@@ -40,11 +44,17 @@ public final class SilentImpact {
 	public static void onClimax(Payloads.TechFx p, TechniqueSpec spec, Dampak d, Phase phase, boolean own) {
 		List<SoundCue> cues = spec.sounds(phase);
 		Vec3 at = new Vec3(p.x(), p.y(), p.z());
-		play(cues, at, d.silence(), p.seed(), own);
+		int tier = spec.has(TechniqueSpec.Flag.TITAH) ? Math.max(1, Math.min(9, 1 + (p.aux() >> 14 & 0xF))) : 1;
+		play(cues, at, d.silence(), p.seed(), own, tier);
 	}
 
 	/** Plays {@code cues} at {@code at} after the silence and the distance; returns the boom's delay in ticks. */
 	public static int play(List<SoundCue> cues, Vec3 at, int silence, int seed, boolean own) {
+		return play(cues, at, silence, seed, own, 1);
+	}
+
+	/** {@link #play} of a Titah decree of Tingkat {@code tier}: from tier 2 the boom travels at about 17 b per tick. */
+	public static int play(List<SoundCue> cues, Vec3 at, int silence, int seed, boolean own, int tier) {
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.level == null || minecraft.player == null) {
 			return 0;
@@ -54,6 +64,10 @@ public final class SilentImpact {
 		boolean on = EpicSettings.silentImpact();
 		int travel = (int) Math.min(16L, Math.round(distance / 2.0D));
 		int extra = on ? Math.max(0, silence) + travel : 0;
+		if (on && tier >= 2) {
+			// a giant decree: the boom rolls in at the speed of sound (about 17 b per tick), at most 6 s late
+			extra = Math.max(extra, (int) Math.min(120L, Math.round(distance / 17.0D)));
+		}
 		SoundManager sounds = minecraft.getSoundManager();
 		int count = Math.min(4, cues.size());
 		for (int i = 0; i < count; i++) {

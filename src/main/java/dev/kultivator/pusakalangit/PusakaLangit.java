@@ -1,5 +1,6 @@
 package dev.kultivator.pusakalangit;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.kultivator.network.Payloads;
 import dev.kultivator.util.Msg;
@@ -11,6 +12,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Locale;
@@ -32,14 +34,19 @@ public final class PusakaLangit {
 			try {
 				TitahMonuments.tick(server);
 				TitahTests.tick(server);
+				Titah.tick(server);
 			} catch (RuntimeException exception) {
 				dev.kultivator.Kultivator.LOGGER.error("Kultivator: Titah upkeep failed", exception);
 			}
 		});
-		ServerPlayerEvents.LEAVE.register(player -> Titah.forget(player.getUUID()));
+		ServerPlayerEvents.LEAVE.register(player -> {
+			Titah.forget(player.getUUID());
+			TitahMonuments.forgetFar(player.getUUID());
+		});
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			Titah.clearAll();
 			TitahTests.clearAll();
+			TitahMonuments.forgetFar(null);
 		});
 	}
 
@@ -49,9 +56,46 @@ public final class PusakaLangit {
 	}
 
 	public static void addCommands(LiteralArgumentBuilder<CommandSourceStack> root, LiteralArgumentBuilder<CommandSourceStack> debug) {
+		LiteralArgumentBuilder<CommandSourceStack> tier = Commands.literal("tingkat");
+		com.mojang.brigadier.builder.RequiredArgumentBuilder<CommandSourceStack, Integer> value = Commands.argument("tingkat",
+				IntegerArgumentType.integer(1, TitahSettings.T_MAX));
+		value.executes(ctx -> setTier(ctx.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(ctx, "tingkat"), null));
+		for (Titah.Skill skill : Titah.Skill.values()) {
+			value.then(Commands.literal(skill.key())
+					.executes(ctx -> setTier(ctx.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(ctx, "tingkat"), skill)));
+		}
+		tier.then(value);
 		root.then(Commands.literal("titah")
 				.executes(ctx -> open(ctx.getSource().getPlayerOrException()))
-				.then(Commands.literal("daftar").executes(ctx -> list(ctx.getSource().getPlayerOrException()))));
+				.then(Commands.literal("daftar").executes(ctx -> list(ctx.getSource().getPlayerOrException())))
+				// Phase 10b Tingkat (DESIGN 29.16.3, 29.16.5)
+				.then(tier)
+				.then(Commands.literal("ya")
+						.then(Commands.argument("kode", IntegerArgumentType.integer(0, 99999))
+								.executes(ctx -> Titah.confirm(ctx.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(ctx, "kode")))))
+				.then(Commands.literal("batal").executes(ctx -> Titah.cancelConfirm(ctx.getSource().getPlayerOrException()))));
+	}
+
+	/**
+	 * {@code /kultivasi titah tingkat <1-9> [decree]}: the Tingkat of the named decree (or the selected one), clamped to
+	 * the player's limit (told when it was cut), answered with the readout.
+	 */
+	private static int setTier(ServerPlayer player, int wanted, Titah.@Nullable Skill named) {
+		dev.kultivator.data.CultivationData data = dev.kultivator.data.Cultivators.get(player);
+		Titah.Skill skill = named != null ? named : TitahSettings.selected(data);
+		int stored = TitahSettings.setTier(player, skill, wanted);
+		if (stored < wanted) {
+			String why = Titah.tierWhy(data, Titah.bypass(player));
+			Msg.chat(player, Component.translatable(KEY + "tier.clamped", wanted, stored, why.isEmpty() ? Component.empty() : Component.translatable(why))
+					.withColor(0xFF8A7A));
+		}
+		Titah.Settings used = TitahSettings.read(player, skill);
+		boolean perm = TitahSettings.permanent(used, dev.kultivator.kehancuran.Kehancuran.selfOn(player));
+		TitahSettings.Readout readout = TitahSettings.readout(skill, used, dev.kultivator.KultivatorConfig.get(), perm);
+		Msg.chat(player, Component.translatable(KEY + "tier.set", skill.displayName(), readout.component()).withStyle(ChatFormatting.GOLD));
+		HeavenDecreeSealItem.refreshView(player);
+		TitahSettings.sync(player);
+		return stored;
 	}
 
 	/** {@code /kultivasi titah}: the menu, when a seal of the player's is in the inventory. */

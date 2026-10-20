@@ -255,7 +255,22 @@ public final class DampakWorld {
 		}
 	}
 
-	/** A Titah sigil of {@code pattern} up to 256 b, faint until its nodes light; false when none is drawn. */
+	/**
+	 * Tingkat Titah (DESIGN 29.16.10): the far ring of a decree wider than this client draws, at its true radius (≤ 4096
+	 * b); only its horizon arc within render distance draws, and nothing inside {@code nearCap} (the near ring's radius).
+	 */
+	public static void titahFarRing(Vec3 centre, float radius, float nearCap, String variant, int rgb, boolean own, int delay) {
+		try {
+			ShockRing.startTitahFar(centre, radius, nearCap, variant, rgb & 0xFFFFFF, own, delay);
+		} catch (RuntimeException exception) {
+			warn("titah far ring", exception);
+		}
+	}
+
+	/**
+	 * A Titah sigil of {@code pattern} (up to 256 b at tier 1, the true radius up to 4096 b from tier 2, of which only the
+	 * visible part draws), faint until its nodes light; false when none is drawn.
+	 */
 	public static boolean titahSigil(ClientLevel level, long cast, @Nullable SigilPattern pattern, Vec3 castPos, Vec3 centre, float radius, int seed,
 									 int rgb, boolean own, @Nullable String palette) {
 		try {

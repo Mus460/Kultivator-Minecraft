@@ -39,10 +39,17 @@ import java.util.Locale;
  * "Hancurkan tanah" coin (only while Mode Kehancuran is on), "Tinggalkan pusaka" (Pedang, Tiang), the client-side Film
  * choice (Penuh / Singkat / Mati), the server's readout line and the hint line; at the bottom the talismans Pilih,
  * Bawaan and Peringatan cahaya. Every value is sanitised by the server, which answers with a {@code TitahSync}.
+ * <p>
+ * Tingkat Titah (DESIGN 29.16.10): a "Tingkat" slider (1-9, label "Tingkat t · ×s") sits above Kekuatan; tiers above
+ * the realm's limit are greyed with a red seal and its tooltip names the reason; at tier 6-9, when the cast would carve
+ * for real, a red PERMANEN stamp stands right of it. The rows below moved down 19 px and still fit 320 × 240.
  */
 public final class TitahScreen extends Screen {
 
 	private static final String K = "kultivator.titah_client.screen.";
+	private static final String KT = "kultivator.titah_tingkat_client.screen.";
+	/** The room right of the Tingkat slider for the PERMANEN stamp. */
+	private static final int STAMP_W = 44;
 	private static final Identifier ICONS = Kultivator.id("textures/gui/titah/decree_icons.png");
 	private static final Identifier WASH = Kultivator.id("textures/gui/titah/seal_wash.png");
 	private static final int MAX_W = 312;
@@ -57,6 +64,7 @@ public final class TitahScreen extends Screen {
 	private int skill;
 	private final List<Widget> widgets = new ArrayList<>();
 	private @Nullable Widget pressed;
+	private @Nullable JadeSlider tSlider;
 	private @Nullable JadeSlider kSlider;
 	private @Nullable JadeSlider dSlider;
 	private @Nullable JadeSlider vSlider;
@@ -114,6 +122,15 @@ public final class TitahScreen extends Screen {
 		TitahClient.Decree decree = TitahClient.decree(skill);
 		boolean open = decree.unlocked;
 		int current = skill;
+		// Tingkat (29.16.10): above Kekuatan, the stamp's room on its right
+		tSlider = new JadeSlider(rx, y, Math.max(40, rw - STAMP_W), 16, TitahClient.T_STEPS, TitahClient.nearest(TitahClient.T_STEPS, decree.t),
+				value -> Component.translatable(KT + "t", Math.round(value), scale(Math.round(value))),
+				index -> TitahClient.set(current, TitahClient.FIELD_T, TitahClient.T_STEPS[index]))
+				.limit(() -> TitahClient.tMaxIndex(current));
+		tSlider.active = open;
+		tSlider.sync(TitahClient.nearest(TitahClient.T_STEPS, decree.t));
+		addRenderableWidget(tSlider);
+		y += 19;
 		kSlider = new JadeSlider(rx, y, rw, 16, TitahClient.K_STEPS, TitahClient.nearest(TitahClient.K_STEPS, decree.k),
 				value -> Component.translatable(K + "k", times(value)),
 				index -> TitahClient.set(current, TitahClient.FIELD_K, TitahClient.K_STEPS[index]))
@@ -221,6 +238,9 @@ public final class TitahScreen extends Screen {
 			// a sync arrived: follow the server's sanitised values (never under the player's hand)
 			seenVersion = TitahClient.version();
 			TitahClient.Decree decree = TitahClient.decree(skill);
+			if (tSlider != null) {
+				tSlider.sync(TitahClient.nearest(TitahClient.T_STEPS, decree.t));
+			}
 			if (kSlider != null) {
 				kSlider.sync(TitahClient.nearest(TitahClient.K_STEPS, decree.k));
 			}
@@ -307,7 +327,19 @@ public final class TitahScreen extends Screen {
 				tooltip = widget.tooltipLines();
 			}
 		}
-		if (kSlider != null && kSlider.isHovered()) {
+		// the PERMANEN stamp right of the Tingkat slider (tier 6-9 and this cast would carve for real)
+		int stampX = rx + Math.max(40, rw - STAMP_W) + 4;
+		int stampY = bodyTop + 12;
+		boolean stamp = decree.unlocked && TitahClient.permanent(skill) && rx + rw - stampX >= 24;
+		if (stamp) {
+			drawStamp(g, font, stampX, stampY, rx + rw - stampX);
+		}
+		if (tSlider != null && tSlider.isHovered()) {
+			tooltip = tierTooltip(skill);
+		} else if (stamp && mouseX >= stampX && mouseX < rx + rw && mouseY >= stampY && mouseY < stampY + 16) {
+			tooltip = List.of(Component.translatable(KT + "perm").withStyle(ChatFormatting.RED),
+					Component.translatable(KT + "perm.tip").withStyle(ChatFormatting.GRAY));
+		} else if (kSlider != null && kSlider.isHovered()) {
 			tooltip = List.of(Component.translatable(K + "k.tip").withStyle(ChatFormatting.GRAY),
 					Component.translatable(K + "k.limit", times(TitahClient.K_STEPS[TitahClient.kMaxIndex(skill)])).withStyle(ChatFormatting.GRAY));
 		} else if (dSlider != null && dSlider.isHovered()) {
@@ -328,9 +360,9 @@ public final class TitahScreen extends Screen {
 		}
 	}
 
-	/** The y of the Film row (after the sliders and the coins that exist now). */
+	/** The y of the Film row (after the sliders and the coins that exist now; Tingkat adds a row of 19). */
 	private int filmRowY(int bodyTop) {
-		int y = bodyTop + 12 + 19 + 19 + 20;
+		int y = bodyTop + 12 + 19 + 19 + 19 + 20;
 		if (TitahClient.kehancuranOn()) {
 			y += 14;
 		}
@@ -338,6 +370,39 @@ public final class TitahScreen extends Screen {
 			y += 14;
 		}
 		return y;
+	}
+
+	/** The world scale of a tier with one decimal (×1,0 … ×43,0). */
+	private static String scale(int tier) {
+		return "×" + String.format(Locale.ROOT, "%.1f", Math.pow(1.6D, Math.max(1, Math.min(9, tier)) - 1)).replace('.', ',');
+	}
+
+	/** The Tingkat slider's tooltip: what it does, the limit now and why higher tiers are sealed. */
+	private static List<Component> tierTooltip(int index) {
+		TitahClient.Decree decree = TitahClient.decree(index);
+		List<Component> lines = new ArrayList<>();
+		lines.add(Component.translatable(KT + "t.tip").withStyle(ChatFormatting.GRAY));
+		lines.add(Component.translatable(KT + "t.limit", decree.tMax).withStyle(ChatFormatting.GRAY));
+		if (decree.tMax < 9 && !decree.tWhy.isEmpty()) {
+			lines.add(Component.translatable(decree.tWhy).withStyle(ChatFormatting.RED));
+		}
+		if (decree.t >= TitahClient.PERMANENT_TIER) {
+			lines.add(Component.translatable(TitahClient.permanent(index) ? KT + "perm.tip" : KT + "t.visual").withStyle(
+					TitahClient.permanent(index) ? ChatFormatting.RED : ChatFormatting.GRAY));
+		}
+		return lines;
+	}
+
+	/** A red seal stamp reading PERMANEN (its frame breathes so it is never missed). */
+	private static void drawStamp(GuiGraphicsExtractor g, Font font, int x, int y, int w) {
+		float pulse = 0.75F + 0.25F * (float) Math.sin(Util.getMillis() / 260.0D);
+		int x1 = x + w;
+		int y1 = y + 15;
+		g.fill(x + 1, y + 2, x1 + 1, y1 + 1, 0x30000000);
+		Brush.frame(g, x, y, x1, y1, Palette.argb(Math.round(200 * pulse), Palette.SEAL));
+		Brush.frame(g, x + 1, y + 1, x1 - 1, y1 - 1, Palette.argb(0x90, Palette.SEAL));
+		g.fill(x + 2, y + 2, x1 - 2, y1 - 2, Palette.argb(0x30, Palette.SEAL));
+		Brush.fitCentered(g, font, Brush.bold(Component.translatable(KT + "perm")), (x + x1) / 2.0F, y + 4.0F, w - 4.0F, Palette.SEAL, 0.7F, 0.45F, false);
 	}
 
 	private static String times(float value) {
