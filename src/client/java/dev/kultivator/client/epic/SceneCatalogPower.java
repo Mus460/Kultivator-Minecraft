@@ -602,7 +602,8 @@ final class SceneCatalogPower {
 			case "ninth_hex" -> sky(s, 0, SkyDirector.Grade.SK_ASH, 0.5F, 0.3F, 20);
 			case "tai_chi_diagram" -> sky(s, 0, SkyDirector.Grade.SK_ASH, 0.2F, 0.1F, 20);
 			case "heaven_punishing_sword", "heaven_trampling" -> sky(s, 0, SkyDirector.Grade.SK_WHITE, w, 0.0F, 20);
-			case "emperor_flame" -> s.at(0, () -> SkyDirector.dao(0xD8B8FF, 0.35F, 20, s.priority, s.pos, s.own, 1.0F));
+			// a darkening golden-violet sky over the rising lotus bud (blended in over the bud's 30 tick rise)
+			case "emperor_flame" -> s.at(0, () -> SkyDirector.dao(0xA884D8, 0.5F, 30, s.priority, s.pos, s.own, 1.0F));
 			case "freeze_mount_qi" -> sky(s, 0, SkyDirector.Grade.SK_ICE, 0.4F, 0.0F, 20);
 			case "nine_heavens_thunder_venerable" -> sky(s, 0, SkyDirector.Grade.SK_TRIB, 0.9F, 0.6F, 20);
 			case "ancient_god_trample", "stellar_black_hole" -> sky(s, 0, SkyDirector.Grade.SK_STARS, w, 0.5F, 20);

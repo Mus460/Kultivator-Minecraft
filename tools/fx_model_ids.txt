@@ -49,7 +49,13 @@ dragon_wings_r
 dragon_wings_stub
 dragon_wings_stub_lavender
 emperor_fist
+emperor_lotus_core
+emperor_lotus_flame
+emperor_lotus_petal_inner
+emperor_lotus_petal_outer
 emperor_seal
+emperor_shock_ring
+emperor_shock_ring_fade
 extra_arm
 extra_head
 fantian_seal
@@ -159,6 +165,12 @@ natal_wok
 natal_wok_gold
 needle
 nimbus_cloud
+nine_sun_crater
+nine_sun_crow
+nine_sun_flash_ring
+nine_sun_flash_ring_fade
+nine_sun_orb
+nine_sun_trail
 pagoda_tier
 pagoda_tier_1
 pagoda_tier_2

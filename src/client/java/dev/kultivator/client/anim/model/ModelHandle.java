@@ -25,5 +25,15 @@ public interface ModelHandle {
 
 	void end(int fadeTicks);
 
+	/**
+	 * Lights the prop by a slow deterministic cycle: block and sky light swing between 15 and {@code low} once every
+	 * {@code period} ticks ({@code offset} ticks into the cycle; a breathing core, never a size change). A period of 0
+	 * brings it back to full bright over 4 ticks.
+	 */
+	void lightCycle(int low, int period, int offset);
+
+	/** Ramps the light linearly to {@code level} (0..15) over {@code ticks} (a cooling crater). */
+	void lightTo(int level, int ticks);
+
 	boolean alive();
 }

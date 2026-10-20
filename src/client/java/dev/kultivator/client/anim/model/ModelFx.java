@@ -40,7 +40,9 @@ import java.util.Set;
  * tick through {@link DisplayKey}: the entity is moved to the prop's base point ({@code setPos}, lerped by the renderer
  * like the body it rides; a prop that turns with its rider takes the rider's yaw as its entity yaw) and the
  * transformation (the animation offset, turn and size) targets the next tick with a one-tick interpolation, re-armed
- * only when the frame changed. Scale only ever ramps once: grow-in, an optional one-shot swell on an event, fade-out.
+ * only when the frame changed. Scale only ever ramps once: grow-in, an optional one-shot swell on an event (or a landing
+ * FLATTEN), fade-out; a prop that should look alive breathes by light instead ({@code lightCycle}: the brightness override
+ * steps through a slow cosine, never the size).
  * Each prop costs one display (and
  * one per child part when the budget allows) and counts in the PhantomDisplays caps; models made per tick are capped at
  * 2 / 12 / 32 by quality (Minimal only for CORE props). Nothing here is ever sent to or made by the server.
@@ -278,6 +280,16 @@ public final class ModelFx {
 		boolean followYaw;
 		int endAt = -1;
 		int fade = 6;
+		// the light (lightCycle / lightTo): a cycle when lightPeriod > 0, else a ramp to lightTarget; shownLight = the level
+		// last set (-1: the creation brightness)
+		int lightLow = 15;
+		int lightPeriod;
+		int lightOffset;
+		int lightFrom = 15;
+		int lightTarget = -1;
+		int lightStart;
+		int lightRamp = 1;
+		int shownLight = -1;
 		boolean shattered;
 		boolean dead;
 
@@ -353,6 +365,9 @@ public final class ModelFx {
 				yawNow = entityYaw + yawNow;
 			}
 			float s = ease(scaleFrom, scale, scaleStart, scaleLerp, t);
+			float revolveDeg = 0.0F;
+			float revolveRadius = 0.0F;
+			float revolveSide = 0.0F;
 			Vector3f offset = new Vector3f();
 			Vector3f scl = new Vector3f(1.0F, 1.0F, 1.0F);
 			Quaternionf local = new Quaternionf();
@@ -392,14 +407,16 @@ public final class ModelFx {
 					case RISE -> offset.y -= step.a() * (1.0F - cubic(p));
 					case SLIDE -> {
 						if (step.to() != null) {
-							float k = step.b() == 1.0F ? cubic(p) : p;
+							// b = 2: an accelerating drop that keeps the prop's own turn (a falling sun and its streak)
+							boolean drop = step.b() == 2.0F;
+							float k = step.b() == 1.0F ? cubic(p) : drop ? p * p : p;
 							Vec3 from = startOf(step);
 							Vec3 at = from.add(step.to().subtract(from).scale(k));
 							offset.add((float) (at.x - base.x), (float) (at.y - base.y), (float) (at.z - base.z));
-							if (p < 1.0F) {
+							if (p < 1.0F && !drop) {
 								travel = step.to().subtract(from);
 							}
-							point = true;
+							point |= !drop;
 						}
 					}
 					case THRUST -> {
@@ -469,6 +486,23 @@ public final class ModelFx {
 							scl.mul(1.15F, 0.85F, 1.15F);
 						}
 					}
+					case TILT -> {
+						// unfolds (or folds back) about the side axis: smoothstep, held after the step
+						float sm = p * p * (3.0F - 2.0F * p);
+						local.rotateX(rad(step.a() * sm));
+					}
+					case REVOLVE -> {
+						// eased in over the first 40 ticks (into^2 / 80 meets into - 20 with the same slope at 40)
+						float run = into < 40.0F ? into * into / 80.0F : into - 20.0F;
+						revolveDeg += step.a() * run;
+						revolveRadius = step.b();
+						revolveSide = step.b() < 0.0F ? step.a() >= 0.0F ? -90.0F : 90.0F : 0.0F;
+					}
+					case FLATTEN -> {
+						float e = cubic(p);
+						float w = Mth.lerp(e, 1.0F, step.b() <= 0.0F ? 1.0F : step.b());
+						scl.mul(w, Mth.lerp(e, 1.0F, Math.max(0.02F, step.a())), w);
+					}
 					case DISSOLVE -> {
 						scl.mul(1.0F - 0.15F * p);
 						if (((int) into & 1) == 0 && p < 1.0F) {
@@ -483,6 +517,13 @@ public final class ModelFx {
 					}
 				}
 			}
+			if (revolveDeg != 0.0F || revolveRadius != 0.0F) {
+				// the whole prop turns about the vertical through its position; it stands |b| out along its (turned) front,
+				// or along its side when it flies round (b < 0)
+				yawNow += revolveDeg;
+				Vec3 out = facing(yawNow + revolveSide, 0.0F).scale(Math.abs(revolveRadius));
+				offset.add((float) out.x, (float) out.y, (float) out.z);
+			}
 			// fade out by shrinking
 			if (endAt >= 0) {
 				float f = Mth.clamp(1.0F - (t - endAt) / Math.max(1, fade), 0.0F, 1.0F);
@@ -493,6 +534,7 @@ public final class ModelFx {
 				yawNow = (float) Math.toDegrees(Math.atan2(-travel.x, travel.z));
 				pitchNow = (float) Math.toDegrees(-Math.atan2(travel.y, Math.sqrt(travel.x * travel.x + travel.z * travel.z)));
 			}
+			applyLight(t);
 			Quaternionf rotation = new Quaternionf().rotateY(rad(-yawNow)).rotateX(rad(pitchNow)).rotateZ(rad(rollNow));
 			if (point && info.axis() == FxModels.Axis.UP) {
 				// swords and staffs fly tip first: their +y turns to the front
@@ -505,6 +547,33 @@ public final class ModelFx {
 			send(pose, base, translation, rotation, scaleVec, first);
 			for (PartProp part : parts) {
 				keyPart(part, base, translation, rotation, scaleVec, t, first);
+			}
+		}
+
+		/** The light level at time {@code t} (-1: no light change is running). */
+		private int lightLevel(float t) {
+			if (lightPeriod > 0) {
+				double c = 0.5D + 0.5D * Math.cos(Math.PI * 2.0D * (t - lightStart + lightOffset) / lightPeriod);
+				return Mth.clamp((int) Math.round(lightLow + (15 - lightLow) * c), 0, 15);
+			}
+			if (lightTarget >= 0) {
+				float k = Mth.clamp((t - lightStart) / Math.max(1, lightRamp), 0.0F, 1.0F);
+				return Mth.clamp(Math.round(Mth.lerp(k, (float) lightFrom, (float) lightTarget)), 0, 15);
+			}
+			return -1;
+		}
+
+		/** Sets the brightness override of the prop and its parts when the level changed (a deterministic glow). */
+		private void applyLight(float t) {
+			int level = lightLevel(t);
+			if (level < 0 || level == shownLight) {
+				return;
+			}
+			shownLight = level;
+			Brightness brightness = level >= 15 ? Brightness.FULL_BRIGHT : new Brightness(level, level);
+			display.setBrightnessOverride(brightness);
+			for (PartProp part : parts) {
+				part.display.setBrightnessOverride(brightness);
 			}
 		}
 
@@ -718,6 +787,35 @@ public final class ModelFx {
 		@Override
 		public boolean alive() {
 			return !dead && endAt < 0;
+		}
+
+		@Override
+		public void lightCycle(int low, int period, int offset) {
+			if (dead) {
+				return;
+			}
+			if (period <= 0) {
+				lightTo(15, 4);
+				return;
+			}
+			lightLow = Mth.clamp(low, 0, 15);
+			lightPeriod = period;
+			lightOffset = offset;
+			lightTarget = -1;
+			lightStart = now();
+		}
+
+		@Override
+		public void lightTo(int level, int ticks) {
+			if (dead) {
+				return;
+			}
+			int current = lightLevel(now());
+			lightFrom = current >= 0 ? current : shownLight >= 0 ? shownLight : request.glow() ? 15 : 11;
+			lightTarget = Mth.clamp(level, 0, 15);
+			lightRamp = Math.max(1, ticks);
+			lightPeriod = 0;
+			lightStart = now();
 		}
 
 		/** Lengthens the prop's life to at least {@code ticks} more. */

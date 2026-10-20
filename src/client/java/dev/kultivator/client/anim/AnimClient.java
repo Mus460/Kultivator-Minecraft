@@ -1,6 +1,7 @@
 package dev.kultivator.client.anim;
 
 import dev.kultivator.client.anim.form.FormLayer;
+import dev.kultivator.client.anim.model.FireUltimates;
 import dev.kultivator.client.anim.model.ModelFx;
 import dev.kultivator.network.Payloads;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -58,6 +59,7 @@ public final class AnimClient {
 		if (!minecraft.isPaused()) {
 			ticks++;
 			ModelFx.tick(level);
+			FireUltimates.tick(level);
 		}
 		if (++pruneTicks >= 20) {
 			pruneTicks = 0;
@@ -74,6 +76,7 @@ public final class AnimClient {
 		ClientBinds.clear();
 		BindVisuals.clear();
 		ModelFx.clear();
+		FireUltimates.clear();
 	}
 
 	private AnimClient() {

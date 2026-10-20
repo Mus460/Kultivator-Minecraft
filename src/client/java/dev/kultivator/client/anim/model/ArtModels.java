@@ -250,6 +250,7 @@ public final class ArtModels {
 			handle.end(6);
 		}
 		CAST_PROPS.remove(casterId);
+		FireUltimates.abort(casterId);
 	}
 
 	private static AnimStep step(Anim kind, int start, int duration, float a, float b) {
@@ -576,24 +577,28 @@ public final class ArtModels {
 				}
 			}
 			case "nine_suns_heavens_fury" -> {
-				if (travel && ev.preImpact() && ev.hasTo()) {
-					int fall = ev.fall();
-					show(ev, "sun", ev.to().add(0.0D, 2.0D, 0.0D), ev.scaleBy(3.5F), 0.0F, 0.0F, fall + 6, step(Anim.FALL, 0, fall, 22.0F, 0.0F),
-							step(Anim.SPIN, 0, fall, 6.0F, 0.0F), step(Anim.SHATTER, fall + 1, 3, 0.0F, 0.0F));
+				// FireUltimates: nine suns kindle in the sky during the charge, each streaks down onto its dense point,
+				// flattens into a flash ring and leaves a crater glow; EXTRA0 is the great strike
+				float sun = ev.scaleBy(5.0F);
+				if (charge) {
+					Vec3 aim = ev.hasTo() ? ev.to() : ev.casterPos().add(ev.forward().scale(16.0D));
+					FireUltimates.sunsCharge(ev.casterId(), aim, ev.duration() > 0 ? ev.duration() : 60, sun);
+				} else if (travel && ev.preImpact() && ev.hasTo()) {
+					FireUltimates.sunsFall(ev.casterId(), ev.to(), ev.fall(), sun);
+				} else if (impact) {
+					FireUltimates.sunsImpact(ev.casterId(), ev.pos(), ev.p().radius(), sun);
+				} else if (phase == Phase.EXTRA0) {
+					FireUltimates.sunsGrand(ev.casterId(), ev.pos(), ev.p().radius(), sun);
 				}
 			}
 			case "emperor_flame" -> {
-				if (ev.extra() || cast && !EffectQuality.minimal()) {
-					if (prop(ev, "lotus_petal_violet") == null) {
-						int n = EffectQuality.maximal() ? 8 : 6;
-						for (int i = 0; i < n; i++) {
-							float heading = i * 360.0F / n;
-							float yaw = heading;
-							Vec3 off = new Vec3(-Mth.sin(yaw * Mth.DEG_TO_RAD) * 0.6D, 0.0D, Mth.cos(yaw * Mth.DEG_TO_RAD) * 0.6D);
-							show(ev, "lotus_petal_violet", ev.casterPos().add(off), ev.scaleBy(2.2F), yaw, 35.0F, 40,
-									step(Anim.GROW, i, 10, 0.1F, 0.0F), step(Anim.OPEN, i, 10, 0.0F, 0.0F), step(Anim.DISSOLVE, 30, 10, 0.0F, 0.0F));
-						}
-					}
+				// FireUltimates: the glass lotus (bud, bloom, flame field, fold) at the field's centre; EXTRA0 is the nova
+				if (cast) {
+					FireUltimates.lotus(ev.casterId(), ev.pos(), ev.p().radius(), ev.duration());
+				} else if (phase == Phase.PULSE) {
+					FireUltimates.lotusPulse(ev.casterId());
+				} else if (phase == Phase.EXTRA0) {
+					FireUltimates.lotusNova(ev.casterId(), ev.pos());
 				}
 			}
 			// ------------------------------------------------------------ ice

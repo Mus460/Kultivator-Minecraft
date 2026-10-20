@@ -141,6 +141,20 @@ public final class FxModels {
 		put("ice_lotus", 1.5F, north, true, 0x9FF3FF, 0xFFFFFF, 0.0F);
 		put("lotus_petal", 2.0F, up, true, 0xFF9EC8, 0xFFF4F8, 0.0F);
 		put("lotus_petal_violet", 2.0F, up, true, 0xB060FF, 0xF8E8FF, 0.0F);
+		// Api Kaisar (emperor_flame): glass petals rising from their base (y 8..32), the seed-pod heart, its flame, the shock ring
+		put("emperor_lotus_petal_outer", 24.0F, up, true, 0xA866FF, 0xFFF8FF, 0.0F);
+		put("emperor_lotus_petal_inner", 16.0F, up, true, 0xD8B8FF, 0xFFFFFF, 0.0F);
+		put("emperor_lotus_core", 14.0F, north, true, 0xFFF2C8, 0xC890FF, 0.0F);
+		put("emperor_lotus_flame", 14.0F, up, true, 0xF0D8FF, 0xA866FF, 0.0F);
+		put("emperor_shock_ring", 30.0F, north, true, 0xFFFFFF, 0xB070FF, -0.02F);
+		put("emperor_shock_ring_fade", 30.0F, north, true, 0xF0E0FF, 0x9A5AE8, -0.02F);
+		// Murka Langit Sembilan Matahari (nine_suns_heavens_fury): the sun, its streak, the flash ring, the crater, the crow
+		put("nine_sun_orb", 5.0F, north, true, 0xFFF2B0, 0xFF8A1A, -0.6F);
+		put("nine_sun_trail", 5.0F, north, true, 0xFFC83A, 0xD8380E, -0.5F);
+		put("nine_sun_flash_ring", 10.0F, north, true, 0xFFFFF0, 0xFFB030, -0.02F);
+		put("nine_sun_flash_ring_fade", 10.0F, north, true, 0xFFF2C0, 0xFF8A20, -0.02F);
+		put("nine_sun_crater", 6.0F, north, true, 0xFF8A1A, 0x3A1208, 0.0F);
+		put("nine_sun_crow", 1.6F, north, true, 0xFFF4C0, 0xE0401A, -0.25F);
 		put("flame_cart", 1.5F, north, true, 0xA86A32, 0xFF9A2A, 0.0F);
 		put("ice_mountain", 12.0F, north, true, 0x9FF3FF, 0xFFFFFF, 0.0F);
 		put("ice_block", 1.2F, north, true, 0x9FF3FF, 0xFFFFFF, 0.0F);

@@ -1878,6 +1878,9 @@ def main():
     ids = sorted(list(MODELS) + list(ALIASES))
     with open(os.path.join(os.path.dirname(__file__), "fx_model_ids.txt"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(ids) + "\n")
+    # the Fire Dao ultimates (Api Kaisar's lotus, the nine suns) have their own generator; it adds its ids to the list
+    import gen_fire_ultimate_models
+    errors += gen_fire_ultimate_models.main()
     print("models: %d, aliases: %d, textures: %d, errors: %d" % (len(MODELS), len(ALIASES), len(used), errors))
     return 1 if errors else 0
 

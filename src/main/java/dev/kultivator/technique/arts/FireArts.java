@@ -319,8 +319,10 @@ public final class FireArts {
 				// The "15 breaths" (十五息) hang over the caster through the charge; a corona ring flares around each falling sun.
 				.fx(Phase.CHARGE, sky(0xFFF0C0), cloudDisc(0xFFD040).above(30.0F), glyph("十五息").onCaster().above(3.0F).scale(2.0F).ticks(60))
 				.fx(Phase.CAST, column(0xFFD040).count(30), flash(0xFFF1C0, 0.2F, 4))
-				// each sun falls on its own pre-impact TRAVEL (6 ticks) and bursts on the IMPACT
-				.fx(Phase.TRAVEL, model("sun").scale(5.0F).fall(40.0F, 6.0F).ticks(7), meteor(0xFFD040).count(30).ticks(6))
+				// each sun falls on its own pre-impact TRAVEL (6 ticks) and bursts on the IMPACT; the suns themselves (kindling in
+				// the sky through the charge, streaking down, flattening into a flash ring over a crater glow) are the client's 3D
+				// choreography (client anim.model.FireUltimates), the meteor sparks trail them
+				.fx(Phase.TRAVEL, meteor(0xFFD040).count(30).ticks(6))
 				.fx(Phase.IMPACT, shockRing(0xFFF1C0).color2(0xFF8020).size(1.4F).count(36).ticks(10), impact(0xFFD040).count(30).ticks(8),
 						column(0xFFB040).particle(ParticleTypes.FLAME).count(16).ticks(10).detail())
 				.fx(Phase.EXTRA0, shell(0xFFF1C0).count(100), flash(0xFFF1C0, 0.3F, 6), shake(1.0F, 30))
@@ -342,9 +344,12 @@ public final class FireArts {
 						.self(costMod(Dao.FIRE, 0.0D, 0.4D, 400).insideArea()))
 				// @400 NOVA(r40) at the lotus > DMG 15 + .5 × stacks.
 				.step(at(400).shape(nova().radius(40.0D).at(Anchor.AREA)).hit(damage(15.0D).perStack(0.5D)).phase(0))
-				// A white-violet lotus of 16 glass petals, 80 b across, and the glyph 帝.
-				.fx(Phase.CAST, model("lotus_petal_violet").n(16).radius(40.0F).scale(8.0F).ticks(400).facing(FxLayer.Facing.FLAT), petalRing(Blocks.STAINED_GLASS.magenta().defaultBlockState(), 16, 40.0F).extra(),
-						FxLayer.of(FxLayer.Template.GLYPH, 0xF0D8FF).text("帝").scale(16.0F).above(12.0F), mist(0xF0D8FF).count(40).detail())
+				// A white-violet lotus of 16 glass petals, 80 b across, and the glyph 帝. The lotus is the client's 3D choreography
+				// (client anim.model.FireUltimates: a bud rising, two rings of petals unfolding, the flame field, the fold into the
+				// heart before the nova); the spec draws the glyph forming over it, a golden cloud disc under a darkening sky and
+				// the mist.
+				.fx(Phase.CAST, FxLayer.of(FxLayer.Template.GLYPH, 0xF0D8FF).text("帝").scale(16.0F).above(30.0F).grow(3.0F, 30.0F),
+						mist(0xF0D8FF).count(40).detail(), cloudDisc(0xE8C070).above(40.0F).detail(), vignette(0x5A2A90, 60))
 				.fx(Phase.PULSE, petals(0xF0D8FF).count(20).extra())
 				.fx(Phase.EXTRA0, shell(0xF0D8FF).count(120), flash(0xF8F0FF, 0.3F, 6), shake(0.8F, 30))
 				.sound(Phase.CAST, SoundEvents.BEACON_ACTIVATE, 1.5F, 0.5F)
