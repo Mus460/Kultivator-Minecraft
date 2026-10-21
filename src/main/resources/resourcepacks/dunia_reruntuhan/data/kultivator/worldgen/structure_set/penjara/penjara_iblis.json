@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 340562,
+    "separation": 48,
+    "spacing": 120
+  },
+  "structures": [
+    {
+      "structure": "kultivator:penjara/penjara_iblis",
+      "weight": 1
+    }
+  ]
+}

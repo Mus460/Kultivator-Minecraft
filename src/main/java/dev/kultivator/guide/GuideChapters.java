@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Kitab Panduan (the in-game guide): the static list of its 12 chapters and their steps, shared by the server and the
+ * Kitab Panduan (the in-game guide): the static list of its 14 chapters and their steps, shared by the server and the
  * client. Pure data: no Minecraft classes, so both sides may use it freely.
  * <p>
  * Contract with {@code client.guide.GuideScreen} and {@link GuideProgress}:
@@ -17,7 +17,7 @@ import java.util.Map;
  * <li>A step id is {@code c<chapter number>.<name>}, e.g. {@code c1.root_test}. Its texts are
  * {@code kultivator.guide.<id>.title} and {@code kultivator.guide.<id>.body} (one key, its lines separated
  * by line breaks), in {@code lang-src/guide.*.json}.</li>
- * <li>A chapter's title is {@code kultivator.guide.chapter.<number>} (1-12) and its one-line summary
+ * <li>A chapter's title is {@code kultivator.guide.chapter.<number>} (1-14) and its one-line summary
  * {@code kultivator.guide.chapter.<number>.desc}.</li>
  * <li>{@link Step#hint()} is a command the screen offers as a clickable chip (prefilled in the chat box), or null.</li>
  * <li>{@link Step#check()} is the id of an automatic check {@link GuideProgress} evaluates on the server; a step without
@@ -34,8 +34,11 @@ import java.util.Map;
  */
 public final class GuideChapters {
 
-	/** Chapters in play order: Hari Pertama ... Tips & Kesalahan Umum. */
-	public static final int CHAPTER_COUNT = 12;
+	/**
+	 * Chapters in play order: Hari Pertama ... Tips & Kesalahan Umum, then (DESIGN 34.9) Dunia yang Luas and Ujung Dunia.
+	 * Chapters 13 and 14 are appended after chapter 12; their texts live in {@code lang-src/dunia_panduan.*}.
+	 */
+	public static final int CHAPTER_COUNT = 14;
 
 	/**
 	 * One step. {@code chapter} is 0-based, {@code index} its place in {@link #steps()} (the bit of GuideSync),
@@ -204,6 +207,30 @@ public final class GuideChapters {
 		step(11, "kehancuran", "/kultivasi kehancuran", null);
 		step(11, "hardcore", null, null);
 		step(11, "help", "/kultivasi panduan", null);
+		// 13. Dunia yang Luas (DESIGN 34.9; appended, saved ticks are by step id so nothing shifts)
+		step(12, "peta", "/kultivasi peta", "adv:dunia/map_opened");
+		step(12, "kota", null, "adv:dunia/kota_found");
+		step(12, "teh", null, "adv:dunia/kota_rumour");
+		step(12, "lelang", null, "adv:dunia/kota_auction");
+		step(12, "pengembara", null, "adv:dunia/wanderer_talk");
+		step(12, "langit", null, "adv:dunia/sky_event");
+		step(12, "kabut", null, "adv:dunia/qi_mist");
+		step(12, "harta", null, "adv:dunia/treasure_claimed");
+		step(12, "gua", null, "adv:dunia/ruin_cleared");
+		step(12, "kapal", null, "adv:dunia/ship_launched");
+		// 14. Ujung Dunia (DESIGN 34.9)
+		step(13, "saingan", null, "adv:dunia/rival_beaten");
+		step(13, "menara", null, "adv:dunia/tower_10");
+		step(13, "bawah", null, "adv:dunia/naihe_crossed");
+		step(13, "yama", null, "adv:dunia/ten_courts");
+		step(13, "naga", null, "adv:dunia/dragon_subdued");
+		step(13, "evolusi", null, "adv:dunia/beast_tier_4");
+		step(13, "laut", null, "adv:dunia/sea_arrived");
+		step(13, "istana", null, "adv:dunia/dragon_king");
+		step(13, "penjara", null, "adv:dunia/prison_sealed");
+		step(13, "kota_abadi", null, "adv:dunia/immortal_city");
+		step(13, "pelayaran", null, "adv:dunia/ship_voyage");
+		step(13, "puncak", null, "adv:dunia/tower_100");
 		List<Chapter> chapters = new ArrayList<>(CHAPTER_COUNT);
 		for (int chapter = 0; chapter < CHAPTER_COUNT; chapter++) {
 			List<Step> own = new ArrayList<>();
@@ -256,7 +283,7 @@ public final class GuideChapters {
 		return CHAPTERS;
 	}
 
-	/** Chapter {@code index} (0-based, clamped to 0-11). */
+	/** Chapter {@code index} (0-based, clamped to 0-13). */
 	public static Chapter chapter(int index) {
 		return CHAPTERS.get(Math.max(0, Math.min(CHAPTER_COUNT - 1, index)));
 	}

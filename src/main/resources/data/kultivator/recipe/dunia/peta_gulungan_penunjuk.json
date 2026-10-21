@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:paper",
+    "minecraft:amethyst_shard",
+    "kultivator:spirit_stone_mid"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:gulungan_penunjuk"
+  }
+}

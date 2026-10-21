@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 340564,
+    "separation": 12,
+    "spacing": 32,
+    "exclusion_zone": {
+      "other_set": "kultivator:bawah/istana_yama",
+      "chunk_count": 12
+    }
+  },
+  "structures": [
+    {
+      "structure": "kultivator:bawah/desa_arwah",
+      "weight": 1
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "kultivator:item/air_mata_air_penglai"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.ten_courts.description"
+    },
+    "icon": {
+      "id": "kultivator:giok_arwah"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.ten_courts.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

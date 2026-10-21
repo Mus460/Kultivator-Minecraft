@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#kultivator:has_structure/menara/lobi",
+  "max_distance_from_center": 32,
+  "size": 0,
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    },
+    "creature": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "start_height": {
+    "absolute": 3
+  },
+  "start_jigsaw_name": "kultivator:menara/lobi_pusat",
+  "start_pool": "kultivator:menara/lobi",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "use_expansion_hack": false
+}

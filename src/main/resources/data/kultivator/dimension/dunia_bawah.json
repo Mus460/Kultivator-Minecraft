@@ -1,0 +1,120 @@
+{
+  "type": "kultivator:dunia_bawah",
+  "generator": {
+    "type": "minecraft:noise",
+    "settings": "kultivator:dunia_bawah",
+    "biome_source": {
+      "type": "minecraft:multi_noise",
+      "biomes": [
+        {
+          "biome": "kultivator:wangchuan",
+          "parameters": {
+            "temperature": [
+              -1.0,
+              1.0
+            ],
+            "humidity": [
+              -1.0,
+              -0.32
+            ],
+            "continentalness": [
+              -1.0,
+              1.0
+            ],
+            "erosion": [
+              -1.0,
+              1.0
+            ],
+            "depth": 0.0,
+            "weirdness": [
+              -1.0,
+              1.0
+            ],
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "kultivator:huangquan",
+          "parameters": {
+            "temperature": [
+              -1.0,
+              -0.15
+            ],
+            "humidity": [
+              -0.32,
+              1.0
+            ],
+            "continentalness": [
+              -1.0,
+              1.0
+            ],
+            "erosion": [
+              -1.0,
+              1.0
+            ],
+            "depth": 0.0,
+            "weirdness": [
+              -1.0,
+              1.0
+            ],
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "kultivator:dataran_cermin",
+          "parameters": {
+            "temperature": [
+              -0.15,
+              0.3
+            ],
+            "humidity": [
+              -0.32,
+              1.0
+            ],
+            "continentalness": [
+              -1.0,
+              1.0
+            ],
+            "erosion": [
+              -1.0,
+              1.0
+            ],
+            "depth": 0.0,
+            "weirdness": [
+              -1.0,
+              1.0
+            ],
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "kultivator:hutan_arwah",
+          "parameters": {
+            "temperature": [
+              0.3,
+              1.0
+            ],
+            "humidity": [
+              -0.32,
+              1.0
+            ],
+            "continentalness": [
+              -1.0,
+              1.0
+            ],
+            "erosion": [
+              -1.0,
+              1.0
+            ],
+            "depth": 0.0,
+            "weirdness": [
+              -1.0,
+              1.0
+            ],
+            "offset": 0.0
+          }
+        }
+      ]
+    }
+  }
+}

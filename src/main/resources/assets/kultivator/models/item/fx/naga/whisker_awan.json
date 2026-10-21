@@ -1,0 +1,77 @@
+{
+ "textures": {
+  "t0": "kultivator:item/fx/naga/whisker_awan",
+  "particle": "kultivator:item/fx/naga/whisker_awan"
+ },
+ "elements": [
+  {
+   "from": [
+    7.6,
+    7.6,
+    8.0
+   ],
+   "to": [
+    8.4,
+    8.4,
+    13.0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    }
+   },
+   "light_emission": 10
+  }
+ ]
+}

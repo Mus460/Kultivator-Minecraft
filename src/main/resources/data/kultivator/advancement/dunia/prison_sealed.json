@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.prison_sealed.description"
+    },
+    "icon": {
+      "id": "kultivator:sobekan_segel"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.prison_sealed.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

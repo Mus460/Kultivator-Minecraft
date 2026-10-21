@@ -1,0 +1,241 @@
+{
+ "textures": {
+  "t0": "kultivator:item/dunia/reruntuhan/ba_feather",
+  "t1": "kultivator:item/dunia/reruntuhan/ba_flame",
+  "particle": "kultivator:item/dunia/reruntuhan/ba_feather"
+ },
+ "elements": [
+  {
+   "from": [
+    5,
+    4,
+    8
+   ],
+   "to": [
+    11,
+    8,
+    20
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     6,
+     8
+    ],
+    "axis": "x",
+    "angle": -22.5
+   }
+  },
+  {
+   "from": [
+    6,
+    6,
+    16
+   ],
+   "to": [
+    10,
+    9,
+    26
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     7,
+     18
+    ],
+    "axis": "x",
+    "angle": -45.0
+   }
+  },
+  {
+   "from": [
+    4,
+    6,
+    12
+   ],
+   "to": [
+    12,
+    14,
+    26
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     10,
+     14
+    ],
+    "axis": "x",
+    "angle": -22.5
+   },
+   "light_emission": 12
+  }
+ ]
+}

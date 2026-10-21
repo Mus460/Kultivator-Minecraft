@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#kultivator:has_structure/penjara/penjara_iblis",
+  "max_distance_from_center": {
+    "horizontal": 64,
+    "vertical": 160
+  },
+  "size": 2,
+  "spawn_overrides": {},
+  "start_height": {
+    "absolute": -12
+  },
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "start_pool": "kultivator:penjara/kuil",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "use_expansion_hack": false
+}

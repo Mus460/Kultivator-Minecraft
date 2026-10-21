@@ -1,0 +1,164 @@
+{
+ "textures": {
+  "t0": "kultivator:item/dunia/reruntuhan/hp_fur",
+  "t1": "kultivator:item/dunia/reruntuhan/hp_spark",
+  "particle": "kultivator:item/dunia/reruntuhan/hp_fur"
+ },
+ "elements": [
+  {
+   "from": [
+    7,
+    7,
+    8
+   ],
+   "to": [
+    9,
+    9,
+    20
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     8,
+     8
+    ],
+    "axis": "x",
+    "angle": 22.5
+   }
+  },
+  {
+   "from": [
+    6.5,
+    10,
+    18
+   ],
+   "to": [
+    9.5,
+    13,
+    24
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     11,
+     20
+    ],
+    "axis": "x",
+    "angle": 45.0
+   },
+   "light_emission": 12
+  }
+ ]
+}

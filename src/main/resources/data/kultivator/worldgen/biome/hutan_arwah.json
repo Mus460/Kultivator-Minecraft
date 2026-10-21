@@ -1,0 +1,63 @@
+{
+  "attributes": {
+    "minecraft:audio/ambient_sounds": {
+      "additions": {
+        "sound": "minecraft:ambient.soul_sand_valley.additions",
+        "tick_chance": 0.0111
+      },
+      "loop": "minecraft:ambient.soul_sand_valley.loop",
+      "mood": {
+        "block_search_extent": 8,
+        "offset": 2.0,
+        "sound": "minecraft:ambient.soul_sand_valley.mood",
+        "tick_delay": 6000
+      }
+    },
+    "minecraft:audio/background_music": {
+      "default": {
+        "max_delay": 24000,
+        "min_delay": 12000,
+        "sound": "minecraft:music.nether.warped_forest"
+      }
+    },
+    "minecraft:visual/ambient_particles": {
+      "argument": [
+        {
+          "particle": {
+            "type": "minecraft:white_ash"
+          },
+          "probability": 0.01
+        }
+      ],
+      "modifier": "append"
+    },
+    "minecraft:visual/fog_color": "#2c3033",
+    "minecraft:visual/water_fog_color": "#141a1e"
+  },
+  "carvers": [],
+  "downfall": 0.0,
+  "effects": {
+    "water_color": "#2f3a40",
+    "grass_color": "#6f6a5a",
+    "foliage_color": "#6a665c"
+  },
+  "features": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      "minecraft:pale_garden_vegetation",
+      "minecraft:pale_moss_patch",
+      "minecraft:patch_soul_fire"
+    ],
+    []
+  ],
+  "has_precipitation": false,
+  "temperature": 0.8
+}

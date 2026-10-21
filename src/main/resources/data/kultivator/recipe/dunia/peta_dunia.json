@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:paper",
+    "minecraft:ink_sac",
+    "kultivator:spirit_stone_low"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:peta_dunia"
+  }
+}

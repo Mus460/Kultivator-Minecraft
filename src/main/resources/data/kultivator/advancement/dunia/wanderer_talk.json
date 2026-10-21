@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.wanderer_talk.description"
+    },
+    "icon": {
+      "id": "kultivator:catatan_pengembara"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.wanderer_talk.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

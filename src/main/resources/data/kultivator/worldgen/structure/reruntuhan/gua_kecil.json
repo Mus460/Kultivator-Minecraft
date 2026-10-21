@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#kultivator:has_structure/reruntuhan/gua_kecil",
+  "max_distance_from_center": 80,
+  "size": 2,
+  "spawn_overrides": {},
+  "start_pool": "kultivator:reruntuhan/gua_kecil/gerbang",
+  "step": "underground_structures",
+  "terrain_adaptation": "beard_box",
+  "use_expansion_hack": false,
+  "start_height": {
+    "absolute": -6
+  },
+  "project_start_to_heightmap": "WORLD_SURFACE_WG"
+}

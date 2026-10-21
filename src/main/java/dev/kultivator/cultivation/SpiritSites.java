@@ -1,5 +1,6 @@
 package dev.kultivator.cultivation;
 
+import dev.kultivator.Kultivator;
 import dev.kultivator.data.Dao;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -16,12 +17,15 @@ import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 
 /**
  * Spiritual sites that speed up meditation (DESIGN section 4). Every check only reads the world. The result is cached
@@ -73,20 +77,53 @@ public final class SpiritSites {
 		}
 	}
 
-	/** What a place offers: the combined multiplier (1.0 for nothing, at most {@link #CAP}) and the sites found. */
-	public record Result(double multiplier, List<Site> sites) {
+	/**
+	 * Phase 34 (DESIGN 34.5.10, contract C34.L1): a site another module adds for one player right now (Kabut Qi, Fajar
+	 * Ungu, the sky events of {@code dunia.langit}). Its multiplier joins the enum sites' product before {@link #CAP};
+	 * {@code dao} (may be null) is the Dao it nourishes; {@code name} is listed with the other site names.
+	 */
+	public record ExtraSite(String id, double multiplier, @Nullable Dao dao, Component name) {
+	}
+
+	/**
+	 * What a place offers: the combined multiplier (1.0 for nothing, at most {@link #CAP}), the sites found and the extra
+	 * sites of the providers (phase 34).
+	 */
+	public record Result(double multiplier, List<Site> sites, List<ExtraSite> extras) {
 		public static final Result NONE = new Result(1.0D, List.of());
 
+		/** A result without extra sites (the pre-phase-34 shape). */
+		public Result(double multiplier, List<Site> sites) {
+			this(multiplier, sites, List.of());
+		}
+
 		public boolean any() {
-			return !sites.isEmpty();
+			return !sites.isEmpty() || !extras.isEmpty();
 		}
 
 		public List<Component> names() {
-			List<Component> names = new ArrayList<>(sites.size());
+			List<Component> names = new ArrayList<>(sites.size() + extras.size());
 			for (Site site : sites) {
 				names.add(site.displayName());
 			}
+			for (ExtraSite extra : extras) {
+				names.add(extra.name());
+			}
 			return names;
+		}
+	}
+
+	/** Phase 34 (DESIGN 34.5.10): extra site providers ({@link #addSiteProvider}); only module L registers one. */
+	private static final List<Function<ServerPlayer, ExtraSite>> PROVIDERS = new CopyOnWriteArrayList<>();
+
+	/**
+	 * Adds a provider of an extra site (DESIGN 34.5.10, contract C34.L1): called on every {@link #evaluate}, it returns the
+	 * {@link ExtraSite} the player is at right now, or null. It must be cheap and only read the world; a provider that
+	 * throws is logged and skipped. The enum sites, their numbers and the cache are unchanged.
+	 */
+	public static void addSiteProvider(Function<ServerPlayer, ExtraSite> provider) {
+		if (provider != null) {
+			PROVIDERS.add(provider);
 		}
 	}
 
@@ -150,9 +187,30 @@ public final class SpiritSites {
 		for (Site site : sites) {
 			multiplier *= site.multiplier();
 		}
-		Result result = sites.isEmpty() ? Result.NONE : new Result(Math.min(CAP, multiplier), List.copyOf(sites));
+		List<ExtraSite> extras = PROVIDERS.isEmpty() ? List.of() : extras(player);
+		for (ExtraSite extra : extras) {
+			multiplier *= extra.multiplier();
+		}
+		Result result = sites.isEmpty() && extras.isEmpty() ? Result.NONE
+				: new Result(Math.min(CAP, multiplier), List.copyOf(sites), extras);
 		CACHE.put(player.getUUID(), new Cached(level.getGameTime(), feet, level.dimension(), result));
 		return result;
+	}
+
+	/** The extra sites of every provider for the player now (multipliers that are not finite or not above 0 are dropped). */
+	private static List<ExtraSite> extras(ServerPlayer player) {
+		List<ExtraSite> extras = new ArrayList<>(2);
+		for (Function<ServerPlayer, ExtraSite> provider : PROVIDERS) {
+			try {
+				ExtraSite extra = provider.apply(player);
+				if (extra != null && Double.isFinite(extra.multiplier()) && extra.multiplier() > 0.0D) {
+					extras.add(extra);
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("A spiritual site provider failed", exception);
+			}
+		}
+		return extras.isEmpty() ? List.of() : List.copyOf(extras);
 	}
 
 	/** Drops the cached result (the player left). */

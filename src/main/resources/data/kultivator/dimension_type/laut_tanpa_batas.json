@@ -1,0 +1,42 @@
+{
+  "ambient_light": 0.0,
+  "attributes": {
+    "minecraft:gameplay/bed_rule": {
+      "can_set_spawn": "never",
+      "can_sleep": "never",
+      "error_message": {
+        "translate": "kultivator.dimensi.no_sleep"
+      }
+    },
+    "minecraft:gameplay/straw_bed_rule": {
+      "can_set_spawn": "never",
+      "can_sleep": "never",
+      "error_message": {
+        "translate": "kultivator.dimensi.no_sleep"
+      }
+    },
+    "minecraft:gameplay/can_pillager_patrol_spawn": false,
+    "minecraft:gameplay/can_start_raid": false,
+    "minecraft:gameplay/piglins_zombify": false,
+    "minecraft:gameplay/respawn_anchor_works": false,
+    "minecraft:visual/cloud_color": "#e8ffffff",
+    "minecraft:visual/cloud_height": 196.0
+  },
+  "coordinate_scale": 1.0,
+  "default_clock": "minecraft:overworld",
+  "has_ceiling": false,
+  "has_ender_dragon_fight": false,
+  "has_fixed_time": false,
+  "has_skylight": true,
+  "height": 256,
+  "infiniburn": "#minecraft:infiniburn_overworld",
+  "logical_height": 256,
+  "min_y": 0,
+  "monster_spawn_block_light_limit": 0,
+  "monster_spawn_light_level": 0,
+  "skybox": "overworld",
+  "timelines": [
+    "minecraft:day",
+    "minecraft:moon"
+  ]
+}

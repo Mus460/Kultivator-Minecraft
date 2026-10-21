@@ -1,0 +1,35 @@
+{
+  "type": "kultivator:laut_tanpa_batas",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "kultivator:laut_roh",
+      "features": true,
+      "lakes": false,
+      "layers": [
+        {
+          "block": "minecraft:bedrock",
+          "height": 1
+        },
+        {
+          "block": "minecraft:sandstone",
+          "height": 33
+        },
+        {
+          "block": "minecraft:sand",
+          "height": 6
+        },
+        {
+          "block": "minecraft:water",
+          "height": 60
+        }
+      ],
+      "structure_overrides": [
+        "kultivator:laut/dermaga_tiba",
+        "kultivator:laut/pulau_roh",
+        "kultivator:laut/istana_naga",
+        "kultivator:laut/pulau_penglai"
+      ]
+    }
+  }
+}

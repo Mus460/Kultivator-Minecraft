@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 340565,
+    "separation": 64,
+    "spacing": 160
+  },
+  "structures": [
+    {
+      "structure": "kultivator:menara/menara_seratus",
+      "weight": 1
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "structures": [
+    {
+      "structure": "kultivator:kota/kota_kultivator",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "kultivator:jauh_dari_pusat",
+    "salt": 340531,
+    "spacing": 64,
+    "separation": 26,
+    "min_chunks": 6,
+    "exclusion_zone": {
+      "other_set": "minecraft:villages",
+      "chunk_count": 8
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:nautilus_shell",
+    "minecraft:prismarine_crystals",
+    "minecraft:prismarine_crystals",
+    "kultivator:spirit_stone_mid"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:mutiara_penunjuk_laut"
+  }
+}

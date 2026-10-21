@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/kota_found",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.kota_rumour.description"
+    },
+    "icon": {
+      "id": "kultivator:teh_embun_pagi"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.kota_rumour.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

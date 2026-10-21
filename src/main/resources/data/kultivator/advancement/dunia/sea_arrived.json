@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.sea_arrived.description"
+    },
+    "icon": {
+      "id": "kultivator:mutiara_penunjuk_laut"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.sea_arrived.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

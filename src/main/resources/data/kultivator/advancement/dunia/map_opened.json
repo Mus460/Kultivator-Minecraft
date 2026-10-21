@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:realm_qi_refining",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.map_opened.description"
+    },
+    "icon": {
+      "id": "kultivator:peta_dunia"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.map_opened.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

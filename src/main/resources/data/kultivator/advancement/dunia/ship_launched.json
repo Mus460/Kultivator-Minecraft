@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:realm_golden_core",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.ship_launched.description"
+    },
+    "icon": {
+      "id": "kultivator:lunas_perahu_awan"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.ship_launched.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

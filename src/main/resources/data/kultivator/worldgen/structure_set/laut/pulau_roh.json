@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 340569,
+    "separation": 8,
+    "spacing": 20,
+    "exclusion_zone": {
+      "other_set": "kultivator:laut/dermaga_tiba",
+      "chunk_count": 3
+    }
+  },
+  "structures": [
+    {
+      "structure": "kultivator:laut/pulau_roh",
+      "weight": 1
+    }
+  ]
+}

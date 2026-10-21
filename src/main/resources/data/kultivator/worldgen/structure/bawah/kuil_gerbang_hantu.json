@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#kultivator:has_structure/bawah/kuil_gerbang_hantu",
+  "max_distance_from_center": 48,
+  "size": 2,
+  "spawn_overrides": {},
+  "start_height": {
+    "absolute": -3
+  },
+  "start_pool": "kultivator:bawah/kuil_start",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "use_expansion_hack": false,
+  "project_start_to_heightmap": "WORLD_SURFACE_WG"
+}

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:dunia/map_opened",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.sites_5.description"
+    },
+    "icon": {
+      "id": "kultivator:gulungan_penunjuk"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.sites_5.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}
