@@ -112,6 +112,7 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
   **Lima Unsur** dalam pertarungan, **Relik di Peti Kuno** dengan Indra Ilahi yang mencium harta, Kejenuhan Bertarung,
   dan kenyamanan HUD (pengukur pedang terbang, peringatan bahaya saat meditasi, cetak biru formasi).
 * **Perubahan keseimbangan** (audit alur Fana → Dewa Abadi): tribulasi lebih adil (lingkar petir mulai Jiwa Baru Lahir, terpental bukan lari, total petir Kenaikan Abadi/Dewa Abadi paling banyak 2,2× nyawa, maks. 10 pelindung hidup), urat roh separuh lebih awet di bawah Transformasi Dewa, Inti Raja dari Raja Siluman atau 9 Inti Tinggi, sesajen ritual Alam Abadi dikembalikan saat gagal ([panduan](docs/PANDUAN.md#73-tribulasi-langit)).
+* **Kitab Panduan** di dalam game: 12 bab, 102 langkah dari Manusia Fana sampai Dewa Abadi (sekte dan murid), dengan centang otomatis; buka lewat tablet *Panduan* di gulungan (`'`), `/kultivasi panduan`, atau tombol *Kitab Panduan* ([panduan](docs/PANDUAN.md#62-kitab-panduan-di-dalam-game)).
 * Semua teks dalam **Bahasa Indonesia** dan **English**. Kompatibel dengan Sodium, Iris, ImmediatelyFast, EMF/ETF,
   Lithium, FerriteCore.
 

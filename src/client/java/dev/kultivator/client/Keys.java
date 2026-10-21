@@ -48,6 +48,9 @@ public final class Keys {
 	// Phase 9 (DESIGN 26.14 item 18, 26.10): unbound by default.
 	/** Opens or closes the Keabadian screen. */
 	public static final KeyMapping ABADI = key("abadi", InputConstants.UNKNOWN.getValue());
+	// Kitab Panduan (the in-game guide): unbound by default.
+	/** Opens or closes the Kitab Panduan; read by {@code client.guide.GuideClient} and the guide screen. */
+	public static final KeyMapping GUIDE = key("guide", InputConstants.UNKNOWN.getValue());
 
 	private static boolean jumpWasDown;
 	private static int airTicks;

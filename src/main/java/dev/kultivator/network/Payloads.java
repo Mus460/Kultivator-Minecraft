@@ -9,6 +9,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 /** Every custom packet of the mod. */
@@ -762,7 +763,78 @@ public final class Payloads {
 		}
 	}
 
+	/**
+	 * Kitab Panduan (the in-game guide): the player's progress over {@code guide.GuideChapters.steps()} in that order.
+	 * {@code done} has bit i set when step i is finished (its automatic check passes, or a manual step is ticked);
+	 * {@code manual} has bit i set when the player ticked manual step i; {@code current} is the 0-based chapter of the
+	 * first unfinished step ({@code GuideChapters.CHAPTER_COUNT} when everything is done); {@code total} is the server's
+	 * step count (a mismatch means a different mod version); {@code open} asks the client to open the guide screen
+	 * ({@code /kultivasi panduan}; never set in the answer to a GuideAction). Sent by {@code guide.GuideProgress} on a GuideAction,
+	 * on the command and when the progress changes (checked every 5 seconds). About 40 bytes on the wire, far under
+	 * {@link #MAX_BYTES}.
+	 */
+	public record GuideSync(BitSet done, BitSet manual, int current, int total, boolean open) implements CustomPacketPayload {
+		/** The wire budget of the contract (8 KB); 102 steps need about 40 bytes. */
+		public static final int MAX_BYTES = 8192;
+		/** Bits above this are ignored by {@link #isDone} and {@link #isTicked} (a sanity bound, not a limit in use). */
+		public static final int MAX_STEPS = 4096;
+		public static final Type<GuideSync> TYPE = typeOf("guide_sync");
+		public static final StreamCodec<RegistryFriendlyByteBuf, GuideSync> CODEC = StreamCodec.of(
+				(buf, p) -> {
+					buf.writeBitSet(p.done);
+					buf.writeBitSet(p.manual);
+					buf.writeVarInt(p.current);
+					buf.writeVarInt(p.total);
+					buf.writeBoolean(p.open);
+				},
+				buf -> new GuideSync(buf.readBitSet(), buf.readBitSet(), buf.readVarInt(), buf.readVarInt(), buf.readBoolean()));
+
+		/** True when step {@code index} (its {@code GuideChapters.Step.index()}) is finished. */
+		public boolean isDone(int index) {
+			return index >= 0 && index < MAX_STEPS && done.get(index);
+		}
+
+		/** True when the player ticked manual step {@code index}. */
+		public boolean isTicked(int index) {
+			return index >= 0 && index < MAX_STEPS && manual.get(index);
+		}
+
+		@Override
+		public Type<GuideSync> type() {
+			return TYPE;
+		}
+	}
+
 	// ================================================================ client -> server
+
+	/**
+	 * Kitab Panduan: {@code "open"} (the guide screen opened: answer with a GuideSync whose {@code open} is false) or
+	 * {@code "tick <step id>"} (toggle a manual step, e.g. {@code "tick c1.hud"}; answered with a GuideSync too). Handled
+	 * by {@code guide.GuideProgress.handle}; unknown actions are ignored.
+	 */
+	public record GuideAction(String action) implements CustomPacketPayload {
+		public static final String OPEN = "open";
+		public static final String TICK = "tick";
+		public static final Type<GuideAction> TYPE = typeOf("guide_action");
+		public static final StreamCodec<RegistryFriendlyByteBuf, GuideAction> CODEC = StreamCodec.of(
+				(buf, p) -> buf.writeUtf(p.action, 64),
+				buf -> new GuideAction(buf.readUtf(64)));
+
+		/** The open request. */
+		public static GuideAction open() {
+			return new GuideAction(OPEN);
+		}
+
+		/** Toggles manual step {@code stepId}. */
+		public static GuideAction tick(String stepId) {
+			return new GuideAction(TICK + " " + stepId);
+		}
+
+		@Override
+		public Type<GuideAction> type() {
+			return TYPE;
+		}
+	}
 
 	/** A key press or screen button: {@code action} from {@link Actions}, plus an int and a short text argument. */
 	public record Action(int action, int arg, String text) implements CustomPacketPayload {

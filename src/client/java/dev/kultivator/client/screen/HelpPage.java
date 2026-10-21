@@ -29,7 +29,7 @@ final class HelpPage extends Page {
 			// Phase 9 (DESIGN 26.1): each module writes its own topic text; jalan_abadi is the glue's (P9-batin).
 			"alam_abadi", "batu_asal", "binatang_purba", "bencana_bintang", "murka_langit", "dunia_batin", "jurus_ciptaan", "lelang", "jalan_abadi"};
 	private static final KeyMapping[] KEYS = {Keys.MEDITATE, Keys.CAST, Keys.PREVIOUS, Keys.NEXT, Keys.FLYING_SWORD, Keys.INFO, Keys.CODEX, Keys.WHEEL,
-			Keys.SEAL_1, Keys.SEAL_2, Keys.SEAL_3, Keys.SEAL_4};
+			Keys.SEAL_1, Keys.SEAL_2, Keys.SEAL_3, Keys.SEAL_4, Keys.GUIDE};
 
 	private final Eased scrollShown = new Eased(14.0F);
 	private float scroll;

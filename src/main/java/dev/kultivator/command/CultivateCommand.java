@@ -171,6 +171,8 @@ public final class CultivateCommand {
 		dev.kultivator.batin.Batin.addCommands(root, uji);
 		// Phase 10b (DESIGN 29.11): /kultivasi titah [daftar].
 		dev.kultivator.pusakalangit.PusakaLangit.addCommands(root, uji);
+		// Kitab Panduan: /kultivasi panduan opens the in-game guide; uji panduan reset|info.
+		dev.kultivator.guide.GuideProgress.addCommands(root, uji);
 
 		TestCommands.addCommands(uji);
 		root.then(uji);

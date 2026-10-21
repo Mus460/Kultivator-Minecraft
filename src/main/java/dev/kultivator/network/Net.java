@@ -43,9 +43,15 @@ public final class Net {
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.TitahSync.TYPE, Payloads.TitahSync.CODEC);
 		// Phase 10b Tingkat (DESIGN 29.16.11, C10b.9): the far planted weapons of the receiver's dimension.
 		PayloadTypeRegistry.clientboundPlay().register(Payloads.TitahFar.TYPE, Payloads.TitahFar.CODEC);
+		// Kitab Panduan (the in-game guide).
+		PayloadTypeRegistry.clientboundPlay().register(Payloads.GuideSync.TYPE, Payloads.GuideSync.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Payloads.Action.TYPE, Payloads.Action.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(Payloads.GuideAction.TYPE, Payloads.GuideAction.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Action.TYPE, (payload, context) -> handle(context.player(), payload));
+		ServerPlayNetworking.registerGlobalReceiver(Payloads.GuideAction.TYPE,
+				(payload, context) -> dev.kultivator.guide.GuideProgress.handle(context.player(), payload));
+		dev.kultivator.guide.GuideProgress.init();
 	}
 
 	/** Sends a payload if the player's client has the mod (vanilla clients are skipped silently). */
