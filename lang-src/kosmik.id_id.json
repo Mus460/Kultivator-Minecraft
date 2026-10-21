@@ -1,0 +1,12 @@
+{
+  "kultivator.film.setting.kosmik3d": "Film kosmik 3D: %s",
+  "kultivator.film.setting.kosmik3d.penuh": "Penuh",
+  "kultivator.film.setting.kosmik3d.ringan": "Ringan",
+  "kultivator.film.setting.kosmik3d.mati": "Mati",
+  "kultivator.film.setting.kosmik3d.tip": "Saat film Titah, kamera masuk ke panggung 3D: planet dunia ini dilihat dari angkasa, bulan, matahari, dan Istana Langit. Ringan: lapisan lebih sedikit dan tekstur lebih kecil. Mati: kembali ke Langit Kosmik biasa. Hanya kamu yang melihatnya.",
+  "kultivator.film.cmd.kosmik3d.started": "Panggung 3D %s: diputar %s detik.",
+  "kultivator.film.cmd.kosmik3d.refused": "Panggung 3D %s tidak dimulai: %s",
+  "kultivator.film.cmd.kosmik3d.info": "Film kosmik 3D:",
+  "kultivator.film.cmd.kosmik3d.beat_unknown": "Beat %s tidak dikenal untuk panggung %s. Beat: %s",
+  "kultivator.film.cmd.kosmik3d.camera": "Panggung 3D butuh kamera sinematik Penuh atau Spektakuler."
+}

@@ -71,6 +71,13 @@ import java.util.Locale;
  * {@code 16 f} b and sweeps at most {@code min(20°, 7 × 2 s / r)} so its arc stays under 7.6 b/s. Every tier-scaled move
  * and turn is clipped to 7 b/s and 16°/s before the shot's own validation. The F4 vignette grows with the tier
  * ({@code min(1, 0.5 + t / 9)}) inside its cap. Tier 1 frames exactly as before.
+ * <p>
+ * Film Kosmik 3D (DESIGN 32.5.6): when {@code Kosmik3D.penuh} grants a plan (setting, budget, a pocket ≤ 24 b above the
+ * caster with R_d 8 b), F3 becomes one calm stage beat behind the same first cloud wipe: Pedang the sword over the planet,
+ * Tiang the opening Southern Heaven Gate, Bintang the Dipper lighting in space, Gunung the seal rising to the gate. It is
+ * one still segment (no translation; the look turns ≤ 16°/s, the virtual eye drifts ≤ 0.4 × its distance per second);
+ * the vista and the sky grade of F3 are left out, the jade title card stays. A skip in F3 dips and cuts to the eye. A
+ * refused plan leaves F3 exactly as before.
  */
 public final class PusakaFilm {
 
@@ -117,6 +124,9 @@ public final class PusakaFilm {
 		boolean climaxed;
 		boolean revealOnClimax;
 		boolean graded;
+		/** Film Kosmik 3D (32.5.6): the stage context of this film and F3's calm stage plan (null = the F3 of 29.4). */
+		dev.kultivator.client.epic.kosmik.@Nullable StageContext stageCtx;
+		dev.kultivator.client.epic.kosmik.Kosmik3D.@Nullable PenuhPlan stagePlan;
 
 		Film(Scene scene, TechniqueSpec spec, Dampak d, long key, Vec3 aim, int rgb, int casterId, int skill, float radius, boolean test) {
 			this.scene = scene;
@@ -408,6 +418,7 @@ public final class PusakaFilm {
 		int f2 = acts[1];
 		int f3 = acts[2];
 		int f4 = acts[3];
+		prepareStage(film);
 		int t2 = f1;
 		int cut1 = f1 + f2;
 		int cut2 = cut1 + f3;
@@ -451,8 +462,12 @@ public final class PusakaFilm {
 		// the clouds close in for the first cut (we rise into them); the sky turns to the vista's grade behind them
 		scene.at(Math.max(0, cut1 - 8), () -> {
 			if (alive(film)) {
-				film.graded = true;
-				SkyDirector.grade(grade(film.d.vista()), 0.9F, 0.6F, 20, scene.priority, scene.pos, true, 1.0F, scene.pos.y);
+				// Film Kosmik 3D (32.5.6): F3 becomes a calm stage beat when the stage grants it (no sky grade, no vista)
+				planStage(film, f3);
+				if (film.stagePlan == null) {
+					film.graded = true;
+					SkyDirector.grade(grade(film.d.vista()), 0.9F, 0.6F, 20, scene.priority, scene.pos, true, 1.0F, scene.pos.y);
+				}
 			}
 		});
 		scene.at(Math.max(0, cut1 - 6), () -> {
@@ -492,7 +507,7 @@ public final class PusakaFilm {
 		}
 		Vec3 f3Look1 = look1;
 		scene.at(Math.max(0, cut1 - 2), () -> {
-			if (alive(film)) {
+			if (alive(film) && film.stagePlan == null) {
 				Vistas.spawn(scene, film.d.vista(), film.spec, vistaAt, v0, f3 + 10, film.rgb, null, 1.0F, film.casterId);
 			}
 		});
@@ -500,7 +515,18 @@ public final class PusakaFilm {
 			if (!chained(film)) {
 				return;
 			}
-			if (!act(film, v0, v1, look0, f3Look1, f3, true, true)) {
+			dev.kultivator.client.epic.kosmik.Kosmik3D.PenuhPlan plan = film.stagePlan;
+			film.stagePlan = null;
+			if (plan != null) {
+				// one still segment in the pocket carrying the stage binding; the second wipe ends it
+				Shots.Shot shot = Shots.pusakaFilm(plan.c(), plan.c(), plan.look0(), plan.look1(), Math.min(SEGMENT, f3)).cut().hold(4)
+						.stage(plan.binding());
+				EpicDirector.refreshFlags(film.scene);
+				if (!CinematicDirector.shoot(film.scene, shot, CinematicDirector.KIND_ULTIMATE, film.scene.priority, true)) {
+					abandon(film);
+					return;
+				}
+			} else if (!act(film, v0, v1, look0, f3Look1, f3, true, true)) {
 				abandon(film);
 				return;
 			}
@@ -607,6 +633,36 @@ public final class PusakaFilm {
 			return false;
 		}
 		return true;
+	}
+
+	/** Film Kosmik 3D (32.5.6): the stage of the decree builds its meshes and samples the home colours at the film start. */
+	private static void prepareStage(Film film) {
+		try {
+			if (dev.kultivator.client.epic.kosmik.Kosmik3D.setting() == EpicSettings.Kosmik3d.MATI) {
+				return;
+			}
+			dev.kultivator.client.epic.kosmik.StageContext ctx = dev.kultivator.client.epic.kosmik.Kosmik3D.context(film.skill, film.tier, film.rgb,
+					film.key * 31L + film.casterId, true);
+			film.stageCtx = ctx;
+			dev.kultivator.client.epic.kosmik.Kosmik3D.prepare(film.skill == 0 || film.skill == 2 ? dev.kultivator.client.epic.kosmik.Kosmik3D.StageId.ORBIT
+					: dev.kultivator.client.epic.kosmik.Kosmik3D.StageId.SURGA, ctx);
+		} catch (RuntimeException | LinkageError exception) {
+			film.stageCtx = null;
+		}
+	}
+
+	/** Film Kosmik 3D (32.5.6): asks for F3's calm stage beat (null plan = F3 as in 29.4). */
+	private static void planStage(Film film, int f3) {
+		film.stagePlan = null;
+		dev.kultivator.client.epic.kosmik.StageContext ctx = film.stageCtx;
+		if (ctx == null || CinematicDirector.mode() != EpicSettings.Camera.PENUH) {
+			return;
+		}
+		try {
+			film.stagePlan = dev.kultivator.client.epic.kosmik.Kosmik3D.penuh(film.skill, ctx, Math.min(SEGMENT, f3));
+		} catch (RuntimeException | LinkageError exception) {
+			film.stagePlan = null;
+		}
 	}
 
 	/** The decree's jade title card at the start of F3 (7b TitleCard, gold rim, the decree glyph on a jade seal). */

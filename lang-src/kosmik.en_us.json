@@ -1,0 +1,12 @@
+{
+  "kultivator.film.setting.kosmik3d": "3D cosmic film: %s",
+  "kultivator.film.setting.kosmik3d.penuh": "Full",
+  "kultivator.film.setting.kosmik3d.ringan": "Light",
+  "kultivator.film.setting.kosmik3d.mati": "Off",
+  "kultivator.film.setting.kosmik3d.tip": "During a Titah film the camera enters a 3D stage: this world's planet seen from space, its moon, the sun, and the Heavenly Palace. Light: fewer layers and smaller textures. Off: back to the normal Cosmic sky. Only you see it.",
+  "kultivator.film.cmd.kosmik3d.started": "3D stage %s: playing %s s.",
+  "kultivator.film.cmd.kosmik3d.refused": "3D stage %s did not start: %s",
+  "kultivator.film.cmd.kosmik3d.info": "3D cosmic film:",
+  "kultivator.film.cmd.kosmik3d.beat_unknown": "Unknown beat %s for the %s stage. Beats: %s",
+  "kultivator.film.cmd.kosmik3d.camera": "3D stages need the Full or Spectacular cinematic camera."
+}

@@ -25,6 +25,8 @@ public final class Film {
 	/** At most this many EVENT acts play per cast (the own-art template: three form shots). */
 	int maxEventActs = 8;
 	int tint = 0xFFE8B0;
+	/** A {@code /sinematik kosmik3d} preview (DESIGN 32.7): built by the command, never in the catalogue, no camera cap trim. */
+	boolean preview;
 	/** Where an untracked prop stands, in the aim space (a missing driver or a Minimal cast still frames the beat). */
 	final Map<String, double[]> props = new HashMap<>();
 
@@ -72,6 +74,12 @@ public final class Film {
 	/** The aim-space fallback of prop {@code key} while no driver tracks it. */
 	public Film prop(String key, double x, double y, double z) {
 		props.put(key, new double[]{x, y, z});
+		return this;
+	}
+
+	/** Marks a command preview (32.7). */
+	public Film preview() {
+		this.preview = true;
 		return this;
 	}
 

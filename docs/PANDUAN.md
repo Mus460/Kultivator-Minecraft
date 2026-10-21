@@ -110,6 +110,8 @@ bulat di dalam game.
     berkultivasi, [pengaturan](#614-pengaturan-tab-pengaturan-grup-aura-kultivasi), [perintah uji](#616-perintah-uji-op)
 62. [**Kitab Panduan (di dalam game)**](#62-kitab-panduan-di-dalam-game): panduan langkah demi langkah dari Manusia Fana
     sampai Dewa Abadi, dengan centang otomatis
+63. [**Film Kosmik 3D**](#63-film-kosmik-3d): film titah lewat panggung 3D Orbit (planet dari angkasa) dan Istana
+    Langit, [pengaturan](#633-pengaturan-grup-momen-epik), [perintah](#634-perintah-client-sinematik-tanpa-cheat)
 
 ---
 
@@ -8418,3 +8420,92 @@ mati). Saat satu bab selesai muncul pemberitahuan kecil *Bab selesai*, dan pelac
 
 Untuk operator: `/kultivasi uji panduan info` menampilkan kemajuanmu, `/kultivasi uji panduan reset` menghapus semua
 centang manual.
+
+## 63. Film Kosmik 3D
+
+Saat kamu memakai **Titah Langit** (Pusaka Langit), filmnya kini melewati dua **panggung 3D** yang digambar sendiri oleh
+mod: **Orbit** (dunia ini dilihat dari luar angkasa) dan **Istana Langit** (Surga). Pedang benar-benar menunggu di
+angkasa di samping planet lalu menukik masuk atmosfer; tiang dilepas dari Gerbang Langit Selatan dan jatuh menembus
+Sembilan Langit. Semua model dan tekstur dibuat sendiri (skrip Python di `tools/`), tanpa pustaka luar.
+
+> **Status:** sudah dikompilasi tetapi **belum diuji di game**. Yang paling perlu dicek: terang planet dan bulan,
+> tampilan planet dengan paket shader, dan apakah semua benda muncul (benda yang hilang berarti urutan sisinya terbalik).
+> Daftar uji lengkap: [FASE-32](uji/FASE-32.md).
+>
+> **Keamanan:** semuanya **hanya tampilan di layarmu sendiri**. Tidak ada blok yang berubah (blok tetap hanya lewat
+> `WorldBreaker` dengan Mode Kehancuranmu), tidak ada `LightningBolt`, cuaca, waktu atau tick-rate yang berubah. Angka
+> gameplay, waktu klimaks dari server, suara Langit berbahasa Jepang dan baris Sumber tidak berubah.
+
+### 63.1 Cara kerjanya (singkat)
+
+* Kamera **tidak benar-benar terbang ke angkasa**: batas kamera (48 blok ke atas, 64 blok ke samping) tetap. Selama
+  shot panggung, kamera asli diam di kantong udara kosong dekat kamu dan hanya mata virtual yang bergerak di dalam
+  panggung. Panggung dipadatkan ke dalam kubah hitam di sekeliling kamera, jadi gambarnya sama, hanya kedalamannya yang
+  dimampatkan.
+* Kubah hitam itu menulis kedalaman, jadi air, awan, hujan dan awan paket shader yang digambar sesudahnya tidak tembus.
+  Hujan/salju di sekitar kamera dan papan nama pemain lain disembunyikan selama panggung tampil (hanya di layarmu).
+* Keluar dari panggung (selesai, Backspace, atau bahaya) **selalu potong** kembali ke matamu di bawah kedipan hitam
+  singkat; kamera tidak pernah meluncur pelan dari kantong udara.
+* Bila panggung tidak bisa jalan (pengaturan Mati, FPS turun, tidak ada kantong udara, dll.), shot itu memutar shot
+  lama dengan panjang yang sama, jadi filmnya tetap utuh.
+
+### 63.2 Isi tiap film titah
+
+| Titah | Yang kamu lihat |
+|---|---|
+| **Pedang Pemisah Langit** | Dibuka di orbit: pedang raksasa melayang di samping planet (dunia ini dari angkasa, dengan benua berwarna bioma di sekitarmu, awan berputar, cahaya atmosfer di tepi, lampu kota di sisi malam), cincin rune menyala, matahari terbit di tepi planet. Pedang berbalik ujung ke bawah dan menukik; dari orbit terlihat jejak terbakar dan selubung plasma menembus atmosfer dan lapisan awan, lalu film lanjut ke perjalanan turun, langit terbelah dan dampak seperti sebelumnya |
+| **Tiang Penenang Samudra** | Dibuka di Istana Langit: lautan awan, Sembilan Langit bertingkat, berkas cahaya emas, kelopak bunga langit berjatuhan, air terjun cahaya, jembatan giok, pulau melayang, Empat Raja Langit penjaga. Gerbang Langit Selatan (Nantianmen) dengan pilar naga terbuka, tiang langit dilepas dari istana, jatuh menembus sembilan cincin langit dan lautan awan, lalu turun ke tanah (dampak seperti sebelumnya). Lemparan tombak pemain tidak ditampilkan; tiang terlihat datang dari bawah gerbang |
+| **Tujuh Bintang Biduk Utara** | Dibuka di orbit: tujuh bintang Biduk Utara menyala satu per satu sebagai inti bintang 3D di angkasa di atas sisi malam planet, lalu tujuh sinar menembus atmosfer, dilihat dari orbit |
+| **Pemindah Gunung** | Segel giok naik dari lautan awan ke Gerbang Langit; sesudah dampak, sel-sel tanah yang terangkat melayang naik dengan latar planet dari orbit |
+
+Dengan **Kamera Penuh** (bukan Spektakuler) bagian "Istana" dari Film Pusaka menjadi satu adegan panggung yang tenang
+(pedang di atas planet, gerbang yang terbuka, Biduk yang menyala, atau segel yang naik). Dengan **Singkat** atau
+**Mati** tidak ada panggung 3D.
+
+Tingkat Titah 1-9 ikut terasa: pedang, tiang dan segel membesar (sekitar s^0,35) dan bingkai kamera menyesuaikan;
+planet dan istana tidak ikut membesar. Kecepatan yang mempersingkat pembangunan memendekkan shot panggung lebih dulu, dan
+klimaks yang datang lebih cepat langsung memotong ke dampak.
+
+Baris Sumber panggung Surga (Perjalanan ke Barat, Lüshi Chunqiu, Huainanzi, Chu Ci, Fengshen Yanyi, Sutra Vimalakirti
+dan Sutra Teratai) tampil saat kamu memutar pratinjau `/sinematik kosmik3d surga`.
+
+### 63.3 Pengaturan (grup Momen Epik)
+
+| Pengaturan | Pilihan (bawaan tebal) | Artinya |
+|---|---|---|
+| Film kosmik 3D | **Penuh** / Ringan / Mati | Penuh: panggung lengkap. Ringan: lebih sedikit lapisan dan tekstur lebih kecil (satu tingkat kualitas di bawah). Mati: kembali ke Langit Kosmik biasa |
+
+Butuh Kamera sinematik **Spektakuler** (film titah) atau **Penuh** (adegan tenang). **Kualitas Efek**
+Minimal/Normal/Maksimal mengatur jumlah quad dan ukuran tekstur (peta planet 256 / 512 / 1024 lebar), dan dengan paket
+shader jumlahnya dikali 0,6. Penjaga frame Momen Epik ikut menurunkan tingkat bila FPS turun; tanpa post shader, jadi
+aman untuk Sodium dan Iris.
+
+### 63.4 Perintah client `/sinematik` (tanpa cheat)
+
+| Perintah | Fungsi |
+|---|---|
+| `/sinematik kosmik3d orbit [detik] [tingkat]` | pratinjau panggung Orbit (2-30 detik, bawaan 8; tingkat 1-9) |
+| `/sinematik kosmik3d surga [detik] [tingkat]` | pratinjau Istana Langit, beserta baris Sumbernya |
+| `/sinematik kosmik3d beat <orbit\|surga> <beat> [detik] [tingkat]` | satu beat saja (1-6 detik), misalnya `pedang_menukik` atau `tiang_jatuh` |
+| `/sinematik kosmik3d info` | pengaturan, tingkat panggung, kantong udara terakhir, alasan penolakan terakhir, quad dan ms frame terakhir |
+| `/sinematik film titah_pedang\|titah_tiang\|titah_bintang\|titah_gunung` | memutar film titah lengkap (sudah ada sebelumnya) |
+
+Contoh:
+
+```
+/sinematik spektakuler
+/sinematik kosmik3d orbit 12
+/sinematik kosmik3d surga 12 9
+/sinematik kosmik3d beat orbit pedang_masuk
+/sinematik film titah_tiang
+/sinematik kosmik3d info
+```
+
+### 63.5 Yang belum lengkap
+
+* Belum diuji di game: terang planet dan bulan, tampilan dengan paket shader (bila jelek, ada saklar
+  `PACK_EMISSIVE_BODIES` di kode), arah pegangan/ujung pedang di panggung, dan warna planet di hutan, gurun, salju dan
+  rimba.
+* Shot lemparan tombak sebelum gerbang Tiang belum dibuat (opsional).
+* Tidak ada pendengar muat ulang sumber daya: setelah F3+T, cache model panggung baru diperbarui setelah keluar-masuk
+  dunia (tekstur dan model item sudah diperbarui sendiri).

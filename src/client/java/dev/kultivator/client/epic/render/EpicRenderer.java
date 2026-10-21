@@ -32,12 +32,16 @@ import java.util.List;
 public final class EpicRenderer {
 
 	private static final Frame FRAME = new Frame();
+	/** The fog start of the last drawn frame (Film Kosmik 3D's pocket search, 32.1.1); 0 = unknown. */
+	private static float lastFog;
 
 	/** The {@code COLLECT_SUBMITS} listener. */
 	public static void collect(LevelRenderContext context) {
 		// Phase 30 (DESIGN 30.2.7, 30.2.8): the film's heat haze and Langit Kosmik draw here too (one boolean each while idle)
 		boolean film = dev.kultivator.client.epic.cosmic.CosmicSky.active() || dev.kultivator.client.epic.lens.HeatHaze.active();
-		if (!EpicDirector.anyGeometry() && !film) {
+		// Film Kosmik 3D (DESIGN 32.1.4): the 3D stages (one boolean while idle)
+		boolean kosmik = dev.kultivator.client.epic.kosmik.Kosmik3D.wants();
+		if (!EpicDirector.anyGeometry() && !film && !kosmik) {
 			return;
 		}
 		if (ShaderCompat.shadowPass()) {
@@ -48,6 +52,16 @@ public final class EpicRenderer {
 			EpicBudget.beginFrame();
 			CameraRenderState camera = context.levelState().cameraRenderState;
 			FRAME.setup(camera, context.levelState().worldPartialTicks, context.poseStack(), context.submitNodeCollector());
+			lastFog = FRAME.fogStart;
+			if (kosmik) {
+				// first: while a stage covers the frame it takes the whole 7b quad budget, and the 7b elements, Langit
+				// Kosmik and the heat haze (all behind its dome) are skipped
+				dev.kultivator.client.epic.kosmik.Kosmik3D.render(FRAME);
+				if (dev.kultivator.client.epic.kosmik.Kosmik3D.covering()) {
+					EpicBudget.addCpu(System.nanoTime() - start);
+					return;
+				}
+			}
 			List<Scene> scenes = EpicDirector.scenesByPriority();
 			for (int i = 0; i < scenes.size(); i++) {
 				Scene scene = scenes.get(i);
@@ -69,6 +83,11 @@ public final class EpicRenderer {
 			FRAME.clear();
 		}
 		EpicBudget.addCpu(System.nanoTime() - start);
+	}
+
+	/** The fog start of the last drawn frame (blocks), or 0 while unknown. */
+	public static float lastFogStart() {
+		return lastFog;
 	}
 
 	/** The per-frame drawing state handed to every element. */

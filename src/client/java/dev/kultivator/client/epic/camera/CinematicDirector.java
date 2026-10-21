@@ -30,6 +30,11 @@ import java.util.WeakHashMap;
  * blend from the eye, exit with a 10-tick blend, snap back instantly on a danger abort, use sine easing and the speed caps
  * of {@link Shots}, one {@code level.clip} per frame, and never start or continue past a hard gate ({@link ShotGuard}).
  * Every mixin entry costs one boolean while no shot runs.
+ * <p>
+ * Film Kosmik 3D (DESIGN 32.1.1, 32.1.5): a shot that carries a stage binding stands still at the stage's pocket while
+ * the stage covers the world ({@link #stageBinding()}). It is never left by the ease back (that would show the world
+ * from the pocket): a skip, a key, a mouse look or the shot's end raise the 2-tick black dip (full cover at once) and
+ * snap back to the eye under it; a danger abort snaps at once as always.
  */
 public final class CinematicDirector {
 
@@ -180,6 +185,13 @@ public final class CinematicDirector {
 		// hides the jump; otherwise it blends like any other shot.
 		boolean masked = request.cut && (dev.kultivator.client.epic.screen.CloudWipe.cover() >= 0.8F
 				|| dev.kultivator.client.epic.screen.ImpactFrame.showing());
+		boolean fromStage = active && !exiting && shot != null && shot.stage != null && shot.stage != request.stage;
+		if ((request.stage != null || fromStage) && !masked) {
+			// Film Kosmik 3D (32.1.1, 32.1.5): a stage segment never blends in from elsewhere (the dome would cross the
+			// terrain) and a shot after one never blends out of the pocket; both jump under the black dip
+			dev.kultivator.client.epic.lens.LensLayers.dip();
+			masked = true;
+		}
 		if (masked) {
 			blendFrom = null;
 		}
@@ -261,6 +273,18 @@ public final class CinematicDirector {
 		return true;
 	}
 
+	/**
+	 * Film Kosmik 3D (32.1.4): the stage binding of the running shot, non-null only while a stage shot runs and is not
+	 * exiting. One boolean while no shot runs.
+	 */
+	public static dev.kultivator.client.epic.kosmik.Kosmik3D.@Nullable Binding stageBinding() {
+		if (!active || exiting) {
+			return null;
+		}
+		Shots.Shot running = shot;
+		return running != null ? running.stage : null;
+	}
+
 	/** Phase 30: true while a film shot runs and is not easing back. */
 	public static boolean filmShooting() {
 		return active && !exiting && shot != null && shot.type == Shots.Type.FILM;
@@ -294,6 +318,12 @@ public final class CinematicDirector {
 	/** Ends the shot with the 10-tick ease back (skip key, inputs, the shot's end). */
 	public static void skip() {
 		if (active && !exiting) {
+			if (shot != null && shot.stage != null) {
+				// Film Kosmik 3D (32.1.5): never ease back from the pocket; the dip covers at once, the camera snaps to the eye
+				dev.kultivator.client.epic.lens.LensLayers.dip();
+				abort();
+				return;
+			}
 			exiting = true;
 			exitAge = 0.0F;
 			rollTarget = 0.0F;
@@ -484,7 +514,8 @@ public final class CinematicDirector {
 			skip();
 			return presses;
 		}
-		if (age >= running.ticks) {
+		// a film stage shot gets one more tick: the film cuts to its next shot in this tick (no dip at a planned cut)
+		if (age >= running.ticks + (film && running.stage != null ? 1 : 0)) {
 			skip();
 		}
 		return presses;
@@ -523,6 +554,10 @@ public final class CinematicDirector {
 		float sigma = EpicClock.sigma();
 		float progress = Mth.clamp((age + partial * sigma) / Math.max(1, running.ticks - running.hold), 0.0F, 1.0F);
 		running.evaluate(ease(progress), feet, subjectEye, yaw0, OUT);
+		if (running.stage != null) {
+			// Film Kosmik 3D (32.5.6): Kamera Penuh's calm beat; the virtual eye follows the shot's eased progress
+			running.stage.follow(ease(progress), age + partial * sigma);
+		}
 		double ox = OUT[0];
 		double oz = OUT[2];
 		if (mirrored) {

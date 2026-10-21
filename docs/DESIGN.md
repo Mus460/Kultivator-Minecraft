@@ -18791,3 +18791,757 @@ languages): `kultivator.aura.realm.<realm id>.name` (e.g. "Aura Inti Emas"), `.d
 21. Teks: setiap kunci `kultivator.aura.*` ada di en_us dan id_id; semua baris Sumber lama tetap sama; setiap ranah punya
     baris Sumber aura sesuai 31.4.
 22. Semua tekstur aura tampak benar (tanpa ungu-hitam), tepi cahaya lembut; model 3D aura tampil rapi dari segala arah.
+
+---------------------------------------------------------------------------------------------------------------------
+
+## 32. Film Kosmik 3D
+
+The user asked (2026-10-21, translated): "For the Heaven seals (Titah Langit / Pusaka Langit) like the sword or the
+pillar falling from the sky, make the cinematic so that at first the sword is in **outer space**, then it is summoned
+and plunges into the earth. Make components with textures in the video, **3D**, like a 3D Earth or planet. Also when
+the pillar from heaven falls, make a 3D cinematic of **Heaven** itself, and the others too." Asked whether to build the
+3D version now, the user answered "gas" (yes).
+
+Today the four decree films (30.3.1-30.3.4, `FilmCatalogTitah`) reach "space" only through Langit Kosmik (30.2.8):
+2D billboards and strips projected on the sky. This section adds **Film Kosmik 3D**: two real 3D sets drawn by our own
+client renderer, the **Orbit stage** (a planet that is this world seen from space, its moon, sun, clouds, atmosphere
+and starfield) and the **Heaven stage** (the Southern Heaven Gate, the Lingxiao Hall, the cloud sea and the Nine
+Heavens), and new authored shots for the four decree films that play inside them. It is presentation only, for the
+caster's own client.
+
+### 32.0 Scope, facts from the code, and what stays (binding)
+
+**Stays exactly as it is:** every Sumber line and gameplay number (radii, damage, `climaxAt`, K = 100 / 120 / 140 / 90,
+the TechFx timeline, Kecepatan, Tingkat 1-9 of 29.16, silences); rule 0.1 and 30.0 amendment 1 (blocks change only
+through `kehancuran/WorldBreaker` under the player's own Mode Kehancuran, Titah carves or disciple Destroyer Arts;
+nothing here touches a block, and without Kehancuran every effect stays visual); never a `LightningBolt`, weather,
+time-of-day or tick-rate change (the stage's sun and moon are drawn, `SkyDirector` is not used in stage shots); the
+weak-laptop rule (no post chain, no core shader, **no custom `RenderPipeline`**: only vanilla render types; the "heavy
+shader" look is layered additive quads, glow textures and the HUD lens layers); `EffectQuality` Minimal / Normal /
+Maximal and the `EpicBudget` frame guard; Sodium and Iris (28.1.4, the pack profile of 23.14.3); the 7b camera safety
+rules (short skippable shots, Kamera Singkat / Penuh / Spektakuler / Mati, Backspace skips, never during danger, every
+23.7.4 hard gate and the 30.2.2 film gates); `DisplayKey` for every display transform (the stages spawn **no** Display
+entity; a later user that needs one goes through `DisplayKey`); ItemStacks only through `ModelFx.stack` and only on
+first draw (never in a static initialiser, a constructor or `prepare`); server code is not touched at all; each file's
+line endings (every file touched here is LF today: check `git ls-files --eol` first); text in
+`lang-src/<fragment>.en_us.json` + `.id_id.json` with identical keys. The Japanese heaven voice (`voice.heaven.decree_*`)
+stays server-triggered and is never played by the film; stage ducking never touches VOICE (`EpicSound.DUCKED` is
+AMBIENT, WEATHER, NEUTRAL, BLOCKS only).
+
+**Facts found in the code (the code is the truth):**
+
+| Fact | Where | Consequence for 32 |
+|---|---|---|
+| A film shot's camera is `FilmPath.out` (x, y, z, yaw, pitch, FOV k, roll), evaluated in `CinematicDirector.filmPose` during camera setup, before the level renders; one `level.clip` per frame from the last pose | `epic/film/FilmPath`, `epic/camera/CinematicDirector` | a stage shot keeps the real camera still at a safe point and turns it; the virtual eye moves in the stage. The renderer reads the same frame's virtual eye |
+| Real camera caps: ≤ 48 b above the subject's feet, ≤ min(64, render distance × 16 − 24) b from it | `FilmPath.MAX_HEIGHT`, `FilmStage.reach` | the camera never travels to a real place "in space"; space is a set drawn around a nearby air pocket |
+| Our geometry is drawn from Fabric `LevelRenderEvents.COLLECT_SUBMITS` through `EpicRenderer.Sink` (camera-relative floats, `submitCustomGeometry`); skipped in Iris's shadow pass | `epic/render/EpicRenderer`, `ShaderCompat.shadowPass` | the stages use the same path and sinks |
+| `submitCustomGeometry` routes a blending render type to the **translucent** phase and an opaque one to the **solid** phase; the classic order is solid terrain, solid features, translucent features, translucent terrain (water, glass), clouds, weather, world border; with "improved transparency" the translucent work is OIT; the see-through *text* phase runs last but custom geometry never goes there | mcsrc `SubmitNodeCollection.submitCustomGeometry`, `LevelRenderer.addMainPass` / `executeClassicTransparency` / `executeOit` | `textSeeThrough` quads (CosmicSky's open-sky trick) are still painted over by water, clouds and rain drawn later. The stage therefore hides the world with an **opaque, depth-writing dome close around the camera**, so everything drawn later fails the depth test |
+| Near plane `Camera.PROJECTION_Z_NEAR = 0.05`; depth is reverse-Z (`GREATER_THAN_OR_EQUAL`, cleared to 0) | mcsrc `Camera`, `RenderPipelines` | stage geometry lives between 0.12 b and the dome |
+| Vanilla types usable for the stage: `entitySolid(tex)` (opaque, culled, depth write), `entityCutout(tex)` (alpha cutout 0.1, no cull), `entityTranslucentEmissive(tex)` (translucent, no cull, depth test without write), `energySwirl(tex, u, v)` (ADDITIVE blend, `NO_CARDINAL_LIGHTING`, `EMISSIVE`, no cull, depth write; a new `RenderType` per call, so it is created **once** per texture with offsets 0, 0 and animated through vertex UVs) | mcsrc `RenderTypes`, `RenderPipelines.ENTITY_SOLID`, `ENTITY_CUTOUT`, `ENTITY_TRANSLUCENT_EMISSIVE`, `ENERGY_SWIRL` | the four stage sink kinds of C32.3 |
+| Living-entity name tags render in the see-through text phase (no depth) unless the HUD is hidden | mcsrc `EntityRenderer.extractNameTags`, `LivingEntityRenderer.shouldShowName` | a tiny mixin clears `state.nameTag` / `scoreText` while a stage is shown, else other players' names would float over space |
+| Item models can be submitted without an entity (`ItemModelResolver.updateForTopItem`, `ItemStackRenderState.submit`, `ItemDisplayContext.FIXED`), as `TitahMonumentRenderer` does | mcsrc, `pusakalangit/world/TitahMonumentRenderer` | the decree weapons (`heaven_splitting_sword`, `dinghai_pillar`, `star_core`, `yishan_seal`) appear in the stages as their existing models |
+| Titah films: one continuous pre-climax act that ends on the server's climax (`holdForClimax`), the climax act on the event under the IMPACT mask, `retimeTitah` shortens cosmic shots first; shots ≤ 4 s, film ≤ 12 s (29.16) | `FilmDirector`, `FilmCatalogTitah` | kept; stage shots shrink first (32.5.1) |
+| Film Pusaka (Kamera Penuh): F3 "Istana" is a world-anchored segment behind the first cloud wipe, 0.30 of the film (≤ 72 ticks) | `pusakalangit/cinema/PusakaFilm` | the Penuh version replaces F3 by one calm stage beat (32.5.6) |
+
+**Not done (and why):** no real camera travel to y = 2000 or beyond the caps (chunks, fog and Sodium would show
+edges); no `textSeeThrough`-only stage (water, clouds and rain would paint over it); no render target or GUI
+picture-in-picture (a second full-screen target is a post-chain cost on the weak laptop); no runtime shaders.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 32.1 The virtual stage technique (F core, used by O and H)
+
+#### 32.1.1 Where the camera goes
+
+At the start of every stage shot F finds a **pocket**: a point C near the caster with a sphere of radius `R_d` (the
+dome radius) that holds only air. The real camera jumps to C under the shot's mask (black dip, cloud wipe, smear or
+impact frame) and **stays there** for the whole stage shot (and the following stage shots of the same stage). Only its
+rotation, FOV and roll change, from the virtual eye's look in the stage. The virtual eye (double precision, stage metres
+"sm") is what moves.
+
+Pocket search (`StagePocket`, once per stage shot start, ≤ 0.3 ms):
+- target `R_d` = 12 b (Normal, Maximal), 10 b (Minimal), 8 b (Kamera Penuh); minimum 6 b (Penuh 5 b);
+- candidates, in order: straight above the caster's feet at heights `R_d + 3`, then +4 b steps up to 46 b (Penuh: up to
+  24 b), then the same columns shifted 8 b to each of the four sides; each candidate must also be ≤ 64 b and
+  ≤ render distance × 16 − 24 b from the caster (the 30.2.3 caps);
+- a candidate passes when: `C.y − R_d − 2 ≥` the highest `Heightmap.Types.WORLD_SURFACE` of 7 × 7 samples over the square
+  of side `2 R_d + 4` around it; `C.y + R_d + 2 ≤ level.getMaxY()`; every sampled column `level.hasChunkAt`; no entity
+  other than the caster within `R_d + 2` (`level.getEntities` with an inflated AABB);
+- the fog: the last frame's `fogStart` (`EpicRenderer.Frame.fogStart`) ≥ 2.5 × `R_d`, else `R_d` = fogStart / 2.5 if
+  that is ≥ the minimum; no Blindness or Darkness on the player (`LivingEntity.hasEffect(MobEffects.BLINDNESS /
+  DARKNESS)`); the camera fluid is none (ShotGuard already refuses fluids);
+- if no candidate passes, the shot plays its **fallback** (`orElse`, 32.5) with the same length: the film never waits.
+
+The pocket is kept for consecutive stage shots of the same stage (no camera jump between them).
+
+#### 32.1.2 Hiding the real world: the dome
+
+The first thing a stage draws is its **dome**: an inward-facing sphere at 0.97 `R_d` around the real camera in the
+**solid** phase (`entitySolid(dome texture)`, depth write on). It is nearer than any world surface outside the pocket,
+so it covers the vanilla sky, terrain, entities and chunk edges, and everything drawn after it (translucent terrain,
+water, vanilla and Iris clouds, rain, particles, the world border) fails the depth test. The Orbit dome is the
+starfield and Milky Way; the Heaven dome is the heavenly sky. If a stage has no dome texture yet, F draws a black
+`textures/misc/kosmik/black.png` dome. The dome is frustum-culled on the CPU (quads whose centre direction is more than
+(diagonal half-FOV + 12°) from the camera forward are skipped).
+
+Name tags: the mixin `KosmikNameTagMixin` (F) injects at the TAIL of `EntityRenderer.extractNameTags(Entity,
+EntityRenderState, float, double, double)` and sets `state.nameTag = null; state.scoreText = null` while
+`Kosmik3D.covering()`; idle cost one boolean. A see-through `TextDisplay` within the pocket can still show (accepted,
+rare).
+
+While a stage covers the frame, `EpicRenderer.collect` skips the 7b element loop, `CosmicSky` and `HeatHaze` (they are
+behind the dome) and spends the whole 7b quad budget on the stage.
+
+#### 32.1.3 Depth inside the dome: the logarithmic diorama
+
+Stage objects span 0.5 sm (a POV ride) to 20 000 sm (the far side of the moon). They are squeezed radially around the
+virtual eye into the dome: a stage point P with `d = P − eye`, `ρ = |d|` is drawn camera-relative at
+
+```
+g(ρ) = clamp(N + (F − N) · ln(ρ / ρ0) / ln(ρ1 / ρ0), N, F)      N = 0.12 b, F = 0.90 R_d, ρ0 = 0.5 sm, ρ1 = 20 000 sm
+drawn = d · g(ρ) / ρ
+```
+
+Every point keeps its exact direction from the eye, so the picture is exactly the true perspective picture; only depth is
+compressed, monotonically, so the depth test still orders surfaces correctly (meshes are tessellated finely enough that
+the per-vertex remap never shows: no stage triangle spans more than a 3:1 distance ratio, enforced by the mesh grids).
+Rules:
+- **Meshes** (spheres, shells, rings, ribbons, billboards, cuboid models of C32.4) are remapped **per vertex**.
+- **Item models** (the decree weapons) cannot be remapped per vertex: each is drawn with one uniform scale `k = g(ρc) /
+  ρc` about the eye, from its centre distance ρc (exact image, approximate depth). Its own decorations (rune rings,
+  plasma sheath) use the same `k` (`StageFrame.cluster`). Camera keys keep ρc ≥ 1.6 × the model's radius.
+- **Sky objects** (sun discs, corona, bright stars) are directions, drawn at 0.94 `R_d` (behind every mapped body, in
+  front of the dome), so a planet or a palace in front hides them through the depth test.
+- The dome at 0.97 `R_d` is behind everything.
+
+Stage axes equal world axes (no rotation): a stage direction is a world direction, so FOV, roll, the HUD lens layers
+and the flare projection all work unchanged.
+
+#### 32.1.4 Render hook and frame (C32.3)
+
+`EpicRenderer.collect` (F) calls `Kosmik3D.render(FRAME)` first when `Kosmik3D.wants()` (one boolean while idle).
+`Kosmik3D` reads `CinematicDirector.stageBinding()`: the binding of the running shot, non-null only while a stage shot
+runs and is not exiting. No binding → nothing is drawn, and a stage that was bound gets `end()`. So the stage can never
+outlive the camera: a danger abort, a death, a disconnect, a skip or the next cut all drop it in the same frame.
+
+Per frame: the binding gives the stage, the pocket C, `R_d`, the beat and the virtual eye (written by `FilmPath.evaluate`
+or, for Penuh, from the shot progress) and the camera axes of `CameraRenderState`. The stage writes into the core's
+sinks; the core submits them in this order: solid (dome first) and cutout; the item models (`ItemStackRenderState.submit`
+with `LightCoordsUtil.FULL_BRIGHT`, `OverlayTexture.NO_OVERLAY`); translucent glow; additive (`collector.order(1)`).
+Normals are written as +Y so the entity diffuse term is constant (`minecraft_mix_light` saturates for an up normal;
+[verify in game, 32.10 item 1]);
+shading is baked into vertex colours by the stage.
+
+#### 32.1.5 Leaving a stage
+
+A stage shot is only entered under a mask (or straight from a stage shot of the same stage) and only left under a mask:
+the next shot's cut, or, when the act ends or is skipped on a stage shot, F raises the 2-tick black dip and calls
+`CinematicDirector.abort()` (instant) once the dip covers ≥ 0.9; `CinematicDirector.skip()` on a stage shot does the
+same instead of the 10-tick ease (an ease from C to the eye would show the world from the pocket). Danger aborts snap at
+once as today. Nothing else needs restoring: the stage holds no camera, time, weather or world state.
+
+#### 32.1.6 Shader packs (Iris) and Sodium
+
+- The stage draws from `COLLECT_SUBMITS`, never in the shadow pass. The pocket is chosen in open air above the highest
+  surface, so pack shadows on stage surfaces are rare.
+- Pack profile (`ShaderCompat.packOn()`): × 0.6 quads (`EpicBudget`), one large additive layer fewer (atmosphere keeps
+  one shell, no cloud shell, no night-light shell), no petals above Normal counts, the dome stays (black space or the sky
+  gradient). `KosmikTypes.PACK_EMISSIVE_BODIES` (default false, [verify in game, 32.10 item 21]) switches planet and moon
+  to `entityTranslucentEmissive` drawn far to near if a pack shades the solid planet badly.
+- The dome writes depth at ≤ 12 b, so pack fog, volumetric clouds and sky passes see a near surface: they do not draw
+  over space. Bloom and tone mapping act on our colours as on any emissive entity.
+- Sodium: no chunk mesh is touched; the jump to C (≤ 48 b, inside render distance) is masked; nothing depends on chunk
+  visibility because the dome covers the world.
+
+#### 32.1.7 Motion caps of stage shots
+
+The real camera does not translate, so the 24 / 48 b/s caps of 30.2.3 do not apply to the virtual eye. Instead:
+- **flow cap**: the virtual path length per second ≤ 2.0 × the mean distance from the eye to the look target
+  (Spektakuler) or ≤ 0.4 × (Kamera Penuh, the calm beats); `FilmPath.validate` shortens the path toward its first key as
+  today;
+- the look, whip and roll caps of 30.2.3 stay (≤ 12°/tick, whip ≤ 45°/tick with the smear, roll ≤ 20°, ≤ 3°/tick);
+  Penuh beats ≤ 16°/s and ≤ 5° roll;
+- no `bullet()` in a stage shot (the stage clock is the shot clock);
+- **luminance**: every stage brightening that covers more than 20 % of the screen (a rune ignition, the cloud punch, a
+  sunrise flare, the gate light) is one luminance event and keeps the 500 ms spacing of 23.x; ring crossings are soft
+  rises (≤ +0.2 alpha over 6 ticks), never flashes. Impact frames are unchanged (they belong to the world shots).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 32.2 The Orbit stage (module O)
+
+**Units and layout.** Stage metres (sm). The planet centre is the origin, its axis +Y, radius `r_p` = 1000 sm, turning
+0.02°/tick about +Y (clouds 0.03°/tick, deterministic from the shot clock). **Home** is the point under the caster: on
+the meridian facing +Z at a latitude from the caster's biome (snowy 60° N, dry 22° N, jungle-like (foliage green and
+warm) 6° N, otherwise 40° N); the default planet texture guarantees a continent with every climate band along that
+meridian (latitude 0-70° N, longitude ±25°). The moon (radius 270 sm) stands at (−6000, 2500, −6500) sm; the sun is a
+direction set per beat. Tingkat: the decree's anchors carry `fs = s(t)^0.35` (32.5.7); the planet does not scale.
+
+#### 32.2.1 Meshes and shells (per quality after "Film kosmik 3D: Ringan" and the frame guard)
+
+All spheres are UV spheres (rings × segments) built once per size into float arrays (unit position = normal, equirect
+UV with the seam duplicated); each frame the CPU drops quads whose four corners face away from the eye (planet, moon,
+shells) or lie outside the view cone (dome). "Drawn" counts are typical with half the body in view.
+
+| Layer | Look | Render type | Minimal | Normal | Maximal |
+|---|---|---|---|---|---|
+| Space dome | `space_<n>.png`: black, soft stars, the Milky Way band tilted 60° to the stage equator, faint nebula tints | `entitySolid` | 6 × 12 (72; ≈ 30 drawn) | 10 × 20 (200; ≈ 70) | 12 × 24 (288; ≈ 100) |
+| Bright stars | 4-point twinkling billboards (`star_spike.png`), alpha-only twinkle (sine, seeded phase) | additive | 0 | 40 | 80 |
+| Planet | the day map (baked, 32.2.2), per-vertex light: `day × (0.08 + 0.92 × max(0, n·sun)^0.8)` | `entitySolid` | 12 × 24 (288; ≈ 150) | 24 × 48 (1152; ≈ 600) | 32 × 64 (2048; ≈ 1050) |
+| Night lights | `planet_night_<n>.png` speckles (villages along coasts and rivers), alpha `smoothstep(0.1, −0.15, n·sun)` | additive shell × 1.001 | – | same grid as the planet, only night quads (≈ 150) | ≈ 260 |
+| Cloud shell | `clouds_<n>.png`, alpha × (0.15 + 0.85 × light), turning faster | `entityTranslucentEmissive` × 1.008 | – | 16 × 32 (≈ 270) | 24 × 48 (≈ 600) |
+| Atmosphere shells | fresnel rim: alpha `a_i × (1 − abs(n·v))^p_i × (0.25 + 0.75 smoothstep(−0.3, 0.4, n·sun))`, colour day `7EC8FF` → terminator `FF9A5A` → night `2A3A8A`; shells × 1.015 / 1.03 / 1.05, `p` = 3 / 4 / 6, quads with all corners < 0.02 alpha skipped | additive | 1 limb billboard only | limb billboard + 2 shells 12 × 24 (≈ 120 each) | limb + 3 shells 16 × 32 (≈ 150 each) |
+| Limb glow | one camera-facing annulus (`limb_glow.png`) at the planet centre, 1.15 `r_p`: the planet's own front hides its middle, so only the rim halo shows | additive | 1 | 1 | 1 |
+| Moon | `moon_<n>.png` craters, light `0.06 + 0.94 × max(0, n·sun)` | `entitySolid` | – | 10 × 20 (≈ 100) | 16 × 32 (≈ 256) |
+| Sun | core (`sun_core.png`, 2 layers), corona (`sun_corona.png`, turning 0.05°/tick), the lens-flare light point | additive sky billboards | 2 | 3 | 4 |
+| Local patch | around home, when the eye is within 1500 sm of it: a land detail decal (`patch_land_<n>.png`, tiled 4 ×, tinted by the home colours, radial alpha fade) 0.3 sm above the surface on a 6 × 12 polar grid, and 2 cloud-deck layers (`patch_cloud_<n>.png`) at +8 and +14 sm | `entityTranslucentEmissive` | decal only (72) | decal + 1 deck (144) | decal + 2 decks (216) |
+| Props of the beats | 32.2.3 | item models + additive | ≤ 2 models, ≤ 40 quads | ≤ 8 models, ≤ 160 | ≤ 16 models, ≤ 320 |
+| **Total drawn (estimate)** | | | **≤ 360** (pack ≤ 230: planet 10 × 20) | **≤ 1450** (pack ≤ 880: planet 20 × 40, one shell, no clouds) | **≤ 2950** (pack ≤ 1780) |
+
+Each layer asks `EpicBudget.takeQuads(n)` in this priority order: dome, planet, sun, limb, props, moon, atmosphere,
+clouds, night lights, local patch, bright stars; a refused layer is skipped for that frame (never half-drawn). The grid
+size changes only at a shot start (no popping). Vertex count = 4 × quads; every grid is built once per session per
+size; per frame the stage only writes floats into the reused sinks (no allocation).
+
+#### 32.2.2 Textures (O, `tools/gen_kosmik_orbit.py`)
+
+Run `python -I tools/gen_kosmik_orbit.py` (stdlib + `tools/png.py`, fixed seed). Noise is 3D value-noise fbm sampled on
+the unit sphere, so every equirect map is seamless in longitude and not pinched at the poles; every map is generated at
+its largest size and box-downsampled. `validate()` checks sizes, the seam (first and last column differ ≤ 2 per
+channel), no magenta, glow textures fading to alpha 0 at the border, and prints the total size (must stay ≤ 8 MB). O
+opens a sample of every output with Read. Output under `assets/kultivator/textures/misc/kosmik/orbit/`:
+
+| File | Size | Content |
+|---|---|---|
+| `planet_day_256/512/1024.png` | 2:1 | the default albedo: deep → shallow ocean, beaches, plains, forest, taiga, savanna, desert belts at 15-30°, jungle near the equator, mountain ridges with slope darkening (no baked sun), ice caps above ±70°; land ≈ 30 % |
+| `planet_class_256/512/1024.png` | 2:1 | R = climate class × 16 (0 deep ocean, 1 shallow, 2 beach, 3 plains, 4 forest, 5 taiga, 6 savanna, 7 desert, 8 jungle, 9 rock, 10 snow / ice), G = detail luminance, B = home weight (1 at home, smooth fall-off to 0 at 35° of arc), A = 255 |
+| `planet_night_256/512.png` | 2:1 | warm city-light speckles on land (alpha = intensity), clustered near coasts and rivers |
+| `clouds_256/512/1024.png` | 2:1 | white with alpha: fbm cover ≈ 45 %, three or four cyclone swirls, thin polar bands |
+| `space_256/512/1024.png` | 2:1 | the dome: black, ≈ 1 star per 60 px as 2-3 px soft dots, the Milky Way band with dark lanes, faint violet and teal nebula tints |
+| `moon_128/256.png` | 2:1 | grey regolith, maria, craters with rims and rays |
+| `sun_core.png` 128, `sun_corona.png` 256, `limb_glow.png` 256, `star_spike.png` 128, `atmo.png` 32 | square | radial glows, streamers, soft annulus, diffraction cross, flat soft white (the shells' alpha is per vertex) |
+| `plasma.png` 64 × 128, `trail.png` 128 × 32, `beam.png` 32 × 128, `star_line.png` 64 × 8 | | the re-entry sheath (white → orange → violet), the burning trail, the star beams, the Dipper lines |
+| `rune_ring.png` 256 | square | a gold annulus of twelve of our own seal glyphs (abstract strokes, not real characters) |
+| `patch_land_256/512.png`, `patch_cloud_256/512.png` | tileable | local land detail (fields, woods, rivers) and the cloud deck |
+| `cell_top.png` 32, `cell_side.png` 32 × 64, `cell_bottom.png` 32 | | Gunung's lifted cells: grass top (white-ish, tinted by the home grass colour), soil and stone layers, roots underneath |
+
+Quality → maps: Minimal 256, Normal 512, Maximal 1024 (planet day, class, clouds, space); "Ringan" one step down.
+
+**Planet bake** (`PlanetBake`, runtime, overworld only): at film arm (or preview) O reads `planet_day_<n>` and
+`planet_class_<n>` (`NativeImage.read` from the resource manager) and recolours them with the home colours of
+`KosmikColors` (C32.2): per pixel `target = palette(class, colours) × (0.75 + 0.5 × G)` (grass classes from the sampled
+grass and foliage colours, water classes from the sampled water colour darkened by depth, snow white, desert and rock
+kept), `out = mix(day, target, 0.85 × B + (water ? 0.3 : 0))`. It runs in row slices on the client thread until 1.2 ms
+per tick are spent (`System.nanoTime`), then uploads one `DynamicTexture` registered at
+`kultivator:dynamic/kosmik_planet` (`TextureManager.register`, the previous one released). Until it is ready the static
+day map is drawn. It is re-baked only when the sampled colours changed (hash), and released on disconnect and resource
+reload. "Ringan" and Minimal skip the bake.
+
+#### 32.2.3 Props and beats (O)
+
+| Prop | Look | Anchor |
+|---|---|---|
+| Sword | `heaven_splitting_sword` item model, length 40 × fs sm; three additive rune rings (`rune_ring.png`) at 0.3 / 0.55 / 0.8 of the blade, radii 6 / 8 / 10 × fs, turning ±3°/tick alternately (a 4th ring from Tingkat 5, a 5th from 8); in the dive and re-entry a gold trail ribbon (16 points) and, below 60 sm altitude, the plasma sheath (an 8-segment additive cone of `plasma.png` over the leading third) | `sword` (centre; axes = the home frame until it turns; scale fs), `beam` (the tip in flight) |
+| Dipper cores | seven `star_core` item models, 6 × fs^0.5 sm, in the Northern Dipper shape (spacing 30 × fs^0.5 sm) 500 × fs^0.5 sm above home, each with a `star_spike` corona; six `star_line` ribbons | `dipper` (centre), `core1`..`core7` (Tianshu, Tianxuan, Tianji, Tianquan, Yuheng, Kaiyang, Yaoguang) |
+| Star beams | seven additive `beam.png` ribbons from each core to a ground point of the constellation on the home patch, a soft glow where each crosses the atmosphere shell and a ground flare | – |
+| Lifted cells | an N × N grid (Minimal 4, Normal 6, Maximal 8) of cuboids (`cell_*` textures, top tinted by the home grass colour), cell size 14 × fs^0.7 sm, rising from home with seeded delays (index hash, deterministic) and slow tumbles (≤ 1°/tick, seeded rates) | `cells` (cluster centre) |
+
+Anchor frames (C32.6): `planet` (origin, y axis, z toward home's meridian, scale 1), `home` (surface point; y radial up,
+z local north, x east; scale fs), `sword`, `beam`, `moon`, `sun` (a point 10^5 sm along the sun direction), `dipper`,
+`core1`..`core7`, `cells`.
+
+Beats (timeline fractions of the shot; every beat is a pure function of shot time, tier and seed):
+
+| Beat | Choreography |
+|---|---|
+| `pedang_hadir` | sun just behind the planet limb seen from the camera, home near the dawn terminator, moon high left; the sword hangs 320 × fs sm above home, tip up, turning 0.5°/tick about its axis; rune rings ignite at 0.15 / 0.35 / 0.55 (alpha 0 → 1 over 4 ticks); the sunrise flare grows 0.5 → 0.9 (one luminance event) |
+| `pedang_menukik` | continues `pedang_hadir`: 0-0.4 the sword pitches 180° tip-down toward home (slerp, ease in-out) while the rings contract to 0.5 × and brighten; 0.4-1 it dives along the radial line, `EXPO_IN`, 120 × fs sm, a gold trail behind |
+| `pedang_masuk` | the sword from 180 × fs to 10 sm above home in a burning streak: plasma sheath from 60 sm (alpha with depth into the atmosphere), trail 260 × fs sm; the cloud punch at 0.85 (an expanding ring on the cloud deck, deterministic growth, one luminance event); local patch on |
+| `bintang_biduk` | home on the night side (city lights), sun behind the planet; the cores light one by one at ticks 4, 8, …, 28 (alpha over 3 ticks, Tianshu → Yaoguang), each line drawing to the next over 3 ticks after it lights |
+| `bintang_sinar` | the terminator in view; from 0.1 each core fires its beam every 3 ticks; each beam brightens the shell where it crosses and flares on the ground |
+| `gunung_sel` | home in daylight, a low sun for rim light; the cells rise 0 → 260 × fs sm with delays 0-0.3, tumbling; thin dust ribbons below |
+| `pedang_tenang` (Penuh) | `pedang_hadir` at half speed, no dive; the eye drifts ≤ 0.4 × distance per second |
+| `bintang_tenang` (Penuh) | `bintang_biduk` stretched to the beat length, no beams |
+| `preview_a` / `_b` / `_c` | planet wide with sunrise and moon / the sword and rings, a slow orbit / the Dipper and its beams |
+
+Re-entry, beams and cells are all mapped meshes, so they sit correctly in front of or behind the planet without any
+special case; the item models use the uniform cluster scale (32.1.3) and stay ≥ 1.6 radii from the eye.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 32.3 The Heaven stage (module H)
+
+**Units and layout.** Stage metres, axes x east, y up, z north. The Southern Heaven Gate stands at the south end of the
+court with its opening centre at (0, 30, 0), facing south (arrivals come from −z); the court runs north over white-jade
+terraces at y = 0 to the Lingxiao Hall at z = +420. The palace islands float on a local cloud bank at y = −10. Below them
+the **Nine Heavens** hang as nine glowing rings, ring 9 at y = −60 (radius 140) down to ring 1 at y = −420 (radius 520);
+below them lies the great **sea of clouds** at y = −460, and through its gaps the dim mortal land at y = −2000.
+
+#### 32.3.1 Model list (cuboid stage models, `assets/kultivator/kosmik/surga_models.json`)
+
+All models are our own cuboids in stage metres on one atlas (`surga_atlas.png`, 256 × 256), drawn per vertex through the
+log diorama (C32.4), with baked face shades (up 1.0, north/south 0.8, east/west 0.6, down 0.5) and a stage light term.
+Hidden faces are omitted by the generator. `lod` marks the lowest quality that draws a part.
+
+| Id | Parts (cuboids, roughly) | Palette | Instances (Min / Nor / Max) |
+|---|---|---|---|
+| `gerbang` Nantianmen | base platform and 9 white-jade steps; 4 vermilion pillars (2 large inner, 2 outer), each with a gold dragon coiled in 12 rotated segments and a cloud capital; a triple-eave hip roof (3 tiers of sloped slabs at 30°, upturned eave tips, ridge with *chiwen* ends); the plaque 南天門 (our pixel strokes); parts `pintu_kiri` / `pintu_kanan` (gold-studded red doors on pivots, opened 0 → 100°) (≈ 70) | vermilion `B0201A` / shadow `7A1410`, gold `FFD54A` / deep gold `C8961E`, imperial glazed tile `E8B030`, white jade `EDEBE0` / `C9C3B4` | 1 / 1 / 1 |
+| `aula` Lingxiao Baodian | a three-tier white-jade terrace with balustrades; a 12-column hall, gold lattice walls; a double-eave hip roof in gold glaze; ridge beasts; plaque 凌霄寶殿 (≈ 80) | as above, roof `E8B030` | 1 / 1 / 1 |
+| `paviliun` | an eight-column pavilion with a round stepped roof in jade glaze `5FD6A0` (≈ 24) | vermilion, jade, gold | 0 / 2 / 4 |
+| `pagoda` | a nine-storey tower, each storey smaller, eaves on every storey (≈ 40) | vermilion, gold, jade glaze | 0 / 0 / 2 |
+| `jembatan` | an arched white-jade bridge of 7 stepped segments with posts (≈ 20) | white jade, gold caps | 0 / 2 / 3 |
+| `pulau_s`, `pulau_m`, `pulau_l` | floating islands: a jade-green terrace top `7FD9B0`, an inverted rock cone of stacked shrinking blocks `6E6488` with hanging roots and violet crystals (≈ 10 / 16 / 24) | rock, jade, crystal `B57CFF` | 2 / 3 / 6 |
+| `tiang_naga` | a free-standing colossal pillar with a coiled red-bearded gold dragon and a cloud capital (≈ 18) | vermilion, gold, red `D0302A` | 0 / 4 / 8 |
+| `pengawal_raja` | one of the Four Heavenly Kings, 14 sm: helmet with plume, shoulder plates, cape, a halberd (*ji*), dark-gold armour `3A2E1E` with a backlit gold edge (≈ 14) | dark gold, gold edge | 0 / 4 / 4 |
+| `pengawal` | a celestial soldier, 6 sm, simplified (≈ 7) | as above | 0 / 0 / 12 |
+| `menara_lonceng` | a bell tower with a great bronze bell (the javelin's target) (≈ 18) | vermilion, bronze `A07040` | 0 / 1 / 1 |
+| `lentera` | a lantern post with glowing paper faces (`glow` faces go to the additive sink) (≈ 3) | red paper `FF6A4A`, gold | 0 / 8 / 16 |
+| `tangga_awan` | cloud stairs from the gate down into the cloud bank (≈ 12) | cloud white `F4F6FF` | 1 / 1 / 1 |
+
+Mesh layers (H draws them as mapped quads):
+
+| Layer | Look | Render type | Minimal | Normal | Maximal |
+|---|---|---|---|---|---|
+| Heaven dome | `sky_heaven_<n>.png`: lilac zenith `3B2E7A` → `8A6CC8` → dawn-gold horizon `FFD9A0`, faint stars, silk aurora ribbons | `entitySolid` | 6 × 12 | 10 × 20 | 12 × 24 |
+| Local cloud bank | `cloud_sea_<n>.png` on a polar grid under the islands, UV scrolling | `entityTranslucentEmissive` | 1 layer 6 × 12 | 2 layers 8 × 16 | 3 layers 10 × 20 + 24 puff billboards |
+| Great cloud sea | the same texture at y = −460, radius 3000, edge fade; gaps show `land_below.png` (tinted by the home colours) | translucent | 1 layer | 2 layers | 3 layers |
+| Nine rings | annuli of `nine_rings.png` (9 rows, gold `FFD54A` at ring 9 → violet `B57CFF` at ring 1), alternate rotation ±0.2°/tick; a passing prop raises a ring's alpha by ≤ 0.2 over 6 ticks | additive | 9 × 12 segments | 9 × 24 | 9 × 32 + a glyph band |
+| Light shafts | golden shafts (`shaft.png`) from the gate and the hall, alpha breathing (slow cosine, never size) | additive | 4 | 8 | 16 |
+| Falling petals | peach-blossom petals (`petal.png`, 4 frames), seeded parametric paths (no random per frame) | translucent billboards | 0 | 40 | 120 |
+| Waterfalls of light | the Heavenly River pouring off island edges (`waterfall.png`, scrolling) | additive | 0 | 2 | 4 |
+| Gate glow | `gate_glow.png` behind the opening doors | additive | 1 | 1 | 2 |
+| **Total drawn (estimate)** | | | **≤ 380** (pack ≤ 230) | **≤ 1400** (pack ≤ 880: kings only, 1 cloud layer, rings 16 seg, petals 20) | **≤ 2800** (pack ≤ 1700) |
+
+Priority for `takeQuads`: dome, gate, hall, props, cloud sea, rings, islands, shafts, guards, pavilions and pagodas,
+waterfalls, petals.
+
+#### 32.3.2 Textures and models (H, `tools/gen_kosmik_surga.py`)
+
+Run `python -I tools/gen_kosmik_surga.py` (stdlib + `tools/png.py`). Writes `surga_atlas.png` (256: vermilion lacquer
+with grain, gold trim, imperial and jade glazed tiles with ridges, white jade, dragon scales, *xiangyun* cloud relief,
+gold door studs, the two plaques drawn as our own strokes, lantern paper, island rock, jade terrace, crystal, guard
+armour), `sky_heaven_128/256/512.png`, `cloud_sea_256/512.png` (tileable), `cloud_puff.png` 128, `shaft.png` 64 × 256,
+`petal.png` 128 × 32, `waterfall.png` 64 × 256, `nine_rings.png` 512 × 72, `gate_glow.png` 128, `land_below_256.png`
+(tileable) under `assets/kultivator/textures/misc/kosmik/surga/`, and `assets/kultivator/kosmik/surga_models.json`
+(format C32.4). `validate()`: every cuboid inside its model's box, every UV inside the atlas, no zero-size face, the
+per-model cuboid counts of the table, the per-quality totals, seamless tiles, alpha borders. Read a sample of every
+output.
+
+#### 32.3.3 Anchors and beats (H)
+
+Anchors (C32.6): `gerbang` (the opening centre; stage axes; scale 1), `pintu` (between the doors), `aula` (the hall's
+front), `tiang` (the heavenly pillar's centre; stage axes; scale fs), `javelin`, `segel` (the jade seal; scale fs),
+`cincin1`..`cincin9` (ring centres), `laut` (the cloud-sea surface under the gate), `lembah` (the land below).
+
+| Beat | Choreography |
+|---|---|
+| `tiang_gerbang` | 0.05-0.35 the thrown javelin (`dinghai_pillar`, 6 × fs sm, ember trail) rises out of the cloud bank past the camera and strikes the bell tower (a soft gold glow at 0.35: one luminance event); 0.40-0.85 the doors swing open to 100° (ease out), the gate glow and the shafts rise through the opening, petals begin; the Four Heavenly Kings flank the stair |
+| `tiang_lepas` | continues: at 0.1 the javelin's glow merges into the heavenly pillar (`dinghai_pillar`, 60 × fs sm) gliding out of the hall's light along the court axis (3 sm/tick); 0.55-0.75 at the terrace edge beyond the gate it turns vertical, its hoops ignite gold → ember; at 0.75 it is released |
+| `tiang_jatuh` | the pillar falls from y −20 to the cloud sea (−460) with `EXPO_IN`, ember trail; each ring brightens softly as the tip passes its plane (tick ≈ 2, 5, 8, …); the cloud sea rushes up; F's cloud wipe closes over the last 5 ticks |
+| `gunung_segel` | the jade seal (`yishan_seal`, 10 × fs sm) rises from the cloud sea to y −40 through the rings (each brightening), turning 90° slowly; the doors open to 40°; at 0.8 a gold beam descends from the gate onto it |
+| `tiang_tenang` (Penuh) | the eye drifts toward the gate (140 → 120 sm); doors open 0.2-0.7; the pillar glides out and is released at 0.9 |
+| `gunung_tenang` (Penuh) | the seal rises through the rings into the gate light; doors to 40° |
+| `preview_a` / `_b` / `_c` | from the cloud sea up to the gate / across the court to the hall / looking down through the nine rings |
+
+#### 32.3.4 Lore and Sumber lines (H, `lang-src/kosmik_surga.*`, key `kultivator.kosmik.surga.<id>.source`)
+
+| Id | Sumber (id_id; en_us says the same in English) |
+|---|---|
+| `gerbang` | "Sumber: Gerbang Langit Selatan (Nantianmen), dijaga Raja Langit Zengzhang dan para jenderal langit; pilar-pilarnya dililit naga berjanggut merah bersisik emas (Perjalanan ke Barat, Wu Cheng'en, bab 4). Bentuk 3D-nya rancangan permainan." |
+| `aula` | "Sumber: Istana Lingxiao (Lingxiao Baodian), balairung Kaisar Giok; bab 4 Perjalanan ke Barat menyebut tiga puluh tiga istana langit dan tujuh puluh dua balairung. Tata letaknya rancangan permainan." |
+| `cincin` | "Sumber: 'Langit punya sembilan wilayah' (天有九野): Juntian di tengah, lalu Cangtian, Biantian, Xuantian, Youtian, Haotian, Zhutian, Yantian, Yangtian (Lüshi Chunqiu, 'Youshi'; juga Huainanzi bab 3, 'Tianwen'). Langit sembilan lapis (九重) ditanyakan dalam Chu Ci, 'Tian Wen'. Cincin bertumpuk adalah rancangan permainan." |
+| `laut_awan` | "Sumber: lautan awan yang memisahkan dunia fana dan alam langit adalah motif umum kisah xianxia; rancangan permainan." |
+| `pengawal` | "Sumber: Empat Raja Langit (Si Da Tianwang); dalam Fengshen Yanyi empat bersaudara Mo diangkat menjadi Empat Raja Langit pada penganugerahan para dewa di akhir kisah, dan di Perjalanan ke Barat mereka menjaga gerbang langit." |
+| `tiang_naga` | "Sumber: pilar-pilar yang dililit naga dan jembatan berhias burung phoenix di gerbang langit (Perjalanan ke Barat, bab 4)." |
+| `jembatan` | "Sumber: Kolam Giok (Yaochi), tempat Pesta Persik Ibu Suri Barat (Perjalanan ke Barat, bab 5); jembatan gioknya rancangan permainan." |
+| `air_terjun` | "Sumber: Sungai Langit (Tianhe), yang armadanya dipimpin Marsekal Tianpeng sebelum ia dibuang dan menjadi Zhu Bajie (Perjalanan ke Barat, bab 19)." |
+| `kelopak` | "Sumber: hujan bunga surgawi (天花): dewi yang menaburkan bunga dalam Sutra Vimalakirti, dan hujan bunga mandarava dalam Sutra Teratai." |
+| `tiang` | "Sumber: dalam Perjalanan ke Barat (bab 3) Tiang Penenang Samudra tersimpan di gudang Raja Naga Laut Timur; dilepas dari gerbang langit adalah rancangan permainan Titah." |
+
+Also `kultivator.kosmik.surga.name`, `.<id>.name` for each row and `kultivator.kosmik.surga.cincin.1`..`9` (the nine
+field names, ring 9 = Juntian). They are printed by `/sinematik kosmik3d surga` and `info`; no new HUD caption.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 32.4 Film DSL additions (F)
+
+| Addition | Meaning |
+|---|---|
+| `FilmSpace.V` | a point in the stage of the shot, in the frame of a stage anchor (`prop` = anchor name): origin, x right, y up, z forward, all × the anchor's scale |
+| `FilmShot.stage(StageId, String beat)` | this shot is drawn in that stage and plays that beat; the real camera stands at the pocket |
+| `keyV(t, anchor, x, y, z)`, `lookV(anchor, x, y, z)`, `lookEndV(anchor, x, y, z)`, `povV(anchor, back, up)`, `flareV(anchor, x, y, z)` | keys, look, POV and flare light point in V |
+| `orElse(FilmShot fallback)` | the shot played when the stage refuses (setting Mati, no pocket, fog, budget −1, stage not ready); forced to the same length |
+
+`FilmPath.evaluate` for a stage shot: the keys and looks resolve through `Kosmik3D.point(anchor, x, y, z, t, out)` at the
+shot time t; `out[0..2]` = C; yaw and pitch from the virtual look direction; FOV, roll, whip, dolly and shake as today
+(the shake rotates only); the virtual eye is published in the binding. `FilmPath.validate` applies the flow cap of
+32.1.7 instead of the b/s caps. `FilmDirector.lightPoint` converts a V light point with the frame's mapping (C + drawn
+offset) and passes null when `KosmikStage.occluded` says a body hides it.
+
+Catalogue validator (F, at first build): a stage shot is preceded by a mask cut or by a stage shot of the same stage;
+no `bullet()` on a stage shot; `orElse` exists; beat ids exist in the stage's `beats()` (checked when the stage is
+created; a missing beat logs once and plays the fallback).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 32.5 The films (F, `FilmCatalogTitah`)
+
+Notation as 30.3 (C = arming tick, K = climax). **ORB** = Orbit stage, **SRG** = Heaven stage, **W** = world. Lens and
+sound words as 30.2.7 / 30.2.12; every shot also has LB + VG; stage shots in space add `quiet(0.6)` (world categories
+ducked, `hum_energy` low), never more than 3 film cues per beat. The fallback of each stage shot is the shot it replaced
+(listed), so a refused stage gives exactly today's film.
+
+#### 32.5.1 The climax contract (unchanged, restated)
+
+- Each film is one pre-climax CAST act whose length is exactly K at Kecepatan 1, ending with a world shot that
+  `holdForClimax()` (≤ 20 ticks), and one CLIMAX act starting on the server's climax event under the IMPACT mask.
+- **Re-timing** (`retimeTitah`): a longer build-up starts the act later (the player's own camera before it); a shorter
+  one shortens **stage shots first** (down to 10 ticks each, their beats compress because they are authored in shot
+  fractions), then cosmic shots, then all shots proportionally (≥ 10 ticks).
+- An **early climax** ends the running act at once, even in the middle of a stage shot: the climax act's IMPACT cut moves
+  the camera from C to the impact and the binding drops in the same frame. A late climax holds the last world shot up to
+  20 ticks; a climax that never comes drops the climax acts after 60 ticks (30.2.6).
+- Titah limits of 29.16 stay: every shot ≤ 4 s, the whole film ≤ 12 s; hard cuts ≥ 10 ticks apart; total camera time
+  ≤ 400 ticks. The KIND_ULTIMATE gap does not apply to Titah (as today).
+
+#### 32.5.2 Titah Pedang Pemisah Langit (`titah_pedang`, K = 100)
+
+| # | when | len | where | shot | lens | sound |
+|---|---|---|---|---|---|---|
+| 1 | C+0 | 12 | W | `worm(0.3)` at the caster's boots `S(0.8,0.3,1.2)` → `S(1.3,0.3,1.9)`, look `A(0,30,0)`, FOV 1.0 → 1.2 | FL `A(0,40,0)` | riser_short |
+| 2 | C+12 | 14 | W | the climb `S(2,2,−1)` → `A(3,40,−4)`, `EXPO_IN`, look `A(0,50,0)`; the cloud wipe closes over its last 5 ticks | SL, CW | riser_long, whoosh @0.5 |
+| 3 | C+26 | 28 | ORB `pedang_hadir` | CW cut into space: `keyV(0, sword, 60, 40, −110)` → `keyV(1, sword, 45, 30, −85)` (slow push), `lookV(sword, 0, 0, 0)` → `lookEndV(sword, 0, 12, 0)`; roll 0 → 4°; FOV 1.0 → 0.92; TC (decree card); the sword over the planet, the rings ignite, the sun rises over the limb | AN, FL `flareV(sun)`, LL gold | hum (quiet 0.6), bell @0.35, riser_short @0.7 |
+| 4 | C+54 | 16 | ORB `pedang_menukik` | continuous: `keyV(0, home, 45, 350, −85)` → `keyV(1, home, 45, 352, −88)`, `lookV(sword, 0, 0, 0)`, `whipPitch(0.45, 35°, 5)` following the dive | SM, SL | whoosh @0.45 |
+| 5 | C+70 | 14 | ORB `pedang_masuk` | BD cut: high side view from orbit `keyV(0, home, −700, 900, −400)` → `keyV(1, home, −640, 860, −380)`, `lookV(beam, 0, 0, 0)`: the burning streak crosses the atmosphere and punches the cloud deck | FR, SL | riser_short @0, zap @0.85 |
+| 6 | C+84 | 16 | W | CW cut (through the clouds): the POV ride on the sword point-first down the pillar (`pov(sword, 3, 0.6)`, keys `A(0.6,36,−2)` → `A(0.6,7,−2)`, `EXPO_IN`, FOV 1.3), the gold ring tearing the clouds above (`SkyMarks`: the sky splits); `holdForClimax` | SM, SL, FR | whoosh |
+| 7-10 | K… | 20, 12, 12, 40 | W | the climax act of 30.3.1 unchanged (impact orbit, the two cleave whips, the aerial pullback) | | |
+
+Fallbacks: 3 → today's shot 3 (`cosmic(ISTANA_LANGIT)`, 28 ticks); 4 → its continuation (`cosmic(ISTANA_LANGIT)`,
+`lookSky(0, 72, 0, 80)`, 16 ticks); 5 → a 14-tick world wide of the falling sword, `A(−18,6,−16)` looking `A(0,20,0)`.
+
+#### 32.5.3 Titah Tiang Penenang Samudra (`titah_tiang`, K = 120)
+
+| # | when | len | where | shot | lens | sound |
+|---|---|---|---|---|---|---|
+| 1 | C+0 | 30 | SRG `tiang_gerbang` | the film **opens in Heaven** (BD cut from the eye): `keyV(0, gerbang, 0, −52, −150)` → `keyV(1, gerbang, 0, −38, −105)` (rising out of the cloud bank), `lookV(gerbang, 0, 0, 0)` → `lookEndV(gerbang, 0, 10, 0)`; the thrown javelin arrives from below (the JAVELIN_THROW beat @10 is seen as its arrival), the gate opens; TC | AN gold-red, FL `flareV(gerbang, 0, 0, 10)`, LL gold | whoosh @0.08, gong @0.42, riser_short @0.55 |
+| 2 | C+30 | 24 | SRG `tiang_lepas` | continuous: `keyV(0, gerbang, 0, −38, −105)` → `keyV(1, gerbang, 40, 0, −30)`, `lookV(tiang, 0, 0, 0)`; roll 0 → 5°: the heavenly pillar glides out through the gate and is released | FL `flareV(tiang, 0, 20, 0)` | bell @0.2, riser_long @0.5 |
+| 3 | C+54 | 26 | SRG `tiang_jatuh` | BD cut: riding beside the falling pillar `keyV(0, tiang, 26, 20, 0)` → `keyV(1, tiang, 22, 30, 0)`, `lookV(tiang, 0, −25, 0)`: the nine rings rush up, the cloud sea below; CW closes over the last 5 ticks | SL, SM | whoosh @0.1, @0.5, @0.9 |
+| 4 | C+80 | 16 | W | CW cut: from below the real clouds, `A(6,26,−6)` → `A(9,28,−14)`, look `A(0,40,0)`, `dolly(AIM)`, FOV 1.3 → 0.75 (vertigo) as the white-hot pillar emerges | AN | gong @0.3 |
+| 5 | C+96 | 24 | W | BD cut: the wide static at horizon level `A(−26,3,−14)`, look `A(0,8,0)`: the streak crosses from the top of the frame; `holdForClimax` | HZ, FR | zap @0.2 |
+| 6-8 | K… | 10, 30, 40 | W | the climax act of 30.3.2 unchanged | | |
+
+Fallbacks: 1 → today's shot 1 (the throw dolly) stretched to 30 ticks; 2 → today's shot 2 (the ride beside the rising
+pillar) trimmed to 24 ticks; 3 → today's shot 3 trimmed to 26 ticks (`cosmic(LAUT_TIMUR)`).
+
+#### 32.5.4 Titah Tujuh Bintang Biduk Utara (`titah_bintang`, K = 140)
+
+| # | when | len | where | shot | lens | sound |
+|---|---|---|---|---|---|---|
+| 1 | C+0 | 20 | W | the telescope: from the pointing finger the look tilts up to the stars, FOV 1.0 → 0.7 | FL star | twinkle @0.3 |
+| 2 | C+20 | 34 | ORB `bintang_biduk` | BD cut: `keyV(0, dipper, −20, −10, −160)` → `keyV(1, dipper, −8, −4, −120)`, `lookV(dipper, 0, 0, 0)` → `lookEndV(core7, 0, 0, 0)`, roll 0 → 6°; the night side below with its lights, the seven cores light one by one and the lines draw; TC | AN violet, FL `flareV(core1)` | twinkle @0.15, @0.5, @0.85 |
+| 3 | C+54 | 26 | ORB `bintang_sinar` | BD cut: side view from orbit `keyV(0, home, 900, 700, 300)` → `keyV(1, home, 860, 660, 280)`, `lookV(home, 0, 40, 0)`: seven beams pierce the atmosphere one after another | FR, LL violet | zap @0.1, zap @0.5 (pitch 1.2), twinkle @0.9 |
+| 4 | C+80 | 4 × 10 | W | the falling-star montage of today (worm, top-down 36 b, side 12 b, OTS), BD cuts | | crunch, glass |
+| 5 | C+120 | 20 | W | Yaoguang: `bullet(0.05, 24)` + `orbit(P(crystal7), 5, 5, 1, 1.6, 0, 90)`; `holdForClimax` | FL | twinkle @0.2 |
+| 6-7 | K… | 40, 30 | W | the climax act of 30.3.3 unchanged | | |
+
+Fallbacks: 2 → today's shot 2 (`cosmic(BIDUK_UTARA)`, 34 ticks); 3 → a 26-tick `lookSky` drift under the Dipper
+(`S(0,3,−4)` → `S(1,3.5,−2)`, `cosmic(BIDUK_UTARA)`).
+
+#### 32.5.5 Titah Pemindah Gunung (`titah_gunung`, K = 90)
+
+| # | when | len | where | shot | lens | sound |
+|---|---|---|---|---|---|---|
+| 1 | C+0 | 20 | W | hero worm on the jade seal leaving the hand (unchanged) | FL jade | riser_short |
+| 2 | C+20 | 26 | W | top-down as the light grid draws (unchanged) | – | twinkle ×3 |
+| 3 | C+46 | 24 | SRG `gunung_segel` | BD cut: below the rising seal `keyV(0, laut, 40, 60, −80)` → `keyV(1, laut, 40, 90, −80)`, `lookV(segel, 0, 0, 0)`: the seal climbs through the nine rings to the opening gate and the gold beam blesses it; TC | AN gold | gong @0.3 (with the quiet hum) |
+| 4 | C+70 | 20 | W | BD cut: worm inside the square under the descending seal, FOV 1.0 → 1.3; `holdForClimax` | VG dark | riser_long |
+| 5 | K | 16 | W | IF cut: the spiral crane among the torn cells, `orbit(A, 10 → 14, 2 → 24, 0, 80°)`, `bullet(0.3, 16)` | IF, SM | silence 6 → sub_boom, rock @0.5 |
+| 6 | K+16 | 18 | ORB `gunung_sel` | CW cut: high over home `keyV(0, home, −260, 420, −380)` → `keyV(1, home, −230, 400, −340)`, `lookV(cells, 0, 0, 0)`: the torn land floats up against the planet and its rim light | LL violet | rock @0.2 (pitch 0.8), hum |
+| 7 | K+34 | 12 | W | BD cut: over the shoulder as the levitated foes slam down (EXTRA4 @125 ≈ K+35) | IF Lembut | punch @0.3 |
+| 8 | K+46 | 24 | W | looking down into the stepped pit as the slabs drift away (unchanged) | LL violet | hum |
+
+Fallbacks: 3 → today's shot 3 (`cosmic(KUA_E)`, 24 ticks); 6 → an 18-tick continuation of the spiral crane
+(`orbit(A, 14 → 16, 24 → 34, 80, 40°)`, no bullet time).
+The climax act is 70 ticks (≤ 160); the film 160 ticks (≤ 240).
+
+#### 32.5.6 Kamera Penuh: the shorter version (F edits `PusakaFilm`)
+
+When the Spektakuler film is refused (or the camera is Penuh), Film Pusaka plays as today, but its **F3 "Istana"**
+(0.30 of the film, ≤ 72 ticks, already behind the first cloud wipe) becomes one calm stage beat when
+`Kosmik3D.penuh(skill, ctx, f3)` returns a plan: Pedang `pedang_tenang` (ORB), Tiang `tiang_tenang` (SRG), Bintang
+`bintang_tenang` (ORB), Gunung `gunung_tenang` (SRG). The plan gives the pocket C (≤ 24 b above the caster, `R_d` 8 b)
+and the look directions; F3 is one `Shots.pusakaFilm(C, C, look0, look1, f3)` segment carrying the stage binding (the
+virtual eye follows the shot's eased progress). Penuh caps hold: no translation, ≤ 16°/s, roll ≤ 5°, flow ≤ 0.4 ×
+distance per second. The Vistas of F3 are not spawned; the jade title card shows as today. The second cloud wipe ends it;
+a skip in F3 dips and cuts to the eye (32.1.5). A refused plan leaves F3 exactly as today. Kamera Singkat and Mati never
+show a stage.
+
+#### 32.5.7 Tingkat Titah (29.16) in the stages
+
+`fs = s(t)^0.35` (1.0 at tier 1, 1.18 at 2, 1.39 at 3, 1.64 at 4, 1.93 at 5, 2.28 at 6, 2.68 at 7, 3.16 at 8, 3.73 at
+9). The decree props scale by `fs` (sword, pillar, seal, javelin), the Dipper by `fs^0.5`, the cells by `fs^0.7`; the
+anchors `sword`, `beam`, `home`, `tiang`, `segel`, `javelin`, `dipper`, `cells` carry that scale, so every `keyV` in
+their frames frames the bigger weapon without new numbers. Rune rings: +1 from tier 5, +1 from tier 8. The planet,
+the moon and the palace never scale: a tier-9 sword is a quarter of the planet's radius, a tier-9 pillar towers over
+the gate. Timing does not change with the tier (29.16.1).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 32.6 Settings (F)
+
+- New row **"Film kosmik 3D: %s"** right after "Langit kosmik" in the Momen Epik group (`EpicSettings`, key
+  `epic_kosmik3d`, values `penuh` (default) / `ringan` / `mati`; shown only when its lang key exists, like the other film
+  rows). Tooltip (id): "Saat film Titah, kamera masuk ke panggung 3D: planet dunia ini dilihat dari angkasa, bulan,
+  matahari, dan Istana Langit. Ringan: lapisan lebih sedikit dan tekstur lebih kecil. Mati: kembali ke Langit Kosmik
+  biasa. Hanya kamu yang melihatnya."
+- **Penuh**: the layers of the current quality tier. **Ringan**: one tier lower (Minimal stays Minimal), every map one
+  size smaller, no planet bake, petals and guards halved. **Mati**: every stage shot plays its fallback.
+- Independent of "Langit kosmik" (which only affects the fallbacks and the other films). Kamera Singkat / Mati, "Kurangi
+  gerak", "Perjalanan langit: Mati" and the per-decree Film choice keep their meaning (30.2.1, 29.4).
+- The stage tier = `EpicBudget.tier()` lowered by Ringan, read at each stage shot start; −1 → fallback.
+
+### 32.7 Test commands (client, `/sinematik`, F)
+
+| Command | Does |
+|---|---|
+| `/sinematik kosmik3d orbit [detik] [tingkat]` | previews the Orbit stage around the player: `preview_a`, `_b`, `_c` as ≤ 6-s stage shots joined by black dips (default 8 s, 2-30), under every gate; Kamera Spektakuler plays FILM shots, Kamera Penuh plays one calm 4-s beat, Singkat / Mati refuse ("camera") |
+| `/sinematik kosmik3d surga [detik] [tingkat]` | the same for the Heaven stage; also prints the stage name and its Sumber lines |
+| `/sinematik kosmik3d beat <orbit\|surga> <beat> [detik] [tingkat]` | plays one beat alone (beat ids suggested) |
+| `/sinematik kosmik3d info` | setting, stage tier, pack, last pocket (C height, `R_d`, refusal reason), bake progress, quads and CPU ms of the last stage frame, the beats of each stage |
+| `/sinematik film titah_pedang\|titah_tiang\|titah_bintang\|titah_gunung [act n]` | (exists) the whole film with the fake climax at K |
+| `/sinematik pusaka film <skill> [detik] [tingkat]` | (exists) the Penuh version with its F3 stage beat |
+
+### 32.8 Verified 26.3 API (mcsrc, new uses)
+
+`RenderTypes.entitySolid(Identifier)`, `entityCutout(Identifier)`, `entityTranslucentEmissive(Identifier)`,
+`energySwirl(Identifier, float, float)` (pipeline `ENERGY_SWIRL`: `BlendFunction.ADDITIVE`, depth `DEFAULT`, no cull,
+`NO_CARDINAL_LIGHTING`); `SubmitNodeCollection.submitCustomGeometry` (blending → translucent phase, else solid);
+`LevelRenderer.executeClassicTransparency` / `executeOit` order; `Camera.PROJECTION_Z_NEAR` (0.05);
+`DepthStencilState.DEFAULT` (`GREATER_THAN_OR_EQUAL`, write); `Minecraft.getItemModelResolver()`,
+`ItemModelResolver.updateForTopItem(ItemStackRenderState, ItemStack, ItemDisplayContext, Level, ItemOwner, int)`,
+`ItemStackRenderState.submit(PoseStack, SubmitNodeCollector, int, int, int)`; `DynamicTexture(Supplier<String>,
+NativeImage)`, `DynamicTexture.upload()`, `TextureManager.register(Identifier, AbstractTexture)` / `release(Identifier)`,
+`NativeImage(int, int, boolean)`, `NativeImage.read(InputStream)`, `getPixel` / `setPixel` (ARGB);
+`BiomeColors.getAverageGrassColor` / `getAverageFoliageColor` / `getAverageWaterColor(BlockAndTintGetter, BlockPos)`,
+`Biome.coldEnoughToSnow(BlockPos, int)`, `Biome.hasPrecipitation()`, `LevelReader.getBiome(BlockPos)`;
+`Level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z)`, `LevelReader.hasChunkAt(BlockPos)`,
+`LevelHeightAccessor.getMaxY()`; `LivingEntity.hasEffect(Holder<MobEffect>)`, `MobEffects.BLINDNESS`, `DARKNESS`;
+`EntityRenderer.extractNameTags(T, S, float, double, double)` (protected final; mixin TAIL),
+`EntityRenderState.nameTag` / `scoreText` (public). Fabric: `LevelRenderEvents.COLLECT_SUBMITS` (in use),
+`ClientPlayConnectionEvents.DISCONNECT` (in use by `TitahWorld`).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 32.9 Modules (exactly three, disjoint files) and contracts
+
+**Order of work.** F first commits the core API of C32.1-C32.5 as compiling skeletons (the records, the interface,
+`StageFrame` and `KosmikMesh` signatures, `Kosmik3D` calling `OrbitStage.create()` and `SurgaStage.create()`); O and H
+commit their `create()` skeletons next (a stub stage whose `ready()` is false, so every stage shot plays its fallback),
+then all three work in parallel. A single compile step runs after all three (rule 0.6). Nobody edits another module's
+file. Every generated texture is opened with Read once; every new Minecraft or Fabric API use is checked in
+`butterbot-fabric/reference/mcsrc` and listed in the module's report.
+
+#### O: the Orbit stage
+
+Owns: `src/client/java/dev/kultivator/client/epic/kosmik/orbit/**` (`OrbitStage` with `public static KosmikStage
+create()`, the planet, `PlanetBake`, moon, sun, dome, atmosphere, clouds, local patch, props, beats and anchors of 32.2),
+`tools/gen_kosmik_orbit.py` (new), `assets/kultivator/textures/misc/kosmik/orbit/**`, and
+`lang-src/kosmik_orbit.{en_us,id_id}.json` (`kultivator.kosmik.orbit.name`, `.source` = "Sumber: rancangan permainan
+(dunia ini dilihat dari angkasa); nama ketujuh bintang Biduk Utara mengikuti Sumber Titah Bintang yang sudah ada.",
+`kultivator.kosmik.orbit.beat.<beat>`).
+
+#### H: the Heaven stage
+
+Owns: `src/client/java/dev/kultivator/client/epic/kosmik/surga/**` (`SurgaStage` with `public static KosmikStage
+create()`, models, cloud sea, nine rings, shafts, petals, waterfalls, guards, beats and anchors of 32.3),
+`tools/gen_kosmik_surga.py` (new), `assets/kultivator/textures/misc/kosmik/surga/**`,
+`assets/kultivator/kosmik/surga_models.json`, and `lang-src/kosmik_surga.{en_us,id_id}.json` (32.3.4).
+
+#### F: films and wiring
+
+Owns: the core `src/client/java/dev/kultivator/client/epic/kosmik/*.java` (root package only: `Kosmik3D`, `KosmikStage`,
+`StageContext`, `KosmikColors`, `StageAnchor`, `StageFrame`, `StagePocket`, `KosmikMesh`, `KosmikTypes`); the edits in
+`epic/film/FilmShot.java`, `FilmSpace.java`, `FilmPath.java`, `FilmStage.java`, `FilmDirector.java`,
+`FilmCatalogTitah.java`, `FilmCatalog.java` (validator only), `FilmCommands.java`; `epic/camera/CinematicDirector.java`
+(`stageBinding()`, skip on a stage shot) and `epic/camera/Shots.java` (`Shot.stage(...)`); `epic/render/EpicRenderer.java`
+(the hook of 32.1.4); `epic/EpicSettings.java` (row and getter) and `epic/EpicClient.java` (`Kosmik3D.init()`);
+`pusakalangit/cinema/PusakaFilm.java` (F3, 32.5.6); the new mixin `client/mixin/KosmikNameTagMixin.java` plus its line in
+`src/client/resources/kultivator.client.mixins.json`; `tools/gen_kosmik_core.py` (new: `textures/misc/kosmik/black.png`,
+`white.png`); `lang-src/kosmik.{en_us,id_id}.json` (`kultivator.film.setting.kosmik3d` = "Film kosmik 3D: %s",
+`.kosmik3d.penuh|ringan|mati`, `.kosmik3d.tip`, `kultivator.film.cmd.kosmik3d.started|refused|info|beat_unknown|camera`).
+
+#### C32.1 Stage interface (F defines, O and H implement; `dev.kultivator.client.epic.kosmik`)
+
+```java
+public interface KosmikStage {
+    Kosmik3D.StageId id();                                  // ORBIT or SURGA
+    void prepare(StageContext ctx);                         // at film arm / preview: build meshes (once), start any bake; ≤ 4 ms; never throws
+    boolean ready();                                        // meshes built (a bake may still run: the static map is used meanwhile)
+    List<String> beats();                                   // the beat ids of 32.2.3 / 32.3.3
+    void beat(String beat, StageContext ctx, int ticks, boolean continued); // a shot of this beat starts (continued: from this stage's previous shot)
+    boolean anchor(String name, double t, StageAnchor out); // the anchor at shot time t (ticks, fractional); false = unknown
+    boolean occluded(double px, double py, double pz, double ex, double ey, double ez); // a body hides P from the eye (flare)
+    void render(StageFrame frame);                          // every frame while bound
+    void end();                                             // the binding ended (cut, skip, abort, death, disconnect)
+    void release();                                         // disconnect / resource reload: free dynamic textures and caches
+    List<String> info();                                    // lines for /sinematik kosmik3d info
+}
+public final class Kosmik3D {
+    public enum StageId { ORBIT, SURGA }
+    public static void init();                               // creates nothing; registers the disconnect release
+    public static boolean wants();                           // one boolean while idle (EpicRenderer)
+    public static boolean covering();                        // a stage is drawn this frame (name-tag mixin, EpicRenderer)
+    public static void prepare(StageId id, StageContext ctx);// from FilmDirector.arm / PusakaFilm / the preview
+    public static @Nullable Binding enter(StageId id, String beat, StageContext ctx, int ticks, boolean penuh); // pocket + gates; null = fallback
+    public static boolean point(Binding b, String anchor, double x, double y, double z, double t, double[] out);
+    public static @Nullable PenuhPlan penuh(int skill, StageContext ctx, int ticks);
+    public static void render(EpicRenderer.Frame frame);
+    public static void clear();                              // from FilmDirector.clear
+    public static List<String> info();
+    public record PenuhPlan(Binding binding, Vec3 c, Vec3 look0, Vec3 look1) {}
+    public static final class Binding { /* stage, beat, C, R_d, eye[3] (written by FilmPath / CinematicDirector), shot time, scale map */ }
+}
+```
+
+#### C32.2 Context and colours (F)
+
+`public record StageContext(int skill /* 0-3, −1 preview */, int tier /* 1-9 */, float s, float fs, int rgb, long seed,
+int quality /* 0-2 after Ringan and the guard */, boolean ringan, boolean pack, boolean calm /* Kamera Penuh */,
+KosmikColors colors)`.
+`public record KosmikColors(int grass, int foliage, int water, boolean snowy, boolean dry, boolean overworld)`: sampled
+once at arm by `KosmikColors.sample(ClientLevel, BlockPos)` (the average of 9 `BiomeColors` samples, the caster's and 8
+on a 48-b ring; `snowy` = `coldEnoughToSnow` at the caster, `dry` = `!hasPrecipitation()`).
+`public final class StageAnchor { public double x, y, z, fx, fy, fz, ux, uy, uz, scale; public void place(double lx,
+double ly, double lz, double[] out); }` (right = forward × up; mutable and reused, no per-frame allocation).
+
+#### C32.3 Frame (F)
+
+```java
+public final class StageFrame {
+    public double ex, ey, ez;                 // the virtual eye (sm)
+    public final Vector3f right, up, forward; // camera axes (stage axes = world axes)
+    public double time;                       // shot time (ticks, fractional; held by hit-stop)
+    public float shotT;                       // 0..1 of the shot
+    public int quality; public boolean pack; public float domeRadius; public float fovDeg;
+    public void map(double x, double y, double z, float[] out);                        // stage point → drawn camera-relative (32.1.3)
+    public float cluster(double cx, double cy, double cz, float[] centreOut);           // uniform k of a compact cluster
+    public EpicRenderer.Sink solid(Identifier tex);   // entitySolid, created once per texture
+    public EpicRenderer.Sink cutout(Identifier tex);  // entityCutout
+    public EpicRenderer.Sink glow(Identifier tex);    // entityTranslucentEmissive
+    public EpicRenderer.Sink add(Identifier tex);     // energySwirl(tex, 0, 0), submitted with order(1)
+    public void vertex(EpicRenderer.Sink s, double x, double y, double z, float u, float v, int argb); // mapped, normal +Y
+    public void billboard(EpicRenderer.Sink s, double x, double y, double z, double half, float rollRad, int argb);
+    public void skyBillboard(EpicRenderer.Sink s, float dx, float dy, float dz, float angularHalf, float rollRad, int argb); // at 0.94 R_d
+    public void ribbon(EpicRenderer.Sink s, double[] xyz, int n, double w0, double w1, int c0, int c1, float uOffset);
+    public void dome(Identifier tex, float uTurn);                                    // the backdrop, first, CPU view-culled
+    public int sphere(EpicRenderer.Sink s, KosmikMesh.Sphere m, double cx, double cy, double cz, double r,
+                      float spinRad, boolean inside, KosmikMesh.Shade shade);         // CPU back-face cull; returns quads written
+    public int model(KosmikMesh.Model m, String part, double x, double y, double z, Quaternionf rot, double scale,
+                     int tint, float light);                                          // cuboid stage model (C32.4)
+    public void item(String modelId, double x, double y, double z, Quaternionf rot, double scale); // ModelFx item model, uniform k
+    public boolean take(int quads);                                                   // EpicBudget.takeQuads
+    public boolean large();                                                           // EpicBudget.takeLarge
+}
+```
+
+#### C32.4 Meshes (F, `KosmikMesh`)
+
+- `Sphere sphere(int rings, int segments)`: cached per size; unit positions (= normals) and equirect UVs.
+- `interface Shade { int argb(double nx, double ny, double nz, float u, float v); }` implemented by stage objects (no
+  per-frame lambdas).
+- `Model load(Identifier json)`: cached per resource reload; a parse error logs once and returns an empty model. JSON:
+  `{"atlas": "<texture id>", "atlasSize": 256, "models": {"<id>": {"parts": {"<part>": {"pivot": [x,y,z], "cuboids":
+  [{"from": [x,y,z], "to": [x,y,z], "rot": {"axis": "x|y|z", "angle": deg, "origin": [x,y,z]}, "faces": {"north|south|
+  east|west|up|down": [u0,v0,u1,v1]}, "lod": 0|1|2, "glow": false, "tint": "RRGGBB"}]}}}}}`, coordinates in stage metres,
+  angles any value (single axis), UVs in atlas pixels, omitted faces not drawn; `glow` faces go to the additive sink.
+  `StageFrame.model` rotates a part about its pivot (doors) and counts its quads.
+
+#### C32.5 Film and camera hooks (F only; listed so O and H know the names)
+
+`FilmSpace.V`; `FilmShot.stage / keyV / lookV / lookEndV / povV / flareV / orElse` (32.4); `CinematicDirector
+.stageBinding()` (non-null only while a stage shot runs and is not exiting); `Shots.Shot.stage(Kosmik3D.Binding)`;
+`FilmDirector`: prepare at arm (`Kosmik3D.prepare` for the stages a film uses), `enter` at each stage shot start (else
+`orElse`), the dip + abort exit (32.1.5), stage shots first in `retimeTitah`.
+
+#### C32.6 Beat and anchor names (O and H implement exactly these)
+
+- Orbit beats: `pedang_hadir`, `pedang_menukik`, `pedang_masuk`, `bintang_biduk`, `bintang_sinar`, `gunung_sel`,
+  `pedang_tenang`, `bintang_tenang`, `preview_a`, `preview_b`, `preview_c`. Anchors: `planet`, `home`, `sword`, `beam`,
+  `moon`, `sun`, `dipper`, `core1`..`core7`, `cells`.
+- Heaven beats: `tiang_gerbang`, `tiang_lepas`, `tiang_jatuh`, `gunung_segel`, `tiang_tenang`, `gunung_tenang`,
+  `preview_a`, `preview_b`, `preview_c`. Anchors: `gerbang`, `pintu`, `aula`, `tiang`, `javelin`, `segel`,
+  `cincin1`..`cincin9`, `laut`, `lembah`.
+- An unknown anchor resolves to the stage origin (logged once); an unknown beat plays the fallback.
+
+#### C32.7 Budgets (all modules)
+
+The stage's quads count in `EpicBudget` (the tables of 32.2.1 and 32.3.1 are the caps per quality, pack × 0.6), its CPU
+time in `EpicBudget.addCpu` (the frame guard lowers the stage tier at the next shot start), item models ≤ 2 / 8 / 16,
+the planet bake ≤ 1.2 ms per tick, `prepare` ≤ 4 ms once. Animation is deterministic (seeded hashes, shot time); size
+only ever changes along an authored path (rings igniting, a growing shock ring), never by random pulsing; glows breathe
+by alpha. No allocation per frame in the draw paths.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 32.10 Daftar uji (untuk `docs/uji/FASE-32.md`)
+
+**Dasar (Kamera Spektakuler, "Film kosmik 3D: Penuh", kualitas Normal)**
+1. `/sinematik kosmik3d orbit`: layar masuk ke angkasa lewat celup hitam; terlihat planet 3D bulat dengan laut, benua,
+   es kutub, awan yang berputar sedikit lebih cepat, cahaya tepi atmosfer, sisi malam dengan titik lampu kota, bulan
+   berkawah, matahari dengan korona, bintang dan pita Bima Sakti. Tidak ada tepi chunk, langit vanilla, awan vanilla,
+   hujan atau air yang menembus.
+2. Biome warna: uji di hutan, gurun dan salju. Daratan di sekitar "rumah" di planet mengikuti warna rumput dan air biome
+   setempat (setelah ±0,5 detik pemanggangan); di Nether/End planet memakai warna bawaan.
+3. `/sinematik kosmik3d surga`: Gerbang Langit Selatan dengan empat pilar berbelit naga, atap tiga lapis, Istana
+   Lingxiao, jembatan giok, pulau melayang, laut awan bergerak, sinar emas, kelopak berjatuhan, sembilan cincin langit di
+   bawah istana. Baris nama dan Sumber tercetak di chat.
+4. `/sinematik film titah_pedang`: pedang tampak di angkasa di atas planet, cincin rune menyala satu per satu, matahari
+   terbit di tepi planet, pedang berbalik lalu menukik; tembakan dari orbit menunjukkan jejak api dan selubung plasma
+   menembus atmosfer dan dek awan; lalu potongan awan ke tunggangan POV dan langit terbelah; dampak tepat pada klimaks.
+5. `/sinematik film titah_tiang`: film dibuka di Surga; lembing api naik dari awan, gerbang terbuka, Tiang langit keluar
+   dari istana dan dilepas, jatuh melewati sembilan cincin dan laut awan, lalu potongan ke dunia nyata sampai dampak.
+6. `/sinematik film titah_bintang`: tujuh inti bintang Biduk Utara menyala berurutan di angkasa di atas sisi malam
+   planet, garisnya tergambar, lalu tujuh sinar menembus atmosfer; montase bintang jatuh dan klimaks tetap seperti biasa.
+7. `/sinematik film titah_gunung`: segel giok naik melewati cincin ke gerbang surga; setelah dampak, potongan ke orbit
+   menunjukkan sel-sel tanah terangkat melayang di depan planet; jenderal yang terangkat tetap terbanting tepat waktunya.
+
+**Waktu dan klimaks**
+8. Pakai segel sungguhan (bukan perintah uji) pada Kecepatan 1, 2 dan 0,5: dampak selalu terjadi tepat saat server
+   memukul; pada Kecepatan cepat tembakan panggung memendek dulu (tetap ≥ 0,5 detik), pada Kecepatan lambat film mulai
+   lebih lambat (kamera sendiri dulu).
+9. Klimaks datang lebih awal saat masih di panggung: langsung potong ke dampak di bawah bingkai dampak, panggung hilang di
+   bingkai yang sama.
+10. Tingkat 1, 5 dan 9 (`/sinematik kosmik3d orbit 8 9`, `/sinematik film titah_pedang` setelah atur Tingkat): pedang,
+    tiang dan segel makin besar dan kamera ikut menjauh; planet dan istana tetap; cincin rune bertambah di tingkat 5 dan 8.
+
+**Keamanan kamera**
+11. Tekan Backspace di tengah tembakan panggung: celup hitam singkat lalu kembali ke mata (tanpa melayang dari udara).
+    Tekan dua kali: seluruh film berhenti.
+12. Gerakkan kunci gerak / mouse besar di panggung: tembakan berakhir dengan aman, kamera kembali normal.
+13. Dipukul mob saat di panggung, atau jatuh / masuk air / terbakar: kamera langsung kembali, panggung hilang seketika;
+    tidak ada FOV, roll atau posisi kamera yang tertinggal.
+14. Mati di tengah film, keluar dunia, pindah dimensi: kembali normal; masuk lagi tidak ada sisa panggung.
+15. Ada musuh dalam 24 blok, darah < 50 %, atau di dalam gua sempit / di bawah atap rendah: babak atau tembakan panggung
+    tidak main (cadangan Langit Kosmik lama atau kamera sendiri), film tidak pernah menunggu.
+16. Kebutaan / Kegelapan, kabut tebal (Nether) atau jarak render sangat kecil: panggung diganti cadangan.
+
+**Pengaturan**
+17. "Film kosmik 3D: Ringan": lapisan lebih sedikit, tekstur lebih kecil, tanpa pemanggangan biome; "Mati": film persis
+    seperti sebelum fase ini (Langit Kosmik 2D).
+18. Kamera Penuh: Film Pusaka tetap, tetapi bagian "Istana" kini panggung 3D tenang (pedang di atas planet / gerbang
+    surga terbuka / Biduk menyala / segel naik), pelan, tanpa sapuan. Singkat dan Mati: tidak ada panggung.
+19. "Kurangi gerak": tidak ada Spektakuler; "Perjalanan langit: Mati" dan pilihan Film per titah tetap berlaku.
+20. Nama pemain lain di dekat titik kamera tidak melayang di angkasa saat panggung tampil, dan kembali normal setelahnya.
+
+**Performa dan kompatibilitas (laptop lemah, Minimal/Otomatis, jarak render 8)**
+21. Sodium + Iris dengan paket shader: dome menutupi dunia, tidak ada awan/kabut paket di depan angkasa, planet tidak
+    berbayang aneh (jika aneh, catat untuk `PACK_EMISSIVE_BODIES`); jumlah lapisan berkurang sesuai profil paket.
+22. Minimal: planet, dome, matahari dan cahaya tepi saja; FPS tidak turun di bawah 30 lebih dari sesaat; penjaga bingkai
+    menurunkan panggung di tembakan berikutnya tanpa kedip.
+23. `/sinematik kosmik3d info` menunjukkan quad dan ms per bingkai di bawah anggaran; tanpa film, biaya nol.
+24. Tidak ada blok berubah, tidak ada petir vanilla, cuaca, waktu atau kecepatan tick yang berubah; pemain lain tidak
+    melihat panggung (hanya kamera sendiri).
+25. Suara: angkasa sepi (dengung rendah), gong/lonceng/whoosh sesuai daftar, suara "langit" berbahasa Jepang dari server
+    tetap terdengar dan tidak dobel.
+26. Teks: setiap kunci `kosmik*` ada di en_us dan id_id; semua Sumber lama tetap sama; semua tekstur tampak benar (tanpa
+    ungu-hitam), tepi cahaya lembut; model istana rapi dari segala arah, tidak ada wajah hilang atau berkedip.

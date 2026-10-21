@@ -8,6 +8,8 @@ import dev.kultivator.client.epic.Scene;
 import dev.kultivator.client.epic.camera.CinematicDirector;
 import dev.kultivator.client.epic.camera.Shots;
 import dev.kultivator.client.epic.cosmic.CosmicSky;
+import dev.kultivator.client.epic.kosmik.Kosmik3D;
+import dev.kultivator.client.epic.kosmik.StageContext;
 import dev.kultivator.client.epic.lens.HeatHaze;
 import dev.kultivator.client.epic.lens.LensLayers;
 import dev.kultivator.client.epic.screen.CloudWipe;
@@ -36,6 +38,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -62,6 +65,10 @@ import java.util.Set;
  * first when Kecepatan makes the build-up shorter.</li>
  * <li><b>Skips</b>: Backspace skips the act (the camera eases back), a double press the whole film; any movement key, a
  * big mouse motion or a foreign hurt ends the shot as in 23.7.4, and the next act re-checks the gates.</li>
+ * <li><b>Film Kosmik 3D</b> (DESIGN 32.4, 32.5): a stage shot plays inside a 3D stage ({@link Kosmik3D}): the stages are
+ * prepared at arm, each stage shot asks {@link Kosmik3D#enter} at its start (only under a mask cut, or straight after a
+ * shot of the same stage) and plays its {@code orElse} fallback, today's shot of the same length, when refused; the Titah
+ * re-timing shortens stage shots first. Leaving a stage always cuts under the black dip.</li>
  * </ul>
  * Client thread only. Idle cost: one null check per tick and per TechFx event.
  */
@@ -119,6 +126,10 @@ public final class FilmDirector {
 		@Nullable FilmPath path;
 		int sound;
 		boolean holding;
+		/** The shot actually playing (a stage shot, or its fallback when the stage refused). */
+		@Nullable FilmShot played;
+		/** The stage binding of the running stage shot. */
+		Kosmik3D.@Nullable Binding binding;
 
 		ActRun(FilmAct act) {
 			this.act = act;
@@ -158,6 +169,11 @@ public final class FilmDirector {
 		boolean ended;
 		final int[] events = new int[Phase.values().length];
 		final List<ActRun> acts = new ArrayList<>();
+		/** Tingkat Titah 1-9 (29.16) and the decree (0-3, −1 for others): the stages scale their props (32.5.7). */
+		int tier = 1;
+		int skill = -1;
+		/** The stage context, made at arm when the film has stage shots. */
+		@Nullable StageContext stageCtx;
 
 		Run(Film film, Ctx ctx, Scene scene, @Nullable TechniqueSpec spec, boolean test) {
 			this.film = film;
@@ -185,8 +201,13 @@ public final class FilmDirector {
 	 * or a missing film refuses it; then the Penuh path of today runs. A second call for the same cast is a no-op (true).
 	 */
 	public static boolean play(String filmId, Ctx ctx) {
+		return play(filmId, ctx, 1);
+	}
+
+	/** {@link #play} at Tingkat Titah {@code tier} (the stage props scale with it, 32.5.7). */
+	public static boolean play(String filmId, Ctx ctx, int tier) {
 		try {
-			return arm(filmId, ctx, false);
+			return arm(filmId, ctx, false, tier);
 		} catch (RuntimeException exception) {
 			warn("play", exception);
 			return false;
@@ -325,7 +346,8 @@ public final class FilmDirector {
 		} else {
 			climaxIn = film.k;
 		}
-		play(spec.id(), new Ctx(p.caster(), spec.id(), player.position(), aim, player.yBodyRot, p.seed(), climaxIn, p.duration()));
+		int tier = film.titah ? dev.kultivator.client.pusakalangit.world.TitahWorld.tierOf(p.aux()) : 1;
+		play(spec.id(), new Ctx(p.caster(), spec.id(), player.position(), aim, player.yBodyRot, p.seed(), climaxIn, p.duration()), tier);
 	}
 
 	/** {@code KEH_CRATER} of an own carving job: the Spektakuler crater reveal (30.3.9). True = it plays (no 7b crane). */
@@ -362,7 +384,7 @@ public final class FilmDirector {
 			}
 			Ctx ctx = new Ctx(minecraft.player.getId(), FilmCatalog.KAWAH, minecraft.player.position(), zone, minecraft.player.yBodyRot,
 					(long) zone.hashCode() * 31L + blocks, 0, 120);
-			return arm(FilmCatalog.KAWAH, ctx, false);
+			return arm(FilmCatalog.KAWAH, ctx, false, 1);
 		} catch (RuntimeException exception) {
 			warn("crater", exception);
 			return false;
@@ -395,7 +417,17 @@ public final class FilmDirector {
 		if (current != null) {
 			end(current, true);
 		}
-		if (!arm(filmId, ctx, true)) {
+		// Tingkat Titah: the decree's own tier from the Titah menu (29.16.3), so the stages frame that weapon size
+		int tier = 1;
+		int skill = skillOf(filmId);
+		if (skill >= 0) {
+			try {
+				tier = Math.max(1, Math.min(9, dev.kultivator.client.pusakalangit.TitahClient.decree(skill).t));
+			} catch (RuntimeException | LinkageError exception) {
+				tier = 1;
+			}
+		}
+		if (!arm(filmId, ctx, true, tier)) {
 			return lastRefusal.isEmpty() ? "gate" : lastRefusal;
 		}
 		Run run = current;
@@ -414,8 +446,48 @@ public final class FilmDirector {
 		return null;
 	}
 
+	/**
+	 * {@code /sinematik kosmik3d ...} (DESIGN 32.7): plays {@code film} (stage shots built by the command, no climax) around
+	 * the player at Tingkat {@code tier}, under every gate. Null = started, else the refusal reason.
+	 */
+	public static @Nullable String preview(Film film, int tier) {
+		Minecraft minecraft = Minecraft.getInstance();
+		LocalPlayer player = minecraft.player;
+		if (player == null) {
+			return "player";
+		}
+		if (!EpicSettings.spektakuler()) {
+			return "camera";
+		}
+		Vec3 look = player.getViewVector(1.0F);
+		Vec3 flat = new Vec3(look.x, 0.0D, look.z);
+		flat = flat.lengthSqr() < 1.0E-4D ? new Vec3(0.0D, 0.0D, 1.0D) : flat.normalize();
+		Vec3 aim = player.position().add(flat.scale(16.0D));
+		Ctx ctx = new Ctx(player.getId(), film.id, player.position(), aim, player.yBodyRot, film.id.hashCode() * 7919L + tier, -1,
+				film.cameraTicks() + 40);
+		if (current != null) {
+			end(current, true);
+		}
+		if (!arm(film, ctx, true, tier)) {
+			return lastRefusal.isEmpty() ? "gate" : lastRefusal;
+		}
+		return null;
+	}
+
+	/** The decree index of a Titah film id ({@code titah_pedang} → 0), else −1. */
+	static int skillOf(String filmId) {
+		for (int i = 0; i < EpicSettings.TITAH_SKILLS.length; i++) {
+			if (filmId.equals("titah_" + EpicSettings.TITAH_SKILLS[i])) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	/** Ends everything (skip-all, dimension change, disconnect). */
 	public static void clear() {
+		// Film Kosmik 3D (32.1.5): a skip-all out of a stage keeps its black dip over the snap back to the eye
+		boolean fromStage = CinematicDirector.stageBinding() != null;
 		if (current != null) {
 			end(current, true);
 		}
@@ -423,9 +495,13 @@ public final class FilmDirector {
 		holdUntil = 0L;
 		TRACKS.clear();
 		LensLayers.clear();
+		if (fromStage) {
+			LensLayers.dip();
+		}
 		CosmicSky.clear();
 		HeatHaze.clear();
 		FilmSound.stopAll();
+		Kosmik3D.clear();
 	}
 
 	/** {@code /sinematik film info}: settings, the gate that would refuse a film now, the last film's shots. */
@@ -438,6 +514,8 @@ public final class FilmDirector {
 		lines.add("running=" + (run == null ? "-" : run.film.id + " t=" + (now - run.armedAt) + " climax=" + (run.climaxAt < 0 ? "?" : run.climaxAt - run.armedAt)
 				+ (run.climaxSeen ? " (seen)" : "")));
 		lines.add("gate now=" + (run != null ? String.valueOf(gate(run)) : "(no film)") + " last refusal=" + (lastRefusal.isEmpty() ? "-" : lastRefusal));
+		lines.add("kosmik3d=" + Kosmik3D.setting().id() + " tier=" + (run == null ? "-" : String.valueOf(run.tier)) + " last stage refusal="
+				+ Kosmik3D.lastRefusal());
 		int from = Math.max(0, LOG.size() - 12);
 		lines.addAll(LOG.subList(from, LOG.size()));
 		return lines;
@@ -541,12 +619,12 @@ public final class FilmDirector {
 	private static void advance(Run run, ActRun ar, int presses) {
 		long age = now - ar.shotStart;
 		int length = ar.ticks[ar.shot];
-		FilmShot shot = ar.act.shots.get(ar.shot);
+		FilmShot shot = ar.played != null ? ar.played : ar.act.shots.get(ar.shot);
 		// sounds at their moments
 		playSounds(run, ar, shot, age, length);
-		// the flare follows its light point
+		// the flare follows its light point (a stage light point hides behind the stage's bodies)
 		if (ar.path != null && FilmLens.has(shot.lens, FilmLens.FLARE)) {
-			LensLayers.light(lightPoint(run, shot));
+			LensLayers.light(lightPoint(run, shot, ar.binding));
 		}
 		// a cloud-wipe cut: the wipe closes over the last 5 ticks of this shot (one luminance event; else a black dip)
 		if (age == length - 5 && ar.shot + 1 < ar.act.shots.size() && ar.act.shots.get(ar.shot + 1).mask == FilmShot.Mask.CLOUD_WIPE) {
@@ -593,12 +671,19 @@ public final class FilmDirector {
 
 	// ================================================================ arming and acts
 
-	private static boolean arm(String filmId, Ctx ctx, boolean test) {
+	private static boolean arm(String filmId, Ctx ctx, boolean test, int tier) {
+		Film film = FilmCatalog.get(filmId);
+		if (film == null) {
+			return refuse("film");
+		}
+		return arm(film, ctx, test, tier);
+	}
+
+	private static boolean arm(Film film, Ctx ctx, boolean test, int tier) {
 		Minecraft minecraft = Minecraft.getInstance();
 		LocalPlayer player = minecraft.player;
-		Film film = FilmCatalog.get(filmId);
-		if (player == null || film == null || ctx.casterId() != player.getId()) {
-			return refuse(film == null ? "film" : "not own");
+		if (player == null || ctx.casterId() != player.getId()) {
+			return refuse("not own");
 		}
 		Run old = current;
 		if (old != null && !old.ended && old.ctx.casterId() == ctx.casterId() && old.ctx.specId().equals(ctx.specId()) && now - old.armedAt <= 1) {
@@ -636,8 +721,11 @@ public final class FilmDirector {
 			end(old, true);
 		}
 		Run run = new Run(film, ctx, scene, spec, test);
+		run.tier = Math.max(1, Math.min(9, tier));
+		run.skill = skillOf(film.id);
 		plan(run);
 		current = run;
+		prepareStages(run);
 		if (!gapFree) {
 			lastUltimateFilm = now;
 		}
@@ -692,6 +780,9 @@ public final class FilmDirector {
 		}
 		// the whole film's camera time
 		int total = 0;
+		if (run.film.preview) {
+			return;
+		}
 		for (ActRun ar : run.acts) {
 			if (ar.state == DONE) {
 				continue;
@@ -743,6 +834,16 @@ public final class FilmDirector {
 				continue;
 			}
 			int over = planned - k;
+			// Film Kosmik 3D (32.5.1): the stage shots shorten first (their beats are authored in shot fractions)
+			for (int i = 0; i < ar.ticks.length && over > 0; i++) {
+				if (ar.act.shots.get(i).stageId != null) {
+					int cut = Math.min(over, ar.ticks[i] - 10);
+					if (cut > 0) {
+						ar.ticks[i] -= cut;
+						over -= cut;
+					}
+				}
+			}
 			for (int i = 0; i < ar.ticks.length && over > 0; i++) {
 				if (ar.act.shots.get(i).cosmic) {
 					int cut = Math.min(over, ar.ticks[i] - 10);
@@ -883,11 +984,29 @@ public final class FilmDirector {
 		FilmShot shot = ar.act.shots.get(index);
 		int length = ar.ticks[index];
 		long seed = run.ctx.seed() * 31L + run.acts.indexOf(ar) * 977L + index;
-		FilmPath path = new FilmPath(shot, run.stage, seed, length);
+		// Film Kosmik 3D (32.4): a stage shot enters its stage, or plays its fallback with the same length and mask
+		FilmShot played = shot;
+		Kosmik3D.Binding binding = null;
+		if (shot.stageId != null) {
+			binding = enterStage(run, ar, shot, length);
+			if (binding == null) {
+				played = shot.fallback != null ? shot.fallback : fallbackOf(length);
+				log(run.film.id + " stage " + shot.stageId.id() + "/" + shot.stageBeat + " -> fallback (" + Kosmik3D.lastRefusal() + ")");
+			}
+		}
+		FilmPath path = new FilmPath(played, run.stage, seed, length);
+		path.bind(binding);
 		path.validate();
 		boolean masked = mask(shot.mask, run);
+		Kosmik3D.Binding leaving = CinematicDirector.stageBinding();
+		if (!masked && leaving != null && (binding == null || !binding.continued())) {
+			// leaving a stage (or its pocket) is always a cut under the black dip, never a blend from the pocket (32.1.5)
+			LensLayers.dip();
+			lastCut = now;
+			masked = true;
+		}
 		Shots.Shot camera = Shots.film(path);
-		if (shot.climaxHold) {
+		if (played.climaxHold) {
 			camera.hold(20);
 		}
 		if (!CinematicDirector.shootFilm(run.scene, camera, masked)) {
@@ -901,10 +1020,69 @@ public final class FilmDirector {
 		ar.path = path;
 		ar.sound = 0;
 		ar.holding = false;
+		ar.played = played;
+		ar.binding = binding;
 		run.camera += length;
-		shotEffects(run, shot, length, seed);
-		log(String.format(Locale.ROOT, "%s act %d shot %d: %d t%s%s shrink %.2f", run.film.id, run.acts.indexOf(ar), index, length,
-				masked ? " cut" : "", shot.cosmic ? " cosmic" : "", path.shrink()));
+		if (binding != null) {
+			// publish the virtual eye of the first frame now, so the flare's light point is right from the start
+			path.evaluate(0.0F, 1.0F);
+		}
+		shotEffects(run, played, length, seed, binding);
+		log(String.format(Locale.ROOT, "%s act %d shot %d: %d t%s%s%s shrink %.2f", run.film.id, run.acts.indexOf(ar), index, length,
+				masked ? " cut" : "", played.cosmic ? " cosmic" : "", binding != null ? " stage " + binding.id.id() + "/" + binding.beat : "",
+				path.shrink()));
+	}
+
+	/**
+	 * The stage of a stage shot (32.1.1, 32.4): entered only under a mask cut at least {@link #CUT_GAP} ticks after the last
+	 * one, or straight after a shot of the same stage (same pocket, no jump). Null = play the fallback.
+	 */
+	private static Kosmik3D.@Nullable Binding enterStage(Run run, ActRun ar, FilmShot shot, int length) {
+		Kosmik3D.StageId id = shot.stageId;
+		if (id == null || shot.stageBeat == null) {
+			return null;
+		}
+		Kosmik3D.Binding running = CinematicDirector.stageBinding();
+		boolean continuing = running != null && running == ar.binding && running.id == id && CinematicDirector.filmShooting();
+		if (!continuing && (shot.mask == FilmShot.Mask.NONE || now - lastCut < CUT_GAP)) {
+			log(run.film.id + " stage " + id.id() + " without a mask");
+			return null;
+		}
+		StageContext ctx = run.stageCtx;
+		if (ctx == null) {
+			ctx = Kosmik3D.context(run.skill, run.tier, run.tint, run.ctx.seed(), false);
+			run.stageCtx = ctx;
+		}
+		return Kosmik3D.enter(id, shot.stageBeat, ctx, length, false);
+	}
+
+	/** The stages a film uses build their meshes at arm (≤ 4 ms each, once per session) and sample the home colours. */
+	private static void prepareStages(Run run) {
+		EnumSet<Kosmik3D.StageId> used = EnumSet.noneOf(Kosmik3D.StageId.class);
+		for (FilmAct act : run.film.acts) {
+			for (FilmShot shot : act.shots) {
+				if (shot.stageId != null) {
+					used.add(shot.stageId);
+				}
+			}
+		}
+		if (used.isEmpty()) {
+			return;
+		}
+		try {
+			run.stageCtx = Kosmik3D.context(run.skill, run.tier, run.tint, run.ctx.seed(), false);
+			for (Kosmik3D.StageId id : used) {
+				Kosmik3D.prepare(id, run.stageCtx);
+			}
+		} catch (RuntimeException | LinkageError exception) {
+			warn("stage prepare", exception);
+		}
+	}
+
+	/** A stage shot without its own fallback: a slow sky drift under Langit Kosmik, {@code length} ticks. */
+	static FilmShot fallbackOf(int length) {
+		return FilmShot.of(length).key(0.0F, FilmSpace.S, 0.0D, 3.0D, -4.0D).key(1.0F, FilmSpace.S, 0.6D, 3.3D, -3.2D).lookSky(0.0F, 58.0F, 0.0F, 64.0F)
+				.cosmic();
 	}
 
 	/** Raises the mask of a hard cut; true when the jump may skip the blend (≥ 10 ticks after the last cut). */
@@ -930,9 +1108,9 @@ public final class FilmDirector {
 	}
 
 	/** The layers, sky, sound and time effects of one shot's start. */
-	private static void shotEffects(Run run, FilmShot shot, int length, long seed) {
+	private static void shotEffects(Run run, FilmShot shot, int length, long seed, Kosmik3D.@Nullable Binding binding) {
 		int tint = shot.tint != 0xFFE8B0 ? shot.tint : run.tint;
-		LensLayers.shot(shot.lens, tint, seed, lightPoint(run, shot));
+		LensLayers.shot(shot.lens, tint, seed, lightPoint(run, shot, binding));
 		FilmParticleProviders.newShot();
 		if (FilmLens.has(shot.lens, FilmLens.VIGNETTE)) {
 			EpicScreen.vignette(shot.vignetteRgb, shot.vignetteRgb == 0 ? 0.28F : 0.32F, length);
@@ -1055,7 +1233,18 @@ public final class FilmDirector {
 		};
 	}
 
-	private static @Nullable Vec3 lightPoint(Run run, FilmShot shot) {
+	private static @Nullable Vec3 lightPoint(Run run, FilmShot shot, Kosmik3D.@Nullable Binding binding) {
+		if (shot.flareSpace == FilmSpace.V || shot.flareSpace == null && shot.lookSpace == FilmSpace.V) {
+			// a stage light point: where the frame draws it, or none while a stage body hides it (32.4)
+			if (binding == null) {
+				return null;
+			}
+			boolean flare = shot.flareSpace == FilmSpace.V;
+			double[] at = new double[3];
+			Kosmik3D.point(binding, flare ? shot.flareProp : shot.lookProp, flare ? shot.fx : shot.lx, flare ? shot.fy : shot.ly,
+					flare ? shot.fz : shot.lz, binding.time, at);
+			return Kosmik3D.lightPoint(binding, at[0], at[1], at[2]);
+		}
 		if (shot.flareSpace != null) {
 			return run.stage.resolve(shot.flareSpace, shot.flareProp, shot.fx, shot.fy, shot.fz, 1.0F);
 		}
@@ -1068,6 +1257,7 @@ public final class FilmDirector {
 	private static void finishAct(Run run, ActRun ar, boolean interrupted) {
 		ar.state = DONE;
 		ar.path = null;
+		ar.binding = null;
 		// the next act starting right now joins without an exit; otherwise the camera eases back to the eye
 		boolean next = false;
 		for (ActRun other : run.acts) {
@@ -1107,6 +1297,7 @@ public final class FilmDirector {
 		LensLayers.off();
 		CosmicSky.hide(10);
 		FilmSound.stopAll();
+		Kosmik3D.disarm();
 		log("ended " + run.film.id + " camera " + run.camera + " t");
 	}
 

@@ -89,6 +89,11 @@ public final class FilmShot {
 	float grey;
 	/** Ducks the world and plays the cosmic hum at this pitch (0 = none). */
 	float quiet;
+	// Film Kosmik 3D (DESIGN 32.4): the stage and beat of a stage shot, its POV anchor and the fallback shot
+	dev.kultivator.client.epic.kosmik.Kosmik3D.@Nullable StageId stageId;
+	@Nullable String stageBeat;
+	@Nullable String povAnchor;
+	@Nullable FilmShot fallback;
 
 	private FilmShot(int ticks) {
 		this.ticks = Math.max(4, Math.min(120, ticks));
@@ -371,6 +376,70 @@ public final class FilmShot {
 	public FilmShot holdForClimax() {
 		this.climaxHold = true;
 		return this;
+	}
+
+	// ================================================================ Film Kosmik 3D (DESIGN 32.4)
+
+	/**
+	 * This shot is drawn in a 3D stage and plays {@code beat} there: the real camera stands at the stage's pocket and only
+	 * turns; its keys, look, POV and flare are given in {@link FilmSpace#V}. Needs a mask cut before it (or a stage shot of
+	 * the same stage), no bullet time and an {@link #orElse} fallback.
+	 */
+	public FilmShot stage(dev.kultivator.client.epic.kosmik.Kosmik3D.StageId id, String beat) {
+		this.stageId = id;
+		this.stageBeat = beat;
+		return this;
+	}
+
+	/** A position key in the frame of stage anchor {@code anchor} (stage metres, × the anchor's scale). */
+	public FilmShot keyV(float t, String anchor, double x, double y, double z) {
+		keys.add(new FilmKey(t, FilmSpace.V, anchor, x, y, z, Ease.IN_OUT));
+		return this;
+	}
+
+	/** Looks at a point in the frame of stage anchor {@code anchor}. */
+	public FilmShot lookV(String anchor, double x, double y, double z) {
+		return look(FilmSpace.V, anchor, x, y, z);
+	}
+
+	/** The look target at the end of the shot, in the frame of stage anchor {@code anchor}. */
+	public FilmShot lookEndV(String anchor, double x, double y, double z) {
+		return lookEnd(FilmSpace.V, anchor, x, y, z);
+	}
+
+	/** Rides stage anchor {@code anchor}: {@code back} behind and {@code up} above its origin, looking along its forward. */
+	public FilmShot povV(String anchor, float back, float up) {
+		this.povAnchor = anchor;
+		this.povBack = back;
+		this.povUp = up;
+		return this;
+	}
+
+	/** The flare's light point in the frame of stage anchor {@code anchor} (hidden while a stage body covers it). */
+	public FilmShot flareV(String anchor, double x, double y, double z) {
+		return flare(FilmSpace.V, anchor, x, y, z);
+	}
+
+	/** The flare's light point at the origin of stage anchor {@code anchor}. */
+	public FilmShot flareV(String anchor) {
+		return flareV(anchor, 0.0D, 0.0D, 0.0D);
+	}
+
+	/**
+	 * The shot played instead when the stage refuses (setting Mati, no pocket, fog, budget −1, stage not ready): today's
+	 * shot of the same length (it is played with this shot's re-timed length and mask).
+	 */
+	public FilmShot orElse(FilmShot shot) {
+		this.fallback = shot;
+		return this;
+	}
+
+	public boolean isStage() {
+		return stageId != null;
+	}
+
+	public @Nullable FilmShot fallback() {
+		return fallback;
 	}
 
 	FilmShot mask(Mask cut) {
