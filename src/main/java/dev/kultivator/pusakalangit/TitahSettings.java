@@ -43,6 +43,8 @@ public final class TitahSettings {
 	public static final int OP_SET = 1;
 	public static final int OP_SELECT = 2;
 	public static final int OP_RESET = 3;
+	/** UI/UX Terpadu (DESIGN 33.7 C33.N4): the hub's Titah card; the same as {@code /kultivasi titah} (needs the seal). */
+	public static final int OP_OPEN = 4;
 
 	/** {@code extra.titah}, created on first write. */
 	static CompoundTag section(CultivationData data) {
@@ -238,6 +240,10 @@ public final class TitahSettings {
 		int op = arg >>> 16 & 0xFF;
 		Titah.Skill skill = Titah.Skill.byOrdinal(arg >>> 8 & 0xFF);
 		int field = arg & 0xFF;
+		if (op == OP_OPEN) {
+			PusakaLangit.open(player);
+			return;
+		}
 		switch (op) {
 			case OP_SET -> {
 				set(player, skill, field, text == null ? "" : text.trim());

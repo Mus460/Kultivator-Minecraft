@@ -536,6 +536,59 @@ public final class EpicSettings {
 		}
 	}
 
+	// ================================================================ UI/UX Terpadu (DESIGN 33.5)
+
+	/** The Pengaturan groups this class sorts its rows into (the values of {@code HubNav.GROUP_*}). */
+	private static final int GROUP_TAMPILAN = 0;
+	private static final int GROUP_FILM = 1;
+	private static final int GROUP_SUARA = 2;
+	private static final String P = "kultivator.pengaturan.";
+
+	/**
+	 * The Pengaturan group of a row of {@link #rows()} (DESIGN 33.5): the camera and film rows go to Kamera & Film, the
+	 * cinematic music to Suara, everything else (the impact and world rows, and any row a later module adds) to
+	 * Tampilan & Efek, so no row is ever lost.
+	 */
+	public static int group(String rowKey) {
+		return switch (rowKey) {
+			case CAMERA, LENS, COSMIC, KOSMIK3D, BULLET, SLOWMO, SKYRIDE, IMPACT_FRAMES, SILENT_IMPACT, LETTERBOX, CARDS, RECORD -> GROUP_FILM;
+			case MUSIC -> GROUP_SUARA;
+			default -> GROUP_TAMPILAN;
+		};
+	}
+
+	/**
+	 * The four Film Titah rows of Pengaturan › Kamera & Film (moved from the Titah Langit menu, DESIGN 33.6 R10): one
+	 * cycling talisman per decree, Penuh → Singkat → Mati, stored as before ({@link #titahFilm} / {@link #setTitahFilm}).
+	 * Empty while the texts are not in the language files.
+	 */
+	public static List<Row> titahRows() {
+		if (!Language.getInstance().has(P + "titah_film") || !Language.getInstance().has("kultivator.titah_client.film.penuh")) {
+			return List.of();
+		}
+		List<Row> rows = new java.util.ArrayList<>();
+		for (int i = 0; i < TITAH_SKILLS.length; i++) {
+			int skill = i;
+			rows.add(new Row(TITAH_FILM + TITAH_SKILLS[i], true, () -> titahFilmText(skill),
+					() -> setTitahFilm(skill, TitahFilm.values()[(titahFilm(skill).ordinal() + 1) % TitahFilm.values().length]),
+					() -> titahFilmTip(skill)));
+		}
+		return List.copyOf(rows);
+	}
+
+	private static Component titahFilmText(int skill) {
+		return Component.translatable(P + "titah_film", Component.translatable(P + "titah." + TITAH_SKILLS[skill]),
+				Component.translatable("kultivator.titah_client.film." + titahFilm(skill).id()));
+	}
+
+	private static List<Component> titahFilmTip(int skill) {
+		String mode = "kultivator.titah_client.film." + titahFilm(skill).id();
+		return List.of(dev.kultivator.client.pusakalangit.TitahClient.decreeName(skill).copy().withStyle(ChatFormatting.GOLD),
+				Component.translatable(P + "titah_film", Component.translatable(P + "titah." + TITAH_SKILLS[skill]), Component.translatable(mode)),
+				Component.translatable(mode + ".tip").withStyle(ChatFormatting.GRAY),
+				Component.translatable(P + "titah_film.note").withStyle(ChatFormatting.DARK_GRAY));
+	}
+
 	private static Component skyRideText() {
 		return Component.translatable(D + "skyride", Component.translatable(D + "skyride." + skyRide().id()));
 	}

@@ -6,15 +6,21 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.screen.ui.TalismanButton;
+import dev.kultivator.sect.hall.Halls;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 
+import java.util.List;
+
 /**
- * The Musuh tablet of the Dunia screen (DESIGN 25.10): the next raid ("Serbuan berikutnya: hari 31 · Sekte Bulan Darah"),
- * the ambush cooldown and the rogues slain, then the last ten encounters (ambushes, camps, raids) on bamboo slips, newest
- * first, scrolling with the wheel. Read-only; the data comes from {@link MusuhClient}.
+ * The Musuh tablet of the Dunia screen (DESIGN 25.10): the next raid ("Serbuan berikutnya: hari 31 · Sekte Bulan Darah")
+ * as one line with a talisman to the sect's own raid page (Aula › Wilayah › Pertahanan holds the full schedule, DESIGN
+ * 33.6 R7), the ambush cooldown and the rogues slain, then the last ten encounters (ambushes, camps, raids) on bamboo
+ * slips, newest first, scrolling with the wheel. Read-only; the data comes from {@link MusuhClient}.
  */
 public class MusuhPage extends DuniaPage {
 
@@ -43,6 +49,13 @@ public class MusuhPage extends DuniaPage {
 
 	@Override
 	protected void build() {
+		// The sect's raid page (schedule, omen, defence score, raid log) lives in the hall; this talisman leads there.
+		int bw = Math.max(64, Math.min(104, Math.round(w * 0.36F)));
+		TalismanButton defence = add(new TalismanButton(x + w - bw - 4, y + 16, bw, 11,
+				() -> Component.translatable("kultivator.uxpages.musuh.to_defence")));
+		defence.onPress(() -> dev.kultivator.client.hub.HubNav.openHall(Halls.PAGE_PERTAHANAN));
+		defence.tooltip(() -> List.of(Component.translatable("kultivator.uxpages.musuh.to_defence.title"),
+				Component.translatable("kultivator.uxpages.musuh.to_defence.tip").withStyle(ChatFormatting.GRAY)));
 	}
 
 	@Override
@@ -59,7 +72,8 @@ public class MusuhPage extends DuniaPage {
 		CompoundTag raid = data.getCompoundOrEmpty("raid");
 		int top = Math.round(cursor);
 		panel(g, x + 2, top, x + w - 2, top + 38);
-		Brush.fit(g, font, MusuhText.nextRaid(raid), x + 6.0F, cursor + 3.0F, w - 12.0F, Palette.SEAL_DARK, scale, scale * 0.7F, false);
+		int bw = Math.max(64, Math.min(104, Math.round(w * 0.36F)));
+		Brush.fit(g, font, MusuhText.nextRaid(raid), x + 6.0F, cursor + 3.0F, w - bw - 16.0F, Palette.SEAL_DARK, scale, scale * 0.7F, false);
 		long cd = data.getLongOr("ambush_cd", 0L);
 		Component ambush = !data.getBooleanOr("ambush_on", true) ? Component.translatable("kultivator.musuh.ui.ambush_off")
 				: cd <= 0L ? Component.translatable("kultivator.musuh.ui.ambush_ready")

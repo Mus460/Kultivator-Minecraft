@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * One tab of the cultivation scroll. It is laid out into the content box of the scroll, owns its controls, draws its
+ * One page of the cultivation scroll (since DESIGN 33 the hub: a section shows one or more pages). It is laid out into the content box of the scroll, owns its controls, draws its
  * own pictures (dantian, pentagram, Bagua...) and handles the mouse inside the box. Data is always read live from
  * {@link ClientCultivation}; {@link #onData()} is called when a new snapshot arrives so cached text can be rebuilt.
  */
@@ -43,6 +43,26 @@ abstract class Page {
 
 	/** The tab's short name written on its jade tablet. */
 	abstract Component shortName();
+
+	/**
+	 * The Ensiklopedia topic the hub's "?" seal opens for this page (a {@code kultivator.screen.help.<topic>} key; DESIGN
+	 * 33.3, C33.N3). Pages override it.
+	 */
+	String helpTopic() {
+		return "jalan";
+	}
+
+	/**
+	 * The page's own sub-pages, shown as the hub's sub-coins when the page is alone in its section (Pengaturan's groups);
+	 * empty for none. The hub calls {@link #showSub(int)} with the chosen index.
+	 */
+	List<Component> subNames() {
+		return List.of();
+	}
+
+	/** Shows sub-page {@code index} of {@link #subNames()} (the hub clamps it). */
+	void showSub(int index) {
+	}
 
 	final void layout(int x, int y, int w, int h) {
 		this.x = x;

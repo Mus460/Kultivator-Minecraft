@@ -10,9 +10,9 @@
   "kultivator.codex.header": "%s · %s",
   "kultivator.codex.tab.kodeks": "Kodeks",
   "kultivator.codex.tab.kodeks.short": "Kodeks",
-  "kultivator.codex.tab.ring": "Cincin Segel",
-  "kultivator.codex.tab.ring.short": "Cincin",
-  "kultivator.codex.tab.kehancuran": "Mode Kehancuran",
+  "kultivator.codex.tab.ring": "Rangkai Segel",
+  "kultivator.codex.tab.ring.short": "Rangkai",
+  "kultivator.codex.tab.kehancuran": "Kehancuran Diri",
   "kultivator.codex.tab.kehancuran.short": "Hancur",
   "kultivator.codex.tab.help": "Bantuan",
   "kultivator.codex.tab.help.short": "Bantuan",
@@ -106,7 +106,7 @@
   "kultivator.codex.detail.select": "Pilih",
   "kultivator.codex.detail.select.tip": "Tombol rapal memakai teknik ini.",
   "kultivator.codex.detail.assign": "Pasang ke Cincin",
-  "kultivator.codex.detail.assign.tip": "Taruh di salah satu dari 12 soket Cincin Segel (1-4 adalah segel cepat).",
+  "kultivator.codex.detail.assign.tip": "Taruh di salah satu dari 12 soket Rangkai Segel (1-4 adalah segel cepat).",
   "kultivator.codex.detail.test": "Uji",
   "kultivator.codex.detail.test.tip": "Op dalam mode Kreatif: langsung dirapal sebagai uji (tanpa biaya, tanpa penguasaan).",
   "kultivator.codex.detail.picker": "Pilih soket",
@@ -196,7 +196,7 @@
   "kultivator.codex.bonus.steps": "serangan penutup",
   "kultivator.codex.bonus.special": "bonus khusus",
 
-  "kultivator.codex.ring.core": "Cincin Segel",
+  "kultivator.codex.ring.core": "Rangkai Segel",
   "kultivator.codex.ring.list": "Bisa dirapal",
   "kultivator.codex.ring.none": "Kau belum menguasai teknik yang bisa dirapal.",
   "kultivator.codex.ring.autofill": "Isi otomatis",
@@ -244,7 +244,7 @@
   "kultivator.codex.wheel.hint": "Gerakkan tetikus ke sebuah segel",
   "kultivator.codex.wheel.costs": "Qi %s · %s",
   "kultivator.codex.wheel.pinned": "%s menjadi segel cepat %s",
-  "kultivator.codex.quick.empty": "Segel cepat %1$s kosong: isi soket %1$s di Cincin Segel",
+  "kultivator.codex.quick.empty": "Segel cepat %1$s kosong: isi soket %1$s di Rangkai Segel",
   "kultivator.codex.hud.release": "Tekan lagi = lepas",
   "kultivator.codex.hud.lockout": "Pamungkas %s dtk",
   "kultivator.codex.hud.kehancuran": "KEHANCURAN",
@@ -268,7 +268,7 @@
   "kultivator.codex.launcher.power": "Kekuatan %s",
   "kultivator.codex.launcher.mastery": "Penguasaan tertinggi: %s",
   "kultivator.codex.launcher.selected": "Terpilih: %s",
-  "kultivator.codex.launcher.keys": "%s merapal (tahan: Roda Segel) · %s / %s memutar cincin · %s membuka Kitab",
+  "kultivator.codex.launcher.keys": "%1$s merapal (tahan: Roda Segel) · %3$s berikutnya · %2$s sebelumnya · Kitab Teknik: %4$s",
 
   "kultivator.codex.teach.never": "Murid tidak akan pernah bisa mempelajari ini",
   "kultivator.codex.teach.state.0": "Semua",
@@ -313,5 +313,5 @@
   "kultivator.screen.help.penguasaan.title": "Penguasaan",
   "kultivator.screen.help.penguasaan": "Setiap teknik punya lima tingkat penguasaan: Pemula, Sukses Kecil, Sukses Besar, Kesempurnaan Agung, dan Puncak Jurus. Poin datang dari merapal, mengenai, membunuh, dan melawan bos, paling banyak 200 poin kena dan bunuh per teknik per hari. Kesempurnaan Agung butuh pemahaman Dao 60 (universal: Jiwa Baru Lahir), Puncak Jurus butuh 90 (universal: Penyatuan Dao).",
   "kultivator.screen.help.kitab_teknik.title": "Kitab Teknik",
-  "kultivator.screen.help.kitab_teknik": "Buka dengan tombol kitab. Saring menurut Dao, tingkat, ranah, jenis, dan keadaan, atau cari menurut nama, karya, atau Dao. Bilah bambu menampilkan sumber, angka langsung, penguasaan, dan cara memperoleh teknik. Cincin Segel menyimpan 12 teknik untuk Roda Segel (tahan tombol rapal); soket 1-4 adalah segel cepat."
+  "kultivator.screen.help.kitab_teknik": "Buka dengan tombol kitab. Saring menurut Dao, tingkat, ranah, jenis, dan keadaan, atau cari menurut nama, karya, atau Dao. Bilah bambu menampilkan sumber, angka langsung, penguasaan, dan cara memperoleh teknik. Rangkai Segel menyimpan 12 teknik untuk Roda Segel (tahan tombol rapal); soket 1-4 adalah segel cepat."
 }

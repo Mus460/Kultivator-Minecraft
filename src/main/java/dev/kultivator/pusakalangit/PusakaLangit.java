@@ -98,8 +98,11 @@ public final class PusakaLangit {
 		return stored;
 	}
 
-	/** {@code /kultivasi titah}: the menu, when a seal of the player's is in the inventory. */
-	private static int open(ServerPlayer player) {
+	/**
+	 * {@code /kultivasi titah} and the hub's {@code TitahSettings.OP_OPEN} (DESIGN 33.7 C33.N4): the menu, when a seal of
+	 * the player's is in the inventory.
+	 */
+	static int open(ServerPlayer player) {
 		if (!HeavenDecreeSealItem.carries(player)) {
 			Msg.actionBar(player, Component.translatable(KEY + "menu.no_seal").withColor(0xFF8A7A));
 			return 0;

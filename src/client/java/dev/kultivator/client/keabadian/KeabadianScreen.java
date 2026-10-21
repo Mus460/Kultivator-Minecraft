@@ -19,7 +19,8 @@ import java.util.List;
  * Batin · Ciptaan · Lelang, each at most {@link #MAX_TABLET_H} tall (the {@code DuniaScreen} formula). The pages belong to
  * P9-langit ({@code AlamAbadiPage}, {@code LelangPage}), P9-purba ({@code PurbaPage}, {@code BencanaPage}) and P9-batin
  * ({@code BatinPage}, {@code CiptaanPage}). On opening it asks the three modules for their data ("sync" of actions 42-44).
- * Behind the scroll: a pale immortal sky with floating islands instead of the Dunia mountains.
+ * Behind the scroll: a pale immortal sky with floating islands instead of the Dunia mountains. Hub section 6 (DESIGN 33.3);
+ * the header's "?" seal opens Panduan › Ensiklopedia on the tablet's topic ({@link #helpTopic}).
  */
 public class KeabadianScreen extends DuniaScreen {
 
@@ -52,6 +53,20 @@ public class KeabadianScreen extends DuniaScreen {
 			case 1, 2 -> dev.kultivator.network.Payloads.DuniaSync.CH_PURBA;
 			case 3, 4 -> dev.kultivator.network.Payloads.DuniaSync.CH_BATIN;
 			default -> -1;
+		};
+	}
+
+	/** The Ensiklopedia topic of each tablet (the header's "?" seal, DESIGN 33 C33.P1). */
+	@Override
+	protected String helpTopic(int index) {
+		return switch (index) {
+			case 0 -> "alam_abadi";
+			case 1 -> "binatang_purba";
+			case 2 -> "bencana_bintang";
+			case 3 -> "dunia_batin";
+			case 4 -> "jurus_ciptaan";
+			case 5 -> "lelang";
+			default -> "jalan_abadi";
 		};
 	}
 

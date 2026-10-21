@@ -64,6 +64,11 @@ final class AlchemyBookPage extends Page {
 	}
 
 	@Override
+	public String helpTopic() {
+		return "alchemy";
+	}
+
+	@Override
 	protected void build() {
 	}
 

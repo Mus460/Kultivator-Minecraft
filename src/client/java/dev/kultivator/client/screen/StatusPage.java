@@ -8,6 +8,7 @@ import dev.kultivator.client.goals.PrepView;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.JadeCoin;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.cultivation.ImmortalPerks;
@@ -100,6 +101,11 @@ final class StatusPage extends Page {
 	}
 
 	@Override
+	public String helpTopic() {
+		return "meditation";
+	}
+
+	@Override
 	protected void build() {
 		CultivationData data = data();
 		builtMortalUntested = mortalUntested(data);
@@ -151,7 +157,7 @@ final class StatusPage extends Page {
 		meditate.onPress(() -> send(Actions.MEDITATE_TOGGLE));
 		meditate.tooltip(() -> List.of(Component.translatable("kultivator.screen.btn.meditate"),
 				Component.translatable("kultivator.screen.btn.meditate.tip"),
-				Component.translatable("kultivator.screen.key_hint", Keys.MEDITATE.getTranslatedKeyMessage())));
+				Component.translatable("kultivator.screen.key_hint", KeyHints.name(Keys.MEDITATE))));
 		row.add(meditate);
 
 		builtSummit = data.rank().isMax();
@@ -412,7 +418,7 @@ final class StatusPage extends Page {
 		}
 		// The Persiapan summary (DESIGN 19.3.10): strikes, quality bonus, healing needed.
 		lines.addAll(PrepView.tooltip(data));
-		lines.add(Component.translatable("kultivator.screen.key_hint_bt", Keys.MEDITATE.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+		lines.add(Component.translatable("kultivator.screen.key_hint_bt", KeyHints.name(Keys.MEDITATE)).withStyle(ChatFormatting.DARK_GRAY));
 		return lines;
 	}
 

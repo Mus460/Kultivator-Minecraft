@@ -19545,3 +19545,392 @@ by alpha. No allocation per frame in the draw paths.
     tetap terdengar dan tidak dobel.
 26. Teks: setiap kunci `kosmik*` ada di en_us dan id_id; semua Sumber lama tetap sama; semua tekstur tampak benar (tanpa
     ungu-hitam), tepi cahaya lembut; model istana rapi dari segala arah, tidak ada wajah hilang atau berkedip.
+
+## 33. UI/UX Terpadu
+
+User request (2026-10-21, Indonesian, binding): the GUI and the keys are hard to use; make every feature easy to reach,
+remove what is duplicated or not needed. Follow-up (binding): every frequently used key must be easy to reach from the
+left hand on WASD, never far keys such as `;` `'` `-` `,` `.` `\` or the numpad.
+
+### 33.0 Scope and what stays (binding)
+
+- UI and key layout only. No gameplay or balance change, no new block change, no new heavy rendering (the hub and the
+  Akses Cepat wheel are GUI fills and the existing jade widgets), no post chains. Every Sumber line, every number and
+  the block-safety rules of 22/23/30 stay. The 7b camera rules stay (the wheel and the hub never open while a film shot
+  runs; WASD still skips a shot, 23.7.4).
+- Every feature stays reachable, and every `/kultivasi ...` command keeps working (commands are not UI, but no UI path
+  may need a typed command).
+- Stored values stay: every row of `config/kultivator-client.json` keeps its key and meaning; saved key bindings the
+  player changed stay (33.4.3).
+- Lang only in `lang-src/<fragment>.en_us.json` + `.id_id.json` with identical keys (the `mergeLang` task fails on a
+  key defined twice, so every new key lives in exactly one fragment: 33.9).
+- Server code never references client classes. ItemStacks lazily. Keep each file's line endings.
+
+### 33.1 Facts from the code (audit, 2026-10-21)
+
+Vanilla 26.3 key defaults (mcsrc `Options`; `InputConstants` now uses USB/SDL scancodes: `KEY_A = 4` ... `KEY_Z = 29`,
+`KEY_1 = 30`): W A S D move, Space jump, Left Shift sneak, Left Ctrl sprint, **E** inventory, **F** swap offhand,
+**Q** drop, **T** chat, **Tab** player list, **/** command, **O** friends (new), **P** social interactions, **L**
+advancements, **G** quick actions (new: `keyQuickActions`, opens the server's `quick_actions` dialog, does nothing when
+the server defines none), **C / X** creative hotbar save / load activators, 1-9 hotbar, F1 hide GUI, F2 screenshot, F3
+debug (+ letters A B C D G H I L N P T V and 1-4, only while F3 is held), F4 spectator shader, F5 perspective, F11
+fullscreen; mouse left attack, right use, middle pick. Mouse buttons are 1-based (`MOUSE_BUTTON_4 = 4`, `_5 = 5`) and a
+`KeyMapping` may use `InputConstants.Type.MOUSE`.
+
+`KeyBindsList.refreshEntry` marks a duplicate only when at least one of the two mappings is **not** at its default, so
+two default bindings on one key never show red; and `Options` saves **every** mapping to `options.txt`
+(`key_<name>:<key>`), so a changed default never reaches a player who already launched once (33.4.3 migrates).
+
+Installed mods (`%APPDATA%/.minecraft/versions/SODIUM/mods`, read from the jars' `Keybindings` / `Iris` classes):
+Combat Roll **R** (roll, movement category); Iris **R** (reload, used with F3), **K** (toggle shaders), **I** (shader
+pack screen), wireframe unbound; Better Combat feint and toggle-mine unbound; Sodium, Player Animation Library, EMF/ETF,
+Dynamic FPS, ImmediatelyFast, Chunky, tl skin cape: no default keys.
+
+#### 33.1.1 Key mappings today (18, category "Kultivator")
+
+| id | default | read by | does |
+|---|---|---|---|
+| `cast` | G | `CodexClient` | tap: cast the selected art; held ≥ 250 ms with "Tahan G untuk roda" (default on): Roda Segel |
+| `meditate` | `;` | `Keys` | toggle meditation |
+| `info` | `'` | `Keys`, `CultivationScreen`, `GuideTracker` (held: the tracker peeks) | open/close the jade scroll |
+| `previous` / `next` | `,` / `.` | `CodexClient` | cycle the loadout (1.2 s carousel) |
+| `flying_sword` | `\` | `Keys` | toggle the flying sword |
+| `codex` | `-` | `CodexClient`, `CodexScreen`, `CultivationScreen` | open/close the Kitab Teknik |
+| `wheel` | unbound | `CodexClient` | hold: Roda Segel (only when bound; then G casts on press) |
+| `seal_1..4` | unbound | `CodexClient` / `QuickSeals` | cast loadout slot 1-4 |
+| `dunia` | unbound | `Keys`, `DuniaScreen` | open/close the Dunia screen |
+| `cincin` | unbound | `Keys` | `TEMPA "ring:open"` (highest bound ring in the bag) |
+| `murid` | M | `Keys`, `DiscipleScreen` | disciple looked at / nearest; again inside: next disciple |
+| `abadi` | unbound | `Keys`, `KeabadianScreen` | open/close the Keabadian screen |
+| `guide` | unbound | `GuideClient`, `GuideScreen` | open/close the Kitab Panduan |
+| `skip_scene` | Backspace | `epic.camera.SkipKey` | end the running shot (double press: bars off) |
+
+Six of the 18 are far keys (`; ' , . \ -`) and seven are unbound, so Dunia, Keabadian and Cincin have **no key and no
+button anywhere**, and the Kitab Panduan only the 8th tablet of the scroll: today they are reachable mostly by command.
+
+#### 33.1.2 Screens, tabs and where they open from
+
+| screen (class) | tabs / pages | opened from today |
+|---|---|---|
+| Gulungan Kultivasi `CultivationScreen` | 1 Status (+ Persiapan coin, Gua coin, meditate / breakthrough or star / reforge / root-test talismans), 2 Akar & Dao (root-test talisman, Dao choice), 3 Teknik (launcher: Kodeks, Cincin Segel, Kehancuran), 4 Pengaturan, 5 Bantuan (all help topics + key list), 6 Jalan (Langkah / Ujian / Harian, book coin, Sembunyikan panduan coin, Ambil hadiah), 7 Alkimia; 8th tablet: Kitab Panduan (a separate screen) | `'`; server `OpenScreen.INFO` (`/kultivasi jalan` → 5, the Kitab Alkimia command → 6, Dao choice → 1) |
+| Kitab Teknik `CodexScreen` | Kodeks, Cincin Segel (loadout), Mode Kehancuran (self), Bantuan (4 topics + technique key list) | `-`; Teknik tab talismans; `OpenScreen.CODEX` |
+| Roda Segel `SealWheel` (HUD) | 12 seals | hold G / the wheel key |
+| Gulungan Murid `DiscipleScreen` | Status, Teknik, Perintah, Pil, Bakat, Pusaka, Jalan | M; server `OpenScreen.DISCIPLE` (right-click the disciple) |
+| Aula Sekte `HallScreen` | 13 tablets in a scrolling column: Aula, Bangun, Formasi, Calon Murid, Jenjang, Perbendaharaan, Tugas, Misi, Arena, Catatan, Segel Merah (only with Kehancuran allowed), Pertahanan, Desa | right-click the Prasasti Sekte (`Halls` → `OpenScreen.HALL`); `/kultivasi formasi katalog` opens the own hall remotely on Formasi; sneak-use of a transport eye (Formasi) |
+| Templat Sekte `TemplateScreen` | 9 templates | founding / relocation / `sectbuild screen` |
+| Dunia `DuniaScreen` | Alam, Pusaka, Musuh, Desa (compact read-only copy of the hall's Desa) | `dunia` key (unbound), `/kultivasi dunia [tab]` |
+| Keabadian `KeabadianScreen` | Alam Abadi, Purba, Bencana, Batin, Ciptaan, Lelang | `abadi` key (unbound), `/kultivasi abadi [tab]` |
+| Titah Langit `TitahScreen` | 4 decree cards, sliders, coins, **Film Penuh / Singkat / Mati per decree** (a client setting that lives only here) | sneak-use of the Segel Titah Langit; `/kultivasi titah` |
+| Kitab Panduan `GuideScreen` | chapters, step cards, command chips, manual ticks | 8th tablet of the scroll, `guide` key (unbound), `/kultivasi panduan` |
+| Cincin `RingScreen` | ring rows | `cincin` key (unbound), item use |
+| Tungku `ForgeScreen` | Tempa Baru, Tempa Ulang, Roh, Cincin (forging a ring, not the storage ring screen) | the forge block |
+| `TreasureScreen`, `KehancuranConfirmScreen`, `MotionWarningScreen`, `PhotosensitivityScreen` | one-shot dialogs | server / settings flows (unchanged) |
+
+HUD elements (all drawn before the chat, hidden with F1): `QiHud` (orb, seal tile, gauges, vein, stars), `CodexHud`
+(wheel, quick seals, charge bar, carousel, toasts), `GuideTracker` (the Langkah Pertama step **and** the Kitab Panduan
+"Panduan: Bab N" line: already one tracker, there is no second one to merge), `TribulationHud`, `MeditationAlert`,
+`AuraHud`, `AlarmHud`, `BuildHud`, `ElitePlate`, `VoiceCaptions`, `TargetMark.Hud`, `CloudWipe`, `ImpactFrame`,
+`ScreenFlash.Hud`, `TitleCard.Hud`, `EpicScreen`, `RedSkyHud`. No HUD duplicates were found; none is removed.
+
+Settings rows today: all but one group already live in the scroll's Pengaturan tab, as one long scrolling column:
+Kualitas efek ×4 + Otomatis; Kosmetik ×5; Antarmuka: HUD, Hardcore; Teknik: guncangan, kilatan, bayangan, efek pemain
+lain, tahan G untuk roda, lepas = rapal, kurangi gerakan; Aura: mode, aura orang lain, dengung; Panduan: ping cooldown,
+peringatan bahaya, pelacak panduan; Momen Epik: the 18 `EpicSettings.rows()` (kamera, lapisan lensa, langit kosmik,
+film kosmik 3D, waktu beku, perjalanan langit, bingkai dampak, dampak sunyi, puing & monumen, daya dampak, bilah layar
+lebar, kartu judul, musik sinematik, gerak lambat, geometri raksasa, langit berubah, skala VFX, mode rekam); Suara:
+suara bicara, teks suara, kredit VOICEVOX. Scattered or duplicated: the four **Film Titah** choices live only in
+`TitahScreen`; the **Sembunyikan panduan** coin exists twice (Jalan tab and Pengaturan, the same `JALAN show/hide`
+action); the key list exists twice (the scroll's Bantuan tab and the codex's Bantuan tablet) and is not settings at all.
+
+### 33.2 Problems found
+
+Duplicates (the same thing in two places):
+1. Help: the scroll's Bantuan tab (≈ 75 topics), the codex's Bantuan tablet (4 of those same topics: `teknik`,
+   `penguasaan`, `kitab_teknik`, `kehancuran_diri`) and the Kitab Panduan (a third, step-by-step help). Two key lists.
+2. Desa: the Dunia screen's Desa tab is a read-only copy of the hall's Desa tablet ("the full cards with their actions
+   live on the hall's Desa tablet").
+3. "Sembunyikan panduan": the Jalan tab coin and the Pengaturan coin.
+4. The Uji Akar talisman: on Status and on Akar & Dao, identical behaviour.
+5. Next raid: Dunia › Musuh repeats the first block of Sekte › Pertahanan.
+6. Opening behaviour: `'` and the 8th tablet open different kinds of things with the same jade look (a tab vs. a
+   separate screen); the codex opens from `-`, from three talismans and from inside the scroll, and Esc in a screen
+   opened from the scroll closes everything instead of going back.
+
+Confusing:
+7. Three "cincin / roda" names: Cincin Segel (the loadout), Roda Segel (the wheel), Cincin (the storage ring).
+8. Two "Kehancuran" pages with a Pulihkan talisman each: the codex's Mode Kehancuran (the player's own) and the hall's
+   Segel Merah (disciples' Destroyer arts). Different subjects, the same words.
+9. The hall's 13 tablets scroll (at 240 px tall about 6 fit); related pages are far apart (Calon / Jenjang, Tugas / Misi /
+   Arena, Pertahanan / Desa).
+10. Lang texts with hard-coded keys ("Tekan ' (apostrof)", "tekan ; (titik koma)", "Tekan -", "tahan '" in `guide.*`),
+    wrong as soon as a key is rebound.
+11. Locked or far features fail silently or are invisible: Dunia, Keabadian, Titah and Cincin have no button; the Aula
+    has no path except walking to the stele.
+
+Dead UI: no button whose `enabledWhen` can never be true was found. The dead ends are the unbound keys with no button
+(`dunia`, `abadi`, `cincin`, `guide`, `wheel`, `seal_1..4`) and the 8th tablet as the only button to the Kitab Panduan.
+
+### 33.3 The hub (Gulungan Kultivasi = the one way in)
+
+The jade scroll `CultivationScreen` becomes the hub. Left edge: **8 jade tablets**, one per section, in play order;
+number keys **1-8** switch section; the header line shows the section's **sub-coins** (a row of small jade coins drawn in
+the header strip, so the content area keeps its size); `Tab` / `Shift+Tab` step through the sub-coins; a "?" seal at the
+right end of the header opens Panduan › Ensiklopedia on the page's topic.
+
+| # | section | sub-coins / cards | opens | locked state (from synced client data only) |
+|---|---|---|---|---|
+| 1 | **Diri** | Status · Akar & Dao · Jalan · Alkimia | the existing `StatusPage`, `RootDaoPage`, `JalanPage`, `AlchemyBookPage` | never |
+| 2 | **Teknik** | launcher card (`TechniquesPage`) | Kitab Teknik on Kodeks / Rangkai Segel / Kehancuran Diri | never |
+| 3 | **Murid** | card "Murid terdekat" + key hint | `DISCIPLE_OPEN -1` (the server answers as for M) | never (the server says when none is near) |
+| 4 | **Sekte** | cards: Aula, Bangun, Formasi, Anggota, Perbendaharaan, Kegiatan, Wilayah, Segel Merah Murid | `HubNav.openHall(page)` (new own-hall op, C33.N4) on that tablet | no own hall in `HallClient.info()` after a refresh: one card "Dirikan sekte: rakit dan letakkan Prasasti Sekte" (links the help topic with the recipe) and the other cards greyed "butuh Prasasti Sekte" |
+| 5 | **Dunia** | cards: Alam Rahasia, Pusaka, Musuh, Cincin | `DuniaScreen` tab 0 / 1 / 2; Cincin = `TEMPA "ring:open"` | Alam Rahasia greyed "terbuka di Pemurnian Qi" while the realm is Mortal (`RealmSpecs`: the first gate is Qi Refining); the pages explain their other locks themselves |
+| 6 | **Keabadian** | cards: Alam Abadi, Purba, Bencana, Batin, Ciptaan, Lelang, Titah Langit | `KeabadianScreen` tab 0-5; Titah = the new `TITAH` open op | Alam Abadi always (it explains the ascent); the next five greyed "terbuka setelah naik ke Alam Abadi" until the phase-9 ascended flag is true (the `ascended` of the Batin sync; not `CultivationData.ascended()`, which is the phase-5 Ascension; verify the accessor); Titah greyed "terbuka di Dewa Abadi Sejati" below True Immortal, "butuh Segel Titah Langit di tas" without the player's seal in the inventory |
+| 7 | **Panduan** | Kitab Panduan (talisman: the step book) · Ensiklopedia (`HelpPage`, now with a topic index) | `GuideClient.open(hub)`; `HelpPage` | never |
+| 8 | **Pengaturan** | Tampilan & Efek · Kamera & Film · Suara · HUD · Kontrol | `SettingsPage` (module G, 33.5) | never |
+
+A greyed card is drawn at 45 % ink with a small lock seal; hovering shows the lock line; clicking it plays the tablet
+"thock" and shows the lock line under the card for 2 s (never a silent no-op). The hub never duplicates a server gate it
+cannot see: anything not listed above opens, and the page itself explains.
+
+Legacy tab ids stay valid (`CultivationScreen(int tab)` and `OpenScreen.INFO` args): 0 → Diri/Status, 1 → Diri/Akar &
+Dao, 2 → Teknik, 3 → Pengaturan, 4 → Panduan/Ensiklopedia, 5 → Diri/Jalan, 6 → Diri/Alkimia. The hub remembers the last
+section and sub-coin for the session (a plain static, no file).
+
+Layout: at 320 × 240 the 8 tablets are 24 px tall with glyph and a one-word name; below 230 px of paper the tablets show
+the glyph only (≥ 18 px) and the name moves to the tooltip, which always also names the number key. Sub-coins shrink
+their text to ≥ 0.6 scale and, when they still do not fit, show the first 4 letters with the full name in the tooltip.
+No text below 0.6 scale; nothing drawn over other text (header title, coins and "?" each get their own box).
+
+#### 33.3.1 Akses Cepat (the radial)
+
+One key, **V**: a **tap** (< 250 ms) opens the hub on the last section; **holding** V opens the Akses Cepat wheel around
+the crosshair (HUD only, like the Roda Segel: the mouse moves a virtual pointer, WASD keeps working, releasing V on a
+slice chooses, releasing in the centre opens the hub, right click or Esc cancels, 1-8 choose a slice directly). Eight
+slices, clockwise from the top:
+
+1 Meditasi · 2 Pedang Terbang · 3 Kitab Teknik · 4 Murid · 5 Cincin · 6 Dunia · 7 Keabadian · 8 Kitab Panduan.
+
+Slices 6 and 7 open the hub on the Dunia / Keabadian section (the cards show what is open). The Akses Cepat wheel and the
+Roda Segel are never open together (opening one closes the other). Neither opens while a film shot runs, while a screen
+is open, or while the tribulation HUD is live (danger). Holding V also peeks the guide tracker (the role `'` had).
+
+### 33.4 Keys
+
+#### 33.4.1 New default table
+
+| key | id | does | old default |
+|---|---|---|---|
+| **G** | `cast` | tap: cast; hold: Roda Segel | G (kept) |
+| **V** | `quick` (new) | tap: hub; hold: Akses Cepat wheel | — |
+| **Z** | `next` | next seal of the loadout (carousel) | `.` |
+| **B** | `meditate` | meditate on/off (also on the wheel) | `;` |
+| **H** | `flying_sword` | flying sword on/off (also on the wheel) | `\` |
+| M | `murid` | disciple scroll (kept; also on the wheel and in the hub) | M |
+| Backspace | `skip_scene` | skip a shot (WASD, jump, attack ... also skip it, 23.7.4) | Backspace (kept) |
+| unbound | `info` | the hub without the wheel (for players who want a plain toggle) | `'` |
+| unbound | `previous` | previous seal (the Roda Segel picks directly; a mouse side button is a good choice) | `,` |
+| unbound | `codex` | Kitab Teknik (wheel slice 3, hub section 2) | `-` |
+| unbound | `wheel`, `seal_1..4`, `dunia`, `abadi`, `cincin`, `guide` | unchanged (all reachable from V and the hub) | unbound |
+
+Core layout: **G, V, Z** (three keys beside WASD) reach everything; B and H are one-tap shortcuts for the two toggles
+players use most. Checked against 33.1: Z, V, B, H are free in vanilla (apart from the F3 debug combos F3+V, F3+B, F3+H,
+which then also press our key, harmless), in Combat Roll, Iris and Better Combat. Not used on purpose: R (Combat Roll,
+Iris), Q E F T Tab (vanilla), X C (creative hotbar activators), K I (Iris), O P L (vanilla), Caps Lock (toggles the OS
+state and capitalises chat). G stays as the user asked; vanilla's `key.quickActions` is also G and only acts on a server
+that defines a quick-actions dialog (then both fire; the Kontrol group says so and links to the controls screen). Two
+defaults on G never show red (the `KeyBindsList` rule above).
+
+Key name (lang `hub.*`): `key.kultivator.quick` "Akses Cepat (ketuk: Gulungan, tahan: roda)" / "Quick Access (tap:
+scroll, hold: wheel)". The other names stay. All keys stay in the "Kultivator" category.
+
+#### 33.4.2 Keys inside screens (one rule set)
+
+- **Esc** closes the top overlay first (search, slip, confirm), then: in the hub, closes it; in a screen opened from the
+  hub, returns to the hub on the section it came from; in a screen opened from the world, closes it.
+- **V** (the `quick` key) closes the hub and any screen opened from it in one press; the `info` key (if bound) does the
+  same. A screen's own toggle key (`codex`, `dunia`, `abadi`, `guide`, M) still closes that screen (M inside the disciple
+  scroll still means "next disciple").
+- **1-8** in the hub: sections (inside Dunia, Keabadian and the disciple scroll the number keys keep switching their own
+  tabs, as today).
+- **Tab / Shift+Tab**: the sub-coins of the hub section.
+- Every icon (tablet, coin, card, slice, "?") has a tooltip: name, one line of what it does, the key if any, the lock line
+  if locked.
+
+#### 33.4.3 Migrating saved keys (players who never rebound)
+
+`options.txt` holds every mapping, so new defaults alone change nothing for an existing install. On
+`ClientLifecycleEvents.CLIENT_STARTED`, once (`key_layout` < 2 in `config/kultivator-client.json` through
+`EffectQuality.get/put`): for each moved mapping (`meditate` `;`, `info` `'`, `previous` `,`, `next` `.`,
+`flying_sword` `\`, `codex` `-`) whose `saveString()` equals the **old** default's
+`InputConstants.Type.KEYBOARD.getOrCreate(old).getName()`, call `setKey(getDefaultKey())`; then
+`KeyMapping.resetMapping()`, `options.save()` and write `key_layout = 2`. A mapping the player changed is left alone
+(it stays their key). A fresh install already has the new defaults. One chat line after a migration (on the first
+world join): "Tombol Kultivator dipindah ke dekat WASD: G rapal, V Akses Cepat, Z teknik berikutnya, B meditasi, H pedang
+terbang. Ubah di Pengaturan › Kontrol."
+
+### 33.5 Pengaturan (one section, five groups)
+
+`SettingsPage` keeps its jade look (talismans for cycles, jade coins for toggles), its scrolling right column and every
+stored key; it gains the five sub-coins of the hub header and shows one group at a time (no long scroll):
+
+| group | rows (existing keys and setters, unchanged) |
+|---|---|
+| **Tampilan & Efek** | Kualitas efek (Minimal / Normal / Maksimal / Otomatis, the left column as today); Kosmetik ×5; Aura: mode, aura orang lain; Teknik: guncangan layar, kilatan layar, bayangan, efek pemain lain, kurangi gerakan; Dampak: puing & monumen, daya dampak, geometri raksasa, langit berubah, skala VFX momen |
+| **Kamera & Film** | kamera sinematik (Penuh / Singkat / Mati / Spektakuler with its warning), lapisan lensa, langit kosmik, film kosmik 3D, waktu beku, gerak lambat, perjalanan langit, bingkai dampak (with its warning), dampak sunyi, bilah layar lebar, kartu judul, mode rekam; **Film Titah**: Pedang, Tiang, Bintang, Gunung (moved from `TitahScreen`; `EpicSettings.titahFilm / setTitahFilm`) |
+| **Suara** | musik sinematik, dengung aura, suara bicara, teks suara, kredit VOICEVOX |
+| **HUD** | HUD Kultivator, ping cooldown, peringatan bahaya, pelacak panduan (the only "Sembunyikan panduan" coin: server `JALAN show/hide`, needs the connection) |
+| **Kontrol** | tahan G untuk roda, lepas = rapal; the live list of every Kultivator key (name + bound key or "tidak diikat"); a talisman "Ubah tombol…" opening vanilla `KeyBindsScreen(hub, options)`; the G / quick-actions note; under a small "Permainan" heading at the bottom: Hardcore terobosan (its 3 s second-click confirm kept) |
+
+Rows come from the same sources (`EffectQuality`, `AuraSettings`, `EpicSettings.rows()` sorted into groups by row key,
+`VoiceSettings.rows()`); a row key missing from the group table falls into Tampilan & Efek, so a later module's row is
+never lost. The 7b rule "settings must survive every edit" (23.17.5) holds: every row listed in 33.1 appears exactly
+once.
+
+### 33.6 What is merged or removed, and why
+
+| # | change | why |
+|---|---|---|
+| R1 | Codex Bantuan tablet removed (`BantuanPage` deleted); the codex header gets "?" → Panduan › Ensiklopedia on `kitab_teknik`; `CodexScreen.TAB_HELP` (3) and `OpenScreen.CODEX` arg 3 open that topic | duplicate of 4 Ensiklopedia topics and of the key list |
+| R2 | Key lists removed from `HelpPage` and the codex; one live list in Pengaturan › Kontrol | duplicate, and it is a control setting |
+| R3 | The scroll's 8th "Kitab Panduan" tablet replaced by section 7 Panduan | the same look opened a different kind of thing |
+| R4 | Dunia's Desa tab removed (`DesaPage` deleted; its "how to pledge" text moves to the hall Desa tablet's empty state); `OpenScreen.DUNIA` arg 3 / `/kultivasi dunia desa` → `HubNav.openHall(PAGE_DESA)` | read-only copy of the hall's Desa |
+| R5 | The Jalan tab's "Sembunyikan panduan" coin removed (the Langkah list keeps one line "Pelacak: Pengaturan › HUD") | duplicate |
+| R6 | The Akar & Dao Uji Akar talisman removed (a one-line hint "Uji akar: talisman di Status" stays while untested) | duplicate; Status is where new players land |
+| R7 | Dunia › Musuh: the next-raid block becomes one line + a link card to Sekte › Wilayah › Pertahanan | duplicate block |
+| R8 | Hall tablets grouped 13 → 8 (sub-coins in the header): Aula (Aula · Catatan), Bangun, Formasi, Anggota (Calon Murid · Jenjang), Perbendaharaan, Kegiatan (Tugas · Misi · Arena), Wilayah (Pertahanan · Desa), Segel Merah Murid (only when allowed). `Halls.PAGE_*` ids unchanged; the screen maps a page id to tablet + sub-coin | no tablet scrolling at 240 px; related pages together |
+| R9 | Renames (display text only, ids unchanged): "Cincin Segel" → "Rangkai Segel"; codex "Mode Kehancuran" → "Kehancuran Diri"; hall "Segel Merah" → "Segel Merah Murid"; each Kehancuran page gets one line linking to the other | name clashes (33.2 items 7, 8) |
+| R10 | `TitahScreen` Film buttons replaced by one chip "Film: Penuh ▸" that opens Pengaturan › Kamera & Film (Film Titah) | scattered setting |
+| R11 | Hard-coded keys in lang texts become tokens `[[key:<id>]]` (e.g. `[[key:meditate]]`) that `KeyHints.fill` replaces with the live key name in the Kitab Panduan, the Ensiklopedia and the tracker | rebinding broke the texts |
+| R12 | `GuideTracker` peeks while the `quick` key (or `info`, if bound) is held | `'` is no longer a default |
+| R13 | Keys `info`, `previous`, `codex` lose their default (33.4) | far keys; reachable through V |
+
+Kept on purpose (not duplicates): the Status meditate talisman, the B key and the wheel slice (one action, several ways
+in); the Teknik launcher talismans (the hub's way into the codex); Musuh (own encounters) vs. Pertahanan (sect raids);
+the Jalan tab (Langkah Pertama with rewards, server progress) and the Kitab Panduan (the step book with its own
+progress): two progressions with different rewards, merging them would change gameplay, and one tracker already shows
+both.
+
+### 33.7 Modules and contracts (exactly three, disjoint files)
+
+#### Module N: hub navigation, keys, wheel
+
+Files (only N edits them): `client/Keys.java`, `client/KultivatorClient.java`, `client/screen/CultivationScreen.java`,
+`client/screen/Page.java`, new `client/screen/HubCardsPage.java` (Murid, Sekte, Dunia, Keabadian, Panduan launcher
+cards), new `client/hub/HubNav.java`, new `client/hub/QuickWheel.java`, new `client/hub/KeyLayout.java`,
+`client/codex/CodexClient.java`, `client/codex/SealWheel.java` (visibility / mutual exclusion only),
+`client/mixin/MouseHandlerMixin.java` (routes the mouse to `QuickWheel` while open), server
+`main/.../sect/hall/Halls.java` (OP_OPEN), `main/.../pusakalangit/TitahSettings.java` and `PusakaLangit.java` (OP_OPEN),
+new `lang-src/hub.en_us.json` + `hub.id_id.json`.
+
+- **C33.N1** `HubNav` (public, client):
+  `DIRI=0, TEKNIK=1, MURID=2, SEKTE=3, DUNIA=4, KEABADIAN=5, PANDUAN=6, PENGATURAN=7`;
+  `GROUP_TAMPILAN=0, GROUP_FILM=1, GROUP_SUARA=2, GROUP_HUD=3, GROUP_KONTROL=4`;
+  `static void openHub(int section)`, `static void openSettings(int group)`, `static void help(String topic)`,
+  `static void openHall(int page)`, `static void openChild(Screen child, int section)`,
+  `static void expectChild(Class<? extends Screen> type, int section)` (a server-opened screen arriving within 3 s counts
+  as a child), `static boolean fromHub(Screen screen)`.
+- **C33.N2** Back behaviour without editing other screens: N registers Fabric `ScreenEvents.AFTER_INIT` and, for a hub
+  child, `ScreenKeyboardEvents.allowKeyPress` (verify the Fabric screen API signatures in the jar): the `quick` / `info`
+  key closes everything (returns false); Esc only marks "Esc pressed"; on the next client tick, if the screen is now
+  null, the mark is ≤ 2 ticks old and no film shot runs, the hub reopens on the remembered section. `GuideScreen` keeps
+  its own parent (the hub instance).
+- **C33.N3** `CultivationScreen(int legacyTab)` keeps the 33.3 mapping; the `TAB_*` constants keep their values. The hub
+  draws the sub-coins and "?" for every section; package methods used by P and G: `HelpPage.focus(String topic)` (P
+  implements), `SettingsPage.showGroup(int group)` (G implements); every `Page` gets `String helpTopic()` (default
+  `"jalan"`) and `List<Component> subNames()` / `void showSub(int)` (default: none), overridden by P and G in their
+  pages.
+- **C33.N4** Server ops (access only, no new power): `Halls.OP_OPEN = 14`, text = the page id: if the player owns a hall
+  core, `openScreen(player, self, page)` (the path `/kultivasi formasi katalog` already takes); else the action-bar line
+  `kultivator.hub.sekte.none`. Sect mates still open another master's hall at its stele. `TitahSettings.OP_OPEN = 4`: the
+  same as `/kultivasi titah` (needs the player's seal in the bag, the same message).
+- **C33.N5** Keys and wheel as 33.3.1 / 33.4; `KeyLayout` as 33.4.3; `QuickWheel.isOpen()`, `QuickWheel.close()`; while
+  it is open `CodexClient` does not open the Roda Segel, and the other way round.
+
+#### Module P: pages and duplicates
+
+Files (only P edits them): `client/codex/CodexScreen.java`, `client/codex/BantuanPage.java` (delete),
+`client/codex/CodexPage.java`, `client/codex/KehancuranPage.java`, `client/screen/HelpPage.java`,
+`client/screen/RootDaoPage.java`, `client/screen/JalanPage.java`, `client/screen/TechniquesPage.java`,
+`client/screen/StatusPage.java`, `client/screen/AlchemyBookPage.java`, `client/dunia/DuniaScreen.java`,
+`client/dunia/DuniaClient.java`, `client/dunia/DuniaPage.java`, `client/keabadian/KeabadianScreen.java`,
+`client/desa/DesaPage.java` (delete), `client/desa/HallDesaPage.java`, `client/musuh/MusuhPage.java`,
+`client/hall/HallScreen.java`, `client/hall/HallPage.java`, `client/kehancuran/RedSealPage.java`,
+`client/pusakalangit/TitahScreen.java`, `client/goals/GuideTracker.java`, `client/guide/GuideScreen.java`, new
+`client/screen/ui/KeyHints.java`; value edits in `lang-src/guide.*`, `goals.*`, `screen.*`, `codex.*`, `desa.*`,
+`musuh.*`, `spine6.*` (only the rows R4-R11 touch); new `lang-src/uxpages.en_us.json` + `uxpages.id_id.json`.
+
+- **C33.P1** R1-R12 exactly as 33.6. `HelpPage.focus(String topic)` scrolls to the topic and highlights its heading for
+  1 s; `HelpPage` gains a topic index (jade coins with the first letters of the titles at the top, ≥ 0.6 scale) and loses
+  the key list. Every hub page overrides `helpTopic()`; the codex, Dunia, Keabadian, hall and Titah screens draw a "?"
+  seal calling `HubNav.help(topic)`.
+- **C33.P2** `KeyHints.fill(Component)` returns a Component with `[[key:<id>]]` replaced by
+  `getTranslatedKeyMessage()` of `key.kultivator.<id>` ("tidak diikat · Akses Cepat (V)" when unbound).
+- **C33.P3** `HallScreen`: 8 tablets, the page-id → (tablet, sub) map, sub-coins in the header; a `requestedPage` from
+  the server lands on the right tablet and sub-coin.
+- **C33.P4** `DuniaClient.open(DUNIA_DESA)` calls `HubNav.openHall(Halls.PAGE_DESA)`; Dunia has 3 tablets (ids 0-2
+  unchanged); `DiscipleScreen` is not edited (its back behaviour comes from C33.N2).
+
+#### Module G: one Pengaturan
+
+Files (only G edits them): `client/screen/SettingsPage.java`, new `client/screen/SettingsRows.java` (group table and row
+builders), `client/epic/EpicSettings.java` (only a `group(String rowKey)` helper and the Titah film rows),
+`client/aura/AuraSettings.java`, `client/voice/VoiceSettings.java` (only if a row needs a group tag), new
+`lang-src/pengaturan.en_us.json` + `pengaturan.id_id.json`. `EffectQuality.java` is read-only for G (its getters and
+setters are used as they are).
+
+- **C33.G1** 33.5 exactly; `SettingsPage(CultivationScreen)` keeps its constructor; `void showGroup(int group)` takes the
+  `HubNav.GROUP_*` ids; the group sub-coins go through the header API of C33.N3 (`subNames()` / `showSub`).
+- **C33.G2** Every stored key keeps its name and default; the first-time warnings (`MotionWarningScreen`,
+  `PhotosensitivityScreen`) still return to the hub on the same group.
+- **C33.G3** Kontrol lists `Keys` + `SkipKey.SKIP` live; "Ubah tombol…" opens `new KeyBindsScreen(hub, minecraft.options)`
+  (verified constructor `KeyBindsScreen(Screen, Options)`).
+
+Order: N first (P and G compile against `HubNav` and the header API; stubs with the exact signatures are fine), then P
+and G in parallel.
+
+### 33.8 Verified 26.3 API (mcsrc / jars)
+
+`Options.keyMappings` (includes `debugKeys`), `keyQuickActions` = G, `keyFriends` = O; the `InputConstants.KEY_*`
+scancodes (33.1), `InputConstants.Type.KEYBOARD.getOrCreate(int)`, `Key.getName()`, `MOUSE_BUTTON_4/5`;
+`KeyMapping.setKey`, `getDefaultKey`, `isDefault`, `saveString`, `isUnbound`, `KeyMapping.resetMapping()`;
+`Options.save()`; the `KeyBindsList.refreshEntry` duplicate rule; `KeyBindsScreen(Screen, Options)`; Fabric
+`ClientLifecycleEvents.CLIENT_STARTED`, `ScreenEvents`, `ScreenKeyboardEvents.allowKeyPress` (fabric-screen-api-v1
+5.2.4 in the Gradle cache: check the signatures before use).
+
+### 33.9 Lang
+
+New keys only in `hub.*` (N: section and card names, lock lines, wheel slices, `key.kultivator.quick`, the migration
+line, `kultivator.hub.sekte.none`), `uxpages.*` (P: link lines, renamed-tab hints, empty states, "?" tooltips) and
+`pengaturan.*` (G: group names and tips, the Kontrol texts). Existing values change only where 33.6 says, in the
+fragments assigned to P. Both languages always together.
+
+### 33.10 Uji (Indonesia)
+
+1. Instal baru: Kontrol › Kultivator menunjukkan G, V, Z, B, H, M, Backspace; tidak ada yang merah.
+2. Instal lama dengan `;` `'` `,` `.` `\` `-` bawaan: setelah masuk, meditasi pindah ke B, teknik berikutnya ke Z, pedang
+   terbang ke H, info/sebelumnya/kodeks menjadi tidak diikat; satu baris chat muncul sekali; tombol yang pernah diubah
+   pemain tetap.
+3. Ketuk V: Gulungan terbuka di bagian terakhir; V lagi menutup. Tahan V: roda Akses Cepat; lepas di tiap irisan
+   menjalankan fungsinya; lepas di tengah membuka Gulungan; klik kanan/Esc batal; WASD tetap jalan.
+4. Tahan G: Roda Segel; roda Akses Cepat tidak bisa terbuka bersamaan.
+5. Tombol 1-8 berpindah bagian; Tab/Shift+Tab berpindah sub-koin; tiap tablet, koin, kartu dan "?" punya tooltip.
+6. Dari Gulungan buka Kitab Teknik, Dunia, Keabadian, Aula, Murid, Kitab Panduan: Esc kembali ke bagian asal; V menutup
+   semuanya. Dibuka dari dunia (klik kanan prasasti, M, perintah): Esc menutup.
+7. Fana: kartu Alam Rahasia abu-abu "terbuka di Pemurnian Qi"; belum naik ke Alam Abadi: lima kartu Keabadian abu-abu;
+   Titah abu-abu dengan alasan yang benar; klik kartu terkunci menampilkan alasan, tidak diam.
+8. Tanpa sekte: Sekte menunjukkan "Dirikan sekte"; dengan sekte: Aula terbuka dari jauh pada tablet yang dipilih; murid
+   sekte lain tetap harus ke prasasti.
+9. Aula: 8 tablet tanpa gulir di 320 × 240; `/kultivasi formasi katalog` dan sneak-use mata transport mendarat di
+   Formasi; kandidat (Calon) dari server mendarat di Anggota › Calon Murid.
+10. `/kultivasi dunia desa` membuka Aula › Wilayah › Desa; Dunia hanya punya Alam, Pusaka, Musuh.
+11. Kitab Teknik: tiga tablet; "?" membuka Ensiklopedia pada Kitab Teknik; nama "Rangkai Segel" dan "Kehancuran Diri".
+12. Pengaturan: lima grup; setiap baris lama ada tepat sekali; nilai di `kultivator-client.json` tidak berubah setelah
+    pembaruan; Film Titah ada di Kamera & Film dan chip di Titah Langit membukanya; peringatan Spektakuler / bingkai
+    dampak kembali ke grup yang sama.
+13. Kontrol: daftar tombol sesuai ikatan nyata; "Ubah tombol…" membuka layar kontrol Minecraft dan kembali.
+14. Ubah meditasi ke J: Kitab Panduan dan Ensiklopedia menulis "J", bukan ";".
+15. GUI skala 2, 3, 4 dan jendela 854 × 480: tidak ada teks bertumpuk; tablet hanya glyph bila sempit.
+16. Saat film/sinematik berjalan, V dan G-tahan tidak membuka roda/Gulungan; WASD tetap melewati shot.
+17. Sodium + Iris (shader aktif): Gulungan, roda dan HUD tampil normal; FPS tidak turun saat roda terbuka (laptop lemah,
+    Minimal).
+18. Semua perintah `/kultivasi ...` lama tetap bekerja.

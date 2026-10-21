@@ -1,12 +1,13 @@
 package dev.kultivator.client.screen;
 
 import dev.kultivator.client.Keys;
-import dev.kultivator.client.codex.Codex;
 import dev.kultivator.client.codex.CodexScreen;
 import dev.kultivator.client.codex.SpecInfo;
 import dev.kultivator.client.codex.TeknikSession;
+import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.SealCard;
 import dev.kultivator.client.screen.ui.TalismanButton;
@@ -23,8 +24,9 @@ import java.util.List;
 
 /**
  * Techniques: since phase 6c a launcher card for the Kitab Teknik (DESIGN 22.12.1): the counter "Teknik 37/168", the
- * power P, the highest mastery, the selected art as a seal card, and talismans to open the Kodeks, the Cincin Segel and
- * the Kehancuran page, with the keys written underneath.
+ * power P, the highest mastery, the selected art as a seal card, and talismans to open the Kodeks, the Rangkai Segel and
+ * the Kehancuran Diri page, with the live keys written underneath. Since DESIGN 33 this is hub section 2 (Teknik): the
+ * Kitab Teknik opens as a hub child, so Escape comes back here.
  */
 final class TechniquesPage extends Page {
 
@@ -57,23 +59,33 @@ final class TechniquesPage extends Page {
 		int gap = 6;
 		TalismanButton open = add(new TalismanButton(bx, top, columnW, BUTTON_H, () -> Component.translatable("kultivator.codex.launcher.open")));
 		open.urgentWhen(() -> Util.getMillis() / 1000L % 4L == 0L);
-		open.onPress(() -> Codex.openTab(CodexScreen.TAB_KODEKS));
+		open.onPress(() -> openCodex(CodexScreen.TAB_KODEKS));
 		open.tooltip(() -> List.of(Component.translatable("kultivator.codex.launcher.open"),
-				Component.translatable("kultivator.codex.launcher.open.tip", Keys.CODEX.getTranslatedKeyMessage()).withStyle(ChatFormatting.GRAY)));
+				Component.translatable("kultivator.codex.launcher.open.tip", KeyHints.name(Keys.CODEX)).withStyle(ChatFormatting.GRAY)));
 		TalismanButton ring = add(new TalismanButton(bx, top + BUTTON_H + gap, columnW, BUTTON_H, () -> Component.translatable("kultivator.codex.tab.ring")));
-		ring.onPress(() -> Codex.openTab(CodexScreen.TAB_RING));
+		ring.onPress(() -> openCodex(CodexScreen.TAB_RING));
 		ring.tooltip(() -> List.of(Component.translatable("kultivator.codex.tab.ring"),
 				Component.translatable("kultivator.codex.launcher.ring.tip").withStyle(ChatFormatting.GRAY)));
 		TalismanButton red = add(new TalismanButton(bx, top + (BUTTON_H + gap) * 2, columnW, BUTTON_H,
 				() -> Component.translatable(TeknikSession.breakerOn() ? "kultivator.codex.launcher.kh_on" : "kultivator.codex.launcher.kh_off")));
 		red.urgentWhen(TeknikSession::breakerOn);
-		red.onPress(() -> Codex.openTab(CodexScreen.TAB_KEHANCURAN));
+		red.onPress(() -> openCodex(CodexScreen.TAB_KEHANCURAN));
 		red.tooltip(() -> List.of(Component.translatable("kultivator.codex.tab.kehancuran"),
 				Component.translatable("kultivator.codex.launcher.kh.tip").withStyle(ChatFormatting.GRAY)));
 		cardSize = Math.max(36, Math.min(56, Math.min(bx - x - 16, h / 3)));
 		cardX = x + 4;
 		cardY = y + 16;
 		infoX = cardX + cardSize + 8;
+	}
+
+	@Override
+	public String helpTopic() {
+		return "kitab_teknik";
+	}
+
+	/** Opens the Kitab Teknik on {@code tab} as a child of the hub (Escape returns to this section, C33.N1). */
+	private static void openCodex(int tab) {
+		HubNav.openChild(new CodexScreen(null, tab), HubNav.TEKNIK);
 	}
 
 	@Override
@@ -108,8 +120,8 @@ final class TechniquesPage extends Page {
 				: Component.translatable("kultivator.codex.launcher.selected", selected.displayName());
 		cursor += Brush.wrap(g, font, current, tx, cursor, room, selected == null ? Palette.INK_FAINT : SpecInfo.ink(selected), 0.65F, false) + 2.0F;
 		float keysY = Math.max(cursor + 4.0F, cardY + cardSize + 8.0F);
-		Component keys = Component.translatable("kultivator.codex.launcher.keys", Keys.CAST.getTranslatedKeyMessage(),
-				Keys.PREVIOUS.getTranslatedKeyMessage(), Keys.NEXT.getTranslatedKeyMessage(), Keys.CODEX.getTranslatedKeyMessage());
+		Component keys = Component.translatable("kultivator.codex.launcher.keys", KeyHints.name(Keys.CAST), KeyHints.name(Keys.PREVIOUS),
+				KeyHints.name(Keys.NEXT), KeyHints.name(Keys.CODEX));
 		Brush.wrap(g, font, keys, x + 4.0F, keysY, columnLeft - x - 12.0F, Palette.INK_SOFT, 0.62F, false);
 	}
 }

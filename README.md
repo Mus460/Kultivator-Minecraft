@@ -112,7 +112,7 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
   **Lima Unsur** dalam pertarungan, **Relik di Peti Kuno** dengan Indra Ilahi yang mencium harta, Kejenuhan Bertarung,
   dan kenyamanan HUD (pengukur pedang terbang, peringatan bahaya saat meditasi, cetak biru formasi).
 * **Perubahan keseimbangan** (audit alur Fana → Dewa Abadi): tribulasi lebih adil (lingkar petir mulai Jiwa Baru Lahir, terpental bukan lari, total petir Kenaikan Abadi/Dewa Abadi paling banyak 2,2× nyawa, maks. 10 pelindung hidup), urat roh separuh lebih awet di bawah Transformasi Dewa, Inti Raja dari Raja Siluman atau 9 Inti Tinggi, sesajen ritual Alam Abadi dikembalikan saat gagal ([panduan](docs/PANDUAN.md#73-tribulasi-langit)).
-* **Kitab Panduan** di dalam game: 12 bab, 102 langkah dari Manusia Fana sampai Dewa Abadi (sekte dan murid), dengan centang otomatis; buka lewat tablet *Panduan* di gulungan (`'`), `/kultivasi panduan`, atau tombol *Kitab Panduan* ([panduan](docs/PANDUAN.md#62-kitab-panduan-di-dalam-game)).
+* **Kitab Panduan** di dalam game: 12 bab, 102 langkah dari Manusia Fana sampai Dewa Abadi (sekte dan murid), dengan centang otomatis; buka lewat bagian *Panduan* di menu utama (ketuk `V`), irisan Kitab Panduan di roda Akses Cepat (tahan `V`), atau `/kultivasi panduan` ([panduan](docs/PANDUAN.md#62-kitab-panduan-di-dalam-game)).
 * Semua teks dalam **Bahasa Indonesia** dan **English**. Kompatibel dengan Sodium, Iris, ImmediatelyFast, EMF/ETF,
   Lithium, FerriteCore.
 
@@ -182,9 +182,7 @@ Mode Kehancuran cukup satu perintah: `/kultivasi kehancuran semua nyala` (matika
 
 ## Tombol bawaan
 
-`G` teknik terpilih (tahan = Roda Segel) · `-` Kitab Teknik · `;` meditasi · `'` layar kultivasi · `,` `.` ganti teknik di
-Cincin Segel · `\` pedang terbang · lompat di udara = Langkah Awan · Roda Segel dan Segel Cepat 1–4 belum diatur. Semua
-bisa diganti di Options → Controls → Key Binds → Kultivator.
+Semua di dekat WASD: `G` rapal (tahan = Roda Segel) · `V` Akses Cepat (ketuk = menu utama dengan 8 bagian, tahan = roda) · `Z` teknik berikutnya · `B` meditasi · `H` pedang terbang · `M` murid · `Backspace` lewati sinematik; sisanya lewat `V` dan menu utama, ganti di Pengaturan › Kontrol ([panduan](docs/PANDUAN.md#2-tombol-dan-cara-menggantinya)).
 
 ## Konfigurasi
 

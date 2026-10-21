@@ -32,7 +32,7 @@ bulat di dalam game.
 ## Daftar isi
 
 1. [Langkah pertama](#1-langkah-pertama)
-2. [Tombol dan cara menggantinya](#2-tombol-dan-cara-menggantinya)
+2. [Tombol dan cara menggantinya](#2-tombol-dan-cara-menggantinya) · 2.1 [Menu utama (hub)](#21-menu-utama-hub)
 3. [Perintah](#3-perintah)
 4. [Ranah dan tahap](#4-ranah-dan-tahap)
 5. [Mengumpulkan kultivasi](#5-mengumpulkan-kultivasi)
@@ -121,20 +121,20 @@ Sejak Fase 7 kamu tidak perlu menghafal daftar ini: **pelacak Langkah Pertama** 
 langkah berikutnya beserta tombolnya, dan tablet **Jalan** di gulungan (`/kultivasi jalan`) memberi hadiah untuk setiap
 bab ([42](#42-tablet-jalan-langkah-pertama-ujian-fondasi-kewajiban-harian)).
 
-Ingin peta lengkap sampai Dewa Abadi? Buka **Kitab Panduan** di dalam game: tablet *Panduan* di gulungan (`'`),
+Ingin peta lengkap sampai Dewa Abadi? Buka **Kitab Panduan** di dalam game: bagian *Panduan* di gulungan (ketuk `V`),
 `/kultivasi panduan`, atau tombol *Kitab Panduan* (lihat [62](#62-kitab-panduan-di-dalam-game)).
 
-1. **Uji akar spiritualmu.** Semua orang mulai sebagai *Manusia Fana*. Tekan `'` untuk membuka gulungan kultivasi
-   lalu klik jimat *Uji Akar*, atau ketik `/kultivasi root test`. Upacara 8 detik membaca akarmu: elemen apa yang kamu
+1. **Uji akar spiritualmu.** Semua orang mulai sebagai *Manusia Fana*. Ketuk `V` untuk membuka gulungan kultivasi
+   (Diri › Status) lalu klik jimat *Uji Akar*, atau ketik `/kultivasi root test`. Upacara 8 detik membaca akarmu: elemen apa yang kamu
    punya dan seberapa tinggi mutunya. Hasilnya permanen.
-2. **Kumpulkan kultivasi.** Basmi monster, tambang bijih, makan Wortel Emas, atau duduk bermeditasi (`;`). Bar emas di
+2. **Kumpulkan kultivasi.** Basmi monster, tambang bijih, makan Wortel Emas, atau duduk bermeditasi (`B`). Bar emas di
    sekitar bola dantian (kiri bawah) terisi.
-3. **Bangkit.** Saat bar Manusia Fana penuh (60), tekan `;` lagi sambil bermeditasi (atau ketik
+3. **Bangkit.** Saat bar Manusia Fana penuh (60), tekan `B` lagi sambil bermeditasi (atau ketik
    `/kultivasi breakthrough`). Kebangkitan 6 detik selalu berhasil dan membawamu ke *Pemurnian Qi*.
 4. **Naik tahap.** Di setiap ranah ada 4 tahap (Awal, Menengah, Akhir, Puncak). Kamu naik tahap otomatis saat bar
    penuh. Di Tahap Puncak kamu harus menerobos ke ranah berikutnya.
 5. **Pelajari teknik.** Di Pemurnian Qi kamu langsung menguasai *Langkah Awan* (lompat lagi di udara) dan *Telapak Qi*
-   (tekan `G`). Semakin tinggi ranahmu, semakin banyak dan semakin dahsyat teknik yang terbuka. Tekan `-` untuk membuka
+   (tekan `G`). Semakin tinggi ranahmu, semakin banyak dan semakin dahsyat teknik yang terbuka. Tahan `V` dan pilih irisan
    **Kitab Teknik**: semua 169 teknik, sumber ceritanya, angkanya, dan cara memperolehnya (lihat
    [Teknik Dewa](#12-teknik-dewa-169-teknik)).
 6. **Pilih Dao** saat mencapai *Inti Emas*: jalan seumur hidup yang menentukan teknik dan kekuatanmu.
@@ -148,25 +148,72 @@ Ingin peta lengkap sampai Dewa Abadi? Buka **Kitab Panduan** di dalam game: tabl
    saat bermeditasi, tulis **jimat**, dan buka koin **Persiapan** di tab Status sebelum setiap terobosan (lihat
    [Dunia yang Hidup](#33-dunia-yang-hidup-fase-7)).
 
-Kalau bingung, buka tab **Bantuan** di gulungan (`'`) atau ketik `/kultivasi` untuk melihat kartu statusmu.
+Kalau bingung, buka **Panduan › Ensiklopedia** di gulungan (`V`, lalu tombol `7`) atau ketik `/kultivasi` untuk melihat kartu statusmu.
 
 ---
 
 ## 2. Tombol dan cara menggantinya
 
-| Tombol bawaan | Fungsi |
-|---|---|
-| `G` | Ketuk: rapal teknik yang sedang dipilih. Tahan ≥ 250 ms: buka **Roda Segel** ([12.1](#121-kitab-teknik)) |
-| `;` | Mulai / berhenti meditasi. Saat bermeditasi dengan bar penuh di leher botol: memulai terobosan |
-| `'` | Buka gulungan kultivasi (layar info). Saat ditahan di dalam game, pelacak Langkah Pertama yang mengecil terbuka lagi |
-| `-` | Buka **Kitab Teknik** |
-| `,` dan `.` | Pilih teknik sebelumnya / berikutnya di dalam Cincin Segel (semua teknik bila cincin kosong) |
-| Roda Segel (tahan), Segel Cepat 1–4 | Belum diatur. Begitu Roda Segel diatur, `G` merapal saat ditekan; Segel Cepat merapal soket 1–4 Cincin Segel |
-| `\` | Naik / turun dari Pedang Terbang |
-| Lompat di udara (`Spasi`) | *Langkah Awan*: lompatan tambahan di udara (setelah teknik ini dikuasai) |
+Sejak pembaruan UI/UX Terpadu semua tombol yang sering dipakai ada di dekat `W` `A` `S` `D`. Cukup tiga tombol: **`G`**
+(rapal), **`V`** (Akses Cepat) dan **`Z`** (teknik berikutnya); `B` dan `H` adalah jalan pintas sekali tekan.
 
-**Mengganti tombol:** Options → Controls → Key Binds → bagian **Kultivator**. Tombol bawaan sengaja dipilih agar tidak
-bentrok dengan tombol vanilla, Butter Bot, maupun Iris (K, O, R).
+| Tombol bawaan | Fungsi | Dulu |
+|---|---|---|
+| `G` | Ketuk: rapal teknik yang sedang dipilih. Tahan ≥ 250 ms: buka **Roda Segel** ([12.1](#121-kitab-teknik)) | `G` |
+| `V` | **Akses Cepat**. Ketuk: buka gulungan kultivasi (menu utama) di bagian terakhir. Tahan: roda Akses Cepat. Saat ditahan, pelacak panduan yang mengecil terbuka lagi | baru |
+| `Z` | Teknik berikutnya di dalam Rangkai Segel (semua teknik bila kosong) | `.` |
+| `B` | Mulai / berhenti meditasi. Saat bermeditasi dengan bar penuh di leher botol: memulai terobosan | `;` |
+| `H` | Naik / turun dari Pedang Terbang | `\` |
+| `M` | Gulungan murid (murid yang ditatap atau terdekat; tekan lagi di dalamnya: murid berikutnya) | `M` |
+| `Backspace` | Lewati shot kamera sinematik (`W` `A` `S` `D`, lompat dan serang juga melewatinya) | `Backspace` |
+| Lompat di udara (`Spasi`) | *Langkah Awan*: lompatan tambahan di udara (setelah teknik ini dikuasai) | |
+| belum diatur | Gulungan saja (tanpa roda), teknik sebelumnya, Kitab Teknik | `'` `,` `-` |
+| belum diatur | Roda Segel (tahan), Segel Cepat 1–4, Dunia, Keabadian, Cincin, Kitab Panduan: semuanya lewat `V` dan menu utama | |
+
+**Roda Akses Cepat** (tahan `V`): delapan irisan searah jarum jam dari atas: 1 Meditasi · 2 Pedang Terbang · 3 Kitab
+Teknik · 4 Murid · 5 Cincin · 6 Dunia · 7 Keabadian · 8 Kitab Panduan. Gerakkan tetikus ke irisan lalu lepas `V`, atau
+tekan angka `1`–`8`. Lepas di tengah = buka menu utama; klik kanan atau `Esc` = batal. `W` `A` `S` `D` tetap jalan. Roda
+tidak terbuka saat film kamera berjalan, saat sebuah layar terbuka, atau saat tribulasi (bahaya), dan tidak pernah
+bersamaan dengan Roda Segel.
+
+**Pemain lama:** sekali saja saat game dimulai, tombol yang masih di bawaan lama (`;` `'` `,` `.` `\` `-`) pindah ke
+bawaan baru, dan satu baris chat memberitahumu. Tombol yang pernah kamu ganti sendiri tetap milikmu.
+
+**Mengganti tombol:** di dalam game buka menu utama › **Pengaturan › Kontrol** (daftar langsung semua tombol
+Kultivator, bentrokan ditandai oranye) lalu talisman **Ubah tombol…**, atau Options → Controls → Key Binds → bagian
+**Kultivator**. Bawaan sengaja tidak memakai tombol vanilla (`Q` `E` `F` `T` `Tab` `X` `C` `O` `P` `L`), Combat Roll
+(`R`) maupun Iris (`R` `K` `I`). `G` juga tombol *Quick Actions* vanilla, yang hanya berbuat sesuatu di server yang
+punya dialog quick actions.
+
+### 2.1 Menu utama (hub)
+
+Gulungan kultivasi (ketuk `V`) adalah satu pintu ke semua fitur. Loh giok di kiri adalah delapan bagian menurut urutan
+bermain; tombol angka `1`–`8` berpindah bagian, `Tab` / `Shift+Tab` berpindah sub-koin di kepala gulungan, dan segel
+**?** di kanan atas membuka Ensiklopedia pada topik halaman itu.
+
+| # | Bagian | Isi |
+|---|---|---|
+| 1 | **Diri** | Status · Akar & Dao · Jalan · Alkimia |
+| 2 | **Teknik** | Peluncur Kitab Teknik (Kodeks, Rangkai Segel, Kehancuran Diri) |
+| 3 | **Murid** | Gulungan murid terdekat |
+| 4 | **Sekte** | Aula, Bangun, Formasi, Anggota, Perbendaharaan, Kegiatan, Wilayah, Segel Merah Murid (aula sendiri dari jauh) |
+| 5 | **Dunia** | Alam Rahasia, Pusaka, Musuh, Cincin |
+| 6 | **Keabadian** | Alam Abadi, Purba, Bencana, Batin, Ciptaan, Lelang, Titah Langit |
+| 7 | **Panduan** | Kitab Panduan · Ensiklopedia |
+| 8 | **Pengaturan** | Tampilan & Efek · Kamera & Film · Suara · HUD · Kontrol |
+
+Kartu yang belum terbuka tampil abu-abu dengan gembok dan alasannya ("terbuka di Pemurnian Qi", "terbuka setelah naik
+ke Alam Abadi", "butuh Prasasti Sekte" ...); mengkliknya menampilkan alasan itu, tidak pernah diam saja.
+
+`Esc` di layar yang dibuka dari menu utama kembali ke bagian asalnya; `V` menutup semuanya sekaligus. Layar yang dibuka
+dari dunia (klik kanan prasasti, `M`, perintah) ditutup biasa oleh `Esc`.
+
+Yang digabung atau dibuang: tablet Bantuan Kitab Teknik (sekarang segel **?** ke Ensiklopedia), daftar tombol ganda
+(satu daftar di Pengaturan › Kontrol), tab Desa di layar Dunia (salinan tablet Desa aula: sekarang Sekte › Wilayah ›
+Desa), koin *Sembunyikan panduan* ganda (satu di Pengaturan › HUD), talisman Uji Akar ganda (di Status), blok serbuan
+berikutnya ganda di Musuh (satu baris + tautan ke Pertahanan), pilihan Film Titah (pindah ke Pengaturan › Kamera &
+Film). Aula Sekte kini 8 tablet tanpa gulir. Nama baru: *Cincin Segel* → **Rangkai Segel**, *Mode Kehancuran* →
+**Kehancuran Diri**, *Segel Merah* aula → **Segel Merah Murid**.
 
 ---
 
@@ -177,7 +224,7 @@ bentrok dengan tombol vanilla, Butter Bot, maupun Iris (K, O, R).
 | Perintah | Fungsi |
 |---|---|
 | `/kultivasi` atau `/kultivasi info` | Kartu status: ranah, kultivasi, Qi Tertimbun, qi, akar, Dao, Penyimpangan Qi |
-| `/kultivasi meditate` | Mulai / berhenti meditasi (sama dengan `;`) |
+| `/kultivasi meditate` | Mulai / berhenti meditasi (sama dengan `B`) |
 | `/kultivasi breakthrough` | Mencoba terobosan |
 | `/kultivasi hardcore on` / `off` | Mode terobosan Hardcore (gagal = turun satu ranah) |
 | `/kultivasi root test` | Memulai upacara uji akar spiritual (hanya Manusia Fana yang belum diuji) |
@@ -525,7 +572,7 @@ Sebelum akarmu diuji, pengali akar dianggap ×1,0.
 ### 7.1 Cara memulai
 
 Bar harus penuh di Tahap Puncak (atau di Manusia Fana). Lalu:
-* tekan `;` sambil bermeditasi (petunjuk muncul di bar aksi), atau
+* tekan `B` sambil bermeditasi (petunjuk muncul di bar aksi), atau
 * klik jimat **Terobosan** di gulungan, atau
 * ketik `/kultivasi breakthrough`.
 
@@ -668,7 +715,7 @@ terbawah).
 
 ## 8. Meditasi
 
-Tekan `;` (atau `/kultivasi meditate`) saat berdiri di tanah. Tidak bisa saat berenang, terbang, menunggang, tidur,
+Tekan `B` (atau `/kultivasi meditate`) saat berdiri di tanah. Tidak bisa saat berenang, terbang, menunggang, tidur,
 atau sedang menerobos. Kamu duduk bersila dengan tangan membentuk mudra, dan butir-butir qi berwarna elemen akarmu berputar
 masuk ke dantian.
 
@@ -961,9 +1008,9 @@ detik, "r" = jari-jari dalam blok.
 
 ### 12.1 Kitab Teknik
 
-**Membuka.** Tekan **`-`** (minus), klik kartu **Buka Kitab Teknik** di tablet Teknik gulungan kultivasi (`'`), atau
+**Membuka.** Tahan **`V`** lalu pilih irisan *Kitab Teknik*, klik kartu **Buka Kitab Teknik** di bagian Teknik menu utama, atau
 ketik `/kultivasi teknik kitab [id]` (dengan id, kartu itu langsung terfokus). Gulungan giok terbuka dalam seperempat
-detik. Tablet di kiri: **Kodeks**, **Cincin Segel**, **Mode Kehancuran** (tablet merah), dan **Bantuan**. Semua halaman
+detik. Tablet di kiri: **Kodeks**, **Rangkai Segel**, dan **Kehancuran Diri** (tablet merah); segel **?** membuka Ensiklopedia. Semua halaman
 muat di GUI 320×240.
 
 **Kodeks: saringan.**
@@ -1017,8 +1064,8 @@ Isinya:
 | Tombol | Bawaan | Fungsi |
 |---|---|---|
 | Rapal | `G` | ketuk: rapal teknik terpilih. Tahan ≥ 250 ms: buka **Roda Segel** (selama "Tahan G untuk roda" nyala; ketukan merapal saat dilepas) |
-| Sebelumnya / berikutnya | `,` / `.` | memutar teknik terpilih **di dalam Cincin Segel** (semua teknik yang bisa dirapal bila cincin kosong), dengan carousel 1,2 detik di atas hotbar |
-| Kitab Teknik | `-` | membuka Kitab Teknik |
+| Sebelumnya / berikutnya | belum diatur / `Z` | memutar teknik terpilih **di dalam Rangkai Segel** (semua teknik yang bisa dirapal bila cincin kosong), dengan carousel 1,2 detik di atas hotbar |
+| Kitab Teknik | belum diatur | membuka Kitab Teknik (juga irisan 3 roda Akses Cepat dan bagian Teknik menu utama) |
 | Roda Segel (tahan) | belum diatur | tahan untuk membuka roda. Begitu tombol ini diatur, `G` kembali merapal saat ditekan tanpa jeda |
 | Segel Cepat 1–4 | belum diatur | merapal soket 1–4 Cincin Segel |
 
@@ -1643,7 +1690,7 @@ bersama pewarismu ×1,5.
 desain permainan.
 
 **Menyalakan dan mematikan: satu klik.**
-* Kitab Teknik (`-`) → tablet merah **Mode Kehancuran** → klik **segel merah besar** sekali. Atau ketik
+* Kitab Teknik (tahan `V` › Kitab Teknik) → tablet merah **Kehancuran Diri** → klik **segel merah besar** sekali. Atau ketik
   `/kultivasi kehancuran nyala` / `/kultivasi kehancuran mati`.
 * **Tanpa layar sumpah**, tanpa tahan, tanpa centang. Saat menyala muncul tepat satu baris merah dan satu detak jantung:
   > **MODE KEHANCURAN NYALA** — jurusmu kini benar-benar menghancurkan blok dunia. Batalkan dengan
@@ -3412,7 +3459,7 @@ kemenangan. *Perfect World*, bab 551/558: membangun kembali untuk naik.
 yang belum terpindai. Di dekat tapak: templat dan tingkat, bangunan yang sedang dibangun, dan "Masih kurang: …" dengan
 petunjuk setor. F1 menyembunyikannya.
 
-**Bantuan:** tab Bantuan gulungan kultivasi punya topik **Pembangunan Sekte** (termasuk jeda alt-tab, pengecualian tapak,
+**Bantuan:** Panduan › Ensiklopedia di menu utama punya topik **Pembangunan Sekte** (termasuk jeda alt-tab, pengecualian tapak,
 dan pengembalian bahan).
 
 **Sumber:** gaya gulungan giok DESIGN 5b.
@@ -6004,8 +6051,8 @@ Setiap langkah punya baris "cara" dengan nama tombol yang sedang kamu pakai.
 
 **Pelacak** (slip giok di **tepi kanan layar, tengah**, sekitar 120 px, mengecil di layar kecil): segel bab, langkah, 1–2
 baris cara, 20 manik kemajuan, dan pengingat hadiah. Mengecil menjadi segel 12 px setelah 20 detik tanpa perubahan;
-terbuka 8 detik saat ada perubahan atau saat tombol gulungan (`'`) ditahan. Langkah selesai = bunyi lonceng kecubung dan
-kilau emas. Koin **Sembunyikan panduan** (tablet Jalan) atau **Panduan** (tab Pengaturan) menyembunyikan dan
+terbuka 8 detik saat ada perubahan atau saat tombol Akses Cepat (`V`) ditahan. Langkah selesai = bunyi lonceng kecubung dan
+kilau emas. Koin **Pelacak panduan** (Pengaturan › HUD) menyembunyikan dan
 menampilkannya; setelah langkah ke-20 pelacak hilang sendiri dan pencapaian *Jalan Telah Terbuka* muncul.
 
 ### 42.2 Ujian Fondasi
@@ -6428,7 +6475,8 @@ Semuanya partikel di komputermu, dalam 32 blok (harta 48 blok), ikut Kualitas Ef
 
 ## 50. Layar kultivasi (gulungan giok)
 
-Tekan `'`. Gulungan memiliki loh giok vertikal di sisi kiri:
+Ketuk `V`. Sejak UI/UX Terpadu gulungan ini adalah menu utama dengan delapan bagian ([2.1](#21-menu-utama-hub)); halaman
+lamanya kini ada di bagian Diri, Teknik, Panduan dan Pengaturan:
 
 | Tab | Isi |
 |---|---|
@@ -6436,7 +6484,7 @@ Tekan `'`. Gulungan memiliki loh giok vertikal di sisi kiri:
 | **Akar & Dao** | Pentagram lima elemen yang menyala sesuai akarmu, segi delapan Bagua delapan Dao (klik untuk membaca/memilih) |
 | **Teknik** | Kartu peluncur **Buka Kitab Teknik** dengan "Teknik x/168", Kekuatan P, penguasaan tertinggi, dan teknik terpilih; jimat ke Kodeks, Cincin Segel, dan Mode Kehancuran ([12.1](#121-kitab-teknik)) |
 | **Pengaturan** | Kualitas Efek (juga Otomatis), kosmetik, HUD, efek teknik ([12.13](#1213-performa-efek-dan-pengaturan)), terobosan Hardcore (klik dua kali dalam 3 detik); sejak Fase 7 bagian **Jalan & HUD**: Pengingat cooldown, Peringatan bahaya, Panduan |
-| **Bantuan** | Ringkasan aturan dan tombol (lihat di bawah) |
+| **Ensiklopedia** (Panduan) | Ringkasan aturan dengan indeks topik (lihat di bawah); daftar tombol kini di Pengaturan › Kontrol |
 | **Jalan** (Fase 7) | Langkah Pertama, Ujian Fondasi, Kewajiban Harian ([42](#42-tablet-jalan-langkah-pertama-ujian-fondasi-kewajiban-harian)); juga `/kultivasi jalan` |
 | **Alkimia** (Fase 7) | Kitab Alkimia: semua resep dan apa yang bisa diracik dari isi tasmu ([40.4](#404-kitab-alkimia)); juga `/kultivasi resep` |
 
@@ -6448,7 +6496,7 @@ Membara/Latihan Khusus, Bakat/alam jiwa/fisik langka, Pusaka Natal/Kitab Abadi T
 Ikatan/Segel Jiwa/Hu Fa/pewaris, dan Mode Kehancuran (MATI secara bawaan). Sumber cerita tiap fitur dibaca di tooltip
 gulungan aula dan tab murid, dan selengkapnya di bagian 20–31 panduan ini.
 
-**Topik Bantuan Fase 6c** (juga di tablet Bantuan Kitab Teknik): Teknik, Penguasaan, Kitab Teknik, dan Mode Kehancuran
+**Topik Bantuan Fase 6c** (segel **?** Kitab Teknik membukanya): Teknik, Penguasaan, Kitab Teknik, dan Mode Kehancuran
 untuk jurusmu sendiri (peringatan merah: mati secara bawaan, satu klik, Shift = tanpa kawah, zona aman, pulihkan dalam
 10 menit).
 
@@ -8289,7 +8337,7 @@ ranah punya baris **Sumber** (lihat tooltip pengaturan *Aura Kultivasi*).
 
 ### 61.1 Kapan aura muncul
 
-* **Kamu**: bermeditasi (`;` atau `/kultivasi meditate`) sampai duduk bersila. Kosmetik `aura` harus nyala
+* **Kamu**: bermeditasi (`B` atau `/kultivasi meditate`) sampai duduk bersila. Kosmetik `aura` harus nyala
   (`/kultivasi visual aura on`, bawaan nyala). **Murid**: saat mereka duduk bermeditasi.
 * Aura muncul perlahan dalam 1,5 detik dan memudar dalam 1 detik setelah kamu berdiri. Model 3D tumbuh sekali saat
   muncul dan mengecil saat aura berakhir.
@@ -8400,9 +8448,9 @@ atau server berhenti.
 
 **Cara membuka:**
 
-* tablet **Panduan** paling bawah di gulungan kultivasi (`'`), atau tombol angka `8` saat gulungan terbuka;
+* bagian **Panduan** di menu utama (ketuk `V`, lalu tombol angka `7`), atau irisan 8 roda Akses Cepat (tahan `V`);
 * perintah `/kultivasi panduan` (semua pemain, tanpa cheat);
-* tombol **Kitab Panduan** di kategori tombol Kultivator (bawaan belum dipasang: atur di Pengaturan > Kontrol).
+* tombol **Kitab Panduan** di kategori tombol Kultivator (bawaan belum dipasang: atur di Pengaturan › Kontrol).
 
 **Cara membaca:** di kiri ada daftar bab dengan bilah kemajuan; bab yang sedang kamu jalani berbingkai emas, bab yang
 selesai mendapat cap giok bercentang. Di kanan, setiap langkah adalah kartu: tanda ✔ atau lingkaran kosong, judul,

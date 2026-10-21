@@ -4,9 +4,11 @@ import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.goals.GoalsClient;
 import dev.kultivator.client.goals.GuideTracker;
+import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.JadeCoin;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
@@ -35,7 +37,7 @@ import java.util.Map;
  * The "Jalan / Path" tablet (DESIGN 19.3.9, {@code CultivationScreen.TAB_JALAN}, also {@code /kultivasi jalan}): three
  * sections switched with jade coins, Langkah · Ujian · Harian. Langkah shows the five chapters as small seal tablets on
  * the left and the chosen chapter's four steps (with live "how" lines) on the right, the chapter's reward talisman and
- * the "Sembunyikan panduan" coin; Ujian the open Foundation Trial set with progress bars and its bonus; Harian today's
+ * a talisman leading to the tracker switch in Pengaturan › HUD (DESIGN 33.6 R5); Ujian the open Foundation Trial set with progress bars and its bonus; Harian today's
  * chores, the streak and when the next set comes. Everything is read from the synced {@code extra.goals}; the server
  * owns every rule. Jade-scroll style, fits 320×240.
  * <p>
@@ -77,6 +79,11 @@ class JalanPage extends Page {
 	@Override
 	Component shortName() {
 		return Component.translatable("kultivator.spine7.tab.jalan.short");
+	}
+
+	@Override
+	public String helpTopic() {
+		return "jalan";
 	}
 
 	@Override
@@ -127,11 +134,13 @@ class JalanPage extends Page {
 		});
 		turn.tooltip(() -> List.of(Component.translatable("kultivator.jalan9.page.book.tip").withStyle(ChatFormatting.GRAY)));
 		put(turn, 0);
-		JadeCoin hide = new JadeCoin(x + 2, y + h - 12, tabletW, 11, () -> Component.translatable(P + "hide"), () -> Guide.hidden(data()));
-		hide.enabledWhen(Keys::connected);
-		hide.onPress(() -> send(Actions.JALAN, 0, Guide.hidden(data()) ? "show" : "hide"));
-		hide.tooltip(() -> List.of(Component.translatable(P + "hide"), Component.translatable(P + "hide.tip").withStyle(ChatFormatting.GRAY)));
-		put(hide, 0);
+		// The tracker's on/off coin lives only in Pengaturan › HUD now (DESIGN 33.6 R5); this talisman leads there.
+		TalismanButton tracker = new TalismanButton(x + 2, y + h - 12, tabletW, 11, () -> Component.translatable(
+				Guide.hidden(data()) ? "kultivator.uxpages.jalan.tracker_off" : "kultivator.uxpages.jalan.tracker"));
+		tracker.onPress(() -> HubNav.openSettings(HubNav.GROUP_HUD));
+		tracker.tooltip(() -> List.of(Component.translatable("kultivator.uxpages.jalan.tracker.title"),
+				Component.translatable("kultivator.uxpages.jalan.tracker.tip").withStyle(ChatFormatting.GRAY)));
+		put(tracker, 0);
 		listX = x + tabletW + 8;
 		listW = x + w - listX;
 		TalismanButton claim = new TalismanButton(listX, y + h - 15, Math.min(140, listW), 15, () -> Component.translatable(
@@ -219,7 +228,7 @@ class JalanPage extends Page {
 					scale, false);
 			if (!done) {
 				Component how = step < Guide.STEP_COUNT ? GuideTracker.how(step, data)
-						: Component.translatable("kultivator.goals.step." + Guide.step(step).id() + ".how");
+						: KeyHints.fill(Component.translatable("kultivator.goals.step." + Guide.step(step).id() + ".how"));
 				cursor += Brush.wrap(g, font, how, listX + 10.0F, cursor, listW - 12.0F, Palette.INK_SOFT, scale - 0.06F, false);
 			}
 			cursor += 3.0F;

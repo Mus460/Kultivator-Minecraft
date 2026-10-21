@@ -5,6 +5,7 @@ import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.Keys;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Rank;
@@ -30,8 +31,8 @@ import java.util.List;
  * top left, the codex toasts and effect icons top right, boss bars and the red sky top centre and the Qi HUD bottom
  * left), about 120 GUI px wide and scaled down on small screens. It shows the chapter seal, the next step with one or two
  * "how" lines (with the live key names) and the progress. It shrinks to a 12 px seal 20 s after joining and opens again
- * for 8 s on a change or while the info key is pressed; a finished step rings an amethyst chime with a gold flash.
- * Hidden by the "Sembunyikan panduan" coin and after the last step. After chapter 5 it wakes again for chapters 6-10
+ * for 8 s on a change or while the Akses Cepat key (or the scroll key, if bound) is held (DESIGN 33.6 R12); a finished step rings an amethyst chime with a gold flash.
+ * Hidden by the tracker coin in Pengaturan › HUD and after the last step. After chapter 5 it wakes again for chapters 6-10
  * (DESIGN 25.8.2) once the player is Foundation+, and after chapter 10 for chapters 11-15 "Jalan Abadi" (DESIGN 26.9) once the
  * player is Dewa Abadi Puncak.
  */
@@ -49,7 +50,7 @@ public final class GuideTracker implements HudElement {
 	private static final Eased open = new Eased(9.0F);
 	private long lastFrame;
 
-	/** Every client tick: notices finished steps and the info key. */
+	/** Every client tick: notices finished steps and the peek key. */
 	static void tick(Minecraft minecraft) {
 		if (minecraft.player == null || !ClientCultivation.received()) {
 			lastBits = -1;
@@ -70,7 +71,7 @@ public final class GuideTracker implements HudElement {
 			// A change opens the slip for 8 s (the first 20 s after joining it stays open anyway).
 			peekUntil = Math.max(peekUntil, now + PEEK_MILLIS);
 		}
-		if (Keys.INFO.isDown()) {
+		if (KeyHints.peekHeld()) {
 			peekUntil = now + PEEK_MILLIS;
 		}
 	}
@@ -159,7 +160,7 @@ public final class GuideTracker implements HudElement {
 		Component title = step < 0 ? Component.translatable("kultivator.goals.tracker.all_done")
 				: Component.translatable("kultivator.goals.step." + steps[step].id());
 		Component how = step < 0 ? Component.empty()
-				: offset > 0 ? Component.translatable("kultivator.goals.step." + steps[step].id() + ".how") : how(step, data);
+				: offset > 0 ? KeyHints.fill(Component.translatable("kultivator.goals.step." + steps[step].id() + ".how")) : how(step, data);
 		List<FormattedCharSequence> titleRows = font.split(Brush.bold(title), (int) (inner / 0.7F));
 		List<FormattedCharSequence> howRows = font.split(how, (int) (inner / 0.6F));
 		int titleCount = Math.min(2, titleRows.size());
@@ -215,7 +216,7 @@ public final class GuideTracker implements HudElement {
 				Palette.argb(alpha, Palette.JADE_LIGHT), 0.55F, false);
 		if (reward) {
 			y += 5.0F;
-			Component line = Component.translatable("kultivator.goals.tracker.reward", Keys.INFO.getTranslatedKeyMessage());
+			Component line = Component.translatable("kultivator.goals.tracker.reward", KeyHints.hubKey());
 			Brush.fit(g, font, line, 6.0F, y, w - 12.0F, Palette.argb(alpha, Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse)), 0.6F, 0.45F, false);
 		}
 		if (book) {
@@ -248,16 +249,15 @@ public final class GuideTracker implements HudElement {
 		String key = "kultivator.goals.step." + id + ".how";
 		Rank rank = data.rank();
 		return switch (id) {
-			case "root", "awaken", "dao" -> Component.translatable(key, Keys.INFO.getTranslatedKeyMessage());
-			case "meditate" -> Component.translatable(key, Keys.MEDITATE.getTranslatedKeyMessage());
+			case "root", "awaken", "dao" -> Component.translatable(key, KeyHints.hubKey());
+			case "meditate" -> Component.translatable(key, KeyHints.name(Keys.MEDITATE));
 			case "bar" -> Component.translatable(key, Msg.number(rank.realm().isMortal() ? data.xp() : rank.xpRequired()),
-					Msg.number(rank.xpRequired()), Keys.MEDITATE.getTranslatedKeyMessage());
-			case "technique" -> Component.translatable(key, Keys.PREVIOUS.getTranslatedKeyMessage(), Keys.NEXT.getTranslatedKeyMessage(),
-					Keys.CAST.getTranslatedKeyMessage());
-			case "sword" -> Component.translatable(key, Keys.FLYING_SWORD.getTranslatedKeyMessage());
-			case "codex" -> Component.translatable(key, Keys.CODEX.getTranslatedKeyMessage(), Math.min(Guide.SEALS_NEEDED, Guide.seals(data)),
+					Msg.number(rank.xpRequired()), KeyHints.name(Keys.MEDITATE));
+			case "technique" -> Component.translatable(key, KeyHints.name(Keys.PREVIOUS), KeyHints.name(Keys.NEXT), KeyHints.name(Keys.CAST));
+			case "sword" -> Component.translatable(key, KeyHints.name(Keys.FLYING_SWORD));
+			case "codex" -> Component.translatable(key, KeyHints.name(Keys.CODEX), Math.min(Guide.SEALS_NEEDED, Guide.seals(data)),
 					Guide.SEALS_NEEDED);
-			default -> Component.translatable(key);
+			default -> KeyHints.fill(Component.translatable(key));
 		};
 	}
 }

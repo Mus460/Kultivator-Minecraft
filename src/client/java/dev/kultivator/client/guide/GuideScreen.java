@@ -5,6 +5,7 @@ import dev.kultivator.client.Keys;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.ScrollFrame;
 import dev.kultivator.client.screen.ui.SlipTooltip;
@@ -30,7 +31,7 @@ import java.util.List;
  * empty ring, the title, the wrapped lines, a talisman chip that writes its command into the chat box, and a tick box
  * for steps the server cannot check by itself). The cards scroll with the wheel, the arrow keys or Page Up / Down;
  * left / right change the chapter, Home jumps to the current one. Fits 320 × 240 and every GUI scale; Escape or the
- * guide key closes it (back to the scroll when it was opened from there).
+ * guide key closes it (back to the scroll when it was opened from there). Key names in the texts are live (DESIGN 33.6 R11).
  */
 public final class GuideScreen extends Screen {
 
@@ -126,7 +127,7 @@ public final class GuideScreen extends Screen {
 			return;
 		}
 		Component desc = GuideBook.chapter(selected).desc();
-		descRows = desc == null ? List.of() : font.split(desc, Math.max(20, (int) (cardsW / 0.65F)));
+		descRows = desc == null ? List.of() : font.split(KeyHints.fill(desc), Math.max(20, (int) (cardsW / 0.65F)));
 		if (descRows.size() > 2) {
 			descRows = descRows.subList(0, 2);
 		}
@@ -135,9 +136,10 @@ public final class GuideScreen extends Screen {
 		for (GuideBook.Step step : GuideBook.chapter(selected).steps()) {
 			int tx = cardsX + MARK_COLUMN;
 			int titleRight = cardsX + cardsW - 4 - (step.manual() ? TICK + 4 : 0);
-			List<FormattedCharSequence> titleRows = font.split(Brush.bold(GuideBook.text(step.titleKey(), step.id())),
+			List<FormattedCharSequence> titleRows = font.split(Brush.bold(KeyHints.fill(GuideBook.text(step.titleKey(), step.id()))),
 					Math.max(20, (int) ((titleRight - tx) / titleScale)));
-			List<FormattedCharSequence> bodyRows = font.split(GuideBook.text(step.bodyKey(), ""),
+			// Key tokens ([[key:meditate]] ...) show the keys bound right now (DESIGN 33.6 R11).
+			List<FormattedCharSequence> bodyRows = font.split(KeyHints.fill(GuideBook.text(step.bodyKey(), "")),
 					Math.max(20, (int) ((cardsX + cardsW - 5 - tx) / bodyScale)));
 			String hint = step.hint();
 			int chipW = 0;

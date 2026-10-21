@@ -3,9 +3,11 @@ package dev.kultivator.client.codex;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.Keys;
+import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.ScrollFrame;
 import dev.kultivator.client.screen.ui.SlipTooltip;
@@ -26,16 +28,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Kitab Teknik (DESIGN 22.12): a jade scroll that unrolls in a quarter second over the ink-blue night, with four
- * tablets on its left edge: Kodeks, Cincin Segel, Kehancuran (a red tablet) and Bantuan. There is no passive tab (PASIF
- * is reserved). Fits 320×240; the detail slip docks on the right from 420 GUI px. The codex key or Escape closes it (an
- * open overlay or the search closes first). Not a pause screen.
+ * The Kitab Teknik (DESIGN 22.12): a jade scroll that unrolls in a quarter second over the ink-blue night, with three
+ * tablets on its left edge: Kodeks, Rangkai Segel and Kehancuran Diri (a red tablet). There is no passive tab (PASIF is
+ * reserved). The help lives in Panduan › Ensiklopedia: the "?" seal at the right end of the header opens it on this
+ * page's topic (DESIGN 33.6 R1); {@link #TAB_HELP} still opens there. Fits 320×240; the detail slip docks on the right
+ * from 420 GUI px. The codex key or Escape closes it (an open overlay or the search closes first; opened from the hub,
+ * Escape returns to it, C33.N2). Not a pause screen.
  */
 public final class CodexScreen extends Screen {
 
 	public static final int TAB_KODEKS = 0;
 	public static final int TAB_RING = 1;
 	public static final int TAB_KEHANCURAN = 2;
+	/** The old Bantuan tablet (DESIGN 33.6 R1): opening on it opens Panduan › Ensiklopedia on {@code kitab_teknik} instead. */
 	public static final int TAB_HELP = 3;
 
 	private static final long UNROLL_MILLIS = 250L;
@@ -51,6 +56,9 @@ public final class CodexScreen extends Screen {
 	private final List<CodexWidgets.Tablet> tablets = new ArrayList<>();
 	private final Eased backdrop = new Eased(6.0F);
 	private int tab;
+	/** Opened on {@link #TAB_HELP}: hand over to the Ensiklopedia on the first tick. */
+	private boolean helpPending;
+	private final KeyHints.HelpSeal help = new KeyHints.HelpSeal(0.0F, 0.0F, 10, this::topic);
 	private long openedAt;
 	private long lastFrame;
 	private long seenVersion = Long.MIN_VALUE;
@@ -69,8 +77,9 @@ public final class CodexScreen extends Screen {
 	public CodexScreen(@Nullable TechniqueSpec focus, int tab) {
 		super(Component.translatable("kultivator.codex.title"));
 		this.kodeks = new KodeksPage(this, FILTERS);
-		this.pages = new CodexPage[]{kodeks, new LoadoutPage(this), new KehancuranPage(this), new BantuanPage(this)};
-		this.tab = tab < 0 ? lastTab : Math.max(0, Math.min(pages.length - 1, tab));
+		this.pages = new CodexPage[]{kodeks, new LoadoutPage(this), new KehancuranPage(this)};
+		this.helpPending = tab == TAB_HELP;
+		this.tab = Math.max(0, Math.min(pages.length - 1, tab < 0 || tab == TAB_HELP ? lastTab : tab));
 		if (focus != null && focus.playerVisible()) {
 			this.tab = TAB_KODEKS;
 			kodeks.focus(focus);
@@ -114,6 +123,20 @@ public final class CodexScreen extends Screen {
 			page.layout(contentX, contentY, contentW, contentH);
 		}
 		seenVersion = ClientCultivation.version();
+	}
+
+	/** The Ensiklopedia topic of the page shown now (the header's "?" seal). */
+	private String topic() {
+		return pages[tab].helpTopic();
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+		if (helpPending) {
+			helpPending = false;
+			HubNav.help("kitab_teknik");
+		}
 	}
 
 	/** Shows {@code lines} as this frame's tooltip (the first one asked for wins). */
@@ -203,6 +226,7 @@ public final class CodexScreen extends Screen {
 		if (bottom - top > 24) {
 			g.enableScissor(paperX0 + ScrollFrame.SIDE + 1, top + ScrollFrame.END + 1, paperX1 - ScrollFrame.SIDE - 1, bottom - ScrollFrame.END - 1);
 			drawHeader(g);
+			help.render(g, font, mouseX, mouseY, seconds);
 			pages[tab].render(g, mouseX, mouseY, seconds);
 			g.disableScissor();
 		}
@@ -210,6 +234,9 @@ public final class CodexScreen extends Screen {
 			if (tabletsOut > 0.9F && tablet.contains(mouseX, mouseY)) {
 				showTooltip(tablet.tooltipLines());
 			}
+		}
+		if (bottom - top > 24 && help.contains(mouseX, mouseY)) {
+			showTooltip(help.tooltipLines());
 		}
 		if (tooltip != null && open >= 1.0F) {
 			g.nextStratum();
@@ -223,7 +250,7 @@ public final class CodexScreen extends Screen {
 		Component text = Brush.bold(Component.translatable("kultivator.codex.header", title, pages[tab].title()));
 		float y = paperTop + ScrollFrame.END + 4.0F;
 		float cx = (paperX0 + paperX1) / 2.0F;
-		float room = contentW - 40.0F;
+		float room = contentW - 56.0F;
 		float scale = Brush.fitScale(font, text, room, 1.0F, 0.6F);
 		float textW = Math.min(room, font.width(text) * scale);
 		Brush.fitCentered(g, font, text, cx, y, room, red ? Palette.SEAL_DARK : Palette.INK, 1.0F, 0.6F, false);
@@ -232,11 +259,13 @@ public final class CodexScreen extends Screen {
 		float right = cx + textW / 2.0F + 6.0F;
 		int rule = red ? Palette.SEAL : Palette.GOLD;
 		Brush.rect(g, contentX + 8.0F, lineY - 0.5F, left - 4.0F, lineY + 0.5F, rule);
-		Brush.rect(g, right + 4.0F, lineY - 0.5F, contentX + contentW - 8.0F, lineY + 0.5F, rule);
+		Brush.rect(g, right + 4.0F, lineY - 0.5F, contentX + contentW - 20.0F, lineY + 0.5F, rule);
 		Brush.rect(g, left - 3.0F, lineY - 2.0F, left + 1.0F, lineY + 2.0F, Palette.SEAL);
 		Brush.rect(g, right - 1.0F, lineY - 2.0F, right + 3.0F, lineY + 2.0F, Palette.SEAL);
 		Glyphs.tab(g, pages[tab].icon(), contentX + 4.0F, lineY, 6.0F, red ? Palette.SEAL_DARK : Palette.GOLD_DARK);
-		Glyphs.tab(g, pages[tab].icon(), contentX + contentW - 4.0F, lineY, 6.0F, red ? Palette.SEAL_DARK : Palette.GOLD_DARK);
+		Glyphs.tab(g, pages[tab].icon(), contentX + contentW - 15.0F, lineY, 6.0F, red ? Palette.SEAL_DARK : Palette.GOLD_DARK);
+		// The "?" seal at the right end (its own box, clear of the title and the rules).
+		help.moveTo(contentX + contentW - 4.0F, lineY);
 	}
 
 	// ================================================================== input
@@ -244,6 +273,10 @@ public final class CodexScreen extends Screen {
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+			if (unroll() >= 1.0F && help.contains(event.x(), event.y())) {
+				help.press();
+				return true;
+			}
 			for (CodexWidgets.Tablet tablet : tablets) {
 				if (tablet.contains(event.x(), event.y())) {
 					tablet.press();
@@ -260,6 +293,9 @@ public final class CodexScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
+		if (help.release(event.x(), event.y())) {
+			return true;
+		}
 		if (pressedTablet != null) {
 			CodexWidgets.Tablet tablet = pressedTablet;
 			pressedTablet = null;

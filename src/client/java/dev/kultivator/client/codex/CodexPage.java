@@ -45,6 +45,11 @@ abstract class CodexPage {
 
 	abstract int icon();
 
+	/** The Panduan › Ensiklopedia topic the header's "?" seal opens (DESIGN 33.6 R1). */
+	String helpTopic() {
+		return "kitab_teknik";
+	}
+
 	/** The blood-red tablet and paper (Kehancuran only). */
 	boolean red() {
 		return false;

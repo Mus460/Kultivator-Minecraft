@@ -21,14 +21,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Segel Merah tablet of the Sect Hall scroll (DESIGN 20.3.21): only shown while the server allows Mode Kehancuran.
+ * The Segel Merah Murid tablet of the Sect Hall scroll (DESIGN 20.3.21; renamed in 33.6 R9 so it is never mistaken for the
+ * codex's Kehancuran Diri): only shown while the server allows Mode Kehancuran.
  * Left: the three locks (server, the player's oath, the released disciples), the server's caps, the running job, the
  * casts that can still be restored and the last records. Right: the oath (opens the blood-red warning) or revoking it,
- * Pulihkan (restore) and cancelling a destructive order on its way.
+ * Pulihkan (restore), cancelling a destructive order on its way and a talisman to the player's own Kehancuran Diri page.
  */
 public class RedSealPage extends HallPage {
 
 	private static final int BUTTON_H = 18;
+	private static final int LINK_H = 13;
 	private static final long REVOKE_MILLIS = 4000L;
 	private static final String P = "kultivator.kehancuran.ui.";
 
@@ -101,6 +103,13 @@ public class RedSealPage extends HallPage {
 		cancel.enabledWhen(() -> !readonly());
 		cancel.tooltip(() -> List.of(Component.translatable(P + "cancel_order"), Component.translatable(P + "cancel_order.tip")));
 		add(cancel);
+
+		// The player's own switch lives in the Kitab Teknik (Kehancuran Diri); one talisman leads there (DESIGN 33.6 R9).
+		TalismanButton self = new TalismanButton(bx, top + 3 * (BUTTON_H + gap), columnW, LINK_H, () -> Component.translatable("kultivator.uxpages.kh.to_self"));
+		self.onPress(() -> dev.kultivator.client.codex.Codex.openTab(dev.kultivator.client.codex.CodexScreen.TAB_KEHANCURAN));
+		self.tooltip(() -> List.of(Component.translatable("kultivator.uxpages.kh.to_self.title"),
+				Component.translatable("kultivator.uxpages.kh.to_self.tip").withStyle(ChatFormatting.GRAY)));
+		add(self);
 	}
 
 	/** A sect mate's hall: shown, never acted on. */
@@ -188,7 +197,7 @@ public class RedSealPage extends HallPage {
 
 		// Right column: the warning under the buttons.
 		int bx = x + w - columnW;
-		float wy = y + 16 + 3 * (BUTTON_H + 5) + 4.0F;
+		float wy = y + 16 + 3 * (BUTTON_H + 5) + LINK_H + 4.0F;
 		panel(g, bx, Math.round(wy), x + w, y + h);
 		g.enableScissor(bx + 1, Math.round(wy) + 1, x + w - 1, y + h - 1);
 		Brush.wrap(g, font, Component.translatable(P + "page_warning").withStyle(ChatFormatting.DARK_RED), bx + 4.0F, wy + 4.0F, columnW - 8.0F,

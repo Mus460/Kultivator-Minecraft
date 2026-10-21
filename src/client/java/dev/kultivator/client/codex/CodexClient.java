@@ -4,6 +4,7 @@ import dev.kultivator.Kultivator;
 import dev.kultivator.client.ClientCultivation;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.Keys;
+import dev.kultivator.client.hub.QuickWheel;
 import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.network.Actions;
@@ -26,8 +27,9 @@ import java.util.List;
  * <li>the wheel key (unbound by default): hold to open the wheel, release to choose;</li>
  * <li>seal keys 1-4: cast loadout slots 1-4; while the wheel is open, the hotbar keys 1-4 pin the hovered seal instead;</li>
  * <li>previous / next: cycle within the loadout (all castable arts while it is empty) with the 1.2 s carousel;</li>
- * <li>the codex key opens the Kitab Teknik.</li>
+ * <li>the codex key (unbound since DESIGN 33.4; wheel slice 3 and hub section 2 reach it) opens the Kitab Teknik.</li>
  * </ul>
+ * The Roda Segel never opens while the Akses Cepat wheel ({@link QuickWheel}) is open (33.3.1).
  * While the wheel is open the use key closes it without choosing, the attack key chooses, and any screen closes it.
  */
 public final class CodexClient {
@@ -111,7 +113,7 @@ public final class CodexClient {
 		}
 		if (wheelBound) {
 			boolean down = Keys.WHEEL.isDown();
-			if (down && free && !SealWheel.isOpen()) {
+			if (down && free && !SealWheel.isOpen() && !QuickWheel.isOpen()) {
 				SealWheel.open(false);
 			} else if (!down && SealWheel.isOpen() && !SealWheel.fromCast()) {
 				SealWheel.close(true);
@@ -157,7 +159,7 @@ public final class CodexClient {
 			} else if (now - castPressedAt < SealWheel.HOLD_MILLIS) {
 				cast();
 			}
-		} else if (!SealWheel.isOpen() && now - castPressedAt >= SealWheel.HOLD_MILLIS) {
+		} else if (!SealWheel.isOpen() && !QuickWheel.isOpen() && now - castPressedAt >= SealWheel.HOLD_MILLIS) {
 			SealWheel.open(true);
 		}
 	}
