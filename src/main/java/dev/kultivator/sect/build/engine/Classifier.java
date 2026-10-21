@@ -6,6 +6,7 @@ import dev.kultivator.kehancuran.ProtectedZones;
 import dev.kultivator.sect.build.blueprint.Costs;
 import dev.kultivator.sect.build.blueprint.TerrainView;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -39,8 +40,10 @@ import java.util.UUID;
  * natural tree cluster found at scan time), cleared plants, the builder's own cells (the {@link CellIndex}, re-checked
  * against the block that stands there now), pure fluids, player-made blocks, containers and protected blocks
  * ({@code #kultivator:sect_protected}, {@code #kultivator:indestructible}, hardness below 0, the stele, a registered
- * formation lodestone, every block entity the builder did not place). A datapack may extend both tags. Server thread
- * only. The only write is clearing a stale own bit (a block the builder could never have placed sits on it).
+ * formation lodestone, the obsidian frame of a lit nether portal, a modded block entity that is not a container). A
+ * natural block entity (a tree's bee nest, a natural creaking heart) is natural; any other vanilla block entity the
+ * builder did not place (a sign, a bed, a banner, a lectern) is player-made. A datapack may extend both tags. Server
+ * thread only. The only write is clearing a stale own bit (a block the builder could never have placed sits on it).
  */
 public final class Classifier {
 
@@ -106,7 +109,14 @@ public final class Classifier {
 			if (entity instanceof Container container) {
 				return container.isEmpty() ? Kind.PLAYER_MADE : Kind.CONTAINER;
 			}
-			return Kind.PROTECTED;
+			if (naturalTagged(state)) {
+				// A tree's bee nest or a pale garden's creaking heart: displaced like the ground around it.
+				return Kind.NATURAL;
+			}
+			// A vanilla sign, bed, banner, lectern...: a player's block, taken up under "Bongkar & simpan". A modded block
+			// entity may keep contents the engine cannot see, so it is never touched.
+			Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+			return "minecraft".equals(id.getNamespace()) ? Kind.PLAYER_MADE : Kind.PROTECTED;
 		}
 		if (state.getBlock() instanceof LiquidBlock || state.is(Blocks.BUBBLE_COLUMN)) {
 			return Kind.FLUID;
@@ -170,7 +180,37 @@ public final class Classifier {
 		if (STELE.equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()))) {
 			return true;
 		}
+		if (portalFrame(level, pos, state)) {
+			return true;
+		}
 		return state.is(Blocks.LODESTONE) && FormationData.get(level).get(pos) != null;
+	}
+
+	/**
+	 * Obsidian (or crying obsidian) touching a lit nether portal: the frame of a working portal is never displaced, while
+	 * the loose obsidian of a lava pool or a ruined portal is natural.
+	 */
+	public static boolean portalFrame(ServerLevel level, BlockPos pos, BlockState state) {
+		if (!state.is(Blocks.OBSIDIAN) && !state.is(Blocks.CRYING_OBSIDIAN)) {
+			return false;
+		}
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+		for (Direction direction : Direction.values()) {
+			cursor.setWithOffset(pos, direction);
+			if (level.isLoaded(cursor) && level.getBlockState(cursor).is(Blocks.NETHER_PORTAL)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Parts of a natural growth that a ground scan looks through like a trunk (DESIGN 21.10): huge mushroom caps and
+	 * stems, a bee nest, a natural creaking heart.
+	 */
+	public static boolean growthPart(BlockState state) {
+		return state.is(Blocks.BROWN_MUSHROOM_BLOCK) || state.is(Blocks.RED_MUSHROOM_BLOCK) || state.is(Blocks.MUSHROOM_STEM) || state.is(Blocks.BEE_NEST)
+				|| state.is(Blocks.CREAKING_HEART) && naturalTagged(state);
 	}
 
 	/** Plants that are simply cleared (no drops, DESIGN 21.10). */
@@ -187,12 +227,18 @@ public final class Classifier {
 				|| state.is(Blocks.BROWN_MUSHROOM) || state.is(Blocks.RED_MUSHROOM) || state.is(Blocks.MOSS_CARPET) || naturalTagged(state);
 	}
 
-	/** In the natural tag, or leaves that would decay (not persistent). */
+	/**
+	 * In the natural tag, or leaves that would decay (not persistent). A block with the {@code natural} state property
+	 * (the creaking heart) counts only while worldgen set it.
+	 */
 	public static boolean naturalTagged(BlockState state) {
 		if (state.is(BlockTags.LEAVES)) {
 			return naturalLeaves(state);
 		}
-		return state.is(NATURAL);
+		if (!state.is(NATURAL)) {
+			return false;
+		}
+		return !state.hasProperty(BlockStateProperties.NATURAL) || state.getValue(BlockStateProperties.NATURAL);
 	}
 
 	/** Leaves that decay (a tree's, never a player's persistent leaves). */

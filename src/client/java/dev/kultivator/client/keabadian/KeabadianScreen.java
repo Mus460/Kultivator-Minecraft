@@ -46,6 +46,16 @@ public class KeabadianScreen extends DuniaScreen {
 	}
 
 	@Override
+	protected int channelOf(int index) {
+		return switch (index) {
+			case 0, 5 -> dev.kultivator.network.Payloads.DuniaSync.CH_ABADI;
+			case 1, 2 -> dev.kultivator.network.Payloads.DuniaSync.CH_PURBA;
+			case 3, 4 -> dev.kultivator.network.Payloads.DuniaSync.CH_BATIN;
+			default -> -1;
+		};
+	}
+
+	@Override
 	protected void requestData() {
 		DuniaClient.requestAbadi();
 	}

@@ -16,6 +16,12 @@ public final class Limits {
 	public static final int ABADI_EACH = 1;
 	/** Ancient Transportation (L5) nodes per owner. */
 	public static final int L5_NODES = 4;
+	/** The Ancient Transportation spec id. */
+	public static final String L5_SPEC = "ancient_transfer";
+	/** L5 nodes that may stand outside the territory as outposts (DESIGN 24.4.10), counted inside {@link #L5_NODES}. */
+	public static final int L5_OUTPOSTS = 2;
+	/** An outpost stands within this many blocks (horizontal) of the stele, in the hall's dimension. */
+	public static final int L5_OUTPOST_RANGE = 4096;
 	/** Personal cores (outside every territory) per player. */
 	public static final int PERSONAL_MAX = 2;
 	/** Personal cores count as this hall level for gates and radii. */

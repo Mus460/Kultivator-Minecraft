@@ -265,6 +265,7 @@ final class Site {
 		return plan().footprint();
 	}
 
+	/** Done or skipped: settled for the queue only; the completed tier counts DONE components alone (Scheduler). */
 	boolean finished(String componentId) {
 		return done.contains(componentId) || skipped.contains(componentId);
 	}

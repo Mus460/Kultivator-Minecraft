@@ -14,6 +14,7 @@ import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.DiscipleHooks;
 import dev.kultivator.disciple.Disciples;
 import dev.kultivator.disciple.power.DisciplePowers;
+import dev.kultivator.sect.build.flow.LumbungOverflow;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sect.hall.SectRanks;
 import dev.kultivator.sect.hall.Talents;
@@ -49,7 +50,8 @@ import java.util.function.ToDoubleFunction;
  * Tugas Sekte and the herb refining (DESIGN 20.3.9, 20.3.11): duty posts 5 blocks N/E/S/W of the stele, a disciple per
  * post looping a cosmetic pose (activity 1-4, rendered by module C). No block or crop is touched: the output is computed
  * lazily from elapsed game time (at most 24,000 ticks banked per post) every 60 s while the hall chunk is loaded and
- * when the hall opens, and goes to the {@link Storehouse}. The disciple's duty is kept in {@code extra.activity.duty}.
+ * when the hall opens, and goes to the {@link Storehouse} (the overflow to the Peti Galian, {@link LumbungOverflow}). The
+ * disciple's duty is kept in {@code extra.activity.duty}.
  * <p>
  * Sumber: Renegade Immortal (Wang Lin's ten vats of water a day); A Record of a Mortal's Journey ch. 150-151 (the
  * Hundred Medicine Garden); A Will Eternal ch. 2 and 20-26 (the Ovens, the Spirit Tail Chickens, the chicken thief task
@@ -361,7 +363,7 @@ public final class Duties {
 		}
 		long now = EventUtil.gameTime();
 		ServerPlayer player = EventUtil.player(owner);
-		List<Component> lost = new ArrayList<>();
+		Overflow lost = new Overflow();
 		RandomSource random = level.getRandom();
 		for (String key : List.copyOf(posts.keySet())) {
 			CompoundTag post = posts.getCompoundOrEmpty(key);
@@ -443,9 +445,7 @@ public final class Duties {
 			thief(owner, disciple, data, player, random);
 		}
 		EventUtil.dirty();
-		if (!lost.isEmpty() && player != null) {
-			EventUtil.chat(player, Component.translatable("kultivator.sectevent.store.full", lost.get(0)).withStyle(ChatFormatting.RED));
-		}
+		LumbungOverflow.tell(player, owner, lost.worst, lost.example);
 	}
 
 	private static void water(DiscipleEntity disciple, DiscipleData data, double minutes) {
@@ -485,10 +485,19 @@ public final class Duties {
 		return whole;
 	}
 
-	private static void store(UUID owner, ItemStack stack, List<Component> lost) {
-		ItemStack rest = Storehouse.insert(owner, stack);
-		if (!rest.isEmpty()) {
-			lost.add(rest.getHoverName());
+	/** Where this round's overflow went (the worst case) and one item of it, for a single note. */
+	private static final class Overflow {
+		int worst = LumbungOverflow.LUMBUNG;
+		@Nullable Component example;
+	}
+
+	/** Into the Lumbung; what does not fit goes to the Peti Galian or waits for room (never lost). */
+	private static void store(UUID owner, ItemStack stack, Overflow overflow) {
+		Component name = stack.getHoverName();
+		int where = LumbungOverflow.store(owner, stack);
+		if (where > overflow.worst) {
+			overflow.worst = where;
+			overflow.example = name;
 		}
 	}
 

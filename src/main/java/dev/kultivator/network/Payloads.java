@@ -14,6 +14,24 @@ import java.util.List;
 /** Every custom packet of the mod. */
 public final class Payloads {
 
+	/**
+	 * The real encoded size of {@code tag} on the wire (what {@link ByteBufCodecs#TRUSTED_COMPOUND_TAG} writes). Use this
+	 * for every byte budget: {@code CompoundTag.sizeInBytes()} is a heap estimate, about 7x the wire size, and wrongly
+	 * blocked the Abadi, Batin and Desa syncs.
+	 */
+	public static int wireBytes(CompoundTag tag) {
+		if (tag == null) {
+			return 1;
+		}
+		io.netty.buffer.ByteBuf buf = io.netty.buffer.Unpooled.buffer(256);
+		try {
+			ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, tag);
+			return buf.readableBytes();
+		} finally {
+			buf.release();
+		}
+	}
+
 	private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> typeOf(String name) {
 		return new CustomPacketPayload.Type<>(Kultivator.id(name));
 	}
@@ -504,8 +522,10 @@ public final class Payloads {
 		public static final int CH_BATIN = 6;
 		/** The number of channels (the client keeps one version counter per channel). */
 		public static final int CHANNELS = 7;
-		/** The size budget of one sync (DESIGN 25.13). */
-		public static final int MAX_BYTES = 8192;
+		/** The size budget of one sync (DESIGN 25.13), measured on the wire with {@link Payloads#wireBytes}; vanilla allows 1 MiB. */
+		public static final int MAX_BYTES = 65536;
+		/** One over-budget warning per channel per server run, so a big sync does not spam the log. */
+		private static final boolean[] WARNED = new boolean[CHANNELS];
 
 		public static final Type<DuniaSync> TYPE = typeOf("dunia_sync");
 		public static final StreamCodec<RegistryFriendlyByteBuf, DuniaSync> CODEC = StreamCodec.of(
@@ -517,12 +537,19 @@ public final class Payloads {
 
 		/**
 		 * Sends {@code data} on {@code channel} to the player (skipped for vanilla clients). Data over {@link #MAX_BYTES} is
-		 * not sent: a warning is logged and the client gets {@code {too_big: true}} instead, so the budget bug is visible.
+		 * not sent: a warning is logged (once per channel) and the client gets {@code {too_big: true}} instead; the client
+		 * keeps its previous data and shows a "data too big" line.
 		 */
 		public static void send(net.minecraft.server.level.ServerPlayer player, int channel, CompoundTag data) {
 			CompoundTag out = data == null ? new CompoundTag() : data;
-			if (out.sizeInBytes() > MAX_BYTES) {
-				Kultivator.LOGGER.warn("DuniaSync channel {} is {} bytes, over the {} byte budget; not sent", channel, out.sizeInBytes(), MAX_BYTES);
+			int bytes = wireBytes(out);
+			if (bytes > MAX_BYTES) {
+				if (channel < 0 || channel >= CHANNELS || !WARNED[channel]) {
+					if (channel >= 0 && channel < CHANNELS) {
+						WARNED[channel] = true;
+					}
+					Kultivator.LOGGER.warn("DuniaSync channel {} is {} bytes, over the {} byte budget; not sent", channel, bytes, MAX_BYTES);
+				}
 				out = new CompoundTag();
 				out.putBoolean("too_big", true);
 			}
@@ -668,7 +695,8 @@ public final class Payloads {
 	 * {@code carveR} are the scaled values. Routed to {@code client.pusakalangit.TitahClient.onSync}.
 	 */
 	public record TitahSync(CompoundTag data) implements CustomPacketPayload {
-		public static final int MAX_BYTES = 65536; // the Tingkat readouts (29.16) pushed it past 10 KiB; vanilla allows 1 MiB
+		public static final int MAX_BYTES = 65536; // measured on the wire (Payloads.wireBytes); vanilla allows 1 MiB
+		private static boolean warned;
 		public static final Type<TitahSync> TYPE = typeOf("titah_sync");
 		public static final StreamCodec<RegistryFriendlyByteBuf, TitahSync> CODEC = StreamCodec.of(
 				(buf, p) -> ByteBufCodecs.TRUSTED_COMPOUND_TAG.encode(buf, p.data),
@@ -677,8 +705,12 @@ public final class Payloads {
 		/** Sends {@code data} to the player (skipped for vanilla clients); over {@link #MAX_BYTES}: a warning and {too_big}. */
 		public static void send(net.minecraft.server.level.ServerPlayer player, CompoundTag data) {
 			CompoundTag out = data == null ? new CompoundTag() : data;
-			if (out.sizeInBytes() > MAX_BYTES) {
-				Kultivator.LOGGER.warn("TitahSync is {} bytes, over the {} byte budget; not sent", out.sizeInBytes(), MAX_BYTES);
+			int bytes = wireBytes(out);
+			if (bytes > MAX_BYTES) {
+				if (!warned) {
+					warned = true;
+					Kultivator.LOGGER.warn("TitahSync is {} bytes, over the {} byte budget; not sent", bytes, MAX_BYTES);
+				}
 				out = new CompoundTag();
 				out.putBoolean("too_big", true);
 			}
@@ -701,7 +733,8 @@ public final class Payloads {
 	 * {@link #MAX_BYTES} (the oldest entries are dropped to fit).
 	 */
 	public record TitahFar(CompoundTag data) implements CustomPacketPayload {
-		public static final int MAX_BYTES = 4096;
+		/** Measured on the wire ({@link Payloads#wireBytes}): one entry is about 120 bytes, so all 24 fit with room. */
+		public static final int MAX_BYTES = 8192;
 		public static final int MAX_ENTRIES = 24;
 		public static final Type<TitahFar> TYPE = typeOf("titah_far");
 		public static final StreamCodec<RegistryFriendlyByteBuf, TitahFar> CODEC = StreamCodec.of(
@@ -716,7 +749,7 @@ public final class Payloads {
 				list.remove(list.size() - 1);
 			}
 			out.put("m", list);
-			while (out.sizeInBytes() > MAX_BYTES && !list.isEmpty()) {
+			while (!list.isEmpty() && wireBytes(out) > MAX_BYTES) {
 				list.remove(list.size() - 1);
 				out.put("m", list);
 			}

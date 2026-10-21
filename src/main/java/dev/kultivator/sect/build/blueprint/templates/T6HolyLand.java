@@ -233,7 +233,7 @@ public final class T6HolyLand {
 		b.add(Component.of("t5_disc", 5).kind("formation").name("disc").group(Group.AXIS)
 				.add(new FormationDisc(6, 7, p).clip(-11, -4, 11, 17)));
 		b.add(Component.of("t5_altars", 5).kind("altar").name("gate_altars").group(Group.BOUNDARY)
-				.add(new GateAltar(-18, 31, p)).add(new GateAltar(18, 31, p)));
+				.add(new GateAltar(-18, 31, p).emptySockets()).add(new GateAltar(18, 31, p).emptySockets()));
 		b.add(Component.of("t5_watch", 5).kind("tower").name("watch_towers").group(Group.BOUNDARY)
 				.add(new Pavilion(-34, 24, p).size(5).eaves(2).rank(Rank.B).entry(Direction.NORTH))
 				.add(new Pavilion(34, 24, p).size(5).eaves(2).rank(Rank.B).entry(Direction.NORTH)));

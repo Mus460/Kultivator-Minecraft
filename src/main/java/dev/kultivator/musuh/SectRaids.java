@@ -102,6 +102,8 @@ public final class SectRaids {
 	public static final TagKey<Item> RAID_SAFE = TagKey.create(Registries.ITEM, Kultivator.id("raid_safe"));
 	public static final int STATE_IDLE = 0;
 	public static final int STATE_OMEN = 1;
+	/** Days until a raid whose raiders could not arrive anywhere comes again. */
+	static final int POSTPONE_DAYS = 2;
 	/** Results kept in the raid log. */
 	public static final int RES_REPELLED = 0;
 	public static final int RES_HELD = 1;
@@ -452,9 +454,16 @@ public final class SectRaids {
 			}
 			raid.queue.poll();
 			raid.alive.add(mob);
+			raid.spawned++;
 		}
 		if (raid.spawnFails > 30 && !raid.queue.isEmpty()) {
-			// No room to arrive for half a minute: the rest of this wave never comes.
+			if (raid.spawned == 0) {
+				// Not one raider could arrive (water all around, no solid ground): postpone instead of a free repel.
+				postpone(server, raid);
+				return;
+			}
+			// No room to arrive for half a minute: the rest of this wave never comes (and the raid is no longer flawless).
+			raid.lost += raid.queue.size();
 			raid.queue.clear();
 		}
 		if (raid.queue.isEmpty() && raid.alive.isEmpty()) {
@@ -497,7 +506,11 @@ public final class SectRaids {
 		tellTerritory(raid, line.copy().withStyle(ChatFormatting.RED));
 	}
 
-	/** A point on the territory edge + 4..8 toward one of the raid's directions, within simulation distance of the owner. */
+	/**
+	 * A point on the territory edge + 4..8 toward one of the raid's directions, within simulation distance of the owner, on
+	 * dry solid ground: water and other fluid spots are skipped (a few nearby angles and closer scales are tried), and an
+	 * island or coastal hall falls back to land 8-12 blocks from the stele. Null when there is no such ground loaded.
+	 */
 	private static @Nullable Vec3 spawnPoint(MinecraftServer server, RaidState raid, @Nullable ServerPlayer owner) {
 		ServerLevel level = raid.level;
 		RandomSource random = level.getRandom();
@@ -512,15 +525,73 @@ public final class SectRaids {
 				point = owner.position().add(flat.normalize().scale(max));
 			}
 		}
-		for (double scale : new double[]{1.0D, 0.75D, 0.5D}) {
-			Vec3 q = centre.add(point.subtract(centre).multiply(scale, 0.0D, scale));
-			BlockPos block = BlockPos.containing(q);
-			if (level.isPositionEntityTicking(block)) {
-				int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, block.getX(), block.getZ());
-				return new Vec3(q.x, y, q.z);
+		Vec3 offset = point.subtract(centre);
+		double reach = offset.horizontalDistance();
+		double heading = Math.atan2(offset.z, offset.x);
+		for (int attempt = 0; attempt < 4; attempt++) {
+			Vec3 base = point;
+			if (attempt > 0) {
+				double turned = heading + (random.nextDouble() - 0.5D) * 1.2D;
+				base = centre.add(Math.cos(turned) * reach, 0.0D, Math.sin(turned) * reach);
+			}
+			for (double scale : new double[]{1.0D, 0.75D, 0.5D}) {
+				Vec3 land = dryLand(level, centre.add(base.subtract(centre).multiply(scale, 0.0D, scale)));
+				if (land != null) {
+					return land;
+				}
+			}
+		}
+		// The edge is water (an island or coastal hall): solid land 8-12 blocks from the stele, where the defenders stand.
+		for (int attempt = 0; attempt < 16; attempt++) {
+			double turned = random.nextDouble() * Math.PI * 2.0D;
+			double near = 8.0D + random.nextDouble() * 4.0D;
+			Vec3 land = dryLand(level, centre.add(Math.cos(turned) * near, 0.0D, Math.sin(turned) * near));
+			if (land != null) {
+				return land;
 			}
 		}
 		return null;
+	}
+
+	/** The surface at {@code q} when it is entity-ticking, solid and dry (no water, lava or other fluid), else null. */
+	private static @Nullable Vec3 dryLand(ServerLevel level, Vec3 q) {
+		BlockPos block = BlockPos.containing(q);
+		if (!level.isPositionEntityTicking(block)) {
+			return null;
+		}
+		int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, block.getX(), block.getZ());
+		BlockPos ground = new BlockPos(block.getX(), y - 1, block.getZ());
+		if (!level.getFluidState(ground).isEmpty() || !level.getFluidState(ground.above()).isEmpty()
+				|| level.getBlockState(ground).getCollisionShape(level, ground).isEmpty()) {
+			return null;
+		}
+		return new Vec3(q.x, y, q.z);
+	}
+
+	/**
+	 * Not one raider could arrive: the raid is called off without a result (no rewards, no {@code raid_flawless}, no count)
+	 * and comes again in {@link #POSTPONE_DAYS} days, after a new omen.
+	 */
+	private static void postpone(MinecraftServer server, RaidState raid) {
+		LIVE.remove(raid.owner);
+		raid.clearBars();
+		for (RogueCultivatorEntity mob : List.copyOf(raid.alive)) {
+			mob.vanish(false);
+		}
+		if (!raid.test) {
+			CompoundTag section = Halls.section(raid.owner, SECTION);
+			section.putInt("state", STATE_IDLE);
+			section.putLong("next_day", today(server) + POSTPONE_DAYS);
+			section.remove("interrupted");
+		}
+		Halls.setDirty();
+		Component line = Component.translatable("kultivator.sect_fix_feat.raid.postponed", LootPouches.sectName(raid.sect), POSTPONE_DAYS);
+		Halls.log(raid.owner, line);
+		tellTerritory(raid, line.copy().withStyle(ChatFormatting.GRAY));
+		ServerPlayer player = server.getPlayerList().getPlayer(raid.owner);
+		if (player != null && !viewers(raid, player).contains(player)) {
+			Msg.chat(player, line.copy().withStyle(ChatFormatting.GRAY));
+		}
 	}
 
 	private static void updateBars(RaidState raid, @Nullable ServerPlayer owner) {
@@ -611,6 +682,11 @@ public final class SectRaids {
 			mob.vanish(false);
 		}
 		UUID owner = raid.owner;
+		if (result == RES_REPELLED && raid.spawned == 0) {
+			// A raid with no raiders is no victory: no pouches, no PK, no raid_flawless; it comes again later.
+			postpone(server, raid);
+			return;
+		}
 		ServerPlayer player = server.getPlayerList().getPlayer(owner);
 		Component summary;
 		switch (result) {
@@ -635,7 +711,7 @@ public final class SectRaids {
 				}
 				if (player != null) {
 					Advancements.grant(player, "raid_repelled");
-					if (raid.maxMeter <= 0.0D) {
+					if (raid.maxMeter <= 0.0D && raid.lost == 0) {
 						Advancements.grant(player, "raid_flawless");
 					}
 				}

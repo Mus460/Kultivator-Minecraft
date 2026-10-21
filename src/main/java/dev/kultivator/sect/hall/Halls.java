@@ -218,6 +218,7 @@ public final class Halls {
 	public static void init() {
 		HallItems.init();
 		SectRanks.init();
+		HallBlock.initSneakUse();
 		ServerLifecycleEvents.SERVER_STARTED.register(started -> server = started);
 		ServerLifecycleEvents.SERVER_STOPPED.register(stopped -> {
 			server = null;

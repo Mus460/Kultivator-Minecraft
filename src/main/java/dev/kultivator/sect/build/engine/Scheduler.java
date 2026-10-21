@@ -59,7 +59,11 @@ final class Scheduler {
 				&& !site.suspended.contains(component.id());
 	}
 
-	/** The highest tier above {@code site.tier} whose components (and all below) are finished; the tier never falls. */
+	/**
+	 * The highest tier above {@code site.tier} whose components (and all below) are DONE; the tier never falls. A skipped
+	 * component lets the queue move on ({@link #next}) but never completes its tier, so skipping cannot raise the hall's
+	 * building cap or bits.
+	 */
 	static int completedTier(Site site) {
 		TemplateSpec spec = site.spec();
 		int tier = site.tier;
@@ -70,7 +74,7 @@ final class Scheduler {
 			}
 			boolean all = true;
 			for (Component component : list) {
-				if (!site.finished(component.id())) {
+				if (!site.done.contains(component.id())) {
 					all = false;
 					break;
 				}
@@ -83,7 +87,7 @@ final class Scheduler {
 		return tier;
 	}
 
-	/** The highest tier whose components, and all below, are still finished (deconstruction lowers the tier with it). */
+	/** The highest tier whose components, and all below, are still DONE (deconstruction lowers the tier with it). */
 	static int builtTier(Site site) {
 		TemplateSpec spec = site.spec();
 		int tier = 0;
@@ -93,7 +97,7 @@ final class Scheduler {
 				break;
 			}
 			for (Component component : list) {
-				if (!site.finished(component.id())) {
+				if (!site.done.contains(component.id())) {
 					return tier;
 				}
 			}

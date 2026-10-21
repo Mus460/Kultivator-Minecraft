@@ -1,0 +1,10 @@
+{
+  "kultivator.sect_fix_feat.too_big": "Data terlalu besar untuk disinkronkan; menampilkan data terakhir. Mohon laporkan.",
+  "kultivator.sect_fix_feat.raid.postponed": "%s tidak menemukan daratan padat di dekat sekte; serbuan ditunda %s hari.",
+  "kultivator.sect_fix_feat.outpost.limit": "Paling banyak %s pos luar Formasi Perpindahan Kuno boleh berdiri di luar wilayah.",
+  "kultivator.sect_fix_feat.outpost.registered": "Pos luar %s/%s terdaftar di luar wilayah (paling jauh %s blok dari prasasti, dimensi yang sama, aula harus tetap aktif).",
+  "kultivator.sect_fix_feat.anchor.none": "\"Di Titik Formasi\" disembunyikan: templat sekte ini belum punya Titik Formasi yang sudah dibangun.",
+  "kultivator.disciplecult.why.bt_doomed": "Petir akan mengambil lebih banyak nyawa daripada yang tersisa",
+  "kultivator.sect_fix_feat.bt.refuse.doomed": "%s pasti gagal: %s sambaran mengambil total %s%% nyawa maksimal, padahal sisa nyawanya hanya %s%%. Sembuhkan dulu, beri pil tribulasi, atau jaga (Hu Fa) sebelum memulai.",
+  "kultivator.sect_fix_feat.scroll.limit": "Batas: %s murid tanpa Aula Sekte; dengan aula, 5 + setengah Tingkat Aula (Tingkat %3$s: %2$s), ditambah bonus bangunan sekte."
+}

@@ -47,6 +47,10 @@ final class RaidState {
 	long absentSince = -1L;
 	int spawnFails;
 	int spawnIndex;
+	/** Raiders that arrived in this raid (all waves). */
+	int spawned;
+	/** Queued raiders dropped because they found no room to arrive (the raid is then not flawless). */
+	int lost;
 	int elders;
 	int patriarchs;
 	boolean discipleHelped;

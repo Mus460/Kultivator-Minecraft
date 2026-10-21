@@ -178,6 +178,31 @@ public final class CoreTicker {
 		return server == null ? 0L : server.overworld().getGameTime();
 	}
 
+	/** True for an Ancient Transfer (L5) outpost: registered to the sect outside its territory (DESIGN 24.4.10). */
+	public static boolean outpost(CoreRecord record) {
+		return record.ext.getBooleanOr("outpost", false);
+	}
+
+	/**
+	 * True when {@code eye} is a valid L5 outpost site of {@code owner}: the hall is active, in this dimension, and its
+	 * stele within {@link Limits#L5_OUTPOST_RANGE} blocks (horizontal).
+	 */
+	public static boolean outpostSite(UUID owner, ServerLevel level, BlockPos eye) {
+		Halls.HallView hall = Halls.hallOf(owner);
+		if (hall == null || !hall.active() || !hall.dim().equals(level.dimension())) {
+			return false;
+		}
+		long dx = eye.getX() - hall.pos().getX();
+		long dz = eye.getZ() - hall.pos().getZ();
+		long range = Limits.L5_OUTPOST_RANGE;
+		return dx * dx + dz * dz <= range * range;
+	}
+
+	/** An outpost record that may run where it stands (L5, flagged, and on a valid outpost site). */
+	private static boolean outpostHere(ServerLevel level, CoreRecord record) {
+		return outpost(record) && Limits.L5_SPEC.equals(record.spec) && outpostSite(record.owner, level, record.eye);
+	}
+
 	/** The owner's hall level, or the level pretended by {@code uji formasi aula}. */
 	public static int hallLevel(UUID owner) {
 		Integer pretend = PRETEND_HALL.get(owner);
@@ -507,7 +532,7 @@ public final class CoreTicker {
 				if (hall == null || !hall.active()) {
 					return Component.translatable("kultivator.formasi.reason.hall_dormant");
 				}
-				if (!Halls.inTerritory(record.owner, level, Vec3.atCenterOf(record.eye))) {
+				if (!Halls.inTerritory(record.owner, level, Vec3.atCenterOf(record.eye)) && !outpostHere(level, record)) {
 					return Component.translatable("kultivator.formasi.reason.outside");
 				}
 			}
@@ -688,7 +713,7 @@ public final class CoreTicker {
 					continue;
 				}
 				ServerLevel level = running.getLevel(record.dim);
-				if (level == null || !Halls.inTerritory(owner, level, Vec3.atCenterOf(record.eye))) {
+				if (level == null || !Halls.inTerritory(owner, level, Vec3.atCenterOf(record.eye)) && !outpostHere(level, record)) {
 					continue;
 				}
 				// A core that would be suspended anyway (requirement not met, an effect blocker, config off) takes no slot.

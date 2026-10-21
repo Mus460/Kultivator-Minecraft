@@ -400,16 +400,47 @@ public final class BuildCommands {
 
 	/** 0 prioritas, 1 lewati, 2 tanpa-terhalang. */
 	private static int componentOp(ServerPlayer player, String id, int op) {
+		OpResult result = componentAction(player.getUUID(), id, op);
+		Msg.chat(player, result.message());
+		return result.ok() ? 1 : 0;
+	}
+
+	/** The outcome of a component action and its message (aqua when done, yellow when refused). */
+	public record OpResult(boolean ok, Component message) {
+	}
+
+	/**
+	 * Runs 0 prioritas, 1 lewati or 2 tanpa-terhalang for the owner's component. Prioritizing a skipped component queues
+	 * it again; skipping is refused for a component that is neither blocked nor waiting for materials, and its message
+	 * says that a skipped part does not count for the tier.
+	 */
+	public static OpResult componentAction(UUID owner, String id, int op) {
 		EngineApi engine = EngineApi.get();
-		UUID owner = player.getUUID();
+		int before = -1;
+		for (ComponentView view : engine.components(owner)) {
+			if (view.id().equals(id)) {
+				before = view.state();
+				break;
+			}
+		}
 		boolean ok = switch (op) {
 			case 0 -> engine.prioritize(owner, id);
 			case 1 -> engine.skip(owner, id);
 			default -> engine.finishWithoutBlocked(owner, id);
 		};
-		String key = op == 0 ? "kultivator.sectbuild.prio.done" : op == 1 ? "kultivator.sectbuild.skip.done" : "kultivator.sectbuild.finish_blocked.done";
-		Msg.chat(player, Component.translatable(ok ? key : "kultivator.sectbuild.component.not_found").withStyle(ok ? ChatFormatting.AQUA : ChatFormatting.YELLOW));
-		return ok ? 1 : 0;
+		String key;
+		if (ok) {
+			key = switch (op) {
+				case 0 -> before == ComponentView.STATE_SKIPPED ? "kultivator.sectbuild.prio.requeued" : "kultivator.sectbuild.prio.done";
+				case 1 -> "kultivator.sectbuild.skip.done_rules";
+				default -> "kultivator.sectbuild.finish_blocked.done";
+			};
+		} else if (op == 1 && before >= 0 && before != ComponentView.STATE_DONE && before != ComponentView.STATE_SKIPPED) {
+			key = "kultivator.sectbuild.skip.not_allowed";
+		} else {
+			key = "kultivator.sectbuild.component.not_found";
+		}
+		return new OpResult(ok, Component.translatable(key).withStyle(ok ? ChatFormatting.AQUA : ChatFormatting.YELLOW));
 	}
 
 	/** Periksa &amp; Perbaiki: inspects the finished components (off the server thread); the engine reports what it queued. */

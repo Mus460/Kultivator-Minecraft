@@ -1312,7 +1312,23 @@ public final class DiscipleCultivation {
 				&& entity.getHealth() < entity.getMaxHealth() * TRIBULATION_MIN_HEALTH) {
 			return PREFIX + "why.bt_injured";
 		}
+		if (DiscipleBreakthrough.kindFor(rank) == DiscipleBreakthrough.Kind.TRIBULATION && tribulationDoomed(entity)) {
+			return PREFIX + "why.bt_doomed";
+		}
 		return null;
+	}
+
+	/**
+	 * True when the strikes alone would take at least the health the disciple has now and no Hu Fa is guarding it: the
+	 * tribulation is certain to fail, so it does not start (the master is told to heal, give a pill or guard first).
+	 */
+	public static boolean tribulationDoomed(DiscipleEntity entity) {
+		DiscipleData data = entity.data();
+		Rank next = data.rank().next();
+		double total = DiscipleBreakthrough.totalShare(data, next);
+		float max = Math.max(1.0F, entity.getMaxHealth());
+		double health = (entity.getHealth() + entity.getAbsorptionAmount()) / max;
+		return health <= total && !dev.kultivator.disciple.path.HuFa.active(entity);
 	}
 
 	/**
@@ -1344,6 +1360,13 @@ public final class DiscipleCultivation {
 				case "why.bt_offline", "why.bt_master_far" -> Component.translatable(PREFIX + "bt.refuse.master_far",
 						String.valueOf((int) BREAKTHROUGH_RANGE), name);
 				case "why.bt_injured" -> Component.translatable(PREFIX + "bt.refuse.injured", name);
+				case "why.bt_doomed" -> {
+					Rank next = rank.next();
+					double total = DiscipleBreakthrough.totalShare(data, next);
+					float max = Math.max(1.0F, entity.getMaxHealth());
+					yield Component.translatable("kultivator.sect_fix_feat.bt.refuse.doomed", name, DiscipleBreakthrough.strikeCount(next),
+							Math.round(total * 100.0D), Math.round((entity.getHealth() + entity.getAbsorptionAmount()) / max * 100.0F));
+				}
 				default -> Component.translatable(PREFIX + "bt.refuse.busy", name);
 			};
 			Msg.chat(master, message.withColor(REFUSE));
@@ -1472,7 +1495,7 @@ public final class DiscipleCultivation {
 			tag.putString("breakthrough_kind_key", PREFIX + "kind." + kindId);
 			tag.putDouble("breakthrough_chance", kind == DiscipleBreakthrough.Kind.GATHERING ? DiscipleBreakthrough.chance(entity, data) : 1.0D);
 			tag.putInt("breakthrough_strikes", kind == DiscipleBreakthrough.Kind.TRIBULATION ? DiscipleBreakthrough.strikeCount(next) : 0);
-			tag.putDouble("breakthrough_strike_share", DiscipleBreakthrough.strikeShare(data));
+			tag.putDouble("breakthrough_strike_share", DiscipleBreakthrough.strikeShare(data, next));
 			tag.putInt("next_realm", next.realm().ordinal());
 			tag.putInt("next_layer", next.layer());
 			tag.putInt("next_stage", next.stage());

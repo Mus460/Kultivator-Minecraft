@@ -32,7 +32,9 @@ import net.minecraft.world.level.block.WallHangingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.WallSkullBlock;
 import net.minecraft.world.level.block.WallTorchBlock;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.entity.SignTextSlot;
@@ -185,10 +187,25 @@ public final class BuildPlacer {
 		int flags = actual.isAir() ? REMOVE_FLAGS : PLACE_FLAGS;
 		if (undo == null) {
 			switch (kind) {
-				case NATURAL -> displace(level, site, pos, current, false);
+				case NATURAL -> {
+					if (current.hasBlockEntity()) {
+						// A tree's bee nest or a natural creaking heart: the bees fly out, the block itself goes to the
+						// Peti Galian (it drops nothing without silk touch).
+						if (level.getBlockEntity(pos) instanceof BeehiveBlockEntity hive) {
+							hive.emptyAllLivingFromHive(null, current, BeehiveBlockEntity.BeeReleaseStatus.EMERGENCY);
+						}
+						displace(level, site, pos, current, true);
+					} else {
+						displace(level, site, pos, current, false);
+					}
+				}
 				case PLAYER_MADE -> {
 					displace(level, site, pos, current, true);
 					if (current.hasBlockEntity()) {
+						// A lectern's book would otherwise vanish with the skipped side effects.
+						if (level.getBlockEntity(pos) instanceof LecternBlockEntity lectern && !lectern.getBook().isEmpty()) {
+							MaterialLedger.get().salvage(site.ledgerOwner(), lectern.getBook().copy());
+						}
 						flags |= Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS;
 					}
 				}

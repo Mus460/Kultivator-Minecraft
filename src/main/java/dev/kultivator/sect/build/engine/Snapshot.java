@@ -2,6 +2,7 @@ package dev.kultivator.sect.build.engine;
 
 import dev.kultivator.sect.build.blueprint.TerrainView;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -211,6 +212,10 @@ public final class Snapshot {
 						}
 						continue;
 					}
+					if (Classifier.growthPart(state)) {
+						// A huge mushroom, a tree's bee nest, a natural creaking heart: looked through like a trunk.
+						continue;
+					}
 					if (state.is(BlockTags.LOGS)) {
 						if (Classifier.treeLog(state)) {
 							logs = true;
@@ -246,7 +251,8 @@ public final class Snapshot {
 		for (Map.Entry<BlockPos, BlockEntity> entry : chunk.getBlockEntities().entrySet()) {
 			BlockPos pos = entry.getKey();
 			int i = index(pos.getX(), pos.getZ());
-			if (i < 0 || own && index.isPlaced(level, pos)) {
+			if (i < 0 || own && index.isPlaced(level, pos) || Classifier.naturalTagged(entry.getValue().getBlockState())) {
+				// The sect's own, or a natural one (a tree's bee nest): never an obstacle.
 				continue;
 			}
 			flags[i] |= TerrainView.BLOCK_ENTITY;
@@ -269,10 +275,11 @@ public final class Snapshot {
 		if (entity instanceof RandomizableContainer loot && loot.getLootTable() != null) {
 			return BE_ITEMS;
 		}
-		if (entity instanceof Container container && !container.isEmpty()) {
-			return BE_ITEMS;
+		if (entity instanceof Container container) {
+			return container.isEmpty() ? BE_OTHER : BE_ITEMS;
 		}
-		return BE_OTHER;
+		// A modded block entity that is not a container is never touched at placement (Classifier).
+		return "minecraft".equals(BuiltInRegistries.BLOCK.getKey(state.getBlock()).getNamespace()) ? BE_OTHER : BE_PROTECTED;
 	}
 
 	/** This snapshot seen in template-local coordinates for a site at {@code stele} with rotation {@code rot}. */

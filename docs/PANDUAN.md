@@ -2210,6 +2210,8 @@ dan bisa [melampaui Gurunya](#293-murid-melampaui-guru).
   gulungan itu: seorang murid muncul di depanmu (atau di sampingmu bila di depan tidak ada tanah aman) sebagai
   **Manusia Fana**, dan akar spiritualnya langsung diuji dengan peluang yang sama seperti milikmu (lihat
   [Akar spiritual](#10-akar-spiritual)). Gulungan hanya terpakai bila murid benar-benar datang.
+* Batas murid hidup (juga di tooltip gulungan): 5 tanpa Aula Sekte; dengan aula `5 + Tingkat Aula ÷ 2` (Tingkat 9: 9),
+  ditambah bonus bangunan sekte.
 * Setiap murid mendapat nama xianxia acak dan salah satu kulit pemain bawaan. Hanya Gurunya yang bisa mengganti nama
   dengan Label Nama.
 * Murid tidak pernah menghilang sendiri, tersimpan bersama dunia, dan tidak bisa diikat tali atau ditunggangi.
@@ -2285,6 +2287,8 @@ Sejak Fase 6c aturan lengkapnya ada di [12.10](#1210-teknik-dan-murid). Ringkasn
 * Tab **Teknik** memakai kartu Kitab Teknik dalam mode mengajar: teknik yang kamu kuasai (terstempel bila murid sudah
   menguasainya, bergembok bila tidak bisa diajar), saringan Dao/keadaan/urutan, detail dengan Sumber dan alasan, tombol
   **Ajarkan**, dan soket **Siapkan** untuk slot tempur.
+* **Siapkan** dan pilihan teknik Dewa bekerja sejauh layar murid bisa dibuka (64 blok). **Ajarkan** tetap butuh 16 blok;
+  di luar jaraknya muncul pesan "terlalu jauh".
 * Biaya mengajar menurut tingkat teknik: Kuning 10%, Misterius 15%, Bumi 20%, Langit 30%, Abadi 40%, Dewa 50% dari Qi
   maksimummu. Penguasaan murid mulai dari tingkat penguasaanmu − 1. Slip Giok bisa mengajar tanpa qi guru.
 * Murid harus mencapai ranah minimal teknik itu, menempuh Dao yang sama (kecuali pengecualian bakat atau fisiknya),
@@ -2320,10 +2324,12 @@ tribulasi nyawanya minimal 50%. Selama terobosan murid diam di tempat.
 |---|---|
 | Manusia Fana → Pemurnian Qi (**Kebangkitan**) | 6 detik menghimpun qi, selalu berhasil |
 | Pemurnian Qi → Pembangunan Fondasi | 5 detik menghimpun qi lalu peluang `70% + (mutu akar − Menengah) × 5%` + bonus pil (5–98%). Batal tanpa akibat bila murid terluka atau dipindahkan lebih dari 6 blok |
-| Inti Emas ke atas (**tribulasi kecil**) | 6 detik awan pertanda, lalu `2 + ranah tujuan ÷ 2` sambaran (3 untuk Inti Emas) berselang 3 detik, masing-masing 18% nyawa maks. murid (pil meringankannya). Sambaran **tidak pernah membunuh** |
+| Inti Emas ke atas (**tribulasi kecil**) | 6 detik awan pertanda, lalu `2 + ranah tujuan ÷ 2` sambaran (3 untuk Inti Emas) berselang 3 detik, masing-masing 18% nyawa maks. murid, tetapi semua sambaran bersama paling banyak 84% (Penyatuan Dao dan Kenaikan Abadi 5 × 16,8%, Dewa Abadi 6 × 14%); pil meringankannya. Sambaran **tidak pernah membunuh** |
 
 * **Gagal** (peluang meleset, sambaran yang seharusnya mematikan, atau terbawa pergi setelah sambaran pertama):
   **Penyimpangan Qi 3 menit** (lemah, qi tidak pulih, kultivasi setengah) dan bar berkurang 30%.
+* Tribulasi yang **pasti gagal** tidak dimulai: bila semua sambaran (setelah pil) mengambil sebanyak sisa nyawa murid
+  atau lebih dan tidak ada Hu Fa yang menjaga, Terobosan ditolak dengan angkanya. Sembuhkan dulu, beri pil, atau jaga.
 * Tribulasi yang ditinggalkan setelah sambaran pertama (tempatnya tidak termuat lagi, atau dunia disimpan dan ditutup)
   juga dihitung **gagal** saat murid termuat kembali, dan kamu diberi tahu begitu daring.
 * Berhasil: kualitas terobosan (Retak, Biasa, Sempurna, Surgawi) seperti milikmu, nyawa dan qi penuh, dan Qi Tertimbun
@@ -2422,8 +2428,8 @@ G B G
   "Aula Sekte berdiri! Sekte <nama> membuka gerbangnya.", dan kamu mendapat pencapaian *Gerbang Sekte Terbuka*. Nama
   awalnya "Sekte <namamu>"; ganti di tablet Aula (*Ganti Nama*) atau dengan `/kultivasi aula nama <nama>`.
 * **Membuka gulungan aula:** klik kanan prasasti aktifmu.
-* **Prasasti kedua** (saat aulamu sudah berdiri) tetap **diam**. Jongkok lalu gunakan dengan tangan kosong: "Pindahkan
-  Aula ke sini?"; ulangi dalam 10 detik untuk memastikan. Paling sering sekali per hari game. Ketenaran, kas, lumbung,
+* **Prasasti kedua** (saat aulamu sudah berdiri) tetap **diam**. Jongkok lalu gunakan dengan tangan utama kosong (barang di
+  tangan kedua, misalnya perisai atau obor, tidak mengganggu): "Pindahkan Aula ke sini?"; ulangi dalam 10 detik untuk memastikan. Paling sering sekali per hari game. Ketenaran, kas, lumbung,
   calon, dan regu yang sedang pergi ikut pindah. Bila aulamu punya templat sekte, yang muncul adalah dialog
   **[Pindah & bongkar] [Pindah & tinggalkan] [Batal]** ([20b.11](#20b11-naik-templat-bongkar-pindah-lepaskan)).
 * Prasasti dalam **128 blok** dari aula pemain lain juga tetap diam.
@@ -2972,8 +2978,8 @@ termuat; berjalanlah berkeliling). Pemindaian hanya **membaca** dunia dan tidak 
 | Batas tinggi dunia | tapak tidak boleh menembus dasar atau atap dunia | merah: pasang Prasasti lebih tinggi/rendah |
 | Tapak lain | tapak + 16 blok tidak boleh menyentuh tapak sekte lain atau pameran; aturan 128 blok antar-Prasasti tetap | merah |
 | Perlindungan titik muncul | server khusus: tidak boleh bertumpuk | merah |
-| Desa | penduduk desa atau golem besi dalam tapak + 16, atau bagian desa di sel yang tersentuh | merah |
-| Bangunan dunia | desa, pos penjarah, kuil, igloo, rumah besar, monumen laut, benteng, kota kuno, ruang ujian, portal rusak berpeti di sel yang tersentuh (tambang terbengkalai diabaikan) | merah, disebut namanya |
+| Desa | penduduk desa atau golem besi desa dalam tapak + 16 (pedagang keliling dan golem buatan pemain tidak dihitung), atau bagian desa di sel yang tersentuh | merah |
+| Bangunan dunia | desa, pos penjarah, kuil, igloo, rumah besar, monumen laut, benteng, kota kuno, ruang ujian, portal rusak berpeti, hanya bila kotak salah satu bagiannya memotong kolom tapak pada rentang tinggi yang memang digali atau dibangun (ruang ujian, benteng, atau kota kuno jauh di bawah tidak dihitung; tambang terbengkalai diabaikan) | merah, disebut namanya |
 | Lava | lava di luar tapak di samping sel galian | merah; lava di dalam tapak menjadi timbunan |
 | Kecuraman | selisih tinggi ≤ batas templat | kuning > 75%, merah > 100% |
 | Pekerjaan tanah | gali + timbun ≤ batas templat (selalu ditulis: "Gali 12.400 · Timbun 3.100") | merah bila lebih |
@@ -3016,14 +3022,18 @@ atau Lepaskan ([20b.11](#20b11-naik-templat-bongkar-pindah-lepaskan)).
 
 * **Alami** = tag `#kultivator:sect_natural`: batu dunia atas, tanah, pasir, kerikil, tanah liat, kalsit, tuf, dripstone,
   sinabar dan belerang, bijih, terakota badlands, salju, es, lumut, rumput, pakis, bunga, tebu, kaktus, bambu, kelp,
-  lamun, jamur, labu, semangka, semak beri, akar bakau, lumpur, daun yang tidak permanen, dan batang pohon alami (seluruh
-  gugus batang dan daun dinilai saat pindai, jadi membersihkan daunnya dulu tidak mengubah batang menjadi "buatan pemain").
+  lamun, jamur, labu, semangka, semak beri, akar bakau, lumpur, blok jamur raksasa dan batangnya, kakao, batu terinfeksi
+  (silverfish), obsidian (kecuali bingkai portal Nether yang menyala), blok magma, sarang laba-laba, basal halus, sculk,
+  gumpalan resin, daun yang tidak permanen, dan batang pohon alami (seluruh gugus batang dan daun dinilai saat pindai, jadi
+  membersihkan daunnya dulu tidak mengubah batang menjadi "buatan pemain"). Sarang lebah dan creaking heart alami juga
+  alami: lebahnya dilepas dan bloknya masuk Peti Galian.
 * **Buatan pemain** = semua yang lain: papan, kaca, wol, obor, rel, redstone, ladang dan tanaman pangan, jalan tanah, daun
-  permanen, karpet. Blok yang dipasang oleh pembangun sekte sendiri selalu dihitung miliknya.
+  permanen, karpet, dan block entity vanilla yang tidak dipasang pembangun (papan nama, kasur, panji, podium; buku di
+  podium ikut ke Peti Galian). Blok yang dipasang oleh pembangun sekte sendiri selalu dihitung miliknya.
 * **Terlindung** (tag `#kultivator:sect_protected` dan `#kultivator:indestructible`): batuan dasar dan semua blok tak
   tertambang, portal dan bingkainya, gerbang End, spawner, spawner ujian, vault, reinforced deepslate, budding amethyst,
-  suar, conduit, respawn anchor, Prasasti dan blok di bawahnya, lodestone formasi terdaftar, dan setiap block entity yang
-  tidak dipasang pembangun (kecuali wadah yang sengaja dikosongkan). Data pack bisa menambah kedua tag itu.
+  suar, conduit, respawn anchor, Prasasti dan blok di bawahnya, lodestone formasi terdaftar, obsidian bingkai portal Nether
+  yang menyala, dan block entity dari mod lain yang bukan wadah. Data pack bisa menambah kedua tag itu.
 
 **Pekerjaan tanah** dikerjakan per **lapisan mendatar**: gali dari atas ke bawah, timbun dari bawah ke atas, berputar di
 setiap lapisan (tidak pernah menyapu satu kolom sekaligus yang bisa menjatuhkan pemain atau murid). Tepi tapak dikerjakan
@@ -3087,7 +3097,7 @@ digandakan.
 | T4 | kuali + api unggun jiwa (tungku alkimia) | masing-masing 1 (Templat 1–5), 2 (Templat 6–9) |
 | T4 | tempat meramu | 1, 1, 1, 2, 2, 2, 3, 3, 3 |
 | T5 | lodestone 1, crying obsidian 4, blok kecubung 4 | semua templat |
-| T5 | altar gerbang opsional: +1 lodestone dan +4 crying obsidian per altar | 2 (Templat 6), 4 (Templat 7–9) |
+| T5 | altar gerbang opsional: soket kosong, tanpa lodestone atau crying obsidian (pasang sendiri bila ingin) | 2 (Templat 6), 4 (Templat 7–9) |
 | T6 | api unggun (ding) + 1 jerami (ding isyarat) | api unggun 1 (Templat 1–4), 2 (Templat 5–9) |
 | T7 | blok sasaran | 4, 4, 6, 8, 8, 10, 12, 12, 16 |
 | T7 | lonceng | Templat 2–9 |
@@ -3134,7 +3144,8 @@ Gudang. Kategori, angka, dan biaya adalah desain game.
 **Satu bagian sekaligus, dibayar penuh.** Sebuah bagian (komponen) baru mulai saat **seluruh** tagihannya bisa dipesan dari
 Gudang, dan hanya satu bagian per tapak yang terbuka. Jadi sekte tidak pernah berdiri setengah jadi menunggu bahan. Begitu
 tagihan bagian berikutnya tertutup, ia mulai sendiri; bagian lain di tingkat yang sama mengikuti urutannya
-(`prioritas <bagian>` memajukan satu bagian). Bahan yang dipesan tetapi tidak terpakai (sel yang ternyata sudah benar,
+(`prioritas <bagian>` memajukan satu bagian; bila tapak sedang menunggu bahan untuk bagian lain, belum ada yang dipesan,
+jadi *Prioritaskan* langsung beralih ke bagian pilihanmu). Bahan yang dipesan tetapi tidak terpakai (sel yang ternyata sudah benar,
 bagian yang dilewati atau dibatalkan) kembali tepat sebesar sisanya.
 
 **Status** di tablet dan HUD: *Berjalan*, *Menunggu bahan: Kayu 120*, *Jeda: pemilik jauh*, *Terhalang: 14 blok*,
@@ -3149,7 +3160,9 @@ bahan: … [Setor yang dibutuhkan]".
 menghalangi ‹bagian›" dengan tiga tombol, dan X merah berkilau di blok itu tiap 5 detik selama 30 detik. Pembangunan
 melanjutkan bagian lain; blok terhalang diperiksa ulang tiap 30 detik.
 * **[Periksa ulang]** — periksa sekarang (misalnya setelah kamu memindahkan peti).
-* **[Lewati bagian ini]** — bagian itu dilewati; bahannya yang belum terpakai kembali ke Gudang.
+* **[Lewati bagian ini]** — hanya untuk bagian yang terhalang atau menunggu bahan; bahannya yang belum terpakai kembali ke
+  Gudang dan antrean lanjut ke bagian lain. Bagian yang dilewati **tidak dihitung selesai**: tingkatnya tidak naik, jadi
+  batas bangunan dan bangunan aula juga tidak naik. Untuk membangunnya lagi nanti: `/kultivasi aula bangun prioritas <bagian>`.
 * **[Selesaikan tanpa blok terhalang]** — bagian itu dianggap selesai tanpa sel yang terhalang.
 
 **Kapan pembangunan berjalan:**
@@ -3454,8 +3467,8 @@ daftar penyumbang.
 | `… sendiri` | Bangun Sendiri: aula tetap memindai bangunan buatanmu |
 | `… setor` / `setor semua` / `setor butuh` | Menyetor tumpukan di tangan / semua bahan yang diterima di tas / hanya yang masih dibutuhkan tingkat ini dan berikutnya |
 | `… jeda` / `… lanjut` | Menjeda / melanjutkan pembangunan |
-| `… prioritas <bagian>` | Memajukan bagian itu ke depan tingkatnya (Tab menyarankan nama bagian). Contoh: `/kultivasi aula bangun prioritas t3_scripture` |
-| `… lewati <bagian>` | Lewati bagian ini; bahannya yang belum terpakai kembali |
+| `… prioritas <bagian>` | Memajukan bagian itu ke depan tingkatnya, juga memasukkan lagi bagian yang dilewati (Tab menyarankan nama bagian). Contoh: `/kultivasi aula bangun prioritas t3_scripture` |
+| `… lewati <bagian>` | Lewati bagian yang terhalang atau menunggu bahan; bahannya yang belum terpakai kembali. Bagian yang dilewati tidak menaikkan tingkat |
 | `… tanpa-terhalang <bagian>` | Selesaikan bagian itu tanpa blok yang terhalang |
 | `… periksa-ulang` | Memeriksa ulang blok terhalang sekarang |
 | `… naik <2-9>` | Pratinjau Naik Templat. Contoh: `/kultivasi aula bangun naik 5` |
@@ -3510,8 +3523,9 @@ Inilah seluruh cakupan pengecualian kedua:
 1. Hanya satu bagian kode, pemasang pembangunan sekte, yang memasang atau mengangkat blok.
 2. Ia bekerja hanya **di dalam kolom tapak yang dikonfirmasi** (persegi tapak × batas tinggi templat), hanya di chunk yang
    sudah termuat (tidak pernah memuat paksa), dan hanya selama aula aktif dan Prasasti berdiri di sel jangkarnya.
-3. Ia tidak pernah menyentuh blok terlindung, penghalang, atau block entity yang tidak dipasangnya, kecuali yang kamu
-   izinkan dengan jelas (*Bongkar & simpan*, *Kosongkan*).
+3. Ia tidak pernah menyentuh blok terlindung, penghalang, atau block entity buatan pemain yang tidak dipasangnya, kecuali
+   yang kamu izinkan dengan jelas (*Bongkar & simpan*, *Kosongkan*). Sarang lebah dan creaking heart alami dipindahkan
+   seperti tanah alami.
 4. Tanpa barang yang dijatuhkan, tanpa api, tanpa ledakan, tanpa petir, tanpa tanaman yang menjalar, tanpa blok yang jatuh,
    dan tanpa makhluk. Blok dipasang tanpa memicu tetangganya (redstone, observer, dan pasir tidak bangun).
 5. Tidak ada makhluk hidup yang terkurung atau dijatuhkan.
@@ -3544,7 +3558,7 @@ tidak mencair. Pameran dan tapak uji tidak pernah mengosongkan wadah dan memulih
 * **Kamera uji** memakai tiga sudut pandang tetap yang dihitung dari ukuran tapak, belum sudut pandang khusus tiap templat.
 * **Audit** belum memeriksa garis pandang, kepadatan, bingkai pemandangan, dan sel gelap tempat monster bisa muncul;
   anggaran warna hanya dilaporkan.
-* **Pemeriksaan tapak:** desa dikenali lewat bangunan dunia di chunk itu; block entity dan rongga hanya dicari di dekat
+* **Pemeriksaan tapak:** bangunan dunia dikenali lewat kotak bagian-bagiannya di chunk tapak yang termuat; block entity dan rongga hanya dicari di dekat
   permukaan.
 * **Berbeda dari daftar rancangan:** serambi samping Templat 2 dan serambi penghubung Templat 3 tidak ada (tidak cukup
   ruang); Templat 3 memakai rangka lonceng dan genderang, bukan menara; jembatan batu pijakan Templat 5 lurus, bukan
@@ -3987,6 +4001,9 @@ R . . . R               Kuarsa Pahat, Pilar Kuarsa ×2, Tongkat End
   per 512 blok yang dimulai (separuh dengan penjaga Ruang). Jeda: M3 10 detik, L5 30 detik.
 * M3 hanya terhubung di dalam wilayah dan butuh simpul tujuan yang termuat; L5 terhubung ke semua simpul kuno dan ke
   semua M3 di dalam wilayah. Tidak pernah lintas dimensi. Hingga 4 murid yang mengikuti dalam 4 blok ikut serta.
+* **Pos luar L5:** paling banyak 2 dari 4 simpul L5 boleh berdiri **di luar wilayah**, di dimensi aula, paling jauh
+  4.096 blok dari prasasti. Daftarkan seperti biasa (jongkok + batu roh di Mata Formasi); aula harus aktif. Pos luar
+  tidak ditangguhkan sebagai "di luar wilayah".
 * Ditolak saat terobosan, tribulasi, ujian, duel, turnamen, Alam Hampa, terbang, menunggang, Kehancuran, atau baru terluka.
 * Pencapaian **Seribu Li dalam Sekejap** pada perpindahan pertama.
 * Sumber: RMJ bab 272 "One Year", 359, 363, dan 1130.
@@ -4026,7 +4043,8 @@ f . . . . . f
 * **Bilah bambu** (klik sebuah inti atau kartu Kitab): nama, bintang tingkat, aliran, Sumber, diagram pola per lapis
   dengan daftar bahan, keadaan dan alasannya, Daya dan rincian biaya, rincian P, angka hidup, penjaga dengan koin perintah
   Jaga → Perkuat → Waspada, *Tugaskan* dan *Lepas*, serta koin *Nyala/Mati*, *Tarik dari Kas*, dan talisman *Isi 12 jam*,
-  *Lihat Pola*, *Lihat yang kurang*, *Tandai*. Di mode Kitab: *Hologram di depanku*, *Di Titik Formasi…*, *Tuju pola ini*.
+  *Lihat Pola*, *Lihat yang kurang*, *Tandai*. Di mode Kitab: *Hologram di depanku*, *Di Titik Formasi…* (disembunyikan selama templat sektemu belum punya Titik
+  Formasi), *Tuju pola ini*.
   Teman sekte melihat semuanya tanpa bisa mengubah, kecuali *Setor*.
 * **Peta simpul:** piringan giok, utara di atas. Simpul wilayah ditempatkan menurut posisinya, pos luar di tepi beserta
   jaraknya; tiap simpul menulis biaya dan Dayanya; segel merah berarti rusak, mati, atau belum termuat.
@@ -4445,7 +4463,9 @@ banyak 24.000 tick (satu hari game) per pos yang tertabung. Murid Tercatat mengh
 ### 24.2 Lumbung Sekte, Hidangan Roh, dan Murnikan Herba
 
 * **Lumbung Sekte:** gudang maya 27 slot di tablet Tugas. Hanya bisa diambil: klik slot untuk memindahkan isinya ke
-  inventarismu. Bila penuh, kelebihan hilang dengan peringatan.
+  inventarismu. Bila penuh, kelebihan masuk **Peti Galian** (tablet Bangun, panel Galian). Barang berdata sendiri
+  (misalnya Rumput Roh berumur) yang tidak muat lagi di Peti Galian menunggu dan masuk sendiri begitu ada tempat; kamu
+  diberi tahu. Tidak ada yang hilang.
 * **Hidangan Roh** (makanan: nutrisi 8, saturasi 1,0): dimakan sendiri memberi +8 kultivasi dan +10 qi. Diberikan
   kepada murid (klik kanan): kultivasinya ×1,2 selama 2 menit.
 * **Murnikan Herba** (tablet Tugas): setiap 3 Herba Fondasi (dari lumbung dulu, lalu inventarismu) menjadi 1 Pil
@@ -4941,8 +4961,8 @@ Sejak Fase 7 kamu sendiri juga memadatkan Bintang Abadi (tanpa bencana untuk sek
 * **Mulai Bencana k** di tab Jalan (gulungan menutup). Syarat: kamu dalam 16 blok, nyawa murid ≥ 50%, hanya satu
   bencana per Guru dalam satu waktu. Harga bintangnya dibayar di awal; murid yang bergerak sebelum sambaran pertama
   membatalkannya dengan harga kembali penuh.
-* Pertanda 6 detik, lalu `6 + k` sambaran sebesar `(0,12 + 0,01 × nomor ujian) × nyawa maksimal`, satu tiap 3 detik,
-  yang terakhir ×2. Gelombang Pengawal Dao datang setiap 3 sambaran; Hu Fa dan Tahan Petir berlaku. Petirnya hanya
+* Pertanda 6 detik, lalu `6 + k` sambaran sebesar `(0,096 + 0,01 × nomor ujian) × nyawa maksimal`, satu tiap 3 detik,
+  yang terakhir ×2 (Bencana 1 total ±85% nyawa, Bencana 7 ±177%). Gelombang Pengawal Dao datang setiap 3 sambaran; Hu Fa dan Tahan Petir berlaku. Petirnya hanya
   partikel: tidak ada petir sungguhan, cuaca tidak berubah, blok tidak tersentuh.
 
 | Hasil | Efek |
@@ -6833,6 +6853,10 @@ membuka tingkat tempa berikutnya, jadi setiap ranah memberi makan ranah berikutn
 
 Tombol baru (bawaan tanpa tombol, ikat di Kontrol): **Layar Dunia Kultivasi** dan **Buka Cincin Penyimpanan**.
 
+Data tiap tablet (juga layar Keabadian dan Titah Langit) paling besar 64 KiB, diukur dari ukuran sebenarnya di jaringan.
+Bila lebih, tablet tetap menampilkan data terakhir dengan baris merah "Data terlalu besar". Tablet Desa di layar Dunia
+tidak memuat catatan penjarahan; catatannya ada di halaman Desa di Aula.
+
 ### 55.2 Alam Rahasia
 
 **Apa:** empat alam rahasia. Pakai kunci di tanah lapang (Overworld, Nether, atau End): pertanda 10 detik (gerbang glif,
@@ -6946,6 +6970,10 @@ Formasi Alarm K1 aktif). Pada malam serbuan tidur ditolak di wilayah aula.
 tribulasi. Gelombang `2 + tingkat aula/3` (3–5) datang dari tepi wilayah, berbaris ke prasasti. Bilah ungu "Serbuan ·
 Gelombang 3/5 · Musuh 6" dan bilah merah **Segel Penjarah**: perampok dalam 6 blok dari prasasti menyalurkan segel
 (+1/+2/+4/+6 per detik menurut tingkat). Batas waktu 10 menit.
+
+Perampok hanya muncul di **daratan kering**: titik di air dilewati, dan aula pulau atau pesisir memakai daratan 8–12 blok
+dari prasasti. Bila tidak satu pun perampok bisa muncul, serbuan **ditunda 2 hari** tanpa hasil (tanpa hadiah, tanpa
+*raid_flawless*). Gelombang yang sebagian tidak bisa datang membuat serbuan tidak lagi "tanpa cela".
 
 | Hasil | Syarat | Akibat |
 |---|---|---|
@@ -7117,6 +7145,9 @@ jarumnya menunjuk sasaran):
 * **Wabah** — jongkok + pakai 2 Pil Penyembuh atau 1 Pil Pembersih Racun di plakat: +10.
 * **Panen Gagal** — setor 32 poin makanan di plakat: +8 dan satu upeti ×1,5.
 * **Jaga Malam** — Malam Penjagaan lagi (2 gelombang): +12.
+
+Di **Peaceful** hanya Wabah dan Panen Gagal yang diminta. Sarang yang jatuh di air dipilih ulang atau dipindah ke daratan
+terdekat.
 
 Setiap permohonan selesai memberi gosip vanilla MINOR_POSITIVE +5 (harga dagang turun sedikit, lalu pulih).
 

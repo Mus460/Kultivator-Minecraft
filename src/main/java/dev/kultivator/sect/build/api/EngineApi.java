@@ -256,7 +256,11 @@ public interface EngineApi {
 
 	// ================================================================== phase 7c Titik Formasi (DESIGN 24.6.2, 24.13 item 8)
 
-	/** The owner's built Titik Formasi anchors ({@code formasi_<n>}), empty until P6b-cetak fills this (slip allowed). */
+	/**
+	 * The owner's built Titik Formasi anchors ({@code formasi_<n>}), empty until P6b-cetak fills this (slip allowed). No
+	 * sect template emits a {@code formasi_<n>} anchor yet (only the legacy {@code formation} disc), so nothing can be read
+	 * here without the engine; the Kitab slip hides its "Di Titik Formasi" talisman while this list is empty.
+	 */
 	default List<FormasiAnchor> formasiAnchors(UUID owner) {
 		return List.of();
 	}

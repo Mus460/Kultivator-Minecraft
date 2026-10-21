@@ -101,7 +101,9 @@ public final class DiscipleItems {
 		public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder,
 									TooltipFlag flag) {
 			builder.accept(Component.translatable("kultivator.disciples.scroll.tooltip").withStyle(ChatFormatting.GRAY));
-			builder.accept(Component.translatable("kultivator.disciples.scroll.tooltip_limit", Disciples.MAX_DISCIPLES)
+			// The real limit (Disciples.cap -> Halls.cap): 5 without a hall, 5 + hall level / 2 with one, plus sect-building bonuses.
+			builder.accept(Component.translatable("kultivator.sect_fix_feat.scroll.limit", Disciples.MAX_DISCIPLES,
+					dev.kultivator.sect.hall.HallLevel.cap(dev.kultivator.sect.hall.HallLevel.MAX_LEVEL), dev.kultivator.sect.hall.HallLevel.MAX_LEVEL)
 					.withStyle(ChatFormatting.DARK_GRAY));
 			// Phase 6 (DESIGN 20.2.7): disciples come from the Sect Hall; the scroll is no longer craftable.
 			builder.accept(Component.translatable("kultivator.spine6.scroll.creative_only").withStyle(ChatFormatting.GOLD));

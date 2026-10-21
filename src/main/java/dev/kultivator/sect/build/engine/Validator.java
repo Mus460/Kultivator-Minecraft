@@ -14,15 +14,20 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
+import net.minecraft.world.entity.npc.wanderingtrader.WanderingTrader;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Validation of a footprint (DESIGN 21.10 "Validation"): red refuses the confirmation, amber warns, notes inform. Checks
@@ -96,7 +101,7 @@ public final class Validator {
 			}
 		}
 		AABB around = AABB.of(wide).inflate(0.0D, 32.0D, 0.0D);
-		if (!level.getEntitiesOfClass(LivingEntity.class, around, entity -> entity instanceof AbstractVillager || entity instanceof IronGolem).isEmpty()) {
+		if (!level.getEntitiesOfClass(LivingEntity.class, around, Validator::villageDweller).isEmpty()) {
 			warnings.add(warn(RED, "village"));
 		}
 		String structure = structureIn(level, footprint);
@@ -106,25 +111,56 @@ public final class Validator {
 		return warnings;
 	}
 
-	/** The id of a player-relevant structure referenced in a loaded chunk of the footprint, or null. */
+	/**
+	 * A villager or a village golem. A wandering trader passes through and a golem a player built belongs to nobody's
+	 * village, so neither makes the site red.
+	 */
+	private static boolean villageDweller(LivingEntity entity) {
+		if (entity instanceof WanderingTrader) {
+			return false;
+		}
+		if (entity instanceof IronGolem golem) {
+			return !golem.isPlayerCreated();
+		}
+		return entity instanceof AbstractVillager;
+	}
+
+	/**
+	 * The id of a player-relevant structure one of whose pieces actually overlaps the footprint box, or null. The
+	 * footprint box already spans exactly the height the engine digs or builds ({@code -1 - below .. -1 + above} around
+	 * the plaza), so a trial chamber, stronghold or ancient city deep under the site, or a structure merely referenced by
+	 * a chunk of the footprint, does not count; only loaded footprint chunks are read.
+	 */
 	private static String structureIn(ServerLevel level, BoundingBox footprint) {
 		var registry = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
+		Set<StructureStart> seen = Collections.newSetFromMap(new IdentityHashMap<>());
 		for (int cx = footprint.minX() >> 4; cx <= footprint.maxX() >> 4; cx++) {
 			for (int cz = footprint.minZ() >> 4; cz <= footprint.maxZ() >> 4; cz++) {
 				if (level.getChunkSource().getChunkNow(cx, cz) == null) {
 					continue;
 				}
-				BlockPos probe = new BlockPos((cx << 4) + 8, footprint.minY() + 1, (cz << 4) + 8);
-				Map<Structure, it.unimi.dsi.fastutil.longs.LongSet> found = level.structureManager().getAllStructuresAt(probe);
-				for (Structure each : found.keySet()) {
-					Identifier id = registry.getKey(each);
-					String path = id == null ? "" : id.getPath();
-					for (String relevant : STRUCTURES) {
-						if (path.contains(relevant)) {
-							return path;
+				List<StructureStart> starts = level.structureManager().startsForStructure(cx, cz, each -> relevant(registry.getKey(each)) != null);
+				for (StructureStart start : starts) {
+					if (!seen.add(start) || !start.getBoundingBox().intersects(footprint)) {
+						continue;
+					}
+					for (StructurePiece piece : start.getPieces()) {
+						if (piece.getBoundingBox().intersects(footprint)) {
+							return relevant(registry.getKey(start.getStructure()));
 						}
 					}
 				}
+			}
+		}
+		return null;
+	}
+
+	/** The path of a structure id that matters to players ({@link #STRUCTURES}), or null. */
+	private static String relevant(Identifier id) {
+		String path = id == null ? "" : id.getPath();
+		for (String each : STRUCTURES) {
+			if (path.contains(each)) {
+				return path;
 			}
 		}
 		return null;
@@ -221,8 +257,9 @@ public final class Validator {
 	/**
 	 * Block entities the builder did not place, by height (DESIGN 21.10 table): only those inside a component's volume
 	 * ({@code boxes}, template-local, every op included) count. A container with items is red, amber once "Kosongkan" is
-	 * authorized; a protected one (spawner, vault, beacon...) is red; any other (a sign, a bed, a bee nest, an empty
-	 * barrel) is an amber obstacle decided per position at placement.
+	 * authorized; a protected one (spawner, vault, beacon, a modded non-container) is red; any other vanilla one (a sign,
+	 * a bed, an empty barrel) is an amber player-made obstacle decided per position at placement. Natural ones (a tree's
+	 * bee nest) are never listed (Snapshot).
 	 */
 	static List<Warning> blockEntities(List<BoundingBox> boxes, List<Long> localPositions, List<Byte> kinds, boolean emptyAuthorized) {
 		int items = 0;

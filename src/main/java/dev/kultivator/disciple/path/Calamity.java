@@ -37,7 +37,7 @@ import java.util.UUID;
  * Gods face Three Trials with Seven Calamities (2 + 2 + 3); failing means death, here an injury (Luka Bencana).
  * <p>
  * Calamity k gates star {@code f + 9(k - 1)} ({@link Stars#gateStar}). The master starts it from the Jalan tab; the
- * star's cost is paid at the start. A 6 s omen, then {@code 6 + k} strikes of {@code (0.12 + 0.01 x trial) x max health},
+ * star's cost is paid at the start. A 6 s omen, then {@code 6 + k} strikes of {@code (0.096 + 0.01 x trial) x max health},
  * one every 60 ticks, the last doubled; a strike that would kill fails the calamity (strikes never kill). Dao Protector
  * waves come every 3 strikes; Hu Fa applies. The same engine runs the soul-lamp trials ({@link SoulLamps}) with
  * {@code k = 8 + lamps out}. Everything visible is particles (the tribulation clouds and bolts), never a LightningBolt
@@ -50,7 +50,8 @@ public final class Calamity {
 	public static final int OMEN_TICKS = 120;
 	public static final int STRIKE_INTERVAL = 60;
 	private static final int SETTLE_TICKS = 30;
-	public static final double BASE_SHARE = 0.12D;
+	/** 0.096 (was 0.12): calamity 1 takes 8 x 10.6% = 85% of max health in all (was 104%, a certain failure without help). */
+	public static final double BASE_SHARE = 0.096D;
 	public static final double SHARE_PER_TRIAL = 0.01D;
 	public static final double LAST_STRIKE_FACTOR = 2.0D;
 	/** Failure: Luka Bencana, a Qi Deviation of 12,000 ticks, and half the cost back as Stored Qi. */

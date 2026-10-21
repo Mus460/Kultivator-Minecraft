@@ -40,6 +40,7 @@ public final class BuildFlow {
 			Deposits.clearSession();
 			BuildInfo.clearSession();
 			BuildCommands.clearSession();
+			LumbungOverflow.clearSession();
 		});
 		ServerPlayerEvents.LEAVE.register(player -> {
 			Founding.forget(player.getUUID());
@@ -91,6 +92,9 @@ public final class BuildFlow {
 	private static void second(MinecraftServer server, ServerPlayer player, int second) {
 		UUID owner = player.getUUID();
 		GatherExpeditions.tick(server, owner);
+		if (Math.floorMod(second + owner.hashCode(), 10) == 0) {
+			LumbungOverflow.retry(player, owner);
+		}
 		if (!KultivatorConfig.get().sectConstruction) {
 			return;
 		}

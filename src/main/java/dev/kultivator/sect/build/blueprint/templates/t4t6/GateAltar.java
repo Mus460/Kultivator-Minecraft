@@ -17,7 +17,9 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
  * obsidian at (±4, 0) and (0, ±4) on the same level (exactly what {@code FormationPattern} reads), placed inactive (the
  * owner registers it with an amethyst shard). The dais is polished andesite with a chiseled-tuff-brick octagon ring at r 3,
  * gilded-blackstone points on the diagonals, a stone-brick rim and four stone lanterns at its corners. Exact items: 1
- * lodestone and 4 crying obsidian. Template-local, centred on (x, z) on {@code level}.
+ * lodestone and 4 crying obsidian; with {@link #emptySockets()} none: the five stones are left as empty sockets over a
+ * chiseled polished blackstone base (like the template 7-9 altar), so the tier completes without them and the owner may
+ * set their own stones in later. Template-local, centred on (x, z) on {@code level}.
  */
 public final class GateAltar implements Part {
 
@@ -27,11 +29,18 @@ public final class GateAltar implements Part {
 	private final int x;
 	private final int z;
 	private final Lv level;
+	private boolean empty;
 
 	public GateAltar(int x, int z, Lv level) {
 		this.x = x;
 		this.z = z;
 		this.level = level;
+	}
+
+	/** Leaves the lodestone and crying obsidian out: five empty sockets the owner may fill (an optional formation). */
+	public GateAltar emptySockets() {
+		this.empty = true;
+		return this;
 	}
 
 	@Override
@@ -71,9 +80,17 @@ public final class GateAltar implements Part {
 			sink.set(diagonal[0], -1, diagonal[1], Palette.st(Palette.PLAQUE_FIELD));
 		}
 		// The Protective Formation itself (DESIGN 10): all on one level.
-		sink.set(0, -1, 0, Palette.st(Blocks.LODESTONE));
-		for (Direction direction : Direction.Plane.HORIZONTAL) {
-			sink.set(4 * direction.getStepX(), -1, 4 * direction.getStepZ(), Palette.st(Blocks.CRYING_OBSIDIAN));
+		if (empty) {
+			int[][] sockets = {{0, 0}, {4, 0}, {-4, 0}, {0, 4}, {0, -4}};
+			for (int[] socket : sockets) {
+				sink.set(socket[0], -2, socket[1], Palette.st(Blocks.CHISELED_POLISHED_BLACKSTONE));
+				sink.air(socket[0], -1, socket[1]);
+			}
+		} else {
+			sink.set(0, -1, 0, Palette.st(Blocks.LODESTONE));
+			for (Direction direction : Direction.Plane.HORIZONTAL) {
+				sink.set(4 * direction.getStepX(), -1, 4 * direction.getStepZ(), Palette.st(Blocks.CRYING_OBSIDIAN));
+			}
 		}
 		sink.phase(Phase.ORNAMENT);
 		for (int[] corner : new int[][]{{HALF, HALF}, {HALF, -HALF}, {-HALF, HALF}, {-HALF, -HALF}}) {

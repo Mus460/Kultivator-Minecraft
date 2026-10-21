@@ -100,9 +100,18 @@ public final class Requests {
 			return false;
 		}
 		RandomSource random = server.overworld().getRandom();
-		int roll = random.nextInt(100);
-		int index = 0;
+		// On Peaceful no beast, camp band or night raid can appear: only the plague and harvest requests are rolled.
+		boolean peaceful = server.overworld().getDifficulty() == Difficulty.PEACEFUL;
+		int total = 0;
 		for (int i = 0; i < WEIGHTS.length; i++) {
+			total += rollable(i, peaceful) ? WEIGHTS[i] : 0;
+		}
+		int roll = random.nextInt(Math.max(1, total));
+		int index = indexOf(peaceful ? Village.REQ_HARVEST : Village.REQ_BEAST);
+		for (int i = 0; i < WEIGHTS.length; i++) {
+			if (!rollable(i, peaceful)) {
+				continue;
+			}
 			roll -= WEIGHTS[i];
 			if (roll < 0) {
 				index = i;
@@ -111,6 +120,12 @@ public final class Requests {
 		}
 		open(server, owner, village, Village.REQUESTS[index], player);
 		return true;
+	}
+
+	/** True when request {@code index} of {@link Village#REQUESTS} may be rolled (Peaceful: plague and harvest only). */
+	private static boolean rollable(int index, boolean peaceful) {
+		String type = Village.REQUESTS[index];
+		return !peaceful || Village.REQ_PLAGUE.equals(type) || Village.REQ_HARVEST.equals(type);
 	}
 
 	/** Opens a request of {@code type} now and sends the letter. */
@@ -146,15 +161,60 @@ public final class Requests {
 		return 0;
 	}
 
-	/** A point 64-160 blocks from the bell (no blocks: only a data point and a smoke column). */
+	/**
+	 * A point 64-160 blocks from the bell (no blocks: only a data point and a smoke column), on dry land: a loaded spot
+	 * on water is picked again; an unloaded one is checked once more when the camp appears ({@link #landNear}).
+	 */
 	private static BlockPos campSpot(ServerLevel level, BlockPos bell) {
 		RandomSource random = level.getRandom();
-		double angle = random.nextDouble() * Math.PI * 2.0D;
-		double distance = 64.0D + random.nextDouble() * 96.0D;
-		int x = (int) Math.floor(bell.getX() + Math.cos(angle) * distance);
-		int z = (int) Math.floor(bell.getZ() + Math.sin(angle) * distance);
-		int y = level.isLoaded(new BlockPos(x, bell.getY(), z)) ? level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z) : bell.getY();
-		return new BlockPos(x, y, z);
+		BlockPos unloaded = null;
+		BlockPos wet = null;
+		for (int attempt = 0; attempt < 16; attempt++) {
+			double angle = random.nextDouble() * Math.PI * 2.0D;
+			double distance = 64.0D + random.nextDouble() * 96.0D;
+			int x = (int) Math.floor(bell.getX() + Math.cos(angle) * distance);
+			int z = (int) Math.floor(bell.getZ() + Math.sin(angle) * distance);
+			BlockPos column = new BlockPos(x, bell.getY(), z);
+			if (!level.isLoaded(column)) {
+				if (unloaded == null) {
+					unloaded = column;
+				}
+				continue;
+			}
+			BlockPos spot = new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z);
+			if (dry(level, spot)) {
+				return spot;
+			}
+			if (wet == null) {
+				wet = spot;
+			}
+		}
+		return unloaded != null ? unloaded : wet != null ? wet : bell;
+	}
+
+	/** True when the surface spot {@code spot} (feet) stands on no water, lava or other fluid. */
+	private static boolean dry(ServerLevel level, BlockPos spot) {
+		return level.getFluidState(spot).isEmpty() && level.getFluidState(spot.below()).isEmpty();
+	}
+
+	/** The nearest dry loaded surface within 32 blocks of {@code camp} (rings of 4 blocks), or null. */
+	private static @Nullable BlockPos landNear(ServerLevel level, BlockPos camp) {
+		for (int ring = 4; ring <= 32; ring += 4) {
+			for (int step = 0; step < 16; step++) {
+				double angle = step * Math.PI / 8.0D;
+				int x = camp.getX() + (int) Math.round(Math.cos(angle) * ring);
+				int z = camp.getZ() + (int) Math.round(Math.sin(angle) * ring);
+				BlockPos column = new BlockPos(x, camp.getY(), z);
+				if (!level.isLoaded(column)) {
+					continue;
+				}
+				BlockPos spot = new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z);
+				if (dry(level, spot)) {
+					return spot;
+				}
+			}
+		}
+		return null;
 	}
 
 	/** The Surat Permohonan of the village's open request (needle at the target). */
@@ -275,6 +335,16 @@ public final class Requests {
 		}
 		BlockPos camp = village.reqPos;
 		int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, camp.getX(), camp.getZ());
+		if (!dry(level, new BlockPos(camp.getX(), y, camp.getZ()))) {
+			// The camp was picked on water (or before its chunk loaded): it moves to the nearest dry land.
+			BlockPos land = landNear(level, camp);
+			if (land != null) {
+				camp = land;
+				y = land.getY();
+				village.reqPos = land;
+				Vassals.changed();
+			}
+		}
 		Vec3 center = new Vec3(camp.getX() + 0.5D, y, camp.getZ() + 0.5D);
 		String key = key(owner, village.id);
 		int spawned = RogueCultivators.spawnBand(level, center, tiers, raidLevel, RogueCultivators.ROLE_CAMP, camp, cleared -> {

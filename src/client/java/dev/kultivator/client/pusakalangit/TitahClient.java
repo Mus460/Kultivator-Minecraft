@@ -123,6 +123,9 @@ public final class TitahClient {
 	/** Ticks of the shared seal recovery left at the sync (every decree waits for it). */
 	private static int recover;
 	private static boolean synced;
+	/** The server refused the last sync as too big (the menu keeps the previous values and says so). */
+	private static boolean tooBig;
+	private static boolean tooBigWarned;
 	private static long syncTick;
 	private static long ticks;
 	/** Bumped on every sync, so an open screen can refresh its controls. */
@@ -169,6 +172,16 @@ public final class TitahClient {
 	 * per skill {@code t, tMax, tWhy, perm} and {@code ro {tier, dmgR, carveR, weapon, permanent}} (missing = tier 1).
 	 */
 	public static void onSync(CompoundTag data) {
+		if (data.getBooleanOr("too_big", false)) {
+			tooBig = true;
+			if (!tooBigWarned) {
+				tooBigWarned = true;
+				dev.kultivator.Kultivator.LOGGER.warn("TitahSync was too big for the server budget; keeping the previous data");
+			}
+			version++;
+			return;
+		}
+		tooBig = false;
 		ListTag skills = data.getListOrEmpty("skills");
 		for (int i = 0; i < DECREES.length && i < skills.size(); i++) {
 			CompoundTag tag = skills.getCompoundOrEmpty(i);
@@ -218,6 +231,7 @@ public final class TitahClient {
 		kehancuranOn = false;
 		recover = 0;
 		synced = false;
+		tooBig = false;
 		version++;
 	}
 
@@ -231,6 +245,11 @@ public final class TitahClient {
 
 	public static boolean kehancuranOn() {
 		return kehancuranOn;
+	}
+
+	/** True while the last {@code TitahSync} was refused by the server as too big. */
+	public static boolean tooBig() {
+		return tooBig;
 	}
 
 	public static boolean synced() {
