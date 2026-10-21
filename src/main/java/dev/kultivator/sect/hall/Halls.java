@@ -181,6 +181,12 @@ public final class Halls {
 	public static final int OP_GRANT = 11;
 	public static final int OP_RESTORE = 12;
 	public static final int OP_CLOSE = 13;
+	/**
+	 * UI/UX Terpadu (DESIGN 33.7 C33.N4): the hub opens the player's own hall from anywhere on tablet {@code text} (a
+	 * {@code PAGE_*} id), the path {@code /kultivasi formasi katalog} already takes. Access only: without an own hall core
+	 * the player gets an action-bar line; another master's hall still opens only at its stele.
+	 */
+	public static final int OP_OPEN = 14;
 
 	/** A stele within this many blocks of another player's hall stays inert. */
 	public static final double OTHER_HALL_RANGE = 128.0D;
@@ -922,6 +928,10 @@ public final class Halls {
 			VIEWERS.remove(self);
 			return;
 		}
+		if (op == OP_OPEN) {
+			openOwn(player, parseInt(text));
+			return;
+		}
 		UUID owner = VIEWERS.getOrDefault(self, self);
 		boolean own = owner.equals(self);
 		CompoundTag core = coreOf(owner);
@@ -961,6 +971,16 @@ public final class Halls {
 		}
 		changed();
 		sendInfo(player, owner);
+	}
+
+	/** {@code OP_OPEN}: the player's own hall on {@code page}, or the "no hall yet" line (C33.N4). */
+	private static void openOwn(ServerPlayer player, int page) {
+		UUID self = player.getUUID();
+		if (coreOf(self) == null) {
+			Msg.actionBar(player, Component.translatable("kultivator.hub.sekte.none").withStyle(ChatFormatting.YELLOW));
+			return;
+		}
+		openScreen(player, self, page < 0 || page > PAGE_DESA ? PAGE_AULA : page);
 	}
 
 	private static int parseInt(String text) {

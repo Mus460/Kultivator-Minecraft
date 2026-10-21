@@ -10,9 +10,9 @@
   "kultivator.codex.header": "%s · %s",
   "kultivator.codex.tab.kodeks": "Codex",
   "kultivator.codex.tab.kodeks.short": "Codex",
-  "kultivator.codex.tab.ring": "Seal Ring",
-  "kultivator.codex.tab.ring.short": "Ring",
-  "kultivator.codex.tab.kehancuran": "Destruction Mode",
+  "kultivator.codex.tab.ring": "Seal Set",
+  "kultivator.codex.tab.ring.short": "Set",
+  "kultivator.codex.tab.kehancuran": "Own Destruction",
   "kultivator.codex.tab.kehancuran.short": "Destroy",
   "kultivator.codex.tab.help": "Guide",
   "kultivator.codex.tab.help.short": "Guide",
@@ -196,7 +196,7 @@
   "kultivator.codex.bonus.steps": "a finishing strike",
   "kultivator.codex.bonus.special": "a special bonus",
 
-  "kultivator.codex.ring.core": "Seal Ring",
+  "kultivator.codex.ring.core": "Seal Set",
   "kultivator.codex.ring.list": "Castable",
   "kultivator.codex.ring.none": "You know no castable technique yet.",
   "kultivator.codex.ring.autofill": "Auto fill",
@@ -244,7 +244,7 @@
   "kultivator.codex.wheel.hint": "Move the mouse to a seal",
   "kultivator.codex.wheel.costs": "Qi %s · %s",
   "kultivator.codex.wheel.pinned": "%s is quick seal %s",
-  "kultivator.codex.quick.empty": "Quick seal %1$s is empty: fill socket %1$s in the Seal Ring",
+  "kultivator.codex.quick.empty": "Quick seal %1$s is empty: fill socket %1$s in the Seal Set",
   "kultivator.codex.hud.release": "Press again = release",
   "kultivator.codex.hud.lockout": "Ultimate %ss",
   "kultivator.codex.hud.kehancuran": "DESTRUCTION",
@@ -268,7 +268,7 @@
   "kultivator.codex.launcher.power": "Power %s",
   "kultivator.codex.launcher.mastery": "Highest mastery: %s",
   "kultivator.codex.launcher.selected": "Selected: %s",
-  "kultivator.codex.launcher.keys": "%s casts (hold: seal wheel) · %s / %s cycle the ring · %s opens the Codex",
+  "kultivator.codex.launcher.keys": "%1$s casts (hold: seal wheel) · %3$s next · %2$s previous · Technique Codex: %4$s",
 
   "kultivator.codex.teach.never": "Disciples can never learn this",
   "kultivator.codex.teach.state.0": "All",
@@ -313,5 +313,5 @@
   "kultivator.screen.help.penguasaan.title": "Mastery",
   "kultivator.screen.help.penguasaan": "Every technique has five mastery levels: Novice, Small Success, Large Success, Great Perfection and Peak. Points come from casting, hitting, killing and bosses, up to 200 hit and kill points per technique per day. Great Perfection needs Dao comprehension 60 (universal: Nascent Soul), Peak needs 90 (universal: Dao Union).",
   "kultivator.screen.help.kitab_teknik.title": "Technique Codex",
-  "kultivator.screen.help.kitab_teknik": "Open it with the codex key. Filter by Dao, grade, realm, type and state, or search by name, work or Dao. The bamboo slip shows the source, the live numbers, mastery and how to obtain the technique. The Seal Ring holds 12 techniques for the seal wheel (hold the cast key); sockets 1-4 are the quick seals."
+  "kultivator.screen.help.kitab_teknik": "Open it with the codex key. Filter by Dao, grade, realm, type and state, or search by name, work or Dao. The bamboo slip shows the source, the live numbers, mastery and how to obtain the technique. The Seal Set holds 12 techniques for the seal wheel (hold the cast key); sockets 1-4 are the quick seals."
 }

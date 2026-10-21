@@ -86,8 +86,15 @@ public final class DuniaClient {
 		dev.kultivator.client.Keys.send(new Payloads.Action(Actions.BATIN, 0, "sync"));
 	}
 
-	/** Opens the Dunia screen on {@code tab} ({@code Payloads.OpenScreen.DUNIA_*}), or switches the open one to it. */
+	/**
+	 * Opens the Dunia screen on {@code tab} ({@code Payloads.OpenScreen.DUNIA_*}), or switches the open one to it. The Desa
+	 * tab is gone (DESIGN 33.6 R4, C33.P4): {@code DUNIA_DESA} opens the player's own hall on its Desa tablet instead.
+	 */
 	public static void open(int tab) {
+		if (tab == Payloads.OpenScreen.DUNIA_DESA) {
+			dev.kultivator.client.hub.HubNav.openHall(dev.kultivator.sect.hall.Halls.PAGE_DESA);
+			return;
+		}
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.gui.screen() instanceof DuniaScreen screen && screen.getClass() == DuniaScreen.class) {
 			screen.showTab(tab);

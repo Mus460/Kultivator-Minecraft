@@ -4,7 +4,6 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
-import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.cultivation.SpiritRoots;
 import dev.kultivator.data.CultivationData;
@@ -45,7 +44,6 @@ final class RootDaoPage extends Page {
 	private int pendingTile = -1;
 	private long pendingUntil;
 	private long swornAt;
-	private boolean builtRootButton;
 
 	private int half;
 	private float starX;
@@ -95,22 +93,7 @@ final class RootDaoPage extends Page {
 		mutantY = starY + 0.81F * starR + nodeR + 8.0F + 9.0F;
 		gradeY = Math.min(y + h - 15.0F, mutantY + 14.0F);
 
-		builtRootButton = StatusPage.mortalUntested(data());
-		if (builtRootButton) {
-			int bw = Math.min(110, half - 8);
-			TalismanButton test = new TalismanButton(x + (half - bw) / 2, Math.round(gradeY) - 2, bw, 15,
-					() -> Component.translatable("kultivator.screen.btn.root_test"));
-			test.enabledWhen(() -> StatusPage.mortalUntested(data()));
-			test.urgentWhen(() -> StatusPage.mortalUntested(data()));
-			test.onPress(() -> {
-				// The testing ceremony plays around the player in the world: close the scroll so it can be watched.
-				send(Actions.ROOT_TEST);
-				screen.onClose();
-			});
-			test.tooltip(() -> List.of(Component.translatable("kultivator.screen.btn.root_test"),
-					Component.translatable("kultivator.screen.btn.root_test.tip")));
-			add(test);
-		}
+		// The Uji Akar talisman lives only on Status now (DESIGN 33.6 R6); the grade line says where while untested.
 
 		// Right: the Bagua.
 		int rx = x + half + 6;
@@ -126,8 +109,8 @@ final class RootDaoPage extends Page {
 	}
 
 	@Override
-	boolean needsRebuild() {
-		return builtRootButton != StatusPage.mortalUntested(data());
+	public String helpTopic() {
+		return "roots";
 	}
 
 	@Override
@@ -215,14 +198,14 @@ final class RootDaoPage extends Page {
 				hovered = element;
 			}
 		}
-		if (!builtRootButton) {
-			Component grade = known
-					? Component.translatable("kultivator.screen.root.grade", data.rootGrade().displayName(), trim(data.rootGrade().multiplier()))
-					: reading ? Component.translatable("kultivator.roots.info.reading")
-					: Component.translatable("kultivator.screen.root.untested");
-			int color = known ? Palette.onPaper(data.rootGrade().color()) : Palette.INK_FAINT;
-			Brush.fitCentered(g, font, grade, starX, gradeY, half - 8.0F, color, 0.85F, 0.5F, false);
-		}
+		boolean untested = StatusPage.mortalUntested(data);
+		Component grade = known
+				? Component.translatable("kultivator.screen.root.grade", data.rootGrade().displayName(), trim(data.rootGrade().multiplier()))
+				: reading ? Component.translatable("kultivator.roots.info.reading")
+				: untested ? Component.translatable("kultivator.uxpages.root.test_on_status")
+				: Component.translatable("kultivator.screen.root.untested");
+		int color = known ? Palette.onPaper(data.rootGrade().color()) : untested ? Palette.SEAL_DARK : Palette.INK_FAINT;
+		Brush.fitCentered(g, font, grade, starX, gradeY, half - 8.0F, color, 0.85F, 0.6F, false);
 		if (hovered != null) {
 			screen.showTooltip(elementTip(data, hovered));
 		}

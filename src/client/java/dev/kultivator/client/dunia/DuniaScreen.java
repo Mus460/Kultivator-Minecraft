@@ -6,6 +6,7 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.JadeTablet;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.ScrollFrame;
 import dev.kultivator.client.screen.ui.SlipTooltip;
@@ -24,10 +25,12 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * The Dunia screen (DESIGN 25.10, {@code OpenScreen.DUNIA = 7}, {@code /kultivasi dunia [tab]}, the {@code dunia} key): the
- * jade scroll at most 320 x 240 with four jade tablets on its left edge, Alam · Pusaka · Musuh · Desa, filled by the pages
- * of modules A, C, B and D. On opening it asks every module for its data ("sync"); a page refreshes when its
- * {@code DuniaSync} arrives. Not a pause screen; the dunia key or Escape closes it.
+ * The Dunia screen (DESIGN 25.10, {@code OpenScreen.DUNIA = 7}, {@code /kultivasi dunia [tab]}, the {@code dunia} key, hub
+ * section 5): the jade scroll at most 320 x 240 with three jade tablets on its left edge, Alam · Pusaka · Musuh, filled by
+ * the pages of modules A, C and B. The old Desa tablet was a read-only copy of the hall's Desa tablet and is gone (DESIGN
+ * 33.6 R4): {@code DUNIA_DESA} opens Aula › Wilayah › Desa. On opening it asks every module for its data ("sync"); a page
+ * refreshes when its {@code DuniaSync} arrives. A "?" seal at the right end of the header opens Panduan › Ensiklopedia on
+ * the tab's topic. Not a pause screen; the dunia key or Escape closes it (Escape returns to the hub when opened from it).
  */
 public class DuniaScreen extends Screen {
 
@@ -47,6 +50,7 @@ public class DuniaScreen extends Screen {
 	private boolean opened;
 	private @Nullable JadeTablet pressedTablet;
 	private @Nullable List<Component> tooltip;
+	private final KeyHints.HelpSeal help = new KeyHints.HelpSeal(0.0F, 0.0F, 10, () -> helpTopic(tab));
 
 	private int paperX0;
 	private int paperX1;
@@ -57,13 +61,12 @@ public class DuniaScreen extends Screen {
 	private int contentW;
 	private int contentH;
 
-	/** Opens on {@code tab}: 0 Alam, 1 Pusaka, 2 Musuh, 3 Desa ({@code Payloads.OpenScreen.DUNIA_*}). */
+	/** Opens on {@code tab}: 0 Alam, 1 Pusaka, 2 Musuh ({@code Payloads.OpenScreen.DUNIA_*}; Desa lives in the hall now). */
 	public DuniaScreen(int tab) {
 		this(Component.translatable("kultivator.spine8.dunia.title"), tab, screen -> List.of(
 				new dev.kultivator.client.alam.AlamPage(screen),
 				new dev.kultivator.client.tempa.PusakaPage(screen),
-				new dev.kultivator.client.musuh.MusuhPage(screen),
-				new dev.kultivator.client.desa.DesaPage(screen)));
+				new dev.kultivator.client.musuh.MusuhPage(screen)));
 	}
 
 	/**
@@ -86,14 +89,23 @@ public class DuniaScreen extends Screen {
 		DuniaClient.requestAll();
 	}
 
-	/** The {@code DuniaSync} channel behind tab {@code index} (Alam, Pusaka, Musuh, Desa), or -1. */
+	/** The {@code DuniaSync} channel behind tab {@code index} (Alam, Pusaka, Musuh), or -1. */
 	protected int channelOf(int index) {
 		return switch (index) {
 			case 0 -> dev.kultivator.network.Payloads.DuniaSync.CH_ALAM;
 			case 1 -> dev.kultivator.network.Payloads.DuniaSync.CH_TEMPA;
 			case 2 -> dev.kultivator.network.Payloads.DuniaSync.CH_MUSUH;
-			case 3 -> dev.kultivator.network.Payloads.DuniaSync.CH_DESA;
 			default -> -1;
+		};
+	}
+
+	/** The Panduan › Ensiklopedia topic of tab {@code index} (the header's "?" seal, DESIGN 33 C33.P1). */
+	protected String helpTopic(int index) {
+		return switch (index) {
+			case 0 -> "alam_rahasia";
+			case 1 -> "pusaka_diri";
+			case 2 -> "kultivator_liar";
+			default -> "jalan_dunia";
 		};
 	}
 
@@ -109,12 +121,12 @@ public class DuniaScreen extends Screen {
 		}
 	}
 
-	/** The tab shown now (0-3; 0-5 on the Keabadian screen). */
+	/** The tab shown now (0-2; 0-5 on the Keabadian screen). */
 	public int tab() {
 		return tab;
 	}
 
-	/** Switches to {@code index} (0-3) while open (the server asked for another tab). */
+	/** Switches to {@code index} (0-2; 0-5 on the Keabadian screen) while open (the server asked for another tab). */
 	public void showTab(int index) {
 		switchTab(Math.max(0, Math.min(pages.size() - 1, index)));
 	}
@@ -246,6 +258,7 @@ public class DuniaScreen extends Screen {
 		if (bottom - top > 24) {
 			g.enableScissor(paperX0 + ScrollFrame.SIDE + 1, top + ScrollFrame.END + 1, paperX1 - ScrollFrame.SIDE - 1, bottom - ScrollFrame.END - 1);
 			drawHeader(g);
+			help.render(g, font, mouseX, mouseY, seconds);
 			pages.get(tab).render(g, mouseX, mouseY, seconds);
 			if (DuniaClient.tooBig(channelOf(tab))) {
 				drawTooBig(g);
@@ -257,6 +270,9 @@ public class DuniaScreen extends Screen {
 			if (tabletsOut > 0.9F && tablet.contains(mouseX, mouseY)) {
 				showTooltip(tablet.tooltipLines());
 			}
+		}
+		if (bottom - top > 24 && help.contains(mouseX, mouseY)) {
+			showTooltip(help.tooltipLines());
 		}
 		if (tooltip != null && open >= 1.0F) {
 			g.nextStratum();
@@ -270,7 +286,7 @@ public class DuniaScreen extends Screen {
 		Component text = Brush.bold(Component.translatable("kultivator.spine8.dunia.header", title, current.title()));
 		float y = paperTop + ScrollFrame.END + 5.0F;
 		float cx = (paperX0 + paperX1) / 2.0F;
-		float room = contentW - 40.0F;
+		float room = contentW - 56.0F;
 		float scale = Brush.fitScale(font, text, room, 1.0F, 0.6F);
 		float textW = Math.min(room, font.width(text) * scale);
 		Brush.fitCentered(g, font, text, cx, y, room, Palette.INK, 1.0F, 0.6F, false);
@@ -278,11 +294,13 @@ public class DuniaScreen extends Screen {
 		float left = cx - textW / 2.0F - 6.0F;
 		float right = cx + textW / 2.0F + 6.0F;
 		Brush.rect(g, contentX + 8.0F, lineY - 0.5F, left - 4.0F, lineY + 0.5F, Palette.GOLD);
-		Brush.rect(g, right + 4.0F, lineY - 0.5F, contentX + contentW - 8.0F, lineY + 0.5F, Palette.GOLD);
+		Brush.rect(g, right + 4.0F, lineY - 0.5F, contentX + contentW - 20.0F, lineY + 0.5F, Palette.GOLD);
 		Brush.rect(g, left - 3.0F, lineY - 2.0F, left + 1.0F, lineY + 2.0F, Palette.SEAL);
 		Brush.rect(g, right - 1.0F, lineY - 2.0F, right + 3.0F, lineY + 2.0F, Palette.SEAL);
 		Glyphs.tab(g, current.icon(), contentX + 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
-		Glyphs.tab(g, current.icon(), contentX + contentW - 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
+		Glyphs.tab(g, current.icon(), contentX + contentW - 15.0F, lineY, 6.0F, Palette.GOLD_DARK);
+		// The "?" seal at the right end, in its own box.
+		help.moveTo(contentX + contentW - 4.0F, lineY);
 	}
 
 	/** The server refused this tab's last sync as too big: a warning band at the bottom of the content box (the old data stays). */
@@ -301,6 +319,10 @@ public class DuniaScreen extends Screen {
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+			if (unroll() >= 1.0F && help.contains(event.x(), event.y())) {
+				help.press();
+				return true;
+			}
 			for (JadeTablet tablet : tablets) {
 				if (tablet.contains(event.x(), event.y())) {
 					tablet.press();
@@ -317,6 +339,9 @@ public class DuniaScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
+		if (help.release(event.x(), event.y())) {
+			return true;
+		}
 		if (pressedTablet != null) {
 			JadeTablet tablet = pressedTablet;
 			pressedTablet = null;

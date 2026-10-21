@@ -27,7 +27,8 @@ import java.util.List;
  * ({@code MouseHandlerMixin}), the wheel steps around the ring, WASD keeps working. Each seal shows its glyph, grade
  * ribbon, scaled qi, a cooldown sweep and greys out when unaffordable; the centre shows the hovered name, qi, cooldown,
  * mastery and one line of description. Release selects (or casts with "Lepas = rapal"); Escape or right click closes
- * without choosing; 1-4 pins the hovered seal to quick seal 1-4 (saved on the server).
+ * without choosing; 1-4 pins the hovered seal to quick seal 1-4 (saved on the server). It never opens together with the
+ * Akses Cepat wheel ({@code client.hub.QuickWheel}) nor during a camera shot (DESIGN 33.3.1).
  */
 public final class SealWheel {
 
@@ -52,6 +53,10 @@ public final class SealWheel {
 	}
 
 	public static void open(boolean byCastKey) {
+		// UI/UX Terpadu (DESIGN 33.3.1): never together with the Akses Cepat wheel, never during a camera shot (7b).
+		if (dev.kultivator.client.hub.QuickWheel.isOpen() || dev.kultivator.client.epic.camera.CinematicDirector.active()) {
+			return;
+		}
 		SEALS.clear();
 		List<TechniqueSpec> ring = TeknikSession.ring();
 		for (int i = 0; i < Math.min(12, ring.size()); i++) {

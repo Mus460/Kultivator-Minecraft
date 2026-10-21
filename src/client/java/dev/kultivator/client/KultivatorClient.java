@@ -24,6 +24,10 @@ public class KultivatorClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		EffectQuality.load();
 		Keys.init();
+		// UI/UX Terpadu (DESIGN 33.7 module N): the hub's back behaviour, the Akses Cepat wheel (V) and the one-time key move.
+		dev.kultivator.client.hub.HubNav.init();
+		dev.kultivator.client.hub.QuickWheel.init();
+		dev.kultivator.client.hub.KeyLayout.init();
 		PillTooltips.init();
 		TrialClient.init();
 		BeastClient.init();

@@ -4,11 +4,13 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.epic.EpicSettings;
 import dev.kultivator.client.epic.screen.PhotosensitivityScreen;
+import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Eased;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.JadeCoin;
 import dev.kultivator.client.screen.ui.JadeSlider;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.ScrollFrame;
 import dev.kultivator.client.screen.ui.SealCard;
@@ -36,9 +38,11 @@ import java.util.Locale;
  * Left: four decree cards (Pedang, Tiang, Bintang, Gunung) with lock state, cooldown sweep and the decree glyph
  * (劍 柱 斗 山); clicking one selects it, and the seal's right-click then casts it. Right, for the selected decree: the
  * Kekuatan, Kerusakan and Kecepatan sliders ({@link JadeSlider}; Kekuatan greyed red above the realm's limit), the
- * "Hancurkan tanah" coin (only while Mode Kehancuran is on), "Tinggalkan pusaka" (Pedang, Tiang), the client-side Film
- * choice (Penuh / Singkat / Mati), the server's readout line and the hint line; at the bottom the talismans Pilih,
- * Bawaan and Peringatan cahaya. Every value is sanitised by the server, which answers with a {@code TitahSync}.
+ * "Hancurkan tanah" coin (only while Mode Kehancuran is on), "Tinggalkan pusaka" (Pedang, Tiang), one "Film: Penuh ▸"
+ * chip naming the client-side Film choice (it opens Pengaturan › Kamera & Film, where the four Film Titah rows live
+ * since DESIGN 33.6 R10), the server's readout line and the hint line; at the bottom the talismans Pilih, Bawaan and
+ * Peringatan cahaya; a "?" seal at the right end of the header opens Panduan › Ensiklopedia on {@code titah}. Every value
+ * is sanitised by the server, which answers with a {@code TitahSync}.
  * <p>
  * Tingkat Titah (DESIGN 29.16.10): a "Tingkat" slider (1-9, label "Tingkat t · ×s") sits above Kekuatan; tiers above
  * the realm's limit are greyed with a red seal and its tooltip names the reason; at tier 6-9, when the cast would carve
@@ -74,6 +78,7 @@ public final class TitahScreen extends Screen {
 	private int seenVersion = -1;
 	private String layoutKey = "";
 	private @Nullable List<Component> tooltip;
+	private final KeyHints.HelpSeal help = new KeyHints.HelpSeal(0.0F, 0.0F, 10, () -> "titah");
 
 	private int x0;
 	private int x1;
@@ -169,18 +174,14 @@ public final class TitahScreen extends Screen {
 			widgets.add(coin);
 			y += 14;
 		}
-		// the Film choice (client side): three talismans after a small label
-		int labelW = 26;
-		int fw = Math.max(30, (rw - labelW - 4) / 3);
-		for (EpicSettings.TitahFilm mode : EpicSettings.TitahFilm.values()) {
-			TalismanButton button = new TalismanButton(rx + labelW + mode.ordinal() * (fw + 2), y, fw, 13,
-					() -> Component.translatable("kultivator.titah_client.film." + mode.id()));
-			button.stampedWhen(() -> EpicSettings.titahFilm(current) == mode);
-			button.onPress(() -> EpicSettings.setTitahFilm(current, mode));
-			button.tooltip(() -> List.of(Component.translatable("kultivator.titah_client.film." + mode.id()),
-					Component.translatable("kultivator.titah_client.film." + mode.id() + ".tip").withStyle(ChatFormatting.GRAY)));
-			widgets.add(button);
-		}
+		// the Film choice (client side): one chip naming it; the choice itself lives in Pengaturan › Kamera & Film (33.6 R10)
+		TalismanButton film = new TalismanButton(rx, y, rw, 13, () -> Component.translatable("kultivator.uxpages.titah.film",
+				Component.translatable("kultivator.titah_client.film." + EpicSettings.titahFilm(current).id())));
+		film.onPress(() -> HubNav.openSettings(HubNav.GROUP_FILM));
+		film.tooltip(() -> List.of(Component.translatable("kultivator.uxpages.titah.film.title"),
+				Component.translatable("kultivator.titah_client.film." + EpicSettings.titahFilm(current).id() + ".tip").withStyle(ChatFormatting.GRAY),
+				Component.translatable("kultivator.uxpages.titah.film.tip").withStyle(ChatFormatting.DARK_GRAY)));
+		widgets.add(film);
 
 		// the bottom talismans
 		int bw = Math.max(60, (inW - 12) / 3);
@@ -206,6 +207,8 @@ public final class TitahScreen extends Screen {
 		warning.onPress(() -> minecraft.gui.setScreen(new PhotosensitivityScreen(this)));
 		warning.tooltip(() -> List.of(Component.translatable(K + "warning.tip").withStyle(ChatFormatting.GRAY)));
 		widgets.add(warning);
+		help.moveTo(inX + inW - 4.0F, top + ScrollFrame.END + 9.0F);
+		widgets.add(help);
 
 		layoutKey = layoutKey();
 		seenVersion = TitahClient.version();
@@ -289,8 +292,8 @@ public final class TitahScreen extends Screen {
 
 		// the header: the title and a gold rule; the seal's glyph 敕 ("by decree") as a faint ink wash behind the panel
 		float y = top + ScrollFrame.END + 5.0F;
-		Brush.fitCentered(g, font, Brush.bold(title), (x0 + x1) / 2.0F, y, inW, Palette.INK, 1.0F, 0.6F, false);
-		Brush.rect(g, inX, y + 11.0F, inX + inW, y + 11.6F, Palette.GOLD);
+		Brush.fitCentered(g, font, Brush.bold(title), (x0 + x1) / 2.0F, y, inW - 28.0F, Palette.INK, 1.0F, 0.6F, false);
+		Brush.rect(g, inX, y + 11.0F, inX + inW - 12.0F, y + 11.6F, Palette.GOLD);
 		int washSize = Math.min(96, rw);
 		g.blit(RenderPipelines.GUI_TEXTURED, WASH, rx + rw - washSize, bodyTop + 6, 0.0F, 0.0F, washSize, washSize, 128, 128, 128, 128,
 				Palette.argb(0x22, Palette.JADE_DARK));
@@ -320,7 +323,6 @@ public final class TitahScreen extends Screen {
 		// the controls (vanilla sliders through super, the theme's own widgets after)
 		super.extractRenderState(g, mouseX, mouseY, a);
 		int filmY = filmRowY(bodyTop);
-		Brush.fit(g, font, Component.translatable(K + "film"), rx, filmY + 3.0F, 24.0F, Palette.INK_SOFT, 0.7F, 0.5F, false);
 		for (Widget widget : widgets) {
 			widget.render(g, font, mouseX, mouseY, seconds);
 			if (widget.contains(mouseX, mouseY) && !widget.tooltipLines().isEmpty()) {

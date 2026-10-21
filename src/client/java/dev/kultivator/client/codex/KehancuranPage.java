@@ -2,6 +2,7 @@ package dev.kultivator.client.codex;
 
 import dev.kultivator.KultivatorConfig;
 import dev.kultivator.client.Keys;
+import dev.kultivator.client.hub.HubNav;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
@@ -32,6 +33,9 @@ import java.util.Locale;
  * with its one red chat line. Below it the status from {@code sessionExtra.teknik.kh}: availability or why not, this
  * rank's K, radius cap and blocks per cast, the safe zones, "Shift saat merapal = tanpa kehancuran", the queue, the
  * Pulihkan talisman with the undo windows (blocks, mm:ss) and the last six self casts.
+ * <p>
+ * DESIGN 33.6 R9: shown as "Kehancuran Diri" (the player's own techniques); one talisman above Pulihkan leads to the
+ * hall's "Segel Merah Murid" (the disciples' Destroyer arts), so the two pages are never mistaken for each other.
  */
 final class KehancuranPage extends CodexPage {
 
@@ -41,6 +45,8 @@ final class KehancuranPage extends CodexPage {
 	private static final int TEXT_SOFT = 0xFFD9A898;
 	private static final int STAMP = 0xFFD8261A;
 	private static final String P = "kultivator.codex.kh.";
+	/** The hall's Segel Merah Murid page ({@code HallScreen} page id 9, after Catatan). */
+	private static final int RED_SEAL_PAGE = 9;
 
 	private int sealX;
 	private int sealY;
@@ -73,6 +79,11 @@ final class KehancuranPage extends CodexPage {
 	}
 
 	@Override
+	String helpTopic() {
+		return "kehancuran_diri";
+	}
+
+	@Override
 	protected void build() {
 		int leftW = Math.max(96, Math.min(150, Math.round(w * 0.42F)));
 		sealR = Math.max(16, Math.min(28, Math.min(leftW, h - 70) / 3));
@@ -85,6 +96,11 @@ final class KehancuranPage extends CodexPage {
 		restore.enabledWhen(() -> Keys.connected() && undoBlocks() > 0);
 		restore.onPress(() -> send(Actions.KEHANCURAN, 0, "self_undo"));
 		restore.tooltip(this::restoreTip);
+		TalismanButton disciples = add(new TalismanButton(x + 4, y + h - 31, bw, 13, () -> Component.translatable("kultivator.uxpages.kh.to_disciples")));
+		disciples.enabledWhen(() -> Keys.connected() && allowed());
+		disciples.onPress(() -> HubNav.openHall(RED_SEAL_PAGE));
+		disciples.tooltip(() -> List.of(Component.translatable("kultivator.uxpages.kh.to_disciples.title"),
+				Component.translatable("kultivator.uxpages.kh.to_disciples.tip").withStyle(ChatFormatting.GRAY)));
 	}
 
 	private boolean on() {
