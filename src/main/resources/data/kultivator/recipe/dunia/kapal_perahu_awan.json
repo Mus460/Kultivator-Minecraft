@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "W": "minecraft:white_wool",
+    "P": "#minecraft:planks",
+    "H": "kultivator:spirit_stone_high"
+  },
+  "pattern": [
+    " W ",
+    "PHP",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:lunas_perahu_awan"
+  }
+}

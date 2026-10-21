@@ -1,0 +1,24 @@
+{
+  "type": "kultivator:menara",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "kultivator:menara_dalam",
+      "features": false,
+      "lakes": false,
+      "layers": [
+        {
+          "block": "minecraft:bedrock",
+          "height": 1
+        },
+        {
+          "block": "minecraft:polished_deepslate",
+          "height": 2
+        }
+      ],
+      "structure_overrides": [
+        "kultivator:menara/lobi"
+      ]
+    }
+  }
+}

@@ -112,6 +112,10 @@ bulat di dalam game.
     sampai Dewa Abadi, dengan centang otomatis
 63. [**Film Kosmik 3D**](#63-film-kosmik-3d): film titah lewat panggung 3D Orbit (planet dari angkasa) dan Istana
     Langit, [pengaturan](#633-pengaturan-grup-momen-epik), [perintah](#634-perintah-client-sinematik-tanpa-cheat)
+64. [**Dunia Kultivasi yang Luas**](#64-dunia-kultivasi-yang-luas): kota kultivator, pengembara, saingan, gua leluhur,
+    penjara iblis, Menara Seratus Lantai, peristiwa langit, harta lahir, kabut Qi, naga liar, evolusi binatang roh, Dunia
+    Bawah, Laut Tanpa Batas, Kota Abadi, kapal terbang dan Peta Dunia, [ringkasan](#641-ringkasan),
+    [config](#6418-berkas-konfigurasi-configkultivator-duniajson), [perintah uji](#6419-perintah-uji-op-kultivasi-uji-)
 
 ---
 
@@ -8440,11 +8444,12 @@ atau server berhenti.
 ## 62. Kitab Panduan (di dalam game)
 
 **Kitab Panduan** adalah buku panduan di dalam game, supaya kamu tidak bermain buta dari *Manusia Fana* sampai
-*Dewa Abadi* dengan sekte tingkat tinggi dan banyak murid. Isinya 12 bab sesuai urutan bermain, 102 langkah:
+*Dewa Abadi* dengan sekte tingkat tinggi dan banyak murid. Isinya 14 bab sesuai urutan bermain, 124 langkah:
 
 1. Hari Pertama · 2. Pemurnian Qi · 3. Pembangunan Fondasi · 4. Inti Emas · 5. Mendirikan Sekte · 6. Murid ·
 7. Jiwa Baru Lahir sampai Penyatuan Dao · 8. Formasi Sekte · 9. Sekte Tingkat Tinggi · 10. Kenaikan Abadi ·
-11. Dewa Abadi · 12. Tips & Kesalahan Umum
+11. Dewa Abadi · 12. Tips & Kesalahan Umum · 13. Dunia yang Luas · 14. Ujung Dunia (lihat
+[64](#64-dunia-kultivasi-yang-luas))
 
 **Cara membuka:**
 
@@ -8458,7 +8463,7 @@ beberapa baris penjelasan, dan kadang *jimat perintah*: klik untuk menuliskan pe
 tekan Enter). Gulir dengan roda tetikus, panah atas/bawah, atau Page Up/Down; panah kiri/kanan berganti bab, Home
 kembali ke bab sekarang, Esc menutup.
 
-**Centang otomatis:** 62 langkah dicentang sendiri oleh server dari data aslimu: akar sudah diuji, ranah dan tahap
+**Centang otomatis:** 84 langkah dicentang sendiri oleh server dari data aslimu: akar sudah diuji, ranah dan tahap
 yang dicapai, menit meditasi, Dao dipilih, Iblis Hati dikalahkan, Gua Kediaman, Aula Sekte didirikan dan tingkatnya,
 templat dan tingkat bangunan sekte, jumlah murid, Bintang Abadi, Pengakuan Langit, dan pencapaian mod (misalnya formasi
 Qi, pil pertama, murid pertama, Hu Fa, serbuan ditolak, Alam Abadi, Titah pertama). Langkah lain punya **kotak centang**
@@ -8557,3 +8562,384 @@ Contoh:
 * Shot lemparan tombak sebelum gerbang Tiang belum dibuat (opsional).
 * Tidak ada pendengar muat ulang sumber daya: setelah F3+T, cache model panggung baru diperbarui setelah keluar-masuk
   dunia (tekstur dan model item sudah diperbarui sendiri).
+
+## 64. Dunia Kultivasi yang Luas
+
+Dunia kini jauh lebih luas: kota kultivator, pengembara dan kelompok saingan, gua leluhur dengan teka-teki formasi,
+penjara iblis kuno, Menara Seratus Lantai, peristiwa langit, harta yang lahir, kabut Qi, naga liar, evolusi binatang roh,
+Dunia Bawah, Laut Tanpa Batas, Kota Abadi, kapal terbang sekte dan Peta Dunia. Bab 13 (*Dunia yang Luas*) dan bab 14
+(*Ujung Dunia*) Kitab Panduan menuntunmu langkah demi langkah, dan setiap topik punya halaman sendiri di menu
+*Bantuan*.
+
+> **Janji keamanan blok tetap berlaku.** Bangunan baru (kota, gua, penjara, menara, pulau, istana) hanya muncul lewat
+> **pembuatan dunia di chunk yang baru dibuat**. Saat bermain tidak ada yang memasang, merusak atau mengubah blok: pintu
+> teka-teki, segel, dinding formasi, gerbang dan bagian yang bergerak adalah *entitas*. Tidak ada petir sungguhan, dan
+> cuaca, waktu atau kecepatan tick vanilla tidak pernah diubah. Kota dan ruang teka-teki juga dilindungi dari Mode
+> Kehancuran.
+
+**Dunia lama:** bangunan baru hanya lahir di daerah yang belum pernah dimuat. Paket pembuatan dunia
+`kultivator:dunia_kota`, `kultivator:dunia_reruntuhan` dan `kultivator:dunia_dimensi` menyala sendiri; bila seorang
+admin mematikannya, nyalakan lagi dengan `/datapack enable "kultivator:dunia_kota"` (dan seterusnya). Tiga dimensi baru
+(Dunia Bawah, Laut Tanpa Batas, bagian dalam menara) dibuat lengkap saat pertama kali dimasuki.
+
+**Laptop lemah:** semua efek mengikuti **Kualitas Efek** (Minimal / Normal / Maksimal) dan penjaga frame Momen Epik,
+tanpa post shader (aman untuk Sodium dan Iris). NPC muncul hanya saat kamu dekat dan dibatasi (bawaan 36 di seluruh dunia,
+12 per pemain), AI-nya diperlambat bila server berat, dan chunk hanya dimuat sebentar lewat tiket pendek.
+
+### 64.1 Ringkasan
+
+| # | Fitur | Di mana | Mulai ranah | Uji cepat (`/kultivasi uji ...`) |
+|---|---|---|---|---|
+| 53 | Kota Kultivator | dataran, sabana, hutan dan sebagainya, chunk baru | semua | `kota cari` |
+| 54 | Kultivator Pengembara | di luar ruangan, kedai teh | Pemurnian Qi | `pengembara` |
+| 55 | Gua Leluhur | bukit/hutan, pegunungan, badlands dan Dark Deep | Pemurnian Qi (Kecil) | `gua cari kecil` |
+| 56 | Kapal Terbang Sekte | lunas yang kamu racik | Inti Emas | `kapal beri perahu` |
+| 57 | Naga Liar (Jiao) | langit Overworld | Jiwa Baru Lahir | `naga air` |
+| 58 | Evolusi Binatang Roh | binatang rohmu, di bawah langit terbuka | Transformasi Dewa | `evolusi 4` |
+| 59 | Peristiwa Langit | senja di Overworld dan Alam Abadi | semua | `langit meteor` |
+| 60 | Harta Lahir | 300-900 blok dari seorang kultivator | semua | `harta_lahir` |
+| 61 | Kultivator Saingan | sekitar harta lahir, balai lelang, sergapan | semua | `saingan perlombaan` |
+| 62 | Penjara Iblis Kuno | pegunungan dan badlands | Inti Emas ke atas | `penjara cari` |
+| 63 | Dunia Bawah | Kuil Gerbang Hantu (rawa, hutan gelap, taman pucat) | Jiwa Baru Lahir | `bawah masuk` |
+| 64 | Laut Tanpa Batas | Pusaran Laut di samudra dalam, atau kapal | Inti Emas | `laut masuk` |
+| 65 | Menara Seratus Lantai | padang dan dataran tinggi | semua (lantai makin berat) | `menara masuk` |
+| 66 | Kota Abadi | Alam Abadi, ketinggian 150-170 | Kenaikan Abadi | `kota_abadi cari` |
+| 67 | Peta Dunia | menu Gulungan › Dunia, `/kultivasi peta` | semua | `peta sampel` |
+| 68 | Cuaca Roh (Kabut Qi) | seluruh dunia, wilayah 512 blok | semua | `cuaca pekat` |
+
+### 64.2 Kota Kultivator (53)
+
+* **Di mana:** kota bertembok sekitar 130 × 130 blok yang lahir bersama dunia (paling dekat 6 chunk dari pusat dunia).
+  Isinya gerbang paifang, alun-alun, **Balai Lelang**, **Kedai Teh Paviliun Angin Bambu**, Paviliun Pil, Paviliun
+  Pusaka, penginapan, kantor sekte penjaga dan sebuah toko peti mati.
+* **Cara main:** penduduk muncul saat kamu mendekat (paling banyak 10) dan pergi saat kamu menjauh. Klik kanan warga
+  untuk berdagang; toko menjual barang di sekitar ranahmu dan membeli 0,35-0,5 × harga dasar (16 tumpukan sehari).
+  * **Balai Lelang** membuka sesi saat senja: lima lot, empat penawar dari kelompok saingan, tawar +5 / +10 / +25 %; batu
+    roh hanya diambil bila kamu menang.
+  * **Kedai teh** menjual tiga teh (Embun Pagi, Awan Ungu, Penenang Hati) dan **Kabar Angin** yang menandai tempat di Peta
+    Dunia. Setelah tiga kabar, pemilik kedai menjual **Token Pasar Gelap**: pintu di balik rak peti terbuka dan makelar
+    menjual barang tanpa batas ranah dengan 1,5 × harga (lebih mahal saat Gerhana Darah). Tiap pembelian bisa memancing
+    razia (8 %): bayar suap atau bertahan 60 detik.
+  * **Papan Misi**: 3 misi sehari (buru binatang, kemah bandit, herba tua, kawal pedagang).
+  * **Nama Baik** (−100 sampai 100) naik lewat misi dan lelang, turun bila kamu melukai warga; di bawah −30 penjaga
+    memusuhimu, mulai 50 kamu mendapat diskon 10 %.
+* **Hadiah:** barang lelang dan pasar gelap, teh, misi, diskon; pencapaian *Kota Kultivator*, *Kabar Angin* dan *Palu Diketuk*.
+* **Uji:** `kota cari`, `kota npc <peran>`, `kota lelang mulai|tutup|tawar <persen>`, `kota teh <jenis>`,
+  `kota gelap buka|razia`, `kota nama_baik <-100..100>`, `kota misi baru|selesai`, `kota stok ulang`.
+* **Sumber:** terinspirasi dari Battle Through the Heavens (Balai Lelang Mi Te di Kota Wu Tan, pasar gelap Wilayah Sudut
+  Hitam) dan Kota Keluarga Shang di Reverend Insanity. Tata kota, harga dan angkanya rancangan game.
+
+### 64.3 Kultivator Pengembara (54)
+
+* **Di mana:** mulai Pemurnian Qi, kadang seorang pengembara menghampirimu di luar ruangan (paling banyak sekali sehari),
+  dan beberapa duduk di kedai teh. Ranahnya dekat dengan ranahmu; wataknya Ramah, Angkuh atau Licik.
+* **Cara main:** klik **[Bicara]** di obrolan atau klik kanan dia.
+  * **Bertukar Pengetahuan:** tawarkan lempeng giok, herba, pil atau 5 % batangmu, lalu **Diskusi Dao** tiga ronde:
+    Gerak mengalahkan Diam, Diam mengalahkan Selaras, Selaras mengalahkan Gerak. Petunjuknya menunjukkan ke mana ia
+    condong (yang Licik sering berbohong). Tiga diskusi sehari.
+  * **Tanding:** duel yang berhenti di 10 % darah. **Tantang:** ia menjadi musuhmu sampai mati.
+  * **Ajak Berkelana** (Ramah, Inti Emas ke atas): ia ikut satu hari dan melawan monster.
+  * Jurus area tidak pernah mengenai pengembara yang damai.
+* **Hadiah:** menang 2-3 ronde diskusi memberi +2-6 pemahaman Dao (bila Dao-nya sama) atau **Catatan Pengembara**; kalah
+  memberi nasihat dan barangmu kembali. Menang tanding: 2 % XP batang, **Lencana Pengembara** dan Nama Baik; pencapaian *Bertukar Pandangan*.
+* **Uji:** `pengembara [dao] [ranah] [watak]`, `pengembara diskusi menang|kalah`, `pengembara hapus`.
+* **Sumber:** Liaozhai Zhiyi, "Pendeta Tao dari Gunung Lao"; terinspirasi dari kultivator lepas di A Record of a
+  Mortal's Journey to Immortality.
+
+### 64.4 Gua Leluhur dan teka-teki formasi (55)
+
+* **Di mana:** hanya di chunk baru. **Gua Kecil** di bukit dan hutan (Pemurnian Qi sampai Fondasi), **Gua Agung** di
+  pegunungan (Inti Emas sampai Jiwa Baru Lahir), **Gua Kuno** di badlands dan Dark Deep (Transformasi Dewa sampai
+  Penyatuan Dao).
+* **Cara main:** gerbang tebing tersegel terbuka bila kultivator dengan ranah cukup mengekliknya dan menyalurkan qi tiga
+  detik. Baca prasasti di ruang depan, lalu lewati 2, 3 atau 5 ruang formasi:
+  * **Delapan Trigram:** injak lempeng menurut urutan Langit Terdahulu.
+  * **Lima Unsur:** nyalakan pelita (5 % Qi) menurut siklus yang melahirkan, mulai dari glif di pintu.
+  * **Peta Bintang:** putar cincin batu sampai bintang emas menunjuk bintang di langit-langit.
+  * **Labirin Ilusi:** Pil Mata Terang memperlihatkan dinding palsu; klik untuk membuyarkannya.
+  * **Cermin Hati:** kalahkan bayanganmu (ia memantulkan pemulihanmu).
+  * **Timbangan Qi:** pemain bernilai 4, binatang roh 2, benda jatuh 1.
+
+  Tiap percobaan paling lama tiga menit, petunjuk muncul setelah 90 detik, dan langkah salah hanya menyakiti (tidak pernah
+  membunuh). Di akhir **Boneka Batu Penjaga** bangkit.
+* **Hadiah:** sisa jiwa leluhur memberi warisan sekali per pemain: batu roh, herba berumur, inti binatang, **Giok
+  Warisan**, dan **Kitab Formasi Kuno** di gua tertinggi. Teka-teki tersegel lagi setelah 3 hari (`reruntuhan.ruinResetDays`). Pencapaian *Pewaris Gua Leluhur*.
+* **Uji:** `gua cari <kecil|agung|kuno>`, `gua teka <jenis>`, `gua selesai`, `gua penjaga`, `gua reset`.
+* **Sumber:** Fengshen Yanyi (Sepuluh Formasi Mutlak, Formasi Sembilan Lengkung Sungai Kuning); Kisah Tiga Negara bab 84
+  (Formasi Delapan Batu Zhuge Liang); terinspirasi dari warisan gua Biksu Anggur Bunga di Reverend Insanity.
+
+### 64.5 Kapal Terbang Sekte (56)
+
+* **Kelas:** **Perahu Awan** (2 kursi, Inti Emas, 12 blok/detik, lambung 200), **Kapal Sekte** (8 kursi, Jiwa Baru Lahir
+  dan aula sekte tingkat 3, 16 blok/detik, lambung 400), **Bahtera Langit** (12 kursi, Transformasi Dewa dan aula tingkat
+  7, 20 blok/detik, lambung 800).
+* **Cara main:** racik lunasnya, gunakan di tanah lapang, lalu klik kanan untuk naik; kursi buritan adalah kemudi.
+  Kapten (pemilik atau saudara sekte): maju/mundur mengatur laju, kiri/kanan kemudi, lompat naik, lari turun, jongkok
+  turun dari kursi. Tombol inventaris saat duduk, atau jongkok + klik kanan di dek, membuka **Kemudi**: muatan 9 petak,
+  perbaikan (8 papan + 1 Batu Roh Menengah per seperempat lambung), warna panji, Simpan, dan **Berlayar ke** aula sekte,
+  tanda di peta atau jalur lain (misalnya Laut Tanpa Batas).
+* **Bahan bakar** dari muatan: Batu Roh Rendah 60 detik, Menengah 10 menit, Tinggi 2 jam, Tertinggi 24 jam, Batu Meteor
+  Roh 4 menit, Batu Asal Abadi 6 jam (di Alam Abadi). Pelayaran lebih dari 1 500 blok memakai **Lompatan Awan** 512 blok
+  tiap 30 detik (bahan bakar × 1,5); di atas 2 000 blok ada 15 % kemungkinan **Bajak Langit** menghadang.
+* Kapal yang berlabuh membentangkan dek yang bisa diinjak; murid yang mengikutimu ikut terbang. Kapal tidak pernah
+  menyentuh blok.
+* **Hadiah:** perjalanan jauh yang cepat; pencapaian *Layar Pertama* dan *Penjelajah Awan* (pelayaran 3 000 blok).
+* **Uji:** `kapal beri <perahu|sekte|bahtera>`, `kapal panggil`, `kapal bahan_bakar <menit>`, `kapal lompat <x> <z>`,
+  `kapal bajak`, `kapal rusak`, `kapal perbaiki`, `kapal hapus`.
+* **Sumber:** RMJ: Immortal Realm bab 567; Bowuzhi karya Zhang Hua.
+
+### 64.6 Naga Liar (57)
+
+* **Di mana:** mulai Jiwa Baru Lahir, **Jiao** kadang terbang di langit Overworld: Jiao Air di atas sungai dan laut,
+  Jiao Awan di atas gunung dan Kabut Qi Pekat, Jiao Petir hanya saat badai petir (lebih sering saat Hujan Meteor Roh atau
+  Bulan Kembar). Paling banyak 2 sekaligus di dunia.
+* **Cara main:** ia netral sampai diserang atau sampai kamu terbang terlalu dekat di ketinggiannya. Ia menyemburkan Napas
+  Unsur, menyabet dengan ekor, meraung (Lemah 4 detik) dan melilit. Pada 25 % darah ia Lemah dan melayang rendah 30
+  detik: gunakan **Selendang Pengikat Naga** (3 Bulu Ekor Roh, 2 Batu Roh Tinggi, 1 Mutiara Es Dingin) untuk
+  **Pertarungan Kehendak** 8 detik. Tahan klik kanan dan putar pandangan agar busur emasmu tetap di atas kehendak naga
+  (perlu 60 %).
+* **Hadiah:** Jiao yang tunduk tinggal di **Mutiara Naga Jinak**: panggil, tunggangi (Napas Naga habis di udara, pulih di
+  tanah), dan ia menyemburkan napasnya pada musuhmu. Jiao yang dibunuh meninggalkan **Sisik Jiao** dan kadang **Mutiara
+  Jiao**. Pencapaian *Pemelihara Naga* dan *Pembunuh Jiao*.
+* **Uji:** `naga <air|awan|petir> [lemah]`, `naga tunduk menang|kalah`, `naga tunggang`, `naga info`, `naga hapus`.
+* **Sumber:** Perjalanan ke Barat bab 15 (Kuda Naga Putih); Fengshen Yanyi bab 12 (Nezha di Laut Timur); Zuo Zhuan,
+  Adipati Zhao tahun 29 (Dong Fu, Pemelihara Naga).
+
+### 64.7 Evolusi Binatang Roh (58)
+
+* **Cara main:** setelah Tingkat 3, binatang roh hanya naik lewat **Kesengsaraan Binatang Roh**: Tingkat 4 (4 000 XP,
+  kamu di Transformasi Dewa), Tingkat 5 (12 000 XP, Kenaikan Abadi), Tingkat 6 (40 000 XP, Abadi Sejati). Jongkok + klik
+  kanan binatangmu di bawah langit terbuka sambil memegang persembahan; jongkok + klik kanan dengan tangan kosong
+  menunjukkan apa yang kurang.
+* **Persembahan:** Tingkat 4: Inti Binatang Raja + 3 Batu Meteor Roh (atau 3 Batu Roh Tinggi). Tingkat 5: Inti Iblis
+  Kuno (serigala), 3 Bulu Ekor Roh (rubah) atau Mutiara Naga (Jiao), atau 1 Batu Roh Agung. Tingkat 6: Persik Abadi (atau 2
+  Batu Roh Agung) + 3 Esensi Makam.
+* Setelah 10 detik datang 3 / 5 / 7 sambaran; berdirilah dalam 6 blok sebagai **Hu Fa** untuk menanggung 30 % tiap
+  sambaran (tidak pernah mematikanmu). Bila sambaran akan membunuh binatangmu, kesengsaraan gagal: ia bertahan dengan 1
+  darah, Luka Kesengsaraan satu hari, separuh persembahan kembali.
+* **Hadiah:** Tingkat 4 membangkitkan Lolongan Bulan (serigala), Api Rubah Langit (rubah) atau Napas Naga (Jiao); lapisan
+  tampilan baru di Tingkat 4-6; Tingkat 6 memberimu berkah. Pencapaian *Garis Darah
+  Terbangun* dan *Binatang Langit*.
+* **Uji:** `evolusi <4-6>`, `evolusi tribulasi [lulus|gagal]`, `evolusi garis <wolf|fox|jiao>`, `evolusi info`.
+* **Sumber:** Shan Hai Jing bagian 1, 2 dan 14 (rubah berekor sembilan, Tiangou, Yinglong); Xuanzhong Ji karya Guo Pu
+  (Rubah Langit); terinspirasi dari Bebe di Coiling Dragon.
+
+### 64.8 Peristiwa Langit (59)
+
+* **Kapan:** setiap senja di Overworld dan Alam Abadi, peluang 25 %, paling cepat 3 malam setelah peristiwa terakhir.
+  Tidur melewati malam mengakhirinya.
+* **Hujan Meteor Roh:** bintang jatuh menghiasi langit, dan meteor roh mendarat 24-96 blok dari kultivator di bawah langit
+  terbuka (paling banyak 6 per malam). Ambil **Batu Meteor Roh** (jongkok + gunakan: 150 Qi; juga bahan bakar kapal dan
+  persembahan evolusi).
+* **Gerhana Darah:** bulan merah; monster yang lahir dekat pemain bisa *Tersentuh Gerhana* (+25 % darah dan serangan,
+  berpendar merah), meditasi Jalan Dao Bayangan × 1,3, segel penjara iblis melemah, pasar gelap lebih mahal, dan Kuil
+  Gerbang Hantu terbuka tanpa dupa.
+* **Bulan Kembar:** bulan perak kedua terbit, situs bulan purnama berlaku semalaman, pemahaman Dao Es dan Bayangan × 1,5,
+  binatang roh mendapat XP roh × 1,5.
+* Di dekat penjara iblis yang segelnya tinggal 30 atau kurang, langit memerah abu sebagai pertanda.
+* **Hadiah:** Batu Meteor Roh, bonus meditasi dan pemahaman; pencapaian *Langit Berubah Rupa*.
+* **Uji:** `langit meteor|gerhana|bulan_kembar [menit]`, `langit berhenti`, `langit jadwal`, `langit jatuh`.
+* **Sumber:** Zuo Zhuan, Adipati Zhuang tahun 7 (bintang jatuh seperti hujan); Tiangou yang menelan bulan; Huainanzi bab
+  8 (sepuluh matahari). Bulan kembar rancangan game.
+
+### 64.9 Harta Lahir (60)
+
+* **Kapan dan di mana:** kira-kira setiap tiga hari sebuah harta lahir 300-900 blok dari seorang kultivator: tanah
+  bergetar 30 detik, lalu **Pilar Pelangi** tujuh warna menembus langit, terlihat dari jauh dan di Peta Dunia.
+* **Cara main:** harta berada di atas teratai giok dan muncul saat pemain dalam 64 blok; kadang dijaga binatang elit.
+  Klik kanan lalu tetap dalam 2 blok selama 5 detik untuk menyerapnya; diserang atau menjauh memutus penyerapan.
+  Kultivator saingan juga berlomba (61). Pilar memudar setelah 10 menit.
+* **Hadiah** (mengikuti kultivator terkuat di sekitarnya): **Harta Fana** (herba 100-300 tahun, Batu Roh Menengah),
+  **Harta Roh** (herba 500-1 000 tahun, inti tinggi, lempeng giok), **Harta Langit** (herba seribu tahun, inti raja,
+  benih api surgawi 5 %), **Harta Abadi** (Batu Asal Abadi, mutiara esensi, bahan purba 5 %). Pencapaian *Harta Langit
+  dan Bumi*.
+* **Uji:** `harta_lahir [1-4] [jenis]`, `harta_lahir dekat`, `harta_lahir hapus`, `harta_lahir jadwal`.
+* **Sumber:** terinspirasi dari pusaka xianxia yang lahir dengan cahaya menembus langit lalu diperebutkan, seperti
+  perebutan Api Surgawi di Battle Through the Heavens.
+
+### 64.10 Perburuan Harta oleh Kultivator Saingan (61)
+
+* **Siapa:** enam kelompok (keluarga, sekte, paviliun), masing-masing dengan pemimpin, anggota, wilayah dan gaya
+  bertarung. Ranah mereka tumbuh bersama hari dunia, tetapi tidak pernah lebih dari satu ranah di atas pemain terkuat
+  yang baru-baru ini bermain.
+* **Cara main:** saat harta lahir, kelompok yang wilayahnya dekat ikut berlomba. Bila kamu dekat, mereka turun dengan
+  pedang terbang, saling bertarung dan mencoba menyalurkan harta itu 5 detik; mereka menyerang siapa pun yang mengklaim
+  harta atau menyerang mereka. Setelah kamu merebut harta, kelompok yang dendam (atau yang licik) bisa **menyergapmu**
+  1-5 menit kemudian di luar kota (paling banyak sekali sehari); kota selalu aman. Empat penawar di Balai Lelang juga
+  anggota kelompok ini.
+* **Hadiah:** pemimpin yang kalah menjatuhkan **Kantong Saingan** dan dendamnya turun ke 20; pencapaian *Yang Kuat
+  Bertahan* dan *Tak Tertandingi*.
+* **Uji:** `saingan daftar`, `saingan datang <grup>`, `saingan perlombaan`, `saingan sergap`, `saingan dendam <grup> <0-100>`.
+* **Sumber:** terinspirasi dari Battle Through the Heavens (perebutan Api Teratai Hijau di Gurun Tagore).
+
+### 64.11 Penjara Iblis Kuno (62)
+
+* **Di mana:** **Kuil Segel** di pegunungan dan badlands: lima pilar dengan jimat segel di atas sumur tersegel, dan jauh
+  di bawahnya **Aula Rantai** dengan **Jantung Segel**.
+* **Cara main:** kekuatan segel (0-100) turun sedikit setiap hari dan satu poin tiap jam selama Gerhana Darah. Klik jimat
+  membuka kartu peringatan; menahan 1,5 detik mencabutnya (segel −5, kamu mendapat **Sobekan Segel**). Di Jantung Segel,
+  **Perkuat Segel** (4 jimat kosong + 1 Batu Roh Tinggi, sekali sehari) menaikkan segel 15. Bila segel mencapai 0 atau
+  kelima jimat tercabut, segel pecah: langit memerah dan raja iblis (**Xiangliu**, **Raja Iblis Banteng** atau
+  **Chiyou**) bangkit bersama iblis tersegel. Setiap jurusnya ditandai di lantai lebih dulu. Menyalakan kembali kelima
+  pilar (salurkan qi tiga detik, terputus bila terkena serangan) melemahkan pukulannya 15 % per pilar dan menyegelnya
+  lagi. Pukulan maut iblis menyisakan 1 darah dan melemparmu ke tangga (Luka Iblis).
+* **Hadiah:** memperkuat segel memberi Pahala dan nama baik sekte; menyegel ulang memberi segel 100, Pahala besar dan
+  sebuah harta lahir di kuil; membunuh raja memberi **Inti Iblis Kuno**, inti raja dan slip giok (penjara lalu tenang 7
+  hari). Pencapaian *Penyegel Iblis* dan *Pembasmi Raja Iblis*.
+* **Uji:** `penjara cari`, `penjara segel <0-100>`, `penjara cabut <1-5>`, `penjara lepas <raja>`, `penjara segel_ulang`,
+  `penjara hapus`.
+* **Sumber:** Batas Air bab 1 (Marsekal Hong Xin membuka sumur bersegel); Perjalanan ke Barat bab 7 dan 14 (Gunung Lima
+  Unsur); Shan Hai Jing bagian 8 dan 17 (Xiangliu, Chiyou); Perjalanan ke Barat bab 59-61 (Raja Iblis Banteng);
+  terinspirasi dari garis Penyegel Iblis di I Shall Seal the Heavens.
+
+### 64.12 Dunia Bawah (63)
+
+* **Pintu masuk:** **Kuil Gerbang Hantu** di rawa, hutan gelap atau taman pucat (Peta Dunia atau Kabar Angin). Mulai Jiwa
+  Baru Lahir, malam hari, pegang **Dupa Arwah** (1 Kayu Pemelihara Jiwa + 2 Batu Roh Menengah, atau pasar gelap) dan
+  jongkok 3 detik di altar; saat Gerhana Darah dupa tidak perlu.
+* **Cara main:** tubuhmu tertinggal sebagai manekin yang tak bisa dilukai (menyentuhnya menarikmu pulang) dan arwahmu tiba
+  di **Teras Wangxiang** selama 20 menit (tidak lapar, garis pucat di tepi layar). **Jalan Huangquan** berbunga lili merah
+  menuju **Jembatan Naihe**; di ujungnya **Meng Po** menawarkan supnya (sekali tiap 7 hari): lupakan Jalan Dao (separuh
+  pemahaman disimpan), hanyutkan Iblis Hati dan penyimpangan Qi, atau lupakan satu teknik. Menolak sup membuka **Sepuluh
+  Pengadilan** berurutan: Cermin Karma, duel **Kepala Lembu dan Muka Kuda** (berhenti di 10 % darah), teka-teki hakim, dan
+  arwah tersesat yang minta diantar. Di **Desa Arwah**, arwah menitipkan **Surat Arwah** untuk orang hidup; Hantu Lapar
+  dan patroli yaksa berkeliaran.
+* **Keamanan:** pukulan maut sebagai arwah tidak membunuhmu: kamu bangun di tubuh dengan 1 darah dan Luka Jiwa 10 menit,
+  tanpa kehilangan barang. Keluar dari game sebagai arwah berarti bangun di tubuh.
+* **Hadiah:** tiap pengadilan memberi **Giok Arwah**; Raja Yama membuka **Buku Hidup dan Mati**: di bawah Dewa Abadi
+  **Lentera Arwah** dan bekal, Dewa Abadi boleh sekali **Coret Namamu** (+5 % nyawa maksimum, permanen). Pencapaian *Menyeberangi Naihe* dan *Sepuluh Pengadilan*.
+* **Uji:** `bawah masuk`, `bawah pulang`, `bawah meng_po <dao|hati|teknik>`, `bawah pengadilan <1-10> [lulus]`,
+  `bawah cermin`, `bawah coret`, `bawah arwah <n>`, `bawah kuil cari`.
+* **Sumber:** Perjalanan ke Barat bab 3 dan 10-11 (Buku Hidup dan Mati, Kaisar Taizong di depan Raja Yama); Yuli Baochao
+  (sepuluh pengadilan, Cermin Karma); Liaozhai Zhiyi, "Xi Fangping"; Sutra Ullambana.
+
+### 64.13 Laut Tanpa Batas (64)
+
+* **Pintu masuk:** mulai Inti Emas, berenang ke **Pusaran Laut** di dasar samudra dalam sambil memegang **Mutiara
+  Penunjuk Laut** (cangkang nautilus, 2 kristal prismarin, 1 Batu Roh Menengah; atau pasar gelap), yang juga menunjuk
+  pusaran terdekat. Kapal sekte juga bisa berlayar ke laut ini lewat jalur *Laut* di Kemudi.
+* **Cara main:** laut timur tak berujung sedalam 60 blok. Kamu tiba di **Dermaga Tiba**; **Gerbang Pulang** di dermaga dan
+  setiap pulau mengembalikanmu ke tempat asal. **Pulau Herba** memberi satu ramuan tua per bedeng per hari, **Pulau
+  Pertapa** sekali pelajaran, **Pulau Pasar** berisi pedagang dan kedai, **Pulau Karang** dijaga kepiting batu dan yaksa.
+  **Penyu Ao** berenang membawa pulau kecil di punggungnya; kamu bisa berdiri di atasnya. Monster laut makin kuat tiap
+  1 000 blok dari pusat (Inti Emas sampai Kenaikan Abadi), tidak pernah dalam 160 blok dari dermaga.
+* **Istana Naga** di dasar laut (Transformasi Dewa ke atas): Raja Naga **Ao Guang** menjual **Mutiara Naga** dan memberi
+  dua misi; setelah misi pertama penjaga gerbang memberimu **Mutiara Penghindar Air** (bernapas di air laut ini).
+* **Pulau Penglai** yang langka (Penyatuan Dao ke atas): menangkan duel wawasan sang abadi untuk **Air Mata Air Penglai**
+  (+20 pemahaman, sekali). Pencapaian *Laut Tanpa Batas* dan *Tamu Istana Kristal*.
+* **Uji:** `laut masuk`, `laut pulang`, `laut pulau cari <jenis>`, `laut istana cari`, `laut monster <jenis> [tingkat]`,
+  `laut penyu`, `laut penglai`, `laut pusaran cari`.
+* **Sumber:** Liezi bab 5 "Tang Wen" (lima pulau abadi yang ditopang penyu raksasa); Perjalanan ke Barat bab 3 (Istana
+  Kristal dan Ao Guang); Fengshen Yanyi bab 12 (yaksa Li Gen); Shiji (Xu Fu mencari Penglai).
+
+### 64.14 Menara Seratus Lantai (65)
+
+* **Di mana:** pagoda sembilan tingkat yang puncaknya tersembunyi awan, di padang dan dataran tinggi.
+* **Cara main:** klik pintu perunggunya: kamu dan sampai tiga kawan dalam 6 blok masuk ke lobi dimensi menara. Sepuluh
+  gerbang pita membawamu ke lantai pertama pita itu; pita yang sudah ditembus tidak perlu didaki lagi. Setiap pita sepuluh
+  lantai berpola sama: 1-3 gelombang tempur, 4 teka-teki formasi berwaktu, 5 ketahanan (60 detik denyut formasi), 6 tempur
+  dengan afiks, 7 **Ujian Hati** (tiga teka-teki Dao atau bayangan cermin), 8 meditasi di lingkaran sementara gelombang qi
+  mendorong (jongkok menahan), 9 elite sekuat raja siluman, 10 **Penjaga Lantai**. Lantai 100 menghadirkan **Bayangan
+  Diri** dengan kekuatan penuhmu. Gagal mengembalikanmu ke lobi dengan Luka Menara (5 menit), tanpa kehilangan barang;
+  pukulan maut menyisakan 1 darah.
+* **Hadiah:** tuntas pertama tiap lantai memberi batu roh, tiap lantai kesepuluh peti tonggak, lantai 100 gelar
+  **Penakluk Seratus Lantai**. Peringkat mingguan di prasasti; tiga teratas memberi nama baik sekte. Pencapaian *Pita Pertama* dan *Penakluk Seratus Lantai*.
+* **Uji:** `menara cari`, `menara masuk`, `menara lantai <1-100>`, `menara selesai`, `menara gagal`, `menara keluar`,
+  `menara rekor <n>`.
+* **Sumber:** Dao De Jing bab 64 (menara sembilan tingkat dimulai dari setumpuk tanah); terinspirasi dari Menara Pemurnian
+  Qi Pembakar Langit di Akademi Canaan, Battle Through the Heavens.
+
+### 64.15 Kota Abadi (66)
+
+* **Di mana:** distrik terapung di Alam Abadi (ketinggian 150-170), hanya untuk yang telah naik: Gerbang Awan, Pasar
+  Abadi, Paviliun Dao, Kebun Persik Abadi, Menara Lonceng, Balai Lelang Abadi dan Istana Giok.
+* **Cara main:** **Pasar Abadi** menjual herba abadi, Pil Abadi, mutiara esensi dan kadang bahan purba dengan Batu Asal
+  Abadi (16 pembelian sehari). **Kuliah Dao** saat tengah hari: duduk dalam 6 blok dari penceramah 60 detik untuk +1-3
+  pemahaman Dao (sekali sehari). Juru lelangnya membuka **Lelang Abadi** yang sudah ada. **Utusan Kaisar Giok** memberi
+  satu titah tiap minggu yang dibayar dengan Batu Asal. Lonceng menara berbunyi saat tengah hari.
+* **Hadiah:** **Persik Abadi** tiap 3 hari (2 % batang di Kenaikan Abadi, 5 % di Abadi Sejati, juga persembahan evolusi
+  Tingkat 6); pemahaman Dao; pencapaian *Kota di Atas Awan*.
+* **Uji:** `kota_abadi cari`, `kota_abadi kuliah`, `kota_abadi persik`, `kota_abadi titah`.
+* **Sumber:** Perjalanan ke Barat bab 4-5 (Sun Wukong menjaga Kebun Persik Abadi); terinspirasi dari kota para abadi di
+  A Record of a Mortal's Journey to Immortality: Immortal Realm.
+
+### 64.16 Peta Dunia (67)
+
+* **Cara membuka:** kartu **Peta Dunia** di Gulungan › Dunia, tombol Peta, `/kultivasi peta`, atau gulungan **Peta Dunia**
+  (kertas + kantung tinta + Batu Roh Rendah).
+* **Cara main:** daerah dalam 96 blok dari jalanmu tersingkap dari kabut; saudara sekte berbagi peta. Situs hanya tampil
+  setelah kamu menemukannya (berdiri dekat, Kabar Angin, **Gulungan Penunjuk**, atau bertukar peta: dua pemegang peta
+  saling klik kanan). Pertanda hidup (pilar harta, meteor, naga) tampil di sekitarmu. Wilayah aula sekte tampak sebagai
+  lingkaran warna; domain sekte NPC ditandai garis tinta dan segel merah. Koin **Cuaca**, **Langit**, **Segel** dan
+  **Jalur** menyalakan lapisan. Seret untuk menggeser, roda untuk tiga zoom (1 piksel = 16 / 64 / 256 blok), klik penanda
+  untuk kartunya (kapten kapal bisa langsung Berlayar), klik kanan menaruh tanda (paling banyak 32).
+* **Hadiah:** pencapaian *Gunung dan Laut* dan *Penjelajah Lima Arah*.
+* **Uji:** `peta ungkap <radius>`, `peta situs semua`, `peta reset`, `peta domain`, `peta sampel`.
+* **Sumber:** Shan Hai Jing; terinspirasi dari Alam Gunung dan Laut di I Shall Seal the Heavens.
+
+### 64.17 Cuaca Roh: Kabut Qi (68)
+
+* **Cara kerja:** dunia terbagi menjadi wilayah 512 blok yang cuaca rohnya berganti setiap 5 menit, terlepas dari hujan
+  biasa: **Cerah** (70 %), **Kabut Qi Tipis** (20 %, situs meditasi × 1,2), **Kabut Qi Pekat** (7 %, × 1,5) dan **Fajar
+  Ungu** (3 %, hanya saat fajar, × 1,6; menghadap timur menggandakan peluang pencerahan). Rawa, hutan, taiga, rimba, hutan
+  ceri dan pegunungan lebih sering berkabut; gurun, lahan tandus dan sabana lebih cerah. Bonus hanya di bawah langit
+  terbuka dan tetap di bawah batas pengali meditasi.
+* **Hadiah:** saat Kabut Qi Pekat atau Fajar Ungu, jongkok + gunakan botol kosong untuk menampung **Embun Roh** (4 sehari):
+  minum untuk regenerasi Qi +20 % selama 5 menit. Pencapaian *Napas Bumi Agung*.
+* **Uji:** `cuaca <cerah|tipis|pekat|ungu> [menit]`, `cuaca info`.
+* **Sumber:** Zhuangzi bab 2 (napas Bumi Agung bernama angin); Liexian Zhuan (Yin Xi melihat qi ungu dari timur sebelum
+  Laozi tiba). Kabut Qi dan bonusnya rancangan game.
+
+### 64.18 Berkas konfigurasi `config/kultivator-dunia.json`
+
+Setiap sistem besar punya saklar sendiri (bawaan **menyala**); nilai di luar batas diperbaiki saat dimuat, dan
+`/kultivasi uji jelajah muat` memuat ulang berkasnya.
+
+| Bagian | Saklar dan angka penting (bawaan) |
+|---|---|
+| `umum` | `enabled` (true), `npcCap` 36, `npcPerPlayer` 12, `msptGuard` 45 |
+| `kota` | `worldgen`, `enabled`, `npcPerTown` 10, `auction`, `blackMarket`, `raidChance` 0,08, `bounties`, `wanderers`, `discussionsPerDay` 3, `companion`, `rivals`, `rivalGroups` 6, `rivalAmbush`, `immortalCity`, `lectures`, `peachDays` 3 |
+| `reruntuhan` | `worldgen`, `ruins`, `hintSeconds` 90, `guardians`, `ruinResetDays` 3, `prisons`, `sealDecayPerDay` 0,2, `eclipseDecayPerHour` 1, `bossDeathGuard`, `rebreakDays` 7, `tower`, `towerDeathGuard` |
+| `langit` | `events`, `chancePerNight` 0,25, `minNightsBetween` 3, `meteorShower`, `bloodEclipse`, `twinMoons`, `treasureBirth`, `treasureDays` 3, `weather`, `cellSize` 512, `dewPerDay` 4 |
+| `naga` | `wild`, `minRealm` nascent_soul, `chance` 0,06, `worldCap` 2, `subdue`, `mount`, `evolution`, `huFaShare` 0,3 |
+| `dimensi` | `worldgen`, `underworld`, `minRealm` nascent_soul, `incenseMinutes` 20, `soupCooldownDays` 7, `yamaPerk`, `sea`, `seaMinRealm` golden_core, `turtle`, `palaceMinRealm`, `penglaiMinRealm` |
+| `kapal` | `ships`, `maxSpeed` 20, `cloudLeap`, `leapDistance` 512, `pirates`, `pirateChance` 0,15, `fuelScale` 1, `deckWalk` |
+| `peta` | `map`, `waypoints` 32, `shareWithSect` |
+
+`worldgen = false` hanya berlaku untuk chunk yang dibuat setelahnya; bangunan yang sudah ada tetap.
+
+### 64.19 Perintah uji (OP, `/kultivasi uji ...`)
+
+`/kultivasi uji jelajah` menampilkan semua perintah di bawah ini sebagai jimat yang bisa diklik (juga grup *jelajah* di
+bantuan cheat). Perintah bersama: `jelajah muat` (muat ulang config), `jelajah anchor` (tampilkan jangkar bangunan),
+`struktur cari <id>` (teleport ke bangunan terdekat; memuat chunk sebentar) dan `struktur lihat <folder/potongan>`.
+Perintah tiap fitur tercantum di bagiannya (64.2-64.17). Contoh:
+
+```
+/kultivasi uji kota cari
+/kultivasi uji pengembara sword golden_core licik
+/kultivasi uji harta_lahir 3
+/kultivasi uji saingan perlombaan
+/kultivasi uji gua cari agung
+/kultivasi uji penjara lepas chiyou
+/kultivasi uji menara lantai 50
+/kultivasi uji langit gerhana 5
+/kultivasi uji cuaca pekat 10
+/kultivasi uji naga petir lemah
+/kultivasi uji evolusi tribulasi lulus
+/kultivasi uji bawah pengadilan 3 lulus
+/kultivasi uji laut istana cari
+/kultivasi uji kapal beri bahtera
+/kultivasi uji peta ungkap 512
+```
+
+### 64.20 Yang belum lengkap
+
+* **Belum diuji di game** (hanya dikompilasi, dan data pembuatan dunia dimuat dengan pemuat registri asli Minecraft):
+  tampilan kota, gua, penjara, menara, pulau dan istana di dunia sungguhan; animasi makhluk dan sudut kamera; HUD
+  Pertarungan Kehendak.
+* Suara bicara Jepang khusus fitur ini (juru lelang, pemilik kedai teh, Meng Po, Raja Yama, Raja Naga, dan lain-lain)
+  belum dibuat; sementara memakai suara yang sudah ada, dengan teks suara baru.
+* Pemain lain belum melihat tubuh arwah sebagai tembus pandang (arwah ditandai jejak cahaya).
+* `laut pulau cari <jenis>` mencari pulau roh terdekat dari jenis apa pun.
+* Diskusi Dao belum memberi pilihan ketiga (+1 penguasaan teknik); Persik Abadi belum menaikkan konversi Esensi Abadi.

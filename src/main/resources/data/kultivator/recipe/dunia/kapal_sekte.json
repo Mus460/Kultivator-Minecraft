@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "W": "minecraft:white_wool",
+    "E": "kultivator:formation_eye",
+    "H": "kultivator:spirit_stone_high",
+    "D": "minecraft:dark_oak_log",
+    "P": "#minecraft:planks"
+  },
+  "pattern": [
+    "WEW",
+    "HDH",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:lunas_kapal_sekte"
+  }
+}

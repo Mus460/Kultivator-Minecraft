@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.rival_beaten.description"
+    },
+    "icon": {
+      "id": "kultivator:kantong_saingan"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.rival_beaten.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

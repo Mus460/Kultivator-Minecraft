@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.ruin_cleared.description"
+    },
+    "icon": {
+      "id": "kultivator:kitab_formasi_kuno"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.ruin_cleared.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

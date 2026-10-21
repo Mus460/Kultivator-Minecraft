@@ -1,0 +1,85 @@
+{
+ "textures": {
+  "t0": "kultivator:item/dunia/reruntuhan/kb_skin",
+  "particle": "kultivator:item/dunia/reruntuhan/kb_skin"
+ },
+ "elements": [
+  {
+   "from": [
+    6.5,
+    4,
+    8
+   ],
+   "to": [
+    9.5,
+    7,
+    16
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t0"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     6,
+     8
+    ],
+    "axis": "x",
+    "angle": -22.5
+   }
+  }
+ ]
+}

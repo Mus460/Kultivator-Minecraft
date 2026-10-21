@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:dunia/ship_launched",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.ship_voyage.description"
+    },
+    "icon": {
+      "id": "kultivator:lunas_kapal_sekte"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.ship_voyage.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

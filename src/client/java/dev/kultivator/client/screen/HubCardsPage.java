@@ -215,6 +215,10 @@ final class HubCardsPage extends Page {
 				card("ensiklopedia", Glyphs.HELP, null, () -> screen.showSection(HubNav.PANDUAN, HubNav.SUB_ENSIKLOPEDIA));
 			}
 		}
+		// Phase 34 (DESIGN 34.6 T): the cards other modules registered for this section.
+		for (dev.kultivator.client.hub.HubCards.Extra extra : dev.kultivator.client.hub.HubCards.of(kind)) {
+			card(extra.id(), extra.glyph(), extra.lock(), extra.action());
+		}
 		layoutCards();
 	}
 

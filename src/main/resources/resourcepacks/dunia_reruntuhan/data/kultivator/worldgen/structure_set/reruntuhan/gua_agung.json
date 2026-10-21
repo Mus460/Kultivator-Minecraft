@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 340556,
+    "separation": 30,
+    "spacing": 72
+  },
+  "structures": [
+    {
+      "structure": "kultivator:reruntuhan/gua_agung",
+      "weight": 1
+    }
+  ]
+}

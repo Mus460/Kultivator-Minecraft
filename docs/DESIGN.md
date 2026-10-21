@@ -19934,3 +19934,1277 @@ fragments assigned to P. Both languages always together.
 17. Sodium + Iris (shader aktif): Gulungan, roda dan HUD tampil normal; FPS tidak turun saat roda terbuka (laptop lemah,
     Minimal).
 18. Semua perintah `/kultivasi ...` lama tetap bekerja.
+
+## 34. Dunia Kultivasi yang Luas
+
+User request (2026-10-22, Indonesian, binding): implement ideas 53-68, "really focus here, make it HIGH DETAIL and
+GOOD": 53 Kota kultivator NPC (auction house, teahouse, black market), 54 NPC kultivator pengembara (exchange knowledge
+or fight), 55 Reruntuhan gua leluhur (formation puzzles), 56 Kapal terbang sekte (long journeys), 57 Naga liar (wild
+dragons in the sky that can be subdued), 58 Evolusi binatang roh (beast tribulation), 59 Peristiwa langit acak (spirit
+meteor shower, blood eclipse, twin moons), 60 Pertanda harta lahir (rainbow light pillar, everyone races for it),
+61 Perburuan harta antar-kultivator NPC (rivals race, fight each other, ambush), 62 Penjara iblis kuno (a seal that can
+break), 63 Dunia Bawah (Diyu: Naihe, Meng Po, the Yama court, ghost NPCs), 64 Laut Tanpa Batas (spirit islands, sea
+monsters, Dragon Palace), 65 Menara 100 lantai (every floor a trial), 66 Kota Abadi (Immortal City in Alam Abadi),
+67 Peta dunia kultivasi (world map in the menu with sect territories), 68 Cuaca roh (dense Qi mist, cultivation bonus).
+Follow-up (user, binding): "berarti nanti kamu akan mengedit mod world generationnya juga ya" — yes: this phase adds
+the mod's own **world generation** (34.0 rule W1), and nothing else changes blocks.
+
+### 34.0 Scope and binding rules
+
+> **User decision (phase 34, 2026-10-22):** the third block exception is **world generation**. New towns, ruins,
+> prisons, towers, islands and palaces are vanilla data-driven structures (structure + template_pool + structure_set +
+> processor_list JSON, jigsaw, NBT templates written by `tools/structgen.py`), generated only when the game generates a
+> **new** chunk; new dimensions get their terrain only from their dimension / dimension_type / noise_settings (or flat /
+> fixed biome sources). Rule 1 of 0 stays for every runtime path: no effect, power, technique, event, entity, puzzle,
+> seal, NPC, ship, dragon, command or formation of this phase places, breaks or changes a block at runtime.
+
+Worldgen (W):
+- **W1** Runtime block changes ONLY through `kehancuran/WorldBreaker` (the player's own opt-in Mode Kehancuran, disciple
+  Destroyer Arts) and `sect/build/engine/BuildPlacer` (the confirmed sect footprint). Phase 34 adds no third runtime path.
+  The structures are ordinary terrain once generated: Mode Kehancuran may carve them like any terrain inside its caps,
+  except the protected zones that 34.2.4 adds through the existing `ProtectedZones.addZoneProvider` hook (no new break
+  path).
+- **W2** Puzzle doors, seals, barriers, moving parts, ship hulls and dragon bodies are **entities**: a server entity with
+  synced state and, where players must be stopped, collision (`canBeCollidedWith(Entity) == true`, the `AbstractBoat` /
+  `Shulker` / `HappyGhast` pattern, verified in mcsrc), drawn on the client with client-only Display entities posed
+  through `client/fx/spec/DisplayKey` (never a raw `setTransformation` loop). Never `setBlock`, never `FallingBlockEntity`.
+- **W3** No `LightningBolt`, no weather, time or tick-rate change. Sky events and spirit weather are client visuals plus
+  server gameplay modifiers (34.5.8, 34.5.10). Vanilla weather is only *read* (thunderstorm → Jiao Petir, 34.5.11).
+- **W4** Structures generate only in new chunks, at moderate frequency (34.2.1 table), never inside the 6-chunk ring
+  around world spawn, with `exclusion_zone` against vanilla villages where a town could overlap one.
+- **W5** No chunk force-loading. The only chunk tickets are `DuniaTickets` (34.4.7): a custom `TicketType` with
+  `FLAG_LOADING` and a 100-tick timeout, radius ≤ 1, at most 4 alive, used by a ship's cloud leap and a dimension
+  arrival, released by the timeout.
+- **W6** No runtime structure placement either: test commands never use `/place`; they **find** the nearest structure
+  (vanilla locate) and teleport, or show a template as a client ghost preview (34.4.6).
+
+Visuals and weak laptop (V):
+- **V1** Every new visual is client side, scaled by `EffectQuality` (Minimal / Normal / Maximal, `scale()`, `chance()`,
+  `othersScale()` for other players' effects) and, for anything big, the 7b `EpicBudget` (`takeQuads`, `takeLarge`,
+  `takePillar`, `displayCap`, the frame guard). Budgets are listed per feature as `Minimal / Normal / Maximal`.
+- **V2** The "heavy shader" look is faked: layered additive quads (`EpicRenderTypes`), glow textures, the `kultivator:qi`
+  particle, HUD overlays (`EpicScreen`, `CloudWipe`, `TitleCard`) and `SkyDirector` grades. **No post chain**, no core
+  shader, no new render pipeline; Sodium and Iris stay compatible (`ShaderCompat` profile: under a shader pack the
+  quads drop to `PACK_QUADS`).
+- **V3** Distance LOD everywhere: full detail ≤ 32 b, reduced ≤ 96 b, silhouette or nothing beyond. Entity counts are
+  capped on the server (34.4.8); AI is throttled (NPC goals every 4th tick when no player is within 24 b; despawn with no
+  player within 64-96 b; never saved bodies, state lives in anchors or SavedData).
+- **V4** 7b camera rules: shots are short (≤ 4 s) and skippable (Backspace, WASD), obey Kamera sinematik Penuh / Singkat /
+  Mati, never start in real danger (`ShotGuard`: low health, recent damage, a hostile within 8 b) and never during a
+  film. Title cards obey "Kartu judul".
+
+Code (C):
+- **C1** Server code never references client classes. ItemStacks lazily (no stack in a static initializer or renderer
+  constructor). Keep each file's line endings (`KultivatorClient.java` and 38 lang fragments are CRLF; new files LF).
+- **C2** Every module registers its own payloads (`PayloadTypeRegistry`, as `aura/AuraPreviews`), entities, items,
+  commands and config in its own init class in its own package, wired by ONE line in `DuniaContent.init()` /
+  `DuniaContentClient.init()` (both already wired in `Kultivator` / `KultivatorClient`, 34.4). Nobody edits
+  `network/Payloads.java` or `Net.java`, `KultivatorConfig.java` or `CultivateCommand.java`.
+- **C3** Lang only in `lang-src/<fragment>.en_us.json` + `.id_id.json` with identical keys, Indonesian primary; every key
+  in exactly one fragment (the `mergeLang` task fails otherwise).
+- **C4** Every big system has an on/off switch with a sane default (34.4.5) and a test command under `/kultivasi uji`
+  (the single cheat root; chips in `CheatHelp`, group `jelajah`, 34.4.6).
+- **C5** Every Sumber line, gameplay number and block-safety rule of earlier sections stays. Every feature has a Sumber
+  line (`Sumber: ...` when the source states it, `Terinspirasi dari ...` when the mod extends it), lang keys
+  `kultivator.<module>.<feature>.source` / `.inspired`, shown in tooltips, screens and the Ensiklopedia.
+- **C6** Verify every Minecraft API in `butterbot-fabric/reference/mcsrc` and every Fabric API in the jars of the Gradle
+  cache before use; 34.1 lists what this design already verified.
+
+### 34.1 Facts from the code and the 26.3 sources (verified 2026-10-22)
+
+Structure templates (`StructureTemplate.save/load`, `NbtUtils`, `StructureTemplateManager`, `TemplateSource`):
+- File `data/<ns>/structure/<path>.nbt`, gzip NBT (`NbtIo.readCompressed`), root compound: `DataVersion` int,
+  `size` [I×3], `palette` [state] (or `palettes` [[state]]), `blocks` [{`pos` [I×3], `state` I, `nbt`?}],
+  `entities` [{`pos` [D×3], `blockPos` [I×3], `nbt`}].
+- A palette state is `{id: "minecraft:stone_bricks", properties: {facing: "north"}}` (**lower-case `id` / `properties`**
+  in 26.3; `properties` absent for a single-state block). Vanilla 26.3 templates read with `tools/nbt.py` confirm it
+  (`plains_small_house_1.nbt`, `tent_taiga_6.nbt`: DataVersion 5023, `id` / `properties`).
+- `SharedConstants.WORLD_VERSION = 5023`; a template with DataVersion 5023 is not data-fixed.
+- Blocks are stored full blocks first, then other blocks, then block entities, each sorted by y, x, z
+  (`buildInfoList`); `placeInWorld` places in list order. Block entity nbt carries `id` (`saveWithId`). Air is stored
+  (clears terrain); `structure_void` is simply absent.
+- Jigsaw block: state `minecraft:jigsaw[orientation=<FrontAndTop>]` (`north_up` ... `up_north`, `down_south` ...),
+  block entity keys `name`, `target`, `pool`, `final_state` (default `minecraft:air`), `joint` (`rollable` / `aligned`),
+  `placement_priority`, `selection_priority`.
+- `SinglePoolElement` places template entities (`setIgnoreEntities(false)`) and removes structure blocks
+  (`BlockIgnoreProcessor.STRUCTURE_BLOCK`); `placeEntities` writes `Pos`, drops `UUID`, creates the entity from nbt
+  (`id` required) and `finalizeSpawn`s mobs with `EntitySpawnReason.STRUCTURE`. Vanilla `Marker` keeps **no** data in
+  26.3 (empty `addAdditionalSaveData`), so the anchors are our own entity (34.4.1).
+- `ChunkMap.addEntity`: an entity type with `clientTrackingRange 0` is never sent to clients (the Marker rule).
+
+Worldgen JSON (codecs in `JigsawStructure`, `Structure.StructureSettings`, `StructureSet`, `StructurePlacements`,
+`AbstractSpreadingStructurePlacement`, `StructureTemplatePool`, `StructurePoolElementType`, `StructureProcessorTypes`,
+and the vanilla 26.3 data in the jar):
+- `worldgen/structure/*.json` `{type: "minecraft:jigsaw", biomes, step, spawn_overrides, terrain_adaptation
+  (none|bury|beard_thin|beard_box|encapsulate), start_pool, size (0-20), start_height {absolute}, use_expansion_hack,
+  project_start_to_heightmap?, max_distance_from_center (int 1-128 or {horizontal 1-128, vertical}),
+  start_jigsaw_name?, pool_aliases?, dimension_padding?, liquid_settings?}`.
+- `worldgen/structure_set/*.json` `{structures: [{structure, weight}], placement: {type, salt, spacing (0-4096),
+  separation, spread_type?, frequency?, frequency_reduction_method?, locate_offset?, exclusion_zone? {other_set,
+  chunk_count 1-16}}}`; placement types `random_spread`, `concentric_rings`, **`dimension_origin`** (new: only the chunk
+  `ChunkGenerator.getOrigin()`, = `ChunkPos.ZERO` for noise and flat generators).
+- `worldgen/template_pool/*.json` `{elements: [{element, weight 1-150}], fallback}`; element types
+  `single_pool_element`, `list_pool_element`, `feature_pool_element`, `empty_pool_element`, `legacy_single_pool_element`;
+  element `{location, processors, projection rigid|terrain_matching, override_liquid_settings?}`.
+- `worldgen/processor_list/*.json` `{processors: [{processor_type, ...}]}`; types `blackstone_replace`, `block_age`,
+  `block_ignore`, `block_rot`, `capped`, `gravity`, `jigsaw_replacement`, `lava_submerged_block`, `nop`,
+  `protected_blocks`, `rule` (`rules: [{input_predicate, location_predicate, output_state}]`).
+- `FlatLevelSource.createState` uses `structure_overrides` when present (the flat settings list), else every set.
+- `worldgen/noise_settings` in 26.3: `default_block`, `default_fluid`, `disable_mob_generation`, `legacy_random_source`,
+  **`material_rule`** (a registry reference such as `minecraft:nether`; there is no `surface_rule` key any more),
+  `noise {min_y, height}`, `noise_router`, `sea_level`, `spawn_target`, `debug_functions`. Copy a vanilla file and change
+  only what is needed.
+- `dimension_type` 26.3: `attributes` (environment attributes: `minecraft:visual/*`, `minecraft:gameplay/*`),
+  `timelines`, `skybox`, `default_clock`, `cardinal_light`, `has_ceiling`, `has_skylight`, `has_fixed_time`,
+  `coordinate_scale`, `min_y`, `height`, `logical_height`, `infiniburn`, `ambient_light`, spawn light limits; see
+  `alam_abadi.json` / `alam_rahasia.json` and vanilla `the_nether.json`.
+
+Other verified facts:
+- Fabric `ResourceLoader.registerBuiltinPack(Identifier, ModContainer, Component, PackActivationType)`
+  (fabric-resource-loader-v1 3.0.4, in 0.162.0+26.3), `PackActivationType.NORMAL | DEFAULT_ENABLED | ALWAYS_ENABLED`;
+  `MinecraftServer.configurePackRepository` adds a **new** pack automatically when its source says so and it is not in
+  the world's disabled list (verify that Fabric's built-in source does this for `DEFAULT_ENABLED` before relying on it
+  for old worlds; 34.4.5 has the fallback).
+- `TicketType(long timeout, int flags)` is a public record, registered in `BuiltInRegistries.TICKET_TYPE`; flags
+  `FLAG_PERSIST 1`, `FLAG_LOADING 2`, `FLAG_SIMULATION 4`, `FLAG_KEEP_DIMENSION_ACTIVE 8`,
+  `FLAG_CAN_EXPIRE_IF_UNLOADED 16`; `ServerChunkCache.addTicketWithRadius(type, pos, radius)` / `removeTicketWithRadius`.
+- Vanilla 26.3 entities useful here: `minecraft:mannequin` (`Mannequin`, a player-shaped body with a
+  `ResolvableProfile`: the soul journey's empty body, 34.5.13), `minecraft:cushion` (`Cushion`, a block-attached seat
+  decoration: teahouse cushions in templates; verify sitting before promising it), `HappyGhast.canBeCollidedWith`
+  (a mob players stand on: the ship pattern, 34.5.15).
+- `kehancuran/ProtectedZones.addZoneProvider(ZoneProvider)` (a `protects(ServerLevel, BlockPos)` predicate counted as
+  the hall zone; a failing provider protects): the only Mode Kehancuran hook this phase uses (34.2.4).
+- `util/Targeting.isHostileTo`: duels first (`DuelRules.dueling`), `Targeting.addExclusion(BiPredicate)`, players only in
+  sparring, owned pets only while attacking, `Enemy` or a mob targeting the caster. So a peaceful NPC (a
+  `PathfinderMob`, not `Enemy`) is never hit by area techniques until it fights; `DuelRules.begin(a, b, maxTicks,
+  listener)` is the non-lethal duel (ends at 10 % health).
+- `cultivation/SpiritSites`: a fixed `Site` enum (mountain ×1.5, cherry grove ×1.4, beacon ×1.5, amethyst ×1.3, End
+  ×1.6, full moon ×1.5), product capped at `CAP 4.0`; `Meditation.gainPerSecond` uses
+  `min(3.5, site × formation × fuel)`. There is **no provider hook** for sites yet (L adds one, 34.6 L).
+- `beast/BeastData`: kinds `WOLF 0`, `FOX 1`, `MAX_TIER 3`, `TIER_XP {0, 100, 400, 1200}`,
+  `TIER_REALM {Mortal, Mortal, Golden Core, Nascent Soul}`; titles Serigala Tersadar / Roh / Petir Bulan / Langit and
+  Rubah Tersadar / Roh / Ekor Tiga / Ekor Sembilan.
+- `guide/GuideChapters`: 12 chapters in a static block; manual ticks are saved **by step id**
+  (`extra.panduan.m`), so appended chapters keep every save valid; `CHAPTER_COUNT` is read by `GuideProgress` and
+  clamps `chapter(int)`.
+- `client/screen/HubCardsPage`: the Dunia section has four built-in cards (Alam Rahasia, Pusaka, Musuh, Cincin) in a
+  `switch`; there is no card registry yet (T adds one, 34.6 T). `HelpPage.TOPICS` is a static array; `CheatHelp.GROUPS`
+  a static list.
+- Existing spirit stone values (`SpiritStones.MISSION_PK` 0.5 / 4.5 / 40 / 300): this phase prices in **Nilai Batu**
+  (NB) with Low = 1, Mid = 9, High = 80, Supreme = 600.
+- Existing names reused, never duplicated: Lelang Abadi (`abadi/Auction`, priced in Batu Asal Abadi), natives
+  (`abadi/Natives`), rogue cultivators and bands (`musuh/RogueCultivators.spawnBand`), Pengejaran (`abadi/Pursuit`),
+  Penyergapan (`musuh/Ambushes`), elite beasts (`elite/*`), primordial beasts (`purba/*`), Bencana Bintang, Hujan Api
+  Meteor of the inner world (`batin/BatinMeteorEntity`), secret realms and their slot leases (`alam/Slots`,
+  `alam/WallGrid`, `alam/RealmRun`), return points (`alam/ReturnPoint`), the disciple player model (`RogueRenderer`,
+  `EnvoyRenderer` pattern), the 7b director, sky grades and cards.
+
+### 34.2 World generation plan
+
+#### 34.2.1 Structures and frequency (moderate, new chunks only)
+
+| id (`kultivator:<id>`) | module | dimension / biomes (tag `#kultivator:has_structure/<id>`) | size, pieces | step, adaptation | spacing / separation (chunks), salt |
+|---|---|---|---|---|---|
+| `kota/kota_kultivator` | K | overworld: plains, meadow, cherry_grove, forest, birch_forest, flower_forest, savanna, taiga, snowy_plains | jigsaw size 6, radius ≤ 72 b, ~22-30 pieces | surface_structures, beard_thin | 64 / 26, 340531, exclusion 8 chunks from `minecraft:villages` |
+| `kota/kota_abadi` | K | `kultivator:alam_abadi` | size 5, a floating district set at absolute y 150-170, ~20 pieces | surface_structures, none (own underside) | 48 / 20, 340566 |
+| `reruntuhan/gua_kecil` | R | overworld hills: windswept_hills, stony_peaks's foot, forest, dark_forest, taiga, jungle | size 4, ~8 pieces, cut into a slope (start_height relative to heightmap −6) | underground_structures, beard_box | 40 / 16, 340555 |
+| `reruntuhan/gua_agung` | R | overworld mountains: jagged_peaks, frozen_peaks, stony_peaks, meadow, grove | size 6, ~14 pieces | underground_structures, beard_box | 72 / 30, 340556 |
+| `reruntuhan/gua_kuno` | R | badlands, eroded_badlands, deep_dark (start y −30) | size 7, ~20 pieces | underground_structures, encapsulate | 96 / 40, 340557 |
+| `penjara/penjara_iblis` | R | overworld mountains and badlands, start y −24 (prison) with a surface shrine piece | size 6, ~16 pieces | underground_structures, beard_box | 120 / 48, 340562 |
+| `menara/menara_seratus` | R | overworld: plains, meadow, savanna_plateau, cherry_grove | ~9 stacked pieces (pagoda 30 × 30, 96 tall) | surface_structures, beard_thin | 160 / 64, 340565 |
+| `bawah/kuil_gerbang_hantu` | D | overworld: swamp, mangrove_swamp, dark_forest, pale_garden | size 2, 3 pieces (the overworld entry shrine) | surface_structures, beard_thin | 56 / 22, 340563 |
+| `bawah/istana_yama` | D | `kultivator:dunia_bawah`, placement `dimension_origin` | size 7, Naihe bridge + Meng Po pavilion + the Ten Courts | surface_structures, beard_box | (origin chunk only) |
+| `bawah/desa_arwah` | D | `kultivator:dunia_bawah` | size 4 (ghost villages) | surface_structures, beard_thin | 32 / 12, 340564 |
+| `laut/pusaran_laut` | D | overworld deep oceans (the sea gate) | 1-2 pieces on the sea floor + a whirl anchor | surface_structures, beard_box | 80 / 32, 340568 |
+| `laut/pulau_roh` | D | `kultivator:laut_tanpa_batas` | size 5, islands 48-110 b across | surface_structures, beard_box | 20 / 8, 340569 |
+| `laut/istana_naga` | D | `kultivator:laut_tanpa_batas` | size 6, sea-floor palace | surface_structures, beard_box | 60 / 24, 340570 |
+| `laut/pulau_penglai` | D | `kultivator:laut_tanpa_batas` | size 6, the Isle of Immortals | surface_structures, beard_box | 140 / 60, 340571 |
+
+The ship and the map have no worldgen of their own (34.5.15, 34.5.16); the tower's interior is its own
+dimension (34.2.2, 34.5.7). Salts are
+unique; numbers are game design and may be tuned within ±25 % by the module without a design change.
+
+#### 34.2.2 New dimensions
+
+| id | module | generator | dimension_type notes |
+|---|---|---|---|
+| `kultivator:dunia_bawah` | D | `minecraft:noise`, `multi_noise` over four custom biomes (Padang Huangquan, Sungai Wangchuan, Hutan Arwah, Dataran Cermin), own `worldgen/noise_settings/dunia_bawah.json` copied from vanilla `nether.json` with `default_block` `minecraft:blackstone`, `default_fluid` `minecraft:water` (the Wangchuan is water, dyed by the biome's `water_color`), `material_rule` its own (soul soil, basalt, bone patches; D writes it, copied from `minecraft:nether`) | `has_ceiling` true, `has_skylight` false, `has_fixed_time` true, fog 10-96 b, `ambient_light` 0.15, no beds/anchors/raids/natural spawns, timelines `#minecraft:in_nether`, skybox `none`, height 256 |
+| `kultivator:laut_tanpa_batas` | D | `minecraft:flat`, biome `kultivator:laut_roh`, layers (bottom up) bedrock 1, sandstone 33, sand 6, water 60 (sand floor y 34-39, water y 40-99), `features` false, `structure_overrides` [`kultivator:laut/*` sets] | `min_y` 0, height 256, skylight, day cycle (`minecraft:day`, `minecraft:moon`), `skybox overworld`, cloud height 196, sky and fog colours from the biome, no beds (spawn stays home), no raids |
+| `kultivator:menara` | R | `minecraft:flat`, biome `kultivator:menara_dalam` (fixed), layers bedrock 1, polished_deepslate 2, `structure_overrides` [`kultivator:menara/lobi` with `dimension_origin`] | skybox `end`-like dark (no sun), fixed time, ambient 0.35, no spawns; floors are instanced slots like `alam/Slots` (34.5.7) |
+
+Dimensions live in the base data (never in a toggle pack: removing a dimension strands players); each module's switch
+closes the **entry** instead (34.4.5).
+
+#### 34.2.3 Data layout (every module the same)
+
+```
+data/kultivator/structure/<folder>/<piece>.nbt                       (generated by tools/gen_dunia_<module>.py)
+data/kultivator/worldgen/structure/<folder>/<id>.json                (the structure id kultivator:<folder>/<id>)
+data/kultivator/worldgen/template_pool/<folder>/<pool>.json
+data/kultivator/worldgen/processor_list/<folder>/<list>.json
+data/kultivator/tags/worldgen/biome/has_structure/<folder>/<id>.json
+data/kultivator/tags/worldgen/structure/<folder>.json                (for locate / map rumours: #kultivator:<folder>)
+resourcepacks/dunia_<module>/pack.mcmeta + data/kultivator/worldgen/structure_set/<folder>/<id>.json   (overworld sets)
+data/kultivator/worldgen/structure_set/<folder>/<id>.json            (sets of the module's own dimensions)
+```
+
+Only the overworld (and Alam Abadi) `structure_set` files sit in the module's built-in toggle pack
+`kultivator:dunia_<module>` (34.4.5); templates, pools, structures and processors are always loaded (unused data costs
+nothing). A generator script writes the NBT **and** the JSON, so they can never disagree.
+
+#### 34.2.4 Structure rules
+
+- Pieces ≤ 48 × 48 (structgen refuses larger), height as needed (the tower is stacked pieces). Interiors and doorways
+  are explicit air, so terrain never fills a room; foundations use `Piece.foundation` + `beard_thin` / `beard_box`.
+- Processors: weathering (`block_rot` 0.9 on decorative edges, `rule` mossify / crack like vanilla `mossify_10_percent`),
+  `protected_blocks` with `#kultivator:sect_protected` so a piece never overwrites a player's sect blocks in a chunk
+  generated next to a base (new chunks only, but the jigsaw may reach into a neighbour chunk that is new).
+- Templates contain only vanilla blocks (validated against `tools/data/vanilla_blocks_26_3.json`) and the anchor entity;
+  chest loot is a loot table id in the chest's block-entity nbt (`LootTable`), tables under
+  `data/kultivator/loot_table/chests/dunia/<module>/...`, every pool capped like `harta/HartaLoot` (34.5 rewards).
+- Spawning inside structures: `spawn_overrides` empties `monster` for towns, Kota Abadi and the Yama court (safe ground);
+  ruins, prisons and islands keep vanilla monsters.
+- Anchors (34.4.1) sit at the spot where the module wants NPCs, puzzles, seals, gates or treasure; one piece holds at
+  most 6 anchors; a whole structure at most 40.
+- Mode Kehancuran: towns, Kota Abadi, the Yama court and every puzzle, seal and gate anchor are protected through the
+  **existing** hook `kehancuran/ProtectedZones.addZoneProvider(ZoneProvider)` (counted as the hall zone, verified): the
+  spine registers one provider backed by a per-level spatial hash of loaded anchors (`DuniaAnchors.protectedNear(level,
+  pos, r)`, r = the anchor's `data.protect`, default 8, towns publish a 72-block footprint anchor). It must stay O(1)
+  per call. Ruins, prisons and islands outside those radii are ordinary terrain for Mode Kehancuran (W1).
+
+### 34.3 Shared tools (written by the lead, 2026-10-22)
+
+- `tools/nbt.py`: dependency-free NBT reader / writer (all 12 tag types, typed wrappers `Byte Short Int Long Float Double
+  ByteArray IntArray LongArray`, gzip with mtime 0 so output is byte-stable) and `Template` (size ≤ 48 per horizontal
+  axis, `set`, `jigsaw`, `entity`, `to_tag` in vanilla order with `DataVersion 5023`, `save`) plus `read_file` /
+  `describe`. `python tools/nbt.py <file.nbt>` prints a summary of any template (vanilla ones too).
+- `tools/structgen.py`: `Piece(sx, sy, sz, seed, palette)` with role palettes (`kota`, `leluhur`, `penjara`, `menara`,
+  `diyu`, `laut`, `abadi`) and helpers `fill`, `air`, `floor`, `box`, `walls` (pillars every 4, windows, doorway,
+  interior air), `doorway`, `pillar`, `stairs`, `slab`, `staircase`, `roof_gable` (ridge slab, chiwen ends, curled eaves),
+  `roof_hip` (wudian, multi-tier pagoda with wall bands), `lantern` (hanging, iron_chain), `standing_lantern`, `path`,
+  `weather`, `ring`, `disc`, `foundation`, `jigsaw_side` / `jigsaw_up` / `jigsaw_down`, `anchor` (the
+  `kultivator:dunia_anchor` entity with `kind` and `data`), and JSON helpers `single`, `pool`, `jigsaw_structure`,
+  `structure_set`, `write_json`, `out_path`, `json_path`. `validate` / `validate_all` fail on unknown block ids and warn
+  on unknown properties and clipped helper blocks.
+- `tools/data/vanilla_blocks_26_3.json`: 1 288 block ids with their blockstate property names, built from the 26.3
+  client jar (`python tools/structgen.py --blocks <client jar>`).
+- `tools/structgen_selftest.py <scratch_dir>`: builds a tea pavilion (every helper), saves it to the scratch dir, reads
+  it back and asserts the round trip (palette, order, jigsaw nbt, anchor entity, doubles, DataVersion, deterministic
+  bytes, validation, no clipping), prints sections and a plan; extra arguments summarise other templates. Passed on
+  2026-10-22 together with vanilla `plains_small_house_1.nbt`.
+- Every module writes `tools/gen_dunia_<module>.py` (structures + their JSON) and, if needed,
+  `tools/gen_dunia_<module>_textures.py` (with `tools/png.py`). Generators take an optional preview dir for 8× texture
+  previews and print `validate_all()`; they write only the module's own folders.
+
+### 34.4 The spine (`dev.kultivator.dunia`, owned by module K, landed FIRST)
+
+Like 33.7 N: K lands the spine first (stubs with the exact signatures are fine for the others to compile), then the six
+modules work in parallel. Files: `dunia/DuniaContent.java` (exists, each module owns one line), new
+`dunia/DuniaSpine.java`, `dunia/DuniaAnchorEntity.java`, `dunia/AnchorHandler.java`, `dunia/DuniaAnchors.java`,
+`dunia/DuniaSites.java`, `dunia/DuniaEvents.java`, `dunia/DuniaConfig.java`, `dunia/DuniaCommands.java`,
+`dunia/DuniaPacks.java`, `dunia/DuniaTickets.java`, `dunia/DuniaBudget.java`, `dunia/DuniaMarkers.java`,
+`dunia/api/*.java`; client `client/dunia/DuniaContentClient.java` (exists), `client/dunia/DuniaSpineClient.java`,
+`client/dunia/DuniaScenes.java`; one additive public method in `client/epic/EpicDirector.java` (34.4.9); one group in
+`command/CheatHelp.java`; lang `lang-src/dunia_luas.*`.
+
+#### 34.4.1 Anchors
+
+`kultivator:dunia_anchor` (`DuniaAnchorEntity extends Entity`): `MobCategory.MISC`, 0.25 × 0.25, `clientTrackingRange 0`
+(never sent), `noPhysics`, no gravity, invulnerable, empty `tick()`, saved with the chunk (it must persist until its
+module consumes it), not summonable by players (`/summon` refused unless op test), no loot.
+- NBT: `kind` (string `<module>/<what>`, e.g. `kota/lelang`, `reruntuhan/teka_bagua`, `penjara/segel`), `data`
+  (compound from the template, read-only), `state` (compound owned by the module, persisted), `site` (long id =
+  `hash(dimension, blockPos of the structure start if known else own blockPos, kind)`).
+- `DuniaAnchors.register(String module, AnchorHandler handler)`; `AnchorHandler` default methods
+  `loaded(ServerLevel, DuniaAnchorEntity)`, `nearby(ServerLevel, DuniaAnchorEntity, List<ServerPlayer> within)` (every
+  20 ticks, staggered by entity id, only when a survival/adventure player is within `radius()` default 48),
+  `unloaded(...)`, `int radius()`. `DuniaAnchors.loaded(ServerLevel, String kindPrefix)` lists loaded anchors.
+- Driven by Fabric `ServerEntityEvents.ENTITY_LOAD / ENTITY_UNLOAD` and one `END_SERVER_TICK` pass that walks at most
+  64 loaded anchors per tick (round robin). Unknown module (switched off or missing): the anchor stays dormant.
+- `DuniaAnchors.protectedNear(ServerLevel, BlockPos, int radius)` and the one `ProtectedZones` provider (34.2.4).
+
+#### 34.4.2 Sites (what the map, rumours and quests know)
+
+SavedData `kultivator:dunia_sites` in the overworld (one file for every dimension):
+`record Site(long id, String kind, ResourceKey<Level> dim, BlockPos pos, int tier, long foundDay)`.
+- `DuniaSites.publish(ServerLevel level, String kind, BlockPos pos, int tier)` idempotent (same id = no change); anchors
+  of kind `<module>/situs` publish their structure when first loaded; dynamic sites (treasure births, dragon sightings,
+  sky-event zones) use `publishLive(level, kind, pos, tier, untilGameTime)` (memory only, never saved).
+- Discovery per player (`discover(ServerPlayer, long id)`, bitsets per player in the same SavedData; sect mates share
+  through `Sects`): automatic within 48 b of a site, by a teahouse rumour, by a locate scroll, by the map exchange of two
+  players (34.5.16). `known(ServerPlayer)`, `near(ServerLevel, BlockPos, int radius, String kindPrefix)`.
+- `DuniaSites.locate(ServerLevel, TagKey<Structure>, BlockPos from, int chunkRadius)` wraps
+  `ServerLevel.findNearestMapStructure` (verify the 26.3 signature), radius ≤ 64 chunks, at most one search per server
+  tick and one per player per 30 s; the result is published as a site of the structure's kind.
+- Fires `DuniaEvents.SITE_DISCOVERED`.
+
+#### 34.4.3 Events and APIs (cross-module, so the six modules never import each other)
+
+`DuniaEvents` (Fabric `EventFactory.createArrayBacked`), fired only by the owner named:
+
+| event | signature | fired by | listened by |
+|---|---|---|---|
+| `TREASURE_BORN` | `(ServerLevel level, TreasureBirth birth)` | L | K (rivals race), T (live marker), R (a birth inside a ruin wakes its guardian) |
+| `TREASURE_CLAIMED` | `(ServerLevel, TreasureBirth, @Nullable ServerPlayer winner, @Nullable String rivalId)` | L | K (rival grudge, ambush), T |
+| `SKY_EVENT` | `(ServerLevel, SkyKind kind, boolean started)` | L | R (blood eclipse −1 seal/h), B (dragons ×2 during meteor shower and twin moons), K (teahouse talk, black-market prices), D (Dunia Bawah gates open wider during the blood eclipse) |
+| `WEATHER_CHANGED` | `(ServerLevel, long cell, SpiritWeather weather)` | L | T (map overlay), B (Jiao Awan likes dense mist) |
+| `SEAL_CHANGED` | `(ServerLevel, long siteId, int integrity, boolean broken)` | R | L (omen sky grade near the prison), K (rumours), T |
+| `BEAST_EVOLVED` | `(ServerPlayer owner, LivingEntity beast, int tier, String line)` | B | K (rumours), T (bestiary page) |
+| `SITE_DISCOVERED` | `(ServerPlayer, Site)` | spine | T, advancements of every module |
+| `VOYAGE` | `(ServerPlayer captain, String destination, boolean arrived)` | T | D (the sea crossing), K (arrival at a town) |
+| `SOUL_JOURNEY` | `(ServerPlayer, boolean entered)` | D | T (map shows the body), B (beasts guard the body) |
+
+Records in `dunia/api`: `TreasureBirth(long id, ResourceKey<Level> dim, BlockPos pos, int tier, String kind, long born,
+long ends)`, `enum SkyKind {METEOR_SHOWER, BLOOD_ECLIPSE, TWIN_MOONS}`, `enum SpiritWeather {CLEAR, THIN_MIST,
+DENSE_MIST, PURPLE_DAWN}`.
+
+`dunia/api/DuniaApi` holds one implementation per service, set by its owner at init, with a no-op default when the
+owner is switched off:
+
+| service | interface (in `dunia/api`) | owner | methods |
+|---|---|---|---|
+| `DuniaApi.sky()` | `SkyService` | L | `@Nullable SkyKind active(ServerLevel)`, `SpiritWeather weatherAt(ServerLevel, BlockPos)`, `double siteFactor(ServerPlayer)` |
+| `DuniaApi.treasures()` | `TreasureService` | L | `@Nullable TreasureBirth spawn(ServerLevel, BlockPos, int tier, String kind)` (R spawns a birth when a seal is re-sealed, D on a sea treasure), `List<TreasureBirth> live(ServerLevel)`, `boolean claim(ServerPlayer, long id)` |
+| `DuniaApi.rivals()` | `RivalService` | K | `List<String> nearRivals(ServerLevel, BlockPos, int)`, `void raceTo(ServerLevel, TreasureBirth)`, `void ambush(ServerPlayer, int tier)`, `@Nullable Component name(String rivalId)` |
+| `DuniaApi.seals()` | `SealService` | R | `int integrity(long siteId)`, `boolean broken(long siteId)` |
+| `DuniaApi.beasts()` | `BeastEvolutionService` | B | `int tier(LivingEntity)`, `String line(LivingEntity)`, `boolean canEvolve(ServerPlayer, LivingEntity)`, `boolean startTribulation(ServerPlayer, LivingEntity, boolean test)`, `void grantItem(ServerPlayer, String what)` (D's Dragon Pearl) |
+| `DuniaApi.routes()` | `RouteService` | T | `void registerDestination(String id, Component name, BiPredicate<ServerPlayer, ServerLevel> allowed, BiConsumer<ServerPlayer, List<Entity>> arrive)` (D registers `laut`), `boolean aboard(ServerPlayer)` |
+| `DuniaApi.souls()` | `SoulService` | D | `boolean isSoul(ServerPlayer)` (T refuses the helm, K's NPCs see a ghost) |
+
+#### 34.4.4 Server budgets (`DuniaBudget`)
+
+- NPC cap: `umum.npcCap` (default 36, 12-64) humans of this phase alive per server, `umum.npcPerPlayer` (default 12) within
+  96 b of one player; dragons ≤ `naga.worldCap` (2); collision parts ≤ 96; ship seats count as parts.
+- `DuniaBudget.mayAdd(ServerLevel, String kind)`, `count(String kind)`, `throttled(Entity, int every)` (true on the entity's
+  turn, staggered by id): NPC custom goals and skill passes run every 4th tick, every 10th when no player is within 24 b.
+- MSPT guard: when the server's average tick time is above 45 ms (`MinecraftServer.getAverageTickTimeNanos`, verify),
+  anchors only tick every 60 ticks, no new NPC spawns, treasure births and sky events postpone (the rule WorldBreaker
+  already follows for its MSPT pause).
+
+#### 34.4.5 Config (`config/kultivator-dunia.json`)
+
+One Gson file, missing values get defaults, out-of-range values are clamped and the file is rewritten (the
+`KultivatorConfig` rule). `DuniaConfig.section(String name, Class<T> type, Supplier<T> defaults, UnaryOperator<T> clamp)`
+returns the module's POJO; sections `umum` (spine), `kota`, `reruntuhan`, `langit`, `naga`, `dimensi`, `kapal`, `peta`.
+`/kultivasi uji jelajah muat` reloads it (op).
+
+`umum`: `enabled` true (master switch: false = every module's runtime off, structures still generate if their pack
+is on), `npcCap` 36, `npcPerPlayer` 12, `msptGuard` 45, `debugAnchors` false.
+
+World generation switch: `DuniaPacks.worldgen(String module, boolean on)` registers the built-in pack
+`kultivator:dunia_<module>` with `DEFAULT_ENABLED` when the section's `worldgen` is true, and does not register it when
+false (then no new chunk gets that module's structures; the game logs "Missing data pack" once for a world that had it
+enabled, harmless). Players can also use `/datapack disable "kultivator:dunia_<module>"`. Fallback if the
+auto-add of 34.1 does not happen for an old world: on `SERVER_STARTED` the spine checks the selected packs and, when a
+`worldgen`-on pack is available but neither enabled nor disabled, enables it through
+`PackRepository.setSelected` + reload (verify; otherwise one chat line to ops with the `/datapack enable` command).
+
+#### 34.4.6 Commands
+
+`DuniaCommands.test(String literal, Supplier<LiteralArgumentBuilder<CommandSourceStack>> node)` collects module nodes and
+registers them in its own `CommandRegistrationCallback` under both roots: `kultivasi uji <literal>` and
+`cultivate uji <literal>`, each node `.requires(LEVEL_GAMEMASTERS)` itself (Brigadier merges with CultivateCommand's
+`uji`; the `debug` alias redirects to the merged node). `DuniaCommands.player(String literal, ...)` adds a player
+command under `kultivasi <literal>`. Spine nodes: `uji jelajah` (this phase's grouped help, the chips of every module),
+`uji jelajah muat`, `uji jelajah anchor` (lists anchors within 64 b with kind and state), `uji struktur cari <id>`
+(locate + teleport, op, the W6 rule), `uji struktur lihat <folder/piece>` (a ghost preview of a template at the player:
+client-only Displays through a spine payload, 20 s, ≤ `EpicBudget.DISPLAYS` × 8 blocks merged in runs; never a block).
+`CheatHelp` gets ONE group `jelajah` with the chips of 34.5's "Uji" lines (K edits it once).
+
+#### 34.4.7 Tickets
+
+`DuniaTickets.touch(ServerLevel, ChunkPos, int radius ≤ 1)`: `TicketType("kultivator:dunia", 100L, FLAG_LOADING)`, at
+most 4 live (oldest dropped), used before a ship's cloud leap lands and before a dimension arrival; nothing else.
+
+#### 34.4.8 Markers (shared table, drawn by T)
+
+`DuniaMarkers.kind(String kind)` → `(icon index, colour, lang key, min zoom)`; the table is in the spine so producers
+only publish kinds. Kinds: `kota/kota`, `kota/kota_abadi`, `reruntuhan/gua_kecil|gua_agung|gua_kuno`,
+`penjara/penjara`, `menara/menara`, `bawah/kuil`, `bawah/istana_yama`, `bawah/desa_arwah`, `laut/pusaran`,
+`laut/pulau`, `laut/istana_naga`, `laut/penglai`, live `langit/harta`, `langit/meteor`, `naga/naga`, `kapal/kapal`,
+`kapal/dermaga`, and the derived `sekte/aula`, `sekte/wilayah`, `desa/desa`. Icons live in
+`textures/dunia/peta/markers.png` (T).
+
+#### 34.4.9 Client spine
+
+- `DuniaSpineClient.init()`: `EntityRenderers.register(anchor, NoopRenderer::new)` (defensive; the anchor is never sent),
+  the ghost-preview receiver of `uji struktur lihat`.
+- `DuniaScenes.world(String key, Vec3 pos, int seed, int lifeTicks, boolean own)` → a 7b `Scene` for world moments
+  (treasure birth, seal break, dragon subdued, beast evolution, arrival in a dimension, ship launch), with a per-key
+  cooldown (default 60 s) and the `ShotGuard` / Penuh-Singkat-Mati rules. It calls the ONE new method the spine adds to
+  `client/epic/EpicDirector.java`: `public static @Nullable Scene worldScene(int extraBeat, Vec3 pos, int seed, int life,
+  boolean own)` (moment `EpicIds.EXTRA`, beats ≥ 40 reserved for phase 34: 40 treasure, 41 seal, 42 dragon, 43 evolve,
+  44 arrive, 45 ship, 46 sky event, 47 tower milestone), which builds the scene the way `dampakScene` does and ends it
+  after `life`. Modules add their own elements to the returned scene and may call `CinematicDirector.shoot(scene, shot,
+  KIND_EXTRA, prio, safeBeat)`, `SkyDirector.grade/dao/release`, `TitleCard.show(TitleCard.full|stamp|banner(...))`.
+
+### 34.5 The sixteen features
+
+Each feature: **Sumber** (the lang text, Indonesian; `Sumber:` = the source says it, `Terinspirasi dari` = the mod builds
+on it), **loop**, **rewards and balance** (the realm it targets; Rank steps 0 Mortal … 64 True Immortal Peak), **content**
+(structures, dimensions, entities, items, screens), **visuals** (budgets Minimal / Normal / Maximal), **config**, **uji**
+(all under `/kultivasi uji`, op) and **Panduan** (the Kitab Panduan step, 34.9). Prices are in Nilai Batu (NB, 34.1):
+the player pays and is paid in real spirit stones, change is given in lower grades, and every buy-back is at most half
+of the sell price, so no shop, auction or bounty prints stones from nothing.
+
+#### 34.5.1 Kota Kultivator (53, module K)
+
+- **Sumber** (`kultivator.kota.kota.inspired`): "Terinspirasi dari Battle Through the Heavens: Balai Lelang Mi Te di
+  Kota Wu Tan, tempat Xiao Yan menjual pil lewat lelang, dan Wilayah Sudut Hitam yang tanpa hukum dengan pasar
+  gelapnya; serta Kota Keluarga Shang di Reverend Insanity, kota dagang tempat para master Gu berjual beli. Tata kota,
+  harga dan angkanya rancangan game." Teahouse (`kultivator.kota.teh.inspired`): "Terinspirasi dari kedai teh dan
+  penginapan dalam kisah wuxia dan xianxia, tempat kabar dunia persilatan beredar; rancangan game."
+- **Structure** `kota/kota_kultivator` (34.2.1): a walled town around 130 × 130 b. Start piece: the **Gerbang Paifang**
+  (three-bay gate arch, two watch towers with hip roofs, lantern posts, the town stele anchor `kota/situs` that names the
+  town and publishes the site). Pools: `kota/jalan` (stone streets with drains, 3 widths, corners, a bridge over a canal),
+  `kota/tembok` (walls with walkways and corner towers, closing the ring by jigsaw priority), `kota/alun` (the square:
+  well, notice board anchor `kota/papan`, an old pine), `kota/balai_lelang` (2 storeys, 23 × 17, gallery, stage, red
+  pillars, a double-eave hip roof; anchors `kota/lelang`, `kota/lentera`), `kota/kedai_teh` (Paviliun Angin Bambu: a
+  pavilion over a pond with a zig-zag bridge, bamboo, cushions; anchors `kota/teh`, 2 × `kota/kursi_pengembara`),
+  `kota/toko_peti` (a coffin shop whose back room hides the stair to the **Pasar Gelap**, an underground hall with stalls
+  and braziers; anchors `kota/gerbang_gelap` (hidden door entity), `kota/gelap`), `kota/paviliun_pil`, `kota/paviliun_
+  pusaka`, `kota/penginapan` (inn with vanilla beds), `kota/kantor_sekte` (the guarding NPC sect's office, 34.5.16
+  domains), `kota/rumah` (3 sizes × 3 variants, gardens), `kota/hias` (lantern rows, carts, stalls). Town name seeded
+  from the site id (`kultivator.kota.nama.<0-23>` + `kultivator.kota.akhiran.<0-7>`: "Kota Batu Giok", "Kota Awan
+  Hijau", …).
+- **NPCs**: `kultivator:kultivator_npc` (K, `PathfinderMob`, not `Enemy`; never saved: `noSave` and refused in
+  `ALLOW_LOAD` like the rogues, re-made by anchors; synced data: role, look seed, realm for the aura, voice index).
+  Roles here: Juru Lelang, Pemilik Kedai Teh, Makelar Gelap, Pedagang Pil, Pandai Pusaka, Penjaga Kota (Foundation-
+  Golden Core strength, fight only monsters and players the town marked hostile), Warga (walk between home and square
+  by day, indoors at night). ≤ `kota.npcPerTown` (10) alive per town, only while a player is within 48 b; despawn after
+  30 s without one within 64 b. Right-click opens `KotaScreen` (jade style, `client/screen/ui` widgets) on the role's
+  tab. Drawn with the disciple player model (`NpcRenderer` built like `musuh/RogueRenderer`: disciple render state,
+  default skins by look seed, the robe layer tinted by role, held item; robe dropped beyond 32 b; name plate = role title
+  within 16 b).
+- **Shops** (Pedagang Pil, Pandai Pusaka): stock seeded by (site, overworld day), 6-9 offers in the player's realm band
+  ±1 (existing items only: the pills of `alchemy`, aged herbs, beast cores, storage pouches, forged artifacts of
+  `tempa` up to the band's grade, talismans), price = item's NB base × 0.9-1.3 × reputation factor; sell to the shop at
+  0.35-0.5 × base, at most 16 stacks per day per player.
+- **Balai Lelang**: a session at dusk (overworld time 12 000-14 000) each in-game day while at least one player is
+  within 20 b of the auctioneer; five lots seeded (site, day) from pools by the highest present realm band (Qi Refining:
+  Foundation Pill, herbs 100-300 years, Low/Mid cores, jade slips, storage pouch; Golden Core: Golden Core Pill,
+  `token_darah_api`, `heavenvoid_fragment`, Mid/High cores, artifacts grade 3-5; Nascent Soul and up: soul items
+  (`soul_nurturing_wood`, `soul_seal_jade`), herbs 1 000 years, King cores, a heavenly flame seed at 3 %). Four NPC
+  bidders from K's rival groups (34.5.3) with a hidden limit 0.6-1.5 × base raise 5-15 % every 4 s; players bid +5 / +10
+  / +25 % in the Lelang tab of `KotaScreen` (the action carries the lot and the price seen; a stale bid is refused);
+  sold 8 s after the last raise; stones taken only on a win. Consignment: 2 items per player per session, paid at the
+  end at 0.7-1.3 × a value ≤ 0.5 × the lot base. These are the rules of Lelang Abadi (26.8) in spirit stones, in K's
+  own class `kota/BalaiLelang` (no edit of `abadi/Auction`).
+- **Kedai Teh**: three teas (one active at a time, 10 in-game minutes): Teh Embun Pagi +10 % meditation XP (2 NB),
+  Teh Awan Ungu +10 % comprehension gain (9 NB, Golden Core+), Teh Penenang Hati −20 % Heart Demon pressure gain (20 NB,
+  Nascent Soul+); through `Meditation` / `Comprehension` / `HeartDemons` public hooks only if they exist, else K applies
+  them as a `MobEffect` of its own read by its own provider (K verifies; no edit of cultivation files beyond L's site
+  hook). **Kabar Angin** (rumours, 1 / 9 / 80 NB by distance band): reveals one undiscovered site of a chosen kind within
+  1 500 / 3 000 / 6 000 b through `DuniaSites.locate`, or, when L has a treasure birth scheduled within one in-game day,
+  its direction ("Langit di barat laut terasa aneh…"). 40 % of wanderer meetings (34.5.2) happen here.
+- **Pasar Gelap**: the hidden door opens (W2 entity, 1.2 s slide through `DisplayKey`) for a player holding a **Token
+  Pasar Gelap** (sold by the tea master after 3 rumours, 5 % from rogue pouches). The broker sells, without the realm
+  gate of the shops: realm keys, heavenvoid map fragments, King cores, Selendang Pengikat Naga (34.5.11), Dupa Arwah
+  (34.5.13), Mutiara Penunjuk Laut (34.5.14), all at 1.5 × base; buys loot pouches and rogue banners at 0.6 × value.
+  Every purchase rolls `kota.raidChance` (8 %) for a **Razia**: the town's guard sect blocks the door for 60 s and 3
+  guards attack (a hostile mark for that player only; bribe 20 NB × band to end it). Reputasi Gelap (−100..100) rises
+  with black-market trade and falls with guard kills.
+- **Nama Baik** (town reputation, per player per town, −100..100, saved in `kultivator:kota` SavedData): + bounties,
+  + auction wins (+1), − attacking NPCs (−10, −30 for a kill); < −30 guards hostile and shops refuse; ≥ 50: 10 % discount.
+- **Papan Misi** (bounties, 3 per town per day, seeded): hunt an elite beast near the town (spawned through the public
+  elite API `uji elit` uses; K verifies `EliteMonsters` exposes it), clear a bandit camp (`musuh/Camps`), deliver an aged
+  herb ≥ 100 years, escort a merchant NPC to the nearest other town or village (≤ 2 000 b). Rewards: NB stones (Qi
+  Refining 6-12, Foundation 15-30, Golden Core 40-80, ×3 per further band), +5 Nama Baik, sometimes a jade slip.
+  At most 3 per player per day over all towns.
+- **Balance**: every realm; the core loop for Qi Refining-Nascent Soul. No XP for sale; daily caps on bounties,
+  shop sales and consignment.
+- **Visuals**: lantern glow sprites on `kota/lentera` anchor rows (16 / 48 / 96 quads per town), stage light shafts
+  during a session (1 / 2 / 3 pillars through `EpicBudget.takePillar`), pond qi particles (`kultivator:qi`, 4 / 10 / 20 per
+  s within 16 b), brazier smoke in the black market (vanilla campfire smoke from template campfires: zero cost).
+- **Config** `kota`: `worldgen` true, `enabled` true, `npcPerTown` 10 (4-14), `auction` true, `auctionRivals` 4 (0-6),
+  `blackMarket` true, `raidChance` 0.08 (0-0.3), `bounties` true, `bountiesPerDay` 3 (0-6), `teaBonus` 0.10 (0-0.2),
+  `priceScale` 1.0 (0.5-2).
+- **Uji**: `uji kota cari`, `uji kota npc <peran>`, `uji kota lelang mulai|tutup|tawar <persen>`, `uji kota teh <jenis>`,
+  `uji kota gelap buka|razia`, `uji kota nama_baik <-100..100>`, `uji kota misi baru|selesai`, `uji kota stok ulang`.
+- **Panduan**: `c13.kota` (adv `dunia/kota_found`), `c13.teh` (adv `dunia/kota_rumour`), `c13.lelang` (adv
+  `dunia/kota_auction`).
+
+#### 34.5.2 Kultivator Pengembara (54, module K)
+
+- **Sumber** (`kultivator.kota.pengembara.source`): "Sumber: Liaozhai Zhiyi, 'Pendeta Tao dari Gunung Lao': Wang Qi naik
+  ke Gunung Lao mencari seorang pendeta Tao untuk belajar ilmu, lalu pulang hanya membawa sedikit dari yang ia minta.
+  Terinspirasi dari kultivator lepas yang berkelana sendirian dalam A Record of a Mortal's Journey to Immortality.
+  Diskusi Dao, tanding dan hadiahnya rancangan game."
+- **Loop**: per eligible player (Qi Refining+, Overworld or Alam Abadi, outdoors, not busy, not in a fight) a roll every
+  6 000 ticks (staggered), chance `0.10 + 0.01 × realm` (≤ 0.20), one in-game day of cooldown after a meeting; plus 0-2
+  wanderers seated in each loaded teahouse. A wanderer (`kultivator_npc` role PENGEMBARA) walks up 16-24 b away, greets
+  (disciple voice `greet`), and a chip "[Bicara]" shows. Seeded: name, Dao (one of the mod's Dao), realm = the player's
+  realm with stage ±1 (never more than one realm above), temperament Ramah 50 % / Angkuh 30 % / Licik 20 %.
+- **Choices** (`PertemuanScreen`, K):
+  1. **Bertukar Pengetahuan** (论道): the player offers a jade slip, an aged herb, a pill or "pengalaman" (5 % of the
+     current bar) and plays **Diskusi Dao**: 3 rounds, each a choice of Gerak / Diam / Selaras with a hint line from the
+     wanderer's Dao (`kultivator.kota.diskusi.<dao>.<n>`), the classic cycle decides (Gerak > Diam > Selaras > Gerak;
+     the hint tells the stance the wanderer leans to). 2-3 wins: +2..6 comprehension in the wanderer's Dao (only when it is
+     the player's own Dao or the player has none; through `dao/Comprehension`'s public adder), or a Catatan Pengembara
+     (a site rumour + lore), or +1 mastery progress on one known technique of that Dao (once per wanderer). 0-1 wins: a
+     lore line and the item back. At most 3 discussions per player per in-game day.
+  2. **Tanding** (sparring): `DuelRules.begin(player, npc, 1200, listener)`; the wanderer fights with the
+     `technique/RivalSkills` primitives at its realm. Win: 2 % of the current bar as XP (through `Progression`), a
+     Lencana Pengembara (advancement counter), +3 Nama Baik in the nearest town. Lose: nothing lost.
+  3. **Tantang** (to the end): the wanderer turns hostile to that player only; killed it drops a `loot_pouch` of its
+     tier; −10 Nama Baik if another NPC within 32 b saw it. Licik ones flee at 30 % and may come back later as a rival
+     ambush (34.5.3).
+  4. **Ajak Berkelana** (Ramah, Golden Core+): follows for one in-game day, fights monsters, leaves with a small gift;
+     one companion at a time.
+  Despawns after 5 minutes idle or 64 b away.
+- **Visuals**: Dao-coloured aura on the wanderer through the existing aura render state (no new FX), a qi swirl when a
+  discussion round is won (8 / 16 / 32 particles).
+- **Config** `kota`: `wanderers` true, `wandererChance` 1.0 (0-3 scale), `discussionsPerDay` 3, `companion` true.
+- **Uji**: `uji pengembara [dao] [ranah] [watak]`, `uji pengembara diskusi menang|kalah`, `uji pengembara hapus`.
+- **Panduan**: `c13.pengembara` (adv `dunia/wanderer_talk`).
+
+#### 34.5.3 Saingan: perburuan harta antar-kultivator (61, module K)
+
+- **Sumber** (`kultivator.kota.saingan.inspired`): "Terinspirasi dari Battle Through the Heavens: perebutan Api Teratai
+  Hijau di Gurun Tagore, tempat Xiao Yan berhadapan dengan Ratu Medusa dan kaum ular; dan dari perebutan pusaka yang
+  baru lahir oleh banyak kultivator dalam cerita xianxia. Nama kelompok, dendam dan angkanya rancangan game."
+- **Rival groups**: SavedData `kultivator:kota_saingan`, six groups seeded per world (names from
+  `kultivator.kota.grup.<0-11>`: Keluarga Mo dari Lembah Hitam (licik), Sekte Pedang Awan Biru (angkuh), Paviliun Bulan
+  Merah (pembunuh), Klan Tie dari Utara (tubuh), Lembah Seribu Racun (racun), Biksu Kuil Batu (netral) …), each a leader
+  and 2-4 members with names, a base region (seeded centroid, also T's NPC sect domain, 34.5.16), a realm band that
+  grows with world days but never more than one realm above the strongest player who was online in the last 7 days, a
+  grudge per player 0-100, wins and losses. `RivalService` (34.4.3) is K's.
+- **Race** (on `TREASURE_BORN`): 1-3 groups whose region is within 3 000 b of the birth get an ETA of 60-240 s (by
+  distance and realm). The race is virtual until a player is within 128 b of the birth: then each group arrives
+  physically at its ETA (a sword descent: client Display sword + trail from the sky, then the NPCs at the landing spot).
+  Two groups present fight each other (NPC vs NPC only, `RivalSkills` exchanges, the loser flees at 25 %); a group that
+  reaches the treasure channels 5 s and claims it (`TreasureService.claim` with its rival id) unless a player claimed it.
+  They attack any player who channels the claim and players who attack them; otherwise they ignore players.
+- **Ambush** (on `TREASURE_CLAIMED` with a player winner): a group with grudge ≥ 40, or a Licik one, comes 60-300 s later
+  when the player is outdoors and not inside a town (towns are safe ground): 3 s of killing intent (the Penyergapan
+  warning, 25.4.3), then leader + up to 3 members. At most one rival ambush per player per in-game day; the same death
+  rules as `musuh/Ambushes`.
+- **Auction**: the four bidders of every Balai Lelang are members of these groups (names on the lot card).
+- **Rewards**: a beaten leader drops a Kantong Saingan (two tier rolls of the loot pouch table of its band + a Mid/High
+  stone) and the group's grudge resets to 20 ("kami akan kembali"). Beating all six leaders: advancement and a title.
+- **Visuals**: the group's colour on robes and the descent trail; NPC-vs-NPC fights use the existing rival qi line FX
+  (no new effect type).
+- **Config** `kota`: `rivals` true, `rivalGroups` 6 (3-8), `racePhysicalRadius` 128, `rivalAmbush` true,
+  `ambushPerDay` 1.
+- **Uji**: `uji saingan daftar`, `uji saingan datang <grup>`, `uji saingan perlombaan` (a test birth 60 b ahead through
+  `TreasureService.spawn` + the race), `uji saingan sergap`, `uji saingan dendam <grup> <0-100>`.
+- **Panduan**: `c13.saingan` (adv `dunia/rival_beaten`).
+
+#### 34.5.4 Kota Abadi (66, module K)
+
+- **Sumber** (`kultivator.kota.kota_abadi.source`): "Sumber: Perjalanan ke Barat bab 4-5: Sun Wukong dibawa ke Istana
+  Langit, diangkat menjadi pengurus kuda surgawi lalu penjaga Kebun Persik Abadi, dan memakan persik keabadian.
+  Terinspirasi dari kota-kota para abadi di A Record of a Mortal's Journey to Immortality: Immortal Realm. Kota, kuliah
+  dan angkanya rancangan game."
+- **Structure** `kota/kota_abadi` in `kultivator:alam_abadi` (only reachable after the phase-9 ascension): a floating
+  district at absolute y 150-170 with its own stone underside (tapering, `abadi` palette): Gerbang Awan (arrival gate,
+  site anchor), Pasar Abadi, Paviliun Dao (lecture hall with cushions), Kebun Persik Abadi (cherry trees, a peach-tree
+  anchor), Menara Lonceng, Balai Lelang Abadi (a stage only: its auctioneer opens the **existing** Lelang Abadi tab with
+  `Net.send(player, new Payloads.OpenScreen(Payloads.OpenScreen.ABADI, Payloads.OpenScreen.ABADI_LELANG))`; no auction
+  logic of its own), Istana Giok (the Jade Emperor's envoy), houses. Cloud skirts under the district are client quads.
+- **NPCs**: `kultivator_npc` roles ABADI (white-gold robe, True Immortal aura), PENCERAMAH, PEDAGANG_ABADI; ≤ 10 per city.
+- **Loop**: Pasar Abadi in Batu Asal Abadi (immortal herbs, `immortal_pill`, essence pearls, rarely a primordial material
+  or `land_expansion_token`), priced so that the mining cap of `OriginStones` (16 per day) buys a rare item in about a
+  week. **Kuliah Dao** at noon each in-game day: sitting within 6 b of the lecturer for 60 s gives +1..3 comprehension
+  in one of the player's comprehended Dao (or an Enlightenment roll through `cultivation/Enlightenment`'s public entry,
+  K verifies). **Persik Abadi** every `kota.peachDays` (3) per player: 2 % of the bar at Immortal Ascension, 5 % at True
+  Immortal, +3 % Esensi Abadi conversion; also B's tier-6 offering (34.5.12). **Titah Utusan**: a weekly quest from the
+  envoy that points at an existing phase-9 challenge (a primordial omen, a calamity) and pays Batu Asal on completion.
+- **Balance**: Immortal Ascension and True Immortal only.
+- **Visuals**: cloud skirts (24 / 64 / 128 quads per district within 160 b), floating petals (`kultivator:qi` tinted
+  pink, 4 / 10 / 20 per s), the bell tower's sound at noon (vanilla bell).
+- **Config** `kota`: `immortalCity` true, `lectures` true, `peachDays` 3.
+- **Uji**: `uji kota_abadi cari`, `uji kota_abadi kuliah`, `uji kota_abadi persik`, `uji kota_abadi titah`.
+- **Panduan**: `c14.kota_abadi` (adv `dunia/immortal_city`).
+
+#### 34.5.5 Reruntuhan Gua Leluhur (55, module R)
+
+- **Sumber** (`kultivator.reruntuhan.gua.source`): "Sumber: Fengshen Yanyi: Sepuluh Formasi Mutlak dan Formasi Sembilan
+  Lengkung Sungai Kuning dipecahkan satu per satu; Kisah Tiga Negara bab 84: Lu Xun tersesat dalam Formasi Delapan
+  Batu Zhuge Liang. Terinspirasi dari warisan gua Biksu Anggur Bunga di Reverend Insanity. Teka-teki, penjaga dan
+  hadiahnya rancangan game."
+- **Structures**: `reruntuhan/gua_kecil` (Qi Refining-Foundation), `gua_agung` (Golden Core-Nascent Soul), `gua_kuno`
+  (Deity Transformation-Dao Union). Layout by jigsaw: a collapsed cliff gate (stone door panels = a **Gerbang Segel**
+  entity), the antechamber with a riddle stele (anchor `reruntuhan/prasasti`, the riddle text from lang), a corridor graph
+  of 2 / 3 / 5 puzzle chambers drawn from the pool, one guardian chamber, the **Aula Warisan** (a seated skeleton of bone
+  blocks, the ancestor's remnant soul: a translucent NPC of R's own `SisaJiwaEntity` using the disciple model, speaking
+  the `elder.*` voice lines).
+- **Puzzles** (entities + client Displays, each ≤ 3 minutes, a hint after `reruntuhan.hintSeconds` 90; a wrong move
+  never kills: a formation backlash of `puzzleBacklash` (10 %) of max health, clamped to leave 1 HP, or guardian
+  constructs):
+  - **P1 Delapan Trigram**: 8 floor plates (interaction entities); the stele riddle encodes the Early Heaven order;
+    stepping in order lights each plate's trigram glyph (client Display); a wrong plate resets with backlash.
+  - **P2 Lima Unsur**: five lamps (template soul lanterns + anchors) lit with qi (5 % of Qi each) in the generating
+    cycle Kayu → Api → Tanah → Logam → Air (`elite/ElementRelations`), starting from the element carved on the door.
+  - **P3 Peta Bintang**: three concentric rings of constellation stones (block Displays on one ring entity each) turn
+    45° per right-click; align the Beidou's handle to the star on the ceiling.
+  - **P4 Labirin Ilusi**: phantom walls (Displays with collision parts) among real template walls; the Pil Mata Terang
+    (`mata_terang_pill`) or a Spirit Sense technique reveals them (client tint); dead ends hold formation pulses.
+  - **P5 Cermin Hati**: a mirror shadow of the player (R's `BayanganEntity`, the player's skin through a
+    `ResolvableProfile` on the disciple model, 60 % of the player's stats) must be beaten without healing items.
+  - **P6 Timbangan Qi**: two pans balanced by standing players, disciples, spirit beasts or dropped item entities
+    (counted by weight classes), so it works solo and in a party.
+- **Guardian**: Boneka Batu Penjaga (R entity, a body of 6-12 block Displays on one hitbox, slam / spin / pebble ring
+  skills, entity-only), tier by grade.
+- **Rewards** (once per player per ruin, kept in the inheritance anchor's state): Kecil 10-30 NB, herbs 100-300 years, a
+  Low/Mid core; Agung 80-200 NB, herbs 300-1 000 years, a High core, a **Giok Warisan** (the existing
+  `technique/source/InheritanceTrials` jade, theme = the ruin's Dao) at 50 %; Kuno 600-1 500 NB, a King core, a Giok
+  Warisan, and a Kitab Formasi Kuno (lore + a 20 % discount voucher for one formation pattern if `formasi` exposes a
+  public pattern-cost hook, else a lore item). Chests use capped loot tables (34.2.4).
+- **Visuals**: glyph Displays (≤ 8 / 16 / 24 per chamber, `EpicBudget.DISPLAYS` scale), ring turning with 4-tick
+  `DisplayKey` frames, lamp flames (`kultivator:qi` tinted by element, 2 / 6 / 12 per s per lamp), a dust burst and a
+  slow 1.2 s door slide when a seal opens (+ DuniaScenes beat 41 card "Segel Terbuka", no camera move indoors).
+- **Config** `reruntuhan`: `worldgen` true, `ruins` true, `puzzleBacklash` 0.10 (0-0.25), `hintSeconds` 90 (30-300),
+  `guardians` true.
+- **Uji**: `uji gua cari <kecil|agung|kuno>`, `uji gua teka <bagua|unsur|bintang|ilusi|cermin|timbangan>` (entities only,
+  in front of the player, needs a free 10-block area), `uji gua selesai`, `uji gua penjaga`, `uji gua reset`.
+- **Panduan**: `c13.gua` (adv `dunia/ruin_cleared`).
+
+#### 34.5.6 Penjara Iblis Kuno (62, module R)
+
+- **Sumber** (`kultivator.reruntuhan.penjara.source`): "Sumber: Batas Air (Shui Hu Zhuan) bab 1: Marsekal Hong Xin
+  memaksa membuka Aula Penakluk Iblis dan sumur bersegel, melepaskan seratus delapan bintang iblis; Perjalanan ke Barat
+  bab 7 dan 14: Sun Wukong dikurung di bawah Gunung Lima Unsur dengan jimat segel Buddha dan bebas ketika Tang Sanzang
+  mencabut jimat itu. Terinspirasi dari garis Penyegel Iblis Meng Hao di I Shall Seal the Heavens. Kekuatan segel,
+  raja iblis dan angkanya rancangan game." Demon kings: Xiangliu (`.xiangliu.source`: "Sumber: Shan Hai Jing bagian 8
+  dan 17: Xiangliu, menteri Gonggong yang berkepala sembilan"), Raja Banteng Iblis (`.banteng.source`: "Sumber:
+  Perjalanan ke Barat bab 59-61, Raja Iblis Banteng"), Chiyou (`.chiyou.source`: "Sumber: Shan Hai Jing bagian 17:
+  Chiyou berperang melawan Kaisar Kuning").
+- **Structure** `penjara/penjara_iblis`: a surface **Kuil Segel** (five stone pillars, each with a talisman anchor
+  `penjara/jimat`, a stair down) and the deep prison at y ≈ −24: a ring hall of chains around the sealed pit, side cells
+  with lesser sealed demons (anchors), the **Jantung Segel** (seal core anchor `penjara/segel`).
+- **Seal**: integrity 0-100 per prison (`SealService`), seeded 60-90. Falls by `sealDecayPerDay` 0.2 per in-game day,
+  1 per in-game hour during a Gerhana Darah (`SKY_EVENT`), 5 per pulled talisman (a choice behind a warning card: each
+  pulled talisman gives the puller a Sobekan Segel (heaven-seal-shard-like material) — the Hong Xin temptation). Rises by
+  **Perkuat Segel** at the core (4 `blank_talisman` + 1 High stone: +15, once per player per in-game day): Pahala
+  (merit) → talisman materials and sect renown through `Sects`' public renown adder (R verifies).
+- **Break** (integrity 0 or all five pulled; at most once per prison per `rebreakDays` 7): DuniaScenes beat 41: chains
+  snap (Display animation), floor crack decals (quads), a red pillar, sky darkening within 128 b (`SkyDirector.grade`
+  darkness 0.6, prio below tribulations), then the seeded demon king rises with 3-6 lesser demons. The fight is held in a
+  48-block soft arena (the `purba` rules: telegraphed entity-only skills, a per-second intake clamp, health
+  `2 000 × party factor`, `penjaraDeathGuard` true = a lethal skill leaves 1 HP with Luka Iblis). **Re-seal win**: the
+  five pillars can be re-lit during the fight (each −15 % boss damage; all five = the demon is sealed again, a bigger
+  Pahala reward and integrity 100). **Kill win**: Inti Iblis Kuno (new material: B's wolf line offering, a Tempa
+  material if `tempa` takes tagged materials), King cores, a demonic jade slip, and the prison is calm for 7 days.
+  Nobody fights: the king stays inside its arena (despawns with no player within 96 b, its health kept in the anchor);
+  lesser demons roam ≤ 48 b at night; the map paints the region red (`SEAL_CHANGED`).
+- **Balance**: Dao Union-Immortal Ascension.
+- **Visuals**: talisman paper Displays fluttering (4-tick keys), chain Displays (iron_chain item models) swaying, red
+  qi leak particles from the pit (4 / 12 / 24 per s), the break moment as above; boss skills use the purba-style
+  telegraph rings (own quads).
+- **Config** `reruntuhan`: `prisons` true, `sealDecayPerDay` 0.2, `eclipseDecayPerHour` 1, `bossDeathGuard` true,
+  `rebreakDays` 7.
+- **Uji**: `uji penjara cari`, `uji penjara segel <0-100>`, `uji penjara cabut <1-5>`, `uji penjara lepas
+  <xiangliu|banteng|chiyou>`, `uji penjara segel_ulang`, `uji penjara hapus`.
+- **Panduan**: `c14.penjara` (adv `dunia/prison_sealed` or `dunia/prison_slain`).
+
+#### 34.5.7 Menara Seratus Lantai (65, module R)
+
+- **Sumber** (`kultivator.reruntuhan.menara.source`): "Sumber: Dao De Jing bab 64: menara sembilan tingkat dimulai dari
+  setumpuk tanah. Terinspirasi dari Menara Pemurnian Qi Pembakar Langit di Akademi Canaan, Battle Through the Heavens,
+  yang makin dalam lantainya makin berat ujiannya. Seratus lantai, ujian dan hadiahnya rancangan game."
+- **Exterior** `menara/menara_seratus`: a 9-tier pagoda (30 × 30 base, ~96 b tall, stacked pieces, `menara` palette, hip
+  roofs with curled eaves), the top hidden in a client cloud ring (32 / 96 / 160 quads, visible up to 256 b and
+  sky-projected beyond), the gate anchor `menara/gerbang` and a ranking stele (text Displays within 24 b).
+- **Interior**: dimension `kultivator:menara` (34.2.2). Lobby at the dimension origin (structure `menara/lobi`): a hall
+  with ten band gates (client gate quads) and the ranking stele. Floors are **instanced slots** like `alam/Slots`:
+  `menara.slots` (6) parties at x = 4 096 + s × 1 024, z = 4 096 on the flat floor; scenery is client Displays merged in
+  runs (`DisplayRun`), walls are an invisible server grid (R uses `alam/WallGrid` if its constructor and `runs()` are
+  public, else its own copy with the same contract). Party ≤ 4 (sect mates or the players who enter together).
+- **Floors**: floor f recommends Rank step `s(f) = round(0.64 × f)` (floor 100 = True Immortal Peak). Each band of ten:
+  1-3 combat waves (elite mobs, rogue bands through `musuh/RogueCultivators.spawnBand`, scaled to s(f); ≤ 8 alive),
+  4 a puzzle from 34.5.5 with a timer, 5 endurance (60 s of formation pulses, % max health, non-lethal), 6 combat with an
+  affix, 7 Ujian Hati (3 Dao riddles, multiple choice from lang, or the mirror shadow), 8 meditation under pressure
+  (45 s in a circle while qi waves push), 9 an elite of Raja Siluman strength, 10 the band's **Penjaga Lantai** (ten
+  guardians: Lembu Besi, Ular Giok, Bangau Api, Kura-kura Batu, Harimau Petir, Rubah Ilusi, Kilin Emas, Bangau Abadi,
+  Naga Bayangan, and on floor 100 the Bayangan Diri: the player's own shadow at full stats).
+- **Rules**: a run starts at `10 × floor(max / 10) + 1` (no re-climbing cleared bands); a failed floor sends the party to
+  the lobby with Luka Menara (5 minutes, no entry), never an item loss; DeathGuard stage MENARA: lethal → 1 HP and
+  expelled. Highest floor in `extra.menara.max`.
+- **Rewards**: first clear of each floor: NB stones by s(f) (Qi Refining band 3-6 NB … True Immortal band 300-600 NB
+  of stones), a milestone chest every 10th floor (cores, herbs, a Giok Warisan at 50 and 90), floor 100: the title
+  "Penakluk Seratus Lantai" and a heavenly flame seed or a True-Immortal material. A weekly world ranking (top 3 get
+  sect renown).
+- **Visuals**: floor scenery 40 / 120 / 240 display blocks merged into runs; band-coloured sky grade inside (own, the
+  dimension is dark); a floor-clear stamp card; every 10th floor a short shot (beat 47, Penuh only, safe).
+- **Config** `reruntuhan`: `tower` true, `towerSlots` 6 (2-8), `towerDeathGuard` true, `towerRewardScale` 1.0,
+  `startAtBand` true.
+- **Uji**: `uji menara cari`, `uji menara masuk`, `uji menara lantai <1-100>`, `uji menara selesai|gagal`, `uji menara
+  keluar`, `uji menara rekor <n>`.
+- **Panduan**: `c13.menara` (adv `dunia/tower_10`), `c14.menara` (adv `dunia/tower_100`).
+
+#### 34.5.8 Peristiwa Langit Acak (59, module L)
+
+- **Sumber** (`kultivator.langit.peristiwa.source`): "Sumber: Zuo Zhuan, Adipati Zhuang tahun 7: pada tengah malam
+  bintang-bintang jatuh seperti hujan, catatan hujan meteor tertua; kepercayaan rakyat Tiongkok bahwa Tiangou, Anjing
+  Langit, menelan bulan saat gerhana; Huainanzi bab 8 (Ben Jing): sepuluh matahari muncul bersamaan pada zaman Yao.
+  Bulan kembar dan semua efek permainannya rancangan game."
+- **Schedule**: per Overworld and Alam Abadi, at each sunset one roll (`chancePerNight` 0.25) when the last event is at
+  least `minNightsBetween` 3 nights ago; announced by an omen line at sunset and a HUD chip ("Malam ini: Gerhana
+  Darah"). Synced to every player in the dimension (L's own payload `LangitSync`: kind, start, end, seed).
+- **Hujan Meteor Roh** (one night, 13 000-23 000): client meteor streaks (additive textured quads with a trail;
+  6 / 16 / 32 alive; far streaks sky-projected) and one fireball every ~40 s. Server: every 30-60 s per outdoor player a
+  **Meteor Roh** falls 24-96 b away (≤ `meteorsPerPlayer` 6 per night): L's `MeteorEntity` (no gravity physics, a scripted
+  fall to the heightmap top, never a block, never fire), a ring + flash + dust impact, then a **Batu Meteor Roh** item.
+  Uses: sneak-use absorbs 150 Qi XP (between Low 30 and Mid 200), T's ship fuel (4 minutes), B's tier-4 offering. While
+  it rains meteors, meditation outdoors gets the site "Hujan Bintang" ×1.3.
+- **Gerhana Darah** (one night): a red disc and halo drawn over the vanilla moon (L's sky quads after the sky pass;
+  L verifies the 26.3 Fabric world-render event name), `SkyDirector` red tint 0.35 with low prio, a faint red HUD
+  vignette (0.03 / 0.05 / 0.07). Gameplay: monsters that spawn naturally near players have 25 % chance of
+  **Tersentuh Gerhana** (+25 % health and attack modifiers, a red glow; L's own attribute modifiers); Shadow Dao
+  meditation ×1.3 (site provider); seals fall (R); the Dunia Bawah shrines open without incense (D).
+- **Bulan Kembar** (one night): a second, pale silver moon quad on the opposite arc. Gameplay: Ice and Shadow Dao
+  comprehension gain ×1.5 while meditating outdoors, the full-moon site counts all night, spirit beasts gain ×1.5 spirit
+  XP, wild Jiao ×2 (B).
+- **Visual budgets**: streaks ≤ 600 / 1 500 / 3 000 quads per frame through `EpicBudget.takeQuads` (shader pack:
+  `PACK_QUADS`); moon discs 1 quad + 3 halo quads each; the HUD layer is a fill.
+- **Config** `langit`: `events` true, `chancePerNight` 0.25 (0-1), `minNightsBetween` 3 (1-14), `meteorShower` true,
+  `bloodEclipse` true, `twinMoons` true, `meteorsPerPlayer` 6 (0-12), `eclipseMobBuff` 0.25 (0-0.5).
+- **Uji**: `uji langit meteor|gerhana|bulan_kembar [menit]`, `uji langit berhenti`, `uji langit jadwal`, `uji langit
+  jatuh` (one meteor 20 b ahead now).
+- **Panduan**: `c13.langit` (adv `dunia/sky_event`).
+
+#### 34.5.9 Pertanda Harta Lahir (60, module L)
+
+- **Sumber** (`kultivator.langit.harta.inspired`): "Terinspirasi dari kemunculan pusaka dalam xianxia yang ditandai
+  cahaya menembus langit lalu diperebutkan banyak kultivator, seperti perebutan Api Surgawi dalam Battle Through the
+  Heavens. Pilar pelangi tujuh warna, penjaga dan angkanya rancangan game."
+- **Loop**: every `treasureDays` (3 ± 1) in-game days per dimension with active players, L picks a focus player (active,
+  not busy, outdoors) and a spot 300-900 b away: a surface column found by noise sampling only
+  (`ChunkGenerator.getBaseHeight`, the `abadi/ArrivalIsland` method; ≤ 16 samples per tick), never inside a town, a
+  sect territory (`Halls.inTerritory`) or water deeper than 3. 30 s before: a tremor (sound + `EffectQuality` shake
+  within 1 000 b). Then the **Pilar Pelangi**: a seven-colour light pillar to build height, slowly turning bands and a
+  crown halo; beyond render distance a sky-projected copy. It stays 12 000 ticks or until claimed.
+- **Treasure**: L's `HartaLahirEntity` (an item Display of the treasure inside a turning jade lotus; no collision) exists
+  only while a player is within 64 b (the chunk is loaded by that player); claim = stand within 2 b and channel 5 s
+  (cancelled when hurt). Guardian 40 %: an elite beast of the tier, R's stone construct (R on) or a young wild Jiao (B
+  on, tier ≥ 3). Tier from the strongest active player within 1 000 b: T1 (Mortal-Foundation) herbs 100-300 years, Mid
+  stones; T2 (Golden Core-Nascent Soul) herbs 500-1 000, a High core, a jade slip; T3 (Deity-Dao Union) a millennium herb,
+  a King core, a heavenly flame seed at 5 %; T4 (Immortal+) Batu Asal Abadi, an essence pearl, a primordial material at
+  5 %. Kinds `herba`, `inti`, `giok`, `pusaka`, `api`, `batu`.
+- **Race**: `TREASURE_BORN` (K's rivals race, 34.5.3); other players see the pillar too. `TREASURE_CLAIMED` on the claim.
+  One live birth per dimension; no XP from the claim itself.
+- **Visuals**: pillar 120 / 320 / 640 quads (`takePillar`, `takeQuads`), base particles 6 / 16 / 32 per s, a
+  DuniaScenes beat 40 shot when the player claims (Penuh: a 3 s orbit; Singkat: a card; Mati: nothing).
+- **Config** `langit`: `treasureBirth` true, `treasureDays` 3 (1-14), `distanceMin` 300, `distanceMax` 900,
+  `durationTicks` 12 000, `guardianChance` 0.4.
+- **Uji**: `uji harta_lahir [1-4] [herba|inti|giok|pusaka|api|batu]` (60 b ahead), `uji harta_lahir dekat` (12 b),
+  `uji harta_lahir hapus`, `uji harta_lahir jadwal`.
+- **Panduan**: `c13.harta` (adv `dunia/treasure_claimed`).
+
+#### 34.5.10 Cuaca Roh (68, module L)
+
+- **Sumber** (`kultivator.langit.cuaca.source`): "Sumber: Zhuangzi bab 2 (Qi Wu Lun): napas yang diembuskan Bumi Agung,
+  namanya angin; Liexian Zhuan: Yin Xi, penjaga celah, melihat qi ungu datang dari timur sebelum Laozi tiba. Kabut Qi
+  dan bonusnya rancangan game."
+- **Mechanic**: the Overworld (and Alam Abadi) is split into cells of `cellSize` 512 b; a cell's weather changes every
+  6 000 ticks, deterministic `hash(seed, cell, period)` biased by the cell centre's biome (noise sample: swamps, forests,
+  cherry groves and mountains misty, deserts clear). Kinds: Cerah 70 %, **Kabut Qi Tipis** 20 % (site ×1.2), **Kabut Qi
+  Pekat** 7 % (×1.5), **Fajar Ungu** 3 %, only at dawn (23 000-1 000; ×1.6 and Dao insight chance ×2 while meditating
+  facing east). Independent of vanilla weather (W3: never changed).
+- **Gameplay**: L adds ONE public hook to `cultivation/SpiritSites` (34.6 L): `addSiteProvider(Function<ServerPlayer,
+  @Nullable ExtraSite>)` where `ExtraSite(String id, double multiplier, @Nullable Dao dao, Component name)`, multiplied
+  with the enum sites before `CAP` 4.0 (and so still under `Meditation.MULTIPLIER_CAP` 3.5), listed in the site names.
+  Outdoors (`canSeeSky`) only. **Embun Roh**: an empty bottle used in Kabut Pekat or at Fajar Ungu gives Spirit Dew
+  (drink: +20 % Qi regeneration for 5 minutes; an alchemy ingredient by tag), 4 per player per day.
+- **Visuals**: L syncs the 3 × 3 cells around each player on change. Mist: a low-prio `SkyDirector.grade` fog tint
+  (intensity 0.25 thin / 0.5 dense), a soft HUD mist vignette (alpha 0.04 / 0.08 / 0.12), drifting `kultivator:qi` motes
+  (3 / 8 / 16 per s within 12 b) and ground-hugging translucent mist planes ahead (8 / 24 / 48 billboards, faded by
+  distance). No vanilla fog distance change, no post chain (Iris safe).
+- **Config** `langit`: `weather` true, `cellSize` 512 (256-2048), `thinFactor` 1.2, `denseFactor` 1.5, `dawnFactor` 1.6,
+  `dewPerDay` 4.
+- **Uji**: `uji cuaca <cerah|tipis|pekat|ungu> [menit]` (the player's cell), `uji cuaca info`.
+- **Panduan**: `c13.kabut` (adv `dunia/qi_mist`).
+
+#### 34.5.11 Naga Liar (57, module B)
+
+- **Sumber** (`kultivator.naga.liar.source`): "Sumber: Perjalanan ke Barat bab 15: naga putih, putra Raja Naga Laut
+  Barat, menelan kuda Tang Sanzang di Jurang Elang Duka lalu ditundukkan Guanyin menjadi Kuda Naga Putih; Fengshen Yanyi
+  bab 12: Nezha mengacau Laut Timur dengan Selendang Langit Kacau dan Gelang Semesta lalu mengalahkan Ao Bing; Zuo
+  Zhuan, Adipati Zhao tahun 29: Dong Fu memelihara naga untuk Kaisar Shun dan diberi nama marga Huanlong. Jiao liar,
+  pertarungan kehendak dan angkanya rancangan game."
+- **Kinds** (Jiao, the dragon that is not yet a true dragon): **Jiao Air** (blue, over rivers and oceans, water),
+  **Jiao Awan** (white jade, over mountains above y 140, wind; more in dense Qi mist), **Jiao Petir** (purple-gold, only
+  while the vanilla weather is a thunderstorm, read only; lightning).
+- **Spawn**: per player every 2 400 ticks a roll when the player is ≥ `minRealm` (Nascent Soul), in the Overworld,
+  outdoors: `chance` 0.06 (×2 during a meteor shower or twin moons); world cap `worldCap` 2, ≤ 1 per player within
+  256 b. It loops lazy figure-eights at y 120-200 within 160 b of its spawn point, leaves after 10 minutes or 256 b
+  from every player. Never in Peaceful.
+- **Entity** `kultivator:naga_liar` (B): one hitbox at the head (2.0 × 1.2), no goals, moved by B's flight script, never
+  saved; the body is client only: a chain of segments that follow the head's trail (the spine's `SegmentChain`, 34.6 K)
+  — head, 8 / 14 / 20 body segments, claws, tail fin, whisker strands — as item models generated by
+  `tools/gen_dunia_naga_models.py` into `models/item/fx/naga/*`. LOD: beyond 96 b 6 segments, beyond 192 b a silhouette,
+  beyond render distance a sky-projected silhouette.
+- **Fight**: neutral until attacked or provoked (a flying player within 24 b at its height for 5 s). Skills (entity
+  only, telegraphed): Napas Unsur (cone; water Slowness, wind knockback, lightning a chain line), Ekor Sabet (tail ring),
+  Raungan Naga (Weakness 4 s), Lilitan (circles the player, tightening). Health `600 × (1 + 0.8 × (realm − Nascent
+  Soul))`. At ≤ 25 % it is **Lemah** (exhausted, hovers low for 30 s); a kill gives 3 Sisik Jiao and a Mutiara Jiao at
+  20 %; at 10 % it flees if not subdued.
+- **Subdue**: the **Selendang Pengikat Naga** (crafted: 3 `spirit_tail_feather` + 2 High stones + 1 `cold_ice_pearl`;
+  also sold in the black market) used on a Lemah Jiao by a player of Deity Transformation+ (Jiao Petir: Dao Union+)
+  starts the **Pertarungan Kehendak**: 8 s, a HUD ring where the dragon's will arc wanders and the player keeps an arc on
+  it by holding use and moving the mouse; Qi drains 3 % per s; the client reports the overlap every 10 ticks and the
+  server checks time and distance; ≥ 60 % overlap tames. Fail: the Jiao recovers 30 % and flees. DuniaScenes beat 42 on
+  success (Penuh and safe only; else a card).
+- **Tamed**: a spirit beast of the new kind `JIAO` (34.5.12) at tier 3, bound to its owner, one per player. Kept as data
+  in a **Mutiara Naga Jinak** (summon / dismiss; no entity while dismissed). Rideable: flying, speed 0.9-1.4 b per tick
+  by tier (comparable to the flying sword of the same realm), one extra passenger, stamina Napas Naga (−1 % per s while
+  flying, refills when landed). Fights with its owner: a breath at the owner's target every 12 s.
+- **Visuals**: whisker and fin flutter, scale glint, breath cones 24 / 64 / 128 quads, a wing-less body undulation; no
+  camera move except the subdue shot.
+- **Config** `naga`: `wild` true, `minRealm` "nascent_soul", `chance` 0.06, `worldCap` 2 (0-4), `subdue` true, `mount`
+  true, `segmentsMax` 20 (6-24).
+- **Uji**: `uji naga <air|awan|petir> [lemah]`, `uji naga tunduk menang|kalah`, `uji naga hapus`, `uji naga tunggang`,
+  `uji naga info`.
+- **Panduan**: `c14.naga` (adv `dunia/dragon_subdued`).
+
+#### 34.5.12 Evolusi Binatang Roh (58, module B)
+
+- **Sumber** (`kultivator.naga.evolusi.source`): "Sumber: Shan Hai Jing bagian 1 (Nan Shan Jing): di Gunung Qingqiu ada
+  binatang seperti rubah berekor sembilan; bagian 2 (Xi Shan Jing): Tiangou di Gunung Yin, seperti kucing hutan
+  berkepala putih; Xuanzhong Ji karya Guo Pu: rubah berumur seribu tahun berhubungan dengan langit dan menjadi Rubah
+  Langit; bagian 14 (Da Huang Dong Jing): Yinglong, naga bersayap. Terinspirasi dari kesengsaraan binatang iblis dalam
+  xianxia dan Bebe yang terus berevolusi di Coiling Dragon. Tingkat, syarat dan angkanya rancangan game."
+- **Tiers 4-6** (new; tiers 0-3 and their XP rule stay): `TIER_XP` gains 4 000 / 12 000 / 40 000, `TIER_REALM` gains
+  Deity Transformation / Immortal Ascension / True Immortal; stat arrays extend (health +70 / +110 / +160, attack +12 /
+  +18 / +26, speed +0.34 / +0.38 / +0.42, scale +0.28 / +0.36 / +0.45). Lines and titles:
+  - Serigala: … Serigala Langit (3) → **Serigala Bintang Perak** (4) → **Tiangou, Anjing Langit** (5) → **Tiangou
+    Penelan Bulan** (6).
+  - Rubah: … Rubah Ekor Sembilan (3) → **Rubah Bulan Qingqiu** (4) → **Rubah Langit** (5) → **Rubah Langit Sembilan
+    Ekor Emas** (6).
+  - Jiao (from 34.5.11): **Jiao** (3) → **Jiao Bertanduk** (4) → **Naga Sejati** (5) → **Yinglong, Naga Bersayap** (6).
+- **Kesengsaraan Binatang Roh** (needed for 3→4, 4→5, 5→6): XP full, owner realm met, an offering — tier 4: 1 King core
+  + 3 Batu Meteor Roh (L; fallback 3 High stones); tier 5: Inti Iblis Kuno (R) for the wolf, 3 `spirit_tail_feather`
+  for the fox, Mutiara Naga (D's Dragon Palace) for the Jiao (fallback 1 Supreme stone); tier 6: a Persik Abadi (K's
+  Kota Abadi) + 3 `tomb_essence` (fallback 2 Supreme stones). Started by sneak-using the beast with the offering under
+  open sky. A 10 s omen (cloud vortex), then 3 / 5 / 7 telegraphed strikes (rings around the beast), each 12 / 16 / 20 %
+  of the beast's max health as the tribulation damage type (bypasses armour). The owner within 6 b is Hu Fa and takes 30 %
+  of each strike instead of the beast (never lethal: rule 3's clamp). The beast never dies: a lethal strike fails the
+  tribulation (1 HP, Luka Kesengsaraan for one in-game day, half the offering kept). Success: DuniaScenes beat 43 (light
+  pillar on the beast, a 2 s growth of the scale attribute, title card "Evolusi! Tiangou, Anjing Langit").
+- **Bloodline arts** (tier 4+, entity only): wolf Lolongan Bulan (Weakness on monsters within 8 b, 30 s cooldown), fox
+  Api Rubah Langit (foxfire chain on 3 targets), Jiao/Naga Napas Naga (breath). Tier 6 owner passives: wolf +10 %
+  meditation at night, fox +5 % comprehension, Yinglong +50 % flight stamina.
+- **Visuals** (B's client layers on wolves and foxes through the 26.3 Fabric feature-renderer registration, B verifies
+  the callback name; Jiao bodies through `SegmentChain`): fox tails as item models (Minimal ≤ 3, Normal 9, Maximal 9 +
+  trails, gold at 6), wolf star-silver glow overlay and a moon halo at 5-6, Jiao horns and whiskers, Naga Sejati mane,
+  Yinglong two flapping wing models; ≤ 12 quads per beast on Minimal.
+- **Edits** (B owns them): `beast/BeastData.java` (`JIAO = 2`, `MAX_TIER 6`, the arrays, titles), `beast/SpiritBeasts.java`
+  (the stat arrays, the new kind's awakening path = only by subduing, `BeastEvolutionService`), `client/beast/BeastClient.java`
+  (colours, layers). Old saves: tiers 0-3 read unchanged.
+- **Config** `naga`: `evolution` true, `tribulationStrikes` [3, 5, 7], `strikeShare` [0.12, 0.16, 0.20], `huFaShare` 0.3,
+  `failCooldownDays` 1, `fallbackItems` true.
+- **Uji**: `uji evolusi <4-6>` (the looked-at beast), `uji evolusi tribulasi [lulus|gagal]`, `uji evolusi garis
+  <wolf|fox|jiao>`, `uji evolusi info`.
+- **Panduan**: `c14.evolusi` (adv `dunia/beast_tier_4`).
+
+#### 34.5.13 Dunia Bawah (63, module D)
+
+- **Sumber** (`kultivator.dimensi.bawah.source`): "Sumber: Perjalanan ke Barat bab 3: Sun Wukong dibawa ke alam baka dan
+  mencoret namanya dari Buku Hidup dan Mati; bab 10-11: arwah Kaisar Taizong turun ke alam baka, diadili para Raja Yama
+  bersama hakim Cui Jue, lalu hidup kembali; Liaozhai Zhiyi, 'Xi Fangping': arwah Xi Fangping turun ke alam baka menuntut
+  keadilan bagi ayahnya; Yuli Baochao (Catatan Giok): sepuluh pengadilan alam baka, Jembatan Naihe dan sup Meng Po yang
+  menghapus ingatan kehidupan lalu. Terinspirasi dari alam Netherworld di Coiling Dragon. Perjalanan arwah, pengadilan
+  dan angkanya rancangan game."
+- **Entry: Perjalanan Arwah** (Nascent Soul+, the realm whose soul may leave the body): at a **Kuil Gerbang Hantu**
+  (34.2.1) at night, sneak 3 s at the incense altar anchor holding a **Dupa Arwah** (crafted: 1 `soul_nurturing_wood` +
+  2 Mid stones; sold in black markets); during a Gerhana Darah without incense. The body stays as a vanilla `Mannequin`
+  with the player's `ResolvableProfile` (invulnerable, no AI, D's tag; if it is hit, the soul is pulled back), the player
+  goes to the arrival terrace of the Yama court (return data `extra.bawah.ret`, `body` uuid). Soul time: 20 minutes per
+  incense (`incenseMinutes`); at 0 the soul is drawn back. As a soul: a pale client tint on the own view edges and a
+  translucent body for others, no hunger loss. A lethal hit: DeathGuard stage BAWAH → back in the body at 1 HP with Luka
+  Jiwa (Weakness I, −20 % Qi regeneration, 10 minutes); never a real death, no item loss. Logging out: the soul is back
+  in the body on the next login. No ticket: the mannequin is only a picture; the body position lives in player data.
+- **Places** (`bawah/istana_yama` at the dimension origin, `bawah/desa_arwah` around it): Teras Wangxiang (homesick
+  terrace: a compass line to the return point), Jalan Huangquan (red spider-lily flowers: poppies and red tulips in the
+  templates), **Jembatan Naihe** over the Wangchuan (a long lantern bridge), **Paviliun Meng Po** at its end, then the
+  **Sepuluh Pengadilan** (ten court halls), **Desa Arwah** (ghost villages).
+- **Meng Po** (D's `ArwahEntity`, role MENG_PO): **Sup Meng Po**, once per `soupCooldownDays` 7: forget the Dao choice
+  (half the comprehension kept as stored), or clear Heart Demon pressure and Qi Deviation, or forget one technique and
+  refund its mastery progress (through the public paths the cheat commands already use; D verifies). Refusing the soup
+  is the way to the courts.
+- **Ten Courts**: each court a judge (Kepala Lembu and Muka Kuda guard them) with one trial reflecting the player's
+  deeds: the **Cermin Karma** in the first court shows real stats (monsters slain, disciples, sect, Kehancuran casts,
+  wanderers duelled), then a guardian duel, a judgment riddle, or escorting a lost soul across the bridge. Progress saved
+  (`extra.bawah.court`). After the tenth, Raja Yama opens the **Buku Hidup dan Mati**: below True Immortal a soul reward
+  (soul items, a Lentera Arwah trinket: +10 % meditation at night for Nascent Soul-Dao Union); at True Immortal once per
+  world per player **Coret Namamu** (JttW ch. 3): +1 cheat-death charge capacity on the existing
+  `cultivation/ImmortalPerks` charges if it exposes the capacity (D verifies; else a permanent +5 % max health perk).
+- **Desa Arwah**: ghosts with quests: Pesan untuk yang Hidup (a letter with `minecraft:lodestone_tracker` to a known
+  town or village; reward soul jade or NB), Arwah Tersesat (escort to the bridge). Hostiles: Hantu Lapar (hungry ghosts,
+  entity only, ≤ `ghostsPerPlayer` 6), Yaksha patrols near the courts.
+- **Balance**: Nascent Soul-Dao Union, the True Immortal perk at the end.
+- **Visuals**: dimension fog by attributes, floating paper-money motes (`kultivator:qi` tinted pale, 4 / 10 / 20 per s),
+  soul wisps (6 / 16 / 32), glow planes on the Wangchuan, Naihe lantern glows; the arrival DuniaScenes beat 44 (a 2 s
+  descent shot, Penuh only).
+- **Config** `dimensi`: `underworld` true, `minRealm` "nascent_soul", `incenseMinutes` 20 (5-60), `soupCooldownDays` 7,
+  `courtsRequired` 10 (3-10), `yamaPerk` true, `ghostsPerPlayer` 6.
+- **Uji**: `uji bawah masuk`, `uji bawah pulang`, `uji bawah meng_po <dao|hati|teknik>`, `uji bawah pengadilan <1-10>
+  [lulus]`, `uji bawah cermin`, `uji bawah coret`, `uji bawah arwah <n>`, `uji bawah kuil cari`.
+- **Panduan**: `c14.bawah` (adv `dunia/naihe_crossed`), `c14.yama` (adv `dunia/ten_courts`).
+
+#### 34.5.14 Laut Tanpa Batas (64, module D)
+
+- **Sumber** (`kultivator.dimensi.laut.source`): "Sumber: Liezi bab 5 (Tang Wen): lima gunung pulau abadi, Daiyu,
+  Yuanjiao, Fanghu, Yingzhou dan Penglai, mengapung di laut timur dan ditopang lima belas penyu raksasa sampai raksasa
+  dari negeri Longbo memancing enam di antaranya; Perjalanan ke Barat bab 3: Sun Wukong mendatangi Istana Naga Laut
+  Timur dan mendapat tongkat Ruyi Jingu dari Raja Naga Ao Guang; Fengshen Yanyi bab 12: Nezha membunuh yaksa Li Gen yang
+  dikirim Raja Naga. Terinspirasi dari Laut Bintang Kacau di A Record of a Mortal's Journey to Immortality. Pulau,
+  monster dan angkanya rancangan game."
+- **Entry**: (a) T's ship (`RouteService` destination `laut`, 34.5.15) after sailing 2 000 b over an ocean; (b) a
+  **Pusaran Laut** (overworld sea gate) entered while holding a Mutiara Penunjuk Laut (Golden Core+). Return: the
+  Gerbang Pulang anchor on any island, the ship, or the arrival point (`extra.laut.ret`).
+- **World** (34.2.2): an endless flat sea 60 deep. Islands `laut/pulau_roh` seeded per island: Pulau Herba (herb gardens
+  with harvest anchors), Pulau Pertapa (a hermit's quest), Pulau Pasar (islanders and stalls: **`kota/*` anchors**, so
+  module K populates them; an anchor kind of another module is allowed in a template, its handler is the kind's module),
+  Pulau Karang (reef monsters). **Pulau Penyu Ao**: a giant turtle carrying a small island of Displays, drifting; its back
+  has deck colliders (the ship pattern), one per dimension near players. **Istana Naga** `laut/istana_naga` on the sea
+  floor (prismarine, coral, pearl lamps, air-filled halls): the Dragon King (D's NPC on the disciple model in dragon
+  robes; audience Deity Transformation+) trades the **Mutiara Naga** (B's Jiao offering), sea-element forged artifacts,
+  and gives quests (the rebel yaksha, a pearl stolen by a sea serpent); the gate guard gives a Mutiara Penghindar Air
+  (Water Breathing while in this dimension's water) after the first quest. **Pulau Penglai** (rare): an immortal hermit's
+  trial for Dao Union+ → Air Mata Air Penglai (+large comprehension, once).
+- **Sea monsters** (D, entity only, ≤ `monstersPerPlayer` 4, tiered by distance from the origin: rings of 1 000 b from
+  Golden Core to Immortal Ascension): Ular Laut Raksasa (a segmented serpent drawn with the spine's `SegmentChain`),
+  Kepiting Batu Raksasa, Yaksha Laut.
+- **Balance**: Golden Core-Immortal Ascension.
+- **Visuals**: horizon haze planes, island qi glow, the gate whirlpool (reusing the public `client/abadi/VortexRenderer`
+  if its draw entry is public; else D's own quads), the turtle's island 60 / 150 / 300 display blocks.
+- **Config** `dimensi`: `sea` true, `seaMinRealm` "golden_core", `monstersPerPlayer` 4, `turtle` true,
+  `palaceMinRealm` "deity_transformation".
+- **Uji**: `uji laut masuk`, `uji laut pulang`, `uji laut pulau cari <herba|pertapa|pasar|karang>`, `uji laut istana
+  cari`, `uji laut monster <ular|kepiting|yaksha> [tingkat]`, `uji laut penyu`, `uji laut penglai`, `uji laut pusaran
+  cari`.
+- **Panduan**: `c14.laut` (adv `dunia/sea_arrived`), `c14.istana` (adv `dunia/dragon_king`).
+
+#### 34.5.15 Kapal Terbang Sekte (56, module T)
+
+- **Sumber** (`kultivator.kapal.kapal.source`): "Sumber: A Record of a Mortal's Journey to Immortality: Immortal Realm,
+  bab 567 'Pursuit': Batu Asal Abadi dipasang pada formasi untuk menggerakkan kereta terbang. Terinspirasi dari kisah
+  kereta terbang orang negeri Qigong yang mengikuti angin dalam Bowuzhi karya Zhang Hua. Kapal, kecepatan dan angkanya
+  rancangan game."
+- **Classes**: **Perahu Awan** (personal, 2 seats, Golden Core), **Kapal Sekte** (8 seats, Nascent Soul and a sect hall
+  of level ≥ 3), **Bahtera Langit** (12 seats, armoured, Deity Transformation and hall level ≥ 7). Item **Lunas Kapal
+  Roh** per class (recipes in `data/kultivator/recipe/dunia/kapal_*.json` from existing materials: planks, High stones,
+  a formation eye for the larger classes). Using it on open ground with room launches the ship; it docks back into the
+  item on "Simpan" at the helm (the ship's hold content and hull state ride in the item's components).
+- **Entities** (T): `kultivator:kapal_roh` (root: synced class, heading, speed, hull, banner colour), `kapal_kursi`
+  (passenger seats, up to 12), `kapal_dek` (deck colliders 3 × 0.5 × 3, ≤ 10, only while docked: hovering ≤ 3 b over
+  ground or water and still for 2 s; during flight everyone is seated). Model: `tools/gen_dunia_kapal.py` builds each
+  hull with `structgen.Piece` and exports a display list `assets/kultivator/dunia/kapal/<class>.json` (block states
+  and offsets merged into runs, sail quads, lantern points); the client draws the runs with the block renderer: 60 / 150
+  / 300 runs, beyond 64 b the Minimal set, beyond 160 b a silhouette quad.
+- **Flight**: the captain at the helm: W/S speed, A/D turn, Space up, Sneak down (an input payload every 2 ticks); the
+  server moves the root, seats follow. Top speed 12 / 16 / 20 b per s by class (`maxSpeed` caps; the MSPT guard halves
+  it). Fuel in the 9-slot hold: Low stone 60 s, Mid 10 min, High 2 h, Supreme 24 h, Batu Meteor Roh 4 min, Batu Asal
+  Abadi 6 h (in Alam Abadi).
+- **Long journeys**: "Berlayar ke…" from the map (a marker or waypoint): autopilot at cruise height (terrain + 40, ≥
+  y 180). When the remaining distance is > 1 500 b, **Lompatan Awan**: every 30 s a 512 b leap: a client `CloudWipe`
+  (Kamera Mati: a plain fade), `DuniaTickets.touch` at the landing chunk, ≤ 40 ticks wait for the chunk, then the root
+  moves with its passengers (T verifies how 26.3 teleports a vehicle with passengers; else dismount, move, remount in
+  one tick); fuel ×1.5 for the leap distance. Arrival: DuniaScenes beat 45 (a 2 s pull-back shot, Penuh only) and the
+  `VOYAGE` event. Destinations: markers, waypoints, the own sect hall, and the routes other modules register (D's
+  `laut`).
+- **Danger**: on journeys > 2 000 b, `pirateChance` 15 % of **Bajak Langit**: the ship halts, the deck appears, a band
+  boards (`RivalService.ambush` when K is on, else `musuh/RogueCultivators.spawnBand`). Hull HP 200 / 400 / 800; pirate
+  skills can hit the hull; at 0 the ship sets down safely (no block touched) as **Rusak** and needs a repair (planks +
+  stones at the helm). Seated disciples in FOLLOW fly along.
+- **Visuals**: sail flutter quads, a stern qi engine glow (4 / 10 / 20 particles per s), lantern glows, a cloud wake
+  (30 / 80 / 160 quads), the sect banner colours.
+- **Config** `kapal`: `ships` true, `maxSpeed` 20 (8-24), `cloudLeap` true, `leapDistance` 512 (256-1024), `pirates`
+  true, `pirateChance` 0.15, `fuelScale` 1.0, `deckWalk` true.
+- **Uji**: `uji kapal beri <perahu|sekte|bahtera>`, `uji kapal panggil`, `uji kapal bahan_bakar <menit>`, `uji kapal
+  lompat <x> <z>`, `uji kapal bajak`, `uji kapal rusak|perbaiki`, `uji kapal hapus`.
+- **Panduan**: `c13.kapal` (adv `dunia/ship_launched`), `c14.pelayaran` (adv `dunia/ship_voyage`, a voyage > 3 000 b).
+
+#### 34.5.16 Peta Dunia Kultivasi (67, module T)
+
+- **Sumber** (`kultivator.peta.peta.source`): "Sumber: Shan Hai Jing, geografi mitos yang mencatat gunung demi gunung
+  dan laut demi laut beserta penghuninya. Terinspirasi dari Alam Gunung dan Laut dengan sembilan gunung dan sembilan
+  lautnya di I Shall Seal the Heavens. Gaya peta, kabut dan wilayah sekte rancangan game."
+- **Opened from**: the hub Dunia section card **Peta Dunia** (34.6 T: `HubCards`), the `peta` key (unbound by default,
+  like `dunia`), `/kultivasi peta`, and the **Peta Dunia** scroll item (paper + ink sac + a Low stone).
+- **Base map**: an ink-wash parchment painted from a coarse biome grid. The server samples biomes by noise only (the
+  biome source with the level's `RandomState` sampler; T verifies the accessors, no chunk load), one sample per
+  `cellSize` 64 b cell, ≤ `samplesPerTick` 128, cached in SavedData `kultivator:peta` (1 byte per cell) and sent in
+  regions of 32 × 32 cells (≈ 1 KB) on request. Biome → ink table (water wash, forest dots, mountain strokes, desert
+  ochre, snow white).
+- **Fog of war**: explored cells per player and dimension (RLE bitset in `extra.peta`), marked when the player is within
+  96 b of a cell centre (every 40 ticks); shared with sect mates (`shareWithSect`).
+- **Markers**: the player's known sites (34.4.8 icons), live markers (treasure births with a rainbow ring, meteor
+  landings, dragons seen in the last 10 minutes), waypoints (≤ 32, name and colour), own ships, return points and the
+  soul's body (63).
+- **Sect territories**: every hall the player knows (own, sect mates', seen) as a translucent disc of
+  `SectBuild.territoryRadius(owner)` around the hall (positions from `Halls`' public readers; T verifies), vassal
+  villages (`Vassals`), and **NPC sect domains**: `npcDomains` 8 seeded lore regions with inked borders and seals,
+  aligned with K's rival groups (names through `RivalService.name`, else T's own seeded names); a town inside a domain
+  shows its guardian sect.
+- **Overlays** (coins): Cuaca Roh (L cells near the player), Peristiwa Langit (the next / active event), Segel (prison
+  integrity colours), Jalur Kapal (the planned voyage line).
+- **Use**: drag to pan, wheel for three zooms (1 px = 16 / 64 / 256 b), a marker card (name, tier, distance, Sumber line,
+  "Berlayar ke sini" for a captain, "Tandai"), search. Undiscovered sites never show. A **Gulungan Penunjuk** reveals the
+  nearest undiscovered site of a kind (`DuniaSites.locate`). Two players holding maps who right-click each other merge
+  their known sites (not their fog).
+- **Weak laptop**: one 512 × 512 `DynamicTexture` rebuilt only when regions arrive or the zoom changes; markers are GUI
+  fills; nothing is drawn in the world.
+- **Config** `peta`: `map` true, `cellSize` 64 (32-256), `samplesPerTick` 128 (16-512), `waypoints` 32, `npcDomains` 8,
+  `shareWithSect` true.
+- **Uji**: `uji peta ungkap <radius>`, `uji peta situs semua`, `uji peta reset`, `uji peta domain`, `uji peta sampel`.
+- **Panduan**: `c13.peta` (manual tick or adv `dunia/map_opened`), `c13.situs` (adv `dunia/sites_5`).
+
+### 34.6 Modules (exactly six, disjoint files)
+
+Common to all: server package `dev.kultivator.dunia.<pkg>`, client package `dev.kultivator.client.dunia.<pkg>`, one init
+class each (server `<Name>.init()`, client `<Name>Client.init()`) wired by the module's own line in `DuniaContent` /
+`DuniaContentClient`; its own payloads (`PayloadTypeRegistry.playS2C/playC2S` in its init, receivers in its client
+init), entities (`<Name>Entities`), items (`<Name>Items`, loaded before `ModItems.init()` because `DuniaContent.init()`
+runs before it), config section, `DuniaCommands.test(...)` nodes, advancements `data/kultivator/advancement/dunia/<id>.json`
+with the ids listed in 34.5, textures `assets/kultivator/textures/dunia/<pkg>/**`, generators
+`tools/gen_dunia_<pkg>*.py`. A module may **read** any public API of earlier phases; it edits only the files listed as
+its own. Lang keys are prefixed `kultivator.<pkg>.*` (no prefix of 34.1's list is taken: checked against every
+fragment) plus `item.kultivator.<id>`, `entity.kultivator.<id>`, `advancement.kultivator.dunia.<id>` and the help topic
+keys of its topics.
+
+#### Module K: Kota & NPC (53, 54, 61, 66) + the spine
+
+- Packages: `dev.kultivator.dunia` (spine, 34.4) + `dunia.api`, `dev.kultivator.dunia.kota`;
+  client `client.dunia` (spine: `DuniaSpineClient`, `DuniaScenes`, `SegmentChain`), `client.dunia.kota`.
+- Files: everything in those packages; `dunia/DuniaContent.java` and `client/dunia/DuniaContentClient.java` (their
+  spine line + the K line); one additive method in `client/epic/EpicDirector.java` (`worldScene`, 34.4.9); one group in
+  `command/CheatHelp.java` (`jelajah`, 34.4.6); `tools/gen_dunia_kota.py`, `tools/gen_dunia_kota_textures.py`.
+- Entities: `dunia_anchor` (spine), `kultivator_npc` (roles of 34.5.1-34.5.4), the black-market door
+  (`kota_pintu`, a W2 door: collider + Displays).
+- Items: `token_pasar_gelap`, `teh_embun_pagi`, `teh_awan_ungu`, `teh_penenang_hati`, `kantong_saingan`,
+  `lencana_pengembara`, `persik_abadi`, `catatan_pengembara`.
+- Screens: `KotaScreen` (shop, Lelang, Kedai Teh, Pasar Gelap, Papan Misi tabs), `PertemuanScreen` (wanderer).
+- Data: `structure/kota/**`, `structure/kota_abadi/**`, `worldgen/{structure,template_pool,processor_list}/kota/**`,
+  `tags/worldgen/biome/has_structure/kota/*`, `tags/worldgen/structure/kota.json`, `resourcepacks/dunia_kota/**`,
+  loot tables `loot_table/chests/dunia/kota/*`.
+- Lang: `lang-src/dunia_luas.*` (spine, cheat group, generic jelajah texts), `lang-src/dunia_kota.*`.
+- Config: `umum` (spine), `kota`. Uji: `jelajah`, `struktur`, `kota`, `pengembara`, `saingan`, `kota_abadi`.
+- Help topics (texts in `dunia_kota`): `kota`, `pengembara`, `saingan`, `kota_abadi`.
+- Implements `RivalService`; fires `SITE_DISCOVERED`; listens `TREASURE_BORN`, `TREASURE_CLAIMED`, `SKY_EVENT`,
+  `SEAL_CHANGED`, `BEAST_EVOLVED`, `VOYAGE`. Handles anchor module `kota` (also the `kota/*` anchors D places on Pulau
+  Pasar).
+- `SegmentChain` (client spine, used by B and D): `SegmentChain(int maxSegments, float spacing)`, `void push(Vec3 head,
+  float yaw, float pitch)`, `int segments()` (LOD by `EffectQuality` and distance), `Pose pose(int i, float partial)`.
+
+#### Module R: Reruntuhan, Penjara & Menara (55, 62, 65)
+
+- Packages: `dev.kultivator.dunia.reruntuhan` (+ `.gua`, `.penjara`, `.menara`); client `client.dunia.reruntuhan`.
+- Files: those packages; `tools/gen_dunia_reruntuhan.py` (all three structure families + the tower's lobby),
+  `tools/gen_dunia_reruntuhan_textures.py`; its line in each `DuniaContent*` file.
+- Entities: puzzle parts (`teka_plat`, `teka_lampu`, `teka_cincin`, `teka_dinding`, `teka_timbangan`), `gerbang_segel`,
+  `sisa_jiwa`, `bayangan` (mirror shadow / floor-100 shadow), `boneka_batu`, `raja_iblis` (three kinds), `iblis_kecil`,
+  `penjaga_lantai` (ten kinds), `segel_jimat` (the pillar talismans).
+- Items: `sobekan_segel`, `inti_iblis_kuno`, `kitab_formasi_kuno`.
+- Data: `structure/{reruntuhan,penjara,menara}/**`, `worldgen/*/{reruntuhan,penjara,menara}/**`, `dimension/menara.json`,
+  `dimension_type/menara.json`, `worldgen/biome/menara_dalam.json`, `resourcepacks/dunia_reruntuhan/**`, loot tables.
+- Lang: `lang-src/dunia_reruntuhan.*`. Config: `reruntuhan`. Uji: `gua`, `penjara`, `menara`.
+- Help topics: `gua_leluhur`, `penjara_iblis`, `menara_seratus`.
+- Implements `SealService`; fires `SEAL_CHANGED`; listens `SKY_EVENT`, `TREASURE_BORN` (a birth inside a ruin's radius
+  wakes its guardian). Uses `TreasureService.spawn` (a re-sealed prison births a T3 treasure at its shrine).
+
+#### Module L: Langit & Cuaca (59, 60, 68)
+
+- Packages: `dev.kultivator.dunia.langit`; client `client.dunia.langit`.
+- Files: that package; ONE additive hook in `cultivation/SpiritSites.java` (`addSiteProvider` + `ExtraSite`, 34.5.10;
+  the existing enum, numbers and cache stay); `tools/gen_dunia_langit_textures.py` (meteor streak, moon discs, pillar
+  gradient, mist plane, lotus); its line in each `DuniaContent*` file.
+- Entities: `meteor_roh`, `harta_lahir`.
+- Items: `batu_meteor_roh`, `embun_roh`.
+- Lang: `lang-src/dunia_langit.*`. Config: `langit`. Uji: `langit`, `harta_lahir`, `cuaca`.
+- Help topics: `peristiwa_langit`, `harta_lahir`, `cuaca_roh`.
+- Implements `SkyService`, `TreasureService`; fires `TREASURE_BORN`, `TREASURE_CLAIMED`, `SKY_EVENT`, `WEATHER_CHANGED`.
+
+#### Module B: Naga & Binatang (57, 58)
+
+- Packages: `dev.kultivator.dunia.naga`; client `client.dunia.naga`.
+- Files: that package; `beast/BeastData.java`, `beast/SpiritBeasts.java`, `client/beast/BeastClient.java` (34.5.12
+  edits); `tools/gen_dunia_naga_models.py` (head, body, claw, fin, whiskers, horns, mane, wings, fox tails, wolf halo item
+  models under `models/item/fx/naga/*` + `items/fx/naga/*` definitions + textures); its line in each `DuniaContent*`.
+- Entities: `naga_liar`, `kesengsaraan_binatang` (the strike telegraph host, never saved).
+- Items: `selendang_pengikat_naga`, `sisik_jiao`, `mutiara_jiao`, `mutiara_naga_jinak`.
+- Lang: `lang-src/dunia_naga.*` (also the new tier titles `kultivator.beasts.title.<line>.<tier>` for tiers 4-6 and
+  the Jiao line: new keys, so they live here, not in `beasts.*`). Config: `naga`. Uji: `naga`, `evolusi`.
+- Help topics: `naga_liar`, `evolusi_binatang`.
+- Implements `BeastEvolutionService`; fires `BEAST_EVOLVED`; listens `SKY_EVENT`, `WEATHER_CHANGED`.
+
+#### Module D: Dimensi baru (63 Dunia Bawah, 64 Laut Tanpa Batas)
+
+- Packages: `dev.kultivator.dunia.dimensi` (+ `.bawah`, `.laut`); client `client.dunia.dimensi`.
+- Files: those packages; `tools/gen_dunia_dimensi.py` (shrine, Yama court, ghost villages, sea gate, islands, palace,
+  Penglai) and `tools/gen_dunia_dimensi_textures.py`; its line in each `DuniaContent*` file.
+- Entities: `arwah` (roles MENG_PO, HAKIM, KEPALA_LEMBU, MUKA_KUDA, ARWAH, HANTU_LAPAR), `yaksha`, `ular_laut`,
+  `kepiting_batu`, `penyu_ao` (+ its deck colliders), `raja_naga`.
+- Items: `dupa_arwah`, `lentera_arwah`, `mutiara_penunjuk_laut`, `mutiara_penghindar_air`, `mutiara_naga`,
+  `air_mata_air_penglai`, `surat_arwah`.
+- Data: `dimension/{dunia_bawah,laut_tanpa_batas}.json`, `dimension_type/*`, `worldgen/biome/{huangquan,wangchuan,
+  hutan_arwah,dataran_cermin,laut_roh}.json`, `worldgen/noise_settings/dunia_bawah.json` (+ its material rule if 26.3
+  keeps material rules in their own registry folder; D verifies the folder name), `structure/{bawah,laut}/**`,
+  `worldgen/*/{bawah,laut}/**`, the overworld sets (`kuil_gerbang_hantu`, `pusaran_laut`) in
+  `resourcepacks/dunia_dimensi/**`, the dimension sets in base data.
+- Lang: `lang-src/dunia_dimensi.*`. Config: `dimensi`. Uji: `bawah`, `laut`.
+- Help topics: `dunia_bawah`, `laut_tanpa_batas`.
+- Implements `SoulService`; fires `SOUL_JOURNEY`; registers the `laut` route through `RouteService`; listens
+  `SKY_EVENT`, `VOYAGE`. Places `kota/*` anchors on Pulau Pasar (handled by K).
+
+#### Module T: Kapal & Peta (56, 67) + the hub, guide and help entries
+
+- Packages: `dev.kultivator.dunia.kapal`, `dev.kultivator.dunia.peta`; client `client.dunia.kapal`, `client.dunia.peta`.
+- Files: those packages; new `client/hub/HubCards.java` (the card registry:
+  `register(int section, String id, int glyph, @Nullable Supplier<Component> lock, Runnable action)`,
+  `List<Extra> of(int section)`) and ONE loop at the end of `HubCardsPage.build()`'s section switch adding the extras
+  (`client/screen/HubCardsPage.java`, keys follow its existing card key format); `guide/GuideChapters.java` (chapters
+  13 and 14 appended, `CHAPTER_COUNT` 14, 34.9); `client/screen/HelpPage.java` (the 34.6 topic ids appended to
+  `TOPICS` in one block "Phase 34"); `tools/gen_dunia_kapal.py` (hulls → display lists), `tools/gen_dunia_peta_textures.py`
+  (parchment, ink brushes, the marker atlas of 34.4.8); its line in each `DuniaContent*` file.
+- Entities: `kapal_roh`, `kapal_kursi`, `kapal_dek`.
+- Items: `lunas_perahu_awan`, `lunas_kapal_sekte`, `lunas_bahtera_langit`, `peta_dunia`, `gulungan_penunjuk`.
+- Key: `key.kultivator.peta` (unbound, the 33.4 rule: reachable from the hub).
+- Lang: `lang-src/dunia_kapal.*`, `lang-src/dunia_peta.*`, `lang-src/dunia_panduan.*` (every `kultivator.guide.c13.*`,
+  `c14.*` and `chapter.13/14` key). Config: `kapal`, `peta`. Uji: `kapal`, `peta`.
+- Help topics: `kapal_terbang`, `peta_dunia`, `dunia_luas` (the overview).
+- Implements `RouteService`; fires `VOYAGE`; listens every event for the map. Registers the hub card "Peta Dunia" in
+  DUNIA. Others may register at most one card each through `HubCards` from their client init: R "Menara Seratus"
+  (DUNIA), K "Kota Abadi" (KEABADIAN, the 33.3 ascent lock). DUNIA then has ≤ 6 cards and KEABADIAN 8; both fit the
+  320 × 240 grid of `layoutCards`.
+
+### 34.7 Order of work and contracts
+
+1. **K lands the spine** (34.4) first: exact signatures, `dunia/api` interfaces with no-op defaults, `DuniaEvents`,
+   `DuniaMarkers` table, `EpicDirector.worldScene`, `SegmentChain`, the `jelajah` cheat group, `dunia_luas` lang. Stubs
+   are fine where a body needs a later module.
+2. Then K, R, L, B, D, T in parallel, each on its own files only.
+3. One compile step after all six (`compileJava`, `compileClientJava`, `jar`, `--no-daemon`; never tests, `runClient` or
+   `build`), then `python tools/structgen_selftest.py <scratch>` and every `tools/gen_dunia_*.py` once (they must print
+   `structgen: N template(s) valid`).
+
+Contract ids (each owner implements, the others only call):
+
+| id | owner | contract |
+|---|---|---|
+| C34.S1 | K (spine) | anchors: `DuniaAnchors.register / loaded / protectedNear`, `AnchorHandler`, the entity NBT of 34.4.1 |
+| C34.S2 | K (spine) | sites: `DuniaSites.publish / publishLive / discover / known / near / locate`, `Site` |
+| C34.S3 | K (spine) | `DuniaEvents` (34.4.3 table), records `TreasureBirth`, `SkyKind`, `SpiritWeather` |
+| C34.S4 | K (spine) | `DuniaConfig.section`, `DuniaCommands.test / player`, `DuniaPacks.worldgen`, `DuniaTickets.touch`, `DuniaBudget` |
+| C34.S5 | K (spine) | `DuniaMarkers` kinds and icons index; `DuniaScenes.world` + `EpicDirector.worldScene`; `SegmentChain` |
+| C34.K1 | K | `RivalService`: groups, race, ambush, names (T's domains, L's guardians never need it) |
+| C34.R1 | R | `SealService`: integrity / broken per prison site id |
+| C34.L1 | L | `SkyService` + `TreasureService` (spawn / live / claim); `SpiritSites.addSiteProvider` is L's and only L calls it |
+| C34.B1 | B | `BeastEvolutionService` (tier, line, canEvolve, startTribulation, grantItem) |
+| C34.D1 | D | `SoulService.isSoul`; the `laut` route |
+| C34.T1 | T | `RouteService` (destinations, `aboard`); `HubCards.register`; guide chapters 13-14; help topic ids |
+
+Offerings across modules always have a documented fallback item (34.5.12) so every module works when another is off.
+
+### 34.8 Voices
+
+Reused (existing `VoiceEvents`, no new file): disciple voices m1-m3 / f1-f3 `greet`, `greet_alt`, `thanks`,
+`farewell`, `attack`, `careful`, `victory` for townsfolk, merchants, wanderers and immortals (voice index from the NPC's
+look seed); `elder.welcome`, `elder.advice`, `elder.inheritance` (ancestor remnant souls, the Penglai hermit, the Dao
+lecturer); `rogue.ambush`, `rogue.flee`, `rogue.defeat` (rival groups, sky pirates, black-market raids); `demon.laugh`,
+`demon.growl`, `demon.whisper`, `demon.death` (sealed demons); `boss.awaken`, `boss.taunt`, `boss.enraged`,
+`boss.defeat`, `boss.roar` (demon kings, floor guardians, Jiao roars, sea serpents); `heaven.witness`,
+`heaven.secret_realm`, `heaven.breakthrough` (sky omens, treasure births, beast evolution); grunts for fights. The
+`Voice.say / heavenNear / boom / ready` helpers rate-limit as today.
+
+New lines wanted (NOT added in this phase: `sounds.json` and `tools/gen_voices.py` are not edited; listed for the voice
+module; the caption key is `kultivator.voice.<key>`):
+
+| key | voice | caption (id_id) | Japanese line (VOICEVOX) |
+|---|---|---|---|
+| `kota.auction_open` | m2 (auctioneer) | "Lelang malam ini dimulai!" | 今宵の競売を始めます！ |
+| `kota.auction_sold` | m2 | "Terjual!" | 落札！ |
+| `kota.tea_welcome` | f1 (tea master) | "Silakan duduk, tehnya baru diseduh." | どうぞ、お茶が入りました。 |
+| `kota.black_whisper` | m3 (broker) | "Barang bagus… untuk orang yang tahu diam." | 良い品だ…口の堅い者にだけな。 |
+| `kota.guard_halt` | m1 (guard) | "Berhenti! Kota ini dilindungi sekte." | 止まれ！この町は宗門の庇護下にある。 |
+| `kota.wanderer_dao` | elder | "Jalan kita berbeda. Mari bertukar pandangan." | 道は違えど、語り合おうではないか。 |
+| `kota.rival_claim` | m3 | "Harta itu milik kami!" | その宝は我らのものだ！ |
+| `kota.immortal_scorn` | f3 | "Debu fana sampai juga ke sini?" | 凡塵の者がここまで来たか。 |
+| `penjara.free_at_last` | demon | "Akhirnya… bebas!" | ついに…自由だ！ |
+| `menara.next_floor` | heaven | "Naiklah, lantai berikutnya menanti." | 登れ。次の階が待っている。 |
+| `langit.treasure_born` | heaven | "Harta langit dan bumi telah lahir." | 天地の宝、ここに生まる。 |
+| `langit.blood_eclipse` | heaven | "Bulan berdarah… langit murka." | 血の月…天が怒っている。 |
+| `naga.subdued` | heaven | "Naga telah tunduk." | 龍、ここに伏す。 |
+| `bawah.meng_po_offer` | f3 (Meng Po) | "Minumlah, lupakan dukamu." | 飲みなさい。悲しみを忘れるのです。 |
+| `bawah.yama_judgement` | boss | "Timbang perbuatanmu di depan cermin!" | 鏡の前で己の業を量れ！ |
+| `bawah.ox_head` | m1 | "Arwah, ikut kami!" | 亡者よ、ついて来い！ |
+| `bawah.ghost_plea` | f2 | "Tolong… sampaikan pesanku." | どうか…言伝を。 |
+| `laut.dragon_king` | boss | "Siapa yang berani datang ke istanaku?" | 我が宮に参るは何者ぞ。 |
+
+Until they exist, the same moments use the reused lines above (captions stay text-only).
+
+### 34.9 Kitab Panduan: chapters 13 and 14 (module T writes them; texts in `dunia_panduan`)
+
+Appended after chapter 12 (saved manual ticks are by step id, so nothing shifts). Chapter 13 **Dunia yang Luas**
+(Qi Refining-Golden Core): `c13.peta` (manual; hint `/kultivasi peta`), `c13.kota` (`adv:dunia/kota_found`), `c13.teh`
+(`adv:dunia/kota_rumour`), `c13.lelang` (`adv:dunia/kota_auction`), `c13.pengembara` (`adv:dunia/wanderer_talk`),
+`c13.langit` (`adv:dunia/sky_event`), `c13.kabut` (`adv:dunia/qi_mist`), `c13.harta` (`adv:dunia/treasure_claimed`),
+`c13.gua` (`adv:dunia/ruin_cleared`), `c13.kapal` (`adv:dunia/ship_launched`). Chapter 14 **Ujung Dunia** (Nascent
+Soul-True Immortal): `c14.saingan` (`adv:dunia/rival_beaten`), `c14.menara` (`adv:dunia/tower_10`), `c14.bawah`
+(`adv:dunia/naihe_crossed`), `c14.naga` (`adv:dunia/dragon_subdued`), `c14.evolusi` (`adv:dunia/beast_tier_4`),
+`c14.laut` (`adv:dunia/sea_arrived`), `c14.penjara` (`adv:dunia/prison_sealed`), `c14.kota_abadi`
+(`adv:dunia/immortal_city`), `c14.pelayaran` (`adv:dunia/ship_voyage`), `c14.puncak` (`adv:dunia/tower_100`). 10 steps
+each (the 4-10 rule). Each module ships the advancements its steps check (frame `task`, hidden until the
+prerequisite realm, icons from the module's items; `docs/ADVANCEMENT_TEMPLATE.json`). Bodies use `[[key:<id>]]` tokens
+(33.6 R11), never a hard-coded key. The `c13.situs` idea of 34.5.16 becomes the advancement `dunia/sites_5` without a
+step.
+
+### 34.10 Uji (Indonesia)
+
+1. Dunia baru: dalam 3 000 blok ada Kota Kultivator (`uji kota cari`), gerbang paifang, tembok, balai lelang, kedai teh,
+   toko peti dengan tangga tersembunyi; tidak ada blok yang berubah saat berjalan di kota; dunia lama: kota hanya muncul
+   di chunk baru.
+2. NPC muncul saat pemain mendekat (≤ 10 per kota), hilang saat menjauh; F3 menunjukkan jumlah entitas stabil; laptop
+   Minimal tetap ≥ 40 FPS di alun-alun.
+3. Lelang senja: lima lot, empat penawar bernama saingan, tawaran usang ditolak, batu diambil hanya saat menang.
+4. Kedai teh: satu teh aktif; Kabar Angin menandai satu situs di Peta; pengembara duduk di kedai.
+5. Pasar gelap: pintu terbuka hanya dengan token (geseran pintu halus, tidak ada blok); razia 8 %; suap mengakhirinya.
+6. Pengembara: diskusi Dao 3 ronde, tanding berhenti di 10 % darah, tantang membuat ia bermusuhan; jurus area tidak
+   pernah mengenai NPC damai.
+7. `uji saingan perlombaan`: pilar pelangi, kelompok saingan turun dengan pedang, saling bertarung, mencoba mengambil
+   harta; setelah pemain menang, sergapan datang 60-300 detik kemudian di luar kota.
+8. Kota Abadi di Alam Abadi: kuliah Dao siang hari, persik tiap 3 hari, juru lelang membuka tab Lelang Abadi yang ada.
+9. Gua leluhur: enam jenis teka-teki dapat diselesaikan sendirian; salah langkah tidak pernah membunuh; pintu segel
+   bergeser (entitas); hadiah sekali per pemain.
+10. Penjara: segel turun saat Gerhana Darah; mencabut jimat memberi peringatan; segel pecah → sinematik singkat (bisa
+    dilewati) → raja iblis; menyalakan lima pilar menyegel ulang.
+11. Menara: masuk dari pagoda, lobi di dimensi menara, lantai 1-10 berbeda jenis; gagal = kembali ke lobi tanpa kehilangan
+    barang; `uji menara lantai 100` memunculkan Bayangan Diri.
+12. Langit: `uji langit meteor|gerhana|bulan_kembar` tampil benar dengan Sodium + Iris (shader aktif) dan tanpa shader;
+    cuaca vanilla dan waktu tidak berubah; tidak ada LightningBolt (cek penangkal petir tidak menyala).
+13. Harta lahir: pilar terlihat dari jauh (proyeksi langit), harta hanya ada saat pemain ≤ 64 blok, kanal 5 detik batal
+    saat terkena serangan.
+14. Kabut Qi: bonus situs tampil di daftar situs meditasi; total pengali tetap ≤ 3,5; HUD kabut lembut, tidak ada post
+    chain.
+15. Naga liar: `uji naga air lemah`, Selendang → pertarungan kehendak 8 detik; naga jinak bisa dipanggil, ditunggangi,
+    stamina habis lalu turun; tidak pernah merusak blok.
+16. Evolusi: `uji evolusi tribulasi lulus` pada serigala tingkat 3 → Serigala Bintang Perak; gagal tidak membunuh hewan;
+    Hu Fa menanggung 30 %; save lama tingkat 0-3 tetap.
+17. Dunia Bawah: dupa di kuil → tubuh jadi manekin, arwah tiba di teras; mati sebagai arwah → kembali ke tubuh 1 HP;
+    Meng Po, sepuluh pengadilan, logout saat arwah → login kembali di tubuh.
+18. Laut Tanpa Batas: masuk lewat pusaran atau kapal; pulau roh, Pulau Pasar berisi NPC kota, Istana Naga, penyu Ao
+    yang bisa diinjak.
+19. Kapal: luncurkan Perahu Awan, terbang WASD, berlabuh → dek bisa diinjak; Berlayar ke penanda jauh dengan Lompatan
+    Awan (wipe awan; Kamera Mati = fade); bajak langit 15 %; tidak ada chunk yang dipaksa termuat lebih dari 5 detik.
+20. Peta: kartu Peta Dunia di Gulungan › Dunia; kabut perang terbuka saat menjelajah; situs yang belum ditemukan tidak
+    tampil; wilayah sekte dan domain sekte NPC; tukar peta antarpemain.
+21. Kitab Panduan bab 13 dan 14 muncul setelah bab 12, centang lama tetap; Ensiklopedia memuat topik baru.
+22. Semua sakelar `config/kultivator-dunia.json` mematikan sistemnya; `worldgen false` → tidak ada struktur baru di chunk
+    baru; Mode Kehancuran tidak bisa merusak kota, istana Yama atau teka-teki (zona terlindung).
+23. `/kultivasi uji` dan `uji jelajah` menampilkan semua chip baru; semua perintah lama tetap bekerja.
+
+### 34.11 Verify before use (each module)
+
+- `ServerLevel.findNearestMapStructure` signature (spine), `BiomeSource.getNoiseBiome` + `RandomState.sampler()` access
+  from a `ServerLevel` (T), `ChunkGenerator.getBaseHeight` (L, as `ArrivalIsland` does).
+- Fabric: `ServerEntityEvents.ENTITY_LOAD / ENTITY_UNLOAD`, `ResourceLoader.registerBuiltinPack` pack folder
+  (`resourcepacks/<path>`), the built-in pack source's auto-add, the 26.3 world-render event (L's moon discs), the
+  living-entity feature-renderer registration callback (B), `EntityRenderers.register` (all), `HudElementRegistry`.
+- Vanilla: `Mannequin` profile / pose setters (D), `Cushion` seating (K), vehicle-with-passengers teleport (T),
+  `EntityType.Builder.clientTrackingRange(0)` + `noSave` (spine, K, R, D), `MinecraftServer` average tick time accessor
+  (spine), material-rule registry folder for `noise_settings` (D).
+- Mod: `EliteMonsters` public spawn entry (K bounties), `Comprehension` / `Enlightenment` / `HeartDemons` public adders
+  (K, D), `Sects` renown adder (R), `Halls` hall-position readers (T), `ImmortalPerks` cheat-death capacity (D),
+  `alam/WallGrid` visibility (R), `client/abadi/VortexRenderer` draw entry (D), `formasi` pattern-cost hook (R).

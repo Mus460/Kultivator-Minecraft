@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 340555,
+    "separation": 16,
+    "spacing": 40
+  },
+  "structures": [
+    {
+      "structure": "kultivator:reruntuhan/gua_kecil",
+      "weight": 1
+    }
+  ]
+}

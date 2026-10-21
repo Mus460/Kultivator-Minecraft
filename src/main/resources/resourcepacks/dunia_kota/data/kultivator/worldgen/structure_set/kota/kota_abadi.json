@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "kultivator:kota/kota_abadi",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 340566,
+    "spacing": 48,
+    "separation": 20
+  }
+}

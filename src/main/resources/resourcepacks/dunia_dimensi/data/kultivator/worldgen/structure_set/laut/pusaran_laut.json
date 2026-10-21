@@ -1,0 +1,19 @@
+{
+  "placement": {
+    "type": "kultivator:jauh_dari_pusat",
+    "salt": 340568,
+    "separation": 32,
+    "spacing": 80,
+    "min_chunks": 6,
+    "exclusion_zone": {
+      "other_set": "minecraft:ocean_monuments",
+      "chunk_count": 5
+    }
+  },
+  "structures": [
+    {
+      "structure": "kultivator:laut/pusaran_laut",
+      "weight": 1
+    }
+  ]
+}

@@ -47,7 +47,11 @@ final class HelpPage extends Page {
 			// Phase 9 (DESIGN 26.1): each module writes its own topic text; jalan_abadi is the glue's (P9-batin).
 			"alam_abadi", "batu_asal", "binatang_purba", "bencana_bintang", "murka_langit", "dunia_batin", "jurus_ciptaan", "lelang", "jalan_abadi",
 			// DESIGN 33 (UI/UX Terpadu): the Titah Langit menu.
-			"titah"};
+			"titah",
+			// Phase 34 (DESIGN 34.6): each module writes its own topic text; dunia_luas is module T's overview.
+			"dunia_luas", "kota", "pengembara", "saingan", "kota_abadi", "gua_leluhur", "penjara_iblis", "menara_seratus",
+			"peristiwa_langit", "harta_lahir", "cuaca_roh", "naga_liar", "evolusi_binatang", "dunia_bawah", "laut_tanpa_batas",
+			"kapal_terbang", "peta_dunia"};
 	private static final long HIGHLIGHT_MILLIS = 1000L;
 	private static final int COIN = 11;
 	private static final int COIN_GAP = 2;

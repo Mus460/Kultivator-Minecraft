@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.naihe_crossed.description"
+    },
+    "icon": {
+      "id": "kultivator:lentera_arwah"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.naihe_crossed.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

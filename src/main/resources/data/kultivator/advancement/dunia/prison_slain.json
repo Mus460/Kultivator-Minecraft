@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.prison_slain.description"
+    },
+    "icon": {
+      "id": "kultivator:inti_iblis_kuno"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.prison_slain.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

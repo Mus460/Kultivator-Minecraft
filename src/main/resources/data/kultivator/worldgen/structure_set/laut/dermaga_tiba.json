@@ -1,0 +1,11 @@
+{
+  "placement": {
+    "type": "minecraft:dimension_origin"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:laut/dermaga_tiba",
+      "weight": 1
+    }
+  ]
+}

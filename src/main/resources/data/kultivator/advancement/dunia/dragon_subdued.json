@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:beast_ascended",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.dragon_subdued.description"
+    },
+    "icon": {
+      "id": "kultivator:mutiara_naga_jinak"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.dragon_subdued.title"
+    },
+    "frame": "challenge",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

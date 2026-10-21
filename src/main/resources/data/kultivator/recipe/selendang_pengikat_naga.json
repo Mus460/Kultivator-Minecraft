@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "kultivator:spirit_tail_feather",
+    "kultivator:spirit_tail_feather",
+    "kultivator:spirit_tail_feather",
+    "kultivator:spirit_stone_high",
+    "kultivator:spirit_stone_high",
+    "kultivator:cold_ice_pearl"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:selendang_pengikat_naga"
+  }
+}

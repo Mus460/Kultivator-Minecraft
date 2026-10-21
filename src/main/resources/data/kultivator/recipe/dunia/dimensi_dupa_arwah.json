@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "kultivator:soul_nurturing_wood",
+    "kultivator:spirit_stone_mid",
+    "kultivator:spirit_stone_mid"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:dupa_arwah"
+  }
+}

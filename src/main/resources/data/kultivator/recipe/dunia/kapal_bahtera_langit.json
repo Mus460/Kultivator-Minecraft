@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "W": "minecraft:white_wool",
+    "E": "kultivator:formation_eye",
+    "S": "kultivator:spirit_stone_supreme",
+    "G": "minecraft:gold_block",
+    "B": "minecraft:deepslate_tiles",
+    "D": "minecraft:dark_oak_log"
+  },
+  "pattern": [
+    "WEW",
+    "SGS",
+    "BDB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kultivator:lunas_bahtera_langit"
+  }
+}

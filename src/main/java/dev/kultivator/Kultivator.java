@@ -141,6 +141,8 @@ public class Kultivator implements ModInitializer {
 		dev.kultivator.voice.Voices.init();
 		// Aura Kultivasi (DESIGN 31.6, C31.5): the preview payload, its ticker and the uji aura cleanup.
 		dev.kultivator.aura.AuraPreviews.init();
+		// Dunia Kultivasi yang Luas (DESIGN 34): the spine and the six world-content modules, before ModItems.init.
+		dev.kultivator.dunia.DuniaContent.init();
 		// After every module registered its items.
 		ModItems.init();
 		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its

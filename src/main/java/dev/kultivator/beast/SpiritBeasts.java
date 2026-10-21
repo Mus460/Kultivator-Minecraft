@@ -79,6 +79,12 @@ import java.util.UUID;
  * Nascent Soul. Each tier adds permanent health, bite, speed and size modifiers; tier 2 brings Moon Thunder (wolf) or
  * Foxfire (fox), tier 3 a blessing for the owner. Beasts only ever hurt what {@link Targeting} lets their owner hurt.
  * Spirit foxes follow and defend their owner (see {@link BeastAi}); wolves do that through vanilla.
+ * <p>
+ * Phase 34 (DESIGN 34.5.12, module B): tiers 4-6 (4 000 / 12 000 / 40 000 XP, owner at Deity Transformation / Immortal
+ * Ascension / True Immortal) never come by XP alone: the owner starts the Kesengsaraan Binatang Roh ({@code dunia.naga}) and
+ * a passed tribulation calls {@link #evolveTo}. Evolution listeners ({@link #addEvolutionListener}) hear every evolution
+ * (the bloodline arts, the advancements, {@code DuniaEvents.BEAST_EVOLVED}); a ready-but-waiting beast is announced once
+ * through {@link #addReadyListener}.
  */
 public final class SpiritBeasts {
 
@@ -115,15 +121,34 @@ public final class SpiritBeasts {
 	public static final Identifier ATTACK_ID = Kultivator.id("beast_attack");
 	public static final Identifier SPEED_ID = Kultivator.id("beast_speed");
 	public static final Identifier SCALE_ID = Kultivator.id("beast_scale");
-	private static final double[] HEALTH = {0.0D, 10.0D, 20.0D, 40.0D};
-	private static final double[] ATTACK = {0.0D, 2.0D, 4.0D, 8.0D};
-	private static final double[] SPEED = {0.0D, 0.10D, 0.20D, 0.30D};
-	private static final double[] SCALE = {0.0D, 0.0D, 0.10D, 0.20D};
+	// Tiers 4-6 (DESIGN 34.5.12): +70 / +110 / +160 health, +12 / +18 / +26 bite, +0.34 / +0.38 / +0.42 speed, +0.28 / +0.36 / +0.45 size.
+	private static final double[] HEALTH = {0.0D, 10.0D, 20.0D, 40.0D, 70.0D, 110.0D, 160.0D};
+	private static final double[] ATTACK = {0.0D, 2.0D, 4.0D, 8.0D, 12.0D, 18.0D, 26.0D};
+	private static final double[] SPEED = {0.0D, 0.10D, 0.20D, 0.30D, 0.34D, 0.38D, 0.42D};
+	private static final double[] SCALE = {0.0D, 0.0D, 0.10D, 0.20D, 0.28D, 0.36D, 0.45D};
 
 	private static final Identifier HEART_DEMON = Kultivator.id("heart_demon");
 
-	private static final int[] WOLF_COLORS = {0xCFE6FF, 0x9FD0FF, 0x8FB4FF, 0xFFF1C2};
-	private static final int[] FOX_COLORS = {0xFFC48A, 0xFF9E50, 0x7FE8FF, 0xFFD54A};
+	// Tier 4 star silver, 5 the Tiangou's pale moon, 6 the eclipse gold; fox: Qingqiu moon silver, heavenly white gold, gold.
+	private static final int[] WOLF_COLORS = {0xCFE6FF, 0x9FD0FF, 0x8FB4FF, 0xFFF1C2, 0xD8E4FF, 0xEAF2FF, 0xFFC850};
+	private static final int[] FOX_COLORS = {0xFFC48A, 0xFF9E50, 0x7FE8FF, 0xFFD54A, 0xC8DAFF, 0xFFF2C8, 0xFFB830};
+	// A Jiao: jade (tier 3), horned azure, true-dragon gold, Yinglong white gold.
+	private static final int[] JIAO_COLORS = {0x9FE8D0, 0x9FE8D0, 0x9FE8D0, 0x9FE8D0, 0x7FD8FF, 0xFFD54A, 0xFFF4C8};
+
+	/** Told after every evolution (a real one or a debug tier change); register from a module's init. */
+	@FunctionalInterface
+	public interface EvolutionListener {
+		void onEvolved(Mob beast, BeastData before, BeastData after, @Nullable ServerPlayer owner, boolean celebrate);
+	}
+
+	/** Told once per session when a beast has the XP and the owner's realm for a tribulation tier (4-6) and waits for it. */
+	@FunctionalInterface
+	public interface ReadyListener {
+		void onReady(Mob beast, BeastData data, ServerPlayer owner);
+	}
+
+	private static final List<EvolutionListener> EVOLUTION_LISTENERS = new java.util.concurrent.CopyOnWriteArrayList<>();
+	private static final List<ReadyListener> READY_LISTENERS = new java.util.concurrent.CopyOnWriteArrayList<>();
 
 	/** Beast UUID -> game time of the last pill it digested. */
 	private static final Map<UUID, Long> LAST_PILL = new HashMap<>();
@@ -218,6 +243,62 @@ public final class SpiritBeasts {
 		}
 		beast.setAttached(BeastData.TYPE, data.withXp(data.xp() + amount));
 		checkEvolution(beast, owner(beast, data));
+		return beast.getAttached(BeastData.TYPE);
+	}
+
+	/** Adds a listener told after every evolution (DESIGN 34.5.12). */
+	public static void addEvolutionListener(EvolutionListener listener) {
+		if (listener != null) {
+			EVOLUTION_LISTENERS.add(listener);
+		}
+	}
+
+	/** Adds a listener told when a beast waits for its tribulation (DESIGN 34.5.12). */
+	public static void addReadyListener(ReadyListener listener) {
+		if (listener != null) {
+			READY_LISTENERS.add(listener);
+		}
+	}
+
+	/**
+	 * Awakens {@code mob} for {@code player} without a pill (test commands, DESIGN 34.5.12 {@code uji evolusi garis}):
+	 * a wolf the player tamed or any fox. True when it is (or already was) the player's spirit beast.
+	 */
+	public static boolean awakenFor(ServerPlayer player, Mob mob) {
+		BeastData data = mob.getAttached(BeastData.TYPE);
+		if (data != null) {
+			return data.ownedBy(player);
+		}
+		int kind = BeastData.kindOf(mob);
+		boolean eligible = mob instanceof Fox || mob instanceof Wolf wolf && wolf.isTame() && wolf.isOwnedBy(player);
+		if (kind < 0 || !eligible) {
+			return false;
+		}
+		awaken(player, mob, kind);
+		return true;
+	}
+
+	/** The online owner of an awakened beast (any dimension), or null. */
+	public static @Nullable ServerPlayer ownerOf(Mob beast) {
+		BeastData data = beast.getAttached(BeastData.TYPE);
+		return data == null ? null : owner(beast, data);
+	}
+
+	/**
+	 * Raises (or for tests lowers) an awakened wolf or fox to {@code tier} (0-6) with the full evolution: stats, title,
+	 * cinematic and messages when it rises. The XP is raised to the tier's threshold when lower, never lowered (a test
+	 * that lowers the tier sets it exactly). The Kesengsaraan Binatang Roh calls this after its last strike. Returns the
+	 * data afterwards, or null for anything that is not an awakened beast.
+	 */
+	public static @Nullable BeastData evolveTo(Mob beast, int tier, boolean celebrate) {
+		BeastData data = beast.getAttached(BeastData.TYPE);
+		if (data == null) {
+			return null;
+		}
+		int target = Math.max(0, Math.min(BeastData.TOP_TIER, tier));
+		double xp = target < data.tier() ? BeastData.TIER_XP[target] : Math.max(data.xp(), BeastData.TIER_XP[target]);
+		BeastData after = data.withTier(target).withXp(xp);
+		evolve(beast, data, after, owner(beast, after), celebrate && target > data.tier());
 		return beast.getAttached(BeastData.TYPE);
 	}
 
@@ -351,7 +432,11 @@ public final class SpiritBeasts {
 	/** Evolves the beast as far as its XP and its (online) owner's realm allow; tells the owner what is missing. */
 	private static void checkEvolution(Mob beast, @Nullable ServerPlayer owner) {
 		BeastData data = beast.getAttached(BeastData.TYPE);
-		if (data == null || data.tier() >= BeastData.MAX_TIER || owner == null) {
+		if (data == null || owner == null) {
+			return;
+		}
+		if (data.tier() >= BeastData.MAX_TIER) {
+			checkTribulationReady(beast, data, owner);
 			return;
 		}
 		int tier = data.tier();
@@ -373,6 +458,34 @@ public final class SpiritBeasts {
 	}
 
 	/**
+	 * Tiers 4-6 (DESIGN 34.5.12): with the XP and the owner's realm the beast waits for its tribulation; the owner is told
+	 * once per session (the listeners say how to start it), or once that the realm is still missing.
+	 */
+	private static void checkTribulationReady(Mob beast, BeastData data, ServerPlayer owner) {
+		if (!data.nextNeedsTribulation() || data.xp() < BeastData.TIER_XP[data.tier() + 1]) {
+			return;
+		}
+		int next = data.tier() + 1;
+		Realm needed = BeastData.TIER_REALM[next];
+		if (!Cultivators.get(owner).realm().atLeast(needed)) {
+			if (NOTIFIED.add(beast.getUUID() + ":" + next)) {
+				Msg.chat(owner, Component.translatable("kultivator.beasts.evolve.blocked", beast.getDisplayName(), next,
+						needed.displayName()).withStyle(ChatFormatting.YELLOW));
+			}
+			return;
+		}
+		if (NOTIFIED.add(beast.getUUID() + ":ready:" + next)) {
+			for (ReadyListener listener : READY_LISTENERS) {
+				try {
+					listener.onReady(beast, data, owner);
+				} catch (RuntimeException exception) {
+					Kultivator.LOGGER.warn("A spirit beast ready listener failed", exception);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Applies a new tier: stats (healed to full when it rises), the tier title as name when the beast still carries one
 	 * of our titles, and for a real evolution the cinematic, sounds, the owner's title screen, new abilities and
 	 * advancements.
@@ -384,6 +497,14 @@ public final class SpiritBeasts {
 		rename(beast, after);
 		for (int tier = before.tier() + 1; tier <= after.tier(); tier++) {
 			NOTIFIED.remove(beast.getUUID() + ":" + tier);
+			NOTIFIED.remove(beast.getUUID() + ":ready:" + tier);
+		}
+		for (EvolutionListener listener : EVOLUTION_LISTENERS) {
+			try {
+				listener.onEvolved(beast, before, after, owner, celebrate);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("A spirit beast evolution listener failed", exception);
+			}
 		}
 		if (!celebrate || !(beast.level() instanceof ServerLevel level)) {
 			return;
@@ -441,7 +562,7 @@ public final class SpiritBeasts {
 
 	/** Sets the permanent tier modifiers (health, bite, speed, size); heals to full when asked, else clamps health. */
 	public static void applyStats(LivingEntity beast, int tier, boolean heal) {
-		int index = Math.max(0, Math.min(BeastData.MAX_TIER, tier));
+		int index = Math.max(0, Math.min(BeastData.TOP_TIER, tier));
 		setModifier(beast, Attributes.MAX_HEALTH, HEALTH_ID, HEALTH[index], AttributeModifier.Operation.ADD_VALUE);
 		setModifier(beast, Attributes.ATTACK_DAMAGE, ATTACK_ID, ATTACK[index], AttributeModifier.Operation.ADD_VALUE);
 		setModifier(beast, Attributes.MOVEMENT_SPEED, SPEED_ID, SPEED[index], AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
@@ -658,13 +779,13 @@ public final class SpiritBeasts {
 
 	/** Colour of a beast's aura / cinematic at a tier (pale moon blue to heavenly gold; fox amber, soul fire, gold). */
 	public static int tierColor(int kind, int tier) {
-		int index = Math.max(0, Math.min(BeastData.MAX_TIER, tier));
-		return kind == BeastData.FOX ? FOX_COLORS[index] : WOLF_COLORS[index];
+		int index = Math.max(0, Math.min(BeastData.TOP_TIER, tier));
+		return kind == BeastData.FOX ? FOX_COLORS[index] : kind == BeastData.JIAO ? JIAO_COLORS[index] : WOLF_COLORS[index];
 	}
 
 	// ================================================================== commands
 
-	/** {@code beast list} for players; {@code debug beast xp <amount>} and {@code debug beast tier <0-3>}. */
+	/** {@code beast list} for players; {@code debug beast xp <amount>} and {@code debug beast tier <0-6>}. */
 	public static void addCommands(LiteralArgumentBuilder<CommandSourceStack> root, LiteralArgumentBuilder<CommandSourceStack> debug) {
 		root.then(Commands.literal("beast")
 				.then(Commands.literal("list").executes(ctx -> list(ctx.getSource(), ctx.getSource().getPlayerOrException()))));
@@ -673,7 +794,7 @@ public final class SpiritBeasts {
 						.then(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D))
 								.executes(ctx -> debugXp(ctx, DoubleArgumentType.getDouble(ctx, "amount")))))
 				.then(Commands.literal("tier")
-						.then(Commands.argument("tier", IntegerArgumentType.integer(0, BeastData.MAX_TIER))
+						.then(Commands.argument("tier", IntegerArgumentType.integer(0, BeastData.TOP_TIER))
 								.executes(ctx -> debugTier(ctx, IntegerArgumentType.getInteger(ctx, "tier"))))));
 	}
 
@@ -733,7 +854,7 @@ public final class SpiritBeasts {
 			return 0;
 		}
 		// Exactly the tier's XP, so the next check neither undoes a lowered tier nor climbs further on its own.
-		BeastData after = data.withTier(tier).withXp(BeastData.TIER_XP[Math.max(0, Math.min(BeastData.MAX_TIER, tier))]);
+		BeastData after = data.withTier(tier).withXp(BeastData.TIER_XP[Math.max(0, Math.min(BeastData.TOP_TIER, tier))]);
 		evolve(beast, data, after, owner(beast, after), after.tier() > data.tier());
 		ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.beasts.debug.tier", beast.getDisplayName(),
 				after.tier())), false);

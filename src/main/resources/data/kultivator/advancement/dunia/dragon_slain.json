@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:beast_ascended",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.dragon_slain.description"
+    },
+    "icon": {
+      "id": "kultivator:sisik_jiao"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.dragon_slain.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

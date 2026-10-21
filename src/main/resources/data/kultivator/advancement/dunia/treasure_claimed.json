@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.treasure_claimed.description"
+    },
+    "icon": {
+      "id": "kultivator:spirit_stone_supreme"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.treasure_claimed.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

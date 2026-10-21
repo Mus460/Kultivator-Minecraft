@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.dragon_king.description"
+    },
+    "icon": {
+      "id": "kultivator:mutiara_naga"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.dragon_king.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

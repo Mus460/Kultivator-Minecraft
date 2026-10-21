@@ -241,6 +241,30 @@ public final class EpicDirector {
 		return scene;
 	}
 
+	/**
+	 * Phase 34 (DESIGN 34.4.9): a fresh scene of moment EXTRA for a world moment of the Dunia modules (beats 40 treasure, 41
+	 * seal, 42 dragon, 43 evolve, 44 arrive, 45 ship, 46 sky event, 47 tower milestone; a client-side beat, never sent by
+	 * the server). It is never merged with another scene, carries the local SAFE / RESULT_SAFE / CAMERA_OK flags (so every
+	 * shot still obeys ShotGuard and Kamera sinematik Penuh / Singkat / Mati) and ends by itself after {@code life} ticks.
+	 * Callers add their own elements and shots. Null without a level.
+	 */
+	public static @Nullable Scene worldScene(int extraBeat, Vec3 pos, int seed, int life, boolean own) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.level == null || minecraft.player == null) {
+			return null;
+		}
+		Scene scene = new Scene(EpicIds.EXTRA, -1, own, own ? minecraft.player.getId() : -1, priority(EpicIds.EXTRA), true, pos, seed);
+		SCENES.add(scene);
+		sorted = false;
+		scene.flags = localFlags(own);
+		scene.idle = 0;
+		scene.beat = extraBeat;
+		EpicBudget.sceneStarted();
+		Scene made = scene;
+		made.at(Math.max(20, life), () -> made.end(20));
+		return scene;
+	}
+
 	/** Re-reads the local SAFE, RESULT_SAFE and CAMERA_OK flags of an own scene (a timed shot checks the moment it starts). */
 	public static void refreshFlags(Scene scene) {
 		int local = EpicIds.FLAG_SAFE | EpicIds.FLAG_RESULT_SAFE | EpicIds.FLAG_CAMERA_OK;

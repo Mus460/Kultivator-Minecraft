@@ -1,0 +1,534 @@
+package dev.kultivator.dunia.kota;
+
+import dev.kultivator.data.Dao;
+import dev.kultivator.data.Realm;
+import dev.kultivator.disciple.DuelRules;
+import dev.kultivator.technique.spec.TechniquePower;
+import dev.kultivator.util.NoGrief;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * {@code kultivator:kultivator_npc} (DESIGN 34.5.1-34.5.4): the human cultivators of the towns, the wanderers, the rival
+ * groups and the immortals. A {@link PathfinderMob}, never an {@code Enemy}: area techniques never hit a peaceful NPC
+ * ({@code Targeting.isHostileTo} only accepts a mob targeting the caster). It is never saved (the type is {@code noSave}
+ * and the {@link #TAG} is refused on load), never picks anything up, never opens doors, never tramples farmland
+ * ({@link NoGrief#TAG}) and never gets a custom name. The spawner (anchors, wanderers, rivals) re-makes it.
+ * <p>
+ * Synced: role, look seed (skin and slim model), realm, stage, Dao (-1 none), voice (0-5: m1-m3, f1-f3), robe colour (0
+ * = the role's), flags ({@link #FLAG_SITTING}, {@link #FLAG_CHANNEL}, {@link #FLAG_HOSTILE}, {@link #FLAG_AURA}) and the
+ * name plate. Server only: home, town, group, temperament, the players it is hostile to, the lonely-despawn rule and a
+ * companion owner.
+ */
+public class KultivatorNpc extends PathfinderMob {
+
+	public static final String TAG = "kultivator.kota_npc";
+
+	public static final int FLAG_SITTING = 1;
+	public static final int FLAG_CHANNEL = 2;
+	public static final int FLAG_HOSTILE = 4;
+	/** Shows the cultivation aura (wanderers, rivals, immortals; the client reads it). */
+	public static final int FLAG_AURA = 8;
+	/** Translucent (a ghost or an illusion; reserved for the Dunia Bawah's use of K's NPCs on Pulau Pasar it stays 0). */
+	public static final int FLAG_GHOST = 16;
+
+	public static final String[] VOICES = {"m1", "m2", "m3", "f1", "f2", "f3"};
+
+	private static final EntityDataAccessor<Integer> DATA_ROLE = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_LOOK = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_REALM = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_STAGE = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_DAO = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_VOICE = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_ROBE = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_FLAGS = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Component> DATA_PLATE = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.COMPONENT);
+
+	public static final double BASE_HEALTH = 24.0D;
+	public static final double[] TIER_HEALTH = {1.0D, 1.5D, 2.5D, 4.0D, 10.0D};
+	public static final double HEALTH_PER_REALM = 0.35D;
+	public static final double SPEED = 0.3D;
+
+	// ------------------------------------------------------------------ server state (never saved)
+	private @Nullable BlockPos home;
+	private long town;
+	private long anchorSite;
+	private String group = "";
+	private int temperament;
+	private final Set<UUID> hostileTo = new HashSet<>();
+	private boolean fightsMonsters;
+	private @Nullable UUID companionOf;
+	private long companionUntil;
+	private double lonelyRange = 64.0D;
+	private int lonelyTicks = 600;
+	private long lonelySince;
+	private long lastHurtLine;
+	/** Free-form state of the spawner (wanderer meeting, rival race, lecture...). */
+	private final net.minecraft.nbt.CompoundTag memory = new net.minecraft.nbt.CompoundTag();
+	private boolean vanished;
+
+	public KultivatorNpc(EntityType<? extends KultivatorNpc> type, Level level) {
+		super(type, level);
+		this.xpReward = 0;
+		this.setCanPickUpLoot(false);
+		this.getNavigation().setCanOpenDoors(false);
+		this.addTag(NoGrief.TAG);
+		this.addTag(TAG);
+		this.setPersistenceRequired();
+	}
+
+	public static AttributeSupplier.Builder createAttributes() {
+		return PathfinderMob.createMobAttributes()
+				.add(Attributes.MAX_HEALTH, 36.0D)
+				.add(Attributes.ATTACK_DAMAGE, 5.0D)
+				.add(Attributes.MOVEMENT_SPEED, SPEED)
+				.add(Attributes.FOLLOW_RANGE, 40.0D)
+				.add(Attributes.ARMOR, 2.0D)
+				.add(Attributes.STEP_HEIGHT, 1.0D);
+	}
+
+	@Override
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(DATA_ROLE, NpcRole.WARGA.ordinal());
+		builder.define(DATA_LOOK, 0);
+		builder.define(DATA_REALM, 1);
+		builder.define(DATA_STAGE, 0);
+		builder.define(DATA_DAO, -1);
+		builder.define(DATA_VOICE, 0);
+		builder.define(DATA_ROBE, 0);
+		builder.define(DATA_FLAGS, 0);
+		builder.define(DATA_PLATE, Component.empty());
+	}
+
+	@Override
+	protected void registerGoals() {
+		this.goalSelector.addGoal(0, new FloatGoal(this));
+		this.goalSelector.addGoal(1, new NpcAi.HoldGoal(this));
+		this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.15D, true));
+		this.goalSelector.addGoal(3, new NpcAi.FollowGoal(this));
+		this.goalSelector.addGoal(4, new NpcAi.HomeGoal(this));
+		this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F));
+		this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+		this.targetSelector.addGoal(1, new NpcAi.ChooseTargetGoal(this));
+	}
+
+	// ================================================================== setup
+
+	/**
+	 * Sets role, look seed, realm ordinal, stage (0-3), Dao (null: none), voice (0-5), robe colour (0: the role's) and
+	 * the combat numbers of DESIGN 25.4.2 for the role's tier: health {@code 24 × tier × (1 + 0.35 R)}, melee
+	 * {@code 4 + R + 1.5 × tier}, armour {@code R + 2 × tier}.
+	 */
+	public void setup(NpcRole role, int look, int realm, int stage, @Nullable Dao dao, int voice, int robe, Component plate) {
+		setup(role, role.tier, look, realm, stage, dao, voice, robe, plate);
+	}
+
+	public void setup(NpcRole role, int tier, int look, int realm, int stage, @Nullable Dao dao, int voice, int robe, Component plate) {
+		int r = Mth.clamp(realm, 0, Realm.values().length - 1);
+		int t = Mth.clamp(tier, 1, 4);
+		this.entityData.set(DATA_ROLE, role.ordinal());
+		this.entityData.set(DATA_LOOK, look);
+		this.entityData.set(DATA_REALM, r);
+		this.entityData.set(DATA_STAGE, Mth.clamp(stage, 0, 3));
+		this.entityData.set(DATA_DAO, dao == null ? -1 : dao.ordinal());
+		this.entityData.set(DATA_VOICE, Math.floorMod(voice, VOICES.length));
+		this.entityData.set(DATA_ROBE, robe);
+		this.entityData.set(DATA_PLATE, plate == null ? Component.empty() : plate);
+		setBase(Attributes.MAX_HEALTH, BASE_HEALTH * TIER_HEALTH[t] * (1.0D + HEALTH_PER_REALM * r));
+		setBase(Attributes.ATTACK_DAMAGE, 4.0D + r + 1.5D * t);
+		setBase(Attributes.ARMOR, r + 2.0D * t);
+		setBase(Attributes.KNOCKBACK_RESISTANCE, Math.min(0.8D, 0.2D * t));
+		setBase(Attributes.MOVEMENT_SPEED, SPEED + 0.01D * t);
+		this.memory.putInt("tier", t);
+		this.setHealth(this.getMaxHealth());
+		if (t >= 4) {
+			this.addTag(TechniquePower.TAG_BOSS);
+		}
+		boolean aura = role == NpcRole.PENGEMBARA || role == NpcRole.SAINGAN || role.immortal() || role == NpcRole.PENJAGA;
+		setFlag(FLAG_AURA, aura);
+	}
+
+	private void setBase(Holder<Attribute> attribute, double value) {
+		AttributeInstance instance = this.getAttribute(attribute);
+		if (instance != null) {
+			instance.setBaseValue(value);
+		}
+	}
+
+	// ================================================================== synced values
+
+	public NpcRole role() {
+		return NpcRole.byOrdinal(this.entityData.get(DATA_ROLE));
+	}
+
+	public int look() {
+		return this.entityData.get(DATA_LOOK);
+	}
+
+	public int realm() {
+		return Math.max(0, this.entityData.get(DATA_REALM));
+	}
+
+	public Realm realmValue() {
+		return Realm.byOrdinal(Mth.clamp(realm(), 0, Realm.values().length - 1));
+	}
+
+	public int stage() {
+		return this.entityData.get(DATA_STAGE);
+	}
+
+	public @Nullable Dao dao() {
+		int index = this.entityData.get(DATA_DAO);
+		Dao[] all = Dao.values();
+		return index >= 0 && index < all.length ? all[index] : null;
+	}
+
+	public int voice() {
+		return Math.floorMod(this.entityData.get(DATA_VOICE), VOICES.length);
+	}
+
+	public boolean female() {
+		return voice() >= 3;
+	}
+
+	/** The robe colour (the role's when 0). */
+	public int robe() {
+		int robe = this.entityData.get(DATA_ROBE);
+		return robe != 0 ? robe : role().robe;
+	}
+
+	public int flags() {
+		return this.entityData.get(DATA_FLAGS);
+	}
+
+	public boolean hasFlag(int flag) {
+		return (flags() & flag) != 0;
+	}
+
+	public void setFlag(int flag, boolean on) {
+		int flags = flags();
+		int next = on ? flags | flag : flags & ~flag;
+		if (next != flags) {
+			this.entityData.set(DATA_FLAGS, next);
+		}
+	}
+
+	public Component plate() {
+		return this.entityData.get(DATA_PLATE);
+	}
+
+	public void setPlate(Component plate) {
+		this.entityData.set(DATA_PLATE, plate == null ? Component.empty() : plate);
+	}
+
+	/** {@code disciple.<voice>.<line>} (DESIGN 34.8: reused disciple voices). */
+	public String voiceKey(String line) {
+		return "disciple." + VOICES[voice()] + "." + line;
+	}
+
+	// ================================================================== server state
+
+	public @Nullable BlockPos home() {
+		return home;
+	}
+
+	public void setHome(@Nullable BlockPos home) {
+		this.home = home == null ? null : home.immutable();
+	}
+
+	/** The town site id (0 outside a town). */
+	public long town() {
+		return town;
+	}
+
+	public void setTown(long town) {
+		this.town = town;
+	}
+
+	/** The anchor site that spawned it (0 for wanderers and rivals). */
+	public long anchorSite() {
+		return anchorSite;
+	}
+
+	public void setAnchorSite(long site) {
+		this.anchorSite = site;
+	}
+
+	/** The rival group id ("" for none). */
+	public String group() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group == null ? "" : group;
+	}
+
+	/** Wanderer temperament: 0 Ramah, 1 Angkuh, 2 Licik. */
+	public int temperament() {
+		return temperament;
+	}
+
+	public void setTemperament(int temperament) {
+		this.temperament = Mth.clamp(temperament, 0, 2);
+	}
+
+	public net.minecraft.nbt.CompoundTag memory() {
+		return memory;
+	}
+
+	/** Makes the NPC hostile to {@code player} only (a challenge, a raid, a town's grudge). */
+	public void markHostile(ServerPlayer player) {
+		hostileTo.add(player.getUUID());
+		setFlag(FLAG_HOSTILE, true);
+		if (getTarget() == null) {
+			setTarget(player);
+		}
+	}
+
+	public void forgive(UUID player) {
+		hostileTo.remove(player);
+		if (hostileTo.isEmpty()) {
+			setFlag(FLAG_HOSTILE, false);
+		}
+		if (getTarget() != null && getTarget().getUUID().equals(player)) {
+			setTarget(null);
+		}
+	}
+
+	public boolean isHostileTo(UUID player) {
+		return hostileTo.contains(player);
+	}
+
+	public Set<UUID> hostiles() {
+		return hostileTo;
+	}
+
+	/** Guards and companions hunt monsters near them. */
+	public void setFightsMonsters(boolean on) {
+		this.fightsMonsters = on;
+	}
+
+	public boolean fightsMonsters() {
+		return fightsMonsters;
+	}
+
+	public @Nullable UUID companionOf() {
+		return companionOf;
+	}
+
+	public long companionUntil() {
+		return companionUntil;
+	}
+
+	/** Follows {@code owner} until game time {@code until} (null ends it). */
+	public void setCompanion(@Nullable UUID owner, long until) {
+		this.companionOf = owner;
+		this.companionUntil = until;
+		this.fightsMonsters = owner != null || role() == NpcRole.PENJAGA;
+	}
+
+	/** Leaves when no survival or adventure player is within {@code range} for {@code ticks}. */
+	public void setLonely(double range, int ticks) {
+		this.lonelyRange = Math.max(8.0D, range);
+		this.lonelyTicks = Math.max(20, ticks);
+		this.lonelySince = this.level().getGameTime();
+	}
+
+	public double lonelyRange() {
+		return lonelyRange;
+	}
+
+	public int lonelyTicks() {
+		return lonelyTicks;
+	}
+
+	long lonelySince() {
+		return lonelySince;
+	}
+
+	void resetLonely(long now) {
+		this.lonelySince = now;
+	}
+
+	boolean vanished() {
+		return vanished;
+	}
+
+	/** Leaves in a cloud-step puff (despawn, flee, end of a meeting). */
+	public void vanish() {
+		if (this.isRemoved()) {
+			return;
+		}
+		vanished = true;
+		if (this.level() instanceof ServerLevel level) {
+			NpcSkills.vanishFx(level, this);
+		}
+		if (DuelRules.inDuel(this)) {
+			DuelRules.cancel(this);
+		}
+		this.discard();
+	}
+
+	// ================================================================== name (never a custom name)
+
+	@Override
+	protected Component getTypeName() {
+		Component plate = plate();
+		return plate.getString().isEmpty() ? Component.translatable(role().titleKey()) : plate;
+	}
+
+	@Override
+	public void setCustomName(@Nullable Component name) {
+		// Never: formations skip custom-named mobs, and the plate carries the name.
+	}
+
+	// ================================================================== targets
+
+	@Override
+	public void setTarget(@Nullable LivingEntity target) {
+		super.setTarget(target != null && !NpcAi.mayHit(this, target) ? null : target);
+	}
+
+	@Override
+	public boolean canAttack(LivingEntity target) {
+		return NpcAi.mayHit(this, target) && super.canAttack(target);
+	}
+
+	@Override
+	public boolean doHurtTarget(ServerLevel level, Entity target) {
+		return target instanceof LivingEntity living && NpcAi.mayHit(this, living) && super.doHurtTarget(level, target);
+	}
+
+	@Override
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+		boolean hurt = super.hurtServer(level, source, amount);
+		if (hurt) {
+			Kota.onNpcHurt(this, source);
+			long now = level.getGameTime();
+			if (now - lastHurtLine > 100L && this.isAlive() && this.random.nextInt(3) == 0) {
+				lastHurtLine = now;
+				dev.kultivator.voice.Voice.say(this, female() ? "grunt.female.hurt" : "grunt.male.hurt", "");
+			}
+		}
+		return hurt;
+	}
+
+	// ================================================================== behaviour
+
+	@Override
+	public void tick() {
+		super.tick();
+		if (!this.level().isClientSide() && this.tickCount % 20 == 0 && !this.isRemoved()) {
+			NpcAi.check(this);
+		}
+	}
+
+	@Override
+	protected InteractionResult mobInteract(Player player, InteractionHand hand) {
+		if (hand != InteractionHand.MAIN_HAND) {
+			return InteractionResult.PASS;
+		}
+		if (!(player instanceof ServerPlayer serverPlayer)) {
+			return InteractionResult.SUCCESS;
+		}
+		return Kota.interact(serverPlayer, this) ? InteractionResult.SUCCESS_SERVER : InteractionResult.PASS;
+	}
+
+	@Override
+	protected void onBelowWorld() {
+		vanish();
+	}
+
+	// ================================================================== nothing left behind, nothing changed
+
+	@Override
+	protected boolean canRide(Entity vehicle) {
+		return false;
+	}
+
+	@Override
+	public boolean canBeLeashed() {
+		return false;
+	}
+
+	@Override
+	public boolean removeWhenFarAway(double distanceSq) {
+		return false;
+	}
+
+	@Override
+	public boolean requiresCustomPersistence() {
+		return true;
+	}
+
+	@Override
+	public boolean canPickUpLoot() {
+		return false;
+	}
+
+	@Override
+	public boolean wantsToPickUp(ServerLevel level, ItemStack stack) {
+		return false;
+	}
+
+	@Override
+	protected boolean shouldDropLoot(ServerLevel level) {
+		return false;
+	}
+
+	@Override
+	protected void dropEquipment(ServerLevel level) {
+	}
+
+	@Override
+	protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean killedByPlayer) {
+	}
+
+	@Override
+	protected SoundEvent getHurtSound(DamageSource source) {
+		return SoundEvents.PLAYER_HURT;
+	}
+
+	@Override
+	protected SoundEvent getDeathSound() {
+		return SoundEvents.PLAYER_DEATH;
+	}
+
+	@Override
+	public float getVoicePitch() {
+		return female() ? 1.15F : 0.95F;
+	}
+}
