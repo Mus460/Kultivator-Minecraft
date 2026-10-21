@@ -15,7 +15,9 @@
     "AvatarNameMixin",
     "FirstPersonHandsMixin",
     "FirstPersonHandsInvoker",
-    "BindFreezeMixin"
+    "BindFreezeMixin",
+    "KosmikNameTagMixin",
+    "KosmikWeatherMixin"
   ],
   "injectors": {
     "defaultRequire": 1

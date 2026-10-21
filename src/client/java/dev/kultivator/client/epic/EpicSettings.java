@@ -70,6 +70,8 @@ public final class EpicSettings {
 	public static final String LENS = "epic_lens";
 	public static final String COSMIC = "epic_cosmic";
 	public static final String BULLET = "epic_bullet";
+	/** Film Kosmik 3D (DESIGN 32.6): Penuh (default), Ringan, Mati. */
+	public static final String KOSMIK3D = "epic_kosmik3d";
 	private static final String F = "kultivator.film.setting.";
 	/** Opens the motion warning (set by the film module). */
 	private static Runnable motionWarning;
@@ -86,6 +88,18 @@ public final class EpicSettings {
 	 */
 	public enum TitahFilm {
 		PENUH, SINGKAT, MATI;
+
+		public String id() {
+			return name().toLowerCase(Locale.ROOT);
+		}
+	}
+
+	/**
+	 * Film kosmik 3D (DESIGN 32.6): Penuh (the layers of the quality tier, default), Ringan (one tier lower, smaller maps,
+	 * no planet bake), Mati (every stage shot plays its fallback, the Langit Kosmik film of 30.3).
+	 */
+	public enum Kosmik3d {
+		PENUH, RINGAN, MATI;
 
 		public String id() {
 			return name().toLowerCase(Locale.ROOT);
@@ -158,6 +172,11 @@ public final class EpicSettings {
 					() -> filmTip("cosmic", Component.translatable(F + "cosmic"))));
 			rows.add(3, new Row(BULLET, false, () -> Component.translatable(F + "bullet"), () -> setFlag(BULLET, !flag(BULLET)),
 					() -> filmTip("bullet", Component.translatable(F + "bullet"))));
+			if (Language.getInstance().has(F + "kosmik3d")) {
+				// Film Kosmik 3D (32.6): right after "Langit kosmik"
+				rows.add(3, new Row(KOSMIK3D, true, EpicSettings::kosmik3dText, EpicSettings::nextKosmik3d,
+						() -> filmTip("kosmik3d", kosmik3dText())));
+			}
 		}
 		return List.copyOf(rows);
 	}
@@ -271,6 +290,33 @@ public final class EpicSettings {
 	/** Langit kosmik (default on). */
 	public static boolean cosmic() {
 		return flag(COSMIC);
+	}
+
+	/** Film kosmik 3D (32.6; default Penuh). */
+	public static Kosmik3d kosmik3d() {
+		JsonElement value = EffectQuality.get(KOSMIK3D);
+		if (value != null && value.isJsonPrimitive()) {
+			String id = value.getAsString();
+			for (Kosmik3d mode : Kosmik3d.values()) {
+				if (mode.id().equals(id)) {
+					return mode;
+				}
+			}
+		}
+		return Kosmik3d.PENUH;
+	}
+
+	public static void setKosmik3d(Kosmik3d mode) {
+		EffectQuality.put(KOSMIK3D, new JsonPrimitive(mode.id()));
+	}
+
+	private static void nextKosmik3d() {
+		Kosmik3d[] all = Kosmik3d.values();
+		setKosmik3d(all[(kosmik3d().ordinal() + 1) % all.length]);
+	}
+
+	private static Component kosmik3dText() {
+		return Component.translatable(F + "kosmik3d", Component.translatable(F + "kosmik3d." + kosmik3d().id()));
 	}
 
 	/** Waktu beku (default on); "Gerak lambat" off also turns bullet time off. */
@@ -560,7 +606,7 @@ public final class EpicSettings {
 	/** Every 7b setting back to its default ({@code /sinematik reset}). */
 	public static void resetAll() {
 		for (String key : new String[]{CAMERA, LETTERBOX, CARDS, MUSIC, SLOWMO, GEOMETRY, SKY, VFX, RECORD, PACK_GEOMETRY, SKYRIDE, IMPACT_FRAMES,
-				SILENT_IMPACT, WORLD_FX, IMPACT_POWER, LENS, COSMIC, BULLET}) {
+				SILENT_IMPACT, WORLD_FX, IMPACT_POWER, LENS, COSMIC, BULLET, KOSMIK3D}) {
 			EffectQuality.put(key, null);
 		}
 		for (String skill : TITAH_SKILLS) {

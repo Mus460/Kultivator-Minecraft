@@ -75,6 +75,9 @@ public final class FilmCatalog {
 			FilmCatalogUltimate.register(map);
 			put(map, kawah());
 			put(map, ciptaan());
+			for (Film film : map.values()) {
+				validate(film);
+			}
 			films = map;
 		}
 		return films;
@@ -82,6 +85,47 @@ public final class FilmCatalog {
 
 	static void put(Map<String, Film> map, Film film) {
 		map.put(film.id, film);
+	}
+
+	/**
+	 * The stage-shot rules of Film Kosmik 3D (DESIGN 32.4), checked once when the catalogue is built (and for every command
+	 * preview): a stage shot follows a mask cut or a stage shot of the same stage, never uses bullet time, and has a
+	 * fallback. A broken rule is logged and repaired (no bullet time; a missing fallback becomes a sky drift; a stage shot
+	 * without its entry mask plays its fallback at run time anyway). Returns the number of problems.
+	 */
+	static int validate(Film film) {
+		int problems = 0;
+		for (int a = 0; a < film.acts.size(); a++) {
+			FilmAct act = film.acts.get(a);
+			for (int i = 0; i < act.shots.size(); i++) {
+				FilmShot shot = act.shots.get(i);
+				if (shot.stageId == null) {
+					continue;
+				}
+				String where = film.id + " act " + a + " shot " + i;
+				FilmShot before = i > 0 ? act.shots.get(i - 1) : null;
+				boolean entry = shot.mask != FilmShot.Mask.NONE || before != null && before.stageId == shot.stageId;
+				if (!entry) {
+					problems++;
+					dev.kultivator.Kultivator.LOGGER.warn("Kultivator: film {}: a stage shot without a mask cut before it", where);
+				}
+				if (shot.bulletTicks > 0) {
+					problems++;
+					shot.bulletTicks = 0;
+					dev.kultivator.Kultivator.LOGGER.warn("Kultivator: film {}: no bullet time in a stage shot", where);
+				}
+				if (shot.fallback == null) {
+					problems++;
+					shot.fallback = FilmDirector.fallbackOf(shot.ticks);
+					dev.kultivator.Kultivator.LOGGER.warn("Kultivator: film {}: a stage shot without orElse", where);
+				}
+				if (shot.stageBeat == null || shot.stageBeat.isEmpty()) {
+					problems++;
+					dev.kultivator.Kultivator.LOGGER.warn("Kultivator: film {}: a stage shot without a beat", where);
+				}
+			}
+		}
+		return problems;
 	}
 
 	// ================================================================ shared shot builders

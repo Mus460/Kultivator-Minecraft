@@ -1,0 +1,15 @@
+{
+  "kultivator.kosmik.orbit.name": "Orbit: this world seen from space",
+  "kultivator.kosmik.orbit.source": "Source: game design (this world seen from space); the names of the seven Northern Dipper stars follow the existing Titah Bintang source.",
+  "kultivator.kosmik.orbit.beat.pedang_hadir": "The sword appears above the planet, its rune rings ignite, the sun rises over the rim",
+  "kultivator.kosmik.orbit.beat.pedang_menukik": "The sword turns point-down and dives",
+  "kultivator.kosmik.orbit.beat.pedang_masuk": "Re-entry: a burning streak through the atmosphere and the cloud deck",
+  "kultivator.kosmik.orbit.beat.bintang_biduk": "The seven Northern Dipper stars ignite over the night side",
+  "kultivator.kosmik.orbit.beat.bintang_sinar": "Seven beams pierce the atmosphere",
+  "kultivator.kosmik.orbit.beat.gunung_sel": "The lifted land floats up against the planet",
+  "kultivator.kosmik.orbit.beat.pedang_tenang": "The sword above the planet (calm)",
+  "kultivator.kosmik.orbit.beat.bintang_tenang": "The Northern Dipper ignites (calm)",
+  "kultivator.kosmik.orbit.beat.preview_a": "The planet from space: sunrise and the moon",
+  "kultivator.kosmik.orbit.beat.preview_b": "The sword and its rune rings",
+  "kultivator.kosmik.orbit.beat.preview_c": "The Northern Dipper and its beams"
+}

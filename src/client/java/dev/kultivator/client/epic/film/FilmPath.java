@@ -1,11 +1,13 @@
 package dev.kultivator.client.epic.film;
 
+import dev.kultivator.client.epic.kosmik.Kosmik3D;
 import dev.kultivator.client.epic.lens.LensLayers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Evaluates one film shot per frame (DESIGN 30.2.4, 30.2.5): the keys resolved in their spaces, joined by a centripetal
@@ -18,6 +20,13 @@ import net.minecraft.world.phys.Vec3;
  * <li>the camera stays ≤ 48 b above the subject's feet and ≤ min(64, render distance × 16 − 24) b from it.</li>
  * </ul>
  * The collision clip and the blends are {@code CinematicDirector}'s. Client thread only.
+ * <p>
+ * Film Kosmik 3D (DESIGN 32.1.7, 32.4): a stage shot ({@link #bind}) keeps the real camera still at the stage's pocket C
+ * and only turns it: the keys, look and POV resolve in {@link FilmSpace#V} through the stage's anchors at the shot time,
+ * the virtual eye is published to the binding every frame, and yaw and pitch come from the virtual look. The b/s caps
+ * do not apply (the camera does not translate); instead the virtual path is shortened toward its first key when its
+ * length per second would pass 2 × the mean distance from the eye to the look target. The look, whip and roll caps stay;
+ * the shake only rotates.
  */
 public final class FilmPath {
 
@@ -44,6 +53,11 @@ public final class FilmPath {
 	private final Vec3[] points;
 	/** The last output: x, y, z, yaw, pitch, FOV factor, roll. */
 	public final double[] out = new double[7];
+	/** Film Kosmik 3D: the stage binding of a stage shot (null for a world shot). */
+	private Kosmik3D.@Nullable Binding binding;
+	private final double[] vtmp = new double[3];
+	/** The flow cap of stage shots: virtual path per second ≤ this × the mean eye-to-look distance (32.1.7). */
+	public static final double STAGE_FLOW = 2.0D;
 
 	public FilmPath(FilmShot shot, FilmStage stage, long seed, int ticks) {
 		this.shot = shot;
@@ -61,8 +75,21 @@ public final class FilmPath {
 		return ticks;
 	}
 
+	/** Makes this a stage shot of {@code b} (before {@link #validate}). */
+	public void bind(Kosmik3D.@Nullable Binding b) {
+		this.binding = b;
+	}
+
+	public Kosmik3D.@Nullable Binding binding() {
+		return binding;
+	}
+
 	/** Samples the path with the spaces frozen now and shortens it to the speed caps (once, at the shot start). */
 	public void validate() {
+		if (binding != null) {
+			validateStage();
+			return;
+		}
 		if (shot.keys.size() < 2 || pov()) {
 			shrink = 1.0D;
 			return;
@@ -98,6 +125,10 @@ public final class FilmPath {
 
 	/** The pose at {@code age} presentation ticks into the shot; writes {@link #out}. */
 	public void evaluate(float age, float partial) {
+		if (binding != null) {
+			evaluateStage(age);
+			return;
+		}
 		float t = Mth.clamp(age / Math.max(1, ticks), 0.0F, 1.0F);
 		Vec3 pos;
 		Vec3 look;
@@ -201,6 +232,201 @@ public final class FilmPath {
 		out[4] = pitch;
 		out[5] = fov(age, t, pos, partial);
 		out[6] = roll;
+	}
+
+	// ================================================================ Film Kosmik 3D (DESIGN 32.1.7, 32.4)
+
+	/** The flow cap of a stage shot: samples the virtual path with the stage frozen at the shot start. */
+	private void validateStage() {
+		shrink = 1.0D;
+		if (shot.keys.size() < 2 || shot.povAnchor != null) {
+			return;
+		}
+		int samples = 24;
+		Vec3 previous = stagePosition(0.0F, 0.0D);
+		double distance = 0.0D;
+		double reach = 0.0D;
+		for (int i = 0; i <= samples; i++) {
+			float t = i / (float) samples;
+			Vec3 p = stagePosition(t, 0.0D);
+			if (i > 0) {
+				distance += p.distanceTo(previous);
+			}
+			reach += p.distanceTo(stageLook(t, p, 0.0D));
+			previous = p;
+		}
+		double seconds = ticks / 20.0D;
+		double mean = reach / (samples + 1);
+		double cap = STAGE_FLOW * Math.max(1.0D, mean);
+		double perSecond = distance / Math.max(0.05D, seconds);
+		if (perSecond > cap) {
+			shrink = cap / perSecond;
+		}
+	}
+
+	/** One frame of a stage shot: the real camera at C, turned to the virtual look; the virtual eye published. */
+	private void evaluateStage(float age) {
+		Kosmik3D.Binding b = binding;
+		double time = Math.max(0.0D, Math.min(age, ticks));
+		float t = Mth.clamp(age / Math.max(1, ticks), 0.0F, 1.0F);
+		Vec3 eye;
+		Vec3 look;
+		if (shot.povAnchor != null) {
+			// ride the anchor: behind and above its origin, looking along its forward
+			Kosmik3D.point(b, shot.povAnchor, 0.0D, 0.0D, 0.0D, time, vtmp);
+			Vec3 origin = new Vec3(vtmp[0], vtmp[1], vtmp[2]);
+			Kosmik3D.point(b, shot.povAnchor, 0.0D, 0.0D, 1.0D, time, vtmp);
+			Vec3 dir = new Vec3(vtmp[0], vtmp[1], vtmp[2]).subtract(origin);
+			Kosmik3D.point(b, shot.povAnchor, 0.0D, 1.0D, 0.0D, time, vtmp);
+			Vec3 upDir = new Vec3(vtmp[0], vtmp[1], vtmp[2]).subtract(origin);
+			double scale = Math.max(1.0E-3D, dir.length());
+			dir = dir.lengthSqr() < 1.0E-12D ? new Vec3(0.0D, 0.0D, 1.0D) : dir.normalize();
+			upDir = upDir.lengthSqr() < 1.0E-12D ? new Vec3(0.0D, 1.0D, 0.0D) : upDir.normalize();
+			eye = origin.subtract(dir.scale(shot.povBack * scale)).add(upDir.scale(shot.povUp * scale));
+			look = origin.add(dir.scale(16.0D * scale));
+		} else {
+			eye = stagePosition(t, time);
+			if (shrink < 1.0D) {
+				Vec3 first = points[0];
+				eye = first.add(eye.subtract(first).scale(shrink));
+			}
+			look = stageLook(t, eye, time);
+		}
+		b.publish(eye.x, eye.y, eye.z, time);
+		double dx = look.x - eye.x;
+		double dy = look.y - eye.y;
+		double dz = look.z - eye.z;
+		double horizontal = Math.sqrt(dx * dx + dz * dz);
+		float yaw = (float) (Mth.atan2(dz, dx) * Mth.RAD_TO_DEG) - 90.0F;
+		float pitch = (float) -(Mth.atan2(dy, horizontal) * Mth.RAD_TO_DEG);
+		boolean whipping = false;
+		if (shot.whipAt >= 0.0F) {
+			float start = shot.whipAt * ticks;
+			float u = (age - start) / shot.whipTicks;
+			if (u > 0.0F) {
+				float e = Ease.IN_OUT.apply(Math.min(1.0F, u));
+				yaw += shot.whipDeg * e;
+				pitch += shot.whipPitch * e;
+				whipping = u < 1.0F;
+			}
+		}
+		if (shot.shake != null) {
+			// the real camera does not move in a stage shot: the shake only turns it
+			FilmShake.sample(shot.shake, shot.shakeAmp, age, shot.shakeTicks, seed, shake);
+			yaw += shake[3];
+			pitch += shake[4];
+		}
+		pitch = Mth.clamp(pitch, -89.0F, 89.0F);
+		float roll = curve(shot.roll, t, 0.0F);
+		if (evaluated) {
+			float dt = Math.max(0.0F, age - lastAge);
+			float maxTurn = (whipping ? MAX_WHIP_TICK : MAX_TURN_TICK) * dt;
+			if (dt <= 0.0F) {
+				yaw = lastYaw;
+				pitch = lastPitch;
+				roll = lastRoll;
+			} else {
+				yaw = lastYaw + Mth.clamp(Mth.wrapDegrees(yaw - lastYaw), -maxTurn, maxTurn);
+				pitch = lastPitch + Mth.clamp(pitch - lastPitch, -maxTurn, maxTurn);
+				float maxRoll = MAX_ROLL_TICK * dt;
+				roll = lastRoll + Mth.clamp(roll - lastRoll, -maxRoll, maxRoll);
+				LensLayers.motion(Mth.wrapDegrees(yaw - lastYaw) / dt, (pitch - lastPitch) / dt, whipping);
+			}
+		}
+		evaluated = true;
+		lastAge = age;
+		lastYaw = yaw;
+		lastPitch = pitch;
+		lastRoll = roll;
+		out[0] = b.cx;
+		out[1] = b.cy;
+		out[2] = b.cz;
+		out[3] = yaw;
+		out[4] = pitch;
+		double k = curve(shot.fov, t, 1.0F);
+		if (shot.crashK > 0.0F) {
+			float u = Math.min(1.0F, age / shot.crashTicks);
+			k *= Mth.lerp(Ease.EXPO_OUT.apply(u), 1.0F, shot.crashK);
+		}
+		out[5] = Mth.clamp(k, 0.55D, 1.45D);
+		out[6] = roll;
+	}
+
+	/** The virtual spline position at shot fraction {@code t}, the stage at shot time {@code time}. */
+	private Vec3 stagePosition(float t, double time) {
+		int n = shot.keys.size();
+		if (n == 0) {
+			Vec3 p = stagePoint(FilmSpace.V, null, 0.0D, 0.0D, -100.0D, time);
+			points[0] = p;
+			return p;
+		}
+		for (int i = 0; i < n; i++) {
+			FilmKey key = shot.keys.get(i);
+			points[i] = stagePoint(key.space(), key.prop(), key.x(), key.y(), key.z(), time);
+		}
+		if (n == 1) {
+			return points[0];
+		}
+		FilmKey first = shot.keys.get(0);
+		if (t <= first.t()) {
+			return points[0];
+		}
+		FilmKey last = shot.keys.get(n - 1);
+		if (t >= last.t()) {
+			return points[n - 1];
+		}
+		int i = 0;
+		while (i < n - 2 && t > shot.keys.get(i + 1).t()) {
+			i++;
+		}
+		FilmKey a = shot.keys.get(i);
+		FilmKey b = shot.keys.get(i + 1);
+		float span = Math.max(1.0E-4F, b.t() - a.t());
+		float u = a.ease().apply((t - a.t()) / span);
+		Vec3 p1 = points[i];
+		Vec3 p2 = points[i + 1];
+		Vec3 p0 = i > 0 ? points[i - 1] : p1.add(p1.subtract(p2));
+		Vec3 p3 = i + 2 < n ? points[i + 2] : p2.add(p2.subtract(p1));
+		return centripetal(p0, p1, p2, p3, u);
+	}
+
+	/** The virtual look target (a stage point, or a sky direction from the eye). */
+	private Vec3 stageLook(float t, Vec3 eye, double time) {
+		if (!Float.isNaN(shot.skyYaw0)) {
+			float e = Ease.IN_OUT.apply(t);
+			double yaw = Math.toRadians(stage.yaw0 + Mth.lerp(e, shot.skyYaw0, shot.skyYaw1));
+			double pitch = Math.toRadians(Mth.lerp(e, shot.skyPitch0, shot.skyPitch1));
+			Vec3 dir = new Vec3(-Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch));
+			return eye.add(dir.scale(64.0D));
+		}
+		if (shot.lookSpace == null) {
+			return stagePoint(FilmSpace.V, null, 0.0D, 0.0D, 0.0D, time);
+		}
+		Vec3 start = stagePoint(shot.lookSpace, shot.lookProp, shot.lx, shot.ly, shot.lz, time);
+		if (shot.lookEndSpace == null) {
+			return start;
+		}
+		Vec3 end = stagePoint(shot.lookEndSpace, shot.lookEndProp, shot.lex, shot.ley, shot.lez, time);
+		Vec3 d0 = start.subtract(eye);
+		Vec3 d1 = end.subtract(eye);
+		double l0 = Math.max(1.0E-3D, d0.length());
+		double l1 = Math.max(1.0E-3D, d1.length());
+		float e = Ease.IN_OUT.apply(t);
+		Vec3 dir = d0.scale(1.0D / l0).scale(1.0F - e).add(d1.scale(1.0D / l1).scale(e));
+		if (dir.lengthSqr() < 1.0E-6D) {
+			dir = d1;
+		}
+		return eye.add(dir.normalize().scale(Mth.lerp(e, l0, l1)));
+	}
+
+	/** A point of a stage shot: V points through the stage's anchors (any other space reads as the stage origin's frame). */
+	private Vec3 stagePoint(FilmSpace space, @Nullable String prop, double x, double y, double z, double time) {
+		Kosmik3D.Binding b = binding;
+		if (b == null) {
+			return Vec3.ZERO;
+		}
+		Kosmik3D.point(b, space == FilmSpace.V && prop != null ? prop : "", x, y, z, time, vtmp);
+		return new Vec3(vtmp[0], vtmp[1], vtmp[2]);
 	}
 
 	// ================================================================ internals

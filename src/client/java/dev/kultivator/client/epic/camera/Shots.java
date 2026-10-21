@@ -82,6 +82,12 @@ public final class Shots {
 		@Nullable Vec3 lookEnd;
 		/** Phase 30: the per-frame evaluator of a FILM shot. */
 		public dev.kultivator.client.epic.film.@Nullable FilmPath film;
+		/**
+		 * Film Kosmik 3D (DESIGN 32.1, 32.5.6): the stage this shot shows (a FILM stage shot, or Kamera Penuh's calm F3
+		 * segment of Film Pusaka). While it runs, {@code CinematicDirector.stageBinding()} returns it and the stage covers
+		 * the world; it is only ever left under a mask (32.1.5).
+		 */
+		public dev.kultivator.client.epic.kosmik.Kosmik3D.@Nullable Binding stage;
 
 		Shot(Type type, float seconds) {
 			this.type = type;
@@ -122,6 +128,12 @@ public final class Shots {
 		/** Marks a masked cut (28.3.2): no enter blend while the cloud wipe or an impact frame hides the jump. */
 		public Shot cut() {
 			this.cut = true;
+			return this;
+		}
+
+		/** Shows stage {@code binding} while this shot runs (32.1). */
+		public Shot stage(dev.kultivator.client.epic.kosmik.Kosmik3D.@Nullable Binding binding) {
+			this.stage = binding;
 			return this;
 		}
 
@@ -484,6 +496,8 @@ public final class Shots {
 		shot.ticks = Math.max(4, Math.min(Type.FILM.max, path.ticks()));
 		shot.film = path;
 		shot.ceremony = true;
+		// Film Kosmik 3D: a stage shot carries its binding (32.4)
+		shot.stage = path.binding();
 		return shot;
 	}
 
