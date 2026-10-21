@@ -108,6 +108,8 @@ bulat di dalam game.
 60. [**Suara Bicara (Jepang)**](#60-suara-bicara-jepang): siapa berbicara, pengaturan, kredit VOICEVOX
 61. [**Aura Kultivasi**](#61-aura-kultivasi): aura yang berbeda di setiap ranah dan tumbuh di setiap tahap saat
     berkultivasi, [pengaturan](#614-pengaturan-tab-pengaturan-grup-aura-kultivasi), [perintah uji](#616-perintah-uji-op)
+62. [**Kitab Panduan (di dalam game)**](#62-kitab-panduan-di-dalam-game): panduan langkah demi langkah dari Manusia Fana
+    sampai Dewa Abadi, dengan centang otomatis
 
 ---
 
@@ -116,6 +118,9 @@ bulat di dalam game.
 Sejak Fase 7 kamu tidak perlu menghafal daftar ini: **pelacak Langkah Pertama** di tepi kanan layar selalu menunjukkan
 langkah berikutnya beserta tombolnya, dan tablet **Jalan** di gulungan (`/kultivasi jalan`) memberi hadiah untuk setiap
 bab ([42](#42-tablet-jalan-langkah-pertama-ujian-fondasi-kewajiban-harian)).
+
+Ingin peta lengkap sampai Dewa Abadi? Buka **Kitab Panduan** di dalam game: tablet *Panduan* di gulungan (`'`),
+`/kultivasi panduan`, atau tombol *Kitab Panduan* (lihat [62](#62-kitab-panduan-di-dalam-game)).
 
 1. **Uji akar spiritualmu.** Semua orang mulai sebagai *Manusia Fana*. Tekan `'` untuk membuka gulungan kultivasi
    lalu klik jimat *Uji Akar*, atau ketik `/kultivasi root test`. Upacara 8 detik membaca akarmu: elemen apa yang kamu
@@ -8379,3 +8384,37 @@ Nama ranah: `mortal`, `qi_refining`, `foundation`, `golden_core`, `nascent_soul`
 `immortal_ascension`, `true_immortal`. Contoh: `/kultivasi uji aura golden_core 2`,
 `/kultivasi uji aura immortal_ascension 4 9`. Pratinjau berakhir sendiri, dan juga saat mati, pindah dimensi, keluar,
 atau server berhenti.
+
+---
+
+## 62. Kitab Panduan (di dalam game)
+
+**Kitab Panduan** adalah buku panduan di dalam game, supaya kamu tidak bermain buta dari *Manusia Fana* sampai
+*Dewa Abadi* dengan sekte tingkat tinggi dan banyak murid. Isinya 12 bab sesuai urutan bermain, 102 langkah:
+
+1. Hari Pertama · 2. Pemurnian Qi · 3. Pembangunan Fondasi · 4. Inti Emas · 5. Mendirikan Sekte · 6. Murid ·
+7. Jiwa Baru Lahir sampai Penyatuan Dao · 8. Formasi Sekte · 9. Sekte Tingkat Tinggi · 10. Kenaikan Abadi ·
+11. Dewa Abadi · 12. Tips & Kesalahan Umum
+
+**Cara membuka:**
+
+* tablet **Panduan** paling bawah di gulungan kultivasi (`'`), atau tombol angka `8` saat gulungan terbuka;
+* perintah `/kultivasi panduan` (semua pemain, tanpa cheat);
+* tombol **Kitab Panduan** di kategori tombol Kultivator (bawaan belum dipasang: atur di Pengaturan > Kontrol).
+
+**Cara membaca:** di kiri ada daftar bab dengan bilah kemajuan; bab yang sedang kamu jalani berbingkai emas, bab yang
+selesai mendapat cap giok bercentang. Di kanan, setiap langkah adalah kartu: tanda ✔ atau lingkaran kosong, judul,
+beberapa baris penjelasan, dan kadang *jimat perintah*: klik untuk menuliskan perintahnya di kotak obrolan (tinggal
+tekan Enter). Gulir dengan roda tetikus, panah atas/bawah, atau Page Up/Down; panah kiri/kanan berganti bab, Home
+kembali ke bab sekarang, Esc menutup.
+
+**Centang otomatis:** 62 langkah dicentang sendiri oleh server dari data aslimu: akar sudah diuji, ranah dan tahap
+yang dicapai, menit meditasi, Dao dipilih, Iblis Hati dikalahkan, Gua Kediaman, Aula Sekte didirikan dan tingkatnya,
+templat dan tingkat bangunan sekte, jumlah murid, Bintang Abadi, Pengakuan Langit, dan pencapaian mod (misalnya formasi
+Qi, pil pertama, murid pertama, Hu Fa, serbuan ditolak, Alam Abadi, Titah pertama). Langkah lain punya **kotak centang**
+yang kamu centang sendiri; centang ini tersimpan di data pemainmu di server (tetap ada setelah keluar-masuk dan saat
+mati). Saat satu bab selesai muncul pemberitahuan kecil *Bab selesai*, dan pelacak Langkah Pertama menampilkan baris
+"Panduan: Bab N".
+
+Untuk operator: `/kultivasi uji panduan info` menampilkan kemajuanmu, `/kultivasi uji panduan reset` menghapus semua
+centang manual.

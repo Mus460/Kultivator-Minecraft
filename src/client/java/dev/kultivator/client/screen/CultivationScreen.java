@@ -107,11 +107,12 @@ public class CultivationScreen extends Screen {
 		contentH = paperBottom - ScrollFrame.END - 6 - contentY;
 
 		tablets.clear();
-		int count = pages.length;
+		// One more tablet than pages: the last one opens the Kitab Panduan (its own screen, not a tab).
+		int count = pages.length + 1;
 		int top = paperTop + 10;
 		int gap = height < 250 ? 2 : 3;
 		int tabletH = Math.max(24, Math.min(54, (paperBottom - paperTop - 20 - gap * (count - 1)) / count));
-		for (int i = 0; i < count; i++) {
+		for (int i = 0; i < pages.length; i++) {
 			int index = i;
 			JadeTablet tablet = new JadeTablet(paperX0 - TABLET_W + 1, top + i * (tabletH + gap), TABLET_W, tabletH, glyph(i),
 					() -> pages[index].shortName(), () -> tab == index);
@@ -119,6 +120,13 @@ public class CultivationScreen extends Screen {
 			tablet.tooltip(() -> List.of(pages[index].title(), Component.translatable("kultivator.screen.tab.key", index + 1)));
 			tablets.add(tablet);
 		}
+		JadeTablet guide = new JadeTablet(paperX0 - TABLET_W + 1, top + pages.length * (tabletH + gap), TABLET_W, tabletH, Glyphs.PATH,
+				() -> Component.translatable("kultivator.guide_client.tab.short"), () -> false);
+		guide.onPress(this::openGuide);
+		guide.tooltip(() -> List.of(Component.translatable("kultivator.guide_client.title"),
+				Component.translatable("kultivator.guide_client.tab.tip").withStyle(net.minecraft.ChatFormatting.GRAY),
+				Component.translatable("kultivator.screen.tab.key", pages.length + 1)));
+		tablets.add(guide);
 		for (Page page : pages) {
 			page.layout(contentX, contentY, contentW, contentH);
 		}
@@ -138,6 +146,11 @@ public class CultivationScreen extends Screen {
 		}
 		tab = index;
 		pages[tab].layout(contentX, contentY, contentW, contentH);
+	}
+
+	/** Opens the Kitab Panduan; closing it comes back to this scroll. */
+	private void openGuide() {
+		dev.kultivator.client.guide.GuideClient.open(this);
 	}
 
 	private float unroll() {
@@ -314,6 +327,11 @@ public class CultivationScreen extends Screen {
 				UiSound.tab();
 				switchTab(number);
 			}
+			return true;
+		}
+		if (number == pages.length && event.key() <= InputConstants.KEY_9) {
+			UiSound.tab();
+			openGuide();
 			return true;
 		}
 		return super.keyPressed(event);

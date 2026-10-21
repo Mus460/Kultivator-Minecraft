@@ -165,7 +165,9 @@ public final class GuideTracker implements HudElement {
 		int titleCount = Math.min(2, titleRows.size());
 		int howCount = Math.min(2, howRows.size());
 		boolean reward = GoalsClient.cfg("guide", true) && rewardWaiting(data, Guide.bits(data));
-		float h = 16.0F + titleCount * 6.5F + howCount * 5.6F + 10.0F + (reward ? 6.0F : 0.0F);
+		// The Kitab Panduan's current chapter (once the guide book has synced), as one small line at the bottom.
+		boolean book = dev.kultivator.client.guide.GuideClient.synced() && !dev.kultivator.client.guide.GuideClient.allDone();
+		float h = 16.0F + titleCount * 6.5F + howCount * 5.6F + 10.0F + (reward ? 6.0F : 0.0F) + (book ? 6.0F : 0.0F);
 		float top = -h / 2.0F;
 		int alpha = Math.round(255 * Math.min(1.0F, t * 1.4F));
 
@@ -215,6 +217,11 @@ public final class GuideTracker implements HudElement {
 			y += 5.0F;
 			Component line = Component.translatable("kultivator.goals.tracker.reward", Keys.INFO.getTranslatedKeyMessage());
 			Brush.fit(g, font, line, 6.0F, y, w - 12.0F, Palette.argb(alpha, Palette.mix(Palette.GOLD, Palette.GOLD_LIGHT, pulse)), 0.6F, 0.45F, false);
+		}
+		if (book) {
+			y += 5.0F;
+			Component line = Component.translatable("kultivator.guide_client.tracker", dev.kultivator.client.guide.GuideClient.current() + 1);
+			Brush.fit(g, font, line, 6.0F, y, w - 12.0F, Palette.argb(alpha, Palette.JADE_LIGHT), 0.55F, 0.4F, false);
 		}
 	}
 
