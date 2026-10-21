@@ -302,8 +302,8 @@ public final class TitahScreen extends Screen {
 		Component state;
 		int stateColor;
 		if (!TitahClient.synced()) {
-			state = Component.translatable(K + "loading");
-			stateColor = Palette.INK_FAINT;
+			state = Component.translatable(TitahClient.tooBig() ? "kultivator.sect_fix_feat.too_big" : K + "loading");
+			stateColor = TitahClient.tooBig() ? Palette.SEAL : Palette.INK_FAINT;
 		} else if (!decree.unlocked) {
 			state = lockedLine(skill);
 			stateColor = Palette.SEAL;
@@ -352,7 +352,11 @@ public final class TitahScreen extends Screen {
 		float ry = filmY + 17.0F;
 		float pulse = glow.to(1.0F, seconds);
 		Brush.fit(g, font, TitahClient.readout(skill), rx, ry, rw, Palette.mix(Palette.INK_SOFT, Palette.JADE_DARK, 0.5F * pulse), 0.7F, 0.5F, false);
-		Brush.fit(g, font, Component.translatable(K + "hint"), rx, ry + 9.0F, rw, Palette.INK_FAINT, 0.65F, 0.5F, false);
+		if (TitahClient.tooBig()) {
+			Brush.fit(g, font, Component.translatable("kultivator.sect_fix_feat.too_big"), rx, ry + 9.0F, rw, Palette.SEAL, 0.65F, 0.5F, false);
+		} else {
+			Brush.fit(g, font, Component.translatable(K + "hint"), rx, ry + 9.0F, rw, Palette.INK_FAINT, 0.65F, 0.5F, false);
+		}
 
 		if (tooltip != null && !tooltip.isEmpty()) {
 			g.nextStratum();

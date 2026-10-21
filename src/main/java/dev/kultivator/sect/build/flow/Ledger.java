@@ -221,6 +221,26 @@ public final class Ledger implements MaterialLedger {
 		FlowData.dirty();
 	}
 
+	/**
+	 * {@link #salvage} without losing a stack's own data: false (nothing kept) when the stack carries data (an aged herb,
+	 * a name, enchantments) and the rich list is full, so the caller can keep it elsewhere.
+	 */
+	public boolean salvageWhole(UUID owner, ItemStack stack) {
+		if (stack == null || stack.isEmpty()) {
+			return true;
+		}
+		if (!stack.getComponentsPatch().isEmpty()) {
+			return keepRich(owner, stack);
+		}
+		salvage(owner, stack);
+		return true;
+	}
+
+	/** The registry-aware NBT ops of the running server, or null without one. */
+	static @Nullable RegistryOps<Tag> registryOps() {
+		return ops();
+	}
+
 	@Override
 	public long depositValueCenti(Item item) {
 		Deposits.Value value = Deposits.valueOf(item);

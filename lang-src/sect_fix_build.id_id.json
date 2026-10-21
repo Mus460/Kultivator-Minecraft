@@ -1,0 +1,9 @@
+{
+  "kultivator.sectbuild.skip.done_rules": "Bagian itu dilewati; bahan yang belum terpakai kembali ke Gudang. Bagian yang dilewati TIDAK dihitung selesai: tingkatnya tetap belum lengkap, jadi batas bangunan dan bangunan aula tidak naik. Untuk membangunnya nanti: /kultivasi aula bangun prioritas <bagian>.",
+  "kultivator.sectbuild.skip.not_allowed": "Hanya bagian yang terhalang atau menunggu bahan yang bisa dilewati.",
+  "kultivator.sectbuild.prio.requeued": "Bagian yang dilewati masuk antrean lagi, paling depan di tingkatnya; tingkatnya baru dihitung setelah bagian itu jadi.",
+  "kultivator.sectbuild.lumbung.to_peti": "Lumbung Sekte penuh: %s dan sisanya masuk Peti Galian (panel Bahan).",
+  "kultivator.sectbuild.lumbung.pending": "Lumbung Sekte dan Peti Galian penuh: %s menunggu (%s tumpukan semuanya). Ambil barang dari Lumbung atau Peti Galian; barang yang menunggu masuk sendiri.",
+  "kultivator.sectbuild.lumbung.still_pending": "%s tumpukan hasil sekte masih menunggu tempat di Lumbung Sekte atau Peti Galian.",
+  "kultivator.sectbuild.lumbung.delivered": "%s tumpukan hasil sekte yang menunggu sudah masuk Lumbung atau Peti Galian (%s masih menunggu)."
+}

@@ -46,6 +46,8 @@ public final class DiscipleBreakthrough {
 	private static final int SETTLE_TICKS = 30;
 	/** Share of max health each strike takes (before pills and the server's tribulation scale). */
 	public static final double STRIKE_SHARE = 0.18D;
+	/** All strikes of one tribulation together take at most this share (before pills and the scale): always below 100%. */
+	public static final double MAX_TOTAL_SHARE = 0.84D;
 	/** The disciple may be moved this far (horizontally) from where the breakthrough began. */
 	public static final double MAX_DRIFT = 6.0D;
 	/** The clouds hang this high above the disciple. */
@@ -107,9 +109,30 @@ public final class DiscipleBreakthrough {
 		return 2 + target.realm().ordinal() / 2;
 	}
 
-	/** Share of max health one strike takes, with the pills already taken and the server scale. */
+	/** Share of max health one strike of the running (or the next) tribulation takes, with the pills and the server scale. */
 	public static double strikeShare(DiscipleData data) {
-		return STRIKE_SHARE * data.nextTribulationFactor() * Math.max(0.0D, KultivatorConfig.get().tribulationDamageScale);
+		Trial t = data.trial();
+		if (t != null) {
+			return strikeShare(data, t.target);
+		}
+		Rank rank = data.rank();
+		Rank peak = rank.isBottleneck() ? rank : new Rank(rank.realm(), rank.layer(), rank.realm().stages() - 1);
+		return strikeShare(data, peak.next());
+	}
+
+	/**
+	 * Share of max health one strike into {@code target} takes: {@link #STRIKE_SHARE}, but all strikes together at most
+	 * {@link #MAX_TOTAL_SHARE} (True Immortal: 6 x 14% instead of 6 x 18% = 108%, a certain failure), then the pills
+	 * already taken and the server scale.
+	 */
+	public static double strikeShare(DiscipleData data, Rank target) {
+		double base = Math.min(STRIKE_SHARE, MAX_TOTAL_SHARE / Math.max(1, strikeCount(target)));
+		return base * data.nextTribulationFactor() * Math.max(0.0D, KultivatorConfig.get().tribulationDamageScale);
+	}
+
+	/** Every strike into {@code target} together, as a share of max health, before any outside help (Hu Fa, formations...). */
+	public static double totalShare(DiscipleData data, Rank target) {
+		return strikeCount(target) * strikeShare(data, target);
 	}
 
 	/** Qi Refining -> Foundation: {@code 0.7 + (grade - 2) x 0.05} plus pill bonuses, 5%..98%. */

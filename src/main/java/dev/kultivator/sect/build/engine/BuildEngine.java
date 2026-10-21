@@ -1945,21 +1945,46 @@ public final class BuildEngine implements EngineApi {
 		return true;
 	}
 
+	/**
+	 * Puts a component first in its tier's queue. A skipped component is queued again (it is built like any other and
+	 * only then counts for the tier). When another component is only waiting for its materials (nothing reserved yet,
+	 * so nothing to give back), that wait is dropped so the next refresh opens the prioritized one.
+	 */
 	@Override
 	public boolean prioritize(UUID owner, String componentId) {
 		Site site = sites.get(owner);
-		if (site == null || site.spec().component(componentId) == null || site.finished(componentId)) {
+		if (site == null || site.spec().component(componentId) == null || site.done.contains(componentId)) {
 			return false;
 		}
+		boolean requeued = site.skipped.remove(componentId);
 		site.prio = componentId;
+		if (site.fundId != null && site.openId == null && !site.fundId.equals(componentId)) {
+			Component next = Scheduler.next(site);
+			if (next != null && next.id().equals(componentId)) {
+				site.fundEmission = null;
+				site.fundId = null;
+				site.fundTold = false;
+			}
+		}
 		site.dirty = true;
+		if (requeued) {
+			save(site);
+		}
 		return true;
 	}
 
+	/**
+	 * Skips a component that cannot go on now: one waiting on blocked cells, or the one waiting for its materials. A
+	 * skipped component never counts toward the completed tier (the hall's building cap and bits), and "Prioritaskan"
+	 * queues it again. Test and showcase sites may skip anything.
+	 */
 	@Override
 	public boolean skip(UUID owner, String componentId) {
 		Site site = sites.get(owner);
 		if (site == null || site.spec().component(componentId) == null || site.finished(componentId)) {
+			return false;
+		}
+		if (!skippable(site, componentId)) {
 			return false;
 		}
 		if (componentId.equals(site.openId)) {
@@ -1985,6 +2010,14 @@ public final class BuildEngine implements EngineApi {
 		}
 		save(site);
 		return true;
+	}
+
+	/** True when the owner may skip the component now (blocked, or waiting for materials; anything on a test site). */
+	static boolean skippable(Site site, String componentId) {
+		if (site.test || site.showcase) {
+			return true;
+		}
+		return site.waiting.containsKey(componentId) || componentId.equals(site.fundId) && site.openId == null;
 	}
 
 	@Override

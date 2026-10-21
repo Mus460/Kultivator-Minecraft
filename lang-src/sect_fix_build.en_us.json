@@ -1,0 +1,9 @@
+{
+  "kultivator.sectbuild.skip.done_rules": "Part skipped; its unused materials went back to the Storehouse. A skipped part does NOT count as finished: its tier stays incomplete, so the hall's building cap and buildings do not rise. To build it later: /kultivasi aula bangun prioritas <part>.",
+  "kultivator.sectbuild.skip.not_allowed": "Only a part that is blocked or waiting for materials can be skipped.",
+  "kultivator.sectbuild.prio.requeued": "The skipped part is queued again and comes first in its tier; its tier counts once it is built.",
+  "kultivator.sectbuild.lumbung.to_peti": "The Sect Granary is full: %s and the rest went to the Dig Chest (Materials panel).",
+  "kultivator.sectbuild.lumbung.pending": "The Sect Granary and the Dig Chest are full: %s is waiting (%s stacks in all). Take goods out of the Granary or the Dig Chest; the waiting goods move in by themselves.",
+  "kultivator.sectbuild.lumbung.still_pending": "%s stacks of sect goods are still waiting for room in the Sect Granary or the Dig Chest.",
+  "kultivator.sectbuild.lumbung.delivered": "%s waiting stacks of sect goods moved into the Granary or the Dig Chest (%s still waiting)."
+}

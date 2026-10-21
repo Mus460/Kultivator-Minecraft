@@ -1,0 +1,10 @@
+{
+  "kultivator.sect_fix_feat.too_big": "Data too big to sync; showing the last data received. Please report this.",
+  "kultivator.sect_fix_feat.raid.postponed": "The %s could find no solid ground to land on near the sect; the raid is postponed by %s days.",
+  "kultivator.sect_fix_feat.outpost.limit": "At most %s Ancient Transportation outposts may stand outside the territory.",
+  "kultivator.sect_fix_feat.outpost.registered": "Outpost %s/%s registered outside the territory (at most %s blocks from the stele, same dimension, the hall must stay active).",
+  "kultivator.sect_fix_feat.anchor.none": "\"At Formation Point\" is hidden: this sect template has no built Formation Point yet.",
+  "kultivator.disciplecult.why.bt_doomed": "The lightning would take more health than is left",
+  "kultivator.sect_fix_feat.bt.refuse.doomed": "%s would surely fail: %s strikes take %s%% of max health in all, but only %s%% is left. Heal first, give a tribulation pill, or stand guard (Hu Fa) before starting.",
+  "kultivator.sect_fix_feat.scroll.limit": "Limit: %s disciples without a Sect Hall; with one, 5 + half the hall level (level %3$s: %2$s), plus sect building bonuses."
+}

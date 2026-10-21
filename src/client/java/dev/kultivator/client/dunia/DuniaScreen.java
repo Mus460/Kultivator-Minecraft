@@ -86,6 +86,17 @@ public class DuniaScreen extends Screen {
 		DuniaClient.requestAll();
 	}
 
+	/** The {@code DuniaSync} channel behind tab {@code index} (Alam, Pusaka, Musuh, Desa), or -1. */
+	protected int channelOf(int index) {
+		return switch (index) {
+			case 0 -> dev.kultivator.network.Payloads.DuniaSync.CH_ALAM;
+			case 1 -> dev.kultivator.network.Payloads.DuniaSync.CH_TEMPA;
+			case 2 -> dev.kultivator.network.Payloads.DuniaSync.CH_MUSUH;
+			case 3 -> dev.kultivator.network.Payloads.DuniaSync.CH_DESA;
+			default -> -1;
+		};
+	}
+
 	/** True for the key that toggles this screen (pressed while open, it closes it). */
 	protected boolean isCloseKey(KeyEvent event) {
 		return Keys.DUNIA.matches(event);
@@ -236,6 +247,9 @@ public class DuniaScreen extends Screen {
 			g.enableScissor(paperX0 + ScrollFrame.SIDE + 1, top + ScrollFrame.END + 1, paperX1 - ScrollFrame.SIDE - 1, bottom - ScrollFrame.END - 1);
 			drawHeader(g);
 			pages.get(tab).render(g, mouseX, mouseY, seconds);
+			if (DuniaClient.tooBig(channelOf(tab))) {
+				drawTooBig(g);
+			}
 			g.disableScissor();
 		}
 
@@ -269,6 +283,17 @@ public class DuniaScreen extends Screen {
 		Brush.rect(g, right - 1.0F, lineY - 2.0F, right + 3.0F, lineY + 2.0F, Palette.SEAL);
 		Glyphs.tab(g, current.icon(), contentX + 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
 		Glyphs.tab(g, current.icon(), contentX + contentW - 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
+	}
+
+	/** The server refused this tab's last sync as too big: a warning band at the bottom of the content box (the old data stays). */
+	private void drawTooBig(GuiGraphicsExtractor g) {
+		int y1 = contentY + contentH;
+		int y0 = y1 - 11;
+		g.nextStratum();
+		g.fill(contentX, y0, contentX + contentW, y1, Palette.argb(0xE0, Palette.PAPER_DEEP));
+		Brush.rect(g, contentX, y0, contentX + contentW, y0 + 0.6F, Palette.SEAL);
+		Brush.fitCentered(g, font, Component.translatable("kultivator.sect_fix_feat.too_big"), contentX + contentW / 2.0F, y0 + 2.0F,
+				contentW - 6.0F, Palette.SEAL_DARK, 0.75F, 0.5F, false);
 	}
 
 	// ================================================================== input

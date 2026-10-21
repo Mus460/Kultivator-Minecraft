@@ -1,6 +1,7 @@
 package dev.kultivator.sect.hall;
 
 import dev.kultivator.kehancuran.ProtectedZones;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -83,6 +84,28 @@ public class HallBlock extends Block {
 		if (level instanceof ServerLevel serverLevel && by instanceof ServerPlayer player) {
 			Halls.onStelePlaced(player, serverLevel, pos.immutable());
 		}
+	}
+
+	/**
+	 * Sneak-use with an empty main hand but something in the off hand (a shield, a totem, a torch): vanilla skips the
+	 * block's use whenever a sneaking player holds anything, so "Pindahkan Aula" would stay silent. The stele handles it
+	 * here as the empty-hand sneak-use (registered on both sides, so the client never places the off-hand item).
+	 */
+	static void initSneakUse() {
+		UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+			if (hand != InteractionHand.MAIN_HAND || player.isSpectator() || !player.isSecondaryUseActive() || !player.getMainHandItem().isEmpty()
+					|| player.getOffhandItem().isEmpty()) {
+				return InteractionResult.PASS;
+			}
+			BlockPos pos = hit.getBlockPos();
+			if (!level.getBlockState(pos).is(HallItems.SECT_HALL_STELE)) {
+				return InteractionResult.PASS;
+			}
+			if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer) {
+				Halls.onSteleUsed(serverPlayer, serverLevel, pos.immutable(), true);
+			}
+			return InteractionResult.SUCCESS;
+		});
 	}
 
 	@Override

@@ -88,6 +88,32 @@
     {
       "id": "minecraft:pale_hanging_moss",
       "required": false
+    },
+    "minecraft:brown_mushroom_block",
+    "minecraft:red_mushroom_block",
+    "minecraft:mushroom_stem",
+    "minecraft:cocoa",
+    "minecraft:infested_stone",
+    "minecraft:infested_cobblestone",
+    "minecraft:infested_stone_bricks",
+    "minecraft:infested_mossy_stone_bricks",
+    "minecraft:infested_cracked_stone_bricks",
+    "minecraft:infested_chiseled_stone_bricks",
+    "minecraft:infested_deepslate",
+    "minecraft:obsidian",
+    "minecraft:magma_block",
+    "minecraft:cobweb",
+    "minecraft:smooth_basalt",
+    "minecraft:sculk",
+    "minecraft:sculk_vein",
+    "minecraft:bee_nest",
+    {
+      "id": "minecraft:resin_clump",
+      "required": false
+    },
+    {
+      "id": "minecraft:creaking_heart",
+      "required": false
     }
   ]
 }

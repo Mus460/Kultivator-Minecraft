@@ -287,7 +287,22 @@ public final class Formasi {
 		}
 		DETECT_COOLDOWN.put(player.getUUID(), now);
 		int hallLevel = personal ? Limits.PERSONAL_HALL_LEVEL : CoreTicker.hallLevel(foreign ? territory : player.getUUID());
-		Detect.Outcome outcome = Detect.detect(level, pos, store.target(pos), hallLevel, personal);
+		Detect.Outcome outcome = null;
+		boolean outpost = false;
+		if (personal && CoreTicker.outpostSite(player.getUUID(), level, pos)) {
+			// An Ancient Transfer (L5) outpost (DESIGN 24.4.10): outside the territory but registered to the sect.
+			int sectLevel = CoreTicker.hallLevel(player.getUUID());
+			Detect.Outcome sect = Detect.detect(level, pos, store.target(pos), sectLevel, false);
+			if (sect.match() != null && Limits.L5_SPEC.equals(sect.match().spec().id())) {
+				outcome = sect;
+				outpost = true;
+				personal = false;
+				hallLevel = sectLevel;
+			}
+		}
+		if (outcome == null) {
+			outcome = Detect.detect(level, pos, store.target(pos), hallLevel, personal);
+		}
 		if (!fuel || foreign || outcome.match() == null) {
 			report(player, level, pos, outcome);
 			return InteractionResult.SUCCESS;
@@ -295,6 +310,17 @@ public final class Formasi {
 		MatchResult match = outcome.match();
 		FormationSpec spec = match.spec();
 		Component refusal = registrationRefusal(player, level, spec, personal, hallLevel, pos, null);
+		int outposts = 0;
+		if (refusal == null && outpost) {
+			for (CoreView view : dev.kultivator.formasi.core.Cores.of(player.getUUID())) {
+				if (!view.virtual() && view.ext().getBooleanOr("outpost", false)) {
+					outposts++;
+				}
+			}
+			if (outposts >= Limits.L5_OUTPOSTS) {
+				refusal = Component.translatable("kultivator.sect_fix_feat.outpost.limit", Limits.L5_OUTPOSTS);
+			}
+		}
 		if (refusal != null) {
 			Msg.chat(player, refusal.copy().withStyle(ChatFormatting.RED));
 			return InteractionResult.SUCCESS;
@@ -305,6 +331,9 @@ public final class Formasi {
 		record.createdDay = now / 24000L;
 		OwnerStore owners = OwnerStore.get(level.getServer());
 		record.draw = !personal && owners.entry(player.getUUID()).drawDefault;
+		if (outpost) {
+			record.ext.putBoolean("outpost", true);
+		}
 		Verifier.apply(record, match);
 		store.setTarget(pos, null);
 		feed(player, level, record, spec, held);
@@ -317,6 +346,10 @@ public final class Formasi {
 				.withStyle(ChatFormatting.GREEN));
 		if (record.reason != null) {
 			Msg.chat(player, Component.translatable("kultivator.formasi.state_reason", record.state.label(), record.reason).withStyle(ChatFormatting.GRAY));
+		}
+		if (outpost) {
+			Msg.chat(player, Component.translatable("kultivator.sect_fix_feat.outpost.registered", outposts + 1, Limits.L5_OUTPOSTS,
+					Limits.L5_OUTPOST_RANGE).withStyle(ChatFormatting.AQUA));
 		}
 		if (outcome.hint() != null) {
 			hint(player, outcome.hint());

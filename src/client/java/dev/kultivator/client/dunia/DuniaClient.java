@@ -13,11 +13,30 @@ import net.minecraft.nbt.CompoundTag;
 public final class DuniaClient {
 
 	private static final long[] VERSIONS = new long[Payloads.DuniaSync.CHANNELS];
+	/** Channels whose last sync was refused by the server as too big (the module keeps its previous data). */
+	private static final boolean[] TOO_BIG = new boolean[Payloads.DuniaSync.CHANNELS];
+	/** One client warning per channel per session. */
+	private static final boolean[] WARNED = new boolean[Payloads.DuniaSync.CHANNELS];
 
 	/** Routes one sync to its module ({@code KultivatorClient} calls this on the client thread). */
 	public static void onSync(Payloads.DuniaSync payload) {
 		CompoundTag data = payload.data();
-		switch (payload.channel()) {
+		int channel = payload.channel();
+		if (channel < 0 || channel >= Payloads.DuniaSync.CHANNELS) {
+			return;
+		}
+		if (data != null && data.getBooleanOr("too_big", false)) {
+			// The server refused an over-budget sync: keep the module's previous data and let the page say so.
+			TOO_BIG[channel] = true;
+			if (!WARNED[channel]) {
+				WARNED[channel] = true;
+				dev.kultivator.Kultivator.LOGGER.warn("DuniaSync channel {} was too big for the server budget; keeping the previous data", channel);
+			}
+			VERSIONS[channel]++;
+			return;
+		}
+		TOO_BIG[channel] = false;
+		switch (channel) {
 			case Payloads.DuniaSync.CH_ALAM -> dev.kultivator.client.alam.AlamClient.onSync(data);
 			case Payloads.DuniaSync.CH_MUSUH -> dev.kultivator.client.musuh.MusuhClient.onSync(data);
 			case Payloads.DuniaSync.CH_TEMPA -> dev.kultivator.client.tempa.TempaClient.onSync(data);
@@ -31,6 +50,11 @@ public final class DuniaClient {
 			}
 		}
 		VERSIONS[payload.channel()]++;
+	}
+
+	/** True while the last sync of {@code channel} was refused as too big (the page shows its previous data and a warning line). */
+	public static boolean tooBig(int channel) {
+		return channel >= 0 && channel < TOO_BIG.length && TOO_BIG[channel];
 	}
 
 	/** The number of syncs received on {@code channel} (0-6) so far. */

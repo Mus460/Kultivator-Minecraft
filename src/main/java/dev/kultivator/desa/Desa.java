@@ -122,7 +122,7 @@ public final class Desa {
 				}
 			}
 		});
-		Halls.addInfoProvider((viewer, owner, info) -> info.put("desa", syncTag(owner, viewer.getUUID().equals(owner))));
+		Halls.addInfoProvider((viewer, owner, info) -> info.put("desa", syncTag(owner, viewer.getUUID().equals(owner), true)));
 	}
 
 	private static boolean protects(ServerLevel level, BlockPos pos) {
@@ -510,14 +510,17 @@ public final class Desa {
 		for (UUID owner : List.copyOf(DIRTY)) {
 			ServerPlayer player = server.getPlayerList().getPlayer(owner);
 			if (player != null) {
-				Payloads.DuniaSync.send(player, Payloads.DuniaSync.CH_DESA, syncTag(owner, true));
+				Payloads.DuniaSync.send(player, Payloads.DuniaSync.CH_DESA, syncTag(owner, true, false));
 			}
 		}
 		DIRTY.clear();
 	}
 
-	/** The data of the Desa tablets (Dunia screen and hall page); {@code own} adds the action rights. */
-	static CompoundTag syncTag(UUID owner, boolean own) {
+	/**
+	 * The data of the Desa tablets (Dunia screen and hall page); {@code own} adds the action rights. {@code withLog} adds
+	 * the raid log, which only the hall page draws (the Dunia sync leaves it out to stay small).
+	 */
+	static CompoundTag syncTag(UUID owner, boolean own, boolean withLog) {
 		CompoundTag tag = new CompoundTag();
 		MinecraftServer server = Vassals.server();
 		KultivatorConfig config = KultivatorConfig.get();
@@ -562,7 +565,9 @@ public final class Desa {
 				v.putBoolean("siege", VillageRaids.siegeAt(owner, village.id) != null);
 				list.add(v);
 			}
-			tag.put("log", entry.log.copy());
+			if (withLog) {
+				tag.put("log", entry.log.copy());
+			}
 		}
 		tag.put("villages", list);
 		return tag;
@@ -577,7 +582,7 @@ public final class Desa {
 		}
 		UUID owner = player.getUUID();
 		if ("sync".equals(text)) {
-			Payloads.DuniaSync.send(player, Payloads.DuniaSync.CH_DESA, syncTag(owner, true));
+			Payloads.DuniaSync.send(player, Payloads.DuniaSync.CH_DESA, syncTag(owner, true, false));
 			return;
 		}
 		MinecraftServer server = player.level().getServer();

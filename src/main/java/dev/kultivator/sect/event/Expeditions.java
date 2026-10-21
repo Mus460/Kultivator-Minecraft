@@ -11,6 +11,7 @@ import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.Disciples;
 import dev.kultivator.disciple.path.DisciplePaths;
 import dev.kultivator.disciple.power.DisciplePowers;
+import dev.kultivator.sect.build.flow.LumbungOverflow;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sect.hall.SectRanks;
 import dev.kultivator.util.Advancements;
@@ -293,18 +294,20 @@ final class Expeditions {
 		if (type == TYPE_SECRET && random.nextDouble() < KUNPENG_CHANCE) {
 			loot.add(SectEventItems.fragment(1 + random.nextInt(6)));
 		}
-		List<Component> lost = new ArrayList<>();
+		// Into the Lumbung; what does not fit goes to the Peti Galian or waits for room (never lost).
+		int worst = LumbungOverflow.LUMBUNG;
+		Component example = null;
 		for (ItemStack stack : loot) {
-			ItemStack rest = Storehouse.insert(owner, stack);
-			if (!rest.isEmpty()) {
-				lost.add(rest.getHoverName());
+			Component name = stack.getHoverName();
+			int where = LumbungOverflow.store(owner, stack);
+			if (where > worst) {
+				worst = where;
+				example = name;
 			}
 		}
 		EventUtil.chat(player, Component.translatable("kultivator.sectevent.mission.success", missionName(type), tier, 10 * tier,
 				(int) Math.round(share * 100.0D)).withStyle(ChatFormatting.GOLD));
-		if (!lost.isEmpty()) {
-			EventUtil.chat(player, Component.translatable("kultivator.sectevent.store.full", lost.get(0)).withStyle(ChatFormatting.RED));
-		}
+		LumbungOverflow.tell(player, owner, worst, example);
 		if (type == TYPE_SECRET && player != null) {
 			Advancements.grant(player, "secret_realm");
 		}

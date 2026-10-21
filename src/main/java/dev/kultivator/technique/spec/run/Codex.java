@@ -112,18 +112,26 @@ public final class Codex {
 		TechniqueRunner.cast(player, spec, CastOptions.TEST);
 	}
 
-	private static @Nullable DiscipleEntity disciple(ServerPlayer player, int entityId) {
+	/**
+	 * The player's own living disciple {@code entityId} within {@code range}, else null; out of range the player is told
+	 * so (these buttons used to fail without a word beyond 16 blocks while the screen stays open up to 64).
+	 */
+	private static @Nullable DiscipleEntity disciple(ServerPlayer player, int entityId, double range) {
 		Entity entity = player.level().getEntity(entityId);
-		if (entity instanceof DiscipleEntity disciple && disciple.isAlive() && disciple.isOwnedBy(player)
-				&& player.distanceToSqr(disciple) <= Disciples.ACTION_RANGE * Disciples.ACTION_RANGE) {
-			return disciple;
+		if (!(entity instanceof DiscipleEntity disciple) || !disciple.isAlive() || !disciple.isOwnedBy(player)) {
+			return null;
 		}
-		return null;
+		if (player.distanceToSqr(disciple) > range * range) {
+			Msg.actionBar(player, Component.translatable("kultivator.disciples.too_far", disciple.getDisplayName(), (int) range).withColor(REFUSE));
+			return null;
+		}
+		return disciple;
 	}
 
 	/** {@code dslot:<socket>:<id|->}: a disciple's combat socket (22.13.3). */
 	private static void discipleSlot(ServerPlayer player, int entityId, String rest) {
-		DiscipleEntity entity = disciple(player, entityId);
+		// Only a loadout choice: the same range as the remote disciple screen.
+		DiscipleEntity entity = disciple(player, entityId, Disciples.VIEW_RANGE);
 		int colon = rest.indexOf(':');
 		if (entity == null || colon <= 0) {
 			return;
@@ -141,7 +149,7 @@ public final class Codex {
 
 	/** {@code teach:<id>}: teaches a spec to the disciple (the same rules as the Ajarkan button). */
 	private static void teach(ServerPlayer player, int entityId, String id) {
-		DiscipleEntity entity = disciple(player, entityId);
+		DiscipleEntity entity = disciple(player, entityId, Disciples.ACTION_RANGE);
 		TechniqueSpec spec = TechniqueRegistry.byId(id);
 		if (entity == null || spec == null) {
 			return;
@@ -154,7 +162,8 @@ public final class Codex {
 
 	/** {@code dlearn:<id>}: the master picks the disciple's Dewa art of a 9-star title (22.13.2 self-comprehension). */
 	private static void dewaChoice(ServerPlayer player, int entityId, String id) {
-		DiscipleEntity entity = disciple(player, entityId);
+		// The chat offer allows any distance; the screen's button uses the remote screen's range.
+		DiscipleEntity entity = disciple(player, entityId, Disciples.VIEW_RANGE);
 		if (entity == null) {
 			return;
 		}

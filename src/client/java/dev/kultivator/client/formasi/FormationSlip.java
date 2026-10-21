@@ -335,17 +335,22 @@ final class FormationSlip {
 		float half = (cw - 3.0F) / 2.0F;
 		LocalPlayer player = Minecraft.getInstance().player;
 		if (visible(cursor, 12.0F, top, bottom) && player != null) {
-			page.talisman(g, cx, cursor, half, 11.0F, Component.translatable("kultivator.formasiui.slip.front"), true,
-					() -> hologram(spec, PatternHologram.inFront(player), PatternHologram.facingRotation(player)), mouseX, mouseY,
-					List.of(Component.translatable("kultivator.formasiui.slip.front.tip")));
 			ListTag anchors = page.f().getListOrEmpty("anchors");
-			Component anchorLabel = anchors.isEmpty() ? Component.translatable("kultivator.formasiui.slip.anchor")
-					: Component.translatable("kultivator.formasiui.slip.anchor_n", anchorIndex % anchors.size() + 1, anchors.size());
-			page.talisman(g, cx + half + 3.0F, cursor, half, 11.0F, anchorLabel, !anchors.isEmpty(), () -> {
-				CompoundTag anchor = anchors.getCompoundOrEmpty(anchorIndex % anchors.size());
-				anchorIndex++;
-				hologram(spec, new BlockPos(anchor.getIntOr("x", 0), anchor.getIntOr("y", 0), anchor.getIntOr("z", 0)), -1);
-			}, mouseX, mouseY, List.of(Component.translatable("kultivator.formasiui.slip.anchor.tip")));
+			// No built Titik Formasi (no sect template has one yet): the "Di Titik Formasi" talisman is hidden, the
+			// hologram talisman takes the whole row and its tooltip says why.
+			List<Component> frontTip = anchors.isEmpty()
+					? List.of(Component.translatable("kultivator.formasiui.slip.front.tip"), Component.translatable("kultivator.sect_fix_feat.anchor.none"))
+					: List.of(Component.translatable("kultivator.formasiui.slip.front.tip"));
+			page.talisman(g, cx, cursor, anchors.isEmpty() ? cw : half, 11.0F, Component.translatable("kultivator.formasiui.slip.front"), true,
+					() -> hologram(spec, PatternHologram.inFront(player), PatternHologram.facingRotation(player)), mouseX, mouseY, frontTip);
+			if (!anchors.isEmpty()) {
+				Component anchorLabel = Component.translatable("kultivator.formasiui.slip.anchor_n", anchorIndex % anchors.size() + 1, anchors.size());
+				page.talisman(g, cx + half + 3.0F, cursor, half, 11.0F, anchorLabel, true, () -> {
+					CompoundTag anchor = anchors.getCompoundOrEmpty(anchorIndex % anchors.size());
+					anchorIndex++;
+					hologram(spec, new BlockPos(anchor.getIntOr("x", 0), anchor.getIntOr("y", 0), anchor.getIntOr("z", 0)), -1);
+				}, mouseX, mouseY, List.of(Component.translatable("kultivator.formasiui.slip.anchor.tip")));
+			}
 		}
 		cursor += 14.0F;
 		BlockPos looked = lookedEye();

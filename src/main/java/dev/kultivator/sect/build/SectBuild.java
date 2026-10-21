@@ -194,9 +194,9 @@ public final class SectBuild {
 					Msg.chat(player, Component.translatable("kultivator.sectbuild.upgrade.no_template").withStyle(ChatFormatting.YELLOW));
 				}
 			}
-			case "prio" -> tell(player, engine.prioritize(owner, param), "kultivator.sectbuild.prio.done");
-			case "skip" -> tell(player, engine.skip(owner, param), "kultivator.sectbuild.skip.done");
-			case "finish_blocked" -> tell(player, engine.finishWithoutBlocked(owner, param), "kultivator.sectbuild.finish_blocked.done");
+			case "prio" -> Msg.actionBar(player, BuildCommands.componentAction(owner, param, 0).message());
+			case "skip" -> Msg.chat(player, BuildCommands.componentAction(owner, param, 1).message());
+			case "finish_blocked" -> Msg.actionBar(player, BuildCommands.componentAction(owner, param, 2).message());
 			case "recheck" -> {
 				engine.recheck(owner);
 				Msg.actionBar(player, Component.translatable("kultivator.sectbuild.recheck.done").withStyle(ChatFormatting.AQUA));
@@ -273,11 +273,6 @@ public final class SectBuild {
 			}
 		}
 		GatherExpeditions.send(player, owner, cat, longTrip, members);
-	}
-
-	private static void tell(ServerPlayer player, boolean ok, String key) {
-		Msg.actionBar(player, Component.translatable(ok ? key : "kultivator.sectbuild.component.not_found")
-				.withStyle(ok ? ChatFormatting.AQUA : ChatFormatting.YELLOW));
 	}
 
 	private static boolean sectMate(ServerPlayer player, UUID owner) {
