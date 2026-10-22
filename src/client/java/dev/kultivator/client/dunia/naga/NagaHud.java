@@ -165,7 +165,8 @@ public final class NagaHud implements HudElement {
 		if (current != null) {
 			drawContest(g, minecraft, current, partial);
 		}
-		if (minecraft.player.getVehicle() instanceof NagaLiarEntity dragon && dragon.isTamed()) {
+		// the taming contest above is input and always shows; the riding stamina follows the "HUD Kultivator" coin (audit M5, S30)
+		if (dev.kultivator.client.EffectQuality.hudVisible() && minecraft.player.getVehicle() instanceof NagaLiarEntity dragon && dragon.isTamed()) {
 			drawStamina(g, minecraft, dragon);
 		}
 		if (dangerTicks > 0 && dangerAt != null) {

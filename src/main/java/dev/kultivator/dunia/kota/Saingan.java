@@ -4,6 +4,7 @@ import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Realm;
+import dev.kultivator.dunia.DuniaAnchors;
 import dev.kultivator.dunia.DuniaBudget;
 import dev.kultivator.dunia.DuniaEvents;
 import dev.kultivator.dunia.DuniaSites;
@@ -15,12 +16,17 @@ import dev.kultivator.fx.FxType;
 import dev.kultivator.harta.SpiritStones;
 import dev.kultivator.musuh.LootPouches;
 import dev.kultivator.musuh.MusuhFxIds;
+import dev.kultivator.sect.hall.HallData;
+import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
+import dev.kultivator.util.Sibuk;
 import dev.kultivator.util.Targeting;
 import dev.kultivator.voice.Voice;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
@@ -30,6 +36,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -83,14 +90,30 @@ public final class Saingan implements RivalService {
 		}
 	}
 
-	/** A pending ambush. */
-	record Ambush(UUID player, String group, long at, int tier, boolean warned) {
+	/** A pending ambush ({@code waits}: how often it already waited for the player to be free or outside safe ground). */
+	record Ambush(UUID player, String group, long at, int tier, boolean warned, int waits) {
+
+		Ambush(UUID player, String group, long at, int tier, boolean warned) {
+			this(player, group, at, tier, warned, 0);
+		}
 	}
+
+	/** A band that waited this often (every {@link Sibuk#RETRY_TICKS}, 5 minutes in all) gives up; its grudge cools by 5. */
+	static final int MAX_WAITS = 30;
+	/** Blocks around a birth whose strongest player caps the racing band (integration audit S20). */
+	static final double RACE_BAND_RADIUS = 128.0D;
 
 	private static final List<Race> RACES = new ArrayList<>();
 	private static final List<Ambush> AMBUSHES = new ArrayList<>();
+	/** Player -> the members of the band that ambushed them (an enemy event while one still stands). */
+	private static final Map<UUID, List<KultivatorNpc>> LIVE_AMBUSH = new HashMap<>();
 
 	static void init() {
+		// Towns and Kota Abadi are safe ground for every enemy system (integration audit T4); answered while module K is on.
+		DuniaApi.addSafeGround((level, pos) -> Kota.enabled()
+				&& (Towns.inTown(level, pos) || DuniaAnchors.nearest(level, Vec3.atCenterOf(pos), "kota/", Towns.SAFE_RADIUS) != null));
+		// A warned or striking rival band is an enemy event of the shared pressure (one at a time, daily cap).
+		Sibuk.registerEnemy("saingan", player -> ambushLive(player.getUUID()));
 		if (!Kota.config().rivals) {
 			return;
 		}
@@ -102,6 +125,26 @@ public final class Saingan implements RivalService {
 	static void clear() {
 		RACES.clear();
 		AMBUSHES.clear();
+		LIVE_AMBUSH.clear();
+	}
+
+	/** True while a warned ambush is about to strike the player, or one of its band still stands. */
+	static boolean ambushLive(UUID player) {
+		for (Ambush ambush : AMBUSHES) {
+			if (ambush.player().equals(player) && ambush.warned()) {
+				return true;
+			}
+		}
+		List<KultivatorNpc> band = LIVE_AMBUSH.get(player);
+		if (band == null) {
+			return false;
+		}
+		band.removeIf(member -> member.isRemoved() || !member.isAlive());
+		if (band.isEmpty()) {
+			LIVE_AMBUSH.remove(player);
+			return false;
+		}
+		return true;
 	}
 
 	/** The group's colour (0xB0B0B0 for an unknown one). */
@@ -126,6 +169,35 @@ public final class Saingan implements RivalService {
 		int byDays = (int) Math.min(Realm.TRUE_IMMORTAL.ordinal(), 1L + day / 10L);
 		int cap = Math.min(Realm.TRUE_IMMORTAL.ordinal(), data.strongestRecent(day) + 1);
 		return Math.max(1, Math.min(byDays, cap));
+	}
+
+	/** The realm a treasure tier is meant for (T1 Foundation, T2 Nascent Soul, T3 Dao Union, T4 True Immortal). */
+	static int realmOfTier(int tier) {
+		return switch (Mth.clamp(tier, 1, 4)) {
+			case 1 -> Realm.FOUNDATION.ordinal();
+			case 2 -> Realm.NASCENT_SOUL.ordinal();
+			case 3 -> Realm.DAO_UNION.ordinal();
+			default -> Realm.TRUE_IMMORTAL.ordinal();
+		};
+	}
+
+	/**
+	 * The band of a group racing to {@code birth} (integration audit S20): the server's band, but never above the realm
+	 * the treasure tier is meant for, nor more than one realm above the strongest player within 128 blocks of it.
+	 */
+	static int raceBand(ServerLevel level, TreasureBirth birth) {
+		int band = Math.min(band(level.getServer()), realmOfTier(birth.tier()));
+		Vec3 at = Vec3.atBottomCenterOf(birth.pos());
+		int strongest = -1;
+		for (ServerPlayer player : level.players()) {
+			if (!player.isSpectator() && player.position().distanceToSqr(at) <= RACE_BAND_RADIUS * RACE_BAND_RADIUS) {
+				strongest = Math.max(strongest, Cultivators.get(player).realm().ordinal());
+			}
+		}
+		if (strongest >= 0) {
+			band = Math.min(band, strongest + 1);
+		}
+		return Math.max(1, band);
 	}
 
 	// ================================================================== RivalService
@@ -356,7 +428,7 @@ public final class Saingan implements RivalService {
 				KotaNet.fx(player, KotaNet.FX_DESCENT, landing.x, landing.y, landing.z, group.color, 1 + group.members.length, 50, null);
 			}
 		}
-		int band = band(level.getServer());
+		int band = raceBand(level, race.birth);
 		List<KultivatorNpc> spawned = spawnGroup(level, group, landing, band, Math.min(3, group.members.length), true);
 		race.members.addAll(spawned);
 		for (KultivatorNpc member : spawned) {
@@ -511,11 +583,22 @@ public final class Saingan implements RivalService {
 				next.add(ambush);
 				continue;
 			}
-			boolean safe = Towns.inTown(level, player.blockPosition()) || !level.canSeeSky(player.blockPosition().above())
-					|| DuniaApi.souls().isSoul(player) || player.isCreative() || player.isSpectator();
+			if (player.isCreative() || player.isSpectator() || level.getDifficulty() == Difficulty.PEACEFUL) {
+				continue;
+			}
+			boolean safe = DuniaApi.safeGround(level, player.blockPosition()) || Towns.inTown(level, player.blockPosition())
+					|| !level.canSeeSky(player.blockPosition().above()) || DuniaApi.souls().isSoul(player) || inSectTerritory(level, player)
+					|| !player.onGround() || player.isPassenger() || player.isFallFlying() || player.getAbilities().flying
+					|| DuniaApi.routes().aboard(player)
+					// never in the middle of real danger or a ritual (the shared Sibuk door; this band itself left out)
+					|| Sibuk.whyExcept(player, "saingan") != null;
 			if (safe) {
-				// wait outside the walls
-				next.add(new Ambush(ambush.player(), ambush.group(), now + 200L, ambush.tier(), false));
+				// wait outside the walls, or until the cultivator is free again (asked again in 10 s, given up after 5 min)
+				if (ambush.waits() + 1 >= MAX_WAITS) {
+					SainganData.get(server).addGrudge(ambush.group(), player.getUUID(), -5);
+					continue;
+				}
+				next.add(new Ambush(ambush.player(), ambush.group(), now + Sibuk.RETRY_TICKS, ambush.tier(), false, ambush.waits() + 1));
 				continue;
 			}
 			KotaData data = KotaData.get(server);
@@ -523,16 +606,21 @@ public final class Saingan implements RivalService {
 			if (data.dailyCount(player.getUUID(), day, "ambush") >= Kota.config().ambushPerDay) {
 				continue;
 			}
+			// Shared enemy pressure: the daily cap of ambushes, rival bands and raids together.
+			if (!ambush.warned() && Sibuk.enemyRefusal(player) != null) {
+				continue;
+			}
 			if (!ambush.warned()) {
 				Fx.send(level, player.position().add(0.0D, 1.0D, 0.0D), FxType.MUSUH, MusuhFxIds.AMBUSH_ALERT, colorOf(ambush.group()), 3.0F);
 				level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 1.0F, 0.8F);
 				Msg.actionBar(player, Component.translatable("kultivator.kota.saingan.niat_membunuh").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
-				next.add(new Ambush(ambush.player(), ambush.group(), now + WARNING_TICKS, ambush.tier(), true));
+				next.add(new Ambush(ambush.player(), ambush.group(), now + WARNING_TICKS, ambush.tier(), true, ambush.waits()));
 				continue;
 			}
 			SainganData.Group group = SainganData.get(server).byId(ambush.group());
 			if (group != null && strike(player, group, ambush.tier())) {
 				data.addDaily(player.getUUID(), day, "ambush", 1);
+				Sibuk.enemyTaken(player, "saingan");
 			}
 		}
 		AMBUSHES.clear();
@@ -554,6 +642,7 @@ public final class Saingan implements RivalService {
 			member.markHostile(player);
 			member.memory().putBoolean("ambush", true);
 		}
+		LIVE_AMBUSH.put(player.getUUID(), new ArrayList<>(members));
 		KotaVoice.say(members.getFirst(), KotaVoice.RIVAL_CLAIM, "rogue.ambush", "kultivator.kota.saingan.suara.klaim");
 		Msg.chat(player, Component.translatable("kultivator.kota.saingan.sergap", groupName(group)).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
 		return true;
@@ -635,6 +724,68 @@ public final class Saingan implements RivalService {
 	}
 
 	// ================================================================== helpers
+
+	/** True inside any sect's territory (the same rule as the road ambushes of {@code musuh}). */
+	private static boolean inSectTerritory(ServerLevel level, ServerPlayer player) {
+		for (UUID owner : HallData.get(level.getServer()).owners()) {
+			if (Halls.inTerritory(owner, level, player.position())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * The DUNIA hub card "Saingan" (integration audit S21, drawn by module M5): every group with its name, colour, style,
+	 * the viewer's grudge (0-100), whether the viewer beat its leader, and its home region once the viewer crossed it
+	 * (a grudge or a beaten leader). Sent as {@link KotaNet#SCREEN_SAINGAN} / {@link KotaNet#TAB_SAINGAN}.
+	 */
+	static CompoundTag view(ServerPlayer player) {
+		CompoundTag tag = new CompoundTag();
+		ListTag list = new ListTag();
+		MinecraftServer server = player.level().getServer();
+		boolean on = Kota.enabled() && Kota.config().rivals;
+		if (on) {
+			for (SainganData.Group group : SainganData.get(server).groups()) {
+				CompoundTag g = new CompoundTag();
+				g.putString("id", group.id);
+				g.putString("name", "kultivator.kota.grup." + group.name);
+				g.putString("style", "kultivator.kota.gaya." + SainganData.STYLES[group.style]);
+				g.putInt("color", group.color);
+				int grudge = group.grudge(player.getUUID());
+				boolean beaten = group.beatenBy(player.getUUID());
+				g.putInt("grudge", grudge);
+				g.putBoolean("beaten", beaten);
+				g.putInt("wins", group.wins);
+				g.putInt("losses", group.losses);
+				if (grudge > 0 || beaten) {
+					g.putBoolean("known", true);
+					g.putInt("x", group.region.getX());
+					g.putInt("z", group.region.getZ());
+				}
+				list.add(g);
+			}
+			tag.putInt("band", band(server));
+		}
+		tag.put("groups", list);
+		tag.putBoolean("on", on);
+		long day = Kota.day(server);
+		tag.putInt("ambush_today", KotaData.get(server).dailyCount(player.getUUID(), day, "ambush"));
+		tag.putInt("ambush_cap", Kota.config().ambushPerDay);
+		tag.putInt("pressure_today", Sibuk.enemyToday(player));
+		tag.putInt("pressure_cap", Sibuk.DAILY_ENEMY_CAP);
+		tag.putBoolean("pending", pendingFor(player.getUUID()));
+		return tag;
+	}
+
+	private static boolean pendingFor(UUID player) {
+		for (Ambush ambush : AMBUSHES) {
+			if (ambush.player().equals(player)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	static @Nullable SainganData.Group nearest(MinecraftServer server, BlockPos pos) {
 		SainganData.Group best = null;

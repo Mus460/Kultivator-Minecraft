@@ -92,9 +92,15 @@ public record DuelRuleSet(RealmRule realm, JurusRule jurus, WinRule win, int rad
 		slipSpec = stake == StakeKind.GULUNGAN && slipSpec != null && !slipSpec.isBlank() ? slipSpec : null;
 	}
 
-	/** The defaults: BEBAS, swords only, Deathblow wins, radius 9, 180 s, the intro film, no stake, no crowd. */
+	/**
+	 * The defaults: BEBAS, swords only, Deathblow wins, the ring radius and time limit of {@code kultivator-duel.json}
+	 * ({@code ringRadiusDefault} 9, {@code timeLimitSeconds} 180; audit M4 R9: the time limit was never read), the intro
+	 * film, no stake, no crowd.
+	 */
 	public static DuelRuleSet defaults() {
-		return new DuelRuleSet(RealmRule.BEBAS, JurusRule.PEDANG_SAJA, WinRule.TEBASAN_PENENTU, 9, TIME_LIMIT_DEFAULT, true, StakeKind.TANPA, 0,
+		dev.kultivator.duel.DuelConfig config = dev.kultivator.duel.DuelConfig.get();
+		int ticks = config.timeLimitSeconds > 0 ? config.timeLimitTicks() : TIME_LIMIT_DEFAULT;
+		return new DuelRuleSet(RealmRule.BEBAS, JurusRule.PEDANG_SAJA, WinRule.TEBASAN_PENENTU, config.ringRadiusDefault, ticks, true, StakeKind.TANPA, 0,
 				0, null, false);
 	}
 

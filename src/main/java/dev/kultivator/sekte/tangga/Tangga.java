@@ -65,17 +65,32 @@ public final class Tangga implements TanggaService {
 	private static boolean initialised;
 
 	/** From {@code SekteContent.init()} (both physical sides). */
+	private static boolean content;
+
+	/** Registry content (K1): the payload type and the heart-stone component, always, whatever the switches say. */
+	public static void registerContent() {
+		if (content) {
+			return;
+		}
+		content = true;
+		TanggaPayloads.register();
+		BatuHatiKomponen.register();
+	}
+
 	public static void init() {
+		registerContent();
 		if (initialised || !SekteContent.on(SekteIds.G)) {
 			return;
 		}
 		initialised = true;
 		TanggaConfig.load();
-		TanggaPayloads.register();
-		BatuHatiKomponen.register();
 		SekteApi.setTangga(INSTANCE);
 		Candidates.setStairTrial(Pendakian.TRIAL);
 		ServerTickEvents.END_SERVER_TICK.register(Pendakian::tick);
+		// R23: the hub card asks for the records and gets a scroll, not chat lines.
+		net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.registerGlobalReceiver(TanggaPayloads.Minta.TYPE,
+				(payload, context) -> net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(context.player(),
+						new TanggaPayloads.Catatan(TanggaCommands.records(context.player()))));
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
 			Pendakian.stopAll(server);
 			STAIR.clear();

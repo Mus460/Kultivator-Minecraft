@@ -62,14 +62,25 @@ public final class Tetua {
 	private static boolean initialised;
 	private static long ticks;
 
+	private static boolean content;
+
+	/** Payload types (K1): always, whatever the switches say. */
+	public static void registerContent() {
+		if (content) {
+			return;
+		}
+		content = true;
+		TetuaPayloads.init();
+	}
+
 	public static void init() {
+		registerContent();
 		if (initialised || !SekteContent.on(SekteIds.E)) {
 			return;
 		}
 		initialised = true;
 		config = SekteConfig.section(SekteIds.E, TetuaConfig.class, TetuaConfig::new, TetuaConfig::clamp);
 		SekteApi.setTetua(new Service());
-		TetuaPayloads.init();
 		TetuaCommands.init();
 		DiscipleHooks.addTick20(Tetua::tick20);
 		Halls.addStatusLineProvider(Tetua::statusLine);

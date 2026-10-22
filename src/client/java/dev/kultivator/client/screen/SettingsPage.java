@@ -25,7 +25,8 @@ import java.util.List;
 final class SettingsPage extends Page {
 
 	private static final String C = "kultivator.codex.settings.";
-	private static final String[] HELP = {"visuals", "momen", "visuals", "jalan", "kitab_teknik"};
+	/** The "?" topic per group (audit M5, R25): Tampilan, Film, Suara, HUD, Kontrol. */
+	private static final String[] HELP = {"visuals", "momen", "suara", "hud", "tombol"};
 	private static final int GAP = 12;
 
 	/** A heading, text line or note drawn by the page itself (not a control). */

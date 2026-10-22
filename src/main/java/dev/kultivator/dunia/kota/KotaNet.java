@@ -24,6 +24,8 @@ public final class KotaNet {
 	public static final int SCREEN_KOTA = 0;
 	public static final int SCREEN_ABADI = 1;
 	public static final int SCREEN_PERTEMUAN = 2;
+	/** The rival groups page of the DUNIA hub card "Saingan" (no NPC: {@code npcId} -1). */
+	public static final int SCREEN_SAINGAN = 3;
 	// Tabs of the town screen
 	public static final int TAB_TOKO = 0;
 	public static final int TAB_LELANG = 1;
@@ -39,6 +41,13 @@ public final class KotaNet {
 	public static final int TAB_LELANG_ABADI = 20;
 	/** The wanderer meeting. */
 	public static final int TAB_PERTEMUAN = 30;
+	/**
+	 * The rival groups (integration audit S21). Data: {@code on}, {@code band}, {@code groups} (list of {@code id},
+	 * {@code name} and {@code style} translation keys, {@code color}, {@code grudge} 0-100, {@code beaten}, {@code wins},
+	 * {@code losses}, and {@code known} with {@code x}/{@code z} of the home region), {@code ambush_today}/{@code ambush_cap},
+	 * {@code pressure_today}/{@code pressure_cap} (the shared enemy pressure) and {@code pending}.
+	 */
+	public static final int TAB_SAINGAN = 40;
 	/** Reach for screen actions (blocks from the NPC). */
 	public static final double REACH = 8.0D;
 
@@ -131,11 +140,30 @@ public final class KotaNet {
 		}
 	}
 
+	/**
+	 * Client to server: "show me the rival groups" (the DUNIA hub card "Saingan"); answered with a {@link Screen} of
+	 * {@link #SCREEN_SAINGAN} / {@link #TAB_SAINGAN}, {@code open} as asked.
+	 */
+	public record SainganAsk(boolean open) implements CustomPacketPayload {
+		public static final Type<SainganAsk> TYPE = new Type<>(Kultivator.id("kota_saingan_ask"));
+		public static final StreamCodec<RegistryFriendlyByteBuf, SainganAsk> CODEC = StreamCodec.of(
+				(buf, p) -> buf.writeBoolean(p.open),
+				buf -> new SainganAsk(buf.readBoolean()));
+
+		@Override
+		public Type<SainganAsk> type() {
+			return TYPE;
+		}
+	}
+
 	static void init() {
 		PayloadTypeRegistry.clientboundPlay().register(Screen.TYPE, Screen.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Fx.TYPE, Fx.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Action.TYPE, Action.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(SainganAsk.TYPE, SainganAsk.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(Action.TYPE, (payload, context) -> Kota.onAction(context.player(), payload));
+		ServerPlayNetworking.registerGlobalReceiver(SainganAsk.TYPE, (payload, context) -> screen(context.player(), payload.open(), SCREEN_SAINGAN,
+				TAB_SAINGAN, -1, Saingan.view(context.player())));
 	}
 
 	public static void screen(ServerPlayer player, boolean open, int screen, int tab, int npcId, CompoundTag data) {

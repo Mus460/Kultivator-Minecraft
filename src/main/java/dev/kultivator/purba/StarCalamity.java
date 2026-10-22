@@ -39,8 +39,9 @@ import java.util.UUID;
  * Bencana Bintang, the player's Seven Calamities (DESIGN 26.5.2; Renegade Immortal ch. ~1157-1159, DESIGN 20.3.19): calamity
  * k (1-7) gates star {@code f + 9(k − 1)} with f = 6 / 7 / 8 by the average breakthrough quality (the disciples' rule). A
  * {@link Stars.StarGate} stops condensing before a gated star; the run ({@code bencana mulai}) deducts the star's cost,
- * shows a 6 s omen, then {@code 6 + k} strikes of {@code (0.12 + 0.01 × trial) × max HP} (the last ×2) through
- * {@link Tribulation#strike}, an envoy wave of {@code 2 + k} every 3 strikes. Passing condenses the star; finishing a Trial
+ * shows a 6 s omen, then {@code 6 + k} strikes of {@code (0.12 + 0.01 × trial) × max HP} (the last ×1.5; balance change
+ * R3, approved: it was ×2) through {@link Tribulation#strike(ServerPlayer, double, int)} with Hu Fa, the lightning rings
+ * (a graze heals 6%) and the CALAMITY beats of {@code EpicHooks.playerCalamity} (audit M4 S8), an envoy wave of {@code 2 + k} every 3 strikes. Passing condenses the star; finishing a Trial
  * (k = 2, 4, 7) multiplies T by 1.1 (≤ 1.331), registered through {@code TechniquePower.addPlayerStarFactor}. Failing gives
  * Luka Bencana (Qi Deviation 12,000 ticks) and 50% of the cost back. Calamities already behind an old save's stars are
  * Terlewati (skipped): they never take a star and can be run later for T alone. Segel Penangkal (3 heaven seal shards)
@@ -54,7 +55,8 @@ final class StarCalamity {
 	public static final int STRIKE_INTERVAL = 60;
 	public static final double STRIKE_BASE = 0.12D;
 	public static final double STRIKE_PER_TRIAL = 0.01D;
-	public static final double LAST_STRIKE = 2.0D;
+	/** Balance change (audit M4 R3, approved): the final strike ×1.5 like the IA / TI tribulations (it was ×2). */
+	public static final double LAST_STRIKE = 1.5D;
 	public static final double SEAL_FACTOR = 0.85D;
 	public static final int SEAL_SHARDS = 3;
 	public static final double TRIAL_STEP = 1.1D;
@@ -320,6 +322,9 @@ final class StarCalamity {
 		Run run = new Run(player.getUUID(), chosen, gate, cost, seal, now);
 		RUNS.put(player.getUUID(), run);
 		run.bar.addPlayer(player);
+		// audit M4 S8: the rings and Hu Fa of a tribulation, and the calamity omen scene (danger-gated 7b camera)
+		Tribulation.ritualBegin(player, data.rank());
+		EpicHooks.playerCalamity(player, EpicIds.CAL_OMEN, chosen, 0, run.total);
 		Fx.send(player.level(), player.position(), FxType.PURBA, PurbaFxIds.WRATH_SKY, 1, 0.0F);
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 1.5F, 0.6F);
 		Msg.chat(player, Component.translatable(gate ? "kultivator.purba.calamity.begin" : "kultivator.purba.calamity.begin_t", chosen, run.total,
@@ -379,6 +384,7 @@ final class StarCalamity {
 			if (player == null) {
 				// Gone without the leave event (it normally calls abandon, which returns the cost in full).
 				run.bar.removeAllPlayers();
+				Tribulation.ritualDrop(run.player);
 				iterator.remove();
 				continue;
 			}
@@ -397,6 +403,11 @@ final class StarCalamity {
 
 	private static void step(ServerPlayer player, Run run) {
 		long now = player.level().getGameTime();
+		if (run.strikes < run.total && now == run.next - dev.kultivator.elite.LightningRings.TELEGRAPH_TICKS) {
+			// audit M4 S8: the ring at the player's feet and the pre-strike beat
+			Tribulation.ritualTelegraph(player, run.strikes + 1, run.next);
+			EpicHooks.playerCalamity(player, EpicIds.CAL_PRE, run.k, run.strikes + 1, run.total);
+		}
 		if (run.strikes >= run.total || now < run.next) {
 			return;
 		}
@@ -408,7 +419,8 @@ final class StarCalamity {
 				run.strikes == run.total ? 0.5F : 0.8F);
 		run.bar.setName(Component.translatable("kultivator.purba.calamity.bar", run.k, run.strikes, run.total));
 		run.bar.setProgress(Mth.clamp(1.0F - run.strikes / (float) run.total, 0.0F, 1.0F));
-		if (Tribulation.strike(player, share)) {
+		EpicHooks.playerCalamity(player, EpicIds.CAL_STRIKE, run.k, run.strikes, run.total);
+		if (Tribulation.strike(player, share, run.strikes)) {
 			run.failed = true;
 			return;
 		}
@@ -436,6 +448,8 @@ final class StarCalamity {
 	static void finish(ServerPlayer player, Run run, boolean pass) {
 		dev.kultivator.voice.Voice.heaven(player, pass ? "tribulation_pass" : "tribulation_fail");
 		run.bar.removeAllPlayers();
+		Tribulation.ritualEnd(player, pass);
+		EpicHooks.playerCalamity(player, pass ? EpicIds.CAL_PASS : EpicIds.CAL_FAIL, run.k, run.strikes, run.total);
 		EnvoyAi.dismissFor(player.getUUID());
 		Fx.send(player.level(), player.position(), FxType.PURBA, PurbaFxIds.WRATH_SKY, 0, 0.0F);
 		CultivationData data = Cultivators.get(player);
@@ -492,6 +506,8 @@ final class StarCalamity {
 			return;
 		}
 		run.bar.removeAllPlayers();
+		Tribulation.ritualEnd(player, false);
+		EpicHooks.playerCalamity(player, EpicIds.CAL_ABORT, run.k, run.strikes, run.total);
 		EnvoyAi.dismissFor(player.getUUID());
 		if (run.cost > 0.0D) {
 			CultivationData data = Cultivators.get(player);

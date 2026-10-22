@@ -383,6 +383,9 @@ public final class Courts {
 		if (n == 1) {
 			Advancements.grant(player, "dunia/court_mirror");
 		}
+		// audit M4 S4 (approved): a Dunia milestone per court (pass() runs once per court: passed == n - 1)
+		dev.kultivator.cultivation.XpSources.milestone(player, dev.kultivator.cultivation.XpSources.MILESTONE_COURT,
+				Component.translatable("kultivator.kekuatan.milestone.court"));
 	}
 
 	/** Nilai Batu a passed court pays: 9 × n, doubled at the fifth and the tenth court (630 NB for all ten). */

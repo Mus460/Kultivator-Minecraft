@@ -62,16 +62,27 @@ public final class Paviliun {
 	private static @Nullable MinecraftServer server;
 	private static long ticks;
 
+	private static boolean content;
+
+	/** Registry content (K1): the incense item, the altar/tomb components and the payload types, always. */
+	public static void registerContent() {
+		if (content) {
+			return;
+		}
+		content = true;
+		Dupa.init();
+		PaviliunKomponen.register();
+		PaviliunPayloads.init();
+	}
+
 	public static void init() {
+		registerContent();
 		if (initialised || !SekteContent.on(SekteIds.A)) {
 			return;
 		}
 		initialised = true;
 		config = SekteConfig.section(SekteIds.A, PaviliunConfig.class, PaviliunConfig::new, PaviliunConfig::clamp);
-		Dupa.init();
-		PaviliunKomponen.register();
 		SekteApi.setPaviliun(new Service());
-		PaviliunPayloads.init();
 		PaviliunCommands.init();
 		DiscipleHooks.addOnDeath(Makam::onDeath);
 		DiscipleHooks.addTick20(Paviliun::tick20);

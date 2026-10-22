@@ -40,13 +40,13 @@
   "kultivator.abadi.why.ascension": "complete the Ascension first",
   "kultivator.abadi.why.cooldown": "the last failure still hurts (%s min)",
   "kultivator.abadi.why.hurt": "you were hurt in the last 10 seconds",
-  "kultivator.abadi.why.offering": "offering: %s/%s Tomb Energy Essence and %s/1 Supreme spirit stone",
+  "kultivator.abadi.why.offering": "offering: %s/%s Tomb Energy Essence and %s/1 Supreme Spirit Stone",
 
   "kultivator.abadi.gate.peak": "Dewa Abadi Peak",
   "kultivator.abadi.gate.stars": "Stars: ★%s / ★%s",
   "kultivator.abadi.gate.ascension": "The Ascension completed",
   "kultivator.abadi.gate.essence": "Tomb Energy Essence: %s / %s",
-  "kultivator.abadi.gate.stone": "Supreme spirit stone: %s / %s",
+  "kultivator.abadi.gate.stone": "Supreme Spirit Stone: %s / %s",
   "kultivator.abadi.gate.cooldown": "Rest after a failure: %s min left",
 
   "kultivator.abadi.cross.no_talisman": "You carry no Realm Crossing Talisman.",
@@ -104,7 +104,7 @@
   "kultivator.abadi.page.cross": "Cross Realms",
   "kultivator.abadi.page.cross_tip": "Starts the talisman's 5 s channel.",
   "kultivator.abadi.page.convert": "Refine 1 Stone",
-  "kultivator.abadi.page.convert_tip": "+2%% Immortal Essence for 1 Origin Stone (%s left today).",
+  "kultivator.abadi.page.convert_tip": "+2%% Immortal Essence (a body meter, not an item) for 1 Origin Stone (%s left today).",
   "kultivator.abadi.page.fallback": "No island was found near the centre: arrivals come down slowly over the clouds.",
 
   "kultivator.abadi.native.laba": "Heaven-Thread Spider",
@@ -136,7 +136,7 @@
   "kultivator.abadi.lelang.step": "+%s%%",
   "kultivator.abadi.lelang.step_tip": "Bid %s Origin Stones (you carry %s). Paid only if you win.",
   "kultivator.abadi.lelang.consign": "Consign held item",
-  "kultivator.abadi.lelang.consign_tip": "Sell one of the held item through the house (at most %s per session); paid in Origin Stones when the session ends.",
+  "kultivator.abadi.lelang.consign_tip": "Sell one piece of the held item through the house (at most %s per session); paid 0.6-1.0 × its value in Origin Stones when the session ends.",
   "kultivator.abadi.lelang.consign.refuse": "The house does not take that item.",
   "kultivator.abadi.lelang.consign.full": "At most %s consignments per session.",
   "kultivator.abadi.lelang.consign.done": "Consigned: %s (worth about %s Origin Stones).",
@@ -206,9 +206,9 @@
   "advancement.kultivator.pursuit_survived.description": "Beat the band a jealous rival sent after you",
 
   "kultivator.screen.help.alam_abadi.title": "Immortal Realm (Alam Abadi)",
-  "kultivator.screen.help.alam_abadi": "At Dewa Abadi Peak with ★9 or more and the Ascension done, offer 9 Tomb Energy Essence and 1 Supreme spirit stone and begin the Realm Ascension Tribulation (Immortality screen, Realm tablet, or /kultivasi abadi naik): a 10 s omen, nine strikes, envoy waves after strikes 3 and 6, then 15 s under a black hole without leaving an 8-block circle. A killing blow is a failure (Qi Deviation, one day to retry), never a death, and totems are not spent. Success opens kultivator:alam_abadi: floating islands made by world generation only, cherry trees, ores, drifting qi motes, no rain and no natural monsters. Natives grow stronger with your stars. Falling below the islands puts you back on solid ground for 10% of your health; the soft border is 2048 blocks from the centre. The reusable Realm Crossing Talisman (2 Origin Stones, paper and an ender eye) carries you, ascended sect mates who click [Join] and up to 3 Inner Disciples+ in FOLLOW between the worlds; disciples left behind come home when you leave. Source: A Record of a Mortal's Journey to Immortality, ch. 2451.",
+  "kultivator.screen.help.alam_abadi": "At Dewa Abadi Peak with ★9 or more and the Ascension done, offer 9 Tomb Energy Essence and 1 Supreme Spirit Stone and begin the Realm Ascension Tribulation (Immortality screen, Realm tablet, or /kultivasi abadi naik): a 10 s omen, nine strikes, envoy waves after strikes 3 and 6, then 15 s under a black hole without leaving an 8-block circle. A killing blow is a failure (Qi Deviation, one day to retry), never a death, and totems are not spent. Success opens kultivator:alam_abadi: floating islands made by world generation only, cherry trees, ores, drifting qi motes, no rain and no natural monsters. Natives grow stronger with your stars. Falling below the islands puts you back on solid ground for 10% of your health; the soft border is 2048 blocks from the centre. The reusable Realm Crossing Talisman (2 Origin Stones, paper and an ender eye) carries you, ascended sect mates who click [Join] and up to 3 Inner Disciples+ in FOLLOW between the worlds; disciples left behind come home when you leave. Source: A Record of a Mortal's Journey to Immortality, ch. 2451.",
   "kultivator.screen.help.batu_asal.title": "Immortal Origin Stones and Essence",
-  "kultivator.screen.help.batu_asal": "Immortal Origin Stones drop from natives (50%), from stone you mine by hand in the Immortal Realm (0.6% per block, more with Fortune, at most 16 a day, never with Silk Touch or Destruction Mode), from primordial beasts, the Heavens' wrath, consignments and rockmen. Use them to bid, to refine your body (+2% Immortal Essence each, at most 10 a day), for crossing talismans, and when condensing stars (-1% cost per stone carried, at most 10, used up). Immortal Essence also grows by meditating in the Immortal Realm (+1% per 30 s); against Phase 9 foes your techniques deal ×0.6 at 0% up to ×1.0 at 100%, and qi regenerates there at ×0.5 to ×1.0. Meditation XP in the Immortal Realm is ×3. Source: RMJ: Immortal Realm, ch. 567 and 615.",
+  "kultivator.screen.help.batu_asal": "Immortal Origin Stones drop from natives (50%), from stone you mine by hand in the Immortal Realm (0.6% per block, more with Fortune, at most 16 a day, never with Silk Touch or Destruction Mode), from primordial beasts, the Heavens' wrath, consignments and rockmen. Use them to bid, to refine your body (+2% Immortal Essence each, at most 10 a day), for crossing talismans, and when condensing stars (-1% cost per stone carried, at most 10, used up; switch it off or preview it with /kultivasi diskonbintang). Mortal town shops never buy Immortal Realm wares. Immortal Essence also grows by meditating in the Immortal Realm (+1% per 30 s); against Phase 9 foes your techniques deal ×0.6 at 0% up to ×1.0 at 100%, and qi regenerates there at ×0.5 to ×1.0. Meditation XP in the Immortal Realm is ×3. Source: RMJ: Immortal Realm, ch. 567 and 615.",
   "kultivator.screen.help.lelang.title": "Immortal Auction",
-  "kultivator.screen.help.lelang": "Every 2 in-game days at dusk (12,000 to 18,000) the house holds a session in the Immortal Realm: five lots, one after another, the same for everyone. Four rival elders bid up to a hidden limit; click +5%, +10% or +25% on the Auction tablet. You need the stones in your bag to bid but pay only if you win; whoever wins without the stones loses the lot and cannot bid again that session. A lot sells 8 s after the last raise. Consign up to 2 items per session for Origin Stones at the end. Win a lot a rival wanted badly and a band may come after you later. Source: RMJ: Immortal Realm, ch. 615 and 567."
+  "kultivator.screen.help.lelang": "Every 2 in-game days at dusk (12,000 to 18,000) the house holds a session in the Immortal Realm: five lots, one after another, the same for everyone. Four rival elders bid up to a hidden limit; click +5%, +10% or +25% on the Auction tablet. You need the stones in your bag to bid but pay only if you win; whoever wins without the stones loses the lot and cannot bid again that session. A lot sells 8 s after the last raise. Consign up to 2 pieces per session (one piece each) for 0.6-1.0 × their value in Origin Stones at the end. Win a lot a rival wanted badly and a band may come after you later. Source: RMJ: Immortal Realm, ch. 615 and 567."
 }

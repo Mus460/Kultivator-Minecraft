@@ -129,6 +129,10 @@ public final class KebunPayloads {
 		PayloadTypeRegistry.clientboundPlay().register(World.TYPE, World.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Fx.TYPE, Fx.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Action.TYPE, Action.CODEC);
+		// The types always (K1, both sides); the receiver only while the module runs.
+		if (!dev.kultivator.sekte.SekteContent.on(dev.kultivator.sekte.SekteIds.W)) {
+			return;
+		}
 		ServerPlayNetworking.registerGlobalReceiver(Action.TYPE, (payload, context) -> {
 			try {
 				handle(context.player(), payload);

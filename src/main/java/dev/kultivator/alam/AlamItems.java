@@ -103,6 +103,10 @@ public final class AlamItems {
 		public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder,
 									TooltipFlag flag) {
 			builder.accept(Component.translatable(getDescriptionId() + ".tooltip").withColor(HartaText.USE_COLOR));
+			if (this == TOMB_ESSENCE) {
+				// audit R21: not Immortal Essence and not the Immortal Essence Pearl
+				builder.accept(Component.translatable("kultivator.ekonomi.nama.esensi_makam").withStyle(ChatFormatting.GRAY));
+			}
 			HartaText.sources(getDescriptionId(), builder);
 			if (realm != null) {
 				builder.accept(Component.translatable("kultivator.alam.item.key_use").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));

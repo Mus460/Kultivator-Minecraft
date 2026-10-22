@@ -45,8 +45,11 @@ import java.util.UUID;
  * expansion token), priced so the 16-a-day mining cap of {@code OriginStones} buys a rare item in about a week. Kuliah
  * Dao at noon: sitting (sneaking or meditating) within 6 blocks of the lecturer for 60 s gives +1..3 comprehension of the
  * player's Dao (an enlightenment moment without one), once a day. Persik Abadi every {@code kota.peachDays} days per
- * player: 2 % of the bar at Immortal Ascension, 5 % at True Immortal (lower realms: a little). Titah Utusan: a weekly
- * edict of the envoy pointing at a phase-9 challenge, paid in Batu Asal. The Balai Lelang Abadi's stage opens the
+ * player: 2 % of the bar at Immortal Ascension, 5 % at True Immortal (lower realms: a little). Perintah Utusan (was "Titah
+ * Utusan", audit S25/S32): a weekly order of the envoy pointing at a phase-9 challenge, paid in Batu Asal: mine 16 Batu Asal
+ * yourself (counted from {@code Abadi.ACT_STONE_MINED}), bring 2 essence pearls (paid 50, more than the 40 they cost), slay
+ * a primordial, or slay 12 enemies there. Each market offer has its own stock per player and period (audit S24): 2 pieces,
+ * a rare one 1. The Balai Lelang Abadi's stage opens the
  * existing Lelang Abadi tab ({@link Kota#interact}); this class has no auction of its own.
  */
 public final class KotaAbadi {
@@ -62,10 +65,14 @@ public final class KotaAbadi {
 	public static final double LECTURE_RANGE = 6.0D;
 	public static final int WEEK = 7;
 
-	/** Titah kinds: offer origin stones, offer essence pearls, slay a primordial (a boss in Alam Abadi), slay enemies there. */
+	/** Order kinds: mine origin stones, offer essence pearls, slay a primordial (a boss in Alam Abadi), slay enemies there. */
 	static final String[] EDICTS = {"batu", "mutiara", "purba", "musuh"};
 	static final int[] EDICT_NEED = {16, 2, 1, 12};
-	static final int[] EDICT_PAY = {24, 30, 60, 20};
+	/** Balance change (audit S25): the pearls pay 50 (they cost 40 at the market); mining pays 24 on top of the 16 mined. */
+	static final int[] EDICT_PAY = {24, 50, 60, 20};
+	/** Pasar Abadi stock per player and two-day period (audit S24): pieces of one offer, and of a rare one. */
+	public static final int MARKET_STOCK = 2;
+	public static final int MARKET_STOCK_RARE = 1;
 
 	record Ware(String id, int price, int weight) {
 	}
@@ -85,6 +92,12 @@ public final class KotaAbadi {
 	private static long lastBellDay = -1L;
 
 	static void init() {
+		// Perintah Utusan "batu": every Batu Asal the player mines in Alam Abadi counts (audit S25).
+		dev.kultivator.abadi.Abadi.addActivityListener((player, what) -> {
+			if (dev.kultivator.abadi.Abadi.ACT_STONE_MINED.equals(what)) {
+				countEdict(player, 0);
+			}
+		});
 		ServerLivingEntityEvents.AFTER_DEATH.register((victim, source) -> {
 			if (!(victim.level() instanceof ServerLevel level) || !Kota.config().immortalCity || !dev.kultivator.abadi.Abadi.isImmortalLevel(level)) {
 				return;
@@ -101,15 +114,27 @@ public final class KotaAbadi {
 			int kind = edict.getIntOr("kind", 0);
 			boolean counts = kind == 2 && victim.entityTags().contains(TechniquePower.TAG_BOSS) || kind == 3 && victim instanceof Enemy;
 			if (counts) {
-				int progress = edict.getIntOr("n", 0) + 1;
-				edict.putInt("n", progress);
-				if (progress >= EDICT_NEED[kind]) {
-					edict.putBoolean("done", true);
-					Msg.chat(player, Component.translatable("kultivator.kota.titah.selesai").withStyle(ChatFormatting.GOLD));
-				}
-				KotaData.get(level.getServer()).touch();
+				countEdict(player, kind);
 			}
 		});
+	}
+
+	/** One step of the player's open order of {@code kind} (nothing when the open order is of another kind or done). */
+	private static void countEdict(ServerPlayer player, int kind) {
+		if (!Kota.config().immortalCity) {
+			return;
+		}
+		CompoundTag edict = edict(player);
+		if (edict.isEmpty() || edict.getBooleanOr("done", false) || edict.getIntOr("kind", 0) != kind) {
+			return;
+		}
+		int progress = edict.getIntOr("n", 0) + 1;
+		edict.putInt("n", progress);
+		if (progress >= EDICT_NEED[kind]) {
+			edict.putBoolean("done", true);
+			Msg.chat(player, Component.translatable("kultivator.kota.titah.selesai").withStyle(ChatFormatting.GOLD));
+		}
+		KotaData.get(player.level().getServer()).touch();
 	}
 
 	// ================================================================== tick: the lecture and the bell
@@ -296,6 +321,26 @@ public final class KotaAbadi {
 		return offers;
 	}
 
+	/** Pieces of offer {@code index} the player may still buy this period. */
+	static int stockLeft(ServerPlayer player, KultivatorNpc npc, Offer offer) {
+		int max = offer.ware().weight() <= 4 ? MARKET_STOCK_RARE : MARKET_STOCK;
+		return Math.max(0, max - bought(player).getIntOr(npc.anchorSite() + "." + offer.index(), 0));
+	}
+
+	/** {@code KotaData.player.abadi_beli}: this period's purchases (reset when the two-day period changes). */
+	private static CompoundTag bought(ServerPlayer player) {
+		KotaData data = KotaData.get(player.level().getServer());
+		long period = Kota.day(player.level().getServer()) / 2L;
+		CompoundTag tag = data.player(player.getUUID()).getCompoundOrEmpty("abadi_beli");
+		if (tag.getLongOr("p", -1L) != period) {
+			tag = new CompoundTag();
+			tag.putLong("p", period);
+			data.player(player.getUUID()).put("abadi_beli", tag);
+			data.touch();
+		}
+		return tag;
+	}
+
 	private static void buy(ServerPlayer player, KultivatorNpc npc, int index, int seen) {
 		for (Offer offer : offers(player, npc)) {
 			if (offer.index() != index) {
@@ -305,10 +350,18 @@ public final class KotaAbadi {
 			if (seen >= 0 && seen != price) {
 				return;
 			}
+			if (stockLeft(player, npc, offer) <= 0) {
+				Msg.actionBar(player, Component.translatable("kultivator.kota.toko.habis").withStyle(ChatFormatting.RED));
+				return;
+			}
 			if (!NilaiBatu.payOrigin(player, price)) {
 				Msg.actionBar(player, Component.translatable("kultivator.kota.abadi.kurang_asal", price).withStyle(ChatFormatting.RED));
 				return;
 			}
+			CompoundTag bought = bought(player);
+			String key = npc.anchorSite() + "." + offer.index();
+			bought.putInt(key, bought.getIntOr(key, 0) + 1);
+			KotaData.get(player.level().getServer()).touch();
 			ItemStack stack = offer.stack().copy();
 			Component name = stack.getHoverName();
 			if (!player.getInventory().add(stack) && !stack.isEmpty()) {
@@ -364,9 +417,7 @@ public final class KotaAbadi {
 				}
 				int kind = edict.getIntOr("kind", 0);
 				boolean done = edict.getBooleanOr("done", false);
-				if (!done && kind == 0) {
-					done = NilaiBatu.payOrigin(player, EDICT_NEED[0]);
-				}
+				// kind 0 (mining) is done by the miner's own Batu Asal, counted as they drop (audit S25: no more free +8)
 				if (!done && kind == 1) {
 					done = takeItems(player, "immortal_essence_pearl", EDICT_NEED[1]);
 				}
@@ -427,6 +478,7 @@ public final class KotaAbadi {
 			entry.store("name", ComponentSerialization.CODEC, offer.stack().getHoverName());
 			entry.putInt("price", offer.ware().price());
 			entry.putBoolean("rare", offer.ware().weight() <= 4);
+			entry.putInt("stock", stockLeft(player, npc, offer));
 			market.add(entry);
 		}
 		tag.put("market", market);

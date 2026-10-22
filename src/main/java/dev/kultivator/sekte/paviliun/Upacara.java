@@ -13,7 +13,7 @@ import dev.kultivator.sekte.SekteLog;
 import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
-import dev.kultivator.voice.VoiceDisciples;
+import dev.kultivator.sekte.SekteSuara;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -185,7 +185,7 @@ final class Upacara {
 				rite.who.put(d.soulId(), d);
 				rite.attended.add(d.soulId());
 				if (i == 0) {
-					VoiceDisciples.line(d, "farewell", 400);
+					SekteSuara.line(d, "mourn", "farewell", 400);
 				}
 			}
 			if (!rite.who.isEmpty()) {
@@ -262,6 +262,9 @@ final class Upacara {
 			DiscipleEntity d = free.get(i);
 			d.setActivity(SekteIds.ACT_MOURN, spots.get(i));
 			rite.who.put(d.soulId(), d);
+			if (i == 0) {
+				SekteSuara.line(d, "qingming", "loyal", 400);
+			}
 		}
 		QINGMING.put(owner, rite);
 		ServerPlayer master = server.getPlayerList().getPlayer(owner);

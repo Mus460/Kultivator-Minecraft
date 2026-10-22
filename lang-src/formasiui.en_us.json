@@ -39,7 +39,7 @@
 	"kultivator.formasiui.field.none": "No formation covers this place. Stand inside your territory or near a running core.",
 	"kultivator.formasiui.field.note": "Read when the scroll opened. Formations protect and nurture; they never farm. Every term has its cap.",
 	"kultivator.formasiui.field.gather": "Cultivation ×%s · Sect · cap ×%s",
-	"kultivator.formasiui.field.gather.tip": "Spirit gathering from the sect's formations. Gathering alone stops at ×%s; the whole formation term stops at the stacking cap.",
+	"kultivator.formasiui.field.gather.tip": "Spirit gathering from the sect's formations. Gathering alone stops at ×%s; for meditation this sect factor now counts outside the ×3.5 absorption limit (see the Meditation line).",
 	"kultivator.formasiui.field.drain": "Qi drain ×%s · floor %s",
 	"kultivator.formasiui.field.drain.tip": "Meditation drains less qi here. Never below the floor.",
 	"kultivator.formasiui.field.heal": "Healing: regeneration level %s · qi ×%s · deviation ×%s (qi cap ×%s)",

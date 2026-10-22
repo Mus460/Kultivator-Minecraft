@@ -6,8 +6,8 @@
   "kultivator.goals.chapter.10": "Abadi",
   "kultivator.goals.reward.6": "Token Ujian Darah-Api dan 4 batu roh Rendah",
   "kultivator.goals.reward.7": "2 batu roh Menengah dan sebuah Fragmen Peta Hampa Langit",
-  "kultivator.goals.reward.8": "1 batu roh Tinggi dan sebotol Darah Dewa Kuno",
-  "kultivator.goals.reward.9": "1 batu roh Agung dan sebuah Lencana Makam Langit",
+  "kultivator.goals.reward.8": "1 batu roh Tinggi dan sebuah Lencana Makam Langit",
+  "kultivator.goals.reward.9": "1 batu roh Agung dan sebotol Darah Dewa Kuno",
   "kultivator.goals.reward.10": "3 Esensi Energi Makam dan gelar \"Penguasa Jalan Dunia\"",
   "kultivator.goals.step.w_ring": "Ikat kantong atau cincin penyimpanan",
   "kultivator.goals.step.w_ring.how": "Gunakan cincin penyimpanan sekali untuk menanam jejak jiwamu (cincin pertama butuh Pemurnian Qi).",
@@ -81,6 +81,6 @@
   "advancement.kultivator.world_path_complete.title": "Jalan Dunia Tuntas",
   "advancement.kultivator.world_path_complete.description": "Selesaikan kedua puluh langkah Jalan Dunia (bab 6-10)",
   "kultivator.screen.help.jalan_dunia.title": "Jalan Dunia",
-  "kultivator.screen.help.jalan_dunia": "Setelah lima bab Langkah Pertama, tablet Jalan berpindah ke Jalan Dunia (koin di bawah tablet bab): bab 6-10, dua puluh langkah yang merangkai fitur fase 8, masing-masing tercentang oleh pencapaiannya dan setiap bab memberi satu hadiah (kunci alam, batu roh, Darah Dewa Kuno, Lencana Makam, Esensi Energi Makam dan gelar \"Penguasa Jalan Dunia\"). Setiap alam memberi makan alam berikutnya: Ujian Darah dan Api memberi Herba Fondasi untuk tempa Bumi dan resep pil Fondasi alternatif; Aula Hampa Langit memberi Kayu Pemelihara Jiwa untuk tempa Langit, roh senjata dan Cincin Ruang Agung; Tanah Dewa Kuno memberi Darah Dewa Kuno untuk tempa Abadi dan tempa ulang +7 sampai +9; Makam Langit memberi Esensi Energi Makam untuk tempa Dewa dan +10 sampai +12. Setiap Esensi yang kamu bawa saat memadatkan bintang menurunkan biayanya 2%% (paling banyak 10, esensinya habis terpakai). Ujian Fondasi mendapat baris keempat pilihan dari fitur dunia; tiga baris mana pun sudah memberi Fondasi Kokoh. Kewajiban harian baru: kalahkan kultivator liar, selesaikan permohonan desa, tempa atau tempa ulang, taklukkan alam rahasia. Sumber: tangga bahan dan semua angkanya adalah desain permainan; setiap fitur menyebut sumbernya sendiri.",
+  "kultivator.screen.help.jalan_dunia": "Setelah lima bab Langkah Pertama, tablet Jalan berpindah ke Jalan Dunia (koin di bawah tablet bab): bab 6-10, dua puluh langkah yang merangkai fitur fase 8, masing-masing tercentang oleh pencapaiannya dan setiap bab memberi satu hadiah (kunci alam, batu roh, Lencana Makam sebelum Makam Langit, Darah Dewa Kuno, Esensi Energi Makam dan gelar \"Penguasa Jalan Dunia\"). Setiap alam memberi makan alam berikutnya: Ujian Darah dan Api memberi Herba Fondasi untuk tempa Bumi dan resep pil Fondasi alternatif; Aula Hampa Langit memberi Kayu Pemelihara Jiwa untuk tempa Langit, roh senjata dan Cincin Ruang Agung; Tanah Dewa Kuno memberi Darah Dewa Kuno untuk tempa Abadi dan tempa ulang +7 sampai +9; Makam Langit memberi Esensi Energi Makam untuk tempa Dewa dan +10 sampai +12. Setiap Esensi yang kamu bawa saat memadatkan bintang menurunkan biayanya 2%% (paling banyak 10, esensinya habis terpakai). Ujian Fondasi mendapat baris keempat pilihan dari fitur dunia; tiga baris mana pun sudah memberi Fondasi Kokoh. Kewajiban harian baru: kalahkan kultivator liar, selesaikan permohonan desa, tempa atau tempa ulang, taklukkan alam rahasia. Sumber: tangga bahan dan semua angkanya adalah desain permainan; setiap fitur menyebut sumbernya sendiri.",
   "kultivator.jalan8.test.hud_dunia": "Contoh bilah bos alam rahasia dan serbuan tampil selama 10 detik."
 }

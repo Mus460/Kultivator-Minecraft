@@ -24,14 +24,30 @@ import java.util.Map;
 
 /**
  * Prices in Nilai Batu (DESIGN 34.5.1): the base NB value of every item the towns trade, and the wares a shop, the
- * auction and the black market can make. Herbs, cores and stones follow their existing Kantor Misi value ×2 (one Low
- * stone is 0.5 PK and 1 NB); pills, talismans, artifacts, storage and treasures have a table here. Items of other
- * modules are found by registry id and simply missing while their module is off. Stacks are made only on demand.
+ * auction and the black market can make. Cores follow their Kantor Persembahan value ×{@link #NB_PER_PK} (one Low stone is
+ * 0.5 PK and 1 NB, the one exchange rate of the mod); aged herbs follow a town curve that rises faster with age (audit
+ * T16: {@code 2 × (1 + (age/100)^1.6)}: 100 years 4 NB, 300 years 12, 1000 years 82); pills, talismans, artifacts,
+ * storage and treasures have a table here. Items of other modules are found by registry id and simply missing while their
+ * module is off. Stacks are made only on demand.
+ * <p>
+ * Balance changes of the economy audit (approved "Ubah angkanya"): the pill pavilion sells herbs up to 300 years only (T16;
+ * older herbs come from the auction, treasures and Pasar Abadi); the black-market wares cost about twice their recipe
+ * (R14: Dupa Arwah 40, Selendang 300) and the Mutiara Penunjuk Laut has one price everywhere (S24: 20 NB, the sea
+ * merchant too); phase-9 wares of Alam Abadi are never bought by a town shop ({@link #phase9}).
  */
 public final class Harga {
 
 	/** Realm bands: 0 Mortal, 1 Qi Refining, 2 Foundation, 3 Golden Core, 4 Nascent Soul, 5 Deity, 6 Dao Union, 7 Immortal Ascension, 8 True Immortal. */
 	public static final int BANDS = 9;
+	/** The one exchange rate between towns and sects (audit T17): NB per Poin Kontribusi (1 Low stone = 1 NB = 0.5 PK). */
+	public static final double NB_PER_PK = 2.0D;
+	/** The town herb curve (audit T16): NB = HERB_FACTOR × (1 + (age / 100)^HERB_POWER). */
+	public static final double HERB_FACTOR = 2.0D;
+	public static final double HERB_POWER = 1.6D;
+	/** The oldest herb a town pavilion sells (audit T16). */
+	public static final int SHOP_HERB_MAX_AGE = 300;
+	/** The Mutiara Penunjuk Laut: one price in every shop (audit S24, R14; the recipe costs a Mid stone and sea shells). */
+	public static final long MUTIARA_NB = 20L;
 
 	/** A ware: item id, the lowest and highest band it is offered in, its base NB and the stack maker. */
 	public record Ware(String id, int minBand, int maxBand, long base, Maker make) {
@@ -96,9 +112,9 @@ public final class Harga {
 		BASE.put("demonic_loot_pouch", 120L);
 		BASE.put("demonic_banner", 200L);
 		// other modules' wares (black market; present only when their module is on)
-		BASE.put("selendang_pengikat_naga", 800L);
-		BASE.put("dupa_arwah", 300L);
-		BASE.put("mutiara_penunjuk_laut", 900L);
+		BASE.put("selendang_pengikat_naga", 300L);
+		BASE.put("dupa_arwah", 40L);
+		BASE.put("mutiara_penunjuk_laut", MUTIARA_NB);
 		// module K
 		BASE.put("token_pasar_gelap", 60L);
 		BASE.put("teh_embun_pagi", 2L);
@@ -106,6 +122,24 @@ public final class Harga {
 		BASE.put("teh_penenang_hati", 20L);
 		BASE.put("catatan_pengembara", 9L);
 		BASE.put("kantong_saingan", 200L);
+	}
+
+	/** Phase-9 wares of Alam Abadi that no town shop buys (audit S24: no Batu Asal to NB loop). */
+	private static final java.util.Set<String> PHASE9 = java.util.Set.of("immortal_pill", "immortal_essence_pearl", "land_expansion_token",
+			"immortal_origin_stone", "kun_scale", "zhulong_scale", "taotie_fang", "peng_feather", "kunpeng_bone_fragment");
+
+	/** True for a phase-9 ware of Alam Abadi (bought and sold only for Batu Asal). */
+	public static boolean phase9(ItemStack stack) {
+		if (stack == null || stack.isEmpty()) {
+			return false;
+		}
+		Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+		return Kultivator.MOD_ID.equals(id.getNamespace()) && PHASE9.contains(id.getPath());
+	}
+
+	/** The town NB of an aged herb (audit T16 curve, at least 1). */
+	public static long herbValue(int age) {
+		return Math.max(1L, Math.round(HERB_FACTOR * (1.0D + Math.pow(Math.max(0, age) / 100.0D, HERB_POWER))));
 	}
 
 	/** Artifact base NB by grade 0-5. */
@@ -121,8 +155,11 @@ public final class Harga {
 		if (SpiritStones.isStone(stack)) {
 			return 0L;
 		}
-		if (SpiritHerbs.isHerb(stack) || BeastCores.isCore(stack)) {
-			return Math.max(1L, Math.round(Harta.missionValue(stack) * 2.0D));
+		if (SpiritHerbs.isHerb(stack)) {
+			return herbValue(SpiritHerbs.age(stack));
+		}
+		if (BeastCores.isCore(stack)) {
+			return Math.max(1L, Math.round(Harta.missionValue(stack) * NB_PER_PK));
 		}
 		Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
 		if (!Kultivator.MOD_ID.equals(id.getNamespace())) {
@@ -201,17 +238,18 @@ public final class Harga {
 			new Ware("king_core", 0, 8, 240L, (r, b) -> BeastCores.create(randomElement(r), 4)),
 			new Ware("inheritance_crystal", 0, 8, 900L, (r, b) -> item("inheritance_crystal")),
 			new Ware("lost_scripture_page", 0, 8, 150L, (r, b) -> item("lost_scripture_page")),
-			new Ware("selendang_pengikat_naga", 0, 8, 800L, (r, b) -> item("selendang_pengikat_naga")),
-			new Ware("dupa_arwah", 0, 8, 300L, (r, b) -> item("dupa_arwah")),
-			new Ware("mutiara_penunjuk_laut", 0, 8, 900L, (r, b) -> item("mutiara_penunjuk_laut")),
+			new Ware("selendang_pengikat_naga", 0, 8, 300L, (r, b) -> item("selendang_pengikat_naga")),
+			new Ware("dupa_arwah", 0, 8, 40L, (r, b) -> item("dupa_arwah")),
+			new Ware("mutiara_penunjuk_laut", 0, 8, MUTIARA_NB, (r, b) -> item("mutiara_penunjuk_laut")),
 			new Ware("vein_compass", 0, 8, 220L, (r, b) -> item("vein_compass")));
 
 	static int herbMin(int band) {
-		return band <= 1 ? 10 : band <= 3 ? 100 : band <= 5 ? 300 : 500;
+		return band <= 1 ? 10 : band <= 3 ? 100 : 200;
 	}
 
+	/** Audit T16: never above {@link #SHOP_HERB_MAX_AGE} (it was 1000 from band 4). */
 	static int herbMax(int band) {
-		return band <= 1 ? 100 : band <= 3 ? 300 : band <= 5 ? 1000 : 1000;
+		return band <= 1 ? 100 : SHOP_HERB_MAX_AGE;
 	}
 
 	static Element randomElement(RandomSource random) {

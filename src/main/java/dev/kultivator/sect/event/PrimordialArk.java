@@ -89,6 +89,10 @@ final class PrimordialArk {
 	static boolean board(ServerPlayer player, DiscipleEntity disciple) {
 		UUID owner = player.getUUID();
 		UUID soul = disciple.soulId();
+		if (Expeditions.refuses(disciple)) {
+			EventUtil.chat(player, Component.translatable(Expeditions.REFUSES).withStyle(ChatFormatting.YELLOW));
+			return false;
+		}
 		if (!mayBoard(owner, soul)) {
 			EventUtil.chat(player, Component.translatable("kultivator.sectevent.ark.not_allowed", disciple.getDisplayName()).withStyle(ChatFormatting.YELLOW));
 			return false;
@@ -128,12 +132,18 @@ final class PrimordialArk {
 				}
 			}
 			loot.add(SectEventItems.fragment(missing.isEmpty() ? 1 + random.nextInt(6) : missing.get(random.nextInt(missing.size()))));
+			// S12: a full Lumbung spills into the Peti Galian (online or not); nothing is lost while the owner is away.
+			int worst = dev.kultivator.sect.build.flow.LumbungOverflow.LUMBUNG;
+			Component example = null;
 			for (ItemStack stack : loot) {
-				ItemStack rest = Storehouse.insert(owner, stack);
-				if (!rest.isEmpty() && player != null) {
-					EventUtil.give(player, rest);
+				Component name = stack.getHoverName();
+				int where = dev.kultivator.sect.build.flow.LumbungOverflow.store(owner, stack);
+				if (where > worst) {
+					worst = where;
+					example = name;
 				}
 			}
+			dev.kultivator.sect.build.flow.LumbungOverflow.tell(player, owner, worst, example);
 			EventUtil.chat(player, Component.translatable("kultivator.sectevent.ark.back", AwayTeams.name(member), (int) (SHARE * 100.0D))
 					.withStyle(ChatFormatting.GOLD));
 			if (player != null) {

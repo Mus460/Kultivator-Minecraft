@@ -2,6 +2,8 @@ package dev.kultivator.sekte;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.CommandNode;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.kultivator.Kultivator;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.Event;
@@ -29,7 +31,7 @@ import java.util.function.Supplier;
  * <li>{@code /kultivasi uji perguruan} (op): the grouped help (every module's chips), {@code muat} (reload
  * {@code config/kultivator-sekte.json}), {@code modul} (which module services are live), then one sub-tree per module,
  * {@code uji perguruan <module id>} ({@link SekteIds#MODULES}), added with {@link #test}.</li>
- * <li>{@code /kultivasi perguruan} (everyone): a short help, then the player sub-commands of the modules, added with
+ * <li>{@code /kultivasi perguruan} (everyone; alias {@code /kultivasi sekte}, R11): a short help, then the player sub-commands of the modules, added with
  * {@link #player} (for example {@code perguruan murid <nama>} of P, {@code perguruan lambang} of S).</li>
  * </ul>
  * Both roots ({@code kultivasi}, {@code cultivate}) get the same nodes. A node supplier that throws is logged and
@@ -109,7 +111,12 @@ public final class SekteCommands {
 					Kultivator.LOGGER.error("Sekte player command {} could not be built", entry.getKey(), exception);
 				}
 			}
-			dispatcher.register(Commands.literal(root).then(uji).then(perguruan));
+			LiteralCommandNode<CommandSourceStack> rootNode = dispatcher.register(Commands.literal(root).then(uji).then(perguruan));
+			// R11: "/kultivasi sekte" is the same tree as "/kultivasi perguruan" (the word the screens use).
+			CommandNode<CommandSourceStack> target = rootNode.getChild("perguruan");
+			if (target != null && rootNode.getChild("sekte") == null) {
+				dispatcher.register(Commands.literal(root).then(Commands.literal("sekte").executes(ctx -> playerHelp(ctx.getSource())).redirect(target)));
+			}
 		}
 	}
 

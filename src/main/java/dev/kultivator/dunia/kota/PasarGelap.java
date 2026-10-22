@@ -44,8 +44,10 @@ import java.util.UUID;
  * and maps, King cores and other modules' wares (Selendang Pengikat Naga, Dupa Arwah, Mutiara Penunjuk Laut when their
  * module is on) at 1.5 × base, and buys loot pouches and banners at 0.6 × value. Every purchase rolls
  * {@code kota.raidChance} (halved at Reputasi Gelap 50+) for a Razia: the town's guard sect bars the door for 60 s and
- * three guards attack that player only; a bribe of 20 NB × realm band ends it. Reputasi Gelap (−100..100) rises with
- * trade and falls with guard kills; below −50 the broker turns the player away.
+ * three guards attack that player only; a bribe of 20 NB × the guards' band (Foundation 2 to Golden Core 3, the band they
+ * fight at; audit R13: it no longer grows with the player's realm) ends it. The broker buys at most 16 stacks per player
+ * and day, like the town shops (audit R18). Reputasi Gelap (−100..100) rises with trade and falls with guard kills; below
+ * −50 the broker turns the player away.
  */
 final class PasarGelap {
 
@@ -54,6 +56,18 @@ final class PasarGelap {
 	static final int RAID_TICKS = 1200;
 	static final long BRIBE_PER_BAND = 20L;
 	static final int TRADE_REP = 2;
+	/** Daily sale counter of the broker in {@code KotaData} (the shops' limit, audit R18). */
+	static final String SALES = "gjual";
+
+	/** The bribe that ends a raid: 20 NB × the raid guards' band (audit R13). */
+	static long bribePrice(ServerPlayer player) {
+		return BRIBE_PER_BAND * guardBand(player);
+	}
+
+	/** The band the raid guards fight at: the player's realm held to Foundation..Golden Core. */
+	static int guardBand(ServerPlayer player) {
+		return Mth.clamp(Cultivators.get(player).realm().ordinal(), Realm.FOUNDATION.ordinal(), Realm.GOLDEN_CORE.ordinal());
+	}
 
 	record Raid(long town, long until, List<KultivatorNpc> guards) {
 	}
@@ -195,6 +209,13 @@ final class PasarGelap {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.toko.tidak_beli").withStyle(ChatFormatting.RED));
 			return;
 		}
+		long day = Kota.day(player.level().getServer());
+		KotaData data = KotaData.get(player.level().getServer());
+		if (data.dailyCount(player.getUUID(), day, SALES) >= Toko.SALES_PER_DAY) {
+			Msg.actionBar(player, Component.translatable("kultivator.kota.toko.batas_jual", Toko.SALES_PER_DAY).withStyle(ChatFormatting.RED));
+			return;
+		}
+		data.addDaily(player.getUUID(), day, SALES, 1);
 		long each = Math.max(1L, (long) Math.floor(Harga.value(hand) * BUYBACK * Kota.config().priceScale));
 		int count = hand.getCount();
 		Component name = hand.getHoverName();
@@ -215,7 +236,7 @@ final class PasarGelap {
 			door.setBarred(true);
 		}
 		List<KultivatorNpc> guards = new ArrayList<>();
-		int band = Mth.clamp(Cultivators.get(player).realm().ordinal(), Realm.FOUNDATION.ordinal(), Realm.GOLDEN_CORE.ordinal());
+		int band = guardBand(player);
 		for (int i = 0; i < 3; i++) {
 			double angle = Math.PI * 2.0D * i / 3.0D + player.getRandom().nextDouble();
 			Vec3 at = player.position().add(Math.cos(angle) * 4.0D, 0.0D, Math.sin(angle) * 4.0D);
@@ -229,7 +250,7 @@ final class PasarGelap {
 			KotaVoice.say(guards.getFirst(), KotaVoice.GUARD_HALT, guards.getFirst().voiceKey("attack"), "kultivator.kota.gelap.suara.razia");
 		}
 		Fx.send(level, player.position().add(0.0D, 1.0D, 0.0D), FxType.MUSUH, MusuhFxIds.AMBUSH_ALERT, 0x6A7AB8, 3.0F);
-		Msg.chat(player, Component.translatable("kultivator.kota.gelap.razia", BRIBE_PER_BAND * Math.max(1, Cultivators.get(player).realm().ordinal()))
+		Msg.chat(player, Component.translatable("kultivator.kota.gelap.razia", bribePrice(player))
 				.withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
 	}
 
@@ -264,7 +285,7 @@ final class PasarGelap {
 
 	/** A guard was right-clicked during the player's raid: the bribe offer. */
 	static void offerBribe(ServerPlayer player, KultivatorNpc guard) {
-		long price = BRIBE_PER_BAND * Math.max(1, Cultivators.get(player).realm().ordinal());
+		long price = bribePrice(player);
 		Msg.chat(player, Component.translatable("kultivator.kota.gelap.suap_tawar", NilaiBatu.text(price))
 				.withStyle(style -> style.withColor(ChatFormatting.GOLD)
 						.withClickEvent(new net.minecraft.network.chat.ClickEvent.RunCommand("/kultivasi suap"))));
@@ -278,7 +299,7 @@ final class PasarGelap {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.gelap.tidak_razia").withStyle(ChatFormatting.GRAY));
 			return false;
 		}
-		long price = BRIBE_PER_BAND * Math.max(1, Cultivators.get(player).realm().ordinal());
+		long price = bribePrice(player);
 		if (!NilaiBatu.pay(player, price)) {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.kurang_batu", NilaiBatu.text(price)).withStyle(ChatFormatting.RED));
 			return false;
@@ -362,7 +383,7 @@ final class PasarGelap {
 		Raid raid = RAIDS.get(player.getUUID());
 		if (raid != null) {
 			tag.putLong("raid_left", Math.max(0L, raid.until() - player.level().getGameTime()));
-			tag.putLong("bribe", BRIBE_PER_BAND * Math.max(1, Cultivators.get(player).realm().ordinal()));
+			tag.putLong("bribe", bribePrice(player));
 		}
 		return tag;
 	}

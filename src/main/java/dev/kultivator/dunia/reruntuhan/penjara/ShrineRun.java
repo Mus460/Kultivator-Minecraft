@@ -92,6 +92,9 @@ public final class ShrineRun extends AnchorRun {
 			Msg.actionBar(player, Component.translatable("kultivator.reruntuhan.penjara.jimat.gone").withStyle(ChatFormatting.GRAY));
 			return;
 		}
+		if (refuse(player, n)) {
+			return;
+		}
 		CompoundTag tag = new CompoundTag();
 		tag.putString("op", "warn");
 		tag.putInt("n", n);
@@ -102,14 +105,41 @@ public final class ShrineRun extends AnchorRun {
 		Voice.inner(player, "demon.tempt", Component.translatable("entity.kultivator.raja_iblis." + RajaIblisEntity.IDS[seal.king()]));
 	}
 
+	/**
+	 * Below {@link Prisons#MIN_REALM} the talisman refuses the hand (the pattern of the ancestral gate): a line naming the
+	 * realm, a soft push back and the backlash flash. True when refused.
+	 */
+	private boolean refuse(ServerPlayer player, int n) {
+		if (Prisons.mayPull(player)) {
+			return false;
+		}
+		Msg.chat(player, Component.translatable("kultivator.reruntuhan.penjara.jimat.ranah", Prisons.MIN_REALM.displayName())
+				.withStyle(ChatFormatting.GRAY));
+		TekaPartEntity talisman = talismans[n];
+		Vec3 from = talisman != null ? talisman.position() : centre();
+		Vec3 away = player.position().subtract(from).multiply(1.0D, 0.0D, 1.0D);
+		away = away.lengthSqr() < 1.0E-4D ? new Vec3(0.0D, 0.3D, 0.0D) : away.normalize().scale(0.6D).add(0.0D, 0.25D, 0.0D);
+		player.push(away.x, away.y, away.z);
+		player.needsSync = true;
+		RFx.at(level, from, RFx.BACKLASH, 0, 0, 0.5F);
+		return true;
+	}
+
 	/** A confirmed pull of talisman {@code n}. */
 	void pull(ServerPlayer player, int n) {
+		pull(player, n, false);
+	}
+
+	private void pull(ServerPlayer player, int n, boolean test) {
 		if (n < 0 || n > 4) {
 			return;
 		}
 		TekaPartEntity talisman = talismans[n];
 		Prisons.Seal seal = seal();
 		if (talisman == null || talisman.position().distanceToSqr(player.position()) > 6.0D * 6.0D || (seal.pulled() & (1 << n)) != 0 || seal.broken()) {
+			return;
+		}
+		if (!test && refuse(player, n)) {
 			return;
 		}
 		seal.pulled |= 1 << n;
@@ -199,7 +229,7 @@ public final class ShrineRun extends AnchorRun {
 		if (talisman != null) {
 			player.teleportTo(talisman.getX(), talisman.getY(), talisman.getZ());
 		}
-		pull(player, n);
+		pull(player, n, true);
 	}
 
 	/** The re-sealed prison gives birth to a treasure at its shrine (T3, DESIGN 34.6 R, through TreasureService). */

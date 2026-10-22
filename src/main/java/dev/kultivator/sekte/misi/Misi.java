@@ -52,15 +52,19 @@ public final class Misi implements MisiService {
 	private static boolean initialised;
 
 	/** From {@code SekteContent.init} (both physical sides). */
+	/** The item and the payload types exist whatever the switches say (registries and channels must match both sides, K1). */
+	public static void registerContent() {
+		GulunganLaporan.register();
+		MisiPayloads.register();
+	}
+
 	public static void init() {
 		if (initialised) {
 			return;
 		}
 		initialised = true;
 		MisiConfig.load();
-		// The item and the payload types exist whatever the switches say (registries and channels must match both sides).
-		GulunganLaporan.register();
-		MisiPayloads.register();
+		registerContent();
 		if (!SekteContent.on(SekteIds.X)) {
 			return;
 		}
@@ -103,6 +107,16 @@ public final class Misi implements MisiService {
 	@Override
 	public int finished(UUID owner) {
 		return owner == null ? 0 : MisiData.section(owner).getIntOr("selesai", 0);
+	}
+
+	@Override
+	public boolean carriesEnvoys() {
+		return MisiConfig.get().aktif;
+	}
+
+	@Override
+	public boolean sendEnvoy(ServerPlayer player, String sectId, UUID soul, boolean officer) {
+		return player != null && sectId != null && soul != null && TimMisi.sendEnvoy(player, sectId, soul, officer);
 	}
 
 	// ================================================================== tick

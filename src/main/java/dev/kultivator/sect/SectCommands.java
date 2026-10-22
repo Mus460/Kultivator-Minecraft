@@ -192,7 +192,6 @@ final class SectCommands {
 			}
 		}
 		Advancements.grant(player, "sect_founded");
-		dev.kultivator.voice.VoiceHooks.sectFounded(player);
 		celebrate(player, sect, true);
 		return 1;
 	}

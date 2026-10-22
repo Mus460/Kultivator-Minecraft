@@ -30,6 +30,7 @@ import dev.kultivator.sekte.api.Sifat;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.voice.VoiceDisciples;
+import dev.kultivator.sect.hall.SectRanks;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
@@ -147,16 +148,25 @@ public final class Kepribadian {
 		}
 	};
 
+	/**
+	 * Registry content and payload types (K1): always, from {@code SekteContent.init} before any switch is read, so the
+	 * channels match on both sides whatever the config says. Runtime logic stays in {@link #init()}.
+	 */
+	public static void registerContent() {
+		KepribadianPayloads.init();
+	}
+
 	public static void init() {
 		if (done) {
 			return;
 		}
 		done = true;
 		KepribadianConfig.load();
+		registerContent();
 		if (!SekteContent.on(SekteIds.P)) {
 			return;
 		}
-		KepribadianPayloads.init();
+		KepribadianPayloads.initServer();
 		Watak.registerHooks();
 		DiscipleHooks.addTick20(Kepribadian::tick20);
 		DiscipleHooks.addOnTaught((entity, master, technique) -> careFrom(entity, Kepuasan.CARE_TEACH, KepribadianPayloads.ICON_STAR));
@@ -192,7 +202,16 @@ public final class Kepribadian {
 
 	// ================================================================== the disciple's second
 
+	/** The mode a sulking disciple had before it sulked, or null (S15: read by the load-time downgrade of DiscipleEntity). */
+	public static DiscipleEntity.Mode modeBeforeSulk(DiscipleData data) {
+		return data == null ? null : DiscipleEntity.Mode.byId(Hati.getString(data, "modeLama"));
+	}
+
 	private static void tick20(DiscipleEntity e) {
+		// S15: a sulker is freed even while the module's own switch is off (only this tick ever released it).
+		if (!on() && e.activity() == SekteIds.ACT_SULK) {
+			restoreFromSulk(e);
+		}
 		if (!on() || e.role() != DiscipleEntity.Role.DISCIPLE || e.isReleasing() || e.departed()
 				|| !(e.level() instanceof ServerLevel level)) {
 			return;
@@ -374,6 +393,7 @@ public final class Kepribadian {
 					e.setMode(DiscipleEntity.Mode.STAY);
 				}
 				e.setActivity(SekteIds.ACT_SULK, sulkSpot(e));
+				VoiceDisciples.line(e, "sulk", 1200);
 				if (activity != DiscipleEntity.ACTIVITY_NONE && master != null) {
 					Msg.chat(master, Component.translatable("kultivator.sekte.kepribadian.tolak.tugas", e.getDisplayName()).withStyle(ChatFormatting.YELLOW));
 				}
@@ -428,6 +448,7 @@ public final class Kepribadian {
 		}
 		if (e.getRandom().nextBoolean()) {
 			KepribadianPayloads.pop(e, KepribadianPayloads.ICON_STORM);
+			VoiceDisciples.line(e, "sulk", 200);
 			return "kultivator.sekte.kepribadian.tolak.perintah";
 		}
 		if (e.level() instanceof ServerLevel level) {
@@ -709,7 +730,7 @@ public final class Kepribadian {
 		return Component.translatable("kultivator.sekte.kepribadian.bicara." + state + "." + e.getRandom().nextInt(3));
 	}
 
-	/** Hadiah: the item in the main hand (a pill is fed, a herb or a spirit stone is given), 3 a day, +2..+6 by its worth. */
+	/** Hadiah: the item in the main hand (a pill is fed, a herb or a spirit stone is given), 3 a day, +2..+8 by its worth. */
 	private static void gift(MinecraftServer server, ServerPlayer player, DiscipleEntity e, long today) {
 		DiscipleData data = e.data();
 		ItemStack stack = player.getMainHandItem();
@@ -724,6 +745,8 @@ public final class Kepribadian {
 			return;
 		}
 		Component itemName = stack.getHoverName();
+		// R19: a spirit stone is not lost: the disciple keeps it as its own contribution points (1/3/9/27 by grade).
+		int keepPk = giftPk(stoneGrade(stack), worth);
 		if (Disciples.isPill(stack)) {
 			if (!DiscipleCultivation.feed(e, player, stack)) {
 				return;
@@ -744,23 +767,40 @@ public final class Kepribadian {
 		}
 		Msg.chat(player, Component.translatable("kultivator.sekte.kepribadian.hadiah.terima", e.getDisplayName(), itemName, worth)
 				.withStyle(ChatFormatting.LIGHT_PURPLE));
+		if (keepPk > 0) {
+			SectRanks.addPk(data, keepPk, "kultivator.sekte_sambung.hadiah.pk_alasan");
+			Msg.chat(player, Component.translatable("kultivator.sekte_sambung.hadiah.pk", e.getDisplayName(), keepPk).withStyle(ChatFormatting.GRAY));
+		}
 		afterChange(e, false);
 	}
 
-	/** The worth of a gift: spirit stones 2/3/5/6 by grade, herbs 2-6 by age, a pill 3; 0 for anything else. */
+	/** R19 (approved balance change): the PK a disciple keeps from a spirit stone gift, 3^grade (1/3/9/27); 0 otherwise. */
+	private static int giftPk(int grade, int worth) {
+		return grade < 0 || worth <= 0 ? 0 : (int) Math.round(Math.pow(3.0D, Math.min(3, grade)));
+	}
+
+	private static int stoneGrade(ItemStack stack) {
+		return stack.getItem() instanceof SpiritStoneItem stone ? Math.max(0, Math.min(3, stone.grade())) : -1;
+	}
+
+	/**
+	 * The worth of a gift: spirit stones 2/4/6/8 by grade (R19, approved: logarithmic in the stone's NB, 2 + 2 × log9 NB; it
+	 * was 2/3/5/6, so a Supreme stone worth 729 Low ones gave only three times a Low one), herbs 2-6 by age, a pill 3; 0 for
+	 * anything else.
+	 */
 	static int giftValue(ItemStack stack) {
 		if (stack == null || stack.isEmpty()) {
 			return 0;
 		}
 		if (stack.getItem() instanceof SpiritStoneItem stone) {
-			int[] worth = {2, 3, 5, 6};
-			return worth[Math.max(0, Math.min(3, stone.grade()))];
+			return 2 + 2 * Math.max(0, Math.min(3, stone.grade()));
 		}
 		if (stack.getItem() instanceof SpiritHerbItem) {
 			int age = stack.getOrDefault(HartaComponents.HERB_AGE, 100);
 			return age >= 1000 ? 6 : age >= 500 ? 4 : age >= 100 ? 3 : 2;
 		}
-		return Disciples.isPill(stack) ? 3 : 0;
+		// audit S26: the phase-7 pills are accepted by disciples too (Harta.discipleAccepts)
+		return Disciples.isPill(stack) || dev.kultivator.harta.Harta.discipleAccepts(stack) ? 3 : 0;
 	}
 
 	/** Minta Maaf di Aula: master and disciple before the hall stele, both bow; +10, a memory +5, once every 3 days. */

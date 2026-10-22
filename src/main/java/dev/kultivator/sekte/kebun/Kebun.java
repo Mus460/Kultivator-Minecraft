@@ -86,15 +86,20 @@ public final class Kebun implements KebunService {
 	}
 
 	/** From {@code SekteContent.init} (both sides). */
+	/** Registry content (K1): the Mountain Spirit Core, the plot/mine components and the payload types, always. */
+	public static void registerContent() {
+		KebunItems.init();
+		KebunKomponen.register();
+		KebunPayloads.register();
+	}
+
 	public static void init() {
+		registerContent();
 		if (initialised || !SekteContent.on(SekteIds.W)) {
 			return;
 		}
 		initialised = true;
 		KebunConfig.load();
-		KebunItems.init();
-		KebunKomponen.register();
-		KebunPayloads.register();
 		KebunCommands.init();
 		SekteApi.setKebun(SERVICE);
 		ServerLifecycleEvents.SERVER_STARTED.register(started -> server = started);

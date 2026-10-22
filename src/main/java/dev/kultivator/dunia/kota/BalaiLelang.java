@@ -5,6 +5,7 @@ import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.harta.BeastCores;
 import dev.kultivator.harta.SpiritHerbs;
 import dev.kultivator.tempa.ArtifactItem;
+import dev.kultivator.tempa.StorageRingItem;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.minecraft.ChatFormatting;
@@ -37,9 +38,10 @@ import java.util.UUID;
  * present realm band; four NPC bidders, members of the rival groups (34.5.3), each with a hidden limit 0.6-1.5 × base,
  * raise 5-15 % every 4 s; players bid +5 / +10 / +25 % from the Lelang tab (the action carries the lot and the price the
  * screen showed, a stale bid is refused, and the bidder must carry the stones); a lot is sold 8 s after the last raise
- * and the stones are taken only then. Consignment: two items per player per session, paid at the session's end at 0.7-1.3
- * × a value of at most half the lots' mean base. These are the rules of Lelang Abadi (26.8) in spirit stones, in a class
- * of its own.
+ * and the stones are taken only then. Consignment ({@link Titipan}, the same rules as Lelang Abadi 26.8): one piece of a
+ * town good per consignment, two per player per session, paid at the session's end at 0.6-1.0 × its value capped at half
+ * the lots' mean base. Consignments are saved in {@code KotaData} at once, and the server stopping closes every session
+ * first ({@link #forceClose}), so a consigned piece is always paid (audit T14).
  */
 final class BalaiLelang {
 
@@ -52,7 +54,7 @@ final class BalaiLelang {
 	static final int SELL_TICKS = 160;
 	static final int UNSOLD_TICKS = 300;
 	static final int EMPTY_TICKS = 600;
-	static final int CONSIGN_MAX = 2;
+	static final int CONSIGN_MAX = Titipan.PER_SESSION;
 	static final int[] STEPS = {5, 10, 25};
 
 	static final class Lot {
@@ -89,25 +91,12 @@ final class BalaiLelang {
 		}
 	}
 
-	static final class Consign {
-		final UUID player;
-		final ItemStack stack;
-		final long value;
-
-		Consign(UUID player, ItemStack stack, long value) {
-			this.player = player;
-			this.stack = stack;
-			this.value = value;
-		}
-	}
-
 	static final class Session {
 		final long town;
 		final long day;
 		final ServerLevel level;
 		final List<Lot> lots = new ArrayList<>();
 		final List<Bidder> bidders = new ArrayList<>();
-		final List<Consign> consigned = new ArrayList<>();
 		final RandomSource random;
 		int current;
 		long lastPresence;
@@ -250,7 +239,7 @@ final class BalaiLelang {
 				case 1 -> SpiritHerbs.randomFor(null, random, 100, 300);
 				case 2 -> BeastCores.create(Harga.randomElement(random), 1 + random.nextInt(2));
 				case 3 -> Harga.item("jade_slip");
-				case 4 -> Harga.item("storage_pouch").isEmpty() ? Harga.item("jade_slip") : dev.kultivator.tempa.StorageRingItem.create(0, null);
+				case 4 -> Harga.item("storage_pouch").isEmpty() ? Harga.item("jade_slip") : StorageRingItem.create(0, null);
 				default -> Harga.item("marrow_cleansing_pill");
 			};
 		} else if (band == 3) {
@@ -386,25 +375,9 @@ final class BalaiLelang {
 		}
 	}
 
-	/** The end: consigned items are paid (0.7-1.3 × their capped value). */
+	/** The end: consigned pieces are paid (0.6-1.0 × their capped value; offline players on their next visit). */
 	private static void finish(Session session) {
-		long cap = Math.max(1L, session.meanBase() / 2L);
-		for (Consign consign : session.consigned) {
-			ServerPlayer player = session.level.getServer().getPlayerList().getPlayer(consign.player);
-			long value = Math.min(consign.value, cap);
-			long paid = Math.max(1L, Math.round(value * (0.7D + session.random.nextDouble() * 0.6D)));
-			if (player != null) {
-				NilaiBatu.give(player, paid);
-				Msg.chat(player, Component.translatable("kultivator.kota.lelang.titipan_laku", consign.stack.getHoverName(), NilaiBatu.text(paid))
-						.withStyle(ChatFormatting.GOLD));
-			} else {
-				// offline: the stones wait in the player's record and are paid on the next visit
-				CompoundTag tag = KotaData.get(session.level.getServer()).player(consign.player);
-				tag.putLong("owed", tag.getLongOr("owed", 0L) + paid);
-				KotaData.get(session.level.getServer()).touch();
-			}
-		}
-		session.consigned.clear();
+		Titipan.settle(session.level.getServer(), session.town, session.day, session.random);
 		if (session.auctioneer != null && !session.auctioneer.isRemoved()) {
 			for (ServerPlayer player : session.level.players()) {
 				if (player.distanceToSqr(session.auctioneer) <= 32.0D * 32.0D) {
@@ -460,32 +433,40 @@ final class BalaiLelang {
 		return true;
 	}
 
+	/** Consigns one piece of the main-hand stack ({@link Titipan}: whitelist, two per session, saved at once). */
 	private static boolean consign(ServerPlayer player, Session session) {
-		int mine = 0;
-		for (Consign consign : session.consigned) {
-			if (consign.player.equals(player.getUUID())) {
-				mine++;
-			}
-		}
-		if (mine >= CONSIGN_MAX) {
+		KotaData data = KotaData.get(player.level().getServer());
+		if (Titipan.count(data, player.getUUID(), session.town, session.day) >= CONSIGN_MAX) {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.lelang.titip_penuh", CONSIGN_MAX).withStyle(ChatFormatting.RED));
 			return true;
 		}
 		ItemStack hand = player.getItemInHand(InteractionHand.MAIN_HAND);
-		long value = Harga.value(hand) * Math.max(1, hand.getCount());
-		if (hand.isEmpty() || value <= 0L) {
+		if (StorageRingItem.unsafeToSell(hand)) {
+			// a pouch or ring that holds items or is bound would lose everything inside (audit K2)
+			Msg.actionBar(player, Component.translatable("kultivator.ekonomi.cincin_berisi").withStyle(ChatFormatting.RED));
+			return true;
+		}
+		if (!Titipan.townAccepts(hand)) {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.lelang.titip_tolak").withStyle(ChatFormatting.RED));
 			return true;
 		}
-		ItemStack taken = hand.copy();
-		hand.shrink(hand.getCount());
-		session.consigned.add(new Consign(player.getUUID(), taken, value));
-		Msg.actionBar(player, Component.translatable("kultivator.kota.lelang.dititip", taken.getHoverName()).withStyle(ChatFormatting.GOLD));
+		long value = Math.min(Harga.value(hand), Math.max(1L, session.meanBase() / 2L));
+		Component name = hand.getHoverName().copy();
+		hand.shrink(1);
+		Titipan.add(data, player.getUUID(), session.town, session.day, name, value);
+		Msg.actionBar(player, Component.translatable("kultivator.kota.lelang.dititip", name).withStyle(ChatFormatting.GOLD));
 		return true;
 	}
 
-	/** Pays stones a consignment earned while the player was away (on their next screen). */
+	/**
+	 * Pays stones a consignment earned while the player was away (on their next screen), and first every consigned piece
+	 * whose session no longer runs (a stop or crash before its end).
+	 */
 	static void payOwed(ServerPlayer player) {
+		Titipan.payStale(player, (town, day) -> {
+			Session running = SESSIONS.get(town);
+			return running != null && running.day == day;
+		});
 		KotaData data = KotaData.get(player.level().getServer());
 		CompoundTag tag = data.player(player.getUUID());
 		long owed = tag.getLongOr("owed", 0L);
@@ -599,16 +580,7 @@ final class BalaiLelang {
 			bidders.add(entry);
 		}
 		tag.put("bidders", bidders);
-		ListTag consign = new ListTag();
-		for (Consign each : session.consigned) {
-			if (each.player.equals(player.getUUID())) {
-				CompoundTag entry = new CompoundTag();
-				entry.store("name", ComponentSerialization.CODEC, each.stack.getHoverName());
-				entry.putLong("value", Math.min(each.value, Math.max(1L, session.meanBase() / 2L)));
-				consign.add(entry);
-			}
-		}
-		tag.put("consign", consign);
+		tag.put("consign", Titipan.view(KotaData.get(player.level().getServer()), player.getUUID(), session.town, session.day));
 		return tag;
 	}
 

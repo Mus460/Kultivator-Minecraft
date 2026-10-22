@@ -1,5 +1,6 @@
 package dev.kultivator.client.dunia.kapal;
 
+import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.dunia.peta.PetaUi;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.KeyHints;
@@ -35,7 +36,8 @@ final class KapalHud implements HudElement {
 		if (fade > 0.0F) {
 			g.fill(0, 0, width, height, Palette.argb(Math.round(230 * fade), 0x0A0E14));
 		}
-		if (minecraft.player == null) {
+		// the boarding fade above always plays; the ship panel follows the "HUD Kultivator" coin (audit M5, S30)
+		if (minecraft.player == null || !EffectQuality.hudVisible()) {
 			return;
 		}
 		KapalRohEntity ship = KapalClient.riding();

@@ -81,6 +81,16 @@ public final class MarrowCleansing {
 		return base >= 1.0D ? 1.0D : Math.min(MAX_CHANCE, base * quality.multiplier());
 	}
 
+	/** The realm the step from {@code grade} needs (null = none; also used for disciples, audit S26). */
+	public static @org.jetbrains.annotations.Nullable Realm stepRealm(RootGrade grade) {
+		return grade == RootGrade.HEAVENLY ? null : STEP_REALM[Math.min(STEP_REALM.length - 1, grade.ordinal())];
+	}
+
+	/** True when the step from {@code grade} needs a High or Perfect pill (High to Heavenly). */
+	public static boolean needsHighPill(RootGrade grade) {
+		return grade == RootGrade.HIGH;
+	}
+
 	/** Swallowing the pill (server side). True when it was taken (and one was consumed outside creative). */
 	public static boolean use(ServerPlayer player, ItemStack stack) {
 		CultivationData data = Cultivators.get(player);

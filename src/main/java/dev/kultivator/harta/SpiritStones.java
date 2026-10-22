@@ -63,13 +63,16 @@ public final class SpiritStones {
 	public static final int SUPREME_REGEN_TICKS = 1200;
 	public static final double SUPREME_REGEN_FACTOR = 3.0D;
 	public static final int USE_COOLDOWN = 20;
-	/** Meditation fuel (applied by P7-kultivasi in {@code Meditation}): one stone every n seconds, the XP factor. */
-	public static final int[] FUEL_SECONDS = {30, 150, 300, 600};
-	public static final double[] FUEL_XP = {1.5D, 2.0D, 2.5D, 3.0D};
+	/**
+	 * Meditation fuel: one stone every n seconds, the XP factor. One source of numbers (audit R17): these are the arrays
+	 * {@code Meditation} applies. A higher stone buys speed, not thrift (audit R20, told in the tooltip).
+	 */
+	public static final int[] FUEL_SECONDS = dev.kultivator.cultivation.Meditation.FUEL_SECONDS;
+	public static final double[] FUEL_XP = dev.kultivator.cultivation.Meditation.FUEL_FACTOR;
 	/** Protective formation power per stone in ticks (20 min, 3 h, 24 h); −1 = to the stone cap. */
 	public static final int[] FORMATION_TICKS = {20 * 60 * 20, 20 * 60 * 60 * 3, 20 * 60 * 60 * 24, -1};
-	/** Kantor Misi contribution points per stone. */
-	public static final double[] MISSION_PK = {0.5D, 4.5D, 40.0D, 300.0D};
+	/** Kantor Misi contribution points per stone: NB / 2 (audit S23, one rate with {@code NilaiBatu.VALUE} 1/9/81/729). */
+	public static final double[] MISSION_PK = {0.5D, 4.5D, 40.5D, 364.5D};
 	/** Alchemy catalysts: a Low stone adds success, a Mid or better stone success and quality. */
 	public static final double LOW_CATALYST_CHANCE = 0.05D;
 	public static final double MID_CATALYST_CHANCE = 0.10D;

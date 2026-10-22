@@ -36,7 +36,7 @@
   "kultivator.sekte.kepribadian.btn.bicara.desc": "Once a day: hear what is on its heart. Contentment +4 (Humble +6).",
   "kultivator.sekte.kepribadian.btn.bicara.sudah": "Already talked today.",
   "kultivator.sekte.kepribadian.btn.hadiah": "Gift (%s)",
-  "kultivator.sekte.kepribadian.btn.hadiah.desc": "Give the item in your hand: a pill, a spirit herb or a spirit stone. +2 to +6 by its worth, three a day.",
+  "kultivator.sekte.kepribadian.btn.hadiah.desc": "Give the item in your hand: a pill, a spirit herb or a spirit stone. +2 to +8 by its worth (spirit stones 2/4/6/8, kept by the disciple as 1/3/9/27 personal PK), three a day.",
   "kultivator.sekte.kepribadian.btn.hadiah.cukup": "Three gifts already today.",
   "kultivator.sekte.kepribadian.btn.maaf": "Apologise",
   "kultivator.sekte.kepribadian.btn.maaf.desc": "Stand with it before the Hall stele and apologise. Contentment +10, once every three days.",

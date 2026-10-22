@@ -37,6 +37,7 @@ public final class Dupa {
 									TooltipFlag flag) {
 			builder.accept(Component.translatable("item.kultivator.dupa.tooltip").withStyle(ChatFormatting.GOLD));
 			builder.accept(Component.translatable("item.kultivator.dupa.tooltip2").withStyle(ChatFormatting.GRAY));
+			builder.accept(Component.translatable("kultivator.ekonomi.nama.dupa").withStyle(ChatFormatting.GRAY));
 			builder.accept(Component.translatable("item.kultivator.dupa.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 		}
 	}

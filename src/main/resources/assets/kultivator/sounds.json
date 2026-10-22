@@ -1,4 +1,220 @@
 {
+  "duel.block": {
+    "subtitle": "subtitles.kultivator.duel.block",
+    "sounds": [
+      {
+        "name": "minecraft:item.shield.block",
+        "type": "event"
+      }
+    ]
+  },
+  "duel.clash": {
+    "subtitle": "subtitles.kultivator.duel.clash",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0"
+      },
+      {
+        "name": "kultivator:film/clang_1"
+      },
+      {
+        "name": "kultivator:film/clang_2"
+      }
+    ]
+  },
+  "duel.clash_heavy": {
+    "subtitle": "subtitles.kultivator.duel.clash_heavy",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0",
+        "pitch": 0.75
+      },
+      {
+        "name": "kultivator:film/clang_1",
+        "pitch": 0.75
+      },
+      {
+        "name": "kultivator:film/clang_2",
+        "pitch": 0.75
+      }
+    ]
+  },
+  "duel.deathblow": {
+    "subtitle": "subtitles.kultivator.duel.deathblow",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0",
+        "pitch": 0.7
+      },
+      {
+        "name": "kultivator:film/clang_1",
+        "pitch": 0.7
+      },
+      {
+        "name": "kultivator:film/clang_2",
+        "pitch": 0.7
+      }
+    ]
+  },
+  "duel.feint": {
+    "subtitle": "subtitles.kultivator.duel.feint",
+    "sounds": [
+      {
+        "name": "kultivator:film/whoosh_0",
+        "pitch": 1.8,
+        "volume": 0.3
+      },
+      {
+        "name": "kultivator:film/whoosh_1",
+        "pitch": 1.8,
+        "volume": 0.3
+      }
+    ]
+  },
+  "duel.gong": {
+    "subtitle": "subtitles.kultivator.duel.gong",
+    "sounds": [
+      {
+        "name": "kultivator:film/gong_0"
+      },
+      {
+        "name": "kultivator:film/gong_1"
+      }
+    ]
+  },
+  "duel.guard_break": {
+    "subtitle": "subtitles.kultivator.duel.guard_break",
+    "sounds": [
+      {
+        "name": "minecraft:item.shield.break",
+        "type": "event",
+        "pitch": 0.8
+      }
+    ]
+  },
+  "duel.hit": {
+    "subtitle": "subtitles.kultivator.duel.hit",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.strong",
+        "type": "event"
+      }
+    ]
+  },
+  "duel.intro_wind": {
+    "subtitle": "subtitles.kultivator.duel.intro_wind",
+    "sounds": [
+      {
+        "name": "minecraft:item.elytra.flying",
+        "type": "event"
+      }
+    ]
+  },
+  "duel.parry": {
+    "subtitle": "subtitles.kultivator.duel.parry",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0",
+        "pitch": 1.35
+      },
+      {
+        "name": "kultivator:film/clang_1",
+        "pitch": 1.35
+      },
+      {
+        "name": "kultivator:film/clang_2",
+        "pitch": 1.35
+      }
+    ]
+  },
+  "duel.parry_perfect": {
+    "subtitle": "subtitles.kultivator.duel.parry_perfect",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0",
+        "pitch": 1.6
+      },
+      {
+        "name": "kultivator:film/clang_1",
+        "pitch": 1.6
+      },
+      {
+        "name": "kultivator:film/clang_2",
+        "pitch": 1.6
+      }
+    ]
+  },
+  "duel.posture_break": {
+    "subtitle": "subtitles.kultivator.duel.posture_break",
+    "sounds": [
+      {
+        "name": "kultivator:film/crunch_0",
+        "pitch": 0.7
+      },
+      {
+        "name": "kultivator:film/crunch_1",
+        "pitch": 0.7
+      },
+      {
+        "name": "kultivator:film/crunch_2",
+        "pitch": 0.7
+      }
+    ]
+  },
+  "duel.qi_reflect": {
+    "subtitle": "subtitles.kultivator.duel.qi_reflect",
+    "sounds": [
+      {
+        "name": "kultivator:film/zap_0",
+        "pitch": 1.3
+      },
+      {
+        "name": "kultivator:film/zap_1",
+        "pitch": 1.3
+      },
+      {
+        "name": "kultivator:film/zap_2",
+        "pitch": 1.3
+      }
+    ]
+  },
+  "duel.qi_wave": {
+    "subtitle": "subtitles.kultivator.duel.qi_wave",
+    "sounds": [
+      {
+        "name": "kultivator:film/zap_0"
+      },
+      {
+        "name": "kultivator:film/zap_1"
+      },
+      {
+        "name": "kultivator:film/zap_2"
+      }
+    ]
+  },
+  "duel.scrape": {
+    "subtitle": "subtitles.kultivator.duel.scrape",
+    "sounds": [
+      {
+        "name": "minecraft:block.grindstone.use",
+        "type": "event"
+      }
+    ]
+  },
+  "duel.sheathe": {
+    "subtitle": "subtitles.kultivator.duel.sheathe",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0"
+      },
+      {
+        "name": "kultivator:film/clang_1"
+      },
+      {
+        "name": "kultivator:film/clang_2"
+      }
+    ]
+  },
   "film.bell": {
     "subtitle": "subtitles.kultivator.film.bell",
     "sounds": [
@@ -282,6 +498,33 @@
       }
     ]
   },
+  "voice.boss.sect_master": {
+    "subtitle": "subtitles.kultivator.voice.boss.sect_master",
+    "sounds": [
+      {
+        "name": "kultivator:voice/boss/sect_master",
+        "stream": false
+      }
+    ]
+  },
+  "voice.boss.sect_master_defeat": {
+    "subtitle": "subtitles.kultivator.voice.boss.sect_master_defeat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/boss/sect_master_defeat",
+        "stream": false
+      }
+    ]
+  },
+  "voice.boss.tamu_tantang": {
+    "subtitle": "subtitles.kultivator.voice.boss.tamu_tantang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/boss/tamu_tantang",
+        "stream": false
+      }
+    ]
+  },
   "voice.boss.taunt": {
     "subtitle": "subtitles.kultivator.voice.boss.taunt",
     "sounds": [
@@ -399,6 +642,15 @@
       }
     ]
   },
+  "voice.disciple.f1.abandoned": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.abandoned",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/abandoned",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.attack": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.attack",
     "sounds": [
@@ -413,6 +665,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f1/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.beloved": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.beloved",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/beloved",
         "stream": false
       }
     ]
@@ -444,11 +705,47 @@
       }
     ]
   },
+  "voice.disciple.f1.climb_illusion": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.climb_illusion",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/climb_illusion",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.climb_peak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.climb_peak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/climb_peak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.cultivate",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f1/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.depart": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.depart",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.envoy_return": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.envoy_return",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/envoy_return",
         "stream": false
       }
     ]
@@ -498,11 +795,65 @@
       }
     ]
   },
+  "voice.disciple.f1.grudge": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.grudge",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/grudge",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.harvest": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.harvest",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/harvest",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f1/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.leave_night": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.leave_night",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/leave_night",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.leitai_juara": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.leitai_juara",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/leitai_juara",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.leitai_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.leitai_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/leitai_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.leitai_salam": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.leitai_salam",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/leitai_salam",
         "stream": false
       }
     ]
@@ -516,11 +867,119 @@
       }
     ]
   },
+  "voice.disciple.f1.mission_report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.mission_report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/mission_report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.mourn": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.mourn",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/mourn",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.oath": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.oath",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/oath",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.ore_found": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.ore_found",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/ore_found",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f1/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.qingming": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.qingming",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/qingming",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.rebel": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.rebel",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/rebel",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.robe": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.robe",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/robe",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.study": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.study",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/study",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.submit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.submit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/submit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.sulk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.sulk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/sulk",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.tea": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.tea",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/tea",
         "stream": false
       }
     ]
@@ -561,6 +1020,15 @@
       }
     ]
   },
+  "voice.disciple.f2.abandoned": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.abandoned",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/abandoned",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.attack": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.attack",
     "sounds": [
@@ -575,6 +1043,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f2/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.beloved": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.beloved",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/beloved",
         "stream": false
       }
     ]
@@ -606,11 +1083,47 @@
       }
     ]
   },
+  "voice.disciple.f2.climb_illusion": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.climb_illusion",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/climb_illusion",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.climb_peak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.climb_peak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/climb_peak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.cultivate",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f2/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.depart": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.depart",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.envoy_return": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.envoy_return",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/envoy_return",
         "stream": false
       }
     ]
@@ -660,11 +1173,65 @@
       }
     ]
   },
+  "voice.disciple.f2.grudge": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.grudge",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/grudge",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.harvest": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.harvest",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/harvest",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f2/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.leave_night": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.leave_night",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/leave_night",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.leitai_juara": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.leitai_juara",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/leitai_juara",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.leitai_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.leitai_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/leitai_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.leitai_salam": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.leitai_salam",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/leitai_salam",
         "stream": false
       }
     ]
@@ -678,11 +1245,119 @@
       }
     ]
   },
+  "voice.disciple.f2.mission_report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.mission_report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/mission_report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.mourn": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.mourn",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/mourn",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.oath": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.oath",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/oath",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.ore_found": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.ore_found",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/ore_found",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f2/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.qingming": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.qingming",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/qingming",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.rebel": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.rebel",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/rebel",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.robe": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.robe",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/robe",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.study": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.study",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/study",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.submit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.submit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/submit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.sulk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.sulk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/sulk",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.tea": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.tea",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/tea",
         "stream": false
       }
     ]
@@ -723,6 +1398,15 @@
       }
     ]
   },
+  "voice.disciple.f3.abandoned": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.abandoned",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/abandoned",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.attack": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.attack",
     "sounds": [
@@ -737,6 +1421,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f3/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.beloved": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.beloved",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/beloved",
         "stream": false
       }
     ]
@@ -768,11 +1461,47 @@
       }
     ]
   },
+  "voice.disciple.f3.climb_illusion": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.climb_illusion",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/climb_illusion",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.climb_peak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.climb_peak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/climb_peak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.cultivate",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f3/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.depart": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.depart",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.envoy_return": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.envoy_return",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/envoy_return",
         "stream": false
       }
     ]
@@ -822,11 +1551,65 @@
       }
     ]
   },
+  "voice.disciple.f3.grudge": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.grudge",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/grudge",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.harvest": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.harvest",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/harvest",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f3/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.leave_night": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.leave_night",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/leave_night",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.leitai_juara": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.leitai_juara",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/leitai_juara",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.leitai_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.leitai_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/leitai_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.leitai_salam": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.leitai_salam",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/leitai_salam",
         "stream": false
       }
     ]
@@ -840,11 +1623,119 @@
       }
     ]
   },
+  "voice.disciple.f3.mission_report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.mission_report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/mission_report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.mourn": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.mourn",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/mourn",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.oath": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.oath",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/oath",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.ore_found": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.ore_found",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/ore_found",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f3/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.qingming": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.qingming",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/qingming",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.rebel": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.rebel",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/rebel",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.robe": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.robe",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/robe",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.study": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.study",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/study",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.submit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.submit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/submit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.sulk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.sulk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/sulk",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.tea": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.tea",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/tea",
         "stream": false
       }
     ]
@@ -885,6 +1776,15 @@
       }
     ]
   },
+  "voice.disciple.m1.abandoned": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.abandoned",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/abandoned",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.attack": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.attack",
     "sounds": [
@@ -899,6 +1799,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m1/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.beloved": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.beloved",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/beloved",
         "stream": false
       }
     ]
@@ -930,11 +1839,47 @@
       }
     ]
   },
+  "voice.disciple.m1.climb_illusion": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.climb_illusion",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/climb_illusion",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.climb_peak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.climb_peak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/climb_peak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.cultivate",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m1/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.depart": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.depart",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.envoy_return": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.envoy_return",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/envoy_return",
         "stream": false
       }
     ]
@@ -984,11 +1929,65 @@
       }
     ]
   },
+  "voice.disciple.m1.grudge": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.grudge",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/grudge",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.harvest": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.harvest",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/harvest",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m1/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.leave_night": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.leave_night",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/leave_night",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.leitai_juara": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.leitai_juara",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/leitai_juara",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.leitai_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.leitai_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/leitai_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.leitai_salam": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.leitai_salam",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/leitai_salam",
         "stream": false
       }
     ]
@@ -1002,11 +2001,119 @@
       }
     ]
   },
+  "voice.disciple.m1.mission_report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.mission_report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/mission_report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.mourn": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.mourn",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/mourn",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.oath": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.oath",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/oath",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.ore_found": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.ore_found",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/ore_found",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m1/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.qingming": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.qingming",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/qingming",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.rebel": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.rebel",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/rebel",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.robe": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.robe",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/robe",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.study": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.study",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/study",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.submit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.submit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/submit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.sulk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.sulk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/sulk",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.tea": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.tea",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/tea",
         "stream": false
       }
     ]
@@ -1047,6 +2154,15 @@
       }
     ]
   },
+  "voice.disciple.m2.abandoned": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.abandoned",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/abandoned",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.attack": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.attack",
     "sounds": [
@@ -1061,6 +2177,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m2/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.beloved": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.beloved",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/beloved",
         "stream": false
       }
     ]
@@ -1092,11 +2217,47 @@
       }
     ]
   },
+  "voice.disciple.m2.climb_illusion": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.climb_illusion",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/climb_illusion",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.climb_peak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.climb_peak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/climb_peak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.cultivate",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m2/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.depart": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.depart",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.envoy_return": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.envoy_return",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/envoy_return",
         "stream": false
       }
     ]
@@ -1146,11 +2307,65 @@
       }
     ]
   },
+  "voice.disciple.m2.grudge": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.grudge",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/grudge",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.harvest": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.harvest",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/harvest",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m2/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.leave_night": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.leave_night",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/leave_night",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.leitai_juara": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.leitai_juara",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/leitai_juara",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.leitai_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.leitai_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/leitai_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.leitai_salam": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.leitai_salam",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/leitai_salam",
         "stream": false
       }
     ]
@@ -1164,11 +2379,119 @@
       }
     ]
   },
+  "voice.disciple.m2.mission_report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.mission_report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/mission_report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.mourn": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.mourn",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/mourn",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.oath": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.oath",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/oath",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.ore_found": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.ore_found",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/ore_found",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m2/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.qingming": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.qingming",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/qingming",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.rebel": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.rebel",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/rebel",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.robe": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.robe",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/robe",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.study": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.study",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/study",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.submit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.submit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/submit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.sulk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.sulk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/sulk",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.tea": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.tea",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/tea",
         "stream": false
       }
     ]
@@ -1209,6 +2532,15 @@
       }
     ]
   },
+  "voice.disciple.m3.abandoned": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.abandoned",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/abandoned",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.attack": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.attack",
     "sounds": [
@@ -1223,6 +2555,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m3/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.beloved": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.beloved",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/beloved",
         "stream": false
       }
     ]
@@ -1254,11 +2595,47 @@
       }
     ]
   },
+  "voice.disciple.m3.climb_illusion": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.climb_illusion",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/climb_illusion",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.climb_peak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.climb_peak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/climb_peak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.cultivate",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m3/cultivate",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.depart": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.depart",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.envoy_return": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.envoy_return",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/envoy_return",
         "stream": false
       }
     ]
@@ -1308,11 +2685,65 @@
       }
     ]
   },
+  "voice.disciple.m3.grudge": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.grudge",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/grudge",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.harvest": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.harvest",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/harvest",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m3/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.leave_night": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.leave_night",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/leave_night",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.leitai_juara": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.leitai_juara",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/leitai_juara",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.leitai_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.leitai_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/leitai_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.leitai_salam": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.leitai_salam",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/leitai_salam",
         "stream": false
       }
     ]
@@ -1326,11 +2757,119 @@
       }
     ]
   },
+  "voice.disciple.m3.mission_report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.mission_report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/mission_report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.mourn": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.mourn",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/mourn",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.oath": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.oath",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/oath",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.ore_found": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.ore_found",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/ore_found",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m3/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.qingming": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.qingming",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/qingming",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.rebel": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.rebel",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/rebel",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.report": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.report",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/report",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.robe": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.robe",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/robe",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.study": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.study",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/study",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.submit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.submit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/submit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.sulk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.sulk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/sulk",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.tea": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.tea",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/tea",
         "stream": false
       }
     ]
@@ -1380,11 +2919,38 @@
       }
     ]
   },
+  "voice.elder.banner": {
+    "subtitle": "subtitles.kultivator.voice.elder.banner",
+    "sounds": [
+      {
+        "name": "kultivator:voice/elder/banner",
+        "stream": false
+      }
+    ]
+  },
+  "voice.elder.envoy": {
+    "subtitle": "subtitles.kultivator.voice.elder.envoy",
+    "sounds": [
+      {
+        "name": "kultivator:voice/elder/envoy",
+        "stream": false
+      }
+    ]
+  },
   "voice.elder.inheritance": {
     "subtitle": "subtitles.kultivator.voice.elder.inheritance",
     "sounds": [
       {
         "name": "kultivator:voice/elder/inheritance",
+        "stream": false
+      }
+    ]
+  },
+  "voice.elder.leitai_buka": {
+    "subtitle": "subtitles.kultivator.voice.elder.leitai_buka",
+    "sounds": [
+      {
+        "name": "kultivator:voice/elder/leitai_buka",
         "stream": false
       }
     ]
@@ -1935,24 +3501,6 @@
       }
     ]
   },
-  "voice.langit.blood_eclipse": {
-    "subtitle": "subtitles.kultivator.voice.langit.blood_eclipse",
-    "sounds": [
-      {
-        "name": "kultivator:voice/world/langit/blood_eclipse",
-        "stream": false
-      }
-    ]
-  },
-  "voice.langit.treasure_born": {
-    "subtitle": "subtitles.kultivator.voice.langit.treasure_born",
-    "sounds": [
-      {
-        "name": "kultivator:voice/world/langit/treasure_born",
-        "stream": false
-      }
-    ]
-  },
   "voice.laut.dragon_king": {
     "subtitle": "subtitles.kultivator.voice.laut.dragon_king",
     "sounds": [
@@ -2094,222 +3642,6 @@
       {
         "name": "kultivator:voice/rogue/flee",
         "stream": false
-      }
-    ]
-  },
-  "duel.clash": {
-    "subtitle": "subtitles.kultivator.duel.clash",
-    "sounds": [
-      {
-        "name": "kultivator:film/clang_0"
-      },
-      {
-        "name": "kultivator:film/clang_1"
-      },
-      {
-        "name": "kultivator:film/clang_2"
-      }
-    ]
-  },
-  "duel.clash_heavy": {
-    "subtitle": "subtitles.kultivator.duel.clash_heavy",
-    "sounds": [
-      {
-        "name": "kultivator:film/clang_0",
-        "pitch": 0.75
-      },
-      {
-        "name": "kultivator:film/clang_1",
-        "pitch": 0.75
-      },
-      {
-        "name": "kultivator:film/clang_2",
-        "pitch": 0.75
-      }
-    ]
-  },
-  "duel.scrape": {
-    "subtitle": "subtitles.kultivator.duel.scrape",
-    "sounds": [
-      {
-        "name": "minecraft:block.grindstone.use",
-        "type": "event"
-      }
-    ]
-  },
-  "duel.parry": {
-    "subtitle": "subtitles.kultivator.duel.parry",
-    "sounds": [
-      {
-        "name": "kultivator:film/clang_0",
-        "pitch": 1.35
-      },
-      {
-        "name": "kultivator:film/clang_1",
-        "pitch": 1.35
-      },
-      {
-        "name": "kultivator:film/clang_2",
-        "pitch": 1.35
-      }
-    ]
-  },
-  "duel.parry_perfect": {
-    "subtitle": "subtitles.kultivator.duel.parry_perfect",
-    "sounds": [
-      {
-        "name": "kultivator:film/clang_0",
-        "pitch": 1.6
-      },
-      {
-        "name": "kultivator:film/clang_1",
-        "pitch": 1.6
-      },
-      {
-        "name": "kultivator:film/clang_2",
-        "pitch": 1.6
-      }
-    ]
-  },
-  "duel.block": {
-    "subtitle": "subtitles.kultivator.duel.block",
-    "sounds": [
-      {
-        "name": "minecraft:item.shield.block",
-        "type": "event"
-      }
-    ]
-  },
-  "duel.guard_break": {
-    "subtitle": "subtitles.kultivator.duel.guard_break",
-    "sounds": [
-      {
-        "name": "minecraft:item.shield.break",
-        "type": "event",
-        "pitch": 0.8
-      }
-    ]
-  },
-  "duel.posture_break": {
-    "subtitle": "subtitles.kultivator.duel.posture_break",
-    "sounds": [
-      {
-        "name": "kultivator:film/crunch_0",
-        "pitch": 0.7
-      },
-      {
-        "name": "kultivator:film/crunch_1",
-        "pitch": 0.7
-      },
-      {
-        "name": "kultivator:film/crunch_2",
-        "pitch": 0.7
-      }
-    ]
-  },
-  "duel.deathblow": {
-    "subtitle": "subtitles.kultivator.duel.deathblow",
-    "sounds": [
-      {
-        "name": "kultivator:film/clang_0",
-        "pitch": 0.7
-      },
-      {
-        "name": "kultivator:film/clang_1",
-        "pitch": 0.7
-      },
-      {
-        "name": "kultivator:film/clang_2",
-        "pitch": 0.7
-      }
-    ]
-  },
-  "duel.feint": {
-    "subtitle": "subtitles.kultivator.duel.feint",
-    "sounds": [
-      {
-        "name": "kultivator:film/whoosh_0",
-        "pitch": 1.8,
-        "volume": 0.3
-      },
-      {
-        "name": "kultivator:film/whoosh_1",
-        "pitch": 1.8,
-        "volume": 0.3
-      }
-    ]
-  },
-  "duel.qi_wave": {
-    "subtitle": "subtitles.kultivator.duel.qi_wave",
-    "sounds": [
-      {
-        "name": "kultivator:film/zap_0"
-      },
-      {
-        "name": "kultivator:film/zap_1"
-      },
-      {
-        "name": "kultivator:film/zap_2"
-      }
-    ]
-  },
-  "duel.qi_reflect": {
-    "subtitle": "subtitles.kultivator.duel.qi_reflect",
-    "sounds": [
-      {
-        "name": "kultivator:film/zap_0",
-        "pitch": 1.3
-      },
-      {
-        "name": "kultivator:film/zap_1",
-        "pitch": 1.3
-      },
-      {
-        "name": "kultivator:film/zap_2",
-        "pitch": 1.3
-      }
-    ]
-  },
-  "duel.hit": {
-    "subtitle": "subtitles.kultivator.duel.hit",
-    "sounds": [
-      {
-        "name": "minecraft:entity.player.attack.strong",
-        "type": "event"
-      }
-    ]
-  },
-  "duel.intro_wind": {
-    "subtitle": "subtitles.kultivator.duel.intro_wind",
-    "sounds": [
-      {
-        "name": "minecraft:item.elytra.flying",
-        "type": "event"
-      }
-    ]
-  },
-  "duel.gong": {
-    "subtitle": "subtitles.kultivator.duel.gong",
-    "sounds": [
-      {
-        "name": "kultivator:film/gong_0"
-      },
-      {
-        "name": "kultivator:film/gong_1"
-      }
-    ]
-  },
-  "duel.sheathe": {
-    "subtitle": "subtitles.kultivator.duel.sheathe",
-    "sounds": [
-      {
-        "name": "kultivator:film/clang_0"
-      },
-      {
-        "name": "kultivator:film/clang_1"
-      },
-      {
-        "name": "kultivator:film/clang_2"
       }
     ]
   }

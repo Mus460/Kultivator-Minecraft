@@ -7,7 +7,7 @@ membangkitkan binatang roh, dan membangun formasi. Sejak Fase 6 kamu juga mendir
 dari Hari Penerimaan Murid, dan membimbing mereka naik tanpa batas sampai **Bintang Abadi**, bahkan sampai melampauimu.
 Sejak Fase 6b sektemu **membangun dirinya sendiri** dari bahan yang kamu setor: pilih satu dari sembilan templat, dari
 Sekte Tak Berperingkat sampai Istana Langit, lalu saksikan kompleks sekte klasik tumbuh melewati sembilan tingkat.
-Sejak Fase 6c ada **169 teknik** (Teknik Dewa) dari cerita kultivasi sungguhan, yang makin dahsyat di setiap ranah, dengan
+Sejak Fase 6c ada **169 teknik** (Teknik Dewa; 168 bisa kamu pelajari, satu khusus murid) dari cerita kultivasi sungguhan, yang makin dahsyat di setiap ranah, dengan
 **Kitab Teknik**, Roda Segel, Penguasaan Jurus, dan saklar satu klik bila kamu ingin jurusmu benar-benar membelah bumi.
 Sejak Fase 7 **dunianya hidup** ([33](#33-dunia-yang-hidup-fase-7)): monster elit Binatang Iblis di setiap ranah, Batu Roh,
 Inti Binatang, herba roh berumur, urat roh dan Kultivasi Tertutup di Gua Kediaman, jimat, alkimia lanjutan, tribulasi
@@ -32,7 +32,7 @@ bulat di dalam game.
 ## Daftar isi
 
 1. [Langkah pertama](#1-langkah-pertama)
-2. [Tombol dan cara menggantinya](#2-tombol-dan-cara-menggantinya) · 2.1 [Menu utama (hub)](#21-menu-utama-hub)
+2. [Tombol dan cara menggantinya](#2-tombol-dan-cara-menggantinya) · 2.1 [Gulungan Kultivasi (hub)](#21-gulungan-kultivasi-hub)
 3. [Perintah](#3-perintah)
 4. [Ranah dan tahap](#4-ranah-dan-tahap)
 5. [Mengumpulkan kultivasi](#5-mengumpulkan-kultivasi)
@@ -118,6 +118,10 @@ bulat di dalam game.
     [config](#6418-berkas-konfigurasi-configkultivator-duniajson), [perintah uji](#6419-perintah-uji-op-kultivasi-uji-)
 65. [**Duel Pedang Kultivator**](#65-duel-pedang-kultivator): menantang, kontrol, tangkis dan postur, kunci bilah,
     taruhan dan Kehormatan, [perintah](#656-perintah)
+66. [**Sekte yang Hidup**](#66-sekte-yang-hidup): watak dan hubungan murid, turnamen, Tangga Seribu, Paviliun Kitab,
+    Tetua dan Pewaris, misi cerita, lambang, diplomasi, Kebun dan Tambang, [perintah uji](#6612-perintah-uji-op)
+67. [**Perubahan keseimbangan (audit integrasi)**](#67-perubahan-keseimbangan-audit-integrasi): panduan, ekonomi,
+    kekuatan, dunia, sekte
 
 ---
 
@@ -141,7 +145,7 @@ Ingin peta lengkap sampai Dewa Abadi? Buka **Kitab Panduan** di dalam game: bagi
    penuh. Di Tahap Puncak kamu harus menerobos ke ranah berikutnya.
 5. **Pelajari teknik.** Di Pemurnian Qi kamu langsung menguasai *Langkah Awan* (lompat lagi di udara) dan *Telapak Qi*
    (tekan `G`). Semakin tinggi ranahmu, semakin banyak dan semakin dahsyat teknik yang terbuka. Tahan `V` dan pilih irisan
-   **Kitab Teknik**: semua 169 teknik, sumber ceritanya, angkanya, dan cara memperolehnya (lihat
+   **Kitab Teknik**: semua 168 teknik pemain, sumber ceritanya, angkanya, dan cara memperolehnya (lihat
    [Teknik Dewa](#12-teknik-dewa-169-teknik)).
 6. **Pilih Dao** saat mencapai *Inti Emas*: jalan seumur hidup yang menentukan teknik dan kekuatanmu.
 7. **Dirikan sekte.** Buat dan pasang **Prasasti Aula Sekte** (lihat [Aula Sekte](#20-aula-sekte)). Setiap beberapa
@@ -166,7 +170,7 @@ Sejak pembaruan UI/UX Terpadu semua tombol yang sering dipakai ada di dekat `W` 
 | Tombol bawaan | Fungsi | Dulu |
 |---|---|---|
 | `G` | Ketuk: rapal teknik yang sedang dipilih. Tahan ≥ 250 ms: buka **Roda Segel** ([12.1](#121-kitab-teknik)) | `G` |
-| `V` | **Akses Cepat**. Ketuk: buka gulungan kultivasi (menu utama) di bagian terakhir. Tahan: roda Akses Cepat. Saat ditahan, pelacak panduan yang mengecil terbuka lagi | baru |
+| `V` | **Akses Cepat**. Ketuk: buka Gulungan Kultivasi di bagian terakhir. Tahan: roda Akses Cepat. Saat ditahan, pelacak panduan yang mengecil terbuka lagi | baru |
 | `Z` | Teknik berikutnya di dalam Rangkai Segel (semua teknik bila kosong) | `.` |
 | `B` | Mulai / berhenti meditasi. Saat bermeditasi dengan bar penuh di leher botol: memulai terobosan | `;` |
 | `H` | Naik / turun dari Pedang Terbang | `\` |
@@ -174,24 +178,25 @@ Sejak pembaruan UI/UX Terpadu semua tombol yang sering dipakai ada di dekat `W` 
 | `Backspace` | Lewati shot kamera sinematik (`W` `A` `S` `D`, lompat dan serang juga melewatinya) | `Backspace` |
 | Lompat di udara (`Spasi`) | *Langkah Awan*: lompatan tambahan di udara (setelah teknik ini dikuasai) | |
 | belum diatur | Gulungan saja (tanpa roda), teknik sebelumnya, Kitab Teknik | `'` `,` `-` |
-| belum diatur | Roda Segel (tahan), Segel Cepat 1–4, Dunia, Keabadian, Cincin, Kitab Panduan: semuanya lewat `V` dan menu utama | |
+| belum diatur | Roda Segel (tahan), Segel Cepat 1–4, Dunia, Keabadian, Cincin, Kitab Panduan, Peta Dunia: semuanya lewat `V` dan Gulungan Kultivasi | |
+| klik kanan dengan senjata (duel) | Tangkis / jaga ([65.2](#652-kontrol-mode-masukan-klasik)); tombol **Tangkis / jaga (duel)** dan **Kamera duel** ada di daftar tetapi belum diatur | |
 
 **Roda Akses Cepat** (tahan `V`): delapan irisan searah jarum jam dari atas: 1 Meditasi · 2 Pedang Terbang · 3 Kitab
 Teknik · 4 Murid · 5 Cincin · 6 Dunia · 7 Keabadian · 8 Kitab Panduan. Gerakkan tetikus ke irisan lalu lepas `V`, atau
-tekan angka `1`–`8`. Lepas di tengah = buka menu utama; klik kanan atau `Esc` = batal. `W` `A` `S` `D` tetap jalan. Roda
+tekan angka `1`–`8`. Lepas di tengah = buka Gulungan Kultivasi; klik kanan atau `Esc` = batal. `W` `A` `S` `D` tetap jalan. Roda
 tidak terbuka saat film kamera berjalan, saat sebuah layar terbuka, atau saat tribulasi (bahaya), dan tidak pernah
 bersamaan dengan Roda Segel.
 
 **Pemain lama:** sekali saja saat game dimulai, tombol yang masih di bawaan lama (`;` `'` `,` `.` `\` `-`) pindah ke
 bawaan baru, dan satu baris chat memberitahumu. Tombol yang pernah kamu ganti sendiri tetap milikmu.
 
-**Mengganti tombol:** di dalam game buka menu utama › **Pengaturan › Kontrol** (daftar langsung semua tombol
+**Mengganti tombol:** di dalam game buka Gulungan › **Pengaturan › Kontrol** (daftar langsung semua tombol
 Kultivator, bentrokan ditandai oranye) lalu talisman **Ubah tombol…**, atau Options → Controls → Key Binds → bagian
 **Kultivator**. Bawaan sengaja tidak memakai tombol vanilla (`Q` `E` `F` `T` `Tab` `X` `C` `O` `P` `L`), Combat Roll
 (`R`) maupun Iris (`R` `K` `I`). `G` juga tombol *Quick Actions* vanilla, yang hanya berbuat sesuatu di server yang
 punya dialog quick actions.
 
-### 2.1 Menu utama (hub)
+### 2.1 Gulungan Kultivasi (hub)
 
 Gulungan kultivasi (ketuk `V`) adalah satu pintu ke semua fitur. Loh giok di kiri adalah delapan bagian menurut urutan
 bermain; tombol angka `1`–`8` berpindah bagian, `Tab` / `Shift+Tab` berpindah sub-koin di kepala gulungan, dan segel
@@ -201,25 +206,26 @@ bermain; tombol angka `1`–`8` berpindah bagian, `Tab` / `Shift+Tab` berpindah 
 |---|---|---|
 | 1 | **Diri** | Status · Akar & Dao · Jalan · Alkimia |
 | 2 | **Teknik** | Peluncur Kitab Teknik (Kodeks, Rangkai Segel, Kehancuran Diri) |
-| 3 | **Murid** | Gulungan murid terdekat |
-| 4 | **Sekte** | Aula, Bangun, Formasi, Anggota, Perbendaharaan, Kegiatan, Wilayah, Segel Merah Murid (aula sendiri dari jauh) |
-| 5 | **Dunia** | Alam Rahasia, Pusaka, Musuh, Cincin |
-| 6 | **Keabadian** | Alam Abadi, Purba, Bencana, Batin, Ciptaan, Lelang, Titah Langit |
+| 3 | **Murid** | Gulungan murid terdekat · Suasana Hati Murid · Catatan Tangga |
+| 4 | **Sekte** | Dua sub-koin (`Tab`). **Aula**: Aula, Bangun, Formasi, Anggota, Perbendaharaan, Kegiatan, Wilayah, Segel Merah Murid (aula sendiri dari jauh). **Perguruan** (Sekte yang Hidup, [66](#66-sekte-yang-hidup); butuh Prasasti Aula Sekte): Jaring Hubungan, Paviliun & Makam, Balai Tetua, Misi Cerita, Lambang & Seragam, Turnamen, Diplomasi Sekte, Kebun & Tambang |
+| 5 | **Dunia** | Alam Rahasia, Pusaka, Musuh, Cincin, Duel Pedang ([65](#65-duel-pedang-kultivator)), Peta Dunia, Menara Seratus, Saingan ([64](#64-dunia-kultivasi-yang-luas)) |
+| 6 | **Keabadian** | Alam Abadi, Purba, Bencana, Batin, Ciptaan, Lelang, Titah Langit, Kota Abadi |
 | 7 | **Panduan** | Kitab Panduan · Ensiklopedia |
 | 8 | **Pengaturan** | Tampilan & Efek · Kamera & Film · Suara · HUD · Kontrol |
 
 Kartu yang belum terbuka tampil abu-abu dengan gembok dan alasannya ("terbuka di Pemurnian Qi", "terbuka setelah naik
 ke Alam Abadi", "butuh Prasasti Sekte" ...); mengkliknya menampilkan alasan itu, tidak pernah diam saja.
 
-`Esc` di layar yang dibuka dari menu utama kembali ke bagian asalnya; `V` menutup semuanya sekaligus. Layar yang dibuka
+`Esc` di layar yang dibuka dari Gulungan Kultivasi kembali ke bagian asalnya; `V` menutup semuanya sekaligus. Layar yang dibuka
 dari dunia (klik kanan prasasti, `M`, perintah) ditutup biasa oleh `Esc`.
 
 Yang digabung atau dibuang: tablet Bantuan Kitab Teknik (sekarang segel **?** ke Ensiklopedia), daftar tombol ganda
 (satu daftar di Pengaturan › Kontrol), tab Desa di layar Dunia (salinan tablet Desa aula: sekarang Sekte › Wilayah ›
 Desa), koin *Sembunyikan panduan* ganda (satu di Pengaturan › HUD), talisman Uji Akar ganda (di Status), blok serbuan
 berikutnya ganda di Musuh (satu baris + tautan ke Pertahanan), pilihan Film Titah (pindah ke Pengaturan › Kamera &
-Film). Aula Sekte kini 8 tablet tanpa gulir. Nama baru: *Cincin Segel* → **Rangkai Segel**, *Mode Kehancuran* →
-**Kehancuran Diri**, *Segel Merah* aula → **Segel Merah Murid**.
+Film). Aula Sekte kini 8 tablet tanpa gulir. Nama baru: *Cincin Segel* → **Rangkai Segel**, tab *Mode Kehancuran* di
+Kitab Teknik → tab **Kehancuran Diri** (saklarnya sendiri tetap bernama **Mode Kehancuran**, seperti di semua aturan
+keamanan), *Segel Merah* aula → **Segel Merah Murid**.
 
 ---
 
@@ -241,7 +247,7 @@ Film). Aula Sekte kini 8 tablet tanpa gulir. Nama baru: *Cincin Segel* → **Ran
 | `/kultivasi teknik info <id>` | Nama, Sumber, angka langsung, penguasaan, dan cara memperoleh teknik itu di chat |
 | `/kultivasi teknik pilih <id>` / `teknik rapal <id>` | Memilih / merapal teknik yang kamu kuasai |
 | `/kultivasi teknik daftar [dao <dao>\|tingkat <tingkat>\|jenis <jenis>]` | Teknik yang kamu kuasai dengan penguasaan dan sisa jeda ([12.12](#1212-perintah-teknik)) |
-| `/kultivasi teknik slot <1-12> <id\|kosong>` / `slot isi` / `slot hapus` | Mengatur Cincin Segel |
+| `/kultivasi teknik slot <1-12> <id\|kosong>` / `slot isi` / `slot hapus` | Mengatur Rangkai Segel |
 | `/kultivasi teknik pahamkan <murid> <id>` | Memilih teknik Dewa yang dipahami murid di gelar bintang barunya (biasanya lewat klik di chat) |
 | `/kultivasi technique list` / `select <id>` / `cast <id>` | Perintah lama; tetap bekerja dengan semua id teknik |
 | `/kultivasi warisan pilih <1-3>` | Memilih hadiah [Ujian Warisan](#126-cara-memperoleh-teknik) |
@@ -978,7 +984,8 @@ kolam yang sama kini juga berisi teknik baru dari tingkat yang lebih tinggi.
 
 ## 12. Teknik Dewa (169 teknik)
 
-Sejak Fase 6c Kultivator punya **169 teknik**: 146 teknik baru ditambah 23 teknik lama yang diperkuat. Kamu bisa
+Sejak Fase 6c Kultivator punya **169 teknik**: 146 teknik baru ditambah 23 teknik lama yang diperkuat. Pemain bisa
+mempelajari 168 di antaranya (penghitung "Teknik x/168" di Kitab Teknik); satu teknik hanya untuk murid. Kamu bisa
 mempelajari **168** di antaranya; satu, *Wilayah Karma*, khusus murid. Semakin tinggi ranahmu, semakin dahsyat setiap
 jurus: di Dewa Abadi, Telapak Qi yang sama memukul sekitar **165 kali** lebih keras daripada di Pemurnian Qi, dengan
 jangkauan, durasi, jumlah, dan ukuran visual yang jauh lebih besar. Jurus terkuat baru terbuka di Kenaikan Abadi, Dewa
@@ -1014,7 +1021,7 @@ detik, "r" = jari-jari dalam blok.
 
 ### 12.1 Kitab Teknik
 
-**Membuka.** Tahan **`V`** lalu pilih irisan *Kitab Teknik*, klik kartu **Buka Kitab Teknik** di bagian Teknik menu utama, atau
+**Membuka.** Tahan **`V`** lalu pilih irisan *Kitab Teknik*, klik kartu **Buka Kitab Teknik** di bagian Teknik Gulungan Kultivasi, atau
 ketik `/kultivasi teknik kitab [id]` (dengan id, kartu itu langsung terfokus). Gulungan giok terbuka dalam seperempat
 detik. Tablet di kiri: **Kodeks**, **Rangkai Segel**, dan **Kehancuran Diri** (tablet merah); segel **?** membuka Ensiklopedia. Semua halaman
 muat di GUI 320×240.
@@ -1031,7 +1038,7 @@ Semua saringan digabung (harus cocok semuanya) dan diingat di `config/kultivator
 tingkat, grid diberi kepala kelompok seperti "Tingkat Bumi · 18".
 
 **Kartu segel** menampilkan glif (trigram Dao dan tanda jenis), pita tingkat di sudut (Dewa berkilau pelangi), empat manik
-penguasaan, gembok bila terkunci, sapuan jeda, nomor soket Cincin Segel, **tanda retak merah kecil** bila jurus itu bisa
+penguasaan, gembok bila terkunci, sapuan jeda, nomor soket Rangkai Segel, **tanda retak merah kecil** bila jurus itu bisa
 memahat dunia, dan lencana **BARU** sampai kartunya kamu buka. Tooltip-nya: nama Indonesia, nama Inggris, tingkat-sub ·
 jenis, baris Sumber, qi dan jeda yang sudah diskalakan, dan alasan terkunci.
 
@@ -1056,7 +1063,7 @@ Isinya:
 8. jimat **Pilih** (tombol rapal memakai teknik ini), **Pasang ke Cincin** (pilih soket 1–12), dan **Uji** (hanya operator
    dalam mode Kreatif: dirapal sebagai uji tanpa biaya dan tanpa penguasaan).
 
-**Cincin Segel.** Dua belas soket mengelilingi dantian; soket 1–4 bernomor emas dan sekaligus menjadi **segel cepat**.
+**Rangkai Segel** (dulu *Cincin Segel*)**.** Dua belas soket mengelilingi dantian; soket 1–4 bernomor emas dan sekaligus menjadi **segel cepat**.
 * Klik soket lalu klik kartu, atau seret kartu dari daftar kanan ke soket. Klik kartu biasa mengisi soket kosong pertama.
   Klik kanan soket mengosongkannya.
 * **Isi otomatis** memasang teknik terkuat yang bisa dirapal per peran: 2 satu sasaran, 3 area, 2 kendali, 1 gerak,
@@ -1071,9 +1078,9 @@ Isinya:
 |---|---|---|
 | Rapal | `G` | ketuk: rapal teknik terpilih. Tahan ≥ 250 ms: buka **Roda Segel** (selama "Tahan G untuk roda" nyala; ketukan merapal saat dilepas) |
 | Sebelumnya / berikutnya | belum diatur / `Z` | memutar teknik terpilih **di dalam Rangkai Segel** (semua teknik yang bisa dirapal bila cincin kosong), dengan carousel 1,2 detik di atas hotbar |
-| Kitab Teknik | belum diatur | membuka Kitab Teknik (juga irisan 3 roda Akses Cepat dan bagian Teknik menu utama) |
+| Kitab Teknik | belum diatur | membuka Kitab Teknik (juga irisan 3 roda Akses Cepat dan bagian Teknik Gulungan Kultivasi) |
 | Roda Segel (tahan) | belum diatur | tahan untuk membuka roda. Begitu tombol ini diatur, `G` kembali merapal saat ditekan tanpa jeda |
-| Segel Cepat 1–4 | belum diatur | merapal soket 1–4 Cincin Segel |
+| Segel Cepat 1–4 | belum diatur | merapal soket 1–4 Rangkai Segel |
 
 Roda Segel menampilkan 12 segel cincin (bila cincin kosong: 12 teknik pertama yang bisa dirapal, urut tingkat) dalam
 lingkaran berjari-jari 56 GUI px (46 bila tinggi layar di bawah 260). Tiap segel memperlihatkan glif, pita tingkat, biaya
@@ -1840,7 +1847,7 @@ gampang ini hanya untuk jurusmu sendiri.
 | `teknik info <id>` | di chat: nama, Sumber, angka langsung, penguasaan, cara memperoleh |
 | `teknik pilih <id>` / `teknik rapal <id>` | memilih / merapal teknik yang kamu kuasai |
 | `teknik daftar [dao <dao>\|tingkat <tingkat>\|jenis <jenis>]` | teknik yang kamu kuasai dengan penguasaan dan "[siap]" / sisa jeda. `<dao>`: `sword`, `fire`, `ice`, `lightning`, `body`, `life`, `shadow`, `space`, `universal`. `<tingkat>`: `huang`, `xuan`, `di`, `tian`, `abadi`, `dewa`. `<jenis>`: `serang`, `area`, `kendali`, `gerak`, `lindung`, `pulih`, `panggil`, `wilayah`, `ubah`, `pamungkas`, `indra` |
-| `teknik slot` / `teknik slot <1-12> <id\|kosong>` / `teknik slot isi` / `teknik slot hapus` | lihat, isi, isi otomatis, atau kosongkan Cincin Segel |
+| `teknik slot` / `teknik slot <1-12> <id\|kosong>` / `teknik slot isi` / `teknik slot hapus` | lihat, isi, isi otomatis, atau kosongkan Rangkai Segel |
 | `teknik pahamkan <murid> <id>` | pilihan teknik Dewa di gelar bintang murid (biasanya lewat klik di chat) |
 | `technique list\|select\|cast <id>` | perintah lama, tetap bekerja dengan semua id |
 | `kehancuran nyala` / `kehancuran mati` | saklar Mode Kehancuran jurusmu sendiri |
@@ -2498,7 +2505,7 @@ G B G
   Pasang prasasti lagi di mana pun untuk membangunkannya dengan seluruh datanya. Ketenaran hanya bisa diraih, jadi
   memasang ulang tidak memberi apa-apa.
 * **Teman satu `/sekte`** boleh membuka gulungan aulamu untuk melihat saja (termasuk Tugas, Misi, Arena, dan Segel
-  Merah) dan menyumbang ke kas lewat Kantor Misi.
+  Merah) dan menyumbang ke kas lewat Kantor Persembahan.
 
 ### 20.3 Tingkat Aula dan bangunan
 
@@ -2573,7 +2580,7 @@ Klik kanan prasasti aktifmu. Loh giok di sisi kiri adalah tablet-tabletnya; teka
 | **Bangun** | [Pembangunan Sekte](#20b-pembangunan-sekte): diagram tapak, tangga sembilan tingkat, dan panel Ikhtisar, Bahan, Misi, Pekerja, Galian, Templat, Penyumbang ([20b.13](#20b13-tablet-bangun-layar-templat-dan-hud)) |
 | **Calon** | Kartu calon murid, koin *Hanya Monster*, tombol *Mulai Perang* pada hari perang ([bagian 21](#21-hari-penerimaan-murid)) |
 | **Jenjang** | Pagoda enam lantai ([23.1](#231-jenjang-sekte)) |
-| **Perbendaharaan** | Kantor Misi, Paviliun Yue Lu, Seni Sekte yang Hilang ([23.2–23.4](#232-poin-kontribusi)) |
+| **Perbendaharaan** | Kantor Persembahan, Paviliun Yue Lu, Seni Sekte yang Hilang ([23.2–23.4](#232-poin-kontribusi)) |
 | **Tugas** | Pos tugas, Lumbung Sekte, Murnikan Herba ([24.1](#241-tugas-sekte)) |
 | **Misi** | Bagian Papan, Tim, Utusan, Terlarang, Bahtera ([24.3–24.6](#243-ekspedisi-misi)) |
 | **Arena** | Bagian Turnamen, Alam Hampa, Menara, Perang ([bagian 25](#25-acara-sekte-turnamen-perang-alam-dewa-hampa-menara)) |
@@ -2781,7 +2788,7 @@ Setiap tingkat membuka fitur aula yang sama di semua templat, dan tingkat pemban
 | 3 | **Paviliun Kitab** | perpustakaan dengan ≥ 10 rak buku dan podium dalam 16 blok dari Prasasti; serambi beratap (Templat 3–9); lantai pelataran lengkap | Paviliun Kitab | halaman cendekia yang tertutup |
 | 4 | **Tembok dan Air** | aula alkimia (kuali di atas api unggun jiwa yang menyala); kolam, danau, atau bak air; batas sekte: tembok + gerbang gunung, atau gerbang + batu batas (Templat 6, 7, 9); pita tembok mencapai bentuk akhirnya | – | sekte bertembok dengan air, kesan pertama yang klasik |
 | 5 | **Formasi Agung** | cakram Bagua: lodestone, crying obsidian di ±4, blok kecubung di ±3, trigram King Wen; dipasang **belum aktif**. Juga menara sudut atau menara jaga, dan altar gerbang opsional | Formasi Agung, setelah kamu mendaftarkan lodestone-nya dengan serpihan kecubung ([17](#17-formasi-pelindung)) | lantai halaman menjadi cakram ritual |
-| 6 | **Aula Utama** | aula utama di terasnya (Templat 1: tingkat sepuhan emas Aula Pendiri: papan nama, chiwen, mutiara emas, hewan atap, lentera atap); paifang; ding perunggu (satu berasap isyarat). Aula Pendiri menjadi **Kantor Misi** (papan nama diganti) | – | poros lengkap: paifang → gerbang → pelataran → teras → aula |
+| 6 | **Aula Utama** | aula utama di terasnya (Templat 1: tingkat sepuhan emas Aula Pendiri: papan nama, chiwen, mutiara emas, hewan atap, lentera atap); paifang; ding perunggu (satu berasap isyarat). Aula Pendiri menjadi **Kantor Persembahan** (papan nama diganti) | – | poros lengkap: paifang → gerbang → pelataran → teras → aula |
 | 7 | **Lapangan Latihan** | lapangan latihan dan panahan dengan ≥ 4 blok sasaran; menara lonceng dan genderang (Templat 3–9); panggung laga (Templat 6–9); panji; serambi; asrama Murid Dalam | Aula Latihan | kehidupan murid: genderang, lonceng, sasaran |
 | 8 | **Pagoda dan Leluhur** | pagoda; aula leluhur dengan lentera jiwa; paviliun meditasi dengan kursi Qi; taman binatang roh; bambu; puncak tambahan (Templat 6–9) | kursi Qi tingkat 2 atau 3 untuk sang guru | kemegahan yang menjulang |
 | 9 | **Menara Langit Membara** | pintu menara dengan 3–7 ruang tepat di bawahnya; puncak kemegahan: air terjun, mutiara emas, papan nama bercahaya, lentera atap; Templat 7–9 menambah unsur langit | [Menara Langit Membara](#257-menara-langit-membara) (≥ 3 ruang) | sekte yang lengkap dan megah sesuai ukurannya |
@@ -2812,8 +2819,8 @@ Setiap tingkat membuka fitur aula yang sama di semua templat, dan tingkat pemban
 menyelubunginya (*A Record of a Mortal's Journey to Immortality*, bab 153); Paviliun Sihir (*I Shall Seal the Heavens*,
 bab 36–38); lapangan latihan (*Return of the Mount Hua Sect*); menara Langit Membara (*Battle Through the Heavens*, bab
 491/549/622). Pos tugas: gentong air (*Renegade Immortal*); Kebun Seratus Obat (*A Record of a Mortal's Journey to
-Immortality*, bab 150–151); Dapur dan Ayam Ekor Roh (*A Will Eternal*, bab 2 dan 20–26). Kantor Misi: *A Will Eternal*,
-bab 9 dan 27 (Kantor Misi); "Aula Pendiri menjadi Kantor Misi" adalah desain game.
+Immortality*, bab 150–151); Dapur dan Ayam Ekor Roh (*A Will Eternal*, bab 2 dan 20–26). Kantor Persembahan: *A Will Eternal*,
+bab 9 dan 27 (Kantor Misi); "Aula Pendiri menjadi Kantor Persembahan" adalah desain game.
 
 <details>
 <summary><b>Daftar bangunan per templat dan tingkat</b> (klik untuk membuka)</summary>
@@ -3180,7 +3187,7 @@ Barang khusus hanya diterima sebanyak yang masih dibutuhkan templat.
   Lumbung Sekte (yang tidak muat kembali ke Lumbung atau Peti Galian).
 * **Lewat chat:** `/kultivasi aula bangun setor` (tumpukan di tangan), `setor semua`, `setor butuh`.
 * Setoran sebagian selalu boleh. **Setoran tidak memberi PK** dengan sendirinya; PK datang dari misi
-  ([20b.8](#20b8-misi-pembangunan-dan-ekspedisi-pengumpulan)) dan Kantor Misi.
+  ([20b.8](#20b8-misi-pembangunan-dan-ekspedisi-pengumpulan)) dan Kantor Persembahan.
 
 **Pakai hasil galian** (koin di panel *Galian*, bawaan menyala): batu, tanah, kayu, dan bunga hasil galian langsung
 membayar tagihan dengan nilai setornya. Bila dimatikan, semuanya disimpan sebagai barang di Peti Galian. Di lereng bukit,
@@ -3294,7 +3301,7 @@ menurut kekurangan tingkat sekarang (atau tingkat berikutnya bila yang sekarang 
   (paling banyak 60 per tawaran) plus **Berkah Pengrajin**: bonus 20% dari jumlahnya sebagai unit. Surplus yang kamu ambil
   dari Gudang harus disetor kembali dulu sebelum setoran dihitung untuk tawaran.
 * **Ekspedisi Berkah** (40%): hasil Ekspedisi Pengumpulan kategori itu ×1,5 hari ini.
-* **Batas harian:** 150 PK kas dari misi pembangunan (terpisah dari 300 milik Kantor Misi); baris yang melewati batas
+* **Batas harian:** 150 PK kas dari misi pembangunan (terpisah dari 300 milik Kantor Persembahan); baris yang melewati batas
   menunggu hari berikutnya.
 * Saat templat lengkap: tidak ada tawaran lagi; panel menulis "Sekte telah lengkap".
 * Pembangunan Sekte **tidak memberi ketenaran**; ketenaran tetap hanya dari murid-muridmu ([20.4](#204-ketenaran)).
@@ -3465,7 +3472,7 @@ kemenangan. *Perfect World*, bab 551/558: membangun kembali untuk naik.
 yang belum terpindai. Di dekat tapak: templat dan tingkat, bangunan yang sedang dibangun, dan "Masih kurang: …" dengan
 petunjuk setor. F1 menyembunyikannya.
 
-**Bantuan:** Panduan › Ensiklopedia di menu utama punya topik **Pembangunan Sekte** (termasuk jeda alt-tab, pengecualian tapak,
+**Bantuan:** Gulungan › Panduan › Ensiklopedia punya topik **Pembangunan Sekte** (termasuk jeda alt-tab, pengecualian tapak,
 dan pengembalian bahan).
 
 **Sumber:** gaya gulungan giok DESIGN 5b.
@@ -4418,7 +4425,7 @@ Baru Lahir ke atas), dengan 0 PK.
 **Poin Kontribusi (PK)** ada di dua tempat: **kas sekte** (milikmu) dan PK **setiap murid**.
 
 **Mendapatkan PK:**
-* **Kas, Kantor Misi** (tablet Perbendaharaan, kiri): tumpukan barang di tasmu yang diterima tampil sebagai kartu segel
+* **Kas, Kantor Persembahan** (tablet Perbendaharaan, kiri): tumpukan barang di tasmu yang diterima tampil sebagai kartu segel
   dengan nilai PK-nya. Klik untuk mempersembahkan seluruh tumpukan; seorang tetua menilai ("Tetua menilai: kualitas
   tinggi."). Paling banyak **300 PK per hari** dari persembahan.
 
@@ -4437,7 +4444,7 @@ Baru Lahir ke atas), dengan 0 PK.
   murid per hari.
 * **Murid, lainnya:** misi, acara, dan tugas Pikul Air.
 * **Anugerah Ketua:** memindahkan PK kas ke murid (tablet Jenjang).
-* Teman satu `/sekte` bisa menyumbang barang ke kas aulamu lewat Kantor Misi (tercatat di Catatan).
+* Teman satu `/sekte` bisa menyumbang barang ke kas aulamu lewat Kantor Persembahan (tercatat di Catatan).
 
 ### 23.3 Paviliun Yue Lu
 
@@ -4581,7 +4588,7 @@ Pengumpul Qi. Mencari Herba Roh menggandakan bahan kebun.
 (dan 5% satu Batu Roh Tinggi mulai tingkat 7); Perburuan Binatang Iblis +1 Inti Binatang berunsur acak (tingkat 1–3
 Rendah, 4–6 Menengah, 7–8 Tinggi, 9 Tinggi atau 10% Raja); Mencari Herba Roh +1–2 herba roh berumur `50 × tingkat` sampai
 `150 × tingkat` tahun. Tugas Kebun murid kadang (10% per panen) menambah satu Rumput Roh berumur 50–200 ke lumbung.
-Kantor Misi menerima batu roh (0,5 / 4,5 / 40 / 300 PK), inti binatang (3 / 10 / 30 / 120 PK), dan herba roh
+Kantor Persembahan menerima batu roh (0,5 / 4,5 / 40,5 / 364,5 PK), inti binatang (3 / 10 / 30 / 120 PK), dan herba roh
 (`1 + umur ÷ 100` PK), tetap dalam batas 300 PK per hari.
 
 **Panggil Pulang** (bagian Tim) memanggil tim saat itu juga tanpa hasil apa pun. Pencapaian *Melangkah Keluar Gerbang*
@@ -5636,7 +5643,7 @@ bab 1152; mata uang: RMJ bab 214, RI bab 329, *A Will Eternal* (AWE) bab 79. Des
 | **Daya formasi pelindung** | **jongkok + pakai** batu pada Batu Magnet formasi pelindungmu | +20 menit / +3 jam / +24 jam / diisi sampai batas 48 jam |
 | **Batu di Hambatan** | pegang batu Tinggi atau Agung di tangan kiri saat terobosan **berhasil** | – / – / kualitas +0,03 / +0,08 per batu |
 | **Katalis alkimia** | masukkan ke panci ([40](#40-alkimia-lanjutan-dan-kitab-alkimia)) | peluang +5% / +10% dan kualitas +0,1 untuk Menengah ke atas |
-| **Kantor Misi** | tawarkan di Aula Sekte | 0,5 / 4,5 / 40 / 300 PK per batu (batas 300 PK per hari tetap) |
+| **Kantor Persembahan** | tawarkan di Aula Sekte | 0,5 / 4,5 / 40,5 / 364,5 PK per batu (batas 300 PK per hari tetap) |
 
 * **Bahan bakar:** kuras urat ×0,5 selama ada bahan bakar. Bahan bakar ikut dalam batas gabungan tempat × formasi ×
   bahan bakar ×3,5. Saat bilah penuh di leher botol, hasilnya masuk **Qi Tertimbun** (di Puncak Dewa Abadi menjadi Qi Abadi
@@ -5683,7 +5690,7 @@ bab 13. Desain permainan: nama tingkat, unsur pada inti, dan elit yang selalu me
 
 **Memurnikan** (jongkok + pakai, jeda 1 detik, ditolak saat Penyimpangan Qi):
 
-| Tingkat | Kultivasi | Racun | Pemahaman (unsur cocok dengan Dao-mu) | Kantor Misi |
+| Tingkat | Kultivasi | Racun | Pemahaman (unsur cocok dengan Dao-mu) | Kantor Persembahan |
 |---|---|---:|---:|---:|
 | Rendah | 3% bilah, paling banyak 150 | 6 | +0,5 | 3 PK |
 | Menengah | 6%, paling banyak 900 | 10 | +1 | 10 PK |
@@ -5748,7 +5755,7 @@ Tahun"), berkilau, dan satu baris diumumkan ke server (paling sering sekali per 
 Roh (+1–2 herba umur `50 × tingkat`–`150 × tingkat`), elit tingkat 2+, dan peti struktur.
 
 **Kegunaan:** bahan pil baru dan resep alternatif, **herba pembantu** di panci (kualitas + `umur ÷ 3333`, paling banyak
-+0,30), Kantor Misi `1 + umur ÷ 100` PK (100 tahun 2 PK, 1.000 tahun 11 PK). Herba **tidak bisa ditanam**.
++0,30), Kantor Persembahan `1 + umur ÷ 100` PK (100 tahun 2 PK, 1.000 tahun 11 PK). Herba **tidak bisa ditanam**.
 
 **Indra Ilahi** menandai tanaman yang terinfus hari ini dengan warna hijau ([46](#46-relik-di-peti-kuno)).
 
@@ -6041,7 +6048,7 @@ masuk, langkah yang pencapaiannya sudah ada langsung tercentang (satu baris chat
 | 2 Pemurnian Qi | rapal jurus · telan pil · duduk di situs roh atau bangun Formasi Pengumpul Qi Kecil · terobos ke Fondasi |
 | 3 Fondasi | terbang dengan pedang · racik pil · temukan batu roh · bertahan dari tribulasi Inti Emas |
 | 4 Inti Emas | pilih Dao · belajar dari buku, slip giok, atau warisan · kalahkan Binatang Iblis · bangunkan binatang roh atau bangun formasi pelindung |
-| 5 Sekte | buka Kitab Teknik dan isi 4 segel Cincin Segel · dirikan sekte atau terima calon di aula · ambil murid pertama · pulangkan ekspedisi pertama |
+| 5 Sekte | buka Kitab Teknik dan isi 4 segel Rangkai Segel · pasang Prasasti Aula Sekte atau terima calon di aula (`/sect create` hanya membentuk kelompok Saudara Sekte dan tidak mencentangnya) · ambil murid pertama · pulangkan ekspedisi pertama |
 
 Setiap langkah punya baris "cara" dengan nama tombol yang sedang kamu pakai.
 
@@ -6058,8 +6065,22 @@ Setiap langkah punya baris "cara" dengan nama tombol yang sedang kamu pakai.
 **Pelacak** (slip giok di **tepi kanan layar, tengah**, sekitar 120 px, mengecil di layar kecil): segel bab, langkah, 1–2
 baris cara, 20 manik kemajuan, dan pengingat hadiah. Mengecil menjadi segel 12 px setelah 20 detik tanpa perubahan;
 terbuka 8 detik saat ada perubahan atau saat tombol Akses Cepat (`V`) ditahan. Langkah selesai = bunyi lonceng kecubung dan
-kilau emas. Koin **Pelacak panduan** (Pengaturan › HUD) menyembunyikan dan
-menampilkannya; setelah langkah ke-20 pelacak hilang sendiri dan pencapaian *Jalan Telah Terbuka* muncul.
+kilau emas. Koin **Pelacak panduan** (Pengaturan › HUD) menyembunyikan dan menampilkannya. Setelah langkah ke-20
+pencapaian *Jalan Telah Terbuka* muncul.
+
+Yang diikuti pelacak (yang pertama cocok menang; sejak audit integrasi ia tidak pernah hilang selama masih ada langkah):
+
+1. **Jalan Abadi** (bab 11–15, [56.10](#5610-jalan-abadi-bab-1115-dan-kewajiban-harian)) begitu kamu Dewa Abadi Puncak.
+2. **Jalan Dunia** (bab 6–10, [55.9](#559-lem-progresi)) begitu bab 1–4 Langkah Pertama selesai dan kamu sudah
+   Pembangunan Fondasi. Langkah sekte bab 5 tidak perlu selesai dulu.
+3. **Langkah Pertama** bab 1–5. Langkah *dirikan sekte*, *murid pertama*, dan *ekspedisi pertama* dilewati selama
+   Prasasti Aula Sektemu belum berdiri, jadi pertapa tidak disuruh mendirikan sekte (tablet tetap mencantumkannya).
+4. Bila tidak ada yang cocok: langkah berikutnya dari **bab sekarang Kitab Panduan** ([62](#62-kitab-panduan-di-dalam-game)),
+   misalnya selama tahun-tahun Kenaikan Abadi.
+
+Segel di pojok pelacak diberi label **Langkah** atau **Kitab** dan menulis nomor bab yang sama dengan judulnya
+("Langkah · Bab 7 · …"; Jalan Dunia dan Jalan Abadi memakai nomor bab 6–15 tablet Jalan, Kitab memakai nomor tampil
+Kitab Panduan).
 
 ### 42.2 Ujian Fondasi
 
@@ -6094,7 +6115,7 @@ satu set lengkap = mutu +0,26. Tidak ada yang wajib dan tidak ada hukuman. Ujian
 
 **Sumber:** RI bab 10 (sebagai murid pelayan, Wang Lin wajib mengisi tidak kurang dari sepuluh tong air setiap hari; gagal
 berarti tanpa makan). Bonus beruntun desain permainan. Ini kewajibanmu sendiri, terpisah dari Tugas Sekte murid dan papan
-Kantor Misi.
+Kantor Persembahan.
 
 * **Tiga kewajiban per hari game** (`/kultivasi harian` atau tab Jalan › Harian). Kewajiban baru juga butuh 15 menit
   bermain sejak set terakhir, jadi tidur melewati malam tidak mendatangkannya.
@@ -6183,8 +6204,9 @@ tingkat fondasi: ISSTH bab 76 dan 100. Menaikkan kualitas ranah lain, biaya, dan
   Pengumpul Qi tingkat 2+** (Agung atau Bintang Surgawi), tidak Penyimpangan Qi, tidak sedang menerobos.
 * Target: kualitas tercatat terendah di antara ranah yang sudah kamu capai (ranah paling awal bila sama).
 * Ritual 30 detik (hitung mundur di talisman dan HUD). Berhenti meditasi = batal tanpa biaya.
-* Biaya di akhir: `3 × kebutuhan bar Puncak ranahmu` dari **Qi Tertimbun** (Inti Emas 9.225; Penyatuan Dao 184.500;
-  Kenaikan Abadi 369.000).
+* Biaya di akhir: `3 × kebutuhan bar Puncak ranah target` (ranah yang kualitasnya dinaikkan, bukan ranahmu sekarang)
+  dari **Qi Tertimbun** (Inti Emas 9.225; Penyatuan Dao 184.500; Kenaikan Abadi 369.000). Contoh: pemain Penyatuan Dao
+  dengan Fondasi Retak membayar harga Fondasi, bukan 184.500.
 * Peluang: Retak → Biasa 100%, Biasa → Sempurna 60%, Sempurna → Surgawi 25%; gagal mengembalikan separuh biaya.
 * Berhasil: judul "Fondasi Diperkokoh", nyawa dan qi maksimum dihitung ulang, pencapaian *Fondasi Diperkokoh*.
 
@@ -6197,7 +6219,8 @@ meridianmu …". Desain permainan (keseimbangan).
 ### 44.4 Bintang Abadi untuk pemain
 
 **Sumber:** BTTH: tingkat Dou bintang 1–9; *Terinspirasi dari* bintang Dewa Kuno dalam RI bab ~1157–1159. Bencana bintang
-pemain belum ada (Fase 7b); murid tetap punya Tiga Ujiannya ([28](#28-bintang-abadi)).
+pemain kini ada sejak Fase 9: beberapa bintang tertahan sampai kamu melewati Bencana Bintang
+([56.6](#566-tujuh-bencana-bintang-dan-murka-langit)); murid punya Tiga Ujiannya sendiri ([28](#28-bintang-abadi)).
 
 * Di **Puncak Dewa Abadi** dengan bilah penuh, semua kultivasi menjadi Qi Abadi (Qi Tertimbun).
 * Bintang ke-n berharga `min(5 miliar, 500.000 × 1,07^(n−1))` Qi Abadi. Tanpa batas jumlah.
@@ -6205,7 +6228,11 @@ pemain belum ada (Fase 7b); murid tetap punya Tiga Ujiannya ([28](#28-bintang-ab
   banyak 1.000 per perintah), atau talisman **Padatkan Bintang** di tab Status (yang menggantikan talisman Terobosan di
   Puncak Dewa Abadi; Shift + klik = semua).
 * Setiap bintang: **+2 nyawa maksimum** dan **+1% qi maksimum**. Kerusakan jurus naik lewat faktor bintang Fase 6c
-  ([12.4](#124-kekuatan-tumbuh-bersama-ranah)), begitu juga ukuran Mode Kehancuran dan kecepatan Pedang Terbang. **★9** dan
+  ([12.4](#124-kekuatan-tumbuh-bersama-ranah)): ×(1 + 4% per bintang), dan ×1,15 lagi setiap 9 bintang; begitu juga
+  ukuran Mode Kehancuran dan kecepatan Pedang Terbang.
+* **Bintang pemain dan bintang murid** memakai kurva biaya yang sama (500.000 × 1,07^(n−1)), tetapi hadiahnya berbeda:
+  bintang murid memberi +4 nyawa dan +0,6 serangan per bintang ([28.3](#283-bonus-per-bintang)) karena murid tidak
+  merapal jurus sepertimu; bintangmu memberi nyawa lebih kecil tetapi menguatkan setiap jurus. **★9** dan
   **★18** membuka Gerbang Dewa I dan II untuk pelajaranmu sendiri.
 * Bintang mengorbit dantian di tab Status dengan jumlahnya, dan "★n" tampil di HUD.
 * Pencapaian *Bintang Pertama*, *Sembilan Bintang*, *Delapan Belas Bintang*.
@@ -6481,14 +6508,14 @@ Semuanya partikel di komputermu, dalam 32 blok (harta 48 blok), ikut Kualitas Ef
 
 ## 50. Layar kultivasi (gulungan giok)
 
-Ketuk `V`. Sejak UI/UX Terpadu gulungan ini adalah menu utama dengan delapan bagian ([2.1](#21-menu-utama-hub)); halaman
+Ketuk `V`. Sejak UI/UX Terpadu gulungan ini adalah Gulungan Kultivasi dengan delapan bagian ([2.1](#21-gulungan-kultivasi-hub)); halaman
 lamanya kini ada di bagian Diri, Teknik, Panduan dan Pengaturan:
 
 | Tab | Isi |
 |---|---|
 | **Status** | Lingkaran dantian besar (cincin kultivasi, qi, Qi Tertimbun), ranah, statistik, Penyimpangan Qi, racun pil, tingkat Alkimia; jimat Meditasi, Terobosan, Uji Akar. Sejak Fase 7: koin **Persiapan** ([43.1](#431-panel-persiapan)), koin **Gua Kediaman**, talisman **Perkokoh Fondasi**, dan di Puncak Dewa Abadi talisman **Padatkan Bintang** dengan Bintang Abadi yang mengorbit dantian ([44](#44-anugerah-kenaikan-perkokoh-fondasi-bintang-pemain)) |
 | **Akar & Dao** | Pentagram lima elemen yang menyala sesuai akarmu, segi delapan Bagua delapan Dao (klik untuk membaca/memilih) |
-| **Teknik** | Kartu peluncur **Buka Kitab Teknik** dengan "Teknik x/168", Kekuatan P, penguasaan tertinggi, dan teknik terpilih; jimat ke Kodeks, Cincin Segel, dan Mode Kehancuran ([12.1](#121-kitab-teknik)) |
+| **Teknik** | Kartu peluncur **Buka Kitab Teknik** dengan "Teknik x/168", Kekuatan P, penguasaan tertinggi, dan teknik terpilih; jimat ke Kodeks, Rangkai Segel, dan tab Kehancuran Diri (saklar Mode Kehancuran) ([12.1](#121-kitab-teknik)) |
 | **Pengaturan** | Kualitas Efek (juga Otomatis), kosmetik, HUD, efek teknik ([12.13](#1213-performa-efek-dan-pengaturan)), terobosan Hardcore (klik dua kali dalam 3 detik); sejak Fase 7 bagian **Jalan & HUD**: Pengingat cooldown, Peringatan bahaya, Panduan |
 | **Ensiklopedia** (Panduan) | Ringkasan aturan dengan indeks topik (lihat di bawah); daftar tombol kini di Pengaturan › Kontrol |
 | **Jalan** (Fase 7) | Langkah Pertama, Ujian Fondasi, Kewajiban Harian ([42](#42-tablet-jalan-langkah-pertama-ujian-fondasi-kewajiban-harian)); juga `/kultivasi jalan` |
@@ -6553,6 +6580,19 @@ Resep Gulungan Penerimaan Murid sudah dihapus sejak Fase 6.
 ---
 
 ## 52. Berkas konfigurasi
+
+Kultivator memakai lima berkas di folder `config/`. Semuanya dibuat saat pertama dipakai; nilai yang hilang diisi
+bawaan dan angka di luar rentang dipotong ke batasnya.
+
+| Berkas | Di mana | Isi | Penjelasan |
+|---|---|---|---|
+| `kultivator.json` | server / dunia pemain tunggal | kultivasi, tribulasi, sekte, Pembangunan Sekte, Mode Kehancuran, teknik, Fase 7–10 | di bawah, [31.9](#319-pengaturan), [55.10](#5510-pengaturan-configkultivatorjson), [56.11](#5611-pengaturan-configkultivatorjson), [58.8](#588-pengaturan-server-configkultivatorjson) |
+| `kultivator-dunia.json` | server | Dunia Kultivasi yang Luas (kota, pengembara, reruntuhan, langit, naga, laut, kapal, peta) | [64.18](#6418-berkas-konfigurasi-configkultivator-duniajson) |
+| `kultivator-sekte.json` | server | Sekte yang Hidup, satu bagian per fitur dengan saklar `aktif` | [66](#66-sekte-yang-hidup) |
+| `kultivator-duel.json` | server | Duel Pedang | [di bawah](#configkultivator-dueljson-server) |
+| `kultivator-client.json` | komputermu | efek, HUD, kamera, aura, suara, duel, saringan Kitab Teknik | [di bawah](#configkultivator-clientjson-komputermu) |
+
+Klien dengan berkas klien yang berbeda tetap bisa tersambung ke server mana pun; berkas server hanya dibaca server.
 
 ### `config/kultivator.json` (server / dunia pemain tunggal)
 
@@ -6620,10 +6660,42 @@ Nilai yang hilang diisi bawaan, nilai di luar rentang dipotong ke batasnya, dan 
 | `aura_mode` | `penuh`, `sederhana`, `mati` | Aura Kultivasi (bawaan `penuh`, [61](#61-aura-kultivasi)) |
 | `aura_others` | `true` / `false` | Aura orang lain (bawaan `true`) |
 | `aura_hum` | `true` / `false` | Dengung aura (bawaan `true`) |
+| `epic_camera`, `epic_letterbox`, `epic_cards`, `epic_music`, `epic_slowmo`, `epic_sky`, `epic_vfx`, `epic_lens`, `epic_cosmic`, `epic_impact_frames`, … | – | Grup **Momen Epik** di Pengaturan › Kamera & Film: Kamera sinematik Penuh/Singkat/Mati, kartu judul, langit, film titah ([54.3](#543-pengaturan), [59.2](#592-pengaturan-baru-grup-momen-epik), [63.3](#633-pengaturan-grup-momen-epik)) |
+| `voice_mode` | `semua`, `langit`, `mati` | Suara bicara (bawaan `semua`, [60.2](#602-pengaturan-grup-suara)) |
+| `voice_text` | `true` / `false` | Teks suara di bawah layar (bawaan `true`) |
+| `duel_input`, `duel_parry_outside`, `duel_camera`, `duel_intro`, `duel_slowmo`, `duel_hitstop`, `duel_sparks`, `duel_trails`, `duel_kiai`, `duel_hud_world`, `duel_crowd`, `duel_lockon`, `duel_pal` | – | Setelan Duel Pedang di komputermu ([65.5](#655-tampilan-kamera-dan-setelan)) |
 | `codex_filters`, `codex_sort`, `teach_filters`, `teach_sort`, `codex_seen` | – | Saringan dan urutan terakhir Kitab Teknik dan tab Teknik murid, serta kartu yang sudah dilihat (lencana BARU) |
 
 Semuanya diatur dari tab Pengaturan gulungan atau langsung di Kitab Teknik. Pilihan **Panduan** (tampilkan atau
-sembunyikan pelacak Langkah Pertama) disimpan di data pemainmu di server, bukan di berkas ini.
+sembunyikan pelacak panduan) disimpan di data pemainmu di server, bukan di berkas ini.
+
+### `config/kultivator-duel.json` (server)
+
+Muat ulang tanpa restart: `/kultivasi uji duel muat`. Berkas yang rusak dibiarkan (supaya bisa kamu perbaiki) dan
+bawaan dipakai sementara.
+
+| Opsi | Bawaan (rentang) | Arti |
+|---|---|---|
+| `enabled` | `true` | Seluruh sistem duel. Bila `false`, lapisan benturan dan duel resmi hilang, pertarungan vanilla seperti dulu |
+| `formalDuels` | `true` | Duel resmi (tantangan, sesi, taruhan) |
+| `mobParry` | `true` | Tangkis dan jaga terhadap pukulan jarak dekat monster di luar duel |
+| `mobPosture` | `true` | Bar Postur untuk elit, kultivator liar, binatang purba, saingan, NPC, dan bos |
+| `armedMobClash` | `true` | Pukulanmu dan pukulan monster bersenjata dalam 2 tick saling beradu (keduanya batal, percikan) |
+| `guardDamageFactor` | `0.4` (0–1) | Bagian kerusakan yang tetap masuk saat menjaga terhadap monster |
+| `maxRewindTicks` | `4` (0–8) | Batas kompensasi lag dalam tick (4 = 200 ms) |
+| `answerSeconds` | `60` (10–600) | Tantangan kedaluwarsa setelah sekian detik |
+| `challengeRange` | `24` (4–64) | Jarak tantangan dalam blok |
+| `ringRadiusDefault` | `9` (6, 9, atau 12) | Jari-jari arena bila tantangan tidak menyebutnya |
+| `ringOutTicks` | `60` (20–400) | Tick di luar garis arena yang membuatmu kalah |
+| `timeLimitSeconds` | `180` (30–600) | Batas waktu bawaan satu duel |
+| `maxSessions` | `16` (1–64) | Duel berjalan paling banyak |
+| `allowStakes`, `maxStoneCount`, `allowSlipStakes` | `true`, `64` (1–64), `true` | Taruhan batu roh dan slip giok |
+| `honour` | `true` | Kehormatan (Elo) dan gelarnya |
+| `npcOffers`, `npcOfferMinutes` | `true`, `20` (1–600) | NPC pengembara boleh menawarkan duel, paling sering sekali per sekian menit per pemain |
+| `rewards` | `true` | Kultivasi dan pemahaman Dao Pedang untuk kemenangan sungguhan |
+| `introFilmMaxTicks` | `100` (40–100) | Lama paling panjang film pembuka |
+| `blockVanillaHitsInClassic` | `true` | Pukulan vanilla langsung antar-peserta duel ditolak bila klien pemukul memakai mode Klasik |
+| `combatRollCompat` | `true` | Gulingan Combat Roll memberi 6 tick menghindar |
 
 ---
 
@@ -6909,8 +6981,8 @@ membuka tingkat tempa berikutnya, jadi setiap ranah memberi makan ranah berikutn
 3. Buat **Tungku Api Bumi (Earthfire Forge)**, taruh di atas magma, dan tempa pusaka pertamamu.
 4. Buat **Kantong Penyimpanan (Storage Pouch)**, lalu naikkan ke cincin di tungku.
 5. Dengan aula level ≥ 2, taruh **Plakat Pelindung Sekte (Sect Patron Plaque)** dekat lonceng desa.
-6. Ikuti tablet **Jalan** bab 6–10 ("Jalan Dunia"); pelacak di tepi kanan layar bangun lagi setelah bab 5 begitu kamu
-   Fondasi.
+6. Ikuti tablet **Jalan** bab 6–10 ("Jalan Dunia"); pelacak di tepi kanan layar pindah ke sana setelah bab 1–4 begitu
+   kamu Fondasi.
 
 Tombol baru (bawaan tanpa tombol, ikat di Kontrol): **Layar Dunia Kultivasi** dan **Buka Cincin Penyimpanan**.
 
@@ -7244,13 +7316,14 @@ desain permainan.
   melihat pintu asli Labirin Ilusi dan bayangan (RMJ bab 1126, Mata Roh Brightsight; pil sebagai pengganti adalah desain
   permainan)
 
-**Jalan bab 6–10 "Jalan Dunia"** (tablet Jalan, koin di bawah tablet bab; pelacak HUD bangun lagi setelah bab 5 saat
+**Jalan bab 6–10 "Jalan Dunia"** (tablet Jalan, koin di bawah tablet bab; pelacak HUD pindah ke sini setelah bab 1–4 saat
 Fondasi+). Tiap langkah dicentang oleh pencapaiannya, hadiah tiap bab sekali:
 * **6 Dunia Luas:** ikat kantong/cincin · tempa pusaka · buka gerbang alam · desa bersumpah → Token Darah-Api + 4 batu Rendah
 * **7 Penguasa Wilayah:** lolos penyergapan · pukul mundur serbuan · ikat pusaka natal · taklukkan Aula Hampa Langit → 2
   batu Menengah + 1 fragmen
-* **8 Kekuatan Dewa:** pusaka Langit · Roh Dasar · serap kristal · kalahkan Patriark → 1 batu Tinggi + 1 Darah Dewa Kuno
-* **9 Kenaikan:** tempa ulang +9 · Makam lapis 9 · 3 desa · Cincin Ruang Agung → 1 batu Agung + 1 lencana
+* **8 Kekuatan Dewa:** pusaka Langit · Roh Dasar · serap kristal · kalahkan Patriark → 1 batu Tinggi + 1 Lencana Makam
+  Langit (dipakai bab 9: Makam lapis 9)
+* **9 Kenaikan:** tempa ulang +9 · Makam lapis 9 · 3 desa · Cincin Ruang Agung → 1 batu Agung + 1 Darah Dewa Kuno
 * **10 Abadi:** Roh Lengkap · pusaka Dewa · Makam lapis 81 · desa setia 100 → 3 Esensi + gelar "Penguasa Jalan Dunia"
 
 **Ujian Fondasi baris ke-4** (pilihan; tiga baris mana pun sudah "Fondasi Kokoh"): Inti Emas lolos penyergapan; Jiwa Baru
@@ -7446,8 +7519,9 @@ Heavens bab 385–386 (langit mencoba membunuh Meng Hao). Utusan dan Panglima te
 
 * **Bencana ke-k** menahan bintang `f + 9(k−1)` (f = 6 untuk kualitas terobosan Normal, 7 Sempurna, 8 Surgawi). Saat
   memadatkan bintang itu muncul "Bencana ke-k menanti" dengan tautan [Mulai]. Qi Tertimbun tetap terisi.
-* Mulai dari tablet Bencana atau `/kultivasi bencana mulai [k]`: `6 + k` sambaran (yang terakhir ×2) dan gelombang
-  utusan tiap 3 sambaran. **Segel Penangkal**: 3 **Serpihan Segel Langit (Heaven Seal Shard)** membuat sambaran ×0,85.
+* Mulai dari tablet Bencana atau `/kultivasi bencana mulai [k]`: `6 + k` sambaran (yang terakhir ×1,5; dulu ×2) dan gelombang
+  utusan tiap 3 sambaran; lingkar petir menandai tiap sambaran, sambaran yang diserempet memberi 40% dan memulihkan 6% darah,
+  dan teman bisa menjadi Hu Fa (`/kultivasi kawal`). **Segel Penangkal**: 3 **Serpihan Segel Langit (Heaven Seal Shard)** membuat sambaran ×0,85.
 * **Lulus:** bintang terpadatkan; menuntaskan Ujian (k = 2, 4, 7) mengalikan faktor T ×1,1 (maks. ×1,331) untuk kekuatan
   dan darah bintang. **Gagal:** Luka Bencana (Deviasi Qi), tanpa bintang, 50% biaya kembali. Setelah bencana ke-7: gelar
   **Penginjak Langit**.
@@ -7522,6 +7596,10 @@ dan 363 (memadukan dua api menjadi Api Teratai Buddha Murka); Coiling Dragon (pe
 | 13 Bencana Bintang | bencana ke-1 · Ujian pertama · murka ditolak · Panglima tumbang | 20 mutiara + 2 Serpihan Segel Langit |
 | 14 Dunia Batin | 9 petak · herba 1.000 tahun · bencana bumi dilalui · Manusia Batu | Token Perluasan Tanah |
 | 15 Leluhur Abadi | jurus ciptaan · kesempurnaan 100% · tiga binatang purba · Penginjak Langit | gelar "Leluhur Abadi" |
+
+**Urutan main:** naik ke Alam Abadi butuh ★9, jadi Bencana Bintang pertama datang lebih dulu. Selama langkah *naik ke
+Alam Abadi* belum selesai, pelacak menunjuk *bencana ke-1* (bab 13) dulu, lalu *naik ke Alam Abadi*; setelah itu bab
+11–15 berurutan seperti tabel. Bit langkah yang tersimpan tidak berubah.
 
 Kewajiban harian baru: bunuh 3 makhluk Alam Abadi · tambang 1 Batu Asal Abadi · panen petak batin · menawar di lelang.
 
@@ -8446,35 +8524,77 @@ atau server berhenti.
 ## 62. Kitab Panduan (di dalam game)
 
 **Kitab Panduan** adalah buku panduan di dalam game, supaya kamu tidak bermain buta dari *Manusia Fana* sampai
-*Dewa Abadi* dengan sekte tingkat tinggi dan banyak murid. Isinya 14 bab sesuai urutan bermain, 124 langkah:
+*Dewa Abadi* dengan sekte tingkat tinggi dan banyak murid. Isinya **16 bab dan 153 langkah**, ditampilkan menurut
+urutan perjalanan (urutan ini sejak audit integrasi; nomor "Bab N" adalah tempat bab itu di daftar ini):
 
-1. Hari Pertama · 2. Pemurnian Qi · 3. Pembangunan Fondasi · 4. Inti Emas · 5. Mendirikan Sekte · 6. Murid ·
-7. Jiwa Baru Lahir sampai Penyatuan Dao · 8. Formasi Sekte · 9. Sekte Tingkat Tinggi · 10. Kenaikan Abadi ·
-11. Dewa Abadi · 12. Tips & Kesalahan Umum · 13. Dunia yang Luas · 14. Ujung Dunia (lihat
-[64](#64-dunia-kultivasi-yang-luas))
+| Bab | Judul | Menjadi bab sekarang mulai | Syarat lain | Tidak lagi menahan sejak | Langkah |
+|---|---|---|---|---|---|
+| 1 | Hari Pertama | awal permainan | – | Pembangunan Fondasi | 8 |
+| 2 | Pemurnian Qi | Pemurnian Qi | – | Pembangunan Fondasi | 11 |
+| 3 | Dunia yang Luas | Pemurnian Qi | – | Inti Emas | 10 |
+| 4 | Pembangunan Fondasi | Pemurnian Qi | – | Inti Emas | 10 |
+| 5 | Inti Emas | Pembangunan Fondasi | – | Jiwa Baru Lahir | 10 |
+| 6 | Mendirikan Sekte | kapan saja | Prasasti Aula Sekte milikmu berdiri | – | 8 |
+| 7 | Murid yang Hidup | Pembangunan Fondasi | aula | Transformasi Dewa | 10 |
+| 8 | Murid | Pembangunan Fondasi | aula | Transformasi Dewa | 11 |
+| 9 | Sekte di Dunia | Inti Emas | aula | Kenaikan Abadi | 10 |
+| 10 | Jiwa Baru Lahir sampai Penyatuan Dao | Inti Emas | – | Kenaikan Abadi | 10 |
+| 11 | Formasi Sekte | Inti Emas | aula | Kenaikan Abadi | 8 |
+| 12 | Sekte Tingkat Tinggi | Jiwa Baru Lahir | aula | Dewa Abadi | 10 |
+| 13 | Ujung Dunia | Inti Emas | – | Kenaikan Abadi | 10 |
+| 14 | Kenaikan Abadi | Penyatuan Dao | – | Dewa Abadi | 7 |
+| 15 | Dewa Abadi | Kenaikan Abadi | – | – | 10 |
+| 16 | Tips & Kesalahan Umum | bacaan, tidak pernah menjadi bab sekarang | – | – | 10 |
+
+Isi bab 3 dan 13 ada di [64](#64-dunia-kultivasi-yang-luas), bab 7 dan 9 di [66](#66-sekte-yang-hidup), langkah duel
+(bab 2, 4, 5, 8, 16) di [65](#65-duel-pedang-kultivator). Bab 17 milik Sekte Langit (37) kelak masuk setelah bab 12.
 
 **Cara membuka:**
 
-* bagian **Panduan** di menu utama (ketuk `V`, lalu tombol angka `7`), atau irisan 8 roda Akses Cepat (tahan `V`);
+* bagian **Panduan** di Gulungan Kultivasi (ketuk `V`, lalu tombol angka `7`), atau irisan 8 roda Akses Cepat (tahan `V`);
 * perintah `/kultivasi panduan` (semua pemain, tanpa cheat);
 * tombol **Kitab Panduan** di kategori tombol Kultivator (bawaan belum dipasang: atur di Pengaturan › Kontrol).
 
 **Cara membaca:** di kiri ada daftar bab dengan bilah kemajuan; bab yang sedang kamu jalani berbingkai emas, bab yang
-selesai mendapat cap giok bercentang. Di kanan, setiap langkah adalah kartu: tanda ✔ atau lingkaran kosong, judul,
-beberapa baris penjelasan, dan kadang *jimat perintah*: klik untuk menuliskan perintahnya di kotak obrolan (tinggal
-tekan Enter). Gulir dengan roda tetikus, panah atas/bawah, atau Page Up/Down; panah kiri/kanan berganti bab, Home
-kembali ke bab sekarang, Esc menutup.
+selesai mendapat cap giok bercentang. Arahkan tetikus ke sebuah bab untuk melihat ranah yang dituju ("Untuk ranah …
+ke atas") dan, untuk bab sekte, bahwa bab itu baru berjalan setelah Prasasti Aula Sektemu berdiri. Di kanan, setiap
+langkah adalah kartu: tanda ✔ atau lingkaran kosong, judul, beberapa baris penjelasan, dan kadang *jimat perintah*:
+klik untuk menuliskan perintahnya di kotak obrolan (tinggal tekan Enter). Gulir dengan roda tetikus, panah atas/bawah,
+atau Page Up/Down; panah kiri/kanan berganti bab, Home kembali ke bab sekarang (ke langkah inti pertama yang belum
+selesai), Esc menutup.
 
-**Centang otomatis:** 84 langkah dicentang sendiri oleh server dari data aslimu: akar sudah diuji, ranah dan tahap
-yang dicapai, menit meditasi, Dao dipilih, Iblis Hati dikalahkan, Gua Kediaman, Aula Sekte didirikan dan tingkatnya,
-templat dan tingkat bangunan sekte, jumlah murid, Bintang Abadi, Pengakuan Langit, dan pencapaian mod (misalnya formasi
-Qi, pil pertama, murid pertama, Hu Fa, serbuan ditolak, Alam Abadi, Titah pertama). Langkah lain punya **kotak centang**
-yang kamu centang sendiri; centang ini tersimpan di data pemainmu di server (tetap ada setelah keluar-masuk dan saat
-mati). Saat satu bab selesai muncul pemberitahuan kecil *Bab selesai*, dan pelacak Langkah Pertama menampilkan baris
-"Panduan: Bab N".
+**Tiga jenis langkah:**
 
-Untuk operator: `/kultivasi uji panduan info` menampilkan kemajuanmu, `/kultivasi uji panduan reset` menghapus semua
-centang manual.
+* **Langkah inti** (94): dicentang sendiri oleh server dari data aslimu, misalnya akar sudah diuji, ranah dan tahap
+  yang dicapai, menit meditasi, Dao dipilih, Iblis Hati dikalahkan, Gua Kediaman, Aula Sekte didirikan dan tingkatnya,
+  templat dan tingkat bangunan sekte, jumlah murid, Bintang Abadi, Pengakuan Langit, dan pencapaian mod. Hanya langkah
+  inti yang menahan bab sekarang.
+* **Langkah pilihan** (28, bertanda "Pilihan" saat tetikus di atasnya): target sampingan atau target nanti, misalnya
+  Formasi Bintang Surgawi (End Rod dari The End), langkah duel, Hu Fa, murid Inti Emas, Kursi Formasi tingkat 8,
+  Sepuluh Ribu Abadi, aula tingkat 9, Kota Abadi, puncak Menara Seratus, Pewaris dan perang sekte, serta seluruh bab 16.
+  Delapan belas di antaranya tetap dicentang otomatis.
+* **Langkah manual** (31 di luar bab 16): bacaan atau kebiasaan yang tidak bisa dicek server; centang sendiri kotaknya.
+  Centang ini tersimpan per id langkah di data pemainmu di server (tetap ada setelah keluar-masuk dan saat mati).
+
+Jadi 112 langkah punya cek otomatis dan 41 dicentang sendiri.
+
+**Bab sekarang:** bab pertama dalam urutan di atas yang ranahnya sudah kamu capai, syarat aulanya terpenuhi, ranah
+"tidak lagi menahan"-nya belum kamu capai, dan masih punya langkah inti yang belum selesai. Langkah manual dan pilihan
+tidak pernah menahanmu di bab lama, dan pertapa tanpa sekte tidak pernah disuruh mendirikan sekte. Bab yang sudah
+"lewat" tetap terbuka dan langkahnya tetap tercentang begitu kamu melakukannya. Saat satu bab selesai muncul
+pemberitahuan kecil *Bab selesai* dengan nomor yang sama seperti di daftar.
+
+**Pelacak di layar:** selama tidak ada rangkaian Langkah di tablet Jalan yang aktif (misalnya selama tahun-tahun
+Kenaikan Abadi), pelacak di tepi kanan layar menunjukkan langkah berikutnya dari bab sekarang Kitab Panduan dengan
+segel berlabel **Kitab** ([42.1](#421-langkah-pertama)). Baris "Kitab Panduan: Bab N" di bawah pelacak Langkah
+memakai nomor yang sama.
+
+**Simpanan lama:** indeks bab dan id langkah yang tersimpan tidak berubah arti; hanya urutan tampilnya yang baru. Lima
+langkah dengan cek otomatis pindah bab dengan id baru (`c13.menara`, `c14.kapal`, `c7.evolusi`, `c11.kota_abadi`,
+`c11.puncak`) dan langsung tercentang lagi dari pencapaianmu. Centang manual dan hadiah bab yang sudah diambil tetap.
+
+Untuk operator: `/kultivasi uji panduan info` menampilkan kemajuanmu (bab sekarang dengan nomor tampilnya),
+`/kultivasi uji panduan reset` menghapus semua centang manual.
 
 ## 63. Film Kosmik 3D
 
@@ -8569,7 +8689,7 @@ Contoh:
 
 Dunia kini jauh lebih luas: kota kultivator, pengembara dan kelompok saingan, gua leluhur dengan teka-teki formasi,
 penjara iblis kuno, Menara Seratus Lantai, peristiwa langit, harta yang lahir, kabut Qi, naga liar, evolusi binatang roh,
-Dunia Bawah, Laut Tanpa Batas, Kota Abadi, kapal terbang sekte dan Peta Dunia. Bab 13 (*Dunia yang Luas*) dan bab 14
+Dunia Bawah, Laut Tanpa Batas, Kota Abadi, kapal terbang sekte dan Peta Dunia. Bab 3 (*Dunia yang Luas*) dan bab 13
 (*Ujung Dunia*) Kitab Panduan menuntunmu langkah demi langkah, dan setiap topik punya halaman sendiri di menu
 *Bantuan*.
 
@@ -9108,8 +9228,8 @@ Gaya boneka: `agresif`, `bertahan`, `penipu`, `santo`. Senjata: `pedang`, `kapak
 ### 65.7 Kitab Panduan dan pencapaian
 
 Langkah baru di Kitab Panduan: *Tangkis serangan monster* dan *Postur dan Tebasan Penentu* (bab 2), *Duel Pedang
-pertama* dan *Tangkisan Sempurna* (bab 3), *Kunci Bilah* dan *Serangan Berbahaya* (bab 4), *Menonton murid berduel*
-(bab 6) dan *Kesalahan umum duel* (bab 12). Pencapaian: tangkisan pertama, tangkisan sempurna pertama, tebasan penentu
+pertama* dan *Tangkisan Sempurna* (bab 4), *Kunci Bilah* dan *Serangan Berbahaya* (bab 5), *Menonton murid berduel*
+(bab 8) dan *Kesalahan umum duel* (bab 16). Semuanya langkah pilihan: tidak menahan bab sekarang. Pencapaian: tangkisan pertama, tangkisan sempurna pertama, tebasan penentu
 pertama, kemenangan duel pertama, menang kunci bilah, Injak Pedang, rantai 10, menonton murid, Kehormatan 1300, dan
 mengalahkan Santo Pedang.
 
@@ -9152,7 +9272,7 @@ Aturan yang tetap berlaku untuk semua fitur di bab ini:
 * **Config:** `config/kultivator-sekte.json`, satu bagian per fitur (`kepribadian`, `hubungan`, `turnamen`, `tangga`,
   `paviliun`, `tetua`, `misi`, `seragam`, `diplomasi`, `kebun`), masing-masing dengan saklar `aktif`. Muat ulang dengan
   `/kultivasi uji perguruan muat`; `/kultivasi uji perguruan modul` menampilkan modul yang aktif.
-* **Kitab Panduan:** bab 15 "Murid yang Hidup" dan bab 16 "Sekte di Dunia" (masing-masing 10 langkah, tercentang dari
+* **Kitab Panduan:** bab 7 "Murid yang Hidup" dan bab 9 "Sekte di Dunia" (masing-masing 10 langkah, tercentang dari
   pencapaian `sekte/*`).
 * **Hub (H):** kartu baru di halaman SEKTE dan MURID: Suasana Hati Murid, Jaring Hubungan, Turnamen, Paviliun & Makam,
   Balai Tetua, Misi Cerita, Lambang & Seragam, Diplomasi, Kebun & Tambang.
@@ -9382,3 +9502,95 @@ Semua di bawah `/kultivasi uji perguruan` (bekerja pada aula pemain yang menjala
 
 Untuk melihat bangunan baru di medan sungguhan: `/kultivasi uji sekte audit <templat>` dan `/kultivasi uji sekte pamer
 <templat> tingkat <t>`.
+
+---
+
+## 67. Perubahan keseimbangan (audit integrasi)
+
+Audit integrasi memeriksa apakah semua alur dari Manusia Fana sampai Dewa Abadi saling tersambung. Angka di bawah
+berubah dengan persetujuanmu ("Ubah angkanya"); semua baris Sumber tetap, dan aturan keamanan blok tidak berubah. Simpanan
+lama tetap bisa dimuat: data yang tersimpan diubah dengan aman saat dibaca.
+
+### 67.1 Panduan dan Jalan
+
+* **Kitab Panduan:** 16 bab dalam urutan perjalanan; langkah manual dan pilihan tidak menahan bab sekarang
+  ([62](#62-kitab-panduan-di-dalam-game)).
+* **Pelacak:** Jalan Dunia mulai setelah bab 1–4 di Pembangunan Fondasi, Jalan Abadi di Dewa Abadi Puncak, langkah sekte
+  menunggu Prasasti Aula Sekte, dan bila tidak ada rangkaian Langkah pelacak menunjukkan langkah Kitab
+  ([42.1](#421-langkah-pertama)).
+* **Langkah *dirikan sekte*** dicentang oleh Prasasti Aula Sekte atau calon pertama di aula, bukan oleh `/sect create`.
+* **Hadiah Jalan bab 8 dan 9 ditukar:** Lencana Makam Langit datang di bab 8 (sebelum bab 9 meminta Makam lapis 9),
+  Darah Dewa Kuno pindah ke bab 9. Tangga batu roh (1 Tinggi, lalu 1 Agung) tetap.
+* **Jalan Abadi:** pelacak menunjuk Bencana Bintang pertama sebelum *naik ke Alam Abadi*
+  ([56.10](#5610-jalan-abadi-bab-1115-dan-kewajiban-harian)).
+* **Kewajiban Harian:** hadiah ketiga tugas mengikuti ranah: 2 Batu Roh Rendah sampai Pembangunan Fondasi, 1 Menengah di
+  Inti Emas dan Jiwa Baru Lahir, 1 Tinggi di Transformasi Dewa dan Penyatuan Dao, 1 Batu Asal Abadi sejak Kenaikan Abadi
+  (dulu selalu 1 Batu Roh Rendah).
+
+### 67.2 Ekonomi
+
+* **Satu kurs:** 1 Poin Kontribusi (PK) = 2 Nilai Batu (NB). Nilai batu roh: Rendah 1, Menengah 9, Tinggi 81, Agung 729
+  (dulu 80 dan 600), juga di Kantor Persembahan (PK 0,5 / 4,5 / 40,5 / 364,5) dan Alam Dimensi.
+* **Paviliun Yue Lu:** Pil Penyembuh dan Pengumpul Qi 6 PK, Pil Fondasi 60, Pil Inti Emas 300, Pil Penangkal Petir
+  1.000; barang aula tingkat 6 kini **Pil Pembersih Sumsum Sempurna** (400 PK), yang tidak dijual kota. Sekte yang
+  bersekutu dengan sekte NPC membayar 10% lebih murah.
+* **Persembahan pil:** nilai = harga dasar kota ÷ 2 × mutu (Rendah 0,6, Menengah 1, Tinggi 1,5, Sempurna 2,5), paling
+  sedikit 1 PK, paling banyak batas harian 300.
+* **Herba:** toko kota menjual herba sampai 300 tahun; harga herba kota = 2 × (1 + (umur/100)^1,6) NB (100 tahun 4,
+  300 tahun 12, 1.000 tahun 82).
+* **Papan Misi kota:** hadiah naik ×2 per pita ranah (dulu ×3) dan berhenti naik setelah Penyatuan Dao.
+* **Pasar Gelap:** suap razia = 20 NB × pita penjaga (bukan ranahmu); penadah membeli paling banyak 16 tumpuk sehari.
+  Dupa Arwah 40 NB, Selendang Pengikat Naga 300 NB; Mutiara Penunjuk Laut 20 NB di mana pun.
+* **Titipan Balai Lelang:** satu buah per titipan, paling banyak 2 titipan per sesi, dibayar 0,6–1,0 × nilainya, dan tetap tersimpan bila server
+  berhenti. Cincin penyimpanan yang berisi atau terikat ditolak toko dan lelang.
+* **Alam Abadi:** stok Pasar Abadi 2 buah per penawaran per pemain setiap dua hari (barang langka 1); toko kota biasa
+  tidak menjual barang Fase 9. Perintah Utusan *mutiara* kini membayar 50 Batu Asal (dulu 30). Saat naik ke Alam Abadi
+  9 Esensi disisihkan dulu; diskon bintang bisa dimatikan dengan `/kultivasi diskonbintang mati`. Perintah Utusan
+  *batu* kini berarti menambang 16 Batu Asal sendiri.
+* **Kedai Teh:** Kabar Angin pita tertinggi 81 NB (dulu 80, kini tepat satu Batu Roh Tinggi). Membawa Lencana Pengembara
+  memberi satu Kabar Angin gratis per hari.
+* **Tambang Roh sekte:** PK dari kas aula per tingkat tambang = 100 × tingkat^1,3 (dulu 200 × tingkat).
+
+### 67.3 Kekuatan dan kultivasi
+
+* **Meditasi:** situs × Formasi Pengumpul Qi × batu roh tetap dibatasi ×3,5; medan Formasi Sekte kini dihitung di luar
+  batas itu, paling banyak ×1,5 (total paling banyak ×5,25). Pesan "batas penyerapan" muncul sekali per sesi.
+* **Kebangkitan** selalu paling rendah Normal (dulu 50% Retak).
+* **XP bertarung:** XP membunuh monster biasa × (kebutuhan bilahmu ÷ 4.500), antara ×1 dan ×8. Tonggak Dunia memberi
+  sebagian bilah: tiap 10 lantai Menara 3%, reruntuhan 5%, pengadilan Dunia Bawah 4%, penjara disegel 10% (sekali per penjara), Darah Jiao 5% (dulu 600 XP datar).
+* **Teknik di Kenaikan Abadi:** kekuatan teknik terhadap musuh ujian naik 0,25 per lapis Kenaikan Abadi. Musuh Dunia
+  (saingan kota, Kepiting Batu, Ular Laut, Yaksha, Naga Liar, makhluk reruntuhan) kini dihitung sebagai musuh ujian.
+* **Bencana Bintang:** sambaran terakhir ×1,5 (dulu ×2); ada lingkar petir; sambaran yang hanya menyerempet memberi 40%
+  kerusakan dan memulihkan 6% darah. Hu Fa kini bisa ikut menjaga Bencana Bintang (`/kultivasi kawal`), seperti saat
+  tribulasi.
+* **Gua Kediaman** diakui di dalam Formasi Sekte keluarga Pelindung atau Gabungan yang berdaya.
+* **Duel:** percikan mode Ringan 0,5; batas waktu dan jari-jari arena bawaan diambil dari `kultivator-duel.json`.
+
+### 67.4 Dunia dan musuh
+
+* **Tekanan musuh harian:** paling banyak satu peristiwa musuh sekaligus (sergapan, saingan, serbuan) dan paling banyak 3
+  sehari per pemain; peristiwa yang tertunda dicoba lagi nanti, tidak hilang. Tidak ada sergapan di kota.
+* **Penjara Iblis Kuno:** merobek jimat segel butuh Penyatuan Dao; raja hanya bangkit bila ada orang Transformasi Dewa ke
+  atas di aula. Satu Sobekan Segel dihitung 2 jimat kosong di Perkuat Segel; 5 Pahala ditukar 1 Giok Warisan di Jantung
+  Segel; Gua Kuno memberi Giok Warisan kedua.
+* **Jarak dari spawn:** Penjara Iblis dan Gua Kuno baru lahir paling dekat 12 chunk dari titik awal, reruntuhan dan
+  Menara lain 6 chunk (hanya di chunk baru).
+* **Pemain yang sibuk** (terobosan, tribulasi, duel, alam rahasia, dan lainnya) tidak diganggu peristiwa musuh atau Iblis
+  Hati; peristiwanya dicoba lagi setelah 10 detik. Uji tekanan yang terputus karena pindah dimensi dibatalkan, bukan
+  dihitung kabur.
+* **Perlombaan harta:** saingan yang ikut paling kuat pita server, tingkat harta, atau ranah pemain terdekat + 1 (yang
+  terendah).
+* **Kota Abadi** langsung tertera di Peta Dunia saat pertama tiba di Alam Abadi.
+
+### 67.5 Sekte yang Hidup
+
+* **Pewaris** butuh murid Transformasi Dewa tanpa syarat bintang (dulu Jiwa Baru Lahir ★9, yang hampir tidak pernah
+  terjadi).
+* **Diplomasi** dimulai di aula tingkat 3; di awal paling banyak satu peristiwa diplomasi sehari.
+* **Utusan yang pulang** menambah hubungan menurut rumus diplomasi × mutu utusan. Misi templat *Utus ke Lelang Kota*.
+* **Hadiah batu roh untuk murid:** kepuasan 2/4/6/8 menurut tingkat batu (dulu 2/3/5/6), dan batu itu menjadi PK pribadi
+  murid 1/3/9/27.
+* **Pil untuk murid:** Pil Pembersih Sumsum pada murid memakai peluang, syarat ranah dan mutu yang sama seperti padamu;
+  pil Fase 7 kini juga bekerja untuk murid (Pil Penempa Tulang paling banyak +10 darah per murid).
+* **Ketua Sekte NPC** kini dilawan sebagai Duel Pedang (dengan pembuka, dan hanya bila kamu tidak sedang sibuk).
+* **Kas aula** menampilkan ringkasan *7 hari: +masuk / −keluar PK*. `/kultivasi sekte` adalah alias `/kultivasi perguruan`.

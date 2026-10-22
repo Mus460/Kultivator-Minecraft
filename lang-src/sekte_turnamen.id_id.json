@@ -52,7 +52,7 @@
   "kultivator.sekte.turnamen.ui.sepanjang_masa": "Sepanjang Masa",
   "kultivator.sekte.turnamen.ui.sepanjang_baris": "%s. %s · %s poin · %s kali juara",
   "kultivator.sekte.turnamen.ui.tribun_ada": "Tribun lei tai berdiri.",
-  "kultivator.sekte.turnamen.ui.tribun_belum": "Tribun belum dibangun (templat 6-9, tingkat 7).",
+  "kultivator.sekte.turnamen.ui.tribun_belum": "Tribun belum dibangun. Butuh templat 6+ (naik templat di halaman Bangun), lalu komponen tingkat 7.",
   "kultivator.sekte.turnamen.ui.tantangan": "Tantangan dari %s!",
   "kultivator.sekte.turnamen.hud.judul": "Musim %s · Babak %s",
   "kultivator.sekte.turnamen.hud.final": "Musim %s · Babak Final",

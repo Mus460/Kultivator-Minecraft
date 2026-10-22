@@ -20,6 +20,8 @@ import dev.kultivator.sekte.api.TurnamenService;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.voice.VoiceDisciples;
+import dev.kultivator.sekte.SekteSuara;
+import dev.kultivator.voice.Voice;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -111,15 +113,24 @@ public final class Turnamen implements TurnamenService, Tournament.Extension {
 	private static long ticks;
 
 	/** From {@code SekteContent.init} (both physical sides), before {@code ModItems.init()}. */
+	/**
+	 * Registry content (K1): the spectator entity type, the payload types and the stand component, always, from
+	 * {@code SekteContent.init} whatever the switches say (a world or a client with another config must still match).
+	 */
+	public static void registerContent() {
+		TurnamenConfig.load();
+		TurnamenEntities.init();
+		TurnamenPayloads.init();
+		TribunKomponen.register();
+	}
+
 	public static void init() {
+		registerContent();
 		if (initialised || !SekteContent.on(SekteIds.T)) {
 			return;
 		}
 		initialised = true;
 		TurnamenConfig.load();
-		TurnamenEntities.init();
-		TurnamenPayloads.init();
-		TribunKomponen.register();
 		BabakDuel.init();
 		Tournament.setExtension(INSTANCE);
 		SekteApi.setTurnamen(INSTANCE);
@@ -187,6 +198,7 @@ public final class Turnamen implements TurnamenService, Tournament.Extension {
 			sync(live, true);
 		}
 		Kerumunan.watch(owner, a, b);
+		SekteSuara.line(a, "leitai_salam", "greet", 400);
 		if (finalBout) {
 			if (duel) {
 				// The duel's own intro film holds the camera: only the "Babak Final" stamp here.
@@ -220,6 +232,10 @@ public final class Turnamen implements TurnamenService, Tournament.Extension {
 		ServerPlayer player = level.getServer().getPlayerList().getPlayer(owner);
 		if (player != null && stage) {
 			Msg.chat(player, Component.translatable("kultivator.sekte.turnamen.mulai_leitai", season).withStyle(ChatFormatting.GOLD));
+		}
+		SekteSuara.inner(player, "elder.leitai_buka", "elder.welcome");
+		if (guest != null) {
+			SekteSuara.inner(player, "boss.tamu_tantang", "boss.taunt");
 		}
 		for (UUID soul : entrants) {
 			DiscipleEntity body = body(owner, soul);
@@ -295,12 +311,14 @@ public final class Turnamen implements TurnamenService, Tournament.Extension {
 					Integer.toString(ending.season()));
 			SekteBus.honored(server, owner, champion, "turnamen.juara", CHAMPION_HONOUR);
 			Musim.board(owner, champion, body.getName(), Elo.rating(body.data()), Elo.wins(body.data()), Elo.losses(body.data()));
-			VoiceDisciples.line(body, "victory", 200);
+			SekteSuara.line(body, "leitai_juara", "victory", 200);
 		}
 		UUID runnerUp = ending.runnerUp();
 		if (runnerUp != null) {
 			DiscipleEntity second = body(owner, runnerUp);
 			if (second != null) {
+				// after the champion's line (the master's one-line gap would swallow it now)
+				Voice.later(70, () -> SekteSuara.line(second, "leitai_kalah", "tired", 200));
 				Ingatan.remember(server, second.data(), "turnamen.final", champion, 3, "kultivator.sekte.turnamen.ingat.final",
 						ending.championName().getString());
 			}

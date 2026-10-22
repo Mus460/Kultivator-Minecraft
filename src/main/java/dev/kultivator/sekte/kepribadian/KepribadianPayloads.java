@@ -183,8 +183,12 @@ public final class KepribadianPayloads {
 	// ================================================================== registration and sending
 
 	private static boolean done;
+	private static boolean receivers;
 
-	/** Once, from {@link Kepribadian#init()} (both physical sides: the client needs the types too). */
+	/**
+	 * Once, from {@link Kepribadian#registerContent()} (both physical sides: the client needs the types too). The types
+	 * exist whatever the switches say, so client and server always agree on the channels (K1).
+	 */
 	static void init() {
 		if (done) {
 			return;
@@ -194,6 +198,14 @@ public final class KepribadianPayloads {
 		PayloadTypeRegistry.clientboundPlay().register(Suasana.TYPE, Suasana.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Letup.TYPE, Letup.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Daftar.TYPE, Daftar.CODEC);
+	}
+
+	/** The server receiver, only while the module runs (from {@link Kepribadian#init()}). */
+	static void initServer() {
+		if (receivers) {
+			return;
+		}
+		receivers = true;
 		ServerPlayNetworking.registerGlobalReceiver(Aksi.TYPE, (payload, context) -> Kepribadian.onAction(context.player(), payload));
 	}
 

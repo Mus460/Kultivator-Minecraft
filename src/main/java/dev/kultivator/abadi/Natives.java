@@ -13,6 +13,7 @@ import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.data.XpSource;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.Disciples;
+import dev.kultivator.dunia.api.DuniaApi;
 import dev.kultivator.elite.BattleFatigue;
 import dev.kultivator.elite.EliteMonsters;
 import dev.kultivator.harta.SpiritHerbs;
@@ -214,6 +215,10 @@ final class Natives {
 				|| !player.isAlive()) {
 			return;
 		}
+		if (DuniaApi.safeGround(level, player.blockPosition())) {
+			// Kota Abadi is safe ground: nothing rises around a player inside the city (integration audit T4).
+			return;
+		}
 		int room = Math.min(config.immortalNativesPerPlayer - near(player, NEAR_RANGE), config.immortalNativeWorldCap - alive());
 		if (room <= 0) {
 			return;
@@ -249,6 +254,10 @@ final class Natives {
 			}
 			int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
 			if (top <= level.getMinY() + 1) {
+				continue;
+			}
+			// Never on safe ground: the heightmap of the floating Kota Abadi is its streets and roofs, not land.
+			if (DuniaApi.safeGround(level, new BlockPos(x, top, z))) {
 				continue;
 			}
 			return new Vec3(x + 0.5D, top, z + 0.5D);

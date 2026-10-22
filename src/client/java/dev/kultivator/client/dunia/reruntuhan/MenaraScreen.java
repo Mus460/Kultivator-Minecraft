@@ -1,6 +1,7 @@
 package dev.kultivator.client.dunia.reruntuhan;
 
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.dunia.reruntuhan.RNet;
 import dev.kultivator.dunia.reruntuhan.menara.PenjagaLantaiEntity;
@@ -9,6 +10,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
@@ -31,6 +33,8 @@ public class MenaraScreen extends Screen {
 	private @Nullable CompoundTag data;
 	private final @Nullable Screen back;
 	private final long openedAt = Util.getMillis();
+	/** The "?" seal: Panduan › Ensiklopedia on the tower topic (audit M5, S11). */
+	private final KeyHints.SealCorner help = new KeyHints.SealCorner("menara_seratus");
 	private int x0;
 	private int y0;
 	private int x1;
@@ -63,6 +67,7 @@ public class MenaraScreen extends Screen {
 		x1 = x0 + w;
 		y0 = (height - h) / 2;
 		y1 = y0 + h;
+		help.place(x1 - 10.0F, y0 + 10.0F);
 	}
 
 	@Override
@@ -81,6 +86,11 @@ public class MenaraScreen extends Screen {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
 		super.extractRenderState(g, mouseX, mouseY, a);
+		drawCard(g);
+		help.render(g, font, mouseX, mouseY, width, height);
+	}
+
+	private void drawCard(GuiGraphicsExtractor g) {
 		long now = Util.getMillis();
 		g.fill(x0 + 3, y0 + 4, x1 + 3, y1 + 4, 0x60000000);
 		g.fillGradient(x0, y0, x1, y1, Palette.PAPER_TOP, Palette.PAPER_BOTTOM);
@@ -209,6 +219,22 @@ public class MenaraScreen extends Screen {
 					0.4F, false);
 		}
 		Brush.rect(g, left, bottom, right, bottom + 3.0F, Palette.ROD_DARK);
+	}
+
+	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		if (event.button() == 0 && help.click(event.x(), event.y())) {
+			return true;
+		}
+		return super.mouseClicked(event, doubleClick);
+	}
+
+	@Override
+	public boolean mouseReleased(MouseButtonEvent event) {
+		if (help.release(event.x(), event.y())) {
+			return true;
+		}
+		return super.mouseReleased(event);
 	}
 
 	@Override

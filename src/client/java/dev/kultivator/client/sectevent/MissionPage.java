@@ -34,9 +34,11 @@ import java.util.Set;
  */
 public class MissionPage extends SectEventPage {
 
-	private static final String[] TABS = {"kultivator.sectevent.ui.tab.board", "kultivator.sectevent.ui.tab.teams",
-			"kultivator.sectevent.ui.tab.envoy", "kultivator.sectevent.ui.tab.forbidden", "kultivator.sectevent.ui.tab.ark",
-			"kultivator.sekte.misi.ui.tab.cerita", "kultivator.sekte.misi.ui.tab.kabar"};
+	// T13: one tablet, two kinds of missions: "Harian" (the old daily board) and "Cerita" (module X's story missions);
+	// the old recruiting envoy is the "Pencari Bakat" (envoys to NPC sects go from the Diplomacy screen as story missions).
+	private static final String[] TABS = {"kultivator.sekte_sambung.misi.tab.harian", "kultivator.sectevent.ui.tab.teams",
+			"kultivator.sekte_sambung.misi.tab.bakat", "kultivator.sectevent.ui.tab.forbidden", "kultivator.sectevent.ui.tab.ark",
+			"kultivator.sekte_sambung.misi.tab.cerita", "kultivator.sekte_sambung.misi.tab.kabar"};
 	/** This tablet's index in the hall screen's page list ({@code Halls.OP_OPEN} argument, the hub card of module X). */
 	public static final int PAGE = 6;
 	private static final int TAB_STORY = 5;
@@ -140,7 +142,7 @@ public class MissionPage extends SectEventPage {
 				roster.layout(rightX, top + 11, rightW, bottom - top - 11);
 				int half = (colW - 6) / 2;
 				TalismanButton send = new TalismanButton(x + 2, bottom - BUTTON_H, half, BUTTON_H,
-						() -> Component.translatable("kultivator.sectevent.ui.envoy.send"));
+						() -> Component.translatable("kultivator.sekte_sambung.bakat.kirim"));
 				send.enabledWhen(() -> envoyReady() && roster.first() != null);
 				send.onPress(() -> {
 					CompoundTag chosen = roster.first();
@@ -152,7 +154,7 @@ public class MissionPage extends SectEventPage {
 				TalismanButton reset = new TalismanButton(x + 4 + half, bottom - BUTTON_H, half, BUTTON_H,
 						() -> Component.translatable("kultivator.sectevent.ui.envoy.reset", 300));
 				reset.enabledWhen(() -> !envoyReady());
-				reset.tooltip(() -> List.of(Component.translatable("kultivator.sectevent.ui.envoy.reset.tip")));
+				reset.tooltip(() -> List.of(Component.translatable("kultivator.sekte_sambung.bakat.percepat.tip")));
 				reset.onPress(() -> act(0, "envoy_reset"));
 				add(reset);
 			}
@@ -524,13 +526,13 @@ public class MissionPage extends SectEventPage {
 
 	private void drawEnvoy(GuiGraphicsExtractor g, int rightX, int rightW) {
 		CompoundTag data = data();
-		heading(g, Component.translatable("kultivator.sectevent.ui.envoy"), x + 2.0F, top, colW - 4.0F, 0.8F);
-		heading(g, Component.translatable("kultivator.sectevent.ui.envoy.pick"), rightX + 2.0F, top, rightW - 4.0F, 0.8F);
+		heading(g, Component.translatable("kultivator.sekte_sambung.bakat.judul"), x + 2.0F, top, colW - 4.0F, 0.8F);
+		heading(g, Component.translatable("kultivator.sekte_sambung.bakat.pilih"), rightX + 2.0F, top, rightW - 4.0F, 0.8F);
 		List<Component> list = new ArrayList<>();
-		list.add(Component.translatable("kultivator.sectevent.ui.envoy.desc"));
+		list.add(Component.translatable("kultivator.sekte_sambung.bakat.desc"));
 		long ready = data.getLongOr("envoy_ready", Long.MIN_VALUE);
-		list.add(envoyReady() ? Component.translatable("kultivator.sectevent.ui.envoy.ready").withColor(Palette.JADE_DARK)
-				: Component.translatable("kultivator.sectevent.ui.envoy.wait", ready).withColor(Palette.DANGER));
+		list.add(envoyReady() ? Component.translatable("kultivator.sekte_sambung.bakat.siap").withColor(Palette.JADE_DARK)
+				: Component.translatable("kultivator.sekte_sambung.bakat.tunggu_ui", ready).withColor(Palette.DANGER));
 		list.add(Component.translatable("kultivator.sectevent.ui.envoy.source").withColor(Palette.INK_FAINT));
 		lines(g, list, x + 4.0F, top + 13.0F, colW - 8.0F, y + h - BUTTON_H - 3.0F, Palette.INK_SOFT, 0.6F);
 	}

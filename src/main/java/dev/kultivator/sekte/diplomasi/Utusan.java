@@ -10,6 +10,8 @@ import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.api.Jabatan;
 import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.api.SekteBus;
+import dev.kultivator.sekte.SekteSuara;
+import dev.kultivator.voice.VoiceDisciples;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -152,7 +154,7 @@ final class Utusan {
 		BODIES.put(body.getUUID(), new Envoy(owner, offerId, sect.id, leaveAt));
 		ENTITIES.put(body.getUUID(), body);
 		body.getLookControl().setLookAt(player);
-		Tubuh.say(body, "greet");
+		SekteSuara.say(body, "elder.envoy", "disciple." + VoiceDisciples.voiceOf(body) + ".greet");
 	}
 
 	static List<CompoundTag> offers(DiplomasiData data, UUID owner) {
@@ -395,15 +397,27 @@ final class Utusan {
 		}
 		DiscipleEntity disciple = pick[0];
 		long today = Diplomasi.today(server);
+		boolean officer = disciple.soulId().equals(SekteApi.tetua().holder(owner, Jabatan.TETUA_LUAR));
+		if (SekteApi.misi().carriesEnvoys()) {
+			// T13: one envoy path. Module X carries the envoy as a story mission (template utusan: stage news, a written
+			// report, one standing formula); D keeps its pause between two envoys to one sect.
+			if (SekteApi.misi().sendEnvoy(player, sect.id, disciple.soulId(), officer)) {
+				r.utusanDay = today;
+				r.note(today, Component.translatable(GeneratorNama.KEY + "kronik.utusan_kirim", disciple.getDisplayName()));
+				Diplomasi.log(server, owner, Component.translatable(GeneratorNama.KEY + "log.utusan_kirim", disciple.getDisplayName(), sect.name()));
+				data.setDirty();
+			}
+			return;
+		}
 		r.utusanDay = today;
 		CompoundTag info = new CompoundTag();
 		info.putString("sect", sect.id);
 		info.putString("name", disciple.getDisplayName().getString());
 		info.putString("soul", disciple.soulId().toString());
-		info.putBoolean("luar", disciple.soulId().equals(SekteApi.tetua().holder(owner, Jabatan.TETUA_LUAR)));
+		info.putBoolean("luar", officer);
 		r.note(today, Component.translatable(GeneratorNama.KEY + "kronik.utusan_kirim", disciple.getDisplayName()));
 		Diplomasi.log(server, owner, Component.translatable(GeneratorNama.KEY + "log.utusan_kirim", disciple.getDisplayName(), sect.name()));
-		Tubuh.say(disciple, "careful");
+		SekteSuara.line(disciple, "depart", "careful", 200);
 		Halls.storeAway(owner, disciple, server.overworld().getGameTime() + 24000L, REASON, info);
 		data.setDirty();
 	}
@@ -445,7 +459,7 @@ final class Utusan {
 					Ingatan.remember(server, data, SekteIds.D + ".utusan", null, 3, GeneratorNama.KEY + "ingatan.utusan",
 							sect == null ? "" : sect.name().getString());
 					SekteBus.honored(server, player.getUUID(), soul, SekteIds.D + ".utusan", 3);
-					Tubuh.say(d, "greet");
+					SekteSuara.line(d, "envoy_return", "greet", 200);
 					return;
 				}
 			}

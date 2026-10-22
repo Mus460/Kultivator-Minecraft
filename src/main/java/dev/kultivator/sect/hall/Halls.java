@@ -542,6 +542,8 @@ public final class Halls {
 		Msg.chat(player, Component.translatable("kultivator.hall.founded_hint", KultivatorConfig.get().recruitmentIntervalDays)
 				.withStyle(ChatFormatting.GRAY));
 		Advancements.grant(player, "sect_gate_open");
+		// T8: founding the real sect (the Hall Stele) is the moment Heaven speaks; /sect create only forms a fellowship.
+		dev.kultivator.voice.VoiceHooks.sectFounded(player);
 		scan(owner, level, pos);
 	}
 
@@ -1131,6 +1133,7 @@ public final class Halls {
 		info.putInt("protectors_max", SectRanks.maxProtectors(owner));
 		info.putIntArray("grants", SectRanks.GRANT_AMOUNTS);
 		info.putInt("pool", core.getIntOr("pool", 0));
+		info.putIntArray("pool_week", poolWeek(core));
 		info.putInt("offered_today", Contribution.offeredToday(core));
 		info.putInt("offer_cap", Contribution.OFFER_DAILY_CAP);
 		info.put("offers", Contribution.offers(viewer));
@@ -1490,8 +1493,70 @@ public final class Halls {
 		if (core == null || amount == 0) {
 			return;
 		}
-		core.putInt("pool", (int) Math.max(0L, Math.min(Integer.MAX_VALUE, (long) core.getIntOr("pool", 0) + amount)));
+		int before = core.getIntOr("pool", 0);
+		int after = (int) Math.max(0L, Math.min(Integer.MAX_VALUE, (long) before + amount));
+		core.putInt("pool", after);
+		flow(core, Math.max(0, after - before), Math.max(0, before - after));
 		changed();
+	}
+
+	/** S28: the hall pool's PK (read only; 0 without a hall). */
+	public static int pool(UUID owner) {
+		CompoundTag core = owner == null ? null : coreOf(owner);
+		return core == null ? 0 : Math.max(0, core.getIntOr("pool", 0));
+	}
+
+	/** S28: {PK in, PK out} of the hall pool over the last 7 days (today included). */
+	public static int[] poolWeek(UUID owner) {
+		CompoundTag core = owner == null ? null : coreOf(owner);
+		return core == null ? new int[]{0, 0} : poolWeek(core);
+	}
+
+	private static final int FLOW_DAYS = 7;
+
+	private static int[] poolWeek(CompoundTag core) {
+		CompoundTag flow = core.getCompoundOrEmpty("pk7");
+		long[] days = flow.getLongArray("day").orElse(new long[0]);
+		int[] in = flow.getIntArray("in").orElse(new int[0]);
+		int[] out = flow.getIntArray("out").orElse(new int[0]);
+		long today = dayIndex();
+		long sumIn = 0L;
+		long sumOut = 0L;
+		for (int i = 0; i < FLOW_DAYS && i < days.length && i < in.length && i < out.length; i++) {
+			if (days[i] > today - FLOW_DAYS && days[i] <= today) {
+				sumIn += in[i];
+				sumOut += out[i];
+			}
+		}
+		return new int[]{(int) Math.min(Integer.MAX_VALUE, sumIn), (int) Math.min(Integer.MAX_VALUE, sumOut)};
+	}
+
+	/** Adds today's PK in and out to the 7-slot ring {@code pk7} (older worlds start with an empty ring). */
+	private static void flow(CompoundTag core, int in, int out) {
+		if (in <= 0 && out <= 0) {
+			return;
+		}
+		CompoundTag flow = core.getCompoundOrEmpty("pk7");
+		long[] days = flow.getLongArray("day").filter(a -> a.length == FLOW_DAYS).map(long[]::clone).orElseGet(() -> {
+			long[] fresh = new long[FLOW_DAYS];
+			java.util.Arrays.fill(fresh, Long.MIN_VALUE);
+			return fresh;
+		});
+		int[] ins = flow.getIntArray("in").filter(a -> a.length == FLOW_DAYS).map(int[]::clone).orElseGet(() -> new int[FLOW_DAYS]);
+		int[] outs = flow.getIntArray("out").filter(a -> a.length == FLOW_DAYS).map(int[]::clone).orElseGet(() -> new int[FLOW_DAYS]);
+		long today = dayIndex();
+		int slot = (int) Math.floorMod(today, (long) FLOW_DAYS);
+		if (days[slot] != today) {
+			days[slot] = today;
+			ins[slot] = 0;
+			outs[slot] = 0;
+		}
+		ins[slot] = (int) Math.min(Integer.MAX_VALUE, (long) ins[slot] + in);
+		outs[slot] = (int) Math.min(Integer.MAX_VALUE, (long) outs[slot] + out);
+		flow.putLongArray("day", days);
+		flow.putIntArray("in", ins);
+		flow.putIntArray("out", outs);
+		core.put("pk7", flow);
 	}
 
 	/** Takes PK from the hall pool; false (nothing taken) when there is not enough. */
@@ -1501,6 +1566,7 @@ public final class Halls {
 			return false;
 		}
 		core.putInt("pool", core.getIntOr("pool", 0) - amount);
+		flow(core, 0, amount);
 		changed();
 		return true;
 	}

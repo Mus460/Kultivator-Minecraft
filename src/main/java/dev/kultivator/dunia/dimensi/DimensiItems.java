@@ -76,6 +76,10 @@ public final class DimensiItems {
 		public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder,
 									TooltipFlag flag) {
 			builder.accept(Component.translatable(getDescriptionId() + ".tooltip").withColor(HartaText.USE_COLOR));
+			if (this == DUPA_ARWAH) {
+				// audit R21: not the sect altar's Dupa
+				builder.accept(Component.translatable("kultivator.ekonomi.nama.dupa_arwah").withStyle(ChatFormatting.GRAY));
+			}
 			HartaText.sources(getDescriptionId(), builder);
 		}
 	}

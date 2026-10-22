@@ -58,6 +58,11 @@ public final class KotaData extends SavedData {
 		return players.computeIfAbsent(id, key -> new CompoundTag());
 	}
 
+	/** Every player with a record (a copy, safe to iterate while records change). */
+	public java.util.List<UUID> playerIds() {
+		return new java.util.ArrayList<>(players.keySet());
+	}
+
 	public void touch() {
 		setDirty();
 	}

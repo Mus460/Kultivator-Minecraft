@@ -30,13 +30,24 @@ final class GerbangSekte {
 	public static final Identifier PACK = Kultivator.id("sekte_gerbang");
 
 	private static boolean registered;
+	private static boolean running;
 
-	static void register(boolean structures) {
+	/** The placement type exists whatever the switches say (K1: a registry never follows a module switch). */
+	static void registerContent() {
 		if (registered) {
 			return;
 		}
 		registered = true;
 		Registry.register(BuiltInRegistries.STRUCTURE_PLACEMENT, PLACEMENT, GerbangSektePlacement.CODEC);
+	}
+
+	/** The gate anchors and, with {@code structures}, the world generation pack: only while module D runs. */
+	static void register(boolean structures) {
+		registerContent();
+		if (running) {
+			return;
+		}
+		running = true;
 		DuniaAnchors.register(AnggotaSekte.MODULE, AnggotaSekte.HANDLER);
 		if (!structures) {
 			return;

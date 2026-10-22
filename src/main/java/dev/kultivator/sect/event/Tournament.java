@@ -436,7 +436,7 @@ public final class Tournament {
 		List<DiscipleEntity> list = new ArrayList<>();
 		for (DiscipleEntity disciple : Disciples.loaded(owner)) {
 			if (EventUtil.free(disciple) && SectRanks.rank(disciple.data()) >= 1 && Halls.inTerritory(owner, disciple.level(), disciple.position())
-					&& !disciple.departed()) {
+					&& !disciple.departed() && !Expeditions.refuses(disciple)) {
 				list.add(disciple);
 			}
 		}
@@ -470,6 +470,19 @@ public final class Tournament {
 	}
 
 	// ================================================================== running
+
+	/** The names of the NPC sects the owner's hall already met (module D; empty when it is off). */
+	private static List<Component> metSects(UUID owner) {
+		List<Component> names = new ArrayList<>();
+		dev.kultivator.sekte.api.DiplomasiService diplomacy = dev.kultivator.sekte.api.SekteApi.diplomasi();
+		for (String id : diplomacy.sects()) {
+			Component name = diplomacy.met(owner, id) ? diplomacy.name(id) : null;
+			if (name != null) {
+				names.add(name);
+			}
+		}
+		return names;
+	}
 
 	/** Builds the bracket and starts; {@code test} skips the presence rules. */
 	static boolean start(UUID owner, Halls.HallView hall, @Nullable ServerPlayer player, boolean test) {
@@ -505,8 +518,12 @@ public final class Tournament {
 		List<Bracket.Entrant> seeds = new ArrayList<>(disciples);
 		int best = disciples.get(0).data.rank().step();
 		if (elite) {
+			// T12: the elite champions come from the NPC sects (Diplomasi) this hall already met; the old static names
+			// are only the fallback (Diplomasi off, or no sect met yet).
+			List<Component> met = metSects(owner);
 			for (int i = 0; i < CHAMPIONS; i++) {
-				seeds.add(Rivals.champion(random, best - 1 + i, random.nextInt(Rivals.SECT_COUNT)));
+				seeds.add(met.isEmpty() ? Rivals.champion(random, best - 1 + i, random.nextInt(Rivals.SECT_COUNT))
+						: Rivals.champion(random, best - 1 + i, met.get(random.nextInt(met.size()))));
 			}
 		}
 		if (guests) {

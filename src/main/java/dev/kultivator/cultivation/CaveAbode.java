@@ -120,7 +120,7 @@ public final class CaveAbode {
 	/** The seat still has its qi formation and lies inside an active protective formation (loaded chunks only). */
 	public static boolean guarded(ServerLevel level, BlockPos seat) {
 		return level.isLoaded(seat) && QiFormations.tier(level, seat) >= MIN_FORMATION_TIER
-				&& ProtectiveFormations.insideActiveFormation(level, top(seat));
+				&& ProtectiveFormations.insideProtection(level, top(seat));
 	}
 
 	/** Where a player stands on the seat. */
@@ -151,7 +151,7 @@ public final class CaveAbode {
 		if (QiFormations.tier(level, seat) < MIN_FORMATION_TIER) {
 			return refuse(player, "kultivator.kultivasi.abode.need_formation");
 		}
-		if (!ProtectiveFormations.insideActiveFormation(level, player.position())) {
+		if (!ProtectiveFormations.insideProtection(level, player.position())) {
 			return refuse(player, "kultivator.kultivasi.abode.need_protection");
 		}
 		write(player, data, level, seat);

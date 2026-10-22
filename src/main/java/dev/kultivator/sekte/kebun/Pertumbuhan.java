@@ -17,6 +17,7 @@ import dev.kultivator.sekte.kebun.TabelHasil.Benih;
 import dev.kultivator.epic.EpicIds;
 import dev.kultivator.epic.EpicMoments;
 import dev.kultivator.util.Advancements;
+import dev.kultivator.sekte.SekteSuara;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -251,6 +252,7 @@ public final class Pertumbuhan {
 			CompoundTag kerja = Kebun.kerja(data);
 			kerja.putInt("total", kerja.getIntOr("total", 0) + count);
 			SekteBus.WORK_DONE.invoker().onWorkDone(aula.server(), aula.owner(), gardener.soulId(), SekteIds.W, count);
+			SekteSuara.line(gardener, "harvest", "cheer", bloom ? 200 : 2400);
 		}
 		if (bloom) {
 			Component line = Component.translatable("kultivator.sekte.kebun.log.bloom", name, Math.min(999, age * 3));

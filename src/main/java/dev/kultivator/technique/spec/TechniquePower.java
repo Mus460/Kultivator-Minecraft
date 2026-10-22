@@ -129,6 +129,13 @@ public final class TechniquePower {
 	 * foes. Trial-mob rule with the attacker's stars counted again: legacy power × 1.5 × sqrt(S(stars)).
 	 */
 	public static final String TAG_ABADI_FOE = "kultivator.abadi_foe";
+	/**
+	 * Realm-scaled hostiles of the Dunia content (town rivals, sea foes, wild dragons, ruin creatures, treasure guardians):
+	 * trial-mob rule like {@link #TAG_ROGUE}. Set only through {@link #markRealmFoe} (audit M4 T5). Classification only.
+	 */
+	public static final String TAG_DUNIA_FOE = "kultivator.dunia_foe";
+	/** Legacy power of the Immortal Ascension layers (audit M4 S7, approved): + 0.25 per layer, so IA T9 sits half a realm higher. */
+	public static final double LEGACY_IA_LAYER = 0.25D;
 	/** The product of every player star factor (DESIGN 26.14 item 5: the T factor of the Seven Calamities) stays in this range. */
 	public static final double PLAYER_STAR_FACTOR_MIN = 1.0D;
 	public static final double PLAYER_STAR_FACTOR_MAX = 1.331D;
@@ -413,13 +420,18 @@ public final class TechniquePower {
 
 	public static double legacyD(CultivationData data, @Nullable Dao dao) {
 		Rank rank = data.rank();
-		return (4.0D + 2.5D * rank.realm().ordinal() + 0.5D * rank.stage()) * comprehensionFactor(data, dao);
+		return (4.0D + 2.5D * rank.realm().ordinal() + 0.5D * rank.stage() + legacyLayer(rank)) * comprehensionFactor(data, dao);
 	}
 
-	/** U_legacy = (3 + 2 realm + 0.5 stage) × C. */
+	/** U_legacy = (3 + 2 realm + 0.5 stage + 0.25 IA layer) × C. */
 	public static double legacyU(DiscipleData data) {
 		Rank rank = data.rank();
-		return (3.0D + 2.0D * rank.realm().ordinal() + 0.5D * rank.stage()) * (1.0D + data.comprehension() / 100.0D);
+		return (3.0D + 2.0D * rank.realm().ordinal() + 0.5D * rank.stage() + legacyLayer(rank)) * (1.0D + data.comprehension() / 100.0D);
+	}
+
+	/** The Immortal Ascension layer term of D/U legacy (0 outside IA): 0.25 × layer (audit M4 S7). */
+	public static double legacyLayer(Rank rank) {
+		return rank.realm() == Realm.IMMORTAL_ASCENSION ? LEGACY_IA_LAYER * rank.layer() : 0.0D;
 	}
 
 	// ================================================================== tiers and growth
@@ -677,7 +689,15 @@ public final class TechniquePower {
 	public static boolean isTrialMob(LivingEntity entity) {
 		Set<String> tags = entity.entityTags();
 		return tags.contains(TAG_DAO_PROTECTOR) || tags.contains(TAG_TRIAL_GUARD) || tags.contains(TAG_ELITE) || tags.contains(TAG_ROGUE)
-				|| tags.contains(TAG_ABADI_FOE);
+				|| tags.contains(TAG_ABADI_FOE) || tags.contains(TAG_DUNIA_FOE);
+	}
+
+	/**
+	 * Marks a realm-scaled Dunia hostile as a trial mob (legacy power × 1.5 instead of P). Call it in the entity's setup and
+	 * again on load; the tag is idempotent and changes no stats (audit M4 T5). Bosses keep their {@link #TAG_BOSS} share cap.
+	 */
+	public static void markRealmFoe(LivingEntity entity) {
+		entity.addTag(TAG_DUNIA_FOE);
 	}
 
 	/** The attacker's own heart demon. */

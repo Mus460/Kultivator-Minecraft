@@ -10,6 +10,7 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.ScrollFrame;
 import dev.kultivator.client.screen.ui.SlipTooltip;
 import dev.kultivator.client.screen.ui.UiSound;
+import dev.kultivator.data.Realm;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ChatScreen;
@@ -25,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Kitab Panduan, the in-game guide, in the jade-scroll style of the cultivation scroll and the Titah menu: the twelve
- * chapters down the left (a red seal with the number, the name, a progress bar; a jade seal with a check once complete;
+ * Kitab Panduan, the in-game guide, in the jade-scroll style of the cultivation scroll and the Titah menu: the chapters
+ * down the left in display order (GuideBook; "Bab N" is the row) (a red seal with the number, the name, a progress bar; a jade seal with a check once complete;
  * the current chapter framed in pulsing gold), and on the right the selected chapter's steps as cards (a check or an
  * empty ring, the title, the wrapped lines, a talisman chip that writes its command into the chat box, and a tick box
  * for steps the server cannot check by itself). The cards scroll with the wheel, the arrow keys or Page Up / Down;
@@ -139,7 +140,7 @@ public final class GuideScreen extends Screen {
 			List<FormattedCharSequence> titleRows = font.split(Brush.bold(KeyHints.fill(GuideBook.text(step.titleKey(), step.id()))),
 					Math.max(20, (int) ((titleRight - tx) / titleScale)));
 			// Key tokens ([[key:meditate]] ...) show the keys bound right now (DESIGN 33.6 R11).
-			List<FormattedCharSequence> bodyRows = font.split(KeyHints.fill(GuideBook.text(step.bodyKey(), "")),
+			List<FormattedCharSequence> bodyRows = font.split(KeyHints.fill(GuideBook.body(step)),
 					Math.max(20, (int) ((cardsX + cardsW - 5 - tx) / bodyScale)));
 			String hint = step.hint();
 			int chipW = 0;
@@ -357,6 +358,15 @@ public final class GuideScreen extends Screen {
 			} else if (current) {
 				lines.add(Component.translatable(K + "chapter.current").withStyle(ChatFormatting.GOLD));
 			}
+			// who the chapter is for (integration audit T1): its realm, and a hall of your own for the sect chapters
+			GuideBook.Chapter chapter = GuideBook.chapter(index);
+			Realm realm = chapter.realm();
+			if (realm != null) {
+				lines.add(Component.translatable(K + "chapter.realm", realm.displayName()).withStyle(ChatFormatting.GRAY));
+			}
+			if (chapter.needsHall()) {
+				lines.add(Component.translatable(K + "chapter.hall").withStyle(ChatFormatting.GRAY));
+			}
 			tooltip = lines;
 		}
 	}
@@ -401,14 +411,21 @@ public final class GuideScreen extends Screen {
 		}
 	}
 
-	/** The global index of the first unfinished step of the selected chapter, or −1. */
+	/** The global index of the first unfinished core step of the selected chapter (else its first unfinished step), or −1. */
 	private int firstOpen() {
+		int any = -1;
 		for (GuideBook.Step step : GuideBook.chapter(selected).steps()) {
-			if (!GuideClient.done(step.index())) {
+			if (GuideClient.done(step.index())) {
+				continue;
+			}
+			if (step.core()) {
 				return step.index();
 			}
+			if (any < 0) {
+				any = step.index();
+			}
 		}
-		return -1;
+		return any;
 	}
 
 	private void drawCard(GuiGraphicsExtractor g, Card card, int y, int mouseX, int mouseY, boolean next, float pulse, float seconds) {
@@ -437,8 +454,13 @@ public final class GuideScreen extends Screen {
 			Brush.ring(g, mx, my, 3.0F, 4.0F, next ? Palette.GOLD_DARK : Palette.INK_FAINT);
 		}
 		if (overMark) {
-			tooltip = List.of(Component.translatable(done ? K + "mark.done" : K + "mark.open"),
-					Component.translatable(step.manual() ? K + "mark.manual" : K + "mark.auto").withStyle(ChatFormatting.GRAY));
+			List<Component> lines = new ArrayList<>();
+			lines.add(Component.translatable(done ? K + "mark.done" : K + "mark.open"));
+			lines.add(Component.translatable(step.manual() ? K + "mark.manual" : K + "mark.auto").withStyle(ChatFormatting.GRAY));
+			if (step.optional()) {
+				lines.add(Component.translatable(K + "mark.optional").withStyle(ChatFormatting.DARK_AQUA));
+			}
+			tooltip = lines;
 		}
 
 		// the title and the lines

@@ -56,9 +56,13 @@ final class Generasi {
 	/** False: module D's SUCCESSION listener owns the founder's +10 with every NPC sect (finish pass, no double bonus). */
 	static final boolean GREET_SELF = false;
 	static final int GOLD = 0xFFD54A;
-	/** Requirements of the ceremony (DESIGN 36.2.6). */
-	static final Realm HEIR_REALM = Realm.NASCENT_SOUL;
-	static final int HEIR_STARS = 9;
+	/**
+	 * Requirements of the ceremony (DESIGN 36.2.6). Balance change S1 (approved, "Ubah angkanya"): the heir needs Deity
+	 * Transformation and no stars (it was Nascent Soul and 9 stars, which only a Dewa Abadi Puncak heir has), so the
+	 * second generation comes in the middle game; the Nine Seals stay an end-game bonus of the heir.
+	 */
+	static final Realm HEIR_REALM = Realm.DEITY_TRANSFORMATION;
+	static final int HEIR_STARS = 0;
 	static final int HALL_LEVEL = 5;
 
 	// ================================================================== reads
@@ -169,7 +173,7 @@ final class Generasi {
 	record Requirement(boolean ok, Component text) {
 	}
 
-	/** Every requirement (DESIGN 36.2.6): an heir loaded, Nascent Soul+, 9 stars, hall level 5, the sect's age. */
+	/** Every requirement (DESIGN 36.2.6, S1): an heir loaded, Deity Transformation+, hall level 5, the sect's age. */
 	static List<Requirement> requirements(MinecraftServer server, UUID owner) {
 		List<Requirement> list = new ArrayList<>();
 		UUID heirSoul = heir(owner);
@@ -180,8 +184,10 @@ final class Generasi {
 		DiscipleData data = heir == null ? null : heir.data();
 		list.add(new Requirement(data != null && data.realm().atLeast(HEIR_REALM),
 				Component.translatable("kultivator.sekte.tetua.req.realm", HEIR_REALM.displayName())));
-		int stars = data == null ? 0 : DisciplePaths.stars(data);
-		list.add(new Requirement(stars >= HEIR_STARS, Component.translatable("kultivator.sekte.tetua.req.stars", stars, HEIR_STARS)));
+		if (HEIR_STARS > 0) {
+			int stars = data == null ? 0 : DisciplePaths.stars(data);
+			list.add(new Requirement(stars >= HEIR_STARS, Component.translatable("kultivator.sekte.tetua.req.stars", stars, HEIR_STARS)));
+		}
 		int level = Halls.level(owner);
 		list.add(new Requirement(level >= HALL_LEVEL, Component.translatable("kultivator.sekte.tetua.req.hall", level, HALL_LEVEL)));
 		long age = age(server, owner);

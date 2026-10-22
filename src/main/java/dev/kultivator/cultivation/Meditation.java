@@ -54,7 +54,7 @@ import java.util.function.ToDoubleFunction;
 
 /**
  * Meditation (DESIGN 4, reworked in 19.3.5): the player sits cross-legged and gathers qi. Every second it gives
- * {@link #gainPerSecond} XP (realm base rate × site × formation × spirit-stone fuel, capped at ×5, × vein density × sect
+ * {@link #gainPerSecond} XP (realm base rate × site × formation × spirit-stone fuel, capped at ×3.5, × sect formation G capped at ×1.5, × vein density × sect
  * bonus × closed-door seclusion), drains the spirit vein, and every minute may bring an enlightenment. Qi regeneration
  * itself is boosted by {@code Qi.tick} (it reads {@code meditating()}). Moving, getting hurt, attacking, using an item or
  * block, changing dimension, dying or starting a breakthrough ends it; a session of a minute or more ends with a
@@ -151,6 +151,8 @@ public final class Meditation {
 		boolean fuelTold;
 		boolean reserveTold;
 		boolean deepTold;
+		/** The absorption limit message (audit M4 T6) was shown once this session. */
+		boolean capTold;
 		double xpGained;
 		double storedGained;
 
@@ -368,16 +370,38 @@ public final class Meditation {
 
 	/**
 	 * Meditation XP per second before {@code Progression}'s multipliers (DESIGN 19.3.5), shared with
-	 * {@code DiscipleCultivation.masterMeditationGain}: {@code base × min(3.5, site × formation × fuel) × clamp(density, 0.15, 1.4)
+	 * {@code DiscipleCultivation.masterMeditationGain}: {@code base × min(3.5, site × formation × fuel) × min(1.5, sect G)
+	 * × clamp(density, 0.15, 1.4)
 	 * × Sects.meditationBonus × (1 + 0.05 × seclusion stacks)}. Site and formation are the synced values of the session.
 	 */
 	public static double gainPerSecond(ServerPlayer player, CultivationData data) {
-		double site = data.siteMultiplier() > 0.0D ? data.siteMultiplier() : 1.0D;
-		double formation = formationTerm(player, QiFormations.multiplier(data.formationTier()));
 		double density = SpiritVeins.density(player.level(), player.blockPosition());
-		return baseRate(data.rank()) * Math.min(MULTIPLIER_CAP, site * formation * fuelFactor(player))
+		return baseRate(data.rank()) * Math.min(MULTIPLIER_CAP, innerMultiplier(player, data)) * sectFactor(player)
 				* Math.max(DENSITY_FLOOR, Math.min(DENSITY_XP_CAP, density))
 				* dev.kultivator.sect.Sects.meditationBonus(player) * (1.0D + SECLUSION_BONUS * seclusionStacks(player));
+	}
+
+	/**
+	 * Balance change (audit M4 T6, approved): the sect formation factor G sits outside {@link #MULTIPLIER_CAP} and is capped
+	 * at this on its own, so a sect field still adds up to +50% on top of a full site × formation × fuel seat.
+	 */
+	public static final double GATHER_SECT_CAP = 1.5D;
+
+	/** Site × personal Qi formation × spirit-stone fuel: the part capped at {@link #MULTIPLIER_CAP}. */
+	public static double innerMultiplier(ServerPlayer player, CultivationData data) {
+		double site = data.siteMultiplier() > 0.0D ? data.siteMultiplier() : 1.0D;
+		return site * QiFormations.multiplier(data.formationTier()) * fuelFactor(player);
+	}
+
+	/**
+	 * The sect gathering factor G at the player (every gathering provider: sect formation field, soul lantern), clamped to
+	 * 1..{@link #GATHER_SECT_CAP}; 1 without a field. {@link #formationTerm} and its stack cap stay for the display only.
+	 */
+	public static double sectFactor(ServerPlayer player) {
+		if (GATHERING.isEmpty()) {
+			return 1.0D;
+		}
+		return Math.max(1.0D, Math.min(GATHER_SECT_CAP, sectGathering(player)));
 	}
 
 	// ================================================================ phase 7c sect formation hooks (DESIGN 24.13 item 8)
@@ -545,6 +569,15 @@ public final class Meditation {
 		refuel(player, data, session);
 
 		double gain = gainPerSecond(player, data);
+		if (!session.capTold) {
+			double inner = innerMultiplier(player, data);
+			if (inner > MULTIPLIER_CAP + 1.0E-6D) {
+				// audit M4 T6: make the ×3.5 absorption limit visible once (site × personal formation × fuel above it is wasted)
+				session.capTold = true;
+				Msg.chat(player, Component.translatable("kultivator.kekuatan.meditation.cap", Msg.number(inner), Msg.number(MULTIPLIER_CAP),
+						Msg.number(GATHER_SECT_CAP)).withColor(MUTED));
+			}
+		}
 		double storedBefore = data.storedQi();
 		double added = Progression.grantXp(player, gain, XpSource.MEDITATION);
 		double stored = Math.max(0.0D, data.storedQi() - storedBefore);

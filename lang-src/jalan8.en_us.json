@@ -6,8 +6,8 @@
   "kultivator.goals.chapter.10": "Immortal",
   "kultivator.goals.reward.6": "A Blood-and-Fire Trial Token and 4 Low spirit stones",
   "kultivator.goals.reward.7": "2 Mid spirit stones and a Heavenvoid Map Fragment",
-  "kultivator.goals.reward.8": "1 High spirit stone and a vial of Ancient God Blood",
-  "kultivator.goals.reward.9": "1 Supreme spirit stone and a Heavenly Tomb Sigil",
+  "kultivator.goals.reward.8": "1 High spirit stone and a Heavenly Tomb Sigil",
+  "kultivator.goals.reward.9": "1 Supreme spirit stone and a vial of Ancient God Blood",
   "kultivator.goals.reward.10": "3 Tomb Energy Essences and the title \"Master of the World Path\"",
   "kultivator.goals.step.w_ring": "Bind a storage pouch or ring",
   "kultivator.goals.step.w_ring.how": "Use a storage ring once to plant your spiritual imprint (the first ring needs Qi Refining).",
@@ -81,6 +81,6 @@
   "advancement.kultivator.world_path_complete.title": "World Path Complete",
   "advancement.kultivator.world_path_complete.description": "Finish all twenty steps of the World Path (chapters 6-10)",
   "kultivator.screen.help.jalan_dunia.title": "The World Path",
-  "kultivator.screen.help.jalan_dunia": "After the five chapters of First Steps, the Path tablet turns to the World Path (the coin under the chapter tablets): chapters 6-10, twenty steps that tie the phase-8 features together, each ticked by its achievement and each chapter with one reward (a realm key, spirit stones, Ancient God Blood, a Tomb Sigil, Tomb Energy Essence and the title \"Master of the World Path\"). Each realm feeds the next: the Blood-and-Fire trial gives Foundation Herbs for Bumi forging and an alternative Foundation pill; the Heavenvoid Hall gives Soul Nurturing Wood for Langit forging, weapon spirits and the Supreme ring; the Land of the Ancient God gives Ancient God Blood for Abadi forging and +7 to +9 refining; the Heavenly Tomb gives Tomb Energy Essence for Dewa forging and +10 to +12. Each Essence you carry when condensing a star lowers its cost by 2%% (at most 10, they are used up). Foundation Trials gain an optional fourth row from the world features; any three rows make a Firm Foundation. New daily chores: slay rogue cultivators, finish a village request, forge or refine, clear a secret realm. Source: the ladder and every number are game design; each feature names its own source.",
+  "kultivator.screen.help.jalan_dunia": "After the five chapters of First Steps, the Path tablet turns to the World Path (the coin under the chapter tablets): chapters 6-10, twenty steps that tie the phase-8 features together, each ticked by its achievement and each chapter with one reward (a realm key, spirit stones, a Tomb Sigil before the Heavenly Tomb, Ancient God Blood, Tomb Energy Essence and the title \"Master of the World Path\"). Each realm feeds the next: the Blood-and-Fire trial gives Foundation Herbs for Bumi forging and an alternative Foundation pill; the Heavenvoid Hall gives Soul Nurturing Wood for Langit forging, weapon spirits and the Supreme ring; the Land of the Ancient God gives Ancient God Blood for Abadi forging and +7 to +9 refining; the Heavenly Tomb gives Tomb Energy Essence for Dewa forging and +10 to +12. Each Essence you carry when condensing a star lowers its cost by 2%% (at most 10, they are used up). Foundation Trials gain an optional fourth row from the world features; any three rows make a Firm Foundation. New daily chores: slay rogue cultivators, finish a village request, forge or refine, clear a secret realm. Source: the ladder and every number are game design; each feature names its own source.",
   "kultivator.jalan8.test.hud_dunia": "Sample secret-realm and raid boss bars show for 10 seconds."
 }

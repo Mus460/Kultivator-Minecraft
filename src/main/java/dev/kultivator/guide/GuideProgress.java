@@ -65,7 +65,7 @@ public final class GuideProgress {
 	/** The longest action text: "tick " plus a step id. */
 	private static final int MAX_ACTION_LENGTH = 64;
 
-	/** The player's evaluated progress. */
+	/** The player's evaluated progress; {@code current} is a 0-based save index of {@link GuideChapters}. */
 	public record State(BitSet done, BitSet manual, int current) {
 
 		/** Steps done in chapter {@code index} (0-based). */
@@ -119,19 +119,28 @@ public final class GuideProgress {
 				done.set(step.index());
 			}
 		}
-		return new State(done, manual, currentChapter(done));
+		return new State(done, manual, currentChapter(done, player, data));
 	}
 
-	/** The 0-based chapter of the first unfinished step, {@link GuideChapters#CHAPTER_COUNT} when all are done. */
-	public static int currentChapter(BitSet done) {
-		for (GuideChapters.Chapter chapter : GuideChapters.chapters()) {
-			for (GuideChapters.Step step : chapter.steps()) {
-				if (!done.get(step.index())) {
-					return chapter.index();
-				}
+	/**
+	 * The player's current chapter (0-based save index, {@link GuideChapters#CHAPTER_COUNT} when all is done): the first
+	 * chapter in display order whose realm and extra check the player meets, whose {@code pastRealm} the player has not
+	 * reached yet, and which still has a core step left (see {@link GuideChapters#currentChapter}). Manual and optional
+	 * steps never hold it (integration audit T1).
+	 */
+	public static int currentChapter(BitSet done, ServerPlayer player, CultivationData data) {
+		return GuideChapters.currentChapter(done, new GuideChapters.Gate() {
+			@Override
+			public boolean open(GuideChapters.Chapter chapter) {
+				return (chapter.minRealm() == null || reached(data, chapter.minRealm(), 1, 1))
+						&& (chapter.requires() == null || check(player, data, chapter.requires()));
 			}
-		}
-		return GuideChapters.CHAPTER_COUNT;
+
+			@Override
+			public boolean past(GuideChapters.Chapter chapter) {
+				return chapter.pastRealm() != null && reached(data, chapter.pastRealm(), 1, 1);
+			}
+		});
 	}
 
 	/** Evaluates one check id (see {@link GuideChapters}); unknown ids and any failure count as not done. */
@@ -316,7 +325,9 @@ public final class GuideProgress {
 				.then(Commands.literal("info").executes(ctx -> {
 					ServerPlayer player = ctx.getSource().getPlayerOrException();
 					State state = evaluate(player);
-					int chapter = Math.min(GuideChapters.CHAPTER_COUNT, state.current() + 1);
+					// "Bab N" is the place in the display order, as the book shows it
+					int chapter = state.current() >= GuideChapters.CHAPTER_COUNT ? GuideChapters.CHAPTER_COUNT
+							: GuideChapters.chapter(state.current()).number();
 					ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.guide.cmd.info",
 							String.valueOf(state.done().cardinality()), String.valueOf(GuideChapters.count()),
 							String.valueOf(state.manual().cardinality()), String.valueOf(chapter))), false);

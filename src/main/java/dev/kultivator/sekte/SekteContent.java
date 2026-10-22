@@ -22,7 +22,7 @@ public final class SekteContent {
 
 	/** The lead's own config section {@code umum}. */
 	public static final class Umum {
-		/** Master switch of the whole phase: off makes every module skip its init (worlds keep their data). */
+		/** Master switch of the whole phase: off makes every module skip its runtime init (registries and data stay). */
 		public boolean aktif = true;
 		/** The ten module switches, by id ({@link SekteIds#MODULES}); a module reads its own with {@link #on}. */
 		public boolean kepribadian = true;
@@ -53,6 +53,20 @@ public final class SekteContent {
 			return u;
 		});
 		SekteCommands.init();
+		// K1: registry content (items, entity types, payload types, template components, the gate placement type) NEVER
+		// follows a switch: a world keeps its items and a client with another config still connects. Only the runtime
+		// logic below (listeners, ticks, commands, receivers) obeys umum.aktif and the module switches. Sekte Langit (37)
+		// follows the same rule for langit.aktif.
+		dev.kultivator.sekte.kepribadian.Kepribadian.registerContent();
+		dev.kultivator.sekte.hubungan.Hubungan.registerContent();
+		dev.kultivator.sekte.turnamen.Turnamen.registerContent();
+		dev.kultivator.sekte.tangga.Tangga.registerContent();
+		dev.kultivator.sekte.paviliun.Paviliun.registerContent();
+		dev.kultivator.sekte.tetua.Tetua.registerContent();
+		dev.kultivator.sekte.misi.Misi.registerContent();
+		dev.kultivator.sekte.seragam.Seragam.registerContent();
+		dev.kultivator.sekte.diplomasi.Diplomasi.registerContent();
+		dev.kultivator.sekte.kebun.Kebun.registerContent();
 		if (!umum.aktif) {
 			return;
 		}

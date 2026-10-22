@@ -126,6 +126,37 @@ public final class ProtectiveFormations {
 				.then(Commands.literal("clear").executes(ProtectiveFormations::clearCommand)));
 	}
 
+	/** Extra shelters (audit M4 S6): a running sect protective formation (registered by {@code formasi.integrate.ZoneBridge}). */
+	private static final List<java.util.function.BiPredicate<ServerLevel, Vec3>> PROTECTION = new ArrayList<>();
+
+	/**
+	 * Registers another protection source for {@link #insideProtection} (audit M4 S6). It is not counted by
+	 * {@link #insideActiveFormation}, so the legacy formation's tribulation factor and push rules stay exactly as they were.
+	 */
+	public static void addProtectionProvider(java.util.function.BiPredicate<ServerLevel, Vec3> provider) {
+		PROTECTION.add(provider);
+	}
+
+	/**
+	 * True inside an active legacy protective formation or inside any registered shelter (a powered sect protective
+	 * formation); used by the Cave Abode (audit M4 S6).
+	 */
+	public static boolean insideProtection(ServerLevel level, Vec3 pos) {
+		if (insideActiveFormation(level, pos)) {
+			return true;
+		}
+		for (java.util.function.BiPredicate<ServerLevel, Vec3> provider : PROTECTION) {
+			try {
+				if (provider.test(level, pos)) {
+					return true;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("Protection provider failed", exception);
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * True when {@code pos} lies inside a switched-on, powered (or guarded) formation of {@code level} (for other modules).
 	 * A Formasi Agung Sekte counts with its larger radius (DESIGN 20.3.2).

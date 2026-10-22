@@ -83,6 +83,10 @@ final class LangitHud implements HudElement {
 		}
 		Font font = minecraft.font;
 		channelRing(g, minecraft, level, player, width, height);
+		// the sky vignettes and the channel ring are the event itself; the chips follow the "HUD Kultivator" coin (audit M5, S30)
+		if (!EffectQuality.hudVisible()) {
+			return;
+		}
 		// chips at the top left
 		float y = 6.0F;
 		SkyKind kind = LangitState.kind();

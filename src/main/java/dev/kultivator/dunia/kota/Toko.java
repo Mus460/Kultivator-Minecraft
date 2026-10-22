@@ -4,6 +4,7 @@ import dev.kultivator.data.Cultivators;
 import dev.kultivator.harta.BeastCores;
 import dev.kultivator.harta.SpiritHerbs;
 import dev.kultivator.harta.SpiritStones;
+import dev.kultivator.tempa.StorageRingItem;
 import dev.kultivator.util.Msg;
 import dev.kultivator.voice.Voice;
 import net.minecraft.ChatFormatting;
@@ -100,13 +101,22 @@ final class Toko {
 		return mine;
 	}
 
-	/** True when the merchant buys this item (its own kind of goods). */
+	/**
+	 * True when the merchant buys this item (its own kind of goods). Never a pouch or ring that still holds items or is
+	 * bound (its contents would be lost, audit K2), and never a phase-9 ware of Alam Abadi (audit S24).
+	 */
 	static boolean buys(KultivatorNpc npc, ItemStack stack) {
-		if (stack.isEmpty() || SpiritStones.isStone(stack) || Harga.value(stack) <= 0L) {
+		return tradable(stack, pillShop(npc));
+	}
+
+	/** The goods of the pill pavilion ({@code pills}) or of the treasure pavilion, under the same rules as {@link #buys}. */
+	static boolean tradable(ItemStack stack, boolean pills) {
+		if (stack.isEmpty() || SpiritStones.isStone(stack) || Harga.value(stack) <= 0L || StorageRingItem.unsafeToSell(stack)
+				|| Harga.phase9(stack)) {
 			return false;
 		}
 		String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
-		if (pillShop(npc)) {
+		if (pills) {
 			return id.endsWith("_pill") || SpiritHerbs.isHerb(stack) || BeastCores.isCore(stack);
 		}
 		return "forged_artifact".equals(id) || id.endsWith("_talisman") || id.startsWith("storage_") || "jade_slip".equals(id);
@@ -175,8 +185,13 @@ final class Toko {
 	/** Sells the whole stack in the main hand (one stack counts once toward the daily 16). */
 	private static boolean sell(ServerPlayer player, KultivatorNpc npc) {
 		ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+		if (StorageRingItem.unsafeToSell(stack)) {
+			Msg.actionBar(player, Component.translatable("kultivator.ekonomi.cincin_berisi").withStyle(ChatFormatting.RED));
+			return true;
+		}
 		if (!buys(npc, stack)) {
-			Msg.actionBar(player, Component.translatable("kultivator.kota.toko.tidak_beli").withStyle(ChatFormatting.RED));
+			Msg.actionBar(player, Component.translatable(Harga.phase9(stack) ? "kultivator.ekonomi.toko.fase9" : "kultivator.kota.toko.tidak_beli")
+					.withStyle(ChatFormatting.RED));
 			return true;
 		}
 		long day = Kota.day(player.level().getServer());

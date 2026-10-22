@@ -28,6 +28,12 @@ public final class DiplomasiConfig {
 	public boolean utusanBerwujud = true;
 	/** Minutes (real time) an envoy body waits at the hall before it leaves (1-20). */
 	public int utusanMenitTunggu = 4;
+	/**
+	 * Hall level from which NPC sects may press the hall (1-9; T11): below it only greetings, gifts and challenges come
+	 * (at most one event a day) and only from sects already met or of tier at most hall level + 2. The old demon raids
+	 * also start at hall level 3 ({@code SectRaids.MIN_HALL_LEVEL}).
+	 */
+	public int mulaiAulaLevel = 3;
 
 	static DiplomasiConfig clamp(DiplomasiConfig c) {
 		c.jumlahSekte = Math.max(4, Math.min(12, c.jumlahSekte));
@@ -37,6 +43,7 @@ public final class DiplomasiConfig {
 		c.simulasiDetik = Math.max(10, Math.min(300, c.simulasiDetik));
 		c.penjagaSekutu = Math.max(0, Math.min(2, c.penjagaSekutu));
 		c.utusanMenitTunggu = Math.max(1, Math.min(20, c.utusanMenitTunggu));
+		c.mulaiAulaLevel = Math.max(1, Math.min(9, c.mulaiAulaLevel));
 		return c;
 	}
 }

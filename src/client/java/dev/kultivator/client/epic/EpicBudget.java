@@ -10,7 +10,9 @@ import java.util.Arrays;
  * <p>
  * Tiers: 0 Minimal, 1 Normal, 2 Maximal, −1 no geometry. The tier in effect is the Effect Quality level, lowered by the
  * frame guard for the rest of a scene and, after drops in three scenes in a row, for the session. A shader pack takes
- * × 0.6 quads and one large layer. Per-frame counters are reset by {@code EpicRenderer} at the start of every frame.
+ * × 0.6 quads and one large layer. Per-frame counters are reset once per rendered frame by the first {@link #beginFrame}
+ * or take call of that frame (audit M4 S10: one shared budget for 7b, the sky, the pavilions and the duel geometry, which
+ * also reads its tier here; before, each renderer's {@code beginFrame} reset the counters for itself).
  * <p>
  * Frame guard: one {@code System.nanoTime()} per frame (the only idle work of 7b) fills a 2-s ring; when a scene's first
  * beat arrives the baseline is the median. 20 frames in a row above 1.35 × baseline or below 30 fps, or 7b's own CPU time
@@ -54,6 +56,8 @@ public final class EpicBudget {
 	private static boolean sceneDropped;
 
 	// ---- per-frame counters (render thread == client thread)
+	/** The frame the counters belong to: {@code Minecraft.getFrameTimeNs()} changes once per rendered frame. */
+	private static long frameKey = Long.MIN_VALUE;
 	private static int quadsUsed;
 	private static int quadsLast;
 	private static int largeUsed;
@@ -126,8 +130,16 @@ public final class EpicBudget {
 
 	// ================================================================ per-frame counters
 
-	/** Starts a frame's counting (called by the renderer before any element draws). */
+	/**
+	 * Starts a frame's counting (called by a renderer before any element draws); a second call in the same frame keeps
+	 * the counts, so every renderer of the frame shares one budget (audit M4 S10).
+	 */
 	public static void beginFrame() {
+		long key = Minecraft.getInstance().getFrameTimeNs();
+		if (key == frameKey) {
+			return;
+		}
+		frameKey = key;
 		quadsLast = quadsUsed;
 		largeLast = largeUsed;
 		quadsUsed = 0;
@@ -139,6 +151,7 @@ public final class EpicBudget {
 
 	/** Takes {@code quads} from this frame's budget; false (nothing taken) when it would overflow. */
 	public static boolean takeQuads(int quads) {
+		beginFrame();
 		if (quadsUsed + quads > quadCap()) {
 			return false;
 		}
@@ -148,6 +161,7 @@ public final class EpicBudget {
 
 	/** Takes one large-layer slot for this frame. */
 	public static boolean takeLarge() {
+		beginFrame();
 		if (largeUsed >= largeCap()) {
 			return false;
 		}

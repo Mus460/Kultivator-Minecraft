@@ -55,7 +55,7 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
   Unsur, Langkah Penginjak Langit, …). Enam tingkat **Kuning → Misterius → Bumi → Langit → Abadi → Dewa**; kekuatan melonjak
   di setiap ranah sampai sekitar ×165 di Dewa Abadi, dengan area, durasi, dan efek yang ikut membesar (pedang raksasa,
   aksara, sinar, avatar, robekan langit, guncangan kamera; semuanya khusus klien). **Penguasaan Jurus** lima tingkat,
-  **Kitab Teknik** (saringan, pencarian, bilah bambu dengan angka langsung), **Cincin Segel** 12 soket, **Roda Segel**,
+  **Kitab Teknik** (saringan, pencarian, bilah bambu dengan angka langsung), **Rangkai Segel** 12 soket, **Roda Segel**,
   segel cepat, Gerbang Dewa, Slip Giok, Ujian Warisan, kolam buku pesona, prestasi, dan murid yang belajar serta bertarung
   dengan teknik baru. Batas bos, aturan arena lama, dan anggaran performa untuk laptop lemah.
 * **Pil** — barang vanilla sebagai pil dengan racun pil, dan **Alkimia** di tungku Kuali di atas Api Unggun dengan pil
@@ -111,8 +111,8 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
   Kenaikan** di setiap tingkat Kenaikan Abadi, **Perkokoh Fondasi**, dan **Bintang Abadi** tanpa batas untuk pemain.
   **Lima Unsur** dalam pertarungan, **Relik di Peti Kuno** dengan Indra Ilahi yang mencium harta, Kejenuhan Bertarung,
   dan kenyamanan HUD (pengukur pedang terbang, peringatan bahaya saat meditasi, cetak biru formasi).
-* **Perubahan keseimbangan** (audit alur Fana → Dewa Abadi): tribulasi lebih adil (lingkar petir mulai Jiwa Baru Lahir, terpental bukan lari, total petir Kenaikan Abadi/Dewa Abadi paling banyak 2,2× nyawa, maks. 10 pelindung hidup), urat roh separuh lebih awet di bawah Transformasi Dewa, Inti Raja dari Raja Siluman atau 9 Inti Tinggi, sesajen ritual Alam Abadi dikembalikan saat gagal ([panduan](docs/PANDUAN.md#73-tribulasi-langit)).
-* **Kitab Panduan** di dalam game: 16 bab, 153 langkah dari Manusia Fana sampai Dewa Abadi (bab 13-14: Dunia Kultivasi yang Luas; bab 15-16: Sekte yang Hidup), dengan centang otomatis; buka lewat bagian *Panduan* di menu utama (ketuk `V`), irisan Kitab Panduan di roda Akses Cepat (tahan `V`), atau `/kultivasi panduan` ([panduan](docs/PANDUAN.md#62-kitab-panduan-di-dalam-game)).
+* **Perubahan keseimbangan** (audit alur Fana → Dewa Abadi): tribulasi lebih adil (lingkar petir mulai Jiwa Baru Lahir, terpental bukan lari, total petir Kenaikan Abadi/Dewa Abadi paling banyak 2,2× nyawa, maks. 10 pelindung hidup), urat roh separuh lebih awet di bawah Transformasi Dewa, Inti Raja dari Raja Siluman atau 9 Inti Tinggi, sesajen ritual Alam Abadi dikembalikan saat gagal ([panduan](docs/PANDUAN.md#73-tribulasi-langit)). Audit integrasi menambah satu kurs batu roh dan Poin Kontribusi, harga Paviliun Yue Lu dan herba baru, batas tekanan musuh harian, meditasi Formasi Sekte di luar batas ×3,5, Kebangkitan paling rendah Normal, hadiah harian menurut ranah, tonggak XP Dunia (menara, reruntuhan, pengadilan, penjara, Darah Jiao), Hu Fa di Bencana Bintang, dan lainnya ([daftar lengkap](docs/PANDUAN.md#67-perubahan-keseimbangan-audit-integrasi)).
+* **Kitab Panduan** di dalam game: 16 bab, 153 langkah dari Manusia Fana sampai Dewa Abadi dalam urutan perjalanan (bab 3 dan 13: Dunia Kultivasi yang Luas; bab 7 dan 9: Sekte yang Hidup), dengan centang otomatis; langkah pilihan dan manual tidak menahan bab sekarang, dan pelacak HUD menunjuk langkah Kitab berikutnya bila tablet Jalan tidak punya langkah aktif; buka lewat bagian *Panduan* di Gulungan Kultivasi (ketuk `V`), irisan Kitab Panduan di roda Akses Cepat (tahan `V`), atau `/kultivasi panduan` ([panduan](docs/PANDUAN.md#62-kitab-panduan-di-dalam-game)).
 * **Duel Pedang Kultivator**: duel resmi melawan pemain, murid sendiri atau NPC kultivator (pengembara, saingan, penjaga kota), atau menonton dua murid berduel. Tebasan ke 8 arah dari gerak tetikus, tebas berat dan tusuk, tangkis dan **Tangkisan Sempurna**, bar **Postur** gaya Sekiro dengan Tebasan Penentu, **Kunci Bilah**, serangan berbahaya bertanda 危 (Injak Pedang, lompat), tipuan, rantai pertukaran, taruhan yang dititipkan, Kehormatan dan gelar. Percikan dan bara di titik kontak bilah, jejak bilah, hit-stop, gerak lambat tampilan saja, kamera bahu dan intro/penutup yang bisa dilewati; tidak ada yang mati dan tidak ada blok yang berubah; Better Combat dan Combat Roll didukung ([panduan](docs/PANDUAN.md#65-duel-pedang-kultivator)).
 * **Sekte yang Hidup**: murid berwatak (Rajin, Malas, Sombong, Setia, Licik...) dengan Kepuasan dan Kesetiaan yang bisa membangkang, memberontak lewat Duel Pedang, minggat atau berkhianat; persahabatan, persaingan, saudara angkat, cinta, Pasangan Dao dan dendam; turnamen di panggung lei tai dengan penonton dan Elo; Ujian Tangga Seribu di gerbang; Paviliun Kitab tempat murid belajar sendiri; Pemakaman dan Altar Leluhur dengan Qingming; Tetua berjabatan dengan Laporan Pagi dan Penyerahan Takhta kepada Ketua Generasi Kedua; Misi Cerita yang pulang lewat gerbang dengan Gulungan Laporan, calon murid dan harta; lambang, seragam dan bendera rancangan sendiri; sekte NPC dengan gerbang gunung worldgen, utusan, pakta, perang dan diplomasi; Kebun Obat dan Tambang Roh yang dikerjakan murid. Tanpa perubahan blok saat bermain ([panduan](docs/PANDUAN.md#66-sekte-yang-hidup)).
 * Semua teks dalam **Bahasa Indonesia** dan **English**. Kompatibel dengan Sodium, Iris, ImmediatelyFast, EMF/ETF,
@@ -130,7 +130,7 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
 | 5 | Murid: bot pengikut yang diajari teknik dan ikut berkultivasi, perintah uji | ✅ |
 | 6 | Sekte Abadi & murid OP: Aula Sekte, Hari Penerimaan Murid, bakat dan fisik, jenjang dan Poin Kontribusi, tugas, misi, turnamen, Alam Dewa Hampa, kekuatan murid, Bintang Abadi, pewaris, Mode Kehancuran opsional ([daftar uji](docs/uji/FASE-6.md)) | ✅ |
 | 6b | Pembangunan Sekte (9 templat x 9 tingkat): pilih templat, pratinjau hologram, konfirmasi sekali, lalu cukup setor bahan dan sekte membangun dirinya sendiri; Gudang Bahan Sekte, Misi Pembangunan, Ekspedisi Pengumpulan, Pekerja Bangunan, Naik Templat/Perbaiki/Bongkar/Pindah, penyumbang LAN, perintah uji `uji sekte` ([daftar uji](docs/uji/FASE-6b.md), [panduan](docs/PANDUAN.md#20b-pembangunan-sekte)). Belum diuji di game; tagihan belum diseimbangkan | ✅ |
-| 6c | Teknik Dewa: 169 teknik (146 baru + 23 lama diperkuat) bersumber cerita kultivasi, makin OP sesuai ranah, Penguasaan Jurus, Kitab Teknik, Cincin dan Roda Segel, Slip Giok, Ujian Warisan, Gerbang Dewa, teknik untuk murid, Mode Kehancuran jurus sendiri lewat saklar gampang, perintah uji `uji teknik` dan `uji boneka` ([daftar uji](docs/uji/FASE-6c.md), [panduan](docs/PANDUAN.md#12-teknik-dewa-169-teknik)). Belum diuji di game; beberapa hal kecil belum ada (pencarian teks di tab Teknik murid, token partikel di `debug teknik beban`) | ✅ |
+| 6c | Teknik Dewa: 169 teknik (146 baru + 23 lama diperkuat) bersumber cerita kultivasi, makin OP sesuai ranah, Penguasaan Jurus, Kitab Teknik, Rangkai Segel dan Roda Segel, Slip Giok, Ujian Warisan, Gerbang Dewa, teknik untuk murid, Mode Kehancuran jurus sendiri lewat saklar gampang, perintah uji `uji teknik` dan `uji boneka` ([daftar uji](docs/uji/FASE-6c.md), [panduan](docs/PANDUAN.md#12-teknik-dewa-169-teknik)). Belum diuji di game; beberapa hal kecil belum ada (pencarian teks di tab Teknik murid, token partikel di `debug teknik beban`) | ✅ |
 | 7 | Dunia yang Hidup: Binatang Iblis (elit), Batu Roh, Inti Binatang, herba roh berumur, Urat Roh dan Kultivasi Tertutup, Gua Kediaman, jimat, Alkimia Lanjutan dan Kitab Alkimia, lingkar petir, Menantang Langit, Hu Fa Tribulasi, tablet Jalan (Langkah Pertama, Ujian Fondasi, Kewajiban Harian), Persiapan dan HUD tribulasi, Anugerah Kenaikan, Perkokoh Fondasi, Bintang Abadi pemain, Lima Unsur, Relik di Peti Kuno, keseimbangan, kenyamanan HUD, perintah uji `uji elit|batu|herba|inti|pil|relik|tribulasi|jimat|jalan|hud|...` ([daftar uji](docs/uji/FASE-7.md), [panduan](docs/PANDUAN.md#33-dunia-yang-hidup-fase-7)). Belum diuji di game; ditunda ke 7b: efek pil baru untuk murid, lingkar petir tujuh warna, bencana bintang pemain, tooltip Sumber anugerah di tab Status | ✅ |
 | 7b | Momen Epik: tribulasi dan semua momen besar menjadi adegan sinematik langsung di game: shot kamera pendek yang aman dan bisa dilewati (Backspace), bilah layar lebar, kartu judul kaligrafi, langit berubah, pusaran awan dan petir raksasa, pilar cahaya, gerbang, efek layar, gerak lambat tampilan saja, suara berlapis dan musik; Mode Rekam; pengaturan `Kamera sinematik: Penuh / Singkat / Mati`, `/sinematik`, perintah uji `uji momen <id>|tribulasi_penuh|semua|berhenti` ([daftar uji](docs/uji/FASE-7b.md), [panduan](docs/PANDUAN.md#54-momen-epik-fase-7b)). Belum diuji di game; belum dicoba dengan paket shader | ✅ |
 | 7c | Formasi Sekte: 24 formasi bersumber cerita dalam 13 aliran dan 5 tingkat, berpusat pada balok Mata Formasi dan pola yang kamu bangun sendiri (hologram cetak biru), Daya dari kecubung dan Batu Roh, Kas Daya, murid sebagai penjaga formasi, batas tumpuk, tablet Formasi di aula dengan peta simpul perpindahan, formasi pembunuh yang hanya melukai monster bermusuhan, perintah `formasi ...` dan uji `uji formasi pasang|semua|musuh|...` ([daftar uji](docs/uji/FASE-7c.md), [panduan](docs/PANDUAN.md#20c-formasi-sekte)). Belum diuji di game; Panji Induk Formasi ditunda | ✅ |
@@ -187,7 +187,7 @@ Mode Kehancuran cukup satu perintah: `/kultivasi kehancuran semua nyala` (matika
 
 ## Tombol bawaan
 
-Semua di dekat WASD: `G` rapal (tahan = Roda Segel) · `V` Akses Cepat (ketuk = menu utama dengan 8 bagian, tahan = roda) · `Z` teknik berikutnya · `B` meditasi · `H` pedang terbang · `M` murid · `Backspace` lewati sinematik; klik kanan dengan senjata = tangkis (duel); sisanya lewat `V` dan menu utama, ganti di Pengaturan › Kontrol ([panduan](docs/PANDUAN.md#2-tombol-dan-cara-menggantinya)).
+Semua di dekat WASD: `G` rapal (tahan = Roda Segel) · `V` Akses Cepat (ketuk = Gulungan Kultivasi dengan 8 bagian, tahan = roda) · `Z` teknik berikutnya · `B` meditasi · `H` pedang terbang · `M` murid · `Backspace` lewati sinematik; klik kanan dengan senjata = tangkis (duel); sisanya lewat `V` dan Gulungan Kultivasi, ganti di Pengaturan › Kontrol ([panduan](docs/PANDUAN.md#2-tombol-dan-cara-menggantinya)).
 
 ## Konfigurasi
 
@@ -201,8 +201,16 @@ batas per tick, jeda MSPT, jangkauan, tabungan, templat terbesar, pengembalian b
 `eliteChanceScale`, `structureLoot`, `spiritStoneMining`, `herbHarvest`, `guideRewards`, `dailyTasks`,
 `tribulationTelegraph`. `config/kultivator-client.json` (klien):
 `effect_quality`, `quality_auto`, `hud`, `shake`, `flash`, `phantoms`, `others_fx`, `wheel_hold`, `release_cast`,
-`reduce_motion`, `cooldown_ping`, `danger_alert`, dan saringan Kitab Teknik. Penjelasan di
-[panduan](docs/PANDUAN.md#52-berkas-konfigurasi).
+`reduce_motion`, `cooldown_ping`, `danger_alert`, `aura_*`, `epic_*` (Momen Epik), `voice_mode`, `voice_text`, `duel_*`,
+dan saringan Kitab Teknik. Penjelasan di [panduan](docs/PANDUAN.md#52-berkas-konfigurasi).
+
+| Berkas | Di mana | Isi |
+|---|---|---|
+| `config/kultivator.json` | server | kultivasi, tribulasi, sekte, Pembangunan Sekte, Mode Kehancuran, teknik, Fase 7-10 ([panduan](docs/PANDUAN.md#52-berkas-konfigurasi)) |
+| `config/kultivator-dunia.json` | server | Dunia Kultivasi yang Luas ([panduan](docs/PANDUAN.md#6418-berkas-konfigurasi-configkultivator-duniajson)) |
+| `config/kultivator-sekte.json` | server | Sekte yang Hidup, satu bagian per fitur dengan saklar `aktif` ([panduan](docs/PANDUAN.md#66-sekte-yang-hidup)) |
+| `config/kultivator-duel.json` | server | Duel Pedang: duel resmi, tangkis monster, postur, taruhan, Kehormatan ([panduan](docs/PANDUAN.md#configkultivator-dueljson-server)) |
+| `config/kultivator-client.json` | komputermu | efek, HUD, kamera, aura, suara, duel ([panduan](docs/PANDUAN.md#configkultivator-clientjson-komputermu)) |
 
 ## Build
 
@@ -236,7 +244,7 @@ adapts a named concept from real cultivation stories, and the game and the guide
 taken from a real cultivation novel, donghua or manhua with a Source line in game. Six grades from Yellow to Divine;
 power climbs at every rank to about 165× at True Immortal, with areas, durations and client-only visuals (giant swords,
 glyphs, beams, avatars, sky tears, camera shake) growing along. Five mastery levels, a Technique Codex with filters,
-search and live numbers, a 12-socket Seal Ring with a seal wheel and quick seals, jade slips, inheritance trials, book
+search and live numbers, a 12-socket Seal Set with a seal wheel and quick seals, jade slips, inheritance trials, book
 pools, feats, the Divine Gate, and disciples who learn and fight with the new arts. Boss caps, the old linear power in
 arenas, and strict performance budgets for weak laptops.
 
@@ -282,7 +290,12 @@ shoulder camera and skippable intro and finisher films. The server decides every
 changes. Works with Better Combat and Combat Roll.
 
 The full player guide is in Indonesian: [docs/PANDUAN.md](docs/PANDUAN.md); every rule and number is in
-[docs/DESIGN.md](docs/DESIGN.md); per-phase test lists in [docs/uji/](docs/uji/).
+[docs/DESIGN.md](docs/DESIGN.md); per-phase test lists in [docs/uji/](docs/uji/). Configuration lives in five files:
+`config/kultivator.json`, `kultivator-dunia.json`, `kultivator-sekte.json` and `kultivator-duel.json` (server) and
+`kultivator-client.json` (your computer). The in-game Kitab Panduan has 16 chapters and 153 steps shown in journey
+order; side goals and manual ticks never hold the current chapter, and the HUD tracker falls back to the Kitab's next
+step instead of disappearing. Balance changes from the integration audit are listed in
+[PANDUAN 67](docs/PANDUAN.md#67-perubahan-keseimbangan-audit-integrasi).
 
 Voices / Suara: the Japanese voice lines (the voice of Heaven, the heart demon, ancient beasts, the old hermit, rogue
 cultivators and six disciple voices) are made with VOICEVOX: VOICEVOX:青山龍星, VOICEVOX:剣崎雌雄, VOICEVOX:麒ヶ島宗麟,

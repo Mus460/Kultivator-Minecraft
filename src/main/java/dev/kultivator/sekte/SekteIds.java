@@ -92,6 +92,24 @@ public final class SekteIds {
 	public static final int ACT_LAST_HOLDING = ACT_MUSTER;
 	public static final int ACT_LAST = ACT_RESERVED;
 
+	/**
+	 * True when the module that releases activity {@code act} (13-24) runs (S15: a disciple saved in a held activity of a
+	 * module now switched off loads free instead of holding its spot forever). Ids outside 13-24 are always true.
+	 */
+	public static boolean activityRuns(int act) {
+		return switch (act) {
+			case ACT_STUDY, ACT_MOURN -> SekteContent.on(A);
+			case ACT_MINE, ACT_TEND -> SekteContent.on(W);
+			case ACT_OFFICE -> SekteContent.on(E);
+			case ACT_SOCIAL -> SekteContent.on(R);
+			case ACT_SULK, ACT_LEAVING -> SekteContent.on(P);
+			case ACT_MUSTER -> SekteContent.on(X) || SekteContent.on(T);
+			case ACT_CLIMB -> SekteContent.on(G);
+			case ACT_BOW -> SekteContent.on(E) || SekteContent.on(A) || SekteContent.on(T);
+			default -> true;
+		};
+	}
+
 	// ================================================================== sect build extensions (TemplateExtensions)
 
 	/** Every component an extension adds has an id {@code sx_<module>_<what>} (stable, never renamed). */

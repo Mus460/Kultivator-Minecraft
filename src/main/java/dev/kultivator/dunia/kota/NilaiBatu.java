@@ -12,13 +12,16 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 /**
- * Nilai Batu (NB, DESIGN 34.1): the price unit of the towns. A Low spirit stone is 1 NB, Mid 9, High 80, Supreme 600.
- * The player always pays and is paid in real spirit stones; change comes back in lower grades (largest first), so no
- * trade creates stones from nothing. Batu Asal Abadi (the Immortal City's currency) is counted separately.
+ * Nilai Batu (NB, DESIGN 34.1): the price unit of the towns. A Low spirit stone is 1 NB, Mid 9, High 81, Supreme 729:
+ * the same 9:1 as the exchange recipes, so no grade is worth more broken than whole (balance change of audit S23, approved
+ * "Ubah angkanya"; it was 80/600, and every payment of 600+ NB came as a Supreme stone worth 720 when broken). This is the
+ * one NB table of the mod: {@code DimensiData} and {@code RRewards} use it too (audit R17). The player always pays and is
+ * paid in real spirit stones; change comes back in lower grades (largest first), so no trade creates stones from nothing.
+ * Batu Asal Abadi (the Immortal City's currency) is counted separately.
  */
 public final class NilaiBatu {
 
-	public static final long[] VALUE = {1L, 9L, 80L, 600L};
+	public static final long[] VALUE = {1L, 9L, 81L, 729L};
 
 	/** Every NB the player carries (main inventory and off hand). */
 	public static long total(ServerPlayer player) {

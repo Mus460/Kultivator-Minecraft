@@ -1,9 +1,10 @@
 {
   "placement": {
-    "type": "minecraft:random_spread",
+    "type": "kultivator:jauh_dari_pusat",
     "salt": 340562,
     "separation": 48,
-    "spacing": 120
+    "spacing": 120,
+    "min_chunks": 12
   },
   "structures": [
     {

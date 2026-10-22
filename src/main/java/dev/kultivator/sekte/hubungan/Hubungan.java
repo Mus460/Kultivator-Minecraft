@@ -21,6 +21,7 @@ import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.sekte.api.Sifat;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
+import dev.kultivator.sekte.SekteSuara;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -86,13 +87,18 @@ public final class Hubungan {
 	/** Bodies already checked this load (name noted, parked pairs restored). */
 	private static final Map<DiscipleEntity, Boolean> SEEN = new WeakHashMap<>();
 
+	/** Payload types (K1): always, from {@code SekteContent.init}, whatever the switches say. */
+	public static void registerContent() {
+		HubunganPayloads.init();
+	}
+
 	public static void init() {
+		registerContent();
 		if (initialised || !SekteContent.on(SekteIds.R)) {
 			return;
 		}
 		initialised = true;
 		HubunganConfig.load();
-		HubunganPayloads.init();
 		HubunganPayloads.initServer();
 		SekteApi.setHubungan(new Service());
 		ServerLifecycleEvents.SERVER_STARTED.register(s -> server = s);
@@ -379,6 +385,11 @@ public final class Hubungan {
 			}
 		}
 		HubunganPayloads.bubble(ea, eb, icon, 100);
+		if (now == Ikatan.DENDAM && was != Ikatan.DENDAM) {
+			SekteSuara.line(ea != null ? ea : eb, "grudge", "careful", 1200);
+		} else if (now == Ikatan.KEKASIH && was != Ikatan.KEKASIH) {
+			SekteSuara.line(ea != null ? ea : eb, "beloved", "thanks", 1200);
+		}
 		String memory = line.replace('.', '_');
 		if (server != null) {
 			if (ea != null) {

@@ -33,6 +33,12 @@ public final class KotaClient {
 		// the one hub card of module K (DESIGN 34.6 T): Kota Abadi in Keabadian, behind the ascent lock; it opens the help topic
 		dev.kultivator.client.hub.HubCards.register(dev.kultivator.client.hub.HubNav.KEABADIAN, "kota_abadi",
 				dev.kultivator.client.screen.ui.Glyphs.HALL, KotaClient::ascentLock, () -> dev.kultivator.client.hub.HubNav.help("kota_abadi"));
+		// audit M5, S21: the rival groups that hunt the player (grudge, region, fallen leader), in Dunia; the list comes from M2
+		dev.kultivator.client.hub.HubCards.register(dev.kultivator.client.hub.HubNav.DUNIA, "saingan",
+				dev.kultivator.client.screen.ui.Glyphs.STATUS, null, () -> {
+					dev.kultivator.client.hub.HubNav.openChild(new SainganScreen(), dev.kultivator.client.hub.HubNav.DUNIA);
+					SainganScreen.request();
+				});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			data = new CompoundTag();
 			npcId = -1;
@@ -43,6 +49,11 @@ public final class KotaClient {
 	}
 
 	private static void onScreen(KotaNet.Screen payload) {
+		if (payload.screen() == SainganScreen.SCREEN) {
+			// the rival list of the Dunia card (no NPC): its own screen, not a town tablet
+			SainganScreen.onData(payload.open(), payload.data() == null ? new CompoundTag() : payload.data());
+			return;
+		}
 		Minecraft minecraft = Minecraft.getInstance();
 		Screen current = minecraft.gui.screen();
 		boolean mine = current instanceof KotaScreens.Holder holder && holder.npcId() == payload.npcId();

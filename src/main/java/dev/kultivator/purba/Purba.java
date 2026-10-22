@@ -5,20 +5,13 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.kultivator.Kultivator;
 import dev.kultivator.KultivatorConfig;
 import dev.kultivator.abadi.Abadi;
-import dev.kultivator.alam.Alam;
-import dev.kultivator.ascension.Ascension;
-import dev.kultivator.batin.Batin;
-import dev.kultivator.cultivation.Breakthrough;
-import dev.kultivator.cultivation.Tribulation;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
-import dev.kultivator.disciple.DuelRules;
-import dev.kultivator.musuh.SectRaids;
 import dev.kultivator.network.Payloads;
-import dev.kultivator.sect.Sparring;
 import dev.kultivator.sect.event.SectEventItems;
 import dev.kultivator.technique.spec.TechniquePower;
 import dev.kultivator.util.Msg;
+import dev.kultivator.util.Sibuk;
 import dev.kultivator.util.NoGrief;
 import dev.kultivator.util.Targeting;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -255,11 +248,12 @@ public final class Purba {
 		return 8 + TechniquePower.playerStars(Cultivators.get(player)) / 9;
 	}
 
-	/** True while anything else holds the player (the 25.3.4 refusals plus Phase 9's own). */
+	/**
+	 * True while anything holds the player: the shared {@link Sibuk} door (the 25.3.4 refusals, Phase 9's own fights,
+	 * calamities and wrath, heart demons, Sword Duels, inheritance trials, rituals, the soul journey, the tower...).
+	 */
 	static boolean busy(ServerPlayer player) {
-		return Breakthrough.isBusy(player) || Tribulation.isActive(player) || Ascension.isActive(player) || Alam.inRun(player)
-				|| SectRaids.active(player.getUUID()) || DuelRules.inDuel(player) || Sparring.inDuel(player) || inFight(player)
-				|| inCalamity(player) || inWrath(player) || Abadi.inAscension(player) || Batin.inDefence(player);
+		return Sibuk.why(player) != null;
 	}
 
 	/** {@code n} Batu Asal Abadi (P9-langit's item, by registry id; empty while it is not registered). */

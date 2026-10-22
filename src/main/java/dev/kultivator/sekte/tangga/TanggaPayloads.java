@@ -3,7 +3,9 @@ package dev.kultivator.sekte.tangga;
 import dev.kultivator.Kultivator;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
@@ -12,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Module G's one payload (DESIGN 36.2.4), registered from {@link Tangga#init()} with {@code PayloadTypeRegistry} (never
+ * Module G's payloads (DESIGN 36.2.4; R23 added {@link Minta} and {@link Catatan}), registered from {@link Tangga#init()} with {@code PayloadTypeRegistry} (never
  * {@code network/Payloads}): the state of one illusory stair, server to the clients near it. The client draws the
  * ribbon from {@link JalurTangga} and the frame here, and the step numbers over the climbers from {@link Climber}.
  * Sent when a phase starts and every 10 ticks while the climbers move; {@link #PHASE_OFF} removes the stair.
@@ -116,6 +118,34 @@ public final class TanggaPayloads {
 		}
 	}
 
+	/** R23: the hub card "Catatan Tangga" asks for the records (client to server, no fields). */
+	public record Minta() implements CustomPacketPayload {
+		public static final Type<Minta> TYPE = new Type<>(Kultivator.id("sekte_tangga_minta"));
+		public static final StreamCodec<RegistryFriendlyByteBuf, Minta> CODEC = StreamCodec.unit(new Minta());
+
+		@Override
+		public Type<Minta> type() {
+			return TYPE;
+		}
+	}
+
+	/**
+	 * R23: the records for the "Catatan Tangga" scroll (server to client): {@code stair} (boolean), {@code pk}, {@code hari}
+	 * (the Ujian Hati price and wait) and {@code rows}, each {@code name}, {@code steps} (-1 never climbed), {@code best},
+	 * {@code heart} 0-3 and {@code peak}.
+	 */
+	public record Catatan(CompoundTag data) implements CustomPacketPayload {
+		public static final Type<Catatan> TYPE = new Type<>(Kultivator.id("sekte_tangga_catatan"));
+		public static final StreamCodec<RegistryFriendlyByteBuf, Catatan> CODEC = StreamCodec.of(
+				(buf, p) -> ByteBufCodecs.COMPOUND_TAG.encode(buf, p.data),
+				buf -> new Catatan(ByteBufCodecs.COMPOUND_TAG.decode(buf)));
+
+		@Override
+		public Type<Catatan> type() {
+			return TYPE;
+		}
+	}
+
 	private static boolean registered;
 
 	static void register() {
@@ -124,6 +154,8 @@ public final class TanggaPayloads {
 		}
 		registered = true;
 		PayloadTypeRegistry.clientboundPlay().register(State.TYPE, State.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(Catatan.TYPE, Catatan.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(Minta.TYPE, Minta.CODEC);
 	}
 
 	private TanggaPayloads() {

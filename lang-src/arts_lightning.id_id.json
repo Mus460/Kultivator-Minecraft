@@ -54,8 +54,8 @@
   "kultivator.technique.lei_zhenzi_wings.unavailable": "Sayap tidak bisa terbang di sini sekarang.",
   "kultivator.technique.lei_zhenzi_wings.no_qi": "Qi habis: Sayap Lei Zhenzi memudar.",
 
-  "kultivator.technique.tribulation_thunder_sword": "Pedang Petir Kesengsaraan Surgawi",
-  "kultivator.technique.tribulation_thunder_sword.desc": "Isi 2 dtk: pedang petir 60 blok jatuh dari langit dan menyapu sepanjang bidikan (48→64 blok), 6× kekuatan, +1% per sambaran kesengsaraan yang pernah kau tahan (maks +100%); 5 pilar petir menghantam musuh di sekitar bidikan, 2× kekuatan.",
+  "kultivator.technique.tribulation_thunder_sword": "Pedang Petir Tribulasi Surgawi",
+  "kultivator.technique.tribulation_thunder_sword.desc": "Isi 2 dtk: pedang petir 60 blok jatuh dari langit dan menyapu sepanjang bidikan (48→64 blok), 6× kekuatan, +1% per sambaran tribulasi yang pernah kau tahan (maks +100%); 5 pilar petir menghantam musuh di sekitar bidikan, 2× kekuatan.",
   "kultivator.technique.tribulation_thunder_sword.source": "Sumber: Against the Gods · 天劫雷剑 Pedang Petir Kesengsaraan Surgawi, bagian dari Kekuatan Ilahi Dao Langit (天道神力) milik Yun Che",
   "kultivator.technique.tribulation_thunder_sword.lore": "Setiap sambaran yang dulu hampir membunuhmu kini menjadi bilahmu.",
 
@@ -64,10 +64,10 @@
   "kultivator.technique.thunderbolt_ancestral_symbol.source": "Sumber: Martial Universe bab 969/982/1033 · Simbol Leluhur Halilintar, salah satu dari delapan Simbol Leluhur (gambaran matahari petir hanya hiasan visual)",
   "kultivator.technique.thunderbolt_ancestral_symbol.lore": "Bola ungu di atas kepalamu tak pernah diam, dan tak pernah meleset.",
 
-  "kultivator.technique.tribulation_thunder_emperor_array": "Formasi Kaisar Petir Kesengsaraan",
-  "kultivator.technique.tribulation_thunder_emperor_array.desc": "Formasi raksasa di titik bidik (radius 24→32, 10 dtk): sembilan sambaran kesengsaraan menghantam hingga 32 musuh, masing-masing 2× kekuatan + 8% darah maksimum (bos 3%); sambaran ke-9 dua kali lipat. Qi 55% (min 700).",
+  "kultivator.technique.tribulation_thunder_emperor_array": "Formasi Kaisar Petir Tribulasi",
+  "kultivator.technique.tribulation_thunder_emperor_array.desc": "Formasi raksasa di titik bidik (radius 24→32, 10 dtk): sembilan sambaran tribulasi menghantam hingga 32 musuh, masing-masing 2× kekuatan + 8% darah maksimum (bos 3%); sambaran ke-9 dua kali lipat. Qi 55% (min 700).",
   "kultivator.technique.tribulation_thunder_emperor_array.source": "Sumber: Against the Gods · 天劫雷帝阵 Formasi Kaisar Petir Kesengsaraan, bagian dari Kekuatan Ilahi Dao Langit (sambaran berupa persentase darah maksimum adalah desain permainan)",
-  "kultivator.technique.tribulation_thunder_emperor_array.lore": "Dulu kau menahan kesengsaraan langit. Kini kaulah yang menjatuhkannya.",
+  "kultivator.technique.tribulation_thunder_emperor_array.lore": "Dulu kau menahan tribulasi langit. Kini kaulah yang menjatuhkannya.",
 
   "kultivator.technique.nine_heavens_thunder_venerable": "Tianzun Guntur Sembilan Langit",
   "kultivator.technique.nine_heavens_thunder_venerable.desc": "Wujud 20 dtk (×1,5 bila ada ruang) dengan 12 dewa guntur di awan (menyerang tiap 0,5 dtk, jangkauan 24→40, 2× kekuatan); tiap 4 dtk ledakan radius 40, 4× kekuatan + setrum 2 dtk; di akhir hingga 64 musuh dalam radius 40 terkena 8× kekuatan. Qi 75%.",

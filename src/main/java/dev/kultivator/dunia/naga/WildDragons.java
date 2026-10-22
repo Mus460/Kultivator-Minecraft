@@ -14,6 +14,7 @@ import dev.kultivator.dunia.api.SpiritWeather;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
+import dev.kultivator.util.Sibuk;
 import dev.kultivator.voice.Voice;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -145,6 +146,11 @@ final class WildDragons {
 			return;
 		}
 		if (!level.canSeeSky(player.blockPosition().above())) {
+			return;
+		}
+		if (Sibuk.why(player) != null) {
+			// Held by a duel, a tribulation, a ritual...: the roll is asked again in 10 s, never dropped.
+			EARLY.put(player.getUUID(), level.getGameTime() + Sibuk.RETRY_TICKS);
 			return;
 		}
 		DuniaBudget.setCap(DuniaBudget.DRAGON, config.worldCap);

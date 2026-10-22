@@ -22,6 +22,7 @@ import dev.kultivator.sekte.api.Sifat;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.voice.VoiceDisciples;
+import dev.kultivator.sekte.SekteSuara;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -154,7 +155,7 @@ final class BelajarMandiri {
 		entity.setActivity(SekteIds.ACT_STUDY, seat);
 		WALKING.put(entity.soulId(), 0);
 		if (entity.level().getRandom().nextInt(3) == 0) {
-			VoiceDisciples.line(entity, "cultivate", 600);
+			SekteSuara.line(entity, "study", "cultivate", 600);
 		}
 	}
 

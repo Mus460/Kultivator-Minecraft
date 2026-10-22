@@ -170,6 +170,17 @@ public final class Expeditions {
 
 	// ================================================================== departure
 
+	/** The reason of {@link #refuses}: a defiant disciple refuses the duty (S13). */
+	public static final String REFUSES = "kultivator.sekte_sambung.membangkang";
+
+	/**
+	 * S13: a defiant disciple (Membangkang, module P) refuses the old event systems too, as the new ones already do
+	 * (expeditions, the talent scout, the Forbidden Ground, the Void Realm, the Ark, the tournament's entrants).
+	 */
+	public static boolean refuses(DiscipleEntity disciple) {
+		return disciple != null && dev.kultivator.sekte.api.SekteApi.hati().defiant(disciple.data());
+	}
+
 	/** Why {@code members} cannot take offer {@code type} / {@code tier}, or null when they can. */
 	static @Nullable String blocker(int type, int tier, List<DiscipleEntity> members) {
 		if (members.isEmpty() || members.size() > MAX_PARTY) {
@@ -178,6 +189,9 @@ public final class Expeditions {
 		boolean leader = false;
 		int highest = 0;
 		for (DiscipleEntity member : members) {
+			if (refuses(member)) {
+				return REFUSES;
+			}
 			int rank = SectRanks.rank(member.data());
 			highest = Math.max(highest, rank);
 			if (rank < 1) {

@@ -621,6 +621,11 @@ public final class Breakthrough {
 			quality = forced;
 		} else if (kind == Kind.TRIBULATION) {
 			quality = BreakthroughQuality.fromScore(roll * 0.5D + lowestHealth * 0.3D + data.rootGrade().ordinal() * 0.05D + bonus);
+		} else if (kind == Kind.AWAKENING) {
+			// Balance change (audit M4 S3, approved): the awakening is promised to always succeed, so it is at least Normal
+			// (it was Cracked half of the time); a site still lifts it to Perfect.
+			BreakthroughQuality rolledQuality = BreakthroughQuality.fromScore(roll * 0.7D + bonus);
+			quality = rolledQuality.ordinal() < BreakthroughQuality.NORMAL.ordinal() ? BreakthroughQuality.NORMAL : rolledQuality;
 		} else {
 			quality = BreakthroughQuality.fromScore(roll * 0.7D + bonus);
 		}

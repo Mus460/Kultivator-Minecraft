@@ -74,6 +74,10 @@ public final class KotaItems {
 		public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder,
 									TooltipFlag flag) {
 			builder.accept(Component.translatable(getDescriptionId() + ".tooltip").withColor(HartaText.USE_COLOR));
+			if (this == LENCANA_PENGEMBARA) {
+				// KedaiTeh: carrying the token gives one free rumour per day
+				builder.accept(Component.translatable(getDescriptionId() + ".tooltip_rumour").withColor(HartaText.USE_COLOR));
+			}
 			HartaText.sources(getDescriptionId(), builder);
 		}
 	}

@@ -69,6 +69,9 @@ public final class Kota {
 		NpcLife.init();
 		KotaCommands.init();
 		ServerLifecycleEvents.SERVER_STARTED.register(started -> server = started);
+		// Audit T14: close every running auction while the players are still online and before the world is saved, so
+		// every consigned piece is paid (offline owners get it as "owed"); the saved entries cover a crash as well.
+		ServerLifecycleEvents.SERVER_STOPPING.register(BalaiLelang::forceClose);
 		ServerLifecycleEvents.SERVER_STOPPED.register(stopped -> {
 			server = null;
 			KotaAnchors.HANDLER.clear();

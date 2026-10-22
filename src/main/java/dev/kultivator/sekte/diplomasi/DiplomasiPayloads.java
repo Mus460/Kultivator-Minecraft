@@ -88,6 +88,10 @@ public final class DiplomasiPayloads {
 	static void register() {
 		PayloadTypeRegistry.serverboundPlay().register(Request.TYPE, Request.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Sheet.TYPE, Sheet.CODEC);
+		// The types always (K1, both sides); the receiver only while the module runs.
+		if (!dev.kultivator.sekte.SekteContent.on(dev.kultivator.sekte.SekteIds.D)) {
+			return;
+		}
 		ServerPlayNetworking.registerGlobalReceiver(Request.TYPE, (payload, context) -> handle(context.player(), payload));
 	}
 

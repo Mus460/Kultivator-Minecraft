@@ -1500,9 +1500,18 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		BlockPos savedSpot = input.read("ActivitySpot", BlockPos.CODEC).orElse(null);
 		if ((savedActivity >= ACTIVITY_WATER && savedActivity <= ACTIVITY_FORMATION_GUARD || savedActivity == ACTIVITY_FORMATION_KEEPER
 				|| savedActivity == ACTIVITY_FORGE_ASSIST || sekteHolding(savedActivity)) && savedSpot != null) {
-			this.activity = savedActivity;
-			this.activitySpot = savedSpot;
-			this.entityData.set(DATA_ACTIVITY, (byte) savedActivity);
+			if (sekteHolding(savedActivity) && !dev.kultivator.sekte.SekteIds.activityRuns(savedActivity)) {
+				// S15: the module that owns this activity is switched off, so nothing would ever release it. The disciple
+				// loads free (no activity); a sulker gets back the mode it had before it sulked.
+				if (savedActivity == dev.kultivator.sekte.SekteIds.ACT_SULK && this.mode == Mode.STAY) {
+					Mode before = dev.kultivator.sekte.kepribadian.Kepribadian.modeBeforeSulk(this.data);
+					this.mode = before == null ? Mode.FOLLOW : before;
+				}
+			} else {
+				this.activity = savedActivity;
+				this.activitySpot = savedSpot;
+				this.entityData.set(DATA_ACTIVITY, (byte) savedActivity);
+			}
 		}
 		this.hookModifiers.clear();
 		input.read("HookMods", com.mojang.serialization.Codec.STRING.listOf()).ifPresent(this.hookModifiers::addAll);

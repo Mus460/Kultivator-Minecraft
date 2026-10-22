@@ -1,7 +1,12 @@
 package dev.kultivator.dunia.api;
 
 import dev.kultivator.Kultivator;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The cross-module services of DESIGN 34.4.3: one implementation per service, set by its owner from its init, a no-op
@@ -17,6 +22,35 @@ public final class DuniaApi {
 	private static BeastEvolutionService beasts = BeastEvolutionService.NONE;
 	private static RouteService routes = RouteService.NONE;
 	private static SoulService souls = SoulService.NONE;
+	private static final List<SafeGround> SAFE_GROUND = new CopyOnWriteArrayList<>();
+
+	/**
+	 * A place where no enemy may start an attack or be spawned (integration audit T4): towns and Kota Abadi (module K), and
+	 * later the sky sect islands (37). Callers: Penyergapan, rival bands, Alam Abadi natives.
+	 */
+	@FunctionalInterface
+	public interface SafeGround {
+		boolean safe(ServerLevel level, BlockPos pos);
+	}
+
+	/** Adds a safe-ground test (a town module, a sect island module). */
+	public static void addSafeGround(SafeGround test) {
+		SAFE_GROUND.add(test);
+	}
+
+	/** True when {@code pos} in {@code level} is safe ground (false while no module answers). */
+	public static boolean safeGround(ServerLevel level, BlockPos pos) {
+		for (SafeGround test : SAFE_GROUND) {
+			try {
+				if (test.safe(level, pos)) {
+					return true;
+				}
+			} catch (RuntimeException e) {
+				Kultivator.LOGGER.warn("Safe-ground test failed", e);
+			}
+		}
+		return false;
+	}
 
 	/** Module L. */
 	public static SkyService sky() {

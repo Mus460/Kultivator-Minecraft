@@ -190,6 +190,9 @@ public final class VoidRealm {
 	// ================================================================== entering and the queue
 
 	static @Nullable String blocker(DiscipleEntity disciple) {
+		if (Expeditions.refuses(disciple)) {
+			return Expeditions.REFUSES;
+		}
 		DiscipleData data = disciple.data();
 		if (SectRanks.rank(data) < MIN_RANK) {
 			return "kultivator.sectevent.void.need_inner";

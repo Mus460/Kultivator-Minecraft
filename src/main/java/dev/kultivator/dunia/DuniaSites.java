@@ -1,5 +1,6 @@
 package dev.kultivator.dunia;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import dev.kultivator.Kultivator;
 import dev.kultivator.sect.Sect;
@@ -8,6 +9,9 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -21,7 +25,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +40,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -73,6 +81,18 @@ public final class DuniaSites extends SavedData {
 	public static final double AUTO_RANGE = 48.0D;
 	public static final int MAX_LOCATE_CHUNKS = 64;
 	public static final int PLAYER_LOCATE_COOLDOWN = 600;
+	/** At most this many old cave sites are checked by one {@link #cleanCaves} run (each may load one chunk to structure starts). */
+	public static final int CLEAN_PER_RUN = 64;
+
+	/** The site kind and tier a structure's own anchors publish (a broad tag such as all three caves finds one of them). */
+	private record RealKind(String kind, int tier) {
+	}
+
+	private static final Map<String, RealKind> REAL_KINDS = Map.of(
+			"kultivator:reruntuhan/gua_kecil", new RealKind("reruntuhan/gua_kecil", 1),
+			"kultivator:reruntuhan/gua_agung", new RealKind("reruntuhan/gua_agung", 2),
+			"kultivator:reruntuhan/gua_kuno", new RealKind("reruntuhan/gua_kuno", 3),
+			"kultivator:kota/kota_abadi", new RealKind("kota/kota_abadi", 1));
 
 	public static final Codec<DuniaSites> CODEC = CompoundTag.CODEC.xmap(DuniaSites::fromTag, DuniaSites::toTag);
 	public static final SavedDataType<DuniaSites> TYPE = new SavedDataType<>(Kultivator.id("dunia_sites"), DuniaSites::new, CODEC,
@@ -297,14 +317,28 @@ public final class DuniaSites extends SavedData {
 		}
 		lastSearchTick = tick;
 		BlockPos found;
+		Holder<Structure> structure;
 		try {
-			found = level.findNearestMapStructure(tag, from, Math.max(1, Math.min(MAX_LOCATE_CHUNKS, chunkRadius)), false);
+			Optional<HolderSet.Named<Structure>> set = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).get(tag);
+			if (set.isEmpty()) {
+				return null;
+			}
+			Pair<BlockPos, Holder<Structure>> result = level.getChunkSource().getGenerator().findNearestMapStructure(level, set.get(), from,
+					Math.max(1, Math.min(MAX_LOCATE_CHUNKS, chunkRadius)), false);
+			if (result == null) {
+				return null;
+			}
+			found = result.getFirst();
+			structure = result.getSecond();
 		} catch (RuntimeException exception) {
 			Kultivator.LOGGER.warn("Dunia locate of {} failed", tag.location(), exception);
 			return null;
 		}
-		if (found == null) {
-			return null;
+		// the structure actually found names the kind (a cave rumour may find a Gua Agung or Gua Kuno, integration audit S18)
+		RealKind real = REAL_KINDS.get(structure.unwrapKey().map(key -> key.identifier().toString()).orElse(""));
+		if (real != null && moduleOf(real.kind()).equals(moduleOf(kind))) {
+			kind = real.kind();
+			tier = real.tier();
 		}
 		// never a height lookup here: that could load the far chunk (the structure's own anchors publish the real height)
 		BlockPos at = found.immutable();
@@ -334,6 +368,84 @@ public final class DuniaSites extends SavedData {
 			return 0L;
 		}
 		return Math.max(0L, PLAYER_LOCATE_COOLDOWN - (player.level().getServer().getTickCount() - last));
+	}
+
+	private static String moduleOf(String kind) {
+		int slash = kind.indexOf('/');
+		return slash < 0 ? kind : kind.substring(0, slash);
+	}
+
+	/**
+	 * Save repair for old worlds (test command {@code uji peta situs bersihkan}, integration audit S18): rumours and pointer
+	 * scrolls used to publish every cave as {@code reruntuhan/gua_kecil}. A Gua Kecil site with a Gua Agung or Gua Kuno site
+	 * within 96 blocks is that cave's duplicate; otherwise the structure start in the site's chunk names the real kind (the
+	 * chunk is brought to structure starts at most, never generated further). Players who knew the wrong site know the
+	 * right one. A site whose chunk holds no cave start is left alone. Returns the number of sites repaired and checked.
+	 */
+	public static int[] cleanCaves(MinecraftServer current) {
+		DuniaSites data = get(current);
+		List<Site> small = new ArrayList<>();
+		for (Site site : data.sites.values()) {
+			if (site.kind().equals("reruntuhan/gua_kecil") && small.size() < CLEAN_PER_RUN) {
+				small.add(site);
+			}
+		}
+		int fixed = 0;
+		for (Site site : small) {
+			ServerLevel level = current.getLevel(site.dim());
+			if (level == null) {
+				continue;
+			}
+			Site real = null;
+			for (Site other : data.sites.values()) {
+				if ((other.kind().equals("reruntuhan/gua_agung") || other.kind().equals("reruntuhan/gua_kuno"))
+						&& other.distance(site.dim(), site.pos()) <= 96.0D) {
+					real = other;
+					break;
+				}
+			}
+			if (real == null) {
+				RealKind kind = startIn(level, site.pos());
+				if (kind == null || kind.kind().equals(site.kind()) || !moduleOf(kind.kind()).equals("reruntuhan")) {
+					continue;
+				}
+				real = publish(level, kind.kind(), site.pos(), kind.tier());
+			}
+			if (real.id() == site.id()) {
+				continue;
+			}
+			data.sites.remove(site.id());
+			for (LongOpenHashSet set : data.known.values()) {
+				if (set.remove(site.id())) {
+					set.add(real.id());
+				}
+			}
+			data.setDirty();
+			fixed++;
+		}
+		return new int[]{fixed, small.size()};
+	}
+
+	/** The known structure (see {@link #REAL_KINDS}) starting in the chunk of {@code pos}, or null. */
+	private static @Nullable RealKind startIn(ServerLevel level, BlockPos pos) {
+		ChunkAccess chunk;
+		try {
+			chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.STRUCTURE_STARTS, true);
+		} catch (RuntimeException exception) {
+			return null;
+		}
+		if (chunk == null) {
+			return null;
+		}
+		Registry<Structure> registry = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
+		for (Map.Entry<Structure, StructureStart> entry : chunk.getAllStarts().entrySet()) {
+			Identifier id = registry.getKey(entry.getKey());
+			RealKind kind = id == null ? null : REAL_KINDS.get(id.toString());
+			if (kind != null && entry.getValue().isValid()) {
+				return kind;
+			}
+		}
+		return null;
 	}
 
 	/** A saved site of {@code kind} already published within 96 blocks of {@code pos} (the structure's own), or null. */

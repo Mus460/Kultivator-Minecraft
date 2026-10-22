@@ -1,0 +1,13 @@
+{
+  "kultivator.kekuatan.power.trial": "Musuh ujian (elit, kultivator nakal, penjaga, musuh Dunia dan Alam Abadi) memakai D × 1,5 = %s. Lapis Kenaikan Abadi di dalam D: +%s.",
+  "kultivator.kekuatan.meditation.cap": "Batas penyerapan Qi tercapai: situs × formasi Qi × batu roh = ×%s, tetapi hanya ×%s yang terserap. Medan Formasi Sekte tetap menambah di atas batas ini (sampai ×%s).",
+  "kultivator.kekuatan.formasi.medcap": "Meditasi: situs × formasi × batu ×%s, terserap sampai ×%s · Medan Sekte ×%s (batas ×%s) di atasnya",
+  "kultivator.kekuatan.formasi.medcap.tip": "Situs, formasi Qi pribadi dan batu roh bersama-sama berhenti di ×3,5. Medan Formasi Sekte dihitung terpisah di atas batas itu, paling banyak ×1,5.",
+  "kultivator.kekuatan.guide.ia8": "Kenaikan Abadi Tahap 8 tidak membuka jurus baru: pakai tahap ini untuk menguasai jurus Tahap 7 sampai tuntas, dan di Tahap 9 jalan berlanjut.",
+  "kultivator.kekuatan.milestone": "Tonggak Dunia: %s. Kultivasi +%s%% bar.",
+  "kultivator.kekuatan.milestone.tower": "Menara, 10 lantai lagi",
+  "kultivator.kekuatan.milestone.ruins": "reruntuhan ditaklukkan",
+  "kultivator.kekuatan.milestone.court": "pengadilan dimenangkan",
+  "kultivator.kekuatan.milestone.prison": "penjara iblis disegel",
+  "kultivator.kekuatan.milestone.jiao": "Darah Jiao"
+}

@@ -81,8 +81,9 @@ public final class SeaPeople {
 	private record Arm(String form, int grade, int sub, int price, int needQ) {
 	}
 
+	/** The Mutiara Penunjuk Laut costs the same as in the towns (audit S24: one price, {@code kota.Harga.MUTIARA_NB}). */
 	private static final Offer[] MERCHANT = {
-			new Offer("kultivator:mutiara_penunjuk_laut", 1, 12),
+			new Offer("kultivator:mutiara_penunjuk_laut", 1, (int) dev.kultivator.dunia.kota.Harga.MUTIARA_NB),
 			new Offer("minecraft:prismarine_shard", 16, 2),
 			new Offer("minecraft:prismarine_crystals", 16, 3),
 			new Offer("minecraft:nautilus_shell", 1, 4),

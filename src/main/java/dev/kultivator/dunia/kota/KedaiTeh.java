@@ -52,11 +52,13 @@ public final class KedaiTeh {
 	public static final int MINUTES = 10;
 	public static final long TEA_TICKS = MINUTES * 1200L;
 	/** Kabar Angin bands: price and radius. */
-	public static final long[] RUMOUR_PRICE = {1L, 9L, 80L};
+	public static final long[] RUMOUR_PRICE = {1L, 9L, 81L};
 	public static final int[] RUMOUR_RADIUS = {1500, 3000, 6000};
 	/** Rumour kinds: the structure tag folders of the modules (each module ships {@code #kultivator:<folder>}). */
 	public static final String[] RUMOUR_KINDS = {"kota", "reruntuhan", "penjara", "menara", "bawah", "laut"};
 	public static final int TOKEN_AFTER = 3;
+	/** KotaData player key: the in-game day of the last free rumour of a Lencana Pengembara. */
+	public static final String BADGE_DAY = "lencana_hari";
 	public static final long TOKEN_PRICE = 60L;
 	/** Teh Awan Ungu: comprehension per minute of meditation. */
 	public static final double AWAN_PER_MINUTE = 0.03D;
@@ -204,6 +206,11 @@ public final class KedaiTeh {
 	 * direction), else the nearest structure of that kind. Paid only when something new was told.
 	 */
 	static boolean rumour(ServerPlayer player, KultivatorNpc npc, int kind, int band, boolean paid) {
+		// Lencana Pengembara: one rumour a day on the house (integration audit S22, new reward approved by the user)
+		boolean badge = paid && badgeFree(player);
+		if (badge) {
+			paid = false;
+		}
 		int b = Math.max(0, Math.min(2, band));
 		int k = Math.max(0, Math.min(RUMOUR_KINDS.length - 1, kind));
 		long price = paid ? Math.max(1L, Math.round(RUMOUR_PRICE[b] * Kota.config().priceScale)) : 0L;
@@ -224,6 +231,7 @@ public final class KedaiTeh {
 				Msg.chat(player, Component.translatable("kultivator.kota.kabar.harta", direction(player.blockPosition(), birth.pos()), (int) distance)
 						.withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.ITALIC));
 				counted(player);
+				badgeUsed(player, badge);
 				return true;
 			}
 		}
@@ -258,7 +266,28 @@ public final class KedaiTeh {
 			KotaVoice.say(npc, KotaVoice.TEA_NEWS, npc.voiceKey("careful"), null);
 		}
 		counted(player);
+		badgeUsed(player, badge);
 		return true;
+	}
+
+	/** True when the player carries a Lencana Pengembara and has not had today's free rumour yet. */
+	static boolean badgeFree(ServerPlayer player) {
+		if (!player.getInventory().contains(stack -> stack.is(KotaItems.LENCANA_PENGEMBARA))) {
+			return false;
+		}
+		return KotaData.get(player.level().getServer()).getLong(player, BADGE_DAY, Long.MIN_VALUE) != today(player);
+	}
+
+	private static void badgeUsed(ServerPlayer player, boolean badge) {
+		if (!badge) {
+			return;
+		}
+		KotaData.get(player.level().getServer()).putLong(player, BADGE_DAY, today(player));
+		Msg.chat(player, Component.translatable("kultivator.sambung.lencana.gratis").withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC));
+	}
+
+	private static long today(ServerPlayer player) {
+		return Math.floorDiv(player.level().getServer().overworld().getOverworldClockTime(), 24000L);
 	}
 
 	/** The site kind a rumour of {@code folder} publishes (its marker). */
@@ -336,6 +365,8 @@ public final class KedaiTeh {
 		tag.putBoolean("token", Kota.config().blackMarket && data.getIntOr("rumours", 0) >= TOKEN_AFTER);
 		tag.putLong("token_price", Math.max(1L, Math.round(TOKEN_PRICE * Kota.config().priceScale)));
 		tag.putLong("cooldown", DuniaSites.locateCooldown(player));
+		// today's rumour is free (Lencana Pengembara); the screen may show it, the server decides on purchase
+		tag.putBoolean("lencana", badgeFree(player));
 		tag.putInt("wanderers", Pengembara.seatedNear(npc));
 		tag.putDouble("bonus", Kota.config().teaBonus);
 		return tag;

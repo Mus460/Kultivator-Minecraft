@@ -41,6 +41,8 @@ public final class DuniaMarkers {
 		put("sekte/wilayah", 20, 0xFFD27A, 0);
 		put("desa/desa", 21, 0xB0C890, 1);
 		put("kota/wilayah", 22, 0xC0A070, 0);
+		// the gates of the NPC sects (Sekte 36 diplomasi, AnggotaSekte.SITE_KIND): the sect hall icon in a rival's red
+		put("sekte/gerbang", 19, 0xE07060, 0);
 	}
 
 	private static void put(String kind, int icon, int color, int minZoom) {

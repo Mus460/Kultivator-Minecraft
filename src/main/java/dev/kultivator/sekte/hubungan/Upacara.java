@@ -10,7 +10,7 @@ import dev.kultivator.sekte.api.Ikatan;
 import dev.kultivator.sekte.api.Perlakuan;
 import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.util.Msg;
-import dev.kultivator.voice.VoiceDisciples;
+import dev.kultivator.sekte.SekteSuara;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -205,8 +205,8 @@ final class Upacara {
 		if (pair.kind() != Ikatan.SAUDARA_ANGKAT) {
 			Hubungan.setKind(owner, pair, pair.kind(), Ikatan.SAUDARA_ANGKAT, a, b, false);
 		}
-		VoiceDisciples.line(a, "loyal", 600);
-		VoiceDisciples.line(b, "loyal", 600);
+		SekteSuara.line(a, "oath", "loyal", 600);
+		SekteSuara.line(b, "oath", "loyal", 600);
 		scene(owner, a, b, BEAT_OATH);
 	}
 
@@ -244,8 +244,8 @@ final class Upacara {
 		MinecraftServer server = Hubungan.server();
 		SekteBus.honored(server, owner, a.soulId(), SekteIds.R + ".restu", 4);
 		SekteBus.honored(server, owner, b.soulId(), SekteIds.R + ".restu", 4);
-		VoiceDisciples.line(a, "thanks", 600);
-		VoiceDisciples.line(b, "thanks", 600);
+		SekteSuara.line(a, "beloved", "thanks", 600);
+		SekteSuara.line(b, "beloved", "thanks", 600);
 		scene(owner, a, b, BEAT_WEDDING);
 	}
 

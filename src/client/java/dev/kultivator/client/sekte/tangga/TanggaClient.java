@@ -18,7 +18,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.util.Mth;
@@ -50,13 +49,9 @@ public final class TanggaClient {
 		LevelRenderEvents.COLLECT_SUBMITS.register(TanggaIlusiRenderer::collect);
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Kultivator.id("sekte_tangga_gulungan"), new TanggaHud());
 		SektePoses.register(SekteIds.ACT_CLIMB, TanggaClient::pose, List.of());
-		HubCards.register(HubNav.MURID, "sekte_tangga_catatan", Glyphs.TALENT, null, () -> {
-			Minecraft minecraft = Minecraft.getInstance();
-			if (minecraft.getConnection() != null) {
-				minecraft.gui.setScreen(null);
-				minecraft.getConnection().sendCommand("kultivasi perguruan " + SekteIds.G);
-			}
-		});
+		// R23: the card opens the records scroll (it used to close the hub and print to chat).
+		ClientPlayNetworking.registerGlobalReceiver(TanggaPayloads.Catatan.TYPE, (payload, context) -> TanggaCatatanScreen.onRecords(payload));
+		HubCards.register(HubNav.MURID, "sekte_tangga_catatan", Glyphs.TALENT, null, TanggaCatatanScreen::open);
 		scenes();
 	}
 

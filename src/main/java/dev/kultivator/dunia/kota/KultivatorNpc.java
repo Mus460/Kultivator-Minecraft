@@ -133,6 +133,8 @@ public class KultivatorNpc extends PathfinderMob implements Duelist {
 		this.getNavigation().setCanOpenDoors(false);
 		this.addTag(NoGrief.TAG);
 		this.addTag(TAG);
+		// realm-scaled Dunia foe: the trial-mob rule of 6c (audit M4 T5)
+		TechniquePower.markRealmFoe(this);
 		this.setPersistenceRequired();
 	}
 

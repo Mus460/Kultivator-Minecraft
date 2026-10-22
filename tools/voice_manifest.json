@@ -265,6 +265,54 @@
    "style": 51
   },
   {
+   "event": "voice.elder.leitai_buka",
+   "ja": "宗門大会、開幕！弟子たちよ、擂台に上がれ！",
+   "en": "The sect tournament begins! Disciples, take the stage!",
+   "id": "Turnamen sekte dibuka! Murid-murid, naiklah ke panggung!",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.elder.banner",
+   "ja": "宗門の旗が山門に掲げられました。",
+   "en": "The sect banner has been raised at the gate.",
+   "id": "Bendera sekte telah dikibarkan di gerbang.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.elder.envoy",
+   "ja": "我が宗門の使者、和をもって参りました。",
+   "en": "Our sect's envoy comes in peace.",
+   "id": "Utusan sekte kami datang dengan damai.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.boss.tamu_tantang",
+   "ja": "我が宗門、貴殿らの剣を試しに参った。",
+   "en": "Our sect has come to test your swords.",
+   "id": "Sekte kami datang untuk menguji pedang kalian.",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.boss.sect_master",
+   "ja": "貴様の宗門が我らに挑むか。",
+   "en": "Your sect dares challenge us?",
+   "id": "Sektemu berani menantang kami?",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.boss.sect_master_defeat",
+   "ja": "今日より…我が宗門は従おう。",
+   "en": "From today... our sect submits.",
+   "id": "Hari ini... sekte kami tunduk.",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
    "event": "voice.disciple.m1.greet",
    "ja": "師尊！お帰りなさいませ！",
    "en": "Master! Welcome back!",
@@ -1237,6 +1285,1302 @@
    "style": 46
   },
   {
+   "event": "voice.disciple.m1.sulk",
+   "ja": "やりたくありません。",
+   "en": "I don't want to.",
+   "id": "Aku tidak mau.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.sulk",
+   "ja": "やりたくありません。",
+   "en": "I don't want to.",
+   "id": "Aku tidak mau.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.sulk",
+   "ja": "やりたくありません。",
+   "en": "I don't want to.",
+   "id": "Aku tidak mau.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.sulk",
+   "ja": "やりたくありません。",
+   "en": "I don't want to.",
+   "id": "Aku tidak mau.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.sulk",
+   "ja": "やりたくありません。",
+   "en": "I don't want to.",
+   "id": "Aku tidak mau.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.sulk",
+   "ja": "やりたくありません。",
+   "en": "I don't want to.",
+   "id": "Aku tidak mau.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.rebel",
+   "ja": "師匠、今日こそ挑ませてもらう！",
+   "en": "Master, today I challenge you!",
+   "id": "Guru, hari ini aku menantangmu!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.rebel",
+   "ja": "師匠、今日こそ挑ませてもらう！",
+   "en": "Master, today I challenge you!",
+   "id": "Guru, hari ini aku menantangmu!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.rebel",
+   "ja": "師匠、今日こそ挑ませてもらう！",
+   "en": "Master, today I challenge you!",
+   "id": "Guru, hari ini aku menantangmu!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.rebel",
+   "ja": "師匠、今日こそ挑ませてもらう！",
+   "en": "Master, today I challenge you!",
+   "id": "Guru, hari ini aku menantangmu!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.rebel",
+   "ja": "師匠、今日こそ挑ませてもらう！",
+   "en": "Master, today I challenge you!",
+   "id": "Guru, hari ini aku menantangmu!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.rebel",
+   "ja": "師匠、今日こそ挑ませてもらう！",
+   "en": "Master, today I challenge you!",
+   "id": "Guru, hari ini aku menantangmu!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.submit",
+   "ja": "負けました…ここに残ります。",
+   "en": "I lost... I will stay here.",
+   "id": "Aku kalah... aku akan tetap di sini.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.submit",
+   "ja": "負けました…ここに残ります。",
+   "en": "I lost... I will stay here.",
+   "id": "Aku kalah... aku akan tetap di sini.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.submit",
+   "ja": "負けました…ここに残ります。",
+   "en": "I lost... I will stay here.",
+   "id": "Aku kalah... aku akan tetap di sini.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.submit",
+   "ja": "負けました…ここに残ります。",
+   "en": "I lost... I will stay here.",
+   "id": "Aku kalah... aku akan tetap di sini.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.submit",
+   "ja": "負けました…ここに残ります。",
+   "en": "I lost... I will stay here.",
+   "id": "Aku kalah... aku akan tetap di sini.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.submit",
+   "ja": "負けました…ここに残ります。",
+   "en": "I lost... I will stay here.",
+   "id": "Aku kalah... aku akan tetap di sini.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.leave_night",
+   "ja": "師匠、お許しください。",
+   "en": "Forgive me, Master.",
+   "id": "Maafkan aku, Guru.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.leave_night",
+   "ja": "師匠、お許しください。",
+   "en": "Forgive me, Master.",
+   "id": "Maafkan aku, Guru.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.leave_night",
+   "ja": "師匠、お許しください。",
+   "en": "Forgive me, Master.",
+   "id": "Maafkan aku, Guru.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.leave_night",
+   "ja": "師匠、お許しください。",
+   "en": "Forgive me, Master.",
+   "id": "Maafkan aku, Guru.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.leave_night",
+   "ja": "師匠、お許しください。",
+   "en": "Forgive me, Master.",
+   "id": "Maafkan aku, Guru.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.leave_night",
+   "ja": "師匠、お許しください。",
+   "en": "Forgive me, Master.",
+   "id": "Maafkan aku, Guru.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.oath",
+   "ja": "義兄弟の契りを結ぼう！",
+   "en": "Let us swear to be siblings!",
+   "id": "Mari bersumpah menjadi saudara!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.oath",
+   "ja": "義兄弟の契りを結ぼう！",
+   "en": "Let us swear to be siblings!",
+   "id": "Mari bersumpah menjadi saudara!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.oath",
+   "ja": "義兄弟の契りを結ぼう！",
+   "en": "Let us swear to be siblings!",
+   "id": "Mari bersumpah menjadi saudara!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.oath",
+   "ja": "義兄弟の契りを結ぼう！",
+   "en": "Let us swear to be siblings!",
+   "id": "Mari bersumpah menjadi saudara!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.oath",
+   "ja": "義兄弟の契りを結ぼう！",
+   "en": "Let us swear to be siblings!",
+   "id": "Mari bersumpah menjadi saudara!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.oath",
+   "ja": "義兄弟の契りを結ぼう！",
+   "en": "Let us swear to be siblings!",
+   "id": "Mari bersumpah menjadi saudara!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.tea",
+   "ja": "お茶をどうぞ。",
+   "en": "Please, have some tea.",
+   "id": "Silakan, minum tehnya.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.tea",
+   "ja": "お茶をどうぞ。",
+   "en": "Please, have some tea.",
+   "id": "Silakan, minum tehnya.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.tea",
+   "ja": "お茶をどうぞ。",
+   "en": "Please, have some tea.",
+   "id": "Silakan, minum tehnya.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.tea",
+   "ja": "お茶をどうぞ。",
+   "en": "Please, have some tea.",
+   "id": "Silakan, minum tehnya.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.tea",
+   "ja": "お茶をどうぞ。",
+   "en": "Please, have some tea.",
+   "id": "Silakan, minum tehnya.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.tea",
+   "ja": "お茶をどうぞ。",
+   "en": "Please, have some tea.",
+   "id": "Silakan, minum tehnya.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.grudge",
+   "ja": "お前だけは許さない。",
+   "en": "I will never forgive you.",
+   "id": "Aku tidak akan memaafkanmu.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.grudge",
+   "ja": "お前だけは許さない。",
+   "en": "I will never forgive you.",
+   "id": "Aku tidak akan memaafkanmu.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.grudge",
+   "ja": "お前だけは許さない。",
+   "en": "I will never forgive you.",
+   "id": "Aku tidak akan memaafkanmu.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.grudge",
+   "ja": "お前だけは許さない。",
+   "en": "I will never forgive you.",
+   "id": "Aku tidak akan memaafkanmu.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.grudge",
+   "ja": "お前だけは許さない。",
+   "en": "I will never forgive you.",
+   "id": "Aku tidak akan memaafkanmu.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.grudge",
+   "ja": "お前だけは許さない。",
+   "en": "I will never forgive you.",
+   "id": "Aku tidak akan memaafkanmu.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.beloved",
+   "ja": "あなたと一緒なら。",
+   "en": "As long as I am with you.",
+   "id": "Asal bersamamu.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.beloved",
+   "ja": "あなたと一緒なら。",
+   "en": "As long as I am with you.",
+   "id": "Asal bersamamu.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.beloved",
+   "ja": "あなたと一緒なら。",
+   "en": "As long as I am with you.",
+   "id": "Asal bersamamu.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.beloved",
+   "ja": "あなたと一緒なら。",
+   "en": "As long as I am with you.",
+   "id": "Asal bersamamu.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.beloved",
+   "ja": "あなたと一緒なら。",
+   "en": "As long as I am with you.",
+   "id": "Asal bersamamu.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.beloved",
+   "ja": "あなたと一緒なら。",
+   "en": "As long as I am with you.",
+   "id": "Asal bersamamu.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.leitai_salam",
+   "ja": "お手合わせ願います！",
+   "en": "Please spar with me!",
+   "id": "Mohon petunjuknya!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.leitai_salam",
+   "ja": "お手合わせ願います！",
+   "en": "Please spar with me!",
+   "id": "Mohon petunjuknya!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.leitai_salam",
+   "ja": "お手合わせ願います！",
+   "en": "Please spar with me!",
+   "id": "Mohon petunjuknya!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.leitai_salam",
+   "ja": "お手合わせ願います！",
+   "en": "Please spar with me!",
+   "id": "Mohon petunjuknya!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.leitai_salam",
+   "ja": "お手合わせ願います！",
+   "en": "Please spar with me!",
+   "id": "Mohon petunjuknya!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.leitai_salam",
+   "ja": "お手合わせ願います！",
+   "en": "Please spar with me!",
+   "id": "Mohon petunjuknya!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.leitai_juara",
+   "ja": "師匠、この栄冠は宗門のために！",
+   "en": "Master, this title is for our sect!",
+   "id": "Guru, gelar ini untuk sekte kita!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.leitai_juara",
+   "ja": "師匠、この栄冠は宗門のために！",
+   "en": "Master, this title is for our sect!",
+   "id": "Guru, gelar ini untuk sekte kita!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.leitai_juara",
+   "ja": "師匠、この栄冠は宗門のために！",
+   "en": "Master, this title is for our sect!",
+   "id": "Guru, gelar ini untuk sekte kita!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.leitai_juara",
+   "ja": "師匠、この栄冠は宗門のために！",
+   "en": "Master, this title is for our sect!",
+   "id": "Guru, gelar ini untuk sekte kita!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.leitai_juara",
+   "ja": "師匠、この栄冠は宗門のために！",
+   "en": "Master, this title is for our sect!",
+   "id": "Guru, gelar ini untuk sekte kita!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.leitai_juara",
+   "ja": "師匠、この栄冠は宗門のために！",
+   "en": "Master, this title is for our sect!",
+   "id": "Guru, gelar ini untuk sekte kita!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.leitai_kalah",
+   "ja": "まだ力が足りない…次の大会こそ！",
+   "en": "Not strong enough yet... next season!",
+   "id": "Aku belum cukup kuat... musim depan!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.leitai_kalah",
+   "ja": "まだ力が足りない…次の大会こそ！",
+   "en": "Not strong enough yet... next season!",
+   "id": "Aku belum cukup kuat... musim depan!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.leitai_kalah",
+   "ja": "まだ力が足りない…次の大会こそ！",
+   "en": "Not strong enough yet... next season!",
+   "id": "Aku belum cukup kuat... musim depan!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.leitai_kalah",
+   "ja": "まだ力が足りない…次の大会こそ！",
+   "en": "Not strong enough yet... next season!",
+   "id": "Aku belum cukup kuat... musim depan!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.leitai_kalah",
+   "ja": "まだ力が足りない…次の大会こそ！",
+   "en": "Not strong enough yet... next season!",
+   "id": "Aku belum cukup kuat... musim depan!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.leitai_kalah",
+   "ja": "まだ力が足りない…次の大会こそ！",
+   "en": "Not strong enough yet... next season!",
+   "id": "Aku belum cukup kuat... musim depan!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.climb_peak",
+   "ja": "頂に着いた！",
+   "en": "I reached the peak!",
+   "id": "Aku sampai di puncak!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.climb_peak",
+   "ja": "頂に着いた！",
+   "en": "I reached the peak!",
+   "id": "Aku sampai di puncak!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.climb_peak",
+   "ja": "頂に着いた！",
+   "en": "I reached the peak!",
+   "id": "Aku sampai di puncak!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.climb_peak",
+   "ja": "頂に着いた！",
+   "en": "I reached the peak!",
+   "id": "Aku sampai di puncak!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.climb_peak",
+   "ja": "頂に着いた！",
+   "en": "I reached the peak!",
+   "id": "Aku sampai di puncak!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.climb_peak",
+   "ja": "頂に着いた！",
+   "en": "I reached the peak!",
+   "id": "Aku sampai di puncak!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.climb_illusion",
+   "ja": "これは幻だ…退かぬ！",
+   "en": "This is only an illusion... I will not retreat!",
+   "id": "Ini hanya ilusi… aku tidak akan mundur!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.climb_illusion",
+   "ja": "これは幻だ…退かぬ！",
+   "en": "This is only an illusion... I will not retreat!",
+   "id": "Ini hanya ilusi… aku tidak akan mundur!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.climb_illusion",
+   "ja": "これは幻だ…退かぬ！",
+   "en": "This is only an illusion... I will not retreat!",
+   "id": "Ini hanya ilusi… aku tidak akan mundur!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.climb_illusion",
+   "ja": "これは幻だ…退かぬ！",
+   "en": "This is only an illusion... I will not retreat!",
+   "id": "Ini hanya ilusi… aku tidak akan mundur!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.climb_illusion",
+   "ja": "これは幻だ…退かぬ！",
+   "en": "This is only an illusion... I will not retreat!",
+   "id": "Ini hanya ilusi… aku tidak akan mundur!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.climb_illusion",
+   "ja": "これは幻だ…退かぬ！",
+   "en": "This is only an illusion... I will not retreat!",
+   "id": "Ini hanya ilusi… aku tidak akan mundur!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.mourn",
+   "ja": "安らかに眠れ。",
+   "en": "Rest in peace.",
+   "id": "Beristirahatlah dengan tenang.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.mourn",
+   "ja": "安らかに眠れ。",
+   "en": "Rest in peace.",
+   "id": "Beristirahatlah dengan tenang.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.mourn",
+   "ja": "安らかに眠れ。",
+   "en": "Rest in peace.",
+   "id": "Beristirahatlah dengan tenang.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.mourn",
+   "ja": "安らかに眠れ。",
+   "en": "Rest in peace.",
+   "id": "Beristirahatlah dengan tenang.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.mourn",
+   "ja": "安らかに眠れ。",
+   "en": "Rest in peace.",
+   "id": "Beristirahatlah dengan tenang.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.mourn",
+   "ja": "安らかに眠れ。",
+   "en": "Rest in peace.",
+   "id": "Beristirahatlah dengan tenang.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.study",
+   "ja": "この書、少しずつ分かってきた。",
+   "en": "This scripture... I am starting to understand.",
+   "id": "Kitab ini... aku mulai mengerti.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.study",
+   "ja": "この書、少しずつ分かってきた。",
+   "en": "This scripture... I am starting to understand.",
+   "id": "Kitab ini... aku mulai mengerti.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.study",
+   "ja": "この書、少しずつ分かってきた。",
+   "en": "This scripture... I am starting to understand.",
+   "id": "Kitab ini... aku mulai mengerti.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.study",
+   "ja": "この書、少しずつ分かってきた。",
+   "en": "This scripture... I am starting to understand.",
+   "id": "Kitab ini... aku mulai mengerti.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.study",
+   "ja": "この書、少しずつ分かってきた。",
+   "en": "This scripture... I am starting to understand.",
+   "id": "Kitab ini... aku mulai mengerti.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.study",
+   "ja": "この書、少しずつ分かってきた。",
+   "en": "This scripture... I am starting to understand.",
+   "id": "Kitab ini... aku mulai mengerti.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.qingming",
+   "ja": "ご先祖様、我らの礼をお受けください。",
+   "en": "Ancestors, accept our respects.",
+   "id": "Para leluhur, terimalah hormat kami.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.qingming",
+   "ja": "ご先祖様、我らの礼をお受けください。",
+   "en": "Ancestors, accept our respects.",
+   "id": "Para leluhur, terimalah hormat kami.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.qingming",
+   "ja": "ご先祖様、我らの礼をお受けください。",
+   "en": "Ancestors, accept our respects.",
+   "id": "Para leluhur, terimalah hormat kami.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.qingming",
+   "ja": "ご先祖様、我らの礼をお受けください。",
+   "en": "Ancestors, accept our respects.",
+   "id": "Para leluhur, terimalah hormat kami.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.qingming",
+   "ja": "ご先祖様、我らの礼をお受けください。",
+   "en": "Ancestors, accept our respects.",
+   "id": "Para leluhur, terimalah hormat kami.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.qingming",
+   "ja": "ご先祖様、我らの礼をお受けください。",
+   "en": "Ancestors, accept our respects.",
+   "id": "Para leluhur, terimalah hormat kami.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.report",
+   "ja": "宗主、今朝のご報告です。",
+   "en": "Sect Master, this morning's report.",
+   "id": "Ketua, laporan pagi ini.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.report",
+   "ja": "宗主、今朝のご報告です。",
+   "en": "Sect Master, this morning's report.",
+   "id": "Ketua, laporan pagi ini.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.report",
+   "ja": "宗主、今朝のご報告です。",
+   "en": "Sect Master, this morning's report.",
+   "id": "Ketua, laporan pagi ini.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.report",
+   "ja": "宗主、今朝のご報告です。",
+   "en": "Sect Master, this morning's report.",
+   "id": "Ketua, laporan pagi ini.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.report",
+   "ja": "宗主、今朝のご報告です。",
+   "en": "Sect Master, this morning's report.",
+   "id": "Ketua, laporan pagi ini.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.report",
+   "ja": "宗主、今朝のご報告です。",
+   "en": "Sect Master, this morning's report.",
+   "id": "Ketua, laporan pagi ini.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.depart",
+   "ja": "行ってまいります、師匠。",
+   "en": "We are setting off, Master.",
+   "id": "Murid berangkat, Guru.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.depart",
+   "ja": "行ってまいります、師匠。",
+   "en": "We are setting off, Master.",
+   "id": "Murid berangkat, Guru.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.depart",
+   "ja": "行ってまいります、師匠。",
+   "en": "We are setting off, Master.",
+   "id": "Murid berangkat, Guru.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.depart",
+   "ja": "行ってまいります、師匠。",
+   "en": "We are setting off, Master.",
+   "id": "Murid berangkat, Guru.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.depart",
+   "ja": "行ってまいります、師匠。",
+   "en": "We are setting off, Master.",
+   "id": "Murid berangkat, Guru.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.depart",
+   "ja": "行ってまいります、師匠。",
+   "en": "We are setting off, Master.",
+   "id": "Murid berangkat, Guru.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.mission_report",
+   "ja": "師匠、ただいま戻りました。ご報告いたします。",
+   "en": "Master, I have returned to report.",
+   "id": "Guru, murid kembali dan melapor.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.mission_report",
+   "ja": "師匠、ただいま戻りました。ご報告いたします。",
+   "en": "Master, I have returned to report.",
+   "id": "Guru, murid kembali dan melapor.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.mission_report",
+   "ja": "師匠、ただいま戻りました。ご報告いたします。",
+   "en": "Master, I have returned to report.",
+   "id": "Guru, murid kembali dan melapor.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.mission_report",
+   "ja": "師匠、ただいま戻りました。ご報告いたします。",
+   "en": "Master, I have returned to report.",
+   "id": "Guru, murid kembali dan melapor.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.mission_report",
+   "ja": "師匠、ただいま戻りました。ご報告いたします。",
+   "en": "Master, I have returned to report.",
+   "id": "Guru, murid kembali dan melapor.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.mission_report",
+   "ja": "師匠、ただいま戻りました。ご報告いたします。",
+   "en": "Master, I have returned to report.",
+   "id": "Guru, murid kembali dan melapor.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.abandoned",
+   "ja": "師匠……私を見捨てたのですか。",
+   "en": "Master... you abandoned me?",
+   "id": "Guru... meninggalkanku?",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.abandoned",
+   "ja": "師匠……私を見捨てたのですか。",
+   "en": "Master... you abandoned me?",
+   "id": "Guru... meninggalkanku?",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.abandoned",
+   "ja": "師匠……私を見捨てたのですか。",
+   "en": "Master... you abandoned me?",
+   "id": "Guru... meninggalkanku?",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.abandoned",
+   "ja": "師匠……私を見捨てたのですか。",
+   "en": "Master... you abandoned me?",
+   "id": "Guru... meninggalkanku?",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.abandoned",
+   "ja": "師匠……私を見捨てたのですか。",
+   "en": "Master... you abandoned me?",
+   "id": "Guru... meninggalkanku?",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.abandoned",
+   "ja": "師匠……私を見捨てたのですか。",
+   "en": "Master... you abandoned me?",
+   "id": "Guru... meninggalkanku?",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.robe",
+   "ja": "宗門の紋の新しい衣…ありがとうございます、師匠。",
+   "en": "A new robe with the sect emblem... thank you, Master.",
+   "id": "Jubah baru dengan lambang sekte... terima kasih, Guru.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.robe",
+   "ja": "宗門の紋の新しい衣…ありがとうございます、師匠。",
+   "en": "A new robe with the sect emblem... thank you, Master.",
+   "id": "Jubah baru dengan lambang sekte... terima kasih, Guru.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.robe",
+   "ja": "宗門の紋の新しい衣…ありがとうございます、師匠。",
+   "en": "A new robe with the sect emblem... thank you, Master.",
+   "id": "Jubah baru dengan lambang sekte... terima kasih, Guru.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.robe",
+   "ja": "宗門の紋の新しい衣…ありがとうございます、師匠。",
+   "en": "A new robe with the sect emblem... thank you, Master.",
+   "id": "Jubah baru dengan lambang sekte... terima kasih, Guru.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.robe",
+   "ja": "宗門の紋の新しい衣…ありがとうございます、師匠。",
+   "en": "A new robe with the sect emblem... thank you, Master.",
+   "id": "Jubah baru dengan lambang sekte... terima kasih, Guru.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.robe",
+   "ja": "宗門の紋の新しい衣…ありがとうございます、師匠。",
+   "en": "A new robe with the sect emblem... thank you, Master.",
+   "id": "Jubah baru dengan lambang sekte... terima kasih, Guru.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.envoy_return",
+   "ja": "師匠、使者の務めを果たしてまいりました。",
+   "en": "Master, the envoy duty is done.",
+   "id": "Guru, tugas utusan telah selesai.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.envoy_return",
+   "ja": "師匠、使者の務めを果たしてまいりました。",
+   "en": "Master, the envoy duty is done.",
+   "id": "Guru, tugas utusan telah selesai.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.envoy_return",
+   "ja": "師匠、使者の務めを果たしてまいりました。",
+   "en": "Master, the envoy duty is done.",
+   "id": "Guru, tugas utusan telah selesai.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.envoy_return",
+   "ja": "師匠、使者の務めを果たしてまいりました。",
+   "en": "Master, the envoy duty is done.",
+   "id": "Guru, tugas utusan telah selesai.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.envoy_return",
+   "ja": "師匠、使者の務めを果たしてまいりました。",
+   "en": "Master, the envoy duty is done.",
+   "id": "Guru, tugas utusan telah selesai.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.envoy_return",
+   "ja": "師匠、使者の務めを果たしてまいりました。",
+   "en": "Master, the envoy duty is done.",
+   "id": "Guru, tugas utusan telah selesai.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.harvest",
+   "ja": "師匠、良い収穫です！",
+   "en": "A good harvest, Master!",
+   "id": "Panennya bagus, Guru!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.harvest",
+   "ja": "師匠、良い収穫です！",
+   "en": "A good harvest, Master!",
+   "id": "Panennya bagus, Guru!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.harvest",
+   "ja": "師匠、良い収穫です！",
+   "en": "A good harvest, Master!",
+   "id": "Panennya bagus, Guru!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.harvest",
+   "ja": "師匠、良い収穫です！",
+   "en": "A good harvest, Master!",
+   "id": "Panennya bagus, Guru!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.harvest",
+   "ja": "師匠、良い収穫です！",
+   "en": "A good harvest, Master!",
+   "id": "Panennya bagus, Guru!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.harvest",
+   "ja": "師匠、良い収穫です！",
+   "en": "A good harvest, Master!",
+   "id": "Panennya bagus, Guru!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.ore_found",
+   "ja": "師匠、岩の中で何かが光っています！",
+   "en": "Master, something is shining inside the rock!",
+   "id": "Guru, ada yang bersinar di dalam batu!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.ore_found",
+   "ja": "師匠、岩の中で何かが光っています！",
+   "en": "Master, something is shining inside the rock!",
+   "id": "Guru, ada yang bersinar di dalam batu!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.ore_found",
+   "ja": "師匠、岩の中で何かが光っています！",
+   "en": "Master, something is shining inside the rock!",
+   "id": "Guru, ada yang bersinar di dalam batu!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.ore_found",
+   "ja": "師匠、岩の中で何かが光っています！",
+   "en": "Master, something is shining inside the rock!",
+   "id": "Guru, ada yang bersinar di dalam batu!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.ore_found",
+   "ja": "師匠、岩の中で何かが光っています！",
+   "en": "Master, something is shining inside the rock!",
+   "id": "Guru, ada yang bersinar di dalam batu!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.ore_found",
+   "ja": "師匠、岩の中で何かが光っています！",
+   "en": "Master, something is shining inside the rock!",
+   "id": "Guru, ada yang bersinar di dalam batu!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
    "event": "voice.kota.auction_open",
    "ja": "今宵の競売を始めます！",
    "en": "Tonight's auction begins!",
@@ -1398,22 +2742,6 @@
   },
   {
    "event": "voice.heaven.langit.blood_eclipse",
-   "ja": "血の月…天が怒っている。",
-   "en": "A blood moon... Heaven is enraged.",
-   "id": "Bulan berdarah… langit murka.",
-   "speaker": "heaven_fierce",
-   "style": 81
-  },
-  {
-   "event": "voice.langit.treasure_born",
-   "ja": "天地の宝、ここに生まる。",
-   "en": "A treasure of Heaven and Earth is born.",
-   "id": "Harta langit dan bumi telah lahir.",
-   "speaker": "heaven_fierce",
-   "style": 81
-  },
-  {
-   "event": "voice.langit.blood_eclipse",
    "ja": "血の月…天が怒っている。",
    "en": "A blood moon... Heaven is enraged.",
    "id": "Bulan berdarah… langit murka.",

@@ -94,6 +94,9 @@ final class ForbiddenGround {
 	}
 
 	static @Nullable String blocker(DiscipleEntity disciple) {
+		if (Expeditions.refuses(disciple)) {
+			return Expeditions.REFUSES;
+		}
 		return disciple.data().realm() == Realm.QI_REFINING ? null : "kultivator.sectevent.forbidden.second_seal";
 	}
 
@@ -157,10 +160,11 @@ final class ForbiddenGround {
 				survivors++;
 				int herbs = 2 + random.nextInt(4);
 				line.putInt("herbs", herbs);
-				ItemStack rest = Storehouse.insert(owner, new ItemStack(SectEventItems.FOUNDATION_HERB, herbs));
-				if (!rest.isEmpty() && player != null) {
-					EventUtil.give(player, rest);
-				}
+				// S12: a full Lumbung spills into the Peti Galian (online or not), never onto the floor of nowhere.
+				ItemStack herb = new ItemStack(SectEventItems.FOUNDATION_HERB, herbs);
+				Component herbName = herb.getHoverName();
+				dev.kultivator.sect.build.flow.LumbungOverflow.tell(player, owner, dev.kultivator.sect.build.flow.LumbungOverflow.store(owner, herb),
+						herbName);
 				DisciplePaths.grantBarShare(data, SHARE);
 				SectRanks.addPk(data, PK, "kultivator.sectevent.pk.forbidden");
 				Halls.addRenown(owner, RENOWN, "kultivator.sectevent.renown.forbidden");

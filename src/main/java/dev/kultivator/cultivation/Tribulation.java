@@ -120,6 +120,14 @@ public final class Tribulation {
 		default void onFinish(ServerPlayer p, Rank t, @Nullable Result result, int strikesDone, boolean test) {
 			onEnd(p, t, result == Result.SUCCESS, test);
 		}
+
+		/**
+		 * A stand-alone ritual of strikes (the player's star calamity, audit M4 S8) begins ({@code begin} true) or ends
+		 * ({@code success} then tells the outcome; false for an abandoned run). Not a tribulation: {@link #isActive} stays
+		 * false. Hu Fa may open its guard session here; {@link #inRitual} is true from the begin call to the end call.
+		 */
+		default void onRitual(ServerPlayer p, Rank t, boolean begin, boolean success) {
+		}
 	}
 
 	private static final List<StrikeFactor> STRIKE_FACTORS = new CopyOnWriteArrayList<>();
@@ -208,6 +216,7 @@ public final class Tribulation {
 		});
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			ACTIVE.clear();
+			RITUALS.clear();
 			FIRE_GUARD.clear();
 			POST_GUARD.clear();
 		});
@@ -529,6 +538,93 @@ public final class Tribulation {
 		}
 		if (player.isAlive() && player.getHealth() < 1.0F) {
 			player.setHealth(1.0F);
+		}
+		return wouldKill;
+	}
+
+	// ================================================================== stand-alone rituals (audit M4 S8)
+
+	/** A running ritual of strikes: its strength, its ground (for the twin ring) and its lightning rings. */
+	private record Ritual(Rank strength, Vec3 start, @Nullable dev.kultivator.elite.LightningRings.State rings) {
+	}
+
+	private static final Map<UUID, Ritual> RITUALS = new HashMap<>();
+
+	/**
+	 * A ritual of strikes begins (the player's star calamity): the lightning rings of {@code strength} (Nascent Soul and up,
+	 * twins from Immortal Ascension, the {@code tribulationTelegraph} setting) and the {@link Listener#onRitual} hook for
+	 * Hu Fa. End it with {@link #ritualEnd}.
+	 */
+	public static void ritualBegin(ServerPlayer player, Rank strength) {
+		Rank s = strength.realm().atLeast(Realm.GOLDEN_CORE) ? strength : new Rank(Realm.GOLDEN_CORE, 0, 0);
+		RITUALS.put(player.getUUID(), new Ritual(s, player.position(), dev.kultivator.elite.LightningRings.begin(player, s, false)));
+		for (Listener listener : LISTENERS) {
+			try {
+				listener.onRitual(player, s, true, false);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Tribulation listener failed at a ritual start", exception);
+			}
+		}
+	}
+
+	/** True between {@link #ritualBegin} and {@link #ritualEnd}. */
+	public static boolean inRitual(ServerPlayer player) {
+		return RITUALS.containsKey(player.getUUID());
+	}
+
+	/**
+	 * {@link dev.kultivator.elite.LightningRings#TELEGRAPH_TICKS} before ritual strike {@code number}: draws its ring (and
+	 * twin) at the player's feet. Nothing without a ritual or without rings.
+	 */
+	public static void ritualTelegraph(ServerPlayer player, int number, long strikeAt) {
+		Ritual ritual = RITUALS.get(player.getUUID());
+		if (ritual != null) {
+			dev.kultivator.elite.LightningRings.telegraph(player, ritual.rings(), number, ritual.start(), variant(player.level()), strikeAt);
+		}
+	}
+
+	/**
+	 * The ritual is over: Hu Fa hears {@code success}, and the ring state is replaced by an empty one so its grazes never
+	 * count as Menantang Langit for a later breakthrough (rings are a tribulation's own bonus).
+	 */
+	public static void ritualEnd(ServerPlayer player, boolean success) {
+		Ritual ritual = RITUALS.remove(player.getUUID());
+		if (ritual == null) {
+			return;
+		}
+		dev.kultivator.elite.LightningRings.begin(player, new Rank(Realm.GOLDEN_CORE, 0, 0), false);
+		for (Listener listener : LISTENERS) {
+			try {
+				listener.onRitual(player, ritual.strength(), false, success);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Tribulation listener failed at a ritual end", exception);
+			}
+		}
+	}
+
+	/** A ritual whose player is already gone: only its state is dropped (the leave events clean the rest). */
+	public static void ritualDrop(UUID player) {
+		RITUALS.remove(player);
+	}
+
+	/**
+	 * Ritual strike {@code number} (1-based; audit M4 S8): like {@link #strike(ServerPlayer, double)}, but the Hu Fa threads
+	 * and auto-join of strike 1 come first, and inside a ritual the lightning ring decides a full hit or a graze
+	 * ({@link dev.kultivator.elite.LightningRings#GRAZE_FACTOR}). A graze also heals {@link #SIDESTEP_HEAL} of max health
+	 * (balance change R3, approved: the same reward as the IA / TI tribulations). Never lethal; true when the full strike
+	 * would have killed.
+	 */
+	public static boolean strike(ServerPlayer player, double shareOfMaxHealth, int number) {
+		if (player == null || !player.isAlive()) {
+			return false;
+		}
+		dev.kultivator.elite.HuFaTribulation.beforeStrike(player, number);
+		Ritual ritual = RITUALS.get(player.getUUID());
+		dev.kultivator.elite.LightningRings.Impact impact = dev.kultivator.elite.LightningRings.impact(player, ritual == null ? null : ritual.rings(), number);
+		dev.kultivator.elite.LightningRings.impactFx(player, impact, variant(player.level()), number);
+		boolean wouldKill = strike(player, shareOfMaxHealth * impact.factor());
+		if (!wouldKill && impact.grazed() && player.isAlive() && !player.isCreative() && !player.isSpectator()) {
+			player.heal((float) (player.getMaxHealth() * SIDESTEP_HEAL));
 		}
 		return wouldKill;
 	}

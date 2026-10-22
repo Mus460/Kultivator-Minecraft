@@ -65,7 +65,8 @@ public class AulaPage extends HallPage {
 		if (!readonly()) {
 			int fy = y + h - BUTTON_H * 2 - 6;
 			nameField = add(new InkField(x + 2, fy, leftW - 6, BUTTON_H - 2, 24, text -> HallClient.send(Halls.OP_RENAME, text)));
-			TalismanButton rename = new TalismanButton(x + 2, fy + BUTTON_H + 2, leftW - 6, BUTTON_H,
+			int half = (leftW - 6) / 2;
+			TalismanButton rename = new TalismanButton(x + 2, fy + BUTTON_H + 2, half - 1, BUTTON_H,
 					() -> Component.translatable("kultivator.hall.ui.rename"));
 			rename.onPress(() -> {
 				if (nameField.focused() && !nameField.text().isBlank()) {
@@ -78,6 +79,19 @@ public class AulaPage extends HallPage {
 			});
 			rename.tooltip(() -> List.of(Component.translatable("kultivator.hall.ui.rename"), Component.translatable("kultivator.hall.ui.rename.tip")));
 			add(rename);
+			// T8: the players' own group (/sect, "Saudara Sekte") is reachable from the hall it lives beside.
+			TalismanButton fellows = new TalismanButton(x + 2 + half + 1, fy + BUTTON_H + 2, leftW - 6 - half - 1, BUTTON_H,
+					() -> Component.translatable("kultivator.sekte_sambung.aula.saudara"));
+			fellows.onPress(() -> {
+				net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+				if (mc.getConnection() != null) {
+					mc.getConnection().sendCommand("sect info");
+					screen.onClose();
+				}
+			});
+			fellows.tooltip(() -> List.of(Component.translatable("kultivator.sekte_sambung.aula.saudara"),
+					Component.translatable("kultivator.sekte_sambung.aula.saudara.tip")));
+			add(fellows);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package dev.kultivator.dunia.peta;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.abadi.Abadi;
 import dev.kultivator.dunia.DuniaSites;
 import dev.kultivator.harta.HartaText;
 import dev.kultivator.registry.ModItems;
@@ -39,10 +40,15 @@ import java.util.function.Consumer;
  */
 public final class PetaItems {
 
-	/** What a pointer scroll looks for: the structure tag folder and the published kind. */
+	/**
+	 * What a pointer scroll looks for: the structure tag folder and the published kind (a cave publishes the kind of the
+	 * cave actually found, see {@link DuniaSites#locate}). New kinds go at the end: the scroll saves the index.
+	 */
 	public static final String[][] POINTER_KINDS = {
 			{"kota", "kota/kota"}, {"reruntuhan", "reruntuhan/gua_kecil"}, {"penjara", "penjara/penjara"}, {"menara", "menara/menara"},
-			{"bawah", "bawah/kuil"}, {"laut", "laut/pusaran"}};
+			{"bawah", "bawah/kuil"}, {"laut", "laut/pusaran"}, {"kota_abadi", "kota/kota_abadi"}};
+	/** Kota Abadi floats only in Alam Abadi; the scroll does not search for it anywhere else. */
+	private static final int KOTA_ABADI = 6;
 
 	/** {@code kultivator:penunjuk}: the pointer scroll's chosen kind (index into {@link #POINTER_KINDS}). */
 	public static final DataComponentType<Integer> POINTER = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Kultivator.id("penunjuk"),
@@ -114,6 +120,10 @@ public final class PetaItems {
 			long wait = DuniaSites.locateCooldown(serverPlayer);
 			if (wait > 0L) {
 				Msg.actionBar(serverPlayer, Component.translatable("kultivator.peta.pointer.wait", (wait + 19L) / 20L).withColor(0xFFD54A));
+				return InteractionResult.FAIL;
+			}
+			if (kind == KOTA_ABADI && !level.dimension().equals(Abadi.IMMORTAL_LEVEL)) {
+				Msg.actionBar(serverPlayer, Component.translatable("kultivator.sambung.peta.kota_abadi.dimensi").withColor(0xFF8A7A));
 				return InteractionResult.FAIL;
 			}
 			TagKey<Structure> tag = TagKey.create(Registries.STRUCTURE, Kultivator.id(POINTER_KINDS[kind][0]));

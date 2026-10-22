@@ -766,8 +766,9 @@ public final class Payloads {
 	/**
 	 * Kitab Panduan (the in-game guide): the player's progress over {@code guide.GuideChapters.steps()} in that order.
 	 * {@code done} has bit i set when step i is finished (its automatic check passes, or a manual step is ticked);
-	 * {@code manual} has bit i set when the player ticked manual step i; {@code current} is the 0-based chapter of the
-	 * first unfinished step ({@code GuideChapters.CHAPTER_COUNT} when everything is done); {@code total} is the server's
+	 * {@code manual} has bit i set when the player ticked manual step i; {@code current} is the 0-based save index of the
+	 * chapter chosen by {@code GuideProgress.currentChapter} (realm and hall gates, core steps only;
+	 * {@code GuideChapters.CHAPTER_COUNT} when everything is done); {@code total} is the server's
 	 * step count (a mismatch means a different mod version); {@code open} asks the client to open the guide screen
 	 * ({@code /kultivasi panduan}; never set in the answer to a GuideAction). Sent by {@code guide.GuideProgress} on a GuideAction,
 	 * on the command and when the progress changes (checked every 5 seconds). About 40 bytes on the wire, far under

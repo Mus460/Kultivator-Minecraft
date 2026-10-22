@@ -12,8 +12,14 @@ import java.util.function.Supplier;
  * Extra launcher cards of the hub sections (DESIGN 34.6 T, contract C34.T1): modules of phase 34 add their card here from
  * their client init, and {@code HubCardsPage} puts them after the built-in cards of the section. A card's texts follow the
  * page's key format, {@code kultivator.hub.card.<id>} and {@code kultivator.hub.card.<id>.tip} (in the module's own lang
- * fragment). At most one card per module (T "Peta Dunia" and R "Menara Seratus" in DUNIA, K "Kota Abadi" in KEABADIAN),
- * so every section keeps fitting the 320 × 240 grid. Client thread only.
+ * fragment). At most one card per module (T "Peta Dunia" and R "Menara Seratus" in DUNIA, K "Kota Abadi" in KEABADIAN).
+ * <p>
+ * Section {@link HubNav#SEKTE} (audit M5, T9) has two sub-coins: "Aula" holds the hall's built-in cards and any extra card
+ * whose id does not start with {@code sekte_}; "Perguruan" holds every card whose id starts with {@code sekte_} (Sekte yang
+ * Hidup 36, the {@code sekte_langit} card of 37). A {@code sekte_*} card in SEKTE always gets the hall lock ("butuh Prasasti
+ * Aula Sekte") before its own lock, so its module passes {@code null} or only its extra condition (for example a hall
+ * level). Each sub-coin is meant for at most 9 cards: the grid then fits 320 × 240 and GUI scale 4 on 1366 × 768; more
+ * cards still work (the grid adds a column, then scrolls) but should get their own sub-coin. Client thread only.
  */
 public final class HubCards {
 

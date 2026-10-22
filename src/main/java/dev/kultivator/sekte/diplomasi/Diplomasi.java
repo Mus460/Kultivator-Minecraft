@@ -64,7 +64,20 @@ public final class Diplomasi implements DiplomasiService {
 	private static boolean initialised;
 
 	/** From {@code SekteContent.init()} (one line). */
+	private static boolean content;
+
+	/** Registry content (K1): the gate placement type and the payload types, always, whatever the switches say. */
+	public static void registerContent() {
+		if (content) {
+			return;
+		}
+		content = true;
+		GerbangSekte.registerContent();
+		DiplomasiPayloads.register();
+	}
+
 	public static void init() {
+		registerContent();
 		if (initialised || !SekteContent.on(SekteIds.D)) {
 			return;
 		}
@@ -78,10 +91,10 @@ public final class Diplomasi implements DiplomasiService {
 			}
 		});
 		GerbangSekte.register(config.strukturAktif);
-		DiplomasiPayloads.register();
 		DiplomasiCommands.register();
 		Utusan.init();
 		Perang.init();
+		KetuaSekte.init();
 		SekteApi.setDiplomasi(SERVICE);
 		listen();
 		UseEntityCallback.EVENT.register(Diplomasi::onUse);
@@ -191,6 +204,11 @@ public final class Diplomasi implements DiplomasiService {
 		ServerPlayer player = srv.getPlayerList().getPlayer(owner);
 		if (player != null) {
 			Advancements.grant(player, SekteIds.ADVANCEMENT_FOLDER + "diplomasi_temu");
+			if (sect.gateBorn()) {
+				// T12: a met sect's gate is on the player's map (the site AnggotaSekte published when the gate was born).
+				dev.kultivator.dunia.DuniaSites.discover(player,
+						dev.kultivator.dunia.DuniaSites.idOf(srv.overworld().dimension(), sect.gate(), AnggotaSekte.SITE_KIND));
+			}
 		}
 	}
 
@@ -309,6 +327,32 @@ public final class Diplomasi implements DiplomasiService {
 	public @Nullable BlockPos gate(String sectId) {
 		SekteNpc sect = find(sectId);
 		return sect == null || !sect.gateBorn() ? null : sect.gate();
+	}
+
+	@Override
+	public void meet(UUID owner, String sectId) {
+		SekteNpc sect = find(sectId);
+		MinecraftServer srv = server;
+		if (sect != null && srv != null && owner != null) {
+			meet(srv, owner, sect);
+		}
+	}
+
+	@Override
+	public boolean met(UUID owner, String sectId) {
+		SekteNpc sect = find(sectId);
+		MinecraftServer srv = server;
+		if (sect == null || srv == null || owner == null) {
+			return false;
+		}
+		Relasi r = DiplomasiData.get(srv).peek(owner, sect.id);
+		return r != null && r.ditemui;
+	}
+
+	@Override
+	public @Nullable BlockPos plannedGate(String sectId) {
+		SekteNpc sect = find(sectId);
+		return sect == null ? null : new BlockPos(sect.blockX, 0, sect.blockZ);
 	}
 
 	private static @Nullable SekteNpc find(@Nullable String sectId) {

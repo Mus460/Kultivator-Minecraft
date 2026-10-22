@@ -17,6 +17,7 @@ import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.voice.VoiceDisciples;
+import dev.kultivator.sekte.SekteSuara;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -579,7 +580,7 @@ final class Pendakian {
 			JalurTangga.point(frame, next, JalurTangga.lane(p.lane), point);
 			level.playSound(null, point[0], point[1] + 1.0D, point[2], SoundEvents.BREEZE_IDLE_AIR, SoundSource.NEUTRAL, 1.2F, 0.5F);
 			level.playSound(null, point[0], point[1] + 1.0D, point[2], SoundEvents.WARDEN_HEARTBEAT, SoundSource.NEUTRAL, 0.9F, 0.7F);
-			VoiceDisciples.line(p.body, "fear", 200);
+			SekteSuara.line(p.body, "climb_illusion", "fear", 200);
 		}
 		p.to = next;
 		int hundreds = (int) (next / 100.0D);
@@ -600,7 +601,7 @@ final class Pendakian {
 			p.state = TanggaPayloads.C_PEAK;
 			level.playSound(null, point[0], point[1] + 1.0D, point[2], SoundEvents.BELL_RESONATE, SoundSource.BLOCKS, 2.0F, 1.2F);
 			level.playSound(null, point[0], point[1] + 1.0D, point[2], SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 1.6F, 1.0F);
-			VoiceDisciples.line(p.body, "victory", 200);
+			SekteSuara.line(p.body, "climb_peak", "victory", 200);
 			if (!peakScene) {
 				peakScene = true;
 				peakScene(server, p);
