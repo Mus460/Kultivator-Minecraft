@@ -398,6 +398,75 @@ for key, ja, cap_en, cap_id, emo in DISCIPLE:
         event(eid, [name], 'Disciple speaks', 'Murid berbicara')
         manifest['lines'].append({'event': eid, 'ja': ja, 'en': cap_en, 'id': cap_id, 'speaker': 'disciple', 'voice': vid, 'style': style})
 
+# --- Dunia Kultivasi yang Luas (DESIGN 34.8): event voice.<key>, caption kultivator.voice.<key>
+READ.update({'凡塵': 'ぼんじん', '霊舟': 'れいしゅう', '玉帝': 'ぎょくてい', '言伝': 'ことづて', '帳': 'ちょう',
+             '空賊': 'くうぞく', '我が宮': 'わがみや', '水晶宮': 'すいしょうきゅう', '亡者': 'もうじゃ'})
+WORLD_SPEAKER = {  # speaker -> (style, fx, speaker group for subtitles)
+    'm1': (12, 'room', 'disciple'), 'm2': (11, 'room', 'disciple'), 'm3': (52, 'room', 'disciple'),
+    'f1': (2, 'room', 'disciple'), 'f2': (8, 'room', 'disciple'), 'f3': (46, 'room', 'disciple'),
+    'elder': (ELDER, 'elder', 'elder'), 'boss': (ANCIENT, 'boss', 'boss'), 'demon': (HEART_DEMON, 'demon', 'demon'),
+    'heaven': (HEAVEN, 'heaven', 'heaven'), 'heaven_fierce': (HEAVEN_FIERCE, 'heaven', 'heaven'),
+}
+WORLD = [
+    ('kota.auction_open', 'm2', '今宵の競売を始めます！', 'Tonight\'s auction begins!', 'Lelang malam ini dimulai!', 'joy'),
+    ('kota.auction_sold', 'm2', '落札！', 'Sold!', 'Terjual!', 'joy'),
+    ('kota.tea_welcome', 'f1', 'どうぞ、お茶が入りました。', 'Please sit, the tea is freshly brewed.', 'Silakan duduk, tehnya baru diseduh.', 'calm'),
+    ('kota.tea_news', 'f1', 'もうお聞きになりましたか？', 'Have you heard the news?', 'Sudah dengar kabarnya?', 'normal'),
+    ('kota.black_whisper', 'm3', '良い品だ…口の堅い者にだけな。', 'Fine goods... for those who know how to keep quiet.', 'Barang bagus… untuk orang yang tahu diam.', 'calm'),
+    ('kota.guard_halt', 'm1', '止まれ！この町は宗門の庇護下にある。', 'Halt! This town is under a sect\'s protection.', 'Berhenti! Kota ini dilindungi sekte.', 'angry'),
+    ('kota.wanderer_dao', 'elder', '道は違えど、語り合おうではないか。', 'Our paths differ. Let us exchange views.', 'Jalan kita berbeda. Mari bertukar pandangan.', 'calm'),
+    ('kota.rival_claim', 'm3', 'その宝は我らのものだ！', 'That treasure is ours!', 'Harta itu milik kami!', 'angry'),
+    ('kota.immortal_scorn', 'f3', '凡塵の者がここまで来たか。', 'Mortal dust made it all the way here?', 'Debu fana sampai juga ke sini?', 'calm'),
+    ('kota.lecture', 'elder', '聞け。満ちた杯に道は流れぬ。', 'Listen. The Dao does not flow into a full cup.', 'Dengarkan. Dao tidak mengalir ke cangkir yang penuh.', 'calm'),
+    ('kota.envoy_pleased', 'boss', '玉帝はお喜びである。', 'The Jade Emperor is pleased.', 'Kaisar Giok berkenan.', 'calm'),
+    ('kota.peach_keeper', 'f2', 'この桃は、己の時に熟すもの。', 'These peaches ripen in their own time.', 'Persik ini matang menurut waktunya sendiri.', 'calm'),
+    ('penjara.free_at_last', 'demon', 'ついに…自由だ！', 'At last... free!', 'Akhirnya… bebas!', 'angry'),
+    ('penjara.resealed', 'heaven', '封印、ここに成る。', 'The seal is restored.', 'Segel telah pulih.', 'normal'),
+    ('menara.next_floor', 'heaven', '登れ。次の階が待っている。', 'Climb. The next floor awaits.', 'Naiklah, lantai berikutnya menanti.', 'normal'),
+    ('menara.shadow_self', 'm3', '我は汝なり。超えられるものなら超えてみよ。', 'I am you. Surpass me if you can.', 'Akulah dirimu. Kalahkan aku jika kau mampu.', 'calm'),
+    ('gua.ancestor_trial', 'elder', '我が陣は汝の力ではなく、心を量る。', 'My formation weighs your heart, not your strength.', 'Formasiku menimbang hatimu, bukan kekuatanmu.', 'calm'),
+    ('heaven.langit.meteor_shower', 'heaven', '星が雨のごとく降り注ぐ。', 'The stars fall like rain.', 'Bintang-bintang jatuh seperti hujan.', 'normal'),
+    ('heaven.langit.twin_moons', 'heaven', '二つの月が夜を照らす。', 'Two moons light the night.', 'Dua bulan menerangi malam.', 'normal'),
+    ('heaven.langit.treasure_born', 'heaven_fierce', '天地の宝、ここに生まる。', 'A treasure of Heaven and Earth is born.', 'Harta langit dan bumi telah lahir.', 'normal'),
+    ('heaven.langit.blood_eclipse', 'heaven_fierce', '血の月…天が怒っている。', 'A blood moon... Heaven is enraged.', 'Bulan berdarah… langit murka.', 'normal'),
+    ('langit.treasure_born', 'heaven_fierce', '天地の宝、ここに生まる。', 'A treasure of Heaven and Earth is born.', 'Harta langit dan bumi telah lahir.', 'normal'),
+    ('langit.blood_eclipse', 'heaven_fierce', '血の月…天が怒っている。', 'A blood moon... Heaven is enraged.', 'Bulan berdarah… langit murka.', 'normal'),
+    ('naga.subdued', 'heaven', '龍、ここに伏す。', 'The dragon submits.', 'Naga telah tunduk.', 'normal'),
+    ('naga.tribulation', 'heaven_fierce', '天が汝の霊獣を試す。', 'Heaven tests your spirit beast.', 'Langit menguji binatang rohmu.', 'normal'),
+    ('naga.evolved', 'heaven_fierce', '古の血が目覚め、霊獣が進化する！', 'Ancient blood awakens, the spirit beast evolves!', 'Darah purba bangkit, binatang roh berevolusi!', 'normal'),
+    ('naga.trib_failed', 'heaven', '時はまだ満ちぬ…再び立て。', 'The time is not yet ripe... rise again.', 'Belum waktunya… bangkitlah lagi.', 'normal'),
+    ('naga.jiao_roar', 'boss', '我が空を乱すは何者ぞ！', 'Who dares disturb my sky?', 'Siapa berani mengusik langitku?', 'angry'),
+    ('bawah.meng_po_offer', 'f3', '飲みなさい。悲しみを忘れるのです。', 'Drink, and forget your sorrow.', 'Minumlah, lupakan dukamu.', 'calm'),
+    ('bawah.meng_po_refuse', 'f3', 'ならば、すべての記憶を抱いて裁きへ行きなさい。', 'Then go to judgement carrying all your memories.', 'Kalau begitu, pergilah ke pengadilan dengan semua ingatanmu.', 'calm'),
+    ('bawah.yama_judgement', 'boss', '鏡の前で己の業を量れ！', 'Weigh your deeds before the mirror!', 'Timbang perbuatanmu di depan cermin!', 'angry'),
+    ('bawah.yama_book', 'boss', '汝の名、この帳に記されておる。', 'Your name is written in this book.', 'Namamu tertulis di buku ini.', 'calm'),
+    ('bawah.ox_head', 'm1', '亡者よ、ついて来い！', 'Soul, come with us!', 'Arwah, ikut kami!', 'angry'),
+    ('bawah.ghost_plea', 'f2', 'どうか…言伝を。', 'Please... deliver my message.', 'Tolong… sampaikan pesanku.', 'sad'),
+    ('laut.dragon_king', 'boss', '我が宮に参るは何者ぞ。', 'Who dares come to my palace?', 'Siapa yang berani datang ke istanaku?', 'calm'),
+    ('laut.gate_guard', 'm1', '水晶宮へようこそ。', 'Welcome to the Crystal Palace.', 'Selamat datang di Istana Kristal.', 'normal'),
+    ('laut.penglai_trial', 'elder', '汝の悟りを示せ。', 'Show me your insight.', 'Tunjukkan wawasanmu.', 'calm'),
+    ('kapal.launch', 'm1', '霊舟、出航！', 'Spirit ship, set sail!', 'Kapal roh, berangkat!', 'joy'),
+    ('kapal.cloud_leap', 'heaven_fierce', '雲海を越えよ！', 'Pierce the sea of clouds!', 'Menembus lautan awan!', 'normal'),
+    ('kapal.arrive', 'm1', '到着いたしました。', 'We have arrived.', 'Kita telah tiba.', 'normal'),
+    ('kapal.sky_pirates', 'm3', '空賊だ！積み荷を置いていけ！', 'Sky pirates! Leave your cargo!', 'Bajak langit! Tinggalkan muatanmu!', 'angry'),
+    ('kapal.hull_broken', 'm1', '船体損傷、降下する！', 'Hull damaged, we are going down!', 'Lambung rusak, kita turun!', 'fear'),
+    ('peta.site_found', 'heaven', '山海、汝の名を記す。', 'The mountains and seas record your name.', 'Gunung dan laut mencatat namamu.', 'normal'),
+]
+for key, spk, ja, cap_en, cap_id, emo in WORLD:
+    style, fxname, group = WORLD_SPEAKER[spk]
+    native = spk.startswith(('m', 'f')) and emo in NATIVE_EMO.get(spk, set())
+    if spk.startswith(('m', 'f')) and native:
+        style = VOICES[spk][emo]
+    raw = tts(ja, style, 'normal' if native else emo, speed=0.88 if group == 'heaven' else 0.95,
+              pitch_scale=-0.06 if group == 'heaven' else None)
+    name = write('world/' + key.replace('.', '/'), fx_room(raw, seed=90) if fxname == 'room' else FX[fxname](raw))
+    eid = f'voice.{key}'
+    event(eid, [name], f'{SPEAKER_EN[group]} speaks' if group != 'disciple' else 'Someone speaks',
+          f'{SPEAKER_ID[group]} berbicara' if group != 'disciple' else 'Seseorang berbicara')
+    en[f'kultivator.voice.{key}'] = cap_en
+    id_[f'kultivator.voice.{key}'] = cap_id
+    manifest['lines'].append({'event': eid, 'ja': ja, 'en': cap_en, 'id': cap_id, 'speaker': spk, 'style': style})
+
 # --- non-verbal clips from the free packs (see docs/CREDITS.md)
 ADV = os.path.join(DL, 'male_adv/x/RPG Male Adventurer')
 FEM = os.path.join(DL, 'female_rpg')

@@ -217,13 +217,21 @@ final class KotaFx {
 		}
 	}
 
-	/** A soft cultivation aura: motes rising around NPCs that carry {@link KultivatorNpc#FLAG_AURA}. */
+	/**
+	 * A soft cultivation aura: motes rising around NPCs that carry {@link KultivatorNpc#FLAG_AURA}; and the small visuals
+	 * of their body language (detail pass): qi drawn in by the seated and meditating, sparks under the smith's hammer,
+	 * steam over the tea master's pot, a glint at the bowing hands. At most six of each kind per 4 ticks, scaled by
+	 * {@code EffectQuality}, within 24 blocks.
+	 */
 	private static void auras(ClientLevel level, Vec3 eye, RandomSource random) {
 		int shown = 0;
-		for (KultivatorNpc npc : level.getEntitiesOfClass(KultivatorNpc.class, new AABB(eye, eye).inflate(24.0D),
-				each -> each.hasFlag(KultivatorNpc.FLAG_AURA) && each.isAlive())) {
-			if (shown++ >= 6) {
-				break;
+		int acts = 0;
+		for (KultivatorNpc npc : level.getEntitiesOfClass(KultivatorNpc.class, new AABB(eye, eye).inflate(24.0D), KultivatorNpc::isAlive)) {
+			if (acts < 6 && npc.distanceToSqr(eye) < 16.0D * 16.0D && body(level, npc, random)) {
+				acts++;
+			}
+			if (!npc.hasFlag(KultivatorNpc.FLAG_AURA) || shown++ >= 6) {
+				continue;
 			}
 			if (!EffectQuality.chance(random, 0.6F)) {
 				continue;
@@ -237,6 +245,51 @@ final class KotaFx {
 			level.addParticle(Qi.mote(rgb, 0.07F + npc.realm() * 0.006F, 26), npc.getX() + Math.cos(angle) * r, npc.getY() + 0.2D + random.nextDouble() * 0.6D,
 					npc.getZ() + Math.sin(angle) * r, 0.0D, 0.03D + npc.realm() * 0.003D, 0.0D);
 		}
+	}
+
+	/** One particle of an NPC's body language this pass (true when one was made). */
+	private static boolean body(ClientLevel level, KultivatorNpc npc, RandomSource random) {
+		if (!EffectQuality.chance(random, 0.5F)) {
+			return false;
+		}
+		float yaw = npc.yBodyRot * net.minecraft.util.Mth.DEG_TO_RAD;
+		double fx = -Math.sin(yaw);
+		double fz = Math.cos(yaw);
+		if (npc.hasFlag(KultivatorNpc.FLAG_SITTING)) {
+			// breathing in: a mote drifts from a little way off toward the dantian
+			double angle = random.nextDouble() * Math.PI * 2.0D;
+			double r = 1.1D + random.nextDouble() * 0.4D;
+			double ox = Math.cos(angle) * r;
+			double oz = Math.sin(angle) * r;
+			level.addParticle(Qi.mote(npc.dao() == null ? 0xBFE8FF : npc.dao().color(), 0.06F, 24), npc.getX() + ox, npc.getY() + 0.6D,
+					npc.getZ() + oz, -ox * 0.04D, 0.0D, -oz * 0.04D);
+			return true;
+		}
+		if (npc.hasFlag(KultivatorNpc.FLAG_WORK)) {
+			double hx = npc.getX() + fx * 0.6D;
+			double hz = npc.getZ() + fz * 0.6D;
+			switch (npc.role()) {
+				case PANDAI_PUSAKA -> {
+					for (int i = 0; i < 2; i++) {
+						level.addParticle(Qi.spark(0xFFB04A, 0.06F, 8), hx, npc.getY() + 0.85D, hz, random.nextGaussian() * 0.08D, 0.06D + random.nextDouble() * 0.05D,
+								random.nextGaussian() * 0.08D);
+					}
+					return true;
+				}
+				case PEMILIK_TEH -> {
+					level.addParticle(Qi.mote(0xF4F4EE, 0.08F, 40), hx, npc.getY() + 1.15D, hz, 0.0D, 0.02D, 0.0D);
+					return true;
+				}
+				default -> {
+					return false;
+				}
+			}
+		}
+		if (npc.hasFlag(KultivatorNpc.FLAG_BOW) && random.nextInt(3) == 0) {
+			level.addParticle(Qi.spark(0xFFE6A0, 0.05F, 10), npc.getX() + fx * 0.45D, npc.getY() + 1.15D, npc.getZ() + fz * 0.45D, 0.0D, 0.01D, 0.0D);
+			return true;
+		}
+		return false;
 	}
 
 	// ================================================================== render

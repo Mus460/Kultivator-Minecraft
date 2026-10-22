@@ -2,6 +2,7 @@ package dev.kultivator.client.dunia.dimensi.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.dunia.dimensi.DimensiState;
 import dev.kultivator.dunia.dimensi.DimensiLevels;
@@ -23,7 +24,9 @@ import org.joml.Quaternionf;
  * POSITION_COLOR, no texture, no shader; Sodium and Iris keep them): the sea gate's turning whirlpool of foam arms and
  * rings on the water, the return gates' twin pillars of light with a veil, Teras Wangxiang's arrival ring and the
  * homesick compass (an arrow on the stone pointing toward the soul's body), the floating Book of Life and Death, the
- * incense altar's smoke glow, herb beds, the Penglai spring's rings and Dizang's halo. At most ~170 quads per mark,
+ * incense altar's smoke glow, herb beds, the Penglai spring's rings, Dizang's halo, and under the Naihe bridge the
+ * Wangchuan's slow pale glow (flowing strips on the water and a thin mist above them, in the bridge piece's own frame)
+ * with soft halos around the bridge's fourteen soul lanterns (within 48 b, not on Minimal). At most ~170 quads per mark,
  * halved beyond 64 b and on Minimal effects.
  */
 public class TandaRenderer extends EntityRenderer<TandaEntity, TandaRenderer.State> {
@@ -36,6 +39,8 @@ public class TandaRenderer extends EntityRenderer<TandaEntity, TandaRenderer.Sta
 		public boolean sea;
 		public boolean bawah;
 		public float compass = Float.NaN;
+		public float yaw;
+		public int sky;
 	}
 
 	public TandaRenderer(EntityRendererProvider.Context context) {
@@ -55,6 +60,8 @@ public class TandaRenderer extends EntityRenderer<TandaEntity, TandaRenderer.Sta
 		state.markState = entity.state();
 		state.sea = DimensiLevels.isLaut(entity.level()) || state.kind == TandaEntity.PUSARAN;
 		state.bawah = DimensiLevels.isBawah(entity.level());
+		state.yaw = entity.getYRot();
+		state.sky = DimensiState.sky();
 		state.compass = Float.NaN;
 		if (state.kind == TandaEntity.TERAS && DimensiState.soul()) {
 			double dx = DimensiState.bodyX() - entity.getX();
@@ -67,6 +74,9 @@ public class TandaRenderer extends EntityRenderer<TandaEntity, TandaRenderer.Sta
 
 	@Override
 	protected AABB getBoundingBoxForCulling(TandaEntity entity, float partialTicks) {
+		if (entity.kind() == TandaEntity.NAIHE) {
+			return entity.getBoundingBox().inflate(26.0D, 8.0D, 26.0D);
+		}
 		return entity.getBoundingBox().inflate(entity.kind() == TandaEntity.PUSARAN ? 8.0D : 3.0D);
 	}
 
@@ -87,6 +97,7 @@ public class TandaRenderer extends EntityRenderer<TandaEntity, TandaRenderer.Sta
 					ring(pose, buffer, 0.0F, 1.4F, 0.0F, 1.1F, 1.35F, 0xFFD27A, 150, Math.round(32 * detail), age * 0.01F, false));
 			case TandaEntity.CERMIN -> billboard(poseStack, collector, camera, (pose, buffer) ->
 					halo(pose, buffer, 1.2F, 0xE0E8FF, 90, 1.4F, age));
+			case TandaEntity.NAIHE -> naihe(state, poseStack, collector, camera, age, detail);
 			default -> {
 			}
 		}
@@ -137,6 +148,77 @@ public class TandaRenderer extends EntityRenderer<TandaEntity, TandaRenderer.Sta
 			float t1 = (i + 1) * Mth.TWO_PI / 12.0F;
 			flatQuad(pose, buffer, t0, 0.3F, t1, 0.3F, 0.5F, 0.01F, ARGB.color(70, 0x2060A0));
 		}
+	}
+
+	// ================================================================== the Wangchuan under the Naihe bridge
+
+	/** The template's river relative to the naihe anchor (tools/gen_dunia_dimensi.py jembatan_naihe, anchor 23.5 9 20.5). */
+	private static final float RIVER_X0 = -22.5F;
+	private static final float RIVER_X1 = 23.5F;
+	private static final float RIVER_Z0 = -10.5F;
+	private static final float RIVER_Z1 = 9.5F;
+	private static final float RIVER_Y = -3.96F;
+
+	/** The river's glow in the piece's frame and the lantern halos along the bridge rails. */
+	private static void naihe(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera, float age, float detail) {
+		boolean eclipse = state.sky == 2;
+		int water = eclipse ? 0xB05060 : 0x6FA8C8;
+		int mist = eclipse ? 0xD08080 : 0xC9D8FF;
+		poseStack.pushPose();
+		poseStack.rotateDegrees(Axis.YP, -state.yaw);
+		int segments = Math.max(6, Math.round(16 * detail));
+		int strips = Math.max(3, Math.round(6 * detail));
+		collector.submitCustomGeometry(poseStack, GLOW, (pose, buffer) -> {
+			float segW = (RIVER_X1 - RIVER_X0) / segments;
+			float stripW = (RIVER_Z1 - RIVER_Z0) / strips;
+			for (int s = 0; s < strips; s++) {
+				float z0 = RIVER_Z0 + s * stripW + stripW * 0.15F;
+				float z1 = z0 + stripW * 0.7F;
+				for (int i = 0; i < segments; i++) {
+					float x0 = RIVER_X0 + i * segW;
+					float x1 = x0 + segW;
+					// the current flows along the river: a slow wave of light moving down its length
+					float wave = 0.5F + 0.5F * Mth.sin(age * 0.045F - i * 0.55F + s * 1.3F);
+					int alpha = Math.round(14 + 34 * wave * wave);
+					flat(pose, buffer, x0, z0, x1, z1, RIVER_Y, ARGB.color(alpha, water));
+				}
+			}
+			// a thin mist drifting the other way, a little above the water
+			for (int i = 0; i < segments; i += 2) {
+				float x0 = RIVER_X0 + i * segW;
+				float x1 = x0 + segW * 2.0F;
+				float drift = 0.5F + 0.5F * Mth.sin(age * 0.03F + i * 0.7F);
+				flat(pose, buffer, x0, RIVER_Z0 + 2.0F, x1, RIVER_Z1 - 2.0F, RIVER_Y + 0.45F, ARGB.color(Math.round(8 + 14 * drift), mist));
+			}
+		});
+		if (detail >= 0.99F && state.distanceToCameraSq < 48.0D * 48.0D) {
+			// the bridge's soul lanterns: x 20 / 26 at z 7, 11 ... 31, two blocks above the arched deck (F 5, rise 3)
+			for (int z = 7; z <= 31; z += 4) {
+				double t = (z - 7) / 25.0D;
+				int h = 5 + (int) Math.round(3.0D * Math.sin(Math.PI * t));
+				float y = h + 2.5F - 9.0F;
+				float lz = z + 0.5F - 20.5F;
+				for (float lx : new float[] {-3.0F, 3.0F}) {
+					poseStack.pushPose();
+					poseStack.translate(lx, y, lz);
+					poseStack.rotateDegrees(Axis.YP, state.yaw);
+					poseStack.rotate(Mth.rotationAroundAxis(Mth.Y_AXIS, camera.orientation, new Quaternionf()));
+					float flick = 0.85F + 0.15F * Mth.sin(age * 0.2F + z + lx);
+					collector.submitCustomGeometry(poseStack, GLOW, (pose, buffer) -> halo(pose, buffer, 0.0F, eclipse ? 0xFF7060 : 0x9FD8FF,
+							Math.round(70 * flick), 0.9F, age));
+					poseStack.popPose();
+				}
+			}
+		}
+		poseStack.popPose();
+	}
+
+	/** A horizontal quad (x0, z0)-(x1, z1) at height {@code y}. */
+	private static void flat(PoseStack.Pose pose, VertexConsumer buffer, float x0, float z0, float x1, float z1, float y, int color) {
+		buffer.addVertex(pose, x0, y, z0).setColor(color);
+		buffer.addVertex(pose, x0, y, z1).setColor(color);
+		buffer.addVertex(pose, x1, y, z1).setColor(color);
+		buffer.addVertex(pose, x1, y, z0).setColor(color);
 	}
 
 	/** A quad lying on the water between polar points (t0, r0) and (t1, r1), {@code w} wide, at height {@code y}. */

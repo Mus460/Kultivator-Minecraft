@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:dunia/ship_launched",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.ship_bahtera.description"
+    },
+    "icon": {
+      "id": "kultivator:lunas_bahtera_langit"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.ship_bahtera.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

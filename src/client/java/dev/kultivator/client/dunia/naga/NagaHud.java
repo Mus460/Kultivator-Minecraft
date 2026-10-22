@@ -100,10 +100,15 @@ public final class NagaHud implements HudElement {
 
 	static void clear() {
 		contest = null;
+		dangerAt = null;
+		dangerTicks = 0;
 	}
 
 	/** Every client tick: sample the overlap, report every 10 ticks. */
 	static void tick(Minecraft minecraft) {
+		if (!minecraft.isPaused()) {
+			dangerTick(minecraft);
+		}
 		Contest current = contest;
 		if (current == null || minecraft.player == null || minecraft.isPaused()) {
 			return;
@@ -163,6 +168,85 @@ public final class NagaHud implements HudElement {
 		if (minecraft.player.getVehicle() instanceof NagaLiarEntity dragon && dragon.isTamed()) {
 			drawStamina(g, minecraft, dragon);
 		}
+		if (dangerTicks > 0 && dangerAt != null) {
+			drawDanger(g, minecraft, partial);
+		}
+	}
+
+	// ================================================================== the danger warning (detail pass)
+
+	/** The telegraphed danger the local player stands in (or a breath aimed at them), kept half a second after it ends. */
+	private static @Nullable net.minecraft.world.phys.Vec3 dangerAt;
+	private static int dangerTicks;
+	private static final int DANGER_HOLD = 10;
+
+	/**
+	 * Every client tick: is the player inside a thunder mark or a whirl's telegraph, under a wild Jiao's breath aimed at
+	 * them, or inside a cloud veil about to burst? The HUD then pulses red at the screen edges and points at it.
+	 */
+	private static void dangerTick(Minecraft minecraft) {
+		if (minecraft.player == null || minecraft.level == null) {
+			dangerTicks = 0;
+			return;
+		}
+		net.minecraft.world.phys.Vec3 at = minecraft.player.position();
+		net.minecraft.world.phys.Vec3 threat = NagaStrikes.threat(at);
+		if (threat == null) {
+			int id = minecraft.player.getId();
+			for (NagaLiarEntity dragon : minecraft.level.getEntitiesOfClass(NagaLiarEntity.class, minecraft.player.getBoundingBox().inflate(48.0D),
+					entity -> entity.isAlive() && !entity.isTamed())) {
+				int skill = dragon.skill();
+				int t = dragon.skillTicks();
+				boolean breath = skill == NagaLiarEntity.SKILL_BREATH && dragon.aimId() == id
+						&& t < NagaLiarEntity.BREATH_TELEGRAPH + NagaLiarEntity.BREATH_ACTIVE;
+				boolean veil = skill == NagaLiarEntity.SKILL_SPECIAL && dragon.kind() == NagaKind.AWAN && t < 22
+						&& dragon.distanceToSqr(minecraft.player) < NagaLiarEntity.VEIL_RADIUS * NagaLiarEntity.VEIL_RADIUS;
+				boolean bite = skill == NagaLiarEntity.SKILL_BITE && dragon.aimId() == id;
+				if (breath || veil || bite) {
+					threat = dragon.position();
+					break;
+				}
+			}
+		}
+		if (threat != null) {
+			dangerAt = threat;
+			dangerTicks = DANGER_HOLD;
+		} else if (dangerTicks > 0) {
+			dangerTicks--;
+		}
+	}
+
+	private static void drawDanger(GuiGraphicsExtractor g, Minecraft minecraft, float partial) {
+		int w = g.guiWidth();
+		int h = g.guiHeight();
+		float time = minecraft.player.tickCount + partial;
+		float pulse = dev.kultivator.client.EffectQuality.reduceMotion() ? 0.8F : 0.6F + 0.4F * Mth.sin(time * 0.5F);
+		float fade = Mth.clamp((dangerTicks - 1 + partial) / DANGER_HOLD, 0.0F, 1.0F);
+		int strips = 6;
+		for (int i = 0; i < strips; i++) {
+			int a = Math.round(90 * pulse * fade * (1.0F - i / (float) strips));
+			if (a <= 0) {
+				continue;
+			}
+			int c = ARGB.color(a, 0xFF3020);
+			int s = i * 4;
+			g.fill(s, 0, s + 4, h, c);
+			g.fill(w - s - 4, 0, w - s, h, c);
+			g.fill(0, s, w, s + 3, c);
+			g.fill(0, h - s - 3, w, h - s, c);
+		}
+		// the pointer: where it comes from, relative to where you look
+		double dx = dangerAt.x - minecraft.player.getX();
+		double dz = dangerAt.z - minecraft.player.getZ();
+		float toward = (float) (Mth.atan2(-dx, dz) * Mth.RAD_TO_DEG);
+		float relative = Mth.wrapDegrees(toward - Mth.lerp(partial, minecraft.player.yRotO, minecraft.player.getYRot())) * Mth.DEG_TO_RAD;
+		int radius = 46;
+		int px = w / 2 + Math.round(Mth.sin(relative) * radius);
+		int py = h / 2 - Math.round(Mth.cos(relative) * radius);
+		int color = ARGB.color(Math.round(255 * fade), 0xFFD060);
+		g.centeredText(minecraft.font, Component.literal("⚠"), px, py - 4, color);
+		g.centeredText(minecraft.font, Component.translatable("kultivator.naga.hud.danger"), w / 2, h / 2 + 30, ARGB.color(Math.round(230 * fade * pulse),
+				0xFF8060));
 	}
 
 	private static void drawContest(GuiGraphicsExtractor g, Minecraft minecraft, Contest current, float partial) {

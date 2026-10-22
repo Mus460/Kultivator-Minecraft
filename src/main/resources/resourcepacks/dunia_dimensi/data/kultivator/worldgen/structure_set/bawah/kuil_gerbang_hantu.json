@@ -14,6 +14,10 @@
     {
       "structure": "kultivator:bawah/kuil_gerbang_hantu",
       "weight": 1
+    },
+    {
+      "structure": "kultivator:bawah/kuil_rawa",
+      "weight": 1
     }
   ]
 }

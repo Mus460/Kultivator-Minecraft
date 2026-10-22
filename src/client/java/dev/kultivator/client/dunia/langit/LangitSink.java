@@ -31,6 +31,11 @@ final class LangitSink {
 	static final Identifier LOTUS_TEX = Kultivator.id("textures/dunia/langit/lotus_petal.png");
 	static final Identifier ROCK_TEX = Kultivator.id("textures/dunia/langit/meteor_rock.png");
 	static final Identifier RING_TEX = Kultivator.id("textures/misc/epic/ring_soft.png");
+	static final Identifier MOON_SHADOW_TEX = Kultivator.id("textures/dunia/langit/moon_shadow.png");
+	static final Identifier CRATER_TEX = Kultivator.id("textures/dunia/langit/crater_decal.png");
+	static final Identifier RUNE_TEX = Kultivator.id("textures/dunia/langit/rune_ring.png");
+	static final Identifier SHAFT_TEX = Kultivator.id("textures/dunia/langit/light_shaft.png");
+	static final Identifier WISP_TEX = Kultivator.id("textures/dunia/langit/qi_wisp.png");
 
 	static final RenderType STREAK = RenderTypes.entityTranslucentEmissive(STREAK_TEX);
 	static final RenderType HEAD = RenderTypes.entityTranslucentEmissive(HEAD_TEX);
@@ -44,6 +49,11 @@ final class LangitSink {
 	static final RenderType LOTUS = RenderTypes.entityTranslucentEmissive(LOTUS_TEX);
 	static final RenderType RING = RenderTypes.entityTranslucentEmissive(RING_TEX);
 	static final RenderType ROCK = RenderTypes.entitySolid(ROCK_TEX);
+	static final RenderType MOON_SHADOW = RenderTypes.entityTranslucentEmissive(MOON_SHADOW_TEX);
+	static final RenderType CRATER = RenderTypes.entityTranslucentEmissive(CRATER_TEX);
+	static final RenderType RUNE = RenderTypes.entityTranslucentEmissive(RUNE_TEX);
+	static final RenderType SHAFT = RenderTypes.entityTranslucentEmissive(SHAFT_TEX);
+	static final RenderType WISP = RenderTypes.entityTranslucentEmissive(WISP_TEX);
 
 	private static final int STRIDE = 8;
 

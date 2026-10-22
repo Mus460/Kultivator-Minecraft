@@ -5,6 +5,7 @@ import dev.kultivator.dunia.DuniaConfig;
 import dev.kultivator.dunia.DuniaEvents;
 import dev.kultivator.dunia.DuniaSites;
 import dev.kultivator.dunia.DuniaSpine;
+import dev.kultivator.dunia.kapal.KapalVoice;
 import dev.kultivator.sect.Sect;
 import dev.kultivator.sect.Sects;
 import dev.kultivator.sect.hall.Halls;
@@ -57,6 +58,8 @@ import java.util.UUID;
 public final class Peta {
 
 	public static final double EXPLORE_RADIUS = 96.0D;
+	/** Known sites for the {@code dunia/sites_15} advancement (Sembilan Gunung, Sembilan Laut). */
+	public static final int SITES_MANY = 15;
 	public static final int LIVE_RANGE = 1536;
 	private static final long SAMPLE_NANOS = 1_500_000L;
 	private static final int REGION_PUSH_TICKS = 10;
@@ -132,9 +135,15 @@ public final class Peta {
 		DuniaEvents.VOYAGE.register((captain, destination, arrived) -> touch(captain));
 		DuniaEvents.SITE_DISCOVERED.register((player, site) -> {
 			touch(player);
-			if (DuniaSites.known(player).size() >= 5) {
+			int known = DuniaSites.known(player).size();
+			if (known >= 5) {
 				Advancements.grant(player, "dunia/sites_5");
 			}
+			if (known >= SITES_MANY) {
+				Advancements.grant(player, "dunia/sites_15");
+			}
+			// the sky notes the new place (one line per 10 s at most: a map exchange writes many sites at once)
+			KapalVoice.sky(player, KapalVoice.SITE_FOUND, null);
 		});
 		DuniaEvents.SOUL_JOURNEY.register(Peta::onSoul);
 	}
@@ -607,6 +616,10 @@ public final class Peta {
 		EXCHANGES.put(pair, now);
 		int toOther = give(self, other);
 		int toSelf = give(other, self);
+		if (toOther + toSelf > 0) {
+			Advancements.grant(self, "dunia/map_exchange");
+			Advancements.grant(other, "dunia/map_exchange");
+		}
 		Msg.actionBar(self, Component.translatable("kultivator.peta.exchange", other.getName(), toSelf, toOther).withColor(0x9FE0C0));
 		Msg.actionBar(other, Component.translatable("kultivator.peta.exchange", self.getName(), toOther, toSelf).withColor(0x9FE0C0));
 		self.level().playSound(null, self.getX(), self.getY(), self.getZ(), net.minecraft.sounds.SoundEvents.BOOK_PAGE_TURN,

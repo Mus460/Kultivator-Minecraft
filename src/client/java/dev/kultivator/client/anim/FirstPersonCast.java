@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
  * thrusts push the hand forward and up, seals and twin palms bring both hands to the centre of the view, raises lift the
  * hand up out of view and bring it back, a slam drops it, a spread opens the arms, a charge pulls back and trembles more
  * the longer it charges. The left arm mirrors the right. Everything fades with the meditation seat and is off while
- * scoping (vanilla skips the arm then).
+ * scoping (vanilla skips the arm then). A sword-duel pose (DESIGN 35.5.5) is handed to {@code FirstPersonDuel}.
  */
 public final class FirstPersonCast {
 
@@ -32,6 +32,13 @@ public final class FirstPersonCast {
 		if (Float.compare(age, cachedAge) != 0) {
 			cachedAge = age;
 			cached = CastPoses.snapshot(player, age);
+			if (cached == null || cached.strength() <= 0.5F) {
+				// DESIGN 35.5.5: the sword duel's pose when no technique pose dominates
+				CastPoses.Snapshot duel = dev.kultivator.client.duel.anim.DuelPoses.snapshot(player, age);
+				if (duel != null) {
+					cached = duel;
+				}
+			}
 		}
 		return cached;
 	}
@@ -40,6 +47,10 @@ public final class FirstPersonCast {
 	public static void apply(PoseStack poseStack, HumanoidArm arm, float partialTicks) {
 		CastPoses.Snapshot pose = localPose(partialTicks);
 		if (pose == null) {
+			return;
+		}
+		if (pose.pose() == dev.kultivator.technique.spec.dsl.Pose.DUEL) {
+			dev.kultivator.client.duel.anim.FirstPersonDuel.apply(poseStack, arm, partialTicks, pose);
 			return;
 		}
 		PoseLibrary.Def def = PoseLibrary.def(pose.pose());

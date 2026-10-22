@@ -116,6 +116,8 @@ bulat di dalam game.
     penjara iblis, Menara Seratus Lantai, peristiwa langit, harta lahir, kabut Qi, naga liar, evolusi binatang roh, Dunia
     Bawah, Laut Tanpa Batas, Kota Abadi, kapal terbang dan Peta Dunia, [ringkasan](#641-ringkasan),
     [config](#6418-berkas-konfigurasi-configkultivator-duniajson), [perintah uji](#6419-perintah-uji-op-kultivasi-uji-)
+65. [**Duel Pedang Kultivator**](#65-duel-pedang-kultivator): menantang, kontrol, tangkis dan postur, kunci bilah,
+    taruhan dan Kehormatan, [perintah](#656-perintah)
 
 ---
 
@@ -8933,13 +8935,195 @@ Perintah tiap fitur tercantum di bagiannya (64.2-64.17). Contoh:
 /kultivasi uji peta ungkap 512
 ```
 
-### 64.20 Yang belum lengkap
+### 64.20 Tambahan pass detail
+
+Pass detail kedua membuat dunia ini lebih hidup. Ringkasan per fitur:
+
+* **Suara Jepang baru:** juru lelang, pemilik kedai teh, pembisik pasar gelap, penjaga gerbang, pengembara, saingan,
+  penceramah Kota Abadi, penjaga kebun persik, raja iblis yang lepas dan yang disegel ulang, Menara (lantai berikut,
+  Diri Bayangan), ujian leluhur gua, langit (hujan meteor, bulan kembar, harta lahir, gerhana darah), naga (tunduk,
+  tribulasi, evolusi, gagal, raungan Jiao), Dunia Bawah (Meng Po, Raja Yama, Kepala Lembu, arwah memohon), laut (Raja Naga,
+  penjaga gerbang, ujian Penglai), kapal (berangkat, lompatan awan, tiba, bajak langit, lambung pecah) dan Peta (situs
+  baru). Teks suaranya mengikuti setelan teks suara.
+* **Kota Kultivator:** empat gaya kota: padang dan hutan, salju (taiga, dataran salju), sabana, dan hutan sakura.
+  `uji kota cari [tampilan]` mencari gaya tertentu. Penduduk memakai pakaian sesuai peran, membawa senjata (hanya tampilan),
+  berbicara dengan gelembung kata, saling mengobrol, punya rutinitas harian (kerja, duduk, meditasi), membungkuk kepada
+  kultivator yang lebih tinggi, dan bereaksi terhadap peristiwa langit. Di halaman pertemuan ada tombol **Duel Pedang**
+  (bab 65). Diskusi Dao yang dimenangkan kadang memberi **+10 poin penguasaan** pada jurus Dao pengembara yang sudah kamu
+  kuasai (sekali per pengembara). Persik Abadi juga menambah **+3 % Esensi Abadi**. Uji: `kota barisan`, `kota obrol`,
+  `kota gerak <gerak>`, `kota langit <peristiwa>`, `pengembara duel`. Pencapaian: *wanderer_duel*, *wanderer_discussion*,
+  *immortal_peach*, *immortal_duel*.
+* **Reruntuhan, penjara, menara:** ruang gua punya dua versi (perpustakaan, kuil, taman); ada Penjara Iblis gurun
+  (badlands) serta Menara Seratus Lantai bergaya sakura dan sabana, dengan halaman depan, gapura, kolam dan lampion.
+  Penjaga dan raja iblis punya gelar di atas nama ("Murka" saat mengamuk); iblis kecil gelisah saat Gerhana Darah.
+  Uji: `penjara cari gurun`, `penjara gerhana <true|false>`, `menara cari sakura|sabana`. Pencapaian baru: *ruin_kuno*,
+  *heart_mirror*, *tower_50*, *hong_xin*, *eclipse_seal*.
+* **Langit dan harta:** **Meteor Agung** jatuh membawa **Inti Meteor Agung** (600 Qi + pemahaman Dao Ruang); monster yang
+  tersentuh gerhana bisa menjatuhkan **Kristal Gerhana** (35 %, paling banyak 5 sehari). Harta lahir kadang dijaga
+  **Penjaga**: selama mereka hidup dalam 16 blok, teratai tersegel; kalahkan dulu, lalu klik kanan dan bertahan 5 detik.
+  Uji: `langit agung`, `langit gerhana_mob`, `langit catatan`, `harta_lahir penjaga`, `cuaca ramalan`.
+* **Naga dan binatang roh:** **Amukan Naga** saat nyawa naga tinggal 50 %, **Gila Darah** saat gerhana, jurus khas tiap
+  jenis (Pusaran Samudra, Tirai Awan, Hujan Petir Langit) untuk naga liar dan naga jinak tingkat 5 ke atas, botol
+  **Darah Jiao**, dan **Penjaga Raga**: binatangmu menjaga tubuhmu saat jiwa berkelana. Uji: `naga amuk`, `naga jurus`,
+  `naga jaga`, `naga darah`, `naga ucap`, `naga gila`, `naga langit <meteor|gerhana|bulan>`.
+* **Dunia Bawah dan Laut:** Bai dan Hei Wuchang di teras, nelayan dengan 3 tugas berbayar sehari, gudang senjata Raja
+  Naga (butuh ranah istana), kuil rawa, Dermaga Tiba, dan pulau roh empat jenis (herba, pertapa, pasar, karang).
+  `uji laut pulau cari <jenis>` kini mencari jenis itu saja. Uji: `bawah wuchang`, `bawah celoteh`, `bawah langit`,
+  `bawah bentrok`, `laut raja`, `laut nelayan`.
+* **Kapal dan Peta:** lima corak kapal dan nama kapal di Kemudi, cuaca memengaruhi bahan bakar dan laju, dan **Bajak
+  Langit** bisa merapat pada pelayaran di atas 2 000 blok (langkah Kitab Panduan *Usir bajak langit*). Nama kapal tampil
+  di penanda Peta. Uji: `kapal gaya`, `kapal nama`, `kapal rampasan`, `kapal meteor`, `kapal info`, `kapal suara <baris>`.
+  Pencapaian: *ship_bahtera*, *ship_leap*, *ship_pirates*, *sites_15*, *map_exchange*.
+
+### 64.21 Yang belum lengkap
 
 * **Belum diuji di game** (hanya dikompilasi, dan data pembuatan dunia dimuat dengan pemuat registri asli Minecraft):
   tampilan kota, gua, penjara, menara, pulau dan istana di dunia sungguhan; animasi makhluk dan sudut kamera; HUD
-  Pertarungan Kehendak.
-* Suara bicara Jepang khusus fitur ini (juru lelang, pemilik kedai teh, Meng Po, Raja Yama, Raja Naga, dan lain-lain)
-  belum dibuat; sementara memakai suara yang sudah ada, dengan teks suara baru.
+  Pertarungan Kehendak; letak pakaian, topi dan regalia penjaga; gelembung kata.
 * Pemain lain belum melihat tubuh arwah sebagai tembus pandang (arwah ditandai jejak cahaya).
-* `laut pulau cari <jenis>` mencari pulau roh terdekat dari jenis apa pun.
-* Diskusi Dao belum memberi pilihan ketiga (+1 penguasaan teknik); Persik Abadi belum menaikkan konversi Esensi Abadi.
+* Hadiah Duel Pedang melawan pengembara dibayar bila nyawa terendahnya di duel mencapai batas menyerahnya; duel yang
+  dibatalkan saat nyawanya sudah rendah masih bisa membayar.
+* Bulan Kembar menambah pemahaman Es dan Bayangan hanya saat bermeditasi di luar ruangan, belum untuk semua sumber.
+
+## 65. Duel Pedang Kultivator
+
+Duel pedang resmi antara dua kultivator: bilah saling beradu, percikan api, postur, kunci bilah, dan satu tebasan penentu.
+**Tidak ada yang mati** di duel resmi (berhenti di 10 % nyawa), **tidak ada blok yang berubah** (gelanggang, tiang, tali,
+bekas tebasan dan debu semuanya hanya tampilan), dan di luar duel tombol serang tetap bekerja seperti vanilla (atau
+Better Combat bila terpasang).
+
+### 65.1 Siapa bisa ditantang
+
+* **Pemain lain:** `/kultivasi duel tantang <pemain>`, atau buka Hub > Dunia > **Duel Pedang**. Butuh aturan `pvp`
+  menyala.
+* **Murid sendiri:** dari layar Duel Pedang. Taruhan hanya Tanpa atau Kehormatan; murid tidak pernah kehilangan barang.
+* **NPC kultivator:** tatap dia (paling jauh 12 blok) lalu `/kultivasi duel tantang`, atau pilih **Duel Pedang** di
+  halaman pertemuan pengembara, saingan atau penjaga kota. Pengembara yang suka menekan dan santo pedang kadang
+  menawarkan duel kepada pemain yang memegang bilah.
+* **Menonton murid berduel:** `/kultivasi duel murid <murid1> <murid2>`; kamu menjadi penonton.
+* Latih Tanding sekte, turnamen dan Tanding dengan Guru otomatis memakai mekanik benturan yang sama (tanpa intro dan
+  taruhan).
+
+Jawab tantangan lewat pop-up atau chip `[Terima]` / `[Tolak]` di obrolan (`/kultivasi duel terima|tolak`), dalam 60
+detik. Lalu: berjalan ke tanda masing-masing, intro sinematik singkat (bisa dilewati dengan Backspace, mengikuti setelan
+Kamera sinematik Penuh/Singkat/Mati), hitung mundur 三 二 一, bertarung (bawaan 180 detik), lalu sinematik penutup.
+Duel batal sendiri (taruhan kembali utuh) bila ada monster dalam 24 blok saat bersiap, salah satu pihak keluar, pindah
+dimensi, mulai terobosan, dan sebagainya.
+
+### 65.2 Kontrol (mode masukan Klasik)
+
+| aksi | cara |
+|---|---|
+| tebas ringan | ketuk klik kiri; **arah** tebasan mengikuti gerak tetikus sesaat sebelum klik (8 arah) |
+| tebas berat | tahan klik kiri sebentar lalu lepas |
+| tusuk | jongkok + klik kiri |
+| tangkis | ketuk klik kanan (memegang senjata) atau tombol **Tangkis / jaga** |
+| jaga | tahan klik kanan / tombol tangkis |
+| tipuan | tekan tangkis saat ayunanmu sendiri belum mendarat |
+| dorong saat kunci bilah | klik kiri berulang |
+| lepas tiba-tiba (kunci bilah) | tangkis tepat saat lawan sedang mendorong |
+| menghindar | Combat Roll (R) bila terpasang; tanpa itu ketuk jongkok sambil bergerak (Langkah Bayangan) |
+| Tebasan Penentu | serang lawan yang terhuyung (tanda 決 di atas kepalanya) |
+| menyerah | `/kultivasi duel menyerah`, tombol HUD (tahan 1 detik), atau jongkok diam 2 detik |
+
+Tombol **Tangkis / jaga** dan **Kamera duel** ada di kategori Kultivator dan bawaannya tidak diikat (klik kanan sudah
+menangkis). Pemain Better Combat dengan dua senjata sebaiknya mengikat tangkis ke tombol samping tetikus atau **C**.
+Setelan **Masukan duel**: Otomatis (bawaan), Klasik, Ikuti Better Combat, Vanilla.
+
+### 65.3 Tangkis, postur dan benturan
+
+* **Tangkis** tepat sebelum pukulan mendarat: kerusakan 0. **Tangkisan Sempurna** (jendela 2 tick, 100 ms): penyerang
+  terhentak, postur penyerang naik banyak, dan kamu mendapat **Celah**: tebas ringan berikutnya menjadi serangan balik
+  (×1.3). Menekan tangkis terus-menerus tanpa serangan datang membuat jendela menyempit sebentar.
+* **Jaga** menahan pukulan tetapi menambah posturmu sendiri; jaga harus menghadap penyerang (dari belakang tak bisa).
+* **Postur** (bar di HUD): naik saat kamu dipukul, menjaga atau ditangkis, dan pulih setelah 1.5 detik tanpa tekanan
+  (lebih lambat bila nyawamu rendah). Postur penuh = **Postur Jebol**: terhuyung 1.5 detik dan lawan bisa melakukan
+  **Tebasan Penentu**, yang langsung memenangkan duel resmi.
+* **Benturan:** dua ayunan yang mendarat bersamaan saling beradu (percikan besar). Berat lawan berat, atau dua tebasan
+  bersilang yang sama kuat, menjadi **Kunci Bilah**: meteran yin-yang di HUD; dorong dengan klik kiri, atau lepas
+  tiba-tiba. Yang kalah terdorong dan terhentak.
+* **Serangan berbahaya** (tanda merah 危 di atas kepala): *Gunung* (berat dari atas) tak bisa dijaga, hanya ditangkis;
+  *Maut* (tusukan berat) hanya bisa ditangkis sempurna atau dengan **Injak Pedang** (tangkis sambil maju); *Sapu* (berat
+  dari bawah) harus dilompati atau dihindari, dan serangan dari udara setelahnya menjadi Tebasan Langit.
+* **Rantai Pertukaran:** tangkisan dan benturan beruntun menambah rantai (一 二 三 ... 十); rantai 4 memicu Tarian Pedang
+  (gerak lambat singkat, hanya tampilan).
+* Melawan monster (di luar duel): tangkisan reaktif tetap bekerja bila setelan **Tangkis di luar duel** menyala; elit,
+  perampok, binatang purba dan NPC Dunia punya postur. Bos tidak pernah dibunuh seketika oleh Tebasan Penentu.
+
+### 65.4 Aturan, taruhan dan Kehormatan
+
+* **Selisih ranah:** Bebas (pihak lemah mendapat bonus kerusakan), Handicap (pihak kuat dibebani), atau **Tekan Ranah**
+  (keduanya bertarung seolah sama ranah; disarankan bila selisih 2 ranah atau lebih).
+* **Jurus:** Pedang Saja (bawaan; serangan qi pedang tetap boleh) atau Jurus Bebas.
+* **Taruhan:** Tanpa, Batu Roh (mutu dan jumlah sama), Gulungan giok teknik, atau Kehormatan. Barang dititipkan dan
+  selalu kembali bila duel batal, juga bila server mati di tengah duel.
+* **Kehormatan** (mulai 1000, gaya Elo) memberi gelar: Pedang Berkarat, Pendekar Pedang, Pedang Ternama, Pedang Tanpa
+  Tanding, Santo Pedang. `/kultivasi duel catatan [pemain]` menampilkan rekor. Hadiah menang (sekali per pasangan per 10
+  menit, hanya untuk pertarungan sungguhan): XP batang dan pemahaman Dao Pedang; kalah dengan 3 tangkisan sempurna atau
+  lebih tetap memberi sedikit pemahaman.
+* Pihak ketiga tidak bisa ikut campur: kerusakan mereka ke peserta dibatalkan.
+
+### 65.5 Tampilan, kamera dan setelan
+
+Percikan dan bara di titik kontak bilah, kilat logam, jejak bilah, gelombang kejut, debu dan bekas tebasan, hit-stop,
+gerak lambat singkat, guncangan kamera, intro dan penutup sinematik. Semuanya digambar di klien, diskalakan Mutu Efek
+(Minimal/Normal/Maksimal) dan anggaran bingkai, tanpa shader sendiri (aman untuk Sodium dan Iris). Setelan (Pengaturan >
+Duel Pedang): Percikan duel (Penuh/Ringan/Mati), Jejak bilah, Hit-stop duel, Gerak lambat duel (hanya tampilan; server
+tidak melambat), **Kamera duel** (Mati, Bahu, Penonton; F5 mengembalikan kamera milikmu untuk duel itu), Intro duel, Kiai,
+Kunci lawan (hanya melawan NPC dan boneka, tidak pernah di PvP), Masukan duel, Tangkis di luar duel.
+
+### 65.6 Perintah
+
+Pemain: `/kultivasi duel tantang <entitas>`, `terima`, `tolak`, `menyerah`, `tunda` (keduanya menekan: duel batal),
+`hormat` (pose salam), `catatan [pemain]`, `layar`, `murid <murid1> <murid2>`.
+
+Uji (OP, `/kultivasi uji duel ...`; juga grup *duel* di bantuan cheat):
+
+```
+/kultivasi uji duel boneka [gaya] [ranah] [tahap] [senjata]   Boneka Duel 6 blok di depan, langsung duel
+/kultivasi uji duel boneka diam|jaga|lawan
+/kultivasi uji duel boneka serang <arah>                       latihan tangkis: satu arah berulang
+/kultivasi uji duel mulai <entitas> [ranah]
+/kultivasi uji duel pasangan <a> <b>
+/kultivasi uji duel stop
+/kultivasi uji duel info
+/kultivasi uji duel jendela                                    jendela tangkis, latensi, 10 hasil terakhir
+/kultivasi uji duel postur <0-100>
+/kultivasi uji duel ikat
+/kultivasi uji duel lambat [tick]
+/kultivasi uji duel percikan [hasil] [warna]
+/kultivasi uji duel intro
+/kultivasi uji duel akhir
+/kultivasi uji duel jejak|kunci|kejut|decal|bilah
+/kultivasi uji duel pose <id>
+/kultivasi uji duel pose semua
+/kultivasi uji duel bc
+/kultivasi uji duel gelanggang [radius]
+/kultivasi uji duel catatan reset [pemain]
+/kultivasi uji duel muat
+```
+
+Gaya boneka: `agresif`, `bertahan`, `penipu`, `santo`. Senjata: `pedang`, `kapak`, `tombak`, `gada`, `tangan`.
+
+### 65.7 Kitab Panduan dan pencapaian
+
+Langkah baru di Kitab Panduan: *Tangkis serangan monster* dan *Postur dan Tebasan Penentu* (bab 2), *Duel Pedang
+pertama* dan *Tangkisan Sempurna* (bab 3), *Kunci Bilah* dan *Serangan Berbahaya* (bab 4), *Menonton murid berduel*
+(bab 6) dan *Kesalahan umum duel* (bab 12). Pencapaian: tangkisan pertama, tangkisan sempurna pertama, tebasan penentu
+pertama, kemenangan duel pertama, menang kunci bilah, Injak Pedang, rantai 10, menonton murid, Kehormatan 1300, dan
+mengalahkan Santo Pedang.
+
+### 65.8 Yang belum lengkap
+
+* Belum diuji di game: rasa waktu tangkis dengan lag, posisi bilah terhadap model pedang, kamera bahu, dan tabel arah
+  Better Combat (`uji duel bc`).
+* Tangkisan terhadap teknik hanya untuk serangan teknik yang bukan tusukan dan menghadap pemain, satu kali per 10 tick.
+* `/kultivasi duel layar` dan `tantang` tanpa sasaran belum bisa membuka layar dari server; pakai Hub > Dunia > Duel
+  Pedang.
+* Animasi Player Animation Library untuk duel belum dibuat; pose duel milik mod selalu dipakai.
+
+**Sumber:** Gu Long, *Juezhan Qianhou* (duel Ximen Chuixue dan Ye Gucheng di atap Kota Terlarang); Jin Yong, *The
+Return of the Condor Heroes* (Makam Pedang Dugu Qiubai, empat tahap pedang) dan *The Smiling, Proud Wanderer* (Sembilan
+Pedang Dugu); Er Gen, *I Shall Seal the Heavens*, Buku 1 Bab 31 (laga Meng Hao di panggung sekte). Desain game: Sekiro
+(postur, tangkis, 危, Mikiri), For Honor dan Mount & Blade (arah serangan dari tetikus). Angka mod ini tidak disalin dari
+mana pun.

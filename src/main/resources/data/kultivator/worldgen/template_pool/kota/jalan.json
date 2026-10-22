@@ -30,7 +30,34 @@
     {
       "element": {
         "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/jalan_lurus_4",
+        "processors": "kultivator:kota/utuh",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/jalan_lurus_5",
+        "processors": "kultivator:kota/utuh",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
         "location": "kultivator:kota/jembatan",
+        "processors": "kultivator:kota/utuh",
+        "projection": "terrain_matching"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/jembatan_2",
         "processors": "kultivator:kota/utuh",
         "projection": "terrain_matching"
       },

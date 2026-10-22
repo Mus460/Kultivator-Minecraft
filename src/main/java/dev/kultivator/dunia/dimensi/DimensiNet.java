@@ -33,6 +33,10 @@ public final class DimensiNet {
 	public static final int SCREEN_HERMIT = 7;
 	public static final int SCREEN_PENGLAI = 8;
 	public static final int SCREEN_GUARD = 9;
+	/** The old fisherman's news of the sea (where the islands lie, where Penyu Ao swims). */
+	public static final int SCREEN_FISHER = 10;
+	/** Bai or Hei Wuchang's guidance on Teras Wangxiang (the soul's progress and the way). */
+	public static final int SCREEN_WUCHANG = 11;
 
 	public static final int FX_ARRIVE_BAWAH = 1;
 	public static final int FX_ARRIVE_LAUT = 2;
@@ -45,6 +49,12 @@ public final class DimensiNet {
 	public static final int FX_HARVEST = 9;
 	public static final int FX_WHIRL = 10;
 	public static final int FX_BLESS = 11;
+	/** Weapons meeting in a duel: sparks, a flash and a ring of steel (arg 1: at sea, with spray). */
+	public static final int FX_CLASH = 12;
+	/** A hungry ghost dissolving (arg 1: it left soul jade). */
+	public static final int FX_GHOST_FADE = 13;
+	/** A sea monster's death throes on the water (arg = tier). */
+	public static final int FX_MONSTER_DOWN = 14;
 
 	public record Open(int screen, int entity, CompoundTag data) implements CustomPacketPayload {
 		public static final Type<Open> TYPE = new Type<>(Kultivator.id("dimensi_open"));

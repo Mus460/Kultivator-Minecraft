@@ -22,16 +22,17 @@ public final class KapalItems {
 
 	/**
 	 * {@code kultivator:kapal_state}: the stowed ship (hull points, fuel ticks left, banner colour, broken flag, its given
-	 * name). A keel without it is a new ship (full hull, no fuel).
+	 * name, its hull livery {@link KapalStyle}). A keel without it is a new ship (full hull, no fuel, Kayu Hitam).
 	 */
-	public record State(int hull, long fuel, int color, boolean broken, String name) {
+	public record State(int hull, long fuel, int color, boolean broken, String name, int style) {
 
 		public static final Codec<State> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 				Codec.INT.fieldOf("hull").forGetter(State::hull),
 				Codec.LONG.optionalFieldOf("fuel", 0L).forGetter(State::fuel),
 				Codec.INT.optionalFieldOf("color", KapalRohEntity.DEFAULT_COLOR).forGetter(State::color),
 				Codec.BOOL.optionalFieldOf("broken", false).forGetter(State::broken),
-				Codec.STRING.optionalFieldOf("name", "").forGetter(State::name)
+				Codec.STRING.optionalFieldOf("name", "").forGetter(State::name),
+				Codec.INT.optionalFieldOf("style", 0).forGetter(State::style)
 		).apply(instance, State::new));
 
 		public static final StreamCodec<ByteBuf, State> STREAM_CODEC = StreamCodec.composite(
@@ -40,10 +41,17 @@ public final class KapalItems {
 				ByteBufCodecs.INT, State::color,
 				ByteBufCodecs.BOOL, State::broken,
 				ByteBufCodecs.STRING_UTF8, State::name,
+				ByteBufCodecs.VAR_INT, State::style,
 				State::new);
 
 		public State {
 			name = name == null ? "" : name;
+			style = Math.max(0, Math.min(KapalStyle.values().length - 1, style));
+		}
+
+		/** A state in the default livery. */
+		public State(int hull, long fuel, int color, boolean broken, String name) {
+			this(hull, fuel, color, broken, name, 0);
 		}
 	}
 

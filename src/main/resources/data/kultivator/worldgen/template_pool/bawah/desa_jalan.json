@@ -7,6 +7,15 @@
         "processors": "kultivator:bawah/lapuk",
         "projection": "rigid"
       },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:bawah/desa/jalan_2",
+        "processors": "kultivator:bawah/lapuk",
+        "projection": "rigid"
+      },
       "weight": 1
     }
   ],

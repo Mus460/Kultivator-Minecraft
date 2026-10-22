@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.ruin_kuno.description"
+    },
+    "icon": {
+      "id": "minecraft:chiseled_polished_blackstone"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.ruin_kuno.title"
+    },
+    "frame": "goal",
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

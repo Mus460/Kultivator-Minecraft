@@ -35,7 +35,13 @@ import java.util.List;
 /**
  * The test commands of module B (DESIGN 34.5.11 / 34.5.12 "Uji"), all under {@code /kultivasi uji} (op):
  * <ul>
- * <li>{@code naga <air|awan|petir> [lemah]}: a wild Jiao in front of you (lemah: already weakened, low and close);</li>
+ * <li>{@code naga <air|awan|petir> [lemah|gila]}: a wild Jiao in front of you (lemah: already weakened, low and close;
+ * gila: Gila Darah, as under the blood eclipse);</li>
+ * <li>{@code naga amuk}: the nearest wild Jiao enters Amukan Naga; {@code naga jurus <napas|ekor|raung|lilit|gigit|khusus>}:
+ * it uses that skill on you now;</li>
+ * <li>{@code naga jaga}: your beasts and Jiao guard your spot for 60 s (Penjaga Raga without a soul journey);
+ * {@code naga darah [kind]}: a Darah Jiao; {@code naga ucap}: your Jiao's remarks now; {@code naga langit
+ * <meteor|gerhana|bulan>}: your Jiao and beasts react to that sky event;</li>
  * <li>{@code naga tunduk menang|kalah}: ends your contest of wills with that result, or starts one on the nearest Jiao;</li>
  * <li>{@code naga hapus}: removes the wild Jiao within 256 blocks and your tamed one;</li>
  * <li>{@code naga tunggang}: gives you a tamed Jiao if you have none, summons it and seats you on it;</li>
@@ -61,9 +67,31 @@ final class NagaCommands {
 		LiteralArgumentBuilder<CommandSourceStack> node = Commands.literal("naga").executes(ctx -> info(ctx));
 		for (NagaKind kind : NagaKind.values()) {
 			node.then(Commands.literal(kind.id())
-					.executes(ctx -> spawn(ctx, kind, false))
-					.then(Commands.literal("lemah").executes(ctx -> spawn(ctx, kind, true))));
+					.executes(ctx -> spawn(ctx, kind, false, false))
+					.then(Commands.literal("lemah").executes(ctx -> spawn(ctx, kind, true, false)))
+					.then(Commands.literal("gila").executes(ctx -> spawn(ctx, kind, false, true))));
 		}
+		node.then(Commands.literal("amuk").executes(NagaCommands::enrage));
+		LiteralArgumentBuilder<CommandSourceStack> skills = Commands.literal("jurus");
+		String[] names = {"napas", "ekor", "raung", "lilit", "gigit", "khusus"};
+		int[] ids = {NagaLiarEntity.SKILL_BREATH, NagaLiarEntity.SKILL_TAIL, NagaLiarEntity.SKILL_ROAR, NagaLiarEntity.SKILL_COIL,
+				NagaLiarEntity.SKILL_BITE, NagaLiarEntity.SKILL_SPECIAL};
+		for (int i = 0; i < names.length; i++) {
+			int id = ids[i];
+			skills.then(Commands.literal(names[i]).executes(ctx -> skill(ctx, id)));
+		}
+		node.then(skills);
+		node.then(Commands.literal("jaga").executes(NagaCommands::guard));
+		LiteralArgumentBuilder<CommandSourceStack> blood = Commands.literal("darah");
+		for (NagaKind kind : NagaKind.values()) {
+			blood.then(Commands.literal(kind.id()).executes(ctx -> blood(ctx, kind)));
+		}
+		node.then(blood.executes(ctx -> blood(ctx, NagaKind.AIR)));
+		node.then(Commands.literal("ucap").executes(NagaCommands::speak));
+		node.then(Commands.literal("langit")
+				.then(Commands.literal("meteor").executes(ctx -> sky(ctx, dev.kultivator.dunia.api.SkyKind.METEOR_SHOWER)))
+				.then(Commands.literal("gerhana").executes(ctx -> sky(ctx, dev.kultivator.dunia.api.SkyKind.BLOOD_ECLIPSE)))
+				.then(Commands.literal("bulan").executes(ctx -> sky(ctx, dev.kultivator.dunia.api.SkyKind.TWIN_MOONS))));
 		node.then(Commands.literal("tunduk")
 				.then(Commands.literal("menang").executes(ctx -> subdue(ctx, true)))
 				.then(Commands.literal("kalah").executes(ctx -> subdue(ctx, false))));
@@ -73,7 +101,7 @@ final class NagaCommands {
 		return node;
 	}
 
-	private static int spawn(CommandContext<CommandSourceStack> ctx, NagaKind kind, boolean lemah) throws CommandSyntaxException {
+	private static int spawn(CommandContext<CommandSourceStack> ctx, NagaKind kind, boolean lemah, boolean frenzy) throws CommandSyntaxException {
 		ServerPlayer player = ctx.getSource().getPlayerOrException();
 		ServerLevel level = player.level();
 		float yaw = player.getYRot() * Mth.DEG_TO_RAD;
@@ -81,7 +109,8 @@ final class NagaCommands {
 		Vec3 pos = lemah ? player.position().add(forward.scale(10.0D)).add(0.0D, 5.0D, 0.0D)
 				: player.position().add(forward.scale(36.0D)).add(0.0D, 22.0D, 0.0D);
 		pos = new Vec3(pos.x, Math.min(pos.y, level.getMaxY() - 8.0D), pos.z);
-		NagaLiarEntity dragon = WildDragons.spawn(level, player, kind, pos, true, lemah);
+		NagaLiarEntity dragon = WildDragons.spawn(level, player, kind, pos, true, lemah, frenzy || WildDragons.sky(level,
+				dev.kultivator.dunia.api.SkyKind.BLOOD_ECLIPSE));
 		if (dragon == null) {
 			ctx.getSource().sendFailure(Component.translatable("kultivator.naga.cmd.spawn_failed"));
 			return 0;
@@ -100,7 +129,7 @@ final class NagaCommands {
 		NagaLiarEntity dragon = nearestWild(player, 64.0D);
 		if (dragon == null) {
 			Vec3 pos = player.position().add(player.getViewVector(1.0F).multiply(1.0D, 0.0D, 1.0D).normalize().scale(10.0D)).add(0.0D, 5.0D, 0.0D);
-			dragon = WildDragons.spawn(player.level(), player, NagaKind.AIR, pos, true, true);
+			dragon = WildDragons.spawn(player.level(), player, NagaKind.AIR, pos, true, true, false);
 		}
 		if (dragon == null) {
 			ctx.getSource().sendFailure(Component.translatable("kultivator.naga.cmd.spawn_failed"));
@@ -161,6 +190,8 @@ final class NagaCommands {
 		source.sendSuccess(() -> Component.translatable("kultivator.naga.cmd.info.config", config.wild, config.minRealm().displayName(),
 				Msg.number(config.chance * 100.0D), Msg.number(WildDragons.skyFactor(player.level())), config.worldCap, config.subdue,
 				config.mount, config.evolution).withStyle(ChatFormatting.GRAY), false);
+		source.sendSuccess(() -> Component.translatable("kultivator.naga.cmd.info.config2", config.enrage, config.specials, config.guardBody,
+				config.dialogue, Msg.number(config.darahChance * 100.0D)).withStyle(ChatFormatting.GRAY), false);
 		List<NagaLiarEntity> wild = WildDragons.all();
 		if (wild.isEmpty()) {
 			source.sendSuccess(() -> Component.translatable("kultivator.naga.cmd.info.none").withStyle(ChatFormatting.GRAY), false);
@@ -183,7 +214,80 @@ final class NagaCommands {
 		for (String line : WillContest.describe()) {
 			source.sendSuccess(() -> Component.literal(" ⚔ " + line).withStyle(ChatFormatting.DARK_AQUA), false);
 		}
+		for (String line : BodyGuards.describe()) {
+			source.sendSuccess(() -> Component.literal(" ⛨ " + line).withStyle(ChatFormatting.GOLD), false);
+		}
+		source.sendSuccess(() -> Component.translatable("kultivator.naga.cmd.info.feats", Integer.bitCount(NagaFeats.kinds(player)),
+				Msg.number(NagaFeats.ridden(player)), Msg.number(NagaFeats.RIDE_GOAL)).withStyle(ChatFormatting.GRAY), false);
 		return wild.size();
+	}
+
+	/** {@code naga amuk}: the nearest wild Jiao enters Amukan Naga against you now. */
+	private static int enrage(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		NagaLiarEntity dragon = nearestWild(player, 128.0D);
+		if (dragon == null) {
+			ctx.getSource().sendFailure(Component.translatable("kultivator.naga.cmd.no_wild"));
+			return 0;
+		}
+		dragon.forceEnrage(player.level(), player);
+		ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.naga.cmd.enraged", dragon.kind().displayName())), false);
+		return 1;
+	}
+
+	/** {@code naga jurus <skill>}: the nearest wild Jiao uses that skill on you now. */
+	private static int skill(CommandContext<CommandSourceStack> ctx, int id) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		NagaLiarEntity dragon = nearestWild(player, 128.0D);
+		if (dragon == null) {
+			ctx.getSource().sendFailure(Component.translatable("kultivator.naga.cmd.no_wild"));
+			return 0;
+		}
+		dragon.forceSkill(player.level(), player, id);
+		ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.naga.cmd.skill", dragon.kind().displayName(),
+				Component.translatable("kultivator.naga.skill." + id))), false);
+		return 1;
+	}
+
+	/** {@code naga jaga}: your beasts and Jiao guard the spot you stand on for 60 s, as they guard a soul's body. */
+	private static int guard(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		int guards = BodyGuards.startTest(player);
+		ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.naga.cmd.guard", guards)), false);
+		return guards;
+	}
+
+	/** {@code naga darah [kind]}: a vial of Darah Jiao. */
+	private static int blood(CommandContext<CommandSourceStack> ctx, NagaKind kind) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		NagaItems.give(player, DarahJiaoItem.of(kind));
+		ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.naga.cmd.blood", kind.displayName())), false);
+		return 1;
+	}
+
+	/** {@code naga ucap}: your summoned Jiao speaks its summon greeting and one rest remark now (no rate limit). */
+	/**
+	 * {@code naga langit <meteor|gerhana|bulan>}: your Jiao and tier 4+ beasts react as if that sky event had just begun
+	 * (remarks, the eclipse howl); the sky itself does not change (module L's own {@code uji} starts real events).
+	 */
+	private static int sky(CommandContext<CommandSourceStack> ctx, dev.kultivator.dunia.api.SkyKind kind) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		NagaLines.skyEvent(player.level(), kind, true, true);
+		ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.naga.cmd.sky")), false);
+		return 1;
+	}
+
+	private static int speak(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		NagaLiarEntity dragon = TamedJiao.active(player);
+		if (dragon == null) {
+			ctx.getSource().sendFailure(Component.translatable("kultivator.naga.cmd.no_tamed"));
+			return 0;
+		}
+		NagaLines.tamed(player, dragon, NagaLines.greetEvent(player.level(), player), NagaLines.GREET, 1, true);
+		NagaLines.tamed(player, dragon, "rest", NagaLines.REST, 1, true);
+		NagaLines.tamed(player, dragon, "victory", NagaLines.VICTORY, 1, true);
+		return 1;
 	}
 
 	private static @Nullable NagaLiarEntity nearestWild(ServerPlayer player, double range) {

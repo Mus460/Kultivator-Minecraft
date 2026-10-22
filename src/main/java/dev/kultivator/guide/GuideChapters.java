@@ -112,6 +112,9 @@ public final class GuideChapters {
 		step(1, "formation2", null, "adv:qi_formation_great");
 		step(1, "formation3", null, "adv:qi_formation_heavenly");
 		step(1, "peak", null, "at:qi_refining:1:4");
+		// Duel Pedang (DESIGN 35.8.5): deflecting monsters, posture and the Deathblow
+		step(1, "tangkis", null, "adv:duel_first_deflect");
+		step(1, "postur", null, "adv:duel_first_deathblow");
 		// 3. Pembangunan Fondasi
 		step(2, "prep", null, null);
 		step(2, "chance", null, null);
@@ -121,6 +124,9 @@ public final class GuideChapters {
 		step(2, "breakthrough", "/kultivasi breakthrough", "rank:foundation");
 		step(2, "sword", null, "adv:flying_sword");
 		step(2, "quality", null, null);
+		// Duel Pedang (DESIGN 35.8.5): the first formal duel and the Perfect Deflect
+		step(2, "duel", "/kultivasi duel tantang ", "adv:duel_first_win");
+		step(2, "sempurna", null, "adv:duel_first_perfect");
 		// 4. Inti Emas
 		step(3, "trials", "/kultivasi jalan", "adv:foundation_trials");
 		step(3, "trib_prep", null, null);
@@ -130,6 +136,9 @@ public final class GuideChapters {
 		step(3, "codex", "/kultivasi teknik", "adv:dao_technique");
 		step(3, "elite", null, "adv:first_elite");
 		step(3, "heart_prep", null, null);
+		// Duel Pedang (DESIGN 35.8.5): the Blade Lock and the perilous attacks
+		step(3, "kunci", null, "adv:duel_bind_win");
+		step(3, "bahaya", null, "adv:duel_mikiri");
 		// 5. Mendirikan Sekte
 		step(4, "stele", null, null);
 		step(4, "place", "/kultivasi aula nama ", "hall");
@@ -150,6 +159,8 @@ public final class GuideChapters {
 		step(5, "hufa", "/kultivasi murid tahan", "adv:disciple_guardian");
 		step(5, "disciple_gc", null, "adv:disciple_golden_core");
 		step(5, "destroyer", "/kultivasi kehancuran sumpah", null);
+		// Duel Pedang (DESIGN 35.8.5): watching two disciples duel
+		step(5, "tonton", "/kultivasi duel murid ", "adv:duel_disciples_watched");
 		// 7. Jiwa Baru Lahir sampai Penyatuan Dao
 		step(6, "heart", null, "heart");
 		step(6, "rings", null, null);
@@ -207,6 +218,8 @@ public final class GuideChapters {
 		step(11, "kehancuran", "/kultivasi kehancuran", null);
 		step(11, "hardcore", null, null);
 		step(11, "help", "/kultivasi panduan", null);
+		// Duel Pedang (DESIGN 35.8.5): the common duel mistakes
+		step(11, "duel_tips", null, null);
 		// 13. Dunia yang Luas (DESIGN 34.9; appended, saved ticks are by step id so nothing shifts)
 		step(12, "peta", "/kultivasi peta", "adv:dunia/map_opened");
 		step(12, "kota", null, "adv:dunia/kota_found");
@@ -227,9 +240,10 @@ public final class GuideChapters {
 		step(13, "evolusi", null, "adv:dunia/beast_tier_4");
 		step(13, "laut", null, "adv:dunia/sea_arrived");
 		step(13, "istana", null, "adv:dunia/dragon_king");
-		step(13, "penjara", null, "adv:dunia/prison_sealed");
+		step(13, "penjara", null, "adv:dunia/prison_sealed|adv:dunia/prison_slain");
 		step(13, "kota_abadi", null, "adv:dunia/immortal_city");
 		step(13, "pelayaran", null, "adv:dunia/ship_voyage");
+		step(13, "bajak", null, "adv:dunia/ship_pirates");
 		step(13, "puncak", null, "adv:dunia/tower_100");
 		List<Chapter> chapters = new ArrayList<>(CHAPTER_COUNT);
 		for (int chapter = 0; chapter < CHAPTER_COUNT; chapter++) {

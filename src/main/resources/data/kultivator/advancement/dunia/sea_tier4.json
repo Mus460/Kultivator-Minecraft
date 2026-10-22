@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.sea_tier4.description"
+    },
+    "icon": {
+      "id": "minecraft:trident"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.sea_tier4.title"
+    },
+    "frame": "challenge",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -3,6 +3,18 @@
     {
       "structure": "kultivator:kota/kota_kultivator",
       "weight": 1
+    },
+    {
+      "structure": "kultivator:kota/kota_kultivator_salju",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kota/kota_kultivator_sabana",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kota/kota_kultivator_sakura",
+      "weight": 1
     }
   ],
   "placement": {

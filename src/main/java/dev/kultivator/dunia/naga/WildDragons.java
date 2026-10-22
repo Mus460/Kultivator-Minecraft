@@ -78,6 +78,8 @@ final class WildDragons {
 			} else {
 				set.remove(kind);
 			}
+			// the owners' Jiao, wolves and foxes notice the sky (remarks, a howl at the eclipse)
+			NagaLines.skyEvent(level, kind, started);
 		});
 		DuniaEvents.WEATHER_CHANGED.register((level, cell, weather) -> {
 			// Jiao Awan loves dense Qi mist: a player under a fresh dense mist rolls again within a minute
@@ -95,6 +97,12 @@ final class WildDragons {
 			SKY.clear();
 			EARLY.clear();
 		});
+	}
+
+	/** True while module L's sky event {@code kind} runs over {@code level} (its event, or its service as a fallback). */
+	static boolean sky(ServerLevel level, SkyKind kind) {
+		Set<SkyKind> set = SKY.get(level.dimension());
+		return set != null && set.contains(kind) || DuniaApi.sky().active(level) == kind;
 	}
 
 	/** The chance multiplier of {@code level} now (2 during a meteor shower or twin moons). */
@@ -153,7 +161,7 @@ final class WildDragons {
 		}
 		Vec3 pos = spawnPoint(level, player);
 		if (pos != null) {
-			spawn(level, player, kind, pos, false, false);
+			spawn(level, player, kind, pos, false, false, sky(level, SkyKind.BLOOD_ECLIPSE));
 		}
 	}
 
@@ -194,13 +202,14 @@ final class WildDragons {
 	}
 
 	/** Spawns a wild Jiao of {@code kind} at {@code pos} for {@code player}'s area. Null when the level refused it. */
-	static @Nullable NagaLiarEntity spawn(ServerLevel level, @Nullable ServerPlayer near, NagaKind kind, Vec3 pos, boolean test, boolean lemah) {
+	static @Nullable NagaLiarEntity spawn(ServerLevel level, @Nullable ServerPlayer near, NagaKind kind, Vec3 pos, boolean test, boolean lemah,
+			boolean frenzy) {
 		NagaLiarEntity dragon = NagaEntities.NAGA_LIAR.create(level, test ? EntitySpawnReason.COMMAND : EntitySpawnReason.NATURAL);
 		if (dragon == null) {
 			return null;
 		}
 		int realm = near == null ? Realm.NASCENT_SOUL.ordinal() : Math.max(Realm.NASCENT_SOUL.ordinal(), Cultivators.get(near).realm().ordinal());
-		dragon.setUpWild(kind, pos, realm, test);
+		dragon.setUpWild(kind, pos, realm, test, frenzy);
 		if (!level.addFreshEntity(dragon)) {
 			return null;
 		}
@@ -225,8 +234,8 @@ final class WildDragons {
 				continue;
 			}
 			Component where = direction(player.position(), at);
-			Msg.actionBar(player, Component.translatable("kultivator.naga.sighted", dragon.kind().displayName(), where)
-					.withColor(dragon.kind().glow));
+			Msg.actionBar(player, Component.translatable(dragon.hasFlag(NagaLiarEntity.FLAG_FRENZY) ? "kultivator.naga.sighted.frenzy"
+					: "kultivator.naga.sighted", dragon.kind().displayName(), where).withColor(dragon.kind().glow));
 			NagaPayloads.send(player, new NagaPayloads.Moment(NagaPayloads.MOMENT_SIGHTED, dragon.getId(), at.x, at.y, at.z,
 					dragon.kind().ordinal(), 3, 2, dragon.getId(), false));
 		}
@@ -314,12 +323,20 @@ final class WildDragons {
 		if (pearl) {
 			NagaItems.give(slayer, new ItemStack(NagaItems.MUTIARA_JIAO));
 		}
+		boolean blood = !dragon.test && slayer.getRandom().nextDouble() < Naga.config().darahChance;
+		if (blood) {
+			NagaItems.give(slayer, DarahJiaoItem.of(dragon.kind()));
+		}
 		if (!dragon.test) {
 			Progression.addXp(slayer, SLAIN_XP * dragon.healthFactor, XpSource.COMBAT);
 		}
 		Msg.chat(slayer, Component.translatable(pearl ? "kultivator.naga.slain.pearl" : "kultivator.naga.slain", dragon.kind().displayName())
 				.withColor(dragon.kind().glow));
+		if (blood) {
+			Msg.chat(slayer, Component.translatable("kultivator.naga.slain.blood", dragon.kind().displayName()).withColor(dragon.kind().glow));
+		}
 		Advancements.grant(slayer, "dunia/dragon_slain");
+		NagaFeats.kindMet(slayer, dragon.kind());
 	}
 
 	private static @Nullable ServerPlayer slayer(ServerLevel level, NagaLiarEntity dragon, DamageSource source) {

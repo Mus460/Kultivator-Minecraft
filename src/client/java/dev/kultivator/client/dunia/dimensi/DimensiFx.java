@@ -29,9 +29,13 @@ import net.minecraft.world.phys.Vec3;
  * <li>Dunia Bawah ambience: floating paper-money motes (4 / 10 / 20 per s), soul wisps (6 / 16 / 32 per s) within
  * 24 b, the pale Wangchuan glow on water near the player, and a wisp trail behind every walking soul.</li>
  * <li>Laut Tanpa Batas ambience: sea mist on the horizon ring (2 / 5 / 10 per s) and spray around swimmers.</li>
+ * <li>Sky events of module L as module D feels them ({@link DimensiState#sky()}): the blood eclipse reddens the motes
+ * of Dunia Bawah and the sea's mist; the twin moons raise the spirit tide; the meteor shower draws streaks over the
+ * sea.</li>
  * <li>Moments: the soul leaving and returning, arrivals (a 2 s pull-back shot in Penuh through the spine's
  * {@link DuniaScenes}, beat 44, with its card; Singkat: the card; Mati: nothing), a court passed, Meng Po's soup, the
- * Book, herbs, the whirl, blessings and the serpent's spout.</li>
+ * Book, herbs, the whirl, blessings and the serpent's spout; the detail pass adds the clash of weapons in a duel,
+ * a hungry ghost dissolving and a sea monster's death throes.</li>
  * </ul>
  */
 public final class DimensiFx {
@@ -41,6 +45,10 @@ public final class DimensiFx {
 	public static final int WANGCHUAN = 0x6FA8C8;
 	public static final int SEA = 0x7FE0F0;
 	public static final int GOLD = 0xFFD27A;
+	/** The blood eclipse's crimson (module L's sky event, as the realms below and beyond feel it). */
+	public static final int ECLIPSE = 0xD05050;
+	/** The spirit tide of the twin moons. */
+	public static final int TIDE = 0xA8F0D8;
 
 	private static long ticks;
 
@@ -75,12 +83,15 @@ public final class DimensiFx {
 
 	private static void bawahAmbience(ClientLevel level, Player player, RandomSource random) {
 		Vec3 at = player.position();
+		// the blood eclipse over the overworld opens the gates: the motes burn redder and crimson wisps rise among them
+		boolean eclipse = DimensiState.sky() == 2;
 		int paper = thisTick(random, perSecond(4, 10, 20));
 		for (int i = 0; i < paper; i++) {
 			double x = at.x + (random.nextDouble() - 0.5D) * 36.0D;
 			double z = at.z + (random.nextDouble() - 0.5D) * 36.0D;
 			double y = at.y + 2.0D + random.nextDouble() * 8.0D;
-			CommonFx.add(Qi.petal(random.nextInt(4) == 0 ? 0xD8C080 : PAPER, 0.16F + random.nextFloat() * 0.08F, 140),
+			CommonFx.add(Qi.petal(eclipse && random.nextInt(3) == 0 ? ECLIPSE : random.nextInt(4) == 0 ? 0xD8C080 : PAPER,
+					0.16F + random.nextFloat() * 0.08F, 140),
 					x, y, z, (random.nextDouble() - 0.5D) * 0.02D, -0.012D, (random.nextDouble() - 0.5D) * 0.02D);
 		}
 		int wisps = thisTick(random, perSecond(6, 16, 32));
@@ -90,7 +101,8 @@ public final class DimensiFx {
 			double x = at.x + Math.cos(angle) * r;
 			double z = at.z + Math.sin(angle) * r;
 			double y = at.y + random.nextDouble() * 4.0D;
-			CommonFx.add(Qi.mote(random.nextInt(3) == 0 ? 0x9FE8E0 : SOUL, 0.12F + random.nextFloat() * 0.1F, 60 + random.nextInt(40)),
+			int rgb = eclipse && random.nextInt(4) == 0 ? ECLIPSE : random.nextInt(3) == 0 ? 0x9FE8E0 : SOUL;
+			CommonFx.add(Qi.mote(rgb, 0.12F + random.nextFloat() * 0.1F, 60 + random.nextInt(40)),
 					x, y, z, 0.0D, 0.008D + random.nextDouble() * 0.01D, 0.0D);
 		}
 		// the Wangchuan's pale glow on still water near the player
@@ -122,11 +134,12 @@ public final class DimensiFx {
 
 	private static void lautAmbience(ClientLevel level, Player player, RandomSource random) {
 		Vec3 at = player.position();
+		int sky = DimensiState.sky();
 		int mist = thisTick(random, perSecond(2, 5, 10));
 		for (int i = 0; i < mist; i++) {
 			double angle = random.nextDouble() * Math.PI * 2.0D;
 			double r = 36.0D + random.nextDouble() * 30.0D;
-			CommonFx.add(Qi.mist(0xE8FAFF, 3.0F + random.nextFloat() * 2.0F, 160), at.x + Math.cos(angle) * r, DimensiLevels.LAUT_SEA_TOP + 1.6D + random.nextDouble() * 3.0D,
+			CommonFx.add(Qi.mist(sky == 2 ? 0xF0C8C8 : 0xE8FAFF, 3.0F + random.nextFloat() * 2.0F, 160), at.x + Math.cos(angle) * r, DimensiLevels.LAUT_SEA_TOP + 1.6D + random.nextDouble() * 3.0D,
 					at.z + Math.sin(angle) * r, 0.01D, 0.0D, 0.0D);
 		}
 		if (player.isInWater() && player.getDeltaMovement().horizontalDistanceSqr() > 0.01D && random.nextInt(3) == 0) {
@@ -142,6 +155,38 @@ public final class DimensiFx {
 					CommonFx.add(Qi.mote(random.nextInt(3) == 0 ? 0xFFE9A8 : 0x9FF0D0, 0.2F + random.nextFloat() * 0.12F, 70 + random.nextInt(40)),
 							x, top + 0.3D + random.nextDouble() * 2.0D, z, 0.0D, 0.025D + random.nextDouble() * 0.02D, 0.0D);
 				}
+			}
+		}
+		skyOverSea(at, sky, random);
+	}
+
+	/**
+	 * Module L's sky events as the sea feels them (the client's {@link DimensiState#sky()}): the twin moons raise the
+	 * spirit tide (pale jade motes lifting off the water around the player, 2 / 4 / 8 per s), the meteor shower draws
+	 * falling streaks low over the horizon (one every 2 / 1 / 0.5 s), the blood eclipse tints the horizon mist. Particles
+	 * only, within the ambience budget.
+	 */
+	private static void skyOverSea(Vec3 at, int sky, RandomSource random) {
+		if (sky == 3) {
+			int tide = thisTick(random, perSecond(2, 4, 8));
+			for (int i = 0; i < tide; i++) {
+				double angle = random.nextDouble() * Math.PI * 2.0D;
+				double r = 3.0D + random.nextDouble() * 18.0D;
+				CommonFx.add(Qi.mote(random.nextInt(4) == 0 ? 0xE8F0FF : TIDE, 0.14F + random.nextFloat() * 0.1F, 50 + random.nextInt(30)),
+						at.x + Math.cos(angle) * r, DimensiLevels.LAUT_SEA_TOP + 1.05D, at.z + Math.sin(angle) * r,
+						0.0D, 0.03D + random.nextDouble() * 0.02D, 0.0D);
+			}
+		} else if (sky == 1 && ticks % perSecond(40, 20, 10) == 0L) {
+			double angle = random.nextDouble() * Math.PI * 2.0D;
+			double r = 50.0D + random.nextDouble() * 20.0D;
+			double x = at.x + Math.cos(angle) * r;
+			double z = at.z + Math.sin(angle) * r;
+			double y = DimensiLevels.LAUT_SEA_TOP + 28.0D + random.nextDouble() * 18.0D;
+			double vx = (random.nextDouble() - 0.5D) * 0.9D;
+			double vz = (random.nextDouble() - 0.5D) * 0.9D;
+			for (int k = 0; k < 6; k++) {
+				CommonFx.add(Qi.spark(k == 0 ? 0xFFFFFF : 0xFFD8A0, 0.5F - k * 0.06F, 18 - k), x - vx * k * 1.5D, y + k * 0.9D, z - vz * k * 1.5D,
+						vx, -0.6D, vz);
 			}
 		}
 	}
@@ -229,7 +274,79 @@ public final class DimensiFx {
 					CommonFx.pillar(at, rgb, 10.0F);
 				}
 			}
+			case DimensiNet.FX_CLASH -> clash(at, fx.arg() == 1, scale, random);
+			case DimensiNet.FX_GHOST_FADE -> {
+				int n = Math.round(EffectQuality.scale(18) * scale);
+				for (int i = 0; i < n; i++) {
+					CommonFx.add(Qi.mote(i % 3 == 0 ? 0xB0A8C8 : SOUL, 0.18F, 40 + random.nextInt(20)), at.x + (random.nextDouble() - 0.5D) * 0.9D,
+							at.y + random.nextDouble() * 1.8D, at.z + (random.nextDouble() - 0.5D) * 0.9D,
+							(random.nextDouble() - 0.5D) * 0.02D, 0.03D + random.nextDouble() * 0.04D, (random.nextDouble() - 0.5D) * 0.02D);
+				}
+				for (int i = 0; i < Math.max(1, n / 4); i++) {
+					CommonFx.add(Qi.smoke(0x4A4458, 0.6F, 40), at.x + (random.nextDouble() - 0.5D), at.y + 0.4D + random.nextDouble(),
+							at.z + (random.nextDouble() - 0.5D), 0.0D, 0.015D, 0.0D);
+				}
+				if (fx.arg() == 1) {
+					// it left its soul jade: a green glint where it fell
+					CommonFx.add(Qi.glint(0x9FF0C0, 0.6F, 20), at.x, at.y + 0.3D, at.z, 0.0D, 0.0D, 0.0D);
+				}
+			}
+			case DimensiNet.FX_MONSTER_DOWN -> {
+				int tier = Math.max(0, Math.min(4, fx.arg()));
+				float radius = 2.0F + tier;
+				int n = Math.round(EffectQuality.scale(16 + 8 * tier) * scale);
+				for (int i = 0; i < n; i++) {
+					double angle = random.nextDouble() * Math.PI * 2.0D;
+					double r = random.nextDouble() * radius;
+					CommonFx.add(ParticleTypes.SPLASH, at.x + Math.cos(angle) * r, at.y + 0.5D, at.z + Math.sin(angle) * r,
+							Math.cos(angle) * 0.1D, 0.25D + random.nextDouble() * 0.2D, Math.sin(angle) * 0.1D);
+					if (i % 4 == 0) {
+						CommonFx.add(ParticleTypes.BUBBLE_COLUMN_UP, at.x + Math.cos(angle) * r * 0.5D, at.y - 1.0D, at.z + Math.sin(angle) * r * 0.5D,
+								0.0D, 0.4D, 0.0D);
+					}
+				}
+				CommonFx.ring(at.add(0.0D, 0.3D, 0.0D), 0xE8FAFF, radius, EffectQuality.scale(24 + 6 * tier));
+				if (tier >= 3) {
+					CommonFx.burst(at.add(0.0D, 1.0D, 0.0D), SEA, Math.round(EffectQuality.scale(14) * scale), 2.0F);
+				}
+			}
 			default -> {
+			}
+		}
+	}
+
+	/**
+	 * Weapons meeting in a duel (the courts' guards, the Penglai trial): a white flash, sparks thrown out in a fan with
+	 * hot embers falling, a ring of steel expanding, vanilla crits; at sea, a burst of spray. About 30 / 60 / 90
+	 * particles, thinned for the duels of others.
+	 */
+	private static void clash(Vec3 at, boolean sea, float scale, RandomSource random) {
+		CommonFx.add(Qi.glint(0xFFFFFF, 1.1F, 5), at.x, at.y, at.z, 0.0D, 0.0D, 0.0D);
+		CommonFx.add(Qi.ring(0xFFF0C8, 0.2F, 1.6F, 8), at.x, at.y, at.z, 0.0D, 0.0D, 0.0D);
+		int sparks = Math.round(EffectQuality.scale(22) * scale);
+		for (int i = 0; i < sparks; i++) {
+			double yaw = random.nextDouble() * Math.PI * 2.0D;
+			double pitch = (random.nextDouble() - 0.3D) * 1.2D;
+			double speed = 0.18D + random.nextDouble() * 0.32D;
+			double vx = Math.cos(yaw) * Math.cos(pitch) * speed;
+			double vy = Math.sin(pitch) * speed + 0.05D;
+			double vz = Math.sin(yaw) * Math.cos(pitch) * speed;
+			int rgb = i % 4 == 0 ? 0xFFFFFF : i % 3 == 0 ? 0xFFB040 : 0xFFE080;
+			CommonFx.add(Qi.spark(rgb, 0.16F + random.nextFloat() * 0.12F, 8 + random.nextInt(8)), at.x, at.y, at.z, vx, vy, vz);
+		}
+		int embers = Math.round(EffectQuality.scale(6) * scale);
+		for (int i = 0; i < embers; i++) {
+			CommonFx.add(Qi.flame(0xFF8030, 0.12F, 20 + random.nextInt(10)), at.x + (random.nextDouble() - 0.5D) * 0.4D, at.y,
+					at.z + (random.nextDouble() - 0.5D) * 0.4D, (random.nextDouble() - 0.5D) * 0.05D, -0.04D, (random.nextDouble() - 0.5D) * 0.05D);
+		}
+		for (int i = 0; i < Math.round(EffectQuality.scale(5) * scale); i++) {
+			CommonFx.add(ParticleTypes.CRIT, at.x, at.y, at.z, (random.nextDouble() - 0.5D) * 0.6D, random.nextDouble() * 0.4D,
+					(random.nextDouble() - 0.5D) * 0.6D);
+		}
+		if (sea) {
+			for (int i = 0; i < Math.round(EffectQuality.scale(10) * scale); i++) {
+				CommonFx.add(ParticleTypes.SPLASH, at.x + (random.nextDouble() - 0.5D), at.y - 0.4D, at.z + (random.nextDouble() - 0.5D),
+						0.0D, 0.2D, 0.0D);
 			}
 		}
 	}

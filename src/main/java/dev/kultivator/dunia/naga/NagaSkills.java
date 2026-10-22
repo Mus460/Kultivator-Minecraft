@@ -49,7 +49,7 @@ final class NagaSkills {
 		switch (skill) {
 			case NagaLiarEntity.SKILL_BREATH -> {
 				Predicate<LivingEntity> victims = entity -> entity == target || wildVictim(entity);
-				if (breath(level, dragon, target, t, victims, (float) (BREATH_PULSE * dragon.damageFactor))) {
+				if (breath(level, dragon, target, t, victims, (float) (BREATH_PULSE * dragon.power()))) {
 					dragon.finishSkill();
 				}
 			}
@@ -57,7 +57,227 @@ final class NagaSkills {
 			case NagaLiarEntity.SKILL_ROAR -> roar(level, dragon, target, t);
 			case NagaLiarEntity.SKILL_COIL -> coil(level, dragon, target, t);
 			case NagaLiarEntity.SKILL_BITE -> bite(level, dragon, target, t);
+			case NagaLiarEntity.SKILL_SPECIAL -> {
+				Predicate<LivingEntity> victims = entity -> entity == target || wildVictim(entity);
+				if (special(level, dragon, target, t, victims, dragon.power(), null)) {
+					dragon.finishSkill();
+				}
+			}
 			default -> dragon.finishSkill();
+		}
+	}
+
+	// ================================================================== the kind skills (detail pass)
+
+	/** Wild damage at Nascent Soul of the kind skills (× the power of the moment). */
+	static final float WHIRL = 2.5F;
+	static final float VEIL_BITE = 13.0F;
+	static final float THUNDER = 9.0F;
+
+	/**
+	 * One tick of the kind skill at {@code aim}; {@code owner} is the tamer of a Naga Sejati (null for a wild Jiao, whose
+	 * victims are players). True when it is over. Telegraphs first ({@link NagaLiarEntity#SPECIAL_TELEGRAPH}), entity
+	 * effects only: velocity, damage, potion effects, particles and sounds; never a block or a LightningBolt.
+	 */
+	static boolean special(ServerLevel level, NagaLiarEntity dragon, LivingEntity aim, int t, Predicate<LivingEntity> victims, double power,
+			@Nullable ServerPlayer owner) {
+		return switch (dragon.kind()) {
+			case AIR -> whirl(level, dragon, aim, t, victims, power, owner);
+			case AWAN -> veil(level, dragon, aim, t, victims, power, owner);
+			case PETIR -> thunder(level, dragon, aim, t, victims, power, owner);
+		};
+	}
+
+	/**
+	 * Pusaran Samudra: a ring of water marks the ground under the target for 1.5 s, then a whirl of radius 8 drags
+	 * everything in it round and inward for 3.5 s, hitting every half second and slowing.
+	 */
+	private static boolean whirl(ServerLevel level, NagaLiarEntity dragon, LivingEntity aim, int t, Predicate<LivingEntity> victims, double power,
+			@Nullable ServerPlayer owner) {
+		Vec3 centre = dragon.specialPoint;
+		int tele = NagaLiarEntity.SPECIAL_TELEGRAPH;
+		double radius = NagaLiarEntity.WHIRL_RADIUS;
+		if (owner == null) {
+			// it circles the whirl, low and fast, as if stirring the sea
+			double angle = t * 0.09D;
+			dragon.steer(centre.add(Math.cos(angle) * 11.0D, 5.0D, Math.sin(angle) * 11.0D), 0.9D, 0.12D);
+		}
+		if (t == 0) {
+			level.playSound(null, centre.x, centre.y, centre.z, SoundEvents.BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundSource.HOSTILE, 2.0F, 0.6F);
+			level.playSound(null, dragon.getX(), dragon.getY(), dragon.getZ(), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.HOSTILE, 1.6F, 1.3F);
+			NagaPayloads.moment(level, NagaPayloads.MOMENT_WHIRL, dragon.getId(), centre, dragon.kind().ordinal(), (int) Math.round(radius * 10.0D),
+					2, tele + NagaLiarEntity.WHIRL_TICKS, owner, 96.0D);
+			warnNear(level, centre, radius + 4.0D, victims, "kultivator.naga.skill.whirl.warn");
+		}
+		if (t < tele) {
+			if (t % 6 == 0) {
+				Fx.ring(level, centre, dragon.kind().glow, (float) (radius * (1.0D - 0.25D * t / tele)));
+			}
+			return false;
+		}
+		int active = t - tele;
+		if (active == 0) {
+			level.playSound(null, centre.x, centre.y, centre.z, SoundEvents.PLAYER_SPLASH_HIGH_SPEED, SoundSource.HOSTILE, 2.0F, 0.5F);
+			level.playSound(null, centre.x, centre.y, centre.z, SoundEvents.TRIDENT_RIPTIDE_2.value(), SoundSource.HOSTILE, 1.6F, 0.7F);
+		}
+		if (active % 8 == 0) {
+			level.playSound(null, centre.x, centre.y, centre.z, SoundEvents.BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundSource.HOSTILE, 1.2F,
+					0.7F + 0.02F * active / 8.0F);
+		}
+		AABB box = new AABB(centre, centre).inflate(radius, 6.0D, radius);
+		for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, box, e -> e != dragon && e.isAlive() && victims.test(e))) {
+			Vec3 to = centre.subtract(victim.position()).multiply(1.0D, 0.0D, 1.0D);
+			double distance = to.length();
+			if (distance > radius) {
+				continue;
+			}
+			double resist = Mth.clamp(victim.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE), 0.0D, 1.0D);
+			Vec3 inward = distance < 0.6D ? Vec3.ZERO : to.scale(1.0D / distance);
+			Vec3 round = new Vec3(-inward.z, 0.0D, inward.x);
+			Vec3 drag = inward.scale(0.085D).add(round.scale(0.07D)).scale(1.0D - resist);
+			victim.setDeltaMovement(victim.getDeltaMovement().add(drag.x, 0.0D, drag.z));
+			victim.needsSync = true;
+			if (active % 10 == 0 && hurt(level, dragon, victim, (float) (WHIRL * power))) {
+				victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 1, false, true), dragon);
+			}
+		}
+		return active >= NagaLiarEntity.WHIRL_TICKS;
+	}
+
+	/**
+	 * Tirai Awan: a cloud billows out of the Jiao (1 s), blinds everyone in 14 blocks for 2.5 s, and the Jiao comes out
+	 * of the mist behind its target with a bite. A tamed one instead blinds and slows its owner's foes and lends its owner
+	 * the wind (Speed).
+	 */
+	private static boolean veil(ServerLevel level, NagaLiarEntity dragon, LivingEntity aim, int t, Predicate<LivingEntity> victims, double power,
+			@Nullable ServerPlayer owner) {
+		double radius = NagaLiarEntity.VEIL_RADIUS;
+		if (t == 0) {
+			dragon.specialPoint = dragon.position();
+			level.playSound(null, dragon.getX(), dragon.getY(), dragon.getZ(), SoundEvents.BREEZE_WHIRL, SoundSource.HOSTILE, 2.0F, 0.5F);
+			level.playSound(null, dragon.getX(), dragon.getY(), dragon.getZ(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.HOSTILE, 2.0F, 0.6F);
+			NagaPayloads.moment(level, NagaPayloads.MOMENT_VEIL, dragon.getId(), dragon.position(), dragon.kind().ordinal(), (int) radius, 2,
+					NagaLiarEntity.VEIL_STRIKE + 20, owner, 96.0D);
+			warnNear(level, dragon.position(), radius + 6.0D, victims, "kultivator.naga.skill.veil.warn");
+		}
+		if (owner == null && t < NagaLiarEntity.VEIL_STRIKE) {
+			dragon.hover(dragon.position(), 0.0D);
+		}
+		if (t == 20) {
+			level.playSound(null, dragon.getX(), dragon.getY(), dragon.getZ(), SoundEvents.WIND_CHARGE_BURST.value(), SoundSource.HOSTILE, 2.0F, 0.6F);
+			Vec3 centre = owner != null ? owner.position() : dragon.position();
+			for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, new AABB(centre, centre).inflate(radius),
+					e -> e != dragon && e.isAlive() && victims.test(e) && e.distanceToSqr(centre) <= radius * radius)) {
+				victim.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 50, 0, false, true), dragon);
+				if (owner != null) {
+					victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 1, false, true), dragon);
+				}
+			}
+			if (owner != null) {
+				owner.addEffect(new MobEffectInstance(MobEffects.SPEED, 100, 1, false, true), dragon);
+				return false;
+			}
+		}
+		if (owner != null) {
+			return t >= 30;
+		}
+		if (t == NagaLiarEntity.VEIL_STRIKE) {
+			// out of the mist behind its target
+			Vec3 look = aim.getViewVector(1.0F).multiply(1.0D, 0.0D, 1.0D);
+			look = look.lengthSqr() < 1.0E-4D ? new Vec3(0.0D, 0.0D, 1.0D) : look.normalize();
+			Vec3 behind = aim.position().subtract(look.scale(4.0D)).add(0.0D, 2.5D, 0.0D);
+			Fx.burst(level, dragon.position(), 0xF4FFF8, 24, 3.0F);
+			dragon.snapTo(behind.x, behind.y, behind.z, dragon.getYRot(), dragon.getXRot());
+			dragon.setDeltaMovement(Vec3.ZERO);
+			dragon.faceVelocity(aim.getEyePosition());
+			level.playSound(null, behind.x, behind.y, behind.z, SoundEvents.PHANTOM_SWOOP, SoundSource.HOSTILE, 2.0F, 0.6F);
+			Fx.burst(level, behind, 0xF4FFF8, 24, 3.0F);
+		}
+		if (t > NagaLiarEntity.VEIL_STRIKE) {
+			Vec3 eye = aim.getEyePosition();
+			dragon.steer(eye, 1.2D, 0.2D);
+			if (dragon.position().add(0.0D, 0.6D, 0.0D).distanceToSqr(eye) < 3.0D * 3.0D) {
+				if (hurt(level, dragon, aim, (float) (VEIL_BITE * power))) {
+					push(aim, dragon.position(), 1.0D, 0.3D);
+				}
+				level.playSound(null, aim.getX(), aim.getY(), aim.getZ(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.HOSTILE, 1.6F, 1.6F);
+				dragon.setDeltaMovement(dragon.getDeltaMovement().scale(-0.4D).add(0.0D, 0.6D, 0.0D));
+				return true;
+			}
+		}
+		return t >= NagaLiarEntity.VEIL_STRIKE + 40;
+	}
+
+	/**
+	 * Hujan Petir Langit: rings of light mark the target and the ground around it (or its owner's other foes) for 1.5 s,
+	 * then bolts of light fall on them one after another, a quarter of a second apart. Each ring hits what stands in it.
+	 * Particles and sounds only, never a LightningBolt.
+	 */
+	private static boolean thunder(ServerLevel level, NagaLiarEntity dragon, LivingEntity aim, int t, Predicate<LivingEntity> victims, double power,
+			@Nullable ServerPlayer owner) {
+		int tele = NagaLiarEntity.SPECIAL_TELEGRAPH;
+		List<Vec3> marks = dragon.marks;
+		if (t == 0) {
+			marks.clear();
+			marks.add(aim.position());
+			int extra = owner != null ? 2 : dragon.hasFlag(NagaLiarEntity.FLAG_ENRAGED) ? 4 : 2;
+			List<LivingEntity> others = level.getEntitiesOfClass(LivingEntity.class, aim.getBoundingBox().inflate(16.0D),
+					e -> e != aim && e != dragon && e.isAlive() && victims.test(e));
+			others.sort(Comparator.comparingDouble(other -> other.distanceToSqr(aim)));
+			for (LivingEntity other : others) {
+				if (marks.size() > extra) {
+					break;
+				}
+				marks.add(other.position());
+			}
+			while (owner == null && marks.size() <= extra) {
+				double angle = dragon.getRandom().nextDouble() * Math.PI * 2.0D;
+				double r = 3.5D + dragon.getRandom().nextDouble() * 3.0D;
+				marks.add(aim.position().add(Math.cos(angle) * r, 0.0D, Math.sin(angle) * r));
+			}
+			for (int i = 0; i < marks.size(); i++) {
+				NagaPayloads.moment(level, NagaPayloads.MOMENT_THUNDER_MARK, dragon.getId(), marks.get(i), dragon.kind().ordinal(),
+						(int) Math.round(NagaLiarEntity.MARK_RADIUS * 10.0D), 2, tele + i * NagaLiarEntity.MARK_STAGGER, owner, 96.0D);
+			}
+			level.playSound(null, dragon.getX(), dragon.getY(), dragon.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.HOSTILE, 1.0F, 0.6F);
+			level.playSound(null, dragon.getX(), dragon.getY(), dragon.getZ(), SoundEvents.WARDEN_SONIC_CHARGE, SoundSource.HOSTILE, 1.2F, 1.6F);
+			warnNear(level, aim.position(), 20.0D, victims, "kultivator.naga.skill.thunder.warn");
+		}
+		if (owner == null) {
+			// high above the target, head down, the storm gathering on its scales
+			dragon.steer(aim.position().add(0.0D, 12.0D, 0.0D), 0.6D, 0.08D);
+			dragon.faceVelocity(aim.position());
+		}
+		for (int i = 0; i < marks.size(); i++) {
+			if (t == tele + i * NagaLiarEntity.MARK_STAGGER) {
+				strikeMark(level, dragon, marks.get(i), victims, (float) (THUNDER * power));
+			}
+		}
+		return t >= tele + Math.max(0, marks.size() - 1) * NagaLiarEntity.MARK_STAGGER + 12;
+	}
+
+	private static void strikeMark(ServerLevel level, NagaLiarEntity dragon, Vec3 mark, Predicate<LivingEntity> victims, float damage) {
+		level.playSound(null, mark.x, mark.y, mark.z, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.HOSTILE, 1.6F, 1.0F);
+		level.playSound(null, mark.x, mark.y, mark.z, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.HOSTILE, 1.2F, 1.3F);
+		Fx.burst(level, mark.add(0.0D, 0.3D, 0.0D), dragon.kind().glow, 14, 1.8F);
+		double r = NagaLiarEntity.MARK_RADIUS;
+		for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, new AABB(mark, mark).inflate(r, 4.0D, r),
+				e -> e != dragon && e.isAlive() && victims.test(e))) {
+			double dx = victim.getX() - mark.x;
+			double dz = victim.getZ() - mark.z;
+			if (dx * dx + dz * dz > r * r) {
+				continue;
+			}
+			if (hurt(level, dragon, victim, damage)) {
+				victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 20, 3, false, true), dragon);
+			}
+		}
+	}
+
+	/** The players a skill threatens get its warning on the action bar (the telegraph in words). */
+	private static void warnNear(ServerLevel level, Vec3 at, double radius, Predicate<LivingEntity> victims, String key) {
+		for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, new AABB(at, at).inflate(radius), victims::test)) {
+			player.sendOverlayMessage(Component.translatable(key).withStyle(ChatFormatting.GOLD));
 		}
 	}
 
@@ -206,7 +426,7 @@ final class NagaSkills {
 				if (victim.position().distanceToSqr(point) > 36.0D + 16.0D) {
 					continue;
 				}
-				if (hurt(level, dragon, victim, (float) (TAIL * dragon.damageFactor))) {
+				if (hurt(level, dragon, victim, (float) (TAIL * dragon.power()))) {
 					push(victim, point, 1.5D, 0.45D);
 				}
 			}
@@ -246,7 +466,7 @@ final class NagaSkills {
 		Vec3 point = target.position().add(Math.cos(angle) * radius, 1.0D + Math.sin(t * 0.2D) * 0.8D, Math.sin(angle) * radius);
 		dragon.steer(point, 1.0D, 0.25D);
 		if (t > 0 && t % 20 == 0 && dragon.distanceToSqr(target) < 5.5D * 5.5D) {
-			if (hurt(level, dragon, target, (float) (COIL * dragon.damageFactor))) {
+			if (hurt(level, dragon, target, (float) (COIL * dragon.power()))) {
 				target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 30, 2, false, true), dragon);
 				level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.HOSTILE, 1.2F, 1.4F);
 			}
@@ -271,7 +491,7 @@ final class NagaSkills {
 		Vec3 eye = target.getEyePosition();
 		dragon.steer(eye, 1.15D, 0.12D);
 		if (dragon.position().add(0.0D, 0.6D, 0.0D).distanceToSqr(eye) < 2.8D * 2.8D) {
-			if (hurt(level, dragon, target, (float) (BITE * dragon.damageFactor))) {
+			if (hurt(level, dragon, target, (float) (BITE * dragon.power()))) {
 				push(target, dragon.position(), 0.9D, 0.2D);
 			}
 			level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.HOSTILE, 1.6F, 1.6F);

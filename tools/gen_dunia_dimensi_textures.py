@@ -3,7 +3,8 @@
 Entity textures (textures/dunia/dimensi/entity/):
     headwear.png        64 x 512  the head pieces of D's people (client Headwear): 16 material bands of 32 px
                                   (0 black gauze, 1 gold, 2 horn, 3 ox fur, 4 white hair, 5 straw, 6 jade, 7 crimson,
-                                  8 dark fur, 9 glow, 10 teal lacquer, 11 pearl); every cube's unwrap starts at the
+                                  8 dark fur, 9 glow, 10 teal lacquer, 11 pearl, 12 mourning paper,
+                                  13 black lacquered paper); every cube's unwrap starts at the
                                   band's top-left, so each band is a seamless material.
     kepiting_batu.png  128 x 512  the rock crab (KepitingRenderer): 0 carapace, 1 barnacle rocks, 2 moss, 3 belly,
                                   4 eyes, 5 mouth, 6 pincer, 7 leg tips.
@@ -16,6 +17,8 @@ Entity textures (textures/dunia/dimensi/entity/):
     hantu_lapar.png     64 x 64   a hungry ghost: grey-violet, ribs, a swollen belly, rags, long nails.
     raja_naga.png       64 x 64   the Dragon King: jade scales, gold eyes, the golden dragon robe with sea-wave hems.
     yaksha.png          64 x 64   a yaksha: blue skin, red eyes, tusks, tiger-skin loincloth, gold rings.
+    wuchang_putih.png   64 x 64   Bai Wuchang: chalk face, smiling closed eyes, white hemp robe, straw cord.
+    wuchang_hitam.png   64 x 64   Hei Wuchang: soot face, a scowl, black robe, white cord.
 
 Item icons (textures/item/, the item atlas): dupa_arwah, lentera_arwah, giok_arwah, surat_arwah,
 mutiara_penunjuk_laut, mutiara_penghindar_air, mutiara_naga, air_mata_air_penglai.
@@ -217,6 +220,47 @@ def m_pearl(x, y):
     tint = (int(225 + 25 * math.sin(hue)), int(228 + 22 * math.sin(hue + 2.1)), int(236 + 19 * math.sin(hue + 4.2)))
     return mix((210, 214, 222), tint, 0.6 + 0.4 * n)
 
+def _glyphs(x, y, seed):
+    """Brush glyphs: short strokes in 6 px cells down columns (a written charm, not real characters)."""
+    cx, cy = x % 6, y % 7
+    col, row = x // 6, y // 7
+    if cx in (0, 5) or cy == 6:
+        return False
+    h = hash01(col, row, seed)
+    if h < 0.18:
+        return False
+    stroke = int(hash01(col, row, seed + 1) * 4)
+    if stroke == 0:
+        return cy in (1, 3) and 1 <= cx <= 4
+    if stroke == 1:
+        return cx == 2 or (cy == 2 and 1 <= cx <= 4)
+    if stroke == 2:
+        return (cx + cy) % 4 == 0 or cy == 4 and cx <= 3
+    return cx == 3 and cy <= 4 or cy == 0 and 1 <= cx <= 4
+
+
+def m_paper(x, y):
+    """Bai Wuchang's hat: white mourning paper, fibres, cinnabar charm strokes."""
+    n = NZ[10].fbm(x / 3.0, y / 5.0)
+    c = mix((214, 210, 200), (250, 248, 242), 0.45 + 0.55 * n)
+    if hash01(x, y, 71) > 0.985:
+        c = shade(c, 0.9)
+    if _glyphs(x, y, 501):
+        c = mix((150, 22, 18), (200, 40, 30), n)
+    return c
+
+
+def m_ink(x, y):
+    """Hei Wuchang's hat: black lacquered paper, a sheen, white charm strokes."""
+    n = NZ[11].fbm(x / 4.0, y / 4.0)
+    c = mix((12, 12, 16), (44, 42, 52), n)
+    if (x * 3 + y) % 11 == 0:
+        c = shade(c, 1.25)
+    if _glyphs(x, y, 502):
+        c = mix((200, 200, 196), (240, 240, 236), n)
+    return c
+
+
 
 NZ = [Noise(1000 + i, 16) for i in range(12)]
 
@@ -225,7 +269,7 @@ NZ = [Noise(1000 + i, 16) for i in range(12)]
 def headwear():
     img = Image(64, 512, (0, 0, 0, 0))
     mats = [m_black, m_gold, m_horn, m_fur((122, 66, 38), (60, 30, 18), (176, 112, 70), 301), m_white, m_straw, m_jade,
-            m_crimson, m_fur((52, 46, 48), (20, 18, 20), (100, 88, 80), 302), m_glow, m_teal, m_pearl]
+            m_crimson, m_fur((52, 46, 48), (20, 18, 20), (100, 88, 80), 302), m_glow, m_teal, m_pearl, m_paper, m_ink]
     for i, fn in enumerate(mats):
         band(img, i, 32, fn)
     return save(img, ENTITY, "headwear.png")
@@ -661,6 +705,94 @@ def ghost_skin():
     return save(img, ENTITY, "hantu_lapar.png")
 
 
+def wuchang_skin(name, white, seed):
+    """Bai Wuchang (white: chalk face, smiling closed eyes, rouged cheeks, white hemp mourning robe, straw cord) or Hei
+    Wuchang (soot face, a scowl under heavy brows, black robe, a white cord); straw sandals; pale or grey hands."""
+    img = Image(64, 64, (0, 0, 0, 0))
+    nz = Noise(seed, 16)
+    face_c = (236, 232, 226) if white else (58, 56, 64)
+    face_d = (206, 200, 196) if white else (34, 32, 40)
+    robe = (230, 226, 216) if white else (26, 24, 30)
+    robe_d = (196, 190, 178) if white else (12, 12, 16)
+    cord = (196, 160, 80) if white else (224, 222, 214)
+
+    def tone(x, y):
+        return mix(face_d, face_c, 0.6 + 0.4 * nz.fbm(x / 4.0, y / 4.0))
+
+    def cloth(x, y):
+        weave = 0.94 if (x + y) % 2 == 0 else 1.0
+        return shade(mix(robe_d, robe, 0.5 + 0.5 * nz.fbm(x / 3.0, y / 6.0)), weave)
+
+    def head(face, x, y, w, h):
+        c = tone(x + 9 * len(face), y)
+        if face == "top" or (face in ("back", "left", "right") and y < 3) or (face == "back"):
+            return mix((16, 14, 18), (40, 36, 44), nz.at(x / 2.0, y / 2.0))
+        if face == "front":
+            if y == 0:
+                return (20, 18, 22)
+            if white:
+                if y == 3 and x in (1, 2, 5, 6):
+                    return (40, 30, 34)
+                if y == 2 and x in (1, 6):
+                    return (60, 48, 52)
+                if y == 5 and x in (1, 6):
+                    return (236, 150, 150)
+                if y == 6 and 2 <= x <= 5:
+                    return (170, 30, 34) if x in (3, 4) else (120, 40, 44)
+            else:
+                if y == 2 and 1 <= x <= 6 and x not in (3, 4):
+                    return (12, 10, 12)
+                if y == 3 and x in (1, 2, 5, 6):
+                    return (230, 220, 200) if x in (2, 5) else (20, 16, 18)
+                if y == 6 and 2 <= x <= 5:
+                    return (16, 12, 14)
+                if y == 7 and x in (2, 5):
+                    return (24, 20, 22)
+        return c
+    paint(img, "head", head)
+
+    def body(face, x, y, w, h):
+        if face in ("top", "bottom"):
+            return shade(robe_d, 0.9)
+        c = cloth(x, y)
+        if face == "front" and abs(x - (y // 2) - 1) == 0 and y < 8:
+            c = shade(robe_d, 0.8)
+        if y in (7, 8):
+            c = shade(cord, 0.85 if y == 8 else 1.0)
+        return c
+    paint(img, "body", body)
+
+    def arm(face, x, y, w, h):
+        if y >= 10 or face == "bottom":
+            return tone(x, y)
+        c = cloth(x + 3, y)
+        if y == 9:
+            c = shade(robe_d, 0.75)
+        return c
+    paint(img, "rarm", arm)
+    paint(img, "larm", arm)
+
+    def leg(face, x, y, w, h):
+        if face == "bottom" or y >= 11:
+            return (150, 118, 62) if (x + y) % 2 else (124, 96, 50)
+        if y == 10:
+            return (176, 140, 76)
+        return cloth(x + 7, y + 3)
+    paint(img, "rleg", leg)
+    paint(img, "lleg", leg)
+
+    def sleeves(face, x, y, w, h):
+        if face in ("top", "bottom") or y < 6:
+            return None
+        if y < 10:
+            return rgba(shade(cloth(x, y), 1.05), 255)
+        return None
+    paint(img, "rarm", sleeves, overlay=True)
+    paint(img, "larm", sleeves, overlay=True)
+    return save(img, ENTITY, name)
+
+
+
 def king_skin():
     img = Image(64, 64, (0, 0, 0, 0))
     scale_a, scale_b = (112, 176, 136), (60, 122, 92)
@@ -1045,6 +1177,8 @@ def main():
     ghost_skin()
     king_skin()
     yaksha_skin()
+    wuchang_skin("wuchang_putih.png", True, 6101)
+    wuchang_skin("wuchang_hitam.png", False, 6102)
     item_dupa()
     item_lentera()
     item_giok()

@@ -33,6 +33,19 @@ public final class VoiceEvents {
 	public static final List<String> DISCIPLE = List.of("greet", "greet_alt", "thanks", "breakthrough", "cheer", "careful", "protect", "attack",
 			"attack_alt", "technique", "victory", "fear", "tired", "cultivate", "loyal", "formation", "injured", "farewell");
 	public static final List<String> GRUNTS = List.of("male.attack", "male.hurt", "male.death", "female.attack", "female.hurt");
+	/** Phase 34 (Dunia Kultivasi yang Luas) lines, one group per module. */
+	public static final List<String> KOTA = List.of("auction_open", "auction_sold", "tea_welcome", "tea_news", "black_whisper", "guard_halt",
+			"wanderer_dao", "rival_claim", "immortal_scorn", "lecture", "envoy_pleased", "peach_keeper");
+	public static final List<String> PENJARA = List.of("free_at_last", "resealed");
+	public static final List<String> MENARA = List.of("next_floor", "shadow_self");
+	public static final List<String> GUA = List.of("ancestor_trial");
+	public static final List<String> HEAVEN_LANGIT = List.of("meteor_shower", "twin_moons", "treasure_born", "blood_eclipse");
+	public static final List<String> LANGIT = List.of("treasure_born", "blood_eclipse");
+	public static final List<String> NAGA = List.of("subdued", "tribulation", "evolved", "trib_failed", "jiao_roar");
+	public static final List<String> BAWAH = List.of("meng_po_offer", "meng_po_refuse", "yama_judgement", "yama_book", "ox_head", "ghost_plea");
+	public static final List<String> LAUT = List.of("dragon_king", "gate_guard", "penglai_trial");
+	public static final List<String> KAPAL = List.of("launch", "cloud_leap", "arrive", "sky_pirates", "hull_broken");
+	public static final List<String> PETA = List.of("site_found");
 	/** Lines without words (no caption): laughs, growls, roars and grunts. */
 	private static final List<String> NON_VERBAL = List.of("demon.laugh", "demon.growl", "demon.death", "boss.roar");
 
@@ -49,6 +62,17 @@ public final class VoiceEvents {
 			group("disciple." + voice, DISCIPLE);
 		}
 		group("grunt", GRUNTS);
+		group("kota", KOTA);
+		group("penjara", PENJARA);
+		group("menara", MENARA);
+		group("gua", GUA);
+		group("heaven.langit", HEAVEN_LANGIT);
+		group("langit", LANGIT);
+		group("naga", NAGA);
+		group("bawah", BAWAH);
+		group("laut", LAUT);
+		group("kapal", KAPAL);
+		group("peta", PETA);
 	}
 
 	private static void group(String prefix, List<String> keys) {

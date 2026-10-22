@@ -34,6 +34,10 @@ import java.util.function.Consumer;
  * Mid spirit stone), also the ship fuel of module T and the tier-4 beast offering of module B (both find it by id);</li>
  * <li>{@code embun_roh} Embun Roh: gathered with an empty bottle in Kabut Qi Pekat or at Fajar Ungu; drinking it gives
  * +20 % Qi regeneration for 5 minutes; tag {@code #kultivator:dunia/spirit_dew} for alchemy;</li>
+ * <li>{@code inti_meteor_agung} Inti Meteor Agung: the heart of the one Meteor Agung of a shower night; sneak-use gives 600
+ * Qi and 1 Space Dao comprehension;</li>
+ * <li>{@code kristal_gerhana} Kristal Gerhana: 35 % from an eclipse-touched monster a player slays; sneak-use teaches 0.3
+ * Shadow Dao comprehension, five a day;</li>
  * <li>entities {@code meteor_roh} and {@code harta_lahir}: never saved, not summonable, no loot.</li>
  * </ul>
  */
@@ -41,6 +45,15 @@ public final class LangitItems {
 
 	/** Qi a Batu Meteor Roh gives at once (Low stone 30, Mid 200). */
 	public static final double METEOR_QI = 150.0D;
+	/** Qi an Inti Meteor Agung gives at once (between a Mid stone 200 and a High stone 900). */
+	public static final double GREAT_CORE_QI = 600.0D;
+	/** Space Dao comprehension an Inti Meteor Agung teaches (250 s of a matching site's 0.004 per second). */
+	public static final double GREAT_CORE_SPACE = 1.0D;
+	/** Shadow Dao comprehension one Kristal Gerhana teaches, at most {@link #ECLIPSE_PER_DAY} a day (1.5, half a technique day). */
+	public static final double ECLIPSE_SHADOW = 0.3D;
+	public static final int ECLIPSE_PER_DAY = 5;
+	/** The chance an eclipse-touched monster slain by a player leaves a Kristal Gerhana. */
+	public static final double ECLIPSE_DROP = 0.35D;
 
 	public static final Item BATU_METEOR_ROH = ModItems.register("batu_meteor_roh", MeteorStoneItem::new,
 			new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON));
@@ -49,6 +62,14 @@ public final class LangitItems {
 			new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON)
 					.component(DataComponents.CONSUMABLE, Consumables.DEFAULT_DRINK)
 					.usingConvertsTo(Items.GLASS_BOTTLE));
+
+	/** Inti Meteor Agung: the heart of the one Meteor Agung of a shower night (DESIGN 34.5.8, detail pass). */
+	public static final Item INTI_METEOR_AGUNG = ModItems.register("inti_meteor_agung", GreatCoreItem::new,
+			new Item.Properties().stacksTo(16).rarity(Rarity.RARE));
+
+	/** Kristal Gerhana: what an eclipse-touched monster may leave (DESIGN 34.5.8, detail pass). */
+	public static final Item KRISTAL_GERHANA = ModItems.register("kristal_gerhana", EclipseCrystalItem::new,
+			new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON));
 
 	private static final ResourceKey<EntityType<?>> METEOR_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Kultivator.id("meteor_roh"));
 	private static final ResourceKey<EntityType<?>> HARTA_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Kultivator.id("harta_lahir"));
@@ -137,6 +158,70 @@ public final class LangitItems {
 					Langit.DEW_TICKS / 1200).withStyle(ChatFormatting.GRAY));
 			builder.accept(Component.translatable("item.kultivator.embun_roh.gather").withStyle(ChatFormatting.GRAY));
 			builder.accept(Component.translatable("kultivator.langit.cuaca.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+		}
+	}
+
+	/** Inti Meteor Agung: sneak + use outside meditation gives its Qi and its Space Dao insight at once. */
+	public static class GreatCoreItem extends Item {
+
+		public GreatCoreItem(Item.Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		public InteractionResult use(Level level, Player player, InteractionHand hand) {
+			if (!player.isSecondaryUseActive() || hand != InteractionHand.MAIN_HAND) {
+				return InteractionResult.PASS;
+			}
+			if (!(player instanceof ServerPlayer serverPlayer)) {
+				return InteractionResult.CONSUME;
+			}
+			return Langit.absorbGreatCore(serverPlayer, player.getItemInHand(hand)) ? InteractionResult.SUCCESS_SERVER : InteractionResult.FAIL;
+		}
+
+		@Override
+		public boolean isFoil(ItemStack stack) {
+			return true;
+		}
+
+		@Override
+		public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder,
+									TooltipFlag flag) {
+			builder.accept(Component.translatable("item.kultivator.inti_meteor_agung.lore").withColor(0xA8F0FF));
+			builder.accept(Component.translatable("item.kultivator.inti_meteor_agung.use", (int) GREAT_CORE_QI,
+					dev.kultivator.util.Msg.number(GREAT_CORE_SPACE)).withStyle(ChatFormatting.GRAY));
+			builder.accept(Component.translatable("item.kultivator.inti_meteor_agung.where").withStyle(ChatFormatting.GRAY));
+			builder.accept(Component.translatable("kultivator.langit.peristiwa.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+		}
+	}
+
+	/** Kristal Gerhana: sneak + use teaches a little Shadow Dao ({@link #ECLIPSE_PER_DAY} a day). */
+	public static class EclipseCrystalItem extends Item {
+
+		public EclipseCrystalItem(Item.Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		public InteractionResult use(Level level, Player player, InteractionHand hand) {
+			if (!player.isSecondaryUseActive() || hand != InteractionHand.MAIN_HAND) {
+				return InteractionResult.PASS;
+			}
+			if (!(player instanceof ServerPlayer serverPlayer)) {
+				return InteractionResult.CONSUME;
+			}
+			return Langit.absorbEclipseCrystal(serverPlayer, player.getItemInHand(hand)) ? InteractionResult.SUCCESS_SERVER : InteractionResult.FAIL;
+		}
+
+		@Override
+		public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder,
+									TooltipFlag flag) {
+			builder.accept(Component.translatable("item.kultivator.kristal_gerhana.lore").withColor(0xFF6A58));
+			builder.accept(Component.translatable("item.kultivator.kristal_gerhana.use", dev.kultivator.util.Msg.number(ECLIPSE_SHADOW),
+					ECLIPSE_PER_DAY).withStyle(ChatFormatting.GRAY));
+			builder.accept(Component.translatable("item.kultivator.kristal_gerhana.where", Math.round(ECLIPSE_DROP * 100.0D))
+					.withStyle(ChatFormatting.GRAY));
+			builder.accept(Component.translatable("kultivator.langit.peristiwa.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 		}
 	}
 

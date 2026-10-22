@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.tower_50.description"
+    },
+    "icon": {
+      "id": "minecraft:lantern"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.tower_50.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

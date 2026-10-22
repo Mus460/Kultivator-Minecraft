@@ -50,6 +50,13 @@ final class KotaCommands {
 			SharedSuggestionProvider.suggest(List.of("embun", "awan", "penenang"), builder);
 	private static final SuggestionProvider<CommandSourceStack> GROUPS = (ctx, builder) ->
 			SharedSuggestionProvider.suggest(Saingan.SERVICE.all(), builder);
+	/** The four biome looks of a town (the structures kota/kota_kultivator[_salju|_sabana|_sakura]). */
+	static final List<String> LOOK_IDS = List.of("sedang", "salju", "sabana", "sakura");
+	private static final SuggestionProvider<CommandSourceStack> LOOKS = (ctx, builder) -> SharedSuggestionProvider.suggest(LOOK_IDS, builder);
+	static final List<String> GESTURE_IDS = List.of("bicara", "hormat", "tatap", "kerja", "duduk", "hunus");
+	private static final SuggestionProvider<CommandSourceStack> GESTURES = (ctx, builder) -> SharedSuggestionProvider.suggest(GESTURE_IDS, builder);
+	private static final SuggestionProvider<CommandSourceStack> SKY_REACTIONS = (ctx, builder) ->
+			SharedSuggestionProvider.suggest(List.of("blood_eclipse", "meteor_shower", "twin_moons", "harta", "blood_eclipse_end"), builder);
 
 	static void init() {
 		DuniaCommands.test("kota", KotaCommands::kota);
@@ -67,8 +74,20 @@ final class KotaCommands {
 
 	private static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> kota() {
 		return Commands.literal("kota")
-				.then(Commands.literal("cari").executes(ctx -> DuniaCommands.findAndTeleport(ctx.getSource().getPlayerOrException(),
-						Kultivator.id("kota/kota_kultivator"))))
+				.then(Commands.literal("cari").executes(ctx -> findTown(ctx.getSource().getPlayerOrException(), null))
+						.then(Commands.argument("tampilan", StringArgumentType.word()).suggests(LOOKS)
+								.executes(ctx -> findTown(ctx.getSource().getPlayerOrException(), StringArgumentType.getString(ctx, "tampilan")))))
+				.then(Commands.literal("barisan").executes(KotaCommands::lineUp))
+				.then(Commands.literal("obrol").executes(ctx -> NpcLife.testChat(ctx.getSource().getPlayerOrException()) ? 1 : 0))
+				.then(Commands.literal("gerak").then(Commands.argument("gerak", StringArgumentType.word()).suggests(GESTURES)
+						.executes(ctx -> gesture(ctx, StringArgumentType.getString(ctx, "gerak")))))
+				.then(Commands.literal("langit").then(Commands.argument("peristiwa", StringArgumentType.word()).suggests(SKY_REACTIONS)
+						.executes(ctx -> {
+							ServerPlayer player = ctx.getSource().getPlayerOrException();
+							int n = NpcLife.testReact(player, StringArgumentType.getString(ctx, "peristiwa"));
+							ok(ctx, "kultivator.kota.uji.langit", n);
+							return Math.max(1, n);
+						})))
 				.then(Commands.literal("npc").then(Commands.argument("peran", StringArgumentType.word()).suggests(ROLES)
 						.executes(ctx -> npc(ctx, StringArgumentType.getString(ctx, "peran")))))
 				.then(Commands.literal("lelang")
@@ -141,6 +160,99 @@ final class KotaCommands {
 				})));
 	}
 
+	/**
+	 * {@code uji kota cari [tampilan]}: the nearest town of any look (the structure tag {@code #kultivator:kota}), or of
+	 * one look, found with vanilla locate and reached by teleport like {@code /locate} + {@code /tp} (rule W6).
+	 */
+	static int findTown(ServerPlayer player, @Nullable String look) {
+		if (look != null) {
+			String id = look.toLowerCase(Locale.ROOT);
+			if (!LOOK_IDS.contains(id)) {
+				player.sendSystemMessage(Component.translatable("kultivator.kota.uji.jenis_tidak_dikenal", look).withStyle(ChatFormatting.RED));
+				return 0;
+			}
+			return DuniaCommands.findAndTeleport(player, Kultivator.id("sedang".equals(id) ? "kota/kota_kultivator" : "kota/kota_kultivator_" + id));
+		}
+		ServerLevel level = (ServerLevel) player.level();
+		net.minecraft.tags.TagKey<net.minecraft.world.level.levelgen.structure.Structure> tag = net.minecraft.tags.TagKey.create(
+				net.minecraft.core.registries.Registries.STRUCTURE, Kultivator.id("kota"));
+		BlockPos found = level.findNearestMapStructure(tag, player.blockPosition(), 100, false);
+		if (found == null) {
+			player.sendSystemMessage(Component.translatable("kultivator.dunia.cmd.find.none", "#kultivator:kota").withStyle(ChatFormatting.RED));
+			return 0;
+		}
+		level.getChunk(found.getX() >> 4, found.getZ() >> 4, net.minecraft.world.level.chunk.status.ChunkStatus.FULL, true);
+		int y = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, found.getX(), found.getZ());
+		if (y <= level.getMinY() + 1) {
+			y = net.minecraft.util.Mth.clamp(found.getY(), level.getMinY() + 2, level.getMaxY() - 2);
+		}
+		int distance = (int) Math.sqrt(found.distSqr(player.blockPosition()));
+		player.teleportTo(level, found.getX() + 0.5D, y + 1.0D, found.getZ() + 0.5D, java.util.Set.of(), player.getYRot(), player.getXRot(), true);
+		player.sendSystemMessage(Component.translatable("kultivator.dunia.cmd.find.ok", "#kultivator:kota", found.getX(), y, found.getZ(), distance)
+				.withStyle(ChatFormatting.GREEN));
+		return 1;
+	}
+
+	/** {@code uji kota barisan}: one NPC of every role in a row before the player (looks, gear, plates, poses). */
+	private static int lineUp(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		Vec3 look = player.getLookAngle().multiply(1.0D, 0.0D, 1.0D).normalize();
+		if (look.lengthSqr() < 1.0E-4D) {
+			look = new Vec3(0.0D, 0.0D, 1.0D);
+		}
+		Vec3 side = new Vec3(-look.z, 0.0D, look.x);
+		NpcRole[] roles = NpcRole.values();
+		int n = 0;
+		for (int i = 0; i < roles.length; i++) {
+			Vec3 at = player.position().add(look.scale(5.0D)).add(side.scale((i - (roles.length - 1) / 2.0D) * 1.6D));
+			KultivatorNpc npc = spawnTestAt(player, roles[i], at);
+			if (npc == null) {
+				break;
+			}
+			npc.memory().putBoolean("hold", true);
+			npc.setHome(npc.blockPosition());
+			NpcLife.face(npc, player.position());
+			n++;
+		}
+		ok(ctx, "kultivator.kota.uji.barisan", n);
+		return Math.max(1, n);
+	}
+
+	/** {@code uji kota gerak <bicara|hormat|tatap|kerja|duduk|hunus>} on the nearest NPC within 16 blocks (5 s). */
+	private static int gesture(CommandContext<CommandSourceStack> ctx, String what) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		KultivatorNpc npc = null;
+		double bestSq = 16.0D * 16.0D;
+		for (KultivatorNpc each : player.level().getEntitiesOfClass(KultivatorNpc.class, player.getBoundingBox().inflate(16.0D), KultivatorNpc::isAlive)) {
+			double d = each.distanceToSqr(player);
+			if (d < bestSq) {
+				bestSq = d;
+				npc = each;
+			}
+		}
+		if (npc == null) {
+			ctx.getSource().sendFailure(Component.translatable("kultivator.kota.uji.tidak_ada", Component.translatable("kultivator.kota.uji.siapa")));
+			return 0;
+		}
+		switch (what.toLowerCase(Locale.ROOT)) {
+			case "bicara" -> NpcLife.speak(npc, "kultivator.kota.warga.kata." + npc.getRandom().nextInt(12), 100);
+			case "hormat" -> npc.bow(100);
+			case "tatap" -> npc.gaze(100);
+			case "kerja" -> npc.work(100);
+			case "duduk" -> npc.setFlag(KultivatorNpc.FLAG_SITTING, !npc.hasFlag(KultivatorNpc.FLAG_SITTING));
+			case "hunus" -> {
+				npc.fought();
+				npc.arm(npc.getMainHandItem().isEmpty());
+			}
+			default -> {
+				ctx.getSource().sendFailure(Component.translatable("kultivator.kota.uji.jenis_tidak_dikenal", what));
+				return 0;
+			}
+		}
+		ok(ctx, "kultivator.kota.uji.gerak", npc.plate(), what);
+		return 1;
+	}
+
 	/** The town the player stands in, else a test town named by their position (so every service works anywhere). */
 	static long townHere(ServerPlayer player) {
 		ServerLevel level = (ServerLevel) player.level();
@@ -181,6 +293,12 @@ final class KotaCommands {
 
 	/** A test NPC of {@code role} 3 blocks ahead, bound to the town here (or the test town). */
 	static @Nullable KultivatorNpc spawnTest(ServerPlayer player, NpcRole role) {
+		Vec3 look = player.getLookAngle();
+		return spawnTestAt(player, role, player.position().add(look.x * 3.0D, 0.0D, look.z * 3.0D));
+	}
+
+	/** A test NPC of {@code role} at {@code at}, bound to the town here (or the test town). */
+	static @Nullable KultivatorNpc spawnTestAt(ServerPlayer player, NpcRole role, Vec3 at) {
 		ServerLevel level = (ServerLevel) player.level();
 		if (!DuniaBudget.mayAdd(level, DuniaBudget.NPC)) {
 			return null;
@@ -189,8 +307,6 @@ final class KotaCommands {
 		if (npc == null) {
 			return null;
 		}
-		Vec3 look = player.getLookAngle();
-		Vec3 at = player.position().add(look.x * 3.0D, 0.0D, look.z * 3.0D);
 		Vec3 spot = Targeting.safeSpot(level, npc, at);
 		if (spot == null) {
 			spot = at;
@@ -292,6 +408,20 @@ final class KotaCommands {
 	private static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> pengembara() {
 		return Commands.literal("pengembara")
 				.executes(ctx -> wanderer(ctx, -1, -1, -1))
+				.then(Commands.literal("duel").executes(ctx -> {
+					ServerPlayer player = ctx.getSource().getPlayerOrException();
+					KultivatorNpc npc = nearestNpc(player, NpcRole.PENGEMBARA);
+					if (npc == null) {
+						npc = Pengembara.spawnFor(player, null, Dao.SWORD.ordinal(), -1, Pengembara.ANGKUH);
+					}
+					if (npc == null) {
+						ctx.getSource().sendFailure(Component.translatable("kultivator.kota.uji.tidak_bisa"));
+						return 0;
+					}
+					KotaDuel.testOffer(player, npc);
+					ok(ctx, "kultivator.kota.uji.duel", npc.plate());
+					return 1;
+				}))
 				.then(Commands.literal("diskusi")
 						.then(Commands.literal("menang").executes(ctx -> forceDiscussion(ctx, true)))
 						.then(Commands.literal("kalah").executes(ctx -> forceDiscussion(ctx, false))))

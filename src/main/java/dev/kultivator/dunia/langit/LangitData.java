@@ -16,7 +16,7 @@ import java.util.Map;
  * SavedData {@code kultivator:dunia_langit} in the overworld (DESIGN 34.5.8-34.5.10, module L): per dimension the sky
  * schedule ({@code roll} the last day a sunset was rolled, {@code last} the last day an event ran) and the event that is
  * announced or running ({@code kind}, {@code start} and {@code end} in overworld clock ticks, {@code seed}), so a restart
- * in the middle of the night keeps the night; and the next treasure-birth day ({@code harta}). Treasure births
+ * in the middle of the night keeps the night, and the seed whose Meteor Agung already fell ({@code agung}); and the next treasure-birth day ({@code harta}). Treasure births
  * themselves and the spirit weather are never saved (births are memory-only live sites; the weather is a pure function of
  * the seed, the cell and the period).
  */
@@ -37,6 +37,8 @@ public final class LangitData extends SavedData {
 		long end;
 		int seed;
 		boolean forced;
+		/** The event seed whose Meteor Agung already fell (0 = none), so a restart cannot drop a second one. */
+		int greatSeed;
 
 		CompoundTag toTag() {
 			CompoundTag tag = new CompoundTag();
@@ -48,6 +50,7 @@ public final class LangitData extends SavedData {
 			tag.putLong("end", end);
 			tag.putInt("seed", seed);
 			tag.putBoolean("forced", forced);
+			tag.putInt("agung", greatSeed);
 			return tag;
 		}
 
@@ -61,6 +64,7 @@ public final class LangitData extends SavedData {
 			dim.end = tag.getLongOr("end", 0L);
 			dim.seed = tag.getIntOr("seed", 0);
 			dim.forced = tag.getBooleanOr("forced", false);
+			dim.greatSeed = tag.getIntOr("agung", 0);
 			return dim;
 		}
 	}

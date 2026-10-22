@@ -12,7 +12,6 @@ import dev.kultivator.dunia.DuniaSites;
 import dev.kultivator.dunia.DuniaSpine;
 import dev.kultivator.dunia.api.DuniaApi;
 import dev.kultivator.dunia.api.TreasureBirth;
-import dev.kultivator.elite.EliteMonsters;
 import dev.kultivator.network.Net;
 import dev.kultivator.sect.build.SectBuild;
 import dev.kultivator.sect.hall.Halls;
@@ -22,7 +21,6 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
@@ -31,17 +29,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.RandomState;
@@ -63,7 +55,8 @@ import java.util.UUID;
  * claimed; one live birth per dimension.
  * <p>
  * The treasure itself ({@link HartaLahirEntity}) exists only while a player is within 64 blocks; the first time it
- * appears a guardian may come with it ({@code guardianChance}: an elite beast of the tier). Claim: right-click and
+ * appears its guardians may wake ({@code guardianChance}, {@link TreasureGuardians}: elite beasts of the tier that seal the
+ * lotus while they live near it). Claim: right-click and
  * channel 5 seconds within 2 blocks (2.5 before it breaks); a hit or a step away breaks it. {@code TREASURE_BORN} fires at the birth,
  * {@code TREASURE_CLAIMED} when a player wins, a rival group takes it ({@link #claimByRival}) or it fades. Births are
  * memory-only (a live site of kind {@code langit/harta}); the next birth day is saved in {@link LangitData}.
@@ -320,6 +313,12 @@ public final class TreasureBirths {
 			Msg.chat(player, Component.translatable("kultivator.langit.harta.born", tierName(tier), direction(player.position(), at),
 					(int) Math.round(distance)).withColor(TreasureRewards.tierColor(tier)));
 			Langit.heaven(player, "langit.treasure_born", "witness");
+			// a treasure above the player's own realm: its aura presses on them (the guardians match the tier, not them)
+			int own = tierOf(Cultivators.get(player).realm());
+			if (own < tier) {
+				Msg.chat(player, Component.translatable("kultivator.langit.harta.above", tierName(tier))
+						.withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+			}
 		}
 		Kultivator.LOGGER.info("A treasure (tier {}, {}) was born at {} in {}", tier, kind, pos.toShortString(), SkyEvents.key(level));
 		DuniaEvents.fireTreasureBorn(level, record);
@@ -389,6 +388,9 @@ public final class TreasureBirths {
 		if (entity == null) {
 			return;
 		}
+		if (level.getServer().getTickCount() % 20 == 2) {
+			TreasureGuardians.tick(level, birth.record, now);
+		}
 		tickChannel(level, birth, entity, now);
 	}
 
@@ -416,63 +418,10 @@ public final class TreasureBirths {
 		if (!birth.guardianDone) {
 			birth.guardianDone = true;
 			if (level.getRandom().nextDouble() < LangitConfig.get().guardianChance) {
-				spawnGuardian(level, birth.record);
+				TreasureGuardians.spawn(level, birth.record);
 			}
 		}
 		return entity;
-	}
-
-	/** A guardian beast of the tier (an elite: T1 tier 1, T2 tier 2, T3-T4 tier 3), 6-10 blocks from the treasure. */
-	private static void spawnGuardian(ServerLevel level, TreasureBirth record) {
-		RandomSource random = level.getRandom();
-		BlockPos pos = record.pos();
-		EntityType<? extends Mob> type = guardianType(level.getBiome(pos), random);
-		for (int attempt = 0; attempt < 6; attempt++) {
-			double angle = random.nextDouble() * Math.PI * 2.0D;
-			double reach = 6.0D + random.nextDouble() * 4.0D;
-			int x = (int) Math.floor(pos.getX() + 0.5D + Math.cos(angle) * reach);
-			int z = (int) Math.floor(pos.getZ() + 0.5D + Math.sin(angle) * reach);
-			if (!level.hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z))) {
-				continue;
-			}
-			int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-			Mob mob = type.create(level, EntitySpawnReason.EVENT);
-			if (mob == null) {
-				return;
-			}
-			mob.snapTo(x + 0.5D, y, z + 0.5D, random.nextFloat() * 360.0F, 0.0F);
-			mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.EVENT, null);
-			mob.addTag(GUARDIAN_TAG);
-			if (level.addFreshEntity(mob)) {
-				// after the add, so the elite registry tracks it and its birth flash is sent
-				EliteMonsters.makeElite(mob, Math.min(3, record.tier()), null, realmNear(level, pos));
-			}
-			return;
-		}
-	}
-
-	private static EntityType<? extends Mob> guardianType(Holder<Biome> biome, RandomSource random) {
-		if (biome.is(Biomes.DESERT) || biome.is(BiomeTags.IS_BADLANDS)) {
-			return EntityTypes.HUSK;
-		}
-		if (biome.is(Biomes.SNOWY_PLAINS) || biome.is(Biomes.ICE_SPIKES) || biome.is(Biomes.FROZEN_PEAKS) || biome.is(Biomes.SNOWY_SLOPES)) {
-			return EntityTypes.STRAY;
-		}
-		if (biome.is(Biomes.SWAMP) || biome.is(Biomes.MANGROVE_SWAMP)) {
-			return EntityTypes.BOGGED;
-		}
-		return random.nextInt(3) == 0 ? EntityTypes.ZOMBIE : EntityTypes.SPIDER;
-	}
-
-	private static int realmNear(ServerLevel level, BlockPos pos) {
-		Vec3 at = Vec3.atCenterOf(pos);
-		int best = 0;
-		for (ServerPlayer player : level.players()) {
-			if (!player.isSpectator() && player.position().distanceTo(at) <= ABSENCE) {
-				best = Math.max(best, Cultivators.get(player).realm().ordinal());
-			}
-		}
-		return best;
 	}
 
 	// ================================================================== the claim channel
@@ -495,6 +444,13 @@ public final class TreasureBirths {
 			}
 		}
 		if (player.getUUID().equals(birth.channeler)) {
+			return;
+		}
+		int guards = TreasureGuardians.guarding(level, birth.record);
+		if (guards > 0) {
+			// the guardians seal the lotus while they live near it
+			Msg.actionBar(player, Component.translatable("kultivator.langit.harta.guarded", guards).withStyle(ChatFormatting.GOLD));
+			level.playSound(null, entity.getX(), entity.getY() + 0.8D, entity.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.6F, 1.4F);
 			return;
 		}
 		birth.channeler = player.getUUID();
@@ -564,6 +520,10 @@ public final class TreasureBirths {
 			Msg.chat(player, Component.literal("  ✦ ").withColor(TreasureRewards.tierColor(tier)).append(name.withStyle(ChatFormatting.WHITE)));
 		}
 		Advancements.grant(player, "dunia/treasure_claimed");
+		if (tier >= 3) {
+			Advancements.grant(player, "dunia/treasure_heaven");
+		}
+		Langit.heaven(player, null, "witness");
 		Vec3 at = birth.entity != null ? birth.entity.position() : Vec3.atCenterOf(birth.record.pos());
 		level.playSound(null, at.x, at.y + 1.0D, at.z, SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 0.8F);
 		level.playSound(null, at.x, at.y + 1.0D, at.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.6F, 1.2F);
@@ -591,6 +551,7 @@ public final class TreasureBirths {
 	/** Ends a birth: removes the treasure, ends the live site, syncs {@code phase}, fires {@code TREASURE_CLAIMED}. */
 	private static void finish(ServerLevel level, Birth birth, int phase, @Nullable ServerPlayer winner, @Nullable String rivalId) {
 		LIVE.remove(level.dimension(), birth);
+		TreasureGuardians.release(level);
 		if (birth.entity != null) {
 			birth.entity.discard();
 			birth.entity = null;

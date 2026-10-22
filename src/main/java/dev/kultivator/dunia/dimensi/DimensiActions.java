@@ -67,6 +67,11 @@ public final class DimensiActions {
 					}
 				}
 			}
+			case "nelayan" -> {
+				if (target instanceof LautNpcEntity npc && npc.role() == LautNpcEntity.NELAYAN) {
+					SeaPeople.fisherAction(player, npc, what);
+				}
+			}
 			case "penglai" -> {
 				if (target instanceof LautNpcEntity npc && npc.role() == LautNpcEntity.DEWA_PENGLAI && "uji".equals(what)) {
 					SeaPeople.penglaiTrial(player, npc);

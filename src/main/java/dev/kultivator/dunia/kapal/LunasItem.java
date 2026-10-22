@@ -128,6 +128,10 @@ public class LunasItem extends Item {
 		Msg.actionBar(player, Component.translatable("kultivator.kapal.launched", Component.translatable("kultivator.kapal.class." + kind.model()))
 				.withColor(0x9FE0C0));
 		Advancements.grant(player, "dunia/ship_launched");
+		if (kind == KapalClass.BAHTERA) {
+			Advancements.grant(player, "dunia/ship_bahtera");
+		}
+		KapalVoice.crew(player, KapalVoice.LAUNCH, "disciple.m1.cheer");
 		return true;
 	}
 
@@ -141,8 +145,13 @@ public class LunasItem extends Item {
 				kind.realm().displayName(), kind.hallLevel()).withStyle(ChatFormatting.GRAY));
 		KapalItems.State state = stack.get(KapalItems.STATE);
 		if (state != null) {
+			if (!state.name().isEmpty()) {
+				builder.accept(Component.translatable("item.kultivator.lunas.tooltip.name", state.name()).withColor(0xFFE9A8));
+			}
 			builder.accept(Component.translatable("item.kultivator.lunas.tooltip.state", state.hull(), kind.hull(), state.fuel() / 1200L)
 					.withColor(state.broken() ? 0xFF8A7A : 0x9FE0C0));
+			builder.accept(Component.translatable("item.kultivator.lunas.tooltip.style",
+					Component.translatable("kultivator.kapal.style." + KapalStyle.byOrdinal(state.style()).id())).withStyle(ChatFormatting.GRAY));
 		}
 		HartaText.sources("kultivator.kapal.kapal", builder);
 	}

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:dunia/ship_launched",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.ship_leap.description"
+    },
+    "icon": {
+      "id": "minecraft:feather"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.ship_leap.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

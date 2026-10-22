@@ -184,6 +184,60 @@
       }
     ]
   },
+  "voice.bawah.ghost_plea": {
+    "subtitle": "subtitles.kultivator.voice.bawah.ghost_plea",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/bawah/ghost_plea",
+        "stream": false
+      }
+    ]
+  },
+  "voice.bawah.meng_po_offer": {
+    "subtitle": "subtitles.kultivator.voice.bawah.meng_po_offer",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/bawah/meng_po_offer",
+        "stream": false
+      }
+    ]
+  },
+  "voice.bawah.meng_po_refuse": {
+    "subtitle": "subtitles.kultivator.voice.bawah.meng_po_refuse",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/bawah/meng_po_refuse",
+        "stream": false
+      }
+    ]
+  },
+  "voice.bawah.ox_head": {
+    "subtitle": "subtitles.kultivator.voice.bawah.ox_head",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/bawah/ox_head",
+        "stream": false
+      }
+    ]
+  },
+  "voice.bawah.yama_book": {
+    "subtitle": "subtitles.kultivator.voice.bawah.yama_book",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/bawah/yama_book",
+        "stream": false
+      }
+    ]
+  },
+  "voice.bawah.yama_judgement": {
+    "subtitle": "subtitles.kultivator.voice.bawah.yama_judgement",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/bawah/yama_judgement",
+        "stream": false
+      }
+    ]
+  },
   "voice.boss.awaken": {
     "subtitle": "subtitles.kultivator.voice.boss.awaken",
     "sounds": [
@@ -1521,6 +1575,15 @@
       }
     ]
   },
+  "voice.gua.ancestor_trial": {
+    "subtitle": "subtitles.kultivator.voice.gua.ancestor_trial",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/gua/ancestor_trial",
+        "stream": false
+      }
+    ]
+  },
   "voice.heaven.breakthrough": {
     "subtitle": "subtitles.kultivator.voice.heaven.breakthrough",
     "sounds": [
@@ -1598,6 +1661,42 @@
     "sounds": [
       {
         "name": "kultivator:voice/heaven/immortal_ascend",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.langit.blood_eclipse": {
+    "subtitle": "subtitles.kultivator.voice.heaven.langit.blood_eclipse",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/heaven/langit/blood_eclipse",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.langit.meteor_shower": {
+    "subtitle": "subtitles.kultivator.voice.heaven.langit.meteor_shower",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/heaven/langit/meteor_shower",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.langit.treasure_born": {
+    "subtitle": "subtitles.kultivator.voice.heaven.langit.treasure_born",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/heaven/langit/treasure_born",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.langit.twin_moons": {
+    "subtitle": "subtitles.kultivator.voice.heaven.langit.twin_moons",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/heaven/langit/twin_moons",
         "stream": false
       }
     ]
@@ -1683,6 +1782,294 @@
       }
     ]
   },
+  "voice.kapal.arrive": {
+    "subtitle": "subtitles.kultivator.voice.kapal.arrive",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kapal/arrive",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kapal.cloud_leap": {
+    "subtitle": "subtitles.kultivator.voice.kapal.cloud_leap",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kapal/cloud_leap",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kapal.hull_broken": {
+    "subtitle": "subtitles.kultivator.voice.kapal.hull_broken",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kapal/hull_broken",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kapal.launch": {
+    "subtitle": "subtitles.kultivator.voice.kapal.launch",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kapal/launch",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kapal.sky_pirates": {
+    "subtitle": "subtitles.kultivator.voice.kapal.sky_pirates",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kapal/sky_pirates",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.auction_open": {
+    "subtitle": "subtitles.kultivator.voice.kota.auction_open",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/auction_open",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.auction_sold": {
+    "subtitle": "subtitles.kultivator.voice.kota.auction_sold",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/auction_sold",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.black_whisper": {
+    "subtitle": "subtitles.kultivator.voice.kota.black_whisper",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/black_whisper",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.envoy_pleased": {
+    "subtitle": "subtitles.kultivator.voice.kota.envoy_pleased",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/envoy_pleased",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.guard_halt": {
+    "subtitle": "subtitles.kultivator.voice.kota.guard_halt",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/guard_halt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.immortal_scorn": {
+    "subtitle": "subtitles.kultivator.voice.kota.immortal_scorn",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/immortal_scorn",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.lecture": {
+    "subtitle": "subtitles.kultivator.voice.kota.lecture",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/lecture",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.peach_keeper": {
+    "subtitle": "subtitles.kultivator.voice.kota.peach_keeper",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/peach_keeper",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.rival_claim": {
+    "subtitle": "subtitles.kultivator.voice.kota.rival_claim",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/rival_claim",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.tea_news": {
+    "subtitle": "subtitles.kultivator.voice.kota.tea_news",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/tea_news",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.tea_welcome": {
+    "subtitle": "subtitles.kultivator.voice.kota.tea_welcome",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/tea_welcome",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kota.wanderer_dao": {
+    "subtitle": "subtitles.kultivator.voice.kota.wanderer_dao",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kota/wanderer_dao",
+        "stream": false
+      }
+    ]
+  },
+  "voice.langit.blood_eclipse": {
+    "subtitle": "subtitles.kultivator.voice.langit.blood_eclipse",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/langit/blood_eclipse",
+        "stream": false
+      }
+    ]
+  },
+  "voice.langit.treasure_born": {
+    "subtitle": "subtitles.kultivator.voice.langit.treasure_born",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/langit/treasure_born",
+        "stream": false
+      }
+    ]
+  },
+  "voice.laut.dragon_king": {
+    "subtitle": "subtitles.kultivator.voice.laut.dragon_king",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/laut/dragon_king",
+        "stream": false
+      }
+    ]
+  },
+  "voice.laut.gate_guard": {
+    "subtitle": "subtitles.kultivator.voice.laut.gate_guard",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/laut/gate_guard",
+        "stream": false
+      }
+    ]
+  },
+  "voice.laut.penglai_trial": {
+    "subtitle": "subtitles.kultivator.voice.laut.penglai_trial",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/laut/penglai_trial",
+        "stream": false
+      }
+    ]
+  },
+  "voice.menara.next_floor": {
+    "subtitle": "subtitles.kultivator.voice.menara.next_floor",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/menara/next_floor",
+        "stream": false
+      }
+    ]
+  },
+  "voice.menara.shadow_self": {
+    "subtitle": "subtitles.kultivator.voice.menara.shadow_self",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/menara/shadow_self",
+        "stream": false
+      }
+    ]
+  },
+  "voice.naga.evolved": {
+    "subtitle": "subtitles.kultivator.voice.naga.evolved",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/naga/evolved",
+        "stream": false
+      }
+    ]
+  },
+  "voice.naga.jiao_roar": {
+    "subtitle": "subtitles.kultivator.voice.naga.jiao_roar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/naga/jiao_roar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.naga.subdued": {
+    "subtitle": "subtitles.kultivator.voice.naga.subdued",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/naga/subdued",
+        "stream": false
+      }
+    ]
+  },
+  "voice.naga.trib_failed": {
+    "subtitle": "subtitles.kultivator.voice.naga.trib_failed",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/naga/trib_failed",
+        "stream": false
+      }
+    ]
+  },
+  "voice.naga.tribulation": {
+    "subtitle": "subtitles.kultivator.voice.naga.tribulation",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/naga/tribulation",
+        "stream": false
+      }
+    ]
+  },
+  "voice.penjara.free_at_last": {
+    "subtitle": "subtitles.kultivator.voice.penjara.free_at_last",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/penjara/free_at_last",
+        "stream": false
+      }
+    ]
+  },
+  "voice.penjara.resealed": {
+    "subtitle": "subtitles.kultivator.voice.penjara.resealed",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/penjara/resealed",
+        "stream": false
+      }
+    ]
+  },
+  "voice.peta.site_found": {
+    "subtitle": "subtitles.kultivator.voice.peta.site_found",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/peta/site_found",
+        "stream": false
+      }
+    ]
+  },
   "voice.rogue.ambush": {
     "subtitle": "subtitles.kultivator.voice.rogue.ambush",
     "sounds": [
@@ -1707,6 +2094,222 @@
       {
         "name": "kultivator:voice/rogue/flee",
         "stream": false
+      }
+    ]
+  },
+  "duel.clash": {
+    "subtitle": "subtitles.kultivator.duel.clash",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0"
+      },
+      {
+        "name": "kultivator:film/clang_1"
+      },
+      {
+        "name": "kultivator:film/clang_2"
+      }
+    ]
+  },
+  "duel.clash_heavy": {
+    "subtitle": "subtitles.kultivator.duel.clash_heavy",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0",
+        "pitch": 0.75
+      },
+      {
+        "name": "kultivator:film/clang_1",
+        "pitch": 0.75
+      },
+      {
+        "name": "kultivator:film/clang_2",
+        "pitch": 0.75
+      }
+    ]
+  },
+  "duel.scrape": {
+    "subtitle": "subtitles.kultivator.duel.scrape",
+    "sounds": [
+      {
+        "name": "minecraft:block.grindstone.use",
+        "type": "event"
+      }
+    ]
+  },
+  "duel.parry": {
+    "subtitle": "subtitles.kultivator.duel.parry",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0",
+        "pitch": 1.35
+      },
+      {
+        "name": "kultivator:film/clang_1",
+        "pitch": 1.35
+      },
+      {
+        "name": "kultivator:film/clang_2",
+        "pitch": 1.35
+      }
+    ]
+  },
+  "duel.parry_perfect": {
+    "subtitle": "subtitles.kultivator.duel.parry_perfect",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0",
+        "pitch": 1.6
+      },
+      {
+        "name": "kultivator:film/clang_1",
+        "pitch": 1.6
+      },
+      {
+        "name": "kultivator:film/clang_2",
+        "pitch": 1.6
+      }
+    ]
+  },
+  "duel.block": {
+    "subtitle": "subtitles.kultivator.duel.block",
+    "sounds": [
+      {
+        "name": "minecraft:item.shield.block",
+        "type": "event"
+      }
+    ]
+  },
+  "duel.guard_break": {
+    "subtitle": "subtitles.kultivator.duel.guard_break",
+    "sounds": [
+      {
+        "name": "minecraft:item.shield.break",
+        "type": "event",
+        "pitch": 0.8
+      }
+    ]
+  },
+  "duel.posture_break": {
+    "subtitle": "subtitles.kultivator.duel.posture_break",
+    "sounds": [
+      {
+        "name": "kultivator:film/crunch_0",
+        "pitch": 0.7
+      },
+      {
+        "name": "kultivator:film/crunch_1",
+        "pitch": 0.7
+      },
+      {
+        "name": "kultivator:film/crunch_2",
+        "pitch": 0.7
+      }
+    ]
+  },
+  "duel.deathblow": {
+    "subtitle": "subtitles.kultivator.duel.deathblow",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0",
+        "pitch": 0.7
+      },
+      {
+        "name": "kultivator:film/clang_1",
+        "pitch": 0.7
+      },
+      {
+        "name": "kultivator:film/clang_2",
+        "pitch": 0.7
+      }
+    ]
+  },
+  "duel.feint": {
+    "subtitle": "subtitles.kultivator.duel.feint",
+    "sounds": [
+      {
+        "name": "kultivator:film/whoosh_0",
+        "pitch": 1.8,
+        "volume": 0.3
+      },
+      {
+        "name": "kultivator:film/whoosh_1",
+        "pitch": 1.8,
+        "volume": 0.3
+      }
+    ]
+  },
+  "duel.qi_wave": {
+    "subtitle": "subtitles.kultivator.duel.qi_wave",
+    "sounds": [
+      {
+        "name": "kultivator:film/zap_0"
+      },
+      {
+        "name": "kultivator:film/zap_1"
+      },
+      {
+        "name": "kultivator:film/zap_2"
+      }
+    ]
+  },
+  "duel.qi_reflect": {
+    "subtitle": "subtitles.kultivator.duel.qi_reflect",
+    "sounds": [
+      {
+        "name": "kultivator:film/zap_0",
+        "pitch": 1.3
+      },
+      {
+        "name": "kultivator:film/zap_1",
+        "pitch": 1.3
+      },
+      {
+        "name": "kultivator:film/zap_2",
+        "pitch": 1.3
+      }
+    ]
+  },
+  "duel.hit": {
+    "subtitle": "subtitles.kultivator.duel.hit",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.strong",
+        "type": "event"
+      }
+    ]
+  },
+  "duel.intro_wind": {
+    "subtitle": "subtitles.kultivator.duel.intro_wind",
+    "sounds": [
+      {
+        "name": "minecraft:item.elytra.flying",
+        "type": "event"
+      }
+    ]
+  },
+  "duel.gong": {
+    "subtitle": "subtitles.kultivator.duel.gong",
+    "sounds": [
+      {
+        "name": "kultivator:film/gong_0"
+      },
+      {
+        "name": "kultivator:film/gong_1"
+      }
+    ]
+  },
+  "duel.sheathe": {
+    "subtitle": "subtitles.kultivator.duel.sheathe",
+    "sounds": [
+      {
+        "name": "kultivator:film/clang_0"
+      },
+      {
+        "name": "kultivator:film/clang_1"
+      },
+      {
+        "name": "kultivator:film/clang_2"
       }
     ]
   }

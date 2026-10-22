@@ -7,6 +7,7 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.dunia.api.SkyKind;
 import dev.kultivator.dunia.api.SpiritWeather;
 import dev.kultivator.dunia.langit.HartaLahirEntity;
+import dev.kultivator.dunia.langit.LangitFxPayload;
 import dev.kultivator.dunia.langit.LangitSkyPayload;
 import dev.kultivator.dunia.langit.TreasureRewards;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
@@ -27,7 +28,8 @@ import net.minecraft.world.phys.Vec3;
  * The HUD of module L (DESIGN 34.5.8-34.5.10): the faint red vignette of Gerhana Darah (0.03 / 0.05 / 0.07 by Effect
  * Quality), the soft mist vignette of the Qi mists (0.04 / 0.08 / 0.12, violet at Fajar Ungu), the chips at the top left
  * ("Malam ini: Gerhana Darah", the running event with its time left, the spirit weather, the nearest rainbow pillar with
- * its distance and an arrow) and the claim ring around the crosshair while the player channels a treasure. Hidden with
+ * its distance and an arrow, "dijaga" while guardians live; a Meteor Agung falling or just fallen with its arrow), the
+ * short bolide flash, and the claim ring around the crosshair while the player channels a treasure. Hidden with
  * F1 and the debug screen; fills and one vignette blit only (no shader).
  */
 final class LangitHud implements HudElement {
@@ -72,6 +74,10 @@ final class LangitHud implements HudElement {
 			g.fillGradient(0, Math.round(height * 0.72F), width, height, Palette.argb(0, rgb),
 					Palette.argb(Math.round(255.0F * MIST_ALPHA[quality] * mist), rgb));
 		}
+		if (LangitState.flash > 0.005F) {
+			// a bolide or a Meteor Agung landing near (Effect Quality "Kilat"): a short soft flash
+			g.fill(0, 0, width, height, Palette.argb(Math.round(Mth.clamp(LangitState.flash, 0.0F, 0.6F) * 255.0F), LangitState.flashRgb));
+		}
 		if (minecraft.getDebugOverlay().showDebugScreen()) {
 			return;
 		}
@@ -112,12 +118,35 @@ final class LangitHud implements HudElement {
 		}
 		if (nearest != null && best > 6.0D) {
 			Vec3 base = nearest.base();
-			double bearing = Math.toDegrees(Math.atan2(-(base.x - player.getX()), base.z - player.getZ()));
-			double relative = Mth.wrapDegrees(bearing - player.getYRot());
-			int arrow = (int) Math.floorMod(Math.round(relative / 45.0D), 8L);
-			Component text = Component.translatable("kultivator.langit.hud.pillar", ARROWS[arrow], (int) Math.round(best));
-			chip(g, font, text, y, TreasureRewards.tierColor(nearest.tier), "宝");
+			int arrow = arrow(player, base);
+			Component text = LangitState.guards.length > 0
+					? Component.translatable("kultivator.langit.hud.pillar_guarded", ARROWS[arrow], (int) Math.round(best), LangitState.guards.length)
+					: Component.translatable("kultivator.langit.hud.pillar", ARROWS[arrow], (int) Math.round(best));
+			y = chip(g, font, text, y, TreasureRewards.tierColor(nearest.tier), "宝");
 		}
+		// a Meteor Agung falling or fallen within the last half minute: where to run
+		for (LangitState.Fx fx : LangitState.FX) {
+			boolean falling = fx.kind == LangitFxPayload.KIND_GREAT_INCOMING;
+			if (!falling && !(fx.kind == LangitFxPayload.KIND_GREAT_IMPACT && fx.age < 600)) {
+				continue;
+			}
+			Vec3 at = new Vec3(fx.x, fx.y, fx.z);
+			double distance = Math.sqrt(Mth.square(at.x - player.getX()) + Mth.square(at.z - player.getZ()));
+			if (distance < 8.0D) {
+				break;
+			}
+			Component text = Component.translatable(falling ? "kultivator.langit.hud.great_falling" : "kultivator.langit.hud.great_landed",
+					ARROWS[arrow(player, at)], (int) Math.round(distance));
+			chip(g, font, text, y, 0x8FE6FF, "隕");
+			break;
+		}
+	}
+
+	/** The arrow index (0 ahead .. clockwise) from the player's view to {@code target}. */
+	private static int arrow(Player player, Vec3 target) {
+		double bearing = Math.toDegrees(Math.atan2(-(target.x - player.getX()), target.z - player.getZ()));
+		double relative = Mth.wrapDegrees(bearing - player.getYRot());
+		return (int) Math.floorMod(Math.round(relative / 45.0D), 8L);
 	}
 
 	private static void vignette(GuiGraphicsExtractor g, int width, int height, float alpha, int rgb) {

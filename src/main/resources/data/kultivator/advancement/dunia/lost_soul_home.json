@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.lost_soul_home.description"
+    },
+    "icon": {
+      "id": "kultivator:lentera_arwah"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.lost_soul_home.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -24,6 +24,12 @@ public final class ShotGuard {
 	public static final float FLOOR_SINGKAT = 0.45F;
 	public static final float FLOOR_PENUH = 0.30F;
 
+	/**
+	 * Phase 35 (DESIGN 35.4.8): entity ids the hostile scan skips (the duel module names the pair of a live sword duel, so a
+	 * held rogue opponent never aborts the intro or the finisher). Client thread only; never null.
+	 */
+	public static java.util.function.IntPredicate ignoreHostile = id -> false;
+
 	private static int lastHurtTime;
 	private static long lastStrikeTick = -100L;
 	private static long ticks;
@@ -74,7 +80,7 @@ public final class ShotGuard {
 		List<Entity> near = player.level().getEntities(player, new AABB(player.blockPosition()).inflate(16.0D),
 				entity -> entity instanceof Mob || entity instanceof Enemy);
 		for (Entity entity : near) {
-			if (!entity.isAlive()) {
+			if (!entity.isAlive() || ignoreHostile.test(entity.getId())) {
 				continue;
 			}
 			double distance = entity.distanceTo(player);

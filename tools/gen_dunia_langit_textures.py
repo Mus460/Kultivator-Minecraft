@@ -13,10 +13,20 @@ textures/dunia/langit/mist_plane.png     64x64  a ground-hugging mist puff (tile
 textures/dunia/langit/lotus_petal.png    16x32  one jade lotus petal (v = 0 the tip, v = 1 the base), veins.
 textures/dunia/langit/meteor_rock.png    32x32  the meteor rock's faces: dark stone with glowing cyan cracks.
 textures/dunia/langit/glow_dot.png       32x32  a round soft glow (impact flash, pillar base, motes).
+textures/dunia/langit/moon_shadow.png    64x64  Tiangou's bite: the dark disc that slides over the moon as the eclipse
+                                                  begins and leaves, a soft penumbra edge (dark, drawn alpha-blended).
+textures/dunia/langit/crater_decal.png   64x64  a meteor's crater glow on the ground: scorched bowl, raised rim, ejecta
+                                                  rays and glowing cyan cracks (never a block).
+textures/dunia/langit/rune_ring.png      64x64  the turning seal ring under the treasure lotus: sixteen seal-script-like
+                                                  glyphs between two thin circles (white, tinted).
+textures/dunia/langit/light_shaft.png    16x64  a sunbeam through dense Qi mist; u across (soft), v along (tiles).
+textures/dunia/langit/qi_wisp.png        64x16  a long wisp of drifting Qi (Fajar Ungu streamers, the eastern band).
 
 Item icons (16x16, the item atlas):
 textures/item/batu_meteor_roh.png        Batu Meteor Roh: a dark star-iron lump with cyan glowing seams.
 textures/item/embun_roh.png              Embun Roh: a small bottle of pale violet dew with a sparkle.
+textures/item/inti_meteor_agung.png      Inti Meteor Agung: a faceted star-iron heart with a white-hot core.
+textures/item/kristal_gerhana.png        Kristal Gerhana: a crimson eclipse shard with a dark moon notch.
 
 Run with: python tools/gen_dunia_langit_textures.py [preview_dir]   (8x previews of every texture into preview_dir)
 Deterministic: the same files on every run.
@@ -353,6 +363,167 @@ def glow_dot():
     save(img, WORLD, "glow_dot.png")
 
 
+def moon_shadow():
+    s = 64
+    img = Image(s, s)
+    for y in range(s):
+        for x in range(s):
+            dx = (x + 0.5) / s * 2 - 1
+            dy = (y + 0.5) / s * 2 - 1
+            r = math.hypot(dx, dy)
+            # the umbra: a hard dark disc a little larger than the moon disc, a short penumbra outside it
+            a = 0.94 if r < 0.88 else 0.94 * (1.0 - smooth((r - 0.88) / 0.1))
+            if a < 0.1:
+                img.set(x, y, (0, 0, 0, 0))
+                continue
+            # a faint copper rim of refracted light right at the penumbra (Earth's sunsets)
+            rim = math.exp(-((r - 0.9) / 0.03) ** 2) * 0.5
+            col = mix((14, 6, 8), (120, 40, 20), rim)
+            img.set(x, y, (col[0], col[1], col[2], alpha_of(a)))
+    save(img, WORLD, "moon_shadow.png")
+
+
+def crater_decal():
+    s = 64
+    img = Image(s, s)
+    noise = Noise(71, 8)
+    rnd = random.Random(73)
+    rays = [rnd.uniform(0, math.pi * 2) for _ in range(11)]
+    cracks = []
+    for i in range(7):
+        ang = math.pi * 2 * i / 7 + rnd.uniform(-0.3, 0.3)
+        pts = []
+        r = 0.08
+        while r < 0.78:
+            pts.append((math.cos(ang) * r, math.sin(ang) * r))
+            ang += rnd.uniform(-0.1, 0.1)
+            r += 0.05
+        cracks.append(pts)
+    for y in range(s):
+        for x in range(s):
+            dx = (x + 0.5) / s * 2 - 1
+            dy = (y + 0.5) / s * 2 - 1
+            r = math.hypot(dx, dy)
+            if r > 1.0:
+                img.set(x, y, (0, 0, 0, 0))
+                continue
+            n = noise.fbm(x / 7.0, y / 7.0, 3)
+            ang = math.atan2(dy, dx)
+            bowl = smooth(1.0 - r / 0.62)
+            rim = math.exp(-((r - 0.66) / 0.08) ** 2)
+            ray = 0.0
+            for ra in rays:
+                d = abs((ang - ra + math.pi) % (math.pi * 2) - math.pi)
+                ray = max(ray, math.exp(-(d / 0.06) ** 2) * smooth((1.0 - r) / 0.35) * (r > 0.6))
+            a = clamp(0.62 * bowl + 0.78 * rim + 0.42 * ray) * (0.75 + 0.25 * n)
+            # glowing cracks: distance to the polylines
+            glow = 0.0
+            for pts in cracks:
+                for (ax, ay), (bx, by) in zip(pts, pts[1:]):
+                    vx, vy = bx - ax, by - ay
+                    t = clamp(((dx - ax) * vx + (dy - ay) * vy) / max(1e-6, vx * vx + vy * vy))
+                    d = math.hypot(dx - (ax + vx * t), dy - (ay + vy * t))
+                    glow = max(glow, math.exp(-(d / 0.022) ** 2) * (1.0 - r / 0.8))
+            glow = clamp(glow) * smooth((0.8 - r) / 0.2)
+            if a < 0.1 and glow < 0.12:
+                img.set(x, y, (0, 0, 0, 0))
+                continue
+            scorch = mix((52, 44, 50), (18, 14, 20), clamp(bowl * 0.8 + 0.2 * n))
+            scorch = mix(scorch, (70, 60, 62), rim * 0.5)
+            col = mix(scorch, (120, 230, 255), glow)
+            if glow > 0.7:
+                col = mix(col, (235, 255, 255), (glow - 0.7) / 0.3)
+            img.set(x, y, (col[0], col[1], col[2], alpha_of(max(a, glow))))
+    save(img, WORLD, "crater_decal.png")
+
+
+def rune_ring():
+    s = 64
+    img = Image(s, s)
+    rnd = random.Random(79)
+    glyphs = []
+    for _ in range(16):
+        strokes = []
+        for _ in range(rnd.randint(3, 5)):
+            x0, y0 = rnd.randint(0, 4), rnd.randint(0, 4)
+            if rnd.random() < 0.5:
+                x1, y1 = rnd.randint(0, 4), y0
+            else:
+                x1, y1 = x0, rnd.randint(0, 4)
+            strokes.append((x0, y0, x1, y1))
+        glyphs.append(strokes)
+    for y in range(s):
+        for x in range(s):
+            dx = (x + 0.5) / s * 2 - 1
+            dy = (y + 0.5) / s * 2 - 1
+            r = math.hypot(dx, dy)
+            ang = (math.atan2(dy, dx) + math.pi * 2) % (math.pi * 2)
+            a = 0.0
+            a = max(a, math.exp(-((r - 0.6) / 0.018) ** 2))
+            a = max(a, math.exp(-((r - 0.95) / 0.02) ** 2) * 0.9)
+            a = max(a, math.exp(-((r - 0.9) / 0.012) ** 2) * 0.55)
+            if 0.64 < r < 0.88:
+                cell = ang / (math.pi * 2) * 16
+                i = int(cell) % 16
+                gu = (cell - math.floor(cell)) * 1.25 - 0.125  # 0..1 inside the cell, margins
+                gv = (r - 0.66) / 0.2
+                if 0.0 <= gu <= 1.0 and 0.0 <= gv <= 1.0:
+                    px, py = gu * 4.0, gv * 4.0
+                    for x0, y0, x1, y1 in glyphs[i]:
+                        tx = clamp((px - x0) * (x1 - x0) / max(1e-6, (x1 - x0) ** 2)) if x1 != x0 else 0.0
+                        ty = clamp((py - y0) * (y1 - y0) / max(1e-6, (y1 - y0) ** 2)) if y1 != y0 else 0.0
+                        cx = x0 + (x1 - x0) * tx
+                        cy = y0 + (y1 - y0) * ty
+                        d = math.hypot(px - cx, py - cy)
+                        a = max(a, math.exp(-(d / 0.28) ** 2))
+                # a dot between the glyphs
+                if abs(gu - 1.06) < 0.05 and abs(gv - 0.5) < 0.12:
+                    a = max(a, 0.8)
+            a = clamp(a)
+            if a < 0.12:
+                img.set(x, y, (0, 0, 0, 0))
+                continue
+            img.set(x, y, (255, 255, 255, alpha_of(a)))
+    save(img, WORLD, "rune_ring.png")
+
+
+def light_shaft():
+    w, h = 16, 64
+    img = Image(w, h)
+    noise = Noise(83, 8)
+    for y in range(h):
+        for x in range(w):
+            across = abs((x + 0.5) / w - 0.5) * 2.0
+            soft = math.exp(-(across * 1.6) ** 2)
+            dust = 0.75 + 0.25 * noise.at(x / 3.0, y / 6.0)
+            a = clamp(soft * dust * 0.9)
+            if a < 0.1:
+                img.set(x, y, (0, 0, 0, 0))
+                continue
+            img.set(x, y, (255, 255, 255, alpha_of(a)))
+    save(img, WORLD, "light_shaft.png")
+
+
+def qi_wisp():
+    w, h = 64, 16
+    img = Image(w, h)
+    noise = Noise(89, 8)
+    for y in range(h):
+        for x in range(w):
+            along = (x + 0.5) / w
+            across = abs((y + 0.5) / h - 0.5) * 2.0
+            taper = math.sin(math.pi * along) ** 0.8
+            width = 0.35 + 0.65 * taper
+            body = math.exp(-((across / width) ** 2) * 2.4) * taper
+            curl = 0.65 + 0.35 * noise.fbm(x / 6.0, y / 3.0 + along * 2.0, 3)
+            a = clamp(body * curl)
+            if a < 0.1:
+                img.set(x, y, (0, 0, 0, 0))
+                continue
+            img.set(x, y, (255, 255, 255, alpha_of(a)))
+    save(img, WORLD, "qi_wisp.png")
+
+
 # ================================================================ item icons
 
 def batu_meteor_roh():
@@ -423,6 +594,86 @@ def embun_roh():
     save(img, ITEM, "embun_roh.png")
 
 
+def inti_meteor_agung():
+    img = Image(16, 16)
+    # a faceted heart: an octagon of star iron, the facets lit from the top left, a white-hot core in the middle
+    rows = {2: (6, 9), 3: (5, 10), 4: (4, 11), 5: (3, 12), 6: (3, 12), 7: (2, 13), 8: (2, 13), 9: (3, 12), 10: (3, 12),
+            11: (4, 11), 12: (5, 10), 13: (6, 9)}
+    for y, (x0, x1) in rows.items():
+        for x in range(x0, x1 + 1):
+            cx, cy = x - 7.5, y - 7.5
+            r = math.hypot(cx, cy)
+            facet = ((x + y) // 3 + (x - y) // 4) % 3
+            light = clamp(0.55 - 0.05 * cx * 0.8 - 0.06 * cy + 0.12 * facet)
+            col = mix((22, 26, 44), (96, 120, 150), light)
+            # glowing veins converging to the core
+            if abs(cx) < 0.6 or abs(cy) < 0.6 or abs(abs(cx) - abs(cy)) < 0.6:
+                col = mix(col, (110, 225, 255), clamp(1.0 - r / 7.0))
+            core = clamp(1.0 - r / 2.6)
+            col = mix(col, (240, 255, 255), core)
+            if x in (x0, x1) or y in (2, 13):
+                col = mix(col, (10, 12, 24), 0.6)
+            img.set(x, y, (col[0], col[1], col[2], 255))
+    for x, y, a in ((13, 2, 255), (14, 1, 170), (12, 1, 170), (13, 0, 170), (2, 13, 220), (1, 14, 140), (3, 14, 140)):
+        img.set(x, y, (200, 245, 255, a))
+    save(img, ITEM, "inti_meteor_agung.png")
+
+
+def kristal_gerhana():
+    img = Image(16, 16)
+    # a cluster of three crimson shards (tall middle, two leaning side shards) rising from a dark stone,
+    # each lit from the left with a bright ridge, and a dark moon notch bitten out of the tall one
+    shards = (  # tip x, tip y, base x, base y, half width
+        (13.2, 5.0, 10.4, 13.4, 1.35),
+        (2.4, 6.2, 5.4, 13.4, 1.35),
+        (7.8, 0.6, 7.8, 13.4, 2.1),
+    )
+    for tx, ty, bx, by, hw in shards:
+        ax, ay = bx - tx, by - ty
+        length = math.hypot(ax, ay)
+        ux, uy = ax / length, ay / length
+        for y in range(16):
+            for x in range(16):
+                px, py = x + 0.5 - tx, y + 0.5 - ty
+                t = (px * ux + py * uy) / length
+                d = px * uy - py * ux  # signed: negative on the left of the axis
+                if t < 0.0 or t > 1.0:
+                    continue
+                width = hw * min(1.0, t * 4.0) * (1.0 - 0.15 * t)
+                if abs(d) > width + 0.15:
+                    continue
+                col = (205, 44, 36) if d < 0 else (118, 14, 18)
+                if abs(d) < 0.5:
+                    col = (255, 128, 96)
+                if abs(d) > width - 0.7:
+                    col = mix(col, (38, 4, 6), 0.55)
+                if t < 0.12:
+                    col = mix(col, (255, 190, 160), 0.5)
+                img.set(x, y, (int(col[0]), int(col[1]), int(col[2]), 255))
+    # the moon notch on the tall shard
+    for y in range(2, 7):
+        for x in range(7, 11):
+            if math.hypot(x + 0.5 - 9.6, y + 0.5 - 4.2) < 1.3 and img.get(x, y)[3] > 0:
+                img.set(x, y, (26, 6, 10, 255))
+    # the dark stone the cluster grows from
+    for y in range(12, 16):
+        for x in range(2, 14):
+            r = math.hypot((x + 0.5 - 8.0) / 6.0, (y + 0.5 - 14.0) / 2.2)
+            if r < 1.0:
+                shade = clamp(0.55 - 0.35 * r + (0.12 if (x * 7 + y * 3) % 5 == 0 else 0.0))
+                col = mix((14, 10, 16), (70, 52, 60), shade)
+                if y == 12 and img.get(x, y)[3] > 0:
+                    continue
+                img.set(x, y, (int(col[0]), int(col[1]), int(col[2]), 255))
+    # glints and a red mote
+    img.set(6, 5, (255, 220, 200, 255))
+    img.set(3, 7, (255, 200, 180, 230))
+    img.set(1, 3, (255, 90, 70, 190))
+    img.set(14, 2, (255, 90, 70, 190))
+    img.set(13, 9, (255, 120, 90, 140))
+    save(img, ITEM, "kristal_gerhana.png")
+
+
 def preview(folder):
     os.makedirs(folder, exist_ok=True)
     for path, img in WRITTEN:
@@ -453,8 +704,15 @@ def main():
     lotus_petal()
     meteor_rock()
     glow_dot()
+    moon_shadow()
+    crater_decal()
+    rune_ring()
+    light_shaft()
+    qi_wisp()
     batu_meteor_roh()
     embun_roh()
+    inti_meteor_agung()
+    kristal_gerhana()
     if len(sys.argv) > 1:
         preview(sys.argv[1])
     for path, img in WRITTEN:

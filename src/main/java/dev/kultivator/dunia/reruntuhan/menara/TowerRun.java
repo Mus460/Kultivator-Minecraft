@@ -753,6 +753,7 @@ public final class TowerRun {
 			if (addFoe(shadow)) {
 				boss = shadow;
 				RFx.big(level, shadow.position().add(0.0D, 1.0D, 0.0D), RFx.SOUL_APPEAR, 0x6A4AA0, 2, 2.0F);
+				Voice.boom(shadow, "menara.shadow_self", 48.0D);
 				for (ServerPlayer player : players()) {
 					Msg.title(player, Component.translatable("kultivator.reruntuhan.menara.diri.title").withStyle(ChatFormatting.DARK_PURPLE),
 							Component.translatable("kultivator.reruntuhan.menara.diri.sub").withStyle(ChatFormatting.GRAY), 10, 60, 20);
@@ -845,6 +846,12 @@ public final class TowerRun {
 		if (floor >= 100) {
 			return;
 		}
+		// the tower's spirit calls the climbers on (a later line than the milestone's witness, so both are heard)
+		for (ServerPlayer player : players()) {
+			if (Voice.ready(player.getUUID(), "menara_next", floor % 10 == 0 ? 1 : 2400)) {
+				Voice.inner(player, "menara.next_floor", Component.translatable("kultivator.reruntuhan.menara.tower_voice"));
+			}
+		}
 		padUp = part(TekaPartEntity.PAD, at(0.0D, -2.0D), 1);
 		padOut = part(TekaPartEntity.PAD, at(0.0D, 6.0D), 0);
 	}
@@ -915,6 +922,9 @@ public final class TowerRun {
 		}
 		if (floor >= 10) {
 			Advancements.grant(player, "dunia/tower_10");
+		}
+		if (floor >= 50) {
+			Advancements.grant(player, "dunia/tower_50");
 		}
 		if (floor >= 100) {
 			Advancements.grant(player, "dunia/tower_100");

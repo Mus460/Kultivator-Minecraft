@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/qi_mist",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.dew_full.description"
+    },
+    "icon": {
+      "id": "kultivator:embun_roh"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.dew_full.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

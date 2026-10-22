@@ -7,12 +7,21 @@
         "processors": "kultivator:kota/lapuk",
         "projection": "rigid"
       },
-      "weight": 1
+      "weight": 2
     },
     {
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "kultivator:kota/tembok_ujung_2",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/tembok_ujung_3",
         "processors": "kultivator:kota/lapuk",
         "projection": "rigid"
       },

@@ -11,10 +11,12 @@ import dev.kultivator.dunia.dimensi.DimensiData;
 import dev.kultivator.dunia.dimensi.DimensiItems;
 import dev.kultivator.dunia.dimensi.DimensiNet;
 import dev.kultivator.dunia.dimensi.DimensiNpc;
+import dev.kultivator.dunia.dimensi.DimensiVoice;
+import dev.kultivator.dunia.dimensi.Dimensi;
 import dev.kultivator.sect.Sect;
 import dev.kultivator.sect.Sects;
+import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
-import dev.kultivator.voice.Voice;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -46,7 +48,14 @@ import java.util.UUID;
  * <li>Courts 3, 6, 9: a judgment riddle; a wrong answer waits 60 s.</li>
  * <li>Courts 4, 7, 10: escort a lost soul from the court to the Naihe bridge (10 minutes).</li>
  * </ul>
- * Every passed court gives soul jade (two on 5 and 10). After {@code courtsRequired} courts Raja Yama opens the Book.
+ * Every passed court gives soul jade (two on 5 and 10) and, the first time, {@code 9 × n} Nilai Batu in real stones
+ * (doubled at 5 and 10: 630 NB for all ten, the Nascent Soul-Dao Union band); court 5 (Yanluo) adds a Dupa Arwah for the
+ * way back, court 10 (Zhuanlun) two Soul Nurturing Wood. Courts only ever rise, so each pays once. After
+ * {@code courtsRequired} courts Raja Yama opens the Book.
+ * <p>
+ * The Mirror also reads the soul's deeds in the wide world: the phase-34 milestones it reached (wanderers met, rivals
+ * beaten, treasures claimed, ruins cleared, seals restored, dragons subdued ...) and its Mode Kehancuran (on or off, the
+ * recent self casts and the blocks they broke, from {@code Kehancuran.selfStatus}).
  */
 public final class Courts {
 
@@ -60,6 +69,10 @@ public final class Courts {
 	public static final long RIDDLE_WAIT = 20L * 60L;
 	public static final long ESCORT_TICKS = 20L * 60L * 10L;
 	public static final int DUEL_TICKS = 20 * 120;
+	/** The world deeds the Mirror of Retribution looks for (advancement names, all phase 34). */
+	public static final String[] DEEDS = {"dunia/wanderer_talk", "dunia/rival_beaten", "dunia/treasure_claimed", "dunia/ruin_cleared",
+			"dunia/prison_sealed", "dunia/dragon_subdued", "dunia/beast_tier_4", "dunia/tower_10", "dunia/kota_found", "dunia/sky_event",
+			"dunia/ship_voyage", "dunia/sea_arrived"};
 
 	/** The trial of court {@code n} (1-10). */
 	public static int trialOf(int n) {
@@ -96,7 +109,7 @@ public final class Courts {
 		CompoundTag bawah = SoulJourney.data(player);
 		if (!bawah.getBooleanOr("mengpo", false)) {
 			Msg.chat(player, Component.translatable("kultivator.dimensi.court.mengpo_dulu").withColor(0xD0A0A0));
-			Voice.say(judge, "boss.taunt", "kultivator.dimensi.voice.yama_judgement");
+			DimensiVoice.say(judge, DimensiVoice.YAMA_JUDGEMENT, "boss.taunt", "kultivator.dimensi.voice.yama_judgement");
 			return;
 		}
 		int passed = passed(player);
@@ -109,7 +122,7 @@ public final class Courts {
 			Msg.chat(player, Component.translatable("kultivator.dimensi.court.urutan", passed + 1).withColor(0xD0A0A0));
 			return;
 		}
-		Voice.say(judge, "boss.awaken", "kultivator.dimensi.voice.yama_judgement");
+		DimensiVoice.say(judge, DimensiVoice.YAMA_JUDGEMENT, "boss.awaken", "kultivator.dimensi.voice.yama_judgement");
 		DimensiNet.open(player, DimensiNet.SCREEN_COURT, judge.getId(), courtTag(player, n));
 	}
 
@@ -149,6 +162,30 @@ public final class Courts {
 		tag.putInt("failed", data.failedBreakthroughs());
 		tag.putInt("enlightenments", data.enlightenments());
 		tag.putInt("pills", data.pillsRefined());
+		// the deeds of the wide world (phase-34 milestones) and the destruction the soul has wrought
+		net.minecraft.nbt.ListTag deeds = new net.minecraft.nbt.ListTag();
+		var advancements = player.level().getServer().getAdvancements();
+		for (String deed : DEEDS) {
+			var holder = advancements.get(dev.kultivator.Kultivator.id(deed));
+			if (holder != null && player.getAdvancements().getOrStartProgress(holder).isDone()) {
+				deeds.add(net.minecraft.nbt.StringTag.valueOf(deed));
+			}
+		}
+		tag.put("deeds", deeds);
+		tag.putInt("deeds_max", DEEDS.length);
+		try {
+			CompoundTag self = dev.kultivator.kehancuran.Kehancuran.selfStatus(player);
+			tag.putBoolean("hancur", self.getBooleanOr("on", false));
+			net.minecraft.nbt.ListTag log = self.getListOrEmpty("log");
+			int blocks = 0;
+			for (int i = 0; i < log.size(); i++) {
+				blocks += log.getCompoundOrEmpty(i).getIntOr("blocks", 0);
+			}
+			tag.putInt("hancur_casts", log.size());
+			tag.putInt("hancur_blocks", blocks);
+		} catch (RuntimeException exception) {
+			tag.putBoolean("hancur", false);
+		}
 		return tag;
 	}
 
@@ -187,7 +224,7 @@ public final class Courts {
 				DimensiData.dirty(player);
 				Msg.chat(player, Component.translatable("kultivator.dimensi.court.salah").withColor(0xD08080));
 				if (judge != null) {
-					Voice.say(judge, "boss.taunt", "");
+					DimensiVoice.sayReused(judge, "boss.taunt", "kultivator.dimensi.voice.court_wrong");
 				}
 			}
 		} else if (what.equals("escort") && trial == ESCORT && judge != null) {
@@ -224,7 +261,7 @@ public final class Courts {
 		if (started) {
 			partner.setFlag(DimensiNpc.FLAG_FIGHT, true);
 			partner.setTarget(player);
-			Voice.say(partner, "boss.awaken", "kultivator.dimensi.voice.ox_head");
+			DimensiVoice.say(partner, DimensiVoice.OX_HEAD, "boss.awaken", "kultivator.dimensi.voice.ox_head");
 			Msg.chat(player, Component.translatable("kultivator.dimensi.court.duel", partner.getName()).withColor(0xE0B070));
 		}
 	}
@@ -261,7 +298,7 @@ public final class Courts {
 		trial.putLong("until", DimensiData.now(level.getServer()) + ESCORT_TICKS);
 		bawah.put("trial", trial);
 		DimensiData.dirty(player);
-		Voice.say(soul, "disciple.f2.careful", "kultivator.dimensi.voice.ghost_plea");
+		DimensiVoice.say(soul, DimensiVoice.GHOST_PLEA, "disciple.f2.careful", "kultivator.dimensi.voice.ghost_plea");
 		Msg.chat(player, Component.translatable("kultivator.dimensi.court.antar").withColor(0xC9B8FF));
 	}
 
@@ -322,6 +359,15 @@ public final class Courts {
 	public static void pass(ServerPlayer player, int n, @Nullable LivingEntity judge) {
 		setPassed(player, n);
 		DimensiData.give(player, new ItemStack(DimensiItems.GIOK_ARWAH, n == 5 || n == 10 ? 2 : 1));
+		DimensiData.giveNb(player, courtNb(n));
+		if (n == 5) {
+			DimensiData.give(player, new ItemStack(DimensiItems.DUPA_ARWAH));
+		} else if (n == 10) {
+			ItemStack wood = Dimensi.itemById("kultivator:soul_nurturing_wood", 2);
+			if (!wood.isEmpty()) {
+				DimensiData.give(player, wood);
+			}
+		}
 		ServerLevel level = player.level();
 		DimensiNet.fx(level, DimensiNet.FX_JUDGED, judge != null ? judge.position() : player.position(), n, 48.0D);
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 1.0F, 0.6F);
@@ -331,8 +377,18 @@ public final class Courts {
 			Msg.chat(player, Component.translatable("kultivator.dimensi.court.yama").withColor(0xFFE9A8));
 		}
 		if (judge instanceof ArwahEntity speaker) {
-			Voice.say(speaker, "boss.defeat", "kultivator.dimensi.voice.yama_judgement");
+			speaker.talk(50);
+			DimensiVoice.sayReused(speaker, "elder.advice", "kultivator.dimensi.voice.court_pass");
 		}
+		if (n == 1) {
+			Advancements.grant(player, "dunia/court_mirror");
+		}
+	}
+
+	/** Nilai Batu a passed court pays: 9 × n, doubled at the fifth and the tenth court (630 NB for all ten). */
+	public static long courtNb(int n) {
+		long base = 9L * Math.max(1, Math.min(10, n));
+		return n == 5 || n == 10 ? base * 2L : base;
 	}
 
 	/** The judge's anchor pass: a guard duel or a court ghost needs nothing else; kept for symmetry. */

@@ -104,6 +104,8 @@ public class RogueRenderer extends LivingEntityRenderer<RogueCultivatorEntity, D
 		data.setData(MeditationPose.STRENGTH, 0.0F);
 		data.setData(TIER, tier);
 		data.setData(VARIANT, variant);
+		// DESIGN 35.5.5: the sword duel's poses (and any cast pose) on rogue cultivators
+		dev.kultivator.client.anim.PoseRenderData.extract(entity, state, partialTicks);
 	}
 
 	@Override
@@ -131,6 +133,14 @@ public class RogueRenderer extends LivingEntityRenderer<RogueCultivatorEntity, D
 	@Override
 	protected void scale(DiscipleRenderState state, PoseStack poseStack) {
 		poseStack.scale(PLAYER_SCALE, PLAYER_SCALE, PLAYER_SCALE);
+	}
+
+	/** The pose's lift (the duel's kneel) before the body turn and its tilt after it, as for players and disciples. */
+	@Override
+	protected void setupRotations(DiscipleRenderState state, PoseStack poseStack, float bodyRot, float entityScale) {
+		dev.kultivator.client.anim.PoseApplier.lift(state, poseStack);
+		super.setupRotations(state, poseStack, bodyRot, entityScale);
+		dev.kultivator.client.anim.PoseApplier.tilt(state, poseStack);
 	}
 
 	@Override

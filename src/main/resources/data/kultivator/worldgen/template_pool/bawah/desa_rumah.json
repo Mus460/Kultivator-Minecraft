@@ -26,6 +26,24 @@
         "projection": "rigid"
       },
       "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:bawah/desa/rumah_4",
+        "processors": "kultivator:bawah/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:bawah/desa/rumah_5",
+        "processors": "kultivator:bawah/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
     }
   ],
   "fallback": "minecraft:empty"

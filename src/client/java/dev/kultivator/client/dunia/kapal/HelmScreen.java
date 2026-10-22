@@ -8,12 +8,15 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.ScrollFrame;
 import dev.kultivator.client.screen.ui.SlipTooltip;
 import dev.kultivator.client.screen.ui.UiSound;
+import dev.kultivator.dunia.api.SpiritWeather;
 import dev.kultivator.dunia.kapal.KapalClass;
 import dev.kultivator.dunia.kapal.KapalNet;
 import dev.kultivator.dunia.kapal.KapalRohEntity;
+import dev.kultivator.dunia.kapal.KapalStyle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -27,17 +30,19 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * Kemudi, the ship's helm screen (DESIGN 34.5.15): the hull, fuel, riders and disciples aboard, the banner colour, the
- * hold, repair, "Simpan" (back into the keel) and the voyage list ("Berlayar ke…": the own sect hall, the routes other
+ * Kemudi, the ship's helm screen (DESIGN 34.5.15): the hull, fuel, riders and disciples aboard, the spirit weather, the
+ * banner colour, the hull livery (five, three of them earned) and the ship's name (owner only), the hold, repair, "Simpan"
+ * (back into the keel) and the voyage list ("Berlayar ke…": the own sect hall, the routes other
  * modules registered, the waypoints, or a marker of the world map). Opened by sneak + use on the ship, or the inventory
  * key while seated; everything it does is a request the server checks.
  */
 public final class HelmScreen extends Screen {
 
 	private static final int W = 300;
-	private static final int H = 206;
+	private static final int H = 236;
 
 	private final int ship;
 	private CompoundTag info;
@@ -46,6 +51,10 @@ public final class HelmScreen extends Screen {
 	private int y0;
 	private long openedAt;
 	private @Nullable List<Component> tooltip;
+	private final List<PetaUi.Button> liveries = new ArrayList<>();
+	private @Nullable EditBox nameBox;
+	/** The name being typed (kept while the server refreshes the screen). */
+	private @Nullable String nameDraft;
 
 	private HelmScreen(int ship, CompoundTag info) {
 		super(Component.translatable("kultivator.kapal.helm.title"));
@@ -107,6 +116,38 @@ public final class HelmScreen extends Screen {
 			swatch.selected = (KapalRohEntity.COLORS[i] & 0xFFFFFF) == (current & 0xFFFFFF);
 			buttons.add(swatch);
 		}
+		// hull liveries (some earned): swatches of their wood
+		liveries.clear();
+		int styleNow = info.getIntOr("style", 0);
+		int open = info.getIntOr("styles_open", 1);
+		for (KapalStyle style : KapalStyle.values()) {
+			int index = style.ordinal();
+			PetaUi.Button swatch = new PetaUi.Button(Component.empty(), () -> send(KapalRohEntity.OP_STYLE, index, ""));
+			swatch.at(x0 + 14 + index * 18, y0 + 202, 15, 11);
+			swatch.accent = 0xFF000000 | KapalLivery.swatch(style);
+			swatch.selected = index == styleNow;
+			swatch.enabled = owner && (open & (1 << index)) != 0;
+			swatch.tip = Component.translatable("kultivator.kapal.style.desc." + style.id());
+			buttons.add(swatch);
+			liveries.add(swatch);
+		}
+		// the ship's name
+		int vw0 = W - 156 - 14;
+		boolean typing = nameBox != null && nameBox.isFocused();
+		nameBox = new EditBox(font, x0 + 156, y0 + 201, vw0 - 46, 12, Component.translatable("kultivator.kapal.helm.name"));
+		nameBox.setMaxLength(KapalRohEntity.NAME_MAX);
+		nameBox.setHint(Component.translatable("kultivator.kapal.helm.name.hint").withStyle(ChatFormatting.DARK_GRAY));
+		nameBox.setValue(nameDraft != null ? nameDraft : info.getStringOr("name", ""));
+		nameBox.setResponder(value -> nameDraft = value);
+		nameBox.setEditable(owner);
+		addRenderableWidget(nameBox);
+		if (typing) {
+			setFocused(nameBox);
+		}
+		PetaUi.Button rename = add(new PetaUi.Button(Component.translatable("kultivator.kapal.helm.name.save"), this::saveName), x0 + 156 + vw0 - 42,
+				y0 + 200, 42);
+		rename.enabled = owner;
+		rename.tip = Component.translatable(owner ? "kultivator.kapal.helm.name.tip" : "kultivator.kapal.stow.owner_only");
 		// voyages
 		int vx = x0 + 156;
 		int vy = y0 + 46;
@@ -175,6 +216,16 @@ public final class HelmScreen extends Screen {
 		KapalClient.helm(ship, op, arg, text);
 	}
 
+	private void saveName() {
+		if (nameBox == null) {
+			return;
+		}
+		send(KapalRohEntity.OP_RENAME, 0, nameBox.getValue().strip());
+		nameDraft = null;
+		nameBox.setFocused(false);
+		setFocused(null);
+	}
+
 	@Override
 	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
 		g.fillGradient(0, 0, width, height, Palette.argb(0x90, Palette.NIGHT), Palette.argb(0xB8, Palette.NIGHT_MIST));
@@ -182,7 +233,6 @@ public final class HelmScreen extends Screen {
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-		super.extractRenderState(g, mouseX, mouseY, a);
 		tooltip = null;
 		int x1 = x0 + W;
 		int y1 = y0 + H;
@@ -194,8 +244,18 @@ public final class HelmScreen extends Screen {
 		// header
 		Brush.fit(g, font, Brush.bold(Component.translatable("kultivator.kapal.class." + kind.model())), x0 + 14, y0 + 12, 140, Palette.SEAL_DARK,
 				1.0F, 0.6F, false);
-		Brush.fit(g, font, Component.translatable("kultivator.kapal.helm.owner", info.getStringOr("owner", "?")), x0 + 14, y0 + 24, 140,
+		int weather = info.getIntOr("weather", 0);
+		boolean misty = weather > 0 && weather < SpiritWeather.values().length;
+		Brush.fit(g, font, Component.translatable("kultivator.kapal.helm.owner", info.getStringOr("owner", "?")), x0 + 14, y0 + 24, misty ? 66 : 140,
 				Palette.INK_SOFT, 0.65F, 0.5F, false);
+		if (misty) {
+			Brush.fit(g, font, Component.translatable("kultivator.kapal.helm.weather", Component.translatable("kultivator.kapal.weather.name."
+					+ SpiritWeather.values()[weather].id())), x0 + 82, y0 + 24, 64, 0xFF6A4FA8, 0.6F, 0.45F, false);
+		}
+		String shipName = info.getStringOr("name", "");
+		if (!shipName.isEmpty()) {
+			Brush.fit(g, font, Component.literal("\u00AB" + shipName + "\u00BB"), x0 + 14, y0 + 2, 132, Palette.GOLD_DARK, 0.6F, 0.45F, false);
+		}
 		Brush.fit(g, font, Brush.bold(Component.translatable("kultivator.kapal.helm.voyage")), x0 + 156, y0 + 12, W - 170, Palette.SEAL_DARK, 0.85F,
 				0.6F, false);
 		Brush.fit(g, font, Component.translatable(info.getBooleanOr("captain", false) ? "kultivator.kapal.helm.voyage.sub"
@@ -225,15 +285,36 @@ public final class HelmScreen extends Screen {
 				: Component.translatable("kultivator.kapal.helm.status_dest", stateName(info), destName(dest));
 		Brush.wrap(g, font, status, sx, sy, 130, Palette.JADE_DARK, 0.65F, false);
 		Brush.fit(g, font, Component.translatable("kultivator.kapal.helm.colour"), x0 + 14, y0 + 162, 130, Palette.INK_SOFT, 0.6F, 0.45F, false);
+		KapalStyle styleNow = KapalStyle.byOrdinal(info.getIntOr("style", 0));
+		Brush.fit(g, font, Component.translatable("kultivator.kapal.helm.style").append(": ").append(Component.translatable("kultivator.kapal.style."
+				+ styleNow.id())), x0 + 14, y0 + 191, 130, Palette.INK_SOFT, 0.6F, 0.45F, false);
+		Brush.fit(g, font, Component.translatable("kultivator.kapal.helm.name"), x0 + 156, y0 + 191, W - 170, Palette.INK_SOFT, 0.6F, 0.45F, false);
+		g.fill(x0 + 14, y0 + 186, x0 + 146, y0 + 187, Palette.argb(0x60, Palette.GOLD_DARK));
+		g.fill(x0 + 156, y0 + 186, x1 - 14, y0 + 187, Palette.argb(0x60, Palette.GOLD_DARK));
 		for (PetaUi.Button button : buttons) {
 			if (button.label.getString().isEmpty()) {
-				// a colour swatch
+				// a colour or livery swatch
 				int x = button.x;
 				int y = button.y;
 				g.fill(x, y, x + button.w, y + button.h, button.accent);
+				int livery = liveries.indexOf(button);
+				if (livery >= 0 && !button.enabled) {
+					// a locked livery: veiled, with a seal bar across
+					g.fill(x, y, x + button.w, y + button.h, 0x99101010);
+					g.fill(x + 2, y + button.h / 2, x + button.w - 2, y + button.h / 2 + 1, Palette.argb(0xC0, Palette.SEAL));
+				}
 				Brush.frame(g, x - 1, y - 1, x + button.w + 1, y + button.h + 1, button.selected ? Palette.GOLD : Palette.argb(0x80, Palette.INK));
 				if (button.over(mouseX, mouseY)) {
 					Brush.frame(g, x - 2, y - 2, x + button.w + 2, y + button.h + 2, Palette.GOLD_LIGHT);
+					if (livery >= 0) {
+						KapalStyle style = KapalStyle.values()[livery];
+						List<Component> lines = new ArrayList<>();
+						lines.add(Brush.bold(Component.translatable("kultivator.kapal.style." + style.id())));
+						lines.add(button.tip.copy().withStyle(ChatFormatting.GRAY));
+						lines.add(Component.translatable("kultivator.kapal.style.locked." + style.unlock().name().toLowerCase(Locale.ROOT))
+								.withStyle(button.enabled ? ChatFormatting.DARK_GREEN : ChatFormatting.RED));
+						tooltip = lines;
+					}
 				}
 				continue;
 			}
@@ -244,6 +325,8 @@ public final class HelmScreen extends Screen {
 		}
 		Brush.fitCentered(g, font, Component.translatable("kultivator.kapal.helm.keys"), (x0 + x1) / 2.0F, y1 - 14, W - 30, Palette.INK_FAINT, 0.55F,
 				0.4F, false);
+		// the name field (a vanilla widget) on top of the paper
+		super.extractRenderState(g, mouseX, mouseY, a);
 		if (tooltip != null) {
 			SlipTooltip.draw(g, font, tooltip, mouseX, mouseY, width, height);
 		}
@@ -273,6 +356,10 @@ public final class HelmScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		if (nameBox != null && nameBox.isFocused() && !nameBox.isMouseOver(event.x(), event.y())) {
+			nameBox.setFocused(false);
+			setFocused(null);
+		}
 		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 			for (PetaUi.Button button : buttons) {
 				if (button.over(event.x(), event.y())) {
@@ -291,6 +378,19 @@ public final class HelmScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
+		if (nameBox != null && nameBox.isFocused()) {
+			if (event.isConfirmation()) {
+				saveName();
+				return true;
+			}
+			if (event.isEscape()) {
+				nameBox.setFocused(false);
+				setFocused(null);
+				return true;
+			}
+			// typing: the inventory key is just a letter here
+			return super.keyPressed(event);
+		}
 		if (minecraft != null && minecraft.options.keyInventory.matches(event)) {
 			onClose();
 			return true;

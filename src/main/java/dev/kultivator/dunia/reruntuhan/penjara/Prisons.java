@@ -269,6 +269,20 @@ public final class Prisons extends SavedData {
 		return s == null ? null : get(s).seals.get(siteId);
 	}
 
+	/** {@code uji penjara gerhana}: marks (or clears) a Gerhana Darah over {@code level} for the prisons only. */
+	public static void testEclipse(net.minecraft.world.level.Level level, boolean on) {
+		if (on) {
+			ECLIPSE.add(level.dimension());
+		} else {
+			ECLIPSE.remove(level.dimension());
+		}
+	}
+
+	/** True while a Gerhana Darah reddens the moon over {@code level} (the sealed demons grow restless). */
+	public static boolean eclipse(@Nullable net.minecraft.world.level.Level level) {
+		return level != null && ECLIPSE.contains(level.dimension());
+	}
+
 	/** The prison id of an anchor of a prison. */
 	public static long idOf(DuniaAnchorEntity anchor) {
 		return anchor.siteOf(SITE_KIND);

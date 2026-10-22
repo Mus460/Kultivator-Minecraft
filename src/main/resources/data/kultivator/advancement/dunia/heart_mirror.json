@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.heart_mirror.description"
+    },
+    "icon": {
+      "id": "minecraft:tinted_glass"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.heart_mirror.title"
+    },
+    "frame": "task",
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

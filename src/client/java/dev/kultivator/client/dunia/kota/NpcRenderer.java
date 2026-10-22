@@ -2,6 +2,8 @@ package dev.kultivator.client.dunia.kota;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.kultivator.client.EffectQuality;
+import dev.kultivator.client.anim.CastPoses;
+import dev.kultivator.client.anim.PoseRenderData;
 import dev.kultivator.client.disciple.DiscipleHeldItemLayer;
 import dev.kultivator.client.disciple.DiscipleLook;
 import dev.kultivator.client.disciple.DiscipleRenderState;
@@ -28,7 +30,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityAttachment;
 import net.minecraft.world.entity.player.PlayerModelType;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.player.PlayerSkin;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,8 +40,12 @@ import org.jetbrains.annotations.Nullable;
  * Draws a {@code kultivator_npc} with the disciple's player model (DESIGN 34.5.1, built like {@code RogueRenderer}): one
  * of the default skins by look seed, the disciple robe tinted by role (or the rival group's colour), its held item, the
  * cross-legged pose while seated (teahouse wanderers), a soft see-through look for ghosts. The robe is dropped beyond
- * 32 blocks (16 on Minimal effects); the name plate (role title and name) shows within 16 blocks. Immortals wear the
- * white-gold robe and a faint luminous tint.
+ * 32 blocks (16 on Minimal effects); the name plate (role title and name) shows within 16 blocks, the realm and Dao
+ * line under it within 10. Immortals wear the white-gold robe and a faint luminous tint.
+ * <p>
+ * Detail pass: the role's {@link KotaGear} outfit ({@link KotaGearLayer}), the cast and duel poses of the 6c engine and
+ * DESIGN 35 ({@code PoseRenderData.extract}, the duel module's obligation of 35.7.6), otherwise the role's body language
+ * ({@link NpcPoses}), and the speech bubble of what it says (within 12 blocks, above the plate).
  */
 public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRenderState, PlayerModel> {
 
@@ -46,6 +54,9 @@ public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRen
 	private static final float PLAYER_SCALE = 0.9375F;
 	private static final double NAME_DISTANCE_SQ = 16.0D * 16.0D;
 	private static final double ROBE_DISTANCE_SQ = 32.0D * 32.0D;
+	private static final double BUBBLE_DISTANCE_SQ = 12.0D * 12.0D;
+	static final RenderStateDataKey<Component> NPC_LINE = RenderStateDataKey.create(() -> "kultivator:kota_npc_line");
+	static final RenderStateDataKey<Vec3> NPC_LINE_AT = RenderStateDataKey.create(() -> "kultivator:kota_npc_line_at");
 
 	private final PlayerModel wideModel;
 	private final PlayerModel slimModel;
@@ -55,6 +66,7 @@ public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRen
 		this.wideModel = this.model;
 		this.slimModel = new PlayerModel(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
 		this.addLayer(new CulledRobe(this, new DiscipleRobeLayer(this, context)));
+		this.addLayer(new KotaGearLayer(this, context));
 		this.addLayer(new DiscipleHeldItemLayer(this));
 	}
 
@@ -107,6 +119,45 @@ public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRen
 		data.setData(MeditationPose.STRENGTH, seated);
 		data.setData(NPC_FLAGS, entity.flags());
 		data.setData(NPC_ROLE, role.ordinal());
+		int gear = KotaGear.kindOf(entity);
+		data.setData(KotaGearLayer.KIND, gear);
+		data.setData(KotaGearLayer.TINT, KotaGear.tint(gear, entity.robe()));
+		// a cast or duel pose wins (6c, DESIGN 35); otherwise the role's body language
+		PoseRenderData.extract(entity, state, partialTicks);
+		if (PoseRenderData.pose(state) == null) {
+			CastPoses.Snapshot idle = NpcPoses.snapshot(entity, state, entity.tickCount + partialTicks);
+			if (idle != null) {
+				data.setData(PoseRenderData.POSE, idle);
+			}
+		}
+		Component line = entity.line();
+		// always written: a render state may be reused from the last frame
+		boolean speaking = !line.getString().isEmpty() && state.distanceToCameraSq <= BUBBLE_DISTANCE_SQ && !state.isInvisible;
+		data.setData(NPC_LINE, speaking ? line : Component.empty());
+		if (speaking) {
+			Vec3 at = entity.getAttachments().getNullable(EntityAttachment.NAME_TAG, 0, entity.getYRot(partialTicks));
+			if (at != null) {
+				data.setData(NPC_LINE_AT, at);
+			}
+		}
+	}
+
+	@Override
+	protected void submitNameDisplay(DiscipleRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+		super.submitNameDisplay(state, poseStack, collector, camera);
+		FabricRenderState data = (FabricRenderState) state;
+		Component line = data.getData(NPC_LINE);
+		Vec3 at = data.getData(NPC_LINE_AT);
+		if (line == null || at == null || line.getString().isEmpty()) {
+			return;
+		}
+		// the speech bubble: one line above the plate (and the realm line), in warm italics between quotes
+		int rows = (state.nameTag != null ? 1 : 0) + (state.scoreText != null ? 1 : 0);
+		poseStack.pushPose();
+		poseStack.translate(0.0F, rows * 9.0F * 1.15F * 0.025F + 0.08F, 0.0F);
+		Component bubble = Component.literal("“").append(line).append("”").withStyle(style -> style.withItalic(true).withColor(0xFFF2D6));
+		collector.submitNameTag(poseStack, at, 0, bubble, !state.isDiscrete, state.lightCoords, camera);
+		poseStack.popPose();
 	}
 
 	@Override

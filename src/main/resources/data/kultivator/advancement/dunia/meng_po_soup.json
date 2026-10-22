@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.meng_po_soup.description"
+    },
+    "icon": {
+      "id": "minecraft:mushroom_stew"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.meng_po_soup.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

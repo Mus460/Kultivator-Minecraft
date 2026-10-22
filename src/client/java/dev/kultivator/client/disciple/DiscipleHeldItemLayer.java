@@ -35,9 +35,7 @@ public class DiscipleHeldItemLayer extends RenderLayer<DiscipleRenderState, Play
 			// the 3D sword: grip in the fist, blade forward along the closed hand
 			poseStack.pushPose();
 			this.getParentModel().translateToHand(state, HumanoidArm.RIGHT, poseStack);
-			poseStack.translate(-1.0F / 16.0F, 10.0F / 16.0F, -1.0F / 16.0F);
-			poseStack.rotateDegrees(Axis.XP, 90.0F);
-			poseStack.scale(0.8F, 0.8F, 0.8F);
+			swordTransform(poseStack);
 			FormModels.submitState(state.rightHandItemState, poseStack, submitNodeCollector, lightCoords, state.outlineColor);
 			poseStack.popPose();
 		} else {
@@ -47,6 +45,16 @@ public class DiscipleHeldItemLayer extends RenderLayer<DiscipleRenderState, Play
 		if (!state.castActive && DutyPoses.showsProp(state)) {
 			dutyProps(state, poseStack, submitNodeCollector, lightCoords);
 		}
+	}
+
+	/**
+	 * The 3D sword's place in the fist, after {@code translateToHand} (DESIGN 35.5.4): the grip in the hand, the blade
+	 * forward along the closed hand. Shared with the duel's {@code BladeProbeLayer}, so the blade it records is this one.
+	 */
+	public static void swordTransform(PoseStack poseStack) {
+		poseStack.translate(-1.0F / 16.0F, 10.0F / 16.0F, -1.0F / 16.0F);
+		poseStack.rotateDegrees(Axis.XP, 90.0F);
+		poseStack.scale(0.8F, 0.8F, 0.8F);
 	}
 
 	private void dutyProps(DiscipleRenderState state, PoseStack poseStack, SubmitNodeCollector c, int light) {

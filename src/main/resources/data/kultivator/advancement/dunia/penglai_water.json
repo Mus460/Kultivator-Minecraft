@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.penglai_water.description"
+    },
+    "icon": {
+      "id": "kultivator:air_mata_air_penglai"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.penglai_water.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

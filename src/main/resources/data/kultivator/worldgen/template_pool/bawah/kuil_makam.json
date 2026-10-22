@@ -8,6 +8,15 @@
         "projection": "rigid"
       },
       "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:bawah/kuil/makam_2",
+        "processors": "kultivator:bawah/kuil_lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
     }
   ],
   "fallback": "minecraft:empty"

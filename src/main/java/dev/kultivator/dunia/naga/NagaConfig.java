@@ -39,6 +39,16 @@ public final class NagaConfig {
 	public boolean fallbackItems = true;
 	/** The tier 4+ bloodline arts and the tier 6 owner passives. */
 	public boolean arts = true;
+	/** A wild Jiao at half health enters Amukan Naga (faster, harder skills, a stormy sky grade for those near). */
+	public boolean enrage = true;
+	/** The kind skills: Pusaran Samudra (water), Tirai Awan (cloud), Hujan Petir Langit (thunder); also a tamed Naga Sejati's. */
+	public boolean specials = true;
+	/** While a soul walks Dunia Bawah, its owner's spirit beasts and tamed Jiao guard the body (Penjaga Raga). */
+	public boolean guardBody = true;
+	/** The tamed Jiao's remarks to its owner and the wild Jiao's warnings. */
+	public boolean dialogue = true;
+	/** The chance a slain wild Jiao leaves a Darah Jiao for its slayer (0-1). */
+	public double darahChance = 0.5D;
 
 	/** Clamps everything into range (called by {@code DuniaConfig} after every read). */
 	public NagaConfig clamp() {
@@ -58,6 +68,7 @@ public final class NagaConfig {
 		}
 		huFaShare = Double.isFinite(huFaShare) ? Math.max(0.0D, Math.min(0.9D, huFaShare)) : 0.3D;
 		failCooldownDays = Math.max(0, Math.min(7, failCooldownDays));
+		darahChance = Double.isFinite(darahChance) ? Math.max(0.0D, Math.min(1.0D, darahChance)) : 0.5D;
 		return this;
 	}
 

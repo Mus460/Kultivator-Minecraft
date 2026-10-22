@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "kultivator:kota/kota_kultivator"
+    "kultivator:kota/kota_kultivator",
+    "kultivator:kota/kota_kultivator_salju",
+    "kultivator:kota/kota_kultivator_sabana",
+    "kultivator:kota/kota_kultivator_sakura"
   ]
 }

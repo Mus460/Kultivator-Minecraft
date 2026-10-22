@@ -1,0 +1,218 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_kecil_0",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 3
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_kecil_1",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 3
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_kecil_2",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 3
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_sedang_0",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_sedang_1",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_sedang_2",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_besar_0",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_besar_1",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_besar_2",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_halaman_0",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_halaman_1",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_halaman_2",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_toko_0",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_toko_1",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/rumah_toko_2",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/hias_kios",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/hias_gerobak",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/hias_lentera",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/hias_sumur",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/hias_kuil",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/hias_batu",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/hias_latihan",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/salju/hias_pohon",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:empty_pool_element"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

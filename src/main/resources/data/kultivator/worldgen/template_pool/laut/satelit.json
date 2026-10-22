@@ -29,6 +29,24 @@
     },
     {
       "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:laut/pulau/satelit_nelayan",
+        "processors": "kultivator:laut/terumbu",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:laut/pulau/satelit_kapal_karam",
+        "processors": "kultivator:laut/terumbu",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
         "element_type": "minecraft:empty_pool_element"
       },
       "weight": 3

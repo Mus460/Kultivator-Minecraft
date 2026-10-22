@@ -4,9 +4,6 @@
     "minecraft:jagged_peaks",
     "minecraft:stony_peaks",
     "minecraft:frozen_peaks",
-    "minecraft:windswept_hills",
-    "minecraft:badlands",
-    "minecraft:eroded_badlands",
-    "minecraft:wooded_badlands"
+    "minecraft:windswept_hills"
   ]
 }

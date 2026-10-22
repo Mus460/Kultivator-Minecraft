@@ -7,7 +7,6 @@ import dev.kultivator.harta.SpiritHerbs;
 import dev.kultivator.tempa.ArtifactItem;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
-import dev.kultivator.voice.Voice;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -173,7 +172,7 @@ final class BalaiLelang {
 			session = start(level, town, day, within, now);
 			session.auctioneer = auctioneer;
 			SESSIONS.put(town, session);
-			Voice.say(auctioneer, auctioneer.voiceKey("cheer"), "kultivator.kota.lelang.suara.buka");
+			KotaVoice.say(auctioneer, KotaVoice.AUCTION_OPEN, auctioneer.voiceKey("cheer"), "kultivator.kota.lelang.suara.buka");
 			for (ServerPlayer player : within) {
 				Msg.chat(player, Component.translatable("kultivator.kota.lelang.mulai", KotaNames.town(town)).withStyle(ChatFormatting.GOLD));
 			}
@@ -357,7 +356,7 @@ final class BalaiLelang {
 				KotaData.get(session.level.getServer()).addReputation(session.town, winner.getUUID(), 1);
 				Advancements.grant(winner, "dunia/kota_auction");
 				if (session.auctioneer != null) {
-					Voice.say(session.auctioneer, session.auctioneer.voiceKey("victory"), "kultivator.kota.lelang.suara.terjual");
+					KotaVoice.say(session.auctioneer, KotaVoice.AUCTION_SOLD, session.auctioneer.voiceKey("victory"), "kultivator.kota.lelang.suara.terjual");
 				}
 			} else {
 				// the winner could not pay (or left): the last NPC bidder takes it, the town remembers
@@ -372,7 +371,7 @@ final class BalaiLelang {
 		} else {
 			lot.state = 2;
 			if (session.auctioneer != null) {
-				Voice.say(session.auctioneer, session.auctioneer.voiceKey("victory"), "kultivator.kota.lelang.suara.terjual");
+				KotaVoice.say(session.auctioneer, KotaVoice.AUCTION_SOLD, session.auctioneer.voiceKey("victory"), "kultivator.kota.lelang.suara.terjual");
 			}
 		}
 		advance(session, now);
@@ -513,7 +512,7 @@ final class BalaiLelang {
 		session.auctioneer = auctioneer;
 		session.test = true;
 		SESSIONS.put(town, session);
-		Voice.say(auctioneer, auctioneer.voiceKey("cheer"), "kultivator.kota.lelang.suara.buka");
+		KotaVoice.say(auctioneer, KotaVoice.AUCTION_OPEN, auctioneer.voiceKey("cheer"), "kultivator.kota.lelang.suara.buka");
 	}
 
 	/** {@code uji kota lelang tutup}: ends every session now (consignments are paid). */

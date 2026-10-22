@@ -145,6 +145,10 @@ public final class RoomRun extends AnchorRun implements PuzzleHost {
 	protected void tick(long now) {
 		List<ServerPlayer> inside = challengers();
 		updateBar(inside, now);
+		int look = data().getIntOr("look", 0);
+		if (look > 0 && now % 50L == 0L && !playersWithin(14.0D).isEmpty()) {
+			dev.kultivator.dunia.reruntuhan.RNet.fx(level, frame.centre(), 20.0D, RFx.ROOM_AIR, look, tier, 0.0F);
+		}
 		Puzzle current = puzzle;
 		if (current == null || current.done()) {
 			return;
@@ -157,6 +161,10 @@ public final class RoomRun extends AnchorRun implements PuzzleHost {
 				for (ServerPlayer player : inside) {
 					Msg.title(player, Component.translatable("kultivator.reruntuhan.teka." + kind.id()).withStyle(ChatFormatting.GOLD),
 							current.objective().copy().withStyle(ChatFormatting.GRAY), 5, 50, 10);
+					// the ancestor's remnant soul speaks once per player per ten minutes when a trial begins
+					if (dev.kultivator.voice.Voice.ready(player.getUUID(), "gua_trial", 12000)) {
+						dev.kultivator.voice.Voice.inner(player, "gua.ancestor_trial", Component.translatable("entity.kultivator.sisa_jiwa.tier." + tier));
+					}
 				}
 			}
 			return;

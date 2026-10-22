@@ -7,6 +7,11 @@
   textures/dunia/kapal/glow.png       32 x 32   a soft round glow (lantern halos, the engine), alpha >= 0.1 in the disc
   textures/dunia/kapal/ring.png       64 x 64   the qi engine ring (a thin bright ring with eight rune ticks)
   textures/dunia/kapal/cloud.png      64 x 64   a cloud puff for the wake (soft lobes, white)
+  textures/dunia/kapal/rope.png       8 x 32    a twisted hemp rigging line (cutout; drawn as a thin camera-facing strip)
+  textures/dunia/kapal/oar.png        16 x 64   a qi oar: a pale shaft and a leaf blade of light (emissive, translucent)
+  textures/dunia/kapal/formation.png  128 x 128 the levitation formation under the keel: three rune rings, a bagua of
+                                                trigram bars and a star (emissive, translucent, turned by the renderer)
+  textures/dunia/kapal/sail_bajak.png 64 x 128  the sky pirates' ragged sail: tarred cloth, torn holes, a red claw sigil
   textures/item/lunas_perahu_awan.png ...       the three keel items (a small ship of each class on a jade disc)
   textures/item/peta_dunia.png                  the world map scroll
   textures/item/gulungan_penunjuk.png           the pointer scroll (a scroll with a compass seal)
@@ -240,6 +245,135 @@ def cloud():
     return img
 
 
+def rope():
+    w, h = 8, 32
+    img = Image(w, h)
+    for y in range(h):
+        for x in range(1, w - 1):
+            # two strands twisting: a diagonal light band every 6 px
+            t = ((x + y) % 6) / 6.0
+            light = 0.55 + 0.35 * math.sin(t * math.pi)
+            edge = 1.0 - abs(x + 0.5 - w / 2.0) / (w / 2.0 - 1)
+            c = mix((70, 52, 32), (176, 146, 98), light * (0.6 + 0.4 * edge))
+            img.set(x, y, c + (255,))
+    return img
+
+
+def oar():
+    w, h = 16, 64
+    img = Image(w, h)
+    for y in range(h):
+        v = y / (h - 1.0)  # 0 at the rowlock (top), 1 at the blade tip
+        if v < 0.55:
+            half = 1.2
+            core = 1.0
+        else:
+            t = (v - 0.55) / 0.45
+            half = 1.2 + 5.6 * math.sin(min(1.0, t * 1.15) * math.pi * 0.62)
+            core = 1.0 - 0.35 * t
+        for x in range(w):
+            d = abs(x + 0.5 - w / 2.0)
+            if d > half + 1.0:
+                continue
+            a = max(0.0, min(1.0, half + 1.0 - d)) * (0.35 + 0.65 * core)
+            if v >= 0.55:
+                # the blade glows brighter along its spine and its rim
+                spine = math.exp(-(d / 1.2) ** 2)
+                rim = math.exp(-((d - half) / 0.9) ** 2)
+                a *= 0.45 + 0.4 * spine + 0.5 * rim
+            img.set(x, y, (255, 255, 255, int(26 + 229 * min(1.0, a))))
+    return img
+
+
+def formation():
+    s = 128
+    img = Image(s, s)
+    c = s / 2.0
+    for y in range(s):
+        for x in range(s):
+            dx, dy = x + 0.5 - c, y + 0.5 - c
+            d = math.hypot(dx, dy) / c
+            if d >= 1.0:
+                continue
+            ang = math.atan2(dy, dx)
+            a = 0.0
+            # three rings
+            for r, wd, k in ((0.94, 0.018, 1.0), (0.80, 0.012, 0.8), (0.42, 0.014, 0.9)):
+                a = max(a, k * math.exp(-((d - r) / wd) ** 2))
+            # rune ticks between the outer rings (36 marks, every third longer)
+            for i in range(36):
+                aa = i * math.pi / 18
+                da = abs(math.atan2(math.sin(ang - aa), math.cos(ang - aa)))
+                lim = 0.90 if i % 3 == 0 else 0.86
+                if da * d * c < 0.9 and 0.83 < d < lim:
+                    a = max(a, 0.85)
+            # bagua: eight trigram bars between the middle and the inner ring
+            sector = (ang + math.pi / 8) % (math.pi / 4)
+            if abs(sector - math.pi / 8) < math.pi / 14:
+                k = int(((ang + math.pi / 8) % (2 * math.pi)) / (math.pi / 4))
+                for line in range(3):
+                    rr = 0.52 + line * 0.075
+                    if abs(d - rr) < 0.018:
+                        broken = (k >> line) & 1
+                        if not (broken and abs(sector - math.pi / 8) < math.pi / 60):
+                            a = max(a, 0.75)
+            # a six-pointed star in the heart
+            star = 0.0
+            for j in range(6):
+                aa = j * math.pi / 3
+                da = abs(math.atan2(math.sin(ang - aa), math.cos(ang - aa)))
+                if d < 0.36 and da < 0.5 * (1.0 - d / 0.36) + 0.03:
+                    star = 0.5
+            a = max(a, star)
+            a = max(a, 0.12 * (1.0 - d))  # a faint wash so the disc reads as one light
+            if a < 0.04:
+                continue
+            img.set(x, y, (255, 255, 255, int(26 + 229 * min(1.0, a))))
+    return img
+
+
+def sail_bajak():
+    w, h = 64, 128
+    img = Image(w, h)
+    rng = random.Random(56106)
+    n1 = noise(rng, w, h, 8)
+    n2 = noise(rng, w, h, 32)
+    tar = (44, 36, 34)
+    worn = (92, 74, 62)
+    battens = [int(h * k / 6) for k in range(1, 6)]
+    holes = [(rng.randint(8, w - 9), rng.randint(10, h - 12), rng.uniform(2.5, 5.5)) for _ in range(5)]
+    for y in range(h):
+        for x in range(w):
+            hole = any(math.hypot((x - hx) * 1.0, (y - hy) * 0.8) < hr * (0.75 + 0.5 * n2[y][x]) for (hx, hy, hr) in holes)
+            # the foot is torn into a ragged fringe
+            fringe = y > h - 10 and n2[y][x] * 12 < (y - (h - 10)) + (x % 7) * 0.6
+            if hole or fringe:
+                continue
+            light = 0.35 + 0.45 * n1[y][x] + 0.2 * (n2[y][x] - 0.5)
+            c = mix(tar, worn, light)
+            if x % 9 == 0:
+                c = mix(c, (20, 16, 14), 0.4)
+            img.set(x, y, c + (255,))
+    for b in battens:
+        for x in range(w):
+            if img.get(x, b)[3] > 0:
+                img.set(x, b, (30, 22, 18, 255))
+    # the red claw sigil: three curved slashes
+    cx, cy = w // 2, int(h * 0.42)
+    for k in (-1, 0, 1):
+        for t in range(-16, 17):
+            x = cx + k * 8 + int(3 * math.sin(t / 16.0 * math.pi / 2))
+            y = cy + t
+            for dx in (-1, 0, 1):
+                if abs(t) < 15 - abs(dx) * 4 and 0 <= x + dx < w and img.get(x + dx, y)[3] > 0:
+                    img.set(x + dx, y, (168, 28, 22, 255))
+    for y in range(h):
+        for x in (0, w - 1):
+            if img.get(x, y)[3] > 0:
+                img.set(x, y, (24, 18, 14, 255))
+    return img
+
+
 # ----------------------------------------------------------------------------------------------------------- items
 OUTLINE = (34, 24, 16, 255)
 
@@ -373,10 +507,14 @@ def main():
     save(glow(), "dunia/kapal/glow.png", preview)
     save(ring(), "dunia/kapal/ring.png", preview)
     save(cloud(), "dunia/kapal/cloud.png", preview)
+    save(rope(), "dunia/kapal/rope.png", preview)
+    save(oar(), "dunia/kapal/oar.png", preview)
+    save(formation(), "dunia/kapal/formation.png", preview)
+    save(sail_bajak(), "dunia/kapal/sail_bajak.png", preview)
     for name, make in ITEMS.items():
         save(make(), "item/" + name + ".png", preview)
         write_item_json(name)
-    print("gen_dunia_kapal_textures: 5 world textures, %d items" % len(ITEMS))
+    print("gen_dunia_kapal_textures: 9 world textures, %d items" % len(ITEMS))
 
 
 if __name__ == "__main__":

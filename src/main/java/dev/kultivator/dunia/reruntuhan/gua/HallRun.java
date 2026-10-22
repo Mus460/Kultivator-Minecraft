@@ -1,5 +1,7 @@
 package dev.kultivator.dunia.reruntuhan.gua;
 
+import dev.kultivator.data.Cultivators;
+import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.DuniaAnchors;
 import dev.kultivator.dunia.reruntuhan.AnchorRun;
@@ -80,6 +82,40 @@ public final class HallRun extends AnchorRun {
 		if (s != null && speak > 0 && --speak == 0) {
 			s.setGlow(0);
 		}
+		// idle musings: now and then the remnant soul turns to a visitor nearby and remembers its life (chat only)
+		if (s != null && speak == 0 && now % 40L == 0L) {
+			for (ServerPlayer player : playersWithin(MUSE_RADIUS)) {
+				if (Voice.ready(player.getUUID(), "gua_muse", MUSE_GAP)) {
+					s.getLookControl().setLookAt(player, 30.0F, 30.0F);
+					s.setGlow(1);
+					speak = 50;
+					int n = Math.floorMod((int) (now / MUSE_GAP) + player.getUUID().hashCode(), MUSES);
+					Msg.chat(player, line("entity.kultivator.sisa_jiwa.tier." + tier, "kultivator.reruntuhan.warisan.muse." + tier + "." + n));
+					break;
+				}
+			}
+		}
+	}
+
+	private static final double MUSE_RADIUS = 7.0D;
+	private static final int MUSE_GAP = 1200;
+	private static final int MUSES = 3;
+
+	/**
+	 * How the ancestor sees the visitor's realm against the ruin's band (Kecil: Qi Refining-Foundation, Agung: Golden
+	 * Core-Nascent Soul, Kuno: Deity Transformation-Dao Union): "senior" above it, "peer" within it, "junior" below.
+	 */
+	private String standing(ServerPlayer player) {
+		Realm realm = Cultivators.get(player).realm();
+		Realm top = switch (tier) {
+			case 2 -> Realm.NASCENT_SOUL;
+			case 3 -> Realm.DAO_UNION;
+			default -> Realm.FOUNDATION;
+		};
+		if (realm.ordinal() > top.ordinal()) {
+			return "senior";
+		}
+		return realm.atLeast(RuinLooks.minRealm(tier)) ? "peer" : "junior";
 	}
 
 	private boolean claimed(UUID player) {
@@ -104,13 +140,16 @@ public final class HallRun extends AnchorRun {
 		s.setGlow(1);
 		speak = 60;
 		String who = "entity.kultivator.sisa_jiwa.tier." + tier;
+		if (Voice.ready(player.getUUID(), "gua_greet", 6000)) {
+			Msg.chat(player, line(who, "kultivator.reruntuhan.warisan.greet." + standing(player)));
+		}
 		if (claimed(player.getUUID())) {
 			Voice.say(s, "elder.welcome", null);
 			Msg.chat(player, line(who, "kultivator.reruntuhan.warisan.again"));
 			return;
 		}
 		if (!victor(player)) {
-			Voice.say(s, "elder.advice", null);
+			Voice.say(s, "gua.ancestor_trial", null);
 			Msg.chat(player, line(who, "kultivator.reruntuhan.warisan.unproven"));
 			return;
 		}
@@ -172,6 +211,9 @@ public final class HallRun extends AnchorRun {
 		level.playSound(null, centre().x, centre().y, centre().z, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.8F, 1.0F);
 		level.playSound(null, centre().x, centre().y, centre().z, SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 1.0F, 0.7F);
 		Advancements.grant(player, "dunia/ruin_cleared");
+		if (tier >= 3) {
+			Advancements.grant(player, "dunia/ruin_kuno");
+		}
 		Reruntuhan.markRuin(player, tier);
 	}
 

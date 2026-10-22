@@ -1,6 +1,7 @@
 package dev.kultivator.dunia.kapal;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -25,8 +26,11 @@ import java.util.UUID;
 /**
  * {@code /kultivasi uji kapal ...} (op, DESIGN 34.5.15 "Uji"): {@code beri <perahu|sekte|bahtera>} (a keel with an hour of
  * fuel), {@code panggil}, {@code bahan_bakar <menit>}, {@code lompat <x> <z>} (a cloud leap toward x/z now),
- * {@code bajak} (sky pirates now), {@code rusak}, {@code perbaiki}, {@code hapus}. Every command acts on the ship the
- * player rides, else their deployed one.
+ * {@code bajak} (sky pirates now: the raider and the band), {@code rusak}, {@code perbaiki}, {@code hapus}; and from the
+ * detail pass {@code gaya <livery>}, {@code nama [text]}, {@code rampasan <1-4>} (the pirates' spoils now), {@code meteor}
+ * (the meteor net catches a stone now), {@code info} (class, name, livery, hull, fuel, the weather's factors) and
+ * {@code suara <line>} (one of the ship's spoken lines, or the fallback while the new clip is not registered). Every
+ * command acts on the ship the player rides, else their deployed one.
  */
 final class KapalTests {
 
@@ -71,7 +75,110 @@ final class KapalTests {
 				}))
 				.then(Commands.literal("rusak").executes(ctx -> hull(ctx, true)))
 				.then(Commands.literal("perbaiki").executes(ctx -> hull(ctx, false)))
-				.then(Commands.literal("hapus").executes(KapalTests::remove));
+				.then(Commands.literal("hapus").executes(KapalTests::remove))
+				.then(Commands.literal("gaya")
+						.then(Commands.argument("gaya", StringArgumentType.word())
+								.suggests((ctx, builder) -> SharedSuggestionProvider.suggest(Arrays.stream(KapalStyle.values()).map(KapalStyle::id), builder))
+								.executes(KapalTests::style)))
+				.then(Commands.literal("nama")
+						.executes(ctx -> name(ctx, ""))
+						.then(Commands.argument("nama", StringArgumentType.greedyString()).executes(ctx -> name(ctx, StringArgumentType.getString(ctx, "nama")))))
+				.then(Commands.literal("rampasan")
+						.then(Commands.argument("tingkat", IntegerArgumentType.integer(1, 4)).executes(KapalTests::spoils)))
+				.then(Commands.literal("meteor").executes(ctx -> {
+					KapalRohEntity ship = ship(ctx);
+					if (ship == null) {
+						return 0;
+					}
+					ship.testMeteor();
+					return 1;
+				}))
+				.then(Commands.literal("info").executes(KapalTests::info))
+				.then(Commands.literal("suara")
+						.then(Commands.argument("baris", StringArgumentType.word())
+								.suggests((ctx, builder) -> SharedSuggestionProvider.suggest(VOICES.keySet(), builder))
+								.executes(KapalTests::voice)));
+	}
+
+	/** {@code uji kapal suara <line>}: the ship's spoken moments, each with the fallback the game uses. */
+	private static final Map<String, String[]> VOICES = Map.of(
+			"launch", new String[]{KapalVoice.LAUNCH, "disciple.m1.cheer"},
+			"cloud_leap", new String[]{KapalVoice.CLOUD_LEAP, null},
+			"arrive", new String[]{KapalVoice.ARRIVE, "disciple.m1.greet"},
+			"sky_pirates", new String[]{KapalVoice.SKY_PIRATES, "rogue.ambush"},
+			"hull_broken", new String[]{KapalVoice.HULL_BROKEN, "disciple.m1.careful"},
+			"site_found", new String[]{KapalVoice.SITE_FOUND, null});
+
+	private static int voice(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		String id = StringArgumentType.getString(ctx, "baris");
+		String[] line = VOICES.get(id);
+		if (line == null) {
+			ctx.getSource().sendFailure(Component.translatable("kultivator.kapal.cmd.unknown_voice", id));
+			return 0;
+		}
+		String played = KapalVoice.pick(line[0], line[1]);
+		if (id.equals("cloud_leap") || id.equals("site_found")) {
+			KapalVoice.sky(player, line[0], line[1]);
+		} else {
+			KapalVoice.crew(player, line[0], line[1]);
+		}
+		ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.kapal.cmd.voice", id, played == null ? "-" : played)),
+				false);
+		return 1;
+	}
+
+	private static int style(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		KapalRohEntity ship = ship(ctx);
+		if (ship == null) {
+			return 0;
+		}
+		String id = StringArgumentType.getString(ctx, "gaya");
+		KapalStyle style = KapalStyle.byId(id);
+		if (style == null) {
+			ctx.getSource().sendFailure(Component.translatable("kultivator.kapal.cmd.unknown_style", id));
+			return 0;
+		}
+		ship.setStyle(style);
+		ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.kapal.style.set",
+				Component.translatable("kultivator.kapal.style." + style.id()))), false);
+		return 1;
+	}
+
+	private static int name(CommandContext<CommandSourceStack> ctx, String text) throws CommandSyntaxException {
+		KapalRohEntity ship = ship(ctx);
+		if (ship == null) {
+			return 0;
+		}
+		ship.setShipName(text);
+		ctx.getSource().sendSuccess(() -> Msg.prefixed(ship.shipName().isEmpty() ? Component.translatable("kultivator.kapal.name.cleared")
+				: Component.translatable("kultivator.kapal.name.set", ship.shipName())), false);
+		return 1;
+	}
+
+	private static int spoils(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		KapalRohEntity ship = ship(ctx);
+		if (ship == null) {
+			return 0;
+		}
+		Voyages.spoils((ServerLevel) ship.level(), ship, player, IntegerArgumentType.getInteger(ctx, "tingkat"));
+		return 1;
+	}
+
+	private static int info(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		KapalRohEntity ship = ship(ctx);
+		if (ship == null) {
+			return 0;
+		}
+		KapalClass kind = ship.kind();
+		ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.kapal.cmd.info",
+				Component.translatable("kultivator.kapal.class." + kind.model()), ship.shipName().isEmpty() ? "-" : ship.shipName(),
+				Component.translatable("kultivator.kapal.style." + ship.style().id()), ship.hull(), kind.hull(), ship.fuelSeconds() / 60,
+				Component.translatable("kultivator.kapal.weather.name." + ship.weather().id()),
+				Math.round(KapalWeather.fuel(ship.weather()) * 100.0D), Math.round(KapalWeather.speed(ship.weather()) * 100.0D),
+				ship.raider() != null ? 1 : 0)), false);
+		return 1;
 	}
 
 	private static int usage(CommandSourceStack source) {

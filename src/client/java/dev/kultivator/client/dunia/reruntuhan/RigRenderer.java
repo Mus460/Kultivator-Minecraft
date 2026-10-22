@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 
@@ -61,6 +62,24 @@ public class RigRenderer<T extends RCreature> extends EntityRenderer<T, RigRende
 	@Override
 	public State createRenderState() {
 		return new State();
+	}
+
+	@Override
+	protected boolean shouldShowName(T entity, double distanceToCameraSq) {
+		// a boss always wears its plate within sight of the fight (the name in the boss colour, its title under it)
+		return entity.deathTime == 0 && distanceToCameraSq < (king ? RTitles.BOSS_SQ : RTitles.GUARD_SQ);
+	}
+
+	@Override
+	protected Component getNameTag(T entity) {
+		return RTitles.name(entity.getDisplayName(), king ? RTitles.KING_NAME : RTitles.GUARD_NAME);
+	}
+
+	@Override
+	protected void extractNameTags(T entity, State state, float partialTicks) {
+		super.extractNameTags(entity, state, partialTicks);
+		state.scoreText = state.nameTag == null ? null
+				: king ? RTitles.king(entity.kind(), entity.flags()) : RTitles.guardian(entity.kind(), entity.flags());
 	}
 
 	@Override
@@ -155,6 +174,10 @@ public class RigRenderer<T extends RCreature> extends EntityRenderer<T, RigRende
 			float d = Math.min(1.0F, s.death);
 			pose.translate(0.0F, -d * 0.8F, 0.0F);
 			pose.rotate(Axis.ZP.rotationDegrees(d * 30.0F));
+		} else if (s.limbAmount < 0.15F && s.skill == 0) {
+			// idle breathing: a slow rise and fall of the whole body while it stands (a little faster when enraged)
+			float rate = (s.flags & RCreature.FLAG_ENRAGED) != 0 ? 0.16F : 0.08F;
+			pose.translate(0.0F, (king ? 0.045F : 0.03F) * Mth.sin(s.ageInTicks * rate + s.id), 0.0F);
 		}
 		if (king) {
 			switch (s.kind) {

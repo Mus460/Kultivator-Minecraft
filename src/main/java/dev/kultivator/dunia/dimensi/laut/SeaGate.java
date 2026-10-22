@@ -64,6 +64,11 @@ public final class SeaGate {
 	public static final TagKey<Structure> PALACES = TagKey.create(Registries.STRUCTURE, Kultivator.id("laut/istana"));
 	public static final TagKey<Structure> PENGLAI = TagKey.create(Registries.STRUCTURE, Kultivator.id("laut/penglai"));
 	public static final TagKey<Structure> SHRINES = TagKey.create(Registries.STRUCTURE, Kultivator.id("bawah/kuil"));
+	/** One tag per island kind ({@code laut/pulau_herba} ...), the four structures of the {@code laut/pulau_roh} set. */
+	public static final TagKey<Structure> HERB_ISLANDS = TagKey.create(Registries.STRUCTURE, Kultivator.id("laut/pulau_herba"));
+	public static final TagKey<Structure> HERMIT_ISLANDS = TagKey.create(Registries.STRUCTURE, Kultivator.id("laut/pulau_pertapa"));
+	public static final TagKey<Structure> MARKET_ISLANDS = TagKey.create(Registries.STRUCTURE, Kultivator.id("laut/pulau_pasar"));
+	public static final TagKey<Structure> REEF_ISLANDS = TagKey.create(Registries.STRUCTURE, Kultivator.id("laut/pulau_karang"));
 	public static final double WHIRL_RADIUS = 5.0D;
 
 	private static boolean routed;
@@ -263,6 +268,19 @@ public final class SeaGate {
 	public static void writeState(ServerPlayer player, CompoundTag tag) {
 		tag.putBoolean("sea", DimensiLevels.isLaut(player.level()));
 		tag.putBoolean("breath", DimensiData.carries(player, DimensiItems.MUTIARA_PENGHINDAR_AIR));
+	}
+
+	/** The fisherman's news: the structure tag of {@code what} (an island kind, {@code istana}, {@code penglai}). */
+	public static TagKey<Structure> newsTag(String what) {
+		return switch (what) {
+			case "herba" -> HERB_ISLANDS;
+			case "pertapa" -> HERMIT_ISLANDS;
+			case "pasar" -> MARKET_ISLANDS;
+			case "karang" -> REEF_ISLANDS;
+			case "istana" -> PALACES;
+			case "penglai" -> PENGLAI;
+			default -> ISLANDS;
+		};
 	}
 
 	/** {@code uji laut pusaran cari} / shrine search: the structure tag of {@code what}. */

@@ -5,6 +5,7 @@ import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.DuniaBudget;
 import dev.kultivator.dunia.dimensi.Dimensi;
 import dev.kultivator.dunia.dimensi.DimensiConfig;
+import dev.kultivator.dunia.dimensi.DimensiSky;
 import dev.kultivator.dunia.dimensi.TandaEntity;
 import dev.kultivator.dunia.dimensi.laut.YakshaEntity;
 import net.minecraft.server.level.ServerLevel;
@@ -26,13 +27,16 @@ import java.util.UUID;
  * and removes them when the chunk unloads (nothing of it is saved):
  * <ul>
  * <li>{@code teras}: the arrival ring; {@code gerbang_pulang}: the Jalan Pulang gate (return to the body);
+ * {@code wuchang} (data {@code role} putih|hitam): Bai or Hei Wuchang greeting the arriving souls;
+ * {@code naihe}: the bridge's crossing pass plus the river-glow mark (turned with the piece);
  * {@code buku}: the Book of Life and Death; {@code dizang}: Dizang's shrine; {@code altar}: the incense altar of an
  * overworld Kuil Gerbang Hantu (the soul's way in).</li>
  * <li>{@code meng_po}, {@code pengadilan} (data {@code court}), {@code penjaga} (data {@code role}, {@code court}),
  * {@code yama}: the officials, one each, facing the anchor's (rotated) direction.</li>
  * <li>{@code huangquan}: up to two wandering souls on the Yellow Springs road; {@code naihe}: crossing and escorts.</li>
  * <li>{@code arwah} (data {@code peran}): a quest ghost of Desa Arwah; {@code hantu}: hungry ghosts (at most
- * {@code dimensi.ghostsPerPlayer} around each player); {@code yaksha}: up to two court patrols.</li>
+ * {@code dimensi.ghostsPerPlayer} around each player, half again during the blood eclipse); {@code yaksha}: up to two
+ * court patrols.</li>
  * </ul>
  * Every spawn asks {@link DuniaBudget} first (the server caps of DESIGN 34.4.4).
  */
@@ -80,6 +84,8 @@ public final class BawahAnchors implements AnchorHandler {
 					ghost.setFlag(dev.kultivator.dunia.dimensi.DimensiNpc.FLAG_QUEST, true);
 				}
 			}
+			case "wuchang" -> ensureOne(level, anchor, made, "hitam".equals(anchor.data().getStringOr("role", "putih"))
+					? ArwahEntity.WUCHANG_HITAM : ArwahEntity.WUCHANG_PUTIH, 0, realm);
 			case "huangquan" -> wanderers(level, anchor, made, realm);
 			case "hantu" -> hungryGhosts(level, anchor, made, within, realm);
 			case "yaksha" -> patrol(level, anchor, made, realm);
@@ -117,6 +123,7 @@ public final class BawahAnchors implements AnchorHandler {
 			case "buku" -> TandaEntity.BUKU;
 			case "dizang" -> TandaEntity.DIZANG;
 			case "altar" -> TandaEntity.ALTAR;
+			case "naihe" -> TandaEntity.NAIHE;
 			default -> -1;
 		};
 	}
@@ -134,7 +141,7 @@ public final class BawahAnchors implements AnchorHandler {
 				return;
 			}
 		}
-		TandaEntity mark = Dimensi.mark(level, anchor.position(), kind, anchor.getUUID());
+		TandaEntity mark = Dimensi.mark(level, anchor.position(), anchor.getYRot(), kind, anchor.getUUID());
 		if (mark != null) {
 			made.add(mark);
 		}
@@ -167,13 +174,18 @@ public final class BawahAnchors implements AnchorHandler {
 
 	private static void hungryGhosts(ServerLevel level, DuniaAnchorEntity anchor, List<Entity> made, List<ServerPlayer> within, int realm) {
 		int cap = DimensiConfig.get().ghostsPerPlayer;
+		// the blood eclipse above opens the gates: the hungry dead gather half again as thick
+		boolean eclipse = DimensiSky.eclipse(level.getServer());
+		if (eclipse) {
+			cap = (cap * 3 + 1) / 2;
+		}
 		if (cap <= 0 || within.isEmpty()) {
 			return;
 		}
 		ServerPlayer nearest = within.get(0);
 		int near = level.getEntitiesOfClass(ArwahEntity.class, new AABB(nearest.blockPosition()).inflate(32.0D),
 				npc -> npc.isAlive() && npc.role() == ArwahEntity.HANTU_LAPAR).size();
-		if (near >= cap || made.size() >= 3 || level.getRandom().nextInt(3) != 0) {
+		if (near >= cap || made.size() >= (eclipse ? 4 : 3) || level.getRandom().nextInt(eclipse ? 2 : 3) != 0) {
 			return;
 		}
 		Vec3 at = anchor.position().add((level.getRandom().nextDouble() - 0.5D) * 10.0D, 0.0D, (level.getRandom().nextDouble() - 0.5D) * 10.0D);

@@ -81,6 +81,8 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.guide.GuideClient.init();
 		// Dunia Kultivasi yang Luas (DESIGN 34): the client side of the spine and the six world-content modules.
 		dev.kultivator.client.dunia.DuniaContentClient.init();
+		// Duel Pedang Kultivator (DESIGN 35.9 module U): receivers, input, HUD, sounds, then the visual and animation modules.
+		dev.kultivator.client.duel.DuelClient.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));

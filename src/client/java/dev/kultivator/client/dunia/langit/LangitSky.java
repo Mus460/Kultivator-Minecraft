@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * The sky of a Hujan Meteor Roh night on the client (DESIGN 34.5.8): short-lived streaks simulated as points on the sky
  * sphere, radiating from one point of the sky (the event's seed, like a real shower's radiant), and every 30-50 s one
- * slow green-white fireball. Positions are directions only; {@link LangitRenderer} projects them onto the sky sphere
+ * slow green-white fireball that bursts at the end of its path (a flare, a far crackle and a faint flash). Positions are directions only; {@link LangitRenderer} projects them onto the sky sphere
  * (DESIGN 23.10.3), so they are the same at every render distance. Streaks alive: 6 / 16 / 32 by Effect Quality.
  */
 final class LangitSky {
@@ -61,6 +61,15 @@ final class LangitSky {
 			Streak streak = STREAKS.get(i);
 			if (++streak.age >= streak.life) {
 				STREAKS.remove(i);
+				if (streak.big) {
+					// the fireball bursts at the end of its path: a flare (drawn while it fades), a far crackle, a faint flash
+					float[] end = new float[3];
+					streak.at(streak.speed * streak.life, end);
+					if (end[1] > 0.05F) {
+						LangitAmbience.fireball(end[0], end[1], end[2]);
+						LangitState.bolide(0xD8FFE8, 0.08F * LangitState.skyWeight);
+					}
+				}
 			}
 		}
 		if (LangitState.shown() != SkyKind.METEOR_SHOWER || level.dimensionType().skybox() != DimensionType.Skybox.OVERWORLD) {
@@ -87,13 +96,22 @@ final class LangitSky {
 		}
 	}
 
-	private static void spawn(RandomSource random, boolean big) {
+	/** The shower's radiant (the point the streaks fly from) as a unit direction, from the event seed. */
+	static void radiant(float[] out) {
 		int seed = LangitState.skySeed;
 		float radiantAz = (seed & 0xFFFF) / 65536.0F * Mth.TWO_PI;
 		float radiantEl = 0.9F + ((seed >>> 16) & 0xFF) / 255.0F * 0.35F;
-		float rx = Mth.cos(radiantEl) * Mth.cos(radiantAz);
-		float ry = Mth.sin(radiantEl);
-		float rz = Mth.cos(radiantEl) * Mth.sin(radiantAz);
+		out[0] = Mth.cos(radiantEl) * Mth.cos(radiantAz);
+		out[1] = Mth.sin(radiantEl);
+		out[2] = Mth.cos(radiantEl) * Mth.sin(radiantAz);
+	}
+
+	private static void spawn(RandomSource random, boolean big) {
+		float[] radiant = new float[3];
+		radiant(radiant);
+		float rx = radiant[0];
+		float ry = radiant[1];
+		float rz = radiant[2];
 		float sx = 0.0F;
 		float sy = 0.0F;
 		float sz = 0.0F;

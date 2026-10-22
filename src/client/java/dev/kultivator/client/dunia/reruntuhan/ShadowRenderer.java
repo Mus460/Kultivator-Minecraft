@@ -133,7 +133,13 @@ public class ShadowRenderer extends LivingEntityRenderer<BayanganEntity, ShadowR
 
 	@Override
 	protected Component getNameTag(BayanganEntity entity) {
-		return entity.getDisplayName();
+		return RTitles.name(entity.getDisplayName(), 0xD8C8FF);
+	}
+
+	@Override
+	protected void extractNameTags(BayanganEntity entity, State state, float partialTicks) {
+		super.extractNameTags(entity, state, partialTicks);
+		state.scoreText = state.nameTag == null ? null : RTitles.shadow(entity.tier());
 	}
 
 	@Override

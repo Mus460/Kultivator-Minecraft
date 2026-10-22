@@ -5,7 +5,9 @@ import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.dunia.kapal.KapalClass;
+import dev.kultivator.dunia.api.SpiritWeather;
 import dev.kultivator.dunia.kapal.KapalRohEntity;
+import dev.kultivator.dunia.kapal.KapalWeather;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -18,7 +20,8 @@ import net.minecraft.world.level.levelgen.Heightmap;
 /**
  * The ship HUD (DESIGN 34.5.15): while the player rides a ship, a small lacquer tablet at the bottom left with the class,
  * its state (berlabuh, terbang, autopilot, lompatan awan, bajak langit, rusak), speed, height above the ground, fuel time,
- * the hull bar, the voyage's destination and distance, and for the captain the keys. Also the plain fade of a cloud leap
+ * the hull bar, the spirit weather under the hull when there is one (and its fuel and speed factors), the voyage's
+ * destination and distance, and for the captain the keys. Also the plain fade of a cloud leap
  * when Kamera sinematik is Mati. GUI fills only; hidden by F1.
  */
 final class KapalHud implements HudElement {
@@ -42,8 +45,10 @@ final class KapalHud implements HudElement {
 		Font font = minecraft.font;
 		KapalClass kind = ship.kind();
 		boolean captain = KapalClient.atHelm(ship);
+		SpiritWeather weather = ship.weather();
+		boolean misty = weather != SpiritWeather.CLEAR;
 		int w = 156;
-		int h = captain ? 70 : 52;
+		int h = (captain ? 70 : 52) + (misty ? 9 : 0);
 		int x0 = 6;
 		int y1 = height - 30;
 		int y0 = y1 - h;
@@ -66,6 +71,13 @@ final class KapalHud implements HudElement {
 		int barColor = hull > 0.5F ? 0xFF67C99B : hull > 0.25F ? 0xFFE5821C : 0xFFD5322A;
 		PetaUi.bar(g, x0 + 78, ty + 1, w - 84, 5, hull, barColor, 0x80000000);
 		ty += 9;
+		if (misty) {
+			// module L's spirit weather under the hull and what it does to the formation
+			Component line2 = Component.translatable("kultivator.kapal.hud.weather", Component.translatable("kultivator.kapal.weather.name." + weather.id()),
+					Math.round(KapalWeather.fuel(weather) * 100.0D), Math.round(KapalWeather.speed(weather) * 100.0D));
+			Brush.fit(g, font, line2, tx, ty, w - 12, 0xFFC9B6FF, 0.6F, 0.45F, true);
+			ty += 9;
+		}
 		String dest = ship.destination();
 		if (!dest.isEmpty()) {
 			String[] parts = dest.split(" ", 3);

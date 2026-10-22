@@ -173,6 +173,8 @@ public final class CultivateCommand {
 		dev.kultivator.pusakalangit.PusakaLangit.addCommands(root, uji);
 		// Kitab Panduan: /kultivasi panduan opens the in-game guide; uji panduan reset|info.
 		dev.kultivator.guide.GuideProgress.addCommands(root, uji);
+		// Duel Pedang (DESIGN 35.8.4): /kultivasi duel ... and /kultivasi uji duel ...
+		dev.kultivator.duel.Duel.addCommands(root, uji);
 
 		TestCommands.addCommands(uji);
 		root.then(uji);

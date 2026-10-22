@@ -7,7 +7,16 @@
         "processors": "kultivator:reruntuhan/lapuk",
         "projection": "rigid"
       },
-      "weight": 10
+      "weight": 5
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:reruntuhan/gua_kecil/kamar_bagua_b",
+        "processors": "kultivator:reruntuhan/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 5
     },
     {
       "element": {
@@ -16,7 +25,16 @@
         "processors": "kultivator:reruntuhan/lapuk",
         "projection": "rigid"
       },
-      "weight": 10
+      "weight": 5
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:reruntuhan/gua_kecil/kamar_unsur_b",
+        "processors": "kultivator:reruntuhan/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 5
     },
     {
       "element": {
@@ -25,7 +43,16 @@
         "processors": "kultivator:reruntuhan/lapuk",
         "projection": "rigid"
       },
-      "weight": 10
+      "weight": 5
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:reruntuhan/gua_kecil/kamar_bintang_b",
+        "processors": "kultivator:reruntuhan/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 5
     },
     {
       "element": {
@@ -34,7 +61,16 @@
         "processors": "kultivator:reruntuhan/lapuk",
         "projection": "rigid"
       },
-      "weight": 10
+      "weight": 5
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:reruntuhan/gua_kecil/kamar_ilusi_b",
+        "processors": "kultivator:reruntuhan/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 5
     },
     {
       "element": {
@@ -43,7 +79,16 @@
         "processors": "kultivator:reruntuhan/lapuk",
         "projection": "rigid"
       },
-      "weight": 10
+      "weight": 5
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:reruntuhan/gua_kecil/kamar_cermin_b",
+        "processors": "kultivator:reruntuhan/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 5
     },
     {
       "element": {
@@ -52,7 +97,16 @@
         "processors": "kultivator:reruntuhan/lapuk",
         "projection": "rigid"
       },
-      "weight": 10
+      "weight": 5
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:reruntuhan/gua_kecil/kamar_timbangan_b",
+        "processors": "kultivator:reruntuhan/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 5
     }
   ],
   "fallback": "kultivator:reruntuhan/gua_kecil/akhir"

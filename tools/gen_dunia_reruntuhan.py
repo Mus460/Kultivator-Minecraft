@@ -101,16 +101,62 @@ PAL = {
         "wallb": "minecraft:polished_blackstone_brick_wall", "wall_crack": "minecraft:cracked_polished_blackstone_bricks",
         "floor_inlay": "minecraft:gilded_blackstone", "light_block": "minecraft:shroomlight", "ceiling": "minecraft:blackstone",
         "metal": "minecraft:gold_block", "gold": "minecraft:gold_block", "plinth": "minecraft:stone_bricks",
-        "plinth_alt": "minecraft:mossy_stone_bricks",
+        "plinth_alt": "minecraft:mossy_stone_bricks", "plinth_stair": "minecraft:stone_brick_stairs",
+        "post": "minecraft:crimson_stem", "beam": "minecraft:stripped_crimson_stem", "band": "minecraft:crimson_planks",
+        "railing": "minecraft:stone_brick_wall", "banner": "red", "banner_alt": "black", "lion": "minecraft:polished_andesite",
+        "plant": "minecraft:potted_fern",
+    }),
+    # the badlands prison (DESIGN 34.2.1 biome palette): red sandstone plinth, acacia posts, terracotta bands
+    "penjara_gurun": dict(PALETTES["penjara"], **{
+        "stair": "minecraft:polished_blackstone_brick_stairs", "slab": "minecraft:polished_blackstone_brick_slab",
+        "wallb": "minecraft:polished_blackstone_brick_wall", "wall_crack": "minecraft:cracked_polished_blackstone_bricks",
+        "floor_inlay": "minecraft:gilded_blackstone", "light_block": "minecraft:shroomlight", "ceiling": "minecraft:blackstone",
+        "metal": "minecraft:gold_block", "gold": "minecraft:gold_block", "plinth": "minecraft:cut_red_sandstone",
+        "plinth_alt": "minecraft:smooth_red_sandstone", "plinth_stair": "minecraft:red_sandstone_stairs",
+        "post": "minecraft:stripped_acacia_log", "beam": "minecraft:acacia_log", "band": "minecraft:red_terracotta",
+        "roof": "minecraft:mud_brick_stairs", "roof_slab": "minecraft:mud_brick_slab", "roof_full": "minecraft:mud_bricks",
+        "floor": "minecraft:polished_blackstone", "floor_alt": "minecraft:terracotta",
+        "railing": "minecraft:red_sandstone_wall", "banner": "orange", "banner_alt": "black", "lion": "minecraft:chiseled_red_sandstone",
+        "plant": "minecraft:potted_dead_bush",
     }),
     "menara": dict(PALETTES["menara"], **{
         "stair": "minecraft:quartz_stairs", "slab": "minecraft:smooth_quartz_slab", "wallb": "minecraft:stone_brick_wall",
         "wall_crack": "minecraft:quartz_bricks", "floor_inlay": "minecraft:lapis_block", "light_block": "minecraft:sea_lantern",
         "ceiling": "minecraft:smooth_quartz", "metal": "minecraft:gold_block", "gold": "minecraft:gold_block",
         "beam": "minecraft:stripped_dark_oak_log", "lacquer": "minecraft:red_nether_bricks", "lacquer_stair": "minecraft:red_nether_brick_stairs",
-        "plinth": "minecraft:polished_andesite", "plinth_alt": "minecraft:andesite",
+        "plinth": "minecraft:polished_andesite", "plinth_alt": "minecraft:andesite", "plinth_stair": "minecraft:polished_andesite_stairs",
+        "railing": "minecraft:diorite_wall", "banner": "red", "banner_alt": "blue", "lion": "minecraft:chiseled_quartz_block",
+        "plant": "minecraft:potted_azalea_bush", "court": "minecraft:smooth_stone", "court_alt": "minecraft:polished_diorite",
+        "lamp": "minecraft:lantern",
     }),
 }
+# the tower's two biome looks (DESIGN 34.2.1: one pagoda per biome family, the same nine-storey plan)
+PAL["menara_sakura"] = dict(PAL["menara"], **{
+    "roof": "minecraft:cherry_stairs", "roof_slab": "minecraft:cherry_slab", "roof_full": "minecraft:cherry_planks",
+    "wall": "minecraft:calcite", "wall_alt": "minecraft:smooth_quartz", "floor_inlay": "minecraft:pink_glazed_terracotta",
+    "accent": "minecraft:pink_terracotta", "railing": "minecraft:cherry_fence", "banner": "pink", "banner_alt": "white",
+    "window": "minecraft:cherry_trapdoor", "plant": "minecraft:potted_cherry_sapling", "lamp": "minecraft:lantern",
+    "court": "minecraft:smooth_quartz", "court_alt": "minecraft:quartz_bricks",
+})
+PAL["menara_sabana"] = dict(PAL["menara"], **{
+    "roof": "minecraft:brick_stairs", "roof_slab": "minecraft:brick_slab", "roof_full": "minecraft:bricks",
+    "wall": "minecraft:mud_bricks", "wall_alt": "minecraft:packed_mud", "wall_crack": "minecraft:mud_bricks",
+    "floor": "minecraft:smooth_sandstone", "floor_alt": "minecraft:cut_sandstone", "floor_inlay": "minecraft:orange_glazed_terracotta",
+    "ceiling": "minecraft:smooth_sandstone", "accent": "minecraft:orange_terracotta", "lacquer": "minecraft:red_terracotta",
+    "beam": "minecraft:stripped_acacia_log", "railing": "minecraft:acacia_fence", "banner": "orange", "banner_alt": "yellow",
+    "window": "minecraft:acacia_trapdoor", "plant": "minecraft:potted_dead_bush", "plinth": "minecraft:sandstone",
+    "plinth_alt": "minecraft:chiseled_sandstone", "plinth_stair": "minecraft:sandstone_stairs", "lion": "minecraft:chiseled_sandstone",
+    "court": "minecraft:smooth_sandstone", "court_alt": "minecraft:cut_sandstone", "stair": "minecraft:smooth_sandstone_stairs",
+    "slab": "minecraft:smooth_sandstone_slab", "glow": "minecraft:lantern",
+})
+# Gua: the dressing of every tier (banner colours, the plants of its garden rooms, the lion stone)
+for _t, _d in (("kecil", {"banner": "green", "banner_alt": "white", "plant": "minecraft:potted_azalea_bush", "lion": "minecraft:mossy_stone_bricks",
+                          "railing": "minecraft:stone_brick_wall", "lamp": "minecraft:soul_lantern"}),
+               ("agung", {"banner": "blue", "banner_alt": "white", "plant": "minecraft:potted_fern", "lion": "minecraft:chiseled_tuff",
+                          "railing": "minecraft:tuff_brick_wall", "lamp": "minecraft:soul_lantern"}),
+               ("kuno", {"banner": "red", "banner_alt": "black", "plant": "minecraft:potted_dead_bush", "lion": "minecraft:chiseled_polished_blackstone",
+                         "railing": "minecraft:polished_blackstone_brick_wall", "lamp": "minecraft:soul_lantern"})):
+    PAL[_t].update(_d)
 # Dao theme of each tier's Giok Warisan (technique/source/InheritanceTrials.THEMES)
 THEMES = {"kecil": ["sword", "life", "body"], "agung": ["fire", "ice", "lightning", "sword"], "kuno": ["space", "shadow", "universal"]}
 TIER = {"kecil": 1, "agung": 2, "kuno": 3}
@@ -126,6 +172,9 @@ ROCK = {
                  ("minecraft:brown_terracotta", 10), ("minecraft:light_gray_terracotta", 8), ("minecraft:red_sandstone", 10),
                  ("minecraft:blackstone", 8), ("minecraft:basalt", 8)],
 }
+
+_OPP = {"north": "south", "south": "north", "east": "west", "west": "east"}
+_DIRS = {"north": (0, -1), "south": (0, 1), "east": (1, 0), "west": (-1, 0)}
 
 JSONS = []       # (path, obj)
 PACK_JSONS = []  # (path, obj) inside the toggle pack
@@ -297,6 +346,190 @@ class RPiece(Piece):
             payload["data"] = data
         self.entity(x + 0.5, float(y), z + 0.5, payload)
 
+    # ------------------------------------------------------------------------------------------ dressing (detail pass)
+    # Everything below is plain vanilla blocks placed by worldgen only; the ambient life of a ruin (campfire smoke, the
+    # flicker of candles, falling spore dust) is vanilla's own client animation, so it costs no runtime code.
+
+    def free(self, x, y, z):
+        """True when (x, y, z) is inside and empty or explicit air (dressing never overwrites a built block)."""
+        return self.inside(x, y, z) and self.get(x, y, z) in (None, "minecraft:air")
+
+    def banner(self, x, y, z, facing, color=None):
+        """A wall banner on the block behind it, facing away from that wall (`color` a dye name or a palette role)."""
+        c = color or self.pal.get("banner", "red")
+        if c in self.pal and ":" not in self.pal[c]:
+            c = self.pal[c]
+        if self.free(x, y, z):
+            self.put(x, y, z, "minecraft:%s_wall_banner" % c, {"facing": facing})
+
+    def standing_banner(self, x, y, z, color, rotation):
+        """A free-standing banner; rotation 0 faces south, every step 22.5 degrees clockwise."""
+        if self.free(x, y, z):
+            self.put(x, y, z, "minecraft:%s_banner" % color, {"rotation": str(int(rotation) % 16)})
+
+    def bracket_lantern(self, x, y, z, toward, role=None):
+        """A lantern under a carved bracket: a top-half stair at (x, y, z) whose back leans on the wall at `toward`."""
+        if not self.free(x, y, z) or not self.free(x, y - 1, z):
+            return
+        self.stair(x, y, z, "stair", toward, half="top")
+        self.lantern(x, y, z, chain=0, role=role or ("lamp" if "lamp" in self.pal else "glow"))
+
+    def brazier(self, x, y, z, soul=True, post="wallb"):
+        """An incense brazier: a carved post with a lit campfire on it (vanilla smoke, nothing to tick)."""
+        if post:
+            if not self.free(x, y, z):
+                return
+            self.put(x, y, z, post)
+            y += 1
+        if self.free(x, y, z):
+            self.put(x, y, z, "minecraft:soul_campfire" if soul else "minecraft:campfire",
+                     {"facing": "north", "lit": "true", "signal_fire": "false", "waterlogged": "false"})
+
+    def lion(self, x, y, z, facing, body=None):
+        """A stone guardian lion (shishi) looking `facing`: plinth, crouched body, a stair head and a carved mane."""
+        if not (self.free(x, y, z) and self.free(x, y + 1, z) and self.free(x, y + 2, z)):
+            return
+        self.put(x, y, z, "trim")
+        self.put(x, y + 1, z, body or self.pal.get("lion", self.b("accent")))
+        self.stair(x, y + 2, z, "stair", _OPP[facing])
+        dx, dz = _DIRS[facing]
+        if self.free(x + dx, y + 1, z + dz):
+            self.slab(x + dx, y + 1, z + dz, "slab", "top")
+
+    def toro(self, x, y, z, post="wallb", role=None, cap="slab"):
+        """A stone lantern (toro): a post, the lantern and a little slab roof."""
+        if not all(self.free(x, y + k, z) for k in range(3)):
+            return
+        self.put(x, y, z, post)
+        bid = self.b(role or ("lamp" if "lamp" in self.pal else "glow"))
+        self.put(x, y + 1, z, bid, {"hanging": "false", "waterlogged": "false"} if bid.endswith("lantern") and "sea_" not in bid else None)
+        self.slab(x, y + 2, z, cap)
+
+    def plant(self, x, y, z, kind=None):
+        """A potted plant (the palette's plant or a given potted_* id)."""
+        if self.free(x, y, z):
+            self.put(x, y, z, kind or self.pal.get("plant", "minecraft:potted_fern"))
+
+    def tea_table(self, x, y, z, wood="spruce", cushion="red_carpet"):
+        """A low table (a top-half trapdoor), a teapot (flower pot) and a candle on it, cushions round it."""
+        if not self.free(x, y, z):
+            return
+        self.put(x, y, z, "minecraft:%s_trapdoor" % wood, {"facing": "north", "half": "top", "open": "false", "powered": "false",
+                                                          "waterlogged": "false"})
+        if self.free(x, y + 1, z):
+            if self.rng.random() < 0.5:
+                self.put(x, y + 1, z, "minecraft:flower_pot")
+            else:
+                self.put(x, y + 1, z, "minecraft:decorated_pot", {"facing": "north", "cracked": "false", "waterlogged": "false"})
+        for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            if self.free(x + dx, y, z + dz) and self.rng.random() < 0.75:
+                self.put(x + dx, y, z + dz, "minecraft:" + cushion)
+
+    def lichen(self, x, y, z, face):
+        """Glow lichen growing on the `face` side of the cell (the wall it clings to)."""
+        if self.free(x, y, z):
+            props = {s: "false" for s in ("north", "south", "east", "west", "up", "down")}
+            props[face] = "true"
+            props["waterlogged"] = "false"
+            self.put(x, y, z, "minecraft:glow_lichen", props)
+
+    def bell(self, x, y, z, facing="north", attach="ceiling"):
+        if self.free(x, y, z):
+            self.put(x, y, z, "minecraft:bell", {"attachment": attach, "facing": facing, "powered": "false"})
+
+    def pond(self, x0, z0, x1, z1, y, lily=0.35, pickle=0.0):
+        """A shallow garden pool sunk into the floor at y (water bounded by the floor around it), lily pads on it."""
+        for x in range(x0, x1 + 1):
+            for z in range(z0, z1 + 1):
+                if not self.inside(x, y, z):
+                    continue
+                self.put(x, y, z, "minecraft:water", {"level": "0"})
+                self.put(x, y - 1, z, "minecraft:mud" if self.rng.random() < 0.5 else "minecraft:clay")
+                if self.free(x, y + 1, z) and self.rng.random() < lily:
+                    self.put(x, y + 1, z, "minecraft:lily_pad")
+
+    def mini_roof(self, x0, x1, z, y, role="roof", slab_role="roof_slab", full_role="roof_full", along="x"):
+        """A three-row curled roof along x (or z) centred on row z (or x): two stair slopes, a slab ridge and the four
+        upturned eave corners. Used over gateways, archways and shrines."""
+        if along == "x":
+            for x in range(x0, x1 + 1):
+                self.stairs(x, y, z - 1, role, "south")
+                self.stairs(x, y, z + 1, role, "north")
+                self.put(x, y, z, full_role)
+                self.slab(x, y + 1, z, slab_role)
+            for x in (x0, x1):
+                self.stairs(x, y + 1, z - 1, role, "south", half="top")
+                self.stairs(x, y + 1, z + 1, role, "north", half="top")
+        else:
+            for zz in range(x0, x1 + 1):
+                self.stairs(z - 1, y, zz, role, "east")
+                self.stairs(z + 1, y, zz, role, "west")
+                self.put(z, y, zz, full_role)
+                self.slab(z, y + 1, zz, slab_role)
+            for zz in (x0, x1):
+                self.stairs(z - 1, y + 1, zz, role, "east", half="top")
+                self.stairs(z + 1, y + 1, zz, role, "west", half="top")
+
+    def paifang(self, cx, y, z, half=3, height=6, post="lacquer", beam="beam", along="x"):
+        """A memorial archway (paifang) of two posts `half` blocks either side of cx, a beam with a gold plaque and a
+        curled roof on top; along x (the way through runs along z)."""
+        post = post if post in self.pal or ":" in post else "pillar"
+        beam = beam if beam in self.pal or ":" in beam else "trim"
+        for s in (-half, half):
+            px, pz = (cx + s, z) if along == "x" else (z, cx + s)
+            self.put(px, y - 1, pz, "trim")
+            for yy in range(y, y + height):
+                self.put(px, yy, pz, post, self._axis_y(post))
+        for s in range(-half - 1, half + 2):
+            px, pz = (cx + s, z) if along == "x" else (z, cx + s)
+            self.put(px, y + height, pz, beam, {"axis": along} if self.b(beam).endswith(("_log", "_stem", "_wood", "_hyphae")) else None)
+        mx, mz = (cx, z) if along == "x" else (z, cx)
+        self.put(mx, y + height - 1, mz, "gold")
+        self.mini_roof(cx - half - 1, cx + half + 1, z, y + height + 1, along=along)
+
+    def railing(self, x0, z0, x1, z1, y, role="railing", gap=None):
+        """A carved railing along a straight line (connections are baked by fix_connections); `gap` (a, b) leaves a way
+        through between along-positions a..b."""
+        n = max(abs(x1 - x0), abs(z1 - z0))
+        for s in range(n + 1):
+            x = x0 + (x1 - x0) * s // max(1, n)
+            z = z0 + (z1 - z0) * s // max(1, n)
+            if gap and gap[0] <= s <= gap[1]:
+                continue
+            if self.free(x, y, z):
+                self.put(x, y, z, role if role in self.pal or ":" in role else "wallb")
+
+    def wall_dressing(self, x, y, z, face, kind):
+        """One wall cell's dressing facing `face`: 'banner', 'lantern', 'lichen', 'candle'."""
+        if kind == "banner":
+            self.banner(x, y, z, face, self.pal.get("banner", "red") if self.rng.random() < 0.7 else self.pal.get("banner_alt", "white"))
+        elif kind == "lantern":
+            self.bracket_lantern(x, y, z, _OPP[face])
+        elif kind == "lichen":
+            self.lichen(x, y, z, _OPP[face])
+
+    def moss_floor(self, x0, y, z0, x1, z1, chance, keep=None):
+        """Moss carpets on free floor cells (skipping `keep(x, z)` cells)."""
+        for x in range(x0, x1 + 1):
+            for z in range(z0, z1 + 1):
+                if keep and keep(x, z):
+                    continue
+                if self.free(x, y, z) and self.get(x, y - 1, z) not in (None, "minecraft:air", "minecraft:water") and self.rng.random() < chance:
+                    self.put(x, y, z, "minecraft:moss_carpet")
+
+    def spore(self, x, y, z):
+        """A spore blossom under the ceiling at y + 1 (its falling spores are vanilla ambient)."""
+        if self.free(x, y, z) and not self.free(x, y + 1, z):
+            self.put(x, y, z, "minecraft:spore_blossom")
+
+    def bones(self, x, y, z, facing="east"):
+        """Remains of an old challenger: a bone block, a skull and a scatter of bone meal-white slabs."""
+        if self.free(x, y, z):
+            self.put(x, y, z, "minecraft:bone_block", {"axis": "x" if facing in ("east", "west") else "z"})
+        dx, dz = _DIRS[facing]
+        if self.free(x + dx, y, z + dz):
+            self.put(x + dx, y, z + dz, "minecraft:skeleton_skull", {"rotation": str(self.rng.randint(0, 15))})
+
 
 # --------------------------------------------------------------------------------------------- connection shapes
 
@@ -393,15 +626,20 @@ def loot_id(name):
 
 # ================================================================================================= Gua: the gate
 
-def gua_gate(tier):
-    """The collapsed cliff gate (start piece). Front (the approach trench) south, the way on north.
+def gua_gate(tier, variant=0):
+    """The cliff gate (start piece). Front (the approach trench) south, the way on north.
 
     Template 19 x 15 x 24: y0 foundation, floor y1 (= surface - 6 through start_height -6 + WORLD_SURFACE_WG), the
     antechamber z 1..11, the carved facade at z 12 with the sealed doorway (Gerbang Segel anchor), the approach trench
-    z 13..23 climbing to the surface (y 7) at the south edge, cliff rock around everything up to y 14."""
+    z 13..23 climbing to the surface (y 7) at the south edge, cliff rock around everything up to y 14.
+
+    variant 0 "Gerbang Runtuh": the collapsed gate (broken retaining walls, rubble, a fallen pillar, vines, skull niches).
+    variant 1 "Gerbang Paviliun": the gate a later sect kept: a lacquered porch with a curled gable roof over the sealed
+    door, a paifang archway at the trench mouth, paired stone lanterns, prayer banners, an ancestral altar with spirit
+    tablets inside and guardian lions at the inner door. Both keep every anchor and connector in the same place."""
     pal = PAL[tier]
     rock = "mountain" if tier == "agung" else "badlands" if tier == "kuno" else "hill"
-    p = RPiece(19, 15, 24, seed=55100 + TIER[tier], palette=pal)
+    p = RPiece(19, 15, 24, seed=55100 + TIER[tier] + 10 * variant, palette=pal)
     W, D = 19, 24
     # cliff mass first (everything not built below stays natural rock)
     p.rock_fill(0, 0, 0, W - 1, 14, D - 1, rock, only_empty=False)
@@ -428,7 +666,7 @@ def gua_gate(tier):
         p.stair(x, 9, 11, "stair", "north", half="top")
     # mossy and cracked patches on the walls
     for (x, y, z), cell in list(p.cells.items()):
-        if cell[0][0] == p.b("wall") and p.rng.random() < 0.22:
+        if cell[0][0] == p.b("wall") and p.rng.random() < (0.22 if variant == 0 else 0.1):
             p.set(x, y, z, p.b(p.rng.choice(["wall_alt", "wall_crack"])))
     # inner columns
     for x in (4, 14):
@@ -443,18 +681,48 @@ def gua_gate(tier):
     p.candles(7, 2, 2)
     p.candles(11, 2, 2)
     p.anchor_at(9, 2, 3, "reruntuhan/prasasti", yaw=FACE_YAW["south"], tier=TIER[tier], protect=6)
-    # wall niches with candles and skulls, shelves of old books
-    for z in (5, 7):
-        p.niche(1, 3, z, "east", "candle")
-        p.niche(17, 3, z, "west", "skull" if tier != "kecil" else "candle")
-    p.niche(1, 4, 9, "east", "book")
-    p.niche(17, 4, 9, "west", "book")
-    p.hang(9, 10, 6, length=2)
-    p.hang(5, 8, 6, length=1)
-    p.hang(13, 8, 6, length=1)
-    p.cobweb_corners(2, 7, 1, 16, 11, chance=0.7)
-    p.roots(3, 8, 2, 15, 10, chance=0.05)
-    p.rubble(14, 2, 2, size=1, kind=rock)
+    if variant == 0:
+        # wall niches with candles and skulls, shelves of old books
+        for z in (5, 7):
+            p.niche(1, 3, z, "east", "candle")
+            p.niche(17, 3, z, "west", "skull" if tier != "kecil" else "candle")
+        p.niche(1, 4, 9, "east", "book")
+        p.niche(17, 4, 9, "west", "book")
+        p.hang(9, 10, 6, length=2)
+        p.hang(5, 8, 6, length=1)
+        p.hang(13, 8, 6, length=1)
+        # tattered banners of the founder's sect between the columns
+        for z in (6, 10):
+            p.banner(2, 6, z, "east", "banner_alt" if z == 10 else None)
+            p.banner(16, 6, z, "west", "banner_alt" if z == 10 else None)
+        p.cobweb_corners(2, 7, 1, 16, 11, chance=0.7)
+        p.roots(3, 8, 2, 15, 10, chance=0.05)
+        p.rubble(14, 2, 2, size=1, kind=rock)
+        p.bones(3, 2, 10, "east")
+    else:
+        # the ancestral altar: a long table of spirit tablets along both side walls, mourning banners above
+        for x, face in ((2, "east"), (16, "west")):
+            for z in range(4, 9):
+                p.slab(x, 2, z, "slab", "top")
+                if z % 2 == 0:
+                    p.put(x, 3, z, p.b("wallb"))
+                    p.slab(x, 4, z, "slab", "bottom")
+                else:
+                    p.candles(x, 3, z, n=p.rng.randint(1, 3))
+            p.banner(x, 6, 6, face, "banner_alt")
+            p.banner(x, 6, 8, face, "banner")
+        p.bracket_lantern(2, 7, 10, "west")
+        p.bracket_lantern(16, 7, 10, "east")
+        # censers before the altar and guardian lions at the inner door
+        p.brazier(6, 2, 10, soul=True)
+        p.brazier(12, 2, 10, soul=True)
+        p.lion(6, 2, 1, "south")
+        p.lion(12, 2, 1, "south")
+        p.hang(9, 10, 6, length=2)
+        p.tea_table(13, 2, 6, wood="dark_oak", cushion="black_carpet" if tier == "kuno" else "red_carpet")
+        p.cobweb_corners(2, 7, 1, 16, 11, chance=0.3)
+        p.lichen(3, 7, 2, "north")
+        p.lichen(15, 6, 11, "south")
     # the way on: open doorway in the north wall, the connector in its floor
     p.air(8, 2, 0, 10, 5, 0)
     p.stair(8, 6, 0, "stair", "east", half="top")
@@ -466,39 +734,40 @@ def gua_gate(tier):
         for y in range(1, 14):
             p.put(x, y, 12, "wall" if (x + y) % 5 else "wall_alt")
     p.air(8, 2, 12, 10, 5, 12)       # the doorway: the Gerbang Segel entity fills it (an entity, never a block)
-    # great frame: two banded pillars, a lintel and a plaque
-    for x in (6, 12):
-        for y in range(2, 9):
-            p.put(x, y, 12, "pillar")
-            p.put(x, y, 13, "pillar" if y in (2, 8) else "trim")
-    for x in range(6, 13):
-        p.put(x, 7, 13, "trim")
-        p.put(x, 8, 13, "pillar")
-    p.fill(7, 9, 13, 11, 10, 13, "accent")
-    p.put(9, 10, 14, "gold")
-    for x in range(5, 14):
-        p.stair(x, 11, 13, "roof", "south")
-    p.stair(4, 11, 13, "roof", "south", shape="outer_left")
-    p.stair(14, 11, 13, "roof", "south", shape="outer_right")
-    p.stair(4, 12, 13, "roof", "south", half="top")
-    p.stair(14, 12, 13, "roof", "south", half="top")
-    p.fill(5, 12, 12, 13, 12, 12, "roof_full")
-    p.slab(9, 13, 12, "roof_slab")
-    # guardian lion-dogs (shishi) on both sides of the doorway
-    for x, face in ((4, "east"), (14, "west")):
-        p.put(x, 2, 14, "trim")
-        p.put(x, 3, 14, "wall")
-        p.stair(x, 4, 14, "stair", "south")
-        p.put(x, 4, 13, "wall")
-        p.put(x, 5, 13, "pillar")
-        p.stair(x, 5, 14, "stair", "south", half="top")
-        p.put(x, 6, 13, "minecraft:skeleton_skull" if tier == "kuno" else p.b("accent"),
-              {"rotation": "0"} if tier == "kuno" else None)
-    # soul fire braziers before the door
-    p.put(7, 1, 15, "minecraft:soul_soil")
-    p.put(11, 1, 15, "minecraft:soul_soil")
-    p.put(7, 2, 15, "minecraft:soul_campfire", {"facing": "south", "lit": "true", "signal_fire": "false", "waterlogged": "false"})
-    p.put(11, 2, 15, "minecraft:soul_campfire", {"facing": "south", "lit": "true", "signal_fire": "false", "waterlogged": "false"})
+    if variant == 0:
+        # great frame: two banded pillars, a lintel and a plaque
+        for x in (6, 12):
+            for y in range(2, 9):
+                p.put(x, y, 12, "pillar")
+                p.put(x, y, 13, "pillar" if y in (2, 8) else "trim")
+        for x in range(6, 13):
+            p.put(x, 7, 13, "trim")
+            p.put(x, 8, 13, "pillar")
+        p.fill(7, 9, 13, 11, 10, 13, "accent")
+        p.put(9, 10, 14, "gold")
+        for x in range(5, 14):
+            p.stair(x, 11, 13, "roof", "south")
+        p.stair(4, 11, 13, "roof", "south", shape="outer_left")
+        p.stair(14, 11, 13, "roof", "south", shape="outer_right")
+        p.stair(4, 12, 13, "roof", "south", half="top")
+        p.stair(14, 12, 13, "roof", "south", half="top")
+        p.fill(5, 12, 12, 13, 12, 12, "roof_full")
+        p.slab(9, 13, 12, "roof_slab")
+        # guardian lion-dogs (shishi) on both sides of the doorway
+        for x, face in ((4, "east"), (14, "west")):
+            p.put(x, 2, 14, "trim")
+            p.put(x, 3, 14, "wall")
+            p.stair(x, 4, 14, "stair", "south")
+            p.put(x, 4, 13, "wall")
+            p.put(x, 5, 13, "pillar")
+            p.stair(x, 5, 14, "stair", "south", half="top")
+            p.put(x, 6, 13, "minecraft:skeleton_skull" if tier == "kuno" else p.b("accent"),
+                  {"rotation": "0"} if tier == "kuno" else None)
+        # soul fire braziers before the door
+        p.put(7, 1, 15, "minecraft:soul_soil")
+        p.put(11, 1, 15, "minecraft:soul_soil")
+        p.put(7, 2, 15, "minecraft:soul_campfire", {"facing": "south", "lit": "true", "signal_fire": "false", "waterlogged": "false"})
+        p.put(11, 2, 15, "minecraft:soul_campfire", {"facing": "south", "lit": "true", "signal_fire": "false", "waterlogged": "false"})
     p.anchor_at(9, 2, 12, "reruntuhan/gerbang", yaw=FACE_YAW["south"], tier=TIER[tier], protect=12, w=3, h=4)
     p.anchor_at(9, 3, 7, "reruntuhan/situs", yaw=0.0, situs="reruntuhan/" + gua_id(tier), tier=TIER[tier], protect=0)
     # ---------------------------------------------------------------- the approach trench (z 13..23)
@@ -510,7 +779,10 @@ def gua_gate(tier):
             for y in range(1, floor_y):
                 p.rock(x, y, z, rock)
             if z >= 14:
-                p.put(x, floor_y, z, "path" if p.rng.random() < 0.7 else "path_alt")
+                if variant == 0:
+                    p.put(x, floor_y, z, "path" if p.rng.random() < 0.7 else "path_alt")
+                else:
+                    p.put(x, floor_y, z, "floor_inlay" if x == 9 else "path" if x in (8, 10) else "floor")
             for y in range(floor_y + 1, 15):
                 p.put(x, y, z, "minecraft:air")
         # stepped stairs where the floor rises
@@ -518,27 +790,74 @@ def gua_gate(tier):
         if nxt > floor_y and z + 1 < D:
             for x in range(x0 + 1, x1):
                 p.stair(x, floor_y + 1, z, "stair", "south")
-        # broken retaining walls on both sides
+        # retaining walls on both sides: broken (variant 0) or dressed stone with a railing on top (variant 1)
         for x in (x0 - 1, x1 + 1):
-            for y in range(floor_y, min(15, floor_y + 4)):
-                if p.rng.random() < 0.8:
-                    p.put(x, y, z, "wall" if p.rng.random() < 0.6 else "wall_alt")
+            if variant == 0:
+                for y in range(floor_y, min(15, floor_y + 4)):
+                    if p.rng.random() < 0.8:
+                        p.put(x, y, z, "wall" if p.rng.random() < 0.6 else "wall_alt")
+            else:
+                for y in range(floor_y, min(15, floor_y + 3)):
+                    p.put(x, y, z, "wall" if (y + z) % 4 else "pillar")
+                if floor_y + 3 < 15:
+                    p.put(x, floor_y + 3, z, "wallb")
     p.fill(5, 1, 13, 13, 1, 14, "floor")
     p.air(5, 2, 13, 13, 14, 14)
-    p.rubble(6, 2, 16, size=1, kind=rock)
-    p.rubble(12, 3, 18, size=1, kind=rock)
-    # a fallen pillar across the trench edge
-    for x in range(7, 11):
-        p.put(x, 4, 20, "pillar")
-    p.standing_lantern(5, 2, 13, post="wallb", role="glow", height=1)
-    p.standing_lantern(13, 2, 13, post="wallb", role="glow", height=1)
-    # moss and vines over the cliff face
-    for x in range(1, 18):
-        for y in range(9, 14):
-            if p.get(x, y, 13) in (None, "minecraft:air") and p.get(x, y, 12) not in (None, "minecraft:air") and p.rng.random() < 0.2:
-                p.put(x, y, 13, "minecraft:vine", {"north": "true", "east": "false", "south": "false", "west": "false", "up": "false"})
-    p.weather(0.06)
-    return finish(p, gua_id(tier) + "/gerbang")
+    if variant == 0:
+        p.rubble(6, 2, 16, size=1, kind=rock)
+        p.rubble(12, 3, 18, size=1, kind=rock)
+        # a fallen pillar across the trench edge
+        for x in range(7, 11):
+            p.put(x, 4, 20, "pillar")
+        p.standing_lantern(5, 2, 13, post="wallb", role="glow", height=1)
+        p.standing_lantern(13, 2, 13, post="wallb", role="glow", height=1)
+        # moss and vines over the cliff face
+        for x in range(1, 18):
+            for y in range(9, 14):
+                if p.get(x, y, 13) in (None, "minecraft:air") and p.get(x, y, 12) not in (None, "minecraft:air") and p.rng.random() < 0.2:
+                    p.put(x, y, 13, "minecraft:vine", {"north": "true", "east": "false", "south": "false", "west": "false", "up": "false"})
+        p.weather(0.06)
+    else:
+        # the porch: two lacquered posts, beams and a curled gable roof leaning on the cliff over the sealed door
+        post = "minecraft:stripped_dark_oak_log" if tier == "kecil" else "minecraft:crimson_stem" if tier == "kuno" else "minecraft:stripped_spruce_log"
+        for x in (6, 12):
+            for y in range(2, 9):
+                p.put(x, y, 15, post, {"axis": "y"})
+            p.put(x, 1, 15, "trim")
+        for x in range(5, 14):
+            p.put(x, 9, 15, "minecraft:stripped_dark_oak_log", {"axis": "x"})
+            p.put(x, 9, 13, "minecraft:stripped_dark_oak_log", {"axis": "x"})
+        for x in (6, 12):
+            p.put(x, 9, 14, "minecraft:stripped_dark_oak_log", {"axis": "z"})
+        p.roof_gable(6, 10, 13, 12, 15, role="roof", slab_role="roof_slab", full_role="roof_full", along="x", overhang=1, eave_curl=True)
+        # the door frame: lacquer jambs, a lintel and the gilded name plaque
+        for y in range(2, 7):
+            p.put(7, y, 13, "pillar")
+            p.put(11, y, 13, "pillar")
+        for x in range(7, 12):
+            p.put(x, 7, 13, "trim")
+        p.put(9, 8, 13, "gold")
+        p.banner(7, 6, 14, "south")
+        p.banner(11, 6, 14, "south")
+        for x in (8, 10):
+            p.lantern(x, 9, 14, chain=1)
+        p.lion(5, 2, 14, "south")
+        p.lion(13, 2, 14, "south")
+        # paired stone lanterns up the trench, prayer banners on its walls, the paifang at its mouth
+        for z in (16, 19):
+            fy = 1 + max(0, min(5, (z - 14) * 5 // 8))
+            p.toro(6, fy + 1, z, post="wallb")
+            p.toro(12, fy + 1, z, post="wallb")
+        for z in (17, 20):
+            fy = 1 + max(0, min(5, (z - 14) * 5 // 8))
+            p.banner(5, fy + 3, z, "east", "banner" if z == 17 else "banner_alt")
+            p.banner(13, fy + 3, z, "west", "banner_alt" if z == 17 else "banner")
+        fy = 1 + max(0, min(5, (22 - 14) * 5 // 8))
+        p.paifang(9, fy + 1, 22, half=4, height=5, post=post, beam="minecraft:stripped_dark_oak_log")
+        p.plant(6, fy + 1, 23)
+        p.plant(12, fy + 1, 23)
+        p.weather(0.03)
+    return finish(p, gua_id(tier) + ("/gerbang" if variant == 0 else "/gerbang_b"))
 
 
 def gua_id(tier):
@@ -810,27 +1129,160 @@ def gua_room(tier, puzzle, variant=0):
             p.stair(CX + ox, 2, CZ + oz, "stair", face)
         data["pans"] = nbt.IntArray([-4, 0, 4, 0])
         data["weight"] = 4 + TIER[tier] + rng.randint(0, 2)
-    # decor common to every room: chest in a corner for tier 2-3, rubble, candles
+    # decor common to every room: chest in a corner for tier 2-3, rubble, candles; then the room's look
+    theme = "batu" if variant == 0 else THEME_B[puzzle]
     if tier != "kecil" and puzzle in ("bagua", "bintang", "timbangan"):
         p.chest(14, 2, 14, "north", loot_id(tier + "_kamar"))
+    room_dress(p, tier, puzzle, side, theme)
     if puzzle != "ilusi":
-        p.rubble(13, 2, 3, size=1, kind=rock)
+        if theme != "taman":
+            p.rubble(13, 2, 3, size=1, kind=rock)
         for x, z in ((3, 13), (13, 13)):
-            p.candles(x, 2, z)
+            if p.free(x, 2, z):
+                p.candles(x, 2, z)
     data["seed"] = seed
+    data["look"] = THEMES_LOOK.index(theme)
     p.anchor_at(CX, CY, CZ, "reruntuhan/teka", yaw=0.0, **data)
-    p.weather(0.05)
-    return finish(p, "%s/kamar_%s" % (gua_id(tier), puzzle))
+    p.weather(0.05 if theme != "pustaka" else 0.03)
+    return finish(p, "%s/kamar_%s%s" % (gua_id(tier), puzzle, "" if variant == 0 else "_b"))
+
+
+# the second look of every puzzle room (variant b): a library, a shrine or a garden grotto
+THEME_B = {"bagua": "pustaka", "unsur": "kuil", "bintang": "taman", "ilusi": "taman", "cermin": "kuil", "timbangan": "pustaka"}
+THEMES_LOOK = ["batu", "pustaka", "kuil", "taman"]
+# inner face of each wall of a room box (x 0..16, z 0..16): (fixed axis, fixed value, facing into the room)
+ROOM_WALLS = {"west": ("x", 1, "east"), "east": ("x", 15, "west"), "north": ("z", 1, "south"), "south": ("z", 15, "north")}
+
+
+def room_dress(p, tier, puzzle, side, theme):
+    """Dresses a puzzle room after its puzzle layout is built, never inside the puzzle's floor (radius 6.8 round the
+    centre; the whole interior below y 6 for the maze), never on the exit wall, never over a built block.
+
+    batu: the plain ruin (banners of the founder's sect, bracket lanterns, cobwebs);
+    pustaka: a library: the side walls become shelves of chiseled bookshelves, lecterns in the corners, a lantern over
+             the formation, scroll banners;
+    kuil: a shrine: an altar of candles and pots on a free side wall, soul braziers in the corners, red and black
+          banners, incense smoke;
+    taman: a garden grotto: moss over the stone, a lily pool in a corner, potted azaleas, glow lichen on the walls,
+           froglights set into the coffers and spore blossoms dusting the air."""
+    maze = puzzle == "ilusi"
+    mirror = ("east" if side == "west" else "west") if puzzle == "cermin" else None
+    free_walls = [w for w in ("west", "north", "east", "south") if w != side and w != mirror]
+    side_walls = [w for w in free_walls if w != "south"]
+
+    def inner(wall, along, y):
+        axis, fixed, _ = ROOM_WALLS[wall]
+        return (fixed, y, along) if axis == "x" else (along, y, fixed)
+
+    def outer(wall, along, y):
+        axis, fixed, _ = ROOM_WALLS[wall]
+        return ((0 if fixed == 1 else 16), y, along) if axis == "x" else (along, y, (0 if fixed == 1 else 16))
+
+    def outside_puzzle(x, z):
+        return math.hypot(x - CX, z - CZ) > 6.8
+
+    def floor_cell(x, z):
+        return p.get(x, 1, z) == p.b("floor")
+
+    def near_exit(x, z):
+        if side == "north":
+            return z <= 2 and 5 <= x <= 11
+        if side == "east":
+            return x >= 14 and 5 <= z <= 11
+        return x <= 2 and 5 <= z <= 11
+
+    # banners at head height on every free wall (the maze's outer walls end at y 5)
+    for wall in free_walls:
+        face = ROOM_WALLS[wall][2]
+        for along in (6, 10):
+            x, y, z = inner(wall, along, 6)
+            if theme == "kuil":
+                p.banner(x, y, z, face, "banner" if along == 6 else "banner_alt")
+            elif theme == "pustaka":
+                p.banner(x, y, z, face, "white" if along == 6 else "banner_alt")
+            elif theme == "batu" and p.rng.random() < 0.75:
+                p.banner(x, y, z, face, "banner" if p.rng.random() < 0.6 else "banner_alt")
+        if theme in ("batu", "kuil") and wall != "south":
+            x, y, z = inner(wall, 8, 7)
+            p.bracket_lantern(x, y, z, _OPP[face])
+    if theme == "pustaka" and not maze:
+        # the side walls become shelves between their pillars (the wall stays closed: shelves are full blocks)
+        for wall in side_walls:
+            face = ROOM_WALLS[wall][2]
+            for along in range(1, 16):
+                if along % 4 == 0:
+                    continue
+                for y in (2, 3, 4):
+                    x, yy, z = outer(wall, along, y)
+                    if p.get(x, yy, z) in (p.b("wall"), p.b("wall_alt"), p.b("wall_crack")):
+                        if p.rng.random() < 0.55:
+                            p.put(x, yy, z, "minecraft:chiseled_bookshelf", {"facing": face})
+                        else:
+                            p.put(x, yy, z, "minecraft:bookshelf")
+        for x, z, face in ((1, 1, "south"), (15, 1, "south"), (1, 15, "north"), (15, 15, "north")):
+            if p.free(x, 2, z) and outside_puzzle(x, z) and not near_exit(x, z):
+                p.put(x, 2, z, "minecraft:lectern", {"facing": face, "has_book": "false", "powered": "false"})
+        if p.free(CX, 5, CZ) and p.free(CX, 6, CZ):
+            p.hang(CX, 9, CZ, length=3)
+    if theme == "kuil":
+        # an altar on the first free side wall: a stone table, candles, pots and a skull of the last guardian
+        wall = side_walls[0] if side_walls else None
+        if wall and not maze:
+            face = ROOM_WALLS[wall][2]
+            for along in (7, 8, 9):
+                x, y, z = inner(wall, along, 2)
+                if p.free(x, y, z):
+                    p.slab(x, y, z, "slab", "top")
+                    deco = {7: "candle", 8: "pot", 9: "candle"}[along]
+                    if deco == "candle":
+                        p.candles(x, 3, z, n=p.rng.randint(2, 4))
+                    else:
+                        p.put(x, 3, z, "minecraft:decorated_pot", {"facing": face, "cracked": "false", "waterlogged": "false"})
+            x, y, z = inner(wall, 8, 5)
+            p.banner(x, y, z, face, "banner")
+        if not maze:
+            for x, z in ((2, 2), (14, 2), (2, 14), (14, 14)):
+                if outside_puzzle(x, z) and not near_exit(x, z):
+                    p.brazier(x, 2, z, soul=True)
+    if theme == "taman":
+        keep = (lambda x, z: not floor_cell(x, z)) if maze else (lambda x, z: not floor_cell(x, z) or not outside_puzzle(x, z))
+        p.moss_floor(1, 2, 1, 15, 15, 0.22 if maze else 0.4, keep=keep)
+        if not maze:
+            p.pond(13, 1, 14, 2, 1)
+            for x, z in ((1, 1), (15, 1), (1, 15), (15, 15), (1, 8), (15, 8)):
+                if outside_puzzle(x, z) and not near_exit(x, z):
+                    p.plant(x, 2, z, p.rng.choice(["minecraft:potted_azalea_bush", "minecraft:potted_flowering_azalea_bush",
+                                                   p.pal.get("plant", "minecraft:potted_fern")]))
+        for cx, cz in ((2, 2), (14, 14), (2, 14), (14, 2), (6, 10), (10, 6)):
+            if p.get(cx, 9, cz) == p.b("ceiling"):
+                p.put(cx, 9, cz, "minecraft:verdant_froglight" if tier == "kecil" else "minecraft:ochre_froglight" if tier == "agung"
+                      else "minecraft:pearlescent_froglight", {"axis": "y"})
+        p.spore(10, 8, 10)
+        p.spore(6, 8, 6)
+        for _ in range(26):
+            wall = p.rng.choice(["west", "east", "north", "south"])
+            along = p.rng.randint(1, 15)
+            y = p.rng.randint(6 if maze else 3, 7)
+            x, yy, z = inner(wall, along, y)
+            p.lichen(x, yy, z, _OPP[ROOM_WALLS[wall][2]])
+        p.roots(2, 7, 2, 14, 14, chance=0.05)
+    if theme == "batu":
+        p.cobweb_corners(1, 6, 1, 15, 15, chance=0.35)
 
 
 # ================================================================================================= Gua: the final piece
 
-def gua_final(tier):
+def gua_final(tier, variant=0):
     """The guardian arena and the Aula Warisan (the teka pool's fallback). 23 x 14 x 40: entry z 35..39, arena
-    x 1..21 z 15..34, the sealed hall door at z 15, hall x 4..18 z 1..14 with the seated ancestor (bone) on a dais."""
+    x 1..21 z 15..34, the sealed hall door at z 15, hall x 4..18 z 1..14 with the seated ancestor (bone) on a dais.
+
+    variant 0 "Aula Dupa": the dais under the coffered dome, bookcases, banners of the founder's Dao and incense.
+    variant 1 "Aula Taman": the ancestor sits in a little pavilion with a curled hip roof and wind bells, the hall floor
+    is a garden of moss, lily pools and potted azaleas round a stepping-stone path; the arena keeps hanging soul
+    lanterns on chains over a cracked ring. Both keep every anchor in the same place."""
     pal = PAL[tier]
     rock = "mountain" if tier == "agung" else "badlands" if tier == "kuno" else "hill"
-    p = RPiece(23, 14, 40, seed=55300 + TIER[tier], palette=pal)
+    p = RPiece(23, 14, 40, seed=55300 + TIER[tier] + 10 * variant, palette=pal)
     p.rock_fill(0, 0, 0, 22, 13, 39, rock, only_empty=False)
     # entry corridor
     p.fill(8, 0, 35, 14, 0, 39, "floor_alt")
@@ -853,6 +1305,13 @@ def gua_final(tier):
     p.ring(acx, 1, acz, 5, "floor_inlay")
     p.disc(acx, 1, acz, 2, "floor_inlay")
     p.put(acx, 1, acz, "accent")
+    if variant == 1:
+        # a cracked fighting ring between the inlays
+        for x in range(acx - 7, acx + 8):
+            for z in range(acz - 7, acz + 8):
+                d = math.hypot(x - acx, z - acz)
+                if 5.6 < d < 7.4 and p.get(x, 1, z) == p.b("floor") and p.rng.random() < 0.55:
+                    p.put(x, 1, z, pal.get("floor_alt2", pal["floor_alt"]))
     for a in range(8):
         ang = a * math.pi / 4 + math.pi / 8
         x = round(acx + 8.5 * math.cos(ang))
@@ -870,6 +1329,24 @@ def gua_final(tier):
             p.put(x, 3, z, "wall_alt")
             p.put(x, 4, z, "minecraft:skeleton_skull" if tier == "kuno" else p.b("accent"),
                   {"rotation": "4" if x == 2 else "12"} if tier == "kuno" else None)
+    # war banners of the guardian's creator high on the walls, braziers at the middle of each side
+    for z in (21, 29):
+        p.banner(1, 8, z, "east", "banner")
+        p.banner(21, 8, z, "west", "banner")
+    for x in (6, 16):
+        p.banner(x, 8, 34, "north", "banner_alt")
+    p.brazier(2, 2, 25, soul=True)
+    p.brazier(20, 2, 25, soul=True)
+    if variant == 1:
+        # soul lanterns hanging on long chains between the columns (the guardian fights under them)
+        for a in range(4):
+            ang = a * math.pi / 2 + math.pi / 4
+            x = round(acx + 6.5 * math.cos(ang))
+            z = round(acz + 6.5 * math.sin(ang))
+            if p.free(x, 9, z):
+                p.lantern(x, 12, z, chain=4, role="glow")
+        p.bones(5, 2, 31, "east")
+        p.bones(17, 2, 19, "west")
     p.rubble(4, 2, 28, size=2, kind=rock)
     p.rubble(18, 2, 21, size=1, kind=rock)
     p.cobweb_corners(1, 10, 16, 21, 34, chance=0.8)
@@ -883,6 +1360,7 @@ def gua_final(tier):
     for x in range(9, 14):
         p.put(x, 7, 15, "trim")
     p.fill(10, 8, 15, 12, 8, 15, "accent")
+    p.put(11, 9, 16, "gold")
     p.anchor_at(acx, 2, acz, "reruntuhan/penjaga", yaw=0.0, tier=TIER[tier], protect=16,
                 door=nbt.IntArray([0, 0, 15 - acz]), dw=3, dh=5, arena=10)
     # ---------------------------------------------------------------- the Aula Warisan
@@ -899,12 +1377,22 @@ def gua_final(tier):
     p.fill(8, 11, 6, 14, 11, 10, "minecraft:air")
     p.fill(8, 12, 6, 14, 12, 10, "light_block" if tier != "kecil" else "ceiling")
     p.put(11, 12, 8, "light_block")
-    # the carpet runner to the dais
-    for z in range(5, 15):
-        p.put(11, 1, z, "floor_inlay")
-        p.put(10, 2, z, "carpet") if z > 6 else None
-        p.put(12, 2, z, "carpet") if z > 6 else None
-        p.put(11, 2, z, "carpet") if z > 6 else None
+    if variant == 0:
+        # the carpet runner to the dais
+        for z in range(5, 15):
+            p.put(11, 1, z, "floor_inlay")
+            if z > 6:
+                for x in (10, 11, 12):
+                    p.put(x, 2, z, "carpet")
+    else:
+        # a stepping-stone path through a moss garden with two lily pools
+        for z in range(5, 15):
+            p.put(11, 1, z, "floor_inlay" if z % 2 else "floor")
+        p.pond(6, 11, 8, 13, 1)
+        p.pond(14, 11, 16, 13, 1)
+        for x, z in ((6, 7), (16, 7), (9, 13), (13, 13), (6, 9), (16, 9)):
+            p.plant(x, 2, z, p.rng.choice(["minecraft:potted_azalea_bush", "minecraft:potted_flowering_azalea_bush", "minecraft:potted_bamboo"]))
+        p.moss_floor(5, 2, 6, 17, 14, 0.45, keep=lambda x, z: abs(x - 11) <= 1 or p.get(x, 1, z) != p.b("floor"))
     # dais (two steps) and the seated ancestor of bone facing the door (south)
     p.fill(7, 2, 2, 15, 2, 5, "trim")
     p.fill(8, 3, 2, 14, 3, 4, "floor_inlay")
@@ -928,6 +1416,31 @@ def gua_final(tier):
     p.candles(13, 4, 4, n=3)
     p.put(8, 4, 2, "minecraft:decorated_pot", {"facing": "south", "cracked": "false", "waterlogged": "false"})
     p.put(14, 4, 2, "minecraft:decorated_pot", {"facing": "south", "cracked": "true", "waterlogged": "false"})
+    if variant == 1:
+        # the pavilion over the dais: four posts, beams, a curled hip roof that merges into the ceiling, wind bells
+        post = "minecraft:crimson_stem" if tier == "kuno" else "minecraft:stripped_dark_oak_log" if tier == "kecil" else "minecraft:stripped_spruce_log"
+        for x in (7, 15):
+            for z in (2, 5):
+                for y in range(3, 9):
+                    p.put(x, y, z, post, {"axis": "y"})
+        for x in range(7, 16):
+            p.put(x, 9, 2, "minecraft:stripped_dark_oak_log", {"axis": "x"})
+            p.put(x, 9, 5, "minecraft:stripped_dark_oak_log", {"axis": "x"})
+        for z in (3, 4):
+            p.put(7, 9, z, "minecraft:stripped_dark_oak_log", {"axis": "z"})
+            p.put(15, 9, z, "minecraft:stripped_dark_oak_log", {"axis": "z"})
+        p.roof_hip(7, 10, 2, 15, 5, role="roof", slab_role="roof_slab", full_role="roof_full", overhang=1, eave_curl=True)
+        p.bell(6, 9, 6, "south")
+        p.bell(16, 9, 6, "south")
+        p.banner(7, 7, 6, "south", "banner")
+        p.banner(15, 7, 6, "south", "banner")
+    else:
+        # incense before the dais and the Dao banners of the ancestor on the side walls
+        p.brazier(6, 2, 7, soul=True)
+        p.brazier(16, 2, 7, soul=True)
+        for z in (6, 10):
+            p.banner(4, 7, z, "east", "banner")
+            p.banner(18, 7, z, "west", "banner")
     # side alcoves: bookcases, treasure chests, lantern shrines
     for x, face in ((4, "east"), (18, "west")):
         for z in (4, 8, 12):
@@ -938,21 +1451,30 @@ def gua_final(tier):
     p.hang(16, 11, 4, length=2)
     p.hang(6, 11, 12, length=2)
     p.hang(16, 11, 12, length=2)
+    p.lichen(4, 8, 14, "south")
+    p.lichen(18, 9, 13, "east")
     theme = THEMES[tier][0]
     p.anchor_at(11, 2, 8, "reruntuhan/warisan", yaw=0.0, tier=TIER[tier], protect=12, theme=theme,
                 seat=nbt.IntArray([0, 2, -5]))
     p.weather(0.05)
-    return finish(p, gua_id(tier) + "/akhir")
+    return finish(p, gua_id(tier) + ("/akhir" if variant == 0 else "/akhir_b"))
 
 
 # ================================================================================================= Penjara Iblis Kuno
 
-def prison_shrine():
+# the two prison looks: the mountain prison and the badlands prison (same plan, anchors and connectors)
+PRISON_FAMS = {"": "penjara", "_gurun": "penjara_gurun"}
+
+
+def prison_shrine(fam=""):
     """Kuil Segel (start piece, projected to the surface with start_height -12): a stone plinth 29 x 29 with five banded
     seal pillars in a pentagon round a sealed well, a hip-roofed pavilion over the well and a spiral stair going down to
-    the shaft connector at the bottom. Floor (template y 13) = the surface."""
-    pal = PAL["penjara"]
-    p = RPiece(29, 34, 29, seed=62001, palette=pal)
+    the shaft connector at the bottom. Floor (template y 13) = the surface.
+
+    Detail pass: a paifang of the sealing sect over the south approach with guardian lions, incense braziers between the
+    pillars, talisman banners and wind bells on the pavilion, the plinth stairs of the biome's stone."""
+    pal = PAL[PRISON_FAMS[fam]]
+    p = RPiece(29, 34, 29, seed=62001 + (50 if fam else 0), palette=pal)
     C = 14
     FY = 13
     # the plinth: a solid stone skirt from y 0 up to the floor, stepped at the edge
@@ -965,7 +1487,7 @@ def prison_shrine():
                     continue
                 p.put(x, y, z, "plinth" if p.rng.random() < 0.8 else "plinth_alt")
             if d == 13:
-                p.stair(x, FY - 1, z, "minecraft:stone_brick_stairs",
+                p.stair(x, FY - 1, z, "plinth_stair",
                         "south" if z == 1 else "north" if z == 27 else "east" if x == 1 else "west",
                         shape="straight")
     # platform floor with a pentagram inlay
@@ -1018,19 +1540,19 @@ def prison_shrine():
     for yy in range(0, FY + 6):
         p.put(C, yy, C, "minecraft:iron_chain", {"axis": "y", "waterlogged": "false"})
     p.jigsaw_down(C + 1, 0, C, name="kultivator:penjara/turun", target="kultivator:penjara/naik",
-                  pool="kultivator:penjara/sumur", final_state="minecraft:air")
+                  pool="kultivator:penjara/sumur" + fam, final_state="minecraft:air")
     # the pavilion over the well: four lacquer posts and a two-tier hip roof with curled eaves
     for x, z in ((C - 4, C - 4), (C + 4, C - 4), (C - 4, C + 4), (C + 4, C + 4)):
         for yy in range(FY + 1, FY + 7):
-            p.put(x, yy, z, "minecraft:crimson_stem", {"axis": "y"})
+            p.put(x, yy, z, "post", {"axis": "y"})
     for x in range(C - 4, C + 5):
-        p.put(x, FY + 7, C - 4, "minecraft:stripped_crimson_stem", {"axis": "x"})
-        p.put(x, FY + 7, C + 4, "minecraft:stripped_crimson_stem", {"axis": "x"})
+        p.put(x, FY + 7, C - 4, "beam", {"axis": "x"})
+        p.put(x, FY + 7, C + 4, "beam", {"axis": "x"})
     for z in range(C - 4, C + 5):
-        p.put(C - 4, FY + 7, z, "minecraft:stripped_crimson_stem", {"axis": "z"})
-        p.put(C + 4, FY + 7, z, "minecraft:stripped_crimson_stem", {"axis": "z"})
+        p.put(C - 4, FY + 7, z, "beam", {"axis": "z"})
+        p.put(C + 4, FY + 7, z, "beam", {"axis": "z"})
     top = p.roof_hip(C - 4, FY + 8, C - 4, C + 4, C + 4, role="roof", slab_role="roof_slab", overhang=2, tiers=2,
-                     tier_gap=2, tier_band=2, band_role="minecraft:crimson_planks")
+                     tier_gap=2, tier_band=2, band_role="band")
     p.put(C, min(33, top), C, "gold")
     for x, z in ((C - 3, C - 3), (C + 3, C - 3), (C - 3, C + 3), (C + 3, C + 3)):
         p.lantern(x, FY + 7, z, chain=1)
@@ -1041,6 +1563,34 @@ def prison_shrine():
     p.fill(12, FY + 1, 3, 16, FY + 1, 3, "trim")
     p.fill(13, FY + 2, 3, 15, FY + 4, 3, "accent")
     p.slab(14, FY + 5, 3, "roof_slab")
+    # ---- detail pass: talisman banners on the pavilion posts (black and white strips of the sealing sect), wind bells
+    for x, z in ((C - 4, C - 4), (C + 4, C - 4), (C - 4, C + 4), (C + 4, C + 4)):
+        p.banner(x, FY + 5, z + (1 if z > C else -1), "south" if z > C else "north", "banner_alt")
+        p.banner(x + (1 if x > C else -1), FY + 5, z, "east" if x > C else "west", "white")
+    for x, z in ((C - 5, C - 5), (C + 5, C - 5), (C - 5, C + 5), (C + 5, C + 5)):
+        if p.get(x, FY + 8, z) not in (None, "minecraft:air"):
+            p.bell(x, FY + 7, z, "north")
+    # incense braziers between the seal pillars (the south gap stays the approach)
+    for i in range(5):
+        ang = -math.pi / 2 + (i + 0.5) * 2 * math.pi / 5
+        x = round(C + 10.5 * math.cos(ang))
+        z = round(C + 10.5 * math.sin(ang))
+        if z < C + 8:
+            p.brazier(x, FY + 1, z, soul=True)
+    # the paifang of the sealing sect over the south approach, guardian lions and paired stone lanterns before it
+    p.paifang(C, FY + 1, 25, half=4, height=6, post="post", beam="beam")
+    p.lion(C - 3, FY + 1, 26, "south")
+    p.lion(C + 3, FY + 1, 26, "south")
+    for x in (C - 6, C + 6):
+        p.toro(x, FY + 1, 23, post="wallb", role="glow")
+    # potted plants of the biome by the tablet, a drift of torn seal paper on the floor (white carpet scraps)
+    for x in (11, 17):
+        p.plant(x, FY + 1, 4)
+    for _ in range(7):
+        x = p.rng.randint(5, 23)
+        z = p.rng.randint(5, 23)
+        if math.hypot(x - C, z - C) > 4.5 and p.free(x, FY + 1, z) and p.get(x, FY, z) not in (None, "minecraft:air"):
+            p.put(x, FY + 1, z, "minecraft:white_carpet")
     p.anchor_at(C, FY + 1, 4, "penjara/situs", yaw=0.0, situs="penjara/penjara", tier=6, protect=0)
     p.anchor_at(C, FY + 1, C, "penjara/kuil", yaw=0.0, protect=16,
                 pillars=nbt.IntArray([c for x, z in pillars for c in (x - C, 2, z - C)]))
@@ -1052,14 +1602,14 @@ def prison_shrine():
                     p.put(x, yy, z, "minecraft:air")
     p.weather(0.07, pairs={"minecraft:stone_bricks": ("minecraft:mossy_stone_bricks", "minecraft:cracked_stone_bricks"),
                            "minecraft:polished_blackstone_bricks": ("minecraft:cracked_polished_blackstone_bricks",)})
-    return finish(p, "kuil")
+    return finish(p, "kuil" + fam)
 
 
-def prison_shaft():
+def prison_shaft(fam=""):
     """Sumur Penjara: a 40 block spiral stair shaft (11 x 40 x 11) with chains, soul lanterns and talisman niches."""
-    pal = PAL["penjara"]
+    pal = PAL[PRISON_FAMS[fam]]
     H = 40
-    p = RPiece(11, H, 11, seed=62002, palette=pal)
+    p = RPiece(11, H, 11, seed=62002 + (50 if fam else 0), palette=pal)
     C = 5
     for y in range(H):
         for x in range(11):
@@ -1090,16 +1640,27 @@ def prison_shaft():
     p.jigsaw_up(C + 1, H - 1, C, name="kultivator:penjara/naik", target="kultivator:penjara/turun", pool="minecraft:empty",
                 final_state="minecraft:air")
     p.jigsaw_down(C + 1, 0, C, name="kultivator:penjara/turun", target="kultivator:penjara/naik",
-                  pool="kultivator:penjara/aula", final_state="minecraft:air")
-    return finish(p, "sumur")
+                  pool="kultivator:penjara/aula" + fam, final_state="minecraft:air")
+    # detail pass: talisman strips on the shaft wall every 6 blocks and cobwebs in the cold stone
+    for y in range(7, H - 2, 6):
+        for dx, dz, face in ((3, 2, "west"), (-3, -2, "east"), (2, -3, "south"), (-2, 3, "north")):
+            x, z = C + dx, C + dz
+            ox, oz = {"west": (1, 0), "east": (-1, 0), "south": (0, -1), "north": (0, 1)}[face]
+            if p.free(x, y, z) and p.get(x + ox, y, z + oz) not in (None, "minecraft:air"):
+                p.banner(x, y, z, face, "white" if (y // 6) % 2 else "banner_alt")
+    for y in range(3, H - 3, 5):
+        dx, dz = p.rng.choice(((3, 3), (-3, 3), (3, -3), (-3, -3)))
+        if p.free(C + dx, y, C + dz):
+            p.put(C + dx, y, C + dz, "minecraft:cobweb")
+    return finish(p, "sumur" + fam)
 
 
-def prison_hall():
+def prison_hall(fam=""):
     """Aula Rantai: the ring hall 47 x 18 x 47 round the sealed pit (radius 7) with the Jantung Segel at its centre,
     five re-lightable seal pillars on the ring, four barred cells of lesser demons, hanging chains converging on the
     pit and veins of crying obsidian. The shaft lands on the north walkway."""
-    pal = PAL["penjara"]
-    p = RPiece(47, 18, 47, seed=62003, palette=pal)
+    pal = PAL[PRISON_FAMS[fam]]
+    p = RPiece(47, 18, 47, seed=62003 + (50 if fam else 0), palette=pal)
     C = 23
     R_OUT = 21
     # shell
@@ -1212,8 +1773,39 @@ def prison_hall():
                 landing=nbt.IntArray([1, 1, -16]))
     p.chest(C + 17, 2, C - 6, "west", loot_id("penjara"))
     p.chest(C - 17, 2, C + 6, "east", loot_id("penjara"))
+    # ---- detail pass
+    # talisman banners (black / white) on the ring wall between the hanging lanterns
+    for k in range(12):
+        ang = k * math.pi / 6 + math.pi / 12
+        x = round(C + 20.2 * math.cos(ang))
+        z = round(C + 20.2 * math.sin(ang))
+        if abs(math.cos(ang)) >= abs(math.sin(ang)):
+            face = "west" if math.cos(ang) > 0 else "east"
+            back = (x + (1 if face == "west" else -1), z)
+        else:
+            face = "north" if math.sin(ang) > 0 else "south"
+            back = (x, z + (1 if face == "north" else -1))
+        if p.get(back[0], 10, back[1]) not in (None, "minecraft:air"):
+            p.banner(x, 10, z, face, "banner_alt" if k % 2 else "white")
+            p.banner(x, 8, z, face, "banner")
+    # candles of the sealers at the foot of every seal pillar, bones of failed sealers in the cells
+    for (dx, _, dz) in hall_pillars:
+        x, z = C + dx, C + dz
+        for ox, oz in ((1, 1), (-1, -1), (1, -1), (-1, 1)):
+            if p.free(x + ox, 2, z + oz):
+                p.candles(x + ox, 2, z + oz, n=p.rng.randint(1, 3))
+    for (dx, _, dz) in hall_cells:
+        x, z = C + dx, C + dz
+        p.bones(x - 1, 2, z - 1, "south")
+        for ox, oz in ((-1, 1), (1, -1)):
+            if p.free(x + ox, 5, z + oz):
+                p.put(x + ox, 5, z + oz, "minecraft:cobweb")
+    # a sealers' camp on the walkway landing: a tea table and an old lectern of seal records
+    p.tea_table(C - 4, 2, C - 15, wood="dark_oak", cushion="black_carpet")
+    if p.free(C + 4, 2, C - 17):
+        p.put(C + 4, 2, C - 17, "minecraft:lectern", {"facing": "south", "has_book": "false", "powered": "false"})
     p.weather(0.06)
-    return finish(p, "aula")
+    return finish(p, "aula" + fam)
 
 
 # ================================================================================================= Menara Seratus Lantai
@@ -1221,19 +1813,53 @@ def prison_hall():
 PAGODA = [30, 26, 24, 22, 20, 18, 16, 14, 12]     # body width of the nine tiers (eaves stick out 2 more each side)
 
 
-def pagoda_tier(i):
+# the three looks of the pagoda (detail pass): the white jade tower of the plains, the cherry tower of the cherry groves
+# and the mud-brick tower of the savanna. Same nine-storey plan, anchors and connectors; each has its own structure.
+TOWER_FAMS = {"menara_seratus": "menara", "menara_sakura": "menara_sakura", "menara_sabana": "menara_sabana"}
+# small trees of the forecourt per look: (log, leaves)
+TOWER_TREES = {"menara_seratus": ("minecraft:oak_log", "minecraft:flowering_azalea_leaves"),
+               "menara_sakura": ("minecraft:cherry_log", "minecraft:cherry_leaves"),
+               "menara_sabana": ("minecraft:acacia_log", "minecraft:acacia_leaves")}
+COURT = 12   # depth of the forecourt in front of the ground hall (south)
+
+
+def small_tree(p, x, y, z, log, leaves, height=3):
+    """A small ornamental tree: a trunk and a rounded crown of persistent leaves (worldgen only, never decays)."""
+    for k in range(height):
+        if p.free(x, y + k, z):
+            p.put(x, y + k, z, log, {"axis": "y"})
+    for dx in range(-2, 3):
+        for dz in range(-2, 3):
+            for dy in range(0, 3):
+                if abs(dx) + abs(dz) + dy > 3 or (abs(dx) == 2 and abs(dz) == 2):
+                    continue
+                if dy == 2 and (abs(dx) > 1 or abs(dz) > 1):
+                    continue
+                cx, cy, cz = x + dx, y + height - 1 + dy, z + dz
+                if p.free(cx, cy, cz):
+                    p.put(cx, cy, cz, leaves, {"distance": "1", "persistent": "true", "waterlogged": "false"})
+
+
+def pagoda_tier(i, fam="menara_seratus"):
     """Tier i (0 = the ground hall) of the nine-storey pagoda. Width PAGODA[i] + eaves; each sits on the one below
-    through a vertical connector at its centre (joint aligned, so every tier keeps the same facing)."""
-    pal = PAL["menara"]
+    through a vertical connector at its centre (joint aligned, so every tier keeps the same facing).
+
+    Detail pass: the ground hall gets a forecourt (COURT deep, south) with a paifang, a censer, lily pools behind carved
+    railings, paired stone lanterns, small trees of the biome, standing banners and guardian lions; inside, banners,
+    lecterns and tea tables. The upper storeys get a carved railing round the balcony, lanterns and wind bells hanging
+    from the curled eave corners and banners under the eaves."""
+    pal = PAL[TOWER_FAMS[fam]]
     body = PAGODA[i]
     w = body + 4
     h = 18 if i == 0 else 22 if i == 8 else 11
-    p = RPiece(min(48, w), h, min(48, w), seed=65000 + i, palette=pal)
+    depth = w + COURT if i == 0 else w
+    p = RPiece(min(48, w), h, min(48, depth), seed=65000 + i + 1000 * list(TOWER_FAMS).index(fam), palette=pal)
     c = w // 2
     b0, b1 = 2, w - 3
+    pool = lambda n: "kultivator:menara/%s/tingkat_%d" % (fam, n)  # noqa: E731
     if i == 0:
         # ground hall: plinth, terrace, the hall with the gate and the ranking stele, first eaves
-        p.foundation(0, 0, w - 1, w - 1, depth=2, role="plinth")
+        p.foundation(0, 0, w - 1, depth - 1, depth=2, role="plinth")
         p.fill(0, 2, 0, w - 1, 2, w - 1, "plinth_alt")
         for x in range(w):
             for z in range(w):
@@ -1241,7 +1867,6 @@ def pagoda_tier(i):
                     p.put(x, 2, z, "floor" if (x + z) % 2 else "floor_alt")
         for x in range(1, w - 1):
             p.stair(x, 2, 0, "stair", "south")
-            p.stair(x, 2, w - 1, "stair", "north")
         p.walls(b0, 3, b0, b1, 10, b1, "wall", pillar="lacquer", windows=4, window_role="window", door=("south", 5))
         for x in range(b0 + 1, b1):
             for z in range(b0 + 1, b1):
@@ -1273,20 +1898,75 @@ def pagoda_tier(i):
         for z in range(b0 + 3, b1 - 2, 4):
             p.hang(b0 + 3, 11, z, length=2)
             p.hang(b1 - 3, 11, z, length=2)
-        for x, z in ((3, 3), (w - 4, 3), (3, w - 4), (w - 4, w - 4)):
+        for x, z in ((3, 3), (w - 4, 3)):
             p.standing_lantern(x, 3, z, post="fence", role="glow", height=2)
+        # ---- the hall's dressing: banners on the side walls, braziers before the gate, a reading corner and tea
+        for z in (c - 4, c + 4):
+            p.banner(b0 + 1, 7, z, "east", "banner")
+            p.banner(b1 - 1, 7, z, "west", "banner_alt")
+        p.brazier(c - 5, 3, b0 + 3, soul=False)
+        p.brazier(c + 5, 3, b0 + 3, soul=False)
+        for z in (c - 2, c + 2):
+            p.put(b1 - 2, 3, z, "minecraft:lectern", {"facing": "west", "has_book": "false", "powered": "false"})
+        p.tea_table(c + 6, 3, c + 5, wood="dark_oak" if fam != "menara_sakura" else "cherry",
+                    cushion="red_carpet" if fam != "menara_sabana" else "orange_carpet")
+        for x, z in ((b0 + 1, b1 - 1), (b1 - 1, b1 - 1), (b0 + 1, b0 + 2), (b1 - 1, b0 + 2)):
+            p.plant(x, 3, z)
         top = p.eaves(b0, 12, b0, b1, b1, layers=4, overhang=2)
         # the roof field inside is solid so the next tier stands on it
         p.fill(b0 + 2, 12, b0 + 2, b1 - 2, h - 2, b1 - 2, "roof_full")
         p.fill(b0 + 3, h - 1, b0 + 3, b1 - 3, h - 1, b1 - 3, "roof_full")
         p.jigsaw_up(c, h - 1, c, name="kultivator:menara/naik", target="kultivator:menara/turun",
-                    pool="kultivator:menara/menara_seratus/tingkat_2", final_state=p.b("roof_full"), joint="aligned")
+                    pool=pool(2), final_state=p.b("roof_full"), joint="aligned")
+        # lanterns on chains and wind bells under the four curled eave corners
+        for x, z in ((b0 - 2, b0 - 2), (b1 + 2, b0 - 2), (b0 - 2, b1 + 2), (b1 + 2, b1 + 2)):
+            p.lantern(x, 12, z, chain=1, role="lamp")
+        # ---- the forecourt (z w .. depth-1): paving, the processional way, pools, lanterns, trees, paifang
         for x in range(w):
-            for z in range(w):
+            for z in range(w, depth):
+                edge = x in (0, w - 1) or z == depth - 1
+                p.put(x, 2, z, "plinth_alt" if edge else ("court" if (x + z) % 3 else "court_alt"))
+        for x in range(1, w - 1):
+            p.put(x, 2, w - 1, "court")       # the old south step row becomes paving
+            p.stair(x, 2, depth - 1, "plinth_stair", "north")
+        for z in range(w - 1, depth - 1):
+            for x in (c - 1, c, c + 1):
+                p.put(x, 2, z, "floor_inlay" if x == c else "path")
+        for z in range(1, w - 1):
+            for x in (0, w - 1):
+                p.put(x, 2, z, "plinth_alt")
+        log, leaves = TOWER_TREES[fam]
+        # two lily pools behind carved railings with a gap toward the way
+        for x0, x1 in ((4, 10), (w - 11, w - 5)):
+            p.pond(x0, w + 2, x1, w + 6, 2, lily=0.3)
+            p.railing(x0 - 1, w + 1, x1 + 1, w + 1, 3)
+            p.railing(x0 - 1, w + 7, x1 + 1, w + 7, 3)
+            outer = x0 - 1 if x0 < c else x1 + 1
+            inner = x1 + 1 if x0 < c else x0 - 1
+            p.railing(outer, w + 1, outer, w + 7, 3)
+            p.railing(inner, w + 1, inner, w + 7, 3, gap=(2, 4))
+        # paired stone lanterns along the way, a censer in the middle of it, lions at the hall door
+        for z in (w + 2, w + 6):
+            p.toro(c - 3, 3, z, post="wallb", role="lamp")
+            p.toro(c + 3, 3, z, post="wallb", role="lamp")
+        p.brazier(c, 3, w + 4, soul=False)
+        p.lion(c - 4, 3, w, "south")
+        p.lion(c + 4, 3, w, "south")
+        p.paifang(c, 3, depth - 3, half=4, height=7, post="lacquer", beam="beam")
+        for x in (2, w - 3):
+            small_tree(p, x, 3, w + 2, log, leaves, height=4)
+            small_tree(p, x, 3, depth - 3, log, leaves, height=3)
+        for x, rot in ((c - 6, 8), (c + 6, 8)):
+            p.standing_banner(x, 3, depth - 2, pal.get("banner", "red"), rot)
+        for x in (1, w - 2):
+            for z in range(w + 8, depth - 1, 2):
+                p.plant(x, 3, z)
+        for x in range(w):
+            for z in range(depth):
                 for y in range(3, h):
                     if p.get(x, y, z) is None:
                         p.put(x, y, z, "minecraft:air")
-        return finish(p, "menara_seratus/tingkat_1")
+        return finish(p, fam + "/tingkat_1")
     # tiers 2..9: a storey of wall with windows, a gold band, eaves; the crown has a spire of gold and pearls
     p.jigsaw_down(c, 0, c, name="kultivator:menara/turun", target="kultivator:menara/naik", pool="minecraft:empty",
                   final_state=p.b("roof_full"), joint="aligned")
@@ -1298,21 +1978,37 @@ def pagoda_tier(i):
             if x in (b0, b1) or z in (b0, b1):
                 p.put(x, storey + 1, z, "gold")
     p.fill(b0 + 1, storey + 1, b0 + 1, b1 - 1, storey + 1, b1 - 1, "ceiling")
-    # a balcony ring with a quartz railing
+    # the balcony ring with a carved railing (posts at the corners and every third block)
     for x in range(b0 - 1, b1 + 2):
         for z in (b0 - 1, b1 + 1):
             p.put(x, 0, z, "floor_alt")
-            p.put(x, 1, z, "minecraft:quartz_slab", {"type": "bottom", "waterlogged": "false"}) if (x - b0) % 3 == 0 else None
     for z in range(b0 - 1, b1 + 2):
         for x in (b0 - 1, b1 + 1):
-            p.put(x, 0, z, p.b("floor_alt"))
+            p.put(x, 0, z, "floor_alt")
+    p.railing(b0 - 1, b0 - 1, b1 + 1, b0 - 1, 1)
+    p.railing(b0 - 1, b1 + 1, b1 + 1, b1 + 1, 1)
+    p.railing(b0 - 1, b0 - 1, b0 - 1, b1 + 1, 1)
+    p.railing(b1 + 1, b0 - 1, b1 + 1, b1 + 1, 1)
     p.hang(c, storey + 1, c, length=1)
+    # banners under the eaves in the middle of every face (only where a solid wall stands behind)
+    for x, z, face in ((c, b0 - 1, "north"), (c, b1 + 1, "south"), (b0 - 1, c, "west"), (b1 + 1, c, "east")):
+        bx, bz = {"north": (x, z + 1), "south": (x, z - 1), "west": (x + 1, z), "east": (x - 1, z)}[face]
+        for dx in (-2, 2) if face in ("north", "south") else (0,):
+            for dz in (-2, 2) if face in ("west", "east") else (0,):
+                if p.get(bx + dx, storey, bz + dz) == p.b("wall") and p.free(x + dx, storey, z + dz):
+                    p.banner(x + dx, storey, z + dz, face, "banner" if i % 2 else "banner_alt")
     if i < 8:
         p.eaves(b0, storey + 2, b0, b1, b1, layers=3, overhang=2)
         p.fill(b0 + 2, storey + 2, b0 + 2, b1 - 2, h - 1, b1 - 2, "roof_full")
         p.jigsaw_up(c, h - 1, c, name="kultivator:menara/naik", target="kultivator:menara/turun",
-                    pool="kultivator:menara/menara_seratus/tingkat_%d" % (i + 2), final_state=p.b("roof_full"), joint="aligned")
-        name = "menara_seratus/tingkat_%d" % (i + 1)
+                    pool=pool(i + 2), final_state=p.b("roof_full"), joint="aligned")
+        # under each curled eave corner: a lantern on a chain (odd storeys) or a wind bell (even storeys)
+        for x, z in ((b0 - 2, b0 - 2), (b1 + 2, b0 - 2), (b0 - 2, b1 + 2), (b1 + 2, b1 + 2)):
+            if i % 2:
+                p.lantern(x, storey + 2, z, chain=1, role="lamp")
+            else:
+                p.bell(x, storey + 1, z, "north")
+        name = fam + "/tingkat_%d" % (i + 1)
     else:
         top = p.roof_hip(b0, storey + 2, b0, b1, b1, role="roof", slab_role="roof_slab", overhang=2, tiers=2, tier_gap=2, tier_band=1)
         y = min(h - 8, top)
@@ -1323,7 +2019,10 @@ def pagoda_tier(i):
             if k % 2 == 0:
                 for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)):
                     p.put(c + dx, yy, c + dz, "minecraft:end_rod", {"facing": {(1, 0): "east", (-1, 0): "west", (0, 1): "south", (0, -1): "north"}[(dx, dz)]})
-        name = "menara_seratus/tingkat_9"
+        for x, z in ((b0 - 2, b0 - 2), (b1 + 2, b0 - 2), (b0 - 2, b1 + 2), (b1 + 2, b1 + 2)):
+            if p.get(x, storey + 2, z) not in (None, "minecraft:air"):
+                p.lantern(x, storey + 2, z, chain=2, role="lamp")
+        name = fam + "/tingkat_9"
     for x in range(p.size[0]):
         for z in range(p.size[2]):
             for yy in range(1, h):
@@ -1403,6 +2102,30 @@ def tower_lobby():
         x2 = round(C + 9 * math.cos(ang))
         z2 = round(C + 9 * math.sin(ang))
         p.lantern(x2, 21, z2, chain=4)
+    # detail pass: banners of the ten bands between the columns, stone lanterns and plants between the gates, a censer
+    # before the stele
+    dyes = ["white", "light_gray", "lime", "green", "cyan", "light_blue", "blue", "purple", "magenta", "red"]
+    for k in range(16):
+        ang = (k + 0.5) * math.pi / 8
+        x = round(C + 20.6 * math.cos(ang))
+        z = round(C + 20.6 * math.sin(ang))
+        if abs(math.cos(ang)) >= abs(math.sin(ang)):
+            face = "west" if math.cos(ang) > 0 else "east"
+            back = (x + (1 if face == "west" else -1), z)
+        else:
+            face = "north" if math.sin(ang) > 0 else "south"
+            back = (x, z + (1 if face == "north" else -1))
+        if p.get(back[0], 9, back[1]) not in (None, "minecraft:air"):
+            p.banner(x, 9, z, face, dyes[k % 10])
+    for b in range(11):
+        ang = -math.pi / 2 + (b + 1.0) * 2 * math.pi / 11
+        x = round(C + 16 * math.cos(ang))
+        z = round(C + 16 * math.sin(ang))
+        if b % 2 == 0:
+            p.toro(x, 1, z, post="wallb", role="lamp")
+        else:
+            p.plant(x, 1, z)
+    p.brazier(C, 1, C - 7, soul=False)
     return finish(p, "lobi")
 
 
@@ -1460,12 +2183,17 @@ def structures():
     all_gua = []
     for tier in ("kecil", "agung", "kuno"):
         gid = gua_id(tier)
+        # every piece has two looks (detail pass): the plain ruin and its b variant (pavilion gate, library / shrine /
+        # garden rooms, garden hall); a puzzle keeps the same total weight so the puzzle mix is unchanged
         wjson("template_pool", "reruntuhan", gid + "/gerbang",
-              {"elements": [{"element": single(loc("reruntuhan", gid + "/gerbang"), proc), "weight": 1}], "fallback": "minecraft:empty"})
-        rooms = [{"element": single(loc("reruntuhan", "%s/kamar_%s" % (gid, pz)), proc), "weight": 10} for pz in PUZZLES]
+              {"elements": [{"element": single(loc("reruntuhan", gid + suffix), proc), "weight": 1} for suffix in ("/gerbang", "/gerbang_b")],
+               "fallback": "minecraft:empty"})
+        rooms = [{"element": single(loc("reruntuhan", "%s/kamar_%s%s" % (gid, pz, b)), proc), "weight": 5}
+                 for pz in PUZZLES for b in ("", "_b")]
         wjson("template_pool", "reruntuhan", gid + "/teka", {"elements": rooms, "fallback": "kultivator:reruntuhan/%s/akhir" % gid})
         wjson("template_pool", "reruntuhan", gid + "/akhir",
-              {"elements": [{"element": single(loc("reruntuhan", gid + "/akhir"), proc), "weight": 1}], "fallback": "minecraft:empty"})
+              {"elements": [{"element": single(loc("reruntuhan", gid + suffix), proc), "weight": 1} for suffix in ("/akhir", "/akhir_b")],
+               "fallback": "minecraft:empty"})
         biome = biomes_tag("reruntuhan", gid, gua_biomes[tier])
         s = {"type": "minecraft:jigsaw", "biomes": biome, "max_distance_from_center": dist[tier], "size": sizes[tier],
              "spawn_overrides": {}, "start_pool": "kultivator:reruntuhan/%s/gerbang" % gid,
@@ -1486,39 +2214,49 @@ def structures():
         all_gua.append("kultivator:reruntuhan/" + gid)
     j(os.path.join(DATA, "tags", "worldgen", "structure", "reruntuhan.json"), {"replace": False, "values": all_gua})
     # --------------------------------------------------------------- Penjara Iblis Kuno
-    wjson("template_pool", "penjara", "kuil", {"elements": [{"element": single(loc("penjara", "kuil"), "kultivator:penjara/lapuk"), "weight": 1}],
-                                               "fallback": "minecraft:empty"})
-    wjson("template_pool", "penjara", "sumur", {"elements": [{"element": single(loc("penjara", "sumur"), "kultivator:penjara/lapuk"), "weight": 1}],
-                                                "fallback": "minecraft:empty"})
-    wjson("template_pool", "penjara", "aula", {"elements": [{"element": single(loc("penjara", "aula"), "kultivator:penjara/lapuk"), "weight": 1}],
-                                               "fallback": "minecraft:empty"})
-    biome = biomes_tag("penjara", "penjara_iblis", ["minecraft:jagged_peaks", "minecraft:stony_peaks", "minecraft:frozen_peaks",
-                                                    "minecraft:windswept_hills", "minecraft:badlands", "minecraft:eroded_badlands",
-                                                    "minecraft:wooded_badlands"])
-    wjson("structure", "penjara", "penjara_iblis", {
-        "type": "minecraft:jigsaw", "biomes": biome, "max_distance_from_center": {"horizontal": 64, "vertical": 160}, "size": 2,
-        "spawn_overrides": {}, "start_height": {"absolute": -12}, "project_start_to_heightmap": "WORLD_SURFACE_WG",
-        "start_pool": "kultivator:penjara/kuil", "step": "surface_structures", "terrain_adaptation": "none",
-        "use_expansion_hack": False})
+    # two looks (detail pass): the mountain prison and the badlands prison (red sandstone plinth, acacia, mud-brick roof).
+    # One structure set holds both; the chunk generator tries each structure of a set until one fits its biome.
+    prison_biomes = {"": ["minecraft:jagged_peaks", "minecraft:stony_peaks", "minecraft:frozen_peaks", "minecraft:windswept_hills"],
+                     "_gurun": ["minecraft:badlands", "minecraft:eroded_badlands", "minecraft:wooded_badlands"]}
+    prison_ids = []
+    for fam in PRISON_FAMS:
+        for piece in ("kuil", "sumur", "aula"):
+            wjson("template_pool", "penjara", piece + fam,
+                  {"elements": [{"element": single(loc("penjara", piece + fam), "kultivator:penjara/lapuk"), "weight": 1}],
+                   "fallback": "minecraft:empty"})
+        sid = "penjara_iblis" + fam
+        biome = biomes_tag("penjara", sid, prison_biomes[fam])
+        wjson("structure", "penjara", sid, {
+            "type": "minecraft:jigsaw", "biomes": biome, "max_distance_from_center": {"horizontal": 64, "vertical": 160}, "size": 2,
+            "spawn_overrides": {}, "start_height": {"absolute": -12}, "project_start_to_heightmap": "WORLD_SURFACE_WG",
+            "start_pool": "kultivator:penjara/kuil" + fam, "step": "surface_structures", "terrain_adaptation": "none",
+            "use_expansion_hack": False})
+        prison_ids.append("kultivator:penjara/" + sid)
     wjson("structure_set", "penjara", "penjara_iblis", {"placement": {"type": "minecraft:random_spread", "salt": 340562, "separation": 48,
                                                                       "spacing": 120},
-                                                        "structures": [{"structure": "kultivator:penjara/penjara_iblis", "weight": 1}]}, pack=True)
-    j(os.path.join(DATA, "tags", "worldgen", "structure", "penjara.json"), {"replace": False, "values": ["kultivator:penjara/penjara_iblis"]})
+                                                        "structures": [{"structure": sid, "weight": 1} for sid in prison_ids]}, pack=True)
+    j(os.path.join(DATA, "tags", "worldgen", "structure", "penjara.json"), {"replace": False, "values": prison_ids})
     # --------------------------------------------------------------- Menara Seratus Lantai
-    for i in range(9):
-        wjson("template_pool", "menara", "menara_seratus/tingkat_%d" % (i + 1),
-              {"elements": [{"element": single(loc("menara", "menara_seratus/tingkat_%d" % (i + 1)), "kultivator:menara/utuh"), "weight": 1}],
-               "fallback": "minecraft:empty"})
-    biome = biomes_tag("menara", "menara_seratus", ["minecraft:plains", "minecraft:sunflower_plains", "minecraft:meadow",
-                                                    "minecraft:savanna", "minecraft:savanna_plateau", "minecraft:cherry_grove"])
-    wjson("structure", "menara", "menara_seratus", {
-        "type": "minecraft:jigsaw", "biomes": biome, "max_distance_from_center": {"horizontal": 32, "vertical": 128}, "size": 8,
-        "spawn_overrides": {"monster": {"bounding_box": "full", "spawns": []}}, "start_height": {"absolute": 0},
-        "project_start_to_heightmap": "WORLD_SURFACE_WG", "start_pool": "kultivator:menara/menara_seratus/tingkat_1",
-        "step": "surface_structures", "terrain_adaptation": "beard_thin", "use_expansion_hack": False})
+    # three looks (detail pass), one structure set: the chunk generator tries each until one fits the biome
+    tower_biomes = {"menara_seratus": ["minecraft:plains", "minecraft:sunflower_plains", "minecraft:meadow"],
+                    "menara_sakura": ["minecraft:cherry_grove"],
+                    "menara_sabana": ["minecraft:savanna", "minecraft:savanna_plateau"]}
+    tower_ids = []
+    for fam in TOWER_FAMS:
+        for i in range(9):
+            wjson("template_pool", "menara", "%s/tingkat_%d" % (fam, i + 1),
+                  {"elements": [{"element": single(loc("menara", "%s/tingkat_%d" % (fam, i + 1)), "kultivator:menara/utuh"), "weight": 1}],
+                   "fallback": "minecraft:empty"})
+        biome = biomes_tag("menara", fam, tower_biomes[fam])
+        wjson("structure", "menara", fam, {
+            "type": "minecraft:jigsaw", "biomes": biome, "max_distance_from_center": {"horizontal": 40, "vertical": 128}, "size": 8,
+            "spawn_overrides": {"monster": {"bounding_box": "full", "spawns": []}}, "start_height": {"absolute": 0},
+            "project_start_to_heightmap": "WORLD_SURFACE_WG", "start_pool": "kultivator:menara/%s/tingkat_1" % fam,
+            "step": "surface_structures", "terrain_adaptation": "beard_thin", "use_expansion_hack": False})
+        tower_ids.append("kultivator:menara/" + fam)
     wjson("structure_set", "menara", "menara_seratus", {"placement": {"type": "minecraft:random_spread", "salt": 340565, "separation": 64,
                                                                       "spacing": 160},
-                                                        "structures": [{"structure": "kultivator:menara/menara_seratus", "weight": 1}]}, pack=True)
+                                                        "structures": [{"structure": sid, "weight": 1} for sid in tower_ids]}, pack=True)
     # the lobby of the tower dimension (base data: the dimension's flat settings list this set)
     wjson("template_pool", "menara", "lobi", {"elements": [{"element": single(loc("menara", "lobi"), "kultivator:menara/utuh"), "weight": 1}],
                                               "fallback": "minecraft:empty"})
@@ -1530,7 +2268,7 @@ def structures():
         "step": "surface_structures", "terrain_adaptation": "none", "use_expansion_hack": False})
     wjson("structure_set", "menara", "lobi", {"placement": {"type": "minecraft:dimension_origin"},
                                               "structures": [{"structure": "kultivator:menara/lobi", "weight": 1}]})
-    j(os.path.join(DATA, "tags", "worldgen", "structure", "menara.json"), {"replace": False, "values": ["kultivator:menara/menara_seratus"]})
+    j(os.path.join(DATA, "tags", "worldgen", "structure", "menara.json"), {"replace": False, "values": tower_ids})
 
 
 def loot_tables():
@@ -1582,15 +2320,18 @@ def pack():
 
 def build():
     for tier in ("kecil", "agung", "kuno"):
-        gua_gate(tier)
-        for pz in PUZZLES:
-            gua_room(tier, pz)
-        gua_final(tier)
-    prison_shrine()
-    prison_shaft()
-    prison_hall()
-    for i in range(9):
-        pagoda_tier(i)
+        for variant in (0, 1):
+            gua_gate(tier, variant)
+            for pz in PUZZLES:
+                gua_room(tier, pz, variant)
+            gua_final(tier, variant)
+    for fam in PRISON_FAMS:
+        prison_shrine(fam)
+        prison_shaft(fam)
+        prison_hall(fam)
+    for fam in TOWER_FAMS:
+        for i in range(9):
+            pagoda_tier(i, fam)
     tower_lobby()
     structures()
     loot_tables()
@@ -1598,9 +2339,9 @@ def build():
 
 
 def folder_of(tid):
-    if tid in ("kuil", "sumur", "aula"):
+    if tid.split("_")[0] in ("kuil", "sumur", "aula"):
         return "penjara"
-    if tid.startswith("menara_seratus") or tid == "lobi":
+    if tid.startswith("menara_") or tid == "lobi":
         return "menara"
     return "reruntuhan"
 

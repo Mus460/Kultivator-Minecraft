@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:beast_ascended",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.body_guard.description"
+    },
+    "icon": {
+      "id": "minecraft:shield"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.body_guard.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

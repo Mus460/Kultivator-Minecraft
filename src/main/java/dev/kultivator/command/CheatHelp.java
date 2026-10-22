@@ -70,7 +70,9 @@ final class CheatHelp {
 					"pil <id>", "relik <tabel>", "pusaka <jenis> <tingkat>", "pusaka natal", "tempa tingkat <n>", "tempa panas", "tempa selesai",
 					"roh <0-3>", "cincin <0-4>")),
 			// Phase 34 (DESIGN 34.4.6): every test command of Dunia Kultivasi yang Luas, one group (module K).
-			new Group("jelajah", dev.kultivator.dunia.DuniaCommands.CHIPS));
+			new Group("jelajah", dev.kultivator.dunia.DuniaCommands.CHIPS),
+			// DESIGN 35.8.4: the sword duel's test commands (module S).
+			new Group("duel", dev.kultivator.duel.Duel.testChips()));
 
 	/** Prints the grouped help; {@code root} is the alias that was typed ("kultivasi" or "cultivate"). */
 	static int show(CommandSourceStack source, String root) {

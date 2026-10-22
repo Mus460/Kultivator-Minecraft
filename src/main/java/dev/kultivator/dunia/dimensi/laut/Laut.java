@@ -29,6 +29,10 @@ public final class Laut {
 			if (sea != null) {
 				for (ServerPlayer player : sea.players()) {
 					SeaGate.breathingTick(player);
+					if (ticks % 200L == 9L) {
+						// the sea's flags and the sky over it (the client's spirit-tide and star-fall touches)
+						dev.kultivator.dunia.dimensi.bawah.SoulJourney.sendState(player);
+					}
 				}
 			}
 		}

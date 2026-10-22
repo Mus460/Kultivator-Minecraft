@@ -41,6 +41,10 @@ public final class NagaItems {
 	public static final Item MUTIARA_NAGA_JINAK = ModItems.register("mutiara_naga_jinak", MutiaraNagaItem::new,
 			new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant());
 
+	/** Darah Jiao: the blood of a slain Jiao (half of them, config {@code darahChance}); drunk for Dao comprehension. */
+	public static final Item DARAH_JIAO = ModItems.register("darah_jiao", DarahJiaoItem::new,
+			new Item.Properties().stacksTo(16).rarity(Rarity.EPIC));
+
 	/** Loads the class so the items above are registered. */
 	static void init() {
 	}

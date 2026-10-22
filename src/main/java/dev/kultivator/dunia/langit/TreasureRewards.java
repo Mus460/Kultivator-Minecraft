@@ -37,7 +37,7 @@ import java.util.List;
  * <li>T3: a millennium herb, a King beast core, a heavenly flame seed at 5 % (10 % for {@code api});</li>
  * <li>T4: Batu Asal Abadi, an Immortal essence pearl, a primordial material at 5 % (10 % for {@code pusaka}).</li>
  * </ul>
- * Kinds {@code herba inti giok pusaka api batu}. The claim gives no cultivation XP of its own. Item stacks are made only
+ * On top, the sky's own gift ({@link #skyGift}). Kinds {@code herba inti giok pusaka api batu}. The claim gives no cultivation XP of its own. Item stacks are made only
  * when a treasure is born or claimed (never in a static initialiser).
  */
 public final class TreasureRewards {
@@ -133,7 +133,37 @@ public final class TreasureRewards {
 				}
 			}
 		}
+		skyGift(out, t, random);
 		return out;
+	}
+
+	/**
+	 * The sky's own gift on top (detail pass): T1 35 % one Embun Roh, T2 35 % one or two Batu Meteor Roh, T3 25 % and T4
+	 * 30 % one Inti Meteor Agung. Small next to the tier's core, so the tiers stay where DESIGN 34.5.9 puts them.
+	 */
+	private static void skyGift(List<ItemStack> out, int tier, RandomSource random) {
+		switch (tier) {
+			case 1 -> {
+				if (random.nextDouble() < 0.35D) {
+					out.add(new ItemStack(LangitItems.EMBUN_ROH));
+				}
+			}
+			case 2 -> {
+				if (random.nextDouble() < 0.35D) {
+					out.add(new ItemStack(LangitItems.BATU_METEOR_ROH, 1 + random.nextInt(2)));
+				}
+			}
+			case 3 -> {
+				if (random.nextDouble() < 0.25D) {
+					out.add(new ItemStack(LangitItems.INTI_METEOR_AGUNG));
+				}
+			}
+			default -> {
+				if (random.nextDouble() < 0.30D) {
+					out.add(new ItemStack(LangitItems.INTI_METEOR_AGUNG));
+				}
+			}
+		}
 	}
 
 	/** The kind's main prize for the tier (always the first stack). */

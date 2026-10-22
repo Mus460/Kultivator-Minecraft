@@ -101,6 +101,9 @@ final class SettingsRows {
 			case HUD -> hud(items);
 			default -> kontrol(items);
 		}
+		if (clamp(group) != KONTROL) {
+			duel(items, clamp(group));
+		}
 		return items;
 	}
 
@@ -239,6 +242,8 @@ final class SettingsRows {
 								.withStyle(Page.data().hardcore() ? ChatFormatting.RED : ChatFormatting.GRAY),
 						Component.translatable("kultivator.screen.settings.hardcore.how").withStyle(ChatFormatting.DARK_GRAY)),
 				() -> Page.data().hardcore(), Keys::connected, this::asking, SettingsRows::ink));
+		// Duel Pedang (DESIGN 35.8.3): input mode, parry outside duels, lock-on, PAL animations.
+		duel(items, KONTROL);
 		// The live list of every Kultivator key (the only key list, DESIGN 33.6 R2), in the second column.
 		items.add(new Item(Type.BREAK, Component::empty, null, null, List::of, SettingsRows::no, SettingsRows::yes, SettingsRows::no,
 				SettingsRows::ink));
@@ -314,6 +319,19 @@ final class SettingsRows {
 	}
 
 	// ================================================================ builders
+
+	/** The sword-duel rows of {@code group} (DESIGN 35.8.3, {@code client.duel.ui.DuelSettings}). */
+	private static void duel(List<Item> items, int group) {
+		for (dev.kultivator.client.duel.ui.DuelSettings.Row row : dev.kultivator.client.duel.ui.DuelSettings.rows(group)) {
+			if (row.heading()) {
+				items.add(new Item(Type.HEADING, row.label(), null, null, List::of, SettingsRows::no, SettingsRows::yes, SettingsRows::no,
+						SettingsRows::ink));
+			} else {
+				items.add(new Item(row.cycle() ? Type.CYCLE : Type.COIN, row.label(), null, row.next(), row.tooltip(), row.on(), SettingsRows::yes,
+						SettingsRows::no, SettingsRows::ink));
+			}
+		}
+	}
 
 	/** The rows of {@link EpicSettings#rows()} in {@code group}, sorted by {@code order} (unlisted rows after, in source order). */
 	private static List<EpicSettings.Row> epicRows(int group, List<String> order) {

@@ -73,7 +73,9 @@ public final class NagaPayloads {
 	 * {@link #MOMENT_SIGHTED} (a wild Jiao appears: a distant roar, its shadow), {@link #MOMENT_SUBDUED} (beat 42),
 	 * {@link #MOMENT_EVOLVED} (beat 43; {@code tier}, {@code line} 0 wolf / 1 fox / 2 jiao), {@link #MOMENT_FAILED} (a
 	 * failed tribulation), {@link #MOMENT_SUMMON} / {@link #MOMENT_DISMISS} (the pearl), {@link #MOMENT_HOWL} (Lolongan
-	 * Bulan), {@link #MOMENT_FOXFIRE} (Api Rubah Langit, {@code tier} = target count) and {@link #MOMENT_ROAR}. {@code own}
+	 * Bulan), {@link #MOMENT_FOXFIRE} (Api Rubah Langit, {@code tier} = target count), {@link #MOMENT_ROAR}, and the detail
+	 * pass moments {@link #MOMENT_ENRAGED}, {@link #MOMENT_WHIRL}, {@link #MOMENT_VEIL}, {@link #MOMENT_THUNDER_MARK},
+	 * {@link #MOMENT_TRIB_START} and {@link #MOMENT_GUARD}. {@code own}
 	 * is true for the player the moment belongs to (their camera may move, the others only see it).
 	 */
 	public record Moment(int what, int entityId, double x, double y, double z, int kind, int tier, int line, int seed, boolean own)
@@ -142,6 +144,18 @@ public final class NagaPayloads {
 	public static final int MOMENT_HOWL = 7;
 	public static final int MOMENT_FOXFIRE = 8;
 	public static final int MOMENT_ROAR = 9;
+	/** Amukan Naga: a wild Jiao at half health (a stormy sky grade near it, a banner, its eyes burn). */
+	public static final int MOMENT_ENRAGED = 10;
+	/** Pusaran Samudra at {@code x, y, z}: the whirl lives {@code seed} ticks, {@code tier} = its radius in tenths. */
+	public static final int MOMENT_WHIRL = 11;
+	/** Tirai Awan: the cloud veil bursts from {@code x, y, z} ({@code tier} = its radius). */
+	public static final int MOMENT_VEIL = 12;
+	/** Hujan Petir Langit: a strike mark at {@code x, y, z} that falls in {@code seed} ticks ({@code tier} = radius in tenths). */
+	public static final int MOMENT_THUNDER_MARK = 13;
+	/** A beast tribulation begins over {@code x, y, z} and lasts about {@code seed} ticks (the sky darkens near it). */
+	public static final int MOMENT_TRIB_START = 14;
+	/** Penjaga Raga: the owner's beasts gather at the body at {@code x, y, z} ({@code tier} = how many guard). */
+	public static final int MOMENT_GUARD = 15;
 
 	/** Registers the payload types (both physical sides) and the server receiver. */
 	static void init() {

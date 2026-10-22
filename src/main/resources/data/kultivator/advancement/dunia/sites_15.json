@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:dunia/sites_5",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.sites_15.description"
+    },
+    "icon": {
+      "id": "kultivator:gulungan_penunjuk"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.sites_15.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

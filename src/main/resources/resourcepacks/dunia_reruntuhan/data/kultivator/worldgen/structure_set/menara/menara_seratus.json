@@ -9,6 +9,14 @@
     {
       "structure": "kultivator:menara/menara_seratus",
       "weight": 1
+    },
+    {
+      "structure": "kultivator:menara/menara_sakura",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:menara/menara_sabana",
+      "weight": 1
     }
   ]
 }

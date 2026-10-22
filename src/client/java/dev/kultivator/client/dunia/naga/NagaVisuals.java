@@ -148,8 +148,18 @@ public final class NagaVisuals {
 		if (skill == NagaLiarEntity.SKILL_BITE) {
 			return 0.8F;
 		}
+		if (skill == NagaLiarEntity.SKILL_SPECIAL) {
+			return t < NagaLiarEntity.SPECIAL_TELEGRAPH ? 0.3F + 0.5F * t / NagaLiarEntity.SPECIAL_TELEGRAPH : 0.9F;
+		}
 		if (dragon.hasFlag(NagaLiarEntity.FLAG_LEMAH)) {
 			return 0.25F + 0.15F * Mth.sin(dragon.tickCount * 0.2F);
+		}
+		if (dragon.hasFlag(NagaLiarEntity.FLAG_ENRAGED) || dragon.hasFlag(NagaLiarEntity.FLAG_FRENZY)) {
+			// bared fangs, a snarl that twitches
+			return 0.22F + 0.08F * Mth.sin(dragon.tickCount * 0.6F);
+		}
+		if (dragon.hasFlag(NagaLiarEntity.FLAG_RESTING)) {
+			return 0.0F;
 		}
 		return 0.05F;
 	}
@@ -209,6 +219,44 @@ public final class NagaVisuals {
 		}
 		if (dragon.isTamed() && dragon.tier() >= BeastData.TOP_TIER && EffectQuality.chance(random, 0.2F * others)) {
 			CommonFx.add(CommonFx.glow(0xFFF4C8, 0.9F, 20), mouth, new Vec3(0.0D, 0.02D, 0.0D), false);
+		}
+		Visual visual = VISUALS.get(dragon.getId());
+		boolean fury = dragon.hasFlag(NagaLiarEntity.FLAG_ENRAGED) || dragon.hasFlag(NagaLiarEntity.FLAG_FRENZY);
+		if (fury && visual != null && visual.chain.segments() > 2 && EffectQuality.chance(random, 0.35F * others)) {
+			// embers of its fury shed from the scales (the blood eclipse's frenzy: a darker red)
+			Vec3 at = visual.chain.pose(1 + random.nextInt(Math.max(1, visual.chain.capacity() - 1)), 1.0F).pos();
+			int rgb = dragon.hasFlag(NagaLiarEntity.FLAG_FRENZY) && !dragon.hasFlag(NagaLiarEntity.FLAG_ENRAGED) ? 0x9A1020 : 0xFF5030;
+			CommonFx.add(CommonFx.glow(rgb, 1.1F, 18), at, new Vec3((random.nextDouble() - 0.5D) * 0.05D, 0.06D, (random.nextDouble() - 0.5D) * 0.05D),
+					false);
+		}
+		if (dragon.hasFlag(NagaLiarEntity.FLAG_RESTING) && dragon.tickCount % 50 == 0 && EffectQuality.chance(random, 0.8F * others)) {
+			// a slow breath of mist from the nostrils
+			Vec3 forward = mouth.subtract(dragon.position().add(0.0D, 0.55D, 0.0D)).normalize();
+			for (int i = 0; i < EffectQuality.scale(3); i++) {
+				CommonFx.add(ParticleTypes.CLOUD, mouth.x, mouth.y + 0.1D, mouth.z, forward.x * 0.03D + (random.nextDouble() - 0.5D) * 0.01D, 0.01D,
+						forward.z * 0.03D + (random.nextDouble() - 0.5D) * 0.01D);
+			}
+		}
+		if (skill == NagaLiarEntity.SKILL_SPECIAL && t < NagaLiarEntity.SPECIAL_TELEGRAPH && visual != null && visual.chain.segments() > 2) {
+			// the kind skill gathers along the body: sparks (thunder), droplets (water), wisps (cloud)
+			int n = Math.max(1, Math.round(EffectQuality.scale(3) * others));
+			for (int i = 0; i < n; i++) {
+				Vec3 at = visual.chain.pose(1 + random.nextInt(Math.max(1, visual.chain.capacity() - 1)), 1.0F).pos();
+				ParticleOptions particle = switch (kind) {
+					case AIR -> ParticleTypes.DRIPPING_WATER;
+					case AWAN -> ParticleTypes.CLOUD;
+					case PETIR -> ParticleTypes.ELECTRIC_SPARK;
+				};
+				CommonFx.add(particle, at.x, at.y + 0.5D, at.z, 0.0D, 0.02D, 0.0D);
+			}
+		}
+		if (kind == NagaKind.AWAN && quality > 0 && visual != null && visual.chain.segments() > 4 && EffectQuality.chance(random, 0.15F * others)) {
+			// cloud wisps peel off the tail
+			Vec3 tail = visual.chain.pose(visual.chain.capacity() - 1, 1.0F).pos();
+			CommonFx.add(ParticleTypes.CLOUD, tail.x, tail.y, tail.z, 0.0D, 0.0D, 0.0D);
+		}
+		if (dragon.hasFlag(NagaLiarEntity.FLAG_GUARD) && EffectQuality.chance(random, 0.1F * others)) {
+			CommonFx.add(ParticleTypes.END_ROD, mouth.x, mouth.y + 1.8D, mouth.z, 0.0D, 0.02D, 0.0D);
 		}
 	}
 

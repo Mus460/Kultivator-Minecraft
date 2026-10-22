@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -143,20 +144,40 @@ public class NagaRenderer extends EntityRenderer<NagaLiarEntity, NagaRenderer.St
 		String kind = state.kind.id();
 		float age = state.ageInTicks;
 		boolean lemah = (state.flags & NagaLiarEntity.FLAG_LEMAH) != 0;
+		boolean resting = (state.flags & NagaLiarEntity.FLAG_RESTING) != 0;
+		boolean enraged = (state.flags & (NagaLiarEntity.FLAG_ENRAGED | NagaLiarEntity.FLAG_FRENZY)) != 0;
 		// ------------------------------------------------------------ the body (world positions, relative to the head entity)
 		Vec3 origin = new Vec3(state.x, state.y, state.z);
 		int n = state.count;
-		float sway = lemah ? 0.4F : 1.0F;
+		// a resting Jiao breathes slowly, an enraged one writhes; Lemah barely moves
+		float sway = lemah ? 0.4F : resting ? 0.35F : enraged ? 1.35F : 1.0F;
+		float pace = resting ? 0.07F : enraged ? 0.26F : 0.18F;
+		// Ekor Sabet: the tail rears up over its telegraph, then lashes round
+		boolean tailSkill = state.skill == NagaLiarEntity.SKILL_TAIL;
+		float tailRaise = 0.0F;
+		float tailLash = 0.0F;
+		if (tailSkill) {
+			float s = state.skillTicks;
+			if (s < NagaLiarEntity.TAIL_TELEGRAPH) {
+				tailRaise = s / NagaLiarEntity.TAIL_TELEGRAPH;
+			} else {
+				float k = Mth.clamp((s - NagaLiarEntity.TAIL_TELEGRAPH) / 6.0F, 0.0F, 1.0F);
+				tailRaise = 1.0F - k;
+				tailLash = Mth.sin(k * Mth.PI);
+			}
+		}
 		for (int i = 1; i < n; i++) {
 			float t = i / (float) Math.max(1, n - 1);
 			float width = Mth.lerp(t, BODY_FROM, BODY_TO);
 			Vec3 at = state.segPos[i].subtract(origin);
-			float undulate = Mth.sin(age * 0.18F - i * 0.7F) * 7.0F * sway * (0.3F + t);
+			float undulate = Mth.sin(age * pace - i * 0.7F) * 7.0F * sway * (0.3F + t);
+			float tailK = Mth.clamp((t - 0.55F) / 0.45F, 0.0F, 1.0F);
+			undulate += tailLash * tailK * 55.0F;
 			poseStack.pushPose();
 			poseStack.translate(at.x, at.y, at.z);
 			poseStack.rotate(Axis.YP.rotationDegrees(180.0F - state.segYaw[i] + undulate));
-			poseStack.rotate(Axis.XP.rotationDegrees(-state.segPitch[i]));
-			poseStack.rotate(Axis.ZP.rotationDegrees(Mth.sin(age * 0.11F - i * 0.5F) * 6.0F * sway));
+			poseStack.rotate(Axis.XP.rotationDegrees(-state.segPitch[i] - tailRaise * tailK * 38.0F));
+			poseStack.rotate(Axis.ZP.rotationDegrees(Mth.sin(age * pace * 0.6F - i * 0.5F) * 6.0F * sway));
 			poseStack.scale(width, width, BODY_LENGTH * state.stretch);
 			NagaModels.submit((i % 3 == 1 ? "sail_" : "body_") + kind, poseStack, collector, light);
 			poseStack.popPose();
@@ -191,13 +212,24 @@ public class NagaRenderer extends EntityRenderer<NagaLiarEntity, NagaRenderer.St
 		NagaModels.submit("jaw_" + kind, poseStack, collector, light);
 		poseStack.popPose();
 		if (state.tier >= 4) {
+			// a Horned Jiao's antlers; from the True Dragon on, the great gilded antlers
+			boolean great = state.tier >= 5;
 			for (int side = -1; side <= 1; side += 2) {
 				poseStack.pushPose();
 				poseStack.translate(side * 3.4F / 16.0F, 4.6F / 16.0F, 5.5F / 16.0F);
-				poseStack.scale(0.8F, 0.8F, 0.8F);
-				NagaModels.submit(side < 0 ? "horn_l" : "horn_r", poseStack, collector, light);
+				float hs = great ? 0.72F : 0.8F;
+				poseStack.scale(hs, hs, hs);
+				NagaModels.submit(great ? side < 0 ? "horn_great_l" : "horn_great_r" : side < 0 ? "horn_l" : "horn_r", poseStack, collector, light);
 				poseStack.popPose();
 			}
+		}
+		if (enraged) {
+			// Amukan Naga / Gila Darah: the eyes burn, a flicker of flame trails from them
+			poseStack.pushPose();
+			float flicker = 1.0F + 0.04F * Mth.sin(age * 1.7F);
+			poseStack.scale(flicker, flicker, flicker);
+			NagaModels.submit("eyes_rage", poseStack, collector, LightCoordsUtil.FULL_BRIGHT);
+			poseStack.popPose();
 		}
 		if (near || mid && !EffectQuality.minimal()) {
 			whiskers(state, poseStack, collector, near, age, kind);
@@ -325,6 +357,27 @@ public class NagaRenderer extends EntityRenderer<NagaLiarEntity, NagaRenderer.St
 				ring(poseStack, collector, mouth(state).subtract(origin), 2.0F + 16.0F * t, 0.6F, 32, ARGB.color(Math.round(180 * (1.0F - t)), glow));
 			}
 		}
+		Vec3 headAt = state.headPos.subtract(origin);
+		if ((state.flags & (NagaLiarEntity.FLAG_ENRAGED | NagaLiarEntity.FLAG_FRENZY)) != 0 && NagaVisuals.takeQuads(3)) {
+			// the heat of its fury around the head
+			float pulse = 0.5F + 0.5F * Mth.sin(age * 0.5F);
+			orb(poseStack, collector, headAt, 1.5F + 0.4F * pulse, ARGB.color(Math.round(50 + 60 * pulse), 0xFF3A20));
+		}
+		if (state.skill == NagaLiarEntity.SKILL_SPECIAL && state.skillTicks < NagaLiarEntity.SPECIAL_TELEGRAPH) {
+			// the kind skill gathers: light at the mouth; the thunder Jiao crackles along its whole body
+			float t = state.skillTicks / NagaLiarEntity.SPECIAL_TELEGRAPH;
+			if (NagaVisuals.takeQuads(3)) {
+				orb(poseStack, collector, mouth(state).subtract(origin), 0.5F + 1.1F * t, ARGB.color(Math.round(90 + 140 * t), glow));
+			}
+			if (state.kind == NagaKind.PETIR && state.count > 4) {
+				arcs(poseStack, collector, state, origin, age, quality, glow);
+			}
+		}
+		if ((state.flags & NagaLiarEntity.FLAG_GUARD) != 0 && NagaVisuals.takeQuads(32)) {
+			// Penjaga Raga: a slow gold halo over the guardian's head
+			ring(poseStack, collector, headAt.add(0.0D, 2.4D, 0.0D), 1.1F + 0.1F * Mth.sin(age * 0.1F), 0.15F, 16,
+					ARGB.color(150, 0xFFE08A));
+		}
 		if ((state.flags & NagaLiarEntity.FLAG_CONTEST) != 0 && NagaVisuals.takeQuads(48)) {
 			// the Selendang's three gold loops tighten around the head
 			Vec3 head = state.headPos.subtract(origin);
@@ -333,6 +386,56 @@ public class NagaRenderer extends EntityRenderer<NagaLiarEntity, NagaRenderer.St
 				ring(poseStack, collector, head.add(0.0D, -0.4D + 0.45D * k, 0.0D), r, 0.12F, 16, ARGB.color(170, 0xFFD27A));
 			}
 		}
+	}
+
+	/**
+	 * Hujan Petir Langit gathering: three jagged arcs leap between body segments two apart, re-drawn every other tick
+	 * (2 quads per sub-segment, 4 sub-segments an arc; 1 arc at Minimal).
+	 */
+	private static void arcs(PoseStack poseStack, SubmitNodeCollector collector, State state, Vec3 origin, float age, int quality, int rgb) {
+		int count = quality == 0 ? 1 : 3;
+		int pieces = 4;
+		if (!NagaVisuals.takeQuads(count * pieces * 2)) {
+			return;
+		}
+		RandomSource random = RandomSource.create(state.entityId * 31L + (long) Math.floor(age / 2.0F));
+		Vec3[][] paths = new Vec3[count][pieces + 1];
+		for (int k = 0; k < count; k++) {
+			int a = 1 + random.nextInt(Math.max(1, state.count - 3));
+			int b = Math.min(state.count - 1, a + 2);
+			Vec3 from = state.segPos[a].subtract(origin).add(0.0D, 0.9D, 0.0D);
+			Vec3 to = state.segPos[b].subtract(origin).add(0.0D, 0.9D, 0.0D);
+			for (int i = 0; i <= pieces; i++) {
+				double t = i / (double) pieces;
+				double jitter = i == 0 || i == pieces ? 0.0D : 0.7D;
+				paths[k][i] = from.add(to.subtract(from).scale(t)).add((random.nextFloat() - 0.5F) * jitter * 2.0D,
+						(random.nextFloat() - 0.2F) * jitter * 2.0D, (random.nextFloat() - 0.5F) * jitter * 2.0D);
+			}
+		}
+		int color = ARGB.color(220, rgb);
+		collector.submitCustomGeometry(poseStack, GLOW, (pose, buffer) -> {
+			for (Vec3[] path : paths) {
+				for (int i = 0; i < pieces; i++) {
+					Vec3 a = path[i];
+					Vec3 b = path[i + 1];
+					Vec3 dir = b.subtract(a);
+					if (dir.lengthSqr() < 1.0E-6D) {
+						continue;
+					}
+					Vec3 side = dir.cross(new Vec3(0.0D, 1.0D, 0.0D));
+					side = side.lengthSqr() < 1.0E-6D ? new Vec3(0.12D, 0.0D, 0.0D) : side.normalize().scale(0.12D);
+					Vec3 lift = new Vec3(0.0D, 0.12D, 0.0D);
+					vertex(pose, buffer, a.subtract(side), color);
+					vertex(pose, buffer, a.add(side), color);
+					vertex(pose, buffer, b.add(side), color);
+					vertex(pose, buffer, b.subtract(side), color);
+					vertex(pose, buffer, a.subtract(lift), color);
+					vertex(pose, buffer, a.add(lift), color);
+					vertex(pose, buffer, b.add(lift), color);
+					vertex(pose, buffer, b.subtract(lift), color);
+				}
+			}
+		});
 	}
 
 	private static Vec3 mouth(State state) {

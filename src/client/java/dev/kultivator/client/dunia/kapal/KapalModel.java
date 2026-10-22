@@ -19,17 +19,20 @@ import org.jetbrains.annotations.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * The hull display lists of the three ship classes (DESIGN 34.5.15), read once per resource reload from
- * {@code assets/kultivator/dunia/kapal/<class>.json} (written by {@code tools/gen_dunia_kapal.py}): a block-state palette,
- * runs of one state along x or z (at most 4 long; hidden blocks already dropped), sails, light points, the stern engine,
- * the banner and the wake size. Runs come sorted with the hull first ({@link Hull#core} of them) and the decoration after,
- * which is the renderer's LOD order. A missing or broken file gives a plain plank box, never a crash.
+ * The hull display lists of the ship classes and the sky pirates' raider (DESIGN 34.5.15), read once per resource reload
+ * from {@code assets/kultivator/dunia/kapal/<model>.json} (written by {@code tools/gen_dunia_kapal.py}): a block-state
+ * palette, runs of one state along x or z (at most 4 long), sails, light points (lanterns, window glows), the stern
+ * engine, the banner, the masthead pennants, the rigging lines and the qi oars. Runs come sorted with the hull first
+ * ({@link Hull#core} of them) and the decoration after, which is the LOD order; runs flagged hidden ({@code "h"}, blocks
+ * walled in on every side) are kept only as data ({@link Hull#hidden}) and never drawn (the generator drops hidden blocks
+ * itself). A livery swaps the drawn block per run ({@link KapalLivery}). A missing or broken file gives a plain plank
+ * box, never a crash.
  */
 public final class KapalModel {
 
@@ -41,8 +44,16 @@ public final class KapalModel {
 	public record Sail(float z, float y0, float y1, float x0, float x1) {
 	}
 
-	/** A lantern or ornament glow. */
-	public record Light(float x, float y, float z, int rgb, float size) {
+	/** A lantern or ornament glow ({@code window}: a cabin window, lit only at night). */
+	public record Light(float x, float y, float z, int rgb, float size, boolean window) {
+	}
+
+	/** A rigging line from one local point to another. */
+	public record Line(float x0, float y0, float z0, float x1, float y1, float z1) {
+	}
+
+	/** A qi oar: its rowlock on the beam ({@code side} −1 port, +1 starboard), its length. */
+	public record Oar(float x, float y, float z, int side, float length) {
 	}
 
 	/** A parsed hull. */
@@ -51,6 +62,14 @@ public final class KapalModel {
 		public final List<Sail> sails = new ArrayList<>();
 		public final List<Light> lights = new ArrayList<>();
 		public final List<float[]> engines = new ArrayList<>();
+		/** Blocks walled in on every side (x, y, z min corners): culling only. */
+		public final List<float[]> hidden = new ArrayList<>();
+		/** Masthead pennants: {x, y, z, length}. */
+		public final List<float[]> pennants = new ArrayList<>();
+		public final List<Line> rigging = new ArrayList<>();
+		public final List<Oar> oars = new ArrayList<>();
+		/** The formation disc under the keel: {y, radius} (radius 0: none). */
+		public float[] formation = {0.0F, 0.0F};
 		public float[] banner = {0.0F, 4.0F, -4.0F, 1.0F, 2.0F};
 		public int core;
 		public int blocks;
@@ -60,25 +79,34 @@ public final class KapalModel {
 		public float deck;
 	}
 
-	private static final Map<KapalClass, Hull> CACHE = new EnumMap<>(KapalClass.class);
+	/** The sky pirates' raider (drawn with the Perahu Awan's sizes when its file is missing). */
+	public static final String RAIDER = "perahu_bajak";
+
+	private static final Map<String, Hull> CACHE = new HashMap<>();
 
 	/** The hull of {@code kind} (loaded on first use after a reload). */
 	public static Hull of(KapalClass kind) {
-		Hull hull = CACHE.get(kind);
+		return of(kind.model(), kind);
+	}
+
+	/** The hull of model {@code model}; {@code sizes} gives the fallback box when the file is missing. */
+	public static Hull of(String model, KapalClass sizes) {
+		Hull hull = CACHE.get(model);
 		if (hull == null) {
-			hull = load(kind);
-			CACHE.put(kind, hull);
+			hull = load(model, sizes);
+			CACHE.put(model, hull);
 		}
 		return hull;
 	}
 
-	/** Forgets every hull (resource reload, disconnect). */
+	/** Forgets every hull and swapped livery state (resource reload, disconnect). */
 	public static void clear() {
 		CACHE.clear();
+		KapalLivery.clear();
 	}
 
-	private static Hull load(KapalClass kind) {
-		Identifier id = Kultivator.id("dunia/kapal/" + kind.model() + ".json");
+	private static Hull load(String model, KapalClass kind) {
+		Identifier id = Kultivator.id("dunia/kapal/" + model + ".json");
 		try {
 			Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(id);
 			if (resource.isPresent()) {
@@ -120,9 +148,19 @@ public final class KapalModel {
 			if (state == null || state.isAir()) {
 				continue;
 			}
+			int n = Math.max(1, Math.min(8, run.get("n").getAsInt()));
+			boolean alongZ = "z".equals(run.get("a").getAsString());
+			float x = run.get("x").getAsFloat();
+			float y = run.get("y").getAsFloat();
+			float z = run.get("z").getAsFloat();
+			if (run.has("h") && run.get("h").getAsInt() != 0) {
+				for (int k = 0; k < n; k++) {
+					hull.hidden.add(new float[]{alongZ ? x : x + k, y, alongZ ? z + k : z});
+				}
+				continue;
+			}
 			boolean detail = run.has("d") && run.get("d").getAsInt() != 0;
-			hull.runs.add(new Run(state, run.get("x").getAsFloat(), run.get("y").getAsFloat(), run.get("z").getAsFloat(),
-					Math.max(1, Math.min(8, run.get("n").getAsInt())), "z".equals(run.get("a").getAsString()), detail));
+			hull.runs.add(new Run(state, x, y, z, n, alongZ, detail));
 			if (!detail) {
 				hull.core++;
 			}
@@ -144,8 +182,32 @@ public final class KapalModel {
 					// keep the lantern gold
 				}
 				float sizeL = l.size() > 4 ? l.get(4).getAsFloat() : 1.0F;
-				hull.lights.add(new Light(l.get(0).getAsFloat(), l.get(1).getAsFloat(), l.get(2).getAsFloat(), rgb, sizeL));
+				boolean window = l.size() > 5 && l.get(5).getAsInt() != 0;
+				hull.lights.add(new Light(l.get(0).getAsFloat(), l.get(1).getAsFloat(), l.get(2).getAsFloat(), rgb, sizeL, window));
 			}
+		}
+		if (root.has("pennants")) {
+			for (JsonElement element : root.getAsJsonArray("pennants")) {
+				JsonArray e = element.getAsJsonArray();
+				hull.pennants.add(new float[]{e.get(0).getAsFloat(), e.get(1).getAsFloat(), e.get(2).getAsFloat(), e.get(3).getAsFloat()});
+			}
+		}
+		if (root.has("rigging")) {
+			for (JsonElement element : root.getAsJsonArray("rigging")) {
+				JsonArray e = element.getAsJsonArray();
+				hull.rigging.add(new Line(e.get(0).getAsFloat(), e.get(1).getAsFloat(), e.get(2).getAsFloat(), e.get(3).getAsFloat(),
+						e.get(4).getAsFloat(), e.get(5).getAsFloat()));
+			}
+		}
+		if (root.has("oars")) {
+			for (JsonElement element : root.getAsJsonArray("oars")) {
+				JsonArray e = element.getAsJsonArray();
+				hull.oars.add(new Oar(e.get(0).getAsFloat(), e.get(1).getAsFloat(), e.get(2).getAsFloat(), e.get(3).getAsInt(), e.get(4).getAsFloat()));
+			}
+		}
+		if (root.has("formation")) {
+			JsonArray f = root.getAsJsonArray("formation");
+			hull.formation = new float[]{f.get(0).getAsFloat(), f.get(1).getAsFloat()};
 		}
 		if (root.has("engine")) {
 			for (JsonElement element : root.getAsJsonArray("engine")) {

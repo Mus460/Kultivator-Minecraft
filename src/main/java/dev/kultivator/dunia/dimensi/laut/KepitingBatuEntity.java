@@ -160,7 +160,7 @@ public class KepitingBatuEntity extends Monster {
 	public void die(DamageSource source) {
 		super.die(source);
 		if (this.level() instanceof ServerLevel level && source.getEntity() instanceof ServerPlayer killer) {
-			Dimensi.monsterSlain(level, killer, this, "kepiting");
+			Dimensi.monsterSlain(level, killer, this, "kepiting", tier());
 		}
 	}
 

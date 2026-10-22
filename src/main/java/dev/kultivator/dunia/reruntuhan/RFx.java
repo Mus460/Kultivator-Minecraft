@@ -38,6 +38,12 @@ public final class RFx {
 	public static final int GUARDIAN_DOWN = 25;
 	public static final int SEAL_LEAK = 26;
 	public static final int SKILL_HIT = 27;
+	/**
+	 * The air of a dressed puzzle room (detail pass), re-sent every 2.5 s while someone is near: a = the room's look
+	 * (1 library: drifting dust motes in the lamplight, 2 shrine: incense from the four braziers, 3 garden grotto:
+	 * falling petals and leaves), b = the tier. The client emits for 3 s after each pulse.
+	 */
+	public static final int ROOM_AIR = 28;
 
 	/** Radius of ordinary effects (players beyond it never get them). */
 	public static final double RANGE = 64.0D;

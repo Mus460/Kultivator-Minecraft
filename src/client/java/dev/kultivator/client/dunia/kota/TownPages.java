@@ -480,6 +480,13 @@ final class TownPages {
 			Component line = Component.translatable("kultivator.kota.gelap.reputasi", rep, Math.round(gelap.getDoubleOr("raid", 0.08D) * 100.0D));
 			Brush.fit(g, font, line, x + 4.0F, infoY, w - 8.0F, rep < 0 ? Palette.SEAL_DARK : Palette.INK_SOFT, 0.62F, 0.4F, false);
 			bar(g, x + 4, infoY + 8, x + w - 4, infoY + 11, (rep + 100) / 200.0F, rep < 0 ? Palette.SEAL : 0xFF6A4A9A);
+			if (gelap.contains("eclipse")) {
+				// Gerhana Darah: the smugglers lie low and every price carries the surcharge (a blood-red band under the heading)
+				float glow = 0.5F + 0.5F * (float) Math.sin(net.minecraft.util.Util.getMillis() / 420.0D);
+				g.fill(x + 2, y + 22, x + w - 2, y + 23, Palette.argb(Math.round(0x70 + 0x50 * glow), 0xB01020));
+				Brush.fit(g, font, Component.translatable("kultivator.kota.gelap.gerhana", gelap.getIntOr("eclipse", 25)), x + 4.0F, infoY - 9.0F,
+						w - 8.0F, 0xFF9A1020, 0.6F, 0.4F, false);
+			}
 			if (gelap.contains("raid_left")) {
 				float pulse = 0.5F + 0.5F * (float) Math.sin(net.minecraft.util.Util.getMillis() / 160.0D);
 				g.fill(x + 2, y + TOP - 2, x + w - 2, y + TOP - 1, Palette.argb(Math.round(0x80 + 0x60 * pulse), Palette.SEAL));

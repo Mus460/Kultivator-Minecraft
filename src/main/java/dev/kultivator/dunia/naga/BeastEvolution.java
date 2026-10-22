@@ -87,6 +87,10 @@ public final class BeastEvolution implements BeastEvolutionService {
 
 	@Override
 	public void grantItem(ServerPlayer player, String what) {
+		if ("darah_jiao".equals(what) || "darah".equals(what)) {
+			NagaItems.give(player, DarahJiaoItem.of(NagaKind.AIR));
+			return;
+		}
 		Item item = switch (what == null ? "" : what) {
 			case "sisik_jiao", "sisik" -> NagaItems.SISIK_JIAO;
 			case "mutiara_jiao", "mutiara" -> NagaItems.MUTIARA_JIAO;

@@ -1,5 +1,7 @@
 package dev.kultivator.dunia.dimensi.bawah;
 
+import dev.kultivator.data.Cultivators;
+import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.dimensi.DimensiNpc;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -12,19 +14,28 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * {@code kultivator:arwah} (DESIGN 34.5.13): the people of Dunia Bawah, drawn with the disciple player model.
  * <ul>
- * <li>{@link #MENG_PO}: the old woman of the soup at the end of the Naihe bridge (Yuli Baochao).</li>
- * <li>{@link #HAKIM}: the judge of court {@link #variant()} 1-10 (the Ten Kings: Qinguang ... Zhuanlun).</li>
+ * <li>{@link #MENG_PO}: the old woman of the soup at the end of the Naihe bridge (Yuli Baochao); she stirs her cauldron.</li>
+ * <li>{@link #HAKIM}: the judge of court {@link #variant()} 1-10 (the Ten Kings: Qinguang ... Zhuanlun), brush and ledger
+ * in hand.</li>
  * <li>{@link #RAJA_YAMA}: King Yama (Yanluo) in his palace, keeper of the Book of Life and Death.</li>
  * <li>{@link #KEPALA_LEMBU} / {@link #MUKA_KUDA}: Ox-Head and Horse-Face, the courts' guards and duel partners.</li>
  * <li>{@link #ARWAH}: a ghost (quest giver, wandering soul, or a lost soul following its escort).</li>
- * <li>{@link #HANTU_LAPAR}: a hungry ghost: hunts the living soul, saps strength; the only hostile role.</li>
+ * <li>{@link #HANTU_LAPAR}: a hungry ghost: hunts the living soul, saps strength; the only hostile role. It cowers from a
+ * True Immortal (never hunts one on sight, still fights back when struck).</li>
+ * <li>{@link #WUCHANG_PUTIH} / {@link #WUCHANG_HITAM}: Bai and Hei Wuchang, the white and black Impermanence of folk
+ * belief who lead the dead below; on Teras Wangxiang they greet arriving souls and show the way (a soul lantern and a
+ * binding chain, their tall hats).</li>
  * </ul>
  */
 public class ArwahEntity extends DimensiNpc {
@@ -36,8 +47,11 @@ public class ArwahEntity extends DimensiNpc {
 	public static final int ARWAH = 4;
 	public static final int HANTU_LAPAR = 5;
 	public static final int RAJA_YAMA = 6;
-	public static final int ROLES = 7;
-	private static final String[] IDS = {"meng_po", "hakim", "kepala_lembu", "muka_kuda", "arwah", "hantu_lapar", "raja_yama"};
+	public static final int WUCHANG_PUTIH = 7;
+	public static final int WUCHANG_HITAM = 8;
+	public static final int ROLES = 9;
+	private static final String[] IDS = {"meng_po", "hakim", "kepala_lembu", "muka_kuda", "arwah", "hantu_lapar", "raja_yama",
+			"wuchang_putih", "wuchang_hitam"};
 
 	public ArwahEntity(EntityType<? extends ArwahEntity> type, Level level) {
 		super(type, level);
@@ -45,7 +59,8 @@ public class ArwahEntity extends DimensiNpc {
 
 	/**
 	 * Role, look seed and variant (court number for judges and guards), with the role's numbers scaled by {@code realm}
-	 * (the realm ordinal of the players it meets: Nascent Soul and up in Dunia Bawah).
+	 * (the realm ordinal of the players it meets: Nascent Soul and up in Dunia Bawah). What they hold is only drawn, never
+	 * dropped (the stacks are made here, at runtime).
 	 */
 	public void setup(int role, int look, int variant, int realm) {
 		int r = Mth.clamp(role, 0, ROLES - 1);
@@ -55,11 +70,22 @@ public class ArwahEntity extends DimensiNpc {
 			case KEPALA_LEMBU, MUKA_KUDA -> setStats(60.0D + 28.0D * rr, 5.0D + 2.2D * rr, 6.0D + rr, 0.3D);
 			case HANTU_LAPAR -> setStats(24.0D + 9.0D * rr, 4.0D + 1.6D * rr, 2.0D, 0.29D);
 			case ARWAH -> setStats(20.0D, 0.0D, 0.0D, 0.27D);
+			case WUCHANG_PUTIH, WUCHANG_HITAM -> setStats(200.0D, 10.0D, 10.0D, 0.24D);
 			default -> setStats(200.0D, 10.0D, 10.0D, 0.25D);
 		}
-		if (r == KEPALA_LEMBU || r == MUKA_KUDA) {
-			// Ox-Head's steel fork, Horse-Face's spear: drawn only, never dropped
-			this.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TRIDENT));
+		switch (r) {
+			// Ox-Head's steel fork, Horse-Face's spear
+			case KEPALA_LEMBU, MUKA_KUDA -> this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.TRIDENT));
+			// the judge's brush and ledger
+			case HAKIM -> {
+				this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.FEATHER));
+				this.setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(Items.BOOK));
+			}
+			// Bai Wuchang's soul lantern, Hei Wuchang's binding chain
+			case WUCHANG_PUTIH -> this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.SOUL_LANTERN));
+			case WUCHANG_HITAM -> this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_CHAIN));
+			default -> {
+			}
 		}
 	}
 
@@ -76,6 +102,11 @@ public class ArwahEntity extends DimensiNpc {
 		return role() == ARWAH || role() == HANTU_LAPAR;
 	}
 
+	/** True for Bai and Hei Wuchang. */
+	public boolean wuchang() {
+		return role() == WUCHANG_PUTIH || role() == WUCHANG_HITAM;
+	}
+
 	@Override
 	protected Component getTypeName() {
 		if (role() == HAKIM) {
@@ -86,12 +117,37 @@ public class ArwahEntity extends DimensiNpc {
 
 	@Override
 	protected boolean wanders() {
-		return role() == HANTU_LAPAR || (role() == ARWAH && !hasFlag(FLAG_QUEST));
+		return role() == HANTU_LAPAR || wuchang() || (role() == ARWAH && !hasFlag(FLAG_QUEST));
 	}
 
 	@Override
 	protected boolean hostileToPlayers() {
 		return role() == HANTU_LAPAR;
+	}
+
+	@Override
+	protected boolean huntsPlayer(Player player) {
+		// a True Immortal's aura: the hungry dead keep their distance (they still fight back when struck)
+		return !(player instanceof ServerPlayer serverPlayer) || !Cultivators.get(serverPlayer).realm().atLeast(Realm.TRUE_IMMORTAL);
+	}
+
+	@Override
+	protected boolean bowsToImmortals() {
+		return role() == HAKIM || role() == KEPALA_LEMBU || role() == MUKA_KUDA || wuchang();
+	}
+
+	@Override
+	public @Nullable String chatterKey() {
+		return switch (role()) {
+			case MENG_PO -> "meng_po";
+			case HAKIM -> "hakim";
+			case RAJA_YAMA -> "yama";
+			case KEPALA_LEMBU, MUKA_KUDA -> "penjaga_alam";
+			case ARWAH -> hasFlag(FLAG_FOLLOW) ? null : "arwah";
+			case WUCHANG_PUTIH -> "wuchang_putih";
+			case WUCHANG_HITAM -> "wuchang_hitam";
+			default -> null;
+		};
 	}
 
 	@Override

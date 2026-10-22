@@ -112,7 +112,8 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
   **Lima Unsur** dalam pertarungan, **Relik di Peti Kuno** dengan Indra Ilahi yang mencium harta, Kejenuhan Bertarung,
   dan kenyamanan HUD (pengukur pedang terbang, peringatan bahaya saat meditasi, cetak biru formasi).
 * **Perubahan keseimbangan** (audit alur Fana → Dewa Abadi): tribulasi lebih adil (lingkar petir mulai Jiwa Baru Lahir, terpental bukan lari, total petir Kenaikan Abadi/Dewa Abadi paling banyak 2,2× nyawa, maks. 10 pelindung hidup), urat roh separuh lebih awet di bawah Transformasi Dewa, Inti Raja dari Raja Siluman atau 9 Inti Tinggi, sesajen ritual Alam Abadi dikembalikan saat gagal ([panduan](docs/PANDUAN.md#73-tribulasi-langit)).
-* **Kitab Panduan** di dalam game: 14 bab, 124 langkah dari Manusia Fana sampai Dewa Abadi (bab 13-14: Dunia Kultivasi yang Luas) (sekte dan murid), dengan centang otomatis; buka lewat bagian *Panduan* di menu utama (ketuk `V`), irisan Kitab Panduan di roda Akses Cepat (tahan `V`), atau `/kultivasi panduan` ([panduan](docs/PANDUAN.md#62-kitab-panduan-di-dalam-game)).
+* **Kitab Panduan** di dalam game: 14 bab, 133 langkah dari Manusia Fana sampai Dewa Abadi (bab 13-14: Dunia Kultivasi yang Luas) (sekte dan murid), dengan centang otomatis; buka lewat bagian *Panduan* di menu utama (ketuk `V`), irisan Kitab Panduan di roda Akses Cepat (tahan `V`), atau `/kultivasi panduan` ([panduan](docs/PANDUAN.md#62-kitab-panduan-di-dalam-game)).
+* **Duel Pedang Kultivator**: duel resmi melawan pemain, murid sendiri atau NPC kultivator (pengembara, saingan, penjaga kota), atau menonton dua murid berduel. Tebasan ke 8 arah dari gerak tetikus, tebas berat dan tusuk, tangkis dan **Tangkisan Sempurna**, bar **Postur** gaya Sekiro dengan Tebasan Penentu, **Kunci Bilah**, serangan berbahaya bertanda 危 (Injak Pedang, lompat), tipuan, rantai pertukaran, taruhan yang dititipkan, Kehormatan dan gelar. Percikan dan bara di titik kontak bilah, jejak bilah, hit-stop, gerak lambat tampilan saja, kamera bahu dan intro/penutup yang bisa dilewati; tidak ada yang mati dan tidak ada blok yang berubah; Better Combat dan Combat Roll didukung ([panduan](docs/PANDUAN.md#65-duel-pedang-kultivator)).
 * Semua teks dalam **Bahasa Indonesia** dan **English**. Kompatibel dengan Sodium, Iris, ImmediatelyFast, EMF/ETF,
   Lithium, FerriteCore.
 
@@ -140,6 +141,7 @@ membunuh — kalau gagal, pemain terluka (Penyimpangan Qi). Hanya ada dua pengec
 | 31 | Aura Kultivasi: saat kamu atau muridmu berkultivasi muncul aura yang berbeda di setiap ranah (qi spiral dan pusaran, platform dan pilar Fondasi, matahari Inti Emas dengan halo, bayi Jiwa Baru Lahir di atas teratai, Dharma Idol dan riak indra ilahi, rune Dao yang melebur, Gerbang Keabadian dengan qi ungu dari timur, roda bintang dan singgasana teratai sembilan tingkat) dan tumbuh di setiap tahap serta lapisan Kenaikan Abadi, diwarnai Dao, aksen Akar Surgawi atau fisik murid, denyut siap menerobos; hanya tampilan, hemat untuk laptop lemah (Penuh/Sederhana/Mati, batas per Kualitas Efek, LOD 24/64 blok, aman Sodium/Iris); uji `uji aura <ranah> [tahap] [lapisan]|semua|murid|aksen|stop` ([panduan](docs/PANDUAN.md#61-aura-kultivasi), [daftar uji](docs/uji/FASE-31.md)). **Belum diuji di game** (hanya dikompilasi) |
 | 32 | Film Kosmik 3D: film Titah Langit kini melewati panggung 3D buatan sendiri: **Orbit** (planet dunia ini dari angkasa dengan benua berwarna bioma sekitarmu, awan berputar, cahaya atmosfer, lampu kota, bulan berkawah, matahari dan Bima Sakti; pedang menukik menembus atmosfer, tujuh bintang Biduk menembakkan sinar) dan **Istana Langit** (Gerbang Langit Selatan, Aula Lingxiao, Sembilan Langit, lautan awan; tiang langit dilepas dan jatuh); hanya tampilan, tanpa post shader, hemat laptop lemah, kamera tetap dalam batas dan selalu kembali (Backspace, bahaya); pengaturan `Film kosmik 3D: Penuh / Ringan / Mati`, `/sinematik kosmik3d orbit\|surga [detik] [tingkat]\|beat ...\|info` ([panduan](docs/PANDUAN.md#63-film-kosmik-3d), [daftar uji](docs/uji/FASE-32.md)). **Belum diuji di game** (hanya dikompilasi) |
 | 34 | Dunia Kultivasi yang Luas: Kota Kultivator (Balai Lelang, kedai teh, pasar gelap), kultivator pengembara dan enam kelompok saingan yang berebut harta, Gua Leluhur dengan teka-teki formasi, Penjara Iblis Kuno, Menara Seratus Lantai, peristiwa langit (Hujan Meteor Roh, Gerhana Darah, Bulan Kembar), Harta Lahir dengan pilar pelangi, Kabut Qi, naga liar (Jiao) yang bisa ditundukkan, evolusi binatang roh Tingkat 4-6, Dunia Bawah (Naihe, Meng Po, Sepuluh Pengadilan), Laut Tanpa Batas (pulau roh, Istana Naga, Penglai), Kota Abadi, kapal terbang sekte dan Peta Dunia; bangunan hanya lahir di chunk baru, tidak ada blok yang berubah saat bermain; config `config/kultivator-dunia.json`, uji `uji jelajah|kota|pengembara|saingan|gua|penjara|menara|langit|harta_lahir|cuaca|naga|evolusi|bawah|laut|kapal|peta ...` ([panduan](docs/PANDUAN.md#64-dunia-kultivasi-yang-luas)). **Belum diuji di game** (hanya dikompilasi) |
+| 35 | Duel Pedang Kultivator: duel resmi pemain/murid/NPC/tonton dengan benturan bilah yang diputuskan server (jendela tangkis dengan kompensasi latensi, postur, kunci bilah, serangan berbahaya, Tebasan Penentu), AI duelist empat gaya Dugu Qiubai, taruhan dan Kehormatan, percikan, jejak, hit-stop, kamera duel, intro dan penutup sinematik, pose dan data bilah, HUD, suara dan kiai; detail pass Dunia (pakaian dan rutinitas NPC kota, empat gaya kota, gaya baru penjara dan menara, Meteor Agung, penjaga harta, Amukan Naga, Wuchang dan pulau roh empat jenis, corak kapal dan Bajak Langit, suara Jepang baru); `/kultivasi duel ...`, uji `uji duel ...` ([panduan](docs/PANDUAN.md#65-duel-pedang-kultivator)). **Belum diuji di game** (hanya dikompilasi) |
 
 ## Perintah singkat
 
@@ -183,7 +185,7 @@ Mode Kehancuran cukup satu perintah: `/kultivasi kehancuran semua nyala` (matika
 
 ## Tombol bawaan
 
-Semua di dekat WASD: `G` rapal (tahan = Roda Segel) · `V` Akses Cepat (ketuk = menu utama dengan 8 bagian, tahan = roda) · `Z` teknik berikutnya · `B` meditasi · `H` pedang terbang · `M` murid · `Backspace` lewati sinematik; sisanya lewat `V` dan menu utama, ganti di Pengaturan › Kontrol ([panduan](docs/PANDUAN.md#2-tombol-dan-cara-menggantinya)).
+Semua di dekat WASD: `G` rapal (tahan = Roda Segel) · `V` Akses Cepat (ketuk = menu utama dengan 8 bagian, tahan = roda) · `Z` teknik berikutnya · `B` meditasi · `H` pedang terbang · `M` murid · `Backspace` lewati sinematik; klik kanan dengan senjata = tangkis (duel); sisanya lewat `V` dan menu utama, ganti di Pengaturan › Kontrol ([panduan](docs/PANDUAN.md#2-tombol-dan-cara-menggantinya)).
 
 ## Konfigurasi
 
@@ -269,6 +271,13 @@ with every stage (and every Immortal Ascension layer) appears around them: spira
 platform with pillars, a golden core sun with halo rings, a Nascent Soul on a lotus, a Dharma Idol, fusing Dao runes, the
 Immortal Gate with purple qi from the east, and a star wheel over a nine-grade lotus throne. Visual only, budgeted for
 weak laptops (`Aura Kultivasi: Penuh / Sederhana / Mati`), compatible with Sodium and Iris; test with `/kultivasi uji aura`.
+
+**Cultivator sword duels.** Formal duels against players, your own disciples or world NPC cultivators, or watch two
+disciples duel: eight swing directions from the mouse, heavy swings and thrusts, deflects and Perfect Deflects, a
+Sekiro-style posture bar with a Deathblow, blade binds, perilous attacks marked 危, feints, exchange chains, escrowed
+stakes and an honour rating. Sparks at the real blade contact point, blade trails, hit-stop, view-only slow motion, a
+shoulder camera and skippable intro and finisher films. The server decides every exchange; nobody dies and no block
+changes. Works with Better Combat and Combat Roll.
 
 The full player guide is in Indonesian: [docs/PANDUAN.md](docs/PANDUAN.md); every rule and number is in
 [docs/DESIGN.md](docs/DESIGN.md); per-phase test lists in [docs/uji/](docs/uji/).

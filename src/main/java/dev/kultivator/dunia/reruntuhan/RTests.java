@@ -190,7 +190,17 @@ final class RTests {
 	private static LiteralArgumentBuilder<CommandSourceStack> penjara() {
 		return Commands.literal("penjara").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 				.executes(ctx -> info(player(ctx)))
-				.then(Commands.literal("cari").executes(ctx -> DuniaCommands.findAndTeleport(player(ctx), Kultivator.id("penjara/penjara_iblis"))))
+				.then(Commands.literal("cari").executes(ctx -> DuniaCommands.findAndTeleport(player(ctx), Kultivator.id("penjara/penjara_iblis")))
+						// the badlands prison (red sandstone, acacia, mud brick)
+						.then(Commands.literal("gurun").executes(ctx -> DuniaCommands.findAndTeleport(player(ctx), Kultivator.id("penjara/penjara_iblis_gurun")))))
+				// a local stand-in for a Gerhana Darah over this dimension: only the prisons' own reaction (restless demons,
+				// faster seal decay, the eclipse achievement); the sky itself stays module L's
+				.then(Commands.literal("gerhana").then(Commands.argument("nyala", com.mojang.brigadier.arguments.BoolArgumentType.bool())
+						.executes(ctx -> {
+							boolean on = com.mojang.brigadier.arguments.BoolArgumentType.getBool(ctx, "nyala");
+							Prisons.testEclipse(player(ctx).level(), on);
+							return say(player(ctx), on ? "kultivator.reruntuhan.uji.eclipse.on" : "kultivator.reruntuhan.uji.eclipse.off");
+						})))
 				.then(Commands.literal("segel").then(Commands.argument("nilai", IntegerArgumentType.integer(0, 100))
 						.executes(ctx -> setSeal(player(ctx), IntegerArgumentType.getInteger(ctx, "nilai")))))
 				.then(Commands.literal("cabut").then(Commands.argument("jimat", IntegerArgumentType.integer(1, 5))

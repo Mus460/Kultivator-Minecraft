@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/sky_event",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.sky_all.description"
+    },
+    "icon": {
+      "id": "kultivator:batu_meteor_roh"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.sky_all.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

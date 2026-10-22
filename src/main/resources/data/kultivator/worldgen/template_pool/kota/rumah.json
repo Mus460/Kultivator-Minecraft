@@ -84,6 +84,60 @@
     {
       "element": {
         "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/rumah_halaman_0",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/rumah_halaman_1",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/rumah_halaman_2",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/rumah_toko_0",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/rumah_toko_1",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/rumah_toko_2",
+        "processors": "kultivator:kota/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
         "location": "kultivator:kota/hias_kios",
         "processors": "kultivator:kota/utuh",
         "projection": "rigid"
@@ -103,6 +157,51 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "kultivator:kota/hias_lentera",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/hias_sumur",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/hias_kuil",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/hias_batu",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/hias_latihan",
+        "processors": "kultivator:kota/utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota/hias_pohon",
         "processors": "kultivator:kota/utuh",
         "projection": "rigid"
       },

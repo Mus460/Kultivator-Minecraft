@@ -317,7 +317,7 @@ public final class Saingan implements RivalService {
 					if (DuniaApi.treasures().claimByRival(level, race.birth.id(), race.group)) {
 						SainganData.get(server).win(race.group);
 						KultivatorNpc leader = race.members.getFirst();
-						Voice.say(leader, "rogue.defeat", "kultivator.kota.saingan.suara.klaim");
+						KotaVoice.say(leader, KotaVoice.RIVAL_CLAIM, "rogue.defeat", "kultivator.kota.saingan.suara.klaim");
 						for (ServerPlayer player : level.players()) {
 							if (player.position().distanceToSqr(target) <= 128.0D * 128.0D) {
 								Msg.chat(player, Component.translatable("kultivator.kota.saingan.klaim", name(server, race.group)).withStyle(ChatFormatting.RED));
@@ -375,7 +375,7 @@ public final class Saingan implements RivalService {
 			}
 		}
 		if (!spawned.isEmpty()) {
-			Voice.say(spawned.getFirst(), "rogue.ambush", "kultivator.kota.saingan.suara.klaim");
+			KotaVoice.say(spawned.getFirst(), KotaVoice.RIVAL_CLAIM, "rogue.ambush", "kultivator.kota.saingan.suara.klaim");
 			level.playSound(null, landing.x, landing.y, landing.z, SoundEvents.TRIDENT_RIPTIDE_3.value(), SoundSource.HOSTILE, 1.0F, 0.8F);
 		}
 		Msg.chat(witness, Component.translatable("kultivator.kota.saingan.datang", groupName(group)).withStyle(style -> style.withColor(ChatFormatting.GOLD)
@@ -427,6 +427,7 @@ public final class Saingan implements RivalService {
 			npc.setGroup(group.id);
 			npc.setLonely(96.0D, 900);
 			npc.memory().putBoolean("leader", isLeader);
+			npc.setFlag(KultivatorNpc.FLAG_LEADER, isLeader);
 			if (!level.addFreshEntity(npc)) {
 				break;
 			}
@@ -553,7 +554,7 @@ public final class Saingan implements RivalService {
 			member.markHostile(player);
 			member.memory().putBoolean("ambush", true);
 		}
-		Voice.say(members.getFirst(), "rogue.ambush", "kultivator.kota.saingan.suara.klaim");
+		KotaVoice.say(members.getFirst(), KotaVoice.RIVAL_CLAIM, "rogue.ambush", "kultivator.kota.saingan.suara.klaim");
 		Msg.chat(player, Component.translatable("kultivator.kota.saingan.sergap", groupName(group)).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
 		return true;
 	}

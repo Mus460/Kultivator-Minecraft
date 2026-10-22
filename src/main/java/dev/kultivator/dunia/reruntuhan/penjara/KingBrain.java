@@ -67,7 +67,7 @@ public final class KingBrain implements RCreature.Brain {
 				c.setFlag(RCreature.FLAG_RISING, false);
 				c.setSkill(0);
 				level.playSound(null, c.getX(), c.getY(), c.getZ(), SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 3.0F, 0.5F);
-				Voice.boom(c, "boss.awaken", 64.0D);
+				Voice.boom(c, "penjara.free_at_last", 64.0D);
 			}
 			return;
 		}

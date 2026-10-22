@@ -97,6 +97,9 @@ final class NpcAi {
 			NpcSkills.use(level, npc, target, now);
 		}
 		Kota.tickNpc(level, npc, now);
+		if (!npc.isRemoved()) {
+			NpcLife.tick(level, npc, now);
+		}
 	}
 
 	// ================================================================== goals

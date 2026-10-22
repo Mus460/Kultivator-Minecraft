@@ -161,7 +161,7 @@ public class UlarLautEntity extends Monster {
 	public void die(DamageSource source) {
 		super.die(source);
 		if (this.level() instanceof ServerLevel level && source.getEntity() instanceof ServerPlayer killer) {
-			Dimensi.monsterSlain(level, killer, this, hasPearl() ? "ular_mutiara" : "ular");
+			Dimensi.monsterSlain(level, killer, this, hasPearl() ? "ular_mutiara" : "ular", tier());
 		}
 	}
 

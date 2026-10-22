@@ -88,6 +88,14 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 	public static final int FLAG_LEAVING = 64;
 	/** Held still by a beast tribulation (DESIGN 34.5.12). */
 	public static final int FLAG_TRIBULATION = 128;
+	/** Amukan Naga: a wild Jiao below half health (faster, harder; its eyes burn red). */
+	public static final int FLAG_ENRAGED = 256;
+	/** A tamed Jiao resting low around its still owner (slow breath, closed jaw). */
+	public static final int FLAG_RESTING = 512;
+	/** Gila Darah: a wild Jiao born under the blood eclipse (provoked sooner, hits harder, red-rimmed). */
+	public static final int FLAG_FRENZY = 1024;
+	/** A tamed Jiao guarding its owner's body while the soul walks Dunia Bawah (Penjaga Raga). */
+	public static final int FLAG_GUARD = 2048;
 
 	// ------------------------------------------------------------------ skills (DATA_SKILL)
 	public static final int SKILL_NONE = 0;
@@ -101,6 +109,24 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 	public static final int SKILL_COIL = 4;
 	/** A dive at the target. */
 	public static final int SKILL_BITE = 5;
+	/**
+	 * The kind skill (detail pass): Pusaran Samudra (water: a whirl drags and drowns), Tirai Awan (cloud: a blinding veil,
+	 * then a bite from behind), Hujan Petir Langit (thunder: marked rings struck by bolts of light). Telegraphed for
+	 * {@link #SPECIAL_TELEGRAPH} ticks.
+	 */
+	public static final int SKILL_SPECIAL = 6;
+	public static final int SPECIAL_TELEGRAPH = 30;
+	/** Pusaran Samudra: the whirl pulls for this long after its telegraph, radius {@link #WHIRL_RADIUS}. */
+	public static final int WHIRL_TICKS = 70;
+	public static final double WHIRL_RADIUS = 8.0D;
+	/** Tirai Awan: the veil's radius; the Jiao strikes from behind after {@link #VEIL_STRIKE} ticks. */
+	public static final double VEIL_RADIUS = 14.0D;
+	public static final int VEIL_STRIKE = 30;
+	/** Hujan Petir Langit: the ring radius of one mark and the ticks between two strikes. */
+	public static final double MARK_RADIUS = 2.6D;
+	public static final int MARK_STAGGER = 5;
+	/** Amukan Naga starts at half health. */
+	public static final float ENRAGE_AT = 0.5F;
 
 	public static final int BREATH_TELEGRAPH = 20;
 	public static final int BREATH_ACTIVE = 30;
@@ -163,8 +189,20 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 	long siteId;
 	/** Tamed: breath timer; ridden: the input of this tick. */
 	int breathTimer = TAMED_BREATH_EVERY / 2;
+	/** Tamed tier 5+: ticks until it may use its kind skill on its owner's foe. */
+	int specialTimer = 300;
 	private Vec3 riddenVelocity = Vec3.ZERO;
 	private int followAngleSeed;
+	/** Amukan Naga has begun once (Lemah calms it for its 30 s; a renewed fight below half health is enraged again). */
+	boolean enrageUsed;
+	/** Players who already felt this Jiao's awe (Immortal Ascension+ cultivators: it bows its head, never provoked). */
+	private final java.util.Set<UUID> awed = new java.util.HashSet<>();
+	/** The kind skill's point (the whirl's centre, the veil's origin) and the marks of a thunder rain. */
+	Vec3 specialPoint = Vec3.ZERO;
+	final List<Vec3> marks = new java.util.ArrayList<>();
+	/** A water Jiao skims the water for a while (ticks left, 0 = none); the cloud Jiao climbs into the clouds. */
+	private int dipTicks;
+	private int nextDip = 600;
 
 	public NagaLiarEntity(EntityType<? extends NagaLiarEntity> type, Level level) {
 		super(type, level);
@@ -335,8 +373,9 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 	// ================================================================== set-up (server)
 
 	/** A wild Jiao of {@code kind} at {@code pos}; {@code realm} (an ordinal, at least Nascent Soul) scales health and damage. */
-	void setUpWild(NagaKind kind, Vec3 pos, int realmOrdinal, boolean test) {
+	void setUpWild(NagaKind kind, Vec3 pos, int realmOrdinal, boolean test, boolean frenzy) {
 		setKind(kind);
+		setFlag(FLAG_FRENZY, frenzy);
 		this.entityData.set(DATA_SEGMENTS, Naga.config().segmentsMax);
 		this.test = test;
 		this.home = pos;
@@ -375,7 +414,8 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 		this.entityData.set(DATA_SEGMENTS, Naga.config().segmentsMax);
 		setOwnerPlayer(owner);
 		setFlag(FLAG_TAMED, true);
-		setFlag(FLAG_LEMAH | FLAG_ANGRY | FLAG_CONTEST | FLAG_FLEE | FLAG_LEAVING, false);
+		setFlag(FLAG_LEMAH | FLAG_ANGRY | FLAG_CONTEST | FLAG_FLEE | FLAG_LEAVING | FLAG_ENRAGED | FLAG_FRENZY, false);
+		this.marks.clear();
 		this.mode = Mode.TAMED;
 		this.targetId = null;
 		this.test = false;
@@ -385,9 +425,27 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 		this.setHealth(Math.max(1.0F, this.getMaxHealth() * Mth.clamp(healthFraction, 0.05F, 1.0F)));
 		setStamina(stamina);
 		endSkill(40);
-		this.setCustomName(Component.translatable(BeastData.titleKey(BeastData.JIAO, tier)));
-		this.setCustomNameVisible(false);
+		nameplate(owner, tier);
 		removeBar();
+	}
+
+	/** The tamed Jiao's name plate: its title and its owner ("Jiao Bertanduk · milik Lin"), shown when looked at. */
+	void nameplate(ServerPlayer owner, int tier) {
+		this.setCustomName(Component.translatable("kultivator.naga.nameplate", Component.translatable(BeastData.titleKey(BeastData.JIAO, tier)),
+				owner.getName()).withColor(dev.kultivator.beast.SpiritBeasts.tierColor(BeastData.JIAO, tier)));
+		this.setCustomNameVisible(false);
+	}
+
+	/** The damage multiplier of this moment: the realm factor, ×1.2 in Amukan Naga, ×1.15 Gila Darah. */
+	double power() {
+		double power = damageFactor;
+		if (hasFlag(FLAG_ENRAGED)) {
+			power *= 1.2D;
+		}
+		if (hasFlag(FLAG_FRENZY)) {
+			power *= 1.15D;
+		}
+		return power;
 	}
 
 	// ================================================================== tick
@@ -455,9 +513,31 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 		setFlag(FLAG_FLEE, next == Mode.FLEE);
 		setFlag(FLAG_LEAVING, next == Mode.LEAVE);
 		setFlag(FLAG_CONTEST, next == Mode.CONTEST);
+		setFlag(FLAG_ENRAGED, next == Mode.FIGHT && enrageUsed && Naga.config().enrage && this.getHealth() <= this.getMaxHealth() * ENRAGE_AT);
 		if (next != Mode.FIGHT) {
 			endSkill(Math.max(skillCooldown, 40));
 		}
+	}
+
+	/** Amukan Naga: half health in a fight; it roars, its skills come faster and hit harder (config {@code enrage}). */
+	private void enrage(ServerLevel level) {
+		enrageUsed = true;
+		if (!Naga.config().enrage) {
+			return;
+		}
+		setFlag(FLAG_ENRAGED, true);
+		skillCooldown = Math.min(skillCooldown, 12);
+		level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.HOSTILE, 3.0F, 0.55F);
+		level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 1.4F, 1.3F);
+		dev.kultivator.voice.Voice.boom(this, "boss.enraged", 96.0D);
+		dev.kultivator.fx.Fx.ring(level, this.position(), 0xFF5040, 9.0F);
+		dev.kultivator.fx.Fx.burst(level, this.position(), kind().glow, 40, 4.0F);
+		for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, this.getBoundingBox().inflate(64.0D))) {
+			player.sendOverlayMessage(Component.translatable("kultivator.naga.enraged", kind().displayName())
+					.withStyle(net.minecraft.ChatFormatting.RED, net.minecraft.ChatFormatting.BOLD));
+		}
+		NagaPayloads.moment(level, NagaPayloads.MOMENT_ENRAGED, this.getId(), this.position(), kind().ordinal(), tier(), 2, this.getId(), null,
+				96.0D);
 	}
 
 	@Override
@@ -537,37 +617,102 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 	}
 
 	private void wander(ServerLevel level) {
-		phase += Math.PI * 2.0D / 1400.0D;
+		NagaKind kind = kind();
+		// the cloud Jiao drifts slower and higher; the thunder Jiao darts on a zigzag over its loop
+		phase += Math.PI * 2.0D / 1400.0D * (kind == NagaKind.AWAN ? 0.8D : 1.0D);
 		double t = phase + 0.12D;
 		double s = Math.sin(t);
-		Vec3 point = new Vec3(home.x + amplitude * s, home.y + 14.0D * Math.sin(t * 0.5D), home.z + amplitude * s * Math.cos(t));
-		steer(point, 0.55D, 0.05D);
+		double lift = kind == NagaKind.AWAN ? 22.0D : 14.0D;
+		Vec3 point = new Vec3(home.x + amplitude * s, home.y + lift * Math.sin(t * 0.5D), home.z + amplitude * s * Math.cos(t));
+		if (kind == NagaKind.PETIR) {
+			double zig = Math.sin(this.tickCount * 0.1D) * 9.0D;
+			point = point.add(Math.cos(t) * zig, Math.sin(this.tickCount * 0.17D) * 3.0D, -Math.sin(t) * zig);
+			if (level.isThundering() && this.tickCount % 160 == 0 && this.random.nextInt(3) == 0) {
+				// it plays in the storm: thunder rolls around it (a sound and light only, never a LightningBolt)
+				level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 2.5F,
+						1.2F + this.random.nextFloat() * 0.3F);
+				dev.kultivator.fx.Fx.burst(level, this.position().add(0.0D, 0.6D, 0.0D), kind.glow, 16, 3.0F);
+			}
+		}
+		point = skim(level, kind, point);
+		steer(point, kind == NagaKind.PETIR ? 0.7D : 0.55D, 0.05D);
 		if (this.tickCount % 10 == 0) {
 			checkProvoke(level);
 		}
 	}
 
-	/** A flying player within 24 blocks at its height (±8) for 5 s provokes it (counted in steps of 10 ticks). */
+	/**
+	 * Now and then (every 45-90 s, for 10 s) a water Jiao skims down to the water under it and a cloud Jiao climbs into
+	 * the cloud layer. Only reads loaded ground and fluid, never touches a block.
+	 */
+	private Vec3 skim(ServerLevel level, NagaKind kind, Vec3 point) {
+		if (dipTicks > 0) {
+			dipTicks--;
+		} else if (--nextDip <= 0) {
+			nextDip = 900 + this.random.nextInt(900);
+			dipTicks = 200;
+		}
+		if (dipTicks <= 0 || kind == NagaKind.PETIR) {
+			return point;
+		}
+		double k = Math.sin(Math.PI * (200 - dipTicks) / 200.0D);
+		if (kind == NagaKind.AWAN) {
+			return new Vec3(point.x, Math.min(level.getMaxY() - 24.0D, point.y + 30.0D * k), point.z);
+		}
+		BlockPos at = BlockPos.containing(this.getX(), this.getY(), this.getZ());
+		if (!level.hasChunkAt(at)) {
+			return point;
+		}
+		BlockPos top = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, at);
+		if (!level.getFluidState(top.below()).is(net.minecraft.tags.FluidTags.WATER)) {
+			return point;
+		}
+		double surface = top.getY() + 2.5D;
+		if (k > 0.85D && this.tickCount % 10 == 0 && this.getY() < surface + 4.0D) {
+			level.playSound(null, this.getX(), surface, this.getZ(), SoundEvents.PLAYER_SPLASH_HIGH_SPEED, SoundSource.HOSTILE, 1.4F, 0.6F);
+			dev.kultivator.fx.Fx.burst(level, new Vec3(this.getX(), surface - 1.5D, this.getZ()), kind.glow, 12, 2.0F);
+		}
+		return new Vec3(point.x, Mth.lerp(k, point.y, surface), point.z);
+	}
+
+	/**
+	 * A flying player within 24 blocks at its height (±8) for 5 s provokes it (counted in steps of 10 ticks). Under the
+	 * blood eclipse (Gila Darah) it takes half the time and 1.5× the range; under twin moons it is calm (twice the time).
+	 * A cultivator of Immortal Ascension and above awes it: it bows its head and lets them pass (unless Gila Darah).
+	 */
 	private void checkProvoke(ServerLevel level) {
-		AABB box = this.getBoundingBox().inflate(PROVOKE_RANGE);
+		boolean frenzy = hasFlag(FLAG_FRENZY);
+		double range = frenzy ? PROVOKE_RANGE * 1.5D : PROVOKE_RANGE;
+		int needed = frenzy ? PROVOKE_TICKS / 2 : WildDragons.sky(level, dev.kultivator.dunia.api.SkyKind.TWIN_MOONS) ? PROVOKE_TICKS * 2
+				: PROVOKE_TICKS;
+		AABB box = this.getBoundingBox().inflate(range);
 		java.util.Set<UUID> seen = new java.util.HashSet<>();
 		for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, box, p -> !p.isSpectator() && !p.isCreative() && p.isAlive())) {
 			boolean flying = player.getAbilities().flying || player.isFallFlying() || player.getVehicle() != null && !player.getVehicle().onGround();
-			if (!flying || Math.abs(player.getY() - this.getY()) > 8.0D || player.distanceToSqr(this) > PROVOKE_RANGE * PROVOKE_RANGE) {
+			if (!flying || Math.abs(player.getY() - this.getY()) > 8.0D || player.distanceToSqr(this) > range * range) {
+				continue;
+			}
+			if (!frenzy && NagaLines.awes(player)) {
+				if (awed.add(player.getUUID())) {
+					level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_AMBIENT, SoundSource.HOSTILE, 1.0F, 0.5F);
+					player.sendOverlayMessage(Component.translatable("kultivator.naga.awe", kind().displayName()).withColor(kind().glow));
+				}
 				continue;
 			}
 			seen.add(player.getUUID());
-			int ticks = provoke.getOrDefault(player.getUUID(), 0) + 10;
+			int before = provoke.getOrDefault(player.getUUID(), 0);
+			int ticks = before + 10;
 			provoke.put(player.getUUID(), ticks);
-			if (ticks >= PROVOKE_TICKS) {
+			if (ticks >= needed) {
 				provoke.clear();
 				engage(level, player, true);
 				return;
 			}
-			if (ticks == 50) {
-				// a warning growl halfway
+			if (before < needed / 2 && ticks >= needed / 2) {
+				// a warning growl halfway, in its own words
 				level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.HOSTILE, 1.2F, 1.6F);
-				player.sendOverlayMessage(Component.translatable("kultivator.naga.provoke.warn", kind().displayName())
+				player.sendOverlayMessage((Naga.config().dialogue ? NagaLines.warn(kind(), player)
+						: Component.translatable("kultivator.naga.provoke.warn", kind().displayName())).copy()
 						.withStyle(net.minecraft.ChatFormatting.YELLOW));
 			}
 		}
@@ -589,7 +734,7 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 		this.setTarget(target);
 		if (fresh) {
 			home = this.position();
-			dev.kultivator.voice.Voice.boom(this, "boss.awaken", 96.0D);
+			NagaVoice.boom(this, NagaVoice.JIAO_ROAR, "boss.awaken", 96.0D);
 			if (roar) {
 				startSkill(SKILL_ROAR, target);
 			} else {
@@ -644,15 +789,20 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 
 	private void pickSkill(LivingEntity target) {
 		double distance = Math.sqrt(this.distanceToSqr(target));
-		int roll = this.random.nextInt(100);
+		boolean specials = Naga.config().specials;
+		int roll = this.random.nextInt(specials ? 100 : 84);
+		// Amukan Naga favours the kind skill (30 % instead of 16 %)
+		int special = !specials ? 100 : hasFlag(FLAG_ENRAGED) ? 70 : 84;
 		int next;
-		if (roll < 30) {
+		if (roll >= special) {
+			next = SKILL_SPECIAL;
+		} else if (roll < 26) {
 			next = SKILL_BREATH;
-		} else if (roll < 52) {
+		} else if (roll < 44) {
 			next = SKILL_BITE;
-		} else if (roll < 70) {
+		} else if (roll < 58) {
 			next = SKILL_TAIL;
-		} else if (roll < 84) {
+		} else if (roll < 70) {
 			next = SKILL_COIL;
 		} else {
 			next = SKILL_ROAR;
@@ -667,13 +817,64 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 			coilAngle = Math.atan2(this.getZ() - target.getZ(), this.getX() - target.getX());
 			coilDamageTaken = 0.0F;
 		}
+		if (next == SKILL_SPECIAL) {
+			this.specialPoint = target.position();
+			this.marks.clear();
+		}
 		startSkill(next, target);
 	}
 
-	/** Ends the running skill with a cooldown scaled by the realm (stronger Jiao act more often). */
+	/** {@code uji naga jurus}: starts skill {@code id} now at {@code target} (a wild Jiao fights it). */
+	void forceSkill(ServerLevel level, LivingEntity target, int id) {
+		if (mode != Mode.FIGHT) {
+			engage(level, target, false);
+		}
+		if (mode != Mode.FIGHT) {
+			return;
+		}
+		if (id == SKILL_TAIL) {
+			tailPoint = trailPoint(10.0D);
+		} else if (id == SKILL_COIL) {
+			coilAngle = Math.atan2(this.getZ() - target.getZ(), this.getX() - target.getX());
+			coilDamageTaken = 0.0F;
+		} else if (id == SKILL_SPECIAL) {
+			this.specialPoint = target.position();
+			this.marks.clear();
+		}
+		this.targetId = target.getUUID();
+		startSkill(id, target);
+	}
+
+	/** {@code uji naga amuk}: Amukan Naga now (a wild Jiao in a fight, health set to half if above). */
+	void forceEnrage(ServerLevel level, LivingEntity target) {
+		if (isTamed()) {
+			return;
+		}
+		if (mode != Mode.FIGHT) {
+			engage(level, target, false);
+		}
+		if (this.getHealth() > this.getMaxHealth() * ENRAGE_AT) {
+			this.setHealth(this.getMaxHealth() * ENRAGE_AT);
+		}
+		enrageUsed = false;
+		enrage(level);
+	}
+
+	/** Starts the kind skill of a tamed Naga Sejati at {@code aim} (its owner's target). */
+	void beginSpecial(LivingEntity aim) {
+		this.specialPoint = aim.position();
+		this.marks.clear();
+		startSkill(SKILL_SPECIAL, aim);
+	}
+
+	/** Ends the running skill with a cooldown scaled by the realm (stronger Jiao act more often; Amukan Naga ×0.65). */
 	void finishSkill() {
 		int base = 70 - (int) Math.round(10.0D * (damageFactor - 1.0D));
-		endSkill(Math.max(30, base + this.random.nextInt(30)));
+		int cooldown = Math.max(30, base + this.random.nextInt(30));
+		if (hasFlag(FLAG_ENRAGED)) {
+			cooldown = Math.max(20, Math.round(cooldown * 0.65F));
+		}
+		endSkill(cooldown);
 	}
 
 	/** The point of its trail about {@code behind} blocks back along the body (the tail end for Ekor Sabet). */
@@ -814,6 +1015,18 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 			name = Component.translatable("kultivator.naga.bar.flee", name);
 		} else if (mode == Mode.CONTEST) {
 			name = Component.translatable("kultivator.naga.bar.contest", name);
+		} else if (hasFlag(FLAG_ENRAGED)) {
+			name = Component.translatable("kultivator.naga.bar.enraged", name);
+		} else if (hasFlag(FLAG_FRENZY)) {
+			name = Component.translatable("kultivator.naga.bar.frenzy", name);
+		}
+		BossEvent.BossBarColor color = hasFlag(FLAG_ENRAGED) || hasFlag(FLAG_FRENZY) ? BossEvent.BossBarColor.RED : switch (kind()) {
+			case AIR -> BossEvent.BossBarColor.BLUE;
+			case AWAN -> BossEvent.BossBarColor.WHITE;
+			case PETIR -> BossEvent.BossBarColor.PURPLE;
+		};
+		if (bar.getColor() != color) {
+			bar.setColor(color);
 		}
 		bar.setName(name);
 		bar.setProgress(Mth.clamp(this.getHealth() / this.getMaxHealth(), 0.0F, 1.0F));
@@ -903,7 +1116,13 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 			for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, this.getBoundingBox().inflate(64.0D))) {
 				player.sendOverlayMessage(Component.translatable("kultivator.naga.lemah", kind().displayName())
 						.withStyle(net.minecraft.ChatFormatting.AQUA));
+				if (Naga.config().dialogue) {
+					dev.kultivator.util.Msg.chat(player, NagaLines.lemah(kind(), player).copy().withColor(kind().glow)
+							.withStyle(net.minecraft.ChatFormatting.ITALIC));
+				}
 			}
+		} else if (!enrageUsed && fraction <= ENRAGE_AT && mode == Mode.FIGHT) {
+			enrage(level);
 		}
 		return hurt;
 	}

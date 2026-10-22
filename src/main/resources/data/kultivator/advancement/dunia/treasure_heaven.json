@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/treasure_claimed",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.treasure_heaven.description"
+    },
+    "icon": {
+      "id": "kultivator:inti_meteor_agung"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.treasure_heaven.title"
+    },
+    "frame": "challenge",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

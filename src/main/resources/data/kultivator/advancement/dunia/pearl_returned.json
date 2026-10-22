@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.pearl_returned.description"
+    },
+    "icon": {
+      "id": "kultivator:mutiara_naga"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.pearl_returned.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/dragon_subdued",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.jiao_rider.description"
+    },
+    "icon": {
+      "id": "kultivator:mutiara_naga_jinak"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.jiao_rider.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}
