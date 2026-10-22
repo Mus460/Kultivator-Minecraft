@@ -84,6 +84,89 @@ public final class Tournament {
 	public static final int[] RANK_POINTS = {10, 6, 4};
 	public static final int RANK_ENTRANT = 1;
 
+	/** Fighters stand this far from the centre of a lei tai stage (it fits the narrowest stage in every rotation). */
+	public static final double STAGE_FIGHTER_OFFSET = 3.0D;
+	/** The inter-sect tournament (DESIGN 36.2.3, module T): this many visitors of the challenging NPC sect. */
+	public static final int GUESTS = 4;
+	public static final String KIND_NORMAL = "biasa";
+	public static final String KIND_ELITE = "elit";
+	public static final String KIND_GUESTS = "antar_sekte";
+
+	/**
+	 * Sekte yang Hidup, module T (DESIGN 36.2.3, contract C36.T5): the arena tournament on top of this schedule. When set
+	 * (from {@code sekte.turnamen.Turnamen.init}), the bracket is fought on the lei tai of the sect's arena instead of the
+	 * ring at the stele, each bout may be a Sword Duel, the tribune seats the spectators, and the module keeps the season,
+	 * the Elo ratings and the events of {@code sekte.api.SekteBus}. Every number of this class (rewards, schedule, Elite
+	 * every third) stays as it is; without an extension everything runs exactly as before.
+	 */
+	public interface Extension {
+
+		/** Where the bracket is fought: the centre of the arena's stage (standing level), or null for the stele ring. */
+		@Nullable Vec3 venue(UUID owner, ServerLevel level, Vec3 stele);
+
+		/** Spectator spots around {@code venue} (the tribune seats), best first; empty for the old circle of seats. */
+		List<BlockPos> seats(UUID owner, ServerLevel level, Vec3 venue);
+
+		/**
+		 * Starts one bout through another engine (the Sword Duel); true when it runs, its end then comes back through
+		 * {@code done} exactly once. False keeps the old ring bout.
+		 */
+		boolean startBout(UUID owner, ServerLevel level, Vec3 venue, DiscipleEntity a, DiscipleEntity b, boolean finalBout, BoutDone done);
+
+		/** Drops the owner's running bout of {@link #startBout} (its {@code done} still comes, without a winner). */
+		void cancelBout(UUID owner);
+
+		/** The tournament started: {@code entrants} are the hall's own souls, strongest first. */
+		void started(UUID owner, ServerLevel level, Vec3 venue, String kind, int season, List<UUID> entrants);
+
+		/**
+		 * One bout was decided. Souls are null for visitors; {@code power} is the rank step of each side; {@code upset} is
+		 * true when the lower realm won.
+		 */
+		void bout(UUID owner, ServerLevel level, @Nullable UUID winner, @Nullable UUID loser, Component winnerName, Component loserName,
+				int winnerPower, int loserPower, boolean upset, boolean finalBout, boolean bronze);
+
+		/** The tournament ended normally (after the rewards of this class were given). */
+		void finished(UUID owner, ServerLevel level, Vec3 venue, Ending ending);
+
+		/** The tournament was cancelled (no rewards). */
+		void cancelled(UUID owner);
+
+		/** True when the extension shows its own final and champion scenes (the old TOURNAMENT beats are skipped). */
+		boolean ownScenes();
+	}
+
+	/** The end of an extension bout: the winner's body (null when nobody won) and whether the loser left the ring. */
+	@FunctionalInterface
+	public interface BoutDone {
+		void done(@Nullable LivingEntity winner, boolean leftRing);
+	}
+
+	/**
+	 * How a tournament ended (for {@link Extension#finished}).
+	 *
+	 * @param season       the hall's competition count (1-based)
+	 * @param kind         {@link #KIND_NORMAL}, {@link #KIND_ELITE} or {@link #KIND_GUESTS}
+	 * @param guestSect    the visiting NPC sect of an inter-sect tournament, or null
+	 * @param champion     the champion's soul (null for a visitor)
+	 * @param championName the champion's name
+	 * @param championBody the champion's body when it is one of the hall's loaded disciples, or null
+	 * @param runnerUp     the losing finalist's soul (null for a visitor)
+	 * @param third        the winner of the bout for third place (null for a visitor or without one)
+	 * @param placings     the hall's own entrants, best first (places, then won bouts)
+	 * @param upsets       pairs {winner, loser} of the hall's own souls where the lower realm won
+	 */
+	public record Ending(int season, String kind, @Nullable String guestSect, @Nullable UUID champion, Component championName,
+			@Nullable DiscipleEntity championBody, @Nullable UUID runnerUp, @Nullable UUID third, List<UUID> placings, List<UUID[]> upsets) {
+	}
+
+	private static @Nullable Extension extension;
+
+	/** Sets (or with null removes) the module-T extension; from {@code sekte.turnamen.Turnamen.init}. */
+	public static void setExtension(@Nullable Extension value) {
+		extension = value;
+	}
+
 	private static final class Run {
 		final UUID owner;
 		final ServerLevel level;
@@ -93,13 +176,21 @@ public final class Tournament {
 		final Bracket bracket;
 		final List<Bracket.Entrant> entrants;
 		final Map<UUID, BlockPos> seats = new HashMap<>();
+		final String kind;
+		final @Nullable String guestSect;
+		final double offset;
+		final List<UUID[]> upsets = new ArrayList<>();
+		int season;
 		@Nullable Bracket.Match current;
 		@Nullable DiscipleEntity bodyA;
 		@Nullable DiscipleEntity bodyB;
 		int pause = PAUSE_TICKS;
 		boolean fighting;
+		/** The running bout goes through the extension (Sword Duel), not {@link DuelArena}. */
+		boolean extensionBout;
 
-		Run(UUID owner, ServerLevel level, Vec3 center, boolean elite, Bracket bracket, List<Bracket.Entrant> entrants) {
+		Run(UUID owner, ServerLevel level, Vec3 center, boolean elite, Bracket bracket, List<Bracket.Entrant> entrants, String kind,
+				@Nullable String guestSect, double offset) {
 			this.owner = owner;
 			this.level = level;
 			this.center = center;
@@ -107,6 +198,9 @@ public final class Tournament {
 			this.elite = elite;
 			this.bracket = bracket;
 			this.entrants = entrants;
+			this.kind = kind;
+			this.guestSect = guestSect;
+			this.offset = offset;
 		}
 	}
 
@@ -135,6 +229,94 @@ public final class Tournament {
 
 	public static boolean running(UUID owner) {
 		return RUNS.containsKey(owner);
+	}
+
+	// ================================================================== module T (DESIGN 36.2.3)
+
+	/** True while {@code soul} is one of the hall's entrants of the running tournament (fighting or seated). */
+	public static boolean isEntrant(UUID owner, UUID soul) {
+		Run run = RUNS.get(owner);
+		if (run == null || soul == null) {
+			return false;
+		}
+		for (Bracket.Entrant entrant : run.entrants) {
+			if (soul.equals(entrant.soul)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** The kind of the owner's running tournament, or null. */
+	public static @Nullable String runningKind(UUID owner) {
+		Run run = RUNS.get(owner);
+		return run == null ? null : run.kind;
+	}
+
+	/** Why a competition cannot start for {@code player} now (a lang key), or null. {@code test} skips the presence rules. */
+	public static @Nullable String whyNot(ServerPlayer player, boolean test) {
+		UUID owner = player.getUUID();
+		Halls.HallView hall = Halls.hallOf(owner);
+		return hall == null ? "kultivator.sectevent.no_hall" : blocker(owner, hall, player, test);
+	}
+
+	/**
+	 * Starts a competition now (tests and module T): {@code kind} {@link #KIND_NORMAL}, {@link #KIND_ELITE},
+	 * {@link #KIND_GUESTS} or null for the scheduled one. An inter-sect tournament seats {@link #GUESTS} visitors of
+	 * {@code guestSect} (named {@code sectName}, strength {@code guestTier} 1-9 around the hall's best disciple) instead of
+	 * the north-bank fillers. {@code test} skips the presence rules (the master's distance, three disciples). The schedule,
+	 * the rewards and the Elite count are this class's own.
+	 */
+	public static boolean startNow(ServerPlayer player, @Nullable String kind, @Nullable String guestSect, @Nullable Component sectName,
+			int guestTier, boolean test) {
+		UUID owner = player.getUUID();
+		Halls.HallView hall = Halls.hallOf(owner);
+		String why = hall == null ? "kultivator.sectevent.no_hall" : blocker(owner, hall, player, test);
+		if (why != null) {
+			EventUtil.chat(player, Component.translatable(why).withStyle(ChatFormatting.YELLOW));
+			return false;
+		}
+		if (KIND_GUESTS.equals(kind) && (guestSect == null || guestSect.isBlank())) {
+			kind = null;
+		}
+		return start(owner, hall, player, test, kind, guestSect, sectName, guestTier);
+	}
+
+	/** Ends the running bout of the owner at once (decided by strength, like a bout nobody fights); false when none runs. */
+	public static boolean skipBout(UUID owner) {
+		Run run = RUNS.get(owner);
+		if (run == null) {
+			return false;
+		}
+		if (!run.fighting) {
+			run.pause = 1;
+			return true;
+		}
+		if (run.extensionBout && extension != null) {
+			extension.cancelBout(owner);
+		} else {
+			DuelArena.cancel(owner);
+		}
+		return true;
+	}
+
+	/** The Arena tablet's view of the owner's competitions (schedule, live bracket, the all-time top ten); a copy. */
+	public static CompoundTag view(UUID owner) {
+		CompoundTag tag = forClient(owner);
+		Run run = RUNS.get(owner);
+		if (run != null) {
+			tag.putString("kind", run.kind);
+			tag.putInt("season", run.season);
+			if (run.guestSect != null) {
+				tag.putString("guest", run.guestSect);
+			}
+			if (run.current != null) {
+				tag.store("now_a", ComponentSerialization.CODEC, run.current.a.name);
+				tag.store("now_b", ComponentSerialization.CODEC, run.current.b.name);
+				tag.putBoolean("fighting", run.fighting);
+			}
+		}
+		return tag;
 	}
 
 	/** The gold name of Nomor Satu Daftar Kuat, removed again when the title ends. */
@@ -291,6 +473,12 @@ public final class Tournament {
 
 	/** Builds the bracket and starts; {@code test} skips the presence rules. */
 	static boolean start(UUID owner, Halls.HallView hall, @Nullable ServerPlayer player, boolean test) {
+		return start(owner, hall, player, test, null, null, null, 0);
+	}
+
+	/** {@link #start} with a forced kind (null = the scheduled one) and the visitors of an inter-sect tournament. */
+	private static boolean start(UUID owner, Halls.HallView hall, @Nullable ServerPlayer player, boolean test, @Nullable String forcedKind,
+			@Nullable String guestSect, @Nullable Component sectName, int guestTier) {
 		ServerLevel level = EventUtil.hallLevel(hall);
 		if (level == null) {
 			return false;
@@ -310,7 +498,9 @@ public final class Tournament {
 			return false;
 		}
 		CompoundTag events = events(owner);
-		boolean elite = nextIsElite(owner);
+		boolean guests = KIND_GUESTS.equals(forcedKind) && guestSect != null;
+		boolean elite = !guests && (forcedKind == null ? nextIsElite(owner) : KIND_ELITE.equals(forcedKind));
+		String kind = guests ? KIND_GUESTS : elite ? KIND_ELITE : KIND_NORMAL;
 		RandomSource random = level.getRandom();
 		List<Bracket.Entrant> seeds = new ArrayList<>(disciples);
 		int best = disciples.get(0).data.rank().step();
@@ -319,19 +509,51 @@ public final class Tournament {
 				seeds.add(Rivals.champion(random, best - 1 + i, random.nextInt(Rivals.SECT_COUNT)));
 			}
 		}
+		if (guests) {
+			// DESIGN 36.2.3: the challenging NPC sect sends its own disciples (tier 4 = as strong as the hall's best).
+			int shift = Math.max(-3, Math.min(3, Math.max(1, Math.min(9, guestTier)) - 4));
+			Component sect = sectName != null ? sectName : Component.literal(guestSect);
+			for (int i = 0; i < GUESTS; i++) {
+				seeds.add(guest(random, best + shift - i, sect));
+			}
+		}
 		int median = disciples.get(disciples.size() / 2).data.rank().step();
 		int slots = Bracket.slotsFor(Math.max(4, seeds.size()));
 		while (seeds.size() < slots) {
 			seeds.add(Rivals.rival(random, median - 1 + random.nextInt(3)));
 		}
 		seeds.sort(Comparator.comparingInt((Bracket.Entrant e) -> e.power).reversed());
-		Run run = new Run(owner, level, EventUtil.center(hall), elite, new Bracket(seeds, true), seeds);
+		Vec3 stele = EventUtil.center(hall);
+		Vec3 venue = null;
+		Extension ext = extension;
+		if (ext != null) {
+			try {
+				venue = ext.venue(owner, level, stele);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Tournament extension venue failed", exception);
+			}
+		}
+		Run run = new Run(owner, level, venue != null ? venue : stele, elite, new Bracket(seeds, true), seeds, kind, guests ? guestSect : null,
+				venue != null ? STAGE_FIGHTER_OFFSET : FIGHTER_OFFSET);
 		RUNS.put(owner, run);
 		events.putInt("count", events.getIntOr("count", 0) + 1);
+		run.season = events.getIntOr("count", 1);
 		events.putLong("next_tournament", EventUtil.day() + KultivatorConfig.get().tournamentIntervalDays);
 		EventUtil.dirty();
 		seat(run);
-		Component title = Component.translatable(elite ? "kultivator.sectevent.tourney.elite" : "kultivator.sectevent.tourney.name");
+		if (ext != null) {
+			List<UUID> souls = new ArrayList<>();
+			for (Bracket.Entrant entrant : disciples) {
+				souls.add(entrant.soul);
+			}
+			try {
+				ext.started(owner, level, run.center, kind, run.season, souls);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Tournament extension start failed", exception);
+			}
+		}
+		Component title = Component.translatable(guests ? "kultivator.sekte.turnamen.name.antar" : elite ? "kultivator.sectevent.tourney.elite"
+				: "kultivator.sectevent.tourney.name");
 		if (player != null) {
 			Msg.title(player, title.copy().withStyle(ChatFormatting.GOLD), Component.translatable("kultivator.sectevent.tourney.subtitle", seeds.size())
 					.withStyle(ChatFormatting.YELLOW), 10, 50, 15);
@@ -342,12 +564,33 @@ public final class Tournament {
 		return true;
 	}
 
-	/** Spectator seats for the master's entrants on a circle around the ring (activity 8). */
+	/** A visiting disciple of an NPC sect (inter-sect tournament) at rank step {@code step}. */
+	private static Bracket.Entrant guest(RandomSource random, int step, Component sect) {
+		DiscipleData data = Rivals.body(random, step);
+		data.setComprehension(25.0D + random.nextInt(35));
+		Component name = Component.translatable("kultivator.sectevent.champion.name",
+				Component.translatable("kultivator.sectevent.rival." + random.nextInt(Rivals.NAME_COUNT)), sect);
+		return new Bracket.Entrant(Bracket.CHAMPION, null, name, data, random.nextInt(DiscipleEntity.SKIN_COUNT), random.nextBoolean(),
+				data.rank().step());
+	}
+
+	/**
+	 * Spectator seats for the master's entrants (activity 8): the extension's tribune seats when it has them, else a
+	 * circle around the ring.
+	 */
 	private static void seat(Run run) {
 		List<Bracket.Entrant> own = new ArrayList<>();
 		for (Bracket.Entrant entrant : run.entrants) {
 			if (entrant.disciple()) {
 				own.add(entrant);
+			}
+		}
+		List<BlockPos> tribune = List.of();
+		if (extension != null) {
+			try {
+				tribune = extension.seats(run.owner, run.level, run.center);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Tournament extension seats failed", exception);
 			}
 		}
 		for (int i = 0; i < own.size(); i++) {
@@ -356,10 +599,15 @@ public final class Tournament {
 			if (disciple == null) {
 				continue;
 			}
-			double angle = Math.PI * 2.0D * i / Math.max(1, own.size());
-			Vec3 near = run.center.add(Math.cos(angle) * SEAT_RADIUS, 0.0D, Math.sin(angle) * SEAT_RADIUS);
-			Vec3 safe = run.level.isLoaded(BlockPos.containing(near)) ? Targeting.safeSpot(run.level, disciple, near) : null;
-			BlockPos seat = safe != null ? BlockPos.containing(safe) : disciple.blockPosition();
+			BlockPos seat;
+			if (i < tribune.size()) {
+				seat = tribune.get(i);
+			} else {
+				double angle = Math.PI * 2.0D * i / Math.max(1, own.size());
+				Vec3 near = run.center.add(Math.cos(angle) * SEAT_RADIUS, 0.0D, Math.sin(angle) * SEAT_RADIUS);
+				Vec3 safe = run.level.isLoaded(BlockPos.containing(near)) ? Targeting.safeSpot(run.level, disciple, near) : null;
+				seat = safe != null ? BlockPos.containing(safe) : disciple.blockPosition();
+			}
 			run.seats.put(entrant.soul, seat);
 			Duties.release(run.owner, entrant.soul, null);
 			BlazingTower.stop(run.owner, entrant.soul, false);
@@ -409,16 +657,34 @@ public final class Tournament {
 		}
 		run.bodyA = a;
 		run.bodyB = b;
-		DuelArena.Bout bout = DuelArena.start(run.owner, run.level, run.center, a, b, BOUT_TICKS, DuelArena.OUT_RADIUS, true,
-				(winner, loser, reason) -> boutEnded(run, match, winner, reason));
-		if (bout == null) {
-			Bracket.Entrant winner = Bracket.simulate(match, run.level.getRandom());
-			cleanupBodies(run);
-			report(run, match, winner, true);
-			return;
+		boolean finalBout = !match.bronze && run.bracket.rounds.get(run.bracket.rounds.size() - 1).size() == 1;
+		Extension ext = extension;
+		boolean viaExtension = false;
+		if (ext != null) {
+			try {
+				// DESIGN 36.2.3: the bout as a Sword Duel on the lei tai (the extension says no when it cannot).
+				viaExtension = ext.startBout(run.owner, run.level, run.center, a, b, finalBout,
+						(winner, leftRing) -> boutEnded(run, match, winner, leftRing ? DuelRules.Reason.LEFT_RING : DuelRules.Reason.DEFEAT));
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Tournament extension bout failed", exception);
+				viaExtension = false;
+			}
+		}
+		if (viaExtension) {
+			run.extensionBout = true;
+		} else {
+			run.extensionBout = false;
+			DuelArena.Bout bout = DuelArena.start(run.owner, run.level, run.center, a, b, BOUT_TICKS, DuelArena.OUT_RADIUS, true,
+					(winner, loser, reason) -> boutEnded(run, match, winner, reason));
+			if (bout == null) {
+				Bracket.Entrant winner = Bracket.simulate(match, run.level.getRandom());
+				cleanupBodies(run);
+				report(run, match, winner, true);
+				return;
+			}
 		}
 		run.fighting = true;
-		if (!match.bronze && run.bracket.rounds.get(run.bracket.rounds.size() - 1).size() == 1) {
+		if (finalBout && (ext == null || !ext.ownScenes())) {
 			dev.kultivator.epic.EpicHooks.tournament(run.level, dev.kultivator.epic.EpicIds.TOUR_INTRO, run.elite ? dev.kultivator.epic.EpicIds.TOUR_ELITE : dev.kultivator.epic.EpicIds.TOUR_INTERNAL, a, b, run.center);
 		}
 		announce(run, Component.translatable(match.bronze ? "kultivator.sectevent.tourney.bronze_bout" : "kultivator.sectevent.tourney.bout",
@@ -435,7 +701,7 @@ public final class Tournament {
 		if (bothVisitors) {
 			return null;
 		}
-		Vec3 target = run.center.add(side * FIGHTER_OFFSET, 0.0D, 0.0D);
+		Vec3 target = run.center.add(side * run.offset, 0.0D, 0.0D);
 		if (entrant.disciple()) {
 			DiscipleEntity disciple = entrant.soul == null ? null : EventUtil.bySoul(run.owner, entrant.soul);
 			if (disciple == null || !EventUtil.free(disciple) || disciple.level() != run.level) {
@@ -465,6 +731,7 @@ public final class Tournament {
 
 	private static void boutEnded(Run run, Bracket.Match match, @Nullable LivingEntity winner, DuelRules.Reason reason) {
 		run.fighting = false;
+		run.extensionBout = false;
 		run.pause = PAUSE_TICKS;
 		Bracket.Entrant result;
 		if (winner == run.bodyA) {
@@ -499,6 +766,22 @@ public final class Tournament {
 		announce(run, Component.translatable("kultivator.sectevent.tourney.result", winner.name, loser == null ? Component.empty() : loser.name)
 				.withStyle(winner.disciple() ? ChatFormatting.AQUA : ChatFormatting.GRAY));
 		run.current = null;
+		Extension ext = extension;
+		if (loser != null && (winner.disciple() || loser.disciple())) {
+			boolean upset = winner.data.realm().ordinal() < loser.data.realm().ordinal();
+			if (upset && winner.soul != null && loser.soul != null) {
+				run.upsets.add(new UUID[]{winner.soul, loser.soul});
+			}
+			if (ext != null) {
+				boolean finalBout = !match.bronze && run.bracket.rounds.get(run.bracket.rounds.size() - 1).size() == 1 && run.bracket.done();
+				try {
+					ext.bout(run.owner, run.level, winner.soul, loser.soul, winner.name, loser.name, winner.power, loser.power, upset, finalBout,
+							match.bronze);
+				} catch (RuntimeException exception) {
+					dev.kultivator.Kultivator.LOGGER.error("Tournament extension bout report failed", exception);
+				}
+			}
+		}
 	}
 
 	/** Visitors fade away; the master's fighters get healed and go back to their seats. */
@@ -577,9 +860,12 @@ public final class Tournament {
 			rank(run.owner, entrant, place);
 		}
 		Bracket.Entrant champion = places[0];
+		Extension ext = extension;
 		if (champion != null) {
 			EventUtil.fx(run.level, run.center, SectEventFxIds.CHAMPION, run.elite ? 1 : 0, 0.0F);
-			dev.kultivator.epic.EpicHooks.tournament(run.level, dev.kultivator.epic.EpicIds.TOUR_WINNER, run.elite ? dev.kultivator.epic.EpicIds.TOUR_ELITE : dev.kultivator.epic.EpicIds.TOUR_INTERNAL, champion.disciple() && champion.soul != null ? EventUtil.bySoul(run.owner, champion.soul) : null, null, run.center);
+			if (ext == null || !ext.ownScenes()) {
+				dev.kultivator.epic.EpicHooks.tournament(run.level, dev.kultivator.epic.EpicIds.TOUR_WINNER, run.elite ? dev.kultivator.epic.EpicIds.TOUR_ELITE : dev.kultivator.epic.EpicIds.TOUR_INTERNAL, champion.disciple() && champion.soul != null ? EventUtil.bySoul(run.owner, champion.soul) : null, null, run.center);
+			}
 			run.level.playSound(null, run.center.x, run.center.y, run.center.z, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.NEUTRAL, 1.0F, 1.0F);
 			announce(run, Component.translatable("kultivator.sectevent.tourney.champion", champion.name,
 					places[1] == null ? Component.literal("-") : places[1].name, places[2] == null ? Component.literal("-") : places[2].name)
@@ -596,6 +882,39 @@ public final class Tournament {
 			}
 		}
 		EventUtil.dirty();
+		if (ext != null) {
+			// The hall's own entrants, best first: the three places, then by won bouts (strength breaks ties).
+			List<Bracket.Entrant> order = new ArrayList<>();
+			for (Bracket.Entrant entrant : run.entrants) {
+				if (entrant.disciple() && entrant.soul != null) {
+					order.add(entrant);
+				}
+			}
+			order.sort(Comparator.comparingInt((Bracket.Entrant e) -> {
+				for (int i = 0; i < places.length; i++) {
+					if (places[i] == e) {
+						return i;
+					}
+				}
+				return places.length;
+			}).thenComparing(Comparator.comparingInt((Bracket.Entrant e) -> e.wins).reversed())
+					.thenComparing(Comparator.comparingInt((Bracket.Entrant e) -> e.power).reversed()));
+			List<UUID> placings = new ArrayList<>();
+			for (Bracket.Entrant entrant : order) {
+				placings.add(entrant.soul);
+			}
+			Bracket.Entrant second = places[1];
+			DiscipleEntity body = champion != null && champion.disciple() && champion.soul != null ? EventUtil.bySoul(run.owner, champion.soul) : null;
+			Ending ending = new Ending(run.season, run.kind, run.guestSect, champion == null ? null : champion.soul,
+					champion == null ? Component.literal("-") : champion.name, body, second == null ? null : second.soul,
+					places[2] == null ? null : places[2].soul, placings,
+					List.copyOf(run.upsets));
+			try {
+				ext.finished(run.owner, run.level, run.center, ending);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Tournament extension finish failed", exception);
+			}
+		}
 	}
 
 	/** The all-time top ten: points per place, per entry and per won bout. */
@@ -631,9 +950,20 @@ public final class Tournament {
 	private static void cancel(Run run, String reasonKey) {
 		RUNS.remove(run.owner, run);
 		if (run.fighting) {
-			DuelArena.cancel(run.owner);
+			if (run.extensionBout && extension != null) {
+				extension.cancelBout(run.owner);
+			} else {
+				DuelArena.cancel(run.owner);
+			}
 		}
 		cleanupBodies(run);
+		if (extension != null) {
+			try {
+				extension.cancelled(run.owner);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("Tournament extension cancel failed", exception);
+			}
+		}
 		for (Bracket.Entrant entrant : run.entrants) {
 			DiscipleEntity disciple = entrant.soul == null ? null : EventUtil.bySoul(run.owner, entrant.soul);
 			if (disciple != null && (disciple.activity() == DiscipleEntity.ACTIVITY_SPECTATOR || disciple.activity() == DiscipleEntity.ACTIVITY_DUELLIST)) {

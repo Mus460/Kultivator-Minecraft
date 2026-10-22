@@ -6,8 +6,11 @@ import dev.kultivator.client.disciple.power.DutyPoses;
 import dev.kultivator.client.disciple.power.PhysiqueVisuals;
 import dev.kultivator.client.render.CultivatorModels;
 import dev.kultivator.client.render.MeditationPose;
+import dev.kultivator.client.sekte.seragam.JubahLook;
+import dev.kultivator.client.sekte.seragam.LambangCache;
 import dev.kultivator.data.Realm;
 import dev.kultivator.disciple.DiscipleEntity;
+import dev.kultivator.sekte.seragam.SeragamData;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -28,6 +31,11 @@ import net.minecraft.util.Mth;
  * rivals, phantoms and clones keep the gold trims from Golden Core) and the embroidered emblem from Nascent Soul. The robe
  * is a PlayerModel, so the meditation pose and the duty poses fold it with the body; see-through bodies wear a
  * see-through robe.
+ * <p>
+ * Sekte yang Hidup (DESIGN 36.2.8, module S): a disciple of a hall whose master designed a uniform wears its rank's
+ * robe and trim colours (where the master did not leave them "Asli"), its cut (Jubah Panjang, Jubah Pendek with bound
+ * leggings and a short skirt, Jubah Tempur with bracers, plated belt and a slit battle skirt) and, from Nascent Soul, the
+ * hall's emblem embroidered on the back instead of the old medallion ({@link JubahLook}).
  */
 public class DiscipleRobeLayer extends RenderLayer<DiscipleRenderState, PlayerModel> {
 
@@ -40,6 +48,9 @@ public class DiscipleRobeLayer extends RenderLayer<DiscipleRenderState, PlayerMo
 	private static final RenderType TRIM_TYPE = RenderTypes.entityTranslucent(TRIM);
 	private static final RenderType RANK_TRIM_TYPE = RenderTypes.entityTranslucent(RANK_TRIM);
 	private static final RenderType EMBLEM_TYPE = RenderTypes.entityTranslucent(EMBLEM);
+	/** Module S's robe cuts, greyscale like {@link #BASE} (indexed by {@code SeragamData.CUT_*}). */
+	private static final RenderType[] CUT_TYPES = {BASE_TYPE, RenderTypes.entityTranslucent(Kultivator.id("textures/entity/robe_base_pendek.png")),
+			RenderTypes.entityTranslucent(Kultivator.id("textures/entity/robe_base_tempur.png"))};
 	private static final int CLOTH_ALPHA = 242;
 	/** Name of the skirt part inside the robe model layers. */
 	private static final String SKIRT = "robe_skirt";
@@ -62,18 +73,25 @@ public class DiscipleRobeLayer extends RenderLayer<DiscipleRenderState, PlayerMo
 		RobeModel model = state.slim ? slim : wide;
 		int overlay = LivingEntityRenderer.getOverlayCoords(state, 0.0F);
 		int alpha = PhysiqueVisuals.clothAlpha(state, CLOTH_ALPHA);
-		int cloth = ARGB.color(alpha, state.robeColor & 0xFFFFFF);
+		// DESIGN 36.2.8: the hall's uniform (null = the old look)
+		LambangCache.Entry uniform = JubahLook.of(state);
+		int cut = JubahLook.cut(uniform, state);
+		JubahLook.storeCut(state, cut);
+		int cloth = ARGB.color(alpha, JubahLook.robe(uniform, state, state.robeColor & 0xFFFFFF) & 0xFFFFFF);
 		int plain = PhysiqueVisuals.translucent(state) ? ARGB.color(alpha, 0xFFFFFF) : -1;
-		submitNodeCollector.submitModel(model, state, poseStack, BASE_TYPE, lightCoords, overlay, cloth, null, state.outlineColor);
+		RenderType base = CUT_TYPES[Math.max(0, Math.min(CUT_TYPES.length - 1, cut))];
+		submitNodeCollector.submitModel(model, state, poseStack, base, lightCoords, overlay, cloth, null, state.outlineColor);
 		if (state.role == DiscipleEntity.Role.DISCIPLE.ordinal()) {
-			// The trims in the colour of its sect rank (grey Tercatat ... white-gold Tetua Agung).
-			int trim = ARGB.color(PhysiqueVisuals.translucent(state) ? alpha : 255, PhysiqueVisuals.trimColor(state));
+			// The trims in the colour of its sect rank (grey Tercatat ... white-gold Tetua Agung), or the uniform's.
+			int trim = ARGB.color(PhysiqueVisuals.translucent(state) ? alpha : 255, JubahLook.trim(uniform, state, PhysiqueVisuals.trimColor(state)) & 0xFFFFFF);
 			submitNodeCollector.order(1).submitModel(model, state, poseStack, RANK_TRIM_TYPE, lightCoords, overlay, trim, null, state.outlineColor);
 		} else if (state.realm >= Realm.GOLDEN_CORE.ordinal()) {
 			submitNodeCollector.order(1).submitModel(model, state, poseStack, TRIM_TYPE, lightCoords, overlay, plain, null, state.outlineColor);
 		}
 		if (state.realm >= Realm.NASCENT_SOUL.ordinal()) {
-			submitNodeCollector.order(2).submitModel(model, state, poseStack, EMBLEM_TYPE, lightCoords, overlay, plain, null, state.outlineColor);
+			Identifier embroidery = JubahLook.embroidery(uniform);
+			RenderType emblem = embroidery == null ? EMBLEM_TYPE : RenderTypes.entityTranslucent(embroidery);
+			submitNodeCollector.order(2).submitModel(model, state, poseStack, emblem, lightCoords, overlay, plain, null, state.outlineColor);
 		}
 	}
 
@@ -108,9 +126,27 @@ public class DiscipleRobeLayer extends RenderLayer<DiscipleRenderState, PlayerMo
 			this.skirt.yScale = 1.0F;
 			this.skirt.zScale = 1.0F + 0.45F * walk;
 			this.skirt.xScale = 1.0F + 0.06F * walk;
+			// DESIGN 36.2.8: the short robe hangs to the knee, the battle robe is cut close with tight sleeves; neither
+			// wears the flaring trouser hems (their trims go with the layers)
+			int cut = JubahLook.cutOf(state);
+			float length = 1.0F;
+			if (cut == SeragamData.CUT_PENDEK) {
+				length = 0.55F;
+				this.leftPants.visible = false;
+				this.rightPants.visible = false;
+			} else if (cut == SeragamData.CUT_TEMPUR) {
+				length = 0.72F;
+				this.skirt.zScale = 1.0F + 0.25F * walk;
+				this.skirt.xScale = 1.0F;
+				this.leftSleeve.visible = false;
+				this.rightSleeve.visible = false;
+				this.leftPants.visible = false;
+				this.rightPants.visible = false;
+			}
+			this.skirt.yScale = length;
 			float seated = MeditationPose.strength(state);
 			if (seated > 0.0F) {
-				this.skirt.yScale = Mth.lerp(seated, 1.0F, 0.32F);
+				this.skirt.yScale = Mth.lerp(seated, length, 0.32F * length);
 				this.skirt.zScale = Mth.lerp(seated, this.skirt.zScale, 1.25F);
 				this.skirt.xScale = Mth.lerp(seated, this.skirt.xScale, 1.12F);
 			}

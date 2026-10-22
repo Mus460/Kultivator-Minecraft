@@ -49,8 +49,38 @@ import java.util.UUID;
  * Sumber: Battle Through the Heavens (Magical Beast Mountain Range, magic cores); Soul Land (Star Dou Great Forest and
  * Hunting Spirit Forest); Coiling Dragon Book 19 (Planar Battlefield badges exchanged at a stele); Perfect World
  * ch. 258-347 (the Kunpeng bone split into six parts, a third of the legacy).
+ * <p>
+ * Sekte yang Hidup (DESIGN 36.4, module X) reads this class through two public facades only:
+ * {@link #lootTable} (the loot table, shared read-only by the story missions) and {@link #releaseErrands} (frees a
+ * disciple from its duty post, the tower and the void queue before it leaves on a story mission). Nothing else of the
+ * board changes.
  */
-final class Expeditions {
+public final class Expeditions {
+
+	/** Expedition type ids for {@link #lootTable}: Patroli, Herba, Karavan, Perburuan, Alam Rahasia. */
+	public static final int LOOT_PATROL = 0;
+	public static final int LOOT_HERBS = 1;
+	public static final int LOOT_CARAVAN = 2;
+	public static final int LOOT_HUNT = 3;
+	public static final int LOOT_SECRET = 4;
+
+	/**
+	 * The loot of a successful expedition of {@code type} ({@code LOOT_*}) and {@code tier} 1-9 (DESIGN 20.3.10 table and
+	 * the phase 7 rows), freshly created; read-only use by module X (no board state is touched).
+	 */
+	public static List<ItemStack> lootTable(int type, int tier, RandomSource random) {
+		return loot(Math.max(0, Math.min(TYPES.length - 1, type)), Math.max(1, Math.min(9, tier)), random);
+	}
+
+	/** Frees {@code soul} from a duty post, the Blazing Tower and the Void Realm queue (as an expedition does). */
+	public static void releaseErrands(UUID owner, UUID soul) {
+		if (owner == null || soul == null) {
+			return;
+		}
+		Duties.release(owner, soul, null);
+		BlazingTower.stop(owner, soul, false);
+		VoidRealm.dequeue(owner, soul);
+	}
 
 	/** Mission types: Patroli Wilayah, Mencari Herba Roh, Mengawal Karavan, Perburuan Binatang Iblis, Alam Rahasia. */
 	static final String[] TYPES = {"patrol", "herbs", "caravan", "hunt", "secret_realm"};

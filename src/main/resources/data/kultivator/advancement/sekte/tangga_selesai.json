@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_recruit_hall",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.tangga.adv.selesai.desc"
+    },
+    "icon": {
+      "id": "minecraft:stone_brick_stairs"
+    },
+    "title": {
+      "translate": "kultivator.sekte.tangga.adv.selesai.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

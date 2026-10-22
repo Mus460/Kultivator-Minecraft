@@ -340,6 +340,10 @@ final class SceneCatalogCombat {
 				}
 			}
 			default -> {
+				// Sekte yang Hidup's beats 100-199 (DESIGN 36.3.7): the module's registered recipe ends the scene itself.
+				if (beat >= EpicIds.EXTRA_SEKTE_FIRST && beat <= EpicIds.EXTRA_SEKTE_LAST && SekteScenes.beat(s, beat, delay)) {
+					return;
+				}
 			}
 		}
 		s.end(delay + 140);

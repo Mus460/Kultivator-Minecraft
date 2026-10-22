@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sect_gate_open",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.seragam.adv.lambang.desc"
+    },
+    "icon": {
+      "id": "minecraft:white_banner"
+    },
+    "title": {
+      "translate": "kultivator.sekte.seragam.adv.lambang.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

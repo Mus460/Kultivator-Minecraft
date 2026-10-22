@@ -1,0 +1,25 @@
+{
+ "parent": "kultivator:first_disciple",
+ "criteria": {
+  "done": {
+   "trigger": "minecraft:impossible"
+  }
+ },
+ "display": {
+  "description": {
+   "translate": "advancement.kultivator.sekte.paviliun_upacara.description"
+  },
+  "icon": {
+   "id": "kultivator:dupa"
+  },
+  "title": {
+   "translate": "advancement.kultivator.sekte.paviliun_upacara.title"
+  },
+  "frame": "task"
+ },
+ "requirements": [
+  [
+   "done"
+  ]
+ ]
+}

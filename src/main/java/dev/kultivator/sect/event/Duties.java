@@ -166,6 +166,14 @@ public final class Duties {
 		return duty.isEmpty() ? null : duty;
 	}
 
+	/**
+	 * Read only (DESIGN 36.4, module W's one addition here): how many items of the owner's Lumbung match {@code filter}
+	 * (the Kebun board shows the seeds it holds). Nothing in the Lumbung changes.
+	 */
+	public static int lumbungCount(UUID owner, java.util.function.Predicate<ItemStack> filter) {
+		return owner == null || filter == null ? 0 : Storehouse.count(owner, filter);
+	}
+
 	/** Posts of a hall of {@code level}: {@code 1 + floor(level / 3)}. */
 	public static int posts(int level) {
 		return 1 + Math.max(0, level) / 3;

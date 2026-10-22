@@ -6,6 +6,8 @@ import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
+import dev.kultivator.client.sekte.misi.MisiClient;
+import dev.kultivator.client.sekte.misi.MisiTab;
 import dev.kultivator.disciple.DiscipleEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -24,11 +26,21 @@ import java.util.Set;
  * The Misi tablet (DESIGN 20.3.10, 20.3.11): sub-tabs Papan (the day's mission board, a team of 1-3 and its success
  * chance), Tim (teams away with their time left and "Panggil Pulang"), Utusan (the envoy), Terlarang (the Blood-Colored
  * Forbidden Ground and its last report) and Bahtera (the Primordial Ark and the six Kunpeng bone pieces).
+ * <p>
+ * Sekte yang Hidup (DESIGN 36.2.7, module X) adds two sections after them: Misi Cerita (the story board, a stance and a
+ * team of 1-4 with the server's stage chances) and Kabar Misi (the running story missions with their stage beads,
+ * "Tarik Pulang" with or without the wounded, and the reports to read again). Their data comes from module X's own
+ * payloads ({@code client.sekte.misi.MisiClient}); the pictures are drawn by {@code MisiTab}.
  */
 public class MissionPage extends SectEventPage {
 
 	private static final String[] TABS = {"kultivator.sectevent.ui.tab.board", "kultivator.sectevent.ui.tab.teams",
-			"kultivator.sectevent.ui.tab.envoy", "kultivator.sectevent.ui.tab.forbidden", "kultivator.sectevent.ui.tab.ark"};
+			"kultivator.sectevent.ui.tab.envoy", "kultivator.sectevent.ui.tab.forbidden", "kultivator.sectevent.ui.tab.ark",
+			"kultivator.sekte.misi.ui.tab.cerita", "kultivator.sekte.misi.ui.tab.kabar"};
+	/** This tablet's index in the hall screen's page list ({@code Halls.OP_OPEN} argument, the hub card of module X). */
+	public static final int PAGE = 6;
+	private static final int TAB_STORY = 5;
+	private static final int TAB_NEWS = 6;
 	private static final String[] TYPES = {"patrol", "herbs", "caravan", "hunt", "secret_realm"};
 	private static final long[] DURATION = {12000L, 12000L, 24000L, 24000L, 48000L};
 	private static final int BUTTON_H = 13;
@@ -40,6 +52,12 @@ public class MissionPage extends SectEventPage {
 	private static final Set<String> ENVOY = new HashSet<>();
 	private static final Set<String> FORBIDDEN = new HashSet<>();
 	private static final Set<String> ARK = new HashSet<>();
+	private static final Set<String> STORY = new HashSet<>();
+	private static int storyOffer = -1;
+	private static String stance = MisiTab.STANCES[0];
+	private String previewKey = "";
+	private long seenMisi = -1L;
+	private int storyBottom;
 
 	private RosterView roster;
 	private int top;
@@ -62,6 +80,11 @@ public class MissionPage extends SectEventPage {
 	@Override
 	public int icon() {
 		return Glyphs.PATH;
+	}
+
+	/** Opens the tablet on the Misi Cerita section next time (module X's hub card). */
+	public static void selectStory() {
+		tab = TAB_STORY;
 	}
 
 	private static boolean busy(CompoundTag entry) {
@@ -145,6 +168,8 @@ public class MissionPage extends SectEventPage {
 				enter.onPress(() -> act(0, "forbidden:" + roster.ids()));
 				add(enter);
 			}
+			case TAB_STORY -> buildStory(rightX, rightW, bottom);
+			case TAB_NEWS -> buildNews(bottom);
 			default -> {
 				roster = new RosterView(font, 1, entry -> true,
 						entry -> ready(entry) && (entry.getBooleanOr("ark_ok", false) || entry.getIntOr("rank", 1) >= 3),
@@ -184,6 +209,134 @@ public class MissionPage extends SectEventPage {
 		}
 	}
 
+	// ================================================================== module X: Misi Cerita and Kabar Misi
+
+	private void buildStory(int rightX, int rightW, int bottom) {
+		MisiClient.request(true);
+		int teamMax = Math.max(1, Math.min(4, MisiClient.state().getIntOr("tim", 4)));
+		roster = new RosterView(font, teamMax, entry -> true, entry -> ready(entry) && entry.getIntOr("rank", 1) >= 1,
+				entry -> sectRank(entry.getIntOr("rank", 1)), STORY);
+		roster.layout(rightX, top + 11, rightW, bottom - top - 11);
+		int stanceY = bottom - BUTTON_H * 2 - 13;
+		storyBottom = stanceY - 12;
+		int third = (colW - 8) / 3;
+		for (int i = 0; i < MisiTab.STANCES.length; i++) {
+			String id = MisiTab.STANCES[i];
+			TalismanButton pick = new TalismanButton(x + 2 + i * (third + 2), stanceY, third, BUTTON_H,
+					() -> Component.translatable("kultivator.sekte.misi.sikap." + id));
+			pick.stampedWhen(() -> stance.equals(id));
+			pick.tooltip(() -> List.of(Component.translatable("kultivator.sekte.misi.sikap." + id + ".desc")));
+			pick.onPress(() -> {
+				stance = id;
+				UiSound.toggle(true);
+			});
+			add(pick);
+		}
+		TalismanButton send = new TalismanButton(x + 2, bottom - BUTTON_H, colW - 4, BUTTON_H, () -> Component.translatable("kultivator.sekte.misi.ui.kirim"));
+		send.enabledWhen(() -> !readonly() && storyReady());
+		send.tooltip(() -> List.of(Component.translatable("kultivator.sekte.misi.ui.kirim.tip")));
+		send.onPress(() -> {
+			if (readonly()) {
+				UiSound.denied();
+				return;
+			}
+			MisiClient.send("kirim", storyOffer, stance + "|" + storySouls());
+			storyOffer = -1;
+			STORY.clear();
+		});
+		add(send);
+	}
+
+	private boolean storyReady() {
+		CompoundTag offer = MisiTab.offer(storyOffer);
+		if (offer == null || offer.getBooleanOr("taken", false) || roster == null || roster.chosen().isEmpty() || MisiTab.full()) {
+			return false;
+		}
+		CompoundTag preview = MisiClient.state().getCompoundOrEmpty("pratinjau");
+		return preview.getIntOr("offer", -1) != storyOffer || preview.getStringOr("blocker", "").isEmpty() && preview.getBooleanOr("rank_ok", true);
+	}
+
+	private String storySouls() {
+		StringBuilder souls = new StringBuilder();
+		if (roster != null) {
+			for (CompoundTag entry : roster.chosen()) {
+				souls.append(souls.isEmpty() ? "" : ",").append(entry.getStringOr("soul", ""));
+			}
+		}
+		return souls.toString();
+	}
+
+	private void buildNews(int bottom) {
+		MisiClient.request(true);
+		int cy = top + 12;
+		int buttonW = 74;
+		for (CompoundTag mission : MisiTab.missions()) {
+			if (cy + MisiTab.MISSION_H > bottom) {
+				break;
+			}
+			int id = mission.getIntOr("id", 0);
+			boolean open = !mission.getBooleanOr("finished", false) && !mission.getBooleanOr("ditarik", false);
+			TalismanButton recall = new TalismanButton(x + w - buttonW - 2, cy + 3, buttonW, BUTTON_H,
+					() -> Component.translatable("kultivator.sekte.misi.ui.tarik"));
+			recall.enabledWhen(() -> open && !readonly());
+			recall.tooltip(() -> List.of(Component.translatable(MisiTab.hurt(mission) ? "kultivator.sekte.misi.ui.tarik.tip_luka"
+					: "kultivator.sekte.misi.ui.tarik.tip")));
+			recall.onPress(() -> MisiClient.send("tarik", id, ""));
+			add(recall);
+			if (open && MisiTab.hurt(mission)) {
+				TalismanButton leave = new TalismanButton(x + w - buttonW - 2, cy + 4 + BUTTON_H, buttonW, BUTTON_H,
+						() -> Component.translatable("kultivator.sekte.misi.ui.tinggal"));
+				leave.urgentWhen(() -> true);
+				leave.enabledWhen(() -> !readonly());
+				leave.tooltip(() -> List.of(Component.translatable("kultivator.sekte.misi.ui.tinggal.tip").withStyle(ChatFormatting.RED)));
+				leave.onPress(() -> MisiClient.send("tinggal", id, ""));
+				add(leave);
+			}
+			cy += MisiTab.MISSION_H;
+		}
+		if (MisiTab.missions().isEmpty()) {
+			cy += 14;
+		}
+		int rowsTop = cy + 12;
+		int rows = Math.max(0, (bottom - rowsTop) / MisiTab.ROW_H);
+		List<CompoundTag> history = MisiTab.history();
+		for (int i = 0; i < Math.min(rows, history.size()); i++) {
+			int index = history.get(i).getIntOr("i", 0);
+			TalismanButton read = new TalismanButton(x + w - 40, rowsTop + i * MisiTab.ROW_H, 38, MisiTab.ROW_H - 1,
+					() -> Component.translatable("kultivator.sekte.misi.ui.baca"));
+			read.onPress(() -> MisiClient.send("baca", index, ""));
+			add(read);
+		}
+		storyBottom = rowsTop;
+	}
+
+	private void drawStory(GuiGraphicsExtractor g, int mouseX, int mouseY, int rightX, int rightW) {
+		MisiClient.request(false);
+		heading(g, Component.translatable("kultivator.sekte.misi.ui.papan", MisiClient.state().getIntOr("selesai", 0)), x + 2.0F, top, colW - 4.0F, 0.8F);
+		heading(g, Component.translatable("kultivator.sekte.misi.ui.tim", Math.max(1, MisiClient.state().getIntOr("tim", 4))), rightX + 2.0F, top,
+				rightW - 4.0F, 0.8F);
+		MisiTab.drawBoard(g, font, x + 2, top + 12, x + colW - 2, storyBottom, mouseX, mouseY, storyOffer, screen::showTooltip);
+		String souls = storySouls();
+		String key = storyOffer + "|" + stance + "|" + souls;
+		if (!key.equals(previewKey)) {
+			previewKey = key;
+			if (storyOffer >= 0 && !souls.isEmpty()) {
+				MisiClient.send("cek", storyOffer, stance + "|" + souls);
+			}
+		}
+		MisiTab.drawPreview(g, font, x + 4.0F, storyBottom + 2.0F, colW - 8.0F, storyOffer, stance, souls, !souls.isEmpty(), screen::showTooltip,
+				mouseX, mouseY);
+	}
+
+	private void drawNews(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+		MisiClient.request(false);
+		heading(g, Component.translatable("kultivator.sekte.misi.ui.kabar", MisiTab.missions().size(), Math.max(1, MisiClient.state().getIntOr("maks", 2))),
+				x + 2.0F, top, w - 4.0F, 0.8F);
+		MisiTab.drawMissions(g, font, x + 2, top + 12, x + w - 2, 78, mouseX, mouseY, screen::showTooltip);
+		heading(g, Component.translatable("kultivator.sekte.misi.ui.laporan"), x + 2.0F, storyBottom - 11.0F, w - 4.0F, 0.7F);
+		MisiTab.drawHistory(g, font, x + 2, storyBottom, x + w - 2, y + h, 40);
+	}
+
 	private List<CompoundTag> teams() {
 		List<CompoundTag> list = new ArrayList<>();
 		for (Tag tag : data().getListOrEmpty("teams")) {
@@ -221,6 +374,9 @@ public class MissionPage extends SectEventPage {
 		if (tab == 3) {
 			builder.append(':').append(forbidden().getIntOr("slots", 3));
 		}
+		if (tab == TAB_STORY || tab == TAB_NEWS) {
+			builder.append(':').append(MisiTab.shape());
+		}
 		return builder.toString();
 	}
 
@@ -230,11 +386,20 @@ public class MissionPage extends SectEventPage {
 	protected void draw(GuiGraphicsExtractor g, int mouseX, int mouseY, float seconds) {
 		int rightX = x + colW + 4;
 		int rightW = x + w - rightX;
+		if ((tab == TAB_STORY || tab == TAB_NEWS) && MisiClient.version() != seenMisi) {
+			// module X's own payload arrived: rebuild the buttons when what exists changed
+			seenMisi = MisiClient.version();
+			if (needsRebuild()) {
+				layout(x, y, w, h);
+			}
+		}
 		switch (tab) {
 			case 0 -> drawBoard(g, mouseX, mouseY, rightX, rightW);
 			case 1 -> drawTeams(g);
 			case 2 -> drawEnvoy(g, rightX, rightW);
 			case 3 -> drawForbidden(g, rightX, rightW);
+			case TAB_STORY -> drawStory(g, mouseX, mouseY, rightX, rightW);
+			case TAB_NEWS -> drawNews(g, mouseX, mouseY);
 			default -> drawArk(g, rightX, rightW);
 		}
 		if (roster != null) {
@@ -462,6 +627,15 @@ public class MissionPage extends SectEventPage {
 					&& mouseY < y + h - BUTTON_H - 14) {
 				offer = offer == index ? -1 : index;
 				UiSound.toggle(offer == index);
+				return true;
+			}
+		}
+		if (tab == TAB_STORY && mouseX >= x + 2 && mouseX < x + colW - 2 && mouseY >= top + 12 && mouseY < storyBottom) {
+			int index = (int) ((mouseY - top - 12) / MisiTab.CARD_H);
+			CompoundTag tag = MisiTab.offer(index);
+			if (tag != null && !tag.getBooleanOr("taken", false)) {
+				storyOffer = storyOffer == index ? -1 : index;
+				UiSound.toggle(storyOffer == index);
 				return true;
 			}
 		}

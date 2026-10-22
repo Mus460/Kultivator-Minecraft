@@ -299,6 +299,17 @@ public final class Heir {
 			Msg.chat(master, Component.translatable(DisciplePaths.PREFIX + "heir.learned", name, learned).withColor(DisciplePaths.JADE));
 		}
 		Advancements.grant(master, "heir_named");
+		// Sekte yang Hidup module E (DESIGN 36.2.6, C36.E2): the heir is told to the sect (the elders, the robe, the hearts).
+		dev.kultivator.sekte.api.SekteBus.HEIR_NAMED.invoker().onHeirNamed(master.level().getServer(), master.getUUID(), entity.soulId(),
+				old.isEmpty() || old.equals(soul) ? null : parseSoul(old));
+	}
+
+	private static @Nullable UUID parseSoul(String text) {
+		try {
+			return UUID.fromString(text);
+		} catch (IllegalArgumentException exception) {
+			return null;
+		}
 	}
 
 	/** The old heir keeps its techniques but loses every hex. */

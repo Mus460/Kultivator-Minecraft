@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sect_founded",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.kebun.adv.tambang.desc"
+    },
+    "icon": {
+      "id": "kultivator:spirit_stone_low"
+    },
+    "title": {
+      "translate": "kultivator.sekte.kebun.adv.tambang.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

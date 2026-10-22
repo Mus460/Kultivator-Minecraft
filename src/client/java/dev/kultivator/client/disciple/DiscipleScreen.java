@@ -57,6 +57,36 @@ public class DiscipleScreen extends Screen {
 	/** Seven tablets fit beside the scroll down to a 240 px high window (DESIGN 20.2.13). */
 	private static final int MIN_TABLET_H = 18;
 
+	/** A tab other systems add after the seven built-in ones (DESIGN 36.3.8): its tablet glyph and its factory. */
+	private record ExtraTab(int glyph, java.util.function.Function<DiscipleScreen, DiscipleTab> factory) {
+	}
+
+	/** At most two extra tabs (Sekte yang Hidup's Hati of module P and Hubungan of module R), so nine tablets still fit. */
+	private static final int MAX_EXTRA_TABS = 2;
+	private static final List<ExtraTab> EXTRA_TABS = new ArrayList<>();
+
+	/**
+	 * Adds a tab after the built-in ones (from a client init; registration order = tablet order). The tab reads the
+	 * disciple info compound like the others (servers add to it with {@code DiscipleHooks.addInfo}). Returns false when
+	 * the two extra places are taken.
+	 */
+	public static synchronized boolean addExtraTab(int glyph, java.util.function.Function<DiscipleScreen, DiscipleTab> factory) {
+		if (factory == null || EXTRA_TABS.size() >= MAX_EXTRA_TABS) {
+			return false;
+		}
+		EXTRA_TABS.add(new ExtraTab(glyph, factory));
+		return true;
+	}
+
+	/** The glyph of tablet {@code index} (built-in, then the extra tabs). */
+	private static int iconOf(int index) {
+		if (index < ICONS.length) {
+			return ICONS[index];
+		}
+		int extra = index - ICONS.length;
+		return extra < EXTRA_TABS.size() ? EXTRA_TABS.get(extra).glyph() : Glyphs.HELP;
+	}
+
 	private final int entityId;
 	private DiscipleView view;
 	private CompoundTag info;
@@ -87,9 +117,16 @@ public class DiscipleScreen extends Screen {
 		this.view = new DiscipleView(info);
 		this.info = info;
 		this.seenVersion = version;
-		this.tabs = new DiscipleTab[]{new StatusTab(this), new TechniqueTab(this), new OrderTab(this), new PillTab(this),
+		List<DiscipleTab> all = new ArrayList<>(List.of(new StatusTab(this), new TechniqueTab(this), new OrderTab(this), new PillTab(this),
 				new dev.kultivator.client.disciple.power.TalentTab(this), new dev.kultivator.client.disciple.power.TreasureTab(this),
-				new dev.kultivator.client.disciple.path.PathTab(this)};
+				new dev.kultivator.client.disciple.path.PathTab(this)));
+		for (ExtraTab extra : EXTRA_TABS) {
+			DiscipleTab made = extra.factory().apply(this);
+			if (made != null) {
+				all.add(made);
+			}
+		}
+		this.tabs = all.toArray(new DiscipleTab[0]);
 	}
 
 	public int entityId() {
@@ -161,7 +198,7 @@ public class DiscipleScreen extends Screen {
 		int tabletH = Math.max(MIN_TABLET_H, Math.min(58, (paperBottom - paperTop - 20 - gap * (count - 1)) / count));
 		for (int i = 0; i < count; i++) {
 			int index = i;
-			JadeTablet tablet = new JadeTablet(paperX0 - TABLET_W + 1, top + i * (tabletH + gap), TABLET_W, tabletH, ICONS[i],
+			JadeTablet tablet = new JadeTablet(paperX0 - TABLET_W + 1, top + i * (tabletH + gap), TABLET_W, tabletH, iconOf(i),
 					() -> tabs[index].shortName(), () -> tab == index);
 			tablet.onPress(() -> switchTab(index));
 			tablet.tooltip(() -> List.of(tabs[index].title(), Component.translatable("kultivator.discipleui.tab.key", index + 1)));
@@ -311,7 +348,7 @@ public class DiscipleScreen extends Screen {
 		Brush.rect(g, right + 4.0F, lineY - 0.5F, contentX + contentW - 8.0F, lineY + 0.5F, Palette.GOLD);
 		Brush.rect(g, left - 3.0F, lineY - 2.0F, left + 1.0F, lineY + 2.0F, Palette.SEAL);
 		Brush.rect(g, right - 1.0F, lineY - 2.0F, right + 3.0F, lineY + 2.0F, Palette.SEAL);
-		Glyphs.tab(g, ICONS[tab], contentX + 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
+		Glyphs.tab(g, iconOf(tab), contentX + 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
 		Glyphs.tab(g, ICONS[tab], contentX + contentW - 4.0F, lineY, 6.0F, Palette.GOLD_DARK);
 	}
 

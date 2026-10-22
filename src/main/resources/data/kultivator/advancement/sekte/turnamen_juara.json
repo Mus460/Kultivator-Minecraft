@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tournament_champion",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.sekte.turnamen_juara.description"
+    },
+    "icon": {
+      "id": "minecraft:golden_sword"
+    },
+    "title": {
+      "translate": "advancement.kultivator.sekte.turnamen_juara.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

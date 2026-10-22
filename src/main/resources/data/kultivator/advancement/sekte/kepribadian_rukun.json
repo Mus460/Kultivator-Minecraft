@@ -1,0 +1,25 @@
+{
+ "parent": "kultivator:sekte/kepribadian_sifat",
+ "criteria": {
+  "done": {
+   "trigger": "minecraft:impossible"
+  }
+ },
+ "display": {
+  "description": {
+   "translate": "advancement.kultivator.sekte.kepribadian_rukun.description"
+  },
+  "icon": {
+   "id": "minecraft:poppy"
+  },
+  "title": {
+   "translate": "advancement.kultivator.sekte.kepribadian_rukun.title"
+  },
+  "frame": "goal"
+ },
+ "requirements": [
+  [
+   "done"
+  ]
+ ]
+}

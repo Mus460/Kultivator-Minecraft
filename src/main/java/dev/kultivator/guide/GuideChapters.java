@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Kitab Panduan (the in-game guide): the static list of its 14 chapters and their steps, shared by the server and the
+ * Kitab Panduan (the in-game guide): the static list of its 16 chapters and their steps, shared by the server and the
  * client. Pure data: no Minecraft classes, so both sides may use it freely.
  * <p>
  * Contract with {@code client.guide.GuideScreen} and {@link GuideProgress}:
@@ -17,7 +17,7 @@ import java.util.Map;
  * <li>A step id is {@code c<chapter number>.<name>}, e.g. {@code c1.root_test}. Its texts are
  * {@code kultivator.guide.<id>.title} and {@code kultivator.guide.<id>.body} (one key, its lines separated
  * by line breaks), in {@code lang-src/guide.*.json}.</li>
- * <li>A chapter's title is {@code kultivator.guide.chapter.<number>} (1-14) and its one-line summary
+ * <li>A chapter's title is {@code kultivator.guide.chapter.<number>} (1-16) and its one-line summary
  * {@code kultivator.guide.chapter.<number>.desc}.</li>
  * <li>{@link Step#hint()} is a command the screen offers as a clickable chip (prefilled in the chat box), or null.</li>
  * <li>{@link Step#check()} is the id of an automatic check {@link GuideProgress} evaluates on the server; a step without
@@ -36,9 +36,11 @@ public final class GuideChapters {
 
 	/**
 	 * Chapters in play order: Hari Pertama ... Tips & Kesalahan Umum, then (DESIGN 34.9) Dunia yang Luas and Ujung Dunia.
-	 * Chapters 13 and 14 are appended after chapter 12; their texts live in {@code lang-src/dunia_panduan.*}.
+	 * Chapters 13 and 14 are appended after chapter 12; their texts live in {@code lang-src/dunia_panduan.*}. Chapters 15
+	 * (Murid yang Hidup) and 16 (Sekte di Dunia) are Sekte yang Hidup's (DESIGN 36.3.6); their texts live in
+	 * {@code lang-src/sekte_panduan.*} and their checks are the {@code sekte/} advancements of the ten modules.
 	 */
-	public static final int CHAPTER_COUNT = 14;
+	public static final int CHAPTER_COUNT = 16;
 
 	/**
 	 * One step. {@code chapter} is 0-based, {@code index} its place in {@link #steps()} (the bit of GuideSync),
@@ -245,6 +247,28 @@ public final class GuideChapters {
 		step(13, "pelayaran", null, "adv:dunia/ship_voyage");
 		step(13, "bajak", null, "adv:dunia/ship_pirates");
 		step(13, "puncak", null, "adv:dunia/tower_100");
+		// 15. Murid yang Hidup (DESIGN 36.3.6; each advancement belongs to the module named in its id)
+		step(14, "sifat", "/kultivasi perguruan murid", "adv:sekte/kepribadian_sifat");
+		step(14, "puas", null, "adv:sekte/kepribadian_puas");
+		step(14, "rukun", null, "adv:sekte/kepribadian_rukun");
+		step(14, "sahabat", null, "adv:sekte/hubungan_sahabat");
+		step(14, "saingan", null, "adv:sekte/hubungan_saingan");
+		step(14, "tangga", null, "adv:sekte/tangga_selesai");
+		step(14, "kitab", null, "adv:sekte/paviliun_belajar");
+		step(14, "leluhur", null, "adv:sekte/paviliun_upacara");
+		step(14, "tetua", null, "adv:sekte/tetua_jabatan");
+		step(14, "penerus", null, "adv:sekte/tetua_penerus");
+		// 16. Sekte di Dunia (DESIGN 36.3.6)
+		step(15, "lambang", "/kultivasi perguruan lambang", "adv:sekte/seragam_lambang");
+		step(15, "bendera", null, "adv:sekte/seragam_bendera");
+		step(15, "turnamen", null, "adv:sekte/turnamen_juara");
+		step(15, "misi", null, "adv:sekte/misi_pulang");
+		step(15, "bawa", null, "adv:sekte/misi_bawa");
+		step(15, "kebun", null, "adv:sekte/kebun_panen");
+		step(15, "tambang", null, "adv:sekte/kebun_tambang");
+		step(15, "rival", "/kultivasi perguruan diplomasi", "adv:sekte/diplomasi_temu");
+		step(15, "sekutu", null, "adv:sekte/diplomasi_sekutu");
+		step(15, "perang", null, "adv:sekte/diplomasi_menang");
 		List<Chapter> chapters = new ArrayList<>(CHAPTER_COUNT);
 		for (int chapter = 0; chapter < CHAPTER_COUNT; chapter++) {
 			List<Step> own = new ArrayList<>();

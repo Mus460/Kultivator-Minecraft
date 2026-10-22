@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/seragam_lambang",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.seragam.adv.bendera.desc"
+    },
+    "icon": {
+      "id": "minecraft:red_banner"
+    },
+    "title": {
+      "translate": "kultivator.sekte.seragam.adv.bendera.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

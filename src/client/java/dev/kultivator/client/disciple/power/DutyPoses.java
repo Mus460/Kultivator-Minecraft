@@ -29,7 +29,8 @@ public final class DutyPoses {
 		if (!(avatar instanceof DiscipleRenderState state) || state.seated > 0.5F) {
 			return;
 		}
-		boolean duty = state.activity >= DiscipleEntity.ACTIVITY_WATER && state.activity <= DiscipleEntity.ACTIVITY_FARM;
+		boolean duty = state.activity >= DiscipleEntity.ACTIVITY_WATER && state.activity <= DiscipleEntity.ACTIVITY_FARM
+				|| dev.kultivator.client.sekte.SektePoses.handles(state.activity);
 		boolean on = duty && !state.castActive && (state.flags & DiscipleLook.FIGHTING) == 0 && state.walkAnimationSpeed <= 0.1F;
 		float s = blend(state.id, on, state.ageInTicks);
 		if (s <= 0.0F || !duty) {
@@ -67,8 +68,8 @@ public final class DutyPoses {
 				pose(model.leftArm, s, -0.55F, 0.0F, 0.3F);
 				model.head.xRot = Mth.lerp(s, model.head.xRot, 0.3F);
 			}
-			default -> {
-			}
+			// Sekte yang Hidup's activities 13-24 (DESIGN 36.3.3): the owner module's registered pose.
+			default -> dev.kultivator.client.sekte.SektePoses.apply(model, state, s, t);
 		}
 	}
 

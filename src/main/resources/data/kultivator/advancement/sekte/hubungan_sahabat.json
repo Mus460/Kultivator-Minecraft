@@ -1,0 +1,25 @@
+{
+ "parent": "kultivator:first_disciple",
+ "criteria": {
+  "done": {
+   "trigger": "minecraft:impossible"
+  }
+ },
+ "display": {
+  "description": {
+   "translate": "advancement.kultivator.sekte.hubungan_sahabat.description"
+  },
+  "icon": {
+   "id": "minecraft:pink_petals"
+  },
+  "title": {
+   "translate": "advancement.kultivator.sekte.hubungan_sahabat.title"
+  },
+  "frame": "task"
+ },
+ "requirements": [
+  [
+   "done"
+  ]
+ ]
+}

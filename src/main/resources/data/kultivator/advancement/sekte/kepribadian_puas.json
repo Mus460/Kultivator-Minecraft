@@ -1,0 +1,25 @@
+{
+ "parent": "kultivator:sekte/kepribadian_sifat",
+ "criteria": {
+  "done": {
+   "trigger": "minecraft:impossible"
+  }
+ },
+ "display": {
+  "description": {
+   "translate": "advancement.kultivator.sekte.kepribadian_puas.description"
+  },
+  "icon": {
+   "id": "minecraft:cake"
+  },
+  "title": {
+   "translate": "advancement.kultivator.sekte.kepribadian_puas.title"
+  },
+  "frame": "goal"
+ },
+ "requirements": [
+  [
+   "done"
+  ]
+ ]
+}

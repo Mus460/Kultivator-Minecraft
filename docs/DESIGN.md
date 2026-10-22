@@ -22644,3 +22644,774 @@ Reflection, Companion Sword, Realm Suppression, Honour, Ring.
     menulis ikatan `parry` yang sebenarnya.
 45. Hub › Dunia › Duel Pedang membuka layar duel; Esc kembali ke hub.
 46. Semua teks duel ada dalam bahasa Indonesia dan Inggris; `mergeLang` tidak gagal.
+
+## 36. Sekte yang Hidup
+
+Permintaan pengguna (gelombang Sekte & Murid, butir 36-52): murid berwatak, hubungan antar-murid, pemberontakan dan
+kepergian, turnamen di arena dengan penonton, Ujian Tangga Seribu di gerbang, Paviliun Kitab tempat murid belajar sendiri,
+tetua NPC pengurus harian, misi ke luar dengan cerita dan laporan, kepulangan membawa murid baru atau harta, pemakaman dan
+Altar Leluhur, seragam yang dirancang sendiri, lambang dan bendera di gerbang dan formasi, persekutuan dan perang antar
+sekte NPC, sekte rival yang tumbuh, pewaris sebagai Ketua Sekte generasi kedua, Kebun Obat dan Tambang Roh yang dikerjakan
+murid. Pendekatannya sama dengan gelombang sebelumnya: satu desainer utama (bagian ini dan inti bersama di
+`dev.kultivator.sekte`), lalu **tepat sepuluh modul** dengan file yang tidak bertumpuk (36.4).
+
+### 36.0 Aturan mengikat (tambahan atas bagian 0, 22, 23)
+
+1. **Blok.** Tidak ada kode baru yang mengubah blok saat permainan berjalan, kecuali lewat dua jalur yang sudah ada:
+   `kehancuran/WorldBreaker` (Mode Kehancuran pilihan pemain sendiri atau Seni Penghancur murid) dan mesin bangunan sekte
+   (`sect/build/engine/BuildPlacer`, dari bahan yang disetor, hanya di dalam kolom tapak). Semua bangunan baru (tiang dan
+   batu Tangga Ujian, tribun arena, pemakaman, altar, petak herba roh, mulut tambang, tiang bendera) adalah **komponen
+   templat** yang didaftarkan lewat `TemplateExtensions` (36.3.5). Gunung sekte NPC hanya lahir dari **world generation
+   di chunk baru** (struktur data-driven yang dibuat dengan `tools/nbt.py` + `tools/structgen.py`, divalidasi dengan
+   harness `scratchpad/final/wg`). Tanaman herba roh, bijih tambang, nama di batu nisan, kain bendera, dan tangga ilusi
+   seribu anak tangga semuanya **gambar klien atau data**, bukan blok. Tanpa Mode Kehancuran semua efek hanya visual.
+2. **Tidak pernah** `LightningBolt`, cuaca, waktu, atau kecepatan tick. Upacara malam, Qingming, dan perang tidak
+   menggeser waktu; mereka menunggu jam dunia.
+3. **Tidak ada murid yang mati karena sistem baru.** Pertarungan pemberontakan, Duel Kehormatan, turnamen, misi, dan
+   kecelakaan tambang memakai aturan duel (berhenti di 10% nyawa) atau `Disciples.depart` "Terluka". Kematian hanya dari
+   sebab yang sudah ada (pertarungan nyata, Hardcore), dan modul A hanya **menghormati** yang gugur.
+4. **Kehilangan murid hanya karena pilihan pemain.** Murid baru pergi setelah peringatan berlapis (Gelisah →
+   Membangkang → Akan Pergi selama 3 hari dunia) yang bisa dibalik setiap saat; murid ber-Segel Jiwa
+   (`disciple/path/SoulSeal`) dan pewaris tidak pernah pergi; saklar `kepribadian.bolehPergi` (default `true`) mematikan
+   kepergian sama sekali; data murid yang pergi disimpan di daftar "Yang Pergi" (maks 10) dan bisa kembali (36.2.1, 36.2.7).
+5. **Laptop lemah.** Semua tampilan "shader berat" dipalsukan dengan quad aditif berlapis, tekstur glow, dan overlay HUD;
+   tidak ada post chain. Setiap efek baru memakai `EffectQuality` (Minimal/Normal/Maksimal), LOD jarak, entitas dibatasi,
+   AI ditipiskan, dan pekerjaan per tick dibagi (36.3.9). Kompatibel Sodium/Iris (tidak menyentuh pipeline chunk;
+   renderer memakai `RenderTypes` biasa dan `DisplayKey` untuk setiap transform display).
+6. **Kamera 7b.** Setiap adegan baru lewat `SekteScenes` (36.3.7): pendek (≤ 6 s gerakan), bisa dilewati (Backspace,
+   tombol apa pun), patuh "Kamera sinematik Penuh/Singkat/Mati", tidak pernah saat bahaya nyata (`ShotGuard`).
+7. **Klien/server terpisah.** Kode server tidak pernah mereferensikan kelas klien. ItemStack dibuat malas (tidak di
+   static initializer, tidak di konstruktor renderer). Teks di `lang-src/<fragmen>.en_us.json` + `.id_id.json` dengan
+   kunci identik (Indonesia utama). Setiap file mempertahankan akhir barisnya (sebagian CRLF di git). Gradle hanya di
+   langkah akhir (`compileJava`, `compileClientJava`, `jar`).
+8. **Angka lama tidak berubah.** Semua angka permainan yang ada (Bond, SectRanks, Tournament, Expeditions, Candidates,
+   Duties, Halls) tetap; modul hanya menambah faktor baru yang berbatas dan bisa dimatikan per modul.
+9. **Setiap fitur punya baris Sumber** (novel kultivasi nyata, mitos, atau sejarah). Yang tidak terverifikasi tidak
+   dikutip (36.5).
+
+### 36.1 Audit sistem yang sudah ada (2026-10-22, kode adalah kebenaran)
+
+| Sistem | Yang ada (file) | Dipakai oleh |
+|---|---|---|
+| Data murid | `disciple/DiscipleData` (`extra()` per modul, `extraSection(key)`), identitas jiwa `DiscipleEntity.soulId()`, `Disciples.depart/arrive/markFallen/setAwayUntil`, `Disciples.loaded(owner)`, batas murid `Halls.cap` = `5 + level/2` (+bonus) | semua |
+| Kait murid | `DiscipleHooks`: xp/rank/potential factor, damage/hurt/strike, onHurt, onDeath, deathGuard, tick20, onKill, teach blocker/factor/onTaught, feed, modeBlocker, retreat, regen, info (`addInfo` → kompon info layar murid), cap | P R A E W |
+| Aktivitas murid | `DiscipleEntity.setActivity` 1-12 (tugas 1-4, penjaga formasi 5, menara 6, tubuh hampa 7, penonton 8, duelist 9, pembangun 10, penjaga mata formasi 11, asisten tempa 12), pose `DutyPoses` + properti `DiscipleHeldItemLayer` | T (8, 9) |
+| Ikatan guru-murid | `disciple/path/Bond` (0-100: ajar +5, pil +2, jaga terobosan +10, meditasi +1/menit, menang babak +3; Segel Jiwa 50, pewaris 80), `DisciplePaths.bond/addBond` | P (kesetiaan dibangun dari Bond) |
+| Pewaris | `disciple/path/Heir` (ritual 60 s, Inti+, Nascent Soul+, bond 80, Segel Jiwa; Sembilan Segel), `MasterRing` (Cincin Jiwa Guru), `Surpass`, `HuFa`, `SoulSeal`, `Stars`, `Calamity`, `DestroyerArts` | E |
+| Bakat & tekad | `sect/hall/Talents` (warna jiwa, bakat, fisik, Calon Istimewa, **Tekad**), `Candidates` (Hari Penerimaan setiap `recruitmentIntervalDays` = 3, uji di prasasti, "pendakian" 3 tingkat: akar LOW+, Tekad 40+, `grade×20+Tekad ≥ 110`; hanya partikel), `HundredDynasties` | G P |
+| Jenjang & kontribusi | `SectRanks` (Tercatat … Tetua 4, Tetua Agung 5; aura tetua 1.15/1.2; dua tetua dari aula lv 5), `Contribution` (PK), `PromotionTrial` | E |
+| Tugas & lumbung | `sect/event/Duties` (pos 5 blok dari prasasti, output malas dari waktu, maks 24.000 tick per pos), `Storehouse` (27 slot virtual), `LumbungOverflow` | W |
+| Misi | `Expeditions` (papan misi harian, tim 1-3, data murni, gagal = luka, tidak pernah mati), `Envoys` (utusan perekrut 1 hari tiap 5 hari, 1-3 calon), `AwayTeams`, `Halls.storeAway/addReturnHandler/away`, `ForbiddenGround`, `PrimordialArk`, klien `sectevent/MissionPage` | X |
+| Turnamen | `Tournament` (setiap `tournamentIntervalDays` = 7 siang, maks 8 murid, eliminasi tunggal, Elit tiap ke-3, gelar "Nomor Satu Daftar Kuat", penonton aktivitas 8, papan sepuluh besar), `DuelArena` (cincin partikel di prasasti, boss bar), `Rivals` (Murid Tepi Utara, juara tamu), `Bracket` | T |
+| Duel Pedang | `duel/**` (DESIGN 35): `DuelChallenges.startDirect(challenger, a, b, pair, rules)`, `DuelSessions.byEntity`, `DuelSession.phase/decided/ended`, `DuelResults` (kartu hasil). **Tidak ada pendengar akhir duel** untuk modul lain | T P R |
+| Aula & tablet | `sect/hall/Halls` (`section(owner,key)`, `log`, `addRenown/addPool`, `addCandidates`, `addInfoProvider`, `inTerritory`, `addArrivalSpotProvider`), `HallBlock` tablet, `LostArts` (Paviliun Kitab dihitung dari scan bangunan), `GrandFormation` | semua |
+| Bangun sekte | `sect/build/**`: 9 templat (`Templates.get`), `TemplateSpec.Builder`, komponen + jangkar (`arrival`, `arena`, `library`, `post_garden`, `treasury`, `main_hall`, `formation`), `Scheduler` membangun komponen "Tambahan" pada tingkat yang sudah selesai lebih dulu. Sudah ada: `t2_garden`/`t2_herbs` (bedeng herba), `t3_scripture` (paviliun kitab, Interiors LIBRARY), `t8_ancestral`/`t8_ancestors`/`t8_shrine` (aula leluhur tingkat 8), arena `Grounds.arena` di T6-T9, jangkar `arena` di T1-T3. **Tidak ada kait untuk menambah komponen** (dibuat di 36.3.5) | G T A S W |
+| Formasi sekte | `formasi/**` (20c), `FormasiAnchor` | S |
+| Sekte pemain | `sect/Sects` (`/sekte`, sparring, bonus meditasi teman sekte) | D (tidak diubah) |
+| Serbuan iblis | `musuh/SectRaids` (setiap `sectRaidIntervalDays` dari aula lv 3, pertanda, live atau data, tidak pernah blok/murid) | D |
+| Desa bawahan | `desa/**` (ikrar, kesetiaan, upeti) | T (penonton desa, opsional) |
+| Dunia | `dunia/**` (DESIGN 34): `DuniaApi.rivals()` kelompok saingan + wilayah, kota, pengembara, peta; `DuniaSites`, `JauhDariPusatPlacement` | D X |
+| Sinematik | `epic/**`, `client/epic/**` (`EpicMoments.send`, `SceneCatalog*`, `CinematicDirector`, `TitleCard`, `SkyDirector`, `EpicBudget`, Penuh/Singkat/Mati, Backspace). Katalog **tertutup** (pembantu package-private; dibuka di 36.3.7) | T G A E X D |
+| Suara | `voice/**`: murid m1-m3/f1-f3 (`VoiceDisciples.line(disciple, line, cooldown)`): attack, attack_alt, breakthrough, careful, cheer, cultivate, farewell, fear, formation, greet, greet_alt, injured, loyal, protect, technique, thanks, tired, victory | semua |
+| Hub & panduan | `client/hub/HubCards.register(section, id, glyph, lock, action)` (bagian MURID 2, SEKTE 3); `guide/GuideChapters` (14 bab sebelum gelombang ini) | semua |
+| Layar murid | `client/disciple/DiscipleScreen` (7 tab tetap; **tidak bisa ditambah**, dibuka di 36.3.8) | P R |
+
+Hasil audit per butir (ada / sebagian / belum):
+
+| # | Butir | Status sebelum | Yang dibangun di atasnya |
+|---|---|---|---|
+| 36 | Watak murid | **Belum** (hanya Bakat/Tekad/fisik) | P: 12 watak (`api/Sifat`), efek lewat `DiscipleHooks` |
+| 37 | Hubungan antar-murid | **Belum** (hanya Bond guru-murid, Segel Jiwa) | R: tabel pasangan per aula |
+| 38 | Memberontak/pergi | **Belum** (hanya "Lepaskan" oleh pemain, `depart`) | P: Kepuasan + Kesetiaan dari Bond, 4 keadaan, 5 cara pergi |
+| 39 | Turnamen di arena + penonton | **Sebagian**: turnamen, bracket, penonton (aktivitas 8) di cincin prasasti; arena ada di T6-T9 tapi tidak dipakai | T: pindah ke arena, Duel Pedang tiap babak, tribun, penonton tamu, musim, antar-sekte |
+| 40 | Tangga Seribu di gerbang | **Sebagian**: "pendakian" 3 tingkat di `Candidates` (partikel) | G: komponen batu ujian + tangga ilusi seribu anak tangga (entitas/visual), verdict lama tetap |
+| 41 | Paviliun Kitab belajar mandiri | **Sebagian**: bangunan `t3_scripture`, `LostArts`; belajar teknik hanya lewat ajar guru | A: rak kitab virtual + belajar mandiri |
+| 42 | Tetua NPC | **Sebagian**: jenjang Tetua/Tetua Agung (aura, ajar) | E: jabatan, urusan harian, laporan pagi |
+| 43 | Misi luar bercerita | **Sebagian**: `Expeditions` (tanpa cerita/laporan) | X: misi cerita + laporan tertulis |
+| 44 | Pulang membawa murid/harta | **Sebagian**: `Envoys` (calon), loot ekspedisi | X: hasil cerita, momen kepulangan di gerbang |
+| 45 | Pemakaman + Altar Leluhur | **Sebagian**: aula leluhur tingkat 8, Soul Tablet di `AwayTeams` | A: makam tingkat 3, altar kecil tingkat 2, upacara |
+| 46 | Seragam rancangan sendiri | **Sebagian**: jubah diwarnai Dao + trim jenjang + sulaman lambang tetap | S: warna per jenjang, potongan, lambang sendiri |
+| 47 | Lambang & bendera | **Belum** | S: perancang lambang, tiang bendera, kain bendera klien, lambang di formasi |
+| 48 | Persekutuan/perang/diplomasi | **Belum** (hanya serbuan iblis tanpa nama) | D: diplomasi, pakta, perang |
+| 49 | Sekte rival yang tumbuh | **Sebagian**: kelompok saingan Dunia (K), juara tamu turnamen | D: sekte NPC bertingkat 1-9 yang tumbuh, menyerang, berdamai |
+| 50 | Pewaris generasi kedua | **Sebagian**: `Heir` (ritual, Sembilan Segel) | E: Upacara Penyerahan Takhta, Ketua Generasi Kedua |
+| 51 | Kebun obat oleh murid | **Sebagian**: bedeng `t2_garden` + tugas kebun (pos 2) | W: petak herba roh yang ditanam/dirawat (data + gambar) |
+| 52 | Tambang roh | **Belum** | W: mulut tambang + giliran kerja (data) |
+
+### 36.2 Desain per butir
+
+Notasi: "hari" = hari dunia (24.000 tick, jam overworld `getOverworldClockTime()/24000`); "PK" = Poin Kontribusi kas aula;
+semua faktor berbatas dan bertumpuk secara perkalian dengan faktor lama.
+
+#### 36.2.1 Watak, Kepuasan dan Kesetiaan (butir 36 dan 38, modul P)
+
+**Lore & Sumber.** Watak para tokoh novel kultivasi: kehati-hatian dan ketekunan Han Li (*A Record of a Mortal's
+Journey*), rasa takut dan kelicikan Bai Xiaochun (*A Will Eternal*), kebanggaan Xiao Yan dan kesetiaannya kepada Yao Lao
+(*Battle Through the Heavens*), dendam Wang Lin (*Renegade Immortal*). Pengkhianatan murid: Han Feng, murid Yao Lao yang
+mengkhianati gurunya (*Battle Through the Heavens*). Murid yang dibina dengan buruk berbalik; murid yang dihargai setia.
+
+**Watak (`api/Sifat`, 6 sumbu × 2).** Diundi saat direkrut (dan sekali, malas, untuk murid lama pada tick20 pertama
+setelah P terpasang): 2 watak dari 2 sumbu berbeda; 15% watak ketiga (30% untuk Calon Istimewa). Bias: verdict tangga G 3
+("melampaui batas") ×3 bobot RAJIN/BERANI; verdict 1 ("menyerah") ×2 MALAS/PENAKUT; Tekad ≥ 70 ×2 SETIA. Watak hanya
+berubah lewat (a) Ujian Hati ulang di tangga G (sekali per 30 hari: satu watak buruk diganti lawannya bila verdict 3) atau
+(b) peristiwa berbobot ±10 (P: dikhianati sahabat → PENDENDAM menggantikan PENYAYANG, 25%).
+
+| Watak | Efek (kait yang dipakai) | Angka |
+|---|---|---|
+| Rajin | `addXpFactor` (sumber meditasi) ×1.08; `workFactor` +0.15 | — |
+| Malas | `addXpFactor` ×0.90; `workFactor` −0.20; peluruhan Kepuasan karena diabaikan ×0.5 | — |
+| Sombong | duel: `addDamageFactor` ×1.05 di sesi duel/turnamen; DIPERMALUKAN ×2; persaingan (R) ×1.5 | — |
+| Rendah Hati | `addTeachCostFactor` ×0.9; persahabatan (R) ×1.25 | — |
+| Setia | lantai Kesetiaan +15; ambang pergi turun ke 10 | — |
+| Licik | X: barang misi +10%; BERKHIANAT ×2 bila ada sekte NPC Bermusuhan | — |
+| Berani | `addRetreatFraction` −0.05 (bertahan lebih lama); DIKORBANKAN ×0.5 | — |
+| Penakut | `addRetreatFraction` +0.10; X: luka misi ×0.5 | — |
+| Ambisius | `addFoundationChance` +0.03; TIDAK_ADIL ×2; MENGEMBARA bila ranah ≥ ranah guru | — |
+| Tenang | perubahan Kepuasan harian ×0.5 (dua arah) | — |
+| Penyayang | dendam (R) ×0.5; +1 Kepuasan/hari bila punya sahabat | — |
+| Pendendam | dendam (R) ×2; bobot ingatan negatif −1 lagi | — |
+
+**Kepuasan (0-100, awal 70)** di `extra.hati`. Diperbarui sekali per hari (pada tick20 pertama murid setelah pergantian
+hari; murid yang jauh/away diperbarui saat kembali dengan maks 5 hari tertunda):
+`Δ = (60 − K) × 0.10 + Ingatan.drift(data, today) × 0.25 + hubungan.socialBalance/20 + rawat + leluhur × 20`, dikali 0.5
+untuk Tenang, dibatasi ±8 per hari. `rawat` hari itu: diajar +3, diberi pil +2, meditasi ≤ 8 blok dari guru +2, dipuji
+(event HONORED) +amount. Penganiayaan (`SekteBus.DISCIPLE_MISTREATED`) langsung: `−severity × faktor watak`
+(Perlakuan: dipukul 8, dihukum 5, diabaikan 3, dipaksa kerja 2, dirampas 6, dikorbankan 12, dipermalukan 6, tidak adil 4),
+plus satu `Kenangan` (bobot −severity/2). Deteksi P sendiri: guru memukul murid (`DiscipleHooks.addOnHurt`, sumber =
+pemain pemilik, maks sekali per 10 s), DIABAIKAN bila tak ada interaksi `neglectDays` = 5 hari, DIKORBANKAN bila guru
+dalam 16 blok saat murid jatuh < 20% nyawa dan guru tidak menyerang dalam 10 s (maks sekali per hari).
+
+**Kesetiaan** = `round(0.55 × Kepuasan + 0.45 × Bond)` (+15 Setia), 0-100. Keadaan: **Setia** ≥ 50, **Gelisah** 30-49
+(gelembung pikiran, suara `tired`, baris log), **Membangkang** 15-29 (menolak tugas/kebun/tambang, mode diubah ke STAY di
+aula, aktivitas `ACT_SULK`, 50% perintah ditolak dengan pesan), **Akan Pergi** < 15 (`ambangPergi`) selama 3 hari
+berturut-turut → pergi. Hitung mundur tampil di layar murid dan hub. Cara memulihkan: **Bicara** (tombol di tab Hati,
+sekali per hari: +4, Rendah Hati +6), **Hadiah** (pil/herba/batu roh, +2..+6 menurut mutu, maks 3 per hari), **Minta Maaf
+di Aula** (pose `ACT_BOW` guru dan murid di prasasti, +10, sekali per 3 hari, ingatan +5), **Tetua Balai Hukum** (E: +3/hari
+untuk murid < 30 × `officeFactor`), **Upacara Leluhur** (A: +blessing×20).
+
+**Cara pergi (`api/Kepergian`)**, dipilih P: Licik + sekte NPC Bermusuhan/Perang → BERKHIANAT (D menerima murid sebagai
+anggota sekte itu; muncul lagi sebagai lawan di turnamen antar-sekte/perang); Berani atau Sombong → MEMBERONTAK: murid
+menantang guru di prasasti lewat Duel Pedang (`DuelChallenges.startDirect`, aturan duel kehormatan, berhenti di 10%);
+guru menang → murid tunduk, Kepuasan diset 40, ingatan "Tunduk" +6; guru kalah atau menolak → murid pergi, dan seorang
+Saudara Angkat dengan Kesetiaan < 50 ikut (50%); selain itu MINGGAT (malam, keluar gerbang dengan bundel, `ACT_LEAVING`).
+Ambisius dengan ranah ≥ ranah guru dan Kepuasan ≥ 50 bisa pamit MENGEMBARA (minta izin: tolak = DIPERMALUKAN 3). DIUSIR =
+tombol "Usir dari Sekte" (konfirmasi 2×; semua murid lain −3 Kepuasan, Penyayang −6). Pelaksanaan: `Disciples.depart`
+(alasan `sekte_pergi`), tag disimpan di daftar "Yang Pergi" P (hall section `sekte_kepribadian`, maks 10); event
+`DISCIPLE_LEFT`. Tidak pernah: murid ber-Segel Jiwa, pewaris, murid yang sedang away, saat Hardcore drop berjalan.
+
+**Data.** `extra.hati`: `sifat` (list id), `k` (Kepuasan), `low` (hari berturut < ambang), `last` (hari interaksi),
+`gifts`/`talk` (hari), `state`. Hall section `sekte_kepribadian`: `pergi` (tag murid + cara + hari, maks 10).
+**UI.** Tab murid "Hati" (`DiscipleScreen.addExtraTab`): watak dengan deskripsi, batang Kepuasan dan Kesetiaan, keadaan,
+hitung mundur, 6 ingatan terkuat (`Ingatan.of`), tombol Bicara/Hadiah/Usir. Hub MURID: kartu "Suasana Hati Murid" (daftar
+keadaan semua murid). **Visual.** Gelembung pikiran quad di atas kepala (awan kecil: hati, awan hujan, tanda seru), hanya
+≤ 24 blok, maks 6 sekaligus, Minimal = ikon datar tanpa animasi; pose `ACT_SULK` (lengan bersilang) dan `ACT_LEAVING`.
+**Config `kepribadian`:** `aktif`, `bolehPergi` (true), `ambangPergi` (15), `hariPergi` (3), `neglectDays` (5),
+`faktorWatak` (1.0, 0-2 pengali semua efek watak), `pukulCooldownDetik` (10).
+**Uji `/kultivasi uji perguruan kepribadian`:** `info <nama>`, `sifat <nama> <id> [id]`, `puas <nama> <0-100>`,
+`siksa <nama> <perlakuan>`, `hari <n>` (jalankan n hari pembaruan), `pergi <nama> <cara>`, `pulih <nama>`,
+`yangpergi`, `reset`. **Panduan:** c15.sifat, c15.puas, c15.rukun.
+
+#### 36.2.2 Hubungan antar-murid (butir 37, modul R)
+
+**Lore & Sumber.** Persaudaraan angkat Sumpah Kebun Persik (*Romance of the Three Kingdoms* bab 1); pasangan Dao Wang Lin
+dan Li Muwan (*Renegade Immortal*); persaingan kakak-adik seperguruan di *A Will Eternal*.
+
+**Tabel pasangan** per aula (hall section `sekte_hubungan`, kunci `soulA|soulB` terurut): afinitas −100..100, jenis
+(`api/Ikatan`), riwayat 4 peristiwa terakhir, hari terakhir. Dengan ≤ 12 murid paling banyak 66 pasangan.
+**Pertemuan.** Satu "giliran sosial" per 20 s per aula (dibagi), hanya bila dua murid idle (FOLLOW tanpa target, MEDITATE,
+STAY, tidak away, tidak Membangkang) ≤ 12 blok: keduanya `ACT_SOCIAL` 30 s (duduk minum teh, properti `teacup`),
+lalu `Δ = 2 × kecocokan` (sama watak +1, watak berlawanan sesumbu −1, Penyayang +1 dengan siapa pun, Sombong+Sombong −2,
+Dao sama +2, elemen akar sama +1), maks ±15 per panggilan dan ±25 per pasangan per hari. Peristiwa dari bus: babak
+turnamen (yang kalah terhadap pemenang −4, Penyayang 0; kalah dari junior (upset) −6), misi bersama
+berhasil +6, gagal −2, saling menyelamatkan +8, sama-sama berduka di makam +3, promosi junior melangkahi senior −5.
+**Jenis.** Kenalan (bertemu, |a| < 40), Sahabat ≥ 40, Saudara Angkat (dari Sahabat ≥ 75: upacara sumpah di prasasti yang
+disetujui pemain), Kekasih ≥ 70 (5% per pertemuan, keduanya Foundation+, belum berpasangan), Pasangan Dao (dari Kekasih ≥
+90 + restu pemain di Aula + keduanya Golden Core+), Saingan ≤ −30 atau 3× bertemu di turnamen, Dendam ≤ −60 setelah
+peristiwa berbobot ≤ −6. Pemain bisa **Merestui** (Kekasih → Pasangan Dao) atau **Melarang** (keduanya DIHUKUM).
+**Efek** (lewat `DiscipleHooks`, satu kali per murid, yang terkuat saja): Sahabat ≤ 16 blok dalam pertarungan ×1.05
+kerusakan; Saudara Angkat ×1.08 dan saling membela (target diambil alih bila saudara dipukul); Kekasih/Pasangan Dao ×1.10
+XP meditasi bila ≤ 8 blok, Pasangan Dao menjaga terobosan pasangannya seperti guru (Bond +0); Saingan ×1.06 XP latihan,
+Sombong −1 Kepuasan/hari; Dendam −2 Kepuasan/hari untuk keduanya, menolak satu tim misi, 10%/hari minta **Duel Kehormatan**
+(pemain menyetujui → Duel Pedang di arena/prasasti; hasil apa pun mengubah Dendam menjadi Saingan, afinitas +30).
+**Data** di atas; `extra.ikatan_murid` hanya penanda pasangan Dao (jiwa pasangan). **UI.** Tab murid "Hubungan" (daftar
+ikatan + batang), kartu hub SEKTE "Jaring Hubungan" (layar lingkaran: titik murid, garis berwarna per jenis; ≤ 12 titik,
+digambar sekali per frame dengan quad garis). **Visual.** Gelembung hati/petir di atas dua kepala saat jenis berubah;
+partikel `kultivator:qi` merah muda untuk Pasangan Dao (Minimal: tidak ada). **Config `hubungan`:** `aktif`,
+`giliranDetik` (20), `jarakTemu` (12), `cintaAktif` (true), `peluangCinta` (0.05), `dendamAktif` (true).
+**Uji `uji perguruan hubungan`:** `info <a> <b>`, `set <a> <b> <-100..100>`, `jenis <a> <b> <ikatan>`, `temu <a> <b>`,
+`jaring`, `reset`. **Panduan:** c15.sahabat, c15.saingan.
+
+#### 36.2.3 Turnamen sekte di arena (butir 39, modul T)
+
+**Lore & Sumber.** Sumber `Tournament` yang ada (Daftar Kuat *Battle Through the Heavens* bab 566-573, Pemilihan Murid
+Terpilih *A Will Eternal*, babak final diumumkan Tetua Agung *I Shall Seal the Heavens* bab 27-31). Panggung **lei tai**
+(擂台), panggung adu silat terbuka dalam tradisi bela diri Tiongkok.
+
+**Loop.** Jadwal, bracket, hadiah, Elit tiap ke-3 tetap milik `Tournament`. T menambah: (1) **tempat**: arena komponen
+(`Grounds.arena` T6-T9) atau jangkar `arena` (T1-T5) dengan "Lingkar Lei Tai" (entitas penanda + cincin quad, bukan blok);
+(2) **babak = Duel Pedang** (`DuelChallenges.startDirect`, aturan sekte: 90 s, berhenti 10%, tanpa taruhan) bila
+`pakaiDuelPedang` (default true) dan kedua petarung punya pedang, selain itu `DuelArena` lama; (3) **penonton**: murid tak
+bertanding di kursi tribun (aktivitas 8 yang ada, titik `sx_turnamen_kursi_*`), utusan sekte sekutu D (≤ 4) dan penonton
+desa bawahan (≤ 6) sebagai entitas `Penonton` ringan (tanpa AI jalan, hanya kepala menoleh, sorak tiap 4 s), total ≤ 12,
+LOD: > 32 blok tidak beranimasi, > 64 tidak dirender; (4) **musim**: nomor musim, Peringkat Elo per murid (`extra.turnamen`:
+`elo` 1000 ±32, `menang`, `kalah`, `gelar`, `terbaik`), papan musim di kartu hub; (5) **antar-sekte** (`hostGuests`):
+4 tamu dari sekte NPC (D; tubuh RIVAL seperti `Rivals`), hasil mengubah standing ±10; (6) **momen**: kartu judul babak
+final (`SekteScenes` beat 120 "Final", 121 "Juara"), suara `cheer`/`victory`. Event: `TOURNAMENT_BOUT` per babak,
+`TOURNAMENT_ENDED` di akhir; juara `HONORED` 8, kalah final `HONORED` 3 (bukan dipermalukan), pemain yang memukul murid
+yang kalah → P mendeteksi sendiri. **Bangunan.** `sx_turnamen_tribun` (T6-T9, tingkat 7): tiga undakan batu di dua sisi
+panjang arena yang ada (≤ 3 blok di luar persegi arena), tiang bendera kecil (S boleh memasang kain di jangkar
+`panji_arena_*`), genderang `Stamp`. Biaya dari Bahan seperti komponen lain (batu + kayu, ±1.800 blok di T6).
+**UI.** Kartu hub SEKTE "Turnamen": bracket hidup, musim, Elo; HUD boss bar lama tetap. **Config `turnamen`:**
+`pakaiDuelPedang`, `penontonMaks` (12), `antarSekte` (true), `eloK` (32). **Uji `uji perguruan turnamen`:** `mulai
+[biasa|elit|antar <sekte>]`, `babak lewati`, `penonton <n>`, `elo <nama> <n>`, `musim`, `final` (adegan saja).
+**Panduan:** c16.turnamen.
+
+#### 36.2.4 Ujian Tangga Seribu (butir 40, modul G)
+
+**Lore & Sumber.** Pendakian tiga tahap Sekte Tujuh Misteri (*A Record of a Mortal's Journey* bab 1-5, sudah dikutip
+`Candidates`); Gunung Tai, "Delapan Belas Tikungan" sekitar 1.600 anak tangga menuju Gerbang Langit Selatan; Sun Wukong
+menunggu dan diuji kesabarannya sebelum diterima Subhuti (*Journey to the West* bab 2).
+
+**Loop.** Pada Hari Penerimaan, bila komponen `sx_tangga_batu` DONE dan `aktif`, uji di prasasti diganti **pendakian**:
+para calon (entitas CANDIDATE yang sudah ada, ≤ 6 tampil) berbaris di batu ujian, lalu Formasi Tangga memproyeksikan
+**tangga ilusi** dari gerbang ke langit (pita quad giok aditif, 1000 anak tangga terlipat dalam spiral 24 blok tinggi,
+digambar klien; LOD: Minimal = 120 anak tangga, Normal 400, Maksimal 1000; hanya dalam 96 blok). Server menggerakkan
+setiap calon di jalur tangga (`noPhysics`, tanpa tabrakan blok; gerak per 4 tick, interpolasi klien). Tiap calon punya
+**Tekanan** naik per 100 anak tangga; ia berhenti di langkah `L = 300 × tingkatLama + acak(0..99) + Tekad`, dibatasi 1000,
+dengan `tingkatLama` = 0-3 dari rumus `Candidates` yang ada (akar LOW+, Tekad 40+, `grade×20+Tekad ≥ 110`). **Verdict
+lama tidak berubah**; G hanya menambah: L = 1000 ("Puncak", tingkat 3 dan Tekad ≥ 90) → bias watak RAJIN/BERANI, Bond
+awal +5, gelar "Pendaki Puncak"; L < 100 dengan Tekad ≥ 70 → "Tidak Menyerah" (verdict hati 2). Ilusi di 300/600/900:
+kilasan pertanda (quad wajah iblis hati, suara angin) dan calon berlutut 2 s. Durasi 60 s (+15 s pengumuman). Event
+`TRIAL_FINISHED`; data per murid `extra.tangga` (`l` langkah, `v` verdict hati 0-3) ditulis saat direkrut. **Ujian Hati
+ulang** untuk murid (sekali per 30 hari, 200 PK): mendaki sendiri, verdict 3 menukar satu watak buruk (P membaca `resolve`).
+**Bangunan.** `sx_tangga_batu` (T2-T9, tingkat 2): dua stela "Batu Hati" (1×1, tinggi 3, ukiran) di pita depan gerbang
+terluar pada |x| ≤ 3, inlay cakram proyektor 3×3 di sumbu; T1 tanpa komponen (proyeksi dari gerbang, pendakian tetap
+jalan). **Visual.** Tangga = pita quad dengan tekstur glow anak tangga, kabut aditif di bawahnya, cahaya keemasan di puncak;
+nomor langkah tiap calon sebagai teks billboard kecil (≤ 6). Adegan `SekteScenes` 130 "Puncak!" (stamp, orbit pendek)
+hanya untuk pemain di dekatnya. **Config `tangga`:** `aktif`, `lod` (otomatis dari EffectQuality), `ujianHatiPK` (200),
+`ujianHatiHari` (30). **Uji `uji perguruan tangga`:** `mulai [n]`, `proyeksi` (visual 20 s), `langkah <nama> <0-1000>`,
+`ulang <nama>`, `info`. **Panduan:** c15.tangga.
+
+#### 36.2.5 Paviliun Kitab, Pemakaman dan Altar Leluhur (butir 41 dan 45, modul A)
+
+**Lore & Sumber.** Biksu penyapu Perpustakaan Sutra Shaolin yang diam-diam menguasai semua kitab (*Demi-Gods and
+Semi-Devils*, Jin Yong); papan arwah leluhur di aula leluhur keluarga dan ziarah makam Qingming (adat Tiongkok); Soul
+Tablet dari `AwayTeams`.
+
+**Paviliun.** Pemain menyetor kitab teknik (item `TechniqueBooks` yang ada) ke "Rak Kitab" virtual dengan mengklik jangkar
+`library` (atau kartu hub): maks 9/18/27 kitab (aula lv 1-3/4-6/7-9). Murid luang (tanpa tugas, idle di wilayah aula, tidak
+Membangkang) memilih sendiri kitab yang belum ia kuasai dan boleh ia pelajari (aturan ajar yang ada: `TeachBlocker`, ranah),
+lalu duduk membaca (`ACT_STUDY`, kursi di sekitar `library`, maks 4 pembaca). **Poin belajar** per detik
+`= 1 × (comprehension/50 + 0.5) × workFactor(P) × officeFactor(TETUA_AJAR) × (Rendah Hati 1.1)`; kebutuhan `600 × (tingkat
+teknik + 1)` → teknik tingkat 0 ±10 menit nyata, tingkat 4 ±50 menit. Selesai: `data.learn(id)` (gratis, tanpa Qi guru),
+`DISCIPLE_STUDIED`, ingatan +3, Bond +0 (bukan ajaran guru). Satu teknik per murid per hari dunia. Kitab tidak habis.
+**Pemakaman** (`sx_paviliun_makam`, T3-T9 tingkat 3, kuadran barat-belakang): baris batu nisan generik (8/16/24/36 menurut
+templat), lentera batu, pohon cemara. Murid yang gugur (`DiscipleHooks.addOnDeath` setelah `markFallen`; Soul Tablet yang
+dibawa pulang) mendapat **Makam** (A: nama, ranah, hari, sebab, 3 ingatan terkuat sebagai "jasa"); nisan ke-n dipetakan
+virtual; nama melayang (teks billboard) saat pemain ≤ 8 blok. Penuh → makam tertua dipindah ke "Kitab Silsilah" (tidak
+hilang). **Altar Leluhur** (`sx_paviliun_altar`, T2-T7 tingkat 2, 5×5, kuadran barat-belakang dekat makam; T8-T9 juga
+memakai `t8_ancestral` dari tingkat 8): papan arwah (gambar klien) untuk setiap makam yang **diabadikan** (pemain klik
+"Abadikan", 50 PK). **Upacara:** dupa harian (pemain klik altar dengan dupa = item `incense` baru A, 1 per hari),
+**Qingming** tiap 15 hari (semua murid berkumpul 60 s, pose `ACT_BOW`, adegan 140 "Qingming"), **pemakaman** saat gugur
+(sahabat R yang hadir `ACT_MOURN` sampai pagi). **Berkah leluhur** 0-0.15 = `min(0.10, 0.01 × papan) + 0.05 × kesegaran`
+(kesegaran 1 setelah upacara, turun 1/7 per hari). Dibaca P (+berkah×20 Kepuasan) dan E (ritual pewaris −20% waktu bila
+≥ 0.1). Event `DISCIPLE_BURIED`, `ANCESTOR_RITE`.
+**UI.** Kartu hub SEKTE "Paviliun Kitab" (rak, pembaca, progres) dan "Makam Leluhur" (daftar makam, abadikan, silsilah).
+**Visual.** Dupa: asap quad bertumpuk + titik bara; papan arwah emas pudar; lentera makam berpendar (quad glow) malam hari;
+Minimal: tanpa asap. **Config `paviliun`:** `rakMaks`, `pembacaMaks` (4), `poinPerTeknik` (600), `abadikanPK` (50),
+`qingmingHari` (15). **Uji `uji perguruan paviliun`:** `rak tambah <id>`, `baca <nama>`, `selesai <nama>`, `makam tambah
+<nama>`, `upacara [harian|qingming|makam]`, `berkah`. **Panduan:** c15.kitab, c15.leluhur.
+
+#### 36.2.6 Tetua dan Pewaris (butir 42 dan 50, modul E)
+
+**Lore & Sumber.** Jabatan biara dalam *Kitab Aturan Murni Baizhang* (Baizhang Qinggui, dinasti Tang), asal susunan
+jabatan biara Chan; Tetua Agung yang memimpin upacara (*I Shall Seal the Heavens* bab 27-31). Penyerahan jubah dan mangkuk
+Patriark Kelima Hongren kepada Huineng (*Sutra Altar*), pewaris generasi berikutnya; pewaris `Heir` yang ada (*I Shall Seal
+the Heavens*).
+
+**Jabatan (`api/Jabatan`).** Dipegang murid berjenjang Tetua/Tetua Agung (`SectRanks`); murid Inti boleh menjadi **Wakil**
+(faktor separuh) agar sekte kecil bisa memakainya. Tetua Agung (satu), Balai Hukum (domain P), Paviliun Kitab (A),
+Perbendaharaan (W tambang + Lumbung), Urusan Luar (X + menerima utusan D), Obat (W kebun + pil). `officeFactor =
+1 + 0.05 × clamp(ordinal ranah − 2, 0, 5)` (Foundation 1.0 … Dao Union 1.25), Wakil `1 + (f−1)/2`, kosong 1.0.
+**Urusan harian.** Pukul 06:00-18:00 dunia pemegang jabatan duduk di meja jabatan (`ACT_OFFICE`) di jangkar domainnya
+(`main_hall`, `library`, `treasury`, `arrival`, `post_garden`), dan setiap 2 menit nyata menjalankan satu urusan:
+Hukum: +3 Kepuasan murid < 30 (sekali per murid per hari); Ajar: pembaca A ×faktor; Perbendaharaan: ringkas Lumbung
+(gabung tumpukan), output tambang ×faktor; Urusan Luar: peluang misi X ×faktor, menyambut utusan D di gerbang;
+Obat: herba ×faktor, memberi 1 pil penyembuh dari Lumbung kepada murid luka (bila ada). **Laporan Pagi**: pertama kali
+pemain berada di wilayah aula setelah 06:00, Tetua Agung berjalan menghadap (maks 20 blok) dan menyerahkan laporan:
+toast + kartu hub berisi baris `SECT_LOG` 24 jam terakhir dikelompokkan per modul (maks 12), suara elder. Tanpa Tetua
+Agung laporan tetap ada di hub (tanpa adegan). **Pelaksana saat pemain tak ada**: bila pemain luring/jauh, Tetua Agung
+boleh menerima calon terbaik pada Hari Penerimaan (`terimaOtomatis`, default false).
+**Pewaris & Generasi Kedua.** `HEIR_NAMED` ditembakkan dari `Heir` (satu baris milik E). **Upacara Penyerahan Takhta**:
+syarat pewaris ranah Nascent Soul+ dan bintang ≥ 9, aula lv ≥ 5, sekte berdiri ≥ 30 hari; upacara 90 s di aula utama
+(murid berbaris `ACT_BOW`, adegan 150 "Penyerahan Takhta", kartu penuh, musik `M_GLORY`). Hasil permanen: pewaris menjadi
+**Ketua Generasi Kedua** (nama emas, `officeFactor` semua jabatan +0.05, memimpin turnamen/penerimaan/pertahanan serbuan
+saat pemain tak ada, tetap murid pemain) dan pemain menjadi **Leluhur Pendiri** (gelar, renown aula ×1.10 lewat
+`Halls.addRenown` tambahan 10%, pengaruh +10 standing awal dengan sekte NPC baru). Penerus berikutnya bisa ditetapkan
+kemudian (generasi ketiga dst., nomor generasi disimpan). Murid lain dengan Bond lebih tinggi daripada pewaris →
+`TIDAK_ADIL` (sekali). Event `SUCCESSION`, `ELDER_APPOINTED`. **UI.** Kartu hub SEKTE "Balai Tetua" (jabatan, angkat/copot,
+laporan), tombol upacara. **Visual.** Meja jabatan = properti `FormModels` di tangan (kuas, gulungan), lingkar cahaya kecil
+di kaki tetua saat bertugas (Minimal: tidak). **Config `tetua`:** `jamMulai` (6), `jamSelesai` (18), `urusanDetik` (120),
+`terimaOtomatis` (false), `takhtaHari` (30). **Uji `uji perguruan tetua`:** `angkat <nama> <jabatan>`, `copot <nama>`,
+`laporan`, `urusan`, `takhta <nama>` (melewati syarat), `generasi`. **Panduan:** c15.tetua, c15.penerus.
+
+#### 36.2.7 Misi luar dan kepulangan (butir 43 dan 44, modul X)
+
+**Lore & Sumber.** Utusan Sekte yang kembali membawa dua-tiga pemuda berbakat (*I Shall Seal the Heavens* bab 19, sudah
+dikutip `Envoys`); ekspedisi ke Pegunungan Binatang Ajaib (*Battle Through the Heavens*, dikutip `Expeditions`).
+
+**Misi Cerita** (di samping papan `Expeditions` yang tetap): 12 templat (kawal kafilah, buru binatang iblis, selidiki
+reruntuhan, utusan ke sekte NPC (D), cari herba langka, tolong desa (desa bawahan), rebut pusaka, cari murid yang
+mengembara (P), jaga perbatasan, lelang kota, kabar angin, penyamaran). Tim 1-4 murid, durasi 1-3 hari dunia, pemain
+memilih **sikap** (Damai/Tegas/Licik). Hasil diundi per **tahap** (3 tahap): `peluang = dasar(tingkat misi) + 0.03 ×
+(ranah rata-rata − ranah misi) + watak (Berani +0.05 di tahap tempur, Licik +0.05 di tahap licik, Penakut −0.05) + ikatan
+(Sahabat/Saudara dalam tim +0.03 masing-masing, Dendam −0.10) × officeFactor(TETUA_LUAR)`, dibatasi 0.10-0.95. Tahap gagal
+berganti cabang cerita (bukan hanya gagal); murid tidak pernah mati (luka = 30% nyawa + Penyimpangan 3 menit seperti
+`Expeditions`). Hasil (`api/MisiHasil`): 0-3 sukses, **calon** 0-3 (`Halls.addCandidates`, peluang 20% per misi sukses,
+Urusan Luar +10%), **harta** (tabel per tingkat: herba, batu roh, kitab teknik, pecahan peta harta `DuniaApi.treasures()`),
+**kepulangan** murid MENGEMBARA dari daftar P (misi "cari murid", 35%), standing D ±. Dibawa pulang lewat
+`Halls.storeAway` (alasan `sekte_misi`, `addReturnHandler`); **momen kepulangan**: tim berjalan masuk dari luar gerbang ke
+jangkar `arrival` (`ACT_MUSTER` 10 s), kartu stamp 160 "Tim Misi Kembali", suara `greet`; lalu **Gulungan Laporan** (item
+buku tertulis baru X, dibuat malas saat diserahkan) berisi cerita 3 paragraf dari lang + nama anggota + hasil.
+Event `MISSION_SENT`, `MISSION_RETURNED`; ingatan per anggota (+4 sukses, −2 gagal, −6 terluka). Meninggalkan murid
+terluka di lapangan (tombol "Tarik Pulang" tanpa yang terluka) → `DIKORBANKAN`. **UI.** Halaman misi cerita di
+`MissionPage` yang ada (tab baru milik X) + kartu hub SEKTE "Misi Cerita". **Config `misi`:** `aktif`, `misiMaksAktif`
+(2), `peluangCalon` (0.20), `durasiMaksHari` (3). **Uji `uji perguruan misi`:** `kirim <templat> <nama..>`, `selesai`,
+`hasil <0-3>`, `laporan`, `pulang <nama>`. **Panduan:** c16.misi, c16.bawa.
+
+#### 36.2.8 Seragam, Lambang dan Bendera (butir 46 dan 47, modul S)
+
+**Lore & Sumber.** Jubah dan mangkuk sebagai tanda pewarisan (Huineng, *Sutra Altar*); warna polos dan berbingkai Delapan
+Panji dinasti Qing sebagai pembeda pasukan.
+
+**Lambang (`api/Lambang`):** bentuk 0-7, simbol 0-31, tiga warna dari palet 32, semboyan ≤ 32 huruf; disimpan sebagai int
+di hall section `sekte_seragam`. **Perancang** (layar klien, dari kartu hub SEKTE "Lambang & Seragam" atau
+`/kultivasi perguruan lambang`): pratinjau langsung di bendera berkibar, jubah, dan cakram formasi; ubah gratis 1×/hari,
+berikutnya 100 PK. **Seragam:** warna badan dan trim per jenjang 0-5 (Tercatat … Tetua Agung) dari palet; tiga potongan
+(Jubah Panjang, Jubah Pendek, Jubah Tempur) sebagai variasi tekstur jubah; `robeColor/trimColor` menggantikan pewarnaan
+Dao/`SectRanks.TRIM` hanya bila pemain mengaturnya (−1 = tetap lama). Sulaman lambang di jubah (yang ada mulai Nascent
+Soul) diganti lambang sekte. **Bendera:** komponen `sx_seragam_panji` (semua templat): tingkat 1 dua tiang di sisi luar
+gerbang terluar (pita depan, 4 ≤ |x| ≤ 8), tingkat 4 empat tiang di tepi cakram formasi (jangkar `panji_gerbang_*`,
+`panji_formasi_*`); tiang = pagar/dinding + blok puncak; **kain digambar klien** di jangkar: quad bertekstur lambang
+(atlas dinamis 64×64 per aula, disusun dari lapisan bentuk/simbol yang diwarnai, satu `DynamicTexture` per aula yang
+terlihat, maks 4), gelombang kain dihitung di verteks (8 segmen, sinus), maks 12 bendera per aula; LOD: ≤ 48 blok
+beranimasi, 48-96 statis, > 96 tidak digambar; Minimal: 2 segmen tanpa gelombang. Lambang juga pada cakram Formasi Sekte
+(decal quad di atas `FormasiAnchor`) dan papan tribun T. Sinkron: payload S `LambangSync` (owner → lambang + warna) dikirim
+saat pemain masuk jangkauan aula atau saat berubah. Event `EMBLEM_CHANGED`. **Config `seragam`:** `ubahGratisPerHari` (1),
+`ubahPK` (100), `benderaMaks` (12), `jarakAnimasi` (48). **Uji `uji perguruan seragam`:** `lambang <bentuk> <simbol>
+<w1> <w2> <w3>`, `acak`, `seragam <jenjang> <badan> <trim>`, `potongan <0-2>`, `bendera` (pratinjau di pemain),
+`atlas` (simpan atlas ke berkas debug). **Panduan:** c16.lambang, c16.bendera.
+
+#### 36.2.9 Diplomasi dan Sekte Rival (butir 48 dan 49, modul D)
+
+**Lore & Sumber.** Tujuh Sekte Besar Negeri Yue bersekutu melawan serbuan Jalan Iblis (*A Record of a Mortal's Journey*);
+perjanjian tiga tahun Xiao Yan dengan Sekte Awan Berkabut (*Battle Through the Heavens*), permusuhan antar sekte yang
+diselesaikan dengan pertarungan yang dijanjikan.
+
+**Sekte NPC.** 8 per dunia (`jumlahSekte` 4-12), diunggulkan dari seed dunia: nama (generator dua suku: "Sekte Pedang
+Awan Ungu", "Lembah Racun Seribu"), aliran (Lurus/Netral/Iblis; Iblis menjadi nama penyerbu `SectRaids`), tingkat 1-9
+(awal 1-5), lambang `Lambang.seeded`, wilayah: selaras dengan wilayah kelompok saingan Dunia (`DuniaApi.rivals().region`)
+bila ada, selain itu titik seed ≥ 1.500 blok dari pusat. **Gerbang gunung** = struktur worldgen data-driven (tiga ukuran
+menurut pita tingkat: kecil 1-3, sedang 4-6, besar 7-9; paifang, tangga, aula, menara; dibuat `tools/structgen.py`, NBT
+lewat `tools/nbt.py`), hanya di chunk baru di wilayahnya; di dalam: anggota NPC (tubuh RIVAL seperti `Rivals`, ≤ 6 per
+gerbang, hanya bila pemain ≤ 64 blok, AI ditipiskan tiap 10 tick) dan Ketua Sekte (bos, sekali per perang).
+**Simulasi** (data, satu sekte per 30 s bergiliran): kekuatan `= tingkat × 100 + sumber`; pertumbuhan harian
+`+2..+6` sumber, naik tingkat tiap `150 × tingkat` sumber (`TUMBUH`); peristiwa per hari dunia untuk tiap aula pemain:
+0-2 dari tabel berbobot menurut sikap (Utusan, Hadiah, Tantangan → T, Serangan (raid live/data memakai jalur `SectRaids`),
+Sergap Misi → X, Membujuk murid → P (`MEREKRUT`: murid Gelisah 20% pergi BERKHIANAT), Perang NPC (kabar saja)).
+**Standing** −100..100 per aula: awal Lurus +10 / Netral 0 / Iblis −40 (+10 Leluhur Pendiri); hadiah +5..+15, utusan +5,
+menolak tantangan −5, kalah/menang turnamen antar-sekte ±10, misi bertemu ±5, serangan −20. `Sikap.of(standing, pakta)`.
+**Aksi pemain** (kartu hub SEKTE "Diplomasi"): kirim utusan (1 murid away 1 hari, butuh Urusan Luar atau Inti+), kirim
+hadiah (dari Lumbung/PK), ajukan **pakta** (non-agresi ≥ 20; persekutuan ≥ 60: penjaga sekutu 2 tubuh saat serbuan, turnamen
+bersama, diskon 10% `Contribution`), tuntut upeti (bila tingkat aula ≥ tingkat mereka + 2), nyatakan **perang** (< −30).
+**Perang:** serangan tiap 3-5 hari; akhir perang dengan (a) perdamaian (sikap mereka melunak bila kekuatan < pemain),
+(b) pemain mendatangi gerbang mereka dan mengalahkan Ketua (bos; hadiah besar, sekte −2 tingkat, menjadi Sekte Bawahan
+standing 30, upeti mingguan), (c) kekalahan aula (serbuan berhasil 3×: upeti paksa, tidak pernah blok/murid). Tidak ada
+blok struktur mereka yang dihancurkan kecuali lewat Mode Kehancuran pemain sendiri (aturan 22). Event
+`RIVAL_SECT_ACTION`. **Visual.** Barisan panji hitam saat pertanda serangan memakai adegan lama `EXTRA_RAID_OMEN`;
+utusan berjalan dengan bendera sekte mereka (kain S). Adegan 180 "Perang Dinyatakan", 181 "Persekutuan", 182 "Kemenangan".
+**Config `diplomasi`:** `jumlahSekte` (8), `jarakMin` (1500), `peristiwaPerHari` (2), `perangAktif` (true),
+`strukturAktif` (true). **Uji `uji perguruan diplomasi`:** `daftar`, `info <sekte>`, `standing <sekte> <n>`, `aksi
+<sekte> <aksi>`, `tumbuh <sekte>`, `perang <sekte>`, `damai <sekte>`, `gerbang <sekte>` (teleport ke struktur bila ada),
+`simulasi <hari>`. **Panduan:** c16.rival, c16.sekutu, c16.perang.
+
+#### 36.2.10 Kebun Obat dan Tambang Roh (butir 51 dan 52, modul W)
+
+**Lore & Sumber.** Kebun Seratus Obat Sekte Huang Feng (*A Record of a Mortal's Journey* bab 150-151, dikutip `Duties`);
+lima batu warna yang dilebur Nüwa untuk menambal langit (*Huainanzi* bab 6) dan gunung-gunung penghasil giok dalam
+*Shanhaijing* sebagai asal "batu roh" dari perut gunung.
+
+**Kebun.** Komponen `sx_kebun_petak` (T2-T9 tingkat 3, 4/6/8/12 petak menurut templat, dekat bedeng `t2_garden` atau
+kuadran timur-belakang): bedeng tanah + batas batu + lentera qi. Pemain memilih benih per petak (herba alkimia yang ada,
+dari Lumbung) di papan kebun (klik jangkar `kebun_petak_n` atau kartu hub); murid bertugas kebun (`ACT_TEND`, maks 1 per
+2 petak) merawat. Pertumbuhan 4 tahap, `1 + mutu herba` hari dunia; hasil `2 + tingkat aula/3` per petak ×
+`workFactor(P)` × `officeFactor(TETUA_OBAT)` × (akar Kayu/Air perawat 1.1) → Lumbung (`Storehouse`, luapan ke
+`LumbungOverflow`). **Tanaman digambar klien** (potongan `FormModels` per tahap, maks 12 petak, LOD 32 blok) — tidak ada
+blok tanaman. Tugas kebun lama (pos 2 `Duties`) tetap; W hanya menambah petak roh.
+**Tambang.** Komponen `sx_kebun_tambang` (T4-T9 tingkat 4, kuadran timur-belakang di tepi belakang tapak yang lebih
+tinggi): mulut tambang (bingkai kayu, rel, lentera, kereta `Stamp`). **Tingkat kedalaman 1-9** (data): naik tingkat dengan
+PK `200 × tingkat` + bahan (kayu/batu dari setoran); tabel hasil per tingkat (batu roh mutu rendah → tinggi, bijih,
+kristal; tingkat 7+ "Inti Roh Gunung" langka). Giliran: 2/3/4/6 penambang (tingkat 1-2/3-4/5-6/7-9), satu giliran = 1 hari
+dunia, penambang "di dalam" = berdiri di mulut tambang dengan `ACT_MINE` (klien menyembunyikan tubuhnya bila di titik,
+bunyi beliung dari dalam tiap 6 s), output dihitung malas seperti `Duties`. Bahaya: tingkat ≥ 5 runtuhan 2% per giliran →
+penambang Terluka (`depart`, pulih 1 hari), tidak pernah mati, tidak ada blok. Lebih dari 5 giliran berturut tanpa hari
+libur → `DIPAKSA_KERJA` (sekali per giliran berikutnya). Event `WORK_DONE`. **UI.** Kartu hub SEKTE "Kebun & Tambang".
+**Visual.** Tunas → bunga dengan pendar aditif; debu emas dari mulut tambang; Minimal: tanpa pendar/debu. **Config
+`kebun`:** `petakMaks` (12), `hasilPetak` (2), `tambangPK` (200), `runtuhPersen` (2), `hariLibur` (5). **Uji `uji
+perguruan kebun`:** `tanam <petak> <herba>`, `tumbuh [hari]`, `panen`, `tambang tingkat <1-9>`, `giliran`, `runtuh`.
+**Panduan:** c16.kebun, c16.tambang.
+
+### 36.3 Inti bersama (desainer utama, sudah ada di kode)
+
+#### 36.3.1 Paket `dev.kultivator.sekte` dan API
+
+* `SekteContent.init()` (dipanggil satu baris di `Kultivator.onInitialize` setelah `Duel.init()`, sebelum
+  `ModItems.init()`): seksi config `umum` (`aktif` dan saklar sepuluh modul), `SekteCommands.init()`, lalu satu baris
+  per modul (36.4) yang mengganti baris komentarnya sendiri. `SekteContent.on(moduleId)` dibaca setiap modul di awal
+  init-nya. Klien: `client/sekte/SekteContentClient.init()` (satu baris di `KultivatorClient`, CRLF dipertahankan).
+* `SekteIds`: id modul (P `kepribadian`, R `hubungan`, T `turnamen`, G `tangga`, A `paviliun`, E `tetua`, X `misi`,
+  S `seragam`, D `diplomasi`, W `kebun`), kunci `extra` per modul (`hati`, `tangga`, `turnamen`, `ingatan` (inti),
+  `ikatan_murid`, `kitab`, `jabatan`, `misi`, `kerja`), `hallSection(module)` = `sekte_<module>`, aktivitas 13-24,
+  `componentId(module, what)` = `sx_<module>_<what>`, folder advancement `sekte/`, bab panduan 14/15 (0-based).
+* `sekte/api/SekteApi`: sepuluh layanan (`hati()` P, `hubungan()` R, `turnamen()` T, `tangga()` G, `paviliun()` A,
+  `tetua()` E, `misi()` X, `lambang()` S, `diplomasi()` D, `kebun()` W), setter per pemilik, default `NONE` yang membuat
+  semua modul lain berjalan seolah pemilik tidak ada. `liveModules()` untuk `uji perguruan modul`.
+* Tipe bersama (data murni, aman di kedua sisi): `Sifat`, `Ikatan`, `Jabatan`, `Sikap`, `Perlakuan`, `Kepergian`,
+  `AksiSekte`, `Lambang`, `Kenangan`, `MisiHasil`, `TurnamenHasil`, `HatiService.Keadaan`, `PaviliunService.Makam`.
+* `SekteBus` (36.3.1, kontrak C36.L2) — peristiwa Fabric array-backed, pendengar yang melempar dicatat dan dilewati:
+
+| Peristiwa | Penembak | Pendengar utama |
+|---|---|---|
+| `DISCIPLE_MISTREATED` (owner, soul, Perlakuan, severity, source) | siapa pun yang melihat | P |
+| `DISCIPLE_HONORED` (owner, soul, reason, 1-10) | T, X, A, E, G | P |
+| `LOYALTY_CHANGED` (owner, soul, sebelum, sesudah) | P | E (laporan), R |
+| `DISCIPLE_LEFT` (owner, soul, nama, Kepergian, toSect, companion) | P | D (pembelot), R, E, A |
+| `RELATION_CHANGED` (owner, a, b, sebelum, sesudah) | R | P, E |
+| `TOURNAMENT_BOUT` (owner, winner, loser, upset) | T | R, P |
+| `TOURNAMENT_ENDED` (owner, TurnamenHasil) | T | D, E, P |
+| `TRIAL_FINISHED` (owner, calon, lulus, langkah terbaik) | G | E |
+| `DISCIPLE_STUDIED` (owner, soul, teknik, learned) | A | E, P |
+| `DISCIPLE_BURIED` (owner, soul, nama) | A | R, P, E |
+| `ANCESTOR_RITE` (owner, jenis, hadirin) | A | P, R |
+| `ELDER_APPOINTED` (owner, soul, jabatan/null) | E | P |
+| `HEIR_NAMED` (owner, soul, sebelumnya) | E (dari `Heir`) | P, S |
+| `SUCCESSION` (owner, ketua baru) | E | D, S, P |
+| `MISSION_SENT` / `MISSION_RETURNED` (owner, MisiHasil) | X | P, R, D, E |
+| `EMBLEM_CHANGED` (owner, Lambang) | S | — (klien lewat payload S) |
+| `RIVAL_SECT_ACTION` (owner/null, sekte, AksiSekte, 1-9) | D | T, X, P, E |
+| `WORK_DONE` (owner, soul, kebun/tambang, jumlah) | W | E, P |
+| `SECT_LOG` (owner, modul, baris) | `SekteLog.log` | E |
+
+  Pembantu: `SekteBus.mistreated(...)`, `honored(...)`, `rivalAction(...)` (aman null). Pendengar harus murah; kerja berat
+  diantrekan ke tick modul sendiri.
+
+#### 36.3.2 Ingatan (kontrak C36.L3)
+
+`sekte.Ingatan` menyimpan cincin ingatan per murid di `extra.ingatan.list` (maks `umum.ingatanMaks` = 16): `kind`
+`<modul>.<apa>`, hari, jiwa lain, bobot −10..10, kunci teks, argumen. Jenis+jiwa+hari sama menggantikan; penuh → yang
+|bobot| terkecil lalu tertua dilupakan. `drift(data, today)` = jumlah bobot yang meluruh separuh tiap 10 hari (|bobot|
+9-10 abadi), dibatasi ±40. `of`, `ofKind`, `about`, `forget`, `today(server)`. Semua modul menulis momennya sendiri lewat
+`Ingatan.remember`; P membaca drift, A mengukir 3 terkuat di makam, X mengutipnya di laporan, tab Hati menampilkannya.
+
+#### 36.3.3 Aktivitas murid 13-24 dan pose (kontrak C36.L6)
+
+`DiscipleEntity` (diedit desainer): 13-20 menahan titik seperti 1-12, tersimpan saat restart; hanya 13 (belajar) yang
+duduk bermeditasi di titiknya; 21-24 pose saja. Pemilik: 13 `ACT_STUDY` A, 14 `ACT_MOURN` A, 15 `ACT_MINE` W, 16
+`ACT_TEND` W, 17 `ACT_OFFICE` E, 18 `ACT_SOCIAL` R, 19 `ACT_SULK` P, 20 `ACT_MUSTER` X (T boleh memakai untuk barisan
+peserta), 21 `ACT_CLIMB` G, 22 `ACT_LEAVING` P, 23 `ACT_BOW` E (A dan T boleh memakai), 24 cadangan. Klien:
+`client/sekte/SektePoses.register(activity, pose, props)`; `DutyPoses.apply` memadukan pose (6 tick, hanya diam dan tenang)
+dan `DiscipleHeldItemLayer` menggambar properti (`FormModels` piece `assets/kultivator/items/fx/<piece>.json`). Setiap
+aktivitas didaftarkan hanya oleh pemiliknya.
+
+#### 36.3.4 Config dan perintah
+
+`config/kultivator-sekte.json` (`SekteConfig.section(name, Class, defaults, clamp)`, `onReload`), satu seksi per modul
+dengan nama id modul + `umum`. Perintah: `/kultivasi uji perguruan` (op: bantuan chip, `muat`, `modul`, subpohon per
+modul lewat `SekteCommands.test(moduleId, node)`, chip lewat `SekteCommands.chips("perguruan <modul> ...")`) dan
+`/kultivasi perguruan` (semua pemain: `SekteCommands.player(literal, node)`: P `murid`, R `hubungan`, S `lambang`, D
+`diplomasi`, X `misi`, W `kebun`, A `paviliun`, E `tetua`, T `turnamen`). Grup `perguruan` di `CheatHelp`.
+
+#### 36.3.5 Kait templat bangunan (kontrak C36.L5)
+
+`sect/build/blueprint/TemplateExtensions.register(owner, template 1-9 atau 0, Consumer<TemplateSpec.Builder>)` dari init
+modul; `TemplateSpec.Builder.build()` menjalankan ekstensi templatnya tepat sebelum dibekukan, jadi komponen ekstensi
+direncanakan, ditagih dari bahan setoran, dijadwalkan dan dibangun mesin persis seperti komponen asli; situs yang sudah
+melewati tingkatnya membangunnya lebih dulu sebagai "Tambahan" tanpa turun tingkat. Pembantu builder: `template()`,
+`footprintBounds()`, `zoneSoFar(id)`, `hasComponent(id)`. Aturan: id `sx_<modul>_<apa>` tetap selamanya; bagian hanya di
+dalam kolom tapak; **petak per modul** (agar tidak bertumpuk):
+
+| Modul | Petak (koordinat lokal templat: prasasti 0,0; +z ke gerbang) | Komponen |
+|---|---|---|
+| G | pita depan antara gerbang terluar dan `z1`, \|x\| ≤ 3 | `sx_tangga_batu` (T2-T9, tingkat 2) |
+| S | pita depan 4 ≤ \|x\| ≤ 8; cincin 1 blok di luar cakram formasi (`discD/discR`) | `sx_seragam_panji` (tingkat 1 gerbang, tingkat 4 formasi) |
+| T | ≤ 3 blok di luar persegi `Grounds.arena` (T6-T9) | `sx_turnamen_tribun` (tingkat 7) |
+| A | kuadran barat-belakang: x < x0 + lebar/3, z < z0 + dalam/3 | `sx_paviliun_altar` (T2-T7, tingkat 2), `sx_paviliun_makam` (T3-T9, tingkat 3) |
+| W | kuadran timur-belakang: x > x1 − lebar/3, z < z0 + dalam/3; atau bersebelahan dengan bedeng `t2_garden`/`t2_herbs` | `sx_kebun_petak` (T2-T9, tingkat 3), `sx_kebun_tambang` (T4-T9, tingkat 4) |
+| P R E X D | tidak ada komponen | — |
+
+Setiap pemilik membaca kelas templat untuk memilih sel kosong di petaknya (tidak menimpa bangunan, pos tugas (0,±5),
+(±5,0) tetap udara), memberi jangkar yang ia butuhkan (`Marks.anchor`), dan memeriksa dengan `/kultivasi uji sekte audit
+<n>`, `uji sekte info <n>` dan `uji sekte pamer <n> tingkat <t>` (di langkah akhir). Biaya mengikuti `Costs`/Bahan seperti
+komponen lain; setiap komponen ≤ 2.500 blok.
+
+#### 36.3.6 Kitab Panduan dan hub
+
+`GuideChapters` (diedit desainer): `CHAPTER_COUNT` 16; bab 15 **Murid yang Hidup** (c15.sifat, puas, rukun, sahabat,
+saingan, tangga, kitab, leluhur, tetua, penerus) dan bab 16 **Sekte di Dunia** (c16.lambang, bendera, turnamen, misi,
+bawa, kebun, tambang, rival, sekutu, perang); cek = advancement `adv:sekte/<modul>_<nama>`:
+P `kepribadian_sifat`, `kepribadian_puas`, `kepribadian_rukun`; R `hubungan_sahabat`, `hubungan_saingan`; G
+`tangga_selesai`; A `paviliun_belajar`, `paviliun_upacara`; E `tetua_jabatan`, `tetua_penerus`; S `seragam_lambang`,
+`seragam_bendera`; T `turnamen_juara`; X `misi_pulang`, `misi_bawa`; W `kebun_panen`, `kebun_tambang`; D `diplomasi_temu`,
+`diplomasi_sekutu`, `diplomasi_menang`. Setiap modul membuat advancement-nya sendiri di
+`data/kultivator/advancement/sekte/` (kriteria `minecraft:impossible`, diberikan kode modul). Teks panduan di
+`lang-src/sekte_panduan.*` (desainer; modul meminta perubahan di laporannya). Kartu hub: setiap modul mendaftarkan
+kartunya sendiri lewat `HubCards.register(HubNav.MURID | HubNav.SEKTE, id "sekte_<modul>_<apa>", glyph, lock, aksi)`.
+
+#### 36.3.7 Adegan sinematik (kontrak C36.L7)
+
+Server: `EpicMoments.send(level, EpicIds.EXTRA, beat, subject, viewer, pos, at, a, b, f, s, flags)` dengan beat di rentang
+modul (`EpicIds.EXTRA_SEKTE_FIRST` 100 + 10 × indeks modul: P 100-109, R 110-119, T 120-129, G 130-139, A 140-149,
+E 150-159, X 160-169, S 170-179, D 180-189, W 190-199). Klien: `client/epic/SekteScenes.register(beat, Recipe)` dengan
+resep deklaratif (gerak kamera ORBIT/PUSH/PULLBACK/CRANE_UP/LOW_HERO/STILL ≤ 6 s, kartu penuh atau stamp + segel,
+musik, warna langit, kilat, panjang 40-200 tick). Semua penjaga lama berlaku (Penuh/Singkat/Mati, Backspace, bahaya,
+`EpicBudget`, skala, pemain lain mode ringan). `EpicIds.maxBeat(EXTRA)` = 199; beat 25-99 tidak dipakai.
+
+#### 36.3.8 Tab layar murid
+
+`DiscipleScreen.addExtraTab(glyph, factory)` (maks 2): P menambah "Hati", R menambah "Hubungan" (urutan daftar = urutan
+init klien: P lalu R). Data tab dari kompon info murid yang diisi server lewat `DiscipleHooks.addInfo` (kunci
+`sekte_hati`, `sekte_hubungan`).
+
+#### 36.3.9 Anggaran (laptop lemah)
+
+| Sumber biaya | Batas |
+|---|---|
+| P pembaruan harian | sekali per murid per hari pada tick20; deteksi hurt O(1) |
+| R giliran sosial | 1 pasangan / 20 s / aula; tabel ≤ 66 pasangan |
+| T penonton | ≤ 12 entitas ringan; animasi ≤ 32 blok |
+| G tangga ilusi | pita quad 120/400/1000 anak tangga (Minimal/Normal/Maks), ≤ 6 calon bergerak tiap 4 tick |
+| A teks nisan / asap dupa | ≤ 8 label ≤ 8 blok; asap ≤ 24 quad |
+| E urusan | 1 urusan / 120 s / aula |
+| X misi | data murni; ≤ 2 misi aktif per aula |
+| S bendera | ≤ 12 kain, ≤ 4 atlas dinamis 64×64, gelombang verteks |
+| D simulasi / anggota | 1 sekte / 30 s; ≤ 6 anggota per gerbang termuat, AI tiap 10 tick |
+| W tanaman / tambang | ≤ 12 petak model, LOD 32 blok; output malas |
+| Adegan | lewat `SekteScenes` + `EpicBudget` |
+
+Setiap renderer baru: `EffectQuality.current()` untuk jumlah quad, jarak LOD, tidak menggambar saat layar dibuka bila
+tidak perlu, tanpa post chain, `RenderTypes` standar (Sodium/Iris aman).
+
+### 36.4 Modul dan kontrak (tepat sepuluh, file tidak bertumpuk)
+
+Urutan: inti desainer (sudah ada) → semua modul paralel. Setiap modul: paket server
+`dev.kultivator.sekte.<id>` + `<Kelas>.init()` (satu baris di `SekteContent`), paket klien
+`dev.kultivator.client.sekte.<id>` + `<Kelas>Client.init()` (satu baris di `SekteContentClient`), aset di
+`assets/kultivator/textures/sekte/<id>/`, `assets/kultivator/items/fx/sekte_<id>_*.json` (potongan FormModels),
+`data/kultivator/advancement/sekte/<id>_*.json`, lang `lang-src/sekte_<id>.en_us.json` + `.id_id.json` (kunci awalan
+`kultivator.sekte.<id>.`), seksi config = id, subpohon uji `uji perguruan <id>`, beat adegan sendiri, payload sendiri
+(`PayloadTypeRegistry` dari init modul; tidak pernah `network/Payloads` atau `Net`), item/entitas sendiri (didaftarkan dari
+init modul, sebelum `ModItems.init()`). Modul tidak pernah mengimpor paket modul lain; hanya `sekte.*`, `sekte.api.*`
+dan kode lama. File lama hanya diedit oleh pemilik yang tertulis di bawah (satu pemilik per file).
+
+**File lama yang sudah diedit desainer (jangan disentuh modul):** `Kultivator.java`, `client/KultivatorClient.java`,
+`command/CheatHelp.java`, `guide/GuideChapters.java`, `disciple/DiscipleEntity.java`,
+`client/disciple/power/DutyPoses.java`, `client/disciple/DiscipleHeldItemLayer.java`,
+`client/disciple/DiscipleScreen.java`, `sect/build/blueprint/TemplateSpec.java`, `epic/EpicIds.java`,
+`client/epic/SceneCatalogCombat.java`, serta semua file di `sekte/`, `sekte/api/`, `client/sekte/SekteContentClient.java`,
+`client/sekte/SektePoses.java`, `client/epic/SekteScenes.java`, `sect/build/blueprint/TemplateExtensions.java`,
+`lang-src/sekte.*`, `lang-src/sekte_panduan.*`, `tools/gen_sekte_lang.py`. Modul hanya **mengganti baris komentarnya
+sendiri** di `SekteContent.java` dan `SekteContentClient.java` (pengecualian satu baris yang disengaja).
+
+#### Modul P — Kepribadian & Kesetiaan (36, 38)
+
+Paket: `sekte/kepribadian/` (`Kepribadian` init + `HatiService` impl, `Watak` (undian/efek), `Kepuasan`, `Kesetiaan`,
+`Kepergian` (pelaksana), `YangPergi`, `KepribadianCommands`, `KepribadianConfig`, `KepribadianPayloads`),
+`client/sekte/kepribadian/` (`KepribadianClient`, `HatiTab`, `GelembungPikiran` renderer, pose 19 dan 22, kartu hub
+"Suasana Hati Murid"). Aset: `textures/sekte/kepribadian/` (ikon watak, gelembung). Advancement: `kepribadian_sifat`,
+`_puas`, `_rukun`. File lama: tidak ada.
+Kontrak: **C36.P1** `SekteApi.setHati` (semua metode `HatiService`); **C36.P2** mendengar `DISCIPLE_MISTREATED`,
+`DISCIPLE_HONORED`, `RELATION_CHANGED`, `ANCESTOR_RITE`, `RIVAL_SECT_ACTION(MEREKRUT)`; menembak `LOYALTY_CHANGED`,
+`DISCIPLE_LEFT`; **C36.P3** daftar "Yang Pergi" bisa dikembalikan lewat event `MISSION_RETURNED` milik X dengan
+`storyArgs[0] = "pulang:<soul>"` (P memanggil `Disciples.arrive` untuk jiwa itu); **C36.P4** tab "Hati" lewat
+`DiscipleScreen.addExtraTab`, info `sekte_hati` lewat `DiscipleHooks.addInfo`; **C36.P5** duel pemberontakan lewat
+`DuelChallenges.startDirect` (hasil dibaca dari `DuelSessions.byEntity(...).phase()` tiap detik, tanpa mengedit duel).
+
+#### Modul R — Hubungan antar-murid (37)
+
+Paket: `sekte/hubungan/` (`Hubungan` init + `HubunganService` impl, `TabelPasangan`, `GiliranSosial`, `Kecocokan`,
+`EfekIkatan`, `DuelKehormatan`, `HubunganCommands`, `HubunganConfig`, `HubunganPayloads`), `client/sekte/hubungan/`
+(`HubunganClient`, `HubunganTab`, `JaringScreen`, pose 18 + properti `sekte_hubungan_teacup`, gelembung hati/petir).
+Advancement: `hubungan_sahabat`, `_saingan`. File lama: tidak ada.
+Kontrak: **C36.R1** `SekteApi.setHubungan`; **C36.R2** mendengar `TOURNAMENT_BOUT`, `MISSION_RETURNED`, `DISCIPLE_BURIED`,
+`DISCIPLE_LEFT`, `ELDER_APPOINTED`; menembak `RELATION_CHANGED`; **C36.R3** tab "Hubungan" lewat `addExtraTab` (didaftar
+setelah P), info `sekte_hubungan`; **C36.R4** Duel Kehormatan lewat `DuelChallenges.startDirect` (pemain sebagai
+challenger, persetujuan lewat pesan klik).
+
+#### Modul T — Turnamen sekte (39)
+
+Paket: `sekte/turnamen/` (`Turnamen` init + `TurnamenService` impl, `ArenaTempat`, `BabakDuel`, `Penonton` entitas,
+`Musim`, `Elo`, `AntarSekte`, `TribunKomponen`, `TurnamenCommands`, `TurnamenConfig`, `TurnamenPayloads`),
+`duel/api/DuelEndListeners.java` (baru, milik T), `client/sekte/turnamen/` (`TurnamenClient`, renderer Penonton, cincin
+Lei Tai, kartu hub "Turnamen", resep adegan 120-121). Advancement: `turnamen_juara`.
+File lama (hanya T): `sect/event/Tournament.java` (tempat arena, babak lewat `BabakDuel` bila aktif, tembak bus, isi
+`extra.turnamen`), `duel/session/DuelResults.java` (satu baris: `DuelEndListeners.fire(session, winner, loser)` saat
+ENDED).
+Kontrak: **C36.T1** `SekteApi.setTurnamen`; **C36.T2** menembak `TOURNAMENT_BOUT`, `TOURNAMENT_ENDED`, `HONORED`;
+mendengar `RIVAL_SECT_ACTION(TANTANGAN)` (→ `hostGuests`); **C36.T3** `DuelEndListeners.add((session, winner, loser) ->
+...)` publik untuk modul lain (P, R boleh memakainya untuk duel pemberontakan/kehormatan); **C36.T4** komponen
+`sx_turnamen_tribun` lewat `TemplateExtensions` (T6-T9) dengan jangkar `kursi_n` dan `panji_arena_n`; **C36.T5** angka
+lama `Tournament` (hadiah, jadwal, Elit) tidak berubah.
+
+#### Modul G — Ujian Tangga Seribu (40)
+
+Paket: `sekte/tangga/` (`Tangga` init + `TanggaService` impl, `Pendakian` (jalannya ujian), `JalurTangga`, `UjianHati`,
+`BatuHatiKomponen`, `TanggaCommands`, `TanggaConfig`, `TanggaPayloads`), `client/sekte/tangga/` (`TanggaClient`,
+`TanggaIlusiRenderer` (pita quad + LOD), angka langkah billboard, pose 21, resep adegan 130).
+Aset `textures/sekte/tangga/` (anak tangga glow, kabut). Advancement: `tangga_selesai`.
+File lama (hanya G): `sect/hall/Candidates.java` (hari penerimaan: bila `SekteApi.tangga().hasStair(owner)` dan aktif,
+uji diganti pendakian; verdict dihitung dengan rumus lama; G menulis `extra.tangga` saat `recruitCandidate`).
+Kontrak: **C36.G1** `SekteApi.setTangga`; **C36.G2** menembak `TRIAL_FINISHED`, `HONORED` (Puncak 6); **C36.G3** `steps()`
+dan `resolve()` dibaca P untuk bias watak; **C36.G4** komponen `sx_tangga_batu` + jangkar `tangga_proyektor`,
+`tangga_baris_n`.
+
+#### Modul A — Paviliun Kitab & Pemakaman/Altar Leluhur (41, 45)
+
+Paket: `sekte/paviliun/` (`Paviliun` init + `PaviliunService` impl, `RakKitab`, `BelajarMandiri`, `Makam`, `Silsilah`,
+`AltarLeluhur`, `Upacara`, item `Dupa`, `PaviliunKomponen`, `PaviliunCommands`, `PaviliunConfig`, `PaviliunPayloads`),
+`client/sekte/paviliun/` (`PaviliunClient`, `RakScreen`, `MakamScreen`, label nisan, papan arwah, asap dupa, pose 13 dan 14
++ properti `sekte_paviliun_scroll`, `_incense`, resep adegan 140-142). Aset `textures/sekte/paviliun/`. Advancement:
+`paviliun_belajar`, `_upacara`. File lama: tidak ada (kematian lewat `DiscipleHooks.addOnDeath`, Soul Tablet lewat
+`UseBlockCallback`/`UseItemCallback` milik A).
+Kontrak: **C36.A1** `SekteApi.setPaviliun`; **C36.A2** menembak `DISCIPLE_STUDIED`, `DISCIPLE_BURIED`, `ANCESTOR_RITE`,
+`HONORED`; **C36.A3** `blessing(owner)` 0-0.15; **C36.A4** komponen `sx_paviliun_altar` (jangkar `altar`), `sx_paviliun_makam`
+(jangkar `makam_n`, `makam_pusat`); jangkar lama `library` dipakai untuk kursi baca (kursi = titik di sekitar jangkar,
+bukan blok baru).
+
+#### Modul E — Tetua & Pewaris (42, 50)
+
+Paket: `sekte/tetua/` (`Tetua` init + `TetuaService` impl, `Jabatan` (penugasan), `UrusanHarian`, `LaporanPagi`,
+`PenyerahanTakhta`, `Generasi`, `TetuaCommands`, `TetuaConfig`, `TetuaPayloads`), `client/sekte/tetua/` (`TetuaClient`,
+`BalaiTetuaScreen`, `LaporanCard`, pose 17 dan 23 + properti `sekte_tetua_brush`, resep adegan 150-152).
+Advancement: `tetua_jabatan`, `_penerus`.
+File lama (hanya E): `disciple/path/Heir.java` (satu panggilan `SekteBus.HEIR_NAMED` setelah ritual selesai),
+`sect/hall/SectRanks.java` (saat promosi: bila junior melangkahi senior dengan Bond lebih tinggi → `SekteBus.mistreated(...,
+TIDAK_ADIL, "tetua.promosi")`; saat penurunan → `DIPERMALUKAN`).
+Kontrak: **C36.E1** `SekteApi.setTetua` (`officeFactor` dibaca P, A, W, X); **C36.E2** menembak `ELDER_APPOINTED`,
+`HEIR_NAMED`, `SUCCESSION`; mendengar `SECT_LOG` (laporan), `RIVAL_SECT_ACTION(UTUSAN)` (penyambutan); **C36.E3** `heir()`
+membaca `Heir` yang ada; tidak mengubah angka `Heir`/`SectRanks`.
+
+#### Modul X — Misi luar & kepulangan (43, 44)
+
+Paket: `sekte/misi/` (`Misi` init + `MisiService` impl, `TemplatMisi` (12), `JalanCerita` (tahap, cabang), `TimMisi`,
+`Kepulangan`, item `GulunganLaporan` (ItemStack dibuat malas), `MisiCommands`, `MisiConfig`, `MisiPayloads`),
+`client/sekte/misi/` (`MisiClient`, tab misi cerita, layar laporan, pose 20 + properti `sekte_misi_bundle`, resep 160-161).
+Advancement: `misi_pulang`, `misi_bawa`.
+File lama (hanya X): `sect/event/Expeditions.java` (hanya bila perlu berbagi tabel loot: ekspos pembaca read-only),
+`client/sectevent/MissionPage.java` (tab "Misi Cerita").
+Kontrak: **C36.X1** `SekteApi.setMisi`; **C36.X2** menembak `MISSION_SENT`, `MISSION_RETURNED`, `HONORED`, `MISTREATED
+(DIKORBANKAN)`; mendengar `RIVAL_SECT_ACTION(SERGAP_MISI)`; **C36.X3** away lewat `Halls.storeAway(..., "sekte_misi", ...)`
++ `addReturnHandler`; calon lewat `Halls.addCandidates`; harta peta lewat `DuniaApi.treasures()`; **C36.X4** misi "cari
+murid" menempatkan `pulang:<soul>` di `storyArgs[0]` (P mengembalikan murid itu).
+
+#### Modul S — Seragam, Lambang & Bendera (46, 47)
+
+Paket: `sekte/seragam/` (`Seragam` init + `LambangService` impl, `LambangData`, `SeragamData`, `PanjiKomponen`,
+`SeragamCommands`, `SeragamConfig`, `SeragamPayloads` (`LambangSync`, `LambangSet`)), `client/sekte/seragam/`
+(`SeragamClient`, `LambangDesignerScreen`, `LambangAtlas` (DynamicTexture, maks 4), `BenderaRenderer` (kain verteks),
+`LambangFormasiRenderer`, cache klien). Aset `textures/sekte/seragam/` (atlas bentuk 8 + simbol 32 skala abu, tiga
+potongan jubah). Advancement: `seragam_lambang`, `_bendera`.
+File lama (hanya S): `client/disciple/DiscipleRobeLayer.java` (warna badan/trim dari cache S bila ≠ −1; tekstur sulaman =
+atlas lambang aula pemilik).
+Kontrak: **C36.S1** `SekteApi.setLambang`; **C36.S2** menembak `EMBLEM_CHANGED`; **C36.S3** komponen `sx_seragam_panji`
+dengan jangkar `panji_gerbang_n`, `panji_formasi_n`; S juga menggambar kain di jangkar `panji_arena_n` (T) bila ada;
+**C36.S4** D memakai `Lambang.seeded` untuk sekte NPC; S menggambar bendera NPC (utusan, gerbang mereka) dari lambang yang
+dikirim payload D (`LambangSync` dengan id sekte), tanpa mengimpor D.
+
+#### Modul D — Diplomasi & Sekte Rival (48, 49)
+
+Paket: `sekte/diplomasi/` (`Diplomasi` init + `DiplomasiService` impl, `SekteNpc` (data), `GeneratorNama`, `Simulasi`,
+`Standing`, `Pakta`, `Perang`, `GerbangSekte` (struktur, placement), `AnggotaSekte` (tubuh), `KetuaSekte` (bos),
+`DiplomasiCommands`, `DiplomasiConfig`, `DiplomasiPayloads`), `client/sekte/diplomasi/` (`DiplomasiClient`,
+`DiplomasiScreen`, resep adegan 180-182). Data: `data/kultivator/worldgen/structure/sekte_gerbang_{kecil,sedang,besar}.json`,
+`worldgen/structure_set/sekte_gerbang.json`, `worldgen/template_pool/sekte/**`, `structure/sekte/**.nbt` (dibuat oleh
+`tools/gen_sekte_gerbang.py` baru milik D yang memakai `tools/nbt.py` + `tools/structgen.py` tanpa mengeditnya; divalidasi
+dengan harness `scratchpad/final/wg`), placement baru (bila perlu, kelas sendiri meniru `JauhDariPusatPlacement`).
+Advancement: `diplomasi_temu`, `_sekutu`, `_menang`.
+File lama (hanya D): `musuh/SectRaids.java` (CRLF dipertahankan; nama penyerbu dari sekte NPC Iblis yang Bermusuhan/Perang
+dan jadwal serangan perang memakai jalur serbuan yang sama; angka serbuan lama tidak berubah).
+Kontrak: **C36.D1** `SekteApi.setDiplomasi`; **C36.D2** menembak `RIVAL_SECT_ACTION` (semua aksi); mendengar
+`DISCIPLE_LEFT(BERKHIANAT)`, `TOURNAMENT_ENDED` (antar-sekte), `MISSION_RETURNED` (rivalSect), `SUCCESSION`;
+**C36.D3** membaca `DuniaApi.rivals()` (tanpa mengimpor `dunia.kota`); **C36.D4** struktur hanya di chunk baru, tidak ada
+blok runtime.
+
+#### Modul W — Kebun Obat & Tambang Roh (51, 52)
+
+Paket: `sekte/kebun/` (`Kebun` init + `KebunService` impl, `PetakHerba`, `Pertumbuhan`, `TambangRoh`, `GiliranTambang`,
+`TabelHasil`, `KebunKomponen`, `KebunCommands`, `KebunConfig`, `KebunPayloads`), `client/sekte/kebun/` (`KebunClient`,
+`KebunScreen`, `TanamanRenderer` (FormModels per tahap, LOD), debu tambang, pose 15 dan 16 + properti
+`sekte_kebun_pick`, `_gourd`, resep 190-191). Aset `textures/sekte/kebun/`, `items/fx/sekte_kebun_*.json`.
+Advancement: `kebun_panen`, `kebun_tambang`.
+File lama (hanya W): `sect/event/Duties.java` (hanya pembaca read-only bila perlu: hari kerja berturut murid kebun untuk
+`DIPAKSA_KERJA`; angka tugas lama tidak berubah).
+Kontrak: **C36.W1** `SekteApi.setKebun`; **C36.W2** menembak `WORK_DONE`, `MISTREATED(DIPAKSA_KERJA)`; hasil ke
+`Storehouse`/`LumbungOverflow`; **C36.W3** komponen `sx_kebun_petak` (jangkar `kebun_petak_n`), `sx_kebun_tambang`
+(jangkar `tambang_mulut`).
+
+### 36.5 Sumber (ringkas, semua sudah diperiksa)
+
+| Butir | Sumber |
+|---|---|
+| 36, 38 | Han Li (*A Record of a Mortal's Journey*), Bai Xiaochun (*A Will Eternal*), Xiao Yan dan Yao Lao, pengkhianatan Han Feng (*Battle Through the Heavens*), Wang Lin (*Renegade Immortal*) |
+| 37 | Sumpah Kebun Persik (*Romance of the Three Kingdoms* bab 1); Wang Lin dan Li Muwan (*Renegade Immortal*) |
+| 39 | Sumber `Tournament` yang ada; panggung lei tai (tradisi bela diri Tiongkok) |
+| 40 | Pendakian Sekte Tujuh Misteri (*A Record of a Mortal's Journey* bab 1-5); Gunung Tai (Delapan Belas Tikungan, sekitar 1.600 anak tangga); Sun Wukong dan Subhuti (*Journey to the West* bab 2) |
+| 41 | Biksu penyapu Perpustakaan Sutra Shaolin (*Demi-Gods and Semi-Devils*, Jin Yong) |
+| 42 | *Baizhang Qinggui* (aturan biara Chan, dinasti Tang); Tetua Agung (*I Shall Seal the Heavens* bab 27-31) |
+| 43, 44 | *I Shall Seal the Heavens* bab 19 (utusan membawa pulang pemuda berbakat); ekspedisi *Battle Through the Heavens* |
+| 45 | Papan arwah leluhur dan Qingming (adat Tiongkok); Soul Tablet `AwayTeams` |
+| 46, 47 | Jubah dan mangkuk Huineng (*Sutra Altar*); warna Delapan Panji dinasti Qing |
+| 48, 49 | Tujuh Sekte Besar melawan Jalan Iblis (*A Record of a Mortal's Journey*); perjanjian tiga tahun Xiao Yan dan Sekte Awan Berkabut (*Battle Through the Heavens*) |
+| 50 | Hongren menyerahkan jubah dan mangkuk kepada Huineng (*Sutra Altar*); `Heir` (*I Shall Seal the Heavens*) |
+| 51 | Kebun Seratus Obat (*A Record of a Mortal's Journey* bab 150-151) |
+| 52 | Batu lima warna Nüwa (*Huainanzi* bab 6); gunung-gunung giok *Shanhaijing* |
+
+Tidak dikutip karena tidak terverifikasi: aula disiplin Shaolin dalam Jin Yong, lambang bunga plum Gunung Hua (*Return of
+the Mount Hua Sect*), tambang batu roh sebagai alur cerita di *Renegade Immortal*/*A Record of a Mortal's Journey*,
+"Hyun Young" (*Return of the Mount Hua Sect*).
+
+### 36.6 Suara (memakai yang ada; baris baru yang diusulkan)
+
+Dipakai ulang: `greet`/`greet_alt` (kepulangan, laporan), `thanks` (hadiah, Bicara), `loyal` (pulih dari Membangkang,
+sumpah saudara), `farewell` (pergi mengembara), `tired` (Gelisah, giliran tambang), `cheer`/`victory` (turnamen),
+`fear` (ilusi tangga, Penakut), `careful` (misi), `cultivate` (belajar), `formation` (tangga proyektor), `protect`
+(saudara angkat membela). Baris baru yang boleh diusulkan modul di laporannya (kunci, penutur, keterangan Indonesia, teks
+Jepang), contoh: `disciple.<v>.sulk` (m1-m3/f1-f3, "Aku tidak mau.", 「やりたくありません。」), `disciple.<v>.rebel`
+("Guru, hari ini aku menantangmu!", 「師匠、今日こそ挑ませてもらう！」), `disciple.<v>.mourn` ("Beristirahatlah dengan
+tenang.", 「安らかに眠れ。」), `elder.report` (elder, "Ketua, laporan pagi ini.", 「宗主、今朝のご報告です。」),
+`boss.sect_master` (boss, "Sektemu berani menantang kami?", 「貴様の宗門が我らに挑むか。」). Tidak ada yang mengedit
+`sounds.json` atau `tools/gen_voices.py`.
+
+### 36.7 Uji akhir (langkah finish, Indonesia)
+
+1. `compileJava`, `compileClientJava`, `jar` lulus; `mergeLang` tidak gagal; kunci `en_us`/`id_id` identik di semua
+   fragmen `sekte*`.
+2. `/kultivasi uji perguruan modul` menampilkan sepuluh modul aktif; `uji perguruan muat` memuat ulang config.
+3. Kitab Panduan menampilkan bab 15 dan 16, masing-masing 10 langkah, dan langkahnya tercentang dari advancement.
+4. Murid lama di dunia lama mendapat watak sekali; kepuasan 70; tidak ada yang pergi tanpa 3 hari peringatan.
+5. `uji perguruan kepribadian siksa <nama> dipukul` ×n → Gelisah → Membangkang (menolak tugas, pose lengan bersilang).
+6. Murid ber-Segel Jiwa tidak pernah pergi; `bolehPergi false` mematikan kepergian.
+7. Dua murid idle di dekat satu sama lain minum teh; `uji perguruan hubungan jaring` menampilkan garis.
+8. `uji sekte templat 6` + `uji sekte tingkat 9`: komponen `sx_*` milik T, G, A, S, W terbangun tanpa tumpang tindih;
+   `uji sekte audit 1..9` tanpa pelanggaran baru.
+9. Turnamen di arena T6: babak Duel Pedang, penonton ≤ 12, final memakai adegan 120 dan bisa dilewati dengan Backspace.
+10. Hari penerimaan dengan batu tangga: tangga ilusi terlihat (Minimal 120 anak tangga), verdict calon sama dengan rumus
+    lama.
+11. Paviliun: kitab di rak dipelajari murid luang tanpa Qi pemain; pemakaman mendapat makam saat murid gugur (Hardcore).
+12. Tetua menghadap dengan laporan pagi; Penyerahan Takhta mengubah gelar dan tidak mengubah angka `Heir`.
+13. Misi cerita kembali lewat gerbang dengan Gulungan Laporan; calon muncul di Hari Penerimaan berikutnya.
+14. Lambang rancangan sendiri tampil di bendera gerbang, cakram formasi dan jubah; bendera diam di > 48 blok.
+15. Sekte NPC: struktur gerbang muncul hanya di chunk baru (harness wg lulus); utusan, pakta, perang, serbuan memakai nama
+    sekte; tidak ada blok runtime yang berubah.
+16. Kebun dan tambang menambah barang ke Lumbung tanpa blok tanaman/bijih; giliran > 5 hari memicu `DIPAKSA_KERJA`.
+17. Dengan Sodium + Iris (shader pack apa pun) semua renderer baru tampil tanpa crash; tidak ada post chain.
+18. Server khusus: tidak ada kelas klien termuat (`sekte/**` server bersih).

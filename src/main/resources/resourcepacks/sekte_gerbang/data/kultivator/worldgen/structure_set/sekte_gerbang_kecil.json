@@ -1,0 +1,15 @@
+{
+  "placement": {
+    "type": "kultivator:gerbang_sekte",
+    "salt": 360911,
+    "spacing": 24,
+    "separation": 8,
+    "band": 0
+  },
+  "structures": [
+    {
+      "structure": "kultivator:sekte_gerbang_kecil",
+      "weight": 1
+    }
+  ]
+}

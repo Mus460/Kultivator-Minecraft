@@ -172,6 +172,13 @@ public final class EpicIds {
 	public static final int TITAH_CARD = 0;
 	/** {@code b} of {@link #EXTRA_TITAH}: the planted weapon was pulled out. */
 	public static final int TITAH_PULL = 1;
+	/**
+	 * Sekte yang Hidup (DESIGN 36.3.7): EXTRA beats 100-199 belong to its ten modules, ten each in {@code SekteIds.MODULES}
+	 * order (P 100-109, R 110-119, T 120-129, G 130-139, A 140-149, E 150-159, X 160-169, S 170-179, D 180-189,
+	 * W 190-199); the client hands them to {@code client.epic.SekteScenes}. Every one obeys 23.1.
+	 */
+	public static final int EXTRA_SEKTE_FIRST = 100;
+	public static final int EXTRA_SEKTE_LAST = 199;
 
 	// TECH_ULTIMATE: the TechFx phases (CAST the pre-roll, TRAVEL / IMPACT the climax, END the release).
 	public static final int TECH_CAST = 0;
@@ -363,7 +370,8 @@ public final class EpicIds {
 	public static int maxBeat(int moment) {
 		return switch (moment) {
 			case TRIBULATION, DISCIPLE_BT -> 6;
-			case EXTRA -> EXTRA_TITAH;
+			// Sekte yang Hidup's beats 100-199 (DESIGN 36.3.7); 25-99 stay unused (the client's default branch ignores them).
+			case EXTRA -> EXTRA_SEKTE_LAST;
 			case BREAKTHROUGH, RECRUIT, SECT, TECH_ULTIMATE -> 2;
 			case ASCENSION -> 5;
 			case HEART_DEMON -> 3;

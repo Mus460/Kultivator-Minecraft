@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sect_founded",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.kebun.adv.panen.desc"
+    },
+    "icon": {
+      "id": "kultivator:spirit_grass"
+    },
+    "title": {
+      "translate": "kultivator.sekte.kebun.adv.panen.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

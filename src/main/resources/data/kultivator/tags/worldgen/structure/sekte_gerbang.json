@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:sekte_gerbang_kecil",
+    "kultivator:sekte_gerbang_sedang",
+    "kultivator:sekte_gerbang_besar"
+  ]
+}

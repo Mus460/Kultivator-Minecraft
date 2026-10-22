@@ -1,0 +1,25 @@
+{
+ "parent": "kultivator:disciple_taught",
+ "criteria": {
+  "done": {
+   "trigger": "minecraft:impossible"
+  }
+ },
+ "display": {
+  "description": {
+   "translate": "advancement.kultivator.sekte.paviliun_belajar.description"
+  },
+  "icon": {
+   "id": "minecraft:enchanted_book"
+  },
+  "title": {
+   "translate": "advancement.kultivator.sekte.paviliun_belajar.title"
+  },
+  "frame": "task"
+ },
+ "requirements": [
+  [
+   "done"
+  ]
+ ]
+}
