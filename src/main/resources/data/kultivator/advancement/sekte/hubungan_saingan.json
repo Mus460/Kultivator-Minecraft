@@ -1,0 +1,25 @@
+{
+ "parent": "kultivator:first_disciple",
+ "criteria": {
+  "done": {
+   "trigger": "minecraft:impossible"
+  }
+ },
+ "display": {
+  "description": {
+   "translate": "advancement.kultivator.sekte.hubungan_saingan.description"
+  },
+  "icon": {
+   "id": "minecraft:iron_sword"
+  },
+  "title": {
+   "translate": "advancement.kultivator.sekte.hubungan_saingan.title"
+  },
+  "frame": "task"
+ },
+ "requirements": [
+  [
+   "done"
+  ]
+ ]
+}

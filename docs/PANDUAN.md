@@ -9127,3 +9127,258 @@ Return of the Condor Heroes* (Makam Pedang Dugu Qiubai, empat tahap pedang) dan 
 Pedang Dugu); Er Gen, *I Shall Seal the Heavens*, Buku 1 Bab 31 (laga Meng Hao di panggung sekte). Desain game: Sekiro
 (postur, tangkis, 危, Mikiri), For Honor dan Mount & Blade (arah serangan dari tetikus). Angka mod ini tidak disalin dari
 mana pun.
+
+## 66. Sekte yang Hidup
+
+Sektemu kini hidup sendiri: murid punya watak dan suasana hati, berteman, bersaing dan jatuh cinta, bisa membangkang dan
+pergi; turnamen pindah ke panggung lei tai, calon murid mendaki Tangga Seribu, murid belajar sendiri di Paviliun Kitab,
+yang gugur dimakamkan dan dihormati di Altar Leluhur, tetua mengurus urusan harian, pewaris bisa naik takhta, tim misi
+pulang membawa cerita, sekte punya lambang dan bendera sendiri, sekte NPC di dunia bisa menjadi sekutu atau musuh, dan
+murid merawat Kebun Obat serta menggali Tambang Roh.
+
+Aturan yang tetap berlaku untuk semua fitur di bab ini:
+
+* **Tidak ada blok yang berubah saat bermain.** Bangunan baru (Tangga Ujian, tribun lei tai, Paviliun, Pemakaman, Altar,
+  tiang bendera, Kebun, mulut tambang) adalah komponen Pembangunan Sekte (bab 20b): dibangun BuildPlacer dari bahan yang
+  kamu setor, seperti bangunan sekte lain. Tangga ilusi, tanaman herba, kain bendera, lingkar lei tai, asap dupa dan papan
+  arwah hanya gambar klien. Tambang tidak menggali blok; kebun tidak menanam blok. Gerbang sekte NPC hanya muncul lewat
+  worldgen di chunk baru.
+* **Ringan untuk laptop lemah.** Semua efek mengikuti Kualitas Efek (Minimal/Normal/Maksimal) dan punya LOD jarak; jumlah
+  entitas dibatasi (penonton ≤ 12, bendera ≤ 12 per aula, gelembung pikiran ≤ 6, anggota gerbang ≤ 6); pekerjaan server
+  dibagi per detik dan per pemain. Aman dengan Sodium dan Iris (tanpa post shader).
+* **Adegan** baru (Final, Juara, Puncak!, Qingming, Penyerahan Takhta, Tim Misi Kembali, Perang, Persekutuan, Kemenangan)
+  pendek, mengikuti setelan Kamera sinematik Penuh/Singkat/Mati, bisa dilewati dengan **Backspace**, dan tidak pernah
+  diputar saat ada bahaya nyata.
+* **Config:** `config/kultivator-sekte.json`, satu bagian per fitur (`kepribadian`, `hubungan`, `turnamen`, `tangga`,
+  `paviliun`, `tetua`, `misi`, `seragam`, `diplomasi`, `kebun`), masing-masing dengan saklar `aktif`. Muat ulang dengan
+  `/kultivasi uji perguruan muat`; `/kultivasi uji perguruan modul` menampilkan modul yang aktif.
+* **Kitab Panduan:** bab 15 "Murid yang Hidup" dan bab 16 "Sekte di Dunia" (masing-masing 10 langkah, tercentang dari
+  pencapaian `sekte/*`).
+* **Hub (H):** kartu baru di halaman SEKTE dan MURID: Suasana Hati Murid, Jaring Hubungan, Turnamen, Paviliun & Makam,
+  Balai Tetua, Misi Cerita, Lambang & Seragam, Diplomasi, Kebun & Tambang.
+* **Murid lama di dunia lama** mendapat watak sekali secara otomatis (Kepuasan 70, keadaan Setia); tidak ada data yang
+  hilang dan tidak ada yang pergi tanpa peringatan 3 hari.
+
+### 66.1 Watak dan Kepuasan murid (butir 36)
+
+Setiap murid punya **2 watak** (15% punya 3) dari enam pasang: Rajin/Malas, Sombong/Rendah Hati, Setia/Licik,
+Berani/Penakut, Ambisius/Tenang, Penyayang/Pendendam. Watak mengubah kemajuannya: Rajin +8% XP meditasi dan kerja lebih
+cepat, Malas −10% XP, Rendah Hati membuat biaya mengajar lebih murah, Ambisius sedikit menaikkan peluang Fondasi, Penakut
+lebih cepat mundur dari pertarungan, Tenang membuat suasana hatinya jarang naik-turun, dan seterusnya. Watak tidak bisa
+dibeli; hanya **Ujian Hati** ulang di Tangga Seribu (66.5) yang bisa menukar satu watak buruk.
+
+**Kepuasan** (0-100, awal 70) berubah sekali per hari dunia. Naik bila kamu mengajarnya (+3), memberinya pil (+2),
+bermeditasi dalam 8 blok darinya (+2), ia dipuji (juara turnamen, misi sukses) atau leluhur dihormati. Turun bila ia
+dipukul, dihukum, diabaikan 5 hari, dipaksa kerja, dirampas, dikorbankan dalam pertarungan, dipermalukan atau
+diperlakukan tidak adil. Setiap peristiwa penting diingat murid (tab **Hati** di gulungan murid menampilkan 6 ingatan
+terkuat).
+
+* **Cara pakai:** buka gulungan murid → tab **Hati** (watak, batang Kepuasan dan Kesetiaan, ingatan, tombol **Bicara**
+  sekali sehari, **Hadiah** pil/herba/batu roh maks 3 per hari, **Usir**). `/kultivasi perguruan murid` menampilkan hati
+  semua muridmu di obrolan. Gelembung pikiran kecil di atas kepala murid (≤ 24 blok) menunjukkan suasana hatinya.
+* **Hadiah:** pencapaian *Kenali Hati Murid* (`sekte/kepribadian_sifat`) dan *Murid yang Bahagia* (Kepuasan 90,
+  `sekte/kepribadian_puas`).
+* **Sumber:** kehati-hatian Han Li (*A Record of a Mortal's Journey*), rasa takut Bai Xiaochun (*A Will Eternal*),
+  kesetiaan Xiao Yan kepada Yao Lao (*Battle Through the Heavens*), dendam Wang Lin (*Renegade Immortal*).
+
+### 66.2 Hubungan antar-murid (butir 37)
+
+Dua murid yang luang dan berdekatan (≤ 12 blok) kadang minum teh bersama (cangkir seladon di tangan). Kecocokan watak,
+Dao dan akar menentukan apakah mereka makin akrab; pengalaman bersama di turnamen, misi dan makam ikut mengubahnya.
+Jenis ikatan: **Kenalan**, **Sahabat** (≥ 40), **Saudara Angkat** (sumpah dari Sahabat ≥ 75, kamu yang menyetujui),
+**Kekasih** (≥ 70), **Pasangan Dao** (dari Kekasih ≥ 90 dengan restumu), **Saingan** (≤ −30 atau sering bertemu di
+turnamen) dan **Dendam** (≤ −60 setelah peristiwa berat).
+
+* **Efek:** Sahabat +5% kerusakan saat bertarung berdekatan, Saudara Angkat +8% dan saling membela, Kekasih/Pasangan Dao
+  +10% XP meditasi berdekatan (Pasangan Dao menjaga terobosan pasangannya), Saingan +6% XP latihan, Dendam −2 Kepuasan
+  per hari dan menolak satu tim misi. Pasangan berdendam kadang meminta **Duel Kehormatan** (Duel Pedang di depan sekte):
+  apa pun hasilnya, dendam menjadi persaingan.
+* **Cara pakai:** tab **Hubungan** di gulungan murid, kartu hub SEKTE **Jaring Hubungan** (lingkaran murid dengan garis
+  berwarna), atau `/kultivasi perguruan hubungan` (`daftar`, `sumpah`, `restui`, `larang`, `duel <a> <b>`, dan
+  `jawab <id> ya|tidak` dari chip permintaan).
+* **Hadiah:** pencapaian `sekte/hubungan_sahabat` dan `sekte/hubungan_saingan`.
+* **Sumber:** Sumpah Kebun Persik (*Romance of the Three Kingdoms* bab 1); Wang Lin dan Li Muwan (*Renegade Immortal*).
+
+### 66.3 Pembangkangan dan kepergian (butir 38)
+
+**Kesetiaan** dihitung dari Kepuasan dan Ikatan (Bond) dengan guru. Keadaannya: **Setia** (≥ 50), **Gelisah** (30-49,
+gelembung awan hujan), **Membangkang** (15-29: menolak tugas, kebun dan tambang, berdiri dengan lengan bersilang di Aula,
+separuh perintah ditolak), lalu **Akan Pergi** (< 15 selama 3 hari berturut-turut, hitung mundur tampil di tab Hati dan
+hub). Cara ia pergi tergantung wataknya: **Minggat** malam hari lewat gerbang dengan buntalan, **Memberontak** (Berani atau
+Sombong menantangmu Duel Pedang; kalau kamu menang ia tunduk dan tetap tinggal), **Berkhianat** (Licik, bila ada sekte NPC
+yang bermusuhan: ia bergabung dengan sekte itu), atau **Mengembara** (Ambisius yang sudah sekuat gurunya meminta izin).
+Murid yang pergi tercatat di daftar **Yang Pergi** dan bisa dibawa pulang lewat misi "cari murid" (66.8).
+
+* **Memulihkan:** Bicara, Hadiah, **Minta Maaf di Aula** (berdiri di depan prasasti Aula: guru dan murid membungkuk, +10,
+  sekali per 3 hari), Tetua Balai Hukum (66.7) dan upacara leluhur (66.6).
+* **Tidak pernah pergi:** murid ber-Segel Jiwa, pewaris, murid yang sedang away. Config `kepribadian.bolehPergi false`
+  mematikan kepergian sama sekali.
+* **Hadiah:** pencapaian *Hati yang Dilunakkan* (`sekte/kepribadian_rukun`: pulihkan murid yang membangkang atau hampir
+  pergi).
+* **Sumber:** pengkhianatan Han Feng, murid Yao Lao (*Battle Through the Heavens*).
+
+### 66.4 Turnamen sekte di arena (butir 39)
+
+Turnamen yang sudah ada (bab 25: jadwal, bracket, hadiah, Turnamen Elit tiap ke-3) kini memakai **panggung lei tai**:
+bangun komponen **tribun lei tai** (templat 6-9, tingkat 7; tiga undakan batu di dua sisi arena, tiang lentera dan
+genderang). Di templat lain lingkar lei tai digambar di jangkar arena. Setiap babak adalah **Duel Pedang** (bab 65, aturan
+sekte: 90 detik, berhenti di 10 % nyawa, tanpa taruhan) bila kedua murid memegang pedang. Murid yang tidak bertanding,
+utusan sekte sekutu dan warga desa bawahan duduk di tribun dan bersorak (≤ 12 penonton; > 32 blok tidak beranimasi,
+> 64 blok tidak digambar). Setiap murid punya **peringkat Elo** per musim; kartu hub **Turnamen** menampilkan bracket
+hidup, papan musim dan daftar juara. Final dan juara mendapat adegan singkat. Sekte NPC bisa datang menantang
+**turnamen antar-sekte** (empat tamu); jawab dengan `/kultivasi perguruan turnamen terima|tolak` (menolak sedikit
+menurunkan sikap mereka; menang atau kalah mengubahnya ±10).
+
+* **Hadiah:** hadiah turnamen lama tetap; juara dipuji (+Kepuasan), finalis yang kalah juga dihormati; upset melahirkan
+  saingan. Pencapaian `sekte/turnamen_juara`.
+* **Sumber:** Daftar Kuat (*Battle Through the Heavens* bab 566-573), Pemilihan Murid Terpilih (*A Will Eternal*),
+  final yang diumumkan Tetua Agung (*I Shall Seal the Heavens* bab 27-31); panggung lei tai (擂台) dalam tradisi bela
+  diri Tiongkok.
+
+### 66.5 Ujian Tangga Seribu di gerbang (butir 40)
+
+Bangun komponen **Batu Hati** (dua stela berukir di depan gerbang; templat 2-9, tingkat 2, templat 6 tingkat 4). Pada
+Hari Penerimaan, saat kamu menguji calon (pecahan ametis seperti biasa), Formasi Tangga memproyeksikan **tangga ilusi
+seribu anak tangga** dari gerbang ke langit (spiral giok bercahaya; Minimal 120, Normal 400, Maksimal 1000 anak tangga).
+Para calon mendaki di bawah tekanan yang terus naik; di anak tangga 300, 600 dan 900 muncul ilusi iblis hati dan mereka
+berlutut sejenak. HUD kecil menampilkan langkah tiap calon. **Keputusan penerimaan sama seperti rumus lama**; tangga hanya
+menambah: yang sampai **Puncak** (1000) mendapat gelar Pendaki Puncak, Ikatan awal +5 dan kecenderungan watak Rajin/Berani;
+yang jatuh di awal tetapi tidak menyerah mendapat "Tidak Menyerah".
+
+* **Ujian Hati ulang:** `/kultivasi perguruan tangga ujian <nama>` (200 PK, sekali per 30 hari): murid lama mendaki
+  sendiri; hasil terbaik menukar satu watak buruknya. `/kultivasi perguruan tangga` menampilkan langkah semua muridmu.
+* **Hadiah:** pencapaian `sekte/tangga_selesai`; adegan singkat "Puncak!" untuk pemain di dekatnya.
+* **Sumber:** pendakian Sekte Tujuh Misteri (*A Record of a Mortal's Journey* bab 1-5); Delapan Belas Tikungan Gunung Tai
+  (sekitar 1.600 anak tangga); kesabaran Sun Wukong sebelum diterima Subhuti (*Journey to the West* bab 2).
+
+### 66.6 Paviliun Kitab, Pemakaman dan Altar Leluhur (butir 41 dan 45)
+
+**Paviliun Kitab:** klik paviliun sambil memegang kitab teknik untuk menaruhnya di **Rak Kitab** (9/18/27 kitab menurut
+tingkat aula; kitab tidak habis), atau buka kartu hub **Paviliun & Makam** / `/kultivasi perguruan paviliun`. Murid yang
+luang memilih sendiri kitab yang boleh ia pelajari, duduk membaca (maks 4 pembaca) dan mempelajarinya **tanpa Qi-mu**
+(teknik tingkat 0 sekitar 10 menit nyata, tingkat 4 sekitar 50 menit; satu teknik per murid per hari dunia). Tetua
+Paviliun Kitab mempercepatnya.
+
+**Pemakaman Sekte:** murid yang gugur (dan Papan Jiwa yang dibawa pulang) mendapat makam dengan nama, ranah, hari, sebab
+dan jasanya; namanya melayang saat kamu dekat (≤ 8 blok). Makam tertua yang tak muat pindah ke **Kitab Silsilah** (tidak
+pernah hilang). **Altar Leluhur:** klik **Abadikan** (50 PK) agar papan arwahnya berdiri di altar. **Upacara:** dupa
+harian (klik altar memegang **Dupa**: resep tongkat + arang + buah beri manis), **Qingming** setiap 15 hari (semua murid
+berkumpul dan bersujud tiga kali), dan pemakaman saat murid gugur (sahabatnya berlutut berduka). **Berkah leluhur**
+(0-0.15) menenangkan hati semua murid dan mempercepat ritual pewaris. `/kultivasi perguruan paviliun makam` membuka
+Makam Leluhur.
+
+* **Hadiah:** pencapaian `sekte/paviliun_belajar` dan `sekte/paviliun_upacara`.
+* **Sumber:** biksu penyapu Perpustakaan Sutra Shaolin (*Demi-Gods and Semi-Devils*, Jin Yong); papan arwah dan ziarah
+  Qingming (adat Tiongkok).
+
+### 66.7 Tetua dan Pewaris (butir 42 dan 50)
+
+**Tetua:** murid berjenjang Tetua (atau Inti sebagai **Wakil**, efek separuh) bisa memegang jabatan: **Tetua Agung**,
+**Balai Hukum** (menenangkan murid yang tidak puas), **Paviliun Kitab** (pembaca lebih cepat), **Perbendaharaan** (Lumbung
+dan tambang), **Urusan Luar** (misi dan utusan sekte NPC) dan **Obat** (kebun dan pil untuk murid terluka). Pukul
+06:00-18:00 mereka duduk di meja jabatan memegang kuas dan gulungan, dan setiap 2 menit mengurus satu urusan. **Laporan
+Pagi:** pertama kali kamu berada di wilayah aula setelah pukul 06:00, Tetua Agung datang menghadap, membungkuk dan
+menyerahkan laporan 24 jam terakhir (juga di kartu hub). Buka kartu hub **Balai Tetua** atau `/kultivasi perguruan
+tetua` untuk mengangkat dan mencopot.
+
+**Pewaris dan Generasi Kedua:** pewaris (bab 29) yang sudah kuat (Jiwa Baru Lahir+, 9 bintang pewaris, aula tingkat 5,
+sekte berdiri 30 hari) bisa dinobatkan lewat **Upacara Penyerahan Takhta** (90 detik di aula utama, murid berbaris
+membungkuk, adegan singkat). Pewaris menjadi **Ketua Generasi Kedua** (nama emas, semua jabatan +5 %, tetap muridmu) dan
+kamu menjadi **Leluhur Pendiri** (renown aula +10 %, +10 sikap awal dengan setiap sekte NPC). Murid yang lebih dekat
+denganmu daripada pewaris akan mengingat ketidakadilan itu.
+
+* **Hadiah:** pencapaian `sekte/tetua_jabatan` dan `sekte/tetua_penerus`.
+* **Sumber:** jabatan biara *Kitab Aturan Murni Baizhang* (Baizhang Qinggui, dinasti Tang); Tetua Agung (*I Shall Seal
+  the Heavens* bab 27-31); jubah dan mangkuk Hongren kepada Huineng (*Sutra Altar*).
+
+### 66.8 Misi luar dan kepulangan (butir 43 dan 44)
+
+Di samping papan Ekspedisi lama, halaman misi kini punya **Misi Cerita** (kartu hub **Misi Cerita** atau tab baru di
+halaman misi): 12 templat (kawal kafilah, buru binatang iblis, selidiki reruntuhan, utusan ke sekte NPC, cari herba
+langka, tolong desa, rebut pusaka, cari murid yang mengembara, jaga perbatasan, lelang kota, kabar angin, penyamaran).
+Pilih tim 1-4 murid dan **sikap** (Damai, Tegas, Licik); paling banyak 2 misi berjalan, 1-3 hari dunia. Setiap misi punya
+3 tahap; tahap yang gagal berganti cabang cerita. Watak dan ikatan memengaruhi peluang (Sahabat/Saudara +3 %, Dendam tidak
+mau satu tim). Murid tidak pernah mati (luka = 30 % nyawa).
+
+**Kepulangan:** tim berjalan masuk lewat gerbang dan berbaris di depanmu, lalu menyerahkan **Gulungan Laporan** (buku
+berisi cerita tiga bagian, nama anggota dan hasilnya). Kadang mereka membawa **calon murid** (muncul di Hari Penerimaan
+berikutnya), **harta** (herba, batu roh, kitab teknik, pecahan peta harta) atau murid yang dulu mengembara. Menarik pulang
+tim tanpa murid yang terluka dianggap mengorbankannya.
+
+* **Hadiah:** pencapaian `sekte/misi_pulang` dan `sekte/misi_bawa`.
+* **Sumber:** utusan yang membawa pulang pemuda berbakat (*I Shall Seal the Heavens* bab 19); ekspedisi ke Pegunungan
+  Binatang Ajaib (*Battle Through the Heavens*).
+
+### 66.9 Seragam, Lambang dan Bendera (butir 46 dan 47)
+
+**Lambang:** buka perancang lewat kartu hub SEKTE **Lambang & Seragam** atau `/kultivasi perguruan lambang`: pilih bentuk
+(8), simbol (32), tiga warna dan semboyan (≤ 32 huruf), dengan pratinjau langsung di bendera, jubah dan cakram formasi.
+Gratis sekali sehari, berikutnya 100 PK. **Seragam:** warna badan dan pinggiran jubah untuk setiap jenjang (Tercatat
+sampai Tetua Agung) dan tiga potongan (Jubah Panjang, Jubah Pendek, Jubah Tempur); sulaman lambang di jubah memakai
+lambang sektemu. **Bendera:** komponen tiang bendera (semua templat): tingkat 1 dua tiang di depan gerbang, tingkat 4
+empat tiang di tepi cakram formasi. Kain berlambang berkibar (≤ 48 blok beranimasi, 48-96 diam, > 96 tidak digambar;
+Minimal tanpa gelombang). Lambang juga tampil di cakram Formasi Sekte dan tiang tribun lei tai.
+
+* **Hadiah:** pencapaian `sekte/seragam_lambang` dan `sekte/seragam_bendera`.
+* **Sumber:** jubah dan mangkuk Huineng sebagai tanda pewarisan (*Sutra Altar*); warna polos dan berbingkai Delapan Panji
+  dinasti Qing.
+
+### 66.10 Diplomasi dan Sekte Rival (butir 48 dan 49)
+
+Setiap dunia punya **8 sekte NPC** (4-12 lewat config) dengan nama, aliran (Lurus, Netral, Iblis), tingkat 1-9 dan
+lambang sendiri. Mereka tumbuh setiap hari, naik tingkat, saling berperang, dan setiap hari mungkin mengirim utusan,
+hadiah, tantangan turnamen, serangan, menyergap tim misimu atau membujuk muridmu yang gelisah. **Gerbang gunung** mereka
+(paifang, tangga, aula, menara dalam tiga ukuran) muncul lewat worldgen di chunk baru; di dalamnya anggota sekte dan,
+saat perang, Ketua Sekte.
+
+* **Cara pakai:** kartu hub SEKTE **Diplomasi** atau `/kultivasi perguruan diplomasi [sekte]`: kirim **utusan** (seorang
+  murid pergi 1 hari; Tetua Urusan Luar lebih baik), kirim **hadiah** (dari PK), ajukan **pakta** non-agresi (sikap ≥ 20)
+  atau **persekutuan** (≥ 60: sekutu mengirim penjaga saat sektemu diserang, mengundang ke turnamen bersama dan memberi
+  hadiah PK mingguan), tuntut **upeti** dari sekte yang jauh lebih lemah, atau nyatakan **perang** (sikap < −30).
+* **Perang:** serangan setiap 3-5 hari (memakai serbuan sekte iblis lama). Menang dengan mendatangi gerbang mereka dan
+  mengalahkan Ketuanya (hadiah besar, sekte itu turun 2 tingkat dan menjadi bawahanmu dengan upeti mingguan); tanpa
+  gerbang, Ketua musuh datang ke Aula setelah mengirim surat tantangan. Tiga serbuan yang menjarah sektemu berarti perang
+  kalah (upeti paksa, tidak pernah blok atau murid). Struktur mereka tidak pernah dihancurkan kecuali lewat Mode
+  Kehancuran milikmu sendiri.
+* **Hadiah:** pencapaian `sekte/diplomasi_temu`, `sekte/diplomasi_sekutu` dan `sekte/diplomasi_menang`.
+* **Sumber:** Tujuh Sekte Besar Negeri Yue melawan Jalan Iblis (*A Record of a Mortal's Journey*); perjanjian tiga tahun
+  Xiao Yan dengan Sekte Awan Berkabut (*Battle Through the Heavens*).
+
+### 66.11 Kebun Obat dan Tambang Roh (butir 51 dan 52)
+
+**Kebun Obat:** komponen petak roh (templat 2-9, tingkat 3; 4/6/8/12 petak). Klik tanah petak atau buka kartu hub **Kebun &
+Tambang** (`/kultivasi perguruan kebun`), pilih benih herba dari Lumbung; murid bertugas kebun merawatnya (4 tahap
+tumbuh, `1 + mutu` hari dunia). Hasil masuk ke **Lumbung** dan bertambah dengan watak Rajin, Tetua Obat dan akar Kayu/Air
+perawatnya. Tanaman hanya gambar (tunas sampai bunga yang berpendar), bukan blok.
+
+**Tambang Roh:** komponen mulut tambang (templat 4-9, tingkat 4) di sisi bukit sekte. Klik mulut tambang atau
+`/kultivasi perguruan kebun tambang`. Murid bergiliran masuk (2-6 penambang, satu giliran = 1 hari dunia, bunyi beliung
+dari dalam) dan keluar membawa batu roh, bijih dan kristal ke Lumbung. Naikkan **kedalaman** 1-9 dengan PK (`200 ×
+tingkat`) dan bahan: makin dalam makin berharga (tingkat 7+ kadang **Inti Roh Gunung**), tetapi mulai tingkat 5 ada
+peluang runtuh 2 % per giliran (penambang terluka, pulih 1 hari, tidak pernah mati, tidak ada blok). Lebih dari 5 giliran
+berturut-turut tanpa libur berarti murid **dipaksa kerja** (Kepuasan turun).
+
+* **Hadiah:** pencapaian `sekte/kebun_panen` dan `sekte/kebun_tambang`.
+* **Sumber:** Kebun Seratus Obat Sekte Huang Feng (*A Record of a Mortal's Journey* bab 150-151); batu lima warna Nüwa
+  (*Huainanzi* bab 6) dan gunung-gunung giok *Shanhaijing*.
+
+### 66.12 Perintah uji (op)
+
+Semua di bawah `/kultivasi uji perguruan` (bekerja pada aula pemain yang menjalankannya):
+
+| fitur | perintah |
+|---|---|
+| umum | `muat`, `modul` |
+| watak, kepergian | `kepribadian info <nama>`, `sifat <nama> <id> [id] [id]`, `puas <nama> <0-100>`, `siksa <nama> <perlakuan>`, `hari <n>`, `pergi <nama> <cara>`, `pulih <nama>\|semua`, `yangpergi`, `bujuk <sekte>`, `reset` |
+| hubungan | `hubungan info <a> <b>`, `set <a> <b> <-100..100>`, `jenis <a> <b> <ikatan>`, `temu <a> <b>`, `jaring`, `hari`, `duel <a> <b>`, `minta`, `reset` |
+| turnamen | `turnamen mulai [biasa\|elit]`, `mulai antar <sekte>`, `babak lewati`, `penonton <n>`, `elo <nama> <n>`, `musim [reset]`, `final`, `juara`, `tribun`, `tantang <sekte>` |
+| tangga | `tangga mulai [n]`, `proyeksi`, `langkah <0-1000> <nama>`, `ulang <nama>`, `henti`, `info` |
+| paviliun, makam | `paviliun rak tambah <id>`, `rak daftar`, `baca <nama>`, `selesai <nama>`, `makam tambah <nama>`, `makam bersih`, `upacara [harian\|qingming\|makam]`, `berkah`, `sinkron` |
+| tetua, pewaris | `tetua angkat <nama> <jabatan>`, `copot <nama>`, `laporan`, `urusan`, `takhta <nama>`, `lewati`, `generasi` |
+| misi | `misi kirim <templat> <sikap> <nama..>`, `selesai`, `hasil <0-3>`, `laporan`, `pulang <nama>`, `papan`, `info` |
+| lambang, seragam | `seragam lambang <bentuk> <simbol> <w1> <w2> <w3>`, `acak`, `semboyan <teks>`, `seragam <jenjang> <badan> <trim>`, `potongan <0-2> [jenjang]`, `bendera`, `atlas`, `info`, `hapus` |
+| diplomasi | `diplomasi daftar`, `info <sekte>`, `standing <sekte> <n>`, `aksi <sekte> <peristiwa>`, `tumbuh <sekte>`, `perang <sekte>`, `damai <sekte>`, `menang <sekte>`, `ketua <sekte>`, `gerbang <sekte>`, `simulasi <hari>`, `layar` |
+| kebun, tambang | `kebun info`, `tanam <petak> <herba>`, `tumbuh [hari]`, `panen`, `tambang tingkat <1-9>`, `tambang bangun`, `giliran`, `runtuh`, `petak <0-12>`, `kerja <hari>`, `inti`, `sinkron` |
+
+Untuk melihat bangunan baru di medan sungguhan: `/kultivasi uji sekte audit <templat>` dan `/kultivasi uji sekte pamer
+<templat> tingkat <t>`.

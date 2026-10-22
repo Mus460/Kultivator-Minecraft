@@ -81,6 +81,11 @@ public class DiscipleHeldItemLayer extends RenderLayer<DiscipleRenderState, Play
 				inHand(model, state, HumanoidArm.LEFT, "herb_basket", poseStack, c, light, 0.6F, 0.0F);
 			}
 			default -> {
+				// Sekte yang Hidup's activities 13-24 (DESIGN 36.3.3): the owner module's registered props.
+				for (dev.kultivator.client.sekte.SektePoses.Prop prop : dev.kultivator.client.sekte.SektePoses.props(state.activity)) {
+					inHand(model, state, prop.left() ? HumanoidArm.LEFT : HumanoidArm.RIGHT, prop.piece(), poseStack, c, light, prop.scale(),
+							prop.pitch());
+				}
 			}
 		}
 	}

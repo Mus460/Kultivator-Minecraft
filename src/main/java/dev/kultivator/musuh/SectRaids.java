@@ -98,6 +98,36 @@ public final class SectRaids {
 		}
 	}
 
+	/**
+	 * Sekte yang Hidup module D (DESIGN 36.2.9): the NPC sect diplomacy names the raiders after a hostile Iblis sect or a
+	 * sect at war with the owner, adds its allies to the data defence score and hears every result. Without a director
+	 * (or when it answers -1 / null / 0) every raid runs exactly as before; no raid number changes.
+	 */
+	public interface Director {
+		/** The demonic sect index 0-7 (element and loot) of the owner's next omen, or -1 to roll it as before. */
+		default int pickSect(UUID owner) {
+			return -1;
+		}
+
+		/** The raiders' display name for a raid of {@code sect} on {@code owner}, or null to keep {@code LootPouches.sectName}. */
+		default @Nullable Component name(UUID owner, int sect) {
+			return null;
+		}
+
+		/** Extra defence score of allied sects for a raid settled as data (0 without allies). */
+		default int allyDefense(UUID owner) {
+			return 0;
+		}
+
+		/** The result ({@code RES_*}) of every finished raid of {@code owner}. */
+		default void onResult(UUID owner, int result) {
+		}
+	}
+
+	private static final Director NO_DIRECTOR = new Director() {
+	};
+	private static volatile Director director = NO_DIRECTOR;
+
 	public static final String SECTION = "raid";
 	public static final TagKey<Item> RAID_SAFE = TagKey.create(Registries.ITEM, Kultivator.id("raid_safe"));
 	public static final int STATE_IDLE = 0;
@@ -173,6 +203,64 @@ public final class SectRaids {
 	/** The registered listeners (for the module's own firing code). */
 	static List<RaidListener> listeners() {
 		return LISTENERS;
+	}
+
+	/** Sets the raid director (Sekte yang Hidup module D); null restores the default. */
+	public static void setDirector(@Nullable Director value) {
+		director = value == null ? NO_DIRECTOR : value;
+	}
+
+	/**
+	 * Brings the owner's next raid forward to {@code inDays} days from today (a war raid of module D, DESIGN 36.2.9) on the
+	 * same schedule path: only while no raid is pending or live, the hall is at least level {@link #MIN_HALL_LEVEL}, raids
+	 * are on, and the planned day is later. The omen, the live fight, the data settlement and every number stay the
+	 * same. True when the day moved.
+	 */
+	public static boolean callRaid(MinecraftServer server, UUID owner, int inDays) {
+		KultivatorConfig config = KultivatorConfig.get();
+		Halls.HallView hall = owner == null ? null : Halls.hallOf(owner);
+		if (server == null || hall == null || !config.sectRaids || config.sectRaidIntervalDays <= 0 || LIVE.containsKey(owner)
+				|| hall.level() < MIN_HALL_LEVEL) {
+			return false;
+		}
+		CompoundTag raid = Halls.section(owner, SECTION);
+		if (raid.getIntOr("state", STATE_IDLE) != STATE_IDLE) {
+			return false;
+		}
+		long today = today(server);
+		long wanted = today + Math.max(2, inDays);
+		if (raid.contains("next_day") && raid.getLongOr("next_day", wanted) <= wanted) {
+			return false;
+		}
+		if (!raid.contains("l3_day")) {
+			raid.putLong("l3_day", today);
+		}
+		raid.putLong("next_day", wanted);
+		Halls.setDirty();
+		return true;
+	}
+
+	/** The raiders of the owner's live raid right now (a copy; empty without one). */
+	public static List<RogueCultivatorEntity> liveRaiders(UUID owner) {
+		RaidState raid = owner == null ? null : LIVE.get(owner);
+		return raid == null ? List.of() : List.copyOf(raid.alive);
+	}
+
+	/** The day index of the owner's next planned raid, or -1 when none is planned. */
+	public static long nextRaidDay(UUID owner) {
+		CompoundTag raid = owner == null ? new CompoundTag() : Halls.section(owner, SECTION);
+		return raid.getLongOr("next_day", -1L);
+	}
+
+	/** The raiders' name: the director's (module D) when it names this raid, else the demonic sect's. */
+	private static Component raiderName(UUID owner, int sect) {
+		Component named = null;
+		try {
+			named = director.name(owner, sect);
+		} catch (RuntimeException exception) {
+			Kultivator.LOGGER.error("The raid director failed to name a raid", exception);
+		}
+		return named != null ? named : LootPouches.sectName(sect);
 	}
 
 	// ================================================================== init
@@ -326,13 +414,19 @@ public final class SectRaids {
 
 	private static void omen(MinecraftServer server, UUID owner, CompoundTag raid, long raidDay) {
 		RandomSource random = server.overworld().getRandom();
-		int sect = random.nextInt(RogueCultivatorEntity.SECTS);
+		int picked = -1;
+		try {
+			picked = director.pickSect(owner);
+		} catch (RuntimeException exception) {
+			Kultivator.LOGGER.error("The raid director failed to pick a sect", exception);
+		}
+		int sect = picked >= 0 ? Math.floorMod(picked, RogueCultivatorEntity.SECTS) : random.nextInt(RogueCultivatorEntity.SECTS);
 		raid.putInt("sect", sect);
 		raid.putInt("state", STATE_OMEN);
 		raid.putLong("omen_day", today(server));
 		raid.remove("interrupted");
 		Halls.setDirty();
-		Component line = Component.translatable("kultivator.musuh.raid.omen", LootPouches.sectName(sect), raidDay);
+		Component line = Component.translatable("kultivator.musuh.raid.omen", raiderName(owner, sect), raidDay);
 		Halls.log(owner, line);
 		ServerPlayer player = server.getPlayerList().getPlayer(owner);
 		Halls.HallView hall = Halls.hallOf(owner);
@@ -399,7 +493,7 @@ public final class SectRaids {
 		raid.nextWave();
 		LIVE.put(owner, raid);
 		Halls.setDirty();
-		Component line = Component.translatable("kultivator.musuh.raid.start", LootPouches.sectName(sect), waves);
+		Component line = Component.translatable("kultivator.musuh.raid.start", raiderName(owner, sect), waves);
 		Halls.log(owner, line);
 		tellTerritory(raid, line.copy().withStyle(ChatFormatting.DARK_RED));
 		Vec3 c = raid.centre();
@@ -501,7 +595,7 @@ public final class SectRaids {
 		Vec3 c = raid.centre();
 		raid.level.playSound(null, c.x, c.y, c.z, SoundEvents.RAID_HORN.value(), SoundSource.HOSTILE, 6.0F, 1.0F);
 		Component line = raid.wave >= raid.waves && raid.finalWave
-				? Component.translatable("kultivator.musuh.raid.final_wave", LootPouches.sectName(raid.sect))
+				? Component.translatable("kultivator.musuh.raid.final_wave", raiderName(raid.owner, raid.sect))
 				: Component.translatable("kultivator.musuh.raid.wave", raid.wave, raid.waves);
 		tellTerritory(raid, line.copy().withStyle(ChatFormatting.RED));
 	}
@@ -585,7 +679,7 @@ public final class SectRaids {
 			section.remove("interrupted");
 		}
 		Halls.setDirty();
-		Component line = Component.translatable("kultivator.sect_fix_feat.raid.postponed", LootPouches.sectName(raid.sect), POSTPONE_DAYS);
+		Component line = Component.translatable("kultivator.sect_fix_feat.raid.postponed", raiderName(raid.owner, raid.sect), POSTPONE_DAYS);
 		Halls.log(raid.owner, line);
 		tellTerritory(raid, line.copy().withStyle(ChatFormatting.GRAY));
 		ServerPlayer player = server.getPlayerList().getPlayer(raid.owner);
@@ -715,13 +809,13 @@ public final class SectRaids {
 						Advancements.grant(player, "raid_flawless");
 					}
 				}
-				summary = Component.translatable("kultivator.musuh.raid.repelled", LootPouches.sectName(raid.sect), pk, pouches);
+				summary = Component.translatable("kultivator.musuh.raid.repelled", raiderName(owner, raid.sect), pk, pouches);
 			}
 			case RES_SACKED -> summary = sack(server, owner, raid.level, raid.stele, raid.sect);
 			default -> {
 				int pk = PK_PER_WAVE * raid.waves / 2;
 				Halls.addPool(owner, pk);
-				summary = Component.translatable("kultivator.musuh.raid.held", LootPouches.sectName(raid.sect), pk);
+				summary = Component.translatable("kultivator.musuh.raid.held", raiderName(owner, raid.sect), pk);
 			}
 		}
 		Halls.log(owner, summary);
@@ -749,7 +843,13 @@ public final class SectRaids {
 		int sect = section.getIntOr("sect", 0);
 		int lr = raidLevel(owner);
 		int[] score = score(server, owner, level);
-		int total = Math.max(score[0], section.getIntOr("score", 0));
+		int ally = 0;
+		try {
+			ally = Math.max(0, director.allyDefense(owner));
+		} catch (RuntimeException exception) {
+			Kultivator.LOGGER.error("The raid director failed to count allies", exception);
+		}
+		int total = Math.max(score[0], section.getIntOr("score", 0)) + ally;
 		int disciples = Math.max(score[1], section.getIntOr("score_d", 0));
 		double chance = repelChance(total, lr, waves);
 		boolean repelled = level != null && level.getRandom().nextDouble() < chance;
@@ -762,11 +862,11 @@ public final class SectRaids {
 			if (disciples > 0) {
 				Halls.addRenown(owner, RENOWN_PER_WAVE * waves / 2, "kultivator.musuh.renown.raid");
 			}
-			summary = Component.translatable("kultivator.musuh.raid.data_repelled", LootPouches.sectName(sect), Math.round(chance * 100.0D), pk);
+			summary = Component.translatable("kultivator.musuh.raid.data_repelled", raiderName(owner, sect), Math.round(chance * 100.0D), pk);
 			result = RES_DATA_REPELLED;
 		} else {
 			Component sack = sack(server, owner, level, hall.pos(), sect);
-			summary = Component.translatable("kultivator.musuh.raid.data_sacked", LootPouches.sectName(sect), Math.round(chance * 100.0D)).append(" ").append(sack);
+			summary = Component.translatable("kultivator.musuh.raid.data_sacked", raiderName(owner, sect), Math.round(chance * 100.0D)).append(" ").append(sack);
 			result = RES_DATA_SACKED;
 		}
 		Halls.log(owner, summary);
@@ -813,6 +913,11 @@ public final class SectRaids {
 				Kultivator.LOGGER.error("A raid listener failed", exception);
 			}
 		}
+		try {
+			director.onResult(owner, result);
+		} catch (RuntimeException exception) {
+			Kultivator.LOGGER.error("The raid director failed on a result", exception);
+		}
 	}
 
 	private static void finishSchedule(UUID owner, CompoundTag section, long raidDay, int interval) {
@@ -848,7 +953,7 @@ public final class SectRaids {
 		CompoundTag section = Halls.section(owner, SECTION);
 		section.putLong("hurt_until", server.overworld().getGameTime() + HURT_TICKS);
 		Halls.setDirty();
-		return Component.translatable("kultivator.musuh.raid.sacked", LootPouches.sectName(sect), stolen.size(), taken / 100L);
+		return Component.translatable("kultivator.musuh.raid.sacked", raiderName(owner, sect), stolen.size(), taken / 100L);
 	}
 
 	/** Items a sack never takes: the tag, containers (rings, shulkers), artifacts and trophies. */

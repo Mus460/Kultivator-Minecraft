@@ -450,10 +450,18 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.getNavigation().stop();
 	}
 
-	/** True while an activity 1-8, 10 (builder), 11 (formation keeper) or 12 (forge assistant) binds the disciple to its spot. */
+	/**
+	 * True while an activity 1-8, 10 (builder), 11 (formation keeper), 12 (forge assistant) or one of Sekte yang Hidup's
+	 * 13-20 ({@code sekte.SekteIds.ACT_*}, DESIGN 36.3.3) binds the disciple to its spot.
+	 */
 	public boolean holdsActivitySpot() {
 		return activity >= ACTIVITY_WATER && activity <= ACTIVITY_SPECTATOR || activity == ACTIVITY_BUILD
-				|| activity == ACTIVITY_FORMATION_KEEPER || activity == ACTIVITY_FORGE_ASSIST;
+				|| activity == ACTIVITY_FORMATION_KEEPER || activity == ACTIVITY_FORGE_ASSIST || sekteHolding(activity);
+	}
+
+	/** Sekte yang Hidup's spot-holding activities 13-20 (DESIGN 36.3.3); 21-24 are poses only. */
+	private static boolean sekteHolding(int id) {
+		return id >= dev.kultivator.sekte.SekteIds.ACT_FIRST && id <= dev.kultivator.sekte.SekteIds.ACT_LAST_HOLDING;
 	}
 
 	/** A clone's source disciple (its soul id), or null. */
@@ -1207,7 +1215,10 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		}
 		if (holdsActivitySpot()) {
 			// Formation guard, tower, spirit body and spectators sit at their spot; duties and builders loop their own pose instead.
-			return activity >= ACTIVITY_FORMATION_GUARD && activity != ACTIVITY_BUILD && activitySpot != null && this.getNavigation().isDone()
+			// Of Sekte yang Hidup's activities only the pavilion reader sits (the others loop their own pose).
+			return activity >= ACTIVITY_FORMATION_GUARD && activity != ACTIVITY_BUILD
+					&& (!sekteHolding(activity) || activity == dev.kultivator.sekte.SekteIds.ACT_STUDY)
+					&& activitySpot != null && this.getNavigation().isDone()
 					&& this.distanceToSqr(activitySpot.getX() + 0.5D, activitySpot.getY(), activitySpot.getZ() + 0.5D) <= 2.25D;
 		}
 		if (role != Role.DISCIPLE) {
@@ -1452,9 +1463,10 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 			// Never written to a chunk (shouldBeSaved); kept so a copy made another way is still refused on load.
 			output.putInt("Role", role.ordinal());
 		}
-		// Lasting assignments (duties, formation guard, formation keeper, forge assistant) survive a restart; tower, spirit body, spectator and duel do not.
+		// Lasting assignments (duties, formation guard, formation keeper, forge assistant, Sekte yang Hidup's 13-20) survive a
+		// restart; tower, spirit body, spectator and duel do not.
 		if ((activity >= ACTIVITY_WATER && activity <= ACTIVITY_FORMATION_GUARD || activity == ACTIVITY_FORMATION_KEEPER
-				|| activity == ACTIVITY_FORGE_ASSIST) && activitySpot != null) {
+				|| activity == ACTIVITY_FORGE_ASSIST || sekteHolding(activity)) && activitySpot != null) {
 			output.putInt("Activity", activity);
 			output.store("ActivitySpot", BlockPos.CODEC, activitySpot);
 		}
@@ -1487,7 +1499,7 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		int savedActivity = input.getIntOr("Activity", 0);
 		BlockPos savedSpot = input.read("ActivitySpot", BlockPos.CODEC).orElse(null);
 		if ((savedActivity >= ACTIVITY_WATER && savedActivity <= ACTIVITY_FORMATION_GUARD || savedActivity == ACTIVITY_FORMATION_KEEPER
-				|| savedActivity == ACTIVITY_FORGE_ASSIST) && savedSpot != null) {
+				|| savedActivity == ACTIVITY_FORGE_ASSIST || sekteHolding(savedActivity)) && savedSpot != null) {
 			this.activity = savedActivity;
 			this.activitySpot = savedSpot;
 			this.entityData.set(DATA_ACTIVITY, (byte) savedActivity);

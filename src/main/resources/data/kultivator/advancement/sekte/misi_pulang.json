@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:first_expedition",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.misi.adv.pulang.desc"
+    },
+    "icon": {
+      "id": "minecraft:paper"
+    },
+    "title": {
+      "translate": "kultivator.sekte.misi.adv.pulang.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

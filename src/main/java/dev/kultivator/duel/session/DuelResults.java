@@ -145,6 +145,7 @@ final class DuelResults {
 			}
 		}
 		session.sendEnded(now);
+		dev.kultivator.duel.api.DuelEndListeners.fire(session, winner, loser, reason);
 
 		// A test dummy leaves with its duel.
 		if (session.dummy != null && session.dummy.isAlive()) {

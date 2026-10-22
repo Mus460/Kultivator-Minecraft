@@ -161,6 +161,147 @@ public final class Candidates {
 	/** Owner -> record id -> server tick before which no new safe-spot search is made (transient). */
 	private static final Map<UUID, Map<Integer, Integer>> RETRY = new HashMap<>();
 
+	// ================================================================== Ujian Tangga Seribu (DESIGN 36.2.4, module G)
+
+	/**
+	 * Module G's thousand-step trial ({@code sekte.tangga}), set from its init; null keeps the stele test. While the
+	 * trial's stair stands the master's test of a candidate becomes a climb of every untested candidate present. The
+	 * old numbers stay: one amethyst shard per candidate tested, {@link #tiers} and {@link #verdict} unchanged.
+	 */
+	public interface StairTrial {
+		/** The master starts the test of record {@code id}: true when the trial took it over (a climb runs or was refused). */
+		boolean begin(ServerPlayer player, UUID owner, int id, boolean shardInHand);
+
+		/** True while record {@code id} is on the stair (accept, dismiss and the raid pause wait for it). */
+		boolean busy(UUID owner, int id);
+
+		/** Record {@code record} was accepted and is now {@code disciple}. */
+		void accepted(ServerPlayer master, DiscipleEntity disciple, CompoundTag record);
+	}
+
+	/** One untested candidate with a body, as a climb takes it. */
+	public record Climber(int id, DiscipleEntity body, Component name, int tiers, int tekad, int verdict) {
+	}
+
+	private static @Nullable StairTrial stairTrial;
+
+	/** Module G's hook (null removes it). */
+	public static void setStairTrial(@Nullable StairTrial trial) {
+		stairTrial = trial;
+	}
+
+	private static boolean climbing(UUID owner, int id) {
+		StairTrial trial = stairTrial;
+		return trial != null && trial.busy(owner, id);
+	}
+
+	/** The active hall's level, or null (dormant, none). */
+	public static @Nullable ServerLevel hallLevel(UUID owner) {
+		CompoundTag core = Halls.coreOf(owner);
+		return core == null || Halls.dormant(core) ? null : Halls.levelOf(core);
+	}
+
+	/** The active hall's stele, or null. */
+	public static @Nullable BlockPos hallStele(UUID owner) {
+		CompoundTag core = Halls.coreOf(owner);
+		return core == null || Halls.dormant(core) ? null : Halls.posOf(core);
+	}
+
+	/** True while a live sect raid holds the recruitment back (the climb settles at once). */
+	public static boolean recruitPaused(UUID owner) {
+		return Halls.recruitPaused(owner);
+	}
+
+	/**
+	 * The untested candidates of the hall with a body (spawned when missing, the body cap kept), {@code first} first,
+	 * at most {@code max}; war-day youths and candidates in a stele test or a duel are left out.
+	 */
+	public static List<Climber> climbers(UUID owner, int first, int max) {
+		List<Climber> out = new ArrayList<>();
+		CompoundTag core = Halls.coreOf(owner);
+		if (core == null || Halls.dormant(core) || max <= 0) {
+			return out;
+		}
+		List<CompoundTag> records = new ArrayList<>();
+		CompoundTag head = find(core, first);
+		if (head != null) {
+			records.add(head);
+		}
+		for (Tag tag : list(core)) {
+			if (tag instanceof CompoundTag rec && rec != head) {
+				records.add(rec);
+			}
+		}
+		for (CompoundTag rec : records) {
+			if (out.size() >= max) {
+				break;
+			}
+			int id = rec.getIntOr("id", -1);
+			DiscipleData data = dataOf(rec);
+			if (Talents.tested(data) || rec.getBooleanOr("war", false) || climbing(owner, id)) {
+				continue;
+			}
+			boolean testing = false;
+			for (Test test : TESTS) {
+				testing |= test.owner.equals(owner) && test.id == id;
+			}
+			if (testing) {
+				continue;
+			}
+			DiscipleEntity body = body(owner, core, rec, false);
+			if (body == null || DuelRules.inDuel(body)) {
+				continue;
+			}
+			out.add(new Climber(id, body, nameOf(rec), tiers(data), Talents.tekad(data), verdict(data)));
+		}
+		return out;
+	}
+
+	/** One amethyst shard for one test (the one in hand first); free in creative. */
+	public static boolean payShard(ServerPlayer player, boolean inHand) {
+		return player.hasInfiniteMaterials() || takeShard(player, inHand);
+	}
+
+	/**
+	 * A climb revealed record {@code id}: {@code mark} writes the climb into its data (module G's {@code extra.tangga}),
+	 * then the old reveal runs (tested, card and chat for the tester and the master) and {@code extra} lines follow.
+	 */
+	public static void revealClimb(MinecraftServer server, UUID tester, UUID owner, int id, java.util.function.Consumer<DiscipleData> mark,
+			List<Component> extra) {
+		CompoundTag core = Halls.coreOf(owner);
+		CompoundTag rec = core == null ? null : find(core, id);
+		if (rec == null) {
+			return;
+		}
+		DiscipleData data = dataOf(rec);
+		if (mark != null) {
+			mark.accept(data);
+		}
+		storeData(rec, data);
+		Map<Integer, DiscipleEntity> views = VIEWS.get(owner);
+		DiscipleEntity entity = views == null ? null : views.get(id);
+		if (entity != null && (entity.isRemoved() || !entity.isAlive())) {
+			entity = null;
+		}
+		if (entity != null && mark != null) {
+			mark.accept(entity.data());
+		}
+		ServerLevel level = Halls.levelOf(core);
+		BlockPos stele = Halls.posOf(core);
+		reveal(server, new Test(owner, id, tester, level, stele == null ? BlockPos.ZERO : stele, 0L, 0, 0, 0), core, rec, entity);
+		if (extra != null && !extra.isEmpty()) {
+			ServerPlayer testerPlayer = server.getPlayerList().getPlayer(tester);
+			ServerPlayer master = server.getPlayerList().getPlayer(owner);
+			for (ServerPlayer player : new ServerPlayer[]{testerPlayer, master != testerPlayer ? master : null}) {
+				if (player != null) {
+					for (Component line : extra) {
+						Msg.chat(player, line);
+					}
+				}
+			}
+		}
+	}
+
 	static void clearAll() {
 		VIEWS.clear();
 		BY_ENTITY.clear();
@@ -379,7 +520,8 @@ public final class Candidates {
 			for (Integer id : List.copyOf(views.keySet())) {
 				DiscipleEntity entity = views.get(id);
 				final int key = id;
-				if (entity != null && !DuelRules.inDuel(entity) && TESTS.stream().noneMatch(test -> test.owner.equals(owner) && test.id == key)) {
+				if (entity != null && !DuelRules.inDuel(entity) && !climbing(owner, key)
+						&& TESTS.stream().noneMatch(test -> test.owner.equals(owner) && test.id == key)) {
 					leave(owner, key, level, false);
 				}
 			}
@@ -891,6 +1033,14 @@ public final class Candidates {
 				return;
 			}
 		}
+		if (climbing(owner, id)) {
+			return;
+		}
+		// DESIGN 36.2.4: with the thousand-step stair standing, module G climbs every untested candidate instead.
+		StairTrial trial = stairTrial;
+		if (trial != null && trial.begin(player, owner, id, shardInHand)) {
+			return;
+		}
 		DiscipleEntity entity = body(owner, core, rec, false);
 		ServerLevel level = Halls.levelOf(core);
 		BlockPos stele = Halls.posOf(core);
@@ -999,6 +1149,10 @@ public final class Candidates {
 				return false;
 			}
 		}
+		if (climbing(owner, id)) {
+			Msg.chat(player, Component.translatable("kultivator.hall.cand.testing", nameOf(rec)).withStyle(ChatFormatting.YELLOW));
+			return false;
+		}
 		int alive = Disciples.aliveCount(Cultivators.get(player));
 		int cap = Disciples.cap(player);
 		if (alive >= cap) {
@@ -1051,6 +1205,11 @@ public final class Candidates {
 		if (rec.getBooleanOr("crowned", false)) {
 			DisciplePaths.addBond(entity.data(), CHAMPION_BOND, "kultivator.hall.bond.champion");
 		}
+		StairTrial trial = stairTrial;
+		if (trial != null) {
+			// Module G: the climb's record goes with the youth (Pendaki Puncak bond, memory, honour).
+			trial.accepted(player, entity, rec);
+		}
 		Halls.setDirty();
 		entity.setSyncedSectRank(rank);
 		entity.setSyncedTalent(Talents.packed(entity.data()));
@@ -1082,6 +1241,10 @@ public final class Candidates {
 		CompoundTag core = Halls.coreOf(owner);
 		CompoundTag rec = core == null ? null : find(core, id);
 		if (rec == null || !player.getUUID().equals(owner)) {
+			return;
+		}
+		if (climbing(owner, id)) {
+			Msg.chat(player, Component.translatable("kultivator.hall.cand.testing", nameOf(rec)).withStyle(ChatFormatting.YELLOW));
 			return;
 		}
 		leave(owner, id, null, true);
@@ -1178,6 +1341,7 @@ public final class Candidates {
 			for (Test test : TESTS) {
 				testing |= test.owner.equals(owner) && test.id == id;
 			}
+			testing |= climbing(owner, id);
 			entry.putBoolean("testing", testing);
 			entry.putInt("grade", tested ? data.rootGrade().ordinal() : -1);
 			entry.putInt("elements", tested ? data.rootElements() : 0);

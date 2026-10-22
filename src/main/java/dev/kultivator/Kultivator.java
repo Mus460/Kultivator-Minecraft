@@ -145,6 +145,8 @@ public class Kultivator implements ModInitializer {
 		dev.kultivator.dunia.DuniaContent.init();
 		// Duel Pedang Kultivator (DESIGN 35, C35.S1): the clash layer, formal duels, duellist AI and the duel payloads.
 		dev.kultivator.duel.Duel.init();
+		// Sekte yang Hidup (DESIGN 36): the lead's core and the ten sect-and-disciple modules, before ModItems.init.
+		dev.kultivator.sekte.SekteContent.init();
 		// After every module registered its items.
 		ModItems.init();
 		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its

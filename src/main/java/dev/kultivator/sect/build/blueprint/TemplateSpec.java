@@ -278,9 +278,36 @@ public final class TemplateSpec {
 		private final List<Component> components = new ArrayList<>();
 		private final LongOpenHashSet keep = new LongOpenHashSet();
 
+		private boolean extended;
+
 		private Builder(int template) {
 			this.template = template;
 			zones.put("plaza", new Zone("plaza", -6, -6, 6, 6, 0, 0, 0, null, 0));
+		}
+
+		/** The template number 1-9 (for {@link TemplateExtensions}). */
+		public int template() {
+			return template;
+		}
+
+		/** The footprint so far (template-local, inclusive): {x0, x1, z0, z1} (for {@link TemplateExtensions}). */
+		public int[] footprintBounds() {
+			return new int[]{x0, x1, z0, z1};
+		}
+
+		/** A zone added so far, or null (for {@link TemplateExtensions}). */
+		public @Nullable Zone zoneSoFar(String id) {
+			return zones.get(id);
+		}
+
+		/** True when a component with this id was added already (for {@link TemplateExtensions}). */
+		public boolean hasComponent(String id) {
+			for (Component component : components) {
+				if (component.id().equals(id)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		/** Footprint rectangle (Table A), inclusive. */
@@ -378,6 +405,11 @@ public final class TemplateSpec {
 		}
 
 		public TemplateSpec build() {
+			if (!extended) {
+				// DESIGN 36.3.5: the components other systems add to this template, right before the spec is frozen.
+				extended = true;
+				TemplateExtensions.apply(this);
+			}
 			return new TemplateSpec(this);
 		}
 	}

@@ -1,0 +1,25 @@
+{
+ "parent": "kultivator:first_disciple",
+ "criteria": {
+  "done": {
+   "trigger": "minecraft:impossible"
+  }
+ },
+ "display": {
+  "description": {
+   "translate": "advancement.kultivator.sekte.kepribadian_sifat.description"
+  },
+  "icon": {
+   "id": "minecraft:writable_book"
+  },
+  "title": {
+   "translate": "advancement.kultivator.sekte.kepribadian_sifat.title"
+  },
+  "frame": "task"
+ },
+ "requirements": [
+  [
+   "done"
+  ]
+ ]
+}

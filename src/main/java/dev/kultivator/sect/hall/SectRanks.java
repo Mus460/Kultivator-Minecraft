@@ -509,11 +509,38 @@ public final class SectRanks {
 		entity.setSyncedSectRank(target);
 		Halls.noteRank(master.getUUID(), entity.soulId(), target, isProtector(data), DisciplePaths.power(data));
 		celebrate(master, entity, target, true);
+		passedOver(master, entity, rank);
 		Advancements.grant(master, "first_promotion");
 		if (target == TETUA_AGUNG) {
 			Advancements.grant(master, "grand_elder");
 		}
 		return true;
+	}
+
+	/**
+	 * Sekte yang Hidup module E (DESIGN 36.2.6): a junior promoted past seniors. Every loaded disciple of the master that
+	 * joined earlier, still stands at or below the promoted one's old rank and has a stronger master bond feels treated
+	 * unfairly ({@code TIDAK_ADIL}, at most three per promotion, from Murid Dalam up). No number of the ranks changes.
+	 */
+	private static void passedOver(ServerPlayer master, DiscipleEntity promoted, int oldRank) {
+		if (oldRank + 1 < DALAM || !dev.kultivator.sekte.SekteContent.on(dev.kultivator.sekte.SekteIds.E)) {
+			return;
+		}
+		long joined = promoted.data().extra().getCompoundOrEmpty(EXTRA).getLongOr("joined", 0L);
+		int bond = DisciplePaths.bond(promoted.data());
+		int told = 0;
+		for (DiscipleEntity other : Disciples.loaded(master.getUUID())) {
+			if (other == promoted || other.role() != DiscipleEntity.Role.DISCIPLE || told >= 3) {
+				continue;
+			}
+			DiscipleData data = other.data();
+			if (rank(data) <= oldRank && data.extra().getCompoundOrEmpty(EXTRA).getLongOr("joined", Long.MAX_VALUE) < joined
+					&& DisciplePaths.bond(data) > bond) {
+				dev.kultivator.sekte.api.SekteBus.mistreated(master.level().getServer(), master.getUUID(), other.soulId(),
+						dev.kultivator.sekte.api.Perlakuan.TIDAK_ADIL, "tetua.promosi");
+				told++;
+			}
+		}
 	}
 
 	/** Demotion is free, refunds nothing and stops at Tercatat. */
@@ -528,6 +555,11 @@ public final class SectRanks {
 		entity.setSyncedSectRank(rank - 1);
 		Halls.noteRank(master.getUUID(), entity.soulId(), rank - 1, isProtector(data), DisciplePaths.power(data));
 		celebrate(master, entity, rank - 1, false);
+		// Sekte yang Hidup module E (DESIGN 36.2.6): a demotion shames the disciple in front of the sect (P hears it).
+		if (dev.kultivator.sekte.SekteContent.on(dev.kultivator.sekte.SekteIds.E)) {
+			dev.kultivator.sekte.api.SekteBus.mistreated(master.level().getServer(), master.getUUID(), entity.soulId(),
+					dev.kultivator.sekte.api.Perlakuan.DIPERMALUKAN, "tetua.turun");
+		}
 		if (rank - 1 == TERCATAT && entity.mode() != DiscipleEntity.Mode.FOLLOW && entity.mode() != DiscipleEntity.Mode.MEDITATE) {
 			entity.setMode(DiscipleEntity.Mode.FOLLOW);
 		}
