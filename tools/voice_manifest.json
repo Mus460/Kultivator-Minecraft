@@ -1235,6 +1235,350 @@
    "speaker": "disciple",
    "voice": "f3",
    "style": 46
+  },
+  {
+   "event": "voice.kota.auction_open",
+   "ja": "今宵の競売を始めます！",
+   "en": "Tonight's auction begins!",
+   "id": "Lelang malam ini dimulai!",
+   "speaker": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.kota.auction_sold",
+   "ja": "落札！",
+   "en": "Sold!",
+   "id": "Terjual!",
+   "speaker": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.kota.tea_welcome",
+   "ja": "どうぞ、お茶が入りました。",
+   "en": "Please sit, the tea is freshly brewed.",
+   "id": "Silakan duduk, tehnya baru diseduh.",
+   "speaker": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.kota.tea_news",
+   "ja": "もうお聞きになりましたか？",
+   "en": "Have you heard the news?",
+   "id": "Sudah dengar kabarnya?",
+   "speaker": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.kota.black_whisper",
+   "ja": "良い品だ…口の堅い者にだけな。",
+   "en": "Fine goods... for those who know how to keep quiet.",
+   "id": "Barang bagus… untuk orang yang tahu diam.",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.kota.guard_halt",
+   "ja": "止まれ！この町は宗門の庇護下にある。",
+   "en": "Halt! This town is under a sect's protection.",
+   "id": "Berhenti! Kota ini dilindungi sekte.",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.kota.wanderer_dao",
+   "ja": "道は違えど、語り合おうではないか。",
+   "en": "Our paths differ. Let us exchange views.",
+   "id": "Jalan kita berbeda. Mari bertukar pandangan.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.kota.rival_claim",
+   "ja": "その宝は我らのものだ！",
+   "en": "That treasure is ours!",
+   "id": "Harta itu milik kami!",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.kota.immortal_scorn",
+   "ja": "凡塵の者がここまで来たか。",
+   "en": "Mortal dust made it all the way here?",
+   "id": "Debu fana sampai juga ke sini?",
+   "speaker": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.kota.lecture",
+   "ja": "聞け。満ちた杯に道は流れぬ。",
+   "en": "Listen. The Dao does not flow into a full cup.",
+   "id": "Dengarkan. Dao tidak mengalir ke cangkir yang penuh.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.kota.envoy_pleased",
+   "ja": "玉帝はお喜びである。",
+   "en": "The Jade Emperor is pleased.",
+   "id": "Kaisar Giok berkenan.",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.kota.peach_keeper",
+   "ja": "この桃は、己の時に熟すもの。",
+   "en": "These peaches ripen in their own time.",
+   "id": "Persik ini matang menurut waktunya sendiri.",
+   "speaker": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.penjara.free_at_last",
+   "ja": "ついに…自由だ！",
+   "en": "At last... free!",
+   "id": "Akhirnya… bebas!",
+   "speaker": "demon",
+   "style": 21
+  },
+  {
+   "event": "voice.penjara.resealed",
+   "ja": "封印、ここに成る。",
+   "en": "The seal is restored.",
+   "id": "Segel telah pulih.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.menara.next_floor",
+   "ja": "登れ。次の階が待っている。",
+   "en": "Climb. The next floor awaits.",
+   "id": "Naiklah, lantai berikutnya menanti.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.menara.shadow_self",
+   "ja": "我は汝なり。超えられるものなら超えてみよ。",
+   "en": "I am you. Surpass me if you can.",
+   "id": "Akulah dirimu. Kalahkan aku jika kau mampu.",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.gua.ancestor_trial",
+   "ja": "我が陣は汝の力ではなく、心を量る。",
+   "en": "My formation weighs your heart, not your strength.",
+   "id": "Formasiku menimbang hatimu, bukan kekuatanmu.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.heaven.langit.meteor_shower",
+   "ja": "星が雨のごとく降り注ぐ。",
+   "en": "The stars fall like rain.",
+   "id": "Bintang-bintang jatuh seperti hujan.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.heaven.langit.twin_moons",
+   "ja": "二つの月が夜を照らす。",
+   "en": "Two moons light the night.",
+   "id": "Dua bulan menerangi malam.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.heaven.langit.treasure_born",
+   "ja": "天地の宝、ここに生まる。",
+   "en": "A treasure of Heaven and Earth is born.",
+   "id": "Harta langit dan bumi telah lahir.",
+   "speaker": "heaven_fierce",
+   "style": 81
+  },
+  {
+   "event": "voice.heaven.langit.blood_eclipse",
+   "ja": "血の月…天が怒っている。",
+   "en": "A blood moon... Heaven is enraged.",
+   "id": "Bulan berdarah… langit murka.",
+   "speaker": "heaven_fierce",
+   "style": 81
+  },
+  {
+   "event": "voice.langit.treasure_born",
+   "ja": "天地の宝、ここに生まる。",
+   "en": "A treasure of Heaven and Earth is born.",
+   "id": "Harta langit dan bumi telah lahir.",
+   "speaker": "heaven_fierce",
+   "style": 81
+  },
+  {
+   "event": "voice.langit.blood_eclipse",
+   "ja": "血の月…天が怒っている。",
+   "en": "A blood moon... Heaven is enraged.",
+   "id": "Bulan berdarah… langit murka.",
+   "speaker": "heaven_fierce",
+   "style": 81
+  },
+  {
+   "event": "voice.naga.subdued",
+   "ja": "龍、ここに伏す。",
+   "en": "The dragon submits.",
+   "id": "Naga telah tunduk.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.naga.tribulation",
+   "ja": "天が汝の霊獣を試す。",
+   "en": "Heaven tests your spirit beast.",
+   "id": "Langit menguji binatang rohmu.",
+   "speaker": "heaven_fierce",
+   "style": 81
+  },
+  {
+   "event": "voice.naga.evolved",
+   "ja": "古の血が目覚め、霊獣が進化する！",
+   "en": "Ancient blood awakens, the spirit beast evolves!",
+   "id": "Darah purba bangkit, binatang roh berevolusi!",
+   "speaker": "heaven_fierce",
+   "style": 81
+  },
+  {
+   "event": "voice.naga.trib_failed",
+   "ja": "時はまだ満ちぬ…再び立て。",
+   "en": "The time is not yet ripe... rise again.",
+   "id": "Belum waktunya… bangkitlah lagi.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.naga.jiao_roar",
+   "ja": "我が空を乱すは何者ぞ！",
+   "en": "Who dares disturb my sky?",
+   "id": "Siapa berani mengusik langitku?",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.bawah.meng_po_offer",
+   "ja": "飲みなさい。悲しみを忘れるのです。",
+   "en": "Drink, and forget your sorrow.",
+   "id": "Minumlah, lupakan dukamu.",
+   "speaker": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.bawah.meng_po_refuse",
+   "ja": "ならば、すべての記憶を抱いて裁きへ行きなさい。",
+   "en": "Then go to judgement carrying all your memories.",
+   "id": "Kalau begitu, pergilah ke pengadilan dengan semua ingatanmu.",
+   "speaker": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.bawah.yama_judgement",
+   "ja": "鏡の前で己の業を量れ！",
+   "en": "Weigh your deeds before the mirror!",
+   "id": "Timbang perbuatanmu di depan cermin!",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.bawah.yama_book",
+   "ja": "汝の名、この帳に記されておる。",
+   "en": "Your name is written in this book.",
+   "id": "Namamu tertulis di buku ini.",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.bawah.ox_head",
+   "ja": "亡者よ、ついて来い！",
+   "en": "Soul, come with us!",
+   "id": "Arwah, ikut kami!",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.bawah.ghost_plea",
+   "ja": "どうか…言伝を。",
+   "en": "Please... deliver my message.",
+   "id": "Tolong… sampaikan pesanku.",
+   "speaker": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.laut.dragon_king",
+   "ja": "我が宮に参るは何者ぞ。",
+   "en": "Who dares come to my palace?",
+   "id": "Siapa yang berani datang ke istanaku?",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.laut.gate_guard",
+   "ja": "水晶宮へようこそ。",
+   "en": "Welcome to the Crystal Palace.",
+   "id": "Selamat datang di Istana Kristal.",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.laut.penglai_trial",
+   "ja": "汝の悟りを示せ。",
+   "en": "Show me your insight.",
+   "id": "Tunjukkan wawasanmu.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.kapal.launch",
+   "ja": "霊舟、出航！",
+   "en": "Spirit ship, set sail!",
+   "id": "Kapal roh, berangkat!",
+   "speaker": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.kapal.cloud_leap",
+   "ja": "雲海を越えよ！",
+   "en": "Pierce the sea of clouds!",
+   "id": "Menembus lautan awan!",
+   "speaker": "heaven_fierce",
+   "style": 81
+  },
+  {
+   "event": "voice.kapal.arrive",
+   "ja": "到着いたしました。",
+   "en": "We have arrived.",
+   "id": "Kita telah tiba.",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.kapal.sky_pirates",
+   "ja": "空賊だ！積み荷を置いていけ！",
+   "en": "Sky pirates! Leave your cargo!",
+   "id": "Bajak langit! Tinggalkan muatanmu!",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.kapal.hull_broken",
+   "ja": "船体損傷、降下する！",
+   "en": "Hull damaged, we are going down!",
+   "id": "Lambung rusak, kita turun!",
+   "speaker": "m1",
+   "style": 33
+  },
+  {
+   "event": "voice.peta.site_found",
+   "ja": "山海、汝の名を記す。",
+   "en": "The mountains and seas record your name.",
+   "id": "Gunung dan laut mencatat namamu.",
+   "speaker": "heaven",
+   "style": 13
   }
  ],
  "disciple_voices": {

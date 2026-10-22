@@ -12,7 +12,6 @@ import dev.kultivator.dunia.api.DuniaApi;
 import dev.kultivator.dunia.api.TreasureBirth;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
-import dev.kultivator.voice.Voice;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -167,7 +166,7 @@ public final class KedaiTeh {
 			Msg.actionBar(player, Component.translatable("kultivator.kota.kurang_batu", NilaiBatu.text(price)).withStyle(ChatFormatting.RED));
 			return;
 		}
-		Voice.say(npc, npc.voiceKey("greet_alt"), "kultivator.kota.teh.suara.sambut");
+		KotaVoice.say(npc, KotaVoice.TEA_WELCOME, npc.voiceKey("greet_alt"), "kultivator.kota.teh.suara.sambut");
 		if (asItem) {
 			ItemStack stack = Harga.item("teh_" + teaItem(kind));
 			if (!player.getInventory().add(stack) && !stack.isEmpty()) {
@@ -196,7 +195,7 @@ public final class KedaiTeh {
 		if (!player.getInventory().add(token) && !token.isEmpty()) {
 			Kota.drop(player, token);
 		}
-		Voice.say(npc, npc.voiceKey("careful"), null);
+		KotaVoice.say(npc, KotaVoice.BLACK_WHISPER, npc.voiceKey("careful"), null);
 		Msg.chat(player, Component.translatable("kultivator.kota.teh.token_bisik").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
 	}
 
@@ -256,7 +255,7 @@ public final class KedaiTeh {
 				direction(player.blockPosition(), site.pos()), distance, site.pos().getX(), site.pos().getZ())
 				.withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC));
 		if (npc != null) {
-			Voice.say(npc, npc.voiceKey("careful"), null);
+			KotaVoice.say(npc, KotaVoice.TEA_NEWS, npc.voiceKey("careful"), null);
 		}
 		counted(player);
 		return true;

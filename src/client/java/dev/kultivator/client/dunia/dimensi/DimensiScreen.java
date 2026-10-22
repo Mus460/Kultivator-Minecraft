@@ -35,6 +35,10 @@ import java.util.Optional;
  * (the Dragon King, the island merchant, the Penglai immortal). Each shows its lore line, what will happen, and talisman
  * strips to choose with; every choice is sent to the server ({@link DimensiNet.Action}), which checks it again (the
  * client never decides). The Book's "Coret Namamu" must be held for 2 s. Esc closes; the game never pauses.
+ * <p>
+ * The detail pass adds the old fisherman's news of the sea, Bai and Hei Wuchang's guidance on Teras Wangxiang, the
+ * Dragon King's armoury (a second page of his scroll, turned here without a packet), and the Mirror's reading of the
+ * soul's deeds in the wide world and its Mode Kehancuran. More than five strips are laid out in two columns.
  */
 public class DimensiScreen extends Screen {
 
@@ -45,14 +49,20 @@ public class DimensiScreen extends Screen {
 	private record Strip(Component label, String action, boolean enabled, boolean hold, @Nullable ItemStack icon) {
 	}
 
+	/** A strip whose action starts with this is handled here (a page turn, closing), never sent. */
+	private static final String LOCAL = "#";
+
 	private final int screen;
 	private final int entity;
 	private final CompoundTag data;
 	private final boolean sea;
-	private final Component heading;
+	private Component heading;
 	private final List<Component> lines = new ArrayList<>();
 	private final List<Strip> strips = new ArrayList<>();
 	private @Nullable Component source;
+	/** The page of a two-page scroll (the Dragon King: 0 audience, 1 armoury). */
+	private int page;
+	private int columns = 1;
 
 	private int x0;
 	private int y0;
@@ -69,8 +79,18 @@ public class DimensiScreen extends Screen {
 		this.entity = entity;
 		this.data = data;
 		this.sea = screen == DimensiNet.SCREEN_KING || screen == DimensiNet.SCREEN_MERCHANT || screen == DimensiNet.SCREEN_PENGLAI
-				|| screen == DimensiNet.SCREEN_HERMIT || screen == DimensiNet.SCREEN_GUARD;
+				|| screen == DimensiNet.SCREEN_HERMIT || screen == DimensiNet.SCREEN_GUARD || screen == DimensiNet.SCREEN_FISHER;
 		this.heading = build();
+	}
+
+	/** Turns to {@code page} (the same data, built again). */
+	private void turn(int page) {
+		this.page = page;
+		lines.clear();
+		strips.clear();
+		source = null;
+		heading = build();
+		init();
 	}
 
 	static void open(DimensiNet.Open payload) {
@@ -121,6 +141,24 @@ public class DimensiScreen extends Screen {
 						lines.add(sect.isEmpty() ? t("court.karma.no_sect", karma.getIntOr("disciples", 0))
 								: t("court.karma.sect", sect, karma.getIntOr("disciples", 0)));
 						lines.add(t("court.karma.bred", karma.getIntOr("bred", 0)));
+						// the deeds of the wide world and the ruin the soul has wrought (Mode Kehancuran)
+						ListTag deeds = karma.getListOrEmpty("deeds");
+						if (deeds.isEmpty()) {
+							lines.add(t("court.karma.no_deeds"));
+						} else {
+							List<String> names = new ArrayList<>();
+							for (int i = 0; i < deeds.size(); i++) {
+								String deed = deeds.getStringOr(i, "");
+								if (!deed.isEmpty()) {
+									names.add(Component.translatable("kultivator.dimensi.ui.court.deed." + deed.substring(deed.indexOf('/') + 1))
+											.getString());
+								}
+							}
+							lines.add(t("court.karma.deeds", deeds.size(), karma.getIntOr("deeds_max", deeds.size()), String.join(", ", names)));
+						}
+						lines.add(karma.getBooleanOr("hancur", false)
+								? t("court.karma.hancur_on", karma.getIntOr("hancur_casts", 0), karma.getIntOr("hancur_blocks", 0))
+								: t("court.karma.hancur_off", karma.getIntOr("hancur_casts", 0)));
 						strips.add(new Strip(t("court.btn.accept"), "court:accept", true, false, null));
 					}
 					case 1 -> strips.add(new Strip(t("court.btn.duel"), "court:duel", true, false, null));
@@ -175,6 +213,26 @@ public class DimensiScreen extends Screen {
 			case DimensiNet.SCREEN_KING -> {
 				int q = data.getIntOr("q", 0);
 				int price = data.getIntOr("price", 80);
+				long nb = data.getLongOr("nb", 0L);
+				ListTag armory = data.getListOrEmpty("armory");
+				if (page == 1) {
+					// the armoury of the Crystal Palace: sea-forged artifacts of the water element
+					lines.add(t("king.armory.intro"));
+					lines.add(t("king.nb", nb));
+					lines.add(t(q >= 5 ? "king.armory.honoured" : "king.armory.guest"));
+					for (int i = 0; i < armory.size(); i++) {
+						CompoundTag arm = armory.getCompoundOrEmpty(i);
+						boolean open = arm.getBooleanOr("open", false);
+						int cost = arm.getIntOr("price", 0);
+						Component name = t("king.armory.item", Component.translatable("kultivator.tempa.grade." + arm.getIntOr("grade", 3)),
+								Component.translatable("kultivator.tempa.form." + arm.getStringOr("form", "pedang")), cost);
+						strips.add(new Strip(open ? name : t("king.armory.locked", name), "raja:senjata:" + i, open && nb >= cost, false,
+								stack("kultivator:forged_artifact", 1)));
+					}
+					strips.add(new Strip(t("king.btn.back"), LOCAL + "page:0", true, false, null));
+					source = Component.translatable("kultivator.dimensi.raja_naga.source");
+					return t("king.armory.title");
+				}
 				lines.add(t("king.intro"));
 				lines.add(t("king.q" + Math.max(0, Math.min(5, q))));
 				lines.add(t("king.nb", data.getLongOr("nb", 0L)));
@@ -190,8 +248,64 @@ public class DimensiScreen extends Screen {
 				} else if (q == 4) {
 					strips.add(new Strip(t("king.btn.lapor"), "raja:lapor", true, false, null));
 				}
+				if (!armory.isEmpty()) {
+					strips.add(new Strip(t("king.btn.armory"), LOCAL + "page:1", true, false, stack("kultivator:forged_artifact", 1)));
+				}
 				source = Component.translatable("kultivator.dimensi.raja_naga.source");
 				return t("king.title");
+			}
+			case DimensiNet.SCREEN_FISHER -> {
+				long wait = data.getLongOr("wait", 0L);
+				int seen = data.getIntOr("seen", 0);
+				int sky = data.getIntOr("sky", 0);
+				lines.add(t("fisher.intro"));
+				lines.add(t("fisher.seen", Integer.bitCount(seen & 15), 4));
+				if (sky > 0) {
+					lines.add(t("fisher.sky." + sky));
+				}
+				lines.add(wait > 0L ? t("fisher.wait", wait / 20L + 1L) : t("fisher.ready"));
+				String[] places = {"herba", "pertapa", "pasar", "karang", "istana", "penglai"};
+				for (int i = 0; i < places.length; i++) {
+					boolean known = i < 4 && (seen & (1 << i)) != 0;
+					Component label = Component.translatable("kultivator.dimensi.nelayan.tempat." + places[i]);
+					strips.add(new Strip(known ? t("fisher.btn.seen", label) : label, "nelayan:" + places[i], wait <= 0L, false, null));
+				}
+				if (data.getBooleanOr("turtle", true)) {
+					strips.add(new Strip(Component.translatable("kultivator.dimensi.nelayan.tempat.penyu"), "nelayan:penyu", true, false, null));
+				}
+				source = Component.translatable("kultivator.dimensi.laut.source");
+				return t("fisher.title");
+			}
+			case DimensiNet.SCREEN_WUCHANG -> {
+				boolean hei = data.getBooleanOr("hitam", false);
+				String who = hei ? "hitam" : "putih";
+				int tier = Math.max(0, Math.min(2, data.getIntOr("tier", 0)));
+				lines.add(t("wuchang." + who + ".greet." + tier));
+				if (data.getBooleanOr("soul", false)) {
+					lines.add(t("wuchang.soul", data.getLongOr("left", 0L) / 1200L + 1L));
+				} else {
+					lines.add(t("wuchang.not_soul"));
+				}
+				long luka = data.getLongOr("luka", 0L);
+				if (luka > 0L) {
+					lines.add(t("wuchang.luka", luka / 1200L + 1L));
+				}
+				int passed = data.getIntOr("passed", 0);
+				int required = data.getIntOr("required", 10);
+				lines.add(t("wuchang.progress", t(data.getBooleanOr("mengpo", false) ? "wuchang.mengpo_done" : "wuchang.mengpo_not"), passed, required));
+				String next = data.getStringOr("next", "mengpo");
+				Component place = "court".equals(next)
+						? t("wuchang.next.court", data.getIntOr("court", passed + 1), Component.translatable("kultivator.dimensi.raja." + data.getIntOr("court", passed + 1)))
+						: t("wuchang.next." + next);
+				String dir = data.getStringOr("dir", "");
+				lines.add(dir.isEmpty() ? t("wuchang.way_unknown", place) : t("wuchang.way", place, Component.translatable(dir), data.getIntOr("dist", 0)));
+				if (data.getBooleanOr("eclipse", false)) {
+					lines.add(t("wuchang.eclipse"));
+				}
+				lines.add(t("wuchang." + who + ".parting"));
+				strips.add(new Strip(t("wuchang.btn.go"), LOCAL + "close", true, false, null));
+				source = Component.translatable("kultivator.dimensi.wuchang.source");
+				return t("wuchang." + who + ".title");
 			}
 			case DimensiNet.SCREEN_MERCHANT -> {
 				long nb = data.getLongOr("nb", 0L);
@@ -255,12 +369,27 @@ public class DimensiScreen extends Screen {
 		boxes.clear();
 		int stripH = 16;
 		int gap = 4;
-		int rows = strips.size();
+		// more than five strips: two columns, filled row by row (the fisherman's places, the armoury)
+		columns = strips.size() > 5 ? 2 : 1;
+		int rows = (strips.size() + columns - 1) / columns;
+		int left = x0 + 22;
+		int right = x1 - 22;
+		int colW = (right - left - (columns - 1) * gap) / columns;
+		int[][] placed = new int[strips.size()][];
 		int bottom = y1 - 16;
-		for (int i = rows - 1; i >= 0; i--) {
+		for (int r = rows - 1; r >= 0; r--) {
 			int top = bottom - stripH;
-			boxes.add(0, new int[]{x0 + 22, top, x1 - 22, bottom});
+			for (int c = 0; c < columns; c++) {
+				int i = r * columns + c;
+				if (i < strips.size()) {
+					int bx = left + c * (colW + gap);
+					placed[i] = new int[]{bx, top, columns == 1 ? right : bx + colW, bottom};
+				}
+			}
 			bottom = top - gap;
+		}
+		for (int[] box : placed) {
+			boxes.add(box);
 		}
 	}
 
@@ -402,6 +531,15 @@ public class DimensiScreen extends Screen {
 						return true;
 					}
 					UiSound.press();
+					if (strip.action().startsWith(LOCAL)) {
+						String local = strip.action().substring(LOCAL.length());
+						if (local.startsWith("page:")) {
+							turn("page:1".equals(local) ? 1 : 0);
+						} else {
+							onClose();
+						}
+						return true;
+					}
 					send(strip.action());
 					onClose();
 					return true;

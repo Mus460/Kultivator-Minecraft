@@ -27,12 +27,23 @@ public record LangitFxPayload(int kind, double x, double y, double z, int a, int
 	public static final int KIND_MARKS = 4;
 	/** Dew gathered here (a sparkle). */
 	public static final int KIND_DEW = 5;
-	/** A meteor stone absorbed by the receiver. */
+	/** A meteor stone absorbed by the receiver ({@code a}: 0 Batu Meteor Roh, 1 Inti Meteor Agung, 2 Kristal Gerhana). */
 	public static final int KIND_ABSORB = 6;
 	/** The channel at the treasure broke (hurt or moved away). */
 	public static final int KIND_CHANNEL_BROKEN = 7;
 	/** A weak demon prison seal near the receiver ({@code a} = felt strength 1-100): the ash-red omen sky (SealOmens). */
 	public static final int KIND_SEAL_OMEN = 8;
+	/**
+	 * A Meteor Agung is falling: (x, y, z) its landing, {@link #ids} = {offset x, y, z in sixteenths of a block, fall ticks}
+	 * so the client can draw it across the sky beyond the tracking range (the same path as {@link MeteorRohEntity}).
+	 */
+	public static final int KIND_GREAT_INCOMING = 9;
+	/** A Meteor Agung landed here: the big burst and the lingering crater glow. */
+	public static final int KIND_GREAT_IMPACT = 10;
+	/** The treasure guardians near the receiver ({@link #ids}; {@code a} = tier): their sigils (replaces the previous list). */
+	public static final int KIND_GUARDS = 11;
+	/** A treasure guardian ({@code a} = tier) or an eclipse-touched monster ({@code a} = 0) fell here: the dissolving burst. */
+	public static final int KIND_GUARD_FALL = 12;
 
 	private static final int[] NO_IDS = new int[0];
 

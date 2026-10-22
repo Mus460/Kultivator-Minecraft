@@ -186,7 +186,7 @@ public class YakshaEntity extends Monster {
 	public void die(DamageSource source) {
 		super.die(source);
 		if (this.level() instanceof ServerLevel level && source.getEntity() instanceof ServerPlayer killer) {
-			Dimensi.monsterSlain(level, killer, this, isChief() ? "yaksha_chief" : "yaksha");
+			Dimensi.monsterSlain(level, killer, this, isChief() ? "yaksha_chief" : "yaksha", variant() == LAUT ? tier() : -1);
 		}
 	}
 

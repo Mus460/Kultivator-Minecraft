@@ -3,12 +3,8 @@
   "values": [
     "minecraft:plains",
     "minecraft:meadow",
-    "minecraft:cherry_grove",
     "minecraft:forest",
     "minecraft:birch_forest",
-    "minecraft:flower_forest",
-    "minecraft:savanna",
-    "minecraft:taiga",
-    "minecraft:snowy_plains"
+    "minecraft:flower_forest"
   ]
 }

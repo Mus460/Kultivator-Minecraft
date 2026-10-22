@@ -2,17 +2,21 @@ package dev.kultivator.dunia.langit;
 
 import dev.kultivator.abadi.Abadi;
 import dev.kultivator.cultivation.Qi;
+import dev.kultivator.dao.Comprehension;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
+import dev.kultivator.data.Dao;
 import dev.kultivator.dunia.DuniaCommands;
 import dev.kultivator.dunia.DuniaConfig;
 import dev.kultivator.dunia.DuniaSpine;
 import dev.kultivator.dunia.api.DuniaApi;
 import dev.kultivator.dunia.api.SpiritWeather;
 import dev.kultivator.network.Net;
+import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.voice.Voice;
 import dev.kultivator.voice.VoiceEvents;
+import dev.kultivator.voice.VoicePayload;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -41,6 +45,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Module L, Langit &amp; Cuaca (DESIGN 34.5.8 Peristiwa Langit Acak, 34.5.9 Pertanda Harta Lahir, 34.5.10 Cuaca Roh;
@@ -95,6 +101,7 @@ public final class Langit {
 			}
 		});
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(SkyEvents::onKill);
+		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(TreasureGuardians::onKill);
 		UseItemCallback.EVENT.register(Langit::useItem);
 		ServerPlayerEvents.JOIN.register(Langit::syncPlayer);
 		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) -> syncPlayer(player));
@@ -107,6 +114,7 @@ public final class Langit {
 			SkyEvents.clear();
 			SpiritWeathers.clear();
 			TreasureBirths.clearAll();
+			TreasureGuardians.clearAll();
 			SealOmens.clear();
 			ONCE.clear();
 		});
@@ -175,6 +183,66 @@ public final class Langit {
 		return true;
 	}
 
+	// ================================================================== Inti Meteor Agung, Kristal Gerhana
+
+	/**
+	 * Sneak + use outside meditation: {@link LangitItems#GREAT_CORE_QI} Qi (as far as the sea holds) and
+	 * {@link LangitItems#GREAT_CORE_SPACE} Space Dao comprehension, also with a full sea (the insight is the prize).
+	 */
+	static boolean absorbGreatCore(ServerPlayer player, ItemStack stack) {
+		if (stack.isEmpty() || player.getCooldowns().isOnCooldown(stack)) {
+			return false;
+		}
+		CultivationData data = Cultivators.get(player);
+		if (data.meditating()) {
+			Msg.actionBar(player, Component.translatable("kultivator.langit.meteor.meditating").withColor(0x8FE6FF));
+			return false;
+		}
+		player.getCooldowns().addCooldown(stack, 40);
+		stack.consume(1, player);
+		double before = data.qi();
+		Qi.restore(player, LangitItems.GREAT_CORE_QI);
+		double gained = Math.max(0.0D, Cultivators.get(player).qi() - before);
+		double insight = Comprehension.grant(player, Dao.SPACE, LangitItems.GREAT_CORE_SPACE);
+		Cultivators.dirty(player);
+		Msg.chat(player, Component.translatable("kultivator.langit.agung.absorbed", Msg.number(gained + 1.0E-6D), Msg.number(insight + 1.0E-6D))
+				.withColor(0xA8F0FF));
+		Advancements.grant(player, "dunia/great_meteor");
+		Net.send(player, LangitFxPayload.at(LangitFxPayload.KIND_ABSORB, player.getX(), player.getY() + 1.0D, player.getZ(), 1));
+		player.level().playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE,
+				SoundSource.PLAYERS, 1.2F, 0.5F);
+		player.level().playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), SoundEvents.BEACON_POWER_SELECT,
+				SoundSource.PLAYERS, 0.8F, 0.7F);
+		return true;
+	}
+
+	/** Sneak + use: {@link LangitItems#ECLIPSE_SHADOW} Shadow Dao comprehension, {@link LangitItems#ECLIPSE_PER_DAY} per day. */
+	static boolean absorbEclipseCrystal(ServerPlayer player, ItemStack stack) {
+		if (stack.isEmpty() || player.getCooldowns().isOnCooldown(stack)) {
+			return false;
+		}
+		CultivationData data = Cultivators.get(player);
+		CompoundTag own = extra(data);
+		long day = Math.floorDiv(player.level().getOverworldClockTime(), (long) SkyEvents.DAY);
+		int count = own.getLongOr("kristal_day", -1L) == day ? own.getIntOr("kristal_n", 0) : 0;
+		if (count >= LangitItems.ECLIPSE_PER_DAY) {
+			Msg.actionBar(player, Component.translatable("kultivator.langit.kristal.limit", LangitItems.ECLIPSE_PER_DAY).withStyle(ChatFormatting.YELLOW));
+			return false;
+		}
+		player.getCooldowns().addCooldown(stack, 20);
+		stack.consume(1, player);
+		own.putLong("kristal_day", day);
+		own.putInt("kristal_n", count + 1);
+		double insight = Comprehension.grant(player, Dao.SHADOW, LangitItems.ECLIPSE_SHADOW);
+		Cultivators.dirty(player);
+		Msg.actionBar(player, Component.translatable("kultivator.langit.kristal.absorbed", Msg.number(insight + 1.0E-6D), count + 1,
+				LangitItems.ECLIPSE_PER_DAY).withColor(0xFF6A58));
+		Net.send(player, LangitFxPayload.at(LangitFxPayload.KIND_ABSORB, player.getX(), player.getY() + 1.0D, player.getZ(), 2));
+		player.level().playSound(null, player.getX(), player.getY() + 1.0D, player.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK,
+				SoundSource.PLAYERS, 0.8F, 0.5F);
+		return true;
+	}
+
 	// ================================================================== Embun Roh
 
 	/** The Qi regeneration factor of a drunk Embun Roh (1 when none runs). */
@@ -227,6 +295,10 @@ public final class Langit {
 		stack.consume(1, serverPlayer);
 		TreasureBirths.give(serverPlayer, new ItemStack(LangitItems.EMBUN_ROH));
 		Msg.actionBar(serverPlayer, Component.translatable("kultivator.langit.dew.gathered", count + 1, config.dewPerDay).withColor(0xD8B8FF));
+		if (count + 1 >= config.dewPerDay) {
+			// every dew of the day gathered
+			Advancements.grant(serverPlayer, "dunia/dew_full");
+		}
 		serverLevel.playSound(null, serverPlayer.getX(), serverPlayer.getY() + 1.0D, serverPlayer.getZ(), SoundEvents.BOTTLE_FILL,
 				SoundSource.PLAYERS, 1.0F, 1.3F);
 		Net.send(serverPlayer, LangitFxPayload.at(LangitFxPayload.KIND_DEW, serverPlayer.getX(), serverPlayer.getEyeY(), serverPlayer.getZ(),
@@ -265,10 +337,22 @@ public final class Langit {
 	static void heaven(ServerPlayer player, @Nullable String newKey, String fallback) {
 		if (newKey != null && VoiceEvents.exists("heaven." + newKey)) {
 			Voice.heaven(player, "heaven." + newKey);
+		} else if (newKey != null && OWN_LINES.contains(newKey)) {
+			// in sounds.json and lang-src/voice but not (yet) in VoiceEvents: sent as the same payload Voice sends, the
+			// client plays an unregistered voice id directly; the same once-per-key cooldown as Voice.heaven
+			String key = "heaven." + newKey;
+			if (Voice.ready(player.getUUID(), "inner:" + key, Voice.HEAVEN_SAME_KEY)) {
+				Net.send(player, new VoicePayload("voice." + key, "kultivator.voice." + key, Optional.empty(), VoicePayload.KIND_HEAVEN,
+						false, -1, player.getX(), player.getEyeY(), player.getZ(), 1.0F, 1.0F));
+			}
 		} else {
 			Voice.heaven(player, fallback);
 		}
 	}
+
+	/** The Heaven lines of DESIGN 34.8 for this module, generated into sounds.json as {@code voice.heaven.<key>}. */
+	private static final Set<String> OWN_LINES = Set.of("langit.meteor_shower", "langit.blood_eclipse", "langit.twin_moons",
+			"langit.treasure_born");
 
 	private Langit() {
 	}

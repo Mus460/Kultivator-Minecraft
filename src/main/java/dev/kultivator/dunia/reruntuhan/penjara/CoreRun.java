@@ -161,6 +161,9 @@ public final class CoreRun extends AnchorRun {
 		RFx.at(level, centre().add(0.0D, 2.0D, 0.0D), RFx.SEAL_SEALED, 0, seal.integrity(), 1.2F);
 		level.playSound(null, centre().x, centre().y, centre().z, SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 1.0F, 0.8F);
 		Msg.chat(player, Component.translatable("kultivator.reruntuhan.penjara.core.done", seal.integrity()).withStyle(ChatFormatting.GOLD));
+		if (Prisons.eclipse(level)) {
+			Advancements.grant(player, "dunia/eclipse_seal");
+		}
 	}
 
 	private static void take(ServerPlayer player, Item item, int count) {
@@ -422,7 +425,10 @@ public final class CoreRun extends AnchorRun {
 		sink(true);
 		Prisons.resealed(level, seal);
 		RFx.big(level, centre(), RFx.SEAL_SEALED, seal.king(), 100, (float) ARENA);
-		Voice.heavenNear(level, centre(), "heaven.witness", 96.0D);
+		Component sealVoice = Component.translatable("kultivator.reruntuhan.penjara.seal_voice");
+		for (ServerPlayer player : playersWithin(96.0D)) {
+			Voice.inner(player, "penjara.resealed", sealVoice);
+		}
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : heroes) {
 			int nb = RRewards.roll(random, 300, 600, 1.0D);

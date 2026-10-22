@@ -22,7 +22,9 @@ import org.joml.Vector3f;
  * Draws the born treasure (DESIGN 34.5.9): its item turning and bobbing above a jade lotus of three petal rings (8 outer,
  * 8 inner, 5 heart petals; each petal two curved quads of the generated petal texture, emissive), a soft glow of the
  * tier's colour behind the item and on the ground, and the channel ring that fills while a player claims it. The lotus
- * slowly turns and opens as the channel grows. Petal rings drop to two at Minimal.
+ * slowly turns and opens as the channel grows. Under it a seal ring of glyphs turns the other way; from Harta Roh up
+ * 2 / 4 / 6 motes of the tier circle the treasure, faster while it is channelled. Petal rings drop to two, the second
+ * seal ring and the motes to none at Minimal.
  */
 public class HartaLahirRenderer extends EntityRenderer<HartaLahirEntity, HartaLahirRenderer.State> {
 
@@ -78,6 +80,14 @@ public class HartaLahirRenderer extends EntityRenderer<HartaLahirEntity, HartaLa
 		petals(lotus, 5, 0.04F, 0.36F, 66.0F - 10.0F * open, 86.0F - 8.0F * open, 0.2F, (-spin * 1.5F) * Mth.DEG_TO_RAD, heart);
 		lotus.submit(collector, poseStack);
 
+		// the seal ring turning under the lotus (counter to the petals), a second finer one at Normal and up
+		LangitSink rune = new LangitSink(LangitSink.RUNE);
+		flat(rune, 0.0F, 0.02F, 0.0F, 1.55F + 0.15F * open, -spin * 0.5F * Mth.DEG_TO_RAD, LangitRenderer.argb(0.7F + 0.25F * open, rgb));
+		if (rich) {
+			flat(rune, 0.0F, 0.035F, 0.0F, 2.3F, spin * 0.3F * Mth.DEG_TO_RAD, LangitRenderer.argb(0.3F, 0xFFFFFF));
+		}
+		rune.submit(collector, poseStack);
+
 		// glows and the channel ring
 		LangitSink glow = new LangitSink(LangitSink.GLOW);
 		LangitSink ring = new LangitSink(LangitSink.RING);
@@ -87,6 +97,14 @@ public class HartaLahirRenderer extends EntityRenderer<HartaLahirEntity, HartaLa
 		float itemY = 0.78F + 0.07F * Mth.sin(state.age * 0.09F);
 		billboard(glow, 0.0F, itemY, 0.0F, 0.75F + 0.25F * open, LangitRenderer.argb(0.55F * pulse + 0.3F * open, rgb), right, up);
 		flat(glow, 0.0F, 0.03F, 0.0F, 1.5F, LangitRenderer.argb(0.55F * pulse, rgb));
+		// motes of the tier circling the treasure: none for Harta Fana, 2 / 4 / 6 above (doubled speed while channelled)
+		int motes = rich ? (state.tier - 1) * 2 : 0;
+		for (int i = 0; i < motes; i++) {
+			float phase = state.age * (0.05F + 0.05F * open) + Mth.TWO_PI * i / motes;
+			float r = 0.85F + 0.12F * Mth.sin(state.age * 0.07F + i);
+			float my = itemY + 0.25F * Mth.sin(phase * 1.5F + i);
+			billboard(glow, Mth.cos(phase) * r, my, Mth.sin(phase) * r, 0.09F, LangitRenderer.argb(0.9F, i % 2 == 0 ? rgb : 0xFFFFFF), right, up);
+		}
 		if (open > 0.0F) {
 			arc(ring, 0.0F, 0.04F, 0.0F, 1.15F, 0.28F, open, LangitRenderer.argb(0.9F, 0xFFF0C0));
 			arc(ring, 0.0F, 0.05F, 0.0F, 1.15F, 0.6F, open, LangitRenderer.argb(0.3F, rgb));
@@ -165,6 +183,16 @@ public class HartaLahirRenderer extends EntityRenderer<HartaLahirEntity, HartaLa
 		sink.vertex(x - half, y, z + half, 0.0F, 1.0F, color, 0.0F, 1.0F, 0.0F);
 		sink.vertex(x + half, y, z + half, 1.0F, 1.0F, color, 0.0F, 1.0F, 0.0F);
 		sink.vertex(x + half, y, z - half, 1.0F, 0.0F, color, 0.0F, 1.0F, 0.0F);
+	}
+
+	/** A horizontal square turned by {@code angle} radians. */
+	private static void flat(LangitSink sink, float x, float y, float z, float half, float angle, int color) {
+		float c = Mth.cos(angle) * half;
+		float s = Mth.sin(angle) * half;
+		sink.vertex(x - c + s, y, z - s - c, 0.0F, 0.0F, color, 0.0F, 1.0F, 0.0F);
+		sink.vertex(x - c - s, y, z - s + c, 0.0F, 1.0F, color, 0.0F, 1.0F, 0.0F);
+		sink.vertex(x + c - s, y, z + s + c, 1.0F, 1.0F, color, 0.0F, 1.0F, 0.0F);
+		sink.vertex(x + c + s, y, z + s - c, 1.0F, 0.0F, color, 0.0F, 1.0F, 0.0F);
 	}
 
 	/** A flat ring arc from north, clockwise, covering {@code fraction} of the circle (24 segments for a full ring). */

@@ -178,7 +178,7 @@ final class PasarGelap {
 				Kota.drop(player, stack);
 			}
 			addShadowReputation(player, TRADE_REP);
-			Voice.say(npc, npc.voiceKey("careful"), "kultivator.kota.gelap.suara.bisik");
+			KotaVoice.say(npc, KotaVoice.BLACK_WHISPER, npc.voiceKey("careful"), "kultivator.kota.gelap.suara.bisik");
 			Msg.actionBar(player, Component.translatable("kultivator.kota.toko.dibeli", name, NilaiBatu.text(offer.price())).withStyle(ChatFormatting.DARK_PURPLE));
 			double chance = Kota.config().raidChance * (shadowReputation(player) >= 50 ? 0.5D : 1.0D);
 			if (player.getRandom().nextDouble() < chance) {
@@ -226,7 +226,7 @@ final class PasarGelap {
 		}
 		RAIDS.put(player.getUUID(), new Raid(town, until, guards));
 		if (!guards.isEmpty()) {
-			Voice.say(guards.getFirst(), guards.getFirst().voiceKey("attack"), "kultivator.kota.gelap.suara.razia");
+			KotaVoice.say(guards.getFirst(), KotaVoice.GUARD_HALT, guards.getFirst().voiceKey("attack"), "kultivator.kota.gelap.suara.razia");
 		}
 		Fx.send(level, player.position().add(0.0D, 1.0D, 0.0D), FxType.MUSUH, MusuhFxIds.AMBUSH_ALERT, 0x6A7AB8, 3.0F);
 		Msg.chat(player, Component.translatable("kultivator.kota.gelap.razia", BRIBE_PER_BAND * Math.max(1, Cultivators.get(player).realm().ordinal()))
@@ -355,6 +355,10 @@ final class PasarGelap {
 		}
 		tag.putInt("rep", shadowReputation(player));
 		tag.putDouble("raid", Kota.config().raidChance * (shadowReputation(player) >= 50 ? 0.5D : 1.0D));
+		if (player.level() instanceof net.minecraft.server.level.ServerLevel here && KabarDunia.eclipse(here)) {
+			// the Gerhana Darah surcharge (x1.25 in every price above) gets its own notice in the tab
+			tag.putInt("eclipse", (int) Math.round((KabarDunia.shadowFactor(here) - 1.0D) * 100.0D));
+		}
 		Raid raid = RAIDS.get(player.getUUID());
 		if (raid != null) {
 			tag.putLong("raid_left", Math.max(0L, raid.until() - player.level().getGameTime()));

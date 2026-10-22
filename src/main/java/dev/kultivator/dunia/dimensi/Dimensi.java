@@ -14,6 +14,7 @@ import dev.kultivator.dunia.dimensi.laut.Laut;
 import dev.kultivator.dunia.dimensi.laut.LautAnchors;
 import dev.kultivator.dunia.dimensi.laut.SeaGate;
 import dev.kultivator.dunia.dimensi.laut.SeaPeople;
+import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -30,6 +31,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +48,9 @@ import java.util.UUID;
  * anchor handlers ({@code bawah}, {@code laut}), the SoulService, the ship route, the test commands and the world
  * generation pack {@code kultivator:dunia_dimensi} (the overworld sets: Kuil Gerbang Hantu and Pusaran Laut). The two
  * dimensions and their own structure sets are base data.
+ * <p>
+ * Listens to module L's {@code SKY_EVENT} ({@link DimensiSky}: the blood eclipse opens the ghost gates and thickens the
+ * hungry dead, the twin moons raise the spirit tide) and module T's {@code VOYAGE} (the ship's arrival at sea).
  * <p>
  * Block safety (DESIGN 34.0 W1): nothing in this module places, breaks or changes a block at runtime. Its towns of the
  * dead and palaces of the sea come only from world generation in new chunks; gates, books, whirlpools and the turtle's
@@ -91,6 +96,7 @@ public final class Dimensi {
 			TASKS.clear();
 			LAST_HURT.clear();
 			ticks = 0L;
+			DimensiSky.clear();
 			Bawah.clear();
 			Laut.clear();
 		});
@@ -153,13 +159,18 @@ public final class Dimensi {
 
 	/** Stands up a mark of {@code kind} at {@code at} for an anchor (see {@link TandaEntity}). */
 	public static @Nullable TandaEntity mark(ServerLevel level, Vec3 at, int kind, @Nullable UUID anchor) {
+		return mark(level, at, 0.0F, kind, anchor);
+	}
+
+	/** {@link #mark(ServerLevel, Vec3, int, UUID)} turned to {@code yaw} (the anchor's: its piece's rotation). */
+	public static @Nullable TandaEntity mark(ServerLevel level, Vec3 at, float yaw, int kind, @Nullable UUID anchor) {
 		TandaEntity mark = DimensiEntities.TANDA.create(level, EntitySpawnReason.EVENT);
 		if (mark == null) {
 			return null;
 		}
 		mark.setKind(kind);
 		mark.setAnchor(anchor);
-		mark.snapTo(at.x, at.y, at.z, 0.0F, 0.0F);
+		mark.snapTo(at.x, at.y, at.z, yaw, 0.0F);
 		return level.addFreshEntity(mark) ? mark : null;
 	}
 
@@ -195,9 +206,18 @@ public final class Dimensi {
 		}
 	}
 
-	/** A sea or underworld monster of this module was slain by a player. */
-	public static void monsterSlain(ServerLevel level, ServerPlayer killer, Entity victim, String what) {
+	/**
+	 * A sea or underworld monster of this module was slain by a player: quests, the tier-4 deed, and the death throes on
+	 * the water ({@code tier} 0-4, -1 when it has none).
+	 */
+	public static void monsterSlain(ServerLevel level, ServerPlayer killer, Entity victim, String what, int tier) {
 		SeaPeople.questKill(killer, victim, what);
+		if (tier >= 4) {
+			Advancements.grant(killer, "dunia/sea_tier4");
+		}
+		if (tier >= 0) {
+			DimensiNet.fx(level, DimensiNet.FX_MONSTER_DOWN, victim.position(), tier, 64.0D);
+		}
 	}
 
 	/** The serpent's water spout at {@code at} (a client effect). */
@@ -206,13 +226,40 @@ public final class Dimensi {
 	}
 
 	private static void onSkyEvent(ServerLevel level, SkyKind kind, boolean started) {
-		if (kind != SkyKind.BLOOD_ECLIPSE || !started || level.dimension() != net.minecraft.world.level.Level.OVERWORLD) {
+		if (level.dimension() != Level.OVERWORLD) {
 			return;
 		}
-		// The ghost gates stand open: every player near a Kuil Gerbang Hantu hears it.
-		for (DuniaAnchorEntity altar : DuniaAnchors.loaded(level, "bawah/altar")) {
-			for (ServerPlayer player : DuniaAnchors.playersNear(level, altar.position(), 64.0D)) {
-				Msg.chat(player, Component.translatable("kultivator.dimensi.gerhana.gerbang").withColor(0xD05050));
+		MinecraftServer server = level.getServer();
+		if (kind == SkyKind.BLOOD_ECLIPSE && started) {
+			// The ghost gates stand open: every player near a Kuil Gerbang Hantu hears it.
+			for (DuniaAnchorEntity altar : DuniaAnchors.loaded(level, "bawah/altar")) {
+				for (ServerPlayer player : DuniaAnchors.playersNear(level, altar.position(), 64.0D)) {
+					Msg.chat(player, Component.translatable("kultivator.dimensi.gerhana.gerbang").withColor(0xD05050));
+				}
+			}
+		}
+		// the souls below and the voyagers beyond feel it too
+		ServerLevel bawah = DimensiLevels.bawah(server);
+		if (bawah != null && kind == SkyKind.BLOOD_ECLIPSE) {
+			for (ServerPlayer player : bawah.players()) {
+				Msg.chat(player, Component.translatable(started ? "kultivator.dimensi.gerhana.bawah" : "kultivator.dimensi.gerhana.bawah_usai")
+						.withColor(0xD05050));
+				if (started) {
+					// the voice of Heaven reaches below too (module L's line when this build has it)
+					DimensiVoice.heaven(player, "heaven.langit.blood_eclipse", "heaven.calamity");
+				}
+				SoulJourney.sendState(player);
+			}
+		}
+		ServerLevel laut = DimensiLevels.laut(server);
+		if (laut != null) {
+			for (ServerPlayer player : laut.players()) {
+				Msg.chat(player, Component.translatable("kultivator.dimensi.langit_laut." + kind.id() + (started ? "" : "_usai"))
+						.withColor(0x9FE8F0));
+				if (started) {
+					DimensiVoice.heaven(player, "heaven.langit." + kind.id(), "heaven.witness");
+				}
+				SoulJourney.sendState(player);
 			}
 		}
 	}

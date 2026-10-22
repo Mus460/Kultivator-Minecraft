@@ -11,7 +11,6 @@ import dev.kultivator.fx.Fx;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.Targeting;
-import dev.kultivator.voice.Voice;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -26,6 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -127,11 +127,24 @@ public final class TamedJiao {
 	private static final Map<UUID, Long> FED = new HashMap<>();
 	/** "owner:tier" already told the Jiao waits for its tribulation (once per session). */
 	private static final Set<String> READY_TOLD = new HashSet<>();
+	/** Owner → where they stood last tick and for how long they stood still (the Jiao rests around a still owner). */
+	private static final Map<UUID, Vec3> STILL_AT = new HashMap<>();
+	private static final Map<UUID, Integer> STILL_TICKS = new HashMap<>();
+	/** Owner → blocks flown on the Jiao not yet written to {@link NagaFeats}. */
+	private static final Map<UUID, Double> RIDDEN = new HashMap<>();
+	/** The Jiao rests after its owner stood still on the ground this long (10 s). */
+	public static final int REST_AFTER = 200;
+	/** A Naga Sejati (tier 5+) uses its kind skill on its owner's foe at most this often (30 s). */
+	public static final int SPECIAL_EVERY = 600;
 
 	static void clear() {
 		ACTIVE.clear();
 		FED.clear();
 		READY_TOLD.clear();
+		STILL_AT.clear();
+		STILL_TICKS.clear();
+		RIDDEN.clear();
+		NagaLines.clear();
 	}
 
 	// ================================================================== numbers
@@ -224,7 +237,7 @@ public final class TamedJiao {
 		level.playSound(null, at.x, at.y, at.z, SoundEvents.BEACON_ACTIVATE, SoundSource.NEUTRAL, 1.5F, 0.8F);
 		level.playSound(null, at.x, at.y, at.z, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.8F, 1.0F);
 		Fx.burst(level, at, dragon.kind().glow, 60, 3.5F);
-		Voice.heavenNear(level, at, "heaven.witness", 64.0D);
+		NagaVoice.heaven(level, at, NagaVoice.SUBDUED, "heaven.witness", 64.0D);
 		NagaPayloads.moment(level, NagaPayloads.MOMENT_SUBDUED, dragon.getId(), at, dragon.kind().ordinal(), record.tier(), 2,
 				dragon.getId(), player, 128.0D);
 		Msg.title(player, Component.translatable("kultivator.naga.subdued.title").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD),
@@ -233,6 +246,10 @@ public final class TamedJiao {
 		Msg.chat(player, Component.translatable("kultivator.naga.subdued.howto").withStyle(ChatFormatting.GRAY));
 		Msg.chat(player, Component.translatable("kultivator.naga.liar.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 		Advancements.grant(player, "dunia/dragon_subdued");
+		NagaFeats.kindMet(player, dragon.kind());
+		if (dragon.kind() == NagaKind.PETIR) {
+			Advancements.grant(player, "dunia/jiao_storm");
+		}
 		for (ServerPlayer other : level.getEntitiesOfClass(ServerPlayer.class, dragon.getBoundingBox().inflate(96.0D), p -> p != player)) {
 			Msg.chat(other, Component.translatable("kultivator.naga.subdued.others", player.getDisplayName(), dragon.kind().displayName())
 					.withStyle(ChatFormatting.GRAY));
@@ -298,6 +315,7 @@ public final class TamedJiao {
 		NagaPayloads.moment(level, NagaPayloads.MOMENT_SUMMON, dragon.getId(), at, record.kind().ordinal(), record.tier(), 2, dragon.getId(),
 				player, 64.0D);
 		Msg.actionBar(player, Component.translatable("kultivator.naga.summoned", dragon.getDisplayName()).withColor(record.kind().glow));
+		NagaLines.tamed(player, dragon, NagaLines.greetEvent(level, player), NagaLines.GREET, 1200);
 		return dragon;
 	}
 
@@ -388,6 +406,12 @@ public final class TamedJiao {
 
 	static void tick(ServerLevel level, NagaLiarEntity dragon, boolean ridden) {
 		ServerPlayer owner = dragon.serverOwner();
+		if (owner != null && !owner.isRemoved() && owner.level() != level && ACTIVE.get(owner.getUUID()) == dragon
+				&& BodyGuards.jiaoGuards(owner.getUUID())) {
+			// Penjaga Raga: its owner's soul walks Dunia Bawah, it keeps the body
+			guardTick(level, dragon, owner, BodyGuards.bodyOf(owner.getUUID(), level));
+			return;
+		}
 		if (owner == null || owner.isRemoved() || owner.level() != level || ACTIVE.get(owner.getUUID()) != dragon) {
 			// an orphan (owner offline, another copy summoned): it goes back
 			if (owner != null && ACTIVE.get(owner.getUUID()) == null && owner.level() == level) {
@@ -406,6 +430,20 @@ public final class TamedJiao {
 		}
 		if (dragon.hasFlag(NagaLiarEntity.FLAG_TRIBULATION)) {
 			return;
+		}
+		if (ridden) {
+			ride(level, dragon, owner);
+		}
+		Vec3 body = ridden ? null : BodyGuards.bodyOf(owner.getUUID(), level);
+		if (body != null) {
+			// the test guard (uji naga jaga): it keeps the spot instead of following
+			guardTick(level, dragon, owner, body);
+			return;
+		}
+		dragon.setFlag(NagaLiarEntity.FLAG_GUARD, false);
+		boolean resting = !ridden && restCheck(dragon, owner);
+		if (dragon.tickCount % 20 == 3) {
+			NagaLines.realmCheck(level, owner, dragon);
 		}
 		double distance = Math.sqrt(dragon.distanceToSqr(owner));
 		if (!ridden && distance > LEASH) {
@@ -433,15 +471,136 @@ public final class TamedJiao {
 			}
 			return;
 		}
-		if (!ridden) {
-			follow(dragon, owner, 1.0D);
+		if (skill == NagaLiarEntity.SKILL_SPECIAL) {
+			Entity aimEntity = level.getEntity(dragon.aimId());
+			LivingEntity aim = aimEntity instanceof LivingEntity living && living.isAlive() ? living : null;
+			if (!ridden) {
+				follow(dragon, owner, 0.6D);
+			}
+			if (aim == null || NagaSkills.special(level, dragon, aim, dragon.serverSkillTicks(),
+					entity -> entity != owner && entity != dragon && (entity == aim || Targeting.isHostileTo(entity, owner, false)),
+					dragon.power(), owner)) {
+				dragon.finishSkill();
+			}
+			return;
 		}
+		if (!ridden) {
+			if (resting) {
+				rest(dragon, owner);
+			} else {
+				follow(dragon, owner, 1.0D);
+			}
+		}
+		if (owner.getHealth() < owner.getMaxHealth() * 0.3F && owner.getLastHurtByMob() != null
+				&& owner.tickCount - owner.getLastHurtByMobTimestamp() < 40) {
+			// its owner bleeds: it answers at once
+			NagaLines.tamed(owner, dragon, "protect", NagaLines.HURT, 2400);
+			dragon.breathTimer = Math.min(dragon.breathTimer, 20);
+		}
+		if (skill == NagaLiarEntity.SKILL_NONE && dragon.tier() >= 5 && Naga.config().specials && --dragon.specialTimer <= 0) {
+			LivingEntity target = ownerTarget(owner, dragon);
+			if (target != null) {
+				dragon.specialTimer = SPECIAL_EVERY;
+				dragon.beginSpecial(target);
+				return;
+			}
+			dragon.specialTimer = 40;
+		}
+		// ridden by an owner who fights, it breathes twice as often
+		int every = ridden && ownerTarget(owner, dragon) != null ? NagaLiarEntity.TAMED_BREATH_EVERY / 2 : NagaLiarEntity.TAMED_BREATH_EVERY;
 		if (skill == NagaLiarEntity.SKILL_NONE && --dragon.breathTimer <= 0) {
-			dragon.breathTimer = NagaLiarEntity.TAMED_BREATH_EVERY;
+			dragon.breathTimer = every;
 			LivingEntity target = ownerTarget(owner, dragon);
 			if (target != null) {
 				dragon.beginSkill(NagaLiarEntity.SKILL_BREATH, target);
 			}
+		}
+	}
+
+	/** True when the owner stood still on the ground long enough and nothing is fought: the Jiao rests (FLAG_RESTING). */
+	private static boolean restCheck(NagaLiarEntity dragon, ServerPlayer owner) {
+		UUID id = owner.getUUID();
+		Vec3 last = STILL_AT.put(id, owner.position());
+		boolean still = last != null && last.distanceToSqr(owner.position()) < 0.0025D && owner.onGround();
+		int ticks = still ? STILL_TICKS.merge(id, 1, Integer::sum) : 0;
+		if (!still) {
+			STILL_TICKS.put(id, 0);
+		}
+		boolean resting = ticks >= REST_AFTER && dragon.serverSkill() == NagaLiarEntity.SKILL_NONE && ownerTarget(owner, dragon) == null;
+		if (resting != dragon.hasFlag(NagaLiarEntity.FLAG_RESTING)) {
+			dragon.setFlag(NagaLiarEntity.FLAG_RESTING, resting);
+			if (resting) {
+				NagaLines.tamed(owner, dragon, "rest", NagaLines.REST, 6000);
+			}
+		}
+		return resting;
+	}
+
+	/** Resting: low and slow, a lazy coil around its owner at shoulder height. */
+	private static void rest(NagaLiarEntity dragon, ServerPlayer owner) {
+		double t = dragon.tickCount * 0.008D + dragon.getId() * 0.7D;
+		Vec3 centre = owner.position().add(0.0D, 1.1D + Math.sin(dragon.tickCount * 0.03D) * 0.25D, 0.0D);
+		Vec3 point = centre.add(Math.cos(t) * 3.4D, 0.0D, Math.sin(t) * 3.4D);
+		double distance = Math.sqrt(dragon.distanceToSqr(point));
+		dragon.steer(point, Math.min(0.35D, 0.05D + distance * 0.05D), 0.05D);
+	}
+
+	/** Ridden: the flight is counted for Penunggang Awan; it remarks on storms and the sea of clouds. */
+	private static void ride(ServerLevel level, NagaLiarEntity dragon, ServerPlayer owner) {
+		if (dragon.getControllingPassenger() != owner) {
+			return;
+		}
+		double dx = dragon.getX() - dragon.xo;
+		double dz = dragon.getZ() - dragon.zo;
+		double moved = Math.sqrt(dx * dx + dz * dz);
+		if (moved > 0.0D && moved < 4.0D) {
+			RIDDEN.merge(owner.getUUID(), moved, Double::sum);
+		}
+		if (dragon.tickCount % 100 == 0) {
+			Double flown = RIDDEN.remove(owner.getUUID());
+			if (flown != null) {
+				NagaFeats.rode(owner, flown);
+			}
+			if (level.isThundering()) {
+				NagaLines.tamed(owner, dragon, "ride_storm", NagaLines.STORM, 12000);
+			} else if (dragon.getY() > 200.0D) {
+				NagaLines.tamed(owner, dragon, "ride_high", NagaLines.HIGH, 12000);
+			}
+		}
+	}
+
+	/**
+	 * Penjaga Raga: it circles over {@code body} (or holds still until the body is known), breathes at the monsters near
+	 * it every 6 s and rests its Napas Naga.
+	 */
+	private static void guardTick(ServerLevel level, NagaLiarEntity dragon, ServerPlayer owner, @Nullable Vec3 body) {
+		dragon.setFlag(NagaLiarEntity.FLAG_GUARD, true);
+		dragon.setFlag(NagaLiarEntity.FLAG_RESTING, false);
+		stamina(dragon, owner, false);
+		Vec3 centre = body != null ? body : dragon.position();
+		int skill = dragon.serverSkill();
+		if (skill == NagaLiarEntity.SKILL_BREATH) {
+			Entity aimEntity = level.getEntity(dragon.aimId());
+			LivingEntity aim = aimEntity instanceof LivingEntity living && living.isAlive() ? living : null;
+			boolean done = NagaSkills.breath(level, dragon, aim, dragon.serverSkillTicks(),
+					entity -> entity != dragon && entity instanceof Enemy, breathPulse(dragon.tier()));
+			if (done || aim == null) {
+				dragon.finishSkill();
+			}
+		} else if (skill != NagaLiarEntity.SKILL_NONE) {
+			dragon.finishSkill();
+		}
+		double t = dragon.tickCount * 0.025D + dragon.getId() * 0.7D;
+		Vec3 point = centre.add(Math.cos(t) * 6.0D, 4.5D + Math.sin(dragon.tickCount * 0.05D) * 0.6D, Math.sin(t) * 6.0D);
+		double distance = Math.sqrt(dragon.distanceToSqr(point));
+		dragon.steer(point, Math.min(1.0D, 0.15D + distance * 0.06D) * (skill == NagaLiarEntity.SKILL_BREATH ? 0.5D : 1.0D), 0.08D);
+		if (body == null || skill != NagaLiarEntity.SKILL_NONE || --dragon.breathTimer > 0) {
+			return;
+		}
+		dragon.breathTimer = NagaLiarEntity.TAMED_BREATH_EVERY / 2;
+		List<Mob> foes = BodyGuards.foesNear(level, body);
+		if (!foes.isEmpty() && foes.get(0).distanceToSqr(dragon) <= NagaLiarEntity.TAMED_BREATH_RANGE * NagaLiarEntity.TAMED_BREATH_RANGE) {
+			dragon.beginSkill(NagaLiarEntity.SKILL_BREATH, foes.get(0));
 		}
 	}
 
@@ -580,7 +739,13 @@ public final class TamedJiao {
 			dragon.setHealthBase(maxHealth(after.tier()));
 			dragon.setHealth(dragon.getMaxHealth());
 			dragon.damageFactor = 1.0D + 0.5D * (after.tier() - BeastData.MAX_TIER);
-			dragon.setCustomName(Component.translatable(BeastData.titleKey(BeastData.JIAO, after.tier())));
+			dragon.nameplate(owner, after.tier());
+		}
+		if (after.tier() >= 5) {
+			Advancements.grant(owner, "dunia/true_dragon");
+		}
+		if (after.tier() >= BeastData.TOP_TIER) {
+			Advancements.grant(owner, "dunia/yinglong");
 		}
 		if (!celebrate || after.tier() <= before) {
 			return;

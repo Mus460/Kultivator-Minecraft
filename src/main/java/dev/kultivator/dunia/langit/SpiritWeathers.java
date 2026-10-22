@@ -1,12 +1,16 @@
 package dev.kultivator.dunia.langit;
 
+import dev.kultivator.data.Cultivators;
+import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.DuniaEvents;
 import dev.kultivator.dunia.DuniaSpine;
 import dev.kultivator.dunia.api.SpiritWeather;
 import dev.kultivator.network.Net;
+import dev.kultivator.util.Msg;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -34,7 +38,8 @@ import java.util.UUID;
  * <p>
  * Independent of vanilla weather, which is never read or changed here (W3). Players are synced the 3 × 3 cells around
  * them when their cell or a kind in that view changes; {@code DuniaEvents.WEATHER_CHANGED} fires once per changed cell
- * that a player can see. {@code uji cuaca} overrides one cell for some minutes (memory only).
+ * that a player can see. {@code uji cuaca} overrides one cell for some minutes (memory only). From Nascent Soul on a
+ * player's divine sense foretells a mist that comes or goes 30 s before the change ({@link #sense}).
  */
 public final class SpiritWeathers {
 
@@ -45,6 +50,8 @@ public final class SpiritWeathers {
 	public static final double DAWN = 0.03D;
 	public static final int DAWN_FROM = 23000;
 	public static final int DAWN_TO = 1000;
+	/** The divine sense of {@link #sense} speaks this many ticks before the change (30 s). */
+	public static final int SENSE_TICKS = 600;
 	private static final int BIAS_CACHE = 4096;
 	private static final int KNOWN_CACHE = 2048;
 
@@ -108,7 +115,11 @@ public final class SpiritWeathers {
 				overrides.remove(cellId(cx, cz));
 			}
 		}
-		long period = Math.floorDiv(now, PERIOD);
+		return natural(level, cx, cz, Math.floorDiv(now, PERIOD), dawn(level));
+	}
+
+	/** The weather of cell (cx, cz) in {@code period} without test overrides ({@code dawn}: whether that time is dawn). */
+	static SpiritWeather natural(ServerLevel level, int cx, int cz, long period, boolean dawn) {
 		double roll = hash01(level.getSeed(), cx, cz, period);
 		double bias = bias(level, cx, cz);
 		double dense = DENSE * bias;
@@ -119,7 +130,7 @@ public final class SpiritWeathers {
 		if (roll < dense + thin) {
 			return SpiritWeather.THIN_MIST;
 		}
-		if (roll < dense + thin + DAWN && dawn(level)) {
+		if (roll < dense + thin + DAWN && dawn) {
 			return SpiritWeather.PURPLE_DAWN;
 		}
 		return SpiritWeather.CLEAR;
@@ -127,8 +138,32 @@ public final class SpiritWeathers {
 
 	/** True at dawn (23 000-1 000 of the overworld clock). */
 	public static boolean dawn(Level level) {
-		int tod = (int) Math.floorMod(level.getOverworldClockTime(), (long) SkyEvents.DAY);
+		return dawnAt(level.getOverworldClockTime());
+	}
+
+	/** True when overworld clock {@code clock} is dawn. */
+	static boolean dawnAt(long clock) {
+		int tod = (int) Math.floorMod(clock, (long) SkyEvents.DAY);
 		return tod >= DAWN_FROM || tod < DAWN_TO;
+	}
+
+	/**
+	 * The weather cell (cx, cz) will have in the next period (the deterministic roll of the next 5 minutes; test overrides
+	 * are not foreseen). The Indra Rohani of {@link #sense} and {@code uji cuaca ramalan} read it.
+	 */
+	static SpiritWeather forecast(ServerLevel level, int cx, int cz) {
+		if (!on(level)) {
+			return SpiritWeather.CLEAR;
+		}
+		long next = Math.floorDiv(level.getGameTime(), PERIOD) + 1L;
+		return natural(level, cx, cz, next, dawnAt(level.getOverworldClockTime() + ticksToNextPeriod(level)));
+	}
+
+	/** True while a test override holds cell (cx, cz). */
+	static boolean overridden(ServerLevel level, int cx, int cz) {
+		Map<Long, Forced> overrides = OVERRIDES.get(level.dimension());
+		Forced forced = overrides == null ? null : overrides.get(cellId(cx, cz));
+		return forced != null && level.getGameTime() < forced.until();
 	}
 
 	/** Game ticks until the weather of every cell rolls again. */
@@ -238,7 +273,31 @@ public final class SpiritWeathers {
 				SENT.put(player.getUUID(), now);
 				Net.send(player, new LangitCuacaPayload(size, cx, cz, kinds));
 			}
+			long left = ticksToNextPeriod(level);
+			if (left <= SENSE_TICKS && left > SENSE_TICKS - 40 && !player.isSpectator()) {
+				sense(player, level, cx, cz);
+			}
 		}
+	}
+
+	/**
+	 * Indra Rohani (detail pass): from Nascent Soul on a cultivator's divine sense feels the spirit weather turn about
+	 * 30 seconds before it does, when a mist comes or goes in their cell (one action bar line; test overrides are skipped).
+	 */
+	private static void sense(ServerPlayer player, ServerLevel level, int cx, int cz) {
+		if (!Cultivators.get(player).realm().atLeast(Realm.NASCENT_SOUL) || overridden(level, cx, cz)) {
+			return;
+		}
+		SpiritWeather current = cell(level, cx, cz);
+		SpiritWeather next = forecast(level, cx, cz);
+		if (next == current || (!next.misty() && !current.misty()) || !Langit.once(player, "indra", 400)) {
+			return;
+		}
+		int seconds = (int) (ticksToNextPeriod(level) / 20L);
+		Component line = next.misty()
+				? Component.translatable("kultivator.langit.indra.coming", LangitCommands.weatherName(next), seconds)
+				: Component.translatable("kultivator.langit.indra.leaving", LangitCommands.weatherName(current), seconds);
+		Msg.actionBar(player, line.copy().withColor(0xC8B8FF));
 	}
 
 	/** Forces a resend to {@code player} on the next pass (join, dimension change, an override). */

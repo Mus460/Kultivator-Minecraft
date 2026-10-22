@@ -87,7 +87,18 @@ public class DemonRenderer extends LivingEntityRenderer<IblisKecilEntity, DemonR
 
 	@Override
 	protected boolean shouldShowName(IblisKecilEntity entity, double distanceToCameraSq) {
-		return false;
+		return entity.deathTime == 0 && distanceToCameraSq < RTitles.SMALL_SQ;
+	}
+
+	@Override
+	protected net.minecraft.network.chat.Component getNameTag(IblisKecilEntity entity) {
+		return RTitles.name(entity.getDisplayName(), 0xE07070);
+	}
+
+	@Override
+	protected void extractNameTags(IblisKecilEntity entity, State state, float partialTicks) {
+		super.extractNameTags(entity, state, partialTicks);
+		state.scoreText = state.nameTag == null ? null : RTitles.lesser(entity.flags());
 	}
 
 	private static final class Eyes extends RenderLayer<State, PlayerModel> {

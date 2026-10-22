@@ -66,6 +66,7 @@ public final class Kota {
 		Pengembara.init();
 		KotaAbadi.init();
 		KabarDunia.init();
+		NpcLife.init();
 		KotaCommands.init();
 		ServerLifecycleEvents.SERVER_STARTED.register(started -> server = started);
 		ServerLifecycleEvents.SERVER_STOPPED.register(stopped -> {
@@ -140,20 +141,34 @@ public final class Kota {
 		switch (role) {
 			case WARGA -> {
 				Voice.say(npc, npc.voiceKey(npc.getRandom().nextBoolean() ? "greet" : "greet_alt"), null);
+				String said = NpcLife.townLine(npc, player);
 				Msg.chat(player, Component.empty().append(npc.plate()).append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
-						.append(Component.translatable("kultivator.kota.warga.kata." + npc.getRandom().nextInt(12)).withStyle(ChatFormatting.WHITE)));
+						.append(Component.translatable(said).withStyle(ChatFormatting.WHITE)));
+				NpcLife.speak(npc, said, 80);
+				NpcLife.greeted(npc, player);
 				return true;
 			}
 			case SAINGAN -> {
 				Voice.say(npc, "rogue.ambush", null);
+				String said = "kultivator.kota.saingan.kata." + npc.getRandom().nextInt(6);
 				Msg.chat(player, Component.empty().append(npc.plate()).append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
-						.append(Component.translatable("kultivator.kota.saingan.kata." + npc.getRandom().nextInt(6)).withStyle(ChatFormatting.WHITE)));
+						.append(Component.translatable(said).withStyle(ChatFormatting.WHITE)));
+				NpcLife.speak(npc, said, 80);
 				return true;
 			}
 			case ABADI -> {
-				Voice.say(npc, npc.voiceKey("greet_alt"), null);
+				// a native immortal looks down on those still short of True Immortal now and then
+				boolean scorn = dev.kultivator.data.Cultivators.get(player).realm().ordinal() < dev.kultivator.data.Realm.TRUE_IMMORTAL.ordinal()
+						&& npc.getRandom().nextInt(3) == 0;
+				if (scorn) {
+					KotaVoice.say(npc, KotaVoice.IMMORTAL_SCORN, npc.voiceKey("greet_alt"), null);
+				} else {
+					Voice.say(npc, npc.voiceKey("greet_alt"), null);
+				}
+				String said = scorn ? "kultivator.kota.abadi.cela." + npc.getRandom().nextInt(4) : "kultivator.kota.abadi.kata." + npc.getRandom().nextInt(8);
 				Msg.chat(player, Component.empty().append(npc.plate()).append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
-						.append(Component.translatable("kultivator.kota.abadi.kata." + npc.getRandom().nextInt(8)).withStyle(ChatFormatting.WHITE)));
+						.append(Component.translatable(said).withStyle(ChatFormatting.WHITE)));
+				NpcLife.speak(npc, said, 80);
 				return true;
 			}
 			case JURU_LELANG_ABADI -> {
@@ -172,14 +187,25 @@ public final class Kota {
 					return true;
 				}
 				if (role.townsfolk() && !role.immortal() && KotaData.get(player.level().getServer()).reputation(npc.town(), player.getUUID()) < HOSTILE_REPUTATION) {
-					Voice.say(npc, npc.voiceKey("careful"), null);
+					if (role == NpcRole.PENJAGA) {
+						KotaVoice.say(npc, KotaVoice.GUARD_HALT, npc.voiceKey("careful"), null);
+					} else {
+						Voice.say(npc, npc.voiceKey("careful"), null);
+					}
 					Msg.actionBar(player, Component.translatable("kultivator.kota.nama_baik.ditolak").withStyle(ChatFormatting.RED));
 					return true;
 				}
-				Voice.say(npc, greetLine(npc), null);
 				if (role == NpcRole.PEMILIK_TEH) {
+					KotaVoice.say(npc, KotaVoice.TEA_WELCOME, greetLine(npc), null);
 					KabarDunia.tell(player, npc);
+				} else if (role == NpcRole.PENJAGA_KEBUN) {
+					KotaVoice.say(npc, KotaVoice.PEACH_KEEPER, greetLine(npc), null);
+				} else if (role == NpcRole.PENCERAMAH) {
+					KotaVoice.say(npc, KotaVoice.LECTURE, greetLine(npc), null);
+				} else {
+					Voice.say(npc, greetLine(npc), null);
 				}
+				NpcLife.greeted(npc, player);
 				open(player, npc, role.tab, true);
 				return true;
 			}
@@ -235,7 +261,7 @@ public final class Kota {
 				case "gbeli", "gjual", "suap" -> PasarGelap.action(player, npc, verb, parts);
 				case "ambil", "serah", "batal" -> PapanMisi.action(player, npc, verb, parts);
 				case "abeli", "persik", "titah" -> KotaAbadi.action(player, npc, verb, parts);
-				case "tukar", "diskusi", "tanding", "tantang", "ajak", "pamit" -> Pengembara.action(player, npc, verb, parts);
+				case "tukar", "diskusi", "tanding", "duel", "tantang", "ajak", "pamit" -> Pengembara.action(player, npc, verb, parts);
 				default -> false;
 			};
 			if (refresh && !npc.isRemoved()) {

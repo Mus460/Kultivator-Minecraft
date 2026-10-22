@@ -6,7 +6,6 @@ import dev.kultivator.cultivation.Tribulation;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
 import dev.kultivator.util.Msg;
-import dev.kultivator.voice.Voice;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -74,6 +73,8 @@ public final class BeastTribulation {
 		int phase = KesengsaraanEntity.PHASE_OMEN;
 		int ticks;
 		int done;
+		/** Strikes the owner stood through as Hu Fa (all of them: the advancement Hu Fa Setia). */
+		int guarded;
 		double scaleFrom;
 		double scaleTo;
 
@@ -166,7 +167,10 @@ public final class BeastTribulation {
 		}
 		level.playSound(null, sky.x, sky.y, sky.z, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 1.2F, 0.6F);
 		level.playSound(null, beast.getX(), beast.getY(), beast.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.NEUTRAL, 1.0F, 0.5F);
-		Voice.heavenNear(level, beast.position(), "heaven.witness", 48.0D);
+		NagaVoice.heaven(level, beast.position(), NagaVoice.TRIBULATION, "heaven.witness", 48.0D);
+		int length = OMEN_TICKS + TELEGRAPH + (session.strikes - 1) * STRIKE_EVERY + 40;
+		NagaPayloads.moment(level, NagaPayloads.MOMENT_TRIB_START, beast.getId(), beast.position(), beast instanceof NagaLiarEntity dragon
+				? dragon.kind().ordinal() : 0, to, line, length, owner, 64.0D);
 		Msg.title(owner, Component.translatable("kultivator.naga.trib.title").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD),
 				Component.translatable("kultivator.naga.trib.subtitle", beast.getDisplayName(), to, session.strikes).withStyle(ChatFormatting.LIGHT_PURPLE),
 				10, 60, 20);
@@ -310,6 +314,7 @@ public final class BeastTribulation {
 			}
 		}
 		if (guard && owner != null && ownerPart > 0.0F) {
+			session.guarded++;
 			guardShare(level, owner, beast, ownerPart);
 		}
 		if (owner != null) {
@@ -365,7 +370,10 @@ public final class BeastTribulation {
 		setScale(beast, session.scaleFrom);
 		level.playSound(null, beast.getX(), beast.getY(), beast.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.NEUTRAL, 1.5F, 0.7F);
 		level.playSound(null, beast.getX(), beast.getY(), beast.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.8F, 1.1F);
-		Voice.heavenNear(level, beast.position(), "heaven.breakthrough", 48.0D);
+		NagaVoice.heaven(level, beast.position(), NagaVoice.EVOLVED, "heaven.breakthrough", 48.0D);
+		if (!session.test && session.guarded >= session.strikes) {
+			dev.kultivator.util.Advancements.grant(owner, "dunia/hufa");
+		}
 		NagaPayloads.moment(level, NagaPayloads.MOMENT_EVOLVED, beast.getId(), beast.position(), beast instanceof NagaLiarEntity dragon
 				? dragon.kind().ordinal() : 0, session.to, session.line, beast.getId(), owner, 96.0D);
 	}
@@ -427,6 +435,7 @@ public final class BeastTribulation {
 		}
 		Fx.send(level, beast.position(), beast.position().add(0.0D, SKY, 0.0D), FxType.TRIBULATION_END, 0, 0, 0.0F);
 		level.playSound(null, beast.getX(), beast.getY(), beast.getZ(), SoundEvents.ENDER_DRAGON_HURT, SoundSource.NEUTRAL, 0.6F, 1.6F);
+		NagaVoice.heaven(level, beast.position(), NagaVoice.TRIB_FAILED, "heaven.tribulation_fail", 48.0D);
 		if (owner != null) {
 			refundHalf(owner, session);
 			Msg.title(owner, Component.translatable("kultivator.naga.trib.failed.title").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD),

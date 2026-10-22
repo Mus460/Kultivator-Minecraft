@@ -8,6 +8,7 @@ import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Realm;
+import dev.kultivator.data.TechniqueSpec;
 import dev.kultivator.data.XpSource;
 import dev.kultivator.disciple.DuelRules;
 import dev.kultivator.dunia.DuniaAnchorEntity;
@@ -15,6 +16,7 @@ import dev.kultivator.dunia.DuniaBudget;
 import dev.kultivator.dunia.api.DuniaApi;
 import dev.kultivator.harta.SpiritHerbs;
 import dev.kultivator.musuh.LootPouches;
+import dev.kultivator.technique.spec.run.Mastery;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
@@ -76,6 +78,8 @@ public final class Pengembara {
 	public static final double EXPERIENCE_SHARE = 0.05D;
 	public static final double SPAR_XP = 0.02D;
 	public static final int DUEL_TICKS = 1200;
+	/** Mastery points of the wanderer's insight into a known technique of its Dao (the third discussion reward). */
+	public static final int TEACH_POINTS = Mastery.ENLIGHTENMENT_POINTS;
 
 	/** Seated wanderers by teahouse seat anchor. */
 	private static final Map<UUID, KultivatorNpc> SEATED = new HashMap<>();
@@ -269,7 +273,7 @@ public final class Pengembara {
 		npc.memory().putBoolean("greeted", true);
 		npc.getNavigation().stop();
 		npc.getLookControl().setLookAt(player, 30.0F, 30.0F);
-		Voice.say(npc, npc.voiceKey("greet"), "kultivator.kota.pengembara.suara.dao");
+		KotaVoice.say(npc, KotaVoice.WANDERER_DAO, npc.voiceKey("greet"), "kultivator.kota.pengembara.suara.dao");
 		greetChip(player, npc);
 	}
 
@@ -337,6 +341,7 @@ public final class Pengembara {
 			case "tukar" -> offer(player, npc, Kota.arg(parts, 1, -1));
 			case "diskusi" -> round(player, npc, Kota.arg(parts, 1, -1));
 			case "tanding" -> spar(player, npc);
+			case "duel" -> KotaDuel.challenge(player, npc);
 			case "tantang" -> challenge(player, npc);
 			case "ajak" -> invite(player, npc);
 			case "pamit" -> {
@@ -472,18 +477,34 @@ public final class Pengembara {
 		CultivationData data = Cultivators.get(player);
 		if (wins >= 2) {
 			Voice.say(npc, npc.voiceKey("cheer"), null);
+			npc.bow(40);
+			NpcLife.speak(npc, "kultivator.kota.diskusi.puas." + npc.getRandom().nextInt(3), 90);
 			boolean own = dao != null && (data.dao() == null || data.dao() == dao);
+			// the third reward of 34.5.2: insight into a known technique of the wanderer's Dao (once per wanderer)
+			TechniqueSpec taught = npc.memory().getBooleanOr("taught", false) ? null : knownOf(data, dao, npc.getRandom());
 			if (own) {
 				double amount = 2.0D + npc.getRandom().nextInt(5);
 				double gained = Comprehension.grant(player, dao, amount);
 				npc.memory().putString("reward", "paham");
 				npc.memory().putDouble("reward_n", gained);
+				// a flawless discussion also opens the technique
+				if (wins >= ROUNDS && taught != null) {
+					teach(player, npc, taught);
+				}
+			} else if (taught != null) {
+				teach(player, npc, taught);
+				npc.memory().putString("reward", "jurus");
 			} else {
 				ItemStack note = new ItemStack(KotaItems.CATATAN_PENGEMBARA);
 				if (!player.getInventory().add(note)) {
 					Kota.drop(player, note);
 				}
 				npc.memory().putString("reward", "catatan");
+			}
+			KotaData kd = KotaData.get(player.level().getServer());
+			kd.putInt(player, "diskusi_menang", kd.getInt(player, "diskusi_menang", 0) + 1);
+			if (wins >= ROUNDS) {
+				Advancements.grant(player, "dunia/wanderer_discussion");
 			}
 		} else {
 			Voice.say(npc, "elder.advice", null);
@@ -493,6 +514,29 @@ public final class Pengembara {
 				Kota.drop(player, offered);
 			}
 		}
+	}
+
+	/** A technique the player has learned of {@code dao} (null: none, or no Dao). */
+	private static @Nullable TechniqueSpec knownOf(CultivationData data, @Nullable Dao dao, RandomSource random) {
+		if (dao == null) {
+			return null;
+		}
+		List<TechniqueSpec> known = new java.util.ArrayList<>();
+		for (TechniqueSpec spec : data.learnedSpecs()) {
+			if (spec != null && spec.dao() == dao) {
+				known.add(spec);
+			}
+		}
+		return known.isEmpty() ? null : known.get(random.nextInt(known.size()));
+	}
+
+	/** +{@link #TEACH_POINTS} mastery points in {@code spec} (the wanderer's insight; once per wanderer). */
+	private static void teach(ServerPlayer player, KultivatorNpc npc, TechniqueSpec spec) {
+		npc.memory().putBoolean("taught", true);
+		npc.memory().putString("taught_name", spec.id());
+		Mastery.add(player, spec.id(), TEACH_POINTS, Mastery.Source.TEACH);
+		Msg.chat(player, Component.translatable("kultivator.kota.diskusi.jurus", npc.plate(), dev.kultivator.technique.source.LearnRules.name(spec), TEACH_POINTS)
+				.withStyle(ChatFormatting.AQUA));
 	}
 
 	private static void spar(ServerPlayer player, KultivatorNpc npc) {
@@ -667,6 +711,12 @@ public final class Pengembara {
 		tag.putDouble("reward_n", npc.memory().getDoubleOr("reward_n", 0.0D));
 		tag.putInt("lore", npc.memory().getIntOr("lore", 0));
 		tag.putBoolean("sparred", npc.memory().getBooleanOr("sparred", false));
+		tag.putInt("duel_style", KotaDuel.style(npc).ordinal());
+		String taught = npc.memory().getStringOr("taught_name", "");
+		TechniqueSpec spec = taught.isEmpty() ? null : dev.kultivator.data.TechniqueRegistry.byId(taught);
+		if (spec != null) {
+			tag.store("taught", ComponentSerialization.CODEC, dev.kultivator.technique.source.LearnRules.name(spec));
+		}
 		tag.putBoolean("can_invite", Kota.config().companion && npc.temperament() == RAMAH && data.realm().ordinal() >= Realm.GOLDEN_CORE.ordinal());
 		tag.putBoolean("own_dao", npc.dao() != null && (data.dao() == null || data.dao() == npc.dao()));
 		tag.putBoolean("has_giok", has(player, 0));

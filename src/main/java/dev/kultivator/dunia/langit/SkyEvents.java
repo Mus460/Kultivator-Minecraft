@@ -2,6 +2,7 @@ package dev.kultivator.dunia.langit;
 
 import dev.kultivator.Kultivator;
 import dev.kultivator.beast.SpiritBeasts;
+import dev.kultivator.data.Cultivators;
 import dev.kultivator.dunia.DuniaBudget;
 import dev.kultivator.dunia.DuniaEvents;
 import dev.kultivator.dunia.DuniaSites;
@@ -12,6 +13,7 @@ import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -196,8 +198,15 @@ public final class SkyEvents {
 		TOUCH.clear();
 	}
 
-	/** {@code ServerEntityEvents.ALLOW_LOAD}: a natural monster spawn near a player during the eclipse may be touched. */
+	/**
+	 * {@code ServerEntityEvents.ALLOW_LOAD}: a natural monster spawn near a player during the eclipse may be touched; a
+	 * treasure guardian loaded from disk after its birth ended is not loaded at all.
+	 */
 	static boolean onSpawn(Entity entity, ServerLevel level, @Nullable EntitySpawnReason reason, boolean loadedFromDisk) {
+		if (loadedFromDisk && entity.entityTags().contains(TreasureBirths.GUARDIAN_TAG) && !TreasureGuardians.known(entity)) {
+			// a guardian saved with its chunk outlives its treasure: it returns to the earth instead of loading
+			return false;
+		}
 		if (loadedFromDisk || reason != EntitySpawnReason.NATURAL || !(entity instanceof Mob mob) || !(entity instanceof Enemy)) {
 			return true;
 		}
@@ -240,6 +249,9 @@ public final class SkyEvents {
 	 * nearby: half of it within 16 blocks, the same numbers as {@code SpiritBeasts.onKill}).
 	 */
 	static void onKill(ServerLevel level, Entity killer, LivingEntity killed, DamageSource source) {
+		if (killer instanceof ServerPlayer slayer && !(slayer instanceof FakePlayer) && killed.entityTags().contains(TOUCHED_TAG)) {
+			eclipseSpoils(level, slayer, killed);
+		}
 		if (!is(level, SkyKind.TWIN_MOONS) || HEART_DEMON.equals(BuiltInRegistries.ENTITY_TYPE.getKey(killed.getType()))) {
 			return;
 		}
@@ -258,8 +270,27 @@ public final class SkyEvents {
 		}
 	}
 
+	/**
+	 * An eclipse-touched monster slain by a player: {@link LangitItems#ECLIPSE_DROP} a Kristal Gerhana where it fell, a red
+	 * burst for the slayer, and the count towards {@code dunia/eclipse_hunter}.
+	 */
+	private static void eclipseSpoils(ServerLevel level, ServerPlayer slayer, LivingEntity killed) {
+		LangitFeats.eclipseSlain(slayer);
+		Net.send(slayer, LangitFxPayload.at(LangitFxPayload.KIND_GUARD_FALL, killed.getX(), killed.getY(), killed.getZ(), 0));
+		if (level.getRandom().nextDouble() >= LangitItems.ECLIPSE_DROP) {
+			return;
+		}
+		ItemEntity crystal = new ItemEntity(level, killed.getX(), killed.getY() + 0.5D, killed.getZ(), new ItemStack(LangitItems.KRISTAL_GERHANA));
+		crystal.setPickUpDelay(10);
+		level.addFreshEntity(crystal);
+		level.playSound(null, killed.getX(), killed.getY() + 0.5D, killed.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.HOSTILE, 0.7F, 0.6F);
+	}
+
 	private static void tickRunning(ServerLevel level, SkyKind kind, LangitConfig config, LangitData.Dim dim) {
 		long now = level.getGameTime();
+		if (kind == SkyKind.METEOR_SHOWER) {
+			GreatMeteors.tick(level, dim, config);
+		}
 		for (ServerPlayer player : List.copyOf(level.players())) {
 			if (player.isSpectator() || player.isRemoved()) {
 				continue;
@@ -268,6 +299,7 @@ public final class SkyEvents {
 			if (outdoors && WITNESSED.getOrDefault(player.getUUID(), 0) != dim.seed) {
 				WITNESSED.put(player.getUUID(), dim.seed);
 				Advancements.grant(player, "dunia/sky_event");
+				LangitFeats.witnessed(player, kind);
 			}
 			if (kind == SkyKind.METEOR_SHOWER && outdoors && (config.meteorShower || dim.forced)) {
 				long[] state = METEORS.computeIfAbsent(player.getUUID(), id -> new long[]{0L, 0L, 0L});
@@ -278,7 +310,7 @@ public final class SkyEvents {
 				}
 				if (now >= state[0] && state[1] < config.meteorsPerPlayer) {
 					state[0] = now + METEOR_GAP_MIN + level.getRandom().nextInt(METEOR_GAP_MAX - METEOR_GAP_MIN + 1);
-					if (fall(level, player, -1.0D) != null) {
+					if (fall(level, player, -1.0D, false) != null) {
 						state[1]++;
 					}
 				}
@@ -322,6 +354,10 @@ public final class SkyEvents {
 			// the new lines of DESIGN 34.8 once the voice module adds them, else the existing ones
 			Langit.heaven(player, "langit." + kind.id(),
 					kind == SkyKind.BLOOD_ECLIPSE ? "wrath" : kind == SkyKind.TWIN_MOONS ? "secret_realm" : "witness");
+			// what the night means at the player's own realm (four bands, the treasure tiers)
+			int band = TreasureBirths.tierOf(Cultivators.get(player).realm());
+			Msg.chat(player, Component.translatable("kultivator.langit.sense." + kind.id() + "." + band)
+					.withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
 		}
 		Kultivator.LOGGER.info("Sky event {} began in {}", kind.id(), key(level));
 		DuniaEvents.fireSkyEvent(level, kind, true);
@@ -391,6 +427,14 @@ public final class SkyEvents {
 	 * direction) on the heightmap top of a loaded chunk. Null when no loaded spot was found.
 	 */
 	static @Nullable MeteorRohEntity fall(ServerLevel level, ServerPlayer player, double distance) {
+		return fall(level, player, distance, false);
+	}
+
+	/**
+	 * {@link #fall(ServerLevel, ServerPlayer, double)} for a common meteor or ({@code great}) a Meteor Agung: 48-140 blocks
+	 * away when no distance is given, from 150-180 blocks up, 25-40 degrees off vertical, over {@link MeteorRohEntity#GREAT_FALL}.
+	 */
+	static @Nullable MeteorRohEntity fall(ServerLevel level, ServerPlayer player, double distance, boolean great) {
 		RandomSource random = level.getRandom();
 		for (int attempt = 0; attempt < 6; attempt++) {
 			double angle;
@@ -401,7 +445,8 @@ public final class SkyEvents {
 				reach = distance;
 			} else {
 				angle = random.nextDouble() * Math.PI * 2.0D;
-				reach = METEOR_NEAR + random.nextDouble() * (METEOR_FAR - METEOR_NEAR);
+				reach = great ? GreatMeteors.NEAR + random.nextDouble() * (GreatMeteors.FAR - GreatMeteors.NEAR)
+						: METEOR_NEAR + random.nextDouble() * (METEOR_FAR - METEOR_NEAR);
 			}
 			int x = (int) Math.floor(player.getX() + Math.cos(angle) * reach);
 			int z = (int) Math.floor(player.getZ() + Math.sin(angle) * reach);
@@ -417,13 +462,14 @@ public final class SkyEvents {
 			if (meteor == null) {
 				return null;
 			}
-			// from 90-120 blocks up, 15-35 degrees off vertical, from a random side
-			double height = 90.0D + random.nextDouble() * 30.0D;
-			double tilt = Math.toRadians(15.0D + random.nextDouble() * 20.0D);
+			// from 90-120 blocks up, 15-35 degrees off vertical, from a random side (great: higher and flatter)
+			double height = great ? 150.0D + random.nextDouble() * 30.0D : 90.0D + random.nextDouble() * 30.0D;
+			double tilt = Math.toRadians(great ? 25.0D + random.nextDouble() * 15.0D : 15.0D + random.nextDouble() * 20.0D);
 			double side = random.nextDouble() * Math.PI * 2.0D;
 			double across = Math.tan(tilt) * height;
 			Vector3f offset = new Vector3f((float) (Math.cos(side) * across), (float) height, (float) (Math.sin(side) * across));
-			meteor.setup(landing, offset, MeteorRohEntity.DEFAULT_FALL + random.nextInt(20), random.nextInt());
+			int fallTicks = great ? MeteorRohEntity.GREAT_FALL : MeteorRohEntity.DEFAULT_FALL + random.nextInt(20);
+			meteor.setup(landing, offset, fallTicks, random.nextInt(), great);
 			level.addFreshEntity(meteor);
 			return meteor;
 		}
@@ -432,6 +478,10 @@ public final class SkyEvents {
 
 	/** The meteor reached the ground: the impact visual and sound, the stone, a live map site. Nothing else changes. */
 	static void meteorLanded(ServerLevel level, MeteorRohEntity meteor) {
+		if (meteor.great()) {
+			GreatMeteors.landed(level, meteor);
+			return;
+		}
 		BlockPos landing = meteor.landing();
 		Vec3 at = Vec3.atBottomCenterOf(landing);
 		LangitFxPayload fx = LangitFxPayload.at(LangitFxPayload.KIND_IMPACT, at.x, at.y, at.z, 0);

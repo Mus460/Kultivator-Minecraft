@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/beast_tier_4",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.true_dragon.description"
+    },
+    "icon": {
+      "id": "kultivator:mutiara_jiao"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.true_dragon.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

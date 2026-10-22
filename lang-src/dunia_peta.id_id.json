@@ -180,5 +180,9 @@
   "advancement.kultivator.dunia.map_opened.title": "Gunung dan Laut",
   "advancement.kultivator.dunia.map_opened.description": "Buka Peta Dunia Kultivasi.",
   "advancement.kultivator.dunia.sites_5.title": "Penjelajah Lima Arah",
-  "advancement.kultivator.dunia.sites_5.description": "Ketahui lima situs dunia."
+  "advancement.kultivator.dunia.sites_5.description": "Ketahui lima situs dunia.",
+  "advancement.kultivator.dunia.sites_15.title": "Sembilan Gunung, Sembilan Laut",
+  "advancement.kultivator.dunia.sites_15.description": "Ketahui 15 situs di Peta Dunia Kultivasi.",
+  "advancement.kultivator.dunia.map_exchange.title": "Tinta Bertukar Tinta",
+  "advancement.kultivator.dunia.map_exchange.description": "Tukarkan situs yang kamu ketahui dengan pemain lain yang juga memegang peta (klik kanan dia)."
 }

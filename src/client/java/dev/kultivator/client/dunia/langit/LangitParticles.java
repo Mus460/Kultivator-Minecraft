@@ -62,6 +62,7 @@ final class LangitParticles {
 		if (level.getGameTime() % 5L == 0L) {
 			eclipseBreath(level, random);
 			channelStreams(level, player, random);
+			guardianMotes(level, random);
 		}
 	}
 
@@ -72,7 +73,7 @@ final class LangitParticles {
 		}
 		// 3 / 8 / 16 per second at full mist
 		mistCarry += EffectQuality.scale(8) / 20.0F * mist;
-		int rgb = LangitState.dawn > 0.5F ? DAWN_RGB : MIST_RGB;
+		int rgb = LangitState.dawn > 0.5F ? DAWN_RGB : LangitState.mistRgb;
 		float light = 0.35F + 0.65F * LangitState.daylight();
 		int shade = Qi.lerp(0x404848, rgb, light);
 		while (mistCarry >= 1.0F) {
@@ -155,6 +156,29 @@ final class LangitParticles {
 						entity.getX() + (random.nextDouble() - 0.5D) * entity.getBbWidth(),
 						entity.getY() + random.nextDouble() * entity.getBbHeight(),
 						entity.getZ() + (random.nextDouble() - 0.5D) * entity.getBbWidth(), 0.0D, 0.03D, 0.0D);
+			}
+		}
+	}
+
+	/** Golden motes rising from the sigil under each treasure guardian (one or two every 5 ticks). */
+	private static void guardianMotes(ClientLevel level, RandomSource random) {
+		int[] ids = LangitState.guards;
+		if (ids.length == 0) {
+			return;
+		}
+		int rgb = TreasureRewards.tierColor(LangitState.guardsTier);
+		int per = EffectQuality.minimal() ? 0 : 1;
+		for (int id : ids) {
+			Entity entity = level.getEntity(id);
+			if (entity == null || !entity.isAlive()) {
+				continue;
+			}
+			for (int i = 0; i <= per; i++) {
+				double angle = random.nextDouble() * Math.PI * 2.0D;
+				double r = 0.6D + random.nextDouble() * entity.getBbWidth();
+				level.addParticle(Qi.mote(i == 0 ? rgb : 0xFFF0C0, 0.1F + random.nextFloat() * 0.06F, 26 + random.nextInt(14)),
+						entity.getX() + Math.cos(angle) * r, entity.getY() + 0.1D, entity.getZ() + Math.sin(angle) * r,
+						0.0D, 0.03D + random.nextDouble() * 0.03D, 0.0D);
 			}
 		}
 	}
@@ -254,16 +278,91 @@ final class LangitParticles {
 		}
 	}
 
-	/** A Batu Meteor Roh absorbed: cyan Qi spiralling up around the player. */
-	static void absorb(ClientLevel level, Player player) {
+	/**
+	 * A sky stone absorbed: Qi spiralling up around the player. {@code kind} 0 a Batu Meteor Roh (cyan), 1 an Inti Meteor
+	 * Agung (a double helix of star light and a ring), 2 a Kristal Gerhana (crimson, sinking inwards like shadow).
+	 */
+	static void absorb(ClientLevel level, Player player, int kind) {
 		RandomSource random = level.getRandom();
-		int count = EffectQuality.scale(16);
-		for (int i = 0; i < count; i++) {
-			double angle = i / (double) count * Math.PI * 4.0D;
-			double r = 0.9D;
-			level.addParticle(Qi.mote(i % 4 == 0 ? 0xFFFFFF : METEOR_RGB, 0.14F, 30), player.getX() + Math.cos(angle) * r,
-					player.getY() + 0.2D + i * 0.1D, player.getZ() + Math.sin(angle) * r, -Math.cos(angle) * 0.03D, 0.04D, -Math.sin(angle) * 0.03D);
+		int body = kind == 2 ? ECLIPSE_RGB : METEOR_RGB;
+		int count = EffectQuality.scale(kind == 1 ? 32 : 16);
+		int strands = kind == 1 ? 2 : 1;
+		for (int strand = 0; strand < strands; strand++) {
+			for (int i = 0; i < count / strands; i++) {
+				double angle = i / (double) (count / strands) * Math.PI * 4.0D + strand * Math.PI;
+				double r = kind == 2 ? 1.4D - i * 0.04D : 0.9D;
+				double rise = kind == 2 ? 2.2D - i * 0.12D : 0.2D + i * 0.1D;
+				level.addParticle(Qi.mote(i % 4 == 0 ? 0xFFFFFF : body, kind == 1 ? 0.17F : 0.14F, 30), player.getX() + Math.cos(angle) * r,
+						player.getY() + Math.max(0.1D, rise), player.getZ() + Math.sin(angle) * r, -Math.cos(angle) * 0.03D,
+						kind == 2 ? -0.02D : 0.04D, -Math.sin(angle) * 0.03D);
+			}
 		}
+		if (kind == 1) {
+			level.addParticle(Qi.ring(0xE8FAFF, 0.5F, 3.5F, 18), player.getX(), player.getY() + 1.0D, player.getZ(), 0.0D, 0.0D, 0.0D);
+			level.addParticle(Qi.groundRing(METEOR_RGB, 0.6F, 4.0F, 24), player.getX(), player.getY() + 0.05D, player.getZ(), 0.0D, 0.0D, 0.0D);
+		} else if (kind == 2) {
+			level.addParticle(Qi.groundRing(ECLIPSE_RGB, 0.5F, 2.5F, 20), player.getX(), player.getY() + 0.05D, player.getZ(), 0.0D, 0.0D, 0.0D);
+		}
+	}
+
+	/** A Meteor Agung landed: a white-hot fountain, a dust wall, two ground rings, a flash and star-iron shards. */
+	static void greatImpact(ClientLevel level, double x, double y, double z) {
+		RandomSource random = level.getRandom();
+		int sparks = EffectQuality.scale(60);
+		for (int i = 0; i < sparks; i++) {
+			double angle = random.nextDouble() * Math.PI * 2.0D;
+			double speed = 0.35D + random.nextDouble() * 0.75D;
+			level.addParticle(Qi.spark(i % 3 == 0 ? 0xFFFFFF : METEOR_RGB, 0.32F, 22 + random.nextInt(16)), x, y + 0.4D, z,
+					Math.cos(angle) * speed, 0.35D + random.nextDouble() * 0.9D, Math.sin(angle) * speed);
+		}
+		int dust = EffectQuality.scale(36);
+		for (int i = 0; i < dust; i++) {
+			double angle = random.nextDouble() * Math.PI * 2.0D;
+			double r = 1.0D + random.nextDouble() * 3.0D;
+			level.addParticle(Qi.smoke(0x5A5260, 1.6F + random.nextFloat() * 1.2F, 70 + random.nextInt(40)), x + Math.cos(angle) * r, y + 0.3D,
+					z + Math.sin(angle) * r, Math.cos(angle) * 0.18D, 0.05D + random.nextDouble() * 0.08D, Math.sin(angle) * 0.18D);
+		}
+		int shards = EffectQuality.scale(14);
+		for (int i = 0; i < shards; i++) {
+			double angle = random.nextDouble() * Math.PI * 2.0D;
+			level.addParticle(Qi.shard(i % 2 == 0 ? 0x3A3448 : METEOR_RGB, 0.22F, 30 + random.nextInt(20)), x, y + 0.6D, z,
+					Math.cos(angle) * 0.4D, 0.5D + random.nextDouble() * 0.4D, Math.sin(angle) * 0.4D);
+		}
+		level.addParticle(Qi.groundRing(METEOR_RGB, 1.0F, 14.0F, 30), x, y + 0.05D, z, 0.0D, 0.0D, 0.0D);
+		level.addParticle(Qi.groundRing(0xFFFFFF, 0.6F, 8.0F, 18), x, y + 0.1D, z, 0.0D, 0.0D, 0.0D);
+		level.addParticle(Qi.ring(0xE8FAFF, 0.8F, 9.0F, 16), x, y + 1.5D, z, 0.0D, 0.0D, 0.0D);
+		level.addParticle(ColorParticleOption.create(ParticleTypes.FLASH, 0xFFE8FAFF), x, y + 1.0D, z, 0.0D, 0.0D, 0.0D);
+	}
+
+	/** A treasure was born near: seven-colour motes rushing out over the ground and a white ring. */
+	static void birthBurst(ClientLevel level, double x, double y, double z, int tier) {
+		RandomSource random = level.getRandom();
+		int count = EffectQuality.scale(28);
+		for (int i = 0; i < count; i++) {
+			double angle = i / (double) count * Math.PI * 2.0D;
+			double speed = 0.3D + random.nextDouble() * 0.2D;
+			level.addParticle(Qi.mote(RAINBOW[i % RAINBOW.length], 0.2F, 30 + random.nextInt(10)), x, y + 0.3D, z,
+					Math.cos(angle) * speed, 0.02D + random.nextDouble() * 0.05D, Math.sin(angle) * speed);
+		}
+		level.addParticle(Qi.groundRing(TreasureRewards.tierColor(tier), 0.8F, 12.0F, 30), x, y + 0.05D, z, 0.0D, 0.0D, 0.0D);
+	}
+
+	/**
+	 * A guardian of the treasure fell ({@code tier} 1-4, its colour) or an eclipse-touched monster fell ({@code tier} 0,
+	 * crimson): the body's Qi scatters upwards and a ring settles.
+	 */
+	static void guardFall(ClientLevel level, double x, double y, double z, int tier) {
+		RandomSource random = level.getRandom();
+		int rgb = tier <= 0 ? ECLIPSE_RGB : TreasureRewards.tierColor(tier);
+		int count = EffectQuality.scale(tier <= 0 ? 12 : 22);
+		for (int i = 0; i < count; i++) {
+			double angle = random.nextDouble() * Math.PI * 2.0D;
+			double r = random.nextDouble() * 0.6D;
+			level.addParticle(Qi.mote(i % 3 == 0 ? 0xFFFFFF : rgb, 0.16F, 30 + random.nextInt(20)), x + Math.cos(angle) * r,
+					y + 0.2D + random.nextDouble() * 1.6D, z + Math.sin(angle) * r, Math.cos(angle) * 0.03D, 0.06D + random.nextDouble() * 0.06D,
+					Math.sin(angle) * 0.03D);
+		}
+		level.addParticle(Qi.groundRing(rgb, 0.6F, tier <= 0 ? 2.5F : 4.5F, 22), x, y + 0.05D, z, 0.0D, 0.0D, 0.0D);
 	}
 
 	/** The channel broke: the gathered Qi scatters. */

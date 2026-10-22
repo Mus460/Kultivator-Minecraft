@@ -55,6 +55,14 @@ public class SoulRenderer extends LivingEntityRenderer<SisaJiwaEntity, DiscipleR
 		state.showCape = false;
 		state.rightArmPose = HumanoidModel.ArmPose.EMPTY;
 		state.leftArmPose = HumanoidModel.ArmPose.EMPTY;
+		if (entity.glow() > 0) {
+			// talking: one hand raised in turn as it explains, and a slow nod (through the state, so the robe layer's
+			// model follows the same pose)
+			boolean right = (((int) (state.ageInTicks / 24.0F)) & 1) == 0;
+			state.rightArmPose = right ? HumanoidModel.ArmPose.ITEM : HumanoidModel.ArmPose.EMPTY;
+			state.leftArmPose = right ? HumanoidModel.ArmPose.EMPTY : HumanoidModel.ArmPose.ITEM;
+			state.xRot += 6.0F * Mth.sin(state.ageInTicks * 0.35F);
+		}
 		int tier = Mth.clamp(entity.tier(), 1, 3);
 		// the robe of a high realm: Nascent Soul trims for Kecil, Deity Transformation, Dao Union and beyond for the others
 		state.realm = tier == 1 ? 5 : tier == 2 ? 7 : 8;
@@ -114,6 +122,12 @@ public class SoulRenderer extends LivingEntityRenderer<SisaJiwaEntity, DiscipleR
 
 	@Override
 	protected Component getNameTag(SisaJiwaEntity entity) {
-		return entity.getDisplayName();
+		return RTitles.name(entity.getDisplayName(), 0xE8F6FF);
+	}
+
+	@Override
+	protected void extractNameTags(SisaJiwaEntity entity, DiscipleRenderState state, float partialTicks) {
+		super.extractNameTags(entity, state, partialTicks);
+		state.scoreText = state.nameTag == null ? null : RTitles.soul(entity.tier());
 	}
 }

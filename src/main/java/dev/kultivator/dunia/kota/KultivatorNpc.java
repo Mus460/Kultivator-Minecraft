@@ -2,7 +2,10 @@ package dev.kultivator.dunia.kota;
 
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Realm;
+import dev.kultivator.data.Rank;
 import dev.kultivator.disciple.DuelRules;
+import dev.kultivator.duel.ai.DuelistProfile;
+import dev.kultivator.duel.api.Duelist;
 import dev.kultivator.technique.spec.TechniquePower;
 import dev.kultivator.util.NoGrief;
 import net.minecraft.core.BlockPos;
@@ -21,6 +24,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -48,11 +52,15 @@ import java.util.UUID;
  * ({@link NoGrief#TAG}) and never gets a custom name. The spawner (anchors, wanderers, rivals) re-makes it.
  * <p>
  * Synced: role, look seed (skin and slim model), realm, stage, Dao (-1 none), voice (0-5: m1-m3, f1-f3), robe colour (0
- * = the role's), flags ({@link #FLAG_SITTING}, {@link #FLAG_CHANNEL}, {@link #FLAG_HOSTILE}, {@link #FLAG_AURA}) and the
- * name plate. Server only: home, town, group, temperament, the players it is hostile to, the lonely-despawn rule and a
- * companion owner.
+ * = the role's), flags ({@link #FLAG_SITTING}, {@link #FLAG_CHANNEL}, {@link #FLAG_HOSTILE}, {@link #FLAG_AURA} and the
+ * body-language flags {@link #FLAG_TALK}, {@link #FLAG_BOW}, {@link #FLAG_GAZE}, {@link #FLAG_WORK} the client poses),
+ * the name plate and the spoken line shown as a speech bubble ({@link #say}). Server only: home, town, group,
+ * temperament, the players it is hostile to, the lonely-despawn rule and a companion owner.
+ * <p>
+ * Wanderers, rivals and guards fight sword duels (DESIGN 35.7.6) through the optional {@link Duelist} interface; the
+ * duel never depends on this class ({@link KotaDuel} answers for it).
  */
-public class KultivatorNpc extends PathfinderMob {
+public class KultivatorNpc extends PathfinderMob implements Duelist {
 
 	public static final String TAG = "kultivator.kota_npc";
 
@@ -63,6 +71,16 @@ public class KultivatorNpc extends PathfinderMob {
 	public static final int FLAG_AURA = 8;
 	/** Translucent (a ghost or an illusion; reserved for the Dunia Bawah's use of K's NPCs on Pulau Pasar it stays 0). */
 	public static final int FLAG_GHOST = 16;
+	/** Talking: the hands move with the words, the head nods (a speech bubble or a screen is open). */
+	public static final int FLAG_TALK = 32;
+	/** The cupped-fist salute and a small bow (to a senior, a guest, a lecture's end). */
+	public static final int FLAG_BOW = 64;
+	/** Looking up at the sky (a sky event, a treasure light, the noon bell). */
+	public static final int FLAG_GAZE = 128;
+	/** The role's work: counting on the abacus, hammering, pouring tea, the morning exercise. */
+	public static final int FLAG_WORK = 256;
+	/** A rival group's leader (the client dresses it in the gold guan and the cloak). */
+	public static final int FLAG_LEADER = 512;
 
 	public static final String[] VOICES = {"m1", "m2", "m3", "f1", "f2", "f3"};
 
@@ -75,6 +93,8 @@ public class KultivatorNpc extends PathfinderMob {
 	private static final EntityDataAccessor<Integer> DATA_ROBE = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> DATA_FLAGS = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Component> DATA_PLATE = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.COMPONENT);
+	/** The line it is saying (a speech bubble above the plate; empty = none). */
+	private static final EntityDataAccessor<Component> DATA_LINE = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.COMPONENT);
 
 	public static final double BASE_HEALTH = 24.0D;
 	public static final double[] TIER_HEALTH = {1.0D, 1.5D, 2.5D, 4.0D, 10.0D};
@@ -98,6 +118,13 @@ public class KultivatorNpc extends PathfinderMob {
 	/** Free-form state of the spawner (wanderer meeting, rival race, lecture...). */
 	private final net.minecraft.nbt.CompoundTag memory = new net.minecraft.nbt.CompoundTag();
 	private boolean vanished;
+	/** Game times the body-language flags and the speech line end at (0 = not set). */
+	private long lineUntil;
+	private long bowUntil;
+	private long gazeUntil;
+	private long workUntil;
+	/** The last game time it fought (the blade goes back into its sheath three seconds later). */
+	private long lastFight;
 
 	public KultivatorNpc(EntityType<? extends KultivatorNpc> type, Level level) {
 		super(type, level);
@@ -131,6 +158,7 @@ public class KultivatorNpc extends PathfinderMob {
 		builder.define(DATA_ROBE, 0);
 		builder.define(DATA_FLAGS, 0);
 		builder.define(DATA_PLATE, Component.empty());
+		builder.define(DATA_LINE, Component.empty());
 	}
 
 	@Override
@@ -252,6 +280,131 @@ public class KultivatorNpc extends PathfinderMob {
 
 	public void setPlate(Component plate) {
 		this.entityData.set(DATA_PLATE, plate == null ? Component.empty() : plate);
+	}
+
+	/** The line it is saying now (empty when silent). */
+	public Component line() {
+		return this.entityData.get(DATA_LINE);
+	}
+
+	/**
+	 * Says {@code text} for {@code ticks}: a speech bubble above the name plate for players within 12 blocks, and the
+	 * talking gesture. Text only (the voice is the caller's, through {@code Voice}). Server side.
+	 */
+	public void say(Component text, int ticks) {
+		if (this.level().isClientSide() || text == null) {
+			return;
+		}
+		this.entityData.set(DATA_LINE, text);
+		this.lineUntil = this.level().getGameTime() + Math.max(20, ticks);
+		setFlag(FLAG_TALK, true);
+	}
+
+	/** The cupped-fist salute for {@code ticks}. */
+	public void bow(int ticks) {
+		if (!this.level().isClientSide()) {
+			this.bowUntil = this.level().getGameTime() + Math.max(10, ticks);
+			setFlag(FLAG_BOW, true);
+		}
+	}
+
+	/** Looks up at the sky for {@code ticks}. */
+	public void gaze(int ticks) {
+		if (!this.level().isClientSide()) {
+			this.gazeUntil = this.level().getGameTime() + Math.max(10, ticks);
+			setFlag(FLAG_GAZE, true);
+		}
+	}
+
+	/** Works (the role's gesture) for {@code ticks}; 0 stops. */
+	public void work(int ticks) {
+		if (!this.level().isClientSide()) {
+			this.workUntil = ticks <= 0 ? 0L : this.level().getGameTime() + ticks;
+			setFlag(FLAG_WORK, ticks > 0);
+		}
+	}
+
+	/** True while the speech line or a bow is still running (chatter waits for it). */
+	public boolean busyTalking() {
+		return hasFlag(FLAG_TALK) || hasFlag(FLAG_BOW);
+	}
+
+	/** Ends the body language whose time is up (every tick, a few comparisons). */
+	private void tickBodyLanguage(long now) {
+		if (lineUntil != 0L && now >= lineUntil) {
+			lineUntil = 0L;
+			this.entityData.set(DATA_LINE, Component.empty());
+			setFlag(FLAG_TALK, false);
+		}
+		if (bowUntil != 0L && now >= bowUntil) {
+			bowUntil = 0L;
+			setFlag(FLAG_BOW, false);
+		}
+		if (gazeUntil != 0L && now >= gazeUntil) {
+			gazeUntil = 0L;
+			setFlag(FLAG_GAZE, false);
+		}
+		if (workUntil != 0L && now >= workUntil) {
+			workUntil = 0L;
+			setFlag(FLAG_WORK, false);
+		}
+	}
+
+	/** The realm (and Dao) line under the plate: "Inti Emas, Akhir · Dao Pedang" (client renderer, within 10 blocks). */
+	@Override
+	public @Nullable Component belowNameDisplay() {
+		Component scoreboard = super.belowNameDisplay();
+		if (scoreboard != null || plate().getString().isEmpty()) {
+			return scoreboard;
+		}
+		Realm realm = realmValue();
+		net.minecraft.network.chat.MutableComponent text = new Rank(realm, 0, Mth.clamp(stage(), 0, Math.max(0, realm.stages() - 1)))
+				.displayName().withColor(realm.color());
+		Dao dao = dao();
+		if (dao != null && role() != NpcRole.WARGA) {
+			text.append(Component.literal(" \u00b7 ").withColor(0x9A9A9A)).append(dao.displayName().copy().withColor(dao.color()));
+		}
+		return text;
+	}
+
+	// ================================================================== weapons (DESIGN 34.5.2-34.5.3, 35.7.6)
+
+	/** Remembers a fight now (the blade stays drawn while it fights and three seconds after). */
+	public void fought() {
+		this.lastFight = this.level().getGameTime();
+	}
+
+	public long lastFight() {
+		return lastFight;
+	}
+
+	/**
+	 * Draws ({@code true}) or sheathes its weapon (the main hand; the sheath and hilt are drawn by the client when the
+	 * hand is empty). A copy without attribute modifiers: the role's combat numbers stay those of DESIGN 25.4.2.
+	 */
+	public void arm(boolean drawn) {
+		ItemStack held = this.getMainHandItem();
+		if (drawn == !held.isEmpty()) {
+			return;
+		}
+		this.setItemSlot(EquipmentSlot.MAINHAND, drawn ? NpcGear.weapon(this) : ItemStack.EMPTY);
+	}
+
+	// ================================================================== sword duels (the duel module asks, KotaDuel answers)
+
+	@Override
+	public @Nullable DuelistProfile duelProfile() {
+		return KotaDuel.profile(this);
+	}
+
+	@Override
+	public boolean acceptsDuel(ServerPlayer challenger) {
+		return KotaDuel.accepts(this, challenger);
+	}
+
+	@Override
+	public void onDuelEnd(boolean won) {
+		KotaDuel.ended(this, won);
 	}
 
 	/** {@code disciple.<voice>.<line>} (DESIGN 34.8: reused disciple voices). */
@@ -451,8 +604,11 @@ public class KultivatorNpc extends PathfinderMob {
 	@Override
 	public void tick() {
 		super.tick();
-		if (!this.level().isClientSide() && this.tickCount % 20 == 0 && !this.isRemoved()) {
-			NpcAi.check(this);
+		if (!this.level().isClientSide() && !this.isRemoved()) {
+			tickBodyLanguage(this.level().getGameTime());
+			if (this.tickCount % 20 == 0) {
+				NpcAi.check(this);
+			}
 		}
 	}
 

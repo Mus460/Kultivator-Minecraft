@@ -1,5 +1,6 @@
 package dev.kultivator.client.dunia.langit;
 
+import dev.kultivator.abadi.Abadi;
 import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.dunia.DuniaScenes;
 import dev.kultivator.client.epic.EpicSettings;
@@ -18,11 +19,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,8 +41,9 @@ import java.util.Map;
 /**
  * Everything the client knows of module L (DESIGN 34.5.8-34.5.10): the sky event of its dimension, the 3 × 3 spirit
  * weather cells around the player, the live treasure births (their pillars), the one-off effects and the eclipse marks.
- * Filled by the four payloads; eased once per client tick; read by {@link LangitRenderer}, {@link LangitHud} and the
- * particle pass of {@link LangitParticles}. All of it is cleared on a world change or a disconnect.
+ * Filled by the four payloads; eased once per client tick; read by {@link LangitRenderer}, {@link LangitHud}, the
+ * particle pass of {@link LangitParticles} and the sounds of {@link LangitAmbience}. Also the treasure guardians near the
+ * player, the mist colour of the local biome, the Meteor Agung's path and the short bolide flash. All of it is cleared on a world change or a disconnect.
  * <p>
  * The sky grades go through the 7b {@link SkyDirector} at the lowest priority (0), refreshed every 5 s so any epic moment
  * may take the sky and L's grade comes back after it: Gerhana Darah red 0.35, the Qi mists white 0.25 / 0.5, Fajar Ungu
@@ -111,6 +118,11 @@ final class LangitState {
 		final int life;
 		int age;
 		final int seed;
+		/** {@link LangitFxPayload#KIND_GREAT_INCOMING}: the start offset of the fall and its ticks. */
+		float ox;
+		float oy;
+		float oz;
+		int fall;
 
 		Fx(int kind, double x, double y, double z, int a, int life, int seed) {
 			this.kind = kind;
@@ -129,6 +141,22 @@ final class LangitState {
 
 	static final List<Fx> FX = new ArrayList<>();
 	static final int MAX_FX = 24;
+	/** A client-only effect kind: the ring that runs over the ground when a treasure is born near the player. */
+	static final int FX_BIRTH_WAVE = 100;
+
+	// ---- the treasure guardians near the player (their sigils), forgotten 5 s after the last refresh
+	static int[] guards = new int[0];
+	static int guardsTier = 1;
+	private static int guardsTicks;
+
+	// ---- the colour of the Qi mist where the player stands (by the biome), eased
+	static int mistRgb = 0xD8F2E8;
+	private static int mistTarget = 0xD8F2E8;
+	private static int tintTimer;
+
+	// ---- a white-blue flash over the screen (a bolide bursting, a Meteor Agung landing near), Effect Quality "Kilat" only
+	static float flash;
+	static int flashRgb = 0xFFFFFF;
 	/** Entity ids of the eclipse-touched monsters near the player. */
 	static int[] marks = new int[0];
 
@@ -228,6 +256,11 @@ final class LangitState {
 				playAt(SoundEvents.BEACON_ACTIVATE, base, 4.0F, 0.6F);
 				TitleCard.show(TitleCard.banner(Component.translatable("kultivator.langit.harta.banner")));
 			}
+			if (distance < 256.0D) {
+				// the birth's shock ring runs over the ground from the pillar's foot
+				add(new Fx(FX_BIRTH_WAVE, base.x, base.y, base.z, view.tier, 70, view.seed));
+				LangitParticles.birthBurst(minecraft.level, base.x, base.y, base.z, view.tier);
+			}
 		}
 	}
 
@@ -267,8 +300,26 @@ final class LangitState {
 				}
 			}
 			case LangitFxPayload.KIND_DEW -> LangitParticles.dew(minecraft.level, payload.x(), payload.y(), payload.z(), payload.a());
-			case LangitFxPayload.KIND_ABSORB -> LangitParticles.absorb(minecraft.level, minecraft.player);
+			case LangitFxPayload.KIND_ABSORB -> LangitParticles.absorb(minecraft.level, minecraft.player, payload.a());
 			case LangitFxPayload.KIND_CHANNEL_BROKEN -> LangitParticles.broken(minecraft.level, payload.x(), payload.y(), payload.z());
+			case LangitFxPayload.KIND_GREAT_INCOMING -> greatIncoming(minecraft, payload, seed);
+			case LangitFxPayload.KIND_GREAT_IMPACT -> {
+				add(new Fx(payload.kind(), payload.x(), payload.y(), payload.z(), payload.a(), 1200, seed));
+				LangitParticles.greatImpact(minecraft.level, payload.x(), payload.y(), payload.z());
+				double distance = minecraft.player.position().distanceTo(new Vec3(payload.x(), payload.y(), payload.z()));
+				if (distance < 128.0D) {
+					CameraShake.add((float) (0.8D * (1.0D - distance / 128.0D)) + 0.15F, 26, minecraft.player.position(), 16.0F);
+				}
+				if (distance < 160.0D) {
+					bolide(0xE8FAFF, (float) (0.55D * (1.0D - distance / 160.0D)));
+				}
+			}
+			case LangitFxPayload.KIND_GUARDS -> {
+				guards = payload.ids().clone();
+				guardsTier = Math.max(1, Math.min(4, payload.a()));
+				guardsTicks = guards.length == 0 ? 0 : 100;
+			}
+			case LangitFxPayload.KIND_GUARD_FALL -> LangitParticles.guardFall(minecraft.level, payload.x(), payload.y(), payload.z(), payload.a());
 			case LangitFxPayload.KIND_SEAL_OMEN -> {
 				float felt = Mth.clamp(payload.a() / 100.0F, 0.0F, 1.0F);
 				boolean fresh = sealOmenTarget <= 0.0F;
@@ -322,6 +373,41 @@ final class LangitState {
 			DuniaScenes.card(scene, 10, Component.translatable("kultivator.langit.kind." + kind.id()),
 					Component.translatable("kultivator.langit.card." + kind.id()), seal, rgb);
 		}
+	}
+
+	/**
+	 * A Meteor Agung was sent: its path (for the sky-projected streak beyond the tracking range), a far rumble from where it
+	 * enters the sky, and within 320 blocks the moment's card (no camera move: the player should look up themselves).
+	 */
+	private static void greatIncoming(Minecraft minecraft, LangitFxPayload payload, int seed) {
+		int[] path = payload.ids();
+		int fall = path.length >= 4 ? Math.max(10, path[3]) : 140;
+		Fx fx = new Fx(LangitFxPayload.KIND_GREAT_INCOMING, payload.x(), payload.y(), payload.z(), payload.a(), fall + 10, seed);
+		fx.ox = path.length >= 4 ? path[0] / 16.0F : 40.0F;
+		fx.oy = path.length >= 4 ? path[1] / 16.0F : 160.0F;
+		fx.oz = path.length >= 4 ? path[2] / 16.0F : 0.0F;
+		fx.fall = fall;
+		add(fx);
+		Vec3 player = minecraft.player.position();
+		Vec3 start = new Vec3(payload.x() + fx.ox, payload.y() + fx.oy, payload.z() + fx.oz);
+		Vec3 toward = start.subtract(player).normalize();
+		playAt(SoundEvents.TRIDENT_THUNDER.value(), player.add(toward.scale(16.0D)), 0.7F, 0.5F);
+		playAt(SoundEvents.FIREWORK_ROCKET_LAUNCH, player.add(toward.scale(12.0D)), 0.6F, 0.4F);
+		Vec3 landing = new Vec3(payload.x(), payload.y(), payload.z());
+		if (player.distanceTo(landing) < 320.0D) {
+			Scene scene = DuniaScenes.world("langit/meteor_agung", landing, seed, 120, true);
+			DuniaScenes.card(scene, 4, Component.translatable("kultivator.langit.agung.card"),
+					Component.translatable("kultivator.langit.agung.card_sub"), "隕", 0x6FD8FF);
+		}
+	}
+
+	/** A short screen flash (Effect Quality "Kilat" on): a bolide bursting or a Meteor Agung landing near. */
+	static void bolide(int rgb, float strength) {
+		if (!EffectQuality.flash() || !(strength > flash)) {
+			return;
+		}
+		flash = Mth.clamp(strength, 0.0F, 0.6F);
+		flashRgb = rgb;
 	}
 
 	/** The local player claimed the treasure: the beat-40 scene (Penuh: a 3 s orbit and the card; Singkat: the card). */
@@ -392,8 +478,18 @@ final class LangitState {
 				it.remove();
 			}
 		}
+		if (guardsTicks > 0 && --guardsTicks == 0) {
+			guards = new int[0];
+		}
+		if (--tintTimer <= 0) {
+			tintTimer = 20;
+			mistTarget = biomeTint(level, minecraft.player.blockPosition());
+		}
+		mistRgb = LangitRenderer.lerpRgb(mistRgb, mistTarget, 0.08F);
+		flash = Math.max(0.0F, flash - 0.04F);
 		LangitSky.tick(level, minecraft);
 		LangitParticles.tick(level, minecraft);
+		LangitAmbience.tick(level, minecraft);
 		grades(minecraft);
 	}
 
@@ -432,6 +528,64 @@ final class LangitState {
 			case PURPLE_DAWN -> 0.8F;
 			case CLEAR -> 0.0F;
 		};
+	}
+
+	/**
+	 * The colour of the Qi mist by the biome under the player (the server's weather is per 512-block cell, its colour is
+	 * local): pink in cherry groves, reed green in swamps, blue-white in snow, sand in deserts, gold in Alam Abadi.
+	 */
+	static int biomeTint(ClientLevel level, BlockPos pos) {
+		if (level.dimension().equals(Abadi.IMMORTAL_LEVEL)) {
+			return 0xF2E4BC;
+		}
+		Holder<Biome> biome = level.getBiome(pos);
+		if (biome.is(Biomes.CHERRY_GROVE)) {
+			return 0xF4D4E4;
+		}
+		if (biome.is(Biomes.SWAMP) || biome.is(Biomes.MANGROVE_SWAMP)) {
+			return 0xC6DABE;
+		}
+		if (biome.is(Biomes.PALE_GARDEN)) {
+			return 0xDCE0E0;
+		}
+		if (biome.is(Biomes.SNOWY_PLAINS) || biome.is(Biomes.SNOWY_TAIGA) || biome.is(Biomes.SNOWY_SLOPES) || biome.is(Biomes.FROZEN_PEAKS)
+				|| biome.is(Biomes.JAGGED_PEAKS) || biome.is(Biomes.ICE_SPIKES) || biome.is(Biomes.GROVE)) {
+			return 0xE2EEFA;
+		}
+		if (biome.is(BiomeTags.IS_JUNGLE)) {
+			return 0xC8ECCC;
+		}
+		if (biome.is(Biomes.DESERT) || biome.is(BiomeTags.IS_BADLANDS) || biome.is(BiomeTags.IS_SAVANNA)) {
+			return 0xEEE2C8;
+		}
+		if (biome.is(BiomeTags.IS_MOUNTAIN)) {
+			return 0xDCE8F2;
+		}
+		return LangitParticles.MIST_RGB;
+	}
+
+	/**
+	 * How much of the moon Tiangou has swallowed during Gerhana Darah (0..1): the bite comes over the first 22 % of the
+	 * night, the totality holds, and the moon is given back over the last 22 % (a forced test night is shorter, the same
+	 * shape).
+	 */
+	static float eclipseCover(ClientLevel level, float partial) {
+		if (skyEnd <= skyStart) {
+			return 1.0F;
+		}
+		float p = (float) ((level.getOverworldClockTime() + partial - skyStart) / (double) (skyEnd - skyStart));
+		if (p < 0.22F) {
+			return smooth(p / 0.22F);
+		}
+		if (p > 0.78F) {
+			return smooth((1.0F - p) / 0.22F);
+		}
+		return 1.0F;
+	}
+
+	static float smooth(float t) {
+		float k = Mth.clamp(t, 0.0F, 1.0F);
+		return k * k * (3.0F - 2.0F * k);
 	}
 
 	static float skyWeight(float partial) {
@@ -542,6 +696,12 @@ final class LangitState {
 		BIRTHS.clear();
 		FX.clear();
 		marks = new int[0];
+		guards = new int[0];
+		guardsTicks = 0;
+		mistRgb = LangitParticles.MIST_RGB;
+		mistTarget = LangitParticles.MIST_RGB;
+		tintTimer = 0;
+		flash = 0.0F;
 		sealOmenTarget = 0.0F;
 		sealOmenTicks = 0;
 		sealOmen = 0.0F;
@@ -549,6 +709,7 @@ final class LangitState {
 		sealOmenShown = 0.0F;
 		LangitSky.clearStreaks();
 		LangitParticles.clear();
+		LangitAmbience.clear();
 	}
 
 	private LangitState() {

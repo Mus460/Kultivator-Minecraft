@@ -13,7 +13,6 @@ import dev.kultivator.disciple.DuelRules;
 import dev.kultivator.dunia.DuniaEvents;
 import dev.kultivator.dunia.DuniaSpine;
 import dev.kultivator.dunia.api.DuniaApi;
-import dev.kultivator.dunia.api.SkyKind;
 import dev.kultivator.dunia.api.SoulService;
 import dev.kultivator.dunia.dimensi.Dimensi;
 import dev.kultivator.dunia.dimensi.DimensiConfig;
@@ -202,13 +201,9 @@ public final class SoulJourney {
 		return null;
 	}
 
-	/** True when the blood eclipse holds the player's level (the gate needs no incense then). */
+	/** True when the blood eclipse holds the overworld's sky (the gate needs no incense then; see {@code DimensiSky}). */
 	public static boolean bloodEclipse(ServerLevel level) {
-		try {
-			return DuniaApi.sky().active(level) == SkyKind.BLOOD_ECLIPSE;
-		} catch (RuntimeException exception) {
-			return false;
-		}
+		return dev.kultivator.dunia.dimensi.DimensiSky.eclipse(level.getServer());
 	}
 
 	/** The altar anchor's pass (every 20 ticks): sneaking players kneel; 3 s later the soul leaves. */
@@ -529,6 +524,7 @@ public final class SoulJourney {
 			tag.putString("bdim", ret.getStringOr("dim", ""));
 		}
 		dev.kultivator.dunia.dimensi.laut.SeaGate.writeState(player, tag);
+		tag.putInt("sky", dev.kultivator.dunia.dimensi.DimensiSky.code(player.level().getServer()));
 		DimensiNet.send(player, new DimensiNet.State(tag));
 	}
 

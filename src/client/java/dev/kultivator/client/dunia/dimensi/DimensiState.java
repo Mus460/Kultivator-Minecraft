@@ -6,7 +6,8 @@ import net.minecraft.nbt.CompoundTag;
 
 /**
  * The local player's last {@link DimensiNet.State} (DESIGN 34.5.13-14): soul flag, soul time left, the body's place
- * (the homesick compass of Teras Wangxiang), Luka Jiwa, and the sea flags. Times are kept as client game times so the
+ * (the homesick compass of Teras Wangxiang), Luka Jiwa, the sea flags and the sky event over the overworld (module L's,
+ * as module D feels it). Times are kept as client game times so the
  * HUD timer runs between the server's 5 s refreshes.
  */
 public final class DimensiState {
@@ -19,6 +20,7 @@ public final class DimensiState {
 	private static String bodyDim = "";
 	private static boolean sea;
 	private static boolean breath;
+	private static int sky;
 
 	static void onState(DimensiNet.State payload) {
 		CompoundTag tag = payload.data();
@@ -31,6 +33,7 @@ public final class DimensiState {
 		bodyDim = tag.getStringOr("bdim", "");
 		sea = tag.getBooleanOr("sea", false);
 		breath = tag.getBooleanOr("breath", false);
+		sky = tag.getIntOr("sky", 0);
 	}
 
 	static void clear() {
@@ -40,6 +43,7 @@ public final class DimensiState {
 		bodyDim = "";
 		sea = false;
 		breath = false;
+		sky = 0;
 	}
 
 	private static long now() {
@@ -78,6 +82,11 @@ public final class DimensiState {
 
 	public static boolean breath() {
 		return breath;
+	}
+
+	/** The sky over the overworld as module D sees it: 0 none, 1 meteor shower, 2 blood eclipse, 3 twin moons. */
+	public static int sky() {
+		return sky;
 	}
 
 	private DimensiState() {

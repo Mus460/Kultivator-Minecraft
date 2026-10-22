@@ -139,6 +139,15 @@ public final class GuideProgress {
 		if (check == null || check.isEmpty()) {
 			return false;
 		}
+		if (check.indexOf('|') >= 0) {
+			// alternatives: "adv:a|adv:b" is done when any one is
+			for (String alternative : check.split("\\|")) {
+				if (check(player, data, alternative)) {
+					return true;
+				}
+			}
+			return false;
+		}
 		try {
 			String[] part = check.split(":");
 			return switch (part[0]) {

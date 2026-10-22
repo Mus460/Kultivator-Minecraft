@@ -115,6 +115,7 @@ public final class ShrineRun extends AnchorRun {
 		seal.pulled |= 1 << n;
 		talisman.setState(TekaPartEntity.LIT);
 		RRewards.give(player, new ItemStack(RItems.SOBEKAN_SEGEL));
+		dev.kultivator.util.Advancements.grant(player, "dunia/hong_xin");
 		RFx.at(level, talisman.position(), RFx.TALISMAN_TORN, n, 0, 1.0F);
 		level.playSound(null, talisman.getX(), talisman.getY(), talisman.getZ(), SoundEvents.BOOK_PAGE_TURN, SoundSource.BLOCKS, 1.0F, 0.5F);
 		level.playSound(null, centre().x, centre().y, centre().z, SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 1.5F, 0.6F);

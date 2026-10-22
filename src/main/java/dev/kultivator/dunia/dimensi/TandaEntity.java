@@ -29,7 +29,9 @@ import java.util.UUID;
  * Kinds: {@link #PUSARAN} the sea-gate whirlpool on the water, {@link #GERBANG} a return gate (Jalan Pulang, Gerbang
  * Pulang), {@link #TERAS} the arrival ring of Teras Wangxiang, {@link #BUKU} the Book of Life and Death, {@link #ALTAR}
  * the incense altar of a Kuil Gerbang Hantu, {@link #HERBA} a harvestable herb bed, {@link #MATA_AIR} the Penglai spring,
- * {@link #DIZANG} Dizang's shrine, {@link #CERMIN} the Mirror of Retribution.
+ * {@link #DIZANG} Dizang's shrine, {@link #CERMIN} the Mirror of Retribution, {@link #NAIHE} the glow of the Wangchuan
+ * under the Naihe bridge and the halos of the bridge's soul lanterns (drawn in the bridge piece's own frame: the mark
+ * carries the anchor's yaw, which the template rotation turned with the piece).
  */
 public class TandaEntity extends Entity {
 
@@ -42,7 +44,8 @@ public class TandaEntity extends Entity {
 	public static final int MATA_AIR = 6;
 	public static final int DIZANG = 7;
 	public static final int CERMIN = 8;
-	public static final int KINDS = 9;
+	public static final int NAIHE = 9;
+	public static final int KINDS = 10;
 
 	/** Tag of every mark (the load refusal and the cleanup). */
 	public static final String TAG = "kultivator.tanda_dimensi";
@@ -122,7 +125,7 @@ public class TandaEntity extends Entity {
 
 	@Override
 	public boolean isPickable() {
-		return kind() != PUSARAN && kind() != TERAS;
+		return kind() != PUSARAN && kind() != TERAS && kind() != NAIHE;
 	}
 
 	@Override

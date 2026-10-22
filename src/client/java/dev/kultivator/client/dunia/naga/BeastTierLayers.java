@@ -166,11 +166,33 @@ public final class BeastTierLayers {
 			if (!EffectQuality.minimal()) {
 				overlay(model, state, poseStack, collector, WOLF_OVERLAY[step], pulse);
 			}
+			ModelPart root = model.root();
+			if (!root.hasChild("head")) {
+				return;
+			}
+			if (!EffectQuality.minimal()) {
+				// the star-silver ruff behind the head (tier 4+), breathing with the wolf
+				poseStack.pushPose();
+				root.translateAndRotate(poseStack);
+				root.getChild("head").translateAndRotate(poseStack);
+				poseStack.translate(1.0F / 16.0F, 0.5F / 16.0F, 2.6F / 16.0F);
+				float ruff = (entry.tier >= 6 ? 0.62F : 0.55F) * (1.0F + 0.03F * pulse);
+				poseStack.scale(ruff, ruff, ruff);
+				NagaModels.submitOnPart("star_ruff", poseStack, collector, entry.tier >= 5 ? LightCoordsUtil.FULL_BRIGHT : light);
+				poseStack.popPose();
+			}
+			if (entry.tier >= BeastData.TOP_TIER) {
+				// Tiangou Penelan Bulan carries the moon in its jaws
+				poseStack.pushPose();
+				root.translateAndRotate(poseStack);
+				root.getChild("head").translateAndRotate(poseStack);
+				poseStack.translate(1.0F / 16.0F, 2.0F / 16.0F, -5.4F / 16.0F);
+				poseStack.rotate(Axis.YP.rotationDegrees(state.ageInTicks * 1.5F));
+				poseStack.scale(0.3F, 0.3F, 0.3F);
+				NagaModels.submitOnPart("moon_orb", poseStack, collector, LightCoordsUtil.FULL_BRIGHT);
+				poseStack.popPose();
+			}
 			if (entry.tier >= 5) {
-				ModelPart root = model.root();
-				if (!root.hasChild("head")) {
-					return;
-				}
 				poseStack.pushPose();
 				root.translateAndRotate(poseStack);
 				root.getChild("head").translateAndRotate(poseStack);

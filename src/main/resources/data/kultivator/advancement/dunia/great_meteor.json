@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/sky_event",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.great_meteor.description"
+    },
+    "icon": {
+      "id": "kultivator:inti_meteor_agung"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.great_meteor.title"
+    },
+    "frame": "goal",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

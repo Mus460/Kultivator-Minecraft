@@ -9,6 +9,10 @@
     {
       "structure": "kultivator:penjara/penjara_iblis",
       "weight": 1
+    },
+    {
+      "structure": "kultivator:penjara/penjara_iblis_gurun",
+      "weight": 1
     }
   ]
 }

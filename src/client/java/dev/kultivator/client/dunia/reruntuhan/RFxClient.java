@@ -113,8 +113,21 @@ final class RFxClient {
 		}
 	}
 
+	/** The air of a dressed puzzle room (RFx.ROOM_AIR): emits for a while after each server pulse. */
+	private static final class Air {
+		final Vec3 at;
+		int look;
+		long until;
+
+		Air(Vec3 at) {
+			this.at = at;
+		}
+	}
+
+	private static final int[] AIR_PER_SECOND = {2, 5, 10};
 	private static final List<Fx> LIVE = new ArrayList<>();
 	private static final List<Leak> LEAKS = new ArrayList<>();
+	private static final List<Air> AIRS = new ArrayList<>();
 	private static final RSink RING = new RSink(RTex.RING);
 	private static final RSink TELE = new RSink(RTex.TELEGRAPH);
 	private static final RSink SIGIL = new RSink(RTex.SIGIL);
@@ -307,6 +320,7 @@ final class RFxClient {
 				}
 			}
 			case RFx.SEAL_LEAK -> leak(a, ia);
+			case RFx.ROOM_AIR -> air(a, ia);
 			case RFx.SKILL_HIT -> {
 				add(kind, a, b, ia, ib, f, 14, seed);
 				Vec3 at = b != null ? b : a;
@@ -350,6 +364,58 @@ final class RFxClient {
 		leak.level = level;
 		leak.until = ticks + 45L;
 		LEAKS.add(leak);
+	}
+
+	private static void air(Vec3 at, int look) {
+		for (Air air : AIRS) {
+			if (air.at.distanceToSqr(at) < 1.0D) {
+				air.look = look;
+				air.until = ticks + 60L;
+				return;
+			}
+		}
+		if (AIRS.size() >= 8) {
+			AIRS.remove(0);
+		}
+		Air air = new Air(at);
+		air.look = look;
+		air.until = ticks + 60L;
+		AIRS.add(air);
+	}
+
+	/**
+	 * The air of the dressed rooms near the viewer: 2 / 5 / 10 motes per second per room by quality. Library: gold
+	 * dust drifting up in the lamplight; shrine: grey incense rising from the four corner braziers (six blocks out
+	 * from the centre); garden grotto: petals and leaves falling from under the coffers.
+	 */
+	private static void airs(ClientLevel level, Vec3 eye, RandomSource random) {
+		int perSecond = AIR_PER_SECOND[EffectQuality.level().ordinal()];
+		for (Iterator<Air> it = AIRS.iterator(); it.hasNext(); ) {
+			Air air = it.next();
+			if (ticks > air.until) {
+				it.remove();
+				continue;
+			}
+			if (air.at.distanceToSqr(eye) > 24.0D * 24.0D || random.nextInt(10) >= Math.min(10, perSecond)) {
+				continue;
+			}
+			double x = air.at.x + (random.nextDouble() - 0.5D) * 13.0D;
+			double z = air.at.z + (random.nextDouble() - 0.5D) * 13.0D;
+			switch (air.look) {
+				case 1 -> level.addParticle(Qi.mote(0xFFE6A0, 0.05F + random.nextFloat() * 0.03F, 70), x, air.at.y + 0.5D + random.nextDouble() * 4.0D, z,
+						random.nextGaussian() * 0.004D, 0.006D, random.nextGaussian() * 0.004D);
+				case 2 -> {
+					double cx = air.at.x + (random.nextBoolean() ? 6.0D : -6.0D) + random.nextGaussian() * 0.15D;
+					double cz = air.at.z + (random.nextBoolean() ? 6.0D : -6.0D) + random.nextGaussian() * 0.15D;
+					level.addParticle(Qi.smoke(0xB8B0A8, 0.18F + random.nextFloat() * 0.1F, 60), cx, air.at.y + 1.4D, cz,
+							random.nextGaussian() * 0.006D, 0.03D, random.nextGaussian() * 0.006D);
+				}
+				case 3 -> level.addParticle(Qi.petal(random.nextInt(3) == 0 ? 0xB8E07A : 0xF4B6C8, 0.07F, 90), x, air.at.y + 5.0D + random.nextDouble(), z,
+						0.01D + random.nextGaussian() * 0.01D, -0.025D, random.nextGaussian() * 0.01D);
+				default -> {
+				}
+			}
+		}
 	}
 
 	/** The seal breaks: decals, the red pillar, chains flying off, a dark red sky, the card and a short orbit. */
@@ -469,6 +535,9 @@ final class RFxClient {
 		}
 		if (ticks % 2L == 0L && Qi.on()) {
 			lamps(level, eye, random);
+			airs(level, eye, random);
+		} else if (!Qi.on()) {
+			AIRS.clear();
 		}
 	}
 
@@ -530,6 +599,7 @@ final class RFxClient {
 	static void clear() {
 		LIVE.clear();
 		LEAKS.clear();
+		AIRS.clear();
 		chainState = null;
 		if (skyOn) {
 			SkyDirector.release(20, SKY_PRIORITY);

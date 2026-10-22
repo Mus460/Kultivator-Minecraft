@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "kultivator:batu_meteor_roh"
+    "kultivator:batu_meteor_roh",
+    "kultivator:inti_meteor_agung"
   ]
 }

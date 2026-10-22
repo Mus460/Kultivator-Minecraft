@@ -19,7 +19,8 @@ import net.minecraft.util.Mth;
  * King Yama's crown board with jade tassels (mianguan), Ox-Head's horned head, Horse-Face's long face and mane, the
  * yaksha's horns, tusks and flame hair, the Dragon King's antlers and gold crown, the hermit's straw hat, the Penglai
  * immortal's jade crown and long white hair, the palace guard's helmet, the hungry ghost's hair and burning eyes, the
- * merchant's cap.
+ * merchant's cap, Bai Wuchang's tall white hat ("一見生財", with his long red tongue) and Hei Wuchang's tall black hat
+ * ("天下太平"), the old fisherman's bamboo douli with its headcloth.
  * <p>
  * One texture serves them all ({@link #TEXTURE}, 64 × 512, made by {@code tools/gen_dunia_dimensi_textures.py}): 16
  * material bands of 32 px ({@code BAND_*}), every cube's UV unwrap fits inside its band (w + d ≤ 32, d + h ≤ 32).
@@ -42,7 +43,10 @@ public final class Headwear {
 	public static final int GHOST_HAIR = 11;
 	public static final int MERCHANT = 12;
 	public static final int GHOST_EYES = 13;
-	public static final int KINDS = 14;
+	public static final int WUCHANG_PUTIH = 14;
+	public static final int WUCHANG_HITAM = 15;
+	public static final int FISHER = 16;
+	public static final int KINDS = 17;
 
 	public static final int BAND_BLACK = 0;
 	public static final int BAND_GOLD = 1;
@@ -56,6 +60,10 @@ public final class Headwear {
 	public static final int BAND_GLOW = 9;
 	public static final int BAND_TEAL = 10;
 	public static final int BAND_PEARL = 11;
+	/** White mourning paper with cinnabar brush strokes (Bai Wuchang's hat). */
+	public static final int BAND_PAPER = 12;
+	/** Black lacquered paper with white brush strokes (Hei Wuchang's hat). */
+	public static final int BAND_INK = 13;
 
 	private static final ModelLayerLocation[] LAYERS = new ModelLayerLocation[KINDS];
 
@@ -218,6 +226,33 @@ public final class Headwear {
 			}
 			case GHOST_EYES -> head.addOrReplaceChild("eyes", band(BAND_GLOW).addBox(-3.2F, -5.2F, -4.35F, 2.0F, 1.0F, 0.3F)
 					.addBox(1.2F, -5.2F, -4.35F, 2.0F, 1.0F, 0.3F), PartPose.ZERO);
+			case WUCHANG_PUTIH, WUCHANG_HITAM -> {
+				int paper = kind == WUCHANG_PUTIH ? BAND_PAPER : BAND_INK;
+				// the tall mourning hat, tapering in four tiers and leaning back a little; brush lines run down its front
+				PartDefinition hat = head.addOrReplaceChild("hat_tall", band(paper).addBox(-4.6F, -3.0F, -4.6F, 9.2F, 3.0F, 9.2F)
+						.addBox(-4.1F, -6.0F, -4.1F, 8.2F, 3.0F, 8.2F).addBox(-3.6F, -9.0F, -3.6F, 7.2F, 3.0F, 7.2F)
+						.addBox(-3.1F, -12.0F, -3.1F, 6.2F, 3.0F, 6.2F), PartPose.offsetAndRotation(0.0F, -7.6F, 0.0F, rad(-6.0F), 0.0F, 0.0F));
+				hat.addOrReplaceChild("crown", band(paper).addBox(-2.6F, -1.0F, -2.6F, 5.2F, 1.0F, 5.2F), PartPose.offset(0.0F, -12.0F, 0.0F));
+				head.addOrReplaceChild("hat_band", band(kind == WUCHANG_PUTIH ? BAND_BLACK : BAND_WHITE)
+						.addBox(-4.7F, -8.2F, -4.7F, 9.4F, 0.8F, 9.4F), PartPose.ZERO);
+				head.addOrReplaceChild("hair", band(BAND_BLACK).addBox(-4.4F, -8.0F, 3.4F, 8.8F, 9.0F, 1.0F), PartPose.ZERO);
+				if (kind == WUCHANG_PUTIH) {
+					// Bai Wuchang's long red tongue hanging to his chest
+					head.addOrReplaceChild("tongue", band(BAND_CRIMSON).addBox(-0.8F, 0.0F, -0.3F, 1.6F, 4.6F, 0.6F),
+							PartPose.offsetAndRotation(0.0F, -2.2F, -4.5F, rad(-8.0F), 0.0F, 0.0F));
+				} else {
+					head.addOrReplaceChild("brows", band(BAND_BLACK).addBox(-3.6F, -5.6F, -4.45F, 2.6F, 0.7F, 0.3F)
+							.addBox(1.0F, -5.6F, -4.45F, 2.6F, 0.7F, 0.3F), PartPose.ZERO);
+				}
+			}
+			case FISHER -> {
+				head.addOrReplaceChild("douli", band(BAND_STRAW).addBox(-7.0F, -8.8F, -7.0F, 14.0F, 0.8F, 14.0F)
+						.addBox(-5.0F, -9.6F, -5.0F, 10.0F, 0.8F, 10.0F).addBox(-3.0F, -10.4F, -3.0F, 6.0F, 0.8F, 6.0F)
+						.addBox(-1.0F, -11.2F, -1.0F, 2.0F, 0.8F, 2.0F), PartPose.ZERO);
+				head.addOrReplaceChild("cloth", band(BAND_TEAL).addBox(-4.4F, -7.8F, -4.4F, 8.8F, 1.4F, 8.8F)
+						.addBox(-3.0F, -7.0F, 4.2F, 2.0F, 5.0F, 0.4F), PartPose.ZERO);
+				head.addOrReplaceChild("beard", band(BAND_WHITE).addBox(-1.5F, -0.8F, -4.6F, 3.0F, 3.0F, 1.0F), PartPose.ZERO);
+			}
 			default -> {
 			}
 		}

@@ -11,8 +11,20 @@
   },
   "structures": [
     {
-      "structure": "kultivator:laut/pulau_roh",
-      "weight": 1
+      "structure": "kultivator:laut/pulau_herba",
+      "weight": 3
+    },
+    {
+      "structure": "kultivator:laut/pulau_pertapa",
+      "weight": 2
+    },
+    {
+      "structure": "kultivator:laut/pulau_pasar",
+      "weight": 2
+    },
+    {
+      "structure": "kultivator:laut/pulau_karang",
+      "weight": 3
     }
   ]
 }

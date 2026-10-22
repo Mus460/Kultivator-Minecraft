@@ -22,6 +22,8 @@ final class MeetingPage extends KotaPage {
 	static final String[] OFFERS = {"giok", "herba", "pil", "pengalaman"};
 	static final String[] STANCES = {"gerak", "diam", "selaras"};
 	static final String[] TEMPERS = {"ramah", "angkuh", "licik"};
+	/** The duel styles by ordinal ({@code DuelStyle}: AGRESIF, BERTAHAN, PENIPU, SANTO_PEDANG; lang of the duel module). */
+	static final String[] STYLES = {"agresif", "bertahan", "penipu", "santo_pedang"};
 
 	MeetingPage(DuniaScreen screen) {
 		super(screen);
@@ -68,27 +70,37 @@ final class MeetingPage extends KotaPage {
 			stance.onPress(() -> act("diskusi:" + index));
 			stance.tooltip(() -> lines(Component.translatable("kultivator.kota.diskusi.tip_sikap." + STANCES[index])));
 		}
-		int cw = Math.max(52, (w - 16) / 4);
+		int cw = Math.max(44, (w - 18) / 5);
 		int cy = y + h - 18;
 		TalismanButton spar = add(new TalismanButton(x + 4, cy, cw, 14, () -> Component.translatable("kultivator.kota.pertemuan.tanding")));
 		spar.enabledWhen(() -> !all().getBooleanOr("sparred", false) && !discussing());
 		spar.onPress(() -> act("tanding"));
 		spar.tooltip(() -> lines(Component.translatable("kultivator.kota.pertemuan.tip_tanding")));
-		TalismanButton dare = add(new TalismanButton(x + 6 + cw, cy, cw, 14, () -> Component.translatable("kultivator.kota.pertemuan.tantang")));
+		// the sword duel of DESIGN 35 (blades clash, sparks fly): the wanderer answers like a person, 1-2 s later
+		TalismanButton duel = add(new TalismanButton(x + 6 + cw, cy, cw, 14, () -> Component.translatable("kultivator.kota.pertemuan.duel")));
+		duel.enabledWhen(() -> !all().getBooleanOr("sparred", false) && !discussing());
+		duel.urgentWhen(() -> !all().getBooleanOr("sparred", false) && !discussing() && all().getIntOr("duel_style", 1) == 3);
+		duel.onPress(() -> {
+			act("duel");
+			screen.onClose();
+		});
+		duel.tooltip(() -> lines(Component.translatable("kultivator.kota.pertemuan.tip_duel",
+				Component.translatable("kultivator.kota.gaya_pedang." + STYLES[Math.max(0, Math.min(3, all().getIntOr("duel_style", 1)))]))));
+		TalismanButton dare = add(new TalismanButton(x + 8 + 2 * cw, cy, cw, 14, () -> Component.translatable("kultivator.kota.pertemuan.tantang")));
 		dare.enabledWhen(() -> !discussing());
 		dare.onPress(() -> {
 			act("tantang");
 			screen.onClose();
 		});
 		dare.tooltip(() -> lines(Component.translatable("kultivator.kota.pertemuan.tip_tantang")));
-		TalismanButton invite = add(new TalismanButton(x + 8 + 2 * cw, cy, cw, 14, () -> Component.translatable("kultivator.kota.pertemuan.ajak")));
+		TalismanButton invite = add(new TalismanButton(x + 10 + 3 * cw, cy, cw, 14, () -> Component.translatable("kultivator.kota.pertemuan.ajak")));
 		invite.enabledWhen(() -> all().getBooleanOr("can_invite", false) && !discussing());
 		invite.onPress(() -> {
 			act("ajak");
 			screen.onClose();
 		});
 		invite.tooltip(() -> lines(Component.translatable("kultivator.kota.pertemuan.tip_ajak")));
-		TalismanButton bye = add(new TalismanButton(x + 10 + 3 * cw, cy, cw, 14, () -> Component.translatable("kultivator.kota.pertemuan.pamit")));
+		TalismanButton bye = add(new TalismanButton(x + 12 + 4 * cw, cy, cw, 14, () -> Component.translatable("kultivator.kota.pertemuan.pamit")));
 		bye.onPress(() -> {
 			act("pamit");
 			screen.onClose();
@@ -116,7 +128,8 @@ final class MeetingPage extends KotaPage {
 		int temper = Math.max(0, Math.min(2, data.getIntOr("temper", 0)));
 		Brush.fit(g, font, Component.translatable("kultivator.kota.pertemuan.watak", Component.translatable("kultivator.kota.watak." + temper),
 				Component.translatable("kultivator.kota.watak.isi." + TEMPERS[temper])), x + 32.0F, top + 13.0F, w - 38.0F, Palette.INK_SOFT, 0.6F, 0.4F, false);
-		Brush.fit(g, font, Component.translatable("kultivator.kota.pertemuan.diskusi_sisa", data.getIntOr("disc_left", 0)), x + 32.0F, top + 22.0F,
+		Component style = Component.translatable("kultivator.kota.gaya_pedang." + STYLES[Math.max(0, Math.min(3, data.getIntOr("duel_style", 1)))]);
+		Brush.fit(g, font, Component.translatable("kultivator.kota.pertemuan.diskusi_gaya", data.getIntOr("disc_left", 0), style), x + 32.0F, top + 22.0F,
 				w - 38.0F, Palette.GOLD_DARK, 0.6F, 0.4F, false);
 
 		// the discussion
@@ -135,6 +148,7 @@ final class MeetingPage extends KotaPage {
 				case "paham" -> Component.translatable("kultivator.kota.diskusi.hasil.paham", String.format(java.util.Locale.ROOT, "%.1f",
 						data.getDoubleOr("reward_n", 0.0D)), dao == null ? Component.empty() : dao.displayName());
 				case "catatan" -> Component.translatable("kultivator.kota.diskusi.hasil.catatan");
+				case "jurus" -> Component.translatable("kultivator.kota.diskusi.hasil.jurus", read(data, "taught"), dev.kultivator.dunia.kota.Pengembara.TEACH_POINTS);
 				default -> Component.translatable("kultivator.kota.diskusi.hasil.lore", Component.translatable("kultivator.kota.diskusi.lore."
 						+ data.getIntOr("lore", 0)));
 			};

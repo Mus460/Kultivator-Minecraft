@@ -265,6 +265,110 @@ public final class EpicDirector {
 		return scene;
 	}
 
+	/** Phase 35 (DESIGN 35.4.8): the client-side beat of a sword duel's scene (never sent by the server). */
+	public static final int DUEL_BEAT = 48;
+	/** The keep-alive element that marks a scene as a duel scene (and holds it open for the bout). */
+	private static final String DUEL_HOLD = "duel_hold";
+
+	/**
+	 * Phase 35 (DESIGN 35.4.8, 35.9 V): the scene of one sword duel between {@code aId} and {@code bId} at {@code center}, of
+	 * moment EXTRA (beat {@link #DUEL_BEAT}), keyed by {@code aId} like {@code sceneFor}. It is {@code own} for both duellists
+	 * and for onlookers within 32 b, so the intro and finisher shots may run for them; its SAFE / RESULT_SAFE / CAMERA_OK
+	 * flags come from a local check that ignores the duel pair (a held opponent never blocks the shot; the server already
+	 * refuses a duel with another enemy within 24 b). A live duel scene of the same pair is reused, re-flagged and kept
+	 * open {@code life} more presentation ticks (the intro, the finisher and the hit-stops of one bout share one scene, so
+	 * the 400-tick camera gap between scenes never eats the finisher). It also keeps {@link EpicClock} ticking while the
+	 * duel's hit-stops and slow motion play. Null without a level.
+	 */
+	public static @Nullable Scene duelScene(int aId, int bId, Vec3 center, int seed, int life) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.level == null || minecraft.player == null) {
+			return null;
+		}
+		LocalPlayer player = minecraft.player;
+		int self = player.getId();
+		boolean own = self == aId || self == bId || player.position().distanceToSqr(center) <= 32.0D * 32.0D;
+		Scene scene = null;
+		for (Scene live : SCENES) {
+			if (live.moment == EpicIds.EXTRA && live.subjectId == aId && !live.ending && live.get(DUEL_HOLD) != null) {
+				scene = live;
+				break;
+			}
+		}
+		if (scene != null && own && !scene.own) {
+			// an onlooker walked into the 32 b: a fresh own scene takes over (the old one fades)
+			scene.end(10);
+			scene = null;
+		}
+		int hold = Math.max(20, life);
+		if (scene == null) {
+			scene = sceneFor(EpicIds.EXTRA, aId, own ? self : -1, own, center, seed, true);
+			if (scene.get(DUEL_HOLD) == null && scene.beat != DUEL_BEAT && !scene.elements.isEmpty()) {
+				// sceneFor found a server EXTRA scene of the same subject: the duel gets its own
+				scene = new Scene(EpicIds.EXTRA, aId, own, own ? self : -1, priority(EpicIds.EXTRA), true, center, seed);
+				SCENES.add(scene);
+				sorted = false;
+			}
+			scene.beat = DUEL_BEAT;
+			EpicBudget.sceneStarted();
+		}
+		scene.flags = (scene.flags & EpicIds.FLAG_TEST) | duelFlags(scene.own, aId, bId);
+		scene.idle = 0;
+		scene.pos = center;
+		Element keep = scene.get(DUEL_HOLD);
+		if (keep == null) {
+			scene.add(DUEL_HOLD, Element.every(0, hold, (tick, self2) -> {
+			}));
+		} else {
+			keep.extend(hold);
+		}
+		return scene;
+	}
+
+	/** Re-reads the flags of a duel scene (each shot of the intro and the finisher checks them the moment it starts). */
+	public static void refreshDuelFlags(Scene scene, int aId, int bId) {
+		scene.flags = (scene.flags & EpicIds.FLAG_TEST) | duelFlags(scene.own, aId, bId);
+	}
+
+	/**
+	 * The local flags of a duel scene: {@link #localFlags} without the duel pair (and without anything
+	 * {@link ShotGuard#ignoreHostile} names), so the held opponent never counts as a hostile.
+	 */
+	private static int duelFlags(boolean own, int aId, int bId) {
+		if (!own) {
+			return 0;
+		}
+		Minecraft minecraft = Minecraft.getInstance();
+		LocalPlayer player = minecraft.player;
+		if (player == null) {
+			return 0;
+		}
+		int flags = ClientCultivation.serverEpicCamera() ? EpicIds.FLAG_CAMERA_OK : 0;
+		boolean calm = !player.isOnFire() && player.fallDistance <= 2.0D && !player.isInWater() && !player.isInLava() && !player.isPassenger();
+		boolean targeted = false;
+		boolean enemy = false;
+		for (Entity entity : player.level().getEntities(player, new AABB(player.blockPosition()).inflate(24.0D),
+				e -> e instanceof Mob || e instanceof Enemy)) {
+			int id = entity.getId();
+			if (!entity.isAlive() || id == aId || id == bId || ShotGuard.ignoreHostile.test(id)) {
+				continue;
+			}
+			if (entity instanceof Enemy) {
+				enemy = true;
+			}
+			if (entity instanceof Mob mob && mob.getTarget() == player && entity.distanceTo(player) <= 16.0F) {
+				targeted = true;
+			}
+		}
+		if (calm && !targeted) {
+			flags |= EpicIds.FLAG_SAFE;
+		}
+		if (calm && !enemy) {
+			flags |= EpicIds.FLAG_RESULT_SAFE;
+		}
+		return flags;
+	}
+
 	/** Re-reads the local SAFE, RESULT_SAFE and CAMERA_OK flags of an own scene (a timed shot checks the moment it starts). */
 	public static void refreshFlags(Scene scene) {
 		int local = EpicIds.FLAG_SAFE | EpicIds.FLAG_RESULT_SAFE | EpicIds.FLAG_CAMERA_OK;

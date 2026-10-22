@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/immortal_city",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.immortal_peach.description"
+    },
+    "icon": {
+      "id": "kultivator:persik_abadi"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.immortal_peach.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

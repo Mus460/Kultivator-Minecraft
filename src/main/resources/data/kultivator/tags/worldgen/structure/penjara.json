@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "kultivator:penjara/penjara_iblis"
+    "kultivator:penjara/penjara_iblis",
+    "kultivator:penjara/penjara_iblis_gurun"
   ]
 }

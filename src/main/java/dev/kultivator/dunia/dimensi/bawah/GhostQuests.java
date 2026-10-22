@@ -7,7 +7,8 @@ import dev.kultivator.dunia.dimensi.DimensiItems;
 import dev.kultivator.dunia.dimensi.DimensiNet;
 import dev.kultivator.dunia.dimensi.DimensiNpc;
 import dev.kultivator.util.Msg;
-import dev.kultivator.voice.Voice;
+import dev.kultivator.dunia.dimensi.DimensiVoice;
+import dev.kultivator.util.Advancements;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -56,7 +57,7 @@ public final class GhostQuests {
 		tag.putBoolean("letter", !SoulJourney.data(player).getCompoundOrEmpty("surat").isEmpty());
 		tag.putInt("look", ghost.look());
 		DimensiNet.open(player, DimensiNet.SCREEN_GHOST, ghost.getId(), tag);
-		Voice.say(ghost, "disciple.f2.careful", "kultivator.dimensi.voice.ghost_plea");
+		DimensiVoice.say(ghost, DimensiVoice.GHOST_PLEA, "disciple.f2.careful", "kultivator.dimensi.voice.ghost_plea");
 	}
 
 	/** {@code ghost:pesan} or {@code ghost:antar}. */
@@ -171,6 +172,7 @@ public final class GhostQuests {
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0F, 0.9F);
 		DimensiNet.fx(level, DimensiNet.FX_SOUL_RETURN, player.position(), 9, 32.0D);
 		Msg.chat(player, Component.translatable("kultivator.dimensi.surat.sampai").withColor(0xE8D9A8));
+		Advancements.grant(player, "dunia/letter_delivered");
 	}
 
 	/** A lost soul crossed the Naihe bridge with its escort. */
@@ -180,6 +182,7 @@ public final class GhostQuests {
 			DimensiData.giveNb(player, 18L);
 		}
 		Msg.chat(player, Component.translatable("kultivator.dimensi.arwah.sampai").withColor(0xE8D9A8));
+		Advancements.grant(player, "dunia/lost_soul_home");
 	}
 
 	/** Counts an errand of today; true while today's paid errands are not used up. */

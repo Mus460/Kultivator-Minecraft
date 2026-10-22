@@ -18,7 +18,8 @@ import org.joml.Vector3f;
 /**
  * Draws a Meteor Roh (DESIGN 34.5.8): a tumbling lump of star iron (a lumpy cuboid with the glowing-seam texture, full
  * bright) inside a white-hot head glow, with a tapering trail of two layered strips behind it along its flight. The
- * spark tail comes from {@link LangitParticles}. No block, no light source: the glow is emissive quads.
+ * spark tail comes from {@link LangitParticles}. A Meteor Agung is 2.4 times larger, sheds two shards behind it and wears a
+ * wide green-white wake. No block, no light source: the glow is emissive quads.
  */
 public class MeteorRohRenderer extends EntityRenderer<MeteorRohEntity, MeteorRohRenderer.State> {
 
@@ -29,6 +30,7 @@ public class MeteorRohRenderer extends EntityRenderer<MeteorRohEntity, MeteorRoh
 		public float dirZ;
 		public float progress;
 		public int seed;
+		public boolean great;
 	}
 
 	public MeteorRohRenderer(EntityRendererProvider.Context context) {
@@ -50,7 +52,8 @@ public class MeteorRohRenderer extends EntityRenderer<MeteorRohEntity, MeteorRoh
 	protected AABB getBoundingBoxForCulling(MeteorRohEntity entity, float partialTicks) {
 		Vec3 dir = entity.direction();
 		AABB box = entity.getBoundingBox();
-		return box.minmax(box.move(-dir.x * 16.0D, -dir.y * 16.0D, -dir.z * 16.0D)).inflate(2.0D);
+		double reach = entity.great() ? 40.0D : 16.0D;
+		return box.minmax(box.move(-dir.x * reach, -dir.y * reach, -dir.z * reach)).inflate(entity.great() ? 6.0D : 2.0D);
 	}
 
 	@Override
@@ -64,6 +67,7 @@ public class MeteorRohRenderer extends EntityRenderer<MeteorRohEntity, MeteorRoh
 		state.dirZ = (float) dir.z;
 		state.progress = (float) entity.progress(age);
 		state.seed = entity.seed();
+		state.great = entity.great();
 		LangitParticles.track(entity);
 	}
 
@@ -76,17 +80,35 @@ public class MeteorRohRenderer extends EntityRenderer<MeteorRohEntity, MeteorRoh
 		float ey = (float) (state.y - camera.pos.y) + 0.5F;
 		float ez = (float) (state.z - camera.pos.z);
 
-		// the rock: a tumbling lump, full bright
+		// the rock: a tumbling lump, full bright (a Meteor Agung: 2.4 times larger with two shards breaking off behind it)
+		float g = state.great ? 2.4F : 1.0F;
 		LangitSink rock = new LangitSink(LangitSink.ROCK);
 		poseStack.pushPose();
 		poseStack.translate(0.0F, 0.5F, 0.0F);
 		poseStack.rotateDegrees(Axis.YP, state.spin);
 		poseStack.rotateDegrees(Axis.XP, state.spin * 0.7F + state.seed % 90);
+		poseStack.scale(g, g, g);
 		lump(rock, state.seed);
 		rock.submit(collector, poseStack);
 		poseStack.popPose();
+		if (state.great) {
+			for (int i = 1; i <= 2; i++) {
+				LangitSink shard = new LangitSink(LangitSink.ROCK);
+				float back = 2.6F * i + 0.4F * Mth.sin(state.spin * 0.05F + i);
+				float side = (i == 1 ? 0.9F : -0.7F) * (1.0F + 0.2F * Mth.sin(state.spin * 0.03F));
+				poseStack.pushPose();
+				poseStack.translate(-state.dirX * back + side * state.dirZ, 0.5F - state.dirY * back, -state.dirZ * back - side * state.dirX);
+				poseStack.rotateDegrees(Axis.ZP, state.spin * (1.3F + i * 0.4F));
+				poseStack.rotateDegrees(Axis.XP, state.spin * 0.9F + i * 40.0F);
+				float k = 0.55F - 0.12F * i;
+				poseStack.scale(k, k, k);
+				lump(shard, state.seed * 31 + i);
+				shard.submit(collector, poseStack);
+				poseStack.popPose();
+			}
+		}
 
-		if (!EpicBudget.takeQuads(6)) {
+		if (!EpicBudget.takeQuads(state.great ? 10 : 6)) {
 			return;
 		}
 		// glows and the trail, in the entity's frame but facing the camera
@@ -95,16 +117,22 @@ public class MeteorRohRenderer extends EntityRenderer<MeteorRohEntity, MeteorRoh
 		float hx = 0.0F;
 		float hy = 0.5F;
 		float hz = 0.0F;
-		float length = 10.0F + 6.0F * (1.0F - state.progress);
+		float length = (10.0F + 6.0F * (1.0F - state.progress)) * (state.great ? 2.2F : 1.0F);
 		float tx = hx - state.dirX * length;
 		float ty = hy - state.dirY * length;
 		float tz = hz - state.dirZ * length;
-		trailStrip(trail, tx, ty, tz, hx, hy, hz, ex, ey - 0.5F, ez, 0.25F, 2.4F, LangitRenderer.argb(0.0F, 0x7FD8FF),
+		trailStrip(trail, tx, ty, tz, hx, hy, hz, ex, ey - 0.5F, ez, 0.25F * g, 2.4F * g, LangitRenderer.argb(0.0F, 0x7FD8FF),
 				LangitRenderer.argb(0.95F, 0xE8FAFF));
-		trailStrip(trail, tx * 0.7F, ty * 0.7F + 0.15F, tz * 0.7F, hx, hy, hz, ex, ey - 0.5F, ez, 0.6F, 5.0F,
+		trailStrip(trail, tx * 0.7F, ty * 0.7F + 0.15F, tz * 0.7F, hx, hy, hz, ex, ey - 0.5F, ez, 0.6F * g, 5.0F * g,
 				LangitRenderer.argb(0.0F, 0x5FB8FF), LangitRenderer.argb(0.35F, 0x9FE0FF));
-		billboard(glow, hx, hy, hz, 1.9F, LangitRenderer.argb(0.95F, 0xFFFFFF), right, up);
-		billboard(glow, hx, hy, hz, 4.2F, LangitRenderer.argb(0.4F, 0x8FD8FF), right, up);
+		billboard(glow, hx, hy, hz, 1.9F * g, LangitRenderer.argb(0.95F, 0xFFFFFF), right, up);
+		billboard(glow, hx, hy, hz, 4.2F * g, LangitRenderer.argb(0.4F, 0x8FD8FF), right, up);
+		if (state.great) {
+			// a wide smoke-and-fire wake and a second, greener sheath (burning star iron)
+			trailStrip(trail, tx * 1.3F, ty * 1.3F, tz * 1.3F, hx, hy, hz, ex, ey - 0.5F, ez, 4.0F, 12.0F,
+					LangitRenderer.argb(0.0F, 0x506070), LangitRenderer.argb(0.22F, 0xB8F0D8));
+			billboard(glow, hx, hy, hz, 16.0F, LangitRenderer.argb(0.18F, 0xA8FFD0), right, up);
+		}
 		glow.submit(collector, poseStack);
 		trail.submit(collector, poseStack);
 		super.submit(state, poseStack, collector, camera);

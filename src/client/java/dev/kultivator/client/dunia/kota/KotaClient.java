@@ -23,6 +23,7 @@ public final class KotaClient {
 	private static long version;
 
 	public static void init() {
+		KotaGear.register();
 		EntityRenderers.register(KotaEntities.NPC, NpcRenderer::new);
 		EntityRenderers.register(KotaEntities.PINTU, PintuRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(KotaNet.Screen.TYPE, (payload, context) -> onScreen(payload));
@@ -37,6 +38,7 @@ public final class KotaClient {
 			npcId = -1;
 			screenKind = -1;
 			KotaFx.clear();
+			NpcPoses.clear();
 		});
 	}
 

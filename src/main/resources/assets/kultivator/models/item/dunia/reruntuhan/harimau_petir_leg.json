@@ -1,6 +1,7 @@
 {
  "textures": {
   "t0": "kultivator:item/dunia/reruntuhan/hp_fur",
+  "t1": "kultivator:item/dunia/reruntuhan/gd_bell",
   "particle": "kultivator:item/dunia/reruntuhan/hp_fur"
  },
  "elements": [
@@ -205,6 +206,74 @@
       16
      ],
      "texture": "#t0"
+    }
+   }
+  },
+  {
+   "from": [
+    5.1,
+    -12.6,
+    5.1
+   ],
+   "to": [
+    10.9,
+    -11.2,
+    10.9
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
     }
    }
   }

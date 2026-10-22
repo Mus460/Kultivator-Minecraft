@@ -1,8 +1,13 @@
 """Kapal Terbang Sekte hull models (DESIGN 34.5.15, module T): builds the three hulls with structgen.Piece and exports
 
-  assets/kultivator/dunia/kapal/<class>.json   the client display list (block-state runs, sails, lights, banner, engine)
+  assets/kultivator/dunia/kapal/<class>.json   the client display list (block-state runs, sails, lights, banner, engine,
+                                               and from the detail pass: masthead pennants, rigging lines, qi oars, the
+                                               formation disc under the keel and night-lit cabin windows)
   data/kultivator/structure/kapal/<class>.nbt  the same hull as a template, only for `uji struktur lihat kapal/<class>`
                                                (never placed by worldgen or at runtime: the ship is an ENTITY, rule W2)
+
+The detail pass also builds perahu_bajak, the sky pirates' raider (entity kapal_bajak, scenery only): a lean black hull
+of blackstone and crimson with a chained ram, two ragged sails and soul lanterns, weathered with cracked bricks.
 
 Run: python tools/gen_dunia_kapal.py [preview_dir]
 It prints the layout constants (seats, deck tiles, helm, sizes) that KapalClass.java must match, a plan and a side view
@@ -23,7 +28,8 @@ ASSETS = os.path.join(REPO, "src", "main", "resources", "assets", "kultivator", 
 
 # Blocks the Minimal / far LOD leaves out (decoration that reads only up close).
 DETAIL_WORDS = ("fence", "lantern", "chain", "trapdoor", "end_rod", "button", "lever", "carpet", "candle", "wall",
-                "pane", "bars", "grindstone", "lightning_rod", "banner", "flower_pot", "bell")
+                "pane", "bars", "grindstone", "lightning_rod", "banner", "flower_pot", "bell", "potted", "barrel",
+                "bookshelf", "cartography", "lectern", "amethyst", "end_rod", "iron_chain")
 
 
 # ----------------------------------------------------------------------------------------------------------- helpers
@@ -303,6 +309,14 @@ def build_perahu():
     for dx in (-2, -1, 1, 2):
         log(p, cx + dx, 4, mz, "minecraft:stripped_dark_oak_log", "x")
     lantern(p, cx + 2, 9, mz, hanging=True)
+    # detail pass: a twin lantern on the port yard arm, a red runner along the middle, a potted pine at the stern and a
+    # pearl finial on the prow cap
+    lantern(p, cx - 2, 9, mz, hanging=True)
+    for z in (5, 6, 8):
+        p.put(cx, deck + 1, z, "minecraft:red_carpet")
+    p.put(cx - 1, deck + 1, 2, "minecraft:potted_spruce_sapling")
+    p.put(cx + 1, deck + 1, 2, "minecraft:potted_azalea_bush")
+    p.put(cx, deck + 5, L - 1, "minecraft:end_rod", {"facing": "up"})
     seats = [loc(p, cx, deck + 1, 3), loc(p, cx, deck + 1, 9)]
     for s in seats:
         s[1] = deck + 1 + 0.5
@@ -313,10 +327,15 @@ def build_perahu():
         "seats": seats,
         "helm": loc(p, cx, deck + 2, 4),
         "sails": [sail(p, cx, mz, 4.6, 9.8, 2.3, 0.0, 1)],
-        "lights": [light(p, cx, deck + 1, 1, 0xFFC66A), light(p, cx + 2, 8, mz, 0xFFC66A),
-                   light(p, cx, deck + 4, L - 1, 0x7FFFD4, 0.6)],
+        "lights": [light(p, cx, deck + 1, 1, 0xFFC66A), light(p, cx + 2, 8, mz, 0xFFC66A), light(p, cx - 2, 8, mz, 0xFFC66A),
+                   light(p, cx, deck + 4, L - 1, 0x7FFFD4, 0.6), light(p, cx, deck + 5, L - 1, 0xE8FFFF, 0.35)],
         "engine": [loc(p, cx, deck - 1, 0)],
         "banner": banner(p, cx, deck + 4, 0, 0.9, 1.6),
+        "pennants": [pennant(p, cx, 10, mz, 1.6)],
+        "rigging": masthead_rigging(p, cx, mz, 10, 10, 2, deck, lambda z: prof.get(z, 0), bow=(cx, deck + 4.5, L - 1),
+                                    stern=(cx, deck + 4.6, 0)),
+        "oars": [oar(p, cx - 3, deck - 0.4, 6, -1, 2.2), oar(p, cx + 3, deck - 0.4, 6, 1, 2.2)],
+        "formation": [-0.6, 3.6],
         "wake": [W * 0.5, L * 0.5],
         "deckTiles": deck_tiles(cells, W, L, 3),
     }
@@ -440,11 +459,29 @@ def build_sekte():
     p.put(cx + 2, deck - 1, 0, "minecraft:gold_block")
     for y in range(top + 1, top + 4):
         p.put(cx, y, z0, "minecraft:dark_oak_fence")
+    # detail pass: the navigator's cabin furnished (a chart table with a lamp, shelves, sea chests, a red rug), a ridge
+    # pearl, a red runner down the deck between the masts, and a bow lantern hanging from the dragon's whisker
+    p.put(cx, deck + 1, 3, "minecraft:cartography_table")
+    lantern(p, cx, deck + 2, 3, hanging=False)
+    for z in (2, 3):
+        p.put(x0 + 1, deck + 1, z, "minecraft:bookshelf")
+    p.put(x0 + 1, deck + 2, 2, "minecraft:bookshelf")
+    p.put(x1 - 1, deck + 1, 2, "minecraft:barrel", {"facing": "up", "open": "false"})
+    p.put(x1 - 1, deck + 1, 3, "minecraft:barrel", {"facing": "west", "open": "false"})
+    for x in range(x0 + 2, x1 - 1):
+        for z in (5, 6):
+            if p.get(x, deck + 1, z) is None:
+                p.put(x, deck + 1, z, "minecraft:red_carpet")
+    p.put(cx, top + 1, (z0 + z1) // 2 + 1, "minecraft:end_rod", {"facing": "up"})
+    for z in (11, 12, 13, 15, 16, 17, 18, 20):
+        p.put(cx, deck + 1, z, "minecraft:red_carpet")
+    chain(p, cx, deck + 3, bz - 1) if p.get(cx, deck + 3, bz - 1) is None else None
     seats = []
     for (x, z) in seat_cells:
         s = loc(p, x, deck + 1, z)
         s[1] = deck + 1 + 0.5
         seats.append(s)
+    half_at = lambda z: prof.get(z, 0)  # noqa: E731
     extra = {
         "origin": [W / 2.0, 0.0, L / 2.0],
         "deck": deck + 1.0,
@@ -453,9 +490,17 @@ def build_sekte():
         "sails": [sail(p, cx, 14, deck + 3.4, 16.8, 4.4, 0.0, 1), sail(p, cx, 19, deck + 3.4, 12.8, 3.4, 0.0, 1)],
         "lights": [light(p, x0 - 1, deck + 2, z1 + 1, 0xFFC66A), light(p, x1 + 1, deck + 2, z1 + 1, 0xFFC66A),
                    light(p, cx - 4, 15, 14, 0xFFC66A), light(p, cx + 4, 15, 14, 0xFFC66A),
-                   light(p, cx, deck + 4, bz, 0xE8FFFF, 0.5)],
+                   light(p, cx, deck + 4, bz, 0xE8FFFF, 0.5), light(p, cx, deck + 2, 3, 0xFFD27A, 0.7),
+                   light(p, cx, top + 1, (z0 + z1) // 2 + 1, 0xE8FFFF, 0.35)]
+        + window_lights(p, x0, x1, z0, z1, deck + 2),
         "engine": [loc(p, cx + dx, deck - 1, 0) for dx in (-1, 0, 1)],
         "banner": banner(p, cx, top + 3, z0, 1.4, 2.6),
+        "pennants": [pennant(p, cx, 17, 14, 2.4), pennant(p, cx, 13, 19, 2.0)],
+        "rigging": masthead_rigging(p, cx, 14, 17, 17, 4, deck, half_at, stern=(cx, top + 3.5, z0))
+        + masthead_rigging(p, cx, 19, 13, 13, 3, deck, half_at, bow=(cx, deck + 3.8, bz - 1))
+        + [rope(p, (cx, 17.9, 14), (cx, 13.9, 19))],
+        "oars": [oar(p, cx + side * prof[z], deck - 0.3, z, side, 3.4) for z in (13, 15, 17) for side in (-1, 1)],
+        "formation": [-0.6, 6.5],
         "wake": [W * 0.5, L * 0.5],
         "deckTiles": deck_tiles(cells, W, L, 3, skip_rect=(x0, z0, x1, z1)),
     }
@@ -586,6 +631,29 @@ def build_bahtera():
         p.put(cx + dx, deck - 2, 0, "minecraft:gold_block")
     for y in range(top + 1, top + 5):
         p.put(cx, y, z0, "minecraft:dark_oak_fence")
+    # detail pass: the pagoda hall furnished (a spirit-crystal altar on white quartz, a chart table, shelves of scrolls,
+    # sea chests and a red carpet to the door), lanterns on the rail posts lit, a gold pearl under the ram's eye
+    p.put(cx, deck + 1, z0 + 1, "minecraft:chiseled_quartz_block")
+    p.put(cx, deck + 2, z0 + 1, "minecraft:amethyst_cluster", {"facing": "up", "waterlogged": "false"})
+    for dx in (-1, 1):
+        p.put(cx + dx, deck + 1, z0 + 1, "minecraft:quartz_stairs", {"facing": "north", "half": "bottom", "shape": "straight",
+                                                                    "waterlogged": "false"})
+    p.put(cx + 2, deck + 1, z0 + 3, "minecraft:cartography_table")
+    lantern(p, cx + 2, deck + 2, z0 + 3, hanging=False)
+    for z in range(z0 + 1, z0 + 4):
+        for y in (deck + 1, deck + 2):
+            p.put(x0 + 1, y, z, "minecraft:bookshelf")
+    for z in (z1 - 2, z1 - 1):
+        p.put(x1 - 1, deck + 1, z, "minecraft:barrel", {"facing": "up", "open": "false"})
+    p.put(x1 - 1, deck + 2, z1 - 1, "minecraft:barrel", {"facing": "west", "open": "false"})
+    for z in range(z0 + 3, z1 + 1):
+        for dx in (-1, 0, 1):
+            if p.get(cx + dx, deck + 1, z) is None:
+                p.put(cx + dx, deck + 1, z, "minecraft:red_carpet")
+    rail_lights = []
+    for (x, z) in sorted(cells):
+        if p.get(x, deck + 3, z) == "minecraft:lantern" and z % 8 == 0:
+            rail_lights.append(light(p, x, deck + 3, z, 0xFFC66A, 0.6))
     seats = []
     for (x, z) in seat_cells:
         s = loc(p, x, deck + 1, z)
@@ -601,11 +669,93 @@ def build_bahtera():
         "lights": [light(p, x0 - 1, deck + 3, z0 - 1, 0xFFC66A), light(p, x1 + 1, deck + 3, z0 - 1, 0xFFC66A),
                    light(p, x0 - 1, deck + 3, z1 + 1, 0xFFC66A), light(p, x1 + 1, deck + 3, z1 + 1, 0xFFC66A),
                    light(p, cx - 6, 22, 17, 0xFFC66A), light(p, cx + 6, 22, 17, 0xFFC66A),
-                   light(p, cx, deck + 3, bz - 1, 0x7FD8FF, 0.8)],
+                   light(p, cx, deck + 3, bz - 1, 0x7FD8FF, 0.8), light(p, cx, deck + 2, z0 + 1, 0xC79BFF, 0.6),
+                   light(p, cx + 2, deck + 2, z0 + 3, 0xFFD27A, 0.6), light(p, cx, top + 1, (z0 + z1) // 2, 0xFFF4C8, 0.45)]
+        + rail_lights + window_lights(p, x0, x1, z0, z1, deck + 2, every=2),
         "engine": [loc(p, cx + dx, deck - 2, 0) for dx in (-2, -1, 0, 1, 2)],
         "banner": banner(p, cx, top + 4, z0, 2.0, 3.6),
+        "pennants": [pennant(p, cx, 24, 17, 3.0), pennant(p, cx, 22, 24, 2.6), pennant(p, cx, 17, 30, 2.2)],
+        "rigging": masthead_rigging(p, cx, 17, 24, 24, 6, deck, lambda z: prof.get(z, 0), stern=(cx, top + 4.5, z0))
+        + masthead_rigging(p, cx, 24, 22, 22, 5, deck, lambda z: prof.get(z, 0))
+        + masthead_rigging(p, cx, 30, 17, 17, 4, deck, lambda z: prof.get(z, 0), bow=(cx, deck + 3.6, bz))
+        + [rope(p, (cx, 24.9, 17), (cx, 22.9, 24)), rope(p, (cx, 22.9, 24), (cx, 17.9, 30))],
+        "oars": [oar(p, cx + side * prof[z], deck - 0.3, z, side, 4.4) for z in (6, 8, 25, 27) for side in (-1, 1)],
+        "formation": [-0.6, 10.5],
         "wake": [W * 0.5, L * 0.5],
         "deckTiles": deck_tiles(cells, W, L, 3, skip_rect=(x0, z0, x1, z1)),
+    }
+    return p, extra, cells
+
+
+BAJAK_MAT = {
+    "hull": "minecraft:polished_blackstone_bricks", "hull_stair": "minecraft:polished_blackstone_brick_stairs",
+    "keel": "minecraft:stripped_crimson_stem", "deck": "minecraft:crimson_planks", "strake": "minecraft:red_nether_bricks",
+    "bulwark": "minecraft:crimson_slab", "rail": None, "mast": "minecraft:crimson_stem", "yard": "minecraft:stripped_crimson_stem",
+    "seat": "minecraft:crimson_stairs", "helm_post": "minecraft:crimson_fence",
+}
+
+
+def build_bajak():
+    """Perahu Bajak Langit (detail pass): the sky pirates' 7 x 15 raider, scenery of entity kapal_bajak. A lean black hull
+    of blackstone with a red strake, a chained ram and a grinning piglin-carved prow, two masts with ragged dark sails,
+    soul lanterns, and weathering (cracked bricks) from hard years in the clouds. No seats: the band leaps down from it."""
+    W, H, L = 7, 13, 15
+    p = Piece(W, H, L, seed=56004)
+    keel, deck = 0, 2
+    prof = {0: 0, 1: 1, 2: 2, 3: 2, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3, 10: 2, 11: 2, 12: 1, 13: 1, 14: 0}
+    cells = hull(p, L, lambda z: prof.get(z, -1), keel, deck, BAJAK_MAT)
+    cx = W // 2
+    edge = set()
+    for (x, z) in cells:
+        for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            if (x + dx, z + dz) not in cells:
+                edge.add((x, z))
+    for (x, z) in sorted(edge):
+        if z in (0, L - 1):
+            continue
+        slab(p, x, deck + 1, z, "minecraft:crimson_slab", "bottom")
+    # the ram: a carved blackstone prow, a chained spike forward and two jagged horns
+    bz = L - 1
+    p.put(cx, deck + 1, bz, "minecraft:chiseled_polished_blackstone")
+    p.put(cx, deck + 2, bz, "minecraft:chiseled_polished_blackstone")
+    stair(p, cx, deck + 3, bz, "minecraft:polished_blackstone_brick_stairs", "north")
+    stair(p, cx - 1, deck + 2, bz - 1, "minecraft:blackstone_stairs", "east", half="top")
+    stair(p, cx + 1, deck + 2, bz - 1, "minecraft:blackstone_stairs", "west", half="top")
+    p.put(cx, deck, bz, "minecraft:iron_chain", {"axis": "z", "waterlogged": "false"})
+    # stern: a crimson post with the raider's soul lantern and a red-glowing engine of shroomlight
+    log(p, cx, deck + 1, 0, "minecraft:stripped_crimson_stem", "y")
+    p.put(cx, deck + 2, 0, "minecraft:crimson_fence")
+    p.put(cx, deck + 3, 0, "minecraft:crimson_fence")
+    lantern(p, cx, deck + 1, 1, hanging=False, soul=True)
+    p.put(cx, deck - 1, 0, "minecraft:shroomlight")
+    # two masts (z 5 and z 10) with yards, soul lanterns on the yard arms
+    for mz, top_y, half in ((5, 9, 2), (10, 10, 2)):
+        mast(p, cx, mz, deck + 1, top_y, BAJAK_MAT, yard_y=top_y, yard_half=half)
+        for dx in (-half, half):
+            lantern(p, cx + dx, top_y - 1, mz, hanging=True, soul=True)
+    # loot on deck: barrels and a crate of stolen stones
+    p.put(cx - 1, deck + 1, 7, "minecraft:barrel", {"facing": "up", "open": "false"})
+    p.put(cx + 1, deck + 1, 8, "minecraft:barrel", {"facing": "east", "open": "false"})
+    p.put(cx + 1, deck + 1, 3, "minecraft:red_carpet")
+    p.weather(0.22)
+    extra = {
+        "origin": [W / 2.0, 0.0, L / 2.0],
+        "deck": deck + 1.0,
+        "seats": [],
+        "helm": loc(p, cx, deck + 2, 3),
+        "sails": [sail(p, cx, 5, deck + 2.4, 8.8, 2.3, 0.0, 1), sail(p, cx, 10, deck + 2.4, 9.8, 2.3, 0.0, 1)],
+        "lights": [light(p, cx, deck + 1, 1, 0x7FD8FF, 0.8), light(p, cx - 2, 8, 5, 0x7FD8FF, 0.7), light(p, cx + 2, 8, 5, 0x7FD8FF, 0.7),
+                   light(p, cx - 2, 9, 10, 0x7FD8FF, 0.7), light(p, cx + 2, 9, 10, 0x7FD8FF, 0.7)],
+        "engine": [loc(p, cx, deck - 1, 0)],
+        "banner": banner(p, cx, deck + 3, 0, 0.8, 1.5),
+        "pennants": [pennant(p, cx, 10, 10, 1.8)],
+        "rigging": masthead_rigging(p, cx, 5, 9, 9, 2, deck, lambda z: prof.get(z, 0), stern=(cx, deck + 3.6, 0))
+        + masthead_rigging(p, cx, 10, 10, 10, 2, deck, lambda z: prof.get(z, 0), bow=(cx, deck + 3.5, bz))
+        + [rope(p, (cx, 9.9, 5), (cx, 10.9, 10))],
+        "oars": [],
+        "formation": [-0.4, 3.2],
+        "wake": [W * 0.5, L * 0.5],
+        "deckTiles": [],
     }
     return p, extra, cells
 
@@ -617,10 +767,72 @@ def sail(p, cx, mz, y0, y1, half, bias, kind):
             "x1": round(half + bias, 3), "kind": kind}
 
 
-def light(p, x, y, z, rgb, size=1.0):
+def light(p, x, y, z, rgb, size=1.0, window=False):
     o = loc(p, x, y, z)
     o[1] += 0.45
-    return o + ["#%06X" % rgb, size]
+    return o + ["#%06X" % rgb, size] + ([1] if window else [])
+
+
+def pt(p, x, y, z):
+    """A local point (x/z block centres, y as given) relative to the root."""
+    w, _, l = p.size
+    return [round(x + 0.5 - w / 2.0, 3), round(float(y), 3), round(z + 0.5 - l / 2.0, 3)]
+
+
+def rope(p, a, b):
+    """A rigging line between two (x, y, z) cell points (y may be fractional)."""
+    return pt(p, *a) + pt(p, *b)
+
+
+def masthead_rigging(p, cx, mz, top_y, yard_y, yard_half, deck, half_at, bow=None, stern=None):
+    """The standing rigging of one mast: two shrouds per side from the masthead to the bulwark beside the mast, the
+    lifts from the masthead to both yard ends, and the stays fore and aft (to the given cell points)."""
+    lines = []
+    h = half_at(mz)
+    for side in (-1, 1):
+        lines.append(rope(p, (cx, top_y + 0.6, mz), (cx + side * h, deck + 1.4, mz - 1)))
+        lines.append(rope(p, (cx, top_y + 0.6, mz), (cx + side * h, deck + 1.4, mz + 1)))
+        if yard_half:
+            lines.append(rope(p, (cx, top_y + 1.0, mz), (cx + side * yard_half, yard_y + 0.5, mz)))
+    if bow is not None:
+        lines.append(rope(p, (cx, top_y + 0.8, mz), bow))
+    if stern is not None:
+        lines.append(rope(p, (cx, top_y + 0.8, mz), stern))
+    return lines
+
+
+def pennant(p, cx, top_y, mz, length):
+    """A masthead pennant (its pole top) flying aft: [x, y, z, length]."""
+    return pt(p, cx, top_y + 1.9, mz) + [length]
+
+
+def oar(p, x, y, z, side, length):
+    """A qi oar's rowlock on the beam (side -1 port, +1 starboard): [x, y, z, side, length]."""
+    return pt(p, x, y, z) + [side, length]
+
+
+def window_lights(p, x0, x1, z0, z1, y, rgb=0xFFB45A, every=1):
+    """Night glows for the cabin's window trapdoors on row y (each pushed half a block outward)."""
+    out = []
+    k = 0
+    for (x, yy, z), ((bid, _props), _d) in sorted(p.cells.items(), key=lambda c: (c[0][2], c[0][0])):
+        if yy != y or "trapdoor" not in bid or not (x0 <= x <= x1 and z0 <= z <= z1):
+            continue
+        k += 1
+        if k % every:
+            continue
+        o = light(p, x, y, z, rgb, 0.45, window=True)
+        o[1] -= 0.2
+        if z == z0:
+            o[2] -= 0.55
+        elif z == z1:
+            o[2] += 0.55
+        elif x == x0:
+            o[0] -= 0.55
+        elif x == x1:
+            o[0] += 0.55
+        out.append(o)
+    return out
 
 
 def banner(p, cx, y, z, w, h):
@@ -693,7 +905,8 @@ def gable_fill(p, x0, y, x1, zs, bid):
 def main():
     preview = sys.argv[1] if len(sys.argv) > 1 else None
     out = {}
-    for name, builder in (("perahu_awan", build_perahu), ("kapal_sekte", build_sekte), ("bahtera_langit", build_bahtera)):
+    for name, builder in (("perahu_awan", build_perahu), ("kapal_sekte", build_sekte), ("bahtera_langit", build_bahtera),
+                          ("perahu_bajak", build_bajak)):
         p, extra, cells = builder()
         model = export(name, p, extra)
         out[name] = model

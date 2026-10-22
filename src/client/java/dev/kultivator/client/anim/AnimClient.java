@@ -37,6 +37,11 @@ public final class AnimClient {
 			if (renderer instanceof AvatarRenderer<?> avatar) {
 				helper.register(new FormLayer<>(avatar, context));
 			}
+			// DESIGN 35.5.4: the duel's blade probe on every PlayerModel renderer (players, disciples, rogues, Dunia NPCs)
+			dev.kultivator.client.duel.anim.BladeProbeLayer probe = dev.kultivator.client.duel.anim.BladeProbeLayer.forRenderer(renderer);
+			if (probe != null) {
+				helper.register(probe);
+			}
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(AnimClient::tick);
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clearAll());
@@ -70,11 +75,13 @@ public final class AnimClient {
 			ClientForms.prune(level);
 			ClientBinds.prune(level);
 			BindVisuals.prune(level);
+			dev.kultivator.client.duel.anim.DuelPoses.prune(level);
 		}
 	}
 
 	private static void clearAll() {
 		CastPoses.clear();
+		dev.kultivator.client.duel.anim.DuelPoses.clear();
 		ClientForms.clear();
 		ClientBinds.clear();
 		BindVisuals.clear();

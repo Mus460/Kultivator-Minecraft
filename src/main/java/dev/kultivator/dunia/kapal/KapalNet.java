@@ -64,6 +64,10 @@ public final class KapalNet {
 		public static final int EV_PIRATES = 5;
 		public static final int EV_BROKEN = 6;
 		public static final int EV_STOWED = 7;
+		/** A meteor shower dropped a Batu Meteor Roh into the cloud net (sparks over the deck). */
+		public static final int EV_METEOR = 8;
+		/** The sky pirates were driven off: their spoils burst open on the deck ({@code arg} the tier). */
+		public static final int EV_SPOILS = 9;
 
 		public static final Type<Event> TYPE = new Type<>(Kultivator.id("kapal_event"));
 		public static final StreamCodec<RegistryFriendlyByteBuf, Event> CODEC = StreamCodec.of(

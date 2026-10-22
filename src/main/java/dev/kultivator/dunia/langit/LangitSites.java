@@ -133,6 +133,8 @@ public final class LangitSites {
 				Advancements.grant(player, "dunia/qi_mist");
 				if (weather.id().equals("fajar_ungu") && facingEast(player)) {
 					Enlightenment.boostChance(player, 2.0D, 40);
+					// Yin Xi at the pass: the purple Qi met face to face
+					Advancements.grant(player, "dunia/purple_dawn");
 				}
 			}
 		}

@@ -37,15 +37,19 @@ public final class NagaClient {
 		LevelRenderEvents.START_MAIN.register(context -> NagaVisuals.beginFrame());
 		// the sky-projected silhouettes of Jiao too far to track (DESIGN 34.5.11 level of detail)
 		LevelRenderEvents.COLLECT_SUBMITS.register(NagaFar::collect);
+		// the world-space telegraphs of the kind skills (whirl, thunder marks)
+		LevelRenderEvents.COLLECT_SUBMITS.register(NagaStrikes::collect);
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			NagaVisuals.tick(minecraft);
 			NagaFar.tick(minecraft);
+			NagaStrikes.tick(minecraft);
 			NagaHud.tick(minecraft);
 			BeastTierLayers.tick(minecraft);
 		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			NagaVisuals.clear();
 			NagaFar.clear();
+			NagaStrikes.clear();
 			NagaHud.clear();
 			BeastTierLayers.clear();
 			NagaModels.clear();

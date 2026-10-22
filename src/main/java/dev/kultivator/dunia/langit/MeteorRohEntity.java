@@ -29,12 +29,15 @@ import org.joml.Vector3fc;
 public class MeteorRohEntity extends Entity {
 
 	public static final int DEFAULT_FALL = 64;
+	/** A Meteor Agung falls slower and longer, so everyone around sees it cross the sky. */
+	public static final int GREAT_FALL = 140;
 
 	private static final EntityDataAccessor<BlockPos> DATA_LANDING = SynchedEntityData.defineId(MeteorRohEntity.class, EntityDataSerializers.BLOCK_POS);
 	private static final EntityDataAccessor<Vector3fc> DATA_OFFSET = SynchedEntityData.defineId(MeteorRohEntity.class, EntityDataSerializers.VECTOR3);
 	private static final EntityDataAccessor<Long> DATA_BORN = SynchedEntityData.defineId(MeteorRohEntity.class, EntityDataSerializers.LONG);
 	private static final EntityDataAccessor<Integer> DATA_FALL = SynchedEntityData.defineId(MeteorRohEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> DATA_SEED = SynchedEntityData.defineId(MeteorRohEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Boolean> DATA_GREAT = SynchedEntityData.defineId(MeteorRohEntity.class, EntityDataSerializers.BOOLEAN);
 
 	private boolean landed;
 
@@ -51,10 +54,17 @@ public class MeteorRohEntity extends Entity {
 		entityData.define(DATA_BORN, 0L);
 		entityData.define(DATA_FALL, DEFAULT_FALL);
 		entityData.define(DATA_SEED, 0);
+		entityData.define(DATA_GREAT, false);
 	}
 
 	/** Sets the path (before the entity is added): lands on top of {@code landing}, starts at {@code landing + offset}. */
 	public void setup(BlockPos landing, Vector3fc offset, int fallTicks, int seed) {
+		setup(landing, offset, fallTicks, seed, false);
+	}
+
+	/** {@link #setup(BlockPos, Vector3fc, int, int)} for a common meteor or ({@code great}) a Meteor Agung. */
+	public void setup(BlockPos landing, Vector3fc offset, int fallTicks, int seed, boolean great) {
+		entityData.set(DATA_GREAT, great);
 		entityData.set(DATA_LANDING, landing.immutable());
 		entityData.set(DATA_OFFSET, new Vector3f(offset));
 		entityData.set(DATA_BORN, level().getGameTime());
@@ -78,6 +88,11 @@ public class MeteorRohEntity extends Entity {
 
 	public int seed() {
 		return entityData.get(DATA_SEED);
+	}
+
+	/** True for a Meteor Agung (bigger, slower, a crater glow and the Inti Meteor Agung where it lands). */
+	public boolean great() {
+		return entityData.get(DATA_GREAT);
 	}
 
 	/** Ticks since the meteor appeared (game time, so a viewer who starts tracking late is in step). */
@@ -134,7 +149,7 @@ public class MeteorRohEntity extends Entity {
 
 	@Override
 	public boolean shouldRenderAtSqrDistance(double distance) {
-		return distance < 256.0D * 256.0D;
+		return distance < (great() ? 512.0D * 512.0D : 256.0D * 256.0D);
 	}
 
 	@Override

@@ -398,6 +398,60 @@ def build_shared_textures():
     tex("fur_gold", 32, fur("FFE07A", "E8A020", "FFF6C8", 47))
     tex("fur_gold_tip", 16, fur_tip("FFFFF0", "FFD040"))
 
+    # detail pass: the burning eyes of Amukan Naga, the moon in the Tiangou's jaws, the star-silver ruff, the great antler
+    def eye_rage(u, v):
+        d = math.hypot(u - 0.5, v - 0.5) * 2.0
+        c = mix(rgb("FFF4C0"), rgb("FF3A20"), clamp01(d * 1.3))
+        a = 255.0 * clamp01(1.25 - d)
+        return (c[0], c[1], c[2], a)
+    tex("eye_rage", 16, eye_rage)
+
+    def flame(u, v):
+        t = 1.0 - v
+        w = 0.42 * (1.0 - t) + 0.05
+        du = abs(u - 0.5 - 0.08 * math.sin(t * 7.0))
+        if du > w:
+            return (0, 0, 0, 0)
+        c = mix(rgb("FFE08A"), rgb("FF2A10"), clamp01(t * 1.2 + du * 1.5))
+        return (c[0], c[1], c[2], 230.0 * (1.0 - t) * (1.0 - du / w))
+    tex("rage_flame", 16, flame)
+
+    nm = Noise(59)
+
+    def moon(u, v):
+        d = math.hypot(u - 0.5, v - 0.5) * 2.0
+        c = mix(rgb("FFF8DC"), rgb("E8D8A8"), d * 0.6)
+        craters = nm.fbm(u * 5.0, v * 5.0)
+        c = mix(c, rgb("B8A878"), smooth(0.55, 0.7, craters) * 0.6)
+        # the bite of the Moon-Devourer: a dark notch on one side
+        if math.hypot(u - 0.95, v - 0.3) < 0.32:
+            c = mix(c, rgb("20142E"), 0.85)
+        return (c[0], c[1], c[2], 255)
+    tex("moon_orb", 32, moon)
+
+    ns = Noise(61)
+    rs = random.Random(61)
+    stars = [(rs.random(), rs.random()) for _ in range(9)]
+
+    def fur_star(u, v):
+        strands = ns.fbm(u * 12.0, v * 2.5)
+        c = mix(rgb("EEF2FF"), rgb("8C9CD8"), v * 0.8)
+        c = mix(c, rgb("FFFFFF"), smooth(0.55, 0.75, strands) * 0.35)
+        for sx, sy in stars:
+            dd = abs(u - sx) + abs(v - sy)
+            if dd < 0.07:
+                c = mix(c, rgb("FFFFFF"), 1.0 - dd / 0.07)
+        return (c[0], c[1], c[2], 255)
+    tex("fur_star", 32, fur_star)
+
+    def horn_great(u, v):
+        t = 1.0 - v
+        ring = smooth(0.85, 1.0, abs(math.sin(t * math.pi * 8.0)))
+        c = mix(rgb("FFF0C8"), rgb("C89A50"), 0.4 * ring + 0.3 * (n.fbm(u * 4, v * 8) - 0.3))
+        c = mix(c, rgb("FFD54A"), smooth(0.55, 1.0, t))
+        return (c[0], c[1], c[2], 255)
+    tex("horn_great", 32, horn_great)
+
 
 # ================================================================================================ the model DSL
 
@@ -638,6 +692,68 @@ def horn_model():
     return m
 
 
+def eyes_rage_model():
+    """Amukan Naga: the eyes burn (drawn full bright over the head, a little larger than the eyes) and trail two short
+    flames back along the skull. Same frame as the head model."""
+    m = Model("eyes_rage")
+    m.box((2.15, 8.9, 2.2), (3.55, 10.9, 5.4), "eye_rage", glow=15)
+    m.box((12.45, 8.9, 2.2), (13.85, 10.9, 5.4), "eye_rage", glow=15)
+    m.full((2.6, 9.0, 5.4), (2.8, 11.6, 10.5), "rage_flame", glow=15, rot=("x", 22.5, (2.7, 9.9, 5.4)))
+    m.full((13.2, 9.0, 5.4), (13.4, 11.6, 10.5), "rage_flame", glow=15, rot=("x", 22.5, (13.3, 9.9, 5.4)))
+    return m
+
+
+def horn_great_model():
+    """A left antler of a Naga Sejati and Yinglong (tier 5+), base at (8, 8, 8): a long ringed beam sweeping back, four
+    tines and a gold crown at the tip; replaces the tier 4 antler."""
+    m = Model("horn_great_l")
+    m.box((6.6, 8.0, 6.6), (9.4, 11.5, 9.4), "horn_great")
+    m.box((6.9, 10.5, 6.9), (9.1, 18.5, 9.1), "horn_great", rot=("x", 22.5, (8.0, 10.5, 8.0)))
+    m.box((7.1, 16.5, 10.0), (8.9, 25.0, 11.8), "horn_great", rot=("x", 45.0, (8.0, 16.5, 10.9)))
+    m.box((7.3, 22.0, 18.5), (8.7, 27.0, 19.9), "horn_great", rot=("x", 45.0, (8.0, 16.5, 10.9)))
+    m.box((7.3, 13.0, 4.0), (8.7, 19.5, 5.4), "horn_great", rot=("x", -22.5, (8.0, 13.0, 4.7)))
+    m.box((7.4, 18.0, 6.0), (8.6, 23.0, 7.2), "horn_great", rot=("x", -22.5, (8.0, 18.0, 6.6)))
+    m.box((3.2, 14.5, 8.0), (4.8, 20.0, 9.6), "horn_great", rot=("z", 22.5, (4.8, 14.5, 8.8)))
+    m.box((3.6, 19.5, 11.0), (5.0, 24.0, 12.4), "horn_great", rot=("z", 22.5, (5.0, 19.5, 11.7)))
+    m.box((7.2, 25.5, 23.0), (8.8, 27.5, 24.6), "horn_gold", glow=10, rot=("x", 45.0, (8.0, 16.5, 10.9)))
+    m.box((3.0, 23.5, 11.0), (4.4, 25.0, 12.4), "horn_gold", glow=8, rot=("z", 22.5, (5.0, 19.5, 11.7)))
+    return m
+
+
+def moon_orb_model():
+    """The moon the Moon-Devouring Tiangou (wolf tier 6) carries in its jaws: a bitten pale-gold moon, glowing."""
+    m = Model("moon_orb")
+    m.box((5.0, 4.5, 4.5), (11.0, 11.5, 11.5), "moon_orb", glow=15)
+    m.box((4.5, 5.0, 4.5), (11.5, 11.0, 11.5), "moon_orb", glow=15)
+    m.box((4.5, 4.5, 5.0), (11.5, 11.5, 11.0), "moon_orb", glow=15)
+    m.full((1.0, 1.0, 7.95), (15.0, 15.0, 8.05), "pearl_aura", glow=15, sides=("north", "south"))
+    return m
+
+
+def star_ruff_model():
+    """The star-silver ruff of a tier 4+ spirit wolf, worn behind the head: eight tufts fanned in a ring around (8, 8, 8),
+    swept back (+z), four with a glowing star tip, on a collar band."""
+    m = Model("star_ruff")
+    fur = "fur_star"
+    # up, down, left, right
+    m.box((7.0, 9.0, 7.0), (9.0, 15.0, 11.0), fur, rot=("x", 22.5, (8.0, 9.0, 9.0)))
+    m.box((7.0, 1.5, 7.0), (9.0, 7.0, 11.0), fur, rot=("x", -22.5, (8.0, 7.0, 9.0)))
+    m.box((1.0, 7.0, 7.0), (7.0, 9.0, 11.0), fur, rot=("y", 22.5, (7.0, 8.0, 9.0)))
+    m.box((9.0, 7.0, 7.0), (15.0, 9.0, 11.0), fur, rot=("y", -22.5, (9.0, 8.0, 9.0)))
+    # the diagonals
+    for x0, x1 in ((2.5, 7.5), (8.5, 13.5)):
+        m.box((x0, 7.0, 7.5), (x1, 9.0, 10.5), fur, rot=("z", 45.0, (8.0, 8.0, 9.0)))
+        m.box((x0, 7.0, 7.5), (x1, 9.0, 10.5), fur, rot=("z", -45.0, (8.0, 8.0, 9.0)))
+    # star tips
+    m.box((7.4, 14.5, 9.5), (8.6, 15.7, 10.7), "fur_moon_tip", glow=13, rot=("x", 22.5, (8.0, 9.0, 9.0)))
+    m.box((0.6, 7.4, 9.5), (1.8, 8.6, 10.7), "fur_moon_tip", glow=13, rot=("y", 22.5, (7.0, 8.0, 9.0)))
+    m.box((14.2, 7.4, 9.5), (15.4, 8.6, 10.7), "fur_moon_tip", glow=13, rot=("y", -22.5, (9.0, 8.0, 9.0)))
+    m.box((7.4, 1.2, 9.5), (8.6, 2.4, 10.7), "fur_moon_tip", glow=13, rot=("x", -22.5, (8.0, 7.0, 9.0)))
+    # the collar band
+    m.box((5.0, 5.0, 8.0), (11.0, 11.0, 10.0), fur)
+    return m
+
+
 def pearl_model():
     """The dragon pearl a tamed Jiao carries in front of its head (and the summoning effect): a round glowing pearl
     inside a circular aura disc on each axis."""
@@ -685,6 +801,10 @@ def build_models():
         mane_model(key)
         wing_model(key).mirrored("wing_r_" + key)
     horn_model().mirrored("horn_r")
+    horn_great_model().mirrored("horn_great_r")
+    eyes_rage_model()
+    moon_orb_model()
+    star_ruff_model()
     pearl_model()
     for variant in ("moon", "sky", "gold"):
         fox_tail_models(variant)
@@ -764,6 +884,12 @@ def icon(name, fn):
     ICONS[name] = make(16, 16, fn)
 
 
+# icons drawn from several layers (item/generated layer N = tint index N) and their tint sources; extra layer textures
+ICON_LAYERS = {}
+ICON_TINTS = {}
+EXTRA_ICON_TEX = {}
+
+
 def build_icons():
     def sash(u, v):
         # a red silk sash with gold hems, curling in an S from the top left to a knotted loop and two trailing ends
@@ -827,6 +953,49 @@ def build_icons():
             return (150, 40, 30, 255)
         return c
     icon("mutiara_naga_jinak", tamed)
+
+    def vial(u, v):
+        # a jade vial: a round belly, a narrow neck, a red seal; the blood inside glows with a blue-violet sheen
+        x, y = u * 16.0, v * 16.0
+        if 6.0 <= x < 10.0 and 1.0 <= y < 3.0:
+            c = rgb("C02A20") if y < 2.0 else rgb("8E1A12")
+            return (c[0], c[1], c[2], 255)
+        if 6.5 <= x < 9.5 and 3.0 <= y < 6.0:
+            edge = x < 7.2 or x >= 8.8
+            c = rgb("2E8A6A") if edge else rgb("9FE8D0")
+            return (c[0], c[1], c[2], 255)
+        d = math.hypot((x - 8.0) / 5.2, (y - 10.5) / 4.8)
+        if d < 1.0:
+            if d > 0.82:
+                c = rgb("1E6A52")
+            elif y > 8.0:
+                # the blood itself is layer1 (tinted by the kind); the glass behind it stays clear jade
+                return (0, 0, 0, 0)
+            else:
+                c = rgb("BFF0E0")
+            return (c[0], c[1], c[2], 255)
+        return (0, 0, 0, 0)
+    icon("darah_jiao", vial)
+
+    def blood(u, v):
+        # layer1 of the vial: the blood in grey (the item model tints it by the Jiao kind, custom_model_data colour 0),
+        # darker toward the bottom, a meniscus line, a glint on the left and a few bright motes of Qi
+        x, y = u * 16.0, v * 16.0
+        d = math.hypot((x - 8.0) / 5.2, (y - 10.5) / 4.8)
+        if d >= 0.82 or y <= 8.0:
+            return (0, 0, 0, 0)
+        g = 235.0 - 120.0 * clamp01((y - 8.0) / 7.0) - 40.0 * clamp01((d - 0.5) / 0.32)
+        if y < 9.0:
+            g = 255.0
+        if math.hypot(x - 6.2, y - 9.8) < 1.1:
+            g = 255.0
+        if (int(x) * 7 + int(y) * 13) % 23 == 0:
+            g = min(255.0, g + 70.0)
+        return (g, g, g, 255)
+    ICON_LAYERS["darah_jiao"] = ["darah_jiao", "darah_jiao_blood"]
+    ICON_TINTS["darah_jiao"] = [{"type": "minecraft:constant", "value": -1},
+                                {"type": "minecraft:custom_model_data", "index": 0, "default": 0xD0303A}]
+    EXTRA_ICON_TEX["darah_jiao_blood"] = make(16, 16, blood)
 
 
 # ================================================================================================ validation and output
@@ -924,12 +1093,18 @@ def main():
     for name, img in sorted(OVERLAYS.items()):
         img.save(os.path.join(OVERLAY_DIR, name + ".png"))
     os.makedirs(ICON_TEX_DIR, exist_ok=True)
+    for name, img in sorted(EXTRA_ICON_TEX.items()):
+        img.save(os.path.join(ICON_TEX_DIR, name + ".png"))
     for name, img in sorted(ICONS.items()):
         img.save(os.path.join(ICON_TEX_DIR, name + ".png"))
+        layers = ICON_LAYERS.get(name, [name])
         write_json(os.path.join(ICON_MODEL_DIR, name + ".json"),
-                   {"parent": "minecraft:item/generated", "textures": {"layer0": "%s:item/%s" % (NS, name)}})
-        write_json(os.path.join(ICON_ITEM_DIR, name + ".json"),
-                   {"model": {"type": "minecraft:model", "model": "%s:item/%s" % (NS, name)}})
+                   {"parent": "minecraft:item/generated",
+                    "textures": {"layer%d" % i: "%s:item/%s" % (NS, tex) for i, tex in enumerate(layers)}})
+        item_model = {"type": "minecraft:model", "model": "%s:item/%s" % (NS, name)}
+        if name in ICON_TINTS:
+            item_model["tints"] = ICON_TINTS[name]
+        write_json(os.path.join(ICON_ITEM_DIR, name + ".json"), {"model": item_model})
     if preview_dir:
         os.makedirs(preview_dir, exist_ok=True)
         for name in sorted(used):

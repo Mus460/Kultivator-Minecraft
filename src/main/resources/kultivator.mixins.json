@@ -17,7 +17,8 @@
     "WitherBossMixin",
     "LivingEntityDamageMixin",
     "MobFinalizeSpawnMixin",
-    "MobSetTargetMixin"
+    "MobSetTargetMixin",
+    "duel.MobGoalSelectorAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

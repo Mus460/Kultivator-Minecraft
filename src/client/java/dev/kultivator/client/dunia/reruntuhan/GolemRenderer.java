@@ -95,6 +95,22 @@ public class GolemRenderer extends EntityRenderer<BonekaBatuEntity, GolemRendere
 	}
 
 	@Override
+	protected boolean shouldShowName(BonekaBatuEntity entity, double distanceToCameraSq) {
+		return entity.deathTime == 0 && distanceToCameraSq < RTitles.GUARD_SQ;
+	}
+
+	@Override
+	protected Component getNameTag(BonekaBatuEntity entity) {
+		return RTitles.name(entity.getDisplayName(), RTitles.GOLEM[Mth.clamp(entity.kind(), 0, 2)]);
+	}
+
+	@Override
+	protected void extractNameTags(BonekaBatuEntity entity, State state, float partialTicks) {
+		super.extractNameTags(entity, state, partialTicks);
+		state.scoreText = state.nameTag == null ? null : RTitles.golem(entity.kind(), entity.flags());
+	}
+
+	@Override
 	public void submit(State s, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
 		int light = s.lightCoords;
 		int overlay = OverlayTexture.pack(0.0F, s.hurt);

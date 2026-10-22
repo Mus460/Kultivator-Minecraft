@@ -344,8 +344,11 @@ public final class PetaScreen extends Screen {
 			mark.z = ship.getIntOr("z", 0);
 			mark.icon = 17;
 			mark.color = 0xD0A060;
-			mark.name = Component.translatable("kultivator.peta.mark.ship", Component.translatable("kultivator.kapal.class."
-					+ dev.kultivator.dunia.kapal.KapalClass.byOrdinal(ship.getIntOr("class", 0)).model()));
+			Component shipClass = Component.translatable("kultivator.kapal.class."
+					+ dev.kultivator.dunia.kapal.KapalClass.byOrdinal(ship.getIntOr("class", 0)).model());
+			String shipName = ship.getStringOr("name", "");
+			mark.name = Component.translatable("kultivator.peta.mark.ship", shipName.isEmpty() ? shipClass
+					: Component.translatable("kultivator.kapal.nameplate", Component.literal(shipName), shipClass));
 			mark.category = Category.KAPAL;
 			marks.add(mark);
 		}

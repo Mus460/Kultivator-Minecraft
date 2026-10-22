@@ -76,9 +76,9 @@ public final class DuniaCommands {
 	 */
 	public static final List<String> CHIPS = List.of(
 			"jelajah", "jelajah muat", "jelajah anchor", "struktur cari <id>", "struktur lihat <folder/potongan>",
-			"kota cari", "kota npc <peran>", "kota lelang mulai", "kota lelang tutup", "kota lelang tawar <persen>", "kota teh <jenis>",
+			"kota cari [tampilan]", "kota barisan", "kota obrol", "kota gerak <gerak>", "kota langit <peristiwa>", "kota npc <peran>", "kota lelang mulai", "kota lelang tutup", "kota lelang tawar <persen>", "kota teh <jenis>",
 			"kota gelap buka", "kota gelap razia", "kota nama_baik <-100..100>", "kota misi baru", "kota misi selesai", "kota stok ulang",
-			"pengembara [dao] [ranah] [watak]", "pengembara diskusi menang", "pengembara diskusi kalah", "pengembara hapus",
+			"pengembara [dao] [ranah] [watak]", "pengembara duel", "pengembara diskusi menang", "pengembara diskusi kalah", "pengembara hapus",
 			"saingan daftar", "saingan datang <grup>", "saingan perlombaan", "saingan sergap", "saingan dendam <grup> <0-100>",
 			"kota_abadi cari", "kota_abadi kuliah", "kota_abadi persik", "kota_abadi titah",
 			"gua cari <kecil|agung|kuno>", "gua teka <jenis>", "gua selesai", "gua penjaga", "gua reset",

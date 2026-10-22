@@ -180,5 +180,9 @@
   "advancement.kultivator.dunia.map_opened.title": "Mountains and Seas",
   "advancement.kultivator.dunia.map_opened.description": "Open the World Map of Cultivation.",
   "advancement.kultivator.dunia.sites_5.title": "Explorer of Five Directions",
-  "advancement.kultivator.dunia.sites_5.description": "Know five sites of the world."
+  "advancement.kultivator.dunia.sites_5.description": "Know five sites of the world.",
+  "advancement.kultivator.dunia.sites_15.title": "Nine Mountains, Nine Seas",
+  "advancement.kultivator.dunia.sites_15.description": "Know 15 sites on the Cultivation World Map.",
+  "advancement.kultivator.dunia.map_exchange.title": "Ink for Ink",
+  "advancement.kultivator.dunia.map_exchange.description": "Trade known sites with another player who holds a map too (right-click them)."
 }

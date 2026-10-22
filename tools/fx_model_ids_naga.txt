@@ -7,6 +7,7 @@ naga/claw_l_petir
 naga/claw_r_air
 naga/claw_r_awan
 naga/claw_r_petir
+naga/eyes_rage
 naga/fox_tail_gold
 naga/fox_tail_moon
 naga/fox_tail_sky
@@ -18,6 +19,8 @@ naga/halo_moon
 naga/head_air
 naga/head_awan
 naga/head_petir
+naga/horn_great_l
+naga/horn_great_r
 naga/horn_l
 naga/horn_r
 naga/jaw_air
@@ -26,10 +29,12 @@ naga/jaw_petir
 naga/mane_air
 naga/mane_awan
 naga/mane_petir
+naga/moon_orb
 naga/pearl
 naga/sail_air
 naga/sail_awan
 naga/sail_petir
+naga/star_ruff
 naga/tail_air
 naga/tail_awan
 naga/tail_petir

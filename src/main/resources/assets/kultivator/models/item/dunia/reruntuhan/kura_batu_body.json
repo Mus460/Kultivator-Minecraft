@@ -1,6 +1,8 @@
 {
  "textures": {
   "t0": "kultivator:item/dunia/reruntuhan/kb_skin",
+  "t1": "kultivator:item/dunia/reruntuhan/gd_bell",
+  "t2": "kultivator:item/dunia/reruntuhan/lb_ring",
   "particle": "kultivator:item/dunia/reruntuhan/kb_skin"
  },
  "elements": [
@@ -205,6 +207,142 @@
       16
      ],
      "texture": "#t0"
+    }
+   }
+  },
+  {
+   "from": [
+    6.8,
+    3.3,
+    -4.6
+   ],
+   "to": [
+    9.2,
+    5.9,
+    -2.2
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t1"
+    }
+   }
+  },
+  {
+   "from": [
+    7.6,
+    2.7,
+    -3.8
+   ],
+   "to": [
+    8.4,
+    3.5,
+    -3.0
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "east": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#t2"
     }
    }
   }

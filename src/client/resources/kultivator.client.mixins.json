@@ -17,7 +17,9 @@
     "FirstPersonHandsInvoker",
     "BindFreezeMixin",
     "KosmikNameTagMixin",
-    "KosmikWeatherMixin"
+    "KosmikWeatherMixin",
+    "duel.DuelInputMixin",
+    "duel.DuelCameraMixin"
   ],
   "injectors": {
     "defaultRequire": 1

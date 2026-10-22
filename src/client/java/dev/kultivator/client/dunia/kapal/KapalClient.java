@@ -1,12 +1,14 @@
 package dev.kultivator.client.dunia.kapal;
 
 import dev.kultivator.Kultivator;
+import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.dunia.DuniaScenes;
 import dev.kultivator.client.epic.EpicSettings;
 import dev.kultivator.client.epic.Scene;
 import dev.kultivator.client.epic.camera.CinematicDirector;
 import dev.kultivator.client.epic.screen.CloudWipe;
 import dev.kultivator.client.epic.screen.EpicScreen;
+import dev.kultivator.client.fx.qi.Qi;
 import dev.kultivator.dunia.kapal.KapalClass;
 import dev.kultivator.dunia.kapal.KapalEntities;
 import dev.kultivator.dunia.kapal.KapalNet;
@@ -26,7 +28,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Module T's client entry (DESIGN 34.6 T), wired by its one line in {@code DuniaContentClient}: the ship renderers, the
+ * Module T's client entry (DESIGN 34.6 T), wired by its one line in {@code DuniaContentClient}: the ship and raider
+ * renderers, the
  * ship payload receivers (cloud wipes, arrival and launch moments, the helm screen), the captain's keys (W/S speed, A/D
  * rudder, jump up, sprint down: an input payload every 2 ticks while seated at the helm; Sneak leaves the seat as on any
  * vehicle), the ship HUD and the per-tick looks ({@link KapalFx}); then the world map client ({@code PetaClient}).
@@ -46,6 +49,7 @@ public final class KapalClient {
 	public static void init() {
 		EntityRenderers.register(KapalEntities.ROH, KapalRenderer::new);
 		EntityRenderers.register(KapalEntities.DEK, NoopRenderer::new);
+		EntityRenderers.register(KapalEntities.BAJAK, KapalBajakRenderer::new);
 		ClientPlayNetworking.registerGlobalReceiver(KapalNet.Event.TYPE, (payload, context) -> onEvent(payload));
 		ClientPlayNetworking.registerGlobalReceiver(KapalNet.Info.TYPE, (payload, context) -> HelmScreen.onInfo(payload));
 		ClientEntityEvents.ENTITY_LOAD.register((entity, level) -> KapalFx.loaded(entity));
@@ -157,10 +161,40 @@ public final class KapalClient {
 			case KapalNet.Event.EV_PIRATES -> {
 				EpicScreen.vignette(0xB3281D, 0.35F, 60);
 				EpicScreen.inkEdge(0x1A0806, 0.4F, 50);
+				DuniaScenes.banner(Component.translatable("kultivator.kapal.moment.raider"));
 			}
 			case KapalNet.Event.EV_BROKEN -> EpicScreen.grey(0.35F, 40);
+			case KapalNet.Event.EV_METEOR -> {
+				// a falling star caught in the cloud net: a shower of gold sparks over the deck
+				DuniaScenes.banner(Component.translatable("kultivator.kapal.moment.meteor"));
+				burst(minecraft, at, 0xFFC66A, 0xFFF4C8, 10, 0.18D, 0.08D);
+				EpicScreen.vignette(0xFFC66A, 0.15F, 30);
+			}
+			case KapalNet.Event.EV_SPOILS -> {
+				// the pirates' chest bursts: gold and jade motes fountain from the deck
+				DuniaScenes.banner(Component.translatable("kultivator.kapal.moment.spoils"));
+				burst(minecraft, at, 0xFFD27A, 0x8CFFE0, 8 + 4 * Math.max(1, Math.min(4, event.arg())), 0.12D, 0.22D);
+			}
 			default -> {
 			}
+		}
+	}
+
+	/**
+	 * A budgeted burst of qi motes at {@code at}: {@code base} motes on Normal (half on Minimal, double on Maximal, scaled
+	 * by the screen-effect setting through {@code EffectQuality}), alternating two colours, thrown outward and up.
+	 */
+	private static void burst(Minecraft minecraft, Vec3 at, int rgbA, int rgbB, int base, double spread, double lift) {
+		if (minecraft.level == null) {
+			return;
+		}
+		int n = EffectQuality.minimal() ? base / 2 : EffectQuality.maximal() ? base * 2 : base;
+		var random = minecraft.level.getRandom();
+		for (int i = 0; i < n; i++) {
+			double a = random.nextDouble() * Math.PI * 2.0D;
+			double s = spread * (0.4D + random.nextDouble());
+			minecraft.level.addParticle(Qi.mote(i % 2 == 0 ? rgbA : rgbB, 0.16F + random.nextFloat() * 0.14F, 22 + random.nextInt(16)), at.x,
+					at.y + 0.6D, at.z, Math.cos(a) * s, lift + random.nextDouble() * lift, Math.sin(a) * s);
 		}
 	}
 

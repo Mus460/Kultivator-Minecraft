@@ -25,7 +25,8 @@ import java.util.UUID;
 /**
  * The handler of every {@code laut/*} anchor (DESIGN 34.4.1): the overworld sea gate ({@code pusaran}: the whirl mark
  * on the water and the crossing), the return gates ({@code gerbang_pulang}), herb beds ({@code herba}), the people
- * ({@code raja_naga}, {@code penjaga}, {@code pertapa}, {@code pedagang}, {@code penglai} with its spring mark) and the
+ * ({@code raja_naga}, {@code penjaga}, {@code pertapa}, {@code pedagang}, {@code nelayan}, {@code penglai} with its spring
+ * mark), the island sites ({@code situs} with data {@code jenis}: the kinds a player has stood on) and the
  * reef monsters ({@code karang}, data {@code monster}: at most two per anchor). Pulau Pasar's {@code kota/*} anchors are
  * handled by module K. Nothing is saved; everything leaves with the chunk.
  */
@@ -58,6 +59,18 @@ public final class LautAnchors implements AnchorHandler {
 			case "penjaga" -> person(level, anchor, made, LautNpcEntity.PENJAGA, realm);
 			case "pertapa" -> person(level, anchor, made, LautNpcEntity.PERTAPA, realm);
 			case "pedagang" -> person(level, anchor, made, LautNpcEntity.PEDAGANG, realm);
+			case "nelayan" -> person(level, anchor, made, LautNpcEntity.NELAYAN, realm);
+			case "situs" -> {
+				// standing on a spirit island counts its kind (the four kinds: dunia/islands_all)
+				String jenis = anchor.data().getStringOr("jenis", "");
+				if (!jenis.isEmpty()) {
+					for (ServerPlayer player : within) {
+						if (player.position().distanceToSqr(anchor.position()) < 40.0D * 40.0D) {
+							SeaPeople.islandSeen(player, jenis);
+						}
+					}
+				}
+			}
 			case "penglai" -> person(level, anchor, made, LautNpcEntity.DEWA_PENGLAI, realm);
 			case "karang" -> reef(level, anchor, made, realm);
 			default -> {

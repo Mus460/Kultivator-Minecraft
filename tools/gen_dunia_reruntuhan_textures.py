@@ -365,6 +365,11 @@ def build_textures():
     horn("lb_horn", "B8B0A0", "3A3430", 732)
     glow("lb_eye", "FFD040", "C08000")
     solid("lb_ring", "D8A020", 0.1, 733)
+    # the guardians' temple regalia (detail pass): saddle cloths, a ribbon collar and the bronze bells
+    cloth("gd_saddle_red", "8A1A1A", "E8B030", 735)
+    cloth("gd_saddle_violet", "3A1A5A", "C0A0FF", 736)
+    cloth("gd_ribbon", "E890C0", "FFFFFF", 738)
+    bronze("gd_bell", 737)
     jade("ug_jade", "2A8A5A", "9AF0C0", 741)
     jade("ug_belly", "C8E8B0", "F0FFF0", 742)
     glow("ug_eye", "FFF080", "40C060")
@@ -537,9 +542,14 @@ def chiyou():
 
 # ================================================================================================ floor guardians
 
-def quadruped(prefix, body_tex, belly_tex, head_fn, leg_tex, hoof_tex, tail_fn, body=(12, 12, 26), plates=None):
+def quadruped(prefix, body_tex, belly_tex, head_fn, leg_tex, hoof_tex, tail_fn, body=(12, 12, 26), plates=None,
+              saddle=None, collar=None, bell=None, cuffs=None):
     """A four-legged guardian: the body (anchor = its centre), a leg (anchor = the hip, down to y - 18), a head and a
-    tail made by the given functions."""
+    tail made by the given functions.
+
+    Detail pass: the temple regalia that tells the guardians apart: a saddle cloth over the back with drapes down both
+    flanks (`saddle`), a collar round the chest (`collar`) with a bronze bell under the throat (`bell`) and metal cuffs
+    above the hooves (`cuffs`)."""
     m = Model(prefix + "_body")
     w, h, l = body
     m.box([8 - w / 2, 8 - h / 2, 8 - l / 2], [8 + w / 2, 8 + h / 2, 8 + l / 2], body_tex)
@@ -549,10 +559,24 @@ def quadruped(prefix, body_tex, belly_tex, head_fn, leg_tex, hoof_tex, tail_fn, 
         for k in range(4):
             z = 8 - l / 2 + 3 + k * (l - 6) / 4
             m.box([8 - w / 2 - 0.6, 8 + h / 2 - 1, z], [8 + w / 2 + 0.6, 8 + h / 2 + 0.8, z + 3], plates)
+    if saddle:
+        top = 8 + h / 2 + (0.8 if plates else 0.0)
+        m.box([8 - w / 2 - 0.4, top, 8 - l / 4], [8 + w / 2 + 0.4, top + 0.6, 8 + l / 4], saddle)
+        for side in (-1, 1):
+            x = 8 + side * (w / 2 + 0.4)
+            m.box([x - 0.3, top - 5.0, 8 - l / 4 + 1], [x + 0.3, top, 8 + l / 4 - 1], saddle)
+            m.cube((x, top - 5.6, 8), (0.8, 1.2, 0.8), bell or saddle)
+    if collar:
+        m.box([8 - w / 2 - 0.9, 8 - h / 2 + 1.5, 8 - l / 2 + 0.5], [8 + w / 2 + 0.9, 8 + h / 2 + 2.1, 8 - l / 2 + 2.5], collar)
+    if bell:
+        m.cube((8, 8 - h / 2 + 0.6, 8 - l / 2 - 0.4), (2.4, 2.6, 2.4), bell)
+        m.cube((8, 8 - h / 2 - 0.9, 8 - l / 2 - 0.4), (0.8, 0.8, 0.8), "lb_ring")
     lg = Model(prefix + "_leg")
     lg.box([5, -6, 5], [11, 8, 11], leg_tex)
     lg.box([5.5, -14, 5.5], [10.5, -6, 10.5], leg_tex)
     lg.box([4.5, -16, 4], [11.5, -13, 11.5], hoof_tex)
+    if cuffs:
+        lg.box([5.1, -12.6, 5.1], [10.9, -11.2, 10.9], cuffs)
     hd = Model(prefix + "_head")
     head_fn(hd)
     tl = Model(prefix + "_tail")
@@ -574,7 +598,8 @@ def lembu_besi():
     def tail(t):
         t.box([7, 2, 8], [9, 9, 10], "lb_iron", rot=("x", 22.5, [8, 8, 8]))
         t.box([6.5, -4, 9], [9.5, 2, 12], "lb_horn")
-    quadruped("lembu_besi", "lb_iron", "lb_iron", head, "lb_iron", "lb_horn", tail, body=(16, 14, 28), plates="lb_ring")
+    quadruped("lembu_besi", "lb_iron", "lb_iron", head, "lb_iron", "lb_horn", tail, body=(16, 14, 28), plates="lb_ring",
+              collar="lb_ring", bell="gd_bell", cuffs="lb_ring")
 
 
 def kura_batu():
@@ -585,7 +610,7 @@ def kura_batu():
             h.cube((x, 8.5, -6), (1.0, 1.0, 1.0), "kb_eye", glow=15)
     def tail(t):
         t.box([6.5, 4, 8], [9.5, 7, 16], "kb_skin", rot=("x", -22.5, [8, 6, 8]))
-    quadruped("kura_batu", "kb_skin", "kb_skin", head, "kb_skin", "kb_shell", tail, body=(18, 8, 22))
+    quadruped("kura_batu", "kb_skin", "kb_skin", head, "kb_skin", "kb_shell", tail, body=(18, 8, 22), bell="gd_bell")
     s = Model("kura_batu_shell")
     # the great domed shell over the body (anchor = the body centre)
     s.box([-4, 10, -6], [20, 14, 22], "kb_shell")
@@ -613,7 +638,8 @@ def harimau_petir():
     def tail(t):
         t.box([7, 7, 8], [9, 9, 20], "hp_fur", rot=("x", 22.5, [8, 8, 8]))
         t.box([6.5, 10, 18], [9.5, 13, 24], "hp_spark", glow=12, rot=("x", 45.0, [8, 11, 20]))
-    quadruped("harimau_petir", "hp_fur", "ri_fur", head, "hp_fur", "hp_fur", tail, body=(12, 11, 26))
+    quadruped("harimau_petir", "hp_fur", "ri_fur", head, "hp_fur", "hp_fur", tail, body=(12, 11, 26), saddle="gd_saddle_violet",
+              collar="gd_saddle_violet", cuffs="gd_bell")
 
 
 def rubah_ilusi():
@@ -629,7 +655,7 @@ def rubah_ilusi():
         t.box([6, 6, 8], [10, 10, 16], "ri_tail", rot=("x", 22.5, [8, 8, 8]))
         t.box([5, 9, 13], [11, 15, 22], "ri_tail", rot=("x", 45.0, [8, 12, 16]))
         t.box([6, 14, 18], [10, 18, 24], "ri_fur", rot=("x", 45.0, [8, 16, 21]))
-    quadruped("rubah_ilusi", "ri_fur", "ri_fur", head, "ri_fur", "ri_tail", tail, body=(9, 8, 20))
+    quadruped("rubah_ilusi", "ri_fur", "ri_fur", head, "ri_fur", "ri_tail", tail, body=(9, 8, 20), collar="gd_ribbon", bell="gd_bell")
 
 
 def kilin_emas():
@@ -646,7 +672,8 @@ def kilin_emas():
     def tail(t):
         t.box([6.5, 6, 8], [9.5, 9, 16], "kl_scale", rot=("x", 22.5, [8, 8, 8]))
         t.box([5, 7, 14], [11, 14, 22], "kl_mane", rot=("x", 45.0, [8, 10, 18]))
-    quadruped("kilin_emas", "kl_scale", "kl_mane", head, "kl_scale", "kl_horn", tail, body=(12, 12, 24), plates="kl_mane")
+    quadruped("kilin_emas", "kl_scale", "kl_mane", head, "kl_scale", "kl_horn", tail, body=(12, 12, 24), plates="kl_mane",
+              saddle="gd_saddle_red", collar="lb_ring", bell="gd_bell", cuffs="lb_ring")
 
 
 def crane(prefix, feather, accent, beak, leg, flame_tex=None):

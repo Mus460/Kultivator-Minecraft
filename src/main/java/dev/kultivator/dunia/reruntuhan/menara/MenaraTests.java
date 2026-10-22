@@ -24,7 +24,10 @@ public final class MenaraTests {
 
 	public static LiteralArgumentBuilder<CommandSourceStack> node() {
 		return Commands.literal("menara").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-				.then(Commands.literal("cari").executes(ctx -> DuniaCommands.findAndTeleport(player(ctx), Kultivator.id("menara/menara_seratus"))))
+				.then(Commands.literal("cari").executes(ctx -> DuniaCommands.findAndTeleport(player(ctx), Kultivator.id("menara/menara_seratus")))
+						// the cherry-grove and savanna looks of the pagoda
+						.then(Commands.literal("sakura").executes(ctx -> DuniaCommands.findAndTeleport(player(ctx), Kultivator.id("menara/menara_sakura"))))
+						.then(Commands.literal("sabana").executes(ctx -> DuniaCommands.findAndTeleport(player(ctx), Kultivator.id("menara/menara_sabana")))))
 				.then(Commands.literal("masuk").executes(ctx -> enter(player(ctx))))
 				.then(Commands.literal("lantai").then(Commands.argument("n", IntegerArgumentType.integer(1, 100))
 						.executes(ctx -> floor(player(ctx), IntegerArgumentType.getInteger(ctx, "n")))))

@@ -95,6 +95,49 @@ final class QuadBuf {
 		vertex(x + half, y, z - half, 1.0F, 0.0F, argb, light, 0.0F, 1.0F, 0.0F);
 	}
 
+	/**
+	 * A strip from point 0 to point 1 turned about its own axis to face the camera ({@code cam*}), {@code half} wide on
+	 * each side: rigging lines, qi oars. u runs across (0 → 1), v along ({@code v0} at point 0, {@code v1} at point 1).
+	 */
+	void ribbon(float x0, float y0, float z0, float x1, float y1, float z1, float half, float v0, float v1, int argb, int light, float camX,
+			float camY, float camZ) {
+		float dx = x1 - x0;
+		float dy = y1 - y0;
+		float dz = z1 - z0;
+		float vx = camX - (x0 + x1) * 0.5F;
+		float vy = camY - (y0 + y1) * 0.5F;
+		float vz = camZ - (z0 + z1) * 0.5F;
+		// side = along × view
+		float sx = dy * vz - dz * vy;
+		float sy = dz * vx - dx * vz;
+		float sz = dx * vy - dy * vx;
+		float len = (float) Math.sqrt(sx * sx + sy * sy + sz * sz);
+		if (len < 1.0E-5F) {
+			return;
+		}
+		sx = sx / len * half;
+		sy = sy / len * half;
+		sz = sz / len * half;
+		float vl = (float) Math.sqrt(vx * vx + vy * vy + vz * vz);
+		float nx = vl < 1.0E-5F ? 0.0F : vx / vl;
+		float ny = vl < 1.0E-5F ? 1.0F : vy / vl;
+		float nz = vl < 1.0E-5F ? 0.0F : vz / vl;
+		vertex(x0 - sx, y0 - sy, z0 - sz, 0.0F, v0, argb, light, nx, ny, nz);
+		vertex(x0 + sx, y0 + sy, z0 + sz, 1.0F, v0, argb, light, nx, ny, nz);
+		vertex(x1 + sx, y1 + sy, z1 + sz, 1.0F, v1, argb, light, nx, ny, nz);
+		vertex(x1 - sx, y1 - sy, z1 - sz, 0.0F, v1, argb, light, nx, ny, nz);
+	}
+
+	/** A flat horizontal square turned by {@code angle} radians about its centre (formation discs). */
+	void flatTurned(float x, float y, float z, float half, float angle, int argb, int light) {
+		float c = (float) Math.cos(angle) * half;
+		float s = (float) Math.sin(angle) * half;
+		vertex(x - c + s, y, z - s - c, 0.0F, 0.0F, argb, light, 0.0F, 1.0F, 0.0F);
+		vertex(x - c - s, y, z - s + c, 0.0F, 1.0F, argb, light, 0.0F, 1.0F, 0.0F);
+		vertex(x + c - s, y, z + s + c, 1.0F, 1.0F, argb, light, 0.0F, 1.0F, 0.0F);
+		vertex(x + c + s, y, z + s - c, 1.0F, 0.0F, argb, light, 0.0F, 1.0F, 0.0F);
+	}
+
 	void submit(SubmitNodeCollector collector, PoseStack poseStack, RenderType type) {
 		if (count < 4) {
 			return;

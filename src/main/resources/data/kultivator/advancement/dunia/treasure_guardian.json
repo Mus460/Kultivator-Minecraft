@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/treasure_claimed",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.treasure_guardian.description"
+    },
+    "icon": {
+      "id": "kultivator:batu_meteor_roh"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.treasure_guardian.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

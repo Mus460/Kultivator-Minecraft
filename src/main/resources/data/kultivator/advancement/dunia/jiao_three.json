@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/dragon_slain",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.jiao_three.description"
+    },
+    "icon": {
+      "id": "kultivator:sisik_jiao"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.jiao_three.title"
+    },
+    "frame": "challenge",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

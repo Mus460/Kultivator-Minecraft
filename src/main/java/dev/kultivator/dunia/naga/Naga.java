@@ -71,6 +71,7 @@ public final class Naga {
 		WillContest.init();
 		BeastTribulation.init();
 		BloodlineArts.init();
+		BodyGuards.init();
 		SpiritBeasts.addEvolutionListener(BeastEvolution::onEvolved);
 		SpiritBeasts.addReadyListener(BeastEvolution::onReady);
 		// before the default phase: a sneak-use with the offering (a King core among it) must start the tribulation, not
@@ -83,8 +84,19 @@ public final class Naga {
 			WillContest.clearFor(player);
 			TamedJiao.onOwnerGone(player, null);
 		});
-		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) ->
-				TamedJiao.onOwnerGone(player, "kultivator.naga.dismiss.dimension"));
+		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) -> {
+			NagaLiarEntity active = TamedJiao.active(player);
+			if (active == null || active.level() == destination) {
+				// nothing out, or its owner came back to it (a soul returning to its body)
+				return;
+			}
+			if (BodyGuards.jiaoStays(player)) {
+				// Penjaga Raga: the soul left for Dunia Bawah, the Jiao keeps the body
+				Msg.chat(player, Component.translatable("kultivator.naga.guard.jiao_stays", active.getDisplayName()).withStyle(ChatFormatting.GOLD));
+				return;
+			}
+			TamedJiao.onOwnerGone(player, "kultivator.naga.dismiss.dimension");
+		});
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
 			if (entity instanceof ServerPlayer player) {
 				TamedJiao.onOwnerGone(player, null);
@@ -251,10 +263,14 @@ public final class Naga {
 		if (killed instanceof NagaLiarEntity) {
 			return;
 		}
+		BodyGuards.onKill(level, killer, killed);
 		if (killer instanceof NagaLiarEntity dragon && dragon.isTamed()) {
 			ServerPlayer owner = dragon.serverOwner();
 			if (owner != null) {
 				TamedJiao.addXp(owner, killed.getMaxHealth());
+				if (killed.getMaxHealth() >= 40.0F && owner.level() == level) {
+					NagaLines.tamed(owner, dragon, "victory", NagaLines.VICTORY, 2400);
+				}
 			}
 			return;
 		}

@@ -8,7 +8,10 @@ import dev.kultivator.dunia.DuniaBudget;
 import dev.kultivator.dunia.DuniaEvents;
 import dev.kultivator.dunia.DuniaSpine;
 import dev.kultivator.dunia.DuniaTickets;
+import dev.kultivator.Kultivator;
 import dev.kultivator.dunia.api.DuniaApi;
+import dev.kultivator.dunia.api.SkyKind;
+import dev.kultivator.dunia.api.SpiritWeather;
 import dev.kultivator.harta.SpiritStones;
 import dev.kultivator.musuh.RogueCultivators;
 import dev.kultivator.sect.Sect;
@@ -17,10 +20,12 @@ import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -36,6 +41,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.StringUtil;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -45,6 +51,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.HasCustomInventoryScreen;
 import net.minecraft.world.entity.LivingEntity;
@@ -55,6 +62,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.ChunkPos;
@@ -87,6 +95,13 @@ import java.util.UUID;
  * explosions, projectiles and boarding sky pirates; at 0 the ship sets down as Rusak until repaired. FOLLOW disciples of
  * the captain fly along: they depart from the world when it lifts off ({@link Disciples#depart}) and arrive again when it
  * docks, so a voyage never strands them. Nothing here references a client class.
+ * <p>
+ * Detail pass: a hull livery ({@link KapalStyle}, chosen at the helm, some earned) and a given name (the nameplate) ride
+ * with the ship and its keel; module L's sky touches it ({@link KapalWeather}: spirit weather under the hull changes fuel
+ * and speed, a blood eclipse emboldens the sky pirates, twin moons cheapen a cloud leap, a meteor shower may drop a Batu
+ * Meteor Roh into the cloud net); the sky pirates come in a raider ({@link KapalBajakEntity}) that draws alongside while
+ * the ship sets down, board once it is low, and leave spoils when driven off; the helmsman speaks the ship's moments
+ * ({@link KapalVoice}).
  */
 public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 
@@ -110,6 +125,10 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 	public static final int OP_STOP = 6;
 	public static final int OP_ROUTE = 7;
 	public static final int OP_HALL = 8;
+	public static final int OP_STYLE = 9;
+	public static final int OP_RENAME = 10;
+	/** Longest ship name. */
+	public static final int NAME_MAX = 24;
 
 	/** Docked: at most this high above the ground, still for {@link #DOCK_TICKS}. */
 	public static final double DOCK_HEIGHT = 3.2D;
@@ -144,6 +163,11 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 	private static final EntityDataAccessor<String> DATA_OWNER_NAME = SynchedEntityData.defineId(KapalRohEntity.class, EntityDataSerializers.STRING);
 	private static final EntityDataAccessor<String> DATA_DEST = SynchedEntityData.defineId(KapalRohEntity.class, EntityDataSerializers.STRING);
 	private static final EntityDataAccessor<Integer> DATA_ABOARD = SynchedEntityData.defineId(KapalRohEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Byte> DATA_STYLE = SynchedEntityData.defineId(KapalRohEntity.class, EntityDataSerializers.BYTE);
+	private static final EntityDataAccessor<String> DATA_NAME = SynchedEntityData.defineId(KapalRohEntity.class, EntityDataSerializers.STRING);
+	private static final EntityDataAccessor<Byte> DATA_WEATHER = SynchedEntityData.defineId(KapalRohEntity.class, EntityDataSerializers.BYTE);
+	/** Batu Meteor Roh, module L's item (looked up by id, nothing of L is imported). */
+	private static final net.minecraft.resources.Identifier METEOR_STONE = Kultivator.id("batu_meteor_roh");
 
 	// ---- server (saved)
 	private @Nullable UUID owner;
@@ -151,7 +175,6 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 	private long fuelTicks;
 	private double fuelDebt;
 	private ListTag aboard = new ListTag();
-	private String shipName = "";
 	private boolean test;
 	// ---- server (session)
 	private double speed;
@@ -175,6 +198,14 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 	private int[] seatIds = new int[0];
 	private String seatsSeen = "";
 	private boolean lowFuelTold;
+	// ---- server (session): the sky and the sky pirates
+	private SpiritWeather weather = SpiritWeather.CLEAR;
+	private @Nullable KapalBajakEntity raider;
+	private @Nullable UUID pirateTarget;
+	private boolean bandOut;
+	private boolean foesSeen;
+	private int pirateTier = 1;
+	private int pirateRealm;
 
 	public KapalRohEntity(EntityType<? extends KapalRohEntity> type, Level level) {
 		super(type, level);
@@ -195,6 +226,9 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		builder.define(DATA_OWNER_NAME, "");
 		builder.define(DATA_DEST, "");
 		builder.define(DATA_ABOARD, 0);
+		builder.define(DATA_STYLE, (byte) 0);
+		builder.define(DATA_NAME, "");
+		builder.define(DATA_WEATHER, (byte) 0);
 	}
 
 	// ================================================================== synced readers (client and server)
@@ -245,6 +279,21 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 	/** Disciples flying along. */
 	public int disciplesAboard() {
 		return entityData.get(DATA_ABOARD);
+	}
+
+	/** The hull livery. */
+	public KapalStyle style() {
+		return KapalStyle.byOrdinal(entityData.get(DATA_STYLE));
+	}
+
+	/** The name its owner gave it ("" when unnamed). */
+	public String shipName() {
+		return entityData.get(DATA_NAME);
+	}
+
+	/** The spirit weather under the hull (module L; CLEAR when L is off), refreshed every 2 s. */
+	public SpiritWeather weather() {
+		return SpiritWeather.values()[Mth.clamp(entityData.get(DATA_WEATHER), 0, SpiritWeather.values().length - 1)];
 	}
 
 	public @Nullable UUID owner() {
@@ -312,7 +361,8 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 			entityData.set(DATA_HULL, Mth.clamp(state.hull(), 0, max));
 			fuelTicks = Math.max(0L, state.fuel());
 			color = state.color();
-			shipName = state.name();
+			entityData.set(DATA_NAME, cleanName(state.name()));
+			entityData.set(DATA_STYLE, (byte) KapalStyle.byOrdinal(state.style()).ordinal());
 			if (state.broken() || state.hull() <= 0) {
 				setState(STATE_BROKEN);
 			}
@@ -378,7 +428,7 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		double ground = ground(level, kind, getX(), getZ(), getYRot());
 		byte state = state();
 		double vertical = 0.0D;
-		double max = maxSpeed(level, cfg, kind);
+		double max = maxSpeed(level, cfg, kind, weather);
 
 		if (state == STATE_BROKEN || !on || (!fueled && !docked())) {
 			// set down gently (a broken ship, ships switched off, an empty hold): no input, no voyage
@@ -391,7 +441,7 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		} else if (state == STATE_HALT) {
 			speed *= 0.85D;
 			vertical = settle(ground, 0.18D);
-			tickPirates(level, captain);
+			tickPirates(level, ground);
 		} else if (state == STATE_LEAP) {
 			speed *= 0.95D;
 			tickLeap(level, captain, cfg);
@@ -436,14 +486,17 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 			fleetTick = 0;
 			noteFleet(level);
 		}
+		if ((tickCount + getId()) % 40 == 0) {
+			senseSky(level);
+		}
 		float shown = (float) speed;
 		if (Math.abs(entityData.get(DATA_SPEED) - shown) > 0.004F || (shown == 0.0F && entityData.get(DATA_SPEED) != 0.0F)) {
 			entityData.set(DATA_SPEED, shown);
 		}
 	}
 
-	private static double maxSpeed(ServerLevel level, KapalConfig cfg, KapalClass kind) {
-		double perSecond = Math.min(kind.topSpeed(), cfg.maxSpeed);
+	private static double maxSpeed(ServerLevel level, KapalConfig cfg, KapalClass kind, SpiritWeather weather) {
+		double perSecond = Math.min(kind.topSpeed() * KapalWeather.speed(weather), cfg.maxSpeed);
 		if (DuniaBudget.overloaded(level.getServer())) {
 			perSecond *= 0.5D;
 		}
@@ -864,6 +917,8 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 			case OP_SAIL -> ship.sailTo(player, helm.text());
 			case OP_ROUTE -> ship.sailRoute(player, helm.text());
 			case OP_HALL -> ship.sailHall(player);
+			case OP_STYLE -> ship.chooseStyle(player, KapalStyle.byOrdinal(helm.arg()));
+			case OP_RENAME -> ship.rename(player, helm.text());
 			case OP_STOP -> {
 				ship.endVoyage(level, false);
 				ship.setState(STATE_IDLE);
@@ -893,6 +948,16 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		info.putString("dest", destination());
 		info.putInt("repair", repairCost());
 		info.putInt("speed_max", Math.min(Math.round(kind.topSpeed()), Kapal.config().maxSpeed));
+		info.putInt("style", style().ordinal());
+		int styles = 0;
+		for (KapalStyle each : KapalStyle.values()) {
+			if (styleOpen(player, each)) {
+				styles |= 1 << each.ordinal();
+			}
+		}
+		info.putInt("styles_open", styles);
+		info.putString("name", shipName());
+		info.putInt("weather", weather().ordinal());
 		ListTag routes = new ListTag();
 		for (Voyages.Route route : Voyages.routes()) {
 			CompoundTag r = new CompoundTag();
@@ -947,6 +1012,9 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 			tag.putInt("state", ship.state());
 			tag.putBoolean("docked", ship.docked());
 			tag.putFloat("yaw", ship.getYRot());
+			if (!ship.shipName().isEmpty()) {
+				tag.putString("name", ship.shipName());
+			}
 			String dest = ship.destination();
 			if (!dest.isEmpty()) {
 				tag.putString("dest", dest);
@@ -990,7 +1058,7 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 			}
 			return;
 		}
-		fuelDebt += cfg.fuelScale;
+		fuelDebt += cfg.fuelScale * KapalWeather.fuel(weather);
 		long whole = (long) fuelDebt;
 		fuelDebt -= whole;
 		fuelTicks -= whole;
@@ -1078,12 +1146,14 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		endVoyage(level, false);
 		setState(STATE_BROKEN);
 		speed = 0.0D;
+		endPirates();
 		level.playSound(null, getX(), getY(), getZ(), SoundEvents.WOOD_BREAK, SoundSource.NEUTRAL, 1.6F, 0.6F);
 		for (Entity passenger : getPassengers()) {
 			if (passenger instanceof ServerPlayer player) {
 				Msg.title(player, Component.translatable("kultivator.kapal.broken.title").withColor(0xFF6A5A),
 						Component.translatable("kultivator.kapal.broken.sub").withColor(0xE8E0C0), 5, 50, 15);
 				KapalNet.send(player, new KapalNet.Event(getId(), KapalNet.Event.EV_BROKEN, getX(), getY(), getZ(), 0));
+				KapalVoice.crew(player, KapalVoice.HULL_BROKEN, "disciple.m1.careful");
 			}
 		}
 	}
@@ -1237,7 +1307,7 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		leapWait = -1;
 		pirateAt = -1.0D;
 		KapalConfig cfg = Kapal.config();
-		if (cfg.pirates && length > PIRATE_VOYAGE && random.nextDouble() < cfg.pirateChance) {
+		if (cfg.pirates && length > PIRATE_VOYAGE && random.nextDouble() < KapalWeather.pirateChance(cfg.pirateChance, sky(level))) {
 			// somewhere between a third and two thirds of the way
 			pirateAt = length * (0.33D + 0.34D * random.nextDouble());
 		}
@@ -1344,8 +1414,8 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		if (length < (forced ? 32.0D : 128.0D)) {
 			return false;
 		}
-		double perTick = Math.max(0.05D, maxSpeed(level, cfg, kind()));
-		long cost = (long) Math.ceil(length / perTick * 1.5D * cfg.fuelScale);
+		double perTick = Math.max(0.05D, maxSpeed(level, cfg, kind(), weather));
+		long cost = (long) Math.ceil(length / perTick * 1.5D * cfg.fuelScale * KapalWeather.fuel(weather) * KapalWeather.leap(sky(level)));
 		if (!spend(level, cost)) {
 			return false;
 		}
@@ -1357,6 +1427,10 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		for (Entity passenger : getPassengers()) {
 			if (passenger instanceof ServerPlayer player) {
 				KapalNet.send(player, new KapalNet.Event(getId(), KapalNet.Event.EV_LEAP_IN, landing.x, landing.y, landing.z, LEAP_WAIT));
+				KapalVoice.sky(player, KapalVoice.CLOUD_LEAP, null);
+				if (player == captain()) {
+					Advancements.grant(player, "dunia/ship_leap");
+				}
 			}
 		}
 		return true;
@@ -1415,6 +1489,7 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		for (Entity passenger : getPassengers()) {
 			if (passenger instanceof ServerPlayer player) {
 				KapalNet.send(player, new KapalNet.Event(getId(), KapalNet.Event.EV_ARRIVE, getX(), getY(), getZ(), player == captain ? 1 : 0));
+				KapalVoice.crew(player, KapalVoice.ARRIVE, "disciple.m1.greet");
 				Msg.actionBar(player, Component.translatable("kultivator.kapal.arrived", name.isEmpty() ? Component.translatable(
 						"kultivator.kapal.dest.here") : Component.literal(name)).withColor(0x9FE0C0));
 			}
@@ -1429,12 +1504,18 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 
 	// ================================================================== sky pirates
 
-	/** Bajak Langit: the ship sets down, the deck comes out and a band boards. */
+	/**
+	 * Bajak Langit: the ship halts and sets down, a raider comes out of the clouds and draws alongside, and once the hull is
+	 * low (or after 12 s) the band boards: module K's rivals when K is on, else rogue cultivators beside the ship. Driven off
+	 * (no foe near for 10 s after the fight), they leave spoils for the captain and the voyage goes on.
+	 */
 	void startPirates(ServerLevel level, @Nullable ServerPlayer captain) {
 		setState(STATE_HALT);
 		haltTicks = 0;
 		calm = 0;
 		speed *= 0.5D;
+		bandOut = false;
+		foesSeen = false;
 		ServerPlayer target = captain != null ? captain : nearestRider();
 		for (Entity passenger : getPassengers()) {
 			if (passenger instanceof ServerPlayer player) {
@@ -1444,11 +1525,46 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 			}
 		}
 		if (target == null) {
+			pirateTarget = null;
 			return;
 		}
-		int realm = Cultivators.get(target).realm().ordinal();
-		int tier = Mth.clamp(1 + realm / 2, 1, 4);
-		Voyages.pirates(level, this, target, tier, realm);
+		pirateTarget = target.getUUID();
+		pirateRealm = Cultivators.get(target).realm().ordinal();
+		pirateTier = Mth.clamp(1 + pirateRealm / 2, 1, 4);
+		spawnRaider(level);
+	}
+
+	/** The raider appears some way off the beam, a little higher, and flies in. */
+	private void spawnRaider(ServerLevel level) {
+		if (raider != null && !raider.isRemoved()) {
+			return;
+		}
+		if (!DuniaBudget.mayAdd(level, DuniaBudget.PART)) {
+			return;
+		}
+		int side = random.nextBoolean() ? 1 : -1;
+		Vec3 from = null;
+		for (double off : new double[]{44.0D, 30.0D, 18.0D}) {
+			double[] o = KapalClass.toWorld(side * off, -off * 0.4D, getYRot());
+			Vec3 at = new Vec3(getX() + o[0], getY() + 6.0D + off * 0.2D, getZ() + o[1]);
+			if (level.isPositionEntityTicking(BlockPos.containing(at))) {
+				from = at;
+				break;
+			}
+		}
+		if (from == null) {
+			return;
+		}
+		KapalBajakEntity skiff = KapalEntities.BAJAK.create(level, EntitySpawnReason.EVENT);
+		if (skiff == null) {
+			return;
+		}
+		skiff.setup(this, side);
+		skiff.snapTo(from.x, from.y, from.z, getYRot(), 0.0F);
+		if (level.addFreshEntity(skiff)) {
+			DuniaBudget.track(DuniaBudget.PART, skiff);
+			raider = skiff;
+		}
 	}
 
 	private @Nullable ServerPlayer nearestRider() {
@@ -1460,15 +1576,25 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		return null;
 	}
 
-	private void tickPirates(ServerLevel level, @Nullable ServerPlayer captain) {
+	private void tickPirates(ServerLevel level, double ground) {
 		haltTicks++;
+		boolean low = !Double.isNaN(ground) && getY() - ground <= DOCK_HEIGHT + 1.0D;
+		if (!bandOut && pirateTarget != null && (low || haltTicks >= 240)) {
+			bandOut = true;
+			ServerPlayer target = level.getServer().getPlayerList().getPlayer(pirateTarget);
+			if (target != null && target.level() == level) {
+				Voyages.pirates(level, this, target, pirateTier, pirateRealm);
+			}
+		}
 		if (haltTicks % 20 != 0) {
 			return;
 		}
 		AABB box = getBoundingBox().inflate(32.0D, 16.0D, 32.0D);
-		List<Mob> foes = level.getEntitiesOfClass(Mob.class, box, mob -> mob.isAlive() && (mob instanceof Enemy || RogueCultivators.isRogue(mob)));
+		List<Mob> foes = level.getEntitiesOfClass(Mob.class, box, mob -> mob.isAlive() && (mob instanceof Enemy || RogueCultivators.isRogue(mob)
+				|| (mob.getTarget() instanceof Player hunted && (hunted.getVehicle() == this || hunted.distanceToSqr(this) < 40.0D * 40.0D))));
 		if (!foes.isEmpty()) {
 			calm = 0;
+			foesSeen = true;
 			// their techniques scorch the hull: a few points per nearby foe every 2 s
 			if (haltTicks % 40 == 0) {
 				int near = 0;
@@ -1485,17 +1611,170 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 			calm += 20;
 		}
 		// the band is gone for 10 s (or 3 minutes passed): the voyage goes on
-		if (calm >= 200 || haltTicks >= 3600) {
+		boolean waited = bandOut || pirateTarget == null;
+		if ((waited && calm >= 200) || haltTicks >= 3600) {
 			if (broken()) {
 				return;
 			}
+			boolean won = foesSeen && haltTicks < 3600;
 			setState(dest != null ? STATE_AUTO : STATE_IDLE);
+			ServerPlayer receiver = pirateTarget == null ? null : level.getServer().getPlayerList().getPlayer(pirateTarget);
+			endPirates();
 			for (Entity passenger : getPassengers()) {
 				if (passenger instanceof ServerPlayer player) {
-					Msg.actionBar(player, Component.translatable("kultivator.kapal.pirates.gone").withColor(0x9FE0C0));
+					Msg.actionBar(player, Component.translatable(won ? "kultivator.kapal.pirates.repelled" : "kultivator.kapal.pirates.gone")
+							.withColor(0x9FE0C0));
+					if (won) {
+						Advancements.grant(player, "dunia/ship_pirates");
+					}
 				}
 			}
+			if (won && receiver != null && receiver.level() == level && receiver.distanceToSqr(this) < 64.0D * 64.0D) {
+				Advancements.grant(receiver, "dunia/ship_pirates");
+				Voyages.spoils(level, this, receiver, pirateTier);
+			}
 		}
+	}
+
+	/** The pirates are done (driven off, the ship broke, it was stowed): the raider turns away. */
+	private void endPirates() {
+		bandOut = false;
+		pirateTarget = null;
+		if (raider != null) {
+			if (!raider.isRemoved()) {
+				raider.flee();
+			}
+			raider = null;
+		}
+	}
+
+	/** The raider of this ship's sky pirates, or null. */
+	@Nullable KapalBajakEntity raider() {
+		return raider == null || raider.isRemoved() ? null : raider;
+	}
+
+	// ================================================================== the sky (module L)
+
+	private static @Nullable SkyKind sky(ServerLevel level) {
+		try {
+			return DuniaApi.sky().active(level);
+		} catch (RuntimeException exception) {
+			return null;
+		}
+	}
+
+	/** Every 2 s: the spirit weather under the hull, and a meteor shower's chance to net a meteor stone. */
+	private void senseSky(ServerLevel level) {
+		SpiritWeather now;
+		try {
+			now = DuniaApi.sky().weatherAt(level, blockPosition());
+		} catch (RuntimeException exception) {
+			now = SpiritWeather.CLEAR;
+		}
+		if (now == null) {
+			now = SpiritWeather.CLEAR;
+		}
+		if (now != weather) {
+			weather = now;
+			entityData.set(DATA_WEATHER, (byte) now.ordinal());
+			ServerPlayer captain = captain();
+			if (captain != null && now != SpiritWeather.CLEAR && !docked()) {
+				Msg.actionBar(captain, Component.translatable("kultivator.kapal.weather." + now.id()).withColor(0xC9B6FF));
+			}
+		}
+		boolean underWay = !docked() && !broken() && (state() == STATE_FLY || state() == STATE_AUTO);
+		if (underWay && (tickCount + getId()) % KapalWeather.METEOR_EVERY < 40 && sky(level) == SkyKind.METEOR_SHOWER
+				&& random.nextDouble() < KapalWeather.METEOR_CHANCE) {
+			netMeteor(level);
+		}
+	}
+
+	/** {@code uji kapal meteor}: the cloud net catches a meteor stone now. */
+	void testMeteor() {
+		netMeteor((ServerLevel) level());
+	}
+
+	private void netMeteor(ServerLevel level) {
+		Item meteor = BuiltInRegistries.ITEM.getOptional(METEOR_STONE).orElse(null);
+		if (meteor == null) {
+			return;
+		}
+		ItemStack left = hold.addItem(new ItemStack(meteor));
+		if (!left.isEmpty()) {
+			return;
+		}
+		level.playSound(null, getX(), getY() + kind().deck(), getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.NEUTRAL, 1.0F, 0.7F);
+		for (Entity passenger : getPassengers()) {
+			if (passenger instanceof ServerPlayer player) {
+				Msg.actionBar(player, Component.translatable("kultivator.kapal.meteor_net").withColor(0xFFC66A));
+				KapalNet.send(player, new KapalNet.Event(getId(), KapalNet.Event.EV_METEOR, getX(), getY() + kind().deck(), getZ(), 0));
+			}
+		}
+		updateFuelShown();
+	}
+
+	// ================================================================== livery and name
+
+	/** True when {@code player} may give the ship {@code style} (creative players may give any). */
+	static boolean styleOpen(ServerPlayer player, KapalStyle style) {
+		if (player.isCreative()) {
+			return true;
+		}
+		return switch (style.unlock()) {
+			case NONE -> true;
+			case HALL_3 -> Halls.level(player.getUUID()) >= 3;
+			case PIRATES -> advancementDone(player, "dunia/ship_pirates");
+			case VOYAGE -> advancementDone(player, "dunia/ship_voyage");
+		};
+	}
+
+	private static boolean advancementDone(ServerPlayer player, String name) {
+		AdvancementHolder holder = player.level().getServer().getAdvancements().get(Kultivator.id(name));
+		return holder != null && player.getAdvancements().getOrStartProgress(holder).isDone();
+	}
+
+	private void chooseStyle(ServerPlayer player, KapalStyle style) {
+		if (!isOwner(player) && !player.isCreative()) {
+			Msg.actionBar(player, Component.translatable("kultivator.kapal.stow.owner_only").withColor(0xFF8A7A));
+			return;
+		}
+		if (!styleOpen(player, style)) {
+			Msg.actionBar(player, Component.translatable("kultivator.kapal.style.locked." + style.unlock().name().toLowerCase(java.util.Locale.ROOT))
+					.withColor(0xFF8A7A));
+			sendInfo(player, false);
+			return;
+		}
+		setStyle(style);
+		level().playSound(null, getX(), getY() + kind().deck(), getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.NEUTRAL, 1.0F, 1.1F);
+		Msg.actionBar(player, Component.translatable("kultivator.kapal.style.set", Component.translatable("kultivator.kapal.style." + style.id()))
+				.withColor(0x9FE0C0));
+		sendInfo(player, false);
+	}
+
+	/** Sets the livery ({@code uji kapal gaya} too). */
+	void setStyle(KapalStyle style) {
+		entityData.set(DATA_STYLE, (byte) style.ordinal());
+	}
+
+	private void rename(ServerPlayer player, String text) {
+		if (!isOwner(player) && !player.isCreative()) {
+			Msg.actionBar(player, Component.translatable("kultivator.kapal.stow.owner_only").withColor(0xFF8A7A));
+			return;
+		}
+		setShipName(text);
+		Msg.actionBar(player, shipName().isEmpty() ? Component.translatable("kultivator.kapal.name.cleared").withColor(0xE8E0C0)
+				: Component.translatable("kultivator.kapal.name.set", shipName()).withColor(0x9FE0C0));
+		sendInfo(player, false);
+	}
+
+	/** Sets the ship's name ({@code uji kapal nama} too); control characters are dropped, at most {@link #NAME_MAX}. */
+	void setShipName(String text) {
+		entityData.set(DATA_NAME, cleanName(text));
+	}
+
+	static String cleanName(String text) {
+		String clean = text == null ? "" : StringUtil.filterText(text).strip();
+		return clean.length() > NAME_MAX ? clean.substring(0, NAME_MAX).strip() : clean;
 	}
 
 	// ================================================================== disciples aboard
@@ -1621,7 +1900,7 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 	/** The keel item with this ship's state and hold. */
 	ItemStack toItem() {
 		ItemStack keel = new ItemStack(KapalItems.keel(kind()));
-		keel.set(KapalItems.STATE, new KapalItems.State(hull(), fuelTicks, color(), broken(), shipName));
+		keel.set(KapalItems.STATE, new KapalItems.State(hull(), fuelTicks, color(), broken(), shipName(), style().ordinal()));
 		List<ItemStack> items = new ArrayList<>();
 		for (int i = 0; i < hold.getContainerSize(); i++) {
 			items.add(hold.getItem(i).copy());
@@ -1644,6 +1923,9 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 
 	@Override
 	public void onRemoval(Entity.RemovalReason reason) {
+		if (level() instanceof ServerLevel) {
+			endPirates();
+		}
 		if (level() instanceof ServerLevel level && reason.shouldDestroy()) {
 			removeDecks();
 			closeHoldMenus(level);
@@ -1682,6 +1964,7 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 	void summonTo(ServerPlayer player) {
 		ServerLevel target = (ServerLevel) player.level();
 		endVoyage(target, false);
+		endPirates();
 		setState(broken() ? STATE_BROKEN : STATE_IDLE);
 		removeDecks();
 		setDocked(false);
@@ -1763,7 +2046,8 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		entityData.set(DATA_HULL, Mth.clamp(input.getIntOr("hull", kind().hull()), 0, kind().hull()));
 		entityData.set(DATA_COLOR, input.getIntOr("color", DEFAULT_COLOR));
 		fuelTicks = Math.max(0L, input.getLongOr("fuel", 0L));
-		shipName = input.getStringOr("name", "");
+		entityData.set(DATA_NAME, cleanName(input.getStringOr("name", "")));
+		entityData.set(DATA_STYLE, (byte) KapalStyle.byOrdinal(input.getIntOr("style", 0)).ordinal());
 		test = input.getBooleanOr("test", false);
 		setState(input.getBooleanOr("broken", false) ? STATE_BROKEN : STATE_IDLE);
 		setDocked(false);
@@ -1786,7 +2070,8 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		output.putInt("hull", hull());
 		output.putInt("color", color());
 		output.putLong("fuel", fuelTicks);
-		output.putString("name", shipName);
+		output.putString("name", shipName());
+		output.putInt("style", style().ordinal());
 		output.putBoolean("test", test);
 		output.putBoolean("broken", broken());
 		NonNullList<ItemStack> items = NonNullList.withSize(HoldContainer.SIZE, ItemStack.EMPTY);

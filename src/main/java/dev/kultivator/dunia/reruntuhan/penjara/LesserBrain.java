@@ -29,6 +29,16 @@ public final class LesserBrain implements RCreature.Brain {
 
 	@Override
 	public void tick(RCreature c, ServerLevel level) {
+		// under a Gerhana Darah the sealed demons grow restless: a longer leash, faster feet, quicker claws, red eyes
+		boolean eclipse = Prisons.eclipse(level);
+		if (c.tickCount % 20 == 0 && c.has(RCreature.FLAG_ENRAGED) != eclipse) {
+			c.setFlag(RCreature.FLAG_ENRAGED, eclipse);
+			if (eclipse && c.getRandom().nextInt(2) == 0) {
+				Voice.say(c, "demon.growl", "");
+			}
+		}
+		double leash = eclipse ? this.leash * 1.5D : this.leash;
+		double pace = eclipse ? 1.45D : 1.2D;
 		if (c.position().distanceToSqr(home) > (leash + 8.0D) * (leash + 8.0D)) {
 			c.teleportTo(home.x, home.y, home.z);
 		}
@@ -66,10 +76,10 @@ public final class LesserBrain implements RCreature.Brain {
 			return;
 		}
 		if (c.tickCount % 10 == 0) {
-			c.getNavigation().moveTo(target, 1.2D);
+			c.getNavigation().moveTo(target, pace);
 		}
 		if (--melee <= 0 && c.distanceToSqr(target) < 2.4D * 2.4D) {
-			melee = 20;
+			melee = eclipse ? 14 : 20;
 			c.swingForAttack(InteractionHand.MAIN_HAND);
 			c.strike(level, target, (float) (target.getMaxHealth() * share));
 		}

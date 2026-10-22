@@ -69,14 +69,21 @@ final class CerminPuzzle extends Puzzle {
 		made.setTier(host.tier());
 		ShadowBrain.mirrorStats(made, challenger, SHARE);
 		made.setIntakeCap(0.0D);
-		made.setBrain(new ShadowBrain(challenger.getUUID(), host.frame().centre(), 9.0D, SHARE, creature -> solve()));
+		java.util.UUID owner = challenger.getUUID();
+		made.setBrain(new ShadowBrain(owner, host.frame().centre(), 9.0D, SHARE, creature -> {
+			ServerPlayer victor = host.level().getServer().getPlayerList().getPlayer(owner);
+			if (victor != null) {
+				dev.kultivator.util.Advancements.grant(victor, "dunia/heart_mirror");
+			}
+			solve();
+		}));
 		shadow = made;
 		if (mirror != null) {
 			mirror.setState(TekaPartEntity.LIT);
 		}
 		RFx.at(host.level(), at.add(0.0D, 1.0D, 0.0D), RFx.SOUL_APPEAR, 0x6A4AA0, 0, 1.2F);
 		host.level().playSound(null, at.x, at.y, at.z, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.HOSTILE, 1.0F, 0.6F);
-		Voice.say(made, "demon.whisper", null);
+		Voice.say(made, "menara.shadow_self", null);
 		Msg.title(challenger, Component.translatable("kultivator.reruntuhan.teka.cermin.title").withStyle(ChatFormatting.DARK_PURPLE),
 				Component.translatable("kultivator.reruntuhan.teka.cermin.subtitle").withStyle(ChatFormatting.GRAY), 5, 40, 10);
 	}

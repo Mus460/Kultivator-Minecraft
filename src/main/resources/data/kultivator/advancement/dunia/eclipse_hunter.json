@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/sky_event",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.dunia.eclipse_hunter.description"
+    },
+    "icon": {
+      "id": "kultivator:kristal_gerhana"
+    },
+    "title": {
+      "translate": "advancement.kultivator.dunia.eclipse_hunter.title"
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

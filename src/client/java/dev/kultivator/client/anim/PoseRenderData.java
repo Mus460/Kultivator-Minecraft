@@ -9,7 +9,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * The cast pose and form of an entity, carried in its render state from the extract step to the model setup and the
- * layers (players: {@code AvatarRendererMixin}; disciples: {@code DiscipleRenderer.extractRenderState}).
+ * layers (players: {@code AvatarRendererMixin}; disciples: {@code DiscipleRenderer.extractRenderState}; rogue cultivators:
+ * {@code RogueRenderer.extractRenderState}). The sword duel's pose ({@code DuelPoses}, DESIGN 35.5.1) rides the same key.
  */
 public final class PoseRenderData {
 
@@ -25,6 +26,22 @@ public final class PoseRenderData {
 	public static void extract(Entity entity, EntityRenderState state, float partialTicks) {
 		float age = entity.tickCount + partialTicks;
 		CastPoses.Snapshot snapshot = CastPoses.snapshot(entity, age);
+		// DESIGN 35.5.1: the sword duel's pose is asked first; a technique pose above half weight wins (the duel keeps
+		// the legs and body underneath it)
+		CastPoses.Snapshot duel = dev.kultivator.client.duel.anim.DuelPoses.snapshot(entity, age);
+		if (duel != null) {
+			snapshot = snapshot != null && snapshot.strength() > 0.5F ? dev.kultivator.client.duel.anim.DuelPoseLibrary.underCast(snapshot, duel) : duel;
+			if (dev.kultivator.client.duel.anim.DuelPoses.hidesItem(entity.getId())
+					&& state instanceof net.minecraft.client.renderer.entity.state.ArmedEntityRenderState armed) {
+				// the winner's sheathed blade (SARUNG after its tick 12)
+				armed.getMainHandItemState().clear();
+				if (armed.mainArm == net.minecraft.world.entity.HumanoidArm.RIGHT) {
+					armed.rightHandItemStack = net.minecraft.world.item.ItemStack.EMPTY;
+				} else {
+					armed.leftHandItemStack = net.minecraft.world.item.ItemStack.EMPTY;
+				}
+			}
+		}
 		// render states are made fresh every frame: only what is there gets written (the readers default to none)
 		FabricRenderState data = (FabricRenderState) state;
 		if (snapshot != null || data.getData(POSE) != null) {

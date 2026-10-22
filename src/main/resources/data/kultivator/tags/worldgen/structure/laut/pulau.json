@@ -1,6 +1,10 @@
 {
   "replace": false,
   "values": [
-    "kultivator:laut/pulau_roh"
+    "kultivator:laut/pulau_roh",
+    "kultivator:laut/pulau_herba",
+    "kultivator:laut/pulau_pertapa",
+    "kultivator:laut/pulau_pasar",
+    "kultivator:laut/pulau_karang"
   ]
 }

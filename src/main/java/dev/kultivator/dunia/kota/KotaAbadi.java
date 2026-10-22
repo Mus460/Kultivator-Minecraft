@@ -13,6 +13,7 @@ import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.DuniaAnchors;
 import dev.kultivator.harta.SpiritHerbs;
 import dev.kultivator.technique.spec.TechniquePower;
+import dev.kultivator.util.Advancements;
 import dev.kultivator.util.KillCredit;
 import dev.kultivator.util.Msg;
 import dev.kultivator.voice.Voice;
@@ -54,6 +55,10 @@ public final class KotaAbadi {
 	public static final long LECTURE_START = 5500L;
 	public static final long LECTURE_END = 7500L;
 	public static final int LECTURE_SECONDS = 60;
+	/** Lines of the lecture shown in the lecturer's speech bubble ({@code kultivator.kota.kuliah.ajar.<n>}). */
+	static final int LECTURE_LINES = 10;
+	/** Esensi Abadi conversion points (of 100) an Immortal Peach adds (34.5.4: "+3 % Esensi Abadi conversion"). */
+	public static final int PEACH_CONVERSION = 3;
 	public static final double LECTURE_RANGE = 6.0D;
 	public static final int WEEK = 7;
 
@@ -130,7 +135,11 @@ public final class KotaAbadi {
 				continue;
 			}
 			if (tick % 400L == 0L) {
-				Voice.say(lecturer, "elder.advice", "kultivator.kota.kuliah.suara");
+				KotaVoice.say(lecturer, KotaVoice.LECTURE, "elder.advice", "kultivator.kota.kuliah.suara");
+			}
+			if (tick % 120L == 0L) {
+				// the lecture itself, line by line in the lecturer's speech bubble
+				NpcLife.speak(lecturer, "kultivator.kota.kuliah.ajar." + (int) Math.floorMod(tick / 120L, LECTURE_LINES), 115);
 			}
 			for (ServerPlayer player : level.players()) {
 				if (player.distanceToSqr(lecturer) > LECTURE_RANGE * LECTURE_RANGE || !(player.isShiftKeyDown() || Meditation.isMeditating(player))) {
@@ -195,7 +204,38 @@ public final class KotaAbadi {
 		player.heal(player.getMaxHealth() * 0.5F);
 		Msg.actionBar(player, Component.translatable("kultivator.kota.persik.makan", String.format(java.util.Locale.ROOT, "%.1f", share * 100.0D))
 				.withStyle(ChatFormatting.LIGHT_PURPLE));
+		int conv = peachConversion(player);
+		if (conv >= 0) {
+			Msg.chat(player, Component.translatable("kultivator.kota.persik.esensi", PEACH_CONVERSION, conv).withStyle(ChatFormatting.LIGHT_PURPLE));
+		}
+		Advancements.grant(player, "dunia/immortal_peach");
 		return true;
+	}
+
+	/**
+	 * The peach's +3 % Esensi Abadi conversion (34.5.4) for an ascended body, the same {@code extra.abadi.conv} 0-100 the
+	 * Batu Asal conversion fills (with its two advancements); the new value, or -1 when the body has not ascended.
+	 */
+	static int peachConversion(ServerPlayer player) {
+		if (!dev.kultivator.abadi.Abadi.ascended(player)) {
+			return -1;
+		}
+		CompoundTag root = Cultivators.get(player).extra();
+		CompoundTag section = root.getCompound(dev.kultivator.abadi.Abadi.EXTRA_KEY).orElse(null);
+		if (section == null) {
+			section = new CompoundTag();
+			root.put(dev.kultivator.abadi.Abadi.EXTRA_KEY, section);
+		}
+		int after = Math.max(0, Math.min(100, section.getIntOr("conv", 0) + PEACH_CONVERSION));
+		section.putInt("conv", after);
+		Cultivators.dirty(player);
+		if (after >= 50) {
+			Advancements.grant(player, "essence_half");
+		}
+		if (after >= 100) {
+			Advancements.grant(player, "essence_converted");
+		}
+		return after;
 	}
 
 	// ================================================================== actions
@@ -294,7 +334,7 @@ public final class KotaAbadi {
 		if (!player.getInventory().add(peach)) {
 			Kota.drop(player, peach);
 		}
-		Voice.say(npc, npc.voiceKey("greet_alt"), null);
+		KotaVoice.say(npc, KotaVoice.PEACH_KEEPER, npc.voiceKey("greet_alt"), null);
 		Msg.chat(player, Component.translatable("kultivator.kota.persik.petik").withStyle(ChatFormatting.LIGHT_PURPLE));
 	}
 
@@ -338,7 +378,7 @@ public final class KotaAbadi {
 				edict.putBoolean("paid", true);
 				data.touch();
 				NilaiBatu.giveOrigin(player, EDICT_PAY[kind]);
-				Voice.say(npc, "elder.inheritance", null);
+				KotaVoice.say(npc, KotaVoice.ENVOY_PLEASED, "elder.inheritance", null);
 				Msg.chat(player, Component.translatable("kultivator.kota.titah.hadiah", EDICT_PAY[kind]).withStyle(ChatFormatting.GOLD));
 			}
 			default -> {

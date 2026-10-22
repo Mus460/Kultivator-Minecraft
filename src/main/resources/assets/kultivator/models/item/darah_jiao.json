@@ -1,0 +1,7 @@
+{
+ "parent": "minecraft:item/generated",
+ "textures": {
+  "layer0": "kultivator:item/darah_jiao",
+  "layer1": "kultivator:item/darah_jiao_blood"
+ }
+}
