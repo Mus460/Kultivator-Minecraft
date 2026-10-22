@@ -1,6 +1,7 @@
 package dev.kultivator.dunia.dimensi;
 
 import dev.kultivator.data.Cultivators;
+import dev.kultivator.dunia.kota.NilaiBatu;
 import dev.kultivator.harta.HartaItems;
 import dev.kultivator.harta.SpiritStones;
 import dev.kultivator.util.NoGrief;
@@ -15,16 +16,17 @@ import net.minecraft.world.item.ItemStack;
  * {@code bawah} (the soul journey, courts, Meng Po, quests) and {@code laut} (the sea's return point, the Dragon King's
  * quests, Penglai), so it is saved, synced and copied on death like every module's extra (DESIGN 26.13 rule).
  * <p>
- * Prices are in Nilai Batu (NB, DESIGN 34.1: Low 1, Mid 9, High 80, Supreme 600). {@link #pay} takes real spirit stones
- * from the inventory, lowest grade first, and gives change in lower grades; {@link #giveNb} pays out real stones. No
- * shop of this module ever creates stones from nothing: rewards are fixed, once-per-player or capped per day.
+ * Prices are in Nilai Batu (NB, DESIGN 34.1), the one table of {@code kota.NilaiBatu} (audit R17: Low 1, Mid 9, High 81,
+ * Supreme 729). {@link #pay} takes real spirit stones from the inventory, lowest grade first, and gives change in lower
+ * grades; {@link #giveNb} pays out real stones. No shop of this module ever creates stones from nothing: rewards are
+ * fixed, once-per-player or capped per day.
  */
 public final class DimensiData {
 
 	public static final String BAWAH = "bawah";
 	public static final String LAUT = "laut";
-	/** Nilai Batu of each stone grade. */
-	public static final int[] NB = {1, 9, 80, 600};
+	/** Nilai Batu of each stone grade (a copy of {@code NilaiBatu.VALUE}, the one table). */
+	public static final int[] NB = {(int) NilaiBatu.VALUE[0], (int) NilaiBatu.VALUE[1], (int) NilaiBatu.VALUE[2], (int) NilaiBatu.VALUE[3]};
 
 	/** {@code extra.<key>} of the player (created and attached when missing). */
 	public static CompoundTag extra(ServerPlayer player, String key) {

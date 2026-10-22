@@ -92,7 +92,7 @@ public final class XpSources {
 		// Phase 7 (DESIGN 19.3.14): spawner mobs ×0.25, a boss type slain again today ×0.25, Kejenuhan Bertarung; the
 		// call also keeps the kill counters and may drop a beast core.
 		double factor = dev.kultivator.elite.EliteRewards.playerKill(player, killed);
-		double xp = combatXp(killed) * factor;
+		double xp = combatXp(killed) * factor * combatScale(Cultivators.get(player).rank());
 		if (xp <= 0.0D) {
 			return;
 		}
@@ -126,6 +126,40 @@ public final class XpSources {
 			xp *= 0.5D;
 		}
 		return xp;
+	}
+
+	/** Balance change (audit M4 S4, approved): ordinary kill XP grows with the bar, {@code clamp(xpRequired / 4500, 1, 8)}. */
+	public static final double COMBAT_SCALE_BAR = 4500.0D;
+	public static final double COMBAT_SCALE_MAX = 8.0D;
+
+	/**
+	 * The kill XP scale of a rank (audit M4 S4): 1 up to Golden Core, then {@code xpRequired / 4500}, at most 8, so a monster
+	 * still gives a sliver of a high realm's bar instead of nothing. Elite, rogue and envoy rewards keep their own tables.
+	 */
+	public static double combatScale(Rank rank) {
+		return Math.max(1.0D, Math.min(COMBAT_SCALE_MAX, rank.xpRequired() / COMBAT_SCALE_BAR));
+	}
+
+	// ================================================================== Dunia milestones (audit M4 S4)
+
+	/** Shares of the bar ({@code Stars.barSize}) for the Dunia milestones (approved balance change). */
+	public static final double MILESTONE_TOWER_TEN = 0.03D;
+	public static final double MILESTONE_RUINS = 0.05D;
+	public static final double MILESTONE_COURT = 0.04D;
+	public static final double MILESTONE_PRISON = 0.10D;
+	public static final double MILESTONE_JIAO_BLOOD = 0.05D;
+
+	/**
+	 * Pays a Dunia milestone (every 10 tower floors, a cleared ruin, a won court, a sealed prison, Darah Jiao) as
+	 * {@code share} of the player's bar through {@code Stars.grantShare} (XpSource.TRIAL, Stored Qi at the peak), with one
+	 * chat line naming {@code what}. The caller pays each milestone once (its own first-clear flag).
+	 */
+	public static void milestone(ServerPlayer player, double share, Component what) {
+		if (player == null || !(share > 0.0D) || !Double.isFinite(share)) {
+			return;
+		}
+		dev.kultivator.ascension.Stars.grantShare(player, share);
+		Msg.chat(player, Component.translatable("kultivator.kekuatan.milestone", what, Msg.number(share * 100.0D)).withStyle(ChatFormatting.AQUA));
 	}
 
 	// ================================================================== mining

@@ -18,6 +18,7 @@ import dev.kultivator.sekte.api.LambangService;
 import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.util.Advancements;
+import dev.kultivator.sekte.SekteSuara;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -106,21 +107,32 @@ public final class Seragam {
 	};
 
 	/** From {@code SekteContent.init()} (its module line). */
-	public static void init() {
-		if (initialised || !SekteContent.on(SekteIds.S)) {
+	private static boolean content;
+
+	/** Registry content (K1): the banner component and the payload types, always, whatever the switches say. */
+	public static void registerContent() {
+		if (content) {
 			return;
 		}
-		initialised = true;
+		content = true;
 		SeragamConfig.load();
 		PanjiKomponen.register();
-		SekteApi.setLambang(SERVICE);
-
 		PayloadTypeRegistry.clientboundPlay().register(SeragamPayloads.LambangSync.TYPE, SeragamPayloads.LambangSync.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(SeragamPayloads.LambangForget.TYPE, SeragamPayloads.LambangForget.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(SeragamPayloads.LambangOpen.TYPE, SeragamPayloads.LambangOpen.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(SeragamPayloads.SeragamDebug.TYPE, SeragamPayloads.SeragamDebug.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(SeragamPayloads.LambangSet.TYPE, SeragamPayloads.LambangSet.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(SeragamPayloads.LambangRequest.TYPE, SeragamPayloads.LambangRequest.CODEC);
+	}
+
+	public static void init() {
+		registerContent();
+		if (initialised || !SekteContent.on(SekteIds.S)) {
+			return;
+		}
+		initialised = true;
+		SekteApi.setLambang(SERVICE);
+
 		ServerPlayNetworking.registerGlobalReceiver(SeragamPayloads.LambangSet.TYPE, (payload, context) -> onSet(context.player(), payload.data()));
 		ServerPlayNetworking.registerGlobalReceiver(SeragamPayloads.LambangRequest.TYPE, (payload, context) -> openDesigner(context.player()));
 
@@ -238,6 +250,7 @@ public final class Seragam {
 		SekteLog.log(server, owner, SekteIds.S, Component.translatable("kultivator.sekte.seragam.log.changed",
 				saved.motto().isEmpty() ? Component.translatable("kultivator.sekte.seragam.no_motto") : Component.literal(saved.motto())));
 		// the disciples whose robes changed remember the new uniform (a small, lasting joy for module P to read)
+		boolean thanked = false;
 		for (DiscipleEntity disciple : Disciples.loaded(owner)) {
 			if (disciple.role() != DiscipleEntity.Role.DISCIPLE) {
 				continue;
@@ -247,6 +260,9 @@ public final class Seragam {
 					|| old.lambang() != saved.lambang()) {
 				Ingatan.remember(server, disciple.data(), "seragam.jubah_baru", null, 2, "kultivator.sekte.seragam.ingat.jubah",
 						saved.motto());
+				if (!thanked && master != null && disciple.distanceToSqr(master) <= 16.0D * 16.0D) {
+					thanked = SekteSuara.line(disciple, "robe", "thanks", 1200);
+				}
 			}
 		}
 		if (master != null) {
@@ -581,6 +597,9 @@ public final class Seragam {
 			}
 			if (player.blockPosition().distSqr(banner.pos()) <= 24 * 24) {
 				Advancements.grant(player, SekteIds.ADVANCEMENT_FOLDER + "seragam_bendera");
+				if (LambangData.markOnce(player.getUUID(), "suara_bendera")) {
+					SekteSuara.inner(player, "elder.banner", "elder.welcome");
+				}
 				return;
 			}
 		}

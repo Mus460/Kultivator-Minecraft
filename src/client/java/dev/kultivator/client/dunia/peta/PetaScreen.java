@@ -2,6 +2,7 @@ package dev.kultivator.client.dunia.peta;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.ScrollFrame;
 import dev.kultivator.client.screen.ui.SlipTooltip;
@@ -158,6 +159,9 @@ public final class PetaScreen extends Screen {
 	private int cardW;
 	private int cardH;
 
+	/** The "?" seal: Panduan › Ensiklopedia on the world-map topic (audit M5, S11). */
+	private final KeyHints.SealCorner help = new KeyHints.SealCorner("peta_dunia");
+
 	public PetaScreen() {
 		super(Component.translatable("kultivator.peta.title"));
 	}
@@ -178,6 +182,7 @@ public final class PetaScreen extends Screen {
 		y0 = (height - h) / 2;
 		x1 = x0 + w;
 		y1 = y0 + h;
+		help.place(x1 - 10.0F, y0 + 12.0F);
 		side = w >= 300;
 		mx0 = x0 + 10;
 		my0 = y0 + 24;
@@ -537,6 +542,7 @@ public final class PetaScreen extends Screen {
 		if (tooltip != null && !tooltip.isEmpty()) {
 			SlipTooltip.draw(g, font, tooltip, mouseX, mouseY, width, height);
 		}
+		help.render(g, font, mouseX, mouseY, width, height);
 	}
 
 	private void drawHeader(GuiGraphicsExtractor g, int mouseX, int mouseY) {
@@ -546,13 +552,13 @@ public final class PetaScreen extends Screen {
 		Component dimName = Component.translatableWithFallback("kultivator.peta.dim." + path, pretty("x/" + path));
 		CompoundTag sheet = PetaCache.sheet();
 		Component sub = Component.translatable("kultivator.peta.header", dimName, sheet.getIntOr("known", 0), sheet.getIntOr("explored", 0));
-		Brush.fit(g, font, sub, x0 + 196, y0 + 10, mx1 - x0 - 200, Palette.INK_SOFT, 0.62F, 0.45F, false);
+		Brush.fit(g, font, sub, x0 + 196, y0 + 10, Math.min(mx1, x1 - 24) - x0 - 200, Palette.INK_SOFT, 0.62F, 0.45F, false);
 		if (overMap(mouseX, mouseY)) {
 			int wx = (int) Math.floor(worldX(mouseX));
 			int wz = (int) Math.floor(worldZ(mouseY));
 			Component at = Component.translatable("kultivator.peta.cursor", wx, wz);
 			float w = font.width(at) * 0.62F;
-			Brush.text(g, font, at, x1 - 12 - w, y0 + 10, Palette.INK_SOFT, 0.62F, false);
+			Brush.text(g, font, at, x1 - 24 - w, y0 + 10, Palette.INK_SOFT, 0.62F, false);
 		}
 	}
 
@@ -1066,6 +1072,9 @@ public final class PetaScreen extends Screen {
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		double mx = event.x();
 		double my = event.y();
+		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && help.click(mx, my)) {
+			return true;
+		}
 		if (selected != null && mx >= cardX && mx < cardX + cardW && my >= cardY && my < cardY + cardH) {
 			for (PetaUi.Button button : cardButtons) {
 				if (button.over(mx, my)) {
@@ -1177,6 +1186,9 @@ public final class PetaScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
+		if (help.release(event.x(), event.y())) {
+			return true;
+		}
 		if (dragging && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 			dragging = false;
 			if (Math.abs(event.x() - pressX) < 3.0D && Math.abs(event.y() - pressY) < 3.0D) {

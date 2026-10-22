@@ -1,0 +1,13 @@
+{
+  "kultivator.kekuatan.power.trial": "Trial foes (elites, rogue cultivators, guards, Dunia and Immortal Realm foes) use D × 1.5 = %s. Immortal Ascension layer term inside D: +%s.",
+  "kultivator.kekuatan.meditation.cap": "Qi absorption limit reached: site × Qi formation × spirit stones = ×%s, but only ×%s is absorbed. A Sect Formation field still adds on top of this limit (up to ×%s).",
+  "kultivator.kekuatan.formasi.medcap": "Meditation: site × formation × stones ×%s, absorbed up to ×%s · Sect field ×%s (limit ×%s) on top",
+  "kultivator.kekuatan.formasi.medcap.tip": "Site, personal Qi formation and spirit stones together stop at ×3.5. A Sect Formation field counts separately on top of that limit, at most ×1.5.",
+  "kultivator.kekuatan.guide.ia8": "Immortal Ascension layer 8 unlocks no new technique: use it to master the layer 7 techniques fully; layer 9 carries the path on.",
+  "kultivator.kekuatan.milestone": "Dunia milestone: %s. Cultivation +%s%% of the bar.",
+  "kultivator.kekuatan.milestone.tower": "the Tower, 10 more floors",
+  "kultivator.kekuatan.milestone.ruins": "a ruin cleared",
+  "kultivator.kekuatan.milestone.court": "a court won",
+  "kultivator.kekuatan.milestone.prison": "a demon prison sealed",
+  "kultivator.kekuatan.milestone.jiao": "Jiao Blood"
+}

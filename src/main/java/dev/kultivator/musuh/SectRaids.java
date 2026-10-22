@@ -34,6 +34,7 @@ import dev.kultivator.talisman.ReturnTalisman;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
+import dev.kultivator.util.Sibuk;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -461,7 +462,9 @@ public final class SectRaids {
 			return false;
 		}
 		Long seen = TRIBULATION_SEEN.get(owner);
-		return !Tribulation.isActive(player) && (seen == null || level.getGameTime() - seen >= TRIBULATION_GRACE);
+		// Never during real danger elsewhere (a duel, a trial, a ritual): the omen waits through the night (Sibuk).
+		return !Tribulation.isActive(player) && (seen == null || level.getGameTime() - seen >= TRIBULATION_GRACE)
+				&& Sibuk.whyExcept(player, "serbuan") == null;
 	}
 
 	private static boolean afk(ServerPlayer player) {
@@ -493,6 +496,10 @@ public final class SectRaids {
 		raid.nextWave();
 		LIVE.put(owner, raid);
 		Halls.setDirty();
+		if (!test && player != null) {
+			// A raid is an enemy event of the shared daily pressure (it still comes: it was announced days ago).
+			Sibuk.enemyTaken(player, "serbuan");
+		}
 		Component line = Component.translatable("kultivator.musuh.raid.start", raiderName(owner, sect), waves);
 		Halls.log(owner, line);
 		tellTerritory(raid, line.copy().withStyle(ChatFormatting.DARK_RED));

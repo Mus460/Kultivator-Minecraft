@@ -74,9 +74,9 @@ public final class DuelSettings {
 		}
 	}
 
-	/** Percikan duel: the spark count factor of the visual module. */
+	/** Percikan duel: the spark count factor of the visual module, its one source (audit M4 R5: Ringan 0.5, as it always drew). */
 	public enum Sparks {
-		PENUH(1.0F), RINGAN(0.4F), MATI(0.0F);
+		PENUH(1.0F), RINGAN(0.5F), MATI(0.0F);
 
 		private final float factor;
 

@@ -76,9 +76,35 @@ public final class GuideClient {
 		return version;
 	}
 
-	/** The first chapter with an unfinished step (0-based), as the server computed it. */
+	/**
+	 * The current chapter as a display position (0-based; "Bab N" is this + 1): the server picks it by realm, hall and the
+	 * core steps left (GuideProgress.currentChapter) and sends its save index, mapped here to the book's order.
+	 */
 	public static int current() {
-		return Math.max(0, Math.min(GuideBook.chapterCount() - 1, current));
+		return Math.max(0, Math.min(GuideBook.chapterCount() - 1, GuideBook.positionOf(current)));
+	}
+
+	/**
+	 * The next step of the current chapter for the HUD tracker when no Langkah chain is active: its first open core step,
+	 * else its first open step; null before the first sync, when everything is done or the chapter has nothing open.
+	 */
+	public static @Nullable GuideBook.Step nextStep() {
+		if (!synced || allDone()) {
+			return null;
+		}
+		GuideBook.Step any = null;
+		for (GuideBook.Step step : GuideBook.chapter(current()).steps()) {
+			if (done(step.index())) {
+				continue;
+			}
+			if (step.core()) {
+				return step;
+			}
+			if (any == null) {
+				any = step;
+			}
+		}
+		return any;
 	}
 
 	/** True when every step of every chapter is done. */

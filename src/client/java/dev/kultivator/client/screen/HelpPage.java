@@ -34,7 +34,8 @@ final class HelpPage extends Page {
 	 * Topics in reading order. The phase-6 topics (Sect Hall onwards, DESIGN 20.4.1) and the phase-7 topics (DESIGN 19.6:
 	 * the Jalan tablet first, for new players) are written by their own modules; a topic whose text is not in the
 	 * language files yet is skipped. Phase 8 adds the topics of DESIGN 25.0 (the Jalan Dunia glue writes {@code desa} and
-	 * {@code jalan_dunia}); 33 adds {@code titah} (the Titah Langit screen's "?").
+	 * {@code jalan_dunia}); 33 adds {@code titah} (the Titah Langit screen's "?"); the integration audit (M5) adds the duel,
+	 * the Living Sect, the settings groups and the glossary ({@code ensiklopedia_sambung.*}).
 	 */
 	private static final String[] TOPICS = {"jalan", "meditation", "xp", "bottleneck", "breakthrough", "persiapan", "tribulation", "protectors",
 			"pills", "techniques", "roots", "dao", "alchemy", "heart_demon", "beasts", "formations", "sects", "ascension", "visuals",
@@ -51,7 +52,11 @@ final class HelpPage extends Page {
 			// Phase 34 (DESIGN 34.6): each module writes its own topic text; dunia_luas is module T's overview.
 			"dunia_luas", "kota", "pengembara", "saingan", "kota_abadi", "gua_leluhur", "penjara_iblis", "menara_seratus",
 			"peristiwa_langit", "harta_lahir", "cuaca_roh", "naga_liar", "evolusi_binatang", "dunia_bawah", "laut_tanpa_batas",
-			"kapal_terbang", "peta_dunia"};
+			"kapal_terbang", "peta_dunia",
+			// Audit M5 (S11, R25, S31/S32): the Sword Duel (35), the Living Sect (36) and its bigger parts, the 37 slot (skipped
+			// until its text exists), the Pengaturan groups' own topics, and one glossary of the words that name two things.
+			"duel_pedang", "sekte_hidup", "turnamen_sekte", "diplomasi_sekte", "kebun_tambang", "sekte_langit", "suara", "hud", "tombol",
+			"glosarium"};
 	private static final long HIGHLIGHT_MILLIS = 1000L;
 	private static final int COIN = 11;
 	private static final int COIN_GAP = 2;

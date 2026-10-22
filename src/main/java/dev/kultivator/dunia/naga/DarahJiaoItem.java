@@ -1,12 +1,10 @@
 package dev.kultivator.dunia.naga;
 
-import dev.kultivator.cultivation.Progression;
 import dev.kultivator.cultivation.Qi;
 import dev.kultivator.dao.Comprehension;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Dao;
-import dev.kultivator.data.XpSource;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
@@ -37,7 +35,8 @@ import java.util.function.Consumer;
  * Darah Jiao (detail pass of DESIGN 34.5.11): the blood of a slain wild Jiao, in a jade vial, carrying the element of its
  * kind ({@code naga_kind} in the stack's custom data). Drunk (use): +{@link #INSIGHT} comprehension of the drinker's own
  * Dao, {@link #INSIGHT_MATCH} when the kind matches it (water: Ice, cloud: Shadow (wind), thunder: Lightning), Qi refilled
- * by a quarter, Regeneration II for 10 s; before a Dao is chosen it gives {@link #XP} cultivation XP instead. One vial per
+ * by a quarter, Regeneration II for 10 s; before a Dao is chosen it gives a Dunia milestone of
+ * {@code XpSources.MILESTONE_JIAO_BLOOD} (5% of the bar; audit M4 S4, it was a flat {@link #XP}) instead. One vial per
  * 5 minutes (item cooldown). Balanced to the hunters of Nascent Soul and above: a Jiao is a 600-1 800 health sky boss
  * that appears to a player about once in 30 minutes, and a technique book gives 5 comprehension.
  */
@@ -109,8 +108,9 @@ public class DarahJiaoItem extends Item {
 			Msg.chat(player, Component.translatable(own == daoOf(kind) ? "kultivator.naga.darah.match" : "kultivator.naga.darah.dao",
 					kind.displayName(), own.displayName(), Msg.number(gained)).withColor(kind.glow));
 		} else {
-			Progression.addXp(player, XP, XpSource.PILL);
-			Msg.chat(player, Component.translatable("kultivator.naga.darah.xp", kind.displayName(), Msg.number(XP)).withColor(kind.glow));
+			// audit M4 S4 (approved): a share of the bar (5%) instead of a flat 600 XP, so the vial keeps its worth at high realms
+			dev.kultivator.cultivation.XpSources.milestone(player, dev.kultivator.cultivation.XpSources.MILESTONE_JIAO_BLOOD,
+					Component.translatable("kultivator.kekuatan.milestone.jiao"));
 		}
 		data.setQi(Math.min(Qi.max(data), data.qi() + Qi.max(data) * 0.25D));
 		Cultivators.dirty(player);

@@ -227,9 +227,9 @@ public final class Perang {
 	private static void jadwal(MinecraftServer server, DiplomasiData data, UUID owner, SekteNpc sect, Relasi r, long today, RandomSource random) {
 		int days = 3 + random.nextInt(3);
 		r.perangSeranganDay = today + days;
-		if (Halls.level(owner) >= SectRaids.MIN_HALL_LEVEL) {
+		if (Halls.level(owner) >= SectRaids.MIN_HALL_LEVEL && SectRaids.callRaid(server, owner, days)) {
+			// S14: the raider is named only when the raid schedule really took the raid.
 			data.hall(owner).putString(PENYERBU, sect.id);
-			SectRaids.callRaid(server, owner, days);
 		}
 		data.setDirty();
 	}
@@ -243,8 +243,13 @@ public final class Perang {
 			pertempuranData(server, data, owner, sect, r, random, today);
 			return;
 		}
+		if (!SectRaids.callRaid(server, owner, 2 + random.nextInt(2))) {
+			// S14: the raid schedule refused (raids off, a raid already planned, pending or live): no false "raid ready";
+			// the clash is settled at the border instead.
+			pertempuranData(server, data, owner, sect, r, random, today);
+			return;
+		}
 		data.hall(owner).putString(PENYERBU, sect.id);
-		SectRaids.callRaid(server, owner, 2 + random.nextInt(2));
 		r.note(today, Component.translatable(GeneratorNama.KEY + "kronik.serangan_siap"));
 		Component line = Component.translatable(GeneratorNama.KEY + "log.serangan_siap", sect.name());
 		Diplomasi.log(server, owner, line.copy().withStyle(ChatFormatting.RED));

@@ -919,6 +919,9 @@ public final class TowerRun {
 				chest.add(r.nextBoolean() ? flameSeed() : new ItemStack(AlamItems.TOMB_ESSENCE, 2));
 			}
 			RRewards.giveAll(player, chest, "kultivator.reruntuhan.menara.chest");
+			// audit M4 S4 (approved): a Dunia milestone every 10 floors, the first clear only (this branch)
+			dev.kultivator.cultivation.XpSources.milestone(player, dev.kultivator.cultivation.XpSources.MILESTONE_TOWER_TEN,
+					Component.translatable("kultivator.kekuatan.milestone.tower"));
 		}
 		if (floor >= 10) {
 			Advancements.grant(player, "dunia/tower_10");

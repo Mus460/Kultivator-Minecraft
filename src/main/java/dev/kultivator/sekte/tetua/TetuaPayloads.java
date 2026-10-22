@@ -117,6 +117,10 @@ public final class TetuaPayloads {
 		PayloadTypeRegistry.clientboundPlay().register(Report.TYPE, Report.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Ceremony.TYPE, Ceremony.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Act.TYPE, Act.CODEC);
+		// The types always (K1, both sides); the receiver only while the module runs.
+		if (!dev.kultivator.sekte.SekteContent.on(dev.kultivator.sekte.SekteIds.E)) {
+			return;
+		}
 		ServerPlayNetworking.registerGlobalReceiver(Act.TYPE, (payload, context) -> BalaiTetua.onAct(context.player(), payload.op(), payload.arg()));
 	}
 

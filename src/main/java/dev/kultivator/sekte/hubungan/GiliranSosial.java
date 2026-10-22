@@ -7,7 +7,7 @@ import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.sekte.SekteIds;
 import dev.kultivator.sekte.api.Ikatan;
 import dev.kultivator.sekte.api.SekteApi;
-import dev.kultivator.voice.VoiceDisciples;
+import dev.kultivator.sekte.SekteSuara;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.core.BlockPos;
@@ -354,7 +354,7 @@ final class GiliranSosial {
 		switch (s.type) {
 			case TEA -> {
 				HubunganPayloads.bubble(s.a, s.b, HubunganPayloads.ICON_TEH, 80);
-				VoiceDisciples.line(Hubungan.random().nextBoolean() ? s.a : s.b, Hubungan.random().nextBoolean() ? "greet" : "greet_alt", 2400);
+				SekteSuara.line(Hubungan.random().nextBoolean() ? s.a : s.b, "tea", "greet", 2400);
 			}
 			case OATH -> HubunganPayloads.bubble(s.a, s.b, HubunganPayloads.ICON_SIMPUL, RITE_TICKS);
 			case WEDDING -> HubunganPayloads.bubble(s.a, s.b, HubunganPayloads.ICON_TERATAI, RITE_TICKS);

@@ -4,18 +4,15 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.kultivator.KultivatorConfig;
 import dev.kultivator.abadi.Abadi;
-import dev.kultivator.alam.Alam;
-import dev.kultivator.ascension.Ascension;
 import dev.kultivator.ascension.Stars;
-import dev.kultivator.cultivation.Tribulation;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Dao;
-import dev.kultivator.musuh.SectRaids;
 import dev.kultivator.network.Payloads;
 import dev.kultivator.purba.Purba;
 import dev.kultivator.technique.spec.run.Codex;
 import dev.kultivator.util.Msg;
+import dev.kultivator.util.Sibuk;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -116,11 +113,12 @@ public final class Batin {
 		DIRTY.add(player.getUUID());
 	}
 
-	/** True while the player is in a run, raid, tribulation, ascension, calamity, primordial fight, wrath, defence or ritual. */
+	/**
+	 * True while anything holds the player (run, raid, tribulation, ascension, calamity, primordial fight, wrath, defence,
+	 * ritual, heart demon, duel...): the shared {@link Sibuk} door.
+	 */
 	static boolean busy(ServerPlayer player) {
-		return Alam.inRun(player) || SectRaids.active(player.getUUID()) || Tribulation.isActive(player) || Ascension.isActive(player)
-				|| Purba.inCalamity(player) || Purba.inFight(player) || Purba.inWrath(player) || Abadi.inAscension(player)
-				|| InnerCalamity.active(player.getUUID()) || Creation.inRitual(player);
+		return Sibuk.why(player) != null;
 	}
 
 	/** Action {@code BATIN}: text = "op[:param]"; "sync" answers with the {@code DuniaSync.CH_BATIN} data. */

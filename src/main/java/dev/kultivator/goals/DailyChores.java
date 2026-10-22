@@ -271,13 +271,37 @@ public final class DailyChores {
 		daily.putInt("streak", streak);
 		daily.putLong("last_full", day);
 		daily.putBoolean("full", true);
-		give(player, SpiritStones.stack(SpiritStones.LOW, 1));
+		ItemStack stones = dayReward(Cultivators.get(player).realm());
+		Component what = Component.literal(stones.getCount() + "× ").append(stones.getHoverName());
+		give(player, stones);
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.9F, 1.2F);
-		Msg.chat(player, Component.translatable("kultivator.goals.daily.done_all", streak,
+		Msg.chat(player, Component.translatable("kultivator.ekonomi.harian.selesai", what, streak,
 				Math.round((streakFactor(streak) - 1.0D) * 100.0D)).withStyle(ChatFormatting.GOLD));
 		if (streak >= STREAK_ADVANCEMENT) {
 			Advancements.grant(player, "daily_streak_5");
 		}
+	}
+
+	/**
+	 * The stones for finishing all three chores, by realm (balance change of audit S27, approved; it was one Low stone at
+	 * every realm): 2 Low up to Foundation, 1 Mid at Golden Core and Nascent Soul, 1 High at Deity Transformation and Dao
+	 * Union, 1 Batu Asal Abadi from Immortal Ascension (1 High while that item is not registered). Made on demand.
+	 */
+	static ItemStack dayReward(Realm realm) {
+		if (realm.atLeast(Realm.IMMORTAL_ASCENSION)) {
+			net.minecraft.world.item.Item origin = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(dev.kultivator.Kultivator.id("immortal_origin_stone"));
+			if (origin != net.minecraft.world.item.Items.AIR) {
+				return new ItemStack(origin);
+			}
+			return SpiritStones.stack(SpiritStones.HIGH, 1);
+		}
+		if (realm.atLeast(Realm.DEITY_TRANSFORMATION)) {
+			return SpiritStones.stack(SpiritStones.HIGH, 1);
+		}
+		if (realm.atLeast(Realm.GOLDEN_CORE)) {
+			return SpiritStones.stack(SpiritStones.MID, 1);
+		}
+		return SpiritStones.stack(SpiritStones.LOW, 2);
 	}
 
 	private static void give(ServerPlayer player, ItemStack stack) {

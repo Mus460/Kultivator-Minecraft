@@ -438,6 +438,9 @@ public final class TechniqueCommands {
 		player.sendSystemMessage(Component.literal(String.format(Locale.ROOT, "R %.3f · C %.2f · Q %.2f · S %.3f (%d★) · P %s · D %s",
 				TechniquePower.rankFactor(data.rank()), TechniquePower.comprehensionFactor(data, null), Math.sqrt(Math.max(0.01D, data.qualityFactor())),
 				TechniquePower.starFactor(stars), stars, Msg.number(TechniquePower.power(data)), Msg.number(TechniquePower.legacyD(data)))).withColor(0xE8E8E8));
+		// audit M4 T5/S7: which foes use D instead of P, and the Immortal Ascension layer term inside D
+		player.sendSystemMessage(Component.translatable("kultivator.kekuatan.power.trial", Msg.number(TechniquePower.legacyD(data) * TechniquePower.TRIAL_MOB_FACTOR),
+				Msg.number(TechniquePower.legacyLayer(data.rank()))).withColor(0xB0B0B0));
 		TechniqueSpec selected = TechniqueRegistry.byId(data.selectedId());
 		if (selected != null) {
 			TechniquePower.Factors f = TechniquePower.factors(data, selected);

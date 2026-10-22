@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * {@code /kultivasi uji peta ...} (op, DESIGN 34.5.16 "Uji"): {@code ungkap <radius>} (explores every cell within the
- * radius and queues their samples), {@code situs semua} (discovers every published site), {@code reset} (forgets the
+ * radius and queues their samples), {@code situs semua} (discovers every published site), {@code situs bersihkan} (repairs old cave sites, DuniaSites.cleanCaves), {@code reset} (forgets the
  * fog, waypoints and sites of the player), {@code domain} (lists the NPC sect domains), {@code sampel} (the cell under
  * the player and the sampler's queue).
  */
@@ -52,6 +52,11 @@ final class PetaTests {
 					int count = n;
 					ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.peta.cmd.sites", count)), false);
 					return 1;
+				})).then(Commands.literal("bersihkan").executes(ctx -> {
+					// save repair: caves that old rumours and pointer scrolls published as Gua Kecil (integration audit S18)
+					int[] result = DuniaSites.cleanCaves(ctx.getSource().getServer());
+					ctx.getSource().sendSuccess(() -> Msg.prefixed(Component.translatable("kultivator.sambung.peta.bersihkan", result[0], result[1])), true);
+					return result[0];
 				})))
 				.then(Commands.literal("reset").executes(ctx -> {
 					Peta.reset(ctx.getSource().getPlayerOrException());

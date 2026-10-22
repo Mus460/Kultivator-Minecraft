@@ -5,6 +5,7 @@ import dev.kultivator.data.Element;
 import dev.kultivator.data.TechniqueGrade;
 import dev.kultivator.data.TechniqueRegistry;
 import dev.kultivator.data.TechniqueSpec;
+import dev.kultivator.dunia.kota.NilaiBatu;
 import dev.kultivator.harta.BeastCores;
 import dev.kultivator.harta.HartaComponents;
 import dev.kultivator.harta.HartaItems;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Rewards of module R in the units of DESIGN 34.1: Nilai Batu (NB, Low = 1, Mid = 9, High = 80, Supreme = 600) paid in
+ * Rewards of module R in the units of DESIGN 34.1: Nilai Batu (NB, the one table of {@code kota.NilaiBatu}) paid in
  * real spirit stones from the highest grade down, aged herbs of the existing herb family, beast cores of
  * {@code harta/BeastCores}, the existing inheritance jade ({@code InheritanceTrials.jade}) and jade slips of the
  * existing registry. Stacks are made only when a reward is given (never in a static initializer). Everything that does
@@ -35,7 +36,8 @@ import java.util.List;
  */
 public final class RRewards {
 
-	public static final int[] NB = {1, 9, 80, 600};
+	/** Nilai Batu of each stone grade (a copy of {@code NilaiBatu.VALUE}, the one table; audit R17). */
+	public static final int[] NB = {(int) NilaiBatu.VALUE[0], (int) NilaiBatu.VALUE[1], (int) NilaiBatu.VALUE[2], (int) NilaiBatu.VALUE[3]};
 
 	/** Gives {@code nb} worth of spirit stones (highest grade first); returns the stacks given. */
 	public static List<ItemStack> stones(ServerPlayer player, int nb) {

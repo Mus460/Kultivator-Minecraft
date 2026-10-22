@@ -81,6 +81,7 @@ public final class BatinItems {
 		public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
 			builder.accept(Component.translatable("item.kultivator.immortal_essence_pearl.lore").withStyle(ChatFormatting.GREEN));
 			builder.accept(Component.translatable("item.kultivator.immortal_essence_pearl.use").withStyle(ChatFormatting.GRAY));
+			builder.accept(Component.translatable("kultivator.ekonomi.nama.mutiara_esensi").withStyle(ChatFormatting.GRAY));
 			builder.accept(Component.translatable("item.kultivator.immortal_essence_pearl.source").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 		}
 	}

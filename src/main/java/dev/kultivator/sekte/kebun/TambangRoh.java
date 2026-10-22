@@ -20,7 +20,7 @@ import java.util.UUID;
 /**
  * The Tambang Roh itself (DESIGN 36.2.10): built when the {@code sx_kebun_tambang} component stands (its
  * {@code tambang_mulut} anchor exists) or the test switch is on, depth level 1-9 kept in {@code sekte_kebun.tambang.lvl}.
- * A deeper level costs {@code tambangPK × level} PK from the hall pool and {@code 16 × level} Kayu and {@code 24 × level}
+ * A deeper level costs {@code tambangPKDasar × level^1.3} PK from the hall pool and {@code 16 × level} Kayu and {@code 24 × level}
  * Batu from the Gudang Bahan (the building materials deposited for the sect, taken through the existing ledger). Depth is
  * data: no block is dug.
  */
@@ -82,19 +82,13 @@ public final class TambangRoh {
 	/** The cost of the step to {@code next}: {PK, Kayu units, Batu units}. */
 	public static int[] cost(int next) {
 		int[] materials = TabelHasil.materials(next);
-		return new int[]{KebunConfig.get().tambangPK * next, materials[0], materials[1]};
+		int pk = (int) Math.round(KebunConfig.get().tambangPKDasar * Math.pow(Math.max(1, next), 1.3D));
+		return new int[]{pk, materials[0], materials[1]};
 	}
 
-	/** True when the hall pool holds {@code pk} (probed by taking and giving back: the pool has no public reader). */
+	/** True when the hall pool holds {@code pk} (S28: read through {@link Halls#pool}, no more take-and-give-back probe). */
 	static boolean poolHas(UUID owner, int pk) {
-		if (pk <= 0) {
-			return true;
-		}
-		if (Halls.spendPool(owner, pk)) {
-			Halls.addPool(owner, pk);
-			return true;
-		}
-		return false;
+		return pk <= 0 || Halls.pool(owner) >= pk;
 	}
 
 	/** Units of {@code cat} in the Gudang Bahan. */

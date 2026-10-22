@@ -56,18 +56,21 @@ final class Envoys {
 	}
 
 	static @Nullable String blocker(DiscipleEntity disciple) {
+		if (Expeditions.refuses(disciple)) {
+			return Expeditions.REFUSES;
+		}
 		DiscipleData data = disciple.data();
 		if (SectRanks.rank(data) < 1) {
-			return "kultivator.sectevent.envoy.need_outer";
+			return "kultivator.sekte_sambung.bakat.perlu_luar";
 		}
 		boolean middle = data.realm().ordinal() > Realm.QI_REFINING.ordinal() || data.realm() == Realm.QI_REFINING && data.stage() >= 1;
-		return middle ? null : "kultivator.sectevent.envoy.need_middle";
+		return middle ? null : "kultivator.sekte_sambung.bakat.perlu_menengah";
 	}
 
 	static boolean send(ServerPlayer player, DiscipleEntity disciple) {
 		UUID owner = player.getUUID();
 		if (EventUtil.day() < readyDay(owner)) {
-			EventUtil.chat(player, Component.translatable("kultivator.sectevent.envoy.wait", readyDay(owner)).withStyle(ChatFormatting.YELLOW));
+			EventUtil.chat(player, Component.translatable("kultivator.sekte_sambung.bakat.tunggu", readyDay(owner)).withStyle(ChatFormatting.YELLOW));
 			return false;
 		}
 		String why = blocker(disciple);
@@ -81,7 +84,7 @@ final class Envoys {
 		}
 		core(owner).putLong("envoy_day", EventUtil.day());
 		EventUtil.dirty();
-		EventUtil.chat(player, Component.translatable("kultivator.sectevent.envoy.sent", name).withStyle(ChatFormatting.AQUA));
+		EventUtil.chat(player, Component.translatable("kultivator.sekte_sambung.bakat.berangkat", name).withStyle(ChatFormatting.AQUA));
 		return true;
 	}
 
@@ -96,7 +99,7 @@ final class Envoys {
 			return false;
 		}
 		resetCooldown(owner);
-		EventUtil.chat(player, Component.translatable("kultivator.sectevent.envoy.reset_done").withStyle(ChatFormatting.GREEN));
+		EventUtil.chat(player, Component.translatable("kultivator.sekte_sambung.bakat.percepat_siap").withStyle(ChatFormatting.GREEN));
 		return true;
 	}
 
@@ -137,7 +140,7 @@ final class Envoys {
 				specs.add(new Halls.CandidateSpec(youth, -1, TALENT_CHANCE, -1.0D, false, "envoy"));
 			}
 			Halls.addCandidates(owner, specs);
-			EventUtil.chat(player, Component.translatable("kultivator.sectevent.envoy.back", AwayTeams.name(member), count).withStyle(ChatFormatting.GOLD));
+			EventUtil.chat(player, Component.translatable("kultivator.sekte_sambung.bakat.pulang", AwayTeams.name(member), count).withStyle(ChatFormatting.GOLD));
 			Halls.log(owner, Component.translatable("kultivator.sectevent.log.envoy", AwayTeams.name(member), count));
 		}
 	}

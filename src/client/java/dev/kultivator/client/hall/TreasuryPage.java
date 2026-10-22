@@ -418,8 +418,14 @@ public class TreasuryPage extends HallPage {
 		CompoundTag info = info();
 		// Top: the pool and today's offerings against the cap.
 		int pool = info.getIntOr("pool", 0);
-		Brush.fit(g, font, Brush.bold(Component.translatable("kultivator.hall.ui.pool", pool)), x + 2.0F, y + 1.0F, leftW - 6.0F, Palette.GOLD_DARK,
-				0.75F, 0.45F, false);
+		// S28: the pool's PK in and out over the last 7 days, beside the balance
+		int[] week = info.getIntArray("pool_week").orElse(new int[0]);
+		Component poolLine = Brush.bold(Component.translatable("kultivator.hall.ui.pool", pool));
+		if (week.length >= 2) {
+			poolLine = Component.empty().append(poolLine).append(Component.literal("  "))
+					.append(Component.translatable("kultivator.sekte_sambung.kas.minggu", week[0], week[1]).withStyle(ChatFormatting.DARK_GRAY));
+		}
+		Brush.fit(g, font, poolLine, x + 2.0F, y + 1.0F, leftW - 6.0F, Palette.GOLD_DARK, 0.75F, 0.45F, false);
 		int offered = info.getIntOr("offered_today", 0);
 		int cap = Math.max(1, info.getIntOr("offer_cap", 300));
 		HallUi.bar(g, font, Component.translatable("kultivator.hall.ui.offered"), Component.literal(offered + "/" + cap), offered / (float) cap,

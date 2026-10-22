@@ -55,7 +55,7 @@ import java.util.function.Function;
  * Players click +5% / +10% / +25% (the action carries the lot and the price it saw; a stale click is refused; a bid needs that
  * much Batu in the inventory). A lot sells 8 s after the last raise. Batu are taken only on a win; a winner who no longer holds
  * enough loses the lot to the best rival and cannot bid for the rest of the session. Consignment: at most 2 items of
- * {@code #kultivator:auction_sellable} per player and session, paid at the session end at 0.7-1.3 × a value that is always at
+ * {@code #kultivator:auction_sellable} per player and session, paid at the session end at 0.6-1.0 × a value that is always at
  * most half the item's lot base (no buy-sell loop). State is memory only (a restart voids open lots with no charge); the bid
  * tick runs only while a session has open lots and a player is in Alam Abadi.
  */
@@ -75,9 +75,10 @@ final class Auction {
 	public static final double RAISE_MAX = 0.15D;
 	public static final double RIVAL_ACT = 0.7D;
 	public static final double OFFENDED = 0.9D;
-	public static final int CONSIGN_MAX = 2;
-	public static final double CONSIGN_MIN = 0.7D;
-	public static final double CONSIGN_SPREAD = 0.6D;
+	/** Consignment rules shared with the town's Balai Lelang ({@code dunia.kota.Titipan}, audit T14/R28). */
+	public static final int CONSIGN_MAX = dev.kultivator.dunia.kota.Titipan.PER_SESSION;
+	public static final double CONSIGN_MIN = dev.kultivator.dunia.kota.Titipan.PAY_MIN;
+	public static final double CONSIGN_SPREAD = dev.kultivator.dunia.kota.Titipan.PAY_SPREAD;
 	public static final long VIEWER_TICKS = 2400L;
 	public static final int[] STEPS = {5, 10, 25};
 	public static final TagKey<Item> SELLABLE = TagKey.create(Registries.ITEM, Kultivator.id("auction_sellable"));
@@ -561,7 +562,7 @@ final class Auction {
 			if (current != null && entry.getLongOr("session", -1L) == current.index) {
 				continue;
 			}
-			total += (int) Math.max(1L, Math.round(entry.getIntOr("value", 1) * (CONSIGN_MIN + random.nextDouble() * CONSIGN_SPREAD)));
+			total += (int) dev.kultivator.dunia.kota.Titipan.paid(entry.getIntOr("value", 1), random);
 			sold++;
 			list.remove(i);
 		}

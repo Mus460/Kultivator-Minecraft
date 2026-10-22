@@ -62,6 +62,13 @@ public final class Goals {
 	/** Star condensing sink (DESIGN 25.8.4): each Esensi Energi Makam carried lowers the star's cost by 2%, at most 10. */
 	public static final double ESSENCE_DISCOUNT = 0.02D;
 	public static final int ESSENCE_MAX = 10;
+	/**
+	 * Audit T15: before Ascension the discount never uses the Esensi the Ascension offering needs (the same 9 as
+	 * {@code abadi.Ascend.OFFER_ESSENCE}, package-private there); only what is carried above it counts.
+	 */
+	public static final int ESSENCE_RESERVE = 9;
+	/** {@code extra.goals.star_discount_off}: the player switched the star discount (Esensi and Batu Asal) off. */
+	public static final String STAR_DISCOUNT_OFF = "star_discount_off";
 
 	public static void init() {
 		Advancements.addListener(Guide::onAdvancement);
@@ -79,8 +86,8 @@ public final class Goals {
 		// Phase 8 glue (DESIGN 25.8): the world counters and the star condensing sink.
 		ServerLivingEntityEvents.AFTER_DEATH.register(Goals::onWorldKill);
 		Alam.addClearListener((player, id, layer, first) -> addWorldCounter(player, W_CLEARS, 1));
-		Stars.addCostModifier(player -> 1.0D - ESSENCE_DISCOUNT * Math.min(ESSENCE_MAX, essence(player)));
-		Stars.addCondenseListener((player, stars) -> takeEssence(player, Math.min(ESSENCE_MAX, essence(player))));
+		Stars.addCostModifier(player -> 1.0D - ESSENCE_DISCOUNT * discountEssence(player));
+		Stars.addCondenseListener((player, stars) -> takeEssence(player, discountEssence(player)));
 	}
 
 	/** A rogue cultivator died: the credited player's rogue counter, and the elder counter during a live sect raid. */
@@ -139,6 +146,48 @@ public final class Goals {
 			}
 		}
 		return count;
+	}
+
+	/** True unless the player switched the star discount off ({@code /kultivasi diskonbintang mati}). Batu Asal follow it too. */
+	public static boolean starDiscountOn(ServerPlayer player) {
+		return !GoalCounters.view(Cultivators.get(player)).getBooleanOr(STAR_DISCOUNT_OFF, false);
+	}
+
+	/** The Esensi the next star's discount uses: 0 when switched off, else what is carried above the reserve (before Ascension), at most 10. */
+	static int discountEssence(ServerPlayer player) {
+		if (!starDiscountOn(player)) {
+			return 0;
+		}
+		int have = essence(player);
+		if (!dev.kultivator.abadi.Abadi.ascended(player)) {
+			have -= ESSENCE_RESERVE;
+		}
+		return Math.max(0, Math.min(ESSENCE_MAX, have));
+	}
+
+	/** {@code /kultivasi diskonbintang}: the switch and a preview of what the next star would use (audit T15). */
+	private static int starDiscount(ServerPlayer player, @org.jetbrains.annotations.Nullable Boolean on) {
+		CultivationData data = Cultivators.get(player);
+		if (on != null) {
+			if (on) {
+				GoalCounters.goals(data).remove(STAR_DISCOUNT_OFF);
+			} else {
+				GoalCounters.goals(data).putBoolean(STAR_DISCOUNT_OFF, true);
+			}
+			Cultivators.dirty(player);
+		}
+		boolean enabled = starDiscountOn(player);
+		int essence = discountEssence(player);
+		int stones = enabled ? Math.min(dev.kultivator.abadi.OriginStones.STAR_STONES_MAX, dev.kultivator.dunia.kota.NilaiBatu.origin(player)) : 0;
+		boolean ascended = dev.kultivator.abadi.Abadi.ascended(player);
+		Msg.chat(player, Component.translatable(enabled ? "kultivator.ekonomi.bintang.hidup" : "kultivator.ekonomi.bintang.mati")
+				.withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE));
+		Msg.chat(player, Component.translatable("kultivator.ekonomi.bintang.pratinjau", essence, Math.round(ESSENCE_DISCOUNT * 100.0D * essence),
+				stones, Math.round(dev.kultivator.abadi.OriginStones.STAR_DISCOUNT * 100.0D * stones)).withStyle(net.minecraft.ChatFormatting.GRAY));
+		if (!ascended) {
+			Msg.chat(player, Component.translatable("kultivator.ekonomi.bintang.sisih", ESSENCE_RESERVE).withStyle(net.minecraft.ChatFormatting.GRAY));
+		}
+		return 1;
 	}
 
 	private static void takeEssence(ServerPlayer player, int amount) {
@@ -204,6 +253,10 @@ public final class Goals {
 			return 1;
 		}));
 		root.then(Commands.literal("harian").executes(ctx -> DailyChores.print(ctx.getSource().getPlayerOrException())));
+		// Audit T15: the star discount switch (Esensi Energi Makam and Batu Asal) with a preview of the next star.
+		root.then(Commands.literal("diskonbintang").executes(ctx -> starDiscount(ctx.getSource().getPlayerOrException(), null))
+				.then(Commands.literal("hidup").executes(ctx -> starDiscount(ctx.getSource().getPlayerOrException(), true)))
+				.then(Commands.literal("mati").executes(ctx -> starDiscount(ctx.getSource().getPlayerOrException(), false))));
 	}
 
 	/** {@code uji jalan reset|bab|ujian}, {@code uji harian ulang|selesai|beruntun} and {@code uji hud} (DESIGN 19.4). */

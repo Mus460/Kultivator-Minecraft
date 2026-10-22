@@ -1,9 +1,6 @@
 package dev.kultivator.dunia.langit;
 
 import dev.kultivator.Kultivator;
-import dev.kultivator.alam.Alam;
-import dev.kultivator.ascension.Ascension;
-import dev.kultivator.cultivation.Tribulation;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.DuniaBudget;
@@ -17,6 +14,7 @@ import dev.kultivator.sect.build.SectBuild;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
+import dev.kultivator.util.Sibuk;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -195,8 +193,9 @@ public final class TreasureBirths {
 		return candidates.isEmpty() ? null : candidates.get(level.getRandom().nextInt(candidates.size()));
 	}
 
+	/** Held by anything (the shared {@link Sibuk} door): the birth waits for another player or the next check. */
 	private static boolean busy(ServerPlayer player) {
-		return Alam.inRun(player) || Tribulation.isActive(player) || Ascension.isActive(player);
+		return Sibuk.why(player) != null;
 	}
 
 	private static boolean busy(ResourceKey<Level> dim) {

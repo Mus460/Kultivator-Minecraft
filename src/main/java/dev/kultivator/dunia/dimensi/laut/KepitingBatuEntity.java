@@ -1,6 +1,7 @@
 package dev.kultivator.dunia.dimensi.laut;
 
 import dev.kultivator.dunia.dimensi.Dimensi;
+import dev.kultivator.technique.spec.TechniquePower;
 import dev.kultivator.util.NoGrief;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -50,6 +51,8 @@ public class KepitingBatuEntity extends Monster {
 		this.setCanPickUpLoot(false);
 		this.addTag(NoGrief.TAG);
 		this.addTag(TAG);
+		// realm-scaled Dunia foe: the trial-mob rule of 6c (audit M4 T5)
+		TechniquePower.markRealmFoe(this);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {

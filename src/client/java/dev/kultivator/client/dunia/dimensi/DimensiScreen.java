@@ -2,6 +2,7 @@ package dev.kultivator.client.dunia.dimensi;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.data.Dao;
@@ -56,6 +57,8 @@ public class DimensiScreen extends Screen {
 	private final int entity;
 	private final CompoundTag data;
 	private final boolean sea;
+	/** The "?" seal over the top-right corner seal: the sea's or the underworld's topic (audit M5, S11). */
+	private final KeyHints.SealCorner help;
 	private Component heading;
 	private final List<Component> lines = new ArrayList<>();
 	private final List<Strip> strips = new ArrayList<>();
@@ -81,6 +84,7 @@ public class DimensiScreen extends Screen {
 		this.sea = screen == DimensiNet.SCREEN_KING || screen == DimensiNet.SCREEN_MERCHANT || screen == DimensiNet.SCREEN_PENGLAI
 				|| screen == DimensiNet.SCREEN_HERMIT || screen == DimensiNet.SCREEN_GUARD || screen == DimensiNet.SCREEN_FISHER;
 		this.heading = build();
+		this.help = new KeyHints.SealCorner(sea ? "laut_tanpa_batas" : "dunia_bawah");
 	}
 
 	/** Turns to {@code page} (the same data, built again). */
@@ -366,6 +370,7 @@ public class DimensiScreen extends Screen {
 		x1 = x0 + w;
 		y0 = (height - h) / 2;
 		y1 = y0 + h;
+		help.place(x1 - 10.5F, y0 + 10.5F);
 		boxes.clear();
 		int stripH = 16;
 		int gap = 4;
@@ -495,6 +500,7 @@ public class DimensiScreen extends Screen {
 					0.8F, 0.5F, false);
 		}
 		Brush.fit(g, font, t("esc"), x0 + 8.0F, y1 - 10.0F, 80.0F, Palette.argb(0xA0, inkSoft() & 0xFFFFFF), 0.6F, 0.45F, false);
+		help.render(g, font, mouseX, mouseY, width, height);
 	}
 
 	private float linesHeight(float room, float scale) {
@@ -516,6 +522,9 @@ public class DimensiScreen extends Screen {
 		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 			double mx = event.x();
 			double my = event.y();
+			if (help.click(mx, my)) {
+				return true;
+			}
 			for (int i = 0; i < strips.size() && i < boxes.size(); i++) {
 				int[] b = boxes.get(i);
 				if (mx >= b[0] && mx < b[2] && my >= b[1] && my < b[3]) {
@@ -551,6 +560,9 @@ public class DimensiScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
+		if (help.release(event.x(), event.y())) {
+			return true;
+		}
 		if (holding >= 0) {
 			holding = -1;
 			return true;

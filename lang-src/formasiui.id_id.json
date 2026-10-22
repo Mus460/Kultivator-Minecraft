@@ -39,7 +39,7 @@
 	"kultivator.formasiui.field.none": "Tidak ada formasi yang mencakup tempat ini. Berdirilah di dalam wilayahmu atau di dekat inti yang menyala.",
 	"kultivator.formasiui.field.note": "Dibaca saat gulungan dibuka. Formasi melindungi dan memelihara, bukan untuk bertani. Setiap nilai punya batasnya.",
 	"kultivator.formasiui.field.gather": "Kultivasi ×%s · Sekte · batas ×%s",
-	"kultivator.formasiui.field.gather.tip": "Pengumpulan roh dari formasi sekte. Pengumpulan saja berhenti di ×%s; seluruh nilai formasi berhenti di batas tumpukan.",
+	"kultivator.formasiui.field.gather.tip": "Pengumpulan roh dari formasi sekte. Pengumpulan saja berhenti di ×%s; untuk meditasi faktor sekte ini kini dihitung di luar batas penyerapan ×3,5 (lihat baris Meditasi).",
 	"kultivator.formasiui.field.drain": "Pengurasan qi ×%s · lantai %s",
 	"kultivator.formasiui.field.drain.tip": "Meditasi menguras lebih sedikit qi di sini. Tidak pernah di bawah lantainya.",
 	"kultivator.formasiui.field.heal": "Pemulihan: regenerasi tingkat %s · qi ×%s · deviasi ×%s (batas qi ×%s)",

@@ -103,7 +103,13 @@ public final class CoreRun extends AnchorRun {
 		if (made != null) {
 			made.setRole(TekaPartEntity.CORE);
 			made.setCenter(centre());
-			made.setListener((player, part, attack) -> reinforce(player));
+			made.setListener((player, part, attack) -> {
+				if (player.isShiftKeyDown()) {
+					tradePahala(player);
+				} else {
+					reinforce(player);
+				}
+			});
 			if (add(made)) {
 				core = made;
 			}
@@ -144,13 +150,21 @@ public final class CoreRun extends AnchorRun {
 			return;
 		}
 		Item high = HartaItems.stoneItem(SpiritStones.HIGH);
-		if (!player.isCreative() && (player.getInventory().countItem(Talismans.BLANK) < 4 || player.getInventory().countItem(high) < 1)) {
+		// A Sobekan Segel stands for two blank talismans (the torn paper still holds the seal's power).
+		int blanks = player.getInventory().countItem(Talismans.BLANK);
+		int shards = player.getInventory().countItem(RItems.SOBEKAN_SEGEL);
+		if (!player.isCreative() && (blanks + shards * Prisons.SHARD_AS_BLANKS < 4 || player.getInventory().countItem(high) < 1)) {
 			Msg.chat(player, Component.translatable("kultivator.reruntuhan.penjara.core.need", 4, SpiritStones.name(SpiritStones.HIGH))
 					.withStyle(ChatFormatting.GRAY));
 			return;
 		}
 		if (!player.isCreative()) {
-			take(player, Talismans.BLANK, 4);
+			int fromBlanks = Math.min(4, blanks);
+			take(player, Talismans.BLANK, fromBlanks);
+			int rest = 4 - fromBlanks;
+			if (rest > 0) {
+				take(player, RItems.SOBEKAN_SEGEL, (rest + Prisons.SHARD_AS_BLANKS - 1) / Prisons.SHARD_AS_BLANKS);
+			}
 			take(player, high, 1);
 		}
 		Prisons.markReinforced(level, seal, player, day);
@@ -161,6 +175,8 @@ public final class CoreRun extends AnchorRun {
 		RFx.at(level, centre().add(0.0D, 2.0D, 0.0D), RFx.SEAL_SEALED, 0, seal.integrity(), 1.2F);
 		level.playSound(null, centre().x, centre().y, centre().z, SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 1.0F, 0.8F);
 		Msg.chat(player, Component.translatable("kultivator.reruntuhan.penjara.core.done", seal.integrity()).withStyle(ChatFormatting.GOLD));
+		Msg.chat(player, Component.translatable("kultivator.reruntuhan.penjara.pahala.hint", Reruntuhan.data(player).getIntOr("pahala", 0),
+				Prisons.PAHALA_PER_JADE).withStyle(ChatFormatting.GRAY));
 		if (Prisons.eclipse(level)) {
 			Advancements.grant(player, "dunia/eclipse_seal");
 		}
@@ -176,6 +192,31 @@ public final class CoreRun extends AnchorRun {
 				need -= t;
 			}
 		}
+	}
+
+	/**
+	 * Sneak + use on the Jantung Segel: {@link Prisons#PAHALA_PER_JADE} Pahala buy one universal Giok Warisan (an
+	 * inheritance trial; balance change approved by the user, integration audit S22).
+	 */
+	private void tradePahala(ServerPlayer player) {
+		CompoundTag own = Reruntuhan.data(player);
+		int pahala = own.getIntOr("pahala", 0);
+		if (pahala < Prisons.PAHALA_PER_JADE) {
+			Msg.actionBar(player, Component.translatable("kultivator.reruntuhan.penjara.pahala.kurang", pahala, Prisons.PAHALA_PER_JADE)
+					.withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		ItemStack jade = RRewards.jade(dev.kultivator.technique.source.InheritanceTrials.UNIVERSAL);
+		if (jade.isEmpty()) {
+			return;
+		}
+		own.putInt("pahala", pahala - Prisons.PAHALA_PER_JADE);
+		dev.kultivator.data.Cultivators.dirty(player);
+		RRewards.give(player, jade);
+		RFx.at(level, centre().add(0.0D, 2.0D, 0.0D), RFx.SEAL_SEALED, 0, seal().integrity(), 0.8F);
+		level.playSound(null, centre().x, centre().y, centre().z, SoundEvents.BELL_RESONATE, SoundSource.BLOCKS, 0.8F, 1.1F);
+		Msg.chat(player, Component.translatable("kultivator.reruntuhan.penjara.pahala.tukar", Prisons.PAHALA_PER_JADE, pahala - Prisons.PAHALA_PER_JADE)
+				.withStyle(ChatFormatting.GOLD));
 	}
 
 	/** Pahala: a small merit tally in {@code extra.reruntuhan.pahala} (shown on the Dunia page) and the sect's renown. */
@@ -230,6 +271,18 @@ public final class CoreRun extends AnchorRun {
 		}
 		if (current == null) {
 			bar.removeAllPlayers();
+			if (seal.broken() && !inHall.isEmpty() && Reruntuhan.config().prisons && !anyoneMayWake(inHall)) {
+				// Only weaker cultivators in the hall: the king stirs below but does not rise for them (integration audit T7).
+				riseAt = -1L;
+				if (now % 100L == 0L) {
+					RFx.at(level, centre().add(0.0D, -1.0D, 0.0D), RFx.SEAL_LEAK, 2, 0, 1.6F);
+					for (ServerPlayer player : inHall) {
+						Msg.actionBar(player, Component.translatable("kultivator.reruntuhan.penjara.raja.lemah", Prisons.RISE_REALM.displayName())
+								.withStyle(ChatFormatting.DARK_RED));
+					}
+				}
+				return;
+			}
 			if (seal.broken() && !inHall.isEmpty() && Reruntuhan.config().prisons) {
 				if (riseAt < 0L) {
 					riseAt = now + (seal.pendingRise() ? 50L : 10L);
@@ -244,6 +297,15 @@ public final class CoreRun extends AnchorRun {
 			return;
 		}
 		fight(seal, current, inHall, now);
+	}
+
+	private static boolean anyoneMayWake(List<ServerPlayer> inHall) {
+		for (ServerPlayer player : inHall) {
+			if (!player.isSpectator() && Prisons.mayWake(player)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void playBreak(Prisons.Seal seal) {
@@ -439,6 +501,15 @@ public final class CoreRun extends AnchorRun {
 			Msg.title(player, Component.translatable("kultivator.reruntuhan.penjara.sealed.title").withStyle(ChatFormatting.GOLD),
 					Component.translatable("kultivator.reruntuhan.penjara.sealed.sub", nb).withStyle(ChatFormatting.YELLOW), 10, 60, 20);
 			Advancements.grant(player, "dunia/prison_sealed");
+			// audit M4 S4 (approved): a Dunia milestone, once per player per prison (not again on a later reseal)
+			CompoundTag own = dev.kultivator.dunia.reruntuhan.Reruntuhan.data(player);
+			String sealKey = "ms_seal_" + seal.id;
+			if (!own.getBooleanOr(sealKey, false)) {
+				own.putBoolean(sealKey, true);
+				dev.kultivator.data.Cultivators.dirty(player);
+				dev.kultivator.cultivation.XpSources.milestone(player, dev.kultivator.cultivation.XpSources.MILESTONE_PRISON,
+						Component.translatable("kultivator.kekuatan.milestone.prison"));
+			}
 		}
 		ShrineRun.birthAt(level, shrine);
 	}

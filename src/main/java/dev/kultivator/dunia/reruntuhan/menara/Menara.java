@@ -93,6 +93,9 @@ public final class Menara {
 			}
 		});
 		ServerPlayerEvents.JOIN.register(player -> Reruntuhan.schedule(2, () -> rejoin(player)));
+		// the tower is climbed alone or with fellow players: disciples wait outside (integration audit M2 step 7)
+		dev.kultivator.disciple.Disciples.addFollowVeto((player, origin, destination) ->
+				isTowerLevel(destination) || isTowerLevel(origin) ? "kultivator.sambung.murid.tunggu_menara" : null);
 		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) -> {
 			TowerRun run = BY_PLAYER.get(player.getUUID());
 			if (run != null && isTowerLevel(origin) && !isTowerLevel(destination)) {

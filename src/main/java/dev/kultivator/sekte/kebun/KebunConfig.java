@@ -13,8 +13,12 @@ public final class KebunConfig {
 	public int petakMaks = 12;
 	/** The base yield of one bed before the hall bonus ({@code hasilPetak + hall level / 3}). */
 	public int hasilPetak = 2;
-	/** PK from the hall pool per mine level ({@code tambangPK × the level reached}). */
-	public int tambangPK = 200;
+	/**
+	 * PK from the hall pool for a mine level: {@code tambangPKDasar × level^1.3}, rounded (S28, approved balance change:
+	 * 246, 417, 606, 810, 1027, 1255, 1493, 1740 PK for levels 2-9, 7,594 in all instead of 8,800). The old linear field
+	 * {@code tambangPK} of older config files is ignored.
+	 */
+	public int tambangPKDasar = 100;
 	/** The chance (percent) of a cave-in per shift from depth level 5 on; a miner is hurt, never killed. */
 	public int runtuhPersen = 2;
 	/** Consecutive work days before a rest is owed; each day beyond it counts as forced work. */
@@ -49,7 +53,7 @@ public final class KebunConfig {
 	private static KebunConfig clamp(KebunConfig c) {
 		c.petakMaks = Math.max(0, Math.min(12, c.petakMaks));
 		c.hasilPetak = Math.max(1, Math.min(16, c.hasilPetak));
-		c.tambangPK = Math.max(0, Math.min(100_000, c.tambangPK));
+		c.tambangPKDasar = Math.max(0, Math.min(10_000, c.tambangPKDasar));
 		c.runtuhPersen = Math.max(0, Math.min(50, c.runtuhPersen));
 		c.hariLibur = Math.max(1, Math.min(30, c.hariLibur));
 		c.hitungDetik = Math.max(10, Math.min(600, c.hitungDetik));

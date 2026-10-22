@@ -50,7 +50,7 @@
   "kultivator.sekte.tangga.mem.ujian_hati": "Heart Trial on the Thousand Steps: %s steps.",
   "kultivator.sekte.tangga.need_pk": "The Heart Trial needs %s PK in the hall's pool.",
   "kultivator.sekte.tangga.no_disciple": "No disciple named \"%s\" is near you.",
-  "kultivator.sekte.tangga.no_stair": "The Thousand-Step Stair is not built yet: raise the Heart Stones before the gate (a Sect Construction component).",
+  "kultivator.sekte.tangga.no_stair": "The Thousand-Step Stair is not built yet. Needs template 2+ (raise the template on the Build page), then raise the Heart Stones before the gate (a Sect Construction component).",
   "kultivator.sekte.tangga.not_now": "%s cannot climb right now.",
   "kultivator.sekte.tangga.off": "The Thousand-Step Trial is switched off in the config.",
   "kultivator.sekte.tangga.paid": "%s PK taken from the hall's pool.",

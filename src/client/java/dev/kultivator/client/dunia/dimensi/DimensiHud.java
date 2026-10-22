@@ -50,7 +50,8 @@ final class DimensiHud implements HudElement {
 			Brush.centered(g, minecraft.font, line, width / 2.0F, y, Palette.argb(0xE0, rgb), 0.85F, true);
 		}
 		long luka = DimensiState.lukaLeft();
-		if (luka > 0L) {
+		// the soul timer above is a danger and always shows; the wound line follows the "HUD Kultivator" coin (audit M5, S30)
+		if (luka > 0L && EffectQuality.hudVisible()) {
 			long minutes = luka / 1200L + 1L;
 			Brush.centered(g, minecraft.font, Component.translatable("kultivator.dimensi.hud.luka", minutes), width / 2.0F, height - 72.0F,
 					Palette.argb(0xC0, 0xE08080), 0.7F, true);

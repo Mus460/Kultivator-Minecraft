@@ -104,7 +104,7 @@ public final class LaporanCard implements HudElement {
 		Minecraft minecraft = Minecraft.getInstance();
 		CompoundTag p = report;
 		if (p == null || shownAt < 0L || minecraft.player == null || minecraft.gui.hud.isHidden() || EpicDirector.recordHide()
-				|| minecraft.gui.screen() != null) {
+				|| minecraft.gui.screen() != null || !dev.kultivator.client.EffectQuality.hudVisible()) {
 			return;
 		}
 		float partial = deltaTracker.getGameTimeDeltaPartialTick(false);

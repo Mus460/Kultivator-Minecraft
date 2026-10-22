@@ -50,7 +50,7 @@
   "kultivator.sekte.tangga.mem.ujian_hati": "Ujian Hati di Tangga Seribu: %s langkah.",
   "kultivator.sekte.tangga.need_pk": "Ujian Hati memerlukan %s PK di kas aula.",
   "kultivator.sekte.tangga.no_disciple": "Tidak ada murid bernama \"%s\" di dekatmu.",
-  "kultivator.sekte.tangga.no_stair": "Tangga Seribu belum berdiri: bangun Batu Hati di depan gerbang (komponen Pembangunan Sekte).",
+  "kultivator.sekte.tangga.no_stair": "Tangga Seribu belum berdiri. Butuh templat 2+ (naik templat di halaman Bangun), lalu bangun Batu Hati di depan gerbang (komponen Pembangunan Sekte).",
   "kultivator.sekte.tangga.not_now": "%s tidak bisa mendaki sekarang.",
   "kultivator.sekte.tangga.off": "Ujian Tangga Seribu dimatikan di config.",
   "kultivator.sekte.tangga.paid": "%s PK diambil dari kas aula.",

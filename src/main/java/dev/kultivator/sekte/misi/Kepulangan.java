@@ -26,7 +26,7 @@ import dev.kultivator.sekte.api.Sifat;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
-import dev.kultivator.voice.VoiceDisciples;
+import dev.kultivator.sekte.SekteSuara;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
@@ -284,7 +284,10 @@ final class Kepulangan {
 		if (!sect.isEmpty()) {
 			int delta;
 			if (tpl == TemplatMisi.UTUSAN) {
-				delta = grade * 4 - 3;
+				// T13: one envoy formula for the board's envoys and module D's "Kirim Utusan": D's +5 (+3 for the Elder of
+				// External Affairs) scaled by the report (grade 0 offends: -2; 1 half; 2 full; 3 one and a half).
+				int base = 5 + (mission.getBooleanOr("luar", false) ? 3 : 0);
+				delta = grade == 0 ? -2 : grade == 1 ? base / 2 : grade == 2 ? base : base * 3 / 2;
 			} else if (tpl.has(TemplatMisi.Flags.SPY)) {
 				delta = grade >= 2 ? 0 : -6;
 			} else if (tpl.has(TemplatMisi.Flags.FOE_SECT)) {
@@ -482,6 +485,8 @@ final class Kepulangan {
 		arrival.putFloat("hp", hp);
 		arrival.putLong("since", level.getGameTime());
 		arrival.putBoolean("lead", index == 0 && !left);
+		arrival.putBoolean("left", left);
+		arrival.putString("tpl", mission == null ? "" : mission.getStringOr("tpl", ""));
 		Vec3 gate = null;
 		// The walk in through the gate only while the master is online (the line-up is watched from their tick).
 		if (mission != null && !left && MisiConfig.get().kembaliLewatGerbang && server.getPlayerList().getPlayer(owner) != null) {
@@ -590,6 +595,9 @@ final class Kepulangan {
 				if (hp < 1.0F) {
 					body.setHealth(Math.max(1.0F, body.getMaxHealth() * hp));
 				}
+				if (arrival.getBooleanOr("left", false)) {
+					SekteSuara.line(body, "abandoned", "fear", 200);
+				}
 				if (arrival.getBooleanOr("muster", false)) {
 					BlockPos spot = BlockPos.containing(arrival.getDoubleOr("mx", body.getX()), arrival.getDoubleOr("my", body.getY()),
 							arrival.getDoubleOr("mz", body.getZ()));
@@ -611,7 +619,8 @@ final class Kepulangan {
 			if (there && !arrival.contains("reached")) {
 				arrival.putLong("reached", now);
 				if (arrival.getBooleanOr("lead", false)) {
-					VoiceDisciples.line(body, "greet", 200);
+					boolean envoy = TemplatMisi.UTUSAN.id().equals(arrival.getStringOr("tpl", ""));
+					SekteSuara.line(body, envoy ? "envoy_return" : "mission_report", "greet", 200);
 					leaderHome(server, owner, master, body, arrival.getIntOr("mid", -1));
 				}
 				MisiData.dirty();

@@ -6179,7 +6179,7 @@ value = min(spec cap, hard cap, base × factor × mastery factor)  (counts round
    - **F ≤ ×3 against monsters; ≤ ×1.5 under the arena rule.**
 2. Disciple casts: × `DiscipleHooks.damageFactor`.
 3. **Arena rule.** If the target is a sparring or `DuelRules` partner, multiply by the attacker's legacy/new power ratio, then apply the existing duel clamps. Techniques hit players for ≤ 15% of max health per hit and per cast. No EXEC and no movement payloads on players; control ×0.3.
-4. **Trial-mob rule.** If the target is tagged `kultivator.dao_protector` or `kultivator.trial_guard`, use legacy power × 1.5 instead of P. This keeps Dao Protector waves, star calamities, promotion trials and inheritance guards real fights.
+4. **Trial-mob rule.** If the target is tagged `kultivator.dao_protector` or `kultivator.trial_guard`, use legacy power × 1.5 instead of P. This keeps Dao Protector waves, star calamities, promotion trials and inheritance guards real fights. *Audit integrasi (approved):* the legacy D gains +0.25 per Immortal Ascension layer (`TechniquePower` legacyLayer), and the Dunia foes (town rivals, Kepiting Batu, Ular Laut, Yaksha, Naga Liar, ruin creatures) are tagged `dunia_foe` by `TechniquePower.markRealmFoe` and count as trial mobs.
 5. **Own Heart Demon:** ≤ 6% of its max health per hit (10% PAMUNGKAS), ≤ 12% per cast. No mastery from it.
 6. **Boss cap** (22.14.2), cumulative per cast per boss. ECHO, LINK, REFLECT, COUNTER, DOT and replays count against the cap of the cast that started them.
 7. **Ender Dragon.** PRECISE hits go to the head part (`EnderDragon.hurt(level, head, source, amount)`). Area hits go to the body, which vanilla quarters.
@@ -11642,7 +11642,7 @@ citations (22.9).
 
 | Effect | Combine rule | Cap | Notes |
 |---|---|---|---|
-| Gathering, players | sect term `G = min(GATHER_SECT_CAP 1.5, max(K2, B5) × M5)` | formation term `min(FORMATION_STACK_CAP 2.6, or 2.8 with A1, QiFormations.multiplier(tier) × G)` | still inside the existing `min(3.5, site × formation × fuel)` (5.0 before the 2026-10-19 balance). Without a seat: ≤ ×1.5. Heavenly Star seat ×2.2: +18% (+27% with A1) |
+| Gathering, players | sect term `G = min(GATHER_SECT_CAP 1.5, max(K2, B5) × M5)` | formation term `min(FORMATION_STACK_CAP 2.6, or 2.8 with A1, QiFormations.multiplier(tier) × G)` | *Audit integrasi (approved):* G now counts **outside** the meditation cap: `base × min(3.5, site × formation × fuel) × G`, G ≤ `Meditation.GATHER_SECT_CAP` 1.5 (max ×5.25); the formation panel shows the limit (`formasi.med`). (Before: inside `min(3.5, …)`, 5.0 before the 2026-10-19 balance.) Without a seat: ≤ ×1.5. Heavenly Star seat ×2.2: +18% (+27% with A1) |
 | Gathering, disciples | the disciple's **own** meditation XP × G, through `DiscipleHooks.addXpFactor` for `XpSource.MEDITATION` | 1.5 | the master share is never multiplied again (`masterMeditationGain` already uses `gainPerSecond`); multiplies with the Tetua aura |
 | Meditation vein drain | strongest: K2 0.9, B5 0.8, B5 with a Dalam+ keeper 0.7 | ≥ 0.7 | other drain factors (Great 0.6, Heavenly 0.35, fuel 0.5, abode 0.5) are unchanged |
 | Healing | strongest | players Regeneration amplifier ≤ 1; disciple `regenFactor` ≤ ×2; qi regen ≤ ×1.39; deviation timer ≤ ×1.33 | paused during the target's own tribulation |
@@ -14085,7 +14085,7 @@ Skill damage to players is a share of the target's max HP; every big skill has a
 
 **Gate.** Calamity k (1–7) gates star `s_k = f + 9(k − 1)`, with the 20.3.19 rule: f = 6 (average breakthrough quality Normal or lower), 7 (Perfect), 8 (Heavenly, Sempurna Foundation or Darah Dewa Kuno). Spine `Stars.StarGate` (#7): `ImmortalPerks.condense` stops before `s_k` with "Bencana ke-k menanti" and a [Mulai] link; Stored Qi keeps filling.
 
-**Run** (`purba/StarCalamity`): start from the Bencana tablet or `/kultivasi bencana mulai`; the star's cost is deducted at the start; omen 6 s; `6 + k` strikes of `(0.12 + 0.01 × trial) × max HP` (trial 1 for k 1–2, 2 for k 3–4, 3 for k 5–7), one per 60 ticks, the last ×2, through `Tribulation.strike` (would-kill = failure); every 3 strikes an envoy wave of `2 + k` with health ×(1 + 0.5k). DeathGuard `LANGIT` covers every source during the run.
+**Run** (`purba/StarCalamity`): start from the Bencana tablet or `/kultivasi bencana mulai`; the star's cost is deducted at the start; omen 6 s; `6 + k` strikes of `(0.12 + 0.01 × trial) × max HP` (trial 1 for k 1–2, 2 for k 3–4, 3 for k 5–7), one per 60 ticks, the last ×1.5 (audit integrasi; was ×2), with lightning rings (NS+, twin from IA) and a graze (40% damage, heals 6%), through `Tribulation.strike` inside `Tribulation.ritualBegin/ritualEnd` (Hu Fa guards it through `Listener.onRitual`) (would-kill = failure); every 3 strikes an envoy wave of `2 + k` with health ×(1 + 0.5k). DeathGuard `LANGIT` covers every source during the run.
 
 **Segel Penangkal:** consuming 3 `heaven_seal_shard` at the start makes every strike ×0.85 for that run (game design; the shards' sink).
 
@@ -23057,7 +23057,7 @@ bunyi beliung dari dalam tiap 6 s), output dihitung malas seperti `Duties`. Baha
 penambang Terluka (`depart`, pulih 1 hari), tidak pernah mati, tidak ada blok. Lebih dari 5 giliran berturut tanpa hari
 libur → `DIPAKSA_KERJA` (sekali per giliran berikutnya). Event `WORK_DONE`. **UI.** Kartu hub SEKTE "Kebun & Tambang".
 **Visual.** Tunas → bunga dengan pendar aditif; debu emas dari mulut tambang; Minimal: tanpa pendar/debu. **Config
-`kebun`:** `petakMaks` (12), `hasilPetak` (2), `tambangPK` (200), `runtuhPersen` (2), `hariLibur` (5). **Uji `uji
+`kebun`:** `petakMaks` (12), `hasilPetak` (2), `tambangPKDasar` (100; cost 100 × level^1.3, audit integrasi S28), `runtuhPersen` (2), `hariLibur` (5). **Uji `uji
 perguruan kebun`:** `tanam <petak> <herba>`, `tumbuh [hari]`, `panen`, `tambang tingkat <1-9>`, `giliran`, `runtuh`.
 **Panduan:** c16.kebun, c16.tambang.
 

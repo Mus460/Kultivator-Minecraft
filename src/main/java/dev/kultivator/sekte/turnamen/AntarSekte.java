@@ -104,7 +104,12 @@ final class AntarSekte {
 		int tier = diplomacy.tier(sect);
 		HOSTING.put(owner, sect);
 		try {
-			return Tournament.startNow(player, Tournament.KIND_GUESTS, sect, sectName(sect), tier <= 0 ? 4 : tier, test);
+			boolean started = Tournament.startNow(player, Tournament.KIND_GUESTS, sect, sectName(sect), tier <= 0 ? 4 : tier, test);
+			if (started) {
+				// S12/T10: whichever door accepted (module D's envoy or the chat), no older challenge waits any more.
+				Musim.setPending(owner, null, 0L);
+			}
+			return started;
 		} finally {
 			HOSTING.remove(owner);
 		}

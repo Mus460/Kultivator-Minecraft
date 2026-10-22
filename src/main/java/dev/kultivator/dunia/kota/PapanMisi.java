@@ -119,7 +119,13 @@ final class PapanMisi {
 		return kinds;
 	}
 
-	/** The stone reward for a band (NB). */
+	/** Bands above this pay as this one (audit S27: no runaway NB at the end of the game). */
+	static final int REWARD_BAND_CAP = 6;
+
+	/**
+	 * The stone reward for a band (NB): 6-12 up to Qi Refining, 15-30 at Foundation, 40-80 at Golden Core, then ×2 per band
+	 * up to Dao Union (320-640), the same above it (balance change of audit S27, approved; it was ×3 per band without a cap).
+	 */
 	static long reward(int band, RandomSource random) {
 		long low;
 		long high;
@@ -132,9 +138,9 @@ final class PapanMisi {
 		} else {
 			low = 40L;
 			high = 80L;
-			for (int b = 4; b <= band; b++) {
-				low *= 3L;
-				high *= 3L;
+			for (int b = 4; b <= Math.min(band, REWARD_BAND_CAP); b++) {
+				low *= 2L;
+				high *= 2L;
 			}
 		}
 		return low + (long) (random.nextDouble() * (high - low + 1L));

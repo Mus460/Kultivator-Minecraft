@@ -70,6 +70,22 @@ public final class DiscipleCultivation {
 	public static final double PILL_SHARE = 0.7D;
 	/** One pill of a kind per disciple per minute. */
 	public static final int PILL_COOLDOWN = 1200;
+	/** Audit S26 phase-7 pills for disciples: Enlightenment XP share without a Dao, Toxin Purging's deviation share. */
+	public static final double ENLIGHTENMENT_XP = 0.05D;
+	public static final double PURGE_DEVIATION = 0.3D;
+	/** {@code extra.harta.bone_hp}: the disciple's permanent max health from Bone Tempering Pills. */
+	public static final String BONE_SECTION = "harta";
+	public static final String BONE_HP = "bone_hp";
+	private static final String ECO = "kultivator.ekonomi.murid.";
+	private static final String WHY_NO_DAO = ECO + "tanpa_dao";
+	private static final String MARROW_REJECTED = ECO + "sumsum_menolak";
+	private static final String MARROW_REALM_FOUNDATION = ECO + "sumsum_ranah_fondasi";
+	private static final String MARROW_REALM_CORE = ECO + "sumsum_ranah_inti";
+	private static final String MARROW_QUALITY = ECO + "sumsum_mutu";
+	private static final String PURGED = ECO + "bersih";
+	private static final String BONE_PART = ECO + "tulang";
+	private static final String BONE_FULL = ECO + "tulang_penuh";
+	private static final String INSIGHT_FULL = ECO + "wawasan_penuh";
 	/** Teaching costs the master this share of their max qi. */
 	public static final double TEACH_COST = 0.2D;
 	/** The master must be this close to start the breakthrough. */
@@ -520,7 +536,8 @@ public final class DiscipleCultivation {
 			return new PillChoice(PillSort.ALCHEMY, null, kind, quality, kind.id(), kind.color(), strength);
 		}
 		if (stack.is(RootItems.MARROW_CLEANSING_PILL)) {
-			return new PillChoice(PillSort.MARROW, null, null, PillQuality.MID, "marrow_cleansing_pill", 0x8FE3C8, 2);
+			// The pill's own quality (crafted pills count as Mid), as for the player (audit S26).
+			return new PillChoice(PillSort.MARROW, null, null, AlchemyComponents.quality(stack), "marrow_cleansing_pill", 0x8FE3C8, 2);
 		}
 		return null;
 	}
@@ -548,6 +565,21 @@ public final class DiscipleCultivation {
 				&& Element.fromMask(data.rootElements()).size() < 3) {
 			return PREFIX + "why.pill_pure";
 		}
+		// Audit S26: a Dao Insight Pill has nothing to clear without a chosen Dao (kept, as for the player).
+		if (choice.kind() == PillKind.DAO_INSIGHT && data.dao() == null) {
+			return WHY_NO_DAO;
+		}
+		// Audit S26: the Marrow Cleansing Pill asks a disciple the player's realm and pill quality for the step.
+		if (choice.sort() == PillSort.MARROW && data.rootGrade() != RootGrade.HEAVENLY) {
+			Realm need = dev.kultivator.item.MarrowCleansing.stepRealm(data.rootGrade());
+			if (need != null && !data.realm().atLeast(need)) {
+				return need == Realm.FOUNDATION ? MARROW_REALM_FOUNDATION : MARROW_REALM_CORE;
+			}
+			if (dev.kultivator.item.MarrowCleansing.needsHighPill(data.rootGrade())
+					&& choice.quality().ordinal() < PillQuality.HIGH.ordinal()) {
+				return MARROW_QUALITY;
+			}
+		}
 		return null;
 	}
 
@@ -556,6 +588,12 @@ public final class DiscipleCultivation {
 	 * Pill work with 70% of the player's numbers (XP, qi, healing, deviation, breakthrough and tribulation bonuses), no
 	 * toxicity, one pill of a kind per minute. One is consumed (not in creative). Anything else is refused with a message.
 	 * True when the pill was taken.
+	 * <p>
+	 * Audit S26 (approved balance change): the Marrow Cleansing Pill rolls the player's chance
+	 * ({@code MarrowCleansing.chance}, by root grade and pill quality) instead of always succeeding, and the four phase-7
+	 * pills work for disciples too: Dao Insight and Enlightenment add comprehension of the disciple's Dao (Enlightenment
+	 * gives XP without one), Toxin Purging clears the other pill waits and eases a deviation, Bone Tempering adds permanent
+	 * max health (+1, Perfect +2, at most +10, kept in {@code extra.harta.bone_hp}).
 	 */
 	public static boolean feed(DiscipleEntity entity, ServerPlayer master, ItemStack stack) {
 		if (!stack.isEmpty() && DiscipleHooks.feedHandler(entity, master, stack)) {
@@ -578,7 +616,7 @@ public final class DiscipleCultivation {
 		switch (choice.sort()) {
 			case VANILLA -> applyVanilla(entity, data, choice.vanilla(), parts, pf);
 			case ALCHEMY -> applyAlchemy(entity, data, choice.kind(), choice.quality(), parts, pf);
-			case MARROW -> applyMarrow(entity, level, data, parts);
+			case MARROW -> applyMarrow(entity, level, data, choice.quality(), parts);
 		}
 		if (parts.isEmpty()) {
 			parts.add(Component.translatable(PREFIX + "pill.part.nothing"));
@@ -611,6 +649,12 @@ public final class DiscipleCultivation {
 	private static void refuseFeed(DiscipleEntity entity, ServerPlayer master, ItemStack stack, String why, @Nullable PillChoice choice) {
 		Component name = name(entity);
 		Component item = stack.isEmpty() ? Component.empty() : stack.getHoverName().copy();
+		if (!why.startsWith(PREFIX)) {
+			// a reason of another fragment (audit S26: ekonomi_selaras); the screen shows {@code why} itself (no
+			// arguments), the chat tells {@code why.chat} with the disciple and the pill
+			Msg.chat(master, Component.translatable(why + ".chat", name, item).withColor(REFUSE));
+			return;
+		}
 		MutableComponent message = switch (why.substring(PREFIX.length())) {
 			case "why.pill_none" -> Component.translatable(PREFIX + "pill.refuse.none", name);
 			case "why.pill_beast" -> Component.translatable(PREFIX + "pill.refuse.beast", item);
@@ -723,13 +767,69 @@ public final class DiscipleCultivation {
 				xpPart(entity, bar * PillKind.IMMORTAL_XP * m, parts);
 				qiPart(data, maxQi(data), parts);
 			}
+			// Audit S26: the four phase-7 pills, simple disciple effects at the disciple's share.
+			case DAO_INSIGHT -> comprehensionPart(data, data.dao(), PillKind.DAO_INSIGHT_COMPREHENSION * e, parts);
+			case ENLIGHTENMENT -> {
+				if (data.dao() != null) {
+					comprehensionPart(data, data.dao(), PillKind.ENLIGHTENMENT_FACTOR * e, parts);
+				} else {
+					xpPart(entity, bar * ENLIGHTENMENT_XP * m, parts);
+				}
+			}
+			case TOXIN_PURGING -> {
+				int cleared = 0;
+				for (String key : new ArrayList<>(data.pillCooldowns().keySet())) {
+					data.setPillCooldown(key, 0);
+					cleared++;
+				}
+				parts.add(Component.translatable(PURGED, cleared));
+				shortenDeviation(entity, data, PURGE_DEVIATION * e, false, parts);
+			}
+			case BONE_TEMPERING -> {
+				CompoundTag harta = data.extraSection(BONE_SECTION);
+				int had = Math.max(0, harta.getIntOr(BONE_HP, 0));
+				int add = quality == PillQuality.PERFECT ? PillKind.BONE_HEALTH_PERFECT : PillKind.BONE_HEALTH;
+				int now = Math.min(PillKind.BONE_HEALTH_CAP, had + add);
+				if (now > had) {
+					harta.putInt(BONE_HP, now);
+					parts.add(Component.translatable(BONE_PART, now - had, now, PillKind.BONE_HEALTH_CAP));
+				} else {
+					parts.add(Component.translatable(BONE_FULL, PillKind.BONE_HEALTH_CAP));
+				}
+			}
+			default -> {
+			}
 		}
 	}
 
-	/** Marrow cleansing: the root grade rises one step (Heavenly at most); with 3+ elements one may be washed out (25%). */
-	private static void applyMarrow(DiscipleEntity entity, ServerLevel level, DiscipleData data, List<Component> parts) {
+	/** Comprehension of {@code dao} for a pill, never past {@code PillKind.DAO_INSIGHT_MAX} (the player's ceiling). */
+	private static void comprehensionPart(DiscipleData data, @Nullable Dao dao, double amount, List<Component> parts) {
+		if (dao == null) {
+			return;
+		}
+		double room = PillKind.DAO_INSIGHT_MAX - data.comprehension();
+		if (room <= 0.0D) {
+			parts.add(Component.translatable(INSIGHT_FULL, dao.displayName(), Msg.number(PillKind.DAO_INSIGHT_MAX)));
+			return;
+		}
+		double gain = Math.min(room, comprehensionGain(data, dao, amount));
+		data.addComprehension(gain);
+		parts.add(Component.translatable(PREFIX + "pill.part.comprehension", decimal(gain), dao.displayName()));
+	}
+
+	/**
+	 * Marrow cleansing: the root grade may rise one step (Heavenly at most) with the player's chance for this grade and pill
+	 * quality ({@code MarrowCleansing.chance}, audit S26); with 3+ elements one may be washed out (25%) after a success.
+	 */
+	private static void applyMarrow(DiscipleEntity entity, ServerLevel level, DiscipleData data, PillQuality quality, List<Component> parts) {
 		RootGrade before = data.rootGrade();
 		if (before != RootGrade.HEAVENLY) {
+			double chance = dev.kultivator.item.MarrowCleansing.chance(before, quality);
+			if (entity.getRandom().nextDouble() >= chance) {
+				parts.add(Component.translatable(MARROW_REJECTED, Msg.number(chance * 100.0D + 1.0E-6D)));
+				Fx.burst(level, entity.position().add(0.0D, 1.1D, 0.0D), 0x5A5048, 16, 1.0F);
+				return;
+			}
 			data.setRootGrade(before.up());
 			parts.add(Component.translatable(PREFIX + "pill.part.root", data.rootGrade().displayName().copy().withColor(data.rootGrade().color())));
 		}
@@ -1588,10 +1688,11 @@ public final class DiscipleCultivation {
 
 	// ================================================================== stats
 
-	/** Extra max health: {@code (realm x 6 + stage x 1.5 + layer x 3) x breakthrough quality factor}. */
+	/** Extra max health: {@code (realm x 6 + stage x 1.5 + layer x 3) x breakthrough quality factor + Bone Tempering (0-10)}. */
 	public static double maxHealthBonus(DiscipleData data) {
 		Rank rank = data.rank();
-		return (rank.realm().ordinal() * 6.0D + rank.stage() * 1.5D + rank.layer() * 3.0D) * data.qualityFactor();
+		return (rank.realm().ordinal() * 6.0D + rank.stage() * 1.5D + rank.layer() * 3.0D) * data.qualityFactor()
+				+ Math.max(0, Math.min(PillKind.BONE_HEALTH_CAP, data.extra().getCompoundOrEmpty(BONE_SECTION).getIntOr(BONE_HP, 0)));
 	}
 
 	/** Extra attack damage: {@code realm x 1.0 + stage x 0.25 + layer x 0.5}. */

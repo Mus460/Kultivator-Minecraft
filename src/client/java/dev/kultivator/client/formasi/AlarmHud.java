@@ -67,7 +67,8 @@ public final class AlarmHud implements HudElement {
 	public void extractRenderState(GuiGraphicsExtractor g, DeltaTracker deltaTracker) {
 		Minecraft minecraft = Minecraft.getInstance();
 		LocalPlayer player = minecraft.player;
-		if (player == null || minecraft.gui.hud.isHidden()) {
+		// intruder pings are a danger warning: hidden only when both "HUD Kultivator" and "Peringatan bahaya" are off (audit M5, S30)
+		if (player == null || minecraft.gui.hud.isHidden() || !EffectQuality.hudVisible() && !EffectQuality.dangerAlert()) {
 			return;
 		}
 		long now = Util.getMillis();

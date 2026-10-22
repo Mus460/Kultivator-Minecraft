@@ -269,7 +269,7 @@
   "kultivator.dpower.why.flame_known": "Already holds this flame",
   "kultivator.dpower.why.flame_full": "Holds all the flames it can (3, one more per 9 stars)",
 
-  "kultivator.dpower.natal.heading": "Natal Treasure",
+  "kultivator.dpower.natal.heading": "Disciple Natal Treasure",
   "kultivator.dpower.natal.form.sword": "Sword",
   "kultivator.dpower.natal.form.sword.desc": "A life-bound flying sword. At fold 9: +10%% technique damage.",
   "kultivator.dpower.natal.form.parasol": "Parasol",
@@ -363,7 +363,7 @@
 
   "kultivator.screen.help.bakat.title": "Talents, soul realms and rare physiques",
   "kultivator.screen.help.bakat": "Each disciple carries the colour of its soul realm, from Red (cultivation ×0.6) to Indigo (×1.7); a Red realm stops at Golden Core Peak unless good fortune lifts it (a Marrow Cleansing Pill, or meditating beside you while you meditate). Some have talents (Persevering Heart, Ancient God Blood, Pill Gift, Spirit Enhancer, Fear of Death, Sword Sense), a few a rare physique, and now and then a special candidate hides among the applicants. From Nascent Soul each Dao has a signature ultimate that the disciple casts by itself against bosses and crowds, or on your order from its Talents page. All of it hits monsters only and never touches a block. Hover over any line on the Talents page to read the story it comes from.",
-  "kultivator.screen.help.pusaka.title": "Natal treasures, the Undying Codex and Heavenly Flames",
+  "kultivator.screen.help.pusaka.title": "Disciple Natal Treasures, the Undying Codex and Heavenly Flames",
   "kultivator.screen.help.pusaka": "From Foundation a disciple can refine one natal treasure (Sword, Parasol, Wok or Bell) with a diamond and Spirit Tail Feathers inside your hall's territory, then temper it fold by fold with feathers and sect PK: each fold +5%% damage, silver at 3, gold and the form's ability at 9, Payung Abadi at 14; from fold 3 a failure breaks a fold. The Undying Codex hardens the body through the blows it survives, up to Undying Blood that refuses death once a day. Heavenly Flame seeds drop from blazes, strays, the Elder Guardian, the Wither and the Ender Dragon; feed one to a fitting disciple and guard its 20-second ritual.",
 
   "advancement.kultivator.rare_physique.title": "Born Different",

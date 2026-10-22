@@ -42,8 +42,13 @@ import java.util.UUID;
  * {@code WRATH_OMEN}), three waves of 2, 3, 4 envoys (15 s apart or when the previous is cleared), then the Duel Kehendak
  * Langit with the Panglima Langit. Win: 25% star share, 6-12 Batu, 2 heaven seal shards. Lose (DeathGuard {@code LANGIT}):
  * 1 HP and Luka Langit 10 minutes, no item loss.
+ * <p>
+ * Integration (audit T3): a player who is busy at dusk (the shared {@code Sibuk} door: a duel, a heart demon, a realm, a
+ * ritual...) is asked again every 10 s through the night instead of losing the dusk; only a night spent busy counts as a
+ * skip. {@link #challenge} (Tantang Langit, Sekte Langit 37) only moves {@code wrath_next} to today: the descent still
+ * comes through the dusk roll and all its refusals.
  */
-final class HeavenlyWrath {
+public final class HeavenlyWrath {
 
 	public static final long DUSK = 12000L;
 	public static final int OMEN_TICKS = 600;
@@ -87,6 +92,10 @@ final class HeavenlyWrath {
 	}
 
 	private static final Map<UUID, Descent> DESCENTS = new HashMap<>();
+	/** Player -> overworld game time of the next try of a dusk roll that met a busy player. */
+	private static final Map<UUID, Long> RETRY = new HashMap<>();
+	/** Overworld day time when a postponed dusk roll lapses (sunrise). */
+	public static final long NIGHT_END = 23000L;
 	private static long lastDuskDay = Long.MIN_VALUE;
 
 	static void clear() {
@@ -94,6 +103,7 @@ final class HeavenlyWrath {
 			descent.bar.removeAllPlayers();
 		}
 		DESCENTS.clear();
+		RETRY.clear();
 		lastDuskDay = Long.MIN_VALUE;
 	}
 
@@ -106,6 +116,7 @@ final class HeavenlyWrath {
 	static void tick(MinecraftServer server, long tick) {
 		if (tick % 20L == 0L) {
 			dusk(server);
+			retries(server);
 		}
 		if (DESCENTS.isEmpty()) {
 			return;
@@ -155,16 +166,89 @@ final class HeavenlyWrath {
 			if (refusal(player) == null) {
 				start(player, false);
 				schedule(player, purba, day);
+			} else if (Purba.busy(player)) {
+				// Busy at dusk: asked again in 10 s through the night (never in the middle of real danger).
+				RETRY.put(player.getUUID(), server.overworld().getGameTime() + dev.kultivator.util.Sibuk.RETRY_TICKS);
 			} else {
-				int skips = purba.getIntOr("wrath_skips", 0) + 1;
-				if (skips >= MAX_SKIPS) {
-					schedule(player, purba, day);
-				} else {
-					purba.putInt("wrath_skips", skips);
-				}
+				skip(player, purba, day);
 			}
 			Cultivators.dirty(player);
 		}
+	}
+
+	/** One more lapsed dusk: after {@link #MAX_SKIPS} the next descent is scheduled anew (no penalty). */
+	private static void skip(ServerPlayer player, CompoundTag purba, long day) {
+		int skips = purba.getIntOr("wrath_skips", 0) + 1;
+		if (skips >= MAX_SKIPS) {
+			schedule(player, purba, day);
+		} else {
+			purba.putInt("wrath_skips", skips);
+		}
+		Cultivators.dirty(player);
+	}
+
+	/** The postponed dusk rolls: start when free, wait while busy, lapse (a skip) at sunrise or on another refusal. */
+	private static void retries(MinecraftServer server) {
+		if (RETRY.isEmpty()) {
+			return;
+		}
+		long now = server.overworld().getGameTime();
+		long clock = Purba.clock(server);
+		long day = Math.floorDiv(clock, 24000L);
+		boolean night = Math.floorMod(clock, 24000L) >= DUSK && Math.floorMod(clock, 24000L) < NIGHT_END;
+		Iterator<Map.Entry<UUID, Long>> iterator = RETRY.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Map.Entry<UUID, Long> entry = iterator.next();
+			if (now < entry.getValue()) {
+				continue;
+			}
+			ServerPlayer player = server.getPlayerList().getPlayer(entry.getKey());
+			if (player == null || !KultivatorConfig.get().heavenlyWrath || active(player)) {
+				iterator.remove();
+				continue;
+			}
+			CompoundTag purba = Purba.section(Cultivators.get(player));
+			if (refusal(player) == null) {
+				iterator.remove();
+				start(player, false);
+				schedule(player, purba, day);
+			} else if (night && Purba.busy(player)) {
+				entry.setValue(now + dev.kultivator.util.Sibuk.RETRY_TICKS);
+			} else {
+				iterator.remove();
+				skip(player, purba, day);
+			}
+		}
+	}
+
+	/**
+	 * Tantang Langit (Sekte Langit 37): the player asks Heaven to come at the next dusk. Only {@code wrath_next} moves to
+	 * today; the dusk roll and every refusal (Peaceful, busy, place, AFK) still decide. Refused (the reason) when Heaven has
+	 * not noticed the player yet (no calamity passed or skipped), Heavenly Wrath is switched off, or a descent is already
+	 * running or called for today. Null when the challenge stands.
+	 */
+	public static @Nullable Component challenge(ServerPlayer player) {
+		if (!KultivatorConfig.get().heavenlyWrath) {
+			return Component.translatable("kultivator.sambung.murka.tantang.off");
+		}
+		CultivationData data = Cultivators.get(player);
+		if (!StarCalamity.noticed(data)) {
+			return Component.translatable("kultivator.sambung.murka.tantang.belum");
+		}
+		if (active(player) || RETRY.containsKey(player.getUUID())) {
+			return Component.translatable("kultivator.sambung.murka.tantang.sudah");
+		}
+		long today = Purba.today(player.level().getServer());
+		CompoundTag purba = Purba.section(data);
+		long next = purba.getLongOr("wrath_next", -1L);
+		if (next >= 0L && next <= today && lastDuskDay != today) {
+			return Component.translatable("kultivator.sambung.murka.tantang.sudah");
+		}
+		// After today's dusk passed, the challenge stands for tomorrow's.
+		purba.putLong("wrath_next", lastDuskDay == today ? today + 1L : today);
+		purba.putInt("wrath_skips", 0);
+		Cultivators.dirty(player);
+		return null;
 	}
 
 	private static void schedule(ServerPlayer player, CompoundTag purba, long day) {

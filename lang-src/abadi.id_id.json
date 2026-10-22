@@ -40,13 +40,13 @@
   "kultivator.abadi.why.ascension": "selesaikan Kenaikan lebih dulu",
   "kultivator.abadi.why.cooldown": "kegagalan terakhir masih terasa (%s mnt)",
   "kultivator.abadi.why.hurt": "kamu terluka dalam 10 detik terakhir",
-  "kultivator.abadi.why.offering": "persembahan: %s/%s Esensi Energi Makam dan %s/1 batu roh Tertinggi",
+  "kultivator.abadi.why.offering": "persembahan: %s/%s Esensi Energi Makam dan %s/1 Batu Roh Agung",
 
   "kultivator.abadi.gate.peak": "Dewa Abadi Puncak",
   "kultivator.abadi.gate.stars": "Bintang: ★%s / ★%s",
   "kultivator.abadi.gate.ascension": "Kenaikan telah dicapai",
   "kultivator.abadi.gate.essence": "Esensi Energi Makam: %s / %s",
-  "kultivator.abadi.gate.stone": "Batu roh Tertinggi: %s / %s",
+  "kultivator.abadi.gate.stone": "Batu Roh Agung: %s / %s",
   "kultivator.abadi.gate.cooldown": "Istirahat setelah gagal: sisa %s mnt",
 
   "kultivator.abadi.cross.no_talisman": "Kamu tidak membawa Jimat Lintas Alam.",
@@ -104,7 +104,7 @@
   "kultivator.abadi.page.cross": "Lintas Alam",
   "kultivator.abadi.page.cross_tip": "Memulai channel jimat selama 5 detik.",
   "kultivator.abadi.page.convert": "Murnikan 1 Batu",
-  "kultivator.abadi.page.convert_tip": "+2%% Esensi Abadi untuk 1 Batu Asal (sisa %s hari ini).",
+  "kultivator.abadi.page.convert_tip": "+2%% Esensi Abadi (meter tubuh, bukan item) untuk 1 Batu Asal (sisa %s hari ini).",
   "kultivator.abadi.page.fallback": "Tidak ada pulau di dekat pusat: kedatangan turun perlahan di atas awan.",
 
   "kultivator.abadi.native.laba": "Laba-laba Benang Langit",
@@ -136,7 +136,7 @@
   "kultivator.abadi.lelang.step": "+%s%%",
   "kultivator.abadi.lelang.step_tip": "Tawar %s Batu Asal (kamu membawa %s). Dibayar hanya bila menang.",
   "kultivator.abadi.lelang.consign": "Titip barang di tangan",
-  "kultivator.abadi.lelang.consign_tip": "Jual satu barang yang dipegang lewat balai lelang (paling banyak %s per sesi); dibayar dengan Batu Asal saat sesi berakhir.",
+  "kultivator.abadi.lelang.consign_tip": "Jual satu buah barang yang dipegang lewat balai lelang (paling banyak %s per sesi); dibayar 0,6-1,0 × nilainya dalam Batu Asal saat sesi berakhir.",
   "kultivator.abadi.lelang.consign.refuse": "Balai lelang tidak menerima barang itu.",
   "kultivator.abadi.lelang.consign.full": "Paling banyak %s titipan per sesi.",
   "kultivator.abadi.lelang.consign.done": "Dititipkan: %s (bernilai sekitar %s Batu Asal).",
@@ -206,9 +206,9 @@
   "advancement.kultivator.pursuit_survived.description": "Kalahkan rombongan yang dikirim saingan yang iri",
 
   "kultivator.screen.help.alam_abadi.title": "Alam Abadi",
-  "kultivator.screen.help.alam_abadi": "Pada Dewa Abadi Puncak dengan ★9 atau lebih dan Kenaikan sudah dicapai, persembahkan 9 Esensi Energi Makam dan 1 batu roh Tertinggi lalu mulai Kesengsaraan Kenaikan Alam (layar Keabadian, tablet Alam, atau /kultivasi abadi naik): pertanda 10 detik, sembilan sambaran, gelombang utusan setelah sambaran 3 dan 6, lalu 15 detik di bawah lubang hitam tanpa keluar dari lingkaran 8 blok. Pukulan mematikan berarti gagal (Penyimpangan Qi, coba lagi setelah satu hari), bukan mati, dan totem tidak terpakai. Berhasil membuka kultivator:alam_abadi: pulau melayang yang hanya dibuat oleh pembangkitan dunia, pohon sakura, bijih, partikel qi, tanpa hujan dan tanpa monster alami. Penduduk asli makin kuat seiring bintangmu. Jatuh di bawah pulau mengembalikanmu ke tanah padat dengan 10% nyawa; batas lunak 2048 blok dari pusat. Jimat Lintas Alam (2 Batu Asal, kertas dan mata ender) membawamu, saudara sekte yang sudah naik dan menekan [Ikut], serta sampai 3 Murid Inti+ yang IKUT antar dunia; murid yang tertinggal pulang saat kamu keluar. Sumber: A Record of a Mortal's Journey to Immortality, bab 2451.",
+  "kultivator.screen.help.alam_abadi": "Pada Dewa Abadi Puncak dengan ★9 atau lebih dan Kenaikan sudah dicapai, persembahkan 9 Esensi Energi Makam dan 1 Batu Roh Agung lalu mulai Kesengsaraan Kenaikan Alam (layar Keabadian, tablet Alam, atau /kultivasi abadi naik): pertanda 10 detik, sembilan sambaran, gelombang utusan setelah sambaran 3 dan 6, lalu 15 detik di bawah lubang hitam tanpa keluar dari lingkaran 8 blok. Pukulan mematikan berarti gagal (Penyimpangan Qi, coba lagi setelah satu hari), bukan mati, dan totem tidak terpakai. Berhasil membuka kultivator:alam_abadi: pulau melayang yang hanya dibuat oleh pembangkitan dunia, pohon sakura, bijih, partikel qi, tanpa hujan dan tanpa monster alami. Penduduk asli makin kuat seiring bintangmu. Jatuh di bawah pulau mengembalikanmu ke tanah padat dengan 10% nyawa; batas lunak 2048 blok dari pusat. Jimat Lintas Alam (2 Batu Asal, kertas dan mata ender) membawamu, saudara sekte yang sudah naik dan menekan [Ikut], serta sampai 3 Murid Inti+ yang IKUT antar dunia; murid yang tertinggal pulang saat kamu keluar. Sumber: A Record of a Mortal's Journey to Immortality, bab 2451.",
   "kultivator.screen.help.batu_asal.title": "Batu Asal Abadi dan Esensi",
-  "kultivator.screen.help.batu_asal": "Batu Asal Abadi jatuh dari penduduk asli (50%), dari batu yang kamu tambang sendiri di Alam Abadi (0,6% per blok, lebih dengan Fortune, paling banyak 16 sehari, tidak pernah dengan Silk Touch atau Mode Kehancuran), dari binatang purba, murka Langit, titipan lelang dan manusia batu. Pakai untuk menawar, memurnikan tubuh (+2% Esensi Abadi per batu, paling banyak 10 sehari), membuat jimat lintas alam, dan saat memadatkan bintang (biaya -1% per batu yang dibawa, maks. 10, terpakai). Esensi Abadi juga naik dengan bermeditasi di Alam Abadi (+1% per 30 detik); terhadap musuh fase 9 teknikmu memberi ×0,6 pada 0% sampai ×1,0 pada 100%, dan qi pulih di sana ×0,5 sampai ×1,0. XP meditasi di Alam Abadi ×3. Sumber: RMJ: Immortal Realm, bab 567 dan 615.",
+  "kultivator.screen.help.batu_asal": "Batu Asal Abadi jatuh dari penduduk asli (50%), dari batu yang kamu tambang sendiri di Alam Abadi (0,6% per blok, lebih dengan Fortune, paling banyak 16 sehari, tidak pernah dengan Silk Touch atau Mode Kehancuran), dari binatang purba, murka Langit, titipan lelang dan manusia batu. Pakai untuk menawar, memurnikan tubuh (+2% Esensi Abadi per batu, paling banyak 10 sehari), membuat jimat lintas alam, dan saat memadatkan bintang (biaya -1% per batu yang dibawa, maks. 10, terpakai; matikan atau lihat pratinjaunya dengan /kultivasi diskonbintang). Toko kota fana tidak membeli barang Alam Abadi. Esensi Abadi juga naik dengan bermeditasi di Alam Abadi (+1% per 30 detik); terhadap musuh fase 9 teknikmu memberi ×0,6 pada 0% sampai ×1,0 pada 100%, dan qi pulih di sana ×0,5 sampai ×1,0. XP meditasi di Alam Abadi ×3. Sumber: RMJ: Immortal Realm, bab 567 dan 615.",
   "kultivator.screen.help.lelang.title": "Lelang Abadi",
-  "kultivator.screen.help.lelang": "Setiap 2 hari dalam game saat senja (12.000 sampai 18.000) balai lelang mengadakan sesi di Alam Abadi: lima barang, satu per satu, sama untuk semua pemain. Empat tetua saingan menawar sampai batas rahasia; tekan +5%, +10% atau +25% di tablet Lelang. Kamu harus membawa batunya untuk menawar, tetapi membayar hanya bila menang; siapa yang menang tanpa batu yang cukup kehilangan barang itu dan tidak boleh menawar lagi di sesi itu. Barang terjual 8 detik setelah tawaran terakhir. Titipkan sampai 2 barang per sesi untuk Batu Asal di akhir sesi. Menangkan barang yang sangat diinginkan saingan dan sebuah rombongan bisa mengejarmu nanti. Sumber: RMJ: Immortal Realm, bab 615 dan 567."
+  "kultivator.screen.help.lelang": "Setiap 2 hari dalam game saat senja (12.000 sampai 18.000) balai lelang mengadakan sesi di Alam Abadi: lima barang, satu per satu, sama untuk semua pemain. Empat tetua saingan menawar sampai batas rahasia; tekan +5%, +10% atau +25% di tablet Lelang. Kamu harus membawa batunya untuk menawar, tetapi membayar hanya bila menang; siapa yang menang tanpa batu yang cukup kehilangan barang itu dan tidak boleh menawar lagi di sesi itu. Barang terjual 8 detik setelah tawaran terakhir. Titipkan sampai 2 buah per sesi (satu buah per titipan) untuk 0,6-1,0 × nilainya dalam Batu Asal di akhir sesi. Menangkan barang yang sangat diinginkan saingan dan sebuah rombongan bisa mengejarmu nanti. Sumber: RMJ: Immortal Realm, bab 615 dan 567."
 }

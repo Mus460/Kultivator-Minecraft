@@ -12,6 +12,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,6 +89,17 @@ public final class SainganData extends SavedData {
 
 	private void seed(long worldSeed, int count) {
 		groups.clear();
+		groups.addAll(plan(worldSeed, count));
+		seeded = true;
+		setDirty();
+	}
+
+	/**
+	 * The groups a world seed gives (pure: the same seed and count always give the same groups, in the same random order
+	 * as the first seeding of every existing world).
+	 */
+	private static List<Group> plan(long worldSeed, int count) {
+		List<Group> list = new ArrayList<>();
 		RandomSource random = RandomSource.create(worldSeed ^ 0x5A1A6A4L);
 		List<Integer> names = new ArrayList<>();
 		for (int i = 0; i < NAMES; i++) {
@@ -103,10 +115,39 @@ public final class SainganData extends SavedData {
 			for (int m = 0; m < size; m++) {
 				members[m] = random.nextInt();
 			}
-			groups.add(new Group("g" + i, name, NAME_STYLE[name], NAME_COLOR[name], region, random.nextInt(), members));
+			list.add(new Group("g" + i, name, NAME_STYLE[name], NAME_COLOR[name], region, random.nextInt(), members));
 		}
-		seeded = true;
-		setDirty();
+		return list;
+	}
+
+	/**
+	 * The seeded centre of rival group {@code i} ({@code "g" + i}) of a world seed with {@code count} groups, from the seed
+	 * alone (no server: worldgen and Diplomasi 36 place sect gates here; integration audit T12). Null when {@code i} is out
+	 * of range. A world keeps the regions of its first seeding (see {@link #get}); use {@link #regionOf(MinecraftServer, int)}
+	 * when a server is at hand.
+	 */
+	public static @Nullable BlockPos regionOf(long worldSeed, int i, int count) {
+		if (i < 0 || i >= Math.min(count, NAMES)) {
+			return null;
+		}
+		return plan(worldSeed, count).get(i).region;
+	}
+
+	/** {@link #regionOf(long, int, int)} with the configured group count ({@code kota.rivalGroups}). */
+	public static @Nullable BlockPos regionOf(long worldSeed, int i) {
+		return regionOf(worldSeed, i, Kota.config().rivalGroups);
+	}
+
+	/** The saved region of group {@code i} of this world (what the map and the bands use), or null. */
+	public static @Nullable BlockPos regionOf(MinecraftServer server, int i) {
+		Group group = get(server).byId("g" + i);
+		return group == null ? null : group.region;
+	}
+
+	/** The display name key of group {@code i} of this world ({@code kultivator.kota.grup.<n>}), or null. */
+	public static @Nullable String nameKeyOf(MinecraftServer server, int i) {
+		Group group = get(server).byId("g" + i);
+		return group == null ? null : "kultivator.kota.grup." + group.name;
 	}
 
 	public List<Group> groups() {

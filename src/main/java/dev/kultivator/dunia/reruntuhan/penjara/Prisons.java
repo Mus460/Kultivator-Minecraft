@@ -2,6 +2,8 @@ package dev.kultivator.dunia.reruntuhan.penjara;
 
 import com.mojang.serialization.Codec;
 import dev.kultivator.Kultivator;
+import dev.kultivator.data.Cultivators;
+import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.AnchorHandler;
 import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.DuniaAnchors;
@@ -54,6 +56,24 @@ public final class Prisons extends SavedData {
 	public static final int TICK_EVERY = 200;
 	public static final double PULL_COST = 5.0D;
 	public static final double REINFORCE = 15.0D;
+	/** The realm a talisman pull (and its warning card) needs: the prison is Dao Union content (integration audit T7). */
+	public static final Realm MIN_REALM = Realm.DAO_UNION;
+	/** The king rises only while someone of this realm (or a Creative player) stands in the hall (integration audit T7). */
+	public static final Realm RISE_REALM = Realm.DEITY_TRANSFORMATION;
+	/** Blank talismans one Sobekan Segel stands for at Perkuat Segel (balance change approved by the user). */
+	public static final int SHARD_AS_BLANKS = 2;
+	/** Pahala traded at the Jantung Segel for one Giok Warisan (balance change approved by the user). */
+	public static final int PAHALA_PER_JADE = 5;
+
+	/** True when {@code player} may tear a seal talisman (Creative, or {@link #MIN_REALM} and up). */
+	public static boolean mayPull(ServerPlayer player) {
+		return player.isCreative() || Cultivators.get(player).realm().atLeast(MIN_REALM);
+	}
+
+	/** True when {@code player} is strong enough to wake the king (Creative, or {@link #RISE_REALM} and up). */
+	public static boolean mayWake(ServerPlayer player) {
+		return player.isCreative() || Cultivators.get(player).realm().atLeast(RISE_REALM);
+	}
 
 	/** One prison's seal. */
 	public static final class Seal {

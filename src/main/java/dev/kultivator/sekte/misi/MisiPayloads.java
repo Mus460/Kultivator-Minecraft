@@ -75,6 +75,10 @@ public final class MisiPayloads {
 		PayloadTypeRegistry.serverboundPlay().register(Aksi.TYPE, Aksi.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Keadaan.TYPE, Keadaan.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Laporan.TYPE, Laporan.CODEC);
+		// The types always (K1, both sides); the receiver only while the module runs.
+		if (!dev.kultivator.sekte.SekteContent.on(dev.kultivator.sekte.SekteIds.X)) {
+			return;
+		}
 		ServerPlayNetworking.registerGlobalReceiver(Aksi.TYPE, (payload, context) -> Misi.onAction(context.player(), payload));
 	}
 

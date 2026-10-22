@@ -40,12 +40,19 @@ public final class VoiceEvents {
 	public static final List<String> MENARA = List.of("next_floor", "shadow_self");
 	public static final List<String> GUA = List.of("ancestor_trial");
 	public static final List<String> HEAVEN_LANGIT = List.of("meteor_shower", "twin_moons", "treasure_born", "blood_eclipse");
-	public static final List<String> LANGIT = List.of("treasure_born", "blood_eclipse");
 	public static final List<String> NAGA = List.of("subdued", "tribulation", "evolved", "trib_failed", "jiao_roar");
 	public static final List<String> BAWAH = List.of("meng_po_offer", "meng_po_refuse", "yama_judgement", "yama_book", "ox_head", "ghost_plea");
 	public static final List<String> LAUT = List.of("dragon_king", "gate_guard", "penglai_trial");
 	public static final List<String> KAPAL = List.of("launch", "cloud_leap", "arrive", "sky_pirates", "hull_broken");
 	public static final List<String> PETA = List.of("site_found");
+	/** Sekte yang Hidup (DESIGN 36.6, docs/progres/sekte-voices.md): the disciples' new moments of the ten modules. */
+	public static final List<String> DISCIPLE_SEKTE = List.of("sulk", "rebel", "submit", "leave_night", "oath", "tea", "grudge", "beloved",
+			"leitai_salam", "leitai_juara", "leitai_kalah", "climb_peak", "climb_illusion", "mourn", "study", "qingming", "report", "depart",
+			"mission_report", "abandoned", "robe", "envoy_return", "harvest", "ore_found");
+	/** Sekte yang Hidup: the elder's tournament, banner and envoy lines. */
+	public static final List<String> ELDER_SEKTE = List.of("leitai_buka", "banner", "envoy");
+	/** Sekte yang Hidup: the visiting sect, the NPC sect master and his defeat. */
+	public static final List<String> BOSS_SEKTE = List.of("tamu_tantang", "sect_master", "sect_master_defeat");
 	/** Lines without words (no caption): laughs, growls, roars and grunts. */
 	private static final List<String> NON_VERBAL = List.of("demon.laugh", "demon.growl", "demon.death", "boss.roar");
 
@@ -60,14 +67,16 @@ public final class VoiceEvents {
 		group("rogue", ROGUE);
 		for (String voice : DISCIPLE_VOICES) {
 			group("disciple." + voice, DISCIPLE);
+			group("disciple." + voice, DISCIPLE_SEKTE);
 		}
+		group("elder", ELDER_SEKTE);
+		group("boss", BOSS_SEKTE);
 		group("grunt", GRUNTS);
 		group("kota", KOTA);
 		group("penjara", PENJARA);
 		group("menara", MENARA);
 		group("gua", GUA);
 		group("heaven.langit", HEAVEN_LANGIT);
-		group("langit", LANGIT);
 		group("naga", NAGA);
 		group("bawah", BAWAH);
 		group("laut", LAUT);

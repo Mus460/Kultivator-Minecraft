@@ -18,7 +18,7 @@ import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.sekte.api.Sikap;
 import dev.kultivator.util.Msg;
-import dev.kultivator.voice.VoiceDisciples;
+import dev.kultivator.sekte.SekteSuara;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -250,6 +250,50 @@ final class TimMisi {
 		if (tpl == null) {
 			return deny(player, "kultivator.sekte.misi.cek.hilang");
 		}
+		return depart(player, tpl, offer, stance, souls);
+	}
+
+	/**
+	 * T13: module D's "Kirim Utusan" travels as an envoy mission (template {@code utusan}) to {@code sectId}: one envoy, the
+	 * sect's tier capped by the envoy's sect rank, the peaceful stance, stage news and a written report like any story
+	 * mission. {@code officer}: the Elder of External Affairs goes (a better standing on return).
+	 */
+	static boolean sendEnvoy(ServerPlayer player, String sectId, UUID soul, boolean officer) {
+		UUID owner = player.getUUID();
+		DiscipleEntity envoy = find(owner, soul);
+		if (envoy == null) {
+			return deny(player, "kultivator.sekte.misi.cek.hilang_murid");
+		}
+		TemplatMisi tpl = TemplatMisi.UTUSAN;
+		int cap = Math.min(tpl.maxTier(), maxTier(SectRanks.rank(envoy.data())));
+		int tier = Math.max(tpl.minTier(), Math.min(cap, Math.max(1, SekteApi.diplomasi().tier(sectId))));
+		RandomSource random = player.getRandom();
+		CompoundTag offer = new CompoundTag();
+		offer.putString("tpl", tpl.id());
+		offer.putInt("tier", tier);
+		offer.putInt("place", random.nextInt(PLACES));
+		offer.putInt("foe", random.nextInt(FOES));
+		offer.putString("sect", sectId);
+		Component name = SekteApi.diplomasi().name(sectId);
+		MisiData.putName(offer, "sect_name", name != null ? name : Component.literal(sectId));
+		if (officer) {
+			offer.putBoolean("luar", true);
+		}
+		return depart(player, tpl, offer, TemplatMisi.Pendekatan.DAMAI, List.of(soul));
+	}
+
+	/** The departure of a team on {@code offer} (a board offer, or module D's envoy offer). */
+	private static boolean depart(ServerPlayer player, TemplatMisi tpl, CompoundTag offer, TemplatMisi.Pendekatan stance, List<UUID> souls) {
+		UUID owner = player.getUUID();
+		MinecraftServer server = player.level().getServer();
+		MisiConfig cfg = MisiConfig.get();
+		Halls.HallView hall = Halls.hallOf(owner);
+		if (!cfg.aktif || hall == null || !hall.active()) {
+			return deny(player, !cfg.aktif ? "kultivator.sekte.misi.cek.mati" : "kultivator.sekte.misi.cek.aula");
+		}
+		if (MisiData.active(owner).size() >= cfg.misiMaksAktif) {
+			return deny(player, Component.translatable("kultivator.sekte.misi.cek.penuh", cfg.misiMaksAktif));
+		}
 		if (souls.isEmpty() || souls.size() > cfg.timMaks) {
 			return deny(player, Component.translatable("kultivator.sekte.misi.cek.ukuran", cfg.timMaks));
 		}
@@ -312,10 +356,13 @@ final class TimMisi {
 				MisiData.putName(mission, key, MisiData.name(offer, key));
 			}
 		}
+		if (offer.getBooleanOr("luar", false)) {
+			mission.putBoolean("luar", true);
+		}
 		ListTag team = new ListTag();
 		List<UUID> sent = new ArrayList<>();
 		Component leaderName = members.get(0).getDisplayName();
-		VoiceDisciples.line(members.get(0), "careful", 200);
+		SekteSuara.line(members.get(0), "depart", "careful", 200);
 		for (DiscipleEntity member : members) {
 			team.add(snapshot(member));
 		}

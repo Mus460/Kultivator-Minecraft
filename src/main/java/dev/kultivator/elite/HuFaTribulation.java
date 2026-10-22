@@ -103,6 +103,16 @@ public final class HuFaTribulation {
 			public void onFinish(ServerPlayer p, Rank t, @Nullable Tribulation.Result result, int strikesDone, boolean test) {
 				close(p, result, test);
 			}
+
+			// audit M4 S8: the player's star calamity is a stand-alone ritual of strikes; Hu Fa guards it the same way
+			@Override
+			public void onRitual(ServerPlayer p, Rank t, boolean begin, boolean success) {
+				if (begin) {
+					open(p, t);
+				} else {
+					close(p, success ? Tribulation.Result.SUCCESS : Tribulation.Result.FAILED, false);
+				}
+			}
 		});
 		Tribulation.addStrikeFactorProvider((p, target, strikeIndex, last) -> strikeFactor(p));
 		Breakthrough.addQualityBonusProvider((p, d, target) -> qualityBonus(p));
@@ -201,7 +211,7 @@ public final class HuFaTribulation {
 			return refuse(guardian, dev.kultivator.alam.Alam.REFUSE_KEY, cultivator);
 		}
 		Session session = SESSIONS.get(cultivator.getUUID());
-		if (session == null || !Tribulation.isActive(cultivator)) {
+		if (session == null || !(Tribulation.isActive(cultivator) || Tribulation.inRitual(cultivator))) {
 			return refuse(guardian, "kultivator.combat.hufa.fail.none", cultivator);
 		}
 		if (guardian.level() != cultivator.level() || guardian.distanceToSqr(cultivator) > JOIN_RANGE * JOIN_RANGE) {

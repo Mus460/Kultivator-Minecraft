@@ -195,6 +195,36 @@ final class TanggaCommands {
 		return 1;
 	}
 
+	/** R23: the same records as {@link #list}, as data for the hub scroll. */
+	static CompoundTag records(ServerPlayer player) {
+		UUID owner = player.getUUID();
+		CompoundTag out = new CompoundTag();
+		out.putBoolean("stair", Tangga.INSTANCE.hasStair(owner));
+		out.putInt("pk", TanggaConfig.get().ujianHatiPK);
+		out.putInt("hari", TanggaConfig.get().ujianHatiHari);
+		net.minecraft.nbt.ListTag rows = new net.minecraft.nbt.ListTag();
+		for (DiscipleEntity disciple : Disciples.loaded(owner)) {
+			if (disciple.role() != DiscipleEntity.Role.DISCIPLE || rows.size() >= 64) {
+				continue;
+			}
+			CompoundTag row = new CompoundTag();
+			row.putString("name", disciple.getDisplayName().getString());
+			CompoundTag mine = disciple.data().extra().getCompound(SekteIds.EXTRA_G).orElse(null);
+			if (mine == null || !mine.contains(Tangga.K_STEPS)) {
+				row.putInt("steps", -1);
+			} else {
+				int steps = mine.getIntOr(Tangga.K_STEPS, 0);
+				row.putInt("steps", steps);
+				row.putInt("best", mine.getIntOr(Tangga.K_BEST, steps));
+				row.putInt("heart", Math.max(0, Math.min(3, mine.getIntOr(Tangga.K_VERDICT, 0))));
+				row.putBoolean("peak", mine.getBooleanOr(Tangga.K_PEAK, false));
+			}
+			rows.add(row);
+		}
+		out.put("rows", rows);
+		return out;
+	}
+
 	private TanggaCommands() {
 	}
 }

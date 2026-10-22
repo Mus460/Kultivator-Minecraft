@@ -92,6 +92,17 @@ public class StorageRingItem extends Item {
 		return tag == null ? null : ArtifactItem.parse(tag.getStringOr("owner", ""));
 	}
 
+	/** True when the pouch or ring holds no item (no container component, or only empty slots). Read-only. */
+	public static boolean isEmpty(ItemStack stack) {
+		ItemContainerContents contents = stack.get(DataComponents.CONTAINER);
+		return contents == null || contents.nonEmptyItemCopyStream().findAny().isEmpty();
+	}
+
+	/** True for a pouch or ring that must not be sold or consigned: it still holds items or is bound to an owner. */
+	public static boolean unsafeToSell(ItemStack stack) {
+		return is(stack) && (!isEmpty(stack) || bondOwner(stack) != null);
+	}
+
 	static String ownerName(ItemStack stack) {
 		CompoundTag tag = stack.get(TempaItems.RING);
 		return tag == null ? "" : tag.getStringOr("owner_name", "");

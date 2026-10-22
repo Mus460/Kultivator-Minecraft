@@ -16,6 +16,7 @@ import dev.kultivator.sect.Sparring;
 import dev.kultivator.trial.HeartDemons;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
+import dev.kultivator.util.Sibuk;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -277,10 +278,15 @@ public final class Ascension {
 		start(player, true);
 	}
 
-	/** Alive, on foot (not riding), not breaking through, not facing a heart demon and not in a sparring duel. */
+	/**
+	 * Alive, on foot (not riding), not breaking through, not facing a heart demon, not in a duel and free of everything
+	 * the shared {@link Sibuk} door knows (Sword Duel, realm runs, wrath, calamity, rituals...). While busy the 30 s wait
+	 * simply starts again, so the Acknowledgement is postponed, never lost.
+	 */
 	private static boolean canBegin(ServerPlayer player, CultivationData data) {
 		return player.isAlive() && !player.isDeadOrDying() && !player.isSpectator() && !player.isPassenger()
-				&& !Breakthrough.isBusy(player) && !data.breakingThrough() && !HeartDemons.inTrial(player) && !Sparring.inDuel(player);
+				&& !Breakthrough.isBusy(player) && !data.breakingThrough() && !HeartDemons.inTrial(player) && !Sparring.inDuel(player)
+				&& Sibuk.why(player) == null;
 	}
 
 	private static void tickEvent(ServerPlayer player, CultivationData data, Event event) {

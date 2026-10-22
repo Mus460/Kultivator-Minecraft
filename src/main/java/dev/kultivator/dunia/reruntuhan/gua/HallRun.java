@@ -195,6 +195,9 @@ public final class HallRun extends AnchorRun {
 				items.add(RRewards.herb(random, 1000, 3000));
 				items.add(RRewards.core(random, 4));
 				items.add(RRewards.jade(theme()));
+				// A second Giok Warisan makes the Kuno hall worth more than the Agung one (integration audit S22, approved);
+				// the Kitab Formasi Kuno stays as the ancestor's lore.
+				items.add(RRewards.jade(theme()));
 				items.add(new ItemStack(RItems.KITAB_FORMASI_KUNO));
 			}
 			default -> {
@@ -211,6 +214,9 @@ public final class HallRun extends AnchorRun {
 		level.playSound(null, centre().x, centre().y, centre().z, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.8F, 1.0F);
 		level.playSound(null, centre().x, centre().y, centre().z, SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 1.0F, 0.7F);
 		Advancements.grant(player, "dunia/ruin_cleared");
+		// audit M4 S4 (approved): a Dunia milestone per ruin inheritance (once per player per ruin: "claimed")
+		dev.kultivator.cultivation.XpSources.milestone(player, dev.kultivator.cultivation.XpSources.MILESTONE_RUINS,
+				Component.translatable("kultivator.kekuatan.milestone.ruins"));
 		if (tier >= 3) {
 			Advancements.grant(player, "dunia/ruin_kuno");
 		}

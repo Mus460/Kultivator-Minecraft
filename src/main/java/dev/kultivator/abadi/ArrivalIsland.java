@@ -1,11 +1,23 @@
 package dev.kultivator.abadi;
 
+import dev.kultivator.Kultivator;
+import dev.kultivator.data.CultivationData;
+import dev.kultivator.data.Cultivators;
+import dev.kultivator.dunia.DuniaSites;
+import dev.kultivator.dunia.DuniaSpine;
+import dev.kultivator.dunia.peta.PetaItems;
+import dev.kultivator.util.Msg;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -23,6 +35,11 @@ public final class ArrivalIsland {
 	/** Distance between two rings of the spiral (blocks). */
 	public static final int STEP = 40;
 	public static final BlockPos FALLBACK = new BlockPos(0, 120, 0);
+	/** {@code extra} flag: the player's first arrival already pointed out the nearest Kota Abadi (integration audit S19). */
+	public static final String CITY_HINT = "sambung_kota_abadi";
+	/** How often the arrival check runs (one player and at most one structure search per run). */
+	public static final int CITY_HINT_TICKS = 100;
+	private static final TagKey<Structure> KOTA_ABADI = TagKey.create(Registries.STRUCTURE, Kultivator.id("kota_abadi"));
 
 	private static int next = -1;
 
@@ -37,6 +54,9 @@ public final class ArrivalIsland {
 		ServerLevel level = server.getLevel(Abadi.IMMORTAL_LEVEL);
 		if (level == null) {
 			return;
+		}
+		if (server.getTickCount() % CITY_HINT_TICKS == 37L) {
+			cityHint(level);
 		}
 		AlamAbadiData data = AlamAbadiData.get(server);
 		if (data.arrival() != null) {
@@ -88,6 +108,40 @@ public final class ArrivalIsland {
 	public static boolean usesFallback(MinecraftServer server) {
 		AlamAbadiData data = AlamAbadiData.get(server);
 		return data.arrival() == null || data.fallback();
+	}
+
+	/**
+	 * A player's first time in Alam Abadi: the nearest Kota Abadi (64 chunks) is found and discovered, so the map shows it at
+	 * once (integration audit S19). One player per run, one structure search (DuniaSites throttles to one per tick); the
+	 * flag is set whether or not a city was found, so nobody is searched for twice. No block is written.
+	 */
+	private static void cityHint(ServerLevel level) {
+		if (!DuniaSpine.enabled()) {
+			return;
+		}
+		for (ServerPlayer player : level.players()) {
+			if (player.isSpectator()) {
+				continue;
+			}
+			CultivationData data = Cultivators.get(player);
+			if (data.extra().getBooleanOr(CITY_HINT, false)) {
+				continue;
+			}
+			data.extra().putBoolean(CITY_HINT, true);
+			Cultivators.dirty(player);
+			BlockPos at = player.blockPosition();
+			java.util.List<DuniaSites.Site> known = DuniaSites.near(level, at, 1024, "kota/kota_abadi");
+			DuniaSites.Site site = !known.isEmpty() ? known.get(0) : DuniaSites.locate(level, KOTA_ABADI, at, DuniaSites.MAX_LOCATE_CHUNKS, "kota/kota_abadi", 1);
+			if (site != null) {
+				DuniaSites.discover(player, site.id());
+				double dx = site.pos().getX() + 0.5D - player.getX();
+				double dz = site.pos().getZ() + 0.5D - player.getZ();
+				int distance = (int) Math.round(Math.sqrt(dx * dx + dz * dz));
+				Msg.chat(player, Component.translatable("kultivator.sambung.kota_abadi.kabar",
+						Component.translatable("kultivator.peta.dir." + PetaItems.direction(dx, dz)), distance).withColor(0xFFF0C0));
+			}
+			return;
+		}
 	}
 
 	/** Spiral sample {@code index}: the centre first, then rings of 8 points every {@link #STEP} blocks. */

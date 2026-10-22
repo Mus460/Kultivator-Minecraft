@@ -132,6 +132,39 @@ public final class Disciples {
 	private record FollowRequest(UUID player, ServerLevel origin, Set<UUID> souls, int deadline) {
 	}
 
+	/**
+	 * Keeps disciples behind when their master changes dimension (integration audit M2 step 7): the reason's translation
+	 * key, or null to let them follow. Dunia Bawah (they guard the master's body), Menara Seratus (they wait at the
+	 * lobby), and later Sekte Langit's ferry (37).
+	 */
+	@FunctionalInterface
+	public interface FollowVeto {
+		@Nullable String veto(ServerPlayer player, ServerLevel origin, ServerLevel destination);
+	}
+
+	private static final List<FollowVeto> FOLLOW_VETOES = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+	/** Adds a follow veto (from the module's init; server side). */
+	public static void addFollowVeto(FollowVeto veto) {
+		FOLLOW_VETOES.add(veto);
+	}
+
+	/** The first veto's reason key for following from {@code origin} to {@code destination}, or null. */
+	public static @Nullable String followVeto(ServerPlayer player, ServerLevel origin, ServerLevel destination) {
+		for (FollowVeto veto : FOLLOW_VETOES) {
+			String key;
+			try {
+				key = veto.veto(player, origin, destination);
+			} catch (RuntimeException exception) {
+				key = null;
+			}
+			if (key != null) {
+				return key;
+			}
+		}
+		return null;
+	}
+
 	public static void init() {
 		DiscipleEntities.init();
 		DiscipleItems.init();
@@ -1006,6 +1039,13 @@ public final class Disciples {
 				souls.add(disciple.soulId());
 			}
 		}
+		if (!souls.isEmpty() && player.level() instanceof ServerLevel destination) {
+			String veto = followVeto(player, origin, destination);
+			if (veto != null) {
+				Msg.actionBar(player, Component.translatable(veto).withStyle(ChatFormatting.GRAY));
+				return;
+			}
+		}
 		if (!souls.isEmpty()) {
 			PENDING_FOLLOW.add(new FollowRequest(player.getUUID(), origin, souls, player.level().getServer().getTickCount() + FOLLOW_RETRY_TICKS));
 		}
@@ -1374,6 +1414,10 @@ public final class Disciples {
 			}
 			DiscipleEntity called = disciple;
 			if (disciple.level() != player.level()) {
+				// A follow veto (Dunia Bawah, Menara Seratus) keeps it where it waits.
+				if (disciple.level() instanceof ServerLevel from && player.level() instanceof ServerLevel to && followVeto(player, from, to) != null) {
+					continue;
+				}
 				// Across dimensions only when it really arrives (a guard that cannot come keeps its post).
 				called = player.isSpectator() ? null : disciple.followAcross(player);
 				if (called == null) {

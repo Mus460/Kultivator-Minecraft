@@ -235,6 +235,20 @@ public final class EpicHooks {
 		});
 	}
 
+	/**
+	 * The player's own star calamity {@code k} (audit M4 S8): the CALAMITY beats (omen, pre, strike, pass, fail, abort) with
+	 * the player as subject and viewer, so the disciples' calamity scene, its sky and its danger-gated 7b shots play for the
+	 * player too. {@code index} of {@code total} strikes.
+	 */
+	public static void playerCalamity(ServerPlayer player, int beat, int k, int index, int total) {
+		guard(() -> {
+			boolean last = beat == EpicIds.CAL_STRIKE && index >= total;
+			int flags = last || beat == EpicIds.CAL_PASS || beat == EpicIds.CAL_FAIL || beat == EpicIds.CAL_ABORT ? EpicIds.FLAG_FINAL : 0;
+			send(player.level(), EpicIds.CALAMITY, beat, player, player, player.position(), k, EpicIds.packCalamity(index, total), 0.0F,
+					EpicScale.of(Cultivators.get(player).rank()), flags);
+		});
+	}
+
 	/** The disciple surpasses the master. */
 	public static void surpass(DiscipleEntity disciple, ServerPlayer master, boolean byDuel) {
 		guard(() -> {

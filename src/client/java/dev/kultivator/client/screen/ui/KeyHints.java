@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
  * Lang texts write a key as the token {@code [[key:<id>]]} (for example {@code [[key:meditate]]}); {@link #fill} replaces
  * each token with the key the player bound to {@code key.kultivator.<id>} right now, so a rebound key never makes the
  * Kitab Panduan, the Ensiklopedia or the tracker wrong. An unbound key names the way to it instead: "tidak diikat ·
- * Akses Cepat (V)" for what the Akses Cepat wheel or the hub reaches, "tidak diikat · Roda Segel (tahan G)" for the seal
- * keys, and "tidak diikat" for the rest.
+ * Akses Cepat (V)" for what the Akses Cepat wheel or the hub reaches (the world map too), "tidak diikat · Roda Segel
+ * (tahan G)" for the seal keys, their own way for Tangkis and the duel camera, and "tidak diikat" for the rest.
  */
 public final class KeyHints {
 
@@ -33,7 +33,13 @@ public final class KeyHints {
 	private static final String TOKEN_START = "[[key:";
 	private static final Pattern TOKEN = Pattern.compile("\\[\\[key:([a-z0-9_]+)]]");
 	/** Keys whose action the Akses Cepat wheel or the hub reaches when the key itself is unbound (33.3.1). */
-	private static final Set<String> QUICK_REACH = Set.of("info", "meditate", "flying_sword", "codex", "murid", "cincin", "dunia", "abadi", "guide");
+	private static final Set<String> QUICK_REACH = Set.of("info", "meditate", "flying_sword", "codex", "murid", "cincin", "dunia", "abadi", "guide",
+			"peta");
+	/**
+	 * Unbound keys whose action has its own way in (audit M5, S29), named by {@code kultivator.uxpages.key.unbound_<id>}:
+	 * Tangkis is also the right click with the blade hand, the duel camera is the "Kamera duel" row of Pengaturan › Film.
+	 */
+	private static final Set<String> OWN_REACH = Set.of("parry", "duel_camera");
 	/** Keys whose action the Roda Segel (hold the cast key) reaches when the key itself is unbound. */
 	private static final Set<String> WHEEL_REACH = Set.of("previous", "next", "wheel", "seal_1", "seal_2", "seal_3", "seal_4");
 
@@ -94,6 +100,9 @@ public final class KeyHints {
 		KeyMapping quick = KeyMapping.get("key.kultivator.quick");
 		if (QUICK_REACH.contains(id) && quick != null && !quick.isUnbound()) {
 			return Component.translatable(P + "key.unbound_quick", quick.getTranslatedKeyMessage());
+		}
+		if (OWN_REACH.contains(id)) {
+			return Component.translatable(P + "key.unbound_" + id);
 		}
 		KeyMapping cast = KeyMapping.get("key.kultivator.cast");
 		if (WHEEL_REACH.contains(id) && cast != null && !cast.isUnbound()) {
@@ -180,6 +189,59 @@ public final class KeyHints {
 		protected void activate() {
 			UiSound.press();
 			HubNav.help(topic.get());
+		}
+	}
+
+	/**
+	 * A "?" seal for a plain {@code Screen} that has no widget list of its own (audit M5, S11: the world map, the tower
+	 * card, the realm screen, the helm and the Sword Duel screen). The screen places it in {@code init}, draws it last in
+	 * its frame (the tooltip on top) and passes its left clicks and releases first; a click opens Panduan › Ensiklopedia
+	 * on {@code topic} ({@link HubNav#help}).
+	 */
+	public static final class SealCorner {
+
+		private final HelpSeal seal;
+		private boolean held;
+		private long lastFrame = -1L;
+
+		public SealCorner(String topic) {
+			this.seal = new HelpSeal(0.0F, 0.0F, 10, () -> topic);
+		}
+
+		/** Centres the seal on ({@code cx}, {@code cy}). */
+		public void place(float cx, float cy) {
+			seal.moveTo(cx, cy);
+		}
+
+		/** Draws the seal and, while the mouse is over it, its tooltip. Call at the end of the screen's frame. */
+		public void render(GuiGraphicsExtractor g, Font font, int mouseX, int mouseY, int screenWidth, int screenHeight) {
+			long now = net.minecraft.util.Util.getMillis();
+			float seconds = lastFrame < 0L ? 0.0F : Math.min(0.25F, (now - lastFrame) / 1000.0F);
+			lastFrame = now;
+			seal.render(g, font, mouseX, mouseY, seconds);
+			if (seal.contains(mouseX, mouseY)) {
+				SlipTooltip.draw(g, font, seal.tooltipLines(), mouseX, mouseY, screenWidth, screenHeight);
+			}
+		}
+
+		/** A left click: true (and the press starts) when it hit the seal. */
+		public boolean click(double mouseX, double mouseY) {
+			if (!seal.contains(mouseX, mouseY)) {
+				return false;
+			}
+			seal.press();
+			held = true;
+			return true;
+		}
+
+		/** A release: true when the press started on the seal (it opens the topic when still over it). */
+		public boolean release(double mouseX, double mouseY) {
+			if (!held) {
+				return false;
+			}
+			held = false;
+			seal.release(mouseX, mouseY);
+			return true;
 		}
 	}
 

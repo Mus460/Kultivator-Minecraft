@@ -2206,8 +2206,10 @@ def structures():
             s["project_start_to_heightmap"] = "WORLD_SURFACE_WG"
         wjson("structure", "reruntuhan", gid, s)
         spacing, separation, salt = sets[tier]
-        wjson("structure_set", "reruntuhan", gid, {"placement": {"type": "minecraft:random_spread", "salt": salt,
-                                                                  "separation": separation, "spacing": spacing},
+        # W4 (integration audit T7): never within 6 chunks of the world centre; the Kuno caves (Deity Transformation) 12
+        wjson("structure_set", "reruntuhan", gid, {"placement": {"type": "kultivator:jauh_dari_pusat", "salt": salt,
+                                                                  "separation": separation, "spacing": spacing,
+                                                                  "min_chunks": 12 if tier == "kuno" else 6},
                                                     "structures": [{"structure": "kultivator:reruntuhan/" + gid, "weight": 1}]}, pack=True)
         j(os.path.join(DATA, "tags", "worldgen", "structure", "reruntuhan", gid + ".json"),
           {"replace": False, "values": ["kultivator:reruntuhan/" + gid]})
@@ -2232,8 +2234,9 @@ def structures():
             "start_pool": "kultivator:penjara/kuil" + fam, "step": "surface_structures", "terrain_adaptation": "none",
             "use_expansion_hack": False})
         prison_ids.append("kultivator:penjara/" + sid)
-    wjson("structure_set", "penjara", "penjara_iblis", {"placement": {"type": "minecraft:random_spread", "salt": 340562, "separation": 48,
-                                                                      "spacing": 120},
+    # W4 (integration audit T7): the Dao Union prison never starts within 12 chunks of the world centre
+    wjson("structure_set", "penjara", "penjara_iblis", {"placement": {"type": "kultivator:jauh_dari_pusat", "salt": 340562, "separation": 48,
+                                                                      "spacing": 120, "min_chunks": 12},
                                                         "structures": [{"structure": sid, "weight": 1} for sid in prison_ids]}, pack=True)
     j(os.path.join(DATA, "tags", "worldgen", "structure", "penjara.json"), {"replace": False, "values": prison_ids})
     # --------------------------------------------------------------- Menara Seratus Lantai
@@ -2254,8 +2257,9 @@ def structures():
             "project_start_to_heightmap": "WORLD_SURFACE_WG", "start_pool": "kultivator:menara/%s/tingkat_1" % fam,
             "step": "surface_structures", "terrain_adaptation": "beard_thin", "use_expansion_hack": False})
         tower_ids.append("kultivator:menara/" + fam)
-    wjson("structure_set", "menara", "menara_seratus", {"placement": {"type": "minecraft:random_spread", "salt": 340565, "separation": 64,
-                                                                      "spacing": 160},
+    # W4 (integration audit T7): never within 6 chunks of the world centre
+    wjson("structure_set", "menara", "menara_seratus", {"placement": {"type": "kultivator:jauh_dari_pusat", "salt": 340565, "separation": 64,
+                                                                      "spacing": 160, "min_chunks": 6},
                                                         "structures": [{"structure": sid, "weight": 1} for sid in tower_ids]}, pack=True)
     # the lobby of the tower dimension (base data: the dimension's flat settings list this set)
     wjson("template_pool", "menara", "lobi", {"elements": [{"element": single(loc("menara", "lobi"), "kultivator:menara/utuh"), "weight": 1}],

@@ -19,6 +19,7 @@ import dev.kultivator.sect.Sparring;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.DamageEstimate;
 import dev.kultivator.util.Msg;
+import dev.kultivator.util.Sibuk;
 import dev.kultivator.util.Targeting;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
@@ -287,7 +288,15 @@ public final class HeartDemons {
 	private static boolean canFace(ServerPlayer player, CultivationData data) {
 		return KultivatorConfig.get().heartDemonTrials && player.isAlive() && !player.isDeadOrDying() && !player.isSpectator()
 				&& !player.isCreative() && !Breakthrough.isBusy(player) && !data.breakingThrough() && !Sparring.inDuel(player)
-				&& !TRIALS.containsKey(player.getUUID()) && !hasPendingLoss(data);
+				&& !TRIALS.containsKey(player.getUUID()) && !hasPendingLoss(data) && Sibuk.why(player) == null;
+	}
+
+	/**
+	 * Held by something else right now (Sword Duel, realm run, wrath, calamity, tribulation, ritual...: the shared
+	 * {@link Sibuk} door): the announced demon waits instead of fading or striking in the middle of real danger.
+	 */
+	private static boolean heldElsewhere(ServerPlayer player, CultivationData data) {
+		return Breakthrough.isBusy(player) || data.breakingThrough() || Sparring.inDuel(player) || Sibuk.why(player) != null;
 	}
 
 	/** On firm ground: not riding, swimming, gliding or on the Flying Sword (the demon would appear in the air or water). */
@@ -334,7 +343,12 @@ public final class HeartDemons {
 			return;
 		}
 		if (!canFace(player, data)) {
-			// Busy now (sparring, a breakthrough, Creative...): the warning fades.
+			if (heldElsewhere(player, data) && KultivatorConfig.get().heartDemonTrials && !player.isCreative() && !player.isSpectator()) {
+				// Busy (a duel, a realm, a tribulation, wrath...): the warning is postponed, asked again in 10 s.
+				WARNINGS.put(player.getUUID(), Sibuk.RETRY_TICKS);
+				return;
+			}
+			// Creative, Spectator, the feature switched off...: the warning fades.
 			WARNINGS.remove(player.getUUID());
 			return;
 		}
@@ -462,7 +476,9 @@ public final class HeartDemons {
 			return;
 		}
 		if (!player.level().dimension().equals(trial.dimension)) {
-			finish(player, data, trial, Outcome.FLED);
+			// A pressure demon cannot follow through a portal: the trial is called off without a penalty (the pressure stays
+			// and comes back later). The breakthrough trial keeps its rule: leaving is fleeing.
+			finish(player, data, trial, trial.kind == Kind.PRESSURE ? Outcome.CANCELLED : Outcome.FLED);
 			return;
 		}
 		if (player.getY() < player.level().getMinY()) {

@@ -1,6 +1,7 @@
 package dev.kultivator.dunia.naga;
 
 import dev.kultivator.beast.BeastData;
+import dev.kultivator.technique.spec.TechniquePower;
 import dev.kultivator.util.NoGrief;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -211,6 +212,8 @@ public class NagaLiarEntity extends Mob implements OwnableEntity {
 		this.setNoGravity(true);
 		this.setCanPickUpLoot(false);
 		this.addTag(NoGrief.TAG);
+		// realm-scaled Dunia foe: the trial-mob rule of 6c (audit M4 T5)
+		TechniquePower.markRealmFoe(this);
 		this.followAngleSeed = this.random.nextInt(360);
 	}
 

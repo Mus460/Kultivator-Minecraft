@@ -46,6 +46,13 @@ import java.util.UUID;
  * stacks graded by an elder, and the Paviliun Yue Lu that sells for pool PK at the hall's price factor. Pills come out as
  * the existing alchemy items at Normal quality.
  * <p>
+ * Balance changes of the economy audit (T17, R10; approved "Ubah angkanya"): one exchange rate with the towns
+ * ({@code Harga.NB_PER_PK}, 1 PK = 2 NB). The pavilion's pills cost about 1.5 × their town price in PK (Healing and Qi
+ * Gathering 6, Foundation 60, Golden Core 300, Tribulation Warding 1,000); the hall-level-6 ware is now a Marrow Cleansing
+ * Pill of <b>Perfect</b> quality (400 PK), which no town sells and which a High root needs for the step to Heavenly. An
+ * offered pill is worth its town base / 2 × its quality (Low 0.6, Mid 1, High 1.5, Perfect 2.5, at least 1 PK, at most
+ * the daily cap). A hall allied with an NPC sect (DESIGN 36.2.9, {@code Sikap.SEKUTU}) pays 10 % less at the pavilion.
+ * <p>
  * Sources: <i>A Will Eternal</i> ch. 9 and 27 (the Missions Office grades spirit plants and pays merit points),
  * <i>Martial Peak</i> (the Contribution Hall), <i>A Record of a Mortal's Journey</i> ch. 153 (Yue Lu Hall supplies
  * manuals, recipes and materials).
@@ -57,18 +64,19 @@ final class Contribution {
 
 	/** Paviliun Yue Lu wares: id, base price, minimum hall level, whether it needs a disciple (or a technique) as target. */
 	enum Ware {
-		HEALING("healing", 40, 1, false),
-		QI_GATHERING("qi_gathering", 60, 1, false),
+		HEALING("healing", 6, 1, false),
+		QI_GATHERING("qi_gathering", 6, 1, false),
 		AMETHYST("amethyst", 40, 1, false),
 		INVITE("invite", 150, 1, false),
 		SERMON("sermon", 150, 1, true),
-		FOUNDATION("foundation", 250, 1, false),
+		FOUNDATION("foundation", 60, 1, false),
 		ENVOY("envoy", 300, 1, false),
 		/** Slip Giok Teknik (DESIGN 22.8.4): the price and hall level follow the chosen art's grade; 200 / 1 is the cheapest. */
 		TECHNIQUE("technique", 200, 1, false),
-		WARDING("warding", 600, 3, false),
-		GOLDEN_CORE("golden_core", 800, 4, false),
-		MARROW("marrow", 900, 6, false),
+		WARDING("warding", 1000, 3, false),
+		GOLDEN_CORE("golden_core", 300, 4, false),
+		/** A Marrow Cleansing Pill of Perfect quality (audit T17: the town sells only Normal ones). */
+		MARROW("marrow", 400, 6, false),
 		CODEX("codex", 1200, 3, true);
 
 		final String id;
@@ -98,6 +106,11 @@ final class Contribution {
 	public static final int AMETHYST_COUNT = 8;
 	/** The envoys' rest (module B's {@code Envoys.COOLDOWN_DAYS}, package-private there). */
 	public static final int ENVOY_COOLDOWN_DAYS = 5;
+
+	/** An alliance with an NPC sect (DESIGN 36.2.9) lowers every pavilion price by this share (audit R10). */
+	public static final double PACT_DISCOUNT = 0.10D;
+	/** Offered pills: PK per NB of their town base, by quality (Low, Mid, High, Perfect). */
+	static final double[] PILL_QUALITY_FACTOR = {0.6D, 1.0D, 1.5D, 2.5D};
 
 	/** Slip Giok Teknik: at most this many slips per in-game day (DESIGN 22.8.4). */
 	public static final int SLIPS_PER_DAY = 2;
@@ -149,6 +162,14 @@ final class Contribution {
 		double treasure = dev.kultivator.harta.Harta.missionValue(stack);
 		if (treasure > 0.0D) {
 			return treasure;
+		}
+		// Audit T17: a pill is worth its town base in PK (Harga.NB_PER_PK) × its quality, so a Tribulation Warding Pill is
+		// worth more than a Healing Pill; the flat table stays for a pill the towns do not price.
+		String pillId = stack.getItem() instanceof PillItem pill ? pill.kind().id() : stack.is(RootItems.MARROW_CLEANSING_PILL) ? "marrow_cleansing_pill" : null;
+		long townBase = pillId == null ? 0L : dev.kultivator.dunia.kota.Harga.base(pillId);
+		if (townBase > 0L) {
+			double factor = PILL_QUALITY_FACTOR[Math.max(0, Math.min(PILL_QUALITY_FACTOR.length - 1, AlchemyComponents.quality(stack).ordinal()))];
+			return Math.min(OFFER_DAILY_CAP, Math.max(1.0D, townBase / dev.kultivator.dunia.kota.Harga.NB_PER_PK * factor));
 		}
 		if (stack.getItem() instanceof PillItem) {
 			return switch (AlchemyComponents.quality(stack)) {
@@ -238,6 +259,27 @@ final class Contribution {
 		return (int) Math.round(ware.price * HallLevel.price(level));
 	}
 
+	/** The price the owner's hall pays: {@link #price} less the alliance discount (audit R10). */
+	static int price(Ware ware, int level, UUID owner) {
+		return discounted(price(ware, level), owner);
+	}
+
+	/** 10 % off while the hall is allied with any NPC sect (DESIGN 36.2.9; nothing while module 36 is off). */
+	static int discounted(int price, UUID owner) {
+		return allied(owner) ? Math.max(1, (int) Math.round(price * (1.0D - PACT_DISCOUNT))) : price;
+	}
+
+	/** True when the owner's hall is allied with an NPC sect ({@code SekteApi.diplomasi()}). */
+	static boolean allied(UUID owner) {
+		dev.kultivator.sekte.api.DiplomasiService diplomacy = dev.kultivator.sekte.api.SekteApi.diplomasi();
+		for (String sect : diplomacy.sects()) {
+			if (diplomacy.stance(owner, sect) == dev.kultivator.sekte.api.Sikap.SEKUTU) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// ---- Slip Giok Teknik (DESIGN 22.8.4)
 
 	/**
@@ -291,12 +333,13 @@ final class Contribution {
 		for (Ware ware : Ware.values()) {
 			CompoundTag entry = new CompoundTag();
 			entry.putString("id", ware.id);
-			entry.putInt("price", price(ware, level));
+			entry.putInt("price", price(ware, level, owner));
 			entry.putInt("need", ware.level);
 			boolean unlocked = level >= ware.level;
 			boolean today = ware == Ware.INVITE ? core.getLongOr("invite_day", -1L) != Halls.dayIndex()
 					: ware != Ware.TECHNIQUE || slipsToday(core) < SLIPS_PER_DAY;
-			entry.putBoolean("ok", unlocked && today && pool >= price(ware, level));
+			entry.putBoolean("ok", unlocked && today && pool >= price(ware, level, owner));
+			entry.putBoolean("pact", allied(owner));
 			entry.putBoolean("locked", !unlocked);
 			entry.putBoolean("used_today", !today);
 			entry.putBoolean("target", ware.disciple);
@@ -305,9 +348,9 @@ final class Contribution {
 				for (TechniqueSpec spec : slips()) {
 					CompoundTag slip = new CompoundTag();
 					slip.putString("id", spec.id());
-					slip.putInt("price", slipPrice(spec, level));
+					slip.putInt("price", discounted(slipPrice(spec, level), owner));
 					slip.putInt("need", spec.grade().pavilionHallLevel());
-					slip.putBoolean("ok", today && level >= spec.grade().pavilionHallLevel() && pool >= slipPrice(spec, level));
+					slip.putBoolean("ok", today && level >= spec.grade().pavilionHallLevel() && pool >= discounted(slipPrice(spec, level), owner));
 					slips.add(slip);
 				}
 				entry.put("slips", slips);
@@ -329,7 +372,7 @@ final class Contribution {
 			Msg.chat(player, Component.translatable("kultivator.hall.shop.locked", ware.level).withStyle(ChatFormatting.YELLOW));
 			return;
 		}
-		int cost = price(ware, level);
+		int cost = price(ware, level, owner);
 		if (core.getIntOr("pool", 0) < cost) {
 			Msg.chat(player, Component.translatable("kultivator.hall.pk.pool_short", cost).withStyle(ChatFormatting.YELLOW));
 			return;
@@ -363,7 +406,7 @@ final class Contribution {
 				Msg.chat(player, Component.translatable("kultivator.sumber.pavilion.daily", SLIPS_PER_DAY).withStyle(ChatFormatting.YELLOW));
 				return;
 			}
-			cost = slipPrice(slip, level);
+			cost = discounted(slipPrice(slip, level), owner);
 			if (core.getIntOr("pool", 0) < cost) {
 				Msg.chat(player, Component.translatable("kultivator.hall.pk.pool_short", cost).withStyle(ChatFormatting.YELLOW));
 				return;
@@ -423,7 +466,7 @@ final class Contribution {
 			}
 			case WARDING -> give(player, pill(AlchemyItems.TRIBULATION_WARDING_PILL));
 			case GOLDEN_CORE -> give(player, pill(AlchemyItems.GOLDEN_CORE_PILL));
-			case MARROW -> give(player, new ItemStack(RootItems.MARROW_CLEANSING_PILL));
+			case MARROW -> give(player, AlchemyComponents.withQuality(new ItemStack(RootItems.MARROW_CLEANSING_PILL), PillQuality.PERFECT));
 			case CODEX -> {
 				SectRanks.setCodexManual(target.data());
 				// Opens the codex on module C's side too (a first Poin Tempa).

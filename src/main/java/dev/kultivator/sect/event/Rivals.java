@@ -39,11 +39,15 @@ final class Rivals {
 
 	/** A rival sect's visiting champion at rank step {@code step}. */
 	static Bracket.Entrant champion(RandomSource random, int step, int sect) {
+		return champion(random, step, Component.translatable("kultivator.sectevent.rival_sect." + Math.floorMod(sect, SECT_COUNT)));
+	}
+
+	/** A champion of the named sect (T12: an NPC sect of Diplomasi the hall already met). */
+	static Bracket.Entrant champion(RandomSource random, int step, Component sectName) {
 		DiscipleData data = body(random, step);
 		data.setComprehension(20.0D + random.nextInt(40));
 		Component name = Component.translatable("kultivator.sectevent.champion.name",
-				Component.translatable("kultivator.sectevent.rival." + random.nextInt(NAME_COUNT)),
-				Component.translatable("kultivator.sectevent.rival_sect." + Math.floorMod(sect, SECT_COUNT)));
+				Component.translatable("kultivator.sectevent.rival." + random.nextInt(NAME_COUNT)), sectName);
 		return new Bracket.Entrant(Bracket.CHAMPION, null, name, data, random.nextInt(DiscipleEntity.SKIN_COUNT), random.nextBoolean(),
 				data.rank().step());
 	}

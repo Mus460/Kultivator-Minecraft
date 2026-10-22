@@ -269,7 +269,7 @@
   "kultivator.dpower.why.flame_known": "Sudah memiliki api ini",
   "kultivator.dpower.why.flame_full": "Sudah menampung api sebanyak yang ia mampu (3, tambah satu tiap 9 bintang)",
 
-  "kultivator.dpower.natal.heading": "Pusaka Natal",
+  "kultivator.dpower.natal.heading": "Pusaka Natal Murid",
   "kultivator.dpower.natal.form.sword": "Pedang",
   "kultivator.dpower.natal.form.sword.desc": "Pedang terbang yang terikat nyawa. Di lipatan 9: kerusakan teknik +10%%.",
   "kultivator.dpower.natal.form.parasol": "Payung",
@@ -363,7 +363,7 @@
 
   "kultivator.screen.help.bakat.title": "Bakat, alam jiwa dan fisik langka",
   "kultivator.screen.help.bakat": "Setiap Murid membawa warna alam jiwanya, dari Merah (kultivasi ×0,6) sampai Nila (×1,7); alam jiwa Merah berhenti di Puncak Inti Emas kecuali keberuntungan menaikkannya (Pil Pembersih Sumsum, atau bermeditasi di sampingmu saat kamu bermeditasi). Sebagian punya bakat (Hati Gigih, Darah Dewa Kuno, Bakat Pil, Jari Penempa Roh, Takut Mati, Indra Pedang), segelintir punya fisik langka, dan sesekali ada calon istimewa yang bersembunyi di antara para pendaftar. Sejak Jiwa Baru Lahir setiap Dao punya Jurus Pamungkas yang dilepaskan murid sendiri melawan bos dan kerumunan, atau atas perintahmu dari halaman Bakat-nya. Semuanya hanya mengenai monster dan tak pernah menyentuh blok. Arahkan kursor ke setiap baris di halaman Bakat untuk membaca kisah asalnya.",
-  "kultivator.screen.help.pusaka.title": "Pusaka Natal, Kitab Abadi Tak Mati dan Api Surgawi",
+  "kultivator.screen.help.pusaka.title": "Pusaka Natal Murid, Kitab Abadi Tak Mati dan Api Surgawi",
   "kultivator.screen.help.pusaka": "Sejak Fondasi seorang Murid bisa memurnikan satu Pusaka Natal (Pedang, Payung, Wajan atau Lonceng) dengan sebutir berlian dan Bulu Ekor Roh di dalam wilayah aulamu, lalu menempanya lipatan demi lipatan dengan bulu dan PK sekte: tiap lipatan +5%% kerusakan, perak di 3, emas dan kemampuan bentuknya di 9, Payung Abadi di 14; sejak lipatan 3 kegagalan mematahkan satu lipatan. Kitab Abadi Tak Mati mengeraskan tubuh lewat pukulan yang ia tahan, sampai Darah Abadi yang menolak maut sekali sehari. Benih Api Surgawi jatuh dari blaze, stray, Elder Guardian, Wither dan Ender Dragon; berikan kepada murid yang cocok dan jaga ritual 20 detiknya.",
 
   "advancement.kultivator.rare_physique.title": "Terlahir Berbeda",

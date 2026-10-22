@@ -52,4 +52,21 @@ public interface DiplomasiService {
 	default @Nullable BlockPos gate(String sectId) {
 		return null;
 	}
+
+	/**
+	 * First contact of the owner's hall with the sect (T12/R7, for Sekte Langit 37 and other modules): marks it met, grants
+	 * {@code diplomasi_temu} and reveals its gate on the map when the gate exists. Idempotent.
+	 */
+	default void meet(UUID owner, String sectId) {
+	}
+
+	/** True when the owner's hall already met the sect (a gate visit, an envoy, a mission, a tournament). */
+	default boolean met(UUID owner, String sectId) {
+		return false;
+	}
+
+	/** The sect's planned gate column (x, 0, z) even before the gate was generated, or null (map domains, T12). */
+	default @Nullable BlockPos plannedGate(String sectId) {
+		return null;
+	}
 }

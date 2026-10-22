@@ -12,17 +12,12 @@ import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Element;
 import dev.kultivator.data.Realm;
-import dev.kultivator.disciple.DiscipleEntity;
-import dev.kultivator.disciple.DiscipleHooks;
 import dev.kultivator.util.Advancements;
-import dev.kultivator.util.Msg;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -71,7 +66,7 @@ public final class Harta {
 		BeastCores.init();
 		HartaLoot.init();
 		Breakthrough.addQualityBonusProvider(new StoneBottleneck());
-		DiscipleHooks.addFeedHandler(Harta::refuseNewPills);
+		// Audit S26: the phase-7 pills now work for disciples (DiscipleCultivation), so nothing refuses them here any more.
 		ServerTickEvents.END_SERVER_TICK.register(Harta::tickServer);
 		ServerPlayerEvents.JOIN.register(Harta::applyBoneTempering);
 		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> applyBoneTempering(newPlayer));
@@ -211,14 +206,13 @@ public final class Harta {
 
 	// ================================================================ hooks
 
-	/** Disciples cannot digest the four phase-7 pills yet (Phase 7b): refused, and the pill is kept. */
-	private static boolean refuseNewPills(DiscipleEntity entity, ServerPlayer master, ItemStack stack) {
-		if (stack.getItem() instanceof PillItem pill && pill.kind().phase7()) {
-			Msg.actionBar(master, Component.translatable("kultivator.harta.pill.disciple_refused", stack.getHoverName(), entity.getDisplayName())
-					.withStyle(ChatFormatting.YELLOW));
-			return true;
-		}
-		return false;
+	/**
+	 * True when a disciple can swallow {@code stack} as a pill (for a gift's value, e.g. {@code Kepribadian.giftValue} of
+	 * module 36): every alchemy pill (the phase-7 pills too since audit S26) and the Marrow Cleansing Pill; never the
+	 * Spirit Beast Pill or anything else. Cooldowns and realm needs are checked when the pill is actually given.
+	 */
+	public static boolean discipleAccepts(ItemStack stack) {
+		return stack != null && !stack.isEmpty() && (stack.getItem() instanceof PillItem || stack.is(dev.kultivator.item.RootItems.MARROW_CLEANSING_PILL));
 	}
 
 	private static void tickServer(MinecraftServer server) {

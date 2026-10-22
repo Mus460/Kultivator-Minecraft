@@ -127,6 +127,8 @@ public class HeavenDecreeSealItem extends Item {
 			builder.accept(Component.translatable(KEY + "tier.seal_permanent").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
 		}
 		builder.accept(Component.translatable(KEY + "seal.cooldown_hint").withStyle(ChatFormatting.DARK_GRAY));
+		// Audit S22/R1: cooldowns and settings live on the player, so a second seal adds nothing.
+		builder.accept(Component.translatable("kultivator.ekonomi.segel.satu").withStyle(ChatFormatting.DARK_GRAY));
 		builder.accept(Component.translatable(KEY + "seal.use").withStyle(ChatFormatting.GRAY));
 		builder.accept(Component.translatable(KEY + "seal.menu").withStyle(ChatFormatting.GRAY));
 		builder.accept(Component.translatable("kultivator.technique." + skill.specId() + ".source").withStyle(ChatFormatting.DARK_GRAY,

@@ -5,6 +5,7 @@ import dev.kultivator.client.duel.DuelKeys;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Glyphs;
 import dev.kultivator.client.screen.ui.JadeCoin;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.TalismanButton;
 import dev.kultivator.client.screen.ui.UiSound;
@@ -148,6 +149,8 @@ public final class DuelScreen extends DuelScrollScreen {
 		}
 		signature = currentSignature();
 		int mid = left + Math.round((right - left) * 0.56F);
+		// the "?" seal: Panduan › Ensiklopedia on the Sword Duel topic (audit M5, S11)
+		add(new KeyHints.HelpSeal(right - 5.0F, top + 5.0F, 10, () -> "duel_pedang"));
 		// ---- left column: the list, then "Duel Tonton"
 		listTop = top + 26;
 		int listBottom = bottom - 32;

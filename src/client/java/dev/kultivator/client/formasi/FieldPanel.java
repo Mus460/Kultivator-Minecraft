@@ -25,6 +25,7 @@ final class FieldPanel {
 		Font font = page.font();
 		CompoundTag f = page.f().getCompoundOrEmpty("field");
 		List<Line> lines = lines(f);
+		meditation(page.f().getCompoundOrEmpty("med"), lines);
 		page.title(g, Component.translatable("kultivator.formasiui.field.title"), x + 2.0F, y + 1.0F, w - 6.0F, 0.7F);
 		float top = y + 13.0F;
 		float view = h - 13.0F;
@@ -50,6 +51,20 @@ final class FieldPanel {
 			Brush.wrap(g, font, Component.translatable("kultivator.formasiui.field.note"), x + 4.0F, cursor + 4.0F, w - 10.0F, Palette.INK_FAINT, 0.5F, false);
 		}
 		FormasiPage.bead(g, x + w, Math.round(top), Math.round(top + view), offset, Math.max(0.0F, content - view));
+	}
+
+	/** Audit M4 T6: the meditation absorption limit ({@code formasi.med} from InfoPart.meditationLimit), shown first. */
+	private static void meditation(CompoundTag med, List<Line> out) {
+		if (!med.contains("cap")) {
+			return;
+		}
+		double inner = med.getFloatOr("inner", 0.0F);
+		double cap = med.getFloatOr("cap", 3.5F);
+		double sect = med.getFloatOr("sect", 1.0F);
+		double sectCap = med.getFloatOr("sectCap", 1.5F);
+		int color = med.getBooleanOr("capped", false) ? 0xFFE08040 : Palette.GOLD;
+		out.add(0, new Line(Component.translatable("kultivator.kekuatan.formasi.medcap", FormasiPage.decimal(inner), FormasiPage.decimal(cap),
+				FormasiPage.decimal(sect), FormasiPage.decimal(sectCap)), color, Component.translatable("kultivator.kekuatan.formasi.medcap.tip")));
 	}
 
 	private static List<Line> lines(CompoundTag f) {

@@ -57,10 +57,6 @@ public final class Simulasi {
 			for (GerbangPlan.Entry entry : plan.entries()) {
 				data.sects.add(SekteNpc.founded(entry));
 			}
-			List<String> groups = DuniaApi.rivals().all();
-			for (int i = 0; i < data.sects.size() && i < groups.size(); i++) {
-				data.sects.get(i).rivalLink = groups.get(i);
-			}
 			data.planSeed = seed;
 			data.planCount = config.jumlahSekte;
 			data.planMinDist = config.jarakMin;
@@ -72,7 +68,59 @@ public final class Simulasi {
 			data.addNews(day, Component.translatable(GeneratorNama.KEY + "berita.berdiri", data.sects.size()));
 			data.setDirty();
 		}
+		linkRivals(data);
 		keepPlanOf(server);
+	}
+
+	/**
+	 * T12: every sect without a Dunia rival group gets the group whose home region lies nearest its gate (a group not yet
+	 * taken first, then the nearest of all), stored by group id. Older worlds linked by index kept their links; their
+	 * sects past the group count (7-8) get one here.
+	 */
+	static void linkRivals(DiplomasiData data) {
+		List<String> groups = DuniaApi.rivals().all();
+		if (groups.isEmpty()) {
+			return;
+		}
+		java.util.Set<String> taken = new java.util.HashSet<>();
+		for (SekteNpc sect : data.sects) {
+			if (!sect.rivalLink.isEmpty()) {
+				taken.add(sect.rivalLink);
+			}
+		}
+		boolean changed = false;
+		for (SekteNpc sect : data.sects) {
+			if (!sect.rivalLink.isEmpty()) {
+				continue;
+			}
+			String free = nearestGroup(groups, sect, taken, true);
+			String pick = free != null ? free : nearestGroup(groups, sect, taken, false);
+			if (pick != null) {
+				sect.rivalLink = pick;
+				taken.add(pick);
+				changed = true;
+			}
+		}
+		if (changed) {
+			data.setDirty();
+		}
+	}
+
+	private static @Nullable String nearestGroup(List<String> groups, SekteNpc sect, java.util.Set<String> taken, boolean freeOnly) {
+		String best = null;
+		double bestD = Double.MAX_VALUE;
+		for (String id : groups) {
+			if (freeOnly && taken.contains(id)) {
+				continue;
+			}
+			net.minecraft.core.BlockPos region = DuniaApi.rivals().region(id);
+			double d = region == null ? Double.MAX_VALUE / 2 : Math.pow(region.getX() - sect.blockX, 2) + Math.pow(region.getZ() - sect.blockZ, 2);
+			if (d < bestD) {
+				bestD = d;
+				best = id;
+			}
+		}
+		return best;
 	}
 
 	/** The placement must keep planning the gates of the sects this world already has, whatever the config says now. */
@@ -245,9 +293,12 @@ public final class Simulasi {
 			Perang.daily(server, data, owner, sect, r, today, random);
 		}
 		Utusan.expire(server, owner);
-		int count = rollCount(Diplomasi.config().peristiwaPerHari, random);
+		int level = Halls.level(owner);
+		boolean early = early(owner);
+		// T11: a young hall (below mulaiAulaLevel) gets at most one quiet event a day.
+		int count = rollCount(early ? Math.min(1, Diplomasi.config().peristiwaPerHari) : Diplomasi.config().peristiwaPerHari, random);
 		for (int i = 0; i < count; i++) {
-			SekteNpc sect = pickSect(data, owner, random);
+			SekteNpc sect = pickSect(data, owner, random, level);
 			if (sect != null) {
 				event(server, data, owner, sect, data.relasi(owner, sect), random, today);
 			}
@@ -303,13 +354,24 @@ public final class Simulasi {
 		return Math.min(max, count);
 	}
 
-	/** A sect for today's event: stronger feelings and a known gate weigh more; vassals stay quiet. */
-	private static @Nullable SekteNpc pickSect(DiplomasiData data, UUID owner, RandomSource random) {
+	/** True while the hall is below {@code mulaiAulaLevel} (T11): no demand, raid, war, ambush or poaching yet. */
+	static boolean early(UUID owner) {
+		return Halls.level(owner) < Diplomasi.config().mulaiAulaLevel;
+	}
+
+	/**
+	 * A sect for today's event: stronger feelings and a known gate weigh more; vassals stay quiet. Only sects already met
+	 * or of tier at most {@code hallLevel + 2} come (T11: an unknown tier-9 sect does not knock on a new hall's door).
+	 */
+	private static @Nullable SekteNpc pickSect(DiplomasiData data, UUID owner, RandomSource random, int hallLevel) {
 		int total = 0;
 		int[] weights = new int[data.sects.size()];
 		for (int i = 0; i < weights.length; i++) {
 			SekteNpc sect = data.sects.get(i);
 			Relasi r = data.relasi(owner, sect);
+			if (!r.ditemui && !r.perang && sect.tier > hallLevel + 2) {
+				continue;
+			}
 			int w = r.bawahan ? 1 : 2 + Math.abs(r.standing) / 20 + (r.perang ? 4 : 0) + (r.ditemui ? 1 : 0);
 			weights[i] = w;
 			total += w;
@@ -334,6 +396,16 @@ public final class Simulasi {
 		boolean away = !SekteApi.misi().awaySouls(owner).isEmpty();
 		boolean strong = sect.strength() > Diplomasi.kekuatanAula(server, owner);
 		List<Peristiwa> table = new ArrayList<>();
+		if (early(owner) && !r.perang) {
+			// T11: a hall below mulaiAulaLevel meets only the quiet half of the table.
+			add(table, Peristiwa.UTUSAN, 3);
+			add(table, Peristiwa.HADIAH, sikap == Sikap.BERMUSUHAN || sikap == Sikap.DINGIN ? 0 : 1);
+			add(table, Peristiwa.TANTANG, sikap == Sikap.BERMUSUHAN ? 0 : 1);
+			add(table, Peristiwa.PAKTA, (sikap == Sikap.NETRAL || sikap == Sikap.RAMAH) && r.pakta == Relasi.PAKTA_TIDAK
+					&& r.standing >= Standing.PAKTA_DAMAI_MIN ? 1 : 0);
+			apply(server, data, owner, sect, r, table.get(random.nextInt(table.size())), random, today);
+			return;
+		}
 		switch (sikap) {
 			case PERANG -> {
 				add(table, Peristiwa.MEREKRUT, 2);
@@ -404,13 +476,12 @@ public final class Simulasi {
 				Diplomasi.fire(server, owner, sect, AksiSekte.HADIAH);
 			}
 			case TANTANG -> {
+				// T10: one door only. The envoy's offer (answered in the Diplomasi screen or by talking to the envoy) holds
+				// the challenge; TANTANGAN is no longer fired, so module T does not open a second prompt in chat.
 				Utusan.offer(server, owner, sect, Utusan.TANTANG);
-				Diplomasi.fire(server, owner, sect, AksiSekte.TANTANGAN);
+				Diplomasi.fire(server, owner, sect, AksiSekte.UTUSAN);
 			}
-			case KETUA -> {
-				Utusan.offer(server, owner, sect, Utusan.KETUA);
-				Diplomasi.fire(server, owner, sect, AksiSekte.TANTANGAN);
-			}
+			case KETUA -> Utusan.offer(server, owner, sect, Utusan.KETUA);
 			case SERANGAN -> Perang.serangan(server, data, owner, sect, r, random, today);
 			case SERGAP -> {
 				r.note(today, Component.translatable(GeneratorNama.KEY + "kronik.sergap"));

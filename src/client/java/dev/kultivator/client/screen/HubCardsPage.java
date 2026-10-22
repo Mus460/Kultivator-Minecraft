@@ -10,6 +10,7 @@ import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.UiSound;
 import dev.kultivator.client.screen.ui.Widget;
 import dev.kultivator.data.CultivationData;
+import dev.kultivator.data.Rank;
 import dev.kultivator.data.Realm;
 import dev.kultivator.network.Actions;
 import dev.kultivator.network.Payloads;
@@ -45,11 +46,26 @@ final class HubCardsPage extends Page {
 	private static final long DENIED_MILLIS = 2000L;
 	private static final int HEAD = 14;
 	private static final int GAP = 5;
+	private static final int MIN_CARD_H = 20;
+	private static final int MIN_CARD_W = 80;
+	private static final int MAX_COLS = 4;
+	/** Sub-coins of the Sekte section (audit M5, T9): the hall's own cards, then the cards of Sekte yang Hidup (36, 37). */
+	static final int SEKTE_SUB_AULA = 0;
+	static final int SEKTE_SUB_PERGURUAN = 1;
+	/** Id prefix of the cards that go to the Perguruan sub-coin and get the hall lock automatically. */
+	private static final String SEKTE_PREFIX = "sekte_";
 
 	private final int kind;
 	private final List<Card> cards = new ArrayList<>();
 	private long hallAsked = -1L;
 	private boolean builtNoHall;
+	private int sekteSub = SEKTE_SUB_AULA;
+	/** Grid scrolling, only when even the narrowest cards do not fit (a fallback; 320 × 240 and GUI 4 on 1366 × 768 fit). */
+	private int scroll;
+	private int maxScroll;
+	private int gridRoom;
+	private int gridBottom;
+	private int rowStep;
 
 	HubCardsPage(CultivationScreen screen, int kind) {
 		super(screen);
@@ -80,11 +96,35 @@ final class HubCardsPage extends Page {
 	String helpTopic() {
 		return switch (kind) {
 			case HubNav.MURID -> "calon";
-			case HubNav.SEKTE -> "aula";
+			case HubNav.SEKTE -> sekteSub == SEKTE_SUB_PERGURUAN ? "sekte_hidup" : "aula";
 			case HubNav.DUNIA -> "jalan_dunia";
 			case HubNav.KEABADIAN -> "jalan_abadi";
 			default -> "jalan";
 		};
+	}
+
+	/** Sekte: two sub-coins, Aula (the hall's own cards) and Perguruan (the {@code sekte_*} cards); none elsewhere. */
+	@Override
+	List<Component> subNames() {
+		if (kind != HubNav.SEKTE) {
+			return List.of();
+		}
+		return List.of(Component.translatable("kultivator.hub.sekte.sub.aula"), Component.translatable("kultivator.hub.sekte.sub.perguruan"));
+	}
+
+	@Override
+	void showSub(int index) {
+		if (kind != HubNav.SEKTE) {
+			return;
+		}
+		int wanted = Math.max(SEKTE_SUB_AULA, Math.min(SEKTE_SUB_PERGURUAN, index));
+		if (wanted != sekteSub) {
+			sekteSub = wanted;
+			scroll = 0;
+			if (w > 0) {
+				layout(x, y, w, h);
+			}
+		}
 	}
 
 	/** The hub switched to this page: the Sekte cards ask for the player's own hall (one refresh, no other traffic). */
@@ -146,6 +186,20 @@ final class HubCardsPage extends Page {
 		return Component.translatable("kultivator.hub.lock.ascend");
 	}
 
+	/**
+	 * Bencana Bintang (audit M5, T18): the calamities are what a True Immortal Peak goes through <i>before</i> the ascent
+	 * ({@code StarCalamity.refusal} only asks {@code rank.isMax()}), so the card opens at the Peak, not after the ascent.
+	 */
+	private static @Nullable Component peakLock() {
+		if (!ClientCultivation.received() || ascendedToImmortalRealm()) {
+			return null;
+		}
+		if (ClientCultivation.data().rank().isMax()) {
+			return null;
+		}
+		return Component.translatable("kultivator.hub.lock.realm", Rank.ofStep(Rank.MAX_STEP).displayName());
+	}
+
 	private static @Nullable Component titahLock() {
 		Component realm = realmLock(Realm.TRUE_IMMORTAL);
 		if (realm != null) {
@@ -182,29 +236,31 @@ final class HubCardsPage extends Page {
 			case HubNav.MURID -> card("murid", Glyphs.TALENT, null, () -> Keys.send(new Payloads.Action(Actions.DISCIPLE_OPEN, -1, "")));
 			case HubNav.SEKTE -> {
 				builtNoHall = noHall();
-				if (builtNoHall) {
-					card("dirikan", Glyphs.HALL, null, () -> HubNav.help("aula"));
+				if (sekteSub == SEKTE_SUB_AULA) {
+					if (builtNoHall) {
+						card("dirikan", Glyphs.HELP, null, () -> HubNav.help("aula"));
+					}
+					card("aula", Glyphs.HALL, this::hallLock, () -> HubNav.openHall(Halls.PAGE_AULA));
+					card("bangun", Glyphs.BUILD, this::hallLock, () -> HubNav.openHall(Halls.PAGE_BANGUN));
+					card("formasi", Glyphs.ROOT_DAO, this::hallLock, () -> HubNav.openHall(Halls.PAGE_FORMASI));
+					card("anggota", Glyphs.TALENT, this::hallLock, () -> HubNav.openHall(Halls.PAGE_CALON));
+					card("perbendaharaan", Glyphs.TREASURE, this::hallLock, () -> HubNav.openHall(Halls.PAGE_TREASURY));
+					card("kegiatan", Glyphs.JALAN, this::hallLock, () -> HubNav.openHall(HALL_TUGAS));
+					card("wilayah", Glyphs.PATH, this::hallLock, () -> HubNav.openHall(Halls.PAGE_PERTAHANAN));
+					card("segel_merah", Glyphs.SEAL, this::redSealLock, () -> HubNav.openHall(HALL_SEGEL_MERAH));
 				}
-				card("aula", Glyphs.HALL, this::hallLock, () -> HubNav.openHall(Halls.PAGE_AULA));
-				card("bangun", Glyphs.BUILD, this::hallLock, () -> HubNav.openHall(Halls.PAGE_BANGUN));
-				card("formasi", Glyphs.ROOT_DAO, this::hallLock, () -> HubNav.openHall(Halls.PAGE_FORMASI));
-				card("anggota", Glyphs.TALENT, this::hallLock, () -> HubNav.openHall(Halls.PAGE_CALON));
-				card("perbendaharaan", Glyphs.TREASURE, this::hallLock, () -> HubNav.openHall(Halls.PAGE_TREASURY));
-				card("kegiatan", Glyphs.JALAN, this::hallLock, () -> HubNav.openHall(HALL_TUGAS));
-				card("wilayah", Glyphs.PATH, this::hallLock, () -> HubNav.openHall(Halls.PAGE_PERTAHANAN));
-				card("segel_merah", Glyphs.SEAL, this::redSealLock, () -> HubNav.openHall(HALL_SEGEL_MERAH));
 			}
 			case HubNav.DUNIA -> {
 				card("alam_rahasia", Glyphs.PATH, () -> realmLock(Realm.QI_REFINING),
 						() -> dev.kultivator.client.dunia.DuniaClient.open(Payloads.OpenScreen.DUNIA_ALAM));
 				card("pusaka", Glyphs.TREASURE, null, () -> dev.kultivator.client.dunia.DuniaClient.open(Payloads.OpenScreen.DUNIA_PUSAKA));
-				card("musuh", Glyphs.TECHNIQUES, null, () -> dev.kultivator.client.dunia.DuniaClient.open(Payloads.OpenScreen.DUNIA_MUSUH));
+				card("musuh", Glyphs.SEAL, null, () -> dev.kultivator.client.dunia.DuniaClient.open(Payloads.OpenScreen.DUNIA_MUSUH));
 				card("cincin", Glyphs.RING, null, () -> Keys.send(new Payloads.Action(Actions.TEMPA, 0, "ring:open")));
 			}
 			case HubNav.KEABADIAN -> {
 				card("alam_abadi", Glyphs.SEAL, null, () -> abadi(Payloads.OpenScreen.ABADI_ALAM));
 				card("purba", Glyphs.TALENT, HubCardsPage::ascentLock, () -> abadi(Payloads.OpenScreen.ABADI_PURBA));
-				card("bencana", Glyphs.ALKIMIA, HubCardsPage::ascentLock, () -> abadi(Payloads.OpenScreen.ABADI_BENCANA));
+				card("bencana", Glyphs.ALKIMIA, HubCardsPage::peakLock, () -> abadi(Payloads.OpenScreen.ABADI_BENCANA));
 				card("batin", Glyphs.STATUS, HubCardsPage::ascentLock, () -> abadi(Payloads.OpenScreen.ABADI_BATIN));
 				card("ciptaan", Glyphs.CODEX, HubCardsPage::ascentLock, () -> abadi(Payloads.OpenScreen.ABADI_CIPTAAN));
 				card("lelang", Glyphs.TREASURE, HubCardsPage::ascentLock, () -> abadi(Payloads.OpenScreen.ABADI_LELANG));
@@ -215,11 +271,46 @@ final class HubCardsPage extends Page {
 				card("ensiklopedia", Glyphs.HELP, null, () -> screen.showSection(HubNav.PANDUAN, HubNav.SUB_ENSIKLOPEDIA));
 			}
 		}
-		// Phase 34 (DESIGN 34.6 T): the cards other modules registered for this section.
+		// Phase 34 (DESIGN 34.6 T): the cards other modules registered for this section. In Sekte the sekte_* cards (36, 37)
+		// form the Perguruan sub-coin and always carry the hall lock before their own (audit M5, T9).
 		for (dev.kultivator.client.hub.HubCards.Extra extra : dev.kultivator.client.hub.HubCards.of(kind)) {
-			card(extra.id(), extra.glyph(), extra.lock(), extra.action());
+			boolean perguruan = extra.id().startsWith(SEKTE_PREFIX);
+			if (kind == HubNav.SEKTE) {
+				if (perguruan != (sekteSub == SEKTE_SUB_PERGURUAN)) {
+					continue;
+				}
+				card(extra.id(), glyphOf(extra.id(), extra.glyph()), perguruan ? withHallLock(extra.lock()) : extra.lock(), extra.action());
+			} else {
+				card(extra.id(), glyphOf(extra.id(), extra.glyph()), extra.lock(), extra.action());
+			}
 		}
 		layoutCards();
+	}
+
+	/** The hall lock first, then the card's own lock line (null = open). */
+	private Supplier<Component> withHallLock(@Nullable Supplier<Component> own) {
+		return () -> {
+			Component hall = hallLock();
+			if (hall != null) {
+				return hall;
+			}
+			return own == null ? null : own.get();
+		};
+	}
+
+	/**
+	 * One glyph per card within a section (audit M5, T9): the registered glyphs of the later modules repeat the built-in
+	 * ones (three seals in Perguruan, two paths and two swords in Dunia), so a few ids get their own here. Others keep theirs.
+	 */
+	private static int glyphOf(String id, int registered) {
+		return switch (id) {
+			case "sekte_diplomasi_rival" -> Glyphs.JALAN;
+			case "sekte_turnamen_papan" -> Glyphs.TECHNIQUES;
+			case "sekte_langit" -> Glyphs.BUILD;
+			case "peta_dunia" -> Glyphs.JALAN;
+			case "saingan" -> Glyphs.STATUS;
+			default -> registered;
+		};
 	}
 
 	private static void abadi(int tab) {
@@ -231,28 +322,71 @@ final class HubCardsPage extends Page {
 		cards.add(add(card));
 	}
 
-	/** A grid of 1-3 columns that always fits the content box (no scrolling at 320 × 240). */
+	/**
+	 * A grid of 1-3 columns that fits the content box. When the rows would need cards lower than 20 px, one more column is
+	 * tried (up to 4, each at least 80 px wide); only if that still does not fit does the grid scroll with the wheel (audit
+	 * M5, T9: a Sekte sub-coin holds at most 9 cards, which fits 320 × 240 and GUI scale 4 on 1366 × 768).
+	 */
 	private void layoutCards() {
 		int n = cards.size();
+		int footer = kind == HubNav.MURID || kind == HubNav.SEKTE ? 12 : 0;
+		gridRoom = Math.max(MIN_CARD_H, h - HEAD - footer);
+		maxScroll = 0;
 		if (n == 0) {
+			gridBottom = y + HEAD;
 			return;
 		}
 		int cols = w >= 330 ? 3 : w >= 170 ? 2 : 1;
 		cols = Math.max(1, Math.min(cols, n));
+		while (cols < Math.min(n, MAX_COLS) && gridHeight(n, cols, MIN_CARD_H) > gridRoom
+				&& (w - 4 - GAP * cols) / (cols + 1) >= MIN_CARD_W) {
+			cols++;
+		}
 		int rows = (n + cols - 1) / cols;
-		int footer = kind == HubNav.MURID || kind == HubNav.SEKTE ? 12 : 0;
-		int room = h - HEAD - footer - GAP * (rows - 1);
-		int cardH = Math.max(20, Math.min(kind == HubNav.MURID || kind == HubNav.PANDUAN ? 52 : 40, room / rows));
+		int room = gridRoom - GAP * (rows - 1);
+		int cardH = Math.max(MIN_CARD_H, Math.min(kind == HubNav.MURID || kind == HubNav.PANDUAN ? 52 : 40, room / rows));
 		int cardW = (w - 4 - GAP * (cols - 1)) / cols;
+		int total = gridHeight(n, cols, cardH);
+		maxScroll = Math.max(0, total - gridRoom);
+		scroll = Math.max(0, Math.min(maxScroll, scroll));
+		rowStep = cardH + GAP;
 		for (int i = 0; i < n; i++) {
 			Card card = cards.get(i);
 			int col = i % cols;
 			int row = i / cols;
 			card.x = x + 2 + col * (cardW + GAP);
-			card.y = y + HEAD + row * (cardH + GAP);
+			card.y = y + HEAD + row * (cardH + GAP) - scroll;
 			card.w = cardW;
 			card.h = cardH;
 		}
+		gridBottom = y + HEAD + Math.min(total, gridRoom);
+	}
+
+	private static int gridHeight(int n, int cols, int cardH) {
+		int rows = (n + cols - 1) / cols;
+		return rows * cardH + GAP * (rows - 1);
+	}
+
+	/** Cards scrolled (even partly) out of the grid are not drawn or clickable. */
+	@Override
+	protected boolean visible(Widget widget) {
+		if (maxScroll <= 0) {
+			return true;
+		}
+		return widget.y >= y + HEAD - 1 && widget.y + widget.h <= y + HEAD + gridRoom + 1;
+	}
+
+	@Override
+	boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+		if (maxScroll <= 0 || !inside(mouseX, mouseY)) {
+			return false;
+		}
+		int before = scroll;
+		scroll = Math.max(0, Math.min(maxScroll, scroll - (int) Math.signum(amount) * Math.max(1, rowStep)));
+		if (scroll != before) {
+			layoutCards();
+		}
+		return true;
 	}
 
 	@Override
@@ -261,12 +395,26 @@ final class HubCardsPage extends Page {
 			// The hall answer arrived: the "Dirikan sekte" card comes or goes (no structure change mid-frame after this).
 			layout(x, y, w, h);
 		}
-		heading(g, title(), x + 2.0F, y, w - 4.0F, 0.85F);
+		Component heading = kind == HubNav.SEKTE ? subNames().get(sekteSub) : title();
+		heading(g, heading, x + 2.0F, y, w - 4.0F, 0.85F);
 		if (cards.isEmpty()) {
+			if (kind == HubNav.SEKTE && sekteSub == SEKTE_SUB_PERGURUAN) {
+				// No sekte_* card was registered on this client: say where the sect modules come from instead of a blank page.
+				Brush.wrap(g, font, Component.translatable("kultivator.hub.sekte.perguruan.empty"), x + 4.0F, y + HEAD + 2.0F, w - 8.0F,
+						Palette.INK_SOFT, 0.7F, false);
+			}
 			return;
 		}
-		Card last = cards.get(cards.size() - 1);
-		float footY = last.y + last.h + 4.0F;
+		if (maxScroll > 0) {
+			// A thin jade rail on the right edge shows where the scrolled grid is.
+			float railTop = y + HEAD;
+			float railH = gridRoom;
+			float knobH = Math.max(8.0F, railH * gridRoom / (float) (gridRoom + maxScroll));
+			float knobY = railTop + (railH - knobH) * scroll / (float) maxScroll;
+			Brush.rect(g, x + w - 1.5F, railTop, x + w - 0.5F, railTop + railH, Palette.argb(0x40, Palette.GOLD));
+			Brush.rect(g, x + w - 2.0F, knobY, x + w, knobY + knobH, Palette.argb(0xC0, Palette.JADE_DARK));
+		}
+		float footY = gridBottom + 4.0F;
 		if (kind == HubNav.MURID) {
 			Component hint = Component.translatable("kultivator.hub.murid.hint", Keys.MURID.getTranslatedKeyMessage());
 			Brush.wrap(g, font, hint, x + 4.0F, footY, w - 8.0F, Palette.INK_SOFT, 0.65F, false);

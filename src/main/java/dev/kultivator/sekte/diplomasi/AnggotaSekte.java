@@ -3,6 +3,7 @@ package dev.kultivator.sekte.diplomasi;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.dunia.AnchorHandler;
 import dev.kultivator.dunia.DuniaAnchorEntity;
+import dev.kultivator.dunia.DuniaSites;
 import dev.kultivator.sekte.api.Sikap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -31,6 +32,8 @@ import java.util.UUID;
 final class AnggotaSekte implements AnchorHandler {
 
 	static final String MODULE = "sektenpc";
+	/** The Dunia site kind of an NPC sect's mountain gate (T12: map marker and pointer by module M2). */
+	public static final String SITE_KIND = "sekte/gerbang";
 	static final AnggotaSekte HANDLER = new AnggotaSekte();
 	/** A gate's greeting repeats for the same player after this long (ticks). */
 	static final long GREET_AGAIN = 20L * 60L * 10L;
@@ -85,7 +88,13 @@ final class AnggotaSekte implements AnchorHandler {
 		}
 		SekteNpc sect = sectOf(anchor);
 		MinecraftServer server = level.getServer();
-		if (sect == null || sect.gateBorn()) {
+		if (sect == null) {
+			return;
+		}
+		// T12: the gate is a Dunia site (map marker, rumours, locate), also for gates born before this was added
+		// (publish is idempotent). Its position is the planned column at the anchor's height, the same as sect.gate().
+		DuniaSites.publish(level, SITE_KIND, new BlockPos(sect.blockX, anchor.getBlockY(), sect.blockZ), sect.tier);
+		if (sect.gateBorn()) {
 			return;
 		}
 		DiplomasiData data = DiplomasiData.get(server);

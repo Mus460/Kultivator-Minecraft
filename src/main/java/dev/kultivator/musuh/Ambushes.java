@@ -1,21 +1,17 @@
 package dev.kultivator.musuh;
 
 import dev.kultivator.KultivatorConfig;
-import dev.kultivator.alam.Alam;
-import dev.kultivator.cultivation.Breakthrough;
-import dev.kultivator.cultivation.Tribulation;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Realm;
-import dev.kultivator.disciple.DuelRules;
+import dev.kultivator.dunia.api.DuniaApi;
 import dev.kultivator.fx.Fx;
 import dev.kultivator.fx.FxType;
-import dev.kultivator.sect.Sparring;
 import dev.kultivator.sect.hall.HallData;
 import dev.kultivator.sect.hall.Halls;
-import dev.kultivator.trial.HeartDemons;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
+import dev.kultivator.util.Sibuk;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.ChatFormatting;
@@ -71,10 +67,15 @@ final class Ambushes {
 
 	private static final Map<UUID, Pending> PENDING = new HashMap<>();
 	private static final Map<UUID, Live> LIVE = new HashMap<>();
+	/** Player -> game time of the postponed roll (the player was busy at the roll: asked again, never dropped). */
+	private static final Map<UUID, Long> RETRY = new HashMap<>();
 
 	static void init() {
+		// A coming or live ambush is an enemy event for the shared pressure (one at a time, daily cap).
+		Sibuk.registerEnemy("sergapan", player -> busy(player.getUUID()));
 		ServerPlayerEvents.LEAVE.register(player -> {
 			PENDING.remove(player.getUUID());
+			RETRY.remove(player.getUUID());
 			Live live = LIVE.remove(player.getUUID());
 			if (live != null) {
 				live.band.dismiss();
@@ -83,6 +84,7 @@ final class Ambushes {
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			PENDING.clear();
 			LIVE.clear();
+			RETRY.clear();
 		});
 	}
 
@@ -90,9 +92,19 @@ final class Ambushes {
 		KultivatorConfig config = KultivatorConfig.get();
 		if (config.rogueAmbushes && config.rogueAmbushChanceScale > 0.0D) {
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				if ((tick + (player.getUUID().hashCode() & 0x7FFFFFFF)) % ROLL_TICKS == 0L) {
-					roll(player, false);
+				Long retry = RETRY.get(player.getUUID());
+				boolean due = (tick + (player.getUUID().hashCode() & 0x7FFFFFFF)) % ROLL_TICKS == 0L;
+				if (retry != null && player.level().getGameTime() >= retry) {
+					RETRY.remove(player.getUUID());
+					due = true;
 				}
+				if (due && isBusyKey(roll(player, false))) {
+					// Busy (a duel, a tribulation, a realm...): the same roll is asked again in 10 s, until the next one.
+					RETRY.put(player.getUUID(), player.level().getGameTime() + Sibuk.RETRY_TICKS);
+				}
+			}
+			if (tick % ROLL_TICKS == 0L) {
+				RETRY.clear();
 			}
 		}
 		if (!PENDING.isEmpty()) {
@@ -158,6 +170,11 @@ final class Ambushes {
 			if (now < dunia.getLongOr("ambush_cd", 0L)) {
 				return "kultivator.musuh.ambush.refuse.cooldown";
 			}
+			// Shared enemy pressure: the daily cap of ambushes, rival bands and raids together.
+			String pressure = Sibuk.enemyRefusal(player);
+			if (pressure != null) {
+				return pressure;
+			}
 			double chance = Math.min(CHANCE_CAP, (BASE_CHANCE + CHANCE_PER_REALM * realm.ordinal()) * KultivatorConfig.get().rogueAmbushChanceScale);
 			if (level.getRandom().nextDouble() >= chance) {
 				return "kultivator.musuh.ambush.refuse.chance";
@@ -166,12 +183,20 @@ final class Ambushes {
 		int[] tiers = party(realm, level.getRandom());
 		dunia.putLong("ambush_cd", now + COOLDOWN_TICKS);
 		Cultivators.dirty(player);
+		if (!forced) {
+			Sibuk.enemyTaken(player, "sergapan");
+		}
 		PENDING.put(player.getUUID(), new Pending(now + TELEGRAPH_TICKS, tiers, realm.ordinal()));
 		// Killing intent: "Don't hide! Reveal yourself!" (RMJ ch. 388).
 		Msg.actionBar(player, Component.translatable("kultivator.musuh.ambush.alert", tiers.length).withStyle(ChatFormatting.DARK_RED));
 		Fx.sendTo(player, player.position(), player.position(), FxType.MUSUH, MusuhFxIds.AMBUSH_ALERT, tiers.length, 0.0F);
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 1.0F, 0.8F);
 		return null;
+	}
+
+	/** True for a refusal that only means "not now" (busy): the roll is asked again. */
+	private static boolean isBusyKey(@Nullable String refusal) {
+		return refusal != null && refusal.startsWith(Sibuk.KEY_PREFIX) && !refusal.equals(Sibuk.KEY_PREFIX + "tekanan.harian");
 	}
 
 	/** The party of DESIGN 25.4.3 by the player's realm. */
@@ -210,9 +235,14 @@ final class Ambushes {
 		if (!player.onGround() || player.getAbilities().flying || player.isFallFlying() || player.isPassenger() || player.isInWater()) {
 			return "kultivator.musuh.ambush.refuse.moving";
 		}
-		if (Alam.inRun(player) || Alam.isRealmLevel(level) || HeartDemons.inTrial(player) || DuelRules.inDuel(player) || Sparring.inDuel(player)
-				|| Tribulation.isActive(player) || Breakthrough.isBusy(player)) {
-			return "kultivator.musuh.ambush.refuse.busy";
+		// One "busy" door for every system (realms, trials, duels, tribulation, breakthrough, wrath, rituals, other enemies).
+		String busy = Sibuk.why(player);
+		if (busy != null) {
+			return busy;
+		}
+		// Towns and Kota Abadi are safe ground (Panduan c14.saingan).
+		if (DuniaApi.safeGround(level, player.blockPosition())) {
+			return "kultivator.musuh.ambush.refuse.town";
 		}
 		Vec3 pos = player.position();
 		Halls.HallView own = Halls.hallOf(player.getUUID());

@@ -239,7 +239,7 @@ EMO = {  # emotion -> (pitch, intonation, speed, volume) used when a voice has n
 
 
 # readings Open JTalk gets wrong (captions keep the kanji)
-READ = {'師尊': 'しそん', '天劫': 'てんごう', '仙帝': 'せんてい', 'お主': 'おぬし', '理': 'ことわり'}
+READ = {'宗主': 'そうしゅ', '擂台': 'らいたい', '師匠': 'ししょう', '師尊': 'しそん', '天劫': 'てんごう', '仙帝': 'せんてい', 'お主': 'おぬし', '理': 'ことわり'}
 
 
 def tts(text, style, emo='normal', speed=1.0, pitch_scale=None, intonation=None, pre=0.05, post=0.12):
@@ -327,6 +327,12 @@ LINES = [
     ('rogue', 'ambush', 'ここで会ったが百年目！その宝、置いていけ！', 'At last we meet! Leave your treasures behind!', 'Akhirnya kita bertemu! Tinggalkan hartamu!', ROGUE, 'angry', 1.0),
     ('rogue', 'flee', 'くっ……覚えていろ！', 'Tch... you will remember this!', 'Cih... ingat saja ini!', ROGUE, 'angry', 1.05),
     ('rogue', 'defeat', 'ば、馬鹿な……', 'I-impossible...', 'T-tidak mungkin...', ROGUE, 'sad', 0.95),
+    ('elder', 'leitai_buka', '宗門大会、開幕！弟子たちよ、擂台に上がれ！', 'The sect tournament begins! Disciples, take the stage!', 'Turnamen sekte dibuka! Murid-murid, naiklah ke panggung!', ELDER, 'normal', 0.95),
+    ('elder', 'banner', '宗門の旗が山門に掲げられました。', 'The sect banner has been raised at the gate.', 'Bendera sekte telah dikibarkan di gerbang.', ELDER, 'calm', 0.95),
+    ('elder', 'envoy', '我が宗門の使者、和をもって参りました。', "Our sect's envoy comes in peace.", 'Utusan sekte kami datang dengan damai.', ELDER, 'calm', 0.95),
+    ('boss', 'tamu_tantang', '我が宗門、貴殿らの剣を試しに参った。', 'Our sect has come to test your swords.', 'Sekte kami datang untuk menguji pedang kalian.', ANCIENT, 'normal', 0.9),
+    ('boss', 'sect_master', '貴様の宗門が我らに挑むか。', 'Your sect dares challenge us?', 'Sektemu berani menantang kami?', ANCIENT, 'angry', 0.9),
+    ('boss', 'sect_master_defeat', '今日より…我が宗門は従おう。', 'From today... our sect submits.', 'Hari ini... sekte kami tunduk.', ANCIENT, 'sad', 0.9),
 ]
 
 # Disciples: every disciple keeps one of six voices (picked from its UUID in code).
@@ -361,6 +367,30 @@ DISCIPLE = [
     ('formation', '陣法、準備完了です！', 'The formation is ready!', 'Formasi sudah siap!', 'normal'),
     ('injured', 'うっ……まだ、戦えます……', 'Ugh... I can still fight...', 'Ugh... saya masih bisa bertarung...', 'sad'),
     ('farewell', 'いってらっしゃいませ、師尊。', 'Have a safe journey, Master.', 'Selamat jalan, Guru.', 'calm'),
+    ('sulk', 'やりたくありません。', "I don't want to.", 'Aku tidak mau.', 'sad'),
+    ('rebel', '師匠、今日こそ挑ませてもらう！', 'Master, today I challenge you!', 'Guru, hari ini aku menantangmu!', 'angry'),
+    ('submit', '負けました…ここに残ります。', 'I lost... I will stay here.', 'Aku kalah... aku akan tetap di sini.', 'sad'),
+    ('leave_night', '師匠、お許しください。', 'Forgive me, Master.', 'Maafkan aku, Guru.', 'sad'),
+    ('oath', '義兄弟の契りを結ぼう！', 'Let us swear to be siblings!', 'Mari bersumpah menjadi saudara!', 'joy'),
+    ('tea', 'お茶をどうぞ。', 'Please, have some tea.', 'Silakan, minum tehnya.', 'calm'),
+    ('grudge', 'お前だけは許さない。', 'I will never forgive you.', 'Aku tidak akan memaafkanmu.', 'angry'),
+    ('beloved', 'あなたと一緒なら。', 'As long as I am with you.', 'Asal bersamamu.', 'calm'),
+    ('leitai_salam', 'お手合わせ願います！', 'Please spar with me!', 'Mohon petunjuknya!', 'normal'),
+    ('leitai_juara', '師匠、この栄冠は宗門のために！', 'Master, this title is for our sect!', 'Guru, gelar ini untuk sekte kita!', 'joy'),
+    ('leitai_kalah', 'まだ力が足りない…次の大会こそ！', 'Not strong enough yet... next season!', 'Aku belum cukup kuat... musim depan!', 'sad'),
+    ('climb_peak', '頂に着いた！', 'I reached the peak!', 'Aku sampai di puncak!', 'joy'),
+    ('climb_illusion', 'これは幻だ…退かぬ！', 'This is only an illusion... I will not retreat!', 'Ini hanya ilusi… aku tidak akan mundur!', 'angry'),
+    ('mourn', '安らかに眠れ。', 'Rest in peace.', 'Beristirahatlah dengan tenang.', 'sad'),
+    ('study', 'この書、少しずつ分かってきた。', 'This scripture... I am starting to understand.', 'Kitab ini... aku mulai mengerti.', 'calm'),
+    ('qingming', 'ご先祖様、我らの礼をお受けください。', 'Ancestors, accept our respects.', 'Para leluhur, terimalah hormat kami.', 'calm'),
+    ('report', '宗主、今朝のご報告です。', "Sect Master, this morning's report.", 'Ketua, laporan pagi ini.', 'normal'),
+    ('depart', '行ってまいります、師匠。', 'We are setting off, Master.', 'Murid berangkat, Guru.', 'normal'),
+    ('mission_report', '師匠、ただいま戻りました。ご報告いたします。', 'Master, I have returned to report.', 'Guru, murid kembali dan melapor.', 'normal'),
+    ('abandoned', '師匠……私を見捨てたのですか。', 'Master... you abandoned me?', 'Guru... meninggalkanku?', 'sad'),
+    ('robe', '宗門の紋の新しい衣…ありがとうございます、師匠。', 'A new robe with the sect emblem... thank you, Master.', 'Jubah baru dengan lambang sekte... terima kasih, Guru.', 'joy'),
+    ('envoy_return', '師匠、使者の務めを果たしてまいりました。', 'Master, the envoy duty is done.', 'Guru, tugas utusan telah selesai.', 'normal'),
+    ('harvest', '師匠、良い収穫です！', 'A good harvest, Master!', 'Panennya bagus, Guru!', 'joy'),
+    ('ore_found', '師匠、岩の中で何かが光っています！', 'Master, something is shining inside the rock!', 'Guru, ada yang bersinar di dalam batu!', 'joy'),
 ]
 
 manifest = {'lines': [], 'disciple_voices': VOICE_CREDIT}
@@ -429,8 +459,6 @@ WORLD = [
     ('heaven.langit.twin_moons', 'heaven', '二つの月が夜を照らす。', 'Two moons light the night.', 'Dua bulan menerangi malam.', 'normal'),
     ('heaven.langit.treasure_born', 'heaven_fierce', '天地の宝、ここに生まる。', 'A treasure of Heaven and Earth is born.', 'Harta langit dan bumi telah lahir.', 'normal'),
     ('heaven.langit.blood_eclipse', 'heaven_fierce', '血の月…天が怒っている。', 'A blood moon... Heaven is enraged.', 'Bulan berdarah… langit murka.', 'normal'),
-    ('langit.treasure_born', 'heaven_fierce', '天地の宝、ここに生まる。', 'A treasure of Heaven and Earth is born.', 'Harta langit dan bumi telah lahir.', 'normal'),
-    ('langit.blood_eclipse', 'heaven_fierce', '血の月…天が怒っている。', 'A blood moon... Heaven is enraged.', 'Bulan berdarah… langit murka.', 'normal'),
     ('naga.subdued', 'heaven', '龍、ここに伏す。', 'The dragon submits.', 'Naga telah tunduk.', 'normal'),
     ('naga.tribulation', 'heaven_fierce', '天が汝の霊獣を試す。', 'Heaven tests your spirit beast.', 'Langit menguji binatang rohmu.', 'normal'),
     ('naga.evolved', 'heaven_fierce', '古の血が目覚め、霊獣が進化する！', 'Ancient blood awakens, the spirit beast evolves!', 'Darah purba bangkit, binatang roh berevolusi!', 'normal'),

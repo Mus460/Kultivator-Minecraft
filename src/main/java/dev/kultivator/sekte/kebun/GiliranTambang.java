@@ -14,6 +14,7 @@ import dev.kultivator.sekte.api.SekteApi;
 import dev.kultivator.sekte.api.SekteBus;
 import dev.kultivator.sekte.kebun.Kebun.Aula;
 import dev.kultivator.util.Advancements;
+import dev.kultivator.sekte.SekteSuara;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -130,6 +131,7 @@ public final class GiliranTambang {
 			aula.level().playSound(null, at.x, at.y, at.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 1.0F, 0.6F);
 			KebunPayloads.fx(aula.level(), KebunPayloads.FX_INTI, at, 0xFFD27A);
 			Pertumbuhan.scene(aula, Kebun.BEAT_CORE, coreFinder, at, level);
+			SekteSuara.line(coreFinder, "ore_found", "cheer", 200);
 		}
 	}
 

@@ -52,7 +52,7 @@
   "kultivator.sekte.turnamen.ui.sepanjang_masa": "All Time",
   "kultivator.sekte.turnamen.ui.sepanjang_baris": "%s. %s · %s points · %s titles",
   "kultivator.sekte.turnamen.ui.tribun_ada": "The lei tai tribune stands.",
-  "kultivator.sekte.turnamen.ui.tribun_belum": "No tribune yet (templates 6-9, tier 7).",
+  "kultivator.sekte.turnamen.ui.tribun_belum": "No tribune yet. Needs template 6+ (raise the template on the Build page), then a tier-7 component.",
   "kultivator.sekte.turnamen.ui.tantangan": "A challenge from %s!",
   "kultivator.sekte.turnamen.hud.judul": "Season %s · Bout %s",
   "kultivator.sekte.turnamen.hud.final": "Season %s · The Final",

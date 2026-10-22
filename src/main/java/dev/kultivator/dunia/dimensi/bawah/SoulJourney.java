@@ -118,6 +118,9 @@ public final class SoulJourney {
 				Dimensi.schedule(1, () -> checkBody(serverLevel, body));
 			}
 		});
+		// the disciples stay by the body while the soul walks Dunia Bawah (integration audit M2 step 7)
+		dev.kultivator.disciple.Disciples.addFollowVeto((player, origin, destination) ->
+				DimensiLevels.isBawah(destination) || DimensiLevels.isBawah(origin) ? "kultivator.sambung.murid.jaga_tubuh" : null);
 		Qi.addRegenFactor(player -> lukaLeft(player) > 0L ? LUKA_QI_FACTOR : 1.0D);
 		Meditation.addGatheringProvider(SoulJourney::lanternFactor);
 		DuniaApi.setSouls(new SoulService() {

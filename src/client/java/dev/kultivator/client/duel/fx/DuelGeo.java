@@ -119,9 +119,12 @@ public final class DuelGeo {
 		add.submit(collector.order(1), poseStack);
 	}
 
-	/** Takes {@code n} quads of this frame's budget (35.4.12); false (nothing drawn) when it would overflow. */
+	/**
+	 * Takes {@code n} quads of this frame's budget (35.4.12); false (nothing drawn) when it would overflow. Audit M4 S10: the
+	 * quads also come out of {@link dev.kultivator.client.epic.EpicBudget#takeQuads}, the frame budget 7b draws from.
+	 */
 	public boolean take(int n) {
-		if (quads + n > quadCap) {
+		if (quads + n > quadCap || !dev.kultivator.client.epic.EpicBudget.takeQuads(n)) {
 			return false;
 		}
 		quads += n;

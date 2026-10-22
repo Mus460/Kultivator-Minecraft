@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.kultivator.client.dunia.peta.PetaClient;
 import dev.kultivator.client.dunia.peta.PetaUi;
 import dev.kultivator.client.screen.ui.Brush;
+import dev.kultivator.client.screen.ui.KeyHints;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.client.screen.ui.ScrollFrame;
 import dev.kultivator.client.screen.ui.SlipTooltip;
@@ -55,6 +56,8 @@ public final class HelmScreen extends Screen {
 	private @Nullable EditBox nameBox;
 	/** The name being typed (kept while the server refreshes the screen). */
 	private @Nullable String nameDraft;
+	/** The "?" seal: Panduan › Ensiklopedia on the ship topic (audit M5, S11). */
+	private final KeyHints.SealCorner help = new KeyHints.SealCorner("kapal_terbang");
 
 	private HelmScreen(int ship, CompoundTag info) {
 		super(Component.translatable("kultivator.kapal.helm.title"));
@@ -82,6 +85,7 @@ public final class HelmScreen extends Screen {
 		}
 		x0 = (width - W) / 2;
 		y0 = (height - H) / 2;
+		help.place(x0 + W - 10.0F, y0 + 12.0F);
 		buttons.clear();
 		boolean owner = info.getBooleanOr("is_owner", false);
 		boolean captain = info.getBooleanOr("captain", false);
@@ -256,7 +260,7 @@ public final class HelmScreen extends Screen {
 		if (!shipName.isEmpty()) {
 			Brush.fit(g, font, Component.literal("\u00AB" + shipName + "\u00BB"), x0 + 14, y0 + 2, 132, Palette.GOLD_DARK, 0.6F, 0.45F, false);
 		}
-		Brush.fit(g, font, Brush.bold(Component.translatable("kultivator.kapal.helm.voyage")), x0 + 156, y0 + 12, W - 170, Palette.SEAL_DARK, 0.85F,
+		Brush.fit(g, font, Brush.bold(Component.translatable("kultivator.kapal.helm.voyage")), x0 + 156, y0 + 12, W - 184, Palette.SEAL_DARK, 0.85F,
 				0.6F, false);
 		Brush.fit(g, font, Component.translatable(info.getBooleanOr("captain", false) ? "kultivator.kapal.helm.voyage.sub"
 				: "kultivator.kapal.helm.voyage.not_captain"), x0 + 156, y0 + 24, W - 170, Palette.INK_FAINT, 0.6F, 0.45F, false);
@@ -330,6 +334,7 @@ public final class HelmScreen extends Screen {
 		if (tooltip != null) {
 			SlipTooltip.draw(g, font, tooltip, mouseX, mouseY, width, height);
 		}
+		help.render(g, font, mouseX, mouseY, width, height);
 	}
 
 	private static Component stateName(CompoundTag info) {
@@ -361,6 +366,9 @@ public final class HelmScreen extends Screen {
 			setFocused(null);
 		}
 		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+			if (help.click(event.x(), event.y())) {
+				return true;
+			}
 			for (PetaUi.Button button : buttons) {
 				if (button.over(event.x(), event.y())) {
 					if (button.enabled) {
@@ -374,6 +382,14 @@ public final class HelmScreen extends Screen {
 			}
 		}
 		return super.mouseClicked(event, doubleClick);
+	}
+
+	@Override
+	public boolean mouseReleased(MouseButtonEvent event) {
+		if (help.release(event.x(), event.y())) {
+			return true;
+		}
+		return super.mouseReleased(event);
 	}
 
 	@Override

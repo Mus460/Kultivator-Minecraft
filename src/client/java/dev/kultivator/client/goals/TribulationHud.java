@@ -1,7 +1,6 @@
 package dev.kultivator.client.goals;
 
 import dev.kultivator.client.ClientCultivation;
-import dev.kultivator.client.EffectQuality;
 import dev.kultivator.client.screen.ui.Brush;
 import dev.kultivator.client.screen.ui.Palette;
 import dev.kultivator.cultivation.Tribulation;
@@ -43,8 +42,8 @@ public final class TribulationHud implements HudElement {
 	public void extractRenderState(GuiGraphicsExtractor g, DeltaTracker deltaTracker) {
 		Minecraft minecraft = Minecraft.getInstance();
 		LocalPlayer player = minecraft.player;
-		if (player == null || minecraft.gui.hud.isHidden() || minecraft.getDebugOverlay().showDebugScreen() || !EffectQuality.hudVisible()
-				|| !ClientCultivation.received()) {
+		// A danger warning: shown even with the "HUD Kultivator" coin off (audit M5, S30); only F1 and F3 hide it.
+		if (player == null || minecraft.gui.hud.isHidden() || minecraft.getDebugOverlay().showDebugScreen() || !ClientCultivation.received()) {
 			return;
 		}
 		CompoundTag trib = HudDemo.active() ? HudDemo.sampleTribulation() : ClientCultivation.data().sessionExtra().getCompoundOrEmpty("trib");

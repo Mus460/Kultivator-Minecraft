@@ -80,10 +80,14 @@ public final class PaviliunPayloads {
 		}
 	}
 
+	/** The types always (K1, both sides); the receiver only while the module runs. */
 	static void init() {
 		PayloadTypeRegistry.clientboundPlay().register(View.TYPE, View.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(Places.TYPE, Places.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(Act.TYPE, Act.CODEC);
+		if (!dev.kultivator.sekte.SekteContent.on(dev.kultivator.sekte.SekteIds.A)) {
+			return;
+		}
 		ServerPlayNetworking.registerGlobalReceiver(Act.TYPE, (payload, context) -> PaviliunView.onAct(context.player(), payload.op(), payload.arg()));
 	}
 

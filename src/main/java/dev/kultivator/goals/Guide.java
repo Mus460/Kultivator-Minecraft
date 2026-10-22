@@ -37,7 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Langkah Pertama / First Steps (DESIGN 19.3.9 a): 20 steps in 5 chapters, a bitmask in {@code extra.goals.guide}.
+ * Langkah Pertama / First Steps (DESIGN 19.3.9 a): 20 steps in 5 chapters, a bitmask in {@code extra.goals.guide}
+ * (60 steps in 15 chapters with the two later sets below).
  * A step completes when its advancement is granted ({@code Advancements.addListener}); on join every step is
  * back-filled from the advancements already done (and from the rank), so veterans are never told to test their root.
  * The two steps without an advancement (the Mortal bar, the Kitab Teknik with 4 seals) are checked every 100 ticks.
@@ -78,7 +79,7 @@ public final class Guide {
 	public static final String WORLD_TITLE = "world_title";
 	/** {@code extra.goals.abadi_title}: the cosmetic title "Leluhur Abadi" of chapter 15. */
 	public static final String ABADI_TITLE = "abadi_title";
-	/** Seals of the Cincin Segel the chapter-5 step asks for. */
+	/** Seals of the Rangkai Segel (Seal Set) the chapter-5 step asks for. */
 	public static final int SEALS_NEEDED = 4;
 	/** The power of the chapter-5 Shield Talisman. */
 	public static final int SHIELD_POWER = 3;
@@ -96,7 +97,9 @@ public final class Guide {
 			new Step("tribulation", "first_tribulation"),
 			new Step("dao", "dao_chosen"), new Step("book", "first_book", "jade_slip", "inheritance"), new Step("elite", "first_elite"),
 			new Step("beast", "spirit_beast", "formation_built"),
-			new Step("codex"), new Step("sect", "sect_founded", "first_recruit_hall"), new Step("disciple", "first_disciple"),
+			// "sect" = a real Sect Hall (the Prasasti, Halls.found) or a hall recruit; /sect create only makes a player group
+			// (integration audit T8), so its sect_founded no longer ticks the step.
+			new Step("codex"), new Step("sect", "sect_gate_open", "first_recruit_hall"), new Step("disciple", "first_disciple"),
 			new Step("expedition", "first_expedition")
 	};
 	/** Chapters 6-10 (DESIGN 25.8.2), each step completed by one phase-8 advancement. */
@@ -129,6 +132,13 @@ public final class Guide {
 			Realm.TRUE_IMMORTAL};
 	private static final int BAR = 2;
 	private static final int CODEX = 16;
+	/** The "sect" step (chapter 5); until it is done the player has no hall, so it and the two after it are skipped. */
+	public static final int SECT = 17;
+	/** Steps 17-19 (sect, disciple, expedition): skipped by the tracker while {@link #SECT} is not done. */
+	public static final int SECT_MASK = 0b111 << SECT;
+	/** Jalan Abadi: a_realm (step 0 of {@code guide3}) and a_calamity (step 8), see {@link #currentStepAbadi}. */
+	private static final int ABADI_REALM = 0;
+	private static final int ABADI_CALAMITY = 8;
 
 	// ================================================================== pure readers
 
@@ -189,9 +199,14 @@ public final class Guide {
 		return chapterBits(data, chapter) == 0xF;
 	}
 
-	/** The first step left among all 60 (0-59), or -1 when everything is done. */
+	/**
+	 * The step to do next among all 60 (0-59), or -1 when everything is done: the first of chapters 1-5 (the sect steps
+	 * only once a hall stands, {@link #hermitSkip}), then of 6-10, then of 11-15 in the Jalan Abadi order
+	 * ({@link #currentStepAbadi}), and last the skipped sect steps.
+	 */
 	public static int currentStepAny(CultivationData data) {
-		int first = currentStep(bits(data));
+		int bits = bits(data);
+		int first = currentStep(bits, hermitSkip(bits));
 		if (first >= 0) {
 			return first;
 		}
@@ -199,18 +214,25 @@ public final class Guide {
 		if (second >= 0) {
 			return STEP_COUNT + second;
 		}
-		int third = currentStep(bits3(data));
-		return third < 0 ? -1 : 2 * STEP_COUNT + third;
+		int third = currentStepAbadi(bits3(data));
+		if (third >= 0) {
+			return 2 * STEP_COUNT + third;
+		}
+		return currentStep(bits);
 	}
 
-	/** The first chapter 0-14 with a step left (15 when all are done). */
+	/** The chapter 0-14 of {@link #currentStepAny} (15 when all are done). */
 	public static int currentChapterAny(CultivationData data) {
-		for (int chapter = 0; chapter < ALL_CHAPTERS; chapter++) {
-			if (!chapterDoneAny(data, chapter)) {
-				return chapter;
-			}
-		}
-		return ALL_CHAPTERS;
+		int step = currentStepAny(data);
+		return step < 0 ? ALL_CHAPTERS : step / PER_CHAPTER;
+	}
+
+	/**
+	 * The steps of chapters 1-5 the tracker skips: the sect steps while the "sect" step is not done (no Sect Hall yet), so a
+	 * hermit is never told to found a sect (integration audit T2). The tablet still lists them.
+	 */
+	public static int hermitSkip(int bits) {
+		return (bits & (1 << SECT)) == 0 ? SECT_MASK : 0;
 	}
 
 	/** Steps done of all 60. */
@@ -265,12 +287,30 @@ public final class Guide {
 
 	/** The first step left (0-19), or -1 when all are done. */
 	public static int currentStep(int bits) {
+		return currentStep(bits, 0);
+	}
+
+	/** The first step left (0-19) that is not in {@code skip}, or -1 when none is. */
+	public static int currentStep(int bits, int skip) {
 		for (int i = 0; i < STEP_COUNT; i++) {
-			if ((bits & (1 << i)) == 0) {
+			if ((bits & (1 << i)) == 0 && (skip & (1 << i)) == 0) {
 				return i;
 			}
 		}
 		return -1;
+	}
+
+	/**
+	 * The first step left (0-19) of Jalan Abadi ({@code guide3}) in play order (integration audit S5): entering the Immortal
+	 * Realm (a_realm, step 0) needs ★9 and so comes after the first Star Calamity (a_calamity, step 8), and every other
+	 * step of chapters 11-15 happens in the Immortal Realm. So while a_realm is open the step is a_calamity (when that is
+	 * open too), then a_realm. The array keeps its order because the bits are saved by index.
+	 */
+	public static int currentStepAbadi(int bits) {
+		if ((bits & (1 << ABADI_REALM)) == 0) {
+			return (bits & (1 << ABADI_CALAMITY)) == 0 ? ABADI_CALAMITY : ABADI_REALM;
+		}
+		return currentStep(bits);
 	}
 
 	/** Filled seals of the Cincin Segel. */
@@ -558,13 +598,15 @@ public final class Guide {
 				list.add(SpiritStones.stack(SpiritStones.MID, 2));
 				list.add(byId("heavenvoid_fragment", 1, SpiritStones.stack(SpiritStones.MID, 1)));
 			}
+			// Integration audit R4: the Tomb Sigil comes with chapter 8, before chapter 9 asks for Heavenly Tomb floor 9;
+			// the Ancient God Blood moved to chapter 9. The stone ladder (High, then Supreme) stays.
 			case 7 -> {
 				list.add(SpiritStones.stack(SpiritStones.HIGH, 1));
-				list.add(byId("ancient_god_blood", 1, SpiritStones.stack(SpiritStones.HIGH, 1)));
+				list.add(byId("tomb_sigil", 1, SpiritStones.stack(SpiritStones.HIGH, 2)));
 			}
 			case 8 -> {
 				list.add(SpiritStones.stack(SpiritStones.SUPREME, 1));
-				list.add(byId("tomb_sigil", 1, SpiritStones.stack(SpiritStones.HIGH, 2)));
+				list.add(byId("ancient_god_blood", 1, SpiritStones.stack(SpiritStones.HIGH, 1)));
 			}
 			case 9 -> list.add(byId("tomb_essence", 3, SpiritStones.stack(SpiritStones.SUPREME, 1)));
 			// Phase 9 (DESIGN 26.9): other modules' items by registry id, a Supreme spirit stone while one is not registered.

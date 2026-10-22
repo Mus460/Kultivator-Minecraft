@@ -52,6 +52,8 @@ public class UlarLautEntity extends Monster {
 		this.setCanPickUpLoot(false);
 		this.addTag(NoGrief.TAG);
 		this.addTag(TAG);
+		// realm-scaled Dunia foe: the trial-mob rule of 6c (audit M4 T5)
+		TechniquePower.markRealmFoe(this);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {

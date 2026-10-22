@@ -45,7 +45,7 @@ import java.util.UUID;
  * condensing discount: −1% per Batu carried (at most 10), the stones used consumed after each star. Inspired by RMJIR (origin
  * stones as their own grade of power); every number is game design.
  */
-final class OriginStones {
+public final class OriginStones {
 
 	public static final double MINE_CHANCE = 0.006D;
 	public static final double FORTUNE_STEP = 0.5D;
@@ -63,14 +63,20 @@ final class OriginStones {
 
 	static void init() {
 		PlayerBlockBreakEvents.AFTER.register(OriginStones::onBlockBroken);
-		Stars.addCostModifier(player -> 1.0D - STAR_DISCOUNT * Math.min(STAR_STONES_MAX, Abadi.stonesIn(player)));
-		Stars.addCondenseListener((player, stars) -> Abadi.takeStones(player, Math.min(STAR_STONES_MAX, Abadi.stonesIn(player))));
+		// Audit T15: the discount follows the player's switch (/kultivasi diskonbintang), so saved Batu stay saved.
+		Stars.addCostModifier(player -> 1.0D - STAR_DISCOUNT * starStones(player));
+		Stars.addCondenseListener((player, stars) -> Abadi.takeStones(player, starStones(player)));
 		Progression.addMultiplierProvider(player -> Abadi.isImmortalLevel(player.level()) && Cultivators.get(player).meditating() ? MEDITATION_XP : 1.0D);
 		Qi.addRegenFactor(player -> Abadi.isImmortalLevel(player.level()) ? 0.5D + 0.5D * conv(player) / 100.0D : 1.0D);
 		TechniquePower.addTargetFactor((attacker, target, spec) -> attacker instanceof ServerPlayer player
 				&& target.entityTags().contains(TechniquePower.TAG_ABADI_FOE) ? FOE_BASE + FOE_PER_CONV * conv(player) / 100.0D : 1.0D);
 		ServerPlayerEvents.LEAVE.register(player -> MEDITATED.remove(player.getUUID()));
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> MEDITATED.clear());
+	}
+
+	/** Batu Asal the next star's discount uses: 0 while the star discount is switched off, else those carried (at most 10). */
+	static int starStones(ServerPlayer player) {
+		return dev.kultivator.goals.Goals.starDiscountOn(player) ? Math.min(STAR_STONES_MAX, Abadi.stonesIn(player)) : 0;
 	}
 
 	/** Every second: meditation inside Alam Abadi fills the conversion (+1% per 30 s). */

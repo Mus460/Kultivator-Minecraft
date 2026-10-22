@@ -1,12 +1,15 @@
 # Progres audit:dunia (READ-ONLY audit, area Dunia & Petualangan)
 
-- [ ] Baca DESIGN 34 (Dunia Kultivasi yang Luas), 19, 25, 26, 36, rancangan 37
-- [ ] Peta paket dunia/** (kota, pengembara, rival, reruntuhan, penjara, menara, langit, harta, cuaca, naga, laut, bawah, kapal, peta)
-- [ ] alam (Alam Rahasia), abadi (Alam Abadi), purba, beast, desa, musuh, trial, elite
-- [ ] Gerbang realm per fitur (tabel progresi)
-- [ ] Duplikat (menara/trial, rival/rogue, teleport, peta, toko/mata uang)
-- [ ] Integrasi (hub, guide, achievement, Kehancuran, EffectQuality, sinematik, suara)
-- [ ] Lang-src konsistensi istilah
-- [ ] Tulis laporan docs/progres/audit-dunia-laporan.md
+Status: SELESAI 2026-10-22. Laporan: docs/progres/audit-dunia-laporan.md (0 KRITIS, 5 TINGGI, 8 SEDANG, 4 RENDAH).
 
-Langkah berikut: baca DESIGN 34.
+- [x] Baca DESIGN 34 (34.0-34.12), 36 (aturan, audit, 36.2.7, 36.2.9), rancangan 37 (integrasi)
+- [x] Peta struktur & structure_set (spacing, exclusion, W4)
+- [x] Penjara, gua, menara (gerbang ranah, hadiah, Panduan)
+- [x] Kota, pengembara, saingan, pasar gelap, Kota Abadi, Natives
+- [x] Peta (domain, penunjuk), kabar angin, situs
+- [x] Kapal, laut, bawah, naga, evolusi (gerbang ranah konsisten)
+- [x] Duplikat sekte NPC (Saingan / Peta / Diplomasi / 37)
+- [x] Istilah lang
+- [x] Tulis laporan
+
+Langkah berikut: tidak ada (laporan dikirim).

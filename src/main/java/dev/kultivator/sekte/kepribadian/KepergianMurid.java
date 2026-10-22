@@ -420,7 +420,7 @@ public final class KepergianMurid {
 				e.setMode(DiscipleEntity.Mode.FOLLOW);
 			}
 			e.getLookControl().setLookAt(master, 30.0F, 30.0F);
-			VoiceDisciples.line(e, "attack_alt", 0);
+			VoiceDisciples.line(e, "rebel", 0);
 			bubble(e, KepribadianPayloads.ICON_STORM);
 			Msg.chat(master, Component.translatable("kultivator.sekte.kepribadian.tantang.ajak", e.getDisplayName(),
 					button("kultivator.sekte.kepribadian.tantang.terima", "/kultivasi perguruan murid tantangan terima", ChatFormatting.GREEN),
@@ -492,6 +492,7 @@ public final class KepergianMurid {
 			e.setMode(DiscipleEntity.Mode.STAY);
 			e.setActivity(SekteIds.ACT_LEAVING, null);
 			p.deadline = now + LEAVING_POSE_TICKS;
+			VoiceDisciples.line(e, "leave_night", 0);
 			return;
 		}
 		if (e.activity() == SekteIds.ACT_LEAVING && now >= p.deadline) {
@@ -547,7 +548,7 @@ public final class KepergianMurid {
 		Hati.putLong(data, "last", Ingatan.today(server));
 		Ingatan.remember(server, data, SekteIds.P + ".tunduk", master.getUUID(), 6, "kultivator.sekte.kepribadian.ingat.tunduk",
 				master.getName().getString());
-		VoiceDisciples.line(e, "loyal", 0);
+		VoiceDisciples.line(e, "submit", 0);
 		bubble(e, KepribadianPayloads.ICON_HEART);
 		Msg.chat(master, Component.translatable("kultivator.sekte.kepribadian.tantang.tunduk", e.getDisplayName()).withStyle(ChatFormatting.GREEN));
 		SekteLog.log(server, master.getUUID(), SekteIds.P, Component.translatable("kultivator.sekte.kepribadian.log.tunduk", e.getDisplayName()));
