@@ -99,7 +99,14 @@ public final class BreakRefund {
 
 	/** {@code SectSpawnMixin}: true when natural monster spawning must be refused above {@code below}. */
 	public static boolean spawnBlocked(ServerLevel level, MobCategory category, BlockPos below) {
-		if (category != MobCategory.MONSTER || !KultivatorConfig.get().sectBuildSpawnProof) {
+		if (category != MobCategory.MONSTER) {
+			return false;
+		}
+		// The shadow of a sky island (DESIGN 37.4.10): no natural monster under a sky hall's island, a gift of the Ascension.
+		if (dev.kultivator.sekte.langit.api.LangitConfig.on() && dev.kultivator.sekte.langit.api.LangitApi.get().underSkyIsland(level, below)) {
+			return true;
+		}
+		if (!KultivatorConfig.get().sectBuildSpawnProof) {
 			return false;
 		}
 		CellIndex index = CellIndex.get(level.getServer());

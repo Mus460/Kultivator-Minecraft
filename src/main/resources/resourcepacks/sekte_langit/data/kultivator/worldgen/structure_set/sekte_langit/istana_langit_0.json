@@ -1,0 +1,15 @@
+{
+  "placement": {
+    "type": "kultivator:sekte_langit",
+    "salt": 360921,
+    "spacing": 24,
+    "separation": 8,
+    "index": 0
+  },
+  "structures": [
+    {
+      "structure": "kultivator:sekte_langit/istana_langit",
+      "weight": 1
+    }
+  ]
+}

@@ -40,6 +40,12 @@ public class KapalBajakEntity extends Entity {
 	private int side = 1;
 	private int fleeTicks;
 	private boolean announced;
+	/**
+	 * Sekte Langit (DESIGN 37.7.4/37.7.5, module 37G): a raider that comes for a sky island instead of a ship lies at this
+	 * fixed berth beside the island's dock or rim (null: the ship mode above).
+	 */
+	private @Nullable Vec3 fixedBerth;
+	private float fixedYaw;
 
 	public KapalBajakEntity(EntityType<? extends KapalBajakEntity> type, Level level) {
 		super(type, level);
@@ -58,6 +64,20 @@ public class KapalBajakEntity extends Entity {
 	void setup(KapalRohEntity ship, int side) {
 		entityData.set(DATA_SHIP, ship.getId());
 		this.side = side >= 0 ? 1 : -1;
+	}
+
+	/**
+	 * Sekte Langit (module 37G): called once before {@code addFreshEntity}, the raider comes for a sky island and lies at
+	 * {@code berth} (facing {@code yaw}) until {@link #leave} or its lifetime ends. Scenery only, as in the ship mode.
+	 */
+	public void berthAt(Vec3 berth, float yaw) {
+		this.fixedBerth = berth;
+		this.fixedYaw = yaw;
+	}
+
+	/** Sekte Langit (module 37G): the island fight is over, the raider turns away and leaves. */
+	public void leave() {
+		flee();
 	}
 
 	public @Nullable KapalRohEntity ship() {
@@ -96,12 +116,14 @@ public class KapalBajakEntity extends Entity {
 			return;
 		}
 		KapalRohEntity ship = ship();
-		if (ship == null || ship.isRemoved()) {
+		if ((ship == null || ship.isRemoved()) && fixedBerth == null) {
 			flee();
 		}
 		Vec3 here = position();
 		Vec3 next;
-		if (phase() == PHASE_FLEE) {
+		if (fixedBerth != null && phase() != PHASE_FLEE) {
+			next = towardBerth(here);
+		} else if (phase() == PHASE_FLEE) {
 			fleeTicks++;
 			Vec3 away = ship == null ? Vec3.directionFromRotation(0.0F, getYRot()) : here.subtract(ship.position()).multiply(1.0D, 0.0D, 1.0D);
 			if (away.lengthSqr() < 1.0E-4D) {
@@ -143,6 +165,9 @@ public class KapalBajakEntity extends Entity {
 		} else if (ship != null && phase() == PHASE_HOLD) {
 			// alongside: turn parallel to the ship
 			setYRot(Mth.wrapDegrees(getYRot() + Mth.clamp(Mth.wrapDegrees(ship.getYRot() - getYRot()), -3.0F, 3.0F)));
+		} else if (fixedBerth != null && phase() == PHASE_HOLD) {
+			// beside the island: turn to the berth's heading
+			setYRot(Mth.wrapDegrees(getYRot() + Mth.clamp(Mth.wrapDegrees(fixedYaw - getYRot()), -3.0F, 3.0F)));
 		}
 		float shown = (float) flat;
 		if (Math.abs(entityData.get(DATA_SPEED) - shown) > 0.01F) {
@@ -151,6 +176,24 @@ public class KapalBajakEntity extends Entity {
 		if (move.lengthSqr() > 1.0E-6D) {
 			setPos(next.x, Mth.clamp(next.y, level().getMinY() + 2.0D, level().getMaxY() - 16.0D), next.z);
 		}
+	}
+
+	/** Sekte Langit: the step toward the fixed berth beside the island (approach, then hold there). */
+	private Vec3 towardBerth(Vec3 here) {
+		Vec3 delta = fixedBerth.subtract(here);
+		double dist = delta.length();
+		if (phase() == PHASE_APPROACH && dist < 1.5D) {
+			entityData.set(DATA_PHASE, PHASE_HOLD);
+		}
+		if (phase() == PHASE_HOLD) {
+			if (!announced) {
+				announced = true;
+				KapalVoice.say(this, KapalVoice.SKY_PIRATES, "rogue.ambush");
+			}
+			return here.add(delta.scale(0.25D));
+		}
+		double step = Math.min(dist, APPROACH_SPEED * Math.min(1.0D, 0.35D + dist / 24.0D));
+		return dist < 1.0E-4D ? here : here.add(delta.scale(step / dist));
 	}
 
 	/** The point beside {@code ship} where the raider lies (its beam, a few blocks off, a little higher). */

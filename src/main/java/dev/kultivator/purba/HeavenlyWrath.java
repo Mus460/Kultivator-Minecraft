@@ -222,6 +222,23 @@ public final class HeavenlyWrath {
 	}
 
 	/**
+	 * Sekte Langit (37G): true when a Tantang Langit could be offered at all (Heavenly Wrath on and Heaven has noticed the
+	 * player), so the Heaven Court envoy hides the button otherwise (audit 4.3). {@link #challenge} still decides.
+	 */
+	public static boolean canChallenge(ServerPlayer player) {
+		return KultivatorConfig.get().heavenlyWrath && StarCalamity.noticed(Cultivators.get(player));
+	}
+
+	/** Sekte Langit (37G): told once for every won descent (after the rewards), tests included. */
+	public static void addWinListener(java.util.function.Consumer<ServerPlayer> listener) {
+		if (listener != null) {
+			WIN_LISTENERS.add(listener);
+		}
+	}
+
+	private static final java.util.List<java.util.function.Consumer<ServerPlayer>> WIN_LISTENERS = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+	/**
 	 * Tantang Langit (Sekte Langit 37): the player asks Heaven to come at the next dusk. Only {@code wrath_next} moves to
 	 * today; the dusk roll and every refusal (Peaceful, busy, place, AFK) still decide. Refused (the reason) when Heaven has
 	 * not noticed the player yet (no calamity passed or skipped), Heavenly Wrath is switched off, or a descent is already
@@ -415,6 +432,13 @@ public final class HeavenlyWrath {
 		// Phase 10b (DESIGN 29.2): the first victory only, the Panglima's decree seal falls from his hand (bound to the winner)
 		dev.kultivator.pusakalangit.Titah.grantFromPanglima(player);
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.0F, 1.0F);
+		for (java.util.function.Consumer<ServerPlayer> listener : WIN_LISTENERS) {
+			try {
+				listener.accept(player);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.error("A Heavenly Wrath win listener failed", exception);
+			}
+		}
 	}
 
 	/** Ends a descent: the bar and sky grade go, the envoys and the Panglima leave. */

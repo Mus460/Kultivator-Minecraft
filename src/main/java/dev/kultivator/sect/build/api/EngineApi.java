@@ -274,6 +274,51 @@ public interface EngineApi {
 		return Component.translatable(UNAVAILABLE_KEY);
 	}
 
+	// ================================================================== Sekte Langit (DESIGN 37.9.1)
+
+	/**
+	 * A sky preview (Rancang Langit) of sky template {@code sky} (11-19) with its plaza at {@code yP} and the throne
+	 * shifted {@code dx, dz} from the owner's stele (path A) or from the player (path B / {@code test}). Async like
+	 * {@link #preview}; {@link #confirm} founds the tethered sky site. 0 when refused (the player is told why).
+	 */
+	default long previewSky(ServerPlayer player, int sky, int rot, Glaze glaze, int yP, int dx, int dz, boolean test) {
+		return 0L;
+	}
+
+	/** {@code uji langit_sekte pamer}: a sky showcase preview whose throne is at {@code origin} (undo-logged). */
+	default long showcaseSky(ServerPlayer player, int sky, int tier, int rot, BlockPos origin) {
+		return 0L;
+	}
+
+	/**
+	 * The Ascension (Upacara Naik, DESIGN 37.3.5 item 4): moves the hall onto the throne of the owner's tethered sky site,
+	 * makes the sky site the owner's main site and turns the ground site into the Mountain Foot ({@code mode}). Null on
+	 * success, else why not.
+	 */
+	default @Nullable Component ascend(UUID owner, FootMode mode) {
+		return Component.translatable(UNAVAILABLE_KEY);
+	}
+
+	/** The owner's sky site (tethered or standing), or null. */
+	default @Nullable SiteView skySite(UUID owner) {
+		return null;
+	}
+
+	/** True when {@code pos} lies in a sky island's footprint column below its lowest block (DESIGN 37.8.3). */
+	default boolean underSkyIsland(Level level, BlockPos pos) {
+		return false;
+	}
+
+	/** {@code uji langit_sekte bangun}: builds the owner's sky site (tethered or not) up to {@code tier} at no cost. */
+	default @Nullable Component testBuildSky(ServerPlayer player, int tier, int speedMode) {
+		return Component.translatable(UNAVAILABLE_KEY);
+	}
+
+	/** {@code uji langit_sekte naik [paksa]}: the Ascension now; {@code force} skips the tier-1 condition (never the stele). */
+	default @Nullable Component testAscend(ServerPlayer player, boolean force) {
+		return Component.translatable(UNAVAILABLE_KEY);
+	}
+
 	// ================================================================== registration
 
 	/** The registered engine, or the safe defaults. */

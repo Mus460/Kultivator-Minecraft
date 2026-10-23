@@ -141,6 +141,17 @@ final class Site {
 	long statPlaced;
 	long statRemoved;
 	long statCredited;
+	// ---- Sekte Langit (DESIGN 37.3.5, 37.3.6): saved under short keys, absent on every ground site
+	/** A sky site (template 11-19): {@code stele} is the throne cell, {@code plazaY} the plaza floor (yP - 1). */
+	boolean sky;
+	/** The stele still stands on the ground at {@link #groundStele}; only tier 1 builds. */
+	boolean tethered;
+	@Nullable BlockPos groundStele;
+	/** 0 not yet, 1 the ground stele was taken up (waiting at the throne), 2 ascended. */
+	int ascent;
+	long ascentDay;
+	/** A Mountain Foot (Kaki Gunung): the old ground site of a sky sect, kept as an orphan with its cells. */
+	boolean foot;
 
 	// ---- live, not saved
 	@Nullable SitePlan plan;
@@ -272,7 +283,12 @@ final class Site {
 
 	SiteView view() {
 		return new SiteView(owner, dim, stele, template, rotation, glaze, plazaY, footprint(), state, status, tier, blockedNow, openId, rate, bank,
-				test || showcase);
+				test || showcase, sky, tethered, skyFloorY());
+	}
+
+	/** The world y of the lowest island block of a sky site (the footprint floor for a ground site). */
+	int skyFloorY() {
+		return sky ? stele.getY() + spec().skyFloor() : footprint().minY();
 	}
 
 	// ================================================================== persistence
@@ -363,6 +379,18 @@ final class Site {
 		stats.putLong("removed", statRemoved);
 		stats.putLong("credited", statCredited);
 		tag.put("stats", stats);
+		if (sky) {
+			tag.putBoolean("sky", true);
+			tag.putBoolean("teth", tethered);
+			if (groundStele != null) {
+				tag.putLong("gs", groundStele.asLong());
+			}
+			tag.putInt("asc", ascent);
+			tag.putLong("ascd", ascentDay);
+		}
+		if (foot) {
+			tag.putBoolean("foot", true);
+		}
 		return tag;
 	}
 
@@ -469,6 +497,13 @@ final class Site {
 		site.statPlaced = stats.getLongOr("placed", 0L);
 		site.statRemoved = stats.getLongOr("removed", 0L);
 		site.statCredited = stats.getLongOr("credited", 0L);
+		site.sky = tag.getBooleanOr("sky", false) || dev.kultivator.sect.build.api.SectTemplates.isSky(template);
+		site.tethered = tag.getBooleanOr("teth", false);
+		long gs = tag.getLongOr("gs", Long.MIN_VALUE);
+		site.groundStele = gs == Long.MIN_VALUE ? null : BlockPos.of(gs);
+		site.ascent = tag.getIntOr("asc", 0);
+		site.ascentDay = tag.getLongOr("ascd", 0L);
+		site.foot = tag.getBooleanOr("foot", false);
 		return site;
 	}
 

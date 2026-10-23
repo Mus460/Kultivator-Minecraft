@@ -96,7 +96,7 @@ public final class BuildPlacer {
 	 */
 	static Result place(ServerLevel level, Site site, BlockPos pos, BlockState target, Phase phase, EntityGuard guard, CellIndex index) {
 		SitePlan plan = site.plan();
-		if (!plan.inFootprint(pos) || pos.equals(site.stele) || pos.equals(site.stele.below())) {
+		if (!plan.inFootprint(pos) || pos.equals(site.stele) || pos.equals(site.stele.below()) && !throneBase(level, site, pos, phase)) {
 			return Result.OUTSIDE;
 		}
 		if (dev.kultivator.alam.Alam.isRealmLevel(level) || dev.kultivator.abadi.Abadi.isImmortalLevel(level)) {
@@ -251,6 +251,12 @@ public final class BuildPlacer {
 		index.setPlaced(level, pos, site.owner, ownable(actual));
 		if (actual.getBlock() == Blocks.DARK_OAK_WALL_SIGN || actual.getBlock() == Blocks.MANGROVE_WALL_SIGN) {
 			writePlaque(level, pos, BuildEngine.INSTANCE.plaqueName(site));
+		} else if (site.sky) {
+			net.minecraft.network.chat.Component[] lines = dev.kultivator.sect.build.blueprint.awan.AwanPapan.lines(site.template, actual.getBlock(),
+					BlockPos.of(plan.local(pos)));
+			if (lines != null) {
+				writeLines(level, pos, lines);
+			}
 		}
 		site.statPlaced++;
 		return Result.PLACED;
@@ -567,6 +573,29 @@ public final class BuildPlacer {
 	static void startWaterfall(ServerLevel level, BlockPos pos) {
 		if (level.isLoaded(pos) && level.getBlockState(pos).is(Blocks.WATER)) {
 			level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+		}
+	}
+
+	/**
+	 * Sekte Langit (DESIGN 37.4.9 item 2): the one exception to "the block under the stele is never built": the jade base
+	 * of a sky site's throne, planned by its own throne component in PLINTH, into an empty cell (the stele is carried up
+	 * onto it at the Ascension). Ground sites are unchanged.
+	 */
+	private static boolean throneBase(ServerLevel level, Site site, BlockPos pos, Phase phase) {
+		return site.sky && phase == Phase.PLINTH && "aw_t1_tahta".equals(site.openId) && level.isLoaded(pos) && level.getBlockState(pos).isAir();
+	}
+
+	/** A sky plaque (the Gate of the Nine Heavens, the Cloud Stair, a satellite): up to four glowing gold lines, waxed. */
+	static void writeLines(ServerLevel level, BlockPos pos, net.minecraft.network.chat.Component[] lines) {
+		if (level.getBlockEntity(pos) instanceof SignBlockEntity sign) {
+			SignText.Mutable text = SignText.EMPTY.asMutable();
+			for (int i = 0; i < Math.min(4, lines.length); i++) {
+				if (lines[i] != null) {
+					text.setLine(i, lines[i]);
+				}
+			}
+			sign.setText(text.setColor(DyeColor.YELLOW).setTextGlowing(true).asImmutable(), SignTextSlot.FRONT);
+			sign.setWaxed(true);
 		}
 	}
 

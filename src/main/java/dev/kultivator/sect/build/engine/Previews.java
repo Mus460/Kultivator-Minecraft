@@ -73,6 +73,19 @@ final class Previews {
 		final int showTier;
 		/** "Kosongkan" was switched on: containers with items in buildings are amber, not red. */
 		boolean emptyAuth;
+		/**
+		 * Sekte Langit (DESIGN 37.3.4, 37.4.8): a sky design. {@code origin} is the throne; {@code groundStele} the hall's
+		 * stele on the ground (path A and B), {@code groundTop} the world y of the owner's ground site column top (path A,
+		 * the section rule) or {@code Integer.MIN_VALUE}; {@code dx/dz} the shift; {@code minY/maxY} the level's bounds.
+		 */
+		boolean sky;
+		@Nullable BlockPos groundStele;
+		int groundTop = Integer.MIN_VALUE;
+		@Nullable BoundingBox ownGround;
+		int dx;
+		int dz;
+		int minY;
+		int maxY = 319;
 		/** A newer preview replaced this one (or it expired): its off-thread compile stops between components. */
 		volatile boolean cancelled;
 		Snapshot snapshot;
@@ -121,9 +134,26 @@ final class Previews {
 		Job job = new Job(ticket, owner, player.getUUID(), template, rotation, glaze, force, kind, dim, origin.immutable(), showTier);
 		job.emptyAuth = emptyAuth;
 		TemplateSpec spec = Templates.get(template);
+		job.sky = spec.sky();
+		ServerLevel startLevel = server.getLevel(dim);
+		if (startLevel != null) {
+			job.minY = startLevel.getMinY();
+			job.maxY = startLevel.getMaxY();
+		}
 		int half = Math.max(Math.max(Math.abs(spec.x0()), Math.abs(spec.x1())), Math.max(Math.abs(spec.z0()), Math.abs(spec.z1()))) + 1;
 		long now = server.overworld().getGameTime();
-		if (kind == Kind.HOLOGRAM || kind == Kind.SHOWCASE && force) {
+		if (job.sky && kind != Kind.HOLOGRAM && !(kind == Kind.SHOWCASE && force)) {
+			// A sky snapshot looks under islands and through the sect's own cells (never cached with ground ones).
+			String key = "sky:" + dim.identifier() + "@" + origin.asLong() + "/" + half;
+			Snapshot cached = snapshots.get(key);
+			if (cached != null && now - snapshotTimes.getOrDefault(key, 0L) < SNAPSHOT_KEEP) {
+				job.snapshot = cached;
+			} else {
+				job.snapshot = Snapshot.sky(origin, half);
+				snapshots.put(key, job.snapshot);
+				snapshotTimes.put(key, now);
+			}
+		} else if (kind == Kind.HOLOGRAM || kind == Kind.SHOWCASE && force) {
 			// A layout hologram never waits for terrain: flat land at the origin (never cached).
 			job.snapshot = flatSnapshot(origin, half);
 		} else {
@@ -226,7 +256,10 @@ final class Previews {
 			if (first || grown) {
 				job.lastCompile = now;
 				job.compiledPercent = percent;
-				job.worldWarnings = Validator.world(level, footprint(job), engine.otherSites(job.owner, job.kind == Kind.SHOWCASE));
+				job.worldWarnings = job.sky
+						? Validator.skyWorld(level, footprint(job), kakiEstimate(job), job.origin, job.owner, engine.otherSites(job.owner, job.kind == Kind.SHOWCASE),
+								job.ownGround)
+						: Validator.world(level, footprint(job), engine.otherSites(job.owner, job.kind == Kind.SHOWCASE));
 				Snapshot frozen = job.snapshot.freeze();
 				List<Validator.Warning> world = job.worldWarnings;
 				job.compiling = CompletableFuture.supplyAsync(() -> compile(job, frozen, world, percent), Util.backgroundExecutor());
@@ -243,6 +276,35 @@ final class Previews {
 		TemplateSpec spec = Templates.get(job.template);
 		SitePlan plan = new SitePlan(spec, job.rotation, job.glaze, 0L, job.origin, TerrainView.flat(-1), Map.of());
 		return plan.footprint();
+	}
+
+	/**
+	 * The stair foot of a sky design for the world checks, before the compile fits it: the foot square around the median
+	 * captured ground (6 below to 12 above), or null while none of it is captured.
+	 */
+	static @Nullable BoundingBox kakiEstimate(Job job) {
+		TemplateSpec spec = Templates.get(job.template);
+		TemplateSpec.Zone kaki = spec.kaki();
+		if (kaki == null) {
+			return null;
+		}
+		TerrainView local = job.snapshot.local(job.origin, job.rotation);
+		List<Integer> grounds = new ArrayList<>();
+		for (int x = Math.min(kaki.x0(), kaki.x1()); x <= Math.max(kaki.x0(), kaki.x1()); x++) {
+			for (int z = Math.min(kaki.z0(), kaki.z1()); z <= Math.max(kaki.z0(), kaki.z1()); z++) {
+				if (local.known(x, z)) {
+					grounds.add(local.ground(x, z));
+				}
+			}
+		}
+		if (grounds.isEmpty()) {
+			return null;
+		}
+		grounds.sort(Integer::compare);
+		int ground = grounds.get(grounds.size() / 2);
+		SitePlan plan = new SitePlan(spec, job.rotation, job.glaze, 0L, job.origin, TerrainView.flat(-1), Map.of());
+		return plan.worldBox(new BoundingBox(Math.min(kaki.x0(), kaki.x1()), ground - 6, Math.min(kaki.z0(), kaki.z1()), Math.max(kaki.x0(), kaki.x1()),
+				ground + 12, Math.max(kaki.z0(), kaki.z1())));
 	}
 
 	/**
@@ -392,7 +454,26 @@ final class Previews {
 		}
 		tag.putLongArray("obst", obstacles.stream().mapToLong(Long::longValue).toArray());
 		List<Validator.Warning> warnings = new ArrayList<>(worldWarnings);
-		if (job.kind != Kind.HOLOGRAM) {
+		if (job.sky) {
+			tag.putBoolean("sky", true);
+			tag.putInt("yP", job.origin.getY());
+			BoundingBox kakiBox = plan.kakiBox();
+			if (kakiBox != null) {
+				tag.putIntArray("kaki", new int[]{kakiBox.minX(), kakiBox.minY(), kakiBox.minZ(), kakiBox.maxX(), kakiBox.maxY(), kakiBox.maxZ()});
+			}
+			if (job.groundStele != null) {
+				tag.putIntArray("ground", new int[]{job.groundStele.getX(), job.groundStele.getY(), job.groundStele.getZ()});
+			}
+		}
+		if (job.kind != Kind.HOLOGRAM && job.sky) {
+			warnings.addAll(Validator.skyTerrain(spec, local, levels, job.origin.getY(), job.minY, job.maxY, job.groundTop, job.dx, job.dz,
+					dev.kultivator.sect.build.flow.LangitPlan.offsetMax(), job.force));
+			List<Long> entityPos = new ArrayList<>();
+			for (long each : frozen.entities) {
+				entityPos.add(plan.local(BlockPos.of(each)));
+			}
+			warnings.addAll(Validator.blockEntities(opBoxes, entityPos, frozen.entityKinds, job.emptyAuth));
+		} else if (job.kind != Kind.HOLOGRAM) {
 			warnings.addAll(Validator.terrain(spec, local, levels, job.force, localBoxes));
 			// Block entities by height: only those inside a component's volume count (DESIGN 21.10 table).
 			List<Long> entityPos = new ArrayList<>();

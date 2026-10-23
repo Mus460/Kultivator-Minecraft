@@ -137,6 +137,8 @@ public final class BuildEngine implements EngineApi {
 	private final Map<UUID, Site> sites = new LinkedHashMap<>();
 	private final Map<UUID, Site> showcases = new LinkedHashMap<>();
 	private final Map<UUID, Site> orphans = new LinkedHashMap<>();
+	/** Sekte Langit (DESIGN 37.3.5): the tethered sky sites of path A, keyed by {@code LangitKeys.skyKey(owner)}. */
+	private final Map<UUID, Site> skies = new LinkedHashMap<>();
 	private final Map<UUID, UUID> showcaseOwners = new HashMap<>();
 	private final Previews previews = new Previews();
 	private final Map<Long, Boolean> autoConfirm = new HashMap<>();
@@ -215,12 +217,23 @@ public final class BuildEngine implements EngineApi {
 				Kultivator.LOGGER.error("Skipping a broken relocated sect site {}", entry.getKey(), exception);
 			}
 		}
+		for (Map.Entry<UUID, CompoundTag> entry : showcase.skies.entrySet()) {
+			try {
+				Site site = Site.load(entry.getKey(), entry.getValue());
+				if (site != null) {
+					skies.put(entry.getKey(), site);
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("Skipping a broken sky sect site {}", entry.getKey(), exception);
+			}
+		}
 	}
 
 	private void stop() {
 		sites.clear();
 		showcases.clear();
 		orphans.clear();
+		skies.clear();
 		showcaseOwners.clear();
 		previews.clear();
 		autoConfirm.clear();
@@ -242,10 +255,11 @@ public final class BuildEngine implements EngineApi {
 	}
 
 	private List<Site> allSites() {
-		List<Site> list = new ArrayList<>(sites.size() + showcases.size() + orphans.size());
+		List<Site> list = new ArrayList<>(sites.size() + showcases.size() + orphans.size() + skies.size());
 		list.addAll(sites.values());
 		list.addAll(showcases.values());
 		list.addAll(orphans.values());
+		list.addAll(skies.values());
 		return list;
 	}
 
@@ -259,7 +273,11 @@ public final class BuildEngine implements EngineApi {
 			return site;
 		}
 		site = showcases.get(key);
-		return site != null ? site : orphans.get(key);
+		if (site != null) {
+			return site;
+		}
+		site = orphans.get(key);
+		return site != null ? site : skies.get(key);
 	}
 
 	private boolean orphan(Site site) {
@@ -286,6 +304,10 @@ public final class BuildEngine implements EngineApi {
 		}
 		if (orphan(site)) {
 			Showcase.get(server).putOrphan(site.owner, site.save());
+			return;
+		}
+		if (skies.get(site.owner) == site) {
+			Showcase.get(server).putSky(site.owner, site.save());
 			return;
 		}
 		if (sites.get(site.owner) != site) {
@@ -417,7 +439,9 @@ public final class BuildEngine implements EngineApi {
 
 	/** The base rate of a template in blocks per second (DESIGN 21.15 table). */
 	public static double baseRate(int template) {
-		return 6.0D + 3.0D * (Math.max(1, template) - 1);
+		// A sky template builds at its ground sibling's pace, half again as fast (its islands are bigger, DESIGN 37.4.7).
+		double base = 6.0D + 3.0D * (Math.max(1, SectTemplates.rank(template)) - 1);
+		return SectTemplates.isSky(template) ? base * 1.5D : base;
 	}
 
 	private static double msptFactor(long mspt, KultivatorConfig config) {
@@ -553,6 +577,10 @@ public final class BuildEngine implements EngineApi {
 		if (!config.sectConstruction || site.state == SiteView.STATE_PAUSED) {
 			return SiteView.STATUS_PAUSED;
 		}
+		if (site.sky && !site.showcase && (!dev.kultivator.sekte.langit.api.LangitConfig.on() || site.footprint().maxY() > level.getMaxY() - 2)) {
+			// Sekte Langit off (DESIGN 37.8.7), or a datapack lowered the world under the island's top (37.8.6): it waits.
+			return SiteView.STATUS_PAUSED;
+		}
 		if (site.spec().isPlaceholder()) {
 			return SiteView.STATUS_COMPLETE;
 		}
@@ -586,6 +614,11 @@ public final class BuildEngine implements EngineApi {
 		if (site.fundEmission != null) {
 			return SiteView.STATUS_WAITING_FUNDS;
 		}
+		if (site.sky && site.tethered && site.tier >= dev.kultivator.sect.build.flow.LangitPlan.TETHER_MAX_TIER && Scheduler.next(site) == null
+				&& site.waiting.isEmpty() && site.suspended.isEmpty()) {
+			// The Cloud Core stands: the stele must be carried up to the throne (DESIGN 37.3.5).
+			return SiteView.STATUS_AWAIT_ASCENT;
+		}
 		if (Scheduler.complete(site) && site.waiting.isEmpty() && site.suspended.isEmpty()) {
 			return SiteView.STATUS_COMPLETE;
 		}
@@ -609,6 +642,15 @@ public final class BuildEngine implements EngineApi {
 	 * counts as "not standing": nothing builds without seeing it.
 	 */
 	private boolean steleOk(Site site, ServerLevel level) {
+		if (site.sky && site.tethered) {
+			// A tethered sky site builds while the hall's stele stands on the ground (DESIGN 37.3.5) and its throne is loaded.
+			Halls.HallView hall = Halls.hallOf(site.ledgerOwner());
+			BlockPos ground = site.groundStele;
+			if (hall == null || ground == null || !hall.active() || !hall.pos().equals(ground) || !hall.dim().equals(site.dim)) {
+				return false;
+			}
+			return level.isLoaded(ground) && level.getBlockState(ground).is(HallItems.SECT_HALL_STELE) && level.isLoaded(site.stele);
+		}
 		Halls.HallView hall = Halls.hallOf(site.owner);
 		if (hall == null || !hall.active() || !hall.pos().equals(site.stele) || !hall.dim().equals(site.dim)) {
 			return false;
@@ -1361,6 +1403,9 @@ public final class BuildEngine implements EngineApi {
 				tierFx(level, site);
 				BuildListener.fire().onTierDone(site.ledgerOwner(), site.template, site.tier);
 			}
+			if (site.sky && !site.showcase) {
+				skyTier(level, site);
+			}
 			finishedTest = site.testTarget >= 0 && site.tier >= site.testTarget;
 		}
 		if (instant(site) && (finishedTest || Scheduler.next(site) == null && site.openId == null)) {
@@ -1371,6 +1416,25 @@ public final class BuildEngine implements EngineApi {
 		}
 		if (site.testTarget >= 0 && site.tier >= site.testTarget) {
 			site.speedMode = 0;
+		}
+	}
+
+	/** Sekte Langit: a sky site's tier is done (the Cloud Core, the Nine Heavens). */
+	private void skyTier(ServerLevel level, Site site) {
+		UUID owner = site.ledgerOwner();
+		dev.kultivator.sekte.langit.api.LangitEvents.tier(owner, level, site.tier);
+		ServerPlayer master = server == null ? null : server.getPlayerList().getPlayer(owner);
+		if (master == null || site.test) {
+			return;
+		}
+		if (site.tier == 1) {
+			dev.kultivator.util.Advancements.grant(master, dev.kultivator.sekte.langit.api.LangitIds.ADV + "tapak_awan");
+			if (site.tethered) {
+				dev.kultivator.sect.build.flow.LangitAngkat.coreDone(master, site.view());
+			}
+		}
+		if (site.tier >= SectTemplates.TIERS) {
+			dev.kultivator.util.Advancements.grant(master, dev.kultivator.sekte.langit.api.LangitIds.ADV + "sembilan_langit");
 		}
 	}
 
@@ -1535,9 +1599,20 @@ public final class BuildEngine implements EngineApi {
 			}
 			return;
 		}
+		if (skies.get(site.owner) == site) {
+			skies.remove(site.owner);
+			if (server != null) {
+				Showcase.get(server).removeSky(site.owner);
+			}
+			dev.kultivator.sekte.langit.api.LangitEvents.removed(site.ledgerOwner());
+			return;
+		}
 		if (sites.get(site.owner) == site) {
 			sites.remove(site.owner);
 			clearSection(site.owner);
+			if (site.sky) {
+				dev.kultivator.sekte.langit.api.LangitEvents.removed(site.owner);
+			}
 		}
 	}
 
@@ -1590,7 +1665,11 @@ public final class BuildEngine implements EngineApi {
 	List<BoundingBox> otherSites(UUID owner, boolean showcase) {
 		List<BoundingBox> list = new ArrayList<>();
 		for (Site site : allSites()) {
-			if (!showcase && site.owner.equals(owner) && !site.showcase && !site.restoring) {
+			if (!showcase && site.ledgerOwner().equals(owner) && !site.showcase && !site.restoring && !orphan(site)) {
+				continue;
+			}
+			if (!showcase && site.foot && owner.equals(site.refundTo)) {
+				// The owner's Mountain Foot under their own sky island.
 				continue;
 			}
 			list.add(site.footprint());
@@ -1619,7 +1698,10 @@ public final class BuildEngine implements EngineApi {
 			error(player, "disabled");
 			return 0L;
 		}
-		if (!SectTemplates.valid(template)) {
+		Site main = sites.get(player.getUUID());
+		boolean skyUpgrade = kind == Previews.Kind.FOUND && main != null && main.sky && !main.tethered;
+		if (!SectTemplates.valid(template) && !(SectTemplates.isSky(template) && (kind == Previews.Kind.SHOWCASE || kind == Previews.Kind.HOLOGRAM
+				|| kind == Previews.Kind.UPGRADE || skyUpgrade))) {
 			error(player, "bad_template");
 			return 0L;
 		}
@@ -1685,6 +1767,9 @@ public final class BuildEngine implements EngineApi {
 		if (!Templates.ready(job.template)) {
 			return err("not_ready");
 		}
+		if (job.sky && (job.kind == Previews.Kind.FOUND || job.kind == Previews.Kind.TEST)) {
+			return foundSky(player, job);
+		}
 		return switch (job.kind) {
 			case FOUND, TEST -> found(player, job);
 			case SHOWCASE -> showcaseConfirm(player, job);
@@ -1737,6 +1822,7 @@ public final class BuildEngine implements EngineApi {
 		site.planVersion = Templates.get(job.template).planVersion();
 		site.state = SiteView.STATE_ACTIVE;
 		site.test = test;
+		site.sky = SectTemplates.isSky(job.template);
 		int flags = auth.getOrDefault(owner, 0);
 		site.removePlayerBlocks = (flags & 1) != 0;
 		site.emptyContainers = (flags & 2) != 0;
@@ -1883,6 +1969,11 @@ public final class BuildEngine implements EngineApi {
 			}
 			BoundingBox fp = site.footprint();
 			if (pos.getX() >= fp.minX() - margin && pos.getX() <= fp.maxX() + margin && pos.getZ() >= fp.minZ() - margin && pos.getZ() <= fp.maxZ() + margin) {
+				return true;
+			}
+			BoundingBox kaki = site.sky ? site.plan().kakiBox() : null;
+			if (kaki != null && pos.getX() >= kaki.minX() - margin && pos.getX() <= kaki.maxX() + margin && pos.getZ() >= kaki.minZ() - margin
+					&& pos.getZ() <= kaki.maxZ() + margin) {
 				return true;
 			}
 		}
@@ -2257,6 +2348,10 @@ public final class BuildEngine implements EngineApi {
 		if (newTemplate <= site.template || job.template != newTemplate) {
 			return err("upgrade_smaller");
 		}
+		if (SectTemplates.isSky(newTemplate) != site.sky || site.sky && site.tethered) {
+			// Across the families only by the Ascension (DESIGN 37.3.7); a tethered island grows after it.
+			return err("upgrade_family");
+		}
 		if (!job.data.confirmable()) {
 			return err("not_confirmable");
 		}
@@ -2333,6 +2428,374 @@ public final class BuildEngine implements EngineApi {
 		orphans.put(key, site);
 		startDismantle(site, 0, false);
 		return null;
+	}
+
+	// ================================================================== EngineApi: Sekte Langit (DESIGN 37.9.1)
+
+	@Override
+	public long previewSky(ServerPlayer player, int sky, int rot, Glaze glaze, int yP, int dx, int dz, boolean test) {
+		if (server == null) {
+			return 0L;
+		}
+		if (!KultivatorConfig.get().sectConstruction) {
+			error(player, "disabled");
+			return 0L;
+		}
+		if (!SectTemplates.isSky(sky)) {
+			error(player, "bad_template");
+			return 0L;
+		}
+		if (!test && !Validator.allowed(sky)) {
+			error(player, "max_template");
+			return 0L;
+		}
+		Halls.HallView hall = Halls.hallOf(player.getUUID());
+		if (hall == null) {
+			error(player, "no_hall");
+			return 0L;
+		}
+		if (!hall.active()) {
+			error(player, "hall_inactive");
+			return 0L;
+		}
+		BlockPos throne = new BlockPos(hall.pos().getX() + dx, yP, hall.pos().getZ() + dz);
+		Previews.Kind kind = test ? Previews.Kind.TEST : Previews.Kind.FOUND;
+		long ticket = previews.start(server, player.getUUID(), player, sky, Math.floorMod(rot, 4), glaze == null ? Glaze.TINTA : glaze, test, kind, hall.dim(),
+				throne, 9, emptyAuthorized(player.getUUID()));
+		Previews.Job job = previews.job(ticket);
+		if (job != null) {
+			job.groundStele = hall.pos();
+			job.dx = dx;
+			job.dz = dz;
+			Site ground = sites.get(player.getUUID());
+			if (ground != null && !ground.sky) {
+				job.ownGround = ground.footprint();
+				job.groundTop = ground.footprint().maxY();
+			}
+		}
+		return ticket;
+	}
+
+	@Override
+	public long showcaseSky(ServerPlayer player, int sky, int tier, int rot, BlockPos origin) {
+		if (!SectTemplates.isSky(sky)) {
+			error(player, "bad_template");
+			return 0L;
+		}
+		return showcase(player, sky, tier, rot, origin);
+	}
+
+	/** Path A or B of a confirmed sky design (DESIGN 37.3.1): a tethered sky site, beside the ground site or as the main one. */
+	private @Nullable net.minecraft.network.chat.Component foundSky(ServerPlayer player, Previews.Job job) {
+		UUID owner = job.owner;
+		Site ground = sites.get(owner);
+		boolean pathA = ground != null && !ground.sky;
+		UUID key = pathA ? dev.kultivator.sekte.langit.api.LangitKeys.skyKey(owner) : owner;
+		Site existing = pathA ? skies.get(key) : ground;
+		if (existing != null) {
+			if (existing.restoring) {
+				return err("restoring");
+			}
+			boolean untouched = existing.statPlaced == 0L && existing.done.isEmpty() && existing.openId == null;
+			if (!untouched && !(job.kind == Previews.Kind.TEST && existing.test)) {
+				return err("has_site");
+			}
+			if (existing.test && !untouched) {
+				reset(existing.owner);
+				return err("restoring");
+			}
+			releaseHeld(existing);
+			if (pathA) {
+				skies.remove(key);
+				if (server != null) {
+					Showcase.get(server).removeSky(key);
+				}
+			} else {
+				sites.remove(owner);
+			}
+		}
+		Site site = newSite(key, job, job.kind == Previews.Kind.TEST);
+		site.sky = true;
+		site.tethered = true;
+		site.groundStele = job.groundStele;
+		site.ascent = 0;
+		if (pathA) {
+			site.refundTo = owner;
+			skies.put(key, site);
+		} else {
+			sites.put(owner, site);
+		}
+		save(site);
+		previews.cancel(job.ticket);
+		long blocks = job.compiled.tag().getLongOr("ops", 0L);
+		Kultivator.LOGGER.info("[Kultivator] Bangun: {} {} T1 -> {} blocks (langit, jalan {})", player.getName().getString(), SectTemplates.id(site.template),
+				blocks, pathA ? "A" : "B");
+		if (!pathA) {
+			BuildListener.fire().onConfirmed(owner, site.template);
+		}
+		ServerLevel level = server == null ? null : server.getLevel(site.dim);
+		if (level != null) {
+			dev.kultivator.sekte.langit.api.LangitEvents.founded(owner, level);
+		}
+		if (!site.test) {
+			dev.kultivator.util.Advancements.grant(player, dev.kultivator.sekte.langit.api.LangitIds.ADV + "rancang");
+		}
+		return null;
+	}
+
+	/** The owner's sky site (the tethered one of path A, or the main site when it is a sky site), or null. */
+	@Nullable Site skyOf(UUID owner) {
+		Site site = skies.get(dev.kultivator.sekte.langit.api.LangitKeys.skyKey(owner));
+		if (site != null) {
+			return site;
+		}
+		site = sites.get(owner);
+		return site != null && site.sky ? site : null;
+	}
+
+	/** Every sky site and sky showcase (the sky API's volumes). */
+	List<Site> skySites() {
+		List<Site> list = new ArrayList<>();
+		for (Site site : allSites()) {
+			if (site.sky && !site.restoring) {
+				list.add(site);
+			}
+		}
+		return list;
+	}
+
+	@Override
+	public @Nullable SiteView skySite(UUID owner) {
+		Site site = skyOf(owner);
+		return site == null ? null : site.view();
+	}
+
+	@Override
+	public boolean underSkyIsland(Level level, BlockPos pos) {
+		for (Site site : allSites()) {
+			if (!site.sky || !site.dim.equals(level.dimension())) {
+				continue;
+			}
+			BoundingBox fp = site.footprint();
+			if (pos.getX() >= fp.minX() && pos.getX() <= fp.maxX() && pos.getZ() >= fp.minZ() && pos.getZ() <= fp.maxZ() && pos.getY() < site.skyFloorY()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * The Ascension (DESIGN 37.3.5 item 4, 37.3.6): the hall already stands on the throne (the flow moved it there). The sky
+	 * site becomes the owner's main site, untethered; on path A the ground site becomes the Mountain Foot ({@code mode}).
+	 */
+	@Override
+	public @Nullable net.minecraft.network.chat.Component ascend(UUID owner, dev.kultivator.sect.build.api.FootMode mode) {
+		if (server == null) {
+			return err("no_site");
+		}
+		Site sky = skyOf(owner);
+		if (sky == null || !sky.tethered) {
+			return err("langit_no_sky");
+		}
+		Halls.HallView hall = Halls.hallOf(owner);
+		if (hall == null || !hall.active() || !hall.pos().equals(sky.stele)) {
+			return err("langit_not_on_throne");
+		}
+		CellIndex index = CellIndex.get(server);
+		UUID skyKey = dev.kultivator.sekte.langit.api.LangitKeys.skyKey(owner);
+		if (skies.get(skyKey) == sky) {
+			// Path A: the ground site steps aside first.
+			Site ground = sites.get(owner);
+			if (ground != null && !ground.sky) {
+				releaseHeld(ground);
+				UUID foot = dev.kultivator.sekte.langit.api.LangitKeys.footKey(owner);
+				sites.remove(owner);
+				clearSection(owner);
+				// Only the ground site's sections (below the island's floor) change hands; the section rule kept them apart.
+				index.rekey(owner, foot, sky.skyFloorY());
+				ground.owner = foot;
+				ground.refundTo = owner;
+				ground.foot = true;
+				switch (mode) {
+					case TINGGALKAN -> {
+						index.clearOwner(foot);
+						if (server != null) {
+							Showcase.get(server).removeOrphan(foot);
+						}
+					}
+					case BONGKAR -> {
+						orphans.put(foot, ground);
+						startDismantle(ground, 0, false);
+					}
+					default -> {
+						ground.state = SiteView.STATE_ACTIVE;
+						ground.openId = null;
+						ground.emission = null;
+						ground.fundEmission = null;
+						ground.fundId = null;
+						ground.pending = null;
+						ground.pendingId = null;
+						orphans.put(foot, ground);
+						ground.dirty = true;
+						save(ground);
+					}
+				}
+			}
+			skies.remove(skyKey);
+			Showcase.get(server).removeSky(skyKey);
+			index.rekey(skyKey, owner, Integer.MAX_VALUE);
+			sky.owner = owner;
+			sky.refundTo = null;
+			sites.put(owner, sky);
+		}
+		sky.tethered = false;
+		sky.groundStele = null;
+		sky.ascent = 2;
+		sky.ascentDay = dev.kultivator.sect.build.flow.FlowData.day();
+		sky.state = SiteView.STATE_ACTIVE;
+		sky.dirty = true;
+		save(sky);
+		ServerLevel level = server.getLevel(sky.dim);
+		if (level != null) {
+			dev.kultivator.sekte.langit.api.LangitEvents.ascended(owner, level);
+		}
+		return null;
+	}
+
+	@Override
+	public @Nullable net.minecraft.network.chat.Component testBuildSky(ServerPlayer player, int tier, int speedMode) {
+		Site site = skyOf(player.getUUID());
+		if (site == null || site.restoring) {
+			return err("langit_no_sky");
+		}
+		int target = Math.max(0, Math.min(SectTemplates.TIERS, tier));
+		if (!site.test) {
+			releaseHeld(site);
+		}
+		site.test = true;
+		site.fundEmission = null;
+		site.fundId = null;
+		if (target < site.tier) {
+			site.speedMode = 1;
+			startDismantle(site, target, true);
+			return null;
+		}
+		site.testTarget = target;
+		site.speedMode = Math.max(0, Math.min(2, speedMode));
+		site.state = SiteView.STATE_ACTIVE;
+		site.dirty = true;
+		save(site);
+		return null;
+	}
+
+	@Override
+	public @Nullable net.minecraft.network.chat.Component testAscend(ServerPlayer player, boolean force) {
+		Site site = skyOf(player.getUUID());
+		if (site == null || !site.tethered) {
+			return err("langit_no_sky");
+		}
+		if (!force && site.tier < dev.kultivator.sect.build.flow.LangitPlan.TETHER_MAX_TIER) {
+			return err("langit_core_unfinished");
+		}
+		return ascend(player.getUUID(), dev.kultivator.sect.build.api.FootMode.TETAP);
+	}
+
+	/**
+	 * {@code aula langit batal} (DESIGN 37.3.3): drops the owner's tethered sky design. Untouched it simply goes (the flow
+	 * gives the offering back); with blocks it comes down in slices with refunds ({@code keepBlocks} false) or stays as
+	 * plain blocks. After the Ascension the sky site is the main site and the ground flows apply. False without one.
+	 */
+	public boolean releaseSky(UUID owner, boolean keepBlocks) {
+		Site site = skyOf(owner);
+		if (site == null || !site.tethered || site.restoring) {
+			return false;
+		}
+		boolean untouched = site.statPlaced == 0L && site.done.isEmpty() && site.openId == null;
+		if (keepBlocks || untouched) {
+			removeSite(site, false);
+			return true;
+		}
+		startDismantle(site, 0, true);
+		return true;
+	}
+
+	/** True while the owner's tethered sky site has not placed a single block (the offering can still be refunded). */
+	public boolean skyUntouched(UUID owner) {
+		Site site = skyOf(owner);
+		return site != null && site.statPlaced == 0L && site.done.isEmpty() && site.openId == null && site.tier == 0;
+	}
+
+	/**
+	 * {@code aula langit kaki bongkar|lepaskan} (DESIGN 37.3.6): the Mountain Foot left on the ground after a path A
+	 * Ascension comes down with refunds to the owner, or is let go as plain blocks. False when there is no foot.
+	 */
+	public boolean footAction(UUID owner, boolean dismantle) {
+		UUID foot = dev.kultivator.sekte.langit.api.LangitKeys.footKey(owner);
+		Site site = orphans.get(foot);
+		if (site == null || server == null) {
+			return false;
+		}
+		if (dismantle) {
+			site.refundTo = owner;
+			startDismantle(site, 0, false);
+			return true;
+		}
+		removeSite(site, false);
+		return true;
+	}
+
+	/** True while the owner keeps a Mountain Foot on the ground. */
+	public boolean hasFoot(UUID owner) {
+		return orphans.containsKey(dev.kultivator.sekte.langit.api.LangitKeys.footKey(owner));
+	}
+
+	/** The tethered sky site waits at the throne (1: the ground stele was taken up) or not any more (0). */
+	public void setAscent(UUID owner, int ascent) {
+		Site site = skyOf(owner);
+		if (site != null && site.tethered && site.ascent != ascent) {
+			site.ascent = ascent;
+			site.dirty = true;
+			save(site);
+			dev.kultivator.sekte.langit.api.LangitEvents.changed(owner);
+		}
+	}
+
+	/**
+	 * The hall's stele stands somewhere else on the ground while the sky site is tethered (DESIGN 37.3.5 item 7): within the
+	 * shift limit the site tethers to the new stele, beyond it the site pauses until the stele comes back.
+	 */
+	public void retether(UUID owner, BlockPos ground, boolean withinReach) {
+		Site site = skyOf(owner);
+		if (site == null || !site.tethered) {
+			return;
+		}
+		site.groundStele = ground.immutable();
+		site.ascent = 0;
+		site.state = withinReach ? SiteView.STATE_ACTIVE : SiteView.STATE_PAUSED;
+		site.dirty = true;
+		save(site);
+		dev.kultivator.sekte.langit.api.LangitEvents.changed(owner);
+	}
+
+	/** Every sky site and sky showcase as the sky API sees it (server thread). */
+	public List<SkySiteInfo> skyInfos() {
+		List<SkySiteInfo> list = new ArrayList<>();
+		for (Site site : skySites()) {
+			try {
+				list.add(new SkySiteInfo(site.ledgerOwner(), site.dim, site.stele, site.stele.getY(), site.skyFloorY(), site.template, site.tier, site.tethered,
+						site.ascent, site.footprint(), site.plan().kakiBox(), Map.copyOf(site.anchors), site.rotation, site.test, site.showcase,
+						site.spec().above()));
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("Sky sect site {} could not be read", site.owner, exception);
+			}
+		}
+		return list;
+	}
+
+	/** The world y of an owner's ground site's column top (path A's section rule), or {@code Integer.MIN_VALUE}. */
+	int groundTop(UUID owner) {
+		Site ground = sites.get(owner);
+		return ground != null && !ground.sky ? ground.footprint().maxY() : Integer.MIN_VALUE;
 	}
 
 	// ================================================================== EngineApi: debug and test

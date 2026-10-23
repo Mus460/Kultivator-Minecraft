@@ -125,6 +125,30 @@ public final class SectRaids {
 		}
 	}
 
+	/**
+	 * Sekte Langit (DESIGN 37.7.5, module 37G): where the raiders of a hall arrive. Asked at the start of every spawn
+	 * point search, before the dry-land search: a sky hall answers a dock or a landing point inside its rim fence (the
+	 * dry-land search would find the ground below the island). Null keeps the old search. The meter, waves, timing and
+	 * results never change.
+	 */
+	public interface SpawnPointProvider {
+		@Nullable Vec3 spawn(UUID owner, ServerLevel level, int wave, RandomSource random);
+
+		/** Extra repel chance for a raid of {@code owner} settled as data (a sky hall is hard to reach); 0 by default. */
+		default double repelBonus(UUID owner) {
+			return 0.0D;
+		}
+	}
+
+	private static final List<SpawnPointProvider> SPAWN_POINTS = new CopyOnWriteArrayList<>();
+
+	/** Adds a raider arrival provider (Sekte Langit); register from a module's {@code init()}. */
+	public static void addSpawnPointProvider(SpawnPointProvider provider) {
+		if (provider != null) {
+			SPAWN_POINTS.add(provider);
+		}
+	}
+
 	private static final Director NO_DIRECTOR = new Director() {
 	};
 	private static volatile Director director = NO_DIRECTOR;
@@ -615,6 +639,16 @@ public final class SectRaids {
 	private static @Nullable Vec3 spawnPoint(MinecraftServer server, RaidState raid, @Nullable ServerPlayer owner) {
 		ServerLevel level = raid.level;
 		RandomSource random = level.getRandom();
+		for (SpawnPointProvider provider : SPAWN_POINTS) {
+			try {
+				Vec3 provided = provider.spawn(raid.owner, level, raid.wave, random);
+				if (provided != null) {
+					return provided;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A raid spawn point provider failed", exception);
+			}
+		}
 		Vec3 centre = raid.centre();
 		double angle = raid.angles[raid.spawnIndex++ % raid.angles.length] + (random.nextDouble() - 0.5D) * 0.5D;
 		double distance = raid.radius + 4.0D + random.nextDouble() * 4.0D;
@@ -859,6 +893,15 @@ public final class SectRaids {
 		int total = Math.max(score[0], section.getIntOr("score", 0)) + ally;
 		int disciples = Math.max(score[1], section.getIntOr("score_d", 0));
 		double chance = repelChance(total, lr, waves);
+		double bonus = 0.0D;
+		for (SpawnPointProvider provider : SPAWN_POINTS) {
+			try {
+				bonus += Math.max(0.0D, provider.repelBonus(owner));
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A raid spawn point provider failed", exception);
+			}
+		}
+		chance = Mth.clamp(chance + bonus, 0.10D, 0.95D);
 		boolean repelled = level != null && level.getRandom().nextDouble() < chance;
 		Component summary;
 		int result;

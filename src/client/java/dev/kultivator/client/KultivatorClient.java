@@ -85,6 +85,8 @@ public class KultivatorClient implements ClientModInitializer {
 		dev.kultivator.client.duel.DuelClient.init();
 		// Sekte yang Hidup (DESIGN 36): the client side of the ten sect-and-disciple modules.
 		dev.kultivator.client.sekte.SekteContentClient.init();
+		// Sekte Langit (DESIGN 37): the client side of the four sky-sect modules (37V owns this line).
+		dev.kultivator.client.sekte.langit.LangitClient.init();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.SyncSelf.TYPE, (payload, context) -> ClientCultivation.update(payload));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fx.TYPE, (payload, context) -> FxDispatcher.play(payload));

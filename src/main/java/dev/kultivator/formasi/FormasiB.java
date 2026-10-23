@@ -36,6 +36,7 @@ public final class FormasiB {
 		}
 		initialised = true;
 		CatalogB.register(specs);
+		dev.kultivator.formasi.catalog.CatalogLangit.register(specs, effects); // Sekte Langit 37M: awan_transfer, jaring_awan
 		effects.effect(CatalogB.ALARM, new AlarmEffect());
 		effects.effect(CatalogB.CONCEAL, new ConcealEffect(false));
 		effects.effect(CatalogB.CONCEAL_DETECT, new ConcealEffect(true));

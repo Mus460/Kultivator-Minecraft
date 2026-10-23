@@ -1,7 +1,9 @@
 package dev.kultivator.sect.build.flow;
 
 import dev.kultivator.sect.build.api.EngineApi;
+import dev.kultivator.data.Cultivators;
 import dev.kultivator.sect.build.api.SectTemplates;
+import dev.kultivator.sekte.langit.api.LangitConfig;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
@@ -31,10 +33,20 @@ public final class Upgrade {
 		if (current <= 0) {
 			return Component.translatable("kultivator.sectbuild.upgrade.no_template");
 		}
-		if (template <= current || !SectTemplates.valid(template)) {
+		if (template <= current || !SectTemplates.validAny(template)) {
 			return Component.translatable("kultivator.sectbuild.upgrade.smaller", SectTemplates.name(current));
 		}
-		if (template > dev.kultivator.KultivatorConfig.get().sectBuildMaxTemplate) {
+		if (SectTemplates.isSky(template) != SectTemplates.isSky(current)) {
+			// Sekte Langit (DESIGN 37.3.7): across families only through the Ascension (or founding again on the ground).
+			return Component.translatable("kultivator.blueprint.error.upgrade_family");
+		}
+		if (SectTemplates.isSky(template) && LangitConfig.get().gerbangRanah) {
+			ServerPlayer master = Ceremonies.online(owner);
+			if (master != null && Cultivators.get(master).realm().ordinal() < LangitRancang.realmFor(template).ordinal()) {
+				return Component.translatable("kultivator.sekte_langit.bangun.ranah", SectTemplates.name(template), LangitRancang.realmFor(template).displayName());
+			}
+		}
+		if (SectTemplates.rank(template) > dev.kultivator.KultivatorConfig.get().sectBuildMaxTemplate) {
 			return Component.translatable("kultivator.sectbuild.template.too_large", dev.kultivator.KultivatorConfig.get().sectBuildMaxTemplate);
 		}
 		return null;

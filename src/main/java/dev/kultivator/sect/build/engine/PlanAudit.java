@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.WallBannerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.StairsShape;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
@@ -98,7 +99,7 @@ final class PlanAudit {
 			tierBills[i] = Bill.builder();
 		}
 		for (Component component : spec.components()) {
-			Sink sink = new Sink(component.id(), spec.column(), spec.keep());
+			Sink sink = Sink.of(component.id(), spec);
 			Emission emission;
 			try {
 				component.emit(ctx, sink);
@@ -168,8 +169,9 @@ final class PlanAudit {
 		List<net.minecraft.network.chat.Component> lines = new ArrayList<>();
 		int emissions = 0;
 		int violations = 0;
-		for (int t = 1; t <= SectTemplates.COUNT; t++) {
-			if (template != null && template != t) {
+		// Sekte Langit (DESIGN 37.4.12): "all" covers the ground templates 1-9 and the sky templates 11-19.
+		for (int t = 1; t <= SectTemplates.SKY_LAST; t++) {
+			if (!SectTemplates.validAny(t) || template != null && template != t) {
 				continue;
 			}
 			TemplateSpec spec = Templates.get(t);
@@ -193,6 +195,8 @@ final class PlanAudit {
 	private static int[] check(TemplateSpec spec, DryRun run, List<net.minecraft.network.chat.Component> lines) {
 		int violations = 0;
 		String name = spec.id();
+		// A sky plan has no ground under it except the stair foot (the dry context's flat land at the foot's design level).
+		Ground ground = Ground.of(spec);
 		// The final planned map (later components overwrite earlier ones, as the build does).
 		Long2ObjectOpenHashMap<BlockState> map = new Long2ObjectOpenHashMap<>();
 		int outside = 0;
@@ -208,7 +212,7 @@ final class PlanAudit {
 					unknown++;
 					log(name, component.id(), "unknown block " + BuiltInRegistries.BLOCK.getKey(state.getBlock()), emission.pos[i]);
 				}
-				if (bannedBlock(state)) {
+				if (bannedBlock(state) || ground.sky() && dev.kultivator.sect.build.blueprint.awan.AwanPalette.banned(state)) {
 					banned++;
 					log(name, component.id(), "banned block " + BuiltInRegistries.BLOCK.getKey(state.getBlock()), emission.pos[i]);
 				}
@@ -222,7 +226,7 @@ final class PlanAudit {
 		it.unimi.dsi.fastutil.longs.LongOpenHashSet falls = new it.unimi.dsi.fastutil.longs.LongOpenHashSet();
 		for (Emission emission : run.emissions().values()) {
 			emission.anchors.forEach((id, at) -> {
-				if (id.startsWith("waterfall")) {
+				if (id.startsWith("waterfall") || id.startsWith("airterjun")) {
 					falls.add(at.asLong());
 				}
 			});
@@ -239,13 +243,13 @@ final class PlanAudit {
 					stairs++;
 				}
 			}
-			if (!supported(map, pos, state)) {
+			if (!supported(map, pos, state, ground)) {
 				unsupported++;
 				if (unsupported <= 8) {
 					log(name, "-", "unsupported " + BuiltInRegistries.BLOCK.getKey(state.getBlock()), pos);
 				}
 			}
-			if (state.is(Blocks.WATER) && !falls.contains(pos) && !contained(map, pos)) {
+			if (state.is(Blocks.WATER) && !falls.contains(pos) && !contained(map, pos, ground)) {
 				water++;
 				if (water <= 8) {
 					log(name, "-", "uncontained water", pos);
@@ -259,18 +263,21 @@ final class PlanAudit {
 		for (Emission emission : run.emissions().values()) {
 			found.putAll(emission.anchors);
 		}
+		if (ground.sky()) {
+			anchors += skyChecks(spec, name, found, map, lines);
+		}
 		BlockPos library = found.get("library");
-		if (library != null && library.distSqr(BlockPos.ZERO) > 16 * 16) {
+		if (!ground.sky() && library != null && library.distSqr(BlockPos.ZERO) > 16 * 16) {
 			anchors++;
 			lines.add(line(name, "library", library));
 		}
 		BlockPos formation = found.get("formation");
-		if (formation == null || formation.distSqr(BlockPos.ZERO) > 24 * 24) {
+		if (!ground.sky() && (formation == null || formation.distSqr(BlockPos.ZERO) > 24 * 24)) {
 			anchors++;
 			lines.add(line(name, "formation", formation == null ? BlockPos.ZERO : formation));
 		}
 		BlockPos tower = found.get("tower");
-		if (tower == null || tower.getX() * tower.getX() + tower.getZ() * tower.getZ() > 12 * 12) {
+		if (!ground.sky() && (tower == null || tower.getX() * tower.getX() + tower.getZ() * tower.getZ() > 12 * 12)) {
 			anchors++;
 			lines.add(line(name, "tower", tower == null ? BlockPos.ZERO : tower));
 		}
@@ -280,7 +287,7 @@ final class PlanAudit {
 				deepest = Math.min(deepest, BlockPos.getY(entry.getLongKey()));
 			}
 		}
-		if (deepest < -28) {
+		if (!ground.sky() && deepest < -28) {
 			anchors++;
 			lines.add(line(name, "tower_depth", new BlockPos(0, deepest, 0)));
 		}
@@ -342,39 +349,113 @@ final class PlanAudit {
 				|| state.is(Blocks.REDSTONE_WIRE) || state.is(Blocks.REDSTONE_BLOCK) || state.is(BlockTags.LIGHTNING_RODS);
 	}
 
-	/** Blocks that need support have it in the plan (flat land: everything below y = -1 is ground). */
-	private static boolean supported(Long2ObjectOpenHashMap<BlockState> map, long pos, BlockState state) {
+	/**
+	 * Where a dry plan has ground of its own: flat land below y = -1 for a ground template; for a sky template only the
+	 * stair-foot square at and below its design level - 1 (the dry context's {@code AwanTerrain}), elsewhere open sky.
+	 */
+	private record Ground(boolean sky, @Nullable BoundingBox kaki, int kakiTop) {
+		static Ground of(TemplateSpec spec) {
+			if (!spec.sky()) {
+				return new Ground(false, null, -1);
+			}
+			TemplateSpec.Zone zone = spec.kaki();
+			return new Ground(true, spec.kakiColumn(), zone == null ? Integer.MIN_VALUE : zone.design() - 1);
+		}
+
+		/** True when an unplanned cell at {@code pos} is ground. */
+		boolean solid(long pos) {
+			int y = BlockPos.getY(pos);
+			if (!sky) {
+				return y < 0;
+			}
+			if (kaki == null) {
+				return false;
+			}
+			int x = BlockPos.getX(pos);
+			int z = BlockPos.getZ(pos);
+			return x >= kaki.minX() && x <= kaki.maxX() && z >= kaki.minZ() && z <= kaki.maxZ() && y <= kakiTop;
+		}
+	}
+
+	/** The anchors every sky template must emit (read by 37B's flow, 37M's ferry and 37V's arrival). */
+	static final String[] SKY_ANCHORS = {"tahta", "arrival", "tangga_kaki", "tangga_puncak", "feri_atas", "feri_bawah"};
+
+	/**
+	 * The sky checks of DESIGN 37.4.12: the anchors the sky modules read, the throne at the origin, and nothing planned
+	 * under the island's floor ({@code skyFloor}) outside the stair-foot column. Returns the problems found.
+	 */
+	private static int skyChecks(TemplateSpec spec, String name, Map<String, BlockPos> found, Long2ObjectOpenHashMap<BlockState> map,
+			List<net.minecraft.network.chat.Component> lines) {
+		int problems = 0;
+		for (String id : SKY_ANCHORS) {
+			if (!found.containsKey(id)) {
+				problems++;
+				lines.add(line(name, id, BlockPos.ZERO));
+			}
+		}
+		BlockPos tahta = found.get("tahta");
+		if (tahta != null && (Math.abs(tahta.getX()) > 2 || Math.abs(tahta.getZ()) > 2)) {
+			problems++;
+			lines.add(line(name, "tahta", tahta));
+		}
+		int floor = spec.skyFloor();
+		BoundingBox kaki = spec.kakiColumn();
+		int below = 0;
+		for (Long2ObjectMap.Entry<BlockState> entry : map.long2ObjectEntrySet()) {
+			long pos = entry.getLongKey();
+			if (entry.getValue().isAir() || BlockPos.getY(pos) >= floor) {
+				continue;
+			}
+			int x = BlockPos.getX(pos);
+			int z = BlockPos.getZ(pos);
+			if (kaki != null && x >= kaki.minX() && x <= kaki.maxX() && z >= kaki.minZ() && z <= kaki.maxZ()) {
+				continue;
+			}
+			below++;
+			if (below <= 4) {
+				log(name, "-", "below the sky floor " + floor, pos);
+			}
+		}
+		if (below > 0) {
+			problems++;
+			lines.add(line(name, "sky_floor", new BlockPos(0, floor, 0)));
+		}
+		return problems;
+	}
+
+	/** Blocks that need support have it in the plan (see {@link Ground}). */
+	private static boolean supported(Long2ObjectOpenHashMap<BlockState> map, long pos, BlockState state, Ground ground) {
 		// Leaves (cherry and flowering azalea leaves are also #flowers) and wall banners (also #banners) hang free.
 		if (state.is(BlockTags.LEAVES) || state.getBlock() instanceof WallBannerBlock) {
 			return true;
 		}
 		if (state.hasProperty(BlockStateProperties.HANGING)) {
 			boolean hanging = state.getValue(BlockStateProperties.HANGING);
-			return solidAt(map, BlockPos.offset(pos, hanging ? Direction.UP : Direction.DOWN));
+			return solidAt(map, BlockPos.offset(pos, hanging ? Direction.UP : Direction.DOWN), ground);
 		}
 		if (state.is(BlockTags.CANDLES) || state.is(BlockTags.FLOWERS) || state.is(Blocks.SHORT_GRASS) || state.is(Blocks.FERN)
 				|| state.is(Blocks.PINK_PETALS) || state.is(Blocks.LEAF_LITTER) || state.is(BlockTags.BANNERS) || state.is(Blocks.BAMBOO)
 				|| state.is(BlockTags.WOOL_CARPETS) || state.is(Blocks.MOSS_CARPET) || state.is(BlockTags.FLOWER_POTS)) {
-			return solidAt(map, BlockPos.offset(pos, Direction.DOWN));
+			return solidAt(map, BlockPos.offset(pos, Direction.DOWN), ground);
 		}
 		return true;
 	}
 
-	private static boolean solidAt(Long2ObjectOpenHashMap<BlockState> map, long pos) {
+	private static boolean solidAt(Long2ObjectOpenHashMap<BlockState> map, long pos, Ground ground) {
 		BlockState below = map.get(pos);
 		if (below == null) {
-			return BlockPos.getY(pos) < 0;
+			return ground.solid(pos);
 		}
 		return !below.isAir();
 	}
 
 	/** Every horizontal neighbour and the cell below a water cell is water or a planned solid (flat land below -1). */
-	private static boolean contained(Long2ObjectOpenHashMap<BlockState> map, long pos) {
+	private static boolean contained(Long2ObjectOpenHashMap<BlockState> map, long pos, Ground ground) {
 		for (Direction direction : new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.DOWN}) {
 			long next = BlockPos.offset(pos, direction);
 			BlockState state = map.get(next);
 			if (state == null) {
-				if (BlockPos.getY(next) >= 0) {
+				if (!ground.solid(next)) {
 					return false;
 				}
 				continue;

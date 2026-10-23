@@ -315,7 +315,12 @@ public final class BuildInfo {
 		if (catalogStats == null || now - catalogAt > CATALOG_TICKS) {
 			ListTag stats = new ListTag();
 			boolean complete = true;
-			for (int template = 1; template <= SectTemplates.COUNT; template++) {
+			// Sekte Langit (DESIGN 37.3.2): the sky templates' stats too while the feature is on.
+			int last = dev.kultivator.sekte.langit.api.LangitConfig.on() ? SectTemplates.SKY_LAST : SectTemplates.COUNT;
+			for (int template = 1; template <= last; template++) {
+				if (!SectTemplates.validAny(template)) {
+					continue;
+				}
 				PlanStats plan;
 				try {
 					plan = EngineApi.get().stats(template);
@@ -349,6 +354,18 @@ public final class BuildInfo {
 		tag.putBoolean("can_change", Founding.freeChange(owner));
 		tag.putInt("builders", Builders.souls(owner).size());
 		tag.putDouble("speed", config.sectBuildSpeed);
+		// Sekte Langit: the Awan tab's gate (LangitRancang decides again on the server).
+		dev.kultivator.sekte.langit.api.LangitConfig sky = dev.kultivator.sekte.langit.api.LangitConfig.get();
+		tag.putBoolean("sky_on", dev.kultivator.sekte.langit.api.LangitConfig.on());
+		tag.putBoolean("sky_gate", sky.gerbangRanah);
+		tag.putInt("sky_max_b", sky.awanAwalMaks);
+		SiteView skySite = engine.skySite(owner);
+		tag.putInt("sky_t", skySite == null ? 0 : skySite.template());
+		int[] territory = new int[SectTemplates.TIERS];
+		for (int n = 1; n <= SectTemplates.TIERS; n++) {
+			territory[n - 1] = dev.kultivator.sect.build.blueprint.Templates.get(SectTemplates.SKY_FIRST + n - 1).territory();
+		}
+		tag.putIntArray("sky_terr", territory);
 		Net.send(player, new Payloads.BuildPreview(tag));
 	}
 

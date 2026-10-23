@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * Kitab Panduan (the in-game guide): the static list of its 16 chapters and their steps, shared by the server and the
+ * Kitab Panduan (the in-game guide): the static list of its 17 chapters and their steps, shared by the server and the
  * client. Pure data: no Minecraft classes, so both sides may use it freely.
  * <p>
  * Contract with {@code client.guide.GuideScreen} and {@link GuideProgress}:
@@ -48,17 +48,18 @@ public final class GuideChapters {
 	 * Chapters by save index: Hari Pertama ... Tips & Kesalahan Umum, then (DESIGN 34.9) Dunia yang Luas and Ujung Dunia.
 	 * Chapters 13 and 14 are appended after chapter 12; their texts live in {@code lang-src/dunia_panduan.*}. Chapters 15
 	 * (Murid yang Hidup) and 16 (Sekte di Dunia) are Sekte yang Hidup's (DESIGN 36.3.6); their texts live in
-	 * {@code lang-src/sekte_panduan.*} and their checks are the {@code sekte/} advancements of the ten modules. The book
-	 * shows them in {@link #displayOrder()}.
+	 * {@code lang-src/sekte_panduan.*} and their checks are the {@code sekte/} advancements of the ten modules. Chapter 17
+	 * (save index 16, Sekte Langit, DESIGN 37.7.8, module 37G) has its texts in {@code lang-src/sekte_langit_panduan.*} and
+	 * its checks are the {@code sekte_langit/} advancements. The book shows them in {@link #displayOrder()}.
 	 */
-	public static final int CHAPTER_COUNT = 16;
+	public static final int CHAPTER_COUNT = 17;
 
 	/**
 	 * The order the book shows the chapters in, as 0-based save indexes (integration audit T1): Dunia yang Luas right
 	 * after Pemurnian Qi, the Sekte yang Hidup chapters beside the older sect chapters, Ujung Dunia before Kenaikan Abadi
 	 * and the Tips last. Sekte Langit (37) inserts its chapter 17 (save index 16) right after chapter 9 (save index 8).
 	 */
-	private static final int[] DISPLAY_ORDER = {0, 1, 12, 2, 3, 4, 14, 5, 15, 6, 7, 8, 13, 9, 10, 11};
+	private static final int[] DISPLAY_ORDER = {0, 1, 12, 2, 3, 4, 14, 5, 15, 6, 7, 8, 16, 13, 9, 10, 11};
 
 	/**
 	 * Per save index: {minRealm, pastRealm, requires}. minRealm: the chapter becomes current only from that realm on (null:
@@ -84,6 +85,7 @@ public final class GuideChapters {
 			{"golden_core", "immortal_ascension", null}, // 14 Ujung Dunia
 			{"foundation", "deity_transformation", "hall"}, // 15 Murid yang Hidup
 			{"golden_core", "immortal_ascension", "hall"}, // 16 Sekte di Dunia
+			{"golden_core", null, "hall_level:6|tier:6"}, // 17 Sekte Langit (37G): a level-6 hall or a tier-6 site first
 	};
 
 	/**
@@ -360,6 +362,19 @@ public final class GuideChapters {
 		step(15, "rival", "/kultivasi perguruan diplomasi", "adv:sekte/diplomasi_temu");
 		step(15, "sekutu", null, "adv:sekte/diplomasi_sekutu");
 		optional(15, "perang", null, "adv:sekte/diplomasi_menang");
+		// 17. Sekte Langit (DESIGN 37.7.8, module 37G; appended last: the GuideSync bits follow this order). "jaring" and
+		// "sembilan" are optional (audit 4.5): the net may never need to catch anyone, the Nine Heavens is a late target.
+		step(16, "syarat", "/kultivasi aula langit", "hall_level:6|tier:6");
+		step(16, "rancang", "/kultivasi aula langit rancang", "adv:sekte_langit/rancang");
+		step(16, "tapak", null, "adv:sekte_langit/tapak_awan");
+		step(16, "naik", null, "adv:sekte_langit/naik");
+		step(16, "formasi", null, "adv:sekte_langit/pindah_awan");
+		step(16, "tangga", null, "adv:sekte_langit/seribu_anak_tangga");
+		optional(16, "jaring", null, "adv:sekte_langit/tertangkap|adv:sekte_langit/terjun_awan");
+		step(16, "feri", "/kultivasi langit feri", "adv:sekte_langit/feri");
+		step(16, "bajak", null, "adv:sekte_langit/bajak_awan");
+		step(16, "temu", null, "adv:sekte_langit/temu_langit");
+		optional(16, "sembilan", null, "adv:sekte_langit/sembilan_langit");
 
 		if (GATES.length != CHAPTER_COUNT || DISPLAY_ORDER.length != CHAPTER_COUNT) {
 			throw new IllegalStateException("Guide chapter tables out of step with CHAPTER_COUNT");

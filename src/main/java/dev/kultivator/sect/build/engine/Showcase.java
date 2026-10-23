@@ -33,6 +33,12 @@ public final class Showcase extends SavedData {
 	 * whenever its player is near, also after a restart; its cells belong to the orphan id, its refunds to the player.
 	 */
 	final Map<UUID, CompoundTag> orphans = new LinkedHashMap<>();
+	/**
+	 * Sekte Langit (DESIGN 37.3.5): the tethered sky sites of path A (a hall that already has a ground site), keyed by
+	 * {@code LangitKeys.skyKey(owner)}; they are not showcases and never count against {@link #MAX_SHOWCASES}. At the
+	 * Ascension the sky site moves to the owner's own section.
+	 */
+	final Map<UUID, CompoundTag> skies = new LinkedHashMap<>();
 
 	public Showcase() {
 	}
@@ -63,10 +69,22 @@ public final class Showcase extends SavedData {
 		}
 	}
 
+	void putSky(UUID id, CompoundTag tag) {
+		skies.put(id, tag);
+		setDirty();
+	}
+
+	void removeSky(UUID id) {
+		if (skies.remove(id) != null) {
+			setDirty();
+		}
+	}
+
 	private static Showcase fromTag(CompoundTag tag) {
 		Showcase data = new Showcase();
 		read(tag.getCompoundOrEmpty("showcases"), data.sites);
 		read(tag.getCompoundOrEmpty("orphans"), data.orphans);
+		read(tag.getCompoundOrEmpty("skies"), data.skies);
 		return data;
 	}
 
@@ -88,6 +106,11 @@ public final class Showcase extends SavedData {
 		CompoundTag tag = new CompoundTag();
 		tag.put("showcases", all);
 		tag.put("orphans", orphanTag);
+		if (!skies.isEmpty()) {
+			CompoundTag skyTag = new CompoundTag();
+			skies.forEach((id, each) -> skyTag.put(id.toString(), each.copy()));
+			tag.put("skies", skyTag);
+		}
 		return tag;
 	}
 }

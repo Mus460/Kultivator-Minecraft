@@ -124,6 +124,16 @@ public final class Costs {
 		if (path.contains("sulfur")) {
 			return Cost.of(Bahan.PERMATA, 50L);
 		}
+		// Sekte Langit (DESIGN 37.4.1): the hanging crystals' flanks and tips, the glow-berry vines under the islands.
+		if (block == Blocks.TINTED_GLASS) {
+			return Cost.of(Bahan.PERMATA, 50L);
+		}
+		if (block == Blocks.AMETHYST_CLUSTER || block == Blocks.LARGE_AMETHYST_BUD) {
+			return Cost.of(Bahan.PERMATA, 25L);
+		}
+		if (block == Blocks.CAVE_VINES || block == Blocks.CAVE_VINES_PLANT) {
+			return Cost.of(Bahan.FLORA, 25L);
+		}
 		// Lights and fittings (Logam & Pelita).
 		if (path.endsWith("lantern") || path.endsWith("froglight") || block == Blocks.SHROOMLIGHT || block == Blocks.GLOWSTONE
 				|| block == Blocks.SEA_LANTERN) {

@@ -90,6 +90,8 @@ public final class Founding {
 		boolean lastConfirmable;
 		int lastSent = Integer.MIN_VALUE / 2;
 		boolean announced;
+		/** A sky design (DESIGN 37.3.4): rotating and re-previewing go through {@code LangitRancang}. */
+		boolean sky;
 
 		Pending(UUID player, long ticket, int template, int rot, Glaze glaze, Mode mode, int created, int tier, boolean force, @Nullable BlockPos origin) {
 			this.player = player;
@@ -132,7 +134,7 @@ public final class Founding {
 		if (!EngineApi.registered()) {
 			return Component.translatable(EngineApi.UNAVAILABLE_KEY);
 		}
-		if (!SectTemplates.valid(template)) {
+		if (!SectTemplates.validAny(template)) {
 			return Component.translatable("kultivator.sectbuild.template.unknown");
 		}
 		if (mode == Mode.SHOWCASE || mode == Mode.CHECK) {
@@ -147,6 +149,11 @@ public final class Founding {
 		}
 		if (mode == Mode.TEST) {
 			return null;
+		}
+		if (SectTemplates.isSky(template) && mode == Mode.FOUND) {
+			// Sekte Langit (DESIGN 37.3.3): its own realm gate and the rules of path A and B.
+			return SectTemplates.rank(template) > config.sectBuildMaxTemplate
+					? Component.translatable("kultivator.sectbuild.template.too_large", config.sectBuildMaxTemplate) : LangitRancang.blocker(player, template);
 		}
 		if (template > config.sectBuildMaxTemplate) {
 			return Component.translatable("kultivator.sectbuild.template.too_large", config.sectBuildMaxTemplate);
@@ -206,6 +213,33 @@ public final class Founding {
 		return true;
 	}
 
+	/**
+	 * A sky design's preview (DESIGN 37.3.4, from {@code LangitRancang}): the throne at {@code yP}, shifted {@code dx, dz}
+	 * from the ground stele; founding or test. The hologram, consent and confirm are the ground's.
+	 */
+	static boolean previewSky(ServerPlayer player, int sky, int rot, int yP, int dx, int dz, boolean test) {
+		Mode mode = test ? Mode.TEST : Mode.FOUND;
+		Component why = blocker(player, sky, mode);
+		if (why != null) {
+			Msg.chat(player, why.copy().withStyle(ChatFormatting.YELLOW));
+			return false;
+		}
+		UUID owner = player.getUUID();
+		int rotation = Math.floorMod(rot, 4);
+		cancel(player, false);
+		FlowData.applyAuthorization(owner);
+		long ticket = EngineApi.get().previewSky(player, sky, rotation, Glaze.TINTA, yP, dx, dz, test);
+		if (ticket == 0L) {
+			Msg.chat(player, Component.translatable("kultivator.sectbuild.preview.refused").withStyle(ChatFormatting.YELLOW));
+			return false;
+		}
+		Pending pending = new Pending(owner, ticket, sky, rotation, Glaze.TINTA, mode, tick(), 0, test, null);
+		pending.sky = true;
+		PENDING.put(owner, pending);
+		Msg.actionBar(player, Component.translatable("kultivator.sectbuild.preview.compiling", SectTemplates.name(sky)).withStyle(ChatFormatting.AQUA));
+		return true;
+	}
+
 	/** {@code uji sekte pamer} (a showcase at {@code origin}) and {@code uji sekte periksa} (the validator, then cancelled). */
 	public static boolean previewAt(ServerPlayer player, int template, int tier, int rot, BlockPos origin, Mode mode) {
 		Component why = blocker(player, template, mode);
@@ -234,6 +268,10 @@ public final class Founding {
 		}
 		if (pending.mode == Mode.UPGRADE) {
 			Msg.chat(player, Component.translatable("kultivator.sectbuild.upgrade.same_rotation").withStyle(ChatFormatting.YELLOW));
+			return;
+		}
+		if (pending.sky) {
+			LangitRancang.turn(player);
 			return;
 		}
 		int next = (pending.rot + 1) % 4;
@@ -325,11 +363,22 @@ public final class Founding {
 				int frozen = Halls.scanCap(self);
 				FlowData.setFrozenScanCap(self, frozen);
 			}
+			// Sekte Langit: the offering is taken first (all or nothing) and given back if the engine refuses.
+			boolean offering = pending.sky && pending.mode == Mode.FOUND && !LangitSesaji.held(self);
+			if (offering && !LangitSesaji.take(player, pending.template)) {
+				return false;
+			}
 			error = engine.confirm(player, pending.ticket);
+			if (error != null && offering) {
+				LangitSesaji.refund(player);
+			}
 		}
 		if (error != null) {
 			Msg.chat(player, error.copy().withStyle(ChatFormatting.RED));
 			return false;
+		}
+		if (pending.sky) {
+			LangitRancang.forget(self);
 		}
 		PENDING.remove(self);
 		Net.send(player, new Payloads.BuildPreview(new CompoundTag()));
@@ -492,6 +541,15 @@ public final class Founding {
 			return;
 		}
 		MutableComponent buttons = Component.empty();
+		if (pending.sky) {
+			// Sekte Langit: height and the offering's bill beside the usual buttons (DESIGN 37.3.4).
+			buttons.append(Ceremonies.button("kultivator.sectbuild.button.langit_naik_tinggi", "/kultivasi aula langit tinggi naik")).append(Component.literal(" "));
+			buttons.append(Ceremonies.button("kultivator.sectbuild.button.langit_turun_tinggi", "/kultivasi aula langit tinggi turun")).append(Component.literal(" "));
+			if (pending.mode == Mode.FOUND) {
+				Msg.chat(player, Component.translatable("kultivator.sekte_langit.sesaji.tagihan", SectTemplates.name(pending.template),
+						LangitSesaji.describe(LangitSesaji.bill(pending.template))).withStyle(ChatFormatting.GOLD));
+			}
+		}
 		if (pending.mode != Mode.UPGRADE) {
 			buttons.append(Ceremonies.button("kultivator.sectbuild.button.rotate", "/kultivasi aula bangun putar")).append(Component.literal(" "));
 		}
@@ -526,6 +584,7 @@ public final class Founding {
 	static void clearSession() {
 		PENDING.clear();
 		SHOWCASE.clear();
+		LangitRancang.clear();
 	}
 
 	private static int tick() {

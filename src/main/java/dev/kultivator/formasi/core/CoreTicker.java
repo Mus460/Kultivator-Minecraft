@@ -198,8 +198,16 @@ public final class CoreTicker {
 		return dx * dx + dz * dz <= range * range;
 	}
 
-	/** An outpost record that may run where it stands (L5, flagged, and on a valid outpost site). */
+	/**
+	 * A record that may run outside the territory where it stands: a flagged L5 outpost within
+	 * {@link Limits#L5_OUTPOST_RANGE}, or any Sekte Langit Cloud Transfer node (37M) within
+	 * {@code TransportNetwork.AWAN_RANGE} of the stele (flag or not: after the Ascension the stele moves up and the node
+	 * registered inside the old ground territory becomes the ground end of the pair).
+	 */
 	private static boolean outpostHere(ServerLevel level, CoreRecord record) {
+		if (Limits.AWAN_SPEC.equals(record.spec)) {
+			return dev.kultivator.formasi.effect.b.TransportNetwork.awanSite(record.owner, level, record.eye);
+		}
 		return outpost(record) && Limits.L5_SPEC.equals(record.spec) && outpostSite(record.owner, level, record.eye);
 	}
 

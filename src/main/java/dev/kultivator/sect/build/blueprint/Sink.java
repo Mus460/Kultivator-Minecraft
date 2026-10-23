@@ -43,6 +43,8 @@ public final class Sink {
 
 	private final String componentId;
 	private final @Nullable BoundingBox clip;
+	/** A second space the plan may use (a sky template's stair-foot column), or null. */
+	private @Nullable BoundingBox clip2;
 	private final LongSet keep;
 	private int size;
 	private long[] pos = new long[1024];
@@ -66,6 +68,7 @@ public final class Sink {
 	private Phase phase = Phase.PLINTH;
 	private int layerOverride = Integer.MIN_VALUE;
 	private boolean optional;
+	private boolean steleBase;
 
 	/**
 	 * @param componentId the component being emitted
@@ -77,6 +80,13 @@ public final class Sink {
 		this.clip = clip;
 		this.keep = keep == null ? new LongOpenHashSet() : keep;
 		this.index.defaultReturnValue(-1);
+	}
+
+	/** The sink of one component of {@code spec}: its column (and a sky template's stair-foot column) and kept cells. */
+	public static Sink of(String componentId, TemplateSpec spec) {
+		Sink sink = new Sink(componentId, spec.column(), spec.keep());
+		sink.clip2 = spec.kakiColumn();
+		return sink;
 	}
 
 	// ================================================================== frame
@@ -208,6 +218,16 @@ public final class Sink {
 		return this;
 	}
 
+	/**
+	 * Sekte Langit (DESIGN 37.4.9 item 2): lets the next ops plan the block under the stele cell, the jade base of the sky
+	 * throne (the stele is carried up onto it later). Only {@code awan.TahtaPrasasti} uses it; the stele cell itself stays
+	 * untouchable, and the placer still allows the base only for a sky site's throne component into an empty cell.
+	 */
+	public Sink steleBase(boolean allow) {
+		this.steleBase = allow;
+		return this;
+	}
+
 	/** Back to the automatic layer (y; -y for CUT and CLEAR). */
 	public Sink layerAuto() {
 		this.layerOverride = Integer.MIN_VALUE;
@@ -224,15 +244,15 @@ public final class Sink {
 		int lx = localX(x, z);
 		int ly = oy + y;
 		int lz = localZ(x, z);
-		if (lx == 0 && lz == 0 && (ly == 0 || ly == -1)) {
-			// The stele and the block under it are never edited (DESIGN 21.9).
+		if (lx == 0 && lz == 0 && (ly == 0 || ly == -1 && !steleBase)) {
+			// The stele and the block under it are never edited (DESIGN 21.9); only a sky throne plans its base (37.4.9).
 			return this;
 		}
 		long key = BlockPos.asLong(lx, ly, lz);
 		if (!state.isAir() && keep.contains(key)) {
 			return this;
 		}
-		if (clip != null && !clip.isInside(lx, ly, lz)) {
+		if (clip != null && !clip.isInside(lx, ly, lz) && (clip2 == null || !clip2.isInside(lx, ly, lz))) {
 			if (!optional && phase != Phase.GARDEN && phase != Phase.ORNAMENT) {
 				outside++;
 			}

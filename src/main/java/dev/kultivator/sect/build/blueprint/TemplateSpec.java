@@ -55,6 +55,9 @@ public final class TemplateSpec {
 	private final Map<String, Zone> zones;
 	private final List<Component> components;
 	private final LongSet keep;
+	/** Sekte Langit (DESIGN 37.4.9 item 5): a sky template (11-19), its lowest planned y and the stair-foot zone. */
+	private final boolean sky;
+	private final int skyFloor;
 
 	private TemplateSpec(Builder builder) {
 		this.template = builder.template;
@@ -73,6 +76,8 @@ public final class TemplateSpec {
 		this.qiTier = builder.qiTier;
 		this.gateAltars = builder.gateAltars;
 		this.planVersion = builder.planVersion;
+		this.sky = builder.sky;
+		this.skyFloor = builder.skyFloor;
 		this.zones = Collections.unmodifiableMap(new LinkedHashMap<>(builder.zones));
 		LongOpenHashSet keepCells = new LongOpenHashSet();
 		// The four duty posts 5 blocks N/E/S/W of the stele stay air (feet and head) over walkable floor (DESIGN 21.9).
@@ -249,6 +254,39 @@ public final class TemplateSpec {
 		return new BoundingBox(x0, -1 - below, z0, x1, -1 + above, z1);
 	}
 
+	// ================================================================== Sekte Langit (DESIGN 37.4.9 item 5)
+
+	/** The zone id of a sky template's stair foot (fitted to the real ground under the island). */
+	public static final String KAKI = "kaki";
+
+	/** True for a sky template (11-19): its plaza floats, its parts stand on the island terrain. */
+	public boolean sky() {
+		return sky;
+	}
+
+	/** The template-local y of the lowest island, satellite, root or crystal block (sky templates; else the column floor). */
+	public int skyFloor() {
+		return sky ? skyFloor : -1 - below;
+	}
+
+	/** The stair-foot zone of a sky template, or null. */
+	public @Nullable Zone kaki() {
+		return sky ? zones.get(KAKI) : null;
+	}
+
+	/**
+	 * The stair-foot column of a sky template (template-local): the foot square from the lowest the foot zone may be fitted
+	 * (minus 4) up to the island column's floor; the engine may change these cells too. Null for ground templates.
+	 */
+	public @Nullable BoundingBox kakiColumn() {
+		Zone zone = kaki();
+		if (zone == null) {
+			return null;
+		}
+		return new BoundingBox(Math.min(zone.x0(), zone.x1()), zone.lo() - 4, Math.min(zone.z0(), zone.z1()), Math.max(zone.x0(), zone.x1()),
+				-1 - below, Math.max(zone.z0(), zone.z1()));
+	}
+
 	/** True when the empty-but-valid placeholder of a template not written yet (no components). */
 	public boolean isPlaceholder() {
 		return components.isEmpty();
@@ -279,6 +317,8 @@ public final class TemplateSpec {
 		private final LongOpenHashSet keep = new LongOpenHashSet();
 
 		private boolean extended;
+		private boolean sky;
+		private int skyFloor;
 
 		private Builder(int template) {
 			this.template = template;
@@ -391,6 +431,26 @@ public final class TemplateSpec {
 		public Builder keep(int x, int y, int z) {
 			keep.add(BlockPos.asLong(x, y, z));
 			return this;
+		}
+
+		/** Marks a sky template (DESIGN 37). */
+		public Builder sky(boolean sky) {
+			this.sky = sky;
+			return this;
+		}
+
+		/** The lowest planned y of a sky template (template-local). */
+		public Builder skyFloor(int y) {
+			this.skyFloor = y;
+			return this;
+		}
+
+		/**
+		 * The stair-foot zone of a sky template ({@link #KAKI}): a square fitted to the real ground within {@code lo..hi}
+		 * (design level {@code design}); only this zone is fitted for a sky site.
+		 */
+		public Builder kaki(int x0, int z0, int x1, int z1, int design, int lo, int hi) {
+			return zone(KAKI, x0, z0, x1, z1, design, lo, hi);
 		}
 
 		public Builder add(Component component) {

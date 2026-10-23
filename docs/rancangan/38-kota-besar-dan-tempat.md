@@ -2766,3 +2766,1593 @@ nama prop/makhluk/senjata), `tempat_cerita`, `tempat_lore`, `tempat_kalimat`, `t
 30. Simpanan: keluar-masuk dunia, restart server: rekening, pesanan, lencana, buku kas, alur cerita, kerusakan dan tagihan
     tetap; mematikan `kotaBesar.worldgen` tidak merusak dunia yang sudah punya ibu kota.
 
+---------------------------------------------------------------------------------------------------------------------
+
+## 38.T Kota Bertema
+
+Permintaan pengguna (2026-10-23, bahasa Indonesia, mengikat): "Tambah variasi kota: kota bertema. Lanjut, tapi
+detail." Lima jenis: (1) **Kota Pelabuhan** di pantai: kapal dagang di dermaga, pasar ikan, mercusuar, galangan kapal,
+kampung pelaut, quest dagang laut, tautan ke dimensi Laut Tanpa Batas dan dermaga kapal terbang; (2) **Kota Oasis
+Gurun**: kafilah unta, bazar, istana pasir, kuil air, badai pasir, quest reruntuhan gurun; (3) **Kota Air** (kota kanal
+seperti Suzhou/Zhouzhuang): kanal, perahu sebagai entitas yang bergerak, jembatan lengkung, taman, dagang sutra dan teh,
+festival lentera di atas air; (4) **Kota Gunung**: teras bertingkat di lereng, tangga batu, jalan tebing, kuil puncak,
+platform kereta gantung/katrol sebagai entitas, quest petik herba dan ziarah; (5) **Kota Iblis**: kota kultivator jalan
+iblis, arena darah, pasar gelap dan pasar tawanan, toko teknik terlarang, gerbang ranah tinggi dan aturan bahaya,
+perburuan hadiah oleh sekte lurus.
+
+Preferensi pengguna yang mengikat bagian ini: **selalu dunia baru** (tidak ada migrasi atau kompatibilitas simpanan yang
+dikejar), semuanya **konten nyata** (struktur detail, model 3D, animasi detail, cerita bertokoh dan rantai quest, GUI
+segar), world generation **hanya di chunk baru**, perubahan blok runtime **hanya** lewat `WorldBreaker`/`BuildPlacer`,
+mekanisme sebagai **entitas**, anggaran **laptop lemah**. Bagian ini memakai seluruh mesin 38 (tata letak 38.B.2, NPC
+38.N, model 38.O, cerita 38.S, perbaikan 38.R, uang 38.M, UI 38.U, rekayasa 38.D) dan **tidak** membuat mesin kedua.
+
+Urutan: 38.T.0 aturan, 38.T.1 ringkasan, 38.T.2 rencana/putusan/kepadatan, 38.T.3-38.T.7 lima kota (lore dan Sumber,
+distrik dan bangunan, NPC dan rutinitas, permainan khas, tokoh dan quest), 38.T.8 klip animasi baru, 38.T.9 model,
+38.T.10 dagang antar-kota dan harga, 38.T.11 tautan ke sistem lain, 38.T.12 suara, 38.T.13 config dan perintah,
+38.T.14 modul dan kepemilikan berkas, 38.T.15 uji terima.
+
+### 38.T.0 Aturan dan fakta tambahan
+
+1. **Semua aturan 38.0 butir 1-18 berlaku.** Tambahan: tidak ada blok runtime baru; kanal, dermaga, tangga, arena, sel
+   tawanan dan semua bangunan lahir dari worldgen; yang bergerak (kapal, perahu, unta, kereta gantung, katrol, pintu air,
+   derek, timba sumur, alat tenun, pintu arena, tandu) adalah **entitas** `noSave` yang dimunculkan ulang dari jangkar
+   atau titik NBT (pola `KotaPintuEntity`, `KapalDekEntity`, `ColliderEntity`).
+2. **Dunia baru.** Tidak ada kode migrasi khusus tema. Rencana tema terdaftar di `RencanaRegistry` sehingga penjaga
+   `RencanaLama` (38.D.3) berlaku otomatis tanpa kode tambahan (biaya nol di dunia baru).
+3. **Satu sumber per sistem.** Toko, bank, papan misi, lelang, teleport, penginapan, tabib, Nama Baik, hukum, perbaikan
+   dan kafilah memakai layanan 38 yang sudah ada lewat jangkar bersama (`kota/*`, `kotabesar/layanan`,
+   `kotabesar/cakram`) atau API pendaftaran; 38.T hanya menambah layanan yang **khas tema** (38.T.10).
+4. **Fakta kode (audit 2026-10-23, verifikasi ulang saat implementasi):**
+   - `util/Sibuk` di 38.0 butir 10 sebenarnya **`musuh/Sibuk.java`**; 38.T memanggil kelas itu.
+   - `dunia/dimensi/laut/SeaGate`: `public static boolean enter(ServerPlayer player, boolean free)` (:120),
+     `public static @Nullable Component blocker(ServerPlayer)` (:104), `leave` (:185), rute kapal `ROUTE = "laut"`;
+     `DimensiLevels.LAUT` (`kultivator:laut_tanpa_batas`, permukaan laut y 99, dermaga tiba di asal).
+   - `dunia/kapal/KapalClass`: `PERAHU` (perahu_awan, Inti Emas), `SEKTE` (kapal_sekte, Jiwa Baru Lahir), `BAHTERA`
+     (bahtera_langit, Transformasi Dewa); `Voyages.ROUTE_CROSSING = 2000`; `KapalBajakEntity` (perompak langit).
+   - `musuh/RogueCultivators`: `VARIANT_DEMONIC = 3`, peran `ROLE_AMBUSH/RAID/CAMP/QUEST/REALM/TEST`;
+     `TechniquePower.markRealmFoe(LivingEntity)` (:699).
+   - mcsrc 26.3: `world/entity/animal/camel/Camel` (+ `CamelHusk`), `equine/Llama`, `TraderLlama`,
+     `vehicle/boat/Raft`; bioma termasuk `dappled_forest`, `pale_garden`, `sulfur_caves` (bawah tanah).
+5. **Bahaya hanya PvE.** Kota Iblis tidak pernah memaksa PvP (aturan 2 DESIGN 0): "hukum yang kuat" di sana berlaku
+   antara pemain dan NPC, tidak antar-pemain. **Tidak ada manusia yang dijual kepada pemain**: pasar tawanan hanya bisa
+   *ditebus dan dibebaskan* (38.T.7.6).
+
+### 38.T.1 Ringkasan lima tema
+
+| Tema (`kota_tema/<id>`) | Nama contoh (kota pertama) | Ukuran | Start | Bioma | Cincin | Bahaya | Ranah disarankan |
+|---|---|---|---|---|---|---|---|
+| `pelabuhan` | Pelabuhan Cahaya Zaitun | 288 × 288 (sepertiga di atas air) | 9 distrik | pantai: daratan + laut dangkal | R2-R4, cincin pertama 1400-4200 | rendah (bajak laut, badai) | Fana+ |
+| `oasis` | Kota Oasis Bulan Sabit | 288 × 288 + Lapangan Kafilah 96 × 96 | 10 distrik | gurun, badlands | R2-R4, cincin pertama 1400-4200 | sedang (badai pasir, reruntuhan) | Pemurnian Qi+ |
+| `air` | Kota Air Seribu Jembatan | 288 × 288 | 9 distrik | dataran rendah datar dekat air | R2-R4, cincin pertama 1400-4200 | rendah (hantu air, pencuri) | Fana+ |
+| `gunung` | Kota Teras Awan | 288 × 288 (naik 30-80 blok) | 9 distrik | lereng bukit dan gunung | R2-R4, cincin pertama 1400-4200 | sedang (longsor, tebing) | Pemurnian Qi+ |
+| `iblis` | Kota Darah Senja | 288 × 288 | 9 distrik | hutan gelap, taman pucat, badlands, rawa | R3-R4, cincin pertama 3500-6000 | tinggi (seluruh kota) | Inti Emas+ |
+
+Nama kota lain: `KotaTemaNames.of(seed, tema, index)` (kunci `kultivator.kota_tema.<tema>.nama.a.<i>|.b.<j>`), mis.
+pelabuhan {Cahaya Zaitun, Mutiara Timur, Angin Selatan, Karang Giok, Teluk Naga} × {Pelabuhan, Bandar, Labuhan}; oasis
+{Bulan Sabit, Mata Air Giok, Pasir Bernyanyi, Kurma Emas} × {Kota Oasis, Benteng Pasir}; air {Seribu Jembatan, Teratai
+Putih, Benang Sutra, Kabut Kanal} × {Kota Air, Desa Air}; gunung {Teras Awan, Seribu Anak Tangga, Kabut Pinus, Lonceng
+Puncak} × {Kota Gunung, Kota Teras}; iblis {Darah Senja, Tulang Hitam, Bulan Merah, Seribu Rantai} × {Kota, Benteng}.
+
+Pendekatan struktur untuk semua tema: **tata letak** (`kultivator:tata_letak`, 38.B.2.3), bukan jigsaw. Alasan:
+(1) kanal, dermaga dan teras harus **bersambung tepat** antar-lot; rotasi jigsaw acak dan jangkauan ≤ 116 tidak
+menjamin; (2) rotasi kota tema **diturunkan dari medan** (arah laut, arah menanjak), bukan dari hash; (3) kota 288 × 288
+dengan tembok tidak muat satu start jigsaw berkualitas. **Jigsaw** hanya untuk satelit kecil (`kota_tema/reruntuhan_gurun`,
+`kota_tema/pos_pemburu`, 38.T.2.6).
+
+**Distrik tema = 2 × 2 lot** (96 × 96, lot tetap 48 × H × 48 dengan lantai jalan di y 4 lot, 38.B.2.5); kota = 3 × 3
+distrik (grid sebelum diputar, utara = −z). Pusat distrik `(x, z)` = pusat kota + `(96x, 96z)`; tembok sebagai lot
+tambahan di tepi luar (ofset di luar sel 96, seperti ibu kota). Semua potongan satu distrik ≤ ±72 blok dari chunk start
+(sel 96 + tembok 8 + menara 8), di dalam jangkauan referensi ±8 chunk; `dy` gunung tidak mengubah jangkauan horizontal.
+Di tabel distrik di bawah, lot ditulis `(lx,lz)` dengan lx, lz ∈ {0, 1} di dalam distrik.
+
+### 38.T.2 Rencana, putusan medan, kepadatan dan anggaran (modul 38TK)
+
+#### 38.T.2.1 Rencana (`dunia/tempat/tema/RencanaKotaTema`)
+
+- Satu kelas, lima instans terdaftar: `RencanaRegistry.register("kota_tema_<tema>", RencanaKotaTema.of(Tema.X))`.
+  `Tema` = enum `PELABUHAN, OASIS, AIR, GUNUNG, IBLIS` dengan field `id`, `ukuranSel`, `peluangSel`, `cincinPertama
+  (min, lebar)`, `prioritas`, `distrik[]`.
+- **Cincin pertama** (empat tema damai): 16 kandidat di sudut `turn(tema) + i × 22.5°`, jari-jari `1400 + hash × 2800`;
+  kandidat pertama yang **layak** (putusan tema, 38.T.2.2) menjadi kota tema pertama; sisanya di cincin gugur. Iblis:
+  12 kandidat, jari-jari `3500 + hash × 2500`.
+- **Sel jauh:** grid per tema `ukuranSel` (pelabuhan 3072, oasis 3584, air 3072, gunung 3072, iblis 4096) digeser per
+  tema (`ofset = hash(seed, tema) mod ukuranSel`) agar sel lima tema tidak sejajar; satu kandidat di titik hash dalam
+  60 % tengah sel, hidup dengan `kotaTema.<tema>.peluangSel` (pelabuhan 0.7, oasis 0.7, air 0.5, gunung 0.6, iblis 0.45).
+- **Jarak:** ≥ 1200 dari setiap ibu kota yang layak (`RencanaKotaBesar`), ≥ 900 dari kota tema lain yang layak, ≥ 700 dari
+  setiap gerbang `GerbangPlan`, ≥ 400 dari setiap kandidat sekte langit 37. Urutan penilaian deterministik: ibu kota dulu,
+  lalu tema menurut `prioritas` (iblis, gunung, pelabuhan, oasis, air), lalu urutan sel spiral; yang lebih dulu menang.
+  Kandidat yang bertabrakan bergeser 240 blok menjauh (maks 3 kali) sebelum dinilai.
+- **Putar** = dari putusan (pelabuhan: arah laut menjadi utara grid; gunung: arah menanjak menjadi utara grid; lainnya:
+  `hash & 3`).
+- Kontrak tambahan pada C38.W2 (milik 38W, 38.T.14.3): `Rencana` mendapat dua metode default
+  `default List<SimpulJalan> simpul(long seed, int selX, int selZ) { return List.of(); }` (titik gerbang kota tema untuk
+  `RencanaJalan`, sehingga jalan desa/kekaisaran tersambung ke gerbang darat kota tema) dan
+  `default List<BoundingBox> zonaAman(long seed) { return zona(seed); }` (Kota Iblis hanya mengembalikan Zona
+  Perjanjian, 38.T.7.8).
+
+#### 38.T.2.2 Putusan medan (`dunia/tempat/tema/PutusanTema`)
+
+Semua memakai `getBaseHeight(x, z, WORLD_SURFACE_WG | OCEAN_FLOOR_WG, ...)` dan `biomeResolver` seperti 38.B.2.4,
+deterministik dari seed, cache `ConcurrentHashMap` (kunci `seed ^ tema ^ index`, maks 64 per tema). Sampel 9 × 9 titik
+berjarak 36 blok di kotak ±144 di sekitar pusat (81 kolom × 2 heightmap per kandidat, sekali per seed).
+
+| Tema | Layak bila | `dasarY` | Rotasi |
+|---|---|---|---|
+| `pelabuhan` | ada satu arah mata angin yang tiga baris luarnya (27 sampel) ≥ 80 % air dengan dasar laut di `seaLevel − 4 .. seaLevel − 20`; enam baris lainnya ≥ 85 % darat, median darat `seaLevel + 1 .. +14`, selisih darat ≤ 14; pusat distrik darat di `#kultivator:kota_tema/pelabuhan/darat` (beach, snowy_beach, plains, sunflower_plains, forest, birch_forest, dappled_forest, savanna, sparse_jungle, meadow, cherry_grove, mangrove_swamp), pusat distrik laut di `#…/pelabuhan/laut` (ocean, lukewarm_ocean, warm_ocean, cold_ocean, beach, river) | `clamp(median darat, seaLevel + 1, seaLevel + 8)` | arah laut → utara grid |
+| `oasis` | ≥ 7 dari 9 pusat distrik di `#…/oasis` (desert, badlands, eroded_badlands, wooded_badlands); ≤ 2 sampel air; selisih ≤ 16; median `seaLevel + 2 .. +40` | median | `hash & 3` |
+| `air` | 9 pusat distrik di `#…/air` (plains, sunflower_plains, forest, birch_forest, flower_forest, dappled_forest, swamp, river, cherry_grove); selisih ≤ 6; median `seaLevel + 1 .. +6`; ≤ 12 sampel air (sungai kecil boleh, danau besar tidak) | `clamp(median, seaLevel + 1, seaLevel + 4)` | `hash & 3` |
+| `gunung` | ada arah mata angin dengan median baris naik monoton antar tiga baris distrik (tiap langkah +10 .. +30, total +30 .. +80); selisih dalam satu baris ≤ 18; pusat distrik di `#…/gunung` (windswept_hills, windswept_forest, windswept_gravelly_hills, meadow, grove, snowy_slopes, taiga, old_growth_pine_taiga; baris atas boleh stony_peaks); tidak ada air | median baris bawah | arah menanjak → utara grid |
+| `iblis` | jarak ≥ 3000 dari pusat; ≥ 6 dari 9 pusat di `#…/iblis` (dark_forest, pale_garden, badlands, eroded_badlands, wooded_badlands, swamp, mangrove_swamp, windswept_gravelly_hills, old_growth_spruce_taiga); ≤ 3 sampel air; selisih ≤ 22 | median | `hash & 3` |
+
+- **Kota Gunung:** `dy` per lot = `round((tinggiPusatLot − dasarY) / 6) × 6`, dijepit monoton per baris (baris atas ≥
+  baris tengah + 6 ≥ baris bawah + 6) dan ≤ 72; sambungan antar-baris memakai lot `tangga_*` yang tinggi anak tangganya
+  dipilih dari selisih `dy` (varian naik 6, 12, 18, 24). Fondasi lot gunung 12 lapis (dinding penahan teras
+  `stone_bricks` + `mossy_stone_bricks`) agar `beard_box` tidak meninggalkan lubang di sisi lereng.
+- **Kota Pelabuhan:** distrik baris laut memakai struktur dengan `terrain_adaptation: none`; dermaga berdiri di
+  **tiang pancang** (`stripped_spruce_log`/`stripped_mangrove_log`) sedalam 24 dari lantai dermaga (dasar laut
+  ≥ `seaLevel − 20` menjamin tiang menyentuh dasar; bagian tiang yang masuk tanah tidak terlihat); semua sel kosong
+  templat laut = `structure_void` sehingga air laut tetap (verifikasi: `StructureTemplate` melewati `structure_void`, dan
+  blok waterloggable di bawah permukaan dipasang `waterlogged=true` lewat `LiquidSettings.APPLY_WATERLOGGING`).
+- **Kota Air:** air kanal diletakkan templat (sumber air di saluran berbatu 5 lebar × 2 dalam), muka air = lantai jalan
+  − 1. **Kode sisi lot** (38.T.2.4) menjamin kanal bersambung antar-lot dan antar-distrik.
+- Server (peta, kabar, teleport) memanggil `PutusanTema.of(ServerLevel, Kandidat)` dengan generator dan `RandomState`
+  overworld, hasilnya sama dengan worldgen (pola 38.B.2.4).
+
+#### 38.T.2.3 Struktur, set, placement
+
+- Struktur `kultivator:kota_tema/<tema>/<distrik>` bertipe `kultivator:tata_letak` (`"rencana": "kota_tema_<tema>"`,
+  `"distrik": "<id>"`, `lot[]` 4 lot + lot tembok, `gaya[]`), `step surface_structures`, `terrain_adaptation beard_box`
+  (kecuali distrik laut pelabuhan: `none`), `spawn_overrides` monster kosong di semua tema (Kota Iblis juga: bahayanya
+  datang dari NPC iblis yang dimunculkan sistem, bukan mob alami; 38.T.7.8).
+- Set `kota_tema/<tema>/<distrik>` placement `kultivator:rencana_tempat` (`rencana`, `distrik`), `spacing 256`,
+  `separation 0`. Salt: pelabuhan 380401-380409, oasis 380411-380420, air 380421-380429, gunung 380431-380439, iblis
+  380441-380449, satelit 380451-380452 (unik di seluruh repo, diperiksa `cek_tempat.py`).
+- Pack bawaan `kultivator:dunia_kotatema` (`resourcepacks/dunia_kotatema`, `DuniaPacks.worldgen("kotatema",
+  kotaTema.worldgen)`); per tema dimatikan lewat `kotaTema.<tema>.worldgen` (rencana tema itu menjawab "tidak layak"
+  untuk semua kandidat, jadi tidak pernah ada distrik setengah).
+- Tag: `#kultivator:kota_tema` (semua 46), dan `kota_tema/*` dimasukkan ke `#kultivator:tempat_berpenghuni` dan
+  `#kultivator:tempat_dirawat` (baris tag milik 38W, 38.T.14.3).
+
+#### 38.T.2.4 Lot, kode sisi, gaya dan titik NBT
+
+- **Kode sisi lot** (validasi `tools/cek_tempat.py`, aturan baru 38W): setiap lot tema menyatakan empat sisi dengan kode
+  `J` (jalan 3 blok), `K` (kanal 5 + jalan setapak 2), `T` (tembok), `A` (air terbuka/laut), `G` (tangga naik), `B` (batas
+  bebas, mis. taman). Dua sisi yang berhadapan harus kodenya sama setelah rotasi; kode ditulis generator ke kunci akar
+  NBT `kultivator_sisi` (diabaikan `StructureTemplate.load` seperti `kultivator_titik`, verifikasi). `cek_tempat.py`
+  menyusun grid tiap kota tema dan gagal bila ada sisi tak cocok atau kanal buntu (kecuali di lot `kolam`/`danau`).
+- **Jenis titik baru** (ditambah ke daftar sah `cek_tempat.py` oleh 38W): `tambatan` (kapal/perahu; data `kelas`),
+  `jalur_kapal`, `jalur_perahu` (simpul spline kanal; data `urut`, `jalur`), `stasiun_lift` (data `pasangan`, `jenis`
+  gantung|katrol), `jalur_tangga` (simpul kuli/peziarah), `kanal` (kotak kanal untuk 38.R), `lentera_air`,
+  `kandang_unta`, `sumur_timba`, `alat_tenun`, `arena_pintu`, `sel_tawanan`, `zona_perjanjian` (kotak), `tandu`,
+  `pandang` (titik kamera adegan), `jaga_suar`.
+- **Gaya per bioma** (pool berakhiran, NBT sama, processor berbeda, seperti 38.B.2.5):
+
+| Tema | Gaya | Bioma | Ciri |
+|---|---|---|---|
+| pelabuhan | `selatan` (dasar) | hangat dan sedang | rumah bata merah gaya Minnan (`bricks`, `red_terracotta`, dinding `white_terracotta`), atap pelana dengan bubungan **ekor walet** (ujung bubungan naik: `stairs` bertumpuk + `end_rod`), kayu `acacia`/`jungle` di dermaga |
+| pelabuhan | `utara` | cold_ocean, snowy_beach, taiga | batu `stone_bricks`, kayu `spruce`, atap `dark_oak` berlapis salju |
+| oasis | `pasir` (dasar) | desert | bata lumpur (`mud_bricks`, `packed_mud`), `smooth_sandstone`, kubah `cut_sandstone`, tenda kain `orange_wool`/`red_wool`, palma (`jungle_log` + `jungle_leaves persistent=true`) |
+| oasis | `merah` | badlands | `terracotta` merah/oranye, kubah `red_sandstone`, kayu `acacia` |
+| air | `jiangnan` (dasar) | semua kecuali sakura | **dinding putih genteng hitam**: dinding `white_terracotta`/`calcite`, genteng `deepslate_tile_*` dan `polished_blackstone_*`, kayu `dark_oak` tua, jendela kisi, tembok kuda bertangga (`stone_brick_wall` + slab) |
+| air | `sakura` | cherry_grove | aksen `cherry`, kelopak `pink_petals` |
+| gunung | `batu` (dasar) | windswept_*, stony_peaks | `stone_bricks`, `andesite`, genteng `dark_oak`, rumah panggung kayu di tepi tebing (tiang `spruce_log` ke teras bawah) |
+| gunung | `salju` | grove, snowy_slopes | `spruce`, salju di bubungan |
+| gunung | `hutan` | meadow, taiga, old_growth_pine_taiga | `spruce` + plester, lumut |
+| iblis | `hitam` (dasar) | dark_forest, pale_garden, windswept_gravelly_hills, taiga | `blackstone`, `polished_basalt`, `nether_bricks`, aksen `red_nether_bricks`, rantai, `soul_lantern` |
+| iblis | `merah` | badlands | `red_sandstone`, `terracotta` gelap, `bone_block` |
+| iblis | `rawa` | swamp, mangrove_swamp | panggung `mangrove_*`, `mud_bricks`, akar, kabut (klien) |
+
+- Processor: `kota_tema/lapuk_ringan` (pola 38.B.2.5), `kota_tema/utuh` (kuil, istana, mercusuar), `kota_tema/iblis_lapuk`
+  (retak 8 %, `cracked_*`, noda darah kering = `red_concrete_powder` 2 % di lantai luar; **tanpa** api).
+- **Anggaran templat** per tema: ±40 NBT lot (36 lot inti + varian rumah + tembok/menara/gerbang), ≤ 1.2 MB gzip per
+  tema, ≤ 5.5 MB semua tema; titik ≤ 96 per lot; jangkar ≤ 6 per lot, ≤ 24 per distrik.
+- **Jangkar bersama** (dilayani modul pemiliknya tanpa kode baru): `kota/situs` (data `situs="kota/kota_tema"`,
+  `tema=<id>`, protect 100; **tidak** di Kota Iblis), `kota/alun`, `kota/teh`, `kota/kursi_pengembara`, `kota/papan`,
+  `kota/penjaga`, `kota/pil`, `kota/pusaka`, `kotabesar/layanan` (data `layanan` = `penginapan`, `rumah_makan`, `tabib`,
+  `bank_cabang`, `papan_gilda`), `kotabesar/cakram` (stasiun teleport), `kotabesar/tukang` (38.R). Jangkar milik 38TK:
+  `kota_tema/situs` (semua tema, data `tema`, `kota` = indeks), `kota_tema/zona` ×9-10 (protect 72), `kota_tema/<layanan>`
+  per layanan khas (38.T.3-38.T.7), `kota_tema/tambatan`, `kota_tema/lift`, `kota_tema/arena`, `kota_tema/sel`.
+
+#### 38.T.2.5 Kepadatan (baris tambahan untuk tabel 38.C.9)
+
+| Tempat | Bioma cocok | R1 | R2 | R3 | R4 | Catatan |
+|---|---|---|---|---|---|---|
+| Kota Pelabuhan | pantai (daratan + laut dangkal) | — | 1 dijamin di 1400-4200 bila ada pantai layak; lalu 0.025 | 0.03 | 0.03 | 1 per sel 3072² × 0.7 × layak (±35 % kandidat pantai lulus) |
+| Kota Oasis | gurun, badlands | — | 1 dijamin di 1400-4200 bila ada gurun layak; lalu 0.04 | 0.05 | 0.05 | 1 per sel 3584² × 0.7 × layak |
+| Kota Air | dataran rendah datar | — | 1 dijamin di 1400-4200; lalu 0.03 | 0.03 | 0.03 | 1 per sel 3072² × 0.5 × layak |
+| Kota Gunung | lereng | — | 1 dijamin di 1400-4200; lalu 0.03 | 0.04 | 0.04 | 1 per sel 3072² × 0.6 × layak |
+| Kota Iblis | hutan gelap, taman pucat, badlands, rawa | — | — | 1 dijamin di 3500-6000; lalu 0.015 | 0.025 | 1 per sel 4096² × 0.45 × layak |
+| `kota_tema/reruntuhan_gurun` | desert, badlands | 0.08 | 0.2 | 0.25 | 0.3 | jigsaw `cincin_tempat`, `min_chunks` 12, salt 380451 |
+| `kota_tema/pos_pemburu` | ikut Kota Iblis | — | — | 1 per Kota Iblis | 1 per Kota Iblis | rencana, 500-700 blok dari Gerbang Tengkorak ke arah sekte Lurus terdekat, salt 380452 |
+
+"Dijamin" berarti: bila cincin pertama punya satu pun kandidat layak; seed tanpa pantai/gurun di cincin itu tidak
+mendapat jaminan (uji `uji tema rencana` mencetak alasannya). "Penuh tapi tidak sesak" (38.C.9) tetap: zona kota tema
++ 3 chunk menolak struktur permukaan lain lewat `TempatKeepOut` (38.D.4); kota tema dihitung sebagai tempat berpenghuni
+(bobot 4) dalam batas ≤ 6 per km².
+
+#### 38.T.2.6 Satelit jigsaw
+
+- `kota_tema/reruntuhan_gurun` (`size 4`, `max_distance 60`, `step surface_structures`, `beard_box`): kota terkubur
+  pasir: menara jaga roboh, gerbang setengah tertimbun, aula bawah tanah tiga ruang (tangga turun ke y −14 relatif),
+  mural gua (billboard klien bergambar penari dan kafilah), peti (`loot_table kultivator:tema/reruntuhan_<tier>`), ruang
+  sarang **Raja Kalajengking** (bos, 38.T.4.6). Pintu aula = `PintuPasirEntity` (pola `PintuTebingEntity` 38GU, milik
+  38TK). Tidak dirawat 38.R. Ranah disarankan: tier 1 Pemurnian Qi (R1-R2), tier 2 Fondasi (R3), tier 3 Inti Emas (R4).
+- `kota_tema/pos_pemburu` (`size 2`): pos sekte Lurus: tenda komando, Papan Buronan Iblis (billboard), pandai, kuda,
+  4 NPC PEMBURU_LURUS (38.T.7.9); dihuni, aman (`TempatZones.safe`).
+
+#### 38.T.2.7 Anggaran (tambahan 38.C.10 dan 38.D.7)
+
+| Hal | Anggaran |
+|---|---|
+| Starts | 46 struktur tata letak (9/10/9/9/9) + 2 satelit; putusan sekali per kandidat (cache); placement O(1) per chunk |
+| Tubuh NPC | `kotaTema.tubuhMaks` 20 per kota (12-36), jenis `DuniaBudget` `npc_kota_tema`; per pemain ikut 38.N.7 (24 total 38) |
+| Penduduk data | pelabuhan 260, oasis 220, air 240, gunung 180, iblis 200 |
+| Impostor | 0/32/48 per pemain (Min/Nor/Maks) |
+| Entitas mekanisme hidup | per kota ≤ 12 (kapal ≤ 3, perahu kanal ≤ 6, unta ≤ 8 per kafilah terlihat, kereta gantung ≤ 2, katrol ≤ 2, pintu/derek/timba/tenun ≤ 8); hanya bila pemain ≤ 96 blok; `DuniaBudget` jenis `mekanisme_tema` cap 24 global |
+| Gerak entitas | spline dari titik NBT, **tanpa** pencarian jalur; posisi = fungsi waktu (`t = gameTime − mulai`), dikirim ke klien tiap 20 tick + interpolasi |
+| Klien | lentera air 0/40/120, partikel badai pasir 0/400/900 quad per detik (`EpicBudget.takeQuads`), tali kereta gantung 1 batch, sinar mercusuar 1 quad aditif |
+| Server | ≤ 0.6 ms/tick untuk semua kota tema yang hidup (`uji tempat ukur` bagian `tema`) |
+
+### 38.T.3 Kota Pelabuhan (`kota_tema/pelabuhan`)
+
+#### 38.T.3.1 Lore dan Sumber
+
+- **Lore** (`tempat_tema_lore.pelabuhan.*`): pelabuhan dagang tertua di pesisir, "tempat seribu bendera berlabuh".
+  Didirikan para pedagang fana yang membayar sekte untuk menjaga mercusuar; kini dipimpin **Syahbandar** dari Kantor
+  Urusan Laut, dengan Dewan Saudagar sebagai penyeimbang. Mercusuar menyimpan **Pelita Penunjuk Angin**, lampu roh yang
+  konon dinyalakan dari mutiara yang dibawa dari Laut Tanpa Batas; selama ia menyala, kapal fana tidak pernah tersesat
+  dalam kabut. Kampung pelaut di barat dihuni keluarga nelayan yang menyembah **Dewi Laut** di Kuil Laut.
+- **Sumber** (`kultivator.kota_tema.pelabuhan.source`): "Sumber: Quanzhou (dikenal pedagang asing sebagai 'Zayton'),
+  salah satu pelabuhan tersibuk dunia pada masa Song-Yuan (abad 10-14) dan simpul Jalur Sutra Maritim; Warisan Dunia
+  UNESCO 2021 'Quanzhou: Emporium of the World in Song-Yuan China'. Kuil Tianhou di Quanzhou dipersembahkan bagi dewi
+  laut Mazu; Pagoda Wanshou adalah penanda navigasi yang terkenal pada masa itu; di Kuil Zhenwu para pejabat
+  mempersembahkan kurban laut. Tata kota, tokoh, harga dan angkanya rancangan game."
+- Sumber gaya (`kultivator.kota_tema.pelabuhan.gaya.inspired`): "Terinspirasi dari rumah bata merah bergaya Minnan di
+  Fujian dengan bubungan ekor walet; rancangan game."
+
+#### 38.T.3.2 Tata letak (grid sebelum diputar; laut di utara)
+
+```
+             x = -1                x = 0                 x = +1
+ z = -1   [dermaga_nelayan]    [dermaga_agung]       [galangan]          ← di atas air (terrain_adaptation none)
+ z =  0   [kota_awak]          [pasar_laut]          [gudang_dagang]     ← tepi pantai (tembok laut)
+ z = +1   [kuil_laut]          [gerbang_darat]       [hunian_saudagar]   ← darat (tembok darat, gerbang ke jalan)
+```
+
+Tembok: tembok darat 3 sisi (`tembok_lurus` 48 × 14 × 6 bata, lebih rendah dari ibu kota), **tembok laut** di antara
+baris laut dan tepi berupa tanggul batu dengan tangga ke dermaga; Gerbang Darat di selatan tengah (`gerbang_darat`
+48 × 20 × 12) menyambung jalan 38.C.6 (`simpul` rencana).
+
+| Distrik | Lot (lx,lz) dan isi (semua berinterior lengkap, cahaya ≥ 8, titik NBT) |
+|---|---|
+| `dermaga_nelayan` | (0,1) **Pasar Ikan Pagi**: dermaga lebar 40 × 30 di atas tiang, 14 lapak beratap kanvas (titik `lapak` ×14, peti es = `blue_ice` + `barrel`, keranjang ikan), timbangan, jemuran ikan (`kerja:jemur`); (1,1) **Tambatan Nelayan**: titian bercabang, 8 `tambatan` perahu nelayan, gudang jala (titik `kerja:jala` ×4); (0,0) **Pemecah Ombak** batu `cobblestone` + `stone_bricks` melengkung 44 blok; (1,0) **Mercusuar Pelita Angin** di ujung pemecah ombak: menara 11 × 42 × 11 (ruang dasar penjaga suar: kasur, meja peta, tangga melingkar; tiga lantai gudang minyak dan lensa; puncak ruang lampu terbuka berpagar dengan entitas `api_suar` (lampu berputar, 38.T.9), titik `jaga_suar`), jangkar `kota_tema/suar` |
+| `dermaga_agung` | (0,0)+(1,0) **Dermaga Agung**: tiga tambatan kapal dagang (`tambatan` kelas `jung`, panjang 28 masing-masing) dengan tangga kapal, bollard (`polished_andesite_wall`), lentera tiang; derek injak (`kota_tema/derek` ×2, entitas); (0,1) **Kantor Urusan Laut** (Shibosi): aula loket bea (meja ×4, timbangan, rak dokumen), ruang Syahbandar lantai dua (meja besar, peta laut di dinding = billboard klien, balkon menghadap dermaga), sel sitaan barang selundupan; (1,1) **Pos Kapal Lintas Laut**: loket, ruang tunggu (kursi ×12), tambatan khusus kapal `jung_laut` (jangkar `kota_tema/lintas_laut`) |
+| `galangan` | (0,0)+(1,0) **Galangan Kapal**: dua landasan miring (slipway) dari tanah ke air dengan rangka lunas setengah jadi = entitas `kapal_galangan` (tahap 0-4, 38.T.9), perancah kayu (blok, statis), bengkel tali (titik `kerja:tali` ×4), tungku ter (`cauldron` + `campfire[lit=true]` daftar putih dapur/bengkel), gudang kayu; (0,1) **Rumah Tukang Kapal**: meja gambar lunas, model kapal di rak (pajangan item), kamar tukang; (1,1) **Dok Kering** kecil (kolam batu kosong 30 × 10 dengan pintu air = entitas `pintu_air`) |
+| `kota_awak` | (0,0) **Kedai Jangkar Patah**: kedai pelaut dua lantai (meja ×10, panggung kecil penyanyi, kamar sewa ×6) jangkar `kotabesar/layanan` `penginapan` + `rumah_makan`; (1,0) **Lorong Tali**: jalan pembuat tali panjang 40 (titik `kerja:tali` ×6), rumah awak bersusun; (0,1)+(1,1) rumah pelaut dan nelayan (pool `kota_tema/pelabuhan/rumah_awak`: rumah bata merah kecil, rumah panggung, rumah dengan jemuran jala), sumur, kuil kecil Dewi Laut keluarga |
+| `pasar_laut` | (0,0)+(1,0) **Pasar Seberang**: aula pasar terbuka 80 × 30 bertiang merah, 16 kios barang luar negeri (rempah, porselen, kaca, mutiara; titik `lapak` ×16), papan kurs kapal datang (billboard), jangkar `kota_tema/toko_seberang`; (0,1) **Alun Pelabuhan**: alun 40 × 40 dengan patung jangkar raksasa (`anvil` + `chain` + `iron_block`), Papan Kabar, jangkar `kota/situs`, `kota/alun`, `kota/papan`; (1,1) **Kedai Teh Ombak** (jangkar `kota/teh`, `kota/kursi_pengembara` ×2) |
+| `gudang_dagang` | (0,0) **Gudang Bersama**: gudang tiga lantai (rak `barrel`, katrol = entitas `katrol_gudang` kecil), jangkar `kota_tema/gudang` (titip muatan, 38.T.10); (1,0) **Balai Dewan Saudagar**: aula meja panjang (kursi ×12), ruang arsip kontrak; (0,1) **Cabang Rumah Uang** (`kotabesar/layanan` `bank_cabang`) + **Papan Gilda** salinan (`papan_gilda`, misi E-C); (1,1) **Menara Tambat Langit**: menara kayu-batu 12 × 40 × 12 dengan dua anjungan di y +28 untuk kapal terbang (jangkar `kota_tema/tambat_langit`, kelas perahu/sekte), loket bahan bakar |
+| `kuil_laut` | (0,0)+(1,0) **Kuil Dewi Laut**: halaman batu dengan pembakar dupa, aula utama (altar, patung Dewi Laut `quartz` + `light_blue_terracotta` 6 tinggi, dua penjaga mata seribu li dan telinga angin = patung batu), paviliun lonceng, jangkar `kota_tema/kuil_laut`; (0,1) **Pagoda Penunjuk** (pagoda batu lima tingkat 13 × 34 × 13 di bukit kecil, penanda kapal; puncak terbuka titik `meditasi` ×4, `pandang`); (1,1) rumah pendeta, kebun dupa |
+| `gerbang_darat` | (0,1) gerbang darat + pos jaga (jangkar `kota/penjaga` ×2); (0,0) **Penginapan Angin Selatan** (12 kamar, `penginapan`); (1,0) **Rumah Makan Sup Ikan** (`rumah_makan`, dapur `smoker`); (1,1) **Halaman Kafilah Darat** (kandang kuda, gerobak, `kotabesar/cakram` stasiun teleport kecil 9 × 9) |
+| `hunian_saudagar` | (0,0)+(1,0) **Rumah Saudagar Zhao**: rumah halaman bertingkat dua (siheyuan bata merah, taman batu, ruang tamu dengan pajangan porselen); (0,1) **Kampung Saudagar Seberang**: rumah-rumah bergaya asing (kubah kecil `cut_sandstone`, lengkung jendela), rumah ibadah kecil saudagar seberang (ruang tenang tanpa patung, karpet, lentera), jangkar `kota_tema/saudagar_seberang`; (1,1) rumah, `bengkel` (`kotabesar/tukang`) |
+
+#### 38.T.3.3 Penduduk, peran, rutinitas dan animasi
+
+Peran baru (38.T.14.3, ditambah 38NL di akhir `NpcRole`): `SYAHBANDAR` (tier 3, PEJABAT, topi pejabat laut + jubah biru
+laut), `PETUGAS_BEA` (1, PEDAGANG, topi petugas + buku segel), `PELAUT` (1, PEKERJA, kain kepala + rompi bergaris + kalung
+gigi hiu), `NAKHODA_LAUT` (2, PEKERJA, topi lebar + jubah mantel), `PENJAGA_SUAR` (2, TETUA, mantel minyak + lentera),
+`TUKANG_KAPAL` (1, PEKERJA, celemek ter + sabuk alat + palu dempul), `PENJUAL_IKAN` (1, PEDAGANG, celemek basah + sanggul
+kain), `PEDAGANG_SEBERANG` (2, PEDAGANG, serban + jubah panjang bersulam), `PENDETA_LAUT` (2, RAHIB, jubah biru-putih +
+mahkota kecil). Nelayan memakai `NELAYAN` yang ada. Penduduk data 260: nelayan 50, pelaut 60, pedagang 40, tukang
+kapal 20, keluarga 70, pejabat/penjaga 20.
+
+Rutinitas khas (menimpa kolom kelompok 38.N.3 hanya pada jam yang disebut):
+
+| Jam | Nelayan / penjual ikan | Pelaut | Tukang kapal | Pedagang seberang | Penjaga suar | Pendeta laut |
+|---|---|---|---|---|---|---|
+| 03-05 | berangkat: `angkat_bawa` jala ke perahu, perahu nelayan keluar dari `tambatan` (entitas, 38.T.3.4) | tidur di kamar sewa | tidur | tidur | `jaga_suar`: menuang minyak (`tuang_teh` varian ember), lampu terang | `sujud_dupa` subuh menghadap laut |
+| 05-08 | **perahu pulang**, `tarik_jala` di dermaga, penjual ikan `seru_dagang` di Pasar Ikan Pagi (pasar ikan buka 05-09 saja) | bangun, `basuh_muka` di sumur | `palu_lunas` di galangan | sarapan di kedai teh | `teropong_laut` di balkon | menyapu halaman kuil |
+| 08-12 | `jemur_ikan`, memperbaiki jala (`ikat_tali` duduk) | memuat/membongkar kapal: `jalan_pikul` peti dari kapal ke gudang lewat titian, `ikat_tali` di bollard | lunas, tali (`kerja:tali`) | jaga kios Pasar Seberang, `tawar` | tidur | menerima peziarah |
+| 12-14 | makan siang bersama di dermaga (`makan` duduk di bollard) | makan di Kedai Jangkar Patah | makan | makan | — | — |
+| 14-18 | tidur siang, anak-anak `main_air` di tangga dermaga | memuat; kapten di Kantor Urusan Laut (`menulis` surat muatan) | lunas | jaga kios | bangun, `teropong_laut` | doa sore |
+| 18-23 | `minum_teh`, `cerita` | Kedai Jangkar Patah: `minum_teh` (arak), nyanyi pelaut (`tertawa` bergiliran, `bicara_tangan` lebar) | pulang | pulang | menyalakan lampu (`jaga_suar`), sinar mercusuar menyala 12500-23500 | doa senja, lonceng |
+
+Cuaca: badai petir (dibaca dari level) → semua perahu tetap tertambat, nelayan `tatap_langit` ke laut, pendeta
+`sujud_dupa` berulang; hujan → pelaut bekerja tetap (mantel), pedagang menutup kios setengah.
+
+#### 38.T.3.4 Permainan khas
+
+- **Kapal dagang terjadwal** (`KapalDagangEntity`, 38.T.9.1): tiga tambatan; tiap tambatan punya siklus 3 hari dunia:
+  **Datang** (hari 0, 2000-4000: kapal muncul 160 blok di laut pada `jalur_kapal` awal, layar terkembang, berlayar
+  sepanjang spline ke tambatan dalam 90 s, layar digulung, jangkar turun = model) → **Tambat** (bongkar/muat:
+  kuli berjalan dengan peti, derek berputar; papan geladak bisa dinaiki lewat `ColliderEntity` geladak pola
+  `KapalDekEntity`; NAKHODA_LAUT di geladak menjual muatan kapal itu) → **Berangkat** (hari 2, 14000: jangkar naik,
+  layar terkembang, kapal mundur 40 blok lalu berlayar keluar dan memudar di 160 blok). Asal kapal (data): "Negeri
+  Rempah Selatan", "Kepulauan Mutiara", "Kota Pelabuhan <nama lain>" (bila pemain tahu kota pelabuhan lain → muatan khas
+  kota itu, 38.T.10). Tanpa pemain dalam 128 blok, siklus berjalan sebagai data (stok tetap berganti).
+- **Muatan kapal** (layar `tema_kapal`, 38.T.13): 4-6 barang luar (rempah, porselen, kaca warna, mutiara, garam laut,
+  **Kompas Pasang** (item baru, menunjuk Pusaran Laut terdekat, 38.T.10)), harga 38.T.10; stok per kapal.
+- **Kapal Lintas Laut** (`kota_tema/lintas_laut`, NAKHODA_LAUT "Kapten Gao Fan"): sekali per hari dunia berangkat
+  12000 ke **Laut Tanpa Batas**. Syarat: pita ≥ 2 (Fondasi), ongkos `40 × (1 + band/4)` NB, tidak buronan; adegan 6 s
+  (kapal berlayar ke kabut, bisa dilewati, 7b) lalu `SeaGate.enter(player, true)` (verifikasi arti `free`: tanpa
+  syarat mutiara/ranah gerbang pusaran). Pulang lewat Gerbang Pulang yang ada (kembali ke titik berangkat = dermaga ini,
+  `extra.laut.ret`). Murid pengikut ikut (maks 2) dengan ongkos sama. `Sibuk` `tema.pelayaran` selama adegan.
+- **Menara Tambat Langit**: tujuan rute kapal terbang `DuniaApi.routes().registerDestination("kota_tema_pelabuhan_" +
+  index, nama, (p, l) -> diketahui(p), (p, ents) -> tibaDiAnjungan)`; layanan isi bahan bakar (jual batu roh dengan harga
+  `NilaiBatu.VALUE`, tidak lebih murah) dan **Kontrak Muatan Langit** (38.T.10.3): antar peti dagang dengan kapal terbang
+  pemain ke kota tema lain, bayaran lebih besar dari kafilah darat.
+- **Galangan**: pesan **lunas** perahu awan (`LunasItem` kelas `PERAHU`, pita ≥ 3) 900 NB, kapal sekte (pita ≥ 4) 4000
+  NB; jadi dalam 2/4 hari dunia (pesanan persisten di `KotaTemaData`); selama menunggu, entitas `kapal_galangan` di
+  landasan naik tahap 0 → 4 (rangka lunas → gading → papan → tiang → layar) sehingga pemain **melihat** kapalnya
+  dibangun. Juga: ganti gaya layar (kosmetik `KapalStyle` bila ada API publik, verifikasi; bila tidak, layanan ini tidak
+  ada) 60 NB.
+- **Memancing berbayar**: sewa perahu nelayan (`perahu_nelayan`, entitas, 2 NB/jam dunia) yang bisa didayung pemain di
+  teluk (gerak seperti perahu vanilla, implementasi sendiri; tidak keluar > 200 blok dari dermaga, kembali sendiri);
+  hasil memancing vanilla + 10 % **Ikan Roh** (item makanan + bahan pil, nilai 6 NB).
+- **Festival: Hari Dewi Laut** (`d % 28 == 23`, 6000-12000): arak-arakan `TanduEntity` membawa patung Dewi Laut kecil
+  dari Kuil Laut ke Dermaga Agung (8 pemikul NPC `jalan_pikul`, genderang, petasan = quad klien), sembahyang di dermaga,
+  lalu **Lomba Perahu Nelayan** (6 perahu entitas pada `jalur_perahu` di teluk, pemain boleh ikut dengan perahu sewaan:
+  biaya 5 NB, juara 30 NB + Jimat Ombak kosmetik + Nama Baik +2). Lentera merah di semua tiang dermaga (klien). Sibuk untuk
+  adegan sembahyang (≤ 4 s).
+- **Bahaya: Serbuan Bajak Laut** (tiap 18 ± 4 hari, malam; atau 50 % setelah pemain menolak suap Kapten Hiu Hitam di
+  quest): `KapalBajakLautEntity` (jung layar hitam) berlayar ke Dermaga Agung, papan titian turun, band bajak laut
+  (`RogueCultivators.spawnBand` varian ROGUE, `ROLE_RAID`, 6 + 3 × pemain, maks 18 hidup, `markRealmFoe`) menyerbu
+  dermaga dan gudang; penjaga dan pelaut bertarung; warga lari (38.N.4 butir 11). Menang = Nama Baik +4 (+8 kontributor
+  teratas), `25 × (band + 1)` NB dari Kas Kota, peti rampasan kapal bajak (loot `kultivator:tema/bajak_laut`). Kalah =
+  Pasar Seberang tutup 1 hari, satu kapal dagang tidak datang siklus berikutnya. Tidak ada blok berubah (kerusakan oleh
+  bajak laut dari ledakan = **tidak ada**: bajak laut tidak memakai TNT/api); `Sibuk` `tempat.pertahanan`; tekanan harian
+  M2.
+- **Bahaya: Badai Laut** (dibaca dari `level.isThundering()`, tidak diubah): kapal tidak berangkat/datang, Kapal Lintas Laut
+  ditunda, sinar mercusuar menyala siang hari; pemain dalam perahu sewaan di teluk saat badai: ombak klien + dorongan
+  acak kecil pada perahu (tanpa tenggelam).
+
+#### 38.T.3.5 Tokoh dan rantai quest "Pelita yang Padam"
+
+| Tokoh | Peran | Watak, suara | Muncul |
+|---|---|---|---|
+| **Lin Haichao** | SYAHBANDAR | perempuan tegas berusia 40-an, mantan nakhoda, tidak percaya sekte; `f2` | quest utama, Kantor Urusan Laut |
+| **Zhao Wanli** | PEDAGANG_SEBERANG (kepala Dewan Saudagar) | ramah, licin, utang budi pada siapa saja; `m2` | dewan, cabang quest |
+| **Kakek Deng Ming** | PENJAGA_SUAR | tua, setengah tuli, bercerita tentang laut tanpa batas; `elder` | mercusuar |
+| **A-Lan** | PELAUT (gadis awak) | pemberani, ingin jadi nakhoda; `f1` | kedai, lomba perahu |
+| **Mbah Lunas (Gong Shumu)** | TUKANG_KAPAL | nenek pembuat kapal, kasar tapi jenius; `elder` | galangan |
+| **Ibrahim dari Negeri Barat** | PEDAGANG_SEBERANG | saudagar seberang yang sopan dan teliti, pencatat bintang; `m1` | kampung saudagar, Pasar Seberang |
+| **Kapten Hiu Hitam (Hei Sha)** | pemimpin bajak laut (tubuh bos `KultivatorNpc` peran `NAKHODA_LAUT` varian bajak, tier 4) | kejam, berkode, dulu murid Kakek Deng; `m3` | Serbuan Bajak Laut, bab 4-5 |
+| **Kapten Gao Fan** | NAKHODA_LAUT | pembawa Kapal Lintas Laut, penakut kecuali di laut; `m2` | lintas laut |
+
+Rantai `tema_pelabuhan_pelita` (7 tahap, data `quest/tema_pelabuhan_pelita.json`, tidak pernah buntu: tiap tahap
+bertenggat 5 hari dunia dengan hasil bawaan lewat rumor):
+
+| # | Pemicu / pemberi | Isi dan tujuan | Cabang | Hadiah |
+|---|---|---|---|---|
+| 1 | masuk kota pertama kali; Kakek Deng menyapa di dermaga | "Pelitaku redup tiap malam." Naik mercusuar, lihat lensa retak; bicara dengan Lin Haichao | — | situs, Nama Baik +2 |
+| 2 | Lin Haichao | tiga kapal hilang di kabut dalam sebulan; periksa catatan bea (layar `tema_dokumen`: cocokkan tiga surat muatan, satu palsu) → muatan selundupan **Minyak Bayangan** yang memadamkan lampu roh | (a) lapor ke Lin; (b) bicara dulu dengan Zhao Wanli (dia menyuap 120 NB × (band+1) agar diam) | (a) Nama Baik +3; (b) uang, bendera `pelabuhan_suap` |
+| 3 | Mbah Lunas | lensa baru butuh **Kaca Garam Laut** (dari pasir pantai + Ikan Roh, racik di bengkel galangan: mini-gim `tema_racik` 3 langkah) atau beli dari Ibrahim (300 NB, Ibrahim minta pemain mengamati bintang bersamanya 1 malam di Pagoda Penunjuk) | racik / beli / malam bintang | lensa |
+| 4 | malam setelah lensa dipasang | Serbuan Bajak Laut khusus: Kapten Hiu Hitam mencari **Mutiara Pelita** di mercusuar; bertahan sampai gelombang 3; Kakek Deng mengenali Hei Sha | bila `pelabuhan_suap`: Zhao membuka gudang bagi bajak laut (+1 gelombang) | Nama Baik +5 |
+| 5 | Kakek Deng | Mutiara Pelita sudah habis cahayanya; yang baru hanya ada di **Laut Tanpa Batas**: naik Kapal Lintas Laut (gratis untuk quest), temukan Pulau Pasar atau Istana Naga laut (situs modul D, `SeaGate.tagOf`) dan dapatkan **Mutiara Fajar** (dibeli dari pedagang pulau 200 NB atau hadiah mengalahkan Yaksha laut, monster D yang ada) | beli / kalahkan | Mutiara Fajar |
+| 6 | kembali | Hei Sha menunggu di Pemecah Ombak: Duel (bos tier 4, ranah = band pemain + 1; aturan Duel Pedang ramah bila pemain memilih "bicara dulu" dan berhasil cek Nama Baik ≥ 30: Hei Sha mau mendengar kisah gurunya) | (a) kalahkan dan serahkan ke Lin (dihukum); (b) damaikan dengan Kakek Deng (Hei Sha menjadi nakhoda Kapal Lintas Laut kedua, bajak laut berhenti menyerbu kota ini); (c) bunuh (Nama Baik −5 di kalangan pelaut, serbuan berhenti juga) | pusaka Hei Sha (golok `dao` roh menengah unik "Gigi Hiu") |
+| 7 | upacara | Pelita Angin dinyalakan ulang (adegan 4 s: sinar mercusuar biru-emas menyapu teluk, semua NPC di dermaga `tatap_langit`), Hari Dewi Laut berikutnya diadakan untuk pemain | — | gelar "Penjaga Pelita", diskon Pasar Seberang 10 %, Kapal Lintas Laut −50 % selamanya, Nama Baik +10 |
+
+Quest samping: `tema_ikan_roh` (Penjual Ikan Bibi Yu: 10 Ikan Roh untuk sup festival), `tema_tali_putus` (A-Lan: kalahkan
+A-Lan dalam lomba perahu → dia dapat restu jadi nakhoda), `tema_bintang_ibrahim` (tiga malam pengamatan di Pagoda
+Penunjuk, hadiah **Astrolab Kecil** kosmetik yang menunjuk utara sejati), `tema_lunas_pertama` (pesan perahu awan pertama,
+Mbah Lunas menamainya bersama pemain).
+
+### 38.T.4 Kota Oasis Gurun (`kota_tema/oasis`)
+
+#### 38.T.4.1 Lore dan Sumber
+
+- **Lore** (`tempat_tema_lore.oasis.*`): kota di tepi **Danau Bulan Sabit**, mata air yang tidak pernah tertimbun pasir
+  selama seribu tahun. Para kafilah menyebutnya "Mata Gurun". Kota ini pintu terakhir sebelum Lautan Pasir Barat; di
+  baliknya ada **Kota Terkubur** yang dulu lebih besar dari kota ini, lenyap dalam satu malam badai. Para pendeta Kuil
+  Air menjaga **Batu Ukur Air** yang menandai tinggi muka danau; bila tandanya turun, kota bersiap haus. Para pelukis
+  gua mengecat kisah kafilah di dinding tebing batu pasir sejak berdirinya kota.
+- **Sumber** (`kultivator.kota_tema.oasis.source`): "Sumber: Dunhuang di Jalur Sutra; Mata Air Bulan Sabit (Yueyaquan),
+  kolam berbentuk bulan sabit di antara bukit pasir Mingsha yang dikenal 'bernyanyi' saat angin bertiup dan konon tidak
+  pernah tertimbun pasir; Gerbang Giok (Yumenguan) dan Yangguan, pos terakhir bagi pengembara yang menuju barat.
+  Terinspirasi dari mural gua Mogao dan kafilah unta Jalur Sutra; tata kota, tokoh, harga dan angkanya rancangan game."
+
+#### 38.T.4.2 Tata letak (grid sebelum diputar; gerbang di selatan)
+
+```
+             x = -1              x = 0               x = +1
+ z = -1   [kuil_air]         [istana_pasir]      [kebun_palma]
+ z =  0   [bazar_barat]      [mata_air]          [bazar_timur]
+ z = +1   [hunian_tanah]     [gerbang_giok]      [karavanserai]
+ z = +2                      [lapangan_kafilah]  (di luar Gerbang Giok)
+```
+
+Tembok: tanah padat (`packed_mud` + `mud_bricks`, 12 tinggi, menara sudut kubah), merlon segitiga; Gerbang Giok
+(`gerbang_giok` 48 × 22 × 14, lengkung tunggal berlapis `prismarine_bricks` hijau giok di ambang, menara pengawas dua
+sisi). Bukit pasir di luar adalah medan alami.
+
+| Distrik | Lot (lx,lz) dan isi |
+|---|---|
+| `kuil_air` | (0,0)+(0,1) **Tebing Seribu Lukisan**: tebing batu pasir buatan 96 × 30 (`smooth_sandstone`, `cut_sandstone`, lapis `terracotta`) dengan 12 gua ceruk bertangga kayu (tiap gua 7 × 6 × 9: patung duduk `sandstone`, dinding = mural billboard klien bertema terbang-menari, kafilah, iblis kalah), titik `meditasi` ×12, `kerja:kuas` ×4, jangkar `kota_tema/mural`; (1,0) **Kuil Air**: aula kubah di tepi danau, kolam suci di tengah (air + `sea_lantern` di dasar), **Batu Ukur Air** (stela `prismarine` + entitas penanda tinggi air), jangkar `kota_tema/kuil_air`; (1,1) asrama pendeta, sumur timba (entitas `timba_sumur`) |
+| `istana_pasir` | (0,0)+(1,0) **Istana Pasir**: istana tiga halaman (gerbang dalam, aula audiensi berkubah 28 × 18 × 24 dengan tiang `smooth_sandstone` berukir dan karpet merah, takhta bertirai), taman air dalam (kanal kecil, air mancur = partikel klien di atas `water`), menara angin (penangkap angin `cut_sandstone` 7 × 22 × 7); (0,1) barak pengawal gurun (kasur ×12, rak tombak); (1,1) **Perbendaharaan**: gudang air (tong `barrel` berderet, label kertas), ruang pajang hadiah kafilah |
+| `kebun_palma` | (0,0)+(1,0) **Kebun Kurma**: 24 palma, saluran irigasi kecil dari danau (`water` dalam parit batu), titik `kerja:panen` ×8, pondok penjaga; (0,1) **Kandang Unta Istana** (kandang `oak_fence`, jerami, palung air; jangkar `kota_tema/kandang` → sewa unta); (1,1) rumah petani kurma, lumbung |
+| `bazar_barat` | (0,0)+(1,0) **Bazar Rempah dan Permadani**: lorong beratap kain (tenda `orange/red/yellow_wool` di atas `oak_fence`, kain berkibar klien), 18 kios (titik `lapak` ×18): rempah dalam karung (`composter` berisi), permadani tergantung (`*_carpet` vertikal di dinding = `*_wool`), lampu kuningan (`lantern`); jangkar `kota_tema/bazar` ×2; (0,1) **Kedai Teh Unta** (`kota/teh`, `kota/kursi_pengembara` ×2) dengan bantal duduk (`*_carpet`) dan meja rendah; (1,1) rumah penenun permadani (`loom`, titik `kerja:tenun` ×3) |
+| `mata_air` | (0,0)+(1,0)+(0,1)+(1,1) **Danau Bulan Sabit**: danau berbentuk bulan sabit 70 × 30 (dalam 4, dasar `sand` + `sea_lantern` jarang), tepi tangga batu, alang-alang (`sugar_cane`, `tall_grass`), paviliun minum di ujung bulan sabit, **Alun Oasis** di lengkung dalam (jangkar `kota/situs`, `kota/alun`, `kota/papan`), panggung tari (bundar 11 batu `cut_sandstone`, jangkar `kota_tema/panggung`) |
+| `bazar_timur` | (0,0) **Bazar Kaca dan Giok**: kios kaca berwarna (`stained_glass` pajangan), kios giok (`kota/pusaka`), kios timbangan logam; (1,0) **Toko Air**: penjual air dan es (`blue_ice`), jangkar `kota_tema/toko_air`; (0,1) **Cabang Rumah Uang** + **Papan Gilda** (`kotabesar/layanan` `bank_cabang`, `papan_gilda`); (1,1) **Rumah Pandai Kuningan** (`anvil`, titik `kerja:palu` ×2), `kota/pil` |
+| `hunian_tanah` | 4 lot rumah halaman tanah (pool `kota_tema/oasis/rumah`: rumah atap datar dengan tangga ke atap, tempat tidur di atap untuk malam panas = titik `kasur` luar ruang, ruang tengah sejuk), sumur timba, oven tanah (`smoker`), `bengkel` (`kotabesar/tukang`) |
+| `gerbang_giok` | (0,1) Gerbang Giok + pos bea (jangkar `kota/penjaga` ×2, `kota_tema/bea_gurun`); (0,0) **Penginapan Pasir Bernyanyi** (`penginapan`, 10 kamar, halaman berpancuran); (1,0) **Rumah Makan Bakar** (`rumah_makan`); (1,1) **Stasiun Formasi** kecil (`kotabesar/cakram`) |
+| `karavanserai` | (0,0)+(1,0)+(0,1)+(1,1) **Karavanserai Agung**: bangunan segi empat 80 × 80 berhalaman dalam, lantai bawah kandang unta dan gudang (titik `kandang_unta` ×12), lantai atas kamar pedagang (kasur ×16), menara penangkap angin di sudut, sumur tengah, jangkar `kota_tema/karavanserai` (kantor kafilah, kontrak kawal) |
+| `lapangan_kafilah` | (di luar tembok) **Lapangan Kafilah**: perkemahan kafilah datang (tenda bundar kain `white_wool` + `brown_wool`, api unggun **mati**), palung air panjang, 2 tambatan kafilah (titik `kandang_unta` ×8), awal Jalan Kafilah (simpul jalan 38.C.6 kelas Jalan Desa berpasir) |
+
+#### 38.T.4.3 Penduduk, peran, rutinitas dan animasi
+
+Peran baru: `TUAN_BENTENG` (tier 4, PEJABAT, serban emas + jubah sutra bergaris + sabuk pedang melengkung),
+`KAFILAH_BASHI` (2, PEDAGANG, topi bulu lebar + mantel panjang + cambuk), `PENUNTUN_UNTA` (1, PEKERJA, kain kepala
+pelindung pasir menutup mulut + rompi), `PEDAGANG_BAZAR` (1, PEDAGANG, topi bundar bersulam + rompi), `PENDETA_AIR`
+(2, RAHIB, jubah biru air + kerudung tipis + kendi), `PELUKIS_GUA` (1, CENDEKIA, celemek bernoda cat + kuas di sanggul),
+`PENARI_GURUN` (1, PEKERJA, selendang panjang + gelang lonceng), `PENGAWAL_GURUN` (2, PENJAGA, helm runcing + baju
+sisik + tombak). Penduduk data 220.
+
+Rutinitas khas: **jeda panas** 11-15 (semua sipil di dalam atau di bawah atap teduh: `duduk_lantai`, `kipas`,
+`tidur_duduk`; bazar tutup), bazar pagi 06-11 dan **Pasar Malam Bulan Sabit** 17-24 (tiap malam, lebih besar pada
+`moonPhase` 2 dan 6 = bulan sabit: +6 kios tamu); malam panas (bioma desert, musim panas 38.N.3) separuh penduduk
+tidur di atap.
+
+| Jam | Penuntun unta / kafilah | Pedagang bazar | Pendeta air | Pelukis gua | Penari |
+|---|---|---|---|---|---|
+| 05-07 | memberi minum unta di palung (`angkat_air`), memasang muatan (`ikat_tali`) | `angkat_bawa` karung ke kios | `timba_sumur` lalu doa di kolam suci (`sujud_dupa` menghadap air) | naik tangga tebing | tidur |
+| 07-11 | kafilah berangkat/datang (38.T.4.4), `pimpin_unta` | `seru_dagang`, `tawar_bazar` | membaca Batu Ukur Air, mencatat (`menulis`) | `lukis_dinding` di gua ceruk | latihan di halaman (`tari_putar` setengah) |
+| 11-15 | jeda panas di karavanserai: `minum_teh`, `catur` | jeda panas | jeda | `lukis_dinding` (gua sejuk) | tidur siang |
+| 15-17 | perawatan unta (`sapu` badan unta = klip `sapu` varian) | buka lagi | upacara sore di tepi danau | `membaca` | dandan (`kipas`) |
+| 17-24 | `cerita` di api unggun lapangan kafilah | Pasar Malam: lampu kuningan menyala (klien), `seru_dagang` | lentera di tepi danau | pulang | **pertunjukan** di panggung 19-21 (`tari_putar`, penonton impostor duduk) |
+
+Reaksi badai pasir (38.T.4.6): semua sipil `lari` ke rumah/karavanserai, penuntun membuat unta berlutut (animasi unta
+`berlutut`) dan berlindung di baliknya (`takut_sembunyi`), penjaga menutup Gerbang Giok (entitas gerbang pola
+`GerbangKotaEntity` lebar 7).
+
+#### 38.T.4.4 Kafilah unta
+
+- **Kafilah** = data yang berjalan sepanjang sisi jalan 38.C.6 antara Kota Oasis dan simpul lain (kota tema, ibu kota,
+  `pos/dagang`, kota 34) dengan kecepatan 0.7 blok/s data; **rupa** kafilah ditentukan kota asal atau tujuan bertema
+  oasis: 4-8 `UntaKafilahEntity` beriring (tali antar-unta digambar klien), 1 KAFILAH_BASHI, 1-2 PENUNTUN_UNTA, 2
+  PENGAWAL_GURUN. Tubuh hanya bila pemain ≤ 64 blok dari posisi data (pola 38.C.6.3 dan `KafilahJalan` 38EK; 38EK
+  membaca `TemaApi.rupaKafilah(situsAsal, situsTujuan)` → `GEROBAK | UNTA | KAPAL`, 38.T.14.3).
+- Jadwal: Kafilah Agung datang ke Kota Oasis tiap 5 hari dunia (`d % 5 == 1`, 8000) lewat Gerbang Giok dengan arak-arakan
+  (genderang, lonceng unta = suara `block.note_block.bell` pitch acak), membongkar di karavanserai → stok Bazar Timur dan
+  Barat berganti, harga barang yang dibawa turun 10 % selama 2 hari. Kafilah berangkat `d % 5 == 3`.
+- **Ikut kafilah** (layar `tema_kafilah`): pemain mendaftar sebagai pengawal (misi gilda `kawal_unta`, 38.T.11) atau
+  sebagai penumpang (8 NB, naik unta sewaan dalam kafilah; perjalanan nyata berjalan bersama tubuh kafilah, bisa
+  dipercepat "tidur di pelana": layar gelap 3 s, pemain dipindah ke posisi kafilah 300 blok di depan; tidak tersedia
+  saat ada bahaya dalam 64 blok).
+- **Sewa unta** (Kandang Unta Istana / karavanserai): `UntaKafilahEntity` mode tunggang, 12 NB per hari dunia, kecepatan
+  0.16 (lebih cepat dari jalan kaki, lebih lambat dari kuda), lari 4 s tiap 10 s (pola dash vanilla Camel), tidak tenggelam
+  di pasir isap; habis sewa atau ditinggal > 64 blok selama 2 menit → unta pulang (berjalan menjauh lalu lenyap). Unta
+  vanilla juga ada di kandang sebagai entitas templat (bisa dijinakkan dengan cara vanilla).
+
+#### 38.T.4.5 Layanan dan permainan khas
+
+- **Tawar-menawar bazar** (layar `tema_tawar`, semua kios bazar): harga buka `1.30 × harga dasar`; pemain menawar
+  hingga 3 putaran (geser harga); pedagang punya **suasana hati** 0-100 (watak 38.S.2 + Nama Baik + jam: pagi ramah, jeda
+  panas ketus). Tawaran ≥ batas rahasia (`0.90 .. 1.10 × dasar`, hash pedagang+hari) → diterima; terlalu rendah
+  (< batas − 15 %) → suasana −25, pedagang `geleng` dan `marah_tunjuk`; suasana < 20 → "tidak jual hari ini" untuk barang
+  itu. Harga akhir tidak pernah < `0.90 × dasar`; beli-kembali tetap ≤ 0.5 (38.M.5).
+- **Kuil Air**: **Restu Mata Air** 3 NB (maks 1 per hari dunia): Regenerasi I 60 s + kebal "Tertiup Pasir" 30 menit
+  dunia; **air suci** (botol `potion` air bertanda, item `kultivator:tema/air_suci`, 2 NB): bahan pil penyejuk dan
+  syarat quest; meditasi di tepi kolam suci: situs `SpiritSites` ekstra "Mata Gurun" ×1.25 (dalam CAP).
+- **Tebing Seribu Lukisan**: membaca mural (klik billboard) membuka **Kisah Mural** (12 kisah, 38.T.4.7) dan sekali per
+  mural **+0.5 pemahaman**; pelukis menerima **pesanan mural**: pemain membayar 50 NB dan memilih satu prestasinya
+  (gelar, bos terkuat, kesengsaraan), dan dalam 3 hari mural pemain muncul di gua ceruk ke-12 (billboard klien bergambar
+  ikon prestasi + nama pemain; data di `KotaTemaData`), dilihat pemain lain di server itu.
+- **Istana Pasir**: audiensi Tuan Benteng (Nama Baik ≥ 50) → **Surat Jalan Gurun** (item: bebas bea gerbang semua kota
+  oasis, pengawal kafilah tidak menyerang bila salah paham, 30 hari dunia) dan Perintah Benteng (tugas mingguan: bersihkan
+  satu `reruntuhan_gurun`, kawal satu kafilah, buru satu kawanan binatang gurun).
+- **Bea gerbang** untuk barang dagang yang dibawa masuk: 3 % nilai peti dagang (38.T.10), dibebaskan oleh Surat Jalan.
+- **Festival: Malam Tari Putar** (bulan purnama `moonPhase == 0`, 18000-21000; batal saat badai): panggung tari di
+  danau, 4 PENARI_GURUN `tari_putar` serempak, musik (suara note block berirama dari titik panggung), lentera kuningan di
+  tepi danau, penonton impostor; pemain boleh ikut **Tari Putar** (mini-gim irama 30 s: tekan tombol arah sesuai
+  ketukan; skor ≥ 70 → Selendang Penari kosmetik + Nama Baik +1, maks sekali per festival).
+- **Pasar Bulan Sabit** (bulan sabit, 38.T.4.3): +6 kios tamu dengan barang langka (giok Barat, peta reruntuhan,
+  sesaji binatang gurun) stok 1 per kios.
+
+#### 38.T.4.6 Bahaya: badai pasir dan reruntuhan
+
+- **Badai Pasir** (`BadaiPasir`, 38TK; tiap 6 ± 2 hari dunia per Kota Oasis, siang; atau dipicu quest): pusat kota,
+  jari-jari 600 blok, 2400 tick. Pertanda 60 s sebelumnya: dinding pasir di cakrawala (quad klien raksasa coklat
+  bergerak), angin bersiul (suara), baris `tema.oasis.badai`; NPC berlindung (38.T.4.3), Gerbang Giok menutup, kafilah di
+  jalan berhenti dan unta berlutut.
+  - Klien (38TV): kabut pasir (warna `#C8A060`, jarak pandang 16 blok pada Normal dan Maksimal; Minimal
+    hanya overlay warna tanpa partikel), partikel pasir horizontal, suara angin loop; jarum kompas dan penunjuk quest bergetar ±20°.
+  - Server: pemain di luar tembok kota yang melihat langit (`canSeeSky`) dan tanpa Restu Mata Air mendapat
+    **Tertiup Pasir** (Lambat I, diperbarui tiap 10 s) dan 0.5 kerusakan per 20 s bila tidak memakai helm/kerudung (item
+    `kultivator:tema/kerudung_pasir`, 15 NB); di dalam tembok tanpa efek. **Cuaca dunia tidak diubah** (tidak ada
+    `setWeatherParameters`): badai adalah keadaan lokal 38TK + gambar klien.
+  - Sesudah badai: 2-4 **Temuan Pasir** (entitas berkilau pola `TandaEntity`, 38TK `TemuanPasirEntity`) muncul di
+    bukit pasir 60-300 blok dari kota: Pecahan Mural, Koin Kuno, Lempeng Peta (bagian peta ke `reruntuhan_gurun`
+    terdekat), dijual ke Pelukis atau dipakai quest.
+  - `Sibuk`: badai tidak membuat sibuk; peristiwa musuh lain tidak dimulai selama badai di jari-jarinya.
+- **Reruntuhan Gurun** (satelit 38.T.2.6): Lempeng Peta dan Kisah Mural menunjuk ke sana (`DuniaSites.locateFor`
+  `kota_tema/reruntuhan_gurun`); bos **Raja Kalajengking** (`KalajengkingRajaEntity`, 38.T.9, tier menurut cincin,
+  `markRealmFoe`) muncul saat pemain pertama ≤ 20 blok dari sarangnya; hadiah: Ekor Racun Kalajengking (bahan pil/pusaka),
+  Giok Barat, peti tier; sekali per pemain per reruntuhan.
+
+#### 38.T.4.7 Tokoh dan rantai quest "Mata Air yang Menyusut"
+
+| Tokoh | Peran | Watak, suara | Muncul |
+|---|---|---|---|
+| **Sha Wuyan** | TUAN_BENTENG | pendiam, berwibawa, takut kotanya mati seperti Kota Terkubur; `boss` | istana, bab 1, 6 |
+| **Bulat Khan** | KAFILAH_BASHI | pemimpin kafilah tua, tertawa keras, tahu semua bintang penunjuk jalan; `m1` | karavanserai, bab 2, 5 |
+| **Pendeta Shui Lian** | PENDETA_AIR | lembut, tegas soal air, membaca Batu Ukur Air; `f3` | kuil air, bab 1, 3, 6 |
+| **Mo Hua** | PELUKIS_GUA | pelukis muda pelupa, mendengar "suara" dari mural; `m3` | tebing lukisan, bab 3-4 |
+| **Si Kecil Ajun** | ANAK (pembaca pasir) | anak yatim kafilah yang bisa "membaca" arah angin di pasir; `f1` | lapangan kafilah, bab 2, 5 |
+| **Xie Duo, Pertapa Kalajengking** | TETUA_IBLIS varian gurun | dulu pendeta air yang diusir; memelihara Raja Kalajengking dengan urat air kota; `demon` | bab 4-6 |
+
+Rantai `tema_oasis_mata_air` (6 tahap):
+
+| # | Pemicu / pemberi | Isi | Cabang | Hadiah |
+|---|---|---|---|---|
+| 1 | masuk kota; Shui Lian | Batu Ukur Air turun dua tanda dalam sebulan; antre air dijatah (NPC antre di sumur = adegan hidup) | — | situs, Nama Baik +2 |
+| 2 | Bulat Khan + Ajun | ikut Kafilah Agung keluar 600 blok (atau kawal sendiri); Ajun membaca pasir: jejak air menuju barat; badai pasir dipicu quest di tengah jalan: lindungi unta (6 binatang gurun menyerang) | menemukan **Lempeng Peta** / kehilangan kafilah (cari Ajun yang tersesat di badai: entitas jejak kaki klien) | 60 × (band+1) NB |
+| 3 | Mo Hua | mural ke-7 "Pendeta yang Diusir" bergerak di mata pemain (billboard beranimasi 2 frame): baca 4 mural lain untuk merangkai kisah Xie Duo | — | +1 pemahaman |
+| 4 | Lempeng Peta | masuk `reruntuhan_gurun` terdekat; aula ketiga: formasi penyedot air (lingkar rune klien + 4 tiang = entitas `PilarRuneEntity` 38TK) dijaga Raja Kalajengking | hancurkan 4 tiang (formasi pecah) / segel dengan air suci (Shui Lian) | Ekor Racun, peti |
+| 5 | Xie Duo muncul | Xie Duo menuntut Kuil Air menerimanya kembali; dialog bercabang (watak ditentukan pilihan bab 4) | (a) duel (bos, ranah band+1); (b) bujuk: Nama Baik ≥ 40 dan bawa air suci → Xie Duo menyerah, menjadi pertapa di gua ke-12; (c) serahkan Ajun sebagai "pembaca air" (ditolak sistem: pilihan ini membuat Ajun lari, Nama Baik −10, Xie Duo tetap harus dilawan) | (a) pusaka kebut `kebut` unik "Ekor Angin"; (b) teknik air Xie Duo (giok) |
+| 6 | Shui Lian | upacara pemulihan: Batu Ukur Air naik (entitas penanda bergerak naik 4 tanda selama adegan 4 s), Malam Tari Putar diadakan untuk pemain | — | gelar "Pembawa Air", Surat Jalan Gurun gratis selamanya, Nama Baik +10 |
+
+Quest samping: `tema_unta_hilang` (unta Bulat Khan kabur saat badai; temukan dengan Ajun), `tema_mural_pesanan`
+(mural pemain), `tema_permadani_ratu` (penenun butuh pewarna dari Ekor Racun dan bunga gurun), `tema_kurma_emas`
+(panen kurma di Kebun Kurma 5 hari berturut, hadiah Kurma Emas: makanan pemulih Qi 10 %).
+
+### 38.T.5 Kota Air (`kota_tema/air`)
+
+#### 38.T.5.1 Lore dan Sumber
+
+- **Lore** (`tempat_tema_lore.air.*`): kota kanal yang dibangun di atas "seribu jembatan" (sebenarnya 64; orang suka
+  membesar-besarkan). Setiap rumah punya pintu depan ke jalan dan pintu belakang ke air. Kekayaannya dari **sutra** (Rumah
+  Sutra Su sudah lima generasi) dan **teh** dari bukit di utara. Legenda kota: **Xiu Niang**, penenun yang tenggelam di
+  malam pernikahannya lima puluh tahun lalu, kainnya tak pernah selesai; pada malam tanpa bulan, ada satu lentera yang
+  berlayar melawan arus.
+- **Sumber** (`kultivator.kota_tema.air.source`): "Sumber: Zhouzhuang di Kunshan dekat Suzhou, kota air dengan Jembatan
+  Kembar dari era Ming: Jembatan Shide berlengkung bundar dan Jembatan Yong'an berlengkung persegi yang bertemu di sudut
+  dua kanal; Kanal Besar dan taman-taman klasik Suzhou; sutra Suzhou dan teh hijau Biluochun dari bukit Dongting di Danau
+  Tai. Lentera air: tradisi melepas lentera teratai di sungai pada malam Festival Zhongyuan di Jiangsu dan Fujian untuk
+  menerangi jalan arwah. Jadwal festival, tokoh, harga dan angkanya rancangan game."
+
+#### 38.T.5.2 Tata letak dan jaringan kanal (grid sebelum diputar)
+
+```
+             x = -1               x = 0                 x = +1
+ z = -1   [taman_sastra]  ~~~~ [rumah_sutra]  ~~~~~~ [bukit_teh]
+             ‖                    ‖                     ‖
+ z =  0   [jembatan_kembar] ~~ [danau_lentera] ~~~~~ [pasar_kanal]
+             ‖                    ‖                     ‖
+ z = +1   [hunian_kanal]  ~~~~ [gerbang_air]  ~~~~~~ [dermaga_perahu]
+                                  ║ (Kanal Utama keluar lewat Pintu Air)
+```
+
+`~~` dan `‖` = kanal 5 lebar dengan jalan setapak 2 di satu sisi (kode sisi `K`); setiap persilangan kanal punya
+jembatan lengkung batu (`stone_brick_stairs` + `stone_bricks`, puncak +4, pagar `stone_brick_wall`) di lot sudut; antar-
+distrik juga jalan 3 (kode `J`) di sisi lain lot. **Kanal Utama** masuk dari luar lewat Pintu Air (`gerbang_air`) ke
+Danau Lentera; kanal lingkar mengitari ketiga baris. Tembok kota rendah (6 tinggi, `white_terracotta` + genteng hitam)
+dengan dua gerbang darat (timur, barat) dan satu **Pintu Air** (entitas `pintu_air`, terbuka 05:00-21:00).
+
+| Distrik | Lot (lx,lz) dan isi |
+|---|---|
+| `taman_sastra` | (0,0)+(1,0)+(0,1)+(1,1) **Taman Sang Sastrawan**: taman klasik 90 × 90: kolam berliku (air + `lily_pad`), gunungan batu berongga (gumpalan `tuff`/`calcite`/`diorite` berlubang 6-9 tinggi), gerbang bulan (lingkar `stone_bricks` 5 diameter di dinding putih), lorong beratap berjendela kisi, Paviliun Menyimak Hujan, Paviliun Bulan di Air (lantai di atas kolam), perpustakaan kecil, bambu, pinus pot; titik `meditasi` ×8, `obrol` ×6, `pandang` ×4, jangkar `kota_tema/taman` |
+| `rumah_sutra` | (0,0)+(1,0) **Rumah Sutra Su**: rumah usaha tiga halaman: halaman ulat sutra (rak nampan bertingkat `oak_slab` + `moss_carpet` "daun murbei", ulat = klien), ruang pemintalan (titik `kerja:pintal` ×4), aula tenun dengan 6 `AlatTenunEntity` (38.T.9), galeri pajang kain (spanduk kain berwarna = `*_banner` + kain berkibar klien), kantor Nyonya Su; jangkar `kota_tema/sutra`; (0,1) kebun murbei (pohon `oak` rendah berdaun `azalea_leaves`); (1,1) rumah pekerja sutra |
+| `bukit_teh` | (0,0)+(1,0) **Teras Teh**: bukit teh buatan bertingkat 4 teras (`azalea`, `flowering_azalea` berbaris di atas `rooted_dirt`), jalan setapak batu, pondok pengering teh (rak `bamboo_mosaic`, tungku pemanggang `smoker`, titik `kerja:sangrai` ×2); (0,1) **Paviliun Teh Awan** (rumah teh dua lantai, jangkar `kota/teh` + `kota_tema/teh_awan`, meja upacara teh ×6, balkon di atas kanal); (1,1) gudang teh + rumah pemetik |
+| `jembatan_kembar` | (0,0)+(1,0)+(0,1)+(1,1) **Sudut Jembatan Kembar**: persilangan dua kanal dengan **Jembatan Lengkung Bundar** (lengkung setengah lingkaran 7 lebar, tinggi +6) dan **Jembatan Lengkung Persegi** (lengkung persegi 7 lebar) yang bertemu di sudut; jalan toko di tepi kanal (12 toko kecil bertingkat dua: kipas, payung kertas, kue beras, tahu; titik `lapak` ×12), rumah bangsawan **Wisma Zhang** (enam halaman kecil, ruang tamu, ruang belajar), titik `pandang` (lukisan terkenal: pemain berdiri di sana → kartu judul "Kenangan Kampung Halaman" kecil) |
+| `danau_lentera` | (0,0)+(1,0)+(0,1)+(1,1) **Danau Lentera** 64 × 50 (dalam 3, dasar `clay`, teratai), **Panggung Air** di tengah (panggung kayu di atas tiang dengan atap pelana, jangkar `kota_tema/panggung_air`), dermaga lingkar dengan 8 titik `lentera_air`, pagoda kecil di pulau, **Alun Tepi Danau** (jangkar `kota/situs`, `kota/alun`, `kota/papan`), kuil kecil Dewa Air |
+| `pasar_kanal` | (0,0)+(1,0) **Pasar Air Pagi**: kanal lebar 9 dengan 10 tambatan perahu-lapak (perahu kanal tertambat menjadi kios, titik `lapak` di perahu), tangga cuci ke air (titik `kerja:cuci` ×6); (0,1) **Cabang Rumah Uang** + **Papan Gilda** (`bank_cabang`, `papan_gilda`), `kota/pil`; (1,1) **Rumah Makan Ikan Danau** (`rumah_makan`, jendela ke kanal) |
+| `hunian_kanal` | 4 lot rumah tepi kanal (pool `kota_tema/air/rumah`: rumah dua lantai berdinding putih, tangga batu turun ke air di belakang, perahu kecil tertambat = entitas templat diam), sumur, kuil leluhur kecil, `bengkel` (`kotabesar/tukang`) |
+| `gerbang_air` | (0,1) **Pintu Air dan Gerbang Air**: menara gerbang di atas kanal (lengkung air 7 + gerbang darat 3 di samping), entitas `pintu_air` (daun kayu turun-naik); (0,0) **Penginapan Bulan di Kanal** (`penginapan`, kamar dengan jendela ke air); (1,0) `kotabesar/cakram` stasiun kecil di halaman; (1,1) pos jaga (`kota/penjaga` ×2) |
+| `dermaga_perahu` | (0,0)+(1,0) **Galangan Perahu**: rumah perahu (perahu terbalik di atas kuda-kuda, titik `kerja:palu` ×3), **Rumah Perahu Naga** (dua perahu naga = entitas diam saat bukan lomba, kepala naga berukir), jangkar `kota_tema/sewa_perahu`; (0,1) **Halte Perahu Pos** pusat (tambatan ×4); (1,1) rumah pendayung |
+
+**Perahu Pos** (rute `jalur_perahu` titik NBT): empat halte (Gerbang Air, Jembatan Kembar, Danau Lentera, Rumah Sutra),
+satu perahu per rute berputar tiap 6 menit dunia; 1 NB, duduk sebagai penumpang (entitas `PerahuKanalEntity` 3 kursi,
+pendayung = tubuh NPC PENDAYUNG penumpang di buritan dengan klip `dayung_yuloh`), `Sibuk` `tema.perahu`, turun di halte
+mana pun.
+
+#### 38.T.5.3 Penduduk, peran, rutinitas dan animasi
+
+Peran baru: `NYONYA_SUTRA` (tier 2, PEDAGANG, sanggul tusuk giok + jubah sutra bersulam), `PENENUN_SUTRA` (1, PEKERJA,
+lengan baju diikat + celemek), `PEMELIHARA_ULAT` (1, PEKERJA, keranjang daun), `AHLI_TEH` (2, CENDEKIA, topi sarjana
+lembut + jubah hijau teh), `PEMETIK_TEH` (1, PEKERJA, caping + keranjang punggung kecil), `PENDAYUNG` (1, PEKERJA, caping
+biru + kain kepala), `SASTRAWAN` (2, CENDEKIA, topi sarjana + kipas). Penduduk data 240.
+
+| Jam | Pendayung | Penenun / pemelihara ulat | Pemetik / ahli teh | Sastrawan | Warga |
+|---|---|---|---|---|---|
+| 04-06 | menyiapkan perahu (`sapu`, `ikat_tali`) | pemelihara memberi daun (`lempar_pakan` ke nampan) | **petik teh pagi** (musim semi: `petik_teh` di teras, embun klien) | tidur | `basuh_pakaian` di tangga cuci kanal |
+| 06-10 | Pasar Air Pagi: perahu-lapak tertambat, `seru_dagang` dari perahu; Perahu Pos jalan | `tenun` di alat tenun (entitas ikut bergerak) | `sangrai` (klip `masak` varian) di pondok | `membaca` di Paviliun Menyimak Hujan | belanja ke pasar air |
+| 10-14 | `dayung_yuloh` + `nyanyi_perahu` (gelembung kalimat lagu perahu) | tenun; makan siang di halaman | upacara teh pertama (`seduh_teh` di Paviliun Teh Awan) | `menulis` puisi di gazebo | makan, tidur siang |
+| 14-18 | Perahu Pos | tenun, pajang kain | tamu teh | `catur` dengan sastrawan lain di Paviliun Bulan di Air | `obrol` di jembatan, anak `memancing` dari jembatan |
+| 18-22 | menambat perahu, menyalakan lentera buritan (klien) | pulang | pulang | `tatap_langit` (bulan), `kipas` | `minum_teh` di jendela kanal, lentera rumah |
+
+Hujan (sering di bioma ini): payung kertas (prop 25), Perahu Pos tetap jalan dengan atap anyaman (model), sastrawan
+justru keluar ke Paviliun Menyimak Hujan (`duduk_kursi` + `tatap_langit`).
+
+#### 38.T.5.4 Permainan khas
+
+- **Sewa perahu** (`kota_tema/sewa_perahu`): `PerahuKanalEntity` yang **didayung pemain** sendiri (kendali seperti perahu
+  vanilla, kecepatan 0.08, hanya mengikuti air; implementasi sendiri, entitas tidak disimpan, kembali ke tambatan bila
+  ditinggal 2 menit) 2 NB per jam dunia; atau **Tur Kanal** berpemandu (3 NB, perahu berjalan sendiri sepanjang rute
+  wisata 6 menit dengan Bibi Chuan menyanyi dan menceritakan 6 tempat; pertama kali: +1 pemahaman, `tema.air.tur`).
+- **Rumah Sutra** (layar `tema_sutra`): beli **Sutra Awan** (bahan dagang/tempa, 38.T.10), **pesanan jubah sutra**
+  (kosmetik jubah dengan warna dan motif pilihan: awan, bangau, teratai, naga; 80 NB, jadi 2 hari; memakai slot kosmetik
+  jubah `KotaGear`-pola pemain bila ada, verifikasi; bila tidak: item zirah dada kain tanpa atribut yang bisa diwarnai),
+  **Kipas Sutra** (prop kosmetik di tangan), magang tenun (mini-gim irama 20 s di alat tenun; skor → sutra gratis 1-3,
+  maks 1 per hari).
+- **Paviliun Teh Awan** (layar `tema_teh`): upacara teh dengan AHLI_TEH (adegan 4 s, klip `seduh_teh` + `tuang_teh`),
+  **teh khas**: Teh Bi Luo (8 NB: pemahaman +0.03/menit meditasi selama 10 menit; tidak bertumpuk dengan teh lain, yang
+  terbesar berlaku), Teh Embun Gunung (5 NB: regen Qi +8 % 5 menit), Teh Seribu Tahun (60 NB, pita ≥ 3, stok 1/hari:
+  sekali per hari dunia mengurangi tekanan iblis hati 5 bila API publik ada, verifikasi; selain itu pemahaman +0.05/menit
+  10 menit). **Petik teh** musim semi (pemain di teras 04-08, 10 petikan) → daun teh segar (bahan, dijual 1 NB/lembar ke
+  ahli teh, maks 20/hari).
+- **Taman Sang Sastrawan**: meditasi di taman: situs ekstra "Taman Klasik" ×1.2 (dalam CAP); **Pasangan Bait** (layar
+  `tema_bait`, 30 bait milik 38TK ditulis sendiri: pilih bait kedua yang serasi dari tiga; 3 benar berturut-turut → +1
+  pemahaman, maks sekali per hari).
+- **Festival: Malam Lentera Air** (bulan mati `moonPhase == 4`, 13000-18000): warga melepas lentera teratai dari titik
+  `lentera_air`; lentera (quad klien, 38.T.9.4) hanyut mengikuti spline kanal ke Danau Lentera dan berputar perlahan di
+  danau; pemain membeli lentera (1 NB, maks 3) dan menulis **harapan** (≤ 32 huruf; teksnya hanya tampil di layar pemain
+  itu; pemain lain melihat lentera tanpa teks), lalu melepasnya di titik mana pun → `+1 Nama Baik` (maks 1), rumor kecil.
+  Pertunjukan di Panggung Air (penyanyi + musik), perahu-perahu berlentera berkeliling. Lentera milik pemain dibatasi
+  `EpicBudget` dan hilang setelah 600 tick.
+- **Festival: Lomba Perahu Naga** (`d % 14 == 6`, 8000-10000): 4 `PerahuNagaEntity` (38.T.9.1) di jalur danau + Kanal
+  Utama (2 putaran); pemain boleh menjadi **penabuh genderang** satu perahu (mini-gim irama 60 s: ketepatan menaikkan
+  kecepatan perahunya 0-12 %); juara → 20 NB per anggota + Nama Baik +2 + Pita Naga kosmetik; penonton impostor di tepi
+  kanal dan jembatan.
+- **Bahaya: Tikus Air** (geng pencuri kanal; tiap 4-7 hari, malam): pencuri merampok perahu-lapak atau Rumah Sutra
+  (adegan: NPC `tunjuk` + "Pencuri!"), lalu kabur dengan **sampan cepat** (`PerahuKanalEntity` varian hitam) di jalur
+  kanal; pemain mengejar (dengan perahu sewaan, di jalan setapak, atau terbang); menghentikannya (serangan ke sampan
+  atau pencuri) → barang kembali, Nama Baik +3, 15 × (band + 1) NB. Pencuri `markRealmFoe` hanya bila melawan; tidak pernah
+  mencuri dari pemain.
+- **Bahaya kecil: Arwah Kanal** (hanya saat quest `tema_air_benang` bab 4 aktif atau Malam Lentera Air): 2-4 arwah lemah
+  (tubuh `KultivatorNpc` peran `SISA_JIWA` varian air, tembus pandang, `markRealmFoe`) muncul di danau; padam bila lentera
+  doa dinyalakan di dekatnya.
+
+#### 38.T.5.5 Tokoh dan rantai quest "Benang Merah di Bawah Air"
+
+| Tokoh | Peran | Watak, suara | Muncul |
+|---|---|---|---|
+| **Nyonya Su Jin** | NYONYA_SUTRA | anggun, teliti, keras pada diri sendiri; `f3` | rumah sutra, bab 1, 5 |
+| **Su Jin'er** | PENENUN_SUTRA (putri Su Jin) | ceria, pemberontak kecil, penenun berbakat; `f1` | rumah sutra, bab 5-6 |
+| **Lu Yuqing** | AHLI_TEH | lembut bicara, menyimpan rahasia kota; `m1` | paviliun teh, bab 2, 4 |
+| **Bibi Chuan** | PENDAYUNG | penyanyi perahu, tahu setiap sudut kanal; `f1` (nada lebih rendah) | perahu, bab 2-3 |
+| **Sastrawan Wen Shi** | SASTRAWAN | tua, suka puisi sedih, kakek Xiu Niang dari pihak ibu; `elder` | taman, bab 4 |
+| **Xiu Niang** | SISA_JIWA (arwah penenun) | sedih, sopan, terikat kain yang tak selesai; `f2` (bergema) | danau, bab 4-6 |
+| **Lao Shu "Tikus Tua"** | pemimpin Tikus Air (`KultivatorNpc`, tier 2) | licik, pengecut, menjual apa saja; `m3` | bab 2-3 |
+
+Rantai `tema_air_benang` (6 tahap):
+
+| # | Pemicu | Isi | Cabang | Hadiah |
+|---|---|---|---|---|
+| 1 | masuk kota; Su Jin | ulat sutra Rumah Su sakit (nampan klien: ulat diam, daun menghitam); periksa daun murbei dan air kanal | — | situs, Nama Baik +2 |
+| 2 | Bibi Chuan | tur kanal malam: noda hitam di air dekat gudang tua; Lu Yuqing mengenalinya sebagai **Minyak Bayangan** (penyelundupan yang sama dengan quest pelabuhan; bila pemain sudah tahu dari pelabuhan, dialog tambahan) | — | — |
+| 3 | malam berikutnya | kejar sampan Lao Shu (bahaya Tikus Air versi quest); tangkap → Lao Shu mengaku menerima minyak dari "orang berjubah merah" dari Kota Iblis (penunjuk ke 38.T.7) | serahkan ke penjaga / lepaskan dengan janji jadi mata-mata (bendera `air_lao_shu_mata`) | 30 × (band+1) NB |
+| 4 | Malam Lentera Air berikutnya (atau `uji tema acara air lentera`) | lentera yang melawan arus; Xiu Niang muncul di Paviliun Bulan di Air; Wen Shi menceritakan kisahnya; tenangkan 3 Arwah Kanal | bicara dengan Xiu Niang (Nama Baik ≥ 20) / usir dengan kekuatan (dia lenyap sementara, bab 5 sulit) | — |
+| 5 | Su Jin + Jin'er | selesaikan **Kain Xiu Niang**: kumpulkan Sutra Awan ×6 (rumah sutra), Daun Teh Embun ×10 (petik), Air Suci ×1 (dari Kota Oasis bila diketahui, atau air mata air roh 38.C.5); tenun bersama Jin'er (mini-gim tenun 3 babak) | — | — |
+| 6 | Malam Lentera Air | lepas kain sebagai lentera perahu; Xiu Niang tenang (adegan 4 s: lentera besar hanyut, arwah memudar menjadi cahaya, warga `sujud_dupa`); ulat sutra pulih (nampan hidup lagi) | bila bab 4 "usir": Xiu Niang tidak muncul, kain dilepas tanpa adegan perpisahan, hadiah lebih kecil | gelar "Penenun Malam", Jubah Sutra Benang Merah (kosmetik unik), diskon Rumah Sutra 15 %, Nama Baik +10 |
+
+Quest samping: `tema_teh_pertama` (petik teh musim semi bersama Lu Yuqing; hadiah 5 Teh Bi Luo dan izin
+menyeduh sendiri di Paviliun: Teh Bi Luo −25 % untuk pemain itu),
+`tema_bait_tua` (Wen Shi kehilangan bait puisi terakhirnya di Pasangan Bait), `tema_perahu_naga` (menangkan lomba sebagai
+penabuh), `tema_anak_jembatan` (anak jatuh ke kanal saat hujan deras → selamatkan: berenang ke titik dan
+bawa ke tangga cuci; Nama Baik +3).
+
+### 38.T.6 Kota Gunung (`kota_tema/gunung`)
+
+#### 38.T.6.1 Lore dan Sumber
+
+- **Lore** (`tempat_tema_lore.gunung.*`): kota yang tumbuh di sepanjang jalan ziarah ke **Aula Emas** di puncak. Di kaki
+  ada pasar dan penginapan peziarah; di lereng, rumah-rumah panggung bertumpu pada tiang di atas jurang dan teras herba;
+  di puncak, biara tua yang menjaga **Lonceng Awan**. Barang naik lewat punggung para kuli atau lewat **Kereta Gantung
+  Tali Besi** yang dibangun Paman Tie Suo dua puluh tahun lalu; para biksu menganggapnya "jalan malas", para pedagang
+  menganggapnya keajaiban. Kera-kera gunung menganggap semua orang membawa makanan untuk mereka.
+- **Sumber** (`kultivator.kota_tema.gunung.source`): "Sumber: Gunung Emei, salah satu gunung suci Buddhisme Tiongkok,
+  dengan Puncak Emas (Jinding) setinggi ±3.077 m, aula emas dan patung Samantabhadra (Puxian) bersepuh; Kuil Baoguo di
+  kaki gunung adalah titik awal ziarah; matahari terbit, lautan awan dan 'cahaya Buddha' dikenal sebagai keajaiban
+  puncaknya. Jalan papan di tebing terinspirasi dari jalan papan di Puncak Selatan Huashan; kota bertingkat dengan rumah
+  panggung di tepi tebing terinspirasi dari kota gunung Chongqing. Tata kota, tokoh, harga dan angkanya rancangan game."
+
+#### 38.T.6.2 Tata letak (grid sebelum diputar; menanjak ke utara)
+
+```
+             x = -1                 x = 0                  x = +1
+ z = -1   [tebing_papan]   ═G═  [puncak_emas]    ═G═   [biara_awan]        baris atas  (dy +30 .. +72)
+             ║G                     ║G  ↑ kereta gantung   ║G
+ z =  0   [teras_hunian]   ═G═  [aula_herba]     ═G═   [teras_kebun]       baris tengah (dy +12 .. +42)
+             ║G                     ║G  │                  ║G
+ z = +1   [penginapan_peziarah] ═ [kaki_gerbang]  ═══   [pasar_kaki]        baris bawah (dy 0 .. +12)
+```
+
+`G` = sambungan tangga (kode sisi `G`): lot tepi baris memuat **tangga batu** 5 lebar dengan bordes tiap 12 anak tangga,
+gapura kecil (`paifang` kayu merah) di tiap bordes, pagar batu di sisi jurang, lentera batu. Antar-teras yang lebih dari
+24 tinggi memakai tangga zig-zag di dalam lot `tangga_tinggi`. **Kereta Gantung** dari stasiun bawah (`kaki_gerbang`) ke
+stasiun atas (`puncak_emas`) melewati tiang tengah di `aula_herba` (dua bentang); tali = gambar klien (38.T.9.3). Tembok
+hanya di baris bawah (gerbang kaki); baris atas dibatasi tebing alami + pagar.
+
+| Distrik | Lot (lx,lz) dan isi |
+|---|---|
+| `kaki_gerbang` | (0,1) **Gerbang Kaki Gunung**: gapura batu tiga pintu, pos jaga (`kota/penjaga` ×2), tugu "Seribu Anak Tangga" (stela), awal `jalur_tangga`; (0,0) **Stasiun Bawah Kereta Gantung**: rumah roda besar (roda kayu Ø 9 = entitas `roda_katrol` berputar saat kereta jalan), loket (jangkar `kota_tema/lift` data `stasiun=bawah`), ruang tunggu; (1,0) **Pos Kuli**: gudang muatan, rak pikulan, papan jasa angkut (jangkar `kota_tema/kuli`), kasur kuli ×8; (1,1) **Alun Kaki** (jangkar `kota/situs`, `kota/alun`, `kota/papan`) dengan pohon tua besar (catatan di bawah tabel) |
+| `pasar_kaki` | (0,0)+(1,0) **Pasar Peziarah**: jalan menanjak landai dengan 14 kios (dupa, tasbih, tongkat bambu, payung, makanan kering; titik `lapak` ×14), kedai bakpao kukus (`smoker`, uap klien); (0,1) **Cabang Rumah Uang** + **Papan Gilda** (`bank_cabang`, `papan_gilda`), `kota/pil`; (1,1) **Kedai Teh Kabut** (`kota/teh`, `kota/kursi_pengembara` ×2) |
+| `penginapan_peziarah` | (0,0)+(1,0) **Kuil Kaki Gunung** (titik awal ziarah: aula Samantabhadra kecil, pembakar dupa, ruang daftar ziarah = jangkar `kota_tema/ziarah`); (0,1) **Penginapan Pondok Pinus** (`penginapan`, kamar bersama 16 kasur + 4 kamar); (1,1) **Rumah Makan Vegetarian** (`rumah_makan`) |
+| `teras_hunian` | 4 lot rumah panggung teras (pool `kota_tema/gunung/rumah`: rumah kayu bertiang yang separuhnya menggantung di atas teras bawah, dapur, tempat tidur loteng, balkon), sumur bambu (pipa `bamboo_block` + air), `bengkel` (`kotabesar/tukang`), titik `jalur_tangga` |
+| `aula_herba` | (0,0)+(1,0) **Aula Herba Gunung**: aula pengering (rak jemur herba bertingkat, titik `kerja:jemur` ×6), toko herba (jangkar `kota_tema/aula_herba`), ruang penilaian umur herba (timbangan, kaca pembesar = item frame); (0,1) **Tiang Tengah** kereta gantung: menara kayu-batu 9 × 34 × 9 dengan roda pemandu (entitas `roda_katrol` kecil); (1,1) **Rumah Pemetik**: tali panjat, keranjang, peta tebing di dinding (billboard) |
+| `teras_kebun` | (0,0)+(1,0) **Teras Kebun Herba dan Teh Gunung**: 5 teras sempit (`farmland` + tanaman vanilla, `azalea` berbaris), saluran air bambu; (0,1) **Katrol Teras**: katrol vertikal (`KatrolEntity` keranjang, 38.T.9.3) dari teras kebun ke `biara_awan` di atas (naik sampai 30 blok); (1,1) gudang pupuk, rumah petani teras |
+| `tebing_papan` | (0,0)+(0,1) **Jalan Papan Tebing**: jalan papan 1 lebar (`spruce_slab` di atas `spruce_fence` sebagai penyangga yang tertanam di dinding tebing buatan `stone`/`andesite` 30 tinggi), rantai pegangan (`chain` mendatar), tangga besi; 6 **ceruk meditasi** di tebing (titik `meditasi`), **tumbuhan tebing** = entitas `HerbaTebingEntity` (38.T.6.4); (1,0) **Gua Pertapa Tebing** kecil (ruang 7 × 5 × 7, titik `meditasi` ×2, `pandang`); (1,1) **Katrol Tebing** (`KatrolEntity` dari bordes ke ceruk tinggi) |
+| `puncak_emas` | (0,0)+(1,0) **Aula Emas**: aula 24 × 18 × 20 berdinding dan beratap `gold_block`/`raw_gold_block` di genteng teratas + `yellow_terracotta`, patung Bodhisattva gajah putih (patung `quartz_block` + `calcite` 10 tinggi di atas "gajah" `white_concrete`), teras pandang tepi tebing berpagar (titik `pandang` ×4, `meditasi` ×8), jangkar `kota_tema/aula_emas`; (0,1) **Stasiun Atas Kereta Gantung** (jangkar `kota_tema/lift` `stasiun=atas`); (1,1) **Menara Lonceng Awan** (lonceng `bell` besar di bingkai kayu, jangkar `kota_tema/lonceng_awan`) |
+| `biara_awan` | (0,0)+(1,0) **Biara Awan**: aula Dharma (bantal duduk ×24, `kerja:ikan_kayu` ×2), asrama biksu (kasur ×12), dapur biara, perpustakaan sutra (rak kitab), jangkar `kota_tema/biara`; (0,1) **Kolam Pelepasan** (kolam ikan dan kura-kura), taman batu; (1,1) **Rumah Tamu Biara** (penginapan biara, 3 NB) + stasiun teleport kecil (`kotabesar/cakram`) |
+
+Catatan isi `kaki_gerbang` (1,1): pohon besar alun = `oak` raksasa buatan tangan dengan `azalea_leaves` dan
+`flowering_azalea_leaves` (bukan warna khusus).
+
+#### 38.T.6.3 Penduduk, peran, rutinitas dan animasi
+
+Peran baru: `KEPALA_BIARA` (tier 4, RAHIB, jubah kasaya merah-emas + tongkat sembilan cincin), `BIKSU_GUNUNG` (2, RAHIB,
+jubah abu + tasbih + topi caping biksu saat turun gunung), `PENJAGA_LIFT` (1, PEKERJA, sarung tangan tebal + kunci roda),
+`KULI_GUNUNG` (1, PEKERJA, kain kepala + rompi + pikulan/rangka punggung), `PEMETIK_HERBA` (1, PEKERJA, tali panjat
+melingkar + keranjang punggung + sabit kecil), `PEZIARAH` (0, TETUA/PEKERJA, ikat kepala kuning + tas dupa + tongkat
+bambu). Penduduk data 180 + peziarah tamu 10-30 (naik saat Musim Ziarah).
+
+| Jam | Kuli gunung | Peziarah | Biksu | Pemetik herba | Penjaga lift |
+|---|---|---|---|---|---|
+| 04-06 | sarapan, mengikat muatan (`ikat_tali`) | bangun di penginapan, dupa di Kuil Kaki | **lonceng subuh** di Menara Lonceng Awan, `tabuh_ikan_kayu` di aula | turun ke teras | memeriksa roda (`putar_katrol` lambat, `palu` ringan) |
+| 06-11 | **naik** sepanjang `jalur_tangga` dengan muatan (`daki_pikul`, berhenti tiap 2 bordes `basuh_muka`-varian lap keringat), turun kosong (`jalan_santai`) | **mendaki**: sebagian `sujud_ziarah` (tiga langkah satu sujud) di 9 bordes terakhir, sebagian berjalan + berhenti mengatur napas | sarapan bubur, kerja (`sapu` halaman, `rak_susun` kitab) | **memetik di tebing**: berjalan di jalan papan, `petik_herba_tebing` di ceruk | kereta gantung jalan tiap 4 menit dunia (`putar_katrol` saat berangkat) |
+| 11-13 | makan di Pos Kuli | makan vegetarian | makan siang hening (`makan` tanpa obrolan) | makan di ceruk | makan bergantian |
+| 13-17 | angkut kedua | di Aula Emas: `sujud_dupa`, foto pemandangan (`pandang`: `tatap_langit` lebar) | ceramah di aula (penonton biksu `duduk_lantai`) | `jemur` herba di aula herba | jalan |
+| 17-20 | `minum_teh`, `catur` | turun atau menginap di Rumah Tamu Biara | doa senja, `tabuh_ikan_kayu` | menilai herba di aula | kereta gantung terakhir 18:00 |
+| 20-04 | tidur | tidur | meditasi malam (`napas_meditasi`) | tidur | tidur |
+
+Cuaca: **kabut** (pagi hari, hujan, atau bioma tinggi: klien kabut putih di baris atas), hujan → jalan papan ditutup
+(penjaga di ujung `berdiri_jaga`, rantai melintang = entitas `PalangEntity` kecil), kereta gantung tetap jalan pelan;
+badai petir → kereta gantung berhenti, peziarah berlindung di aula.
+
+#### 38.T.6.4 Permainan khas
+
+- **Kereta Gantung** (`KeretaGantungEntity`, 38.T.9.3): kabin kayu 6 penumpang bergerak di garis lurus antar-stasiun
+  (dua bentang lewat Tiang Tengah, kurva gantung klien), 40 s sekali jalan, berangkat tiap 4 menit dunia (bila ada
+  penumpang) 05:00-18:00; ongkos 1 NB naik, gratis turun; `Sibuk` `tema.lift`. Penumpang duduk (seat), pintu kabin
+  tertutup (collider), dari dalam terlihat lautan awan (klien: lapis awan quad di bawah puncak saat pagi). Kereta tidak
+  pernah menjatuhkan penumpang; peristiwa **Lift Macet** (quest) berhenti di tengah bentang, pemain boleh keluar
+  (terbang/turun dengan tali `TaliTurunEntity` yang dijatuhkan penjaga).
+- **Katrol** (`KatrolEntity`): keranjang terbuka 2 orang/1 muatan naik-turun vertikal 30 blok dalam 12 s, dijalankan
+  PENJAGA_LIFT memutar engkol (`putar_katrol`) di atas; gratis.
+- **Jasa kuli**: titip barang (peti 27 slot dari inventori, bukan wadah berisi) ke Pos Kuli 2 NB → muncul di peti titipan
+  `kota_tema/titipan` di Biara Awan atau Aula Emas setelah kuli selesai berjalan (±3 menit dunia; kuli yang membawanya
+  terlihat mendaki); barang disimpan `KotaTemaData` (persisten), diambil oleh pemilik saja.
+- **Petik herba tebing**: `HerbaTebingEntity` (tanaman berkilau di ceruk dan tepi jalan papan; 12 titik per kota, muncul
+  ulang tiap hari dunia per pemain = data, tubuh hanya klien-tampak bagi pemain yang belum memetik): klik → herba berumur
+  (tabel `harta` herba gunung, umur 60-300 tahun, batas M3 ≤ 300) + 5 % **Rumput Awan Seribu Tahun** (bahan langka, umur
+  tetap 300). Jatuh dari tebing = jatuh biasa (pemain bertanggung jawab); Aula Herba menjual **Tali Panjat** (15 NB,
+  sekali pakai: mencegah kerusakan jatuh satu kali saat memetik di tebing kota ini).
+- **Aula Herba** (layar `tema_herba`): beli/jual herba gunung (jual ke aula 0.5 × nilai, 38.M.5), **penilaian umur** gratis,
+  **peringkat Pemetik Tebing** 1-5 (poin dari petikan) → izin titik herba tambahan dan diskon 5-15 %.
+- **Ziarah Seribu Anak Tangga** (jangkar `kota_tema/ziarah`): daftar di Kuil Kaki (gratis), daki dari gerbang kaki ke Aula
+  Emas **tanpa terbang, kereta gantung, katrol, teleport** (diperiksa: bendera terbang/kendaraan/teleport selama ziarah
+  membatalkan), nyalakan dupa di 9 bordes (jangkar `kota_tema/bordes` ×9, klik → asap klien), tiba di Aula Emas dalam satu
+  hari dunia → **Restu Puncak** (7 hari dunia): situs meditasi ekstra "Aula Emas" ×1.4 saat bermeditasi di teras Aula
+  Emas dan +10 % XP meditasi di mana saja (dalam CAP 38.0 butir 4), sekali per 7 hari; pertama kali: +2 pemahaman,
+  advancement `tema/peziarah`.
+- **Festival / fenomena: Fajar Cahaya Budha** (pagi 23000-1000, tidak hujan, peluang 30 % per hari): lautan awan di bawah
+  puncak + **lingkaran cahaya pelangi** di awan (quad aditif klien, 38.T.9.4) dengan bayangan pemain di tengahnya bila
+  pemain berdiri di titik `pandang` Aula Emas; pemain yang melihatnya (≥ 10 s) mendapat **Restu Cahaya** (pemahaman +1,
+  maks sekali per 7 hari dunia), peziarah NPC `sujud_ziarah` serempak. Baris `tema.gunung.cahaya`.
+- **Musim Ziarah** (`d % 30` di 0..4): peziarah ×3, kios pasar kaki +4, upacara Lonceng Awan siang hari (adegan pendek:
+  108 pukulan dipadatkan 4 s, `Sibuk`).
+- **Bahaya: Longsor** (saat hujan, peluang 25 % per jam dunia per kota): `BatuRuntuhEntity` (3-6 batu, 38.T.9.3)
+  menggelinding dari tebing di atas `tebing_papan` dan tangga baris atas di jalur tertentu (spline dari titik), 4-8
+  kerusakan bila mengenai, terpental dari pagar (tidak menghancurkan blok, tidak meninggalkan blok); NPC menutup jalur
+  (`PalangEntity`), pengumuman. Pemain dengan Mode Kehancuran atau pukulan teknik bisa memecah batu (entitas mati,
+  partikel).
+- **Bahaya: Kera Gunung** (`KeraGunungEntity`, 4-8 ekor di baris atas): kera mendekati pemain yang **memegang makanan**,
+  merebutnya (makanan di tangan saja, 1 buah) lalu kabur ke tebing; bila dipukul atau diberi umpan buah (lempar ke tanah)
+  menjatuhkan barang curian. Tidak pernah mengambil barang lain. Membunuh kera di wilayah biara = Nama Baik −3 (biksu
+  marah).
+
+#### 38.T.6.5 Tokoh dan rantai quest "Tali yang Terakhir"
+
+| Tokoh | Peran | Watak, suara | Muncul |
+|---|---|---|---|
+| **Kepala Biara Jue Yuan** | KEPALA_BIARA | tenang, humor tersembunyi, kultivator Penyatuan Dao yang tak pernah bertarung; `elder` | biara, bab 1, 6 |
+| **Paman Tie Suo** | PENJAGA_LIFT | keras kepala, bangga pada kereta gantungnya, berutang pada pedagang; `m1` | stasiun, bab 2-5 |
+| **Shan Ling** | PEMETIK_HERBA | gadis pemberani, hafal setiap ceruk tebing, berteman dengan kera; `f1` | tebing, bab 3-4 |
+| **Lao Dan** | KULI_GUNUNG | kuli tua, kaki besi, bijak sederhana; `m2` | tangga, bab 2 |
+| **Pei Wenzhi** | PEZIARAH (tuan muda sastrawan) | sombong lalu tobat, mendaki untuk mendiang ibunya; `m3` | ziarah, quest samping |
+| **Biksuni Jing Yue** | BIKSU_GUNUNG (penjaga Aula Emas) | lembut, tegas soal kesucian puncak; `f3` | aula emas, bab 6 |
+| **Gou Tie "Cakar Besi"** | pemimpin pemburu herba liar (`KultivatorNpc`, tier 3) | rakus, ingin monopoli herba tebing; `m3` | bab 3-5 |
+| **Kera Putih Tua** | binatang roh penjaga (entitas `KeraGunungEntity` varian putih besar, tier 4, tidak bermusuhan kecuali diserang) | kuno, bijak, tidak bicara (gestur); — | bab 4-5 |
+
+Rantai `tema_gunung_tali` (6 tahap):
+
+| # | Pemicu | Isi | Cabang | Hadiah |
+|---|---|---|---|---|
+| 1 | naik kereta gantung pertama kali | **Lift Macet** di tengah bentang (adegan: kabin bergoyang); Tie Suo menurunkan tali; di stasiun: tali besi terpotong rapi, bukan aus | — | situs, Nama Baik +2 |
+| 2 | Tie Suo + Lao Dan | jaga Tiang Tengah semalam (pemain di titik `jaga`); tiga sosok datang dengan gergaji roh; kalahkan atau usir | tangkap satu (interogasi: Gou Tie) / biarkan kabur (jejak kaki ke tebing) | 40 × (band+1) NB |
+| 3 | Shan Ling | Gou Tie ingin kereta gantung rusak agar kuli harus memakai jasanya dan pemetik tebing takut naik; ia memasang **jerat roh** di 6 ceruk; lepaskan jerat (6 entitas `JeratEntity` di jalan papan) | — | herba tebing ×3 |
+| 4 | jerat dilepas | Kera Putih Tua muncul (adegan 4 s: dari kabut), membawa pemain ke ceruk tersembunyi lewat Katrol Tebing: sarang kera dengan **Tali Sutra Kera** (serat roh yang dipintal kera dari akar tebing) | ambil sopan (beri 10 buah) / ambil paksa (Kera Putih bermusuhan; Shan Ling kecewa, bab 6 berubah) | Tali Sutra Kera |
+| 5 | Tie Suo | Gou Tie dan 4 pemburu menyerbu stasiun saat tali baru dipasang (pertahanan kecil; Kera Putih membantu bila bab 4 sopan) | (a) kalahkan, serahkan ke biara (Gou Tie menjadi kuli tobat); (b) kalahkan dan usir; (c) terima suapnya (monopoli herba: harga herba +20 %, Shan Ling pergi dari kota) | (a)/(b) Nama Baik +5 |
+| 6 | Kepala Biara | upacara pemberkatan tali (adegan: Lonceng Awan berbunyi, kabin pertama naik membawa pemain, lautan awan, Cahaya Budha muncul pasti) | — | gelar "Penjaga Tali Awan", kereta gantung gratis selamanya, Restu Puncak tanpa ziarah sekali, Nama Baik +10 |
+
+Quest samping: `tema_ziarah_ibu` (temani Pei Wenzhi mendaki; ia meminta pemain membawakan dupa pesanan ibunya dari Kota
+Air bila diketahui), `tema_kuli_sehari` (pikul 3 muatan ke atas tanpa terbang: hadiah 30 NB dan Tongkat Kuli kosmetik),
+`tema_kera_nakal` (ambil kembali 5 barang curian kera untuk peziarah), `tema_rumput_awan` (temukan Rumput Awan Seribu
+Tahun untuk ramuan Kepala Biara).
+
+### 38.T.7 Kota Iblis (`kota_tema/iblis`)
+
+#### 38.T.7.1 Lore dan Sumber
+
+- **Lore** (`tempat_tema_lore.iblis.*`): kota bebas para kultivator jalan iblis, didirikan di atas medan perang tempat
+  sekte-sekte lurus pernah mengalahkan Pemimpin Iblis Darah tiga ribu tahun lalu. Tidak ada hukum selain **Perjanjian
+  Pasar**: di dalam pasar dan kedai, darah tidak boleh tumpah; di luar itu, yang kuat benar. Kota dikuasai **Penguasa
+  Kota** yang memungut upeti dari setiap pintu, menyewakan arena dan menyimpan **Menara Kitab Terlarang**. Sekte-sekte
+  lurus memasang hadiah atas kepala penghuninya, dan setiap beberapa purnama pasukan pemburu mengepung temboknya.
+- **Sumber** (`kultivator.kota_tema.iblis.inspired`): "Terinspirasi dari Wilayah Sudut Hitam (Black-Corner Region) dalam
+  Battle Through the Heavens karya Tian Can Tu Dou, wilayah tanpa pemimpin tempat faksi-faksi saling bunuh demi untung,
+  dengan Kota Tanda Hitam (Black Mark City) yang memungut biaya masuk tinggi (terjemahan Wuxiaworld, sekitar bab 383-387);
+  dan dari kiasan umum novel xianxia tentang kota jalan iblis, arena darah dan perburuan hadiah oleh sekte lurus. Tata
+  kota, tokoh, harga dan angkanya rancangan game."
+
+#### 38.T.7.2 Tata letak (grid sebelum diputar)
+
+```
+             x = -1                 x = 0                  x = +1
+ z = -1   [menara_terlarang]    [istana_darah]        [penjara_tawanan]
+ z =  0   [pasar_gelap] (ZP)    [arena_darah]         [sarang_kontrak]
+ z = +1   [kumuh_iblis]         [gerbang_tengkorak]   [kedai_racun] (ZP)
+```
+
+ZP = **Zona Perjanjian** (titik kotak `zona_perjanjian`, dijaga PENEGAK_IBLIS; satu-satunya tanah aman, 38.T.7.8).
+Tembok: `blackstone` + `polished_basalt` 16 tinggi berduri (paku `iron_bars` + `end_rod` di merlon; tanpa `pointed_dripstone` karena bisa jatuh),
+menara sudut beratap runcing, panji hitam-merah (kain klien). **Gerbang Tengkorak**: rahang tengkorak raksasa dari
+`bone_block` + `basalt` (22 tinggi), pintu ganda besi = entitas `GerbangKotaEntity`-pola (38TK `GerbangTengkorakEntity`,
+model rahang membuka).
+
+| Distrik | Lot (lx,lz) dan isi |
+|---|---|
+| `gerbang_tengkorak` | (0,1) Gerbang Tengkorak + rumah bea (meja upeti, timbangan, rak senjata sitaan sementara), jangkar `kota_tema/gerbang_iblis` (upeti, gerbang ranah); (0,0) **Lapangan Peringatan**: tiang-tiang batu berantai dengan senjata patah dan topeng retak (tanpa tubuh), papan "nama-nama yang menantang Penguasa"; (1,0) pos penegak (kasur ×8, rak rantai); (1,1) kandang serigala bayangan (binatang tunggangan penegak, entitas templat `wolf` vanilla bertali, tidak dijinakkan) |
+| `pasar_gelap` (ZP) | (0,0)+(1,0) **Pasar Seribu Bayangan**: lorong sempit beratap kain hitam, 20 kios bertirai (titik `lapak` ×20): racun, pil darah, tulang binatang iblis, senjata curian, peta sarang, **kios topeng**; lampu `soul_lantern` dan `red_candle`; jangkar `kota_tema/pasar_gelap` ×2, `zona_perjanjian`; (0,1) **Balai Lelang Gelap** (aula kecil bertribun, panggung bertirai merah, jangkar `kota_tema/lelang_gelap` → `BalaiLelang.mulai` profil `GELAP`); (1,1) **Rumah Tukar Makelar** (meja tukar, brankas, ruang belakang Bai She) |
+| `arena_darah` | (0,0)+(1,0)+(0,1)+(1,1) **Arena Darah**: lubang arena 31 × 31 turun 5 blok (lantai `polished_blackstone` + noda `red_concrete_powder`), dinding dengan 4 gerbang kurungan (`arena_pintu` → `PintuArenaEntity`), tribun 6 undakan (titik `kursi` ×140, penonton impostor), **Bilik Penguasa** di sisi utara (takhta, tirai), ruang gladiator di bawah tribun (kasur ×10, rak senjata, titik `latihan` ×6), kandang binatang iblis (`iron_bars`), meja taruhan (jangkar `kota_tema/arena`, `kota_tema/taruhan`); obor tinggi = `soul_lantern` di tiang `chain` |
+| `istana_darah` | (0,0)+(1,0) **Istana Darah**: aula takhta 30 × 18 × 26 (tiang `red_nether_bricks` 2 × 2, kolam darah dangkal di depan takhta (catatan di bawah tabel), ruang perjamuan, ruang semedi darah (titik `meditasi` ×4); (0,1) barak penegak (kasur ×12); (1,1) **Perbendaharaan Upeti** (peti, rak, jangkar `kota_tema/perbendaharaan`, target quest) |
+| `menara_terlarang` | (0,0)+(0,1) **Menara Kitab Terlarang**: menara sembilan lantai 15 × 52 × 15 (dinding `blackstone_bricks`, jendela sempit, tangga dalam melingkar), tiap lantai rak kitab berantai (`chiseled_bookshelf` + `chain`), lantai 9 tertutup segel (entitas `SegelPintuEntity`, terbuka saat Pesta Darah atau rute quest), jangkar `kota_tema/kitab_terlarang`; (1,0) rumah Si Buta Mo Wen; (1,1) **Kolam Semedi Darah** (kolam merah, titik `meditasi` ×6, situs ekstra iblis) |
+| `penjara_tawanan` | (0,0)+(1,0) **Kandang Tawanan**: halaman berpagar `iron_bars`, 10 sel kecil (titik `sel_tawanan` ×10, pintu = `SangkarEntity` pola 38GU, milik 38TK `SelTawananEntity`), menara jaga; (0,1) ruang penjaga; (1,1) **Terowongan Tua** (lorong bawah tanah dari penjara ke luar tembok, ditutup reruntuhan = entitas `PintuTebingEntity`-pola; dipakai rute penebusan quest) |
+| `sarang_kontrak` | (0,0)+(1,0) **Sarang Kontrak** (gilda pembunuh bayaran): aula dengan dinding kontrak (billboard poster), loket bertirai, ruang rahasia (jangkar `kota_tema/kontrak`); (0,1)+(1,1) rumah-rumah kultivator iblis (pool `kota_tema/iblis/rumah`: rumah batu hitam bergembok, ruang semedi, peti) |
+| `kumuh_iblis` | 4 lot gubuk dan lorong (penghuni: pengikut iblis rendahan, pedagang kecil yang terlilit utang), dapur umum, sumur tercemar (air + `crimson_roots`), titik `main` anak-anak liar, `bengkel` (`kotabesar/tukang`, tukang bayaran) |
+| `kedai_racun` (ZP) | (0,0)+(1,0) **Kedai Cawan Racun**: kedai dua lantai (meja ×12, bar panjang, kamar sewa ×8: `kotabesar/layanan` `penginapan` + `rumah_makan`, harga ×1.5), panggung musik; (0,1) **Kedai Teh Asap** (`kota/teh` untuk kabar; Kota Iblis tidak punya `kota/situs`, tetapi jangkar `kota/teh` dilayani K tanpa kota: verifikasi bahwa `KedaiTeh` tidak menuntut `Towns`; bila menuntut, layanan kabar dipindah ke `kota_tema/kabar_gelap` milik 38TK); (1,1) **Stasiun Formasi Hitam** (`kotabesar/cakram`; tujuan dari sini hanya situs yang diketahui; ke kota ini hanya bila pemain sudah pernah masuk) |
+
+Catatan kolam darah istana: **tidak ada fluida baru dan tidak ada lampu menyala oleh redstone**; kolam = lantai
+`red_concrete` dangkal di bawah lapisan `red_stained_glass` dengan `shroomlight` tersembunyi di bawah tepi (cahaya ≥ 8)
+dan riak klien (quad aditif).
+
+#### 38.T.7.3 Penduduk, peran, rutinitas dan animasi
+
+Peran baru: `PENGUASA_IBLIS` (tier 5, —, jubah naga hitam-merah + mahkota tanduk), `PENEGAK_IBLIS` (3-4, PENJAGA,
+topeng besi + rantai di bahu + golok), `JAGAL_ARENA` (3, PEJABAT, celemek kulit berdarah + kapak besar), `GLADIATOR_IBLIS`
+(2-5, KULTIVATOR, zirah tak lengkap + bekas luka tekstur), `MAKELAR_GELAP` (2, PEDAGANG, cadar + perhiasan ular),
+`PENJAGA_KITAB_TERLARANG` (4, CENDEKIA, penutup mata kain + jubah bertulisan), `PEMBUNUH_BAYARAN` (3, KULTIVATOR, tudung +
+pisau ganda), `WARGA_IBLIS` (1, PEKERJA/PEDAGANG, jubah gelap), `PEMBURU_LURUS` (3-4, KULTIVATOR, jubah lambang sekte
+Lurus + pedang; hanya di pos pemburu dan penyerbuan). `TAWANAN`, `ANAK`, `PENGEMIS` dipakai ulang. Penduduk data 200
+(+ 4-10 tawanan).
+
+**Kota malam:** jadwal kelompok digeser 12 jam untuk peran iblis (jam 18-06 = "siang" mereka), siang hari jalan sepi,
+jendela tertutup, hanya penegak berpatroli dan pedagang kecil di Pasar Seribu Bayangan.
+
+| Jam | Penegak | Gladiator / jagal | Makelar / pedagang gelap | Warga iblis | Tawanan |
+|---|---|---|---|---|---|
+| 06-12 | patroli siang berpasangan (`baris_jaga` rantai) | tidur di ruang gladiator | tidur | tidur | `berlutut_rantai`, `duduk_lantai` lesu; penjaga memberi makan (`lempar_pakan`) 08:00 |
+| 12-18 | jaga gerbang (`berdiri_jaga`, `ancam` bila pemain lemah lewat) | latihan (`latihan_pedang_*`, `asah_pisau`) | buka pasar 15:00 (`hitung_koin_gelap`) | bangun, `semedi_darah` di rumah | diam |
+| 18-24 | patroli Zona Perjanjian; menonton arena | **pertandingan** 19-23 (`sorak_arena` penonton, gladiator masuk lewat gerbang kurungan) | Pasar Seribu Bayangan ramai: `seru_dagang` berbisik (`bisik`), `tawar` | ke arena atau kedai, `minum_teh` (cawan racun), `berdebat` | `takut_sembunyi` saat sorak |
+| 00-06 | patroli lentera jiwa | `makan` pesta di kedai | lelang gelap (hari lelang), menghitung | pulang 04:00 | tidur gelisah |
+
+#### 38.T.7.4 Gerbang ranah dan aturan masuk
+
+- **Upeti Gerbang** `10 × (band + 1)` NB per masuk per hari dunia (gratis bila Gentar ≥ 60 atau gelar "Tamu Darah");
+  **gerbang ranah**: pita < 2 (di bawah Fondasi) ditolak ("Mangsa sekecil ini tidak berharga di sini."), pita 2 diizinkan
+  dengan kartu peringatan merah (`TitleCard.banner`), ranah disarankan Inti Emas; buronan ibu kota **diterima** (kota ini
+  tidak peduli).
+- Melompati tembok / terbang masuk tanpa upeti dan terlihat penegak = **Penyusup**: penegak bermusuhan 1 hari dunia di
+  kota ini (bukan kejahatan ibu kota).
+- Senjata tidak disita. Murid pengikut boleh masuk (diveto hanya di arena dan sel).
+
+#### 38.T.7.5 Arena Darah
+
+- **Tangga Darah** (peringkat 1-9 per pemain, `KotaTemaData`): pertarungan pemain vs GLADIATOR_IBLIS bernama (nama dari
+  `TempatNames` + julukan, mis. "Han si Taring Patah"), tier lawan = `clamp(band − 1 + peringkat / 3, 1, 8)`, AI duelist
+  (35.7 pola `Rivals`), `markRealmFoe`. Aturan "darah" (`DuelChallenges.challenge` dengan aturan arena, verifikasi
+  `DuelRuleSet`): NPC kalah = **roboh** (mati di arena, tubuh diseret keluar oleh jagal = klip), **pemain tidak pernah
+  mati**: pada HP 5 % pertandingan dihentikan, pemain "diseret pengawas" ke ruang gladiator dengan efek Lemah I 3 menit dan
+  kehilangan biaya. Biaya `8 × (band + 1)` NB; hadiah menang `2.2 × biaya` (dari biaya + Kas Kota Iblis; tidak mencetak:
+  bila Kas kurang, hadiah = 2 × biaya) + Gentar +5 + naik peringkat; peringkat 9 → gelar "Juara Tangga Darah", senjata
+  arena unik `gada` roh tinggi "Palu Darah Senja" (sekali). Maks 5 pertandingan per hari dunia. Murid diveto; `Sibuk`
+  `tema.arena`.
+- **Lawan Binatang**: binatang elit iblis dari kandang (`elite/*` verifikasi API spawn), tier menurut peringkat; hadiah
+  inti binatang.
+- **Taruhan** (layar `tema_taruhan`): pertandingan NPC vs NPC tiap 20 menit dunia pada 19-23; peluang dari tier dan
+  watak, pembayaran dengan **EV 0.90** (`odds = 0.9 / p`), maks taruhan `20 × (band + 1)` NB, 6 taruhan per malam;
+  pertandingan tampil hidup bila pemain di tribun, selain itu data.
+- **Tebusan Darah**: pertarungan khusus untuk membebaskan satu tawanan tanpa membayar (38.T.7.6); lawan tier +1.
+
+#### 38.T.7.6 Pasar Seribu Bayangan, Lelang Gelap dan Kandang Tawanan
+
+- **Pasar Seribu Bayangan** (layar `tema_pasar_gelap`; harga 38.T.10.2): racun (bahan pil dan pelapis senjata), **pil
+  darah** (pulih cepat dengan efek samping), tulang dan inti binatang iblis, **peta sarang** (gulungan penunjuk
+  `gua/sarang_iblis` atau `reruntuhan_gurun`), **topeng** (kosmetik; Topeng Tanpa Wajah: selama dipakai di Kota Iblis,
+  penantang Jam Berburu ½ lebih jarang), senjata curian (senjata kota 38EK mutu acak dengan harga 0.85 × tetapi komponen
+  `kultivator:asal_gelap`: toko kota lurus menolak membelinya). Markup dasar 1.3 (Gentar ≥ 30: 1.2; Infami ≥ 30: 1.15;
+  "Tamu Darah": 1.1). Beli-kembali ≤ 0.5 (38.M.5).
+- **Lelang Gelap** (`d % 9 == 4`, 18000-20000): `BalaiLelang.mulai(level, juru, new ProfilLelang(5, 2, 0.15,
+  List.of("saingan", "iblis_tokoh"), "gelap"))` (profil dibuat 38TK; mesin 38EK, tidak disunting); tabel lot `gelap`
+  (data 38TK): racun langka, teknik terlarang, pusaka iblis mutu 2-3, kunci Alam Rahasia, **Kontrak Kepala** (lot yang
+  isinya informasi letak buronan bernilai tinggi untuk perburuan lurus). Komisi 15 % ke Kas Kota Iblis.
+- **Kandang Tawanan** (layar `tema_tawanan`): 4-10 TAWANAN (orang fana dari kampung yang diculik; data: asal kampung
+  nyata terdekat yang diketahui sistem, nama dari `TempatNames`). Satu-satunya interaksi pemain: **Tebus** (`25 × (1 +
+  kekuatanKota / 2)` NB per orang, maks 3 per hari dunia) atau **Tebusan Darah** (arena). Tawanan yang ditebus mengikuti
+  pemain (tubuh NPC `TAWANAN` pengikut pola kawal 38.S.4 `tawanan_pulang`) dan harus dikawal keluar gerbang lalu ke
+  kampung asalnya (atau kampung/kota mana pun yang aman); tiba → Nama Baik +3 di tempat tujuan, kesetiaan desa +5 bila
+  terikrar, Infami −5, `DiplomasiService.adjust(owner, sekteLurusTerdekat, +2, "tebus")`. Tawanan **tidak pernah** menjadi
+  milik, pelayan, murid paksa atau barang pemain; bila pemain menolak mengawal, tawanan berjalan sendiri ke Pos Pemburu.
+  Tawanan baru datang 1-2 per 3 hari dunia (data "penculikan"; kampung terikrar pemain di dekat Kota Iblis mendapat kabar
+  "warga hilang" = kait quest).
+
+#### 38.T.7.7 Menara Kitab Terlarang dan perburuan
+
+- **Menara Kitab Terlarang** (layar `tema_kitab_terlarang`, Si Buta Mo Wen; lantai 1-8 terbuka sesuai Gentar: lantai n
+  butuh Gentar ≥ 10 × (n − 1)):
+  - **Gulungan Terlarang** (item habis pakai milik 38TK, 38.T.10.2): *Bakar Darah* (korbankan 30 % HP → Kekuatan II 30 s,
+    jeda 5 menit), *Langkah Hantu* (Tak Terlihat 12 s + kecepatan, biaya 20 % Qi), *Rantai Jiwa* (tarik satu musuh ≤ 12 blok
+    ke depan, `markRealmFoe` musuh kebal), *Topeng Iblis Hati* (selama 60 s kerusakan +15 %, setelahnya tekanan iblis hati
+    +5 bila API publik ada, verifikasi). Setiap pembelian Infami +2; setiap pemakaian di luar Kota Iblis disaksikan NPC
+    sekte Lurus = Infami +1.
+  - **Giok teknik terlarang**: giok teknik Dao bernuansa darah/jiwa/racun lewat API publik pemberian giok
+    (`JadeSlips`/`TechniqueBooks`, verifikasi; bila tidak ada API publik, layanan ini hanya menjual gulungan); harga `3 ×`
+    nilai giok biasa, pita ≥ 3, Infami +8 saat dipelajari (komponen `kultivator:noda_terlarang` pada giok).
+  - **Lantai 9** (segel): terbuka hanya saat Pesta Darah atau setelah rute quest "iblis": satu **Kitab Darah Senja**
+    (teknik unik pemimpin iblis kuno; stok 1 per dunia per kota; Infami +20).
+- **Sarang Kontrak** (layar `tema_kontrak`): kontrak pembunuhan **hanya** terhadap: binatang iblis dan elit di alam liar,
+  kelompok kultivator iblis saingan (`RogueCultivators` `VARIANT_DEMONIC`, `ROLE_QUEST`, di kemah nyata), band begal, dan
+  regu **Pemburu Lurus** yang sedang memburu penghuni kota (38.T.7.9). **Tidak pernah** warga kota, kampung, murid,
+  villager atau pemain lain. Imbalan `MisiGilda` pita × 1.3; Infami +5 per kontrak (kecuali binatang: +1); Gentar +3.
+
+#### 38.T.7.8 Aturan bahaya
+
+1. **Tanah aman hanya Zona Perjanjian** (`pasar_gelap`, `kedai_racun`; `Rencana.zonaAman` → `TempatZones.safe`): tidak ada
+   pertarungan; pelanggar (pemain menyerang NPC, atau NPC lain) diburu semua penegak (`markRealmFoe`) dan dilarang masuk
+   Zona Perjanjian 3 hari. Di luar ZP, kota **bukan** tanah aman: Penyergapan, Saingan dan peristiwa musuh 38 boleh terjadi
+   (tetap lewat tekanan harian M2 dan `Sibuk`).
+2. **Jam Berburu** (13000-23000, luar ZP): sekali per malam per pemain, 1-3 kultivator iblis (`RogueCultivators`
+   `VARIANT_DEMONIC`, tier `band ± 1`, `markRealmFoe`) menghadang: dialog "Upeti jalan, atau darahmu?" → **Bayar**
+   `5 × (band + 1)` NB atau **Lawan** (menang: Gentar +10, rampasan biasa). Gentar ≥ 30 atau Topeng Tanpa Wajah (½):
+   lebih jarang; Gentar ≥ 60: tidak ada.
+3. **Gentar** (0-100, per pemain per Kota Iblis): + menang arena, + menang Jam Berburu, + selesai kontrak, + bab quest;
+   −10 menolak tagihan darah; turun 1 per 3 hari dunia. Ambang: 30 (penantang berkurang, diskon pasar), 60 (audiensi
+   Penguasa, upeti gratis), 80 (gelar "Yang Ditakuti di <kota>", penegak `hormat` saat pemain lewat).
+4. **Infami** (0-100, per pemain, global, `KotaTemaData.infami`; tampil di hub kartu Kota Bertema): sumber 38.T.7.6-7.7;
+   turun: tebus tawanan −5, perburuan lurus −3, donasi 50 NB di Kuil Langit ibu kota −1 (maks −5 per minggu), bab quest.
+   Akibat: ≥ 20 gerbang kompleks Lurus memperingatkan; ≥ 40 **Pemburu Lurus** dapat mencegat pemain (38.T.7.9); ≥ 60
+   kompleks sekte Lurus menolak masuk dan Kuil Langit ibu kota menolak Restu Kuil; Nama Baik kota lain **tidak** diubah
+   langsung (dua sistem terpisah, tidak saling menghukum dua kali).
+5. **Kematian** di Kota Iblis mengikuti aturan vanilla/mod yang ada; tidak ada penyitaan tambahan.
+6. **Perbaikan** (38.R) gaya `iblis`: penagih = PENEGAK_IBLIS, **Harga Darah** = tagihan × 2 (faktor tempat 2.0), tolak →
+   penegak bermusuhan 1 hari + Gentar −10 (bukan Nama Baik); pemain jauh lebih kuat (38.R.5) → penegak `berlutut`, tanpa
+   tagihan, perbaikan lambat oleh tukang bayaran.
+7. **Mode Kehancuran** tetap tidak bisa merusak kota (zona `TempatZones`), seperti tempat lain.
+
+#### 38.T.7.9 Perburuan hadiah oleh sekte lurus
+
+- **Papan Buronan Iblis** (billboard di Gilda Kultivator ibu kota, Papan Gilda semua kota tema, gerbang kompleks Lurus,
+  `kota_tema/pos_pemburu`): 3-6 **buronan iblis bernama** per Kota Iblis yang diketahui (tokoh data: nama, julukan, ranah
+  `tier`, kejahatan: "membakar Dusun Batu Hijau", "menculik 12 warga"), diterbitkan atas nama sekte Lurus dari
+  `DiplomasiService` (sekte Lurus terdekat; bila tidak ada, Gilda Kultivator).
+- Buronan **keluar** dari Kota Iblis pada jadwal data (berburu, berdagang) dan bisa ditemui: di jalan (posisi data,
+  tubuh bila pemain ≤ 64), di `gua/sarang_iblis` terdekat, atau di luar ZP di dalam kota (membunuhnya di dalam kota =
+  penegak bermusuhan 1 hari, Gentar −10). Tubuh `KultivatorNpc` peran `PEMBUNUH_BAYARAN`/`WARGA_IBLIS` dengan nama,
+  tier ranah, `markRealmFoe`, 2-3 pengawal.
+- Imbalan: `MisiGilda.imbalan(pangkat B..S menurut tier)` + `DiplomasiService.adjust(owner, sekte, +3, "buronan")` +
+  Infami −3 + 20 % peluang barang (pusaka buronan). Dihitung juga sebagai misi gilda (poin lencana, 38.M.3) lewat jenis
+  misi `buronan_iblis` yang didaftarkan 38TK (`EkonomiApi.daftarJenisMisi`, 38.T.14.3).
+- **Pemburu Lurus memburu pemain** berinfami ≥ 40: maks sekali per 5 hari dunia, di luar tempat aman, lewat tekanan harian
+  M2 dan `Sibuk`: regu 2-4 PEMBURU_LURUS (tier pemain ± 0..1, `markRealmFoe`) dipimpin Han Qingshuang bila dia masih
+  hidup dalam cerita. Dialog dulu: **Menyerah dan menebus** (`50 × (band + 1)` NB "denda tobat", Infami −20) /
+  **Lawan** (menang: Infami +5, `DiplomasiService.adjust(−3)`) / **Lari**.
+- **Pos Pemburu** (satelit): Han Qingshuang dan regunya; menerima laporan, membeli Kontrak Kepala, tempat tawanan yang
+  ditebus bisa diantar (setara kampung tujuan).
+
+#### 38.T.7.10 Acara Kota Iblis
+
+| Acara | Jadwal | Isi |
+|---|---|---|
+| Malam Pertandingan | tiap malam 19000-23000 | arena, taruhan, penonton impostor ≤ 140 |
+| Lelang Gelap | `d % 9 == 4`, 18000-20000 | 38.T.7.6 |
+| **Pesta Darah** | selama peristiwa langit Gerhana Darah (`DuniaApi.sky()`, dibaca) | lentera kota merah, Turnamen Darah (8 gladiator + pemain, gugur, hadiah dari pendaftaran ×4), lantai 9 menara terbuka, Jam Berburu ganda, PENGUASA_IBLIS hadir di Bilik Penguasa |
+| **Penyerbuan Lurus** | tiap 20 ± 5 hari dunia (hash), atau bab 5 quest | koalisi sekte Lurus terdekat (8-14 PEMBURU_LURUS hidup bila pemain ≤ 128 blok, selain itu data) mengepung Gerbang Tengkorak dalam 3 gelombang; pemain memilih pihak lewat dialog (Han Qingshuang di luar, atau Tu Gang di dalam): **bantu Lurus** (Infami −10, standing +5, tawanan dibebaskan di akhir bila menang) atau **bela kota** (Infami +10, standing −5, Gentar +10). Tidak ada blok berubah; gerbang = entitas; hasil data: Lurus menang → kandang kosong 5 hari dan pasar tutup 2 hari; kota menang → upeti gerbang ×1.5 selama 3 hari. `Sibuk` `tempat.pertahanan` |
+
+#### 38.T.7.11 Tokoh dan rantai quest "Rantai yang Putus"
+
+| Tokoh | Peran | Watak, suara | Muncul |
+|---|---|---|---|
+| **Xue Yao, Penguasa Darah Senja** | PENGUASA_IBLIS (ranah: Jiwa Baru Lahir di R3, Transformasi Dewa di R4) | dingin, sopan mematikan, menganggap kota ini "satu-satunya tempat jujur di dunia"; `boss` | istana, bab 6 |
+| **Tu Gang "Si Jagal"** | JAGAL_ARENA | kasar, adil menurut aturannya sendiri, menghormati yang kuat; `m1` | arena, bab 2, 5 |
+| **Nyonya Bai She** | MAKELAR_GELAP | ramah seperti ular, pemilik jaringan Minyak Bayangan; `f3` | pasar gelap, bab 3 |
+| **Si Buta Mo Wen** | PENJAGA_KITAB_TERLARANG | tua, buta, "melihat" lewat kitab; netral sejati; `elder` | menara, bab 4 cabang |
+| **Ye Wuhen** | WARGA_IBLIS (pembelot) | kultivator iblis muda yang ingin keluar; dulu diculik dari kampung saat kecil; `m3` | bab 1, 4-7 |
+| **A-Fu** | TAWANAN (anak) | anak kampung pemberani yang terus mencoba kabur; `f1` | kandang, bab 2 |
+| **Han Qingshuang** | PEMBURU_LURUS (murid inti sekte Lurus) | lurus, keras, tidak percaya penghuni kota iblis; `f2` | pos pemburu, bab 4-6 |
+| **Hong Pao** | PEMBUNUH_BAYARAN (kurir Bai She) | "orang berjubah merah" dari quest pelabuhan dan kota air; `m3` | bab 3 |
+
+Rantai `tema_iblis_rantai` (7 tahap, tiga rute: **Lurus**, **Penebusan**, **Darah**):
+
+| # | Pemicu | Isi | Cabang | Hadiah |
+|---|---|---|---|---|
+| 1 | bayar upeti pertama | Ye Wuhen menyapa di Lapangan Peringatan, memperingatkan aturan kota (ZP, Jam Berburu), meminta pemain "melihat kandang" | — | situs, Gentar +2 |
+| 2 | Kandang Tawanan | A-Fu (dari kampung yang diketahui pemain, atau kampung terdekat) memohon; Tu Gang menawarkan Tebusan Darah | tebus (NB) / Tebusan Darah (arena) / abaikan (A-Fu mencoba kabur sendiri dan tertangkap: rute Penebusan sulit) | A-Fu dikawal pulang: Nama Baik +3, Infami −5 |
+| 3 | Bai She | Hong Pao mengirim Minyak Bayangan ke pelabuhan dan kota air (bila pemain sudah menyelesaikan bab 2 quest pelabuhan atau bab 3 quest kota air, dialog mengenali); temukan gudang minyak di `sarang_kontrak` | **sabotase** gudang (entitas tong minyak dihancurkan; Infami −5, Bai She memusuhi: pasar ×1.2) / **beli bagian** (Infami +10, 200 × (band+1) NB keuntungan bertahap) | — |
+| 4 | Han Qingshuang di Pos Pemburu (atau Ye Wuhen) | Han meminta **Peta Gerbang Rahasia** (didapat dari Mo Wen di lantai 4 menara: teka-teki 3 kitab) | serahkan ke Han (rute **Lurus**) / serahkan ke Ye Wuhen (rute **Penebusan**: dia akan membawa tawanan lewat Terowongan Tua) / laporkan ke Xue Yao (rute **Darah**) | — |
+| 5 | Penyerbuan Lurus khusus | **Lurus:** buka Gerbang Tengkorak dari dalam (entitas tuas di rumah bea, dijaga 6 penegak) · **Penebusan:** kawal 6-10 tawanan lewat Terowongan Tua saat penyerbuan (pintu tebing-pola dibuka, penegak mengejar) · **Darah:** bela gerbang, kalahkan Han Qingshuang dalam duel (tidak mati: ia mundur terluka) | — | Lurus/Penebusan: Infami −15; Darah: Infami +15, Gentar +20 |
+| 6 | Istana Darah | **Lurus/Penebusan:** hadapi Xue Yao (bos 3 fase: pedang darah, kolam darah = gelombang lingkar klien + kerusakan area, panggil 2 gladiator; ranah band + 2, `markRealmFoe`) · **Darah:** jamuan Xue Yao, ujian kesetiaan: menolak membunuh Ye Wuhen membuka cabang duel Ye Wuhen yang tidak mematikan | — | pusaka Xue Yao (kipas besi roh tinggi unik "Kipas Senja"), atau Kitab Darah Senja (Darah) |
+| 7 | sesudahnya | **Lurus:** Tu Gang menjadi penguasa, kandang ditutup **permanen**, pasar ×1.2, Pos Pemburu menjadi markas tetap; gelar "Pemutus Rantai"; Infami −30; standing Lurus +10 · **Penebusan:** Ye Wuhen menjadi penguasa, ZP meluas ke seluruh kota pada siang hari, kandang menjadi **Rumah Tebusan** (tawanan dibebaskan setengah harga dan dikawal NPC), Jam Berburu berhenti bagi pemain; gelar "Pembawa Fajar" · **Darah:** gelar "Tamu Darah" (upeti gratis, pasar ×1.1, lantai 9 terbuka bagi pemain), Infami +25, kompleks Lurus menutup gerbang sampai Infami < 40 | — | gelar + Gentar/Nama Baik seperti disebut |
+
+Rantai tidak pernah buntu: tiap tahap bertenggat 6 hari dunia; tanpa pemain, Xue Yao tetap berkuasa dan rumor bercerita
+tentang penyerbuan yang gagal. Quest samping: `tema_iblis_topeng` (Bai She: ambil kembali topeng curian dari regu
+pemburu), `tema_iblis_gladiator_tua` (gladiator tua "Lao Kuang" ingin mati terhormat atau pensiun: cabang), `tema_iblis_kitab`
+(Mo Wen meminta tiga kitab kuno dari Perpustakaan Agung ibu kota, ditukar akses lantai), `tema_iblis_anak_liar` (anak-anak
+kumuh mencuri roti dari dapur umum; bantu mereka atau laporkan ke penegak).
+
+### 38.T.8 Klip animasi, perlengkapan dan prop baru (data untuk 38NL dan 38MD)
+
+#### 38.T.8.1 Klip baru (`KlipKatalog`, id 79-107; format dan kanal persis 38.N.5; ditambah 38NL)
+
+| Id | Nama | Durasi | Kunci (derajat; t dalam tick) | Prop / peristiwa / sinkron |
+|---|---|---|---|---|
+| 79 | `dayung_yuloh` | loop 40 | berdiri di buritan; RAX −70, LAX −70, RAY −30, LAY 10; TWIST −20 (t0) → +20 (t20) → −20; LEAN 10 ↔ 20 | prop `dayung_yuloh` dua tangan; dayung entitas perahu ikut fase yang sama (`DATA_ANIM_T0`) |
+| 80 | `tarik_jala` | loop 30 | LEAN 25 → 5 (t15); RAX/LAX −100 → −40 (t15, easeInOutSine) | prop `jala` (tali jala quad klien ke air) |
+| 81 | `jemur_ikan` | loop 40 | RAX −150, LAX −60 → −150 (t20, menggantung ikan) | prop `ikan_tali` |
+| 82 | `ikat_tali` | loop 24 | jongkok LIFT −0.3, LEAN 35; RAX −60 ↔ −45, RAZ ±10 (t0/t6/t12/t18), LAX cermin | prop `tali` |
+| 83 | `palu_lunas` | loop 16 | LEAN 20; RAX −110 → −50 (t5, easeOutBack) → −110; LAX −50 (memegang pahat dempul) | `palu_dempul` kanan, `pahat` kiri; suara `block.wood.hit` t5 |
+| 84 | `teropong_laut` | loop 120 | RAX −95, RAY −15, LAX −95, LAY 15 (dua tangan ke mata); HX −5; HY −30 → +30 (t60) → −30 | `teropong` (prop 37 yang ada) |
+| 85 | `pimpin_unta` | loop 30 | lengan kanan ke belakang memegang tali: RAX 25, RAZ 10; HY −40 (menoleh ke unta) tiap 60 tick selama 10 | tali klien ke kepala unta pertama |
+| 86 | `tawar_bazar` | loop 24 | LEAN 8; RAX −90 ↔ −40, RAZ 30; LAX −70 (hitung jari, RAZ ±4); mod SHAKE_HEAD t12-t20 | gelembung angka harga |
+| 87 | `tari_putar` | loop 40 | **badan berputar 9°/tick** (yaw render klien, bukan kanal); RAX −160, RAZ 40, LAX −160, LAZ −40 bergantian naik-turun 20 tick; LIFT 0 ↔ 0.05 tiap 10 | `selendang` (2 pita quad klien mengikuti putaran, tertinggal 6 tick) |
+| 88 | `lukis_dinding` | loop 36 | HX −15; RAX −120 → −90, RAY −20 → +20 (goresan, t0-t18), kembali; LAX −40 (palet) | `kuas_besar`, `palet`; mural billboard bertambah satu goresan per siklus (klien) |
+| 89 | `timba_sumur` | loop 60 | RAX/LAX −170 → −60 (t30, menarik tali turun), LEAN 10 → 0 | sinkron `TimbaSumurEntity` (balok miring ±25°) |
+| 90 | `tenun` | loop 20 | duduk (`duduk_kursi`); RAX −60 ↔ −40, LAX −40 ↔ −60 bergantian tiap 10 (lempar teropong); RLX −90 ↔ −80 (injak pedal) | sinkron `AlatTenunEntity` |
+| 91 | `petik_teh` | loop 16 | LEAN 20; RAX −80 → −95 (t4) → −80 (petik cepat); LAX −40 (keranjang di pinggul) | `keranjang_teh` |
+| 92 | `seduh_teh` | once 80 | duduk; t0-t20 angkat teko RAX −70; t20-t40 tuang (seperti 22); t40-t60 tutup cangkir LAX −60, RAZ −15; t60-t80 sodorkan dua tangan RAX/LAX −80, RAY −30, LAY 30, LEAN 15 | `teko`, `cangkir`; uap klien |
+| 93 | `nyanyi_perahu` | lapisan kepala | HX −10 ↔ 0 (periode 40), wajah "bicara A/B" bergantian 10 tick | gelembung lirik (kalimat lagu perahu, `tempat_tema_kalimat`) |
+| 94 | `lepas_lentera_air` | once 60 | `berlutut`; RAX/LAX −60 → −30 (t30, lepas); HX 25 (menatap lentera) | `lentera_teratai`; lentera klien mulai hanyut di t30 |
+| 95 | `daki_pikul` | loop 24 | LEAN 22; LIFT +0.04 di t6 dan t18 (langkah tangga); RAX −150, RAZ 20 (pikulan di bahu); LAX −20 ↔ 10 berayun | `pikulan` atau `rangka_punggung` |
+| 96 | `putar_katrol` | loop 30 | LEAN 15; RAX = −90 + 30 sin(2πt/30), RAY = 20 cos(2πt/30); LAX sama, fase sama (dua tangan di engkol) | sinkron engkol `KatrolEntity` / `roda_katrol` |
+| 97 | `petik_herba_tebing` | loop 40 | LEAN −10 (memeluk tebing); RAX −160 (meraih ke atas), LAX −110 (memegang rantai); RLX −20, LLX 10 | `sabit_herba` |
+| 98 | `sujud_ziarah` | once 120 | t0-t30 tiga langkah maju 1 blok (gerak server); t30-t50 tangan menyatu RAX/LAX −90, RAY/LAY ∓40; t50-t80 `berlutut` + LEAN 70, HX 20, LIFT −0.4; t80-t110 bangkit | `tas_dupa` di punggung |
+| 99 | `tabuh_ikan_kayu` | loop 20 | `duduk_lantai`; RAX −70 → −50 (t4) → −70 | `pemukul_kecil`; `ikan_kayu` di lantai (pajangan); suara `block.wood.hit` pitch 1.6 t4 |
+| 100 | `sorak_arena` | loop 20 | RAX −160 ↔ −110 (tinju diangkat), LAX −30; HX −10; LIFT 0 ↔ 0.04 | dipakai juga oleh penonton impostor (prosedural) |
+| 101 | `asah_pisau` | loop 24 | duduk, LEAN 30; RAX −50, RAY −20 → +20 (gosok); LAX −50 (bilah) | `pisau_ganda`; percikan t12 |
+| 102 | `ancam` | once 40 | t0 LEAN 10; t10 RAX −90 (senjata menunjuk), HX −10; tahan sampai t30 | wajah "senyum" + alis turun (38.O.1 atlas) |
+| 103 | `hitung_koin_gelap` | loop 30 | duduk; RAX −60 → −50 (ketuk kecil, t0/t10/t20); LAX −50; HY ±30 cepat tiap 30 (curiga) | `kantong_uang` |
+| 104 | `berlutut_rantai` | loop 80 | `berlutut`; RAX 20, LAX 20, RAZ 15, LAZ −15 (tangan terikat di belakang); HX 30; mod TREMBLE lemah | `rantai_tangan` |
+| 105 | `semedi_darah` | loop 80 | `napas_meditasi` + LIFT +0.03 (melayang); HY ±10 lambat; aura `FLAG_AURA` warna merah tua | aura klien merah |
+| 106 | `pikul_tandu` | loop 30 | RAX −150, RAZ 20, LAX −150, LAZ −20 (galah tandu di dua bahu); langkah serempak (fase sama untuk semua pemikul) | sinkron `TanduEntity` (goyang ±2°) |
+| 107 | `tabuh_genderang_perahu` | loop 12 | RAX −140 ↔ −40, LAX berlawanan tiap 6; LEAN 10 | penabuh perahu naga; suara genderang t0/t6 |
+
+Prop baru (indeks `PropId` 41-62, ditambah 38NL; model `kultivator:fx/tempat/tema/<id>` dibuat 38TV): 41 `dayung_yuloh`
+(galah 1 × 1 × 40 + bilah 1 × 8 × 12), 42 `jala` (gulungan 6 × 4 × 6 bertekstur jaring), 43 `ikan_tali` (3 ikan 2 × 6 ×
+1 di tali), 44 `tali` (gulungan 5 × 2 × 5), 45 `palu_dempul` (kepala kayu 3 × 3 × 4 + gagang), 46 `kuas_besar` (gagang 1 ×
+12 × 1 + bulu 2 × 3 × 2), 47 `palet` (papan 6 × 0.5 × 5 + 4 titik warna), 48 `kendi` (badan 4 × 5 × 4 + leher 2 × 2 × 2),
+49 `keranjang_teh` (5 × 4 × 5 + daun), 50 `lentera_teratai` (6 kelopak 3 × 0.5 × 2 diputar + lilin pancar), 51
+`pemukul_kecil`, 52 `ikan_kayu` (badan ikan 6 × 5 × 5 berlubang), 53 `tongkat_cincin` (1 × 20 × 1 + kepala 4 × 4 × 1 dengan
+6 cincin), 54 `tongkat_bambu`, 55 `tas_dupa` (3 × 4 × 2 + tali), 56 `rangka_punggung` (rangka 8 × 16 × 2 + muatan 8 × 8 ×
+6), 57 `pisau_ganda`, 58 `rantai_tangan`, 59 `cawan_racun` (cawan 3 × 3 × 3 hijau gelap + asap), 60 `cambuk_kafilah`, 61
+`sabit_herba`, 62 `kipas_sutra`. (Teropong, pikulan, teko, cangkir, kantong uang: prop 38.O.4 yang ada.)
+
+#### 38.T.8.2 Perlengkapan baru (atlas `perlengkapan.png` dilebarkan 38MD menjadi 64 × 1536, pita 32-47 baru)
+
+| Id | Bagian | Kubus (px) | Pita | Peran |
+|---|---|---|---|---|
+| `topi_syahbandar` | kepala | badan 8.4 × 3.5 × 8.4; sayap depan melengkung 9 × 0.6 × 3; jambul giok 1.5³ | 32 biru tua + emas | SYAHBANDAR |
+| `rompi_bergaris` | badan | 8.6 × 9 × 4.6 bergaris biru-putih | 32 | PELAUT |
+| `kalung_gigi_hiu` | badan | 7 gigi 0.8 × 1.5 × 0.6 melingkar | 33 | PELAUT |
+| `mantel_nakhoda` | badan + lengan | mantel 9 × 13 × 5, kerah 9 × 2 × 5.4 | 33 | NAKHODA_LAUT |
+| `celemek_ter` | badan | 8.2 × 11 × 0.6 hitam berkilap | 34 | TUKANG_KAPAL |
+| `serban_seberang` | kepala | lilitan 9 × 4 × 9 + ujung 2 × 3 × 1 | 34 putih/hijau | PEDAGANG_SEBERANG |
+| `mahkota_laut` | kepala | dasar 6 × 1.5 × 6 + 5 kelopak 1 × 3 × 0.5 (ombak) | 35 perak-biru | PENDETA_LAUT |
+| `serban_emas` | kepala | 9.4 × 4.5 × 9.4 + bros 2 × 2 × 0.5 | 35 | TUAN_BENTENG |
+| `kerudung_pasir` | kepala | penutup 8.8 × 8.8 × 8.8 (sisi wajah terbuka mata saja) + ekor kain 4 × 6 × 1 | 36 | PENUNTUN_UNTA (+ item pemain) |
+| `topi_bulu_lebar` | kepala | 11 × 3 × 11 + puncak 7 × 3 × 7 | 36 | KAFILAH_BASHI |
+| `helm_runcing` | kepala | 8.8 × 5 × 8.8 + kerucut 3 tingkat 6/4/2 | 37 | PENGAWAL_GURUN |
+| `baju_sisik` | badan | 8.8 × 10 × 4.8 bertekstur sisik | 37 | PENGAWAL_GURUN |
+| `selendang_penari` | badan | sabuk 8.6 × 1 × 4.6 + 2 pita kain (quad klien) | 38 | PENARI_GURUN |
+| `sanggul_giok` | kepala | sanggul 4 × 3 × 4 atas + 2 tusuk 6 × 0.5 × 0.5 menyilang | 38 | NYONYA_SUTRA |
+| `caping_biru` | kepala | caping 3 tingkat (seperti `caping`) + kain biru di tepi | 39 | PENDAYUNG |
+| `jubah_teh` | badan | jubah 8.6 × 13 × 4.6 hijau teh | 39 | AHLI_TEH, SASTRAWAN (biru) |
+| `kasaya` | badan | kain menyilang bahu 9 × 14 × 5 + lipatan | 40 merah-emas | KEPALA_BIARA |
+| `ikat_kepala_kuning` | kepala | pita 8.6 × 1.5 × 8.6 + ekor 1 × 4 × 0.5 | 40 | PEZIARAH |
+| `tali_melingkar` | badan | gulungan tali menyilang dada 10 × 10 × 1 + 3 lilitan | 41 | PEMETIK_HERBA |
+| `topeng_besi` | kepala | pelat 8.4 × 6 × 0.6 depan + lubang mata (alpha) | 42 | PENEGAK_IBLIS |
+| `rantai_bahu` | badan | 6 mata rantai 1.5 × 1 × 0.5 di bahu kiri ke pinggang | 42 | PENEGAK_IBLIS, JAGAL_ARENA |
+| `mahkota_tanduk` | kepala | lingkar 8.6 × 2 × 8.6 + 2 tanduk 3 segmen (2 × 3 × 2, 1.5 × 3 × 1.5, 1 × 2 × 1, rot 22.5) | 43 hitam-merah | PENGUASA_IBLIS |
+| `cadar_ular` | kepala | cadar 8.4 × 4 × 0.4 bawah mata + mahkota ular 6 × 2 × 6 | 44 | MAKELAR_GELAP |
+| `penutup_mata` | kepala | pita 8.6 × 2 × 8.6 di mata | 44 | PENJAGA_KITAB_TERLARANG |
+| `tudung_pembunuh` | kepala | tudung 9 × 9 × 9 menjorok 1 ke depan | 45 | PEMBUNUH_BAYARAN |
+| `zirah_gladiator` | badan + lengan | bahu kiri saja 5 × 4 × 5 + sabuk lebar 9 × 3 × 5 | 45 | GLADIATOR_IBLIS |
+| `jubah_pemburu_lurus` | badan | jubah 8.6 × 13 × 4.6 putih-biru + panel lambang (decal sekte Lurus) | 46 | PEMBURU_LURUS |
+| `jubah_naga_hitam` | badan | 8.8 × 14 × 4.8, kerah tinggi 9 × 3 × 5, lengan lebar | 47 | PENGUASA_IBLIS |
+
+### 38.T.9 Model 3D dan animasi model (modul 38TV; perilaku server 38TK)
+
+Aturan 38.O.0 berlaku (kubus ModelPart, tekstur prosedural `tools/png.py`, palet 38.O.0 + palet tema: biru laut
+`#2E5E8C`, pasir `#D8B878`, lumpur `#8A6A48`, putih kapur `#EDE8DC`, genteng hitam `#2A2A30`, emas puncak `#E0B040`,
+hitam iblis `#1C1418`, merah darah `#7A1020`; tanpa placeholder; pratinjau 8× dan render isometrik dibuka dengan Read).
+Ukuran dalam piksel model (16 = 1 blok). Semua entitas di bawah: `noSave`, dimunculkan dari jangkar/titik, LOD: > 64 blok
+tanpa animasi kecil, > 128 blok tidak digambar (kecuali kapal di laut: 192).
+
+#### 38.T.9.1 Kapal dan perahu
+
+| Entitas (`kultivator:<id>`) | Bagian model (px) | Tekstur | Animasi |
+|---|---|---|---|
+| `kapal_dagang` (jung dagang, 22 × 7 blok) | lunas 16 × 8 × 352; lambung 3 lapis menyempit ke bawah: 64 × 16 × 320, 96 × 16 × 336, bibir geladak 112 × 8 × 352 (sisi = 2 × 8 × 352 dengan papan bertekstur); haluan persegi 112 × 40 × 8 dengan **mata kapal** dicat; buritan tinggi 112 × 48 × 64 + pagar tiang 2 × 10 × 2 ×12; kemudi 8 × 64 × 40 (engsel di buritan); 3 tiang: utama 8 × 320 × 8, depan 6 × 240 × 6, belakang 6 × 200 × 6; **layar bilah**: layar = 9 panel 160 × 24 × 1 (utama), 120 × 18 × 1 (depan), 100 × 15 × 1 (belakang) dengan bilah bambu 164 × 2 × 2 di antara panel; jangkar 16 × 24 × 4; papan titian 24 × 2 × 96; lentera buritan 6³ pancar; peti muatan 3-6 (16³) di geladak | 256 × 256 `kapal_dagang.png`: kayu merah-coklat, haluan merah-hijau-putih, layar tikar kuning-coklat bergaris, varian layar biru-putih (`jung_laut`) | diam: LIFT ±0.08 periode 80, oleng ±1.5°; **layar gulung**: panel turun dan bertumpuk ke bawah bergiliran (panel i mulai t = 4i, 40 tick) — sebaliknya saat kembang; berlayar: miring 3°, buih buritan (partikel); jangkar turun/naik 30 tick (rantai = garis klien); titian turun 20 tick; kemudi bergerak ±12° saat berbelok; geladak bisa dipijak (collider pola `KapalDekEntity`) |
+| `kapal_bajak_laut` | hull `kapal_dagang` + layar robek (panel ber-alpha), panji hitam (kain klien), haluan bertaji 8 × 8 × 32 (tanpa meriam) | `kapal_bajak_laut.png`: kayu hitam, layar hitam-merah | seperti di atas + titian turun cepat 10 tick saat serbuan |
+| `perahu_nelayan` (6 × 2 blok) | lambung 32 × 10 × 96 dengan ujung melengkung (3 kubus rot 22.5 tiap ujung); atap anyaman lengkung 28 × 14 × 32 (3 kubus); bangku 28 × 2 × 4; dayung 2 × 2 × 48 | 64 × 64 kayu + anyaman | terombang-ambing; dayung kayuh saat bergerak; lomba: cepat + percikan |
+| `perahu_kanal` (7 × 2 blok; varian `wisata`, `lapak`, `hitam`) | lambung 30 × 10 × 112, ujung naik; atap hitam lengkung 3 segmen 32 × 16 × 24 (rot 0/±11.25); yuloh (dayung buritan) 2 × 2 × 64 berpivot di buritan; bangku 2; lentera haluan 4 × 6 × 4 pancar; varian lapak: 4 peti/keranjang + tenda kecil | 64 × 64 kayu tua + atap anyaman hitam | gerak sepanjang spline `jalur_perahu`; yuloh mengayun ±25° sinkron klip 79; haluan naik-turun kecil; berbelok mulus (yaw dari turunan spline) |
+| `perahu_naga` (18 × 2 blok) | lambung sempit 24 × 10 × 288; kepala naga 24 × 32 × 40 (rahang 20 × 6 × 24 membuka, tanduk 2 × 10 × 2 ×2 rot 22.5, janggut 4 × 8 × 1, mata pancar); ekor melingkar 3 segmen 16 × 24 × 32 → 8 × 16 × 16; genderang 12³ di tengah; 10 pasang dayung 1 × 1 × 24 | 128 × 128 sisik merah-emas-hijau | dayung serempak sinus (frekuensi ∝ kecepatan); rahang naga membuka/menutup tiap ketukan; pendayung = **impostor klien** (10 tubuh ringan, bukan entitas) |
+
+#### 38.T.9.2 Makhluk
+
+| Entitas | Pemilik server | Bagian model (px) | Tekstur | Animasi |
+|---|---|---|---|---|
+| `unta_kafilah` (unta Baktria, tinggi 2.3 blok) | 38TK | badan 20 × 18 × 36 (pivot pinggang); **dua punuk** 12 × 10 × 12 (z −8, +8) dengan jumbai 10 × 3 × 10; leher 8 × 22 × 8 miring 35° + jumbai leher 9 × 10 × 2; kepala 8 × 9 × 16 + bibir 6 × 3 × 4 + telinga 2 × 4 × 1; kaki 4 × (paha 6 × 24 × 6 + betis 5 × 14 × 5, sendi lutut), telapak 7 × 2 × 7; ekor 3 × 12 × 2; varian beban: rangka 22 × 2 × 24 + 2 karung 8 × 14 × 16 + gulungan permadani 6 × 6 × 22 + lonceng leher 3³ | 128 × 128 coklat pasir dengan bulu gelap lebat di punuk, leher, paha (musim dingin lebih lebat) | jalan **pace** (kaki sesisi bergerak bersama, khas unta), kepala mengangguk; punuk bergoyang ±2°; mengunyah (rahang) diam; ekor mengibas; **berlutut**: kaki depan menekuk dulu (lutut turun, 20 tick), lalu kaki belakang (20 tick), badan turun 0.9 blok; bangun sebaliknya; badai: berlutut + kepala rendah |
+| `kalajengking_raja` (bos, panjang 4, tinggi 2.2) | 38TK | sefalotoraks 32 × 14 × 28; perut 4 segmen 28 × 12 × 10 → 22 × 10 × 8; ekor 6 segmen 10 × 10 × 12 → 6 × 6 × 8 melengkung ke atas (rot −30° per segmen) + sengat kait 8 × 10 × 14; capit: lengan 6 × 6 × 20 + capit atas/bawah 10 × 8 × 14 / 10 × 4 × 14; 8 kaki 3 ruas 3 × 3 × 14; mata 6 kubus 1³ pancar | 128 × 128 kitin hitam-merah, retakan oranye pancar | diam: ekor mengayun, capit berderak; jalan: gelombang kaki; **capit** (6 tick snap); **sengat** (ekor melengkung ke depan 10 tick easeOutBack, partikel racun); **gali**: tenggelam ke pasir 30 tick (hanya gambar + partikel, tidak ada blok berubah, tubuh tak terlihat dan kebal 4 s) lalu muncul di dekat pemain |
+| `kera_gunung` (0.7 blok; varian putih tua 1.8 ×) | 38TK | badan 8 × 10 × 12; kepala 7 × 7 × 6 + muka 5 × 4 × 1 merah muda + telinga; lengan 3 × 10 × 3; kaki 3 × 8 × 3; ekor 2 × 2 × 10; varian tua: janggut 4 × 4 × 1, alis putih | 64 × 64 coklat-abu (putih untuk varian) | duduk menggaruk; lari empat kaki; **rebut** (lengan menyambar 6 tick, barang muncul di tangan); memanjat (lompatan); varian tua: gestur menunjuk, membungkuk |
+
+#### 38.T.9.3 Mekanisme dan dekorasi berentitas
+
+| Entitas | Bagian model (px) | Animasi |
+|---|---|---|
+| `api_suar` (lampu mercusuar) | rumah lampu kuningan 24³ (rangka 2 × 24 × 2 ×4 + atap kerucut 3 tingkat), lensa (kaca bertekstur cincin), sumbu pancar | lensa berputar 3°/tick; **sinar** = 2 quad aditif 4 × 64 blok (klien), menyala 12500-23500 dan saat badai; Minimal: hanya cahaya titik |
+| `derek_dermaga` (derek injak) | dua kaki A 4 × 128 × 4; lengan 4 × 4 × 128 miring 30°; roda injak Ø 64 (12 jari 2 × 64 × 2 rot 15° + pelek 16 segmen); kait 4 × 6 × 2 + peti 16³ | roda berputar, peti naik 3 blok, lengan berayun 90° (60 tick), turun; siklus 200 tick saat kapal tambat |
+| `kapal_galangan` | tahap 0 lunas 16 × 8 × 352; 1 + 12 gading lengkung 4 × 48 × 4 (3 kubus per gading); 2 + papan separuh; 3 lambung penuh + pangkal tiang; 4 tiang + layar tergulung | tahap berubah dengan efek "papan baru" (skala 0 → 1, 10 tick) saat hari pesanan bertambah |
+| `pintu_air` | daun papan 112 × 64 × 6, alur samping 6 × 80 × 6 ×2, rantai katrol | naik-turun 40 tick (05:00 buka, 21:00 tutup), percikan |
+| `timba_sumur` | tiang 6 × 48 × 6; balok 4 × 4 × 96 berpivot; pemberat batu 12³; ember 8³ di tali | balok miring ±25° sinkron klip 89 |
+| `alat_tenun` | rangka 40 × 36 × 24; benang lungsin (quad bertekstur); sisir 36 × 3 × 3 berayun 15°; teropong 8 × 2 × 2 meluncur; 2 pedal; gulungan kain (silinder 6 kubus) | sisir dan teropong sinkron klip 90; gulungan membesar sesuai kemajuan |
+| `roda_katrol` (Ø 9 blok / kecil Ø 3) | 8 jari 4 × 144 × 4 rot 22.5°, pelek 16 segmen, poros 12³ | berputar saat kereta/katrol bergerak |
+| `kereta_gantung` | kabin 40 × 36 × 40 kayu berkisi + atap bertingkat 48 × 6 × 48 / 32 × 6 × 32; lengan gantung 4 × 40 × 4; troli 16 × 8 × 24 dengan 2 roda Ø 10; pintu geser 16 × 28 × 1 | troli roda berputar; kabin berayun pendulum ±3° teredam saat mulai/berhenti dan melewati tiang; pintu geser 10 tick; **tali** = kurva gantung klien (rantai 3 px, sag 4 % bentang), 1 batch |
+| `katrol` | keranjang anyaman 24 × 20 × 24, 4 tali (garis klien) ke roda; drum engkol 16 × 16 × 24 + engkol 2 × 2 × 10 | keranjang naik/turun 12 s, berayun kecil; engkol berputar sinkron klip 96 |
+| `pintu_arena` | jeruji 48 × 64 × 2 (12 batang 2 × 64 × 2 + 4 palang), rantai | naik 32 tick, debu; jatuh cepat 8 tick + guncang kamera klien kecil |
+| `tandu` | kabin 24 × 32 × 24 beratap lengkung + tirai (quad), 2 galah 2 × 2 × 96 | goyang ±2° sinkron klip 106; tirai berayun |
+| `gerbang_tengkorak` | daun ganda besi 48 × 96 × 4 bertekstur relief; **rahang bawah** 160 × 48 × 64 dengan 10 gigi 6 × 10 × 6 | buka: rahang turun 25° (24 tick, debu, suara `block.iron_door.open` pitch 0.6) lalu daun berayun 90° |
+| `batu_runtuh` | bongkah 3 kubus diputar (20 × 18 × 20 inti) | menggelinding (rotasi ∝ jarak), terpental di pagar (entitas collider), pecah menjadi partikel saat berhenti |
+| `herba_tebing` | tanaman silang 12 × 16 × 12 (quad) + kuncup pancar | bergoyang angin; menghilang (skala → 0) saat dipetik bagi pemain itu |
+| `temuan_pasir` (3 varian) | koin 6 × 1 × 6, pecahan mural 10 × 8 × 1, lempeng peta 8 × 1 × 10, setengah tertanam | kilau berkala |
+| `pilar_rune`, `jerat`, `segel_pintu`, `palang`, `tali_turun`, `sel_tawanan` | pilar 8 × 32 × 8 bergaris rune pancar; jerat cincin 12 × 1 × 12 bergerigi; segel pelat 32 × 48 × 2 bertulisan pancar; palang rantai 2 garis; tali 1 × 1 × n; sel memakai model `sangkar` 38MD (diimpor, tidak disunting) | rune berdenyut; jerat menutup 4 tick; segel retak dan memudar 20 tick |
+
+#### 38.T.9.4 Efek klien tema (38TV; semua patuh `EffectQuality` dan `EpicBudget`)
+
+| Efek | Spesifikasi | Min / Nor / Maks |
+|---|---|---|
+| Badai pasir | overlay kabut warna `#C8A060` (jarak 16 blok), partikel pasir quad horizontal, dinding pasir cakrawala (1 quad besar 256 × 64 blok bergerak 0.3 b/tick), suara angin loop | overlay saja / 400 / 900 partikel per detik |
+| Lentera air | lentera teratai quad bertumpuk (kelopak 2 quad + api pancar), hanyut sepanjang spline kanal (titik `jalur_perahu` dikirim sekali per kota), berputar 0.5°/tick, memudar 600 tick | 0 / 40 / 120 |
+| Cahaya Budha | cincin pelangi 5 lapis quad aditif di awan berlawanan arah matahari + siluet pemain (bayangan kepala) di tengah | 1 cincin / 3 / 5 lapis |
+| Lautan awan | 2 lapis quad awan bertekstur di bawah baris atas Kota Gunung pada pagi dan saat hujan | 1 / 2 / 2 lapis |
+| Kabut gunung | kabut putih jarak 24-48 di baris atas saat pagi/hujan | ya / ya / ya |
+| Riak kolam darah | 3 cincin aditif merah membesar di permukaan kolam istana | 0 / 1 / 3 |
+| Ombak teluk badai | permukaan quad bergelombang di sekitar perahu sewaan | 0 / 1 / 1 |
+| Sinar mercusuar | 2 quad aditif berputar | titik cahaya / 2 / 2 |
+| Kain dan panji | memakai `KainKota` 38MD (impor) | ≤ 24 per kota |
+| Mural bergerak (quest oasis) | billboard 2 frame berganti 20 tick | ya |
+
+### 38.T.10 Dagang antar-kota, toko khas dan harga (kurs tunggal 38.M.0)
+
+Semua harga dalam **Nilai Batu (NB)**: Rendah 1, Menengah 9, Tinggi 81, Agung 729 (`NilaiBatu.VALUE`); dibayar lewat
+`NilaiBatu.pay/give` (`give` tidak pernah mengeluarkan Agung); `LabelHarga` 38.U menampilkan rincian batu (mis. 150 NB =
+"1 Tinggi · 7 Menengah · 6 Rendah"). PK hanya muncul pada biaya sekte (2 PK per murid pengawal per hari, setara 4 NB
+menurut 1 PK = 2 NB, **tidak pernah** ditukar langsung). Aturan 38.M.5 berlaku: beli-kembali ≤ 0.5, komponen
+`kultivator:asal_toko` (3 hari), tidak ada pencetakan uang.
+
+#### 38.T.10.1 Barang dagang (`kultivator:dagang/<id>`, item baru 38TK, model item 38TV)
+
+Kolom permintaan = faktor harga jual di kota itu (≤ 1.35; produsen 0.8-1.0); "—" = tidak dibeli.
+
+| Barang | Asal (harga beli dasar) | Pelabuhan | Oasis | Air | Gunung | Ibu kota / kota 34 | Kota Iblis (pasar gelap) |
+|---|---|---|---|---|---|---|---|
+| `ikan_asin_roh` | pelabuhan 4 | 0.8 | 1.30 | 0.95 | 1.25 | 1.15 | 1.0 |
+| `mutiara_laut` | pelabuhan 40 | 0.8 | 1.30 | 1.25 | 1.0 | 1.20 | 1.1 |
+| `rempah_seberang` | pelabuhan 12 | 0.85 | 0.9 | 1.25 | 1.30 | 1.20 | 1.0 |
+| `porselen_hijau` | pelabuhan 24 | 0.85 | 1.35 | 1.0 | 1.10 | 1.20 | — |
+| `kurma_emas` | oasis 3 | 1.25 | 0.8 | 1.30 | 1.20 | 1.10 | 1.0 |
+| `permadani_gurun` | oasis 30 | 1.15 | 0.85 | 1.20 | 1.0 | 1.30 | 1.1 |
+| `giok_barat` | oasis 60 | 1.10 | 0.85 | 1.30 | 1.15 | 1.25 | 1.2 |
+| `kaca_warna` | oasis 16 | 1.0 | 0.85 | 1.25 | 1.30 | 1.15 | — |
+| `sutra_awan` | air 36 | 1.30 | 1.35 | 0.8 | 1.10 | 1.20 | 1.1 |
+| `teh_bi_luo` (peti kecil) | air 10 | 1.25 | 1.30 | 0.8 | 0.95 | 1.15 | — |
+| `arak_beras` | air 6 | 1.20 | 1.25 | 0.85 | 1.0 | 1.05 | 1.2 |
+| `herba_tebing_kering` | gunung 14 | 1.20 | 1.15 | 1.25 | 0.8 | 1.30 | 1.1 |
+| `dupa_gunung` | gunung 5 | 1.30 | 1.20 | 1.15 | 0.8 | 1.10 | — |
+| `teh_awan_gunung` | gunung 9 | 1.20 | 1.30 | 0.9 | 0.8 | 1.10 | — |
+| `lingzhi_gunung` | gunung 45 | 1.15 | 1.20 | 1.20 | 0.85 | 1.30 | 1.25 |
+| `racun_ular_hitam` | iblis 18 | — | — | — | — | penadah Pasar Gelap ibu kota 1.2 | 0.8 |
+| `minyak_bayangan` (selundupan) | iblis 30 (hanya pasar gelap) | penadah 1.35 | penadah 1.35 | penadah 1.35 | — | — | 0.8 |
+
+- **Beli** di kota asal pada harga dasar (diskon Nama Baik/gelar berlaku, maks 15 %), stok **16 per barang per pemain per
+  hari dunia**; kafilah/kapal yang baru datang menurunkan harga barangnya 10 % selama 2 hari.
+- **Jual** di kota lain: `dasar × permintaan × jenuh`, `jenuh = max(0.6, 1 − 0.04 × n)` dengan n = jumlah unit barang itu
+  yang dijual **semua pemain** ke kota itu dalam 24 jam dunia terakhir (pulih 1 unit per jam dunia). Permintaan bergeser
+  ±0.05 tiap 7 hari dunia (hash) dan karena peristiwa: badai pasir → kurma/ikan asin di oasis +0.15 (2 hari); Pelita padam
+  → mutiara di pelabuhan +0.1; Musim Ziarah → dupa di gunung tetap 0.8 tetapi di tempat lain +0.1; Pesta Darah → racun
+  di Kota Iblis −0.1.
+- **Batas laba** per pemain per minggu dunia: `150 × (band + 1)` NB (dihitung jual − beli barang dagang); melewatinya,
+  harga jual barang dagang untuk pemain itu turun ke `0.5 × dasar` sampai minggu berikutnya. Margin ideal per unit
+  ≤ +35 %.
+- **Selundupan** (`minyak_bayangan`): tidak pernah dijual toko lurus; hanya penadah (PENGEMIS/WARGA di kumuh ibu kota,
+  Lao Shu di Kota Air, gang di kampung pelaut). Bea gerbang kota tema (Gerbang Giok, Kantor Urusan Laut, Pintu Air,
+  Gerbang Kaki) memeriksa: 40 % peluang **disita permanen** (bukan Barang Sitaan 38.R yang bisa diambil
+  kembali) + Nama Baik −5 di kota itu; ibu kota: poin kejahatan 6 (38.B.5.2). Infami +2 per transaksi.
+- **Bea** (sink): Gerbang Giok 3 % nilai barang dagang yang dibawa masuk (Surat Jalan bebas), Kantor Urusan Laut 2 % atas
+  penjualan di Pasar Seberang; kota lain tanpa bea.
+- **Peti Dagang** (`kultivator:dagang/peti`): wadah tersegel 8 unit satu jenis (segel 1 NB, dibuka di kota mana pun);
+  dipakai Kontrak Muatan dan Kafilah Sekte; bukan wadah berisi untuk toko (ditolak dijual ke toko biasa, 38.0 butir 16).
+- Permintaan disimpan sebagai data `data/kultivator/tempat/permintaan/kota_tema_<tema>.json` (`{barang: faktor}`) yang
+  dibaca generik oleh `KafilahSekte` 38EK (amandemen 38.T.14.3), sehingga kafilah sekte pemain memakai tabel yang sama.
+
+**Jalur dagang khas** (laba ideal per unit sebelum jenuh dan batas, untuk penguji `uji tema dagang`):
+
+| Jalur | Barang | Laba ideal / unit | Catatan |
+|---|---|---|---|
+| Air → Oasis ("Jalur Sutra") | Sutra Awan | 36 → 48.6 = +12.6 | jalur terbaik, jauh dan berseberangan bioma |
+| Pelabuhan → Oasis | Porselen Hijau | 24 → 32.4 = +8.4 | |
+| Oasis → Air | Giok Barat | 60 → 78 = +18 | barang mahal, modal besar |
+| Gunung → ibu kota | Lingzhi Gunung | 45 → 58.5 = +13.5 | |
+| Gunung → Pelabuhan | Dupa Gunung | 5 → 6.5 = +1.5 | murah, untuk pita rendah |
+| Pelabuhan → Gunung | Rempah Seberang | 12 → 15.6 = +3.6 | |
+
+#### 38.T.10.2 Toko dan jasa khas (layar 38.T.13.3; pita = syarat beli)
+
+| Kota | Barang / jasa | Harga (NB) | Batas / catatan |
+|---|---|---|---|
+| Pelabuhan | Ikan Roh / Sup Ikan Pagi | 6 / 3 | sup: kenyang + regen Qi +5 % 3 menit |
+| Pelabuhan | **Kompas Pasang** (menunjuk Pusaran Laut terdekat) | 150 | pita ≥ 2, 1 per pemain |
+| Pelabuhan | Mutiara Penunjuk Laut (item modul D, lewat `Dimensi.itemById`) | 300 | pita ≥ 3, stok 1 per 3 hari |
+| Pelabuhan | Kapal Lintas Laut ke Laut Tanpa Batas | `40 × (1 + band/4)` | pita ≥ 2, 1 per hari |
+| Pelabuhan | Lunas perahu awan / kapal sekte | 900 / 4000 | pita ≥ 3 / ≥ 4; 2 / 4 hari |
+| Pelabuhan | Sewa perahu nelayan / lomba perahu | 2 per jam dunia / 5 | |
+| Pelabuhan | Bahan bakar kapal terbang (batu roh) | nilai `NilaiBatu.VALUE` | tanpa diskon |
+| Oasis | Kerudung Pasir / Air Suci / Kurma Emas | 15 / 2 / 3 | |
+| Oasis | Restu Mata Air | 3 | 1 per hari |
+| Oasis | Sewa unta / ikut kafilah | 12 per hari / 8 | |
+| Oasis | Pesanan mural | 50 | 1 mural per pemain per kota |
+| Air | Sutra Awan / Kipas Sutra / Jubah Sutra (pesanan) | 36 / 20 / 80 | jubah 2 hari |
+| Air | Teh Bi Luo / Teh Embun Gunung / Teh Seribu Tahun | 8 / 5 / 60 | Seribu Tahun pita ≥ 3, 1 per hari |
+| Air | Lentera teratai / Perahu Pos / sewa perahu / Tur Kanal | 1 / 1 / 2 per jam / 3 | lentera maks 3 per festival |
+| Gunung | Herba gunung berumur | `Harga.value × 1.0` | umur ≤ 300 (M3) |
+| Gunung | Rumput Awan Seribu Tahun | 120 | stok 1 per 7 hari |
+| Gunung | Tali Panjat / dupa ziarah / Rumah Tamu Biara | 15 / 2 / 3 | |
+| Gunung | Kereta gantung / jasa kuli | 1 / 2 | turun gratis |
+| Iblis | Upeti Gerbang | `10 × (band + 1)` | gratis Gentar ≥ 60 |
+| Iblis | Pil Darah (pulih 30 % HP seketika, Lemah I 20 s) | 25 | 3 per hari |
+| Iblis | Racun (pelapis senjata: Racun I 4 s pada 3 serangan) | 12 / 30 / 80 (lemah/sedang/kuat) | pita ≥ 2/3/4 |
+| Iblis | Gulungan Bakar Darah / Langkah Hantu / Rantai Jiwa / Topeng Iblis Hati | 40 / 60 / 90 / 120 | pita ≥ 2/3/4/4; Infami +2 per beli |
+| Iblis | Topeng Tanpa Wajah | 70 | kosmetik + efek Jam Berburu |
+| Iblis | Peta sarang | 35 | 1 per hari |
+| Iblis | Tebus tawanan | `25 × (1 + kekuatanKota / 2)` | maks 3 per hari |
+| Iblis | Arena (biaya) / taruhan maks | `8 × (band + 1)` / `20 × (band + 1)` | 5 laga / 6 taruhan per malam |
+
+Markup pasar gelap 1.3 berlaku pada harga dasar barang `Harga` umum (bukan pada tabel di atas, yang sudah final).
+
+#### 38.T.10.3 Kontrak muatan (darat, laut, langit)
+
+- Diterbitkan di **Balai Dewan Saudagar** (pelabuhan), **Karavanserai Agung** (oasis), **Rumah Sutra** (air), **Pos Kuli**
+  (gunung): "antar N Peti Dagang tersegel (disediakan) ke kota tema/ibu kota Y yang **diketahui** dalam D hari dunia".
+  Deposit 20 % nilai muatan (kembali saat tiba). Bayaran `ceil(jarak / 100 × (2 + band))` NB + 25 % bila tiba di separuh
+  waktu; dengan kapal terbang (diserahkan di Menara Tambat Langit atau Dermaga Langit ibu kota) × 1.3. Maks 2 kontrak
+  aktif; 3 per minggu.
+- Gagal (waktu habis, peti dibuka) → deposit hilang, Nama Baik −2 di kota penerbit. Risiko di jalan: begal 38.C.6.3
+  (tekanan harian M2), perompak langit modul T (sistem yang ada). Tidak ada risiko tambahan buatan 38.T.
+- Kontrak dihitung sebagai misi gilda `muatan` (poin lencana, 38.T.11).
+
+### 38.T.11 Tautan ke sistem lain
+
+| Sistem | Tautan | Pemilik kode |
+|---|---|---|
+| **Stasiun teleport** (38.B.4.3) | setiap kota tema punya jangkar `kotabesar/cakram` (dilayani 38KS tanpa kode baru); jenis tujuan ditambah `kota_tema/pelabuhan|oasis|air|gunung|iblis`; titik tiba `TempatApi.arrival` = `kota/alun` (empat tema) atau **luar** Gerbang Tengkorak (iblis, 24 blok di depan gerbang); Kota Iblis hanya bisa dituju setelah pernah masuk | 38KS (daftar jenis), 38TK (jangkar) |
+| **Perjalanan Awan, rute kapal** | Dermaga Langit ibu kota menyebut kota tema ≥ 600 blok; Menara Tambat Langit pelabuhan = `registerDestination("kota_tema_pelabuhan_<i>", ...)` | 38TK (`DuniaApi.routes()`), 38KS (daftar Perjalanan Awan) |
+| **Laut Tanpa Batas** | Kapal Lintas Laut → `SeaGate.enter(player, true)`; pulang lewat Gerbang Pulang yang ada; quest pelabuhan bab 5 memakai `SeaGate.tagOf` untuk tujuan pulau | 38TK (memanggil API publik D) |
+| **Misi gilda** (38.M.3) | jenis misi baru lewat `EkonomiApi.daftarJenisMisi(JenisMisi)`: `muatan` (D-B), `kawal_unta` (D-B), `reruntuhan` (C-A), `antar_sutra` (E), `herba_tebing` (D), `pencuri_kanal` (D), `bajak_laut` (B), `buronan_iblis` (B-S), `tebus_tawanan` (C); Papan Gilda salinan (E-C) di empat kota tema damai (`kotabesar/layanan` `papan_gilda`); Kota Iblis memakai Sarang Kontrak | 38EK (API pendaftaran), 38TK (jenis) |
+| **Sekte NPC** (`DiplomasiService`) | Biara Awan = "cabang" sekte Lurus terdekat (nama dan lambang di papan biara); Kota Iblis berpanji sekte Iblis terdekat (`GerbangPlan` aliran Iblis) bila ada; Penyerbuan Lurus dan Papan Buronan atas nama sekte Lurus terdekat; `adjust` hanya lewat API (tebus +2, buronan +3, penyerbuan ±5, melawan pemburu −3) | 38TK (pembaca) |
+| **Kafilah sekte / kafilah jalan** (38.M.4.2, 38.C.6.3) | tujuan kafilah sekte termasuk kota tema yang diketahui; permintaan dari data 38.T.10.1; rupa kafilah `TemaApi.rupaKafilah` (unta di rute yang menyentuh oasis, kapal di rute pelabuhan↔pelabuhan) | 38EK (pembaca), 38TK (data + API) |
+| **Sibuk** (`musuh/Sibuk`) | `Sibuk.register`: `tema.pelayaran` (adegan Kapal Lintas Laut), `tema.perahu` (penumpang perahu/tur), `tema.lift` (kereta gantung/katrol), `tema.arena` (laga arena darah), `tema.tari` (mini-gim tari/irama); semua peristiwa tema (bajak laut, Jam Berburu, Pemburu Lurus, Tikus Air, Penyerbuan Lurus) memanggil `Sibuk.why` dan menunda 200 tick; peristiwa musuh ikut tekanan harian M2 | 38TK |
+| **Tempat aman** | `Rencana.zonaAman`: empat kota tema seluruhnya + `pos_pemburu`; Kota Iblis hanya Zona Perjanjian | 38W (TempatZones membaca), 38TK (kotak) |
+| **Mode Kehancuran** | semua zona kota tema (termasuk Kota Iblis) dilindungi `TempatZones` → `ProtectedZones`; satelit reruntuhan tidak | 38W |
+| **Perbaikan dan ganti rugi** (38.R) | `tempat_dirawat` + faktor tempat: pelabuhan 1.8, oasis 1.8, air 2.0, gunung 2.0, iblis 2.0 gaya `iblis`; kekuatan (38.R.5): pelabuhan 3, oasis 4, air 2, gunung 4, iblis = ranah Penguasa; penagih: PETUGAS_BEA, PENGAWAL_GURUN, KEPALA_DESA (kepala kampung air), BIKSU_GUNUNG, PENEGAK_IBLIS; dermaga di atas air dipulihkan biasa (restore hanya ke udara/air yang direkam); **air kanal** boleh dipulihkan sebagai sumber bila posisinya di kotak titik `kanal` (amandemen aturan 38.R.3 butir 6) | 38PR |
+| **Nama Baik** (K) | empat kota tema adalah "kota" K lewat `kota/situs` (`Towns` menerima `kota/kota_tema`, SAFE_RADIUS 160); Kota Iblis tidak (Gentar dan Infami) | 38KS (`Towns`), 38TK |
+| **Murid** | `Disciples.addFollowVeto`: arena, sel tawanan, kereta gantung, katrol, perahu tur (murid menunggu di stasiun/dermaga/pintu); Kapal Lintas Laut boleh 2 murid | 38TK |
+| **Duel Pedang** (35) | laga arena darah dan duel quest memakai `DuelChallenges.challenge` dengan aturan arena (verifikasi `DuelRuleSet`) | 38TK |
+| **Meditasi** | `SpiritSites.addSiteProvider` (38TK, satu provider): "Mata Gurun" ×1.25, "Taman Klasik" ×1.2, "Aula Emas" ×1.4 (Restu Puncak), "Kolam Semedi Darah" ×1.3 (hanya bila Infami ≥ 20); semua dalam CAP | 38TK |
+| **Peristiwa langit** | dibaca saja: Gerhana Darah → Pesta Darah; bulan purnama/sabit/mati → festival; petir → badai laut | 38TK |
+| **Hub dan peta** | penanda `DuniaMarkers` 42 `kota_tema/pelabuhan` (`#5FA8C8`), 43 `oasis` (`#E0B060`), 44 `air` (`#7FC8B0`), 45 `gunung` (`#A0A8B8`), 46 `iblis` (`#8A1020`), 47 `kota_tema/reruntuhan_gurun` (`#C09050`), 48 `kota_tema/pos_pemburu` (`#D8E4F0`), live 49 `tema/kapal_dagang`; kartu hub DUNIA **"Kota Bertema"** (daftar kota tema diketahui, jarak, acara berikutnya, meter Infami dan Gentar, **Buku Dagang**: harga terakhir yang diketahui pemain per kota, diperbarui saat mengunjungi pasar atau mendengar kabar) lewat `HubCards.register` | 38W (penanda), 38TV (kartu) |
+| **Kitab Panduan** | bab **20 "Lima Kota Bertema"** (indeks 19, `CHAPTER_COUNT` +1 setelah bab 18-19 38W; `minRealm` Fana): `c20.pelabuhan` (masuk), `c20.oasis`, `c20.air`, `c20.gunung`, `c20.dagang` (jual barang dagang di kota lain dengan laba), `c20.laut` (Kapal Lintas Laut), `c20.ziarah` (Seribu Anak Tangga), `c20.lentera` (Malam Lentera Air), `c20.iblis` (opsional, `minRealm` Inti Emas: masuk Kota Iblis), `c20.tebus` (opsional: tebus satu tawanan) | 38W (`GuideChapters`), 38TK (teks `tempat_tema_panduan`) |
+| **Rumor** (38.S.5) | templat `data/kultivator/tempat/kabar/tema_*.json`: kafilah tiba, badai pasir, pelita padam/menyala, bajak laut, lomba perahu naga, longsor, Kota Iblis dikepung, buronan iblis terlihat di jalan, tawanan pulang, harga sutra naik di oasis | 38TK (data), 38ST (mesin) |
+| **Advancement** | `tempat/tema_pelabuhan` … `tema_iblis` (masuk), `tema_penjaga_pelita`, `tema_pembawa_air`, `tema_penenun_malam`, `tema_penjaga_tali`, `tema_peziarah`, `tema_saudagar` (laba dagang 1000 NB total), `tema_lima_kota`, `tema_juara_tangga_darah`, `tema_pemutus_rantai`, `tema_pembawa_fajar`, `tema_tamu_darah` (tersembunyi), `tema_pembebas` (tebus 10) | 38TK |
+
+### 38.T.12 Suara baru (Jepang; 38ST menambah ke `tools/gen_voices.py` `WORLD`, grup `tema.*` di `VoiceEvents`)
+
+| Kunci | Suara | Jepang | English | Indonesia | Emosi |
+|---|---|---|---|---|---|
+| `tema.pelabuhan.welcome` | f2 | 港へようこそ。荷を下ろすなら、まず税関へ。 | Welcome to the harbour. If you're unloading, customs first. | Selamat datang di pelabuhan. Kalau mau bongkar muatan, ke bea cukai dulu. | normal |
+| `tema.pelabuhan.fish_call` | f1 | 獲れたてだよ！朝の霊魚、今だけだよ！ | Fresh from the sea! Morning spirit fish, only for now! | Baru ditangkap! Ikan roh pagi, cuma sekarang! | joy |
+| `tema.pelabuhan.ship_arrive` | m2 | 南の船が入ったぞ！荷揚げを急げ！ | A southern ship is in! Hurry with the unloading! | Kapal selatan masuk! Cepat bongkar muatan! | joy |
+| `tema.pelabuhan.ship_depart` | m2 | 錨を上げろ！帆を張れ！ | Weigh anchor! Hoist the sails! | Angkat jangkar! Kembangkan layar! | joy |
+| `tema.pelabuhan.lighthouse` | elder | この灯が消えたら、海は人を帰さぬ。 | If this light goes out, the sea won't send anyone home. | Kalau pelita ini padam, laut tak akan memulangkan siapa pun. | calm |
+| `tema.pelabuhan.pirates` | m1 | 海賊だ！桟橋を守れ！ | Pirates! Defend the piers! | Bajak laut! Pertahankan dermaga! | angry |
+| `tema.pelabuhan.black_shark` | m3 | この港の灯は、俺がもらう。 | This harbour's light is mine to take. | Pelita pelabuhan ini akan kuambil. | angry |
+| `tema.pelabuhan.sea_crossing` | m2 | 霧の向こうは果てなき海だ。しっかり掴まってな。 | Beyond the fog lies the Boundless Sea. Hold on tight. | Di balik kabut ada Laut Tanpa Batas. Pegangan yang kuat. | normal |
+| `tema.pelabuhan.goddess_day` | elder | 海の女神に祈りを。今年も無事の航海を。 | Pray to the Sea Goddess, for another year of safe voyages. | Berdoalah pada Dewi Laut, demi pelayaran selamat setahun lagi. | calm |
+| `tema.pelabuhan.shipwright` | elder | 良い船は、竜骨から嘘をつかん。 | A good ship never lies, starting from its keel. | Kapal yang baik tak pernah berbohong, mulai dari lunasnya. | calm |
+| `tema.pelabuhan.lamp_lit` | elder | 灯がともった…おかえり、みんな。 | The light is lit... welcome home, everyone. | Pelita menyala... selamat pulang, semuanya. | joy |
+| `tema.oasis.welcome` | m1 | 玉門を越えた先は砂の海だ。水は持ったか？ | Beyond the Jade Gate lies a sea of sand. Got your water? | Di balik Gerbang Giok ada lautan pasir. Sudah bawa air? | normal |
+| `tema.oasis.bazaar` | m3 | さあさあ、西の香辛料に絨毯だ！値段は相談次第！ | Come, come! Western spices and carpets! The price is open to talk! | Ayo, ayo! Rempah Barat dan permadani! Harga bisa dirunding! | joy |
+| `tema.oasis.haggle_no` | m3 | それじゃ商売にならんよ、旦那。 | That won't make me a living, sir. | Kalau segitu, aku tak bisa makan, Tuan. | angry |
+| `tema.oasis.haggle_yes` | m3 | ええい、持ってけ！今日だけだぞ！ | Fine, take it! Only today! | Ah, ambillah! Hanya hari ini! | joy |
+| `tema.oasis.caravan` | m1 | 隊商が着いたぞ！駱駝に水をやれ！ | The caravan has arrived! Water the camels! | Kafilah sudah tiba! Beri minum unta-unta! | joy |
+| `tema.oasis.sandstorm` | m1 | 砂嵐だ！駱駝を伏せさせろ、中へ入れ！ | Sandstorm! Make the camels kneel, get inside! | Badai pasir! Suruh unta berlutut, masuk ke dalam! | angry |
+| `tema.oasis.water_priestess` | f3 | 水は命。一滴たりとも無駄にしてはなりません。 | Water is life. Not one drop must be wasted. | Air adalah kehidupan. Tak satu tetes pun boleh terbuang. | calm |
+| `tema.oasis.lord` | boss | この町が砂に呑まれる日は来させぬ。 | I will not let the day come when sand swallows this town. | Takkan kubiarkan datang hari pasir menelan kota ini. | calm |
+| `tema.oasis.scorpion` | demon | 水は我が蠍のもの。砂に還れ！ | The water belongs to my scorpion. Return to the sand! | Air ini milik kalajengkingku. Kembalilah ke pasir! | angry |
+| `tema.oasis.dance` | f1 | 今宵は満月、旋舞をご覧あれ！ | Tonight is the full moon. Behold the whirling dance! | Malam ini purnama, saksikanlah tari putar! | joy |
+| `tema.air.welcome` | f1 | 舟に乗っていくかい？町を一回りしてあげるよ。 | Want a boat ride? I'll take you round the town. | Mau naik perahu? Kuantar keliling kota. | joy |
+| `tema.air.boat_song` | f1 | 水は流れて、橋はめぐる… | The water flows, the bridges pass by... | Air mengalir, jembatan silih berganti... | calm |
+| `tema.air.silk` | f3 | 蘇家の絹は、五代にわたり嘘をついたことがありません。 | The silk of House Su has not lied in five generations. | Sutra keluarga Su tak pernah berbohong selama lima generasi. | calm |
+| `tema.air.tea` | m1 | 一煎目は香りを、二煎目は心を味わうのです。 | The first steep is for the fragrance, the second for the heart. | Seduhan pertama untuk harumnya, seduhan kedua untuk hatinya. | calm |
+| `tema.air.thief` | m2 | 泥棒だ！舟で逃げたぞ！ | Thief! He's escaping by boat! | Pencuri! Dia kabur naik perahu! | angry |
+| `tema.air.lantern_night` | f1 | 灯籠を流しましょう。迷った魂が帰れるように。 | Let's float the lanterns, so the lost souls can find their way home. | Mari melepas lentera, agar arwah yang tersesat bisa pulang. | calm |
+| `tema.air.ghost` | f2 | わたしの布は…まだ織りかけなの。 | My cloth... is still unfinished. | Kainku... masih belum selesai ditenun. | calm |
+| `tema.air.ghost_rest` | f2 | ありがとう…これで、やっと眠れる。 | Thank you... now, at last, I can sleep. | Terima kasih... akhirnya aku bisa tidur. | calm |
+| `tema.air.dragon_boat` | m1 | 太鼓を合わせろ！竜舟、進め！ | Match the drum! Dragon boat, forward! | Ikuti genderang! Perahu naga, maju! | joy |
+| `tema.air.poet` | elder | 雨を聴く亭で、詩を一つ詠まぬか。 | Will you not compose a verse in the Pavilion for Listening to Rain? | Maukah kau menggubah satu bait di Paviliun Menyimak Hujan? | calm |
+| `tema.gunung.welcome` | m1 | 千段の石段の始まりだ。足元に気をつけて。 | This is the start of the thousand stone steps. Watch your feet. | Inilah awal seribu anak tangga. Hati-hati langkahmu. | normal |
+| `tema.gunung.porter` | m2 | 一歩ずつ、一歩ずつ。山は逃げやせん。 | One step at a time. The mountain isn't going anywhere. | Selangkah demi selangkah. Gunung tak akan lari. | calm |
+| `tema.gunung.lift` | m1 | 乗った乗った！雲の上まで一息だ！ | All aboard! Up above the clouds in one breath! | Ayo naik! Ke atas awan dalam sekali napas! | joy |
+| `tema.gunung.lift_stuck` | m1 | くそっ、綱が…！動くな、今助ける！ | Damn, the rope...! Don't move, I'm coming! | Sial, talinya...! Jangan bergerak, aku datang! | angry |
+| `tema.gunung.monkey` | f1 | あっ、猿に饅頭を取られたね。果物を投げてごらん。 | Oh, the monkey took your bun. Try throwing it some fruit. | Wah, bakpaomu direbut kera. Coba lempar buah. | joy |
+| `tema.gunung.rockfall` | m1 | 落石だ！道から離れろ！ | Falling rocks! Get off the path! | Batu runtuh! Menjauh dari jalan! | angry |
+| `tema.gunung.abbot` | elder | 山頂に至る道は千あれど、心に至る道は一つ。 | A thousand paths reach the summit, but only one reaches the heart. | Seribu jalan menuju puncak, tetapi hanya satu menuju hati. | calm |
+| `tema.gunung.pilgrim` | m2 | 三歩一拝、願いよ届け。 | Three steps, one bow. Let my wish be heard. | Tiga langkah satu sujud, semoga permohonanku sampai. | calm |
+| `tema.gunung.buddha_light` | f3 | 見なさい、雲の上の光の輪を。仏光です。 | Look, the ring of light upon the clouds. The Buddha's light. | Lihatlah lingkaran cahaya di atas awan. Cahaya Buddha. | joy |
+| `tema.gunung.cloud_bell` | elder | 雲の鐘が鳴る。山はあなたを覚えました。 | The cloud bell rings. The mountain remembers you. | Lonceng Awan berbunyi. Gunung kini mengingatmu. | calm |
+| `tema.iblis.gate_toll` | m1 | 通るなら貢ぎ物を置いていけ。命よりは安いぞ。 | Leave a tribute if you'd pass. It's cheaper than your life. | Kalau mau lewat, tinggalkan upeti. Lebih murah dari nyawamu. | normal |
+| `tema.iblis.gate_weak` | m1 | こんな小物、餌にもならん。帰れ。 | Small fry like you isn't even good bait. Go home. | Ikan teri sepertimu bahkan tak pantas jadi umpan. Pulang sana. | normal |
+| `tema.iblis.pact` | m3 | 市場の中で血を流すな。それがこの町唯一の掟だ。 | Spill no blood inside the market. That is this town's only law. | Jangan tumpahkan darah di dalam pasar. Itulah satu-satunya hukum kota ini. | calm |
+| `tema.iblis.hunt_hour` | demon | 夜道の通行料だ。金か、血か？ | A toll for the night road. Gold, or blood? | Upeti jalan malam. Uang, atau darah? | angry |
+| `tema.iblis.arena_open` | m1 | 血の階段へようこそ！生きて降りられるかな？ | Welcome to the Blood Ladder! Think you'll walk down alive? | Selamat datang di Tangga Darah! Yakin bisa turun hidup-hidup? | joy |
+| `tema.iblis.arena_win` | m1 | 見たか！新しい名が血に刻まれたぞ！ | Did you see?! A new name is carved in blood! | Kalian lihat?! Nama baru terukir dengan darah! | joy |
+| `tema.iblis.broker` | f3 | 欲しいものは何？ここでは、値段のないものはないのよ。 | What do you desire? Here, nothing is without a price. | Apa yang kau inginkan? Di sini, tak ada yang tak berharga. | calm |
+| `tema.iblis.forbidden` | elder | この書は、読む者の何かを喰らう。それでも開くか？ | This book devours something of whoever reads it. Will you still open it? | Kitab ini memakan sesuatu dari pembacanya. Masih mau membukanya? | calm |
+| `tema.iblis.captive` | f1 | おねがい…村に帰りたいの。 | Please... I want to go home to my village. | Tolong... aku ingin pulang ke desaku. | calm |
+| `tema.iblis.lord` | boss | 正道の者が、わざわざ地獄の門を叩くとはね。 | How rare, a righteous one knocking at hell's gate of their own accord. | Jarang sekali, orang jalan lurus mengetuk gerbang neraka atas kemauan sendiri. | calm |
+| `tema.iblis.hunter` | f2 | 正道の名において、その首、貰い受ける！ | In the name of the righteous path, your head is forfeit! | Atas nama jalan lurus, kepalamu kuambil! | angry |
+| `tema.iblis.raid` | m1 | 正道の連中が門に来た！迎え撃て！ | The righteous are at the gate! Meet them head on! | Orang-orang jalan lurus di gerbang! Hadapi mereka! | angry |
+| `tema.iblis.dawn` | m3 | この町にも、朝は来るんだな。 | So even this town gets a morning. | Ternyata kota ini pun bisa didatangi pagi. | calm |
+| `tema.dagang.sold` | m2 | 良い取引でした。また来てくださいよ。 | A fine deal. Do come again. | Transaksi yang bagus. Datang lagi, ya. | joy |
+| `tema.dagang.saturated` | m2 | その品はもう溢れててね…安くしか買えんよ。 | We're already flooded with that... I can only buy it cheap. | Barang itu sudah membanjir... aku cuma bisa beli murah. | normal |
+
+Total 56 baris. Gelembung kalimat tanpa suara (±250 kunci, `tempat_tema_kalimat`): seruan pasar ikan, tawar bazar,
+lagu perahu (12 bait milik sendiri), keluhan kuli, bisikan pasar gelap, ejekan penantang Jam Berburu, doa peziarah.
+
+### 38.T.13 Config, perintah dan layar
+
+#### 38.T.13.1 Config (`config/kultivator-dunia.json`, `DuniaConfig.section`, dijepit saat dimuat)
+
+Di teks bagian ini kunci ditulis `kotaTema.<tema>.<kunci>`; di berkas, `DuniaConfig.section` hanya satu tingkat
+(verifikasi), jadi bagiannya `kotaTema` + `temaPelabuhan`, `temaOasis`, `temaAir`, `temaGunung`, `temaIblis` (tidak
+bertabrakan dengan `kota`, `langit`, `sekteLangit`, `tempat`, `kotaBesar`, `kampung`, `kompleksSekte`, `gua`, `jalan`).
+
+| Bagian | Kunci (bawaan, jepit) |
+|---|---|
+| `kotaTema` | `aktif` true, `worldgen` true, `tubuhMaks` 20 (12-36), `mekanismeMaks` 12 (4-16), `jarakDariIbuKota` 1200 (800-3000), `jarakAntarTema` 900 (600-3000), `dagang` true, `batasLabaMingguan` 150 (50-400, dikali band + 1), `jenuhPerUnit` 0.04 (0.02-0.08), `acara` true, `bahaya` true, `alurCerita` true, `kontrakMuatan` true |
+| `temaPelabuhan` | `worldgen` true, `peluangSel` 0.7, `ukuranSel` 3072, `kapalDagang` true, `lintasLaut` true, `serbuanBajakLaut` true, `galangan` true |
+| `temaOasis` | `worldgen` true, `peluangSel` 0.7, `ukuranSel` 3584, `badaiPasir` true, `badaiHariMin` 4, `badaiHariMaks` 8, `kafilahUnta` true, `reruntuhan` true |
+| `temaAir` | `worldgen` true, `peluangSel` 0.5, `ukuranSel` 3072, `perahuPos` true, `lenteraAir` true, `perahuNaga` true, `tikusAir` true |
+| `temaGunung` | `worldgen` true, `peluangSel` 0.6, `ukuranSel` 3072, `keretaGantung` true, `longsor` true, `keraGunung` true, `cahayaBudha` true |
+| `temaIblis` | `worldgen` true, `peluangSel` 0.45, `ukuranSel` 4096, `jamBerburu` true, `penyerbuanLurus` true, `pemburuLurus` true, `infami` true, `arenaEv` 0.90 (0.80-0.92), `taruhanEv` 0.90 (0.80-0.92) |
+
+Aturan 38.0 butir 17: item, entitas, payload, struktur dan placement tema **selalu** didaftarkan; saklar hanya
+mematikan perilaku dan pack worldgen (`worldgen` false → rencana tema menjawab "tidak layak", tidak pernah setengah).
+
+#### 38.T.13.2 Perintah
+
+Uji di bawah `/kultivasi uji tema` (op, `DuniaCommands.test("tema", ...)`; chip `tema` ditambah 38W ke `CHIPS`):
+
+| Sub-perintah | Arti |
+|---|---|
+| `rencana [tema]` | daftar kandidat tiap tema (cincin pertama, sel), status layak/tidak dan **alasannya** (air kurang, selisih, bioma), jarak dari pusat |
+| `putusan <tema>` | nilai putusan di posisi pemain seolah kandidat di sini (sampel, arah laut/menanjak, `dasarY`, `dy` per lot) |
+| `cari <tema> [indeks]` | locate lalu teleport (`DuniaCommands.findAndTeleport`) ke kota tema; `cari reruntuhan` / `cari pos_pemburu` |
+| `distrik <tema> <id>` | teleport ke pusat distrik di kota tema terdekat |
+| `lot` | lot di bawah pemain: templat, rotasi, `dy`, kode sisi keempat arah, jumlah titik per jenis |
+| `cek` | validasi sisi server di kota sekitar: kode sisi bersambung, kanal tidak buntu, jangkar ada, mekanisme hidup terdaftar |
+| `acara <tema> <acara> [mulai|akhir]` | `kapal_datang`, `kapal_pergi`, `dewi_laut`, `bajak_laut`, `kafilah_agung`, `badai_pasir`, `tari_putar`, `lentera_air`, `perahu_naga`, `tikus_air`, `ziarah`, `cahaya_budha`, `longsor`, `lift_macet`, `pesta_darah`, `lelang_gelap`, `penyerbuan`, `jam_berburu` (cuaca dan waktu dunia **tidak** diubah) |
+| `kapal [tambatan]` / `perahu [jalur]` / `lift [naik|turun|macet|pulih]` / `unta [sewa|kafilah]` | memunculkan/menjalankan mekanisme terdekat (hanya bila pemain di kota itu) |
+| `arena <peringkat>` / `taruhan` | mulai laga uji / taruhan uji |
+| `infami <0-100>` / `gentar <0-100>` | setel meter pemain (uji) |
+| `buronan [daftar|buat]` / `pemburu` | daftar buronan iblis aktif / buat satu di dekat pemain / pratinjau cegatan Pemburu Lurus (lewat `Sibuk`) |
+| `dagang [harga|jual <barang> <n>|batas|jenuh|simulasi <hari>]` | harga semua kota, simulasi jual, sisa batas laba, keadaan jenuh, simulasi pedagang aktif N hari (laba harus ≤ batas) |
+| `kontrak [buat|selesai|gagal]` | kontrak muatan uji |
+| `alur <tema> <bab>` | lompat ke bab rantai quest kota tema (adegan tampil) |
+| `model` | barisan semua entitas tema di depan pemain (AI mati, 30 s; 38TV `pamer`) |
+| `fx <badai|lentera|cahaya|awan|suar|riak|ombak>` | pratinjau efek klien 20 s |
+| `kepadatan [radius]` | kepadatan tema per km² dari rencana (tanpa membuat chunk), ikut dihitung `uji tempat kepadatan` |
+
+Perintah pemain (tanpa op): `/kultivasi dagang` (Buku Dagang, sama dengan kartu hub).
+
+#### 38.T.13.3 Layar baru (38TV, kit "Pasar Giok" 38.U; lembar dibangun 38TK, `TempatLayar.daftar`)
+
+| Layar | Isi | Keadaan khusus |
+|---|---|---|
+| `tema_tawar` | tawar-menawar bazar (wireframe di bawah) | pedagang menolak, suasana rendah |
+| `tema_dagang` (Buku Dagang) | tabel barang × kota yang diketahui (harga terakhir dilihat, umur data, jenuh), laba minggu ini vs batas, kontrak aktif | belum ada kota tema diketahui |
+| `tema_kapal` | muatan kapal tambat (Pratinjau3D barang), asal kapal, jadwal berangkat; tab Kapal Lintas Laut | badai, kapal belum datang |
+| `tema_galangan` | pesan lunas, tahap pembangunan (Pratinjau3D `kapal_galangan` tahap kini), ganti layar | pita kurang |
+| `tema_kafilah` | jadwal kafilah, ikut sebagai penumpang/pengawal, sewa unta | badai, kafilah sudah berangkat |
+| `tema_mural` | 12 kisah mural (gambar + teks), pesan mural | — |
+| `tema_sutra` / `tema_teh` / `tema_bait` | toko sutra + pesanan jubah (Pratinjau3D jubah di boneka), menu teh + upacara, pasangan bait | efek teh aktif |
+| `tema_herba` / `tema_ziarah` | toko & penilaian herba, peringkat pemetik / kemajuan 9 bordes dan syarat (tanpa terbang) | ziarah batal |
+| `tema_lift` | jadwal kereta gantung, ongkos, posisi kabin di skema tali | macet, malam |
+| `tema_pasar_gelap` / `tema_kitab_terlarang` / `tema_kontrak` | toko gelap (harga dengan markup dan Gentar/Infami), lantai menara terkunci per Gentar, papan kontrak | Penyusup (ditolak) |
+| `tema_taruhan` | laga berikutnya, dua petarung (potret, tier, peluang, odds), taruhan | batas taruhan |
+| `tema_tawanan` | daftar tawanan (nama, kampung asal, potret), [Tebus], [Tebusan Darah] | batas 3 per hari |
+| `tema_dokumen` / `tema_racik` / `tema_irama` | mini-gim quest: cocokkan surat muatan, racik lensa 3 langkah, irama (tari putar, tenun, genderang perahu naga) | — |
+
+```
+tema_tawar (320 × 240)
++----------------------------------------------------------------------+
+|⟦Tawar ⟧|  ┌──────┐  Pedagang Rahim · Kios Rempah     Suasana ███░ 72 |
+|⟦Kios  ⟧|  │potret│  "Saffron Barat, harga teman: 52 NB!"             |
+|        |  └──────┘                                                   |
+|        |  Barang: Rempah Barat ×4   ╭──────╮  Harga dasar ≈ ? NB      |
+|        |                            │  3D  │  Putaran 1/3            |
+|        |  Tawaranmu:  (−)  44 NB  (+)  ╰──────╯                       |
+|        |  [Tawar]   [Terima 52 NB]   [Pergi]        Uangmu 310 NB     |
++----------------------------------------------------------------------+
+
+tema_dagang (Buku Dagang, 320 × 240)
++----------------------------------------------------------------------+
+|⟦Harga ⟧| Barang        Pelab.   Oasis    Air     Gunung   Ibu kota  |
+|⟦Laba  ⟧| Sutra Awan    46.8     48.6▲    36 ■    39.6     43.2      |
+|⟦Kontrak⟧ Giok Barat    66       60 ■     78▲     69       75        |
+|        | Dupa Gunung   6.5▲     6        5.8     5 ■      5.5       |
+|        |  ■ = asal   ▲ = terbaik   abu = data > 3 hari               |
+|        | Laba minggu ini: 212 / 450 NB  ▁▃▅▆ 4 hari                   |
++----------------------------------------------------------------------+
+```
+
+### 38.T.14 Modul dan kepemilikan berkas
+
+#### 38.T.14.1 Keputusan
+
+Lima tema **tidak** dimasukkan ke modul 38 yang ada (pekerjaan 38KS dan 38DS sudah penuh dan berkas mereka terpisah
+per tempat), tetapi menjadi **dua modul baru**:
+
+- **38TK — Kota Tema: dunia dan permainan** (server, data, worldgen, cerita data, ekonomi khas).
+- **38TV — Kota Tema: model, efek klien dan layar** (semua yang digambar).
+
+Modul inti 38 hanya menerima **baris tambahan kecil di berkas yang sudah mereka miliki** (38.T.14.3), dikerjakan dalam
+langkah 2 mereka. 38TK dan 38TV berjalan di **langkah 2b**, setelah sepuluh modul inti selesai langkah 2, sehingga
+**tidak pernah lebih dari sepuluh modul bekerja bersamaan** (batas 38 tetap terjaga; total modul 38 menjadi dua belas,
+disebut). Tidak ada berkas yang punya dua pemilik.
+
+#### 38.T.14.2 Berkas baru (milik penuh)
+
+| Modul | Java | Generator, data, aset, lang |
+|---|---|---|
+| **38TK** | `dunia/tempat/tema/**`: `KotaTema` (init, satu baris di `Tempat.init()` yang sudah disiapkan 38W sebagai komentar), `Tema`, `TemaApi` (stub dibuat 38W di langkah 1, milik 38TK sejak 2b), `TemaConfig`, `TemaCommands`, `TemaNet` (payload S2C `kultivator:tema_fx`: keadaan badai, festival, spline lentera/perahu), `RencanaKotaTema`, `PutusanTema`, `KotaTemaNames`, `KotaTemaData` (SavedData `kultivator:kota_tema`: pesanan lunas/jubah/mural, titipan kuli, peringkat arena, Infami, Gentar, tawanan, buronan, data dagang dan jenuh, kontrak, Kas Kota Iblis, keadaan quest dunia), `TemaAnchors`, `TemaEntities`, `TemaItems`, `TemaKalender`, `TemaSitus` (provider `SpiritSites`), `TemaSibuk`; `tema/pelabuhan/**` (`KapalDagangEntity`, `KapalBajakLautEntity`, `PerahuNelayanEntity`, `ApiSuarEntity`, `DerekDermagaEntity`, `KapalGalanganEntity`, `JadwalKapal`, `LintasLaut`, `Galangan`, `HariDewiLaut`, `SerbuanBajakLaut`); `tema/oasis/**` (`UntaKafilahEntity`, `KalajengkingRajaEntity`, `TimbaSumurEntity`, `TemuanPasirEntity`, `PintuPasirEntity`, `PilarRuneEntity`, `BadaiPasir`, `Tawar`, `KuilAir`, `Mural`, `KafilahUnta`, `TariPutar`, `BatuUkurAirEntity`); `tema/air/**` (`PerahuKanalEntity`, `PerahuNagaEntity`, `AlatTenunEntity`, `JalurKanal`, `RumahSutra`, `PaviliunTeh`, `LenteraAir`, `LombaPerahuNaga`, `TikusAir`, `PasanganBait`); `tema/gunung/**` (`KeretaGantungEntity`, `KatrolEntity`, `RodaKatrolEntity`, `BatuRuntuhEntity`, `KeraGunungEntity`, `HerbaTebingEntity`, `PalangEntity`, `TaliTurunEntity`, `JeratEntity`, `Ziarah`, `JasaKuli`, `AulaHerba`, `CahayaBudha`, `Longsor`); `tema/iblis/**` (`GerbangTengkorakEntity`, `PintuArenaEntity`, `SelTawananEntity`, `SegelPintuEntity`, `ArenaDarah`, `Taruhan`, `PasarGelapAgung`, `KandangTawanan`, `MenaraTerlarang`, `GulunganTerlarangItem`, `SarangKontrak`, `JamBerburu`, `Gentar`, `Infami`, `PemburuLurus`, `PenyerbuanLurus`, `PestaDarah`, `BuronanIblis`); `tema/bersama/**` (`TanduEntity`, `PintuAirEntity`, `Dagang`, `KontrakMuatan`, `PetiDagangItem`, `DagangItems`, `TemaLayar` (pembangun lembar), `TemaCerita` (syarat/akibat/tujuan quest tema)) | `tools/tempat_tema_lib.py`, `tools/gen_tempat_tema_{pelabuhan,oasis,air,gunung,iblis,satelit,data}.py`; `data/kultivator/structure/kota_tema/**` (NBT), `worldgen/{structure,structure_set,template_pool,processor_list}/kota_tema/**`, tag `has_structure/kota_tema/**` dan `tags/worldgen/structure/kota_tema.json`, `resourcepacks/dunia_kotatema/**`; `data/kultivator/tempat/{dialog,quest,kabar}/tema_*.json`, `data/kultivator/tempat/{permintaan,jadwal}/kota_tema_*.json`, `data/kultivator/tempat/dagang/**`, `loot_table/tema/**`, `advancement/tempat/tema_*.json`; `lang-src/tempat_tema.*`, `tempat_tema_cerita.*`, `tempat_tema_lore.*`, `tempat_tema_kalimat.*`, `tempat_tema_panduan.*` |
+| **38TV** | `client/dunia/tempat/tema/**`: `TemaClient` (init + penerima `TemaNet`, satu baris di `TempatClient` yang disiapkan 38W sebagai komentar), `model/**` (semua `*Model`/`*Renderer` entitas 38.T.9), `fx/**` (`BadaiPasirFx`, `LenteraAirFx`, `CahayaBudhaFx`, `LautAwanFx`, `KabutGunungFx`, `SinarSuarFx`, `RiakDarahFx`, `OmbakFx`, `TaliGantungRenderer`, `MuralBillboard`, `PendayungImpostor`), `TemaHub` (kartu "Kota Bertema", `HubCards.register`); `client/tempat/ui/tema/**` (semua layar 38.T.13.3, memakai kit `client/tempat/ui/kit/**` tanpa menyuntingnya) | `tools/gen_tempat_tema_{models,textures,ui}.py`; `assets/kultivator/{models/item,items,textures/item}/fx/tempat/tema/**` (prop 41-62), `{models/item,items,textures/item}/dagang/**` dan `.../tema/**` (item 38TK), `textures/entity/tempat/tema/**`, `textures/dunia/tempat/tema/**`, `textures/gui/tempat/tema/**`; `lang-src/tempat_tema_model.*`, `tempat_tema_ui.*` |
+
+#### 38.T.14.3 Baris tambahan pada modul inti (berkas yang sudah mereka miliki; semua aditif)
+
+| Modul | Tambahan | Berkas (sudah milik modul itu) |
+|---|---|---|
+| **38W** | `Rencana.simpul(...)` dan `Rencana.zonaAman(...)` (metode default, 38.T.2.1); `RencanaJalan` memakai `simpul` semua rencana; `TempatZones.safe` memakai `zonaAman`; `TempatApi.arrival` memakai jangkar `kota_tema/tiba` bila ada (tiba di luar Gerbang Tengkorak); stub `dunia/tempat/tema/TemaApi.java` + komentar baris init 38TK/38TV di langkah 1; tag `tempat_berpenghuni`, `tempat_dirawat` (+ `kota_tema/*`); `cek_tempat.py`: kode sisi, jenis titik baru, rentang salt 380401-380452, anggaran tema; penanda `DuniaMarkers` 42-49 + ikon di `gen_dunia_peta_textures.py`; bab 20 `GuideChapters`; chip `tema` di `DuniaCommands.CHIPS`; kepadatan tema di `uji tempat kepadatan` | `dunia/tempat/**` (38W), `tools/{cek_tempat,tempat_lib}.py`, `DuniaMarkers.java`, `GuideChapters.java`, `DuniaCommands.java`, tag `tempat_*` |
+| **38NL** | peran `NpcRole` 38.T.3.3-38.T.7.3 di **akhir** enum setelah peran 38.N.2 (`SYAHBANDAR`, `PETUGAS_BEA`, `PELAUT`, `NAKHODA_LAUT`, `PENJAGA_SUAR`, `TUKANG_KAPAL`, `PENJUAL_IKAN`, `PEDAGANG_SEBERANG`, `PENDETA_LAUT`, `TUAN_BENTENG`, `KAFILAH_BASHI`, `PENUNTUN_UNTA`, `PEDAGANG_BAZAR`, `PENDETA_AIR`, `PELUKIS_GUA`, `PENARI_GURUN`, `PENGAWAL_GURUN`, `NYONYA_SUTRA`, `PENENUN_SUTRA`, `PEMELIHARA_ULAT`, `AHLI_TEH`, `PEMETIK_TEH`, `PENDAYUNG`, `SASTRAWAN`, `KEPALA_BIARA`, `BIKSU_GUNUNG`, `PENJAGA_LIFT`, `KULI_GUNUNG`, `PEMETIK_HERBA`, `PEZIARAH`, `PENGUASA_IBLIS`, `PENEGAK_IBLIS`, `JAGAL_ARENA`, `GLADIATOR_IBLIS`, `MAKELAR_GELAP`, `PENJAGA_KITAB_TERLARANG`, `PEMBUNUH_BAYARAN`, `WARGA_IBLIS`, `PEMBURU_LURUS`: 39 peran); `townsfolk()` memuat peran sipil damai (bukan peran iblis kecuali `WARGA_IBLIS` = tidak); `KlipKatalog` 79-107; `PropId` 41-62; `Jadwal` membaca data opsional `data/kultivator/tempat/jadwal/<jenis_situs>.json` (timpa per peran per jam, geser 12 jam untuk kota malam) | `dunia/kota/NpcRole.java`, `dunia/tempat/hidup/**`, `client/dunia/tempat/hidup/**` |
+| **38MD** | perlengkapan 38.T.8.2 (pita 32-47; atlas 64 × 1536, pita 0-31 disalin byte demi byte) | `tools/gen_tempat_gear.py`, `client/dunia/kota/KotaGear.java`, `KotaGearLayer.java`, `perlengkapan.png` |
+| **38ST** | 56 baris suara 38.T.12 di `gen_voices.py` + grup `tema` di `VoiceEvents`; pendaftaran syarat/akibat/tujuan quest dari modul lain: `Syarat.daftar(String id, ...)`, `Akibat.daftar(...)`, `QuestTracker.daftarTujuan(...)` (38TK mendaftarkan `infami`, `gentar`, `pita_dagang`, `naik_lift`, `ziarah_selesai`, `tebus`, `lentera_dilepas`, `kapal_lintas`, dst.) | `tools/gen_voices.py`, `voice/VoiceEvents.java`, `dunia/tempat/cerita/**` |
+| **38EK** | `EkonomiApi.daftarJenisMisi(JenisMisi)`; `KafilahSekte` membaca semua `data/kultivator/tempat/permintaan/*.json` dan `TemaApi.rupaKafilah`; `KafilahJalan` meneruskan rupa ke 38TK (tubuh unta/kapal dimunculkan 38TK lewat `TemaApi`); `ProfilLelang`/`BalaiLelang.mulai` publik (sudah direncanakan) dengan `tabelLot` dari data | `dunia/tempat/ekonomi/**`, `dunia/kota/BalaiLelang.java` |
+| **38KS** | `Towns` menerima `kota/kota_tema` (SAFE_RADIUS 160); jenis tujuan teleport dan Perjalanan Awan + `kota_tema/*` | `dunia/kota/Towns.java`, `dunia/tempat/kotabesar/Teleport.java` |
+| **38PR** | faktor tempat dan kekuatan 38.T.11; gaya tagihan `iblis` (penagih, Harga Darah, akibat tolak lewat `TemaApi`); air kanal di kotak `kanal` boleh dipulihkan | `dunia/tempat/perbaikan/**` |
+| 38UI, 38DS, 38GU | tidak ada | — |
+
+#### 38.T.14.4 Kontrak tema
+
+- **C38.T1 `TemaApi`** (38TK; stub 38W langkah 1 dengan nilai bawaan aman): `@Nullable String temaDi(ServerLevel,
+  BlockPos)`, `String rupaKafilah(long situsAsal, long situsTujuan)` (bawaan `"GEROBAK"`), `double permintaan(long
+  situsId, Item)` (bawaan 1.0), `int infami(ServerPlayer)` (0), `void tambahInfami(ServerPlayer, int, String alasan)`,
+  `int gentar(ServerPlayer, long situsId)` (0), `boolean zonaPerjanjian(ServerLevel, BlockPos)` (false), `void
+  tolakTagihanIblis(ServerPlayer, long situsId)` (dipanggil 38PR), `@Nullable Entity tubuhKafilah(ServerLevel, String
+  rupa, Vec3 pos, float yaw)` (dipanggil 38EK).
+- **C38.T2 `TemaEntities`** (38TK): semua `EntityType` 38.T.9 didaftarkan di awal langkah 2b (stub tipe dulu, pola 38.E.0
+  langkah 1) agar 38TV bisa mendaftarkan renderer sejak awal; 38TV tidak mengubah atribut atau perilaku.
+- **C38.T3 lembar layar**: setiap layar `tema_*` punya kunci lembar yang ditulis di javadoc pembangun lembar `TemaLayar`
+  (38TK); 38TV hanya membaca.
+- **C38.T4 `TemaNet`** (38TK): payload `kultivator:tema_fx` `(int jenis, long situsId, CompoundTag data)` dengan jenis
+  `BADAI` (mulai, akhir, pusat, jari-jari), `FESTIVAL`, `SPLINE` (titik kanal sekali per kota), `CAHAYA`, `KAPAL_JADWAL`;
+  ≤ 8 KB per paket.
+- Peristiwa lintas modul memakai `TempatEvents` 38W: `ACARA(level, situsId, "tema.<acara>", mulai)`, `QUEST(player, id,
+  tahap)`.
+
+#### 38.T.14.5 Urutan kerja
+
+1. **Langkah 1 (38W):** stub `TemaApi`, komentar baris init, metode default `Rencana`, tag, aturan `cek_tempat.py`.
+2. **Langkah 2 (sepuluh modul inti):** termasuk baris tambahan 38.T.14.3.
+3. **Langkah 2b (38TK + 38TV paralel):** 38TK mendaratkan `TemaEntities` + `TemaNet` + `TemaLayar` (tanda tangan) dulu,
+   lalu keduanya bekerja paralel; masing-masing menjaga `docs/progres/kota-TK.md` / `kota-TV.md` (checklist + langkah
+   berikutnya, aturan progres pengguna).
+4. **Langkah 3 (finish 38):** generator Python tema (NBT, JSON, tekstur, model, UI, suara VOICEVOX), `cek_tempat.py`,
+   harness `scratchpad/final/wg/run_all.sh` dengan 46 + 2 struktur tema, `mergeLang`, lalu satu langkah Gradle
+   (`compileJava`, `compileClientJava`, `jar`, `--no-daemon`). Tidak ada tes, `runClient` atau `gradlew build`.
+
+### 38.T.15 Uji terima dan daftar uji
+
+#### 38.T.15.1 Bukti konten nyata (tambahan 38.E.4)
+
+| Fitur | Bukti yang harus terlihat | Cara cepat |
+|---|---|---|
+| Rencana | tiap tema punya kandidat; empat tema damai punya kota pertama layak di 1400-4200 (atau alasan jelas), Kota Iblis di 3500-6000 | `uji tema rencana` |
+| Pelabuhan | sepertiga kota di atas air di tiang, tembok laut, mercusuar di ujung pemecah ombak, gaya bata merah ekor walet | `uji tema cari pelabuhan`, terbang keliling |
+| Kapal dagang | kapal datang berlayar, layar digulung, jangkar turun, kuli bongkar muatan, derek berputar; geladak bisa dipijak; berangkat dan memudar | `uji tema acara pelabuhan kapal_datang` |
+| Laut | Kapal Lintas Laut membawa pemain ke dermaga Laut Tanpa Batas dan Gerbang Pulang kembali ke pelabuhan | layar `tema_kapal` |
+| Oasis | danau bulan sabit, bazar berkain, Tebing Seribu Lukisan, karavanserai, Gerbang Giok | `uji tema cari oasis` |
+| Kafilah unta | unta Baktria berjalan pace beriring bertali, berlutut saat badai | `uji tema acara oasis kafilah_agung`, `... badai_pasir` |
+| Badai pasir | dinding pasir datang, kabut, NPC berlindung, gerbang menutup, cuaca dunia **tidak** berubah, Temuan Pasir sesudahnya | `uji tema acara oasis badai_pasir mulai` |
+| Kota Air | kanal bersambung tanpa buntu, Jembatan Kembar (lengkung bundar + persegi), Pintu Air, taman klasik | `uji tema cek`, `uji tema cari air` |
+| Perahu | Perahu Pos membawa pemain antar-halte dengan pendayung beranimasi yuloh; perahu naga berlomba | `uji tema perahu`, `uji tema acara air perahu_naga` |
+| Lentera air | lentera hanyut sepanjang kanal ke danau, harapan tampil hanya untuk pemiliknya | `uji tema acara air lentera_air` |
+| Kota Gunung | tiga baris teras naik, tangga dengan gapura per bordes, rumah panggung di tepi, Aula Emas di puncak | `uji tema cari gunung` |
+| Kereta gantung / katrol | kabin naik di tali (kurva gantung), berayun, roda stasiun berputar; katrol diputar penjaga | `uji tema lift naik` |
+| Ziarah dan Cahaya Budha | 9 bordes berasap, Restu Puncak; cincin cahaya di awan dengan bayangan pemain | `uji tema fx cahaya`, ziarah manual |
+| Kota Iblis | Gerbang Tengkorak (rahang membuka), arena berlubang bertribun penuh impostor, menara sembilan lantai, kandang | `uji tema cari iblis` |
+| Arena darah | laga melawan gladiator bernama; pemain dihentikan di 5 % HP, tidak mati; taruhan EV 0.90 | `uji tema arena 3`, `uji tema taruhan` |
+| Tawanan | tebus → tawanan mengikuti dan diantar pulang; tidak ada opsi memiliki tawanan | layar `tema_tawanan` |
+| Pemburu lurus | buronan iblis bernama di papan; Infami 45 → regu pemburu mencegat di luar tempat aman dengan dialog | `uji tema infami 45`, `uji tema pemburu` |
+| Dagang | beli sutra di Kota Air, jual di Oasis dengan laba; jenuh menurunkan harga; batas laba berlaku | `uji tema dagang simulasi 7` |
+| Model dan klip | semua entitas tema dan klip 79-107 tampil tanpa patah, prop 41-62 di tangan | `uji tema model`, `uji hidup klip semua` |
+| Cerita | lima rantai quest dapat dilompati per bab dengan adegan; cabang menghasilkan akhir berbeda | `uji tema alur <tema> <bab>` |
+| Suara | 56 baris tema terdengar (Jepang) dengan subtitel ID/EN | interaksi |
+
+#### 38.T.15.2 Daftar uji (Indonesia, ditambahkan ke `docs/uji/FASE-38.md` sebagai bagian 38.T)
+
+1. Dunia baru: `uji tema rencana` menampilkan lima tema; empat tema damai layak di cincin pertama (atau alasan); `uji tema
+   cari <tema>` membawa ke setiap kota; semua distrik lengkap, tidak ada lot hilang, tidak ada struktur lain di zona.
+2. Pelabuhan: dermaga di atas laut berdiri di tiang sampai dasar; air laut tetap di sekitar tiang (tidak ada kantong udara);
+   rotasi kota menghadap laut.
+3. Kapal dagang datang pukul 08:00-10:00 (tick 2000-4000) hari siklusnya, tambat, bongkar, lalu berangkat; restart server di tengah tambat:
+   kapal muncul lagi di tambatannya (dari jangkar + data siklus).
+4. Kapal Lintas Laut (pita Fondasi): adegan berlayar, tiba di dermaga Laut Tanpa Batas; Gerbang Pulang kembali ke dermaga
+   pelabuhan; murid (≤ 2) ikut.
+5. Serbuan Bajak Laut: kapal hitam datang, band menyerbu dermaga, tidak ada blok rusak oleh bajak laut; menang → hadiah Kas
+   Kota.
+6. Oasis: tawar di bazar tiga putaran; harga akhir ≥ 0.90 dasar; tawaran terlalu rendah membuat pedagang ketus.
+7. Badai pasir: di luar tembok tanpa Restu Mata Air → Lambat I; di dalam tembok aman; `isRaining/isThundering` dunia tidak
+   berubah; sesudahnya 2-4 Temuan Pasir.
+8. Kafilah Agung: unta beriring masuk Gerbang Giok, berlutut di karavanserai; ikut kafilah sebagai penumpang; sewa unta,
+   tinggalkan 2 menit → unta pulang.
+9. Reruntuhan gurun: Lempeng Peta menunjuk; Raja Kalajengking menggali (tanpa blok berubah) dan muncul; hadiah sekali.
+10. Kota Air: semua kanal bersambung (`uji tema cek`); Perahu Pos melewati 4 halte; Tikus Air dikejar dengan perahu
+    sewaan; barang kembali.
+11. Malam Lentera Air (bulan mati): warga melepas lentera; pemain menulis harapan; pemain kedua tidak melihat teks
+    harapan pemain pertama.
+12. Lomba Perahu Naga sebagai penabuh: ketepatan irama mempercepat perahu; juara mendapat hadiah.
+13. Kota Gunung: kereta gantung naik dua bentang lewat tiang tengah; badai petir menghentikannya; Lift Macet quest: tali
+    turun, pemain turun selamat.
+14. Ziarah: terbang sekali di tengah → batal; ulangi tanpa terbang → Restu Puncak; meditasi di teras Aula Emas mendapat
+    faktor ekstra (dalam CAP).
+15. Kera gunung merebut bakpao di tangan, tidak pernah barang lain; lempar buah → barang jatuh.
+16. Longsor saat hujan: batu menggelinding dan terpental di pagar; tidak ada blok berubah.
+17. Kota Iblis: pita Pemurnian Qi ditolak di gerbang; pita Fondasi masuk dengan kartu merah; upeti dibayar; terbang
+    masuk tanpa upeti dan terlihat → penegak bermusuhan.
+18. Zona Perjanjian: menyerang NPC di pasar → semua penegak memburu; di luar ZP pada malam hari → Jam Berburu (bayar atau
+    lawan) maksimal sekali semalam.
+19. Arena: lima laga, kalah satu kali → pemain dihentikan di 5 % HP dan hidup; taruhan 1000 kali simulasi → EV 0.88-0.92.
+20. Tawanan: tebus satu, kawal ke kampung asal → Nama Baik +3 kampung, Infami −5; tidak ada pilihan memperbudak.
+21. Menara Kitab Terlarang: lantai terkunci per Gentar; gulungan Bakar Darah bekerja dan menambah Infami.
+22. Infami ≥ 40: regu Pemburu Lurus mencegat di jalan (tidak di dalam tempat aman); "Menyerah dan menebus" menurunkan
+    Infami 20; buronan iblis bernama dari papan bisa ditemukan di jalan dan memberi standing sekte Lurus +3.
+23. Penyerbuan Lurus: pilih pihak; hasil berbeda (kandang kosong / upeti naik); gerbang = entitas, tidak ada blok runtuh.
+24. Dagang: `uji tema dagang simulasi 7` pada pita 3: laba per minggu ≤ `150 × 4 = 600` NB; jenuh terlihat setelah 10 unit;
+    selundupan disita 40 % di bea.
+25. Kontrak muatan dengan kapal terbang ke ibu kota: bayaran × 1.3; peti dibuka di jalan → gagal, deposit hilang.
+26. Lima rantai quest: setiap bab bisa dilompati (`uji tema alur`), setiap cabang utama menghasilkan akhir yang berbeda
+    (pelabuhan bab 6 a/b/c, oasis bab 5 a/b/c, air bab 4, gunung bab 4-5, iblis tiga rute).
+27. Perbaikan: rusak dermaga dan kanal (`uji tempat rusak 30 pemain`) → tagihan dari penagih kota; air kanal dipulihkan;
+    di Kota Iblis tagihan = Harga Darah, tolak → penegak bermusuhan 1 hari.
+28. Peta dan hub: penanda 42-49 muncul setelah kota ditemukan; kartu "Kota Bertema" menampilkan Infami, Gentar dan Buku
+    Dagang; Kitab Panduan bab 20 mencentang langkah.
+29. Performa: di tengah setiap kota tema, `uji tempat ukur` bagian `tema` ≤ 0.6 ms/tick; Efek Minimal: tanpa partikel
+    badai, lentera air, cincin cahaya; entitas mekanisme ≤ 12 per kota.
+30. Keamanan: grep finish: tidak ada `setBlock`, `LightningBolt`, `setWeatherParameters`, `Explosion`, `FallingBlockEntity`
+    baru di `dunia/tempat/tema/**`; semua mekanisme adalah entitas `noSave`.

@@ -1,0 +1,22 @@
+{
+  "kultivator.sekte_langit.visual.title": "Pemandangan Langit",
+  "kultivator.sekte_langit.visual.foot": "Kualitas efek: %s  ·  langit menggambar %s quad bingkai lalu  ·  aula langit tersinkron: %s",
+  "kultivator.sekte_langit.visual.lautAwan": "Laut awan",
+  "kultivator.sekte_langit.visual.lautAwan.tip": "Tiga lapis awan di bawah pulau, melekat pada dunia dan hanyut mengikuti angin hari ini. Memudar sampai 384 blok.",
+  "kultivator.sekte_langit.visual.airTerjun": "Air terjun kabut",
+  "kultivator.sekte_langit.visual.airTerjun.tip": "Pita air yang tumpah dari takik tepi pulau lalu berubah menjadi kabut. Hanya gambar: tidak ada air nyata yang jatuh dari pulau.",
+  "kultivator.sekte_langit.visual.sungaiBintang": "Sungai Bintang",
+  "kultivator.sekte_langit.visual.sungaiBintang.tip": "Bima Sakti dan bintang berkedip di atas awan pada malam cerah, berputar bersama langit.",
+  "kultivator.sekte_langit.visual.halo": "Cahaya Buddha",
+  "kultivator.sekte_langit.visual.halo.tip": "Pada sebagian fajar, saat matahari rendah di belakangmu, lingkar pelangi muncul di laut awan mengelilingi bayanganmu (ilham Puncak Emas Gunung Emei).",
+  "kultivator.sekte_langit.visual.bangau": "Kawanan bangau",
+  "kultivator.sekte_langit.visual.bangau.tip": "Bangau bermahkota merah terbang berformasi V mengelilingi pulau pada siang hari.",
+  "kultivator.sekte_langit.visual.kelopak": "Kelopak plum",
+  "kultivator.sekte_langit.visual.kelopak.tip": "Kelopak dari pohon plum pulau tertiup angin melewati tepi dan memudar di bawah awan.",
+  "kultivator.sekte_langit.visual.lentera": "Lentera langit",
+  "kultivator.sekte_langit.visual.lentera.tip": "Pada malam pesta (tiga malam setelah Upacara Naik, tahun baru dunia, setelah turnamen) lentera kertas dilepas dari plaza.",
+  "kultivator.sekte_langit.visual.cuacaKebal": "Kebal cuaca",
+  "kultivator.sekte_langit.visual.cuacaKebal.tip": "Di atas laut awan langit selalu cerah: hujan dan salju tidak digambar dan tidak terdengar di sana. Badai tetap turun di tanah di bawah.",
+  "kultivator.sekte_langit.visual.suaraAmbien": "Suara ambien langit",
+  "kultivator.sekte_langit.visual.suaraAmbien.tip": "Angin di tepi, lonceng gerbang saat fajar, lonceng angin di bawah atap, kepak bangau dan gemericik air terjun kabut."
+}
