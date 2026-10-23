@@ -9,6 +9,7 @@ import dev.kultivator.formasi.effect.FormationEffect;
 import dev.kultivator.formasi.spec.Family;
 import dev.kultivator.formasi.spec.FormationSpec;
 import dev.kultivator.sect.hall.Halls;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -36,6 +37,16 @@ public final class TransportNetwork {
 
 	public static final String M3 = "sect_transfer";
 	public static final String L5 = "ancient_transfer";
+	/**
+	 * Formasi Pindah Awan (DESIGN 37.5.1, Sekte Langit 37M; spec of {@code CatalogLangit}): a node pair between the ground
+	 * and a sky island. A trip touching an {@code awan_transfer} node is linked when one end stands in the territory and
+	 * the other within {@link #AWAN_RANGE} blocks (horizontal, any height) of the stele; channel, refusals and qi as M3.
+	 */
+	public static final String AWAN = "awan_transfer";
+	/** Horizontal reach of a ground Cloud Transfer node from the stele. */
+	public static final int AWAN_RANGE = 128;
+	/** Daya a Cloud Transfer trip costs its source (none with a keeper, like M3). */
+	public static final double AWAN_COST = 1.0D;
 	public static final double M3_COST = 1.0D;
 	public static final double L5_COST_STEP = 2.0D;
 	public static final double L5_STEP_BLOCKS = 512.0D;
@@ -82,6 +93,10 @@ public final class TransportNetwork {
 		if (from.id() == to.id() || !from.dim().equals(to.dim()) || !from.owner().equals(to.owner())) {
 			return false;
 		}
+		if (awan(from) || awan(to)) {
+			// 37M: one end in the (sky) hall's territory, the other within AWAN_RANGE of the stele, at any height.
+			return inside(level, from) && nearHall(level, to) || inside(level, to) && nearHall(level, from);
+		}
 		if (ancient(from) || ancient(to)) {
 			return ancient(from) && ancient(to) || inside(level, from) && inside(level, to) || ancient(from) && inside(level, to)
 					|| ancient(to) && inside(level, from);
@@ -93,8 +108,35 @@ public final class TransportNetwork {
 		return Halls.inTerritory(core.owner(), level, Vec3.atCenterOf(core.eye()));
 	}
 
+	/** True for a Cloud Transfer node (37M). */
+	public static boolean awan(CoreView core) {
+		return AWAN.equals(core.spec());
+	}
+
+	/** {@code core} stands within {@link #AWAN_RANGE} blocks (horizontal) of its owner's stele, in the hall's dimension. */
+	private static boolean nearHall(ServerLevel level, CoreView core) {
+		return awanSite(core.owner(), level, core.eye());
+	}
+
+	/**
+	 * True when {@code eye} may hold a Cloud Transfer node of {@code owner} outside the territory: the hall is active, in
+	 * this dimension, and its stele lies within {@link #AWAN_RANGE} blocks horizontally (37M; the ground end of the pair).
+	 */
+	public static boolean awanSite(UUID owner, ServerLevel level, BlockPos eye) {
+		Halls.HallView hall = owner == null ? null : Halls.hallOf(owner);
+		if (hall == null || !hall.active() || !hall.dim().equals(level.dimension())) {
+			return false;
+		}
+		long dx = eye.getX() - hall.pos().getX();
+		long dz = eye.getZ() - hall.pos().getZ();
+		return dx * dx + dz * dz <= (long) AWAN_RANGE * AWAN_RANGE;
+	}
+
 	/** Daya the source pays for a trip (before keeper rules). */
 	public static double cost(CoreView from, CoreView to) {
+		if (awan(from)) {
+			return AWAN_COST;
+		}
 		if (!ancient(from)) {
 			return M3_COST;
 		}
@@ -144,7 +186,11 @@ public final class TransportNetwork {
 		if (destinationOff(to)) {
 			return Component.translatable("kultivator.formasib.trip.refuse.dest_off");
 		}
-		if (!level.isLoaded(to.eye()) && !ancient(from)) {
+		boolean cloud = awan(from) || awan(to);
+		if (!level.isLoaded(to.eye()) && cloud) {
+			// 37M: the other end of a Cloud Transfer pair may lie out of view; a short ticket loads it during the channel
+			dev.kultivator.dunia.DuniaTickets.touch(level, net.minecraft.world.level.ChunkPos.containing(to.eye()), 1);
+		} else if (!level.isLoaded(to.eye()) && !ancient(from)) {
 			return Component.translatable("kultivator.formasib.trip.refuse.unloaded");
 		}
 		// The source must run: a switched-off, suspended or broken node never sends anyone, keeper or not. A keeper at
@@ -169,7 +215,12 @@ public final class TransportNetwork {
 			return Component.translatable("kultivator.formasib.trip.refuse.daya", Math.round(cost));
 		}
 		int length = ancient(from) ? TransportChannel.L5_CHANNEL : kept ? TransportChannel.M3_CHANNEL_KEPT : TransportChannel.M3_CHANNEL;
-		return TransportChannel.start(player, from, to, length, ancient(from), cost, !space, instant);
+		Component refused = TransportChannel.start(player, from, to, length, ancient(from), cost, !space, instant);
+		if (refused == null && cloud) {
+			// 37M: the cloud pillar at both ends, the arrival effect and the first-trip advancement
+			dev.kultivator.sekte.langit.gerak.PindahAwan.started(player, from.eye(), to.eye(), instant ? 0 : length);
+		}
+		return refused;
 	}
 
 	/** True when a destination node is switched off or suspended (it takes no traveller; BROKEN has its own line). */

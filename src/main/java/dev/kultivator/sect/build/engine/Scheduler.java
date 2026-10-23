@@ -18,8 +18,16 @@ final class Scheduler {
 
 	/** The next component to open, or null when nothing can open now. */
 	static @Nullable Component next(Site site) {
+		if (site.foot) {
+			// A Mountain Foot (DESIGN 37.3.6) keeps what stands; it is never built further.
+			return null;
+		}
 		TemplateSpec spec = site.spec();
 		int limit = site.testTarget >= 0 ? Math.min(SectTemplates.TIERS, site.testTarget) : SectTemplates.TIERS;
+		if (site.sky && site.tethered) {
+			// Sekte Langit (DESIGN 37.3.5): a tethered sky site builds tier 1 only, then waits for the Ascension.
+			limit = Math.min(limit, dev.kultivator.sect.build.flow.LangitPlan.TETHER_MAX_TIER);
+		}
 		// Tambahan: unfinished components of tiers the site already completed.
 		for (Component component : spec.components()) {
 			if (component.tier() <= site.tier && component.tier() <= limit && available(site, component)) {

@@ -22,7 +22,14 @@ import java.util.function.Consumer;
  */
 public final class TemplateExtensions {
 
-	/** One extension: {@code owner} names it in logs, {@code template} 1-9 or 0 for every template. */
+	/**
+	 * Every sky template 11-19 (DESIGN 37.4.9 item 6). {@code 0} means every <b>ground</b> template 1-9 only: the plots
+	 * DESIGN 36 extensions use are ground coordinates, so they never reach the Awan family (which places the DESIGN 36
+	 * components with the same {@code sx_*} ids and anchors itself).
+	 */
+	public static final int SKY_ALL = -1;
+
+	/** One extension: {@code owner} names it in logs, {@code template} 1-9, 11-19, 0 (every ground) or {@link #SKY_ALL}. */
 	private record Extension(String owner, int template, Consumer<TemplateSpec.Builder> adder) {
 	}
 
@@ -30,11 +37,12 @@ public final class TemplateExtensions {
 	private static volatile boolean frozen;
 
 	/**
-	 * Adds {@code adder} to template {@code template} (1-9, or 0 for all nine; it then reads {@code builder.template()}).
-	 * Returns false when refused (too late, bad template, null adder).
+	 * Adds {@code adder} to template {@code template} (1-9 or 11-19; 0 for all nine ground templates; {@link #SKY_ALL}
+	 * for all nine sky templates; it then reads {@code builder.template()}). Returns false when refused (too late, bad
+	 * template, null adder).
 	 */
 	public static synchronized boolean register(String owner, int template, Consumer<TemplateSpec.Builder> adder) {
-		if (adder == null || template != 0 && !SectTemplates.valid(template)) {
+		if (adder == null || template != 0 && template != SKY_ALL && !SectTemplates.validAny(template)) {
 			return false;
 		}
 		if (frozen) {
@@ -53,7 +61,10 @@ public final class TemplateExtensions {
 			mine = List.copyOf(EXTENSIONS);
 		}
 		for (Extension extension : mine) {
-			if (extension.template() != 0 && extension.template() != builder.template()) {
+			int wanted = extension.template();
+			boolean match = wanted == builder.template() || wanted == 0 && SectTemplates.valid(builder.template())
+					|| wanted == SKY_ALL && SectTemplates.isSky(builder.template());
+			if (!match) {
 				continue;
 			}
 			try {

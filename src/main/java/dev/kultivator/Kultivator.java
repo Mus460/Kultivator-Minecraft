@@ -147,6 +147,8 @@ public class Kultivator implements ModInitializer {
 		dev.kultivator.duel.Duel.init();
 		// Sekte yang Hidup (DESIGN 36): the lead's core and the ten sect-and-disciple modules, before ModItems.init.
 		dev.kultivator.sekte.SekteContent.init();
+		// Sekte Langit (DESIGN 37): the sky sect core (37B) and its three modules, after SekteContent, before ModItems.init.
+		dev.kultivator.sekte.langit.LangitContent.init();
 		// After every module registered its items.
 		ModItems.init();
 		// Phase 6c (DESIGN 22.2.3, 22.18.1): the technique registry is built here only, after every module registered its

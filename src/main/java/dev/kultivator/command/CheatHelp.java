@@ -74,7 +74,9 @@ final class CheatHelp {
 			// DESIGN 35.8.4: the sword duel's test commands (module S).
 			new Group("duel", dev.kultivator.duel.Duel.testChips()),
 			// DESIGN 36.3.4: Sekte yang Hidup's test commands (the lead's live chip list, each module appends its own).
-			new Group("perguruan", dev.kultivator.sekte.SekteCommands.CHIPS));
+			new Group("perguruan", dev.kultivator.sekte.SekteCommands.CHIPS),
+			// DESIGN 37.7.9 (audit 4.1: group "sekte_langit", not "langit"): Sekte Langit's tests (module 37G).
+			new Group("sekte_langit", dev.kultivator.sekte.langit.LangitTests.CHIPS));
 
 	/** Prints the grouped help; {@code root} is the alias that was typed ("kultivasi" or "cultivate"). */
 	static int show(CommandSourceStack source, String root) {

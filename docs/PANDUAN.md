@@ -122,6 +122,8 @@ bulat di dalam game.
     Tetua dan Pewaris, misi cerita, lambang, diplomasi, Kebun dan Tambang, [perintah uji](#6612-perintah-uji-op)
 67. [**Perubahan keseimbangan (audit integrasi)**](#67-perubahan-keseimbangan-audit-integrasi): panduan, ekonomi,
     kekuatan, dunia, sekte
+68. [**Sekte Langit**](#68-sekte-langit): templat Awan A1-A9, Upacara Naik, akses dan Feri Awan, perlindungan jatuh,
+    peristiwa langit, sekte langit NPC, [perintah](#689-perintah)
 
 ---
 
@@ -207,7 +209,7 @@ bermain; tombol angka `1`–`8` berpindah bagian, `Tab` / `Shift+Tab` berpindah 
 | 1 | **Diri** | Status · Akar & Dao · Jalan · Alkimia |
 | 2 | **Teknik** | Peluncur Kitab Teknik (Kodeks, Rangkai Segel, Kehancuran Diri) |
 | 3 | **Murid** | Gulungan murid terdekat · Suasana Hati Murid · Catatan Tangga |
-| 4 | **Sekte** | Dua sub-koin (`Tab`). **Aula**: Aula, Bangun, Formasi, Anggota, Perbendaharaan, Kegiatan, Wilayah, Segel Merah Murid (aula sendiri dari jauh). **Perguruan** (Sekte yang Hidup, [66](#66-sekte-yang-hidup); butuh Prasasti Aula Sekte): Jaring Hubungan, Paviliun & Makam, Balai Tetua, Misi Cerita, Lambang & Seragam, Turnamen, Diplomasi Sekte, Kebun & Tambang |
+| 4 | **Sekte** | Dua sub-koin (`Tab`). **Aula**: Aula, Bangun, Formasi, Anggota, Perbendaharaan, Kegiatan, Wilayah, Segel Merah Murid (aula sendiri dari jauh). **Perguruan** (Sekte yang Hidup, [66](#66-sekte-yang-hidup); butuh Prasasti Aula Sekte): Jaring Hubungan, Paviliun & Makam, Balai Tetua, Misi Cerita, Lambang & Seragam, Turnamen, Diplomasi Sekte, Kebun & Tambang, Sekte Langit ([68](#68-sekte-langit)) |
 | 5 | **Dunia** | Alam Rahasia, Pusaka, Musuh, Cincin, Duel Pedang ([65](#65-duel-pedang-kultivator)), Peta Dunia, Menara Seratus, Saingan ([64](#64-dunia-kultivasi-yang-luas)) |
 | 6 | **Keabadian** | Alam Abadi, Purba, Bencana, Batin, Ciptaan, Lelang, Titah Langit, Kota Abadi |
 | 7 | **Panduan** | Kitab Panduan · Ensiklopedia |
@@ -8524,7 +8526,7 @@ atau server berhenti.
 ## 62. Kitab Panduan (di dalam game)
 
 **Kitab Panduan** adalah buku panduan di dalam game, supaya kamu tidak bermain buta dari *Manusia Fana* sampai
-*Dewa Abadi* dengan sekte tingkat tinggi dan banyak murid. Isinya **16 bab dan 153 langkah**, ditampilkan menurut
+*Dewa Abadi* dengan sekte tingkat tinggi dan banyak murid. Isinya **17 bab dan 164 langkah**, ditampilkan menurut
 urutan perjalanan (urutan ini sejak audit integrasi; nomor "Bab N" adalah tempat bab itu di daftar ini):
 
 | Bab | Judul | Menjadi bab sekarang mulai | Syarat lain | Tidak lagi menahan sejak | Langkah |
@@ -8541,13 +8543,14 @@ urutan perjalanan (urutan ini sejak audit integrasi; nomor "Bab N" adalah tempat
 | 10 | Jiwa Baru Lahir sampai Penyatuan Dao | Inti Emas | – | Kenaikan Abadi | 10 |
 | 11 | Formasi Sekte | Inti Emas | aula | Kenaikan Abadi | 8 |
 | 12 | Sekte Tingkat Tinggi | Jiwa Baru Lahir | aula | Dewa Abadi | 10 |
-| 13 | Ujung Dunia | Inti Emas | – | Kenaikan Abadi | 10 |
-| 14 | Kenaikan Abadi | Penyatuan Dao | – | Dewa Abadi | 7 |
-| 15 | Dewa Abadi | Kenaikan Abadi | – | – | 10 |
-| 16 | Tips & Kesalahan Umum | bacaan, tidak pernah menjadi bab sekarang | – | – | 10 |
+| 13 | Sekte Langit | Inti Emas | aula level 6 atau tapak tingkat 6 | – | 11 |
+| 14 | Ujung Dunia | Inti Emas | – | Kenaikan Abadi | 10 |
+| 15 | Kenaikan Abadi | Penyatuan Dao | – | Dewa Abadi | 7 |
+| 16 | Dewa Abadi | Kenaikan Abadi | – | – | 10 |
+| 17 | Tips & Kesalahan Umum | bacaan, tidak pernah menjadi bab sekarang | – | – | 10 |
 
-Isi bab 3 dan 13 ada di [64](#64-dunia-kultivasi-yang-luas), bab 7 dan 9 di [66](#66-sekte-yang-hidup), langkah duel
-(bab 2, 4, 5, 8, 16) di [65](#65-duel-pedang-kultivator). Bab 17 milik Sekte Langit (37) kelak masuk setelah bab 12.
+Isi bab 3 dan 14 ada di [64](#64-dunia-kultivasi-yang-luas), bab 7 dan 9 di [66](#66-sekte-yang-hidup), bab 13 di
+[68](#68-sekte-langit), langkah duel (bab 2, 4, 5, 8, 17) di [65](#65-duel-pedang-kultivator).
 
 **Cara membuka:**
 
@@ -8565,15 +8568,15 @@ selesai), Esc menutup.
 
 **Tiga jenis langkah:**
 
-* **Langkah inti** (94): dicentang sendiri oleh server dari data aslimu, misalnya akar sudah diuji, ranah dan tahap
+* **Langkah inti** (103): dicentang sendiri oleh server dari data aslimu, misalnya akar sudah diuji, ranah dan tahap
   yang dicapai, menit meditasi, Dao dipilih, Iblis Hati dikalahkan, Gua Kediaman, Aula Sekte didirikan dan tingkatnya,
   templat dan tingkat bangunan sekte, jumlah murid, Bintang Abadi, Pengakuan Langit, dan pencapaian mod. Hanya langkah
   inti yang menahan bab sekarang.
-* **Langkah pilihan** (28, bertanda "Pilihan" saat tetikus di atasnya): target sampingan atau target nanti, misalnya
+* **Langkah pilihan** (30, bertanda "Pilihan" saat tetikus di atasnya): target sampingan atau target nanti, misalnya
   Formasi Bintang Surgawi (End Rod dari The End), langkah duel, Hu Fa, murid Inti Emas, Kursi Formasi tingkat 8,
-  Sepuluh Ribu Abadi, aula tingkat 9, Kota Abadi, puncak Menara Seratus, Pewaris dan perang sekte, serta seluruh bab 16.
-  Delapan belas di antaranya tetap dicentang otomatis.
-* **Langkah manual** (31 di luar bab 16): bacaan atau kebiasaan yang tidak bisa dicek server; centang sendiri kotaknya.
+  Sepuluh Ribu Abadi, aula tingkat 9, Kota Abadi, puncak Menara Seratus, Pewaris dan perang sekte, Jaring Awan dan
+  Sembilan Langit, serta seluruh bab 17. Dua puluh di antaranya tetap dicentang otomatis.
+* **Langkah manual** (31 di luar bab 17): bacaan atau kebiasaan yang tidak bisa dicek server; centang sendiri kotaknya.
   Centang ini tersimpan per id langkah di data pemainmu di server (tetap ada setelah keluar-masuk dan saat mati).
 
 Jadi 112 langkah punya cek otomatis dan 41 dicentang sendiri.
@@ -8689,7 +8692,7 @@ Contoh:
 
 Dunia kini jauh lebih luas: kota kultivator, pengembara dan kelompok saingan, gua leluhur dengan teka-teki formasi,
 penjara iblis kuno, Menara Seratus Lantai, peristiwa langit, harta yang lahir, kabut Qi, naga liar, evolusi binatang roh,
-Dunia Bawah, Laut Tanpa Batas, Kota Abadi, kapal terbang sekte dan Peta Dunia. Bab 3 (*Dunia yang Luas*) dan bab 13
+Dunia Bawah, Laut Tanpa Batas, Kota Abadi, kapal terbang sekte dan Peta Dunia. Bab 3 (*Dunia yang Luas*) dan bab 14
 (*Ujung Dunia*) Kitab Panduan menuntunmu langkah demi langkah, dan setiap topik punya halaman sendiri di menu
 *Bantuan*.
 
@@ -9229,7 +9232,7 @@ Gaya boneka: `agresif`, `bertahan`, `penipu`, `santo`. Senjata: `pedang`, `kapak
 
 Langkah baru di Kitab Panduan: *Tangkis serangan monster* dan *Postur dan Tebasan Penentu* (bab 2), *Duel Pedang
 pertama* dan *Tangkisan Sempurna* (bab 4), *Kunci Bilah* dan *Serangan Berbahaya* (bab 5), *Menonton murid berduel*
-(bab 8) dan *Kesalahan umum duel* (bab 16). Semuanya langkah pilihan: tidak menahan bab sekarang. Pencapaian: tangkisan pertama, tangkisan sempurna pertama, tebasan penentu
+(bab 8) dan *Kesalahan umum duel* (bab 17). Semuanya langkah pilihan: tidak menahan bab sekarang. Pencapaian: tangkisan pertama, tangkisan sempurna pertama, tebasan penentu
 pertama, kemenangan duel pertama, menang kunci bilah, Injak Pedang, rantai 10, menonton murid, Kehormatan 1300, dan
 mengalahkan Santo Pedang.
 
@@ -9594,3 +9597,194 @@ lama tetap bisa dimuat: data yang tersimpan diubah dengan aman saat dibaca.
   pil Fase 7 kini juga bekerja untuk murid (Pil Penempa Tulang paling banyak +10 darah per murid).
 * **Ketua Sekte NPC** kini dilawan sebagai Duel Pedang (dengan pembuka, dan hanya bila kamu tidak sedang sibuk).
 * **Kas aula** menampilkan ringkasan *7 hari: +masuk / −keluar PK*. `/kultivasi sekte` adalah alias `/kultivasi perguruan`.
+
+## 68. Sekte Langit
+
+Sektemu bisa naik ke atas awan: pulau batu terapung dengan pulau satelit, jembatan giok, Tangga Awan yang memutar turun ke
+tanah, dermaga kapal, air terjun kabut di tepi, dan pada puncaknya Istana Sembilan Langit. Prasasti Aula Sekte benar-benar
+berdiri di langit, jadi calon murid, murid, formasi, wilayah, penyerbuan dan pos jaga semuanya bekerja di atas sana.
+
+Aturan yang tetap berlaku:
+
+* **Tidak ada blok yang berubah sendiri.** Setiap pulau, jembatan, tangga, dermaga dan gerbang adalah komponen
+  Pembangunan Sekte (bab 20b): dibangun BuildPlacer dari bahan yang kamu setor ke Gudang Bahan, tingkat demi tingkat.
+  Air terjun tepi, laut awan, bangau, kelopak, kubah formasi, lentera dan feri hanyalah gambar atau entitas; tidak ada
+  air yang mengalir keluar pulau. Perlindungan jatuh memakai efek dan teleport, bukan blok.
+* **Tanpa petir buatan, cuaca, waktu atau tick-rate.** Kebal cuaca di pulau hanya visual dan gameplay: petir vanilla di
+  ruang udara sekte menjadi visual saja, salju tidak menumpuk, hujan tidak digambar di atas laut awan.
+* **Ringan untuk laptop lemah.** Semua efek mengikuti Kualitas Efek (Minimal/Normal/Maksimal) dan anggaran bingkai;
+  tampilan "shader" dipalsukan dengan quad aditif berlapis dan tekstur cahaya, tanpa post shader (aman untuk Sodium dan
+  Iris). Tombol **Pemandangan** di layar Sekte Langit menyalakan atau mematikan tiap efek
+  (`config/kultivator-langit-client.json`).
+* **Adegan** (Naik, Bajak Awan, Longbo, Utusan, Pesta) pendek, mengikuti Kamera sinematik Penuh/Singkat/Mati, bisa
+  dilewati dengan **Backspace**, dan tidak diputar saat ada bahaya nyata.
+
+### 68.1 Templat Awan A1-A9
+
+Templat langit bernomor 11-19 dan bersaudara dengan templat darat 1-9. Ukuran tapak dan wilayah dihitung dari tata letak
+pulau (A1-A3 lebih luas dari saudara daratnya karena pulau satelit harus muat).
+
+| No | Nama | Ranah ketua minimum |
+|---|---|---|
+| A1 | Batu Awan Pertapa | Inti Emas |
+| A2 | Pulau Kabut | Inti Emas |
+| A3 | Pulau Bangau | Inti Emas |
+| A4 | Gugus Awan Biru | Jiwa Baru Lahir |
+| A5 | Puncak Melayang | Jiwa Baru Lahir |
+| A6 | Tanah Suci Mengambang | Jiwa Baru Lahir |
+| A7 | Gua Surga di Awan | Transformasi Dewa |
+| A8 | Kunlun Melayang | Transformasi Dewa |
+| A9 | Istana Sembilan Langit | Penyatuan Dao |
+
+Tingkat 1-9 menambah bagian demi bagian: T1 Inti Awan dan Tahta Prasasti (dengan simpul Formasi Pindah Awan), T3 Tangga
+Awan, T5 Jaring Awan dan cakram Formasi Agung, T7 dermaga resmi dan halte Feri Awan, T8 paviliun meditasi di tepi, T9
+Gerbang Sembilan Langit. Bahan per tingkat seimbang dengan templat darat dan dibayar dari Gudang seperti biasa.
+
+### 68.2 Mendirikan dan menaikkan sekte
+
+Ada dua jalan yang bertemu di satu alur:
+
+* **Jalan A "Angkat Gunung ke Langit"**: aula yang sudah punya templat darat tingkat 6 ke atas, level aula 6 ke atas dan
+  Formasi Agung aktif. Templat langit boleh paling banyak satu nomor di atas templat daratmu.
+* **Jalan B "Dirikan di Atas Awan"**: aula baru tanpa templat, hanya A1-A3.
+
+Langkahnya:
+
+1. **Rancang**: hub (`H`) › Sekte › Perguruan › **Sekte Langit** › Rancang (tab Awan di layar templat), atau
+   `/kultivasi aula langit rancang <1-9>`. Atur tinggi (`tinggi naik|turun`, langkah 4 blok, bawaan pelataran di y 232),
+   geser (`geser <dx> <dz>`, maks 64 blok), `putar`, lalu `pratinjau`. Hologram menunjukkan pulau; tanda merah berarti
+   ruang udara terhalang atau langit terlalu sempit.
+2. **Sesaji Angkat Gunung** (`/kultivasi aula langit sesaji` menampilkan tagihannya), diambil dari inventarismu saat
+   `konfirmasi ya` dan dikembalikan utuh bila kamu `batal` sebelum blok pertama ditaruh:
+   A1-A3 16 batu roh Menengah + 8 membran phantom, 8 mutiara ender, 16 bulu; A4-A6 8 batu roh Tinggi + 24 membran,
+   16 mutiara, 4 serpihan gema; A7-A8 24 batu roh Tinggi + 48 membran, 4 air mata ghast, 8 serpihan gema, 1 jantung
+   lautan; A9 2 batu roh Agung + 64 membran, 16 serpihan gema, 1 bintang nether.
+3. **Tertambat**: prasasti masih di tanah; hanya tingkat 1 (Inti Awan + Tahta Prasasti) yang dibangun. Pilar cahaya
+   penambat menghubungkan prasasti darat dengan Tahta.
+4. **Upacara Naik**: setelah T1 selesai, cabut prasastimu, terbang ke atas (pedang, kapal, CloudTravel) dan taruh di alas
+   Tahta. Pilih `[Naik, Kaki Gunung tetap]`, `[Naik, bongkar tapak bawah]` atau `[Naik, tinggalkan tapak bawah]`
+   (Jalan A), atau `[Naik]` (Jalan B). Murid di sekitar dipindah ke pulau dengan efek awan, dan tingkat aula dijamin
+   selama 30 hari agar tidak turun sebelum pulau tumbuh. Formasi Agung darat tidak ikut naik: pelindung aula kembali
+   saat T5 langit selesai.
+5. **Bangun T2-T9** seperti sekte darat (setor bahan, pekerja, kecepatan).
+
+**Kaki Gunung** (Jalan A): tapak darat yang ditinggal tetap terlindung sebagai Kaki Gunung; nanti bisa
+`/kultivasi aula langit kaki bongkar` (dibongkar dengan pengembalian bahan) atau `kaki lepaskan` (menjadi blok biasa).
+**Turun Gunung** = pindah aula biasa: taruh prasasti di tanah dan pilih pindah & bongkar atau pindah & tinggalkan.
+Naik templat di dalam keluarga Awan (misalnya A3 ke A5) memakai alur Naik Templat biasa.
+
+### 68.3 Akses: naik dan turun
+
+| Jalur | Sejak | Siapa | Biaya |
+|---|---|---|---|
+| Pedang terbang | selalu | pemain | Qi |
+| Kapal sekte (merapat ke dermaga) | selalu, dermaga resmi T7 | pemain dan murid | bahan bakar kapal |
+| Formasi Pindah Awan | T1 (simpul langit); simpul tanah kamu taruh sendiri dalam 128 blok | pemain + paling banyak 4 murid | 1 Daya + 10 Qi, jeda 10 dtk |
+| Tangga Awan (jalan kaki, heliks nyata) | T3 | semua | gratis |
+| Feri Awan | T7 | anggota dan murid | gratis |
+| Terjun Awan (turun saja) | T5 | anggota | gratis |
+
+* **Formasi Pindah Awan**: simpul tanah berpola cincin kuarsa halus, sudut balok kecubung, Mata Formasi di tengah;
+  paling banyak 2 simpul per pemilik.
+* **Feri Awan**: bunyikan lonceng di halte atas atau di pelataran kaki tangga, atau `/kultivasi langit feri`. Feri
+  menunggu 30 dtk, membawa 4 penumpang, tidak pernah menembus pulau, dan hilang 20 dtk setelah kosong.
+* **Tangga Awan**: berjalan dari kaki sampai puncak tanpa terbang, menumpang atau teleport memberi pencapaian *Seribu
+  Anak Tangga*. Calon murid tiba di kaki tangga setelah Tangga Awan selesai dan mendaki sendiri.
+* Murid Inti ber-ranah Inti Emas ke atas sesekali **berpatroli dengan pedang** mengelilingi pulau (paling banyak 2).
+
+### 68.4 Perlindungan jatuh
+
+* **Penahan dasar** (selalu aktif sejak tertambat): kamu, rekan sekte, murid dan hewan jinak anggota yang jatuh dari pulau
+  mendapat jatuh lambat, lalu **ditangkap** dan dikembalikan ke titik aman terakhir di pulau. Penangkapan tidak pernah
+  membunuh: bila tidak ada titik aman, kamu hanya melayang turun dengan jatuh lambat. Perampok, bajak awan dan orang asing
+  tidak dilindungi; perampok yang jatuh dihitung "dibuang ke awan".
+* **Jaring Awan** (formasi T5, keluarga Pelindung, memakai Daya): melindungi juga tamu yang diundang
+  (`/kultivasi aula langit undang <pemain>`, 1 hari) dan rombongan sekte sekutu, dan membuka **Terjun Awan**: tahan
+  shift saat meninggalkan tepi pulau, lalu meluncur turun ke tanah tanpa kerusakan jatuh. Bila Jaring padam, penahan
+  dasar tetap bekerja.
+* Gerbang pulau: `/kultivasi aula langit gerbang tutup|buka`. Saat tertutup, pemain bukan anggota didorong keluar dengan
+  lembut, tidak pernah dipindahkan di udara.
+
+### 68.5 Kehidupan di atas awan
+
+* **Qi di ketinggian**: anggota yang bermeditasi di pulau mendapat situs *Sekte Langit* ×1,05-1,25 (naik per tingkat,
+  +0,05 dengan Formasi Agung), yang bertumpuk dengan situs gunung tetapi tetap di dalam batas pengali meditasi ×3,5.
+  Pengurasan urat roh di pulau ×0,9 (×0,85 sejak T5). *Qi Fajar* ×1,05 di paviliun meditasi saat fajar; *Bulan di Atas
+  Awan* ×1,5 (Dao Es) saat purnama walaupun di bawah sedang hujan.
+* **Kesengsaraan dilihat dari atas**: kesengsaraan pemain lain di bawah tampak sebagai pusaran gelap di laut awan dengan
+  kilat yang menembus ke atas. Menyaksikannya (menghadap ke bawah 10 dtk) memberi +2% XP tahap, paling banyak 3 kali
+  sehari.
+* **Halo Pelangi**: saat matahari rendah di belakangmu, bayanganmu di laut awan dikelilingi halo (pencapaian *Cahaya
+  Buddha*).
+* Murid berjaga di tepi, duduk memandang laut awan saat fajar dan senja, dan tidak pernah berjalan keluar pagar tepi.
+
+### 68.6 Peristiwa langit
+
+Diperiksa sekali sehari per pulau yang berdiri, hanya bila kamu atau rekan sekte ada dalam 160 blok; paling banyak satu
+peristiwa per 3 hari.
+
+* **Bajak Awan** (T3+): layar hitam menembus laut awan. Lei Sha, Kapten Bajak Awan, merapat dengan 1-3 perahu di dermaga
+  dan menurunkan regu. Menang: 150 renown dan rampasan ke Lumbung. Tak ada yang melawan 10 menit: mereka membawa 5% satu
+  jenis bahan (paling banyak 300). Perahu Bajak Awan juga mengangkut gelombang Penyerbuan Sekte ke pulau langit.
+* **Raksasa Longbo** (A7+, T8+): kadang menyertai Bajak Awan, memanjat dari laut awan untuk mencuri kura-kura penyangga
+  pulau. Menang: 400 renown dan **Cangkang Kura-kura Langit** (trofi dan bahan altar).
+* **Utusan Istana Langit** (A7+, T9 dengan Gerbang Sembilan Langit): saat senja Xian Lingyue turun di gerbang membawa
+  Perintah Istana Langit. **Terima Perintah**: dalam 3 hari kalahkan 12 kultivator nakal atau persembahkan 8 batu roh
+  Tinggi (648 NB), hadiahnya renown dan gelar "Diakui Langit". **Tolak dengan hormat**: tidak ada hukuman, tetapi tiga
+  penolakan beruntun membuat kesengsaraan berikutnya lebih keras. **Tantang Langit**: Murka Langit datang senja
+  berikutnya bila semua syaratnya terpenuhi (menang: +800 renown).
+* **Tamu Sekte Langit**: rombongan sekte langit NPC yang ramah berkunjung dengan perahu awan (+3 hubungan; sekutu membawa
+  herba langit untuk Lumbung).
+* **Pesta Lentera**: tiga malam setelah Upacara Naik dan setiap 96 hari, lentera langit naik dari pulau.
+
+**Layar Sekte Langit** (hub › Sekte › Perguruan › Sekte Langit) menampilkan diorama pulau dan keadaannya (templat,
+tingkat, ketinggian, tertambat atau berdiri, Formasi Agung, Jaring Awan, gerbang), tiga tab **Peristiwa** (jadwal dan
+Perintah Istana Langit), **Kronik** dan **Tetangga** (sekte langit NPC yang dikenal), serta tombol Rancang, Feri,
+Tutup/Buka Gerbang, Undang dan Pemandangan.
+
+### 68.7 Sekte langit NPC
+
+Dua sekte gerbang NPC terkuat di duniamu punya **Istana Awan** di atas gerbangnya (y 204-228): pulau inti, pulau satelit
+(kebun, alkimia, arena), jembatan dan gerbang beratap tiga. Istana hanya muncul lewat worldgen di **chunk baru** (buat dunia
+baru untuk melihatnya) dan terlindung dari Kehancuran. Mendekat pertama kali memberi pencapaian *Temu Langit*. Hubungan
+memakai Diplomasi Sekte ([66](#66-sekte-yang-hidup)): sekutu memberi hak labuh dan kunjungan tamu; sekte yang bermusuhan
+mengirim Bajak Awan atas namanya. Perang tetap dimenangkan di gerbang darat sekte itu.
+
+### 68.8 Kitab Panduan, pencapaian, config
+
+* **Kitab Panduan bab 13 "Sekte Langit"** (11 langkah, mulai Inti Emas setelah aula level 6 atau tapak tingkat 6;
+  langkah Jaring Awan dan Sembilan Langit pilihan).
+* **15 pencapaian** `sekte_langit/*`: Rancang, Tapak Awan, Naik, Seribu Anak Tangga, Pindah Awan, Feri, Tertangkap,
+  Terjun Awan, Cahaya Buddha, Bajak Awan, Longbo, Utusan Langit, Temu Langit, Sekutu Langit, Sembilan Langit.
+* **Config server**: bagian `sekteLangit` di `config/kultivator-sekte.json` (`aktif`, `gerbangRanah`, `awanAwalMaks`,
+  `sesajiSkala`, `tinggiAsal`, `offsetMaks`, `jaminanHari`, `lindungiUdara`, `jaringDasar`, `tangkapJarak`, `terjunAwan`,
+  `feri`, `patroliPedang`, `faktorQi`, `bajakAwan`, `bajakHari`, `longbo`, `utusanLangit`, `sengsaraSaksi`,
+  `sengsaraLebihKeras`, `kebalSalju`, `strukturNpc`, `sekteNpcMaks`). Saklar hanya mematikan perilaku; barang, entitas
+  dan data tetap terdaftar. `jaringDasar` jangan dimatikan di server publik.
+* **Config klien**: `config/kultivator-langit-client.json` (laut awan, halo, bangau, sungai bintang, air terjun, kelopak,
+  lentera, kebal cuaca, suara ambien).
+
+### 68.9 Perintah
+
+Ketua aula: `/kultivasi aula langit [info]`, `rancang <1-9>`, `sesaji`, `tinggi naik|turun`, `geser <dx> <dz>`, `putar`,
+`pratinjau`, `konfirmasi [ya]`, `batal`, `bubarkan [ya]`, `naik tetap|bongkar|tinggalkan|batal`, `kaki bongkar|lepaskan`,
+`gerbang tutup|buka`, `undang <pemain>`. Semua pemain: `/kultivasi langit feri`, `/kultivasi langit utusan <jawab>`.
+
+**Perintah uji** (op): `/kultivasi uji langit_sekte ...`
+
+| Sub | Fungsi |
+|---|---|
+| `pratinjau <1-9> [tinggi <y>] [putar <0-3>]` | hologram pulau gratis di atas penguji |
+| `pamer <1-9> tingkat <0-9> [tinggi <y>]` | pameran pulau di udara (bisa dibatalkan, paling banyak 2) |
+| `bangun <0-9> [instan\|cepat]` | bangun situs langit sendiri gratis sampai tingkat itu |
+| `naik [paksa]` | jalankan Upacara Naik |
+| `tp tahta\|kaki\|puncak\|feri` / `tp dermaga <i>` | teleport penguji |
+| `feri` / `formasi` | panggil feri, cetak tautan simpul awan |
+| `jatuh [<tinggi>] [terjun]` / `jatuh murid` | uji penangkapan dan Terjun Awan |
+| `patroli` / `tangga` | uji patroli pedang dan pendakian Tangga Awan |
+| `bajak [1-3]` / `longbo` / `utusan` / `tamu` | mulai peristiwa sekarang |
+| `sengsara` / `halo` / `pesta` | efek klien uji |
+| `npc daftar\|cari\|tp <i>` | sekte langit NPC: rencana, terdekat, teleport |
+| `info` / `audit [1-9]` / `reset` | status situs langit, audit rencana Awan, hapus situs uji |
+
+Grup chip **Sekte Langit** ada di daftar cheat.

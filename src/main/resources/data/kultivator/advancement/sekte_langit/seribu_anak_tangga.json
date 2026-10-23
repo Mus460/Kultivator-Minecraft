@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:root",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.sekte_langit.seribu_anak_tangga.description"
+    },
+    "icon": {
+      "id": "minecraft:quartz_stairs"
+    },
+    "title": {
+      "translate": "advancement.kultivator.sekte_langit.seribu_anak_tangga.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

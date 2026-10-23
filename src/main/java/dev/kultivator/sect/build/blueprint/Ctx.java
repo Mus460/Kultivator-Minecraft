@@ -29,8 +29,17 @@ public final class Ctx {
 		this.levels = levels == null ? Map.of() : Map.copyOf(levels);
 	}
 
-	/** A dry-run context: flat land at the plaza floor, rotation 0, every zone at its design level. */
+	/**
+	 * A dry-run context: flat land at the plaza floor, rotation 0, every zone at its design level. A sky template stands on
+	 * its own islands over flat land at its stair foot's design level (DESIGN 37.4.9).
+	 */
 	public static Ctx dry(TemplateSpec spec, Glaze glaze) {
+		if (spec.sky()) {
+			TemplateSpec.Zone kaki = spec.kaki();
+			int ground = kaki == null ? -150 : kaki.design() - 1;
+			return new Ctx(spec, 0, glaze, 0x5EC7L, new dev.kultivator.sect.build.blueprint.awan.AwanTerrain(spec.template(), TerrainView.flat(ground)),
+					Map.of());
+		}
 		return new Ctx(spec, 0, glaze, 0x5EC7L, TerrainView.flat(-1), Map.of());
 	}
 

@@ -1,0 +1,22 @@
+{
+  "kultivator.sekte_langit.visual.title": "Sky Views",
+  "kultivator.sekte_langit.visual.foot": "Effect quality: %s  ·  the sky drew %s quads last frame  ·  sky halls synced: %s",
+  "kultivator.sekte_langit.visual.lautAwan": "Sea of clouds",
+  "kultivator.sekte_langit.visual.lautAwan.tip": "Three cloud layers below the island, fixed to the world and drifting with today's wind. They fade out to 384 blocks.",
+  "kultivator.sekte_langit.visual.airTerjun": "Mist falls",
+  "kultivator.sekte_langit.visual.airTerjun.tip": "Ribbons of water pouring from the notches of the island's rim and turning to mist. Drawing only: no real water ever falls off the island.",
+  "kultivator.sekte_langit.visual.sungaiBintang": "River of Stars",
+  "kultivator.sekte_langit.visual.sungaiBintang.tip": "The Milky Way and twinkling stars above the clouds on clear nights, turning with the sky.",
+  "kultivator.sekte_langit.visual.halo": "Buddha's Light",
+  "kultivator.sekte_langit.visual.halo.tip": "On some dawns, with the sun low behind you, a rainbow ring appears on the cloud sea around your own shadow (inspired by the Golden Summit of Mount Emei).",
+  "kultivator.sekte_langit.visual.bangau": "Crane flocks",
+  "kultivator.sekte_langit.visual.bangau.tip": "Red-crowned cranes fly round the island in a V by day.",
+  "kultivator.sekte_langit.visual.kelopak": "Plum petals",
+  "kultivator.sekte_langit.visual.kelopak.tip": "Petals from the island's plum trees blow past the rim and fade below the clouds.",
+  "kultivator.sekte_langit.visual.lentera": "Sky lanterns",
+  "kultivator.sekte_langit.visual.lentera.tip": "On festival nights (three nights after the Ascension, the world's new year, after a tournament) paper lanterns rise from the plaza.",
+  "kultivator.sekte_langit.visual.cuacaKebal": "Above the weather",
+  "kultivator.sekte_langit.visual.cuacaKebal.tip": "Above the cloud sea the sky is always clear: rain and snow are not drawn or heard there. The storm still falls on the ground below.",
+  "kultivator.sekte_langit.visual.suaraAmbien": "Sky ambient sounds",
+  "kultivator.sekte_langit.visual.suaraAmbien.tip": "Wind at the rim, the gate bell at dawn, wind chimes under the eaves, crane wings and the patter of the mist falls."
+}

@@ -18,7 +18,15 @@ import java.util.UUID;
  * is or is not building right now ({@code status}), the completed tier, the open component and the current rate.
  */
 public record SiteView(UUID owner, ResourceKey<Level> dim, BlockPos stele, int template, int rotation, Glaze glaze, int plazaY,
-		BoundingBox footprint, int state, int status, int tier, int blocked, @Nullable String openId, double rate, long bank, boolean test) {
+		BoundingBox footprint, int state, int status, int tier, int blocked, @Nullable String openId, double rate, long bank, boolean test,
+		boolean sky, boolean tethered, int skyFloorY) {
+
+	/** A ground site (the shape every site had before Sekte Langit). */
+	public SiteView(UUID owner, ResourceKey<Level> dim, BlockPos stele, int template, int rotation, Glaze glaze, int plazaY,
+			BoundingBox footprint, int state, int status, int tier, int blocked, @Nullable String openId, double rate, long bank, boolean test) {
+		this(owner, dim, stele, template, rotation, glaze, plazaY, footprint, state, status, tier, blocked, openId, rate, bank, test, false, false,
+				footprint.minY());
+	}
 
 	// ---- state (saved, DESIGN 21.20)
 	public static final int STATE_NONE = 0;
@@ -51,6 +59,8 @@ public record SiteView(UUID owner, ResourceKey<Level> dim, BlockPos stele, int t
 	public static final int STATUS_COMPLETE = 9;
 	/** The plan is being emitted off the server thread (a moment). */
 	public static final int STATUS_PREPARING = 10;
+	/** Sekte Langit (DESIGN 37.3.5): a tethered sky site finished tier 1; it waits for the stele to be carried up. */
+	public static final int STATUS_AWAIT_ASCENT = 11;
 
 	public CompoundTag toTag() {
 		CompoundTag tag = new CompoundTag();
@@ -72,6 +82,11 @@ public record SiteView(UUID owner, ResourceKey<Level> dim, BlockPos stele, int t
 		tag.putDouble("rate", rate);
 		tag.putLong("bank", bank);
 		tag.putBoolean("test", test);
+		if (sky) {
+			tag.putBoolean("sky", true);
+			tag.putBoolean("teth", tethered);
+			tag.putInt("floor", skyFloorY);
+		}
 		return tag;
 	}
 
@@ -94,6 +109,7 @@ public record SiteView(UUID owner, ResourceKey<Level> dim, BlockPos stele, int t
 		return new SiteView(owner, ResourceKey.create(Registries.DIMENSION, dim), new BlockPos(stele[0], stele[1], stele[2]), tag.getIntOr("t", 0),
 				tag.getIntOr("rot", 0), glaze == null ? Glaze.TINTA : glaze, tag.getIntOr("plaza_y", stele[1] - 1), new BoundingBox(fp[0], fp[1], fp[2], fp[3], fp[4], fp[5]), tag.getIntOr("state", STATE_NONE),
 				tag.getIntOr("status", STATUS_RUNNING), tag.getIntOr("tier", 0), tag.getIntOr("blocked", 0), open.isEmpty() ? null : open,
-				tag.getDoubleOr("rate", 0.0D), tag.getLongOr("bank", 0L), tag.getBooleanOr("test", false));
+				tag.getDoubleOr("rate", 0.0D), tag.getLongOr("bank", 0L), tag.getBooleanOr("test", false), tag.getBooleanOr("sky", false),
+				tag.getBooleanOr("teth", false), tag.getIntOr("floor", fp[1]));
 	}
 }

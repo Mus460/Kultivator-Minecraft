@@ -17,6 +17,10 @@ import dev.kultivator.musuh.RogueCultivators;
 import dev.kultivator.sect.Sect;
 import dev.kultivator.sect.Sects;
 import dev.kultivator.sect.hall.Halls;
+import dev.kultivator.sekte.langit.api.LangitApi;
+import dev.kultivator.sekte.langit.api.LangitConfig;
+import dev.kultivator.sekte.langit.api.SkyHallView;
+import dev.kultivator.sekte.langit.gerak.LangitDermaga;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
@@ -206,6 +210,13 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 	private boolean foesSeen;
 	private int pirateTier = 1;
 	private int pirateRealm;
+	// ---- server (session): Sekte Langit sky docks (DESIGN 37.5.4, module 37M)
+	/** The sky dock of the voyage to a sky hall, or null. */
+	private LangitDermaga.@Nullable Dock skyDock;
+	/** 0 no sky leg, 1 to the waypoint off the dock, 2 in along the dock's axis, 3 to the hover point off the rim. */
+	private int skyStage;
+	/** The lowest cruise height of the sky leg (the deck or the hover point), NaN when none. */
+	private double skyY = Double.NaN;
 
 	public KapalRohEntity(EntityType<? extends KapalRohEntity> type, Level level) {
 		super(type, level);
@@ -1253,7 +1264,60 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 			Msg.actionBar(player, Component.translatable("kultivator.kapal.no_hall").withColor(0xFF8A7A));
 			return;
 		}
+		if (sailSkyHall(player, hall)) {
+			return;
+		}
 		startVoyage(player, Vec3.atCenterOf(hall.pos()), "aula", hall.name());
+	}
+
+	/**
+	 * Sekte Langit (DESIGN 37.5.4, module 37M): the hall stands on a sky island, so the ship sails to a free dock that fits
+	 * its hull ({@code LangitDermaga}): first to the waypoint straight out from the dock, then in along the dock's axis;
+	 * without one it waits at {@code yP + 8} off the rim. False when the hall is not a standing sky hall.
+	 */
+	private boolean sailSkyHall(ServerPlayer player, Halls.HallView hall) {
+		clearSkyLeg();
+		SkyHallView sky = owner == null ? null : LangitApi.get().skyHall(owner);
+		if (sky == null || sky.tethered() || !sky.dim().equals(level().dimension()) || !LangitConfig.on()) {
+			return false;
+		}
+		ServerLevel level = (ServerLevel) level();
+		LangitDermaga.Dock dock = LangitDermaga.pick(level, owner, kind(), this);
+		if (dock == null) {
+			Vec3 hover = LangitDermaga.hover(sky, position());
+			startVoyage(player, hover, "aula", hall.name());
+			if (dest != null) {
+				skyStage = 3;
+				skyY = hover.y;
+			}
+			Msg.actionBar(player, Component.translatable("kultivator.sekte_langit.gerak.dermaga.tidak_ada").withColor(0xFFD54A));
+			return true;
+		}
+		Vec3 waypoint = dock.waypoint();
+		double wx = waypoint.x - getX();
+		double wz = waypoint.z - getZ();
+		if (wx * wx + wz * wz > ARRIVE_RANGE * ARRIVE_RANGE) {
+			startVoyage(player, waypoint, "aula", hall.name());
+			if (dest != null) {
+				skyDock = dock;
+				skyStage = 1;
+				skyY = dock.deck().y;
+			}
+		} else {
+			startVoyage(player, dock.deck(), "aula", hall.name());
+			if (dest != null) {
+				skyDock = dock;
+				skyStage = 2;
+				skyY = dock.deck().y;
+			}
+		}
+		return true;
+	}
+
+	private void clearSkyLeg() {
+		skyDock = null;
+		skyStage = 0;
+		skyY = Double.NaN;
 	}
 
 	private void sailRoute(ServerPlayer player, String id) {
@@ -1328,6 +1392,7 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		leapWait = -1;
 		leapTarget = null;
 		pirateAt = -1.0D;
+		clearSkyLeg();
 		entityData.set(DATA_DEST, "");
 		if (!arrived) {
 			destId = "";
@@ -1346,12 +1411,18 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		float want = (float) (Mth.atan2(dz, dx) * Mth.RAD_TO_DEG) - 90.0F;
 		float err = Mth.wrapDegrees(want - getYRot());
 		float step = Mth.clamp(err, -kind.turnRate(), kind.turnRate());
-		setYRot(Mth.wrapDegrees(getYRot() + step));
+		if (skyStage != 2 || dist >= 1.5D) {
+			// on a sky dock's last metre the bow keeps the dock's heading (tickSkyLeg) instead of chasing the centre
+			setYRot(Mth.wrapDegrees(getYRot() + step));
+		}
 		// pirates
 		if (pirateAt > 0.0D && voyageLength - dist >= pirateAt) {
 			pirateAt = -1.0D;
 			startPirates(level, captain);
 			return 0.0D;
+		}
+		if (dist <= ARRIVE_RANGE && skyStage > 0) {
+			return tickSkyLeg(level, kind, max, ground, captain, dist);
 		}
 		if (dist <= ARRIVE_RANGE) {
 			speed *= 0.85D;
@@ -1378,8 +1449,61 @@ public class KapalRohEntity extends Entity implements HasCustomInventoryScreen {
 		} else {
 			cruise = Math.max(Double.isNaN(ground) ? getY() : ground + CRUISE_ABOVE, CRUISE_MIN_Y);
 		}
+		if (skyStage > 0 && !Double.isNaN(skyY)) {
+			// a sky leg never dives under the island: it keeps at least the deck's (or the hover point's) height
+			cruise = Math.max(cruise, skyY);
+		}
 		cruise = Math.min(cruise, level.getMaxY() - kind.height() - 4.0D);
 		return Mth.clamp(cruise - getY(), -0.3D, 0.4D);
+	}
+
+	/**
+	 * The last part of a sky leg (37M), within {@code ARRIVE_RANGE} of its target: at the waypoint the ship turns in along
+	 * the dock's axis; on the dock it creeps onto the deck centre, faces the island and settles (the deck is its ground,
+	 * so the usual docking follows); at the hover point it stops in the air and the voyage ends.
+	 */
+	private double tickSkyLeg(ServerLevel level, KapalClass kind, double max, double ground, ServerPlayer captain, double dist) {
+		LangitDermaga.Dock dock = skyDock;
+		if (skyStage == 1 && dock != null) {
+			if (LangitDermaga.occupied(level, dock, this)) {
+				// someone took the dock meanwhile: wait off the rim instead
+				Vec3 hover = new Vec3(dock.waypoint().x, Math.max(dock.deck().y, getY()), dock.waypoint().z);
+				skyDock = null;
+				skyStage = 3;
+				skyY = hover.y;
+				Msg.actionBar(captain, Component.translatable("kultivator.sekte_langit.gerak.dermaga.terisi").withColor(0xFFD54A));
+				return Mth.clamp(skyY - getY(), -0.3D, 0.3D);
+			}
+			dest = dock.deck();
+			skyStage = 2;
+			pirateAt = -1.0D;
+			return Mth.clamp(skyY - getY(), -0.3D, 0.3D);
+		}
+		if (skyStage == 2 && dock != null) {
+			Vec3 deck = dock.deck();
+			double creep = Math.min(max * 0.4D, dist * 0.06D);
+			if (dist < 0.6D) {
+				speed = 0.0D;
+				float err = Mth.wrapDegrees(dock.yaw() - getYRot());
+				setYRot(Mth.wrapDegrees(getYRot() + Mth.clamp(err, -kind.turnRate(), kind.turnRate())));
+			} else {
+				speed += Mth.clamp(creep - speed, -BRAKE, ACCEL);
+			}
+			double v = settle(ground, 0.3D);
+			if (Math.abs(speed) < 0.01D && !Double.isNaN(ground) && getY() - ground <= DOCK_HEIGHT && deck.y - getY() < 4.0D) {
+				arrive(level, captain);
+			}
+			return v;
+		}
+		// 3: the hover point off the rim
+		speed *= 0.85D;
+		double v = Double.isNaN(skyY) ? 0.0D : Mth.clamp(skyY - getY(), -0.3D, 0.3D);
+		if (Math.abs(speed) < 0.01D && Math.abs(v) < 0.05D) {
+			endVoyage(level, true);
+			setState(STATE_IDLE);
+			Msg.actionBar(captain, Component.translatable("kultivator.sekte_langit.gerak.dermaga.menunggu").withColor(0x9FE0C0));
+		}
+		return v;
 	}
 
 	/** {@code uji kapal lompat <x> <z>}: a voyage toward x/z with a cloud leap at once (fuel paid as usual). */

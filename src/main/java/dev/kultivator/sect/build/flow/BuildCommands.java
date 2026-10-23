@@ -137,7 +137,7 @@ public final class BuildCommands {
 			Msg.chat(player, Component.translatable("kultivator.sectbuild.recheck.done").withStyle(ChatFormatting.AQUA));
 			return 1;
 		}));
-		bangun.then(Commands.literal("naik").then(Commands.argument("t", IntegerArgumentType.integer(2, SectTemplates.COUNT)).executes(ctx ->
+		bangun.then(Commands.literal("naik").then(Commands.argument("t", IntegerArgumentType.integer(2, SectTemplates.SKY_LAST)).executes(ctx ->
 				Founding.preview(self(ctx), IntegerArgumentType.getInteger(ctx, "t"), -1, null, Founding.Mode.UPGRADE, false) ? 1 : 0)));
 		bangun.then(Commands.literal("perbaiki").executes(ctx -> repair(self(ctx))));
 		bangun.then(Commands.literal("bongkar")
@@ -175,7 +175,8 @@ public final class BuildCommands {
 					Relocation.cancelMove(self(ctx));
 					return 1;
 				})));
-		root.then(Commands.literal("aula").then(bangun));
+		// Sekte Langit (DESIGN 37.7.8): /kultivasi aula langit ...
+		root.then(Commands.literal("aula").then(bangun).then(LangitRancang.node()));
 
 		LiteralArgumentBuilder<CommandSourceStack> debugBangun = Commands.literal("bangun");
 		debugBangun.then(Commands.literal("tingkat-set").then(Commands.argument("n", IntegerArgumentType.integer(0, SectTemplates.TIERS)).executes(ctx -> {
@@ -225,7 +226,7 @@ public final class BuildCommands {
 				.then(Commands.literal("hapus").executes(ctx -> showcaseRemove(ctx, false))
 						.then(Commands.literal("semua").executes(ctx -> showcaseRemove(ctx, true))))
 				.then(Commands.literal("daftar").executes(ctx -> showcaseList(self(ctx))))
-				.then(Commands.argument("t", IntegerArgumentType.integer(1, SectTemplates.COUNT))
+				.then(Commands.argument("t", IntegerArgumentType.integer(1, SectTemplates.SKY_LAST))
 						.executes(ctx -> showcase(ctx, SectTemplates.TIERS, null))
 						.then(Commands.literal("tingkat").then(Commands.argument("n", IntegerArgumentType.integer(1, SectTemplates.TIERS))
 								.executes(ctx -> showcase(ctx, IntegerArgumentType.getInteger(ctx, "n"), null))
@@ -233,7 +234,7 @@ public final class BuildCommands {
 										.executes(ctx -> showcase(ctx, IntegerArgumentType.getInteger(ctx, "n"), StringArgumentType.getString(ctx, "arah"))))))
 						.then(Commands.argument("arah", StringArgumentType.word()).suggests(DIRECTION)
 								.executes(ctx -> showcase(ctx, SectTemplates.TIERS, StringArgumentType.getString(ctx, "arah"))))));
-		sekte.then(Commands.literal("hologram").then(Commands.argument("t", IntegerArgumentType.integer(1, SectTemplates.COUNT))
+		sekte.then(Commands.literal("hologram").then(Commands.argument("t", IntegerArgumentType.integer(1, SectTemplates.SKY_LAST))
 				.executes(ctx -> hologram(ctx, SectTemplates.TIERS))
 				.then(Commands.argument("n", IntegerArgumentType.integer(1, SectTemplates.TIERS))
 						.executes(ctx -> hologram(ctx, IntegerArgumentType.getInteger(ctx, "n"))))));
@@ -242,14 +243,14 @@ public final class BuildCommands {
 			return done(ctx);
 		}));
 		sekte.then(Commands.literal("info").executes(ctx -> siteInfo(self(ctx)))
-				.then(Commands.argument("t", IntegerArgumentType.integer(1, SectTemplates.COUNT))
+				.then(Commands.argument("t", IntegerArgumentType.integer(1, SectTemplates.SKY_LAST))
 						.executes(ctx -> planInfo(self(ctx), IntegerArgumentType.getInteger(ctx, "t")))));
-		sekte.then(Commands.literal("periksa").then(Commands.argument("t", IntegerArgumentType.integer(1, SectTemplates.COUNT))
+		sekte.then(Commands.literal("periksa").then(Commands.argument("t", IntegerArgumentType.integer(1, SectTemplates.SKY_LAST))
 				.executes(ctx -> check(ctx, null))
 				.then(Commands.argument("arah", StringArgumentType.word()).suggests(DIRECTION)
 						.executes(ctx -> check(ctx, StringArgumentType.getString(ctx, "arah"))))));
 		sekte.then(Commands.literal("audit").executes(ctx -> audit(self(ctx), null))
-				.then(Commands.argument("t", IntegerArgumentType.integer(1, SectTemplates.COUNT))
+				.then(Commands.argument("t", IntegerArgumentType.integer(1, SectTemplates.SKY_LAST))
 						.executes(ctx -> audit(self(ctx), IntegerArgumentType.getInteger(ctx, "t")))));
 		sekte.then(Commands.literal("kamera").then(Commands.argument("view", IntegerArgumentType.integer(1, 3)).executes(ctx -> {
 			EngineApi.get().camera(self(ctx), IntegerArgumentType.getInteger(ctx, "view"));
@@ -304,6 +305,8 @@ public final class BuildCommands {
 			Msg.chat(player, Component.translatable("kultivator.sectbuild.test.parties", count).withStyle(ChatFormatting.AQUA));
 			return count;
 		})));
+		// Sekte Langit (DESIGN 37.7.8): pamer, hologram, info, periksa and audit take 11-19 too.
+		sekte.then(LangitRancang.testNode());
 		sekte.then(Commands.literal("pekerja").executes(ctx -> allBuilders(self(ctx))));
 		uji.then(sekte);
 	}

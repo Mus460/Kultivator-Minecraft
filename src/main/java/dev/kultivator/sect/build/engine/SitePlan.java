@@ -45,7 +45,9 @@ public final class SitePlan {
 		this.stele = stele.immutable();
 		this.terrain = terrain;
 		this.levels = Map.copyOf(levels);
-		this.ctx = new Ctx(spec, this.rotation, glaze, seed, terrain, this.levels);
+		// A sky plan's parts stand on its own islands (DESIGN 37.4.9): the real snapshot only shows through at the stair foot.
+		TerrainView view = spec.sky() ? new dev.kultivator.sect.build.blueprint.awan.AwanTerrain(spec.template(), terrain) : terrain;
+		this.ctx = new Ctx(spec, this.rotation, glaze, seed, view, this.levels);
 		this.vanilla = SectTemplates.rotation(this.rotation);
 	}
 
@@ -75,7 +77,7 @@ public final class SitePlan {
 
 	/** Emits one component now (any thread; reads only immutable inputs). */
 	public Emission emit(Component component) {
-		Sink sink = new Sink(component.id(), spec.column(), spec.keep());
+		Sink sink = Sink.of(component.id(), spec);
 		try {
 			component.emit(ctx, sink);
 		} catch (RuntimeException exception) {
@@ -124,9 +126,28 @@ public final class SitePlan {
 		return worldBox(spec.column());
 	}
 
-	/** True when the world position lies in the confirmed footprint column. */
+	/**
+	 * True when the world position lies in the confirmed footprint column, or (a sky plan, DESIGN 37.4.6) in its stair-foot
+	 * column from the fitted foot level minus 4 up to the island column's floor.
+	 */
 	public boolean inFootprint(BlockPos pos) {
-		return footprint().isInside(pos);
+		if (footprint().isInside(pos)) {
+			return true;
+		}
+		BoundingBox kaki = kakiBox();
+		return kaki != null && kaki.isInside(pos);
+	}
+
+	/** The stair-foot column of a sky plan in world coordinates (from the fitted foot level - 4), or null. */
+	public @Nullable BoundingBox kakiBox() {
+		BoundingBox local = spec.kakiColumn();
+		TemplateSpec.Zone zone = spec.kaki();
+		if (local == null || zone == null) {
+			return null;
+		}
+		int foot = levels.getOrDefault(zone.id(), zone.design());
+		BoundingBox fitted = new BoundingBox(local.minX(), Math.max(local.minY(), foot - 4), local.minZ(), local.maxX(), local.maxY(), local.maxZ());
+		return worldBox(fitted);
 	}
 
 	/** The template-local packed position of a world position. */

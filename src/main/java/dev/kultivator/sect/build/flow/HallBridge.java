@@ -38,6 +38,10 @@ public final class HallBridge {
 		Halls.addCapBonusProvider(SectBuild::capBonus);
 		Halls.addCandidateBonusProvider(SectBuild::extraCandidates);
 		Halls.addArrivalSpotProvider((owner, level, stele, random) -> {
+			if (dev.kultivator.sekte.langit.api.LangitConfig.on() && dev.kultivator.sekte.langit.api.LangitApi.get().isSkyHall(owner)) {
+				// A standing sky hall: 37G's stair-foot provider decides (DESIGN 37.7.6).
+				return null;
+			}
 			BlockPos arrival = SectBuild.anchor(owner, "arrival");
 			if (arrival == null) {
 				return null;
@@ -45,6 +49,8 @@ public final class HallBridge {
 			return arrival.offset(random.nextInt(ARRIVAL_SPREAD * 2 + 1) - ARRIVAL_SPREAD, 0, random.nextInt(ARRIVAL_SPREAD * 2 + 1) - ARRIVAL_SPREAD);
 		});
 		Halls.addStatusLineProvider(SectBuild::statusLine);
+		// Sekte Langit (DESIGN 37.3.5): the Ascension is asked first (the stele set on a sky throne), then the move dialog.
+		Halls.addSteleMoveListener(LangitAngkat.INSTANCE);
 		Halls.addSteleMoveListener(Relocation.INSTANCE);
 		Duties.addPostSpotProvider((owner, duty, index) -> {
 			BlockPos post = SectBuild.anchor(owner, "post_" + duty);

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#kultivator:has_structure/sekte_langit",
+  "max_distance_from_center": 80,
+  "size": 3,
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "piece",
+      "spawns": []
+    }
+  },
+  "start_height": {
+    "type": "minecraft:uniform",
+    "min_inclusive": {
+      "absolute": 204
+    },
+    "max_inclusive": {
+      "absolute": 228
+    }
+  },
+  "start_pool": "kultivator:sekte_langit/inti",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "use_expansion_hack": false
+}

@@ -42,6 +42,11 @@ import java.util.Locale;
  * footprint preview of the chosen template arrives, its warnings show as bamboo slips with the consent checkbox and the
  * jade Konfirmasi seal, held for 3 s. In upgrade mode ("Naik Templat") only larger templates can be chosen. The world and
  * its hologram stay visible behind the scroll; Esc keeps the preview for walking around (the HUD and chat take over).
+ * <p>
+ * Sekte Langit (DESIGN 37.3.4): two jade tabs under the grid switch between the ground family (Darat, 1-9) and the sky
+ * family (Awan, A1-A9 = templates 11-19). On the Awan tab "Lihat Tapak" asks for a sky design over the ground stele
+ * ({@code langit:<n>}), and while a sky preview is shown the glaze coins become the plaza height (down 4, the plaza y,
+ * up 4); the offering's bill is announced in chat with the preview.
  */
 public class TemplateScreen extends Screen {
 
@@ -67,6 +72,8 @@ public class TemplateScreen extends Screen {
 	private final Eased backdrop = new Eased(6.0F);
 	private @Nullable Widget pressed;
 	private int selected;
+	/** The Awan tab (sky templates 11-19) is shown. */
+	private boolean sky;
 	private int glaze;
 	private boolean consent;
 	private boolean holding;
@@ -108,7 +115,8 @@ public class TemplateScreen extends Screen {
 		super(Component.translatable(upgrade ? "kultivator.sectbuild.ui.upgrade_title" : "kultivator.sectbuild.ui.template_title"));
 		this.upgrade = upgrade;
 		this.back = back instanceof TemplateScreen ? null : back;
-		this.selected = SectTemplates.valid(select) ? select : 1;
+		this.selected = SectTemplates.validAny(select) ? select : 1;
+		this.sky = SectTemplates.isSky(selected);
 		this.openedAt = Util.getMillis();
 		this.lastFrame = openedAt;
 		Glaze chosen = Glaze.byId(BuildClient.catalog().getStringOr("glaze", "tinta"));
@@ -118,8 +126,9 @@ public class TemplateScreen extends Screen {
 
 	/** The server asked to select {@code template} while the screen is open. */
 	public void select(int template) {
-		if (SectTemplates.valid(template)) {
+		if (SectTemplates.validAny(template)) {
 			selected = template;
+			sky = SectTemplates.isSky(template);
 			consent = false;
 			warnScroll = 0;
 		}
@@ -141,9 +150,55 @@ public class TemplateScreen extends Screen {
 		return PlanStats.empty(template);
 	}
 
+	/** The template of grid cell {@code n} (1-9) on the current tab. */
+	private int templateOf(int n) {
+		return sky ? SectTemplates.SKY_FIRST + n - 1 : n;
+	}
+
+	/** Why a sky template cannot be chosen (the gate of DESIGN 37.3.3 as far as the client knows it), or null. */
+	private @Nullable Component lockedSky(int template) {
+		CompoundTag catalog = catalog();
+		if (!catalog.getBooleanOr("sky_on", false)) {
+			return Component.translatable("kultivator.sekte_langit.bangun.mati");
+		}
+		int n = template - SectTemplates.SKY_FIRST + 1;
+		int max = catalog.getIntOr("max_t", 9);
+		if (n > max) {
+			return Component.translatable("kultivator.sectbuild.template.too_large", max);
+		}
+		dev.kultivator.data.Realm realm = dev.kultivator.sect.build.flow.LangitRancang.realmFor(template);
+		if (catalog.getBooleanOr("sky_gate", true) && catalog.getIntOr("realm", 0) < realm.ordinal()) {
+			return Component.translatable("kultivator.sekte_langit.bangun.ranah", SectTemplates.name(template), realm.displayName());
+		}
+		int current = catalog.getIntOr("t", 0);
+		if (upgrade) {
+			if (!SectTemplates.isSky(current)) {
+				return Component.translatable("kultivator.blueprint.error.upgrade_family");
+			}
+			return template <= current ? Component.translatable("kultivator.sectbuild.upgrade.smaller", SectTemplates.name(current)) : null;
+		}
+		int skyTemplate = catalog.getIntOr("sky_t", 0);
+		if (skyTemplate > 0 || SectTemplates.isSky(current)) {
+			return Component.translatable("kultivator.sekte_langit.bangun.sudah", SectTemplates.name(skyTemplate > 0 ? skyTemplate : current));
+		}
+		if (current <= 0 && n > catalog.getIntOr("sky_max_b", 3)) {
+			return Component.translatable("kultivator.sekte_langit.bangun.jalan_b", catalog.getIntOr("sky_max_b", 3));
+		}
+		if (current > 0 && n > current + 1) {
+			return Component.translatable("kultivator.sekte_langit.bangun.loncat", SectTemplates.name(SectTemplates.SKY_FIRST + current));
+		}
+		return null;
+	}
+
 	/** Why a template cannot be chosen (null when it can). */
 	private @Nullable Component locked(int template) {
+		if (SectTemplates.isSky(template)) {
+			return lockedSky(template);
+		}
 		CompoundTag catalog = catalog();
+		if (upgrade && SectTemplates.isSky(catalog.getIntOr("t", 0))) {
+			return Component.translatable("kultivator.blueprint.error.upgrade_family");
+		}
 		int max = catalog.getIntOr("max_t", 9);
 		if (template > max) {
 			return Component.translatable("kultivator.sectbuild.template.too_large", max);
@@ -214,12 +269,22 @@ public class TemplateScreen extends Screen {
 		int coinW = rightW / 3;
 		for (Glaze each : Glaze.values()) {
 			int index = each.ordinal();
-			JadeCoin coin = new JadeCoin(rightX + index * coinW, glazeY, coinW - 2, 11, each::displayName, () -> glaze == index);
+			JadeCoin coin = new JadeCoin(rightX + index * coinW, glazeY, coinW - 2, 11, () -> coinLabel(each), () -> !skyPreview() && glaze == index);
 			coin.onPress(() -> {
+				if (skyPreview()) {
+					// Down 4 / up 4: the plaza height of the sky design (the middle coin only shows it).
+					if (index != 1) {
+						consent = false;
+						BuildClient.send(0, "langit_tinggi:" + (index == 0 ? -1 : 1));
+					}
+					return;
+				}
 				glaze = index;
 				consent = false;
 			});
-			coin.tooltip(() -> List.of(each.displayName(), Component.translatable("kultivator.sectbuild.glaze_tip." + each.id())));
+			coin.enabledWhen(() -> !sky || skyPreview() && index != 1);
+			coin.tooltip(() -> skyPreview() ? List.of(Component.translatable("kultivator.sectbuild.ui.sky_height_tip"))
+					: List.of(each.displayName(), Component.translatable("kultivator.sectbuild.glaze_tip." + each.id())));
 			widgets.add(coin);
 		}
 		int third = (rightW - 4) / 3;
@@ -227,7 +292,11 @@ public class TemplateScreen extends Screen {
 		look.enabledWhen(() -> locked(selected) == null);
 		look.onPress(() -> {
 			consent = false;
-			BuildClient.send(0, "preview:" + selected + ":-1:" + Glaze.byOrdinal(glaze).id() + (upgrade ? ":upgrade" : ""));
+			if (sky && !upgrade) {
+				BuildClient.send(0, "langit:" + (selected - SectTemplates.SKY_FIRST + 1));
+			} else {
+				BuildClient.send(0, "preview:" + selected + ":-1:" + Glaze.byOrdinal(glaze).id() + (upgrade ? ":upgrade" : ""));
+			}
 		});
 		look.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.look"), Component.translatable("kultivator.sectbuild.ui.look_tip")));
 		widgets.add(look);
@@ -246,6 +315,29 @@ public class TemplateScreen extends Screen {
 		});
 		widgets.add(cancel);
 
+		// The Darat / Awan tabs under the grid.
+		int tabY = gridY + 3 * (plaqueH + gap) + 1;
+		int tabW = (3 * plaqueW + 2 * gap) / 2;
+		for (int i = 0; i < 2; i++) {
+			boolean awan = i == 1;
+			JadeCoin tab = new JadeCoin(gridX + i * tabW, tabY, tabW - 2, 11,
+					() -> Component.translatable(awan ? "kultivator.sectbuild.ui.tab_awan" : "kultivator.sectbuild.ui.tab_darat"), () -> sky == awan);
+			tab.onPress(() -> {
+				if (sky != awan) {
+					sky = awan;
+					int n = SectTemplates.rank(selected);
+					selected = templateOf(n);
+					consent = false;
+					warnScroll = 0;
+				}
+			});
+			if (awan) {
+				tab.enabledWhen(() -> catalog().getBooleanOr("sky_on", false));
+				tab.tooltip(() -> List.of(Component.translatable("kultivator.sectbuild.ui.tab_awan"), Component.translatable("kultivator.sectbuild.ui.tab_awan_tip")));
+			}
+			widgets.add(tab);
+		}
+
 		sealR = Math.max(9.0F, Math.min(13.0F, (contentBottom - bottomY) * 0.28F));
 		sealX = rightX + rightW - sealR - 4.0F;
 		sealY = contentBottom - sealR - 9.0F;
@@ -253,6 +345,24 @@ public class TemplateScreen extends Screen {
 		boxX1 = Math.round(sealX - sealR - 6.0F);
 		boxY1 = contentBottom - 2;
 		boxY0 = boxY1 - 14;
+	}
+
+	/** True while the shown preview is a sky design. */
+	private boolean skyPreview() {
+		CompoundTag preview = preview();
+		return preview != null && preview.getBooleanOr("sky", false);
+	}
+
+	/** A glaze coin's label, or the sky height control it stands for. */
+	private Component coinLabel(Glaze each) {
+		if (!skyPreview()) {
+			return each.displayName();
+		}
+		return switch (each.ordinal()) {
+			case 0 -> Component.literal("\u25BC 4");
+			case 2 -> Component.literal("\u25B2 4");
+			default -> Component.translatable("kultivator.sectbuild.ui.sky_height", preview() == null ? 0 : preview().getIntOr("yP", 0));
+		};
 	}
 
 	// ================================================================== drawing
@@ -306,9 +416,10 @@ public class TemplateScreen extends Screen {
 
 	/** The 3x3 grid of jade plaques. */
 	private void drawGrid(GuiGraphicsExtractor g, int mouseX, int mouseY) {
-		for (int template = 1; template <= SectTemplates.COUNT; template++) {
-			int col = (template - 1) % 3;
-			int row = (template - 1) / 3;
+		for (int n = 1; n <= SectTemplates.COUNT; n++) {
+			int template = templateOf(n);
+			int col = (n - 1) % 3;
+			int row = (n - 1) / 3;
 			int px = gridX + col * (plaqueW + gap);
 			int py = gridY + row * (plaqueH + gap);
 			boolean over = mouseX >= px && mouseX < px + plaqueW && mouseY >= py && mouseY < py + plaqueH;
@@ -325,11 +436,11 @@ public class TemplateScreen extends Screen {
 			Brush.frame(g, px + 1, py + 1, px + plaqueW - 1, py + plaqueH - 1, chosen ? Palette.GOLD : Palette.argb(0x90, Palette.JADE_DARK));
 			// The ink sketch.
 			float size = Math.min(plaqueW - 6.0F, plaqueH - 12.0F);
-			SiteDiagram.draw(g, px + (plaqueW - size) / 2.0F, py + 2.0F, size, SiteDiagram.sketch(template), SiteDiagram.Bounds.of(template), 9, 0,
+			SiteDiagram.draw(g, px + (plaqueW - size) / 2.0F, py + 2.0F, size, SiteDiagram.sketch(n), SiteDiagram.Bounds.of(n), 9, 0,
 					-1, -1, false);
 			// The numeral seal and the name.
 			g.fill(px + 2, py + 2, px + 9, py + 9, lock == null ? Palette.SEAL : Palette.grey(Palette.SEAL, 0.7F));
-			Brush.centered(g, font, Component.literal(Integer.toString(template)), px + 5.6F, py + 3.0F, Palette.TALISMAN, 0.62F, false);
+			Brush.centered(g, font, Component.literal(sky ? "A" + n : Integer.toString(n)), px + 5.6F, py + 3.0F, Palette.TALISMAN, sky ? 0.5F : 0.62F, false);
 			Brush.fitCentered(g, font, SectTemplates.name(template), px + plaqueW / 2.0F, py + plaqueH - 8.0F, plaqueW - 4.0F,
 					lock == null ? Palette.INK : Palette.INK_FAINT, 0.6F, 0.4F, false);
 			if (lock != null) {
@@ -339,15 +450,15 @@ public class TemplateScreen extends Screen {
 				List<Component> tip = new ArrayList<>();
 				tip.add(SectTemplates.name(template));
 				tip.add(Component.translatable("kultivator.sectbuild.archetype." + template));
-				tip.add(Component.translatable("kultivator.sectbuild.ui.realm_hint", Component.translatable("kultivator.sectbuild.realm_hint." + template)));
+				tip.add(Component.translatable("kultivator.sectbuild.ui.realm_hint", realmHint(template)));
 				if (lock != null) {
 					tip.add(lock);
 				}
 				tooltip = tip;
 			}
 		}
-		// Below the grid: the source line of the chosen template and the "just deposit" promise.
-		int textY = gridY + 3 * (plaqueH + gap) + 2;
+		// Below the grid and its tabs: the source line of the chosen template and the "just deposit" promise.
+		int textY = gridY + 3 * (plaqueH + gap) + 14;
 		float textW = 3 * plaqueW + 2 * gap;
 		Brush.wrap(g, font, Component.translatable("kultivator.sectbuild.ui.promise"), gridX, textY, textW, Palette.INK_SOFT, 0.55F, false);
 	}
@@ -368,8 +479,8 @@ public class TemplateScreen extends Screen {
 			parts = SiteDiagram.fromComponents(preview.getListOrEmpty("comps"), stele, rot);
 			bounds = SiteDiagram.bounds(fp, stele, rot);
 		} else {
-			parts = SiteDiagram.sketch(selected);
-			bounds = SiteDiagram.Bounds.of(selected);
+			parts = SiteDiagram.sketch(SectTemplates.rank(selected));
+			bounds = SiteDiagram.Bounds.of(SectTemplates.rank(selected));
 		}
 		int scrub = BuildClient.scrubTier();
 		int hover = SiteDiagram.draw(g, diagramX, diagramY, diagramSize, parts, bounds, scrub, 0, mouseX, mouseY, true);
@@ -407,7 +518,7 @@ public class TemplateScreen extends Screen {
 
 	/** The numbers beside the diagram. */
 	private void drawNumbers(GuiGraphicsExtractor g, @Nullable CompoundTag preview) {
-		int t = selected - 1;
+		int t = SectTemplates.rank(selected) - 1;
 		PlanStats stats = stats(selected);
 		boolean real = !stats.isEmpty();
 		float x = diagramX + diagramSize + 5.0F;
@@ -432,17 +543,19 @@ public class TemplateScreen extends Screen {
 		double speed = Math.max(0.25D, catalog().getDoubleOr("speed", 1.0D));
 		double minutes = (real && stats.minutes() > 0.0D ? stats.minutes() : TARGET_MINUTES[t]) / ((1.0D + 0.25D * builders) * speed);
 		lines.add(Component.translatable("kultivator.sectbuild.ui.time", Math.max(1L, Math.round(minutes)), builders));
-		lines.add(Component.translatable("kultivator.sectbuild.ui.perks", TOWER_ROOMS[t], QI_SEAT[t], TERRITORY[t]));
+		int[] skyTerritory = catalog().getIntArray("sky_terr").orElse(null);
+		int territory = SectTemplates.isSky(selected) && skyTerritory != null && skyTerritory.length > t ? skyTerritory[t] : TERRITORY[t];
+		lines.add(Component.translatable("kultivator.sectbuild.ui.perks", TOWER_ROOMS[t], QI_SEAT[t], territory));
 		if (ALTARS[t] > 0) {
 			lines.add(Component.translatable("kultivator.sectbuild.ui.altars", ALTARS[t]));
 		}
-		if (selected >= 5) {
+		if (t + 1 >= 5) {
 			lines.add(Component.translatable("kultivator.sectbuild.ui.cap_bonus"));
 		}
-		if (selected >= 6) {
+		if (t + 1 >= 6) {
 			lines.add(Component.translatable("kultivator.sectbuild.ui.candidate_bonus"));
 		}
-		lines.add(Component.translatable("kultivator.sectbuild.ui.realm_hint", Component.translatable("kultivator.sectbuild.realm_hint." + selected)));
+		lines.add(Component.translatable("kultivator.sectbuild.ui.realm_hint", realmHint(selected)));
 		if (preview != null) {
 			lines.add(Component.translatable("kultivator.sectbuild.ui.gate",
 					Component.translatable("kultivator.sectbuild.gate." + SectTemplates.gate(preview.getIntOr("rot", 0)).getSerializedName())));
@@ -455,6 +568,14 @@ public class TemplateScreen extends Screen {
 			Brush.rect(g, x, y + 2.0F * scale, x + 1.6F, y + 4.4F * scale, Palette.SEAL);
 			y += Brush.wrap(g, font, line, x + 3.0F, y, w - 3.0F, Palette.INK, scale, false) + 0.5F;
 		}
+	}
+
+	/** The realm hint of a template: the ground's own line, or the sky family's realm (DESIGN 37.3.3). */
+	private static Component realmHint(int template) {
+		if (SectTemplates.isSky(template)) {
+			return dev.kultivator.sect.build.flow.LangitRancang.realmFor(template).displayName();
+		}
+		return Component.translatable("kultivator.sectbuild.realm_hint." + template);
 	}
 
 	/** Without a preview: the whole bill as bamboo slips and the hint to look at the footprint. */
@@ -612,9 +733,10 @@ public class TemplateScreen extends Screen {
 				return true;
 			}
 		}
-		for (int template = 1; template <= SectTemplates.COUNT; template++) {
-			int px = gridX + (template - 1) % 3 * (plaqueW + gap);
-			int py = gridY + (template - 1) / 3 * (plaqueH + gap);
+		for (int n = 1; n <= SectTemplates.COUNT; n++) {
+			int template = templateOf(n);
+			int px = gridX + (n - 1) % 3 * (plaqueW + gap);
+			int py = gridY + (n - 1) / 3 * (plaqueH + gap);
 			if (mx >= px && mx < px + plaqueW && my >= py && my < py + plaqueH) {
 				if (template != selected) {
 					select(template);
@@ -685,7 +807,7 @@ public class TemplateScreen extends Screen {
 		}
 		int number = event.key() - InputConstants.KEY_1;
 		if (number >= 0 && number < SectTemplates.COUNT) {
-			select(number + 1);
+			select(templateOf(number + 1));
 			UiSound.tab();
 			return true;
 		}

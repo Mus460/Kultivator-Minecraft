@@ -67,11 +67,11 @@ import dev.kultivator.sect.build.blueprint.templates.T9HeavenlyCourt;
  */
 public final class Templates {
 
-	private static final TemplateSpec[] CACHE = new TemplateSpec[SectTemplates.COUNT + 1];
+	private static final TemplateSpec[] CACHE = new TemplateSpec[SectTemplates.SKY_LAST + 1];
 
-	/** The spec of template 1-9 (built once). */
+	/** The spec of template 1-9 or sky template 11-19 (built once); anything else is clamped to a ground template. */
 	public static TemplateSpec get(int template) {
-		int t = Math.max(1, Math.min(SectTemplates.COUNT, template));
+		int t = SectTemplates.isSky(template) ? template : Math.max(1, Math.min(SectTemplates.COUNT, template));
 		TemplateSpec spec = CACHE[t];
 		if (spec != null) {
 			return spec;
@@ -87,6 +87,7 @@ public final class Templates {
 					case 6 -> T6HolyLand.build();
 					case 7 -> T7CaveHeaven.build();
 					case 8 -> T8AncientLineage.build();
+					case 11, 12, 13, 14, 15, 16, 17, 18, 19 -> dev.kultivator.sect.build.blueprint.awan.AwanTemplates.build(t);
 					default -> T9HeavenlyCourt.build();
 				};
 			}
@@ -94,9 +95,9 @@ public final class Templates {
 		}
 	}
 
-	/** True when template {@code template} has a real plan (not a placeholder awaiting its author). */
+	/** True when template {@code template} (1-9 or 11-19) has a real plan (not a placeholder awaiting its author). */
 	public static boolean ready(int template) {
-		return SectTemplates.valid(template) && !get(template).isPlaceholder();
+		return SectTemplates.validAny(template) && !get(template).isPlaceholder();
 	}
 
 	private Templates() {

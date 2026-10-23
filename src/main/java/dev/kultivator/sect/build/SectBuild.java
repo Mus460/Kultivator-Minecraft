@@ -22,6 +22,7 @@ import dev.kultivator.sect.build.flow.Ceremonies;
 import dev.kultivator.sect.build.flow.Deposits;
 import dev.kultivator.sect.build.flow.FlowData;
 import dev.kultivator.sect.build.flow.Founding;
+import dev.kultivator.sect.build.flow.LangitRancang;
 import dev.kultivator.sect.build.flow.GatherExpeditions;
 import dev.kultivator.sect.build.flow.HallBridge;
 import dev.kultivator.sect.build.flow.Ledger;
@@ -170,6 +171,9 @@ public final class SectBuild {
 				Founding.preview(player, template, rot, glaze, upgrade ? Founding.Mode.UPGRADE : Founding.Mode.FOUND, false);
 			}
 			case "upgrade" -> Founding.preview(player, parse(param, 0), -1, null, Founding.Mode.UPGRADE, false);
+			// Sekte Langit (DESIGN 37.3.4): the template screen's Awan tab.
+			case "langit" -> LangitRancang.design(player, parse(param, 0), false);
+			case "langit_tinggi" -> LangitRancang.heightStep(player, parse(param, 0));
 			case "rotate" -> Founding.rotate(player);
 			case "confirm" -> Founding.confirm(player, parseLong(param));
 			case "cancel" -> Founding.cancel(player, true);
@@ -362,18 +366,22 @@ public final class SectBuild {
 	/** Extra disciple cap (1 for templates 5-9 once T9 is complete). */
 	public static int capBonus(UUID owner) {
 		EngineApi engine = EngineApi.get();
-		return engine.template(owner) >= CAP_BONUS_TEMPLATE && engine.tier(owner) >= SectTemplates.TIERS ? 1 : 0;
+		return SectTemplates.rank(engine.template(owner)) >= CAP_BONUS_TEMPLATE && engine.tier(owner) >= SectTemplates.TIERS ? 1 : 0;
 	}
 
 	/** Extra candidates per arrival (1 for templates 6-9 at tier 7 or more). */
 	public static int extraCandidates(UUID owner) {
 		EngineApi engine = EngineApi.get();
-		return engine.template(owner) >= CANDIDATE_TEMPLATE && engine.tier(owner) >= CANDIDATE_TIER ? 1 : 0;
+		return SectTemplates.rank(engine.template(owner)) >= CANDIDATE_TEMPLATE && engine.tier(owner) >= CANDIDATE_TIER ? 1 : 0;
 	}
 
 	/** The template's territory radius R_t (0 without a template). */
 	public static int territoryRadius(UUID owner) {
 		int template = EngineApi.get().template(owner);
+		if (SectTemplates.isSky(template)) {
+			// A sky template's territory covers its whole archipelago (DESIGN 37.3.2, the layout's own radius).
+			return dev.kultivator.sect.build.blueprint.Templates.get(template).territory();
+		}
 		return SectTemplates.valid(template) ? TERRITORY[template - 1] : 0;
 	}
 

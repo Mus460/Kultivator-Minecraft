@@ -19,7 +19,10 @@
     "KosmikNameTagMixin",
     "KosmikWeatherMixin",
     "duel.DuelInputMixin",
-    "duel.DuelCameraMixin"
+    "duel.DuelCameraMixin",
+    "WeatherEffectRendererMixin",
+    "ClientLevelWeatherMixin",
+    "LangitDutyPosesMixin"
   ],
   "injectors": {
     "defaultRequire": 1

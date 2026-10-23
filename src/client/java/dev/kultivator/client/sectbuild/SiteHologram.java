@@ -55,6 +55,45 @@ public final class SiteHologram {
 
 	// ================================================================== the preview
 
+	/** Sky blue of the Cloud Stair's foot and the tether (Sekte Langit, DESIGN 37.4.8). */
+	private static final int SKY = 0x9FD8FF;
+
+	/**
+	 * A sky design's extras: the stair-foot box fitted to the ground (its square and posts), the tether line from the
+	 * ground stele up to the throne, and the plaza height as a label on the throne.
+	 */
+	private static void drawSky(CompoundTag tag, double base, float pulse) {
+		int[] kaki = box(tag, "kaki");
+		if (kaki != null) {
+			double x0 = kaki[0];
+			double z0 = kaki[2];
+			double x1 = kaki[3] + 1.0D;
+			double z1 = kaki[5] + 1.0D;
+			double lo = kaki[1];
+			double hi = kaki[4] + 1.0D;
+			int color = argb(Math.round(190 * pulse), SKY);
+			rect(x0, z0, x1, z1, lo + 0.05D, color, 2.5F);
+			rect(x0, z0, x1, z1, hi, argb(Math.round(120 * pulse), SKY), 1.5F);
+			line(new Vec3(x0, lo, z0), new Vec3(x0, hi, z0), color, 1.5F);
+			line(new Vec3(x1, lo, z0), new Vec3(x1, hi, z0), color, 1.5F);
+			line(new Vec3(x1, lo, z1), new Vec3(x1, hi, z1), color, 1.5F);
+			line(new Vec3(x0, lo, z1), new Vec3(x0, hi, z1), color, 1.5F);
+			text(Component.translatable("kultivator.sectbuild.holo.kaki").getString(), new Vec3((x0 + x1) / 2.0D, lo + 2.0D, (z0 + z1) / 2.0D),
+					argb(255, SKY), 0.6F);
+		}
+		int[] ground = tag.getIntArray("ground").orElse(null);
+		int[] stele = tag.getIntArray("stele").orElse(null);
+		if (ground != null && ground.length == 3 && stele != null && stele.length == 3) {
+			Vec3 from = new Vec3(ground[0] + 0.5D, ground[1] + 1.0D, ground[2] + 0.5D);
+			Vec3 to = new Vec3(stele[0] + 0.5D, base, stele[2] + 0.5D);
+			line(from, to, argb(Math.round(200 * pulse), GOLD), 2.0F);
+		}
+		if (stele != null && stele.length == 3) {
+			text(Component.translatable("kultivator.sectbuild.holo.tahta", tag.getIntOr("yP", (int) base)).getString(),
+					new Vec3(stele[0] + 0.5D, base + 2.2D, stele[2] + 0.5D), argb(255, SKY), 0.7F);
+		}
+	}
+
 	private static void drawPreview(Minecraft minecraft, CompoundTag tag) {
 		int[] fp = box(tag, "fp");
 		if (fp == null || minecraft.player == null) {
@@ -95,6 +134,9 @@ public final class SiteHologram {
 		line(new Vec3(x1, base, z0), new Vec3(x1, top, z0), gold, 3.0F);
 		line(new Vec3(x1, base, z1), new Vec3(x1, top, z1), gold, 3.0F);
 		line(new Vec3(x0, base, z1), new Vec3(x0, top, z1), gold, 3.0F);
+		if (tag.getBooleanOr("sky", false)) {
+			drawSky(tag, base, pulse);
+		}
 		// The gold axis through the stele, from the back to the gate.
 		if (stele != null && stele.length == 3) {
 			Direction gate = SectTemplates.gate(tag.getIntOr("rot", 0));

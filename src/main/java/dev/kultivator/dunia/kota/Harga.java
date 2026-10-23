@@ -122,6 +122,8 @@ public final class Harga {
 		BASE.put("teh_penenang_hati", 20L);
 		BASE.put("catatan_pengembara", 9L);
 		BASE.put("kantong_saingan", 200L);
+		// Sekte Langit 37G: Raksasa Longbo's trophy, worth its 600 PK use at 1 PK = 2 NB (audit 4.10)
+		BASE.put("cangkang_kura_langit", 1200L);
 	}
 
 	/** Phase-9 wares of Alam Abadi that no town shop buys (audit S24: no Batu Asal to NB loop). */

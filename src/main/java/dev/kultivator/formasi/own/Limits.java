@@ -22,6 +22,13 @@ public final class Limits {
 	public static final int L5_OUTPOSTS = 2;
 	/** An outpost stands within this many blocks (horizontal) of the stele, in the hall's dimension. */
 	public static final int L5_OUTPOST_RANGE = 4096;
+	/** The Cloud Transfer spec id (Sekte Langit 37M, DESIGN 37.5.1). */
+	public static final String AWAN_SPEC = "awan_transfer";
+	/**
+	 * Cloud Transfer nodes per owner (one on the island, one on the ground); the ground one is registered like an L5
+	 * outpost when it stands outside the territory within {@code TransportNetwork.AWAN_RANGE} of the stele.
+	 */
+	public static final int AWAN_NODES = 2;
 	/** Personal cores (outside every territory) per player. */
 	public static final int PERSONAL_MAX = 2;
 	/** Personal cores count as this hall level for gates and radii. */
@@ -58,6 +65,9 @@ public final class Limits {
 	/** The maximum of a group (see {@link #group}). */
 	public static int groupMax(FormationSpec spec, int hallLevel) {
 		if (spec.family() == Family.PERPINDAHAN) {
+			if (AWAN_SPEC.equals(spec.id())) {
+				return AWAN_NODES;
+			}
 			return spec.grade() == Grade.LANGIT ? L5_NODES : m3Nodes(hallLevel);
 		}
 		if (spec.grade() == Grade.ABADI) {

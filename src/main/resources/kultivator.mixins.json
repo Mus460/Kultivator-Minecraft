@@ -18,6 +18,7 @@
     "LivingEntityDamageMixin",
     "MobFinalizeSpawnMixin",
     "MobSetTargetMixin",
+    "ServerLevelPrecipitationMixin",
     "duel.MobGoalSelectorAccessor"
   ],
   "injectors": {

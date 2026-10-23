@@ -289,11 +289,14 @@ public final class Formasi {
 		int hallLevel = personal ? Limits.PERSONAL_HALL_LEVEL : CoreTicker.hallLevel(foreign ? territory : player.getUUID());
 		Detect.Outcome outcome = null;
 		boolean outpost = false;
-		if (personal && CoreTicker.outpostSite(player.getUUID(), level, pos)) {
-			// An Ancient Transfer (L5) outpost (DESIGN 24.4.10): outside the territory but registered to the sect.
+		boolean awanSite = personal && dev.kultivator.formasi.effect.b.TransportNetwork.awanSite(player.getUUID(), level, pos);
+		if (personal && (CoreTicker.outpostSite(player.getUUID(), level, pos) || awanSite)) {
+			// An Ancient Transfer (L5) outpost (DESIGN 24.4.10): outside the territory but registered to the sect. The ground
+			// end of a Sekte Langit Cloud Transfer pair (37M, DESIGN 37.5.1) registers the same way near the stele.
 			int sectLevel = CoreTicker.hallLevel(player.getUUID());
 			Detect.Outcome sect = Detect.detect(level, pos, store.target(pos), sectLevel, false);
-			if (sect.match() != null && Limits.L5_SPEC.equals(sect.match().spec().id())) {
+			String found = sect.match() == null ? "" : sect.match().spec().id();
+			if (Limits.L5_SPEC.equals(found) && CoreTicker.outpostSite(player.getUUID(), level, pos) || Limits.AWAN_SPEC.equals(found) && awanSite) {
 				outcome = sect;
 				outpost = true;
 				personal = false;
@@ -311,9 +314,10 @@ public final class Formasi {
 		FormationSpec spec = match.spec();
 		Component refusal = registrationRefusal(player, level, spec, personal, hallLevel, pos, null);
 		int outposts = 0;
-		if (refusal == null && outpost) {
+		boolean l5Outpost = outpost && Limits.L5_SPEC.equals(spec.id());
+		if (refusal == null && l5Outpost) {
 			for (CoreView view : dev.kultivator.formasi.core.Cores.of(player.getUUID())) {
-				if (!view.virtual() && view.ext().getBooleanOr("outpost", false)) {
+				if (!view.virtual() && view.ext().getBooleanOr("outpost", false) && Limits.L5_SPEC.equals(view.spec())) {
 					outposts++;
 				}
 			}
@@ -347,9 +351,12 @@ public final class Formasi {
 		if (record.reason != null) {
 			Msg.chat(player, Component.translatable("kultivator.formasi.state_reason", record.state.label(), record.reason).withStyle(ChatFormatting.GRAY));
 		}
-		if (outpost) {
+		if (l5Outpost) {
 			Msg.chat(player, Component.translatable("kultivator.sect_fix_feat.outpost.registered", outposts + 1, Limits.L5_OUTPOSTS,
 					Limits.L5_OUTPOST_RANGE).withStyle(ChatFormatting.AQUA));
+		} else if (outpost) {
+			Msg.chat(player, Component.translatable("kultivator.sekte_langit.gerak.pindah.simpul_tanah",
+					dev.kultivator.formasi.effect.b.TransportNetwork.AWAN_RANGE).withStyle(ChatFormatting.AQUA));
 		}
 		if (outcome.hint() != null) {
 			hint(player, outcome.hint());

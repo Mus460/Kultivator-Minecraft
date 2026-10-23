@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Validation of a footprint (DESIGN 21.10 "Validation"): red refuses the confirmation, amber warns, notes inform. Checks
  * needing the world (dimension, height, other sites, spawn protection, villages, structures) run on the server thread
@@ -308,9 +310,191 @@ public final class Validator {
 		return false;
 	}
 
-	/** True when the config allows the template (sectBuildMaxTemplate). */
+	// ================================================================== Sekte Langit (DESIGN 37.4.8)
+
+	/**
+	 * The world rules of a sky design on the server thread: S1 dimension, S5 other sites (horizontal, the island box +
+	 * {@link #SITE_MARGIN}), S10 structures, S12 spawn and S13 villages of {@link #world} on the island box; then the stair
+	 * foot (S7 its chunks not shared with a footprint of the owner's ground site or of another site, S10, S12, S13 ±16 around
+	 * it), S6 no other hall within {@code Halls.OTHER_HALL_RANGE} of the throne, S14 strangers in the island space (amber).
+	 */
+	static List<Warning> skyWorld(ServerLevel level, BoundingBox island, @Nullable BoundingBox kaki, BlockPos throne, java.util.UUID owner,
+			List<BoundingBox> otherSites, @Nullable BoundingBox ownGround) {
+		List<Warning> warnings = new ArrayList<>(world(level, island, otherSites));
+		if (kaki != null) {
+			int kx0 = kaki.minX() >> 4;
+			int kx1 = kaki.maxX() >> 4;
+			int kz0 = kaki.minZ() >> 4;
+			int kz1 = kaki.maxZ() >> 4;
+			List<BoundingBox> others = new ArrayList<>(otherSites);
+			if (ownGround != null) {
+				others.add(ownGround);
+			}
+			for (BoundingBox other : others) {
+				if (kx1 >= other.minX() >> 4 && kx0 <= other.maxX() >> 4 && kz1 >= other.minZ() >> 4 && kz0 <= other.maxZ() >> 4) {
+					warnings.add(warn(RED, "langit_kaki_tapak"));
+					break;
+				}
+			}
+			AABB foot = new AABB(kaki.minX(), kaki.minY(), kaki.minZ(), kaki.maxX() + 1, kaki.maxY() + 1, kaki.maxZ() + 1).inflate(16.0D);
+			if (!level.getEntitiesOfClass(LivingEntity.class, foot, Validator::villageDweller).isEmpty()) {
+				warnings.add(warn(RED, "village"));
+			}
+			String structure = structureIn(level, kaki);
+			if (structure != null) {
+				warnings.add(warn(RED, "structure", structure));
+			}
+			if (level.getServer() instanceof DedicatedServer dedicated && dedicated.spawnProtectionRadius() > 0) {
+				BlockPos spawn = level.getServer().overworld().getRespawnData().globalPos().pos();
+				int r = dedicated.spawnProtectionRadius();
+				if (kaki.intersects(spawn.getX() - r, spawn.getZ() - r, spawn.getX() + r, spawn.getZ() + r)) {
+					warnings.add(warn(RED, "spawn"));
+				}
+			}
+		}
+		// S6: no other hall (active or dormant) within 128 blocks of the throne.
+		net.minecraft.server.MinecraftServer server = level.getServer();
+		if (server != null) {
+			double range = dev.kultivator.sect.hall.Halls.OTHER_HALL_RANGE;
+			for (java.util.UUID other : dev.kultivator.sect.hall.HallData.get(server).owners()) {
+				if (other.equals(owner)) {
+					continue;
+				}
+				dev.kultivator.sect.hall.Halls.HallView hall = dev.kultivator.sect.hall.Halls.hallOf(other);
+				if (hall == null || !hall.dim().equals(level.dimension())) {
+					continue;
+				}
+				double dx = hall.pos().getX() - throne.getX();
+				double dz = hall.pos().getZ() - throne.getZ();
+				if (dx * dx + dz * dz <= range * range) {
+					warnings.add(warn(RED, "langit_aula_lain", (int) range));
+					break;
+				}
+			}
+			// S14: strangers in the island space (the builder defers its blocks around them).
+			AABB space = AABB.of(island);
+			int strangers = 0;
+			for (net.minecraft.server.level.ServerPlayer player : level.players()) {
+				if (player.getUUID().equals(owner) || !space.contains(player.position())) {
+					continue;
+				}
+				dev.kultivator.sect.Sect sect = dev.kultivator.sect.Sects.sectOf(player);
+				if (sect == null || !sect.isMember(owner)) {
+					strangers++;
+				}
+			}
+			if (strangers > 0) {
+				warnings.add(warn(AMBER, "langit_ada_orang", strangers));
+			}
+		}
+		return warnings;
+	}
+
+	/**
+	 * The terrain rules of a sky design on the frozen snapshot (template-local, relative to the throne): S2 the plaza band,
+	 * S3 a clear sky over every island column ({@code top <= skyFloor - 8}), S4 the section rule against the owner's ground
+	 * site ({@code groundTop}, world y of its column top; {@code Integer.MIN_VALUE} without one), S7 the stair foot (relief
+	 * at most 4, water at most 30%, no lava), S8 the shift, S9 the notes. {@code force} (tests) turns S2 and the foot's
+	 * relief and water amber, never S3, S4, S7 lava or S8.
+	 */
+	static List<Warning> skyTerrain(TemplateSpec spec, TerrainView terrain, Map<String, Integer> levels, int yP, int minY, int maxY, int groundTop,
+			int dx, int dz, int offsetMax, boolean force) {
+		List<Warning> warnings = new ArrayList<>();
+		dev.kultivator.sect.build.blueprint.awan.AwanLayout layout = dev.kultivator.sect.build.blueprint.awan.AwanLayout.of(spec.template());
+		int skyFloor = spec.skyFloor();
+		int topMax = Integer.MIN_VALUE;
+		int blocked = 0;
+		for (int x = spec.x0(); x <= spec.x1(); x++) {
+			for (int z = spec.z0(); z <= spec.z1(); z++) {
+				if (!terrain.known(x, z)) {
+					continue;
+				}
+				int top = terrain.top(x, z);
+				topMax = Math.max(topMax, top);
+				if (dev.kultivator.sect.build.blueprint.awan.AwanTerrain.islandTop(layout, x, z) != Integer.MIN_VALUE && top > skyFloor - 8) {
+					blocked++;
+				}
+			}
+		}
+		// S2: the band, in world y.
+		int bandMin = Math.max(dev.kultivator.sect.build.flow.LangitPlan.PLAZA_MIN,
+				(topMax == Integer.MIN_VALUE ? minY : yP + topMax) + spec.below() + dev.kultivator.sect.build.flow.LangitPlan.CLEARANCE);
+		int bandMax = maxY - 2 - spec.above();
+		if (bandMin > bandMax) {
+			warnings.add(warn(force ? AMBER : RED, "langit_sempit", bandMin, bandMax));
+		} else if (yP < bandMin) {
+			warnings.add(warn(force ? AMBER : RED, "langit_rendah", yP, bandMin));
+		} else if (yP > bandMax) {
+			warnings.add(warn(RED, "langit_tinggi", yP, bandMax));
+		}
+		// S3: a clear sky.
+		if (blocked > 0) {
+			warnings.add(warn(RED, "langit_terhalang", blocked));
+		}
+		// S4: the section rule.
+		int floorWorld = yP + skyFloor;
+		if (groundTop != Integer.MIN_VALUE) {
+			int needed = ((groundTop >> 4) + 1) << 4;
+			if (floorWorld < needed) {
+				warnings.add(warn(RED, "langit_seksi", floorWorld, needed));
+			}
+		}
+		// S7: the stair foot.
+		TemplateSpec.Zone kaki = spec.kaki();
+		if (kaki != null) {
+			int lo = Integer.MAX_VALUE;
+			int hi = Integer.MIN_VALUE;
+			int cells = 0;
+			int wet = 0;
+			int lava = 0;
+			for (int x = Math.min(kaki.x0(), kaki.x1()); x <= Math.max(kaki.x0(), kaki.x1()); x++) {
+				for (int z = Math.min(kaki.z0(), kaki.z1()); z <= Math.max(kaki.z0(), kaki.z1()); z++) {
+					if (!terrain.known(x, z)) {
+						continue;
+					}
+					cells++;
+					int ground = terrain.ground(x, z);
+					lo = Math.min(lo, ground);
+					hi = Math.max(hi, ground);
+					if (terrain.water(x, z) > 0) {
+						wet++;
+					}
+					if ((terrain.flags(x, z) & TerrainView.LAVA) != 0) {
+						lava++;
+					}
+				}
+			}
+			if (cells > 0) {
+				if (hi - lo > 4) {
+					warnings.add(warn(force ? AMBER : RED, "langit_kaki_relief", hi - lo));
+				}
+				if (wet / (double) cells > WATER_LIMIT) {
+					warnings.add(warn(force ? AMBER : RED, "langit_kaki_air", Math.round(100.0D * wet / cells)));
+				}
+				if (lava > 0) {
+					warnings.add(warn(RED, "langit_kaki_lava"));
+				}
+				int foot = levels.getOrDefault(kaki.id(), kaki.design());
+				if (yP + foot < minY + 3) {
+					warnings.add(warn(RED, "langit_kaki_rendah"));
+				}
+				warnings.add(warn(NOTE, "langit_tangga", Math.max(0, -foot)));
+			}
+		}
+		// S8: the shift.
+		if (Math.abs(dx) > offsetMax || Math.abs(dz) > offsetMax) {
+			warnings.add(warn(RED, "langit_jauh", Math.max(Math.abs(dx), Math.abs(dz)), offsetMax));
+		}
+		// S9: what is not checked in the air, and the island's shadow.
+		warnings.add(warn(NOTE, "langit_udara"));
+		warnings.add(warn(NOTE, "langit_bayangan"));
+		return warnings;
+	}
+
+	/** True when the config allows the template (sectBuildMaxTemplate); a sky template counts as its ground sibling. */
 	static boolean allowed(int template) {
-		return template >= 1 && template <= KultivatorConfig.get().sectBuildMaxTemplate;
+		int rank = dev.kultivator.sect.build.api.SectTemplates.rank(template);
+		return rank >= 1 && rank <= KultivatorConfig.get().sectBuildMaxTemplate;
 	}
 
 	private Validator() {

@@ -261,6 +261,32 @@ public final class CellIndex extends SavedData {
 		setDirty();
 	}
 
+	/**
+	 * Sekte Langit (DESIGN 37.3.6, 37.4.9 item 9): moves the sections of {@code from} whose lowest y is below
+	 * {@code belowY} to {@code to} ({@code Integer.MAX_VALUE} for all). The section rule of {@code Validator.sky} (S4) makes
+	 * sure no section holds cells of both the ground site and the sky island, so the Ascension splits them cleanly.
+	 */
+	public int rekey(UUID from, UUID to, int belowY) {
+		int moved = 0;
+		for (Long2ObjectOpenHashMap<Entry> map : dims.values()) {
+			for (Long2ObjectMap.Entry<Entry> each : map.long2ObjectEntrySet()) {
+				Entry entry = each.getValue();
+				if (!from.equals(entry.owner)) {
+					continue;
+				}
+				int minY = SectionPos.sectionToBlockCoord(SectionPos.y(each.getLongKey()));
+				if (minY < belowY) {
+					entry.owner = to;
+					moved++;
+				}
+			}
+		}
+		if (moved > 0) {
+			setDirty();
+		}
+		return moved;
+	}
+
 	/** Placed cells of a section count (for stats). */
 	public long placedCount(UUID owner) {
 		long count = 0L;

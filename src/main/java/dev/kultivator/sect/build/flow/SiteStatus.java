@@ -48,6 +48,10 @@ public final class SiteStatus {
 
 	/** The translation key of a site status ({@code SiteView.STATUS_*}). */
 	public static String statusKey(int status) {
+		if (status == SiteView.STATUS_AWAIT_ASCENT) {
+			// Sekte Langit (DESIGN 37.3.5): the core stands, the stele waits on the sky throne.
+			return "kultivator.sekte_langit.status.menunggu_naik";
+		}
 		return "kultivator.sectbuild.status." + Math.max(0, Math.min(SiteView.STATUS_PREPARING, status));
 	}
 

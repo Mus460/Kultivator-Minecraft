@@ -57,6 +57,12 @@ public final class Snapshot {
 	/** Every block entity the builder did not place (world positions, y included) and its kind. */
 	final List<Long> entities = new ArrayList<>();
 	final List<Byte> entityKinds = new ArrayList<>();
+	/**
+	 * Sekte Langit (DESIGN 37.4.8): a sky site's snapshot looks through the air under a sky island and through its own sect
+	 * cells (the island and the hollow belly) down to the real ground, and its {@code top} ignores the sect's own cells, so
+	 * an upgrade of a sky island sees the land under it, not its own belly. Not saved: a site re-captures on upgrade only.
+	 */
+	boolean sky;
 
 	private Snapshot(int minX, int minZ, int size, int steleY) {
 		this.minX = minX;
@@ -74,6 +80,13 @@ public final class Snapshot {
 	/** An empty snapshot of the square of half size {@code half} around {@code stele}. */
 	public static Snapshot of(BlockPos stele, int half) {
 		return new Snapshot(stele.getX() - half, stele.getZ() - half, 2 * half + 1, stele.getY());
+	}
+
+	/** An empty sky snapshot (it looks under sky islands, see {@link #sky}). */
+	public static Snapshot sky(BlockPos throne, int half) {
+		Snapshot snapshot = of(throne, half);
+		snapshot.sky = true;
+		return snapshot;
 	}
 
 	int index(int wx, int wz) {
@@ -172,6 +185,10 @@ public final class Snapshot {
 		for (int x = x0; x <= x1; x++) {
 			for (int z = z0; z <= z1; z++) {
 				int i = index(x, z);
+				if (sky) {
+					captureSkyColumn(level, chunk, cursor, x, z, i, own ? index : null);
+					continue;
+				}
 				int surface = chunk.getHeight(Heightmap.Types.WORLD_SURFACE, x & 15, z & 15);
 				int y = Math.max(minY, surface);
 				int topY = y;
@@ -266,6 +283,86 @@ public final class Snapshot {
 		}
 	}
 
+	/**
+	 * One column of a sky snapshot: from the surface down, the sect's own cells and air are passed (whole empty sections at
+	 * once), the first other non-air block is the top, then the natural ground below it by the usual rules.
+	 */
+	private void captureSkyColumn(ServerLevel level, LevelChunk chunk, BlockPos.MutableBlockPos cursor, int x, int z, int i, @Nullable CellIndex index) {
+		int minY = level.getMinY();
+		int y = Math.max(minY, chunk.getHeight(Heightmap.Types.WORLD_SURFACE, x & 15, z & 15));
+		int topY = Integer.MIN_VALUE;
+		while (y >= minY) {
+			int sectionIndex = chunk.getSectionIndex(y);
+			if (sectionIndex >= 0 && sectionIndex < chunk.getSectionsCount() && chunk.getSection(sectionIndex).hasOnlyAir()) {
+				y = ((y >> 4) << 4) - 1;
+				continue;
+			}
+			cursor.set(x, y, z);
+			BlockState state = chunk.getBlockState(cursor);
+			if (state.isAir() || index != null && index.isPlaced(level, cursor)) {
+				y--;
+				continue;
+			}
+			topY = y;
+			break;
+		}
+		if (topY == Integer.MIN_VALUE) {
+			ground[i] = (short) (minY - steleY);
+			top[i] = ground[i];
+			known.set(i);
+			return;
+		}
+		// From the first foreign block: the usual ground probe (plants, logs and leaves looked through).
+		int groundY = topY;
+		int waterDepth = 0;
+		int flag = 0;
+		boolean leaves = false;
+		boolean logs = false;
+		for (int step = 0; step < PROBE && y >= minY; y--, step++) {
+			cursor.set(x, y, z);
+			BlockState state = chunk.getBlockState(cursor);
+			if (state.isAir()) {
+				continue;
+			}
+			if (state.getFluidState().is(Fluids.LAVA) || state.getFluidState().is(Fluids.FLOWING_LAVA)) {
+				flag |= TerrainView.LAVA;
+				groundY = y;
+				break;
+			}
+			if (state.is(Blocks.WATER) || !state.getFluidState().isEmpty() && !state.isSolid()) {
+				waterDepth++;
+				continue;
+			}
+			if (state.is(BlockTags.LEAVES)) {
+				leaves |= Classifier.naturalLeaves(state);
+				continue;
+			}
+			if (Classifier.growthPart(state)) {
+				continue;
+			}
+			if (state.is(BlockTags.LOGS)) {
+				logs |= Classifier.treeLog(state);
+				continue;
+			}
+			if (state.canBeReplaced() || !state.isSolid()) {
+				continue;
+			}
+			groundY = y;
+			if (!Classifier.naturalTagged(state) && !Classifier.rockySurface(level, cursor, state)) {
+				flag |= TerrainView.PLAYER_MADE;
+			}
+			break;
+		}
+		if (leaves && logs) {
+			flag |= TerrainView.TREE;
+		}
+		ground[i] = (short) Math.max(-2047, groundY - steleY);
+		top[i] = (short) Math.max(-2047, Math.max(groundY, topY) - steleY);
+		water[i] = (byte) Math.min(127, waterDepth);
+		flags[i] = (byte) flag;
+		known.set(i);
+	}
+
 	/** The validation kind of a block entity (reads only: an unopened loot chest counts as holding items, never rolled). */
 	private static byte kindOf(ServerLevel level, BlockPos pos, BlockEntity entity) {
 		BlockState state = entity.getBlockState();
@@ -347,6 +444,7 @@ public final class Snapshot {
 	/** An immutable copy (the capture keeps writing into this one until frozen). */
 	public Snapshot freeze() {
 		Snapshot copy = new Snapshot(minX, minZ, size, steleY);
+		copy.sky = sky;
 		System.arraycopy(ground, 0, copy.ground, 0, ground.length);
 		System.arraycopy(top, 0, copy.top, 0, top.length);
 		System.arraycopy(water, 0, copy.water, 0, water.length);
