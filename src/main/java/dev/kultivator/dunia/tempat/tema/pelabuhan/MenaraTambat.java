@@ -77,7 +77,7 @@ public final class MenaraTambat {
 		}
 		daftarRute(server, kota.situs, anchor.blockPosition());
 		if (handler.buatan(anchor) == null && PelabuhanAnchors.dekat(anchor, within, 40.0D)) {
-			KultivatorNpc npc = HidupApi.tubuh(level, kota.situs, NpcRole.PELAUT, anchor.blockPosition(), anchor.getYRot());
+			KultivatorNpc npc = HidupApi.tubuhStaf(level, kota.situs, NpcRole.PELAUT, anchor.blockPosition(), anchor.getYRot());
 			if (npc != null) {
 				npc.memory().putBoolean("hold", true);
 				npc.memory().putString(TokoPelabuhan.LAYANAN_NPC, "bahan_bakar");

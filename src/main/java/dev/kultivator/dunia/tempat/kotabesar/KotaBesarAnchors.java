@@ -3,10 +3,13 @@ package dev.kultivator.dunia.tempat.kotabesar;
 import dev.kultivator.Kultivator;
 import dev.kultivator.dunia.AnchorHandler;
 import dev.kultivator.dunia.DuniaAnchorEntity;
+import dev.kultivator.dunia.DuniaAnchors;
+import dev.kultivator.dunia.DuniaSpine;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
 import dev.kultivator.dunia.kota.Towns;
 import dev.kultivator.dunia.tempat.Kandidat;
+import dev.kultivator.dunia.tempat.cerita.CeritaApi;
 import dev.kultivator.dunia.tempat.ekonomi.LapakSekte;
 import dev.kultivator.dunia.tempat.ekonomi.LelangAgung;
 import dev.kultivator.dunia.tempat.hidup.HidupApi;
@@ -43,7 +46,11 @@ public final class KotaBesarAnchors implements AnchorHandler {
 	/** A slain service body returns after this many ticks (5 minutes). */
 	static final int KEMBALI_TICK = 6000;
 	/** A service body farther than this from every player may make room for a nearer one when the cap is full. */
-	static final double LEPAS_JARAK = 80.0D;
+	static final double LEPAS_JARAK = 160.0D;
+	/** Service bodies come when a player is within this ({@link #radius}); everything else keeps {@link #DEKAT}. */
+	static final int JARAK_TUBUH = 128;
+	/** The range of the gates, stalls, stages and forwarders (the handler's radius before the bodies reached 128). */
+	static final double DEKAT = 56.0D;
 
 	private static final Map<String, AnchorHandler> TAMBAHAN = new HashMap<>();
 	/** Live capitals by town id. */
@@ -142,6 +149,35 @@ public final class KotaBesarAnchors implements AnchorHandler {
 		return npc != null && npc.isAlive() && !npc.isRemoved() ? npc : null;
 	}
 
+	/**
+	 * {@code uji hidup audit}: why the service anchor has no body now (suffix of {@code kultivator.hidup.uji.audit.alasan.*}),
+	 * or null when its body stands.
+	 */
+	public static @Nullable String alasanKosong(ServerLevel level, DuniaAnchorEntity anchor) {
+		if (tubuhDari(anchor) != null) {
+			return null;
+		}
+		if (!DuniaSpine.enabled()) {
+			return "dunia_mati";
+		}
+		if (!KotaBesarConfig.hidup()) {
+			return "saklar";
+		}
+		if (peran(anchor.data().getStringOr("peran", "")) == null) {
+			return "peran";
+		}
+		if (level.getGameTime() < HANDLER.kembaliPada.getOrDefault(anchor.getUUID(), 0L)) {
+			return "mati";
+		}
+		if (DuniaAnchors.playersNear(level, anchor.position(), JARAK_TUBUH).isEmpty()) {
+			return "jauh";
+		}
+		if (tubuhHidup(Towns.townOf(anchor)) >= KotaBesarConfig.get().tubuhMaks) {
+			return "topi_kota";
+		}
+		return "menunggu";
+	}
+
 	/** How many service bodies of town {@code town} are alive now. */
 	static int tubuhHidup(long town) {
 		int n = 0;
@@ -165,7 +201,7 @@ public final class KotaBesarAnchors implements AnchorHandler {
 
 	@Override
 	public int radius() {
-		return 56;
+		return JARAK_TUBUH;
 	}
 
 	@Override
@@ -207,8 +243,15 @@ public final class KotaBesarAnchors implements AnchorHandler {
 	}
 
 	@Override
-	public void nearby(ServerLevel level, DuniaAnchorEntity anchor, List<ServerPlayer> within) {
+	public void nearby(ServerLevel level, DuniaAnchorEntity anchor, List<ServerPlayer> semua) {
 		String what = anchor.what();
+		if ("layanan".equals(what) && KotaBesarConfig.hidup()) {
+			bawaTubuh(level, anchor, semua);
+		}
+		List<ServerPlayer> within = DuniaAnchors.dalam(semua, anchor, DEKAT);
+		if (within.isEmpty()) {
+			return;
+		}
 		AnchorHandler extra = TAMBAHAN.get(what);
 		if (extra != null) {
 			try {
@@ -235,7 +278,6 @@ public final class KotaBesarAnchors implements AnchorHandler {
 				if ("lelang_agung".equals(anchor.data().getStringOr("layanan", ""))) {
 					LelangAgung.jangkarDekat(level, anchor, within);
 				}
-				bawaTubuh(level, anchor, within);
 			}
 			case "gerbang" -> {
 				GerbangKotaEntity g = gerbang.get(anchor.getUUID());
@@ -350,7 +392,7 @@ public final class KotaBesarAnchors implements AnchorHandler {
 		if (tubuhHidup(town) >= KotaBesarConfig.get().tubuhMaks && !lepasJauh(level, town)) {
 			return;
 		}
-		KultivatorNpc made = HidupApi.tubuh(level, town, peran, anchor.blockPosition(), anchor.getYRot());
+		KultivatorNpc made = HidupApi.tubuhStaf(level, town, peran, anchor.blockPosition(), anchor.getYRot());
 		if (made != null) {
 			made.memory().putString("kotabesar_layanan", anchor.data().getStringOr("layanan", ""));
 			if (peran == NpcRole.PANGERAN_KOTA) {
@@ -364,8 +406,23 @@ public final class KotaBesarAnchors implements AnchorHandler {
 					made.setPlate(KotaBesarNames.hakim(level.getSeed(), k.index()));
 				}
 			}
+			// the recurring character of the lot (38.S.2: Bibi Hong, Qian Duoduo...), one body per capital
+			String tokoh = anchor.data().getStringOr("tokoh", "");
+			if (!tokoh.isEmpty() && !adaTokoh(town, tokoh)) {
+				CeritaApi.tandaiTokoh(made, tokoh);
+			}
 			tubuh.put(id, made);
 		}
+	}
+
+	/** True when a live service body of {@code town} already stands for character {@code tokoh}. */
+	private boolean adaTokoh(long town, String tokoh) {
+		for (KultivatorNpc npc : tubuh.values()) {
+			if (npc.isAlive() && !npc.isRemoved() && npc.town() == town && tokoh.equals(npc.memory().getStringOr("tokoh", ""))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

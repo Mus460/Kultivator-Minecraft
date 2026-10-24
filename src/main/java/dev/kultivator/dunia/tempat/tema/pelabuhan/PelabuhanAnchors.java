@@ -227,7 +227,7 @@ public final class PelabuhanAnchors implements AnchorHandler {
 			return;
 		}
 		NpcRole role = role(teks(anchor, "peran"), GUDANG.equals(anchor.what()) ? NpcRole.KULI : NpcRole.PELAUT);
-		KultivatorNpc npc = HidupApi.tubuh(level, kota.situs, role, anchor.blockPosition(), anchor.getYRot());
+		KultivatorNpc npc = HidupApi.tubuhStaf(level, kota.situs, role, anchor.blockPosition(), anchor.getYRot());
 		if (npc == null) {
 			return;
 		}

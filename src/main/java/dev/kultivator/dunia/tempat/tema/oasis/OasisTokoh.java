@@ -134,7 +134,7 @@ public final class OasisTokoh {
 		if (data == null) {
 			return null;
 		}
-		KultivatorNpc npc = HidupApi.tubuh(level, situs, data.peran(), pos, yaw);
+		KultivatorNpc npc = HidupApi.tubuhStaf(level, situs, data.peran(), pos, yaw);
 		if (npc != null) {
 			tandai(npc, id);
 		}

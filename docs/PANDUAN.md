@@ -9875,6 +9875,20 @@ Perintah uji (op) ada di bawah `/kultivasi uji tempat|kota_besar|ekonomi|hidup|c
 config di `config/kultivator-dunia.json` bagian `tempat`, `kotaBesar`, `ekonomi38`, `kampung`, `kompleksSekte`, `gua`,
 `jalan`, `perbaikan` dan `cerita`. Rancangan lengkap: `docs/rancangan/38-kota-besar-dan-tempat.md`.
 
+### 69.5 Setiap tempat punya orangnya
+
+Setiap toko, kedai teh, penginapan, rumah makan, bank, balai lelang, gilda, kuil, perpustakaan, yamen, gerbang,
+stasiun teleport dan dermaga punya penjaganya sendiri. Mereka datang begitu kamu (mode survival atau adventure) berada
+dalam 128 blok dan tidak pernah tertahan oleh batas jumlah NPC atau beban server; hanya warga yang berjalan-jalan dan
+penduduk yang dibatasi. Klik kanan penjaga membuka layarnya (dagang pil dan pusaka, menu teh, kamar, bank dan gadai,
+lelang, misi gilda ...). Tokoh cerita ibu kota (Bibi Hong di Penginapan Awan Singgah, Gendut Zhu di rumah makan,
+Nyonya Qian Duoduo di Rumah Uang, Hakim Bao Qing, Lin Fei dan Xiao Mei di Gilda Kultivator, Tetua Dan Chen di Gilda
+Alkemis, Kakek Lumpur dan Si Kecil Dou di kumuh, dan lainnya) berdiri di tempat kerjanya dengan dialog dan quest mereka.
+
+Bila sebuah tempat terasa kosong, jalankan `/kultivasi uji hidup audit` (op) di dekatnya: daftar setiap jangkar
+tempat kerja yang termuat dalam 128 blok, perannya, apakah orangnya ada, dan bila tidak, alasannya (saklar mati, peran
+salah, tak ada pemain survival dekat, baru terbunuh, topi penuh, penjaga MSPT), plus ringkasan budget NPC.
+
 ## 70. Lima Kota Bertema
 
 Selain ibu kota, dunia punya lima jenis kota bertema (masing-masing 288 × 288 blok, sembilan distrik, menghadap medannya):

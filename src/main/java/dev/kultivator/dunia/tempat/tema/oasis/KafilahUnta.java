@@ -756,7 +756,7 @@ public final class KafilahUnta {
 		if (OasisAnchors.angka(anchor, "sewa", 0) == 1) {
 			KultivatorNpc npc = PENUNTUN.get(anchor.getUUID());
 			if (npc == null || npc.isRemoved() || !npc.isAlive()) {
-				npc = HidupApi.tubuh(level, situs, NpcRole.PENUNTUN_UNTA, anchor.blockPosition().relative(anchor.getDirection(), 2), anchor.getYRot());
+				npc = HidupApi.tubuhStaf(level, situs, NpcRole.PENUNTUN_UNTA, anchor.blockPosition().relative(anchor.getDirection(), 2), anchor.getYRot());
 				if (npc != null) {
 					npc.memory().putBoolean("hold", true);
 					npc.memory().putString(Tawar.KIOS, "kandang");

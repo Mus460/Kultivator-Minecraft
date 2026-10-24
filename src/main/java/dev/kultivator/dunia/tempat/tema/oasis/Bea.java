@@ -87,7 +87,7 @@ public final class Bea {
 		long situs = OasisAnchors.situsOf(level, anchor);
 		KultivatorNpc guard = PENJAGA.get(anchor.getUUID());
 		if (guard == null || guard.isRemoved() || !guard.isAlive()) {
-			guard = HidupApi.tubuh(level, situs, NpcRole.PENGAWAL_GURUN, anchor.blockPosition(), anchor.getYRot());
+			guard = HidupApi.tubuhStaf(level, situs, NpcRole.PENGAWAL_GURUN, anchor.blockPosition(), anchor.getYRot());
 			if (guard != null) {
 				guard.memory().putBoolean("hold", true);
 				SosokApi.gerak(guard, GerakId.SIKAP_TOMBAK, 0, 0, PropId.TOMBAK, 0, 0);

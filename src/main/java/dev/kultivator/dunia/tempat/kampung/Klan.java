@@ -337,7 +337,7 @@ final class Klan {
 		if (Kampung.tubuhKu(site) >= KampungConfig.get().tubuhMaks) {
 			return null;
 		}
-		KultivatorNpc npc = HidupApi.tubuh(level, site, role, anchor.blockPosition(), anchor.getYRot());
+		KultivatorNpc npc = HidupApi.tubuhStaf(level, site, role, anchor.blockPosition(), anchor.getYRot());
 		if (npc != null) {
 			Component given = Component.translatable("kultivator.kampung.nama_diri." + Math.floorMod(KampungNames.mix(site ^ role.ordinal()), 12));
 			npc.setPlate(Component.translatable(role == NpcRole.PATRIARK_KLAN ? "kultivator.kampung.patriark.plat" : "kultivator.kampung.tuan_muda.plat",

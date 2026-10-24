@@ -4,6 +4,9 @@ import dev.kultivator.Kultivator;
 import dev.kultivator.dunia.AnchorHandler;
 import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.DuniaSites;
+import dev.kultivator.dunia.kota.KultivatorNpc;
+import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.tempat.hidup.HidupApi;
 import dev.kultivator.dunia.tempat.TempatZones;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -12,7 +15,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * The anchors of the mortal villages and clan villages (module {@code kampung}, DESIGN 38.C.2; templates of
@@ -30,6 +36,9 @@ final class KampungAnchors implements AnchorHandler {
 
 	/** Sizes in matching order (the longest first). */
 	private static final List<String> UKURAN = List.of("desa_besar", "dusun", "desa");
+
+	/** Market anchor UUID -> the stall keeper (staff: outside the NPC caps, held at the stalls). */
+	private final Map<UUID, KultivatorNpc> penjual = new HashMap<>();
 
 	/** A village's size and style. */
 	record Identitas(String ukuran, String gaya) {
@@ -117,7 +126,10 @@ final class KampungAnchors implements AnchorHandler {
 				FestivalPanen.dekat(level, anchor, site, within);
 				AnakBerbakat.dekat(level, anchor, site, within);
 			}
-			case "pasar" -> PasarDesa.dekat(level, anchor, site, within);
+			case "pasar" -> {
+				penjual(level, anchor, site);
+				PasarDesa.dekat(level, anchor, site, within);
+			}
 			case "tuan_muda" -> Klan.tuanMuda(level, anchor, site, within);
 			case "patriark" -> Klan.patriark(level, anchor, site, within);
 			default -> {
@@ -129,6 +141,23 @@ final class KampungAnchors implements AnchorHandler {
 	public void unloaded(ServerLevel level, DuniaAnchorEntity anchor) {
 		if (anchor.what().equals("lonceng")) {
 			FestivalPanen.lepas(situs(anchor));
+		}
+		KultivatorNpc npc = penjual.remove(anchor.getUUID());
+		if (npc != null && !npc.isRemoved()) {
+			npc.discard();
+		}
+	}
+
+	/** The village market's stall keeper (a peddler minding the day's wares). */
+	private void penjual(ServerLevel level, DuniaAnchorEntity anchor, long site) {
+		KultivatorNpc npc = penjual.get(anchor.getUUID());
+		if (npc != null && npc.isAlive() && !npc.isRemoved()) {
+			return;
+		}
+		npc = HidupApi.tubuhStaf(level, site, NpcRole.PEDAGANG_KELILING, anchor.blockPosition(), anchor.getYRot());
+		if (npc != null) {
+			npc.memory().putBoolean("hold", true);
+			penjual.put(anchor.getUUID(), npc);
 		}
 	}
 

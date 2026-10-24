@@ -135,7 +135,7 @@ public final class TokohIblis {
 			return null;
 		}
 		int look = id.hashCode() * 0x45D9F3B ^ 0x1B1A20;
-		KultivatorNpc npc = HidupApi.tubuh(level, situs, data.peran(), pos, yaw, look);
+		KultivatorNpc npc = HidupApi.tubuhStaf(level, situs, data.peran(), pos, yaw, look);
 		if (npc != null) {
 			tandai(npc, id);
 		}

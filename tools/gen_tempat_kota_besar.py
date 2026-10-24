@@ -887,9 +887,11 @@ def yamen(k, x0, z0, y=LY):
     for i in range(0, len(cells), 3):
         rel += [cells[i] - ax, cells[i + 1], cells[i + 2] - az]
     k.jangkar(ax + 0.5, y + 1, az + 0.5, "kotabesar/sel", protect=16, pts=rel)
-    k.jangkar(ix1 - 0.5, f + 2, cz + 0.5, "kotabesar/layanan", yaw=270.0, layanan="yamen", peran="HAKIM")
+    k.jangkar(ix1 - 0.5, f + 2, cz + 0.5, "kotabesar/layanan", yaw=270.0, layanan="yamen", peran="HAKIM",
+              tokoh="bao_qing")
     k.jangkar(x0 + 6.5, y + 1, z0 + 24.5, "kota/penjaga", yaw=90.0)
-    k.jangkar(ix0 + 3.5, f + 1, cz + 0.5, "kotabesar/layanan", yaw=90.0, layanan="denda", peran="KAPTEN_PENJAGA")
+    k.jangkar(ix0 + 3.5, f + 1, cz + 0.5, "kotabesar/layanan", yaw=90.0, layanan="denda", peran="KAPTEN_PENJAGA",
+              tokoh="tie_hu")
     k.titik("pintu", x0 + 3, y + 1, z0 + 24, "west")
     k.kotak("bangunan", x0 + 14, y, z0 + 12, x0 + 31, y + 16, z0 + 36, "west", nama="aula_yamen")
     k.kotak("bangunan", jx0, y, jz0, jx1, y + 6, jz1, "west", nama="penjara")
@@ -1335,7 +1337,7 @@ def build_istana():
     K.paving(k, px0 + 1, pz0 + 1, px1 - 1, pz1 - 1, LY, role="paving", alt="kerb", alt_chance=0.05)
     a, cx, tf = throne_hall(k, 55, 28, 88, 60)
     k.jangkar(cx + 0.5, tf + 1, a["inner"][1] + 2.5, "kotabesar/layanan", yaw=180.0, layanan="audiensi",
-              peran="PANGERAN_KOTA")
+              peran="PANGERAN_KOTA", tokoh="yan_wushuang")
     # front court: imperial path, lions, huabiao, incense, flanking office wings
     k.path([(cx, 62), (cx, 92)], LY, width=7, role="imperial", alt="paving", alt_chance=0.08)
     for z in (66, 80):
@@ -1357,7 +1359,10 @@ def build_istana():
                          face="east" if side == 0 else "west")
         if side == 0:
             k.jangkar((jx0 + jx1) / 2.0 + 0.5, wf + 1, (jz0 + jz1) / 2.0 + 0.5, "kotabesar/layanan", yaw=90.0,
-                      layanan="perintah_istana", peran="MENTERI")
+                      layanan="perintah_istana", peran="MENTERI", tokoh="gu_lianshan")
+        else:
+            k.jangkar((jx0 + jx1) / 2.0 + 0.5, wf + 1, (jz0 + jz1) / 2.0 + 0.5, "kotabesar/layanan", yaw=270.0,
+                      layanan="istana_ajudan", peran="MENTERI", tokoh="mo_ying")
     # rear residence hall and its garden (lot (1,0) north part)
     r = K.aula(k, 58, 5, 85, 22, h=6, podium_h=2, teras=2, roof="hip", tiers=2, door_sides=("south",), door_w=3)
     rx0, rz0, rx1, rz1 = r["inner"]
@@ -1368,6 +1373,8 @@ def build_istana():
         k.titik("kasur", x, rf + 1, rz0 + 1, "south")
     K.rug(k, rc - 3, rz0 + 3, rc + 3, rz1 - 1, rf + 1)
     K.low_table(k, rc, rf + 1, rz0 + 5)
+    k.jangkar(rc + 0.5, rf + 1, rz0 + 8.5, "kotabesar/layanan", yaw=180.0, layanan="istana_pewaris", peran="PANGERAN_KOTA",
+              tokoh="yan_ruyi")
     for d_, (dx, dz) in K.FACE.items():
         k.titik("kursi_lantai", rc + dx * 2 if dx else rc, rf + 1, rz0 + 5 + dz * 2 if dz else rz0 + 5, OPP[d_])
     K.dandan(k, (rx0 + 1, rz0, rx1, rz1), rf, "rumah", simpan=[(rc - 3, rz0, rc + 3, rz1)], titik_maks=2)
@@ -1673,7 +1680,7 @@ def perpustakaan(k, y=LY):
     k.titik("kerja:rak", ix0 + 2, f + 1, iz0 + 2, "north")
     k.titik("kerja:rak", ix1 - 2, f + 1, iz0 + 2, "north")
     k.jangkar((ix0 + ix1) / 2.0 + 0.5, f + 1, iz1 - 2.5, "kotabesar/layanan", yaw=0.0, layanan="perpustakaan",
-              peran="PUSTAKAWAN")
+              peran="PUSTAKAWAN", tokoh="tuan_wen")
     # lecture hall, west wing x 4..28
     b = K.aula(k, 4, 9, 28, 40, h=6, podium_h=1, teras=1, roof="gable", along="z", door_sides=("east",), door_w=3,
                tile=True)
@@ -1780,7 +1787,8 @@ def kuil_langit(k, y=LY):
     for d_, (dx, dz) in K.FACE.items():
         k.titik("dupa", bx + dx * 3, y + 1, bz + dz * 3, OPP[d_])
     k.jangkar(bx + 0.5, y + 1, bz + 3.5, "kotabesar/kuil", protect=24)
-    k.jangkar(cx + 0.5, f + 1, iz0 + 6.5, "kotabesar/layanan", yaw=180.0, layanan="kuil", peran="RAHIB")
+    k.jangkar(cx + 0.5, f + 1, iz0 + 6.5, "kotabesar/layanan", yaw=180.0, layanan="kuil", peran="RAHIB",
+              tokoh="jing_xin")
     # bell tower (west) and drum stand (east)
     tx = x0 + 6
     for xx in (tx, tx + 4):
@@ -1828,7 +1836,7 @@ def sekolah(k, x0, z0, y=LY):
         k.put(x, f + 2, iz0, "minecraft:black_wool")
         k.put(x, f + 3, iz0, "minecraft:black_wool")
     K.table(k, (ix0 + ix1) // 2, f + 1, iz0 + 2, "minecraft:white_carpet")
-    k.titik("kursi", (ix0 + ix1) // 2, f + 1, iz0 + 1, "south", {"peran": "CENDEKIA"})
+    k.titik("kursi", (ix0 + ix1) // 2, f + 1, iz0 + 1, "south", {"peran": "PENCERAMAH_FANA"})
     n = 0
     for z in range(iz0 + 4, iz1 - 1, 2):
         for x in range(ix0 + 2, ix1 - 1, 3):
@@ -1961,7 +1969,8 @@ def kantor_pelabuhan(k, x0, z0, y=LY):
     # D-KS: luggage stacks, waiting benches and tea tables for passengers between the chairs
     K.dandan(k, (ix0, iz0 + 6, ix1, iz1), f, "tunggu", titik_maks=2)
     K.k_peti(K.Ruang(k, (ix1 - 3, iz0 + 6, ix1, iz0 + 8), f), ix1 - 2, iz0 + 6, w=2, d=2)
-    k.jangkar((ix0 + ix1) / 2.0 + 0.5, f + 1, iz0 + 2.5, "kotabesar/layanan", yaw=0.0, layanan="dermaga", peran="NAKHODA")
+    k.jangkar((ix0 + ix1) / 2.0 + 0.5, f + 1, iz0 + 2.5, "kotabesar/layanan", yaw=0.0, layanan="dermaga", peran="NAKHODA",
+              tokoh="yun_fei")
     k.kotak("bangunan", x0 + 5, y, z0 + 8, x0 + 40, f + 14, z0 + 36, "south", nama="kantor_pelabuhan")
 
 
@@ -2330,6 +2339,8 @@ def gilda_alkemis(k, y=LY):
     k.kotak("panggung", cx - 10, f + 2, cz - 10, cx + 10, f + 6, cz + 10, "south", acara="pil")
     k.jangkar(cx + 0.5, f + 2, cz + 0.5, "kotabesar/panggung", acara="pil", pts=pts)
     k.jangkar(cx + 0.5, f + 2, iz1 - 1.5, "kotabesar/layanan", yaw=0.0, layanan="gilda_alkemis", peran="ALKEMIS")
+    k.jangkar(cx + 3.5, f + 2, iz1 - 1.5, "kotabesar/layanan", yaw=0.0, layanan="ketua_alkemis", peran="KETUA_GILDA",
+              tokoh="dan_chen")
     # herb store (west wing)
     b = K.aula(k, 3, 8, 16, 40, h=6, podium_h=1, teras=1, roof="gable", along="z", door_sides=("east",), door_w=1, tile=True)
     bx0, bz0, bx1, bz1 = b["inner"]
@@ -2380,7 +2391,8 @@ def gilda_tempa(k, y=LY):
     # D-KS: ore and charcoal stock, timber for hafts, finished blanks on racks between the forge bays
     K.dandan(k, (ix0, iz0, ix1, iz1), f, "gudang", lorong="z", titik_maks=1,
              simpan=[((ix0 + ix1) // 2 - 2, iz0 + 8, (ix0 + ix1) // 2 + 2, iz0 + 16)])
-    k.jangkar((ix0 + ix1) / 2.0 - 0.5, f + 1, iz0 + 12.5, "kotabesar/layanan", yaw=90.0, layanan="gilda_tempa", peran="EMPU")
+    k.jangkar((ix0 + ix1) / 2.0 - 0.5, f + 1, iz0 + 12.5, "kotabesar/layanan", yaw=90.0, layanan="gilda_tempa", peran="EMPU",
+              tokoh="ou_ye")
     k.titik("kerja:palu", (ix0 + ix1) // 2 + 1, f + 1, iz0 + 12, "west", {"peran": "EMPU"})
     # display hall (south lot)
     b = K.aula(k, x0 + 2, 50, x1 - 2, 90, h=7, podium_h=2, teras=2, roof="hip", tiers=2, door_sides=("west",),
@@ -2442,7 +2454,8 @@ def gilda_kultivator(k, y=LY):
     for x in range(ix0 + 4, ix1 - 3, 4):
         K.wall_banner(k, x, f + 6, iz0, "south", ("white", "light_gray", "lime", "green", "cyan", "light_blue", "blue",
                                                   "purple", "yellow")[(x // 4) % 9])
-    k.jangkar(cx + 0.5, f + 1, iz0 + 2.5, "kotabesar/layanan", yaw=0.0, layanan="gilda_misi", peran="PETUGAS_GILDA")
+    k.jangkar(cx + 0.5, f + 1, iz0 + 2.5, "kotabesar/layanan", yaw=0.0, layanan="gilda_misi", peran="PETUGAS_GILDA",
+              tokoh="xiao_mei")
     for x in (cx - 5, cx + 5):
         k.titik("kerja:meja_tulis", x, f + 1, iz0 + 2, "south", {"peran": "PETUGAS_GILDA"})
     # the Young Dragon List stele
@@ -2455,7 +2468,8 @@ def gilda_kultivator(k, y=LY):
         k.put(sx, f + dy, sz - 1, "minecraft:polished_basalt", {"axis": "y"})
     k.put(sx, f + 9, sz, "gold")
     k.put(sx, f + 9, sz - 1, "gold")
-    k.jangkar(sx - 1.5, f + 1, sz + 0.5, "kotabesar/layanan", yaw=270.0, layanan="naga_muda", peran="KETUA_GILDA")
+    k.jangkar(sx - 1.5, f + 1, sz + 0.5, "kotabesar/layanan", yaw=270.0, layanan="naga_muda", peran="KETUA_GILDA",
+              tokoh="lin_fei")
     # duel test floor 15 x 15 with a rope ring
     tx0, tz0 = cx - 7, (iz0 + iz1) // 2 - 3
     for x in range(tx0, tx0 + 15):
@@ -2466,7 +2480,8 @@ def gilda_kultivator(k, y=LY):
                     k.put(x, f + 1, z, "wood_fence")
                     k.put(x, f + 2, z, "wood_fence")
     k.kotak("panggung", tx0 + 1, f + 1, tz0 + 1, tx0 + 13, f + 4, tz0 + 13, "north", acara="uji_duel")
-    k.jangkar(cx + 0.5, f + 1, tz0 + 15.5, "kotabesar/layanan", yaw=0.0, layanan="uji_duel", peran="PENGUJI")
+    k.jangkar(cx + 0.5, f + 1, tz0 + 15.5, "kotabesar/layanan", yaw=0.0, layanan="uji_duel", peran="PENGUJI",
+              tokoh="feng_ao")
     for z in range(tz0 + 1, tz0 + 14, 3):
         k.titik("penonton", tx0 - 2, f + 1, z, "east")
         k.titik("penonton", tx0 + 16, f + 1, z, "west")
@@ -2543,7 +2558,8 @@ def rumah_makan(k, x0, z0, y=LY, name="teratai", seats=10):
             n += 1
     for x in range(ix0 + 2, ix1 - 1, 5):
         K.lit(k, x, f + 6, (iz0 + iz1) // 2, chain=1, role="lamp")
-    k.jangkar((ix0 + ix1) / 2.0 + 0.5, f + 1, iz0 + 2.5, "kotabesar/layanan", yaw=0.0, layanan="rumah_makan", peran="KOKI")
+    k.jangkar((ix0 + ix1) / 2.0 + 0.5, f + 1, iz0 + 2.5, "kotabesar/layanan", yaw=0.0, layanan="rumah_makan", peran="KOKI",
+              tokoh="gendut_zhu")
     k.titik("kerja:teko", (ix0 + ix1) // 2 + 3, f + 1, iz0 + 4, "south", {"peran": "PELAYAN"})
     for x in range(x0 + 6, x0 + 42, 3):
         if x % 2:
@@ -2693,7 +2709,8 @@ def rumah_uang(k, x0, z0, y=LY):
     # D-KS: the customers' hall (benches, tea, vases) and the back office behind the teller bars (desks, ledgers)
     K.dandan(k, (ix0, wz + 2, ix1, iz1 - 3), f, "tunggu", titik_maks=2)
     K.dandan(k, (ix0 + 9, iz0, ix1, wz - 2), f, "kantor", titik_maks=2)
-    k.jangkar((ix0 + ix1) / 2.0 + 0.5, f + 1, wz + 1.5, "kotabesar/layanan", yaw=180.0, layanan="bank", peran="BANKIR")
+    k.jangkar((ix0 + ix1) / 2.0 + 0.5, f + 1, wz + 1.5, "kotabesar/layanan", yaw=180.0, layanan="bank", peran="BANKIR",
+              tokoh="qian_duoduo")
     k.kotak("bangunan", x0 + 5, y, z0 + 5, x0 + 42, f + 14, z0 + 38, "south", nama="rumah_uang")
 
 
@@ -2724,7 +2741,8 @@ def rumah_judi_batu(k, x0, z0, y=LY):
             k.stairs(ix1 - 2, f + 2, z, "wood_stairs", "west")
     K.counter(k, ix1 - 8, ix1 - 1, iz0 + 3, f, "south")
     k.titik("kursi", ix1 - 4, f + 1, iz0 + 2, "south", {"peran": "BANDAR_BATU"})
-    k.jangkar(ix1 - 4.5, f + 1, iz0 + 4.5, "kotabesar/layanan", yaw=0.0, layanan="judi_batu", peran="BANDAR_BATU")
+    k.jangkar(ix1 - 4.5, f + 1, iz0 + 4.5, "kotabesar/layanan", yaw=0.0, layanan="judi_batu", peran="BANDAR_BATU",
+              tokoh="lao_shi")
     k.jangkar(ix0 + 7.5, f + 1, (iz0 + iz1) / 2.0 + 0.5, "kotabesar/panggung", acara="judi_batu")
     K.dandan(k, (ix0 + 14, iz0 + 3, ix1 - 4, iz1), f, "judi", titik_maks=2)
     k.kotak("bangunan", x0 + 4, y, z0 + 5, x0 + 43, f + 16, z0 + 40, "east", nama="rumah_judi_batu")
@@ -2755,7 +2773,8 @@ def pasar_binatang(k, x0, z0, y=LY):
         K.bamboo_clump(k, bx, bz, y + 1, 5)
     sx, sz = K.stall(k, x0 + 8, z0 + 38, "north", w=3, goods=("minecraft:hay_block", "minecraft:melon"))
     K.notice_board(k, x0 + 18, z0 + 42, "north", w=5)
-    k.jangkar(sx + 0.5, y + 1, sz + 0.5, "kotabesar/layanan", yaw=180.0, layanan="pasar_binatang", peran="PEDAGANG_BINATANG")
+    k.jangkar(sx + 0.5, y + 1, sz + 0.5, "kotabesar/layanan", yaw=180.0, layanan="pasar_binatang", peran="PEDAGANG_BINATANG",
+              tokoh="ma_laoliu")
     k.titik("kerja:sapu", x0 + 24, y + 1, z0 + 30, "north")
 
 
@@ -3171,7 +3190,7 @@ def bengkel_tukang(k, x0, z0, y=LY):
         k.put(x, y + 1, sz0 + 6, ("minecraft:stone_bricks", "minecraft:cobblestone", "minecraft:smooth_stone")[x % 3])
         if x % 2:
             k.put(x, y + 2, sz0 + 6, "minecraft:stone_bricks")
-    k.titik("kerja:pahat", sx0 + 4, y + 1, sz0 + 4, "north", {"peran": "TUKANG_BATU"})
+    k.titik("kerja:pahat", sx0 + 4, y + 1, sz0 + 4, "north", {"peran": "TUKANG"})
     # scaffolding tower (vanilla scaffolding as a trial frame)
     tx, tz = x0 + 38, z0 + 7
     for dy in range(1, 9):
@@ -3360,9 +3379,9 @@ def alun_gerbang(k, x0, z0, y=LY):
     k.put(ix0, f + 1, iz0, "minecraft:barrel", {"facing": "up", "open": "false"})
     K.crates(k, ix0, iz1 - 2, ix0 + 1, iz1, f + 1, h=2)
     K.table(k, ix0 + 1, f + 1, (iz0 + iz1) // 2, "minecraft:white_carpet")
-    k.titik("kerja:timbangan", ix1 - 3, f + 1, (iz0 + iz1) // 2, "east", {"peran": "PETUGAS_CUKAI"})
+    k.titik("kerja:timbangan", ix1 - 3, f + 1, (iz0 + iz1) // 2, "east", {"peran": "MENTERI"})
     k.jangkar(ix1 - 3.5, f + 1, (iz0 + iz1) / 2.0 + 0.5, "kotabesar/layanan", yaw=270.0, layanan="cukai",
-              peran="PETUGAS_CUKAI")
+              peran="MENTERI")
     # guard house (east of the avenue)
     g = K.aula(k, x0 + 33, z0 + 4, x0 + 44, z0 + 18, h=5, podium_h=1, teras=1, roof="hip", door_sides=("west",), door_w=3,
                tile=True)
@@ -3445,7 +3464,7 @@ def penginapan_tingkat(k, x0, z0, y=LY):
     # ground floor
     K.counter(k, ix1 - 8, ix1 - 1, iz1 - 4, f, "south")
     k.jangkar(ix1 - 4.5, f + 1, iz1 - 2.5, "kotabesar/layanan", yaw=180.0, layanan="penginapan",
-              peran="PEMILIK_PENGINAPAN", nama="awan_singgah")
+              peran="PEMILIK_PENGINAPAN", nama="awan_singgah", tokoh="bibi_hong")
     k.titik("kerja:timbangan", ix1 - 4, f + 1, iz1 - 5, "south", {"peran": "PEMILIK_PENGINAPAN"})
     furnish_kitchen = K.furnish_kitchen
     furnish_kitchen(k, ix0 + 8, iz0, ix1 - 10, f, iz0, "south")
@@ -3684,7 +3703,7 @@ def kedai_teh_agung(k, x0, z0, y=LY):
     tz = (iz0 + iz1) // 2
     K.table(k, ix1 - 2, f + 2, tz, "minecraft:red_carpet")
     K.chair(k, ix1 - 1, f + 2, tz, "west")
-    k.titik("kursi", ix1 - 1, f + 2, tz, "west", {"peran": "PENCERITA"})
+    k.titik("kursi", ix1 - 1, f + 2, tz, "west", {"peran": "TETUA_DESA"})
     k.put(ix1 - 2, f + 2, tz - 1, "minecraft:dark_oak_button", {"face": "floor", "facing": "west", "powered": "false"})
     K.wall_banner(k, ix1, f + 5, tz, "west")
     k.kotak("panggung", ix1 - 4, f + 2, iz0 + 8, ix1, f + 6, iz1 - 8, "west", acara="cerita")
@@ -3709,7 +3728,7 @@ def kedai_teh_agung(k, x0, z0, y=LY):
             K.barrel(k, x, f + 1, iz0, "south")
         K.shelf(k, x, f + 3, iz0, "south")
     k.jangkar(ix0 + 7.5, f + 1, iz0 + 2.5, "kota/teh", yaw=0.0)
-    k.titik("kerja:teko", ix0 + 6, f + 1, iz0 + 2, "south", {"peran": "PEMILIK_KEDAI"})
+    k.titik("kerja:teko", ix0 + 6, f + 1, iz0 + 2, "south", {"peran": "PEMILIK_TEH"})
     k.jangkar(ix0 + 4.5, f + 1, iz1 - 2.5, "kota/kursi_pengembara", yaw=90.0)
     k.jangkar(ix0 + 14.5, f + 1, iz1 - 2.5, "kota/kursi_pengembara", yaw=270.0)
     # galleries along the north (east of the counter) and south walls at +4
@@ -3977,7 +3996,7 @@ def arena_agung(k, y=LY):
     K.roof_over(k, jx0, z_back, jx1, z_front, y + 13, kind="hip", tiers=2, overhang=1, tile=True)
     for i, x in enumerate((cx - 3, cx, cx + 3)):
         K.chair(k, x, y + 7, z_front + 1 - 2, "south")
-        k.titik("kursi", x, y + 7, z_front - 1, "south", {"peran": "JURI"})
+        k.titik("kursi", x, y + 7, z_front - 1, "south", {"peran": "PENGUJI"})
     k.put(jx0 + 2, y + 7, z_back + 2, "minecraft:bell", {"attachment": "floor", "facing": "south", "powered": "false"})
     K.drum(k, jx1 - 2, y + 7, z_back + 2, "south")
     for x in range(jx0 + 1, jx1, 3):
@@ -4155,9 +4174,9 @@ def lapangan_latihan(k, x0, z0, y=LY):
     pf = pv["f"]
     K.drum(k, px0 + 1, pf + 1, pz1, "north")
     K.chair(k, (px0 + px1) // 2, pf + 1, pz1, "north")
-    k.titik("kursi", (px0 + px1) // 2, pf + 1, pz1, "north", {"peran": "PELATIH"})
+    k.titik("kursi", (px0 + px1) // 2, pf + 1, pz1, "north", {"peran": "PENGUJI"})
     k.jangkar((px0 + px1) / 2.0 + 0.5, pf + 1, pz0 - 1.5, "kotabesar/layanan", yaw=0.0, layanan="pelatih",
-              peran="PELATIH")
+              peran="PENGUJI")
     k.kotak("bangunan", x0 + 28, y, z0 + 37, x0 + 43, pf + 10, z0 + 44, "north", nama="lapangan_latihan")
 
 
@@ -4495,9 +4514,9 @@ def sarang_tikus(k, x0, z0, y=LY):
             K.shelf(k, x, f + 2, bz1 - 6, "south")
         else:
             K.barrel(k, x, f + 1, bz1 - 6, "south")
-    k.titik("kerja:timbangan", (bx0 + bx1) // 2, f + 1, bz1 - 5, "south", {"peran": "PEGADAI"})
+    k.titik("kerja:timbangan", (bx0 + bx1) // 2, f + 1, bz1 - 5, "south", {"peran": "BANKIR"})
     k.jangkar((bx0 + bx1) / 2.0 + 0.5, f + 1, bz1 - 4.5, "kotabesar/layanan", yaw=0.0, layanan="pegadaian",
-              peran="PEGADAI")
+              peran="BANKIR")
     K.table(k, bx0 + 3, f + 1, bz1 - 2, "")
     k.put(bx0 + 3, f + 2, bz1 - 2, "minecraft:white_carpet")
     for dx, face in ((-1, "east"), (1, "west")):
@@ -4531,7 +4550,7 @@ def sarang_tikus(k, x0, z0, y=LY):
     k.fill(bx0 + 1, f2, bz0 + 1, bx1 - 1, f2, bz1 - 1, "minecraft:spruce_planks")
     for x in range(bx0 + 2, bx0 + 8, 2):
         K.bed(k, x, f2 + 1, bz0 + 2, "north", role="minecraft:gray_bed")
-        k.titik("kasur", x, f2 + 1, bz0 + 2, "south", {"peran": "PREMAN"})
+        k.titik("kasur", x, f2 + 1, bz0 + 2, "south", {"peran": "KULI"})
     K.table(k, bx1 - 4, f2 + 1, bz0 + 4, "minecraft:red_carpet")
     for i in range(5):
         k.stairs(bx0 + 1, f + 1 + i, bz1 - 1 - i, "minecraft:spruce_stairs", "north")
@@ -4548,6 +4567,8 @@ def sarang_tikus(k, x0, z0, y=LY):
         k.put(x, y + 1, z0 + 29, "minecraft:brown_carpet")
     k.titik("kursi_lantai", x0 + 6, y + 1, z0 + 29, "north", {"pengemis": 1})
     k.titik("kursi_lantai", x0 + 8, y + 1, z0 + 29, "north", {"pengemis": 1})
+    k.jangkar(x0 + 7.5, y + 1, z0 + 29.5, "kotabesar/layanan", yaw=0.0, layanan="kumuh", peran="PENGEMIS", tokoh="kakek_lumpur")
+    k.jangkar(x0 + 35.5, y + 1, z0 + 30.5, "kotabesar/layanan", yaw=90.0, layanan="kumuh_anak", peran="ANAK", tokoh="dou")
     k.jangkar(x0 + 24.5, y + 1, z0 + 29.5, "kotabesar/zona", distrik="kumuh", protect=100)
     k.kotak("bangunan", bx0, 0, bz0, bx1, f2 + 10, bz1, "south", nama="sarang_tikus")
 
@@ -4793,7 +4814,7 @@ def kandang_kuda(k, x0, z0, y=LY):
         K.lit(k, x, y + 5, sz1 - 2, chain=1)
     k.put(sx1 - 2, y + 1, sz1 - 1, "minecraft:anvil", {"facing": "east"})
     k.put(sx1 - 4, y + 1, sz1 - 1, "minecraft:grindstone", {"face": "floor", "facing": "south"})
-    k.titik("kerja:palu", sx1 - 3, y + 1, sz1 - 2, "south", {"peran": "PANDAI_LADAM"})
+    k.titik("kerja:palu", sx1 - 3, y + 1, sz1 - 2, "south", {"peran": "TUKANG"})
     # paddock with four horses
     px0, pz0, px1, pz1 = x0 + 4, z0 + 18, x0 + 40, z0 + 42
     for x in range(px0, px1 + 1):
@@ -4816,7 +4837,7 @@ def kandang_kuda(k, x0, z0, y=LY):
         for z in range(z0 + 4, z0 + 14):
             for dy in range(1, 3 + (x + z) % 2):
                 k.put(x, y + dy, z, "minecraft:hay_block", {"axis": "y"})
-    k.titik("kerja:sapu", (px0 + px1) // 2, y + 1, pz0 - 2, "north", {"peran": "PENGURUS_KUDA"})
+    k.titik("kerja:sapu", (px0 + px1) // 2, y + 1, pz0 - 2, "north", {"peran": "KULI"})
     k.kotak("bangunan", sx0, y, sz0, sx1, y + 12, sz1, "south", nama="kandang_kuda")
 
 
@@ -4834,9 +4855,9 @@ def pos_kafilah(k, x0, z0, y=LY):
             k.put(ix1, f + dy, z, "minecraft:white_wool" if (z + dy) % 2 else "minecraft:birch_planks")
     K.table(k, ix1 - 3, f + 1, iz1 - 2, "minecraft:white_carpet")
     K.chair(k, ix1 - 2, f + 1, iz1 - 2, "west")
-    k.titik("kerja:meja_tulis", ix1 - 2, f + 1, iz1 - 2, "west", {"peran": "KEPALA_KAFILAH"})
+    k.titik("kerja:meja_tulis", ix1 - 2, f + 1, iz1 - 2, "west", {"peran": "PEDAGANG_KELILING"})
     k.jangkar(ix0 + 1.5, f + 1, (iz0 + iz1) / 2.0 + 0.5, "kotabesar/layanan", yaw=270.0, layanan="kafilah",
-              peran="KEPALA_KAFILAH")
+              peran="PEDAGANG_KELILING")
     K.dandan(k, (ix0 + 4, iz0, ix1 - 1, iz1), f, "kantor", titik_maks=1)
     # warehouse
     w = K.aula(k, x0 + 29, z0 + 4, x0 + 44, z0 + 24, h=6, podium_h=1, teras=0, roof="gable", along="z",
@@ -4935,7 +4956,7 @@ def kios_jalan(k, x0, z0, y=LY):
     k.put(ix0 + 3, sf + 1, iz0, "minecraft:smithing_table")
     for x in range(ix0 + 5, ix1):
         k.put(x, sf + 1, iz0, "minecraft:stripped_oak_log", {"axis": "x"})
-    k.titik("kerja:palu", ix0 + 2, sf + 1, iz0 + 1, "north", {"peran": "TUKANG_RODA"})
+    k.titik("kerja:palu", ix0 + 2, sf + 1, iz0 + 1, "north", {"peran": "TUKANG"})
     for z in range(wz0 + 13, wz0 + 22, 3):
         for dy in (1, 2, 3):
             k.put(wx0 + 2, y + dy, z, "minecraft:oak_fence")
@@ -4945,7 +4966,7 @@ def kios_jalan(k, x0, z0, y=LY):
                                                     "waterlogged": "false"})
     k.put(wx0 + 8, y + 1, wz0 + 18, "minecraft:barrel", {"facing": "south", "open": "false"})
     k.put(wx0 + 13, y + 1, wz0 + 18, "minecraft:barrel", {"facing": "south", "open": "false"})
-    k.titik("kerja:gergaji", wx0 + 10, y + 1, wz0 + 19, "north", {"peran": "TUKANG_RODA"})
+    k.titik("kerja:gergaji", wx0 + 10, y + 1, wz0 + 19, "north", {"peran": "TUKANG"})
     k.jangkar(wx0 + 12.5, y + 1, wz0 + 12.5, "kotabesar/tukang", yaw=0.0, kampung="luar")
     k.kotak("bangunan", wx0 + 6, y, wz0, wx0 + 21, sf + 10, wz0 + 9, "south", nama="bengkel_roda")
 

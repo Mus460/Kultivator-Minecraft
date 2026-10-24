@@ -235,7 +235,7 @@ public final class OasisAnchors implements AnchorHandler {
 		if (buatan(anchor) != null) {
 			return;
 		}
-		KultivatorNpc npc = HidupApi.tubuh(level, situsOf(level, anchor), peran, anchor.blockPosition(), anchor.getYRot());
+		KultivatorNpc npc = HidupApi.tubuhStaf(level, situsOf(level, anchor), peran, anchor.blockPosition(), anchor.getYRot());
 		if (npc != null) {
 			OasisTokoh.Data tokoh = OasisTokoh.diJangkar(anchor.what());
 			if (tokoh != null) {

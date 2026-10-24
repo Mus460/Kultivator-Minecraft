@@ -564,7 +564,7 @@ public final class BalaiLelang {
 		}
 		KultivatorNpc auctioneer = juruDekat(level, juru.blockPosition());
 		if (auctioneer == null) {
-			auctioneer = HidupApi.tubuh(level, key, NpcRole.JURU_LELANG, juru.blockPosition(), juru.getYRot());
+			auctioneer = HidupApi.tubuhStaf(level, key, NpcRole.JURU_LELANG, juru.blockPosition(), juru.getYRot());
 		}
 		if (auctioneer == null) {
 			return false;

@@ -7,6 +7,7 @@ import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.AnchorHandler;
 import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.DuniaBudget;
+import dev.kultivator.dunia.DuniaSpine;
 import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Targeting;
 import net.minecraft.core.BlockPos;
@@ -28,9 +29,10 @@ import java.util.UUID;
 
 /**
  * The anchor handler of module K (DESIGN 34.4.1, 34.5.1, 34.5.4): every {@code kota/*} anchor of the towns, the Immortal
- * City and D's Pulau Pasar. People anchors ({@link #ROLES}) bring their NPC when a player comes within 48 blocks (at most
- * {@code kota.npcPerTown} per town, inside the spine's NPC budget; a slain one returns after 5 minutes); the NPC leaves 30
- * s after the last player is gone beyond 64 blocks, or with its chunk. The hidden door anchor brings the door entity;
+ * City and D's Pulau Pasar. People anchors ({@link #ROLES}) bring their NPC when a player comes within 128 blocks: shop
+ * keepers, the tea master, brokers and guards always (staff, outside every cap), the strolling crowd at most
+ * {@code kota.npcPerTown} per town inside the spine's NPC budget; a slain one returns after 5 minutes. The NPC leaves 30 s
+ * after the last player is gone beyond 160 blocks (crowd 64), or with its chunk. The hidden door anchor brings the door entity;
  * light anchors send their points to nearby clients (lantern rows, the stage light, the pond, cloud skirts, the bell).
  * The town stele greets a player the first time they reach the town (banner, advancement {@code dunia/kota_found}).
  */
@@ -39,6 +41,10 @@ final class KotaAnchors implements AnchorHandler {
 	static final KotaAnchors HANDLER = new KotaAnchors();
 	static final int RESPAWN_TICKS = 6000;
 	static final int FX_RESEND = 600;
+	/** People anchors bring their NPC when a player is within this ({@link #radius}); the rest keeps {@link #DEKAT}. */
+	static final int JARAK_ORANG = 128;
+	/** The range of the stele, the door, the seats, the lights and the auction (the radius before people reached 128). */
+	static final double DEKAT = 48.0D;
 
 	/** Anchor "what" → role. */
 	static final Map<String, NpcRole> ROLES = new HashMap<>();
@@ -67,7 +73,7 @@ final class KotaAnchors implements AnchorHandler {
 
 	@Override
 	public int radius() {
-		return 48;
+		return JARAK_ORANG;
 	}
 
 	@Override
@@ -77,7 +83,7 @@ final class KotaAnchors implements AnchorHandler {
 	}
 
 	@Override
-	public void nearby(ServerLevel level, DuniaAnchorEntity anchor, List<ServerPlayer> within) {
+	public void nearby(ServerLevel level, DuniaAnchorEntity anchor, List<ServerPlayer> semua) {
 		KotaConfig config = Kota.config();
 		boolean abadi = Towns.isAbadi(anchor);
 		if (!config.enabled || abadi && !config.immortalCity) {
@@ -86,16 +92,20 @@ final class KotaAnchors implements AnchorHandler {
 		long town = Towns.townOf(anchor);
 		String what = anchor.what();
 		long now = level.getGameTime();
+		NpcRole role = ROLES.get(what);
+		if (role != null) {
+			person(level, anchor, town, role, semua, now);
+		}
+		List<ServerPlayer> within = dev.kultivator.dunia.DuniaAnchors.dalam(semua, anchor, DEKAT);
+		if (within.isEmpty()) {
+			return;
+		}
 		switch (what) {
 			case "situs", "abadi_gerbang" -> greet(level, anchor, town, abadi, within);
 			case "gerbang_gelap" -> door(level, anchor, town);
 			case "kursi_pengembara" -> Pengembara.seat(level, anchor, town, within.getFirst());
 			case "lentera", "kolam", "panggung", "abadi_awan", "abadi_lonceng", "abadi_kebun" -> lights(level, anchor, town, within, now);
 			default -> {
-				NpcRole role = ROLES.get(what);
-				if (role != null) {
-					person(level, anchor, town, role, within, now);
-				}
 			}
 		}
 		if ("lelang".equals(what)) {
@@ -157,11 +167,10 @@ final class KotaAnchors implements AnchorHandler {
 		if (anchor.state().getLongOr("dead_until", 0L) > now) {
 			return;
 		}
-		if (countIn(town) >= Kota.config().npcPerTown) {
-			return;
-		}
 		Vec3 at = anchor.position();
-		if (!DuniaBudget.mayAdd(level, DuniaBudget.NPC, at)) {
+		// shop keepers, the tea master, brokers and guards always come; only the strolling crowd is capped
+		boolean crowd = crowd(role);
+		if (crowd ? countIn(town) >= Kota.config().npcPerTown || !DuniaBudget.mayAdd(level, DuniaBudget.NPC, at) : !DuniaSpine.enabled()) {
 			return;
 		}
 		KultivatorNpc npc = KotaEntities.NPC.create(level, EntitySpawnReason.EVENT);
@@ -181,7 +190,7 @@ final class KotaAnchors implements AnchorHandler {
 		npc.setHome(anchor.blockPosition());
 		npc.setTown(town);
 		npc.setAnchorSite(anchor.site());
-		npc.setLonely(64.0D, 600);
+		npc.setLonely(crowd ? 64.0D : dev.kultivator.dunia.tempat.hidup.HidupApi.STAF_JARAK, 600);
 		npc.setYHeadRot(anchor.getYRot());
 		if (role == NpcRole.PENJAGA) {
 			npc.setFightsMonsters(true);
@@ -201,12 +210,51 @@ final class KotaAnchors implements AnchorHandler {
 		npcs.put(anchor.getUUID(), npc);
 		// a town that holds a grudge against a nearby player sends its guards at them
 		if (role == NpcRole.PENJAGA) {
-			for (ServerPlayer player : within) {
+			for (ServerPlayer player : dev.kultivator.dunia.DuniaAnchors.dalam(within, anchor, DEKAT)) {
 				if (KotaData.get(level.getServer()).reputation(town, player.getUUID()) < Kota.HOSTILE_REPUTATION || PasarGelap.raided(player, town)) {
 					npc.markHostile(player);
 				}
 			}
 		}
+	}
+
+	/** The strolling townsfolk of a town (capped by {@code kota.npcPerTown} and the NPC budget); every other role is staff. */
+	static boolean crowd(NpcRole role) {
+		return role == NpcRole.WARGA || role == NpcRole.ABADI;
+	}
+
+	/**
+	 * {@code uji hidup audit}: why a people anchor has no NPC now (suffix of {@code kultivator.hidup.uji.audit.alasan.*}), or
+	 * null when it stands.
+	 */
+	@Nullable String alasanKosong(ServerLevel level, DuniaAnchorEntity anchor) {
+		if (npcOf(anchor) != null) {
+			return null;
+		}
+		NpcRole role = ROLES.get(anchor.what());
+		if (role == null) {
+			return "peran";
+		}
+		if (!DuniaSpine.enabled()) {
+			return "dunia_mati";
+		}
+		KotaConfig config = Kota.config();
+		if (!config.enabled || Towns.isAbadi(anchor) && !config.immortalCity) {
+			return "saklar";
+		}
+		if (anchor.state().getLongOr("dead_until", 0L) > level.getGameTime()) {
+			return "mati";
+		}
+		if (dev.kultivator.dunia.DuniaAnchors.playersNear(level, anchor.position(), JARAK_ORANG).isEmpty()) {
+			return "jauh";
+		}
+		if (crowd(role) && countIn(Towns.townOf(anchor)) >= config.npcPerTown) {
+			return "topi_kota";
+		}
+		if (crowd(role) && !DuniaBudget.mayAdd(level, DuniaBudget.NPC, anchor.position())) {
+			return DuniaBudget.overloaded(level.getServer()) ? "mspt" : "topi_npc";
+		}
+		return "menunggu";
 	}
 
 	/** Remembers that the anchor's NPC died (it comes back after 5 minutes). */

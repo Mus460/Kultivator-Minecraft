@@ -158,6 +158,12 @@ public final class DuniaAnchors {
 		return best;
 	}
 
+	/** The {@link AnchorHandler#radius()} of {@code module}'s handler, or -1 when no handler serves it ({@code uji hidup audit}). */
+	public static int radiusOf(String module) {
+		AnchorHandler handler = HANDLERS.get(module);
+		return handler == null ? -1 : handler.radius();
+	}
+
 	/** How many anchors are loaded now (every level). */
 	public static int count() {
 		return ORDER.size();
@@ -348,6 +354,18 @@ public final class DuniaAnchors {
 		}
 		if (list.size() > 1) {
 			list.sort(Comparator.comparingDouble(player -> player.position().distanceToSqr(at)));
+		}
+		return list;
+	}
+
+	/** The players of {@code within} no farther than {@code range} from {@code anchor} (a handler whose radius grew for its bodies). */
+	public static List<ServerPlayer> dalam(List<ServerPlayer> within, DuniaAnchorEntity anchor, double range) {
+		double r2 = range * range;
+		List<ServerPlayer> list = new ArrayList<>(within.size());
+		for (ServerPlayer player : within) {
+			if (player.position().distanceToSqr(anchor.position()) <= r2) {
+				list.add(player);
+			}
 		}
 		return list;
 	}

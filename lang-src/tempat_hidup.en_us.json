@@ -523,5 +523,22 @@
   "kultivator.hidup.obrol.pulih_tetangga.2": "His arm's still in a sling, poor man can't work.",
   "kultivator.hidup.obrol.pulih_tetangga.3": "Let's carry his timber for him until he's healed.",
   "kultivator.hidup.kegiatan.belanja": "buying vegetables at the market",
-  "kultivator.hidup.uji.keadaan_jadwal": "Life state: %s."
+  "kultivator.hidup.uji.keadaan_jadwal": "Life state: %s.",
+  "kultivator.hidup.uji.audit.kosong": "No workplace anchor (service, shop, tea house, character) is loaded within %s blocks.",
+  "kultivator.hidup.uji.audit.ada": "[%s blocks] %s - %s: present (%s)",
+  "kultivator.hidup.uji.audit.tidak": "[%s blocks] %s - %s: EMPTY, %s",
+  "kultivator.hidup.uji.audit.lagi": "... and %s more anchors (the nearest are shown).",
+  "kultivator.hidup.uji.audit.ringkas": "Staffed %s of %s workplaces. NPC budget %s/%s (service people are not capped), resident bodies %s, MSPT guard %s.",
+  "kultivator.hidup.uji.audit.mspt_ya": "on (server overloaded)",
+  "kultivator.hidup.uji.audit.mspt_tidak": "off",
+  "kultivator.hidup.uji.audit.alasan.dunia_mati": "world switch umum.enabled is off",
+  "kultivator.hidup.uji.audit.alasan.saklar": "module switch is off (kota.enabled / kotaBesar.aktif / tempat.aktif)",
+  "kultivator.hidup.uji.audit.alasan.peran": "role unknown to NpcRole (wrong anchor data)",
+  "kultivator.hidup.uji.audit.alasan.mati": "the person was slain and returns within 5 minutes",
+  "kultivator.hidup.uji.audit.alasan.jauh": "no survival/adventure player within %s blocks (creative and spectator do not count)",
+  "kultivator.hidup.uji.audit.alasan.topi_kota": "per-town people cap is full (kota.npcPerTown / kotaBesar.tubuhMaks)",
+  "kultivator.hidup.uji.audit.alasan.topi_npc": "world NPC budget is full (umum.npcCap / npcPerPlayer)",
+  "kultivator.hidup.uji.audit.alasan.mspt": "MSPT guard is on (server overloaded)",
+  "kultivator.hidup.uji.audit.alasan.tanpa_modul": "this anchor's module is not registered (switched off)",
+  "kultivator.hidup.uji.audit.alasan.menunggu": "waiting for the anchor's visit turn (a few seconds at most) or its module's own conditions"
 }

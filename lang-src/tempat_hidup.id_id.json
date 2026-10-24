@@ -523,5 +523,22 @@
   "kultivator.hidup.obrol.pulih_tetangga.2": "Lengannya masih digendong, kasihan dia tidak bisa kerja.",
   "kultivator.hidup.obrol.pulih_tetangga.3": "Kita bantu angkat kayunya dulu sampai dia sembuh.",
   "kultivator.hidup.kegiatan.belanja": "berbelanja sayur ke pasar",
-  "kultivator.hidup.uji.keadaan_jadwal": "Keadaan hidup: %s."
+  "kultivator.hidup.uji.keadaan_jadwal": "Keadaan hidup: %s.",
+  "kultivator.hidup.uji.audit.kosong": "Tidak ada jangkar tempat kerja (layanan, toko, kedai, tokoh) yang termuat dalam %s blok.",
+  "kultivator.hidup.uji.audit.ada": "[%s blok] %s - %s: ada (%s)",
+  "kultivator.hidup.uji.audit.tidak": "[%s blok] %s - %s: KOSONG, %s",
+  "kultivator.hidup.uji.audit.lagi": "... dan %s jangkar lagi (yang terdekat ditampilkan).",
+  "kultivator.hidup.uji.audit.ringkas": "Terisi %s dari %s tempat kerja. Budget NPC %s/%s (orang layanan tidak dibatasi), tubuh penduduk %s, penjaga MSPT %s.",
+  "kultivator.hidup.uji.audit.mspt_ya": "aktif (server berat)",
+  "kultivator.hidup.uji.audit.mspt_tidak": "tidak aktif",
+  "kultivator.hidup.uji.audit.alasan.dunia_mati": "saklar dunia umum.enabled mati",
+  "kultivator.hidup.uji.audit.alasan.saklar": "saklar modul mati (kota.enabled / kotaBesar.aktif / tempat.aktif)",
+  "kultivator.hidup.uji.audit.alasan.peran": "peran tidak dikenal di NpcRole (data jangkar salah)",
+  "kultivator.hidup.uji.audit.alasan.mati": "orangnya terbunuh, kembali dalam 5 menit",
+  "kultivator.hidup.uji.audit.alasan.jauh": "tak ada pemain survival/adventure dalam %s blok (mode kreatif dan penonton tidak dihitung)",
+  "kultivator.hidup.uji.audit.alasan.topi_kota": "topi orang per kota penuh (kota.npcPerTown / kotaBesar.tubuhMaks)",
+  "kultivator.hidup.uji.audit.alasan.topi_npc": "budget NPC dunia penuh (umum.npcCap / npcPerPlayer)",
+  "kultivator.hidup.uji.audit.alasan.mspt": "penjaga MSPT aktif (server berat)",
+  "kultivator.hidup.uji.audit.alasan.tanpa_modul": "modul jangkar ini tidak terdaftar (dimatikan)",
+  "kultivator.hidup.uji.audit.alasan.menunggu": "menunggu giliran kunjungan jangkar (paling lama beberapa detik) atau syarat modulnya sendiri"
 }
