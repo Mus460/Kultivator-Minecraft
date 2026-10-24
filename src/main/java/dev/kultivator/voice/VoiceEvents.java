@@ -91,6 +91,12 @@ public final class VoiceEvents {
 	/** DESIGN 37: the cloud pirate captain, the Longbo giant, the guest elder and the Heavenly Court envoy. */
 	public static final List<String> SEKTE_LANGIT = List.of("bajak_datang", "longbo_datang", "longbo_kalah", "tamu_salam", "utusan_salam",
 			"utusan_tantang");
+	/**
+	 * Kota yang Hidup (docs/progres/suara-kota.md): the far murmurs under the residents' gestured talks, voice type
+	 * ({@code pria}, {@code wanita}, {@code kakek}, {@code nenek}, {@code anak}) to its line count; keys {@code gumam.<tipe>.<n>}.
+	 * The client picks the type from the speaker's Sosok and a random line ({@code client/dunia/tempat/hidup/ObrolanSuara}).
+	 */
+	public static final Map<String, Integer> GUMAM = Map.of("pria", 14, "wanita", 14, "kakek", 13, "nenek", 12, "anak", 13);
 	/** Lines without words (no caption): laughs, growls, roars and grunts. */
 	private static final List<String> NON_VERBAL = List.of("demon.laugh", "demon.growl", "demon.death", "boss.roar");
 
@@ -134,6 +140,13 @@ public final class VoiceEvents {
 		group("tema.gunung", TEMA_GUNUNG);
 		group("tema.iblis", TEMA_IBLIS);
 		group("tema.dagang", TEMA_DAGANG);
+		for (String tipe : List.of("pria", "wanita", "kakek", "nenek", "anak")) {
+			List<String> nomor = new ArrayList<>();
+			for (int n = 0; n < GUMAM.get(tipe); n++) {
+				nomor.add(Integer.toString(n));
+			}
+			group("gumam." + tipe, nomor);
+		}
 	}
 
 	private static void group(String prefix, List<String> keys) {

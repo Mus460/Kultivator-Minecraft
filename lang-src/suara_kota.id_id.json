@@ -1,0 +1,13 @@
+{
+  "kultivator.voice.credits.8": "VOICEVOX:ずんだもん, VOICEVOX:雨晴はう, VOICEVOX:もち子さん — obrolan warga dan riuh kota (juga suara-suara di atas)",
+  "kultivator.voice.setting.obrolan": "Obrolan warga: %s",
+  "kultivator.voice.setting.obrolan.tip": "Gumaman pendek berbahasa Jepang saat dua warga mengobrol (suara pria, wanita, kakek, nenek atau anak sesuai wujudnya), pelan dan memudar menurut jarak. Juga diatur penggeser \"Suara/Ucapan\" dan hanya berbunyi bila \"Suara bicara: Semua\".",
+  "kultivator.voice.setting.persen": "%s%%",
+  "kultivator.voice.setting.riuh": "Riuh kota: %s",
+  "kultivator.voice.setting.riuh.tip": "Keramaian latar di tempat berpenghuni (ibu kota, kota bertema, kota, kampung, kompleks sekte): tawar-menawar di pasar, cangkir dan tawa di kedai, ombak dan camar di pelabuhan, langkah di jalan, lonceng dan doa di kuil. Makin banyak warga di dekatmu makin ramai; pelan di malam hari, saat hujan dan di dalam ruangan. Juga diatur penggeser \"Sekitar/Lingkungan\".",
+  "subtitles.kultivator.ambient.kota.jalan": "Keramaian jalan",
+  "subtitles.kultivator.ambient.kota.kedai": "Ramai kedai",
+  "subtitles.kultivator.ambient.kota.kuil": "Doa di kuil",
+  "subtitles.kultivator.ambient.kota.pasar": "Riuh pasar",
+  "subtitles.kultivator.ambient.kota.pelabuhan": "Hiruk pelabuhan"
+}

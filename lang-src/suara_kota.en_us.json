@@ -1,0 +1,13 @@
+{
+  "kultivator.voice.credits.8": "VOICEVOX:ずんだもん, VOICEVOX:雨晴はう, VOICEVOX:もち子さん — townsfolk chatter and town crowds (with the voices above)",
+  "kultivator.voice.setting.obrolan": "Townsfolk chatter: %s",
+  "kultivator.voice.setting.obrolan.tip": "Short quiet Japanese murmurs when two townsfolk talk (a man, woman, old man, old woman or child by their looks), fading with distance. The \"Voice/Speech\" slider applies too; only plays with \"Spoken voices: All\".",
+  "kultivator.voice.setting.persen": "%s%%",
+  "kultivator.voice.setting.riuh": "Town crowd: %s",
+  "kultivator.voice.setting.riuh.tip": "Background crowd in inhabited places (the capital, themed cities, towns, villages, sect compounds): bargaining in the market, cups and laughter in taverns, waves and gulls in harbours, footsteps in the streets, bells and chanting in temples. The more townsfolk near you, the livelier; quieter at night, in the rain and indoors. The \"Ambient/Environment\" slider applies too.",
+  "subtitles.kultivator.ambient.kota.jalan": "Street crowd murmurs",
+  "subtitles.kultivator.ambient.kota.kedai": "Tavern chatters",
+  "subtitles.kultivator.ambient.kota.kuil": "Temple chanting",
+  "subtitles.kultivator.ambient.kota.pasar": "Market bustles",
+  "subtitles.kultivator.ambient.kota.pelabuhan": "Harbour bustles"
+}

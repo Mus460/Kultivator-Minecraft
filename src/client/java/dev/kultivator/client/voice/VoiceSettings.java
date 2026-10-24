@@ -17,7 +17,8 @@ import java.util.function.Supplier;
  * The voice settings (module V), stored as {@code voice_mode} and {@code voice_text} in {@code config/kultivator-client.json}
  * through {@link EffectQuality#get} / {@link EffectQuality#put}: "Suara bicara: Semua / Hanya Langit / Mati" and "Teks suara:
  * Nyala / Mati", plus the VOICEVOX credit row (its tooltip names every character, as the VOICEVOX terms require; a click
- * plays a sample line). The volume itself is the vanilla "Voice/Speech" slider.
+ * plays a sample line). The volume itself is the vanilla "Voice/Speech" slider. Also "Riuh kota" and "Obrolan warga"
+ * (Kota yang Hidup), each 100/75/50/25 % or Mati, stored as {@code riuh_kota} / {@code obrolan_warga}.
  */
 public final class VoiceSettings {
 
@@ -36,9 +37,14 @@ public final class VoiceSettings {
 
 	public static final String MODE = "voice_mode";
 	public static final String TEXT = "voice_text";
+	/** Kota yang Hidup (docs/progres/suara-kota.md): crowd ambience and townsfolk chatter, 0-100 % (0 = off). */
+	public static final String RIUH = "riuh_kota";
+	public static final String OBROLAN = "obrolan_warga";
+	/** The steps the two cycling rows go through: loud to off, then back to full. */
+	private static final int[] PERSEN = {100, 75, 50, 25, 0};
 	private static final String T = "kultivator.voice.setting.";
 	/** The VOICEVOX credit lines (keys {@code kultivator.voice.credits.0..N-1}). */
-	private static final int CREDIT_LINES = 8;
+	private static final int CREDIT_LINES = 9;
 
 	public static Mode mode() {
 		JsonElement e = safeGet(MODE);
@@ -73,6 +79,50 @@ public final class VoiceSettings {
 		EffectQuality.put(TEXT, new JsonPrimitive(on));
 	}
 
+	/** Crowd ambience volume, 0..1 (the vanilla "Ambient/Environment" slider applies on top). */
+	public static float riuh() {
+		return persen(RIUH) / 100.0F;
+	}
+
+	/** Townsfolk chatter volume, 0..1 (the vanilla "Voice/Speech" slider applies on top; "Suara bicara" other than Semua silences it). */
+	public static float obrolan() {
+		return mode() != Mode.SEMUA ? 0.0F : persen(OBROLAN) / 100.0F;
+	}
+
+	private static int persen(String key) {
+		JsonElement e = safeGet(key);
+		if (e != null && e.isJsonPrimitive()) {
+			try {
+				return Math.max(0, Math.min(100, e.getAsInt()));
+			} catch (RuntimeException ignored) {
+				return 100;
+			}
+		}
+		return 100;
+	}
+
+	private static void langkah(String key) {
+		int now = persen(key);
+		int next = PERSEN[0];
+		for (int i = 0; i < PERSEN.length; i++) {
+			if (PERSEN[i] == now) {
+				next = PERSEN[(i + 1) % PERSEN.length];
+			}
+		}
+		EffectQuality.put(key, new JsonPrimitive(next));
+	}
+
+	private static Component nilai(String key) {
+		int p = persen(key);
+		return p == 0 ? Component.translatable(T + "mode.mati") : Component.translatable(T + "persen", p);
+	}
+
+	private static Row baris(String key, String lang) {
+		return new Row(key, true, () -> Component.translatable(T + lang, nilai(key)), () -> langkah(key),
+				() -> List.of(Component.translatable(T + lang, nilai(key)), Component.translatable(T + lang + ".tip").withStyle(ChatFormatting.GRAY)),
+				() -> persen(key) > 0);
+	}
+
 	private static JsonElement safeGet(String key) {
 		try {
 			return EffectQuality.get(key);
@@ -99,6 +149,10 @@ public final class VoiceSettings {
 		rows.add(new Row(TEXT, false, () -> Component.translatable(T + "text"), () -> setText(!text()),
 				() -> List.of(Component.translatable(T + "text"), Component.translatable(T + "text.tip").withStyle(ChatFormatting.GRAY)),
 				VoiceSettings::text));
+		if (Language.getInstance().has(T + "riuh")) {
+			rows.add(baris(RIUH, "riuh"));
+			rows.add(baris(OBROLAN, "obrolan"));
+		}
 		rows.add(new Row("voice_credits", true, () -> Component.translatable(T + "credits"), VoiceClient::preview, VoiceSettings::credits,
 				() -> true));
 		return rows;

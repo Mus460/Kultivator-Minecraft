@@ -1,4 +1,49 @@
 {
+  "ambient.kota.jalan": {
+    "subtitle": "subtitles.kultivator.ambient.kota.jalan",
+    "sounds": [
+      {
+        "name": "kultivator:ambient/kota/jalan",
+        "stream": true
+      }
+    ]
+  },
+  "ambient.kota.kedai": {
+    "subtitle": "subtitles.kultivator.ambient.kota.kedai",
+    "sounds": [
+      {
+        "name": "kultivator:ambient/kota/kedai",
+        "stream": true
+      }
+    ]
+  },
+  "ambient.kota.kuil": {
+    "subtitle": "subtitles.kultivator.ambient.kota.kuil",
+    "sounds": [
+      {
+        "name": "kultivator:ambient/kota/kuil",
+        "stream": true
+      }
+    ]
+  },
+  "ambient.kota.pasar": {
+    "subtitle": "subtitles.kultivator.ambient.kota.pasar",
+    "sounds": [
+      {
+        "name": "kultivator:ambient/kota/pasar",
+        "stream": true
+      }
+    ]
+  },
+  "ambient.kota.pelabuhan": {
+    "subtitle": "subtitles.kultivator.ambient.kota.pelabuhan",
+    "sounds": [
+      {
+        "name": "kultivator:ambient/kota/pelabuhan",
+        "stream": true
+      }
+    ]
+  },
   "duel.block": {
     "subtitle": "subtitles.kultivator.duel.block",
     "sounds": [
@@ -534,6 +579,42 @@
       }
     ]
   },
+  "voice.cerita.bao_verdict": {
+    "subtitle": "subtitles.kultivator.voice.cerita.bao_verdict",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/cerita/bao_verdict",
+        "stream": false
+      }
+    ]
+  },
+  "voice.cerita.coronation": {
+    "subtitle": "subtitles.kultivator.voice.cerita.coronation",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/cerita/coronation",
+        "stream": false
+      }
+    ]
+  },
+  "voice.cerita.moying_reveal": {
+    "subtitle": "subtitles.kultivator.voice.cerita.moying_reveal",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/cerita/moying_reveal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.cerita.ruyi_thanks": {
+    "subtitle": "subtitles.kultivator.voice.cerita.ruyi_thanks",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/cerita/ruyi_thanks",
+        "stream": false
+      }
+    ]
+  },
   "voice.demon.death": {
     "subtitle": "subtitles.kultivator.voice.demon.death",
     "sounds": [
@@ -669,6 +750,15 @@
       }
     ]
   },
+  "voice.disciple.f1.belajar_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.belajar_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/belajar_sendiri",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.beloved": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.beloved",
     "sounds": [
@@ -723,6 +813,15 @@
       }
     ]
   },
+  "voice.disciple.f1.copet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.copet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/copet",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.cultivate",
     "sounds": [
@@ -732,11 +831,38 @@
       }
     ]
   },
+  "voice.disciple.f1.dao_pilih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.dao_pilih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/dao_pilih",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.depart": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.depart",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f1/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.diselamatkan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.diselamatkan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/diselamatkan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.ditebus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.ditebus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/ditebus",
         "stream": false
       }
     ]
@@ -804,6 +930,15 @@
       }
     ]
   },
+  "voice.disciple.f1.hadiah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.hadiah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/hadiah",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.harvest": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.harvest",
     "sounds": [
@@ -813,11 +948,65 @@
       }
     ]
   },
+  "voice.disciple.f1.hati_lulus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.hati_lulus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/hati_lulus",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.hufa_jaga": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.hufa_jaga",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/hufa_jaga",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.hufa_minta": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.hufa_minta",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/hufa_minta",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.iblis_bisik": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.iblis_bisik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/iblis_bisik",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f1/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.jalan_ganti": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.jalan_ganti",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/jalan_ganti",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.latih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.latih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/latih",
         "stream": false
       }
     ]
@@ -858,11 +1047,29 @@
       }
     ]
   },
+  "voice.disciple.f1.lihat_lapak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.lihat_lapak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/lihat_lapak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.loyal": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.loyal",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f1/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.makan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.makan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/makan",
         "stream": false
       }
     ]
@@ -903,11 +1110,29 @@
       }
     ]
   },
+  "voice.disciple.f1.pamit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.pamit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/pamit",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f1/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.pulang_belanja": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.pulang_belanja",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/pulang_belanja",
         "stream": false
       }
     ]
@@ -948,6 +1173,168 @@
       }
     ]
   },
+  "voice.disciple.f1.salam_pagi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.salam_pagi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/salam_pagi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.serap_batu": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.serap_batu",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/serap_batu",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_balas": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_balas",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_balas",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_curi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_curi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_curi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_damai": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_damai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_damai",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_ejek": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_ejek",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_ejek",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_ejek_guru": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_ejek_guru",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_ejek_guru",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_kekasih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_kekasih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_kekasih",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_keroyok": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_keroyok",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_keroyok",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_lindungi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_lindungi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_lindungi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_maaf": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_maaf",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_maaf",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_menang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_menang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_menang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_saingan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_saingan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_saingan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_sergap": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_sergap",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_sergap",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_sumpah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_sumpah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_sumpah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_tantang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_tantang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_tantang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.seteru_terima": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.seteru_terima",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/seteru_terima",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.study": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.study",
     "sounds": [
@@ -975,6 +1362,24 @@
       }
     ]
   },
+  "voice.disciple.f1.tawar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.tawar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/tawar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.tawar_sepakat": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.tawar_sepakat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/tawar_sepakat",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.tea": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.tea",
     "sounds": [
@@ -993,6 +1398,24 @@
       }
     ]
   },
+  "voice.disciple.f1.tembus_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.tembus_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/tembus_sendiri",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.tertawan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.tertawan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/tertawan",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f1.thanks": {
     "subtitle": "subtitles.kultivator.voice.disciple.f1.thanks",
     "sounds": [
@@ -1007,6 +1430,24 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f1/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.tutup_keluar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.tutup_keluar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/tutup_keluar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f1.tutup_masuk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f1.tutup_masuk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f1/tutup_masuk",
         "stream": false
       }
     ]
@@ -1043,6 +1484,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f2/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.belajar_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.belajar_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/belajar_sendiri",
         "stream": false
       }
     ]
@@ -1101,6 +1551,15 @@
       }
     ]
   },
+  "voice.disciple.f2.copet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.copet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/copet",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.cultivate",
     "sounds": [
@@ -1110,11 +1569,38 @@
       }
     ]
   },
+  "voice.disciple.f2.dao_pilih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.dao_pilih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/dao_pilih",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.depart": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.depart",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f2/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.diselamatkan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.diselamatkan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/diselamatkan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.ditebus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.ditebus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/ditebus",
         "stream": false
       }
     ]
@@ -1182,6 +1668,15 @@
       }
     ]
   },
+  "voice.disciple.f2.hadiah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.hadiah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/hadiah",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.harvest": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.harvest",
     "sounds": [
@@ -1191,11 +1686,65 @@
       }
     ]
   },
+  "voice.disciple.f2.hati_lulus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.hati_lulus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/hati_lulus",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.hufa_jaga": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.hufa_jaga",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/hufa_jaga",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.hufa_minta": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.hufa_minta",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/hufa_minta",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.iblis_bisik": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.iblis_bisik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/iblis_bisik",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f2/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.jalan_ganti": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.jalan_ganti",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/jalan_ganti",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.latih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.latih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/latih",
         "stream": false
       }
     ]
@@ -1236,11 +1785,29 @@
       }
     ]
   },
+  "voice.disciple.f2.lihat_lapak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.lihat_lapak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/lihat_lapak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.loyal": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.loyal",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f2/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.makan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.makan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/makan",
         "stream": false
       }
     ]
@@ -1281,11 +1848,29 @@
       }
     ]
   },
+  "voice.disciple.f2.pamit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.pamit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/pamit",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f2/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.pulang_belanja": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.pulang_belanja",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/pulang_belanja",
         "stream": false
       }
     ]
@@ -1326,6 +1911,168 @@
       }
     ]
   },
+  "voice.disciple.f2.salam_pagi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.salam_pagi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/salam_pagi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.serap_batu": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.serap_batu",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/serap_batu",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_balas": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_balas",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_balas",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_curi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_curi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_curi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_damai": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_damai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_damai",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_ejek": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_ejek",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_ejek",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_ejek_guru": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_ejek_guru",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_ejek_guru",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_kekasih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_kekasih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_kekasih",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_keroyok": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_keroyok",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_keroyok",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_lindungi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_lindungi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_lindungi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_maaf": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_maaf",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_maaf",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_menang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_menang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_menang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_saingan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_saingan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_saingan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_sergap": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_sergap",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_sergap",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_sumpah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_sumpah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_sumpah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_tantang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_tantang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_tantang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.seteru_terima": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.seteru_terima",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/seteru_terima",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.study": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.study",
     "sounds": [
@@ -1353,6 +2100,24 @@
       }
     ]
   },
+  "voice.disciple.f2.tawar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.tawar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/tawar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.tawar_sepakat": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.tawar_sepakat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/tawar_sepakat",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.tea": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.tea",
     "sounds": [
@@ -1371,6 +2136,24 @@
       }
     ]
   },
+  "voice.disciple.f2.tembus_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.tembus_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/tembus_sendiri",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.tertawan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.tertawan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/tertawan",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f2.thanks": {
     "subtitle": "subtitles.kultivator.voice.disciple.f2.thanks",
     "sounds": [
@@ -1385,6 +2168,24 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f2/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.tutup_keluar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.tutup_keluar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/tutup_keluar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f2.tutup_masuk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f2.tutup_masuk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f2/tutup_masuk",
         "stream": false
       }
     ]
@@ -1421,6 +2222,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f3/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.belajar_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.belajar_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/belajar_sendiri",
         "stream": false
       }
     ]
@@ -1479,6 +2289,15 @@
       }
     ]
   },
+  "voice.disciple.f3.copet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.copet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/copet",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.cultivate",
     "sounds": [
@@ -1488,11 +2307,38 @@
       }
     ]
   },
+  "voice.disciple.f3.dao_pilih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.dao_pilih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/dao_pilih",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.depart": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.depart",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f3/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.diselamatkan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.diselamatkan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/diselamatkan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.ditebus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.ditebus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/ditebus",
         "stream": false
       }
     ]
@@ -1560,6 +2406,15 @@
       }
     ]
   },
+  "voice.disciple.f3.hadiah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.hadiah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/hadiah",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.harvest": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.harvest",
     "sounds": [
@@ -1569,11 +2424,65 @@
       }
     ]
   },
+  "voice.disciple.f3.hati_lulus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.hati_lulus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/hati_lulus",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.hufa_jaga": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.hufa_jaga",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/hufa_jaga",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.hufa_minta": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.hufa_minta",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/hufa_minta",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.iblis_bisik": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.iblis_bisik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/iblis_bisik",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f3/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.jalan_ganti": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.jalan_ganti",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/jalan_ganti",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.latih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.latih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/latih",
         "stream": false
       }
     ]
@@ -1614,11 +2523,29 @@
       }
     ]
   },
+  "voice.disciple.f3.lihat_lapak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.lihat_lapak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/lihat_lapak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.loyal": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.loyal",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f3/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.makan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.makan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/makan",
         "stream": false
       }
     ]
@@ -1659,11 +2586,29 @@
       }
     ]
   },
+  "voice.disciple.f3.pamit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.pamit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/pamit",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f3/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.pulang_belanja": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.pulang_belanja",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/pulang_belanja",
         "stream": false
       }
     ]
@@ -1704,6 +2649,168 @@
       }
     ]
   },
+  "voice.disciple.f3.salam_pagi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.salam_pagi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/salam_pagi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.serap_batu": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.serap_batu",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/serap_batu",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_balas": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_balas",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_balas",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_curi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_curi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_curi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_damai": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_damai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_damai",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_ejek": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_ejek",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_ejek",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_ejek_guru": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_ejek_guru",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_ejek_guru",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_kekasih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_kekasih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_kekasih",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_keroyok": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_keroyok",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_keroyok",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_lindungi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_lindungi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_lindungi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_maaf": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_maaf",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_maaf",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_menang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_menang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_menang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_saingan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_saingan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_saingan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_sergap": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_sergap",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_sergap",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_sumpah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_sumpah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_sumpah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_tantang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_tantang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_tantang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.seteru_terima": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.seteru_terima",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/seteru_terima",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.study": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.study",
     "sounds": [
@@ -1731,6 +2838,24 @@
       }
     ]
   },
+  "voice.disciple.f3.tawar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.tawar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/tawar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.tawar_sepakat": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.tawar_sepakat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/tawar_sepakat",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.tea": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.tea",
     "sounds": [
@@ -1749,6 +2874,24 @@
       }
     ]
   },
+  "voice.disciple.f3.tembus_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.tembus_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/tembus_sendiri",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.tertawan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.tertawan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/tertawan",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.f3.thanks": {
     "subtitle": "subtitles.kultivator.voice.disciple.f3.thanks",
     "sounds": [
@@ -1763,6 +2906,24 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/f3/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.tutup_keluar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.tutup_keluar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/tutup_keluar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.f3.tutup_masuk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.f3.tutup_masuk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/f3/tutup_masuk",
         "stream": false
       }
     ]
@@ -1799,6 +2960,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m1/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.belajar_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.belajar_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/belajar_sendiri",
         "stream": false
       }
     ]
@@ -1857,6 +3027,15 @@
       }
     ]
   },
+  "voice.disciple.m1.copet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.copet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/copet",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.cultivate",
     "sounds": [
@@ -1866,11 +3045,38 @@
       }
     ]
   },
+  "voice.disciple.m1.dao_pilih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.dao_pilih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/dao_pilih",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.depart": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.depart",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m1/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.diselamatkan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.diselamatkan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/diselamatkan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.ditebus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.ditebus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/ditebus",
         "stream": false
       }
     ]
@@ -1938,6 +3144,15 @@
       }
     ]
   },
+  "voice.disciple.m1.hadiah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.hadiah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/hadiah",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.harvest": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.harvest",
     "sounds": [
@@ -1947,11 +3162,65 @@
       }
     ]
   },
+  "voice.disciple.m1.hati_lulus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.hati_lulus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/hati_lulus",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.hufa_jaga": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.hufa_jaga",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/hufa_jaga",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.hufa_minta": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.hufa_minta",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/hufa_minta",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.iblis_bisik": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.iblis_bisik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/iblis_bisik",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m1/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.jalan_ganti": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.jalan_ganti",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/jalan_ganti",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.latih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.latih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/latih",
         "stream": false
       }
     ]
@@ -1992,11 +3261,29 @@
       }
     ]
   },
+  "voice.disciple.m1.lihat_lapak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.lihat_lapak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/lihat_lapak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.loyal": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.loyal",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m1/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.makan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.makan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/makan",
         "stream": false
       }
     ]
@@ -2037,11 +3324,29 @@
       }
     ]
   },
+  "voice.disciple.m1.pamit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.pamit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/pamit",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m1/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.pulang_belanja": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.pulang_belanja",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/pulang_belanja",
         "stream": false
       }
     ]
@@ -2082,6 +3387,168 @@
       }
     ]
   },
+  "voice.disciple.m1.salam_pagi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.salam_pagi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/salam_pagi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.serap_batu": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.serap_batu",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/serap_batu",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_balas": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_balas",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_balas",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_curi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_curi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_curi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_damai": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_damai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_damai",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_ejek": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_ejek",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_ejek",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_ejek_guru": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_ejek_guru",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_ejek_guru",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_kekasih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_kekasih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_kekasih",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_keroyok": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_keroyok",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_keroyok",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_lindungi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_lindungi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_lindungi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_maaf": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_maaf",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_maaf",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_menang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_menang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_menang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_saingan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_saingan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_saingan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_sergap": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_sergap",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_sergap",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_sumpah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_sumpah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_sumpah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_tantang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_tantang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_tantang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.seteru_terima": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.seteru_terima",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/seteru_terima",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.study": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.study",
     "sounds": [
@@ -2109,6 +3576,24 @@
       }
     ]
   },
+  "voice.disciple.m1.tawar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.tawar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/tawar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.tawar_sepakat": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.tawar_sepakat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/tawar_sepakat",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.tea": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.tea",
     "sounds": [
@@ -2127,6 +3612,24 @@
       }
     ]
   },
+  "voice.disciple.m1.tembus_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.tembus_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/tembus_sendiri",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.tertawan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.tertawan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/tertawan",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m1.thanks": {
     "subtitle": "subtitles.kultivator.voice.disciple.m1.thanks",
     "sounds": [
@@ -2141,6 +3644,24 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m1/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.tutup_keluar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.tutup_keluar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/tutup_keluar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m1.tutup_masuk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m1.tutup_masuk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m1/tutup_masuk",
         "stream": false
       }
     ]
@@ -2177,6 +3698,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m2/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.belajar_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.belajar_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/belajar_sendiri",
         "stream": false
       }
     ]
@@ -2235,6 +3765,15 @@
       }
     ]
   },
+  "voice.disciple.m2.copet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.copet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/copet",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.cultivate",
     "sounds": [
@@ -2244,11 +3783,38 @@
       }
     ]
   },
+  "voice.disciple.m2.dao_pilih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.dao_pilih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/dao_pilih",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.depart": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.depart",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m2/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.diselamatkan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.diselamatkan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/diselamatkan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.ditebus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.ditebus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/ditebus",
         "stream": false
       }
     ]
@@ -2316,6 +3882,15 @@
       }
     ]
   },
+  "voice.disciple.m2.hadiah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.hadiah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/hadiah",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.harvest": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.harvest",
     "sounds": [
@@ -2325,11 +3900,65 @@
       }
     ]
   },
+  "voice.disciple.m2.hati_lulus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.hati_lulus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/hati_lulus",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.hufa_jaga": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.hufa_jaga",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/hufa_jaga",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.hufa_minta": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.hufa_minta",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/hufa_minta",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.iblis_bisik": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.iblis_bisik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/iblis_bisik",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m2/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.jalan_ganti": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.jalan_ganti",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/jalan_ganti",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.latih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.latih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/latih",
         "stream": false
       }
     ]
@@ -2370,11 +3999,29 @@
       }
     ]
   },
+  "voice.disciple.m2.lihat_lapak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.lihat_lapak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/lihat_lapak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.loyal": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.loyal",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m2/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.makan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.makan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/makan",
         "stream": false
       }
     ]
@@ -2415,11 +4062,29 @@
       }
     ]
   },
+  "voice.disciple.m2.pamit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.pamit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/pamit",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m2/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.pulang_belanja": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.pulang_belanja",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/pulang_belanja",
         "stream": false
       }
     ]
@@ -2460,6 +4125,168 @@
       }
     ]
   },
+  "voice.disciple.m2.salam_pagi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.salam_pagi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/salam_pagi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.serap_batu": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.serap_batu",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/serap_batu",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_balas": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_balas",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_balas",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_curi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_curi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_curi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_damai": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_damai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_damai",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_ejek": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_ejek",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_ejek",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_ejek_guru": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_ejek_guru",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_ejek_guru",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_kekasih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_kekasih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_kekasih",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_keroyok": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_keroyok",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_keroyok",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_lindungi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_lindungi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_lindungi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_maaf": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_maaf",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_maaf",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_menang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_menang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_menang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_saingan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_saingan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_saingan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_sergap": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_sergap",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_sergap",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_sumpah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_sumpah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_sumpah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_tantang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_tantang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_tantang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.seteru_terima": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.seteru_terima",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/seteru_terima",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.study": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.study",
     "sounds": [
@@ -2487,6 +4314,24 @@
       }
     ]
   },
+  "voice.disciple.m2.tawar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.tawar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/tawar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.tawar_sepakat": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.tawar_sepakat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/tawar_sepakat",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.tea": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.tea",
     "sounds": [
@@ -2505,6 +4350,24 @@
       }
     ]
   },
+  "voice.disciple.m2.tembus_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.tembus_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/tembus_sendiri",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.tertawan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.tertawan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/tertawan",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m2.thanks": {
     "subtitle": "subtitles.kultivator.voice.disciple.m2.thanks",
     "sounds": [
@@ -2519,6 +4382,24 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m2/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.tutup_keluar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.tutup_keluar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/tutup_keluar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m2.tutup_masuk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m2.tutup_masuk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m2/tutup_masuk",
         "stream": false
       }
     ]
@@ -2555,6 +4436,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m3/attack_alt",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.belajar_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.belajar_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/belajar_sendiri",
         "stream": false
       }
     ]
@@ -2613,6 +4503,15 @@
       }
     ]
   },
+  "voice.disciple.m3.copet": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.copet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/copet",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.cultivate": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.cultivate",
     "sounds": [
@@ -2622,11 +4521,38 @@
       }
     ]
   },
+  "voice.disciple.m3.dao_pilih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.dao_pilih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/dao_pilih",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.depart": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.depart",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m3/depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.diselamatkan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.diselamatkan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/diselamatkan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.ditebus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.ditebus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/ditebus",
         "stream": false
       }
     ]
@@ -2694,6 +4620,15 @@
       }
     ]
   },
+  "voice.disciple.m3.hadiah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.hadiah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/hadiah",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.harvest": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.harvest",
     "sounds": [
@@ -2703,11 +4638,65 @@
       }
     ]
   },
+  "voice.disciple.m3.hati_lulus": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.hati_lulus",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/hati_lulus",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.hufa_jaga": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.hufa_jaga",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/hufa_jaga",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.hufa_minta": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.hufa_minta",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/hufa_minta",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.iblis_bisik": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.iblis_bisik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/iblis_bisik",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.injured": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.injured",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m3/injured",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.jalan_ganti": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.jalan_ganti",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/jalan_ganti",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.latih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.latih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/latih",
         "stream": false
       }
     ]
@@ -2748,11 +4737,29 @@
       }
     ]
   },
+  "voice.disciple.m3.lihat_lapak": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.lihat_lapak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/lihat_lapak",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.loyal": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.loyal",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m3/loyal",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.makan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.makan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/makan",
         "stream": false
       }
     ]
@@ -2793,11 +4800,29 @@
       }
     ]
   },
+  "voice.disciple.m3.pamit": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.pamit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/pamit",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.protect": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.protect",
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m3/protect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.pulang_belanja": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.pulang_belanja",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/pulang_belanja",
         "stream": false
       }
     ]
@@ -2838,6 +4863,168 @@
       }
     ]
   },
+  "voice.disciple.m3.salam_pagi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.salam_pagi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/salam_pagi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.serap_batu": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.serap_batu",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/serap_batu",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_balas": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_balas",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_balas",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_curi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_curi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_curi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_damai": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_damai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_damai",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_ejek": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_ejek",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_ejek",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_ejek_guru": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_ejek_guru",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_ejek_guru",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_kalah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_kekasih": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_kekasih",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_kekasih",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_keroyok": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_keroyok",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_keroyok",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_lindungi": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_lindungi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_lindungi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_maaf": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_maaf",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_maaf",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_menang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_menang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_menang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_saingan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_saingan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_saingan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_sergap": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_sergap",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_sergap",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_sumpah": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_sumpah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_sumpah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_tantang": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_tantang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_tantang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.seteru_terima": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.seteru_terima",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/seteru_terima",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.study": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.study",
     "sounds": [
@@ -2865,6 +5052,24 @@
       }
     ]
   },
+  "voice.disciple.m3.tawar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.tawar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/tawar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.tawar_sepakat": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.tawar_sepakat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/tawar_sepakat",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.tea": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.tea",
     "sounds": [
@@ -2883,6 +5088,24 @@
       }
     ]
   },
+  "voice.disciple.m3.tembus_sendiri": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.tembus_sendiri",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/tembus_sendiri",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.tertawan": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.tertawan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/tertawan",
+        "stream": false
+      }
+    ]
+  },
   "voice.disciple.m3.thanks": {
     "subtitle": "subtitles.kultivator.voice.disciple.m3.thanks",
     "sounds": [
@@ -2897,6 +5120,24 @@
     "sounds": [
       {
         "name": "kultivator:voice/disciple/m3/tired",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.tutup_keluar": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.tutup_keluar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/tutup_keluar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.disciple.m3.tutup_masuk": {
+    "subtitle": "subtitles.kultivator.voice.disciple.m3.tutup_masuk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/disciple/m3/tutup_masuk",
         "stream": false
       }
     ]
@@ -2951,6 +5192,24 @@
     "sounds": [
       {
         "name": "kultivator:voice/elder/leitai_buka",
+        "stream": false
+      }
+    ]
+  },
+  "voice.elder.seteru_ganti_rugi": {
+    "subtitle": "subtitles.kultivator.voice.elder.seteru_ganti_rugi",
+    "sounds": [
+      {
+        "name": "kultivator:voice/elder/seteru_ganti_rugi",
+        "stream": false
+      }
+    ]
+  },
+  "voice.elder.seteru_lerai": {
+    "subtitle": "subtitles.kultivator.voice.elder.seteru_lerai",
+    "sounds": [
+      {
+        "name": "kultivator:voice/elder/seteru_lerai",
         "stream": false
       }
     ]
@@ -3150,6 +5409,600 @@
       }
     ]
   },
+  "voice.gumam.anak.0": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.0",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/0",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.1": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.1",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/1",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.10": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.10",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/10",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.11": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.11",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/11",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.12": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.12",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/12",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.2": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.2",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/2",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.3": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.3",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/3",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.4": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.4",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/4",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.5": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.5",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/5",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.6": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.6",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/6",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.7": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.7",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/7",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.8": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.8",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/8",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.anak.9": {
+    "subtitle": "subtitles.kultivator.voice.gumam.anak.9",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/anak/9",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.0": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.0",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/0",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.1": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.1",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/1",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.10": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.10",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/10",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.11": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.11",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/11",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.12": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.12",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/12",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.2": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.2",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/2",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.3": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.3",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/3",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.4": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.4",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/4",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.5": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.5",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/5",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.6": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.6",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/6",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.7": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.7",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/7",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.8": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.8",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/8",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.kakek.9": {
+    "subtitle": "subtitles.kultivator.voice.gumam.kakek.9",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/kakek/9",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.0": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.0",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/0",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.1": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.1",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/1",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.10": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.10",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/10",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.11": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.11",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/11",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.2": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.2",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/2",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.3": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.3",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/3",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.4": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.4",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/4",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.5": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.5",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/5",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.6": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.6",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/6",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.7": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.7",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/7",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.8": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.8",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/8",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.nenek.9": {
+    "subtitle": "subtitles.kultivator.voice.gumam.nenek.9",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/nenek/9",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.0": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.0",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/0",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.1": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.1",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/1",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.10": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.10",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/10",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.11": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.11",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/11",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.12": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.12",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/12",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.13": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.13",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/13",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.2": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.2",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/2",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.3": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.3",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/3",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.4": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.4",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/4",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.5": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.5",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/5",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.6": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.6",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/6",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.7": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.7",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/7",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.8": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.8",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/8",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.pria.9": {
+    "subtitle": "subtitles.kultivator.voice.gumam.pria.9",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/pria/9",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.0": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.0",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/0",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.1": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.1",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/1",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.10": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.10",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/10",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.11": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.11",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/11",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.12": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.12",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/12",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.13": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.13",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/13",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.2": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.2",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/2",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.3": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.3",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/3",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.4": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.4",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/4",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.5": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.5",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/5",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.6": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.6",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/6",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.7": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.7",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/7",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.8": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.8",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/8",
+        "stream": false
+      }
+    ]
+  },
+  "voice.gumam.wanita.9": {
+    "subtitle": "subtitles.kultivator.voice.gumam.wanita.9",
+    "sounds": [
+      {
+        "name": "kultivator:voice/gumam/wanita/9",
+        "stream": false
+      }
+    ]
+  },
   "voice.heaven.breakthrough": {
     "subtitle": "subtitles.kultivator.voice.heaven.breakthrough",
     "sounds": [
@@ -3263,6 +6116,15 @@
     "sounds": [
       {
         "name": "kultivator:voice/world/heaven/langit/twin_moons",
+        "stream": false
+      }
+    ]
+  },
+  "voice.heaven.langit_naik": {
+    "subtitle": "subtitles.kultivator.voice.heaven.langit_naik",
+    "sounds": [
+      {
+        "name": "kultivator:voice/heaven/langit_naik",
         "stream": false
       }
     ]
@@ -3501,6 +6363,276 @@
       }
     ]
   },
+  "voice.kotabesar.alchemy_start": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.alchemy_start",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/alchemy_start",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.alchemy_winner": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.alchemy_winner",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/alchemy_winner",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.bank_note": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.bank_note",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/bank_note",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.bank_welcome": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.bank_welcome",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/bank_welcome",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.beast_market": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.beast_market",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/beast_market",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.beast_tide": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.beast_tide",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/beast_tide",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.curfew": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.curfew",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/curfew",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.defense_won": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.defense_won",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/defense_won",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.dock_depart": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.dock_depart",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/dock_depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.fine_paid": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.fine_paid",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/fine_paid",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.gamble_cut": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.gamble_cut",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/gamble_cut",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.gamble_lose": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.gamble_lose",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/gamble_lose",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.gamble_win": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.gamble_win",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/gamble_win",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.gate_welcome": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.gate_welcome",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/gate_welcome",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.grand_auction": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.grand_auction",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/grand_auction",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.guild_bounty": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.guild_bounty",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/guild_bounty",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.guild_rank": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.guild_rank",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/guild_rank",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.inn_welcome": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.inn_welcome",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/inn_welcome",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.jail": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.jail",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/jail",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.lantern_festival": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.lantern_festival",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/lantern_festival",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.library_hush": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.library_hush",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/library_hush",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.palace_audience": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.palace_audience",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/palace_audience",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.recruit_call": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.recruit_call",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/recruit_call",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.riddle_right": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.riddle_right",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/riddle_right",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.smith_master": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.smith_master",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/smith_master",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.suspect": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.suspect",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/suspect",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.teleport_ready": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.teleport_ready",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/teleport_ready",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.temple_bell": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.temple_bell",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/temple_bell",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.tournament_open": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.tournament_open",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/tournament_open",
+        "stream": false
+      }
+    ]
+  },
+  "voice.kotabesar.wanted": {
+    "subtitle": "subtitles.kultivator.voice.kotabesar.wanted",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/kotabesar/wanted",
+        "stream": false
+      }
+    ]
+  },
   "voice.laut.dragon_king": {
     "subtitle": "subtitles.kultivator.voice.laut.dragon_king",
     "sounds": [
@@ -3641,6 +6773,744 @@
     "sounds": [
       {
         "name": "kultivator:voice/rogue/flee",
+        "stream": false
+      }
+    ]
+  },
+  "voice.sekte_langit.bajak_datang": {
+    "subtitle": "subtitles.kultivator.voice.sekte_langit.bajak_datang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/sekte_langit/bajak_datang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.sekte_langit.longbo_datang": {
+    "subtitle": "subtitles.kultivator.voice.sekte_langit.longbo_datang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/sekte_langit/longbo_datang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.sekte_langit.longbo_kalah": {
+    "subtitle": "subtitles.kultivator.voice.sekte_langit.longbo_kalah",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/sekte_langit/longbo_kalah",
+        "stream": false
+      }
+    ]
+  },
+  "voice.sekte_langit.tamu_salam": {
+    "subtitle": "subtitles.kultivator.voice.sekte_langit.tamu_salam",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/sekte_langit/tamu_salam",
+        "stream": false
+      }
+    ]
+  },
+  "voice.sekte_langit.utusan_salam": {
+    "subtitle": "subtitles.kultivator.voice.sekte_langit.utusan_salam",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/sekte_langit/utusan_salam",
+        "stream": false
+      }
+    ]
+  },
+  "voice.sekte_langit.utusan_tantang": {
+    "subtitle": "subtitles.kultivator.voice.sekte_langit.utusan_tantang",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/sekte_langit/utusan_tantang",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.air.boat_song": {
+    "subtitle": "subtitles.kultivator.voice.tema.air.boat_song",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/air/boat_song",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.air.dragon_boat": {
+    "subtitle": "subtitles.kultivator.voice.tema.air.dragon_boat",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/air/dragon_boat",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.air.ghost": {
+    "subtitle": "subtitles.kultivator.voice.tema.air.ghost",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/air/ghost",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.air.ghost_rest": {
+    "subtitle": "subtitles.kultivator.voice.tema.air.ghost_rest",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/air/ghost_rest",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.air.lantern_night": {
+    "subtitle": "subtitles.kultivator.voice.tema.air.lantern_night",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/air/lantern_night",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.air.poet": {
+    "subtitle": "subtitles.kultivator.voice.tema.air.poet",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/air/poet",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.air.silk": {
+    "subtitle": "subtitles.kultivator.voice.tema.air.silk",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/air/silk",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.air.tea": {
+    "subtitle": "subtitles.kultivator.voice.tema.air.tea",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/air/tea",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.air.thief": {
+    "subtitle": "subtitles.kultivator.voice.tema.air.thief",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/air/thief",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.air.welcome": {
+    "subtitle": "subtitles.kultivator.voice.tema.air.welcome",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/air/welcome",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.dagang.saturated": {
+    "subtitle": "subtitles.kultivator.voice.tema.dagang.saturated",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/dagang/saturated",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.dagang.sold": {
+    "subtitle": "subtitles.kultivator.voice.tema.dagang.sold",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/dagang/sold",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.gunung.abbot": {
+    "subtitle": "subtitles.kultivator.voice.tema.gunung.abbot",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/gunung/abbot",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.gunung.buddha_light": {
+    "subtitle": "subtitles.kultivator.voice.tema.gunung.buddha_light",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/gunung/buddha_light",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.gunung.cloud_bell": {
+    "subtitle": "subtitles.kultivator.voice.tema.gunung.cloud_bell",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/gunung/cloud_bell",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.gunung.lift": {
+    "subtitle": "subtitles.kultivator.voice.tema.gunung.lift",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/gunung/lift",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.gunung.lift_stuck": {
+    "subtitle": "subtitles.kultivator.voice.tema.gunung.lift_stuck",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/gunung/lift_stuck",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.gunung.monkey": {
+    "subtitle": "subtitles.kultivator.voice.tema.gunung.monkey",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/gunung/monkey",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.gunung.pilgrim": {
+    "subtitle": "subtitles.kultivator.voice.tema.gunung.pilgrim",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/gunung/pilgrim",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.gunung.porter": {
+    "subtitle": "subtitles.kultivator.voice.tema.gunung.porter",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/gunung/porter",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.gunung.rockfall": {
+    "subtitle": "subtitles.kultivator.voice.tema.gunung.rockfall",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/gunung/rockfall",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.gunung.welcome": {
+    "subtitle": "subtitles.kultivator.voice.tema.gunung.welcome",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/gunung/welcome",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.arena_open": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.arena_open",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/arena_open",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.arena_win": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.arena_win",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/arena_win",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.broker": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.broker",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/broker",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.captive": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.captive",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/captive",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.dawn": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.dawn",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/dawn",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.forbidden": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.forbidden",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/forbidden",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.gate_toll": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.gate_toll",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/gate_toll",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.gate_weak": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.gate_weak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/gate_weak",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.hunt_hour": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.hunt_hour",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/hunt_hour",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.hunter": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.hunter",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/hunter",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.lord": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.lord",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/lord",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.pact": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.pact",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/pact",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.iblis.raid": {
+    "subtitle": "subtitles.kultivator.voice.tema.iblis.raid",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/iblis/raid",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.oasis.bazaar": {
+    "subtitle": "subtitles.kultivator.voice.tema.oasis.bazaar",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/oasis/bazaar",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.oasis.caravan": {
+    "subtitle": "subtitles.kultivator.voice.tema.oasis.caravan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/oasis/caravan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.oasis.dance": {
+    "subtitle": "subtitles.kultivator.voice.tema.oasis.dance",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/oasis/dance",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.oasis.haggle_no": {
+    "subtitle": "subtitles.kultivator.voice.tema.oasis.haggle_no",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/oasis/haggle_no",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.oasis.haggle_yes": {
+    "subtitle": "subtitles.kultivator.voice.tema.oasis.haggle_yes",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/oasis/haggle_yes",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.oasis.lord": {
+    "subtitle": "subtitles.kultivator.voice.tema.oasis.lord",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/oasis/lord",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.oasis.sandstorm": {
+    "subtitle": "subtitles.kultivator.voice.tema.oasis.sandstorm",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/oasis/sandstorm",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.oasis.scorpion": {
+    "subtitle": "subtitles.kultivator.voice.tema.oasis.scorpion",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/oasis/scorpion",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.oasis.water_priestess": {
+    "subtitle": "subtitles.kultivator.voice.tema.oasis.water_priestess",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/oasis/water_priestess",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.oasis.welcome": {
+    "subtitle": "subtitles.kultivator.voice.tema.oasis.welcome",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/oasis/welcome",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.black_shark": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.black_shark",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/black_shark",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.fish_call": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.fish_call",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/fish_call",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.goddess_day": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.goddess_day",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/goddess_day",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.lamp_lit": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.lamp_lit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/lamp_lit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.lighthouse": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.lighthouse",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/lighthouse",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.pirates": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.pirates",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/pirates",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.sea_crossing": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.sea_crossing",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/sea_crossing",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.ship_arrive": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.ship_arrive",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/ship_arrive",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.ship_depart": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.ship_depart",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/ship_depart",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.shipwright": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.shipwright",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/shipwright",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tema.pelabuhan.welcome": {
+    "subtitle": "subtitles.kultivator.voice.tema.pelabuhan.welcome",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tema/pelabuhan/welcome",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.bandit": {
+    "subtitle": "subtitles.kultivator.voice.tempat.bandit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/bandit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.bill_paid": {
+    "subtitle": "subtitles.kultivator.voice.tempat.bill_paid",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/bill_paid",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.bill_refused": {
+    "subtitle": "subtitles.kultivator.voice.tempat.bill_refused",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/bill_refused",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.bill_request": {
+    "subtitle": "subtitles.kultivator.voice.tempat.bill_request",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/bill_request",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.captive_saved": {
+    "subtitle": "subtitles.kultivator.voice.tempat.captive_saved",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/captive_saved",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.child_play": {
+    "subtitle": "subtitles.kultivator.voice.tempat.child_play",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/child_play",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.clan_patriarch": {
+    "subtitle": "subtitles.kultivator.voice.tempat.clan_patriarch",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/clan_patriarch",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.demon_hideout": {
+    "subtitle": "subtitles.kultivator.voice.tempat.demon_hideout",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/demon_hideout",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.hermit": {
+    "subtitle": "subtitles.kultivator.voice.tempat.hermit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/hermit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.hermit_koan": {
+    "subtitle": "subtitles.kultivator.voice.tempat.hermit_koan",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/hermit_koan",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.inheritance": {
+    "subtitle": "subtitles.kultivator.voice.tempat.inheritance",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/inheritance",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.inheritance_pass": {
+    "subtitle": "subtitles.kultivator.voice.tempat.inheritance_pass",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/inheritance_pass",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.peddler": {
+    "subtitle": "subtitles.kultivator.voice.tempat.peddler",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/peddler",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.repair_work": {
+    "subtitle": "subtitles.kultivator.voice.tempat.repair_work",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/repair_work",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.sect_visit": {
+    "subtitle": "subtitles.kultivator.voice.tempat.sect_visit",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/sect_visit",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.tribulation_peak": {
+    "subtitle": "subtitles.kultivator.voice.tempat.tribulation_peak",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/tribulation_peak",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.village_elder": {
+    "subtitle": "subtitles.kultivator.voice.tempat.village_elder",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/village_elder",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.village_fear": {
+    "subtitle": "subtitles.kultivator.voice.tempat.village_fear",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/village_fear",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.waystation": {
+    "subtitle": "subtitles.kultivator.voice.tempat.waystation",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/waystation",
+        "stream": false
+      }
+    ]
+  },
+  "voice.tempat.young_master": {
+    "subtitle": "subtitles.kultivator.voice.tempat.young_master",
+    "sounds": [
+      {
+        "name": "kultivator:voice/world/tempat/young_master",
         "stream": false
       }
     ]
