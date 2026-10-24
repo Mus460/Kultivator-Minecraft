@@ -14,18 +14,18 @@ public final class DuniaSpine {
 	public static final class Umum {
 		/** Master switch: false = every module's runtime off (structures still generate while their packs are on). */
 		public boolean enabled = true;
-		/** Humans of this phase alive per server (12-192). */
-		public int npcCap = 120;
-		/** Humans within 96 blocks of one player (4-96). */
-		public int npcPerPlayer = 48;
+		/** Humans of this phase alive per server (12-600). */
+		public int npcCap = 300;
+		/** Humans within 96 blocks of one player (4-400). */
+		public int npcPerPlayer = 200;
 		/** MSPT guard in milliseconds (30-200). */
 		public int msptGuard = 90;
 		/** Logs every anchor load and unload. */
 		public boolean debugAnchors = false;
 
 		Umum clamp() {
-			npcCap = Mth.clamp(npcCap, 12, 192);
-			npcPerPlayer = Mth.clamp(npcPerPlayer, 4, 96);
+			npcCap = Mth.clamp(npcCap, 12, 600);
+			npcPerPlayer = Mth.clamp(npcPerPlayer, 4, 400);
 			msptGuard = Mth.clamp(msptGuard, 30, 200);
 			return this;
 		}

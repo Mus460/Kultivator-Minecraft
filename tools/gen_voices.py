@@ -266,10 +266,16 @@ def load(path):
     return trim(to_sr(data, sr))
 
 
-def write(rel, audio):
+MADE = []
+
+
+def write(rel, make):
+    """Writes the clip only when it is missing: existing clips are never re-encoded or replaced (delete one to remake it)."""
     path = os.path.join(OUT, rel + '.ogg')
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    sf.write(path, np.clip(audio, -1, 1).astype(np.float32), SR, format='OGG', subtype='VORBIS')
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        sf.write(path, np.clip(make(), -1, 1).astype(np.float32), SR, format='OGG', subtype='VORBIS')
+        MADE.append(rel)
     return 'kultivator:voice/' + rel
 
 
@@ -456,9 +462,8 @@ def event(eid, names, sub_en, sub_id, stream=False):
 
 
 for group, key, ja, cap_en, cap_id, style, emo, speed in LINES:
-    raw = tts(ja, style, emo, speed=speed, pitch_scale=-0.06 if group == 'heaven' else None)
     fxname = {'heaven': 'heaven', 'demon': 'demon', 'boss': 'boss', 'elder': 'elder', 'rogue': 'room'}[group]
-    name = write(f'{group}/{key}', FX[fxname](raw))
+    name = write(f'{group}/{key}', lambda: FX[fxname](tts(ja, style, emo, speed=speed, pitch_scale=-0.06 if group == 'heaven' else None)))
     eid = f'voice.{group}.{key}'
     event(eid, [name], f'{SPEAKER_EN[group]} speaks', f'{SPEAKER_ID[group]} berbicara')
     en[f'kultivator.voice.{group}.{key}'] = cap_en
@@ -471,8 +476,8 @@ for key, ja, cap_en, cap_id, emo in DISCIPLE:
     for vid, styles in VOICES.items():
         style = styles[emo]
         native = emo in NATIVE_EMO.get(vid, set())
-        raw = tts(ja, style, 'normal' if native else emo, speed=1.0)
-        name = write(f'disciple/{vid}/{key}', fx_room(raw, seed=60 + len(manifest['lines'])))
+        name = write(f'disciple/{vid}/{key}', lambda: fx_room(tts(ja, style, 'normal' if native else emo, speed=1.0),
+                                                              seed=60 + len(manifest['lines'])))
         eid = f'voice.disciple.{vid}.{key}'
         event(eid, [name], 'Disciple speaks', 'Murid berbicara')
         manifest['lines'].append({'event': eid, 'ja': ja, 'en': cap_en, 'id': cap_id, 'speaker': 'disciple', 'voice': vid, 'style': style})
@@ -653,9 +658,11 @@ for key, spk, ja, cap_en, cap_id, emo in WORLD:
     native = spk.startswith(('m', 'f')) and emo in NATIVE_EMO.get(spk, set())
     if spk.startswith(('m', 'f')) and native:
         style = VOICES[spk][emo]
-    raw = tts(ja, style, 'normal' if native else emo, speed=0.88 if group == 'heaven' else 0.95,
-              pitch_scale=-0.06 if group == 'heaven' else None)
-    name = write('world/' + key.replace('.', '/'), fx_room(raw, seed=90) if fxname == 'room' else FX[fxname](raw))
+    def make():
+        raw = tts(ja, style, 'normal' if native else emo, speed=0.88 if group == 'heaven' else 0.95,
+                  pitch_scale=-0.06 if group == 'heaven' else None)
+        return fx_room(raw, seed=90) if fxname == 'room' else FX[fxname](raw)
+    name = write('world/' + key.replace('.', '/'), make)
     eid = f'voice.{key}'
     event(eid, [name], f'{SPEAKER_EN[group]} speaks' if group != 'disciple' else 'Someone speaks',
           f'{SPEAKER_ID[group]} berbicara' if group != 'disciple' else 'Seseorang berbicara')
@@ -682,8 +689,10 @@ LANGIT_37 = [
 ]
 READ.update({'天宮': 'てんきゅう', '天命': 'てんめい', '同道': 'どうどう', '黄昏': 'たそがれ'})
 for key, style, fxname, ja, cap_en, cap_id, emo, sub_en, sub_id in LANGIT_37:
-    raw = tts(ja, style, emo, speed=0.88 if fxname == 'heaven' else 0.95, pitch_scale=-0.06 if fxname == 'heaven' else None)
-    name = write('world/' + key.replace('.', '/'), fx_room(raw, seed=93) if fxname == 'room' else FX[fxname](raw))
+    def make():
+        raw = tts(ja, style, emo, speed=0.88 if fxname == 'heaven' else 0.95, pitch_scale=-0.06 if fxname == 'heaven' else None)
+        return fx_room(raw, seed=93) if fxname == 'room' else FX[fxname](raw)
+    name = write('world/' + key.replace('.', '/'), make)
     eid = f'voice.{key}'
     event(eid, [name], f'{sub_en} speaks', f'{sub_id} berbicara')
     en[f'kultivator.voice.{key}'] = cap_en
@@ -697,9 +706,13 @@ DEM = os.path.join(DL, 'demon/x')
 
 
 def pack(eid, rel_dir, files, fx, sub_en, sub_id):
+    """A missing pack file is skipped only when its processed clip already exists (the packs are not kept)."""
     names = []
     for i, f in enumerate(files):
-        names.append(write(f'{rel_dir}/{i}', fx(load(f))))
+        rel = f'{rel_dir}/{i}'
+        if not os.path.exists(f) and not os.path.exists(os.path.join(OUT, rel + '.ogg')):
+            raise SystemExit(f'missing pack file {f} and no clip {rel}.ogg: download the packs of docs/CREDITS.md into {DL}')
+        names.append(write(rel, lambda: fx(load(f))))
     event(eid, names, sub_en, sub_id)
 
 
@@ -714,7 +727,7 @@ pack('voice.grunt.male.death', 'grunt/male/death', [f'{ADV}/death{i}.wav' for i 
 pack('voice.grunt.female.hurt', 'grunt/female/hurt', [f'{FEM}/oww.ogg', f'{FEM}/gah.ogg'], room_soft, 'Disciple hurt', 'Murid terluka')
 for vid in ('f1', 'f2', 'f3'):
     for k, ja in (('kiai0', 'はっ！'), ('kiai1', 'やぁっ！'), ('kiai2', 'えいっ！')):
-        write(f'grunt/female/{vid}_{k}', room_soft(tts(ja, VOICES[vid]['angry'], 'angry' if vid != 'f1' else 'normal', speed=1.1, post=0.02)))
+        write(f'grunt/female/{vid}_{k}', lambda: room_soft(tts(ja, VOICES[vid]['angry'], 'angry' if vid != 'f1' else 'normal', speed=1.1, post=0.02)))
 event('voice.grunt.female.attack', [f'kultivator:voice/grunt/female/{v}_{k}' for v in ('f1', 'f2', 'f3') for k in ('kiai0', 'kiai1', 'kiai2')],
       'Disciple shouts', 'Murid berteriak')
 pack('voice.demon.laugh', 'demon/laugh', [f'{DEM}/DL DEMON LAUGHS.wav', f'{DEM}/DL DEMON MOOHAAA LAUGH.wav', f'{DEM}/DL DEMON SNIGGER 1.wav',
@@ -723,6 +736,121 @@ pack('voice.demon.growl', 'demon/growl', [f'{DEM}/DL DEMON GROWL {i}.wav' for i 
      fx_demon, 'Demonic growl', 'Geraman iblis')
 pack('voice.demon.death', 'demon/death', [f'{DEM}/DL DEMON DIES.wav'], fx_demon, 'Demon shrieks', 'Iblis menjerit')
 pack('voice.boss.roar', 'boss/roar', [f'{DEM}/DL DEMON FIGHT GRUNT {i}.wav' for i in range(1, 4)], fx_boss, 'Ancient roar', 'Raungan purba')
+
+# --- Kota yang Hidup (docs/progres/suara-kota.md): murmurs under the gestured talks of resident NPCs (38.N.4 butir 8).
+# Event voice.gumam.<tipe>.<n>, caption kultivator.voice.gumam.<tipe>.<n>; the client picks the voice type from the
+# speaker's Sosok (man, woman, old man, old woman, child) and a random line. Mono, quiet and dull ("far murmur") so they
+# sit under the crowd ambience instead of reading as a line spoken to the player.
+GUMAM_SPEAKER = {  # tipe -> [(style, pitch, speed)], rotated over the lines for variety
+    'pria': [(12, 0.0, 1.05), (11, 0.0, 1.05), (52, 0.0, 1.05), (13, 0.0, 1.0)],
+    'wanita': [(2, 0.0, 1.05), (8, 0.0, 1.05), (10, 0.0, 1.05), (20, 0.0, 1.05), (46, 0.0, 1.05)],
+    'kakek': [(42, 0.0, 0.92), (53, 0.0, 0.95)],
+    'nenek': [(80, -0.07, 0.86), (20, -0.09, 0.86)],
+    'anak': [(3, 0.05, 1.1), (1, 0.06, 1.1), (10, 0.12, 1.1)],
+}
+GUMAM_EN = {'pria': 'man', 'wanita': 'woman', 'kakek': 'old man', 'nenek': 'old woman', 'anak': 'child'}
+GUMAM_ID = {'pria': 'pria', 'wanita': 'wanita', 'kakek': 'kakek', 'nenek': 'nenek', 'anak': 'anak'}
+GUMAM = {
+    'pria': [
+        ('いらっしゃい、いらっしゃい！', 'Come in, come in!', 'Mari, mari, silakan!'),
+        ('今日はいい天気だな。', 'Fine weather today.', 'Cuaca hari ini bagus, ya.'),
+        ('それ、いくらだ？', 'How much is that?', 'Itu berapa harganya?'),
+        ('高いなあ、もう少し安くならんか。', "Pricey... can't you go a bit lower?", 'Mahal... tidak bisa kurang sedikit?'),
+        ('聞いたか、あの噂。', 'Did you hear that rumour?', 'Sudah dengar kabar itu?'),
+        ('はっはっは、そりゃいい！', "Ha ha ha, that's a good one!", 'Ha ha ha, bagus sekali!'),
+        ('おう、久しぶりだな。', 'Hey, long time no see.', 'Wah, lama tidak jumpa.'),
+        ('雨が降りそうだな。', 'Looks like rain.', 'Sepertinya mau hujan.'),
+        ('腹が減ったな、飯にしよう。', "I'm starving, let's eat.", 'Lapar nih, ayo makan.'),
+        ('まあまあ、落ち着けよ。', 'Easy now, calm down.', 'Sudah, sudah, tenang dulu.'),
+        ('昨日の市は賑やかだったな。', "Yesterday's market was lively.", 'Pasar kemarin ramai sekali.'),
+        ('へえ、本当かい？', 'Huh, really?', 'Oh ya, sungguh?'),
+        ('霊石三つでどうだ。', 'How about three spirit stones?', 'Bagaimana kalau tiga batu roh?'),
+        ('じゃあ、またな。', 'Well, see you.', 'Ya sudah, sampai jumpa.'),
+    ],
+    'wanita': [
+        ('まあ、いらっしゃい。', 'Oh, welcome.', 'Wah, silakan masuk.'),
+        ('このお野菜、新鮮ですよ。', 'These vegetables are fresh.', 'Sayuran ini masih segar, lho.'),
+        ('あら、お久しぶりね。', "Oh, it's been a while.", 'Eh, lama tidak bertemu.'),
+        ('ねえ、聞いた？隣の娘さんがね…', 'Did you hear? The girl next door...', 'Eh, sudah dengar? Anak gadis tetangga itu...'),
+        ('うふふ、そうなの。', 'Hee hee, is that so.', 'Hihi, begitu ya.'),
+        ('今日は風が気持ちいいわね。', 'What a pleasant breeze today.', 'Anginnya segar hari ini.'),
+        ('ちょっと高くない？', "Isn't that a bit pricey?", 'Agak mahal, tidak?'),
+        ('じゃあ、二つちょうだい。', "Then I'll take two.", 'Kalau begitu, aku ambil dua.'),
+        ('本当に？信じられない！', 'Really? Unbelievable!', 'Sungguh? Tidak bisa dipercaya!'),
+        ('洗濯物、乾くかしら。', 'Will the washing dry, I wonder.', 'Jemuranku kering tidak, ya.'),
+        ('あはは、おかしい！', 'Ah ha ha, how funny!', 'Ahaha, lucu sekali!'),
+        ('お茶でも飲んでいく？', 'Will you stay for some tea?', 'Mampir minum teh dulu?'),
+        ('気をつけて帰ってね。', 'Take care on the way home.', 'Hati-hati pulangnya, ya.'),
+        ('また明日ね。', 'See you tomorrow.', 'Sampai besok, ya.'),
+    ],
+    'kakek': [
+        ('ほっほっほ、若いのう。', 'Ho ho ho, so young.', 'Ho ho ho, masih muda, ya.'),
+        ('わしの若い頃はのう…', 'Back when I was young...', 'Waktu aku masih muda dulu...'),
+        ('今年の米は出来がよい。', 'The rice came in well this year.', 'Padi tahun ini bagus hasilnya.'),
+        ('腰が痛うてかなわん。', 'My back is killing me.', 'Pinggangku sakit sekali.'),
+        ('明日は雨じゃな、膝が言うておる。', 'Rain tomorrow; my knees say so.', 'Besok hujan; lututku bilang begitu.'),
+        ('ふむ、それは良い話じゃ。', 'Hmm, that is good news.', 'Hmm, itu kabar baik.'),
+        ('茶を一杯もらおうかの。', "I'll have a cup of tea.", 'Aku minta secangkir teh.'),
+        ('近頃の若い者は…', 'Young folk these days...', 'Anak muda zaman sekarang...'),
+        ('まあ、焦らずともよい。', 'Now, no need to rush.', 'Sudahlah, tidak perlu terburu-buru.'),
+        ('昔、この町には仙人がおったそうな。', 'They say an immortal once lived in this town.', 'Konon dulu ada seorang abadi tinggal di kota ini.'),
+        ('囲碁でも打つかの。', 'Shall we play a game of Go?', 'Bagaimana kalau main catur Go?'),
+        ('ほう、そうかそうか。', 'Oh, I see, I see.', 'Oh, begitu, begitu.'),
+        ('うむ、達者でな。', 'Mm, take care of yourself.', 'Hm, jaga dirimu baik-baik.'),
+    ],
+    'nenek': [
+        ('あらあら、まあまあ。', 'Oh my, oh my.', 'Aduh, aduh.'),
+        ('孫がね、大きくなってねえ。', 'My grandchild has grown so big.', 'Cucuku sudah besar, lho.'),
+        ('寒くなってきたねえ。', "It's getting cold, isn't it.", 'Mulai dingin, ya.'),
+        ('ちゃんと食べてるかい？', 'Are you eating properly?', 'Makanmu cukup, Nak?'),
+        ('昔はねえ、この辺は田んぼだったのよ。', 'Long ago, all this was rice fields.', 'Dulu, di sini semua sawah.'),
+        ('ほほほ、ありがとうねえ。', 'Ho ho, thank you, dear.', 'Hohoho, terima kasih, ya.'),
+        ('お饅頭、おひとつどうぞ。', 'Have a steamed bun.', 'Silakan, ambil satu bakpao.'),
+        ('まあ、怖い話だねえ。', 'My, what a frightening tale.', 'Aduh, cerita yang menakutkan.'),
+        ('今日は市が立つ日だよ。', 'Today is market day.', 'Hari ini hari pasar.'),
+        ('よっこらしょ。', 'Up we go.', 'Aduh, encok...'),
+        ('そうかい、そうかい。', 'Is that so, is that so.', 'Begitu, ya, begitu.'),
+        ('気をつけてお行きなさいね。', 'Go carefully now.', 'Hati-hati di jalan, ya.'),
+    ],
+    'anak': [
+        ('わーい、待ってー！', 'Yay, wait for me!', 'Hore, tunggu aku!'),
+        ('お母さん、あれ買って！', 'Mum, buy me that!', 'Bu, belikan yang itu!'),
+        ('鬼ごっこしようよ！', "Let's play tag!", 'Ayo main kejar-kejaran!'),
+        ('見て見て、蝶々！', 'Look, look, a butterfly!', 'Lihat, lihat, kupu-kupu!'),
+        ('お腹すいたー。', "I'm hungry...", 'Laparrr...'),
+        ('へへへ、つかまえた！', 'Hee hee, got you!', 'Hehe, kena kau!'),
+        ('すごーい！', 'Wooow!', 'Hebaaat!'),
+        ('僕、仙人になるんだ！', "I'm going to be an immortal!", 'Aku mau jadi abadi!'),
+        ('ねえねえ、知ってる？', 'Hey, hey, you know what?', 'Eh, eh, tahu tidak?'),
+        ('飴玉ちょうだい！', 'Give me a sweet!', 'Minta permennya!'),
+        ('あははは！', 'Ah ha ha ha!', 'Ahahaha!'),
+        ('こっちだよー！', 'Over here!', 'Sebelah sini!'),
+        ('またあしたね！', 'See you tomorrow!', 'Sampai besok!'),
+    ],
+}
+READ.update({'仙人': 'せんにん', '霊石三つ': 'れいせきみっつ', '痛うて': 'いとうて', '言うておる': 'いうておる', '囲碁': 'いご',
+             '市が立つ': 'いちがたつ', '昨日の市': 'きのうのいち', '飴玉': 'あめだま', '蝶々': 'ちょうちょう'})
+
+
+def fx_far(x):
+    """A murmur a few steps away: dull top, thin bottom, a little room, gently levelled and kept quiet."""
+    tail = int(SR * 0.35)
+    d = np.zeros(len(x) + tail)
+    d[:len(x)] = lowpass(highpass(x, 160), 2600)
+    d = np.tanh(2.2 * d / max(1e-9, np.max(np.abs(d)))) / np.tanh(2.2)
+    w = convolve(d, ir(0.5, 0.42, 9, 3500, 77))[:len(d)]
+    return fade_out(norm(d + w * 2.5, 0.55), 90)
+
+
+for tipe, lines in GUMAM.items():
+    for n, (ja, cap_en, cap_id) in enumerate(lines):
+        style, p, spd = GUMAM_SPEAKER[tipe][n % len(GUMAM_SPEAKER[tipe])]
+        name = write(f'gumam/{tipe}/{n}', lambda: fx_far(tts(ja, style, 'normal', speed=spd, pitch_scale=p, intonation=1.15)))
+        eid = f'voice.gumam.{tipe}.{n}'
+        event(eid, [name], f'Townsfolk chatter ({GUMAM_EN[tipe]})', f'Warga mengobrol ({GUMAM_ID[tipe]})')
+        en[f'kultivator.voice.gumam.{tipe}.{n}'] = cap_en
+        id_[f'kultivator.voice.gumam.{tipe}.{n}'] = cap_id
+        manifest['lines'].append({'event': eid, 'ja': ja, 'en': cap_en, 'id': cap_id, 'speaker': 'gumam_' + tipe, 'style': style})
 
 # ---------------------------------------------------------------- outputs
 sj = os.path.join(REPO, 'src/main/resources/assets/kultivator/sounds.json')
@@ -740,4 +868,4 @@ for lang, d in (('en_us', en), ('id_id', id_)):
 with open(os.path.join(REPO, 'tools/voice_manifest.json'), 'w', encoding='utf-8', newline='\n') as f:
     json.dump(manifest, f, ensure_ascii=False, indent=1)
     f.write('\n')
-print('events', len(sounds), 'lines', len(manifest['lines']))
+print('events', len(sounds), 'lines', len(manifest['lines']), 'new clips', len(MADE))

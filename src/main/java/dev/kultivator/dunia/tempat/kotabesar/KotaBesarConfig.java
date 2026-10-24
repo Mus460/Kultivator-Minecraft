@@ -27,7 +27,7 @@ public final class KotaBesarConfig {
 	/** Largest ground height difference the capital accepts (38.B.2.4). */
 	public int selisihMaks = 20;
 	/** Bodies of capital people per capital (38.B.7; 12-48). */
-	public int tubuhMaks = 48;
+	public int tubuhMaks = 96;
 	/** Curfew: the night drum closes the gates at 16000 (22.00) and the morning bell opens them at 1000 (07.00) (38.B.4.1). */
 	public boolean jamMalam = true;
 	/** Crime record, wanted state, fines and cells (38.B.5.2). */
@@ -45,7 +45,7 @@ public final class KotaBesarConfig {
 		peluangSel = Mth.clamp(peluangSel, 0.0D, 1.0D);
 		jarakAntar = Mth.clamp(jarakAntar, 1000, 50000);
 		selisihMaks = Mth.clamp(selisihMaks, 4, 64);
-		tubuhMaks = Mth.clamp(tubuhMaks, 12, 96);
+		tubuhMaks = Mth.clamp(tubuhMaks, 12, 200);
 		return this;
 	}
 

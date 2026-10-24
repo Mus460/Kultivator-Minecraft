@@ -324,6 +324,29 @@ final class ImpostorRenderer {
 		return SINKS.computeIfAbsent(atlas, id -> new BonekaImpostor.Sink(RenderTypes.entityTranslucent(id)));
 	}
 
+	/**
+	 * The far crowd as {@link RiuhKota} hears it: every doll within {@code r} blocks (horizontal) goes to {@code dengar}
+	 * with its role and distance; returns the occupied stand seats within {@code r} (a cheering crowd).
+	 */
+	static int dengar(double x, double z, double r, java.util.function.ObjDoubleConsumer<NpcRole> dengar) {
+		double r2 = r * r;
+		int kursi = 0;
+		for (Kerumunan k : TEMPAT.values()) {
+			for (Orang o : k.orang) {
+				double d2 = (o.x - x) * (o.x - x) + (o.z - z) * (o.z - z);
+				if (d2 < r2) {
+					dengar.accept(o.peran, Math.sqrt(d2));
+				}
+			}
+			for (Kursi s : k.tribun) {
+				if ((s.x() - x) * (s.x() - x) + (s.z() - z) * (s.z() - z) < r2) {
+					kursi++;
+				}
+			}
+		}
+		return kursi;
+	}
+
 	/** Counts for {@code /sosok}-style debugging: places and dolls known. */
 	static int[] hitung() {
 		int orang = 0;

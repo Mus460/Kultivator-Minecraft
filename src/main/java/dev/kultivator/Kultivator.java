@@ -69,6 +69,8 @@ public class Kultivator implements ModInitializer {
 		// Phase 30 (DESIGN 30.2.11): the Kenney CC0 film particle types and presentation sounds (drawn and played by the client).
 		dev.kultivator.fx.FilmParticles.register();
 		dev.kultivator.sound.FilmSounds.register();
+		// Kota yang Hidup (docs/progres/suara-kota.md): the crowd ambience loops, played by the client only.
+		dev.kultivator.sound.SuaraKota.register();
 		// Phase 6c spine (DESIGN 22.14.6): DeathGuard is the only player ALLOW_DEATH listener; modules register their guards.
 		dev.kultivator.util.DeathGuard.init();
 

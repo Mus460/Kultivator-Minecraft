@@ -17,6 +17,8 @@ processed (echo, choir, demon voice) by `tools/gen_voices.py`.
 - VOICEVOX:†聖騎士 紅桜† — Kultivator Jahat / Rogue Cultivators
 - VOICEVOX:白上虎太郎, VOICEVOX:玄野武宏, VOICEVOX:雀松朱司 — murid laki-laki / male disciples
 - VOICEVOX:四国めたん, VOICEVOX:春日部つむぎ, VOICEVOX:小夜/SAYO — murid perempuan / female disciples
+- VOICEVOX:ずんだもん, VOICEVOX:雨晴はう, VOICEVOX:もち子さん — obrolan warga dan riuh kota (bersama suara di atas) /
+  townsfolk chatter and town crowd walla (together with the voices above)
 
 Ketentuan tiap karakter: https://github.com/VOICEVOX/voicevox_vvm (TERMS). Kultivator adalah proyek pribadi non-komersial.
 Character terms: see the VOICEVOX VVM TERMS. Kultivator is a personal, non-commercial project.
@@ -28,6 +30,26 @@ Character terms: see the VOICEVOX VVM TERMS. Kultivator is a personal, non-comme
 - "Female RPG Character voice pack" oleh/by RiddlesYouThis — CC-BY 3.0 (https://creativecommons.org/licenses/by/3.0/) —
   https://opengameart.org/content/female-rpg-character-voice-pack (oww, gah; diolah/processed)
 - "Demon voice" oleh/by Tim Rockk — CC0 — https://opengameart.org/content/demon-voice (tawa, geraman, jeritan iblis; diolah/processed)
+
+## Riuh kota / Town crowd ambience
+
+Loop keramaian `sounds/ambient/kota/{pasar,kedai,pelabuhan,jalan,kuil}.ogg` dicampur oleh `tools/gen_riuh_kota.py`:
+gumaman orang banyak dari VOICEVOX (karakter di atas), lonceng kuil, mokugyo dan dasar ombak disintesis sendiri, ditambah:
+The crowd loops are mixed by `tools/gen_riuh_kota.py` from VOICEVOX walla (characters above), our own synthesised temple
+bell, wooden fish and surf bed, plus:
+
+- Kenney (www.kenney.nl) "RPG Audio" — CC0 1.0 — https://kenney.nl/assets/rpg-audio (handleCoins, footstep00-09, creak1-3,
+  cloth1-4, metalPot1-3; langkah, koin, derit gerobak / footsteps, coins, cart creaks)
+- Kenney "Impact Sounds" 1.0 — CC0 1.0 — https://kenney.nl/assets/impact-sounds (footstep_concrete/wood, impactGlass_light,
+  impactPlate_light, impactPlank_medium, impactWood_light/heavy, impactBell_heavy; cangkir, peti, lonceng kecil / cups,
+  crates, small bells)
+- "Solo Seagull Sound Effects" oleh/by Rango Mango — CC0 — https://opengameart.org/content/solo-seagull-sound-effects
+  (Seagull Ambient 1-7, Seagull Big Ambient 2; camar pelabuhan / harbour gulls)
+- "water waves" oleh/by transitking (dikirim/submitted by qubodup) — CC0 — https://opengameart.org/content/water-waves
+  (wave_01-04; ombak pelabuhan / harbour waves)
+
+Gumaman obrolan warga (`sounds/voice/gumam/`) dibuat dengan VOICEVOX oleh `tools/gen_voices.py` (bagian GUMAM).
+Townsfolk chatter murmurs (`sounds/voice/gumam/`) are VOICEVOX lines made by `tools/gen_voices.py` (GUMAM section).
 
 ## Partikel dan efek suara film / Film particles and sound effects (Kenney, CC0)
 

@@ -59,15 +59,15 @@ public final class Pemanggil {
 	public static final String BUDGET = "npc_hidup";
 
 	static final double CARI = 64.0D;
-	static final double PANGGIL = 64.0D;
-	static final double LEPAS = 72.0D;
-	static final double JAUH = 128.0D;
-	static final int SIKLUS = 40;
+	static final double PANGGIL = 128.0D;
+	static final double LEPAS = 160.0D;
+	static final double JAUH = 192.0D;
+	static final int SIKLUS = 20;
 	/** Pathfinding starts allowed per server tick for all resident bodies (38.N.7). */
 	static final int JALUR_PER_TICK = 8;
 	/** Places without a player near for this long are dropped. */
 	static final long LUPA = 1200L;
-	static final int BARU_PER_SIKLUS = 6;
+	static final int BARU_PER_SIKLUS = 48;
 
 	static final Map<Long, TempatHuni> AKTIF = new LinkedHashMap<>();
 	private static final Map<Long, Long> SIKLUS_T = new HashMap<>();
@@ -269,19 +269,19 @@ public final class Pemanggil {
 				if (pos != null) {
 					berjalan.add(p.id());
 				}
-				pos = new Posisi(key, k.dalam() ? null : huni.tujuan(level, p, k, jam, false));
+				// indoor activities (sleep, meals at home) stand at home too: every house has its people (user request)
+				pos = new Posisi(key, huni.tujuan(level, p, k, jam, false));
 				cache.put(p.id(), pos);
 			}
 			if (body != null) {
 				ServerPlayer near = terdekat(dekat, body.position());
 				boolean jauhSemua = near == null || near.position().distanceTo(body.position()) > LEPAS;
-				boolean masuk = k.dalam() && (near == null || near.position().distanceTo(body.position()) > 16.0D || !near.hasLineOfSight(body));
-				if (jauhSemua || masuk && body.memory().getBooleanOr("hd_di_rumah", false)) {
+				if (jauhSemua) {
 					lepas(huni, body);
 				}
 				continue;
 			}
-			if (k.dalam() || pos.tujuan() == null || dekat.isEmpty()) {
+			if (pos.tujuan() == null || dekat.isEmpty()) {
 				continue;
 			}
 			BlockPos goal = pos.tujuan().pos();

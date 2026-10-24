@@ -313,6 +313,30 @@
    "style": 53
   },
   {
+   "event": "voice.elder.seteru_lerai",
+   "ja": "もうよい！互いの宗門の恥を晒すな。",
+   "en": "Enough! You shame both your sects.",
+   "id": "Cukup! Kalian mempermalukan sekte masing-masing.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.elder.seteru_ganti_rugi",
+   "ja": "我が宗門が償いをいたそう。",
+   "en": "Our sect will pay for the damage.",
+   "id": "Sekte kami akan membayar ganti rugi.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.heaven.langit_naik",
+   "ja": "山は雲を越え、宗門は天に昇る。",
+   "en": "The mountain passes the clouds; the sect ascends.",
+   "id": "Gunung melampaui awan; sekte naik ke langit.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
    "event": "voice.disciple.m1.greet",
    "ja": "師尊！お帰りなさいませ！",
    "en": "Master! Welcome back!",
@@ -2581,6 +2605,2166 @@
    "style": 46
   },
   {
+   "event": "voice.disciple.m1.pamit",
+   "ja": "師匠、少し町へ行ってまいります。",
+   "en": "Master, I am off to town for a while.",
+   "id": "Guru, murid pamit ke kota sebentar.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.pamit",
+   "ja": "師匠、少し町へ行ってまいります。",
+   "en": "Master, I am off to town for a while.",
+   "id": "Guru, murid pamit ke kota sebentar.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.pamit",
+   "ja": "師匠、少し町へ行ってまいります。",
+   "en": "Master, I am off to town for a while.",
+   "id": "Guru, murid pamit ke kota sebentar.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.pamit",
+   "ja": "師匠、少し町へ行ってまいります。",
+   "en": "Master, I am off to town for a while.",
+   "id": "Guru, murid pamit ke kota sebentar.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.pamit",
+   "ja": "師匠、少し町へ行ってまいります。",
+   "en": "Master, I am off to town for a while.",
+   "id": "Guru, murid pamit ke kota sebentar.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.pamit",
+   "ja": "師匠、少し町へ行ってまいります。",
+   "en": "Master, I am off to town for a while.",
+   "id": "Guru, murid pamit ke kota sebentar.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.pulang_belanja",
+   "ja": "師匠、ただいま戻りました。お土産です。",
+   "en": "Master, I am back. I brought you something.",
+   "id": "Guru, murid pulang. Ini oleh-olehnya.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.pulang_belanja",
+   "ja": "師匠、ただいま戻りました。お土産です。",
+   "en": "Master, I am back. I brought you something.",
+   "id": "Guru, murid pulang. Ini oleh-olehnya.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.pulang_belanja",
+   "ja": "師匠、ただいま戻りました。お土産です。",
+   "en": "Master, I am back. I brought you something.",
+   "id": "Guru, murid pulang. Ini oleh-olehnya.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.pulang_belanja",
+   "ja": "師匠、ただいま戻りました。お土産です。",
+   "en": "Master, I am back. I brought you something.",
+   "id": "Guru, murid pulang. Ini oleh-olehnya.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.pulang_belanja",
+   "ja": "師匠、ただいま戻りました。お土産です。",
+   "en": "Master, I am back. I brought you something.",
+   "id": "Guru, murid pulang. Ini oleh-olehnya.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.pulang_belanja",
+   "ja": "師匠、ただいま戻りました。お土産です。",
+   "en": "Master, I am back. I brought you something.",
+   "id": "Guru, murid pulang. Ini oleh-olehnya.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.tawar",
+   "ja": "高すぎる！少しまけてくれ。",
+   "en": "Too expensive! Knock a little off.",
+   "id": "Terlalu mahal! Kurangi sedikit.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.tawar",
+   "ja": "高すぎる！少しまけてくれ。",
+   "en": "Too expensive! Knock a little off.",
+   "id": "Terlalu mahal! Kurangi sedikit.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.tawar",
+   "ja": "高すぎる！少しまけてくれ。",
+   "en": "Too expensive! Knock a little off.",
+   "id": "Terlalu mahal! Kurangi sedikit.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.tawar",
+   "ja": "高すぎる！少しまけてくれ。",
+   "en": "Too expensive! Knock a little off.",
+   "id": "Terlalu mahal! Kurangi sedikit.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.tawar",
+   "ja": "高すぎる！少しまけてくれ。",
+   "en": "Too expensive! Knock a little off.",
+   "id": "Terlalu mahal! Kurangi sedikit.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.tawar",
+   "ja": "高すぎる！少しまけてくれ。",
+   "en": "Too expensive! Knock a little off.",
+   "id": "Terlalu mahal! Kurangi sedikit.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.tawar_sepakat",
+   "ja": "よし、それで手を打とう。",
+   "en": "All right, it is a deal.",
+   "id": "Baiklah, sepakat.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.tawar_sepakat",
+   "ja": "よし、それで手を打とう。",
+   "en": "All right, it is a deal.",
+   "id": "Baiklah, sepakat.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.tawar_sepakat",
+   "ja": "よし、それで手を打とう。",
+   "en": "All right, it is a deal.",
+   "id": "Baiklah, sepakat.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.tawar_sepakat",
+   "ja": "よし、それで手を打とう。",
+   "en": "All right, it is a deal.",
+   "id": "Baiklah, sepakat.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.tawar_sepakat",
+   "ja": "よし、それで手を打とう。",
+   "en": "All right, it is a deal.",
+   "id": "Baiklah, sepakat.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.tawar_sepakat",
+   "ja": "よし、それで手を打とう。",
+   "en": "All right, it is a deal.",
+   "id": "Baiklah, sepakat.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.lihat_lapak",
+   "ja": "ふむ…この丹薬、なかなか良い。",
+   "en": "Hmm... this pill is not bad.",
+   "id": "Hmm... pil ini lumayan.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.lihat_lapak",
+   "ja": "ふむ…この丹薬、なかなか良い。",
+   "en": "Hmm... this pill is not bad.",
+   "id": "Hmm... pil ini lumayan.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.lihat_lapak",
+   "ja": "ふむ…この丹薬、なかなか良い。",
+   "en": "Hmm... this pill is not bad.",
+   "id": "Hmm... pil ini lumayan.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.lihat_lapak",
+   "ja": "ふむ…この丹薬、なかなか良い。",
+   "en": "Hmm... this pill is not bad.",
+   "id": "Hmm... pil ini lumayan.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.lihat_lapak",
+   "ja": "ふむ…この丹薬、なかなか良い。",
+   "en": "Hmm... this pill is not bad.",
+   "id": "Hmm... pil ini lumayan.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.lihat_lapak",
+   "ja": "ふむ…この丹薬、なかなか良い。",
+   "en": "Hmm... this pill is not bad.",
+   "id": "Hmm... pil ini lumayan.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.copet",
+   "ja": "待て、泥棒！",
+   "en": "Stop, thief!",
+   "id": "Berhenti, pencuri!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.copet",
+   "ja": "待て、泥棒！",
+   "en": "Stop, thief!",
+   "id": "Berhenti, pencuri!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.copet",
+   "ja": "待て、泥棒！",
+   "en": "Stop, thief!",
+   "id": "Berhenti, pencuri!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.copet",
+   "ja": "待て、泥棒！",
+   "en": "Stop, thief!",
+   "id": "Berhenti, pencuri!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.copet",
+   "ja": "待て、泥棒！",
+   "en": "Stop, thief!",
+   "id": "Berhenti, pencuri!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.copet",
+   "ja": "待て、泥棒！",
+   "en": "Stop, thief!",
+   "id": "Berhenti, pencuri!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.makan",
+   "ja": "わあ、美味しい！",
+   "en": "Wow, delicious!",
+   "id": "Wah, enak sekali!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.makan",
+   "ja": "わあ、美味しい！",
+   "en": "Wow, delicious!",
+   "id": "Wah, enak sekali!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.makan",
+   "ja": "わあ、美味しい！",
+   "en": "Wow, delicious!",
+   "id": "Wah, enak sekali!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.makan",
+   "ja": "わあ、美味しい！",
+   "en": "Wow, delicious!",
+   "id": "Wah, enak sekali!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.makan",
+   "ja": "わあ、美味しい！",
+   "en": "Wow, delicious!",
+   "id": "Wah, enak sekali!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.makan",
+   "ja": "わあ、美味しい！",
+   "en": "Wow, delicious!",
+   "id": "Wah, enak sekali!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.latih",
+   "ja": "もう一太刀！",
+   "en": "One more stroke!",
+   "id": "Satu jurus lagi!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.latih",
+   "ja": "もう一太刀！",
+   "en": "One more stroke!",
+   "id": "Satu jurus lagi!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.latih",
+   "ja": "もう一太刀！",
+   "en": "One more stroke!",
+   "id": "Satu jurus lagi!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.latih",
+   "ja": "もう一太刀！",
+   "en": "One more stroke!",
+   "id": "Satu jurus lagi!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.latih",
+   "ja": "もう一太刀！",
+   "en": "One more stroke!",
+   "id": "Satu jurus lagi!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.latih",
+   "ja": "もう一太刀！",
+   "en": "One more stroke!",
+   "id": "Satu jurus lagi!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.salam_pagi",
+   "ja": "おはようございます、先輩！",
+   "en": "Good morning, Senior!",
+   "id": "Selamat pagi, Kakak Senior!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.salam_pagi",
+   "ja": "おはようございます、先輩！",
+   "en": "Good morning, Senior!",
+   "id": "Selamat pagi, Kakak Senior!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.salam_pagi",
+   "ja": "おはようございます、先輩！",
+   "en": "Good morning, Senior!",
+   "id": "Selamat pagi, Kakak Senior!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.salam_pagi",
+   "ja": "おはようございます、先輩！",
+   "en": "Good morning, Senior!",
+   "id": "Selamat pagi, Kakak Senior!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.salam_pagi",
+   "ja": "おはようございます、先輩！",
+   "en": "Good morning, Senior!",
+   "id": "Selamat pagi, Kakak Senior!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.salam_pagi",
+   "ja": "おはようございます、先輩！",
+   "en": "Good morning, Senior!",
+   "id": "Selamat pagi, Kakak Senior!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.tutup_masuk",
+   "ja": "これより閉関いたします。お邪魔なさらぬよう。",
+   "en": "I will now enter seclusion. Please do not disturb me.",
+   "id": "Murid akan menutup diri. Mohon jangan diganggu.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.tutup_masuk",
+   "ja": "これより閉関いたします。お邪魔なさらぬよう。",
+   "en": "I will now enter seclusion. Please do not disturb me.",
+   "id": "Murid akan menutup diri. Mohon jangan diganggu.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.tutup_masuk",
+   "ja": "これより閉関いたします。お邪魔なさらぬよう。",
+   "en": "I will now enter seclusion. Please do not disturb me.",
+   "id": "Murid akan menutup diri. Mohon jangan diganggu.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.tutup_masuk",
+   "ja": "これより閉関いたします。お邪魔なさらぬよう。",
+   "en": "I will now enter seclusion. Please do not disturb me.",
+   "id": "Murid akan menutup diri. Mohon jangan diganggu.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.tutup_masuk",
+   "ja": "これより閉関いたします。お邪魔なさらぬよう。",
+   "en": "I will now enter seclusion. Please do not disturb me.",
+   "id": "Murid akan menutup diri. Mohon jangan diganggu.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.tutup_masuk",
+   "ja": "これより閉関いたします。お邪魔なさらぬよう。",
+   "en": "I will now enter seclusion. Please do not disturb me.",
+   "id": "Murid akan menutup diri. Mohon jangan diganggu.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.tutup_keluar",
+   "ja": "閉関、終わりました…気が澄んでいる。",
+   "en": "Seclusion is over... my qi feels clear.",
+   "id": "Pengasingan selesai... qi-ku lebih jernih.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.tutup_keluar",
+   "ja": "閉関、終わりました…気が澄んでいる。",
+   "en": "Seclusion is over... my qi feels clear.",
+   "id": "Pengasingan selesai... qi-ku lebih jernih.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.tutup_keluar",
+   "ja": "閉関、終わりました…気が澄んでいる。",
+   "en": "Seclusion is over... my qi feels clear.",
+   "id": "Pengasingan selesai... qi-ku lebih jernih.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.tutup_keluar",
+   "ja": "閉関、終わりました…気が澄んでいる。",
+   "en": "Seclusion is over... my qi feels clear.",
+   "id": "Pengasingan selesai... qi-ku lebih jernih.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.tutup_keluar",
+   "ja": "閉関、終わりました…気が澄んでいる。",
+   "en": "Seclusion is over... my qi feels clear.",
+   "id": "Pengasingan selesai... qi-ku lebih jernih.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.tutup_keluar",
+   "ja": "閉関、終わりました…気が澄んでいる。",
+   "en": "Seclusion is over... my qi feels clear.",
+   "id": "Pengasingan selesai... qi-ku lebih jernih.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.hufa_minta",
+   "ja": "先輩、突破の護法をお願いできますか。",
+   "en": "Senior, would you guard me while I break through?",
+   "id": "Senior, maukah menjagaku saat menembus?",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.hufa_minta",
+   "ja": "先輩、突破の護法をお願いできますか。",
+   "en": "Senior, would you guard me while I break through?",
+   "id": "Senior, maukah menjagaku saat menembus?",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.hufa_minta",
+   "ja": "先輩、突破の護法をお願いできますか。",
+   "en": "Senior, would you guard me while I break through?",
+   "id": "Senior, maukah menjagaku saat menembus?",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.hufa_minta",
+   "ja": "先輩、突破の護法をお願いできますか。",
+   "en": "Senior, would you guard me while I break through?",
+   "id": "Senior, maukah menjagaku saat menembus?",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.hufa_minta",
+   "ja": "先輩、突破の護法をお願いできますか。",
+   "en": "Senior, would you guard me while I break through?",
+   "id": "Senior, maukah menjagaku saat menembus?",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.hufa_minta",
+   "ja": "先輩、突破の護法をお願いできますか。",
+   "en": "Senior, would you guard me while I break through?",
+   "id": "Senior, maukah menjagaku saat menembus?",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.hufa_jaga",
+   "ja": "安心して、私が護ります。",
+   "en": "Be at ease, I will guard you.",
+   "id": "Tenang, aku menjagamu.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.hufa_jaga",
+   "ja": "安心して、私が護ります。",
+   "en": "Be at ease, I will guard you.",
+   "id": "Tenang, aku menjagamu.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.hufa_jaga",
+   "ja": "安心して、私が護ります。",
+   "en": "Be at ease, I will guard you.",
+   "id": "Tenang, aku menjagamu.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.hufa_jaga",
+   "ja": "安心して、私が護ります。",
+   "en": "Be at ease, I will guard you.",
+   "id": "Tenang, aku menjagamu.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.hufa_jaga",
+   "ja": "安心して、私が護ります。",
+   "en": "Be at ease, I will guard you.",
+   "id": "Tenang, aku menjagamu.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.hufa_jaga",
+   "ja": "安心して、私が護ります。",
+   "en": "Be at ease, I will guard you.",
+   "id": "Tenang, aku menjagamu.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.tembus_sendiri",
+   "ja": "今日、己の力で突破する！",
+   "en": "Today I break through by my own strength!",
+   "id": "Hari ini aku menembus dengan kekuatanku sendiri!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.tembus_sendiri",
+   "ja": "今日、己の力で突破する！",
+   "en": "Today I break through by my own strength!",
+   "id": "Hari ini aku menembus dengan kekuatanku sendiri!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.tembus_sendiri",
+   "ja": "今日、己の力で突破する！",
+   "en": "Today I break through by my own strength!",
+   "id": "Hari ini aku menembus dengan kekuatanku sendiri!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.tembus_sendiri",
+   "ja": "今日、己の力で突破する！",
+   "en": "Today I break through by my own strength!",
+   "id": "Hari ini aku menembus dengan kekuatanku sendiri!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.tembus_sendiri",
+   "ja": "今日、己の力で突破する！",
+   "en": "Today I break through by my own strength!",
+   "id": "Hari ini aku menembus dengan kekuatanku sendiri!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.tembus_sendiri",
+   "ja": "今日、己の力で突破する！",
+   "en": "Today I break through by my own strength!",
+   "id": "Hari ini aku menembus dengan kekuatanku sendiri!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.hati_lulus",
+   "ja": "心魔など…私は揺るがない。",
+   "en": "A heart demon... cannot shake me.",
+   "id": "Iblis hati... tidak bisa menggoyahkanku.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.hati_lulus",
+   "ja": "心魔など…私は揺るがない。",
+   "en": "A heart demon... cannot shake me.",
+   "id": "Iblis hati... tidak bisa menggoyahkanku.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.hati_lulus",
+   "ja": "心魔など…私は揺るがない。",
+   "en": "A heart demon... cannot shake me.",
+   "id": "Iblis hati... tidak bisa menggoyahkanku.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.hati_lulus",
+   "ja": "心魔など…私は揺るがない。",
+   "en": "A heart demon... cannot shake me.",
+   "id": "Iblis hati... tidak bisa menggoyahkanku.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.hati_lulus",
+   "ja": "心魔など…私は揺るがない。",
+   "en": "A heart demon... cannot shake me.",
+   "id": "Iblis hati... tidak bisa menggoyahkanku.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.hati_lulus",
+   "ja": "心魔など…私は揺るがない。",
+   "en": "A heart demon... cannot shake me.",
+   "id": "Iblis hati... tidak bisa menggoyahkanku.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.dao_pilih",
+   "ja": "我が道は、この道なり。",
+   "en": "This Dao is my path.",
+   "id": "Jalanku adalah Dao ini.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.dao_pilih",
+   "ja": "我が道は、この道なり。",
+   "en": "This Dao is my path.",
+   "id": "Jalanku adalah Dao ini.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.dao_pilih",
+   "ja": "我が道は、この道なり。",
+   "en": "This Dao is my path.",
+   "id": "Jalanku adalah Dao ini.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.dao_pilih",
+   "ja": "我が道は、この道なり。",
+   "en": "This Dao is my path.",
+   "id": "Jalanku adalah Dao ini.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.dao_pilih",
+   "ja": "我が道は、この道なり。",
+   "en": "This Dao is my path.",
+   "id": "Jalanku adalah Dao ini.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.dao_pilih",
+   "ja": "我が道は、この道なり。",
+   "en": "This Dao is my path.",
+   "id": "Jalanku adalah Dao ini.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.belajar_sendiri",
+   "ja": "自分で悟った！",
+   "en": "I understood it on my own!",
+   "id": "Aku memahaminya sendiri!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.belajar_sendiri",
+   "ja": "自分で悟った！",
+   "en": "I understood it on my own!",
+   "id": "Aku memahaminya sendiri!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.belajar_sendiri",
+   "ja": "自分で悟った！",
+   "en": "I understood it on my own!",
+   "id": "Aku memahaminya sendiri!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.belajar_sendiri",
+   "ja": "自分で悟った！",
+   "en": "I understood it on my own!",
+   "id": "Aku memahaminya sendiri!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.belajar_sendiri",
+   "ja": "自分で悟った！",
+   "en": "I understood it on my own!",
+   "id": "Aku memahaminya sendiri!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.belajar_sendiri",
+   "ja": "自分で悟った！",
+   "en": "I understood it on my own!",
+   "id": "Aku memahaminya sendiri!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.serap_batu",
+   "ja": "この霊石…霊気が澄んでいる。",
+   "en": "This spirit stone... its qi is pure.",
+   "id": "Batu roh ini... qi-nya murni.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.serap_batu",
+   "ja": "この霊石…霊気が澄んでいる。",
+   "en": "This spirit stone... its qi is pure.",
+   "id": "Batu roh ini... qi-nya murni.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.serap_batu",
+   "ja": "この霊石…霊気が澄んでいる。",
+   "en": "This spirit stone... its qi is pure.",
+   "id": "Batu roh ini... qi-nya murni.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.serap_batu",
+   "ja": "この霊石…霊気が澄んでいる。",
+   "en": "This spirit stone... its qi is pure.",
+   "id": "Batu roh ini... qi-nya murni.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.serap_batu",
+   "ja": "この霊石…霊気が澄んでいる。",
+   "en": "This spirit stone... its qi is pure.",
+   "id": "Batu roh ini... qi-nya murni.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.serap_batu",
+   "ja": "この霊石…霊気が澄んでいる。",
+   "en": "This spirit stone... its qi is pure.",
+   "id": "Batu roh ini... qi-nya murni.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.hadiah",
+   "ja": "これ、あなたに。受け取ってね。",
+   "en": "This is for you. Please accept it.",
+   "id": "Ini untukmu. Jangan ditolak, ya.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.hadiah",
+   "ja": "これ、あなたに。受け取ってね。",
+   "en": "This is for you. Please accept it.",
+   "id": "Ini untukmu. Jangan ditolak, ya.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.hadiah",
+   "ja": "これ、あなたに。受け取ってね。",
+   "en": "This is for you. Please accept it.",
+   "id": "Ini untukmu. Jangan ditolak, ya.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.hadiah",
+   "ja": "これ、あなたに。受け取ってね。",
+   "en": "This is for you. Please accept it.",
+   "id": "Ini untukmu. Jangan ditolak, ya.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.hadiah",
+   "ja": "これ、あなたに。受け取ってね。",
+   "en": "This is for you. Please accept it.",
+   "id": "Ini untukmu. Jangan ditolak, ya.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.hadiah",
+   "ja": "これ、あなたに。受け取ってね。",
+   "en": "This is for you. Please accept it.",
+   "id": "Ini untukmu. Jangan ditolak, ya.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.tertawan",
+   "ja": "師匠…助けて…",
+   "en": "Master... help me...",
+   "id": "Guru... tolong aku...",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 33
+  },
+  {
+   "event": "voice.disciple.m2.tertawan",
+   "ja": "師匠…助けて…",
+   "en": "Master... help me...",
+   "id": "Guru... tolong aku...",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.tertawan",
+   "ja": "師匠…助けて…",
+   "en": "Master... help me...",
+   "id": "Guru... tolong aku...",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.tertawan",
+   "ja": "師匠…助けて…",
+   "en": "Master... help me...",
+   "id": "Guru... tolong aku...",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.tertawan",
+   "ja": "師匠…助けて…",
+   "en": "Master... help me...",
+   "id": "Guru... tolong aku...",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.tertawan",
+   "ja": "師匠…助けて…",
+   "en": "Master... help me...",
+   "id": "Guru... tolong aku...",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.diselamatkan",
+   "ja": "師匠が来てくださった！信じていました。",
+   "en": "Master came! I knew you would.",
+   "id": "Guru datang! Aku tahu Guru pasti datang.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.disciple.m2.diselamatkan",
+   "ja": "師匠が来てくださった！信じていました。",
+   "en": "Master came! I knew you would.",
+   "id": "Guru datang! Aku tahu Guru pasti datang.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.disciple.m3.diselamatkan",
+   "ja": "師匠が来てくださった！信じていました。",
+   "en": "Master came! I knew you would.",
+   "id": "Guru datang! Aku tahu Guru pasti datang.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.diselamatkan",
+   "ja": "師匠が来てくださった！信じていました。",
+   "en": "Master came! I knew you would.",
+   "id": "Guru datang! Aku tahu Guru pasti datang.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.disciple.f2.diselamatkan",
+   "ja": "師匠が来てくださった！信じていました。",
+   "en": "Master came! I knew you would.",
+   "id": "Guru datang! Aku tahu Guru pasti datang.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.diselamatkan",
+   "ja": "師匠が来てくださった！信じていました。",
+   "en": "Master came! I knew you would.",
+   "id": "Guru datang! Aku tahu Guru pasti datang.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.iblis_bisik",
+   "ja": "力が…もっと力が欲しい…",
+   "en": "Power... I need more power...",
+   "id": "Kekuatan... aku butuh lebih banyak kekuatan...",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.iblis_bisik",
+   "ja": "力が…もっと力が欲しい…",
+   "en": "Power... I need more power...",
+   "id": "Kekuatan... aku butuh lebih banyak kekuatan...",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.iblis_bisik",
+   "ja": "力が…もっと力が欲しい…",
+   "en": "Power... I need more power...",
+   "id": "Kekuatan... aku butuh lebih banyak kekuatan...",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.iblis_bisik",
+   "ja": "力が…もっと力が欲しい…",
+   "en": "Power... I need more power...",
+   "id": "Kekuatan... aku butuh lebih banyak kekuatan...",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.iblis_bisik",
+   "ja": "力が…もっと力が欲しい…",
+   "en": "Power... I need more power...",
+   "id": "Kekuatan... aku butuh lebih banyak kekuatan...",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.iblis_bisik",
+   "ja": "力が…もっと力が欲しい…",
+   "en": "Power... I need more power...",
+   "id": "Kekuatan... aku butuh lebih banyak kekuatan...",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.ditebus",
+   "ja": "ありがとうございます、師匠…私は戻りました。",
+   "en": "Thank you, Master... I have come back.",
+   "id": "Terima kasih, Guru... aku kembali.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.ditebus",
+   "ja": "ありがとうございます、師匠…私は戻りました。",
+   "en": "Thank you, Master... I have come back.",
+   "id": "Terima kasih, Guru... aku kembali.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.ditebus",
+   "ja": "ありがとうございます、師匠…私は戻りました。",
+   "en": "Thank you, Master... I have come back.",
+   "id": "Terima kasih, Guru... aku kembali.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.ditebus",
+   "ja": "ありがとうございます、師匠…私は戻りました。",
+   "en": "Thank you, Master... I have come back.",
+   "id": "Terima kasih, Guru... aku kembali.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.ditebus",
+   "ja": "ありがとうございます、師匠…私は戻りました。",
+   "en": "Thank you, Master... I have come back.",
+   "id": "Terima kasih, Guru... aku kembali.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.ditebus",
+   "ja": "ありがとうございます、師匠…私は戻りました。",
+   "en": "Thank you, Master... I have come back.",
+   "id": "Terima kasih, Guru... aku kembali.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.jalan_ganti",
+   "ja": "自分の道を見つけた。",
+   "en": "I have found my own path.",
+   "id": "Aku sudah menemukan jalanku.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.jalan_ganti",
+   "ja": "自分の道を見つけた。",
+   "en": "I have found my own path.",
+   "id": "Aku sudah menemukan jalanku.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.jalan_ganti",
+   "ja": "自分の道を見つけた。",
+   "en": "I have found my own path.",
+   "id": "Aku sudah menemukan jalanku.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.jalan_ganti",
+   "ja": "自分の道を見つけた。",
+   "en": "I have found my own path.",
+   "id": "Aku sudah menemukan jalanku.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.jalan_ganti",
+   "ja": "自分の道を見つけた。",
+   "en": "I have found my own path.",
+   "id": "Aku sudah menemukan jalanku.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.jalan_ganti",
+   "ja": "自分の道を見つけた。",
+   "en": "I have found my own path.",
+   "id": "Aku sudah menemukan jalanku.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_ejek",
+   "ja": "小さな宗門の弟子が、ここに座るとはな。",
+   "en": "A disciple of a petty sect dares sit here?",
+   "id": "Murid sekte kecil berani duduk di sini?",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.seteru_ejek",
+   "ja": "小さな宗門の弟子が、ここに座るとはな。",
+   "en": "A disciple of a petty sect dares sit here?",
+   "id": "Murid sekte kecil berani duduk di sini?",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.seteru_ejek",
+   "ja": "小さな宗門の弟子が、ここに座るとはな。",
+   "en": "A disciple of a petty sect dares sit here?",
+   "id": "Murid sekte kecil berani duduk di sini?",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_ejek",
+   "ja": "小さな宗門の弟子が、ここに座るとはな。",
+   "en": "A disciple of a petty sect dares sit here?",
+   "id": "Murid sekte kecil berani duduk di sini?",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.seteru_ejek",
+   "ja": "小さな宗門の弟子が、ここに座るとはな。",
+   "en": "A disciple of a petty sect dares sit here?",
+   "id": "Murid sekte kecil berani duduk di sini?",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_ejek",
+   "ja": "小さな宗門の弟子が、ここに座るとはな。",
+   "en": "A disciple of a petty sect dares sit here?",
+   "id": "Murid sekte kecil berani duduk di sini?",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_ejek_guru",
+   "ja": "師匠に礼儀を教わらなかったのか？",
+   "en": "Did your master never teach you manners?",
+   "id": "Gurumu tidak mengajarimu sopan santun?",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.seteru_ejek_guru",
+   "ja": "師匠に礼儀を教わらなかったのか？",
+   "en": "Did your master never teach you manners?",
+   "id": "Gurumu tidak mengajarimu sopan santun?",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.seteru_ejek_guru",
+   "ja": "師匠に礼儀を教わらなかったのか？",
+   "en": "Did your master never teach you manners?",
+   "id": "Gurumu tidak mengajarimu sopan santun?",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_ejek_guru",
+   "ja": "師匠に礼儀を教わらなかったのか？",
+   "en": "Did your master never teach you manners?",
+   "id": "Gurumu tidak mengajarimu sopan santun?",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.seteru_ejek_guru",
+   "ja": "師匠に礼儀を教わらなかったのか？",
+   "en": "Did your master never teach you manners?",
+   "id": "Gurumu tidak mengajarimu sopan santun?",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_ejek_guru",
+   "ja": "師匠に礼儀を教わらなかったのか？",
+   "en": "Did your master never teach you manners?",
+   "id": "Gurumu tidak mengajarimu sopan santun?",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_balas",
+   "ja": "口を慎め！",
+   "en": "Watch your mouth!",
+   "id": "Jaga mulutmu!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.seteru_balas",
+   "ja": "口を慎め！",
+   "en": "Watch your mouth!",
+   "id": "Jaga mulutmu!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.seteru_balas",
+   "ja": "口を慎め！",
+   "en": "Watch your mouth!",
+   "id": "Jaga mulutmu!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_balas",
+   "ja": "口を慎め！",
+   "en": "Watch your mouth!",
+   "id": "Jaga mulutmu!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.seteru_balas",
+   "ja": "口を慎め！",
+   "en": "Watch your mouth!",
+   "id": "Jaga mulutmu!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_balas",
+   "ja": "口を慎め！",
+   "en": "Watch your mouth!",
+   "id": "Jaga mulutmu!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_tantang",
+   "ja": "勇気があるなら、擂台に上がれ！",
+   "en": "If you dare, step onto the stage!",
+   "id": "Kalau berani, naik ke panggung!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.seteru_tantang",
+   "ja": "勇気があるなら、擂台に上がれ！",
+   "en": "If you dare, step onto the stage!",
+   "id": "Kalau berani, naik ke panggung!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.seteru_tantang",
+   "ja": "勇気があるなら、擂台に上がれ！",
+   "en": "If you dare, step onto the stage!",
+   "id": "Kalau berani, naik ke panggung!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_tantang",
+   "ja": "勇気があるなら、擂台に上がれ！",
+   "en": "If you dare, step onto the stage!",
+   "id": "Kalau berani, naik ke panggung!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.seteru_tantang",
+   "ja": "勇気があるなら、擂台に上がれ！",
+   "en": "If you dare, step onto the stage!",
+   "id": "Kalau berani, naik ke panggung!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_tantang",
+   "ja": "勇気があるなら、擂台に上がれ！",
+   "en": "If you dare, step onto the stage!",
+   "id": "Kalau berani, naik ke panggung!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_terima",
+   "ja": "その挑戦、受けて立つ。",
+   "en": "Challenge accepted.",
+   "id": "Tantangan diterima.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.seteru_terima",
+   "ja": "その挑戦、受けて立つ。",
+   "en": "Challenge accepted.",
+   "id": "Tantangan diterima.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.seteru_terima",
+   "ja": "その挑戦、受けて立つ。",
+   "en": "Challenge accepted.",
+   "id": "Tantangan diterima.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_terima",
+   "ja": "その挑戦、受けて立つ。",
+   "en": "Challenge accepted.",
+   "id": "Tantangan diterima.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.seteru_terima",
+   "ja": "その挑戦、受けて立つ。",
+   "en": "Challenge accepted.",
+   "id": "Tantangan diterima.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_terima",
+   "ja": "その挑戦、受けて立つ。",
+   "en": "Challenge accepted.",
+   "id": "Tantangan diterima.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_menang",
+   "ja": "今日のことを覚えておけ。",
+   "en": "Remember this day.",
+   "id": "Ingat hari ini.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.seteru_menang",
+   "ja": "今日のことを覚えておけ。",
+   "en": "Remember this day.",
+   "id": "Ingat hari ini.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.seteru_menang",
+   "ja": "今日のことを覚えておけ。",
+   "en": "Remember this day.",
+   "id": "Ingat hari ini.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_menang",
+   "ja": "今日のことを覚えておけ。",
+   "en": "Remember this day.",
+   "id": "Ingat hari ini.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.seteru_menang",
+   "ja": "今日のことを覚えておけ。",
+   "en": "Remember this day.",
+   "id": "Ingat hari ini.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_menang",
+   "ja": "今日のことを覚えておけ。",
+   "en": "Remember this day.",
+   "id": "Ingat hari ini.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_kalah",
+   "ja": "これで終わりだと思うな！",
+   "en": "This is not over!",
+   "id": "Ini belum selesai!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.seteru_kalah",
+   "ja": "これで終わりだと思うな！",
+   "en": "This is not over!",
+   "id": "Ini belum selesai!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.seteru_kalah",
+   "ja": "これで終わりだと思うな！",
+   "en": "This is not over!",
+   "id": "Ini belum selesai!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_kalah",
+   "ja": "これで終わりだと思うな！",
+   "en": "This is not over!",
+   "id": "Ini belum selesai!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.seteru_kalah",
+   "ja": "これで終わりだと思うな！",
+   "en": "This is not over!",
+   "id": "Ini belum selesai!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_kalah",
+   "ja": "これで終わりだと思うな！",
+   "en": "This is not over!",
+   "id": "Ini belum selesai!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_keroyok",
+   "ja": "皆、やってしまえ！",
+   "en": "Brothers, get them!",
+   "id": "Saudara-saudara, hajar mereka!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.seteru_keroyok",
+   "ja": "皆、やってしまえ！",
+   "en": "Brothers, get them!",
+   "id": "Saudara-saudara, hajar mereka!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.seteru_keroyok",
+   "ja": "皆、やってしまえ！",
+   "en": "Brothers, get them!",
+   "id": "Saudara-saudara, hajar mereka!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_keroyok",
+   "ja": "皆、やってしまえ！",
+   "en": "Brothers, get them!",
+   "id": "Saudara-saudara, hajar mereka!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.seteru_keroyok",
+   "ja": "皆、やってしまえ！",
+   "en": "Brothers, get them!",
+   "id": "Saudara-saudara, hajar mereka!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_keroyok",
+   "ja": "皆、やってしまえ！",
+   "en": "Brothers, get them!",
+   "id": "Saudara-saudara, hajar mereka!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_sergap",
+   "ja": "この道は我が宗門のものだ。",
+   "en": "This road belongs to our sect.",
+   "id": "Jalan ini milik sekte kami.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.seteru_sergap",
+   "ja": "この道は我が宗門のものだ。",
+   "en": "This road belongs to our sect.",
+   "id": "Jalan ini milik sekte kami.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.seteru_sergap",
+   "ja": "この道は我が宗門のものだ。",
+   "en": "This road belongs to our sect.",
+   "id": "Jalan ini milik sekte kami.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_sergap",
+   "ja": "この道は我が宗門のものだ。",
+   "en": "This road belongs to our sect.",
+   "id": "Jalan ini milik sekte kami.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.seteru_sergap",
+   "ja": "この道は我が宗門のものだ。",
+   "en": "This road belongs to our sect.",
+   "id": "Jalan ini milik sekte kami.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_sergap",
+   "ja": "この道は我が宗門のものだ。",
+   "en": "This road belongs to our sect.",
+   "id": "Jalan ini milik sekte kami.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_lindungi",
+   "ja": "その村人を放せ！",
+   "en": "Let that villager go!",
+   "id": "Lepaskan warga itu!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.seteru_lindungi",
+   "ja": "その村人を放せ！",
+   "en": "Let that villager go!",
+   "id": "Lepaskan warga itu!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.seteru_lindungi",
+   "ja": "その村人を放せ！",
+   "en": "Let that villager go!",
+   "id": "Lepaskan warga itu!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_lindungi",
+   "ja": "その村人を放せ！",
+   "en": "Let that villager go!",
+   "id": "Lepaskan warga itu!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.seteru_lindungi",
+   "ja": "その村人を放せ！",
+   "en": "Let that villager go!",
+   "id": "Lepaskan warga itu!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_lindungi",
+   "ja": "その村人を放せ！",
+   "en": "Let that villager go!",
+   "id": "Lepaskan warga itu!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_curi",
+   "ja": "その巻物を返せ、盗人め！",
+   "en": "Give back that scroll, thief!",
+   "id": "Kembalikan gulungan itu, pencuri!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.seteru_curi",
+   "ja": "その巻物を返せ、盗人め！",
+   "en": "Give back that scroll, thief!",
+   "id": "Kembalikan gulungan itu, pencuri!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.seteru_curi",
+   "ja": "その巻物を返せ、盗人め！",
+   "en": "Give back that scroll, thief!",
+   "id": "Kembalikan gulungan itu, pencuri!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_curi",
+   "ja": "その巻物を返せ、盗人め！",
+   "en": "Give back that scroll, thief!",
+   "id": "Kembalikan gulungan itu, pencuri!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.seteru_curi",
+   "ja": "その巻物を返せ、盗人め！",
+   "en": "Give back that scroll, thief!",
+   "id": "Kembalikan gulungan itu, pencuri!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_curi",
+   "ja": "その巻物を返せ、盗人め！",
+   "en": "Give back that scroll, thief!",
+   "id": "Kembalikan gulungan itu, pencuri!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_maaf",
+   "ja": "あの件は…申し訳なかった。",
+   "en": "About that matter... I am sorry.",
+   "id": "Aku... minta maaf atas kejadian itu.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.seteru_maaf",
+   "ja": "あの件は…申し訳なかった。",
+   "en": "About that matter... I am sorry.",
+   "id": "Aku... minta maaf atas kejadian itu.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 41
+  },
+  {
+   "event": "voice.disciple.m3.seteru_maaf",
+   "ja": "あの件は…申し訳なかった。",
+   "en": "About that matter... I am sorry.",
+   "id": "Aku... minta maaf atas kejadian itu.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_maaf",
+   "ja": "あの件は…申し訳なかった。",
+   "en": "About that matter... I am sorry.",
+   "id": "Aku... minta maaf atas kejadian itu.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.seteru_maaf",
+   "ja": "あの件は…申し訳なかった。",
+   "en": "About that matter... I am sorry.",
+   "id": "Aku... minta maaf atas kejadian itu.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_maaf",
+   "ja": "あの件は…申し訳なかった。",
+   "en": "About that matter... I am sorry.",
+   "id": "Aku... minta maaf atas kejadian itu.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_sumpah",
+   "ja": "この恨み、必ず晴らすと誓う！",
+   "en": "I swear I will repay this grudge!",
+   "id": "Aku bersumpah akan membalas ini!",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.disciple.m2.seteru_sumpah",
+   "ja": "この恨み、必ず晴らすと誓う！",
+   "en": "I swear I will repay this grudge!",
+   "id": "Aku bersumpah akan membalas ini!",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.disciple.m3.seteru_sumpah",
+   "ja": "この恨み、必ず晴らすと誓う！",
+   "en": "I swear I will repay this grudge!",
+   "id": "Aku bersumpah akan membalas ini!",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_sumpah",
+   "ja": "この恨み、必ず晴らすと誓う！",
+   "en": "I swear I will repay this grudge!",
+   "id": "Aku bersumpah akan membalas ini!",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 6
+  },
+  {
+   "event": "voice.disciple.f2.seteru_sumpah",
+   "ja": "この恨み、必ず晴らすと誓う！",
+   "en": "I swear I will repay this grudge!",
+   "id": "Aku bersumpah akan membalas ini!",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_sumpah",
+   "ja": "この恨み、必ず晴らすと誓う！",
+   "en": "I swear I will repay this grudge!",
+   "id": "Aku bersumpah akan membalas ini!",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_damai",
+   "ja": "今日から、もう敵ではない。",
+   "en": "From today on, we are enemies no more.",
+   "id": "Mulai hari ini, kita bukan musuh lagi.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.seteru_damai",
+   "ja": "今日から、もう敵ではない。",
+   "en": "From today on, we are enemies no more.",
+   "id": "Mulai hari ini, kita bukan musuh lagi.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.seteru_damai",
+   "ja": "今日から、もう敵ではない。",
+   "en": "From today on, we are enemies no more.",
+   "id": "Mulai hari ini, kita bukan musuh lagi.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_damai",
+   "ja": "今日から、もう敵ではない。",
+   "en": "From today on, we are enemies no more.",
+   "id": "Mulai hari ini, kita bukan musuh lagi.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.seteru_damai",
+   "ja": "今日から、もう敵ではない。",
+   "en": "From today on, we are enemies no more.",
+   "id": "Mulai hari ini, kita bukan musuh lagi.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_damai",
+   "ja": "今日から、もう敵ではない。",
+   "en": "From today on, we are enemies no more.",
+   "id": "Mulai hari ini, kita bukan musuh lagi.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_saingan",
+   "ja": "次の大会は、私が勝つ。",
+   "en": "Next season, I will win.",
+   "id": "Musim depan, aku yang menang.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.seteru_saingan",
+   "ja": "次の大会は、私が勝つ。",
+   "en": "Next season, I will win.",
+   "id": "Musim depan, aku yang menang.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.seteru_saingan",
+   "ja": "次の大会は、私が勝つ。",
+   "en": "Next season, I will win.",
+   "id": "Musim depan, aku yang menang.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_saingan",
+   "ja": "次の大会は、私が勝つ。",
+   "en": "Next season, I will win.",
+   "id": "Musim depan, aku yang menang.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.seteru_saingan",
+   "ja": "次の大会は、私が勝つ。",
+   "en": "Next season, I will win.",
+   "id": "Musim depan, aku yang menang.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_saingan",
+   "ja": "次の大会は、私が勝つ。",
+   "en": "Next season, I will win.",
+   "id": "Musim depan, aku yang menang.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.disciple.m1.seteru_kekasih",
+   "ja": "宗門が敵同士でも…私はあなたを選ぶ。",
+   "en": "Even if our sects are enemies... I still choose you.",
+   "id": "Walau sekte kita bermusuhan... aku tetap memilihmu.",
+   "speaker": "disciple",
+   "voice": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.disciple.m2.seteru_kekasih",
+   "ja": "宗門が敵同士でも…私はあなたを選ぶ。",
+   "en": "Even if our sects are enemies... I still choose you.",
+   "id": "Walau sekte kita bermusuhan... aku tetap memilihmu.",
+   "speaker": "disciple",
+   "voice": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.disciple.m3.seteru_kekasih",
+   "ja": "宗門が敵同士でも…私はあなたを選ぶ。",
+   "en": "Even if our sects are enemies... I still choose you.",
+   "id": "Walau sekte kita bermusuhan... aku tetap memilihmu.",
+   "speaker": "disciple",
+   "voice": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.disciple.f1.seteru_kekasih",
+   "ja": "宗門が敵同士でも…私はあなたを選ぶ。",
+   "en": "Even if our sects are enemies... I still choose you.",
+   "id": "Walau sekte kita bermusuhan... aku tetap memilihmu.",
+   "speaker": "disciple",
+   "voice": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.disciple.f2.seteru_kekasih",
+   "ja": "宗門が敵同士でも…私はあなたを選ぶ。",
+   "en": "Even if our sects are enemies... I still choose you.",
+   "id": "Walau sekte kita bermusuhan... aku tetap memilihmu.",
+   "speaker": "disciple",
+   "voice": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.disciple.f3.seteru_kekasih",
+   "ja": "宗門が敵同士でも…私はあなたを選ぶ。",
+   "en": "Even if our sects are enemies... I still choose you.",
+   "id": "Walau sekte kita bermusuhan... aku tetap memilihmu.",
+   "speaker": "disciple",
+   "voice": "f3",
+   "style": 46
+  },
+  {
    "event": "voice.kota.auction_open",
    "ja": "今宵の競売を始めます！",
    "en": "Tonight's auction begins!",
@@ -2907,6 +5091,1462 @@
    "id": "Gunung dan laut mencatat namamu.",
    "speaker": "heaven",
    "style": 13
+  },
+  {
+   "event": "voice.kotabesar.gate_welcome",
+   "ja": "ようこそ、都へ。城内での私闘は禁じられている。",
+   "en": "Welcome to the capital. Private fights are forbidden within the walls.",
+   "id": "Selamat datang di ibu kota. Bertarung sendiri di dalam tembok dilarang.",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.kotabesar.curfew",
+   "ja": "夜鼓が鳴った。門を閉めるぞ！",
+   "en": "The night drum has sounded. Closing the gates!",
+   "id": "Genderang malam sudah berbunyi. Gerbang ditutup!",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.kotabesar.suspect",
+   "ja": "おい、そこの者。妙な真似はするなよ。",
+   "en": "You there. Don't try anything strange.",
+   "id": "Hei, kau. Jangan macam-macam.",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.kotabesar.wanted",
+   "ja": "手配書の顔だ！捕らえろ！",
+   "en": "That's the face on the wanted poster! Seize them!",
+   "id": "Itu wajah di surat buronan! Tangkap!",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.kotabesar.fine_paid",
+   "ja": "罰金は納められた。行ってよし。",
+   "en": "The fine is paid. You may go.",
+   "id": "Denda sudah dibayar. Silakan pergi.",
+   "speaker": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.kotabesar.jail",
+   "ja": "牢で頭を冷やすがいい。",
+   "en": "Cool your head in the cell.",
+   "id": "Dinginkan kepalamu di sel.",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.kotabesar.bank_welcome",
+   "ja": "銭荘へようこそ。霊石はしかとお預かりいたします。",
+   "en": "Welcome to the money house. Your spirit stones are safe with us.",
+   "id": "Selamat datang di rumah uang. Batu rohmu aman bersama kami.",
+   "speaker": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.kotabesar.bank_note",
+   "ja": "この為替手形は、どの都の銭荘でも換金できます。",
+   "en": "This note can be cashed at the money house of any capital.",
+   "id": "Surat wesel ini bisa ditukar di rumah uang ibu kota mana pun.",
+   "speaker": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.kotabesar.gamble_cut",
+   "ja": "切るぞ…さあ、天か地か！",
+   "en": "Cutting... now, heaven or earth!",
+   "id": "Kupotong… nah, langit atau bumi!",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.kotabesar.gamble_win",
+   "ja": "出た！霊光だ！",
+   "en": "It's out! Spirit light!",
+   "id": "Keluar! Cahaya roh!",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.kotabesar.gamble_lose",
+   "ja": "ただの石…これもまた天命よ。",
+   "en": "Just stone... that too is fate.",
+   "id": "Cuma batu… itu pun takdir.",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.kotabesar.grand_auction",
+   "ja": "大競売会、ただいま開幕でございます！",
+   "en": "The Grand Auction now begins!",
+   "id": "Lelang Agung kini dimulai!",
+   "speaker": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.kotabesar.alchemy_start",
+   "ja": "丹会を始める。炉に火を入れよ！",
+   "en": "The Pill Gathering begins. Light your furnaces!",
+   "id": "Pertemuan Pil dimulai. Nyalakan tungkumu!",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.kotabesar.alchemy_winner",
+   "ja": "見事な丹だ。今回の首席はそなたである。",
+   "en": "A splendid pill. You stand first this time.",
+   "id": "Pil yang indah. Kali ini kaulah yang pertama.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.kotabesar.smith_master",
+   "ja": "良い鉄は、良い火を待つものだ。",
+   "en": "Good iron waits for good fire.",
+   "id": "Besi yang baik menunggu api yang baik.",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.kotabesar.guild_bounty",
+   "ja": "新しい依頼が出ています。腕に覚えは？",
+   "en": "New commissions are posted. Confident in your skill?",
+   "id": "Ada misi baru. Yakin dengan kemampuanmu?",
+   "speaker": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.kotabesar.guild_rank",
+   "ja": "おめでとうございます、位が一つ上がりました。",
+   "en": "Congratulations, your rank has risen.",
+   "id": "Selamat, pangkatmu naik satu.",
+   "speaker": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.kotabesar.recruit_call",
+   "ja": "我が宗門に入りたい者は、前へ！",
+   "en": "Those who wish to join our sect, step forward!",
+   "id": "Yang ingin masuk sekte kami, maju!",
+   "speaker": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.kotabesar.beast_market",
+   "ja": "この子は満月の夜に生まれた霊狼だよ。",
+   "en": "This one is a spirit wolf born under a full moon.",
+   "id": "Yang ini serigala roh yang lahir di malam purnama.",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.kotabesar.inn_welcome",
+   "ja": "いらっしゃいませ。お泊まりですか、お食事ですか？",
+   "en": "Welcome! Staying the night, or here to eat?",
+   "id": "Selamat datang! Mau menginap atau makan?",
+   "speaker": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.kotabesar.library_hush",
+   "ja": "書閣ではお静かに。",
+   "en": "Quiet in the library, please.",
+   "id": "Harap tenang di perpustakaan.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.kotabesar.temple_bell",
+   "ja": "鐘の音に心を澄ませよ。",
+   "en": "Let the bell clear your heart.",
+   "id": "Biarkan lonceng menjernihkan hatimu.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.kotabesar.teleport_ready",
+   "ja": "陣が開きます。目を閉じてください。",
+   "en": "The array is opening. Please close your eyes.",
+   "id": "Formasi terbuka. Silakan pejamkan mata.",
+   "speaker": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.kotabesar.dock_depart",
+   "ja": "出航！雲の上で会おう！",
+   "en": "Setting sail! See you above the clouds!",
+   "id": "Berangkat! Sampai jumpa di atas awan!",
+   "speaker": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.kotabesar.palace_audience",
+   "ja": "面を上げよ。",
+   "en": "Raise your head.",
+   "id": "Angkat kepalamu.",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.kotabesar.lantern_festival",
+   "ja": "灯籠祭りが始まりました！謎かけはいかが？",
+   "en": "The Lantern Festival has begun! Care for a riddle?",
+   "id": "Festival Lentera sudah dimulai! Mau teka-teki?",
+   "speaker": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.kotabesar.riddle_right",
+   "ja": "正解です！お見事！",
+   "en": "Correct! Well done!",
+   "id": "Benar! Hebat!",
+   "speaker": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.kotabesar.beast_tide",
+   "ja": "獣潮だ！城壁へ急げ！",
+   "en": "A beast tide! To the walls, quickly!",
+   "id": "Gelombang binatang! Cepat ke tembok!",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.kotabesar.defense_won",
+   "ja": "都は守られた！",
+   "en": "The capital is saved!",
+   "id": "Ibu kota selamat!",
+   "speaker": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.kotabesar.tournament_open",
+   "ja": "天下の英傑よ、この擂台で力を示せ！",
+   "en": "Heroes of the realm, prove your strength upon this stage!",
+   "id": "Para pahlawan dunia, tunjukkan kekuatan kalian di panggung ini!",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.tempat.village_elder",
+   "ja": "旅のお方、村で少し休んでいきなされ。",
+   "en": "Traveller, rest a while in our village.",
+   "id": "Pengembara, beristirahatlah sebentar di desa kami.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tempat.village_fear",
+   "ja": "ど、どうかお許しを…しゅうりは我らがいたします。",
+   "en": "P-please forgive us... we will repair it ourselves.",
+   "id": "M-mohon ampun... kami sendiri yang akan memperbaikinya.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tempat.bill_request",
+   "ja": "恐れながら…壊れた分の弁償をお願いしたい。",
+   "en": "With respect... we must ask you to pay for the damage.",
+   "id": "Maaf... kami harus meminta ganti rugi atas kerusakannya.",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.tempat.bill_paid",
+   "ja": "ありがたい。すぐに職人を集めます。",
+   "en": "Thank you. I'll gather the craftsmen at once.",
+   "id": "Terima kasih. Akan segera kukumpulkan para tukang.",
+   "speaker": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.tempat.bill_refused",
+   "ja": "…この恨み、町は忘れませんぞ。",
+   "en": "...The town will not forget this.",
+   "id": "...Kota ini tidak akan melupakannya.",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.tempat.repair_work",
+   "ja": "よいしょ！もう一枚！",
+   "en": "Heave! One more plank!",
+   "id": "Hup! Satu papan lagi!",
+   "speaker": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.tempat.clan_patriarch",
+   "ja": "我が一族の地に、何用か。",
+   "en": "What business brings you to my clan's land?",
+   "id": "Ada urusan apa di tanah klanku?",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.tempat.young_master",
+   "ja": "身の程を知れ。この地で俺に逆らうとはな！",
+   "en": "Know your place. Defying me on my own land!",
+   "id": "Tahu dirilah. Berani menentangku di tanahku sendiri!",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.tempat.hermit",
+   "ja": "縁ある者よ、座るがよい。",
+   "en": "You who share a bond with me, sit.",
+   "id": "Engkau yang berjodoh denganku, duduklah.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tempat.hermit_koan",
+   "ja": "空の器にこそ、道は満ちる。",
+   "en": "Only an empty vessel can be filled with the Dao.",
+   "id": "Hanya wadah yang kosong dapat diisi Dao.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tempat.inheritance",
+   "ja": "我が遺産を継ぐ資格、示してみよ。",
+   "en": "Show me you are worthy of my legacy.",
+   "id": "Tunjukkan bahwa kau layak mewarisi peninggalanku.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.tempat.inheritance_pass",
+   "ja": "よかろう。我が道、汝に託す。",
+   "en": "Very well. I entrust my path to you.",
+   "id": "Baiklah. Jalanku kuserahkan padamu.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.tempat.demon_hideout",
+   "ja": "生きて帰れると思うな！",
+   "en": "Don't think you'll leave alive!",
+   "id": "Jangan kira kau bisa pulang hidup-hidup!",
+   "speaker": "demon",
+   "style": 21
+  },
+  {
+   "event": "voice.tempat.captive_saved",
+   "ja": "助かった…本当にありがとうございます！",
+   "en": "We're saved... thank you, truly!",
+   "id": "Kami selamat... terima kasih, sungguh!",
+   "speaker": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.tempat.waystation",
+   "ja": "駅で一休みしていきな。水も飯もあるぞ。",
+   "en": "Rest a bit at the post. There's water and food.",
+   "id": "Mampirlah istirahat di pos. Ada air dan makanan.",
+   "speaker": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.tempat.peddler",
+   "ja": "珍しい品だよ、遠い町から運んできたんだ！",
+   "en": "Rare goods, carried all the way from distant towns!",
+   "id": "Barang langka, kubawa dari kota yang jauh!",
+   "speaker": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.tempat.bandit",
+   "ja": "通行料を置いていけ！",
+   "en": "Leave a toll if you want to pass!",
+   "id": "Tinggalkan upeti kalau mau lewat!",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.tempat.tribulation_peak",
+   "ja": "この峰は、幾多の劫を見届けてきた。",
+   "en": "This peak has witnessed countless tribulations.",
+   "id": "Puncak ini telah menyaksikan tak terhitung kesengsaraan.",
+   "speaker": "heaven",
+   "style": 13
+  },
+  {
+   "event": "voice.tempat.sect_visit",
+   "ja": "本宗に何のご用でしょうか。",
+   "en": "What brings you to our sect?",
+   "id": "Ada keperluan apa ke sekte kami?",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.tempat.child_play",
+   "ja": "鬼さんこちら！",
+   "en": "Catch me if you can!",
+   "id": "Ayo tangkap aku!",
+   "speaker": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.cerita.ruyi_thanks",
+   "ja": "このご恩は、決して忘れません。",
+   "en": "I will never forget this kindness.",
+   "id": "Budi ini takkan pernah kulupakan.",
+   "speaker": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.cerita.moying_reveal",
+   "ja": "気づくのが遅かったな…！",
+   "en": "You noticed too late...!",
+   "id": "Kau terlambat menyadarinya...!",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.cerita.bao_verdict",
+   "ja": "証拠は揃った。判決を下す！",
+   "en": "The evidence is complete. I pronounce the verdict!",
+   "id": "Bukti sudah lengkap. Putusan dijatuhkan!",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.cerita.coronation",
+   "ja": "今日より、この都を汝に託す。",
+   "en": "From this day, I entrust this capital to you.",
+   "id": "Mulai hari ini, kota ini kuserahkan padamu.",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.tema.pelabuhan.welcome",
+   "ja": "港へようこそ。荷を下ろすなら、まず税関へ。",
+   "en": "Welcome to the harbour. If you're unloading, customs first.",
+   "id": "Selamat datang di pelabuhan. Kalau mau bongkar muatan, ke bea cukai dulu.",
+   "speaker": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.tema.pelabuhan.fish_call",
+   "ja": "獲れたてだよ！朝の霊魚、今だけだよ！",
+   "en": "Fresh from the sea! Morning spirit fish, only for now!",
+   "id": "Baru ditangkap! Ikan roh pagi, cuma sekarang!",
+   "speaker": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.tema.pelabuhan.ship_arrive",
+   "ja": "南の船が入ったぞ！荷揚げを急げ！",
+   "en": "A southern ship is in! Hurry with the unloading!",
+   "id": "Kapal selatan masuk! Cepat bongkar muatan!",
+   "speaker": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.tema.pelabuhan.ship_depart",
+   "ja": "錨を上げろ！帆を張れ！",
+   "en": "Weigh anchor! Hoist the sails!",
+   "id": "Angkat jangkar! Kembangkan layar!",
+   "speaker": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.tema.pelabuhan.lighthouse",
+   "ja": "この灯が消えたら、海は人を帰さぬ。",
+   "en": "If this light goes out, the sea won't send anyone home.",
+   "id": "Kalau pelita ini padam, laut tak akan memulangkan siapa pun.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tema.pelabuhan.pirates",
+   "ja": "海賊だ！桟橋を守れ！",
+   "en": "Pirates! Defend the piers!",
+   "id": "Bajak laut! Pertahankan dermaga!",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.tema.pelabuhan.black_shark",
+   "ja": "この港の灯は、俺がもらう。",
+   "en": "This harbour's light is mine to take.",
+   "id": "Pelita pelabuhan ini akan kuambil.",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.tema.pelabuhan.sea_crossing",
+   "ja": "霧の向こうは果てなき海だ。しっかり掴まってな。",
+   "en": "Beyond the fog lies the Boundless Sea. Hold on tight.",
+   "id": "Di balik kabut ada Laut Tanpa Batas. Pegangan yang kuat.",
+   "speaker": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.tema.pelabuhan.goddess_day",
+   "ja": "海の女神に祈りを。今年も無事の航海を。",
+   "en": "Pray to the Sea Goddess, for another year of safe voyages.",
+   "id": "Berdoalah pada Dewi Laut, demi pelayaran selamat setahun lagi.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tema.pelabuhan.shipwright",
+   "ja": "良い船は、竜骨から嘘をつかん。",
+   "en": "A good ship never lies, starting from its keel.",
+   "id": "Kapal yang baik tak pernah berbohong, mulai dari lunasnya.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tema.pelabuhan.lamp_lit",
+   "ja": "灯がともった…おかえり、みんな。",
+   "en": "The light is lit... welcome home, everyone.",
+   "id": "Pelita menyala... selamat pulang, semuanya.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tema.oasis.welcome",
+   "ja": "玉門を越えた先は砂の海だ。水は持ったか？",
+   "en": "Beyond the Jade Gate lies a sea of sand. Got your water?",
+   "id": "Di balik Gerbang Giok ada lautan pasir. Sudah bawa air?",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.tema.oasis.bazaar",
+   "ja": "さあさあ、西の香辛料に絨毯だ！値段は相談次第！",
+   "en": "Come, come! Western spices and carpets! The price is open to talk!",
+   "id": "Ayo, ayo! Rempah Barat dan permadani! Harga bisa dirunding!",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.tema.oasis.haggle_no",
+   "ja": "それじゃ商売にならんよ、旦那。",
+   "en": "That won't make me a living, sir.",
+   "id": "Kalau segitu, aku tak bisa makan, Tuan.",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.tema.oasis.haggle_yes",
+   "ja": "ええい、持ってけ！今日だけだぞ！",
+   "en": "Fine, take it! Only today!",
+   "id": "Ah, ambillah! Hanya hari ini!",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.tema.oasis.caravan",
+   "ja": "隊商が着いたぞ！駱駝に水をやれ！",
+   "en": "The caravan has arrived! Water the camels!",
+   "id": "Kafilah sudah tiba! Beri minum unta-unta!",
+   "speaker": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.tema.oasis.sandstorm",
+   "ja": "砂嵐だ！駱駝を伏せさせろ、中へ入れ！",
+   "en": "Sandstorm! Make the camels kneel, get inside!",
+   "id": "Badai pasir! Suruh unta berlutut, masuk ke dalam!",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.tema.oasis.water_priestess",
+   "ja": "水は命。一滴たりとも無駄にしてはなりません。",
+   "en": "Water is life. Not one drop must be wasted.",
+   "id": "Air adalah kehidupan. Tak satu tetes pun boleh terbuang.",
+   "speaker": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.tema.oasis.lord",
+   "ja": "この町が砂に呑まれる日は来させぬ。",
+   "en": "I will not let the day come when sand swallows this town.",
+   "id": "Takkan kubiarkan datang hari pasir menelan kota ini.",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.tema.oasis.scorpion",
+   "ja": "水は我が蠍のもの。砂に還れ！",
+   "en": "The water belongs to my scorpion. Return to the sand!",
+   "id": "Air ini milik kalajengkingku. Kembalilah ke pasir!",
+   "speaker": "demon",
+   "style": 21
+  },
+  {
+   "event": "voice.tema.oasis.dance",
+   "ja": "今宵は満月、旋舞をご覧あれ！",
+   "en": "Tonight is the full moon. Behold the whirling dance!",
+   "id": "Malam ini purnama, saksikanlah tari putar!",
+   "speaker": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.tema.air.welcome",
+   "ja": "舟に乗っていくかい？町を一回りしてあげるよ。",
+   "en": "Want a boat ride? I'll take you round the town.",
+   "id": "Mau naik perahu? Kuantar keliling kota.",
+   "speaker": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.tema.air.boat_song",
+   "ja": "水は流れて、橋はめぐる…",
+   "en": "The water flows, the bridges pass by...",
+   "id": "Air mengalir, jembatan silih berganti...",
+   "speaker": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.tema.air.silk",
+   "ja": "蘇家の絹は、五代にわたり嘘をついたことがありません。",
+   "en": "The silk of House Su has not lied in five generations.",
+   "id": "Sutra keluarga Su tak pernah berbohong selama lima generasi.",
+   "speaker": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.tema.air.tea",
+   "ja": "一煎目は香りを、二煎目は心を味わうのです。",
+   "en": "The first steep is for the fragrance, the second for the heart.",
+   "id": "Seduhan pertama untuk harumnya, seduhan kedua untuk hatinya.",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.tema.air.thief",
+   "ja": "泥棒だ！舟で逃げたぞ！",
+   "en": "Thief! He's escaping by boat!",
+   "id": "Pencuri! Dia kabur naik perahu!",
+   "speaker": "m2",
+   "style": 40
+  },
+  {
+   "event": "voice.tema.air.lantern_night",
+   "ja": "灯籠を流しましょう。迷った魂が帰れるように。",
+   "en": "Let's float the lanterns, so the lost souls can find their way home.",
+   "id": "Mari melepas lentera, agar arwah yang tersesat bisa pulang.",
+   "speaker": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.tema.air.ghost",
+   "ja": "わたしの布は…まだ織りかけなの。",
+   "en": "My cloth... is still unfinished.",
+   "id": "Kainku... masih belum selesai ditenun.",
+   "speaker": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.tema.air.ghost_rest",
+   "ja": "ありがとう…これで、やっと眠れる。",
+   "en": "Thank you... now, at last, I can sleep.",
+   "id": "Terima kasih... akhirnya aku bisa tidur.",
+   "speaker": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.tema.air.dragon_boat",
+   "ja": "太鼓を合わせろ！竜舟、進め！",
+   "en": "Match the drum! Dragon boat, forward!",
+   "id": "Ikuti genderang! Perahu naga, maju!",
+   "speaker": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.tema.air.poet",
+   "ja": "雨を聴く亭で、詩を一つ詠まぬか。",
+   "en": "Will you not compose a verse in the Pavilion for Listening to Rain?",
+   "id": "Maukah kau menggubah satu bait di Paviliun Menyimak Hujan?",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tema.gunung.welcome",
+   "ja": "千段の石段の始まりだ。足元に気をつけて。",
+   "en": "This is the start of the thousand stone steps. Watch your feet.",
+   "id": "Inilah awal seribu anak tangga. Hati-hati langkahmu.",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.tema.gunung.porter",
+   "ja": "一歩ずつ、一歩ずつ。山は逃げやせん。",
+   "en": "One step at a time. The mountain isn't going anywhere.",
+   "id": "Selangkah demi selangkah. Gunung tak akan lari.",
+   "speaker": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.tema.gunung.lift",
+   "ja": "乗った乗った！雲の上まで一息だ！",
+   "en": "All aboard! Up above the clouds in one breath!",
+   "id": "Ayo naik! Ke atas awan dalam sekali napas!",
+   "speaker": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.tema.gunung.lift_stuck",
+   "ja": "くそっ、綱が…！動くな、今助ける！",
+   "en": "Damn, the rope...! Don't move, I'm coming!",
+   "id": "Sial, talinya...! Jangan bergerak, aku datang!",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.tema.gunung.monkey",
+   "ja": "あっ、猿に饅頭を取られたね。果物を投げてごらん。",
+   "en": "Oh, the monkey took your bun. Try throwing it some fruit.",
+   "id": "Wah, bakpaomu direbut kera. Coba lempar buah.",
+   "speaker": "f1",
+   "style": 0
+  },
+  {
+   "event": "voice.tema.gunung.rockfall",
+   "ja": "落石だ！道から離れろ！",
+   "en": "Falling rocks! Get off the path!",
+   "id": "Batu runtuh! Menjauh dari jalan!",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.tema.gunung.abbot",
+   "ja": "山頂に至る道は千あれど、心に至る道は一つ。",
+   "en": "A thousand paths reach the summit, but only one reaches the heart.",
+   "id": "Seribu jalan menuju puncak, tetapi hanya satu menuju hati.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tema.gunung.pilgrim",
+   "ja": "三歩一拝、願いよ届け。",
+   "en": "Three steps, one bow. Let my wish be heard.",
+   "id": "Tiga langkah satu sujud, semoga permohonanku sampai.",
+   "speaker": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.tema.gunung.buddha_light",
+   "ja": "見なさい、雲の上の光の輪を。仏光です。",
+   "en": "Look, the ring of light upon the clouds. The Buddha's light.",
+   "id": "Lihatlah lingkaran cahaya di atas awan. Cahaya Buddha.",
+   "speaker": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.tema.gunung.cloud_bell",
+   "ja": "雲の鐘が鳴る。山はあなたを覚えました。",
+   "en": "The cloud bell rings. The mountain remembers you.",
+   "id": "Lonceng Awan berbunyi. Gunung kini mengingatmu.",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tema.iblis.gate_toll",
+   "ja": "通るなら貢ぎ物を置いていけ。命よりは安いぞ。",
+   "en": "Leave a tribute if you'd pass. It's cheaper than your life.",
+   "id": "Kalau mau lewat, tinggalkan upeti. Lebih murah dari nyawamu.",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.tema.iblis.gate_weak",
+   "ja": "こんな小物、餌にもならん。帰れ。",
+   "en": "Small fry like you isn't even good bait. Go home.",
+   "id": "Ikan teri sepertimu bahkan tak pantas jadi umpan. Pulang sana.",
+   "speaker": "m1",
+   "style": 12
+  },
+  {
+   "event": "voice.tema.iblis.pact",
+   "ja": "市場の中で血を流すな。それがこの町唯一の掟だ。",
+   "en": "Spill no blood inside the market. That is this town's only law.",
+   "id": "Jangan tumpahkan darah di dalam pasar. Itulah satu-satunya hukum kota ini.",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.tema.iblis.hunt_hour",
+   "ja": "夜道の通行料だ。金か、血か？",
+   "en": "A toll for the night road. Gold, or blood?",
+   "id": "Upeti jalan malam. Uang, atau darah?",
+   "speaker": "demon",
+   "style": 21
+  },
+  {
+   "event": "voice.tema.iblis.arena_open",
+   "ja": "血の階段へようこそ！生きて降りられるかな？",
+   "en": "Welcome to the Blood Ladder! Think you'll walk down alive?",
+   "id": "Selamat datang di Tangga Darah! Yakin bisa turun hidup-hidup?",
+   "speaker": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.tema.iblis.arena_win",
+   "ja": "見たか！新しい名が血に刻まれたぞ！",
+   "en": "Did you see?! A new name is carved in blood!",
+   "id": "Kalian lihat?! Nama baru terukir dengan darah!",
+   "speaker": "m1",
+   "style": 32
+  },
+  {
+   "event": "voice.tema.iblis.broker",
+   "ja": "欲しいものは何？ここでは、値段のないものはないのよ。",
+   "en": "What do you desire? Here, nothing is without a price.",
+   "id": "Apa yang kau inginkan? Di sini, tak ada yang tak berharga.",
+   "speaker": "f3",
+   "style": 46
+  },
+  {
+   "event": "voice.tema.iblis.forbidden",
+   "ja": "この書は、読む者の何かを喰らう。それでも開くか？",
+   "en": "This book devours something of whoever reads it. Will you still open it?",
+   "id": "Kitab ini memakan sesuatu dari pembacanya. Masih mau membukanya?",
+   "speaker": "elder",
+   "style": 42
+  },
+  {
+   "event": "voice.tema.iblis.captive",
+   "ja": "おねがい…村に帰りたいの。",
+   "en": "Please... I want to go home to my village.",
+   "id": "Tolong... aku ingin pulang ke desaku.",
+   "speaker": "f1",
+   "style": 2
+  },
+  {
+   "event": "voice.tema.iblis.lord",
+   "ja": "正道の者が、わざわざ地獄の門を叩くとはね。",
+   "en": "How rare, a righteous one knocking at hell's gate of their own accord.",
+   "id": "Jarang sekali, orang jalan lurus mengetuk gerbang neraka atas kemauan sendiri.",
+   "speaker": "boss",
+   "style": 53
+  },
+  {
+   "event": "voice.tema.iblis.hunter",
+   "ja": "正道の名において、その首、貰い受ける！",
+   "en": "In the name of the righteous path, your head is forfeit!",
+   "id": "Atas nama jalan lurus, kepalamu kuambil!",
+   "speaker": "f2",
+   "style": 8
+  },
+  {
+   "event": "voice.tema.iblis.raid",
+   "ja": "正道の連中が門に来た！迎え撃て！",
+   "en": "The righteous are at the gate! Meet them head on!",
+   "id": "Orang-orang jalan lurus di gerbang! Hadapi mereka!",
+   "speaker": "m1",
+   "style": 34
+  },
+  {
+   "event": "voice.tema.iblis.dawn",
+   "ja": "この町にも、朝は来るんだな。",
+   "en": "So even this town gets a morning.",
+   "id": "Ternyata kota ini pun bisa didatangi pagi.",
+   "speaker": "m3",
+   "style": 52
+  },
+  {
+   "event": "voice.tema.dagang.sold",
+   "ja": "良い取引でした。また来てくださいよ。",
+   "en": "A fine deal. Do come again.",
+   "id": "Transaksi yang bagus. Datang lagi, ya.",
+   "speaker": "m2",
+   "style": 39
+  },
+  {
+   "event": "voice.tema.dagang.saturated",
+   "ja": "その品はもう溢れててね…安くしか買えんよ。",
+   "en": "We're already flooded with that... I can only buy it cheap.",
+   "id": "Barang itu sudah membanjir... aku cuma bisa beli murah.",
+   "speaker": "m2",
+   "style": 11
+  },
+  {
+   "event": "voice.sekte_langit.bajak_datang",
+   "ja": "倉の中身を差し出せ！さもなくばこの島を焼き払う！",
+   "en": "Hand over your storehouse, or we burn this island!",
+   "id": "Serahkan isi gudang kalian, atau pulau ini kami bakar!",
+   "speaker": "Cloud Pirate Captain",
+   "style": 51
+  },
+  {
+   "event": "voice.sekte_langit.longbo_datang",
+   "ja": "祖先は山を支える亀を六匹釣った。お前の亀が七匹目だ！",
+   "en": "My ancestor fished up six mountain-bearing turtles. Yours will be the seventh!",
+   "id": "Leluhurku memancing enam kura-kura penyangga gunung. Kura-kuramu yang ketujuh!",
+   "speaker": "Longbo Giant",
+   "style": 53
+  },
+  {
+   "event": "voice.sekte_langit.longbo_kalah",
+   "ja": "馬鹿な…亀一匹さえ釣れぬとは…",
+   "en": "Impossible... not even one turtle...",
+   "id": "Mustahil... seekor kura-kura pun tak terpancing...",
+   "speaker": "Longbo Giant",
+   "style": 53
+  },
+  {
+   "event": "voice.sekte_langit.tamu_salam",
+   "ja": "雲の上の同道よ、お招きに感謝する。",
+   "en": "Fellow daoist above the clouds, thank you for the welcome.",
+   "id": "Sahabat di atas awan, terima kasih atas sambutanmu.",
+   "speaker": "Guest Elder",
+   "style": 42
+  },
+  {
+   "event": "voice.sekte_langit.utusan_salam",
+   "ja": "天宮はそなたの島を見ていた。天命を受けよ。",
+   "en": "The Heavenly Court has seen your island. Receive its command.",
+   "id": "Istana Langit telah melihat pulaumu. Terimalah perintahnya.",
+   "speaker": "Heavenly Court Envoy",
+   "style": 46
+  },
+  {
+   "event": "voice.sekte_langit.utusan_tantang",
+   "ja": "天は聞いた。黄昏に備えよ。",
+   "en": "Heaven has heard. Prepare yourself at dusk.",
+   "id": "Langit telah mendengar. Bersiaplah saat senja.",
+   "speaker": "Heaven",
+   "style": 81
+  },
+  {
+   "event": "voice.gumam.pria.0",
+   "ja": "いらっしゃい、いらっしゃい！",
+   "en": "Come in, come in!",
+   "id": "Mari, mari, silakan!",
+   "speaker": "gumam_pria",
+   "style": 12
+  },
+  {
+   "event": "voice.gumam.pria.1",
+   "ja": "今日はいい天気だな。",
+   "en": "Fine weather today.",
+   "id": "Cuaca hari ini bagus, ya.",
+   "speaker": "gumam_pria",
+   "style": 11
+  },
+  {
+   "event": "voice.gumam.pria.2",
+   "ja": "それ、いくらだ？",
+   "en": "How much is that?",
+   "id": "Itu berapa harganya?",
+   "speaker": "gumam_pria",
+   "style": 52
+  },
+  {
+   "event": "voice.gumam.pria.3",
+   "ja": "高いなあ、もう少し安くならんか。",
+   "en": "Pricey... can't you go a bit lower?",
+   "id": "Mahal... tidak bisa kurang sedikit?",
+   "speaker": "gumam_pria",
+   "style": 13
+  },
+  {
+   "event": "voice.gumam.pria.4",
+   "ja": "聞いたか、あの噂。",
+   "en": "Did you hear that rumour?",
+   "id": "Sudah dengar kabar itu?",
+   "speaker": "gumam_pria",
+   "style": 12
+  },
+  {
+   "event": "voice.gumam.pria.5",
+   "ja": "はっはっは、そりゃいい！",
+   "en": "Ha ha ha, that's a good one!",
+   "id": "Ha ha ha, bagus sekali!",
+   "speaker": "gumam_pria",
+   "style": 11
+  },
+  {
+   "event": "voice.gumam.pria.6",
+   "ja": "おう、久しぶりだな。",
+   "en": "Hey, long time no see.",
+   "id": "Wah, lama tidak jumpa.",
+   "speaker": "gumam_pria",
+   "style": 52
+  },
+  {
+   "event": "voice.gumam.pria.7",
+   "ja": "雨が降りそうだな。",
+   "en": "Looks like rain.",
+   "id": "Sepertinya mau hujan.",
+   "speaker": "gumam_pria",
+   "style": 13
+  },
+  {
+   "event": "voice.gumam.pria.8",
+   "ja": "腹が減ったな、飯にしよう。",
+   "en": "I'm starving, let's eat.",
+   "id": "Lapar nih, ayo makan.",
+   "speaker": "gumam_pria",
+   "style": 12
+  },
+  {
+   "event": "voice.gumam.pria.9",
+   "ja": "まあまあ、落ち着けよ。",
+   "en": "Easy now, calm down.",
+   "id": "Sudah, sudah, tenang dulu.",
+   "speaker": "gumam_pria",
+   "style": 11
+  },
+  {
+   "event": "voice.gumam.pria.10",
+   "ja": "昨日の市は賑やかだったな。",
+   "en": "Yesterday's market was lively.",
+   "id": "Pasar kemarin ramai sekali.",
+   "speaker": "gumam_pria",
+   "style": 52
+  },
+  {
+   "event": "voice.gumam.pria.11",
+   "ja": "へえ、本当かい？",
+   "en": "Huh, really?",
+   "id": "Oh ya, sungguh?",
+   "speaker": "gumam_pria",
+   "style": 13
+  },
+  {
+   "event": "voice.gumam.pria.12",
+   "ja": "霊石三つでどうだ。",
+   "en": "How about three spirit stones?",
+   "id": "Bagaimana kalau tiga batu roh?",
+   "speaker": "gumam_pria",
+   "style": 12
+  },
+  {
+   "event": "voice.gumam.pria.13",
+   "ja": "じゃあ、またな。",
+   "en": "Well, see you.",
+   "id": "Ya sudah, sampai jumpa.",
+   "speaker": "gumam_pria",
+   "style": 11
+  },
+  {
+   "event": "voice.gumam.wanita.0",
+   "ja": "まあ、いらっしゃい。",
+   "en": "Oh, welcome.",
+   "id": "Wah, silakan masuk.",
+   "speaker": "gumam_wanita",
+   "style": 2
+  },
+  {
+   "event": "voice.gumam.wanita.1",
+   "ja": "このお野菜、新鮮ですよ。",
+   "en": "These vegetables are fresh.",
+   "id": "Sayuran ini masih segar, lho.",
+   "speaker": "gumam_wanita",
+   "style": 8
+  },
+  {
+   "event": "voice.gumam.wanita.2",
+   "ja": "あら、お久しぶりね。",
+   "en": "Oh, it's been a while.",
+   "id": "Eh, lama tidak bertemu.",
+   "speaker": "gumam_wanita",
+   "style": 10
+  },
+  {
+   "event": "voice.gumam.wanita.3",
+   "ja": "ねえ、聞いた？隣の娘さんがね…",
+   "en": "Did you hear? The girl next door...",
+   "id": "Eh, sudah dengar? Anak gadis tetangga itu...",
+   "speaker": "gumam_wanita",
+   "style": 20
+  },
+  {
+   "event": "voice.gumam.wanita.4",
+   "ja": "うふふ、そうなの。",
+   "en": "Hee hee, is that so.",
+   "id": "Hihi, begitu ya.",
+   "speaker": "gumam_wanita",
+   "style": 46
+  },
+  {
+   "event": "voice.gumam.wanita.5",
+   "ja": "今日は風が気持ちいいわね。",
+   "en": "What a pleasant breeze today.",
+   "id": "Anginnya segar hari ini.",
+   "speaker": "gumam_wanita",
+   "style": 2
+  },
+  {
+   "event": "voice.gumam.wanita.6",
+   "ja": "ちょっと高くない？",
+   "en": "Isn't that a bit pricey?",
+   "id": "Agak mahal, tidak?",
+   "speaker": "gumam_wanita",
+   "style": 8
+  },
+  {
+   "event": "voice.gumam.wanita.7",
+   "ja": "じゃあ、二つちょうだい。",
+   "en": "Then I'll take two.",
+   "id": "Kalau begitu, aku ambil dua.",
+   "speaker": "gumam_wanita",
+   "style": 10
+  },
+  {
+   "event": "voice.gumam.wanita.8",
+   "ja": "本当に？信じられない！",
+   "en": "Really? Unbelievable!",
+   "id": "Sungguh? Tidak bisa dipercaya!",
+   "speaker": "gumam_wanita",
+   "style": 20
+  },
+  {
+   "event": "voice.gumam.wanita.9",
+   "ja": "洗濯物、乾くかしら。",
+   "en": "Will the washing dry, I wonder.",
+   "id": "Jemuranku kering tidak, ya.",
+   "speaker": "gumam_wanita",
+   "style": 46
+  },
+  {
+   "event": "voice.gumam.wanita.10",
+   "ja": "あはは、おかしい！",
+   "en": "Ah ha ha, how funny!",
+   "id": "Ahaha, lucu sekali!",
+   "speaker": "gumam_wanita",
+   "style": 2
+  },
+  {
+   "event": "voice.gumam.wanita.11",
+   "ja": "お茶でも飲んでいく？",
+   "en": "Will you stay for some tea?",
+   "id": "Mampir minum teh dulu?",
+   "speaker": "gumam_wanita",
+   "style": 8
+  },
+  {
+   "event": "voice.gumam.wanita.12",
+   "ja": "気をつけて帰ってね。",
+   "en": "Take care on the way home.",
+   "id": "Hati-hati pulangnya, ya.",
+   "speaker": "gumam_wanita",
+   "style": 10
+  },
+  {
+   "event": "voice.gumam.wanita.13",
+   "ja": "また明日ね。",
+   "en": "See you tomorrow.",
+   "id": "Sampai besok, ya.",
+   "speaker": "gumam_wanita",
+   "style": 20
+  },
+  {
+   "event": "voice.gumam.kakek.0",
+   "ja": "ほっほっほ、若いのう。",
+   "en": "Ho ho ho, so young.",
+   "id": "Ho ho ho, masih muda, ya.",
+   "speaker": "gumam_kakek",
+   "style": 42
+  },
+  {
+   "event": "voice.gumam.kakek.1",
+   "ja": "わしの若い頃はのう…",
+   "en": "Back when I was young...",
+   "id": "Waktu aku masih muda dulu...",
+   "speaker": "gumam_kakek",
+   "style": 53
+  },
+  {
+   "event": "voice.gumam.kakek.2",
+   "ja": "今年の米は出来がよい。",
+   "en": "The rice came in well this year.",
+   "id": "Padi tahun ini bagus hasilnya.",
+   "speaker": "gumam_kakek",
+   "style": 42
+  },
+  {
+   "event": "voice.gumam.kakek.3",
+   "ja": "腰が痛うてかなわん。",
+   "en": "My back is killing me.",
+   "id": "Pinggangku sakit sekali.",
+   "speaker": "gumam_kakek",
+   "style": 53
+  },
+  {
+   "event": "voice.gumam.kakek.4",
+   "ja": "明日は雨じゃな、膝が言うておる。",
+   "en": "Rain tomorrow; my knees say so.",
+   "id": "Besok hujan; lututku bilang begitu.",
+   "speaker": "gumam_kakek",
+   "style": 42
+  },
+  {
+   "event": "voice.gumam.kakek.5",
+   "ja": "ふむ、それは良い話じゃ。",
+   "en": "Hmm, that is good news.",
+   "id": "Hmm, itu kabar baik.",
+   "speaker": "gumam_kakek",
+   "style": 53
+  },
+  {
+   "event": "voice.gumam.kakek.6",
+   "ja": "茶を一杯もらおうかの。",
+   "en": "I'll have a cup of tea.",
+   "id": "Aku minta secangkir teh.",
+   "speaker": "gumam_kakek",
+   "style": 42
+  },
+  {
+   "event": "voice.gumam.kakek.7",
+   "ja": "近頃の若い者は…",
+   "en": "Young folk these days...",
+   "id": "Anak muda zaman sekarang...",
+   "speaker": "gumam_kakek",
+   "style": 53
+  },
+  {
+   "event": "voice.gumam.kakek.8",
+   "ja": "まあ、焦らずともよい。",
+   "en": "Now, no need to rush.",
+   "id": "Sudahlah, tidak perlu terburu-buru.",
+   "speaker": "gumam_kakek",
+   "style": 42
+  },
+  {
+   "event": "voice.gumam.kakek.9",
+   "ja": "昔、この町には仙人がおったそうな。",
+   "en": "They say an immortal once lived in this town.",
+   "id": "Konon dulu ada seorang abadi tinggal di kota ini.",
+   "speaker": "gumam_kakek",
+   "style": 53
+  },
+  {
+   "event": "voice.gumam.kakek.10",
+   "ja": "囲碁でも打つかの。",
+   "en": "Shall we play a game of Go?",
+   "id": "Bagaimana kalau main catur Go?",
+   "speaker": "gumam_kakek",
+   "style": 42
+  },
+  {
+   "event": "voice.gumam.kakek.11",
+   "ja": "ほう、そうかそうか。",
+   "en": "Oh, I see, I see.",
+   "id": "Oh, begitu, begitu.",
+   "speaker": "gumam_kakek",
+   "style": 53
+  },
+  {
+   "event": "voice.gumam.kakek.12",
+   "ja": "うむ、達者でな。",
+   "en": "Mm, take care of yourself.",
+   "id": "Hm, jaga dirimu baik-baik.",
+   "speaker": "gumam_kakek",
+   "style": 42
+  },
+  {
+   "event": "voice.gumam.nenek.0",
+   "ja": "あらあら、まあまあ。",
+   "en": "Oh my, oh my.",
+   "id": "Aduh, aduh.",
+   "speaker": "gumam_nenek",
+   "style": 80
+  },
+  {
+   "event": "voice.gumam.nenek.1",
+   "ja": "孫がね、大きくなってねえ。",
+   "en": "My grandchild has grown so big.",
+   "id": "Cucuku sudah besar, lho.",
+   "speaker": "gumam_nenek",
+   "style": 20
+  },
+  {
+   "event": "voice.gumam.nenek.2",
+   "ja": "寒くなってきたねえ。",
+   "en": "It's getting cold, isn't it.",
+   "id": "Mulai dingin, ya.",
+   "speaker": "gumam_nenek",
+   "style": 80
+  },
+  {
+   "event": "voice.gumam.nenek.3",
+   "ja": "ちゃんと食べてるかい？",
+   "en": "Are you eating properly?",
+   "id": "Makanmu cukup, Nak?",
+   "speaker": "gumam_nenek",
+   "style": 20
+  },
+  {
+   "event": "voice.gumam.nenek.4",
+   "ja": "昔はねえ、この辺は田んぼだったのよ。",
+   "en": "Long ago, all this was rice fields.",
+   "id": "Dulu, di sini semua sawah.",
+   "speaker": "gumam_nenek",
+   "style": 80
+  },
+  {
+   "event": "voice.gumam.nenek.5",
+   "ja": "ほほほ、ありがとうねえ。",
+   "en": "Ho ho, thank you, dear.",
+   "id": "Hohoho, terima kasih, ya.",
+   "speaker": "gumam_nenek",
+   "style": 20
+  },
+  {
+   "event": "voice.gumam.nenek.6",
+   "ja": "お饅頭、おひとつどうぞ。",
+   "en": "Have a steamed bun.",
+   "id": "Silakan, ambil satu bakpao.",
+   "speaker": "gumam_nenek",
+   "style": 80
+  },
+  {
+   "event": "voice.gumam.nenek.7",
+   "ja": "まあ、怖い話だねえ。",
+   "en": "My, what a frightening tale.",
+   "id": "Aduh, cerita yang menakutkan.",
+   "speaker": "gumam_nenek",
+   "style": 20
+  },
+  {
+   "event": "voice.gumam.nenek.8",
+   "ja": "今日は市が立つ日だよ。",
+   "en": "Today is market day.",
+   "id": "Hari ini hari pasar.",
+   "speaker": "gumam_nenek",
+   "style": 80
+  },
+  {
+   "event": "voice.gumam.nenek.9",
+   "ja": "よっこらしょ。",
+   "en": "Up we go.",
+   "id": "Aduh, encok...",
+   "speaker": "gumam_nenek",
+   "style": 20
+  },
+  {
+   "event": "voice.gumam.nenek.10",
+   "ja": "そうかい、そうかい。",
+   "en": "Is that so, is that so.",
+   "id": "Begitu, ya, begitu.",
+   "speaker": "gumam_nenek",
+   "style": 80
+  },
+  {
+   "event": "voice.gumam.nenek.11",
+   "ja": "気をつけてお行きなさいね。",
+   "en": "Go carefully now.",
+   "id": "Hati-hati di jalan, ya.",
+   "speaker": "gumam_nenek",
+   "style": 20
+  },
+  {
+   "event": "voice.gumam.anak.0",
+   "ja": "わーい、待ってー！",
+   "en": "Yay, wait for me!",
+   "id": "Hore, tunggu aku!",
+   "speaker": "gumam_anak",
+   "style": 3
+  },
+  {
+   "event": "voice.gumam.anak.1",
+   "ja": "お母さん、あれ買って！",
+   "en": "Mum, buy me that!",
+   "id": "Bu, belikan yang itu!",
+   "speaker": "gumam_anak",
+   "style": 1
+  },
+  {
+   "event": "voice.gumam.anak.2",
+   "ja": "鬼ごっこしようよ！",
+   "en": "Let's play tag!",
+   "id": "Ayo main kejar-kejaran!",
+   "speaker": "gumam_anak",
+   "style": 10
+  },
+  {
+   "event": "voice.gumam.anak.3",
+   "ja": "見て見て、蝶々！",
+   "en": "Look, look, a butterfly!",
+   "id": "Lihat, lihat, kupu-kupu!",
+   "speaker": "gumam_anak",
+   "style": 3
+  },
+  {
+   "event": "voice.gumam.anak.4",
+   "ja": "お腹すいたー。",
+   "en": "I'm hungry...",
+   "id": "Laparrr...",
+   "speaker": "gumam_anak",
+   "style": 1
+  },
+  {
+   "event": "voice.gumam.anak.5",
+   "ja": "へへへ、つかまえた！",
+   "en": "Hee hee, got you!",
+   "id": "Hehe, kena kau!",
+   "speaker": "gumam_anak",
+   "style": 10
+  },
+  {
+   "event": "voice.gumam.anak.6",
+   "ja": "すごーい！",
+   "en": "Wooow!",
+   "id": "Hebaaat!",
+   "speaker": "gumam_anak",
+   "style": 3
+  },
+  {
+   "event": "voice.gumam.anak.7",
+   "ja": "僕、仙人になるんだ！",
+   "en": "I'm going to be an immortal!",
+   "id": "Aku mau jadi abadi!",
+   "speaker": "gumam_anak",
+   "style": 1
+  },
+  {
+   "event": "voice.gumam.anak.8",
+   "ja": "ねえねえ、知ってる？",
+   "en": "Hey, hey, you know what?",
+   "id": "Eh, eh, tahu tidak?",
+   "speaker": "gumam_anak",
+   "style": 10
+  },
+  {
+   "event": "voice.gumam.anak.9",
+   "ja": "飴玉ちょうだい！",
+   "en": "Give me a sweet!",
+   "id": "Minta permennya!",
+   "speaker": "gumam_anak",
+   "style": 3
+  },
+  {
+   "event": "voice.gumam.anak.10",
+   "ja": "あははは！",
+   "en": "Ah ha ha ha!",
+   "id": "Ahahaha!",
+   "speaker": "gumam_anak",
+   "style": 1
+  },
+  {
+   "event": "voice.gumam.anak.11",
+   "ja": "こっちだよー！",
+   "en": "Over here!",
+   "id": "Sebelah sini!",
+   "speaker": "gumam_anak",
+   "style": 10
+  },
+  {
+   "event": "voice.gumam.anak.12",
+   "ja": "またあしたね！",
+   "en": "See you tomorrow!",
+   "id": "Sampai besok!",
+   "speaker": "gumam_anak",
+   "style": 3
   }
  ],
  "disciple_voices": {

@@ -9939,3 +9939,22 @@ penonton turnamen) kini memakai satu sistem penampilan, **Sosok**:
 * Aman untuk Sodium dan Iris (hanya tipe render vanilla) dan Player Animation Library (hanya menganimasikan pemain).
 * Uji (op) `/kultivasi uji penampilan galeri|acak|klip|jalan|wajah|pegas|murid|hapus`; klien `/sosok info` menampilkan
   anggaran. Rancangan lengkap: `docs/rancangan/40-penampilan-dan-animasi.md`.
+
+## 73. Kota yang Hidup: Riuh Kota dan Obrolan Warga
+
+Tempat berpenghuni kini terdengar hidup. Semua suara ini hanya diputar di klien (tanpa lalu lintas jaringan) dan ringan.
+
+* **Riuh kota**: keramaian latar di ibu kota, lima kota bertema, kota kultivator, kampung dan kompleks sekte NPC. Suasananya
+  mengikuti siapa yang ada di sekitarmu: pedagang membuat **pasar** (tawar-menawar, koin, gerobak), pemilik kedai dan koki
+  membuat **kedai/rumah teh** (cangkir, tawa), pelaut, nelayan atau air terbuka membuat **pelabuhan** (ombak, camar, teriakan
+  dermaga), rahib dan tetua sekte membuat **kuil** (lonceng, doa, sunyi), selebihnya **jalan/alun-alun** (langkah, gumaman).
+* Makin banyak warga di dekatmu (termasuk kerumunan jauh dan penonton tribun) makin ramai. Malam hari (jam malam ibu kota,
+  kampung yang tidur), hujan dan berada di dalam ruangan membuatnya lebih pelan, kecuali di kedai. Suara memudar masuk dan
+  keluar dengan halus saat kamu melewati gerbang.
+* **Obrolan warga**: saat dua warga mengobrol dengan gerak tangan, terdengar gumaman pendek berbahasa Jepang dari yang sedang
+  berbicara: suara pria, wanita, kakek, nenek atau anak sesuai wujudnya (Sosok). Pelan dan memudar menurut jarak (sekitar
+  16 blok); kata-katanya tetap di gelembung ucapan. Takarir Minecraft menampilkan "Warga mengobrol".
+* **Setelan** (Pengaturan > Suara): "Riuh kota" dan "Obrolan warga", masing-masing 100 / 75 / 50 / 25 % atau Mati. Riuh kota
+  juga diatur penggeser vanilla "Sekitar/Lingkungan"; obrolan diatur penggeser "Suara/Ucapan" dan hanya berbunyi bila
+  "Suara bicara: Semua". Pada kualitas efek Minimal pemindaian suasana berjalan lebih jarang.
+* Kredit suara (VOICEVOX, Kenney CC0, OpenGameArt CC0): `docs/CREDITS.md`.

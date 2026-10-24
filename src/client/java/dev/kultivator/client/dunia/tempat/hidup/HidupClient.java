@@ -27,6 +27,13 @@ public final class HidupClient {
 		LevelRenderEvents.COLLECT_SUBMITS.register(ImpostorRenderer::collect);
 		ClientTickEvents.END_CLIENT_TICK.register(ImpostorRenderer::tick);
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ImpostorRenderer.bersihkan());
+		// Kota yang Hidup (docs/progres/suara-kota.md): the crowd ambience and the murmurs under the gestured talks.
+		ClientTickEvents.END_CLIENT_TICK.register(RiuhKota::tick);
+		ClientTickEvents.END_CLIENT_TICK.register(ObrolanSuara::tick);
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			RiuhKota.bersihkan();
+			ObrolanSuara.bersihkan();
+		});
 	}
 
 	private HidupClient() {
