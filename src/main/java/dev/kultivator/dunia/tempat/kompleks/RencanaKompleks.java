@@ -12,6 +12,7 @@ import dev.kultivator.dunia.tempat.ZonaRencana;
 import dev.kultivator.dunia.tempat.worldgen.TataLetakStructure;
 import dev.kultivator.sekte.diplomasi.GerbangPlan;
 import dev.kultivator.sekte.langit.npc.LangitNpcPlan;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.jetbrains.annotations.Nullable;
@@ -238,7 +239,7 @@ public final class RencanaKompleks implements Rencana {
 				}
 			}
 		}
-		return new Plan(seed, List.copyOf(list), Map.copyOf(starts), Map.copyOf(byIndex), List.copyOf(all));
+		return new Plan(seed, List.copyOf(list), new Long2ObjectOpenHashMap<>(starts), Map.copyOf(byIndex), List.copyOf(all));
 	}
 
 	/** The compound of gate entry {@code e} (pure). */

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "kultivator:sekte_langit/istana_langit",
+      "required": false
+    }
+  ]
+}

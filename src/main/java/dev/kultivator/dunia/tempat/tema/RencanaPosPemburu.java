@@ -9,6 +9,7 @@ import dev.kultivator.dunia.tempat.RencanaRegistry;
 import dev.kultivator.dunia.tempat.ZonaRencana;
 import dev.kultivator.sekte.diplomasi.GerbangPlan;
 import dev.kultivator.sekte.diplomasi.SekteNpc;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
@@ -105,7 +106,7 @@ public final class RencanaPosPemburu implements Rencana {
 					starts.putIfAbsent(RencanaKotaTema.chunkKey(d.chunkX(), d.chunkZ()), d);
 				}
 			}
-			p = new Plan(seed, List.copyOf(ks), List.copyOf(ds), Map.copyOf(starts));
+			p = new Plan(seed, List.copyOf(ks), List.copyOf(ds), new Long2ObjectOpenHashMap<>(starts));
 			cached = p;
 			return p;
 		}

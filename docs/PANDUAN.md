@@ -9902,6 +9902,25 @@ Bila sebuah tempat terasa kosong, jalankan `/kultivasi uji hidup audit` (op) di 
 tempat kerja yang termuat dalam 128 blok, perannya, apakah orangnya ada, dan bila tidak, alasannya (saklar mati, peran
 salah, tak ada pemain survival dekat, baru terbunuh, topi penuh, penjaga MSPT), plus ringkasan budget NPC.
 
+### 69.6 Berdampingan dengan mod dunia lain
+
+Kultivator kini menyesuaikan diri dengan mod dunia yang terpasang (Terralith, Tectonic, Structory, Structory Towers,
+Dungeons and Taverns, Lithostitched, Amplified Nether, Nullscape) dan struktur vanilla, sehingga **tidak ada bangunan yang
+saling menembus**:
+
+* **Tempat Kultivator didahulukan.** Kedai, reruntuhan, menara, desa dan dungeon dari mod lain atau vanilla tidak lahir
+  bila salah satu bagiannya (plus jarak 12 blok) menyentuh ibu kota, kota bertema, kompleks sekte, kampung, kota lama,
+  gerbang sekte, penjara, menara seratus lantai, gua, situs atau pos jalan. Di luar tempat kita mereka tetap muncul seperti
+  biasa, jadi jumlahnya di dunia tidak berkurang. Benteng (stronghold) tidak pernah ditolak supaya Mata Ender tetap benar.
+* **Jalan mengalah.** Ubin jalan, tangga dan jembatan dilewati di bagian yang menyentuh bangunan mod lain, jadi jalan tidak
+  memotong kedai atau reruntuhan.
+* **Istana Awan di atas gunung tinggi.** Dengan Tectonic puncak gunung bisa melewati y 204-228; istana langit sekte NPC
+  kini diangkat sampai dasarnya 16 blok di atas tanah tertinggi di bawahnya (sebatas batas tinggi dunia).
+* Struktur Structory yang memakai tahap lain (raw_generation) dan menara penyihir Terralith juga ikut dijaga keluar dari
+  ibu kota. Kultivator tidak menaruh struktur di Nether atau End, jadi Amplified Nether dan Nullscape tidak bertabrakan.
+* Hanya berlaku untuk **chunk baru** (buat dunia baru). Pemeriksaan untuk pengembang: `python tools/cek_kompat_mod.py`
+  (membaca jar mod dan melapor bila ada structure set yang memakai spacing, separation dan salt yang sama).
+
 ## 70. Lima Kota Bertema
 
 Selain ibu kota, dunia punya lima jenis kota bertema (masing-masing 288 × 288 blok, sembilan distrik, menghadap medannya):
