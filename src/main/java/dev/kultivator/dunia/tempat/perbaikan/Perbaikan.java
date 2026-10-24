@@ -250,6 +250,72 @@ public final class Perbaikan {
 		}
 	}
 
+	/**
+	 * A destroying explosion is about to break {@code blok} (mixin on {@code ServerExplosion}): a player behind it (his
+	 * TNT, his fireball) is {@code ledakan_tnt}, anything else (creeper, ghast, wither) {@code monster}.
+	 */
+	static void onLedakan(ServerLevel level, java.util.List<BlockPos> blok, @Nullable Entity sumber) {
+		if (!PerbaikanConfig.get().aktif || blok.isEmpty()) {
+			return;
+		}
+		BoundingBox box = BoundingBox.encapsulatingPositions(blok).orElse(null);
+		if (box == null) {
+			return;
+		}
+		UUID who = sumber instanceof ServerPlayer player ? player.getUUID() : null;
+		for (TempatRawat t : tempatKena(level, box)) {
+			LogAtribusi.catat(t.kunci, level.getGameTime(), who == null ? Gugus.MONSTER : Gugus.TNT, who, box.inflatedBy(1));
+			PindaiTempat.prioritasNanti(t, box.inflatedBy(1), level.getServer().getTickCount() + 2L);
+		}
+	}
+
+	/**
+	 * A block was destroyed, placed or changed by an entity (mixin on {@code ServerLevel.gameEvent}): a mob or a stray
+	 * projectile is {@code monster} (enderman, zombie at a door, wither); a player's projectile is his {@code pecah}.
+	 * Players' own hands are logged by the break and use events above.
+	 */
+	static void onUbahBlok(ServerLevel level, BlockPos pos, Entity pelaku) {
+		if (!PerbaikanConfig.get().aktif) {
+			return;
+		}
+		TempatRawat t = Rekam.tempatDi(level, pos);
+		if (t == null) {
+			return;
+		}
+		UUID who = null;
+		if (pelaku instanceof net.minecraft.world.entity.projectile.Projectile projectile && projectile.getOwner() instanceof ServerPlayer player) {
+			who = player.getUUID();
+		}
+		LogAtribusi.catatBlok(t.kunci, level.getGameTime(), who == null ? Gugus.MONSTER : Gugus.PECAH, who, pos);
+		PindaiTempat.prioritasNanti(t, new BoundingBox(pos), level.getServer().getTickCount() + 2L);
+	}
+
+	/** A fire is eating the block at {@code pos} (mixin on {@code FireBlock.checkBurnOut}): natural fire spread. */
+	static void onTerbakar(ServerLevel level, BlockPos pos) {
+		if (!PerbaikanConfig.get().aktif) {
+			return;
+		}
+		TempatRawat t = Rekam.tempatDi(level, pos);
+		if (t != null) {
+			LogAtribusi.catatSekitar(t.kunci, level.getGameTime(), Gugus.API, null, pos, 1);
+			PindaiTempat.prioritasNanti(t, new BoundingBox(pos).inflatedBy(1), level.getServer().getTickCount() + 2L);
+		}
+	}
+
+	private static Set<TempatRawat> tempatKena(ServerLevel level, BoundingBox box) {
+		Set<TempatRawat> hit = new HashSet<>();
+		for (int cx = box.minX() >> 4; cx <= box.maxX() >> 4; cx++) {
+			for (int cz = box.minZ() >> 4; cz <= box.maxZ() >> 4; cz++) {
+				for (TempatRawat t : Rekam.diChunk(level.dimension(), ChunkPos.pack(cx, cz))) {
+					if (t.kotak.intersects(box.inflatedBy(1))) {
+						hit.add(t);
+					}
+				}
+			}
+		}
+		return hit;
+	}
+
 	private static void onAcara(ServerLevel level, long situsId, String acara, boolean mulai) {
 		String a = acara == null ? "" : acara.toLowerCase(Locale.ROOT);
 		if (!(a.contains("pertahanan") || a.contains("serbu") || a.contains("gelombang") || a.contains("bajak") || a.contains("serang")

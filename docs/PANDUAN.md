@@ -9860,9 +9860,22 @@ Barat dan Kampung Kumuh, dikelilingi tembok dan menara dengan empat gerbang.
 
 * Penduduk punya jadwal harian: bangun, menyapu, bekerja sesuai peran, makan, minum teh, tidur; anak bermain, tetua main
   catur, pedagang berseru. Hujan membuat mereka berpayung, badai membuat anak bersembunyi, Gerhana Darah mengosongkan jalan.
+* **Pasar, kedai dan jalan lebih ramai**: pagi (07-11) tetua dan warga yang senggang berbelanja dari lapak ke lapak (melihat
+  barang, menawar, mengobrol) lalu membawa keranjang pulang; siang sepertiga makan di rumah makan; sore minum teh,
+  mendengar cerita atau jalan-jalan; pukul 17 belanja makan malam; malam (20-22) lebih dari separuh yang senggang ke
+  kedai (minum, bercerita, menyimak), beberapa pekerja bertahan sampai larut. Pedagang, penjaga dan penjaga tempat kerja
+  tetap di tempatnya. Pejalan berpindah tujuan tiap 20 menit dunia sehingga terlihat berjalan; bila kursi penuh, mereka
+  berdiri di blok kosong di sekitar meja. Hujan dan salju membuat semua masuk ke bawah atap. Tukang bengkel kini mengukir
+  di bangkunya; palu dan plester hanya terlihat pada regu perbaikan di tempat yang benar-benar rusak.
 * **Perbaikan**: bila kamu merusak kampung atau kota, Kepala Desa membawa tagihan. Bayar dan tukang bekerja empat kali lebih
   cepat; tolak dan Nama Baik turun serta harga naik 10 %. Bila ranahmu jauh di atas mereka, tidak ada tagihan: NPC
   berlutut, anak bersembunyi, perbaikan berjalan lebih lama karena takut. Peti berisi tidak pernah dibuang.
+* **Hanya kerusakan nyata yang diperbaiki**: tukang, mandor, tagihan, "Mohon Bantuan" dan kabar kerusakan hanya muncul
+  untuk blok yang dirusak pemain (dibongkar, dibangun sembarangan), ledakan, api, teknik penghancur, atau monster dan
+  serbuan (enderman mengambil blok, zombi mendobrak pintu, wither). Perubahan alami (pasir dan kerikil jalan yang runtuh,
+  tanaman tumbuh, tembaga berkarat, obor yang copot, cuaca dan hal lain dari dunia atau mod lain) diterima ke cetak biru
+  dan tidak pernah "diperbaiki". Operator dapat memeriksa sebuah tempat dengan `/kultivasi uji tempat cetak periksa`:
+  jumlah blok rusak nyata per penyebab (dengan contoh posisi), perubahan alami, beda keadaan saja, dan pekerjaan terbuka.
 * **Lingkar uang**: semua harga memakai satu kurs batu roh. Uang datang dari misi gilda, lapak murid (sewa lapak, isi
   barang, tunjuk murid penjaga; lihat `/kultivasi kas`) dan kafilah dagang ke kota lain; keluar untuk senjata, pil, lelang,
   denda dan perbaikan.

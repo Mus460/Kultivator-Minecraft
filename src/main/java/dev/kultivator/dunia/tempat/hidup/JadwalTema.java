@@ -553,7 +553,7 @@ public final class JadwalTema {
 		}
 		if (r == NpcRole.PENJAGA_LIFT) {
 			if (h == 4) {
-				return k("periksa_roda", "stasiun_lift", GerakId.PERBAIKI_PALU, PropId.PALU);
+				return k("periksa_roda", "stasiun_lift", GerakId.LIHAT_BARANG, 0);
 			}
 			if (h >= 5 && h < 18) {
 				if ((h == 11 || h == 12) && separuh(p, 3) == (h == 11)) {

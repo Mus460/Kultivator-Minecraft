@@ -50,6 +50,7 @@ public final class PindaiTempat {
 	private static List<TempatRawat> aktif = List.of();
 	private static int putar;
 	private static long baca;
+	private static long diterima;
 
 	static void berhenti() {
 		KURSOR.clear();
@@ -74,14 +75,14 @@ public final class PindaiTempat {
 		int h = PRIORITAS_MAKS / 2;
 		BoundingBox clipped = new BoundingBox(Math.max(kotak.minX(), c.getX() - h), Math.max(kotak.minY(), c.getY() - h), Math.max(kotak.minZ(), c.getZ() - h),
 				Math.min(kotak.maxX(), c.getX() + h), Math.min(kotak.maxY(), c.getY() + h), Math.min(kotak.maxZ(), c.getZ() + h));
-		if (PRIORITAS.size() < 64) {
+		if (PRIORITAS.size() < 512) {
 			PRIORITAS.addLast(new Prioritas(t.kunci, clipped));
 		}
 	}
 
 	/** As {@link #prioritas} but at server tick {@code saat} (TNT after its fuse, fire after it spread). */
 	static void prioritasNanti(TempatRawat t, BoundingBox kotak, long saat) {
-		if (NANTI.size() < 64) {
+		if (NANTI.size() < 256) {
 			NANTI.add(new Nanti(t.kunci, kotak, saat));
 		}
 	}
@@ -249,9 +250,24 @@ public final class PindaiTempat {
 			return;
 		}
 		BlockState target = Banding.rusak(rec, now, cetak, pos, t);
-		if (target != null) {
-			PekerjaanPerbaikan.temukan(level, t, pos, rec, now, target, be);
+		if (target == null) {
+			return;
 		}
+		LogAtribusi.Atribusi why = LogAtribusi.cari(t, pos, rec, now, level.getGameTime());
+		if (why == null) {
+			// nobody damaged it (worldgen settling, growth, gravity, weathering, another mod): the blueprint takes it
+			if (cetak.terima(pos, now)) {
+				CetakStore.put(t.dimensi, cetak);
+				diterima++;
+			}
+			return;
+		}
+		PekerjaanPerbaikan.temukan(level, t, pos, rec, now, target, be, why);
+	}
+
+	/** Natural changes the blueprints took since the server started (for {@code uji tempat cetak periksa}). */
+	static long diterima() {
+		return diterima;
 	}
 
 	private PindaiTempat() {

@@ -149,7 +149,9 @@ public final class KerjaPeran {
 				k("dupa", GerakId.MEMBACA, PropId.KITAB, 0, 0, GerakId.SUJUD_DUPA).sel(GerakId.TULIS_JIMAT, PropId.KERTAS_JIMAT));
 		put(NpcRole.TABIB, k("kerja:lumpang", GerakId.TUMBUK_HERBA, PropId.ALU, 0, PropId.KOTAK_OBAT, 0).sel(GerakId.RACIK_HERBA, PropId.HERBA),
 				k("meja_tulis", GerakId.MENULIS, PropId.KUAS).sel(GerakId.PERIKSA_NADI, 0));
-		put(NpcRole.TUKANG, k("kerja:gergaji", GerakId.PERBAIKI_PALU, PropId.PALU).sel(GerakId.PERBAIKI_PLESTER, PropId.SENDOK_PLESTER),
+		// craft work at the bench (carving with mallet and chisel, looking a plank over); hammering at walls and plastering
+		// belong to repair crews and are only seen where something is really damaged (38.R)
+		put(NpcRole.TUKANG, k("kerja:gergaji", GerakId.PERBAIKI_PALU, PropId.PAHAT).sel(GerakId.LIHAT_BARANG, PropId.PAPAN_KAYU),
 				angkut("kerja:gergaji", "peti_milik", GerakId.ANGKAT_PAPAN, PropId.PAPAN_KAYU, 0, GerakId.ANGKAT_PAPAN));
 		put(NpcRole.PENJAGA_TEKA, k("lapak", GerakId.BICARA_TANGAN, PropId.LENTERA_TANGAN, 0, 0, GerakId.SERU_DAGANG));
 		put(NpcRole.JUARA_SEKTE, k("latihan", GerakId.LATIHAN_PEDANG_2, 0).sela(GerakId.TEBAS_UDARA).sel(GerakId.SIRKULASI_QI, 0),

@@ -1,5 +1,6 @@
 package dev.kultivator.mixin;
 
+import dev.kultivator.dunia.tempat.perbaikan.PerbaikanApi;
 import dev.kultivator.sect.build.engine.BreakRefund;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -19,7 +20,8 @@ import java.util.List;
  * ({@code DESTROY} or {@code DESTROY_WITH_DECAY}; a wind charge or a mace's Wind Burst is {@code TRIGGER_BLOCK} and never
  * breaks blocks), sect cells among the exploded positions are taken out of the list (so they neither drop nor burn),
  * removed without item drops by the engine's {@code BuildPlacer}, and their placed cost is credited to the owner's
- * ledger; Perbaiki can rebuild them.
+ * ledger; Perbaiki can rebuild them. The same blocks are also reported to place repair (DESIGN 38.R.2) so a cared-for
+ * place knows who blew it up; only reported damage is ever repaired.
  */
 @Mixin(ServerExplosion.class)
 public abstract class SectExplosionMixin {
@@ -36,6 +38,7 @@ public abstract class SectExplosionMixin {
 	private void kultivator$sectExplosionCredit(List<BlockPos> targetBlocks, CallbackInfo ci) {
 		if (this.blockInteraction == Explosion.BlockInteraction.DESTROY || this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY) {
 			BreakRefund.explosion(this.level, targetBlocks);
+			PerbaikanApi.ledakan(this.level, targetBlocks, ((ServerExplosion) (Object) this).getIndirectSourceEntity());
 		}
 	}
 }

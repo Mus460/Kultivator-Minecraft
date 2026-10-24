@@ -23,8 +23,13 @@ import java.util.UUID;
  *       (fire now, or air where a block was);</li>
  *   <li>{@code kehancuran}: a Mode Kehancuran batch of the player's own technique or his disciple changed a box that holds
  *       this block (the master);</li>
- *   <li>otherwise {@code serangan} while a raid or city defence is running at the place, else {@code monster}.</li>
+ *   <li>{@code monster}: an explosion without a player behind it, or a mob (or a stray projectile) that destroyed,
+ *       placed or changed this block (enderman, zombie at a door, wither); {@code serangan} instead while a raid or city
+ *       defence is running at the place;</li>
+ *   <li>{@code api} without a culprit: fire standing in the place now, or a block a natural fire burned away.</li>
  * </ul>
+ * Anything else is no damage (null): weathering, growth, gravity, oxidation, a torch that popped, a block another mod
+ * changed. The scanner then takes the world's block into the blueprint instead of sending a crew (no false repairs).
  */
 public final class LogAtribusi {
 
@@ -48,6 +53,15 @@ public final class LogAtribusi {
 
 	static void catat(long kunci, long now, String sebab, @Nullable UUID pelaku, BoundingBox kotak) {
 		ArrayDeque<Peristiwa> ring = LOG.computeIfAbsent(kunci, k -> new ArrayDeque<>());
+		// a burning roof reports every few ticks: an equal recent event covering this box is enough
+		int looked = 0;
+		for (Iterator<Peristiwa> it = ring.descendingIterator(); it.hasNext() && looked++ < 16; ) {
+			Peristiwa e = it.next();
+			if (now - e.waktu() < 200L && e.sebab().equals(sebab) && java.util.Objects.equals(e.pelaku(), pelaku) && e.kotak().isInside(kotak.minX(),
+					kotak.minY(), kotak.minZ()) && e.kotak().isInside(kotak.maxX(), kotak.maxY(), kotak.maxZ())) {
+				return;
+			}
+		}
 		ring.addLast(new Peristiwa(now, sebab, pelaku, kotak));
 		while (ring.size() > MAKS || !ring.isEmpty() && now - ring.peekFirst().waktu() > UMUR) {
 			ring.pollFirst();
@@ -76,8 +90,8 @@ public final class LogAtribusi {
 		return until != null && until > now;
 	}
 
-	/** The cause of a difference at {@code pos} found at game time {@code now}. */
-	static Atribusi cari(TempatRawat t, BlockPos pos, BlockState rec, BlockState now, long time) {
+	/** The cause of a difference at {@code pos} found at game time {@code now}, or null when nothing damaged it. */
+	static @Nullable Atribusi cari(TempatRawat t, BlockPos pos, BlockState rec, BlockState now, long time) {
 		ArrayDeque<Peristiwa> ring = LOG.get(t.kunci);
 		if (ring != null) {
 			boolean burned = now.getBlock() instanceof BaseFireBlock || now.isAir() && !rec.isAir();
@@ -117,7 +131,7 @@ public final class LogAtribusi {
 					}
 					case Gugus.MONSTER, Gugus.SERANGAN -> {
 						if (inside) {
-							return new Atribusi(e.sebab(), null);
+							return new Atribusi(diserang(t.situsId, time) ? Gugus.SERANGAN : e.sebab(), null);
 						}
 					}
 					default -> {
@@ -125,7 +139,8 @@ public final class LogAtribusi {
 				}
 			}
 		}
-		return new Atribusi(diserang(t.situsId, time) ? Gugus.SERANGAN : Gugus.MONSTER, null);
+		// fire in a place is always worth putting out, whoever lit it (lightning, lava, a stray spark)
+		return now.getBlock() instanceof BaseFireBlock ? new Atribusi(Gugus.API, null) : null;
 	}
 
 	static void bersihkan(long now) {

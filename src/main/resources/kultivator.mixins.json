@@ -21,6 +21,8 @@
     "MobSetTargetMixin",
     "ServerLevelPrecipitationMixin",
     "ChunkGeneratorTempatMixin",
+    "TempatUbahBlokMixin",
+    "TempatApiMixin",
     "duel.MobGoalSelectorAccessor"
   ],
   "injectors": {

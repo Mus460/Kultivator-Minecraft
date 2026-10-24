@@ -438,7 +438,7 @@ public final class Pemanggil {
 		BlockPos spawn = goal;
 		ServerPlayer watcher = null;
 		for (ServerPlayer player : level.players()) {
-			if (player.position().distanceTo(Vec3.atBottomCenterOf(goal)) < 20.0D) {
+			if (player.position().distanceTo(Vec3.atBottomCenterOf(goal)) < 40.0D) {
 				watcher = player;
 				break;
 			}
