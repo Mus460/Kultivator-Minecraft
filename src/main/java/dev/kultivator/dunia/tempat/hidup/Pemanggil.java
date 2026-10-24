@@ -59,15 +59,15 @@ public final class Pemanggil {
 	public static final String BUDGET = "npc_hidup";
 
 	static final double CARI = 64.0D;
-	static final double PANGGIL = 48.0D;
-	static final double LEPAS = 56.0D;
+	static final double PANGGIL = 64.0D;
+	static final double LEPAS = 72.0D;
 	static final double JAUH = 128.0D;
 	static final int SIKLUS = 40;
 	/** Pathfinding starts allowed per server tick for all resident bodies (38.N.7). */
 	static final int JALUR_PER_TICK = 8;
 	/** Places without a player near for this long are dropped. */
 	static final long LUPA = 1200L;
-	static final int BARU_PER_SIKLUS = 3;
+	static final int BARU_PER_SIKLUS = 6;
 
 	static final Map<Long, TempatHuni> AKTIF = new LinkedHashMap<>();
 	private static final Map<Long, Long> SIKLUS_T = new HashMap<>();

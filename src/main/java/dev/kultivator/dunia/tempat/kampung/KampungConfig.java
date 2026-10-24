@@ -15,7 +15,7 @@ public final class KampungConfig {
 	/** Village life of this module: markets, harvest festival, clans, talented children, tribute bonus. */
 	public boolean aktif = true;
 	/** Bodies this module keeps per village at once (the young master, a sparring clan disciple, the market keeper). */
-	public int tubuhMaks = 10;
+	public int tubuhMaks = 16;
 	/** The Harvest Festival every {@link #siklusPanen} days (38.C.2.3: {@code d % 12 == 0}). */
 	public boolean festivalPanen = true;
 	/** Days between two Harvest Festivals of one village. */
@@ -32,7 +32,7 @@ public final class KampungConfig {
 	public double hargaPasar = 0.9D;
 
 	KampungConfig clamp() {
-		tubuhMaks = Mth.clamp(tubuhMaks, 0, 24);
+		tubuhMaks = Mth.clamp(tubuhMaks, 0, 40);
 		siklusPanen = Mth.clamp(siklusPanen, 3, 60);
 		kesetiaanPanen = Mth.clamp(kesetiaanPanen, 0, 10);
 		hariAnakBerbakat = Mth.clamp(hariAnakBerbakat, 3, 60);

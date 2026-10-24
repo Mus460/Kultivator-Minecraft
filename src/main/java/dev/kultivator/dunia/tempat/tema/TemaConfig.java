@@ -24,7 +24,7 @@ public final class TemaConfig {
 		/** Pack {@code kultivator:dunia_kotatema} (all five themes and both satellites). */
 		public boolean worldgen = true;
 		/** NPC bodies per themed town (12-36), budget kind {@code npc_kota_tema}. */
-		public int tubuhMaks = 20;
+		public int tubuhMaks = 32;
 		/** Live mechanism entities per town (4-16); global cap 24 ({@code mekanisme_tema}). */
 		public int mekanismeMaks = 12;
 		/** Smallest distance from any suitable capital (800-3000). */
@@ -47,7 +47,7 @@ public final class TemaConfig {
 		public boolean kontrakMuatan = true;
 
 		Inti clamp() {
-			tubuhMaks = Mth.clamp(tubuhMaks, 12, 36);
+			tubuhMaks = Mth.clamp(tubuhMaks, 12, 72);
 			mekanismeMaks = Mth.clamp(mekanismeMaks, 4, 16);
 			jarakDariIbuKota = Mth.clamp(jarakDariIbuKota, 800, 3000);
 			jarakAntarTema = Mth.clamp(jarakAntarTema, 600, 3000);

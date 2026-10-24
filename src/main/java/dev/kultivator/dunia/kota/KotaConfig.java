@@ -13,7 +13,7 @@ public final class KotaConfig {
 	public boolean worldgen = true;
 	/** The towns' NPCs, shops and services. */
 	public boolean enabled = true;
-	public int npcPerTown = 10;
+	public int npcPerTown = 14;
 	public boolean auction = true;
 	public int auctionRivals = 4;
 	public boolean blackMarket = true;
@@ -38,7 +38,7 @@ public final class KotaConfig {
 	public int peachDays = 3;
 
 	KotaConfig clamp() {
-		npcPerTown = Mth.clamp(npcPerTown, 4, 14);
+		npcPerTown = Mth.clamp(npcPerTown, 4, 24);
 		auctionRivals = Mth.clamp(auctionRivals, 0, 6);
 		raidChance = Mth.clamp(raidChance, 0.0D, 0.3D);
 		bountiesPerDay = Mth.clamp(bountiesPerDay, 0, 6);
