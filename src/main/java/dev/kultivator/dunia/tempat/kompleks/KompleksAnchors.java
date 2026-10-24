@@ -48,10 +48,27 @@ final class KompleksAnchors implements AnchorHandler {
 	private static final Map<UUID, Long> RUPA = new HashMap<>();
 	/** Sect id -> the bodies this module made for it (sparring partners), capped by {@code kompleksSekte.tubuhMaks}. */
 	private static final Map<String, List<KultivatorNpc>> TUBUH = new HashMap<>();
+	/** Anchor UUID -> the disciple minding the sect's wares at the market lot or the hall counter. */
+	private static final Map<UUID, KultivatorNpc> PENJUAL = new HashMap<>();
 
 	static void reset() {
 		RUPA.clear();
 		TUBUH.clear();
+		PENJUAL.clear();
+	}
+
+	/** The disciple who keeps the sale point (staff: outside the NPC caps, held at the anchor). */
+	private static void penjual(ServerLevel level, DuniaAnchorEntity anchor, RencanaKompleks.Kompleks k) {
+		KultivatorNpc npc = PENJUAL.get(anchor.getUUID());
+		if (npc != null && npc.isAlive() && !npc.isRemoved()) {
+			return;
+		}
+		npc = HidupApi.tubuhStaf(level, Kompleks.situs(level, k), NpcRole.MURID_SEKTE_DALAM,
+				anchor.blockPosition(), anchor.getYRot());
+		if (npc != null) {
+			npc.memory().putBoolean("hold", true);
+			PENJUAL.put(anchor.getUUID(), npc);
+		}
 	}
 
 	/** Living bodies this module made for sect {@code sekte} (the dead and the gone are dropped). */
@@ -105,9 +122,13 @@ final class KompleksAnchors implements AnchorHandler {
 			case "gerbang" -> KompleksSikap.gerbang(level, anchor, k, within);
 			case "dalam", "puncak", "tetua" -> KompleksSikap.dalam(level, anchor, k, within);
 			case "arena" -> arena(level, anchor, k, within);
-			case "pasar" -> PasarSekte.dekat(level, anchor, k, within);
+			case "pasar" -> {
+				penjual(level, anchor, k);
+				PasarSekte.dekat(level, anchor, k, within);
+			}
 			case "aula" -> {
 				if (!anyMarketLot(k)) {
+					penjual(level, anchor, k);
 					PasarSekte.dekat(level, anchor, k, within);
 				}
 			}
@@ -122,6 +143,10 @@ final class KompleksAnchors implements AnchorHandler {
 	@Override
 	public void unloaded(ServerLevel level, DuniaAnchorEntity anchor) {
 		RUPA.remove(anchor.getUUID());
+		KultivatorNpc npc = PENJUAL.remove(anchor.getUUID());
+		if (npc != null && !npc.isRemoved()) {
+			npc.discard();
+		}
 	}
 
 	@Override

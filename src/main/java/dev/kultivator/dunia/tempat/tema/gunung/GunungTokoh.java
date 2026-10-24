@@ -129,7 +129,7 @@ public final class GunungTokoh {
 			return null;
 		}
 		int look = id.hashCode() * 0x2F6B ^ 0x51ED;
-		KultivatorNpc npc = HidupApi.tubuh(level, kotaId, data.peran(), pos, yaw, look);
+		KultivatorNpc npc = HidupApi.tubuhStaf(level, kotaId, data.peran(), pos, yaw, look);
 		if (npc != null) {
 			tandai(npc, id);
 		}

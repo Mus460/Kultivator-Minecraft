@@ -217,7 +217,7 @@ public final class IblisAnchors implements AnchorHandler {
 		if (npc != null || menunggu(anchor)) {
 			return npc;
 		}
-		npc = HidupApi.tubuh(level, kota.situsId(), role, anchor.blockPosition(), anchor.getYRot(), (int) (anchor.blockPosition().asLong() * 0x9E37L));
+		npc = HidupApi.tubuhStaf(level, kota.situsId(), role, anchor.blockPosition(), anchor.getYRot(), (int) (anchor.blockPosition().asLong() * 0x9E37L));
 		if (npc == null) {
 			return null;
 		}

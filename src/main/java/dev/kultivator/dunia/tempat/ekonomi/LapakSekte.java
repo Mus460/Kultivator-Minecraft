@@ -443,7 +443,7 @@ public final class LapakSekte {
 			return;
 		}
 		if (body == null || body.isRemoved()) {
-			body = HidupApi.tubuh(level, situs, NpcRole.PEDAGANG_KELILING, anchor.blockPosition(), anchor.getYRot());
+			body = HidupApi.tubuhStaf(level, situs, NpcRole.PEDAGANG_KELILING, anchor.blockPosition(), anchor.getYRot());
 			if (body == null) {
 				return;
 			}

@@ -378,19 +378,23 @@ public final class Pemanggil {
 	// ================================================================== bodies
 
 	private static void panggil(ServerLevel level, TempatHuni huni, List<Calon> calon, long now, @Nullable String acara) {
-		if (calon.isEmpty() || DuniaBudget.overloaded(level.getServer())) {
+		if (calon.isEmpty() || !dev.kultivator.dunia.DuniaSpine.enabled()) {
 			return;
 		}
+		boolean berat = DuniaBudget.overloaded(level.getServer());
 		HidupConfig cfg = HidupConfig.get();
 		int cap = cfg.tubuhUntuk(huni.jenis);
-		calon.sort(Comparator.comparingDouble(Calon::jarak));
+		// workplace keepers (stationary roles: cook, healer, smith, innkeeper, banker...) first and outside the caps, so a
+		// village's healer or a compound's alchemist is never crowded out by strollers; the rest by distance, capped
+		calon.sort(Comparator.comparing((Calon c) -> !c.p().peran().stationary).thenComparingDouble(Calon::jarak));
 		int dibuat = 0;
 		for (Calon c : calon) {
-			if (dibuat >= BARU_PER_SIKLUS || huni.tubuh.size() >= cap || !DuniaBudget.mayAdd(level, BUDGET)) {
+			boolean staf = c.p().peran().stationary;
+			if (dibuat >= BARU_PER_SIKLUS || !staf && (berat || huni.tubuh.size() >= cap || !DuniaBudget.mayAdd(level, BUDGET))) {
 				return;
 			}
 			Vec3 at = Vec3.atBottomCenterOf(c.tujuan().pos());
-			if (!perPemainBoleh(level, at, cfg.perPemain)) {
+			if (!staf && !perPemainBoleh(level, at, cfg.perPemain)) {
 				continue;
 			}
 			if (!c.p().peran().petarung() && HidupApi.bahayaDi(level, c.tujuan().pos()) != null) {

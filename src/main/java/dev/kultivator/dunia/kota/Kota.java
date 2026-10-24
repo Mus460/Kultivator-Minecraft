@@ -4,6 +4,7 @@ import dev.kultivator.Kultivator;
 import dev.kultivator.abadi.Abadi;
 import dev.kultivator.cultivation.Meditation;
 import dev.kultivator.cultivation.Progression;
+import dev.kultivator.dunia.DuniaAnchorEntity;
 import dev.kultivator.dunia.DuniaAnchors;
 import dev.kultivator.dunia.DuniaConfig;
 import dev.kultivator.dunia.DuniaPacks;
@@ -104,6 +105,21 @@ public final class Kota {
 	/** True while the module runs (the spine's master switch and {@code kota.enabled}). */
 	public static boolean enabled() {
 		return DuniaSpine.enabled() && config.enabled;
+	}
+
+	/** The role a {@code kota/<what>} people anchor brings, or null when the anchor brings nobody ({@code uji hidup audit}). */
+	public static @Nullable NpcRole peranJangkar(DuniaAnchorEntity anchor) {
+		return KotaAnchors.ROLES.get(anchor.what());
+	}
+
+	/** The NPC a {@code kota/*} people anchor brought, when it stands ({@code uji hidup audit}). */
+	public static @Nullable KultivatorNpc orangJangkar(DuniaAnchorEntity anchor) {
+		return KotaAnchors.HANDLER.npcOf(anchor);
+	}
+
+	/** Why a {@code kota/*} people anchor has no NPC now (audit reason suffix), or null when it stands. */
+	public static @Nullable String alasanKosong(ServerLevel level, DuniaAnchorEntity anchor) {
+		return KotaAnchors.HANDLER.alasanKosong(level, anchor);
 	}
 
 	/** The in-game day the daily caps count in (overworld clock). */

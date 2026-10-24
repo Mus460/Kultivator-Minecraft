@@ -261,7 +261,7 @@ public final class GunungAnchors implements AnchorHandler {
 		if (!list.isEmpty() || !TemaMekanisme.pemainDekat(level, anchor.position(), jarak)) {
 			return;
 		}
-		KultivatorNpc npc = HidupApi.tubuh(level, kotaId(level, anchor), role, anchor.blockPosition(), anchor.getYRot());
+		KultivatorNpc npc = HidupApi.tubuhStaf(level, kotaId(level, anchor), role, anchor.blockPosition(), anchor.getYRot());
 		if (npc != null) {
 			npc.memory().putBoolean("hold", true);
 			npc.memory().putString("tema", GunungData.TEMA);
@@ -325,7 +325,7 @@ public final class GunungAnchors implements AnchorHandler {
 		BlockPos top = anchor.blockPosition().above(naik);
 		Vec3 out = KatrolEntity.keluarArah(anchor);
 		BlockPos at = BlockPos.containing(top.getX() + 0.5D + out.x * 2.0D + out.z, top.getY(), top.getZ() + 0.5D + out.z * 2.0D + out.x);
-		KultivatorNpc npc = HidupApi.tubuh(level, kotaId(level, anchor), NpcRole.PENJAGA_LIFT, at, anchor.getYRot());
+		KultivatorNpc npc = HidupApi.tubuhStaf(level, kotaId(level, anchor), NpcRole.PENJAGA_LIFT, at, anchor.getYRot());
 		if (npc != null) {
 			npc.memory().putBoolean("hold", true);
 			npc.memory().putString("tema", GunungData.TEMA);

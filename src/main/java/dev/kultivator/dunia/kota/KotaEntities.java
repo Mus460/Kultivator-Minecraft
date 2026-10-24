@@ -47,7 +47,8 @@ public final class KotaEntities {
 		ServerEntityEvents.ALLOW_LOAD.register((entity, level, reason, flag) -> reason != EntitySpawnReason.LOAD
 				|| !(entity instanceof KultivatorNpc) && !(entity instanceof KotaPintuEntity) && !entity.entityTags().contains(KultivatorNpc.TAG));
 		ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
-			if (entity instanceof KultivatorNpc npc) {
+			// resident bodies have their own budget (Pemanggil.BUDGET); counting them here starved every shop and service NPC
+			if (entity instanceof KultivatorNpc npc && !npc.penduduk()) {
 				DuniaBudget.track(DuniaBudget.NPC, npc);
 			}
 		});

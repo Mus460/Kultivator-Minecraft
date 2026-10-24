@@ -3,6 +3,7 @@ package dev.kultivator.dunia.tempat.hidup;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Realm;
 import dev.kultivator.dunia.DuniaBudget;
+import dev.kultivator.dunia.DuniaSpine;
 import dev.kultivator.dunia.kota.KotaEntities;
 import dev.kultivator.dunia.kota.KotaNames;
 import dev.kultivator.dunia.kota.KultivatorNpc;
@@ -48,6 +49,8 @@ public final class HidupApi {
 	/** A body made by {@link #tubuh} leaves when no player is within this range for {@link #TUBUH_SEPI} ticks (38.N.1). */
 	public static final double TUBUH_JARAK = 56.0D;
 	public static final int TUBUH_SEPI = 600;
+	/** A workplace body ({@link #tubuhStaf}) is called from up to 128 blocks, so it stays while a player is within this. */
+	public static final double STAF_JARAK = 160.0D;
 	/** At most this many danger zones are remembered at once (oldest dropped). */
 	private static final int BAHAYA_MAKS = 32;
 	/** Watchers of a {@code tonton:<x,z>} crowd (C39.K11: at most 8 walk to the ring's edge). */
@@ -86,8 +89,28 @@ public final class HidupApi {
 	 * plate every time ({@code KotaNames.plate(look, peran)}; the Sosok follows from role and look, DESIGN 40.2.2).
 	 */
 	public static @Nullable KultivatorNpc tubuh(ServerLevel level, long situsId, NpcRole peran, BlockPos pos, float yaw, int look) {
+		return buat(level, situsId, peran, pos, yaw, look, false);
+	}
+
+	/**
+	 * A workplace's own person (shop keeper, service clerk, tea master, named quest giver at its lot): like
+	 * {@link #tubuh(ServerLevel, long, NpcRole, BlockPos, float)} but never refused by the NPC caps or the MSPT guard, so every
+	 * shop and service is staffed whenever a player is near; it leaves when no player is within {@link #STAF_JARAK}
+	 * blocks for {@link #TUBUH_SEPI} ticks. Only the world switch {@code umum.enabled} stops it.
+	 */
+	public static @Nullable KultivatorNpc tubuhStaf(ServerLevel level, long situsId, NpcRole peran, BlockPos pos, float yaw) {
+		int look = (int) (situsId ^ (situsId >>> 32)) ^ (int) pos.asLong() ^ (peran.ordinal() * 0x9E3779B9);
+		return buat(level, situsId, peran, pos, yaw, look, true);
+	}
+
+	/** {@link #tubuhStaf(ServerLevel, long, NpcRole, BlockPos, float)} with an explicit look seed (a named character). */
+	public static @Nullable KultivatorNpc tubuhStaf(ServerLevel level, long situsId, NpcRole peran, BlockPos pos, float yaw, int look) {
+		return buat(level, situsId, peran, pos, yaw, look, true);
+	}
+
+	private static @Nullable KultivatorNpc buat(ServerLevel level, long situsId, NpcRole peran, BlockPos pos, float yaw, int look, boolean staf) {
 		Vec3 at = Vec3.atBottomCenterOf(pos);
-		if (!DuniaBudget.mayAdd(level, DuniaBudget.NPC, at)) {
+		if (staf ? !DuniaSpine.enabled() : !DuniaBudget.mayAdd(level, DuniaBudget.NPC, at)) {
 			return null;
 		}
 		KultivatorNpc npc = KotaEntities.NPC.create(level, EntitySpawnReason.EVENT);
@@ -104,7 +127,7 @@ public final class HidupApi {
 		npc.setHome(BlockPos.containing(spot));
 		npc.setTown(situsId);
 		npc.setAnchorSite(situsId);
-		npc.setLonely(TUBUH_JARAK, TUBUH_SEPI);
+		npc.setLonely(staf ? STAF_JARAK : TUBUH_JARAK, TUBUH_SEPI);
 		npc.setFlag(KultivatorNpc.FLAG_GHOST, peran == NpcRole.SISA_JIWA);
 		if (peran.kelompok == NpcRole.Kelompok.PENJAGA) {
 			npc.setFightsMonsters(true);

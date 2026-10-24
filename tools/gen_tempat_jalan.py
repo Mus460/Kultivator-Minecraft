@@ -1466,7 +1466,7 @@ def dagang():
     t.titik("obrol", 21, y, 26, "north")
     t.kotak("bangunan", o0, LY, o0, o1, LY + 12, o1, nama="karavanserai")
     t.jangkar(21.5, y, 30.5, "pos/dagang", protect="32", situs="pos/dagang")
-    t.jangkar(16.5, y, 15.5, "kotabesar/layanan", layanan="dagang_wilayah", peran="PEDAGANG_KELILING")
+    t.jangkar(16.5, y, 15.5, "kotabesar/layanan", layanan="dagang_wilayah", peran="PEDAGANG_KELILING", tokoh="lao_qiao")
     t.jangkar(6.5, y, 22.5, "kotabesar/layanan", layanan="penginapan", peran="PEMILIK_PENGINAPAN")
     t.jangkar(37.5, y, 22.5, "kotabesar/layanan", layanan="papan_gilda", peran="PETUGAS_GILDA")
     t.simpan()

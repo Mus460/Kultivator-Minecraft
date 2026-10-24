@@ -5,10 +5,16 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.kultivator.dunia.DuniaAnchorEntity;
+import dev.kultivator.dunia.DuniaAnchors;
+import dev.kultivator.dunia.DuniaBudget;
 import dev.kultivator.dunia.DuniaCommands;
+import dev.kultivator.dunia.DuniaSpine;
 import dev.kultivator.dunia.api.SkyKind;
+import dev.kultivator.dunia.kota.Kota;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.dunia.tempat.kotabesar.KotaBesarAnchors;
 import dev.kultivator.sosok.GerakId;
 import dev.kultivator.sosok.PropId;
 import dev.kultivator.sosok.SosokApi;
@@ -38,6 +44,8 @@ import java.util.Map;
  *       every clip 1-107 in turn, five seconds each, the clip's name in its bubble (38.E.4);</li>
  *   <li>{@code prop <id|nama>}: the nearest NPC holds a prop for 10 s;</li>
  *   <li>{@code impostor}: active places, bodies, far crowd sizes;</li>
+ *   <li>{@code audit}: every workplace anchor (service, shop, tea house, character) loaded within 128 blocks: its role,
+ *       whether its person stands, and if not the exact reason (switch, unknown role, no player near, dead, cap...);</li>
  *   <li>{@code saksi}: who sees the caller now (bodies with a line of sight, scheduled occupants of the lot);</li>
  *   <li>{@code bahaya}: danger at the caller for 60 s;</li>
  *   <li>{@code cuaca <hujan|badai|salju|kabut|gerhana|meteor|bulan|cerah>}: the residents react for 60 s (only the
@@ -73,6 +81,7 @@ public final class HidupCommands {
 				.then(Commands.literal("prop").then(Commands.argument("prop", StringArgumentType.word())
 						.executes(ctx -> prop(ctx, StringArgumentType.getString(ctx, "prop")))))
 				.then(Commands.literal("impostor").executes(HidupCommands::impostor))
+				.then(Commands.literal("audit").executes(HidupCommands::audit))
 				.then(Commands.literal("saksi").executes(HidupCommands::saksi))
 				.then(Commands.literal("bahaya").executes(HidupCommands::bahaya))
 				.then(Commands.literal("keadaan").then(Commands.argument("keadaan", StringArgumentType.word())
@@ -302,6 +311,122 @@ public final class HidupCommands {
 	private static BlockPos depan(ServerPlayer player, double d) {
 		Vec3 look = player.getLookAngle();
 		return BlockPos.containing(player.position().add(look.x * d, 0.0D, look.z * d));
+	}
+
+	// ================================================================== audit (every workplace has its person)
+
+	private static final double AUDIT_JARAK = 128.0D;
+	private static final int AUDIT_BARIS = 48;
+
+	/** The role (or character id) a workplace anchor brings, or null for anchors that bring nobody. */
+	private static @Nullable String stafDari(DuniaAnchorEntity anchor) {
+		if ("kotabesar/layanan".equals(anchor.kind())) {
+			return anchor.data().getStringOr("peran", "?");
+		}
+		if ("kota".equals(anchor.module())) {
+			NpcRole role = Kota.peranJangkar(anchor);
+			return role == null ? null : role.name();
+		}
+		String peran = anchor.data().getStringOr("peran", "");
+		return peran.isEmpty() ? (anchor.data().getStringOr("tokoh", "").isEmpty() ? null : "") : peran;
+	}
+
+	private static @Nullable NpcRole peranAudit(String nama) {
+		try {
+			return nama.isEmpty() ? null : NpcRole.valueOf(nama);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
+	/** A non-resident body of {@code peran} (or of the anchor's character) standing within 8 blocks of the anchor. */
+	private static @Nullable KultivatorNpc tubuhSekitar(ServerLevel level, DuniaAnchorEntity anchor, @Nullable NpcRole peran) {
+		String tokoh = anchor.data().getStringOr("tokoh", "");
+		for (KultivatorNpc npc : level.getEntitiesOfClass(KultivatorNpc.class, anchor.getBoundingBox().inflate(8.0D, 4.0D, 8.0D),
+				n -> n.isAlive() && !n.penduduk())) {
+			if (peran != null && npc.role() == peran || !tokoh.isEmpty() && tokoh.equals(npc.memory().getStringOr("tokoh", ""))) {
+				return npc;
+			}
+		}
+		return null;
+	}
+
+	/** Why an anchor of another module has no body (that module spawns it; only the shared gates are known here). */
+	private static String alasanUmum(ServerLevel level, DuniaAnchorEntity anchor, String staf) {
+		int radius = DuniaAnchors.radiusOf(anchor.module());
+		if (radius < 0) {
+			return "tanpa_modul";
+		}
+		if (!DuniaSpine.enabled()) {
+			return "dunia_mati";
+		}
+		if (!staf.isEmpty() && peranAudit(staf) == null) {
+			return "peran";
+		}
+		if (DuniaAnchors.playersNear(level, anchor.position(), radius).isEmpty()) {
+			return "jauh";
+		}
+		return "menunggu";
+	}
+
+	private static int audit(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		ServerLevel level = player.level();
+		List<DuniaAnchorEntity> list = new ArrayList<>();
+		for (DuniaAnchorEntity anchor : DuniaAnchors.loaded(level, "")) {
+			if (anchor.position().distanceTo(player.position()) <= AUDIT_JARAK && stafDari(anchor) != null) {
+				list.add(anchor);
+			}
+		}
+		if (list.isEmpty()) {
+			return gagal(ctx, "kultivator.hidup.uji.audit.kosong", (int) AUDIT_JARAK);
+		}
+		list.sort(java.util.Comparator.comparingDouble(a -> a.position().distanceToSqr(player.position())));
+		int ada = 0;
+		int baris = 0;
+		for (DuniaAnchorEntity anchor : list) {
+			String staf = stafDari(anchor);
+			NpcRole peran = peranAudit(staf);
+			KultivatorNpc body;
+			String alasan;
+			int radius;
+			if ("kotabesar/layanan".equals(anchor.kind())) {
+				body = KotaBesarAnchors.tubuhDari(anchor);
+				alasan = KotaBesarAnchors.alasanKosong(level, anchor);
+				radius = DuniaAnchors.radiusOf("kotabesar");
+			} else if ("kota".equals(anchor.module())) {
+				body = Kota.orangJangkar(anchor);
+				alasan = Kota.alasanKosong(level, anchor);
+				radius = DuniaAnchors.radiusOf("kota");
+			} else {
+				body = tubuhSekitar(level, anchor, peran);
+				alasan = body == null ? alasanUmum(level, anchor, staf) : null;
+				radius = DuniaAnchors.radiusOf(anchor.module());
+			}
+			if (body != null) {
+				ada++;
+			}
+			if (baris++ >= AUDIT_BARIS) {
+				continue;
+			}
+			String layanan = anchor.data().getStringOr("layanan", anchor.data().getStringOr("tokoh", ""));
+			Component apa = Component.literal(anchor.kind() + (layanan.isEmpty() ? "" : " [" + layanan + "]"));
+			Component siapa = peran != null ? Component.translatable(peran.titleKey()) : Component.literal(staf.isEmpty() ? "-" : staf);
+			int jarak = (int) Math.round(anchor.position().distanceTo(player.position()));
+			Component line = body != null
+					? Component.translatable("kultivator.hidup.uji.audit.ada", jarak, apa, siapa, body.getDisplayName()).withStyle(ChatFormatting.GREEN)
+					: Component.translatable("kultivator.hidup.uji.audit.tidak", jarak, apa, siapa,
+							Component.translatable("kultivator.hidup.uji.audit.alasan." + (alasan == null ? "menunggu" : alasan), Math.max(0, radius)))
+							.withStyle(ChatFormatting.RED);
+			ctx.getSource().sendSuccess(() -> line, false);
+		}
+		if (list.size() > AUDIT_BARIS) {
+			ok(ctx, "kultivator.hidup.uji.audit.lagi", list.size() - AUDIT_BARIS);
+		}
+		ok(ctx, "kultivator.hidup.uji.audit.ringkas", ada, list.size(), DuniaBudget.count(DuniaBudget.NPC), DuniaBudget.cap(DuniaBudget.NPC),
+				DuniaBudget.count(Pemanggil.BUDGET), Component.translatable(DuniaBudget.overloaded(level.getServer())
+						? "kultivator.hidup.uji.audit.mspt_ya" : "kultivator.hidup.uji.audit.mspt_tidak"));
+		return list.size();
 	}
 
 	// ================================================================== impostor, witnesses, danger, weather
