@@ -12,10 +12,10 @@ public final class HidupConfig {
 
 	/** NPC life of every 38 place: residents, schedules, bodies, far crowds. */
 	public boolean aktif = true;
-	/** All resident bodies at once, world-wide (38.N.7, 24-128). */
-	public int tubuhGlobal = 64;
-	/** Resident bodies within 96 blocks of one player (6-48). */
-	public int perPemain = 24;
+	/** All resident bodies at once, world-wide (38.N.7, 24-256). */
+	public int tubuhGlobal = 160;
+	/** Resident bodies within 96 blocks of one player (6-96). */
+	public int perPemain = 56;
 	/** Far crowds (L2 impostors, 48-128 blocks) are sent to clients. */
 	public boolean impostor = true;
 	/** Far crowd entries sent to one player at most (the client further limits by its EffectQuality, 0-48). */
@@ -30,25 +30,25 @@ public final class HidupConfig {
 	public int jadwalGeser = 40;
 
 	/** Body caps per kind of place (38.N.7 "Tubuh maks"). */
-	public int tubuhKotaBesar = 28;
-	public int tubuhKota = 6;
-	public int tubuhKampung = 10;
-	public int tubuhKompleks = 12;
-	public int tubuhPos = 4;
-	public int tubuhTema = 20;
+	public int tubuhKotaBesar = 64;
+	public int tubuhKota = 16;
+	public int tubuhKampung = 18;
+	public int tubuhKompleks = 20;
+	public int tubuhPos = 6;
+	public int tubuhTema = 44;
 
 	HidupConfig clamp() {
-		tubuhGlobal = Mth.clamp(tubuhGlobal, 24, 128);
-		perPemain = Mth.clamp(perPemain, 6, 48);
+		tubuhGlobal = Mth.clamp(tubuhGlobal, 24, 256);
+		perPemain = Mth.clamp(perPemain, 6, 96);
 		impostorMaks = Mth.clamp(impostorMaks, 0, 48);
 		obrolanDetik = Mth.clamp(obrolanDetik, 10, 600);
 		jadwalGeser = Mth.clamp(jadwalGeser, 0, 90);
-		tubuhKotaBesar = Mth.clamp(tubuhKotaBesar, 12, 48);
-		tubuhKota = Mth.clamp(tubuhKota, 0, 16);
-		tubuhKampung = Mth.clamp(tubuhKampung, 0, 24);
-		tubuhKompleks = Mth.clamp(tubuhKompleks, 0, 24);
-		tubuhPos = Mth.clamp(tubuhPos, 0, 8);
-		tubuhTema = Mth.clamp(tubuhTema, 12, 36);
+		tubuhKotaBesar = Mth.clamp(tubuhKotaBesar, 12, 96);
+		tubuhKota = Mth.clamp(tubuhKota, 0, 32);
+		tubuhKampung = Mth.clamp(tubuhKampung, 0, 40);
+		tubuhKompleks = Mth.clamp(tubuhKompleks, 0, 40);
+		tubuhPos = Mth.clamp(tubuhPos, 0, 12);
+		tubuhTema = Mth.clamp(tubuhTema, 12, 72);
 		return this;
 	}
 
