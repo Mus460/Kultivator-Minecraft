@@ -114,6 +114,11 @@ public final class GerakPengendali {
 			data.setData(GerakData.KUNCI, d);
 			return null;
 		}
+		// movement (run blend, turn, start/stop, landing) for the walk profile and the shared polish
+		Langkah.perbarui(k.langkah, st, age, e.onGround(), false);
+		if (lod <= LOD_KURANG) {
+			d.langkah = k.langkah;
+		}
 
 		// who the body is
 		SosokApi.Pemegang p = SosokApi.pemegang(e);
@@ -609,7 +614,8 @@ public final class GerakPengendali {
 			return bawaan;
 		}
 		return switch (kl.id()) {
-			case GerakId.JALAN_TERGESA, GerakId.LARI_TAKUT -> ProfilJalan.TERGESA;
+			case GerakId.JALAN_TERGESA -> ProfilJalan.TERGESA;
+			case GerakId.LARI_TAKUT -> ProfilJalan.TAKUT;
 			case GerakId.JALAN_TUA -> ProfilJalan.TUA_TONGKAT;
 			case GerakId.JALAN_ANAK, GerakId.MAIN_KEJAR -> ProfilJalan.ANAK_LOMPAT;
 			case GerakId.BARIS_JAGA -> ProfilJalan.MILITER;

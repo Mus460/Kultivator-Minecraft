@@ -18,7 +18,8 @@ import java.util.Arrays;
  * Settings ({@code config/kultivator-client.json} through {@link EffectQuality#get}/{@link EffectQuality#put}, the
  * {@code AuraSettings} pattern): {@code sosok_detail} = {@code otomatis} (default: Maksimal effects give Tinggi, Normal
  * Sedang, Minimal Rendah) / {@code tinggi} / {@code sedang} / {@code rendah}; {@code sosok_wajah} = true (expressions and
- * blinking). Minimal effects always force Rendah.
+ * blinking); {@code sosok_jalan} = {@code cantik} (the player walk of {@code Langkah}) / {@code vanilla}; {@code sosok_jalan_kuat}
+ * = 100 (percent, 50-150, the walk polish of players and NPCs). Minimal effects always force Rendah.
  * <p>
  * The LOD of a body comes from its camera distance with a 2-block hysteresis per entity, so it never flickers on a
  * border. Two counted budgets need "the N nearest": the bodies with full Gerak per frame and the bodies with springs. A
@@ -113,6 +114,13 @@ public final class SosokDetail {
 	private static boolean loaded;
 	private static Setelan setelan = Setelan.OTOMATIS;
 	private static boolean wajah = true;
+	private static final String JALAN_KEY = "sosok_jalan";
+	private static final String JALAN_KUAT_KEY = "sosok_jalan_kuat";
+	private static final int KUAT_MIN = 50;
+	private static final int KUAT_MAKS = 150;
+	private static final int KUAT_LANGKAH = 25;
+	private static boolean jalanCantik = true;
+	private static int jalanKuat = 100;
 
 	/** Last LOD per entity id (byte = ordinal), for the hysteresis. */
 	private static final Int2ByteOpenHashMap TERAKHIR = new Int2ByteOpenHashMap();
@@ -189,6 +197,37 @@ public final class SosokDetail {
 		load();
 		wajah = on;
 		EffectQuality.put(WAJAH_KEY, new JsonPrimitive(on));
+	}
+
+	/** "Gaya jalan pemain": Cantik (the walk and run of {@code Langkah}) or Vanilla (plain vanilla walking for players). */
+	public static boolean jalanPemain() {
+		load();
+		return jalanCantik;
+	}
+
+	/** Cantik ↔ Vanilla. */
+	public static void putarJalan() {
+		load();
+		jalanCantik = !jalanCantik;
+		EffectQuality.put(JALAN_KEY, new JsonPrimitive(jalanCantik ? "cantik" : "vanilla"));
+	}
+
+	/** "Kekuatan gerak jalan" in percent (50-150, steps of 25), for players and NPCs alike. */
+	public static int jalanKuatPersen() {
+		load();
+		return jalanKuat;
+	}
+
+	/** The same as a multiplier (1 = as designed). */
+	public static float jalanKuat() {
+		return jalanKuatPersen() / 100.0F;
+	}
+
+	/** 50 → 75 → 100 → 125 → 150 → 50. */
+	public static void putarJalanKuat() {
+		load();
+		jalanKuat = jalanKuat >= KUAT_MAKS ? KUAT_MIN : jalanKuat + KUAT_LANGKAH;
+		EffectQuality.put(JALAN_KUAT_KEY, new JsonPrimitive(jalanKuat));
 	}
 
 	// ================================================================ level of detail
@@ -435,6 +474,15 @@ public final class SosokDetail {
 		loaded = true;
 		setelan = Setelan.byId(string(EffectQuality.get(DETAIL_KEY)));
 		wajah = bool(EffectQuality.get(WAJAH_KEY), true);
+		jalanCantik = !"vanilla".equals(string(EffectQuality.get(JALAN_KEY)));
+		int kuat = 100;
+		try {
+			JsonElement e = EffectQuality.get(JALAN_KUAT_KEY);
+			kuat = e == null || e.isJsonNull() ? 100 : e.getAsInt();
+		} catch (RuntimeException exception) {
+			kuat = 100;
+		}
+		jalanKuat = Math.max(KUAT_MIN, Math.min(KUAT_MAKS, kuat / KUAT_LANGKAH * KUAT_LANGKAH));
 	}
 
 	private static @Nullable String string(@Nullable JsonElement element) {

@@ -57,6 +57,8 @@ public final class GerakData {
 	public int profil;
 	/** True when the arms are driven by a pose this frame (no swing rescale then). */
 	public boolean lenganDipose;
+	/** The shared locomotion polish's state (PENUH and KURANG bodies), or null. */
+	public Langkah.Keadaan langkah;
 
 	// ------------------------------------------------------------------ face (40K WajahModel)
 
@@ -121,6 +123,7 @@ public final class GerakData {
 		ayunLengan = 1.0F;
 		ayunKakiKanan = 1.0F;
 		lenganDipose = false;
+		langkah = null;
 		lirikX = 0.0F;
 		lirikY = 0.0F;
 		pegasAktif = false;
