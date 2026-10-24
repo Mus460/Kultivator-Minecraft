@@ -2858,7 +2858,7 @@ dan kait perbaikan; 42U butuh lembar 42A-42F (kunci dibekukan G0); 42V hanya but
 
 ---------------------------------------------------------------------------------------------------------------------
 
-### 42.16 Keputusan terbuka (saran bawaan dicetak tebal)
+### 42.16 Keputusan (DIPUTUSKAN 2026-10-24: K9 = tidak; semua keputusan lain memakai saran bawaan yang dicetak tebal)
 
 | # | Pertanyaan | Pilihan | Saran bawaan |
 |---|---|---|---|
