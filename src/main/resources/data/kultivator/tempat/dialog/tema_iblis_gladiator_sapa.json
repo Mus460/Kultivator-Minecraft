@@ -1,0 +1,16 @@
+{
+  "pembicara": [
+    "peran:gladiator_iblis"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "iblis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "latih_jurus"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "pembicara": [
+    "peran:petani"
+  ],
+  "prioritas": 25,
+  "syarat": [
+    "oasis_di_kota",
+    "quest tema_oasis_kurma_emas baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "memanen",
+      "prop": "keranjang",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_oasis_kurma_emas",
+            "oasis_panen"
+          ],
+          "ke": "petik"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "petik",
+      "gestur": "tunjuk"
+    }
+  ]
+}

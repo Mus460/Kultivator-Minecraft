@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "tokoh:ibrahim"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest tema_pelabuhan_bintang baru",
+    "pelabuhan_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_pelabuhan_bintang"
+          ],
+          "ke": "terima"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "tunjuk"
+    }
+  ]
+}

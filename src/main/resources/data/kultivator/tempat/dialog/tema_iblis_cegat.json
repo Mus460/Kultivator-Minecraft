@@ -1,0 +1,49 @@
+{
+  "pembicara": [
+    "peran:pemburu_lurus",
+    "tokoh:han_qingshuang"
+  ],
+  "prioritas": 0,
+  "syarat": [
+    "acak 0"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "isian": [
+        "nb_pita:50"
+      ],
+      "gestur": "sikap_gagang",
+      "suara": "tema.iblis.hunter",
+      "pilihan": [
+        {
+          "akibat": [
+            "iblis_pemburu menyerah"
+          ],
+          "ke": "tobat"
+        },
+        {
+          "akibat": [
+            "iblis_pemburu lawan"
+          ],
+          "ke": "lawan"
+        },
+        {
+          "akibat": [
+            "iblis_pemburu lari",
+            "tutup"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tobat",
+      "gestur": "hormat"
+    },
+    {
+      "id": "lawan",
+      "gestur": "hunus"
+    }
+  ]
+}

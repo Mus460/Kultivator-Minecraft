@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/mandiri_jalan",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.mandiri.jalan.adv.belanja.desc"
+    },
+    "icon": {
+      "id": "kultivator:hidangan/bakpao_roh"
+    },
+    "title": {
+      "translate": "kultivator.sekte.mandiri.jalan.adv.belanja.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

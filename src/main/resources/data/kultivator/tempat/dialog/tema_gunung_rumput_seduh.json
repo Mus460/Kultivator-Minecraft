@@ -1,0 +1,29 @@
+{
+  "pembicara": [
+    "tokoh:jue_yuan"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_rumput_awan tahap ramuan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "seduh_teh",
+      "prop": "teko",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri kultivator:tema/teh_embun_gunung 4",
+            "efek minecraft:regeneration 600 1",
+            "beri_nb_pita 20",
+            "nama_baik 4",
+            "gunung_adv rumput_awan",
+            "quest_maju tema_rumput_awan"
+          ]
+        }
+      ]
+    }
+  ]
+}

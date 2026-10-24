@@ -40,6 +40,8 @@ public final class DuniaContent {
 		dev.kultivator.dunia.dimensi.Dimensi.init();
 		// T Kapal & Peta (56, 67):
 		dev.kultivator.dunia.kapal.Kapal.init();
+		// DESIGN 38 Kota Besar dan Tempat (38W spine + every 38 package, 38.T themed cities):
+		dev.kultivator.dunia.tempat.Tempat.init();
 	}
 
 	private DuniaContent() {

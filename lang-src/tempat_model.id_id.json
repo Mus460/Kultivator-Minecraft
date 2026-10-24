@@ -1,0 +1,17 @@
+{
+  "kultivator.tempat_model.perintah.festival": "Uji hiasan festival: lentera jalan, lentera langit, kembang api, armilari, kincir air, panji, tenda dan asap dupa di depanmu selama 20 detik (hanya di layarmu).",
+  "kultivator.tempat_model.perintah.senjata": "Uji rak senjata: empat rak, satu per mutu, berisi 28 senjata kota selama 30 detik (hanya di layarmu).",
+  "kultivator.tempat_model.perintah.pamer": "Pameran model: sembilan makhluk dan mekanisme tempat (Penjaga Kristal, Boneka Penjaga, Tikus Roh, pintu sangkar, lempeng glif, pintu tebing, gerobak, rakit, papan kabar) bergerak di depanmu selama 30 detik (hanya di layarmu).",
+  "kultivator.tempat_model.perintah.prop": "Dinding prop halaman %s: %s prop tangan berputar di atas nama dan nomornya selama 30 detik (hanya di layarmu).",
+  "kultivator.tempat_model.perintah.hapus": "Uji hiasan, rak senjata dan pameran model diakhiri.",
+  "kultivator.tempat_model.perintah.info": "Hiasan terpasang: %s, rak senjata: %s, tempat pamer: %s, quad bingkai terakhir: %s.",
+  "kultivator.tempat_model.pamer.kristal": "Penjaga Kristal",
+  "kultivator.tempat_model.pamer.boneka": "Boneka Penjaga Makam",
+  "kultivator.tempat_model.pamer.tikus": "Tikus Roh Dapur",
+  "kultivator.tempat_model.pamer.sangkar": "Pintu Sangkar Tawanan",
+  "kultivator.tempat_model.pamer.glif": "Lempeng Glif Lima Unsur",
+  "kultivator.tempat_model.pamer.pintu": "Pintu Tebing Palsu",
+  "kultivator.tempat_model.pamer.gerobak": "Gerobak Kafilah",
+  "kultivator.tempat_model.pamer.rakit": "Rakit Penyeberangan",
+  "kultivator.tempat_model.pamer.papan": "Papan Kabar Hidup"
+}

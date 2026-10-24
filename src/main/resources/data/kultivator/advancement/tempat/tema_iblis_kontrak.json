@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_iblis",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_iblis_kontrak.description"
+    },
+    "icon": {
+      "id": "minecraft:paper"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_iblis_kontrak.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

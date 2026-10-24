@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380416,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_oasis",
+    "distrik": "bazar_timur"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/oasis/bazar_timur",
+      "weight": 1
+    }
+  ]
+}

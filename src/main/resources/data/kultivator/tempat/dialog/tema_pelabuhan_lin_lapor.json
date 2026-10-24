@@ -1,0 +1,33 @@
+{
+  "pembicara": [
+    "tokoh:lin_haichao"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest tema_pelabuhan_pelita tahap lapor"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {
+          "akibat": [
+            "nama_baik 3",
+            "bendera pelabuhan_lapor",
+            "kabar tema_pelabuhan_minyak pemain",
+            "kabar tema_pelabuhan_minyak_2 pemain",
+            "quest_maju tema_pelabuhan_pelita"
+          ],
+          "ke": "tindak"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tindak",
+      "gestur": "tunjuk"
+    }
+  ]
+}

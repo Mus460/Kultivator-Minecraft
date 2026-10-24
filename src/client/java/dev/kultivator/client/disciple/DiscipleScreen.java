@@ -61,9 +61,24 @@ public class DiscipleScreen extends Screen {
 	private record ExtraTab(int glyph, java.util.function.Function<DiscipleScreen, DiscipleTab> factory) {
 	}
 
-	/** At most two extra tabs (Sekte yang Hidup's Hati of module P and Hubungan of module R), so nine tablets still fit. */
-	private static final int MAX_EXTRA_TABS = 2;
+	/**
+	 * At most three extra tabs (Sekte yang Hidup's Hati of module P, Hubungan of module R, Jalan Hidup of DESIGN 39E), so
+	 * ten tablets still fit beside the scroll down to a 240 px high window.
+	 */
+	private static final int MAX_EXTRA_TABS = 3;
 	private static final List<ExtraTab> EXTRA_TABS = new ArrayList<>();
+	/** The glyph of the extra tab the next scroll opens on (-1 = the usual first tab), see {@link #bukaTab}. */
+	private static int pendingGlyph = -1;
+	private static long pendingSince;
+
+	/**
+	 * Asks the next disciple scroll opened within 3 s to start on the extra tab with {@code glyph} (the "Jalan Hidup
+	 * Murid" board opens a disciple on its Jalan Hidup tab). Client thread only.
+	 */
+	public static void bukaTab(int glyph) {
+		pendingGlyph = glyph;
+		pendingSince = Util.getMillis();
+	}
 
 	/**
 	 * Adds a tab after the built-in ones (from a client init; registration order = tablet order). The tab reads the
@@ -206,6 +221,18 @@ public class DiscipleScreen extends Screen {
 		}
 		for (DiscipleTab each : tabs) {
 			each.layout(contentX, contentY, contentW, contentH);
+		}
+		if (pendingGlyph >= 0) {
+			int glyph = pendingGlyph;
+			pendingGlyph = -1;
+			if (Util.getMillis() - pendingSince <= 3000L) {
+				for (int i = ICONS.length; i < tabs.length; i++) {
+					if (iconOf(i) == glyph) {
+						tab = i;
+						break;
+					}
+				}
+			}
 		}
 	}
 

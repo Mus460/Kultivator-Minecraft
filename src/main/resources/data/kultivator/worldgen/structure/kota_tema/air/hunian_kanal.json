@@ -1,0 +1,76 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#minecraft:is_overworld",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_air",
+  "distrik": "hunian_kanal",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/hunian_kanal/rumah_barat_laut",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/hunian_kanal/rumah_barat_daya",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/hunian_kanal/rumah_timur_laut",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/hunian_kanal/rumah_tenggara",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 48,
+      "pool": "kultivator:kota_tema/air/tembok/hunian_kanal_selatan0",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 48,
+      "pool": "kultivator:kota_tema/air/tembok/hunian_kanal_selatan1",
+      "putar": 0
+    },
+    {
+      "dx": -56,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/tembok/hunian_kanal_barat0",
+      "putar": 0
+    },
+    {
+      "dx": -56,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/tembok/hunian_kanal_barat1",
+      "putar": 0
+    },
+    {
+      "dx": -56,
+      "dz": 48,
+      "pool": "kultivator:kota_tema/air/tembok/hunian_kanal_sudut",
+      "putar": 0
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "minecraft:cherry_grove",
+      "akhiran": "sakura"
+    }
+  ]
+}

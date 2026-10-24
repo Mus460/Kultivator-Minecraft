@@ -1,0 +1,109 @@
+{
+  "pemberi": "tokoh:bao_qing",
+  "tempat": "yamen",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "panggil",
+      "batas_hari": 6,
+      "gagal_ke": "diam"
+    },
+    {
+      "id": "qian",
+      "batas_hari": 6,
+      "gagal_ke": "diam"
+    },
+    {
+      "id": "kuil",
+      "batas_hari": 6,
+      "gagal_ke": "diam"
+    },
+    {
+      "id": "cermin",
+      "tujuan": [
+        "pergi gua/cermin_hati"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "diam",
+      "arah": "gua/cermin_hati"
+    },
+    {
+      "id": "surat",
+      "tujuan": [
+        "bicara tokoh:jing_xin"
+      ],
+      "akibat": [
+        "beri cerita:surat_mata_mata",
+        "alur 5 bukti"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "diam"
+    },
+    {
+      "id": "pilih",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera takhta5_c"
+          ],
+          "ke": "suap"
+        },
+        {
+          "syarat": [
+            "bendera takhta5_b"
+          ],
+          "ke": "duel"
+        }
+      ],
+      "ke": "sidang",
+      "batas_hari": 6,
+      "gagal_ke": "diam"
+    },
+    {
+      "id": "sidang",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "alur 5 a",
+        "nama_baik 10",
+        "adegan sidang",
+        "kabar takhta_sidang pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "duel",
+      "tujuan": [
+        "duel tokoh:mo_ying"
+      ],
+      "akibat": [
+        "alur 5 b",
+        "beri cerita:cincin_mo_ying",
+        "adegan topeng",
+        "kabar takhta_topeng"
+      ],
+      "ke": "selesai",
+      "batas_hari": 6,
+      "gagal_ke": "diam"
+    },
+    {
+      "id": "suap",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "alur 5 c",
+        "kabar takhta_suap"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "diam",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}

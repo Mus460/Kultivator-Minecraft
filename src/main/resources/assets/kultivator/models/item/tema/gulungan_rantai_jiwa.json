@@ -1,0 +1,6 @@
+{
+ "parent": "minecraft:item/generated",
+ "textures": {
+  "layer0": "kultivator:item/tema/gulungan_rantai_jiwa"
+ }
+}

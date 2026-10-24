@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_oasis",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_oasis_kalajengking.description"
+    },
+    "icon": {
+      "id": "kultivator:tema/ekor_racun_kalajengking"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_oasis_kalajengking.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

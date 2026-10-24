@@ -277,7 +277,7 @@ public final class SkyEvents {
 	private static void eclipseSpoils(ServerLevel level, ServerPlayer slayer, LivingEntity killed) {
 		LangitFeats.eclipseSlain(slayer);
 		Net.send(slayer, LangitFxPayload.at(LangitFxPayload.KIND_GUARD_FALL, killed.getX(), killed.getY(), killed.getZ(), 0));
-		if (level.getRandom().nextDouble() >= LangitItems.ECLIPSE_DROP) {
+		if (level.getRandom().nextDouble() >= LangitItems.eclipseDrop(slayer)) {
 			return;
 		}
 		ItemEntity crystal = new ItemEntity(level, killed.getX(), killed.getY() + 0.5D, killed.getZ(), new ItemStack(LangitItems.KRISTAL_GERHANA));

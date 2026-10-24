@@ -1,0 +1,54 @@
+{
+  "pembicara": [
+    "peran:juara_sekte"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 65"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "ke": "gigi"
+        },
+        {
+          "syarat": [
+            "pita 1"
+          ],
+          "ke": "tanding"
+        },
+        {
+          "ke": "arena"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "gigi",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "tanding",
+      "gestur": "hunus",
+      "pilihan": [
+        {
+          "akibat": [
+            "mulai_duel agresif"
+          ]
+        },
+        {}
+      ]
+    },
+    {
+      "id": "arena",
+      "gestur": "sorak_arena",
+      "akibat": [
+        "lore kota_besar.arena"
+      ]
+    }
+  ]
+}

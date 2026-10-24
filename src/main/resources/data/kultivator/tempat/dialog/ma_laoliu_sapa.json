@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "tokoh:ma_laoliu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lempar_pakan",
+      "suara": "kotabesar.beast_market",
+      "pilihan": [
+        {
+          "ke": "asal"
+        },
+        {
+          "ke": "setia"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "asal",
+      "gestur": "marah_tunjuk"
+    },
+    {
+      "id": "setia",
+      "gestur": "lempar_pakan"
+    }
+  ]
+}

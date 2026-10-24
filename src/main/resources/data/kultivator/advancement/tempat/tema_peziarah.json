@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_ziarah",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_peziarah.description"
+    },
+    "icon": {
+      "id": "minecraft:gold_block"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_peziarah.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

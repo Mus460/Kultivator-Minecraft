@@ -1,0 +1,26 @@
+{
+  "pembicara": [
+    "tokoh:mo_hua"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest tema_oasis_mural_pesanan baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lukis_dinding",
+      "prop": "palet",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_oasis_mural_pesanan",
+            "oasis_mural_buka"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

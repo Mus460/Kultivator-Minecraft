@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380443,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_iblis",
+    "distrik": "penjara_tawanan"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/iblis/penjara_tawanan",
+      "weight": 1
+    }
+  ]
+}

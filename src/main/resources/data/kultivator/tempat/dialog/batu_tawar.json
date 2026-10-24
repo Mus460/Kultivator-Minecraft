@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:lao_shi"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest batu_bermata_darah baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "asah_pisau",
+      "prop": "batu_mentah",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai batu_bermata_darah"
+          ],
+          "ke": "bawa"
+        },
+        {
+          "ke": "buang"
+        }
+      ]
+    },
+    {
+      "id": "buang",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai batu_bermata_darah"
+          ],
+          "ke": "bawa"
+        }
+      ]
+    },
+    {
+      "id": "bawa",
+      "gestur": "bisik"
+    }
+  ]
+}

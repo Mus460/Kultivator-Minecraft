@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380446,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_iblis",
+    "distrik": "sarang_kontrak"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/iblis/sarang_kontrak",
+      "weight": 1
+    }
+  ]
+}

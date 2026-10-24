@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/mandiri_jalan",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.mandiri.seteru.adv.kekasih.desc"
+    },
+    "icon": {
+      "id": "minecraft:red_dye"
+    },
+    "title": {
+      "translate": "kultivator.sekte.mandiri.seteru.adv.kekasih.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

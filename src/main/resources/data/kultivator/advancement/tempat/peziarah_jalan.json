@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tonggak_tiga",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.peziarah_jalan.description"
+    },
+    "icon": {
+      "id": "minecraft:chiseled_stone_bricks"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.peziarah_jalan.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

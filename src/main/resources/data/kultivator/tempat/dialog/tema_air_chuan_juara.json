@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "tokoh:bibi_chuan"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest tema_air_perahu_naga selesai"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tepuk_tangan"
+    }
+  ]
+}

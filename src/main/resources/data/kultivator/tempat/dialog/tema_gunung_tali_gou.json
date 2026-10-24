@@ -1,0 +1,74 @@
+{
+  "pembicara": [
+    "tokoh:gou_tie"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_gunung_tali tahap bela",
+    "bendera gunung_gou_menyerah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berlutut",
+      "pilihan": [
+        {
+          "ke": "tobat"
+        },
+        {
+          "ke": "usir"
+        },
+        {
+          "ke": "suap"
+        }
+      ]
+    },
+    {
+      "id": "tobat",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "akibat": [
+            "gunung_gou tobat",
+            "nama_baik 5",
+            "gunung_adv tobat_gou",
+            "kabar tema_gunung_gou_tobat",
+            "kabar tema_gunung_gou_tobat_2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "usir",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "akibat": [
+            "gunung_gou usir",
+            "nama_baik 5",
+            "kabar tema_gunung_gou_usir",
+            "kabar tema_gunung_gou_usir_2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "suap",
+      "gestur": "hitung_koin_gelap",
+      "prop": "kantong_uang",
+      "pilihan": [
+        {
+          "akibat": [
+            "gunung_gou suap",
+            "kabar tema_gunung_gou_suap",
+            "kabar tema_gunung_gou_suap_2"
+          ]
+        },
+        {
+          "ke": "mulai"
+        }
+      ]
+    }
+  ]
+}

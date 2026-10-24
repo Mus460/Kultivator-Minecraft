@@ -1,0 +1,23 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_tema/reruntuhan_gurun/menara_roboh",
+        "processors": "kultivator:kota_tema/reruntuhan_gurun/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 3
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_tema/reruntuhan_gurun/menara_roboh_b",
+        "processors": "kultivator:kota_tema/reruntuhan_gurun/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

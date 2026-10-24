@@ -1,0 +1,18 @@
+{
+  "pembicara": [
+    "tokoh:tie_suo"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest tema_gunung_tali tahap bela",
+    "!bendera gunung_gou_menyerah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "perbaiki_palu",
+      "prop": "palu"
+    }
+  ]
+}

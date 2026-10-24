@@ -1,0 +1,20 @@
+{
+  "pembicara": [
+    "tokoh:jing_xin"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest takhta_topeng_terlepas tahap pilih",
+    "!bendera takhta5_surat_dibaca"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "akibat": [
+        "bendera takhta5_surat_dibaca"
+      ]
+    }
+  ]
+}

@@ -7,8 +7,12 @@ import dev.kultivator.client.disciple.DiscipleLook;
 import dev.kultivator.client.disciple.DiscipleRenderState;
 import dev.kultivator.client.disciple.DiscipleRobeLayer;
 import dev.kultivator.client.render.MeditationPose;
+import dev.kultivator.client.sosok.SosokJembatan;
+import dev.kultivator.client.sosok.SosokRender;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.purba.HeavenEnvoyEntity;
+import dev.kultivator.sosok.Gaya;
+import dev.kultivator.sosok.Sosok;
 import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -34,6 +38,10 @@ import org.jetbrains.annotations.Nullable;
  * on the player model, one of the default skins, the disciple robe in white-gold cloth (dropped beyond 32 blocks, 16 on
  * Minimal) and anything in its hands, slightly translucent. The halo ring is drawn by {@code PurbaFx}. The name plate is its
  * title (never a custom name), within 16 blocks.
+ * <p>
+ * DESIGN 40.4.1 D (module 40R): the envoy is a Sosok body made on the client ({@code utusan_langit}: a man in the
+ * white-gold immortal robe under duty armour, gold guan), still slightly see-through; the halo stays PurbaFx's. Gerak
+ * gives it the military stance and walk; a cast pose (27) now shows on it like on the rogues.
  */
 public class EnvoyRenderer extends LivingEntityRenderer<HeavenEnvoyEntity, DiscipleRenderState, PlayerModel> {
 
@@ -43,15 +51,23 @@ public class EnvoyRenderer extends LivingEntityRenderer<HeavenEnvoyEntity, Disci
 	private static final double ROBE_DISTANCE_SQ = 32.0D * 32.0D;
 	private static final int ENVOY_ROBE = 0xF4EED8;
 	private static final int PANGLIMA_ROBE = 0xE8C66A;
+	private static final String RUPA = "utusan_langit";
 
+	/** The Sosok body (128 × 128 atlas mesh). */
+	private final PlayerModel sosokWide;
+	private final PlayerModel sosokSlim;
+	/** The old player-skin body (last fallback). */
 	private final PlayerModel wideModel;
 	private final PlayerModel slimModel;
 
 	public EnvoyRenderer(EntityRendererProvider.Context context) {
-		super(context, new PlayerModel(context.bakeLayer(ModelLayers.PLAYER), false), 0.5F);
-		this.wideModel = this.model;
+		super(context, new PlayerModel(SosokJembatan.tubuh(context, false), false), 0.5F);
+		this.sosokWide = this.model;
+		this.sosokSlim = new PlayerModel(SosokJembatan.tubuh(context, true), true);
+		this.wideModel = new PlayerModel(context.bakeLayer(ModelLayers.PLAYER), false);
 		this.slimModel = new PlayerModel(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
-		this.addLayer(new CulledRobe(this, new DiscipleRobeLayer(this, context)));
+		this.addLayer(new SosokRender.TanpaSosok(this, new CulledRobe(this, new DiscipleRobeLayer(this, context))));
+		SosokRender.pasangLapisan(this::addLayer, this, context);
 		this.addLayer(new DiscipleHeldItemLayer(this));
 	}
 
@@ -90,6 +106,13 @@ public class EnvoyRenderer extends LivingEntityRenderer<HeavenEnvoyEntity, Disci
 		state.seated = 0.0F;
 		state.natalItem.clear();
 		((FabricRenderState) state).setData(MeditationPose.STRENGTH, 0.0F);
+		// DESIGN 40: the client-made Sosok of the envoy (a man, its own face per entity), then the cast/duel poses and Gerak
+		Sosok sosok = SosokRender.dariLama(entity, RUPA, entity.skin(), -1);
+		SosokRender.ekstrak(entity, state, partialTicks, new SosokRender.RupaMasukan(RUPA, state.realm, -1, 0, 0, null, 0, 0, true),
+				sosok, Gaya.NETRAL, true, sosok.skala());
+		dev.kultivator.client.anim.PoseRenderData.extract(entity, state, partialTicks);
+		SosokRender.selesai(entity, state, partialTicks);
+		SosokRender.labelLod(entity, state, partialTicks);
 	}
 
 	@Override
@@ -112,8 +135,17 @@ public class EnvoyRenderer extends LivingEntityRenderer<HeavenEnvoyEntity, Disci
 
 	@Override
 	protected void scale(DiscipleRenderState state, PoseStack poseStack) {
-		float scale = state.stage >= 3 ? PANGLIMA_SCALE : PLAYER_SCALE;
+		float scale = (state.stage >= 3 ? PANGLIMA_SCALE : PLAYER_SCALE) * SosokRender.skalaGambar(state);
 		poseStack.scale(scale, scale, scale);
+	}
+
+	@Override
+	protected void setupRotations(DiscipleRenderState state, PoseStack poseStack, float bodyRot, float entityScale) {
+		dev.kultivator.client.anim.PoseApplier.lift(state, poseStack);
+		SosokRender.angkat(state, poseStack);
+		super.setupRotations(state, poseStack, bodyRot, entityScale);
+		SosokRender.baring(state, poseStack);
+		dev.kultivator.client.anim.PoseApplier.tilt(state, poseStack);
 	}
 
 	@Override
@@ -128,7 +160,11 @@ public class EnvoyRenderer extends LivingEntityRenderer<HeavenEnvoyEntity, Disci
 
 	@Override
 	public void submit(DiscipleRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-		this.model = state.slim ? slimModel : wideModel;
+		if (SosokRender.aktif(state)) {
+			this.model = state.slim ? sosokSlim : sosokWide;
+		} else {
+			this.model = state.slim ? slimModel : wideModel;
+		}
 		super.submit(state, poseStack, collector, camera);
 	}
 

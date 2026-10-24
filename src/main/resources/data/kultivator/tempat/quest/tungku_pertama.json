@@ -1,0 +1,15 @@
+{
+  "pemberi": "tokoh:dan_chen",
+  "tempat": "gilda_alkemis",
+  "tahap": [
+    {
+      "id": "racik",
+      "tujuan": [
+        "racik *"
+      ]
+    },
+    {
+      "id": "nilai"
+    }
+  ]
+}

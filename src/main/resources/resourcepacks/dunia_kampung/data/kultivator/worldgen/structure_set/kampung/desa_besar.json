@@ -1,0 +1,62 @@
+{
+  "placement": {
+    "type": "kultivator:cincin_tempat",
+    "salt": 380103,
+    "spacing": 64,
+    "separation": 24,
+    "min_chunks": 16,
+    "jarak_tempat": 8,
+    "cincin": [
+      {
+        "sampai_chunk": 62,
+        "frekuensi": 0.17
+      },
+      {
+        "sampai_chunk": 187,
+        "frekuensi": 0.25
+      },
+      {
+        "sampai_chunk": 500,
+        "frekuensi": 0.25
+      },
+      {
+        "sampai_chunk": 100000,
+        "frekuensi": 0.2
+      }
+    ],
+    "exclusion_zone": {
+      "other_set": "minecraft:villages",
+      "chunk_count": 6
+    }
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kampung/desa_besar_sedang",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/desa_besar_salju",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/desa_besar_sabana",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/desa_besar_sakura",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/desa_besar_gurun",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/desa_besar_rawa",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/desa_besar_terasering",
+      "weight": 1
+    }
+  ]
+}

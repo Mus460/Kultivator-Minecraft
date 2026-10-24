@@ -1,0 +1,109 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:spirit_grass",
+          "weight": 20,
+          "modifier": [
+            {
+              "type": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 3
+              }
+            },
+            {
+              "type": "minecraft:set_components",
+              "components": {
+                "kultivator:herb_age": 60
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:purple_flame_flower",
+          "weight": 8,
+          "modifier": {
+            "type": "minecraft:set_components",
+            "components": {
+              "kultivator:herb_age": 80
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:qi_gathering_pill",
+          "weight": 15,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 2
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:teh_embun_pagi",
+          "weight": 15,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 2
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:jade_slip",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:spirit_stone_low",
+          "weight": 20,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 6
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "weight": 10,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 4
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:heart_calming_pill",
+          "weight": 6
+        }
+      ]
+    }
+  ],
+  "random_sequence": "kultivator:chests/tempat/gua/pertapa_bilik"
+}

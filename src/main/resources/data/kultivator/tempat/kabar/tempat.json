@@ -1,0 +1,28 @@
+{
+  "templat": [
+    {
+      "id": "tempat_rusak_1",
+      "pemicu": "tempat_rusak",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "tempat_rusak_2",
+      "pemicu": "tempat_rusak",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "kejahatan_1",
+      "pemicu": "kejahatan",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "kejahatan_2",
+      "pemicu": "kejahatan",
+      "bobot": 10,
+      "umur_hari": 5
+    }
+  ]
+}

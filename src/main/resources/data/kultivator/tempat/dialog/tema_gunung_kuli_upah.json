@@ -1,0 +1,28 @@
+{
+  "pembicara": [
+    "tokoh:lao_dan"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_kuli_sehari tahap upah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tertawa",
+      "prop": "tongkat",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri_nb 30",
+            "beri kultivator:tema/tongkat_kuli",
+            "gunung_hadiah bekal_kuli",
+            "gunung_adv kuli_sehari",
+            "quest_maju tema_kuli_sehari"
+          ]
+        }
+      ]
+    }
+  ]
+}

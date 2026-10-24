@@ -1,0 +1,27 @@
+{
+  "pembicara": [
+    "peran:patriark_klan"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "bendera klan_hormat"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "suara": "tempat.clan_patriarch",
+      "pilihan": [
+        {
+          "ke": "aula"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "aula",
+      "gestur": "cerita"
+    }
+  ]
+}

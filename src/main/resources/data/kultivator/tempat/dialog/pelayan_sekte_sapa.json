@@ -1,0 +1,46 @@
+{
+  "pembicara": [
+    "peran:pelayan_sekte"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 60"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tuang_teh",
+      "prop": "teko",
+      "pilihan": [
+        {
+          "ke": "lama"
+        },
+        {
+          "ke": "kabar"
+        },
+        {
+          "ke": "pendiri"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lama",
+      "gestur": "seduh_teh",
+      "prop": "cangkir"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    },
+    {
+      "id": "pendiri",
+      "gestur": "tertawa",
+      "akibat": [
+        "lore kompleks"
+      ]
+    }
+  ]
+}

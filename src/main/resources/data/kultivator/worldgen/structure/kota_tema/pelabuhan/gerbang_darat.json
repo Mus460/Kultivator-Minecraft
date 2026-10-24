@@ -1,0 +1,73 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_tema/pelabuhan",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_pelabuhan",
+  "distrik": "gerbang_darat",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/pelabuhan/gerbang_darat/penginapan_angin_selatan",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/pelabuhan/gerbang_darat/alun_gerbang",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/pelabuhan/gerbang_darat/rumah_makan_sup_ikan",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/pelabuhan/gerbang_darat/halaman_kafilah",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 46,
+      "pool": "kultivator:kota_tema/pelabuhan/tembok/setengah",
+      "putar": 2
+    },
+    {
+      "dx": -24,
+      "dz": 46,
+      "pool": "kultivator:kota_tema/pelabuhan/tembok/gerbang_darat",
+      "putar": 2
+    },
+    {
+      "dx": 24,
+      "dz": 46,
+      "pool": "kultivator:kota_tema/pelabuhan/tembok/setengah",
+      "putar": 2
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": [
+        "minecraft:cold_ocean",
+        "minecraft:deep_cold_ocean",
+        "minecraft:snowy_beach",
+        "minecraft:taiga",
+        "minecraft:snowy_taiga",
+        "minecraft:snowy_plains",
+        "minecraft:old_growth_pine_taiga",
+        "minecraft:old_growth_spruce_taiga"
+      ],
+      "akhiran": "utara"
+    }
+  ]
+}

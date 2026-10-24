@@ -1,0 +1,60 @@
+{
+  "pembicara": [
+    "peran:makelar_gelap",
+    "tokoh:lao_shi"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_pewaris_sakit tahap pasar"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hitung_koin_gelap",
+      "prop": "kantong_uang",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 80"
+          ],
+          "akibat": [
+            "bayar_pita 80",
+            "beri cerita:pil_penawar_racun_darah",
+            "nama_baik -3",
+            "quest_maju takhta_pewaris_sakit"
+          ],
+          "ke": "beli",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta3_pasar.mulai.1.alasan"
+        },
+        {
+          "ke": "siapa"
+        }
+      ]
+    },
+    {
+      "id": "siapa",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 80"
+          ],
+          "akibat": [
+            "bayar_pita 80",
+            "beri cerita:pil_penawar_racun_darah",
+            "nama_baik -3",
+            "quest_maju takhta_pewaris_sakit"
+          ],
+          "ke": "beli"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "beli",
+      "gestur": "tertawa"
+    }
+  ]
+}

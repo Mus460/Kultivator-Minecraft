@@ -177,7 +177,7 @@
   "kultivator.sekte_langit.layar.pemandangan.tip": "Set up the sea of clouds, the mist falls, the cranes, the lanterns and the sky sounds.",
   "kultivator.sekte_langit.uji.ok": "Done.",
   "kultivator.sekte_langit.uji.pratinjau": "Sky preview A%s at height %s opened (hologram in the air).",
-  "kultivator.sekte_langit.uji.pamer": "Sky showcase A%s at height %s opened; confirm it like a normal showcase.",
+  "kultivator.sekte_langit.uji.pamer": "Sky showcase A%s at height %s opened; confirm with /kultivasi uji sekte pamer konfirmasi (cancel: /kultivasi aula bangun batal).",
   "kultivator.sekte_langit.uji.ditolak": "Refused (A%s, height %s); see the build engine's message.",
   "kultivator.sekte_langit.uji.audit": "Cloud audit %s: %s ops, %s violations.",
   "kultivator.sekte_langit.uji.reset": "%s sky showcases removed through the undo log. (Your own hall's site: uji sekte reset.)",

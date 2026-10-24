@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380420,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_oasis",
+    "distrik": "lapangan_kafilah"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/oasis/lapangan_kafilah",
+      "weight": 1
+    }
+  ]
+}

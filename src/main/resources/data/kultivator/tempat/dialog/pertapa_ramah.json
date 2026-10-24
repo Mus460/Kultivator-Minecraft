@@ -1,0 +1,54 @@
+{
+  "pembicara": [
+    "peran:pertapa"
+  ],
+  "prioritas": -1,
+  "syarat": [
+    "watak ramah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tuang_teh",
+      "suara": "tempat.hermit",
+      "pilihan": [
+        {
+          "ke": "topik"
+        },
+        {
+          "ke": "lore"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "topik",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "lore"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lore",
+      "gestur": "cerita",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

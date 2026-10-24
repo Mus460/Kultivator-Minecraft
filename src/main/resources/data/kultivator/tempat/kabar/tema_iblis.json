@@ -1,0 +1,458 @@
+{
+  "templat": [
+    {
+      "id": "tema_iblis_warga_hilang",
+      "pemicu": "tema_iblis_warga_hilang",
+      "bobot": 12,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "tema_iblis_tawanan_pulang",
+      "pemicu": "tema_iblis_tawanan_pulang",
+      "bobot": 12,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "tema_iblis_afu_kabur",
+      "pemicu": "tema_iblis_afu_kabur",
+      "bobot": 8,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_minyak_sabotase",
+      "pemicu": "tema_iblis_minyak_sabotase",
+      "bobot": 12,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_xue_kalah",
+      "pemicu": "tema_iblis_xue_kalah",
+      "bobot": 14,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga",
+        "penegak_iblis"
+      ]
+    },
+    {
+      "id": "tema_iblis_akhir_lurus",
+      "pemicu": "tema_iblis_akhir_lurus",
+      "bobot": 14,
+      "umur_hari": 12,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_akhir_penebusan",
+      "pemicu": "tema_iblis_akhir_penebusan",
+      "bobot": 14,
+      "umur_hari": 12,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_akhir_darah",
+      "pemicu": "tema_iblis_akhir_darah",
+      "bobot": 14,
+      "umur_hari": 12,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_lao_pensiun",
+      "pemicu": "tema_iblis_lao_pensiun",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_lao_terhormat",
+      "pemicu": "tema_iblis_lao_terhormat",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_anak_bantu",
+      "pemicu": "tema_iblis_anak_bantu",
+      "bobot": 6,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga_iblis",
+        "pengemis"
+      ]
+    },
+    {
+      "id": "tema_iblis_anak_lapor",
+      "pemicu": "tema_iblis_anak_lapor",
+      "bobot": 6,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga_iblis",
+        "penegak_iblis"
+      ]
+    },
+    {
+      "id": "tema_iblis_buronan_tewas",
+      "pemicu": "tema_iblis_buronan_tewas",
+      "bobot": 12,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemburu_lurus"
+      ]
+    },
+    {
+      "id": "tema_iblis_kitab",
+      "pemicu": "tema_iblis_kitab",
+      "bobot": 12,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_serbu_mulai",
+      "pemicu": "tema_iblis_serbu_mulai",
+      "bobot": 10,
+      "umur_hari": 2,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga",
+        "penegak_iblis"
+      ]
+    },
+    {
+      "id": "tema_iblis_serbu_lurus",
+      "pemicu": "tema_iblis_serbu_lurus",
+      "bobot": 12,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_serbu_kota",
+      "pemicu": "tema_iblis_serbu_kota",
+      "bobot": 12,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_pesta",
+      "pemicu": "tema_iblis_pesta",
+      "bobot": 12,
+      "umur_hari": 2,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_turnamen",
+      "pemicu": "tema_iblis_turnamen",
+      "bobot": 12,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga",
+        "gladiator_iblis"
+      ]
+    },
+    {
+      "id": "tema_iblis_ye_hilang",
+      "pemicu": "tema_iblis_ye_hilang",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_padam",
+      "pemicu": "tema_iblis_padam",
+      "bobot": 8,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_lelang_mulai",
+      "pemicu": "acara_tema_lelang_gelap",
+      "bobot": 10,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_laga_malam",
+      "pemicu": "acara_tema_malam_pertandingan",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "warga_iblis",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    },
+    {
+      "id": "tema_iblis_serbu_acara",
+      "pemicu": "acara_tema_penyerbuan",
+      "bobot": 8,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_pesta_acara",
+      "pemicu": "acara_tema_pesta_darah",
+      "bobot": 8,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_iblis_topeng_selesai",
+      "pemicu": "quest_tema_iblis_topeng",
+      "bobot": 8,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "makelar_gelap",
+        "warga_iblis",
+        "pembunuh_bayaran"
+      ]
+    },
+    {
+      "id": "tema_iblis_rantai_selesai",
+      "pemicu": "quest_tema_iblis_rantai",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "tema_iblis_umum_0",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "penegak_iblis",
+        "pembunuh_bayaran",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    },
+    {
+      "id": "tema_iblis_umum_1",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "penegak_iblis",
+        "pembunuh_bayaran",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    },
+    {
+      "id": "tema_iblis_umum_2",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "penegak_iblis",
+        "pembunuh_bayaran",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    },
+    {
+      "id": "tema_iblis_umum_3",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "penegak_iblis",
+        "pembunuh_bayaran",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    },
+    {
+      "id": "tema_iblis_umum_4",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "penegak_iblis",
+        "pembunuh_bayaran",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    },
+    {
+      "id": "tema_iblis_umum_5",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "penegak_iblis",
+        "pembunuh_bayaran",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    },
+    {
+      "id": "tema_iblis_umum_6",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "penegak_iblis",
+        "pembunuh_bayaran",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    },
+    {
+      "id": "tema_iblis_umum_7",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "penegak_iblis",
+        "pembunuh_bayaran",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    },
+    {
+      "id": "tema_iblis_umum_8",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "penegak_iblis",
+        "pembunuh_bayaran",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    },
+    {
+      "id": "tema_iblis_umum_9",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "warga_iblis",
+        "makelar_gelap",
+        "penegak_iblis",
+        "pembunuh_bayaran",
+        "gladiator_iblis",
+        "jagal_arena"
+      ]
+    }
+  ]
+}

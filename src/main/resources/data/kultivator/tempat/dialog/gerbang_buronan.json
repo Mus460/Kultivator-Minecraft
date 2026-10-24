@@ -1,0 +1,21 @@
+{
+  "pembicara": [
+    "peran:penjaga_gerbang"
+  ],
+  "prioritas": 25,
+  "syarat": [
+    "buronan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kaget",
+      "suara": "kotabesar.wanted",
+      "pilihan": [
+        {},
+        {}
+      ]
+    }
+  ]
+}

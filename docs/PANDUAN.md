@@ -124,6 +124,13 @@ bulat di dalam game.
     kekuatan, dunia, sekte
 68. [**Sekte Langit**](#68-sekte-langit): templat Awan A1-A9, Upacara Naik, akses dan Feri Awan, perlindungan jatuh,
     peristiwa langit, sekte langit NPC, [perintah](#689-perintah)
+69. [**Kota Besar dan Tempat-Tempat Dunia**](#69-kota-besar-dan-tempat-tempat-dunia): ibu kota, jam malam dan hukum,
+    layanan dan acara, kampung, kompleks sekte, gua dan situs, jalan, kehidupan NPC, perbaikan, lingkar uang
+70. [**Lima Kota Bertema**](#70-lima-kota-bertema): pelabuhan, oasis gurun, kota air, kota gunung, kota iblis, dagang
+    antar-kota, kontrak muatan
+71. [**Murid Mandiri dan Perseteruan antar-sekte**](#71-murid-mandiri-dan-perseteruan-antar-sekte): jalan hidup,
+    kebijakan aula, belanja ke kota, tumbuh sendiri, buku harian, perseteruan
+72. [**Penampilan dan Animasi**](#72-penampilan-dan-animasi): Sosok untuk murid dan NPC, setelan detail animasi
 
 ---
 
@@ -8526,31 +8533,38 @@ atau server berhenti.
 ## 62. Kitab Panduan (di dalam game)
 
 **Kitab Panduan** adalah buku panduan di dalam game, supaya kamu tidak bermain buta dari *Manusia Fana* sampai
-*Dewa Abadi* dengan sekte tingkat tinggi dan banyak murid. Isinya **17 bab dan 164 langkah**, ditampilkan menurut
-urutan perjalanan (urutan ini sejak audit integrasi; nomor "Bab N" adalah tempat bab itu di daftar ini):
+*Dewa Abadi* dengan sekte tingkat tinggi dan banyak murid. Isinya **21 bab dan 198 langkah**, ditampilkan menurut
+urutan perjalanan (urutan ini sejak audit integrasi, bab 4-6 dan 11 sejak DESIGN 38/39; nomor "Bab N" adalah tempat bab
+itu di daftar ini):
 
 | Bab | Judul | Menjadi bab sekarang mulai | Syarat lain | Tidak lagi menahan sejak | Langkah |
 |---|---|---|---|---|---|
 | 1 | Hari Pertama | awal permainan | – | Pembangunan Fondasi | 8 |
 | 2 | Pemurnian Qi | Pemurnian Qi | – | Pembangunan Fondasi | 11 |
 | 3 | Dunia yang Luas | Pemurnian Qi | – | Inti Emas | 10 |
-| 4 | Pembangunan Fondasi | Pemurnian Qi | – | Inti Emas | 10 |
-| 5 | Inti Emas | Pembangunan Fondasi | – | Jiwa Baru Lahir | 10 |
-| 6 | Mendirikan Sekte | kapan saja | Prasasti Aula Sekte milikmu berdiri | – | 8 |
-| 7 | Murid yang Hidup | Pembangunan Fondasi | aula | Transformasi Dewa | 10 |
-| 8 | Murid | Pembangunan Fondasi | aula | Transformasi Dewa | 11 |
-| 9 | Sekte di Dunia | Inti Emas | aula | Kenaikan Abadi | 10 |
-| 10 | Jiwa Baru Lahir sampai Penyatuan Dao | Inti Emas | – | Kenaikan Abadi | 10 |
-| 11 | Formasi Sekte | Inti Emas | aula | Kenaikan Abadi | 8 |
-| 12 | Sekte Tingkat Tinggi | Jiwa Baru Lahir | aula | Dewa Abadi | 10 |
-| 13 | Sekte Langit | Inti Emas | aula level 6 atau tapak tingkat 6 | – | 11 |
-| 14 | Ujung Dunia | Inti Emas | – | Kenaikan Abadi | 10 |
-| 15 | Kenaikan Abadi | Penyatuan Dao | – | Dewa Abadi | 7 |
-| 16 | Dewa Abadi | Kenaikan Abadi | – | – | 10 |
-| 17 | Tips & Kesalahan Umum | bacaan, tidak pernah menjadi bab sekarang | – | – | 10 |
+| 4 | Kota Besar | Pemurnian Qi | – | Kenaikan Abadi | 8 |
+| 5 | Tempat-Tempat Dunia | awal permainan | – | Kenaikan Abadi | 8 |
+| 6 | Lima Kota Bertema | awal permainan | – | Kenaikan Abadi | 10 |
+| 7 | Pembangunan Fondasi | Pemurnian Qi | – | Inti Emas | 10 |
+| 8 | Inti Emas | Pembangunan Fondasi | – | Jiwa Baru Lahir | 10 |
+| 9 | Mendirikan Sekte | kapan saja | Prasasti Aula Sekte milikmu berdiri | – | 8 |
+| 10 | Murid yang Hidup | Pembangunan Fondasi | aula | Transformasi Dewa | 10 |
+| 11 | Murid Mandiri | Pembangunan Fondasi | aula | Kenaikan Abadi | 8 |
+| 12 | Murid | Pembangunan Fondasi | aula | Transformasi Dewa | 11 |
+| 13 | Sekte di Dunia | Inti Emas | aula | Kenaikan Abadi | 10 |
+| 14 | Jiwa Baru Lahir sampai Penyatuan Dao | Inti Emas | – | Kenaikan Abadi | 10 |
+| 15 | Formasi Sekte | Inti Emas | aula | Kenaikan Abadi | 8 |
+| 16 | Sekte Tingkat Tinggi | Jiwa Baru Lahir | aula | Dewa Abadi | 10 |
+| 17 | Sekte Langit | Inti Emas | aula level 6 atau tapak tingkat 6 | – | 11 |
+| 18 | Ujung Dunia | Inti Emas | – | Kenaikan Abadi | 10 |
+| 19 | Kenaikan Abadi | Penyatuan Dao | – | Dewa Abadi | 7 |
+| 20 | Dewa Abadi | Kenaikan Abadi | – | – | 10 |
+| 21 | Tips & Kesalahan Umum | bacaan, tidak pernah menjadi bab sekarang | – | – | 10 |
 
-Isi bab 3 dan 14 ada di [64](#64-dunia-kultivasi-yang-luas), bab 7 dan 9 di [66](#66-sekte-yang-hidup), bab 13 di
-[68](#68-sekte-langit), langkah duel (bab 2, 4, 5, 8, 17) di [65](#65-duel-pedang-kultivator).
+Isi bab 3 dan 18 ada di [64](#64-dunia-kultivasi-yang-luas), bab 4 dan 5 di [69](#69-kota-besar-dan-tempat-tempat-dunia),
+bab 6 di [70](#70-lima-kota-bertema), bab 10 dan 13 di [66](#66-sekte-yang-hidup), bab 11 di
+[71](#71-murid-mandiri-dan-perseteruan-antar-sekte), bab 17 di [68](#68-sekte-langit), langkah duel (bab 2, 7, 8, 12, 21)
+di [65](#65-duel-pedang-kultivator).
 
 **Cara membuka:**
 
@@ -8692,7 +8706,7 @@ Contoh:
 
 Dunia kini jauh lebih luas: kota kultivator, pengembara dan kelompok saingan, gua leluhur dengan teka-teki formasi,
 penjara iblis kuno, Menara Seratus Lantai, peristiwa langit, harta yang lahir, kabut Qi, naga liar, evolusi binatang roh,
-Dunia Bawah, Laut Tanpa Batas, Kota Abadi, kapal terbang sekte dan Peta Dunia. Bab 3 (*Dunia yang Luas*) dan bab 14
+Dunia Bawah, Laut Tanpa Batas, Kota Abadi, kapal terbang sekte dan Peta Dunia. Bab 3 (*Dunia yang Luas*) dan bab 18
 (*Ujung Dunia*) Kitab Panduan menuntunmu langkah demi langkah, dan setiap topik punya halaman sendiri di menu
 *Bantuan*.
 
@@ -9231,8 +9245,8 @@ Gaya boneka: `agresif`, `bertahan`, `penipu`, `santo`. Senjata: `pedang`, `kapak
 ### 65.7 Kitab Panduan dan pencapaian
 
 Langkah baru di Kitab Panduan: *Tangkis serangan monster* dan *Postur dan Tebasan Penentu* (bab 2), *Duel Pedang
-pertama* dan *Tangkisan Sempurna* (bab 4), *Kunci Bilah* dan *Serangan Berbahaya* (bab 5), *Menonton murid berduel*
-(bab 8) dan *Kesalahan umum duel* (bab 17). Semuanya langkah pilihan: tidak menahan bab sekarang. Pencapaian: tangkisan pertama, tangkisan sempurna pertama, tebasan penentu
+pertama* dan *Tangkisan Sempurna* (bab 7), *Kunci Bilah* dan *Serangan Berbahaya* (bab 8), *Menonton murid berduel*
+(bab 12) dan *Kesalahan umum duel* (bab 21). Semuanya langkah pilihan: tidak menahan bab sekarang. Pencapaian: tangkisan pertama, tangkisan sempurna pertama, tebasan penentu
 pertama, kemenangan duel pertama, menang kunci bilah, Injak Pedang, rantai 10, menonton murid, Kehormatan 1300, dan
 mengalahkan Santo Pedang.
 
@@ -9275,7 +9289,7 @@ Aturan yang tetap berlaku untuk semua fitur di bab ini:
 * **Config:** `config/kultivator-sekte.json`, satu bagian per fitur (`kepribadian`, `hubungan`, `turnamen`, `tangga`,
   `paviliun`, `tetua`, `misi`, `seragam`, `diplomasi`, `kebun`), masing-masing dengan saklar `aktif`. Muat ulang dengan
   `/kultivasi uji perguruan muat`; `/kultivasi uji perguruan modul` menampilkan modul yang aktif.
-* **Kitab Panduan:** bab 7 "Murid yang Hidup" dan bab 9 "Sekte di Dunia" (masing-masing 10 langkah, tercentang dari
+* **Kitab Panduan:** bab 10 "Murid yang Hidup" dan bab 13 "Sekte di Dunia" (masing-masing 10 langkah, tercentang dari
   pencapaian `sekte/*`).
 * **Hub (H):** kartu baru di halaman SEKTE dan MURID: Suasana Hati Murid, Jaring Hubungan, Turnamen, Paviliun & Makam,
   Balai Tetua, Misi Cerita, Lambang & Seragam, Diplomasi, Kebun & Tambang.
@@ -9752,7 +9766,7 @@ mengirim Bajak Awan atas namanya. Perang tetap dimenangkan di gerbang darat sekt
 
 ### 68.8 Kitab Panduan, pencapaian, config
 
-* **Kitab Panduan bab 13 "Sekte Langit"** (11 langkah, mulai Inti Emas setelah aula level 6 atau tapak tingkat 6;
+* **Kitab Panduan bab 17 "Sekte Langit"** (11 langkah, mulai Inti Emas setelah aula level 6 atau tapak tingkat 6;
   langkah Jaring Awan dan Sembilan Langit pilihan).
 * **15 pencapaian** `sekte_langit/*`: Rancang, Tapak Awan, Naik, Seribu Anak Tangga, Pindah Awan, Feri, Tertangkap,
   Terjun Awan, Cahaya Buddha, Bajak Awan, Longbo, Utusan Langit, Temu Langit, Sekutu Langit, Sembilan Langit.
@@ -9788,3 +9802,140 @@ Ketua aula: `/kultivasi aula langit [info]`, `rancang <1-9>`, `sesaji`, `tinggi 
 | `info` / `audit [1-9]` / `reset` | status situs langit, audit rencana Awan, hapus situs uji |
 
 Grup chip **Sekte Langit** ada di daftar cheat.
+
+## 69. Kota Besar dan Tempat-Tempat Dunia
+
+Dunia kini punya tempat nyata untuk hampir setiap fitur: **ibu kota kultivator** yang penuh NPC, kampung fana dan kampung
+kultivator, desa klan, kompleks sekte NPC, banyak jenis gua dan situs, serta jalan batu dengan jembatan, tonggak, kuil jalan
+dan pos singgah yang menyambungkan semuanya. Semuanya lahir lewat world generation **di chunk baru**, jadi buat dunia baru
+untuk melihatnya.
+
+Aturan yang tetap berlaku:
+
+* **Tidak ada blok yang berubah sendiri.** Gerbang kota, rakit, gerobak dan papan adalah entitas. Kerusakan yang kamu buat
+  dicatat, lalu tukang NPC memperbaikinya pelan-pelan lewat jalur pembangunan yang sama dengan Pembangunan Sekte. Mode
+  Kehancuran di dalam zona kota atau kampung tidak menghancurkan apa pun.
+* **Tanpa petir buatan, cuaca, waktu atau tick-rate.** Hujan, badai, gerhana dan petir alami hanya membuat NPC bereaksi.
+* **Ringan untuk laptop lemah**: jumlah NPC per tempat dibatasi, NPC jauh digambar ringkas, efek mengikuti Kualitas Efek.
+
+### 69.1 Ibu kota
+
+Ibu kota pertama lahir 1800-3200 blok dari pusat dunia (dengan Tectonic + Terralith aturan medannya lebih longgar). Cari
+dengan peta atau `/kultivasi uji kota_besar cari` (op). Ada **11 distrik**: Distrik Gerbang, Lapangan Kafilah (di luar
+tembok), Distrik Pusat, Pasar Timur, Distrik Gilda, Distrik Cendekia, Arena Agung, Distrik Istana, Distrik Awan, Hunian
+Barat dan Kampung Kumuh, dikelilingi tembok dan menara dengan empat gerbang.
+
+* **Jam malam**: pukul 22.00 genderang Menara Genderang berbunyi dan gerbang menutup sampai lonceng pagi pukul 07.00.
+  Ketuk daun gerbang untuk minta penjaga membuka (2 NB). Melompati tembok di malam hari atau masuk istana
+  dalam saat jam malam dihitung pelanggaran.
+* **Hukum**: melukai warga di depan penjaga membuat kamu Dicurigai lalu Buronan (wajahmu di papan buronan Yamen). Bayar
+  denda di Yamen (`/kultivasi denda` di dekat Yamen atau penjaga) atau Serahkan Diri dan jalani hitungan mundur di sel.
+* **Layanan**: Rumah Uang (setor, tarik dengan biaya 1 %, Surat Wesel yang bisa ditukar di ibu kota mana pun, gadai pusaka),
+  Paviliun Seribu Bilah (senjata kota dengan pratinjau 3D, pesanan pusaka ke empu yang selesai setelah beberapa hari dunia),
+  judi batu (belah batu kasar; rata-rata 0,88 dari harga yang dibayar), Lelang Agung (delapan lot, penawar NPC bernama,
+  titip barang sendiri), Gilda Kultivator (misi dengan pangkat dan Lencana 1-9, penunjuk ke tempat misi yang nyata),
+  stasiun teleport.
+* **Acara**: Festival Lentera saat purnama (teka-teki lentera memberi Jimat Lentera dan Nama Baik), Pertemuan Pil (lima
+  alkemis saingan), Gelombang Binatang (gerbang tertutup, monster datang dari luar tembok), Turnamen Agung (babak pemain
+  lewat Duel Pedang).
+* **Alur "Bayangan di Balik Takhta"**: rantai quest tujuh bab di istana dan Yamen; bab 5 bercabang tiga dan mengubah bab
+  6-7.
+* Papan hidup: papan buronan di dinding utara aula Yamen dan papan Pahlawan Kota (menurut Nama Baik) di ujung utara jalan
+  Lapangan Agung.
+
+### 69.2 Tempat lain
+
+| Tempat | Yang bisa dilakukan |
+|---|---|
+| Kampung fana / kultivator | lonceng kampung, Plakat Pelindung Sekte yang bisa kamu ikrarkan, Festival Panen, anak berbakat yang bisa direkrut |
+| Desa klan | Patriark dan Tuan Muda yang menantang pemain berranah rendah (tanding lewat dialog) |
+| Kompleks sekte NPC | sikap sekte menentukan seberapa jauh kamu boleh masuk: Netral hanya halaman, sekutu boleh tanding latih, perang membuat murid mereka bermusuhan |
+| Gua Pertapa | tiga ujian lintas hari; pertapa mengajarkan teknik lalu pergi, kursinya bisa jadi Gua Kediaman |
+| Makam Warisan | penghalang menolak ranah rendah; ujian Hati, Kekuatan dan Pemahaman; kompas Giok Warisan menunjuk ke makam; murid menunggu di luar |
+| Cermin Hati, gua urat roh, sarang binatang dan sarang iblis | ujian batin, tempat kultivasi, sarang yang bisa dibersihkan (tawanan diselamatkan) |
+| Puncak Petir, Panggung Bintang | situs tribulasi (tercatat di Batu Catatan) dan situs bintang |
+| Jalan | ubin batu, jembatan di sungai, tonggak sekitar tiap 500 blok (menyentuh tonggak menggambar jalan di peta), kuil jalan, pos singgah dan pos dagang; begal bisa menghadang |
+
+### 69.3 Kehidupan NPC, perbaikan dan uang
+
+* Penduduk punya jadwal harian: bangun, menyapu, bekerja sesuai peran, makan, minum teh, tidur; anak bermain, tetua main
+  catur, pedagang berseru. Hujan membuat mereka berpayung, badai membuat anak bersembunyi, Gerhana Darah mengosongkan jalan.
+* **Perbaikan**: bila kamu merusak kampung atau kota, Kepala Desa membawa tagihan. Bayar dan tukang bekerja empat kali lebih
+  cepat; tolak dan Nama Baik turun serta harga naik 10 %. Bila ranahmu jauh di atas mereka, tidak ada tagihan: NPC
+  berlutut, anak bersembunyi, perbaikan berjalan lebih lama karena takut. Peti berisi tidak pernah dibuang.
+* **Lingkar uang**: semua harga memakai satu kurs batu roh. Uang datang dari misi gilda, lapak murid (sewa lapak, isi
+  barang, tunjuk murid penjaga; lihat `/kultivasi kas`) dan kafilah dagang ke kota lain; keluar untuk senjata, pil, lelang,
+  denda dan perbaikan.
+* **Catatan Perjalanan** (`/kultivasi jurnal`) menyimpan quest, rumor dan lore tempat yang sudah kamu temui.
+
+### 69.4 Kitab Panduan dan perintah
+
+Kitab Panduan bab 4 "Kota Besar" (dari Pemurnian Qi, 8 langkah) dan bab 5 "Tempat-Tempat Dunia" (dari awal, 8 langkah).
+Perintah uji (op) ada di bawah `/kultivasi uji tempat|kota_besar|ekonomi|hidup|cerita|kampung|kompleks|gua|jalan|ui`;
+config di `config/kultivator-dunia.json` bagian `tempat`, `kotaBesar`, `ekonomi38`, `kampung`, `kompleksSekte`, `gua`,
+`jalan`, `perbaikan` dan `cerita`. Rancangan lengkap: `docs/rancangan/38-kota-besar-dan-tempat.md`.
+
+## 70. Lima Kota Bertema
+
+Selain ibu kota, dunia punya lima jenis kota bertema (masing-masing 288 × 288 blok, sembilan distrik, menghadap medannya):
+
+| Kota | Di mana | Yang khas |
+|---|---|---|
+| **Kota Pelabuhan** | pantai | kapal dagang yang datang, tambat dan berangkat; pasar ikan, mercusuar, galangan; **Kapal Lintas Laut** ke Laut Tanpa Batas (pita Fondasi, murid boleh ikut); Serbuan Bajak Laut |
+| **Kota Oasis Gurun** | gurun, badlands | bazar dengan tawar-menawar tiga putaran, Kafilah Agung berunta (bisa ikut atau sewa unta), **badai pasir** (di luar tembok tanpa Restu Mata Air kamu melambat; Gerbang Giok menutup selama badai), Surat Jalan Gurun, reruntuhan gurun dan Raja Kalajengking |
+| **Kota Air** | dataran rendah dekat air | kanal bersambung, Perahu Pos dengan empat halte, Malam Lentera Air saat bulan mati, Lomba Perahu Naga (kamu jadi penabuh irama), Tikus Air pencuri kanal |
+| **Kota Gunung** | lereng | teras bertingkat, kereta gantung dua bentang (berhenti saat badai petir), ziarah Seribu Anak Tangga (jangan terbang), kera yang merebut bakpao, longsor yang tidak mengubah blok |
+| **Kota Iblis** | hutan gelap, rawa, badlands; jauh dari spawn | gerbang menolak ranah rendah dan memungut upeti, Zona Perjanjian di pasar, Jam Berburu di malam hari, arena darah (kalah berhenti di 5 % HP), pasar tawanan (tebus dan antar pulang), Menara Kitab Terlarang, Kolam Semedi Darah, Infami dan Gentar, Pemburu Lurus dan Penyerbuan Lurus |
+
+* **Dagang antar-kota**: bicara ke pedagang pasar kota bertema, buka tab Jasa, pilih "Pasar <kota>" untuk membuka Buku Dagang
+  mode pasar (beli, jual, segel). Harga jenuh bila kamu menjual terlalu banyak barang yang sama; laba mingguan dibatasi
+  menurut pita ranah. Barang selundupan disita sebagian di bea. Bea Gerbang Giok 3 % dibebaskan hanya bila Surat Jalan
+  Gurun-mu masih berlaku.
+* **Kontrak muatan**: Syahbandar, Kafilah Bashi, Nyonya Sutra dan Kuli Gunung punya Papan Kontrak Muatan; antar peti dengan
+  kapal terbang ke ibu kota untuk bayaran lebih, jangan buka petinya di jalan.
+* Setiap kota punya rantai quest bertokoh dengan cabang berakhir berbeda, rumor sendiri dan lore yang terbuka saat kota
+  ditemukan. Kitab Panduan bab 6 "Lima Kota Bertema" (dari awal, 10 langkah; Kota Iblis dan tebusan tawanan pilihan).
+* Uji (op): `/kultivasi uji tema ...`; config bagian `kotaTema` dan `temaPelabuhan|temaOasis|temaAir|temaGunung|temaIblis`.
+
+## 71. Murid Mandiri dan Perseteruan antar-sekte
+
+Murid tidak lagi hanya menunggu perintah. Setiap murid punya **Jalan Hidup** (arah hidup), **Cita-cita** yang bisa berubah,
+dorongan yang naik turun dan perencana harian yang memilih kegiatan nyata: berlatih, bermeditasi, bekerja di kebun atau
+tungku, menulis jimat, mengajar, makan, minum teh, dan **turun ke kota** membeli perbekalan dengan uang sakunya sendiri.
+
+* **Kebijakan aula**: Mandiri Penuh, Seimbang (bawaan) atau Patuh, diatur di papan Jalan Hidup Murid
+  (`/kultivasi perguruan mandiri papan`). Tiap murid juga bisa diberi kebijakan sendiri di tab ketiga layar murid, "Jalan
+  Hidup". Perintahmu selalu menang; setelah perintah, murid menunggu satu hari dunia sebelum kembali mandiri.
+* **Belanja ke kota**: murid pamit, berjalan ke kota terdekat, menawar, melihat lapak, kadang kecopetan, makan di kedai,
+  lalu pulang membawa barang. Murid juga bisa bepergian ke tempat lain, terluka, atau tertawan (kamu bisa menebus atau
+  menyelamatkannya). Tidak ada murid yang mati karena hidup mandiri (`bolehGugur` mati secara bawaan).
+* **Tumbuh sendiri sampai Abadi Sejati**: murid menembus ranah sendiri dengan sahabatnya sebagai Hu Fa, memilih Dao, belajar
+  teknik dan menyerap batu roh. Chat menawarkan tombol untuk menjaga atau membiarkan terobosan, menyetujui Dao dan jenjang
+  (`/kultivasi perguruan mandiri tembus|dao|jenjang ...`). XP kegiatan mandiri dikali 1,5.
+* **Buku Harian**: baca kisah tiap murid (`/kultivasi perguruan mandiri harian <murid>`): perjalanan, tokoh yang ditemui,
+  suasana hati.
+* **Perseteruan**: di kota atau di jalan murid bisa bertemu murid sekte lain yang bernama. Ejekan bisa naik menjadi duel
+  kehormatan (Duel Pedang dengan kartu judul dan kerumunan), sergapan, patroli bersenjata di jalan, tawuran, sumpah dendam,
+  atau Kekasih Terlarang yang berakhir dengan kawin lari. Akhirnya Damai, Saingan atau Dendam. Murid yang kalah duel di
+  rumah terluka satu hari. Kamu bisa Damaikan, Utus tetua, Hukum atau Usir (tombol di chat,
+  `/kultivasi perguruan mandiri seteru ...`). Perang antar-sekte dari perseteruan mati secara bawaan (`bolehPerang`).
+* Kitab Panduan bab 11 "Murid Mandiri" (dari Pembangunan Fondasi dengan aula sendiri, 8 langkah).
+* Config `config/kultivator-sekte.json` seksi `mandiri` dan `mandiri_seteru`; uji (op)
+  `/kultivasi uji perguruan mandiri ...`. Rancangan lengkap: `docs/rancangan/39-murid-mandiri.md`.
+
+## 72. Penampilan dan Animasi
+
+Murid dan semua NPC manusia (warga kota, penduduk kampung, murid mandiri, orang Dimensi, Kultivator Liar, Utusan Langit,
+penonton turnamen) kini memakai satu sistem penampilan, **Sosok**:
+
+* Laki-laki dan perempuan, empat usia (anak, muda, dewasa, tua) dengan tinggi dan proporsi berbeda.
+* Kulit kultivator yang disusun dari bagian (rambut, wajah, busana, tepi bermotif, perlengkapan) menurut peran, jalan hidup,
+  Dao, ranah dan sekte, jadi tidak ada dua murid yang sama persis; fisik langka terlihat di wajah.
+* Animasi: ratusan klip kerja, sikap dan kegiatan; rambut, jubah dan selendang berayun; mata berkedip dan melirik, mulut
+  bergerak saat berbicara, raut ikut suasana hati; prop di tangan, di pinggang atau di depan kaki.
+* **Pengaturan → Tampilan & Efek → Penampilan & Animasi**: "Detail animasi" Otomatis (mengikuti Kualitas Efek:
+  Maksimal = Tinggi, Normal = Sedang, Minimal = Rendah), Tinggi, Sedang atau Rendah, dan "Ekspresi wajah" (mati = wajah
+  diam, sedikit lebih ringan).
+* Aman untuk Sodium dan Iris (hanya tipe render vanilla) dan Player Animation Library (hanya menganimasikan pemain).
+* Uji (op) `/kultivasi uji penampilan galeri|acak|klip|jalan|wajah|pegas|murid|hapus`; klien `/sosok info` menampilkan
+  anggaran. Rancangan lengkap: `docs/rancangan/40-penampilan-dan-animasi.md`.

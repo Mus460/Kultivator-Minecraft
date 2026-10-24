@@ -1,0 +1,14 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_tema/pelabuhan/gerbang_darat/penginapan_angin_selatan",
+        "processors": "kultivator:kota_tema/pelabuhan/gaya_utara",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

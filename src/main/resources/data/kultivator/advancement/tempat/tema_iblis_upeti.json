@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_iblis",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_iblis_upeti.description"
+    },
+    "icon": {
+      "id": "minecraft:skeleton_skull"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_iblis_upeti.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:dan_chen"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tungku_pertama tahap nilai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "periksa_nadi",
+      "prop": "labu_pil",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera alkemis_tingkat_1",
+            "nama_baik 3",
+            "quest_maju tungku_pertama"
+          ],
+          "ke": "lulus"
+        }
+      ]
+    },
+    {
+      "id": "lulus",
+      "gestur": "angguk_dengar"
+    }
+  ]
+}

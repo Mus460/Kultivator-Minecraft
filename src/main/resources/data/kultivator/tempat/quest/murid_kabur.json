@@ -1,0 +1,51 @@
+{
+  "pemberi": "peran:tetua_sekte",
+  "tempat": "kompleks",
+  "tahap": [
+    {
+      "id": "cari",
+      "tujuan": [
+        "pergi pos/singgah"
+      ],
+      "arah": "pos/singgah"
+    },
+    {
+      "id": "temu",
+      "akibat_masuk": [
+        "panggil_peran murid_sekte_dalam"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera kabur_lindungi"
+          ],
+          "ke": "lindungi"
+        }
+      ],
+      "ke": "kembali"
+    },
+    {
+      "id": "kembali",
+      "tujuan": [
+        "antar cerita:kitab_curian peran:tetua_sekte"
+      ],
+      "akibat": [
+        "sikap_sekte terdekat 5",
+        "beri_nb_pita 30"
+      ],
+      "ke": "selesai",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "lindungi",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "bendera calon_murid_kabur",
+        "pesan kultivator.cerita.pesan.calon_kabur"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

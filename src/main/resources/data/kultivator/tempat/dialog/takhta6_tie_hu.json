@@ -1,0 +1,35 @@
+{
+  "pembicara": [
+    "tokoh:tie_hu"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_malam_gerhana tahap bertahan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hunus",
+      "prop": "tombak",
+      "suara": "kotabesar.beast_tide",
+      "pilihan": [
+        {
+          "syarat": [
+            "!bendera takhta6_dipanggil"
+          ],
+          "akibat": [
+            "bendera takhta6_dipanggil",
+            "panggil_peran tetua_iblis musuh 2"
+          ],
+          "ke": "muncul"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "muncul",
+      "gestur": "tunjuk"
+    }
+  ]
+}

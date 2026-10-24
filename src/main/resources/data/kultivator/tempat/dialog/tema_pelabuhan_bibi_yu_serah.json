@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "tokoh:bibi_yu"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest tema_pelabuhan_ikan_roh tahap serah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kaget",
+      "pilihan": [
+        {
+          "syarat": [
+            "punya kultivator:tema/ikan_roh 10"
+          ],
+          "akibat": [
+            "ambil kultivator:tema/ikan_roh 10",
+            "beri kultivator:tema/sup_ikan_pagi 2",
+            "beri_nb 75",
+            "nama_baik 2",
+            "kabar tema_pelabuhan_sup pemain",
+            "quest_maju tema_pelabuhan_ikan_roh"
+          ],
+          "ke": "terima",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_pelabuhan_bibi_yu_serah.mulai.1.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "tertawa"
+    }
+  ]
+}

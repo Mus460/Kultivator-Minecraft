@@ -1,0 +1,58 @@
+{
+  "pembicara": [
+    "peran:pengawal_istana"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "quest pedang_ayah baru",
+    "!bendera pedang_ayah_tolak",
+    "acak 70"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berdiri_jaga",
+      "prop": "tombak",
+      "pilihan": [
+        {
+          "ke": "cerita"
+        },
+        {
+          "akibat": [
+            "bendera pedang_ayah_tolak"
+          ],
+          "ke": "tolak"
+        }
+      ]
+    },
+    {
+      "id": "cerita",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai pedang_ayah",
+            "bendera pedang_ayah_tolak off"
+          ],
+          "ke": "terima"
+        },
+        {
+          "akibat": [
+            "bendera pedang_ayah_tolak"
+          ],
+          "ke": "tolak"
+        }
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat"
+    },
+    {
+      "id": "tolak",
+      "gestur": "sikap_tombak",
+      "prop": "tombak"
+    }
+  ]
+}

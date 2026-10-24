@@ -1,0 +1,56 @@
+{
+  "pembicara": [
+    "tokoh:tie_suo"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest tema_gunung_tali tahap interogasi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "marah_hentak",
+      "pilihan": [
+        {
+          "ke": "aku"
+        }
+      ]
+    },
+    {
+      "id": "aku",
+      "gestur": "berdebat",
+      "pilihan": [
+        {
+          "ke": "shan"
+        },
+        {
+          "ke": "lepas"
+        }
+      ]
+    },
+    {
+      "id": "lepas",
+      "gestur": "sikap_lipat_tangan",
+      "akibat": [
+        "nama_baik 1"
+      ],
+      "pilihan": [
+        {
+          "ke": "shan"
+        }
+      ]
+    },
+    {
+      "id": "shan",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju tema_gunung_tali"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "pembicara": [
+    "peran:pendayung"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lambai",
+      "prop": "dayung_yuloh",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "nyanyi_perahu"
+    }
+  ]
+}

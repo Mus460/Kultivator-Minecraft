@@ -1,0 +1,60 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380203,
+    "spacing": 128,
+    "separation": 0,
+    "rencana": "kompleks_sekte",
+    "distrik": "puncak"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kompleks_sekte/iblis_puncak",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/iblis_puncak_langit",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/iblis_puncak_sedang",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/iblis_puncak_sedang_langit",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/lurus_puncak",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/lurus_puncak_langit",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/lurus_puncak_sedang",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/lurus_puncak_sedang_langit",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/netral_puncak",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/netral_puncak_langit",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/netral_puncak_sedang",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/netral_puncak_sedang_langit",
+      "weight": 1
+    }
+  ]
+}

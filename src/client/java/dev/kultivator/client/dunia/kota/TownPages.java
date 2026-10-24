@@ -277,7 +277,8 @@ final class TownPages {
 
 	static final class Teh extends KotaPage {
 		private static final String[] TEAS = {"embun", "awan", "penenang"};
-		private static final String[] KINDS = {"kota", "reruntuhan", "penjara", "menara", "bawah", "laut"};
+		/** The Kabar Angin kinds, in the order the server indexes them ({@code kabar:<index>:<band>}): a 3 x 3 grid. */
+		private static final String[] KINDS = dev.kultivator.dunia.kota.KedaiTeh.RUMOUR_KINDS;
 		private int kind;
 
 		Teh(DuniaScreen screen) {
@@ -335,7 +336,7 @@ final class TownPages {
 						() -> Component.translatable("kultivator.kota.kabar.jenis." + KINDS[index]), () -> kind == index));
 				coin.onPress(() -> kind = index);
 			}
-			int by = coinY + 28;
+			int by = coinY + 3 * 13 + 2;
 			int rw = Math.max(50, (w - 16) / 3);
 			for (int b = 0; b < 3; b++) {
 				int band = b;
@@ -389,7 +390,7 @@ final class TownPages {
 			long cooldown = teh.getLongOr("cooldown", 0L);
 			Component kabar = cooldown > 0L ? Component.translatable("kultivator.kota.kabar.judul_tunggu", clock(cooldown))
 					: Component.translatable("kultivator.kota.kabar.judul");
-			Brush.fit(g, font, kabar, x + 4.0F, coinY + 54.0F + 2.0F, w - 8.0F, Palette.SEAL_DARK, 0.62F, 0.4F, false);
+			Brush.fit(g, font, kabar, x + 4.0F, coinY + 54.0F + 2.0F + 13.0F, w - 8.0F, Palette.SEAL_DARK, 0.62F, 0.4F, false);
 			if (!master()) {
 				Brush.fit(g, font, Component.translatable("kultivator.kota.teh.di_kedai"), x + 4.0F, y + h - 15.0F, w - 150.0F, Palette.INK_FAINT, 0.6F, 0.4F, false);
 			}

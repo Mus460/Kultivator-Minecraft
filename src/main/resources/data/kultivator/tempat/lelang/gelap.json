@@ -1,0 +1,30 @@
+{
+  "_catatan": "Lelang Gelap Kota Iblis (DESIGN 38.T.7.6; profil 38TK-I LelangGelap.PROFIL: 5 lot, 2 titipan, komisi 15 %). Kelas 2 rendah / 2 menengah / 1 tinggi relatif pita pemain terkuat yang hadir. Dibaca LelangAgung.buatLot. Kontrak Kepala (tema/kontrak_kepala) baru terjual bila Harga punya harga dasarnya (permintaan 38EK); tanpa itu buatLot memilih baris lain.",
+  "lot": [
+    {"jenis": "gelap", "kelas": "rendah", "bobot": 10},
+    {"jenis": "item", "kelas": "rendah", "bobot": 8, "id": "toxin_purging_pill", "jumlah": 4},
+    {"jenis": "item", "kelas": "rendah", "bobot": 6, "id": "demonic_loot_pouch"},
+    {"jenis": "item", "kelas": "rendah", "bobot": 6, "id": "dupa_arwah", "jumlah": 3},
+    {"jenis": "inti", "kelas": "rendah", "bobot": 6, "tingkat_min": 1, "tingkat_maks": 2},
+    {"jenis": "item", "kelas": "rendah", "bobot": 5, "id": "binding_talisman", "jumlah": 4},
+    {"jenis": "senjata", "kelas": "rendah", "bobot": 4, "faktor": 0.9},
+
+    {"jenis": "pusaka", "kelas": "menengah", "bobot": 9, "mutu_min": 2, "mutu_maks": 3},
+    {"jenis": "gelap", "kelas": "menengah", "bobot": 8, "faktor": 1.1},
+    {"jenis": "item", "kelas": "menengah", "bobot": 6, "id": "demonic_banner"},
+    {"jenis": "item", "kelas": "menengah", "bobot": 6, "id": "token_darah_api"},
+    {"jenis": "item", "kelas": "menengah", "bobot": 5, "id": "heavenvoid_map"},
+    {"jenis": "item", "kelas": "menengah", "bobot": 4, "id": "tema/kontrak_kepala"},
+    {"jenis": "item", "kelas": "menengah", "bobot": 4, "id": "lost_scripture_page"},
+    {"jenis": "inti", "kelas": "menengah", "bobot": 4, "tingkat_min": 2, "tingkat_maks": 3},
+    {"jenis": "misteri", "kelas": "menengah", "bobot": 4},
+
+    {"jenis": "pusaka", "kelas": "tinggi", "bobot": 9, "mutu_min": 3, "mutu_maks": 3, "faktor": 1.15},
+    {"jenis": "item", "kelas": "tinggi", "bobot": 5, "id": "soul_nurturing_pill", "pita_min": 3},
+    {"jenis": "item", "kelas": "tinggi", "bobot": 4, "id": "inheritance_crystal", "pita_min": 3},
+    {"jenis": "item", "kelas": "tinggi", "bobot": 3, "id": "soul_seal_jade", "pita_min": 5},
+    {"jenis": "item", "kelas": "tinggi", "bobot": 3, "id": "tema/kontrak_kepala", "faktor": 1.4},
+    {"jenis": "inti", "kelas": "tinggi", "bobot": 3, "tingkat_min": 3, "tingkat_maks": 4},
+    {"jenis": "misteri", "kelas": "tinggi", "bobot": 5}
+  ]
+}

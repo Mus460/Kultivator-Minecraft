@@ -1,0 +1,51 @@
+{
+  "pemberi": "tokoh:lao_qiao",
+  "tempat": "jalan",
+  "tahap": [
+    {
+      "id": "begal",
+      "tujuan": [
+        "kalahkan peran:pembunuh_bayaran x2"
+      ],
+      "akibat_masuk": [
+        "panggil_peran pembunuh_bayaran musuh 2"
+      ],
+      "batas_hari": 2,
+      "gagal_ke": "hilang"
+    },
+    {
+      "id": "siap",
+      "batas_hari": 2,
+      "gagal_ke": "hilang"
+    },
+    {
+      "id": "kawal",
+      "tujuan": [
+        "kawal tokoh:lao_qiao kota/"
+      ],
+      "batas_hari": 2,
+      "gagal_ke": "hilang",
+      "arah": "kota/"
+    },
+    {
+      "id": "untung",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "beri_nb_pita 50",
+        "ambil cerita:bekal_kafilah",
+        "nama_baik 3",
+        "kabar kafilah_selamat pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "hilang",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}

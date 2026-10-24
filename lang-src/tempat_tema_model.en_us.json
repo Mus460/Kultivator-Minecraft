@@ -1,0 +1,8 @@
+{
+  "kultivator.tempat_tema_model.perintah.info.judul": "Themed town models (on your screen only)",
+  "kultivator.tempat_tema_model.perintah.info.renderer": "Renderers in place: %s of %s themed entity types.",
+  "kultivator.tempat_tema_model.perintah.info.bingkai": "Per frame (last second): %s entities drawn, %s of them far away (small animations frozen), %s glow passes; %s FPS.",
+  "kultivator.tempat_tema_model.perintah.info.lod": "Small animations stop at %s blocks, nothing drawn past %s blocks (ships and lighthouses %s), glow passes up to %s blocks. Effect quality: %s.",
+  "kultivator.tempat_tema_model.perintah.cek.ok": "All themed model assets present: %s hand props, %s themed and trade items, %s entity textures.",
+  "kultivator.tempat_tema_model.perintah.cek.kurang": "Themed model assets missing (%s): %s. Re-run tools/gen_tempat_tema_models.py and gen_tempat_tema_textures.py."
+}

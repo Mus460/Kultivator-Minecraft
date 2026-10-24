@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "peran:tetua_sekte"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest surat_ah_lun tahap tahan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 100"
+          ],
+          "akibat": [
+            "bayar_pita 100",
+            "quest_maju surat_ah_lun"
+          ],
+          "ke": "lepas",
+          "tampil": true,
+          "alasan": "kultivator.cerita.ah_lun_tebus.mulai.1.alasan"
+        },
+        {
+          "akibat": [
+            "mulai_duel"
+          ]
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lepas",
+      "gestur": "kipas"
+    }
+  ]
+}

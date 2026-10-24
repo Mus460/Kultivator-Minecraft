@@ -1,0 +1,81 @@
+{
+  "pembicara": [
+    "tokoh:sha_wuyan"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "angguk_dengar",
+      "suara": "tema.oasis.lord",
+      "pilihan": [
+        {
+          "syarat": [
+            "nama_baik 50"
+          ],
+          "akibat": [
+            "oasis_surat"
+          ],
+          "ke": "surat",
+          "tampil": true,
+          "alasan": "kultivator.kota_tema.oasis.alasan.nama_baik_50"
+        },
+        {
+          "syarat": [
+            "nama_baik 50"
+          ],
+          "akibat": [
+            "oasis_perintah"
+          ],
+          "ke": "perintah",
+          "tampil": true,
+          "alasan": "kultivator.kota_tema.oasis.alasan.nama_baik_50"
+        },
+        {
+          "ke": "terkubur"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "surat",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "perintah",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {}
+      ]
+    },
+    {
+      "id": "terkubur",
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {
+          "ke": "takut"
+        },
+        {
+          "ke": "mulai"
+        }
+      ]
+    },
+    {
+      "id": "takut",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

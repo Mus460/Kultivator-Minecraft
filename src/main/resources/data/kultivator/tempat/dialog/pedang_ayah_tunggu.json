@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "tokoh:ou_ye"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest pedang_ayah tahap tunggu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "palu_landasan",
+      "prop": "palu"
+    }
+  ]
+}

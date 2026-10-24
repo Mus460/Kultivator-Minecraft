@@ -1,0 +1,103 @@
+{
+  "pemberi": "tokoh:tie_suo",
+  "tempat": "kota_tema_gunung",
+  "tahap": [
+    {
+      "id": "macet",
+      "tujuan": [
+        "tanda gunung_lift_macet"
+      ]
+    },
+    {
+      "id": "tali_putus",
+      "akibat": [
+        "nama_baik 2"
+      ]
+    },
+    {
+      "id": "lao_dan"
+    },
+    {
+      "id": "jaga",
+      "tujuan": [
+        "tanda gunung_jaga_selesai"
+      ],
+      "akibat": [
+        "beri_nb_pita 40"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gunung_tangkap"
+          ],
+          "ke": "interogasi"
+        }
+      ],
+      "ke": "jejak"
+    },
+    {
+      "id": "interogasi",
+      "ke": "shan_ling"
+    },
+    {
+      "id": "jejak"
+    },
+    {
+      "id": "shan_ling"
+    },
+    {
+      "id": "jerat",
+      "tujuan": [
+        "tanda gunung_jerat x6"
+      ],
+      "akibat": [
+        "gunung_herba 3"
+      ]
+    },
+    {
+      "id": "kera_putih",
+      "tujuan": [
+        "tanda gunung_tali_sutra"
+      ],
+      "akibat_masuk": [
+        "gunung_kera_putih"
+      ]
+    },
+    {
+      "id": "pasang"
+    },
+    {
+      "id": "bela",
+      "tujuan": [
+        "tanda gunung_bela_selesai"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera gunung_gou_suap"
+          ],
+          "ke": "berkat_suap"
+        },
+        {
+          "syarat": [
+            "bendera gunung_paksa"
+          ],
+          "ke": "berkat_paksa"
+        }
+      ],
+      "ke": "berkat"
+    },
+    {
+      "id": "berkat",
+      "ke": "selesai"
+    },
+    {
+      "id": "berkat_paksa",
+      "ke": "selesai"
+    },
+    {
+      "id": "berkat_suap",
+      "ke": "selesai"
+    }
+  ]
+}

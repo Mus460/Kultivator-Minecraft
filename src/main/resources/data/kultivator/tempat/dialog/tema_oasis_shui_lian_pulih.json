@@ -1,0 +1,142 @@
+{
+  "pembicara": [
+    "tokoh:shui_lian"
+  ],
+  "prioritas": 12,
+  "syarat": [
+    "oasis_air_pulih"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lambai",
+      "prop": "kendi",
+      "suara": "tema.oasis.water_priestess",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_restu"
+          ],
+          "ke": "restu"
+        },
+        {
+          "akibat": [
+            "oasis_air_suci 1"
+          ],
+          "ke": "air"
+        },
+        {
+          "akibat": [
+            "oasis_air_suci 4"
+          ],
+          "ke": "air"
+        },
+        {
+          "ke": "danau"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai",
+            "bendera oasis.xie_bujuk"
+          ],
+          "ke": "xie_teh"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai",
+            "!bendera oasis.xie_bujuk"
+          ],
+          "ke": "xie_duka"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai",
+            "bendera oasis.formasi_pecah"
+          ],
+          "ke": "urat_retak"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai",
+            "bendera oasis.formasi_segel"
+          ],
+          "ke": "segel_kilau"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "restu",
+      "gestur": "sikap_doa",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "air",
+      "gestur": "tuang_teh",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "danau",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "xie_teh",
+      "gestur": "tuang_teh",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "xie_duka",
+      "gestur": "sikap_tunduk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "urat_retak",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "segel_kilau",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

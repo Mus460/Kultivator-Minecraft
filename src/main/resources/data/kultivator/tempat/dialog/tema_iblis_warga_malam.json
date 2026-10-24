@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "peran:warga_iblis"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "iblis_di_kota",
+    "jam 18 24"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

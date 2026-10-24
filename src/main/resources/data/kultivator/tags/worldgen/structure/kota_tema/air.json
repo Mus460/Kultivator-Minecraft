@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:kota_tema/air/taman_sastra",
+    "kultivator:kota_tema/air/rumah_sutra",
+    "kultivator:kota_tema/air/bukit_teh",
+    "kultivator:kota_tema/air/jembatan_kembar",
+    "kultivator:kota_tema/air/danau_lentera",
+    "kultivator:kota_tema/air/pasar_kanal",
+    "kultivator:kota_tema/air/hunian_kanal",
+    "kultivator:kota_tema/air/gerbang_air",
+    "kultivator:kota_tema/air/dermaga_perahu"
+  ]
+}

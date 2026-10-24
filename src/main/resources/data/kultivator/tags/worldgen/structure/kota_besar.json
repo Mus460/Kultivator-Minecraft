@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:kota_besar/cendekia",
+    "kultivator:kota_besar/istana",
+    "kultivator:kota_besar/awan",
+    "kultivator:kota_besar/gilda",
+    "kultivator:kota_besar/pusat",
+    "kultivator:kota_besar/pasar",
+    "kultivator:kota_besar/hunian_barat",
+    "kultivator:kota_besar/gerbang",
+    "kultivator:kota_besar/arena",
+    "kultivator:kota_besar/kumuh",
+    "kultivator:kota_besar/luar"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "pembicara": [
+    "tokoh:shui_lian"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_oasis_mata_air tahap duel"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_panggil_xie"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

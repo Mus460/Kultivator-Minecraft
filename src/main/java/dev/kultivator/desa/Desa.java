@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Desa Bawahan, the vassal villages (DESIGN 25.6, owned by P8-desa): the plaque and the pledge ({@link Pledge}),
@@ -112,6 +113,8 @@ public final class Desa {
 		ServerPlayerEvents.LEAVE.register(player -> VillageGuards.onLeave(player.getUUID()));
 		ServerPlayerEvents.JOIN.register(player -> dirty(player.getUUID()));
 		ProtectedZones.addZoneProvider(Desa::protects);
+		// DESIGN 38.R.3 rule 2: the patron plaque of a pledged village is the master's claim (repair crews keep off it)
+		ProtectedZones.addClaimProvider(Desa::claimsPlaque);
 		DiscipleHooks.addDeathGuard(VillageGuards::save);
 		SectRaids.addListener(new SectRaids.RaidListener() {
 			@Override
@@ -135,6 +138,53 @@ public final class Desa {
 			}
 		}
 		return false;
+	}
+
+	/** Blocks around a pledged village's patron plaque that count as the master's claim (DESIGN 38.R.3 rule 2). */
+	public static final double PLAQUE_CLAIM_RADIUS = 4.0D;
+
+	/** The claim provider: within {@link #PLAQUE_CLAIM_RADIUS} of the plaque of any pledged, not lost village. */
+	private static boolean claimsPlaque(ServerLevel level, BlockPos pos) {
+		if (!level.dimension().equals(Level.OVERWORLD)) {
+			return false;
+		}
+		for (UUID owner : Vassals.owners()) {
+			Vassals.Owner entry = Vassals.peek(owner);
+			if (entry == null) {
+				continue;
+			}
+			for (Village village : entry.villages) {
+				if (village.pledged && !village.lost && village.plaque.distSqr(pos) <= PLAQUE_CLAIM_RADIUS * PLAQUE_CLAIM_RADIUS) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Public loyalty step for other modules (DESIGN 38.R.4: refusing a damage bill of a pledged village costs 10 loyalty):
+	 * the pledged village whose bell is within {@link #ZONE_RADIUS} of {@code pos} changes by {@code delta} (0-100, the
+	 * usual renounce at 0). Returns the village name, or null when no pledged village is there.
+	 */
+	public static @Nullable String loyaltyAt(ServerLevel level, BlockPos pos, int delta) {
+		MinecraftServer server = Vassals.server();
+		if (server == null || !level.dimension().equals(Level.OVERWORLD)) {
+			return null;
+		}
+		for (UUID owner : Vassals.owners()) {
+			Vassals.Owner entry = Vassals.peek(owner);
+			if (entry == null) {
+				continue;
+			}
+			for (Village village : List.copyOf(entry.villages)) {
+				if (village.pledged && !village.lost && village.bell.distSqr(pos) <= ZONE_RADIUS * ZONE_RADIUS) {
+					addLoyalty(server, owner, village, delta);
+					return village.name;
+				}
+			}
+		}
+		return null;
 	}
 
 	// ================================================================== server tick

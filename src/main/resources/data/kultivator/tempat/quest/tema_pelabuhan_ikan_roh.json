@@ -1,0 +1,16 @@
+{
+  "pemberi": "tokoh:bibi_yu",
+  "tempat": "tema_pelabuhan",
+  "tahap": [
+    {
+      "id": "kumpul",
+      "tujuan": [
+        "punya kultivator:tema/ikan_roh 10"
+      ]
+    },
+    {
+      "id": "serah",
+      "ke": "selesai"
+    }
+  ]
+}

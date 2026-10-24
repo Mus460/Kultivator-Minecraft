@@ -1,0 +1,25 @@
+{
+  "pembicara": [
+    "tokoh:mo_ying"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest takhta_topeng_terlepas tahap duel"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "ancam",
+      "suara": "cerita.moying_reveal",
+      "pilihan": [
+        {
+          "akibat": [
+            "mulai_duel"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

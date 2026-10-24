@@ -1,0 +1,25 @@
+{
+  "pembicara": [
+    "peran:tawanan"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "iblis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berlutut_rantai",
+      "suara": "tema.iblis.captive",
+      "pilihan": [
+        {
+          "akibat": [
+            "iblis_tebus_lagi"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

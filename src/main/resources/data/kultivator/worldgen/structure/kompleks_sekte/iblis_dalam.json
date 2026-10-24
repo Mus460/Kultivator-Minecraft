@@ -1,0 +1,99 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:kompleks_sekte/semua",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kompleks_sekte",
+  "distrik": "iblis_dalam",
+  "lot": [
+    {
+      "dx": -72,
+      "dz": -72,
+      "pool": "kultivator:kompleks_sekte/iblis/dalam_lubang_tulang",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -72,
+      "pool": "kultivator:kompleks_sekte/iblis/dalam_taman_dalam",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -72,
+      "pool": "kultivator:kompleks_sekte/iblis/dalam_aula_harta",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": -24,
+      "pool": "kultivator:kompleks_sekte/iblis/dalam_gua_meditasi",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -24,
+      "pool": "kultivator:kompleks_sekte/iblis/dalam_paviliun_sutra",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -24,
+      "pool": "kultivator:kompleks_sekte/iblis/dalam_menara_genderang",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": 24,
+      "pool": "kultivator:kompleks_sekte/iblis/dalam_asrama_dalam",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": 24,
+      "pool": "kultivator:kompleks_sekte/iblis/dalam_gerbang_dalam",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": 24,
+      "pool": "kultivator:kompleks_sekte/iblis/dalam_kolam_darah",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": 69,
+      "pool": "kultivator:kompleks_sekte/iblis/tebing_10_sisi",
+      "putar": 0,
+      "dy": -10
+    },
+    {
+      "dx": -24,
+      "dz": 69,
+      "pool": "kultivator:kompleks_sekte/iblis/tebing_10_tengah",
+      "putar": 0,
+      "dy": -10
+    },
+    {
+      "dx": 24,
+      "dz": 69,
+      "pool": "kultivator:kompleks_sekte/iblis/tebing_10_sisi",
+      "putar": 0,
+      "dy": -10
+    },
+    {
+      "dx": -4,
+      "dz": 59,
+      "pool": "kultivator:kompleks_sekte/iblis/tangga_10",
+      "putar": 0,
+      "dy": -10
+    }
+  ],
+  "gaya": []
+}

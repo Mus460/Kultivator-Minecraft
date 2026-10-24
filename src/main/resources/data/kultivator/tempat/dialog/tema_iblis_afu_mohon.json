@@ -1,0 +1,41 @@
+{
+  "pembicara": [
+    "tokoh:a_fu"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_iblis_rantai tahap kandang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berlutut_rantai",
+      "suara": "tema.iblis.captive",
+      "pilihan": [
+        {
+          "ke": "nama"
+        },
+        {
+          "ke": "janji"
+        }
+      ]
+    },
+    {
+      "id": "nama",
+      "gestur": "duduk_lantai",
+      "pilihan": [
+        {
+          "ke": "janji"
+        }
+      ]
+    },
+    {
+      "id": "janji",
+      "gestur": "menangis",
+      "akibat": [
+        "peristiwa tanda iblis_afu_temu"
+      ]
+    }
+  ]
+}

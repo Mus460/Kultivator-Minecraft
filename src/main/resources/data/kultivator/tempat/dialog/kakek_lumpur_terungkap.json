@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "tokoh:kakek_lumpur"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "alur 7",
+    "alur_dou"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "duduk_lantai",
+      "pilihan": [
+        {
+          "ke": "ajar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ajar",
+      "gestur": "tidur_duduk",
+      "akibat": [
+        "efek minecraft:resistance 300 0"
+      ]
+    }
+  ]
+}

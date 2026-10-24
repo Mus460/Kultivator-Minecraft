@@ -1,0 +1,53 @@
+{
+  "_": "DESIGN 38.T.10.1 model routes (ideal unit profit before saturation)",
+  "jalur": [
+    {
+      "dari": "air",
+      "ke": "oasis",
+      "barang": "kultivator:dagang/sutra_awan",
+      "beli": 36,
+      "jual_ideal": 48.6,
+      "laba_ideal": 12.6
+    },
+    {
+      "dari": "pelabuhan",
+      "ke": "oasis",
+      "barang": "kultivator:dagang/porselen_hijau",
+      "beli": 24,
+      "jual_ideal": 32.4,
+      "laba_ideal": 8.4
+    },
+    {
+      "dari": "oasis",
+      "ke": "air",
+      "barang": "kultivator:dagang/giok_barat",
+      "beli": 60,
+      "jual_ideal": 78.0,
+      "laba_ideal": 18.0
+    },
+    {
+      "dari": "gunung",
+      "ke": "ibu_kota",
+      "barang": "kultivator:dagang/lingzhi_gunung",
+      "beli": 45,
+      "jual_ideal": 58.5,
+      "laba_ideal": 13.5
+    },
+    {
+      "dari": "gunung",
+      "ke": "pelabuhan",
+      "barang": "kultivator:dagang/dupa_gunung",
+      "beli": 5,
+      "jual_ideal": 6.5,
+      "laba_ideal": 1.5
+    },
+    {
+      "dari": "pelabuhan",
+      "ke": "gunung",
+      "barang": "kultivator:dagang/rempah_seberang",
+      "beli": 12,
+      "jual_ideal": 15.6,
+      "laba_ideal": 3.6
+    }
+  ]
+}

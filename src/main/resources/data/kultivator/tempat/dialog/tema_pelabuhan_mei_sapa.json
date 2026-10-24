@@ -1,0 +1,61 @@
+{
+  "pembicara": [
+    "tokoh:pendeta_laut"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "pelabuhan_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "prop": "dupa",
+      "pilihan": [
+        {
+          "ke": "dewi"
+        },
+        {
+          "syarat": [
+            "bendera pelabuhan_hasil_tumpas"
+          ],
+          "akibat": [
+            "nama_baik 1"
+          ],
+          "ke": "arwah"
+        },
+        {
+          "syarat": [
+            "bendera pelabuhan_hasil_damai"
+          ],
+          "ke": "maaf"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "dewi",
+      "gestur": "sujud_dupa",
+      "prop": "dupa"
+    },
+    {
+      "id": "arwah",
+      "gestur": "sujud_dupa",
+      "prop": "dupa"
+    },
+    {
+      "id": "maaf",
+      "gestur": "sikap_doa",
+      "prop": "dupa"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "sikap_doa"
+    }
+  ]
+}

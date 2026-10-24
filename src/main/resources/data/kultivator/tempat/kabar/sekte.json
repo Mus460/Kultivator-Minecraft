@@ -1,0 +1,52 @@
+{
+  "templat": [
+    {
+      "id": "sekte_perang",
+      "pemicu": "sekte_perang",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "sekte_damai",
+      "pemicu": "sekte_damai",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "sekte_sekutu",
+      "pemicu": "sekte_sekutu",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "sekte_putus",
+      "pemicu": "sekte_putus",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "sekte_tumbuh",
+      "pemicu": "sekte_tumbuh",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "sekte_serangan",
+      "pemicu": "sekte_serangan",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "sekte_perang_npc",
+      "pemicu": "sekte_perang_npc",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "sekte_turnamen",
+      "pemicu": "sekte_turnamen",
+      "bobot": 10,
+      "umur_hari": 5
+    }
+  ]
+}

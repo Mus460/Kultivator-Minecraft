@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/ibu_kota",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.lelang_agung_ikut.description"
+    },
+    "icon": {
+      "id": "minecraft:name_tag"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.lelang_agung_ikut.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

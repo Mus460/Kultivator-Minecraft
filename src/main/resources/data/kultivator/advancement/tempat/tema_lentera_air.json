@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_air",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_lentera_air.description"
+    },
+    "icon": {
+      "id": "minecraft:lantern"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_lentera_air.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

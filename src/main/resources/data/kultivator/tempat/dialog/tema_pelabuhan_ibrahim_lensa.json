@@ -1,0 +1,70 @@
+{
+  "pembicara": [
+    "tokoh:ibrahim"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest tema_pelabuhan_pelita tahap lensa"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb 300"
+          ],
+          "akibat": [
+            "pelabuhan_kaca_ibrahim"
+          ],
+          "ke": "jual",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_pelabuhan_ibrahim_lensa.mulai.1.alasan"
+        },
+        {
+          "ke": "bintang"
+        },
+        {
+          "syarat": [
+            "bendera pelabuhan_lensa_bintang",
+            "pelabuhan_bintang_malam 1"
+          ],
+          "akibat": [
+            "beri kultivator:tema/kaca_garam_laut 1",
+            "bendera pelabuhan_lensa_bintang off"
+          ],
+          "ke": "hadiah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bintang",
+      "gestur": "v_tatap_tunjuk",
+      "pilihan": [
+        {
+          "akibat": [
+            "pelabuhan_bintang",
+            "bendera pelabuhan_lensa_bintang"
+          ],
+          "ke": "janji"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "janji",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "jual",
+      "gestur": "hormat_dalam"
+    },
+    {
+      "id": "hadiah",
+      "gestur": "hormat_dalam"
+    }
+  ]
+}

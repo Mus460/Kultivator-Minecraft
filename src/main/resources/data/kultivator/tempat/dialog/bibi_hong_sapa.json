@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:bibi_hong"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tuang_teh",
+      "prop": "teko",
+      "suara": "kotabesar.inn_welcome",
+      "pilihan": [
+        {
+          "ke": "kamar"
+        },
+        {
+          "ke": "kabar"
+        },
+        {
+          "ke": "teh"
+        }
+      ]
+    },
+    {
+      "id": "kamar",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik",
+      "prop": "teko"
+    },
+    {
+      "id": "teh",
+      "gestur": "tuang_teh",
+      "prop": "teko",
+      "akibat": [
+        "efek minecraft:regeneration 20 0"
+      ]
+    }
+  ]
+}

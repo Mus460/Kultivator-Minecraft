@@ -1,0 +1,80 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_tema/iblis",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_iblis",
+  "distrik": "kedai_racun",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/iblis/kedai_racun/kedai_barat",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/iblis/kedai_racun/kedai_teh_asap",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/iblis/kedai_racun/kedai_timur",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/iblis/kedai_racun/stasiun_formasi_hitam",
+      "putar": 0
+    },
+    {
+      "dx": 47,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/iblis/tembok/lurus_jaga",
+      "putar": 1
+    },
+    {
+      "dx": 47,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/iblis/tembok/menara",
+      "putar": 1
+    },
+    {
+      "dx": -48,
+      "dz": 47,
+      "pool": "kultivator:kota_tema/iblis/tembok/lurus",
+      "putar": 2
+    },
+    {
+      "dx": 0,
+      "dz": 47,
+      "pool": "kultivator:kota_tema/iblis/tembok/lurus",
+      "putar": 2
+    },
+    {
+      "dx": 47,
+      "dz": 47,
+      "pool": "kultivator:kota_tema/iblis/tembok/sudut",
+      "putar": 2
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "#kultivator:kota_tema/gaya/iblis_merah",
+      "akhiran": "merah"
+    },
+    {
+      "biomes": "#kultivator:kota_tema/gaya/iblis_rawa",
+      "akhiran": "rawa"
+    }
+  ]
+}

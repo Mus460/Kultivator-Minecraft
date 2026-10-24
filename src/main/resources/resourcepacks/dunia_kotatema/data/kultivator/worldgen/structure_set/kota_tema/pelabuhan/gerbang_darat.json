@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380408,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_pelabuhan",
+    "distrik": "gerbang_darat"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/pelabuhan/gerbang_darat",
+      "weight": 1
+    }
+  ]
+}

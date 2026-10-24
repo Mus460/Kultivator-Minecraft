@@ -1,0 +1,61 @@
+{
+  "pembicara": [
+    "peran:pengawal_gurun"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "oasis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tombak",
+      "prop": "tombak",
+      "pilihan": [
+        {
+          "ke": "bea"
+        },
+        {
+          "ke": "badai"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bea",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "badai",
+      "gestur": "sikap_tombak",
+      "prop": "tombak",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

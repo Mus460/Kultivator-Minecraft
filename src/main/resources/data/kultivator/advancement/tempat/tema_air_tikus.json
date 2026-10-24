@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_air",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_air_tikus.description"
+    },
+    "icon": {
+      "id": "minecraft:lead"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_air_tikus.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

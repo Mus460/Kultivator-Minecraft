@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "tokoh:yan_ruyi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_depan",
+      "pilihan": [
+        {
+          "ke": "kumuh"
+        },
+        {
+          "ke": "tertib"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kumuh",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "ke": "takut"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "takut",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "tertib",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

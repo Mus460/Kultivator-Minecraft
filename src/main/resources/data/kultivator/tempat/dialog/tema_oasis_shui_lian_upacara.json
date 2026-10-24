@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:shui_lian"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest tema_oasis_mata_air tahap pulih"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "prop": "kendi",
+      "suara": "tema.oasis.water_priestess",
+      "pilihan": [
+        {
+          "ke": "upacara"
+        }
+      ]
+    },
+    {
+      "id": "upacara",
+      "gestur": "sujud_dupa",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_air_pulih",
+            "oasis_surat selamanya",
+            "gelar pembawa_air",
+            "nama_baik 10",
+            "quest_maju tema_oasis_mata_air"
+          ],
+          "ke": "akhir"
+        }
+      ]
+    },
+    {
+      "id": "akhir",
+      "gestur": "tepuk_tangan"
+    }
+  ]
+}

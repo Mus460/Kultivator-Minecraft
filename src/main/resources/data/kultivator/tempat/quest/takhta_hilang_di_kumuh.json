@@ -1,0 +1,63 @@
+{
+  "pemberi": "tokoh:bao_qing",
+  "tempat": "kumuh",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "petunjuk",
+      "tujuan": [
+        "punya cerita:sandal_berdarah",
+        "punya cerita:kertas_jimat_hitam",
+        "bendera takhta2_saksi"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "hilang",
+      "arah": "kota/kota_besar"
+    },
+    {
+      "id": "sarang",
+      "tujuan": [
+        "pergi gua/sarang_iblis"
+      ],
+      "akibat": [
+        "bendera takhta2_sarang"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "hilang",
+      "arah": "gua/sarang_iblis"
+    },
+    {
+      "id": "bebaskan",
+      "tujuan": [
+        "bebaskan tawanan x2"
+      ],
+      "akibat": [
+        "beri cerita:cap_bayangan",
+        "alur 2 bukti",
+        "gelar pembebas"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "hilang",
+      "arah": "gua/sarang_iblis"
+    },
+    {
+      "id": "lapor",
+      "tujuan": [
+        "antar cerita:cap_bayangan tokoh:bao_qing"
+      ],
+      "akibat": [
+        "nama_baik 5",
+        "beri_nb_pita 60",
+        "alur 2 bebas",
+        "kabar takhta_tawanan_pulang pemain"
+      ]
+    },
+    {
+      "id": "hilang",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}

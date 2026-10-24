@@ -1,0 +1,69 @@
+{
+  "type": "minecraft:chest",
+  "random_sequence": "kultivator:gua/hadiah_bintang",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 1
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:heaven_seal_shard",
+          "weight": 30,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 2
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:batu_meteor_roh",
+          "weight": 30,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 4
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:spirit_stone_supreme",
+          "weight": 12
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:immortal_essence_pearl",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:kristal_gerhana",
+          "weight": 14,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 2
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:inti_meteor_agung",
+          "weight": 8
+        }
+      ]
+    }
+  ]
+}

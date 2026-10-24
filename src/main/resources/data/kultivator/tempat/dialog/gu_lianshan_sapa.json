@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "tokoh:gu_lianshan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "pewaris"
+        },
+        {
+          "ke": "lelang"
+        },
+        {
+          "ke": "ajudan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pewaris",
+      "gestur": "hitung_sempoa",
+      "prop": "sempoa"
+    },
+    {
+      "id": "lelang",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "ajudan",
+      "gestur": "kipas",
+      "prop": "kipas_lipat"
+    }
+  ]
+}

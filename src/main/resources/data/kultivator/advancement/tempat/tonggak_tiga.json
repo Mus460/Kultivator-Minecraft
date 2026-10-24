@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:dunia/map_opened",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tonggak_tiga.description"
+    },
+    "icon": {
+      "id": "minecraft:cobblestone_wall"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tonggak_tiga.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

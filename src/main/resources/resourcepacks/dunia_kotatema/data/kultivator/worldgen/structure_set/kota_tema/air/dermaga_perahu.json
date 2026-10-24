@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380429,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_air",
+    "distrik": "dermaga_perahu"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/air/dermaga_perahu",
+      "weight": 1
+    }
+  ]
+}

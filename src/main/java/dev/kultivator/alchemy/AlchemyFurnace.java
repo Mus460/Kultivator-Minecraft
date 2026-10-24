@@ -142,6 +142,37 @@ public final class AlchemyFurnace {
 		DURATION_PROVIDERS.add(provider);
 	}
 
+	/**
+	 * Told when a refining at a furnace ends (38EK, DESIGN 38.E.2: the Alchemist Guild's exam counts and the Pill Meeting's
+	 * scores of 38KS). {@code result} is a copy of the pills made (empty on failure), {@code quality} the rolled quality
+	 * (null on failure or an unknown mix), {@code owner} may be null or offline.
+	 */
+	@FunctionalInterface
+	public interface FinishListener {
+		void finished(ServerLevel level, BlockPos pos, @Nullable UUID owner, ItemStack result, @Nullable PillQuality quality, boolean success,
+				int alchemyLevel);
+	}
+
+	private static final List<FinishListener> FINISH_LISTENERS = new ArrayList<>();
+
+	/** Registers a {@link FinishListener} (once, from a module's {@code init()}). */
+	public static void addFinishListener(FinishListener listener) {
+		if (listener != null) {
+			FINISH_LISTENERS.add(listener);
+		}
+	}
+
+	private static void tellFinished(ServerLevel level, BlockPos pos, @Nullable UUID owner, ItemStack result, @Nullable PillQuality quality,
+			boolean success, int alchemyLevel) {
+		for (FinishListener listener : FINISH_LISTENERS) {
+			try {
+				listener.finished(level, pos, owner, result.copy(), quality, success, alchemyLevel);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.warn("Alchemy finish listener failed", exception);
+			}
+		}
+	}
+
 	/** The formation chance bonus at {@code pos} (0 without providers). */
 	public static double formationChance(ServerLevel level, BlockPos pos, @Nullable UUID owner) {
 		double sum = 0.0D;
@@ -413,6 +444,7 @@ public final class AlchemyFurnace {
 		RandomSource random = level.getRandom();
 		if (recipe == null) {
 			failure(level, top, owner, "kultivator.alchemy.refine.unknown", UNKNOWN_XP);
+			tellFinished(level, pos, pot.owner(), ItemStack.EMPTY, null, false, alchemyLevel);
 			return;
 		}
 		// Phase 7 (DESIGN 19.3.7): stones and a core add to the chance (still capped at MAX_CHANCE), stones and the
@@ -424,6 +456,7 @@ public final class AlchemyFurnace {
 		}
 		if (random.nextDouble() >= chance) {
 			failure(level, top, owner, "kultivator.alchemy.refine.failed", recipe.xp() * FAILED_XP_SHARE);
+			tellFinished(level, pos, pot.owner(), ItemStack.EMPTY, null, false, alchemyLevel);
 			return;
 		}
 		PillQuality quality = rollQuality(random, alchemyLevel, soul, mix.qualityBonus());
@@ -447,6 +480,7 @@ public final class AlchemyFurnace {
 			AlchemyComponents.withQuality(result, quality);
 		}
 		Component name = result.getHoverName().copy();
+		tellFinished(level, pos, pot.owner(), result, quality, true, alchemyLevel);
 		dropBeside(level, pos, result, owner == null ? null : owner.position());
 
 		Fx.send(level, top, FxType.ALCHEMY, 2, quality.ordinal(), (float) recipe.color());

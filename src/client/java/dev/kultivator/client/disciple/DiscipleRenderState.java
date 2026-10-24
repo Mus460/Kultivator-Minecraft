@@ -42,4 +42,10 @@ public class DiscipleRenderState extends AvatarRenderState {
 	public final ItemStackRenderState parasolItem = new ItemStackRenderState();
 	/** 0..1 how solid a Divine Clone is (fading in after it appears and out before it is removed). */
 	public float cloneFade = 1.0F;
+	// Penampilan dan Animasi (DESIGN 40.7.2, module 40R): this frame's packed Sosok and Gaya (0 = Sosok did not extract
+	// this body); the full per-body data rides SosokRender.DATA.
+	/** {@code Sosok.pack()} of the body (0 = none). */
+	public int sosok;
+	/** {@code Gaya.pack()} of the body. */
+	public int gaya;
 }

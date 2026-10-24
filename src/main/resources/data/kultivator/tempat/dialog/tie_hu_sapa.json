@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "tokoh:tie_hu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berdiri_jaga",
+      "prop": "tombak",
+      "suara": "kotabesar.gate_welcome",
+      "pilihan": [
+        {
+          "ke": "jam"
+        },
+        {
+          "ke": "nasihat"
+        },
+        {
+          "ke": "tegang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "jam",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "nasihat",
+      "gestur": "bisik"
+    },
+    {
+      "id": "tegang",
+      "gestur": "sikap_tombak",
+      "prop": "tombak"
+    }
+  ]
+}

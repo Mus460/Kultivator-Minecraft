@@ -1,0 +1,45 @@
+{
+  "pembicara": [
+    "tokoh:dan_chen"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest resep_hilang baru",
+    "quest tungku_pertama selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "cerita",
+      "prop": "kitab",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai resep_hilang"
+          ],
+          "ke": "pesan"
+        },
+        {
+          "ke": "bahaya"
+        }
+      ]
+    },
+    {
+      "id": "bahaya",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai resep_hilang"
+          ],
+          "ke": "pesan"
+        }
+      ]
+    },
+    {
+      "id": "pesan",
+      "gestur": "tunjuk"
+    }
+  ]
+}

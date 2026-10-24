@@ -1,0 +1,54 @@
+{
+  "pemberi": "tokoh:lin_fei",
+  "tempat": "gilda_kultivator",
+  "tahap": [
+    {
+      "id": "misi",
+      "tujuan": [
+        "misi_gilda *"
+      ]
+    },
+    {
+      "id": "arena",
+      "tujuan": [
+        "duel tokoh:feng_ao"
+      ],
+      "arah": "kota/kota_besar"
+    },
+    {
+      "id": "sikap",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera feng_ao_dendam"
+          ],
+          "ke": "dendam"
+        }
+      ],
+      "ke": "sahabat"
+    },
+    {
+      "id": "sahabat",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gelar sahabat_naga_muda",
+        "nama_baik 5",
+        "kabar naga_muda_sahabat pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "dendam",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "nama_baik 2",
+        "kabar naga_muda_dendam pemain"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

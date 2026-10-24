@@ -179,5 +179,9 @@
   "advancement.kultivator.sekte.hubungan_sahabat.title": "A Cup of Tea",
   "advancement.kultivator.sekte.hubungan_sahabat.description": "Two of your disciples became friends",
   "advancement.kultivator.sekte.hubungan_saingan.title": "Senior and Junior",
-  "advancement.kultivator.sekte.hubungan_saingan.description": "Two of your disciples became rivals"
+  "advancement.kultivator.sekte.hubungan_saingan.description": "Two of your disciples became rivals",
+  "kultivator.sekte.hubungan.sebab.mandiri_teh": "Tea on their own time",
+  "kultivator.sekte.hubungan.ingat.mandiri_teh": "Shared tea in free time with %s",
+  "kultivator.sekte.hubungan.sebab.mandiri_tanding": "Sparring bout",
+  "kultivator.sekte.hubungan.ingat.mandiri_tanding": "Sparred with %s"
 }

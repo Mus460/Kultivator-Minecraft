@@ -1,0 +1,81 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:kompleks_sekte/semua",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kompleks_sekte",
+  "distrik": "iblis_puncak_sedang",
+  "lot": [
+    {
+      "dx": -72,
+      "dz": -48,
+      "pool": "kultivator:kompleks_sekte/iblis/puncak_gua_puncak",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -48,
+      "pool": "kultivator:kompleks_sekte/iblis/puncak_aula_puncak",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -48,
+      "pool": "kultivator:kompleks_sekte/iblis/puncak_paviliun_pandang",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": 0,
+      "pool": "kultivator:kompleks_sekte/iblis/puncak_rumah_tetua_barat",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": 0,
+      "pool": "kultivator:kompleks_sekte/iblis/puncak_pelataran",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": 0,
+      "pool": "kultivator:kompleks_sekte/iblis/puncak_rumah_tetua_timur",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": 45,
+      "pool": "kultivator:kompleks_sekte/iblis/tebing_18_sisi",
+      "putar": 0,
+      "dy": -18
+    },
+    {
+      "dx": -24,
+      "dz": 45,
+      "pool": "kultivator:kompleks_sekte/iblis/tebing_18_tengah",
+      "putar": 0,
+      "dy": -18
+    },
+    {
+      "dx": 24,
+      "dz": 45,
+      "pool": "kultivator:kompleks_sekte/iblis/tebing_18_sisi",
+      "putar": 0,
+      "dy": -18
+    },
+    {
+      "dx": -4,
+      "dz": 24,
+      "pool": "kultivator:kompleks_sekte/iblis/tangga_18",
+      "putar": 0,
+      "dy": -18
+    }
+  ],
+  "gaya": []
+}

@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "tokoh:deng_ming"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest tema_pelabuhan_pelita tahap upacara"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "syarat": [
+            "punya kultivator:tema/mutiara_fajar"
+          ],
+          "akibat": [
+            "pelabuhan_upacara",
+            "gelar penjaga_pelita",
+            "nama_baik 10",
+            "kabar tema_pelabuhan_pelita_nyala pemain",
+            "kabar tema_pelabuhan_pelita_nyala_2 pemain",
+            "quest_maju tema_pelabuhan_pelita"
+          ],
+          "ke": "nyala",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_pelabuhan_deng_upacara.mulai.1.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "nyala",
+      "gestur": "tertawa"
+    }
+  ]
+}

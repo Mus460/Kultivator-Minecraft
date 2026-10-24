@@ -1,0 +1,64 @@
+{
+  "pembicara": [
+    "peran:pengawal_istana"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 60"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berdiri_jaga",
+      "prop": "tombak",
+      "pilihan": [
+        {
+          "ke": "audiensi"
+        },
+        {
+          "ke": "sejarah"
+        },
+        {
+          "ke": "pangeran"
+        },
+        {
+          "syarat": [
+            "bendera pedang_ayah_tolak",
+            "quest pedang_ayah baru"
+          ],
+          "ke": "pedang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "audiensi",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "sejarah",
+      "gestur": "tunjuk",
+      "akibat": [
+        "lore kota_besar.istana"
+      ]
+    },
+    {
+      "id": "pangeran",
+      "gestur": "bisik"
+    },
+    {
+      "id": "pedang",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai pedang_ayah",
+            "bendera pedang_ayah_tolak off"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

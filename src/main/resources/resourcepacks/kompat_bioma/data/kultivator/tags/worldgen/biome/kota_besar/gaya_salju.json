@@ -1,0 +1,69 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "terralith:alpha_islands_winter",
+      "required": false
+    },
+    {
+      "id": "terralith:alpine_grove",
+      "required": false
+    },
+    {
+      "id": "terralith:cold_shrubland",
+      "required": false
+    },
+    {
+      "id": "terralith:frozen_cliffs",
+      "required": false
+    },
+    {
+      "id": "terralith:glacial_chasm",
+      "required": false
+    },
+    {
+      "id": "terralith:haze_mountain",
+      "required": false
+    },
+    {
+      "id": "terralith:shield",
+      "required": false
+    },
+    {
+      "id": "terralith:siberian_grove",
+      "required": false
+    },
+    {
+      "id": "terralith:siberian_taiga",
+      "required": false
+    },
+    {
+      "id": "terralith:snowy_maple_forest",
+      "required": false
+    },
+    {
+      "id": "terralith:snowy_shield",
+      "required": false
+    },
+    {
+      "id": "terralith:volcanic_peaks",
+      "required": false
+    },
+    {
+      "id": "terralith:windswept_spires",
+      "required": false
+    },
+    {
+      "id": "terralith:wintry_forest",
+      "required": false
+    },
+    {
+      "id": "terralith:wintry_lowlands",
+      "required": false
+    },
+    {
+      "id": "terralith:yosemite_lowlands",
+      "required": false
+    }
+  ]
+}

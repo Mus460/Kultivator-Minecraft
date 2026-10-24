@@ -1,0 +1,27 @@
+{
+  "pembicara": [
+    "peran:tukang"
+  ],
+  "prioritas": 8,
+  "syarat": [
+    "takut 60"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berlutut",
+      "suara": "tempat.village_fear",
+      "pilihan": [
+        {
+          "ke": "lega"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lega",
+      "gestur": "hormat"
+    }
+  ]
+}

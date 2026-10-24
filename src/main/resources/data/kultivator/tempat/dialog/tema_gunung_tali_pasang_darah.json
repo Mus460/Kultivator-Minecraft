@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:tie_suo"
+  ],
+  "prioritas": 65,
+  "syarat": [
+    "quest tema_gunung_tali tahap pasang",
+    "bendera gunung_paksa"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "syarat": [
+            "punya kultivator:tema/tali_sutra_kera"
+          ],
+          "akibat": [
+            "ambil kultivator:tema/tali_sutra_kera 1",
+            "quest_maju tema_gunung_tali"
+          ],
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_gunung.alasan.tali_sutra"
+        },
+        {}
+      ]
+    }
+  ]
+}

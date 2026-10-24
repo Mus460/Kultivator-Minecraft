@@ -1,0 +1,28 @@
+{
+  "pembicara": [
+    "tokoh:lin_haichao"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "pelabuhan_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "menulis",
+      "prop": "papan_catatan",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "sikap_tangan_belakang"
+    }
+  ]
+}

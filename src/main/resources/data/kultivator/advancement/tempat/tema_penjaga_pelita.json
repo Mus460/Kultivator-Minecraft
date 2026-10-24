@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_pelabuhan",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_penjaga_pelita.description"
+    },
+    "icon": {
+      "id": "minecraft:sea_lantern"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_penjaga_pelita.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

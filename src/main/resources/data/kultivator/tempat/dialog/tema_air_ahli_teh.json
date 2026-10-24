@@ -1,0 +1,25 @@
+{
+  "pembicara": [
+    "peran:ahli_teh"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tuang_teh",
+      "prop": "teko",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

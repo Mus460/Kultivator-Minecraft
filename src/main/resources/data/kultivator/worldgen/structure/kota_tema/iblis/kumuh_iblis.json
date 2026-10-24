@@ -1,0 +1,80 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_tema/iblis",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_iblis",
+  "distrik": "kumuh_iblis",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/iblis/kumuh_iblis/kumuh_barat_laut",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/iblis/kumuh_iblis/kumuh_barat_daya",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/iblis/kumuh_iblis/dapur_umum",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/iblis/kumuh_iblis/bengkel_kumuh",
+      "putar": 0
+    },
+    {
+      "dx": -58,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/iblis/tembok/lurus_sangkar",
+      "putar": 3
+    },
+    {
+      "dx": -58,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/iblis/tembok/lurus",
+      "putar": 3
+    },
+    {
+      "dx": -48,
+      "dz": 47,
+      "pool": "kultivator:kota_tema/iblis/tembok/lurus",
+      "putar": 2
+    },
+    {
+      "dx": 0,
+      "dz": 47,
+      "pool": "kultivator:kota_tema/iblis/tembok/lurus_jaga",
+      "putar": 2
+    },
+    {
+      "dx": -58,
+      "dz": 47,
+      "pool": "kultivator:kota_tema/iblis/tembok/sudut",
+      "putar": 3
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "#kultivator:kota_tema/gaya/iblis_merah",
+      "akhiran": "merah"
+    },
+    {
+      "biomes": "#kultivator:kota_tema/gaya/iblis_rawa",
+      "akhiran": "rawa"
+    }
+  ]
+}

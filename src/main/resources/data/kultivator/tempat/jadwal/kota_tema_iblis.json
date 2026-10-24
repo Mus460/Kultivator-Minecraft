@@ -1,0 +1,153 @@
+{
+  "_catatan": "DESIGN 38.T.7.3 / 38.T.7.10, module 38TK-I: what the built-in JadwalTema leaves to the theme (the keeper of the forbidden books, the contract killers, the night events). Hours are clock hours (06:00 = tick 0); the night shift of the demonic roles is applied by JadwalTema itself.",
+  "jenis": "kota_tema/iblis",
+  "peran": {
+    "penjaga_kitab_terlarang": {
+      "6-11": {
+        "kegiatan": "tidur",
+        "tujuan": "@kasur",
+        "klip": "tidur",
+        "dalam": true
+      },
+      "12-17": {
+        "kegiatan": "baca_kitab",
+        "tujuan": "meja_tulis",
+        "klip": "membaca",
+        "kanan": "kitab",
+        "dalam": true
+      },
+      "18-23": {
+        "kegiatan": "rak_berantai",
+        "tujuan": "@kerja",
+        "klip": "rak_susun",
+        "kanan": "gulungan",
+        "dalam": true
+      },
+      "0-5": {
+        "kegiatan": "dupa_menara",
+        "tujuan": "dupa",
+        "klip": "sujud_dupa",
+        "kanan": "dupa",
+        "dalam": true
+      }
+    },
+    "pembunuh_bayaran": {
+      "6-13": {
+        "kegiatan": "tidur",
+        "tujuan": "@kasur",
+        "klip": "tidur",
+        "dalam": true
+      },
+      "14-17": {
+        "kegiatan": "asah_pisau",
+        "tujuan": "kursi",
+        "klip": "asah_pisau",
+        "kanan": "pisau_ganda"
+      },
+      "18-21": {
+        "kegiatan": "loket_kontrak",
+        "tujuan": "@kerja",
+        "klip": "sikap_lipat_tangan",
+        "kanan": "pisau_ganda"
+      },
+      "22-3": {
+        "kegiatan": "patroli_atap",
+        "tujuan": "jaga",
+        "klip": "berdiri_jaga",
+        "jalan": "baris_jaga"
+      },
+      "4-5": {
+        "kegiatan": "minum_racun",
+        "tujuan": "meja_makan",
+        "klip": "minum_teh",
+        "kanan": "cawan_racun"
+      }
+    }
+  },
+  "acara": {
+    "tema.malam_pertandingan": {
+      "*": {
+        "kegiatan": "tonton_arena",
+        "tujuan": "penonton",
+        "klip": "sorak_arena"
+      },
+      "warga_iblis": {
+        "kegiatan": "tonton_arena",
+        "tujuan": "penonton",
+        "klip": "sorak_arena"
+      },
+      "makelar_gelap": {
+        "kegiatan": "taruhan",
+        "tujuan": "penonton",
+        "klip": "hitung_koin_gelap",
+        "kanan": "kantong_uang"
+      },
+      "anak": {
+        "kegiatan": "intip_arena",
+        "tujuan": "penonton",
+        "klip": "sikap_anak"
+      }
+    },
+    "tema.lelang_gelap": {
+      "makelar_gelap": {
+        "kegiatan": "lelang_gelap",
+        "tujuan": "kursi",
+        "klip": "hitung_koin_gelap",
+        "kanan": "kantong_uang"
+      },
+      "warga_iblis": {
+        "kegiatan": "lelang_gelap",
+        "tujuan": "kursi",
+        "klip": "duduk_kursi"
+      }
+    },
+    "tema.penyerbuan": {
+      "*": {
+        "kegiatan": "sembunyi",
+        "tujuan": "@rumah",
+        "klip": "takut_sembunyi",
+        "dalam": true
+      },
+      "gladiator_iblis": {
+        "kegiatan": "bela_gerbang",
+        "tujuan": "jaga",
+        "klip": "latih_jurus"
+      },
+      "pembunuh_bayaran": {
+        "kegiatan": "bela_gerbang",
+        "tujuan": "jaga",
+        "klip": "sikap_lipat_tangan",
+        "kanan": "pisau_ganda"
+      },
+      "tawanan": {
+        "kegiatan": "berharap",
+        "tujuan": "@tetap",
+        "klip": "sikap_doa"
+      }
+    },
+    "tema.pesta_darah": {
+      "*": {
+        "kegiatan": "pesta_darah",
+        "tujuan": "meja_makan",
+        "klip": "minum_arak",
+        "kanan": "cawan_arak"
+      },
+      "warga_iblis": {
+        "kegiatan": "pesta_darah",
+        "tujuan": "penonton",
+        "klip": "sorak_arena"
+      },
+      "anak": {
+        "kegiatan": "lentera_merah",
+        "tujuan": "obrol",
+        "klip": "main_lentera",
+        "kanan": "lentera_tangan"
+      },
+      "tawanan": {
+        "kegiatan": "takut",
+        "tujuan": "@tetap",
+        "klip": "takut_sembunyi"
+      }
+    }
+  }
+}

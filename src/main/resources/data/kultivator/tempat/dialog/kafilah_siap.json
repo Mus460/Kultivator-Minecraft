@@ -1,0 +1,25 @@
+{
+  "pembicara": [
+    "tokoh:lao_qiao"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest kafilah_terakhir tahap siap"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "jalan_pikul",
+      "prop": "pikulan",
+      "pilihan": [
+        {
+          "akibat": [
+            "kawal_mulai 40",
+            "quest_maju kafilah_terakhir"
+          ]
+        }
+      ]
+    }
+  ]
+}

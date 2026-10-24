@@ -1,0 +1,26 @@
+{
+  "pembicara": [
+    "tokoh:su_jiner"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest tema_air_benang tahap kain"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tepuk_tangan",
+      "pilihan": [
+        {
+          "ke": "cara"
+        }
+      ]
+    },
+    {
+      "id": "cara",
+      "gestur": "tenun"
+    }
+  ]
+}

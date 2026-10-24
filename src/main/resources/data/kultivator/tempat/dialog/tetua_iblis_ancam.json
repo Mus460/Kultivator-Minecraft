@@ -1,0 +1,22 @@
+{
+  "pembicara": [
+    "peran:tetua_iblis"
+  ],
+  "prioritas": -1,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "ancam",
+      "suara": "tempat.demon_hideout",
+      "pilihan": [
+        {
+          "akibat": [
+            "mulai_duel"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

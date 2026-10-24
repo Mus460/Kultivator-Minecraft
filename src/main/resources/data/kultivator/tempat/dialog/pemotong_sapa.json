@@ -1,0 +1,46 @@
+{
+  "pembicara": [
+    "peran:pemotong_batu"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 65"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "asah_pisau",
+      "prop": "pahat",
+      "pilihan": [
+        {
+          "ke": "giok"
+        },
+        {
+          "ke": "aneh"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "giok",
+      "gestur": "lihat_barang",
+      "prop": "batu_mentah",
+      "akibat": [
+        "lore kota_besar.pasar"
+      ]
+    },
+    {
+      "id": "aneh",
+      "gestur": "cerita"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

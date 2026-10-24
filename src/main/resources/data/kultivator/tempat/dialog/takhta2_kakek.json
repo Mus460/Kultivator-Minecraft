@@ -1,0 +1,59 @@
+{
+  "pembicara": [
+    "tokoh:kakek_lumpur"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_hilang_di_kumuh tahap petunjuk",
+    "!bendera takhta2_kakek_bicara"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "duduk_lantai",
+      "pilihan": [
+        {
+          "ke": "tahu"
+        },
+        {
+          "syarat": [
+            "nb 1"
+          ],
+          "akibat": [
+            "bayar 1"
+          ],
+          "ke": "bakpao"
+        }
+      ]
+    },
+    {
+      "id": "bakpao",
+      "gestur": "makan",
+      "prop": "mangkuk",
+      "pilihan": [
+        {
+          "ke": "tahu"
+        }
+      ]
+    },
+    {
+      "id": "tahu",
+      "gestur": "cerita",
+      "akibat": [
+        "beri cerita:kertas_jimat_hitam",
+        "bendera takhta2_kakek_bicara"
+      ],
+      "pilihan": [
+        {
+          "ke": "iblis"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "iblis",
+      "gestur": "bisik"
+    }
+  ]
+}

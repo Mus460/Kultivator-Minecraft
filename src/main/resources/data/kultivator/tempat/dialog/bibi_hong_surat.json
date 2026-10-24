@@ -1,0 +1,18 @@
+{
+  "pembicara": [
+    "tokoh:bibi_hong"
+  ],
+  "prioritas": 8,
+  "syarat": [
+    "quest surat_ah_lun selesai",
+    "!bendera ah_lun_pulang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tertawa",
+      "prop": "teko"
+    }
+  ]
+}

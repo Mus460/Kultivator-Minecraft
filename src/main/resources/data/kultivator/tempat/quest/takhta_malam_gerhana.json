@@ -1,0 +1,29 @@
+{
+  "pemberi": "tokoh:tie_hu",
+  "tempat": "ibu_kota",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "bertahan",
+      "tujuan": [
+        "kalahkan peran:tetua_iblis x2"
+      ],
+      "akibat": [
+        "nama_baik 10",
+        "beri_nb_pita 80",
+        "alur 6 menang",
+        "kabar takhta_gerhana_menang pemain"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "mundur",
+      "arah": "kota/kota_besar"
+    },
+    {
+      "id": "mundur",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}

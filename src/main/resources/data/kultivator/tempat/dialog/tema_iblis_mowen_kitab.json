@@ -1,0 +1,23 @@
+{
+  "pembicara": [
+    "tokoh:mo_wen"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_iblis_kitab tahap serah",
+    "punya kultivator:lost_scripture_page 3"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "membaca",
+      "prop": "kitab",
+      "akibat": [
+        "ambil kultivator:lost_scripture_page 3",
+        "iblis_akses_lantai",
+        "peristiwa tanda iblis_kitab_serah"
+      ]
+    }
+  ]
+}

@@ -122,10 +122,111 @@ public final class Keepers {
 		section.putInt("core", record.id);
 		section.putString("dim", record.dim.identifier().toString());
 		section.putString("order", order.id());
+		// The master's order: no longer a post the disciple chose by itself (DESIGN 39D).
+		section.remove("self");
 		disciple.setActivity(DiscipleEntity.ACTIVITY_FORMATION_KEEPER, post);
 		CoreTicker.markDirty(level);
 		Advancements.grant(master, "formation_keeper");
 		return null;
+	}
+
+	// ================================================================== self-chosen keeping (DESIGN 39D, contract C39.D1)
+
+	/**
+	 * DESIGN 39D: the running core of {@code owner} in the disciple's level, within {@link #ASSIGN_RANGE} blocks of it, that
+	 * the disciple may keep by itself now (a free slot, the grade's keeper realm, the rank a second keeper needs), the
+	 * nearest first; null when none. Reads the level's core store only (a handful of records), never blocks.
+	 */
+	public static @Nullable CoreRecord selfCore(UUID owner, DiscipleEntity disciple) {
+		if (owner == null || !(disciple.level() instanceof ServerLevel level)) {
+			return null;
+		}
+		DiscipleData data = disciple.data();
+		CoreRecord best = null;
+		double bestDistance = ASSIGN_RANGE * ASSIGN_RANGE;
+		for (CoreRecord record : CoreTicker.store(level).all()) {
+			FormationSpec spec = FormationRegistry.byId(record.spec);
+			if (spec == null || !owner.equals(record.owner) || !record.state.running() || record.hasKeeper(disciple.soulId())) {
+				continue;
+			}
+			Grade grade = spec.grade();
+			if (record.keepers.size() >= grade.maxKeepers() || !data.realm().atLeast(grade.keeperRealm().realm())) {
+				continue;
+			}
+			if (!record.keepers.isEmpty() && SectRanks.rank(data) < (grade == Grade.ABADI ? SectRanks.INTI : SectRanks.DALAM)) {
+				continue;
+			}
+			double distance = disciple.distanceToSqr(Vec3.atCenterOf(record.eye));
+			if (distance <= bestDistance) {
+				bestDistance = distance;
+				best = record;
+			}
+		}
+		return best;
+	}
+
+	/**
+	 * DESIGN 39D: the disciple takes keeper post of core {@code coreId} by itself with {@code order} (the planner's
+	 * JAGA_FORMASI). The old rules of {@link #assign} apply with {@code owner} in place of the master (its own core, its
+	 * own disciple within {@link #ASSIGN_RANGE}, not breaking through, idle, the grade's realm and rank, a free slot, a
+	 * safe post), but nothing is said to the master and no advancement is granted. Null on success, else why not.
+	 */
+	public static @Nullable Component assignSelf(UUID owner, ServerLevel level, int coreId, DiscipleEntity disciple, KeeperOrder order) {
+		CoreRecord record = CoreTicker.store(level).byId(coreId);
+		FormationSpec spec = record == null ? null : FormationRegistry.byId(record.spec);
+		if (record == null || spec == null) {
+			return Component.translatable("kultivator.formasi.keeper.no_core");
+		}
+		if (owner == null || !record.owner.equals(owner) || !record.state.running()) {
+			return Component.translatable("kultivator.formasi.keeper.not_owner");
+		}
+		if (disciple.role() != DiscipleEntity.Role.DISCIPLE || !owner.equals(disciple.ownerId()) || disciple.isReleasing()) {
+			return Component.translatable("kultivator.formasi.keeper.not_yours", disciple.getName());
+		}
+		if (disciple.level() != level || disciple.distanceToSqr(Vec3.atCenterOf(record.eye)) > ASSIGN_RANGE * ASSIGN_RANGE) {
+			return Component.translatable("kultivator.formasi.keeper.too_far", disciple.getName(), (int) ASSIGN_RANGE);
+		}
+		if ((disciple.syncedFlags() & DiscipleEntity.FLAG_BREAKING_THROUGH) != 0 || disciple.departed()
+				|| disciple.activity() != DiscipleEntity.ACTIVITY_NONE || record.hasKeeper(disciple.soulId())) {
+			return Component.translatable("kultivator.formasi.keeper.busy", disciple.getName());
+		}
+		DiscipleData data = disciple.data();
+		Grade grade = spec.grade();
+		if (!data.realm().atLeast(grade.keeperRealm().realm())) {
+			return Component.translatable("kultivator.formasi.keeper.realm", disciple.getName(), grade.keeperRealm().realm().displayName());
+		}
+		if (record.keepers.size() >= grade.maxKeepers()) {
+			return Component.translatable("kultivator.formasi.keeper.full", grade.maxKeepers());
+		}
+		if (!record.keepers.isEmpty()) {
+			int need = grade == Grade.ABADI ? SectRanks.INTI : SectRanks.DALAM;
+			if (SectRanks.rank(data) < need) {
+				return Component.translatable("kultivator.formasi.keeper.rank", disciple.getName(), SectRanks.rankName(need));
+			}
+		}
+		BlockPos post = post(level, disciple, record.eye);
+		if (post == null) {
+			return Component.translatable("kultivator.formasi.keeper.no_post");
+		}
+		CompoundTag extra = data.extra().getCompound(EXTRA).orElse(null);
+		if (extra != null) {
+			releaseRecord(disciple, extra);
+		}
+		record.keepers.add(new CoreRecord.Keeper(disciple.soulId(), order));
+		CompoundTag section = data.extraSection(EXTRA);
+		section.putInt("core", record.id);
+		section.putString("dim", record.dim.identifier().toString());
+		section.putString("order", order.id());
+		section.putBoolean("self", true);
+		disciple.setActivity(DiscipleEntity.ACTIVITY_FORMATION_KEEPER, post);
+		CoreTicker.markDirty(level);
+		return null;
+	}
+
+	/** True when the disciple keeps a core it chose by itself (DESIGN 39D). */
+	public static boolean selfKept(DiscipleEntity disciple) {
+		return disciple.activity() == DiscipleEntity.ACTIVITY_FORMATION_KEEPER
+				&& disciple.data().extra().getCompoundOrEmpty(EXTRA).getBooleanOr("self", false);
 	}
 
 	/** Frees the disciple's keeper post (it walks free; the core loses its keeper). */

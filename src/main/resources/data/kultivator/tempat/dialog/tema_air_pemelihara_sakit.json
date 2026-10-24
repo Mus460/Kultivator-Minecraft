@@ -1,0 +1,28 @@
+{
+  "pembicara": [
+    "peran:pemelihara_ulat"
+  ],
+  "prioritas": 6,
+  "syarat": [
+    "air_ulat_sakit"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lempar_pakan",
+      "prop": "keranjang",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

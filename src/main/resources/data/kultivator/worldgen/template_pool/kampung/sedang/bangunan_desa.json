@@ -1,0 +1,149 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/bengkel_pandai",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/kandang",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/kincir_air",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/kolam_ikan",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/ladang",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/lumbung",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/makam_desa",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/menara_pengawas",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/pasar_desa",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/rumah_besar",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/rumah_kecil",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 6
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/rumah_panjang",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/rumah_sedang",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 3
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/rumah_tabib",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/sawah",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 3
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sedang/warung_teh",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

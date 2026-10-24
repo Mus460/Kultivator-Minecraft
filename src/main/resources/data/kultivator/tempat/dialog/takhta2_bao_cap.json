@@ -1,0 +1,20 @@
+{
+  "pembicara": [
+    "tokoh:bao_qing"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest takhta_hilang_di_kumuh selesai",
+    "!bendera takhta2_bao_cap"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "palu_hakim",
+      "akibat": [
+        "bendera takhta2_bao_cap"
+      ]
+    }
+  ]
+}

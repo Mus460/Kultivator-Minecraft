@@ -34,6 +34,8 @@ public final class DuniaContentClient {
 		dev.kultivator.client.dunia.dimensi.DimensiClient.init();
 		// T Kapal & Peta:
 		dev.kultivator.client.dunia.kapal.KapalClient.init();
+		// DESIGN 38 Kota Besar dan Tempat (every 38 client package, 38.T themed cities):
+		dev.kultivator.client.dunia.tempat.TempatClient.init();
 	}
 
 	private DuniaContentClient() {

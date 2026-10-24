@@ -1,0 +1,76 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#minecraft:is_overworld",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_air",
+  "distrik": "dermaga_perahu",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/dermaga_perahu/rumah_perahu_naga",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/dermaga_perahu/halte_pusat",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/dermaga_perahu/galangan",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/dermaga_perahu/rumah_pendayung",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 48,
+      "pool": "kultivator:kota_tema/air/tembok/dermaga_perahu_selatan0",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 48,
+      "pool": "kultivator:kota_tema/air/tembok/dermaga_perahu_selatan1",
+      "putar": 0
+    },
+    {
+      "dx": 48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/tembok/dermaga_perahu_timur0",
+      "putar": 0
+    },
+    {
+      "dx": 48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/tembok/dermaga_perahu_timur1",
+      "putar": 0
+    },
+    {
+      "dx": 48,
+      "dz": 48,
+      "pool": "kultivator:kota_tema/air/tembok/dermaga_perahu_sudut",
+      "putar": 0
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "minecraft:cherry_grove",
+      "akhiran": "sakura"
+    }
+  ]
+}

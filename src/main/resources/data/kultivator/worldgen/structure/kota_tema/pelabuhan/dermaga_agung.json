@@ -1,0 +1,59 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_tema/pelabuhan",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_pelabuhan",
+  "distrik": "dermaga_agung",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/pelabuhan/dermaga_agung/dermaga_barat",
+      "putar": 0,
+      "dy": -20
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/pelabuhan/dermaga_agung/kantor_urusan_laut",
+      "putar": 0,
+      "dy": -20
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/pelabuhan/dermaga_agung/dermaga_timur",
+      "putar": 0,
+      "dy": -20
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/pelabuhan/dermaga_agung/pos_lintas_laut",
+      "putar": 0,
+      "dy": -20
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": [
+        "minecraft:cold_ocean",
+        "minecraft:deep_cold_ocean",
+        "minecraft:snowy_beach",
+        "minecraft:taiga",
+        "minecraft:snowy_taiga",
+        "minecraft:snowy_plains",
+        "minecraft:old_growth_pine_taiga",
+        "minecraft:old_growth_spruce_taiga"
+      ],
+      "akhiran": "utara"
+    }
+  ]
+}

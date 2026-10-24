@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380426,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_air",
+    "distrik": "pasar_kanal"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/air/pasar_kanal",
+      "weight": 1
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380402,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_pelabuhan",
+    "distrik": "dermaga_agung"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/pelabuhan/dermaga_agung",
+      "weight": 1
+    }
+  ]
+}

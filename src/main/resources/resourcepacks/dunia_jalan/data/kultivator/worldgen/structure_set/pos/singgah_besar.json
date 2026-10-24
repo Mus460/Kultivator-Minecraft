@@ -1,0 +1,15 @@
+{
+  "placement": {
+    "type": "kultivator:jalan",
+    "salt": 380305,
+    "spacing": 1,
+    "separation": 0,
+    "titik": "singgah_besar"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:pos/singgah_besar",
+      "weight": 1
+    }
+  ]
+}

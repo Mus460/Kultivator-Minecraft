@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380412,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_oasis",
+    "distrik": "istana_pasir"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/oasis/istana_pasir",
+      "weight": 1
+    }
+  ]
+}

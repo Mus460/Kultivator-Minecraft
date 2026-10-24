@@ -1,0 +1,54 @@
+{
+  "pembicara": [
+    "tokoh:xiu_niang"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest tema_air_benang tahap kain",
+    "!bendera air_xiu_putus"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "pilihan": [
+        {
+          "syarat": [
+            "nama_baik 20"
+          ],
+          "akibat": [
+            "bendera air_xiu_putus",
+            "bendera air_xiu_bicara"
+          ],
+          "ke": "dengar",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_air_xiu_temui.mulai.1.alasan"
+        },
+        {
+          "akibat": [
+            "bendera air_xiu_putus",
+            "bendera air_xiu_usir",
+            "npc_pergi"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dengar",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "ke": "janji"
+        }
+      ]
+    },
+    {
+      "id": "janji",
+      "gestur": "hormat_dalam",
+      "akibat": [
+        "npc_pergi"
+      ]
+    }
+  ]
+}

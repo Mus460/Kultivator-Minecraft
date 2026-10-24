@@ -1,0 +1,98 @@
+{
+  "pemberi": "tokoh:deng_ming",
+  "tempat": "tema_pelabuhan",
+  "tahap": [
+    {
+      "id": "redup",
+      "tujuan": [
+        "pelabuhan_suar lihat",
+        "bicara tokoh:lin_haichao"
+      ],
+      "akibat": [
+        "nama_baik 2"
+      ],
+      "batas_hari": 5,
+      "gagal_ke": "catatan",
+      "arah": "kota_tema/pelabuhan"
+    },
+    {
+      "id": "catatan",
+      "tujuan": [
+        "pelabuhan_dokumen benar"
+      ],
+      "batas_hari": 5,
+      "gagal_ke": "lapor"
+    },
+    {
+      "id": "lapor",
+      "batas_hari": 5,
+      "gagal_ke": "lensa"
+    },
+    {
+      "id": "lensa",
+      "batas_hari": 5,
+      "gagal_ke": "serbuan"
+    },
+    {
+      "id": "serbuan",
+      "akibat_masuk": [
+        "pelabuhan_pelita 1",
+        "pelabuhan_serbuan"
+      ],
+      "tujuan": [
+        "pelabuhan_bajak *"
+      ],
+      "akibat": [
+        "nama_baik 5",
+        "kabar tema_pelabuhan_bab4 pemain"
+      ],
+      "batas_hari": 5,
+      "gagal_ke": "mutiara"
+    },
+    {
+      "id": "mutiara",
+      "akibat_masuk": [
+        "bendera pelabuhan_lintas_gratis",
+        "beri kultivator:tema/mutiara_pelita"
+      ],
+      "tujuan": [
+        "punya kultivator:tema/mutiara_fajar",
+        "pelabuhan_di_kota"
+      ],
+      "ke": "duel",
+      "batas_hari": 10,
+      "gagal_ke": "titipan"
+    },
+    {
+      "id": "titipan",
+      "akibat_masuk": [
+        "beri kultivator:tema/mutiara_fajar",
+        "kabar tema_pelabuhan_titipan"
+      ],
+      "tujuan": [
+        "pelabuhan_di_kota"
+      ],
+      "ke": "duel"
+    },
+    {
+      "id": "duel",
+      "akibat_masuk": [
+        "pelabuhan_heisha"
+      ],
+      "tujuan": [
+        "pelabuhan_heisha kalah"
+      ],
+      "batas_hari": 5,
+      "gagal_ke": "upacara"
+    },
+    {
+      "id": "nasib",
+      "batas_hari": 3,
+      "gagal_ke": "upacara"
+    },
+    {
+      "id": "upacara",
+      "ke": "selesai"
+    }
+  ]
+}

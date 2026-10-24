@@ -1,0 +1,90 @@
+{
+  "pembicara": [
+    "tokoh:han_qingshuang"
+  ],
+  "prioritas": 12,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_gagang",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_kontrak"
+          ]
+        },
+        {
+          "syarat": [
+            "punya kultivator:tema/kontrak_kepala"
+          ],
+          "ke": "kontrak"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute lurus"
+          ],
+          "ke": "markas"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute penebusan"
+          ],
+          "ke": "peta_ye"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute darah"
+          ],
+          "ke": "gerbang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kontrak",
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {
+          "akibat": [
+            "iblis_jual_kontrak"
+          ]
+        },
+        {}
+      ]
+    },
+    {
+      "id": "markas",
+      "gestur": "sikap_gagang",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "peta_ye",
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "gerbang",
+      "gestur": "sikap_gagang",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

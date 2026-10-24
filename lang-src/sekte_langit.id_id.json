@@ -177,7 +177,7 @@
   "kultivator.sekte_langit.layar.pemandangan.tip": "Atur laut awan, air terjun kabut, bangau, lentera dan suara langit.",
   "kultivator.sekte_langit.uji.ok": "Selesai.",
   "kultivator.sekte_langit.uji.pratinjau": "Pratinjau langit A%s di tinggi %s dibuka (hologram di udara).",
-  "kultivator.sekte_langit.uji.pamer": "Pamer pulau langit A%s di tinggi %s dibuka; konfirmasi seperti pamer biasa.",
+  "kultivator.sekte_langit.uji.pamer": "Pamer pulau langit A%s di tinggi %s dibuka; konfirmasi dengan /kultivasi uji sekte pamer konfirmasi (batal: /kultivasi aula bangun batal).",
   "kultivator.sekte_langit.uji.ditolak": "Ditolak (A%s, tinggi %s); lihat pesan mesin bangun.",
   "kultivator.sekte_langit.uji.audit": "Audit Awan %s: %s op, %s pelanggaran.",
   "kultivator.sekte_langit.uji.reset": "%s pamer langit dibongkar dari log undo. (Situs aulamu sendiri: uji sekte reset.)",

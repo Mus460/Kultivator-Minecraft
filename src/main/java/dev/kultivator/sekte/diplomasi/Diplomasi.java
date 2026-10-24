@@ -78,18 +78,11 @@ public final class Diplomasi implements DiplomasiService {
 
 	public static void init() {
 		registerContent();
+		planConfig();
 		if (initialised || !SekteContent.on(SekteIds.D)) {
 			return;
 		}
 		initialised = true;
-		config = SekteConfig.section(SekteIds.D, DiplomasiConfig.class, DiplomasiConfig::new, DiplomasiConfig::clamp);
-		GerbangPlan.configure(config.jumlahSekte, config.jarakMin, config.strukturAktif);
-		SekteConfig.onReload(() -> {
-			GerbangPlan.configure(config.jumlahSekte, config.jarakMin, config.strukturAktif);
-			if (server != null) {
-				Simulasi.keepPlanOf(server);
-			}
-		});
 		GerbangSekte.register(config.strukturAktif);
 		DiplomasiCommands.register();
 		Utusan.init();
@@ -111,6 +104,29 @@ public final class Diplomasi implements DiplomasiService {
 			server = null;
 		});
 		ServerTickEvents.END_SERVER_TICK.register(Simulasi::tick);
+	}
+
+	/** True once {@link #planConfig()} read the section. */
+	private static boolean planned;
+
+	/**
+	 * T12: the sect count and ring distance decide the one NPC sect list ({@link GerbangPlan}, {@link DaftarSekte}) that the
+	 * towns' Saingan bands, the map domains and the tournaments read even while this module is off, so the section is read
+	 * (and the plan configured) whatever the switch says. Gates are still only generated when the module is on.
+	 */
+	private static void planConfig() {
+		if (planned) {
+			return;
+		}
+		planned = true;
+		config = SekteConfig.section(SekteIds.D, DiplomasiConfig.class, DiplomasiConfig::new, DiplomasiConfig::clamp);
+		GerbangPlan.configure(config.jumlahSekte, config.jarakMin, config.strukturAktif);
+		SekteConfig.onReload(() -> {
+			GerbangPlan.configure(config.jumlahSekte, config.jarakMin, config.strukturAktif);
+			if (server != null) {
+				Simulasi.keepPlanOf(server);
+			}
+		});
 	}
 
 	public static DiplomasiConfig config() {
@@ -353,6 +369,71 @@ public final class Diplomasi implements DiplomasiService {
 	public @Nullable BlockPos plannedGate(String sectId) {
 		SekteNpc sect = find(sectId);
 		return sect == null ? null : new BlockPos(sect.blockX, 0, sect.blockZ);
+	}
+
+	@Override
+	public @Nullable Component master(String sectId) {
+		SekteNpc sect = find(sectId);
+		return sect == null ? null : sect.master();
+	}
+
+	@Override
+	public int aliran(String sectId) {
+		SekteNpc sect = find(sectId);
+		return sect == null ? -1 : sect.aliran;
+	}
+
+	@Override
+	public @Nullable String nearest(BlockPos pos, int aliran) {
+		MinecraftServer srv = server;
+		if (srv == null || pos == null) {
+			return null;
+		}
+		SekteNpc best = null;
+		long bestD = Long.MAX_VALUE;
+		for (SekteNpc sect : DiplomasiData.get(srv).sects()) {
+			if (aliran >= 0 && sect.aliran != aliran) {
+				continue;
+			}
+			long dx = sect.blockX - pos.getX();
+			long dz = sect.blockZ - pos.getZ();
+			long d = dx * dx + dz * dz;
+			if (d < bestD) {
+				bestD = d;
+				best = sect;
+			}
+		}
+		return best == null ? null : best.id;
+	}
+
+	@Override
+	public @Nullable String rivalGroup(String sectId) {
+		SekteNpc sect = find(sectId);
+		return sect == null ? null : sect.rivalLink();
+	}
+
+	@Override
+	public @Nullable String sectOfRival(String rivalId) {
+		int index = DaftarSekte.index(rivalId);
+		SekteNpc sect = rivalId == null || !rivalId.startsWith("g") ? null : find(DaftarSekte.id(index));
+		return sect == null ? null : sect.id;
+	}
+
+	@Override
+	public int color(String sectId) {
+		SekteNpc sect = find(sectId);
+		return sect == null ? 0xB0B0B0 : GerbangPlan.warna(sect.emblem(), sect.aliran);
+	}
+
+	@Override
+	public boolean atWar(UUID owner, String sectId) {
+		SekteNpc sect = find(sectId);
+		MinecraftServer srv = server;
+		if (sect == null || srv == null || owner == null) {
+			return false;
+		}
+		Relasi r = DiplomasiData.get(srv).peek(owner, sect.id);
+		return r != null && r.perang;
 	}
 
 	private static @Nullable SekteNpc find(@Nullable String sectId) {

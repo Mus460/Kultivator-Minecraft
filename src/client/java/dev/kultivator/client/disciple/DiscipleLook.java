@@ -154,7 +154,7 @@ public final class DiscipleLook {
 			case RIVAL -> Component.translatable("kultivator.dpower.tag.rival", name(disciple), rankShort(rank)).withColor(0xFF9A7A);
 			case PHANTOM -> Component.translatable("kultivator.dpower.tag.phantom", name(disciple), rankShort(rank)).withColor(0xB08AD8);
 			case CLONE -> Component.translatable("kultivator.dpower.tag.clone", name(disciple)).withColor(0xBFE8FF);
-			case DISCIPLE -> {
+			case DISCIPLE, JELMAAN -> {
 				int talent = disciple.syncedTalent();
 				int soul = PowerIds.COLOUR_RGB[Mth.clamp(DiscipleEntity.talentSoulColor(talent), 0, PowerIds.COLOUR_RGB.length - 1)];
 				int sectRank = Mth.clamp(disciple.syncedSectRank(), 0, PhysiqueVisuals.RANK_TRIM.length - 1);

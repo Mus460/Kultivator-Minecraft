@@ -120,6 +120,8 @@ public final class HeartDemons {
 		@Nullable Outcome pending;
 		/** Where the owner last stood on the ground (put back there if the demon throws them into the void). */
 		Vec3 lastGround;
+		/** A trial chosen at a place (DESIGN 38.C.4 Gua Cermin Hati, {@link #startVoluntaryTrial}); losses weigh the place factor. */
+		boolean tempat;
 
 		Trial(UUID owner, Kind kind, @Nullable Rank target, ResourceKey<Level> dimension, int duration, ServerBossEvent bar, Vec3 start) {
 			this.owner = owner;
@@ -207,6 +209,29 @@ public final class HeartDemons {
 			return false;
 		}
 		finish(player, Cultivators.get(player), trial, Outcome.CANCELLED);
+		return true;
+	}
+
+	/**
+	 * DESIGN 38.C.4 (Gua Cermin Hati, owner 38GU): a heart demon trial the cultivator chose to face at a place, run as a
+	 * pressure trial (120 s; a win is the usual win, pressure cleared). A loss weighs the bounded place factor
+	 * {@code TempatApi.faktor(player, "iblis_hati")} (0.5 at the mirror): a Qi Deviation of {@code 0.6 x factor} and
+	 * {@code +10 x factor} pressure instead of the release of a pressure trial; dying or leaving costs nothing more.
+	 * False when the demon may not come now (the same checks as a pressure demon, the pressure itself not needed).
+	 */
+	public static boolean startVoluntaryTrial(ServerPlayer player) {
+		CultivationData data = Cultivators.get(player);
+		if (!canFace(player, data) || !standing(player, data)) {
+			return false;
+		}
+		WARNINGS.remove(player.getUUID());
+		if (!startTrial(player, data, Kind.PRESSURE, null)) {
+			return false;
+		}
+		Trial trial = TRIALS.get(player.getUUID());
+		if (trial != null) {
+			trial.tempat = true;
+		}
 		return true;
 	}
 
@@ -587,7 +612,7 @@ public final class HeartDemons {
 			case DIED -> {
 				Fx.send(fxLevel, at, at, FxType.HEART_DEMON_DEFEAT, TrialFxIds.DEFEAT_DISSOLVED, player.getId(), 0.0F);
 				Advancements.grant(player, "heart_demon_lost");
-				if (trial.kind == Kind.PRESSURE) {
+				if (trial.kind == Kind.PRESSURE && !trial.tempat) {
 					// Breakthrough trials: Breakthrough records the failure for after the respawn itself.
 					setPendingLoss(data, true);
 					Msg.chat(player, Component.translatable("kultivator.trial.died").withStyle(ChatFormatting.DARK_RED));
@@ -595,7 +620,7 @@ public final class HeartDemons {
 			}
 			case LEFT -> {
 				Fx.send(fxLevel, at, at, FxType.HEART_DEMON_DEFEAT, TrialFxIds.DEFEAT_DISSOLVED, player.getId(), 0.0F);
-				if (trial.kind == Kind.PRESSURE) {
+				if (trial.kind == Kind.PRESSURE && !trial.tempat) {
 					setPendingLoss(data, true);
 				}
 			}
@@ -673,6 +698,13 @@ public final class HeartDemons {
 		if (trial.kind == Kind.BREAKTHROUGH) {
 			// Breakthrough applies the failure (deviation or Hardcore realm loss, +25 pressure).
 			Breakthrough.onTrialFinished(player, false);
+		} else if (trial.tempat) {
+			// DESIGN 38.C.4: a trial chosen at a place weighs the bounded place factor (0.5 at the Heart Mirror)
+			double f = dev.kultivator.dunia.tempat.TempatApi.faktor(player, "iblis_hati");
+			Msg.chat(player, Component.translatable("kultivator.trial.lost.pressure").withStyle(ChatFormatting.DARK_RED));
+			data.setHeartDemonPressure(data.heartDemonPressure() + 10.0D * f);
+			Cultivators.dirty(player);
+			Deviation.apply(player, 0.6D * f);
 		} else {
 			punishPressure(player, data);
 		}

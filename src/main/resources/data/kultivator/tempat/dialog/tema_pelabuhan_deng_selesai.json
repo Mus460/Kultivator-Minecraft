@@ -1,0 +1,103 @@
+{
+  "pembicara": [
+    "tokoh:deng_ming"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "quest tema_pelabuhan_pelita selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "syarat": [
+            "bendera pelabuhan_hasil_damai"
+          ],
+          "ke": "murid"
+        },
+        {
+          "syarat": [
+            "bendera pelabuhan_hasil_serah"
+          ],
+          "ke": "sel"
+        },
+        {
+          "syarat": [
+            "bendera pelabuhan_hasil_tumpas"
+          ],
+          "ke": "makam"
+        },
+        {
+          "syarat": [
+            "!bendera pelabuhan_hasil_damai",
+            "!bendera pelabuhan_hasil_serah",
+            "!bendera pelabuhan_hasil_tumpas"
+          ],
+          "ke": "kabut"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "murid",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "salam"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "salam",
+      "gestur": "angguk_dengar"
+    },
+    {
+      "id": "sel",
+      "gestur": "cerita",
+      "pilihan": [
+        {
+          "ke": "tiga"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tiga",
+      "gestur": "tatap_langit"
+    },
+    {
+      "id": "makam",
+      "gestur": "tatap_langit",
+      "prop": "lentera_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "nama_baik 1"
+          ],
+          "ke": "pelita_kecil"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pelita_kecil",
+      "gestur": "angguk_dengar"
+    },
+    {
+      "id": "kabut",
+      "gestur": "tatap_langit"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "cerita"
+    }
+  ]
+}

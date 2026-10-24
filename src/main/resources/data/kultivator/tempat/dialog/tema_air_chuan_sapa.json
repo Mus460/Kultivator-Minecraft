@@ -1,0 +1,99 @@
+{
+  "pembicara": [
+    "tokoh:bibi_chuan"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lambai",
+      "prop": "dayung_yuloh",
+      "pilihan": [
+        {
+          "akibat": [
+            "air_sewa"
+          ]
+        },
+        {
+          "akibat": [
+            "air_tur"
+          ]
+        },
+        {
+          "syarat": [
+            "acara air lentera_air"
+          ],
+          "akibat": [
+            "air_lentera_beli"
+          ],
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_air_chuan_sapa.mulai.3.alasan"
+        },
+        {
+          "syarat": [
+            "quest tema_air_perahu_naga baru"
+          ],
+          "ke": "naga"
+        },
+        {
+          "ke": "lagu"
+        },
+        {
+          "syarat": [
+            "bendera air_lao_shu_mata"
+          ],
+          "ke": "mata"
+        },
+        {
+          "syarat": [
+            "!bendera air_lao_shu_mata",
+            "quest tema_air_benang selesai"
+          ],
+          "ke": "penjara"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "mata",
+      "gestur": "bisik"
+    },
+    {
+      "id": "penjara",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "naga",
+      "gestur": "genderang",
+      "prop": "pemukul",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_air_perahu_naga"
+          ],
+          "ke": "naga_ajar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "naga_ajar",
+      "gestur": "tabuh_genderang_perahu",
+      "prop": "pemukul"
+    },
+    {
+      "id": "lagu",
+      "gestur": "nyanyi_perahu",
+      "prop": "dayung_yuloh"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

@@ -124,6 +124,8 @@ public final class Harga {
 		BASE.put("kantong_saingan", 200L);
 		// Sekte Langit 37G: Raksasa Longbo's trophy, worth its 600 PK use at 1 PK = 2 NB (audit 4.10)
 		BASE.put("cangkang_kura_langit", 1200L);
+		// 38TK-I: the Kontrak Kepala lot of the Black Auction (DESIGN 38.T.7.6), about one Foundation-band bounty
+		BASE.put("tema/kontrak_kepala", 180L);
 	}
 
 	/** Phase-9 wares of Alam Abadi that no town shop buys (audit S24: no Batu Asal to NB loop). */

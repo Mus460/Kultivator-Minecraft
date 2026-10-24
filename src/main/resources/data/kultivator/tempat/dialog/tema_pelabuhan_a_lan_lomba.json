@@ -1,0 +1,26 @@
+{
+  "pembicara": [
+    "tokoh:a_lan"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest tema_pelabuhan_tali_putus tahap lomba"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "ikat_tali",
+      "prop": "tali",
+      "pilihan": [
+        {
+          "akibat": [
+            "pelabuhan_lomba_latih",
+            "tutup"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

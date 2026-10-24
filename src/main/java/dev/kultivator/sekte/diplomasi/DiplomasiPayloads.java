@@ -201,11 +201,11 @@ public final class DiplomasiPayloads {
 			if (enemy != null) {
 				s.store("musuh", ComponentSerialization.CODEC, enemy.name());
 			}
-			if (!sect.rivalLink.isEmpty()) {
-				Component group = dev.kultivator.dunia.api.DuniaApi.rivals().name(sect.rivalLink);
-				if (group != null) {
-					s.store("klan", ComponentSerialization.CODEC, group);
-				}
+			// T12: the sect's own travelling band (Saingan group g<i>) and its temper, when the towns' rivals run.
+			Component band = dev.kultivator.dunia.api.DuniaApi.rivals().name(sect.rivalLink());
+			if (band != null) {
+				s.store("klan", ComponentSerialization.CODEC, Component.translatable(GeneratorNama.KEY + "layar.klan_watak",
+						dev.kultivator.dunia.kota.SainganData.styleName(server, sect.rivalLink())));
 			}
 			s.putInt("peluang_pakta", (int) Math.round(Pakta.chance(sect, r, Relasi.PAKTA_DAMAI) * 100.0D));
 			s.putInt("peluang_sekutu", (int) Math.round(Pakta.chance(sect, r, Relasi.PAKTA_SEKUTU) * 100.0D));

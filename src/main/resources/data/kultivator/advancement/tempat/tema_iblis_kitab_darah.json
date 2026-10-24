@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_iblis",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_iblis_kitab_darah.description"
+    },
+    "icon": {
+      "id": "minecraft:enchanted_book"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_iblis_kitab_darah.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

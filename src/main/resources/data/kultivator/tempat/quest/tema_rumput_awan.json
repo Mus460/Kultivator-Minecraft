@@ -1,0 +1,16 @@
+{
+  "pemberi": "tokoh:jue_yuan",
+  "tempat": "kota_tema_gunung",
+  "tahap": [
+    {
+      "id": "cari",
+      "tujuan": [
+        "antar kultivator:tema/rumput_awan_seribu_tahun tokoh:jue_yuan"
+      ]
+    },
+    {
+      "id": "ramuan",
+      "ke": "selesai"
+    }
+  ]
+}

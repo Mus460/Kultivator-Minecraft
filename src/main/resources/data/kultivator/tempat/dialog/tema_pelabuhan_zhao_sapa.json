@@ -1,0 +1,27 @@
+{
+  "pembicara": [
+    "tokoh:zhao_wanli"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "pelabuhan_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "hitung_sempoa"
+    }
+  ]
+}

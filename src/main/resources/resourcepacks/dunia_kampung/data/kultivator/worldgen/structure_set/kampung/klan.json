@@ -1,0 +1,50 @@
+{
+  "placement": {
+    "type": "kultivator:cincin_tempat",
+    "salt": 380104,
+    "spacing": 56,
+    "separation": 20,
+    "min_chunks": 24,
+    "jarak_tempat": 8,
+    "cincin": [
+      {
+        "sampai_chunk": 62,
+        "frekuensi": 0.0
+      },
+      {
+        "sampai_chunk": 187,
+        "frekuensi": 0.26
+      },
+      {
+        "sampai_chunk": 500,
+        "frekuensi": 0.33
+      },
+      {
+        "sampai_chunk": 100000,
+        "frekuensi": 0.33
+      }
+    ],
+    "exclusion_zone": {
+      "other_set": "minecraft:villages",
+      "chunk_count": 6
+    }
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kampung/klan_sedang",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/klan_salju",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/klan_sakura",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/klan_gunung",
+      "weight": 1
+    }
+  ]
+}

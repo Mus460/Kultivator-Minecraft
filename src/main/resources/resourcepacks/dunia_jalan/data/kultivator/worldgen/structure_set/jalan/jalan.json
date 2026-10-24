@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "kultivator:jalan",
+    "salt": 380301,
+    "spacing": 1,
+    "separation": 0
+  },
+  "structures": [
+    {
+      "structure": "kultivator:jalan/jalan",
+      "weight": 1
+    }
+  ]
+}

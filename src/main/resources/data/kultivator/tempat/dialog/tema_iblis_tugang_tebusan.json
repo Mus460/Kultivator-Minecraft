@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:tu_gang"
+  ],
+  "prioritas": 65,
+  "syarat": [
+    "quest tema_iblis_rantai tahap tebus_afu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_berkacak",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_tawanan"
+          ]
+        },
+        {
+          "ke": "aturan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "aturan",
+      "gestur": "tertawa"
+    }
+  ]
+}

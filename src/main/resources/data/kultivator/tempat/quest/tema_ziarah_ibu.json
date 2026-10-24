@@ -1,0 +1,45 @@
+{
+  "pemberi": "tokoh:pei_wenzhi",
+  "tempat": "kota_tema_gunung",
+  "tahap": [
+    {
+      "id": "daftar",
+      "tujuan": [
+        "tanda gunung_ziarah_daftar"
+      ]
+    },
+    {
+      "id": "daki",
+      "tujuan": [
+        "ziarah_selesai gunung"
+      ]
+    },
+    {
+      "id": "cerita",
+      "akibat": [
+        "gunung_adv ibu_peziarah",
+        "nama_baik 3",
+        "beri kultivator:tema/dupa_ziarah 4"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "situs_dikenal kota_tema/air"
+          ],
+          "ke": "lentera"
+        }
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "lentera",
+      "tujuan": [
+        "antar kultivator:tema/lentera_teratai tokoh:pei_wenzhi"
+      ]
+    },
+    {
+      "id": "lentera_terima",
+      "ke": "selesai"
+    }
+  ]
+}

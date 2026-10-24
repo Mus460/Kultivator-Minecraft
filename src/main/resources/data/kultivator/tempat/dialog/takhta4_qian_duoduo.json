@@ -1,0 +1,49 @@
+{
+  "pembicara": [
+    "tokoh:qian_duoduo"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_dua_calon tahap galang",
+    "!bendera takhta4_dukung_qian_duoduo"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hitung_sempoa",
+      "prop": "sempoa",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 15"
+          ],
+          "akibat": [
+            "bayar_pita 15"
+          ],
+          "ke": "setuju",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta4_qian_duoduo.mulai.1.alasan"
+        },
+        {
+          "syarat": [
+            "quest wesel_palsu selesai"
+          ],
+          "ke": "setuju",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta4_qian_duoduo.mulai.2.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "setuju",
+      "gestur": "hormat",
+      "akibat": [
+        "peristiwa tanda dukungan",
+        "bendera takhta4_dukung_qian_duoduo",
+        "nama_baik 3"
+      ]
+    }
+  ]
+}

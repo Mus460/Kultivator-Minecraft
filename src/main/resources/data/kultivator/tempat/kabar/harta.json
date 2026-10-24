@@ -1,0 +1,28 @@
+{
+  "templat": [
+    {
+      "id": "harta_lahir_1",
+      "pemicu": "harta_lahir",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "harta_lahir_2",
+      "pemicu": "harta_lahir",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "harta_diklaim_1",
+      "pemicu": "harta_diklaim",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "harta_diklaim_2",
+      "pemicu": "harta_diklaim",
+      "bobot": 10,
+      "umur_hari": 5
+    }
+  ]
+}

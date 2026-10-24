@@ -1,0 +1,54 @@
+{
+  "pembicara": [
+    "peran:pertapa"
+  ],
+  "prioritas": -1,
+  "syarat": [
+    "watak curiga"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "suara": "tempat.hermit",
+      "pilihan": [
+        {
+          "ke": "topik"
+        },
+        {
+          "ke": "lore"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "topik",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "lore"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lore",
+      "gestur": "cerita",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

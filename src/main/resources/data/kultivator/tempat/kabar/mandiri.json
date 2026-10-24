@@ -1,0 +1,181 @@
+{
+  "templat": [
+    {
+      "id": "mandiri_copet_0",
+      "pemicu": "mandiri_copet",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga",
+        "pedagang_bazar",
+        "pedagang_keliling",
+        "pemilik_teh",
+        "penjaga_gerbang",
+        "penjaga",
+        "pengemis",
+        "anak",
+        "kuli"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "mandiri_copet_1",
+      "pemicu": "mandiri_copet",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga",
+        "pedagang_bazar",
+        "pedagang_keliling",
+        "pemilik_teh",
+        "penjaga_gerbang",
+        "penjaga",
+        "pengemis",
+        "anak",
+        "kuli"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "mandiri_copet_2",
+      "pemicu": "mandiri_copet",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga",
+        "pedagang_bazar",
+        "pedagang_keliling",
+        "pemilik_teh",
+        "penjaga_gerbang",
+        "penjaga",
+        "pengemis",
+        "anak",
+        "kuli"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "mandiri_tolong_0",
+      "pemicu": "mandiri_tolong",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "pelayan",
+        "kuli",
+        "anak",
+        "petani",
+        "nelayan"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "mandiri_tolong_1",
+      "pemicu": "mandiri_tolong",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "pelayan",
+        "kuli",
+        "anak",
+        "petani",
+        "nelayan"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "mandiri_tolong_2",
+      "pemicu": "mandiri_tolong",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "pelayan",
+        "kuli",
+        "anak",
+        "petani",
+        "nelayan"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "mandiri_duel_0",
+      "pemicu": "mandiri_duel",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pelayan",
+        "penjaga",
+        "petugas_gilda",
+        "pedagang_senjata",
+        "anak",
+        "kuli"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "mandiri_duel_1",
+      "pemicu": "mandiri_duel",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pelayan",
+        "penjaga",
+        "petugas_gilda",
+        "pedagang_senjata",
+        "anak",
+        "kuli"
+      ],
+      "isian": [
+        "kota"
+      ]
+    },
+    {
+      "id": "mandiri_duel_2",
+      "pemicu": "mandiri_duel",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pelayan",
+        "penjaga",
+        "petugas_gilda",
+        "pedagang_senjata",
+        "anak",
+        "kuli"
+      ],
+      "isian": [
+        "kota"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "pemberi": "tokoh:qian_duoduo",
+  "tempat": "rumah_uang",
+  "tahap": [
+    {
+      "id": "tanya",
+      "akibat_masuk": [
+        "beri cerita:wesel_palsu"
+      ]
+    },
+    {
+      "id": "pemalsu",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera wesel_peras"
+          ],
+          "ke": "peras"
+        }
+      ],
+      "ke": "lapor"
+    },
+    {
+      "id": "lapor",
+      "tujuan": [
+        "bicara tokoh:qian_duoduo"
+      ],
+      "akibat": [
+        "ambil cerita:wesel_palsu",
+        "beri_nb_pita 40",
+        "nama_baik 4",
+        "kabar wesel_tertangkap"
+      ]
+    },
+    {
+      "id": "peras",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "bendera qian_curiga"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

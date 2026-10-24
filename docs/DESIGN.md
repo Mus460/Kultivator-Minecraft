@@ -25064,3 +25064,157 @@ Kode adalah kebenaran; butir di bawah mencatat tempat implementasi menyimpang da
 * Uji: `/kultivasi uji langit_sekte patroli|tangga` (GerakUji) ditambahkan.
 * Harness worldgen (scratchpad `langitG/wg/run_fin.sh`): TplCheck 7 berkas 0 masalah, WgCheckL semua OK (56 bioma,
   2 set), PlanCheckL 2 istana per seed.
+
+---------------------------------------------------------------------------------------------------------------------
+
+## 38. Kota Besar dan Tempat untuk Semua Fitur (+ 38.T Kota Bertema)
+
+Kontrak lengkap: **`docs/rancangan/38-kota-besar-dan-tempat.md`** (38.0-38.E dan 38.T.0-38.T.15). Bagian ini hanya ringkasan
+dan catatan implementasi; bila berbeda, kode adalah kebenaran, lalu rancangan, lalu ringkasan ini. Jadwal kerja paralel:
+`docs/progres/jadwal-38-39-40.md` (W0-W3 + finish F0-F3), laporan modul `docs/progres/mega-*.md`, daftar uji
+`docs/uji/FASE-38.md`.
+
+Permintaan pengguna (2026-10-22/23): kota besar penuh NPC, **setiap fitur yang butuh tempat punya lokasi nyata** dengan
+world generation detail (desa, kompleks sekte, gua, jalan), kehidupan harian NPC, perbaikan + ganti rugi, lingkar uang,
+GUI baru, model/animasi/cerita nyata; lalu lima **kota bertema**.
+
+### 38.0 Aturan tetap (ringkas)
+
+* Blok dunia berubah **hanya** lewat `kehancuran/WorldBreaker` (Mode Kehancuran pemain, Destroyer Arts murid) dan
+  `sect/build/engine/BuildPlacer`. Semua tempat 38 adalah worldgen di **chunk baru** (NBT dari `tools/nbt.py` +
+  `tools/structgen.py`, divalidasi `structgen_selftest`, `tempat_lib`, `tools/cek_tempat.py` dan harness TplCheck/WgCheck38/
+  PlanCheck38/PlanCheckTema). Gerbang, perahu, kereta gantung, unta, kapal, lift, rakit: **entitas**. Perbaikan 38.R
+  memakai jalur BuildPlacer; Mode Kehancuran di dalam zona tempat tidak menghancurkan apa pun.
+* Tanpa `LightningBolt`, cuaca, waktu atau tick-rate; badai pasir, longsor, gerhana dan malam lentera hanya efek, status
+  dan entitas.
+* **Dunia baru saja** (keputusan orkestrator 0.1): tidak ada migrasi, `RencanaLama` dibuang, tidak ada pelindung dunia lama.
+* Semua item, entitas, payload, struktur dan placement **selalu terdaftar** (K1); saklar config hanya menghentikan perilaku
+  dan pack worldgen.
+* Anggaran laptop lemah: `tempat.tubuhGlobal` 64 / `perPemain` 24, tubuh per ibu kota 28, kampung 10, kompleks 12, kota
+  tema 20 + mekanisme 12; LOD + `EffectQuality`; tick handler memindai dunia dengan jeda (>= 20 tick); Sodium/Iris aman
+  (hanya tipe render vanilla, tidak menggambar di shadow pass).
+* Teks hanya di fragmen `lang-src/tempat_*.{id_id,en_us}.json` (termasuk `tempat_tema_*`) dengan kunci identik.
+
+### 38.1 Isi yang dibangun (modul)
+
+| Modul | Isi | Paket utama |
+|---|---|---|
+| 38W | jenis struktur `kultivator:tata_letak` + `kultivator:jalan`, rencana cincin, jalan + jembatan + tonggak + kuil jalan + pos singgah/dagang, penanda peta, Kitab Panduan bab 18-20, chip uji | `dunia/tempat/{worldgen,jalan}`, `PanduanTempat` |
+| 38KS | ibu kota 11 distrik (tembok, 4 gerbang entitas, Istana, Yamen, Rumah Uang, Paviliun Seribu Bilah, Lelang Agung, Gilda, stasiun teleport), jam malam, hukum + sel, acara (Festival Lentera, Pertemuan Pil, Gelombang Binatang, Turnamen Agung), alur "Bayangan di Balik Takhta" bab 1-7 | `dunia/tempat/kotabesar` |
+| 38DS | kampung fana/kultivator, desa klan (Tuan Muda), Festival Panen, anak berbakat, kompleks sekte NPC per `Sikap` | `dunia/tempat/{kampung,kompleks}` |
+| 38GU | Gua Pertapa (3 ujian), Makam Warisan + kompas Giok Warisan (32 bingkai), Cermin Hati, gua urat roh, sarang binatang/iblis, Puncak Petir, Panggung Bintang | `dunia/tempat/gua` |
+| 38NL | kehidupan penduduk: jadwal jam 5-22, kerja per peran, hunian, reaksi hujan/badai/gerhana/petir alami | `dunia/tempat/hidup` |
+| 38MD | model kubus + tekstur: gerbang kota, sel Yamen, gerobak, rakit, rak senjata, papan hidup, prop | `client/dunia/tempat/model` |
+| 38ST | dialog, quest, rumor, lore, tokoh bernama, adegan cerita, baris suara (`tools/gen_tempat_cerita.py` + `cerita_isi_*`) | `dunia/tempat/cerita`, `data/kultivator/tempat/{dialog,quest,kabar}` |
+| 38PR | kerusakan tercatat, tukang memperbaiki pelan-pelan, tagihan ganti rugi / takut pada ranah jauh lebih tinggi, peti berisi tidak pernah dibuang | `dunia/tempat/perbaikan` |
+| 38EK | kurs tunggal, toko, bank + Surat Wesel, gadai, judi batu (EV 0.88 buta, strategi terbaik <= 1.02), lelang, gilda + misi + lencana 1-9, lapak murid + Buku Kas, kafilah | `dunia/tempat/ekonomi`, `dunia/kota/{BalaiLelang,PapanMisi}` |
+| 38UI | kit "Pasar Giok" dan semua layar tempat, `LembarKunci` | `client/tempat/ui/{kit,layar}` |
+| 38TK / 38TV | 38.T: lima kota bertema, mekanisme, dagang antar-kota, rantai quest; model/fx/layar tema | `dunia/tempat/tema/**`, `client/**/tema/**` |
+
+### 38.T Kota Bertema (ringkas)
+
+Lima tema `kota_tema/<id>` (288 x 288, 3 x 3 distrik dari 2 x 2 lot 48 x 48, rotasi dari medan): **pelabuhan** (kapal dagang,
+mercusuar, galangan, Kapal Lintas Laut ke Laut Tanpa Batas, serbuan bajak laut), **oasis** (bazar tawar tiga putaran, kafilah
+unta, badai pasir + Gerbang Giok yang menutup sendiri, Surat Jalan Gurun, reruntuhan + Raja Kalajengking), **air** (kanal,
+Perahu Pos, Malam Lentera Air, Lomba Perahu Naga, Tikus Air), **gunung** (teras, kereta gantung dua bentang, ziarah, kera,
+longsor tanpa blok), **iblis** (Infami/Gentar, Zona Perjanjian, Jam Berburu, arena, tawanan, Menara Kitab Terlarang, Kolam
+Semedi Darah, Pemburu Lurus, Penyerbuan Lurus). Satelit jigsaw kecil: `reruntuhan_gurun`, `pos_pemburu`. Dagang antar-kota
+lewat Buku Dagang (mode pasar), kontrak muatan, bea Gerbang Giok 3 % (gratis hanya dengan Surat Jalan Gurun yang masih sah).
+
+### 38.2 Config, perintah, panduan
+
+* Config `config/kultivator-dunia.json`: bagian `tempat`, `tempat.hidup`, `kotaBesar`, `ekonomi38`, `kampung`,
+  `kompleksSekte`, `gua`, `jalan`, `perbaikan`, `cerita`, `kotaTema`, `temaPelabuhan|temaOasis|temaAir|temaGunung|temaIblis`
+  (tabel di 38.D.9 dan 38.T.13.1 rancangan).
+* Uji op `/kultivasi uji tempat|kota_besar|ekonomi|hidup|cerita|kampung|kompleks|gua|jalan|ui|tema ...`; klien
+  `/hiasan pamer|prop|senjata` (uji model 38.O.5). Pemain: `/kultivasi jurnal`, `/kultivasi kas`, `/kultivasi denda`,
+  `/kultivasi misi`, `/kultivasi dagang`.
+* Kitab Panduan: bab 18 "Kota Besar", 19 "Tempat-Tempat Dunia", 20 "Lima Kota Bertema" (indeks simpan 17-19), tampil
+  setelah "Dunia yang Luas". Penanda peta 42-49 untuk kota tema.
+
+### 38.3 Catatan implementasi (kode adalah kebenaran)
+
+* `RencanaKotaBesar.tanah/longgar`: kandidat yang gagal aturan medan ketat boleh lolos aturan longgar (sebaran x3, air +5,
+  tinggi +40) karena pemain memakai Tectonic + Terralith; cincin pertama memilih yang ketat. `tools/gen_kompat_bioma.py`
+  menambah bioma Terralith ke setiap tag bioma mod (pack bawaan `kultivator:kompat_bioma`, 53 tag dari 71). Distrik
+  pelabuhan memakai tag `#kultivator:has_structure/kota_tema/pelabuhan`.
+* `mixin/EntitySectionMixin` menyalin `EntitySection.getEntities()` agar penurunan chunk tidak CME; jangan dibuang.
+* Anggaran gzip per folder di `tools/cek_tempat.py`: kota_besar 3 MB, kampung 1.5 MB, kompleks 1.2 MB, gua 760 KB +
+  situs 240 KB (bersama 1 MB, W3), pos 600 KB, jalan 200 KB, kota_tema 6.2 MB (<= 1.2 MB per tema).
+* Hook lembar pertama layar tempat dipindah dari konstruktor ke `init()` (F2, crash subclass). Pasar kota tema dibuka dari
+  tab Jasa dialog (`DagangLayar.jasa`); Buku Dagang menggambar blok pasar (W3).
+* Papan hidup ibu kota (buronan di dinding utara Yamen, pahlawan di ujung utara Lapangan Agung) memakai yaw 90 x putar kota
+  (depan model -z, renderer 180 - yaw).
+* Kalah tidak pernah berarti mati: duel berhenti di ambang Duel Pedang, arena iblis berhenti di 5 % HP.
+* Belum: rak senjata toko belum disinkron dari stok toko (`RakSenjata.pasang` hanya dipakai `/hiasan senjata`); klip suara
+  Jepang baru belum dibuat (daftar `docs/progres/mega-voices.md`; kode memakai cadangan teks).
+
+---------------------------------------------------------------------------------------------------------------------
+
+## 39. Murid Mandiri (+ 39.F Perseteruan antar-sekte)
+
+Kontrak lengkap: **`docs/rancangan/39-murid-mandiri.md`** (39.0-39.13 dan 39.F). Daftar uji `docs/uji/FASE-39.md`.
+
+Permintaan pengguna (2026-10-23): murid tumbuh dan berkegiatan sendiri sampai Abadi Sejati tanpa diajari, tiap murid beda
+jalan; turun ke kota membeli perbekalan secara detail; lalu murid bisa bermusuhan dengan murid sekte lain.
+
+### 39.0 Aturan tetap (ringkas)
+
+* Paket `dev.kultivator.sekte.mandiri` (modul 39A-39E) + `sekte/mandiri/seteru` (39F), di atas DESIGN 36 (watak, hubungan,
+  ingatan, paviliun, misi, tetua), 20 (jenjang, Hu Fa) dan 38 (kota, jalan, ekonomi, kehidupan NPC).
+* Config `config/kultivator-sekte.json` seksi `mandiri`: `skalaXp` **1.5** (disetujui), `bolehGugur` **false** (tidak ada
+  kematian dari 39; NEKAT bisa terluka/tertawan, tidak pernah `markFallen`); seksi `mandiri_seteru`: `bolehPerang`
+  **false** (intensitas TINGGI berhenti di tantangan turnamen resmi).
+* Perintah guru selalu menang; jeda perintah 24000 tick. Simulasi luar layar malas (kejar-ketinggalan maks 30 hari);
+  kegiatan 40-60 tidak dipulihkan saat muat ulang. Sibuk lewat `dev.kultivator.util.Sibuk`.
+
+### 39.1 Isi
+
+* **39A Inti/data**: Jalan Hidup (16 jalan), Cita-cita, dorongan, `MandiriApi` (luka `lukai`/`luka`, godaan iblis, tutup
+  diri, kebijakan Mandiri Penuh / Seimbang / Patuh).
+* **39B Tumbuh**: terobosan sendiri dijaga sahabat (Hu Fa), pilih Dao, belajar teknik sendiri, serap batu, jenjang; guru
+  bisa menyetujui atau membiarkan (`/kultivasi perguruan mandiri tembus|dao|jenjang ...`).
+* **39C Perjalanan**: belanja ke kota dengan uang saku (tawar, lapak, copet, makan), perjalanan lain, tawanan + tebusan,
+  kepulangan (barang, luka, deviasi, pemahaman).
+* **39D Kerja**: pekerjaan sendiri di aula (kebun, tungku, jimat, mengajar) dan kabar kerja.
+* **39E Cerita/Layar/Suara**: Buku Harian (534 baris), tab "Jalan Hidup" di layar murid, papan Jalan Hidup Murid,
+  tokoh bernama, toast, pose `MandiriPoses`, Kitab Panduan bab 21 "Murid Mandiri" (indeks simpan 20).
+* **39F Perseteruan**: tangga T1-T7 (ejekan, duel kehormatan lewat Duel Pedang, sergapan, patroli, tawuran, sumpah dendam,
+  Kekasih Terlarang/kawin lari, delegasi tetua), akhir DAMAI / SAINGAN / DENDAM, kabar rumor, pose `SeteruPoses`; guru:
+  Damaikan / Utus tetua / Hukum / Usir (`/kultivasi perguruan mandiri seteru aksi|usir`).
+
+### 39.2 Catatan implementasi (kode adalah kebenaran)
+
+* Kalah duel seteru yang ditonton di rumah: murid kita mendapat luka `TERLUKA` satu hari (`MandiriApi.lukai`, sebab
+  `seteru`; F3). Pulang dari perjalanan dengan luka BERAT/TERTAWAN: luka BERAT 2-4 hari (`Kepulangan`).
+* Tubuh RIVAL 39F <= 4 per server, AI tiap 4 tick, kerumunan lewat `HidupApi.kerumunan/bubarkan` (38) <= 8 warga; adegan
+  hanya bila pemain <= 96 blok.
+* Penampilan murid lewat `SosokApi.setJalan/gerak/tatap` (40), tidak pernah menyetel kulit sendiri.
+* Belum: kekasih yang kawin lari datang dengan nama gulungan aula (CandidateSpec belum punya nama tetap); tombol Larang
+  guru (`KebijakanAula.larang`) dan glyph pedang bersilang opsional; kabar pengembara belum membuka situs baru; klip suara
+  39E/39F belum dibuat (cadangan dipakai).
+
+---------------------------------------------------------------------------------------------------------------------
+
+## 40. Penampilan dan Animasi (Sosok)
+
+Kontrak lengkap: **`docs/rancangan/40-penampilan-dan-animasi.md`** (40.0-40.7). Daftar uji `docs/uji/FASE-40.md`.
+
+Permintaan pengguna (2026-10-23): murid laki-laki dan perempuan dengan animasi sangat detail dan kulit sesuai gaya
+kultivator; NPC lain sesuai pekerjaan atau jabatannya.
+
+* Satu sistem bersama **Sosok** untuk murid dan setiap NPC manusia (kota, penduduk 38, murid mandiri 39, orang Dimensi,
+  Kultivator Liar, Utusan Langit, penonton turnamen). Modul 40I (identitas: kelamin, usia, proporsi, `SosokApi`), 40K
+  (kulit prosedural: 352 lembar bagian `textures/sosok/bagian`, 48 atlas cadangan, `resep.json` +- 125 rupa per peran,
+  `tools/gen_sosok_*`, `cek_sosok.py`), 40G (Gerak: klip 1-176 + 200-399 untuk 38/39, pegas rambut/jubah, wajah dan kedip,
+  prop `PropKatalog`/`SosokPropLayer`), 40R (renderer, LOD, atlas dinamis, setelan).
+* Aturan: hanya `RenderTypes` vanilla (`entityCutout`/`entityTranslucent`), tidak dievaluasi ulang di shadow pass Iris;
+  NPC bukan `Avatar` sehingga Player Animation Library tidak menyentuhnya. `DutyPoses.apply(PlayerModel,
+  AvatarRenderState)` tetap statis (target mixin 37). Parity palet Python dan Java `RupaResolver`.
+* Setelan klien `sosok_detail` (otomatis/tinggi/sedang/rendah) dan `sosok_wajah`; server `DuniaConfig` seksi `sosok`
+  (`rasioPerempuan` 0.5, usia saat rekrut, hari tumbuh, `skalaTubuh`). Uji op `/kultivasi uji penampilan galeri|acak|klip|
+  jalan|wajah|pegas|murid|pratinjau_benih|hapus`; klien `/sosok info|lod`.
+* Catatan W3: titik pinggang prop (+-2.6, 10.5, -2.6)/16 (bukan (+-4.6, 9, 0) yang ada di dalam lengan); bendera pegangan
+  opsional `PropKatalog.TEGAK`; prop di depan kaki tetap di lantai saat duduk/jongkok. Belum: lapisan "drape" untuk lembar
+  tambahan (bepergian, kerja, zirah, tidur), kain kepala dan alas kaki; kilau rambut hitam masih biru-abu; varian lari anak
+  `lari_riang`.

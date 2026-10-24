@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "peran:tetua_klan"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "bendera klan_hormat",
+    "acak 60"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tertawa"
+    }
+  ]
+}

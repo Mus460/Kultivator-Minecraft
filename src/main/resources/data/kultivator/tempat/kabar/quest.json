@@ -1,0 +1,200 @@
+{
+  "templat": [
+    {
+      "id": "naga_muda_sahabat",
+      "pemicu": "naga_muda_sahabat",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "petugas_gilda",
+        "penguji",
+        "warga",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "naga_muda_dendam",
+      "pemicu": "naga_muda_dendam",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "petugas_gilda",
+        "penguji",
+        "warga"
+      ]
+    },
+    {
+      "id": "wesel_tertangkap",
+      "pemicu": "wesel_tertangkap",
+      "bobot": 10,
+      "umur_hari": 5,
+      "peran_penyebar": [
+        "bankir",
+        "warga",
+        "pedagang_senjata",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "lonceng_dituang",
+      "pemicu": "lonceng_dituang",
+      "bobot": 10,
+      "umur_hari": 2
+    },
+    {
+      "id": "lonceng_pulih",
+      "pemicu": "lonceng_pulih",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "ah_lun_surat",
+      "pemicu": "ah_lun_surat",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "pemilik_penginapan",
+        "pelayan",
+        "warga",
+        "koki"
+      ]
+    },
+    {
+      "id": "ah_lun_pulang",
+      "pemicu": "ah_lun_pulang",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "pemilik_penginapan",
+        "pelayan",
+        "warga",
+        "koki"
+      ]
+    },
+    {
+      "id": "tikus_roh",
+      "pemicu": "tikus_roh",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "rubah_pulang",
+      "pemicu": "rubah_pulang",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "pedagang_binatang",
+        "warga",
+        "pedagang_keliling"
+      ]
+    },
+    {
+      "id": "kafilah_selamat",
+      "pemicu": "kafilah_selamat",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "panen_selamat",
+      "pemicu": "panen_selamat",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "bakat_sekte",
+      "pemicu": "bakat_sekte",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "tuan_muda_kalah",
+      "pemicu": "tuan_muda_kalah",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "tawanan_pulang",
+      "pemicu": "tawanan_pulang",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "quest_tungku_pertama",
+      "pemicu": "quest_tungku_pertama",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "quest_resep_hilang",
+      "pemicu": "quest_resep_hilang",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "quest_pedang_tanpa_nama",
+      "pemicu": "quest_pedang_tanpa_nama",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "quest_batu_bermata_darah",
+      "pemicu": "quest_batu_bermata_darah",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "quest_tiga_ujian_pertapa",
+      "pemicu": "quest_tiga_ujian_pertapa",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "quest_peta_awan",
+      "pemicu": "quest_peta_awan",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "quest_murid_kabur",
+      "pemicu": "quest_murid_kabur",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "quest_tikus_dapur",
+      "pemicu": "quest_tikus_dapur",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "pedang_ayah_lama",
+      "pemicu": "pedang_ayah_lama",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "pedang_ayah_baru",
+      "pemicu": "pedang_ayah_baru",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "kristal_formasi_pulih",
+      "pemicu": "kristal_formasi_pulih",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "demam_gratis",
+      "pemicu": "demam_gratis",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "demam_jual",
+      "pemicu": "demam_jual",
+      "bobot": 10,
+      "umur_hari": 7
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/mandiri_jalan",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.mandiri.tumbuh.adv.tembus.desc"
+    },
+    "icon": {
+      "id": "kultivator:tribulation_warding_pill"
+    },
+    "title": {
+      "translate": "kultivator.sekte.mandiri.tumbuh.adv.tembus.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

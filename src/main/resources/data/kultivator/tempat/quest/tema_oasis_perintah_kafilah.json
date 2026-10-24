@@ -1,0 +1,20 @@
+{
+  "pemberi": "tokoh:sha_wuyan",
+  "tempat": "kota_tema_oasis",
+  "ulang": true,
+  "tahap": [
+    {
+      "id": "kawal",
+      "tujuan": [
+        "misi_gilda kawal_unta"
+      ],
+      "batas_hari": 7,
+      "arah": "kota_tema/oasis",
+      "akibat": [
+        "beri_nb_pita 35",
+        "nama_baik 2"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

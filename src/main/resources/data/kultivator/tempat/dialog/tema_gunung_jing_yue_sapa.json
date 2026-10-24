@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "tokoh:jing_yue"
+  ],
+  "prioritas": 1,
+  "syarat": [
+    "kota_tema gunung"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "prop": "tasbih_tangan",
+      "pilihan": [
+        {
+          "ke": "restu"
+        },
+        {
+          "ke": "cahaya"
+        },
+        {
+          "ke": "gajah"
+        }
+      ]
+    },
+    {
+      "id": "restu",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "cahaya",
+      "gestur": "tatap_langit"
+    },
+    {
+      "id": "gajah",
+      "gestur": "cerita"
+    }
+  ]
+}

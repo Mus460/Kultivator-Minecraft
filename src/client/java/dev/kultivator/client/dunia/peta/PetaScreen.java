@@ -50,6 +50,8 @@ public final class PetaScreen extends Screen {
 
 	private static final int[] ZOOMS = {16, 64, 256};
 	private static final Identifier MARKERS = dev.kultivator.Kultivator.id("textures/dunia/peta/markers.png");
+	/** Second marker atlas (38W), cells {@link dev.kultivator.dunia.DuniaMarkers#ATLAS2_FIRST} and up, same 8 x 4 layout. */
+	private static final Identifier MARKERS_TEMPAT = dev.kultivator.Kultivator.id("textures/dunia/peta/markers_tempat.png");
 	private static final Identifier COMPASS = dev.kultivator.Kultivator.id("textures/dunia/peta/compass.png");
 	private static final int SIDE_W = 108;
 
@@ -888,8 +890,10 @@ public final class PetaScreen extends Screen {
 	}
 
 	private void icon(GuiGraphicsExtractor g, int index, int x, int y, int size, int tint) {
-		int i = Mth.clamp(index, 0, 31);
-		g.blit(RenderPipelines.GUI_TEXTURED, MARKERS, x, y, (i % 8) * 16.0F, (i / 8) * 16.0F, size, size, 16, 16, 128, 64, tint);
+		int i = Mth.clamp(index, 0, 63);
+		Identifier atlas = i >= dev.kultivator.dunia.DuniaMarkers.ATLAS2_FIRST ? MARKERS_TEMPAT : MARKERS;
+		int c = i % 32;
+		g.blit(RenderPipelines.GUI_TEXTURED, atlas, x, y, (c % 8) * 16.0F, (c / 8) * 16.0F, size, size, 16, 16, 128, 64, tint);
 	}
 
 	private void drawCoin(GuiGraphicsExtractor g, PetaUi.Button coin, int mouseX, int mouseY) {

@@ -1,0 +1,69 @@
+{
+  "pembicara": [
+    "tokoh:jing_xin"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest batu_bermata_darah tahap uji"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "prop": "tasbih_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "efek minecraft:nausea 8 0"
+          ],
+          "ke": "salah"
+        },
+        {
+          "ke": "benar1"
+        },
+        {
+          "akibat": [
+            "efek minecraft:nausea 8 0"
+          ],
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "benar1",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "efek minecraft:nausea 8 0"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "efek minecraft:nausea 8 0"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "efek minecraft:weakness 1 0",
+            "quest_maju batu_bermata_darah"
+          ],
+          "ke": "benar2"
+        }
+      ]
+    },
+    {
+      "id": "benar2",
+      "gestur": "sujud_dupa",
+      "prop": "dupa",
+      "suara": "kotabesar.temple_bell"
+    },
+    {
+      "id": "salah",
+      "gestur": "hormat_dalam"
+    }
+  ]
+}

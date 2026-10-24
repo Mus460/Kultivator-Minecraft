@@ -1,0 +1,23 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_tema/air/hunian_kanal/rumah_tenggara",
+        "processors": "kultivator:kota_tema/air/gaya_sakura",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_tema/air/hunian_kanal/rumah_tenggara_b",
+        "processors": "kultivator:kota_tema/air/gaya_sakura",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

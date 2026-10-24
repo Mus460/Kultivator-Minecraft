@@ -1153,8 +1153,8 @@ nama **persis** sama; model item dibuat 38MD/38TV di `kultivator:fx/tempat/<id>`
 
 **Titik pasang (`Titik`):** `KANAN`, `KIRI` (`translateToHand`, pola `DiscipleHeldItemLayer.hand`), `DUA_TANGAN`
 (jangkar tangan kanan, putaran dari posisi kedua tangan pada frame itu: vektor tangan kanan→kiri dihitung dari
-`rightArm`/`leftArm` setelah pose), `PUNGGUNG` (badan, translate (0, 4, 2.7)/16, rx 0), `PINGGANG_KIRI` (badan, (4.6, 9,
-0)/16), `PINGGANG_KANAN` (badan, (−4.6, 9, 0)/16), `KEPALA` (kepala, (0, −8.6, 0.5)/16: kuas di sanggul, bunga),
+`rightArm`/`leftArm` setelah pose), `PUNGGUNG` (badan, translate (0, 4, 2.7)/16, rx 0), `PINGGANG_KIRI` (badan, (2.6, 10.5,
+−2.6)/16), `PINGGANG_KANAN` (badan, (−2.6, 10.5, −2.6)/16; W3/40G: titik lama (±4.6, 9, 0) ada di dalam lengan), `KEPALA` (kepala, (0, −8.6, 0.5)/16: kuas di sanggul, bunga),
 `PANGKUAN` (badan, (0, 11.5, −4)/16, rx −90°; hanya saat duduk), `BAHU_KIRI` (badan, (4.2, 0.6, −1.6)/16), `DEPAN_KAKI` (akar model, (0, 23.5, −7)/16: gasing, ikan
 kayu). Prop digambar sebagai `ItemStack(Items.STICK)` dengan `DataComponents.ITEM_MODEL` (pola `PhysiqueVisuals.fx`),
 dibuat sekali per id (cache) — tidak di inisialisasi statis (aturan `NpcGear`). Prop hilang saat bertarung (`FIGHTING`,
@@ -1559,7 +1559,8 @@ aditif di atasnya.
   mendaftarkan klip tambahan dari klien init-nya), `static void petakanAktivitas(int aktivitas, int klip, int varian)`
   (aktivitas murid → klip; 40-56 sudah dipetakan 40G, 40.5.13), `static void daftarKait(String id, KaitGerak kait)` (efek
   klien pada peristiwa `KAIT`; `KaitGerak.picu(LivingEntity, DiscipleRenderState, float t)`); `PropKatalog.daftar(int id,
-  Identifier modelItem)` (prop 100-149 untuk 39, 150-199 untuk 38), `Klip.Pembangun` fluent (`Klip.baru(id, nama, durasi).loop().kunci(t,
+  Identifier modelItem)` (prop 100-149 untuk 39, 150-199 untuk 38; W3: juga `daftar(id, model, Pegangan)` dengan bendera
+  pegangan opsional `PropKatalog.TEGAK`), `Klip.Pembangun` fluent (`Klip.baru(id, nama, durasi).loop().kunci(t,
   kanal, nilai, ...).osc(...).prop(...).varian(...)`).
 - **C40.G2 `GerakData`** (render data key `kultivator:gerak`): dibaca 40K (`SosokBusanaModel`: pegas, panel rok, wajah) dan
   40R (`setupRotations`: BOB/SPIN, tidur).

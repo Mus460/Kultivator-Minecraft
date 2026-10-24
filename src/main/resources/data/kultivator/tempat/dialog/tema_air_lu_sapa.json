@@ -1,0 +1,92 @@
+{
+  "pembicara": [
+    "tokoh:lu_yuqing"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tuang_teh",
+      "prop": "teko",
+      "pilihan": [
+        {
+          "ke": "teh"
+        },
+        {
+          "akibat": [
+            "air_jual_daun"
+          ]
+        },
+        {
+          "syarat": [
+            "quest tema_air_teh_pertama baru"
+          ],
+          "ke": "petik"
+        },
+        {
+          "syarat": [
+            "bendera air_wen_dengar"
+          ],
+          "ke": "cawan"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "cawan",
+      "gestur": "tuang_teh",
+      "prop": "teko",
+      "pilihan": [
+        {
+          "syarat": [
+            "quest tema_air_benang hasil tenang"
+          ],
+          "ke": "kosong"
+        },
+        {
+          "syarat": [
+            "quest tema_air_benang hasil sepi"
+          ],
+          "ke": "masih"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kosong",
+      "gestur": "seduh_teh",
+      "prop": "cangkir"
+    },
+    {
+      "id": "masih",
+      "gestur": "sikap_tangan_belakang"
+    },
+    {
+      "id": "petik",
+      "gestur": "petik_teh",
+      "prop": "keranjang_teh",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_air_teh_pertama"
+          ]
+        },
+        {}
+      ]
+    },
+    {
+      "id": "teh",
+      "gestur": "seduh_teh",
+      "prop": "cangkir"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

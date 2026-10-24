@@ -1,0 +1,37 @@
+{
+  "pembicara": [
+    "peran:pandai_desa"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 60"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "palu_landasan",
+      "prop": "palu",
+      "pilihan": [
+        {
+          "ke": "cangkul"
+        },
+        {
+          "ke": "pedang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "cangkul",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "pedang",
+      "gestur": "lihat_barang",
+      "akibat": [
+        "lore kampung"
+      ]
+    }
+  ]
+}

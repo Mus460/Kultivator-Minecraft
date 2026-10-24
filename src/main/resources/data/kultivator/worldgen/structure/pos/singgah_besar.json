@@ -1,0 +1,35 @@
+{
+  "type": "kultivator:jalan",
+  "biomes": "#minecraft:is_overworld",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "pos": "singgah_besar",
+  "lot": [
+    {
+      "dx": -32,
+      "dz": -32,
+      "pool": "kultivator:pos/singgah_besar/nw"
+    },
+    {
+      "dx": 0,
+      "dz": -32,
+      "pool": "kultivator:pos/singgah_besar/ne"
+    },
+    {
+      "dx": -32,
+      "dz": 0,
+      "pool": "kultivator:pos/singgah_besar/sw"
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:pos/singgah_besar/se"
+    }
+  ]
+}

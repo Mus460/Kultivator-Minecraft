@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/mandiri_jalan",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.mandiri.cerita.adv.harian.desc"
+    },
+    "icon": {
+      "id": "minecraft:writable_book"
+    },
+    "title": {
+      "translate": "kultivator.sekte.mandiri.cerita.adv.harian.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

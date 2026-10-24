@@ -1,0 +1,53 @@
+{
+  "pembicara": [
+    "peran:tabib"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "quest demam_kumuh baru",
+    "!bendera demam_kumuh_tolak",
+    "acak 75"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "periksa_nadi",
+      "prop": "kotak_obat",
+      "pilihan": [
+        {
+          "ke": "bantu"
+        },
+        {
+          "akibat": [
+            "bendera demam_kumuh_tolak"
+          ],
+          "ke": "tolak"
+        }
+      ]
+    },
+    {
+      "id": "bantu",
+      "gestur": "racik_herba",
+      "prop": "herba",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai demam_kumuh",
+            "bendera demam_kumuh_tolak off"
+          ]
+        },
+        {
+          "akibat": [
+            "bendera demam_kumuh_tolak"
+          ],
+          "ke": "tolak"
+        }
+      ]
+    },
+    {
+      "id": "tolak",
+      "gestur": "angguk_dengar"
+    }
+  ]
+}

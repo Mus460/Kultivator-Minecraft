@@ -1,0 +1,109 @@
+{
+  "pembicara": [
+    "tokoh:sha_wuyan"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "quest tema_oasis_mata_air selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "suara": "tema.oasis.lord",
+      "pilihan": [
+        {
+          "syarat": [
+            "nama_baik 50"
+          ],
+          "akibat": [
+            "oasis_perintah"
+          ],
+          "ke": "perintah",
+          "tampil": true,
+          "alasan": "kultivator.kota_tema.oasis.alasan.nama_baik_50"
+        },
+        {
+          "ke": "kota"
+        },
+        {
+          "syarat": [
+            "bendera oasis.xie_bujuk"
+          ],
+          "ke": "xie_tebing"
+        },
+        {
+          "syarat": [
+            "!bendera oasis.xie_bujuk"
+          ],
+          "ke": "xie_ukir"
+        },
+        {
+          "syarat": [
+            "bendera oasis.xie_ajun"
+          ],
+          "ke": "ajun_dingin"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "surat",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "perintah",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {}
+      ]
+    },
+    {
+      "id": "kota",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "xie_tebing",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "xie_ukir",
+      "gestur": "sikap_tunduk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ajun_dingin",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

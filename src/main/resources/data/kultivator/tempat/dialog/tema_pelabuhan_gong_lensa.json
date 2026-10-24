@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "tokoh:gong_shumu"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest tema_pelabuhan_pelita tahap lensa"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "palu_lunas",
+      "prop": "palu_dempul",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_racik"
+          ]
+        },
+        {
+          "syarat": [
+            "punya kultivator:tema/kaca_garam_laut"
+          ],
+          "ke": "pasang"
+        },
+        {
+          "ke": "ibrahim"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ibrahim",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "pasang",
+      "gestur": "angkat_bawa",
+      "akibat": [
+        "ambil kultivator:tema/kaca_garam_laut 1",
+        "pelabuhan_pelita 1",
+        "kabar tema_pelabuhan_lensa pemain",
+        "quest_maju tema_pelabuhan_pelita"
+      ]
+    }
+  ]
+}

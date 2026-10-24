@@ -1,0 +1,61 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 2,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:spirit_stone_mid",
+          "weight": 30,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 4
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:demonic_banner",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:jade_slip",
+          "weight": 10
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:demonic_loot_pouch",
+          "weight": 14
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:gold_ingot",
+          "weight": 20,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 6
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:soul_seal_jade",
+          "weight": 4
+        }
+      ]
+    }
+  ],
+  "random_sequence": "kultivator:chests/tempat/gua/sarang_iblis_kamar"
+}

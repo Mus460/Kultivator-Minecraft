@@ -287,11 +287,167 @@ def connect_all(p):
 
 def save(p, name):
     connect_all(p)
+    titik_hidup(p, name)
     path = out_path(folder(), name)
     p.save(path)
     SAVED.append(folder() + "/" + name)
     COUNTS[folder() + "/" + name] = len(p.cells)
     return path
+
+
+# ======================================================================================================== life points
+# DESIGN 38.C.7 (module 38DS): the towns and Kota Abadi get the life points of DESIGN 38.B.2.5 in the extra root key
+# "kultivator_titik" (nbt.Template.titik; vanilla ignores the key, the blocks are what the builders wrote). 38NL reads
+# them at run time (TitikTemplat) for the residents' beds, seats, work spots, doors, street walks and meeting spots. They
+# are derived after a piece is built, so every builder gets them without hand-placed lists:
+#   kasur    the head block of every bed (facing = the bed's head);
+#   kursi    every chair() (facing = its table), and the stone benches of the square;
+#   kerja:*  the free floor cell in front of a work block (anvil, forge, pill stove, brewing stand, lectern, loom, ...);
+#   pintu    the doorway cell above each building connector (kota/pintu, kota/abadi_pintu);
+#   jalan    walk nodes down the middle of every street, bridge and the Kota Abadi bridges (data urut = order);
+#   jaga, obrol, kursi, lapak, tiba, penonton, kerja:*  at the town's anchors by kind (guards, townsfolk, the tea
+#            master, the auctioneer, wanderers' seats, the stage, the square);
+#   dupa     in front of every incense burner (ding).
+# At most 96 points per piece (38.C.10). A standing point needs an explicit air cell (or carpet / pressure plate) with a
+# free cell above and a solid block below, so no NPC is sent into a wall.
+import tempat_lib as TL  # noqa: E402
+
+TITIK_MAKS = 96
+KERJA_BLOK = {
+    "minecraft:anvil": "palu", "minecraft:chipped_anvil": "palu", "minecraft:damaged_anvil": "palu",
+    "minecraft:smithing_table": "palu", "minecraft:blast_furnace": "tungku", "minecraft:furnace": "tungku",
+    "minecraft:smoker": "kuali", "minecraft:brewing_stand": "lumpang", "minecraft:lectern": "meja_tulis",
+    "minecraft:loom": "tenun", "minecraft:grindstone": "pahat", "minecraft:stonecutter": "pahat",
+    "minecraft:cartography_table": "kuas", "minecraft:crafting_table": "gergaji", "minecraft:fletching_table": "gergaji",
+    "minecraft:composter": "cangkul",
+}
+JANGKAR_TITIK = {
+    "kota/penjaga": "jaga", "kota/gerbang_gelap": "jaga", "kota/abadi_gerbang": "jaga", "kota/abadi_utusan": "jaga",
+    "kota/abadi_lonceng": "jaga", "kota/warga": "obrol", "kota/abadi_warga": "obrol", "kota/papan": "obrol",
+    "kota/kursi_pengembara": "kursi", "kota/teh": "kerja:teko", "kota/lelang": "kerja:timbangan",
+    "kota/abadi_lelang": "kerja:timbangan", "kota/gelap": "kerja:timbangan", "kota/abadi_pasar": "lapak",
+    "kota/kolam": "kerja:pancing", "kota/abadi_kebun": "kerja:sabit", "kota/abadi_persik": "kerja:sabit",
+    "kota/abadi_penceramah": "kerja:meja_tulis", "kota/panggung": "penonton", "kota/alun": "tiba", "kota/situs": "tiba",
+    "kota/kota": "tiba", "kota/kota_abadi": "tiba",
+}
+FREE = ("minecraft:air", "minecraft:cave_air")
+STEPS = (("north", 0, -1), ("east", 1, 0), ("south", 0, 1), ("west", -1, 0))
+YAW_HADAP = ("south", "west", "north", "east")
+
+
+def kursi_of(p):
+    """The chairs of a piece (recorded by chair(), turned into "kursi" points when the piece is saved)."""
+    if not hasattr(p, "_kursi"):
+        p._kursi = []
+    return p._kursi
+
+
+def _bid(p, x, y, z):
+    cell = p.cells.get((x, y, z))
+    return None if cell is None else cell[0][0]
+
+
+def berdiri(p, x, y, z):
+    """True when an NPC can stand IN cell (x, y, z): explicit air (or carpet / plate), free above, solid below."""
+    if not p.inside(x, y, z) or y < 1:
+        return False
+    here = _bid(p, x, y, z)
+    if here is None or not (here in FREE or here.endswith("_carpet") or here.endswith("_pressure_plate")):
+        return False
+    above = _bid(p, x, y + 1, z)
+    if above is not None and above not in FREE:
+        return False
+    below = _bid(p, x, y - 1, z)
+    if below is None or below in FREE or below in ("minecraft:water", "minecraft:lava"):
+        return False
+    return not below.endswith("_carpet")
+
+
+def _tambah(p, seen, jenis, x, y, z, hadap, data=None):
+    if len(p.titik_list) >= TITIK_MAKS or (jenis, x, y, z) in seen or not p.inside(x, y, z):
+        return False
+    if not TL.titik_sah(jenis):
+        raise ValueError("illegal titik %r" % jenis)
+    seen.add((jenis, x, y, z))
+    p.titik(jenis, x, y, z, hadap, data)
+    return True
+
+
+def titik_hidup(p, name):
+    """Derives the life points of piece `name` (see the section comment). Deterministic (sorted cells)."""
+    seen = {(t["jenis"], t["pos"][0], t["pos"][1], t["pos"][2]) for t in p.titik_list}
+    cells = sorted(p.cells.items())
+    # beds
+    for (x, y, z), ((bid, props), _nbt) in cells:
+        pd = dict(props)
+        if bid.endswith("_bed") and pd.get("part") == "head":
+            _tambah(p, seen, "kasur", x, y, z, pd.get("facing", "north"))
+    # chairs
+    for x, y, z, facing in kursi_of(p):
+        _tambah(p, seen, "kursi", x, y, z, facing)
+    # doorways above building connectors
+    for (x, y, z), ((bid, props), nbt_data) in cells:
+        if bid == "minecraft:jigsaw" and nbt_data and str(nbt_data.get("name", "")).endswith(("kota/pintu", "kota/abadi_pintu")):
+            front = dict(props).get("orientation", "south_up").split("_")[0]
+            if front in ("north", "east", "south", "west") and berdiri(p, x, y + 1, z):
+                _tambah(p, seen, "pintu", x, y + 1, z, front)
+    # work blocks: the free floor cell in front (the block's facing first); the worker faces the block
+    for (x, y, z), ((bid, props), _nbt) in cells:
+        alat = KERJA_BLOK.get(bid)
+        if alat is None:
+            continue
+        pd = dict(props)
+        order = sorted(STEPS, key=lambda st: 0 if st[0] == pd.get("facing") else 1)
+        for face, dx, dz in order:
+            if berdiri(p, x + dx, y, z + dz):
+                _tambah(p, seen, "kerja:" + alat, x + dx, y, z + dz, OPP[face])
+                break
+    # incense burners (a lit campfire with a cauldron on top): the worshipper stands two blocks out, facing it
+    for (x, y, z), ((bid, props), _nbt) in cells:
+        if bid == "minecraft:campfire" and _bid(p, x, y + 1, z) == "minecraft:cauldron":
+            for face, dx, dz in (("south", 0, 2), ("north", 0, -2), ("east", 2, 0), ("west", -2, 0)):
+                if berdiri(p, x + dx, y - 1, z + dz):
+                    _tambah(p, seen, "dupa", x + dx, y - 1, z + dz, OPP[face])
+                    break
+    # anchors by kind (the anchor's own yaw gives the facing: 0 south, 90 west, 180 north, 270 east)
+    for ex, ey, ez, ent in p.entities:
+        if ent.get("id") != K + "dunia_anchor":
+            continue
+        jenis = JANGKAR_TITIK.get(ent.get("kind", ""))
+        if jenis is None:
+            continue
+        rot = ent.get("Rotation") or [0.0]
+        yaw = float(getattr(rot[0], "v", rot[0]))
+        hadap = YAW_HADAP[int(round((yaw % 360.0) / 90.0)) % 4]
+        _tambah(p, seen, jenis, int(ex // 1), int(ey // 1), int(ez // 1), hadap)
+    # walks down the street (pieces of the street network and the Kota Abadi bridges)
+    if name.startswith(("jalan", "jembatan", "abadi_jembatan", "tembok_ujung")):
+        sx, sy, sz = p.size
+        long_z = sz >= sx
+        n = sz if long_z else sx
+        order = 0
+        for i in range(2, n - 2, 5):
+            x, z = (sx // 2, i) if long_z else (i, sz // 2)
+            for y in range(1, min(sy - 1, 40)):
+                if berdiri(p, x, y, z):
+                    _tambah(p, seen, "jalan", x, y, z, "south" if long_z else "east", {"urut": str(order)})
+                    order += 1
+                    break
+    # the square: stone benches, children's play, talk by the well, the morning stalls
+    if name == "alun":
+        for x, z, f in ((3, 10, "south"), (6, 10, "south"), (10, 3, "east"), (10, 6, "east")):
+            _tambah(p, seen, "kursi", x, 1, z, f)
+        for x, z in ((8, 27), (24, 27), (12, 29)):
+            if berdiri(p, x, 1, z):
+                _tambah(p, seen, "main", x, 1, z, "north")
+        for x, z, f in ((13, 16, "east"), (19, 17, "west"), (16, 20, "north")):
+            if berdiri(p, x, 1, z):
+                _tambah(p, seen, "obrol", x, 1, z, f)
+        for x, z, f in ((26, 21, "north"), (27, 17, "south")):
+            if berdiri(p, x, 1, z):
+                _tambah(p, seen, "lapak", x, 1, z, f)
+    if len(p.titik_list) >= TITIK_MAKS:
+        print("note: %s/%s reached %d life points" % (folder(), name, TITIK_MAKS))
 
 
 def conn(p, x, y, z, facing, name, target="minecraft:empty", pool_id="minecraft:empty", final="minecraft:air", prio=0):
@@ -400,8 +556,10 @@ def table(p, x, y, z, top="plate"):
 
 
 def chair(p, x, y, z, facing):
-    """A chair facing its table (a stair whose back is away from the table)."""
+    """A chair facing its table (a stair whose back is away from the table); also a "kursi" life point (38.C.7)."""
     p.stairs(x, y, z, "wood_stairs", OPP[facing])
+    if p.inside(x, y, z):
+        kursi_of(p).append((x, y, z, facing))
 
 
 def bed(p, x, y, z, facing="north", role="bed"):

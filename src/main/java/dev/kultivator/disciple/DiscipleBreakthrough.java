@@ -155,8 +155,13 @@ public final class DiscipleBreakthrough {
 
 	// ================================================================== start / tick
 
-	/** Begins the breakthrough. Every requirement must already be checked (see DiscipleCultivation.startBreakthrough). */
-	static void start(DiscipleEntity entity, ServerLevel level, ServerPlayer master) {
+	/**
+	 * Begins the breakthrough. Every requirement must already be checked (see DiscipleCultivation.startBreakthrough and,
+	 * for a disciple breaking through on its own, {@code startBreakthroughSelf}, DESIGN 39.5.2). {@code master} may be null
+	 * (the master offline or elsewhere): then no chat line is sent; the rules, omen, strikes, endings and the
+	 * {@code BreakthroughListener}s are exactly the same.
+	 */
+	static void start(DiscipleEntity entity, ServerLevel level, @Nullable ServerPlayer master) {
 		DiscipleData data = entity.data();
 		Rank current = data.rank();
 		Rank target = current.next();
@@ -174,19 +179,25 @@ public final class DiscipleBreakthrough {
 				Fx.send(level, entity.position(), FxType.AWAKENING, data.rootColor(), AWAKENING_TICKS, 0.0F);
 				sound(level, entity.position(), SoundEvents.BEACON_POWER_SELECT, 0.8F, 0.7F);
 				sound(level, entity.position(), SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 0.6F);
-				Msg.chat(master, Component.translatable("kultivator.disciplecult.bt.awakening_start", name).withColor(0x8FE3C8));
+				if (master != null) {
+					Msg.chat(master, Component.translatable("kultivator.disciplecult.bt.awakening_start", name).withColor(0x8FE3C8));
+				}
 			}
 			case GATHERING -> {
 				Fx.send(level, entity.position(), FxType.BREAKTHROUGH_START, target.realm().ordinal(), GATHER_TICKS, 0.0F);
 				sound(level, entity.position(), SoundEvents.BEACON_POWER_SELECT, 0.8F, 0.9F);
-				Msg.chat(master, Component.translatable("kultivator.disciplecult.bt.gathering_start", name, targetName,
-						percent(trial.chance)).withColor(0x8FE3C8));
+				if (master != null) {
+					Msg.chat(master, Component.translatable("kultivator.disciplecult.bt.gathering_start", name, targetName,
+							percent(trial.chance)).withColor(0x8FE3C8));
+				}
 			}
 			case TRIBULATION -> {
 				sendOmen(level, trial, OMEN_TICKS);
 				rumble(level, entity.position(), variant, entity.getRandom());
-				Msg.chat(master, Component.translatable("kultivator.disciplecult.bt.omen." + variant, name, targetName,
-						Component.literal(String.valueOf(trial.strikeCount)).withStyle(ChatFormatting.YELLOW)).withStyle(variantColor(variant)));
+				if (master != null) {
+					Msg.chat(master, Component.translatable("kultivator.disciplecult.bt.omen." + variant, name, targetName,
+							Component.literal(String.valueOf(trial.strikeCount)).withStyle(ChatFormatting.YELLOW)).withStyle(variantColor(variant)));
+				}
 			}
 		}
 		entity.refreshSynced();

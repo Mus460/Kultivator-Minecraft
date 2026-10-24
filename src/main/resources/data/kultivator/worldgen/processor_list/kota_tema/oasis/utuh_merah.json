@@ -1,0 +1,2121 @@
+{
+  "processors": [
+    {
+      "processor_type": "minecraft:rule",
+      "rules": [
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:chiseled_sandstone"
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:chiseled_red_sandstone"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:cut_sandstone"
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:cut_red_sandstone"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:cut_sandstone_slab",
+              "properties": {
+                "type": "bottom",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:cut_red_sandstone_slab",
+            "properties": {
+              "type": "bottom",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:cut_sandstone_slab",
+              "properties": {
+                "type": "top",
+                "waterlogged": "true"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:cut_red_sandstone_slab",
+            "properties": {
+              "type": "top",
+              "waterlogged": "true"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_door",
+              "properties": {
+                "facing": "east",
+                "half": "lower",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_door",
+            "properties": {
+              "facing": "east",
+              "half": "lower",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_door",
+              "properties": {
+                "facing": "east",
+                "half": "upper",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_door",
+            "properties": {
+              "facing": "east",
+              "half": "upper",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_door",
+              "properties": {
+                "facing": "north",
+                "half": "lower",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_door",
+            "properties": {
+              "facing": "north",
+              "half": "lower",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_door",
+              "properties": {
+                "facing": "north",
+                "half": "upper",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_door",
+            "properties": {
+              "facing": "north",
+              "half": "upper",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_door",
+              "properties": {
+                "facing": "south",
+                "half": "lower",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_door",
+            "properties": {
+              "facing": "south",
+              "half": "lower",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_door",
+              "properties": {
+                "facing": "south",
+                "half": "upper",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_door",
+            "properties": {
+              "facing": "south",
+              "half": "upper",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_door",
+              "properties": {
+                "facing": "west",
+                "half": "lower",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_door",
+            "properties": {
+              "facing": "west",
+              "half": "lower",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_door",
+              "properties": {
+                "facing": "west",
+                "half": "upper",
+                "hinge": "left",
+                "open": "false",
+                "powered": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_door",
+            "properties": {
+              "facing": "west",
+              "half": "upper",
+              "hinge": "left",
+              "open": "false",
+              "powered": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "false",
+                "north": "false",
+                "south": "false",
+                "waterlogged": "false",
+                "west": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "false",
+              "north": "false",
+              "south": "false",
+              "waterlogged": "false",
+              "west": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "false",
+                "north": "false",
+                "south": "false",
+                "waterlogged": "false",
+                "west": "true"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "false",
+              "north": "false",
+              "south": "false",
+              "waterlogged": "false",
+              "west": "true"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "false",
+                "north": "false",
+                "south": "true",
+                "waterlogged": "false",
+                "west": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "false",
+              "north": "false",
+              "south": "true",
+              "waterlogged": "false",
+              "west": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "false",
+                "north": "false",
+                "south": "true",
+                "waterlogged": "false",
+                "west": "true"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "false",
+              "north": "false",
+              "south": "true",
+              "waterlogged": "false",
+              "west": "true"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "false",
+                "north": "true",
+                "south": "false",
+                "waterlogged": "false",
+                "west": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "false",
+              "north": "true",
+              "south": "false",
+              "waterlogged": "false",
+              "west": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "false",
+                "north": "true",
+                "south": "false",
+                "waterlogged": "false",
+                "west": "true"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "false",
+              "north": "true",
+              "south": "false",
+              "waterlogged": "false",
+              "west": "true"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "false",
+                "north": "true",
+                "south": "true",
+                "waterlogged": "false",
+                "west": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "false",
+              "north": "true",
+              "south": "true",
+              "waterlogged": "false",
+              "west": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "false",
+                "north": "true",
+                "south": "true",
+                "waterlogged": "false",
+                "west": "true"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "false",
+              "north": "true",
+              "south": "true",
+              "waterlogged": "false",
+              "west": "true"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "true",
+                "north": "false",
+                "south": "false",
+                "waterlogged": "false",
+                "west": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "true",
+              "north": "false",
+              "south": "false",
+              "waterlogged": "false",
+              "west": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "true",
+                "north": "false",
+                "south": "false",
+                "waterlogged": "false",
+                "west": "true"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "true",
+              "north": "false",
+              "south": "false",
+              "waterlogged": "false",
+              "west": "true"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "true",
+                "north": "false",
+                "south": "true",
+                "waterlogged": "false",
+                "west": "true"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "true",
+              "north": "false",
+              "south": "true",
+              "waterlogged": "false",
+              "west": "true"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "true",
+                "north": "true",
+                "south": "false",
+                "waterlogged": "false",
+                "west": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "true",
+              "north": "true",
+              "south": "false",
+              "waterlogged": "false",
+              "west": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "true",
+                "north": "true",
+                "south": "false",
+                "waterlogged": "false",
+                "west": "true"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "true",
+              "north": "true",
+              "south": "false",
+              "waterlogged": "false",
+              "west": "true"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "true",
+                "north": "true",
+                "south": "true",
+                "waterlogged": "false",
+                "west": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "true",
+              "north": "true",
+              "south": "true",
+              "waterlogged": "false",
+              "west": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_fence",
+              "properties": {
+                "east": "true",
+                "north": "true",
+                "south": "true",
+                "waterlogged": "false",
+                "west": "true"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_fence",
+            "properties": {
+              "east": "true",
+              "north": "true",
+              "south": "true",
+              "waterlogged": "false",
+              "west": "true"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_leaves",
+              "properties": {
+                "distance": "1",
+                "persistent": "true",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_leaves",
+            "properties": {
+              "distance": "1",
+              "persistent": "true",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_log",
+              "properties": {
+                "axis": "x"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_log",
+            "properties": {
+              "axis": "x"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_log",
+            "properties": {
+              "axis": "y"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_log",
+              "properties": {
+                "axis": "z"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_log",
+            "properties": {
+              "axis": "z"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_planks"
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_planks"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_slab",
+              "properties": {
+                "type": "bottom",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_slab",
+            "properties": {
+              "type": "bottom",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_slab",
+              "properties": {
+                "type": "top",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_slab",
+            "properties": {
+              "type": "top",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_stairs",
+              "properties": {
+                "facing": "east",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_stairs",
+            "properties": {
+              "facing": "east",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_stairs",
+              "properties": {
+                "facing": "north",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_stairs",
+              "properties": {
+                "facing": "south",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_stairs",
+            "properties": {
+              "facing": "south",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "east",
+                "half": "top",
+                "open": "false",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "east",
+              "half": "top",
+              "open": "false",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "east",
+                "half": "top",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "east",
+              "half": "top",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "north",
+                "half": "top",
+                "open": "false",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "north",
+              "half": "top",
+              "open": "false",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "north",
+                "half": "top",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "north",
+              "half": "top",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "south",
+                "half": "top",
+                "open": "false",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "south",
+              "half": "top",
+              "open": "false",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "south",
+                "half": "top",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "south",
+              "half": "top",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:jungle_trapdoor",
+              "properties": {
+                "facing": "west",
+                "half": "top",
+                "open": "true",
+                "powered": "false",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:acacia_trapdoor",
+            "properties": {
+              "facing": "west",
+              "half": "top",
+              "open": "true",
+              "powered": "false",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:mud_bricks"
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:terracotta"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:packed_mud"
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:brown_terracotta"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sand"
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sand"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone"
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_stairs",
+              "properties": {
+                "facing": "east",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_stairs",
+            "properties": {
+              "facing": "east",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_stairs",
+              "properties": {
+                "facing": "east",
+                "half": "top",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_stairs",
+            "properties": {
+              "facing": "east",
+              "half": "top",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_stairs",
+              "properties": {
+                "facing": "north",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_stairs",
+              "properties": {
+                "facing": "north",
+                "half": "top",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "top",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_stairs",
+              "properties": {
+                "facing": "south",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_stairs",
+            "properties": {
+              "facing": "south",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_stairs",
+              "properties": {
+                "facing": "south",
+                "half": "top",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_stairs",
+            "properties": {
+              "facing": "south",
+              "half": "top",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_stairs",
+              "properties": {
+                "facing": "west",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_stairs",
+            "properties": {
+              "facing": "west",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_stairs",
+              "properties": {
+                "facing": "west",
+                "half": "top",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_stairs",
+            "properties": {
+              "facing": "west",
+              "half": "top",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "low",
+                "north": "low",
+                "south": "low",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "none"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "low",
+              "north": "low",
+              "south": "low",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "none"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "low",
+                "north": "low",
+                "south": "none",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "low"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "low",
+              "north": "low",
+              "south": "none",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "low"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "low",
+                "north": "low",
+                "south": "none",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "none"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "low",
+              "north": "low",
+              "south": "none",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "none"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "low",
+                "north": "none",
+                "south": "low",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "low"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "low",
+              "north": "none",
+              "south": "low",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "low"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "low",
+                "north": "none",
+                "south": "low",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "none"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "low",
+              "north": "none",
+              "south": "low",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "none"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "low",
+                "north": "none",
+                "south": "none",
+                "up": "false",
+                "waterlogged": "false",
+                "west": "low"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "low",
+              "north": "none",
+              "south": "none",
+              "up": "false",
+              "waterlogged": "false",
+              "west": "low"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "none",
+                "north": "low",
+                "south": "low",
+                "up": "false",
+                "waterlogged": "false",
+                "west": "none"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "none",
+              "north": "low",
+              "south": "low",
+              "up": "false",
+              "waterlogged": "false",
+              "west": "none"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "none",
+                "north": "low",
+                "south": "low",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "low"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "none",
+              "north": "low",
+              "south": "low",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "low"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "none",
+                "north": "low",
+                "south": "none",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "low"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "none",
+              "north": "low",
+              "south": "none",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "low"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "none",
+                "north": "low",
+                "south": "none",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "none"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "none",
+              "north": "low",
+              "south": "none",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "none"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "none",
+                "north": "none",
+                "south": "low",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "low"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "none",
+              "north": "none",
+              "south": "low",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "low"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "none",
+                "north": "none",
+                "south": "low",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "none"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "none",
+              "north": "none",
+              "south": "low",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "none"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "none",
+                "north": "none",
+                "south": "none",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "low"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "none",
+              "north": "none",
+              "south": "none",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "low"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "none",
+                "north": "none",
+                "south": "none",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "none"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "none",
+              "north": "none",
+              "south": "none",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "none"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:sandstone_wall",
+              "properties": {
+                "east": "none",
+                "north": "none",
+                "south": "none",
+                "up": "true",
+                "waterlogged": "false",
+                "west": "tall"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:red_sandstone_wall",
+            "properties": {
+              "east": "none",
+              "north": "none",
+              "south": "none",
+              "up": "true",
+              "waterlogged": "false",
+              "west": "tall"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:smooth_sandstone"
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:smooth_sandstone_stairs",
+              "properties": {
+                "facing": "east",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone_stairs",
+            "properties": {
+              "facing": "east",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:smooth_sandstone_stairs",
+              "properties": {
+                "facing": "east",
+                "half": "top",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone_stairs",
+            "properties": {
+              "facing": "east",
+              "half": "top",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:smooth_sandstone_stairs",
+              "properties": {
+                "facing": "north",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:smooth_sandstone_stairs",
+              "properties": {
+                "facing": "north",
+                "half": "top",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "top",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:smooth_sandstone_stairs",
+              "properties": {
+                "facing": "south",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone_stairs",
+            "properties": {
+              "facing": "south",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:smooth_sandstone_stairs",
+              "properties": {
+                "facing": "south",
+                "half": "top",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone_stairs",
+            "properties": {
+              "facing": "south",
+              "half": "top",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:smooth_sandstone_stairs",
+              "properties": {
+                "facing": "west",
+                "half": "bottom",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone_stairs",
+            "properties": {
+              "facing": "west",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:smooth_sandstone_stairs",
+              "properties": {
+                "facing": "west",
+                "half": "top",
+                "shape": "straight",
+                "waterlogged": "false"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:smooth_red_sandstone_stairs",
+            "properties": {
+              "facing": "west",
+              "half": "top",
+              "shape": "straight",
+              "waterlogged": "false"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:stripped_jungle_log",
+              "properties": {
+                "axis": "x"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stripped_acacia_log",
+            "properties": {
+              "axis": "x"
+            }
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "id": "minecraft:stripped_jungle_log",
+              "properties": {
+                "axis": "y"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "id": "minecraft:stripped_acacia_log",
+            "properties": {
+              "axis": "y"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "processor_type": "minecraft:protected_blocks",
+      "value": "#kultivator:sect_protected"
+    }
+  ]
+}

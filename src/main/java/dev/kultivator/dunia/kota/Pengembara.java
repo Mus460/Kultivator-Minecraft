@@ -189,7 +189,7 @@ public final class Pengembara {
 		int realm = realmIndex >= 0 ? realmIndex : data.realm().ordinal();
 		int stage = Mth.clamp(data.rank().stage() + random.nextInt(3) - 1, 0, 3);
 		int temperament = temper >= 0 ? temper : random.nextInt(10) < 5 ? RAMAH : random.nextInt(5) < 3 ? ANGKUH : LICIK;
-		MutableComponent plate = Component.translatable("kultivator.kota.pengembara.papan", KotaNames.person(look),
+		MutableComponent plate = Component.translatable("kultivator.kota.pengembara.papan", KotaNames.person(look, NpcRole.PENGEMBARA),
 				Component.translatable("kultivator.kota.watak." + temperament)).withColor(dao == null ? 0xC0D0E0 : dao.color());
 		npc.snapTo(spot.x, spot.y, spot.z, random.nextFloat() * 360.0F, 0.0F);
 		npc.setup(NpcRole.PENGEMBARA, look, realm, stage, dao, Math.floorMod(look >>> 5, KultivatorNpc.VOICES.length), 0, plate);
@@ -690,7 +690,7 @@ public final class Pengembara {
 
 	static CompoundTag view(ServerPlayer player, KultivatorNpc npc) {
 		CompoundTag tag = new CompoundTag();
-		tag.store("name", ComponentSerialization.CODEC, KotaNames.person(npc.look()));
+		tag.store("name", ComponentSerialization.CODEC, KotaNames.person(npc.look(), npc.role()));
 		tag.putInt("dao", npc.dao() == null ? -1 : npc.dao().ordinal());
 		tag.putInt("realm", npc.realm());
 		tag.putInt("stage", npc.stage());

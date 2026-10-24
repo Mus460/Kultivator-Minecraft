@@ -1,0 +1,33 @@
+{
+  "pembicara": [
+    "peran:murid_klan"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 55"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "latihan_tinju",
+      "pilihan": [
+        {
+          "ke": "latih"
+        },
+        {
+          "ke": "hidup"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "latih",
+      "gestur": "tiang_berdiri"
+    },
+    {
+      "id": "hidup",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

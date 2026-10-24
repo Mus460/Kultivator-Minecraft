@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380404,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_pelabuhan",
+    "distrik": "kota_awak"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/pelabuhan/kota_awak",
+      "weight": 1
+    }
+  ]
+}

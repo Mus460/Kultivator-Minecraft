@@ -1,0 +1,45 @@
+{
+  "pembicara": [
+    "tokoh:lao_kuang"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_iblis_gladiator_tua tahap pilih",
+    "!bendera iblis_lao_terhormat"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tua",
+      "pilihan": [
+        {
+          "ke": "duel"
+        },
+        {
+          "syarat": [
+            "nb 120"
+          ],
+          "ke": "pensiun",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_iblis_lao_pilih.mulai.2.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "duel",
+      "gestur": "hunus",
+      "akibat": [
+        "mulai_duel"
+      ]
+    },
+    {
+      "id": "pensiun",
+      "gestur": "hormat_dalam",
+      "akibat": [
+        "iblis_lao pensiun"
+      ]
+    }
+  ]
+}

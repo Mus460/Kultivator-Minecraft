@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "peran:pertapa"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tiga_ujian_pertapa tahap herba"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "napas_meditasi",
+      "pilihan": [
+        {
+          "syarat": [
+            "punya kultivator:ninecurl_ginseng"
+          ],
+          "akibat": [
+            "ambil kultivator:ninecurl_ginseng",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "terima",
+          "tampil": true,
+          "alasan": "kultivator.cerita.pertapa_herba.mulai.1.alasan"
+        },
+        {
+          "syarat": [
+            "punya kultivator:spirit_grass 8"
+          ],
+          "akibat": [
+            "ambil kultivator:spirit_grass 8",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "terima",
+          "tampil": true,
+          "alasan": "kultivator.cerita.pertapa_herba.mulai.2.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "sujud_dupa",
+      "prop": "dupa"
+    }
+  ]
+}

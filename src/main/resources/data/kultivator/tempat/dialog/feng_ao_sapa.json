@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "tokoh:feng_ao"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "ke": "sombong"
+        },
+        {
+          "syarat": [
+            "ranah 2"
+          ],
+          "ke": "tanding",
+          "tampil": true,
+          "alasan": "kultivator.cerita.feng_ao_sapa.mulai.2.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sombong",
+      "gestur": "marah_tunjuk"
+    },
+    {
+      "id": "tanding",
+      "gestur": "hunus",
+      "pilihan": [
+        {
+          "akibat": [
+            "mulai_duel"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

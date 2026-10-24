@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "tokoh:sha_wuyan"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_oasis_mata_air tahap ukur"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "angguk_dengar",
+      "suara": "tema.oasis.lord",
+      "pilihan": [
+        {
+          "ke": "dua"
+        }
+      ]
+    },
+    {
+      "id": "dua",
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {
+          "ke": "kafilah"
+        }
+      ]
+    },
+    {
+      "id": "kafilah",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju tema_oasis_mata_air"
+          ]
+        }
+      ]
+    }
+  ]
+}

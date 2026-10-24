@@ -1,0 +1,38 @@
+{
+  "pembicara": [
+    "tokoh:ah_lun",
+    "peran:murid_sekte_luar"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest surat_ah_lun tahap temu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kaget",
+      "akibat": [
+        "jadi_tokoh ah_lun"
+      ],
+      "pilihan": [
+        {
+          "syarat": [
+            "punya cerita:surat_bibi_hong"
+          ],
+          "akibat": [
+            "ambil cerita:surat_bibi_hong",
+            "quest_maju surat_ah_lun"
+          ],
+          "ke": "baca",
+          "tampil": true,
+          "alasan": "kultivator.cerita.ah_lun_temu.mulai.1.alasan"
+        }
+      ]
+    },
+    {
+      "id": "baca",
+      "gestur": "menangis"
+    }
+  ]
+}

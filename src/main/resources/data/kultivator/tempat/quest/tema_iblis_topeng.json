@@ -1,0 +1,28 @@
+{
+  "pemberi": "tokoh:bai_she",
+  "tempat": "tema_iblis",
+  "tahap": [
+    {
+      "id": "cari",
+      "tujuan": [
+        "iblis_topeng rebut"
+      ],
+      "batas_hari": 4,
+      "gagal_ke": "hilang"
+    },
+    {
+      "id": "kembali",
+      "tujuan": [
+        "tanda iblis_topeng_serah"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "hilang",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}

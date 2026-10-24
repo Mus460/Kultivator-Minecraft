@@ -1,0 +1,15 @@
+{
+  "placement": {
+    "type": "kultivator:jalan",
+    "salt": 380302,
+    "spacing": 1,
+    "separation": 0,
+    "titik": "tonggak"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:pos/tonggak",
+      "weight": 1
+    }
+  ]
+}

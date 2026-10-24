@@ -1,0 +1,28 @@
+{
+  "pembicara": [
+    "tokoh:pei_wenzhi"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "quest tema_ziarah_ibu selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lambai",
+      "prop": "tongkat_bambu",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

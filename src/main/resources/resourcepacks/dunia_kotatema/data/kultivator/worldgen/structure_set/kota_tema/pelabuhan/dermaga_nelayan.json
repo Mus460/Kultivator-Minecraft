@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380401,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_pelabuhan",
+    "distrik": "dermaga_nelayan"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/pelabuhan/dermaga_nelayan",
+      "weight": 1
+    }
+  ]
+}

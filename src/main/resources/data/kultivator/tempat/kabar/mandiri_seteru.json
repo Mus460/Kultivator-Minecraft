@@ -1,0 +1,67 @@
+{
+  "templat": [
+    {
+      "id": "mandiri_seteru_duel",
+      "pemicu": "mandiri_seteru",
+      "bobot": 10,
+      "umur_hari": 5,
+      "teks": "kultivator.sekte.mandiri.seteru.kabar.duel"
+    },
+    {
+      "id": "mandiri_seteru_tawuran",
+      "pemicu": "mandiri_seteru",
+      "bobot": 10,
+      "umur_hari": 5,
+      "teks": "kultivator.sekte.mandiri.seteru.kabar.tawuran"
+    },
+    {
+      "id": "mandiri_seteru_damai",
+      "pemicu": "mandiri_seteru",
+      "bobot": 8,
+      "umur_hari": 6,
+      "teks": "kultivator.sekte.mandiri.seteru.kabar.damai"
+    },
+    {
+      "id": "mandiri_seteru_patroli",
+      "pemicu": "mandiri_seteru",
+      "bobot": 8,
+      "umur_hari": 6,
+      "teks": "kultivator.sekte.mandiri.seteru.kabar.patroli"
+    },
+    {
+      "id": "mandiri_seteru_kawin_lari",
+      "pemicu": "mandiri_seteru",
+      "bobot": 6,
+      "umur_hari": 9,
+      "teks": "kultivator.sekte.mandiri.seteru.kabar.kawin_lari"
+    },
+    {
+      "id": "mandiri_seteru_pembela",
+      "pemicu": "mandiri_seteru",
+      "bobot": 9,
+      "umur_hari": 6,
+      "teks": "kultivator.sekte.mandiri.seteru.kabar.pembela"
+    },
+    {
+      "id": "mandiri_seteru_gulungan",
+      "pemicu": "mandiri_seteru",
+      "bobot": 7,
+      "umur_hari": 5,
+      "teks": "kultivator.sekte.mandiri.seteru.kabar.gulungan"
+    },
+    {
+      "id": "mandiri_seteru_sumpah",
+      "pemicu": "mandiri_seteru",
+      "bobot": 8,
+      "umur_hari": 6,
+      "teks": "kultivator.sekte.mandiri.seteru.kabar.sumpah"
+    },
+    {
+      "id": "mandiri_seteru_saingan",
+      "pemicu": "mandiri_seteru",
+      "bobot": 7,
+      "umur_hari": 8,
+      "teks": "kultivator.sekte.mandiri.seteru.kabar.saingan"
+    }
+  ]
+}

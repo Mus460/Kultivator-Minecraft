@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "tokoh:ajun"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_oasis_mata_air tahap kafilah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tunjuk",
+      "suara": "tempat.child_play",
+      "pilihan": [
+        {
+          "ke": "siapa"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "siapa",
+      "gestur": "takut_sembunyi",
+      "pilihan": [
+        {}
+      ]
+    }
+  ]
+}

@@ -1,6 +1,5 @@
 package dev.kultivator.sekte.diplomasi;
 
-import dev.kultivator.dunia.api.DuniaApi;
 import dev.kultivator.musuh.SectRaids;
 import dev.kultivator.sect.hall.HallData;
 import dev.kultivator.sect.hall.Halls;
@@ -68,59 +67,7 @@ public final class Simulasi {
 			data.addNews(day, Component.translatable(GeneratorNama.KEY + "berita.berdiri", data.sects.size()));
 			data.setDirty();
 		}
-		linkRivals(data);
 		keepPlanOf(server);
-	}
-
-	/**
-	 * T12: every sect without a Dunia rival group gets the group whose home region lies nearest its gate (a group not yet
-	 * taken first, then the nearest of all), stored by group id. Older worlds linked by index kept their links; their
-	 * sects past the group count (7-8) get one here.
-	 */
-	static void linkRivals(DiplomasiData data) {
-		List<String> groups = DuniaApi.rivals().all();
-		if (groups.isEmpty()) {
-			return;
-		}
-		java.util.Set<String> taken = new java.util.HashSet<>();
-		for (SekteNpc sect : data.sects) {
-			if (!sect.rivalLink.isEmpty()) {
-				taken.add(sect.rivalLink);
-			}
-		}
-		boolean changed = false;
-		for (SekteNpc sect : data.sects) {
-			if (!sect.rivalLink.isEmpty()) {
-				continue;
-			}
-			String free = nearestGroup(groups, sect, taken, true);
-			String pick = free != null ? free : nearestGroup(groups, sect, taken, false);
-			if (pick != null) {
-				sect.rivalLink = pick;
-				taken.add(pick);
-				changed = true;
-			}
-		}
-		if (changed) {
-			data.setDirty();
-		}
-	}
-
-	private static @Nullable String nearestGroup(List<String> groups, SekteNpc sect, java.util.Set<String> taken, boolean freeOnly) {
-		String best = null;
-		double bestD = Double.MAX_VALUE;
-		for (String id : groups) {
-			if (freeOnly && taken.contains(id)) {
-				continue;
-			}
-			net.minecraft.core.BlockPos region = DuniaApi.rivals().region(id);
-			double d = region == null ? Double.MAX_VALUE / 2 : Math.pow(region.getX() - sect.blockX, 2) + Math.pow(region.getZ() - sect.blockZ, 2);
-			if (d < bestD) {
-				bestD = d;
-				best = id;
-			}
-		}
-		return best;
 	}
 
 	/** The placement must keep planning the gates of the sects this world already has, whatever the config says now. */

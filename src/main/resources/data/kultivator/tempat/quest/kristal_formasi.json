@@ -1,0 +1,44 @@
+{
+  "pemberi": "peran:penjaga_formasi",
+  "tempat": "stasiun_teleport",
+  "tahap": [
+    {
+      "id": "kecubung",
+      "tujuan": [
+        "antar minecraft:amethyst_shard peran:penjaga_formasi x8"
+      ]
+    },
+    {
+      "id": "pasang",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera formasi_belajar"
+          ],
+          "ke": "belajar"
+        }
+      ],
+      "ke": "upah"
+    },
+    {
+      "id": "belajar",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "nama_baik 2",
+        "kabar kristal_formasi_pulih pemain"
+      ]
+    },
+    {
+      "id": "upah",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "beri_nb_pita 6",
+        "kabar kristal_formasi_pulih pemain"
+      ]
+    }
+  ]
+}

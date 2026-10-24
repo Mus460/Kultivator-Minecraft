@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_air",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_air_teh.description"
+    },
+    "icon": {
+      "id": "kultivator:tema/teh_bi_luo"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_air_teh.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

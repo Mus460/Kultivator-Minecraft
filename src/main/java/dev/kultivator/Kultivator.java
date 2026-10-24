@@ -105,6 +105,8 @@ public class Kultivator implements ModInitializer {
 		Ascension.init();
 		// Phase 5
 		dev.kultivator.disciple.Disciples.init();
+		// Sosok (DESIGN 40, module 40I): one look and animation system for disciples and every human NPC
+		dev.kultivator.sosok.Sosok.init();
 		// Phase 6: Sekte Abadi & Murid OP (DESIGN 20.2.12)
 		dev.kultivator.sect.hall.Halls.init();
 		dev.kultivator.sect.event.SectEvents.init();

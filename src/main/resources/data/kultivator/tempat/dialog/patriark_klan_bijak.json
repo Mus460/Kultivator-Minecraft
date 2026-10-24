@@ -1,0 +1,57 @@
+{
+  "pembicara": [
+    "peran:patriark_klan"
+  ],
+  "prioritas": -1,
+  "syarat": [
+    "watak bijak"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "cerita",
+      "suara": "tempat.clan_patriarch",
+      "pilihan": [
+        {
+          "ke": "topik"
+        },
+        {
+          "ke": "lore"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "topik",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "lore"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lore",
+      "isian": [
+        "sekte_terdekat"
+      ],
+      "gestur": "cerita",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

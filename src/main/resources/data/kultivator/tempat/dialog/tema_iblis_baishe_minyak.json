@@ -1,0 +1,64 @@
+{
+  "pembicara": [
+    "tokoh:bai_she"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_iblis_rantai tahap minyak"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas",
+      "prop": "kipas_sutra",
+      "suara": "tema.iblis.broker",
+      "pilihan": [
+        {
+          "ke": "tawar"
+        },
+        {
+          "ke": "asal"
+        }
+      ]
+    },
+    {
+      "id": "asal",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "tawar"
+        }
+      ]
+    },
+    {
+      "id": "tawar",
+      "isian": [
+        "nb_pita:200"
+      ],
+      "gestur": "hitung_koin_gelap",
+      "prop": "kantong_uang",
+      "pilihan": [
+        {
+          "akibat": [
+            "iblis_minyak beli"
+          ],
+          "ke": "beli"
+        },
+        {
+          "ke": "pikir"
+        }
+      ]
+    },
+    {
+      "id": "beli",
+      "gestur": "tertawa",
+      "prop": "kipas_sutra"
+    },
+    {
+      "id": "pikir",
+      "gestur": "kipas",
+      "prop": "kipas_sutra"
+    }
+  ]
+}

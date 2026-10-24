@@ -43,6 +43,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.AABB;
@@ -89,6 +90,10 @@ import java.util.concurrent.CompletableFuture;
  * (only the keep-list and the protected zones stay); a block entity is removed with
  * {@link Block#UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS} so nothing spills, and an undoable job saves its full NBT (capped) so
  * Pulihkan puts containers back with their contents. Only an unloaded neighbour still makes a position unsafe.
+ * <p>
+ * DESIGN 38.R (38PR): place repairs ({@link #submitRestore}) are small restore batches that put a recorded town, village
+ * or compound back where the world still holds the planned state or air, with their own per-tick budget beside the casts;
+ * {@link #addChangeListener} tells the repair module which master's cast changed which box (damage attribution).
  */
 public final class WorldBreaker {
 
@@ -507,6 +512,7 @@ public final class WorldBreaker {
 			UNDO.clear();
 			BULK.clear();
 			PERMANENT.clear();
+			RESTORES.clear();
 		});
 	}
 
@@ -753,6 +759,8 @@ public final class WorldBreaker {
 			long now = server.overworld().getGameTime();
 			UNDO.removeIf(undo -> now >= undo.expiresAt);
 		}
+		// DESIGN 38.R.3: the place repairs run beside the casts, with their own small budget
+		tickRestoreRequests(server);
 		// Phase 10b (29.16.7): the bulk carve first, then the classic queue keeps running
 		tickBulk(server);
 		Job job = JOBS.peekFirst();
@@ -792,6 +800,13 @@ public final class WorldBreaker {
 		double sy = 0.0D;
 		double sz = 0.0D;
 		int done = 0;
+		// DESIGN 38.R.2: the box this batch changed, for the change listeners (attribution of place damage)
+		int bx0 = Integer.MAX_VALUE;
+		int by0 = Integer.MAX_VALUE;
+		int bz0 = Integer.MAX_VALUE;
+		int bx1 = Integer.MIN_VALUE;
+		int by1 = Integer.MIN_VALUE;
+		int bz1 = Integer.MIN_VALUE;
 		while (budget > 0 && reads > 0 && job.index < job.positions.length) {
 			int i = job.index++;
 			reads--;
@@ -914,6 +929,15 @@ public final class WorldBreaker {
 			sx += pos.getX() + 0.5D;
 			sy += pos.getY() + 0.5D;
 			sz += pos.getZ() + 0.5D;
+			bx0 = Math.min(bx0, pos.getX());
+			by0 = Math.min(by0, pos.getY());
+			bz0 = Math.min(bz0, pos.getZ());
+			bx1 = Math.max(bx1, pos.getX());
+			by1 = Math.max(by1, pos.getY());
+			bz1 = Math.max(bz1, pos.getZ());
+		}
+		if (done > 0 && !job.restore) {
+			notifyChange(level, job.owner, job.disciple, new BoundingBox(bx0, by0, bz0, bx1, by1, bz1), done);
 		}
 		if (done > 0) {
 			Vec3 centroid = new Vec3(sx / done, sy / done, sz / done);
@@ -1770,6 +1794,189 @@ public final class WorldBreaker {
 		job.expiresAt = Long.MAX_VALUE;
 		JOBS.addLast(job);
 		return true;
+	}
+
+	// ================================================================== DESIGN 38.R: place repairs and change listeners (38PR)
+
+	/**
+	 * One batch of place repair (DESIGN 38.R.3, contract of 38PR): for each index {@code i}, block {@code positions[i]} of
+	 * {@code dimension} becomes {@code targets[i]}, but only while the world still holds {@code expected[i]} (the state when
+	 * the repair was planned) or air. {@code blockEntityTags[i]} (may be null, or hold nulls) is loaded into the restored
+	 * block entity: a loot table for an unopened chest, a sign's text. {@code done} (may be null) receives one flag per
+	 * index when the whole batch was worked through: true = the position holds its target now, false = it must be planned
+	 * again (chunk not loaded, someone standing there, the block changed meanwhile, a filled container in the way).
+	 */
+	public record RestoreRequest(ResourceKey<Level> dimension, long[] positions, BlockState[] targets, BlockState[] expected,
+			@Nullable CompoundTag[] blockEntityTags, String reason, java.util.function.@Nullable Consumer<boolean[]> done) {
+	}
+
+	/**
+	 * A Mode Kehancuran job changed blocks (DESIGN 38.R.2 attribution): {@code owner} is the master (a disciple's cast is
+	 * the master's too, {@code disciple} names the disciple, "" for the player's own technique), {@code box} the box of
+	 * this batch, {@code blocks} how many changed. Called on the server thread after every changing batch of a cast; never
+	 * for a restore, a clear or a repair. Must be cheap.
+	 */
+	@FunctionalInterface
+	public interface ChangeListener {
+		void changed(ServerLevel level, UUID owner, String disciple, BoundingBox box, int blocks);
+	}
+
+	/** Repair batches waiting at most (a full queue refuses, the caller keeps its work and asks again later). */
+	public static final int MAX_RESTORE_REQUESTS = 64;
+	/** Repair batches longer than this are refused (a caller sends many small batches). */
+	public static final int MAX_RESTORE_POSITIONS = 512;
+
+	/** A repair batch being worked through. */
+	private static final class RestoreWork {
+		final RestoreRequest request;
+		final boolean[] result;
+		int index;
+
+		RestoreWork(RestoreRequest request) {
+			this.request = request;
+			this.result = new boolean[request.positions().length];
+		}
+	}
+
+	private static final Deque<RestoreWork> RESTORES = new ArrayDeque<>();
+	private static final List<ChangeListener> CHANGE_LISTENERS = new java.util.concurrent.CopyOnWriteArrayList<>();
+	/** Positions place repairs may change per tick (38.R.7 {@code perbaikan.blokPerTick}), always also under the cast budget. */
+	private static volatile int restorePerTick = 8;
+
+	/** Sets the repair budget per tick (1-64); called by 38PR when its config loads. */
+	public static void setRestoreBudget(int perTick) {
+		restorePerTick = Math.max(1, Math.min(64, perTick));
+	}
+
+	/** Adds a change listener (DESIGN 38.R.2); a listener that throws is logged and skipped. */
+	public static void addChangeListener(ChangeListener listener) {
+		if (listener != null) {
+			CHANGE_LISTENERS.add(listener);
+		}
+	}
+
+	private static void notifyChange(ServerLevel level, UUID owner, String disciple, BoundingBox box,
+			int blocks) {
+		if (CHANGE_LISTENERS.isEmpty() || blocks <= 0) {
+			return;
+		}
+		for (ChangeListener listener : CHANGE_LISTENERS) {
+			try {
+				listener.changed(level, owner, disciple == null ? "" : disciple, box, blocks);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A WorldBreaker change listener failed", exception);
+			}
+		}
+	}
+
+	/**
+	 * Queues a place repair batch (DESIGN 38.R.3). The same rules as a Pulihkan restore, made stricter: a position changes
+	 * only where the world holds {@code expected} or air (a flowing fluid counts as air), never in an unloaded chunk (the
+	 * position fails and is planned again), never where an entity stands, never over a container that still holds items,
+	 * never into lava; the same {@link #FLAGS} (no neighbour updates, no drops); at most {@link #setRestoreBudget} positions
+	 * per tick and the cast budget, paused while the tick time is above {@code kehancuranMsptPause}. No zone check: a repair
+	 * only puts a recorded place back (the caller has already left out player claims). False when the batch is malformed or
+	 * the queue is full.
+	 */
+	public static boolean submitRestore(RestoreRequest request) {
+		if (request == null || request.dimension() == null || request.positions() == null || request.targets() == null || request.expected() == null) {
+			return false;
+		}
+		int n = request.positions().length;
+		if (n == 0 || n > MAX_RESTORE_POSITIONS || request.targets().length != n || request.expected().length != n
+				|| request.blockEntityTags() != null && request.blockEntityTags().length != n) {
+			return false;
+		}
+		for (BlockState target : request.targets()) {
+			if (target == null || target.getFluidState().is(net.minecraft.tags.FluidTags.LAVA)) {
+				return false;
+			}
+		}
+		if (RESTORES.size() >= MAX_RESTORE_REQUESTS) {
+			return false;
+		}
+		RESTORES.addLast(new RestoreWork(request));
+		return true;
+	}
+
+	/** Repair batches waiting (for {@code uji tempat perbaiki}). */
+	public static int restoreQueue() {
+		return RESTORES.size();
+	}
+
+	private static void tickRestoreRequests(MinecraftServer server) {
+		if (RESTORES.isEmpty()) {
+			return;
+		}
+		KultivatorConfig config = KultivatorConfig.get();
+		if (server.getAverageTickTimeNanos() > config.kehancuranMsptPause * 1_000_000L) {
+			return;
+		}
+		int budget = Math.max(1, Math.min(restorePerTick, config.kehancuranBlocksPerTick));
+		int reads = budget * READ_FACTOR;
+		while (budget > 0 && reads > 0 && !RESTORES.isEmpty()) {
+			RestoreWork work = RESTORES.peekFirst();
+			RestoreRequest request = work.request;
+			ServerLevel level = server.getLevel(request.dimension());
+			int n = request.positions().length;
+			while (level != null && budget > 0 && reads > 0 && work.index < n) {
+				int i = work.index++;
+				reads--;
+				int changed = restoreOne(level, request, i, work.result);
+				budget -= changed;
+			}
+			if (level == null || work.index >= n) {
+				RESTORES.pollFirst();
+				if (request.done() != null) {
+					try {
+						request.done().accept(work.result);
+					} catch (RuntimeException exception) {
+						Kultivator.LOGGER.error("Kultivator: a place repair callback failed ({})", request.reason(), exception);
+					}
+				}
+			}
+		}
+	}
+
+	/** Works one repair position; returns 1 when a block changed (budget used), else 0. Writes the result flag. */
+	private static int restoreOne(ServerLevel level, RestoreRequest request, int i, boolean[] result) {
+		BlockPos pos = BlockPos.of(request.positions()[i]);
+		if (!level.isLoaded(pos)) {
+			return 0;
+		}
+		BlockState target = request.targets()[i];
+		BlockState state = level.getBlockState(pos);
+		if (state == target) {
+			result[i] = true;
+			return 0;
+		}
+		BlockState expected = request.expected()[i];
+		if (!state.isAir() && state != expected && !flowing(state)) {
+			return 0;
+		}
+		if (state.hasBlockEntity() && level.getBlockEntity(pos) instanceof net.minecraft.world.Container container && !container.isEmpty()) {
+			// never throw anyone's things away: the place's foreman asks the player to move them (38.R.3 rule 3)
+			return 0;
+		}
+		if (!target.isAir() && !level.isUnobstructed(target, pos, CollisionContext.empty())) {
+			return 0;
+		}
+		if (!level.setBlock(pos, target, state.hasBlockEntity() || target.hasBlockEntity() ? FLAGS_ENTITY : FLAGS)) {
+			return 0;
+		}
+		if (PoiTypes.hasPoi(state) || PoiTypes.hasPoi(target)) {
+			level.updatePOIOnBlockStateChange(pos, state, target);
+		}
+		CompoundTag[] tags = request.blockEntityTags();
+		if (tags != null && tags[i] != null) {
+			loadTag(level, pos, target, tags[i]);
+		}
+		result[i] = true;
+		if (!target.isAir() && level.getRandom().nextInt(3) == 0) {
+			net.minecraft.world.level.block.SoundType sound = target.getSoundType();
+			level.playSound(null, pos, sound.getPlaceSound(), SoundSource.BLOCKS, (sound.getVolume() + 1.0F) * 0.4F, sound.getPitch() * 0.9F);
+		}
+		return 1;
 	}
 
 	// ================================================================== Phase 10b: the fast bulk carve (DESIGN 29.16.7)
@@ -2824,6 +3031,11 @@ public final class WorldBreaker {
 			}
 			int cx = work.pos.x();
 			int cz = work.pos.z();
+			if (!job.restore) {
+				// DESIGN 38.R.2: one change note per carved chunk column (the box is the whole column of the chunk)
+				notifyChange(level, job.owner, "", new BoundingBox(cx << 4, level.getMinY(), cz << 4, (cx << 4) + 15, level.getMaxY(), (cz << 4) + 15),
+						(int) Math.min(Integer.MAX_VALUE, work.changedHere));
+			}
 			ResourceKey<Level> dimension = job.dimension;
 			job.inFlight.add(level.getChunkSource().getLightEngine().waitForPendingTasks(cx, cz)
 					.thenRunAsync(() -> resend(server, dimension, cx, cz), server));

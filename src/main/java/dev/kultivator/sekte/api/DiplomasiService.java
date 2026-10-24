@@ -69,4 +69,44 @@ public interface DiplomasiService {
 	default @Nullable BlockPos plannedGate(String sectId) {
 		return null;
 	}
+
+	// ------------------------------------------------------------------ read helpers (T12 one list; 38, 39F)
+
+	/** The sect master's title and name ("Ketua Mo Tianhe"), or null for an unknown sect. */
+	default @Nullable Component master(String sectId) {
+		return null;
+	}
+
+	/** The sect's alignment: 0 righteous (Lurus), 1 neutral (Netral), 2 demonic (Iblis); -1 for an unknown sect. */
+	default int aliran(String sectId) {
+		return -1;
+	}
+
+	/**
+	 * The sect of alignment {@code aliran} (-1 = any) whose gate lies nearest {@code pos} (planned gate columns, so it works
+	 * before any gate was generated), or null (DESIGN 38: "the nearest righteous sect" of bounties and ransoms).
+	 */
+	default @Nullable String nearest(BlockPos pos, int aliran) {
+		return null;
+	}
+
+	/** The Saingan rival group that is the sect's travelling band ({@code "g<i>"} for sect {@code "s<i>"}), or null. */
+	default @Nullable String rivalGroup(String sectId) {
+		return null;
+	}
+
+	/** The sect whose travelling band is rival group {@code rivalId}, or null. */
+	default @Nullable String sectOfRival(String rivalId) {
+		return null;
+	}
+
+	/** The sect's ink colour (map border, band robes, name plates; the same colour Saingan gives its band). */
+	default int color(String sectId) {
+		return 0xB0B0B0;
+	}
+
+	/** True when the sect and the owner's hall are at war right now (38 Turnamen Agung skips them). */
+	default boolean atWar(UUID owner, String sectId) {
+		return false;
+	}
 }

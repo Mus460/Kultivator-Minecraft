@@ -1,0 +1,21 @@
+{
+  "pemberi": "tokoh:sha_wuyan",
+  "tempat": "kota_tema_oasis",
+  "ulang": true,
+  "tahap": [
+    {
+      "id": "bersihkan",
+      "tujuan": [
+        "pergi kota_tema/reruntuhan_gurun",
+        "kalahkan monster x8"
+      ],
+      "batas_hari": 7,
+      "arah": "kota_tema/reruntuhan_gurun",
+      "akibat": [
+        "beri_nb_pita 40",
+        "nama_baik 2"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

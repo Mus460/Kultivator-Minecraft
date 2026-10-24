@@ -1,0 +1,58 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_tema/oasis",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_oasis",
+  "distrik": "gerbang_giok",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/oasis/gerbang_giok/penginapan",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/oasis/gerbang_giok/bea",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/oasis/gerbang_giok/rumah_makan",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/oasis/gerbang_giok/stasiun",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 48,
+      "pool": "kultivator:kota_tema/oasis/tembok/gerbang_a",
+      "putar": 2
+    },
+    {
+      "dx": -48,
+      "dz": 48,
+      "pool": "kultivator:kota_tema/oasis/tembok/gerbang_b",
+      "putar": 2
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "#kultivator:kota_tema/gaya/oasis_merah",
+      "akhiran": "merah"
+    }
+  ]
+}

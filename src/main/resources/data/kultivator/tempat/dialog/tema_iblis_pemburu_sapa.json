@@ -1,0 +1,21 @@
+{
+  "pembicara": [
+    "peran:pemburu_lurus"
+  ],
+  "prioritas": 8,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berdiri_jaga",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_kontrak"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

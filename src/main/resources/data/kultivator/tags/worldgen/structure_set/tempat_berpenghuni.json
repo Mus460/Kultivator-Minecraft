@@ -1,0 +1,285 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "kultivator:kota_besar/istana",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_besar/cendekia",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_besar/awan",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_besar/gilda",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_besar/pusat",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_besar/pasar",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_besar/hunian_barat",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_besar/gerbang",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_besar/arena",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_besar/kumuh",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_besar/luar",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota/kota_kultivator",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota/kota_abadi",
+      "required": false
+    },
+    {
+      "id": "kultivator:kampung/dusun",
+      "required": false
+    },
+    {
+      "id": "kultivator:kampung/desa",
+      "required": false
+    },
+    {
+      "id": "kultivator:kampung/desa_besar",
+      "required": false
+    },
+    {
+      "id": "kultivator:kampung/klan",
+      "required": false
+    },
+    {
+      "id": "kultivator:kompleks_sekte/halaman",
+      "required": false
+    },
+    {
+      "id": "kultivator:kompleks_sekte/dalam",
+      "required": false
+    },
+    {
+      "id": "kultivator:kompleks_sekte/puncak",
+      "required": false
+    },
+    {
+      "id": "kultivator:pos/singgah",
+      "required": false
+    },
+    {
+      "id": "kultivator:pos/singgah_besar",
+      "required": false
+    },
+    {
+      "id": "kultivator:pos/dagang",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pelabuhan/dermaga_nelayan",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pelabuhan/dermaga_agung",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pelabuhan/galangan",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pelabuhan/kota_awak",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pelabuhan/pasar_laut",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pelabuhan/gudang_dagang",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pelabuhan/kuil_laut",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pelabuhan/gerbang_darat",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pelabuhan/hunian_saudagar",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/oasis/kuil_air",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/oasis/istana_pasir",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/oasis/kebun_palma",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/oasis/bazar_barat",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/oasis/mata_air",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/oasis/bazar_timur",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/oasis/hunian_tanah",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/oasis/gerbang_giok",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/oasis/karavanserai",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/oasis/lapangan_kafilah",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/air/taman_sastra",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/air/rumah_sutra",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/air/bukit_teh",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/air/jembatan_kembar",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/air/danau_lentera",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/air/pasar_kanal",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/air/hunian_kanal",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/air/gerbang_air",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/air/dermaga_perahu",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/gunung/tebing_papan",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/gunung/puncak_emas",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/gunung/biara_awan",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/gunung/teras_hunian",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/gunung/aula_herba",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/gunung/teras_kebun",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/gunung/penginapan_peziarah",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/gunung/kaki_gerbang",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/gunung/pasar_kaki",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/iblis/menara_terlarang",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/iblis/istana_darah",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/iblis/penjara_tawanan",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/iblis/pasar_gelap",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/iblis/arena_darah",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/iblis/sarang_kontrak",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/iblis/kumuh_iblis",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/iblis/gerbang_tengkorak",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/iblis/kedai_racun",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pos_pemburu",
+      "required": false
+    }
+  ]
+}

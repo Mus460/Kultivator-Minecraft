@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "tokoh:a_fu"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_iblis_rantai tahap tebus_afu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berlutut_rantai",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_tawanan"
+          ]
+        },
+        {
+          "ke": "darah"
+        },
+        {
+          "ke": "abai"
+        }
+      ]
+    },
+    {
+      "id": "darah",
+      "gestur": "sikap_anak",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_tawanan"
+          ]
+        },
+        {}
+      ]
+    },
+    {
+      "id": "abai",
+      "gestur": "takut_sembunyi",
+      "akibat": [
+        "iblis_afu abai"
+      ]
+    }
+  ]
+}

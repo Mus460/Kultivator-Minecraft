@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "peran:penjaga_gerbang"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 60",
+    "jam 6 21"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berdiri_jaga",
+      "prop": "tombak",
+      "suara": "kotabesar.gate_welcome",
+      "pilihan": [
+        {
+          "ke": "hukum"
+        },
+        {
+          "ke": "jam"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "hukum",
+      "gestur": "cerita",
+      "akibat": [
+        "lore kota_besar.gerbang"
+      ]
+    },
+    {
+      "id": "jam",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "pembicara": [
+    "peran:sisa_jiwa"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "makam life 2",
+    "!quest warisan_life_2 selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_belakang",
+      "suara": "tempat.inheritance",
+      "akibat": [
+        "quest_mulai warisan_life_2"
+      ],
+      "pilihan": [
+        {
+          "syarat": [
+            "quest warisan_life_2 tahap kisah"
+          ],
+          "ke": "k1"
+        },
+        {
+          "syarat": [
+            "quest warisan_life_2 tahap hati"
+          ],
+          "ke": "h1"
+        },
+        {
+          "syarat": [
+            "quest warisan_life_2 tahap makam"
+          ],
+          "ke": "dalam"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "k1",
+      "gestur": "cerita",
+      "pilihan": [
+        {
+          "ke": "k2"
+        }
+      ]
+    },
+    {
+      "id": "k2",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "ke": "k3"
+        }
+      ]
+    },
+    {
+      "id": "k3",
+      "gestur": "hormat_dalam",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju warisan_life_2"
+          ],
+          "ke": "h1"
+        },
+        {
+          "akibat": [
+            "quest_maju warisan_life_2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "h1",
+      "gestur": "segel_tangan",
+      "pilihan": [
+        {
+          "ke": "h2"
+        },
+        {
+          "akibat": [
+            "efek minecraft:nausea 6 0",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "goyah"
+        },
+        {
+          "akibat": [
+            "efek minecraft:nausea 6 0",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "goyah"
+        }
+      ]
+    },
+    {
+      "id": "h2",
+      "gestur": "segel_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "efek minecraft:nausea 6 0",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "goyah"
+        },
+        {
+          "ke": "h3"
+        },
+        {
+          "akibat": [
+            "efek minecraft:nausea 6 0",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "goyah"
+        }
+      ]
+    },
+    {
+      "id": "h3",
+      "gestur": "segel_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "efek minecraft:nausea 6 0",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "goyah"
+        },
+        {
+          "akibat": [
+            "quest_maju warisan_life_2"
+          ],
+          "ke": "teguh"
+        },
+        {
+          "akibat": [
+            "efek minecraft:nausea 6 0",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "goyah"
+        }
+      ]
+    },
+    {
+      "id": "goyah",
+      "gestur": "hormat_dalam",
+      "pilihan": [
+        {
+          "ke": "h1"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "teguh",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "dalam",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

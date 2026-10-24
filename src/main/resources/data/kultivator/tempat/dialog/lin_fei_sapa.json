@@ -1,0 +1,32 @@
+{
+  "pembicara": [
+    "tokoh:lin_fei"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_berkacak",
+      "pilihan": [
+        {
+          "ke": "lengan"
+        },
+        {
+          "ke": "daftar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lengan",
+      "gestur": "tertawa",
+      "akibat": [
+        "lore gilda.kultivator"
+      ]
+    },
+    {
+      "id": "daftar",
+      "gestur": "tunjuk"
+    }
+  ]
+}

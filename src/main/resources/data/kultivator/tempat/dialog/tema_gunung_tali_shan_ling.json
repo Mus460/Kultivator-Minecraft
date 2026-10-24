@@ -1,0 +1,60 @@
+{
+  "pembicara": [
+    "tokoh:shan_ling"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest tema_gunung_tali tahap shan_ling"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_berkacak",
+      "prop": "keranjang",
+      "pilihan": [
+        {
+          "ke": "jerat"
+        },
+        {
+          "ke": "rencana"
+        }
+      ]
+    },
+    {
+      "id": "rencana",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "jerat"
+        }
+      ]
+    },
+    {
+      "id": "jerat",
+      "gestur": "tunjuk",
+      "prop": "sabit_herba",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju tema_gunung_tali"
+          ]
+        },
+        {
+          "ke": "tali"
+        }
+      ]
+    },
+    {
+      "id": "tali",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju tema_gunung_tali"
+          ]
+        }
+      ]
+    }
+  ]
+}

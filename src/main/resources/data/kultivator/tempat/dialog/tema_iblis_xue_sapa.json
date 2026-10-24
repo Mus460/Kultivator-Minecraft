@@ -1,0 +1,33 @@
+{
+  "pembicara": [
+    "tokoh:xue_yao"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "iblis_di_kota",
+    "iblis_penguasa xue_yao"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "syarat": [
+            "iblis_audiensi"
+          ],
+          "ke": "kota",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_iblis_xue_sapa.mulai.1.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kota",
+      "gestur": "kipas",
+      "prop": "kipas_sutra"
+    }
+  ]
+}

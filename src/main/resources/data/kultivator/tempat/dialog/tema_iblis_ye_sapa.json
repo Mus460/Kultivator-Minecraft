@@ -1,0 +1,75 @@
+{
+  "pembicara": [
+    "tokoh:ye_wuhen"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "iblis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {
+          "syarat": [
+            "iblis_penguasa xue_yao"
+          ],
+          "ke": "xue"
+        },
+        {
+          "syarat": [
+            "iblis_penguasa ye_wuhen"
+          ],
+          "ke": "penguasa"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute lurus"
+          ],
+          "ke": "tu_gang"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute darah",
+            "bendera iblis_jamuan_tolak"
+          ],
+          "ke": "duel_aula"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "xue",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "penguasa",
+      "gestur": "tatap_langit",
+      "suara": "tema.iblis.dawn"
+    },
+    {
+      "id": "tu_gang",
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "duel_aula",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

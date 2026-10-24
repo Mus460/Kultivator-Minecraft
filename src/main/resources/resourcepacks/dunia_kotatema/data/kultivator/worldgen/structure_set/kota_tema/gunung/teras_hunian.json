@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380434,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_gunung",
+    "distrik": "teras_hunian"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/gunung/teras_hunian",
+      "weight": 1
+    }
+  ]
+}

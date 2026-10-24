@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "peran:tabib"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 60"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "periksa_nadi",
+      "prop": "kotak_obat",
+      "pilihan": [
+        {
+          "ke": "penyimpangan"
+        },
+        {
+          "ke": "ranjang"
+        },
+        {
+          "ke": "baik"
+        }
+      ]
+    },
+    {
+      "id": "penyimpangan",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "ranjang",
+      "gestur": "tatap_langit"
+    },
+    {
+      "id": "baik",
+      "gestur": "kipas"
+    }
+  ]
+}

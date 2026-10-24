@@ -1,0 +1,61 @@
+{
+  "pembicara": [
+    "tokoh:yan_wushuang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_dua_calon tahap audiensi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_belakang",
+      "suara": "kotabesar.palace_audience",
+      "pilihan": [
+        {
+          "ke": "calon"
+        }
+      ]
+    },
+    {
+      "id": "calon",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera takhta4_ruyi",
+            "quest_maju takhta_dua_calon"
+          ],
+          "ke": "pilih_ruyi"
+        },
+        {
+          "akibat": [
+            "bendera takhta4_gu",
+            "quest_maju takhta_dua_calon"
+          ],
+          "ke": "pilih_gu"
+        },
+        {
+          "akibat": [
+            "bendera takhta4_netral",
+            "quest_maju takhta_dua_calon"
+          ],
+          "ke": "pilih_netral"
+        }
+      ]
+    },
+    {
+      "id": "pilih_ruyi",
+      "gestur": "hormat_dalam"
+    },
+    {
+      "id": "pilih_gu",
+      "gestur": "hormat_dalam"
+    },
+    {
+      "id": "pilih_netral",
+      "gestur": "tatap_langit"
+    }
+  ]
+}

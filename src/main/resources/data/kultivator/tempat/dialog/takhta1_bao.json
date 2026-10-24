@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "tokoh:bao_qing"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_kedatangan tahap yamen"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "ke": "takut"
+        },
+        {
+          "ke": "bantu"
+        }
+      ]
+    },
+    {
+      "id": "takut",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "bantu"
+        }
+      ]
+    },
+    {
+      "id": "bantu",
+      "gestur": "palu_hakim",
+      "akibat": [
+        "quest_maju takhta_kedatangan"
+      ]
+    }
+  ]
+}

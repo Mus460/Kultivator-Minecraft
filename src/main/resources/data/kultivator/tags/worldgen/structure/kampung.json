@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "#kultivator:kampung/dusun",
+    "#kultivator:kampung/desa",
+    "#kultivator:kampung/desa_besar",
+    "#kultivator:kampung/klan"
+  ]
+}

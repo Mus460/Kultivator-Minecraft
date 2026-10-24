@@ -1,0 +1,68 @@
+{
+  "pembicara": [
+    "tokoh:tu_gang"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "iblis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_berkacak",
+      "suara": "tema.iblis.arena_open",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_taruhan"
+          ]
+        },
+        {
+          "syarat": [
+            "iblis_pesta"
+          ],
+          "akibat": [
+            "iblis_turnamen daftar",
+            "tutup"
+          ]
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute penebusan"
+          ],
+          "ke": "tebus_laga"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute darah"
+          ],
+          "ke": "tamu_xue"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tebus_laga",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tamu_xue",
+      "gestur": "sikap_berkacak",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

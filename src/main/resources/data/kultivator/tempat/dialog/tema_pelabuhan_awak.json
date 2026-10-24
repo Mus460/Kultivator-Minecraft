@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "peran:pelaut",
+    "peran:nelayan",
+    "peran:penjual_ikan",
+    "peran:tukang_kapal",
+    "peran:kuli"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "pelabuhan_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "ikat_tali",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "pembicara": [
+    "tokoh:lin_haichao"
+  ],
+  "prioritas": 15,
+  "syarat": [
+    "quest tema_pelabuhan_pelita selesai",
+    "pelabuhan_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_belakang",
+      "prop": "papan_catatan",
+      "pilihan": [
+        {
+          "syarat": [
+            "bendera pelabuhan_lapor"
+          ],
+          "ke": "zhao_adil"
+        },
+        {
+          "syarat": [
+            "bendera pelabuhan_suap"
+          ],
+          "ke": "zhao_suap"
+        },
+        {
+          "syarat": [
+            "!bendera pelabuhan_lapor",
+            "!bendera pelabuhan_suap"
+          ],
+          "ke": "zhao_lolos"
+        },
+        {
+          "syarat": [
+            "bendera pelabuhan_hasil_serah"
+          ],
+          "ke": "putusan"
+        },
+        {
+          "syarat": [
+            "bendera pelabuhan_hasil_damai"
+          ],
+          "ke": "bebas"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "zhao_adil",
+      "gestur": "menulis",
+      "prop": "papan_catatan"
+    },
+    {
+      "id": "zhao_suap",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "syarat": [
+            "!bendera pelabuhan_suap_tebus",
+            "nb_pita 120"
+          ],
+          "akibat": [
+            "bayar_pita 120",
+            "nama_baik 6",
+            "bendera pelabuhan_suap_tebus"
+          ],
+          "ke": "kembali",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_pelabuhan_lin_selesai.zhao_suap.1.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kembali",
+      "gestur": "angguk_dengar"
+    },
+    {
+      "id": "zhao_lolos",
+      "gestur": "sikap_lipat_tangan"
+    },
+    {
+      "id": "putusan",
+      "gestur": "sikap_tangan_belakang"
+    },
+    {
+      "id": "bebas",
+      "gestur": "sikap_lipat_tangan"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "sikap_tangan_belakang"
+    }
+  ]
+}

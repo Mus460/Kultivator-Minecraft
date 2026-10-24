@@ -1,0 +1,24 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380202,
+    "spacing": 128,
+    "separation": 0,
+    "rencana": "kompleks_sekte",
+    "distrik": "dalam"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kompleks_sekte/iblis_dalam",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/lurus_dalam",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/netral_dalam",
+      "weight": 1
+    }
+  ]
+}

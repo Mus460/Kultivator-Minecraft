@@ -1,0 +1,41 @@
+{
+  "pembicara": [
+    "tokoh:gendut_zhu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "masak",
+      "prop": "sendok_sayur",
+      "pilihan": [
+        {
+          "ke": "sup"
+        },
+        {
+          "ke": "lompat"
+        },
+        {
+          "ke": "mi"
+        }
+      ]
+    },
+    {
+      "id": "sup",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "lompat",
+      "gestur": "kaget"
+    },
+    {
+      "id": "mi",
+      "gestur": "masak",
+      "prop": "mangkuk",
+      "akibat": [
+        "bayar 1",
+        "efek minecraft:saturation 2 0"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "pembicara": [
+    "tokoh:shan_ling"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest tema_gunung_tali tahap kera_putih"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kaget",
+      "pilihan": [
+        {
+          "ke": "sopan"
+        },
+        {
+          "ke": "paksa"
+        }
+      ]
+    },
+    {
+      "id": "sopan",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {}
+      ]
+    },
+    {
+      "id": "paksa",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "ke": "sopan"
+        },
+        {}
+      ]
+    }
+  ]
+}

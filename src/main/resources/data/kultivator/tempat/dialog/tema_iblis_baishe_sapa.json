@@ -1,0 +1,96 @@
+{
+  "pembicara": [
+    "tokoh:bai_she"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "iblis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas",
+      "prop": "kipas_sutra",
+      "suara": "tema.iblis.broker",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_pasar_gelap"
+          ]
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_topeng baru"
+          ],
+          "ke": "topeng"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute lurus"
+          ],
+          "ke": "sewa_naik"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute penebusan"
+          ],
+          "ke": "pajak_cahaya"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute darah"
+          ],
+          "ke": "keluarga"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "topeng",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_iblis_topeng",
+            "iblis_topeng_regu"
+          ]
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sewa_naik",
+      "gestur": "kipas",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pajak_cahaya",
+      "gestur": "kipas",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "keluarga",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

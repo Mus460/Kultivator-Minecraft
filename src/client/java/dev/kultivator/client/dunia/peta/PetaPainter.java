@@ -11,7 +11,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Paints the world map (DESIGN 34.5.16) into ONE 512 × 512 {@link DynamicTexture} ({@code kultivator:dynamic/peta}):
@@ -73,6 +75,18 @@ public final class PetaPainter {
 	}
 
 	private static final int INK = 0x23231F;
+
+	/**
+	 * An extra layer painted into each bake after the brush stamps (DESIGN 38.D.12, owner 38W: known roads and the
+	 * capital plan). Runs on the render thread once per bake (not per frame); keep it cheap. {@code x0/z0} is the world
+	 * position of pixel (0, 0), {@code bpp} blocks per pixel; pixels are ARGB like the rest of the map.
+	 */
+	@FunctionalInterface
+	public interface Overlay {
+		void paint(NativeImage img, int x0, int z0, int bpp);
+	}
+
+	private static final List<Overlay> OVERLAYS = new CopyOnWriteArrayList<>();
 
 	// sources (ARGB), loaded once
 	private static int[] parchment;
@@ -153,6 +167,28 @@ public final class PetaPainter {
 		}
 	}
 
+	/** Adds a map layer ({@link Overlay}), painted into every following bake. Additive hook for other modules. */
+	public static void addOverlay(Overlay overlay) {
+		if (overlay != null && !OVERLAYS.contains(overlay)) {
+			OVERLAYS.add(overlay);
+		}
+	}
+
+	/** Repaints on the next frame (an overlay's data changed): the shown and running bakes count as stale. */
+	public static void invalidate() {
+		shownVersion = -1;
+		bakeVersion = -1;
+	}
+
+	/** Blends ink colour {@code rgb} over pixel (px, py) of a bake with strength {@code alpha} 0-1 (overlay helper). */
+	public static void ink(NativeImage img, int px, int py, int rgb, double alpha) {
+		if (px < 0 || py < 0 || px >= SIZE || py >= SIZE || alpha <= 0.0D) {
+			return;
+		}
+		int dst = img.getPixel(px, py);
+		img.setPixel(px, py, 0xFF000000 | mix(dst & 0xFFFFFF, rgb & 0xFFFFFF, alpha));
+	}
+
 	/** Drops the texture (disconnect, the screen closed for good) and any bake. */
 	public static void release() {
 		if (back != null) {
@@ -218,6 +254,13 @@ public final class PetaPainter {
 					stampRow(img, stampPhase++);
 				}
 				if (stampPhase >= gridSize) {
+					for (Overlay overlay : OVERLAYS) {
+						try {
+							overlay.paint(img, bakeX, bakeZ, bakeBpp);
+						} catch (RuntimeException exception) {
+							Kultivator.LOGGER.warn("Kultivator: a world map overlay failed", exception);
+						}
+					}
 					finish(img);
 				}
 			}

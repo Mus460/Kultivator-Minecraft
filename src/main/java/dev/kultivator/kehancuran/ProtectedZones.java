@@ -114,6 +114,63 @@ public final class ProtectedZones {
 		return false;
 	}
 
+	/**
+	 * A player claim (DESIGN 38.R.3 rule 2): land that belongs to a player, where a place's repair crew never puts back or
+	 * removes a block (a cave abode seat, a vassal village's patron plaque, a sky site). Unlike a {@link ZoneProvider} it
+	 * protects nothing from Mode Kehancuran by itself; the place zones of 34/38 are never claims. Must be cheap.
+	 */
+	@FunctionalInterface
+	public interface ClaimProvider {
+		boolean claims(ServerLevel level, BlockPos pos);
+	}
+
+	private static final List<ClaimProvider> CLAIM_PROVIDERS = new java.util.concurrent.CopyOnWriteArrayList<>();
+	/** Halls of this server cached for {@link #claimed} (rebuilt at most every 200 ticks; halls rarely move). */
+	private static volatile List<GlobalPos> claimHalls = List.of();
+	private static volatile long claimHallsAt = Long.MIN_VALUE;
+
+	/** Adds a player-claim provider (DESIGN 38.R.3 rule 2). */
+	public static void addClaimProvider(ClaimProvider provider) {
+		if (provider != null) {
+			CLAIM_PROVIDERS.add(provider);
+		}
+	}
+
+	/**
+	 * True when {@code pos} lies on a player's claim (DESIGN 38.R.3 rule 2): within {@code kehancuranHallSafeRadius} of a
+	 * known Sect Hall or stele, or claimed by a provider ({@code CaveAbode}, {@code Desa}, ...). A failing provider claims
+	 * (never repair over someone's land by mistake).
+	 */
+	public static boolean claimed(ServerLevel level, BlockPos pos) {
+		long now = level.getServer().getTickCount();
+		if (now - claimHallsAt >= 200L || now < claimHallsAt) {
+			claimHalls = List.copyOf(KehancuranLog.knownHalls(level.getServer()));
+			claimHallsAt = now;
+		}
+		double safe = KultivatorConfig.get().kehancuranHallSafeRadius;
+		for (GlobalPos hall : claimHalls) {
+			if (!hall.dimension().equals(level.dimension())) {
+				continue;
+			}
+			double dx = pos.getX() - hall.pos().getX();
+			double dz = pos.getZ() - hall.pos().getZ();
+			if (dx * dx + dz * dz <= safe * safe) {
+				return true;
+			}
+		}
+		for (ClaimProvider provider : CLAIM_PROVIDERS) {
+			try {
+				if (provider.claims(level, pos)) {
+					return true;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A player claim provider failed", exception);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/** Why a position is protected (a translation key suffix), for the refusal message. */
 	public enum Zone {
 		HALL("hall"),

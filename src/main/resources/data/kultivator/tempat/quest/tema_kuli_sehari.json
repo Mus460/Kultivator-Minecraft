@@ -1,0 +1,19 @@
+{
+  "pemberi": "tokoh:lao_dan",
+  "tempat": "kota_tema_gunung",
+  "tahap": [
+    {
+      "id": "pikul",
+      "tujuan": [
+        "tanda gunung_muatan x3"
+      ],
+      "akibat_masuk": [
+        "gunung_pikul"
+      ]
+    },
+    {
+      "id": "upah",
+      "ke": "selesai"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "pembicara": [
+    "tokoh:bibi_hong"
+  ],
+  "prioritas": 8,
+  "syarat": [
+    "quest surat_ah_lun selesai",
+    "bendera ah_lun_pulang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tuang_teh",
+      "prop": "teko",
+      "akibat": [
+        "efek minecraft:regeneration 100 0"
+      ]
+    }
+  ]
+}

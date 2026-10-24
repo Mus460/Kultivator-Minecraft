@@ -1,0 +1,102 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_besar/semua",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_besar",
+  "distrik": "pasar",
+  "lot": [
+    {
+      "dx": 70,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/tembok/lurus_jaga",
+      "putar": 1
+    },
+    {
+      "dx": 70,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/tembok/gerbang_samping",
+      "putar": 1
+    },
+    {
+      "dx": 70,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/tembok/lurus",
+      "putar": 1
+    },
+    {
+      "dx": -72,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/pasar/rumah_uang",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/pasar/rumah_judi_batu",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/pasar/kios_pil",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/pasar/lelang_agung_a",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/pasar/pasar_binatang",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/pasar/lapak_sekte",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/pasar/lelang_agung_b",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/pasar/toko_senjata",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/pasar/pasar_malam",
+      "putar": 0
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "#kultivator:kota_besar/gaya_salju",
+      "akhiran": "salju"
+    },
+    {
+      "biomes": "#kultivator:kota_besar/gaya_gurun",
+      "akhiran": "gurun"
+    },
+    {
+      "biomes": "#kultivator:kota_besar/gaya_sakura",
+      "akhiran": "sakura"
+    }
+  ]
+}

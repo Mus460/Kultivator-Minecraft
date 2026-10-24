@@ -1,0 +1,59 @@
+{
+  "pembicara": [
+    "tokoh:su_jin"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "pilihan": [
+        {
+          "ke": "usaha"
+        },
+        {
+          "ke": "kota"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "usaha",
+      "gestur": "hitung_sempoa",
+      "prop": "sempoa",
+      "pilihan": [
+        {
+          "ke": "dagang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "dagang",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "kota",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "ke": "legenda"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "legenda",
+      "gestur": "sikap_tangan_belakang"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

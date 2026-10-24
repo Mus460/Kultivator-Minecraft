@@ -9,8 +9,13 @@ import dev.kultivator.client.disciple.DiscipleRobeLayer;
 import dev.kultivator.client.disciple.power.DutyPoses;
 import dev.kultivator.client.disciple.power.PhysiqueVisuals;
 import dev.kultivator.client.render.MeditationPose;
+import dev.kultivator.client.sosok.SosokJembatan;
+import dev.kultivator.client.sosok.SosokRender;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.dunia.dimensi.DimensiNpc;
+import dev.kultivator.sosok.Gaya;
+import dev.kultivator.sosok.GerakId;
+import dev.kultivator.sosok.Sosok;
 import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
 import net.minecraft.ChatFormatting;
@@ -50,6 +55,14 @@ import java.util.Map;
  * ({@link DimensiNpc#FLAG_BOW}) bends low; a meditating one ({@link DimensiNpc#FLAG_SIT}) sinks into the lotus seat,
  * blended in and out over 10 ticks; the subclasses add each role's own idle ({@link #pose}). The ghosts hover and sway.
  * The name plate within 16 b is the role's name and title ({@code kultivator.dimensi.gelar.*}).
+ * <p>
+ * Penampilan dan Animasi (DESIGN 40.2.2, 40.4.1 D, module 40R): a subclass that names a look key ({@link #rupa}) makes the
+ * body a Sosok made on the client from its old fields ({@code SosokRender.dariLama}: fixed sex for Meng Po, King Yama,
+ * the judges and the Dragon King, the role's age mix): its own atlas, busana, face and props, slim arms by its sex, and
+ * its height from the Sosok unless the role is larger than life. The iconic own skins (Ox-Head, Horse-Face, the two
+ * Impermanences, the hungry ghosts, the Dragon King) keep their PNG and mesh ({@link #kulitSendiri}); Gerak animates
+ * them all. Talking and bowing become clips 38 {@code bicara_tangan} and 32 {@code hormat} (wanfu for women), the roles'
+ * work becomes their clips; bodies without a look key (Yaksha) keep the old gestures.
  */
 public abstract class HumanNpcRenderer<T extends LivingEntity> extends LivingEntityRenderer<T, DiscipleRenderState, PlayerModel> {
 
@@ -64,14 +77,21 @@ public abstract class HumanNpcRenderer<T extends LivingEntity> extends LivingEnt
 	/** Per entity id: {target 0/1, the age it changed} of the lotus seat. */
 	private static final Map<Integer, float[]> SEATS = new HashMap<>();
 
+	/** The old player-skin body (own skins, Yaksha, the last fallback). */
 	private final PlayerModel wideModel;
 	private final PlayerModel slimModel;
+	/** The Sosok body (128 × 128 atlas mesh). */
+	private final PlayerModel sosokWide;
+	private final PlayerModel sosokSlim;
 
 	protected HumanNpcRenderer(EntityRendererProvider.Context context) {
 		super(context, new DutyPoses.Model(context.bakeLayer(ModelLayers.PLAYER), false), 0.5F);
 		this.wideModel = this.model;
 		this.slimModel = new DutyPoses.Model(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
-		this.addLayer(new CulledRobe(this, new DiscipleRobeLayer(this, context)));
+		this.sosokWide = new DutyPoses.Model(SosokJembatan.tubuh(context, false), false);
+		this.sosokSlim = new DutyPoses.Model(SosokJembatan.tubuh(context, true), true);
+		this.addLayer(new SosokRender.TanpaSosok(this, new CulledRobe(this, new DiscipleRobeLayer(this, context))));
+		SosokRender.pasangLapisan(this::addLayer, this, context);
 		this.addLayer(new HeadwearLayer(this, context));
 		this.addLayer(new DiscipleHeldItemLayer(this));
 	}
@@ -86,6 +106,36 @@ public abstract class HumanNpcRenderer<T extends LivingEntity> extends LivingEnt
 
 	/** The role's own idle and gesture on top of the shared ones (arm poses, duty poses, hover). Default: none. */
 	protected void pose(T entity, DiscipleRenderState state, boolean talking, boolean still) {
+	}
+
+	/** The role's Sosok look key ({@code d.meng_po}, ... of 40.4.1 D), or null: the body stays as before (Yaksha). */
+	protected @Nullable String rupa(T entity) {
+		return null;
+	}
+
+	/** True for an iconic own skin: Gerak animates it, but it keeps its PNG and mesh (no atlas, no busana or face). */
+	protected boolean kulitSendiri(T entity) {
+		return false;
+	}
+
+	/** The seed of the client-made Sosok (with the UUID): the role's look and variant fields. */
+	protected int lookSosok(T entity) {
+		return entity.getId();
+	}
+
+	/** 1/0 when the old skin's slim arms meant a woman/man for this role, -1 when they meant nothing (the policy decides). */
+	protected int slimLama(T entity) {
+		return -1;
+	}
+
+	/** True when Gerak animates this body (the shared and role gestures then ask clips instead of arm poses). */
+	protected static boolean sosokGerak(DiscipleRenderState state) {
+		return SosokRender.gerak(state);
+	}
+
+	/** Asks Gerak for a client clip on this body (talking, bowing, the role's work; 40G plays it as layer 6). */
+	protected static void klip(DiscipleRenderState state, int klip) {
+		SosokRender.mintaKlip(state, klip, 0);
 	}
 
 	@Override
@@ -119,8 +169,40 @@ public abstract class HumanNpcRenderer<T extends LivingEntity> extends LivingEnt
 		data.setData(HeadwearLayer.GLOW, Headwear.NONE);
 		skin(state, entity.getId() & 7, false);
 		look(entity, state);
+		sosok(entity, state, partialTicks);
 		if (entity instanceof DimensiNpc npc) {
 			gestures(entity, npc, state);
+		}
+		SosokRender.selesai(entity, state, partialTicks);
+		SosokRender.labelLod(entity, state, partialTicks);
+	}
+
+	/**
+	 * DESIGN 40.2.2: the client-made Sosok of a role with a look key. The draw scale is the Sosok's height (the server
+	 * never sets the scale attribute of D people), except for the larger-than-life roles whose scale is above 1 (King
+	 * Yama, the judges, the guards, the immortals); own skins keep the role's scale.
+	 */
+	private void sosok(T entity, DiscipleRenderState state, float partialTicks) {
+		String key = rupa(entity);
+		if (key == null) {
+			return;
+		}
+		FabricRenderState data = (FabricRenderState) state;
+		boolean own = kulitSendiri(entity);
+		Sosok sosok = SosokRender.dariLama(entity, key, lookSosok(entity), slimLama(entity));
+		float roleScale = data.getDataOrDefault(SCALE, 1.0F);
+		float scale = !own && roleScale <= 1.0F ? sosok.skala() : roleScale;
+		int headwear = data.getDataOrDefault(HeadwearLayer.KIND, Headwear.NONE);
+		SosokRender.ekstrak(entity, state, partialTicks, new SosokRender.RupaMasukan(key, state.realm, -1, 0, 0, null, 0, headwear,
+				PhysiqueVisuals.translucent(state)), sosok, Gaya.NETRAL, !own, scale);
+		if (SosokRender.aktif(state)) {
+			// 40.4.5: the ghost hair and eyes are painted on the Sosok atlas, the old pieces would double them
+			if (SosokJembatan.headwearMilikSosok(headwear)) {
+				data.setData(HeadwearLayer.KIND, Headwear.NONE);
+			}
+			if (SosokJembatan.headwearMilikSosok(data.getDataOrDefault(HeadwearLayer.GLOW, Headwear.NONE))) {
+				data.setData(HeadwearLayer.GLOW, Headwear.NONE);
+			}
 		}
 	}
 
@@ -135,7 +217,14 @@ public abstract class HumanNpcRenderer<T extends LivingEntity> extends LivingEnt
 		}
 		boolean talking = npc.hasFlag(DimensiNpc.FLAG_TALK);
 		boolean still = state.walkAnimationSpeed <= 0.1F && seat < 0.5F;
-		if (npc.hasFlag(DimensiNpc.FLAG_BOW) && seat < 0.5F) {
+		if (sosokGerak(state)) {
+			// DESIGN 40.7.2: the bow and the talking hand are Gerak clips (talking also works while walking: upper body only)
+			if (npc.hasFlag(DimensiNpc.FLAG_BOW) && seat < 0.5F) {
+				klip(state, GerakId.HORMAT);
+			} else if (talking && seat < 0.5F) {
+				klip(state, GerakId.BICARA_TANGAN);
+			}
+		} else if (npc.hasFlag(DimensiNpc.FLAG_BOW) && seat < 0.5F) {
 			state.isCrouching = true;
 		} else if (talking && still) {
 			// a hand lifted in rhythm while it speaks (the free hand, or the one holding the brush or lantern)
@@ -221,12 +310,18 @@ public abstract class HumanNpcRenderer<T extends LivingEntity> extends LivingEnt
 		if (isBodyVisible && PhysiqueVisuals.translucent(state)) {
 			return RenderTypes.entityTranslucent(this.getTextureLocation(state));
 		}
+		// DESIGN 40.6.3: vanilla entity cutout for a Sosok body
+		if (isBodyVisible && !forceTransparent && SosokRender.aktif(state)) {
+			return RenderTypes.entityCutout(this.getTextureLocation(state));
+		}
 		return super.getRenderType(state, isBodyVisible, forceTransparent, appearGlowing);
 	}
 
 	@Override
 	protected void scale(DiscipleRenderState state, PoseStack poseStack) {
-		float scale = PLAYER_SCALE * ((FabricRenderState) state).getDataOrDefault(SCALE, 1.0F);
+		SosokRender.Keadaan sosok = SosokRender.keadaan(state);
+		float role = sosok != null ? sosok.skalaGambar : ((FabricRenderState) state).getDataOrDefault(SCALE, 1.0F);
+		float scale = PLAYER_SCALE * role;
 		poseStack.scale(scale, scale, scale);
 	}
 
@@ -237,7 +332,11 @@ public abstract class HumanNpcRenderer<T extends LivingEntity> extends LivingEnt
 		if (hover != 0.0F) {
 			poseStack.translate(0.0F, hover, 0.0F);
 		}
+		dev.kultivator.client.anim.PoseApplier.lift(state, poseStack);
+		SosokRender.angkat(state, poseStack);
 		super.setupRotations(state, poseStack, bodyRot, entityScale);
+		SosokRender.baring(state, poseStack);
+		dev.kultivator.client.anim.PoseApplier.tilt(state, poseStack);
 	}
 
 	@Override
@@ -262,7 +361,11 @@ public abstract class HumanNpcRenderer<T extends LivingEntity> extends LivingEnt
 
 	@Override
 	public void submit(DiscipleRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-		this.model = state.slim ? slimModel : wideModel;
+		if (SosokRender.aktif(state)) {
+			this.model = state.slim ? sosokSlim : sosokWide;
+		} else {
+			this.model = state.slim ? slimModel : wideModel;
+		}
 		super.submit(state, poseStack, collector, camera);
 	}
 

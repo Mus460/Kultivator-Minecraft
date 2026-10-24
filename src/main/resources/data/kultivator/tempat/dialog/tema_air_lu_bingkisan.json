@@ -1,0 +1,21 @@
+{
+  "pembicara": [
+    "tokoh:lu_yuqing"
+  ],
+  "prioritas": 35,
+  "syarat": [
+    "air_misi antar_sutra",
+    "air_bingkisan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "akibat": [
+        "air_bingkisan ambil",
+        "air_misi_selesai antar_sutra"
+      ]
+    }
+  ]
+}

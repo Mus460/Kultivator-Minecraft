@@ -1,0 +1,35 @@
+{
+  "pembicara": [
+    "peran:biksu_gunung"
+  ],
+  "prioritas": 1,
+  "syarat": [
+    "kota_tema gunung"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "prop": "tasbih_tangan",
+      "pilihan": [
+        {
+          "ke": "hari"
+        },
+        {
+          "ke": "kabar"
+        }
+      ]
+    },
+    {
+      "id": "hari",
+      "gestur": "sapu",
+      "prop": "sapu"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

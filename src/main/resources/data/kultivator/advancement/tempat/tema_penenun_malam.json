@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_air",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_penenun_malam.description"
+    },
+    "icon": {
+      "id": "minecraft:red_wool"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_penenun_malam.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

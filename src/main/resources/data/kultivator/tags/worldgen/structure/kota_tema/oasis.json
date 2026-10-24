@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:kota_tema/oasis/kuil_air",
+    "kultivator:kota_tema/oasis/istana_pasir",
+    "kultivator:kota_tema/oasis/kebun_palma",
+    "kultivator:kota_tema/oasis/bazar_barat",
+    "kultivator:kota_tema/oasis/mata_air",
+    "kultivator:kota_tema/oasis/bazar_timur",
+    "kultivator:kota_tema/oasis/hunian_tanah",
+    "kultivator:kota_tema/oasis/gerbang_giok",
+    "kultivator:kota_tema/oasis/karavanserai",
+    "kultivator:kota_tema/oasis/lapangan_kafilah"
+  ]
+}

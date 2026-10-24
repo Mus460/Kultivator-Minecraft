@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380439,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_gunung",
+    "distrik": "pasar_kaki"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/gunung/pasar_kaki",
+      "weight": 1
+    }
+  ]
+}

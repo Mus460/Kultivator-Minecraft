@@ -51,6 +51,8 @@ import java.util.UUID;
 public final class LangitMain {
 
 	private static boolean initialised;
+	/** Stale envoys found on load; discarded on the next tick, not inside the chunk's entity walk. */
+	private static final java.util.List<net.minecraft.world.entity.Entity> STALE = new java.util.ArrayList<>();
 
 	public static void init() {
 		if (initialised) {
@@ -138,7 +140,7 @@ public final class LangitMain {
 		ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
 			// an envoy saved by a restart mid-visit is no longer tracked: he goes home
 			if (entity.entityTags().contains(LangitUtusan.TAG) && !LangitUtusan.tracked(entity)) {
-				entity.discard();
+				STALE.add(entity);
 			}
 		});
 		ServerPlayerEvents.LEAVE.register(LangitSyncServer::forget);
@@ -146,6 +148,10 @@ public final class LangitMain {
 	}
 
 	private static void tick(MinecraftServer server) {
+		if (!STALE.isEmpty()) {
+			STALE.forEach(net.minecraft.world.entity.Entity::discard);
+			STALE.clear();
+		}
 		long tick = server.overworld().getGameTime();
 		LangitSyncServer.tick(server, tick);
 		LangitSerbu.tick(server);
@@ -161,6 +167,7 @@ public final class LangitMain {
 	}
 
 	private static void clearAll() {
+		STALE.clear();
 		LangitBajak.clear();
 		LangitUtusan.clear();
 		LangitPeristiwa.clear();

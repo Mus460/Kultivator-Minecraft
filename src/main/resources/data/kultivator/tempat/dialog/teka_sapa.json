@@ -1,0 +1,57 @@
+{
+  "pembicara": [
+    "peran:penjaga_teka"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 70"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "main_lentera",
+      "prop": "lentera_tangan",
+      "pilihan": [
+        {
+          "ke": "soal"
+        },
+        {
+          "ke": "kapan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "soal",
+      "gestur": "kipas",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "benar"
+        },
+        {
+          "ke": "salah"
+        },
+        {
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "benar",
+      "gestur": "tepuk_tangan",
+      "akibat": [
+        "bendera teka_jernih"
+      ]
+    },
+    {
+      "id": "salah",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "kapan",
+      "gestur": "tatap_langit"
+    }
+  ]
+}

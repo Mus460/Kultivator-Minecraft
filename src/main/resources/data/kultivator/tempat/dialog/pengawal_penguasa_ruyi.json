@@ -1,0 +1,20 @@
+{
+  "pembicara": [
+    "peran:pengawal_istana"
+  ],
+  "prioritas": 4,
+  "syarat": [
+    "alur_penguasa ruyi",
+    "acak 40"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lambai",
+      "pilihan": [
+        {}
+      ]
+    }
+  ]
+}

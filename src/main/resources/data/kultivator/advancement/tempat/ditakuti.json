@@ -1,0 +1,26 @@
+{
+  "parent": "kultivator:dunia/kota_found",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.ditakuti.description"
+    },
+    "icon": {
+      "id": "minecraft:skeleton_skull"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.ditakuti.title"
+    },
+    "frame": "challenge",
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

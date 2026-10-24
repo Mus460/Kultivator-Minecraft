@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380418,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_oasis",
+    "distrik": "gerbang_giok"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/oasis/gerbang_giok",
+      "weight": 1
+    }
+  ]
+}

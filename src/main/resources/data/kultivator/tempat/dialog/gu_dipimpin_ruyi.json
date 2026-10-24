@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "tokoh:gu_lianshan"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "alur_penguasa ruyi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hitung_sempoa",
+      "prop": "sempoa"
+    }
+  ]
+}

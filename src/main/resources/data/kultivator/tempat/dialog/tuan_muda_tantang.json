@@ -1,0 +1,68 @@
+{
+  "pembicara": [
+    "peran:tuan_muda"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest tuan_muda_sombong baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "suara": "tempat.young_master",
+      "pilihan": [
+        {
+          "ke": "hina"
+        },
+        {
+          "syarat": [
+            "watak penakut"
+          ],
+          "ke": "mundur"
+        },
+        {
+          "syarat": [
+            "!watak penakut"
+          ],
+          "ke": "hina"
+        }
+      ]
+    },
+    {
+      "id": "hina",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri cerita:surat_tuan_muda",
+            "quest_mulai tuan_muda_sombong",
+            "tanding_klan"
+          ]
+        },
+        {
+          "akibat": [
+            "bendera klan_meremehkan",
+            "quest_mulai tuan_muda_sombong",
+            "quest_maju tuan_muda_sombong"
+          ],
+          "ke": "tawa"
+        }
+      ]
+    },
+    {
+      "id": "mundur",
+      "gestur": "lari_takut",
+      "akibat": [
+        "bendera klan_hormat",
+        "quest_mulai tuan_muda_sombong",
+        "quest_maju tuan_muda_sombong"
+      ]
+    },
+    {
+      "id": "tawa",
+      "gestur": "tertawa"
+    }
+  ]
+}

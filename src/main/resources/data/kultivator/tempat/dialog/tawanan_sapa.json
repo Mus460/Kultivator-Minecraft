@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "peran:tawanan"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest tawanan_pulang baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berlutut_rantai",
+      "suara": "tempat.captive_saved",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tawanan_pulang",
+            "kawal_mulai 40"
+          ],
+          "ke": "ikut"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ikut",
+      "gestur": "pincang"
+    }
+  ]
+}

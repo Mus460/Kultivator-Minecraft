@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:dunia/ruin_cleared",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.pewaris_makam.description"
+    },
+    "icon": {
+      "id": "minecraft:chiseled_quartz_block"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.pewaris_makam.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

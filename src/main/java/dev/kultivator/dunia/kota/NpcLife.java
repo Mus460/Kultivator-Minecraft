@@ -7,6 +7,7 @@ import dev.kultivator.dunia.DuniaEvents;
 import dev.kultivator.dunia.api.DuniaApi;
 import dev.kultivator.dunia.api.SkyKind;
 import dev.kultivator.dunia.api.TreasureBirth;
+import dev.kultivator.dunia.tempat.hidup.TubuhPenduduk;
 import dev.kultivator.voice.Voice;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -38,6 +39,9 @@ import java.util.List;
  * <li><b>The sky</b>: a blood eclipse sends the townsfolk home with worried words, a meteor shower or the twin moons
  * make them stop and look up, a newborn treasure's light sets the town talking ({@link DuniaEvents}).</li>
  * <li><b>Blades</b>: wanderers and rivals draw when they fight or duel and sheathe three seconds after.</li>
+ * <li><b>Residents of DESIGN 38</b> (bodies of {@code dunia/tempat/hidup}, {@link KultivatorNpc#penduduk}): blades as
+ * above, the sky and a newborn treasure with their own clips and lines ({@link TubuhPenduduk#reaksi}), then their own day
+ * ({@link TubuhPenduduk#tik}) instead of the old round.</li>
  * </ul>
  */
 final class NpcLife {
@@ -110,7 +114,12 @@ final class NpcLife {
 	static void tick(ServerLevel level, KultivatorNpc npc, long now) {
 		KotaDuel.sample(npc);
 		blades(npc, now);
-		reactLater(npc, now);
+		reactLater(level, npc, now);
+		if (npc.penduduk()) {
+			// a 38 resident: schedule, titik, chats, bargaining and reactions of DESIGN 38.N.4
+			TubuhPenduduk.tik(level, npc, now);
+			return;
+		}
 		boolean fighting = npc.getTarget() != null || DuelRules.inDuel(npc) || npc.memory().getBooleanOr("duel", false) || KotaDuel.inSession(npc);
 		if (fighting) {
 			endChat(level, npc);
@@ -410,8 +419,11 @@ final class NpcLife {
 		}
 	}
 
-	/** A sky or treasure reaction whose (staggered) moment came. */
-	private static void reactLater(KultivatorNpc npc, long now) {
+	/**
+	 * A sky or treasure reaction whose (staggered) moment came. A DESIGN 38 resident shows it with its own clips and then
+	 * re-reads its schedule (the eclipse sends it indoors, the meteors out to the open squares; {@link TubuhPenduduk#reaksi}).
+	 */
+	private static void reactLater(ServerLevel level, KultivatorNpc npc, long now) {
 		String react = npc.memory().getStringOr("react", "");
 		if (react.isEmpty() || now < npc.memory().getLongOr("react_at", 0L)) {
 			return;
@@ -419,6 +431,12 @@ final class NpcLife {
 		npc.memory().remove("react");
 		npc.memory().remove("react_at");
 		if (npc.getTarget() != null || DuelRules.inDuel(npc)) {
+			return;
+		}
+		if (npc.penduduk()) {
+			BlockPos at = react.equals("harta") ? BlockPos.of(npc.memory().getLongOr("react_x", 0L)) : null;
+			npc.memory().remove("react_x");
+			TubuhPenduduk.reaksi(level, npc, react, at, now);
 			return;
 		}
 		NpcRole role = npc.role();

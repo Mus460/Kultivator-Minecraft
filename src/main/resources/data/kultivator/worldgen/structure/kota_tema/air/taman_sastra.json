@@ -1,0 +1,76 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#minecraft:is_overworld",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_air",
+  "distrik": "taman_sastra",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/taman_sastra/perpustakaan",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/taman_sastra/gunungan",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/taman_sastra/kebun_bambu",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/taman_sastra/kolam",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": -56,
+      "pool": "kultivator:kota_tema/air/tembok/taman_sastra_utara0",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -56,
+      "pool": "kultivator:kota_tema/air/tembok/taman_sastra_utara1",
+      "putar": 0
+    },
+    {
+      "dx": -56,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/tembok/taman_sastra_barat0",
+      "putar": 0
+    },
+    {
+      "dx": -56,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/tembok/taman_sastra_barat1",
+      "putar": 0
+    },
+    {
+      "dx": -56,
+      "dz": -56,
+      "pool": "kultivator:kota_tema/air/tembok/taman_sastra_sudut",
+      "putar": 0
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "minecraft:cherry_grove",
+      "akhiran": "sakura"
+    }
+  ]
+}

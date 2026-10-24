@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:xue_yao"
+  ],
+  "prioritas": 80,
+  "syarat": [
+    "quest tema_iblis_rantai tahap jamuan",
+    "!bendera iblis_jamuan_tolak"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "minum_arak",
+      "prop": "cawan_arak",
+      "pilihan": [
+        {
+          "akibat": [
+            "iblis_ye_pergi",
+            "peristiwa iblis_xue jamuan"
+          ],
+          "ke": "terima"
+        },
+        {
+          "akibat": [
+            "bendera iblis_jamuan_tolak"
+          ],
+          "ke": "tolak"
+        }
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "tertawa",
+      "prop": "cawan_arak"
+    },
+    {
+      "id": "tolak",
+      "gestur": "kipas",
+      "prop": "kipas_sutra"
+    }
+  ]
+}

@@ -330,7 +330,11 @@ public final class SectRanks {
 		}
 	}
 
-	/** A Tetua teaches one junior nearby an art it knows, paid from 30% of its own qi, once per day. */
+	/**
+	 * A Tetua teaches one junior nearby an art it knows, paid from 30% of its own qi, once per day. Murid Mandiri (DESIGN
+	 * 39.5.5): with the master offline the elders still teach while the hall's Mandiri policy is not Patuh (the line goes
+	 * to the morning report and the junior's diary instead of the chat).
+	 */
 	private static void elderTeaches(DiscipleEntity elder) {
 		DiscipleData data = elder.data();
 		CompoundTag tag = data.extraSection(EXTRA);
@@ -340,7 +344,7 @@ public final class SectRanks {
 		}
 		ServerPlayer master = elder.owner();
 		UUID owner = elder.ownerId();
-		if (master == null || owner == null) {
+		if (owner == null || master == null && !teachesWithoutMaster(elder)) {
 			return;
 		}
 		double cost = DiscipleCultivation.maxQi(data) * ELDER_TEACH_QI;
@@ -366,14 +370,36 @@ public final class SectRanks {
 					Fx.burst(level, junior.position().add(0.0D, 1.0D, 0.0D), colour, 16, 0.8F);
 					level.playSound(null, junior.getX(), junior.getY(), junior.getZ(), SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.NEUTRAL, 0.8F, 1.2F);
 				}
-				Msg.chat(master, Component.translatable("kultivator.hall.rank.elder_taught", elder.getDisplayName(), junior.getDisplayName(),
-						technique.displayName()).withStyle(ChatFormatting.AQUA));
+				Component line = Component.translatable("kultivator.hall.rank.elder_taught", elder.getDisplayName(), junior.getDisplayName(),
+						technique.displayName());
+				if (master != null) {
+					Msg.chat(master, line.copy().withStyle(ChatFormatting.AQUA));
+				} else {
+					taughtWithoutMaster(elder, junior, owner, technique, line);
+				}
 				return;
 			}
 		}
 	}
 
-	private static boolean canLearnFromElder(DiscipleEntity junior, ServerPlayer master, Technique technique) {
+	/** Murid Mandiri is on and the elder's effective policy lets the hall live without its master (not Patuh). */
+	private static boolean teachesWithoutMaster(DiscipleEntity elder) {
+		return dev.kultivator.sekte.mandiri.api.MandiriApi.aktif()
+				&& dev.kultivator.sekte.mandiri.api.MandiriApi.kebijakan(elder).mode().hidup();
+	}
+
+	/** The offline lesson: the Tetua's morning report line and an entry in the junior's diary (DESIGN 39.5.5, 39.8.1). */
+	private static void taughtWithoutMaster(DiscipleEntity elder, DiscipleEntity junior, UUID owner, Technique technique, Component line) {
+		net.minecraft.server.MinecraftServer server = elder.level().getServer();
+		dev.kultivator.sekte.SekteLog.log(server, owner, dev.kultivator.sekte.mandiri.api.MandiriIds.MODUL, line);
+		long clock = server == null ? 0L : server.overworld().getOverworldClockTime();
+		int hour = (int) Math.floorMod(clock / 1000L + 6L, 24L);
+		dev.kultivator.sekte.mandiri.api.MandiriApi.catat(owner, junior.soulId(), new dev.kultivator.sekte.mandiri.api.EntriHarian(
+				Math.floorDiv(clock, 24000L), hour, "ajar", "ajar.tetua", List.of(elder.getName().getString(),
+				"t:" + dev.kultivator.data.TechniqueRegistry.legacy(technique).id()), dev.kultivator.sekte.mandiri.api.EntriHarian.Suasana.SENANG, false));
+	}
+
+	private static boolean canLearnFromElder(DiscipleEntity junior, @Nullable ServerPlayer master, Technique technique) {
 		DiscipleData data = junior.data();
 		if (!DiscipleTechniques.teachable(technique) || data.knows(technique) || !data.realm().atLeast(technique.minRealm()) || slotsFull(data)) {
 			return false;
@@ -445,6 +471,160 @@ public final class SectRanks {
 			}
 		}
 		return list;
+	}
+
+	// ================================================================== Murid Mandiri: self-made rank requests (DESIGN 39.5.5)
+
+	/**
+	 * The checklist of {@link #requirements} for a request the disciple makes itself (DESIGN 39.5.5). {@code master} may be
+	 * null: the realm, PK, retest, trial and Murid Inti lines need no master; the seat counts of Tetua and Tetua Agung read
+	 * the master's living list, so without the master online they show one unmet line "waits for the master".
+	 */
+	static List<Requirement> requirementsSelf(@Nullable ServerPlayer master, DiscipleData data, UUID soul) {
+		if (master != null) {
+			return requirements(master, data, soul);
+		}
+		int rank = rank(data);
+		if (rank >= MAX_RANK) {
+			return List.of();
+		}
+		int target = rank + 1;
+		java.util.ArrayList<Requirement> list = new java.util.ArrayList<>();
+		Realm needed = REALM_NEEDED[target];
+		boolean realmOk = target == TETUA_AGUNG
+				? data.realm().ordinal() > Realm.NASCENT_SOUL.ordinal() || data.realm() == Realm.NASCENT_SOUL && data.stage() >= 1
+				: data.realm().atLeast(needed);
+		Component realmText = target == TETUA_AGUNG ? new Rank(Realm.NASCENT_SOUL, 0, 1).displayName() : needed.displayName();
+		list.add(new Requirement(realmOk, Component.translatable("kultivator.hall.req.realm", realmText)));
+		if (PK_COST[target] > 0) {
+			list.add(new Requirement(pk(data) >= PK_COST[target], Component.translatable("kultivator.hall.req.pk", pk(data), PK_COST[target])));
+		}
+		switch (target) {
+			case LUAR -> {
+				long need = retestTicks();
+				long since = Halls.gameTime() - data.extra().getCompoundOrEmpty(EXTRA).getLongOr("joined", 0L);
+				boolean ok = since >= need;
+				list.add(new Requirement(ok, ok ? Component.translatable("kultivator.hall.req.retest_done")
+						: Component.translatable("kultivator.hall.req.retest", Halls.clock(need - since))));
+			}
+			case DALAM -> list.add(new Requirement(trialPassed(data), Component.translatable(trialPassed(data)
+					? "kultivator.hall.req.trial_done" : "kultivator.hall.req.trial"), true));
+			case INTI -> {
+				boolean top = Tournament.hasTitle(data, "top3") || Tournament.hasTitle(data, "nomor_satu")
+						|| Tournament.hasTitle(data, "juara_peringkat") || VoidRealm.bestFloor(data) >= INTI_VOID_FLOOR;
+				list.add(new Requirement(top, Component.translatable("kultivator.hall.req.inti", INTI_VOID_FLOOR)));
+			}
+			default -> list.add(new Requirement(false, Component.translatable("kultivator.sekte.mandiri.tumbuh.req.guru")));
+		}
+		return list;
+	}
+
+	/**
+	 * Why the disciple cannot be promoted by its own request now (the first unmet line of {@link #requirementsSelf}), or
+	 * null when every line holds. Luar to Murid Dalam needs the Latihan Khusus passed first: the trial itself is started
+	 * by the master ({@link #promoteByMaster}), so an unpassed trial is an unmet line here.
+	 */
+	public static @Nullable Component promoteBlockerSelf(DiscipleEntity entity) {
+		DiscipleData data = entity.data();
+		if (rank(data) >= MAX_RANK) {
+			return Component.translatable("kultivator.hall.rank.top", entity.getDisplayName());
+		}
+		for (Requirement requirement : requirementsSelf(entity.owner(), data, entity.soulId())) {
+			if (!requirement.ok()) {
+				return requirement.text();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Murid Mandiri: true when the self-made request is held only by lines that need the master (the Latihan Khusus of
+	 * Luar to Murid Dalam, the seat counts of Tetua and Tetua Agung while the master is offline), so the request goes to
+	 * the master instead of waiting for the disciple to grow. False when nothing holds it or a line it must meet itself
+	 * (realm, PK, retest, tournament or Void floor, a full seat) is unmet.
+	 */
+	public static boolean onlyMasterLinesSelf(DiscipleEntity entity) {
+		DiscipleData data = entity.data();
+		if (rank(data) >= MAX_RANK) {
+			return false;
+		}
+		boolean held = false;
+		for (Requirement requirement : requirementsSelf(entity.owner(), data, entity.soulId())) {
+			if (requirement.ok()) {
+				continue;
+			}
+			boolean masterLine = requirement.trial()
+					|| requirement.text().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents t
+					&& "kultivator.sekte.mandiri.tumbuh.req.guru".equals(t.getKey());
+			if (!masterLine) {
+				return false;
+			}
+			held = true;
+		}
+		return held;
+	}
+
+	/** The unmet lines of the self-made request, for the disciple's notice and the test command (empty when none). */
+	public static List<Component> unmetSelf(DiscipleEntity entity) {
+		java.util.ArrayList<Component> out = new java.util.ArrayList<>();
+		for (Requirement requirement : requirementsSelf(entity.owner(), entity.data(), entity.soulId())) {
+			if (!requirement.ok()) {
+				out.add(requirement.text());
+			}
+		}
+		return out;
+	}
+
+	/** The next rank index (1 Luar ... 5 Tetua Agung), or -1 at the top. */
+	public static int nextRank(DiscipleData data) {
+		int rank = rank(data);
+		return rank >= MAX_RANK ? -1 : rank + 1;
+	}
+
+	/**
+	 * Murid Mandiri (DESIGN 39.5.5): the disciple's approved request promotes it one rank exactly like {@link #promote}
+	 * (every requirement, its own PK at {@code PK_COST}, the hall registry, the robe flash and bell, E's "passed over")
+	 * with the master nullable: the chat, the sect line and the advancements only when the master is online. True when
+	 * promoted.
+	 */
+	public static boolean promoteSelf(DiscipleEntity entity) {
+		ServerPlayer master = entity.owner();
+		UUID owner = entity.ownerId();
+		DiscipleData data = entity.data();
+		if (owner == null || entity.role() != DiscipleEntity.Role.DISCIPLE || promoteBlockerSelf(entity) != null) {
+			return false;
+		}
+		ensure(data);
+		int rank = rank(data);
+		int target = rank + 1;
+		int cost = PK_COST[target];
+		if (pk(data) < cost) {
+			return false;
+		}
+		addPk(data, -cost, "kultivator.hall.pk.promotion");
+		setRank(data, target);
+		entity.setSyncedSectRank(target);
+		Halls.noteRank(owner, entity.soulId(), target, isProtector(data), DisciplePaths.power(data));
+		if (master != null) {
+			celebrate(master, entity, target, true);
+			passedOver(master, entity, rank);
+			Advancements.grant(master, "first_promotion");
+			if (target == TETUA_AGUNG) {
+				Advancements.grant(master, "grand_elder");
+			}
+		} else if (entity.level() instanceof ServerLevel level) {
+			Vec3 pos = entity.position();
+			Fx.send(level, pos, FxType.HALL, HallFxIds.PROMOTION, TRIM[target], target);
+			level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BELL_BLOCK, SoundSource.NEUTRAL, 1.0F, 1.0F);
+			level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.PLAYER_LEVELUP, SoundSource.NEUTRAL, 0.5F, 1.3F);
+			Halls.log(owner, Component.translatable("kultivator.hall.rank.promoted", entity.getName(), rankName(target)));
+		}
+		return true;
+	}
+
+	/** The master answers a disciple's request (a chat click): the old {@link #promote}, the Latihan Khusus included. */
+	public static boolean promoteByMaster(ServerPlayer master, DiscipleEntity entity) {
+		return entity != null && entity.isOwnedBy(master) && promote(master, entity, false);
 	}
 
 	/** Half a recruitment cycle: Fanren's retest of an unofficial disciple. */

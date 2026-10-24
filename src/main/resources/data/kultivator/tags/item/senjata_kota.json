@@ -1,0 +1,33 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:senjata/jian_fana",
+    "kultivator:senjata/jian_roh_rendah",
+    "kultivator:senjata/jian_roh_menengah",
+    "kultivator:senjata/jian_roh_tinggi",
+    "kultivator:senjata/dao_fana",
+    "kultivator:senjata/dao_roh_rendah",
+    "kultivator:senjata/dao_roh_menengah",
+    "kultivator:senjata/dao_roh_tinggi",
+    "kultivator:senjata/qiang_fana",
+    "kultivator:senjata/qiang_roh_rendah",
+    "kultivator:senjata/qiang_roh_menengah",
+    "kultivator:senjata/qiang_roh_tinggi",
+    "kultivator:senjata/kapak_fana",
+    "kultivator:senjata/kapak_roh_rendah",
+    "kultivator:senjata/kapak_roh_menengah",
+    "kultivator:senjata/kapak_roh_tinggi",
+    "kultivator:senjata/gada_fana",
+    "kultivator:senjata/gada_roh_rendah",
+    "kultivator:senjata/gada_roh_menengah",
+    "kultivator:senjata/gada_roh_tinggi",
+    "kultivator:senjata/kipas_besi_fana",
+    "kultivator:senjata/kipas_besi_roh_rendah",
+    "kultivator:senjata/kipas_besi_roh_menengah",
+    "kultivator:senjata/kipas_besi_roh_tinggi",
+    "kultivator:senjata/kebut_fana",
+    "kultivator:senjata/kebut_roh_rendah",
+    "kultivator:senjata/kebut_roh_menengah",
+    "kultivator:senjata/kebut_roh_tinggi"
+  ]
+}

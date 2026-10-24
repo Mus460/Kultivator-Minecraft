@@ -1,0 +1,64 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_tema/gunung",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_gunung",
+  "distrik": "kaki_gerbang",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/gunung/kaki_gerbang/stasiun_bawah",
+      "putar": 0,
+      "dy": 6
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/gunung/kaki_gerbang/pos_kuli",
+      "putar": 0,
+      "dy": 6
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/gunung/kaki_gerbang/gerbang",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/gunung/kaki_gerbang/alun",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 48,
+      "pool": "kultivator:kota_tema/gunung/tembok/gerbang_kaki",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 48,
+      "pool": "kultivator:kota_tema/gunung/tembok/lurus_jaga",
+      "putar": 0
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "#kultivator:kota_tema/gaya/gunung_salju",
+      "akhiran": "salju"
+    },
+    {
+      "biomes": "#kultivator:kota_tema/gaya/gunung_hutan",
+      "akhiran": "hutan"
+    }
+  ]
+}

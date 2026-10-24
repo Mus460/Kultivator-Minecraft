@@ -1,0 +1,37 @@
+{
+  "pembicara": [
+    "tokoh:zhao_wanli"
+  ],
+  "prioritas": 22,
+  "syarat": [
+    "quest tema_pelabuhan_pelita selesai",
+    "bendera pelabuhan_suap",
+    "pelabuhan_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bisik",
+      "prop": "kantong_uang",
+      "pilihan": [
+        {
+          "ke": "pucat"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pucat",
+      "gestur": "kaget"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "hitung_sempoa"
+    }
+  ]
+}

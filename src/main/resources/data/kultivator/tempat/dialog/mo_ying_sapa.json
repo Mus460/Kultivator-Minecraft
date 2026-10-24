@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:mo_ying"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "prop": "kuas",
+      "pilihan": [
+        {
+          "ke": "lama"
+        },
+        {
+          "ke": "dingin"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lama",
+      "gestur": "menulis",
+      "prop": "kuas"
+    },
+    {
+      "id": "dingin",
+      "gestur": "sikap_tangan_depan"
+    }
+  ]
+}

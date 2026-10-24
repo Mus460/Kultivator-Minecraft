@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380011,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_besar",
+    "distrik": "luar"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_besar/luar",
+      "weight": 1
+    }
+  ]
+}

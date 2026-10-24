@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "peran:anak"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "iblis_di_kota",
+    "quest tema_iblis_anak_liar baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "takut_sembunyi",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb 20"
+          ],
+          "akibat": [
+            "quest_mulai tema_iblis_anak_liar",
+            "iblis_anak bantu"
+          ],
+          "ke": "bantu",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_iblis_anak_liar.mulai.1.alasan"
+        },
+        {
+          "akibat": [
+            "quest_mulai tema_iblis_anak_liar",
+            "iblis_anak lapor"
+          ],
+          "ke": "lapor"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bantu",
+      "gestur": "lambai"
+    },
+    {
+      "id": "lapor",
+      "gestur": "menangis"
+    }
+  ]
+}

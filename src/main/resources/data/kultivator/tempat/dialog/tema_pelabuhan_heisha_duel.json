@@ -1,0 +1,52 @@
+{
+  "pembicara": [
+    "tokoh:hei_sha"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_pelabuhan_pelita tahap duel"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_berkacak",
+      "pilihan": [
+        {
+          "akibat": [
+            "pelabuhan_heisha_musuh",
+            "tutup"
+          ]
+        },
+        {
+          "syarat": [
+            "nama_baik 30"
+          ],
+          "ke": "kisah",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_pelabuhan_heisha_duel.mulai.2.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kisah",
+      "gestur": "v_tatap_renung",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera pelabuhan_heisha_dengar",
+            "pelabuhan_heisha_ramah",
+            "mulai_duel"
+          ]
+        },
+        {
+          "akibat": [
+            "pelabuhan_heisha_musuh",
+            "tutup"
+          ]
+        }
+      ]
+    }
+  ]
+}

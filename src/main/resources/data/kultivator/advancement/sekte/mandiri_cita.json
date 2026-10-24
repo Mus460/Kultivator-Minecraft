@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/mandiri_jalan",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.mandiri.cerita.adv.cita.desc"
+    },
+    "icon": {
+      "id": "kultivator:jade_slip"
+    },
+    "title": {
+      "translate": "kultivator.sekte.mandiri.cerita.adv.cita.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

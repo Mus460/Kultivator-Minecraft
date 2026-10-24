@@ -1,0 +1,38 @@
+{
+  "pembicara": [
+    "tokoh:lao_qiao"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "seru_dagang",
+      "prop": "pikulan",
+      "suara": "tempat.peddler",
+      "pilihan": [
+        {
+          "ke": "jalan"
+        },
+        {
+          "ke": "kabar"
+        },
+        {
+          "ke": "peta"
+        }
+      ]
+    },
+    {
+      "id": "jalan",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    },
+    {
+      "id": "peta",
+      "gestur": "tertawa"
+    }
+  ]
+}

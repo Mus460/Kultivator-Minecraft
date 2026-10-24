@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:yan_ruyi"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest takhta_pewaris_sakit selesai",
+    "!bendera takhta3_ruyi_terima"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "suara": "cerita.ruyi_thanks",
+      "akibat": [
+        "bendera takhta3_ruyi_terima"
+      ],
+      "pilihan": [
+        {
+          "ke": "siapa"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "siapa",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

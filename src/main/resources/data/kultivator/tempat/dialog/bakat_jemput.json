@@ -1,0 +1,25 @@
+{
+  "pembicara": [
+    "peran:anak"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest anak_berbakat tahap jemput"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_anak",
+      "pilihan": [
+        {
+          "akibat": [
+            "kawal_mulai 40",
+            "quest_maju anak_berbakat"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

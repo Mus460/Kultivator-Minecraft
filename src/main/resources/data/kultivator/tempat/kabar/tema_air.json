@@ -1,0 +1,388 @@
+{
+  "templat": [
+    {
+      "id": "tema_air_lentera",
+      "pemicu": "tema_air_lentera",
+      "bobot": 10,
+      "umur_hari": 1
+    },
+    {
+      "id": "tema_air_harapan",
+      "pemicu": "tema_air_harapan",
+      "bobot": 10,
+      "umur_hari": 1
+    },
+    {
+      "id": "tema_air_perahu_naga",
+      "pemicu": "tema_air_perahu_naga",
+      "bobot": 10,
+      "umur_hari": 1
+    },
+    {
+      "id": "tema_air_juara_naga",
+      "pemicu": "tema_air_juara_naga",
+      "bobot": 10,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_air_tikus",
+      "pemicu": "tema_air_tikus",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_air_tikus_tertangkap",
+      "pemicu": "tema_air_tikus_tertangkap",
+      "bobot": 10,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_air_lao_shu_ditahan",
+      "pemicu": "tema_air_lao_shu_ditahan",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "tema_air_benang_tenang",
+      "pemicu": "tema_air_benang_tenang",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "tema_air_benang_sepi",
+      "pemicu": "tema_air_benang_sepi",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "tema_air_umum_1",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_2",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_3",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_4",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_5",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_6",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_7",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_8",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_9",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_10",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_11",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_12",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_13",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_14",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_15",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_16",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_17",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_18",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_19",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_umum_20",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pendayung",
+        "penenun_sutra",
+        "pemelihara_ulat",
+        "ahli_teh",
+        "pemetik_teh",
+        "sastrawan",
+        "nyonya_sutra"
+      ]
+    },
+    {
+      "id": "tema_air_teh_pertama_selesai",
+      "pemicu": "quest_tema_air_teh_pertama",
+      "bobot": 10,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_air_bait_tua_selesai",
+      "pemicu": "quest_tema_air_bait_tua",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "tema_air_perahu_naga_selesai",
+      "pemicu": "quest_tema_air_perahu_naga",
+      "bobot": 10,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_air_anak_jembatan_selesai",
+      "pemicu": "quest_tema_air_anak_jembatan",
+      "bobot": 10,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_air_benang_selesai",
+      "pemicu": "quest_tema_air_benang",
+      "bobot": 10,
+      "umur_hari": 6
+    }
+  ]
+}

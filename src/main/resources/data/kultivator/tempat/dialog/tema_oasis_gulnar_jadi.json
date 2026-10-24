@@ -1,0 +1,23 @@
+{
+  "pembicara": [
+    "tokoh:gulnar"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_oasis_permadani_ratu tahap ambil"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju tema_oasis_permadani_ratu"
+          ]
+        }
+      ]
+    }
+  ]
+}

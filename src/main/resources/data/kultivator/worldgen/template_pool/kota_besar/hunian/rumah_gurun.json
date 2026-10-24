@@ -1,0 +1,59 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_besar/hunian/rumah_a",
+        "processors": "kultivator:kota_besar/gaya_gurun",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_besar/hunian/rumah_b",
+        "processors": "kultivator:kota_besar/gaya_gurun",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_besar/hunian/rumah_c",
+        "processors": "kultivator:kota_besar/gaya_gurun",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_besar/hunian/rumah_d",
+        "processors": "kultivator:kota_besar/gaya_gurun",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_besar/hunian/rumah_e",
+        "processors": "kultivator:kota_besar/gaya_gurun",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_besar/hunian/rumah_f",
+        "processors": "kultivator:kota_besar/gaya_gurun",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

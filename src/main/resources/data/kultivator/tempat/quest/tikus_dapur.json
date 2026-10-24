@@ -1,0 +1,40 @@
+{
+  "pemberi": "tokoh:gendut_zhu",
+  "tempat": "rumah_makan",
+  "tahap": [
+    {
+      "id": "jerat",
+      "tujuan": [
+        "antar minecraft:string tokoh:gendut_zhu x4"
+      ]
+    },
+    {
+      "id": "jaga",
+      "tujuan": [
+        "jam 21 24",
+        "pergi kota/kota_besar"
+      ],
+      "akibat": [
+        "kabar tikus_roh"
+      ]
+    },
+    {
+      "id": "kucing",
+      "tujuan": [
+        "bicara tokoh:ma_laoliu"
+      ]
+    },
+    {
+      "id": "kembali",
+      "tujuan": [
+        "bicara tokoh:gendut_zhu"
+      ],
+      "akibat": [
+        "efek minecraft:saturation 10 0",
+        "efek minecraft:regeneration 200 0",
+        "bendera makan_gratis",
+        "nama_baik 3"
+      ]
+    }
+  ]
+}

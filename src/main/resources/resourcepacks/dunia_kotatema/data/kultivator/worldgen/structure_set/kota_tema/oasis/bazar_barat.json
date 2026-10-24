@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380414,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_oasis",
+    "distrik": "bazar_barat"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/oasis/bazar_barat",
+      "weight": 1
+    }
+  ]
+}

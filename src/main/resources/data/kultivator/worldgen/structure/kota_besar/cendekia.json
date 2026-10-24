@@ -1,0 +1,126 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_besar/semua",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_besar",
+  "distrik": "cendekia",
+  "lot": [
+    {
+      "dx": -72,
+      "dz": -82,
+      "pool": "kultivator:kota_besar/tembok/lurus",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -90,
+      "pool": "kultivator:kota_besar/tembok/menara",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -82,
+      "pool": "kultivator:kota_besar/tembok/lurus_jaga",
+      "putar": 0
+    },
+    {
+      "dx": -82,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/tembok/lurus_jaga",
+      "putar": 3
+    },
+    {
+      "dx": -90,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/tembok/menara",
+      "putar": 3
+    },
+    {
+      "dx": -82,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/tembok/lurus",
+      "putar": 3
+    },
+    {
+      "dx": -90,
+      "dz": -90,
+      "pool": "kultivator:kota_besar/tembok/sudut",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/cendekia/perpustakaan_a",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/cendekia/kuil_langit_a",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/cendekia/rumah_cendekia_a",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/cendekia/perpustakaan_b",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/cendekia/kuil_langit_b",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/cendekia/taman_tinta",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/cendekia/menara_pengamat",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/cendekia/sekolah",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/cendekia/rumah_cendekia_b",
+      "putar": 0
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "#kultivator:kota_besar/gaya_salju",
+      "akhiran": "salju"
+    },
+    {
+      "biomes": "#kultivator:kota_besar/gaya_gurun",
+      "akhiran": "gurun"
+    },
+    {
+      "biomes": "#kultivator:kota_besar/gaya_sakura",
+      "akhiran": "sakura"
+    }
+  ]
+}

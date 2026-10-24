@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "tokoh:hei_sha"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_pelabuhan_pelita tahap nasib"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tunduk",
+      "pilihan": [
+        {
+          "akibat": [
+            "nama_baik 3",
+            "pelabuhan_nasib serah",
+            "kabar tema_pelabuhan_heisha_serah_2 pemain",
+            "quest_maju tema_pelabuhan_pelita"
+          ]
+        },
+        {
+          "syarat": [
+            "bendera pelabuhan_heisha_dengar"
+          ],
+          "akibat": [
+            "nama_baik 5",
+            "pelabuhan_nasib damai",
+            "kabar tema_pelabuhan_heisha_damai_2 pemain",
+            "quest_maju tema_pelabuhan_pelita"
+          ],
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_pelabuhan_heisha_nasib.mulai.2.alasan"
+        },
+        {
+          "akibat": [
+            "nama_baik -5",
+            "pelabuhan_nasib tumpas",
+            "kabar tema_pelabuhan_heisha_tumpas_2 pemain",
+            "quest_maju tema_pelabuhan_pelita"
+          ]
+        }
+      ]
+    }
+  ]
+}

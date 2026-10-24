@@ -1,0 +1,55 @@
+{
+  "pemberi": "peran:kepala_desa",
+  "tempat": "kampung",
+  "tahap": [
+    {
+      "id": "jemput",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera bakat_aula"
+          ],
+          "ke": "aula"
+        }
+      ],
+      "ke": "sekte",
+      "batas_hari": 3,
+      "gagal_ke": "ragu"
+    },
+    {
+      "id": "sekte",
+      "tujuan": [
+        "kawal peran:anak sekte/kompleks"
+      ],
+      "akibat": [
+        "sikap_sekte terdekat 5",
+        "kabar bakat_sekte pemain"
+      ],
+      "ke": "selesai",
+      "batas_hari": 3,
+      "gagal_ke": "ragu",
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "aula",
+      "tujuan": [
+        "kawal peran:anak sekte/aula"
+      ],
+      "akibat": [
+        "bendera anak_berbakat_aula",
+        "pesan kultivator.cerita.pesan.calon"
+      ],
+      "ke": "selesai",
+      "batas_hari": 3,
+      "gagal_ke": "ragu",
+      "arah": "sekte/aula"
+    },
+    {
+      "id": "ragu",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}

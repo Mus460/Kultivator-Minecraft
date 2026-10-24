@@ -1,0 +1,130 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 2,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:spirit_stone_high",
+          "weight": 22,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 2
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:tema/koin_kuno",
+          "weight": 22,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 8,
+              "max": 16
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:tema/pecahan_mural",
+          "weight": 14,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 3
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:beast_core_high",
+          "weight": 12
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:gold_lightning_bamboo",
+          "weight": 8,
+          "modifier": {
+            "type": "minecraft:set_components",
+            "components": {
+              "kultivator:herb_age": 400
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:ninecurl_ginseng",
+          "weight": 6,
+          "modifier": {
+            "type": "minecraft:set_components",
+            "components": {
+              "kultivator:herb_age": 300
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:diamond",
+          "weight": 8,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 1
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:tema/lempeng_peta",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:dagang/giok_barat",
+          "weight": 5,
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 2
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "kultivator:dagang/permadani_gurun",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 6
+        }
+      ]
+    }
+  ],
+  "random_sequence": "kultivator:tema/reruntuhan_3"
+}

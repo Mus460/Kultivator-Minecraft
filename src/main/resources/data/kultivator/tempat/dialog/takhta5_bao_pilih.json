@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "tokoh:bao_qing"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_topeng_terlepas tahap pilih"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "syarat": [
+            "bukti 3"
+          ],
+          "akibat": [
+            "bendera takhta5_a",
+            "quest_maju takhta_topeng_terlepas"
+          ],
+          "ke": "adili",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta5_bao_pilih.mulai.1.alasan"
+        },
+        {
+          "akibat": [
+            "bendera takhta5_b",
+            "quest_maju takhta_topeng_terlepas"
+          ],
+          "ke": "sendiri"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "adili",
+      "gestur": "palu_hakim",
+      "suara": "cerita.bao_verdict"
+    },
+    {
+      "id": "sendiri",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

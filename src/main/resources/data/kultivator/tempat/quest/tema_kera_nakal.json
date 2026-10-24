@@ -1,0 +1,16 @@
+{
+  "pemberi": "peran:peziarah",
+  "tempat": "kota_tema_gunung",
+  "tahap": [
+    {
+      "id": "rebut",
+      "tujuan": [
+        "tanda gunung_kera_kembali x5"
+      ]
+    },
+    {
+      "id": "kembalikan",
+      "ke": "selesai"
+    }
+  ]
+}

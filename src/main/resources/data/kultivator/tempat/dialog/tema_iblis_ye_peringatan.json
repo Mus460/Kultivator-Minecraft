@@ -1,0 +1,58 @@
+{
+  "pembicara": [
+    "tokoh:ye_wuhen"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_iblis_rantai tahap peringatan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "isian": [
+        "pemain"
+      ],
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {
+          "ke": "aturan"
+        },
+        {
+          "ke": "kenapa"
+        }
+      ]
+    },
+    {
+      "id": "aturan",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "kenapa"
+        },
+        {
+          "ke": "kandang"
+        }
+      ]
+    },
+    {
+      "id": "kenapa",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "ke": "kandang"
+        }
+      ]
+    },
+    {
+      "id": "kandang",
+      "gestur": "tunjuk",
+      "akibat": [
+        "peristiwa tanda iblis_peringatan"
+      ],
+      "pilihan": [
+        {}
+      ]
+    }
+  ]
+}

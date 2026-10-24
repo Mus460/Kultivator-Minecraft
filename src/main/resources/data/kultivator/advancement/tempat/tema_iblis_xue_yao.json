@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_iblis",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_iblis_xue_yao.description"
+    },
+    "icon": {
+      "id": "minecraft:red_candle"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_iblis_xue_yao.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

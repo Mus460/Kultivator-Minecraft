@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "peran:penegak_iblis"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "iblis_di_kota",
+    "gentar 80"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat"
+    }
+  ]
+}

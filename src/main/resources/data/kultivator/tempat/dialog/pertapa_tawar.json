@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "peran:pertapa"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest tiga_ujian_pertapa baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "napas_meditasi",
+      "suara": "tempat.hermit",
+      "pilihan": [
+        {
+          "ke": "ujian"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ujian",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tiga_ujian_pertapa"
+          ]
+        },
+        {
+          "ke": "sepi"
+        }
+      ]
+    },
+    {
+      "id": "sepi",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tiga_ujian_pertapa"
+          ]
+        }
+      ]
+    }
+  ]
+}

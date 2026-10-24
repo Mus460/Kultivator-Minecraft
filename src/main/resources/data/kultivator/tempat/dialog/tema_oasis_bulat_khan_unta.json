@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "tokoh:bulat_khan"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest tema_oasis_unta_hilang baru",
+    "quest tema_oasis_mata_air 2"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tua",
+      "suara": "tema.oasis.caravan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_oasis_unta_hilang"
+          ],
+          "ke": "terima"
+        },
+        {
+          "ke": "marah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "tepuk_bahu"
+    },
+    {
+      "id": "marah",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_oasis_unta_hilang"
+          ],
+          "ke": "terima"
+        },
+        {}
+      ]
+    }
+  ]
+}

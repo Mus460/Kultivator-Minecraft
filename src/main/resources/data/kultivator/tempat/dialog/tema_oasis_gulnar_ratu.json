@@ -1,0 +1,34 @@
+{
+  "pembicara": [
+    "tokoh:gulnar"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest tema_oasis_permadani_ratu baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tenun",
+      "pilihan": [
+        {
+          "ke": "bahan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bahan",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_oasis_permadani_ratu"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

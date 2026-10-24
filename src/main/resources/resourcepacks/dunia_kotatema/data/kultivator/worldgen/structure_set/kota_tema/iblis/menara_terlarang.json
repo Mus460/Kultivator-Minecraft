@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380441,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_iblis",
+    "distrik": "menara_terlarang"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/iblis/menara_terlarang",
+      "weight": 1
+    }
+  ]
+}

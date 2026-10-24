@@ -1,0 +1,38 @@
+{
+  "pembicara": [
+    "peran:kepala_desa"
+  ],
+  "prioritas": 25,
+  "syarat": [
+    "quest anak_berbakat baru",
+    "quest gagal_panen selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera bakat_aula",
+            "quest_mulai anak_berbakat"
+          ],
+          "ke": "terima"
+        },
+        {
+          "akibat": [
+            "bendera bakat_npc",
+            "quest_mulai anak_berbakat"
+          ],
+          "ke": "terima"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "tunjuk"
+    }
+  ]
+}

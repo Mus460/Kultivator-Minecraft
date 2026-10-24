@@ -1,0 +1,26 @@
+{
+  "pembicara": [
+    "peran:tuan_muda"
+  ],
+  "prioritas": 12,
+  "syarat": [
+    "bendera tuan_muda_tantang_ulang",
+    "!bendera klan_hormat"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hunus",
+      "suara": "tempat.young_master",
+      "pilihan": [
+        {
+          "akibat": [
+            "tanding_klan"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

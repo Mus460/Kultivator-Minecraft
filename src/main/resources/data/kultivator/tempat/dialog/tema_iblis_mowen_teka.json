@@ -1,0 +1,90 @@
+{
+  "pembicara": [
+    "tokoh:mo_wen"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_iblis_rantai tahap peta",
+    "!punya kultivator:tema/peta_gerbang_rahasia"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "membaca",
+      "prop": "kitab",
+      "suara": "tema.iblis.forbidden",
+      "pilihan": [
+        {
+          "syarat": [
+            "gentar 30"
+          ],
+          "ke": "satu",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_iblis_mowen_teka.mulai.1.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "satu",
+      "gestur": "membaca",
+      "prop": "kitab",
+      "pilihan": [
+        {
+          "ke": "salah"
+        },
+        {
+          "ke": "dua"
+        },
+        {
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "dua",
+      "gestur": "membaca",
+      "prop": "kitab",
+      "pilihan": [
+        {
+          "ke": "tiga"
+        },
+        {
+          "ke": "salah"
+        },
+        {
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "tiga",
+      "gestur": "membaca",
+      "prop": "kitab",
+      "pilihan": [
+        {
+          "ke": "salah"
+        },
+        {
+          "ke": "salah"
+        },
+        {
+          "ke": "benar"
+        }
+      ]
+    },
+    {
+      "id": "benar",
+      "gestur": "membaca",
+      "prop": "gulungan",
+      "akibat": [
+        "iblis_beri peta"
+      ]
+    },
+    {
+      "id": "salah",
+      "gestur": "sikap_tua"
+    }
+  ]
+}

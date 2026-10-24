@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380452,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_pos_pemburu",
+    "distrik": "pos"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/pos_pemburu",
+      "weight": 1
+    }
+  ]
+}

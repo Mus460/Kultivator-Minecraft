@@ -1,0 +1,24 @@
+{
+  "pembicara": [
+    "tokoh:ajun"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest tema_oasis_unta_hilang tahap cari"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_anak",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_unta_kabur"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

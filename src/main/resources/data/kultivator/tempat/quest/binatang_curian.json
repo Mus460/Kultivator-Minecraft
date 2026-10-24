@@ -1,0 +1,35 @@
+{
+  "pemberi": "tokoh:ma_laoliu",
+  "tempat": "pasar_binatang",
+  "tahap": [
+    {
+      "id": "lacak",
+      "tujuan": [
+        "pergi pos/kemah_begal"
+      ],
+      "arah": "pos/kemah_begal"
+    },
+    {
+      "id": "rebut",
+      "tujuan": [
+        "kalahkan kultivator:rogue_cultivator x3"
+      ],
+      "akibat": [
+        "beri cerita:anak_rubah_roh"
+      ],
+      "arah": "pos/kemah_begal"
+    },
+    {
+      "id": "pulang",
+      "tujuan": [
+        "antar cerita:anak_rubah_roh tokoh:ma_laoliu"
+      ],
+      "akibat": [
+        "beri_nb_pita 25",
+        "nama_baik 4",
+        "bendera ma_diskon",
+        "kabar rubah_pulang pemain"
+      ]
+    }
+  ]
+}

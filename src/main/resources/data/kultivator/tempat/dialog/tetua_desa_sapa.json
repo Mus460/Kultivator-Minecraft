@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "peran:tetua_desa"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 65"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "duduk_kursi",
+      "suara": "tempat.village_elder",
+      "pilihan": [
+        {
+          "ke": "kisah"
+        },
+        {
+          "ke": "kultivator"
+        },
+        {
+          "ke": "nasihat"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kisah",
+      "gestur": "cerita",
+      "akibat": [
+        "lore kampung"
+      ]
+    },
+    {
+      "id": "kultivator",
+      "gestur": "tatap_langit"
+    },
+    {
+      "id": "nasihat",
+      "gestur": "tepuk_bahu"
+    }
+  ]
+}

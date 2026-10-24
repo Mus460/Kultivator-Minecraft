@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:dunia/kota_found",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.anak_binatang.description"
+    },
+    "icon": {
+      "id": "minecraft:bone"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.anak_binatang.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

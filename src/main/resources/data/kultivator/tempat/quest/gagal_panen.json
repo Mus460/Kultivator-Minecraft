@@ -1,0 +1,76 @@
+{
+  "pemberi": "peran:kepala_desa",
+  "tempat": "kampung",
+  "tahap": [
+    {
+      "id": "pilih",
+      "tujuan": [
+        "hari 0"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera panen_binatang"
+          ],
+          "ke": "sarang"
+        }
+      ],
+      "ke": "air"
+    },
+    {
+      "id": "air",
+      "tujuan": [
+        "pergi situs/mata_air_roh"
+      ],
+      "akibat": [
+        "beri cerita:air_roh_ladang"
+      ],
+      "ke": "siram",
+      "arah": "situs/mata_air_roh"
+    },
+    {
+      "id": "siram",
+      "tujuan": [
+        "antar cerita:air_roh_ladang peran:kepala_desa"
+      ],
+      "ke": "syukur",
+      "arah": "kampung/"
+    },
+    {
+      "id": "sarang",
+      "tujuan": [
+        "pergi gua/sarang_binatang"
+      ],
+      "ke": "usir",
+      "arah": "gua/sarang_binatang"
+    },
+    {
+      "id": "usir",
+      "tujuan": [
+        "kalahkan monster x6"
+      ],
+      "ke": "lapor_desa"
+    },
+    {
+      "id": "lapor_desa",
+      "tujuan": [
+        "bicara peran:kepala_desa"
+      ],
+      "ke": "syukur",
+      "arah": "kampung/"
+    },
+    {
+      "id": "syukur",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "nama_baik 6",
+        "beri minecraft:bread 8",
+        "bendera desa_mau_ikrar",
+        "kabar panen_selamat pemain"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

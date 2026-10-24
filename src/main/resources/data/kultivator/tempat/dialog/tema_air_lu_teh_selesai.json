@@ -1,0 +1,18 @@
+{
+  "pembicara": [
+    "tokoh:lu_yuqing"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest tema_air_teh_pertama selesai"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "prop": "cangkir"
+    }
+  ]
+}

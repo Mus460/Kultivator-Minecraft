@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:a_lan"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest tema_pelabuhan_tali_putus baru",
+    "pelabuhan_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bicara_tangan",
+      "prop": "tali",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_pelabuhan_tali_putus"
+          ],
+          "ke": "terima"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "tertawa"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_tema/iblis",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_iblis",
+  "distrik": "gerbang_tengkorak",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/iblis/gerbang_tengkorak/lapangan_peringatan",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/iblis/gerbang_tengkorak/rumah_bea",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/iblis/gerbang_tengkorak/pos_penegak",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/iblis/gerbang_tengkorak/kandang_serigala",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 47,
+      "pool": "kultivator:kota_tema/iblis/tembok/lurus_pendek",
+      "putar": 2
+    },
+    {
+      "dx": -24,
+      "dz": 47,
+      "pool": "kultivator:kota_tema/iblis/tembok/gerbang_tengkorak",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": 47,
+      "pool": "kultivator:kota_tema/iblis/tembok/lurus_pendek",
+      "putar": 2
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "#kultivator:kota_tema/gaya/iblis_merah",
+      "akhiran": "merah"
+    },
+    {
+      "biomes": "#kultivator:kota_tema/gaya/iblis_rawa",
+      "akhiran": "rawa"
+    }
+  ]
+}

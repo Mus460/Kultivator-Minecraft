@@ -2,8 +2,13 @@ package dev.kultivator.client.disciple.power;
 
 import dev.kultivator.client.disciple.DiscipleLook;
 import dev.kultivator.client.disciple.DiscipleRenderState;
+import dev.kultivator.client.sekte.SektePoses;
+import dev.kultivator.client.sosok.gerak.GerakData;
+import dev.kultivator.client.sosok.gerak.GerakKatalog;
+import dev.kultivator.client.sosok.gerak.Klip;
+import dev.kultivator.client.sosok.gerak.Sampler;
 import dev.kultivator.disciple.DiscipleEntity;
-import net.minecraft.client.model.geom.ModelPart;
+import dev.kultivator.sosok.GerakId;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.util.Mth;
@@ -12,11 +17,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The looping duty poses of the Tugas Sekte (DESIGN 20.3.9, drawn by module C from {@code syncedActivity()}): carrying
- * two buckets on a pole over the shoulder, tending herbs bent over with a sickle and a basket, stirring a wok with a
- * ladle and scattering feed from a basket on the arm (the props are drawn by {@code DiscipleHeldItemLayer}). Applied
- * after the normal animation to the disciple's body model and its robe, only while it stands still and calm: never while
- * it walks, fights or plays a cast pose (polish plan 2.6 [224]); it blends in and out over 6 ticks.
+ * The looping duty poses of the Tugas Sekte (DESIGN 20.3.9, drawn from {@code syncedActivity()}), now clips of the
+ * shared Gerak catalog (DESIGN 40.5.10, 40.7.2): carrying two buckets on a pole over the shoulder (clip 5, variant
+ * {@code V_JALAN_PIKUL_DIAM}), tending herbs bent over with a sickle and a basket (44 {@code V_MEMANEN_SABIT}; the old
+ * bend of the shoulders is the clip's LEAN, so the head and shoulders follow the hips), stirring a wok with a ladle (23)
+ * and scattering feed from a basket on the arm (51 {@code V_LEMPAR_PAKAN_LOOP}); the props stay
+ * {@code DiscipleHeldItemLayer}'s. Sekte yang Hidup's activities 13-24 keep their registered function poses
+ * ({@code SektePoses}); Sekte Langit's 25-27 are laid on at every return by {@code LangitDutyPosesMixin} (this method
+ * keeps its signature and always returns normally). An autonomous activity with a Gerak clip (DESIGN 39, 40-60, see
+ * {@code GerakKatalog.petakanAktivitas}) is played by the Gerak controller itself as layer 5; only a body without Gerak
+ * data gets it here, under the same gate.
+ * <p>
+ * Applied after the normal animation to the disciple's body model and its robe, only while it stands still and calm:
+ * never while it walks, fights or plays a cast pose (polish plan 2.6 [224]); it blends in and out over 6 ticks.
  */
 public final class DutyPoses {
 
@@ -26,77 +39,63 @@ public final class DutyPoses {
 	private static final Map<Integer, float[]> BLENDS = new HashMap<>();
 
 	public static void apply(PlayerModel model, AvatarRenderState avatar) {
-		if (!(avatar instanceof DiscipleRenderState state) || state.seated > 0.5F) {
+		if (!(avatar instanceof DiscipleRenderState state)) {
 			return;
 		}
-		boolean duty = state.activity >= DiscipleEntity.ACTIVITY_WATER && state.activity <= DiscipleEntity.ACTIVITY_FARM
-				|| dev.kultivator.client.sekte.SektePoses.handles(state.activity);
-		boolean on = duty && !state.castActive && (state.flags & DiscipleLook.FIGHTING) == 0 && state.walkAnimationSpeed <= 0.1F;
+		int act = state.activity;
+		boolean lama = legacy(act);
+		boolean gerak = !lama && act >= 28 && GerakData.dari(state) == null && GerakKatalog.klipAktivitas(act) != 0;
+		if (!lama && !gerak) {
+			return;
+		}
+		Klip klipGerak = gerak ? GerakKatalog.klip(GerakKatalog.klipAktivitas(act)) : null;
+		boolean duduk = klipGerak != null && klipGerak.punya(Klip.DUDUK | Klip.BERSILA);
+		if (state.seated > 0.5F && !duduk) {
+			return;
+		}
+		boolean diam = state.walkAnimationSpeed <= 0.1F || klipGerak != null && klipGerak.punya(Klip.JALAN_OK);
+		boolean on = !state.castActive && (state.flags & DiscipleLook.FIGHTING) == 0 && diam;
 		float s = blend(state.id, on, state.ageInTicks);
-		if (s <= 0.0F || !duty) {
+		if (s <= 0.0F) {
 			return;
 		}
 		float t = state.ageInTicks;
-		switch (state.activity) {
-			case DiscipleEntity.ACTIVITY_WATER -> {
-				// the carrying pole over the right shoulder, the right hand steadying it, the left swinging a little
-				float bob = Mth.sin(t * 0.25F) * 0.04F;
-				pose(model.rightArm, s, -2.9F + bob, 0.0F, -0.2F);
-				pose(model.leftArm, s, -0.25F - bob, 0.0F, -0.15F);
-				model.body.xRot = Mth.lerp(s, model.body.xRot, 0.05F);
-				model.head.zRot = Mth.lerp(s, model.head.zRot, -0.06F);
+		switch (act) {
+			// the carrying pole over the right shoulder, the right hand steadying it, the left swinging a little
+			case DiscipleEntity.ACTIVITY_WATER -> Sampler.terapkan(model, state, GerakId.JALAN_PIKUL, GerakId.V_JALAN_PIKUL_DIAM, s, t);
+			// bent over the herb beds, cutting with the sickle in the right hand, the basket in the left
+			case DiscipleEntity.ACTIVITY_GARDEN -> Sampler.terapkan(model, state, GerakId.MEMANEN, GerakId.V_MEMANEN_SABIT, s, t);
+			// stirring the spirit rice: the ladle circles, the left hand holds the wok's handle
+			case DiscipleEntity.ACTIVITY_KITCHEN -> Sampler.terapkan(model, state, GerakId.MASAK, 0, s, t);
+			// scattering feed from the basket on the left arm
+			case DiscipleEntity.ACTIVITY_FARM -> Sampler.terapkan(model, state, GerakId.LEMPAR_PAKAN, GerakId.V_LEMPAR_PAKAN_LOOP, s, t);
+			default -> {
+				if (lama) {
+					// Sekte yang Hidup's activities 13-24 (DESIGN 36.3.3): the owner module's registered pose
+					SektePoses.apply(model, state, s, t);
+				} else {
+					// an autonomous activity's Gerak clip on a body the controller does not drive
+					Sampler.terapkan(model, state, GerakKatalog.klipAktivitas(act), GerakKatalog.varianAktivitas(act), s, t);
+				}
 			}
-			case DiscipleEntity.ACTIVITY_GARDEN -> {
-				// bent over the herb beds, cutting with the sickle in the right hand, the basket in the left
-				float pick = Mth.sin(t * 0.18F);
-				model.body.xRot = Mth.lerp(s, model.body.xRot, 0.55F);
-				model.head.xRot = Mth.lerp(s, model.head.xRot, 0.6F);
-				pose(model.rightArm, s, -1.1F + pick * 0.3F, 0.0F, 0.1F);
-				pose(model.leftArm, s, -0.75F, 0.15F, -0.1F);
-				bend(model, s);
-			}
-			case DiscipleEntity.ACTIVITY_KITCHEN -> {
-				// stirring the spirit rice: the ladle circles, the left hand holds the wok's handle
-				pose(model.rightArm, s, -1.05F + Mth.sin(t * 0.3F) * 0.18F, 0.0F, Mth.cos(t * 0.3F) * 0.2F);
-				pose(model.leftArm, s, -0.7F, 0.0F, -0.15F);
-				model.head.xRot = Mth.lerp(s, model.head.xRot, 0.45F);
-			}
-			case DiscipleEntity.ACTIVITY_FARM -> {
-				// scattering feed from the basket on the left arm
-				float throwing = Math.max(0.0F, Mth.sin(t * 0.22F));
-				pose(model.rightArm, s, -0.9F - throwing * 0.5F, 0.0F, -0.25F - throwing * 0.5F);
-				pose(model.leftArm, s, -0.55F, 0.0F, 0.3F);
-				model.head.xRot = Mth.lerp(s, model.head.xRot, 0.3F);
-			}
-			// Sekte yang Hidup's activities 13-24 (DESIGN 36.3.3): the owner module's registered pose.
-			default -> dev.kultivator.client.sekte.SektePoses.apply(model, state, s, t);
 		}
 	}
 
-	/** True when the duty prop should be drawn (the pose is mostly on). */
+	/** The four base duties and the registered Sekte yang Hidup poses (their props are DiscipleHeldItemLayer's). */
+	private static boolean legacy(int act) {
+		return act >= DiscipleEntity.ACTIVITY_WATER && act <= DiscipleEntity.ACTIVITY_FARM || SektePoses.handles(act);
+	}
+
+	/** True when the duty prop should be drawn (a base duty or Sekte pose is mostly on). */
 	public static boolean showsProp(DiscipleRenderState state) {
+		if (!legacy(state.activity)) {
+			return false;
+		}
 		float[] b = BLENDS.get(state.id);
 		if (b == null) {
 			return false;
 		}
 		return value(b, state.ageInTicks) > 0.5F;
-	}
-
-	private static void pose(ModelPart part, float s, float x, float y, float z) {
-		part.xRot = Mth.lerp(s, part.xRot, x);
-		part.yRot = Mth.lerp(s, part.yRot, y);
-		part.zRot = Mth.lerp(s, part.zRot, z);
-	}
-
-	/** A bent-over body moves the head and shoulders forward and down with it (like the vanilla crouch). */
-	private static void bend(PlayerModel model, float s) {
-		float k = s * 0.55F / 0.5F;
-		model.head.y += 4.2F * k;
-		model.body.y += 3.2F * k;
-		model.rightArm.y += 3.2F * k;
-		model.leftArm.y += 3.2F * k;
-		model.rightLeg.z += 4.0F * k;
-		model.leftLeg.z += 4.0F * k;
 	}
 
 	private static float blend(int id, boolean on, float now) {

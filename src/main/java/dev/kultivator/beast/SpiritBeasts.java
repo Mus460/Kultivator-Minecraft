@@ -704,20 +704,51 @@ public final class SpiritBeasts {
 		}
 	}
 
-	/** Spirit XP from kills: the beast's own (victim max health), its owner's monsters nearby (half of it). */
+	/** Place XP factors of kill XP (DESIGN 38.A #34: a beast den x1.25); each answer 1.0 when it does not apply. */
+	private static final List<java.util.function.ToDoubleFunction<Mob>> XP_FACTORS = new java.util.concurrent.CopyOnWriteArrayList<>();
+	/** The product of the place XP factors is kept within this cap (DESIGN 38.0 rule 4). */
+	public static final double XP_FACTOR_CAP = 1.25D;
+
+	/** Adds a place factor of a spirit beast's kill XP (DESIGN 38.A #34, 38GU); register from a module's init. */
+	public static void addXpFactorProvider(java.util.function.ToDoubleFunction<Mob> provider) {
+		if (provider != null) {
+			XP_FACTORS.add(provider);
+		}
+	}
+
+	/** The bounded product (1.0 .. {@link #XP_FACTOR_CAP}) of the place XP factors for {@code beast}. */
+	private static double xpFactor(Mob beast) {
+		double f = 1.0D;
+		for (java.util.function.ToDoubleFunction<Mob> provider : XP_FACTORS) {
+			try {
+				double v = provider.applyAsDouble(beast);
+				if (Double.isFinite(v) && v > 0.0D) {
+					f *= v;
+				}
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.warn("Spirit beast XP factor failed", exception);
+			}
+		}
+		return Math.max(1.0D, Math.min(XP_FACTOR_CAP, f));
+	}
+
+	/**
+	 * Spirit XP from kills: the beast's own (victim max health), its owner's monsters nearby (half of it); both times the
+	 * bounded place factor ({@link #addXpFactorProvider}).
+	 */
 	private static void onKill(ServerLevel level, Entity killer, LivingEntity killed, DamageSource source) {
 		if (BuiltInRegistries.ENTITY_TYPE.getKey(killed.getType()).equals(HEART_DEMON)) {
 			return;
 		}
 		if (killer instanceof Mob beast && beast.hasAttached(BeastData.TYPE)) {
-			addXp(beast, killed.getMaxHealth());
+			addXp(beast, killed.getMaxHealth() * xpFactor(beast));
 			return;
 		}
 		if (killer instanceof ServerPlayer player && !(player instanceof FakePlayer) && killed instanceof Enemy) {
 			double share = killed.getMaxHealth() * OWNER_KILL_SHARE;
 			for (Mob beast : BeastRegistry.of(player.getUUID())) {
 				if (beast != killed && beast.level() == player.level() && beast.distanceToSqr(player) <= KILL_SHARE_RANGE * KILL_SHARE_RANGE) {
-					addXp(beast, share);
+					addXp(beast, share * xpFactor(beast));
 				}
 			}
 		}

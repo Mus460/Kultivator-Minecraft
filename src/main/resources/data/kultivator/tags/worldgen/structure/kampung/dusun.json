@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:kampung/dusun_sedang",
+    "kultivator:kampung/dusun_salju",
+    "kultivator:kampung/dusun_sabana",
+    "kultivator:kampung/dusun_sakura",
+    "kultivator:kampung/dusun_gurun",
+    "kultivator:kampung/dusun_rawa",
+    "kultivator:kampung/dusun_terasering"
+  ]
+}

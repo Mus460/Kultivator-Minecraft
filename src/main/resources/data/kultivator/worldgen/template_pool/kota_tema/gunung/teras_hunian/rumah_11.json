@@ -1,0 +1,23 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_tema/gunung/teras_hunian/rumah_11_a",
+        "processors": "kultivator:kota_tema/gunung/gaya_batu",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_tema/gunung/teras_hunian/rumah_11_b",
+        "processors": "kultivator:kota_tema/gunung/gaya_batu",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

@@ -1,0 +1,127 @@
+{
+  "jenis": "kota_tema/pelabuhan",
+  "peran": {
+    "syahbandar": {
+      "22-4": {
+        "kegiatan": "tidur",
+        "tujuan": "@kasur",
+        "klip": "tidur",
+        "dalam": true
+      },
+      "5": {
+        "kegiatan": "basuh_muka",
+        "tujuan": "@rumah",
+        "klip": "basuh_muka"
+      },
+      "6-7": {
+        "kegiatan": "teropong",
+        "tujuan": "@kerja",
+        "klip": "teropong_laut",
+        "kanan": "teropong"
+      },
+      "8-11": {
+        "kegiatan": "surat_muatan",
+        "tujuan": "meja_tulis",
+        "klip": "menulis",
+        "kanan": "kuas"
+      },
+      "12-13": {
+        "kegiatan": "makan",
+        "tujuan": "meja_makan",
+        "klip": "makan",
+        "kanan": "sumpit",
+        "kiri": "mangkuk"
+      },
+      "14-17": {
+        "kegiatan": "periksa_muatan",
+        "tujuan": "tambatan",
+        "klip": "menulis",
+        "kanan": "papan_catatan"
+      },
+      "18-21": {
+        "kegiatan": "minum_teh",
+        "tujuan": "kursi",
+        "klip": "minum_teh",
+        "kanan": "cangkir"
+      }
+    },
+    "petugas_bea": {
+      "22-4": {
+        "kegiatan": "tidur",
+        "tujuan": "@kasur",
+        "klip": "tidur",
+        "dalam": true
+      },
+      "5": {
+        "kegiatan": "basuh_muka",
+        "tujuan": "@rumah",
+        "klip": "basuh_muka"
+      },
+      "6-11": {
+        "kegiatan": "periksa_muatan",
+        "tujuan": "kerja:timbangan",
+        "klip": "menulis",
+        "kanan": "papan_catatan"
+      },
+      "12": {
+        "kegiatan": "makan",
+        "tujuan": "meja_makan",
+        "klip": "makan",
+        "kanan": "sumpit",
+        "kiri": "mangkuk"
+      },
+      "13-17": {
+        "kegiatan": "surat_muatan",
+        "tujuan": "meja_tulis",
+        "klip": "menulis",
+        "kanan": "kuas"
+      },
+      "18-21": {
+        "kegiatan": "minum_teh",
+        "tujuan": "kursi",
+        "klip": "minum_teh",
+        "kanan": "cangkir"
+      }
+    },
+    "kuli": {
+      "22-4": {
+        "kegiatan": "tidur",
+        "tujuan": "@kasur",
+        "klip": "tidur",
+        "dalam": true
+      },
+      "5": {
+        "kegiatan": "basuh_muka",
+        "tujuan": "@rumah",
+        "klip": "basuh_muka"
+      },
+      "6-11": {
+        "kegiatan": "bongkar_kapal",
+        "tujuan": "tambatan",
+        "klip": "angkat_bawa",
+        "kanan": "peti",
+        "jalan": "jalan_bawa"
+      },
+      "12-13": {
+        "kegiatan": "makan_dermaga",
+        "tujuan": "tambatan",
+        "klip": "makan",
+        "kanan": "sumpit",
+        "kiri": "mangkuk"
+      },
+      "14-17": {
+        "kegiatan": "angkat_karung",
+        "tujuan": "kerja:rak",
+        "klip": "rak_susun",
+        "kanan": "peti",
+        "jalan": "jalan_pikul"
+      },
+      "18-21": {
+        "kegiatan": "nyanyi_pelaut",
+        "tujuan": "kursi",
+        "klip": "minum_arak",
+        "kanan": "cawan_arak"
+      }
+    }
+  }
+}

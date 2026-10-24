@@ -1,0 +1,195 @@
+{
+  "templat": [
+    {
+      "id": "acara_pasar_malam",
+      "pemicu": "acara_pasar_malam",
+      "bobot": 10,
+      "umur_hari": 2
+    },
+    {
+      "id": "acara_pertemuan_pil",
+      "pemicu": "acara_pertemuan_pil",
+      "bobot": 10,
+      "umur_hari": 2
+    },
+    {
+      "id": "acara_lelang_agung",
+      "pemicu": "acara_lelang_agung",
+      "bobot": 10,
+      "umur_hari": 2
+    },
+    {
+      "id": "acara_hari_gerbang",
+      "pemicu": "acara_hari_gerbang",
+      "bobot": 10,
+      "umur_hari": 2
+    },
+    {
+      "id": "acara_turnamen_agung",
+      "pemicu": "acara_turnamen_agung",
+      "bobot": 10,
+      "umur_hari": 2
+    },
+    {
+      "id": "acara_festival_lentera",
+      "pemicu": "acara_festival_lentera",
+      "bobot": 10,
+      "umur_hari": 2
+    },
+    {
+      "id": "acara_pertemuan_sekte",
+      "pemicu": "acara_pertemuan_sekte",
+      "bobot": 10,
+      "umur_hari": 2
+    },
+    {
+      "id": "acara_gelombang_binatang",
+      "pemicu": "acara_gelombang_binatang",
+      "bobot": 10,
+      "umur_hari": 2
+    },
+    {
+      "id": "acara_jam_malam_1",
+      "pemicu": "acara_jam_malam",
+      "bobot": 10,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "anak",
+        "kapten_penjaga",
+        "koki",
+        "kuli",
+        "pedagang_pil",
+        "pedagang_senjata",
+        "pelayan",
+        "pemilik_penginapan",
+        "pemilik_teh",
+        "pemotong_batu",
+        "pengawal_istana",
+        "pengemis",
+        "penjaga",
+        "penjaga_gerbang",
+        "petugas_gilda",
+        "pustakawan",
+        "tabib",
+        "warga"
+      ]
+    },
+    {
+      "id": "acara_jam_malam_2",
+      "pemicu": "acara_jam_malam",
+      "bobot": 10,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "anak",
+        "kapten_penjaga",
+        "koki",
+        "kuli",
+        "pedagang_pil",
+        "pedagang_senjata",
+        "pelayan",
+        "pemilik_penginapan",
+        "pemilik_teh",
+        "pemotong_batu",
+        "pengawal_istana",
+        "pengemis",
+        "penjaga",
+        "penjaga_gerbang",
+        "petugas_gilda",
+        "pustakawan",
+        "tabib",
+        "warga"
+      ]
+    },
+    {
+      "id": "acara_lonceng_pagi_1",
+      "pemicu": "acara_lonceng_pagi",
+      "bobot": 10,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "anak",
+        "koki",
+        "kuli",
+        "pedagang_pil",
+        "pedagang_senjata",
+        "pelayan",
+        "pemilik_penginapan",
+        "pemilik_teh",
+        "pemotong_batu",
+        "pengemis",
+        "penjaga_gerbang",
+        "petugas_gilda",
+        "pustakawan",
+        "tabib",
+        "warga"
+      ]
+    },
+    {
+      "id": "acara_lonceng_pagi_2",
+      "pemicu": "acara_lonceng_pagi",
+      "bobot": 10,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "anak",
+        "koki",
+        "kuli",
+        "pedagang_pil",
+        "pedagang_senjata",
+        "pelayan",
+        "pemilik_penginapan",
+        "pemilik_teh",
+        "pemotong_batu",
+        "pengemis",
+        "penjaga_gerbang",
+        "petugas_gilda",
+        "pustakawan",
+        "tabib",
+        "warga"
+      ]
+    },
+    {
+      "id": "acara_festival_panen_1",
+      "pemicu": "acara_festival_panen",
+      "bobot": 10,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "anak",
+        "kepala_desa",
+        "nelayan",
+        "pandai_desa",
+        "pedagang_keliling",
+        "petani",
+        "tetua_desa"
+      ]
+    },
+    {
+      "id": "acara_festival_panen_2",
+      "pemicu": "acara_festival_panen",
+      "bobot": 10,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "anak",
+        "kepala_desa",
+        "nelayan",
+        "pandai_desa",
+        "pedagang_keliling",
+        "petani",
+        "tetua_desa"
+      ]
+    },
+    {
+      "id": "acara_festival_panen_3",
+      "pemicu": "acara_festival_panen",
+      "bobot": 10,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "anak",
+        "kepala_desa",
+        "nelayan",
+        "pandai_desa",
+        "pedagang_keliling",
+        "petani",
+        "tetua_desa"
+      ]
+    }
+  ]
+}

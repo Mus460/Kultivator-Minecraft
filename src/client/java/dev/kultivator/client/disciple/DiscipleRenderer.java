@@ -12,10 +12,14 @@ import dev.kultivator.client.disciple.power.NatalTreasureLayer;
 import dev.kultivator.client.disciple.power.PhysiqueVisuals;
 import dev.kultivator.client.fx.spec.AvatarLayer;
 import dev.kultivator.client.render.MeditationPose;
+import dev.kultivator.client.sekte.seragam.JubahLook;
+import dev.kultivator.client.sosok.SosokJembatan;
+import dev.kultivator.client.sosok.SosokRender;
 import dev.kultivator.data.Dao;
 import dev.kultivator.data.Rank;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.disciple.power.PowerIds;
+import dev.kultivator.sosok.RupaKunci;
 import dev.kultivator.technique.spec.dsl.Pose;
 import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState;
 import net.minecraft.client.model.HumanoidModel;
@@ -53,6 +57,12 @@ import java.util.List;
  * power and look bits; a sword pose (or a sword disciple in a fight) puts its natal sword, or a qi sword, in the right
  * hand; the AVATAR and CLONE renderers and the form pieces are layers here too; Divine Clones fade in over 10 ticks and
  * out over the fade the server announces, with a white rim while they fade.
+ * <p>
+ * Penampilan dan Animasi (DESIGN 40.7.2, module 40R): the body is a Sosok, the player mesh on a 128 × 128 atlas composed
+ * from its synced sex, age, build and seed, its rank, Dao, realm, physique, life path and the hall's uniform (the class
+ * fallback atlas while it waits or when far); slim arms follow the sex. The busana and hair cubes, the animated face and
+ * the clip props are Sosok layers; the old robe layer stands down while the atlas is worn. Gerak animates it after the
+ * cast and duel extract; clip 13 lays it down to sleep. The old default skins remain only as the last fallback.
  */
 public class DiscipleRenderer extends LivingEntityRenderer<DiscipleEntity, DiscipleRenderState, PlayerModel> {
 
@@ -62,16 +72,27 @@ public class DiscipleRenderer extends LivingEntityRenderer<DiscipleEntity, Disci
 	private static final float CLONE_FADE_IN = 10.0F;
 	/** Disciples whose fire lotus charge pose this renderer started (render states are fresh every frame). */
 	private static final java.util.Set<Integer> LOTUS_HELD = new java.util.HashSet<>();
+	/** The look keys of the six sect ranks (no string built per frame). */
+	private static final String[] RANK_LOOK = {"murid.0", "murid.1", "murid.2", "murid.3", "murid.4", "murid.5"};
+	private static final String CANDIDATE_LOOK = "murid.calon";
+	private static final String RIVAL_LOOK = "murid.saingan";
 
+	/** The Sosok body (128 × 128 atlas mesh), wide and slim arms, with the duty poses. */
+	private final PlayerModel sosokWide;
+	private final PlayerModel sosokSlim;
+	/** The old player-skin body: the last fallback when no atlas exists at all. */
 	private final PlayerModel wideModel;
 	private final PlayerModel slimModel;
 
 	public DiscipleRenderer(EntityRendererProvider.Context context) {
-		// Phase 6: the player model plus the duty poses of module C (DESIGN 20.3.9, 20.3.22).
-		super(context, new DutyPoses.Model(context.bakeLayer(ModelLayers.PLAYER), false), 0.5F);
-		this.wideModel = this.model;
+		// Phase 6: the player model plus the duty poses of module C (DESIGN 20.3.9, 20.3.22); DESIGN 40: on the Sosok mesh.
+		super(context, new DutyPoses.Model(SosokJembatan.tubuh(context, false), false), 0.5F);
+		this.sosokWide = this.model;
+		this.sosokSlim = new DutyPoses.Model(SosokJembatan.tubuh(context, true), true);
+		this.wideModel = new DutyPoses.Model(context.bakeLayer(ModelLayers.PLAYER), false);
 		this.slimModel = new DutyPoses.Model(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
-		this.addLayer(new DiscipleRobeLayer(this, context));
+		this.addLayer(new SosokRender.TanpaSosok(this, new DiscipleRobeLayer(this, context)));
+		SosokRender.pasangLapisan(this::addLayer, this, context);
 		this.addLayer(new NatalTreasureLayer(this));
 		this.addLayer(new DiscipleHeldItemLayer(this));
 		this.addLayer(new FormLayer<>(this));
@@ -131,6 +152,10 @@ public class DiscipleRenderer extends LivingEntityRenderer<DiscipleEntity, Disci
 			state.isCrouching = false;
 		}
 
+		// DESIGN 40: the Sosok of this disciple (atlas, LOD, slim arms, sleep) before the cast/duel extract
+		SosokRender.ekstrak(entity, state, partialTicks, new SosokRender.RupaMasukan(lookKey(entity, state), state.realm, state.dao,
+				state.sectRank, DiscipleEntity.talentPhysique(state.talent), JubahLook.of(state), 0, 0, PhysiqueVisuals.translucent(state)));
+
 		// the fire lotus charge holds the lotus overhead while the bit is set (the release pose comes from PowerFx)
 		boolean lotus = (state.power & PowerIds.BIT_LOTUS) != 0;
 		Pose playing = CastPoses.poseOf(entity.getId());
@@ -176,6 +201,10 @@ public class DiscipleRenderer extends LivingEntityRenderer<DiscipleEntity, Disci
 		state.rightArmPose = state.rightHandItemState.isEmpty() ? HumanoidModel.ArmPose.EMPTY : HumanoidModel.ArmPose.ITEM;
 		state.leftArmPose = state.leftHandItemState.isEmpty() ? HumanoidModel.ArmPose.EMPTY : HumanoidModel.ArmPose.ITEM;
 
+		// DESIGN 40.5.1: Gerak after the cast and duel poses (layers 4-9, walk profile, springs, face, gaze, props)
+		SosokRender.selesai(entity, state, partialTicks);
+		SosokRender.labelLod(entity, state, partialTicks);
+
 		// Divine Clones: fade in over 10 ticks, out over the announced fade
 		state.cloneFade = 1.0F;
 		if (state.role == DiscipleEntity.Role.CLONE.ordinal()) {
@@ -183,6 +212,23 @@ public class DiscipleRenderer extends LivingEntityRenderer<DiscipleEntity, Disci
 			float out = PhysiqueVisuals.cloneFadeOut(entity.getId(), partialTicks);
 			state.cloneFade = Math.min(in, out);
 		}
+	}
+
+	/**
+	 * The look key of a disciple (DESIGN 40.4.2): {@code murid.<rank>} for a master's disciple, its phantom, its clone and
+	 * its town body; {@code murid.calon} for a candidate, {@code murid.saingan} for a visiting rival; a key the server set
+	 * ({@code DATA_RUPA}, test galleries) wins.
+	 */
+	private static String lookKey(DiscipleEntity entity, DiscipleRenderState state) {
+		RupaKunci own = SosokRender.rupaDari(entity);
+		if (!own.kosong()) {
+			return SosokRender.teksRupaDari(entity, own);
+		}
+		return switch (DiscipleEntity.Role.byOrdinal(state.role)) {
+			case CANDIDATE -> CANDIDATE_LOOK;
+			case RIVAL -> RIVAL_LOOK;
+			default -> RANK_LOOK[Mth.clamp(state.sectRank, 0, RANK_LOOK.length - 1)];
+		};
 	}
 
 	@Override
@@ -219,19 +265,27 @@ public class DiscipleRenderer extends LivingEntityRenderer<DiscipleEntity, Disci
 		if (isBodyVisible && PhysiqueVisuals.translucent(state)) {
 			return RenderTypes.entityTranslucent(this.getTextureLocation(state));
 		}
+		// DESIGN 40.6.3: a Sosok body uses the vanilla entity cutout type (Iris draws it with the pack's entity shader)
+		if (isBodyVisible && !forceTransparent && SosokRender.aktif(state)) {
+			return RenderTypes.entityCutout(this.getTextureLocation(state));
+		}
 		return super.getRenderType(state, isBodyVisible, forceTransparent, appearGlowing);
 	}
 
 	@Override
 	protected void scale(DiscipleRenderState state, PoseStack poseStack) {
-		poseStack.scale(PLAYER_SCALE, PLAYER_SCALE, PLAYER_SCALE);
+		// the body size itself is the synced Attributes.SCALE (state.scale); this is the player proportion on top
+		float scale = PLAYER_SCALE * SosokRender.skalaGambar(state);
+		poseStack.scale(scale, scale, scale);
 	}
 
 	@Override
 	protected void setupRotations(DiscipleRenderState state, PoseStack poseStack, float bodyRot, float entityScale) {
 		MeditationPose.lower(state, poseStack);
 		PoseApplier.lift(state, poseStack);
+		SosokRender.angkat(state, poseStack);
 		super.setupRotations(state, poseStack, bodyRot, entityScale);
+		SosokRender.baring(state, poseStack);
 		PoseApplier.tilt(state, poseStack);
 	}
 
@@ -247,7 +301,11 @@ public class DiscipleRenderer extends LivingEntityRenderer<DiscipleEntity, Disci
 
 	@Override
 	public void submit(DiscipleRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-		this.model = state.slim ? slimModel : wideModel;
+		if (SosokRender.aktif(state)) {
+			this.model = state.slim ? sosokSlim : sosokWide;
+		} else {
+			this.model = state.slim ? slimModel : wideModel;
+		}
 		super.submit(state, poseStack, collector, camera);
 	}
 

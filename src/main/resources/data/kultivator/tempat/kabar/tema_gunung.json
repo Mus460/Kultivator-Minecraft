@@ -1,0 +1,267 @@
+{
+  "templat": [
+    {
+      "id": "tema_gunung_ziarah_1",
+      "pemicu": "acara_tema_ziarah",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_gunung_ziarah_2",
+      "pemicu": "acara_tema_ziarah",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_gunung_cahaya_1",
+      "pemicu": "acara_tema_cahaya_budha",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_gunung_cahaya_2",
+      "pemicu": "acara_tema_cahaya_budha",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_gunung_longsor_1",
+      "pemicu": "acara_tema_longsor",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_gunung_longsor_2",
+      "pemicu": "acara_tema_longsor",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_gunung_macet",
+      "pemicu": "acara_tema_lift_macet",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_gunung_tali_1",
+      "pemicu": "quest_tema_gunung_tali",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "tema_gunung_tali_2",
+      "pemicu": "quest_tema_gunung_tali",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "tema_gunung_ibu",
+      "pemicu": "quest_tema_ziarah_ibu",
+      "bobot": 10,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_gunung_kuli",
+      "pemicu": "quest_tema_kuli_sehari",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_gunung_kera",
+      "pemicu": "quest_tema_kera_nakal",
+      "bobot": 10,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_gunung_rumput",
+      "pemicu": "quest_tema_rumput_awan",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "tema_gunung_gou_tobat",
+      "pemicu": "tema_gunung_gou_tobat",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "tema_gunung_gou_usir",
+      "pemicu": "tema_gunung_gou_usir",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "tema_gunung_gou_suap",
+      "pemicu": "tema_gunung_gou_suap",
+      "bobot": 10,
+      "umur_hari": 7
+    },
+    {
+      "id": "tema_gunung_gou_tobat_2",
+      "pemicu": "tema_gunung_gou_tobat_2",
+      "bobot": 10,
+      "umur_hari": 7,
+      "peran_penyebar": [
+        "biksu_gunung",
+        "kuli_gunung",
+        "kepala_biara"
+      ]
+    },
+    {
+      "id": "tema_gunung_gou_usir_2",
+      "pemicu": "tema_gunung_gou_usir_2",
+      "bobot": 10,
+      "umur_hari": 5,
+      "peran_penyebar": [
+        "pemetik_herba",
+        "kuli_gunung"
+      ]
+    },
+    {
+      "id": "tema_gunung_gou_suap_2",
+      "pemicu": "tema_gunung_gou_suap_2",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pemetik_herba",
+        "biksu_gunung",
+        "peziarah"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_0",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "kuli_gunung"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_1",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "kuli_gunung",
+        "peziarah"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_2",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "peziarah"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_3",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "peziarah"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_4",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "biksu_gunung"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_5",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "biksu_gunung",
+        "kepala_biara"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_6",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pemetik_herba"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_7",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pemetik_herba"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_8",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "penjaga_lift"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_9",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "penjaga_lift",
+        "kuli_gunung"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_10",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "biksu_gunung",
+        "kuli_gunung",
+        "peziarah"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_11",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pemetik_herba",
+        "peziarah"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_12",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "kuli_gunung",
+        "peziarah",
+        "pelayan"
+      ]
+    },
+    {
+      "id": "tema_gunung_umum_13",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "biksu_gunung",
+        "kepala_biara"
+      ]
+    }
+  ]
+}

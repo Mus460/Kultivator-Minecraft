@@ -141,6 +141,7 @@ public final class Kota {
 		}
 		NpcRole role = npc.role();
 		npc.getLookControl().setLookAt(player, 30.0F, 30.0F);
+		if (dev.kultivator.dunia.tempat.cerita.TempatDialog.interact(player, npc)) { return true; } // 38ST: data dialogs, 38 roles and characters
 		switch (role) {
 			case WARGA -> {
 				Voice.say(npc, npc.voiceKey(npc.getRandom().nextBoolean() ? "greet" : "greet_alt"), null);

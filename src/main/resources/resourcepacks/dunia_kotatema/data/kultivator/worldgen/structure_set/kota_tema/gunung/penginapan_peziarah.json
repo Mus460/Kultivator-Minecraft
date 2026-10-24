@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380437,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_gunung",
+    "distrik": "penginapan_peziarah"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/gunung/penginapan_peziarah",
+      "weight": 1
+    }
+  ]
+}

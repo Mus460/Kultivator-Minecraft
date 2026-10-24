@@ -1,0 +1,72 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#kultivator:has_structure/kampung/klan_sedang",
+  "max_distance_from_center": 116,
+  "size": 4,
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "start_height": {
+    "absolute": 0
+  },
+  "start_pool": "kultivator:kampung/klan_sedang/lapangan",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "use_expansion_hack": false,
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "pool_aliases": [
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/klan/aula_leluhur",
+      "target": "kultivator:kampung/klan_sedang/aula_leluhur"
+    },
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/klan/dapur_pelayan",
+      "target": "kultivator:kampung/klan_sedang/dapur_pelayan"
+    },
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/klan/gerbang",
+      "target": "kultivator:kampung/klan_sedang/gerbang"
+    },
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/klan/ladang_barat",
+      "target": "kultivator:kampung/klan_sedang/ladang_barat"
+    },
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/klan/ladang_timur",
+      "target": "kultivator:kampung/klan_sedang/ladang_timur"
+    },
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/klan/paviliun_alkimia",
+      "target": "kultivator:kampung/klan_sedang/paviliun_alkimia"
+    },
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/klan/pustaka_tamu",
+      "target": "kultivator:kampung/klan_sedang/pustaka_tamu"
+    },
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/klan/rumah_patriark",
+      "target": "kultivator:kampung/klan_sedang/rumah_patriark"
+    },
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/klan/rumah_tetua_barat",
+      "target": "kultivator:kampung/klan_sedang/rumah_tetua_barat"
+    },
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/klan/rumah_tetua_timur",
+      "target": "kultivator:kampung/klan_sedang/rumah_tetua_timur"
+    }
+  ]
+}

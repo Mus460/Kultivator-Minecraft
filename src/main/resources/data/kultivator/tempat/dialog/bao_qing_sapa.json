@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "tokoh:bao_qing"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "ke": "hukum"
+        },
+        {
+          "ke": "denda"
+        },
+        {
+          "ke": "senyum"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "hukum",
+      "gestur": "palu_hakim",
+      "akibat": [
+        "lore kota_besar.pusat"
+      ]
+    },
+    {
+      "id": "denda",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "senyum",
+      "gestur": "sikap_lipat_tangan"
+    }
+  ]
+}

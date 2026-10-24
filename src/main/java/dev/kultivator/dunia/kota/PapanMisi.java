@@ -3,6 +3,11 @@ package dev.kultivator.dunia.kota;
 import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Dao;
 import dev.kultivator.dunia.DuniaBudget;
+import dev.kultivator.dunia.tempat.ekonomi.BukuKas;
+import dev.kultivator.dunia.tempat.ekonomi.JenisMisi;
+import dev.kultivator.dunia.tempat.ekonomi.Lencana;
+import dev.kultivator.dunia.tempat.ekonomi.MisiGilda;
+import dev.kultivator.dunia.tempat.ui.LembarKunci;
 import dev.kultivator.elite.EliteMonsters;
 import dev.kultivator.harta.SpiritHerbs;
 import dev.kultivator.musuh.Camps;
@@ -46,8 +51,12 @@ import java.util.UUID;
  * nearest other town or village within 2 000 blocks. One bounty at a time; at most {@code kota.bountiesPerDay} per
  * player per day over all towns. Rewards: spirit stones by band (Qi Refining 6-12 NB, Foundation 15-30, Golden Core
  * 40-80, ×3 per further band), +5 Nama Baik, a jade slip at 20 %.
+ * <p>
+ * DESIGN 38.M.3 (one board system): every town bounty also has a guild rank by the band it was taken at ({@link #pangkat}:
+ * E up to Mortal, D at Qi Refining, C from Foundation on) and pays the guild points of that rank to the Lencana Bintang of
+ * the Gilda Kultivator, so the town board counts toward the badge exactly like the graded guild board.
  */
-final class PapanMisi {
+public final class PapanMisi {
 
 	static final int HUNT = 0;
 	static final int CAMP = 1;
@@ -120,13 +129,13 @@ final class PapanMisi {
 	}
 
 	/** Bands above this pay as this one (audit S27: no runaway NB at the end of the game). */
-	static final int REWARD_BAND_CAP = 6;
+	public static final int REWARD_BAND_CAP = 6;
 
 	/**
 	 * The stone reward for a band (NB): 6-12 up to Qi Refining, 15-30 at Foundation, 40-80 at Golden Core, then ×2 per band
 	 * up to Dao Union (320-640), the same above it (balance change of audit S27, approved; it was ×3 per band without a cap).
 	 */
-	static long reward(int band, RandomSource random) {
+	public static long reward(int band, RandomSource random) {
 		long low;
 		long high;
 		if (band <= 1) {
@@ -144,6 +153,11 @@ final class PapanMisi {
 			}
 		}
 		return low + (long) (random.nextDouble() * (high - low + 1L));
+	}
+
+	/** The reward bounty {@code index} of {@code town} on {@code day} shows on the board and pays (one roll for both). */
+	static long rewardOf(long town, long day, int index, int band) {
+		return reward(band, RandomSource.create(town ^ day ^ index));
 	}
 
 	// ================================================================== actions
@@ -191,6 +205,8 @@ final class PapanMisi {
 		misi.putLong("day", day);
 		misi.putInt("index", index);
 		misi.putInt("band", Mth.clamp(Cultivators.get(player).realm().ordinal(), 1, 8));
+		misi.putInt("rank_band", Mth.clamp(Cultivators.get(player).realm().ordinal(), 0, 8));
+		misi.putLong("reward", rewardOf(npc.town(), day, index, misi.getIntOr("band", 1)));
 		BlockPos centre = npc.blockPosition();
 		switch (board[index]) {
 			case HUNT -> {
@@ -308,13 +324,28 @@ final class PapanMisi {
 		}
 	}
 
-	/** The reward: stones, Nama Baik and sometimes a jade slip. */
+	/** The guild rank of a town bounty taken at {@code band}: E (Mortal), D (Qi Refining), C (Foundation and above). */
+	public static int pangkat(int band) {
+		return band <= 0 ? JenisMisi.E : band == 1 ? JenisMisi.D : JenisMisi.C;
+	}
+
+	/** The reward: stones, Nama Baik, guild points of the bounty's rank and sometimes a jade slip. */
 	private static void pay(ServerPlayer player, long town, CompoundTag misi) {
 		RandomSource random = player.getRandom();
-		long stones = reward(misi.getIntOr("band", 1), random);
+		long stones = Math.max(1L, misi.getLongOr("reward", 1L));
 		NilaiBatu.give(player, stones);
 		int rep = KotaData.get(player.level().getServer()).addReputation(town, player.getUUID(), REPUTATION);
 		Msg.chat(player, Component.translatable("kultivator.kota.misi.hadiah", NilaiBatu.text(stones), REPUTATION, rep).withStyle(ChatFormatting.GREEN));
+		int rank = pangkat(misi.getIntOr("rank_band", misi.getIntOr("band", 1)));
+		int points = MisiGilda.POIN[rank];
+		Lencana.tambah(player, points);
+		Msg.chat(player, Component.translatable("kultivator.tempat_ekonomi.misi.poin_kota", JenisMisi.HURUF.charAt(rank), points)
+				.withStyle(ChatFormatting.AQUA));
+		if (dev.kultivator.sect.hall.Halls.hallOf(player.getUUID()) != null) {
+			BukuKas.catat(player.level().getServer(), player.getUUID(), LembarKunci.BukuKas.SUMBER_MISI, 0, stones,
+					"kultivator.tempat_ekonomi.kas.catatan.misi", String.valueOf(JenisMisi.HURUF.charAt(rank)), IDS[Math.max(0, Math.min(IDS.length - 1,
+							misi.getIntOr("type", 0)))]);
+		}
 		if (random.nextFloat() < 0.2F) {
 			ItemStack slip = Harga.item("jade_slip");
 			if (!slip.isEmpty() && !player.getInventory().add(slip)) {
@@ -456,7 +487,7 @@ final class PapanMisi {
 		int look = level.getRandom().nextInt();
 		merchant.snapTo(spot.x, spot.y, spot.z, player.getYRot(), 0.0F);
 		merchant.setup(NpcRole.WARGA, 1, look, 1, 0, Dao.values()[Math.floorMod(look, Dao.COUNT)], Math.floorMod(look, 6), 0x8A6A3A,
-				Component.translatable("kultivator.kota.misi.pedagang", KotaNames.person(look)));
+				Component.translatable("kultivator.kota.misi.pedagang", KotaNames.person(look, NpcRole.WARGA)));
 		merchant.setTown(board.town());
 		merchant.setLonely(96.0D, 2400);
 		merchant.setCompanion(player.getUUID(), level.getGameTime() + 24000L);
@@ -485,8 +516,8 @@ final class PapanMisi {
 			CompoundTag entry = new CompoundTag();
 			entry.putInt("type", board[i]);
 			entry.putBoolean("taken", taken.getBooleanOr(player.getUUID() + "." + day + "." + i, false));
-			RandomSource preview = RandomSource.create(npc.town() ^ day ^ i);
-			entry.putLong("reward", reward(band, preview));
+			entry.putLong("reward", rewardOf(npc.town(), day, i, band));
+			entry.putString("pangkat", String.valueOf(JenisMisi.HURUF.charAt(pangkat(Mth.clamp(Cultivators.get(player).realm().ordinal(), 0, 8)))));
 			list.add(entry);
 		}
 		tag.put("board", list);

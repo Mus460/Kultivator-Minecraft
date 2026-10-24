@@ -1,0 +1,73 @@
+{
+  "pembicara": [
+    "tokoh:jue_yuan"
+  ],
+  "prioritas": 1,
+  "syarat": [
+    "kota_tema gunung"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "prop": "tongkat_cincin",
+      "pilihan": [
+        {
+          "ke": "lonceng"
+        },
+        {
+          "ke": "tarung"
+        },
+        {
+          "ke": "kabar"
+        },
+        {
+          "syarat": [
+            "bendera gunung_gou_tobat"
+          ],
+          "ke": "gou_tobat"
+        },
+        {
+          "syarat": [
+            "bendera gunung_gou_suap"
+          ],
+          "ke": "emas"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lonceng",
+      "gestur": "cerita",
+      "pilihan": [
+        {
+          "ke": "aula"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "aula",
+      "gestur": "tatap_langit"
+    },
+    {
+      "id": "tarung",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "gou_tobat",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "emas",
+      "gestur": "sikap_doa",
+      "prop": "tongkat_cincin"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

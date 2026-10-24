@@ -1,0 +1,34 @@
+{
+  "pembicara": [
+    "tokoh:yan_ruyi"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "alur 4",
+    "!alur 5"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_depan",
+      "pilihan": [
+        {
+          "ke": "lemah"
+        },
+        {
+          "ke": "gu"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lemah",
+      "gestur": "marah_tunjuk"
+    },
+    {
+      "id": "gu",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "pemberi": "tokoh:yan_wushuang",
+  "tempat": "istana",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "alun",
+      "tujuan": [
+        "pergi kota/kota_besar"
+      ],
+      "arah": "kota/kota_besar"
+    },
+    {
+      "id": "upacara",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera bersekongkol"
+          ],
+          "ke": "sunyi"
+        }
+      ],
+      "ke": "hormat"
+    },
+    {
+      "id": "hormat",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gelar penjaga_takhta",
+        "beri cerita:lencana_istana",
+        "nama_baik 5",
+        "bendera audiensi_bebas"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "sunyi",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

@@ -32,8 +32,10 @@ import org.jetbrains.annotations.Nullable;
  * to the hub.
  * <p>
  * Contract with the server (M2, {@code KotaNet.TAB_SAINGAN}, {@code Saingan.view}): data {@code {on:bool, band:int,
- * groups:[{id, name:key, style:key, color:rgb, grudge:0-100, beaten:bool, wins, losses, known:bool, x, z}], ambush_today,
- * ambush_cap, pressure_today, pressure_cap, pending:bool}}; {@code x/z} are read only when {@code known}.
+ * groups:[{id, sekte, pola, a, b, style:key, color:rgb, grudge:0-100, beaten:bool, wins, losses, known:bool, x, z}], ambush_today,
+ * ambush_cap, pressure_today, pressure_cap, pending:bool}}; {@code x/z} are read only when {@code known}. A group is the
+ * travelling band of NPC sect {@code sekte} (integration audit T12): {@code pola/a/b} are that sect's name words, rebuilt
+ * with {@link SainganData#nameFrom} so the row reads exactly like the Diplomasi screen and the map.
  */
 public final class SainganScreen extends Screen {
 
@@ -170,9 +172,9 @@ public final class SainganScreen extends Screen {
 	private void drawRow(GuiGraphicsExtractor g, CompoundTag row, float left, float top, float room, @Nullable LocalPlayer player) {
 		int rgb = row.getIntOr("color", 0x3A3050) & 0xFFFFFF;
 		boolean beaten = row.getBooleanOr("beaten", false);
-		// a colour chip, the name and the style (both sent as translation keys)
+		// a colour chip, the name (the sect's name words, T12) and the style (a translation key)
 		Brush.rect(g, left, top + 1.0F, left + 4.0F, top + 9.0F, Palette.opaque(rgb));
-		Component name = Component.translatable(row.getStringOr("name", "kultivator.kota.grup.0"));
+		Component name = SainganData.nameFrom(row);
 		Component style = Component.translatable(row.getStringOr("style", "kultivator.kota.gaya." + SainganData.STYLES[SainganData.STYLES.length - 1]));
 		Component head = Component.translatable(K + "row", Brush.bold(name), style);
 		float nameRoom = room * 0.62F;

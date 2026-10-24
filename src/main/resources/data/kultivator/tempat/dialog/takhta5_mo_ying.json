@@ -1,0 +1,58 @@
+{
+  "pembicara": [
+    "tokoh:mo_ying"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest takhta_topeng_terlepas tahap pilih"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_depan",
+      "prop": "kantong_uang",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri_nb_pita 300",
+            "bendera takhta5_c",
+            "bendera bersekongkol",
+            "ambil cerita:catatan_pembukuan",
+            "ambil cerita:surat_mata_mata",
+            "nama_baik -10",
+            "quest_maju takhta_topeng_terlepas"
+          ],
+          "ke": "terima"
+        },
+        {
+          "akibat": [
+            "bendera takhta5_b",
+            "quest_maju takhta_topeng_terlepas"
+          ],
+          "ke": "topeng"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat_dalam"
+    },
+    {
+      "id": "topeng",
+      "gestur": "ancam",
+      "suara": "cerita.moying_reveal",
+      "akibat": [
+        "adegan topeng"
+      ],
+      "pilihan": [
+        {
+          "akibat": [
+            "mulai_duel"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "templat": [
+    {
+      "id": "perbaikan.rusak_monster",
+      "pemicu": "perbaikan_rusak_monster",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "perbaikan.rusak_pemain",
+      "pemicu": "perbaikan_rusak_pemain",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "perbaikan.selesai",
+      "pemicu": "perbaikan_selesai",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "perbaikan.mohon_bantuan",
+      "pemicu": "perbaikan_mohon_bantuan",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "perbaikan.sahabat",
+      "pemicu": "perbaikan_sahabat",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "perbaikan.tagihan_dibayar",
+      "pemicu": "perbaikan_tagihan_dibayar",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "perbaikan.tagihan_ditolak",
+      "pemicu": "perbaikan_tagihan_ditolak",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "perbaikan.rendah_hati",
+      "pemicu": "perbaikan_rendah_hati",
+      "bobot": 10,
+      "umur_hari": 5
+    }
+  ]
+}

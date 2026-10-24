@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "tokoh:lao_dan"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "quest tema_kuli_sehari baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tepuk_bahu",
+      "prop": "pikulan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_kuli_sehari"
+          ]
+        },
+        {
+          "ke": "terbang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terbang",
+      "gestur": "cerita",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_kuli_sehari"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

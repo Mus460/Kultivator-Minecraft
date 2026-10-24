@@ -1,0 +1,30 @@
+{
+  "pemberi": "tokoh:mo_hua",
+  "tempat": "kota_tema_oasis",
+  "tahap": [
+    {
+      "id": "pesan",
+      "tujuan": [
+        "oasis_mural_dipesan"
+      ],
+      "arah": "kota_tema/oasis"
+    },
+    {
+      "id": "lukis",
+      "tujuan": [
+        "tunggu 3"
+      ]
+    },
+    {
+      "id": "lihat",
+      "tujuan": [
+        "bicara tokoh:mo_hua"
+      ],
+      "akibat": [
+        "beri minecraft:painting 1",
+        "nama_baik 2"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

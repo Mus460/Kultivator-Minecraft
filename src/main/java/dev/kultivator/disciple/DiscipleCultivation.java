@@ -1526,6 +1526,280 @@ public final class DiscipleCultivation {
 		return true;
 	}
 
+	// ================================================================== Murid Mandiri (DESIGN 39.5, module 39B)
+
+	/** Lang prefix of the self paths' chat lines (fragment {@code sekte_mandiri_tumbuh}). */
+	private static final String SELF = "kultivator.sekte.mandiri.tumbuh.";
+
+	/**
+	 * {@link #meditationBase} without the x1.5 of the master's MEDITATE order (pure, DESIGN 39.5.1): the base of the
+	 * "breathing while working" XP of self-chosen activities and of the catch-up of 39.4.7.
+	 */
+	public static double meditationBaseTanpaMode(DiscipleData data) {
+		return Math.max(0.4D + 0.2D * data.realm().ordinal(), dev.kultivator.cultivation.Meditation.baseRate(data.rank()) * DISCIPLE_BASE_SHARE);
+	}
+
+	/**
+	 * The XP of a self-chosen activity that is not seated meditation, given at the end of its block (DESIGN 39.5.1). The
+	 * caller passes {@code 50 x meditationBaseTanpaMode x K x skalaXp x hours}; the multiplier is
+	 * {@code xpMultiplier(null, data, MEDITATION)} (no formation or site factor: the disciple did not sit there), then the
+	 * bar, the stage-up FX and the bottleneck notice of {@link #addXp}. Never during a breakthrough. Returns the XP added.
+	 */
+	public static double addXpKegiatan(DiscipleEntity entity, double amount) {
+		if (!(amount > 0.0D) || !Double.isFinite(amount) || entity.role() != DiscipleEntity.Role.DISCIPLE) {
+			return 0.0D;
+		}
+		DiscipleData data = entity.data();
+		if (data.breakingThrough()) {
+			return 0.0D;
+		}
+		double gain = amount * xpMultiplier(null, data, XpSource.MEDITATION);
+		if (!(gain > 0.0D) || !Double.isFinite(gain)) {
+			return 0.0D;
+		}
+		data.addTotalXp(gain);
+		int stageUps = distribute(data, gain);
+		ServerPlayer master = entity.owner();
+		if (stageUps > 0) {
+			onStageUp(entity, data, stageUps, master);
+		}
+		if (master != null) {
+			notifyBottleneck(entity, master, data);
+		}
+		return gain;
+	}
+
+	/**
+	 * Why a disciple cannot break through on its own now (DESIGN 39.5.2), or null: every check of
+	 * {@link #breakthroughBlocker} except the two about the master ({@code bt_offline}, {@code bt_master_far}); the
+	 * "doomed" test counts the friends' Hu Fa promised for this attempt ({@code faktorPenjaga}, the product of their strike
+	 * factors not yet standing guard, 1 = none). The {@code breakthroughBlocker} hooks (the Red cap...) still apply.
+	 */
+	public static @Nullable String breakthroughBlockerSelf(DiscipleEntity entity, double faktorPenjaga) {
+		DiscipleData data = entity.data();
+		Rank rank = data.rank();
+		if (data.breakingThrough()) {
+			return PREFIX + "why.bt_busy";
+		}
+		if (rank.isMax()) {
+			return PREFIX + "why.bt_max";
+		}
+		if (!rank.isBottleneck()) {
+			return PREFIX + "why.bt_not_peak";
+		}
+		if (!data.barFull()) {
+			return PREFIX + "why.bt_not_full";
+		}
+		if (data.deviating()) {
+			return PREFIX + "why.bt_deviation";
+		}
+		String hook = DiscipleHooks.breakthroughBlocker(entity);
+		if (hook != null) {
+			return hook;
+		}
+		if (DiscipleBreakthrough.kindFor(rank) == DiscipleBreakthrough.Kind.TRIBULATION
+				&& entity.getHealth() < entity.getMaxHealth() * TRIBULATION_MIN_HEALTH) {
+			return PREFIX + "why.bt_injured";
+		}
+		if (DiscipleBreakthrough.kindFor(rank) == DiscipleBreakthrough.Kind.TRIBULATION && tribulationDoomedSelf(entity, faktorPenjaga)) {
+			return PREFIX + "why.bt_doomed";
+		}
+		return null;
+	}
+
+	/**
+	 * The self "doomed" test (DESIGN 39.5.3): {@code health <= totalShare x strikeFactor hooks x faktorPenjaga} and no
+	 * master's Hu Fa. The hooks already hold the friends standing guard and the formations; {@code faktorPenjaga} adds the
+	 * ones only promised.
+	 */
+	public static boolean tribulationDoomedSelf(DiscipleEntity entity, double faktorPenjaga) {
+		DiscipleData data = entity.data();
+		Rank next = data.rank().next();
+		double factor = Math.max(DiscipleHooks.STRIKE_FACTOR_FLOOR,
+				DiscipleHooks.strikeFactor(entity, next, 1) * Math.max(0.0D, Math.min(1.0D, faktorPenjaga)));
+		double total = DiscipleBreakthrough.totalShare(data, next) * factor;
+		float max = Math.max(1.0F, entity.getMaxHealth());
+		double health = (entity.getHealth() + entity.getAbsorptionAmount()) / max;
+		return health <= total && !dev.kultivator.disciple.path.HuFa.active(entity);
+	}
+
+	/**
+	 * Starts the disciple's own breakthrough (DESIGN 39.5.2 step 5): {@link #breakthroughBlockerSelf} must pass, then the
+	 * old breakthrough runs unchanged ({@code DiscipleBreakthrough.start} with the master when online, else without:
+	 * chat lines only reach an online master). True when it began.
+	 */
+	public static boolean startBreakthroughSelf(DiscipleEntity entity, double faktorPenjaga) {
+		if (entity.role() != DiscipleEntity.Role.DISCIPLE || !(entity.level() instanceof ServerLevel level)
+				|| breakthroughBlockerSelf(entity, faktorPenjaga) != null) {
+			return false;
+		}
+		DiscipleBreakthrough.start(entity, level, entity.owner());
+		return true;
+	}
+
+	/**
+	 * The disciple swallows one pill of {@code stack} from its own bag (DESIGN 39.5.6): the gates of {@link #feedBlocker}
+	 * and the same effects as {@link #feed} (70 % share, one pill of a kind per minute, the pill-effect hooks), but the
+	 * pill comes from the bag (the caller took it out; one is shrunk here), the Bond does not grow (the Bond is the tie to
+	 * the master) and the master only hears it when near. True when it was taken; false leaves {@code stack} untouched.
+	 */
+	public static boolean feedSelf(DiscipleEntity entity, ItemStack stack) {
+		if (entity.role() != DiscipleEntity.Role.DISCIPLE || !(entity.level() instanceof ServerLevel level) || stack.isEmpty()
+				|| feedBlocker(entity, stack) != null) {
+			return false;
+		}
+		PillChoice choice = pillOf(stack);
+		if (choice == null) {
+			return false;
+		}
+		Component pillName = stack.getHoverName().copy();
+		ItemStack fed = stack.copyWithCount(1);
+		DiscipleData data = entity.data();
+		List<Component> parts = new ArrayList<>();
+		double pf = DiscipleHooks.pillEffectFactor(entity, fed);
+		switch (choice.sort()) {
+			case VANILLA -> applyVanilla(entity, data, choice.vanilla(), parts, pf);
+			case ALCHEMY -> applyAlchemy(entity, data, choice.kind(), choice.quality(), parts, pf);
+			case MARROW -> applyMarrow(entity, level, data, choice.quality(), parts);
+		}
+		if (parts.isEmpty()) {
+			parts.add(Component.translatable(PREFIX + "pill.part.nothing"));
+		}
+		data.setPillCooldown(choice.key(), PILL_COOLDOWN);
+		stack.shrink(1);
+		Vec3 pos = entity.position();
+		int rgb = choice.strength() == 0 ? 0x5A6B3A : choice.color();
+		Fx.burst(level, pos.add(0.0D, 1.0D, 0.0D), rgb, 8 + 6 * choice.strength(), 0.7F);
+		Fx.ring(level, pos.add(0.0D, 0.1D, 0.0D), rgb, 0.9F + 0.2F * choice.strength());
+		if (choice.strength() >= 2) {
+			Fx.pillar(level, pos, rgb, 1.2F + choice.strength());
+		}
+		sound(level, pos.add(0.0D, 1.0D, 0.0D), SoundEvents.BOTTLE_EMPTY, 0.5F, 1.3F);
+		sound(level, pos.add(0.0D, 1.0D, 0.0D), SoundEvents.AMETHYST_BLOCK_CHIME, 0.8F, 1.0F + 0.15F * choice.strength());
+		if (choice.strength() >= 3) {
+			sound(level, pos.add(0.0D, 1.0D, 0.0D), SoundEvents.BEACON_POWER_SELECT, 0.6F, 1.3F);
+		}
+		ServerPlayer master = entity.owner();
+		if (master != null && master.level() == level && master.distanceToSqr(entity) <= 48.0D * 48.0D) {
+			Msg.chat(master, Component.translatable(SELF + "pil.telan", name(entity), pillName, join(parts)).withColor(choice.color()));
+		}
+		entity.refreshSynced();
+		return true;
+	}
+
+	/**
+	 * The disciple chooses its own Dao (DESIGN 39.5.4): the gates of {@link #daoBlocker}, the first insight and the same
+	 * pillar, ring and burst as {@link #chooseDao}; the master hears it when online. True when it was set.
+	 */
+	public static boolean chooseDaoSelf(DiscipleEntity entity, Dao dao) {
+		if (dao == null || entity.role() != DiscipleEntity.Role.DISCIPLE || daoBlocker(entity) != null) {
+			return false;
+		}
+		DiscipleData data = entity.data();
+		data.setDao(dao);
+		data.setComprehension(comprehensionGain(data, dao, FIRST_INSIGHT));
+		entity.refreshSynced();
+		if (entity.level() instanceof ServerLevel level) {
+			Vec3 pos = entity.position();
+			Fx.pillar(level, pos, dao.color(), 6.0F);
+			Fx.ring(level, pos.add(0.0D, 0.1D, 0.0D), dao.color(), 2.5F);
+			Fx.burst(level, pos.add(0.0D, 1.2D, 0.0D), dao.color(), 30, 1.4F);
+			sound(level, pos, SoundEvents.BEACON_ACTIVATE, 0.8F, 1.3F);
+			sound(level, pos, SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 0.9F);
+		}
+		ServerPlayer master = entity.owner();
+		if (master != null) {
+			Msg.chat(master, Component.translatable(SELF + "dao.pilih", name(entity), daoName(dao)).withColor(dao.color()));
+		}
+		return true;
+	}
+
+	/**
+	 * The disciple picks one art of its pending Dewa offer itself (DESIGN 39.5.5, the master did not choose in time):
+	 * every gate again ({@link #dewaPending}), learned, a free combat socket, the old FX. True when learned.
+	 */
+	public static boolean chooseDewaSelf(DiscipleEntity entity, String id) {
+		DiscipleData data = entity.data();
+		TechniqueSpec spec = TechniqueRegistry.byId(id);
+		if (spec == null || entity.role() != DiscipleEntity.Role.DISCIPLE || !dewaPending(data).contains(id) || !data.learn(id)) {
+			return false;
+		}
+		data.extraSection(TEKNIK).remove(DEWA_PENDING);
+		autoSlot(entity, spec);
+		entity.refreshSynced();
+		if (entity.level() instanceof ServerLevel level) {
+			int color = spec.dao() == null ? TechniqueBooks.UNIVERSAL_COLOR : spec.dao().color();
+			Fx.send(level, entity.position(), FxType.DAO_CHOSEN, spec.dao() == null ? -1 : spec.dao().ordinal(), TechniqueBooks.FX_LEARNED, 0.0F);
+			Fx.burst(level, entity.position().add(0.0D, 1.2D, 0.0D), color, 24, 1.2F);
+			sound(level, entity.position(), SoundEvents.ENCHANTMENT_TABLE_USE, 1.0F, 0.9F);
+			sound(level, entity.position(), SoundEvents.AMETHYST_BLOCK_RESONATE, 0.9F, 1.2F);
+		}
+		ServerPlayer master = entity.owner();
+		if (master != null) {
+			Msg.chat(master, Component.translatable(SELF + "dewa.pilih", name(entity), spec.displayName().copy().withColor(GOLD),
+					spec.description().copy().withColor(MUTED)).withColor(JADE));
+		}
+		return true;
+	}
+
+	/**
+	 * Why {@code spec} cannot be learned without the master now (DESIGN 39.5.5: rack, scroll, senior, enlightenment), or
+	 * null: teachable (no fusion pair), new, the realm, the Dao (or a bypass), the star gates, not breaking through and,
+	 * for a legacy art, the teach hooks (the two providers ignore the master, so they are asked with none).
+	 */
+	public static @Nullable String teachBlockerSelf(DiscipleEntity entity, TechniqueSpec spec) {
+		DiscipleData data = entity.data();
+		if (!spec.teachable() || "fusion_pair".equals(spec.special()) || !DiscipleTechniques.usable(spec)) {
+			return PREFIX + "why.not_teachable";
+		}
+		if (data.knows(spec.id())) {
+			return PREFIX + "why.known";
+		}
+		if (!DiscipleTechniques.rankReached(data.rank(), spec.minRank())) {
+			return PREFIX + "why.realm";
+		}
+		Dao dao = spec.dao();
+		boolean anyDao = dao != null && DiscipleHooks.daoBypass(data);
+		if (dao != null && data.dao() == null && !anyDao) {
+			return PREFIX + "why.no_dao";
+		}
+		if (dao != null && dao != data.dao() && !anyDao) {
+			return PREFIX + "why.other_dao";
+		}
+		if (!starsReached(data, spec)) {
+			return "kultivator.teknik.teach.why_stars";
+		}
+		if (data.breakingThrough()) {
+			return PREFIX + "why.busy";
+		}
+		Technique legacy = spec.legacy();
+		if (legacy != null) {
+			String hook = DiscipleHooks.teachBlocker(entity, null, legacy);
+			if (hook != null) {
+				return hook;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * The disciple learns {@code spec} without its master (a senior's lesson, enlightenment): {@code DiscipleData.learn},
+	 * the mastery level when given ({@code mastery > 1}), a free combat socket. The gates are the caller's
+	 * ({@link #teachBlockerSelf}). True when learned.
+	 */
+	public static boolean learnSelf(DiscipleEntity entity, TechniqueSpec spec, int mastery) {
+		DiscipleData data = entity.data();
+		if (!data.learn(spec.id())) {
+			return false;
+		}
+		if (mastery > 1) {
+			Mastery.setDiscipleLevel(data, spec.id(), mastery);
+		}
+		autoSlot(entity, spec);
+		entity.refreshSynced();
+		return true;
+	}
+
 	// ================================================================== screen details
 
 	/**

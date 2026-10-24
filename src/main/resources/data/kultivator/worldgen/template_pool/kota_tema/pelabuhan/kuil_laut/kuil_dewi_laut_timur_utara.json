@@ -1,0 +1,14 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_tema/pelabuhan/kuil_laut/kuil_dewi_laut_timur",
+        "processors": "kultivator:kota_tema/pelabuhan/gaya_utara_utuh",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

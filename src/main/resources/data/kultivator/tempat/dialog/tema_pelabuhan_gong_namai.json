@@ -1,0 +1,66 @@
+{
+  "pembicara": [
+    "tokoh:gong_shumu"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest tema_pelabuhan_lunas_pertama tahap namai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "palu_lunas",
+      "prop": "palu_dempul",
+      "pilihan": [
+        {
+          "akibat": [
+            "pelabuhan_namai camar_putih",
+            "quest_maju tema_pelabuhan_lunas_pertama"
+          ],
+          "ke": "jadi"
+        },
+        {
+          "akibat": [
+            "pelabuhan_namai angin_selatan",
+            "quest_maju tema_pelabuhan_lunas_pertama"
+          ],
+          "ke": "jadi"
+        },
+        {
+          "akibat": [
+            "pelabuhan_namai pelita_kecil",
+            "quest_maju tema_pelabuhan_lunas_pertama"
+          ],
+          "ke": "jadi"
+        },
+        {
+          "akibat": [
+            "pelabuhan_namai ombak_giok",
+            "quest_maju tema_pelabuhan_lunas_pertama"
+          ],
+          "ke": "jadi"
+        },
+        {
+          "akibat": [
+            "pelabuhan_namai bintang_fajar",
+            "quest_maju tema_pelabuhan_lunas_pertama"
+          ],
+          "ke": "jadi"
+        },
+        {
+          "akibat": [
+            "pelabuhan_namai kura_kura_tua",
+            "quest_maju tema_pelabuhan_lunas_pertama"
+          ],
+          "ke": "jadi"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "jadi",
+      "gestur": "tertawa"
+    }
+  ]
+}

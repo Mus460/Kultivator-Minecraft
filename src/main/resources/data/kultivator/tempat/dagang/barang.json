@@ -1,0 +1,269 @@
+{
+  "_": "DESIGN 38.T.10.1; generated from DagangItems.java by tools/gen_tempat_tema_data.py (do not edit)",
+  "kurs": {
+    "rendah": 1,
+    "menengah": 9,
+    "tinggi": 81,
+    "agung": 729
+  },
+  "stok_harian": 16,
+  "jenuh_min": 0.6,
+  "batas_laba_mingguan": "150 x (band + 1)",
+  "barang": [
+    {
+      "id": "kultivator:dagang/ikan_asin_roh",
+      "asal": "pelabuhan",
+      "dasar": 4,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 0.8,
+        "oasis": 1.3,
+        "air": 0.95,
+        "gunung": 1.25,
+        "ibu_kota": 1.15,
+        "iblis": 1.0
+      }
+    },
+    {
+      "id": "kultivator:dagang/mutiara_laut",
+      "asal": "pelabuhan",
+      "dasar": 40,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 0.8,
+        "oasis": 1.3,
+        "air": 1.25,
+        "gunung": 1.0,
+        "ibu_kota": 1.2,
+        "iblis": 1.1
+      }
+    },
+    {
+      "id": "kultivator:dagang/rempah_seberang",
+      "asal": "pelabuhan",
+      "dasar": 12,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 0.85,
+        "oasis": 0.9,
+        "air": 1.25,
+        "gunung": 1.3,
+        "ibu_kota": 1.2,
+        "iblis": 1.0
+      }
+    },
+    {
+      "id": "kultivator:dagang/porselen_hijau",
+      "asal": "pelabuhan",
+      "dasar": 24,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 0.85,
+        "oasis": 1.35,
+        "air": 1.0,
+        "gunung": 1.1,
+        "ibu_kota": 1.2,
+        "iblis": 0.0
+      }
+    },
+    {
+      "id": "kultivator:dagang/kurma_emas",
+      "asal": "oasis",
+      "dasar": 3,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.25,
+        "oasis": 0.8,
+        "air": 1.3,
+        "gunung": 1.2,
+        "ibu_kota": 1.1,
+        "iblis": 1.0
+      }
+    },
+    {
+      "id": "kultivator:dagang/permadani_gurun",
+      "asal": "oasis",
+      "dasar": 30,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.15,
+        "oasis": 0.85,
+        "air": 1.2,
+        "gunung": 1.0,
+        "ibu_kota": 1.3,
+        "iblis": 1.1
+      }
+    },
+    {
+      "id": "kultivator:dagang/giok_barat",
+      "asal": "oasis",
+      "dasar": 60,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.1,
+        "oasis": 0.85,
+        "air": 1.3,
+        "gunung": 1.15,
+        "ibu_kota": 1.25,
+        "iblis": 1.2
+      }
+    },
+    {
+      "id": "kultivator:dagang/kaca_warna",
+      "asal": "oasis",
+      "dasar": 16,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.0,
+        "oasis": 0.85,
+        "air": 1.25,
+        "gunung": 1.3,
+        "ibu_kota": 1.15,
+        "iblis": 0.0
+      }
+    },
+    {
+      "id": "kultivator:dagang/sutra_awan",
+      "asal": "air",
+      "dasar": 36,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.3,
+        "oasis": 1.35,
+        "air": 0.8,
+        "gunung": 1.1,
+        "ibu_kota": 1.2,
+        "iblis": 1.1
+      }
+    },
+    {
+      "id": "kultivator:dagang/teh_bi_luo",
+      "asal": "air",
+      "dasar": 10,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.25,
+        "oasis": 1.3,
+        "air": 0.8,
+        "gunung": 0.95,
+        "ibu_kota": 1.15,
+        "iblis": 0.0
+      }
+    },
+    {
+      "id": "kultivator:dagang/arak_beras",
+      "asal": "air",
+      "dasar": 6,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.2,
+        "oasis": 1.25,
+        "air": 0.85,
+        "gunung": 1.0,
+        "ibu_kota": 1.05,
+        "iblis": 1.2
+      }
+    },
+    {
+      "id": "kultivator:dagang/herba_tebing_kering",
+      "asal": "gunung",
+      "dasar": 14,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.2,
+        "oasis": 1.15,
+        "air": 1.25,
+        "gunung": 0.8,
+        "ibu_kota": 1.3,
+        "iblis": 1.1
+      }
+    },
+    {
+      "id": "kultivator:dagang/dupa_gunung",
+      "asal": "gunung",
+      "dasar": 5,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.3,
+        "oasis": 1.2,
+        "air": 1.15,
+        "gunung": 0.8,
+        "ibu_kota": 1.1,
+        "iblis": 0.0
+      }
+    },
+    {
+      "id": "kultivator:dagang/teh_awan_gunung",
+      "asal": "gunung",
+      "dasar": 9,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.2,
+        "oasis": 1.3,
+        "air": 0.9,
+        "gunung": 0.8,
+        "ibu_kota": 1.1,
+        "iblis": 0.0
+      }
+    },
+    {
+      "id": "kultivator:dagang/lingzhi_gunung",
+      "asal": "gunung",
+      "dasar": 45,
+      "selundupan": false,
+      "catatan": "",
+      "permintaan": {
+        "pelabuhan": 1.15,
+        "oasis": 1.2,
+        "air": 1.2,
+        "gunung": 0.85,
+        "ibu_kota": 1.3,
+        "iblis": 1.25
+      }
+    },
+    {
+      "id": "kultivator:dagang/racun_ular_hitam",
+      "asal": "iblis",
+      "dasar": 18,
+      "selundupan": false,
+      "catatan": "penadah",
+      "permintaan": {
+        "pelabuhan": 0.0,
+        "oasis": 0.0,
+        "air": 0.0,
+        "gunung": 0.0,
+        "ibu_kota": 1.2,
+        "iblis": 0.8
+      }
+    },
+    {
+      "id": "kultivator:dagang/minyak_bayangan",
+      "asal": "iblis",
+      "dasar": 30,
+      "selundupan": true,
+      "catatan": "penadah",
+      "permintaan": {
+        "pelabuhan": 1.35,
+        "oasis": 1.35,
+        "air": 1.35,
+        "gunung": 0.0,
+        "ibu_kota": 0.0,
+        "iblis": 0.8
+      }
+    }
+  ]
+}

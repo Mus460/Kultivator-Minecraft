@@ -1,0 +1,125 @@
+{
+  "pemberi": "tokoh:dan_chen",
+  "tempat": "gilda_alkemis",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "tabib",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera takhta3_beli"
+          ],
+          "ke": "pasar"
+        },
+        {
+          "syarat": [
+            "bendera takhta3_urat"
+          ],
+          "ke": "urat"
+        }
+      ],
+      "ke": "air",
+      "batas_hari": 6,
+      "gagal_ke": "lemah"
+    },
+    {
+      "id": "air",
+      "tujuan": [
+        "pergi situs/mata_air_roh"
+      ],
+      "akibat": [
+        "beri cerita:air_mata_air_roh"
+      ],
+      "ke": "racik",
+      "batas_hari": 6,
+      "gagal_ke": "lemah",
+      "arah": "situs/mata_air_roh"
+    },
+    {
+      "id": "urat",
+      "tujuan": [
+        "pergi gua/urat_roh"
+      ],
+      "akibat": [
+        "beri cerita:rumput_bintang"
+      ],
+      "ke": "racik",
+      "batas_hari": 6,
+      "gagal_ke": "lemah",
+      "arah": "gua/urat_roh"
+    },
+    {
+      "id": "racik",
+      "tujuan": [
+        "racik *"
+      ],
+      "akibat": [
+        "ambil cerita:air_mata_air_roh",
+        "ambil cerita:rumput_bintang",
+        "beri cerita:pil_penawar_racun_darah",
+        "bendera alkemis_tingkat_plus"
+      ],
+      "ke": "antar",
+      "batas_hari": 6,
+      "gagal_ke": "lemah"
+    },
+    {
+      "id": "pasar",
+      "ke": "antar",
+      "batas_hari": 6,
+      "gagal_ke": "lemah"
+    },
+    {
+      "id": "antar",
+      "tujuan": [
+        "antar cerita:pil_penawar_racun_darah tokoh:yan_ruyi"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera takhta3_beli"
+          ],
+          "ke": "dibeli"
+        }
+      ],
+      "ke": "sembuh",
+      "batas_hari": 6,
+      "gagal_ke": "lemah"
+    },
+    {
+      "id": "sembuh",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "alur 3 sembuh",
+        "gelar penyelamat_pewaris",
+        "beri cerita:lencana_penyelamat",
+        "nama_baik 5",
+        "adegan pewaris_selamat"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "dibeli",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "alur 3 dibeli",
+        "gelar penyelamat_pewaris",
+        "beri cerita:lencana_penyelamat",
+        "adegan pewaris_selamat"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "lemah",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}
