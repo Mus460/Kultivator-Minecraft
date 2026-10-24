@@ -28,8 +28,8 @@ keprihatinan pengguna (tetap waras). Ide yang dipilih:
   (makin makmur, makin banyak bangunan baru yang dibangun tukang); (46) **kota rusak** karena perang/serangan dan
   **dibangun kembali** (perbaikan nyata); (47) **distrik malam** (lentera merah, kedai dan rumah judi ramai).
 
-Bagian ini adalah kontrak implementasi lengkap untuk **sembilan modul** (42A, 42B, 42C, 42D, 42E, 42F, 42W, 42U, 42V;
-42.15). Semua nama kelas, field, metode, id, kunci lang, perintah dan angka di bawah adalah nama yang **harus** dipakai.
+Bagian ini adalah kontrak implementasi lengkap untuk **sebelas modul** (42A, 42S, 42B, 42K, 42C, 42D, 42E, 42F, 42W, 42U,
+42V; 42.15). Semua nama kelas, field, metode, id, kunci lang, perintah dan angka di bawah adalah nama yang **harus** dipakai.
 Yang ditandai "(verifikasi)" sudah dicek polanya di kode tetapi nama persisnya wajib dicocokkan lagi dengan kode mod atau
 `butterbot-fabric/reference/mcsrc` sebelum dipakai. Semua angka adalah desain game; baris Sumber hanya menjelaskan ilham.
 Bagian ini berdiri sendiri di `docs/rancangan/42-kota-hidup.md`; `docs/DESIGN.md` dan `docs/PANDUAN.md` hanya disunting oleh
@@ -104,6 +104,13 @@ profesi, lentera, asap, panji, kavling yang dibangun bertahap, pembangunan kemba
 13. **Tanpa cuaca, waktu, tick-rate.** Musim (42.7.6) dibaca dari `hari / 24 mod 4` (38.N.3) dan bioma; salju hanya dibaca
     (`Biome.coldEnoughToSnow`, verifikasi), tidak pernah dipaksa. `uji kota warga tahun <n>` memajukan **umur data**, bukan
     waktu dunia.
+
+14. **Kecocokan mod dunia.** Semua potongan, lot, kavling, gudang, kantor, cabang, distrik malam dan kandang 42 tunduk pada
+    keep-out yang ada (`mixin/ChunkGeneratorTempatMixin` + `TempatKeepOut`, tag `#kultivator:boleh_di_tempat`), tidak pernah
+    tumbuh di atas struktur mod lain atau medannya, dan menghormati medan Tectonic serta bioma Terralith (`kompat_bioma`); rincian
+    42.12.1A.
+15. **Tanpa LLM.** Semua percakapan dan perilaku adalah algoritma deterministik dari data pengarang (42.5A); tidak ada model
+    bahasa, layanan jaringan atau teks bebas yang dibuat mesin.
 
 ---------------------------------------------------------------------------------------------------------------------
 
@@ -262,13 +269,14 @@ permen hari ini akan menjadi pandai besi, menikah di jalan yang sama, dan suatu 
 
 | # | Ide | Dipakai ulang (tidak digandakan) | Baru di 42 | Modul |
 |---|---|---|---|---|
-| A1 | Bicara dengan warga mana pun | `TempatDialog`, layar `dialog` 38.U.3.1, `Kalimat`, `KabarTempat`, `PenyediaJasa`, `Tokoh.WATAK` | jalur `interact` untuk **semua** peran sipil + kota lama; mesin templat 6 sumbu (`BicaraWarga`); tablet Hubungan/Tanya Jalan/Permintaan | 42B |
+| A1 | Bicara dengan warga mana pun | `TempatDialog`, layar `dialog` 38.U.3.1, `Kalimat`, `KabarTempat`, `PenyediaJasa`, `Tokoh.WATAK` | jalur `interact` untuk **semua** peran sipil + kota lama; **Mesin Percakapan Lanjut** tanpa LLM (kepribadian, emosi PAD, pengetahuan, topik utilitas, tata bahasa, nada pemain, obrolan NPC-NPC, 42.5A); tablet Hubungan/Tanya Jalan/Permintaan | 42B, 42K |
 | A2 | Warga mengingat pemain | `PendudukData.kenal` (dipindah), `KotaData.reputation` | `Ingatan` per warga per pemain (kesan, utang, bantuan, peristiwa ≤ 4) | 42A |
 | A3 | Hubungan antar-warga | `NpcLife` obrolan, `HidupApi.kerumunan`, klip `berdebat/obrol/tertawa` | graf `Hubungan` (≤ 8 tautan per warga) + perilaku terlihat | 42A, 42D |
 | A4 | Menikah, lahir, menua, mati | `PendudukData.mati` → `DUKA`, `SosokApi.setUsia` | siklus hidup penuh, pohon keluarga, pewarisan rumah/usaha | 42A |
 | A5 | Pindah, ganti kerja, calon murid | `KafilahJalan` (tubuh di jalan), `AnakBerbakat`, `HariGerbang`, `Halls.addCandidates` | `Migrasi`, `Magang`, akar roh warga, jalur calon ke Kantor Rekrutmen | 42A, 42E |
 | A6 | Suasana hati | `SosokApi.setSuasana`, wajah 40, `PerbaikanApi.takut` | `Suasana` lapis (pribadi + tempat + peristiwa) | 42A |
 | A7 | Kebiasaan unik | `Jadwal` data per peran/jam, klip 38/40 | 32 `Kebiasaan` yang menimpa jadwal per warga | 42A, 42V |
+| + | Sebaran merata, kegiatan tidak monoton | `Pemanggil` (panggil 128, terdekat dulu), `TempatHuni` (kunci titik), `Jadwal.ramai` (pasar pagi, makan siang, kedai malam) | zona + kapasitas + target per jam, Penyeimbang, pemilih tubuh proporsional, kumpulan ≥ 10 kegiatan per peran, rencana harian, selingan, belokan, kelompok, metrik (42.4A) | 42S |
 | C14 | Rumah | jangkar/lot `bangunan` 38.B.2.5, `ProtectedZones.addClaimProvider`, `KlaimPemain` | `RumahKota` (beli/sewa, klaim, kunci teleport) | 42C |
 | C15 | Toko sendiri | `LapakSekte` (logika jual harian), `Dagang` (jenuh), `BukuKas` | `TokoPemain`, blok `rak_dagang`, pegawai warga/murid, pembeli bertubuh | 42C |
 | C16 | Harga dinamis | `Dagang.permintaan/jenuh`, `tempat/permintaan/*.json`, `PerbaikanApi.faktorHarga` | `HargaKota.faktor(level, situs, kategori)` satu pengali untuk semua toko | 42C |
@@ -376,7 +384,7 @@ tahun tiap warga digeser menurut `lahir` sehingga peristiwa tahunan tersebar rat
   bergiliran; nama, tahun lahir-wafat dan gelar ditulis klien (billboard `TeksTempat` di batu nisan, ≤ 16 blok). Tempat tanpa
   bukit makam memakai titik `makam`/`kuil` terdekat (nama hanya di Pohon Keluarga).
 * **Yatim**: diasuh kakek-nenek, paman/bibi, lalu Kuil (peran `RAHIB` mengasuh; rumah yatim = titik kasur kuil).
-* **Anak angkat**: pasangan tanpa anak 5 %/tahun mengangkat yatim (pasangan sesama jenis selalu lewat jalur ini, 42.16 K9).
+* **Anak angkat**: pasangan tanpa anak 5 %/tahun mengangkat yatim. Pasangan warga hanya pria-wanita (42.16 K9: tidak).
 
 #### 42.4.5 Hubungan antar-warga
 
@@ -399,7 +407,7 @@ memakai tautan (dari pohon). Pertemuan harian: tiap warga 2 undian pertemuan den
 | Jenis | Terbentuk | Perilaku terlihat (tubuh L0/L1) | Akibat data |
 |---|---|---|---|
 | `SAHABAT` | ≥ +40 | berbagi titik `obrol` sore, `tertawa` bergantian, jalan berdua ke kedai teh, menjenguk saat sakit (prop keranjang) | gosip berpindah ×2, suasana +5 bila bertemu |
-| `KEKASIH` | ≥ +60 antara dua dewasa lajang 16-45 dengan watak tidak bertentangan (< −2) | jalan bersisian senja (langkah tersinkron `gerakSinkron`), memberi bunga (prop 182 `bunga`), wajah tersipu | → lamaran 42.4.6 |
+| `KEKASIH` | ≥ +60 antara pria dan wanita dewasa lajang 16-45 dengan watak tidak bertentangan (< −2) (42.16 K9) | jalan bersisian senja (langkah tersinkron `gerakSinkron`), memberi bunga (prop 182 `bunga`), wajah tersipu | → lamaran 42.4.6 |
 | `PASANGAN` | menikah | sarapan dan makan malam bersama di meja rumah, `lambai` pagi saat berangkat kerja, duduk berdua di serambi | rumah tangga sama |
 | `MUSUH` | ≤ −40 | menghindar (biaya jalur +8 di simpul dekat musuh), tatap tajam + `marah_tunjuk` saat berpapasan, `berdebat` bila dipaksa satu titik | 5 %/hari perkelahian (42.7.4); gosip buruk tentang satu sama lain |
 | `SAINGAN` | peran kerja sama di tempat sama, ≤ −20 | berseru dagang bergantian lebih keras, saling melirik | toko saingan banting harga −5 % (42.6.3) |
@@ -605,10 +613,169 @@ yang belum ada di tempat itu → kebiasaan memakai titik cadangan atau tidak tam
 | `TubuhPenduduk` | jalan berpasangan (kekasih, kakek-cucu) lewat `WargaApi.mitraJalan(npc)`; menghindari musuh (biaya simpul); reaksi `kota_suasana` (42.7). |
 | `HidupApi` | tidak berubah tanda tangannya; 42 hanya memanggil. |
 | `HidupCommands` | sub `audit` mencetak warga per tubuh (nama, umur, suasana) — aditif. |
+| `Pemanggil` (tambahan 42S) | `addPemilihTubuh(PemilihTubuh)`: strategi memilih warga yang diberi tubuh/impostor (bawaan = urutan lama "stationary dulu, terdekat"); 42S mendaftarkan pembagian proporsional per zona (42.4A.2) |
+| `TempatHuni` (tambahan 42S) | `addPenyeimbang(Penyeimbang)`: memilih titik untuk tujuan umum (bawaan = titik pertama yang cocok); reservasi titik berkedaluwarsa |
+| `TubuhPenduduk` (tambahan 42S/42K) | `addSelingan(PenyediaSelingan)` (selingan mikro 42.4A.5) dan `addUjaran(PenyediaUjaran)` (gelembung obrolan 42.5A.9 menggantikan `DATA_LINE` bila aktif) |
 
 `WargaApi.dari(KultivatorNpc)` = `HidupApi.pendudukDari(npc)` + `situs` → Warga; NPC non-penduduk (jangkar `kota/warga` 34,
 staf `tubuhStaf`) dipetakan ke warga tempat itu yang berperan sama dan sedang tidak bertubuh (atau Warga staf tetap untuk
 slot layanan) sehingga **setiap** orang sipil punya nama dan ingatan.
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 42.4A Sebaran merata dan kegiatan yang tidak monoton (modul 42S)
+
+Permintaan susulan pengguna (2026-10-24, mengikat): "Pastikan penempatan NPC tersebar merata dan apa yang mereka lakukan tidak
+monoton." 42.4A memisahkan dua pertanyaan yang sekarang tercampur di 38NL: **jenis** kegiatan pada jam itu (tetap milik jadwal
+peran + `Jadwal.ramai` yang sudah dibangun: pasar pagi 07-11, makan siang 12, teh/jalan 13-16, belanja 17, kedai malam 20-22)
+dan **di mana tepatnya serta variasi apa** (baru, 42S). Fakta kode: `Pemanggil` memanggil tubuh dalam `PANGGIL` 128 blok,
+`BARU_PER_SIKLUS` 48 per `SIKLUS` 20 tick, mengurutkan calon "stationary dulu, lalu yang **terdekat** dengan pemain"
+(`Pemanggil.java:389`), dan impostor juga "terdekat dulu" — akibatnya tubuh menumpuk di sekitar pemain dan tepi pandangan
+kosong; `TempatHuni.tujuan` mengunci satu orang per titik (antre 3 blok) tetapi memilih titik pertama yang cocok, sehingga
+lot dekat rumah penuh sementara lot lain kosong.
+
+#### 42.4A.1 Zona, kapasitas dan target per jam (`PetaZona`, `Kapasitas`)
+
+* **Zona** per tempat, dihitung sekali saat tempat aktif dari titik dan simpul `TempatHuni` (dan bertambah saat kavling jadi):
+  ibu kota = 11 distrik × (lot, ruas jalan, alun); kota tema = 9 distrik; kota 34 = alun, jalan utama, 4 jalan samping, gerbang,
+  luar tembok; kampung = pusat, rumah, ladang, tepi air; kompleks = halaman, dalam, puncak. Di dalam zona: **bangunan** (kotak
+  `bangunan`), **ruas jalan** (potongan graf simpul ±16 blok), **lapangan** (alun, taman, dermaga).
+* **Kapasitas dasar** `K` = jumlah tempat yang masuk akal: kursi 1, meja_makan 1, lapak 2 (penjual + pembeli), kerja 1, kasur 1, obrol
+  2, main 3, catur 2 + 3 penonton, sumur 4, panggung 12, ruas jalan `panjang / 6` pejalan, lapangan `luas / 25`.
+* **Pengali jam** (`data/kultivator/tempat/ragam/zona.json`, contoh):
+
+| Jenis zona | 04-06 | 06-08 | 08-11 | 11-13 | 13-17 | 17-19 | 19-23 | 23-04 |
+|---|---|---|---|---|---|---|---|---|
+| pasar / lapak | 0,1 | 0,8 | **1,0** | 0,6 | 0,6 | 0,8 | 0,2 | 0 |
+| rumah makan / warung | 0,1 | 0,6 (sarapan) | 0,3 | **1,0** | 0,4 | **0,9** | 0,5 | 0 |
+| kedai teh | 0 | 0,3 | 0,5 | 0,5 | **0,9** | 0,6 | 0,5 | 0 |
+| kedai arak / distrik malam | 0 | 0 | 0 | 0,2 | 0,2 | 0,5 | **1,0** | 0,4 |
+| rumah | **1,0** | 0,6 | 0,25 | 0,4 | 0,25 | 0,5 | 0,7 | **1,0** |
+| kuil | **1,0** (subuh) | 0,6 | 0,3 | 0,2 | 0,3 | 0,6 (senja) | 0,2 | 0 |
+| sekolah | 0 | 0,2 | **1,0** (07-10 anak) | 0 | 0 | 0 | 0 | 0 |
+| bengkel / kerja | 0 | 0,5 | **1,0** | 0,4 | **1,0** | 0,3 | 0 | 0 |
+| ladang / tepi air / dermaga | 0,2 | 0,9 | **1,0** | 0,4 | 0,9 | 0,4 | 0 | 0 |
+| alun / taman | 0,6 (tai chi) | 0,7 | 0,5 | 0,4 | 0,7 | **0,9** | 0,7 (lentera) | 0,05 |
+| ruas jalan | 0,1 | **0,9** | 0,6 | 0,7 | 0,6 | **0,9** | 0,5 | 0,05 |
+| gerbang / tepi kota | 0,2 | 0,6 | 0,5 | 0,4 | 0,5 | 0,6 | 0,3 | 0,1 |
+
+  Acara (festival, upacara, rombongan, Pasar Hantu) menimpa pengali zonanya untuk durasi acara (tanpa melebihi kapasitas fisik).
+* **Target** per zona per jam: `T_z = K_z × m_z(jam) / Σ_z (K_z × m_z(jam)) × N_bebas(jam)` (N_bebas = warga tanpa tugas tetap jam
+  itu; staf, penjaga di pos dan pekerja di titik kerjanya sudah dihitung sebagai penghuni zona kerjanya). **Topi** `C_z =
+  ceil(kapZona × T_z) + 1` (bawaan 1,25); **lantai** `L_z = floor(lantaiZona × T_z)` (0,5) untuk zona berkapasitas ≥ 4 agar tidak
+  ada distrik kosong melompong. Topi per bangunan = jumlah titiknya + antre ≤ 2; per titik satu orang.
+
+#### 42.4A.2 Penyeimbang hunian dan anti-gerombol (`Penyeimbang`)
+
+* **Pemilihan tempat untuk tujuan umum** (`pasar`, `kedai`, `makan`, `jalan_jalan`, `obrol`, `main`, `teh`, `kuil`, `belanja` dari
+  jadwal/`Jadwal.ramai`/rencana harian): undian berbobot di antara titik dari jenis itu pada **semua** zona tempat:
+  `w = max(0, C_z − occ_z) / C_z × e^(−jarakDariRumah / 220) × preferensi (kebiasaan, sahabat di sana, toko langganan) × (2 bila occ_z
+  < L_z)`. Titik dipesan (`reservasi` dengan kedaluwarsa = durasi kegiatan + 1 menit dunia); titik penuh → **luapan** ke titik
+  sejenis terdekat di zona yang masih di bawah target; tidak ada titik → kegiatan diganti alternatif dari kumpulan 42.4A.3.
+* **Anti-gerombol**: tubuh yang tidak berinteraksi menjaga jarak ≥ `jarakMin` 1,5 blok (tujuan digeser ke sel kosong tetangga
+  dalam radius 3; kelompok 42.4A.6 memakai formasi sendiri); antre di depan titik ≤ 2 lalu belok ke luapan; ruas jalan yang
+  melebihi topi menurunkan bobot rute melewatinya (rute jalan-jalan memilih ruas sepi).
+* **Penyeimbangan per siklus** (setiap `SIKLUS` Pemanggil, satu tempat per tick): hitung `occ_z` data (semua warga, bukan hanya
+  bertubuh); bila `occ_z > C_z` warga dengan sisa durasi terpendek dipindahkan ke zona kurang terisi pada pergantian kegiatan
+  berikutnya (tidak pernah memutus kegiatan di tengah klip).
+* **Tubuh (L0/L1) dan impostor (L2)** merata: `Pemanggil` tidak lagi murni "terdekat dulu". 42A menambah kait
+  `Pemanggil.addPemilihTubuh(PemilihTubuh)`; 42S mengisi: (1) staf dan peran stationary tetap didahulukan (perilaku audit
+  `audit-npc-tempat.md`); (2) sisa anggaran tubuh dalam `PANGGIL` dibagi ke zona yang terlihat secara **proporsional** jumlah warga
+  data yang tujuannya di zona itu (metode sisa terbesar), minimal 1 tubuh per zona yang punya warga dan dalam 96 blok; (3) di dalam
+  zona baru dipilih yang terdekat pemain. Impostor memakai pembagian yang sama sehingga tepi pandangan tetap berpenghuni.
+  `BARU_PER_SIKLUS`, `LEPAS`, `JAUH` dan topi `npc_hidup` tidak berubah.
+* `Jadwal.ramai` tetap menentukan *apa* (pasar/makan/kedai/jalan) dan *siapa yang bebas*; 42S hanya mengganti "titik pertama
+  yang cocok" dengan Penyeimbang lewat kait `TempatHuni.addPenyeimbang(Penyeimbang)` (42A) dan menyisipkan ragam 42.4A.3-42.4A.6
+  lewat `PenimpaJadwal`. Urutan penimpa: acara/bahaya > upacara > kebiasaan > **rencana harian 42S** > `ramai` > jadwal peran.
+
+#### 42.4A.3 Kumpulan kegiatan per peran (`KumpulanKegiatan`, data `data/kultivator/tempat/ragam/peran/<peran>.json`)
+
+Setiap kegiatan: `{id, blok (kerja/bebas/makan/malam), titik, klip + varian, prop, durasi [min, max] menit dunia, syarat (musim,
+cuaca, hari, sifat, kebiasaan), bobot, selingan (daftar 42.4A.5)}`. Minimal **10 kegiatan per peran umum** (sub-varian = klip/prop/
+titik berbeda); peran 38.T memakai kumpulan temanya ditambah kumpulan kelompok jadwalnya.
+
+| Peran | Kegiatan (sub-varian dalam kurung) |
+|---|---|
+| PETANI | mencangkul (lurus/belokan), menanam bibit, menyiangi (`menyiangi`), menyiram (ember/gayung), memanen (musim), memikul hasil ke pasar, memberi makan ayam, memperbaiki pagar (palu), istirahat di pematang (duduk minum/kipas), mengasah cangkul, mengusir burung, berjualan di pasar desa |
+| PEDAGANG (lapak) | berseru (3 gaya), menata barang, menghitung sempoa, melayani tawar, menyapu lapak, makan di lapak, mengobrol dengan lapak sebelah, menawari pejalan, tidur ayam saat sepi, mengipas, mengusir lalat (`usir_lalat`), mengambil stok dari gudang |
+| KOKI | memotong di talenan, mengaduk wajan, mencicipi, menyajikan (nampan), mencuci mangkuk, mengipas tungku, belanja sayur pagi, memanggil pelanggan, istirahat di pintu belakang, menguleni adonan, menimbang beras |
+| TUKANG | memalu, menggergaji, memplester, memikul papan, mengukir, memeriksa hasil, minum istirahat, mengantar barang jadi, naik perancah (kavling/perbaikan), mengambil kayu, menegur magang |
+| KULI | memikul peti, mendorong gerobak, mengangkut karung, bersandar istirahat, minum, makan bakpao, adu jangkrik, menunggu kafilah, mengikat muatan, bongkar muat di dermaga/gudang |
+| PENJAGA | jaga di pos, patroli (3 rute), memeriksa pedagang, menegur anak, minum teh di pos, latihan tombak, ganti regu (`hormat`), menolong nenek menyeberang, mengobrol dengan rekan, memeriksa gerbang, mengusir pemabuk (malam) |
+| ANAK | kejar-kejaran, lompat tali, gasing, layangan, cuju, petak umpet (`sembunyi_tong`), memberi makan kucing, membantu orang tua (bawa kecil), sekolah, menonton pengamen/akrobat, beli permen/tanghulu, main air (panas), mengikuti pemain (pemuja) |
+| TETUA | catur, berkipas, bercerita ke anak, tai chi, jalan burung sangkar, duduk di serambi, ke kuil, menonton catur, minum teh, menggandeng cucu, tidur siang, menyapu halaman |
+| WARGA umum | pasar pagi, makan di rumah makan, minum teh, jalan-jalan (rute ruas sepi), mengobrol di sumur/obrol, menimba air, menjemur, menyapu, mengunjungi kerabat, ke kuil, menonton rombongan, ke Rumah Uang, ke tabib, duduk di jembatan |
+| NELAYAN | memancing, menjala, menambal jala (`tambal_jala`), menjemur ikan, menjual ikan, mendayung (bila ada perahu), membersihkan ikan, mengobrol di dermaga, minum di kedai, memperbaiki perahu (palu) |
+| RAHIB | menyapu kuil, sujud dupa, membaca sutra, memukul lonceng, membagi bubur, menjenguk orang sakit, meditasi berjalan, menerima peziarah, memimpin upacara, merawat kebun kuil |
+| CENDEKIA / PUSTAKAWAN | menulis, membaca, mengajar, menyalin kitab, berdiskusi (dua tubuh), minum teh, jalan sambil bersyair, merapikan rak, memberi les anak, mengunjungi toko buku |
+
+#### 42.4A.4 Rencana harian yang berbeda tiap hari (`RencanaHarian`)
+
+* Dibuat malas saat warga pertama kali dievaluasi pada hari itu (benih `warga ^ hari`): setiap blok jadwal peran (mis. "kerja
+  07-12", "bebas 13-16") diisi 2-4 kegiatan dari kumpulannya, berdurasi acak dalam rentangnya (20-90 menit dunia), dengan bobot
+  `w = bobot × sifat (X: sosial ×(1 + X/100); C: kerja inti ×(1 + C/150); O: kegiatan jarang ×(1 + O/100)) × kebiasaan × musim ×
+  cuaca × 0,25^(kali dilakukan hari ini) × (0,6 bila dilakukan kemarin di blok sama) × suasana/emosi (sedih: menyendiri, gembira:
+  sosial)`.
+* Kegiatan inti pekerjaan tetap mendominasi jam kerja (≥ 50 % waktu kerja) agar toko tetap dijaga; sisanya variasi.
+* Minggu: hari 0 **hari pasar besar** (pedagang tamu, pasar ×1,3), hari 3 **hari ternak/pasar ikan** (kandang dan dermaga ramai),
+  hari 6 **hari istirahat** (separuh pekerja: memancing, piknik di taman, kuil, kunjungi kerabat); musim mengganti kumpulan (dingin:
+  dalam rumah ×1,4, sup; panas: tepi air; gugur: panen; semi: tanam, layangan); hari raya 42.7.6 dan upacara menimpa.
+
+#### 42.4A.5 Selingan mikro (`Selingan`, data `tempat/ragam/selingan.json`)
+
+Selama satu kegiatan, tiap `selinganDetik` 8-30 s (acak per warga) disisipkan satu selingan 1-3 s yang cocok dengan kegiatan dan
+tidak sama dengan selingan sebelumnya: menoleh ke sekitar (`lihat_sekeliling`), meregang (`peregangan_pagi` pendek), **menyeka
+keringat** (`seka_keringat`, panas/kerja berat), memeriksa barang (`lihat_barang`), melirik pemain yang lewat (`HidupApi.tatap` 2 s),
+bicara singkat dengan tetangga (satu ujaran 42K), menggaruk kepala (`garuk_kepala`), menguap, membetulkan topi (`betulkan_topi`),
+minum dari kendi, bersiul (gumam 73), menepuk debu baju, menghitung koin, menyapa anak yang lewat. Bobot dari sifat (E tinggi:
+lebih banyak menoleh; X: lebih banyak bicara) dan keadaan (lelah setelah 2 jam kerja: seka keringat/meregang ×2).
+
+#### 42.4A.6 Belokan spontan dan kegiatan berkelompok (`Belokan`, `KegiatanKelompok`)
+
+* **Belokan**: saat berjalan antar-tujuan, `belokanPeluang` 12 % per perjalanan bila ada daya tarik ≤ 24 blok dari rute: beli jajanan
+  di lapak (tanghulu/bakpao, prop dibawa sambil makan), mengelus kucing kota, menonton pengamen/akrobat/pendongeng (masuk kerumunan
+  bila kapasitas masih ada), menyapa sahabat (berhenti, 2-4 ujaran), membaca papan pengumuman, memberi koin pengemis (dermawan),
+  melongok ke toko (pesolek), duduk sebentar di bangku, anak bermain air di sumur. Maks `belokanMaks` 3 per warga per hari.
+* **Berkelompok** (formasi jarak 1,2, tiba bersamaan, memesan beberapa titik bersebelahan): keluarga jalan sore (18-19, 20 % rumah
+  tangga per hari), sahabat bertemu di kedai teh (jadwal tumpang-tindih pasangan `SAHABAT`), anak 2-5 kejar-kejaran, kekasih jalan
+  senja, tetua berkumpul main catur, rekan kerja makan siang bersama, rombongan pembeli hari pasar, kelompok festival. Kelompok
+  terhitung satu unit dalam Penyeimbang (kapasitas zona dikurangi sebanyak anggotanya).
+
+#### 42.4A.7 Klip tambahan (450-459 untuk 42S, dibuat 42V; 460-469 cadangan)
+
+| Id | Klip | Durasi | Kunci ringkas |
+|---|---|---|---|
+| 450 | `seka_keringat` | once 30 | RAX −150 ke dahi menyapu (RAY −30 → +20), HX −10 |
+| 451 | `garuk_kepala` | once 24 | RAX −160, RAZ ±8 cepat, HX 10 |
+| 452 | `betulkan_topi` | once 20 | RAX/LAX −165 memegang tepi topi |
+| 453 | `lihat_sekeliling` | once 40 | HY −60 → +60 lambat, TWIST ikut ±15 |
+| 454 | `menyiangi` | loop 30 | jongkok LEAN 55, RAX −40 → −10 mencabut |
+| 455 | `usir_lalat` | once 16 | RAX −90 mengibas RAZ ±40 |
+| 456 | `tambal_jala` | loop 30 | duduk, kedua tangan −60 menjalin (RAY/LAY ±15) |
+| 457 | `sembunyi_tong` | loop 20 | jongkok di balik titik, HY mengintip ±40 |
+| 458 | `tepuk_debu` | once 20 | LAX/RAX −30 → −10 menepuk baju bergantian |
+| 459 | `piknik_duduk` | loop 80 | `duduk_lantai` + makan dari kotak |
+| 460-469 | cadangan 42S | — | — |
+
+#### 42.4A.8 Ukuran keberhasilan, uji dan alat debug (`MetrikRagam`, `RagamUji`)
+
+| Metrik | Sasaran (diuji `uji kota_hidup ragam laporan` dan simulasi 7 hari) |
+|---|---|
+| Kegiatan berbeda per warga bebas per hari | rata-rata ≥ 5 (min 4); staf/stationary ≥ 3 (lewat sub-varian dan selingan) |
+| Pengulangan kegiatan yang sama per warga per hari (di luar kerja inti) | ≤ 2 kali |
+| Kemiripan rencana dua hari berturut (Jaccard) | rata-rata ≤ 0,6 |
+| Selingan | 2-7 per menit nyata per tubuh, tidak ada selingan sama berturut |
+| Belokan | 0,5-2 per warga per hari |
+| Bagian tubuh terbanyak di satu zona yang terlihat | ≤ 1,5 × bagian wajarnya dan ≤ 35 % bila ≥ 4 zona terlihat (kecuali acara di zona itu) |
+| Gini hunian relatif kapasitas antar-zona | ≤ 0,35 |
+| Zona kosong (K ≥ 4, T ≥ 1, occ 0) | ≤ 10 % |
+| Pelanggaran jarak minimum | ≤ 2 % pasangan tubuh |
+
+Perintah (op): `uji kota_hidup sebaran peta` (lapisan klien peta panas sel 16 × 16 di dunia dan di minimap: warna = hunian/target,
+debug saja, payload `kota_peta_panas` ≤ 4 KB, 1 Hz), `sebaran zona` (tabel zona: K, pengali jam, target, topi, lantai, hunian data,
+tubuh), `sebaran titik` (titik dipesan diberi partikel warna menurut pemesan), `sebaran simulasi <hari>` (simulasi tanpa tubuh,
+cetak metrik per jam), `ragam <warga>` (rencana hari ini, riwayat 3 hari, selingan terakhir), `ragam laporan [hari]` (semua metrik
+tabel di atas: lulus/gagal).
 
 ---------------------------------------------------------------------------------------------------------------------
 
@@ -621,14 +788,20 @@ slot layanan) sehingga **setiap** orang sipil punya nama dan ingatan.
    true;` sehingga **semua** orang sipil (`npc.role().townsfolk()` atau tubuh penduduk/jangkar warga) masuk jalur dialog.
    Nama Baik ≤ `Kota.HOSTILE_REPUTATION` tetap ditolak seperti sekarang.
 2. Dialog data 38 (tokoh, quest) tetap didahulukan (`pilih(...)`). Bila tidak ada, lembar sapa diganti lembar
-   **`BicaraWarga.lembar`**: baris pembuka dari mesin templat (42.5.2), potret, nama, umur, pekerjaan, ikon hubungan dengan
+   **`BicaraWarga.lembar`**: baris pembuka dari Mesin Percakapan Lanjut (42.5A; sumbu konteks 42.5.2), potret, nama, umur, pekerjaan, ikon hubungan dengan
    pemain, lalu tablet: **Bicara**, **Kabar**, **Tanya Jalan**, **Hubungan**, **Tolong** (permintaan), **Beri**, **Jasa** (bila
    ada; peran lama 34 seperti `PEDAGANG_PIL` membuka layar lamanya lewat op `jasa:kota_<tab>` → `KotaNet` yang ada),
    **Quest** (38).
 3. Tubuh berhenti dan menatap (`HidupApi.tatap`), klip `bicara_tangan`/gestur templat, gumam 73 (`ObrolanSuara`), suara
    VOICEVOX untuk baris yang punya kunci suara (42.12.7). Dialog berakhir: tubuh kembali ke jadwalnya, `Ingatan.sapa`.
 
-#### 42.5.2 Mesin templat (`BicaraWarga`, data `data/kultivator/tempat/bicara/*.json`)
+#### 42.5.2 Sumbu konteks (dipakai 42.5A)
+
+**Catatan penyatuan:** bila `kotaBicara.mesinLanjut` aktif (bawaan), format baris tunggal di bawah **tidak dibuat** sebagai
+berkas `tempat/bicara/*.json`; sumbu dan isiannya menjadi `syarat` dan slot aturan tata bahasa 42.5A.8, contoh baris menjadi
+contoh bingkai, dan target "≥ 1.400 baris" diganti target isi 42.5A.8 (≥ 900 bingkai, ≥ 2.400 terminal). Bila mesin dimatikan,
+hanya sapaan 38 (`Kalimat`) yang tersisa.
+
 
 Setiap baris: `{id, topik, syarat {peran?, kelompok?, tahap?, kelamin?, watak?, kebiasaan?, jam?, cuaca?, musim?, acara?,
 suasana?, kesan?, kenangan?, hubungan?, tempat?}, bobot, teks (kunci lang), isian[], gestur?, suara?}`. Pemilihan: semua
@@ -651,9 +824,8 @@ Isian: `{pemain}` (nama bila dikenal, selain itu sebutan menurut ranah: "Tuan Ku
 `{warga}`, `{pasangan}`, `{anak}`, `{sahabat}`, `{musuh}`, `{almarhum}`, `{kerja}`, `{tempat}`, `{distrik}`, `{acara}`,
 `{barang_mahal}`/`{barang_murah}` (dari `HargaKota`), `{arah}`, `{jarak}`, `{sekte_pelindung}`, `{tahun}`.
 
-**Isi minimum** (dibuat `tools/gen_kota_hidup_bicara.py` + `cerita_isi_*` gaya 38ST, id + en, indeks `BicaraIndeks`):
-≥ **1.400 baris** = 20 topik × 10 kelompok × ±7, ditambah 220 baris khusus peran 38/38.T, 180 baris kebiasaan, 140 baris
-kenangan, 90 baris anak. Contoh:
+**Cakupan topik** (ditulis sebagai bingkai 42.5A.8 oleh `tools/gen_kota_hidup_cakap.py`): 20 topik × 10 kelompok, ditambah bingkai
+khusus peran 38/38.T, kebiasaan, kenangan dan anak. Contoh realisasi:
 
 | Topik / syarat | Baris (id) |
 |---|---|
@@ -754,6 +926,353 @@ warga, 6 per tempat, 3 diterima per pemain per hari. Memakai mesin quest 38 (`Qu
 * **Pinjami warga** (permintaan `pinjam_uang`): mangkir menurut watak (jujur 2 %, ramah 5 %, licik 30 %, serakah 20 %);
   bunga dibayar dari Kas Kota; batas bunga total yang diterima pemain `10 × (b+1)` NB per minggu (keran 42.6.0). Utang
   diwariskan (42.4.6).
+
+---------------------------------------------------------------------------------------------------------------------
+
+### 42.5A Mesin Percakapan Lanjut (modul 42K; tanpa LLM)
+
+Permintaan susulan pengguna (2026-10-24, mengikat): interaksi NPC-NPC dan NPC-pemain harus terasa **alami, tidak kaku**,
+tetapi **tanpa LLM**: "algoritma atau program saja, tapi canggih". 42.5A adalah mesin percakapan **deterministik** sepenuhnya
+di Java: model kepribadian dan emosi, gudang pengetahuan dengan kurva lupa, pemilihan topik berbasis utilitas, mesin keadaan
+percakapan, dan tata bahasa bertipe dengan register, dialek, tik bicara dan memori anti-ulang. Tidak ada jaringan, tidak ada
+model bahasa, tidak ada teks yang dibuat di luar data yang ditulis pengarang; keanekaragaman datang dari kombinasi.
+
+#### 42.5A.0 Prinsip
+
+1. **Deterministik**: setiap keputusan memakai `SplittableRandom(Cakap.benih(benihDunia, wargaId, pemainIdx|lawanId, hari,
+   nomorGiliran, "cakap"))`. Keadaan dunia yang sama → ujaran yang sama (uji emas 42.5A.12). Tidak ada `Math.random`, tidak ada
+   waktu dinding.
+2. **Makna dulu, kata belakangan**: server memilih **apa** yang dikatakan (niat, topik, fakta, sikap, register) dan menyusun
+   **Ujaran** = pohon `Component.translatable` dengan argumen bertipe. Teks dirangkai klien dari kunci lang (Indonesia utama,
+   Inggris cermin, kunci identik), jadi satu derivasi tampil benar di kedua bahasa.
+3. **Efek terpisah dari teks**: percakapan yang tidak dilihat pemain hanya menjalankan efeknya (fakta berpindah, hubungan,
+   emosi) tanpa merangkai kalimat (murah). Teks hanya dirangkai saat ada pendengar pemain.
+4. **Data-driven**: kepribadian, emosi, predikat fakta, topik, niat, nada, tata bahasa, dialek, tik dan naskah obrolan NPC-NPC
+   ada di `data/kultivator/tempat/percakapan/**` (dimuat ulang `/reload`, divalidasi `tools/cek_cakap.py`).
+5. **Menyatukan, bukan menambah**: `Kalimat` 38, templat 42.5.2, obrolan 4 baris `NpcLife` dan rumor per tempat `KabarTempat`
+   semua lewat 42K saat `kotaBicara.mesinLanjut` aktif (42.5A.11).
+
+| Ilham | Isi yang dipakai | Sumber |
+|---|---|---|
+| Model kepribadian enam faktor | Kejujuran-Kerendahan hati, Emosionalitas, Ekstraversi, Keramahan, Ketekunan, Keterbukaan | model HEXACO (Ashton dan Lee, 2004) |
+| Ruang emosi tiga sumbu | Pleasure-Arousal-Dominance dan pemetaan temperamen dari kepribadian | Mehrabian dan Russell (1974); Mehrabian (1996) |
+| Penilaian peristiwa | emosi lahir dari penilaian peristiwa terhadap tujuan, standar dan selera | model OCC (Ortony, Clore, Collins, *The Cognitive Structure of Emotions*, 1988) |
+| Kurva lupa | ingatan meluruh eksponensial dan menguat saat diulang | Ebbinghaus (1885) |
+| Tata bahasa generatif | aturan bersimbol yang diperluas rekursif dengan slot | Tracery (Kate Compton, 2015); tata bahasa bebas konteks |
+| Giliran bicara | pembuka, pasangan berdekatan, giliran, potongan, penutup | analisis percakapan Sacks, Schegloff, Jefferson (1974) |
+| Relevansi | bicara seperlunya, relevan, jujur | prinsip kerja sama Grice (1975) |
+| AI utilitas | skor kurva per pertimbangan, pilih berbobot | Dave Mark, *Behavioral Mathematics for Game AI* (2009) |
+| Fisika sosial | aksi sosial antar-tokoh dari keadaan hubungan dan pengetahuan | *Prom Week* / Comme il Faut (McCoy dkk., 2011); *Façade* (Mateas dan Stern, 2005); opini dan rumor koloni gaya *Dwarf Fortress* / *RimWorld* |
+| Sapaan kultivator | "Rekan Daois" (道友), "Senior" (前辈), "junior ini" (晚辈), merendah diri | konvensi novel kultivasi (*A Record of a Mortal's Journey*, *Renegade Immortal*) |
+
+#### 42.5A.1 Arsitektur
+
+```
+ Peristiwa dunia/warga/pemain ──▶ Penilaian (OCC) ──▶ Emosi PAD (meluruh)        Kepribadian HEXACO (tetap)
+          │                                              │                              │
+          └──▶ Pengetahuan (fakta, sumber, kebenaran, kekuatan; kurva lupa) ◀── dengar/lihat/obrolan
+                                   │
+   konteks (jam, tempat, cuaca, acara, lawan bicara, riwayat percakapan, janji)
+                                   ▼
+                PerencanaTopik (utilitas, softmax ber-benih) ──▶ KeadaanPercakapan (FSM giliran)
+                                                                  │  niat (speech act) + sikap
+                                                                  ▼
+                        TataBahasa (bingkai + slot bertipe + fitur: kelamin, jamak, register, dialek, tik)
+                                                                  ▼
+             Ujaran (Component bersarang) + gestur (klip 38/40/42) + suara seru/VOICEVOX ──▶ layar dialog / gelembung
+   Pemain: pilih topik + niat + NADA ──▶ PenilaiNada (cek) ──▶ Akibat (kesan, emosi, harga, quest, gosip, hukum)
+```
+
+#### 42.5A.2 Kepribadian (6 sifat, `Kepribadian`)
+
+Enam byte −100..100 per warga, dibangkitkan sekali dari watak (`Tokoh.WATAK`) + kebiasaan + acak ber-benih (simpangan 20),
+lalu tetap seumur hidup (anak mewarisi rata-rata orang tua ± 25). Tabel rata-rata watak (`percakapan/kepribadian.json`):
+
+| Watak | H Jujur-rendah hati | E Emosional | X Ekstraversi | A Ramah | C Tekun | O Terbuka |
+|---|---|---|---|---|---|---|
+| ramah | +20 | +10 | +40 | +60 | 0 | +10 |
+| curiga | +10 | +30 | −20 | −30 | +20 | −30 |
+| serakah | −60 | 0 | +10 | −20 | +20 | −10 |
+| bijak | +30 | −30 | 0 | +20 | +30 | +50 |
+| penakut | +10 | +60 | −40 | +10 | 0 | −10 |
+| sombong | −50 | −10 | +40 | −30 | 0 | 0 |
+| jujur | +60 | 0 | 0 | +20 | +30 | 0 |
+| licik | −50 | 0 | +20 | −20 | 0 | +30 |
+
+Geser kebiasaan: pemabuk C −20 X +15; kutu buku O +25 X −15; penggosip sumur X +25 H −10; pemarah A −30 E +20; dermawan A +25 H
++15; pengintip O +15 H −15; pemuja kultivator O +20. Sifat dipakai di seluruh 42.5A:
+
+| Sifat | Pengaruh (angka di data) |
+|---|---|
+| X | banyak bicara (giliran 1-3 ujaran), peluang memulai obrolan NPC-NPC, memotong, bercanda, kesabaran +X/4 |
+| A | menghindari topik konflik, memaafkan (kesan negatif meluruh ×(1 + A/100)), menerima nada sopan/akrab |
+| H | jujur (H < −30: peluang berbohong/membumbui fakta 15-40 %), menolak suap (H > 40), merendah diri |
+| E | amplitudo emosi ×(1 + E/100), bicara tentang kekhawatiran, takut pada ancaman |
+| C | register lebih formal, menepati janji warga ke pemain, tidak bergosip saat bekerja |
+| O | rasa ingin tahu (bertanya tentang perjalanan/sekte pemain), suhu pemilihan topik lebih tinggi, menerima candaan |
+
+#### 42.5A.3 Emosi PAD dan penilaian peristiwa (`Emosi`, `Penilaian`)
+
+* **Temperamen dasar** dari sifat (S = −E stabilitas): `P0 = 0,21X + 0,59A + 0,19S`, `A0 = 0,15O + 0,30A − 0,57S`, `D0 = 0,25O +
+  0,17C + 0,60X − 0,32A` (dibagi 100, dijepit ±0,6), lalu P0 digeser suasana jangka panjang 42.4.11 (`+ suasana / 250`).
+* **Keadaan** `(P, A, D)` −1..1 (tiga byte + hari-tick terakhir), disimpan **jarang** (hanya warga yang mendapat dorongan dalam
+  2 hari dunia). Nilai sekarang dihitung malas: `v(t) = v0 + (v − v0) × 2^(−Δt / t½)`, `t½ = 2 jam dunia × (1 + C/200 − E/300)`.
+* **Penilaian** (`percakapan/emosi.json`): peristiwa → dorongan ΔPAD × intensitas × `(1 + E/100)`; sasaran (pemain/warga) dicatat
+  untuk emosi berarah (marah *kepada* X):
+
+| Peristiwa | ΔP | ΔA | ΔD | Catatan |
+|---|---|---|---|---|
+| dipuji / dibantu | +0,30 | +0,10 | +0,10 | syukur kepada pelaku |
+| diberi hadiah disukai / dibenci | +0,25 / −0,15 | +0,10 | 0 | — |
+| dihina | −0,40 | +0,35 | +0,20 bila D ≥ 0, −0,20 bila D < 0 | marah atau malu |
+| diancam oleh yang lebih kuat | −0,35 | +0,50 | −0,45 | takut |
+| dicurangi / dicuri | −0,45 | +0,40 | +0,10 | marah kepada pelaku |
+| dirayu (diterima / ditolak) | +0,25 / −0,10 | +0,30 | +0,10 / −0,10 | — |
+| candaan berhasil / gagal | +0,20 / −0,15 | +0,15 | 0 | — |
+| kabar duka keluarga / kenalan | −0,60 / −0,20 | −0,20 | −0,10 | — |
+| festival / pernikahan di tempat | +0,20 | +0,20 | 0 | — |
+| serangan monster dekat | −0,50 | +0,60 | −0,30 | — |
+| menang taruhan / kalah | +0,30 / −0,30 | +0,30 | ±0,10 | — |
+| mabuk (kebiasaan) | +0,15 | +0,10 | +0,25 | C efektif −30 |
+| janji pemain ditepati / diingkari | +0,25 / −0,35 | 0 / +0,25 | 0 | kesan ±, fakta `PEMAIN_INGKAR` |
+
+* **Label emosi** dari oktan PAD (Mehrabian): +P+A+D *gembira*, +P−A+D *tenang puas*, +P+A−D *terpesona/kagum*, +P−A−D *lega*,
+  −P+A+D *marah*, −P+A−D *takut/cemas*, −P−A+D *jemu/ketus*, −P−A−D *sedih*. Label memilih kode wajah (42.4.11), gestur, nada
+  balasan dan kata sifat intensitas ("agak", "sangat", "bukan main").
+
+#### 42.5A.4 Pengetahuan dan kurva lupa (`Pengetahuan`, `Fakta`, `Lupa`; menyatukan gosip 42.5.4)
+
+* **Fakta** (≤ `kotaBicara.faktaMaks` 24 per warga + catatan percakapan per pemain di 42.5A.6): `(predikat, subjek, objek, nilai,
+  kebenaran BENAR/BUMBU/PALSU, yakin 0-100, sumber SAKSI|DIRI|DENGAR(wargaId)|PAPAN|PEMAIN, hariKejadian, hariTahu, kekuatan S
+  (jam dunia), kaliDiceritakan, valensi −3..3, gosipId?)` ≈ 18 B. Gosip 42.5.4 = fakta yang membawa `gosipId` ke tabel gosip
+  bersama per tempat (≤ 64): satu penyimpanan, `GosipWarga` pindah ke 42K.
+* **Predikat** (`percakapan/predikat.json`, 44 jenis): pemain (`MENOLONG`, `MENCURI`, `MEMBELI`, `MENAWAR_KERAS`, `BERJANJI(apa,
+  batas)`, `INGKAR`, `RANAH`, `SEKTE`, `PEJABAT`, `MENANG_DUEL`, `MENGANCAM`, `MENYUAP`, `MERAYU`, `BERCANDA`, `DERMAWAN`), warga
+  (`NIKAH`, `BERTUNANGAN`, `HAMIL`, `LAHIR`, `SAKIT`, `WAFAT`, `PINDAH`, `BERUTANG`, `SUKA`, `BENCI`, `BERKELAHI`, `MABUK`, `KALAH_JUDI`,
+  `DIREKRUT`, `USAHA_LARIS`, `USAHA_BANGKRUT`), kota (`HARGA_NAIK/TURUN`, `ACARA`, `BAHAYA`, `KAFILAH_TIBA`, `KAVLING_JADI`,
+  `PELINDUNG_BARU`, `PASAR_HANTU_DI`), dunia (`TEMPAT_ADA`, `HARTA_LAHIR`, `SEKTE_PERANG` dari `KabarTempat`/`DuniaEvents`), opini
+  (`OPINI(subjek, nilai)`).
+* **Kurva lupa**: peluang ingat `R = e^(−Δt / S)`, Δt = jam dunia sejak terakhir diingat. `S` awal 24 jam (dengar), ×1,5 saksi
+  sendiri, ×2 bila |valensi| ≥ 2 (ingatan kilat), ×1,6 setiap kali diceritakan ulang (pengulangan), ×(1 + C/200). Hari Warga
+  membuang fakta R < 0,1 (kecuali yang melibatkan keluarga atau kenangan kuat 42.4.10).
+* **Keyakinan**: `yakin = kepercayaan pada sumber × (1 − 0,15 × lompatan)`; kepercayaan = `50 + hubungan/2 + H_pencerita/4` (saksi =
+  100). Fakta bertentangan: yang lebih yakin menang; warga yang menyaksikan sendiri **mengoreksi** ("Bukan lima copet, hanya satu,
+  aku lihat sendiri") → fakta koreksi menyebar juga.
+* **Kemenonjolan** (salience) untuk topik: `sal = R × (1 + |valensi|) × kebaruan × relevansi × diri`; `kebaruan = 1 / (1 +
+  umurHari / 3)`, `relevansi` = 2 bila subjek dikenal pendengar (pemain/keluarga/sahabat), 1,5 tetangga, 1 lainnya; `diri` = 2 bila
+  menyangkut pembicara.
+
+#### 42.5A.5 Pemilihan topik berbasis utilitas (`PerencanaTopik`, data `percakapan/topik.json`)
+
+Kandidat (≤ 24 per giliran) dibangun dari: fakta menonjol (8 teratas), kebutuhan warga (permintaan 42.5.6, utang, sakit), konteks
+(cuaca, jam, acara, tempat, musim), riwayat dengan lawan bicara (janji jatuh tempo, pertanyaan belum terjawab, topik terakhir),
+minat (kebiasaan, pekerjaan), rasa ingin tahu tentang lawan (O tinggi: perjalanan, sekte, ranah pemain), dan pertanyaan arah.
+
+`U = 0,35·sal + 0,20·relLawan + 0,15·cocokEmosi + 0,10·konteks + 0,10·minat + 0,10·kebutuhan − 0,30·sudahDibahas − tabu`
+
+| Pertimbangan | Rumus / kurva | Contoh |
+|---|---|---|
+| `relLawan` | hubungan atau kesan dinormalkan 0-1; rahasia (fakta valensi negatif tentang orang ketiga) butuh ≥ 0,7 | gosip pedas hanya ke sahabat |
+| `cocokEmosi` | kedekatan valensi topik dengan P sekarang (sedih → keluhan, gembira → kabar baik) | — |
+| `konteks` | 1 bila syarat jam/tempat/acara topik cocok, 0,5 sebagian | "panas sekali" siang musim panas |
+| `sudahDibahas` | `0,9^jamSejak` dengan lawan yang sama (≤ 24 jam), 0,5 bila dibahas siapa pun ke pemain ini 1 jam terakhir | — |
+| `tabu` | 1 (dibuang) untuk: duka di pesta pernikahan, gosip saat C > 40 sedang bekerja, rahasia ke orang asing, menjelekkan pejabat pemain di depannya bila takut | — |
+| pengali sifat | X: +0,1 pada topik sosial; A: −0,2 topik konflik; E: +0,2 kekhawatiran; H: −0,3 gosip; O: +0,2 pertanyaan | — |
+
+Pilih dengan softmax suhu `τ = 0,25 + O/400` (orang terbuka lebih variatif) memakai RNG ber-benih. **Rantai lanjutan**: tiap topik
+punya tautan (`"lanjut": ["kafilah", "begal"]`) yang mendapat +0,25 pada giliran berikut, sehingga obrolan mengalir: harga naik →
+kafilah tertahan → begal di jalan barat → "katanya sekte Tuan menjaga jalan itu?".
+
+#### 42.5A.6 Mesin keadaan percakapan, giliran, potongan, kilas balik (`KeadaanPercakapan`, `Giliran`, `Kilasan`)
+
+```
+PEMBUKA ─▶ BASA_BASI ─▶ TOPIK ⇄ LANJUTAN ─▶ PERMINTAAN/TAWARAN ─▶ REAKSI ─▶ (TOPIK | KILAS_BALIK | PENUTUP)
+   │            ▲            │  ▲                                              │
+   └─ KILAS_BALIK (janji jatuh tempo, utang, kejadian terakhir) ──────────────┘
+ setiap keadaan: POTONG (bahaya, pelanggan, anak menangis, lawan ber-X tinggi A rendah) → kembali atau PENUTUP
+```
+
+* **Kesabaran** 0-100 per sesi: awal `40 + X/4 + kesan/4 − sibuk(jadwal kerja/acara) × 30`, −8 per giliran, −20 topik yang tidak
+  disukai, +10 topik minat/candaan berhasil; ≤ 0 → PENUTUP sopan ("Maaf, adonanku menunggu").
+* **Giliran**: NPC 1-3 ujaran per giliran (X), **sambung rasa** pendengar (`hmm`, `oh ya?`, angguk, 30 % per ujaran panjang) di
+  NPC-NPC; pemain memilih 3-6 opsi (42.5A.7).
+* **Potongan**: peristiwa (bahaya 38.N.4, pelanggan toko datang, ronda memukul gong, pasangan memanggil) memotong dengan ujaran
+  `POTONG.<sebab>` lalu kembali ("Tadi sampai mana? Oh ya, soal kafilah…") bila kesabaran > 30.
+* **Riwayat** per (warga, pemain): 6 percakapan terakhir `(hari, topik[3], niat terakhir, nada pemain, hasil)` + **janji** (≤ 3:
+  siapa, apa (predikat), batas hari, status). **Kilas balik** diprioritaskan di PEMBUKA bila: janji jatuh tempo/lewat ("Kau
+  berjanji minggu lalu membawakan obat untuk ibuku…"), utang, peristiwa kuat sejak terakhir bertemu ("Sejak kau menangkap copet
+  itu, pasar jadi tenang"), atau lama tak jumpa ("Lama tidak kelihatan, terakhir sebelum musim dingin"). Ungkapan waktu dari slot
+  `waktu_lalu` (kemarin, kemarin lusa, tiga hari lalu, minggu lalu, bulan lalu, musim lalu, tahun lalu dalam Tahun Fana).
+* Janji pemain lahir dari pilihan `[Aku akan …]` di REAKSI/PERMINTAAN; menepati/ingkar mengubah emosi, kesan dan fakta yang
+  menyebar.
+
+#### 42.5A.7 Pilihan pemain dan nada (`Nada`, `PenilaiNada`, data `percakapan/nada.json`)
+
+Setiap opsi = **niat** (tanya topik, beri kabar, minta, tawar, janji, tolak, puji, hina, pamit) × **nada**. Layar dialog
+menampilkan opsi niat; nada dipilih dengan tablet kecil di kanan (ikon) atau tombol 1-6 (bawaan Sopan). Peluang berhasil
+`p = logistik(b0 + Σ wᵢ·xᵢ)`; angka tidak ditampilkan (bawaan), hanya isyarat raut ("Dia tampak tidak sabar"); `tampilPeluang`
+menampilkannya.
+
+| Nada | Syarat | Faktor (xᵢ) | Berhasil | Gagal |
+|---|---|---|---|---|
+| **Sopan** | — | A, C, kesan, Nama Baik | kesan +2, info terbuka, harga −0 | (jarang) kesabaran −5 |
+| **Akrab** | kesan ≥ 20 | kesan, X, A, umur sebaya | kesan +4, rahasia terbuka, harga −3 % | kesan −3 "sok akrab" |
+| **Merayu** | lawan dewasa, tidak menikah atau H rendah | O, X, P sekarang, kesan, ranah pemain | kesan +6, emosi +, harga −5 %, fakta `PEMAIN_MERAYU` (gosip) | kesan −8, pasangan/keluarga marah, gosip |
+| **Mengancam** | — | selisih ranah, Infami, E lawan, D lawan (−), saksi | info/harga −20 %/barang diserahkan | kesan −20, emosi takut/marah; di ibu kota disaksikan = kejahatan (`Hukum.kejahatan` 3 poin); Takut 38.R + |
+| **Menyuap** | NB di kantong (2-50 × (b+1)) | H lawan (−), serakah, kemiskinan rumah tangga | info rahasia, aturan longgar (penjaga, saksi perkara), harga | H > 40: ditolak + gosip "mencoba menyuap", pejabat: Infami |
+| **Bercanda** | — | X, O, P sekarang, emosi tidak sedih/takut, kesan | kesan +3, emosi +, kesabaran +10, obrolan berlanjut | kesan −2, "tidak lucu"; saat duka: −10 |
+
+* Pengulangan trik yang sama ke warga yang sama dalam 1 hari: faktor ×0,7 per ulangan.
+* Akibat mengalir ke sistem lain: kesan/ingatan (42.4.10), emosi, harga pribadi pedagang (`HargaKota` × faktor pribadi ±5-20 %),
+  permintaan dan quest (opsi terbuka bila berhasil), gosip (fakta tentang pemain menyebar menurut predikat), `Hukum` (ancaman di
+  ibu kota), Infami (`TemaApi.tambahInfami`), perkara 42.6.6 (suap saksi).
+
+#### 42.5A.8 Tata bahasa bertipe (`TataBahasa`, `Realisasi`, `Dialek`, `Tik`, `AntiUlang`)
+
+**Format aturan** (bahasa-netral, `data/kultivator/tempat/percakapan/tata/<kelompok>.json`):
+
+```json
+{
+  "aturan": "kabar.harga_naik",
+  "niat": "BERI_KABAR",
+  "topik": "harga",
+  "syarat": {"fakta": "HARGA_NAIK", "label_emosi": ["jemu", "sedih", "cemas", "netral"]},
+  "bingkai": [
+    {"kunci": "harga_naik.0", "slot": ["$barang", "$waktu_lalu", "$keluh"], "bobot": 3},
+    {"kunci": "harga_naik.1", "slot": ["$barang", "$sebab"], "bobot": 2, "register": ["biasa", "kasar"]},
+    {"kunci": "harga_naik.2", "slot": ["$sebutan", "$barang"], "bobot": 1, "register": ["sopan", "kuno"]}
+  ],
+  "slot": {
+    "$barang": {"tipe": "barang", "dari": "fakta.objek", "fitur": ["jamak"]},
+    "$waktu_lalu": {"tipe": "waktu_lalu", "dari": "fakta.hariKejadian"},
+    "$sebab": {"aturan": "sebab.harga", "opsional": 0.5},
+    "$keluh": {"aturan": "seru.keluh", "opsional": 0.6},
+    "$sebutan": {"tipe": "sebutan_pendengar"}
+  },
+  "lanjut": ["kafilah", "begal"], "gestur": "geleng", "seru": "keluh"
+}
+```
+
+Terminal = kunci lang `kultivator.cakap.<kunci>[.<fitur>…]` di fragmen `kota_hidup_cakap.{id_id,en_us}.json` (kunci identik):
+`"kultivator.cakap.harga_naik.0": "%1$s naik lagi sejak %2$s. %3$s"` / `"%1$s went up again %2$s. %3$s"`. Urutan kata ditangani
+string tiap bahasa (argumen posisi), argumen sendiri adalah `Component` hasil perluasan rekursif (kedalaman ≤ 4).
+
+* **Tipe slot** (`TipeSlot`, Java): `sebutan_pendengar` (dari ranah, kelamin, kesan, register: Tuan/Nona/Kakak/Adik/Senior/Rekan
+  Daois/Tuan Abadi/Leluhur), `nama_warga` (dengan fitur kelamin), `ganti` (dia/ia, he/she), `barang` (nama item + jamak),
+  `tempat`, `arah`, `jarak`, `angka` (kata bilangan ≤ 20, lalu angka), `harga` (format NB 38.U), `waktu_lalu`, `waktu_depan`,
+  `cuaca`, `musim`, `kata_emosi` (intensitas dari PAD), `seru` (kata seru), `tik`, `pekerjaan`, `hubungan` (istriku/sahabatku…).
+* **Fitur dan kesesuaian**: `kelamin` (l/p), `jamak` (s/j), `register` (sopan/biasa/kasar/kuno), `dialek`; pencarian kunci berurutan
+  `kunci.fitur1.fitur2` → `kunci.fitur1` → `kunci` (bahasa yang tidak membedakan cukup mengisi kunci dasar; generator mengisi
+  cermin otomatis). Contoh Inggris: `kultivator.cakap.ganti.l` "he", `.p` "she"; Indonesia keduanya "dia".
+* **Register**: dari kelompok peran, C, hubungan dan selisih ranah: *sopan* (PEDAGANG ke pembeli, warga ke pejabat), *biasa*
+  (kenalan), *kasar* (MUSUH, pemabuk, Kota Iblis, A < −40), *kuno-kultivator* (KULTIVATOR/RAHIB/tetua sekte, atau warga ke pemain ≥ 3
+  ranah di atas: "Junior ini tidak berani…", "Senior, hamba hanya penjual teh").
+* **Dialek** (`percakapan/dialek.json`, leksikon pengganti `kultivator.cakap.lex.<kata>.<dialek>`): `ibukota` (baku halus),
+  `pelabuhan` (logat pelaut: "Bung", "ombak"), `oasis` ("Saudara", sumpah demi mata air), `air` (lembut: "Kakak", akhiran
+  "ya…"), `gunung` (biara: "Dermawan" untuk pengunjung), `iblis` (kasar, ancaman sopan), `kampung` (lugas, "Nak"). Satu kata kunci
+  leksikon per 40-80 kata yang sering dipakai.
+* **Tik bicara** (`percakapan/tik.json`, 36 tik): satu atau dua per warga dari benih + sifat: "hehe", "astaga", "aduh biyung",
+  "kata orang tua dulu", "untung-rugi" (pedagang), "uhuk" (tetua), "hik" (mabuk, malam), gagap suku pertama (E > 60: "S-saya…"),
+  "begitulah dunia", "demi langit". Disisipkan dengan peluang `kotaBicara.tikPeluang` 0,25 (× 1,5 saat A tinggi emosi), tidak dua
+  kali berturut.
+* **Anti-ulang**: penalti bobot bingkai/terminal `× 0,1` bila dipakai pembicara yang sama ke pendengar yang sama ≤ 24 jam dunia,
+  `× 0,5` bila pendengar mendengarnya dari siapa pun ≤ 1 jam; memori per pemain 256 kunci terakhir (cincin) + per warga 64.
+  Sasaran keragaman: niat umum (sapa, kabar, keluhan) ≥ 10⁴ realisasi berbeda; `uji kota_hidup cakap kombinasi` mencetaknya.
+* **Isi minimum** (pengganti target 42.5.2): 62 niat, ≥ 900 bingkai, ≥ 2.400 terminal leksikon (termasuk 7 dialek × 60 kata), 36
+  tik; ditulis sebagai sumber pengarang `tools/kota_cakap_sumber/*.txt` (satu baris per varian, tag fitur) dan dikompilasi
+  `tools/gen_kota_hidup_cakap.py` menjadi JSON tata + fragmen lang id/en.
+* **Jepang**: ujaran bersuara hanya untuk niat yang dipetakan ke baris VOICEVOX 42.12.7 atau ke **kata seru** pendek (diputar di
+  awal gelembung, teks tetap Indonesia/Inggris):
+
+| Kunci | Suara | Jepang | Arti | Emosi |
+|---|---|---|---|---|
+| `kota42.seru.ya_l` / `_p` | m2 / f1 | はい。 | Ya. | normal |
+| `kota42.seru.eh_l` / `_p` | m3 / f2 | ええっ？ | Hah? | fear |
+| `kota42.seru.hmm_l` / `_p` | m2 / f2 | ふむ… / うーん… | Hmm... | calm |
+| `kota42.seru.oh_l` / `_p` | m1 / f1 | へえ！ | Oh ya! | joy |
+| `kota42.seru.tawa_l` / `_p` | m1 / f1 | あははっ！ | Hahaha! | joy |
+| `kota42.seru.cih` | m3 | ちっ。 | Cih. | angry |
+| `kota42.seru.aduh_l` / `_p` | m2 / f2 | やれやれ… | Aduh... | sad |
+| `kota42.seru.terima_kasih_l` / `_p` | m2 / f1 | どうも！ | Terima kasih! | joy |
+| `kota42.seru.maaf_l` / `_p` | m3 / f3 | すみません… | Maaf... | sad |
+| `kota42.seru.wah_anak` | f1 | わあっ！ | Wah! | joy |
+| `kota42.seru.tetua_hmm` | elder | ほっほっ。 | Ho ho. | calm |
+| `kota42.seru.tetua_marah` | elder | 馬鹿者！ | Dasar bodoh! | angry |
+| `kota42.seru.mabuk` | m1 | ひっく。 | Hik. | normal |
+| `kota42.seru.bisik_p` | f2 | しーっ。 | Sst. | calm |
+| `kota42.seru.takut_p` | f3 | ひっ…！ | Hii...! | fear |
+| `kota42.seru.setuju_l` | m1 | そうだそうだ！ | Betul, betul! | joy |
+
+(24 klip; kunci berakhiran `_l/_p` dipilih menurut kelamin pembicara.)
+
+#### 42.5A.9 Obrolan NPC-NPC (`ObrolanWarga`, data `percakapan/obrolan/*.json`)
+
+Dipicu oleh siklus obrolan 38 (`tempat.hidup.obrolanDetik` 40; pasangan di titik `obrol`, berpapasan, kerja satu lot, sumur, kedai):
+peluang mulai `0,3 + X_A/300 + hubungan/400`, ≤ 1 per pasangan per jam dunia.
+
+| Jenis | Syarat (hubungan, pengetahuan, emosi) | Alur giliran (naskah keadaan) | Efek nyata |
+|---|---|---|---|
+| `GOSIP` | ≥ kenal, salah satu punya fakta menonjol yang tidak diketahui lawan | sapa → umpan ("Sudah dengar?") → kabar (bisa dibumbui H) → reaksi (kaget/ragu/koreksi) → komentar | fakta pindah dengan keyakinan (42.5A.4), kesan pada subjek ±3 |
+| `DEBAT` | `MUSUH`/`SAINGAN` atau `OPINI` berlawanan (harga, pajak, sekte pelindung) | tuduhan → bantahan → eskalasi (A rendah) → (potong pihak ketiga / pergi / perkelahian 42.7.4 bila A < −40 dan D tinggi) | hubungan −2..−8, emosi marah, peluang perkelahian |
+| `MERAYU` | `KEKASIH` atau ketertarikan (kecocokan + P tinggi), lajang | puji → malu-malu → canda → janji bertemu | hubungan +3..+6, KEKASIH lebih cepat (42.4.6) |
+| `DAGANG` | pedagang dan pembeli | tawar 1-3 putaran (pelit: 3) → sepakat/batal | stok kota/penjualan antar-NPC 38.N.4 tercatat, kabar harga |
+| `AJAR` | `GURU_MURID`, tetua–anak, guru sekolah | nasihat/peragaan → pertanyaan → pujian/teguran | ahli murid +, fakta (lore) pindah ke anak |
+| `CURHAT` | `SAHABAT`/keluarga, P < −0,3 | keluhan → hiburan → (permintaan tolong muncul bila masalah nyata) | P naik +0,2, permintaan 42.5.6 bisa lahir |
+| `CANDA` | X keduanya > 20, P ≥ 0 | olok ringan → tawa | hubungan +2, P +0,1 |
+| `SAPA` | lainnya | salam + satu basa-basi | — |
+
+* **Terlihat**: bila pemain ≤ `obrolanTampilJarak` 12 blok, setiap ujaran dirangkai dan dikirim sebagai gelembung (payload
+  `kota_ujaran`), dengan gestur niat (`bicara_tangan`, `bisik`, `berdebat`, `tertawa`, `tunjuk`, `geleng`, `angguk`), tatapan saling
+  (`HidupApi.tatap`), gumam suara 73, jeda giliran 40-80 tick menurut panjang. ≤ `obrolanMaksTampil` 4 obrolan tampil per tempat.
+* **Menguping**: pemain yang mendengar sampai akhir mendapat fakta itu sebagai **catatan** (Buku Kota tab Kabar; jurnal 38) — mis.
+  lokasi Pasar Hantu malam ini, siapa berutang pada rentenir, bahwa toko saingan menimbun beras.
+* **Tidak terlihat**: hanya efek (tanpa realisasi teks), ≤ 0,05 ms per obrolan.
+* Pemain bisa **menyela** obrolan NPC-NPC (klik salah satu): keduanya menoleh, sesi pemain dimulai dengan topik obrolan itu.
+
+#### 42.5A.10 Contoh (keluaran emas, `golden/contoh_bibi_wang.json`)
+
+```
+Keadaan: Bibi Wang (penakut: H+10 E+60 X−40… + gosip_sumur X+25), P −0,1 A +0,2 D −0,3 (cemas), dialek ibukota,
+fakta: COPET_TERTANGKAP(pemain, pasar, h−2, BENAR, saksi), BERJANJI(pemain, "obat untuk Nenek Wang", batas h−1, belum).
+[PEMBUKA→KILAS_BALIK] "Oh, Tuan Han... kemarin Tuan bilang mau bawakan obat untuk ibu mertuaku, ya? Aduh, bukan menagih,
+                       hanya... batuknya makin parah."                        (gestur: tangan di dada; seru: aduh_p)
+  Pemain [Sopan] Minta maaf, besok kubawa.  →  janji diperpanjang 1 hari, kesan −2, P −0,05
+[LANJUTAN] "I-iya, tidak apa. Oh ya! Tuan yang menangkap copet di pasar kemarin lusa, kan? Satu pasar membicarakannya."
+  Pemain [Bercanda] "Copetnya lebih lambat dari bebek Bibi."  →  p = 0,62 (X−15, P−0,1, kesan 34) berhasil: tawa kecil, kesan +3
+[TOPIK] (utilitas: harga 0,41, kafilah 0,33, Zhang-Li 0,29 → softmax τ 0,25) "Beras naik lagi sejak minggu lalu. Kata Bibi
+         Zhang, kafilah dari selatan tertahan begal."
+[PENUTUP] kesabaran 6 → "Aduh, cucianku! Hati-hati di jalan, Tuan."
+```
+
+Uji emas menyimpan **kunci dan argumen** (bahasa-netral) plus realisasi id/en yang diharapkan; perubahan data yang menggeser
+keluaran harus memperbarui berkas emas dengan sengaja (`uji kota_hidup cakap golden tulis`).
+
+#### 42.5A.11 Hubungan dengan sistem dialog yang ada
+
+| Sistem lama | Setelah 42K (`mesinLanjut` true) | Bila `mesinLanjut` false |
+|---|---|---|
+| `Kalimat.sapa` 38 (grup × situasi) | `Kalimat.sapa` meneruskan ke `Cakap.sapa(player, npc)`; kunci `kultivator.cerita.kalimat.*` dipakai sebagai leksikon cadangan niat `SAPA` | perilaku 38 |
+| templat 42.5.2 (`tempat/bicara/*.json`) | **tidak dibuat**; sumbunya (peran, jam, cuaca, acara, suasana, kesan, kenangan) menjadi `syarat` aturan tata | templat 42.5.2 minimal (sapa saja) |
+| obrolan 4 baris `NpcLife`/38.N.4 butir 8 (`DATA_LINE`) | diganti `ObrolanWarga` (gelembung `kota_ujaran`); `ObrolanSuara` 73 tetap memutar gumam | 4 baris lama |
+| rumor per tempat `KabarTempat` | `pemicu` juga melahirkan fakta di warga saksi/penyebar; kedai teh membaca fakta paling yakin di tempat itu | 38 |
+| dialog data 38 (tokoh, quest) | tetap ditulis tangan dan didahulukan; simpul boleh memuat `"cakap": "<niat>"` untuk sisipan alami (sapa, reaksi terima kasih, kilas balik janji) | teks tetap |
+| gosip 42.5.4 | penyimpanan = fakta 42K; aturan sebar 42.5.4 tetap (angka sama) | — |
+
+#### 42.5A.12 Data, kinerja, determinisme dan uji
+
+* **Data** (SavedData `kultivator:kota_cakap`, 42K): per warga `K` (6 byte sifat), `E` (PAD 3 byte + tick, jarang), `F` (fakta ≤ 24 ×
+  18 B), `R` riwayat per pemain (≤ 6 × 12 B + janji ≤ 3 × 10 B, maks 6 pemain), `U` anti-ulang (64 short); per pemain cincin 256
+  short. ±0,6 KB per warga aktif → 3.000 warga ≈ 1,8 MB mentah / ±400 KB gzip. Data tata/leksikon dimuat dari datapack (≈ 600 KB
+  JSON + lang).
+* **Kinerja**: giliran dialog pemain < 0,2 ms (≤ 24 kandidat, perluasan ≤ 4 tingkat); obrolan NPC-NPC tanpa teks < 0,05 ms,
+  dengan teks < 0,3 ms; ≤ 4 obrolan tampil per tempat per 40 tick; Hari Warga menambah peluruhan fakta O(fakta).
+* **Determinisme**: benih 42.5A.0; urutan iterasi selalu terurut (id), tidak ada `HashMap` yang urutannya memengaruhi pilihan
+  (`LinkedHashMap`/array terurut).
+* **Validasi data** `tools/cek_cakap.py`: semua kunci ada di id dan en, jumlah `%n$s` sama dengan slot, tidak ada aturan yatim/tak
+  terjangkau, kedalaman ≤ 4, laporan kombinasi per niat; dijalankan generator dan agen finish.
+* **Uji emas** (`data/kultivator/tempat/percakapan/golden/*.json`, ≥ 40 berkas: tiap niat, register, dialek, nada, 8 jenis obrolan
+  NPC-NPC, kilas balik, potongan): `uji kota_hidup cakap golden` membangun keadaan dari berkas, menjalankan mesin dengan benih
+  tetap dan membandingkan kunci/argumen + teks id/en. Dijalankan di game oleh penguji (agen tidak menjalankan tes JUnit/Gradle).
 
 ---------------------------------------------------------------------------------------------------------------------
 
@@ -1262,6 +1781,7 @@ spanduk melintang di jalan utama (titik `spanduk_a/_b` berpasangan), dan kertas 
   ditimpa (mandor menegur lewat dialog, kavling "terhalang" sampai pemain membersihkannya). Laju sama dengan perbaikan (1 blok
   per tukang per 5 s; regu 3 ±36 blok/menit), tunduk `perbaikan.blokPerTick` dan topi WorldBreaker. Rumah kecil ±600 blok ≈ 1-3
   hari dunia termasuk menunggu bahan. Perancah gambar klien (`tools/gen_tempat_perancah.py` yang ada) di tahap 2-4.
+* **Kecocokan**: sebelum tiap tahap pemeriksaan struktur asing, medan dan klaim 42.12.1A; gagal = kavling `TIDAK_LAYAK` permanen.
 * **Selesai**: `Cetak.terima` untuk kotak kavling (cetak biru menerima bangunan baru, jadi 38.R merawatnya), titik templat menjadi
   titik hidup tempat (`TempatHuni.addSumberTitik`), rumah tangga pindah masuk (pengantin baru, rumah sesak, pendatang) atau usaha
   baru dibuka (pemilik warga, investor pemain). **Upacara peresmian**: barongsai (Rombongan Bulan Sabit bila di kota atau
@@ -1637,6 +2157,30 @@ kota_tumbuh 2,4 MB baru. Harness: `scratchpad/final/wg/run_38.sh` (kota besar, k
 PlanCheckTema; generator menulis pratinjau isometrik (`tools/tempat_iso.py`) untuk tiap lot baru dan tiap tahap rencana; 42W
 membuka pratinjau dengan Read dan mencatatnya di `docs/progres/kota42-42W.md`.
 
+#### 42.12.1A Kecocokan dengan mod dunia pengguna (tidak ada tabrakan)
+
+Paket pengguna: **Terralith, Tectonic, Structory, Structory Towers, Dungeons and Taverns, Lithostitched, Amplified Nether,
+Nullscape, Yeetus Experimentus**. Agen lain sedang memperbaiki tabrakan worldgen yang sudah ada; 42W mulai **setelah** perbaikan
+itu di-commit dan memakai hasilnya (tidak menyunting `mixin/ChunkGeneratorTempatMixin`, `TempatKeepOut` atau tag
+`#kultivator:boleh_di_tempat`).
+
+| Risiko | Aturan 42 |
+|---|---|
+| Struktur mod lain lahir di dalam kota/lot 42 | 42 **tidak menambah jenis struktur, structure set atau placement**. Semua lot baru ibu kota dan kota tema ada di dalam rencana `kultivator:tata_letak` yang sudah dilindungi zona keep-out (`TempatKeepOut.tolak`: start `surface_structures` di kotak zona ditolak, kecuali `#kultivator:boleh_di_tempat`). Elemen pool baru kota 34/kampung (kavling, kedai arak, gudang, makam ujung tembok) adalah potongan jigsaw struktur yang sama, jadi mewarisi set, jarak dan `exclusion_zone`-nya. 42 tidak menambah apa pun ke `boleh_di_tempat`. |
+| Kavling tumbuh di atas struktur mod lain atau medannya | Sebelum **setiap tahap** (`PekerjaanTumbuh.periksa`): (1) semua posisi target berada di dalam potongan kavling milik kita (`level.structureManager().getStructureWithPieceAt(pos, strukturKita)` di sudut dan pusat kotak, verifikasi nama 26.3); (2) tidak ada start/potongan struktur **bernamespace lain** yang memotong kotak kavling + 2 blok (`structureManager().getAllStructuresAt(pos)` di 9 titik sampel + `StructureStart.getBoundingBox().intersects`, verifikasi); (3) tidak diklaim pemain (`KlaimPemain`); (4) `expected` = rekaman Cetak, jadi blok asing apa pun tidak pernah ditimpa. Gagal (1)/(2) → kavling **dimatikan permanen** (`TIDAK_LAYAK`, tercatat di `uji kota_hidup tumbuh kavling`), tidak pernah dibangun "di sebelahnya". Pemeriksaan sama berlaku bila suatu saat jalur `BuildPlacer` yang dipakai. |
+| Medan kasar Tectonic | Generator menandai kavling hanya pada lot yang putusan medannya (`PutusanTanah`/`PutusanTema`, sidecar `lantai`) beda tinggi ≤ 2 dan tanpa air; lot curam mendapat varian taman (bukan kavling). Saat tumbuh: tanah rekaman Cetak di kotak kavling harus dalam ±2 blok dari `lantai` dan tanpa fluida, selain itu `TIDAK_LAYAK`. Tahap 1 hanya menaruh blok di jejak templat; tidak ada perataan tanah di luar jejak. |
+| Bioma Terralith | 42 hanya membaca tag bioma mod yang sudah diperluas paket `kultivator:kompat_bioma` (`tools/gen_kompat_bioma.py`); salju musim dingin dibaca dari suhu bioma (`coldEnoughToSnow`, berlaku untuk bioma Terralith); hewan dan rombongan muncul dari titik, tidak dari bioma. Bila 42W menambah gaya kavling per bioma, tagnya ikut didaftarkan ke `gen_kompat_bioma.py` (baris aditif). |
+| Bangunan mod lain dipakai sebagai layanan | Tidak pernah: rumah dijual, toko, gudang, kantor rekrutmen, cabang, distrik malam dan kandang hewan hanya di bangunan/titik **milik kita** di dalam kotak tempat (`TempatZones.inside`). Kedai Dungeons and Taverns bukan `kedai_arak` 42. Klaim rumah ditolak bila kotaknya memotong struktur bernamespace lain. |
+| Entitas 42 masuk struktur mod lain | Hewan, lapak, tenda, panggung hanya muncul di titik di dalam kotak tempat; pelancong/rombongan berjalan di rute `RencanaJalan` dan tidak berhenti/menginap di struktur asing. |
+| Dimensi lain (Amplified Nether, Nullscape) | 42 hanya overworld (`level.dimension() == Level.OVERWORLD` di semua pintu masuk); tidak ada konten Nether/End, tidak ada perubahan medan dimensi. |
+| Mixin worldgen (Lithostitched) | 42 menambah **nol** mixin worldgen; satu-satunya kait tetap `ChunkGeneratorTempatMixin` (pemilik 38W/agen perbaikan). Generator NBT memakai blok vanilla saja. |
+| Fitur eksperimental (Yeetus Experimentus) | 42 tidak bergantung pada fitur/flag eksperimental; semua blok, item dan ikon advancement diverifikasi berada di registri 26.3 non-eksperimental (42A). |
+| Tinggi dan atap kota | Titik pijak selalu dari jangkar/lantai lot (38.0 butir 12), tidak dari heightmap, jadi menara Structory Towers di luar zona tidak memengaruhi tujuan warga. |
+
+Uji: dunia baru dengan paket mod pengguna, `uji kota_hidup kompat periksa [radius]` di 3 ibu kota, 3 kota tema, 5 kota 34, 10 kampung
+→ daftar struktur asing yang memotong kotak lot/kavling/makam/kantor (harus kosong) dan kavling `TIDAK_LAYAK` beserta sebabnya;
+harness `run_38.sh`/`run_all.sh` bersih.
+
 #### 42.12.2 Entitas baru (semua `noSave`, didaftarkan selalu, muncul hanya saat dipakai; model/tekstur 42V)
 
 | Entitas | Ukuran (blok) | Pemilik server | Perilaku |
@@ -1747,7 +2291,7 @@ diubah). Kunci rupa baru di `resep.json`: `*.pengantin`, `*.berkabung`, `*.dingi
 **Tekstur glif** 16 × 16 (digambar tangan sebagai matriks piksel di generator, tanpa font): 福 寿 春 囍 奠 酒 茶 药 布 铁 饼 书 符 当 客 栈
 丰 戒 面; panji 32 × 64 per keadaan; kuplet 8 × 48.
 
-#### 42.12.5 Animasi (klip 350-449 milik 42, cadangan 450-469; 42V `client/dunia/kota42/gerak/KotaPoses` lewat `GerakKatalog.daftar`)
+#### 42.12.5 Animasi (klip 350-449 milik 42, 450-459 milik 42S (42.4A.7), cadangan 460-469; 42V `client/dunia/kota42/gerak/KotaPoses` lewat `GerakKatalog.daftar`)
 
 **Suntingan batas** (42V, aditif, satu baris tiap berkas): `GerakId` konstanta `KOTA_HIDUP_FIRST = 350`, `KOTA_HIDUP_LAST = 469`
 (menggeser `CADANGAN_FIRST` ke 470); `GerakKatalog.UKURAN` → `GerakId.KOTA_HIDUP_LAST + 1` dan pemeriksaan batas atas `daftar` →
@@ -1964,7 +2508,7 @@ Ejaan kana dipakai bila kanji berisiko salah baca; kata yang masih salah baca di
 | `kota42.xiao_bang` | m3 | 師匠、見ててください。僕が町の夜を守ります！ | Guru, lihatlah. Aku yang akan menjaga malam kota! | joy |
 | `kota42.xiao_yu` | f1 | 葉っぱがね、私の手の上で浮かぶの！ | Daunnya melayang di atas tanganku! | joy |
 
-78 baris; caption `en` ditulis 42V (contoh `kota42.ronda_geng1`: "Dry skies, dry things, mind the fire!"). Sebelum klip dibuat:
+78 baris + 24 kata seru 42.5A.8 = **102 klip**; caption `en` ditulis 42V (contoh `kota42.ronda_geng1`: "Dry skies, dry things, mind the fire!"). Sebelum klip dibuat:
 cadangan `kotabesar.*`, `tempat.*` dan gumam 73 (`ObrolanSuara`) yang sudah ada, teks tetap di gelembung.
 
 ---------------------------------------------------------------------------------------------------------------------
@@ -1980,6 +2524,8 @@ cadangan `kotabesar.*`, `tempat.*` dan gumam 73 (`ObrolanSuara`) yang sudah ada,
 | `kultivator:kota_acara` (`KotaAcaraData`) | 42D | kalender per situs (upacara terjadwal: jenis, warga, jam), rombongan (6: posisi rute, kota berikut), jeda peristiwa, hari raya yang sudah jalan | < 30 KB |
 | `kultivator:kota_sekte` (`KotaSekteData`) | 42E | kantor (situs → pemilik, sewa, penjaga, pelamar ≤ 12), pakta (situs → pemilik, mulai, gagal, upeti, serbuan berikut), cabang (situs → pemilik, rumah, jenis, sejak), tugas murid (soul → situs, tugas, sampai) | < 20 KB |
 | `kultivator:kota_tumbuh` (`KotaTumbuhData`) | 42F | kavling (situs → id, pos, hadap, gaya, jenis, tahap, bahan terpakai, penyumbang, terhalang), stok bahan (5), kemakmuran, proyek bangun kembali (gugus, pengungsi, penyumbang, tugu) | < 40 KB |
+| `kultivator:kota_cakap` (`CakapData`) | 42K | per warga sifat (6 B), PAD jarang, fakta ≤ 24, riwayat percakapan + janji per pemain, anti-ulang; per pemain cincin 256 kunci; tabel gosip per tempat (42.5A.12) | ±0,6 KB per warga aktif (≈ 400 KB gzip untuk 3.000) |
+| `kultivator:kota_ragam` (`RagamData`) | 42S | per tempat: peta zona (cache, dibangun ulang saat aktif), riwayat kegiatan per warga 3 hari (≤ 24 short/hari), metrik harian 7 hari; reservasi titik hanya di memori | ±150 B per warga |
 
 **Kunci compound Warga** (satu atau dua huruf): `i` id, `s` situs-slot, `k` kelamin, `l` lahir (hari dunia × 10 untuk pecahan
 Tahun Fana), `m` marga, `n` nama, `g` generasi, `a`/`b` ayah/ibu, `p` pasangan, `c` anak (int[]), `r` rumah tangga, `h` rumah
@@ -1998,6 +2544,8 @@ kesehatan, `u` suasana dasar, `t` status (`HIDUP/JALAN/SEKTE/MATI`), `T` hari st
 | `kultivator:kota_kavling` | S2C | kotak perancah (≤ 16 × 6 short), tahap, rencana | ≤ 96 blok, berubah | ≤ 256 B |
 | `kultivator:kota_kejar` | S2C | id copet, sisa tick | selama kejar, 4 Hz | 12 B |
 | `kultivator:kota_irama` | C2S/S2C | ketukan HUD irama | selama, ≤ 10/s (`TempatLayar.AKSI_PER_DETIK`) | 16 B |
+| `kultivator:kota_ujaran` | S2C | id entitas pembicara, `Component` ujaran (pohon translatable), id gestur, durasi, kunci suara seru/VOICEVOX atau kosong | tiap ujaran NPC-NPC/selingan yang didengar pemain ≤ 12 blok | ≤ 512 B, ≤ 8/s per pemain |
+| `kultivator:kota_peta_panas` | S2C (debug, op) | sel 16 × 16: hunian/target (byte) untuk `uji … sebaran peta` | 1 Hz selama debug | ≤ 4 KB |
 | layar | `TempatLayar` 38 | lembar per layar | buka/segarkan | ≤ 32 KB |
 
 Usia, suasana dan rupa tubuh memakai data tersinkron Sosok yang sudah ada (`setUsia`, `setSuasana`, `setRupa`) — tidak ada
@@ -2012,6 +2560,8 @@ payload per warga. Hewan memakai data entitas biasa.
 * Entitas: `DuniaBudget.setCap("kota42", 96)` (hewan ≤ 48, mekanisme ≤ 48); per tempat hewan 24, mekanisme 12; tubuh tambahan
   42 (pencopet, bayi *zhuazhou*, penari barongsai, anggota rombongan ≤ 5, pemusik ≤ 4) memakai `HidupApi.tubuhStaf` hanya saat
   acaranya; peserta upacara adalah tubuh penduduk biasa (topi 38). MSPT guard 38 tetap berlaku untuk hewan.
+* Mesin percakapan 42K dan sebaran 42S: angka di 42.5A.12 dan 42.4A (Penyeimbang O(titik sejenis) per pergantian kegiatan, pemilih
+  tubuh O(warga terdekat) per siklus, rencana harian sekali per warga per hari).
 * Klien: anggaran 42.12.6; animasi hewan penuh ≤ 32 blok, 32-64 tiap 2 bingkai, > 64 pose dasar; wayang dan boid berhenti di luar
   frustum; tidak menggambar saat `ShaderCompat.shadowPass()`.
 
@@ -2031,17 +2581,29 @@ terdaftar walau dimatikan)
 | | `peluangLahir` | 0.25 | 0-0.6 | per tahun pasangan |
 | | `peluangLamaran` | 0.40 | 0-1 | — |
 | | `migrasi` | true | – | pindah antar-kota |
-| | `pasanganSesamaJenis` | true | – | K9 (anak lewat anak angkat) |
 | | `rasioPerempuan` | 0.5 | 0.2-0.8 | — |
 | | `peluangAkar` | 0.15 | 0.02-0.5 | total peluang berakar saat lahir (sebaran 42.4.2 diskalakan) |
 | | `arsipMaks` | 400 | 100-2000 | per tempat |
 | | `kejarHari` | 60 | 10-365 | — |
 | | `ingatanMaks` / `hubunganMaks` / `gosipMaks` | 6 / 8 / 64 | 2-16 / 4-16 / 16-256 | — |
 | | `tokohAbadi` | true | – | tokoh cerita tidak menua (kecuali yang ditandai fana) |
+| | `sebaranAktif` | true | – | 42.4A (mati = urutan lama Pemanggil, titik pertama) |
+| | `kapZona` / `lantaiZona` | 1.25 / 0.5 | 1-3 / 0-1 | topi dan lantai zona |
+| | `jarakMin` | 1.5 | 0.8-4 | jarak antar-tubuh tak berinteraksi |
+| | `belokanPeluang` / `belokanMaks` | 0.12 / 3 | 0-0.5 / 0-10 | 42.4A.6 |
+| | `selinganDetik` | 8-30 | 4-120 | rentang selingan mikro |
+| | `ragamPenaltiKemarin` | 0.6 | 0-1 | 42.4A.4 |
+| | `kelompokPeluang` | 0.2 | 0-0.6 | jalan keluarga dan kelompok lain |
 | `kotaBicara` | `aktif`, `semuaWarga` | true, true | – | dialog untuk semua orang sipil |
 | | `ulangHari` | 3 | 0-14 | jeda baris yang sama |
 | | `permintaanPerHari` / `PerTempat` | 3 / 6 | 0-10 / 0-20 | — |
 | | `pinjaman` | true | – | 42.5.7 |
+| | `mesinLanjut` | true | – | 42.5A (mati = sapaan 38 saja) |
+| | `obrolanNpc`, `obrolanTampilJarak`, `obrolanMaksTampil` | true, 12, 4 | –, 4-32, 0-12 | 42.5A.9 |
+| | `tampilPeluang` | false | – | tampilkan persen berhasil nada |
+| | `tikPeluang` | 0.25 | 0-0.6 | tik bicara |
+| | `dialek`, `registerKuno`, `suaraSeru` | true, true, true | – | 42.5A.8 |
+| | `faktaMaks`, `lupaSkala`, `antiUlangJam` | 24, 1.0, 24 | 8-64, 0.25-4, 1-168 | 42.5A.4 / 42.5A.8 |
 | `kotaEkonomi` | `aktif` | true | – | sakelar 42C |
 | | `rumah`, `rumahMaks`, `kunciJedaMenit` | true, 4, 30 | –, 1-12, 5-240 | 42.6.1 |
 | | `sewaPersen` / `pajakProperti` | 3 / 1 | 1-10 / 0-5 | % per 7 hari |
@@ -2088,8 +2650,17 @@ grup `command/CheatHelp` "kota hidup")
 | `warga kesan <a> <n>` / `kenangan <a> <jenis>` / `utang <a> <n>` | set ingatan penguji |
 | `warga suasana <a> <kode>` / `kebiasaan <a> <id>` | pratinjau |
 | `warga pohon <a>` | buka Pohon Keluarga |
-| `bicara uji <topik> [syarat=nilai…]` | tampilkan baris terpilih dan semua kandidat dengan skor |
-| `bicara indeks` | jumlah baris per topik/kelompok (cek ≥ 1.400) |
+| `bicara uji <topik> [syarat=nilai…]` | tampilkan ujaran terpilih dan semua kandidat dengan skor |
+| `cakap info <npc>` | sifat HEXACO, PAD sekarang + label, 8 fakta paling menonjol (R, yakin, sumber), 5 topik dengan utilitas |
+| `cakap fakta <npc> [tambah <predikat> <subjek> [objek] / lupa]` / `cakap emosi <npc> <peristiwa>` | atur pengetahuan/emosi |
+| `cakap uji <niat> [fitur=nilai…] [n]` | rangkai n ujaran (id dan en), laporkan jumlah berbeda |
+| `cakap kombinasi [niat]` | jumlah realisasi berbeda per niat (sasaran ≥ 10⁴ untuk niat umum) |
+| `cakap obrol <npcA> <npcB> [jenis]` | paksa obrolan NPC-NPC, cetak keadaan sebelum/sesudah |
+| `cakap jejak` | catat keadaan FSM, kandidat topik dan cek nada di chat selama sesi penguji |
+| `cakap golden [tulis]` | jalankan/tulis ulang uji emas 42.5A.12 |
+| `sebaran peta` / `zona` / `titik` / `simulasi <hari>` | 42.4A.8 |
+| `ragam <warga>` / `ragam laporan [hari]` | 42.4A.8 |
+| `kompat periksa [radius]` | struktur asing yang memotong lot/kavling/makam/kantor dan kavling `TIDAK_LAYAK` (42.12.1A) |
 | `gosip daftar` / `gosip buat <templat>` / `gosip sebar <hari>` / `gosip jejak <id>` | gosip |
 | `jalan <tujuan>` | jawaban Tanya Jalan dari NPC terdekat |
 | `tolong buat <jenis> [warga]` / `tolong selesai` | permintaan |
@@ -2121,7 +2692,9 @@ tempat): `sapa` (bicara dengan 5 warga berbeda), `kenal` (`adv:tempat/kota42_ken
 `rumah` (`adv:tempat/kota42_rumah`), `toko` (jual 10 barang lewat toko sendiri), `investasi`, `pasar_hantu`
 (`adv:tempat/kota42_pasar_hantu`), `ronda`, `copet` (tangkap pencopet), `jabatan` (pangkat 2), `kantor` (terima satu calon dari
 Kantor Rekrutmen), `pakta`, `kavling` (`adv:tempat/kota42_kavling`), `generasi` (`adv:tempat/kota42_generasi`: anak yang kau kenal
-menjadi dewasa). Teks `kultivator.guide.c23.<nama>.title|body`, `kultivator.guide.chapter.23` + `.desc` di
+menjadi dewasa), `nada` (`adv:tempat/kota42_lidah_perak`: berhasil dengan 4 nada berbeda), `nguping` (`adv:tempat/kota42_nguping`:
+mendapat kabar dari obrolan NPC-NPC), `janji` (`adv:tempat/kota42_janji`: menepati janji yang diingat warga); teks bab menjelaskan
+bahwa warga punya watak, perasaan dan ingatan, bahwa nada bicaramu berakibat, dan bahwa mereka bergosip satu sama lain. Teks `kultivator.guide.c23.<nama>.title|body`, `kultivator.guide.chapter.23` + `.desc` di
 `lang-src/kota_hidup_panduan.*`. Bab PANDUAN.md baru "74. Kota yang Hidup" (agen finish, CRLF).
 
 #### 42.14.5 Advancement (`data/kultivator/advancement/tempat/kota42_*.json`, pola `docs/ADVANCEMENT_TEMPLATE.json`, parent
@@ -2163,14 +2736,18 @@ menjadi dewasa). Teks `kultivator.guide.c23.<nama>.title|body`, `kultivator.guid
 | `kota42_bangun_kembali` | `minecraft:bricks` | menyelesaikan proyek bangun kembali |
 | `kota42_dua_keluarga` | `minecraft:pink_petals` | menyelesaikan alur "Dua Keluarga di Jalan Sumur" |
 | `kota42_lao_geng` | `minecraft:bell` | menyelesaikan "Lentera Terakhir Lao Geng" |
+| `kota42_lidah_perak` | `minecraft:amethyst_shard` | berhasil memakai 4 nada berbeda (42.5A.7) |
+| `kota42_nguping` | `minecraft:sculk_sensor` | mendapat kabar dengan menguping obrolan NPC-NPC |
+| `kota42_janji` | `minecraft:lead` | menepati janji yang diingat dan ditagih warga |
 
 (Semua ikon diverifikasi terhadap registri 26.3 oleh 42A.)
 
 #### 42.14.6 Lang (fragmen 42; kunci identik id_id/en_us; Indonesia utama)
 
 `kota_hidup` (umum, Sumber, pesan, config, perintah), `kota_hidup_warga` (42A: tahap, kebiasaan, wajah, kenangan, status;
-nama warga **tidak** di lang: suku kata pinyin netral bahasa di `data/kultivator/kota/nama.json`), `kota_hidup_bicara` (42B,
-≥ 1.400 baris, dibuat generator), `kota_hidup_cerita` (42B: tokoh, alur, kisah Lao Shuo, perkara, tolong), `kota_hidup_ekonomi`
+nama warga **tidak** di lang: suku kata pinyin netral bahasa di `data/kultivator/kota/nama.json`), `kota_hidup_cakap` (42K: terminal tata
+bahasa ≥ 2.400 kunci, dibuat `gen_kota_hidup_cakap.py`), `kota_hidup_cakap_lex` (42K: leksikon, dialek, tik), `kota_hidup_ragam`
+(42S: nama kegiatan, debug), `kota_hidup_cerita` (42B: tokoh, alur, kisah Lao Shuo, perkara, tolong), `kota_hidup_ekonomi`
 (42C), `kota_hidup_acara` (42D), `kota_hidup_sekte` (42E), `kota_hidup_tumbuh` (42F), `kota_hidup_ui` (42U),
 `kota_hidup_suara` (dibuat `gen_voices.py`, 42V), `kota_hidup_panduan` (42V), `kota_hidup_subtitle` (42V).
 
@@ -2178,12 +2755,14 @@ nama warga **tidak** di lang: suku kata pinyin netral bahasa di `data/kultivator
 
 ### 42.15 Modul, kepemilikan berkas, kontrak dan urutan
 
-#### 42.15.1 Sembilan modul (paket baru `dev.kultivator.dunia.kota42`; berkas baru milik penuh, tidak bertumpuk)
+#### 42.15.1 Sebelas modul (paket baru `dev.kultivator.dunia.kota42`; berkas baru milik penuh, tidak bertumpuk)
 
 | Label | Lingkup | Berkas baru (milik penuh) |
 |---|---|---|
 | **42A** Inti Warga | 42.0, 42.4, 42.13.1 `WargaData`, 42.13.2 kerangka payload, 42.14.1-42.14.3 kerangka, 42.14.5 JSON | `dunia/kota42/{KotaHidup (init), KotaConfig (7 bagian), KotaBus, KotaPayloads, KotaHidupCommands, KotaUji (akar + `daftar(sub, node)`), KotaTitik}`, `dunia/kota42/api/{WargaApi, WargaInfo, Kategori, KodeWajah, Kenangan, JenisUpacara, JenisHubungan, KotaGerakId, PenimpaJadwalKota}`, `dunia/kota42/warga/{Warga, WargaData, WargaGen, HariWarga, SiklusHidup, Hubungan, Ingatan, Suasana, Kebiasaan, Pekerjaan, PendudukTambahan, Migrasi, PerjalananWarga, ArsipWarga, NamaWarga, Berbakat, PenimpaWarga}`, data `kota/nama.json`, `tempat/kebiasaan/*.json`, `client/dunia/kota42/KotaHidupClient` (init + stub init modul klien lain), lang `kota_hidup`, `kota_hidup_warga`, semua advancement JSON |
-| **42B** Bicara & Cerita | 42.5, 42.10 (data cerita) | `dunia/kota42/bicara/{BicaraWarga, BicaraIndeks, GosipWarga, TanyaJalan, PermintaanWarga, Selera, Pinjaman, TujuanKota (tujuan quest baru), TokohKota}`, data `tempat/bicara/*.json`, `tempat/tolong/*.json`, `tempat/selera.json`, `tempat/perkara/*.json` (isi; mesin 42C), `tempat/quest/kota42_*.json`, `tempat/dialog/kota42_*.json`, `tempat/tokoh/kota42.json`, `tempat/kabar/kota42.json`, `tempat/wayang/*.json` (naskah; pemutar 42V), `tools/gen_kota_hidup_bicara.py`, `tools/cerita_isi_kota42.py`, lang `kota_hidup_bicara`, `kota_hidup_cerita` |
+| **42B** Bicara & Cerita | 42.5, 42.10 (data cerita) | `dunia/kota42/bicara/{BicaraWarga, TanyaJalan, PermintaanWarga, Selera, Pinjaman, TujuanKota (tujuan quest baru), TokohKota}`, data `tempat/bicara/*.json`, `tempat/tolong/*.json`, `tempat/selera.json`, `tempat/perkara/*.json` (isi; mesin 42C), `tempat/quest/kota42_*.json`, `tempat/dialog/kota42_*.json`, `tempat/tokoh/kota42.json`, `tempat/kabar/kota42.json`, `tempat/wayang/*.json` (naskah; pemutar 42V), `tools/cerita_isi_kota42.py`, lang `kota_hidup_cerita` (kalimat percakapan dari 42K) |
+| **42K** Mesin Percakapan | 42.5A, penyimpanan gosip 42.5.4 | `dunia/kota42/cakap/{Cakap (fasad), CakapData, CakapReload, Kepribadian, Emosi, Penilaian, Pengetahuan, Fakta, Predikat, Lupa, GosipWarga, Topik, PerencanaTopik, KeadaanPercakapan, Giliran, Kilasan, Niat, Nada, PenilaiNada, TataBahasa, TipeSlot, Realisasi, Ujaran, AntiUlang, Dialek, Tik, ObrolanWarga, CakapUji}`, `client/dunia/kota42/cakap/{UjaranClient, GelembungUjaran}`, data `tempat/percakapan/**` (kepribadian, emosi, predikat, topik, niat, nada, tata/*, dialek, tik, obrolan/*, golden/*), `tools/kota_cakap_sumber/**`, `tools/gen_kota_hidup_cakap.py`, `tools/cek_cakap.py`, lang `kota_hidup_cakap`, `kota_hidup_cakap_lex` |
+| **42S** Sebaran & Ragam | 42.4A | `dunia/kota42/ragam/{RagamData, PetaZona, Kapasitas, Penyeimbang, PemilihTubuh, RencanaHarian, KumpulanKegiatan, Selingan, Belokan, KegiatanKelompok, IramaMingguan, MetrikRagam, RagamUji}`, `client/dunia/kota42/ragam/PetaPanasDebug`, data `tempat/ragam/{zona.json, selingan.json, belokan.json, peran/*.json}`, lang `kota_hidup_ragam` |
 | **42C** Ekonomi Kota | 42.6 | `dunia/kota42/ekonomi/{KotaEkonomiData, RumahKota, KunciRumah, TokoPemain, LapakKota, RakDagangBlock, RakDagangBlockEntity, MejaKasirBlock, PapanNamaTokoBlock, HargaKota, StokKota, UsahaWarga, Investasi, GudangKota, KontrakDagang, RumahDagang, PajakKota, Jabatan, Perkara, PasarHantu, LapakHantuEntity, TendaLapakEntity, KotaEkonomiItems, KotaEkonomiBlocks}`, lang `kota_hidup_ekonomi` |
 | **42D** Kehidupan & Acara | 42.7, 42.9.6 (server), 42.10 jadwal tokoh | `dunia/kota42/acara/{KotaAcaraData, KalenderKota, Rombongan, RutinitasPagi, Ronda, PeristiwaJalan, Copet, Perkelahian, GerobakTerguling, ApiKecilEntity, BarangTercecerEntity, MusimKota, Upacara, UsunganPetiEntity, MejaJamuanEntity, PanggungKelilingEntity, BarongsaiEntity, TendaPasarEntity, DistrikMalam, MejaDaduEntity, Guanpu, LayarBayangEntity, TeaterBayang, KotaAcaraEntities, KotaAcaraItems}`, `dunia/kota42/hewan/{HewanKota, KucingKotaEntity, AnjingKotaEntity, AyamKotaEntity, KawananMerpatiEntity, KudaTambatEntity, UntaTambatEntity, KeledaiKotaEntity, HewanEntities}`, lang `kota_hidup_acara` |
 | **42E** Sekte & Kota | 42.8 | `dunia/kota42/sekte/{KotaSekteData, KantorRekrut, BatuUjiEntity, PaktaLindung, SerbuanKota, TugasKotaMurid, CabangKota, PapanCabangBlock}`, lang `kota_hidup_sekte` |
@@ -2201,7 +2780,8 @@ nama warga **tidak** di lang: suku kata pinyin netral bahasa di `data/kultivator
 | `dunia/DuniaContent.java`, `dunia/DuniaCommands.java`, `command/CheatHelp.java` | 42A | `KotaHidup.init()`, chip `kota_hidup`, grup cheat |
 | `KultivatorClient.java` (CRLF) | 42A | `KotaHidupClient.init()` |
 | `dunia/tempat/cerita/TempatDialog.java` | 42B | satu baris `BicaraWarga.boleh` (42.5.1) + satu baris tablet tambahan di lembar sapa |
-| `dunia/tempat/cerita/KabarTempat.java` | 42B | satu baris `GosipWarga.dariKabar(...)` di `pemicu` |
+| `dunia/tempat/cerita/KabarTempat.java` | 42K | satu baris `GosipWarga.dariKabar(...)` di `pemicu` |
+| `dunia/tempat/cerita/Kalimat.java`, `dunia/kota/NpcLife.java` (obrolan 4 baris) | 42K | `Kalimat.sapa` → `Cakap.sapa` bila `mesinLanjut`; obrolan `NpcLife` diserahkan ke `ObrolanWarga` (42.5A.11) |
 | `dunia/DuniaMarkers.java` (+ ikon) | 42B | jenis `kota/tujuan` (sementara 5 menit) bila belum ada |
 | `dunia/kota/{Toko, PasarGelap, KedaiTeh}.java`, `dunia/tempat/ekonomi/{TokoSenjata, Hidangan, Penginapan, LapakSekte, KasKota}.java`, `dunia/tempat/kampung/PasarDesa.java`, `dunia/tempat/tema/bersama/Dagang.java` | 42C | satu pengali `HargaKota.faktor` per harga; `LapakSekte.peluangLaku` publik; `PasarGelap.dagangan` publik; `KedaiTeh` token → sandi malam; `KasKota.pajak(...)` |
 | `dunia/tempat/ekonomi/GerobakEntity.java`, `dunia/tempat/tema/bersama/TanduEntity.java`, `dunia/tempat/kotabesar/KotaBesarKalender.java` | 42D | data `TERGULING`; varian warna tandu; daftar acara 42 |
@@ -2212,7 +2792,7 @@ nama warga **tidak** di lang: suku kata pinyin netral bahasa di `data/kultivator
 | `sosok/GerakId.java`, `client/sosok/gerak/{GerakKatalog, PropKatalog}.java`, `sosok/PropId.java` | 42V | batas 42.12.5 |
 | `tools/gen_sosok_resep.py`, `tools/gen_sosok_bagian_busana.py`, `tools/gen_tempat_gear.py`, `client/.../KotaGear.java` | 42V | busana, rupa, pita gear 48-63 |
 | `guide/GuideChapters.java` | 42V | bab 23 |
-| `tools/gen_voices.py`, `voice/VoiceEvents.java` | 42V | 78 baris, grup `KOTA42` (generasi hanya F42) |
+| `tools/gen_voices.py`, `voice/VoiceEvents.java` | 42V | 102 klip (78 baris + 24 kata seru), grup `KOTA42` (generasi hanya F42) |
 | `client/dunia/tempat/hidup/RiuhKota.java` | 42V | suasana `malam_meriah`, `upacara` |
 | `docs/DESIGN.md`, `docs/PANDUAN.md`, `docs/CREDITS.md`, `README` | F42 | ringkasan 42, bab 74, kredit suara buatan |
 
@@ -2229,8 +2809,13 @@ Berkas 36/37/38/39/40 lain baca saja; yang dibutuhkan masuk "Butuh dari modul la
   suasanaTempat(long situs)`, `void daftarPenimpa(PenimpaJadwalKota)`, `void pekerjakan(Warga, UUID majikan, String tugas)`.
 * **C42.A2 `KotaBus`**: `LAHIR`, `NIKAH`, `WAFAT`, `PINDAH(asal, tujuan)`, `KERJA_BERUBAH`, `GOSIP_LAHIR`, `UPACARA(fase)`,
   `HARGA_BERUBAH`, `KAVLING(tahap)`, `SERBUAN(mulai/akhir, menang)`, `PAKTA_BERUBAH`, `RUMAH_BERUBAH`.
-* **C42.B1** `BicaraWarga.lembar(player, npc)`, `GosipWarga.lahir(level, situs, templat, subjek…)`, `PermintaanWarga.buat(warga,
-  jenis)`, `TanyaJalan.jawab(npc, tujuan)`.
+* **C42.B1** `BicaraWarga.lembar(player, npc)`, `PermintaanWarga.buat(warga, jenis)`, `TanyaJalan.jawab(npc, tujuan)`.
+* **C42.K1** `Cakap.{sapa(player, npc), sesi(player, npc) → SesiCakap, pilih(sesi, niat, nada) → Hasil, ujaran(warga, niat, konteks)
+  → Ujaran, peristiwa(warga, jenisPeristiwa, sasaran, intensitas), fakta(warga) → List<Fakta>, tahu(warga, Fakta, sumber),
+  janji(warga, player, predikat, batasHari), obrol(wargaA, wargaB, jenis?)}`; `GosipWarga.lahir(level, situs, templat, subjek…)`;
+  `Penilaian.daftar(jenis, ΔPAD)`; format data 42.5A.8 dibekukan di langkah 1.
+* **C42.S1** `Penyeimbang.pilihTitik(huni, warga, jenis) → Tujuan`, `PemilihTubuh.pilih(huni, calon, anggaran)`,
+  `RencanaHarian.hari(warga, hari)`, `MetrikRagam.laporan(situs, hari)`; kait 42A di `Pemanggil`/`TempatHuni`/`TubuhPenduduk` (42.4.14).
 * **C42.C1** `HargaKota.faktor(server, situs, Kategori)`, `Kategori.dari(ItemStack)`, `RumahKota.{milik(UUID), diklaim(level, pos),
   rumahDi(level, pos)}`, `TokoPemain.di(level, pos)`, `UsahaWarga.usaha(situs)`, `Jabatan.pangkat(UUID, situs)`,
   `PasarHantu.lokasi(situs, hari)`, `KotaEkonomi.kasKota(situs)`.
@@ -2241,7 +2826,7 @@ Berkas 36/37/38/39/40 lain baca saja; yang dibutuhkan masuk "Butuh dari modul la
   atas nama anggota tanpa aula.
 * **C42.F1** `Kemakmuran.nilai(situs)`, `Kavling.daftar(situs)`, `BangunKembali.aktif(situs)`, `BahanKota.stok(situs)`.
 * **C42.U1** kunci lembar `KotaLembar` (javadoc per layar) dibekukan di akhir langkah 1.
-* **C42.V1** id klip 350-449 (cadangan 450-469) dan prop 170-239 dibekukan di `dunia/kota42/api/KotaGerakId` (aman di dua sisi).
+* **C42.V1** id klip 350-449, 450-459 (42S; cadangan 460-469) dan prop 170-239 dibekukan di `dunia/kota42/api/KotaGerakId` (aman di dua sisi).
 
 #### 42.15.4 Ketergantungan dan urutan kerja
 
@@ -2252,20 +2837,22 @@ G0  42A langkah 1: semua api/*, stub init semua paket server+klien, WargaData ko
     advancement JSON, KotaLembar kunci, KotaGerakId, NpcRole +13, kait hidup (PenimpaJadwal, sumber penduduk/titik/penolak)
     -> F42-0: build B0
   |
-G1  42A (sisa) | 42W | 42V | 42C               (paralel; 42C memakai WargaApi stub untuk pemilik usaha/pegawai)
+G1  42A (sisa) | 42W | 42V | 42C | 42K | 42S   (paralel; 42C/42K/42S memakai WargaApi stub; 42W mulai setelah perbaikan
+    tabrakan worldgen agen lain di-commit, 42.12.1A)
   |  42W: generator + cek_tempat + pratinjau; 42V: aset, suara buatan, pratinjau PNG; F42-1: build B1 + harness wg
   v
 G2  42B | 42D | 42E | 42F | 42U               (paralel; butuh Warga nyata dari 42A, NBT tahap dari 42W, rumah dari 42C)
   v
-F42 finish: "Butuh dari modul lain", semua generator, VOICEVOX 78 baris, cek_tempat/cek_sosok, harness run_38/run_all/
+F42 finish: "Butuh dari modul lain", semua generator, VOICEVOX 102 klip, cek_tempat/cek_sosok, harness run_38/run_all/
     PlanCheckTema, mergeLang tanpa ganda, build B2 (`compileJava compileClientJava jar --no-daemon`), docs (DESIGN 42 ringkas,
     PANDUAN bab 74, CREDITS, README, docs/uji/FASE-42.md)
   |
 D42 detail pass (opsional, 5 agen: D-42A generasi 200 hari simulasi + keseimbangan, D-42B baris dialog & gosip, D-42D upacara
-    & rombongan di layar, D-42W interior dan kavling per gaya, D-42V model & animasi hewan/barongsai)
+    & rombongan di layar, D-42W interior dan kavling per gaya, D-42V model & animasi hewan/barongsai,
+    D-42K korpus tata bahasa + uji emas, D-42S simulasi sebaran 7 hari di ibu kota dan kota tema)
 ```
 
-Ketergantungan keras: 42B/42D/42E butuh `WargaApi` (42A); 42E butuh `RumahKota` (42C) untuk cabang; 42F butuh NBT tahap (42W)
+Ketergantungan keras: 42B/42D/42E/42K/42S butuh `WargaApi` (42A); 42B butuh `Cakap` (42K) untuk lembar; 42E butuh `RumahKota` (42C) untuk cabang; 42F butuh NBT tahap (42W)
 dan kait perbaikan; 42U butuh lembar 42A-42F (kunci dibekukan G0); 42V hanya butuh 40. Berkas progres:
 `docs/progres/kota42-42A0.md`, `kota42-42A.md`, …, `kota42-F42.md`.
 
@@ -2283,12 +2870,15 @@ dan kait perbaikan; 42U butuh lembar 42A-42F (kunci dibekukan G0); 42V hanya but
 | K6 | Serangan sekte NPC ke kota boleh merusak blok nyata lewat `WorldBreaker`? | **tidak (hanya suasana, blokade, pengungsi)** / ya, terbatas radius 6 di luar zona inti | tidak |
 | K7 | Bekas jelaga visual (klien, tanpa blok) setelah serangan | **ya, digosok warga 3 hari** / tidak | ya |
 | K8 | Pemain menikahi warga | **tidak di 42 (rancangan terpisah nanti)** / ya | tidak |
-| K9 | Pasangan sesama jenis di antara warga (anak lewat anak angkat) | **ya** / tidak | ya |
+| K9 | Pasangan sesama jenis di antara warga (anak lewat anak angkat) | ya / **tidak** | **DIPUTUSKAN 2026-10-24: tidak** (pengguna) |
 | K10 | Urutan bangun dengan 41 | **41 dulu, 42 = bab 23** / 42 dulu (bab 22) | 41 dulu |
 | K11 | Kota tumbuh hanya di kavling yang direncanakan worldgen | **ya (aturan blok; kota "penuh" setelah semua kavling)** / boleh meluas ke luar tembok lewat rencana tambahan | ya |
 | K12 | Pasar Hantu di kampung | **tidak (kota ke atas dan pos dagang)** / ya | tidak |
 | K13 | Upeti perlindungan | **NB dari Kas Kota + barang surplus** / hanya barang / hanya renown | NB + barang |
 | K14 | Copet dan perkelahian juga terjadi saat pemain tidak dekat (hanya gosip) | **ya, sebagai data + gosip** / hanya saat pemain dekat | ya |
+| K15 | Tampilkan peluang berhasil nada bicara | **tidak, hanya isyarat raut wajah dan kalimat** / tampilkan persen | tidak (lebih alami; `tampilPeluang` untuk yang mau) |
+| K16 | Pemilihan tubuh di sekitar pemain | **proporsional per zona (merata)** / terdekat dulu (perilaku lama) | proporsional |
+| K17 | Gelembung obrolan NPC-NPC | **tampil ≤ 12 blok, maks 4 obrolan per tempat** / semua obrolan dalam 32 blok / mati | seperti kiri |
 
 ---------------------------------------------------------------------------------------------------------------------
 
@@ -2355,6 +2945,29 @@ dan kait perbaikan; 42U butuh lembar 42A-42F (kunci dibekukan G0); 42V hanya but
 29. Semua layar 42.11 pada skala GUI 2/3/4 tanpa tumpang tindih dan bisa dipakai dengan keyboard saja.
 30. `uji kota_hidup anggaran`: rata-rata < 0,5 ms/tick semua 42; entitas 42 ≤ 96; Hari Warga ibu kota < 1 ms.
 31. Semua sakelar `aktif = false`: perilaku berhenti, blok/item/entitas tetap terdaftar, perilaku 38 kembali persis.
+32. **Mesin percakapan**: dua warga berwatak berbeda (penakut vs sombong) menjawab topik sama dengan register, kata dan gestur
+    berbeda; `cakap uji SAPA 200` menghasilkan ≥ 150 kalimat berbeda tanpa pengulangan berturut; semua teks berasal dari kunci
+    fragmen lang (tidak ada teks buatan model bahasa).
+33. Emosi: hina warga → wajah marah dan nada ketus, meluruh dalam ±2 jam dunia; hadiah → senang; serangan → takut.
+34. Pengetahuan: warga saksi copet menceritakannya; warga yang hanya mendengar menyebut sumbernya ("kata Bibi Zhang"); fakta yang
+    tidak diulang terlupa setelah beberapa hari (`cakap info`).
+35. Kilas balik: janji `[Aku akan membawa obat]` → hari berikut warga menagih dengan ungkapan waktu yang benar ("kemarin"); menepati →
+    terima kasih + kesan; ingkar → kecewa + gosip.
+36. Nada: sopan/akrab/merayu/mengancam/menyuap/bercanda masing-masing berhasil dan gagal sesuai sifat; ancaman yang disaksikan di
+    ibu kota menambah poin kejahatan; suap ke warga ber-H tinggi ditolak dan digosipkan.
+37. Obrolan NPC-NPC: gelembung bergantian dengan gestur; gosip benar-benar berpindah (`cakap info` pendengar), debat menurunkan
+    hubungan, merayu menaikkan; menguping memberi catatan kabar; menyela obrolan memulai sesi dengan topiknya.
+38. Dialek: warga Kota Pelabuhan memakai sapaan pelaut, Kota Gunung "Dermawan"; register kuno saat pemain ≥ 3 ranah di atas.
+39. Uji emas `cakap golden`: ≥ 40 berkas lulus; mengulang dengan benih sama menghasilkan keluaran identik.
+40. **Sebaran**: `sebaran peta` di ibu kota jam 09, 12, 20, 23 menunjukkan pasar/rumah makan/kedai/rumah sebagai pusat sesuai jam
+    sementara distrik lain tetap berpenghuni; `ragam laporan 7` memenuhi semua sasaran 42.4A.8 (≤ 35 % tubuh di satu zona, Gini
+    ≤ 0,35, zona kosong ≤ 10 %).
+41. Pemain berdiri di satu sudut kota: tubuh tersebar ke semua zona yang terlihat (tidak menumpuk di dekat pemain); tidak ada dua
+    tubuh tak berinteraksi berjarak < 1,5 blok.
+42. **Ragam**: satu warga diikuti 3 hari (`ragam <warga>`): ≥ 5 kegiatan berbeda per hari, rencana hari ke-2 berbeda dari hari ke-1,
+    selingan (seka keringat, menoleh, melirik pemain) terlihat, satu belokan (jajan/elus kucing/tonton pengamen), keluarga jalan sore.
+43. **Kompat**: dunia baru dengan paket mod pengguna: `kompat periksa` kosong di 3 ibu kota, 3 kota tema, 5 kota 34, 10 kampung;
+    kavling dekat struktur asing ditandai `TIDAK_LAYAK` dan tidak dibangun.
 
 **Daftar centang (untuk FASE-42.md):**
 - [ ] Warga tersimpan: identitas, nama generasi, akar, watak, kebiasaan; slot `PendudukGen` + slot tambahan
@@ -2365,7 +2978,13 @@ dan kait perbaikan; 42U butuh lembar 42A-42F (kunci dibekukan G0); 42V hanya but
 - [ ] Ingatan per pemain + kesan + kenangan kuat + warisan kesan
 - [ ] Suasana 7 kode wajah; akibat di harga, dialog, pindah
 - [ ] 32 kebiasaan sebagai penimpa jadwal data
-- [ ] Dialog untuk semua orang sipil; ≥ 1.400 baris; Tanya Jalan; Kabar; Tolong 16 jenis; Beri dan pinjaman
+- [ ] Dialog untuk semua orang sipil; Tanya Jalan; Kabar; Tolong 16 jenis; Beri dan pinjaman
+- [ ] Mesin percakapan tanpa LLM: HEXACO, PAD + penilaian, fakta + kurva lupa + keyakinan, topik utilitas, FSM + kilas balik + janji,
+      6 nada, tata bahasa bertipe (register, dialek, tik, anti-ulang) ≥ 900 bingkai / ≥ 2.400 terminal, 8 jenis obrolan NPC-NPC
+      yang mengubah keadaan, uji emas ≥ 40, `cek_cakap.py` bersih
+- [ ] Sebaran: zona + kapasitas + target per jam, Penyeimbang + reservasi + luapan, pemilih tubuh proporsional, metrik lulus
+- [ ] Ragam: ≥ 10 kegiatan per peran umum, rencana harian, selingan, belokan, kelompok, irama mingguan/musim
+- [ ] Kompat mod dunia 42.12.1A: tanpa struktur/placement baru, keep-out dihormati, periksa struktur asing sebelum tiap tahap
 - [ ] Gosip lahir dari peristiwa nyata, menyebar lewat hubungan dan titik kumpul, dibumbui, ditelusuri
 - [ ] Rumah klaim pemain (tanpa perbaikan/tagihan di dalam), kunci rumah, segel, cetak biru menerima
 - [ ] Toko pemain: blok rak/kasir/papan, pegawai, pembeli bertubuh, batas keran
@@ -2379,5 +2998,5 @@ dan kait perbaikan; 42U butuh lembar 42A-42F (kunci dibekukan G0); 42V hanya but
 - [ ] Bangun kembali hanya untuk kerusakan nyata; pengungsi; tugu kenangan klien
 - [ ] Lentera, asap, panji, petasan (tanpa `FireworkRocketEntity`), jelaga (K7), melodi prosedural, wayang
 - [ ] 17 entitas, 4 blok, ±20 item, 13 peran, klip 350-449, prop 170-239, busana/rupa baru
-- [ ] 78 suara Jepang, bab Kitab Panduan 23, 34 advancement, fragmen lang identik
+- [ ] 102 klip suara Jepang (78 baris + 24 kata seru), bab Kitab Panduan 23, 37 advancement, fragmen lang identik
 - [ ] Sibuk di semua peristiwa; tidak ada blok runtime selain `WorldBreaker`; tidak ada LightningBolt/cuaca/waktu/tick-rate

@@ -21,6 +21,7 @@
     "MobSetTargetMixin",
     "ServerLevelPrecipitationMixin",
     "ChunkGeneratorTempatMixin",
+    "StructureStartJalanMixin",
     "TempatUbahBlokMixin",
     "TempatApiMixin",
     "duel.MobGoalSelectorAccessor"

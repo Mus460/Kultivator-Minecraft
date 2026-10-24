@@ -6,6 +6,7 @@ import dev.kultivator.dunia.tempat.jalan.SimpulJalan;
 import dev.kultivator.dunia.tempat.worldgen.TataLetakStructure;
 import dev.kultivator.sekte.diplomasi.GerbangPlan;
 import dev.kultivator.sekte.langit.npc.LangitNpcPlan;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.jetbrains.annotations.Nullable;
@@ -151,7 +152,7 @@ public final class RencanaKotaBesar implements Rencana {
 			}
 			earlier.put(k.index(), near.stream().mapToInt(Integer::intValue).toArray());
 		}
-		return new Plan(seed, List.copyOf(list), List.copyOf(districts), Map.copyOf(starts), Map.copyOf(byIndex), Map.copyOf(earlier));
+		return new Plan(seed, List.copyOf(list), List.copyOf(districts), new Long2ObjectOpenHashMap<>(starts), Map.copyOf(byIndex), Map.copyOf(earlier));
 	}
 
 	/** Sets the terrain rules ({@code kotaBesar.selisihMaks}, 38KS config) and drops cached verdicts. */

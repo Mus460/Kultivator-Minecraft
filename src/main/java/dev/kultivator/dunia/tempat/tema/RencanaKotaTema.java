@@ -15,6 +15,7 @@ import dev.kultivator.dunia.tempat.jalan.SimpulJalan;
 import dev.kultivator.dunia.tempat.worldgen.TataLetakStructure;
 import dev.kultivator.sekte.diplomasi.GerbangPlan;
 import dev.kultivator.sekte.langit.npc.LangitNpcPlan;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.jetbrains.annotations.Nullable;
@@ -221,7 +222,7 @@ public final class RencanaKotaTema implements Rencana {
 			}
 			kandidat.put(t, List.copyOf(ks));
 			distrik.put(t, List.copyOf(ds));
-			mulai.put(t, Map.copyOf(starts));
+			mulai.put(t, new Long2ObjectOpenHashMap<>(starts));
 		}
 		return new Plan(seed, Map.copyOf(calon), Map.copyOf(kandidat), Map.copyOf(distrik), Map.copyOf(mulai), Map.copyOf(tetangga), List.copyOf(urutan));
 	}

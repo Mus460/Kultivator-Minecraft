@@ -154,6 +154,33 @@ public final class TempatZones {
 			return false;
 		}
 
+		/** True when a planned box touches {@code box} (columns only, before the verdict). */
+		public boolean menyentuh(BoundingBox box) {
+			return menyentuhLahir(box, null);
+		}
+
+		/**
+		 * True when {@code box} touches (columns only) a planned box whose place passes its verdict from {@code sumber}
+		 * (null: any planned box).
+		 */
+		public boolean menyentuhLahir(BoundingBox box, @Nullable PutusanTanah.Sumber sumber) {
+			for (int cx = box.minX() >> CELL_SHIFT; cx <= box.maxX() >> CELL_SHIFT; cx++) {
+				for (int cz = box.minZ() >> CELL_SHIFT; cz <= box.maxZ() >> CELL_SHIFT; cz++) {
+					List<Masuk> list = cells.get(key(cx, cz));
+					if (list == null) {
+						continue;
+					}
+					for (Masuk m : list) {
+						if (m.kotak().intersects(box.minX(), box.minZ(), box.maxX(), box.maxZ())
+								&& (sumber == null || m.distrik() == null || m.rencana().putusan(sumber, m.distrik()).layak())) {
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		}
+
 		public boolean kosong() {
 			return cells.isEmpty();
 		}
