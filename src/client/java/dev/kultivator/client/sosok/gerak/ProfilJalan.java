@@ -9,7 +9,8 @@ import net.minecraft.util.Mth;
  * multiplier ({@link GerakData#ayunLengan}, applied by {@code GerakApplier}); and per step (phase
  * {@code phi = walkAnimationPos x 0.6662}, the vanilla formula) the hips sway (BZ), the head counter-turns, the body bobs
  * and leans. Specials: the old man's stick taps in step, children skip every second step, dancers walk on their toes
- * with lifted arms, ghosts hover. Running ({@code walkAnimationSpeed > 0.9}) and the limp override the profile.
+ * with lifted arms, ghosts hover, the fleeing look back. Running blends in by ground speed ({@code Langkah}); the limp overrides
+ * the profile. The rhythm is integrated per body ({@code GerakKeadaan.fasa}), so it may change without the step jumping.
  */
 public enum ProfilJalan {
 	//          irama lengan kaki  bz   hy    bob   lean  hx
@@ -29,7 +30,9 @@ public enum ProfilJalan {
 	IBLIS(0.95F, 0.50F, 0.95F, 1.0F, 0.0F, 0.15F, 10.0F, 6.0F),
 	ARWAH(0.60F, 0.15F, 0.10F, 2.0F, 0.0F, 0.0F, 0.0F, 0.0F),
 	/** The limp of clip 146 / wound 1 (right leg swing x0.4, a hip drop every step). */
-	PINCANG(0.85F, 0.80F, 0.85F, 6.0F, 0.0F, 0.20F, 6.0F, 8.0F);
+	PINCANG(0.85F, 0.80F, 0.85F, 6.0F, 0.0F, 0.20F, 6.0F, 8.0F),
+	/** Fleeing (clip LARI_TAKUT): head up, arms wide and flailing, glances back over the shoulder; a deeper run. */
+	TAKUT(1.30F, 1.45F, 1.10F, 1.5F, 0.0F, 0.40F, 14.0F, -4.0F);
 
 	final float irama;
 	final float lengan;
@@ -67,6 +70,8 @@ public enum ProfilJalan {
 	}
 
 	private static final float D = Mth.DEG_TO_RAD;
+	/** Two strides of vanilla's {@code cos(pos x 0.6662)}: the child's half-phase skip stays continuous across the wrap. */
+	private static final float PERIODE = 2.0F * Mth.TWO_PI / 0.6662F;
 
 	/**
 	 * Applies the profile to the render state's walk and writes its channels as the lowest layer (9) into
@@ -75,22 +80,28 @@ public enum ProfilJalan {
 	boolean terapkan(DiscipleRenderState st, GerakKeadaan k, GerakData d, float[] target, float[] bobot, boolean perempuan,
 			float age) {
 		float speed = st.walkAnimationSpeed;
-		boolean lari = speed > 0.9F;
-		float irama = this.irama;
+		// the run blends in by real ground speed (Langkah), so a jog is half way and nothing pops at one threshold
+		float r = this == ARWAH ? 0.0F : k.langkah.lari;
+		boolean lari = r > 0.5F;
+		float irama = this == MILITER && perempuan ? 1.05F : this.irama;
 		float lengan = this.lengan;
 		float kaki = this.kaki;
 		float bobAmp = this.bob;
 		float leanV = this.lean;
-		if (lari && this != ARWAH) {
-			irama = 1.0F;
-			lengan = perempuan ? 1.08F : 1.2F;
-			kaki = 1.0F;
-			bobAmp = 0.5F;
-			leanV = 12.0F;
-		} else if (this == MILITER && perempuan) {
-			irama = 1.05F;
+		if (r > 0.0F) {
+			irama = Mth.lerp(r, irama, 1.0F);
+			lengan = Mth.lerp(r, lengan, this == TAKUT ? 1.5F : perempuan ? 1.08F : 1.2F);
+			kaki = Mth.lerp(r, kaki, 1.0F);
+			bobAmp = Mth.lerp(r, bobAmp, 0.5F);
+			leanV = Mth.lerp(r, leanV, this == TAKUT ? 16.0F : 12.0F);
 		}
-		st.walkAnimationPos *= irama;
+		// the rhythm is integrated, not multiplied: a changing rhythm (blend, profile switch) never jumps the step phase
+		float mentah = st.walkAnimationPos;
+		float maju = mentah - k.posLalu;
+		k.fasa = Float.isNaN(maju) || maju < 0.0F || maju > 8.0F ? mentah : k.fasa + maju * irama;
+		k.fasa %= PERIODE;
+		k.posLalu = mentah;
+		st.walkAnimationPos = k.fasa;
 		st.walkAnimationSpeed = speed * kaki;
 		d.ayunLengan = kaki <= 0.01F ? 0.0F : lengan / kaki;
 		d.ayunKakiKanan = this == PINCANG ? 0.4F : 1.0F;
@@ -160,6 +171,13 @@ public enum ProfilJalan {
 				if (half > 0.0F) {
 					tulis(target, bobot, Klip.LIFT, 0.06F * Math.max(0.0F, s), w);
 				}
+			}
+			case TAKUT -> {
+				// arms thrown wide, and now and then a frightened look back over the shoulder
+				tulis(target, bobot, Klip.RAZ, 16.0F * D, w);
+				tulis(target, bobot, Klip.LAZ, -16.0F * D, w);
+				float lihat = Math.max(0.0F, Mth.sin(age * 0.07F + (k.benih & 15)));
+				tulis(target, bobot, Klip.HY, 45.0F * D * lihat * lihat * lihat * lihat, w);
 			}
 			case PENARI -> {
 				// arms lifted softly, walking on the toes

@@ -221,6 +221,11 @@ final class GerakKeadaan {
 
 	// walk
 	float langkahSinLalu;
+	/** The integrated step phase (walk position x rhythm) and last frame's raw walk position. */
+	float fasa;
+	float posLalu = Float.NaN;
+	/** Run blend, turn, start/stop and landing of the shared locomotion polish. */
+	final Langkah.Keadaan langkah = new Langkah.Keadaan();
 	float spin;
 
 	/** The data handed to the render state (reused). */
@@ -255,6 +260,8 @@ final class GerakKeadaan {
 		spin = 0.0F;
 		diamSejak = -1.0F;
 		lariSejak = -1.0F;
+		posLalu = Float.NaN;
+		langkah.reset();
 		isengKlip = null;
 		reaksiKlip = 0;
 		ageLalu = Float.NaN;

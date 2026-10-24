@@ -136,6 +136,14 @@ final class SettingsRows {
 				SosokDetail::putarSetelan, SettingsRows::sosokDetailTooltip));
 		items.add(coin(() -> Component.translatable(SOSOK + "wajah"), SosokDetail::wajah, SosokDetail::setWajah,
 				() -> List.of(Component.translatable(SOSOK + "wajah"), Component.translatable(SOSOK + "wajah.tip").withStyle(ChatFormatting.GRAY))));
+		// the walk and run (Langkah): the player's style cycles Cantik/Vanilla, the strength cycles 50-150 %
+		items.add(cycle(() -> Component.translatable(SOSOK + "jalan", Component.translatable(SOSOK + "jalan." + (SosokDetail.jalanPemain() ? "cantik" : "vanilla"))),
+				SosokDetail::putarJalan,
+				() -> List.of(Component.translatable(SOSOK + "jalan", Component.translatable(SOSOK + "jalan." + (SosokDetail.jalanPemain() ? "cantik" : "vanilla"))),
+						Component.translatable(SOSOK + "jalan.tip").withStyle(ChatFormatting.GRAY))));
+		items.add(cycle(() -> Component.translatable(SOSOK + "jalan_kuat", SosokDetail.jalanKuatPersen()), SosokDetail::putarJalanKuat,
+				() -> List.of(Component.translatable(SOSOK + "jalan_kuat", SosokDetail.jalanKuatPersen()),
+						Component.translatable(SOSOK + "jalan_kuat.tip").withStyle(ChatFormatting.GRAY))));
 		// Techniques and effects (DESIGN 22.12.9; hold G and release = cast live in Kontrol).
 		items.add(heading(C + "techniques"));
 		items.add(cycle(() -> Component.translatable(C + "shake", Component.translatable(C + "shake." + EffectQuality.shake().id())),

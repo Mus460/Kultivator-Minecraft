@@ -3,6 +3,7 @@ package dev.kultivator.client.sosok.gerak;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import dev.kultivator.client.render.MeditationPose;
+import dev.kultivator.client.sosok.SosokDetail;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -39,6 +40,11 @@ public final class GerakApplier {
 		boolean walking = state.walkAnimationSpeed > 0.01F && !meditasi && !state.isPassenger;
 		if (walking) {
 			ayun(model, state, d);
+		}
+		if (d.langkah != null && !meditasi && !state.isPassenger && d.tidurBobot < 0.5F && state.swimAmount <= 0.0F) {
+			// the shared polish (players use the same code): only what the walk profile does not already do
+			boolean lengan = !d.lenganDipose && !d.aktivitas;
+			Langkah.terapkan(model, state, d.langkah, SosokDetail.jalanKuat(), false, lengan, lengan, lengan);
 		}
 		float[] t = d.tambah;
 		model.head.xRot += t[Klip.HX];
@@ -137,7 +143,7 @@ public final class GerakApplier {
 	}
 
 	/** A small extra body twist (the gaze past 40 degrees): arms turn with the torso. */
-	private static void putarBadan(PlayerModel model, float twist) {
+	static void putarBadan(PlayerModel model, float twist) {
 		model.body.yRot += twist;
 		model.rightArm.yRot += twist;
 		model.leftArm.yRot += twist;

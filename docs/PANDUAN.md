@@ -9963,6 +9963,13 @@ penonton turnamen) kini memakai satu sistem penampilan, **Sosok**:
 * **Pengaturan → Tampilan & Efek → Penampilan & Animasi**: "Detail animasi" Otomatis (mengikuti Kualitas Efek:
   Maksimal = Tinggi, Normal = Sedang, Minimal = Rendah), Tinggi, Sedang atau Rendah, dan "Ekspresi wajah" (mati = wajah
   diam, sedikit lebih ringan).
+* **Jalan dan lari** (pemain dan NPC, satu kode bersama): lutut terangkat, siku menekuk, bahu berlawanan dengan pinggul,
+  condong ke depan saat berlari (berbaur halus dari jalan menurut kecepatan nyata), condong ke arah belokan, sedikit
+  condong saat mulai/berhenti, langkah pendek saat mundur atau menyamping, mendarat lembut setelah jatuh. Warga yang
+  lari ketakutan kini berbeda dari yang sekadar tergesa (lengan terlempar, sesekali menoleh ke belakang). Pemain di
+  sudut pandang orang ketiga mengalah pada emote/serangan Better Combat (Player Animation Library), meditasi, jurus,
+  pedang terbang, berenang, elytra, jongkok, menunggang dan model pemain EMF. Pengaturan: "Gaya jalan pemain"
+  Cantik/Vanilla dan "Kekuatan gerak jalan" 50-150%.
 * Aman untuk Sodium dan Iris (hanya tipe render vanilla) dan Player Animation Library (hanya menganimasikan pemain).
 * Uji (op) `/kultivasi uji penampilan galeri|acak|klip|jalan|wajah|pegas|murid|hapus`; klien `/sosok info` menampilkan
   anggaran. Rancangan lengkap: `docs/rancangan/40-penampilan-dan-animasi.md`.
