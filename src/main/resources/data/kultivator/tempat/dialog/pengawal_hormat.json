@@ -1,0 +1,18 @@
+{
+  "pembicara": [
+    "peran:pengawal_istana"
+  ],
+  "prioritas": 6,
+  "syarat": [
+    "bendera pengawal_sahabat",
+    "acak 50"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "prop": "tombak"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "pembicara": [
+    "tokoh:lin_haichao"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest tema_pelabuhan_tali_putus selesai"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {}
+      ]
+    }
+  ]
+}

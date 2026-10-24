@@ -1,0 +1,61 @@
+{
+  "pembicara": [
+    "tokoh:dan_chen"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_pewaris_sakit tahap tabib"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "ke": "resep"
+        }
+      ]
+    },
+    {
+      "id": "resep",
+      "gestur": "bicara_tangan",
+      "prop": "kitab",
+      "akibat": [
+        "beri cerita:resep_penawar"
+      ],
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera takhta3_air",
+            "quest_maju takhta_pewaris_sakit"
+          ]
+        },
+        {
+          "akibat": [
+            "bendera takhta3_urat",
+            "quest_maju takhta_pewaris_sakit"
+          ]
+        },
+        {
+          "ke": "cepat"
+        }
+      ]
+    },
+    {
+      "id": "cepat",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera takhta3_beli",
+            "quest_maju takhta_pewaris_sakit"
+          ]
+        },
+        {
+          "ke": "resep"
+        }
+      ]
+    }
+  ]
+}

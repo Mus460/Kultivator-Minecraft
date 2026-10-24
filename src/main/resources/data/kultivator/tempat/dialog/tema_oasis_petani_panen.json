@@ -1,0 +1,38 @@
+{
+  "pembicara": [
+    "peran:petani"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "oasis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "memanen",
+      "prop": "keranjang",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_panen"
+          ]
+        },
+        {
+          "ke": "tumbuh"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tumbuh",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

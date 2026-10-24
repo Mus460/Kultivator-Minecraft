@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/kampung_tiba",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.kampung_ikrar.description"
+    },
+    "icon": {
+      "id": "minecraft:bell"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.kampung_ikrar.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

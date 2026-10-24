@@ -1,0 +1,57 @@
+{
+  "pembicara": [
+    "peran:penari_gurun"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "oasis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas",
+      "prop": "kipas_sutra",
+      "suara": "tema.oasis.dance",
+      "pilihan": [
+        {
+          "syarat": [
+            "oasis_festival"
+          ],
+          "akibat": [
+            "oasis_tari"
+          ],
+          "tampil": true,
+          "alasan": "kultivator.kota_tema.oasis.alasan.festival"
+        },
+        {
+          "ke": "rahasia"
+        },
+        {
+          "ke": "kapan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "rahasia",
+      "gestur": "tari_putar",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kapan",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "tokoh:wen_shi"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "bendera air_wen_dengar"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "duduk_kursi",
+      "pilihan": [
+        {
+          "ke": "cucu"
+        }
+      ]
+    },
+    {
+      "id": "cucu",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "ke": "lentera"
+        }
+      ]
+    },
+    {
+      "id": "lentera",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "ke": "tenang"
+        }
+      ]
+    },
+    {
+      "id": "tenang",
+      "gestur": "angkat_bawa",
+      "prop": "lentera_teratai",
+      "akibat": [
+        "beri kultivator:tema/lentera_teratai 3"
+      ]
+    }
+  ]
+}

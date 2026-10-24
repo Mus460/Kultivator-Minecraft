@@ -6,6 +6,10 @@ import dev.kultivator.data.Cultivators;
 import dev.kultivator.data.Rank;
 import dev.kultivator.data.RootGrade;
 import dev.kultivator.fx.Fx;
+import dev.kultivator.sosok.Gaya;
+import dev.kultivator.sosok.Sosok;
+import dev.kultivator.sosok.SosokApi;
+import dev.kultivator.sosok.SosokUsia;
 import dev.kultivator.trial.HeartDemonEntity;
 import dev.kultivator.util.NoGrief;
 import dev.kultivator.util.Targeting;
@@ -39,6 +43,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
@@ -66,6 +71,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * A disciple (Murid, DESIGN 18): a humanoid follower drawn with the player model and one of the default player skins.
@@ -75,7 +83,7 @@ import java.util.UUID;
  * no plates, tramples nothing ({@link NoGrief#TAG}), is not touched by blocks at all and travels through no portal. Death
  * leaves only its Soul Tablet ({@link Disciples#onDeath}).
  */
-public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
+public class DiscipleEntity extends PathfinderMob implements OwnableEntity, SosokApi.Pemegang {
 
 	/** Bits of {@link #syncedFlags()}. */
 	public static final int FLAG_MEDITATING = 1;
@@ -90,6 +98,11 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	public static final int SKIN_COUNT = 9;
 	/** Key of {@link DiscipleData#save()} in the entity's saved data. */
 	public static final String DATA_KEY = "kultivator_disciple";
+
+	/** {@link #addModeListener}: called after every {@link #setMode} on the server (DESIGN 39.7.2). */
+	private static final List<Consumer<DiscipleEntity>> MODE_LISTENERS = new CopyOnWriteArrayList<>();
+	/** {@link #addGoalInstaller}: called at the end of {@link #registerGoals} for every new body. */
+	private static final List<BiConsumer<DiscipleEntity, GoalSelector>> GOAL_INSTALLERS = new CopyOnWriteArrayList<>();
 
 	/** Every disciple's state is looked at this often (ticks). */
 	static final int STATE_INTERVAL = 10;
@@ -115,7 +128,14 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		/** A Void Realm phantom: fights only its {@link DuelRules} partner. */
 		PHANTOM,
 		/** A Divine Clone: allied with its source's master, fights monsters, follows its source. */
-		CLONE;
+		CLONE,
+		/**
+		 * Murid Mandiri's town body (DESIGN 39.6.6, module 39C): a read-only look-alike of a disciple who is away on a
+		 * journey (the real data stays in {@code AwayStore}). Never saved, never listed by {@link Disciples}, fights nobody,
+		 * and every hurt is refused except the void and {@code /kill}; its walk and poses come from goals that 39C adds
+		 * with {@link #addGoalInstaller}. Appended last so the ordinals of the older roles never shift.
+		 */
+		JELMAAN;
 
 		public static Role byOrdinal(int ordinal) {
 			Role[] values = values();
@@ -229,6 +249,14 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	private static final EntityDataAccessor<Integer> DATA_POWER = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
 	// Aura Kultivasi (DESIGN 31, C31.5): Heavenly root, breakthrough ready and the root element mask.
 	private static final EntityDataAccessor<Integer> DATA_AURA = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	// Sosok (DESIGN 40.2.4, module 40I): identity, changeable style, server clip, its start, props, the entity looked at.
+	// Only "sosok" and "gaya" are saved; clips, props and the gaze are session state ({@link SosokApi}).
+	private static final EntityDataAccessor<Integer> DATA_SOSOK = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_GAYA = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_GERAK = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_GERAK_T0 = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_PROP = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_LOOK_AT = SynchedEntityData.defineId(DiscipleEntity.class, EntityDataSerializers.INT);
 	/** {@link #syncedAura()} bit: the root is of the Heavenly grade. */
 	public static final int AURA_HEAVENLY_ROOT = 1;
 	/** {@link #syncedAura()} bit: at the bottleneck with a full bar, not the maximum rank. */
@@ -273,6 +301,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	/** GUARD_HALL: the hall stele (refreshed every 2 s), and the tick until which it rests between patrol legs. */
 	private @Nullable BlockPos hallAnchor;
 	private int patrolRestUntil;
+	/** Timers of the timed Sosok clips, moods and function activities (DESIGN 40, session state). */
+	private final SosokApi.Waktu sosokWaktu = new SosokApi.Waktu();
 
 	public DiscipleEntity(EntityType<? extends DiscipleEntity> type, Level level) {
 		super(type, level);
@@ -303,6 +333,12 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		builder.define(DATA_TALENT, 0);
 		builder.define(DATA_POWER, 0);
 		builder.define(DATA_AURA, 0);
+		builder.define(DATA_SOSOK, Sosok.KOSONG);
+		builder.define(DATA_GAYA, 0);
+		builder.define(DATA_GERAK, 0);
+		builder.define(DATA_GERAK_T0, 0);
+		builder.define(DATA_PROP, 0);
+		builder.define(DATA_LOOK_AT, SosokApi.TATAP_TIDAK_ADA);
 	}
 
 	@Override
@@ -318,6 +354,36 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F));
 		this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 		this.targetSelector.addGoal(1, new DiscipleAi.ChooseTargetGoal(this));
+		for (BiConsumer<DiscipleEntity, GoalSelector> installer : GOAL_INSTALLERS) {
+			try {
+				installer.accept(this, this.goalSelector);
+			} catch (RuntimeException exception) {
+				Kultivator.LOGGER.error("A disciple goal installer failed", exception);
+			}
+		}
+	}
+
+	/**
+	 * Adds goals to every disciple body created from now on (DESIGN 39.12 39A hook; 39C's town-body goals). Runs from the
+	 * entity constructor on both sides, before the role, data and owner are set: an installed goal must test
+	 * {@link #role()} (or anything else) in its own {@code canUse}, never at install time. Register once from a module
+	 * init, before any world loads.
+	 */
+	public static void addGoalInstaller(BiConsumer<DiscipleEntity, GoalSelector> installer) {
+		if (installer != null) {
+			GOAL_INSTALLERS.add(installer);
+		}
+	}
+
+	/**
+	 * Called after every {@link #setMode} on the server (DESIGN 39.12 39A hook): Murid Mandiri treats it as the master's
+	 * explicit order and pauses its planner for that disciple (39.7.2). Listeners must be cheap; one that throws is logged
+	 * and skipped.
+	 */
+	public static void addModeListener(Consumer<DiscipleEntity> listener) {
+		if (listener != null) {
+			MODE_LISTENERS.add(listener);
+		}
 	}
 
 	// ================================================================== API (DESIGN 18.1)
@@ -383,6 +449,15 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 			refreshHallAnchor();
 		}
 		this.getNavigation().stop();
+		if (!this.level().isClientSide()) {
+			for (Consumer<DiscipleEntity> listener : MODE_LISTENERS) {
+				try {
+					listener.accept(this);
+				} catch (RuntimeException exception) {
+					Kultivator.LOGGER.error("A disciple mode listener failed", exception);
+				}
+			}
+		}
 	}
 
 	// ================================================================== phase 6: roles, activities, synced values
@@ -451,12 +526,14 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 	}
 
 	/**
-	 * True while an activity 1-8, 10 (builder), 11 (formation keeper), 12 (forge assistant) or one of Sekte yang Hidup's
-	 * 13-20 ({@code sekte.SekteIds.ACT_*}, DESIGN 36.3.3) binds the disciple to its spot.
+	 * True while an activity 1-8, 10 (builder), 11 (formation keeper), 12 (forge assistant), one of Sekte yang Hidup's
+	 * 13-20 ({@code sekte.SekteIds.ACT_*}, DESIGN 36.3.3) or one of Murid Mandiri's holding ids among 40-60
+	 * ({@code SekteIds.mandiriHolding}, DESIGN 39.4.2) binds the disciple to its spot.
 	 */
 	public boolean holdsActivitySpot() {
 		return activity >= ACTIVITY_WATER && activity <= ACTIVITY_SPECTATOR || activity == ACTIVITY_BUILD
-				|| activity == ACTIVITY_FORMATION_KEEPER || activity == ACTIVITY_FORGE_ASSIST || sekteHolding(activity);
+				|| activity == ACTIVITY_FORMATION_KEEPER || activity == ACTIVITY_FORGE_ASSIST || sekteHolding(activity)
+				|| dev.kultivator.sekte.SekteIds.mandiriHolding(activity);
 	}
 
 	/** Sekte yang Hidup's spot-holding activities 13-20 (DESIGN 36.3.3); 21-24 are poses only. */
@@ -654,6 +731,128 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		return this.entityData.get(DATA_SLIM);
 	}
 
+	// ================================================================== Sosok (DESIGN 40.2.4, contract C40.I1)
+
+	/** The disciple's identity: sex, visible age, build, look seed (the entity-seed stand-in while still unset). */
+	public Sosok syncedSosok() {
+		return Sosok.dari(this.entityData.get(DATA_SOSOK), this.getUUID());
+	}
+
+	/** The changeable style: shown traits, life path, wound, special outfit, mood. */
+	public Gaya syncedGaya() {
+		return Gaya.unpack(this.entityData.get(DATA_GAYA));
+	}
+
+	/** The server clip ({@code GerakId.pack}: clip {@code << 8 | variant}; 0 = none). */
+	public int syncedGerak() {
+		return this.entityData.get(DATA_GERAK);
+	}
+
+	/** Game time {@code & 0x7FFFFFFF} when the server clip started. */
+	public int syncedGerakT0() {
+		return this.entityData.get(DATA_GERAK_T0);
+	}
+
+	/** The props of the server clip ({@code PropId.pack}; 0 = the clip's own). */
+	public int syncedProp() {
+		return this.entityData.get(DATA_PROP);
+	}
+
+	/** The id of the entity it looks at, or {@link SosokApi#TATAP_TIDAK_ADA}. */
+	public int syncedLookAt() {
+		return this.entityData.get(DATA_LOOK_AT);
+	}
+
+	@Override
+	public int sosokData() {
+		return this.entityData.get(DATA_SOSOK);
+	}
+
+	/**
+	 * Sets the packed Sosok and keeps the old look fields in step: the slim arm model follows the body (every woman and
+	 * child) and the vanilla skin index, used only as the last fallback, comes from the look seed.
+	 */
+	@Override
+	public void setSosokData(int packed) {
+		this.entityData.set(DATA_SOSOK, packed);
+		Sosok sosok = Sosok.unpack(packed);
+		if (sosok != null) {
+			this.entityData.set(DATA_SLIM, sosok.lenganRamping());
+			this.entityData.set(DATA_SKIN, Math.floorMod(sosok.benih(), SKIN_COUNT));
+		}
+	}
+
+	@Override
+	public int gayaData() {
+		return this.entityData.get(DATA_GAYA);
+	}
+
+	@Override
+	public void setGayaData(int packed) {
+		this.entityData.set(DATA_GAYA, packed);
+	}
+
+	@Override
+	public int gerakData() {
+		return this.entityData.get(DATA_GERAK);
+	}
+
+	@Override
+	public int gerakT0() {
+		return this.entityData.get(DATA_GERAK_T0);
+	}
+
+	@Override
+	public void setGerakData(int gerak, int t0) {
+		this.entityData.set(DATA_GERAK, gerak);
+		this.entityData.set(DATA_GERAK_T0, t0);
+	}
+
+	@Override
+	public int propData() {
+		return this.entityData.get(DATA_PROP);
+	}
+
+	@Override
+	public void setPropData(int packed) {
+		this.entityData.set(DATA_PROP, packed);
+	}
+
+	@Override
+	public int tatapData() {
+		return this.entityData.get(DATA_LOOK_AT);
+	}
+
+	@Override
+	public void setTatapData(int entityId) {
+		this.entityData.set(DATA_LOOK_AT, entityId);
+	}
+
+	@Override
+	public SosokApi.Waktu waktuSosok() {
+		return sosokWaktu;
+	}
+
+	/** Gives the body {@code sosok} (synced data, slim model, skin fallback, {@code Attributes.SCALE}). Server side. */
+	void applySosok(Sosok sosok) {
+		if (sosok != null) {
+			SosokApi.setSosok(this, sosok);
+		}
+	}
+
+	/** Restores a saved pair (body NBT, Soul Tablet, departure): sosok 0 keeps the entity-seed stand-in. */
+	private void loadSosok(int sosok, int gaya) {
+		Sosok saved = Sosok.unpack(sosok);
+		if (saved != null) {
+			setSosokData(saved.pack());
+			if (!this.level().isClientSide()) {
+				SosokApi.terapkanSkala(this, saved);
+			}
+		}
+		this.entityData.set(DATA_GAYA, Gaya.unpack(gaya).withSuasana(Gaya.SUASANA_NETRAL).pack());
+		sosokWaktu.reset();
+	}
+
 	public int syncedRealm() {
 		return this.entityData.get(DATA_REALM);
 	}
@@ -696,17 +895,21 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		return life;
 	}
 
-	/** Binds a freshly created disciple to its master: data, name, skin, the FOLLOW order and full health. */
-	void setupNew(ServerPlayer master, DiscipleData fresh, Component name, int skin, boolean slim) {
+	/**
+	 * Binds a freshly created disciple to its master: data, name, its Sosok (sex, age, build, look seed; the slim model
+	 * and skin fallback follow it, DESIGN 40.2.4), the FOLLOW order and full health. The day it joined is noted for the
+	 * visible ageing ({@link SosokUsia}).
+	 */
+	void setupNew(ServerPlayer master, DiscipleData fresh, Component name, Sosok sosok) {
 		bindTo(master);
-		this.entityData.set(DATA_SKIN, Math.floorMod(skin, SKIN_COUNT));
-		this.entityData.set(DATA_SLIM, slim);
 		this.soulId = this.getUUID();
 		this.life = 0;
 		this.mode = Mode.FOLLOW;
 		this.post = null;
 		this.setCustomName(name);
 		setData(fresh);
+		applySosok(sosok);
+		SosokUsia.catatLahir(this);
 		this.setHealth(this.getMaxHealth());
 	}
 
@@ -720,8 +923,12 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.entityData.set(DATA_OWNER_NAME, masterName == null ? "" : masterName);
 	}
 
-	/** Gives a candidate, rival, phantom or clone its looks (no master is bound here). */
-	void setupBody(DiscipleData fresh, @Nullable Component name, int skin, boolean slim) {
+	/**
+	 * Gives a candidate, rival, phantom or clone its looks (no master is bound here). A body made only from the old
+	 * look fields gets the deterministic Sosok of its name, skin and slim flag ({@code SosokGen.dariTubuhLama}); a clone
+	 * or phantom passes its source's Sosok and style so it looks exactly like it.
+	 */
+	void setupBody(DiscipleData fresh, @Nullable Component name, int skin, boolean slim, @Nullable Sosok sosok, int gaya) {
 		this.entityData.set(DATA_SKIN, Math.floorMod(skin, SKIN_COUNT));
 		this.entityData.set(DATA_SLIM, slim);
 		this.soulId = this.getUUID();
@@ -732,6 +939,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 			this.setCustomName(name);
 		}
 		setData(fresh);
+		applySosok(sosok != null ? sosok : dev.kultivator.sosok.SosokGen.dariTubuhLama(name, skin, slim));
+		this.entityData.set(DATA_GAYA, Gaya.unpack(gaya).withSuasana(Gaya.SUASANA_NETRAL).pack());
 		this.setHealth(this.getMaxHealth());
 	}
 
@@ -747,6 +956,7 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.mode = Mode.FOLLOW;
 		this.post = null;
 		setActivity(ACTIVITY_NONE, null);
+		SosokUsia.catatLahir(this);
 		refreshSynced();
 	}
 
@@ -762,13 +972,14 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.entityData.set(DATA_SLIM, tag.getBooleanOr("slim", false));
 		tag.read("name", ComponentSerialization.CODEC).ifPresent(this::setCustomName);
 		setData(DiscipleData.load(tag.getCompoundOrEmpty("disciple")));
+		loadSosok(tag.getIntOr("sosok", Sosok.KOSONG), tag.getIntOr("gaya", 0));
 		Mode saved = Mode.byId(tag.getStringOr("mode", Mode.FOLLOW.id()));
 		setMode(saved == null ? Mode.FOLLOW : saved);
 		float health = tag.getFloatOr("health", this.getMaxHealth());
 		this.setHealth(Math.max(1.0F, Math.min(this.getMaxHealth(), health)));
 	}
 
-	/** Everything a Soul Tablet keeps: soul, life, master, name, skin and the whole cultivation. */
+	/** Everything a Soul Tablet keeps: soul, life, master, name, skin, Sosok and style, and the whole cultivation. */
 	CompoundTag writeTablet() {
 		CompoundTag tag = new CompoundTag();
 		tag.store("soul", UUIDUtil.CODEC, soulId());
@@ -780,6 +991,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		tag.putString("owner_name", ownerName());
 		tag.putInt("skin", skinIndex());
 		tag.putBoolean("slim", slimSkin());
+		tag.putInt("sosok", sosokData());
+		tag.putInt("gaya", gayaData());
 		Component name = this.getCustomName();
 		if (name != null) {
 			tag.store("name", ComponentSerialization.CODEC, name);
@@ -803,6 +1016,9 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		this.mode = Mode.FOLLOW;
 		this.post = null;
 		setData(DiscipleData.load(tag.getCompoundOrEmpty("disciple")));
+		// the same face in the new life; the wound and the special outfit of the old body do not come back
+		loadSosok(tag.getIntOr("sosok", Sosok.KOSONG), Gaya.unpack(tag.getIntOr("gaya", 0))
+				.withLuka(Gaya.LUKA_SEHAT).withBusanaKhusus(Gaya.BUSANA_OTOMATIS).pack());
 		this.setHealth(this.getMaxHealth());
 	}
 
@@ -866,8 +1082,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		if (DuelRules.dueling(this, target)) {
 			return true;
 		}
-		// Candidates fight nobody; rivals and phantoms fight only their duel partner.
-		if (role == Role.CANDIDATE || role == Role.RIVAL || role == Role.PHANTOM) {
+		// Candidates and town bodies fight nobody; rivals and phantoms fight only their duel partner.
+		if (role == Role.CANDIDATE || role == Role.RIVAL || role == Role.PHANTOM || role == Role.JELMAAN) {
 			return false;
 		}
 		// Disciples never fight disciples (of anyone): that also keeps two disciples from asking each other forever. A heart
@@ -977,8 +1193,9 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		if (attacker != null && DuelRules.dueling(attacker, this)) {
 			return super.isInvulnerableTo(level, source);
 		}
-		if (role == Role.CANDIDATE || role == Role.RIVAL || role == Role.PHANTOM) {
-			// Candidates are untouchable (only /kill and the void); rivals and phantoms are only for their duel partner.
+		if (role == Role.CANDIDATE || role == Role.RIVAL || role == Role.PHANTOM || role == Role.JELMAAN) {
+			// Candidates and town bodies are untouchable (only /kill and the void); rivals and phantoms are only for their
+			// duel partner.
 			return !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY);
 		}
 		if (attacker != null && attacker != this && isFriendly(attacker)) {
@@ -1095,6 +1312,12 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		if (this.isInLava()) {
 			this.lavaIgnite();
 			this.lavaHurt();
+		}
+		// Sosok (DESIGN 40): timed clips, moods and function activities end; once a second the automatic look state
+		// (wound, mourning, shown traits) and, spread over the minute, the visible ageing
+		SosokApi.tik(this);
+		if ((this.tickCount + this.getId()) % SosokUsia.INTERVAL == 0) {
+			SosokUsia.periksa(this);
 		}
 		if (releaseTicks > 0) {
 			tickRelease();
@@ -1215,9 +1438,12 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		}
 		if (holdsActivitySpot()) {
 			// Formation guard, tower, spirit body and spectators sit at their spot; duties and builders loop their own pose instead.
-			// Of Sekte yang Hidup's activities only the pavilion reader sits (the others loop their own pose).
+			// Of Sekte yang Hidup's activities only the pavilion reader sits (the others loop their own pose); of Murid
+			// Mandiri's 40-60 only seclusion, absorbing stones and self-chosen meditation sit (DESIGN 39.4.2).
+			boolean mandiri = dev.kultivator.sekte.SekteIds.mandiriActivity(activity);
 			return activity >= ACTIVITY_FORMATION_GUARD && activity != ACTIVITY_BUILD
 					&& (!sekteHolding(activity) || activity == dev.kultivator.sekte.SekteIds.ACT_STUDY)
+					&& (!mandiri || dev.kultivator.sekte.SekteIds.mandiriSits(activity))
 					&& activitySpot != null && this.getNavigation().isDone()
 					&& this.distanceToSqr(activitySpot.getX() + 0.5D, activitySpot.getY(), activitySpot.getZ() + 0.5D) <= 2.25D;
 		}
@@ -1451,6 +1677,8 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		}
 		output.putInt("Skin", skinIndex());
 		output.putBoolean("Slim", slimSkin());
+		output.putInt("sosok", sosokData());
+		output.putInt("gaya", gayaData());
 		output.store("Soul", UUIDUtil.CODEC, soulId());
 		output.putInt("Life", life);
 		if (releaseTicks > 0) {
@@ -1464,7 +1692,7 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 			output.putInt("Role", role.ordinal());
 		}
 		// Lasting assignments (duties, formation guard, formation keeper, forge assistant, Sekte yang Hidup's 13-20) survive a
-		// restart; tower, spirit body, spectator and duel do not.
+		// restart; tower, spirit body, spectator, duel and Murid Mandiri's 40-60 (the planner picks again, S15) do not.
 		if ((activity >= ACTIVITY_WATER && activity <= ACTIVITY_FORMATION_GUARD || activity == ACTIVITY_FORMATION_KEEPER
 				|| activity == ACTIVITY_FORGE_ASSIST || sekteHolding(activity)) && activitySpot != null) {
 			output.putInt("Activity", activity);
@@ -1490,6 +1718,7 @@ public class DiscipleEntity extends PathfinderMob implements OwnableEntity {
 		}
 		this.entityData.set(DATA_SKIN, Math.floorMod(input.getIntOr("Skin", 0), SKIN_COUNT));
 		this.entityData.set(DATA_SLIM, input.getBooleanOr("Slim", false));
+		loadSosok(input.getIntOr("sosok", Sosok.KOSONG), input.getIntOr("gaya", 0));
 		this.soulId = input.read("Soul", UUIDUtil.CODEC).orElse(null);
 		this.life = Math.max(0, input.getIntOr("Life", 0));
 		this.releaseTicks = Math.max(0, input.getIntOr("Releasing", 0));

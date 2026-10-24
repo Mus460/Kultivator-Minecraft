@@ -6,7 +6,9 @@ import dev.kultivator.harta.SpiritStones;
 import dev.kultivator.sect.event.Storehouse;
 import dev.kultivator.sect.hall.Halls;
 import dev.kultivator.util.Msg;
+import dev.kultivator.Kultivator;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -14,27 +16,108 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Upeti / tribute (DESIGN 25.6.4; PW ch. 3, the offerings Stone Village makes to its guardian): every 3 in-game days,
  * computed lazily with at most 3 cycles of catch-up, into the Lumbung ({@link Storehouse#insert}); whatever does not fit
  * waits in the village's {@code owed} buffer (at most 9 stacks) and is retried first on the next cycle. Halved after a
  * sack, skipped while the hall is dormant. The amounts are game design.
+ * <p>
+ * Hooks for other modules (DESIGN 38.C.2.3, owner 38DS): {@link #addBonusProvider} adds wares to a cycle (a Desa Klan pays
+ * aged herbs and middle spirit stones besides the crops), {@link #addPledgeVeto} lets a module refuse a pledge (a clan
+ * is pledged only after its patriarch was beaten or its regard reached 50; {@code Pledge} asks {@link #vetoIkrar}), and
+ * {@link #ikrarDi} answers which master protects the village at a bell (the vassal records are package-private).
  */
 public final class Tribute {
 
 	public static final int CYCLE_DAYS = 3;
 	public static final int MAX_CATCHUP = 3;
 	public static final int OWED_MAX = 9;
+
+	/** Extra wares of one tribute cycle (added after the crops, before the Lumbung; amounts already scaled by the provider). */
+	@FunctionalInterface
+	public interface BonusProvider {
+		/**
+		 * Adds stacks for {@code village} of {@code owner} to {@code out}. {@code factor} is the cycle's factor (0.5 after a
+		 * sack, 1.5 for a Panen Gagal reward); {@code bell} is the village bell.
+		 */
+		void bonus(MinecraftServer server, UUID owner, BlockPos bell, int loyalty, double factor, RandomSource random, List<ItemStack> out);
+	}
+
+	/** May refuse a pledge at {@code bell}: the reason, or null to allow. */
+	@FunctionalInterface
+	public interface PledgeVeto {
+		@Nullable Component refuse(ServerPlayer player, ServerLevel level, BlockPos bell);
+	}
+
+	/** A pledged village as other modules see it. */
+	public record Ikrar(UUID owner, String name, BlockPos bell, BlockPos plaque, int loyalty, int guardRealm, boolean guardPresent) {
+	}
+
+	private static final List<BonusProvider> BONUS = new CopyOnWriteArrayList<>();
+	private static final List<PledgeVeto> VETO = new CopyOnWriteArrayList<>();
+
+	/** Adds a tribute bonus provider (once, from a module's init). */
+	public static void addBonusProvider(BonusProvider provider) {
+		if (provider != null) {
+			BONUS.add(provider);
+		}
+	}
+
+	/** Adds a pledge veto (once, from a module's init). */
+	public static void addPledgeVeto(PledgeVeto veto) {
+		if (veto != null) {
+			VETO.add(veto);
+		}
+	}
+
+	/** The first refusal of the registered vetoes for a pledge at {@code bell}, or null (called by {@code Pledge}). */
+	public static @Nullable Component vetoIkrar(ServerPlayer player, ServerLevel level, BlockPos bell) {
+		for (PledgeVeto veto : VETO) {
+			try {
+				Component why = veto.refuse(player, level, bell);
+				if (why != null) {
+					return why;
+				}
+			} catch (RuntimeException e) {
+				Kultivator.LOGGER.warn("Pledge veto failed at {}", bell, e);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * The pledged, not lost village whose bell lies within {@code range} blocks of {@code pos} (overworld records only),
+	 * or null.
+	 */
+	public static @Nullable Ikrar ikrarDi(BlockPos pos, double range) {
+		double r2 = range * range;
+		for (UUID owner : Vassals.owners()) {
+			Vassals.Owner entry = Vassals.peek(owner);
+			if (entry == null) {
+				continue;
+			}
+			for (Village village : entry.villages) {
+				if (village.pledged && !village.lost && village.bell.distSqr(pos) <= r2) {
+					return new Ikrar(owner, village.name, village.bell, village.plaque, village.loyalty, village.guardRealm, village.guardPresent());
+				}
+			}
+		}
+		return null;
+	}
 
 	/** Pays every due cycle of {@code village} (at most {@link #MAX_CATCHUP}); true when something changed. */
 	static boolean process(MinecraftServer server, UUID owner, Village village, long day) {
@@ -64,6 +147,7 @@ public final class Tribute {
 	static void pay(MinecraftServer server, UUID owner, Village village, double factor) {
 		RandomSource random = server.overworld().getRandom();
 		List<ItemStack> stacks = roll(village, factor, random);
+		bonus(server, owner, village, factor, random, stacks);
 		int stored = retryOwed(server, owner, village);
 		int pending = 0;
 		for (ItemStack stack : stacks) {
@@ -108,6 +192,23 @@ public final class Tribute {
 		}
 		list.removeIf(ItemStack::isEmpty);
 		return list;
+	}
+
+	/** Lets every {@link BonusProvider} add its wares to one cycle. */
+	private static void bonus(MinecraftServer server, UUID owner, Village village, double factor, RandomSource random, List<ItemStack> stacks) {
+		for (BonusProvider provider : BONUS) {
+			try {
+				List<ItemStack> extra = new ArrayList<>();
+				provider.bonus(server, owner, village.bell, village.loyalty, factor, random, extra);
+				for (ItemStack stack : extra) {
+					if (stack != null && !stack.isEmpty()) {
+						stacks.add(stack);
+					}
+				}
+			} catch (RuntimeException e) {
+				Kultivator.LOGGER.warn("Tribute bonus provider failed for village {}", village.name, e);
+			}
+		}
 	}
 
 	private static void add(List<ItemStack> list, Item item, int count) {

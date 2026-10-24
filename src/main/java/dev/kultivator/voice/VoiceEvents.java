@@ -53,6 +53,44 @@ public final class VoiceEvents {
 	public static final List<String> ELDER_SEKTE = List.of("leitai_buka", "banner", "envoy");
 	/** Sekte yang Hidup: the visiting sect, the NPC sect master and his defeat. */
 	public static final List<String> BOSS_SEKTE = List.of("tamu_tantang", "sect_master", "sect_master_defeat");
+	/** DESIGN 38.B.8 (38ST): the capital's gates, law, bank, gambling house, guilds, inn, temple, dock and events. */
+	public static final List<String> KOTABESAR = List.of("gate_welcome", "curfew", "suspect", "wanted", "fine_paid", "jail", "bank_welcome",
+			"bank_note", "gamble_cut", "gamble_win", "gamble_lose", "grand_auction", "alchemy_start", "alchemy_winner", "smith_master",
+			"guild_bounty", "guild_rank", "recruit_call", "beast_market", "inn_welcome", "library_hush", "temple_bell", "teleport_ready",
+			"dock_depart", "palace_audience", "lantern_festival", "riddle_right", "beast_tide", "defense_won", "tournament_open");
+	/** DESIGN 38.S.6 (38ST): villages, clans, hermits, tombs, lairs, roads, sect compounds and repairs. */
+	public static final List<String> TEMPAT = List.of("village_elder", "village_fear", "bill_request", "bill_paid", "bill_refused",
+			"repair_work", "clan_patriarch", "young_master", "hermit", "hermit_koan", "inheritance", "inheritance_pass", "demon_hideout",
+			"captive_saved", "waystation", "peddler", "bandit", "tribulation_peak", "sect_visit", "child_play");
+	/** DESIGN 38.S.6 (38ST): the capital arc "Bayangan di Balik Takhta". */
+	public static final List<String> CERITA = List.of("ruyi_thanks", "moying_reveal", "bao_verdict", "coronation");
+	/** DESIGN 38.T.12 (38ST): the themed cities, one group per theme ({@code tema.<tema>.<line>}). */
+	public static final List<String> TEMA_PELABUHAN = List.of("welcome", "fish_call", "ship_arrive", "ship_depart", "lighthouse", "pirates",
+			"black_shark", "sea_crossing", "goddess_day", "shipwright", "lamp_lit");
+	public static final List<String> TEMA_OASIS = List.of("welcome", "bazaar", "haggle_no", "haggle_yes", "caravan", "sandstorm",
+			"water_priestess", "lord", "scorpion", "dance");
+	public static final List<String> TEMA_AIR = List.of("welcome", "boat_song", "silk", "tea", "thief", "lantern_night", "ghost", "ghost_rest",
+			"dragon_boat", "poet");
+	public static final List<String> TEMA_GUNUNG = List.of("welcome", "porter", "lift", "lift_stuck", "monkey", "rockfall", "abbot", "pilgrim",
+			"buddha_light", "cloud_bell");
+	public static final List<String> TEMA_IBLIS = List.of("gate_toll", "gate_weak", "pact", "hunt_hour", "arena_open", "arena_win", "broker",
+			"forbidden", "captive", "lord", "hunter", "raid", "dawn");
+	public static final List<String> TEMA_DAGANG = List.of("sold", "saturated");
+	/** DESIGN 39.8.4 (39E): autonomous disciples (town trips, seclusion, self-made breakthroughs, captivity, the demonic path). */
+	public static final List<String> DISCIPLE_MANDIRI = List.of("pamit", "pulang_belanja", "tawar", "tawar_sepakat", "lihat_lapak", "copet",
+			"makan", "latih", "salam_pagi", "tutup_masuk", "tutup_keluar", "hufa_minta", "hufa_jaga", "tembus_sendiri", "hati_lulus", "dao_pilih",
+			"belajar_sendiri", "serap_batu", "hadiah", "tertawan", "diselamatkan", "iblis_bisik", "ditebus", "jalan_ganti");
+	/** DESIGN 39.F.7 (39F, scripted by 39E): inter-sect feuds; rival sect bodies speak with the same six voices. */
+	public static final List<String> DISCIPLE_SETERU = List.of("seteru_ejek", "seteru_ejek_guru", "seteru_balas", "seteru_tantang",
+			"seteru_terima", "seteru_menang", "seteru_kalah", "seteru_keroyok", "seteru_sergap", "seteru_lindungi", "seteru_curi", "seteru_maaf",
+			"seteru_sumpah", "seteru_damai", "seteru_saingan", "seteru_kekasih");
+	/** DESIGN 39.F.7: the elder who breaks up a feud and pays for the damage. */
+	public static final List<String> ELDER_SETERU = List.of("seteru_lerai", "seteru_ganti_rugi");
+	/** DESIGN 37 (docs/progres/langit-voices.md): Heaven's line when a sect rises above the clouds. */
+	public static final List<String> HEAVEN_SEKTE_LANGIT = List.of("langit_naik");
+	/** DESIGN 37: the cloud pirate captain, the Longbo giant, the guest elder and the Heavenly Court envoy. */
+	public static final List<String> SEKTE_LANGIT = List.of("bajak_datang", "longbo_datang", "longbo_kalah", "tamu_salam", "utusan_salam",
+			"utusan_tantang");
 	/** Lines without words (no caption): laughs, growls, roars and grunts. */
 	private static final List<String> NON_VERBAL = List.of("demon.laugh", "demon.growl", "demon.death", "boss.roar");
 
@@ -68,8 +106,13 @@ public final class VoiceEvents {
 		for (String voice : DISCIPLE_VOICES) {
 			group("disciple." + voice, DISCIPLE);
 			group("disciple." + voice, DISCIPLE_SEKTE);
+			group("disciple." + voice, DISCIPLE_MANDIRI);
+			group("disciple." + voice, DISCIPLE_SETERU);
 		}
 		group("elder", ELDER_SEKTE);
+		group("elder", ELDER_SETERU);
+		group("heaven", HEAVEN_SEKTE_LANGIT);
+		group("sekte_langit", SEKTE_LANGIT);
 		group("boss", BOSS_SEKTE);
 		group("grunt", GRUNTS);
 		group("kota", KOTA);
@@ -82,6 +125,15 @@ public final class VoiceEvents {
 		group("laut", LAUT);
 		group("kapal", KAPAL);
 		group("peta", PETA);
+		group("kotabesar", KOTABESAR);
+		group("tempat", TEMPAT);
+		group("cerita", CERITA);
+		group("tema.pelabuhan", TEMA_PELABUHAN);
+		group("tema.oasis", TEMA_OASIS);
+		group("tema.air", TEMA_AIR);
+		group("tema.gunung", TEMA_GUNUNG);
+		group("tema.iblis", TEMA_IBLIS);
+		group("tema.dagang", TEMA_DAGANG);
 	}
 
 	private static void group(String prefix, List<String> keys) {

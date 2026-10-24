@@ -1,0 +1,40 @@
+{
+  "templat": [
+    {
+      "id": "langit_meteor_1",
+      "pemicu": "langit_meteor_shower",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "langit_meteor_2",
+      "pemicu": "langit_meteor_shower",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "langit_gerhana_1",
+      "pemicu": "langit_blood_eclipse",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "langit_gerhana_2",
+      "pemicu": "langit_blood_eclipse",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "langit_bulan_1",
+      "pemicu": "langit_twin_moons",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "langit_bulan_2",
+      "pemicu": "langit_twin_moons",
+      "bobot": 10,
+      "umur_hari": 5
+    }
+  ]
+}

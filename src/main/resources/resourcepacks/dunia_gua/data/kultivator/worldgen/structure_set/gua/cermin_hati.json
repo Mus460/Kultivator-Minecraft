@@ -1,0 +1,34 @@
+{
+  "placement": {
+    "type": "kultivator:cincin_tempat",
+    "salt": 380518,
+    "spacing": 40,
+    "separation": 14,
+    "min_chunks": 24,
+    "jarak_tempat": 4,
+    "cincin": [
+      {
+        "sampai_chunk": 62,
+        "frekuensi": 0.0
+      },
+      {
+        "sampai_chunk": 187,
+        "frekuensi": 0.04
+      },
+      {
+        "sampai_chunk": 500,
+        "frekuensi": 0.06
+      },
+      {
+        "sampai_chunk": 9999,
+        "frekuensi": 0.08
+      }
+    ]
+  },
+  "structures": [
+    {
+      "structure": "kultivator:gua/cermin_hati",
+      "weight": 1
+    }
+  ]
+}

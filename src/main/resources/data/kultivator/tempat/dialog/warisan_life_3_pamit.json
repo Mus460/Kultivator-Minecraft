@@ -1,0 +1,18 @@
+{
+  "pembicara": [
+    "peran:sisa_jiwa"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "makam life 3",
+    "quest warisan_life_3 selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "suara": "tempat.inheritance_pass"
+    }
+  ]
+}

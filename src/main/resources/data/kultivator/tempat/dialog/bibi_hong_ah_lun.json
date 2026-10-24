@@ -1,0 +1,75 @@
+{
+  "pembicara": [
+    "tokoh:bibi_hong"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest surat_ah_lun baru",
+    "!bendera hong_tolak"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tertawa",
+      "prop": "teko",
+      "pilihan": [
+        {
+          "ke": "cerita"
+        },
+        {
+          "akibat": [
+            "bendera hong_tolak"
+          ],
+          "ke": "akhir_sibuk"
+        }
+      ]
+    },
+    {
+      "id": "cerita",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "syarat": [
+            "situs_dikenal sekte/kompleks"
+          ],
+          "ke": "sekte"
+        },
+        {
+          "akibat": [
+            "beri cerita:surat_bibi_hong",
+            "quest_mulai surat_ah_lun"
+          ],
+          "ke": "terima"
+        }
+      ]
+    },
+    {
+      "id": "sekte",
+      "isian": [
+        "sekte_terdekat"
+      ],
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri cerita:surat_bibi_hong",
+            "quest_mulai surat_ah_lun"
+          ],
+          "ke": "terima"
+        }
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat",
+      "akibat": [
+        "bendera inap_gratis_1"
+      ]
+    },
+    {
+      "id": "akhir_sibuk",
+      "gestur": "kipas"
+    }
+  ]
+}

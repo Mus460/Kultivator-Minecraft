@@ -1,0 +1,15 @@
+{
+  "type": "kultivator:jalan",
+  "biomes": "#minecraft:is_overworld",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {},
+  "pos": "kemah_begal",
+  "lot": [
+    {
+      "dx": -12,
+      "dz": -12,
+      "pool": "kultivator:pos/kemah_begal"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "pembicara": [
+    "tokoh:gulnar"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_oasis_permadani_ratu tahap bahan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tenun",
+      "pilihan": [
+        {
+          "syarat": [
+            "punya kultivator:tema/ekor_racun_kalajengking",
+            "punya minecraft:cactus_flower 6"
+          ],
+          "akibat": [
+            "ambil kultivator:tema/ekor_racun_kalajengking 1",
+            "ambil minecraft:cactus_flower 6",
+            "quest_maju tema_oasis_permadani_ratu"
+          ],
+          "ke": "terima",
+          "tampil": true,
+          "alasan": "kultivator.kota_tema.oasis.alasan.bahan_ratu"
+        },
+        {
+          "ke": "cari"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "cari",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "tenun"
+    }
+  ]
+}

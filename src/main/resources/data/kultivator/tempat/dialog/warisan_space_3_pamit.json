@@ -1,0 +1,18 @@
+{
+  "pembicara": [
+    "peran:sisa_jiwa"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "makam space 3",
+    "quest warisan_space_3 selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "suara": "tempat.inheritance_pass"
+    }
+  ]
+}

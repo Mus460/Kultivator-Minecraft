@@ -1,0 +1,21 @@
+{
+  "pembicara": [
+    "peran:penegak_iblis"
+  ],
+  "prioritas": 25,
+  "syarat": [
+    "iblis_di_kota",
+    "!pita 2"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "ancam",
+      "suara": "tema.iblis.gate_weak",
+      "pilihan": [
+        {}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "pembicara": [
+    "peran:tetua_klan"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 60",
+    "!bendera klan_hormat",
+    "!bendera klan_meremehkan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tua",
+      "pilihan": [
+        {
+          "ke": "sejarah"
+        },
+        {
+          "ke": "tuan_muda"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sejarah",
+      "gestur": "cerita",
+      "akibat": [
+        "lore kampung.klan"
+      ]
+    },
+    {
+      "id": "tuan_muda",
+      "gestur": "kipas"
+    }
+  ]
+}

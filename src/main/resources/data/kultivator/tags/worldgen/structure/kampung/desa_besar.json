@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:kampung/desa_besar_sedang",
+    "kultivator:kampung/desa_besar_salju",
+    "kultivator:kampung/desa_besar_sabana",
+    "kultivator:kampung/desa_besar_sakura",
+    "kultivator:kampung/desa_besar_gurun",
+    "kultivator:kampung/desa_besar_rawa",
+    "kultivator:kampung/desa_besar_terasering"
+  ]
+}

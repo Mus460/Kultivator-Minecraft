@@ -34,6 +34,14 @@ public final class SekteIds {
 	/** The ten module ids in DESIGN order (config sections, test sub-trees, tiles). */
 	public static final String[] MODULES = {P, R, T, G, A, E, X, S, D, W};
 
+	/**
+	 * Murid Mandiri (DESIGN 39 + 39.F, package {@code sekte.mandiri}): switch {@code umum.mandiri}, config section and
+	 * test tree {@code mandiri}. Deliberately not in {@link #MODULES}: that array is the ten DESIGN 36 modules whose index
+	 * fixes the epic beat ranges 100-199 ({@code EpicIds.EXTRA_SEKTE_FIRST}) and the service list of
+	 * {@code SekteApi.liveModules}; 39 reports itself with {@code uji perguruan mandiri modul}.
+	 */
+	public static final String MANDIRI = "mandiri";
+
 	// ================================================================== saved data keys
 
 	/**
@@ -55,6 +63,8 @@ public final class SekteIds {
 	public static final String EXTRA_E = "jabatan";
 	public static final String EXTRA_X = "misi";
 	public static final String EXTRA_W = "kerja";
+	/** 39: path, goals, drives, activity, purse, bag... (schema C39.A4 in {@code sekte.mandiri.api.MandiriIds}). */
+	public static final String EXTRA_MANDIRI = "mandiri";
 
 	/** Sections of the owner's {@code HallData} ({@code Halls.section(owner, key)}): {@code sekte_<module>}. */
 	public static String hallSection(String module) {
@@ -108,6 +118,35 @@ public final class SekteIds {
 			case ACT_BOW -> SekteContent.on(E) || SekteContent.on(A) || SekteContent.on(T);
 			default -> true;
 		};
+	}
+
+	// ================================================================== disciple activities 40-60 (DESIGN 39.4.2, 39.F.5)
+
+	/** First activity id of Murid Mandiri (names and owners per id in {@code sekte.mandiri.MandiriKegiatan}). */
+	public static final int ACT_MANDIRI_FIRST = 40;
+	/** Last id: 40-56 DESIGN 39, 57-60 the feud module 39F. */
+	public static final int ACT_MANDIRI_LAST = 60;
+
+	/** True for 40-60. None of them is saved with the body (a reload restores 0, rule S15; the planner picks again). */
+	public static boolean mandiriActivity(int act) {
+		return act >= ACT_MANDIRI_FIRST && act <= ACT_MANDIRI_LAST;
+	}
+
+	/**
+	 * The ids of 40-60 that bind the disciple to its spot like the duty posts (39.4.2, 39.F.9): 40-45, 48, 51, 53-60.
+	 * 46 packing, 47 carrying, 49 bargaining, 50 browsing and 52 the flying departure are poses only.
+	 */
+	public static boolean mandiriHolding(int act) {
+		return mandiriActivity(act) && act != 46 && act != 47 && act != 49 && act != 50 && act != 52;
+	}
+
+	/**
+	 * The ids of 40-60 that count as seated meditation (39.4.2): 45 seclusion, 54 absorbing stones and 56 self-chosen
+	 * meditation, so the old meditation XP, regeneration, Master Guidance and the formation factor work without
+	 * changing the master's order.
+	 */
+	public static boolean mandiriSits(int act) {
+		return act == 45 || act == 54 || act == 56;
 	}
 
 	// ================================================================== sect build extensions (TemplateExtensions)

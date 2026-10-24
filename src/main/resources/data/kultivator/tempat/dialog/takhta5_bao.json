@@ -1,0 +1,37 @@
+{
+  "pembicara": [
+    "tokoh:bao_qing"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_topeng_terlepas tahap panggil"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "palu_hakim",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju takhta_topeng_terlepas"
+          ]
+        },
+        {
+          "ke": "curiga"
+        }
+      ]
+    },
+    {
+      "id": "curiga",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju takhta_topeng_terlepas"
+          ]
+        }
+      ]
+    }
+  ]
+}

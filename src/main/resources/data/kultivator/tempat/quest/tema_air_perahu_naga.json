@@ -1,0 +1,16 @@
+{
+  "pemberi": "tokoh:bibi_chuan",
+  "tempat": "kota_air",
+  "tahap": [
+    {
+      "id": "tabuh",
+      "tujuan": [
+        "air_naga_menang juara"
+      ],
+      "akibat": [
+        "nama_baik 1",
+        "bendera tema.air.juara_naga"
+      ]
+    }
+  ]
+}

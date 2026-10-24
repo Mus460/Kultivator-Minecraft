@@ -1,0 +1,19 @@
+{
+  "pembicara": [
+    "tokoh:gong_shumu"
+  ],
+  "prioritas": 42,
+  "syarat": [
+    "quest tema_pelabuhan_lunas_pertama tahap pesan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_berkacak",
+      "pilihan": [
+        {}
+      ]
+    }
+  ]
+}

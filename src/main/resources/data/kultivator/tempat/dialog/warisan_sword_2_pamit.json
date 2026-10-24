@@ -1,0 +1,18 @@
+{
+  "pembicara": [
+    "peran:sisa_jiwa"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "makam sword 2",
+    "quest warisan_sword_2 selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "suara": "tempat.inheritance_pass"
+    }
+  ]
+}

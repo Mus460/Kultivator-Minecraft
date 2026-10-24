@@ -1,0 +1,148 @@
+{
+  "templat": [
+    {
+      "id": "quest_warisan_sword_1",
+      "pemicu": "quest_warisan_sword_1",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_sword_2",
+      "pemicu": "quest_warisan_sword_2",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_sword_3",
+      "pemicu": "quest_warisan_sword_3",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_fire_1",
+      "pemicu": "quest_warisan_fire_1",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_fire_2",
+      "pemicu": "quest_warisan_fire_2",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_fire_3",
+      "pemicu": "quest_warisan_fire_3",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_ice_1",
+      "pemicu": "quest_warisan_ice_1",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_ice_2",
+      "pemicu": "quest_warisan_ice_2",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_ice_3",
+      "pemicu": "quest_warisan_ice_3",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_lightning_1",
+      "pemicu": "quest_warisan_lightning_1",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_lightning_2",
+      "pemicu": "quest_warisan_lightning_2",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_lightning_3",
+      "pemicu": "quest_warisan_lightning_3",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_body_1",
+      "pemicu": "quest_warisan_body_1",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_body_2",
+      "pemicu": "quest_warisan_body_2",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_body_3",
+      "pemicu": "quest_warisan_body_3",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_life_1",
+      "pemicu": "quest_warisan_life_1",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_life_2",
+      "pemicu": "quest_warisan_life_2",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_life_3",
+      "pemicu": "quest_warisan_life_3",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_shadow_1",
+      "pemicu": "quest_warisan_shadow_1",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_shadow_2",
+      "pemicu": "quest_warisan_shadow_2",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_shadow_3",
+      "pemicu": "quest_warisan_shadow_3",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_space_1",
+      "pemicu": "quest_warisan_space_1",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_space_2",
+      "pemicu": "quest_warisan_space_2",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "quest_warisan_space_3",
+      "pemicu": "quest_warisan_space_3",
+      "bobot": 10,
+      "umur_hari": 8
+    }
+  ]
+}

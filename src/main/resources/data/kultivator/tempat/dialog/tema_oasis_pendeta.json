@@ -1,0 +1,67 @@
+{
+  "pembicara": [
+    "peran:pendeta_air"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "oasis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_restu"
+          ],
+          "ke": "restu"
+        },
+        {
+          "akibat": [
+            "oasis_air_suci 1"
+          ],
+          "ke": "air"
+        },
+        {
+          "ke": "tugas"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "restu",
+      "gestur": "sikap_doa",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "air",
+      "gestur": "tuang_teh",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tugas",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

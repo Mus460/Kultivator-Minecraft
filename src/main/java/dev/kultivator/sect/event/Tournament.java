@@ -436,7 +436,8 @@ public final class Tournament {
 		List<DiscipleEntity> list = new ArrayList<>();
 		for (DiscipleEntity disciple : Disciples.loaded(owner)) {
 			if (EventUtil.free(disciple) && SectRanks.rank(disciple.data()) >= 1 && Halls.inTerritory(owner, disciple.level(), disciple.position())
-					&& !disciple.departed() && !Expeditions.refuses(disciple)) {
+					&& !disciple.departed() && !Expeditions.refuses(disciple)
+					&& dev.kultivator.sosok.SosokApi.usia(disciple) != dev.kultivator.sosok.Sosok.ANAK) {
 				list.add(disciple);
 			}
 		}
@@ -471,15 +472,28 @@ public final class Tournament {
 
 	// ================================================================== running
 
-	/** The names of the NPC sects the owner's hall already met (module D; empty when it is off). */
-	private static List<Component> metSects(UUID owner) {
-		List<Component> names = new ArrayList<>();
+	/**
+	 * The sects that send champions to the owner's Turnamen Elit (integration audit T12: the one NPC sect list of
+	 * {@link dev.kultivator.sekte.diplomasi.DaftarSekte}, never names of its own): the sects the hall already met and is not
+	 * at war with; before the hall met anyone, the three weakest sects of the list (the ones a young hall meets first).
+	 * Works with the Diplomasi module off too (the list then comes from the seeded plan).
+	 */
+	private static List<Component> eliteSects(UUID owner, net.minecraft.server.MinecraftServer server) {
 		dev.kultivator.sekte.api.DiplomasiService diplomacy = dev.kultivator.sekte.api.SekteApi.diplomasi();
-		for (String id : diplomacy.sects()) {
-			Component name = diplomacy.met(owner, id) ? diplomacy.name(id) : null;
-			if (name != null) {
-				names.add(name);
+		List<String> ids = dev.kultivator.sekte.diplomasi.DaftarSekte.ids(server);
+		List<Component> names = new ArrayList<>();
+		for (String id : ids) {
+			if (diplomacy.met(owner, id) && !diplomacy.atWar(owner, id)) {
+				names.add(dev.kultivator.sekte.diplomasi.DaftarSekte.name(server, id));
 			}
+		}
+		if (!names.isEmpty()) {
+			return names;
+		}
+		List<String> weakest = new ArrayList<>(ids);
+		weakest.sort(Comparator.comparingInt((String id) -> dev.kultivator.sekte.diplomasi.DaftarSekte.tier(server, id)));
+		for (int i = 0; i < Math.min(3, weakest.size()); i++) {
+			names.add(dev.kultivator.sekte.diplomasi.DaftarSekte.name(server, weakest.get(i)));
 		}
 		return names;
 	}
@@ -518,12 +532,10 @@ public final class Tournament {
 		List<Bracket.Entrant> seeds = new ArrayList<>(disciples);
 		int best = disciples.get(0).data.rank().step();
 		if (elite) {
-			// T12: the elite champions come from the NPC sects (Diplomasi) this hall already met; the old static names
-			// are only the fallback (Diplomasi off, or no sect met yet).
-			List<Component> met = metSects(owner);
+			// T12: the elite champions come from the one NPC sect list (met sects first, see eliteSects).
+			List<Component> sects = eliteSects(owner, level.getServer());
 			for (int i = 0; i < CHAMPIONS; i++) {
-				seeds.add(met.isEmpty() ? Rivals.champion(random, best - 1 + i, random.nextInt(Rivals.SECT_COUNT))
-						: Rivals.champion(random, best - 1 + i, met.get(random.nextInt(met.size()))));
+				seeds.add(sects.isEmpty() ? Rivals.rival(random, best - 1 + i) : Rivals.champion(random, best - 1 + i, sects.get(random.nextInt(sects.size()))));
 			}
 		}
 		if (guests) {

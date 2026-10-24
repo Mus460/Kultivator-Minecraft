@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380417,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_oasis",
+    "distrik": "hunian_tanah"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/oasis/hunian_tanah",
+      "weight": 1
+    }
+  ]
+}

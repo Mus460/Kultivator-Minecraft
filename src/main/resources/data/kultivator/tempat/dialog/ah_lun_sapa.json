@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:ah_lun"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sapu",
+      "prop": "sapu",
+      "suara": "tempat.sect_visit",
+      "pilihan": [
+        {
+          "ke": "asal"
+        },
+        {
+          "ke": "hidup"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "asal",
+      "gestur": "sikap_tunduk"
+    },
+    {
+      "id": "hidup",
+      "gestur": "segel_tangan"
+    }
+  ]
+}

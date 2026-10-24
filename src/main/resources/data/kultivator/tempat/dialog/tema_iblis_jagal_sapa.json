@@ -1,0 +1,16 @@
+{
+  "pembicara": [
+    "peran:jagal_arena"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "iblis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "asah_pisau"
+    }
+  ]
+}

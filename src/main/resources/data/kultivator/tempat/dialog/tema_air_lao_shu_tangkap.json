@@ -1,0 +1,54 @@
+{
+  "pembicara": [
+    "tokoh:lao_shu"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_air_benang tahap wen_shi",
+    "!bendera air_lao_shu_putus"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berlutut",
+      "pilihan": [
+        {
+          "ke": "jubah"
+        }
+      ]
+    },
+    {
+      "id": "jubah",
+      "gestur": "takut_sembunyi",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera air_lao_shu_putus",
+            "bendera air_lao_shu_serah",
+            "nama_baik 2",
+            "kabar tema_air_lao_shu_ditahan"
+          ],
+          "ke": "serah"
+        },
+        {
+          "akibat": [
+            "bendera air_lao_shu_putus",
+            "bendera air_lao_shu_mata",
+            "air_lepas_lao_shu"
+          ],
+          "ke": "mata"
+        }
+      ]
+    },
+    {
+      "id": "serah",
+      "gestur": "menangis"
+    },
+    {
+      "id": "mata",
+      "gestur": "hitung_koin_gelap"
+    }
+  ]
+}

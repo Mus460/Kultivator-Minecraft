@@ -1,0 +1,28 @@
+{
+  "pembicara": [
+    "peran:pedagang_seberang",
+    "peran:nakhoda_laut"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "pelabuhan_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

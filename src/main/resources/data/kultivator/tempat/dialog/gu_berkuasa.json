@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "tokoh:gu_lianshan"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "alur_penguasa gu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "syarat": [
+            "alur_bab5 c"
+          ],
+          "ke": "ajudan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ajudan",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

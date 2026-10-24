@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_oasis",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_oasis_penari.description"
+    },
+    "icon": {
+      "id": "kultivator:tema/selendang_penari"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_oasis_penari.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

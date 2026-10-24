@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "peran:penceramah_fana"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 70"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "mengajar",
+      "prop": "kitab",
+      "pilihan": [
+        {
+          "ke": "singkat"
+        },
+        {
+          "ke": "cendekia"
+        },
+        {
+          "ke": "fana"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "singkat",
+      "gestur": "bicara_tangan",
+      "akibat": [
+        "lore kota_besar.pusat"
+      ]
+    },
+    {
+      "id": "cendekia",
+      "gestur": "membaca",
+      "prop": "kitab",
+      "akibat": [
+        "lore kota_besar.cendekia"
+      ]
+    },
+    {
+      "id": "fana",
+      "gestur": "tatap_langit"
+    }
+  ]
+}

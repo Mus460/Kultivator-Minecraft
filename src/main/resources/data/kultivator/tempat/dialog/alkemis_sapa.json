@@ -1,0 +1,45 @@
+{
+  "pembicara": [
+    "peran:alkemis"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 60"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas_tungku",
+      "prop": "kipas_tungku",
+      "pilihan": [
+        {
+          "ke": "jadi"
+        },
+        {
+          "ke": "dan_chen"
+        },
+        {
+          "ke": "nasihat"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "jadi",
+      "gestur": "tumbuk_herba",
+      "prop": "alu",
+      "akibat": [
+        "lore gilda.alkemis"
+      ]
+    },
+    {
+      "id": "dan_chen",
+      "gestur": "menangis"
+    },
+    {
+      "id": "nasihat",
+      "gestur": "napas_meditasi"
+    }
+  ]
+}

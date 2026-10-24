@@ -1,0 +1,18 @@
+{
+  "pembicara": [
+    "peran:sisa_jiwa"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "makam body 3",
+    "quest warisan_body_3 selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "suara": "tempat.inheritance_pass"
+    }
+  ]
+}

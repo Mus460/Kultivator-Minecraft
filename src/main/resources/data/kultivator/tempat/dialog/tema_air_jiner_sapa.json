@@ -1,0 +1,64 @@
+{
+  "pembicara": [
+    "tokoh:su_jiner"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "syarat": [
+            "!quest tema_air_benang selesai"
+          ],
+          "ke": "merah"
+        },
+        {
+          "syarat": [
+            "quest tema_air_benang hasil tenang"
+          ],
+          "ke": "pamit"
+        },
+        {
+          "syarat": [
+            "quest tema_air_benang hasil sepi"
+          ],
+          "ke": "diam"
+        },
+        {
+          "syarat": [
+            "quest tema_air_benang selesai"
+          ],
+          "ke": "motif"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pamit",
+      "gestur": "tatap_langit"
+    },
+    {
+      "id": "diam",
+      "gestur": "sikap_tangan_belakang"
+    },
+    {
+      "id": "motif",
+      "gestur": "tenun"
+    },
+    {
+      "id": "merah",
+      "gestur": "tatap_langit"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

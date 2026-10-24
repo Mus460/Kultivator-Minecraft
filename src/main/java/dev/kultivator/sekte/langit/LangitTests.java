@@ -145,10 +145,11 @@ public final class LangitTests {
 		int tier = IntegerArgumentType.getInteger(ctx, "t");
 		int yP = y != Integer.MIN_VALUE ? y : LangitConfig.get().tinggiAsal;
 		BlockPos origin = new BlockPos(player.getBlockX(), yP, player.getBlockZ());
-		long ticket = EngineApi.get().showcaseSky(player, 10 + n, tier, 0, origin);
-		Msg.chat(player, Msg.prefixed(Component.translatable(ticket != 0L ? "kultivator.sekte_langit.uji.pamer" : "kultivator.sekte_langit.uji.ditolak",
-				n, yP)).withStyle(ticket != 0L ? ChatFormatting.AQUA : ChatFormatting.YELLOW));
-		return ticket != 0L ? 1 : 0;
+		// Through Founding so "/kultivasi uji sekte pamer konfirmasi" finds the pending showcase.
+		boolean opened = dev.kultivator.sect.build.flow.Founding.previewAt(player, 10 + n, tier, 0, origin, dev.kultivator.sect.build.flow.Founding.Mode.SHOWCASE);
+		Msg.chat(player, Msg.prefixed(Component.translatable(opened ? "kultivator.sekte_langit.uji.pamer" : "kultivator.sekte_langit.uji.ditolak",
+				n, yP)).withStyle(opened ? ChatFormatting.AQUA : ChatFormatting.YELLOW));
+		return opened ? 1 : 0;
 	}
 
 	private static int build(CommandContext<CommandSourceStack> ctx, int mode) throws CommandSyntaxException {

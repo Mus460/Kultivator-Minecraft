@@ -1,0 +1,48 @@
+{
+  "pembicara": [
+    "tokoh:lao_qiao"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest kafilah_terakhir baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "seru_dagang",
+      "prop": "pikulan",
+      "suara": "tempat.peddler",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri cerita:bekal_kafilah",
+            "quest_mulai kafilah_terakhir"
+          ],
+          "ke": "jalan"
+        },
+        {
+          "ke": "tawar"
+        }
+      ]
+    },
+    {
+      "id": "tawar",
+      "gestur": "tawar",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri cerita:bekal_kafilah",
+            "quest_mulai kafilah_terakhir"
+          ],
+          "ke": "jalan"
+        }
+      ]
+    },
+    {
+      "id": "jalan",
+      "gestur": "takut_sembunyi",
+      "suara": "tempat.bandit"
+    }
+  ]
+}

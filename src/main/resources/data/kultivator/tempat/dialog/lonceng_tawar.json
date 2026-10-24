@@ -1,0 +1,37 @@
+{
+  "pembicara": [
+    "tokoh:jing_xin"
+  ],
+  "prioritas": 25,
+  "syarat": [
+    "quest lonceng_retak baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai lonceng_retak"
+          ]
+        },
+        {
+          "ke": "penting"
+        }
+      ]
+    },
+    {
+      "id": "penting",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai lonceng_retak"
+          ]
+        }
+      ]
+    }
+  ]
+}

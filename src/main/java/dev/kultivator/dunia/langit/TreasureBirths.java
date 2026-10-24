@@ -214,6 +214,16 @@ public final class TreasureBirths {
 		RandomSource random = level.getRandom();
 		ChunkGenerator generator = level.getChunkSource().getGenerator();
 		RandomState noise = level.getChunkSource().randomState();
+		// DESIGN 38.A #23 (38GU): at 35 % a known spirit-vein cave or star stage within reach is chosen instead
+		if (search.candidates == 0) {
+			search.candidates++;
+			BlockPos place = dev.kultivator.dunia.tempat.gua.GuaApi.tempatLahir(level, focus, config.distanceMin, config.distanceMax);
+			if (place != null && allowed(level, place)) {
+				SEARCH.remove(level.dimension());
+				startTremor(level, place, TREMOR_TICKS, -1, null);
+				return;
+			}
+		}
 		// two height samples per candidate
 		for (int i = 0; i < SAMPLES_PER_TICK / 2; i++) {
 			if (++search.candidates > MAX_CANDIDATES) {

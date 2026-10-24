@@ -1,0 +1,23 @@
+{
+  "pembicara": [
+    "tokoh:feng_ao"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "alur 6",
+    "!alur 7",
+    "bendera feng_ao_sahabat",
+    "!bendera takhta6_feng_ao"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hunus",
+      "akibat": [
+        "efek minecraft:strength 600 0",
+        "bendera takhta6_feng_ao"
+      ]
+    }
+  ]
+}

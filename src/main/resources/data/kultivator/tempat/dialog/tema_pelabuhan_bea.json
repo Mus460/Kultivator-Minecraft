@@ -1,0 +1,29 @@
+{
+  "pembicara": [
+    "peran:petugas_bea",
+    "peran:syahbandar"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "pelabuhan_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "menulis",
+      "prop": "papan_catatan",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "angguk_dengar"
+    }
+  ]
+}

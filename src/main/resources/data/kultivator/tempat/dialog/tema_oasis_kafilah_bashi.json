@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "peran:kafilah_bashi"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "oasis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "pimpin_unta",
+      "prop": "cambuk_kafilah",
+      "suara": "tema.oasis.caravan",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_kafilah"
+          ]
+        },
+        {
+          "ke": "jalan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "jalan",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

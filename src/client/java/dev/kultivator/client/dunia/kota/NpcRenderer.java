@@ -2,16 +2,19 @@ package dev.kultivator.client.dunia.kota;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.kultivator.client.EffectQuality;
-import dev.kultivator.client.anim.CastPoses;
 import dev.kultivator.client.anim.PoseRenderData;
 import dev.kultivator.client.disciple.DiscipleHeldItemLayer;
 import dev.kultivator.client.disciple.DiscipleLook;
 import dev.kultivator.client.disciple.DiscipleRenderState;
 import dev.kultivator.client.disciple.DiscipleRobeLayer;
 import dev.kultivator.client.render.MeditationPose;
+import dev.kultivator.client.sekte.seragam.LambangCache;
+import dev.kultivator.client.sosok.SosokJembatan;
+import dev.kultivator.client.sosok.SosokRender;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.dunia.kota.KultivatorNpc;
 import dev.kultivator.dunia.kota.NpcRole;
+import dev.kultivator.sosok.RupaKunci;
 import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
 import net.minecraft.client.model.HumanoidModel;
@@ -46,6 +49,13 @@ import org.jetbrains.annotations.Nullable;
  * Detail pass: the role's {@link KotaGear} outfit ({@link KotaGearLayer}), the cast and duel poses of the 6c engine and
  * DESIGN 35 ({@code PoseRenderData.extract}, the duel module's obligation of 35.7.6), otherwise the role's body language
  * ({@link NpcPoses}), and the speech bubble of what it says (within 12 blocks, above the plate).
+ * <p>
+ * Penampilan dan Animasi (DESIGN 40.7.2, module 40R): the NPC is a Sosok like a disciple. Its look key is the one the
+ * server set ({@code DATA_RUPA}: 38's sect members, test galleries) or its role's id ({@code juru_lelang}, ...; 40K falls
+ * back to the schedule group's row); a {@code sekte=} part brings that sect's uniform. The atlas, the busana and hair
+ * cubes, the face and the clip props replace the old default skin and robe (the robe stays for the old-skin fallback
+ * only); the KotaGear outfit stays, minus the hair pieces Sosok now draws ({@link KotaGearLayer}). The role's body
+ * language is Gerak's (40G maps the flags and roles to clips), after the cast and duel extract.
  */
 public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRenderState, PlayerModel> {
 
@@ -58,14 +68,24 @@ public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRen
 	static final RenderStateDataKey<Component> NPC_LINE = RenderStateDataKey.create(() -> "kultivator:kota_npc_line");
 	static final RenderStateDataKey<Vec3> NPC_LINE_AT = RenderStateDataKey.create(() -> "kultivator:kota_npc_line_at");
 
+	/** {@code NpcRole.id()} by ordinal (no lower-casing per frame). */
+	private static String[] roleIds;
+
+	/** The Sosok body (128 × 128 atlas mesh). */
+	private final PlayerModel sosokWide;
+	private final PlayerModel sosokSlim;
+	/** The old player-skin body (last fallback when no atlas exists). */
 	private final PlayerModel wideModel;
 	private final PlayerModel slimModel;
 
 	public NpcRenderer(EntityRendererProvider.Context context) {
-		super(context, new PlayerModel(context.bakeLayer(ModelLayers.PLAYER), false), 0.5F);
-		this.wideModel = this.model;
+		super(context, new PlayerModel(SosokJembatan.tubuh(context, false), false), 0.5F);
+		this.sosokWide = this.model;
+		this.sosokSlim = new PlayerModel(SosokJembatan.tubuh(context, true), true);
+		this.wideModel = new PlayerModel(context.bakeLayer(ModelLayers.PLAYER), false);
 		this.slimModel = new PlayerModel(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
-		this.addLayer(new CulledRobe(this, new DiscipleRobeLayer(this, context)));
+		this.addLayer(new SosokRender.TanpaSosok(this, new CulledRobe(this, new DiscipleRobeLayer(this, context))));
+		SosokRender.pasangLapisan(this::addLayer, this, context);
 		this.addLayer(new KotaGearLayer(this, context));
 		this.addLayer(new DiscipleHeldItemLayer(this));
 	}
@@ -122,14 +142,17 @@ public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRen
 		int gear = KotaGear.kindOf(entity);
 		data.setData(KotaGearLayer.KIND, gear);
 		data.setData(KotaGearLayer.TINT, KotaGear.tint(gear, entity.robe()));
-		// a cast or duel pose wins (6c, DESIGN 35); otherwise the role's body language
+		// DESIGN 40: the Sosok of this NPC (look key, sect uniform, atlas, LOD, slim arms, sleep)
+		RupaKunci rupa = SosokRender.rupaDari(entity);
+		String key = rupa.kosong() ? roleId(role) : SosokRender.teksRupaDari(entity, rupa);
+		LambangCache.Entry uniform = rupa.sekte() == null ? null : LambangCache.get(rupa.sekte());
+		SosokRender.ekstrak(entity, state, partialTicks, new SosokRender.RupaMasukan(key, Math.max(0, entity.realm()),
+				rupa.dao() >= 0 ? rupa.dao() : state.dao, Math.max(0, rupa.pangkat()), 0, uniform, gear, 0,
+				entity.hasFlag(KultivatorNpc.FLAG_GHOST)));
+		// a cast or duel pose wins (6c, DESIGN 35); otherwise Gerak (the role's body language, clips, walk, face)
 		PoseRenderData.extract(entity, state, partialTicks);
-		if (PoseRenderData.pose(state) == null) {
-			CastPoses.Snapshot idle = NpcPoses.snapshot(entity, state, entity.tickCount + partialTicks);
-			if (idle != null) {
-				data.setData(PoseRenderData.POSE, idle);
-			}
-		}
+		SosokRender.selesai(entity, state, partialTicks);
+		SosokRender.labelLod(entity, state, partialTicks);
 		Component line = entity.line();
 		// always written: a render state may be reused from the last frame
 		boolean speaking = !line.getString().isEmpty() && state.distanceToCameraSq <= BUBBLE_DISTANCE_SQ && !state.isInvisible;
@@ -140,6 +163,19 @@ public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRen
 				data.setData(NPC_LINE_AT, at);
 			}
 		}
+	}
+
+	private static String roleId(NpcRole role) {
+		String[] ids = roleIds;
+		if (ids == null) {
+			NpcRole[] roles = NpcRole.values();
+			ids = new String[roles.length];
+			for (int i = 0; i < roles.length; i++) {
+				ids[i] = roles[i].id();
+			}
+			roleIds = ids;
+		}
+		return ids[role.ordinal()];
 	}
 
 	@Override
@@ -184,18 +220,28 @@ public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRen
 		if (isBodyVisible && (flags & KultivatorNpc.FLAG_GHOST) != 0) {
 			return RenderTypes.entityTranslucent(this.getTextureLocation(state));
 		}
+		// DESIGN 40.6.3: vanilla entity cutout for a Sosok body
+		if (isBodyVisible && !forceTransparent && SosokRender.aktif(state)) {
+			return RenderTypes.entityCutout(this.getTextureLocation(state));
+		}
 		return super.getRenderType(state, isBodyVisible, forceTransparent, appearGlowing);
 	}
 
 	@Override
 	protected void scale(DiscipleRenderState state, PoseStack poseStack) {
-		poseStack.scale(PLAYER_SCALE, PLAYER_SCALE, PLAYER_SCALE);
+		// the body size is the synced Attributes.SCALE (children 0.66, 40I); this is the player proportion on top
+		float scale = PLAYER_SCALE * SosokRender.skalaGambar(state);
+		poseStack.scale(scale, scale, scale);
 	}
 
 	@Override
 	protected void setupRotations(DiscipleRenderState state, PoseStack poseStack, float bodyRot, float entityScale) {
 		MeditationPose.lower(state, poseStack);
+		dev.kultivator.client.anim.PoseApplier.lift(state, poseStack);
+		SosokRender.angkat(state, poseStack);
 		super.setupRotations(state, poseStack, bodyRot, entityScale);
+		SosokRender.baring(state, poseStack);
+		dev.kultivator.client.anim.PoseApplier.tilt(state, poseStack);
 	}
 
 	@Override
@@ -210,7 +256,11 @@ public class NpcRenderer extends LivingEntityRenderer<KultivatorNpc, DiscipleRen
 
 	@Override
 	public void submit(DiscipleRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-		this.model = state.slim ? slimModel : wideModel;
+		if (SosokRender.aktif(state)) {
+			this.model = state.slim ? sosokSlim : sosokWide;
+		} else {
+			this.model = state.slim ? slimModel : wideModel;
+		}
 		super.submit(state, poseStack, collector, camera);
 	}
 

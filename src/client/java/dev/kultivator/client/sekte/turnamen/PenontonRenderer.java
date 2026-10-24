@@ -4,7 +4,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.kultivator.Kultivator;
 import dev.kultivator.client.dunia.dimensi.render.Headwear;
 import dev.kultivator.client.render.CultivatorModels;
+import dev.kultivator.client.sosok.SosokJembatan;
+import dev.kultivator.client.sosok.SosokRender;
 import dev.kultivator.sekte.turnamen.Penonton;
+import dev.kultivator.sosok.Sosok;
+import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState;
+import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.player.PlayerModel;
@@ -20,6 +25,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +35,13 @@ import java.util.Map;
  * arms), the cultivator robe tinted with its sect's field colour and trimmed with its border colour (envoys) or in plain
  * homespun (villagers), and its head piece ({@link PenontonModels}). Light by design (36.3.9): beyond 32 blocks it stands
  * still (no cheer, no breathing), beyond 64 it is not drawn at all; no item in the hands, no name tag unless looked at.
+ * <p>
+ * DESIGN 40.6.1 (module 40R): a spectator never gets an atlas of its own. It wears one of the ready class fallback
+ * atlases of Sosok (40K, {@code textures/sosok/cadangan/<kelamin>_<usia>_<kelas>.png}; envoys {@code kultivator},
+ * villagers {@code sipil}) on the Sosok mesh, chosen once per spectator from a client-made Sosok
+ * ({@code penonton.utusan} / {@code penonton.warga}: old slim arms = woman, villagers of every age, children drawn
+ * small), so a stand of 160 spectators never queues a composition; the robe in the sect's colours and the head piece stay
+ * on top, the cheer stays the old one. Without the fallback atlases the old default skins return.
  */
 public class PenontonRenderer extends LivingEntityRenderer<Penonton, PenontonRenderState, PlayerModel> {
 
@@ -40,6 +53,16 @@ public class PenontonRenderer extends LivingEntityRenderer<Penonton, PenontonRen
 	private static final Identifier[] SLIM = new Identifier[CHARACTERS.length];
 	/** Per entity id: the cheer counter last seen and the age when the cheer began. */
 	private static final Map<Integer, float[]> CHEERS = new HashMap<>();
+	/** True when the state wears a Sosok fallback atlas (the 128 × 128 mesh draws it). */
+	private static final RenderStateDataKey<Boolean> SOSOK = RenderStateDataKey.create(() -> "kultivator:penonton_sosok");
+	/** The Sosok height of a spectator (the server never sets its scale attribute). */
+	private static final RenderStateDataKey<Float> SKALA = RenderStateDataKey.create(() -> "kultivator:penonton_skala");
+	/** Per entity id: the fallback look, computed once from the spectator's fixed fields. */
+	private static final Map<Integer, Rupa> RUPA = new HashMap<>();
+
+	/** One spectator's fallback look and the fields it was made from. */
+	private record Rupa(int skin, boolean slimOld, int kind, @Nullable Identifier texture, boolean slim, float skala) {
+	}
 
 	static {
 		for (int i = 0; i < CHARACTERS.length; i++) {
@@ -50,11 +73,16 @@ public class PenontonRenderer extends LivingEntityRenderer<Penonton, PenontonRen
 
 	private final PlayerModel wideModel;
 	private final PlayerModel slimModel;
+	/** The Sosok mesh (128 × 128) for the fallback atlases. */
+	private final PlayerModel sosokWide;
+	private final PlayerModel sosokSlim;
 
 	public PenontonRenderer(EntityRendererProvider.Context context) {
 		super(context, new PenontonModels.Body(context.bakeLayer(ModelLayers.PLAYER), false), 0.5F);
 		this.wideModel = this.model;
 		this.slimModel = new PenontonModels.Body(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
+		this.sosokWide = new PenontonModels.Body(SosokJembatan.tubuh(context, false), false);
+		this.sosokSlim = new PenontonModels.Body(SosokJembatan.tubuh(context, true), true);
 		this.addLayer(new RobeLayer(this, context));
 		this.addLayer(new HatLayer(this, context));
 	}
@@ -80,6 +108,17 @@ public class PenontonRenderer extends LivingEntityRenderer<Penonton, PenontonRen
 		state.trim = entity.trim();
 		int skin = Math.max(0, Math.min(CHARACTERS.length - 1, entity.skin()));
 		state.texture = state.slim ? SLIM[skin] : WIDE[skin];
+		Rupa rupa = rupa(entity, skin);
+		FabricRenderState data = (FabricRenderState) state;
+		if (rupa.texture() != null) {
+			state.texture = rupa.texture();
+			state.slim = rupa.slim();
+			data.setData(SOSOK, Boolean.TRUE);
+			data.setData(SKALA, rupa.skala());
+		} else {
+			data.setData(SOSOK, Boolean.FALSE);
+			data.setData(SKALA, 1.0F);
+		}
 		state.id = entity.getId();
 		state.showCape = false;
 		state.animate = state.distanceToCameraSq <= ANIMATE_DISTANCE_SQ;
@@ -102,16 +141,43 @@ public class PenontonRenderer extends LivingEntityRenderer<Penonton, PenontonRen
 		state.cheer = since >= 0.0F && since <= PenontonModels.CHEER_TICKS ? since : -1.0F;
 	}
 
+	/**
+	 * The fallback look of a spectator (DESIGN 40.6.1: never an atlas of its own): its client-made Sosok, the class
+	 * fallback atlas of its sex, age and class, slim arms by its sex, its height. Made once per spectator; the cache
+	 * forgets everything past 256 entries (a stand holds at most 160).
+	 */
+	private static Rupa rupa(Penonton entity, int skin) {
+		Rupa rupa = RUPA.get(entity.getId());
+		if (rupa != null && rupa.skin() == skin && rupa.slimOld() == entity.slim() && rupa.kind() == entity.kind()) {
+			return rupa;
+		}
+		boolean envoy = entity.kind() == Penonton.KIND_ENVOY;
+		String key = envoy ? "penonton.utusan" : "penonton.warga";
+		Sosok sosok = SosokRender.dariLama(key, skin * 2 + (entity.slim() ? 1 : 0), entity.slim() ? 1 : 0, entity.getUUID());
+		Identifier texture = SosokRender.cadangan(sosok.kelamin(), sosok.usia(), envoy ? "kultivator" : "sipil");
+		rupa = new Rupa(skin, entity.slim(), entity.kind(), texture, sosok.lenganRamping(), sosok.skala());
+		if (RUPA.size() > 256) {
+			RUPA.clear();
+		}
+		RUPA.put(entity.getId(), rupa);
+		return rupa;
+	}
+
 	@Override
 	public void submit(PenontonRenderState state, PoseStack poseStack, SubmitNodeCollector collector,
 			net.minecraft.client.renderer.state.level.CameraRenderState camera) {
-		this.model = state.slim ? this.slimModel : this.wideModel;
+		if (((FabricRenderState) state).getDataOrDefault(SOSOK, Boolean.FALSE)) {
+			this.model = state.slim ? this.sosokSlim : this.sosokWide;
+		} else {
+			this.model = state.slim ? this.slimModel : this.wideModel;
+		}
 		super.submit(state, poseStack, collector, camera);
 	}
 
 	@Override
 	protected void scale(PenontonRenderState state, PoseStack poseStack) {
-		poseStack.scale(PLAYER_SCALE, PLAYER_SCALE, PLAYER_SCALE);
+		float scale = PLAYER_SCALE * ((FabricRenderState) state).getDataOrDefault(SKALA, 1.0F);
+		poseStack.scale(scale, scale, scale);
 	}
 
 	@Override

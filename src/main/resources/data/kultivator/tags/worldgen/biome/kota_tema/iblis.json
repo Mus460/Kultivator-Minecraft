@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:dark_forest",
+    {
+      "id": "minecraft:pale_garden",
+      "required": false
+    },
+    "minecraft:badlands",
+    "minecraft:eroded_badlands",
+    "minecraft:wooded_badlands",
+    "minecraft:swamp",
+    "minecraft:mangrove_swamp",
+    "minecraft:windswept_gravelly_hills",
+    "minecraft:old_growth_spruce_taiga"
+  ]
+}

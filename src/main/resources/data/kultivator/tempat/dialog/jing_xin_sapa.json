@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:jing_xin"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "suara": "kotabesar.temple_bell",
+      "pilihan": [
+        {
+          "ke": "iblis"
+        },
+        {
+          "ke": "cermin"
+        },
+        {
+          "ke": "doa"
+        }
+      ]
+    },
+    {
+      "id": "iblis",
+      "gestur": "hormat_dalam"
+    },
+    {
+      "id": "cermin",
+      "gestur": "cerita",
+      "akibat": [
+        "lore gua.cermin_hati"
+      ]
+    },
+    {
+      "id": "doa",
+      "gestur": "sujud_dupa",
+      "prop": "dupa",
+      "akibat": [
+        "efek minecraft:luck 600 0"
+      ]
+    }
+  ]
+}

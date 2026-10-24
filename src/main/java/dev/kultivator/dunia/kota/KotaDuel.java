@@ -151,6 +151,7 @@ final class KotaDuel {
 
 	static boolean accepts(KultivatorNpc npc, ServerPlayer challenger) {
 		if (!npc.isAlive() || npc.isRemoved() || npc.getTarget() != null || DuelRules.inDuel(npc) || npc.isHostileTo(challenger.getUUID())
+				|| dev.kultivator.sosok.SosokApi.usia(npc) == dev.kultivator.sosok.Sosok.ANAK
 				|| !Kota.enabled()) {
 			return false;
 		}

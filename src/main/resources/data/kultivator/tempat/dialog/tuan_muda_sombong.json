@@ -1,0 +1,53 @@
+{
+  "pembicara": [
+    "peran:tuan_muda"
+  ],
+  "prioritas": -1,
+  "syarat": [
+    "watak sombong"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "ke": "topik"
+        },
+        {
+          "ke": "lore"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "topik",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "lore"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lore",
+      "gestur": "cerita",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

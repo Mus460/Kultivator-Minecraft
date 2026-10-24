@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_iblis",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_pembawa_fajar.description"
+    },
+    "icon": {
+      "id": "minecraft:sunflower"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_pembawa_fajar.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

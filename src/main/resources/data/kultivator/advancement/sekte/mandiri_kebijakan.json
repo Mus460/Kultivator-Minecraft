@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sect_founded",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.mandiri.inti.adv.kebijakan.desc"
+    },
+    "icon": {
+      "id": "minecraft:writable_book"
+    },
+    "title": {
+      "translate": "kultivator.sekte.mandiri.inti.adv.kebijakan.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

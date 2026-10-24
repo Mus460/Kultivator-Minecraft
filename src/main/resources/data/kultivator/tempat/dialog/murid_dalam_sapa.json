@@ -1,0 +1,35 @@
+{
+  "pembicara": [
+    "peran:murid_sekte_dalam"
+  ],
+  "prioritas": -1,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_belakang",
+      "suara": "tempat.sect_visit",
+      "pilihan": [
+        {
+          "syarat": [
+            "pita 1"
+          ],
+          "ke": "tanding"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tanding",
+      "gestur": "hunus",
+      "pilihan": [
+        {
+          "akibat": [
+            "tanding_sekte"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

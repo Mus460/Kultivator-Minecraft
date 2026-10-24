@@ -1,0 +1,32 @@
+{
+  "pembicara": [
+    "tokoh:ye_wuhen"
+  ],
+  "prioritas": 75,
+  "syarat": [
+    "quest tema_iblis_rantai tahap pilih",
+    "punya kultivator:tema/peta_gerbang_rahasia"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "ambil kultivator:tema/peta_gerbang_rahasia 1",
+            "iblis_rute penebusan",
+            "peristiwa tanda iblis_peta_serah"
+          ],
+          "ke": "serah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "serah",
+      "gestur": "hormat_dalam"
+    }
+  ]
+}

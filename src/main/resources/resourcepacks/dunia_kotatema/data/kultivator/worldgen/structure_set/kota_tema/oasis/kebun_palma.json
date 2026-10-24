@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380413,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_oasis",
+    "distrik": "kebun_palma"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/oasis/kebun_palma",
+      "weight": 1
+    }
+  ]
+}

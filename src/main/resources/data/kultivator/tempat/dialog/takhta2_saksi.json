@@ -1,0 +1,46 @@
+{
+  "pembicara": [
+    "peran:pengemis"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest takhta_hilang_di_kumuh tahap petunjuk",
+    "!bendera takhta2_saksi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "takut_sembunyi",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb 2"
+          ],
+          "akibat": [
+            "bayar 2"
+          ],
+          "ke": "lihat",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta2_saksi.mulai.1.alasan"
+        },
+        {
+          "syarat": [
+            "nama_baik 5"
+          ],
+          "ke": "lihat",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta2_saksi.mulai.2.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lihat",
+      "gestur": "bisik",
+      "akibat": [
+        "bendera takhta2_saksi"
+      ]
+    }
+  ]
+}

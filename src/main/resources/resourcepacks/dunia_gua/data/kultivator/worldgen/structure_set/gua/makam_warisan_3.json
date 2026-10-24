@@ -1,0 +1,30 @@
+{
+  "placement": {
+    "type": "kultivator:cincin_tempat",
+    "salt": 380514,
+    "spacing": 48,
+    "separation": 16,
+    "min_chunks": 64,
+    "jarak_tempat": 4,
+    "cincin": [
+      {
+        "sampai_chunk": 187,
+        "frekuensi": 0.0
+      },
+      {
+        "sampai_chunk": 500,
+        "frekuensi": 0.06
+      },
+      {
+        "sampai_chunk": 9999,
+        "frekuensi": 0.12
+      }
+    ]
+  },
+  "structures": [
+    {
+      "structure": "kultivator:gua/makam_warisan_3",
+      "weight": 1
+    }
+  ]
+}

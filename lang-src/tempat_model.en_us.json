@@ -1,0 +1,17 @@
+{
+  "kultivator.tempat_model.perintah.festival": "Festival decoration test: street lanterns, sky lanterns, fireworks, armillary, water wheel, banners, awnings and incense smoke in front of you for 20 seconds (on your screen only).",
+  "kultivator.tempat_model.perintah.senjata": "Weapon rack test: four racks, one per grade, holding the 28 city weapons for 30 seconds (on your screen only).",
+  "kultivator.tempat_model.perintah.pamer": "Model showcase: nine place creatures and mechanisms (Crystal Guardian, Tomb Puppet, Spirit Rat, cage door, glyph plate, cliff door, cart, raft, notice board) moving in front of you for 30 seconds (on your screen only).",
+  "kultivator.tempat_model.perintah.prop": "Prop wall page %s: %s hand props turning above their names and numbers for 30 seconds (on your screen only).",
+  "kultivator.tempat_model.perintah.hapus": "Decoration, weapon rack and model showcase tests ended.",
+  "kultivator.tempat_model.perintah.info": "Decorations placed: %s, weapon racks: %s, showcase stands: %s, quads last frame: %s.",
+  "kultivator.tempat_model.pamer.kristal": "Crystal Guardian",
+  "kultivator.tempat_model.pamer.boneka": "Tomb Guardian Puppet",
+  "kultivator.tempat_model.pamer.tikus": "Kitchen Spirit Rat",
+  "kultivator.tempat_model.pamer.sangkar": "Captive Cage Door",
+  "kultivator.tempat_model.pamer.glif": "Five Element Glyph Plate",
+  "kultivator.tempat_model.pamer.pintu": "False Cliff Door",
+  "kultivator.tempat_model.pamer.gerobak": "Caravan Cart",
+  "kultivator.tempat_model.pamer.rakit": "Ferry Raft",
+  "kultivator.tempat_model.pamer.papan": "Living Notice Board"
+}

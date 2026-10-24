@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "peran:pelukis_gua"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "oasis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lukis_dinding",
+      "prop": "kuas",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_mural_buka"
+          ]
+        },
+        {
+          "ke": "warna"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "warna",
+      "gestur": "bicara_tangan",
+      "prop": "palet",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

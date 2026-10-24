@@ -1,0 +1,474 @@
+{
+  "templat": [
+    {
+      "id": "tema_oasis_kafilah_tiba",
+      "pemicu": "tema_oasis_kafilah_tiba",
+      "bobot": 10,
+      "umur_hari": 2,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "kafilah_bashi",
+        "penuntun_unta",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_oasis_air_pulih",
+      "pemicu": "tema_oasis_air_pulih",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua",
+        "warga",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "tema_oasis_raja_tumbang",
+      "pemicu": "tema_oasis_raja_tumbang",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "petugas_gilda",
+        "pemburu_lurus",
+        "warga",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "tema_oasis_xie_kalah",
+      "pemicu": "tema_oasis_xie_kalah",
+      "bobot": 10,
+      "umur_hari": 7,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_oasis_xie_pertapa",
+      "pemicu": "tema_oasis_xie_pertapa",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_oasis_unta_pulang",
+      "pemicu": "tema_oasis_unta_pulang",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "kafilah_bashi",
+        "penuntun_unta",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_oasis_badai_1",
+      "pemicu": "acara_tema_badai_pasir",
+      "bobot": 10,
+      "umur_hari": 2,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_oasis_badai_2",
+      "pemicu": "acara_tema_badai_pasir",
+      "bobot": 10,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pelukis_gua",
+        "penuntun_unta",
+        "pedagang_bazar"
+      ]
+    },
+    {
+      "id": "tema_oasis_kafilah_agung",
+      "pemicu": "acara_tema_kafilah_agung",
+      "bobot": 10,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua",
+        "warga",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "tema_oasis_tari_putar",
+      "pemicu": "acara_tema_tari_putar",
+      "bobot": 10,
+      "umur_hari": 1,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua",
+        "warga",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "tema_oasis_permadani_jadi",
+      "pemicu": "quest_tema_oasis_permadani_ratu",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_oasis_kurma_jadi",
+      "pemicu": "quest_tema_oasis_kurma_emas",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_oasis_mural_jadi",
+      "pemicu": "quest_tema_oasis_mural_pesanan",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pelukis_gua",
+        "pemilik_teh",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_0",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_1",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_2",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_3",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_4",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_5",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_6",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_7",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_8",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_9",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_10",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_11",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_12",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_13",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_14",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_umum_15",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 30,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua"
+      ]
+    },
+    {
+      "id": "tema_oasis_mata_air_jadi",
+      "pemicu": "quest_tema_oasis_mata_air",
+      "bobot": 10,
+      "umur_hari": 12,
+      "peran_penyebar": [
+        "pedagang_bazar",
+        "penuntun_unta",
+        "kafilah_bashi",
+        "pengawal_gurun",
+        "pendeta_air",
+        "penari_gurun",
+        "pelukis_gua",
+        "warga",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "tema_oasis_perintah_reruntuhan_jadi",
+      "pemicu": "quest_tema_oasis_perintah_reruntuhan",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "pengawal_gurun",
+        "kafilah_bashi",
+        "warga"
+      ]
+    },
+    {
+      "id": "tema_oasis_perintah_kafilah_jadi",
+      "pemicu": "quest_tema_oasis_perintah_kafilah",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "kafilah_bashi",
+        "penuntun_unta",
+        "pemilik_teh"
+      ]
+    },
+    {
+      "id": "tema_oasis_perintah_buru_jadi",
+      "pemicu": "quest_tema_oasis_perintah_buru",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "pengawal_gurun",
+        "penuntun_unta",
+        "warga"
+      ]
+    }
+  ]
+}

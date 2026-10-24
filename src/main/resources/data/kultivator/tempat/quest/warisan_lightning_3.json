@@ -1,0 +1,33 @@
+{
+  "pemberi": "peran:sisa_jiwa",
+  "tempat": "makam",
+  "tahap": [
+    {
+      "id": "kisah",
+      "arah": "gua/makam"
+    },
+    {
+      "id": "hati",
+      "arah": "gua/makam"
+    },
+    {
+      "id": "makam",
+      "tujuan": [
+        "ujian makam:lightning:3"
+      ],
+      "arah": "gua/makam"
+    },
+    {
+      "id": "pamit",
+      "tujuan": [
+        "bicara peran:sisa_jiwa"
+      ],
+      "akibat": [
+        "gelar pewaris_leluhur",
+        "suara tempat.inheritance_pass",
+        "bendera warisan_lightning_3",
+        "efek minecraft:luck 18000 0"
+      ]
+    }
+  ]
+}

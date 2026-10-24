@@ -1,0 +1,41 @@
+{
+  "pembicara": [
+    "tokoh:bulat_khan"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_oasis_mata_air tahap kafilah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "pimpin_unta",
+      "prop": "tali_kekang",
+      "suara": "tema.oasis.caravan",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_kafilah_quest"
+          ]
+        },
+        {
+          "ke": "bahaya"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bahaya",
+      "gestur": "sikap_tua",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_kafilah_quest"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

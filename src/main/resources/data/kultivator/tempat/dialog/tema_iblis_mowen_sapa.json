@@ -1,0 +1,78 @@
+{
+  "pembicara": [
+    "tokoh:mo_wen"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "iblis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "membaca",
+      "prop": "kitab",
+      "suara": "tema.iblis.forbidden",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_kitab_terlarang"
+          ]
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_kitab baru"
+          ],
+          "ke": "kitab"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai"
+          ],
+          "ke": "rantai_kitab"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai selesai",
+            "iblis_rute darah"
+          ],
+          "ke": "lantai_sembilan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kitab",
+      "gestur": "membaca",
+      "prop": "kitab",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_iblis_kitab"
+          ]
+        },
+        {}
+      ]
+    },
+    {
+      "id": "rantai_kitab",
+      "gestur": "membaca",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lantai_sembilan",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

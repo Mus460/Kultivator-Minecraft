@@ -1,0 +1,19 @@
+{
+  "pembicara": [
+    "tokoh:mo_ying"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "alur_bab5 a"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "akibat": [
+        "npc_pergi"
+      ]
+    }
+  ]
+}

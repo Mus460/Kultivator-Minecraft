@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * Kitab Panduan (the in-game guide): the static list of its 17 chapters and their steps, shared by the server and the
+ * Kitab Panduan (the in-game guide): the static list of its 20 chapters and their steps, shared by the server and the
  * client. Pure data: no Minecraft classes, so both sides may use it freely.
  * <p>
  * Contract with {@code client.guide.GuideScreen} and {@link GuideProgress}:
@@ -50,16 +50,24 @@ public final class GuideChapters {
 	 * (Murid yang Hidup) and 16 (Sekte di Dunia) are Sekte yang Hidup's (DESIGN 36.3.6); their texts live in
 	 * {@code lang-src/sekte_panduan.*} and their checks are the {@code sekte/} advancements of the ten modules. Chapter 17
 	 * (save index 16, Sekte Langit, DESIGN 37.7.8, module 37G) has its texts in {@code lang-src/sekte_langit_panduan.*} and
-	 * its checks are the {@code sekte_langit/} advancements. The book shows them in {@link #displayOrder()}.
+	 * its checks are the {@code sekte_langit/} advancements. Chapters 18 (Kota Besar), 19 (Tempat-Tempat Dunia) and 20
+	 * (Lima Kota Bertema) are DESIGN 38's (38.D.11 and 38.T, module 38W; save indexes 17-19, texts in
+	 * {@code lang-src/tempat_panduan.*} and {@code tempat_tema_panduan.*}, checks the {@code tempat/} advancements).
+	 * Chapter 21 (save index 20, Murid Mandiri, DESIGN 39.10.4, module 39E) has its texts in
+	 * {@code lang-src/sekte_mandiri_cerita.*} and its checks are the {@code sekte/mandiri_*} advancements of modules
+	 * 39A-39F. The book shows them in {@link #displayOrder()}.
 	 */
-	public static final int CHAPTER_COUNT = 17;
+	public static final int CHAPTER_COUNT = 21;
 
 	/**
 	 * The order the book shows the chapters in, as 0-based save indexes (integration audit T1): Dunia yang Luas right
 	 * after Pemurnian Qi, the Sekte yang Hidup chapters beside the older sect chapters, Ujung Dunia before Kenaikan Abadi
 	 * and the Tips last. Sekte Langit (37) inserts its chapter 17 (save index 16) right after chapter 9 (save index 8).
+	 * DESIGN 38 shows Kota Besar, Tempat-Tempat Dunia and Lima Kota Bertema (save indexes 17, 18, 19) right after Dunia
+	 * yang Luas (save index 12): the places a young cultivator travels to first. DESIGN 39 shows Murid Mandiri (save
+	 * index 20) right after Murid yang Hidup (save index 14): disciples that live their own lives.
 	 */
-	private static final int[] DISPLAY_ORDER = {0, 1, 12, 2, 3, 4, 14, 5, 15, 6, 7, 8, 16, 13, 9, 10, 11};
+	private static final int[] DISPLAY_ORDER = {0, 1, 12, 17, 18, 19, 2, 3, 4, 14, 20, 5, 15, 6, 7, 8, 16, 13, 9, 10, 11};
 
 	/**
 	 * Per save index: {minRealm, pastRealm, requires}. minRealm: the chapter becomes current only from that realm on (null:
@@ -86,6 +94,10 @@ public final class GuideChapters {
 			{"foundation", "deity_transformation", "hall"}, // 15 Murid yang Hidup
 			{"golden_core", "immortal_ascension", "hall"}, // 16 Sekte di Dunia
 			{"golden_core", null, "hall_level:6|tier:6"}, // 17 Sekte Langit (37G): a level-6 hall or a tier-6 site first
+			{"qi_refining", "immortal_ascension", null}, // 18 Kota Besar (38.D.11): from Qi Refining
+			{null, "immortal_ascension", null}, // 19 Tempat-Tempat Dunia: from the start (Fana)
+			{null, "immortal_ascension", null}, // 20 Lima Kota Bertema (38.T): from the start (Fana)
+			{"foundation", "immortal_ascension", "hall"}, // 21 Murid Mandiri (39E): a hall of one's own, from Foundation
 	};
 
 	/**
@@ -375,6 +387,52 @@ public final class GuideChapters {
 		step(16, "bajak", null, "adv:sekte_langit/bajak_awan");
 		step(16, "temu", null, "adv:sekte_langit/temu_langit");
 		optional(16, "sembilan", null, "adv:sekte_langit/sembilan_langit");
+		// 18. Kota Besar (DESIGN 38.D.11, module 38W; appended after 17, so the GuideSync bits of older steps keep their
+		// place). The checks are tempat/ advancements: ibu_kota and teleport from 38KS, lelang_agung from 38EK; the others
+		// (three services, first badge star, attending an event or the Grand Auction, the Yamen board, throne chapters 3
+		// and 7) are granted by dunia/tempat/PanduanTempat from what the player does. "hukum" is a side goal.
+		step(17, "tiba", "/kultivasi peta", "adv:tempat/ibu_kota");
+		step(17, "layanan", null, "adv:tempat/tiga_layanan");
+		step(17, "gilda", null, "adv:tempat/lencana_1");
+		step(17, "lelang", null, "adv:tempat/lelang_agung_ikut|adv:tempat/lelang_agung");
+		optional(17, "hukum", null, "adv:tempat/papan_yamen");
+		step(17, "acara", null, "adv:tempat/acara_ikut");
+		step(17, "takhta", null, "adv:tempat/takhta_bab3|adv:tempat/penjaga_takhta");
+		step(17, "teleport", null, "adv:tempat/teleport");
+		// 19. Tempat-Tempat Dunia (DESIGN 38.D.11): villages and clans, sect compounds (arrival, pledge and builder help
+		// granted by PanduanTempat), caves (38GU), roads (38W: three milestones), repairs (38PR: a paid bill, or helping
+		// the builders). Pledging a village is a side goal.
+		step(18, "kampung", null, "adv:tempat/kampung_tiba");
+		optional(18, "ikrar", null, "adv:tempat/kampung_ikrar");
+		step(18, "kompleks", null, "adv:tempat/kompleks_tiba|adv:tempat/tamu_sekte");
+		step(18, "pertapa", null, "adv:tempat/murid_pertapa");
+		step(18, "warisan", null, "adv:tempat/pewaris_makam");
+		step(18, "sarang", null, "adv:tempat/sarang_bersih");
+		step(18, "jalan", "/kultivasi peta", "adv:tempat/tonggak_tiga");
+		step(18, "perbaikan", null, "adv:tempat/jujur|adv:tempat/tukang_bantu|adv:tempat/tukang_sukarela");
+		// 20. Lima Kota Bertema (DESIGN 38.T, texts and tema_* advancements by 38TK). The Demon City (Golden Core
+		// territory) and ransoming a captive are side goals: a Righteous player is never sent there.
+		step(19, "pelabuhan", null, "adv:tempat/tema_pelabuhan");
+		step(19, "oasis", null, "adv:tempat/tema_oasis");
+		step(19, "air", null, "adv:tempat/tema_air");
+		step(19, "gunung", null, "adv:tempat/tema_gunung");
+		step(19, "dagang", "/kultivasi dagang", "adv:tempat/tema_dagang");
+		step(19, "laut", null, "adv:tempat/tema_lintas_laut");
+		step(19, "ziarah", null, "adv:tempat/tema_ziarah");
+		step(19, "lentera", null, "adv:tempat/tema_lentera_air");
+		optional(19, "iblis", null, "adv:tempat/tema_iblis");
+		optional(19, "tebus", null, "adv:tempat/tema_tebus");
+		// 21. Murid Mandiri (DESIGN 39.10.4, module 39E; appended last, so older GuideSync bits keep their place). Checks:
+		// the path (39A), the hall policy (39A), a diary page read (39E), a shopping trip (39C), a breakthrough made alone
+		// (39B), a goal reached (39E). True Immortal reached alone is a late target and the feud ending (39F) a side goal.
+		step(20, "jalan", "/kultivasi perguruan mandiri", "adv:sekte/mandiri_jalan");
+		step(20, "kebijakan", "/kultivasi perguruan mandiri papan", "adv:sekte/mandiri_kebijakan");
+		step(20, "harian", "/kultivasi perguruan mandiri harian", "adv:sekte/mandiri_harian");
+		step(20, "belanja", null, "adv:sekte/mandiri_belanja");
+		step(20, "tembus", null, "adv:sekte/mandiri_tembus");
+		step(20, "cita", null, "adv:sekte/mandiri_cita");
+		optional(20, "abadi", null, "adv:sekte/mandiri_abadi");
+		optional(20, "seteru", null, "adv:sekte/mandiri_seteru_damai|adv:sekte/mandiri_seteru_duel");
 
 		if (GATES.length != CHAPTER_COUNT || DISPLAY_ORDER.length != CHAPTER_COUNT) {
 			throw new IllegalStateException("Guide chapter tables out of step with CHAPTER_COUNT");

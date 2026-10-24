@@ -1,0 +1,127 @@
+{
+  "pemberi": "tokoh:shui_lian",
+  "tempat": "kota_tema_oasis",
+  "tahap": [
+    {
+      "id": "ukur",
+      "akibat": [
+        "nama_baik 2"
+      ],
+      "arah": "kota_tema/oasis",
+      "ke": "kafilah"
+    },
+    {
+      "id": "kafilah",
+      "tujuan": [
+        "oasis_kafilah akhir"
+      ],
+      "arah": "kota_tema/oasis",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera oasis.kafilah_hilang"
+          ],
+          "ke": "cari_ajun"
+        }
+      ],
+      "ke": "lempeng"
+    },
+    {
+      "id": "cari_ajun",
+      "tujuan": [
+        "bicara tokoh:ajun"
+      ],
+      "akibat": [
+        "oasis_ajun_pulang",
+        "beri kultivator:tema/lempeng_peta",
+        "beri_nb_pita 30",
+        "nama_baik 1"
+      ],
+      "ke": "mural"
+    },
+    {
+      "id": "lempeng",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "beri_nb_pita 60",
+        "nama_baik 2"
+      ],
+      "ke": "mural"
+    },
+    {
+      "id": "mural",
+      "tujuan": [
+        "oasis_mural 3",
+        "oasis_mural 6",
+        "oasis_mural 7",
+        "oasis_mural 9",
+        "oasis_mural 11"
+      ],
+      "akibat": [
+        "oasis_paham 1"
+      ],
+      "arah": "kota_tema/oasis",
+      "ke": "formasi"
+    },
+    {
+      "id": "formasi",
+      "tujuan": [
+        "oasis_formasi *"
+      ],
+      "akibat": [
+        "nama_baik 2"
+      ],
+      "arah": "kota_tema/reruntuhan_gurun",
+      "ke": "xie"
+    },
+    {
+      "id": "xie",
+      "akibat_masuk": [
+        "oasis_panggil_xie"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera oasis.xie_bujuk"
+          ],
+          "ke": "pertapa"
+        }
+      ],
+      "ke": "duel"
+    },
+    {
+      "id": "duel",
+      "tujuan": [
+        "duel tokoh:xie_duo"
+      ],
+      "akibat_masuk": [
+        "oasis_panggil_xie"
+      ],
+      "akibat": [
+        "oasis_hadiah ekor_angin",
+        "nama_baik 3",
+        "kabar tema_oasis_xie_kalah pemain"
+      ],
+      "ke": "pulih"
+    },
+    {
+      "id": "pertapa",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "oasis_hadiah giok_xie",
+        "nama_baik 5",
+        "kabar tema_oasis_xie_pertapa pemain"
+      ],
+      "ke": "pulih"
+    },
+    {
+      "id": "pulih",
+      "arah": "kota_tema/oasis",
+      "ke": "selesai"
+    }
+  ]
+}

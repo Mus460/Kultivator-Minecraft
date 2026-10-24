@@ -30,6 +30,27 @@ public final class DuniaPacks {
 
 	static void init() {
 		ServerLifecycleEvents.SERVER_STARTED.register(DuniaPacks::check);
+		kompatBioma();
+	}
+
+	/**
+	 * {@code kultivator:kompat_bioma} (tools/gen_kompat_bioma.py): adds the Terralith biomes to the mod's biome tags as
+	 * optional entries, so towns, capitals, villages, sect gates and caves also stand in Terralith worlds. Always on;
+	 * without Terralith the optional entries resolve to nothing.
+	 */
+	private static void kompatBioma() {
+		Optional<ModContainer> mod = FabricLoader.getInstance().getModContainer(Kultivator.MOD_ID);
+		if (mod.isEmpty()) {
+			return;
+		}
+		try {
+			if (!ResourceLoader.registerBuiltinPack(Kultivator.id("kompat_bioma"), mod.get(),
+					Component.translatable("kultivator.dunia.pack.kompat_bioma"), PackActivationType.DEFAULT_ENABLED)) {
+				Kultivator.LOGGER.warn("Biome compatibility pack kompat_bioma is missing from the mod");
+			}
+		} catch (RuntimeException exception) {
+			Kultivator.LOGGER.warn("Biome compatibility pack kompat_bioma could not be registered", exception);
+		}
 	}
 
 	/**

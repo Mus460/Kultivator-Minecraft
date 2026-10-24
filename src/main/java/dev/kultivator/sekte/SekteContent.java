@@ -35,6 +35,8 @@ public final class SekteContent {
 		public boolean seragam = true;
 		public boolean diplomasi = true;
 		public boolean kebun = true;
+		/** Murid Mandiri (DESIGN 39 + 39.F, {@link SekteIds#MANDIRI}): disciples who live, travel and grow on their own. */
+		public boolean mandiri = true;
 		/** Memories kept per disciple (4-16). */
 		public int ingatanMaks = Ingatan.MAX_MEMORIES;
 	}
@@ -67,6 +69,7 @@ public final class SekteContent {
 		dev.kultivator.sekte.seragam.Seragam.registerContent();
 		dev.kultivator.sekte.diplomasi.Diplomasi.registerContent();
 		dev.kultivator.sekte.kebun.Kebun.registerContent();
+		dev.kultivator.sekte.mandiri.Mandiri.registerContent();
 		if (!umum.aktif) {
 			return;
 		}
@@ -90,6 +93,8 @@ public final class SekteContent {
 		dev.kultivator.sekte.diplomasi.Diplomasi.init();
 		// W Kebun Obat & Tambang Roh (51, 52):
 		dev.kultivator.sekte.kebun.Kebun.init();
+		// Murid Mandiri, DESIGN 39 + 39.F (39A-39F; the module switch is checked inside):
+		dev.kultivator.sekte.mandiri.Mandiri.init();
 	}
 
 	/** True when the phase and module {@code module} ({@link SekteIds#MODULES}) are switched on. */
@@ -108,6 +113,7 @@ public final class SekteContent {
 			case SekteIds.S -> umum.seragam;
 			case SekteIds.D -> umum.diplomasi;
 			case SekteIds.W -> umum.kebun;
+			case SekteIds.MANDIRI -> umum.mandiri;
 			default -> false;
 		};
 	}

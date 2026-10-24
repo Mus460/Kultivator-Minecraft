@@ -55,7 +55,7 @@ final class HelpPage extends Page {
 			"kapal_terbang", "peta_dunia",
 			// Audit M5 (S11, R25, S31/S32): the Sword Duel (35), the Living Sect (36) and its bigger parts, the 37 slot (skipped
 			// until its text exists), the Pengaturan groups' own topics, and one glossary of the words that name two things.
-			"duel_pedang", "sekte_hidup", "turnamen_sekte", "diplomasi_sekte", "kebun_tambang", "sekte_langit", "suara", "hud", "tombol",
+			"duel_pedang", "sekte_hidup", "turnamen_sekte", "diplomasi_sekte", "kebun_tambang", "sekte_langit", "mandiri", "suara", "hud", "tombol",
 			"glosarium"};
 	private static final long HIGHLIGHT_MILLIS = 1000L;
 	private static final int COIN = 11;

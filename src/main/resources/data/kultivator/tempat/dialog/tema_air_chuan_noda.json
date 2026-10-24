@@ -1,0 +1,36 @@
+{
+  "pembicara": [
+    "tokoh:bibi_chuan"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest tema_air_benang tahap noda"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "prop": "dayung_yuloh",
+      "pilihan": [
+        {
+          "syarat": [
+            "air_malam"
+          ],
+          "akibat": [
+            "air_tur"
+          ],
+          "tampil": true,
+          "alasan": "kultivator.cerita.tema_air_chuan_noda.mulai.1.alasan"
+        },
+        {
+          "ke": "tunggu"
+        }
+      ]
+    },
+    {
+      "id": "tunggu",
+      "gestur": "tertawa"
+    }
+  ]
+}

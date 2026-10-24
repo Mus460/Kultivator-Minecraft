@@ -1,0 +1,38 @@
+{
+  "pembicara": [
+    "peran:tetua_sekte"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest murid_kabur baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_belakang",
+      "suara": "tempat.sect_visit",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai murid_kabur"
+          ]
+        },
+        {
+          "ke": "kenapa"
+        }
+      ]
+    },
+    {
+      "id": "kenapa",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai murid_kabur"
+          ]
+        }
+      ]
+    }
+  ]
+}

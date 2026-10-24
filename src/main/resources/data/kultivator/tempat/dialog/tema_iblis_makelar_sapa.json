@@ -1,0 +1,25 @@
+{
+  "pembicara": [
+    "peran:makelar_gelap"
+  ],
+  "prioritas": 6,
+  "syarat": [
+    "iblis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bisik",
+      "prop": "kantong_uang",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_pasar_gelap"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

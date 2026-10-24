@@ -1,0 +1,99 @@
+{
+  "_catatan": "DESIGN 38.T.5.3, module 38TK-A: hours the built-in JadwalTema leaves to the theme (Madam Su's day, the boat songs at noon, stern lanterns at dusk, the silkworm keepers' evening round) and the residents' side of the lantern night and the dragon boat race that the built-in table does not name. Hours are clock hours (06:00 = tick 0).",
+  "jenis": "kota_tema/air",
+  "peran": {
+    "nyonya_sutra": {
+      "5": {
+        "kegiatan": "periksa_ulat",
+        "tujuan": "kerja:rak",
+        "klip": "lihat_barang"
+      },
+      "6-9": {
+        "kegiatan": "hitung_sutra",
+        "tujuan": "kerja:timbangan",
+        "klip": "hitung_sempoa",
+        "kanan": "sempoa"
+      },
+      "10-13": {
+        "kegiatan": "pajang_kain",
+        "tujuan": "lapak",
+        "klip": "tawar"
+      },
+      "14-17": {
+        "kegiatan": "surat_dagang",
+        "tujuan": "meja_tulis",
+        "klip": "menulis",
+        "kanan": "kuas"
+      },
+      "18-20": {
+        "kegiatan": "teh_sore",
+        "tujuan": "kursi",
+        "klip": "minum_teh",
+        "kanan": "cangkir"
+      }
+    },
+    "pendayung": {
+      "10-11": {
+        "kegiatan": "dayung_lagu",
+        "tujuan": "jalur_perahu",
+        "klip": "dayung_yuloh",
+        "kanan": "dayung_yuloh"
+      },
+      "12-13": {
+        "kegiatan": "nyanyi_perahu",
+        "tujuan": "jalur_perahu",
+        "klip": "nyanyi_perahu",
+        "kanan": "dayung_yuloh"
+      },
+      "19-21": {
+        "kegiatan": "lentera_buritan",
+        "tujuan": "tambatan",
+        "klip": "ikat_tali",
+        "kanan": "lentera_tangan"
+      }
+    },
+    "pemelihara_ulat": {
+      "18-19": {
+        "kegiatan": "bersih_nampan",
+        "tujuan": "kerja:rak",
+        "klip": "sapu",
+        "kanan": "sapu"
+      }
+    }
+  },
+  "acara": {
+    "tema.lentera_air": {
+      "sastrawan": {
+        "kegiatan": "puisi_lentera",
+        "tujuan": "pandang",
+        "klip": "menulis",
+        "kanan": "kuas"
+      },
+      "nyonya_sutra": {
+        "kegiatan": "doa_lentera",
+        "tujuan": "dupa",
+        "klip": "sujud_dupa",
+        "kanan": "dupa"
+      },
+      "ahli_teh": {
+        "kegiatan": "teh_lentera",
+        "tujuan": "kerja:teko",
+        "klip": "tuang_teh",
+        "kanan": "teko"
+      }
+    },
+    "tema.perahu_naga": {
+      "anak": {
+        "kegiatan": "sorak_anak",
+        "tujuan": "penonton",
+        "klip": "main_lompat"
+      },
+      "sastrawan": {
+        "kegiatan": "syair_lomba",
+        "tujuan": "penonton",
+        "klip": "kipas",
+        "kanan": "kipas_lipat"
+      }
+    }
+  }
+}

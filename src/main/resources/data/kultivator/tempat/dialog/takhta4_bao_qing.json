@@ -1,0 +1,37 @@
+{
+  "pembicara": [
+    "tokoh:bao_qing"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_dua_calon tahap galang",
+    "!bendera takhta4_dukung_bao_qing"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "syarat": [
+            "nama_baik 10"
+          ],
+          "ke": "setuju",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta4_bao_qing.mulai.1.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "setuju",
+      "gestur": "palu_hakim",
+      "akibat": [
+        "peristiwa tanda dukungan",
+        "bendera takhta4_dukung_bao_qing",
+        "nama_baik 3"
+      ]
+    }
+  ]
+}

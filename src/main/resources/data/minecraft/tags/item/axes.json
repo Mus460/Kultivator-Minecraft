@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:senjata/kapak_fana",
+    "kultivator:senjata/kapak_roh_rendah",
+    "kultivator:senjata/kapak_roh_menengah",
+    "kultivator:senjata/kapak_roh_tinggi",
+    "kultivator:senjata/gada_fana",
+    "kultivator:senjata/gada_roh_rendah",
+    "kultivator:senjata/gada_roh_menengah",
+    "kultivator:senjata/gada_roh_tinggi"
+  ]
+}

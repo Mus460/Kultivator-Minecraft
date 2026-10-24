@@ -1,0 +1,22 @@
+{
+  "pembicara": [
+    "tokoh:bai_she"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_iblis_topeng tahap kembali"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas",
+      "prop": "kipas_sutra",
+      "akibat": [
+        "beri_nb_pita 8",
+        "gentar 5",
+        "peristiwa tanda iblis_topeng_serah"
+      ]
+    }
+  ]
+}

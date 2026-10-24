@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "peran:penjaga_formasi"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest kristal_formasi tahap pasang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "segel_tangan",
+      "prop": "piringan_formasi",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera formasi_belajar",
+            "quest_maju kristal_formasi"
+          ]
+        },
+        {
+          "akibat": [
+            "quest_maju kristal_formasi"
+          ]
+        }
+      ]
+    }
+  ]
+}

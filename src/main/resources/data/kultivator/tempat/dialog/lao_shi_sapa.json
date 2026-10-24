@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "tokoh:lao_shi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "asah_pisau",
+      "prop": "batu_mentah",
+      "pilihan": [
+        {
+          "ke": "mata"
+        },
+        {
+          "ke": "curang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "mata",
+      "gestur": "cerita"
+    },
+    {
+      "id": "curang",
+      "gestur": "tertawa"
+    }
+  ]
+}

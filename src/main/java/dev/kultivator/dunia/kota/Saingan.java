@@ -52,9 +52,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Saingan, the rival groups of treasure hunters (DESIGN 34.5.3, contract C34.K1 {@link RivalService}). Six groups per
- * world ({@link SainganData}), each a leader and 2-4 members with a home region and a realm band that grows with the
- * world's days but never more than one realm above the strongest player of the last 7 days.
+ * Saingan, the rival groups of treasure hunters (DESIGN 34.5.3, contract C34.K1 {@link RivalService}). One group per NPC
+ * sect of the world ({@link SainganData}; integration audit T12: group {@code g<i>} is the travelling band of sect
+ * {@code s<i>}, named after it, home region at its gate), each a leader and 2-4 members with a realm band that grows with
+ * the world's days but never more than one realm above the strongest player of the last 7 days.
  * <p>
  * Race: on {@code TREASURE_BORN} 1-3 groups whose region is within 3 000 blocks get an ETA of 60-240 s. The race is
  * virtual until a player is within {@code kota.racePhysicalRadius} (128) of the birth; then each group arrives at its ETA
@@ -159,7 +160,7 @@ public final class Saingan implements RivalService {
 
 	/** The group's name component. */
 	static MutableComponent groupName(SainganData.Group group) {
-		return Component.translatable("kultivator.kota.grup." + group.name).withColor(group.color);
+		return group.name().copy().withColor(group.color);
 	}
 
 	/** The realm band of the groups today: grows by one every 10 in-game days, at most one above the strongest recent player. */
@@ -296,14 +297,14 @@ public final class Saingan implements RivalService {
 	record Member(Component name, String group) {
 	}
 
-	/** {@code n} members of random groups ("Mo Shen dari Keluarga Mo"). */
+	/** {@code n} members of random groups ("Mo Shen dari Sekte Pedang Awan Ungu": a band carries its sect's name). */
 	static List<Member> bidders(MinecraftServer server, RandomSource random, int n) {
 		List<Member> list = new ArrayList<>();
 		List<SainganData.Group> groups = SainganData.get(server).groups();
 		for (int i = 0; i < n && !groups.isEmpty(); i++) {
 			SainganData.Group group = groups.get(random.nextInt(groups.size()));
 			int look = group.members[random.nextInt(group.members.length)];
-			list.add(new Member(Component.translatable("kultivator.kota.saingan.dari", KotaNames.person(look), groupName(group)), group.id));
+			list.add(new Member(Component.translatable("kultivator.kota.saingan.dari", KotaNames.person(look, NpcRole.SAINGAN), groupName(group)), group.id));
 		}
 		return list;
 	}
@@ -490,9 +491,9 @@ public final class Saingan implements RivalService {
 			}
 			int look = isLeader ? group.leaderLook : group.members[(i - (leader ? 1 : 0)) % group.members.length];
 			int realm = isLeader ? Math.min(Realm.TRUE_IMMORTAL.ordinal(), band) : Math.max(1, band - (random.nextInt(3) == 0 ? 1 : 0));
-			Dao dao = Dao.values()[Math.floorMod(look ^ group.name, Dao.COUNT)];
+			Dao dao = Dao.values()[Math.floorMod(look ^ group.sect, Dao.COUNT)];
 			MutableComponent plate = Component.translatable(isLeader ? "kultivator.kota.saingan.pemimpin" : "kultivator.kota.saingan.anggota",
-					KotaNames.person(look), groupName(group)).withColor(group.color);
+					KotaNames.person(look, NpcRole.SAINGAN), groupName(group)).withColor(group.color);
 			npc.snapTo(spot.x, spot.y, spot.z, random.nextFloat() * 360.0F, 0.0F);
 			npc.setup(NpcRole.SAINGAN, isLeader ? 3 : 2, look, realm, random.nextInt(4), dao, Math.floorMod(look >>> 9, KultivatorNpc.VOICES.length),
 					group.color, plate);
@@ -749,7 +750,8 @@ public final class Saingan implements RivalService {
 			for (SainganData.Group group : SainganData.get(server).groups()) {
 				CompoundTag g = new CompoundTag();
 				g.putString("id", group.id);
-				g.putString("name", "kultivator.kota.grup." + group.name);
+				group.putName(g);
+				g.putString("sekte", group.sectId());
 				g.putString("style", "kultivator.kota.gaya." + SainganData.STYLES[group.style]);
 				g.putInt("color", group.color);
 				int grudge = group.grudge(player.getUUID());

@@ -1,0 +1,53 @@
+{
+  "pembicara": [
+    "tokoh:yan_wushuang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_belakang",
+      "suara": "kotabesar.palace_audience",
+      "pilihan": [
+        {
+          "ke": "sejarah"
+        },
+        {
+          "ke": "lelah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sejarah",
+      "gestur": "cerita",
+      "akibat": [
+        "lore kota_besar"
+      ],
+      "pilihan": [
+        {
+          "ke": "sumpah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sumpah",
+      "gestur": "hormat_dalam"
+    },
+    {
+      "id": "lelah",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "ke": "pengganti"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pengganti",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

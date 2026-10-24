@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "tokoh:feng_ao"
+  ],
+  "prioritas": 15,
+  "syarat": [
+    "bendera feng_ao_dendam"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "ancam",
+      "suara": "tempat.young_master",
+      "pilihan": [
+        {
+          "akibat": [
+            "mulai_duel"
+          ]
+        },
+        {
+          "syarat": [
+            "nama_baik 20"
+          ],
+          "ke": "maaf",
+          "tampil": true,
+          "alasan": "kultivator.cerita.feng_ao_dendam.mulai.2.alasan"
+        }
+      ]
+    },
+    {
+      "id": "maaf",
+      "gestur": "sikap_angkuh",
+      "akibat": [
+        "bendera feng_ao_dendam off",
+        "bendera feng_ao_sahabat"
+      ]
+    }
+  ]
+}

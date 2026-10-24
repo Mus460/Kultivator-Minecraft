@@ -1,0 +1,35 @@
+{
+  "pembicara": [
+    "peran:pelayan"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 45"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "jalan_bawa",
+      "prop": "nampan",
+      "pilihan": [
+        {
+          "ke": "laris"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "laris",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

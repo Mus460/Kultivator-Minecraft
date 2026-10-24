@@ -274,6 +274,7 @@ public final class Duties {
 		DiscipleEntity disciple = EventUtil.bySoul(owner, soul);
 		if (disciple != null) {
 			EventUtil.extra(disciple.data()).remove("duty");
+			EventUtil.extra(disciple.data()).remove(SELF_DUTY);
 			if (disciple.activity() >= DiscipleEntity.ACTIVITY_WATER && disciple.activity() <= DiscipleEntity.ACTIVITY_FARM) {
 				disciple.setActivity(DiscipleEntity.ACTIVITY_NONE, null);
 			}
@@ -281,6 +282,138 @@ public final class Duties {
 				EventUtil.chat(tell, Component.translatable("kultivator.sectevent.duty.released", disciple.getDisplayName()).withStyle(ChatFormatting.GRAY));
 			}
 		}
+	}
+
+	// ================================================================== self-chosen posts (DESIGN 39D, contract C39.D1)
+
+	/**
+	 * {@code extra.activity} key of a post a disciple took by itself (Murid Mandiri, 39D). It is not {@code duty}: the
+	 * work streak of module W counts {@code duty} as a day of work, and a post the disciple chose is never forced work.
+	 */
+	public static final String SELF_DUTY = "self_duty";
+	/** Post flag of a self-chosen post (no chat lines to the master when it ends). */
+	private static final String SELF = "self";
+
+	/** The duty of a post the disciple took by itself, or null. */
+	public static @Nullable String selfDutyOf(DiscipleData data) {
+		String duty = data.extra().getCompoundOrEmpty(EXTRA).getStringOr(SELF_DUTY, "");
+		return duty.isEmpty() ? null : duty;
+	}
+
+	/**
+	 * The duty a disciple of {@code owner} could take by itself now: {@code wanted} when no post holds it yet, else the
+	 * first duty nobody holds, else {@code wanted} on a second post; null when every post of the hall is taken or the hall
+	 * is not standing. Read only (the planner asks it every hour, so it does no world access).
+	 */
+	public static @Nullable String selfPostOpen(UUID owner, @Nullable String wanted) {
+		Halls.HallView hall = owner == null ? null : Halls.hallOf(owner);
+		if (hall == null || !hall.active()) {
+			return null;
+		}
+		CompoundTag posts = EventUtil.section(owner).getCompoundOrEmpty(POSTS);
+		int max = Math.min(4, posts(Halls.level(owner)));
+		int used = 0;
+		List<String> held = new ArrayList<>();
+		for (int i = 0; i < 4; i++) {
+			CompoundTag post = posts.getCompoundOrEmpty(String.valueOf(i));
+			if (posts.contains(String.valueOf(i))) {
+				used++;
+				held.add(post.getStringOr("duty", ""));
+			}
+		}
+		if (used >= max) {
+			return null;
+		}
+		String first = wanted != null && valid(wanted) ? wanted : WATER;
+		if (!held.contains(first)) {
+			return first;
+		}
+		for (String duty : DUTIES) {
+			if (!held.contains(duty)) {
+				return duty;
+			}
+		}
+		return first;
+	}
+
+	/**
+	 * DESIGN 39D: a disciple of {@code owner} takes a free post with {@code duty} by itself (the planner's POS_TUGAS). The
+	 * old rules of {@link #assign} apply (a standing hall, within 64 blocks of the stele, free for an errand, a free post
+	 * of {@link #posts}), but nothing is said to the master: the planner writes the diary. The disciple must be idle (no
+	 * other activity). The output is the old lazy output of {@link #compute}. True when it stands at its post.
+	 */
+	public static boolean assignSelf(UUID owner, DiscipleEntity disciple, String duty) {
+		Halls.HallView hall = owner == null ? null : Halls.hallOf(owner);
+		ServerLevel level = hall == null ? null : EventUtil.hallLevel(hall);
+		if (hall == null || !hall.active() || level == null || disciple == null || !owner.equals(disciple.ownerId())) {
+			return false;
+		}
+		if (!valid(duty) || !EventUtil.free(disciple) || !EventUtil.nearHall(disciple, hall, 64.0D)
+				|| disciple.activity() != DiscipleEntity.ACTIVITY_NONE) {
+			return false;
+		}
+		CompoundTag posts = EventUtil.sub(EventUtil.section(owner), POSTS);
+		String soul = disciple.soulId().toString();
+		if (postOf(posts, soul) != null) {
+			return false;
+		}
+		String key = null;
+		int max = posts(Halls.level(owner));
+		for (int i = 0; i < Math.min(4, max); i++) {
+			if (!posts.contains(String.valueOf(i))) {
+				key = String.valueOf(i);
+				break;
+			}
+		}
+		if (key == null) {
+			return false;
+		}
+		BlockPos spot = postSpot(level, disciple, owner, duty, hall.pos(), Integer.parseInt(key));
+		if (spot == null) {
+			return false;
+		}
+		CompoundTag post = EventUtil.sub(posts, key);
+		post.putLong("spot", spot.asLong());
+		post.putString("soul", soul);
+		post.putString("duty", duty);
+		post.putLong("last", EventUtil.gameTime());
+		post.putBoolean(SELF, true);
+		EventUtil.extra(disciple.data()).putString(SELF_DUTY, duty);
+		disciple.setActivity(activityOf(duty), spot);
+		EventUtil.dirty();
+		EventUtil.fx(level, Vec3.atBottomCenterOf(spot), SectEventFxIds.DUTY_PUFF, activityOf(duty), 0.0F);
+		level.playSound(null, spot.getX() + 0.5D, spot.getY(), spot.getZ() + 0.5D, SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.NEUTRAL, 0.5F, 1.3F);
+		return true;
+	}
+
+	/**
+	 * DESIGN 39D: ends a self-chosen post (the planner's block is over). The output since the last computation is worked
+	 * out first, so the hour on the post is never lost; the body activity is cleared when it is still the post's. Quiet.
+	 * True when the soul held a self-chosen post.
+	 */
+	public static boolean releaseSelf(UUID owner, UUID soul) {
+		if (owner == null || soul == null) {
+			return false;
+		}
+		CompoundTag posts = EventUtil.sub(EventUtil.section(owner), POSTS);
+		String key = postOf(posts, soul.toString());
+		if (key == null || !posts.getCompoundOrEmpty(key).getBooleanOr(SELF, false)) {
+			return false;
+		}
+		Halls.HallView hall = Halls.hallOf(owner);
+		if (hall != null) {
+			compute(owner, hall);
+		}
+		posts.remove(key);
+		EventUtil.dirty();
+		DiscipleEntity disciple = EventUtil.bySoul(owner, soul);
+		if (disciple != null) {
+			EventUtil.extra(disciple.data()).remove(SELF_DUTY);
+			if (disciple.activity() >= DiscipleEntity.ACTIVITY_WATER && disciple.activity() <= DiscipleEntity.ACTIVITY_FARM) {
+				disciple.setActivity(DiscipleEntity.ACTIVITY_NONE, null);
+			}
+		}
+		return true;
 	}
 
 	/** True when the master's disciple list holds this soul as living (read only). */
@@ -403,9 +536,13 @@ public final class Duties {
 			}
 			if (disciple.activity() != activityOf(duty)) {
 				// Called away ("murid panggil") or given another task: the post is free again.
+				boolean self = post.getBooleanOr(SELF, false);
 				posts.remove(key);
 				EventUtil.extra(disciple.data()).remove("duty");
-				EventUtil.chat(player, Component.translatable("kultivator.sectevent.duty.left", disciple.getDisplayName()).withStyle(ChatFormatting.GRAY));
+				EventUtil.extra(disciple.data()).remove(SELF_DUTY);
+				if (!self) {
+					EventUtil.chat(player, Component.translatable("kultivator.sectevent.duty.left", disciple.getDisplayName()).withStyle(ChatFormatting.GRAY));
+				}
 				continue;
 			}
 			post.putLong("last", now);

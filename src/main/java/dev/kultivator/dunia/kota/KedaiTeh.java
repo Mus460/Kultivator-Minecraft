@@ -54,8 +54,12 @@ public final class KedaiTeh {
 	/** Kabar Angin bands: price and radius. */
 	public static final long[] RUMOUR_PRICE = {1L, 9L, 81L};
 	public static final int[] RUMOUR_RADIUS = {1500, 3000, 6000};
-	/** Rumour kinds: the structure tag folders of the modules (each module ships {@code #kultivator:<folder>}). */
-	public static final String[] RUMOUR_KINDS = {"kota", "reruntuhan", "penjara", "menara", "bawah", "laut"};
+	/**
+	 * Rumour kinds: the structure tag folders of the modules (each module ships {@code #kultivator:<folder>}). DESIGN 38
+	 * (38.D.12, 38W) appends the capital ({@code kota_besar}), the villages ({@code kampung}, 38DS) and the caves of 38
+	 * ({@code gua}, 38GU) at the end, so the indexes of the older kinds stay.
+	 */
+	public static final String[] RUMOUR_KINDS = {"kota", "reruntuhan", "penjara", "menara", "bawah", "laut", "kota_besar", "kampung", "gua"};
 	public static final int TOKEN_AFTER = 3;
 	/** KotaData player key: the in-game day of the last free rumour of a Lencana Pengembara. */
 	public static final String BADGE_DAY = "lencana_hari";
@@ -298,6 +302,9 @@ public final class KedaiTeh {
 			case "menara" -> "menara/menara";
 			case "bawah" -> "bawah/kuil";
 			case "laut" -> "laut/pusaran";
+			case "kota_besar" -> "kota/kota_besar";
+			case "kampung" -> "kampung/desa";
+			case "gua" -> "gua/pertapa";
 			default -> "reruntuhan/gua_kecil";
 		};
 	}

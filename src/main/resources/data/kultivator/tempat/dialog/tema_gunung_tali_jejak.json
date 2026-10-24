@@ -1,0 +1,32 @@
+{
+  "pembicara": [
+    "tokoh:tie_suo"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest tema_gunung_tali tahap jejak"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "shan"
+        }
+      ]
+    },
+    {
+      "id": "shan",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju tema_gunung_tali"
+          ]
+        }
+      ]
+    }
+  ]
+}

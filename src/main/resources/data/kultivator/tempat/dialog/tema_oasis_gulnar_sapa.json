@@ -1,0 +1,50 @@
+{
+  "pembicara": [
+    "tokoh:gulnar"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tenun",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_tawar"
+          ]
+        },
+        {
+          "ke": "motif"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai"
+          ],
+          "ke": "benang_merah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "motif",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "benang_merah",
+      "gestur": "tenun",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

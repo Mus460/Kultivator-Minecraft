@@ -1,0 +1,24 @@
+{
+  "pembicara": [
+    "tokoh:feng_ao"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest daftar_naga_muda tahap arena"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hunus",
+      "pilihan": [
+        {
+          "akibat": [
+            "mulai_duel"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

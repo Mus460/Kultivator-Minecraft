@@ -1,0 +1,35 @@
+{
+  "pemberi": "peran:tawanan",
+  "tempat": "sarang_iblis",
+  "tahap": [
+    {
+      "id": "kawal",
+      "tujuan": [
+        "kawal peran:tawanan kampung/"
+      ],
+      "batas_hari": 2,
+      "gagal_ke": "tersesat",
+      "arah": "kampung/"
+    },
+    {
+      "id": "sambut",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "nama_baik 3",
+        "gelar pembebas",
+        "beri cerita:tanda_bebas",
+        "kabar tawanan_pulang pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "tersesat",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}

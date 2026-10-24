@@ -1,0 +1,67 @@
+{
+  "pemberi": "tokoh:bibi_hong",
+  "tempat": "penginapan",
+  "tahap": [
+    {
+      "id": "cari",
+      "tujuan": [
+        "pergi sekte/kompleks"
+      ],
+      "arah": "sekte/kompleks"
+    },
+    {
+      "id": "temu",
+      "cabang": [
+        {
+          "syarat": [
+            "aliran_terdekat 2"
+          ],
+          "ke": "tahan"
+        }
+      ],
+      "ke": "balasan"
+    },
+    {
+      "id": "balasan",
+      "tujuan": [
+        "bicara tokoh:ah_lun"
+      ],
+      "akibat": [
+        "beri cerita:balasan_ah_lun"
+      ],
+      "ke": "pulang"
+    },
+    {
+      "id": "pulang",
+      "tujuan": [
+        "antar cerita:balasan_ah_lun tokoh:bibi_hong"
+      ],
+      "akibat": [
+        "bendera inap_gratis_7",
+        "efek minecraft:regeneration 200 0",
+        "nama_baik 5",
+        "kabar ah_lun_surat pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "tahan",
+      "tujuan": [
+        "duel peran:tetua_sekte"
+      ],
+      "ke": "kabari"
+    },
+    {
+      "id": "kabari",
+      "tujuan": [
+        "bicara tokoh:bibi_hong"
+      ],
+      "akibat": [
+        "bendera ah_lun_pulang",
+        "bendera inap_gratis_7",
+        "nama_baik 8",
+        "kabar ah_lun_pulang pemain"
+      ]
+    }
+  ]
+}

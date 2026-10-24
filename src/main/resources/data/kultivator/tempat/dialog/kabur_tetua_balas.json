@@ -1,0 +1,21 @@
+{
+  "pembicara": [
+    "peran:tetua_sekte"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "quest murid_kabur selesai",
+    "bendera kabur_kembali",
+    "!bendera kabur_tetua_renung"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tatap_langit",
+      "akibat": [
+        "bendera kabur_tetua_renung"
+      ]
+    }
+  ]
+}

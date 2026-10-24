@@ -1,0 +1,35 @@
+{
+  "pemberi": "peran:anak",
+  "tempat": "tema_iblis",
+  "tahap": [
+    {
+      "id": "pilih",
+      "tujuan": [
+        "iblis_anak"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera iblis_anak_lapor"
+          ],
+          "ke": "dilapor"
+        }
+      ],
+      "ke": "dibantu"
+    },
+    {
+      "id": "dibantu",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "dilapor",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

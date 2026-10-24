@@ -1,0 +1,58 @@
+{
+  "pembicara": [
+    "peran:murid_sekte_dalam"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest murid_kabur tahap temu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "takut_sembunyi",
+      "pilihan": [
+        {
+          "ke": "alasan"
+        }
+      ]
+    },
+    {
+      "id": "alasan",
+      "gestur": "menangis",
+      "prop": "kitab",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri cerita:kitab_curian",
+            "bendera kabur_kembali",
+            "quest_maju murid_kabur"
+          ],
+          "ke": "serah"
+        },
+        {
+          "akibat": [
+            "bendera kabur_lindungi",
+            "sikap_sekte terdekat -5",
+            "quest_maju murid_kabur"
+          ],
+          "ke": "pergi"
+        }
+      ]
+    },
+    {
+      "id": "serah",
+      "gestur": "sikap_tunduk",
+      "akibat": [
+        "npc_pergi"
+      ]
+    },
+    {
+      "id": "pergi",
+      "gestur": "lari_lambai",
+      "akibat": [
+        "npc_pergi"
+      ]
+    }
+  ]
+}

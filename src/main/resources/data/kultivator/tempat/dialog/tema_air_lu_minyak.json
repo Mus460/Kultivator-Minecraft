@@ -1,0 +1,60 @@
+{
+  "pembicara": [
+    "tokoh:lu_yuqing"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "bendera air_minyak_dengar"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "ke": "rahasia"
+        },
+        {
+          "syarat": [
+            "quest tema_pelabuhan_pelita aktif"
+          ],
+          "ke": "pelabuhan"
+        },
+        {
+          "syarat": [
+            "quest tema_pelabuhan_pelita selesai"
+          ],
+          "ke": "pelabuhan"
+        },
+        {
+          "ke": "tikus"
+        }
+      ]
+    },
+    {
+      "id": "rahasia",
+      "gestur": "tuang_teh",
+      "prop": "teko",
+      "pilihan": [
+        {
+          "ke": "tikus"
+        }
+      ]
+    },
+    {
+      "id": "pelabuhan",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "tikus"
+        }
+      ]
+    },
+    {
+      "id": "tikus",
+      "gestur": "tunjuk"
+    }
+  ]
+}

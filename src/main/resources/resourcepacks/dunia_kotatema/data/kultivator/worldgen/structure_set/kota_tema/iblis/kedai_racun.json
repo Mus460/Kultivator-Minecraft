@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380449,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_iblis",
+    "distrik": "kedai_racun"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/iblis/kedai_racun",
+      "weight": 1
+    }
+  ]
+}

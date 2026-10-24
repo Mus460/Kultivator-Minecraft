@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "tokoh:dou"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest demam_kumuh tahap bawa"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lari_lambai",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera demam_gratis",
+            "quest_maju demam_kumuh"
+          ]
+        },
+        {
+          "akibat": [
+            "bendera demam_bayar",
+            "quest_maju demam_kumuh"
+          ]
+        }
+      ]
+    }
+  ]
+}

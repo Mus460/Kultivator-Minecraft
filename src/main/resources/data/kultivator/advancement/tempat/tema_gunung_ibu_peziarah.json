@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_gunung",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_gunung_ibu_peziarah.description"
+    },
+    "icon": {
+      "id": "kultivator:tema/dupa_ziarah"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_gunung_ibu_peziarah.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

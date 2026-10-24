@@ -254,6 +254,129 @@ final class NatalTreasure {
 		return null;
 	}
 
+	// ================================================================== the disciple's own work (DESIGN 39D, 39.6.7)
+
+	/**
+	 * Why the disciple cannot refine its form by itself (reason key without the prefix), given the diamonds and feathers its
+	 * bag holds; null when it can. The old rules with the disciple in place of the master: Foundation or higher, standing
+	 * inside its hall's territory, 1 diamond and 8 Spirit Tail Feathers.
+	 */
+	static @Nullable String refineBlockerSelf(DiscipleEntity entity, int diamonds, int feathers) {
+		DiscipleData data = entity.data();
+		if (form(data) >= 0) {
+			return "why.natal_has";
+		}
+		if (!data.realm().atLeast(Realm.FOUNDATION)) {
+			return "why.natal_realm";
+		}
+		UUID owner = entity.ownerId();
+		if (owner == null || !Halls.inTerritory(owner, entity.level(), entity.position())) {
+			return "why.natal_territory";
+		}
+		if (diamonds < REFINE_DIAMONDS || feathers < REFINE_FEATHERS) {
+			return "why.natal_materials";
+		}
+		return null;
+	}
+
+	/**
+	 * The disciple refines its natal treasure in {@code form} with materials its caller already took out of its own bag
+	 * ({@code diamonds}, {@code feathers}, at least the old amounts). Null on success, else a reason key (the caller puts
+	 * the materials back). The old effects play; the master hears nothing (the diary tells it).
+	 */
+	static @Nullable String refineSelf(DiscipleEntity entity, int form, int diamonds, int feathers) {
+		String why = refineBlockerSelf(entity, diamonds, feathers);
+		if (why != null) {
+			return why;
+		}
+		int chosen = Math.max(0, Math.min(3, form));
+		CompoundTag natal = PowerCore.editSub(entity.data(), "natal");
+		natal.putInt("form", chosen);
+		natal.putInt("folds", 0);
+		DisciplePowers.syncPower(entity);
+		if (entity.level() instanceof ServerLevel level) {
+			PowerCore.fx(level, entity.position(), PowerIds.FX_NATAL_REFINE, chosen, 0.0F);
+			PowerCore.sound(level, entity.position(), SoundEvents.ANVIL_USE, 0.8F, 1.2F);
+			PowerCore.sound(level, entity.position(), SoundEvents.BEACON_POWER_SELECT, 1.0F, 1.2F);
+		}
+		return null;
+	}
+
+	/** Personal PK the next fold costs when the disciple pays it itself ({@code n x 40}, the old pool price). */
+	static int foldPkSelf(DiscipleData data) {
+		return (folds(data) + 1) * FOLD_PK;
+	}
+
+	/**
+	 * Why the next fold cannot be tried by the disciple itself (reason key without the prefix), given the feathers of its
+	 * bag; null when it can: a form, below the fold cap, {@code n} feathers, {@code n x 40} personal PK ({@code SectRanks.pk}).
+	 */
+	static @Nullable String enhanceBlockerSelf(DiscipleEntity entity, int feathers) {
+		DiscipleData data = entity.data();
+		if (form(data) < 0) {
+			return "why.natal_none";
+		}
+		int n = folds(data) + 1;
+		if (n > maxFolds(data)) {
+			return "why.natal_max";
+		}
+		if (feathers < n) {
+			return "why.natal_feathers";
+		}
+		if (dev.kultivator.sect.hall.SectRanks.pk(data) < n * FOLD_PK) {
+			return "why.natal_pool";
+		}
+		return null;
+	}
+
+	/**
+	 * One fold of spirit enhancement the disciple pays itself: {@code n} feathers its caller already took out of the bag and
+	 * {@code n x 40} personal PK taken here; the old chance ({@link #chance}, the hall level of its owner) and the old loss
+	 * from fold 3. Returns the result: 1 a new fold, 0 failed, -1 failed and lost a fold, {@link Integer#MIN_VALUE} refused
+	 * (nothing was paid; the caller puts the feathers back). The milestone advancements go to the master when online.
+	 */
+	static int enhanceSelf(DiscipleEntity entity, int feathers) {
+		if (enhanceBlockerSelf(entity, feathers) != null) {
+			return Integer.MIN_VALUE;
+		}
+		DiscipleData data = entity.data();
+		int n = folds(data) + 1;
+		dev.kultivator.sect.hall.SectRanks.addPk(data, -n * FOLD_PK, "kultivator.sekte.mandiri.kerja.pk.natal");
+		boolean success = entity.getRandom().nextDouble() < chance(data, entity.ownerId(), n);
+		CompoundTag natal = PowerCore.editSub(data, "natal");
+		ServerLevel level = entity.level() instanceof ServerLevel serverLevel ? serverLevel : null;
+		int result;
+		if (success) {
+			natal.putInt("folds", n);
+			result = 1;
+			if (level != null) {
+				PowerCore.fx(level, entity.position(), PowerIds.FX_NATAL_FOLD, n, 1.0F);
+				PowerCore.sound(level, entity.position(), SoundEvents.ANVIL_USE, 0.8F, 1.0F + 0.03F * n);
+				PowerCore.sound(level, entity.position(), SoundEvents.AMETHYST_BLOCK_CHIME, 1.0F, 1.0F + 0.04F * n);
+			}
+			ServerPlayer master = entity.owner();
+			if (master != null && n >= GOLD) {
+				Advancements.grant(master, "natal_fold_9");
+			}
+			if (master != null && n >= ETERNAL) {
+				Advancements.grant(master, "payung_abadi");
+			}
+		} else {
+			boolean lost = n >= LOSS_FROM;
+			if (lost) {
+				natal.putInt("folds", n - 2);
+			}
+			result = lost ? -1 : 0;
+			if (level != null) {
+				PowerCore.fx(level, entity.position(), PowerIds.FX_NATAL_FOLD, folds(data), 0.0F);
+				PowerCore.sound(level, entity.position(), SoundEvents.FIRE_EXTINGUISH, 1.0F, 0.8F);
+				PowerCore.sound(level, entity.position(), SoundEvents.ITEM_BREAK.value(), 0.8F, 0.8F);
+			}
+		}
+		DisciplePowers.syncPower(entity);
+		return result;
+	}
+
 	// ================================================================== abilities
 
 	/** Once a second: the Parasol shelters (every 60 s), the Bell rings on each new cast. */

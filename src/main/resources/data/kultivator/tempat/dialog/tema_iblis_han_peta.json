@@ -1,0 +1,41 @@
+{
+  "pembicara": [
+    "tokoh:han_qingshuang"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "quest tema_iblis_rantai tahap peta"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "isian": [
+        "sekte_lurus"
+      ],
+      "gestur": "sikap_gagang",
+      "suara": "tema.iblis.hunter",
+      "pilihan": [
+        {
+          "ke": "kenapa"
+        },
+        {
+          "ke": "cari"
+        }
+      ]
+    },
+    {
+      "id": "kenapa",
+      "gestur": "sikap_tangan_belakang",
+      "pilihan": [
+        {
+          "ke": "cari"
+        }
+      ]
+    },
+    {
+      "id": "cari",
+      "gestur": "tunjuk"
+    }
+  ]
+}

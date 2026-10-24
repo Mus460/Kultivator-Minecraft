@@ -36,6 +36,8 @@ public final class SekteContentClient {
 		dev.kultivator.client.sekte.diplomasi.DiplomasiClient.init();
 		// W Kebun Obat & Tambang Roh (51, 52):
 		dev.kultivator.client.sekte.kebun.KebunClient.init();
+		// Murid Mandiri, DESIGN 39 + 39.F (39E owns MandiriClient, which calls 39F's SeteruClient):
+		dev.kultivator.client.sekte.mandiri.MandiriClient.init();
 	}
 
 	private SekteContentClient() {

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_gunung",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_gunung_kera_nakal.description"
+    },
+    "icon": {
+      "id": "minecraft:sweet_berries"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_gunung_kera_nakal.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

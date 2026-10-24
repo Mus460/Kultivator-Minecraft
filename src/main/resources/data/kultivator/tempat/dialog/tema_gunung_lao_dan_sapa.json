@@ -1,0 +1,64 @@
+{
+  "pembicara": [
+    "tokoh:lao_dan"
+  ],
+  "prioritas": 1,
+  "syarat": [
+    "kota_tema gunung"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tepuk_bahu",
+      "prop": "rangka_punggung",
+      "pilihan": [
+        {
+          "akibat": [
+            "gunung_titip aula_emas"
+          ]
+        },
+        {
+          "akibat": [
+            "gunung_titip biara"
+          ]
+        },
+        {
+          "ke": "lama"
+        },
+        {
+          "syarat": [
+            "bendera gunung_gou_tobat"
+          ],
+          "ke": "murid_kuli"
+        },
+        {
+          "syarat": [
+            "bendera gunung_gou_usir"
+          ],
+          "ke": "gunung_lain"
+        },
+        {
+          "ke": "kabar"
+        }
+      ]
+    },
+    {
+      "id": "lama",
+      "gestur": "cerita"
+    },
+    {
+      "id": "murid_kuli",
+      "gestur": "tepuk_bahu"
+    },
+    {
+      "id": "gunung_lain",
+      "gestur": "bisik"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

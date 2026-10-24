@@ -1,0 +1,27 @@
+{
+  "pembicara": [
+    "peran:peziarah"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_kera_nakal tahap kembalikan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "prop": "dupa",
+      "pilihan": [
+        {
+          "akibat": [
+            "nama_baik 3",
+            "beri kultivator:tema/dupa_ziarah 6",
+            "gunung_adv kera_nakal",
+            "quest_maju tema_kera_nakal"
+          ]
+        }
+      ]
+    }
+  ]
+}

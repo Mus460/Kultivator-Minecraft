@@ -1,0 +1,38 @@
+{
+  "pembicara": [
+    "peran:kepala_desa"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest gagal_panen baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tatap_langit",
+      "suara": "tempat.village_elder",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera panen_air",
+            "quest_mulai gagal_panen"
+          ],
+          "ke": "terima"
+        },
+        {
+          "akibat": [
+            "bendera panen_binatang",
+            "quest_mulai gagal_panen"
+          ],
+          "ke": "terima"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat"
+    }
+  ]
+}

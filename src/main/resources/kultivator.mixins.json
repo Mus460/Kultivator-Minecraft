@@ -11,6 +11,7 @@
     "SculkSensorBlockMixin",
     "BigDripleafBlockMixin",
     "EntityMixin",
+    "EntitySectionMixin",
     "RedStoneOreBlockMixin",
     "SectSpawnMixin",
     "SectExplosionMixin",
@@ -19,6 +20,7 @@
     "MobFinalizeSpawnMixin",
     "MobSetTargetMixin",
     "ServerLevelPrecipitationMixin",
+    "ChunkGeneratorTempatMixin",
     "duel.MobGoalSelectorAccessor"
   ],
   "injectors": {

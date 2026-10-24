@@ -1,0 +1,20 @@
+{
+  "pemberi": "tokoh:mo_wen",
+  "tempat": "tema_iblis",
+  "tahap": [
+    {
+      "id": "kumpul",
+      "tujuan": [
+        "punya kultivator:lost_scripture_page 3"
+      ],
+      "arah": "kotabesar"
+    },
+    {
+      "id": "serah",
+      "tujuan": [
+        "tanda iblis_kitab_serah"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

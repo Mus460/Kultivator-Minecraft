@@ -134,6 +134,15 @@ final class GreatMeteors {
 			entity.push(away.x / length * strength, 0.35D + 0.2D * strength, away.z / length * strength);
 		}
 		int stones = STONES_MIN + random.nextInt(STONES_MAX - STONES_MIN + 1);
+		// DESIGN 38.A #22 (38GU): watched from a star stage or the capital's observatory, the landing leaves up to twice the
+		// stones (the bounded place factor "bintang", 1.0 .. 2.0; the core stays one)
+		double watch = 1.0D;
+		for (ServerPlayer viewer : level.players()) {
+			if (TreasureBirths.horizontal(viewer.position(), at) <= ANNOUNCE_RANGE) {
+				watch = Math.max(watch, dev.kultivator.dunia.tempat.TempatApi.faktor(viewer, "bintang"));
+			}
+		}
+		stones = (int) Math.round(stones * Math.min(2.0D, watch));
 		drop(level, at, new ItemStack(LangitItems.BATU_METEOR_ROH, stones), random);
 		drop(level, at, new ItemStack(LangitItems.INTI_METEOR_AGUNG), random);
 		DuniaSites.publishLive(level, "langit/meteor", landing, 2, level.getGameTime() + SITE_TICKS);

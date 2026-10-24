@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_air",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_air_perahu_naga.description"
+    },
+    "icon": {
+      "id": "kultivator:tema/pita_naga"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_air_perahu_naga.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

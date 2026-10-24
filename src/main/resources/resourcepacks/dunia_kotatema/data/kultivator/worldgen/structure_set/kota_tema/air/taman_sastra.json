@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380421,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_air",
+    "distrik": "taman_sastra"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/air/taman_sastra",
+      "weight": 1
+    }
+  ]
+}

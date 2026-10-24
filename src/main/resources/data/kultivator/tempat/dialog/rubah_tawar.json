@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:ma_laoliu"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest binatang_curian baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai binatang_curian"
+          ],
+          "ke": "pesan"
+        },
+        {
+          "ke": "kenapa"
+        }
+      ]
+    },
+    {
+      "id": "kenapa",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai binatang_curian"
+          ],
+          "ke": "pesan"
+        }
+      ]
+    },
+    {
+      "id": "pesan",
+      "gestur": "lempar_pakan"
+    }
+  ]
+}

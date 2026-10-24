@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_gunung",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_gunung_cahaya_budha.description"
+    },
+    "icon": {
+      "id": "minecraft:glowstone_dust"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_gunung_cahaya_budha.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

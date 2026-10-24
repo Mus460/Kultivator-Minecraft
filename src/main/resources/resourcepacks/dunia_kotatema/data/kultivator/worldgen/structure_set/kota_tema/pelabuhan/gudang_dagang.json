@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380406,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_pelabuhan",
+    "distrik": "gudang_dagang"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/pelabuhan/gudang_dagang",
+      "weight": 1
+    }
+  ]
+}

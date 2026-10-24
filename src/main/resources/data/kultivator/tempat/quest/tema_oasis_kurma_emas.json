@@ -1,0 +1,18 @@
+{
+  "pemberi": "peran:petani",
+  "tempat": "kota_tema_oasis",
+  "tahap": [
+    {
+      "id": "panen",
+      "tujuan": [
+        "oasis_kurma 5"
+      ],
+      "arah": "kota_tema/oasis",
+      "akibat": [
+        "beri kultivator:dagang/kurma_emas 12",
+        "nama_baik 2"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

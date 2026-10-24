@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "peran:penuntun_unta"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "oasis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "pimpin_unta",
+      "prop": "tali_kekang",
+      "suara": "tema.oasis.caravan",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_kafilah"
+          ]
+        },
+        {
+          "ke": "unta"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "unta",
+      "gestur": "tepuk_bahu",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

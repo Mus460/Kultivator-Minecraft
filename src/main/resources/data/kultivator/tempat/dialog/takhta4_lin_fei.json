@@ -1,0 +1,57 @@
+{
+  "pembicara": [
+    "tokoh:lin_fei"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_dua_calon tahap galang",
+    "!bendera takhta4_dukung_lin_fei"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_berkacak",
+      "pilihan": [
+        {
+          "syarat": [
+            "pita 2"
+          ],
+          "ke": "setuju",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta4_lin_fei.mulai.1.alasan"
+        },
+        {
+          "syarat": [
+            "nb 5"
+          ],
+          "akibat": [
+            "bayar 5"
+          ],
+          "ke": "cerita"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "cerita",
+      "gestur": "minum_arak",
+      "prop": "cawan_arak",
+      "pilihan": [
+        {
+          "ke": "setuju"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "setuju",
+      "gestur": "tepuk_bahu",
+      "akibat": [
+        "peristiwa tanda dukungan",
+        "bendera takhta4_dukung_lin_fei",
+        "nama_baik 3"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "pembicara": [
+    "tokoh:su_jiner"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest tema_air_benang tahap lepas"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa"
+    }
+  ]
+}

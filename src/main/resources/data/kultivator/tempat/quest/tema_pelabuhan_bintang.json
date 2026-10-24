@@ -1,0 +1,20 @@
+{
+  "pemberi": "tokoh:ibrahim",
+  "tempat": "tema_pelabuhan",
+  "tahap": [
+    {
+      "id": "malam",
+      "akibat_masuk": [
+        "pelabuhan_bintang"
+      ],
+      "tujuan": [
+        "pelabuhan_bintang malam x3"
+      ],
+      "akibat": [
+        "pelabuhan_hadiah astrolab",
+        "nama_baik 2"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

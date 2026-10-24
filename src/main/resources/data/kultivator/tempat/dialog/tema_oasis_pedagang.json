@@ -1,0 +1,52 @@
+{
+  "pembicara": [
+    "peran:pedagang_bazar"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "oasis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "seru_dagang",
+      "suara": "tema.oasis.bazaar",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_tawar"
+          ]
+        },
+        {
+          "ke": "pasar"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pasar",
+      "gestur": "tawar_bazar",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

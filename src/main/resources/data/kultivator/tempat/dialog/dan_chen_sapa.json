@@ -1,0 +1,32 @@
+{
+  "pembicara": [
+    "tokoh:dan_chen"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "ke": "ujian"
+        },
+        {
+          "ke": "wabah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ujian",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "wabah",
+      "gestur": "tatap_langit",
+      "akibat": [
+        "lore gilda.alkemis"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "pembicara": [
+    "tokoh:mo_hua"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lukis_dinding",
+      "prop": "kuas_besar",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_mural_buka"
+          ]
+        },
+        {
+          "ke": "suara"
+        },
+        {
+          "ke": "pelukis"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai",
+            "bendera oasis.xie_bujuk"
+          ],
+          "ke": "mural_tiga_belas"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai",
+            "!bendera oasis.xie_bujuk"
+          ],
+          "ke": "mural_senja"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai"
+          ],
+          "ke": "kisah_kita"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "suara",
+      "gestur": "bicara_tangan",
+      "prop": "kuas",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "pelukis",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "mural_tiga_belas",
+      "gestur": "lukis_dinding",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "mural_senja",
+      "gestur": "sikap_tunduk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kisah_kita",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "pembicara": [
+    "tokoh:wen_shi"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "batu"
+        },
+        {
+          "ke": "bulan"
+        },
+        {
+          "syarat": [
+            "quest tema_air_bait_tua baru"
+          ],
+          "ke": "bait"
+        },
+        {
+          "syarat": [
+            "quest tema_air_benang hasil tenang"
+          ],
+          "ke": "cucu_pulang"
+        },
+        {
+          "syarat": [
+            "quest tema_air_benang hasil sepi"
+          ],
+          "ke": "cucu_sepi"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "cucu_pulang",
+      "gestur": "tatap_langit",
+      "prop": "kipas_lipat"
+    },
+    {
+      "id": "cucu_sepi",
+      "gestur": "sikap_tangan_belakang"
+    },
+    {
+      "id": "batu",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "bulan",
+      "gestur": "tatap_langit"
+    },
+    {
+      "id": "bait",
+      "gestur": "kipas",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_air_bait_tua"
+          ],
+          "ke": "bait_cara"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bait_cara",
+      "gestur": "membaca",
+      "prop": "kitab"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "membaca",
+      "prop": "kitab"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "pembicara": [
+    "tokoh:dou"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "main_kejar",
+      "suara": "tempat.child_play",
+      "pilihan": [
+        {
+          "akibat": [
+            "bayar 1"
+          ],
+          "ke": "kabar"
+        },
+        {
+          "ke": "rumah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    },
+    {
+      "id": "rumah",
+      "gestur": "main_lompat"
+    }
+  ]
+}

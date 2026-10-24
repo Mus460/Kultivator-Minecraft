@@ -1,0 +1,30 @@
+{
+  "pemberi": "tokoh:lao_shi",
+  "tempat": "rumah_judi",
+  "tahap": [
+    {
+      "id": "kuil",
+      "tujuan": [
+        "antar cerita:batu_bermata_darah tokoh:jing_xin"
+      ],
+      "akibat_masuk": [
+        "beri cerita:batu_bermata_darah",
+        "efek minecraft:weakness 1200 0"
+      ]
+    },
+    {
+      "id": "uji"
+    },
+    {
+      "id": "lapor",
+      "tujuan": [
+        "bicara tokoh:lao_shi"
+      ],
+      "akibat": [
+        "beri_nb_pita 30",
+        "nama_baik 3",
+        "bendera lao_shi_hutang_budi"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_pelabuhan",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_pelabuhan_lomba.description"
+    },
+    "icon": {
+      "id": "minecraft:prismarine_crystals"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_pelabuhan_lomba.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

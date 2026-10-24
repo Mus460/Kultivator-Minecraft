@@ -1,0 +1,28 @@
+{
+  "pembicara": [
+    "tokoh:deng_ming"
+  ],
+  "prioritas": 52,
+  "syarat": [
+    "quest tema_pelabuhan_pelita tahap nasib",
+    "bendera pelabuhan_heisha_dengar"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "akibat": [
+            "nama_baik 5",
+            "pelabuhan_nasib damai",
+            "kabar tema_pelabuhan_heisha_damai_2 pemain",
+            "quest_maju tema_pelabuhan_pelita"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

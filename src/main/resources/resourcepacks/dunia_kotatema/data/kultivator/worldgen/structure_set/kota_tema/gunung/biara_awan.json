@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380433,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_gunung",
+    "distrik": "biara_awan"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/gunung/biara_awan",
+      "weight": 1
+    }
+  ]
+}

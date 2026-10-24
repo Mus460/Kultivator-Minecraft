@@ -1,0 +1,16 @@
+{
+  "pembicara": [
+    "peran:pertapa"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "quest tiga_ujian_pertapa selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "napas_meditasi"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "pembicara": [
+    "tokoh:ma_laoliu"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest tikus_dapur tahap kembali",
+    "!bendera tikus_si_belang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lempar_pakan",
+      "akibat": [
+        "bendera tikus_si_belang"
+      ]
+    }
+  ]
+}

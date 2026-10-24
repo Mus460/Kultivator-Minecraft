@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380436,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_gunung",
+    "distrik": "teras_kebun"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/gunung/teras_kebun",
+      "weight": 1
+    }
+  ]
+}

@@ -179,5 +179,9 @@
   "advancement.kultivator.sekte.hubungan_sahabat.title": "Secawan Teh",
   "advancement.kultivator.sekte.hubungan_sahabat.description": "Dua muridmu menjadi sahabat",
   "advancement.kultivator.sekte.hubungan_saingan.title": "Kakak dan Adik Seperguruan",
-  "advancement.kultivator.sekte.hubungan_saingan.description": "Dua muridmu menjadi saingan"
+  "advancement.kultivator.sekte.hubungan_saingan.description": "Dua muridmu menjadi saingan",
+  "kultivator.sekte.hubungan.sebab.mandiri_teh": "Minum teh sendiri bersama",
+  "kultivator.sekte.hubungan.ingat.mandiri_teh": "Minum teh di waktu luang bersama %s",
+  "kultivator.sekte.hubungan.sebab.mandiri_tanding": "Tanding latihan",
+  "kultivator.sekte.hubungan.ingat.mandiri_tanding": "Tanding latihan dengan %s"
 }

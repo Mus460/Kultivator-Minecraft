@@ -1,0 +1,31 @@
+{
+  "pembicara": [
+    "tokoh:lao_kuang"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "iblis_di_kota",
+    "iblis_lao_ada",
+    "quest tema_iblis_gladiator_tua baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "asah_pedang",
+      "pilihan": [
+        {
+          "ke": "ingin"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ingin",
+      "gestur": "sikap_tua",
+      "akibat": [
+        "quest_mulai tema_iblis_gladiator_tua"
+      ]
+    }
+  ]
+}

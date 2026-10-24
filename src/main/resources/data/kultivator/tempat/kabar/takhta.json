@@ -1,0 +1,250 @@
+{
+  "templat": [
+    {
+      "id": "takhta_bab2",
+      "pemicu": "alur_bab2",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab3",
+      "pemicu": "alur_bab3",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab4",
+      "pemicu": "alur_bab4",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab5",
+      "pemicu": "alur_bab5",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab6",
+      "pemicu": "alur_bab6",
+      "bobot": 10,
+      "umur_hari": 6,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab7",
+      "pemicu": "alur_bab7",
+      "bobot": 10,
+      "umur_hari": 4,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab2_hilang",
+      "pemicu": "alur_bab2_hilang",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab3_lemah",
+      "pemicu": "alur_bab3_lemah",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab5_tersembunyi",
+      "pemicu": "alur_bab5_tersembunyi",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab6_bertahan",
+      "pemicu": "alur_bab6_bertahan",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab7_ruyi",
+      "pemicu": "alur_bab7_ruyi",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_bab7_gu",
+      "pemicu": "alur_bab7_gu",
+      "bobot": 10,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "warga",
+        "pemilik_teh",
+        "pemilik_penginapan",
+        "koki",
+        "petugas_gilda",
+        "anak",
+        "pedagang_keliling",
+        "pengemis",
+        "kuli"
+      ]
+    },
+    {
+      "id": "takhta_tawanan_pulang",
+      "pemicu": "takhta_tawanan_pulang",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "takhta_dukung_ruyi",
+      "pemicu": "takhta_dukung_ruyi",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "takhta_dukung_gu",
+      "pemicu": "takhta_dukung_gu",
+      "bobot": 10,
+      "umur_hari": 6
+    },
+    {
+      "id": "takhta_sidang",
+      "pemicu": "takhta_sidang",
+      "bobot": 10,
+      "umur_hari": 10
+    },
+    {
+      "id": "takhta_topeng",
+      "pemicu": "takhta_topeng",
+      "bobot": 10,
+      "umur_hari": 10
+    },
+    {
+      "id": "takhta_suap",
+      "pemicu": "takhta_suap",
+      "bobot": 10,
+      "umur_hari": 8
+    },
+    {
+      "id": "takhta_gerhana_menang",
+      "pemicu": "takhta_gerhana_menang",
+      "bobot": 10,
+      "umur_hari": 10
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "pembicara": [
+    "tokoh:ou_ye"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_dua_calon tahap galang",
+    "!bendera takhta4_dukung_ou_ye"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "palu_landasan",
+      "prop": "palu",
+      "pilihan": [
+        {
+          "syarat": [
+            "punya minecraft:iron_ingot 8"
+          ],
+          "akibat": [
+            "ambil minecraft:iron_ingot 8"
+          ],
+          "ke": "setuju",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta4_ou_ye.mulai.1.alasan"
+        },
+        {
+          "syarat": [
+            "quest pedang_tanpa_nama selesai"
+          ],
+          "ke": "setuju",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta4_ou_ye.mulai.2.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "setuju",
+      "gestur": "angguk_dengar",
+      "akibat": [
+        "peristiwa tanda dukungan",
+        "bendera takhta4_dukung_ou_ye",
+        "nama_baik 3"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "tokoh:yan_ruyi"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "alur_penguasa gu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tuang_teh",
+      "prop": "teko"
+    }
+  ]
+}

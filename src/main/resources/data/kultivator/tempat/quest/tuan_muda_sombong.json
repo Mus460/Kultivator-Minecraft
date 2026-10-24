@@ -1,0 +1,52 @@
+{
+  "pemberi": "peran:tuan_muda",
+  "tempat": "desa_klan",
+  "tahap": [
+    {
+      "id": "duel",
+      "tujuan": [
+        "duel peran:tuan_muda"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera klan_meremehkan"
+          ],
+          "ke": "mengalah"
+        },
+        {
+          "syarat": [
+            "bendera klan_hormat"
+          ],
+          "ke": "menang"
+        }
+      ],
+      "ke": "menang",
+      "batas_hari": 3,
+      "gagal_ke": "mengalah"
+    },
+    {
+      "id": "menang",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "nama_baik 5",
+        "bendera klan_hormat",
+        "kabar tuan_muda_kalah pemain"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "mengalah",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "bendera klan_meremehkan",
+        "nama_baik -2"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

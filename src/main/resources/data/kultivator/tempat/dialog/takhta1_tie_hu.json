@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "tokoh:tie_hu"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_kedatangan tahap gerbang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "menulis",
+      "prop": "kuas",
+      "suara": "kotabesar.gate_welcome",
+      "pilihan": [
+        {
+          "ke": "hilang"
+        },
+        {
+          "ke": "tulis"
+        }
+      ]
+    },
+    {
+      "id": "tulis",
+      "gestur": "berdiri_jaga",
+      "prop": "tombak",
+      "pilihan": [
+        {
+          "ke": "hilang"
+        }
+      ]
+    },
+    {
+      "id": "hilang",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju takhta_kedatangan"
+          ]
+        }
+      ]
+    }
+  ]
+}

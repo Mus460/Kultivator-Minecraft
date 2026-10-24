@@ -1,0 +1,29 @@
+{
+  "pembicara": [
+    "tokoh:lin_fei"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest daftar_naga_muda baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_berkacak",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai daftar_naga_muda"
+          ],
+          "ke": "mulai_lomba"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "mulai_lomba",
+      "gestur": "tunjuk"
+    }
+  ]
+}

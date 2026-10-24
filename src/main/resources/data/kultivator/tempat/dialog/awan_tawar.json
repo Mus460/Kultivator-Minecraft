@@ -1,0 +1,58 @@
+{
+  "pembicara": [
+    "tokoh:yun_fei"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest peta_awan baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lambai",
+      "suara": "kotabesar.dock_depart",
+      "pilihan": [
+        {
+          "syarat": [
+            "situs_dikenal sekte/istana_langit"
+          ],
+          "akibat": [
+            "bendera awan_langit",
+            "quest_mulai peta_awan"
+          ],
+          "ke": "ok",
+          "tampil": true,
+          "alasan": "kultivator.cerita.awan_tawar.mulai.1.alasan"
+        },
+        {
+          "akibat": [
+            "bendera awan_kota",
+            "quest_mulai peta_awan"
+          ],
+          "ke": "ok"
+        },
+        {
+          "ke": "isi"
+        }
+      ]
+    },
+    {
+      "id": "isi",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera awan_kota",
+            "quest_mulai peta_awan"
+          ],
+          "ke": "ok"
+        }
+      ]
+    },
+    {
+      "id": "ok",
+      "gestur": "hormat"
+    }
+  ]
+}

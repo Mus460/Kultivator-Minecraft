@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "tokoh:jue_yuan"
+  ],
+  "prioritas": 15,
+  "syarat": [
+    "quest tema_rumput_awan baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "prop": "tongkat_cincin",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_rumput_awan"
+          ]
+        },
+        {
+          "ke": "shan"
+        }
+      ]
+    },
+    {
+      "id": "shan",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_rumput_awan"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

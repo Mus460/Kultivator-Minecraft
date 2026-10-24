@@ -54,6 +54,17 @@ public final class LangitItems {
 	public static final int ECLIPSE_PER_DAY = 5;
 	/** The chance an eclipse-touched monster slain by a player leaves a Kristal Gerhana. */
 	public static final double ECLIPSE_DROP = 0.35D;
+	/** The chance watched from a star stage or the capital's observatory (DESIGN 38.A #22; the daily cap is unchanged). */
+	public static final double ECLIPSE_DROP_WATCHED = 0.50D;
+
+	/**
+	 * The Kristal Gerhana chance for {@code slayer}: {@link #ECLIPSE_DROP}, raised by the bounded place factor
+	 * {@code bintang} (Panggung Bintang, Menara Pengamat) to at most {@link #ECLIPSE_DROP_WATCHED}.
+	 */
+	public static double eclipseDrop(net.minecraft.server.level.ServerPlayer slayer) {
+		double f = dev.kultivator.dunia.tempat.TempatApi.faktor(slayer, "bintang");
+		return f > 1.0D ? Math.min(ECLIPSE_DROP_WATCHED, ECLIPSE_DROP * f) : ECLIPSE_DROP;
+	}
 
 	public static final Item BATU_METEOR_ROH = ModItems.register("batu_meteor_roh", MeteorStoneItem::new,
 			new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON));

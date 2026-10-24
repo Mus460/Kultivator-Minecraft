@@ -1,0 +1,16 @@
+{
+  "pembicara": [
+    "tokoh:yan_ruyi"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "alur_penguasa ruyi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tangan_depan"
+    }
+  ]
+}

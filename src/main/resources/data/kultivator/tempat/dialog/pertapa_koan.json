@@ -1,0 +1,463 @@
+{
+  "pembicara": [
+    "peran:pertapa"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tiga_ujian_pertapa tahap koan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "napas_meditasi",
+      "suara": "tempat.hermit_koan",
+      "pilihan": [
+        {
+          "syarat": [
+            "watak ramah",
+            "!bendera koan_salah"
+          ],
+          "ke": "k0"
+        },
+        {
+          "syarat": [
+            "watak ramah",
+            "bendera koan_salah"
+          ],
+          "ke": "k8"
+        },
+        {
+          "syarat": [
+            "watak curiga",
+            "!bendera koan_salah"
+          ],
+          "ke": "k1"
+        },
+        {
+          "syarat": [
+            "watak curiga",
+            "bendera koan_salah"
+          ],
+          "ke": "k9"
+        },
+        {
+          "syarat": [
+            "watak serakah",
+            "!bendera koan_salah"
+          ],
+          "ke": "k2"
+        },
+        {
+          "syarat": [
+            "watak serakah",
+            "bendera koan_salah"
+          ],
+          "ke": "k10"
+        },
+        {
+          "syarat": [
+            "watak bijak",
+            "!bendera koan_salah"
+          ],
+          "ke": "k3"
+        },
+        {
+          "syarat": [
+            "watak bijak",
+            "bendera koan_salah"
+          ],
+          "ke": "k11"
+        },
+        {
+          "syarat": [
+            "watak penakut",
+            "!bendera koan_salah"
+          ],
+          "ke": "k4"
+        },
+        {
+          "syarat": [
+            "watak penakut",
+            "bendera koan_salah"
+          ],
+          "ke": "k8"
+        },
+        {
+          "syarat": [
+            "watak sombong",
+            "!bendera koan_salah"
+          ],
+          "ke": "k5"
+        },
+        {
+          "syarat": [
+            "watak sombong",
+            "bendera koan_salah"
+          ],
+          "ke": "k9"
+        },
+        {
+          "syarat": [
+            "watak jujur",
+            "!bendera koan_salah"
+          ],
+          "ke": "k6"
+        },
+        {
+          "syarat": [
+            "watak jujur",
+            "bendera koan_salah"
+          ],
+          "ke": "k10"
+        },
+        {
+          "syarat": [
+            "watak licik",
+            "!bendera koan_salah"
+          ],
+          "ke": "k7"
+        },
+        {
+          "syarat": [
+            "watak licik",
+            "bendera koan_salah"
+          ],
+          "ke": "k11"
+        }
+      ]
+    },
+    {
+      "id": "k0",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "k1",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "k2",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        }
+      ]
+    },
+    {
+      "id": "k3",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "k4",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "k5",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        }
+      ]
+    },
+    {
+      "id": "k6",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "k7",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "k8",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        }
+      ]
+    },
+    {
+      "id": "k9",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "k10",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        }
+      ]
+    },
+    {
+      "id": "k11",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah",
+            "efek minecraft:slowness 200 1"
+          ],
+          "ke": "salah"
+        },
+        {
+          "akibat": [
+            "bendera koan_salah off",
+            "quest_maju tiga_ujian_pertapa"
+          ],
+          "ke": "benar"
+        }
+      ]
+    },
+    {
+      "id": "benar",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "salah",
+      "gestur": "hormat_dalam"
+    }
+  ]
+}

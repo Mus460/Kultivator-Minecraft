@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_gunung",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_gunung_rumput_awan.description"
+    },
+    "icon": {
+      "id": "kultivator:tema/rumput_awan_seribu_tahun"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_gunung_rumput_awan.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

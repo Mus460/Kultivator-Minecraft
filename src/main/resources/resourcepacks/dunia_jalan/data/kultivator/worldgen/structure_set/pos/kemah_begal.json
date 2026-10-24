@@ -1,0 +1,15 @@
+{
+  "placement": {
+    "type": "kultivator:jalan",
+    "salt": 380307,
+    "spacing": 1,
+    "separation": 0,
+    "titik": "kemah_begal"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:pos/kemah_begal",
+      "weight": 1
+    }
+  ]
+}

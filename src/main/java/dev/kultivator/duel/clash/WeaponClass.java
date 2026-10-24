@@ -3,9 +3,12 @@ package dev.kultivator.duel.clash;
 import dev.kultivator.Kultivator;
 import dev.kultivator.tempa.ArtifactItem;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -30,6 +33,8 @@ public enum WeaponClass {
 
 	/** The training sword of module A ({@code kultivator:pedang_latih}); looked up lazily, it may not exist yet. */
 	private static final Identifier TRAINING_SWORD = Kultivator.id("pedang_latih");
+	/** Kultivator maces (also in {@code #minecraft:axes} for tools): a gada fights as GADA, not KAPAK. */
+	private static final TagKey<Item> SENJATA_GADA = TagKey.create(Registries.ITEM, Kultivator.id("senjata_gada"));
 
 	public final int lightWindup;
 	public final int heavyMin;
@@ -85,7 +90,7 @@ public enum WeaponClass {
 			// Forged artifacts are not in #swords: only the sword form is a blade (the umbrella, wok and bell are not).
 			return ArtifactItem.PEDANG.equals(ArtifactItem.form(ArtifactItem.data(stack))) ? PEDANG : TANGAN_KOSONG;
 		}
-		if (stack.is(Items.MACE)) {
+		if (stack.is(Items.MACE) || stack.is(SENJATA_GADA)) {
 			return GADA;
 		}
 		if (stack.is(Items.TRIDENT) || stack.is(ItemTags.SPEARS)) {

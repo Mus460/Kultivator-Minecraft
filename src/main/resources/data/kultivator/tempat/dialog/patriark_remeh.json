@@ -1,0 +1,34 @@
+{
+  "pembicara": [
+    "peran:patriark_klan"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "bendera klan_meremehkan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas",
+      "suara": "tempat.clan_patriarch",
+      "pilihan": [
+        {
+          "syarat": [
+            "pita 1"
+          ],
+          "ke": "lagi"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lagi",
+      "gestur": "tunjuk",
+      "akibat": [
+        "bendera klan_meremehkan off",
+        "bendera tuan_muda_tantang_ulang"
+      ]
+    }
+  ]
+}

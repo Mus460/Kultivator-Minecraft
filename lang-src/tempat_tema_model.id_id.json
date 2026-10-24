@@ -1,0 +1,8 @@
+{
+  "kultivator.tempat_tema_model.perintah.info.judul": "Model kota bertema (hanya di layarmu)",
+  "kultivator.tempat_tema_model.perintah.info.renderer": "Renderer terpasang: %s dari %s jenis entitas tema.",
+  "kultivator.tempat_tema_model.perintah.info.bingkai": "Per bingkai (detik terakhir): %s entitas digambar, %s di antaranya jauh (animasi kecil dibekukan), %s lapis cahaya; %s FPS.",
+  "kultivator.tempat_tema_model.perintah.info.lod": "Animasi kecil berhenti di %s blok, tak digambar lewat %s blok (kapal dan mercusuar %s), lapis cahaya sampai %s blok. Mutu efek: %s.",
+  "kultivator.tempat_tema_model.perintah.cek.ok": "Semua aset model tema lengkap: %s prop tangan, %s item tema dan dagang, %s tekstur entitas.",
+  "kultivator.tempat_tema_model.perintah.cek.kurang": "Aset model tema kurang %s: %s. Jalankan ulang tools/gen_tempat_tema_models.py dan gen_tempat_tema_textures.py."
+}

@@ -47,7 +47,22 @@ import java.util.UUID;
  * Terlewati (skipped): they never take a star and can be run later for T alone. Segel Penangkal (3 heaven seal shards)
  * makes every strike of one run ×0.85.
  */
-final class StarCalamity {
+public final class StarCalamity {
+
+	/** Told after every finished calamity run ({@code pass} false for a failure), tests included (DESIGN 38.A #20). */
+	@FunctionalInterface
+	public interface FinishListener {
+		void finished(ServerPlayer player, int k, boolean pass);
+	}
+
+	private static final java.util.List<FinishListener> FINISH = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+	/** Adds a finish listener (38GU: Panggung Bintang rolls the reward table once more); register from a module's init. */
+	public static void addFinishListener(FinishListener listener) {
+		if (listener != null) {
+			FINISH.add(listener);
+		}
+	}
 
 	public static final int COUNT = 7;
 	public static final int STARS_PER_STAGE = 9;
@@ -497,6 +512,13 @@ final class StarCalamity {
 		addResult(player, purba, run.k, pass);
 		Cultivators.dirty(player);
 		Purba.sync(player);
+		for (FinishListener listener : FINISH) {
+			try {
+				listener.finished(player, run.k, pass);
+			} catch (RuntimeException exception) {
+				dev.kultivator.Kultivator.LOGGER.warn("Star calamity finish listener failed", exception);
+			}
+		}
 	}
 
 	/** The logged-out end of a run: nothing is lost (the cost goes back in full). */

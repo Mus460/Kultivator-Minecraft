@@ -6,6 +6,12 @@ import dev.kultivator.data.Rank;
 import dev.kultivator.disciple.DuelRules;
 import dev.kultivator.duel.ai.DuelistProfile;
 import dev.kultivator.duel.api.Duelist;
+import dev.kultivator.dunia.tempat.hidup.GolPenduduk;
+import dev.kultivator.sosok.Gaya;
+import dev.kultivator.sosok.RupaKunci;
+import dev.kultivator.sosok.Sosok;
+import dev.kultivator.sosok.SosokApi;
+import dev.kultivator.sosok.SosokGen;
 import dev.kultivator.technique.spec.TechniquePower;
 import dev.kultivator.util.NoGrief;
 import net.minecraft.core.BlockPos;
@@ -57,10 +63,24 @@ import java.util.UUID;
  * the name plate and the spoken line shown as a speech bubble ({@link #say}). Server only: home, town, group,
  * temperament, the players it is hostile to, the lonely-despawn rule and a companion owner.
  * <p>
+ * Sosok (DESIGN 40.2, module 40I): the shared look and animation data ({@link SosokApi.Pemegang}): identity
+ * ({@code DATA_SOSOK}: sex, visible age, build, look seed), style ({@code DATA_GAYA}), the server clip and its start
+ * ({@code DATA_GERAK}, {@code DATA_GERAK_T0}), props ({@code DATA_PROP}), the entity it looks at ({@code DATA_LOOK_AT})
+ * and the look key ({@code DATA_RUPA}, empty = its role). {@link #setup} derives the Sosok from role and look seed
+ * ({@link SosokGen#untukNpc}) so every spawner is right unedited, makes the voice match the sex and sets
+ * {@code Attributes.SCALE}; a look key set later ({@code SosokApi.setRupa}) re-derives it unless a Sosok was given
+ * explicitly ({@code SosokApi.setSosok}).
+ * <p>
  * Wanderers, rivals and guards fight sword duels (DESIGN 35.7.6) through the optional {@link Duelist} interface; the
  * duel never depends on this class ({@link KotaDuel} answers for it).
+ * <p>
+ * DESIGN 38 residents (38.N.1, module 38NL): a body may stand for one resident of a place ({@link #setPenduduk}; site
+ * id and resident index, server only, never saved: the body is re-made from the deterministic data). Such a body gets
+ * its day from the place's schedule (delegated through {@code NpcAi.check} and {@code NpcLife.tick} to
+ * {@code TubuhPenduduk}), walks with {@link GolPenduduk}, is not pushed while it sleeps or sits
+ * ({@link #diamDiTitik}) and never vanishes in a puff (the caller releases it unseen).
  */
-public class KultivatorNpc extends PathfinderMob implements Duelist {
+public class KultivatorNpc extends PathfinderMob implements Duelist, SosokApi.Pemegang {
 
 	public static final String TAG = "kultivator.kota_npc";
 
@@ -95,6 +115,15 @@ public class KultivatorNpc extends PathfinderMob implements Duelist {
 	private static final EntityDataAccessor<Component> DATA_PLATE = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.COMPONENT);
 	/** The line it is saying (a speech bubble above the plate; empty = none). */
 	private static final EntityDataAccessor<Component> DATA_LINE = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.COMPONENT);
+	// Sosok (DESIGN 40.2.4, 40.7.4): the names 38.N.1 planned as DATA_ANIM/DATA_ANIM_T0 are DATA_GERAK/DATA_GERAK_T0 here.
+	private static final EntityDataAccessor<Integer> DATA_SOSOK = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_GAYA = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_GERAK = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_GERAK_T0 = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_PROP = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DATA_LOOK_AT = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.INT);
+	/** The look key ({@link RupaKunci} text form, at most 96 chars; empty = the role's own row). */
+	private static final EntityDataAccessor<String> DATA_RUPA = SynchedEntityData.defineId(KultivatorNpc.class, EntityDataSerializers.STRING);
 
 	public static final double BASE_HEALTH = 24.0D;
 	public static final double[] TIER_HEALTH = {1.0D, 1.5D, 2.5D, 4.0D, 10.0D};
@@ -125,6 +154,15 @@ public class KultivatorNpc extends PathfinderMob implements Duelist {
 	private long workUntil;
 	/** The last game time it fought (the blade goes back into its sheath three seconds later). */
 	private long lastFight;
+	/** Timers of the timed Sosok clips and moods (DESIGN 40, session state). */
+	private final SosokApi.Waktu sosokWaktu = new SosokApi.Waktu();
+	/** True once a caller gave an explicit Sosok ({@code SosokApi.setSosok}): a later look key no longer re-derives it. */
+	private boolean sosokTetap;
+	/** DESIGN 38 resident (38.N.1 {@code TubuhPenduduk}): the place it lives in and its index there (-1 = not a resident). */
+	private long situsPenduduk;
+	private int pendudukId = -1;
+	/** Asleep, seated or kneeling at its titik: not pushed aside, the vanilla head turns stop (38.N.5.1). */
+	private boolean diamDiTitik;
 
 	public KultivatorNpc(EntityType<? extends KultivatorNpc> type, Level level) {
 		super(type, level);
@@ -161,15 +199,31 @@ public class KultivatorNpc extends PathfinderMob implements Duelist {
 		builder.define(DATA_FLAGS, 0);
 		builder.define(DATA_PLATE, Component.empty());
 		builder.define(DATA_LINE, Component.empty());
+		builder.define(DATA_SOSOK, Sosok.KOSONG);
+		builder.define(DATA_GAYA, 0);
+		builder.define(DATA_GERAK, 0);
+		builder.define(DATA_GERAK_T0, 0);
+		builder.define(DATA_PROP, 0);
+		builder.define(DATA_LOOK_AT, SosokApi.TATAP_TIDAK_ADA);
+		builder.define(DATA_RUPA, "");
 	}
 
+	/**
+	 * Goals of 34 plus the three of a DESIGN 38 resident ({@link GolPenduduk}, idle for every other NPC): holding still
+	 * at a bed, chair or kneeling spot (priority 1, before a hold or a walk), walking to the schedule's titik (4: L0
+	 * vanilla path near a player, L1 straight steps along the {@code jalan} nodes) and keeping the eyes on the work at
+	 * hand (5: before the vanilla glances at players).
+	 */
 	@Override
 	protected void registerGoals() {
 		this.goalSelector.addGoal(0, new FloatGoal(this));
+		this.goalSelector.addGoal(1, new GolPenduduk.Diam(this));
 		this.goalSelector.addGoal(1, new NpcAi.HoldGoal(this));
 		this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.15D, true));
 		this.goalSelector.addGoal(3, new NpcAi.FollowGoal(this));
+		this.goalSelector.addGoal(4, new GolPenduduk.Jalan(this));
 		this.goalSelector.addGoal(4, new NpcAi.HomeGoal(this));
+		this.goalSelector.addGoal(5, new GolPenduduk.Fokus(this));
 		this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F));
 		this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
 		this.targetSelector.addGoal(1, new NpcAi.ChooseTargetGoal(this));
@@ -180,7 +234,9 @@ public class KultivatorNpc extends PathfinderMob implements Duelist {
 	/**
 	 * Sets role, look seed, realm ordinal, stage (0-3), Dao (null: none), voice (0-5), robe colour (0: the role's) and
 	 * the combat numbers of DESIGN 25.4.2 for the role's tier: health {@code 24 × tier × (1 + 0.35 R)}, melee
-	 * {@code 4 + R + 1.5 × tier}, armour {@code R + 2 × tier}.
+	 * {@code 4 + R + 1.5 × tier}, armour {@code R + 2 × tier}. The Sosok follows from role and look (DESIGN 40.2.2): sex,
+	 * age, build and seed, the voice forced to the sex ({@code f1-f3} = 3 + voice % 3 for a woman, {@code m1-m3} =
+	 * voice % 3 for a man) and {@code Attributes.SCALE}.
 	 */
 	public void setup(NpcRole role, int look, int realm, int stage, @Nullable Dao dao, int voice, int robe, Component plate) {
 		setup(role, role.tier, look, realm, stage, dao, voice, robe, plate);
@@ -197,6 +253,12 @@ public class KultivatorNpc extends PathfinderMob implements Duelist {
 		this.entityData.set(DATA_VOICE, Math.floorMod(voice, VOICES.length));
 		this.entityData.set(DATA_ROBE, robe);
 		this.entityData.set(DATA_PLATE, plate == null ? Component.empty() : plate);
+		RupaKunci rupa = RupaKunci.parse(this.entityData.get(DATA_RUPA));
+		if (sosokTetap) {
+			cocokkanSuara();
+		} else {
+			terapkanSosok(rupa.kosong() ? SosokGen.untukNpc(role, look) : SosokGen.untukRupa(rupa.kunci(), role, look));
+		}
 		setBase(Attributes.MAX_HEALTH, BASE_HEALTH * TIER_HEALTH[t] * (1.0D + HEALTH_PER_REALM * r));
 		setBase(Attributes.ATTACK_DAMAGE, 4.0D + r + 1.5D * t);
 		setBase(Attributes.ARMOR, r + 2.0D * t);
@@ -250,8 +312,177 @@ public class KultivatorNpc extends PathfinderMob implements Duelist {
 		return Math.floorMod(this.entityData.get(DATA_VOICE), VOICES.length);
 	}
 
+	/** True for a woman: the explicit Sosok sex (DESIGN 40.0 rule 10), the voice only before {@link #setup} ran. */
 	public boolean female() {
-		return voice() >= 3;
+		Sosok sosok = Sosok.unpack(this.entityData.get(DATA_SOSOK));
+		return sosok != null ? sosok.perempuan() : voice() >= 3;
+	}
+
+	// ================================================================== Sosok (DESIGN 40.2.4, contract C40.I1)
+
+	/** The identity: sex, visible age, build, look seed (the entity-seed stand-in before {@link #setup}). */
+	public Sosok syncedSosok() {
+		return Sosok.dari(this.entityData.get(DATA_SOSOK), this.getUUID());
+	}
+
+	/** The changeable style (traits, path, wound, special outfit, mood). */
+	public Gaya syncedGaya() {
+		return Gaya.unpack(this.entityData.get(DATA_GAYA));
+	}
+
+	/** The server clip ({@code GerakId.pack}; 0 = none). */
+	public int syncedGerak() {
+		return this.entityData.get(DATA_GERAK);
+	}
+
+	/** Game time {@code & 0x7FFFFFFF} when the server clip started. */
+	public int syncedGerakT0() {
+		return this.entityData.get(DATA_GERAK_T0);
+	}
+
+	/** The props of the server clip ({@code PropId.pack}; 0 = the clip's own). */
+	public int syncedProp() {
+		return this.entityData.get(DATA_PROP);
+	}
+
+	/** The id of the entity it looks at, or {@link SosokApi#TATAP_TIDAK_ADA}. */
+	public int syncedLookAt() {
+		return this.entityData.get(DATA_LOOK_AT);
+	}
+
+	/** The look key in text form (empty = the role's own row {@code peran.<role id>}). */
+	public String syncedRupa() {
+		return this.entityData.get(DATA_RUPA);
+	}
+
+	/**
+	 * The look key the client resolves: the one set with {@code SosokApi.setRupa}, else the role's id ({@code juru_lelang},
+	 * {@code menteri}; 40K falls back to {@link NpcRole#rupaKelompok()} when the recipe has no row).
+	 */
+	public RupaKunci rupaKunci() {
+		RupaKunci rupa = RupaKunci.parse(syncedRupa());
+		return rupa.kosong() ? RupaKunci.dari(role().id()) : rupa;
+	}
+
+	@Override
+	public int sosokData() {
+		return this.entityData.get(DATA_SOSOK);
+	}
+
+	/** An explicit Sosok ({@code SosokApi.setSosok}): kept even when a look key is set later; the voice follows the sex. */
+	@Override
+	public void setSosokData(int packed) {
+		this.sosokTetap = true;
+		this.entityData.set(DATA_SOSOK, packed);
+		cocokkanSuara();
+	}
+
+	@Override
+	public int gayaData() {
+		return this.entityData.get(DATA_GAYA);
+	}
+
+	@Override
+	public void setGayaData(int packed) {
+		this.entityData.set(DATA_GAYA, packed);
+	}
+
+	@Override
+	public int gerakData() {
+		return this.entityData.get(DATA_GERAK);
+	}
+
+	@Override
+	public int gerakT0() {
+		return this.entityData.get(DATA_GERAK_T0);
+	}
+
+	@Override
+	public void setGerakData(int gerak, int t0) {
+		this.entityData.set(DATA_GERAK, gerak);
+		this.entityData.set(DATA_GERAK_T0, t0);
+	}
+
+	@Override
+	public int propData() {
+		return this.entityData.get(DATA_PROP);
+	}
+
+	@Override
+	public void setPropData(int packed) {
+		this.entityData.set(DATA_PROP, packed);
+	}
+
+	@Override
+	public int tatapData() {
+		return this.entityData.get(DATA_LOOK_AT);
+	}
+
+	@Override
+	public void setTatapData(int entityId) {
+		this.entityData.set(DATA_LOOK_AT, entityId);
+	}
+
+	@Override
+	public String rupaData() {
+		return this.entityData.get(DATA_RUPA);
+	}
+
+	/**
+	 * A new look key ({@code SosokApi.setRupa}): an NPC sect member {@code murid.2|sekte=npc:s3}, a sect master
+	 * {@code ketua_sekte|sekte=...}. Unless a Sosok was given explicitly, sex and age are re-derived from the key's policy
+	 * (a {@code murid.*} row is mostly young) with the same look seed, and the voice follows.
+	 */
+	@Override
+	public void setRupaData(String rupa) {
+		String text = rupa == null ? "" : rupa;
+		this.entityData.set(DATA_RUPA, text);
+		if (!sosokTetap && !this.level().isClientSide()) {
+			RupaKunci key = RupaKunci.parse(text);
+			terapkanSosok(key.kosong() ? SosokGen.untukNpc(role(), look()) : SosokGen.untukRupa(key.kunci(), role(), look()));
+		}
+	}
+
+	@Override
+	public SosokApi.Waktu waktuSosok() {
+		return sosokWaktu;
+	}
+
+	/** Mouth movement without a line: the old talking flag for {@code tick} ticks (no bubble). */
+	@Override
+	public boolean bicaraSendiri(int tick) {
+		if (this.level().isClientSide()) {
+			return true;
+		}
+		long until = this.level().getGameTime() + Math.max(10, tick);
+		if (until > this.lineUntil) {
+			this.lineUntil = until;
+		}
+		setFlag(FLAG_TALK, true);
+		return true;
+	}
+
+	/** The derived Sosok (role, look key): synced, voice forced to the sex, {@code Attributes.SCALE}. Server side. */
+	private void terapkanSosok(Sosok sosok) {
+		if (sosok == null || this.level().isClientSide()) {
+			return;
+		}
+		this.entityData.set(DATA_SOSOK, sosok.pack());
+		cocokkanSuara();
+		SosokApi.terapkanSkala(this, sosok);
+	}
+
+	/** Keeps the voice inside the sex's three (m1-m3 men, f1-f3 women). */
+	private void cocokkanSuara() {
+		Sosok sosok = Sosok.unpack(this.entityData.get(DATA_SOSOK));
+		if (sosok == null) {
+			return;
+		}
+		int voice = Math.floorMod(this.entityData.get(DATA_VOICE), VOICES.length);
+		int matched = sosok.perempuan() ? 3 + voice % 3 : voice % 3;
+		if (matched != voice) {
+			this.entityData.set(DATA_VOICE, matched);
+		}
 	}
 
 	/** The robe colour (the role's when 0). */
@@ -464,6 +695,51 @@ public class KultivatorNpc extends PathfinderMob implements Duelist {
 		return memory;
 	}
 
+	// ================================================================== DESIGN 38 resident (38.N.1, module 38NL)
+
+	/**
+	 * True for the body of a DESIGN 38 resident ({@code dunia/tempat/hidup/Pemanggil}): its day comes from the place's
+	 * schedule ({@code Jadwal}) instead of the old round, its walks from {@link GolPenduduk}, and it is released quietly
+	 * (no puff) when players leave.
+	 */
+	public boolean penduduk() {
+		return pendudukId >= 0;
+	}
+
+	/** The site id of the place the resident lives in (0 for every other NPC). */
+	public long situsPenduduk() {
+		return situsPenduduk;
+	}
+
+	/** The resident's index in its place ({@code Penduduk.id}), or -1. */
+	public int pendudukId() {
+		return pendudukId;
+	}
+
+	/** Binds the body to resident {@code id} of place {@code situs} ({@code id < 0} unbinds). Server side, once. */
+	public void setPenduduk(long situs, int id) {
+		this.situsPenduduk = id < 0 ? 0L : situs;
+		this.pendudukId = Math.max(-1, id);
+		if (id < 0) {
+			this.diamDiTitik = false;
+		}
+	}
+
+	/** True while it sleeps, sits or kneels at its titik (set by the resident's pass). */
+	public boolean diamDiTitik() {
+		return diamDiTitik;
+	}
+
+	public void setDiamDiTitik(boolean diam) {
+		this.diamDiTitik = diam;
+	}
+
+	/** A sleeper in its bed or a man on his chair is not shoved off by whoever brushes past. */
+	@Override
+	public boolean isPushable() {
+		return !diamDiTitik && super.isPushable();
+	}
+
 	/** Makes the NPC hostile to {@code player} only (a challenge, a raid, a town's grudge). */
 	public void markHostile(ServerPlayer player) {
 		hostileTo.add(player.getUUID());
@@ -608,6 +884,7 @@ public class KultivatorNpc extends PathfinderMob implements Duelist {
 		super.tick();
 		if (!this.level().isClientSide() && !this.isRemoved()) {
 			tickBodyLanguage(this.level().getGameTime());
+			SosokApi.tik(this);
 			if (this.tickCount % 20 == 0) {
 				NpcAi.check(this);
 			}

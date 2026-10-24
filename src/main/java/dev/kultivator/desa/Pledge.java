@@ -60,6 +60,9 @@ public final class Pledge {
 		if (why == null && Vassals.anyBellWithin(bell, OTHER_VILLAGE_RANGE)) {
 			why = Component.translatable("kultivator.desa.refuse.taken", (int) OTHER_VILLAGE_RANGE);
 		}
+		if (why == null) {
+			why = Tribute.vetoIkrar(player, level, bell);
+		}
 		if (why != null) {
 			Msg.chat(player, why.copy().withStyle(ChatFormatting.YELLOW));
 			Msg.chat(player, Component.translatable("kultivator.desa.refuse.inert").withStyle(ChatFormatting.GRAY));

@@ -1,0 +1,51 @@
+{
+  "pembicara": [
+    "peran:penjaga_formasi"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "quest kristal_formasi baru",
+    "!bendera kristal_formasi_tolak",
+    "acak 75"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kaget",
+      "prop": "piringan_formasi",
+      "pilihan": [
+        {
+          "ke": "butuh"
+        },
+        {
+          "akibat": [
+            "bendera kristal_formasi_tolak"
+          ],
+          "ke": "tolak"
+        }
+      ]
+    },
+    {
+      "id": "butuh",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai kristal_formasi",
+            "bendera kristal_formasi_tolak off"
+          ]
+        },
+        {
+          "akibat": [
+            "bendera kristal_formasi_tolak"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tolak",
+      "gestur": "kipas"
+    }
+  ]
+}

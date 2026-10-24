@@ -27,6 +27,8 @@ import dev.kultivator.util.Advancements;
 import dev.kultivator.util.Msg;
 import dev.kultivator.util.NoGrief;
 import dev.kultivator.util.Targeting;
+import dev.kultivator.sosok.Sosok;
+import dev.kultivator.sosok.SosokGen;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -499,8 +501,9 @@ public final class Disciples {
 		}
 		RandomSource random = player.getRandom();
 		DiscipleData data = DiscipleData.fresh(random);
-		disciple.setupNew(player, data, DiscipleNames.pick(random, takenNames(cultivation)), random.nextInt(DiscipleEntity.SKIN_COUNT),
-				random.nextBoolean());
+		// DESIGN 40.2.2: sex, visible age, build and look seed first; the name comes from the pool of that sex
+		Sosok sosok = SosokGen.untukMurid(random);
+		disciple.setupNew(player, data, DiscipleNames.pick(random, takenNames(cultivation), sosok.kelamin()), sosok);
 		place(disciple, spot, player);
 		// Listed before it joins the world (joining lists it too; the entry is the same).
 		ensureAlive(player, disciple);
@@ -880,6 +883,27 @@ public final class Disciples {
 	 */
 	public static @Nullable DiscipleEntity spawnUnowned(ServerLevel level, Vec3 pos, DiscipleData data, @Nullable Component name, int skin,
 			boolean slim, DiscipleEntity.Role role, @Nullable BlockPos anchor) {
+		Sosok sosok = null;
+		int gaya = 0;
+		if (role == DiscipleEntity.Role.PHANTOM) {
+			// A Void Realm phantom is the climbing disciple's own shadow (DESIGN 40.4.2: it copies its source exactly): the
+			// nearest real disciple with the same old look fields gives its Sosok and style.
+			DiscipleEntity source = phantomSource(level, pos, skin, slim);
+			if (source != null) {
+				sosok = source.syncedSosok();
+				gaya = source.gayaData();
+			}
+		}
+		return spawnUnowned(level, pos, data, name, skin, slim, sosok, gaya, role, anchor);
+	}
+
+	/**
+	 * {@link #spawnUnowned(ServerLevel, Vec3, DiscipleData, Component, int, boolean, DiscipleEntity.Role, BlockPos)} with
+	 * an explicit Sosok and style (DESIGN 40: a body that must look like someone; null = the deterministic Sosok of its
+	 * name, skin and slim flag).
+	 */
+	public static @Nullable DiscipleEntity spawnUnowned(ServerLevel level, Vec3 pos, DiscipleData data, @Nullable Component name, int skin,
+			boolean slim, @Nullable Sosok sosok, int gaya, DiscipleEntity.Role role, @Nullable BlockPos anchor) {
 		if (role == DiscipleEntity.Role.DISCIPLE || role == DiscipleEntity.Role.CLONE) {
 			return null;
 		}
@@ -893,8 +917,24 @@ public final class Disciples {
 		body.snapTo(pos.x, pos.y, pos.z, yaw, 0.0F);
 		body.setYHeadRot(yaw);
 		body.setYBodyRot(yaw);
-		body.setupBody(data, name, skin, slim);
+		body.setupBody(data, name, skin, slim, sosok, gaya);
 		return level.addFreshEntity(body) ? body : null;
+	}
+
+	/** The nearest real disciple within 16 blocks of {@code pos} wearing {@code skin}/{@code slim} (a phantom's source). */
+	private static @Nullable DiscipleEntity phantomSource(ServerLevel level, Vec3 pos, int skin, boolean slim) {
+		DiscipleEntity best = null;
+		double bestSq = 16.0D * 16.0D;
+		for (DiscipleEntity disciple : level.getEntitiesOfClass(DiscipleEntity.class, new AABB(pos, pos).inflate(16.0D),
+				each -> each.isAlive() && each.role() == DiscipleEntity.Role.DISCIPLE && each.skinIndex() == Math.floorMod(skin, DiscipleEntity.SKIN_COUNT)
+						&& each.slimSkin() == slim)) {
+			double d = disciple.distanceToSqr(pos);
+			if (d < bestSq) {
+				bestSq = d;
+				best = disciple;
+			}
+		}
+		return best;
 	}
 
 	/**
@@ -914,7 +954,9 @@ public final class Disciples {
 		clone.bindTo(source.ownerId(), source.ownerName());
 		clone.setCloneSource(source.soulId());
 		clone.snapTo(pos.x, pos.y, pos.z, source.getYRot(), 0.0F);
-		clone.setupBody(source.data().copy(), source.getCustomName(), source.skinIndex(), source.slimSkin());
+		// DESIGN 40.4.2: a Divine Clone is exactly its source (same Sosok and style; only the client's white fade differs)
+		clone.setupBody(source.data().copy(), source.getCustomName(), source.skinIndex(), source.slimSkin(), source.syncedSosok(),
+				source.gayaData());
 		return level.addFreshEntity(clone) ? clone : null;
 	}
 

@@ -1,0 +1,36 @@
+{
+  "pembicara": [
+    "tokoh:gu_lianshan"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "alur 4",
+    "!alur 5"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kipas",
+      "prop": "kipas_lipat",
+      "pilihan": [
+        {
+          "ke": "kumuh"
+        },
+        {
+          "ke": "kenapa"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kumuh",
+      "gestur": "hitung_sempoa",
+      "prop": "sempoa"
+    },
+    {
+      "id": "kenapa",
+      "gestur": "bicara_tangan"
+    }
+  ]
+}

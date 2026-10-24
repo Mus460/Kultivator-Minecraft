@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:kota_tema/pelabuhan/dermaga_nelayan",
+    "kultivator:kota_tema/pelabuhan/dermaga_agung",
+    "kultivator:kota_tema/pelabuhan/galangan",
+    "kultivator:kota_tema/pelabuhan/kota_awak",
+    "kultivator:kota_tema/pelabuhan/pasar_laut",
+    "kultivator:kota_tema/pelabuhan/gudang_dagang",
+    "kultivator:kota_tema/pelabuhan/kuil_laut",
+    "kultivator:kota_tema/pelabuhan/gerbang_darat",
+    "kultivator:kota_tema/pelabuhan/hunian_saudagar"
+  ]
+}

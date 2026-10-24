@@ -1,0 +1,140 @@
+{
+  "pemberi": "tokoh:su_jin",
+  "tempat": "kota_air",
+  "tahap": [
+    {
+      "id": "ulat",
+      "tujuan": [
+        "air_periksa daun",
+        "air_periksa air"
+      ],
+      "akibat": [
+        "nama_baik 2"
+      ]
+    },
+    {
+      "id": "lapor_su",
+      "tujuan": [
+        "bicara tokoh:su_jin"
+      ]
+    },
+    {
+      "id": "noda",
+      "tujuan": [
+        "air_noda lihat"
+      ]
+    },
+    {
+      "id": "minyak",
+      "tujuan": [
+        "bicara tokoh:lu_yuqing"
+      ],
+      "akibat_masuk": [
+        "bendera air_minyak_dengar"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "air_tanpa_tikus"
+          ],
+          "ke": "wen_shi"
+        }
+      ]
+    },
+    {
+      "id": "kejar",
+      "tujuan": [
+        "air_tikus lao_shu"
+      ]
+    },
+    {
+      "id": "lao_shu",
+      "tujuan": [
+        "bicara tokoh:lao_shu"
+      ],
+      "batas_hari": 1,
+      "gagal_ke": "wen_shi"
+    },
+    {
+      "id": "wen_shi",
+      "tujuan": [
+        "bicara tokoh:wen_shi"
+      ],
+      "akibat_masuk": [
+        "bendera air_wen_dengar"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "air_tanpa_arwah"
+          ],
+          "ke": "temui"
+        }
+      ]
+    },
+    {
+      "id": "arwah",
+      "tujuan": [
+        "air_arwah tenang x3"
+      ]
+    },
+    {
+      "id": "temui",
+      "tujuan": [
+        "bicara tokoh:xiu_niang"
+      ]
+    },
+    {
+      "id": "kain",
+      "tujuan": [
+        "air_kain jadi"
+      ]
+    },
+    {
+      "id": "lepas",
+      "tujuan": [
+        "air_kain_lepas *"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera air_xiu_bicara"
+          ],
+          "ke": "tenang"
+        }
+      ],
+      "ke": "sepi"
+    },
+    {
+      "id": "tenang",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "selesai",
+      "akibat": [
+        "gelar penenun_malam",
+        "air_jubah_merah",
+        "bendera tema.air.diskon_sutra",
+        "nama_baik 10",
+        "air_anugerah tema_penenun_malam",
+        "air_ulat pulih",
+        "kabar tema_air_benang_tenang pemain"
+      ]
+    },
+    {
+      "id": "sepi",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "selesai",
+      "akibat": [
+        "gelar penenun_malam",
+        "bendera tema.air.diskon_sutra",
+        "nama_baik 4",
+        "air_anugerah tema_penenun_malam",
+        "air_ulat pulih",
+        "kabar tema_air_benang_sepi pemain"
+      ]
+    }
+  ]
+}

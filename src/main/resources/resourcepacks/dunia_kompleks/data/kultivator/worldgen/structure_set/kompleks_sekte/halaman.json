@@ -1,0 +1,48 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380201,
+    "spacing": 128,
+    "separation": 0,
+    "rencana": "kompleks_sekte",
+    "distrik": "halaman"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kompleks_sekte/iblis_halaman",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/iblis_halaman_kecil",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/iblis_halaman_kecil_langit",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/lurus_halaman",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/lurus_halaman_kecil",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/lurus_halaman_kecil_langit",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/netral_halaman",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/netral_halaman_kecil",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kompleks_sekte/netral_halaman_kecil_langit",
+      "weight": 1
+    }
+  ]
+}

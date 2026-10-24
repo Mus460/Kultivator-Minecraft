@@ -1,0 +1,14 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kota_tema/pelabuhan/dermaga_nelayan/tambatan_nelayan",
+        "processors": "kultivator:kota_tema/pelabuhan/gaya_utara",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "tokoh:feng_ao"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest daftar_naga_muda tahap sikap"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berlutut",
+      "pilihan": [
+        {
+          "akibat": [
+            "bendera feng_ao_sahabat",
+            "quest_maju daftar_naga_muda"
+          ],
+          "ke": "sahabat"
+        },
+        {
+          "akibat": [
+            "bendera feng_ao_dendam",
+            "quest_maju daftar_naga_muda"
+          ],
+          "ke": "dendam"
+        }
+      ]
+    },
+    {
+      "id": "sahabat",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "dendam",
+      "gestur": "marah_hentak"
+    }
+  ]
+}

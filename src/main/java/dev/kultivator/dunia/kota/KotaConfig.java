@@ -27,9 +27,8 @@ public final class KotaConfig {
 	public double wandererChance = 1.0D;
 	public int discussionsPerDay = 3;
 	public boolean companion = true;
-	// 34.5.3 Saingan
+	// 34.5.3 Saingan (one group per NPC sect: the count is diplomasi.jumlahSekte, integration audit T12)
 	public boolean rivals = true;
-	public int rivalGroups = 6;
 	public int racePhysicalRadius = 128;
 	public boolean rivalAmbush = true;
 	public int ambushPerDay = 1;
@@ -47,7 +46,6 @@ public final class KotaConfig {
 		priceScale = Mth.clamp(priceScale, 0.5D, 2.0D);
 		wandererChance = Mth.clamp(wandererChance, 0.0D, 3.0D);
 		discussionsPerDay = Mth.clamp(discussionsPerDay, 0, 10);
-		rivalGroups = Mth.clamp(rivalGroups, 3, 8);
 		racePhysicalRadius = Mth.clamp(racePhysicalRadius, 48, 256);
 		ambushPerDay = Mth.clamp(ambushPerDay, 0, 3);
 		peachDays = Mth.clamp(peachDays, 1, 14);

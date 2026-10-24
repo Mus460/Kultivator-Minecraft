@@ -1,0 +1,40 @@
+{
+  "pemberi": "tokoh:ou_ye",
+  "tempat": "gilda_tempa",
+  "tahap": [
+    {
+      "id": "kristal",
+      "tujuan": [
+        "pergi gua/urat_roh"
+      ],
+      "akibat": [
+        "beri cerita:kristal_urat"
+      ],
+      "arah": "gua/urat_roh"
+    },
+    {
+      "id": "tempa"
+    },
+    {
+      "id": "celup",
+      "tujuan": [
+        "pergi situs/mata_air_roh"
+      ],
+      "akibat": [
+        "beri cerita:pedang_tanpa_nama",
+        "adegan pedang_lahir"
+      ],
+      "arah": "situs/mata_air_roh"
+    },
+    {
+      "id": "kembali",
+      "tujuan": [
+        "bicara tokoh:ou_ye"
+      ],
+      "akibat": [
+        "gelar pembawa_pedang_tanpa_nama",
+        "nama_baik 3"
+      ]
+    }
+  ]
+}

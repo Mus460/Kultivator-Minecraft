@@ -1,0 +1,27 @@
+{
+  "pembicara": [
+    "tokoh:lao_shu"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "bendera air_lao_shu_mata"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "hitung_koin_gelap"
+    }
+  ]
+}

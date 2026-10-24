@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:sekte/mandiri_tembus",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "kultivator.sekte.mandiri.tumbuh.adv.abadi.desc"
+    },
+    "icon": {
+      "id": "kultivator:immortal_pill"
+    },
+    "title": {
+      "translate": "kultivator.sekte.mandiri.tumbuh.adv.abadi.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

@@ -33,6 +33,8 @@ public class KultivatorClient implements ClientModInitializer {
 		BeastClient.init();
 		CultivatorRender.init();
 		dev.kultivator.client.disciple.DiscipleClient.init();
+		// Penampilan dan Animasi (DESIGN 40.7.2, module 40R): Sosok layers, Gerak catalogue, atlas release, /sosok.
+		dev.kultivator.client.sosok.SosokClient.init();
 		BookTooltips.init();
 		// Phase 6 (DESIGN 20.2.12).
 		dev.kultivator.client.hall.HallClient.init();

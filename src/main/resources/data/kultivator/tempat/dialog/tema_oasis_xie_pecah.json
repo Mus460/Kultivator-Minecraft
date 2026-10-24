@@ -1,0 +1,83 @@
+{
+  "pembicara": [
+    "tokoh:xie_duo"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest tema_oasis_mata_air tahap xie",
+    "bendera oasis.formasi_pecah"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "marah_hentak",
+      "suara": "tema.oasis.scorpion",
+      "pilihan": [
+        {
+          "ke": "alasan"
+        }
+      ]
+    },
+    {
+      "id": "alasan",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "ke": "tuntut"
+        }
+      ]
+    },
+    {
+      "id": "tuntut",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju tema_oasis_mata_air",
+            "mulai_duel"
+          ]
+        },
+        {
+          "syarat": [
+            "nama_baik 50",
+            "punya kultivator:tema/air_suci 2"
+          ],
+          "akibat": [
+            "ambil kultivator:tema/air_suci 2",
+            "bendera oasis.xie_bujuk",
+            "oasis_xie_pertapa",
+            "quest_maju tema_oasis_mata_air"
+          ],
+          "ke": "terima",
+          "tampil": true,
+          "alasan": "kultivator.kota_tema.oasis.alasan.xie_bujuk_50"
+        },
+        {
+          "akibat": [
+            "nama_baik -10",
+            "oasis_ajun_lari",
+            "bendera oasis.xie_ajun"
+          ],
+          "ke": "ajun"
+        }
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat_dalam"
+    },
+    {
+      "id": "ajun",
+      "gestur": "ancam",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju tema_oasis_mata_air",
+            "mulai_duel"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:senjata/qiang_fana",
+    "kultivator:senjata/qiang_roh_rendah",
+    "kultivator:senjata/qiang_roh_menengah",
+    "kultivator:senjata/qiang_roh_tinggi"
+  ]
+}

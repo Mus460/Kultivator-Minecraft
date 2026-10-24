@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#kultivator:has_structure/kampung/rawa",
+  "max_distance_from_center": 100,
+  "size": 6,
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "start_height": {
+    "absolute": 0
+  },
+  "start_pool": "kultivator:kampung/rawa/pusat",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "use_expansion_hack": false,
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "pool_aliases": [
+    {
+      "type": "minecraft:direct",
+      "alias": "kultivator:kampung/rawa/bangunan",
+      "target": "kultivator:kampung/rawa/bangunan_desa_besar"
+    }
+  ]
+}

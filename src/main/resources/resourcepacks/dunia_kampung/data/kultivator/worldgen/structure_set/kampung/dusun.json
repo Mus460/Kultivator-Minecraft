@@ -1,0 +1,62 @@
+{
+  "placement": {
+    "type": "kultivator:cincin_tempat",
+    "salt": 380101,
+    "spacing": 24,
+    "separation": 9,
+    "min_chunks": 6,
+    "jarak_tempat": 8,
+    "cincin": [
+      {
+        "sampai_chunk": 62,
+        "frekuensi": 0.3
+      },
+      {
+        "sampai_chunk": 187,
+        "frekuensi": 0.26
+      },
+      {
+        "sampai_chunk": 500,
+        "frekuensi": 0.21
+      },
+      {
+        "sampai_chunk": 100000,
+        "frekuensi": 0.16
+      }
+    ],
+    "exclusion_zone": {
+      "other_set": "minecraft:villages",
+      "chunk_count": 4
+    }
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kampung/dusun_sedang",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/dusun_salju",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/dusun_sabana",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/dusun_sakura",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/dusun_gurun",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/dusun_rawa",
+      "weight": 1
+    },
+    {
+      "structure": "kultivator:kampung/dusun_terasering",
+      "weight": 1
+    }
+  ]
+}

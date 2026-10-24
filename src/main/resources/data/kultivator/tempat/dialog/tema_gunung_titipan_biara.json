@@ -1,0 +1,26 @@
+{
+  "pembicara": [
+    "peran:biksu_gunung"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "kota_tema gunung",
+    "gunung_titipan biara"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "angkat_bawa",
+      "prop": "peti",
+      "pilihan": [
+        {
+          "akibat": [
+            "gunung_ambil biara"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

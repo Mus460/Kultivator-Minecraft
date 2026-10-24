@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_gunung",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_ziarah.description"
+    },
+    "icon": {
+      "id": "minecraft:candle"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_ziarah.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

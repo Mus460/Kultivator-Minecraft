@@ -1,0 +1,27 @@
+{
+  "pembicara": [
+    "tokoh:ajun"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest tema_oasis_mata_air tahap mural",
+    "bendera oasis.kafilah_hilang"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "ke": "peta"
+        }
+      ]
+    },
+    {
+      "id": "peta",
+      "gestur": "tunjuk"
+    }
+  ]
+}

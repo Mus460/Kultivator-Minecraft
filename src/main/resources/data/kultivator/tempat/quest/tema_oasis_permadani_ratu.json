@@ -1,0 +1,23 @@
+{
+  "pemberi": "tokoh:gulnar",
+  "tempat": "kota_tema_oasis",
+  "tahap": [
+    {
+      "id": "bahan",
+      "arah": "kota_tema/reruntuhan_gurun"
+    },
+    {
+      "id": "tenun",
+      "tujuan": [
+        "tunggu 2"
+      ]
+    },
+    {
+      "id": "ambil"
+    },
+    {
+      "id": "antar",
+      "ke": "selesai"
+    }
+  ]
+}

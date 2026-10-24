@@ -1,0 +1,20 @@
+{
+  "pembicara": [
+    "tokoh:su_jin"
+  ],
+  "prioritas": 35,
+  "syarat": [
+    "air_misi antar_sutra",
+    "!air_bingkisan"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "angkat_bawa",
+      "akibat": [
+        "air_bingkisan"
+      ]
+    }
+  ]
+}

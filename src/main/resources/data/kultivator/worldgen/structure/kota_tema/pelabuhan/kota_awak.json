@@ -1,0 +1,67 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_tema/pelabuhan",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_pelabuhan",
+  "distrik": "kota_awak",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/pelabuhan/kota_awak/kedai_jangkar_patah",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/pelabuhan/kota_awak/lorong_barat",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/pelabuhan/kota_awak/lorong_tali",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/pelabuhan/kota_awak/lorong_timur",
+      "putar": 0
+    },
+    {
+      "dx": -62,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/pelabuhan/tembok/ujung_barat",
+      "putar": 3
+    },
+    {
+      "dx": -56,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/pelabuhan/tembok/lurus",
+      "putar": 3
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": [
+        "minecraft:cold_ocean",
+        "minecraft:deep_cold_ocean",
+        "minecraft:snowy_beach",
+        "minecraft:taiga",
+        "minecraft:snowy_taiga",
+        "minecraft:snowy_plains",
+        "minecraft:old_growth_pine_taiga",
+        "minecraft:old_growth_spruce_taiga"
+      ],
+      "akhiran": "utara"
+    }
+  ]
+}

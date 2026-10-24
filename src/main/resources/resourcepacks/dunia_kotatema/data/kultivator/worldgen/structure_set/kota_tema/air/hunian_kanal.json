@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380427,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_air",
+    "distrik": "hunian_kanal"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/air/hunian_kanal",
+      "weight": 1
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "pembicara": [
+    "tokoh:deng_ming"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest tema_pelabuhan_pelita tahap redup"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {}
+      ]
+    }
+  ]
+}

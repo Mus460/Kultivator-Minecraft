@@ -1,0 +1,22 @@
+{
+  "pemberi": "tokoh:wen_shi",
+  "tempat": "kota_air",
+  "tahap": [
+    {
+      "id": "bait",
+      "tujuan": [
+        "air_bait_tua ketemu"
+      ]
+    },
+    {
+      "id": "kembali",
+      "tujuan": [
+        "bicara tokoh:wen_shi"
+      ],
+      "akibat": [
+        "nama_baik 3",
+        "air_anugerah tema_air_bait"
+      ]
+    }
+  ]
+}

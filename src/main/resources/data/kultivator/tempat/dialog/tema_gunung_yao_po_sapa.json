@@ -1,0 +1,52 @@
+{
+  "pembicara": [
+    "tokoh:yao_po"
+  ],
+  "prioritas": 1,
+  "syarat": [
+    "kota_tema gunung"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tumbuk_herba",
+      "prop": "herba",
+      "pilihan": [
+        {
+          "ke": "umur"
+        },
+        {
+          "ke": "tali"
+        },
+        {
+          "syarat": [
+            "bendera gunung_gou_suap"
+          ],
+          "ke": "harga"
+        },
+        {
+          "ke": "kabar"
+        }
+      ]
+    },
+    {
+      "id": "umur",
+      "gestur": "lihat_barang"
+    },
+    {
+      "id": "tali",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "harga",
+      "gestur": "sikap_lipat_tangan",
+      "prop": "herba"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

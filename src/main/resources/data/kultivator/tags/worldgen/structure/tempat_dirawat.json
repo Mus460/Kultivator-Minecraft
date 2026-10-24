@@ -1,0 +1,32 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:pos/singgah",
+    "kultivator:pos/singgah_besar",
+    "kultivator:pos/dagang",
+    "kultivator:jalan/jalan",
+    "#kultivator:kota_besar",
+    "#kultivator:kota",
+    "#kultivator:kota_abadi",
+    {
+      "id": "#kultivator:kampung",
+      "required": false
+    },
+    {
+      "id": "#kultivator:kompleks_sekte",
+      "required": false
+    },
+    {
+      "id": "#kultivator:kota_tema",
+      "required": false
+    },
+    {
+      "id": "kultivator:laut/pulau_pasar",
+      "required": false
+    },
+    {
+      "id": "kultivator:kota_tema/pos_pemburu",
+      "required": false
+    }
+  ]
+}

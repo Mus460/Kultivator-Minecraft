@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "tokoh:yan_wushuang"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_penobatan tahap upacara"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "prop": "papan_titah",
+      "pilihan": [
+        {
+          "akibat": [
+            "alur 7 penobatan"
+          ],
+          "ke": "serah"
+        }
+      ]
+    },
+    {
+      "id": "serah",
+      "isian": [
+        "penguasa"
+      ],
+      "gestur": "hormat",
+      "suara": "cerita.coronation",
+      "akibat": [
+        "adegan penobatan",
+        "quest_maju takhta_penobatan"
+      ],
+      "pilihan": [
+        {}
+      ]
+    }
+  ]
+}

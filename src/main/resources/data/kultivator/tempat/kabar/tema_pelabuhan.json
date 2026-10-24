@@ -1,0 +1,378 @@
+{
+  "templat": [
+    {
+      "id": "tema_pelabuhan_kapal_tiba_selatan",
+      "pemicu": "tema_pelabuhan_kapal_tiba_selatan",
+      "bobot": 12,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_pelabuhan_kapal_tiba_mutiara",
+      "pemicu": "tema_pelabuhan_kapal_tiba_mutiara",
+      "bobot": 12,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_pelabuhan_kapal_tiba_barat",
+      "pemicu": "tema_pelabuhan_kapal_tiba_barat",
+      "bobot": 12,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_pelabuhan_kapal_tiba_kota",
+      "pemicu": "tema_pelabuhan_kapal_tiba_kota",
+      "bobot": 12,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_pelabuhan_dewi_laut",
+      "pemicu": "tema_pelabuhan_dewi_laut",
+      "bobot": 14,
+      "umur_hari": 2
+    },
+    {
+      "id": "tema_pelabuhan_bajak_datang",
+      "pemicu": "tema_pelabuhan_bajak_datang",
+      "bobot": 16,
+      "umur_hari": 2
+    },
+    {
+      "id": "tema_pelabuhan_bajak_menang",
+      "pemicu": "tema_pelabuhan_bajak_menang",
+      "bobot": 12,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_pelabuhan_bajak_kalah",
+      "pemicu": "tema_pelabuhan_bajak_kalah",
+      "bobot": 12,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_pelabuhan_lomba_juara",
+      "pemicu": "tema_pelabuhan_lomba_juara",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "tema_pelabuhan_heisha_serah",
+      "pemicu": "tema_pelabuhan_heisha_serah",
+      "bobot": 14,
+      "umur_hari": 8
+    },
+    {
+      "id": "tema_pelabuhan_heisha_damai",
+      "pemicu": "tema_pelabuhan_heisha_damai",
+      "bobot": 14,
+      "umur_hari": 8
+    },
+    {
+      "id": "tema_pelabuhan_heisha_tumpas",
+      "pemicu": "tema_pelabuhan_heisha_tumpas",
+      "bobot": 14,
+      "umur_hari": 8
+    },
+    {
+      "id": "tema_pelabuhan_minyak",
+      "pemicu": "tema_pelabuhan_minyak",
+      "bobot": 12,
+      "umur_hari": 5
+    },
+    {
+      "id": "tema_pelabuhan_lensa",
+      "pemicu": "tema_pelabuhan_lensa",
+      "bobot": 10,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_pelabuhan_bab4",
+      "pemicu": "tema_pelabuhan_bab4",
+      "bobot": 10,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_pelabuhan_titipan",
+      "pemicu": "tema_pelabuhan_titipan",
+      "bobot": 8,
+      "umur_hari": 3
+    },
+    {
+      "id": "tema_pelabuhan_pelita_nyala",
+      "pemicu": "tema_pelabuhan_pelita_nyala",
+      "bobot": 18,
+      "umur_hari": 10
+    },
+    {
+      "id": "tema_pelabuhan_alan",
+      "pemicu": "tema_pelabuhan_alan",
+      "bobot": 8,
+      "umur_hari": 5
+    },
+    {
+      "id": "tema_pelabuhan_lunas",
+      "pemicu": "tema_pelabuhan_lunas",
+      "bobot": 8,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_pelabuhan_sup",
+      "pemicu": "tema_pelabuhan_sup",
+      "bobot": 8,
+      "umur_hari": 4
+    },
+    {
+      "id": "tema_pelabuhan_heisha_serah_2",
+      "pemicu": "tema_pelabuhan_heisha_serah_2",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "pelaut",
+        "nelayan",
+        "penjual_ikan",
+        "nakhoda_laut",
+        "pedagang_seberang",
+        "penjaga_suar",
+        "syahbandar",
+        "petugas_bea",
+        "tukang_kapal",
+        "pendeta_laut",
+        "kuli"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_heisha_damai_2",
+      "pemicu": "tema_pelabuhan_heisha_damai_2",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "pelaut",
+        "nelayan",
+        "penjual_ikan",
+        "nakhoda_laut",
+        "pedagang_seberang",
+        "penjaga_suar",
+        "syahbandar",
+        "petugas_bea",
+        "tukang_kapal",
+        "pendeta_laut",
+        "kuli"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_heisha_tumpas_2",
+      "pemicu": "tema_pelabuhan_heisha_tumpas_2",
+      "bobot": 10,
+      "umur_hari": 8,
+      "peran_penyebar": [
+        "pelaut",
+        "nelayan",
+        "penjual_ikan",
+        "nakhoda_laut",
+        "pedagang_seberang",
+        "penjaga_suar",
+        "syahbandar",
+        "petugas_bea",
+        "tukang_kapal",
+        "pendeta_laut",
+        "kuli"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_pelita_nyala_2",
+      "pemicu": "tema_pelabuhan_pelita_nyala_2",
+      "bobot": 12,
+      "umur_hari": 10,
+      "peran_penyebar": [
+        "pelaut",
+        "nelayan",
+        "penjual_ikan",
+        "nakhoda_laut",
+        "pedagang_seberang",
+        "penjaga_suar",
+        "syahbandar",
+        "petugas_bea",
+        "tukang_kapal",
+        "pendeta_laut",
+        "kuli"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_minyak_2",
+      "pemicu": "tema_pelabuhan_minyak_2",
+      "bobot": 8,
+      "umur_hari": 5,
+      "peran_penyebar": [
+        "petugas_bea",
+        "kuli",
+        "syahbandar"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_keruk",
+      "pemicu": "umum",
+      "bobot": 4,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "kuli",
+        "tukang_kapal",
+        "nelayan"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_camar",
+      "pemicu": "umum",
+      "bobot": 4,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "nelayan",
+        "penjual_ikan",
+        "pelaut"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_alan",
+      "pemicu": "umum",
+      "bobot": 4,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pelaut",
+        "nelayan",
+        "tukang_kapal"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_laut",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pelaut",
+        "nelayan",
+        "penjual_ikan",
+        "nakhoda_laut",
+        "pedagang_seberang",
+        "penjaga_suar",
+        "syahbandar",
+        "petugas_bea",
+        "tukang_kapal",
+        "pendeta_laut",
+        "kuli"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_suar",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pelaut",
+        "nelayan",
+        "penjual_ikan",
+        "nakhoda_laut",
+        "pedagang_seberang",
+        "penjaga_suar",
+        "syahbandar",
+        "petugas_bea",
+        "tukang_kapal",
+        "pendeta_laut",
+        "kuli"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_hiu",
+      "pemicu": "umum",
+      "bobot": 5,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pelaut",
+        "nelayan",
+        "penjual_ikan",
+        "nakhoda_laut",
+        "pedagang_seberang",
+        "penjaga_suar",
+        "syahbandar",
+        "petugas_bea",
+        "tukang_kapal",
+        "pendeta_laut",
+        "kuli"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_zhao",
+      "pemicu": "umum",
+      "bobot": 5,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pelaut",
+        "kuli",
+        "petugas_bea",
+        "pedagang_seberang"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_lunas",
+      "pemicu": "umum",
+      "bobot": 5,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "tukang_kapal",
+        "pelaut",
+        "kuli"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_ibrahim",
+      "pemicu": "umum",
+      "bobot": 5,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pedagang_seberang",
+        "nakhoda_laut",
+        "pelaut"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_ikan",
+      "pemicu": "umum",
+      "bobot": 6,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "nelayan",
+        "penjual_ikan"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_badai",
+      "pemicu": "umum",
+      "bobot": 5,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "nelayan",
+        "pelaut",
+        "nakhoda_laut",
+        "pendeta_laut"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_kompas",
+      "pemicu": "umum",
+      "bobot": 4,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "nakhoda_laut",
+        "pedagang_seberang"
+      ]
+    },
+    {
+      "id": "tema_pelabuhan_umum_dewi",
+      "pemicu": "umum",
+      "bobot": 5,
+      "umur_hari": 3,
+      "peran_penyebar": [
+        "pendeta_laut",
+        "nelayan",
+        "penjual_ikan"
+      ]
+    }
+  ]
+}

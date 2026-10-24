@@ -1,0 +1,71 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:kompleks_sekte/semua",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kompleks_sekte",
+  "distrik": "iblis_halaman",
+  "lot": [
+    {
+      "dx": -72,
+      "dz": -72,
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_altar_iblis",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -72,
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_aula_utama",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -72,
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_alkimia_racun",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": -24,
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_sangkar_tawanan",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -24,
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_lapangan_latihan",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -24,
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_gudang_pelayan",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": 24,
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_asrama_luar",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": 24,
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_gerbang",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": 24,
+      "pool": "kultivator:kompleks_sekte/iblis/halaman_dapur",
+      "putar": 0
+    }
+  ],
+  "gaya": []
+}

@@ -1,0 +1,24 @@
+{
+  "pembicara": [
+    "peran:penenun_sutra"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tenun",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bicara"
+    }
+  ]
+}

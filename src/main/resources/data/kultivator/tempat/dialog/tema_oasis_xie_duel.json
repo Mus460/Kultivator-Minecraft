@@ -1,0 +1,25 @@
+{
+  "pembicara": [
+    "tokoh:xie_duo"
+  ],
+  "prioritas": 55,
+  "syarat": [
+    "quest tema_oasis_mata_air tahap duel"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "suara": "tema.oasis.scorpion",
+      "pilihan": [
+        {
+          "akibat": [
+            "mulai_duel"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

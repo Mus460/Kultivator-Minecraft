@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "peran:tabib"
+  ],
+  "prioritas": 6,
+  "syarat": [
+    "bendera demam_dermawan",
+    "acak 40"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tepuk_bahu"
+    }
+  ]
+}

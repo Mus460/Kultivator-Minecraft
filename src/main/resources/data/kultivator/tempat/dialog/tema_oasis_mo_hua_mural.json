@@ -1,0 +1,39 @@
+{
+  "pembicara": [
+    "tokoh:mo_hua"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_oasis_mata_air tahap mural"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kaget",
+      "prop": "kuas",
+      "pilihan": [
+        {
+          "ke": "urutan"
+        },
+        {
+          "akibat": [
+            "oasis_mural_buka"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "urutan",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_mural_buka"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -73,7 +73,7 @@ public final class Hubungan {
 	/** The reasons whose memory and history have their own text ({@code ...ingat.<suffix>}, {@code ...sebab.<suffix>}). */
 	private static final Set<String> KNOWN = Set.of("teh", "selamat", "turnamen_babak", "turnamen_upset", "misi_berhasil", "misi_sebagian",
 			"misi_gagal", "misi_selamat", "paviliun_duka", "paviliun_qingming", "tetua_jabatan", "tetua_bangga", "sumpah", "restu", "larang",
-			"duel", "uji", "pergi");
+			"duel", "uji", "pergi", "mandiri_teh", "mandiri_tanding");
 
 	private static final int COLOR_GOOD = 0x8FE3B0;
 	private static final int COLOR_LOVE = 0xFF9CC4;

@@ -1,0 +1,16 @@
+{
+  "pembicara": [
+    "tokoh:yan_wushuang"
+  ],
+  "prioritas": 10,
+  "syarat": [
+    "alur 8"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tatap_langit"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:kompleks_sekte/iblis_dalam",
+    "kultivator:kompleks_sekte/iblis_halaman",
+    "kultivator:kompleks_sekte/iblis_halaman_kecil",
+    "kultivator:kompleks_sekte/iblis_halaman_kecil_langit",
+    "kultivator:kompleks_sekte/iblis_puncak",
+    "kultivator:kompleks_sekte/iblis_puncak_langit",
+    "kultivator:kompleks_sekte/iblis_puncak_sedang",
+    "kultivator:kompleks_sekte/iblis_puncak_sedang_langit",
+    "kultivator:kompleks_sekte/lurus_dalam",
+    "kultivator:kompleks_sekte/lurus_halaman",
+    "kultivator:kompleks_sekte/lurus_halaman_kecil",
+    "kultivator:kompleks_sekte/lurus_halaman_kecil_langit",
+    "kultivator:kompleks_sekte/lurus_puncak",
+    "kultivator:kompleks_sekte/lurus_puncak_langit",
+    "kultivator:kompleks_sekte/lurus_puncak_sedang",
+    "kultivator:kompleks_sekte/lurus_puncak_sedang_langit",
+    "kultivator:kompleks_sekte/netral_dalam",
+    "kultivator:kompleks_sekte/netral_halaman",
+    "kultivator:kompleks_sekte/netral_halaman_kecil",
+    "kultivator:kompleks_sekte/netral_halaman_kecil_langit",
+    "kultivator:kompleks_sekte/netral_puncak",
+    "kultivator:kompleks_sekte/netral_puncak_langit",
+    "kultivator:kompleks_sekte/netral_puncak_sedang",
+    "kultivator:kompleks_sekte/netral_puncak_sedang_langit"
+  ]
+}

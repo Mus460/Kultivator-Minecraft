@@ -1,0 +1,35 @@
+{
+  "pemberi": "tokoh:lao_kuang",
+  "tempat": "tema_iblis",
+  "tahap": [
+    {
+      "id": "pilih",
+      "tujuan": [
+        "iblis_lao"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera iblis_lao_terhormat"
+          ],
+          "ke": "terhormat"
+        }
+      ],
+      "ke": "pensiun"
+    },
+    {
+      "id": "terhormat",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "pensiun",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:qian_duoduo"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest wesel_palsu baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hitung_sempoa",
+      "prop": "sempoa",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai wesel_palsu"
+          ],
+          "ke": "bukti"
+        },
+        {
+          "ke": "tahu"
+        }
+      ]
+    },
+    {
+      "id": "tahu",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai wesel_palsu"
+          ],
+          "ke": "bukti"
+        }
+      ]
+    },
+    {
+      "id": "bukti",
+      "gestur": "tunjuk"
+    }
+  ]
+}

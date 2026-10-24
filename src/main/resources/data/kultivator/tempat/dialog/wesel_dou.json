@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "tokoh:dou"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest wesel_palsu tahap tanya"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "main_lompat",
+      "pilihan": [
+        {
+          "akibat": [
+            "bayar 2",
+            "panggil_peran makelar_gelap",
+            "quest_maju wesel_palsu"
+          ],
+          "ke": "itu"
+        }
+      ]
+    },
+    {
+      "id": "itu",
+      "gestur": "tunjuk"
+    }
+  ]
+}

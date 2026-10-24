@@ -1,0 +1,41 @@
+{
+  "pembicara": [
+    "tokoh:dan_chen"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest resep_hilang tahap pilih"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "membaca",
+      "prop": "gulungan",
+      "pilihan": [
+        {
+          "akibat": [
+            "ambil cerita:halaman_resep_kuno",
+            "quest_maju resep_hilang"
+          ],
+          "ke": "serah"
+        },
+        {
+          "akibat": [
+            "bendera resep_simpan",
+            "quest_maju resep_hilang"
+          ],
+          "ke": "simpan"
+        }
+      ]
+    },
+    {
+      "id": "serah",
+      "gestur": "hormat_dalam"
+    },
+    {
+      "id": "simpan",
+      "gestur": "sikap_angkuh"
+    }
+  ]
+}

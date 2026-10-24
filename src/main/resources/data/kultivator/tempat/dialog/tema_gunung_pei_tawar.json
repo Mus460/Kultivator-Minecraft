@@ -1,0 +1,46 @@
+{
+  "pembicara": [
+    "tokoh:pei_wenzhi"
+  ],
+  "prioritas": 25,
+  "syarat": [
+    "quest tema_ziarah_ibu baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "prop": "tongkat_bambu",
+      "pilihan": [
+        {
+          "ke": "ibu"
+        },
+        {
+          "ke": "lelah"
+        }
+      ]
+    },
+    {
+      "id": "lelah",
+      "gestur": "menguap_peregangan",
+      "pilihan": [
+        {
+          "ke": "ibu"
+        }
+      ]
+    },
+    {
+      "id": "ibu",
+      "gestur": "menangis",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_ziarah_ibu"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

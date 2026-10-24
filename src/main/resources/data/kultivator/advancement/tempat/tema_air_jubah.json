@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_air",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_air_jubah.description"
+    },
+    "icon": {
+      "id": "kultivator:tema/jubah_sutra"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_air_jubah.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

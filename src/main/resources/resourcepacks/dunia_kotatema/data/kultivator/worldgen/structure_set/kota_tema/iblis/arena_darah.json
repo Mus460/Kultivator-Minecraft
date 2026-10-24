@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380445,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_iblis",
+    "distrik": "arena_darah"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/iblis/arena_darah",
+      "weight": 1
+    }
+  ]
+}

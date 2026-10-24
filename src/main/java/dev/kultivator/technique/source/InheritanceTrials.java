@@ -464,7 +464,8 @@ public final class InheritanceTrials {
 		Msg.title(player, Component.translatable(PREFIX + "won_title").withStyle(ChatFormatting.GOLD), themeName(trial.theme), 10, 60, 20);
 		Advancements.grant(player, "inheritance");
 		dev.kultivator.voice.VoiceHooks.inheritance(player, true);
-		List<String> ids = roll(data, trial.theme, player.getRandom());
+		// DESIGN 38.A #28 (38GU): at a Makam Warisan whose Heart trial was passed with a jade in hand, +10 points on the grade roll
+		List<String> ids = roll(data, trial.theme, player.getRandom(), dev.kultivator.dunia.tempat.TempatApi.faktor(player, "warisan") - 1.0D);
 		if (ids.isEmpty()) {
 			Dao dao = Dao.byId(trial.theme);
 			Dao target = dao != null ? dao : data.dao();
@@ -528,9 +529,19 @@ public final class InheritanceTrials {
 	 * candidates falls back to the other rolled grade, then to lower grades.
 	 */
 	public static List<String> roll(CultivationData data, String theme, RandomSource random) {
+		return roll(data, theme, random, 0.0D);
+	}
+
+	/**
+	 * {@link #roll(CultivationData, String, RandomSource)} with a bounded place bonus (0 .. 0.10, DESIGN 38.0 rule 4):
+	 * that many more points on the higher grade's share of the realm's table (Deity Transformation and Dao Union: the
+	 * chance of a Langit art first).
+	 */
+	public static List<String> roll(CultivationData data, String theme, RandomSource random, double bonus) {
+		double b = Math.max(0.0D, Math.min(0.10D, bonus));
 		List<String> picked = new ArrayList<>();
 		for (int i = 0; i < CHOICES; i++) {
-			List<TechniqueGrade> order = gradeOrder(data, random);
+			List<TechniqueGrade> order = gradeOrder(data, random, b);
 			for (TechniqueGrade grade : order) {
 				List<TechniqueSpec> pool = candidates(data, theme, grade, picked);
 				if (!pool.isEmpty()) {
@@ -543,19 +554,22 @@ public final class InheritanceTrials {
 	}
 
 	/** The rolled grade first, then the other grade of the realm's table, then lower grades. */
-	private static List<TechniqueGrade> gradeOrder(CultivationData data, RandomSource random) {
+	private static List<TechniqueGrade> gradeOrder(CultivationData data, RandomSource random, double bonus) {
 		Rank rank = data.rank();
 		List<TechniqueGrade> order = new ArrayList<>();
 		if (rank.realm() == Realm.TRUE_IMMORTAL) {
-			boolean abadi = random.nextDouble() < TI_ABADI_SHARE;
+			boolean abadi = random.nextDouble() < TI_ABADI_SHARE + bonus;
 			order.add(abadi ? TechniqueGrade.ABADI : TechniqueGrade.TIAN);
 			order.add(abadi ? TechniqueGrade.TIAN : TechniqueGrade.ABADI);
 		} else if (rank.realm() == Realm.IMMORTAL_ASCENSION) {
-			boolean abadi = rank.layer() >= ABADI_FROM_LAYER && random.nextDouble() < IA_ABADI_SHARE;
+			boolean abadi = rank.layer() >= ABADI_FROM_LAYER && random.nextDouble() < IA_ABADI_SHARE + bonus;
 			order.add(abadi ? TechniqueGrade.ABADI : TechniqueGrade.TIAN);
 			if (rank.layer() >= ABADI_FROM_LAYER) {
 				order.add(abadi ? TechniqueGrade.TIAN : TechniqueGrade.ABADI);
 			}
+		} else if (bonus > 0.0D && random.nextDouble() < bonus) {
+			order.add(TechniqueGrade.TIAN);
+			order.add(TechniqueGrade.DI);
 		} else {
 			order.add(TechniqueGrade.DI);
 		}

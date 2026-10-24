@@ -1,0 +1,28 @@
+{
+  "pembicara": [
+    "peran:penjaga_gerbang"
+  ],
+  "prioritas": 3,
+  "syarat": [
+    "jam 22 24"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_tombak",
+      "prop": "tombak",
+      "suara": "kotabesar.curfew",
+      "pilihan": [
+        {
+          "ke": "panjang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "panjang",
+      "gestur": "tatap_langit"
+    }
+  ]
+}

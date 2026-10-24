@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:xue_yao"
+  ],
+  "prioritas": 80,
+  "syarat": [
+    "quest tema_iblis_rantai tahap istana"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "prop": "kipas_sutra",
+      "suara": "tema.iblis.lord",
+      "pilihan": [
+        {
+          "ke": "tantang"
+        },
+        {
+          "ke": "kenapa"
+        }
+      ]
+    },
+    {
+      "id": "kenapa",
+      "gestur": "kipas",
+      "prop": "kipas_sutra",
+      "pilihan": [
+        {
+          "ke": "tantang"
+        }
+      ]
+    },
+    {
+      "id": "tantang",
+      "gestur": "hunus",
+      "akibat": [
+        "iblis_xue_bos",
+        "tutup"
+      ]
+    }
+  ]
+}

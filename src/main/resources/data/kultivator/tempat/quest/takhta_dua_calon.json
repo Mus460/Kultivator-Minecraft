@@ -1,0 +1,70 @@
+{
+  "pemberi": "tokoh:yan_wushuang",
+  "tempat": "istana",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "audiensi",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera takhta4_netral"
+          ],
+          "ke": "netral"
+        }
+      ],
+      "ke": "galang",
+      "batas_hari": 6,
+      "gagal_ke": "netral"
+    },
+    {
+      "id": "galang",
+      "tujuan": [
+        "tanda dukungan x3"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera takhta4_ruyi"
+          ],
+          "ke": "ruyi"
+        }
+      ],
+      "ke": "gu",
+      "batas_hari": 6,
+      "gagal_ke": "netral"
+    },
+    {
+      "id": "ruyi",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "alur 4 ruyi",
+        "kabar takhta_dukung_ruyi"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "gu",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "alur 4 gu",
+        "kabar takhta_dukung_gu"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "netral",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "alur 4 netral"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

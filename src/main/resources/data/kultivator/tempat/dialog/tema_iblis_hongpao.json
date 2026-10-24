@@ -1,0 +1,38 @@
+{
+  "pembicara": [
+    "tokoh:hong_pao"
+  ],
+  "prioritas": 65,
+  "syarat": [
+    "quest tema_iblis_rantai tahap minyak"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "syarat": [
+            "iblis_kenal_minyak"
+          ],
+          "ke": "kenal"
+        },
+        {
+          "syarat": [
+            "!iblis_kenal_minyak"
+          ],
+          "ke": "asing"
+        }
+      ]
+    },
+    {
+      "id": "kenal",
+      "gestur": "bisik"
+    },
+    {
+      "id": "asing",
+      "gestur": "sikap_lipat_tangan"
+    }
+  ]
+}

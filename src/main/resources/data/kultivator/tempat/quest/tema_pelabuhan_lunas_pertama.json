@@ -1,0 +1,28 @@
+{
+  "pemberi": "tokoh:gong_shumu",
+  "tempat": "tema_pelabuhan",
+  "tahap": [
+    {
+      "id": "pesan",
+      "tujuan": [
+        "pelabuhan_lunas_pesan"
+      ]
+    },
+    {
+      "id": "namai",
+      "batas_hari": 4,
+      "gagal_ke": "ambil"
+    },
+    {
+      "id": "ambil",
+      "tujuan": [
+        "bendera pelabuhan_lunas_diambil"
+      ],
+      "akibat": [
+        "nama_baik 2",
+        "kabar tema_pelabuhan_lunas pemain"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

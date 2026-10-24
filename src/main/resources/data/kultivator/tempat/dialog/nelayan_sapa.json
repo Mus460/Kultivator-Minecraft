@@ -1,0 +1,34 @@
+{
+  "pembicara": [
+    "peran:nelayan"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 50"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "memancing",
+      "prop": "joran",
+      "pilihan": [
+        {
+          "ke": "ikan_roh"
+        },
+        {
+          "ke": "cuaca"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ikan_roh",
+      "gestur": "cerita"
+    },
+    {
+      "id": "cuaca",
+      "gestur": "tatap_langit"
+    }
+  ]
+}

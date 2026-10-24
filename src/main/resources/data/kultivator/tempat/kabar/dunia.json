@@ -1,0 +1,28 @@
+{
+  "templat": [
+    {
+      "id": "segel_pecah_1",
+      "pemicu": "segel_pecah",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "segel_pecah_2",
+      "pemicu": "segel_pecah",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "binatang_evolusi",
+      "pemicu": "binatang_evolusi",
+      "bobot": 10,
+      "umur_hari": 5
+    },
+    {
+      "id": "situs_gua",
+      "pemicu": "situs_gua",
+      "bobot": 10,
+      "umur_hari": 5
+    }
+  ]
+}

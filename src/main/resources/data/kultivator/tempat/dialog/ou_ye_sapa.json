@@ -1,0 +1,35 @@
+{
+  "pembicara": [
+    "tokoh:ou_ye"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "palu_landasan",
+      "prop": "palu",
+      "suara": "kotabesar.smith_master",
+      "pilihan": [
+        {
+          "ke": "leluhur"
+        },
+        {
+          "ke": "pedang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "leluhur",
+      "gestur": "palu_landasan",
+      "prop": "palu",
+      "akibat": [
+        "lore gilda.pandai"
+      ]
+    },
+    {
+      "id": "pedang",
+      "gestur": "sikap_lipat_tangan"
+    }
+  ]
+}

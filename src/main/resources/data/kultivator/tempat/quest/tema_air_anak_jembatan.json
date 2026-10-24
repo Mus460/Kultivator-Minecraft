@@ -1,0 +1,30 @@
+{
+  "pemberi": "peran:anak",
+  "tempat": "kota_air",
+  "ulang": true,
+  "tahap": [
+    {
+      "id": "tolong",
+      "tujuan": [
+        "air_anak selamat"
+      ],
+      "batas_hari": 1,
+      "gagal_ke": "ditolong_lain",
+      "ke": "pulang"
+    },
+    {
+      "id": "pulang",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "ditolong_lain",
+      "tujuan": [
+        "hari 0"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}

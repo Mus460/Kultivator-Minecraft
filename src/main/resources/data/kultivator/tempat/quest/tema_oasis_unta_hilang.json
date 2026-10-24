@@ -1,0 +1,32 @@
+{
+  "pemberi": "tokoh:bulat_khan",
+  "tempat": "kota_tema_oasis",
+  "tahap": [
+    {
+      "id": "ajun",
+      "arah": "kota_tema/oasis"
+    },
+    {
+      "id": "cari",
+      "tujuan": [
+        "oasis_unta pulang"
+      ],
+      "batas_hari": 3,
+      "gagal_ke": "lepas"
+    },
+    {
+      "id": "hadiah",
+      "ke": "selesai"
+    },
+    {
+      "id": "lepas",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "nama_baik -1"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}

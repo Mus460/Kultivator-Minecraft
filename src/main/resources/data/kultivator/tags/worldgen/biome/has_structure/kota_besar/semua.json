@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "#kultivator:kota_besar/tanah",
+    "minecraft:river",
+    "minecraft:frozen_river",
+    "minecraft:beach",
+    "minecraft:snowy_beach",
+    "minecraft:stony_shore",
+    "minecraft:lush_caves",
+    "minecraft:dripstone_caves",
+    "minecraft:sulfur_caves",
+    "minecraft:jagged_peaks",
+    "minecraft:frozen_peaks",
+    "minecraft:stony_peaks",
+    "minecraft:ice_spikes"
+  ]
+}

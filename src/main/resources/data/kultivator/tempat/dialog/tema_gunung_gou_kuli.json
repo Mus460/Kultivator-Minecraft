@@ -1,0 +1,27 @@
+{
+  "pembicara": [
+    "tokoh:gou_tie"
+  ],
+  "prioritas": 5,
+  "syarat": [
+    "bendera gunung_gou_tobat"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "angkat_bawa",
+      "prop": "rangka_punggung",
+      "pilihan": [
+        {
+          "ke": "tenang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tenang",
+      "gestur": "tertawa"
+    }
+  ]
+}

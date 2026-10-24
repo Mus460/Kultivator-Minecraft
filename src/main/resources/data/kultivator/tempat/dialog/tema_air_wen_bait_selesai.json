@@ -1,0 +1,17 @@
+{
+  "pembicara": [
+    "tokoh:wen_shi"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest tema_air_bait_tua selesai"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam"
+    }
+  ]
+}

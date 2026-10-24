@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_oasis",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_oasis_si_belang.description"
+    },
+    "icon": {
+      "id": "minecraft:saddle"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_oasis_si_belang.title"
+    },
+    "frame": "task"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

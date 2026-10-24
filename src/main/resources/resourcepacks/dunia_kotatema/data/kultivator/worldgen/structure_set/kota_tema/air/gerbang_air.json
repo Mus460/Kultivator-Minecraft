@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380428,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_air",
+    "distrik": "gerbang_air"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/air/gerbang_air",
+      "weight": 1
+    }
+  ]
+}

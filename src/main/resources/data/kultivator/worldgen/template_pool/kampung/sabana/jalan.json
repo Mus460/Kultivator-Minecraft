@@ -1,0 +1,50 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sabana/jalan_lurus_12",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "terrain_matching"
+      },
+      "weight": 6
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sabana/jalan_lurus_18",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "terrain_matching"
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sabana/jalan_simpang",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sabana/jalan_belok",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "kultivator:kampung/sabana/jalan_jembatan",
+        "processors": "kultivator:kampung/lapuk",
+        "projection": "terrain_matching"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "kultivator:kampung/sabana/ujung"
+}

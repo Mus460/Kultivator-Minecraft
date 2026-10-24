@@ -1,0 +1,24 @@
+{
+  "pemberi": "tokoh:a_lan",
+  "tempat": "tema_pelabuhan",
+  "tahap": [
+    {
+      "id": "lomba",
+      "tujuan": [
+        "pelabuhan_lomba kalahkan_alan"
+      ]
+    },
+    {
+      "id": "restu",
+      "tujuan": [
+        "bicara tokoh:lin_haichao"
+      ],
+      "akibat": [
+        "nama_baik 3",
+        "bendera pelabuhan_alan_nakhoda",
+        "kabar tema_pelabuhan_alan pemain"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "pemberi": "peran:pengawal_istana",
+  "tempat": "barak_istana",
+  "tahap": [
+    {
+      "id": "empu",
+      "tujuan": [
+        "bicara tokoh:ou_ye"
+      ]
+    },
+    {
+      "id": "besi",
+      "tujuan": [
+        "antar minecraft:iron_ingot tokoh:ou_ye x6"
+      ]
+    },
+    {
+      "id": "tunggu",
+      "tujuan": [
+        "tunggu 1"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera pedang_ayah_baru"
+          ],
+          "ke": "serah_baru"
+        }
+      ],
+      "ke": "serah_lama"
+    },
+    {
+      "id": "serah_lama",
+      "tujuan": [
+        "bicara peran:pengawal_istana"
+      ],
+      "akibat": [
+        "nama_baik 3",
+        "bendera pengawal_sahabat",
+        "kabar pedang_ayah_lama pemain"
+      ]
+    },
+    {
+      "id": "serah_baru",
+      "tujuan": [
+        "bicara peran:pengawal_istana"
+      ],
+      "akibat": [
+        "nama_baik 3",
+        "bendera pengawal_sahabat",
+        "kabar pedang_ayah_baru pemain"
+      ]
+    }
+  ]
+}

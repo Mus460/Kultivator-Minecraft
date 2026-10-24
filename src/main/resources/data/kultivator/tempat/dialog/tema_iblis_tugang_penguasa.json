@@ -1,0 +1,57 @@
+{
+  "pembicara": [
+    "tokoh:tu_gang"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "iblis_di_kota",
+    "iblis_penguasa tu_gang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_berkacak",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_taruhan"
+          ]
+        },
+        {
+          "syarat": [
+            "iblis_rute lurus"
+          ],
+          "ke": "kenapa"
+        },
+        {
+          "syarat": [
+            "iblis_afu_bebas"
+          ],
+          "ke": "afu"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kenapa",
+      "gestur": "sikap_berkacak",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "afu",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

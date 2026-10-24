@@ -1,0 +1,40 @@
+{
+  "pembicara": [
+    "tokoh:yun_fei"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lambai",
+      "suara": "kotabesar.dock_depart",
+      "pilihan": [
+        {
+          "ke": "cerita"
+        },
+        {
+          "ke": "rute"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "cerita",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "benar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "benar",
+      "gestur": "kipas"
+    },
+    {
+      "id": "rute",
+      "gestur": "tunjuk"
+    }
+  ]
+}

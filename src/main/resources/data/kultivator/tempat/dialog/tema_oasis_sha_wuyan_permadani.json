@@ -1,0 +1,35 @@
+{
+  "pembicara": [
+    "tokoh:sha_wuyan"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_oasis_permadani_ratu tahap antar"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "angguk_dengar",
+      "pilihan": [
+        {
+          "ke": "bayar"
+        }
+      ]
+    },
+    {
+      "id": "bayar",
+      "gestur": "hormat",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri_nb_pita 40",
+            "beri kultivator:dagang/permadani_gurun 1",
+            "nama_baik 3",
+            "quest_maju tema_oasis_permadani_ratu"
+          ]
+        }
+      ]
+    }
+  ]
+}

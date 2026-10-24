@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:cold_ocean",
+    "minecraft:snowy_beach",
+    "minecraft:taiga",
+    "minecraft:snowy_taiga",
+    "minecraft:snowy_plains",
+    "minecraft:old_growth_spruce_taiga"
+  ]
+}

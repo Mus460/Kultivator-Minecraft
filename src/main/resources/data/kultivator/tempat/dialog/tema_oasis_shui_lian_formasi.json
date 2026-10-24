@@ -1,0 +1,50 @@
+{
+  "pembicara": [
+    "tokoh:shui_lian"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_oasis_mata_air tahap formasi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_air_suci 4"
+          ],
+          "ke": "bekal"
+        },
+        {
+          "ke": "siapa"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bekal",
+      "gestur": "tuang_teh",
+      "prop": "kendi",
+      "pilihan": [
+        {}
+      ]
+    },
+    {
+      "id": "siapa",
+      "gestur": "sikap_tunduk",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_air_suci 4"
+          ],
+          "ke": "bekal"
+        },
+        {}
+      ]
+    }
+  ]
+}

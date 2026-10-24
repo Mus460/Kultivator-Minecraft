@@ -1,0 +1,74 @@
+{
+  "pembicara": [
+    "tokoh:tie_suo"
+  ],
+  "prioritas": 1,
+  "syarat": [
+    "kota_tema gunung"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "seru_dagang",
+      "prop": "palu",
+      "pilihan": [
+        {
+          "ke": "bangun"
+        },
+        {
+          "ke": "malas"
+        },
+        {
+          "syarat": [
+            "quest tema_gunung_tali hasil berkat"
+          ],
+          "ke": "nyanyi"
+        },
+        {
+          "syarat": [
+            "quest tema_gunung_tali hasil berkat_paksa"
+          ],
+          "ke": "uban"
+        },
+        {
+          "syarat": [
+            "quest tema_gunung_tali hasil berkat_suap"
+          ],
+          "ke": "muatan"
+        },
+        {
+          "ke": "kabar"
+        }
+      ]
+    },
+    {
+      "id": "bangun",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "malas",
+      "gestur": "bisik"
+    },
+    {
+      "id": "nyanyi",
+      "gestur": "tertawa",
+      "prop": "palu"
+    },
+    {
+      "id": "uban",
+      "gestur": "sikap_lipat_tangan",
+      "prop": "palu"
+    },
+    {
+      "id": "muatan",
+      "gestur": "marah_tunjuk",
+      "prop": "palu"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

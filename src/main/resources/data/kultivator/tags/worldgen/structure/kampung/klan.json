@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "kultivator:kampung/klan_sedang",
+    "kultivator:kampung/klan_salju",
+    "kultivator:kampung/klan_sakura",
+    "kultivator:kampung/klan_gunung"
+  ]
+}

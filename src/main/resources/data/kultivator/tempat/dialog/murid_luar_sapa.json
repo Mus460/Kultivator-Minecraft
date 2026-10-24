@@ -1,0 +1,33 @@
+{
+  "pembicara": [
+    "peran:murid_sekte_luar"
+  ],
+  "prioritas": -1,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sapu",
+      "prop": "sapu",
+      "suara": "tempat.sect_visit",
+      "pilihan": [
+        {
+          "ke": "hidup"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "hidup",
+      "gestur": "angkat_air"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

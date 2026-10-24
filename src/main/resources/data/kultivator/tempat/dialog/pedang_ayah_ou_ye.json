@@ -1,0 +1,37 @@
+{
+  "pembicara": [
+    "tokoh:ou_ye"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "quest pedang_ayah tahap besi"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "lihat_barang",
+      "prop": "palu",
+      "pilihan": [
+        {
+          "ke": "lama"
+        },
+        {
+          "akibat": [
+            "bendera pedang_ayah_baru"
+          ],
+          "ke": "baru"
+        }
+      ]
+    },
+    {
+      "id": "lama",
+      "gestur": "angguk_dengar"
+    },
+    {
+      "id": "baru",
+      "gestur": "palu_landasan",
+      "prop": "palu"
+    }
+  ]
+}

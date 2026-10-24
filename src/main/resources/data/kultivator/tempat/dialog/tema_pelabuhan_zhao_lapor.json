@@ -1,0 +1,51 @@
+{
+  "pembicara": [
+    "tokoh:zhao_wanli"
+  ],
+  "prioritas": 56,
+  "syarat": [
+    "quest tema_pelabuhan_pelita tahap lapor"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "pilihan": [
+        {
+          "ke": "suap"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "suap",
+      "isian": [
+        "nb_pita:120"
+      ],
+      "gestur": "hitung_sempoa",
+      "prop": "kantong_uang",
+      "pilihan": [
+        {
+          "akibat": [
+            "beri_nb_pita 120",
+            "bendera pelabuhan_suap",
+            "quest_maju tema_pelabuhan_pelita"
+          ],
+          "ke": "terima"
+        },
+        {
+          "ke": "tolak"
+        }
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "tertawa"
+    },
+    {
+      "id": "tolak",
+      "gestur": "sikap_lipat_tangan"
+    }
+  ]
+}

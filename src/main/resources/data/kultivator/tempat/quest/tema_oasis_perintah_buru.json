@@ -1,0 +1,19 @@
+{
+  "pemberi": "tokoh:sha_wuyan",
+  "tempat": "kota_tema_oasis",
+  "ulang": true,
+  "tahap": [
+    {
+      "id": "buru",
+      "tujuan": [
+        "kalahkan minecraft:husk x8"
+      ],
+      "batas_hari": 7,
+      "akibat": [
+        "beri_nb_pita 30",
+        "nama_baik 2"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

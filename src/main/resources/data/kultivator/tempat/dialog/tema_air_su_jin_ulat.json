@@ -1,0 +1,45 @@
+{
+  "pembicara": [
+    "tokoh:su_jin"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest tema_air_benang baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_air_benang"
+          ],
+          "ke": "terima"
+        },
+        {
+          "ke": "biasa"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "biasa",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_air_benang"
+          ],
+          "ke": "terima"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "tunjuk"
+    }
+  ]
+}

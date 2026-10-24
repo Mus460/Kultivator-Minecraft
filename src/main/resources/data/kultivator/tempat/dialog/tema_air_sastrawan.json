@@ -1,0 +1,26 @@
+{
+  "pembicara": [
+    "peran:sastrawan"
+  ],
+  "prioritas": 5,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "menulis",
+      "prop": "kuas",
+      "pilihan": [
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "kipas",
+      "prop": "kipas_lipat"
+    }
+  ]
+}

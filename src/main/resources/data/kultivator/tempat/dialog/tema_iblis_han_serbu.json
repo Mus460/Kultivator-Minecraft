@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "tokoh:han_qingshuang"
+  ],
+  "prioritas": 72,
+  "syarat": [
+    "iblis_serbu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_gagang",
+      "pilihan": [
+        {
+          "akibat": [
+            "iblis_pihak lurus"
+          ],
+          "ke": "lurus"
+        },
+        {
+          "syarat": [
+            "quest tema_iblis_rantai tahap serbu_darah"
+          ],
+          "ke": "duel"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lurus",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "duel",
+      "gestur": "hunus",
+      "akibat": [
+        "mulai_duel"
+      ]
+    }
+  ]
+}

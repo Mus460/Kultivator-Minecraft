@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "tokoh:gendut_zhu"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest tikus_dapur baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kaget",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tikus_dapur"
+          ],
+          "ke": "jerat"
+        },
+        {
+          "ke": "takut"
+        }
+      ]
+    },
+    {
+      "id": "takut",
+      "gestur": "lari_takut",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tikus_dapur"
+          ],
+          "ke": "jerat"
+        }
+      ]
+    },
+    {
+      "id": "jerat",
+      "gestur": "masak",
+      "prop": "sendok_sayur"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "pembicara": [
+    "peran:penegak_iblis"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "iblis_di_kota",
+    "pita 2"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "berdiri_jaga",
+      "suara": "tema.iblis.gate_toll",
+      "pilihan": [
+        {
+          "akibat": [
+            "iblis_bayar_upeti"
+          ],
+          "ke": "lewat"
+        },
+        {
+          "ke": "aturan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "aturan",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "akibat": [
+            "iblis_bayar_upeti"
+          ],
+          "ke": "lewat"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lewat",
+      "gestur": "sikap_lipat_tangan"
+    }
+  ]
+}

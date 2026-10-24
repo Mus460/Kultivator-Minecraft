@@ -75,12 +75,17 @@ final class NpcAi {
 			return;
 		}
 		long now = level.getGameTime();
-		Player near = level.getNearestPlayer(npc.getX(), npc.getY(), npc.getZ(), npc.lonelyRange(), entity -> !entity.isSpectator());
-		if (near != null) {
+		if (npc.penduduk()) {
+			// a DESIGN 38 resident is released unseen by its caller (Pemanggil), never in a puff
 			npc.resetLonely(now);
-		} else if (now - npc.lonelySince() >= npc.lonelyTicks()) {
-			npc.vanish();
-			return;
+		} else {
+			Player near = level.getNearestPlayer(npc.getX(), npc.getY(), npc.getZ(), npc.lonelyRange(), entity -> !entity.isSpectator());
+			if (near != null) {
+				npc.resetLonely(now);
+			} else if (now - npc.lonelySince() >= npc.lonelyTicks()) {
+				npc.vanish();
+				return;
+			}
 		}
 		if (npc.companionOf() != null && now >= npc.companionUntil()) {
 			Pengembara.companionEnd(npc);
@@ -115,6 +120,10 @@ final class NpcAi {
 
 		@Override
 		public boolean canUse() {
+			if (npc.penduduk()) {
+				// a 38 resident keeps to its schedule's titik instead (GolPenduduk, DESIGN 38.N.4)
+				return false;
+			}
 			BlockPos home = npc.home();
 			boolean holds = npc.role().stationary || npc.memory().getBooleanOr("hold", false);
 			return holds && npc.getTarget() == null && home != null && DuniaBudget.throttled(npc, 4)
@@ -186,7 +195,8 @@ final class NpcAi {
 
 	/**
 	 * Walking roles stroll near home (townsfolk: by day between their home and the square, indoors at night; wanderers
-	 * and rivals around where they stand).
+	 * and rivals around where they stand). A DESIGN 38 resident body never uses it: its own goal
+	 * ({@code dunia/tempat/hidup/GolPenduduk.Jalan}) walks it to the schedule's titik.
 	 */
 	static final class HomeGoal extends Goal {
 		private final KultivatorNpc npc;
@@ -198,6 +208,9 @@ final class NpcAi {
 
 		@Override
 		public boolean canUse() {
+			if (npc.penduduk()) {
+				return false;
+			}
 			if (npc.role().stationary || npc.memory().getBooleanOr("hold", false) || npc.companionOf() != null || npc.getTarget() != null || npc.hasFlag(KultivatorNpc.FLAG_SITTING)
 					|| npc.memory().getBooleanOr("busy", false)) {
 				return false;

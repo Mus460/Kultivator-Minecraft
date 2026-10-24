@@ -1,0 +1,46 @@
+{
+  "pemberi": "peran:tabib",
+  "tempat": "balai_tabib",
+  "tahap": [
+    {
+      "id": "racik",
+      "tujuan": [
+        "racik *"
+      ]
+    },
+    {
+      "id": "bawa",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera demam_bayar"
+          ],
+          "ke": "jual"
+        }
+      ],
+      "ke": "gratis"
+    },
+    {
+      "id": "gratis",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "nama_baik 4",
+        "bendera demam_dermawan",
+        "kabar demam_gratis pemain"
+      ]
+    },
+    {
+      "id": "jual",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "beri_nb_pita 4",
+        "nama_baik -1",
+        "kabar demam_jual pemain"
+      ]
+    }
+  ]
+}

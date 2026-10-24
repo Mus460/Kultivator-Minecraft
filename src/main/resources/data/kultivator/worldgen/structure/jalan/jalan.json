@@ -1,0 +1,24 @@
+{
+  "type": "kultivator:jalan",
+  "biomes": "#minecraft:is_overworld",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "ubin": [
+    "kultivator:jalan/ubin_kekaisaran",
+    "kultivator:jalan/ubin_desa",
+    "kultivator:jalan/ubin_setapak"
+  ],
+  "jembatan": [
+    "kultivator:jalan/jembatan_kekaisaran",
+    "kultivator:jalan/jembatan_desa",
+    "kultivator:jalan/jembatan_setapak"
+  ],
+  "tangga": [
+    "kultivator:jalan/tangga_kekaisaran",
+    "kultivator:jalan/tangga_desa",
+    "kultivator:jalan/tangga_setapak"
+  ],
+  "penyeberangan": "kultivator:jalan/penyeberangan",
+  "lentera": "kultivator:jalan/lentera"
+}

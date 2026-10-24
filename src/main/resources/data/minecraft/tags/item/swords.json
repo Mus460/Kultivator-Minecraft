@@ -1,6 +1,22 @@
 {
   "replace": false,
   "values": [
-    "kultivator:pedang_latih"
+    "kultivator:pedang_latih",
+    "kultivator:senjata/jian_fana",
+    "kultivator:senjata/jian_roh_rendah",
+    "kultivator:senjata/jian_roh_menengah",
+    "kultivator:senjata/jian_roh_tinggi",
+    "kultivator:senjata/dao_fana",
+    "kultivator:senjata/dao_roh_rendah",
+    "kultivator:senjata/dao_roh_menengah",
+    "kultivator:senjata/dao_roh_tinggi",
+    "kultivator:senjata/kipas_besi_fana",
+    "kultivator:senjata/kipas_besi_roh_rendah",
+    "kultivator:senjata/kipas_besi_roh_menengah",
+    "kultivator:senjata/kipas_besi_roh_tinggi",
+    "kultivator:senjata/kebut_fana",
+    "kultivator:senjata/kebut_roh_rendah",
+    "kultivator:senjata/kebut_roh_menengah",
+    "kultivator:senjata/kebut_roh_tinggi"
   ]
 }

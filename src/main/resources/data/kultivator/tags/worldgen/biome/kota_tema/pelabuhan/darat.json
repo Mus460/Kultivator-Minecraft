@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:beach",
+    "minecraft:snowy_beach",
+    "minecraft:plains",
+    "minecraft:sunflower_plains",
+    "minecraft:forest",
+    "minecraft:birch_forest",
+    {
+      "id": "minecraft:dappled_forest",
+      "required": false
+    },
+    "minecraft:savanna",
+    "minecraft:sparse_jungle",
+    "minecraft:meadow",
+    "minecraft:cherry_grove",
+    "minecraft:mangrove_swamp",
+    "minecraft:stony_shore"
+  ]
+}

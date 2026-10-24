@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:tempat/tema_tebus",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.tema_pembebas.description"
+    },
+    "icon": {
+      "id": "minecraft:shears"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.tema_pembebas.title"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

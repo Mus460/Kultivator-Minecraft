@@ -1,0 +1,25 @@
+{
+  "pembicara": [
+    "tokoh:lao_dan"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest tema_kuli_sehari tahap pikul"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "ikat_tali",
+      "prop": "tali",
+      "pilihan": [
+        {
+          "akibat": [
+            "gunung_pikul"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

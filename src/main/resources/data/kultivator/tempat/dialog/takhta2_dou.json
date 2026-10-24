@@ -1,0 +1,63 @@
+{
+  "pembicara": [
+    "tokoh:dou"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_hilang_di_kumuh tahap petunjuk",
+    "!bendera takhta2_dou_bicara"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "takut_sembunyi",
+      "pilihan": [
+        {
+          "ke": "gang"
+        },
+        {
+          "syarat": [
+            "nb 1"
+          ],
+          "akibat": [
+            "bayar 1"
+          ],
+          "ke": "percaya",
+          "tampil": true,
+          "alasan": "kultivator.cerita.takhta2_dou.mulai.2.alasan"
+        }
+      ]
+    },
+    {
+      "id": "percaya",
+      "gestur": "main_lompat",
+      "pilihan": [
+        {
+          "ke": "gang"
+        }
+      ]
+    },
+    {
+      "id": "gang",
+      "gestur": "tunjuk",
+      "akibat": [
+        "beri cerita:sandal_berdarah",
+        "bendera takhta2_dou_bicara"
+      ],
+      "pilihan": [
+        {
+          "akibat": [
+            "alur 2 dou"
+          ],
+          "ke": "janji"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "janji",
+      "gestur": "sikap_anak"
+    }
+  ]
+}

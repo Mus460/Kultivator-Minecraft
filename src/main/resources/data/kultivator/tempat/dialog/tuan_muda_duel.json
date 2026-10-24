@@ -1,0 +1,29 @@
+{
+  "pembicara": [
+    "peran:tuan_muda"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tuan_muda_sombong tahap duel"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hunus",
+      "pilihan": [
+        {
+          "akibat": [
+            "tanding_klan"
+          ]
+        },
+        {
+          "akibat": [
+            "bendera klan_meremehkan",
+            "quest_maju tuan_muda_sombong"
+          ]
+        }
+      ]
+    }
+  ]
+}

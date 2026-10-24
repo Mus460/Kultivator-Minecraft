@@ -20,6 +20,7 @@ Usage:
     t.jigsaw(4, 0, 8, "south_up", name="kultivator:kota/street", target="kultivator:kota/house",
              pool="kultivator:kota/houses")
     t.entity(4.5, 1.0, 4.5, {"id": "kultivator:dunia_anchor", "kind": "kota/lelang"})
+    t.titik("kasur", 2, 1, 2, "east")                  # DESIGN 38: extra root key kultivator_titik (vanilla ignores it)
     t.save("src/main/resources/data/kultivator/structure/kota/center_1.nbt")
 
     tag = read_file("some.nbt")          # -> (root_name, python value) with typed wrappers kept
@@ -335,6 +336,8 @@ class Template:
         self.size = (sx, sy, sz)
         self.cells = {}      # (x, y, z) -> (state_key, nbt or None)
         self.entities = []   # (x, y, z, nbt)
+        self.titik_list = []  # DESIGN 38.B.2.5: life points, written to the extra root key "kultivator_titik"
+        self.sisi_map = None  # DESIGN 38.T.2.4: lot side codes, written to the extra root key "kultivator_sisi"
 
     def inside(self, x, y, z):
         return 0 <= x < self.size[0] and 0 <= y < self.size[1] and 0 <= z < self.size[2]
@@ -386,6 +389,42 @@ class Template:
             raise IndexError("entity (%r,%r,%r) outside template %r" % (x, y, z, self.size))
         self.entities.append((float(x), float(y), float(z), dict(nbt)))
 
+    def titik(self, jenis, x, y, z, hadap="south", data=None):
+        """A life point of DESIGN 38.B.2.5 (bed, chair, work spot, door, path node, ...), stored in the extra root key
+        ``kultivator_titik`` of the same NBT file. StructureTemplate.load reads only size/palette(s)/blocks/entities
+        (26.3 StructureTemplate.load), so vanilla ignores the key and the blocks stay exactly what set() wrote; the mod
+        reads it back at runtime (TitikTemplat) and rotates/offsets each point with its piece.
+
+        jenis: "kasur", "kursi", "kerja:<alat>", "pintu", "jalan", "bangunan", ... (tools/cek_tempat.py checks the
+        list); x/y/z: template-local block position (y = the block the NPC stands IN, i.e. one above the floor);
+        hadap: horizontal facing name the NPC looks at ("north"/"east"/"south"/"west"); data: optional dict of short
+        string values (e.g. {"urut": "3", "jalur": "a"}; a box point uses "dx", "dy", "dz" for its size).
+        At most 96 points per template (the 38.C.10 budget per lot).
+        """
+        if not isinstance(jenis, str) or not jenis or jenis != jenis.strip():
+            raise ValueError("titik jenis must be a non-empty string, got %r" % (jenis,))
+        if not self.inside(x, y, z):
+            raise IndexError("titik %s (%d,%d,%d) outside template %r" % (jenis, x, y, z, self.size))
+        if hadap not in ("north", "east", "south", "west"):
+            raise ValueError("titik hadap must be north/east/south/west, got %r" % (hadap,))
+        if len(self.titik_list) >= 96:
+            raise ValueError("more than 96 titik in one template (DESIGN 38.C.10)")
+        entry = {"jenis": jenis, "pos": [int(x), int(y), int(z)], "hadap": hadap}
+        if data:
+            entry["data"] = {str(k): str(v) for k, v in data.items()}
+        self.titik_list.append(entry)
+        return entry
+
+    def sisi(self, utara, timur, selatan, barat):
+        """The four side codes of a themed-city lot (DESIGN 38.T.2.4) before rotation: J road, K canal, T wall,
+        A open water, G stairs, B free border. Stored in the extra root key ``kultivator_sisi`` ({n, e, s, w})."""
+        sah = ("J", "K", "T", "A", "G", "B")
+        for code in (utara, timur, selatan, barat):
+            if code not in sah:
+                raise ValueError("sisi code %r not in %s" % (code, "".join(sah)))
+        self.sisi_map = {"n": utara, "e": timur, "s": selatan, "w": barat}
+        return self.sisi_map
+
     def to_tag(self):
         palette = []
         index = {}
@@ -409,13 +448,19 @@ class Template:
         entities = []
         for x, y, z, nbt in self.entities:
             entities.append({"pos": [x, y, z], "blockPos": [int(x // 1), int(y // 1), int(z // 1)], "nbt": nbt})
-        return {
+        root = {
             "size": list(self.size),
             "entities": entities,
             "blocks": full + other + with_nbt,
             "palette": palette,
             "DataVersion": DATA_VERSION,
         }
+        # Extra keys only when used, so every template written before DESIGN 38 keeps its exact bytes.
+        if self.titik_list:
+            root["kultivator_titik"] = [dict(t) for t in self.titik_list]
+        if self.sisi_map:
+            root["kultivator_sisi"] = dict(self.sisi_map)
+        return root
 
     def save(self, path):
         write_file(path, self.to_tag())

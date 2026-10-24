@@ -5,6 +5,7 @@ import dev.kultivator.client.Keys;
 import dev.kultivator.client.aura.AuraSettings;
 import dev.kultivator.client.epic.EpicSettings;
 import dev.kultivator.client.screen.ui.Palette;
+import dev.kultivator.client.sosok.SosokDetail;
 import dev.kultivator.client.voice.VoiceSettings;
 import dev.kultivator.data.CultivationData;
 import dev.kultivator.goals.Guide;
@@ -62,6 +63,7 @@ final class SettingsRows {
 	private static final String C = "kultivator.codex.settings.";
 	private static final String G = "kultivator.goals.settings.";
 	private static final String AURA = "kultivator.aura.setting.";
+	private static final String SOSOK = "kultivator.sosok.setelan.";
 	private static final String KEY_PREFIX = "key.kultivator.";
 	private static final long CONFIRM_MILLIS = 3000L;
 	private static final int[] FLAGS = {CultivationData.COSMETIC_AURA, CultivationData.COSMETIC_ROBE, CultivationData.COSMETIC_BACK_SWORD,
@@ -128,6 +130,12 @@ final class SettingsRows {
 				AuraSettings::cycleMode, SettingsRows::auraModeTooltip));
 		items.add(coin(() -> Component.translatable(AURA + "others"), AuraSettings::others, AuraSettings::setOthers,
 				() -> List.of(Component.translatable(AURA + "others"), Component.translatable(AURA + "others.tip").withStyle(ChatFormatting.GRAY))));
+		// Penampilan & Animasi (DESIGN 40.6.2): the detail level cycles, the face expressions are a coin.
+		items.add(heading(SOSOK + "judul"));
+		items.add(cycle(() -> Component.translatable(SOSOK + "detail", Component.translatable(SOSOK + "detail." + SosokDetail.setelan().id())),
+				SosokDetail::putarSetelan, SettingsRows::sosokDetailTooltip));
+		items.add(coin(() -> Component.translatable(SOSOK + "wajah"), SosokDetail::wajah, SosokDetail::setWajah,
+				() -> List.of(Component.translatable(SOSOK + "wajah"), Component.translatable(SOSOK + "wajah.tip").withStyle(ChatFormatting.GRAY))));
 		// Techniques and effects (DESIGN 22.12.9; hold G and release = cast live in Kontrol).
 		items.add(heading(C + "techniques"));
 		items.add(cycle(() -> Component.translatable(C + "shake", Component.translatable(C + "shake." + EffectQuality.shake().id())),
@@ -381,6 +389,23 @@ final class SettingsRows {
 	private static Item goalCoin(String key, BooleanSupplier value, Consumer<Boolean> set) {
 		return coin(() -> Component.translatable(G + key), value, set,
 				() -> List.of(Component.translatable(G + key), Component.translatable(G + key + ".tip").withStyle(ChatFormatting.GRAY)));
+	}
+
+	/**
+	 * The "Detail animasi" row's tooltip (DESIGN 40.6.2): what the level changes, the level now in effect, and its
+	 * distances and counts (full detail, reduced, silhouette; bodies with full animation and with springs; atlases).
+	 */
+	private static List<Component> sosokDetailTooltip() {
+		List<Component> lines = new ArrayList<>();
+		lines.add(Component.translatable(SOSOK + "detail", Component.translatable(SOSOK + "detail." + SosokDetail.setelan().id())));
+		lines.add(Component.translatable(SOSOK + "detail.tip").withStyle(ChatFormatting.GRAY));
+		SosokDetail.Tingkat t = SosokDetail.tingkat();
+		lines.add(Component.translatable(SOSOK + "detail.sekarang", Component.translatable(SOSOK + "detail." + t.id()))
+				.withStyle(ChatFormatting.GOLD));
+		lines.add(Component.translatable(SOSOK + "detail.jarak", t.penuh, t.kurang, t.siluet).withStyle(ChatFormatting.GRAY));
+		lines.add(Component.translatable(SOSOK + "detail.jumlah", t.gerakPenuhMaks, t.pegasMaks, t.atlasMaks).withStyle(ChatFormatting.GRAY));
+		lines.add(Component.translatable(SOSOK + "detail.catatan").withStyle(ChatFormatting.DARK_GRAY));
+		return lines;
 	}
 
 	/** The Aura Kultivasi mode row's tooltip: the modes, then the aura of your current realm and its Sumber line. */

@@ -1,0 +1,29 @@
+{
+  "pembicara": [
+    "tokoh:jing_xin"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest takhta_topeng_terlepas tahap kuil"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "suara": "kotabesar.temple_bell",
+      "pilihan": [
+        {
+          "ke": "altar"
+        }
+      ]
+    },
+    {
+      "id": "altar",
+      "gestur": "hormat_dalam",
+      "akibat": [
+        "quest_maju takhta_topeng_terlepas"
+      ]
+    }
+  ]
+}

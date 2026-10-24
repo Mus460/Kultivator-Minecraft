@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "tokoh:tu_gang"
+  ],
+  "prioritas": 72,
+  "syarat": [
+    "iblis_serbu"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "marah_tunjuk",
+      "suara": "tema.iblis.raid",
+      "pilihan": [
+        {
+          "akibat": [
+            "iblis_pihak kota"
+          ],
+          "ke": "kota"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kota",
+      "gestur": "tertawa"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "pembicara": [
+    "tokoh:bulat_khan"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tertawa",
+      "prop": "cambuk_kafilah",
+      "suara": "tema.oasis.caravan",
+      "pilihan": [
+        {
+          "akibat": [
+            "buka_layanan tema_kafilah"
+          ]
+        },
+        {
+          "ke": "bintang"
+        },
+        {
+          "ke": "kabar"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai",
+            "!bendera oasis.kafilah_hilang"
+          ],
+          "ke": "utuh"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai",
+            "bendera oasis.kafilah_hilang"
+          ],
+          "ke": "hilang"
+        },
+        {
+          "syarat": [
+            "bendera oasis.xie_ajun"
+          ],
+          "ke": "dingin"
+        },
+        {
+          "syarat": [
+            "bendera oasis.sahabat_kafilah"
+          ],
+          "ke": "belang"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bintang",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "cerita",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "utuh",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "hilang",
+      "gestur": "tepuk_bahu",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "dingin",
+      "gestur": "marah_tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "belang",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "pembicara": [
+    "tokoh:xie_duo"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "oasis_xie_pertapa"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "meditasi_napas",
+      "suara": "tempat.hermit",
+      "pilihan": [
+        {
+          "ke": "ajar"
+        },
+        {
+          "ke": "sesal"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "ajar",
+      "gestur": "napas_meditasi",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sesal",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

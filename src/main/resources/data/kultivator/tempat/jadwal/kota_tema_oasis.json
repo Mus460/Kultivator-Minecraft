@@ -1,0 +1,135 @@
+{
+  "jenis": "kota_tema/oasis",
+  "peran": {
+    "tuan_benteng": {
+      "5": {
+        "kegiatan": "doa_subuh",
+        "tujuan": "dupa",
+        "klip": "sujud_dupa",
+        "kanan": "dupa"
+      },
+      "6-7": {
+        "kegiatan": "makan",
+        "tujuan": "meja_makan",
+        "klip": "makan",
+        "kanan": "sumpit",
+        "kiri": "mangkuk"
+      },
+      "8-10": {
+        "kegiatan": "sidang",
+        "tujuan": "@kerja",
+        "klip": "duduk_kursi"
+      },
+      "11-14": {
+        "kegiatan": "jeda_panas",
+        "tujuan": "@rumah",
+        "klip": "kipas",
+        "kanan": "kipas_lipat"
+      },
+      "15-16": {
+        "kegiatan": "menulis",
+        "tujuan": "meja_tulis",
+        "klip": "menulis",
+        "kanan": "kuas",
+        "kiri": "papan_catatan"
+      },
+      "17": {
+        "kegiatan": "patroli",
+        "tujuan": "jaga",
+        "klip": "sikap_tangan_belakang",
+        "jalan": "jalan_santai"
+      },
+      "18-20": {
+        "kegiatan": "jamuan",
+        "tujuan": "meja_makan",
+        "klip": "minum_teh",
+        "kanan": "cangkir",
+        "kiri": "lepek"
+      },
+      "21-4": {
+        "kegiatan": "tidur",
+        "tujuan": "@kasur",
+        "klip": "tidur",
+        "dalam": true
+      }
+    },
+    "pengawal_gurun": {
+      "5": {
+        "kegiatan": "latihan_pagi",
+        "tujuan": "latihan",
+        "klip": "latihan_tombak",
+        "kanan": "tombak"
+      },
+      "6-10": {
+        "kegiatan": "patroli",
+        "tujuan": "jaga",
+        "klip": "berdiri_jaga",
+        "kanan": "tombak"
+      },
+      "11-14": {
+        "kegiatan": "jeda_panas",
+        "tujuan": "jaga",
+        "klip": "sikap_tombak",
+        "kanan": "tombak"
+      },
+      "15-17": {
+        "kegiatan": "patroli_siang",
+        "tujuan": "jaga",
+        "klip": "berdiri_jaga",
+        "kanan": "tombak",
+        "jalan": "baris_jaga"
+      },
+      "18": {
+        "kegiatan": "makan",
+        "tujuan": "meja_makan",
+        "klip": "makan",
+        "kanan": "sumpit",
+        "kiri": "mangkuk"
+      },
+      "19-22": {
+        "kegiatan": "patroli_lentera",
+        "tujuan": "jalan_lentera",
+        "klip": "berdiri_jaga",
+        "kanan": "tombak",
+        "kiri": "lentera_tangan",
+        "jalan": "baris_jaga"
+      },
+      "23-4": {
+        "kegiatan": "tidur",
+        "tujuan": "@kasur",
+        "klip": "tidur",
+        "dalam": true
+      }
+    },
+    "anak": {
+      "7-10": {
+        "kegiatan": "main_air",
+        "tujuan": "air",
+        "klip": "main_kejar"
+      },
+      "15-17": {
+        "kegiatan": "main",
+        "tujuan": "main",
+        "klip": "main_gasing",
+        "kanan": "gasing"
+      }
+    }
+  },
+  "acara": {
+    "tema.tari_putar": {
+      "tuan_benteng": {
+        "kegiatan": "tonton_tari",
+        "tujuan": "penonton",
+        "klip": "tepuk_tangan"
+      }
+    },
+    "tema.kafilah_agung": {
+      "pengawal_gurun": {
+        "kegiatan": "sambut_kafilah",
+        "tujuan": "jaga",
+        "klip": "sikap_tombak",
+        "kanan": "tombak"
+      }
+    }
+  }
+}

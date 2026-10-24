@@ -1,0 +1,84 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#kultivator:has_structure/kota_besar/semua",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_besar",
+  "distrik": "kumuh",
+  "lot": [
+    {
+      "dx": -72,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/kumuh/gubuk_a",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/kumuh/pasar_loak",
+      "putar": 0
+    },
+    {
+      "dx": -72,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/kumuh/dapur_umum",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/kumuh/gubuk_b",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/kumuh/sarang_tikus",
+      "putar": 0
+    },
+    {
+      "dx": -24,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/kumuh/gubuk_d",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -72,
+      "pool": "kultivator:kota_besar/kumuh/gubuk_c",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": -24,
+      "pool": "kultivator:kota_besar/kumuh/warung_jalan",
+      "putar": 0
+    },
+    {
+      "dx": 24,
+      "dz": 24,
+      "pool": "kultivator:kota_besar/kumuh/gubuk_e",
+      "putar": 0
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "#kultivator:kota_besar/gaya_salju",
+      "akhiran": "salju"
+    },
+    {
+      "biomes": "#kultivator:kota_besar/gaya_gurun",
+      "akhiran": "gurun"
+    },
+    {
+      "biomes": "#kultivator:kota_besar/gaya_sakura",
+      "akhiran": "sakura"
+    }
+  ]
+}

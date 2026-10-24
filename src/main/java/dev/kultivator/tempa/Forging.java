@@ -1351,6 +1351,108 @@ public final class Forging {
 		return tag;
 	}
 
+	// ================================================================== 38EK: shop stock and forge orders (DESIGN 38.M.2.1)
+
+	/** Heat level of a guild forge (Gilda Pandai Pusaka): forge orders are made as at heat 3. */
+	public static final int GUILD_HEAT = 3;
+	/** Highest grade a guild order may ask for. */
+	public static final int ORDER_MAX_GRADE = 4;
+
+	/**
+	 * One material line of the forge recipe for a new artifact ({@link #planNew}'s rows, as a guild order lists them):
+	 * {@code test} matches the stacks, {@code count} is needed, {@code nameKey} names the line, {@code icon} makes a
+	 * display stack on demand (never in a static initializer).
+	 */
+	public record OrderMaterial(Predicate<ItemStack> test, int count, String nameKey, java.util.function.Supplier<ItemStack> icon) {
+	}
+
+	/**
+	 * The materials a forge order of {@code form} at {@code grade} hands over (38EK {@code PesananTempa}): the embryo of
+	 * the form, the beast core of the grade (two king cores for grade 5), the metal row and the realm materials. The same
+	 * rows as the forge itself (no cheaper path through the guild).
+	 */
+	public static List<OrderMaterial> orderMaterials(String form, int grade) {
+		int g = Math.max(0, Math.min(ArtifactItem.MAX_GRADE, grade));
+		List<OrderMaterial> list = new ArrayList<>();
+		switch (ArtifactItem.FORMS.contains(form) ? form : ArtifactItem.PEDANG) {
+			case ArtifactItem.PAYUNG -> {
+				list.add(new OrderMaterial(item(Items.BAMBOO_BLOCK), 1, "block.minecraft.bamboo_block", () -> new ItemStack(Items.BAMBOO_BLOCK)));
+				list.add(new OrderMaterial(item(Items.STICK), 4, "item.minecraft.stick", () -> new ItemStack(Items.STICK)));
+			}
+			case ArtifactItem.WAJAN -> list.add(new OrderMaterial(item(Items.CAULDRON), 1, "block.minecraft.cauldron", () -> new ItemStack(Items.CAULDRON)));
+			case ArtifactItem.LONCENG -> list.add(new OrderMaterial(item(Items.BELL), 1, "block.minecraft.bell", () -> new ItemStack(Items.BELL)));
+			default -> list.add(new OrderMaterial(stack -> stack.is(ItemTags.SWORDS) && !ArtifactItem.is(stack), 1, "kultivator.tempa.order.embryo_sword",
+					() -> new ItemStack(Items.IRON_SWORD)));
+		}
+		if (g == 5) {
+			list.add(new OrderMaterial(stack -> BeastCores.isCore(stack) && BeastCores.grade(stack) >= BeastCores.KING, 2, "kultivator.tempa.order.core_king",
+					() -> BeastCores.create(null, BeastCores.KING)));
+		} else {
+			int min = CORE_MIN[g];
+			list.add(new OrderMaterial(stack -> BeastCores.isCore(stack) && BeastCores.grade(stack) >= min, 1, "kultivator.tempa.order.core." + min,
+					() -> BeastCores.create(null, min)));
+		}
+		switch (g) {
+			case 0 -> list.add(new OrderMaterial(item(Items.IRON_INGOT), 4, "item.minecraft.iron_ingot", () -> new ItemStack(Items.IRON_INGOT)));
+			case 1 -> {
+				list.add(new OrderMaterial(item(Items.GOLD_INGOT), 4, "item.minecraft.gold_ingot", () -> new ItemStack(Items.GOLD_INGOT)));
+				list.add(new OrderMaterial(item(Items.DIAMOND), 1, "item.minecraft.diamond", () -> new ItemStack(Items.DIAMOND)));
+			}
+			case 2 -> {
+				list.add(new OrderMaterial(item(Items.DIAMOND), 2, "item.minecraft.diamond", () -> new ItemStack(Items.DIAMOND)));
+				list.add(new OrderMaterial(item(Items.AMETHYST_BLOCK), 2, "block.minecraft.amethyst_block", () -> new ItemStack(Items.AMETHYST_BLOCK)));
+			}
+			case 3 -> {
+				list.add(new OrderMaterial(item(Items.NETHERITE_INGOT), 1, "item.minecraft.netherite_ingot", () -> new ItemStack(Items.NETHERITE_INGOT)));
+				list.add(new OrderMaterial(item(Items.DIAMOND), 2, "item.minecraft.diamond", () -> new ItemStack(Items.DIAMOND)));
+			}
+			case 4 -> {
+				list.add(new OrderMaterial(item(Items.NETHERITE_INGOT), 2, "item.minecraft.netherite_ingot", () -> new ItemStack(Items.NETHERITE_INGOT)));
+				list.add(new OrderMaterial(item(Items.ECHO_SHARD), 1, "item.minecraft.echo_shard", () -> new ItemStack(Items.ECHO_SHARD)));
+			}
+			default -> {
+				list.add(new OrderMaterial(item(Items.NETHERITE_INGOT), 4, "item.minecraft.netherite_ingot", () -> new ItemStack(Items.NETHERITE_INGOT)));
+				list.add(new OrderMaterial(item(Items.NETHER_STAR), 1, "item.minecraft.nether_star", () -> new ItemStack(Items.NETHER_STAR)));
+			}
+		}
+		if (REALM_COUNT[g] > 0) {
+			var tag = TempaItems.realmTag(g);
+			list.add(new OrderMaterial(stack -> stack.is(tag), REALM_COUNT[g], "kultivator.tempa.order.realm." + g,
+					() -> new ItemStack(Items.AMETHYST_SHARD)));
+		}
+		return list;
+	}
+
+	/** A sub-quality roll 0-2 with the forge's odds ({@link #SUB_LOW}, {@link #SUB_MID}) shifted by {@code bonus}. */
+	private static int rollSub(net.minecraft.util.RandomSource random, double bonus) {
+		double roll = random.nextDouble() + bonus;
+		return roll < SUB_LOW ? 0 : roll < SUB_MID ? 1 : 2;
+	}
+
+	/**
+	 * A forged artifact for a guild shop rack (38EK): {@code form} at {@code grade} (0-5) with a random sub-quality and,
+	 * half of the time, a random element; the maker line names the guild ({@code maker}, may be null).
+	 */
+	public static ItemStack buatStok(ServerLevel level, String form, int grade, net.minecraft.util.RandomSource random) {
+		return buatStok(level, form, grade, random, null);
+	}
+
+	/** {@link #buatStok(ServerLevel, String, int, net.minecraft.util.RandomSource)} with a maker name. */
+	public static ItemStack buatStok(ServerLevel level, String form, int grade, net.minecraft.util.RandomSource random, @Nullable String maker) {
+		Element element = random.nextBoolean() ? null : Element.values()[random.nextInt(Element.values().length)];
+		return ArtifactItem.create(form, grade, rollSub(random, 0.0D), 0, element, maker);
+	}
+
+	/**
+	 * The finished artifact of a guild forge order (38EK {@code PesananTempa}): made as at {@link #GUILD_HEAT} by the
+	 * master smith; the sub-quality odds get the core bonus of a core one grade above the minimum ({@link #CORE_SUB}).
+	 */
+	public static ItemStack buatPesanan(ServerLevel level, String form, int grade, @Nullable Element element, String maker,
+			net.minecraft.util.RandomSource random) {
+		int g = Math.max(0, Math.min(ORDER_MAX_GRADE, grade));
+		return ArtifactItem.create(form, g, rollSub(random, CORE_SUB), 0, element, maker);
+	}
+
 	/** Item ids of the ring tiers (the preview names them). */
 	static final class BuiltinRingNames {
 		static final String[] NAMES = {"storage_pouch", "storage_ring_low", "storage_ring_mid", "storage_ring_high", "storage_ring_supreme"};

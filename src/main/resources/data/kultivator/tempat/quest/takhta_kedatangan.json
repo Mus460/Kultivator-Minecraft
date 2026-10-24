@@ -1,0 +1,17 @@
+{
+  "pemberi": "tokoh:tie_hu",
+  "tempat": "ibu_kota",
+  "alur": true,
+  "tahap": [
+    {
+      "id": "gerbang",
+      "arah": "kota/kota_besar"
+    },
+    {
+      "id": "yamen",
+      "akibat": [
+        "nama_baik 2"
+      ]
+    }
+  ]
+}

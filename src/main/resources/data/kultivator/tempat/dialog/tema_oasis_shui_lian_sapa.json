@@ -1,0 +1,94 @@
+{
+  "pembicara": [
+    "tokoh:shui_lian"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat",
+      "prop": "kendi",
+      "suara": "tema.oasis.water_priestess",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_restu"
+          ],
+          "ke": "restu"
+        },
+        {
+          "akibat": [
+            "oasis_air_suci 1"
+          ],
+          "ke": "air"
+        },
+        {
+          "akibat": [
+            "oasis_air_suci 4"
+          ],
+          "ke": "air"
+        },
+        {
+          "ke": "batu"
+        },
+        {
+          "ke": "antre"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "restu",
+      "gestur": "sikap_doa",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "air",
+      "gestur": "tuang_teh",
+      "prop": "kendi",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "batu",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "ke": "batu2"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "batu2",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "antre",
+      "gestur": "sikap_tunduk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

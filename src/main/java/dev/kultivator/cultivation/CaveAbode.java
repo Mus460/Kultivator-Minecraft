@@ -67,6 +67,8 @@ public final class CaveAbode {
 	/** Called by {@link ImmortalPerks#init()}. */
 	public static void init() {
 		ProtectedZones.addZoneProvider(CaveAbode::protects);
+		// DESIGN 38.R.3 rule 2: an abode is a player claim, place repair crews never work inside it
+		ProtectedZones.addClaimProvider(CaveAbode::protects);
 		ServerPlayerEvents.JOIN.register(CaveAbode::remember);
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> ZONES.clear());
 	}

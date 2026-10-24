@@ -1,0 +1,37 @@
+{
+  "pembicara": [
+    "peran:penjaga_formasi"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 55"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "segel_tangan",
+      "prop": "piringan_formasi",
+      "pilihan": [
+        {
+          "ke": "kerja"
+        },
+        {
+          "ke": "tersesat"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kerja",
+      "gestur": "bicara_tangan",
+      "akibat": [
+        "lore kota_besar.awan"
+      ]
+    },
+    {
+      "id": "tersesat",
+      "gestur": "tertawa"
+    }
+  ]
+}

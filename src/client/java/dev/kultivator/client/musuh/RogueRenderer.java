@@ -8,9 +8,13 @@ import dev.kultivator.client.disciple.DiscipleRenderState;
 import dev.kultivator.client.disciple.DiscipleRobeLayer;
 import dev.kultivator.client.disciple.power.PhysiqueVisuals;
 import dev.kultivator.client.render.MeditationPose;
+import dev.kultivator.client.sosok.SosokJembatan;
+import dev.kultivator.client.sosok.SosokRender;
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.musuh.RogueCultivatorEntity;
 import dev.kultivator.musuh.RogueCultivators;
+import dev.kultivator.sosok.Gaya;
+import dev.kultivator.sosok.Sosok;
 import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
 import net.minecraft.client.model.HumanoidModel;
@@ -38,6 +42,11 @@ import org.jetbrains.annotations.Nullable;
  * disciple robe in dark cloth (dropped beyond 32 blocks), a cloth mask tinted with the tier's trim colour
  * ({@link RogueMaskLayer}) and anything in its hands. Illusory phantoms and energy bodies are see-through, demonic sect
  * members carry a faint blood tint. Its name plate is its title (never a custom name), shown within 16 blocks.
+ * <p>
+ * DESIGN 40.4.1 D (module 40R): a rogue is a Sosok body made on the client ({@code liar.<sect 0-7>}): its old slim arms
+ * decide the sex, its height and face come from the Sosok, its cloth is its demonic sect's (40K's row), the cloth mask
+ * stays on top. Illusory phantoms and energy bodies wear the same look see-through. Gerak animates it (arms folded,
+ * the prowling walk) under the duel and cast poses.
  */
 public class RogueRenderer extends LivingEntityRenderer<RogueCultivatorEntity, DiscipleRenderState, PlayerModel> {
 
@@ -50,15 +59,24 @@ public class RogueRenderer extends LivingEntityRenderer<RogueCultivatorEntity, D
 	/** Robe cloth by variant (rogue, ghost, energy, demonic) and the Patriarch's. */
 	private static final int[] ROBE = {0x34343C, 0x4A3A5E, 0x6C9CC8, 0x3A1418};
 	private static final int PATRIARCH_ROBE = 0x1A0A0E;
+	/** DESIGN 40.4.1 D look keys of the eight demonic sects. */
+	private static final String[] RUPA = {"liar.0", "liar.1", "liar.2", "liar.3", "liar.4", "liar.5", "liar.6", "liar.7"};
 
+	/** The Sosok body (128 × 128 atlas mesh). */
+	private final PlayerModel sosokWide;
+	private final PlayerModel sosokSlim;
+	/** The old player-skin body (last fallback). */
 	private final PlayerModel wideModel;
 	private final PlayerModel slimModel;
 
 	public RogueRenderer(EntityRendererProvider.Context context) {
-		super(context, new PlayerModel(context.bakeLayer(ModelLayers.PLAYER), false), 0.5F);
-		this.wideModel = this.model;
+		super(context, new PlayerModel(SosokJembatan.tubuh(context, false), false), 0.5F);
+		this.sosokWide = this.model;
+		this.sosokSlim = new PlayerModel(SosokJembatan.tubuh(context, true), true);
+		this.wideModel = new PlayerModel(context.bakeLayer(ModelLayers.PLAYER), false);
 		this.slimModel = new PlayerModel(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
-		this.addLayer(new CulledRobe(this, new DiscipleRobeLayer(this, context)));
+		this.addLayer(new SosokRender.TanpaSosok(this, new CulledRobe(this, new DiscipleRobeLayer(this, context))));
+		SosokRender.pasangLapisan(this::addLayer, this, context);
 		this.addLayer(new RogueMaskLayer(this, context));
 		this.addLayer(new DiscipleHeldItemLayer(this));
 	}
@@ -104,8 +122,15 @@ public class RogueRenderer extends LivingEntityRenderer<RogueCultivatorEntity, D
 		data.setData(MeditationPose.STRENGTH, 0.0F);
 		data.setData(TIER, tier);
 		data.setData(VARIANT, variant);
+		// DESIGN 40: the client-made Sosok of this rogue (old slim arms = woman), its sect's look, see-through phantoms
+		String key = RUPA[Mth.clamp(entity.sect(), 0, RUPA.length - 1)];
+		Sosok sosok = SosokRender.dariLama(entity, key, entity.skin() * 8 + entity.sect(), entity.slim() ? 1 : 0);
+		SosokRender.ekstrak(entity, state, partialTicks, new SosokRender.RupaMasukan(key, state.realm, -1, 0, 0, null, 0, 0,
+				PhysiqueVisuals.translucent(state)), sosok, Gaya.NETRAL, true, sosok.skala());
 		// DESIGN 35.5.5: the sword duel's poses (and any cast pose) on rogue cultivators
 		dev.kultivator.client.anim.PoseRenderData.extract(entity, state, partialTicks);
+		SosokRender.selesai(entity, state, partialTicks);
+		SosokRender.labelLod(entity, state, partialTicks);
 	}
 
 	@Override
@@ -127,19 +152,27 @@ public class RogueRenderer extends LivingEntityRenderer<RogueCultivatorEntity, D
 		if (isBodyVisible && PhysiqueVisuals.translucent(state)) {
 			return RenderTypes.entityTranslucent(this.getTextureLocation(state));
 		}
+		// DESIGN 40.6.3: vanilla entity cutout for a Sosok body
+		if (isBodyVisible && !forceTransparent && SosokRender.aktif(state)) {
+			return RenderTypes.entityCutout(this.getTextureLocation(state));
+		}
 		return super.getRenderType(state, isBodyVisible, forceTransparent, appearGlowing);
 	}
 
 	@Override
 	protected void scale(DiscipleRenderState state, PoseStack poseStack) {
-		poseStack.scale(PLAYER_SCALE, PLAYER_SCALE, PLAYER_SCALE);
+		// the server never sets a rogue's scale attribute: the Sosok's height is drawn here
+		float scale = PLAYER_SCALE * SosokRender.skalaGambar(state);
+		poseStack.scale(scale, scale, scale);
 	}
 
 	/** The pose's lift (the duel's kneel) before the body turn and its tilt after it, as for players and disciples. */
 	@Override
 	protected void setupRotations(DiscipleRenderState state, PoseStack poseStack, float bodyRot, float entityScale) {
 		dev.kultivator.client.anim.PoseApplier.lift(state, poseStack);
+		SosokRender.angkat(state, poseStack);
 		super.setupRotations(state, poseStack, bodyRot, entityScale);
+		SosokRender.baring(state, poseStack);
 		dev.kultivator.client.anim.PoseApplier.tilt(state, poseStack);
 	}
 
@@ -155,7 +188,11 @@ public class RogueRenderer extends LivingEntityRenderer<RogueCultivatorEntity, D
 
 	@Override
 	public void submit(DiscipleRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-		this.model = state.slim ? slimModel : wideModel;
+		if (SosokRender.aktif(state)) {
+			this.model = state.slim ? sosokSlim : sosokWide;
+		} else {
+			this.model = state.slim ? slimModel : wideModel;
+		}
 		super.submit(state, poseStack, collector, camera);
 	}
 

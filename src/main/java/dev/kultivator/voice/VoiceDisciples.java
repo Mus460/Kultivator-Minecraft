@@ -2,6 +2,8 @@ package dev.kultivator.voice;
 
 import dev.kultivator.disciple.DiscipleEntity;
 import dev.kultivator.purba.PrimordialBeastEntity;
+import dev.kultivator.sosok.Sosok;
+import dev.kultivator.sosok.SosokApi;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -18,9 +20,9 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 
 /**
- * What disciples say (DESIGN: voices, module V). Every disciple keeps one of six voices for life, picked from its soul id:
- * female for the default characters Alex, Ari, Efe, Makena and Noor (its face), male for Kai, Steve, Sunny and Zuri; the
- * number 1-3 from the soul id. The lines come from the master's once-a-second scan ({@link #scan}) and from the hooks
+ * What disciples say (DESIGN: voices, module V). Every disciple keeps one of six voices for life: female or male by its
+ * explicit sex (DESIGN 40.2.1, {@code SosokApi.perempuan}; never guessed from a skin any more), the number 1-3 from its
+ * Sosok look seed. Every spoken line also moves the mouth ({@code SosokApi.bicara}). The lines come from the master's once-a-second scan ({@link #scan}) and from the hooks
  * ({@link VoiceHooks}); every line is rare and spaced: one disciple line per master every {@link #MASTER_GAP} ticks, each
  * disciple its own cooldown per line, combat lines at most every {@link #COMBAT_GAP} ticks (8 s).
  */
@@ -31,8 +33,8 @@ public final class VoiceDisciples {
 	/** The master counts as "away" after this long beyond 16 blocks (5 minutes). */
 	public static final int AWAY_TICKS = 6000;
 	private static final double SCAN = 24.0D;
-	/** Skin indexes of the default characters with a female face: alex, ari, efe, makena, noor. */
-	private static final int FEMALE_SKINS = 1 | 1 << 1 | 1 << 2 | 1 << 4 | 1 << 5;
+	/** How long the mouth moves for one spoken line (ticks; the clips are short shouts and sentences). */
+	public static final int LINE_TICKS = 40;
 
 	private static final class State {
 		long lastNear = -1L;
@@ -44,19 +46,20 @@ public final class VoiceDisciples {
 
 	// ================================================================== voice
 
-	/** True when the disciple speaks with a female voice. */
+	/** True when the disciple speaks with a female voice: its explicit sex (DESIGN 40.2.1). */
 	public static boolean female(DiscipleEntity disciple) {
-		int skin = disciple.skinIndex();
-		return skin >= 0 && skin < 31 && (FEMALE_SKINS & (1 << skin)) != 0;
+		return SosokApi.perempuan(disciple);
 	}
 
-	/** "m1".."m3" or "f1".."f3", stable for the soul. */
+	/**
+	 * "m1".."m3" or "f1".."f3": the sex, and the number from the Sosok look seed, so the voice stays the same through
+	 * death and revival (the tablet keeps the Sosok) and a Divine Clone speaks like its source.
+	 */
 	public static String voiceOf(DiscipleEntity disciple) {
-		UUID soul = disciple.soulId();
-		long h = soul.getMostSignificantBits() * 31L + soul.getLeastSignificantBits();
-		h ^= h >>> 29;
+		Sosok sosok = SosokApi.sosok(disciple);
+		long h = Sosok.aduk(sosok.benih() * 31L + sosok.postur());
 		int n = 1 + (int) Math.floorMod(h, 3L);
-		return (female(disciple) ? "f" : "m") + n;
+		return (sosok.perempuan() ? "f" : "m") + n;
 	}
 
 	/** The disciple says {@code line} (one of {@link VoiceEvents#DISCIPLE}) if its cooldown for that line allows. */
@@ -76,6 +79,7 @@ public final class VoiceDisciples {
 			Voice.ready(master, "disciple_gap", MASTER_GAP);
 		}
 		Voice.say(disciple, "disciple." + voiceOf(disciple) + "." + line, null);
+		SosokApi.bicara(disciple, LINE_TICKS);
 		return true;
 	}
 
@@ -201,6 +205,7 @@ public final class VoiceDisciples {
 			UUID owner = d.ownerId();
 			if (owner != null && Voice.ready(d.getUUID(), "d:farewell", 12000)) {
 				Voice.callTo(master, d, "disciple." + voiceOf(d) + ".farewell");
+				SosokApi.bicara(d, LINE_TICKS);
 				return;
 			}
 		}

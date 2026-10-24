@@ -1,0 +1,30 @@
+{
+  "pembicara": [
+    "tokoh:ajun"
+  ],
+  "prioritas": 70,
+  "syarat": [
+    "bendera oasis.xie_ajun"
+  ],
+  "sekali": true,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "takut_sembunyi",
+      "pilihan": [
+        {
+          "akibat": [
+            "nama_baik 3"
+          ],
+          "ke": "maaf"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "maaf",
+      "gestur": "sikap_anak"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "jenis": "kota_tema/gunung",
+  "acara": {
+    "tema.cahaya_budha": {
+      "pedagang": {
+        "kegiatan": "cahaya_budha",
+        "tujuan": "pandang",
+        "klip": "tatap_langit"
+      },
+      "anak": {
+        "kegiatan": "cahaya_budha",
+        "tujuan": "pandang",
+        "klip": "tunjuk"
+      }
+    }
+  }
+}

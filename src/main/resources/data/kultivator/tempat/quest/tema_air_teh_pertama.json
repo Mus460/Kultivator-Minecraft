@@ -1,0 +1,24 @@
+{
+  "pemberi": "tokoh:lu_yuqing",
+  "tempat": "kota_air",
+  "tahap": [
+    {
+      "id": "petik",
+      "tujuan": [
+        "air_petik x10"
+      ]
+    },
+    {
+      "id": "antar",
+      "tujuan": [
+        "bicara tokoh:lu_yuqing"
+      ],
+      "akibat": [
+        "beri kultivator:tema/teh_bi_luo 5",
+        "bendera tema.air.izin_seduh",
+        "nama_baik 2",
+        "air_anugerah tema_air_teh"
+      ]
+    }
+  ]
+}

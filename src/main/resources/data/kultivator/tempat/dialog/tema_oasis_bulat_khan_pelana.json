@@ -1,0 +1,24 @@
+{
+  "pembicara": [
+    "tokoh:bulat_khan"
+  ],
+  "prioritas": 45,
+  "syarat": [
+    "oasis_penumpang"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "akibat": [
+            "oasis_tidur_pelana"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

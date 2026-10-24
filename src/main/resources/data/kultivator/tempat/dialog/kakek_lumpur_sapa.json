@@ -1,0 +1,43 @@
+{
+  "pembicara": [
+    "tokoh:kakek_lumpur"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "duduk_lantai",
+      "pilihan": [
+        {
+          "ke": "lapar"
+        },
+        {
+          "ke": "dingin"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "lapar",
+      "gestur": "cerita",
+      "pilihan": [
+        {
+          "akibat": [
+            "bayar 1",
+            "bendera kakek_diberi"
+          ],
+          "ke": "terima"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat_dalam"
+    },
+    {
+      "id": "dingin",
+      "gestur": "tatap_langit"
+    }
+  ]
+}

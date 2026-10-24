@@ -1,0 +1,57 @@
+{
+  "pembicara": [
+    "tokoh:shui_lian"
+  ],
+  "prioritas": 40,
+  "syarat": [
+    "quest tema_oasis_mata_air baru",
+    "oasis_di_kota"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "suara": "tema.oasis.water_priestess",
+      "pilihan": [
+        {
+          "ke": "kisah"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kisah",
+      "gestur": "bicara_tangan",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_oasis_mata_air"
+          ],
+          "ke": "terima"
+        },
+        {
+          "ke": "sha"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "sha",
+      "gestur": "bisik",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai tema_oasis_mata_air"
+          ],
+          "ke": "terima"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "hormat_dalam"
+    }
+  ]
+}

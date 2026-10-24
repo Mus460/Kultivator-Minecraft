@@ -116,6 +116,11 @@ public final class DuelRules {
 				|| b instanceof net.minecraft.server.level.ServerPlayer pb && dev.kultivator.alam.Alam.inRun(pb)) {
 			return false;
 		}
+		// DESIGN 40.2.3: a child (visible age group ANAK) is never a duellist.
+		if (dev.kultivator.sosok.SosokApi.usia(a) == dev.kultivator.sosok.Sosok.ANAK
+				|| dev.kultivator.sosok.SosokApi.usia(b) == dev.kultivator.sosok.Sosok.ANAK) {
+			return false;
+		}
 		Duel duel = new Duel(a, b, maxTicks, listener);
 		DUELS.put(a.getUUID(), duel);
 		DUELS.put(b.getUUID(), duel);

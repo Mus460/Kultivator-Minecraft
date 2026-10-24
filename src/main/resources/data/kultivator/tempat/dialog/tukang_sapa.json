@@ -1,0 +1,44 @@
+{
+  "pembicara": [
+    "peran:tukang"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 55"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "angkat_papan",
+      "prop": "papan_kayu",
+      "suara": "tempat.repair_work",
+      "pilihan": [
+        {
+          "ke": "bangun"
+        },
+        {
+          "ke": "atap"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "bangun",
+      "gestur": "perbaiki_palu",
+      "prop": "palu"
+    },
+    {
+      "id": "atap",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

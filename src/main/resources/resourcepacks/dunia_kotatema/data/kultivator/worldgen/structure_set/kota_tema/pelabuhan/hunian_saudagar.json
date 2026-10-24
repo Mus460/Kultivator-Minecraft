@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380409,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_pelabuhan",
+    "distrik": "hunian_saudagar"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/pelabuhan/hunian_saudagar",
+      "weight": 1
+    }
+  ]
+}

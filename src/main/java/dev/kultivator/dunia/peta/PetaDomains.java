@@ -1,9 +1,7 @@
 package dev.kultivator.dunia.peta;
 
-import dev.kultivator.dunia.api.DuniaApi;
-import dev.kultivator.dunia.api.RivalService;
-import dev.kultivator.sekte.api.DiplomasiService;
-import dev.kultivator.sekte.api.SekteApi;
+import dev.kultivator.sekte.diplomasi.DaftarSekte;
+import dev.kultivator.sekte.diplomasi.GerbangPlan;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -11,6 +9,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -21,122 +20,51 @@ import java.util.Random;
 
 /**
  * The NPC sect domains of the world map (DESIGN 34.5.16): {@code npcDomains} lore regions of the overworld, each an inked
- * border with a seal and a name. When module K's rival groups exist, the domains are theirs (their seeded home region,
- * name and colour, {@link RivalService}); otherwise the map seeds its own from the world seed, so every world has the
- * same sects in the same places. Pure lore: a domain changes no rule, it only names who guards a town inside it.
+ * border with a seal and a name. Pure lore: a domain changes no rule, it only names who guards a town inside it.
  * <p>
- * One list of sects (integration audit T12): when Sekte 36's diplomacy knows an NPC sect whose gate lies inside a rival
- * domain, the domain carries that sect's name, so the map, the gate and the diplomacy screen agree; without rival groups
- * the diplomacy sects draw their own domains around their gates.
+ * One list of sects (integration audit T12): domain {@code "sekte:s<i>"} belongs to NPC sect {@code s<i>} of
+ * {@link DaftarSekte} (the same entry is the Diplomasi sect, the Saingan band {@code g<i>}, the elite tournament guest and
+ * the sect compound of DESIGN 38). Its centre is the sect's gate (the generated gate once born, else the planned column),
+ * its name comes from {@code DiplomasiService} (the plan's own name while that module is off), its ink is the sect's
+ * emblem colour and its seal the glyph of the sect's name word. The map has no sects of its own any more.
  * <p>
  * Terinspirasi dari wilayah sekte-sekte besar dalam novel xianxia; nama dan letaknya rancangan game.
  */
 public final class PetaDomains {
 
-	/** The map's own sects (lang {@code kultivator.peta.domain.<i>}, seal glyph {@code .seal}). */
-	public static final int OWN = 16;
-	private static final int[] COLORS = {0x3C7FD6, 0x6E8F2E, 0xBFD8F0, 0x8E5BD8, 0xD4502A, 0xA01E2A, 0xD4A637, 0x5A6BC8, 0x4FAE7E,
-			0x7A7F86, 0x9AC7C0, 0x6C5CE0, 0xE8E6DA, 0x3A3446, 0x2F9FB0, 0x5E8C3A};
+	/** Domain radius: {@code 520 + [0, 620)} blocks, seeded per world and sect. */
+	private static final int RADIUS_MIN = 520;
+	private static final int RADIUS_SPREAD = 620;
 
 	/**
-	 * One domain. {@code name} is a component (a rival's own name or the map's lang key); {@code seal} is one glyph, or
-	 * {@code #<lang key>} of the glyph (resolved by the client).
+	 * One domain. {@code name} is a component (the sect's name); {@code seal} is one glyph, or {@code #<lang key>} of the
+	 * glyph (resolved by the client).
 	 */
 	public record Domain(String id, Component name, String seal, BlockPos centre, int radius, int color) {
 	}
 
-	/** The domains of {@code level} (overworld only), at most {@code count}. */
+	/** The domains of {@code level} (overworld only): the first {@code count} sects of the one list, in index order. */
 	public static List<Domain> of(ServerLevel level, int count) {
 		List<Domain> out = new ArrayList<>();
 		if (count <= 0 || !Level.OVERWORLD.equals(level.dimension())) {
 			return out;
 		}
-		RivalService rivals = DuniaApi.rivals();
-		long seed = level.getSeed();
-		Random random = new Random(seed ^ 0x34A67D0E1A5L);
-		List<String> groups = rivals.all();
-		if (!groups.isEmpty()) {
-			for (String id : groups) {
-				if (out.size() >= count) {
-					break;
-				}
-				BlockPos centre = rivals.region(id);
-				if (centre == null) {
-					continue;
-				}
-				int radius = 520 + random.nextInt(620);
-				Component name = sectNameIn(centre, radius);
-				if (name == null) {
-					name = rivals.name(id);
-				}
-				out.add(new Domain(id, name == null ? Component.literal(id) : name, seal(id), centre, radius, 0xFFFFFF & rivals.color(id)));
-			}
-			if (!out.isEmpty()) {
-				return out;
-			}
-		}
-		DiplomasiService diplomacy = SekteApi.diplomasi();
-		for (String id : diplomacy.sects()) {
+		MinecraftServer server = level.getServer();
+		Random random = new Random(level.getSeed() ^ 0x34A67D0E1A5L);
+		for (String id : DaftarSekte.ids(server)) {
 			if (out.size() >= count) {
 				break;
 			}
-			BlockPos gate = gateOf(diplomacy, id);
-			Component name = diplomacy.name(id);
-			if (gate == null || name == null) {
+			int radius = RADIUS_MIN + random.nextInt(RADIUS_SPREAD);
+			GerbangPlan.Entry entry = DaftarSekte.entry(server, id);
+			BlockPos centre = DaftarSekte.gate(server, id);
+			if (entry == null || centre == null) {
 				continue;
 			}
-			int radius = 520 + random.nextInt(620);
-			int index = Math.floorMod(id.hashCode(), OWN);
-			out.add(new Domain("sekte:" + id, name, seal(name.getString()), gate, radius, COLORS[index]));
-		}
-		if (!out.isEmpty()) {
-			return out;
-		}
-		int n = Math.min(count, OWN);
-		int first = random.nextInt(OWN);
-		double start = random.nextDouble() * 360.0D;
-		for (int i = 0; i < n; i++) {
-			int index = (first + i * 5) % OWN;
-			double angle = Math.toRadians(start + i * (360.0D / n) + random.nextGaussian() * 9.0D);
-			double distance = 1400.0D + random.nextInt(5200);
-			int x = (int) Math.round(Math.cos(angle) * distance);
-			int z = (int) Math.round(Math.sin(angle) * distance);
-			int radius = 520 + random.nextInt(620);
-			out.add(new Domain("peta:" + index, Component.translatable("kultivator.peta.domain." + index),
-					"#kultivator.peta.domain." + index + ".seal", new BlockPos(x, 64, z), radius,
-					COLORS[index]));
+			out.add(new Domain(DaftarSekte.domainId(entry.index()), DaftarSekte.name(server, id), entry.seal(), centre, radius,
+					0xFFFFFF & entry.warna()));
 		}
 		return out;
-	}
-
-	/** The gate (generated or planned) of a diplomacy sect, or null. */
-	private static @Nullable BlockPos gateOf(DiplomasiService diplomacy, String id) {
-		BlockPos gate = diplomacy.gate(id);
-		return gate != null ? gate : diplomacy.plannedGate(id);
-	}
-
-	/** The name of the diplomacy sect whose gate lies nearest {@code centre} within {@code radius}, or null (module off). */
-	private static @Nullable Component sectNameIn(BlockPos centre, int radius) {
-		DiplomasiService diplomacy = SekteApi.diplomasi();
-		Component best = null;
-		double bestD = (double) radius * radius;
-		for (String id : diplomacy.sects()) {
-			BlockPos gate = gateOf(diplomacy, id);
-			if (gate == null) {
-				continue;
-			}
-			double dx = gate.getX() - centre.getX();
-			double dz = gate.getZ() - centre.getZ();
-			double d = dx * dx + dz * dz;
-			if (d <= bestD) {
-				Component name = diplomacy.name(id);
-				if (name != null) {
-					best = name;
-					bestD = d;
-				}
-			}
-		}
-		return best;
 	}
 
 	/** The domain containing {@code pos}, or null. */
@@ -170,11 +98,6 @@ public final class PetaDomains {
 			list.add(d);
 		}
 		return list;
-	}
-
-	/** A one-glyph seal for a rival group (the first letter of its id, upper case). */
-	private static String seal(String id) {
-		return id == null || id.isEmpty() ? "?" : id.substring(0, 1).toUpperCase(java.util.Locale.ROOT);
 	}
 
 	private PetaDomains() {

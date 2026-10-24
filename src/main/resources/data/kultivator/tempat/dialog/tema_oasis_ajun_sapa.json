@@ -1,0 +1,114 @@
+{
+  "pembicara": [
+    "tokoh:ajun"
+  ],
+  "prioritas": 10,
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_anak",
+      "suara": "tempat.child_play",
+      "pilihan": [
+        {
+          "ke": "angin"
+        },
+        {
+          "ke": "baca"
+        },
+        {
+          "syarat": [
+            "punya kultivator:dagang/kurma_emas"
+          ],
+          "akibat": [
+            "ambil kultivator:dagang/kurma_emas 1",
+            "klip tertawa"
+          ],
+          "ke": "kurma"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai",
+            "!bendera oasis.xie_ajun"
+          ],
+          "ke": "angin_bersih"
+        },
+        {
+          "syarat": [
+            "bendera oasis.xie_ajun"
+          ],
+          "ke": "jarak"
+        },
+        {
+          "syarat": [
+            "quest tema_oasis_mata_air selesai",
+            "bendera oasis.xie_bujuk"
+          ],
+          "ke": "kunjung_xie"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "angin",
+      "teks": "kabar",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "baca",
+      "gestur": "berlutut",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "angin_bersih",
+      "gestur": "tunjuk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "jarak",
+      "gestur": "sikap_tunduk",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kunjung_xie",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "kurma",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "mulai"
+        },
+        {}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "pembicara": [
+    "tokoh:dan_chen"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest tungku_pertama baru"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_angkuh",
+      "pilihan": [
+        {
+          "syarat": [
+            "nb_pita 5"
+          ],
+          "akibat": [
+            "bayar_pita 5",
+            "quest_mulai tungku_pertama"
+          ],
+          "ke": "terima",
+          "tampil": true,
+          "alasan": "kultivator.cerita.tungku_pertama_tawar.mulai.1.alasan"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "terima",
+      "gestur": "tunjuk"
+    }
+  ]
+}

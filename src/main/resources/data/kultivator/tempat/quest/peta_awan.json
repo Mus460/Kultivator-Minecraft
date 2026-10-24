@@ -1,0 +1,57 @@
+{
+  "pemberi": "tokoh:yun_fei",
+  "tempat": "dermaga",
+  "tahap": [
+    {
+      "id": "muat",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat_masuk": [
+        "beri cerita:muatan_awan"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera awan_langit"
+          ],
+          "ke": "langit"
+        }
+      ],
+      "ke": "kota"
+    },
+    {
+      "id": "langit",
+      "tujuan": [
+        "pergi sekte/istana_langit"
+      ],
+      "akibat": [
+        "ambil cerita:muatan_awan"
+      ],
+      "ke": "bayar",
+      "arah": "sekte/istana_langit"
+    },
+    {
+      "id": "kota",
+      "tujuan": [
+        "pergi kota/kota_kultivator"
+      ],
+      "akibat": [
+        "ambil cerita:muatan_awan"
+      ],
+      "ke": "bayar",
+      "arah": "kota/kota_kultivator"
+    },
+    {
+      "id": "bayar",
+      "tujuan": [
+        "bicara tokoh:yun_fei"
+      ],
+      "akibat": [
+        "beri_nb_pita 40",
+        "nama_baik 3",
+        "bendera awan_gratis"
+      ]
+    }
+  ]
+}

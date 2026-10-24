@@ -1,0 +1,41 @@
+{
+  "pembicara": [
+    "tokoh:tuan_wen"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "membaca",
+      "prop": "kitab",
+      "suara": "kotabesar.library_hush",
+      "pilihan": [
+        {
+          "ke": "perpus"
+        },
+        {
+          "ke": "gilda"
+        },
+        {
+          "ke": "kacamata"
+        }
+      ]
+    },
+    {
+      "id": "perpus",
+      "gestur": "cerita",
+      "prop": "kitab",
+      "akibat": [
+        "lore kota_besar.cendekia"
+      ]
+    },
+    {
+      "id": "gilda",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "kacamata",
+      "gestur": "tertawa"
+    }
+  ]
+}

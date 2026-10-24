@@ -1,0 +1,42 @@
+{
+  "pembicara": [
+    "peran:petani"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 50"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "mencangkul",
+      "prop": "cangkul",
+      "pilihan": [
+        {
+          "ke": "tanam"
+        },
+        {
+          "ke": "sekte"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "tanam",
+      "gestur": "bisik"
+    },
+    {
+      "id": "sekte",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    }
+  ]
+}

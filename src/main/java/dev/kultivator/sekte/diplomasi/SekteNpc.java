@@ -53,8 +53,6 @@ public final class SekteNpc {
 	/** The player hall this sect became a vassal of (after its master was defeated), or null. */
 	@Nullable UUID tuan;
 	int ketuaKalah;
-	/** The Dunia rival group it is aligned with ({@code DuniaApi.rivals()}), or "". */
-	String rivalLink = "";
 	/** The NPC sect it feuds with (index), -1 none; and until which day. */
 	int musuhNpc = -1;
 	long musuhSampai;
@@ -89,6 +87,14 @@ public final class SekteNpc {
 
 	public String id() {
 		return id;
+	}
+
+	/**
+	 * The Saingan rival group that is this sect's travelling band (T12: one list, so sect {@code s<i>} always walks with
+	 * group {@code g<i>}; nothing to link or store).
+	 */
+	public String rivalLink() {
+		return DaftarSekte.rivalId(index);
 	}
 
 	public int index() {
@@ -187,7 +193,6 @@ public final class SekteNpc {
 			t.putString("tuan", tuan.toString());
 		}
 		t.putInt("kalah", ketuaKalah);
-		t.putString("rival", rivalLink);
 		t.putInt("musuh", musuhNpc);
 		t.putLong("musuh_sampai", musuhSampai);
 		ListTag list = new ListTag();
@@ -225,7 +230,6 @@ public final class SekteNpc {
 			}
 		}
 		s.ketuaKalah = t.getIntOr("kalah", 0);
-		s.rivalLink = t.getStringOr("rival", "");
 		s.musuhNpc = t.getIntOr("musuh", -1);
 		s.musuhSampai = t.getLongOr("musuh_sampai", 0L);
 		ListTag list = t.getListOrEmpty("pembelot");

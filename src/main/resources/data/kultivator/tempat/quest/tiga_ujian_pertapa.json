@@ -1,0 +1,35 @@
+{
+  "pemberi": "peran:pertapa",
+  "tempat": "gua_pertapa",
+  "tahap": [
+    {
+      "id": "herba",
+      "arah": "gua/pertapa"
+    },
+    {
+      "id": "meditasi",
+      "tujuan": [
+        "ujian pertapa:meditasi"
+      ],
+      "arah": "gua/pertapa"
+    },
+    {
+      "id": "koan",
+      "arah": "gua/pertapa"
+    },
+    {
+      "id": "lulus",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "gelar murid_pertapa",
+        "beri cerita:tanda_pertapa",
+        "bendera pertapa_lulus",
+        "efek minecraft:luck 6000 0",
+        "suara tempat.hermit_koan"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

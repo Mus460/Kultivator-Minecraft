@@ -1,0 +1,58 @@
+{
+  "type": "kultivator:tata_letak",
+  "biomes": "#minecraft:is_overworld",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  },
+  "rencana": "kota_tema_air",
+  "distrik": "pasar_kanal",
+  "lot": [
+    {
+      "dx": -48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/pasar_kanal/pasar_air_barat",
+      "putar": 0
+    },
+    {
+      "dx": -48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/pasar_kanal/rumah_uang",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/pasar_kanal/pasar_air_timur",
+      "putar": 0
+    },
+    {
+      "dx": 0,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/pasar_kanal/rumah_makan",
+      "putar": 0
+    },
+    {
+      "dx": 48,
+      "dz": -48,
+      "pool": "kultivator:kota_tema/air/tembok/pasar_kanal_timur0",
+      "putar": 0
+    },
+    {
+      "dx": 48,
+      "dz": 0,
+      "pool": "kultivator:kota_tema/air/tembok/pasar_kanal_timur1",
+      "putar": 0
+    }
+  ],
+  "gaya": [
+    {
+      "biomes": "minecraft:cherry_grove",
+      "akhiran": "sakura"
+    }
+  ]
+}

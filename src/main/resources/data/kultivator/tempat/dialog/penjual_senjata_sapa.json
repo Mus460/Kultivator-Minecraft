@@ -1,0 +1,46 @@
+{
+  "pembicara": [
+    "peran:pedagang_senjata"
+  ],
+  "prioritas": -2,
+  "syarat": [
+    "acak 55"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "seru_dagang",
+      "pilihan": [
+        {
+          "syarat": [
+            "!pita 2"
+          ],
+          "ke": "saran_rendah"
+        },
+        {
+          "syarat": [
+            "pita 2"
+          ],
+          "ke": "saran_tinggi"
+        },
+        {
+          "ke": "karat"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "saran_rendah",
+      "gestur": "bicara_tangan"
+    },
+    {
+      "id": "saran_tinggi",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "karat",
+      "gestur": "tertawa"
+    }
+  ]
+}

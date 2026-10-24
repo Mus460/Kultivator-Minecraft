@@ -1,0 +1,52 @@
+{
+  "pemberi": "tokoh:dan_chen",
+  "tempat": "makam",
+  "tahap": [
+    {
+      "id": "makam",
+      "tujuan": [
+        "pergi gua/makam"
+      ],
+      "akibat": [
+        "beri cerita:halaman_resep_kuno"
+      ],
+      "arah": "gua/makam"
+    },
+    {
+      "id": "pilih",
+      "cabang": [
+        {
+          "syarat": [
+            "bendera resep_simpan"
+          ],
+          "ke": "simpan"
+        }
+      ],
+      "ke": "serah"
+    },
+    {
+      "id": "serah",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "nama_baik 5",
+        "beri_nb_pita 40",
+        "bendera alkemis_resep_gilda",
+        "bendera alkemis_tingkat_plus"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "simpan",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "bendera resep_pribadi",
+        "nama_baik -2"
+      ],
+      "ke": "selesai"
+    }
+  ]
+}

@@ -95,7 +95,37 @@ public final class DuniaCommands {
 			"laut penglai", "laut pusaran cari",
 			"kapal beri <perahu|sekte|bahtera>", "kapal panggil", "kapal bahan_bakar <menit>", "kapal lompat <x> <z>", "kapal bajak",
 			"kapal rusak", "kapal perbaiki", "kapal hapus",
-			"peta ungkap <radius>", "peta situs semua", "peta reset", "peta domain", "peta sampel");
+			"peta ungkap <radius>", "peta situs semua", "peta reset", "peta domain", "peta sampel",
+			// DESIGN 38.D.10 (38W owns the chip list; each module registers its own node)
+			"tempat rencana", "tempat cek", "tempat zona", "tempat kepadatan [radius]", "tempat ukur", "tempat lihat <folder/potongan>",
+			"tempat rusak", "tempat perbaiki", "tempat tagihan", "tempat takut", "tempat cetak", "tempat sitaan", "tempat gugus",
+			"kota_besar cari [indeks]", "kota_besar distrik <id>", "kota_besar lot", "kota_besar jam_malam [tutup|buka]",
+			"kota_besar hukum <poin>", "kota_besar sel", "kota_besar acara <acara> [mulai|akhir]", "kota_besar alur <bab>",
+			"kota_besar teleport <tujuan>", "kota_besar istana",
+			"ekonomi senjata <bentuk> <mutu>", "ekonomi pesanan selesai", "ekonomi lencana <1-9>", "ekonomi misi <pangkat>",
+			"ekonomi bank", "ekonomi lapak [hari]", "ekonomi kafilah [permintaan]", "ekonomi simulasi <pita> <hari>", "ekonomi simulasi semua <hari>", "ekonomi judi <n>",
+			"ekonomi kas", "ekonomi kurs", "ekonomi stok ulang", "ekonomi lelang [agung|kota]",
+			"hidup jadwal <npc>", "hidup jam <0-23>", "hidup klip <id> [npc]", "hidup klip semua", "hidup prop <id>", "hidup impostor",
+			"hidup saksi", "hidup bahaya", "hidup cuaca <hujan|badai|kabut|gerhana>",
+			"model pamer", "model prop", "model gear <peran>", "model wajah", "model senjata", "model festival",
+			"cerita dialog <id>", "cerita quest <id> [tahap]", "cerita bendera <id> [on|off]", "cerita rumor [tambah <templat>]", "cerita tokoh",
+			"kampung cari <ukuran> [gaya]", "kampung klan", "kampung panen", "kampung anak",
+			"kompleks cari <sekte>", "kompleks rotasi", "kompleks sikap <sekte> <sikap>",
+			"tempat_gua cari <jenis>", "tempat_gua ujian <warisan|cermin|pertapa> [tahap]", "tempat_gua penjaga", "tempat_gua tikus [n]",
+			"tempat_gua status",
+			"jalan cari", "jalan peta", "jalan cek", "jalan pos <jenis>",
+			"ui layar <id>", "ui skala <2|3|4>",
+			// DESIGN 38.T.13 (themed cities, 38TK)
+			"tema rencana [tema]", "tema putusan <tema>", "tema cari <tema> [indeks]", "tema distrik <tema> <id>", "tema lot", "tema cek",
+			"tema acara <tema> <acara> [mulai|akhir]", "tema kapal", "tema perahu", "tema lift [naik|turun|macet|pulih]", "tema unta",
+			"tema arena <peringkat>", "tema taruhan", "tema infami <0-100>", "tema gentar <0-100>", "tema buronan", "tema pemburu",
+			"tema dagang [harga|batas|jenuh]", "tema dagang simulasi <hari>", "tema kontrak [buat|selesai|gagal]", "tema alur <tema> <bab>",
+			"tema model", "tema fx <efek>", "tema kepadatan [radius]",
+			// DESIGN 40.6 (shared appearance "Sosok", 40I)
+			"penampilan galeri peran [halaman]", "penampilan galeri murid", "penampilan galeri jalan", "penampilan galeri usia <peran>",
+			"penampilan galeri dao", "penampilan galeri fisik", "penampilan acak [n]", "penampilan klip <id> [radius]", "penampilan klip semua",
+			"penampilan klip kelompok <kelompok>", "penampilan jalan", "penampilan wajah", "penampilan pegas", "penampilan murid <ubah>",
+			"penampilan pratinjau_benih <benih> <rupa>", "penampilan hapus");
 
 	private static final SuggestionProvider<CommandSourceStack> STRUCTURES = (ctx, builder) -> {
 		Registry<Structure> registry = ctx.getSource().getServer().registryAccess().lookupOrThrow(Registries.STRUCTURE);
@@ -103,7 +133,7 @@ public final class DuniaCommands {
 				.map(Identifier::getPath), builder);
 	};
 
-	private static final SuggestionProvider<CommandSourceStack> TEMPLATES = (ctx, builder) -> {
+	public static final SuggestionProvider<CommandSourceStack> TEMPLATES = (ctx, builder) -> {
 		List<String> paths = new ArrayList<>();
 		ctx.getSource().getServer().getResourceManager().listResources("structure",
 				id -> id.getNamespace().equals(Kultivator.MOD_ID) && id.getPath().endsWith(".nbt")).keySet()
@@ -304,6 +334,14 @@ public final class DuniaCommands {
 		ServerPlayer player = ctx.getSource().getPlayerOrException();
 		Net.send(player, new DuniaGhostPayload(0.0D, 0.0D, 0.0D, 0, new int[0]));
 		return 1;
+	}
+
+	/**
+	 * The ghost preview of template {@code path} ({@code <folder/piece>}) in front of the command's player (DESIGN 38:
+	 * {@code uji tempat lihat} uses it too). 0 when the template is missing.
+	 */
+	public static int lihat(CommandContext<CommandSourceStack> ctx, String path) throws CommandSyntaxException {
+		return ghost(ctx, path);
 	}
 
 	/** {@code uji struktur lihat <folder/piece>}: the template's blocks merged into boxes, drawn by the client. */

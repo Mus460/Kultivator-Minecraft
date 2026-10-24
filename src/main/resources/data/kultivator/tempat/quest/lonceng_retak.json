@@ -1,0 +1,33 @@
+{
+  "pemberi": "tokoh:jing_xin",
+  "tempat": "kuil",
+  "tahap": [
+    {
+      "id": "perunggu",
+      "tujuan": [
+        "antar minecraft:copper_ingot tokoh:jing_xin x16"
+      ]
+    },
+    {
+      "id": "tuang",
+      "tujuan": [
+        "tunggu 1"
+      ],
+      "akibat_masuk": [
+        "kabar lonceng_dituang"
+      ]
+    },
+    {
+      "id": "dentang",
+      "tujuan": [
+        "bicara tokoh:jing_xin"
+      ],
+      "akibat": [
+        "efek minecraft:luck 2400 0",
+        "nama_baik 4",
+        "suara kotabesar.temple_bell",
+        "kabar lonceng_pulih"
+      ]
+    }
+  ]
+}

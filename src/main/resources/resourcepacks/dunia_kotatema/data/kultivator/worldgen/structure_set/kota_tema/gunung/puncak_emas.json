@@ -1,0 +1,16 @@
+{
+  "placement": {
+    "type": "kultivator:rencana_tempat",
+    "salt": 380432,
+    "spacing": 256,
+    "separation": 0,
+    "rencana": "kota_tema_gunung",
+    "distrik": "puncak_emas"
+  },
+  "structures": [
+    {
+      "structure": "kultivator:kota_tema/gunung/puncak_emas",
+      "weight": 1
+    }
+  ]
+}

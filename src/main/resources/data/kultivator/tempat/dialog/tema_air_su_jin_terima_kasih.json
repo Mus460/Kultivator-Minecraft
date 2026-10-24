@@ -1,0 +1,61 @@
+{
+  "pembicara": [
+    "tokoh:su_jin"
+  ],
+  "prioritas": 20,
+  "syarat": [
+    "quest tema_air_benang selesai"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "hormat_dalam",
+      "pilihan": [
+        {
+          "ke": "jiner"
+        },
+        {
+          "syarat": [
+            "quest tema_air_benang hasil tenang"
+          ],
+          "ke": "hantu"
+        },
+        {
+          "ke": "merah"
+        },
+        {
+          "syarat": [
+            "quest tema_air_benang hasil sepi"
+          ],
+          "ke": "sepi"
+        },
+        {
+          "ke": "kabar"
+        },
+        {}
+      ]
+    },
+    {
+      "id": "hantu",
+      "gestur": "tatap_langit"
+    },
+    {
+      "id": "merah",
+      "gestur": "tunjuk"
+    },
+    {
+      "id": "sepi",
+      "gestur": "sikap_tangan_belakang"
+    },
+    {
+      "id": "kabar",
+      "teks": "kabar",
+      "gestur": "bisik"
+    },
+    {
+      "id": "jiner",
+      "gestur": "tertawa"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "pembicara": [
+    "tokoh:jue_yuan"
+  ],
+  "prioritas": 60,
+  "syarat": [
+    "quest tema_gunung_tali tahap berkat"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_doa",
+      "prop": "tongkat_cincin",
+      "suara": "kotabesar.temple_bell",
+      "pilihan": [
+        {
+          "ke": "upacara"
+        }
+      ]
+    },
+    {
+      "id": "upacara",
+      "gestur": "tatap_langit",
+      "akibat": [
+        "gunung_upacara",
+        "gunung_gelar",
+        "nama_baik 10",
+        "quest_maju tema_gunung_tali"
+      ]
+    }
+  ]
+}

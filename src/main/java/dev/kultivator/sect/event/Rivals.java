@@ -24,9 +24,11 @@ import org.jetbrains.annotations.Nullable;
  */
 final class Rivals {
 
-	/** Rival names (both languages) in {@code kultivator.sectevent.rival.<n>}, rival sects in {@code rival_sect.<n>}. */
+	/**
+	 * Rival names (both languages) in {@code kultivator.sectevent.rival.<n>}. The champions' sects are the NPC sects of the
+	 * one list (integration audit T12, {@code DaftarSekte}); there are no static sect names any more.
+	 */
 	public static final int NAME_COUNT = 24;
-	public static final int SECT_COUNT = 8;
 
 	/** A north-bank disciple at rank step {@code step}. */
 	static Bracket.Entrant rival(RandomSource random, int step) {
@@ -37,12 +39,7 @@ final class Rivals {
 				data.rank().step());
 	}
 
-	/** A rival sect's visiting champion at rank step {@code step}. */
-	static Bracket.Entrant champion(RandomSource random, int step, int sect) {
-		return champion(random, step, Component.translatable("kultivator.sectevent.rival_sect." + Math.floorMod(sect, SECT_COUNT)));
-	}
-
-	/** A champion of the named sect (T12: an NPC sect of Diplomasi the hall already met). */
+	/** A champion of the named sect (T12: an NPC sect of the one list, met by the hall when it met any). */
 	static Bracket.Entrant champion(RandomSource random, int step, Component sectName) {
 		DiscipleData data = body(random, step);
 		data.setComprehension(20.0D + random.nextInt(40));

@@ -1,0 +1,35 @@
+{
+  "pembicara": [
+    "tokoh:ou_ye"
+  ],
+  "prioritas": 30,
+  "syarat": [
+    "quest pedang_tanpa_nama baru",
+    "pita 1"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "sikap_lipat_tangan",
+      "pilihan": [
+        {
+          "ke": "usul"
+        }
+      ]
+    },
+    {
+      "id": "usul",
+      "gestur": "palu_landasan",
+      "prop": "palu",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_mulai pedang_tanpa_nama"
+          ]
+        },
+        {}
+      ]
+    }
+  ]
+}

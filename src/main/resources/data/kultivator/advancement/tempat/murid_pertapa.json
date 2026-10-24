@@ -1,0 +1,25 @@
+{
+  "parent": "kultivator:dunia/map_opened",
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kultivator.tempat.murid_pertapa.description"
+    },
+    "icon": {
+      "id": "minecraft:bamboo"
+    },
+    "title": {
+      "translate": "advancement.kultivator.tempat.murid_pertapa.title"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

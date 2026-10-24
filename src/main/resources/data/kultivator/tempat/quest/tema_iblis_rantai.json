@@ -1,0 +1,217 @@
+{
+  "pemberi": "tokoh:ye_wuhen",
+  "tempat": "tema_iblis",
+  "tahap": [
+    {
+      "id": "peringatan",
+      "tujuan": [
+        "tanda iblis_peringatan"
+      ],
+      "akibat": [
+        "gentar 2"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "kandang",
+      "arah": "kota_tema/iblis"
+    },
+    {
+      "id": "kandang",
+      "akibat_masuk": [
+        "iblis_afu pastikan"
+      ],
+      "tujuan": [
+        "tanda iblis_afu_temu"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "tebus_afu"
+    },
+    {
+      "id": "tebus_afu",
+      "tujuan": [
+        "iblis_afu"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "bendera iblis_afu_abai"
+          ],
+          "ke": "minyak"
+        }
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "minyak"
+    },
+    {
+      "id": "antar_afu",
+      "tujuan": [
+        "iblis_pulang a_fu"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "minyak",
+      "arah": "kampung/"
+    },
+    {
+      "id": "minyak",
+      "tujuan": [
+        "iblis_minyak"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "peta"
+    },
+    {
+      "id": "peta",
+      "tujuan": [
+        "punya kultivator:tema/peta_gerbang_rahasia"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "padam",
+      "arah": "kota_tema/pos_pemburu"
+    },
+    {
+      "id": "pilih",
+      "tujuan": [
+        "tanda iblis_peta_serah"
+      ],
+      "batas_hari": 6,
+      "gagal_ke": "padam",
+      "cabang": [
+        {
+          "syarat": [
+            "iblis_rute lurus"
+          ],
+          "ke": "serbu_lurus"
+        },
+        {
+          "syarat": [
+            "iblis_rute penebusan"
+          ],
+          "ke": "serbu_tebus"
+        },
+        {
+          "syarat": [
+            "iblis_rute darah"
+          ],
+          "ke": "serbu_darah"
+        }
+      ]
+    },
+    {
+      "id": "serbu_lurus",
+      "akibat_masuk": [
+        "iblis_serbu"
+      ],
+      "tujuan": [
+        "iblis_serbu tuas"
+      ],
+      "akibat": [
+        "infami -15 rantai_lurus"
+      ],
+      "ke": "istana",
+      "batas_hari": 6,
+      "gagal_ke": "padam"
+    },
+    {
+      "id": "serbu_tebus",
+      "akibat_masuk": [
+        "iblis_serbu"
+      ],
+      "tujuan": [
+        "iblis_serbu terowongan"
+      ],
+      "akibat": [
+        "infami -15 rantai_tebus"
+      ],
+      "ke": "istana",
+      "batas_hari": 6,
+      "gagal_ke": "padam"
+    },
+    {
+      "id": "serbu_darah",
+      "akibat_masuk": [
+        "iblis_serbu"
+      ],
+      "tujuan": [
+        "iblis_serbu han_mundur"
+      ],
+      "akibat": [
+        "infami 15 rantai_darah",
+        "gentar 20"
+      ],
+      "ke": "jamuan",
+      "batas_hari": 6,
+      "gagal_ke": "padam"
+    },
+    {
+      "id": "istana",
+      "tujuan": [
+        "iblis_xue kalah"
+      ],
+      "akibat": [
+        "iblis_hadiah kipas"
+      ],
+      "cabang": [
+        {
+          "syarat": [
+            "iblis_rute lurus"
+          ],
+          "ke": "akhir_lurus"
+        }
+      ],
+      "ke": "akhir_tebus",
+      "batas_hari": 6,
+      "gagal_ke": "padam"
+    },
+    {
+      "id": "jamuan",
+      "tujuan": [
+        "iblis_xue"
+      ],
+      "akibat": [
+        "iblis_hadiah kitab"
+      ],
+      "ke": "akhir_darah",
+      "batas_hari": 6,
+      "gagal_ke": "padam"
+    },
+    {
+      "id": "akhir_lurus",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "iblis_akhir lurus"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "akhir_tebus",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "iblis_akhir penebusan"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "akhir_darah",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "iblis_akhir darah"
+      ],
+      "ke": "selesai"
+    },
+    {
+      "id": "padam",
+      "tujuan": [
+        "hari 0"
+      ],
+      "akibat": [
+        "kabar tema_iblis_padam"
+      ],
+      "ke": "gagal"
+    }
+  ]
+}

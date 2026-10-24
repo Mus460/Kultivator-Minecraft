@@ -1,0 +1,54 @@
+{
+  "pembicara": [
+    "tokoh:pei_wenzhi"
+  ],
+  "prioritas": 50,
+  "syarat": [
+    "quest tema_ziarah_ibu tahap cerita"
+  ],
+  "mulai": "mulai",
+  "simpul": [
+    {
+      "id": "mulai",
+      "gestur": "kaget",
+      "pilihan": [
+        {
+          "ke": "awan"
+        },
+        {
+          "ke": "jujur"
+        }
+      ]
+    },
+    {
+      "id": "awan",
+      "gestur": "tatap_langit",
+      "pilihan": [
+        {
+          "ke": "akhir"
+        }
+      ]
+    },
+    {
+      "id": "jujur",
+      "gestur": "tertawa",
+      "pilihan": [
+        {
+          "ke": "akhir"
+        }
+      ]
+    },
+    {
+      "id": "akhir",
+      "gestur": "hormat_dalam",
+      "prop": "dupa",
+      "pilihan": [
+        {
+          "akibat": [
+            "quest_maju tema_ziarah_ibu"
+          ]
+        }
+      ]
+    }
+  ]
+}

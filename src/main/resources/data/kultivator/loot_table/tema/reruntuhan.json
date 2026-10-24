@@ -1,0 +1,58 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:loot_table",
+              "value": "kultivator:tema/reruntuhan_1",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "position": {
+                    "x": {
+                      "min": -2600,
+                      "max": 2600
+                    },
+                    "z": {
+                      "min": -2600,
+                      "max": 2600
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "kultivator:tema/reruntuhan_2",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "position": {
+                    "x": {
+                      "min": -5200,
+                      "max": 5200
+                    },
+                    "z": {
+                      "min": -5200,
+                      "max": 5200
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "kultivator:tema/reruntuhan_3"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "kultivator:tema/reruntuhan"
+}
