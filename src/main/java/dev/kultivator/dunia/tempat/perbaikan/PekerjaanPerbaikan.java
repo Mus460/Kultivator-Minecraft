@@ -87,16 +87,17 @@ public final class PekerjaanPerbaikan {
 	// ================================================================== finding damage
 
 	/**
-	 * Records the difference at {@code pos}: the world holds {@code now} where the blueprint has {@code rec}; the repair
-	 * target is {@code target} (crop age 0, air for a foreign block). {@code be} is the slice's block-entity tag.
+	 * Records the damage at {@code pos}: the world holds {@code now} where the blueprint has {@code rec}; the repair
+	 * target is {@code target} (crop age 0, air for a foreign block); {@code why} its attributed cause (the scanner never
+	 * calls this for a change nothing damaged). {@code be} is the slice's block-entity tag.
 	 */
-	static void temukan(ServerLevel level, TempatRawat t, BlockPos pos, BlockState rec, BlockState now, BlockState target, @Nullable CompoundTag be) {
+	static void temukan(ServerLevel level, TempatRawat t, BlockPos pos, BlockState rec, BlockState now, BlockState target, @Nullable CompoundTag be,
+			LogAtribusi.Atribusi why) {
 		long key = pos.asLong();
 		if (diketahui(t.kunci, key) || KlaimPemain.diklaim(level, pos)) {
 			return;
 		}
 		long time = level.getGameTime();
-		LogAtribusi.Atribusi why = LogAtribusi.cari(t, pos, rec, now, time);
 		CompoundTag tag = be;
 		if (tag != null && tag.getBooleanOr("kultivator_jarahan", false)) {
 			// rule 5: a looted chest comes back empty; only monsters and raids leave the loot table in place

@@ -11,7 +11,8 @@ import dev.kultivator.sosok.PropId;
  * @param kunci        activity id ({@code tidur}, {@code kerja}, {@code makan}, {@code obrol}...; lang
  *                     {@code kultivator.hidup.kegiatan.<kunci>})
  * @param tujuan       the place it goes to: a titik type ({@code kursi}, {@code obrol}, {@code kerja:palu}, {@code lapak}...)
- *                     or one of {@link #KASUR}, {@link #KERJA}, {@link #RUMAH}, {@link #TETAP}, {@code @xz:<x>,<z>}
+ *                     or one of {@link #KASUR}, {@link #KERJA}, {@link #RUMAH}, {@link #TETAP}, {@link #KEDAI},
+ *                     {@link #DEPAN_LAPAK}, {@link #JALAN}, {@code @xz:<x>,<z>}
  * @param klip         clip at the goal ({@link GerakId}, 0 = stand)
  * @param varian       clip variant
  * @param propKanan    right-hand prop ({@link PropId}, 0 = the clip's own)
@@ -33,6 +34,15 @@ public record Kegiatan(String kunci, String tujuan, int klip, int varian, int pr
 	public static final String TETAP = "@tetap";
 	/** Prefix of a crowd point given in world coordinates ({@code @xz:120,-340}). */
 	public static final String XZ = "@xz:";
+	/** A seat (or a standing spot beside one) of the tavern, tea house or eating house: near a stove or tea kettle. */
+	public static final String KEDAI = "@kedai";
+	/**
+	 * Prefix of a shopper's spot in front of a market stall ({@code lapak} / {@code kerja:kios}), facing the vendor; the
+	 * number after it picks the stall ({@code @depan_lapak:17}), so a new number sends the shopper to the next stall.
+	 */
+	public static final String DEPAN_LAPAK = "@depan_lapak:";
+	/** Prefix of a street spot for a stroll ({@code @jalan:<n>}: a {@code jalan} node, else before a door or a chat corner). */
+	public static final String JALAN = "@jalan:";
 
 	/** Asleep or indoors: no body, no crowd entry. */
 	public static Kegiatan dalam(String kunci) {

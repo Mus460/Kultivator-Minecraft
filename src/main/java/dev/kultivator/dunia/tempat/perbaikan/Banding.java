@@ -57,6 +57,10 @@ public final class Banding {
 		if (!fire && rec.getBlock() == now.getBlock()) {
 			return null;
 		}
+		if (fire && apiAbadi(now, cetak.di(pos.below()))) {
+			// a hearth: soul fire, or fire on netherrack / magma, burns forever by design
+			return null;
+		}
 		if (!rec.getFluidState().isEmpty() && !rec.getFluidState().isSource()) {
 			return null;
 		}
@@ -170,6 +174,11 @@ public final class Banding {
 
 	private static boolean salju(BlockState state) {
 		return state.getBlock() instanceof SnowLayerBlock || state.is(Blocks.SNOW_BLOCK) || state.is(BlockTags.ICE) || state.is(Blocks.POWDER_SNOW);
+	}
+
+	private static boolean apiAbadi(BlockState fire, @Nullable BlockState under) {
+		return fire.is(Blocks.SOUL_FIRE) || under != null && (under.is(BlockTags.INFINIBURN_OVERWORLD) || under.is(BlockTags.INFINIBURN_NETHER)
+				|| under.is(BlockTags.INFINIBURN_END));
 	}
 
 	private static boolean air(BlockState state) {

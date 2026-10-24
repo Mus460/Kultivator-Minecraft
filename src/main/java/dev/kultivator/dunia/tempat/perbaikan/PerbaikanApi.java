@@ -88,6 +88,36 @@ public final class PerbaikanApi {
 		return pt == null ? 0 : pt.poinBantu;
 	}
 
+	// ================================================================== damage attribution hooks (mixins, 38.R.2)
+
+	/** A destroying explosion is about to break {@code blok}; {@code sumber} is its indirect source (may be null). */
+	public static void ledakan(net.minecraft.server.level.ServerLevel level, java.util.List<net.minecraft.core.BlockPos> blok,
+			net.minecraft.world.entity.@Nullable Entity sumber) {
+		try {
+			Perbaikan.onLedakan(level, blok, sumber);
+		} catch (RuntimeException exception) {
+			dev.kultivator.Kultivator.LOGGER.debug("Kultivator: explosion attribution failed", exception);
+		}
+	}
+
+	/** A non-player entity destroyed, placed or changed the block at {@code pos}. */
+	public static void ubahBlok(net.minecraft.server.level.ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.world.entity.Entity pelaku) {
+		try {
+			Perbaikan.onUbahBlok(level, pos, pelaku);
+		} catch (RuntimeException exception) {
+			dev.kultivator.Kultivator.LOGGER.debug("Kultivator: block change attribution failed", exception);
+		}
+	}
+
+	/** Fire is eating the block at {@code pos}. */
+	public static void terbakar(net.minecraft.server.level.ServerLevel level, net.minecraft.core.BlockPos pos) {
+		try {
+			Perbaikan.onTerbakar(level, pos);
+		} catch (RuntimeException exception) {
+			dev.kultivator.Kultivator.LOGGER.debug("Kultivator: fire attribution failed", exception);
+		}
+	}
+
 	private PerbaikanApi() {
 	}
 }

@@ -55,6 +55,8 @@ public final class TempatHuni {
 	private final Map<String, List<Titik>> titik = new HashMap<>();
 	private int titikN;
 	private long titikT = Long.MIN_VALUE;
+	/** Seats of the taverns, tea houses and eating houses (near a tea kettle, or a stove with four seats or more). */
+	private List<Titik> kursiKedai = List.of();
 	private final Map<Integer, Titik> kasurMilik = new HashMap<>();
 	private final Map<Integer, Titik> rumahMilik = new HashMap<>();
 	private final Map<String, Map<Integer, Titik>> kerjaMilik = new HashMap<>();
@@ -159,6 +161,7 @@ public final class TempatHuni {
 			list.sort(Comparator.comparingLong(t -> t.pos().asLong()));
 		}
 		titikN = all.size();
+		kursiKedai = cariKursiKedai();
 		kasurMilik.clear();
 		rumahMilik.clear();
 		kerjaMilik.clear();
@@ -176,6 +179,50 @@ public final class TempatHuni {
 			}
 			kerjaMilik.put(e.getKey(), owners);
 		}
+	}
+
+	/** Seat titik within 10 blocks of a tea kettle, or of a stove that has at least four seats round it (not a home kitchen). */
+	private List<Titik> cariKursiKedai() {
+		List<Titik> seats = new ArrayList<>();
+		for (String type : List.of("kursi", "meja_makan", "kursi_lantai")) {
+			seats.addAll(titik(type));
+		}
+		List<Titik> hearths = new ArrayList<>(titik("kerja:teko"));
+		for (Titik stove : titik("kerja:kuali")) {
+			int n = 0;
+			for (Titik seat : seats) {
+				if (dekatKedai(stove, seat) && ++n >= 4) {
+					hearths.add(stove);
+					break;
+				}
+			}
+		}
+		List<Titik> out = new ArrayList<>();
+		for (Titik seat : seats) {
+			for (Titik h : hearths) {
+				if (dekatKedai(h, seat)) {
+					out.add(seat);
+					break;
+				}
+			}
+		}
+		return out;
+	}
+
+	private static boolean dekatKedai(Titik a, Titik b) {
+		int dx = a.pos().getX() - b.pos().getX();
+		int dz = a.pos().getZ() - b.pos().getZ();
+		return dx * dx + dz * dz <= 100 && Math.abs(a.pos().getY() - b.pos().getY()) <= 4;
+	}
+
+	/** True when the place has a market stall. */
+	boolean adaPasar() {
+		return !titik("lapak").isEmpty() || !titik("kerja:kios").isEmpty();
+	}
+
+	/** True when the place has a tavern, tea house or eating house. */
+	boolean adaKedai() {
+		return !kursiKedai.isEmpty();
 	}
 
 	/** The slot hash of a titik in this place. */
@@ -348,6 +395,22 @@ public final class TempatHuni {
 		if (Kegiatan.RUMAH.equals(to)) {
 			return new Tujuan(rumahPos(p), Direction.SOUTH, "rumah", rumah(p) != null);
 		}
+		if (Kegiatan.KEDAI.equals(to)) {
+			if (!kursiKedai.isEmpty()) {
+				return pilih(level, p, kursiKedai, jam, kunciUntuk);
+			}
+			to = "kursi";
+		}
+		if (to.startsWith(Kegiatan.DEPAN_LAPAK)) {
+			Tujuan front = depanLapak(level, p, giliran(to, Kegiatan.DEPAN_LAPAK));
+			if (front != null) {
+				return front;
+			}
+			to = "obrol";
+		}
+		if (to.startsWith(Kegiatan.JALAN)) {
+			return jalanJalan(level, p, giliran(to, Kegiatan.JALAN));
+		}
 		if (Kegiatan.KERJA.equals(to)) {
 			Titik own = kerja(p);
 			if (own != null) {
@@ -369,11 +432,81 @@ public final class TempatHuni {
 				return new Tujuan(rumahPos(p), Direction.SOUTH, "rumah", false);
 			}
 		}
-		return pilih(p, bebasUntuk(list, p.peran()), jam, kunciUntuk);
+		return pilih(level, p, bebasUntuk(list, p.peran()), jam, kunciUntuk);
+	}
+
+	/** The turn number after a goal prefix ({@code @jalan:17} -> 17; 0 when missing). */
+	private static int giliran(String tujuan, String prefix) {
+		try {
+			return Integer.parseInt(tujuan.substring(prefix.length()));
+		} catch (NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	/**
+	 * A shopper's spot in front of one of the market stalls (the turn number picks the stall; it changes every twenty minutes): two blocks out from the
+	 * stall along its facing, shifted sideways by the resident so a crowd stands side by side, facing the vendor.
+	 */
+	private @Nullable Tujuan depanLapak(ServerLevel level, Penduduk p, int turn) {
+		List<Titik> stalls = new ArrayList<>(titik("lapak"));
+		stalls.addAll(titik("kerja:kios"));
+		if (stalls.isEmpty()) {
+			return null;
+		}
+		Titik stall = stalls.get((int) Math.floorMod(p.benih() + turn * 7L, (long) stalls.size()));
+		Direction face = stall.hadap();
+		Direction side = face.getClockWise();
+		int shift = Math.floorMod(p.id(), 3) - 1;
+		for (int out : new int[]{2, 3, 1}) {
+			BlockPos at = berdiri(level, stall.pos().relative(face, out).relative(side, shift));
+			if (at != null) {
+				return new Tujuan(at, face.getOpposite(), "lapak", false);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * A street spot across the place for a stroll (the turn number picks it; it changes every twenty minutes): a street node, else the free block
+	 * before a door, else a chat corner, a viewpoint or a play spot; home when the place has none of them.
+	 */
+	private Tujuan jalanJalan(ServerLevel level, Penduduk p, int turn) {
+		for (String type : List.of("jalan", "pintu", "obrol", "pandang", "main")) {
+			List<Titik> list = titik(type);
+			if (list.isEmpty()) {
+				continue;
+			}
+			Titik t = list.get((int) Math.floorMod(p.benih() * 31L + turn * 13L, (long) list.size()));
+			BlockPos at = type.equals("pintu") ? berdiri(level, t.pos().relative(t.hadap(), 2)) : t.pos();
+			if (at != null) {
+				return new Tujuan(at, t.hadap(), type, false);
+			}
+		}
+		return new Tujuan(rumahPos(p), Direction.SOUTH, "rumah", false);
+	}
+
+	/**
+	 * A block a person can stand in at {@code at} or one block up or down (sturdy floor, two free blocks, no fluid), or
+	 * null. Never searches far: a spot in a wall or over a drop is simply not used.
+	 */
+	static @Nullable BlockPos berdiri(ServerLevel level, BlockPos at) {
+		for (int dy : new int[]{0, 1, -1}) {
+			BlockPos feet = at.above(dy);
+			if (!level.isLoaded(feet)) {
+				return null;
+			}
+			BlockPos floor = feet.below();
+			if (level.getBlockState(floor).isFaceSturdy(level, floor, Direction.UP) && level.getBlockState(feet).getCollisionShape(level, feet).isEmpty()
+					&& level.getBlockState(feet.above()).getCollisionShape(level, feet.above()).isEmpty() && level.getFluidState(feet).isEmpty()) {
+				return feet;
+			}
+		}
+		return null;
 	}
 
 	/** One of the four titik of the list nearest the resident's home, by seed and hour, skipping locked ones. */
-	private Tujuan pilih(Penduduk p, List<Titik> list, int jam, boolean kunciUntuk) {
+	private Tujuan pilih(ServerLevel level, Penduduk p, List<Titik> list, int jam, boolean kunciUntuk) {
 		BlockPos home = rumahPos(p);
 		List<Titik> near = new ArrayList<>(list);
 		if (near.size() > 4) {
@@ -388,11 +521,26 @@ public final class TempatHuni {
 				return new Tujuan(t.pos(), t.hadap(), t.jenis(), true);
 			}
 		}
-		// all taken: queue three blocks in front of the first
+		// all taken: stand beside one of them (each latecomer at its own free block round the seats, facing in)
+		for (int i = 0; i < near.size(); i++) {
+			Titik t = near.get((start + i) % near.size());
+			for (int k = 0; k < 8; k++) {
+				int ring = (p.id() + k) % 8;
+				int r = 2 + (p.id() / 8 + k / 4) % 2;
+				BlockPos at = berdiri(level, t.pos().offset(SEKITAR[ring][0] * r, 0, SEKITAR[ring][1] * r));
+				if (at != null && !kunci.containsKey(at.asLong())) {
+					Direction face = Direction.fromYRot(Math.toDegrees(Math.atan2(-(t.pos().getX() - at.getX()), t.pos().getZ() - at.getZ())));
+					return new Tujuan(at, face, t.jenis(), false);
+				}
+			}
+		}
 		Titik t = near.get(start);
 		BlockPos queue = t.pos().relative(t.hadap(), 3);
 		return new Tujuan(queue, t.hadap().getOpposite(), t.jenis(), false);
 	}
+
+	/** The eight directions round a titik (x, z). */
+	private static final int[][] SEKITAR = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
 
 	private @Nullable Tujuan xz(ServerLevel level, Penduduk p, String text) {
 		String[] parts = text.split(",");
@@ -452,6 +600,13 @@ public final class TempatHuni {
 			acara = null;
 		}
 		Kegiatan k = Jadwal.kegiatan(p, jenis, waktu, cuaca, acara);
+		if (acara == null && keadaan.getOrDefault(p.id(), PendudukData.SEHAT) == PendudukData.SEHAT && !p.tamu()) {
+			// markets, taverns and streets full of people living their day (Jadwal.ramai)
+			Kegiatan ramai = Jadwal.ramai(p, Jadwal.saat(p, jenis, waktu), k, cuaca, adaPasar(), adaKedai());
+			if (ramai != null) {
+				k = ramai;
+			}
+		}
 		if (now < tutupSampai && p.peran().kelompok == NpcRole.Kelompok.PEDAGANG && (k.kunci().equals("pasar_malam") || k.kunci().equals("pasar_bulan"))) {
 			return TUTUP_MALAM;
 		}

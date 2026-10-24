@@ -40,7 +40,8 @@ public final class Cetak {
 	public final int maxY;
 	/** Bit {@code (z & 15) * 16 + (x & 15)} set = column recorded. */
 	public final long[] mask;
-	final BlockState[] palet;
+	/** Grows when the blueprint takes a natural change ({@link #terima}). */
+	BlockState[] palet;
 	final short[] isi;
 	/** Column bit to its rank among the set bits (-1 not masked). */
 	private final short[] rank;
@@ -139,6 +140,37 @@ public final class Cetak {
 	/** The block-entity tag of voxel {@code i}, or null. */
 	public @Nullable CompoundTag beVoxel(int i) {
 		return be.get(i);
+	}
+
+	/**
+	 * The blueprint takes the world's block at {@code pos} (a change nothing damaged: growth, weathering, gravity, a
+	 * popped torch), so it is never "repaired". A running fluid is taken as air. False when not recorded here.
+	 */
+	boolean terima(BlockPos pos, BlockState state) {
+		int i = indeks(pos.getX(), pos.getY(), pos.getZ());
+		if (i < 0 || isi[i] == TIDAK) {
+			return false;
+		}
+		BlockState s = !state.getFluidState().isEmpty() && !state.getFluidState().isSource() && state.getBlock() instanceof net.minecraft.world.level.block.LiquidBlock
+				? Blocks.AIR.defaultBlockState() : state;
+		int p = -1;
+		for (int n = 0; n < palet.length; n++) {
+			if (palet[n] == s) {
+				p = n;
+				break;
+			}
+		}
+		if (p < 0) {
+			if (palet.length >= MAKS_PALET) {
+				return false;
+			}
+			palet = java.util.Arrays.copyOf(palet, palet.length + 1);
+			p = palet.length - 1;
+			palet[p] = s;
+		}
+		isi[i] = (short) p;
+		be.remove(i);
+		return true;
 	}
 
 	// ================================================================== building

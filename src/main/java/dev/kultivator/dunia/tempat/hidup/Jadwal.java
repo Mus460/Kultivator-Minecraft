@@ -669,6 +669,126 @@ public final class Jadwal {
 		return kerja(p, s, "");
 	}
 
+	// ================================================================== town life (markets, taverns, streets)
+
+	/**
+	 * The town as the people live it between work and sleep (user request: "more people in the taverns and markets,
+	 * walking around or living their normal day"), laid over any round (built-in, themed or data file) by
+	 * {@link TempatHuni#kegiatan} when no event runs. Stall keepers, guards, workplace keepers and fixed lives keep their
+	 * day; for the others, by an hourly roll of their seed and the day:
+	 * <ul>
+	 *   <li>07-11 the morning market: elders and idlers (and one worker in ten on an errand) go stall to stall, looking at
+	 *       the goods, bargaining, a word with a neighbour, then carry the basket home;</li>
+	 *   <li>12 a third eat at the eating house, 18-19 a fifth; 13-16 tea, a story or a stroll; 17 the dinner shopping;</li>
+	 *   <li>20-22 the evening tavern: more than half of the idle evening goes to the tavern (wine, a story, listening), the
+	 *       tavern evening itself is always held at the tavern, and a few workers stay drinking past their bedtime;</li>
+	 *   <li>children run about the streets in the afternoon; rain, snow and storms send everyone under a roof.</li>
+	 * </ul>
+	 * Where the place has no stall ({@code pasar}) or no tavern ({@code kedai}) that part is skipped. A stroll changes its
+	 * goal every twenty minutes, so the street sees people walking from place to place. Null: keep {@code k}.
+	 */
+	public static @Nullable Kegiatan ramai(Penduduk p, Saat s, Kegiatan k, Cuaca c, boolean pasar, boolean kedai) {
+		NpcRole peran = p.peran();
+		NpcRole.Kelompok g = peran.kelompok;
+		if (g == NpcRole.Kelompok.PENJAGA || g == NpcRole.Kelompok.KHUSUS || peran == NpcRole.TAWANAN) {
+			return null;
+		}
+		int h = s.jam();
+		String kunci = k.kunci();
+		int dadu = dadu(p, s, h);
+		boolean bebas = !peran.stationary && g != NpcRole.Kelompok.PEDAGANG;
+		if (k.dalam()) {
+			// a few workers drink on past their bedtime
+			return kedai && bebas && h == 22 && g == NpcRole.Kelompok.PEKERJA && kunci.equals("tidur") && dadu < 20 ? KEDAI.ke(Kegiatan.KEDAI) : null;
+		}
+		if (kedai && kunci.equals("kedai")) {
+			return k.ke(Kegiatan.KEDAI);
+		}
+		if (!bebas) {
+			return null;
+		}
+		boolean basah = c.hujan() || c.salju() || c.badai();
+		boolean santai = switch (kunci) {
+			case "obrol", "serambi", "minum_teh", "bercerita", "musik", "lihat_kota", "catur", "beri_pakan", "hangat" -> true;
+			default -> false;
+		};
+		boolean anak = g == NpcRole.Kelompok.ANAK;
+		boolean tua = g == NpcRole.Kelompok.TETUA;
+		int gilir = dadu(p, s, 100 + h * 3 + s.menit() / 20);
+		if (kunci.equals("makan") && kedai && (h == 12 && dadu < 35 || (h == 18 || h == 19) && dadu < 20)) {
+			return MAKAN.ke(Kegiatan.KEDAI);
+		}
+		if (h >= 7 && h < 12 && pasar && !basah && !anak) {
+			int peluang = tua && !kunci.equals("tidur_siang") ? 55 : santai ? 60 : kunci.equals("kerja") ? 10 : 0;
+			if (h == 11) {
+				peluang /= 2;
+			}
+			if (dadu < peluang) {
+				return h >= 10 && s.menit() >= 40 ? PULANG_BELANJA : belanja(gilir);
+			}
+			return null;
+		}
+		if (h >= 13 && h < 17) {
+			if (anak && kunci.equals("main") && !basah && dadu < 25) {
+				return new Kegiatan("main", Kegiatan.JALAN + gilir, GerakId.MAIN_KEJAR, 0, 0, 0, 0, GerakId.LARI, false);
+			}
+			int peluang = santai ? 50 : tua ? 30 : kunci.equals("kerja") && g == NpcRole.Kelompok.PEKERJA ? 8 : 0;
+			if (dadu >= peluang) {
+				return null;
+			}
+			if (kedai && (basah || gilir < 45)) {
+				return tua && (gilir & 1) == 0 ? CERITA_KEDAI : TEH.ke(Kegiatan.KEDAI);
+			}
+			return basah ? null : pasar && gilir < 75 ? belanja(gilir) : jalanJalan(gilir);
+		}
+		if (h == 17 && santai && pasar && !basah && dadu < 40) {
+			return belanja(gilir);
+		}
+		if (h >= 18 && h < 23 && (santai || kunci.equals("meditasi") && g == NpcRole.Kelompok.KULTIVATOR && h < 21)) {
+			int peluang = santai ? (h >= 20 ? 55 : 45) : 25;
+			if (dadu >= peluang) {
+				return null;
+			}
+			if (kedai && (basah || gilir < 80)) {
+				if (tua && gilir < 30) {
+					return CERITA_KEDAI;
+				}
+				return gilir % 3 == 0 ? MENYIMAK : KEDAI.ke(Kegiatan.KEDAI);
+			}
+			return basah || h >= 21 ? null : jalanJalan(gilir);
+		}
+		return null;
+	}
+
+	/** An evening (or afternoon) story told at a tavern table. */
+	private static final Kegiatan CERITA_KEDAI = Kegiatan.di("bercerita", Kegiatan.KEDAI, GerakId.CERITA, 0);
+	/** Listening to the tavern's storyteller with a cup in hand, nodding along. */
+	private static final Kegiatan MENYIMAK = new Kegiatan("menyimak", Kegiatan.KEDAI, GerakId.ANGGUK_DENGAR, 0, PropId.CAWAN_ARAK, 0, 0, 0, false);
+	/** The basket carried home from the market. */
+	private static final Kegiatan PULANG_BELANJA = new Kegiatan("belanja", Kegiatan.RUMAH, GerakId.ANGKAT_BAWA, 0, PropId.KERANJANG, 0, 0,
+			GerakId.JALAN_BAWA, false);
+
+	/** Stall to stall: looking the goods over, bargaining, a word with a neighbour (the goal changes every 20 minutes). */
+	private static Kegiatan belanja(int gilir) {
+		return switch (gilir % 4) {
+			case 0, 1 -> new Kegiatan("belanja", Kegiatan.DEPAN_LAPAK + gilir, GerakId.LIHAT_BARANG, 0, 0, PropId.KERANJANG, 0, GerakId.JALAN_SANTAI, false);
+			case 2 -> new Kegiatan("belanja", Kegiatan.DEPAN_LAPAK + gilir, GerakId.TAWAR, 0, 0, PropId.KERANJANG, 0, GerakId.JALAN_SANTAI, false);
+			default -> new Kegiatan("pasar", "obrol", GerakId.BICARA_TANGAN, 0, 0, PropId.KERANJANG, 0, GerakId.JALAN_SANTAI, false);
+		};
+	}
+
+	/** A stroll down the street: looking about, a fan in hand now and then. */
+	private static Kegiatan jalanJalan(int gilir) {
+		return new Kegiatan("jalan_jalan", Kegiatan.JALAN + gilir, (gilir & 1) == 0 ? GerakId.MEMANDANG : GerakId.SIKAP_TANGAN_BELAKANG, 0, 0, 0, 0,
+				GerakId.JALAN_SANTAI, false);
+	}
+
+	/** A roll 0-99 of the resident for the day and {@code slot}. */
+	private static int dadu(Penduduk p, Saat s, int slot) {
+		long h = PendudukGen.mixSeed(p.benih() ^ s.hari() * 0x9E3779B97F4A7C15L ^ (slot + 1L) * 0xBF58476D1CE4E5B9L);
+		return (int) Math.floorMod(h, 100L);
+	}
+
 	// ================================================================== the weather (38.N.3 "Cuaca")
 
 	private static Kegiatan cuaca(Penduduk p, Saat s, Kegiatan k, Cuaca c) {
@@ -728,7 +848,7 @@ public final class Jadwal {
 
 	/** True for goals out in the open (rain falls on them). */
 	public static boolean luar(String tujuan) {
-		if (tujuan.startsWith(Kegiatan.XZ)) {
+		if (tujuan.startsWith(Kegiatan.XZ) || tujuan.startsWith(Kegiatan.DEPAN_LAPAK) || tujuan.startsWith(Kegiatan.JALAN)) {
 			return true;
 		}
 		return switch (tujuan) {

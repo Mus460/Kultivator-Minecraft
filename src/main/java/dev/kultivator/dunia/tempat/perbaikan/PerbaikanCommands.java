@@ -39,7 +39,8 @@ import java.util.UUID;
  *       follows within seconds;</li>
  *   <li>{@code perbaiki [cepat|batal]}: status, work everything off now, or drop the jobs;</li>
  *   <li>{@code tagihan [lihat|buat|bayar|tolak]}: the caller's bills, send the collector now, answer directly;</li>
- *   <li>{@code takut <0-100>}, {@code cetak [info|rekam|bandingkan]}, {@code sitaan}, {@code gugus}.</li>
+ *   <li>{@code takut <0-100>}, {@code cetak [info|rekam|bandingkan|periksa]}, {@code sitaan}, {@code gugus}; {@code cetak periksa}
+ *       counts real damage by cause, natural changes and state-only differences (checking false repairs).</li>
  * </ul>
  */
 public final class PerbaikanCommands {
@@ -80,7 +81,8 @@ public final class PerbaikanCommands {
 					.executes(ctx -> cetak(ctx.getSource(), "info"))
 					.then(Commands.literal("info").executes(ctx -> cetak(ctx.getSource(), "info")))
 					.then(Commands.literal("rekam").executes(ctx -> cetak(ctx.getSource(), "rekam")))
-					.then(Commands.literal("bandingkan").executes(ctx -> cetak(ctx.getSource(), "bandingkan"))));
+					.then(Commands.literal("bandingkan").executes(ctx -> cetak(ctx.getSource(), "bandingkan")))
+					.then(Commands.literal("periksa").executes(ctx -> cetak(ctx.getSource(), "periksa"))));
 			root.then(Commands.literal("sitaan").executes(ctx -> sitaan(ctx.getSource())));
 			root.then(Commands.literal("gugus").executes(ctx -> gugus(ctx.getSource())));
 		}
@@ -345,6 +347,9 @@ public final class PerbaikanCommands {
 				source.sendSuccess(() -> Component.translatable(U + "cetak_rekam", n), false);
 				return n;
 			}
+			case "periksa" -> {
+				return periksa(source, level, t);
+			}
 			case "bandingkan" -> {
 				int[] diff = bandingkan(level, t);
 				source.sendSuccess(() -> Component.translatable(U + "cetak_banding", diff[0], diff[1], diff[2]), false);
@@ -389,6 +394,87 @@ public final class PerbaikanCommands {
 			}
 		}
 		return new int[]{read, damage, other};
+	}
+
+	/**
+	 * {@code cetak periksa}: every difference between the blueprint and the world of the place, split into real damage by
+	 * cause (what a crew would repair), natural changes (the blueprint takes them on the next scan, no crew) and state-only
+	 * differences (doors, lamps, crops: never work), plus the open repair operations by cause. For checking false repairs.
+	 */
+	private static int periksa(CommandSourceStack source, ServerLevel level, TempatRawat t) {
+		Map<String, int[]> rusak = new java.util.TreeMap<>();
+		Map<String, BlockPos> contoh = new java.util.HashMap<>();
+		int read = 0;
+		int alami = 0;
+		int keadaan = 0;
+		long time = level.getGameTime();
+		BlockPos.MutableBlockPos at = new BlockPos.MutableBlockPos();
+		for (long key : t.chunks) {
+			LevelChunk chunk = level.getChunkSource().getChunkNow(ChunkPos.getX(key), ChunkPos.getZ(key));
+			Cetak c = chunk == null ? null : Rekam.cetak(t, key);
+			if (c == null) {
+				continue;
+			}
+			for (int i = 0; i < c.ukuran() && read < 400_000; i++) {
+				BlockState rec = c.voxel(i);
+				if (rec == null) {
+					continue;
+				}
+				read++;
+				c.posisi(i, at);
+				BlockState now = chunk.getBlockState(at);
+				if (now == rec) {
+					continue;
+				}
+				BlockPos pos = at.immutable();
+				if (Banding.rusak(rec, now, c, pos, t) == null) {
+					keadaan++;
+					continue;
+				}
+				LogAtribusi.Atribusi why = LogAtribusi.cari(t, pos, rec, now, time);
+				if (why == null) {
+					alami++;
+					continue;
+				}
+				rusak.computeIfAbsent(why.sebab(), k -> new int[1])[0]++;
+				contoh.putIfAbsent(why.sebab(), pos);
+			}
+		}
+		int total = 0;
+		for (int[] n : rusak.values()) {
+			total += n[0];
+		}
+		final int r0 = read;
+		final int r1 = total;
+		final int r2 = alami;
+		final int r3 = keadaan;
+		source.sendSuccess(() -> Component.translatable(U + "periksa", Penagihan.namaTempat(t), r0, r1, r2, r3, PindaiTempat.diterima())
+				.withStyle(ChatFormatting.GOLD), false);
+		for (Map.Entry<String, int[]> e : rusak.entrySet()) {
+			BlockPos p = contoh.get(e.getKey());
+			source.sendSuccess(() -> Component.translatable(U + "periksa_sebab", Component.translatable("kultivator.tempat_perbaikan.sebab." + e.getKey()),
+					e.getValue()[0], p.toShortString()), false);
+		}
+		Map<String, int[]> ops = new java.util.TreeMap<>();
+		int gugus = 0;
+		for (Gugus g : PerbaikanData.get(source.getServer()).gugus.values()) {
+			if (g.kunci != t.kunci) {
+				continue;
+			}
+			gugus++;
+			for (Gugus.Op op : g.ops) {
+				if (op.terbuka() || op.status == Gugus.MENGHALANGI) {
+					ops.computeIfAbsent(op.sebab, k -> new int[1])[0]++;
+				}
+			}
+		}
+		final int g0 = gugus;
+		source.sendSuccess(() -> Component.translatable(U + "periksa_kerja", g0), false);
+		for (Map.Entry<String, int[]> e : ops.entrySet()) {
+			source.sendSuccess(() -> Component.translatable(U + "periksa_kerja_sebab", Component.translatable("kultivator.tempat_perbaikan.sebab." + e.getKey()),
+					e.getValue()[0]), false);
+		}
+		return total;
 	}
 
 	private static int sitaan(CommandSourceStack source) {
